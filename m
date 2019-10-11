@@ -2,61 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A17C5D376A
-	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 04:11:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9A9BD3A29
+	for <lists+kvm@lfdr.de>; Fri, 11 Oct 2019 09:41:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbfJKCLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 10 Oct 2019 22:11:13 -0400
-Received: from mga03.intel.com ([134.134.136.65]:64396 "EHLO mga03.intel.com"
+        id S1727632AbfJKHlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 03:41:08 -0400
+Received: from mga04.intel.com ([192.55.52.120]:5858 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727369AbfJKCLM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 10 Oct 2019 22:11:12 -0400
+        id S1727068AbfJKHlH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 03:41:07 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Oct 2019 19:11:11 -0700
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Oct 2019 00:41:07 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,282,1566889200"; 
-   d="scan'208";a="224185722"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 10 Oct 2019 19:11:10 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
-        like.xu@linux.intel.com
-Subject: [PATCH] kvm/tools: update extension capability list for tools header
-Date:   Thu, 10 Oct 2019 18:05:59 +0800
-Message-Id: <20191010100559.27192-1-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.0
+X-IronPort-AV: E=Sophos;i="5.67,283,1566889200"; 
+   d="scan'208";a="194257161"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+  by fmsmga007.fm.intel.com with ESMTP; 11 Oct 2019 00:41:06 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        mtosatti@redhat.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, tao3.xu@intel.com,
+        jingqi.liu@intel.com
+Subject: [PATCH RESEND v6 0/2] x86: Enable user wait instructions
+Date:   Fri, 11 Oct 2019 15:41:01 +0800
+Message-Id: <20191011074103.30393-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although these two capabilities are not currently used in tools, the lack
-of declarations are bothering users and synchronize them as placeholders.
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- tools/include/uapi/linux/kvm.h | 2 ++
- 1 file changed, 2 insertions(+)
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 5e3f12d5359e..ebb1f3c49a19 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -996,6 +996,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
- #define KVM_CAP_PMU_EVENT_FILTER 173
-+#define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
-+#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
+
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it in kvm and provide a capability to
+enable it. Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+QEMU use "-overcommit cpu-pm=on, a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Changelog:
+v6:
+	Remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set.
+        (Paolo)
+
+Tao Xu (2):
+  x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
+  target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
+
+ target/i386/cpu.c     |  2 +-
+ target/i386/cpu.h     |  3 +++
+ target/i386/kvm.c     | 19 +++++++++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 4 files changed, 43 insertions(+), 1 deletion(-)
+
 -- 
-2.21.0
+2.20.1
 
