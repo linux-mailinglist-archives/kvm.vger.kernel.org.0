@@ -2,85 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4375BD4E46
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 10:26:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B238D4E51
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 10:47:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728927AbfJLI02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Oct 2019 04:26:28 -0400
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:55520 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728886AbfJLI02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Oct 2019 04:26:28 -0400
-Received: by mail-pf1-f201.google.com with SMTP id u21so6420811pfm.22
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 01:26:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=mE3OAeOE/eYuT5ARQUE6mDRHkwycMi2Fh29zXTPw2/A=;
-        b=kbHL3GIfkJgldeU+DhHMBH2y8H7A2yBAorSwuDzUCWdBceeDijoKWTqJx0SUtmgXBG
-         28PgdlKbGSc+PODN7x1v1GBxUqQ1x8HoVmi64/LNEf/eIKm44YURxqTeRodAVaj+xd4s
-         +BAFAw47eI1eAv69Q9s4QJjxHk+ZGKLVtuBfwm9FLwUmPAgp6ImKLrWn4eN+2hOq3waX
-         AoWZGSo3JiOCVkPF+uGM5T0OBTk61Q16pOOEVeslq+3dvQWykUbgw0JOMjEzdK+tcjz1
-         EyxkqMlWvlshGEobgM9LU1kN+52noICVpQjc2as2Id1ybH24RiQfmRA1bHhZrDJOMzAl
-         fa7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=mE3OAeOE/eYuT5ARQUE6mDRHkwycMi2Fh29zXTPw2/A=;
-        b=rEsQmXXXgxF8WvuxEaTl5C9kBk1OwlY7eM/F24HYaoipauw1/nSLTGj1+2HI/O0s8E
-         vIB2CcwK/S/Pa8ZEpVTYaNDMN3I+hPmmzF0XF5eujiZFtYAs8Jq7zTjSHW6WnqsvHL2k
-         Fo5yr+7Xm1qCNGTLQUhP9hecjkXmBhCU/isgokaoALtFceUOV+eviuA09cvac+nUO9jP
-         8bhLrZ/DgDjxJUv/jKkaG1oQrTxgcTMmvqq3IkY2/1K4kNy3scp3gFrENqkiETvLlj76
-         oy4YWTOjl2R74Lf4d9J1pHap0htu0r6Fv1nWghKk2TWs2jGvw/lvCSs+GbQTOtmmsQyj
-         r7HQ==
-X-Gm-Message-State: APjAAAVubdWolNlbPJ0Md/+N9CAj2DYyGKE5sHzHy19GxAxpI+hfx7Bq
-        wwrlk7IlsVnFZyprje3iDbxDUTJOaS4ZtXGtxx1D1scpA27S7xNepFcaQS39FZ8KfiKzVQwm9yO
-        nK3ak2Ew0KfRGJniuCWH2+ODsr2cwzTdzEWy+D7xO4fgXKG5Y5nHKaQ==
-X-Google-Smtp-Source: APXvYqzkv5IT+m8HeDRkDddUX/rYRW6cGmJw/DYW9p/YGkuLUwtd3wS6ODZp6QTbTyfqh1emcLZRxKHFag==
-X-Received: by 2002:a65:685a:: with SMTP id q26mr3471031pgt.32.1570868787641;
- Sat, 12 Oct 2019 01:26:27 -0700 (PDT)
-Date:   Sat, 12 Oct 2019 01:26:23 -0700
-In-Reply-To: <81990077-23b0-b150-1373-2bb5734d4f23@arm.com>
-Message-Id: <20191012082623.249497-1-morbo@google.com>
-Mime-Version: 1.0
-References: <81990077-23b0-b150-1373-2bb5734d4f23@arm.com>
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests PATCH 1/1] pci: use uint64_t for unsigned long values
-From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com
-Cc:     jmattson@google.com, Bill Wendling <morbo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1728927AbfJLIoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Oct 2019 04:44:12 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40120 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728812AbfJLImM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Oct 2019 04:42:12 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9C8d3I5005712;
+        Sat, 12 Oct 2019 08:40:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=eTLCc8eWlTUmLnYiMct7cflsemw5ED6SJHMEBd984nY=;
+ b=j30w7pPALDgopJ4pGWnCJS1/9jQn6QG03r+u5ObslfJMqn7zIKaKQnQS5BAu23EUZP2g
+ mf2muP0iGYXuxmFp6bjU8pidcKg9pSU6ec93baDYNfaOdtS2xewSK7WcCLZTkzJ50Lxw
+ GqKTU0guXmfG1HFZUQXTGeXskTFdqX1/IyDaVNUhVnk5AMry4eSJFq/TIVDGZUrsEGFu
+ PNdpOpR9xlxMjyNutSmxh00Btm84uEtkp5Dl33vEqicctzE0Lq+eKvAO8AjwuPAItQ0b
+ Nhy49fJQyAvsFomXvv7Ew3UMO8tjWzwHYNlhx/mYoZzAPIqUCDsZP8MuGCe8JgXVuzXR 1A== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2vk6sq0pb3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 12 Oct 2019 08:40:24 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9C8cGL9154374;
+        Sat, 12 Oct 2019 08:40:23 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2vk3xw8vhe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 12 Oct 2019 08:40:23 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9C8eIcl029967;
+        Sat, 12 Oct 2019 08:40:18 GMT
+Received: from [10.191.25.133] (/10.191.25.133)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sat, 12 Oct 2019 01:40:17 -0700
+Subject: Re: [PATCH v5 0/5] Add a unified parameter "nopvspin"
+To:     linux-kernel@vger.kernel.org
+Cc:     vkuznets@redhat.com, linux-hyperv@vger.kernel.org,
+        kvm@vger.kernel.org, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, pbonzini@redhat.com,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com,
+        sstabellini@kernel.org, peterz@infradead.org
+References: <1570439071-9814-1-git-send-email-zhenzhong.duan@oracle.com>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <d04aacc3-c816-94a6-052f-bf306ec23941@oracle.com>
+Date:   Sat, 12 Oct 2019 16:40:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <1570439071-9814-1-git-send-email-zhenzhong.duan@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9407 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910120081
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9407 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910120081
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "pci_bar_*" functions use 64-bit masks, but the results are assigned
-to 32-bit variables. Use 32-bit masks, since we're interested only in
-the least significant 4-bits.
+The last two patches are reviewed, will any KVM expert be willing to 
+review the first three patches?
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- lib/linux/pci_regs.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+They are all KVM related changes. Thanks
 
-diff --git a/lib/linux/pci_regs.h b/lib/linux/pci_regs.h
-index 1becea8..3bc2b92 100644
---- a/lib/linux/pci_regs.h
-+++ b/lib/linux/pci_regs.h
-@@ -96,8 +96,8 @@
- #define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
- #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
- #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
--#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
--#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
-+#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fU)
-+#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03U)
- /* bit 1 is reserved if address_space = 1 */
- 
- /* Header type 0 (normal devices) */
--- 
-2.23.0.700.g56cf767bdb-goog
+Zhenzhong
 
+On 2019/10/7 17:04, Zhenzhong Duan wrote:
+> There are cases folks want to disable spinlock optimization for
+> debug/test purpose. Xen and hyperv already have parameters "xen_nopvspin"
+> and "hv_nopvspin" to support that, but kvm doesn't.
+>
+> The first patch adds that feature to KVM guest with "nopvspin".
+>
+> For compatibility reason original parameters "xen_nopvspin" and
+> "hv_nopvspin" are retained and marked obsolete.
+>
+> v5:
+> PATCH1: new patch to revert a currently unnecessory commit,
+>          code is simpler a bit after that change.         [Boris Ostrovsky]
+> PATCH3: fold 'if' statement,add comments on virt_spin_lock_key,
+>          reorder with PATCH2 to better reflect dependency
+> PATCH4: fold 'if' statement, add Reviewed-by             [Boris Ostrovsky]
+> PATCH5: add Reviewed-by                                  [Michael Kelley]
+>
+> v4:
+> PATCH1: use variable name nopvspin instead of pvspin and
+>          defined it as __initdata, changed print message,
+>          updated patch description                     [Sean Christopherson]
+> PATCH2: remove Suggested-by, use "kvm-guest:" prefix  [Sean Christopherson]
+> PATCH3: make variable nopvsin and xen_pvspin coexist
+>          remove Reviewed-by due to code change         [Sean Christopherson]
+> PATCH4: make variable nopvsin and hv_pvspin coexist   [Sean Christopherson]
+>
+> v3:
+> PATCH2: Fix indentation
+>
+> v2:
+> PATCH1: pick the print code change into separate PATCH2,
+>          updated patch description             [Vitaly Kuznetsov]
+> PATCH2: new patch with print code change      [Vitaly Kuznetsov]
+> PATCH3: add Reviewed-by                       [Juergen Gross]
+>
+> Zhenzhong Duan (5):
+>    Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key
+>      get initialized"
+>    x86/kvm: Change print code to use pr_*() format
+>    x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+>    xen: Mark "xen_nopvspin" parameter obsolete
+>    x86/hyperv: Mark "hv_nopvspin" parameter obsolete
+>
+>   Documentation/admin-guide/kernel-parameters.txt | 14 +++++-
+>   arch/x86/hyperv/hv_spinlock.c                   |  4 ++
+>   arch/x86/include/asm/qspinlock.h                |  1 +
+>   arch/x86/kernel/kvm.c                           | 63 ++++++++++++++-----------
+>   arch/x86/xen/spinlock.c                         |  4 +-
+>   kernel/locking/qspinlock.c                      |  7 +++
+>   6 files changed, 62 insertions(+), 31 deletions(-)
+>
