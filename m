@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 001C6D535C
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 02:11:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 690E9D535D
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 02:11:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727751AbfJLX7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Oct 2019 19:59:09 -0400
-Received: from mail-vk1-f202.google.com ([209.85.221.202]:56601 "EHLO
-        mail-vk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727184AbfJLX7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Oct 2019 19:59:08 -0400
-Received: by mail-vk1-f202.google.com with SMTP id 63so5313824vkr.23
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 16:59:08 -0700 (PDT)
+        id S1727879AbfJLX7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Oct 2019 19:59:11 -0400
+Received: from mail-vk1-f201.google.com ([209.85.221.201]:56060 "EHLO
+        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727184AbfJLX7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Oct 2019 19:59:10 -0400
+Received: by mail-vk1-f201.google.com with SMTP id n79so5333049vkf.22
+        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 16:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=zSF4K4KobVK0wAbhJ8ImjLlW0FtYSy+9RfQnkWgPq2s=;
-        b=JY4TuIqeZpMKV3pfz3/t4yY+xRCx+eWa8WSue4ArrMk72WYBaO1fp+gl0b6VDp2U7g
-         lxpfbdZuglXQC6oeaW6NceC4WmoK7/7n/Et6+TAS8p1BaK7NYsXU8k6VcRgeBGsciVoe
-         RuL9F7fuNGVaHgPamm++o2PTFKPZdZsaYXe1hLOqRWz8mAo25ZJ0ExMRl6FhDJsJg5nf
-         +SJ7dlCclKNUxhHROUFOofUl+VA+rBKmyXZ02TFyf2ltaai8RyMzV3Rvva3aLdHWDZpI
-         sDq33SApopjENhm00j9RpJs9b1gCCBG+ZzxV9IYvyhlIpfOnPCUQPNm+iA9ojdX8Y67E
-         0VcA==
+        bh=1c3/4XvvM3pptgQ9eG052L3zXWS4WmiadVHCv3Es8bc=;
+        b=DEBgRx7nECy/kgccXF+o/TeCJhmrR18KbupJmrm0WeVJ/TgsM8SCpU8g6OW8w8XA99
+         9KDxec6AWz82o2WrJEBPqGofAG5TYPA7FDnxjqQLFhX+30alMK+T5gN7Pmehu0fsksoi
+         gwN5DVzqYfVa1TpmYDKRVE3C72b/IWLNPWOmsFkwpokWDcdCu+s17cXdXwhiWQmgImjI
+         RZ/Jv0OKjCYscLFep5qXuQ2+jgds3ICToa7gAbV/yT3xyFXr9EU+eayANSVoUElI9KBe
+         78e3mPZ/CPg7THmXvqPLl47ct/VS8cmW/Py3HhQIqKbTT0tuyCf7ciqdQy7mEOaT/G6n
+         n9EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=zSF4K4KobVK0wAbhJ8ImjLlW0FtYSy+9RfQnkWgPq2s=;
-        b=O3tw5wdVz2QVouqNmh+3ZeK1UViDtMeCX7WiREiKgGyKHY5ndXCdeBGYK5snJkJDqk
-         Fk093xT74V3R0Q+EjTodm2pLGJ9GYY6iPYDL84MT+mUeD3riaRT7tfcF7EWoMUsTaX1b
-         h0K6koXzqpSeogRzFBzL5w80op+PTW3Q/O/JLi8aU3FbFjCu3SzGkYDXBhN2UecZcPs+
-         BcVYBJRhxA5FpdpgAHDLx3wl7aCtMsZRZRiObdg7WmqWh9cIKQlI6khs61AOCuxBte6M
-         fpEwFPD8nrYpJ/oVvnyCosJrFbnc9l/EBGlvZAV6BydVTi4bpmjWO17bQU4COd8YI///
-         z06g==
-X-Gm-Message-State: APjAAAU7YTIT0UOP9+uEQHeJ3c1LSPyboM+QfiSi8crfmNVwxWW82N8s
-        KDnrz94WI5ckOxbULyFq6cYmewkHzLoVNNF7Fez1lZ1g5QhR8bpUw73y4q+JoV7JSWzn9vvyZLL
-        kXIq/9SCzpmM9O9h3QBuCg8Trs7nB9G5dqOnySn2scIbFfvSbrnh19Q==
-X-Google-Smtp-Source: APXvYqzqhjsc1ENu8a5PE/yUgA7ipRHZ22X+utfzNvFSEWpNwjCIYW8Ew2++2BLxJ8vwJAiJCS7M/ErWrQ==
-X-Received: by 2002:a67:c783:: with SMTP id t3mr9169465vsk.113.1570924747493;
- Sat, 12 Oct 2019 16:59:07 -0700 (PDT)
-Date:   Sat, 12 Oct 2019 16:58:58 -0700
+        bh=1c3/4XvvM3pptgQ9eG052L3zXWS4WmiadVHCv3Es8bc=;
+        b=n/fOMZvm7X2QL51uXcxVycNosSsFvM9VgKi0hK2xzkz2EW5GNPO2wu2l3u7yZWsT02
+         FFPWK/N9CCp+zQlKQss5S5zo7mdYYMYRFvRVvyNUlMj0A966or6VqGap5vQ+6ghC5iGK
+         bULpJcZmUlT5NkaemAuK1heNcN6vwY+WbnRGl/DAmJkRlh2+XqUkHFkggwZ8bJMsvVvc
+         vVud4US/YmEc1VK8m1pmTF4V+kqRFaTRretLYQogqVDzZdQI+oIUTUA+h0XQy7JT+X9b
+         ibkjBnCBAhkgDVIkXxnzT/rvJxlZsE79HSMYhg59JdgEjzx0o73VYcdjheAuzAgR2W3U
+         a/Sg==
+X-Gm-Message-State: APjAAAXbX6E2CH4PldmQfl1umutM98kG+mqnRkLUje10HznSDyKEipWZ
+        riLlGRASRzduY6e7XKDldZXyWYGHKD6OkqOk96FR3SJJHIaxNVxFiNKQVw0rdzx+p70ENbSmsuw
+        L4qbTsOf1Lf+O0SVc3Z9OGrkoX4BtRF5YKq5q5KrDshckBI5b+CQxOQ==
+X-Google-Smtp-Source: APXvYqzgv1wPyLSLizxdIHZ6gXAFeEiv6JDREnxmm4i5mbnZR+nBAG9gIMm6LbBpOXg2587kec6psuCdew==
+X-Received: by 2002:a67:fe47:: with SMTP id m7mr13628405vsr.100.1570924749963;
+ Sat, 12 Oct 2019 16:59:09 -0700 (PDT)
+Date:   Sat, 12 Oct 2019 16:58:59 -0700
 In-Reply-To: <20191012235859.238387-1-morbo@google.com>
-Message-Id: <20191012235859.238387-2-morbo@google.com>
+Message-Id: <20191012235859.238387-3-morbo@google.com>
 Mime-Version: 1.0
 References: <20191012235859.238387-1-morbo@google.com>
 X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests PATCH 1/2] x86: realmode: explicitly copy structure
- to avoid memcpy
+Subject: [kvm-unit-tests PATCH 2/2] x86: realmode: use inline asm to get stack pointer
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com
 Cc:     jmattson@google.com, Bill Wendling <morbo@google.com>
@@ -58,63 +57,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clang prefers to use a "mempcy" (or equivalent) to copy the "regs"
-structure. This doesn't work in 16-bit mode, as it will end up copying
-over half the number of bytes. GCC performs a field-by-field copy of the
-structure, so force clang to do the same thing.
+It's fragile to try to retrieve the stack pointer by taking the address
+of a variable on the stack. For instance, clang reserves more stack
+space than gcc here, indicating that the variable may not be at the
+start of the stack. Instead of relying upon this to work, retrieve the
+"%rbp" value, which contains the value of "%rsp" before stack
+allocation.
 
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/realmode.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ x86/realmode.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/x86/realmode.c b/x86/realmode.c
-index 303d093..cf45fd6 100644
+index cf45fd6..7c89dd1 100644
 --- a/x86/realmode.c
 +++ b/x86/realmode.c
-@@ -117,6 +117,19 @@ struct regs {
- 	u32 eip, eflags;
- };
+@@ -518,11 +518,12 @@ extern void retf_imm(void);
  
-+#define COPY_REG(name, dst, src) (dst).name = (src).name
-+#define COPY_REGS(dst, src)				\
-+	COPY_REG(eax, dst, src);			\
-+	COPY_REG(ebx, dst, src);			\
-+	COPY_REG(ecx, dst, src);			\
-+	COPY_REG(edx, dst, src);			\
-+	COPY_REG(esi, dst, src);			\
-+	COPY_REG(edi, dst, src);			\
-+	COPY_REG(esp, dst, src);			\
-+	COPY_REG(ebp, dst, src);			\
-+	COPY_REG(eip, dst, src);			\
-+	COPY_REG(eflags, dst, src)
+ static void test_call(void)
+ {
+-	u32 esp[16];
+ 	u32 addr;
+ 
+ 	inregs = (struct regs){ 0 };
+-	inregs.esp = (u32)esp;
 +
- struct table_descr {
- 	u16 limit;
- 	void *base;
-@@ -148,11 +161,11 @@ static void exec_in_big_real_mode(struct insn_desc *insn)
- 	extern u8 test_insn[], test_insn_end[];
++	// At this point the original stack pointer is in %ebp.
++	asm volatile ("mov %%ebp, %0" : "=rm"(inregs.esp));
  
- 	for (i = 0; i < insn->len; ++i)
--	    test_insn[i] = ((u8 *)(unsigned long)insn->ptr)[i];
-+		test_insn[i] = ((u8 *)(unsigned long)insn->ptr)[i];
- 	for (; i < test_insn_end - test_insn; ++i)
- 		test_insn[i] = 0x90; // nop
- 
--	save = inregs;
-+	COPY_REGS(save, inregs);
- 	asm volatile(
- 		"lgdtl %[gdt_descr] \n\t"
- 		"mov %%cr0, %[tmp] \n\t"
-@@ -196,7 +209,7 @@ static void exec_in_big_real_mode(struct insn_desc *insn)
- 		: [gdt_descr]"m"(gdt_descr), [bigseg]"r"((short)16)
- 		: "cc", "memory"
- 		);
--	outregs = save;
-+	COPY_REGS(outregs, save);
- }
- 
- #define R_AX 1
+ 	MK_INSN(call1, "mov $test_function, %eax \n\t"
+ 		       "call *%eax\n\t");
 -- 
 2.23.0.700.g56cf767bdb-goog
 
