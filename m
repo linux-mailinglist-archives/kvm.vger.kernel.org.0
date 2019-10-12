@@ -2,212 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B5E61D4BF5
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 03:54:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1782DD4C2F
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 04:42:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728753AbfJLByn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 21:54:43 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35817 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728799AbfJLByn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 21:54:43 -0400
-Received: by mail-pl1-f195.google.com with SMTP id c3so5271487plo.2;
-        Fri, 11 Oct 2019 18:54:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=aemc2m7M6ERZ7jrXLh5L9TwhoO5qe1NcLVg2O2xGzms=;
-        b=c0Q56pUQNuHfYFlH1dxjzdT7SxiwdTHGLptUhAbocoGdwoDpGT9gLO12lJxV32jJWQ
-         n3lhgOG6SYo4cZ13HvHpXNJy+KbvYTYm4VcS6Gfbs8xN+GPDHYWMLgxnBVQZaOCMAsxb
-         oa7nsWvN//+pGWAc2rnOdaQC1mGHeoJyx2PPDG34H1BcYfr7hzlzfm/eNXRapUFFBtOm
-         ZYnW0pkO2mTZMUaaCWgZ/L0f4qZYQlL4ZrUqsR7rst5BXtN+tOY4PeslsAXJPGTwF8PP
-         4XQ+PDJHHus/hCB9+vcVJP46uipbQlmcxCXPxxNbrlImzFoZjzwOJ7o4ll9MI41ZyOmc
-         49Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=aemc2m7M6ERZ7jrXLh5L9TwhoO5qe1NcLVg2O2xGzms=;
-        b=WLjDibv63avtI3xpHfyyuqSGROVHLBE4YfE7KixbxgrCPrtUD+Dy2rjJUjgRnE5bhg
-         vUkbFmuthprpiK3CEfZx7ojygN0RfiGnQgbUGV2+92UP1A9rLJUbJkdI964m2Juo3avn
-         pJzyl5RLCWOOH3wsmc6NxoK7M8HH3Z9zvoYzhhEzbJS8Cxm2PHspVWayuWZkYmysS+g6
-         7i9M0dP8Yh4EvMmWivSjSWioPhZFayuKFvdgZ+1FUNq8x2Y8BQCimEWaTs3hQw+4VRfs
-         D7sNQj64A/hFfewQei8cd67luJ7GXDhsEPk6CT7Niar2ad0QbKpa1dw80rqAnrO1QO7m
-         BfmQ==
-X-Gm-Message-State: APjAAAVcYiH1R++cikkKoLjeJATHMzEYqTqvy52IB2Q+qknwIgxSv7tS
-        8X+1e6dna0Wx7u4nwzfuuz8=
-X-Google-Smtp-Source: APXvYqx8Mkqd/4+atQ6tFJLNh/jn99EK79gsh6NgLlpBUrnjSQj3sQ7NN5aw89F/6l4LFb/uf+Wk/g==
-X-Received: by 2002:a17:902:9349:: with SMTP id g9mr17036858plp.75.1570845282286;
-        Fri, 11 Oct 2019 18:54:42 -0700 (PDT)
-Received: from localhost.localdomain (KD124211219252.ppp-bb.dion.ne.jp. [124.211.219.252])
-        by smtp.gmail.com with ESMTPSA id e127sm10992187pfe.37.2019.10.11.18.54.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Oct 2019 18:54:41 -0700 (PDT)
-From:   prashantbhole.linux@gmail.com
-To:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     Prashant Bhole <prashantbhole.linux@gmail.com>,
-        David Ahern <dsahern@gmail.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH net-next 3/3] tuntap: remove usage of ptr ring in vhost_net
-Date:   Sat, 12 Oct 2019 10:53:57 +0900
-Message-Id: <20191012015357.1775-4-prashantbhole.linux@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191012015357.1775-1-prashantbhole.linux@gmail.com>
-References: <20191012015357.1775-1-prashantbhole.linux@gmail.com>
+        id S1728111AbfJLCme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 22:42:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54208 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727072AbfJLCme (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 22:42:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 010492BF02;
+        Sat, 12 Oct 2019 02:42:34 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 94E6D5C1B2;
+        Sat, 12 Oct 2019 02:42:33 +0000 (UTC)
+Date:   Fri, 11 Oct 2019 23:42:32 -0300
+From:   Eduardo Habkost <ehabkost@redhat.com>
+To:     Luwei Kang <luwei.kang@intel.com>
+Cc:     pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 2/2] target/i386: Add support for put/get PEBS registers
+Message-ID: <20191012024232.GA832@habkost.net>
+References: <1567056175-14275-1-git-send-email-luwei.kang@intel.com>
+ <1567056175-14275-2-git-send-email-luwei.kang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1567056175-14275-2-git-send-email-luwei.kang@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Sat, 12 Oct 2019 02:42:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Prashant Bhole <prashantbhole.linux@gmail.com>
+On Thu, Aug 29, 2019 at 01:22:55PM +0800, Luwei Kang wrote:
+> This patch add a new feature words for IA32_PERF_CAPABILITIES (RO)
+> register that serve to expose PEBS output Intel PT feature.
+> The registers relate with PEBS need to be set/get when PEBS output
+> Intel PT is supported in guest.
+> 
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 
-Remove usage of ptr ring of tuntap in vhost_net and remove the
-functions exported from tuntap drivers to get ptr ring.
+Sorry for taking so long to take a look at the series.
 
-Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
----
- drivers/net/tap.c   | 13 -------------
- drivers/net/tun.c   | 13 -------------
- drivers/vhost/net.c | 31 ++++---------------------------
- 3 files changed, 4 insertions(+), 53 deletions(-)
+What's the status of the kernel KVM patches for this?
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 3d0bf382dbbc..27ffd2210375 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1298,19 +1298,6 @@ struct socket *tap_get_socket(struct file *file)
- }
- EXPORT_SYMBOL_GPL(tap_get_socket);
- 
--struct ptr_ring *tap_get_ptr_ring(struct file *file)
--{
--	struct tap_queue *q;
--
--	if (file->f_op != &tap_fops)
--		return ERR_PTR(-EINVAL);
--	q = file->private_data;
--	if (!q)
--		return ERR_PTR(-EBADFD);
--	return &q->ring;
--}
--EXPORT_SYMBOL_GPL(tap_get_ptr_ring);
--
- int tap_queue_resize(struct tap_dev *tap)
- {
- 	struct net_device *dev = tap->dev;
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 7d4886f53389..75893921411b 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -3750,19 +3750,6 @@ struct socket *tun_get_socket(struct file *file)
- }
- EXPORT_SYMBOL_GPL(tun_get_socket);
- 
--struct ptr_ring *tun_get_tx_ring(struct file *file)
--{
--	struct tun_file *tfile;
--
--	if (file->f_op != &tun_fops)
--		return ERR_PTR(-EINVAL);
--	tfile = file->private_data;
--	if (!tfile)
--		return ERR_PTR(-EBADFD);
--	return &tfile->tx_ring;
--}
--EXPORT_SYMBOL_GPL(tun_get_tx_ring);
--
- module_init(tun_init);
- module_exit(tun_cleanup);
- MODULE_DESCRIPTION(DRV_DESCRIPTION);
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 5e5c1063606c..0d302efadf44 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -122,7 +122,6 @@ struct vhost_net_virtqueue {
- 	/* Reference counting for outstanding ubufs.
- 	 * Protected by vq mutex. Writers must also take device mutex. */
- 	struct vhost_net_ubuf_ref *ubufs;
--	struct ptr_ring *rx_ring;
- 	struct vhost_net_buf rxq;
- 	/* Batched XDP buffs */
- 	struct xdp_buff *xdp;
-@@ -997,8 +996,9 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
- 	int len = 0;
- 	unsigned long flags;
- 
--	if (rvq->rx_ring)
--		return vhost_net_buf_peek(rvq);
-+	len = vhost_net_buf_peek(rvq);
-+	if (len)
-+		return len;
- 
- 	spin_lock_irqsave(&sk->sk_receive_queue.lock, flags);
- 	head = skb_peek(&sk->sk_receive_queue);
-@@ -1189,7 +1189,7 @@ static void handle_rx(struct vhost_net *net)
- 			goto out;
- 		}
- 		busyloop_intr = false;
--		if (nvq->rx_ring) {
-+		if (!vhost_net_buf_is_empty(&nvq->rxq)) {
- 			ctl.cmd = TUN_CMD_PACKET;
- 			ctl.ptr = vhost_net_buf_consume(&nvq->rxq);
- 			msg.msg_control = &ctl;
-@@ -1345,7 +1345,6 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 		n->vqs[i].batched_xdp = 0;
- 		n->vqs[i].vhost_hlen = 0;
- 		n->vqs[i].sock_hlen = 0;
--		n->vqs[i].rx_ring = NULL;
- 		vhost_net_buf_init(&n->vqs[i].rxq);
- 	}
- 	vhost_dev_init(dev, vqs, VHOST_NET_VQ_MAX,
-@@ -1374,7 +1373,6 @@ static struct socket *vhost_net_stop_vq(struct vhost_net *n,
- 	vhost_net_disable_vq(n, vq);
- 	vq->private_data = NULL;
- 	vhost_net_buf_unproduce(nvq);
--	nvq->rx_ring = NULL;
- 	mutex_unlock(&vq->mutex);
- 	return sock;
- }
-@@ -1470,25 +1468,6 @@ static struct socket *get_raw_socket(int fd)
- 	return ERR_PTR(r);
- }
- 
--static struct ptr_ring *get_tap_ptr_ring(int fd)
--{
--	struct ptr_ring *ring;
--	struct file *file = fget(fd);
--
--	if (!file)
--		return NULL;
--	ring = tun_get_tx_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = tap_get_ptr_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = NULL;
--out:
--	fput(file);
--	return ring;
--}
--
- static struct socket *get_tap_socket(int fd)
- {
- 	struct file *file = fget(fd);
-@@ -1572,8 +1551,6 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 		r = vhost_net_enable_vq(n, vq);
- 		if (r)
- 			goto err_used;
--		if (index == VHOST_NET_VQ_RX)
--			nvq->rx_ring = get_tap_ptr_ring(fd);
- 
- 		oldubufs = nvq->ubufs;
- 		nvq->ubufs = ubufs;
+> ---
+>  target/i386/cpu.c | 20 ++++++++++++++++++++
+>  target/i386/cpu.h |  4 ++++
+>  target/i386/kvm.c | 36 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 60 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 9e0bac3..7fe34c0 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1244,6 +1244,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              },
+>          },
+>      },
+> +    [FEAT_PERF_CAPABILITIES] = {
+> +        .type = MSR_FEATURE_WORD,
+> +        .feat_names = {
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            "pebs-output-pt", NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +            NULL, NULL, NULL, NULL,
+> +        },
+> +        .msr = {
+> +            .index = MSR_IA32_PERF_CAPABILITIES,
+> +            .cpuid_dep = {
+> +                FEAT_1_ECX,
+> +                CPUID_EXT_PDCM,
+> +            },
+> +        },
+> +    },
+>  };
+>  
+>  typedef struct X86RegisterInfo32 {
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index d7cec36..0904004 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -347,6 +347,7 @@ typedef enum X86Seg {
+>  #define MSR_IA32_PRED_CMD               0x49
+>  #define MSR_IA32_CORE_CAPABILITY        0xcf
+>  #define MSR_IA32_ARCH_CAPABILITIES      0x10a
+> +#define MSR_IA32_PERF_CAPABILITIES      0x345
+>  #define MSR_IA32_TSCDEADLINE            0x6e0
+>  
+>  #define FEATURE_CONTROL_LOCKED                    (1<<0)
+> @@ -503,6 +504,7 @@ typedef enum FeatureWord {
+>      FEAT_XSAVE_COMP_HI, /* CPUID[EAX=0xd,ECX=0].EDX */
+>      FEAT_ARCH_CAPABILITIES,
+>      FEAT_CORE_CAPABILITY,
+> +    FEAT_PERF_CAPABILITIES,
+>      FEATURE_WORDS,
+>  } FeatureWord;
+>  
+> @@ -754,6 +756,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  
+>  #define MSR_CORE_CAP_SPLIT_LOCK_DETECT  (1U << 5)
+>  
+> +#define MSR_PERF_CAP_PEBS_VIA_PT        (1ULL << 16)
+> +
+>  /* Supported Hyper-V Enlightenments */
+>  #define HYPERV_FEAT_RELAXED             0
+>  #define HYPERV_FEAT_VAPIC               1
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 8023c67..c0dcc13 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2651,6 +2651,20 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>                  kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
+>                              env->msr_rtit_addrs[i]);
+>              }
+> +
+> +            if (env->features[FEAT_PERF_CAPABILITIES] &
+> +                                        MSR_PERF_CAP_PEBS_VIA_PT) {
+> +                kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE,
+> +                                env->msr_pebs_enable);
+> +                for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+> +                    kvm_msr_entry_add(cpu, MSR_RELOAD_FIXED_CTR0 + i,
+> +                                env->msr_reload_fixed_ctr[i]);
+> +                }
+> +                for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
+> +                    kvm_msr_entry_add(cpu, MSR_RELOAD_PMC0 + i,
+> +                                env->msr_reload_pmc[i]);
+> +                }
+> +            }
+>          }
+>  
+>          /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
+> @@ -2989,6 +3003,16 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          for (i = 0; i < addr_num; i++) {
+>              kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
+>          }
+> +
+> +        if (env->features[FEAT_PERF_CAPABILITIES] & MSR_PERF_CAP_PEBS_VIA_PT) {
+> +            kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE, 0);
+> +            for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+> +                kvm_msr_entry_add(cpu, MSR_RELOAD_FIXED_CTR0 + i, 0);
+> +            }
+> +            for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
+> +                kvm_msr_entry_add(cpu, MSR_RELOAD_PMC0 + i, 0);
+> +            }
+> +        }
+>      }
+>  
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
+> @@ -3268,6 +3292,18 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
+>              env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
+>              break;
+> +        case MSR_IA32_PEBS_ENABLE:
+> +            env->msr_pebs_enable = msrs[i].data;
+> +            break;
+> +        case MSR_RELOAD_FIXED_CTR0 ...
+> +                                MSR_RELOAD_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
+> +            env->msr_reload_fixed_ctr[index - MSR_RELOAD_FIXED_CTR0] =
+> +                                                                msrs[i].data;
+> +            break;
+> +        case MSR_RELOAD_PMC0 ...
+> +                                MSR_RELOAD_PMC0 + MAX_GP_COUNTERS - 1:
+> +            env->msr_reload_fixed_ctr[index - MSR_RELOAD_PMC0] = msrs[i].data;
+> +            break;
+>          }
+>      }
+>  
+> -- 
+> 1.8.3.1
+> 
+
 -- 
-2.21.0
-
+Eduardo
