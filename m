@@ -2,268 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02FE5D527A
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 22:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D803D531E
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 00:39:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729778AbfJLUli (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Oct 2019 16:41:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60490 "EHLO mx1.redhat.com"
+        id S1727602AbfJLWiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Oct 2019 18:38:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52192 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729432AbfJLUli (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Oct 2019 16:41:38 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        id S1727189AbfJLWiy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Oct 2019 18:38:54 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8B32919D381
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 20:41:37 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id n3so6329170wrt.9
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 13:41:37 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9673988309
+        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 22:38:54 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id m19so13693359qtm.13
+        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 15:38:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=JZaFkxctsbibUFj6Bxd+GJuTId3Jtu6GLUhdMt1F3Wo=;
-        b=hYXO5NSgo1pmbmXoerdI5B88JCwYfS3yFGugojwigQ/MrvYTfQSP98zk0CRjwG7p1a
-         KQP8OmwuAv9KmI+kIrewuuFT+ElunnI2ozObiuRpO0yvG7zbgv5AqSWHHKzYn+hx7Wgl
-         eW60TqDO9wcBHRWTzfuD1CUt6j4/3NvnYLkIrWltZuFkDwdwBgvsSJxLP9gePyTvVDC4
-         zABjhKaSzeJ9BxwN+0saUZuA4ftn+lB2L1+fpCczgSuH85go4K4juuVh38VQGOGrNRuK
-         dJB+PFF9rydtlKSnmLCYAUu4uwJG2AP6p5yTXIfn+YPfJ/ls1Zbud1FVkhb4aXF77wlZ
-         kusg==
-X-Gm-Message-State: APjAAAVYOBVZx7Le3IGUaYBXAhF6Ju8vK2CgO5U4LjeGtevjVCWExssh
-        oTcy0RwomnOt0bKuE9FfiUWs/UNvkamergzd0NGa4VvKr66T0juHJ06y6RfHB+LLHcv5CbxCFRC
-        YA8XnjFjJCIEs
-X-Received: by 2002:adf:8123:: with SMTP id 32mr19539077wrm.300.1570912896273;
-        Sat, 12 Oct 2019 13:41:36 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx/hxD3KXTjJMl1Pw2GVerYimRvfAMTY7X+pjGBb9FOLN0joa/A5jXnMGxtXzxdKd0aKlEjnw==
-X-Received: by 2002:adf:8123:: with SMTP id 32mr19539067wrm.300.1570912896036;
-        Sat, 12 Oct 2019 13:41:36 -0700 (PDT)
+        bh=S0RIwai/cYE64lyIc+A9F/PqKRzGBKYVkHbCBiipZNM=;
+        b=ePfM/N3xgq3FT/CqsNL/gXjeMfmMjpenqPk1/TjoUa987b28q+pWBW7FZ4tF1ZEzHA
+         zVhljPnragIie6kZ3ed0Q2bvVM7zYkrAmzkqH55V88HBOPlPHA6yEH5CX7DQ6P71+GcJ
+         Rhgr+DP0kAYekx4iaxVgPC8rSBtmLnPhaaLz/Vd8Kf/Ey1xSp21fTyKOgLSlnrjUJYWf
+         XNzrFeMnrjpMrNnbRXgejzhfleTKfo2jn6cYCHlF+r/tSkNwPc8oiMcXeyBnx/DseE6+
+         h8zejm18E2s2l9+5JhuNJ0fP6f+GdqjclIzJSdr0K90ZxDbmXXzj1EYrBw7j91pKZS+z
+         OefA==
+X-Gm-Message-State: APjAAAX5OfYs8Hq1xzb/XPA1N04weFdqeD0gTI+KwZ7RtEPdug3VB06o
+        +JZW3xDvmYoKNW4ea9wifgfZOcrntfe2vMK3Jmu8aKk2wddtiHK+3HZUmswUC5XIzT+9ppnvNJJ
+        lfjOQxJ1yrzHr
+X-Received: by 2002:aed:25af:: with SMTP id x44mr24961930qtc.64.1570919933838;
+        Sat, 12 Oct 2019 15:38:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz0MjmCeNSh32vVCuUQMNhBZu1KOBCgrBIVtG1Hs9yeNlxecSX6iaR51H1qP+Z4lvase2/DGg==
+X-Received: by 2002:aed:25af:: with SMTP id x44mr24961905qtc.64.1570919933558;
+        Sat, 12 Oct 2019 15:38:53 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
-        by smtp.gmail.com with ESMTPSA id q22sm10966643wmj.5.2019.10.12.13.41.34
+        by smtp.gmail.com with ESMTPSA id 56sm11130495qty.15.2019.10.12.15.38.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2019 13:41:35 -0700 (PDT)
-Date:   Sat, 12 Oct 2019 16:41:32 -0400
+        Sat, 12 Oct 2019 15:38:52 -0700 (PDT)
+Date:   Sat, 12 Oct 2019 18:38:46 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     prashantbhole.linux@gmail.com
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        David Ahern <dsahern@gmail.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] vhost_net: user tap recvmsg api to access
- ptr ring
-Message-ID: <20191012164059-mutt-send-email-mst@kernel.org>
-References: <20191012015357.1775-1-prashantbhole.linux@gmail.com>
- <20191012015357.1775-3-prashantbhole.linux@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Jorgen Hansen <jhansen@vmware.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] vsock: don't allow half-closed socket in the
+ host transports
+Message-ID: <20191012183838-mutt-send-email-mst@kernel.org>
+References: <20191011130758.22134-1-sgarzare@redhat.com>
+ <20191011101408-mutt-send-email-mst@kernel.org>
+ <20191011143457.4ujt3gg7oxco6gld@steredhat>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191012015357.1775-3-prashantbhole.linux@gmail.com>
+In-Reply-To: <20191011143457.4ujt3gg7oxco6gld@steredhat>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 12, 2019 at 10:53:56AM +0900, prashantbhole.linux@gmail.com wrote:
-> From: Prashant Bhole <prashantbhole.linux@gmail.com>
+On Fri, Oct 11, 2019 at 04:34:57PM +0200, Stefano Garzarella wrote:
+> On Fri, Oct 11, 2019 at 10:19:13AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Oct 11, 2019 at 03:07:56PM +0200, Stefano Garzarella wrote:
+> > > We are implementing a test suite for the VSOCK sockets and we discovered
+> > > that vmci_transport never allowed half-closed socket on the host side.
+> > > 
+> > > As Jorgen explained [1] this is due to the implementation of VMCI.
+> > > 
+> > > Since we want to have the same behaviour across all transports, this
+> > > series adds a section in the "Implementation notes" to exaplain this
+> > > behaviour, and changes the vhost_transport to behave the same way.
+> > > 
+> > > [1] https://patchwork.ozlabs.org/cover/847998/#1831400
+> > 
+> > Half closed sockets are very useful, and lots of
+> > applications use tricks to swap a vsock for a tcp socket,
+> > which might as a result break.
 > 
-> Currently vhost_net directly accesses ptr ring of tap driver to
-> fetch Rx packet pointers. In order to avoid it this patch modifies
-> tap driver's recvmsg api to do additional task of fetching Rx packet
-> pointers.
+> Got it!
 > 
-> A special struct tun_msg_ctl is already being usedd via msg_control
-> for tun Rx XDP batching. This patch extends tun_msg_ctl usage to
-> send sub commands to recvmsg api. recvmsg can now produce/unproduce
-> pointers from ptr ring as an additional task.
+> > 
+> > If VMCI really cares it can implement an ioctl to
+> > allow applications to detect that half closed sockets aren't supported.
+> > 
+> > It does not look like VMCI wants to bother (users do not read
+> > kernel implementation notes) so it does not really care.
+> > So why do we want to cripple other transports intentionally?
 > 
-> This will be useful in future in implementation of virtio-net XDP
-> offload feature. Where packets will be XDP batch processed in
-> tun_recvmsg.
+> The main reason is that we are developing the test suite and we noticed
+> the miss match. Since we want to make sure that applications behave in
+> the same way on different transports, we thought we would solve it that
+> way.
+> 
+> But what you are saying (also in the reply of the patches) is actually
+> quite right. Not being publicized, applications do not expect this behavior,
+> so please discard this series.
+> 
+> My problem during the tests, was trying to figure out if half-closed
+> sockets were supported or not, so as you say adding an IOCTL or maybe
+> better a getsockopt() could solve the problem.
+> 
+> What do you think?
+> 
+> Thanks,
+> Stefano
 
-I'd like to see that future patch, by itself this patchset
-seems to be of limited usefulness.
+Sure, why not.
 
-> Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
-> ---
->  drivers/net/tap.c      | 22 +++++++++++++++++++-
->  drivers/net/tun.c      | 24 +++++++++++++++++++++-
->  drivers/vhost/net.c    | 46 +++++++++++++++++++++++++++++++++---------
->  include/linux/if_tun.h |  3 +++
->  4 files changed, 83 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 01bd260ce60c..3d0bf382dbbc 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -1234,8 +1234,28 @@ static int tap_recvmsg(struct socket *sock, struct msghdr *m,
->  		       size_t total_len, int flags)
->  {
->  	struct tap_queue *q = container_of(sock, struct tap_queue, sock);
-> -	struct sk_buff *skb = m->msg_control;
-> +	struct tun_msg_ctl *ctl = m->msg_control;
-> +	struct sk_buff *skb = NULL;
->  	int ret;
-> +
-> +	if (ctl) {
-> +		switch (ctl->cmd) {
-> +		case TUN_CMD_PACKET:
-> +			skb = ctl->ptr;
-> +			break;
-> +		case TUN_CMD_PRODUCE_PTRS:
-> +			return ptr_ring_consume_batched(&q->ring,
-> +							ctl->ptr_array,
-> +							ctl->num);
-> +		case TUN_CMD_UNPRODUCE_PTRS:
-> +			ptr_ring_unconsume(&q->ring, ctl->ptr_array, ctl->num,
-> +					   tun_ptr_free);
-> +			return 0;
-> +		default:
-> +			return -EINVAL;
-> +		}
-> +	}
-> +
->  	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC)) {
->  		kfree_skb(skb);
->  		return -EINVAL;
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 29711671959b..7d4886f53389 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2577,7 +2577,8 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
->  {
->  	struct tun_file *tfile = container_of(sock, struct tun_file, socket);
->  	struct tun_struct *tun = tun_get(tfile);
-> -	void *ptr = m->msg_control;
-> +	struct tun_msg_ctl *ctl = m->msg_control;
-> +	void *ptr = NULL;
->  	int ret;
->  
->  	if (!tun) {
-> @@ -2585,6 +2586,27 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
->  		goto out_free;
->  	}
->  
-> +	if (ctl) {
-> +		switch (ctl->cmd) {
-> +		case TUN_CMD_PACKET:
-> +			ptr = ctl->ptr;
-> +			break;
-> +		case TUN_CMD_PRODUCE_PTRS:
-> +			ret = ptr_ring_consume_batched(&tfile->tx_ring,
-> +						       ctl->ptr_array,
-> +						       ctl->num);
-> +			goto out;
-> +		case TUN_CMD_UNPRODUCE_PTRS:
-> +			ptr_ring_unconsume(&tfile->tx_ring, ctl->ptr_array,
-> +					   ctl->num, tun_ptr_free);
-> +			ret = 0;
-> +			goto out;
-> +		default:
-> +			ret = -EINVAL;
-> +			goto out_put_tun;
-> +		}
-> +	}
-> +
->  	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC|MSG_ERRQUEUE)) {
->  		ret = -EINVAL;
->  		goto out_put_tun;
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 5946d2775bd0..5e5c1063606c 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -175,24 +175,44 @@ static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
->  
->  static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
->  {
-> +	struct vhost_virtqueue *vq = &nvq->vq;
-> +	struct socket *sock = vq->private_data;
->  	struct vhost_net_buf *rxq = &nvq->rxq;
-> +	struct tun_msg_ctl ctl = {
-> +		.cmd = TUN_CMD_PRODUCE_PTRS,
-> +		.ptr_array = rxq->queue,
-> +		.num = VHOST_NET_BATCH,
-> +	};
-> +	struct msghdr msg = {
-> +		.msg_control = &ctl,
-> +	};
->  
->  	rxq->head = 0;
-> -	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
-> -					      VHOST_NET_BATCH);
-> +	rxq->tail = sock->ops->recvmsg(sock, &msg, 0, 0);
-> +	if (rxq->tail < 0)
-> +		rxq->tail = 0;
-> +
->  	return rxq->tail;
->  }
->  
->  static void vhost_net_buf_unproduce(struct vhost_net_virtqueue *nvq)
->  {
-> +	struct vhost_virtqueue *vq = &nvq->vq;
-> +	struct socket *sock = vq->private_data;
->  	struct vhost_net_buf *rxq = &nvq->rxq;
-> +	struct tun_msg_ctl ctl = {
-> +		.cmd = TUN_CMD_UNPRODUCE_PTRS,
-> +		.ptr_array = rxq->queue + rxq->head,
-> +		.num = vhost_net_buf_get_size(rxq),
-> +	};
-> +	struct msghdr msg = {
-> +		.msg_control = &ctl,
-> +	};
->  
-> -	if (nvq->rx_ring && !vhost_net_buf_is_empty(rxq)) {
-> -		ptr_ring_unconsume(nvq->rx_ring, rxq->queue + rxq->head,
-> -				   vhost_net_buf_get_size(rxq),
-> -				   tun_ptr_free);
-> -		rxq->head = rxq->tail = 0;
-> -	}
-> +	if (!vhost_net_buf_is_empty(rxq))
-> +		sock->ops->recvmsg(sock, &msg, 0, 0);
-> +
-> +	rxq->head = rxq->tail = 0;
->  }
->  
->  static int vhost_net_buf_peek_len(void *ptr)
-> @@ -1109,6 +1129,9 @@ static void handle_rx(struct vhost_net *net)
->  		.flags = 0,
->  		.gso_type = VIRTIO_NET_HDR_GSO_NONE
->  	};
-> +	struct tun_msg_ctl ctl = {
-> +		.cmd = TUN_CMD_PACKET,
-> +	};
->  	size_t total_len = 0;
->  	int err, mergeable;
->  	s16 headcount;
-> @@ -1166,8 +1189,11 @@ static void handle_rx(struct vhost_net *net)
->  			goto out;
->  		}
->  		busyloop_intr = false;
-> -		if (nvq->rx_ring)
-> -			msg.msg_control = vhost_net_buf_consume(&nvq->rxq);
-> +		if (nvq->rx_ring) {
-> +			ctl.cmd = TUN_CMD_PACKET;
-> +			ctl.ptr = vhost_net_buf_consume(&nvq->rxq);
-> +			msg.msg_control = &ctl;
-> +		}
->  		/* On overrun, truncate and discard */
->  		if (unlikely(headcount > UIO_MAXIOV)) {
->  			iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
-> diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
-> index bdfa671612db..8608d4095143 100644
-> --- a/include/linux/if_tun.h
-> +++ b/include/linux/if_tun.h
-> @@ -13,10 +13,13 @@
->  
->  #define TUN_CMD_PACKET 1
->  #define TUN_CMD_BATCH  2
-> +#define TUN_CMD_PRODUCE_PTRS	3
-> +#define TUN_CMD_UNPRODUCE_PTRS	4
->  struct tun_msg_ctl {
->  	unsigned short cmd;
->  	unsigned short num;
->  	void *ptr;
-> +	void **ptr_array;
->  };
->  
->  struct tun_xdp_hdr {
-> -- 
-> 2.21.0
