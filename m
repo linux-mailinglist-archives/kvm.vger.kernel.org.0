@@ -2,131 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12F55D522B
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 21:26:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BB68D5265
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 22:27:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729710AbfJLT0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 12 Oct 2019 15:26:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54964 "EHLO mx1.redhat.com"
+        id S1729563AbfJLU1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 12 Oct 2019 16:27:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41654 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729458AbfJLT0R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 12 Oct 2019 15:26:17 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        id S1729469AbfJLU1t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 12 Oct 2019 16:27:49 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5B36D1108
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 19:26:16 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id w8so6273158wrm.3
-        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 12:26:16 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0656B8830A
+        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 20:27:49 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id 4so3399714wmj.6
+        for <kvm@vger.kernel.org>; Sat, 12 Oct 2019 13:27:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=NER+WYNjIiTuYyELfX6XGxRMHyIeb8bjpkbmjz8T8Lw=;
-        b=PotKNSCfpvrAfW1QcepcQk8+s9Emz5s4j4SjzyzCFBcscI3/0SBt78Hj/OWs2cp3cf
-         kE9rBHPA7kPF3XENKKavkXsUphNKF5A0ffHIq+ZEJaSmrAkSIfk6J5dyRRJusDoprCch
-         BQ1FLCVfDPWUVRmsAW2moTKKkyoB7dkTZd7tywu9TxegegiedGp4IUg3FkpKOXUzH30Y
-         vrG4XdBWpQq5mekKoabBO7q7NiIpDUY8o8mlvarVSYXDZwtcvhcPbgB93G3DdeINdpty
-         6sXKQja0oJGqji1HyOSI9UqsoBRRqnvhfwmk5ZB8pS7dplTxyQVDmWFvYXAP6zR4VQa0
-         yK0Q==
-X-Gm-Message-State: APjAAAXoN3TR5zKdovbPwv527WUPCnGrkbvF/v/QoNXOYmX+dLTcAV+W
-        syUOpGgKtB5ZjFEpteGIcU9EcjQ32CDbeNpW7Exk3FxWjF0trfmZ2jkZqOIfzUv70rta3ocOV0t
-        09vyCXkkdb5Rb
-X-Received: by 2002:adf:e90d:: with SMTP id f13mr18704542wrm.104.1570908374716;
-        Sat, 12 Oct 2019 12:26:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwzVc4L36wZsuw/yIheWC3DcZ/4dWluqHH2rLuU6KbnjXtc/R53950cBJ1bTedee2IPkXIj5Q==
-X-Received: by 2002:adf:e90d:: with SMTP id f13mr18704533wrm.104.1570908374478;
-        Sat, 12 Oct 2019 12:26:14 -0700 (PDT)
+        bh=EqTOWjC4L/Kz6sFQs9jCsgXd8dSNgdgkSYjDXmXjolo=;
+        b=bOMhKyJHFgqHbj68EjNohliXw0nouTbx0k4xghAxnLiXybIHMYxm3GvgCrKsAci72n
+         hWUtCUyhAJDTU7x0o2xV2r0hOKQ/5yGA5UtkqUxAOQq+vvJ4SzFeg59cnPNEk//ev5d/
+         MrIC762kIvQHr8aMcmgQ2hZGuQXBoZTnPVnBU0C4iAWqxugJbqIMjgtKVbiThyXYz72C
+         lGsYoynJUV7m/XLp7YAP6E4a8ERx/MAwNvnLc3rl01I8dHdF1RtvZvG3M46S4a/wpmqs
+         RbigXs1F3YCzlFSbsumyFPoWejs7cODXiIt3ljggZ4Ohyt3deTHUMNszmZ1wNOPlBts1
+         B2aA==
+X-Gm-Message-State: APjAAAUlUB4W3b67ls9QdFwIFkju7MqvWU0VcxszIZj9op4tenS3OUzn
+        B2lCgm+PI+xUugZSbMNvXmlyAZ8Cdfn6DM1W32tmZFhqXT36dD4p26w6xXKMTd484keadrOVe5m
+        RdgKmgp3vh9wb
+X-Received: by 2002:a05:600c:21c8:: with SMTP id x8mr7778916wmj.123.1570912067637;
+        Sat, 12 Oct 2019 13:27:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwQzyMBrFDfWTdK5lUQ3sY5hHb4OoDfa1GaxOr1ruBpGf2toaNre0YJeRWwm2tOu4hgB0VNpQ==
+X-Received: by 2002:a05:600c:21c8:: with SMTP id x8mr7778905wmj.123.1570912067370;
+        Sat, 12 Oct 2019 13:27:47 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
-        by smtp.gmail.com with ESMTPSA id r6sm14770346wmh.38.2019.10.12.12.26.12
+        by smtp.gmail.com with ESMTPSA id s9sm14550556wme.36.2019.10.12.13.27.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2019 12:26:13 -0700 (PDT)
-Date:   Sat, 12 Oct 2019 15:26:11 -0400
+        Sat, 12 Oct 2019 13:27:46 -0700 (PDT)
+Date:   Sat, 12 Oct 2019 16:27:43 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC v1 0/2] vhost: ring format independence
-Message-ID: <20191012152332-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH RFC v1 1/2] vhost: option to fetch descriptors through an
+ independent struct
+Message-ID: <20191012162445-mutt-send-email-mst@kernel.org>
 References: <20191011134358.16912-1-mst@redhat.com>
- <f650ac1a-6e2a-9215-6e4f-a1095f4a89cd@redhat.com>
+ <20191011134358.16912-2-mst@redhat.com>
+ <3b2a6309-9d21-7172-a581-9f0f1d5c1427@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f650ac1a-6e2a-9215-6e4f-a1095f4a89cd@redhat.com>
+In-Reply-To: <3b2a6309-9d21-7172-a581-9f0f1d5c1427@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 12, 2019 at 04:15:42PM +0800, Jason Wang wrote:
+On Sat, Oct 12, 2019 at 03:28:49PM +0800, Jason Wang wrote:
 > 
 > On 2019/10/11 下午9:45, Michael S. Tsirkin wrote:
-> > So the idea is as follows: we convert descriptors to an
-> > independent format first, and process that converting to
-> > iov later.
+> > The idea is to support multiple ring formats by converting
+> > to a format-independent array of descriptors.
 > > 
-> > The point is that we have a tight loop that fetches
-> > descriptors, which is good for cache utilization.
-> > This will also allow all kind of batching tricks -
-> > e.g. it seems possible to keep SMAP disabled while
-> > we are fetching multiple descriptors.
+> > This costs extra cycles, but we gain in ability
+> > to fetch a batch of descriptors in one go, which
+> > is good for code cache locality.
+> > 
+> > To simplify benchmarking, I kept the old code
+> > around so one can switch back and forth by
+> > writing into a module parameter.
+> > This will go away in the final submission.
+> > 
+> > This patch causes a minor performance degradation,
+> > it's been kept as simple as possible for ease of review.
+> > Next patch gets us back the performance by adding batching.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >   drivers/vhost/test.c  |  17 ++-
+> >   drivers/vhost/vhost.c | 299 +++++++++++++++++++++++++++++++++++++++++-
+> >   drivers/vhost/vhost.h |  16 +++
+> >   3 files changed, 327 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> > index 056308008288..39a018a7af2d 100644
+> > --- a/drivers/vhost/test.c
+> > +++ b/drivers/vhost/test.c
+> > @@ -18,6 +18,9 @@
+> >   #include "test.h"
+> >   #include "vhost.h"
+> > +static int newcode = 0;
+> > +module_param(newcode, int, 0644);
+> > +
+> >   /* Max number of bytes transferred before requeueing the job.
+> >    * Using this limit prevents one virtqueue from starving others. */
+> >   #define VHOST_TEST_WEIGHT 0x80000
+> > @@ -58,10 +61,16 @@ static void handle_vq(struct vhost_test *n)
+> >   	vhost_disable_notify(&n->dev, vq);
+> >   	for (;;) {
+> > -		head = vhost_get_vq_desc(vq, vq->iov,
+> > -					 ARRAY_SIZE(vq->iov),
+> > -					 &out, &in,
+> > -					 NULL, NULL);
+> > +		if (newcode)
+> > +			head = vhost_get_vq_desc_batch(vq, vq->iov,
+> > +						       ARRAY_SIZE(vq->iov),
+> > +						       &out, &in,
+> > +						       NULL, NULL);
+> > +		else
+> > +			head = vhost_get_vq_desc(vq, vq->iov,
+> > +						 ARRAY_SIZE(vq->iov),
+> > +						 &out, &in,
+> > +						 NULL, NULL);
+> >   		/* On error, stop handling until the next kick. */
+> >   		if (unlikely(head < 0))
+> >   			break;
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index 36ca2cf419bf..36661d6cb51f 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -301,6 +301,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+> >   			   struct vhost_virtqueue *vq)
+> >   {
+> >   	vq->num = 1;
+> > +	vq->ndescs = 0;
+> >   	vq->desc = NULL;
+> >   	vq->avail = NULL;
+> >   	vq->used = NULL;
+> > @@ -369,6 +370,9 @@ static int vhost_worker(void *data)
+> >   static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+> >   {
+> > +	kfree(vq->descs);
+> > +	vq->descs = NULL;
+> > +	vq->max_descs = 0;
+> >   	kfree(vq->indirect);
+> >   	vq->indirect = NULL;
+> >   	kfree(vq->log);
+> > @@ -385,6 +389,10 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+> >   	for (i = 0; i < dev->nvqs; ++i) {
+> >   		vq = dev->vqs[i];
+> > +		vq->max_descs = dev->iov_limit;
+> > +		vq->descs = kmalloc_array(vq->max_descs,
+> > +					  sizeof(*vq->descs),
+> > +					  GFP_KERNEL);
 > 
 > 
-> I wonder this may help for performance:
-
-Could you try it out and report please?
-Would be very much appreciated.
-
-> - another indirection layer, increased footprint
-
-Seems to be offset off by improved batching.
-For sure will be even better if we can move stac/clac out,
-or replace some get/put user with bigger copy to/from.
-
-> - won't help or even degrade when there's no batch
-
-I couldn't measure a difference. I'm guessing
-
-> - an extra overhead in the case of in order where we should already had
-> tight loop
-
-it's not so tight with translation in there.
-this exactly makes the loop tight.
-
-> - need carefully deal with indirect and chain or make it only work for
-> packet sit just in a single descriptor
+> Is iov_limit too much here? It can obviously increase the footprint. I guess
+> the batching can only be done for descriptor without indirect or next set.
+> Then we may batch 16 or 64.
 > 
 > Thanks
 
-I don't understand this last comment.
+Yes, next patch only batches up to 64.  But we do need iov_limit because
+guest can pass a long chain of scatter/gather.
+We already have iovecs in a huge array so this does not look like
+a big deal. If we ever teach the code to avoid the huge
+iov arrays by handling huge s/g lists piece by piece,
+we can make the desc array smaller at the same point.
 
-> 
-> > 
-> > And perhaps more importantly, this is a very good fit for the packed
-> > ring layout, where we get and put descriptors in order.
-> > 
-> > This patchset seems to already perform exactly the same as the original
-> > code already based on a microbenchmark.  More testing would be very much
-> > appreciated.
-> > 
-> > Biggest TODO before this first step is ready to go in is to
-> > batch indirect descriptors as well.
-> > 
-> > Integrating into vhost-net is basically
-> > s/vhost_get_vq_desc/vhost_get_vq_desc_batch/ -
-> > or add a module parameter like I did in the test module.
-> > 
-> > 
-> > 
-> > Michael S. Tsirkin (2):
-> >    vhost: option to fetch descriptors through an independent struct
-> >    vhost: batching fetches
-> > 
-> >   drivers/vhost/test.c  |  19 ++-
-> >   drivers/vhost/vhost.c | 333 +++++++++++++++++++++++++++++++++++++++++-
-> >   drivers/vhost/vhost.h |  20 ++-
-> >   3 files changed, 365 insertions(+), 7 deletions(-)
-> > 
+
