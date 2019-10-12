@@ -2,204 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7600D4C5D
-	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 05:14:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CE10D4C7A
+	for <lists+kvm@lfdr.de>; Sat, 12 Oct 2019 05:38:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbfJLDOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 11 Oct 2019 23:14:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42328 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726345AbfJLDOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 11 Oct 2019 23:14:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6D4A3307D989;
-        Sat, 12 Oct 2019 03:14:09 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA0C76092D;
-        Sat, 12 Oct 2019 03:14:08 +0000 (UTC)
-Date:   Sat, 12 Oct 2019 00:14:07 -0300
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Luwei Kang <luwei.kang@intel.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
-        rth@twiddle.net, mtosatti@redhat.com,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Message-ID: <20191012031407.GK4084@habkost.net>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
+        id S1726918AbfJLDiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 11 Oct 2019 23:38:00 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:33836 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726354AbfJLDiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 11 Oct 2019 23:38:00 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id BCF21FAD66123068F06F;
+        Sat, 12 Oct 2019 11:37:56 +0800 (CST)
+Received: from localhost (10.133.215.230) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Sat, 12 Oct 2019
+ 11:37:49 +0800
+From:   Zhuang Yanying <ann.zhuangyanying@huawei.com>
+To:     <linfeng23@huawei.com>, <pbonzini@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <weiqi4@huawei.com>, <weidong.huang@huawei.com>,
+        Zhuang Yanying <ann.zhuangyanying@huawei.com>
+Subject: [PATCH v2] KVM: fix overflow of zero page refcount with ksm running
+Date:   Sat, 12 Oct 2019 11:37:31 +0800
+Message-ID: <1570851452-23364-1-git-send-email-ann.zhuangyanying@huawei.com>
+X-Mailer: git-send-email 1.9.5.msysgit.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Sat, 12 Oct 2019 03:14:09 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.133.215.230]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Mar 05, 2018 at 12:48:36AM +0800, Luwei Kang wrote:
-> From: Chao Peng <chao.p.peng@linux.intel.com>
-> 
-> Add Intel Processor Trace related definition. It also add
-> corresponding part to kvm_get/set_msr and vmstate.
-> 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-[...]
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index f9f4cd1..097c953 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
->              }
->          }
-> +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-> +            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-> +                                                    0x14, 1, R_EAX) & 0x7;
-> +
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> +                            env->msr_rtit_ctrl);
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> +                            env->msr_rtit_status);
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> +                            env->msr_rtit_output_base);
+We are testing Virtual Machine with KSM on v5.4-rc2 kernel,
+and found the zero_page refcount overflow.
+The cause of refcount overflow is increased in try_async_pf
+(get_user_page) without being decreased in mmu_set_spte()
+while handling ept violation.
+In kvm_release_pfn_clean(), only unreserved page will call
+put_page. However, zero page is reserved.
+So, as well as creating and destroy vm, the refcount of
+zero page will continue to increase until it overflows.
 
-This causes the following crash on some hosts:
+step1:
+echo 10000 > /sys/kernel/pages_to_scan/pages_to_scan
+echo 1 > /sys/kernel/pages_to_scan/run
+echo 1 > /sys/kernel/pages_to_scan/use_zero_pages
 
-  qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-  qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+step2:
+just create several normal qemu kvm vms.
+And destroy it after 10s.
+Repeat this action all the time.
 
-Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
-additional conditions that might prevent writing to this MSR
-(PT_CAP_topa_output && PT_CAP_single_range_output).  This causes
-QEMU to crash if some of the conditions aren't met.
+After a long period of time, all domains hang because
+of the refcount of zero page overflow.
 
-Writing and reading this MSR (and the ones below) need to be
-conditional on KVM_GET_MSR_INDEX_LIST.
+Qemu print error log as follow:
+ …
+ error: kvm run failed Bad address
+ EAX=00006cdc EBX=00000008 ECX=80202001 EDX=078bfbfd
+ ESI=ffffffff EDI=00000000 EBP=00000008 ESP=00006cc4
+ EIP=000efd75 EFL=00010002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ ES =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ CS =0008 00000000 ffffffff 00c09b00 DPL=0 CS32 [-RA]
+ SS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ DS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ FS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ GS =0010 00000000 ffffffff 00c09300 DPL=0 DS   [-WA]
+ LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
+ TR =0000 00000000 0000ffff 00008b00 DPL=0 TSS32-busy
+ GDT=     000f7070 00000037
+ IDT=     000f70ae 00000000
+ CR0=00000011 CR2=00000000 CR3=00000000 CR4=00000000
+ DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
+ DR6=00000000ffff0ff0 DR7=0000000000000400
+ EFER=0000000000000000
+ Code=00 01 00 00 00 e9 e8 00 00 00 c7 05 4c 55 0f 00 01 00 00 00 <8b> 35 00 00 01 00 8b 3d 04 00 01 00 b8 d8 d3 00 00 c1 e0 08 0c ea a3 00 00 01 00 c7 05 04
+ …
 
+Meanwhile, a kernel warning is departed.
 
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
-> +                            env->msr_rtit_output_mask);
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
-> +                            env->msr_rtit_cr3_match);
-> +            for (i = 0; i < addr_num; i++) {
-> +                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
-> +                            env->msr_rtit_addrs[i]);
-> +            }
-> +        }
->  
->          /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
->           *       kvm_put_msr_feature_control. */
-> @@ -2124,6 +2143,20 @@ static int kvm_get_msrs(X86CPU *cpu)
->          }
->      }
->  
-> +    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-> +        int addr_num =
-> +            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
-> +
-> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
-> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
-> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
-> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
-> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
-> +        for (i = 0; i < addr_num; i++) {
-> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
-> +        }
-> +    }
-> +
->      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
->      if (ret < 0) {
->          return ret;
-> @@ -2364,6 +2397,24 @@ static int kvm_get_msrs(X86CPU *cpu)
->          case MSR_IA32_SPEC_CTRL:
->              env->spec_ctrl = msrs[i].data;
->              break;
-> +        case MSR_IA32_RTIT_CTL:
-> +            env->msr_rtit_ctrl = msrs[i].data;
-> +            break;
-> +        case MSR_IA32_RTIT_STATUS:
-> +            env->msr_rtit_status = msrs[i].data;
-> +            break;
-> +        case MSR_IA32_RTIT_OUTPUT_BASE:
-> +            env->msr_rtit_output_base = msrs[i].data;
-> +            break;
-> +        case MSR_IA32_RTIT_OUTPUT_MASK:
-> +            env->msr_rtit_output_mask = msrs[i].data;
-> +            break;
-> +        case MSR_IA32_RTIT_CR3_MATCH:
-> +            env->msr_rtit_cr3_match = msrs[i].data;
-> +            break;
-> +        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-> +            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-> +            break;
->          }
->      }
->  
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 361c05a..c05fe6f 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
->      }
->  };
->  
-> +static bool intel_pt_enable_needed(void *opaque)
-> +{
-> +    X86CPU *cpu = opaque;
-> +    CPUX86State *env = &cpu->env;
-> +    int i;
-> +
-> +    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
-> +        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
-> +        env->msr_rtit_cr3_match) {
-> +        return true;
-> +    }
-> +
-> +    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
-> +        if (env->msr_rtit_addrs[i]) {
-> +            return true;
-> +        }
-> +    }
-> +
-> +    return false;
-> +}
-> +
-> +static const VMStateDescription vmstate_msr_intel_pt = {
-> +    .name = "cpu/intel_pt",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = intel_pt_enable_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
-> +        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
-> +        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
-> +        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
-> +        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
-> +        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  VMStateDescription vmstate_x86_cpu = {
->      .name = "cpu",
->      .version_id = 12,
-> @@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
->  #endif
->          &vmstate_spec_ctrl,
->          &vmstate_mcg_ext_ctl,
-> +        &vmstate_msr_intel_pt,
->          NULL
->      }
->  };
-> -- 
-> 1.8.3.1
-> 
+ [40914.836375] WARNING: CPU: 3 PID: 82067 at ./include/linux/mm.h:987 try_get_page+0x1f/0x30
+ [40914.836412] CPU: 3 PID: 82067 Comm: CPU 0/KVM Kdump: loaded Tainted: G           OE     5.2.0-rc2 #5
+ [40914.836415] RIP: 0010:try_get_page+0x1f/0x30
+ [40914.836417] Code: 40 00 c3 0f 1f 84 00 00 00 00 00 48 8b 47 08 a8 01 75 11 8b 47 34 85 c0 7e 10 f0 ff 47 34 b8 01 00 00 00 c3 48 8d 78 ff eb e9 <0f> 0b 31 c0 c3 66 90 66 2e 0f 1f 84 00 0
+ 0 00 00 00 48 8b 47 08 a8
+ [40914.836418] RSP: 0018:ffffb4144e523988 EFLAGS: 00010286
+ [40914.836419] RAX: 0000000080000000 RBX: 0000000000000326 RCX: 0000000000000000
+ [40914.836420] RDX: 0000000000000000 RSI: 00004ffdeba10000 RDI: ffffdf07093f6440
+ [40914.836421] RBP: ffffdf07093f6440 R08: 800000424fd91225 R09: 0000000000000000
+ [40914.836421] R10: ffff9eb41bfeebb8 R11: 0000000000000000 R12: ffffdf06bbd1e8a8
+ [40914.836422] R13: 0000000000000080 R14: 800000424fd91225 R15: ffffdf07093f6440
+ [40914.836423] FS:  00007fb60ffff700(0000) GS:ffff9eb4802c0000(0000) knlGS:0000000000000000
+ [40914.836425] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ [40914.836426] CR2: 0000000000000000 CR3: 0000002f220e6002 CR4: 00000000003626e0
+ [40914.836427] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ [40914.836427] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ [40914.836428] Call Trace:
+ [40914.836433]  follow_page_pte+0x302/0x47b
+ [40914.836437]  __get_user_pages+0xf1/0x7d0
+ [40914.836441]  ? irq_work_queue+0x9/0x70
+ [40914.836443]  get_user_pages_unlocked+0x13f/0x1e0
+ [40914.836469]  __gfn_to_pfn_memslot+0x10e/0x400 [kvm]
+ [40914.836486]  try_async_pf+0x87/0x240 [kvm]
+ [40914.836503]  tdp_page_fault+0x139/0x270 [kvm]
+ [40914.836523]  kvm_mmu_page_fault+0x76/0x5e0 [kvm]
+ [40914.836588]  vcpu_enter_guest+0xb45/0x1570 [kvm]
+ [40914.836632]  kvm_arch_vcpu_ioctl_run+0x35d/0x580 [kvm]
+ [40914.836645]  kvm_vcpu_ioctl+0x26e/0x5d0 [kvm]
+ [40914.836650]  do_vfs_ioctl+0xa9/0x620
+ [40914.836653]  ksys_ioctl+0x60/0x90
+ [40914.836654]  __x64_sys_ioctl+0x16/0x20
+ [40914.836658]  do_syscall_64+0x5b/0x180
+ [40914.836664]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+ [40914.836666] RIP: 0033:0x7fb61cb6bfc7
 
+Signed-off-by: LinFeng <linfeng23@huawei.com>
+Signed-off-by: Zhuang Yanying <ann.zhuangyanying@huawei.com>
+---
+v1 -> v2:  fix compile error
+---
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fd68fbe..a073442 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -152,7 +152,7 @@ __weak int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+ bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+ {
+ 	if (pfn_valid(pfn))
+-		return PageReserved(pfn_to_page(pfn));
++		return PageReserved(pfn_to_page(pfn)) && !is_zero_pfn(pfn);
+ 
+ 	return true;
+ }
 -- 
-Eduardo
+1.8.3.1
+
+
