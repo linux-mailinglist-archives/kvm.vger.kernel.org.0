@@ -2,92 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA874D54DD
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 09:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45E00D551C
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 10:08:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728285AbfJMHSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 03:18:32 -0400
-Received: from mail-ua1-f73.google.com ([209.85.222.73]:54864 "EHLO
-        mail-ua1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727738AbfJMHSb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Oct 2019 03:18:31 -0400
-Received: by mail-ua1-f73.google.com with SMTP id t16so3322643uae.21
-        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 00:18:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=+jS/fgeA9g5b7maojEvnHW9C5zu2iR1VcbKtchXrGvo=;
-        b=t3ajNdFAPbH26YVnunixwCMh9vPN7BKt9D6YzrtC3ehk7ZhWr/jvbrqDsDRAvud9hf
-         kaGdgVDpgjHGN97SH/VxrfXqVae3h6a9Qt0Q2+bqDIz5afycMeGoqq3mUQ/HCrtVT8Bm
-         MhDT8SzREjjpRnmF7JE09zhoFOJx7pH0UysOi0qkT1utQefu/BW00y4ZlwVpCEBFqKED
-         hkksIT9+F3sYke8BZ5NGSMnTbdm0ouXmKSIXuzKiB6MNpHD/rr/c0ve960+RpQ6txZvd
-         go7uLkDbk0206+x8UeeyqOcKliYef/5cbSH0CpK01fEm1oJ7Rk9w6Ip1C1VK7FrXfCzb
-         yRIA==
+        id S1728322AbfJMIH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 04:07:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46522 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728073AbfJMIH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Oct 2019 04:07:59 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1AB3E81F18
+        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 08:07:59 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id t25so14544255qtq.9
+        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 01:07:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=+jS/fgeA9g5b7maojEvnHW9C5zu2iR1VcbKtchXrGvo=;
-        b=hLgif0WqANvYo099urrcYgT78OTSJB1djDEpEU30jzEUAMCDnAg3QlNjyYi+P7jBED
-         vsuLIO8FjCl63JB7Y/Uuf30YHBmlVhCFyfkh5zLk9+1emczLA1IazHFvuJKD+Iu7xgw1
-         i8ehYRcGjgSfWi1JSVSOt8Su1VeJ+ayUEReWIweAcMNiOcUBR2VK49lfjwy2FkDtcxTE
-         rR7aHARFyF7f8p5HbcP9mQJZI/wc3UYAzxiay/VGnSzVakbHsglFBS38Z69dvfSgN0fq
-         eeMla7cKtlD6d0k7K97OfuEldzCXCBUzsWL+FUTMdt7aBLtZzanT9r1r6omQjmcfvmU2
-         t0Pw==
-X-Gm-Message-State: APjAAAWgG0ZExFTLdfjQ4q2mCumvDDqMk32B5kGE/hX+GRG8EevLj37w
-        aQIBMSjatmc6/hi7SkimZLEisvc3sWmDZ0ERfz3JwYO3NUosCHSgMIsbES/tR5K6NAYNCvYap3d
-        zqMfTDU9uyyfoU4neoV/8dlVeoa5BAEoqaYRKnFkfcfoibLfOA5gftw==
-X-Google-Smtp-Source: APXvYqynd2e3ep5GXfzDTkYLzLXqia4dttmm50W9SXS9/5bSl3EjdABMtGtRsx3EJHUEQGnMwEd9gqif2g==
-X-Received: by 2002:ab0:1644:: with SMTP id l4mr7507361uae.30.1570951110442;
- Sun, 13 Oct 2019 00:18:30 -0700 (PDT)
-Date:   Sun, 13 Oct 2019 00:18:24 -0700
-In-Reply-To: <20191012074454.208377-2-morbo@google.com>
-Message-Id: <20191013071824.222946-1-morbo@google.com>
-Mime-Version: 1.0
-References: <20191012074454.208377-2-morbo@google.com>
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests PATCH 1/1] x86: use pointer for end of exception table
-From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com
-Cc:     jmattson@google.com, Bill Wendling <morbo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=yhYWl1Umy/1VTjIbbiNd2BN64NH6epCZE/mb8RSLaXM=;
+        b=A3rAC975lbPOLzEhXGDqIVGPvxIbP28sgE7xBMU1GqmcIvgZiq/DeAXfpJ7MtJFVYl
+         mwhIE85vtS142sPlR+EIYsSDvmlSpTWEORGojjJE7v+ZdlDzeudLr7e1jpvMb/pe5YnP
+         wb1QbKs6Ei+LvhdEM3Iz+6SBlVD/6AvyHZfnw0bcDc61MeVWA8DoHCLaliohh/EjUx9i
+         ddFC7yTNjeVfU9qToOnjCCt77KWEKJ2gYFuCA2B/kbELTcjVESh6Bw7rWPm03pxXAzQh
+         RpccmG6hUESByvu3ZOU9cHpfKuLBtBvy8VtItJBTwRLx9ZJxFyxeZEwbQIOsPfuJ+dgP
+         eI1A==
+X-Gm-Message-State: APjAAAU3xbFGLqgBjv+sjIJvuKb4lWU7G95SJuWs5ut2x+QODe34SiHm
+        ManVYwO0iA+OP8v7OdMt3m4AENP6Lm7dGYPbv94CoV3XXha3LSrFTBHRhhpuDiCrYTVRyruXlAU
+        TgE2JT+4kXnx8
+X-Received: by 2002:a37:9a05:: with SMTP id c5mr23746934qke.98.1570954078376;
+        Sun, 13 Oct 2019 01:07:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxdHllinWFJ1shL2L0dscS9heDbinJBHlNcirUbgmYpZ/ksUyJvF3jXeQkMuv9YmookTDp0DQ==
+X-Received: by 2002:a37:9a05:: with SMTP id c5mr23746919qke.98.1570954078076;
+        Sun, 13 Oct 2019 01:07:58 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id q8sm7301621qtj.76.2019.10.13.01.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Oct 2019 01:07:57 -0700 (PDT)
+Date:   Sun, 13 Oct 2019 04:07:52 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH RFC v3 0/4] vhost: ring format independence
+Message-ID: <20191013080742.16211-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Two global objects can't have the same address in C. Clang uses this
-fact to omit the check on the first iteration of the loop in
-check_exception_table.
+This adds infrastructure required for supporting
+multiple ring formats.
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- lib/x86/desc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The idea is as follows: we convert descriptors to an
+independent format first, and process that converting to
+iov later.
 
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index 451f504..cfc449f 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -41,7 +41,7 @@ struct ex_record {
-     unsigned long handler;
- };
- 
--extern struct ex_record exception_table_start, exception_table_end;
-+extern struct ex_record exception_table_start, *exception_table_end;
- 
- static const char* exception_mnemonic(int vector)
- {
-@@ -113,7 +113,7 @@ static void check_exception_table(struct ex_regs *regs)
- 		(((regs->rflags >> 16) & 1) << 8);
-     asm("mov %0, %%gs:4" : : "r"(ex_val));
- 
--    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
-+    for (ex = &exception_table_start; ex != (void*)&exception_table_end; ++ex) {
-         if (ex->rip == regs->rip) {
-             regs->rip = ex->handler;
-             return;
+The point is that we have a tight loop that fetches
+descriptors, which is good for cache utilization.
+This will also allow all kind of batching tricks -
+e.g. it seems possible to keep SMAP disabled while
+we are fetching multiple descriptors.
+
+This seems to perform exactly the same as the original
+code already based on a microbenchmark.
+Lightly tested.
+More testing would be very much appreciated.
+
+To use new code:
+	echo 1 > /sys/module/vhost_test/parameters/newcode
+or
+	echo 1 > /sys/module/vhost_net/parameters/newcode
+
+Changes from v2:
+	- fixed indirect descriptor batching
+
+Changes from v1:
+	- typo fixes
+
+
+Michael S. Tsirkin (4):
+  vhost: option to fetch descriptors through an independent struct
+  vhost/test: add an option to test new code
+  vhost: batching fetches
+  vhost/net: add an option to test new code
+
+ drivers/vhost/net.c   |  32 +++-
+ drivers/vhost/test.c  |  19 ++-
+ drivers/vhost/vhost.c | 340 +++++++++++++++++++++++++++++++++++++++++-
+ drivers/vhost/vhost.h |  20 ++-
+ 4 files changed, 397 insertions(+), 14 deletions(-)
+
 -- 
-2.23.0.700.g56cf767bdb-goog
+MST
 
