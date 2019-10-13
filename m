@@ -2,86 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D42AD55FC
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 13:42:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B9ACD5859
+	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 23:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729315AbfJMLm2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 07:42:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38126 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729370AbfJMLm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Oct 2019 07:42:27 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 707933B464
-        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 11:42:27 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id x77so14048888qka.11
-        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 04:42:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LyPdJiu+Pv3Ms2s+9K7y5cFNFk6/oEkuyO+dRyVq8dg=;
-        b=JvSayOAsSNCMMtM5CvbB4jB5QhXHK2ysSXDq9uRvqnrs+rOieQFI56Q6SRAPKwEIB2
-         afUUsTC3vXvg1/uW7tDewAWJ3XT0coD1V0ymQVBzycu7P2gtm4yBqzNFmbUiJoU9geli
-         nL1YNasiGyMt4J0d9fBNa2JMNLU2rJF6pd1dC4G9p+kRNC6/G6yOAUbhKXEPmh3+CXu9
-         /vYRevewbaTR4JgyxrXCjyo3QCRDdJTr0/P3iTeArNvc6hWsSy4MMVOeNE+vRg8mpw91
-         duNIPn8341P65EKg6a7FQasSBLwx19SCU2DvubfXDUGiQl8DAK04NWY2zql17PUOmCGw
-         JiqA==
-X-Gm-Message-State: APjAAAX1PpHMJluz0DiLzPAAWvoLyn+9AA8ObTK24TwLavsqJlBJNMDt
-        glhq770D/Vhu+aIk49oLE36ZmVQUarIXc3CrRvbIvAjXX+nfrdyPwD4y4jat0JwMqdplPEVd7HO
-        tcnGta8vwr0FV
-X-Received: by 2002:a0c:c792:: with SMTP id k18mr25297612qvj.154.1570966946778;
-        Sun, 13 Oct 2019 04:42:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyhx3XLFozvF0Fexkmjc2uJBOUXPVXIPjvAKX3RiiVhxNpPC56P8T4wN2MQG4g59b9OLo3Gdg==
-X-Received: by 2002:a0c:c792:: with SMTP id k18mr25297597qvj.154.1570966946584;
-        Sun, 13 Oct 2019 04:42:26 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
-        by smtp.gmail.com with ESMTPSA id z5sm7213125qtb.49.2019.10.13.04.42.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Oct 2019 04:42:25 -0700 (PDT)
-Date:   Sun, 13 Oct 2019 07:42:22 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>
-Subject: [PATCH RFC v4 5/5] vhost: last descriptor must have NEXT clear
-Message-ID: <20191013113940.2863-6-mst@redhat.com>
-References: <20191013113940.2863-1-mst@redhat.com>
+        id S1729223AbfJMVmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 17:42:13 -0400
+Received: from sonic315-21.consmr.mail.ne1.yahoo.com ([66.163.190.147]:42180
+        "EHLO sonic315-21.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727632AbfJMVmN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 13 Oct 2019 17:42:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1571002932; bh=AZDKeY/KduJkitky/ovq7oNAqmYov3JYHc+M1QmYqnU=; h=Date:From:Reply-To:Subject:From:Subject; b=WLqD/BceALicXFQ2HysQF+M/1T5kXG6DQkeO3gEWhZd9ATBJB4ste5QP6xbqGxCwD4k1BLIiAURoPaxn6zY+9kQSt6PvLwDSzlDg2R8QXr5Q06eA7scLQLOtSeGT7UsT66IqjLNmSWGkGcTNyFi8X6SFOZrlM5LGd/rYtcxOsUm23rRMuRbgwMJuusTAMlYSxojHho1RaqpVGDrHNSpv/PlQ4mkk1o97uE3PHnRJiIJNFZZIROhlJBr9KYwQxU46vJze+wxtj7zjLcArsB7JCSCEVFg5dadJbKTF6Xc1QgmnVhWibao52JIGbHoiucIuvIl2GG0WXq+teaC45SGF2Q==
+X-YMail-OSG: 9SN.jO4VM1m5UBqEhlFxOzSqph_GFnNCQteNFa5xKuNdyg7syt6rYQvFEp46mn7
+ BHb1IIQ2eAXDxN66JKdSiPGOFJBSjVCt64qjSZcZM7xeMVacftlydN8Y3q6TX2SYJjG4jj5OGZIj
+ BDGO6n3bZ5tofxetPHBUlG6qnagQBrMqqjDBGXal.1O.nDUREPNKLo.b1IaZix8k1MH4nrv_ABPV
+ P3.oY41hAgfL3TmeICs4oDFu8CFA9WXuqfxn2eAPEyyfeLA.efQJx7hqhkVsYWwyXQhOSRwg6.Gi
+ mOw5JPxqA21DSuVr2RjoiZuhvwSauIyhjskh0UtN0UEdUF78raZtDubJXPBGwUYepSYI_OHDnPsP
+ pj3olL5dn1tKw7X4dZVYN_UeorMp62fEZ5DVsinrzXR9c7R5iNS1KeaU9sVsHxHQTE10s.xJydcU
+ 3A6Y3W62mRdcYzMPqAGIaLR6JD8MkpWjwKlcIV_84lV4ZAliIBPmVIdYCD32q_fTHTiEoU72cG1n
+ lH74WZFZpojxMKRGpoaBioEqULeL_yVjO56.CXdPb19zymHffYdxkSMFb1FNKr22k6AyHxS9lKOZ
+ EA8iq3BVhP2hY_M95UpV19gZRM2hv6ddyFIB8G0FCRpwhE2OjS0YaQq1qrcssQyHSQyAgunUBkuq
+ Jq.qntn.qJGIzVsxQmSPD2BtXBnPOAOS_OF3YEy0wtjE_gvVrqrywOneO7qnyRuZJDeng3m64UqO
+ CxPzOfBAv4sqja1PvA4NoETwD0fLgtQjs53v9GSN4Y0W08rpTGdsB5pcsYvmb49Xh4PLEESXIbg8
+ a0GdFpW3AncxGkvTO6ev720Hs5mbkYjzReaG2cP540s9ZHP4knd7QVbhdyXT87MYrqJbdDPVD8fV
+ JEsJf4LcVaQaIbYgnY2lSQL6yxHZMeaFzRMbSGDpJ4.ooW6iI7E6YiiAyq5KxPQB4WhU7zZ0diF6
+ E16G6hhR_a.GhsDzpDeWRD59hIwutrQoaMZu42QPKXvuSlXloARtIxCD.l.WrUUM4S88xlwnlwrz
+ 3z2tr6PoaFwSHDtH_HDqHKnIQkXOv1Mt0nTBlQeyOWoEbS.2.hb9up1EWv3DtjQIFQiShXG55Shd
+ ZdxmVu9EHHg7ejoHN2eKMsAf8EY2bJU9zvKs19kpNJL1ESFCPBCX3Y8S68J3FtJ0RMUlaTRNVje9
+ TfJJP9TMX8lguLzgifqkcTMrcwVD3CZQ.VKNlg4xe9COsYZLnYr9C8yJ7z_mit8g8B7iQAOkbGi.
+ wbY8Yn.iRqu6R3O3rkg1y_0VKj26jjyA7Ka5Om2IzaCHVNcaY.UQFrA--
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 13 Oct 2019 21:42:12 +0000
+Date:   Sun, 13 Oct 2019 21:42:11 +0000 (UTC)
+From:   Lipton Davied <barrsterliptondaveid@gmail.com>
+Reply-To: barrsterliptondaveid@gmail.com
+Message-ID: <1726240534.968324.1571002931214@mail.yahoo.com>
+Subject: HI
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191013113940.2863-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-fetch_buf already guarantees we exit on a descriptor without a NEXT
-flag.  Add a BUG_ON statement to make sure we don't overflow the buffer
-in case of a bug.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/vhost/vhost.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index d46c28149f6f..09f594bb069a 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -2656,6 +2656,8 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
- 			break;
- 	}
- 
-+	BUG_ON(i >= vq->ndescs);
-+
- 	vq->first_desc = i + 1;
- 
- 	return ret;
--- 
-MST
+Lieber Freund
 
+
+Ich bin Herr Lipton, Rechtsberater. Ich m=C3=B6chte, dass Ihr Kontakt mir h=
+ilft, einen von meinem verstorbenen Kunden auf seinem Konto hinterlassenen =
+wertvollen Betrag (4,8 Mio. USD) wiederzugewinnen, bevor er von der Securit=
+y Finance-Firma, bei der der Betrag eingezahlt wurde, unbrauchbar beschlagn=
+ahmt oder ausgewertet wird.
+
+
+Ich bitte nur um ehrliche Zusammenarbeit, um diese Transaktion so schnell w=
+ie m=C3=B6glich zu sehen.
+
+
+Ich suche eine direkte Antwort auf weitere Klarstellungen.
+
+
+Gr=C3=BC=C3=9Fe
+
+
+Mr. Lipton Daveid (links)
