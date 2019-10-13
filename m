@@ -2,130 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D7E6D5920
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 02:50:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACA39D593E
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 03:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729596AbfJNAt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 20:49:56 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43880 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729454AbfJNAt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Oct 2019 20:49:56 -0400
-Received: by mail-oi1-f194.google.com with SMTP id t84so12414132oih.10;
-        Sun, 13 Oct 2019 17:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Dm90rt3X4Dj0eZ5nqIXjNthLIZg5on7T0CNMl+bnamI=;
-        b=XE1UTlaI0ZlC+hBkpc7OA5fWSkOET5PEeVgIug60HyB8Ljy84wZqVh/RMQrjINYbty
-         NdTqnyJSMZX1AFMLi4orjiH0xoP2Vigz663/RR5zx7mGQVm1R7qGnELhRrvGvRw09AwB
-         U6tT8Es08EKQ3vSOaNMXymM4T/n5uC0fnkD48oCPd8EDWrncVEFg/sAA5tcLlJsG31H4
-         Dh32BfSvfJpudqCpStZVVEkCGMNotSF1PS81/u0A5BiVBUpke8qMgtYZy+7E0aPk38jA
-         T3w4LD0S4LoMdsQ8NjZxxxmeoGCt1kM2h2lkaHeYRGIcCpfRlwE8LBKkZslNQfyld7gO
-         LM7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Dm90rt3X4Dj0eZ5nqIXjNthLIZg5on7T0CNMl+bnamI=;
-        b=uhjTXTzTIaRYXfZ/PS/KgFTH/kXSAqAvTaz/fwqcQRc3cHkm+u+tzVJZdm4+pGJPjm
-         MtrSdRY2q4v0LWMnyK9g8TovvSHK5I12TIahKl5HPOS3D0GYhAH3SlWF4/XWbdlTtu4d
-         e7IhLTysuMO8bJw5cHpsOk10uslNby/I2eVLn0pd5nJQbwTBlc+4cbSZF2UIjvzk0qRS
-         RpNl+MS2nse1361lqxI9cLflvT7Or5ZFmYCwla8No+4gXPGStIZRWevbx2pscv5HSCAv
-         odTWApaUrVrfk+Lup2wgMyOVPli+0UlrsGioc9sI3Fvb8N11ysw+NFH73wUY9zH3M6Zp
-         yBbw==
-X-Gm-Message-State: APjAAAXUF+EaWV/qQLWPKDku5WXEODo3yojg6W7FtQmjPehWfI1a1jR3
-        aHxY8GFW2ruU51a5szWo+6MB6zCiynPeBinqdOXhag==
-X-Google-Smtp-Source: APXvYqxHyULL/aZ+orTB4oPYdU/SUdg/07ZS2C52JueTMCjbvM79SmxwlCVeROmuMrojVdXYg3qOO5lAxDrvtJtHKSw=
-X-Received: by 2002:aca:da41:: with SMTP id r62mr21466808oig.47.1571014193872;
- Sun, 13 Oct 2019 17:49:53 -0700 (PDT)
+        id S1729564AbfJNBUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 21:20:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:18548 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729180AbfJNBUx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Oct 2019 21:20:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Oct 2019 18:20:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,294,1566889200"; 
+   d="scan'208";a="395033621"
+Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
+  by fmsmga005.fm.intel.com with ESMTP; 13 Oct 2019 18:20:48 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        peterz@infradead.org, Jim Mattson <jmattson@google.com>
+Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
+        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] KVM: x86/vPMU: Efficiency optimization by reusing last created perf_event
+Date:   Sun, 13 Oct 2019 17:15:29 +0800
+Message-Id: <20191013091533.12971-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <1568974038-13750-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1568974038-13750-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 14 Oct 2019 08:49:42 +0800
-Message-ID: <CANRm+Cy_eQ=m=bDfyw2yrAmDjJuc=f+siSQTrPpjCpBbYbfPeA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: micro-optimize fixed mode ipi delivery
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping,
-On Fri, 20 Sep 2019 at 18:07, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> After disabling mwait/halt/pause vmexits, RESCHEDULE_VECTOR and
-> CALL_FUNCTION_SINGLE_VECTOR etc IPI is one of the main remaining
-> cause of vmexits observed in product environment which can't be
-> optimized by PV IPIs. This patch is the follow-up on commit
-> 0e6d242eccdb (KVM: LAPIC: Micro optimize IPI latency), to optimize
-> redundancy logic before fixed mode ipi is delivered in the fast
-> path.
->
-> - broadcast handling needs to go slow path, so the delivery mode repair
->   can be delayed to before slow path.
-> - self-IPI will not be intervened by hypervisor any more after APICv is
->   introduced and the boxes support APICv are popular now. In addition,
->   kvm_apic_map_get_dest_lapic() can handle the self-IPI, so there is no
->   need a shortcut for the non-APICv case.
->
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/irq_comm.c | 6 +++---
->  arch/x86/kvm/lapic.c    | 5 -----
->  2 files changed, 3 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index 8ecd48d..aa88156 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -52,15 +52,15 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
->         unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
->         unsigned int dest_vcpus = 0;
->
-> +       if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
-> +               return r;
-> +
->         if (irq->dest_mode == 0 && irq->dest_id == 0xff &&
->                         kvm_lowest_prio_delivery(irq)) {
->                 printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
->                 irq->delivery_mode = APIC_DM_FIXED;
->         }
->
-> -       if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
-> -               return r;
-> -
->         memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
->
->         kvm_for_each_vcpu(i, vcpu, kvm) {
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 323bdca..d77fe29 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -955,11 +955,6 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
->
->         *r = -1;
->
-> -       if (irq->shorthand == APIC_DEST_SELF) {
-> -               *r = kvm_apic_set_irq(src->vcpu, irq, dest_map);
-> -               return true;
-> -       }
-> -
->         rcu_read_lock();
->         map = rcu_dereference(kvm->arch.apic_map);
->
-> --
-> 2.7.4
->
+Performance Monitoring Unit is designed to monitor micro architectural
+events which helps in analyzing how applications or operating systems
+are performing on the processors. In KVM/X86, version 2 Architectural
+PMU on Intel and AMD hosts have been enabled.
+
+This patch series is going to improve vPMU Efficiency for guest perf users
+which is mainly measured by guest NMI handler latency for basic perf usages
+[1][2][3][4] with hardware PMU. It's not a passthrough solution but based
+on the legacy vPMU implementation (since 2011) with backport-friendliness.
+
+The general idea (defined in patch 2/3) is to reuse last created perf_event
+for the same vPMC when the new requested config is the exactly same as the
+last programed config (used by pmc_reprogram_counter()) AND the new event
+period is appropriate and accepted (via perf_event_period() in patch 1/3).
+Before reusing the perf_event, it will be disabled until it's suitable for
+reuse and a hardware counter will be reassigned again to serve vPMC.
+
+If the disabled perf_event is no longer reused, we do a lazy release
+mechanism (defined in patch 3/3) which in a short is to release the
+disabled perf_events on the first call of vcpu_enter_guest since the
+vcpu gets next scheduled in if its MSRs is not accessed in the last
+sched time slice. The bitmap pmu->lazy_release_ctrl is added to track.
+The kvm_pmu_cleanup() is called at the first time to run vcpu_enter_guest
+after the vcpu shced_in and the overhead for check is very limited.
+
+With this optimization, the average latency of the guest NMI handler is
+reduced from 99450 ns to 56195 ns (1.76x speed up on CLX-AP with v5.3).
+If host disables the watchdog (echo 0 > /proc/sys/kernel/watchdog), the
+minimum latency of guest NMI handler could be speed up at 2994x and in
+the average at 685x. The run time of workload with perf attached inside
+the guest could be reduced significantly with this optimization.
+
+Please check each commit for more details and share your comments with us.
+
+Thanks,
+Like Xu
+
+---
+[1] multiplexing sampling usage: time perf record  -e \
+`perf list | grep Hardware | grep event |\
+awk '{print $1}' | head -n 10 |tr '\n' ',' | sed 's/,$//' ` ./ftest
+[2] one gp counter sampling usage: perf record -e branch-misses ./ftest
+[3] one fixed counter sampling usage: perf record -e instructions ./ftest
+[4] event count usage: perf stat -e branch-misses ./ftest
+
+---
+Changes in v2:
+- use perf_event_pause() to disable, read, reset by only one lock;
+- use __perf_event_read_value() after _perf_event_disable();
+- replace bitfields with 'u8 event_count; bool need_cleanup;';
+- refine comments and commit messages;
+- fix two issues reported by kbuild test robot for ARCH=[nds32|sh]
+
+v1:
+https://lore.kernel.org/kvm/20190930072257.43352-1-like.xu@linux.intel.com/
+
+Like Xu (4):
+  perf/core: Provide a kernel-internal interface to recalibrate event
+    period
+  perf/core: Provide a kernel-internal interface to pause perf_event
+  KVM: x86/vPMU: Reuse perf_event to avoid unnecessary
+    pmc_reprogram_counter
+  KVM: x86/vPMU: Add lazy mechanism to release perf_event per vPMC
+
+ arch/x86/include/asm/kvm_host.h | 17 +++++++
+ arch/x86/kvm/pmu.c              | 88 ++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/pmu.h              | 15 +++++-
+ arch/x86/kvm/pmu_amd.c          | 14 ++++++
+ arch/x86/kvm/vmx/pmu_intel.c    | 27 ++++++++++
+ arch/x86/kvm/x86.c              | 12 +++++
+ include/linux/perf_event.h      | 10 ++++
+ kernel/events/core.c            | 44 ++++++++++++++---
+ 8 files changed, 216 insertions(+), 11 deletions(-)
+
+-- 
+2.21.0
+
