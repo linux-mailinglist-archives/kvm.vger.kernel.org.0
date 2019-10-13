@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACA39D593E
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 03:21:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD814D5946
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 03:21:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729564AbfJNBUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 21:20:53 -0400
+        id S1729739AbfJNBU4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 21:20:56 -0400
 Received: from mga02.intel.com ([134.134.136.20]:18548 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729180AbfJNBUx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Oct 2019 21:20:53 -0400
+        id S1729180AbfJNBUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Oct 2019 21:20:54 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Oct 2019 18:20:51 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Oct 2019 18:20:54 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,294,1566889200"; 
-   d="scan'208";a="395033621"
+   d="scan'208";a="395033631"
 Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Oct 2019 18:20:48 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 13 Oct 2019 18:20:51 -0700
 From:   Like Xu <like.xu@linux.intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         peterz@infradead.org, Jim Mattson <jmattson@google.com>
@@ -29,92 +29,115 @@ Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
         ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
         like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/4] KVM: x86/vPMU: Efficiency optimization by reusing last created perf_event
-Date:   Sun, 13 Oct 2019 17:15:29 +0800
-Message-Id: <20191013091533.12971-1-like.xu@linux.intel.com>
+Subject: [PATCH v2 1/4] perf/core: Provide a kernel-internal interface to recalibrate event period
+Date:   Sun, 13 Oct 2019 17:15:30 +0800
+Message-Id: <20191013091533.12971-2-like.xu@linux.intel.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191013091533.12971-1-like.xu@linux.intel.com>
+References: <20191013091533.12971-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Performance Monitoring Unit is designed to monitor micro architectural
-events which helps in analyzing how applications or operating systems
-are performing on the processors. In KVM/X86, version 2 Architectural
-PMU on Intel and AMD hosts have been enabled.
+Currently, perf_event_period() is used by user tools via ioctl. Based on
+naming convention, exporting perf_event_period() for kernel users (such
+as KVM) who may recalibrate the event period for their assigned counter
+according to their requirements.
 
-This patch series is going to improve vPMU Efficiency for guest perf users
-which is mainly measured by guest NMI handler latency for basic perf usages
-[1][2][3][4] with hardware PMU. It's not a passthrough solution but based
-on the legacy vPMU implementation (since 2011) with backport-friendliness.
+The perf_event_period() is an external accessor, just like the
+perf_event_{en,dis}able() and should thus use perf_event_ctx_lock().
 
-The general idea (defined in patch 2/3) is to reuse last created perf_event
-for the same vPMC when the new requested config is the exactly same as the
-last programed config (used by pmc_reprogram_counter()) AND the new event
-period is appropriate and accepted (via perf_event_period() in patch 1/3).
-Before reusing the perf_event, it will be disabled until it's suitable for
-reuse and a hardware counter will be reassigned again to serve vPMC.
-
-If the disabled perf_event is no longer reused, we do a lazy release
-mechanism (defined in patch 3/3) which in a short is to release the
-disabled perf_events on the first call of vcpu_enter_guest since the
-vcpu gets next scheduled in if its MSRs is not accessed in the last
-sched time slice. The bitmap pmu->lazy_release_ctrl is added to track.
-The kvm_pmu_cleanup() is called at the first time to run vcpu_enter_guest
-after the vcpu shced_in and the overhead for check is very limited.
-
-With this optimization, the average latency of the guest NMI handler is
-reduced from 99450 ns to 56195 ns (1.76x speed up on CLX-AP with v5.3).
-If host disables the watchdog (echo 0 > /proc/sys/kernel/watchdog), the
-minimum latency of guest NMI handler could be speed up at 2994x and in
-the average at 685x. The run time of workload with perf attached inside
-the guest could be reduced significantly with this optimization.
-
-Please check each commit for more details and share your comments with us.
-
-Thanks,
-Like Xu
-
+Suggested-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
 ---
-[1] multiplexing sampling usage: time perf record  -e \
-`perf list | grep Hardware | grep event |\
-awk '{print $1}' | head -n 10 |tr '\n' ',' | sed 's/,$//' ` ./ftest
-[2] one gp counter sampling usage: perf record -e branch-misses ./ftest
-[3] one fixed counter sampling usage: perf record -e instructions ./ftest
-[4] event count usage: perf stat -e branch-misses ./ftest
+ include/linux/perf_event.h |  5 +++++
+ kernel/events/core.c       | 28 +++++++++++++++++++++-------
+ 2 files changed, 26 insertions(+), 7 deletions(-)
 
----
-Changes in v2:
-- use perf_event_pause() to disable, read, reset by only one lock;
-- use __perf_event_read_value() after _perf_event_disable();
-- replace bitfields with 'u8 event_count; bool need_cleanup;';
-- refine comments and commit messages;
-- fix two issues reported by kbuild test robot for ARCH=[nds32|sh]
-
-v1:
-https://lore.kernel.org/kvm/20190930072257.43352-1-like.xu@linux.intel.com/
-
-Like Xu (4):
-  perf/core: Provide a kernel-internal interface to recalibrate event
-    period
-  perf/core: Provide a kernel-internal interface to pause perf_event
-  KVM: x86/vPMU: Reuse perf_event to avoid unnecessary
-    pmc_reprogram_counter
-  KVM: x86/vPMU: Add lazy mechanism to release perf_event per vPMC
-
- arch/x86/include/asm/kvm_host.h | 17 +++++++
- arch/x86/kvm/pmu.c              | 88 ++++++++++++++++++++++++++++++++-
- arch/x86/kvm/pmu.h              | 15 +++++-
- arch/x86/kvm/pmu_amd.c          | 14 ++++++
- arch/x86/kvm/vmx/pmu_intel.c    | 27 ++++++++++
- arch/x86/kvm/x86.c              | 12 +++++
- include/linux/perf_event.h      | 10 ++++
- kernel/events/core.c            | 44 ++++++++++++++---
- 8 files changed, 216 insertions(+), 11 deletions(-)
-
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 61448c19a132..d601df36e671 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1336,6 +1336,7 @@ extern void perf_event_disable_local(struct perf_event *event);
+ extern void perf_event_disable_inatomic(struct perf_event *event);
+ extern void perf_event_task_tick(void);
+ extern int perf_event_account_interrupt(struct perf_event *event);
++extern int perf_event_period(struct perf_event *event, u64 value);
+ #else /* !CONFIG_PERF_EVENTS: */
+ static inline void *
+ perf_aux_output_begin(struct perf_output_handle *handle,
+@@ -1415,6 +1416,10 @@ static inline void perf_event_disable(struct perf_event *event)		{ }
+ static inline int __perf_event_disable(void *info)			{ return -1; }
+ static inline void perf_event_task_tick(void)				{ }
+ static inline int perf_event_release_kernel(struct perf_event *event)	{ return 0; }
++static inline int perf_event_period(struct perf_event *event, u64 value)
++{
++	return -EINVAL;
++}
+ #endif
+ 
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 9ec0b0bfddbd..e1b83d2731da 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -5106,16 +5106,11 @@ static int perf_event_check_period(struct perf_event *event, u64 value)
+ 	return event->pmu->check_period(event, value);
+ }
+ 
+-static int perf_event_period(struct perf_event *event, u64 __user *arg)
++static int _perf_event_period(struct perf_event *event, u64 value)
+ {
+-	u64 value;
+-
+ 	if (!is_sampling_event(event))
+ 		return -EINVAL;
+ 
+-	if (copy_from_user(&value, arg, sizeof(value)))
+-		return -EFAULT;
+-
+ 	if (!value)
+ 		return -EINVAL;
+ 
+@@ -5133,6 +5128,19 @@ static int perf_event_period(struct perf_event *event, u64 __user *arg)
+ 	return 0;
+ }
+ 
++int perf_event_period(struct perf_event *event, u64 value)
++{
++	struct perf_event_context *ctx;
++	int ret;
++
++	ctx = perf_event_ctx_lock(event);
++	ret = _perf_event_period(event, value);
++	perf_event_ctx_unlock(event, ctx);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(perf_event_period);
++
+ static const struct file_operations perf_fops;
+ 
+ static inline int perf_fget_light(int fd, struct fd *p)
+@@ -5176,8 +5184,14 @@ static long _perf_ioctl(struct perf_event *event, unsigned int cmd, unsigned lon
+ 		return _perf_event_refresh(event, arg);
+ 
+ 	case PERF_EVENT_IOC_PERIOD:
+-		return perf_event_period(event, (u64 __user *)arg);
++	{
++		u64 value;
++
++		if (copy_from_user(&value, (u64 __user *)arg, sizeof(value)))
++			return -EFAULT;
+ 
++		return _perf_event_period(event, value);
++	}
+ 	case PERF_EVENT_IOC_ID:
+ 	{
+ 		u64 id = primary_event_id(event);
 -- 
 2.21.0
 
