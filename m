@@ -2,243 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C886D595E
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 03:49:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1746D596E
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 03:55:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729714AbfJNBr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 21:47:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54132 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729652AbfJNBrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 13 Oct 2019 21:47:25 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 16D675945E;
-        Mon, 14 Oct 2019 01:47:25 +0000 (UTC)
-Received: from [10.72.12.117] (ovpn-12-117.pek2.redhat.com [10.72.12.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D0B1219C58;
-        Mon, 14 Oct 2019 01:47:19 +0000 (UTC)
-Subject: Re: [PATCH RFC v1 2/2] vhost: batching fetches
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-References: <20191011134358.16912-1-mst@redhat.com>
- <20191011134358.16912-3-mst@redhat.com>
- <3be186d8-cde6-aa08-0446-1ec7fec0efe0@redhat.com>
- <20191012162759-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b6f24555-aaf8-b470-ab16-099055364cfc@redhat.com>
-Date:   Mon, 14 Oct 2019 09:47:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729726AbfJNBy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 21:54:59 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:38246 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729659AbfJNBy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Oct 2019 21:54:59 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9E1ndFm173147;
+        Mon, 14 Oct 2019 01:53:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=j5D+EfTCH3XEexfVGOeGGMESi7OPI6/NGgwOQMZ9O/0=;
+ b=HOG78u7pcBus9hSBE6n90TV7D0yGvrjDG8kc8ySemUiMqgW0JzFTMTFB6Fvp9uMbp3uL
+ ZMI4lQoJh1mbewqOlC9X0sr/8o63mrFTmqx+VLj0j8vsJGI5IY8T3Lx/wuWFL1VBySLi
+ hLIkpT7emwb1+aYtlhbt3wbuwcZSFug+qxqdsdquqTqoqzINnqQz3vPFytlx1FjNZlKl
+ bYOlXJpfqSgVVem3xxS/96536l562aGZ5wO3Igr23i+RfwYH4l2rtslv1ihJ8+Oe5+IN
+ kXIQrVkkUkuHVwaHB3Z/r4b/0wYTNgLZQbmLHgANytdLgWyaGZoSRt1U7CO6Rq4MBT3s pw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2vk6sq5h0a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Oct 2019 01:53:12 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9E1j6Vi017104;
+        Mon, 14 Oct 2019 01:53:11 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2vkry5187c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Oct 2019 01:53:11 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9E1r5Jt015486;
+        Mon, 14 Oct 2019 01:53:06 GMT
+Received: from [10.191.5.73] (/10.191.5.73)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Oct 2019 01:53:05 +0000
+Subject: Re: [PATCH v5 3/5] x86/kvm: Add "nopvspin" parameter to disable PV
+ spinlocks
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, sstabellini@kernel.org, peterz@infradead.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>
+References: <1570439071-9814-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1570439071-9814-4-git-send-email-zhenzhong.duan@oracle.com>
+ <87o8yl587f.fsf@vitty.brq.redhat.com>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <4e1ef1d3-527b-bb70-5536-d9daeb50b7c7@oracle.com>
+Date:   Mon, 14 Oct 2019 09:52:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191012162759-mutt-send-email-mst@kernel.org>
+In-Reply-To: <87o8yl587f.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 14 Oct 2019 01:47:25 +0000 (UTC)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9409 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910140015
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9409 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910140016
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/10/13 上午4:36, Michael S. Tsirkin wrote:
-> On Sat, Oct 12, 2019 at 03:30:52PM +0800, Jason Wang wrote:
->> On 2019/10/11 下午9:46, Michael S. Tsirkin wrote:
->>> With this patch applied, new and old code perform identically.
->>>
->>> Lots of extra optimizations are now possible, e.g.
->>> we can fetch multiple heads with copy_from/to_user now.
->>> We can get rid of maintaining the log array.  Etc etc.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>    drivers/vhost/test.c  |  2 +-
->>>    drivers/vhost/vhost.c | 50 ++++++++++++++++++++++++++++++++++++-------
->>>    drivers/vhost/vhost.h |  4 +++-
->>>    3 files changed, 46 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
->>> index 39a018a7af2d..e3a8e9db22cd 100644
->>> --- a/drivers/vhost/test.c
->>> +++ b/drivers/vhost/test.c
->>> @@ -128,7 +128,7 @@ static int vhost_test_open(struct inode *inode, struct file *f)
->>>    	dev = &n->dev;
->>>    	vqs[VHOST_TEST_VQ] = &n->vqs[VHOST_TEST_VQ];
->>>    	n->vqs[VHOST_TEST_VQ].handle_kick = handle_vq_kick;
->>> -	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV,
->>> +	vhost_dev_init(dev, vqs, VHOST_TEST_VQ_MAX, UIO_MAXIOV + 64,
->>>    		       VHOST_TEST_PKT_WEIGHT, VHOST_TEST_WEIGHT);
->>>    	f->private_data = n;
->>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->>> index 36661d6cb51f..aa383e847865 100644
->>> --- a/drivers/vhost/vhost.c
->>> +++ b/drivers/vhost/vhost.c
->>> @@ -302,6 +302,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
->>>    {
->>>    	vq->num = 1;
->>>    	vq->ndescs = 0;
->>> +	vq->first_desc = 0;
->>>    	vq->desc = NULL;
->>>    	vq->avail = NULL;
->>>    	vq->used = NULL;
->>> @@ -390,6 +391,7 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
->>>    	for (i = 0; i < dev->nvqs; ++i) {
->>>    		vq = dev->vqs[i];
->>>    		vq->max_descs = dev->iov_limit;
->>> +		vq->batch_descs = dev->iov_limit - UIO_MAXIOV;
->>>    		vq->descs = kmalloc_array(vq->max_descs,
->>>    					  sizeof(*vq->descs),
->>>    					  GFP_KERNEL);
->>> @@ -2366,6 +2368,8 @@ static void pop_split_desc(struct vhost_virtqueue *vq)
->>>    	--vq->ndescs;
->>>    }
->>> +#define VHOST_DESC_FLAGS (VRING_DESC_F_INDIRECT | VRING_DESC_F_WRITE | \
->>> +			  VRING_DESC_F_NEXT)
->>>    static int push_split_desc(struct vhost_virtqueue *vq, struct vring_desc *desc, u16 id)
->>>    {
->>>    	struct vhost_desc *h;
->>> @@ -2375,7 +2379,7 @@ static int push_split_desc(struct vhost_virtqueue *vq, struct vring_desc *desc,
->>>    	h = &vq->descs[vq->ndescs++];
->>>    	h->addr = vhost64_to_cpu(vq, desc->addr);
->>>    	h->len = vhost32_to_cpu(vq, desc->len);
->>> -	h->flags = vhost16_to_cpu(vq, desc->flags);
->>> +	h->flags = vhost16_to_cpu(vq, desc->flags) & VHOST_DESC_FLAGS;
->>>    	h->id = id;
->>>    	return 0;
->>> @@ -2450,7 +2454,7 @@ static int fetch_indirect_descs(struct vhost_virtqueue *vq,
->>>    	return 0;
->>>    }
->>> -static int fetch_descs(struct vhost_virtqueue *vq)
->>> +static int fetch_buf(struct vhost_virtqueue *vq)
->>>    {
->>>    	struct vring_desc desc;
->>>    	unsigned int i, head, found = 0;
->>> @@ -2462,7 +2466,11 @@ static int fetch_descs(struct vhost_virtqueue *vq)
->>>    	/* Check it isn't doing very strange things with descriptor numbers. */
->>>    	last_avail_idx = vq->last_avail_idx;
->>> -	if (vq->avail_idx == vq->last_avail_idx) {
->>> +	if (unlikely(vq->avail_idx == vq->last_avail_idx)) {
->>> +		/* If we already have work to do, don't bother re-checking. */
->>> +		if (likely(vq->ndescs))
->>> +			return vq->num;
->>> +
->>>    		if (unlikely(vhost_get_avail_idx(vq, &avail_idx))) {
->>>    			vq_err(vq, "Failed to access avail idx at %p\n",
->>>    				&vq->avail->idx);
->>> @@ -2541,6 +2549,24 @@ static int fetch_descs(struct vhost_virtqueue *vq)
->>>    	return 0;
->>>    }
->>> +static int fetch_descs(struct vhost_virtqueue *vq)
->>> +{
->>> +	int ret = 0;
->>> +
->>> +	if (unlikely(vq->first_desc >= vq->ndescs)) {
->>> +		vq->first_desc = 0;
->>> +		vq->ndescs = 0;
->>> +	}
->>> +
->>> +	if (vq->ndescs)
->>> +		return 0;
->>> +
->>> +	while (!ret && vq->ndescs <= vq->batch_descs)
->>> +		ret = fetch_buf(vq);
->>
->> It looks to me descriptor chaining might be broken here.
-> It should work because fetch_buf fetches a whole buf, following
-> the chain. Seems to work in a small test ... what issues do you see?
+On 2019/10/13 17:02, Vitaly Kuznetsov wrote:
+> Zhenzhong Duan <zhenzhong.duan@oracle.com> writes:
+...snip
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index ef836d6..6e14bd4 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -825,18 +825,31 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
+>    */
+>   void __init kvm_spinlock_init(void)
+>   {
+> -	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
+> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
+> +	/*
+> +	 * Disable PV qspinlocks if host kernel doesn't support
+> +	 * KVM_FEATURE_PV_UNHALT feature or there is only 1 vCPU.
+> +	 * virt_spin_lock_key is enabled to avoid lock holder
+> +	 * preemption issue.
+> +	 */
+> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT) ||
+> +	    num_possible_cpus() == 1) {
+> +		pr_info("PV spinlocks disabled\n");
+> Why don't we need static_branch_disable(&virt_spin_lock_key) here?
 
+Thanks for review.
 
-Consider the case when fetch_buf return -EINVAL when push_split_desc() 
-fail. This means we only have partial descriptors.
+I have a brief explanation in above comment area.
 
-Do we need decreasing last_avail_idx and vq->ndescs here? Or having a 
-head,tail instead of first_desc?
+Boris also raised the same question in v4 and see my detailed explanation
 
-Thanks
-
+in https://lkml.org/lkml/2019/10/6/39
 
 >
->>> +
->>> +	return vq->ndescs ? 0 : ret;
->>> +}
->>> +
->>>    /* This looks in the virtqueue and for the first available buffer, and converts
->>>     * it to an iovec for convenient access.  Since descriptors consist of some
->>>     * number of output then some number of input descriptors, it's actually two
->>> @@ -2562,6 +2588,8 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
->>>    	if (ret)
->>>    		return ret;
->>> +	/* Note: indirect descriptors are not batched */
->>> +	/* TODO: batch up to a limit */
->>>    	last = peek_split_desc(vq);
->>>    	id = last->id;
->>> @@ -2584,12 +2612,12 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
->>>    	if (unlikely(log))
->>>    		*log_num = 0;
->>> -	for (i = 0; i < vq->ndescs; ++i) {
->>> +	for (i = vq->first_desc; i < vq->ndescs; ++i) {
->>>    		unsigned iov_count = *in_num + *out_num;
->>>    		struct vhost_desc *desc = &vq->descs[i];
->>>    		int access;
->>> -		if (desc->flags & ~(VRING_DESC_F_INDIRECT | VRING_DESC_F_WRITE)) {
->>> +		if (desc->flags & ~VHOST_DESC_FLAGS) {
->>>    			vq_err(vq, "Unexpected flags: 0x%x at descriptor id 0x%x\n",
->>>    			       desc->flags, desc->id);
->>>    			ret = -EINVAL;
->>> @@ -2628,15 +2656,21 @@ int vhost_get_vq_desc_batch(struct vhost_virtqueue *vq,
->>>    			}
->>>    			*out_num += ret;
->>>    		}
->>> +
->>> +		ret = desc->id;
->>> +
->>> +		if (!(desc->flags & VRING_DESC_F_NEXT))
->>> +			break;
->>>    	}
->>
->> What happens if we reach vq->ndescs but VRING_DESC_F_NEXT is still set?
->>
->> Thanks
-> This can't happen: descriptors are pushed by push_split_desc each time
-> we go through a loop in fetch_buf. The only way to exit the loop
-> with return code 0 is if next_desc return -1 that is when VRING_DESC_F_NEXT
-> is clear.
+> Also, as you're printing the exact reason for PV spinlocks disablement
+> in other cases, I'd suggest separating "no host support" and "single
+> CPU" cases.
+
+Will do after reaching a consensus on your first question.
+
 >
-> But it's a good idea to add a BUG_ON here, I'll do it in the next version.
+>>   		return;
+>> +	}
+>>   
+>>   	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
+>> +		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
+>>   		static_branch_disable(&virt_spin_lock_key);
+>>   		return;
+>>   	}
+>>   
+>> -	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
+>> -	if (num_possible_cpus() == 1)
+>> +	if (nopvspin) {
+>> +		pr_info("PV spinlocks disabled forced by \"nopvspin\" parameter.\n");
+> Nit: to make it sound better a comma is missing between 'disabled' and
+> 'forced', or
 >
->
->>> -	ret = id;
->>> -	vq->ndescs = 0;
->>> +	vq->first_desc = i + 1;
->>>    	return ret;
->>>    err:
->>> -	vhost_discard_vq_desc(vq, 1);
->>> +	for (i = vq->first_desc; i < vq->ndescs; ++i)
->>> +		if (!(desc->flags & VRING_DESC_F_NEXT))
->>> +			vhost_discard_vq_desc(vq, 1);
->>>    	vq->ndescs = 0;
->>>    	return ret;
->>> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
->>> index 1724f61b6c2d..8b88e0c903da 100644
->>> --- a/drivers/vhost/vhost.h
->>> +++ b/drivers/vhost/vhost.h
->>> @@ -100,7 +100,9 @@ struct vhost_virtqueue {
->>>    	struct vhost_desc *descs;
->>>    	int ndescs;
->>> +	int first_desc;
->>>    	int max_descs;
->>> +	int batch_descs;
->>>    	const struct vhost_umem_node *meta_iotlb[VHOST_NUM_ADDRS];
->>>    	struct file *kick;
->>> @@ -245,7 +247,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
->>>    int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
->>>    #define vq_err(vq, fmt, ...) do {                                  \
->>> -		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
->>> +		pr_err(pr_fmt(fmt), ##__VA_ARGS__);       \
->>>    		if ((vq)->error_ctx)                               \
->>>    				eventfd_signal((vq)->error_ctx, 1);\
->>>    	} while (0)
+> "PV spinlocks forcefully disabled by ..." if you prefer.
+
+Will do.
+
+Zhenzhong
+
+
