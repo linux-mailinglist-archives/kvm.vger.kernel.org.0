@@ -2,119 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D3CA6D5BC4
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 08:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 305FAD5CD6
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 09:57:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730171AbfJNG67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 02:58:59 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39448 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730128AbfJNG66 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Oct 2019 02:58:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571036337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=fTMccw4yJmRrZCZ9gNo4nMTzO7ADWuT1mX49M7Icnho=;
-        b=Z6E2eVOOLBl/hs/JLfDLsLdK2UTxZo5xJu5dr0VqVRCo+Qy/5lXMoSc7PzEOl0hUtXHMyw
-        Bg0Qsd5GB1K8i53sJTnGMcAi0jz/Mk40jIuFI0ybxOH+jZy1+L670mddDoptQq1KZhRmjx
-        EN74q1IlkLuSzHVm8t0WvcHkHfMONp8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-6WkznHgqMLu4fqDjp6rA2Q-1; Mon, 14 Oct 2019 02:58:54 -0400
-Received: by mail-wr1-f69.google.com with SMTP id p8so3787489wrj.8
-        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 23:58:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=qg9GPSpE2649WBDEVbobtu+jtSwl5swPTKuvxOPA1Ww=;
-        b=DdRx2LF0mc7LX/jTVJvPaX0rP59oTvHqMKWAxHuSe2mB1wbsDWSsz0QHZ5EM1iXYTz
-         xQ2zGqa6Su0FwG89KKr72Yqsk+lf1MOGuuy7XdkmipLxdxNe9jbloA33H4kM8uKLBl3q
-         TDjLKOdZwAo7t9z89RVLrPRL3aYSKJWsAVAbByDloeRSqllDIWuYvyBkQbD4+bjCnGxH
-         igeyTUejL98oC6sddOJ/y5DpfNbwguACQqtbpYtslz/a40Gb20wOeup60AN2E4+e/PWS
-         BHicd74VHHorqWfYLP+OoZof6/5FT3eNAdRBZ5ZCDrB5wey5LYQ/wogLez1Edbofvpeq
-         bJgg==
-X-Gm-Message-State: APjAAAXWK/+hQm9kuRvPEeHdrUa5osyhL2Q30DlvYW5B9gWoN2h5dHMm
-        tkoeNKDban2ou60HQitqRD/9HHkuHOaA/OVvXxtU98Oqfljq+UUVDwyvFKHGit0wuIS7e/JindQ
-        +4EYUSap1DLXQ
-X-Received: by 2002:a1c:106:: with SMTP id 6mr12661939wmb.134.1571036333214;
-        Sun, 13 Oct 2019 23:58:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx2OUyyPpyXE9W0ygYy2lBrXHn8KLvNfyvMNxm3vCpYPWzXJRiYFSSA6PpWL9tHhL0NCFDn6Q==
-X-Received: by 2002:a1c:106:: with SMTP id 6mr12661909wmb.134.1571036332956;
-        Sun, 13 Oct 2019 23:58:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
-        by smtp.gmail.com with ESMTPSA id q19sm35151293wra.89.2019.10.13.23.58.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2019 23:58:52 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 4/6] psci: Add hvc call service for ptp_kvm.
-To:     "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
-        "john.stultz@linaro.org" <john.stultz@linaro.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "richardcochran@gmail.com" <richardcochran@gmail.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        Will Deacon <Will.Deacon@arm.com>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Steve Capper <Steve.Capper@arm.com>,
-        "Kaly Xin (Arm Technology China)" <Kaly.Xin@arm.com>,
-        "Justin He (Arm Technology China)" <Justin.He@arm.com>,
-        nd <nd@arm.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-References: <20190918080716.64242-1-jianyong.wu@arm.com>
- <20190918080716.64242-5-jianyong.wu@arm.com>
- <83ed7fac-277f-a31e-af37-8ec134f39d26@redhat.com>
- <HE1PR0801MB1676F57B317AE85E3B934B32F48E0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <629538ea-13fb-e666-8df6-8ad23f114755@redhat.com>
- <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <ef6ab8bd-41ad-88f8-9cfd-dc749ca65310@redhat.com>
- <a1b554b8-4417-5305-3419-fe71a8c50842@kernel.org>
- <56a5b885-62c8-c4ef-e2f8-e945c0eb700e@redhat.com>
- <HE1PR0801MB1676115C248E6DF09F9DD5A6F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <1cc145ca-1af2-d46f-d530-0ae434005f0b@redhat.com>
- <HE1PR0801MB1676B1AD68544561403C3196F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
- <6b8b59b2-a07e-7e33-588c-1da7658e3f1e@redhat.com>
- <HE1PR0801MB167635A4AA59FD93C45872E4F4900@HE1PR0801MB1676.eurprd08.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        id S1729660AbfJNH5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 03:57:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52908 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726169AbfJNH5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 03:57:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C1B7EA3CD80;
+        Mon, 14 Oct 2019 07:57:47 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D29BA60923;
+        Mon, 14 Oct 2019 07:57:43 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
+ default argument promotion
+To:     Bill Wendling <morbo@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+        David Gibson <dgibson@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
+ <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
+ <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
+ <7f7fa66f-9e6c-2e48-03b2-64ebca36df99@redhat.com>
+ <CAGG=3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h0V7SHbbEQ@mail.gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <fc847a82-49cb-c931-617c-82ef5531963e@redhat.com>
-Date:   Mon, 14 Oct 2019 08:58:54 +0200
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
+Date:   Mon, 14 Oct 2019 09:57:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <HE1PR0801MB167635A4AA59FD93C45872E4F4900@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+In-Reply-To: <CAGG=3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h0V7SHbbEQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: 6WkznHgqMLu4fqDjp6rA2Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Mon, 14 Oct 2019 07:57:47 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/10/19 07:50, Jianyong Wu (Arm Technology China) wrote:
->>
->> John (Stultz), does that sound good to you?  The context is that Jianyon=
-g
->> would like to add a hypercall that returns a (cycles,
->> nanoseconds) pair to the guest.  On x86 we're relying on the vclock_mode
->> field that is already there for the vDSO, but being able to just use
->> ktime_get_snapshot would be much nicer.
->>
-> Could I add struct clocksource to system_time_snapshot struct in next ver=
-sion of my patch set?
+On 11/10/2019 20.36, Bill Wendling wrote:
+> I apologize for the breakage. I'm not sure how this escaped me. Here's
+> a proposed fix. Thoughts?
+> 
+> commit 5fa1940140fd75a97f3ac5ae2e4de9e1bef645d0
+> Author: Bill Wendling <morbo@google.com>
+> Date:   Fri Oct 11 11:26:03 2019 -0700
+> 
+>     Use a status enum for reporting pass/fail
+> 
+>     Some values passed into "report" as "pass/fail" are larger than the
+>     size of the parameter. Use instead a status enum so that the size of the
+>     argument no longer matters.
+> 
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index b6635d9..8f80a1c 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -95,13 +95,22 @@ extern int vsnprintf(char *buf, int size, const
+> char *fmt, va_list va)
+>  extern int vprintf(const char *fmt, va_list va)
+>   __attribute__((format(printf, 1, 0)));
+> 
+> +enum status { PASSED, FAILED };
+> +
+> +#define STATUS(x) ((x) != 0 ? PASSED : FAILED)
+> +
+> +#define report(msg_fmt, status, ...) \
+> + report_status(msg_fmt, STATUS(status) __VA_OPT__(,) __VA_ARGS__)
+> +#define report_xfail(msg_fmt, xfail, status, ...) \
+> + report_xfail_status(msg_fmt, xfail, STATUS(status) __VA_OPT__(,) __VA_ARGS__)
+> +
+>  void report_prefix_pushf(const char *prefix_fmt, ...)
+>   __attribute__((format(printf, 1, 2)));
+>  extern void report_prefix_push(const char *prefix);
+>  extern void report_prefix_pop(void);
+> -extern void report(const char *msg_fmt, unsigned pass, ...)
+> +extern void report_status(const char *msg_fmt, unsigned pass, ...)
+>   __attribute__((format(printf, 1, 3)));
+> -extern void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
+> +extern void report_xfail_status(const char *msg_fmt, bool xfail, enum
+> status status, ...)
+>   __attribute__((format(printf, 1, 4)));
+>  extern void report_abort(const char *msg_fmt, ...)
+>   __attribute__((format(printf, 1, 2)))
+> diff --git a/lib/report.c b/lib/report.c
+> index 2a5f549..4ba2ac0 100644
+> --- a/lib/report.c
+> +++ b/lib/report.c
+> @@ -80,12 +80,12 @@ void report_prefix_pop(void)
+>   spin_unlock(&lock);
+>  }
+> 
+> -static void va_report(const char *msg_fmt,
+> - bool pass, bool xfail, bool skip, va_list va)
+> +static void va_report(const char *msg_fmt, enum status status, bool xfail,
+> +               bool skip, va_list va)
+>  {
+>   const char *prefix = skip ? "SKIP"
+> -   : xfail ? (pass ? "XPASS" : "XFAIL")
+> -   : (pass ? "PASS"  : "FAIL");
+> +   : xfail ? (status == PASSED ? "XPASS" : "XFAIL")
+> +   : (status == PASSED ? "PASS"  : "FAIL");
+> 
+>   spin_lock(&lock);
+> 
+> @@ -96,27 +96,27 @@ static void va_report(const char *msg_fmt,
+>   puts("\n");
+>   if (skip)
+>   skipped++;
+> - else if (xfail && !pass)
+> + else if (xfail && status == FAILED)
+>   xfailures++;
+> - else if (xfail || !pass)
+> + else if (xfail || status == FAILED)
+>   failures++;
+> 
+>   spin_unlock(&lock);
+>  }
+> 
+> -void report(const char *msg_fmt, unsigned pass, ...)
+> +void report_status(const char *msg_fmt, enum status status, ...)
+>  {
+>   va_list va;
+> - va_start(va, pass);
+> - va_report(msg_fmt, pass, false, false, va);
+> + va_start(va, status);
+> + va_report(msg_fmt, status, false, false, va);
+>   va_end(va);
+>  }
+> 
+> -void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
+> +void report_xfail_status(const char *msg_fmt, bool xfail, enum status
+> status, ...)
+>  {
+>   va_list va;
+> - va_start(va, pass);
+> - va_report(msg_fmt, pass, xfail, false, va);
+> + va_start(va, status);
+> + va_report(msg_fmt, status, xfail, false, va);
+>   va_end(va);
+>  }
 
-Yes, I say go ahead.  At least it will get closer to a final design.
+That's certainly a solution... but I wonder whether it might be easier
+to simply fix the failing tests instead, to make sure that they do not
+pass a value > sizeof(int) to report() and report_xfail_status() ?
 
-Paolo
+Another idea would be to swap the parameters of report() and
+report_xfail_status() :
 
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index b94d0ac..d6d1323 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -99,10 +99,10 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
+                                        __attribute__((format(printf, 1,
+2)));
+ extern void report_prefix_push(const char *prefix);
+ extern void report_prefix_pop(void);
+-extern void report(const char *msg_fmt, bool pass, ...)
+-                                       __attribute__((format(printf, 1,
+3)));
+-extern void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+-                                       __attribute__((format(printf, 1,
+4)));
++extern void report(bool pass, const char *msg_fmt, ...)
++                                       __attribute__((format(printf, 2,
+3)));
++extern void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
++                                       __attribute__((format(printf, 3,
+4)));
+ extern void report_abort(const char *msg_fmt, ...)
+                                        __attribute__((format(printf, 1,
+2)))
+                                        __attribute__((noreturn));
+diff --git a/lib/report.c b/lib/report.c
+index ca9b4fd..2255dc3 100644
+--- a/lib/report.c
++++ b/lib/report.c
+@@ -104,18 +104,18 @@ static void va_report(const char *msg_fmt,
+        spin_unlock(&lock);
+ }
+
+-void report(const char *msg_fmt, bool pass, ...)
++void report(bool pass, const char *msg_fmt, ...)
+ {
+        va_list va;
+-       va_start(va, pass);
++       va_start(va, msg_fmt);
+        va_report(msg_fmt, pass, false, false, va);
+        va_end(va);
+ }
+
+-void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
++void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+ {
+        va_list va;
+-       va_start(va, pass);
++       va_start(va, msg_fmt);
+        va_report(msg_fmt, pass, xfail, false, va);
+        va_end(va);
+ }
+
+... then we can keep the "bool" - but we have to fix all calling sites, too.
+
+Paolo, any preferences?
+
+ Thomas
