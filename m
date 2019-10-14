@@ -2,167 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 397C1D5F28
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 11:41:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C91CD60E1
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 13:04:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731096AbfJNJlX convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 14 Oct 2019 05:41:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44476 "EHLO mail.kernel.org"
+        id S1731723AbfJNLEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 07:04:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52726 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731088AbfJNJlX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 05:41:23 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 205171] kernel panic during windows 10pro start
-Date:   Mon, 14 Oct 2019 09:41:21 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: gregkh@linuxfoundation.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-205171-28872-6iSzxl8nZA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-205171-28872@https.bugzilla.kernel.org/>
-References: <bug-205171-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1731686AbfJNLEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 07:04:44 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A4C4B4E908
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 11:04:43 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id r187so6014517wme.0
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 04:04:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NBIhzwFtIahXPEyulKTMfAVXwty40qS02FIJNaibIzc=;
+        b=jHT87YW8gxsbqgjv4yWRqycwvhNTddAQnrIHQIjH5Oo3Nq87Q4zXvQtUS8Bx/A0nzh
+         JEOv5W+Co2MNb5SZmQclR3/UH/2ysAAOIbW9nHGZIGX46l9sBGFeN+t/PNnIJ/oVO985
+         HGd9hsIzgw/fm+AxI86aO7ihdSlxnSaNpM/fqStsUAtdmti4IBwMA/0wZjlKSjmfRDIW
+         8JqvA3jGTMTO/vpijmzEPBkj9atcYCqGkGqenWXDUAkAwehYA+2Lzt16Z+Q9bkgBIy/9
+         sXTguxJQkw5SraabSDQ7zTRf2Wy5c3RLZy65Hl7NWS4rBTmZMWL0HPgK9gSIn92Wo9Is
+         wYJA==
+X-Gm-Message-State: APjAAAVpidBk6D1rKIfJoiKphWa/hEvtRTTAQaXV2PxfxsR1v7OmkyeF
+        tuvSLssqNlkO+FiqY6hxlc3WdMlBU0KI2b+nAm3nUa7PFqqPd0YIGeQQXwBxk94pzYk/5+JbBRt
+        uUFZXrpjVMEMl
+X-Received: by 2002:a05:600c:2185:: with SMTP id e5mr1843050wme.78.1571051082253;
+        Mon, 14 Oct 2019 04:04:42 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxJ+Y7r465A1g1xbi8lTQm9LjfvAs84OW30L78PfgV0kCbXozAobF2aaxhtMPIAqI8gjh/X5A==
+X-Received: by 2002:a05:600c:2185:: with SMTP id e5mr1843026wme.78.1571051081963;
+        Mon, 14 Oct 2019 04:04:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
+        by smtp.gmail.com with ESMTPSA id r6sm19989932wmh.38.2019.10.14.04.04.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2019 04:04:41 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
+ default argument promotion
+To:     Thomas Huth <thuth@redhat.com>, Bill Wendling <morbo@google.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+        David Gibson <dgibson@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
+ <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
+ <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
+ <7f7fa66f-9e6c-2e48-03b2-64ebca36df99@redhat.com>
+ <CAGG=3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h0V7SHbbEQ@mail.gmail.com>
+ <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4d591c3f-82aa-dd9e-efce-8b7d73b2f64f@redhat.com>
+Date:   Mon, 14 Oct 2019 13:04:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=205171
-
---- Comment #3 from gregkh@linuxfoundation.org ---
-On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
-> bugzilla-daemon@bugzilla.kernel.org writes:
-> 
-> > https://bugzilla.kernel.org/show_bug.cgi?id=205171
-> >
-> >             Bug ID: 205171
-> >            Summary: kernel panic during windows 10pro start
-> >            Product: Virtualization
-> >            Version: unspecified
-> >     Kernel Version: 4.19.74 and higher
-> >           Hardware: All
-> >                 OS: Linux
-> >               Tree: Mainline
-> >             Status: NEW
-> >           Severity: normal
-> >           Priority: P1
-> >          Component: kvm
-> >           Assignee: virtualization_kvm@kernel-bugs.osdl.org
-> >           Reporter: dront78@gmail.com
-> >         Regression: No
-> >
-> > works fine on 4.19.73
-> >
-> > [ 5829.948945] BUG: unable to handle kernel NULL pointer dereference at
-> > 0000000000000000
-> > [ 5829.948951] PGD 0 P4D 0 
-> > [ 5829.948954] Oops: 0002 [#1] SMP NOPTI
-> > [ 5829.948957] CPU: 3 PID: 1699 Comm: CPU 0/KVM Tainted: G           OE    
-> > 4.19.78-2-lts #1
-> > [ 5829.948958] Hardware name: Micro-Star International Co., Ltd. GE62
-> > 6QF/MS-16J4, BIOS E16J4IMS.117 01/18/2018
-> > [ 5829.948989] RIP: 0010:kvm_write_guest_virt_system+0x1e/0x40 [kvm]
-> 
-> It seems 4.19 stable backport is broken, upstream commit f7eea636c3d50
-> has:
-> 
-> @@ -4588,7 +4589,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->                                 vmx_instruction_info, true, len, &gva))
->                         return 1;
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0
->                 */
-> -               kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
-> NULL);
-> +               if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
-> &e))
-> +                       kvm_inject_page_fault(vcpu, &e);
->         }
-> 
-> and it's 4.19 counterpart (73c31bd92039):
-> 
-> @@ -8798,8 +8799,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->                                 vmx_instruction_info, true, &gva))
->                         return 1;
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0
->                 */
-> -               kvm_write_guest_virt_system(vcpu, gva, &field_value,
-> -                                           (is_long_mode(vcpu) ? 8 : 4),
-> NULL);
-> +               if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
-> +                                               (is_long_mode(vcpu) ? 8 : 4),
-> +                                               NULL))
-> +                       kvm_inject_page_fault(vcpu, &e);
->         }
->  
-> (note the last argument to kvm_write_guest_virt_system() - it's NULL
-> instead of &e.
-> 
-> And v4.19.74 has 6e60900cfa3e (541ab2aeb282 upstream):
-> 
-> @@ -5016,6 +5016,13 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu,
-> gva_t addr, void *val,
->         /* kvm_write_guest_virt_system can pull in tons of pages. */
->         vcpu->arch.l1tf_flush_l1d = true;
->  
-> +       /*
-> +        * FIXME: this should call handle_emulation_failure if
-> X86EMUL_IO_NEEDED
-> +        * is returned, but our callers are not ready for that and they
-> blindly
-> +        * call kvm_inject_page_fault.  Ensure that they at least do not leak
-> +        * uninitialized kernel stack memory into cr2 and error code.
-> +        */
-> +       memset(exception, 0, sizeof(*exception));
->         return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
->                                            PFERR_WRITE_MASK, exception);
+On 14/10/19 09:57, Thomas Huth wrote:
+> -void report(const char *msg_fmt, bool pass, ...)
+> +void report(bool pass, const char *msg_fmt, ...)
+>  {
+>         va_list va;
+> -       va_start(va, pass);
+> +       va_start(va, msg_fmt);
+>         va_report(msg_fmt, pass, false, false, va);
+>         va_end(va);
 >  }
 > 
-> This all results in memset(NULL). (also, 6e60900cfa3e should come
-> *after* f7eea636c3d50 and not before but oh well..)
+> -void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+> +void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>  {
+>         va_list va;
+> -       va_start(va, pass);
+> +       va_start(va, msg_fmt);
+>         va_report(msg_fmt, pass, xfail, false, va);
+>         va_end(va);
+>  }
 > 
-> The following will likely fix the problem (untested):
+> ... then we can keep the "bool" - but we have to fix all calling sites, too.
 > 
-> diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-> index e83f4f6bfdac..d3a900a4fa0e 100644
-> --- a/arch/x86/kvm/vmx.c
-> +++ b/arch/x86/kvm/vmx.c
-> @@ -8801,7 +8801,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0
->                 */
->                 if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
->                                                 (is_long_mode(vcpu) ? 8 : 4),
-> -                                               NULL))
-> +                                               &e))
->                         kvm_inject_page_fault(vcpu, &e);
->         }
-> 
-> I can send a patch to stable@ if needed.
+> Paolo, any preferences?
 
-A patch was already sent, and is included in the 4.19.79 and 4.14.149
-kernel releases, and will be part of the next 4.9.y and 4.4.y kernel
-releases that happen later this week.
+Actually I had already pushed Bill's patch.  I also thought about
+reordering the arguments, but it's a big change.  If someone wants to
+try his hands at doing it with Coccinelle, I'm happy to apply it.
 
-thanks,
+Paolo
 
-greg k-h
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
