@@ -2,46 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01EF0D5F26
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 11:41:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 397C1D5F28
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 11:41:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731094AbfJNJlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 05:41:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44432 "EHLO mail.kernel.org"
+        id S1731096AbfJNJlX convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 14 Oct 2019 05:41:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44476 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730977AbfJNJlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 05:41:21 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 16A1620663;
-        Mon, 14 Oct 2019 09:41:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571046080;
-        bh=diRFlxJdPpwxJzwD6o7heiqFYOgIzONcIhEg4USVzi4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OizufxVBxP5BdzbfmAIetfQvEWskWn76w2rZlTBZNIbX1RCSvWBqVKHYVPMKiX1jQ
-         YB8xQdW0+7qf3+SAAjZebrL0MB4oD1tgRqantHUD/x5T4xKPHoBOYw+717Ur52uqxy
-         ot0Rao9Y9RYU6g1Fw5x0gvRqaCZj5MHJaIvdNGfs=
-Date:   Mon, 14 Oct 2019 11:41:18 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     pbonzini@redhat.com, bugzilla-daemon@bugzilla.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [Bug 205171] New: kernel panic during windows 10pro start
-Message-ID: <20191014094118.GB3050866@kroah.com>
+        id S1731088AbfJNJlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 05:41:23 -0400
+From:   bugzilla-daemon@bugzilla.kernel.org
+Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
+To:     kvm@vger.kernel.org
+Subject: [Bug 205171] kernel panic during windows 10pro start
+Date:   Mon, 14 Oct 2019 09:41:21 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: gregkh@linuxfoundation.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-205171-28872-6iSzxl8nZA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-205171-28872@https.bugzilla.kernel.org/>
 References: <bug-205171-28872@https.bugzilla.kernel.org/>
- <87bluj66ev.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bluj66ev.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=205171
+
+--- Comment #3 from gregkh@linuxfoundation.org ---
 On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
 > bugzilla-daemon@bugzilla.kernel.org writes:
 > 
@@ -81,9 +86,12 @@ On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
 > @@ -4588,7 +4589,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
 >                                 vmx_instruction_info, true, len, &gva))
 >                         return 1;
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0 */
-> -               kvm_write_guest_virt_system(vcpu, gva, &field_value, len, NULL);
-> +               if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len, &e))
+>                 /* _system ok, nested_vmx_check_permission has verified cpl=0
+>                 */
+> -               kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
+> NULL);
+> +               if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
+> &e))
 > +                       kvm_inject_page_fault(vcpu, &e);
 >         }
 > 
@@ -92,9 +100,11 @@ On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
 > @@ -8798,8 +8799,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
 >                                 vmx_instruction_info, true, &gva))
 >                         return 1;
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0 */
+>                 /* _system ok, nested_vmx_check_permission has verified cpl=0
+>                 */
 > -               kvm_write_guest_virt_system(vcpu, gva, &field_value,
-> -                                           (is_long_mode(vcpu) ? 8 : 4), NULL);
+> -                                           (is_long_mode(vcpu) ? 8 : 4),
+> NULL);
 > +               if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
 > +                                               (is_long_mode(vcpu) ? 8 : 4),
 > +                                               NULL))
@@ -106,13 +116,16 @@ On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
 > 
 > And v4.19.74 has 6e60900cfa3e (541ab2aeb282 upstream):
 > 
-> @@ -5016,6 +5016,13 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu, gva_t addr, void *val,
+> @@ -5016,6 +5016,13 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu,
+> gva_t addr, void *val,
 >         /* kvm_write_guest_virt_system can pull in tons of pages. */
 >         vcpu->arch.l1tf_flush_l1d = true;
 >  
 > +       /*
-> +        * FIXME: this should call handle_emulation_failure if X86EMUL_IO_NEEDED
-> +        * is returned, but our callers are not ready for that and they blindly
+> +        * FIXME: this should call handle_emulation_failure if
+> X86EMUL_IO_NEEDED
+> +        * is returned, but our callers are not ready for that and they
+> blindly
 > +        * call kvm_inject_page_fault.  Ensure that they at least do not leak
 > +        * uninitialized kernel stack memory into cr2 and error code.
 > +        */
@@ -131,7 +144,8 @@ On Mon, Oct 14, 2019 at 11:08:24AM +0200, Vitaly Kuznetsov wrote:
 > --- a/arch/x86/kvm/vmx.c
 > +++ b/arch/x86/kvm/vmx.c
 > @@ -8801,7 +8801,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->                 /* _system ok, nested_vmx_check_permission has verified cpl=0 */
+>                 /* _system ok, nested_vmx_check_permission has verified cpl=0
+>                 */
 >                 if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
 >                                                 (is_long_mode(vcpu) ? 8 : 4),
 > -                                               NULL))
@@ -148,3 +162,7 @@ releases that happen later this week.
 thanks,
 
 greg k-h
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
