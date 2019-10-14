@@ -2,91 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0DD9D61BB
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 13:52:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38904D6457
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 15:48:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731359AbfJNLwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 07:52:18 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:56142 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730369AbfJNLwR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 07:52:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=7VSr7BYb7+J2hDKY+7JG0niopCL5cvNnFzSou8GfhQQ=; b=EeyYP8IjsvAkXMNXfavRV9I8j
-        eafH208u2y1jq2NjgLUZq5lnznDQ+L+tetsdLZaAoBq2s9Uj/0LNnVnpxP3qMsyMEtP2Br7VfD+KR
-        Nx+zVESmeSsJGQg1BONDaXirf+hy8Yzjm3t8BeeRVunGQm73RedlC/q+8+P34GNdIPjlyp8qVqnWN
-        EuCg7OU8EfI26+PHoR2LJkOLIxtbLMFgMYdlWwi04JLwxGfFF4TeKfGRl+9tz7u/xkgKdDgwK2/ZZ
-        0fOd6ManRE7v12zs7/E1Pc0WeYMWvU4RhM2MnzmQvYt/gsGM2GuLvTIfUEZkNTjRaR3rrHev1IL71
-        EVQggPzgw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iJytO-0007iT-61; Mon, 14 Oct 2019 11:52:02 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0883D300F3F;
-        Mon, 14 Oct 2019 13:51:04 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id E411E200843F1; Mon, 14 Oct 2019 13:51:58 +0200 (CEST)
-Date:   Mon, 14 Oct 2019 13:51:58 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
-        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] perf/core: Provide a kernel-internal interface to
- pause perf_event
-Message-ID: <20191014115158.GC2328@hirez.programming.kicks-ass.net>
-References: <20191013091533.12971-1-like.xu@linux.intel.com>
- <20191013091533.12971-3-like.xu@linux.intel.com>
+        id S1732255AbfJNNsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 09:48:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43210 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732077AbfJNNsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 09:48:32 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C70A9A707;
+        Mon, 14 Oct 2019 13:48:31 +0000 (UTC)
+Received: from gondolin (dhcp-192-233.str.redhat.com [10.33.192.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BBCF1001B03;
+        Mon, 14 Oct 2019 13:48:27 +0000 (UTC)
+Date:   Mon, 14 Oct 2019 15:48:25 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tianyu Lan <Tianyu.Lan@microsoft.com>
+Cc:     vkuznets <vkuznets@redhat.com>,
+        "lantianyu1986@gmail.com" <lantianyu1986@gmail.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rth@twiddle.net" <rth@twiddle.net>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        Roman Kagan <rkagan@virtuozzo.com>
+Subject: Re: [PATCH] target/i386/kvm: Add Hyper-V direct tlb flush support
+Message-ID: <20191014154825.7eb5017d.cohuck@redhat.com>
+In-Reply-To: <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
+References: <20191012034153.31817-1-Tianyu.Lan@microsoft.com>
+        <87r23h58th.fsf@vitty.brq.redhat.com>
+        <KL1P15301MB02611D1F7C54C4A599766B8D92900@KL1P15301MB0261.APCP153.PROD.OUTLOOK.COM>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191013091533.12971-3-like.xu@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 14 Oct 2019 13:48:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 13, 2019 at 05:15:31PM +0800, Like Xu wrote:
-> Exporting perf_event_pause() as an external accessor for kernel users (such
-> as KVM) who may do both disable perf_event and read count with just one
-> time to hold perf_event_ctx_lock. Also the value could be reset optionally.
+On Mon, 14 Oct 2019 13:29:12 +0000
+Tianyu Lan <Tianyu.Lan@microsoft.com> wrote:
 
-> +u64 perf_event_pause(struct perf_event *event, bool reset)
-> +{
-> +	struct perf_event_context *ctx;
-> +	u64 count, enabled, running;
-> +
-> +	ctx = perf_event_ctx_lock(event);
+> > > diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> > > index 18892d6541..923fb33a01 100644
+> > > --- a/linux-headers/linux/kvm.h
+> > > +++ b/linux-headers/linux/kvm.h
+> > > @@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
+> > >  #define KVM_CAP_ARM_SVE 170
+> > >  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+> > >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+> > > +#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 174  
+> >
+> > I was once told that scripts/update-linux-headers.sh script is supposed
+> > to be used instead of cherry-picking stuff you need (adn this would be a
+> > separate patch - update linux headers to smth).
+> >  
+> 
+> Thanks for suggestion. I just try the update-linux-headers.sh and there are a lot
+> of changes which are not related with my patch. I also include these
+> changes in my patch, right?
 
-> +	_perf_event_disable(event);
-> +	count = __perf_event_read_value(event, &enabled, &running);
-> +	if (reset)
-> +		local64_set(&event->count, 0);
+The important part is that you split out the headers update as a
+separate patch.
 
-This local64_set() already assumes there are no child events, so maybe
-write the thing like:
-
-	WARN_ON_ONCE(event->attr.inherit);
-	_perf_event_disable(event);
-	count = local64_read(&event->count);
-	local64_set(&event->count, 0);
-
-
-> +	perf_event_ctx_unlock(event, ctx);
-> +
-> +	return count;
-> +}
-> +EXPORT_SYMBOL_GPL(perf_event_pause);
+If this change is already included in the upstream kernel, just do a
+complete update via the script (mentioning the base you did the update
+against.) If not, include a placeholder patch that can be replaced by a
+real update when applying.
