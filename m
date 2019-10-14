@@ -2,157 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7D12D5E2F
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 11:08:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72FFDD5E88
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 11:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730684AbfJNJIb convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 14 Oct 2019 05:08:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36228 "EHLO mail.kernel.org"
+        id S1730838AbfJNJSo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 05:18:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38002 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730655AbfJNJIa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 05:08:30 -0400
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 205171] kernel panic during windows 10pro start
-Date:   Mon, 14 Oct 2019 09:08:29 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: vkuznets@redhat.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-205171-28872-YCF28yxjs3@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-205171-28872@https.bugzilla.kernel.org/>
-References: <bug-205171-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1730656AbfJNJSn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 05:18:43 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DE50A73A69
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 09:18:41 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id l12so8216285wrm.6
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 02:18:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=I4lbvaq6vVdEN7xa2xYOpTCkhvY6ZkuoHSMKJd3XSac=;
+        b=KahFVC35gwATITFn0RVMJBGvnFupT5qUjDWFaIArqFJmmgHQlt3RiDDT297yTooLYE
+         cAex7kIAreWoqDzTxbvFGg6Vo3tUDtCM0znIH2A9LrDUoyWW1SfQZ5T+qjmO8VE0xYKP
+         neYXq+1AbKBRZZwgm4LMmGDGZEfky8qN6bxEiNLx0cDp6K8acQ3xkjOWW1Hui8PBvTq0
+         BImaoOdz17DhRZOQz8IthQx1VzrYwhL+XLGhQOLbsLZznImc2tzl98+OBBJJbkGOZxBP
+         cAeZUOcVShGwYqWQ8az9uztDpkCRyTEcuY0o1wr0KzEOSrJYlJf7eEpXlfEbUO6+AWYf
+         of0g==
+X-Gm-Message-State: APjAAAXKjZ0KWYL160oHF8umzkd03kCx4oIz7589BYSN9SUI6zvceh/B
+        XPQNnIX7UCBng1s88/tC7bTVXEmVQ+e5cSg02s3EpqASqyqlzWYw1SQjE5t+Cdb5UVR37Z5mdix
+        3IKPibqhbd7fU
+X-Received: by 2002:a5d:4b09:: with SMTP id v9mr23805269wrq.127.1571044720418;
+        Mon, 14 Oct 2019 02:18:40 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwar4f7SJRAHyQ+5Z2fHgpCWGXj/TXfvOHxHfn21TXUp6RnIgTR2a5itwE7yCxFrOcXsEFiVg==
+X-Received: by 2002:a5d:4b09:: with SMTP id v9mr23805240wrq.127.1571044720157;
+        Mon, 14 Oct 2019 02:18:40 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id z125sm20070555wme.37.2019.10.14.02.18.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2019 02:18:39 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
+        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, sstabellini@kernel.org, peterz@infradead.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 3/5] x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+In-Reply-To: <4e1ef1d3-527b-bb70-5536-d9daeb50b7c7@oracle.com>
+References: <1570439071-9814-1-git-send-email-zhenzhong.duan@oracle.com> <1570439071-9814-4-git-send-email-zhenzhong.duan@oracle.com> <87o8yl587f.fsf@vitty.brq.redhat.com> <4e1ef1d3-527b-bb70-5536-d9daeb50b7c7@oracle.com>
+Date:   Mon, 14 Oct 2019 11:18:38 +0200
+Message-ID: <878spn65xt.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=205171
+Zhenzhong Duan <zhenzhong.duan@oracle.com> writes:
 
---- Comment #2 from vkuznets@redhat.com ---
-bugzilla-daemon@bugzilla.kernel.org writes:
-
-> https://bugzilla.kernel.org/show_bug.cgi?id=205171
+> On 2019/10/13 17:02, Vitaly Kuznetsov wrote:
+>> Zhenzhong Duan <zhenzhong.duan@oracle.com> writes:
+> ...snip
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index ef836d6..6e14bd4 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -825,18 +825,31 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
+>>    */
+>>   void __init kvm_spinlock_init(void)
+>>   {
+>> -	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
+>> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
+>> +	/*
+>> +	 * Disable PV qspinlocks if host kernel doesn't support
+>> +	 * KVM_FEATURE_PV_UNHALT feature or there is only 1 vCPU.
+>> +	 * virt_spin_lock_key is enabled to avoid lock holder
+>> +	 * preemption issue.
+>> +	 */
+>> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT) ||
+>> +	    num_possible_cpus() == 1) {
+>> +		pr_info("PV spinlocks disabled\n");
+>> Why don't we need static_branch_disable(&virt_spin_lock_key) here?
 >
->             Bug ID: 205171
->            Summary: kernel panic during windows 10pro start
->            Product: Virtualization
->            Version: unspecified
->     Kernel Version: 4.19.74 and higher
->           Hardware: All
->                 OS: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: normal
->           Priority: P1
->          Component: kvm
->           Assignee: virtualization_kvm@kernel-bugs.osdl.org
->           Reporter: dront78@gmail.com
->         Regression: No
+> Thanks for review.
 >
-> works fine on 4.19.73
+> I have a brief explanation in above comment area.
 >
-> [ 5829.948945] BUG: unable to handle kernel NULL pointer dereference at
-> 0000000000000000
-> [ 5829.948951] PGD 0 P4D 0 
-> [ 5829.948954] Oops: 0002 [#1] SMP NOPTI
-> [ 5829.948957] CPU: 3 PID: 1699 Comm: CPU 0/KVM Tainted: G           OE    
-> 4.19.78-2-lts #1
-> [ 5829.948958] Hardware name: Micro-Star International Co., Ltd. GE62
-> 6QF/MS-16J4, BIOS E16J4IMS.117 01/18/2018
-> [ 5829.948989] RIP: 0010:kvm_write_guest_virt_system+0x1e/0x40 [kvm]
+> Boris also raised the same question in v4 and see my detailed explanation
+>
+> in https://lkml.org/lkml/2019/10/6/39
+>
+>>
+>> Also, as you're printing the exact reason for PV spinlocks disablement
+>> in other cases, I'd suggest separating "no host support" and "single
+>> CPU" cases.
+>
+> Will do after reaching a consensus on your first question.
 
-It seems 4.19 stable backport is broken, upstream commit f7eea636c3d50
-has:
+Oh, sorry I missed v4 discussion. As I'm not the first to ask why we
+don't do static_branch_disable(&virt_spin_lock_key) here I suggest we do
+the followin:
 
-@@ -4588,7 +4589,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-                                vmx_instruction_info, true, len, &gva))
-                        return 1;
-                /* _system ok, nested_vmx_check_permission has verified cpl=0
-*/
--               kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
-NULL);
-+               if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len,
-&e))
-+                       kvm_inject_page_fault(vcpu, &e);
-        }
+- Split !kvm_para_has_feature(KVM_FEATURE_PV_UNHALT) and
+  num_possible_cpus() == 1 cases
+- Do static_branch_disable(&virt_spin_lock_key) for UP case (just for
+  consistency).
+- Add a comment why we don't do that for
+  !kvm_para_has_feature(KVM_FEATURE_PV_UNHALT) case (basically, what you
+  replied to Boris)
 
-and it's 4.19 counterpart (73c31bd92039):
+This will also allow us to print the exact reason.
 
-@@ -8798,8 +8799,10 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-                                vmx_instruction_info, true, &gva))
-                        return 1;
-                /* _system ok, nested_vmx_check_permission has verified cpl=0
-*/
--               kvm_write_guest_virt_system(vcpu, gva, &field_value,
--                                           (is_long_mode(vcpu) ? 8 : 4),
-NULL);
-+               if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
-+                                               (is_long_mode(vcpu) ? 8 : 4),
-+                                               NULL))
-+                       kvm_inject_page_fault(vcpu, &e);
-        }
-
-(note the last argument to kvm_write_guest_virt_system() - it's NULL
-instead of &e.
-
-And v4.19.74 has 6e60900cfa3e (541ab2aeb282 upstream):
-
-@@ -5016,6 +5016,13 @@ int kvm_write_guest_virt_system(struct kvm_vcpu *vcpu,
-gva_t addr, void *val,
-        /* kvm_write_guest_virt_system can pull in tons of pages. */
-        vcpu->arch.l1tf_flush_l1d = true;
-
-+       /*
-+        * FIXME: this should call handle_emulation_failure if
-X86EMUL_IO_NEEDED
-+        * is returned, but our callers are not ready for that and they blindly
-+        * call kvm_inject_page_fault.  Ensure that they at least do not leak
-+        * uninitialized kernel stack memory into cr2 and error code.
-+        */
-+       memset(exception, 0, sizeof(*exception));
-        return kvm_write_guest_virt_helper(addr, val, bytes, vcpu,
-                                           PFERR_WRITE_MASK, exception);
- }
-
-This all results in memset(NULL). (also, 6e60900cfa3e should come
-*after* f7eea636c3d50 and not before but oh well..)
-
-The following will likely fix the problem (untested):
-
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index e83f4f6bfdac..d3a900a4fa0e 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -8801,7 +8801,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
-                /* _system ok, nested_vmx_check_permission has verified cpl=0
-*/
-                if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
-                                                (is_long_mode(vcpu) ? 8 : 4),
--                                               NULL))
-+                                               &e))
-                        kvm_inject_page_fault(vcpu, &e);
-        }
-
-I can send a patch to stable@ if needed.
+>
+>>
+>>>   		return;
+>>> +	}
+>>>   
+>>>   	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
+>>> +		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
+>>>   		static_branch_disable(&virt_spin_lock_key);
+>>>   		return;
+>>>   	}
+>>>   
+>>> -	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
+>>> -	if (num_possible_cpus() == 1)
+>>> +	if (nopvspin) {
+>>> +		pr_info("PV spinlocks disabled forced by \"nopvspin\" parameter.\n");
+>> Nit: to make it sound better a comma is missing between 'disabled' and
+>> 'forced', or
+>>
+>> "PV spinlocks forcefully disabled by ..." if you prefer.
+>
+> Will do.
+>
+> Zhenzhong
+>
+>
 
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+Vitaly
