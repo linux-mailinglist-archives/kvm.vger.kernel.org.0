@@ -2,122 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AD2FD691C
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 20:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8874D695C
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 20:24:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732805AbfJNSJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 14:09:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13746 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1732127AbfJNSJG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 14 Oct 2019 14:09:06 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9EHvfXj002516
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 14:09:04 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vmvajkust-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 14:09:04 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
-        Mon, 14 Oct 2019 19:09:02 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 14 Oct 2019 19:09:00 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9EI8SHF39256424
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Oct 2019 18:08:28 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0572BA404D;
-        Mon, 14 Oct 2019 18:08:59 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E73BFA4040;
-        Mon, 14 Oct 2019 18:08:58 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 14 Oct 2019 18:08:58 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id A50A6E0285; Mon, 14 Oct 2019 20:08:58 +0200 (CEST)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH 4/4] vfio-ccw: Rename the io_fctl trace
-Date:   Mon, 14 Oct 2019 20:08:55 +0200
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191014180855.19400-1-farman@linux.ibm.com>
-References: <20191014180855.19400-1-farman@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19101418-0012-0000-0000-000003580122
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101418-0013-0000-0000-000021931427
-Message-Id: <20191014180855.19400-5-farman@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-14_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910140149
+        id S1730952AbfJNSXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 14:23:52 -0400
+Received: from mail-vk1-f194.google.com ([209.85.221.194]:38864 "EHLO
+        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728957AbfJNSXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 14:23:51 -0400
+Received: by mail-vk1-f194.google.com with SMTP id s72so3754108vkh.5
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 11:23:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PSbm597Gf81I9JKwx1mjpFgm8v53e7w/YVxe9kMybDs=;
+        b=oM+ayx/B71SngcaUIXxwtxS0RwAWGmnHO8Hzo3v+NZ2x7r7CS2HVrIkO+r7LS3lj3l
+         M+lX7+F3nCsYghbUPmFXN85rjq7ssvijX92INzqwBoHnCA84am5CDSSIMj7KP1ss3t2Y
+         Ip1odrGejXZ9dJP9wNr6JO2UJ0Gl5pmb3jMHOXFEhznNVPRur1Qehofmy2+Am6n9BHMi
+         SZ2XtcamVSwfZqRxJMtl6A21mkrPIZ0IQXmjzLQoEJlbcPlMQFgBLn0h3xZQQJwYw199
+         G0fMI6sIwzjtkAcPK0SB3zPQ57kqPi0RQFHYxRFgRNzSKFmB17a/R54LcnzQtH5XaZoK
+         ZKDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PSbm597Gf81I9JKwx1mjpFgm8v53e7w/YVxe9kMybDs=;
+        b=p7FnD0y5ee8hG8yc9da4AHQIiaU7JA2AEbGx1OvgSRJk+OwbCYfKd5Cmm+R2Ac4fQp
+         N44frpQDd7yCrPdk3eRG5mfE1QgTC3eueqD59NOfdgeqYhg56ZIwtemqQHffuSUekkCp
+         I45tS2pJbUffy1i4JrXq/7rquhDlrDWYA77CXTacWx01YGxQyfKW/Gxkkz5BAL3/obkL
+         nbnvjUCuDxCT0scbLUwTXo4p1P8GVIruasMK/W750+WvxoHreDdUNYKufwsiywKbzCJi
+         bNPRtID4PBxtLbRSx9hYyzSO4xJtTgrXvf4zrUOx/qE5CmRBBwEvbCGnP9Gl5llxDnlu
+         NC4Q==
+X-Gm-Message-State: APjAAAVm9MkfMNoN/wes0ZdqaaB0z7cPWdGN0O12KelIOsYyAL1X3PY9
+        ggXNZ6lZis63yHMqV2WinusMyz7jtMwxCUirNzEQ
+X-Google-Smtp-Source: APXvYqwGUEtgq/LVskAw2UlHr4s2yXjasvHwrWltNpEYEJNC3TasMW2/dO06qLSjr+iy1zIZyHCMi58Zhb3nPJFDSmU=
+X-Received: by 2002:a1f:7f14:: with SMTP id o20mr17023122vki.100.1571077430478;
+ Mon, 14 Oct 2019 11:23:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191012074454.208377-1-morbo@google.com> <20191014162657.GB22962@linux.intel.com>
+In-Reply-To: <20191014162657.GB22962@linux.intel.com>
+From:   Bill Wendling <morbo@google.com>
+Date:   Mon, 14 Oct 2019 11:23:39 -0700
+Message-ID: <CAGG=3QX-dd3z4FeeFPuT0q43mFRR0nnEf8g7fHbdxWRzDL_YMA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] Use a status enum for reporting pass/fail
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename this trace to the function name, so we remember what is being
-traced instead of an abstract reference to the function control bit
-of the SCSW (since that exists in the IRB, but not the ORB).
+On Mon, Oct 14, 2019 at 9:27 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Sat, Oct 12, 2019 at 12:44:53AM -0700, Bill Wendling wrote:
+> > Some values passed into "report" as "pass/fail" are larger than the
+> > size of the parameter. Instead use a status enum so that the size of the
+> > argument no longer matters.
+> >
+> > Signed-off-by: Bill Wendling <morbo@google.com>
+>
+> The threading of these mails has me all kinds of confused.  What is the
+> relationship between all these patches?  Did you perhaps intend to send
+> some of these as v2?
+>
+>   [kvm-unit-tests PATCH 1/2] Use a status enum for reporting pass/fail
+>   [kvm-unit-tests PATCH 2/2] Use a status enum for reporting pass/fail
+>   [kvm-unit-tests PATCH 1/1] x86: use pointer for end of exception table
+>   [kvm-unit-tests PATCH 2/2] x86: use pointer for end of exception table
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- drivers/s390/cio/vfio_ccw_fsm.c   | 4 ++--
- drivers/s390/cio/vfio_ccw_trace.c | 2 +-
- drivers/s390/cio/vfio_ccw_trace.h | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Yes, the later ones are meant as v2. I'm not familiar with the patch
+submission policy via emails. :-(
 
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index 23648a9aa721..23e61aa638e4 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -318,8 +318,8 @@ static void fsm_io_request(struct vfio_ccw_private *private,
- 	}
- 
- err_out:
--	trace_vfio_ccw_io_fctl(scsw->cmd.fctl, schid,
--			       io_region->ret_code, errstr);
-+	trace_vfio_ccw_fsm_io_request(scsw->cmd.fctl, schid,
-+				      io_region->ret_code, errstr);
- }
- 
- /*
-diff --git a/drivers/s390/cio/vfio_ccw_trace.c b/drivers/s390/cio/vfio_ccw_trace.c
-index 37ecbf8be805..8c671d2519f6 100644
---- a/drivers/s390/cio/vfio_ccw_trace.c
-+++ b/drivers/s390/cio/vfio_ccw_trace.c
-@@ -11,4 +11,4 @@
- 
- EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_async_request);
- EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_event);
--EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_io_fctl);
-+EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_io_request);
-diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
-index 4be2e36242e6..415aa23658ad 100644
---- a/drivers/s390/cio/vfio_ccw_trace.h
-+++ b/drivers/s390/cio/vfio_ccw_trace.h
-@@ -69,7 +69,7 @@ TRACE_EVENT(vfio_ccw_fsm_event,
- 		__entry->event)
- );
- 
--TRACE_EVENT(vfio_ccw_io_fctl,
-+TRACE_EVENT(vfio_ccw_fsm_io_request,
- 	TP_PROTO(int fctl, struct subchannel_id schid, int errno, char *errstr),
- 	TP_ARGS(fctl, schid, errno, errstr),
- 
--- 
-2.17.1
-
+-bw
