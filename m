@@ -2,69 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B9ACD5859
-	for <lists+kvm@lfdr.de>; Sun, 13 Oct 2019 23:46:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D7E6D5920
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 02:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729223AbfJMVmN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 13 Oct 2019 17:42:13 -0400
-Received: from sonic315-21.consmr.mail.ne1.yahoo.com ([66.163.190.147]:42180
-        "EHLO sonic315-21.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727632AbfJMVmN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 13 Oct 2019 17:42:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1571002932; bh=AZDKeY/KduJkitky/ovq7oNAqmYov3JYHc+M1QmYqnU=; h=Date:From:Reply-To:Subject:From:Subject; b=WLqD/BceALicXFQ2HysQF+M/1T5kXG6DQkeO3gEWhZd9ATBJB4ste5QP6xbqGxCwD4k1BLIiAURoPaxn6zY+9kQSt6PvLwDSzlDg2R8QXr5Q06eA7scLQLOtSeGT7UsT66IqjLNmSWGkGcTNyFi8X6SFOZrlM5LGd/rYtcxOsUm23rRMuRbgwMJuusTAMlYSxojHho1RaqpVGDrHNSpv/PlQ4mkk1o97uE3PHnRJiIJNFZZIROhlJBr9KYwQxU46vJze+wxtj7zjLcArsB7JCSCEVFg5dadJbKTF6Xc1QgmnVhWibao52JIGbHoiucIuvIl2GG0WXq+teaC45SGF2Q==
-X-YMail-OSG: 9SN.jO4VM1m5UBqEhlFxOzSqph_GFnNCQteNFa5xKuNdyg7syt6rYQvFEp46mn7
- BHb1IIQ2eAXDxN66JKdSiPGOFJBSjVCt64qjSZcZM7xeMVacftlydN8Y3q6TX2SYJjG4jj5OGZIj
- BDGO6n3bZ5tofxetPHBUlG6qnagQBrMqqjDBGXal.1O.nDUREPNKLo.b1IaZix8k1MH4nrv_ABPV
- P3.oY41hAgfL3TmeICs4oDFu8CFA9WXuqfxn2eAPEyyfeLA.efQJx7hqhkVsYWwyXQhOSRwg6.Gi
- mOw5JPxqA21DSuVr2RjoiZuhvwSauIyhjskh0UtN0UEdUF78raZtDubJXPBGwUYepSYI_OHDnPsP
- pj3olL5dn1tKw7X4dZVYN_UeorMp62fEZ5DVsinrzXR9c7R5iNS1KeaU9sVsHxHQTE10s.xJydcU
- 3A6Y3W62mRdcYzMPqAGIaLR6JD8MkpWjwKlcIV_84lV4ZAliIBPmVIdYCD32q_fTHTiEoU72cG1n
- lH74WZFZpojxMKRGpoaBioEqULeL_yVjO56.CXdPb19zymHffYdxkSMFb1FNKr22k6AyHxS9lKOZ
- EA8iq3BVhP2hY_M95UpV19gZRM2hv6ddyFIB8G0FCRpwhE2OjS0YaQq1qrcssQyHSQyAgunUBkuq
- Jq.qntn.qJGIzVsxQmSPD2BtXBnPOAOS_OF3YEy0wtjE_gvVrqrywOneO7qnyRuZJDeng3m64UqO
- CxPzOfBAv4sqja1PvA4NoETwD0fLgtQjs53v9GSN4Y0W08rpTGdsB5pcsYvmb49Xh4PLEESXIbg8
- a0GdFpW3AncxGkvTO6ev720Hs5mbkYjzReaG2cP540s9ZHP4knd7QVbhdyXT87MYrqJbdDPVD8fV
- JEsJf4LcVaQaIbYgnY2lSQL6yxHZMeaFzRMbSGDpJ4.ooW6iI7E6YiiAyq5KxPQB4WhU7zZ0diF6
- E16G6hhR_a.GhsDzpDeWRD59hIwutrQoaMZu42QPKXvuSlXloARtIxCD.l.WrUUM4S88xlwnlwrz
- 3z2tr6PoaFwSHDtH_HDqHKnIQkXOv1Mt0nTBlQeyOWoEbS.2.hb9up1EWv3DtjQIFQiShXG55Shd
- ZdxmVu9EHHg7ejoHN2eKMsAf8EY2bJU9zvKs19kpNJL1ESFCPBCX3Y8S68J3FtJ0RMUlaTRNVje9
- TfJJP9TMX8lguLzgifqkcTMrcwVD3CZQ.VKNlg4xe9COsYZLnYr9C8yJ7z_mit8g8B7iQAOkbGi.
- wbY8Yn.iRqu6R3O3rkg1y_0VKj26jjyA7Ka5Om2IzaCHVNcaY.UQFrA--
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.ne1.yahoo.com with HTTP; Sun, 13 Oct 2019 21:42:12 +0000
-Date:   Sun, 13 Oct 2019 21:42:11 +0000 (UTC)
-From:   Lipton Davied <barrsterliptondaveid@gmail.com>
-Reply-To: barrsterliptondaveid@gmail.com
-Message-ID: <1726240534.968324.1571002931214@mail.yahoo.com>
-Subject: HI
+        id S1729596AbfJNAt4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 13 Oct 2019 20:49:56 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:43880 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729454AbfJNAt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 13 Oct 2019 20:49:56 -0400
+Received: by mail-oi1-f194.google.com with SMTP id t84so12414132oih.10;
+        Sun, 13 Oct 2019 17:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Dm90rt3X4Dj0eZ5nqIXjNthLIZg5on7T0CNMl+bnamI=;
+        b=XE1UTlaI0ZlC+hBkpc7OA5fWSkOET5PEeVgIug60HyB8Ljy84wZqVh/RMQrjINYbty
+         NdTqnyJSMZX1AFMLi4orjiH0xoP2Vigz663/RR5zx7mGQVm1R7qGnELhRrvGvRw09AwB
+         U6tT8Es08EKQ3vSOaNMXymM4T/n5uC0fnkD48oCPd8EDWrncVEFg/sAA5tcLlJsG31H4
+         Dh32BfSvfJpudqCpStZVVEkCGMNotSF1PS81/u0A5BiVBUpke8qMgtYZy+7E0aPk38jA
+         T3w4LD0S4LoMdsQ8NjZxxxmeoGCt1kM2h2lkaHeYRGIcCpfRlwE8LBKkZslNQfyld7gO
+         LM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Dm90rt3X4Dj0eZ5nqIXjNthLIZg5on7T0CNMl+bnamI=;
+        b=uhjTXTzTIaRYXfZ/PS/KgFTH/kXSAqAvTaz/fwqcQRc3cHkm+u+tzVJZdm4+pGJPjm
+         MtrSdRY2q4v0LWMnyK9g8TovvSHK5I12TIahKl5HPOS3D0GYhAH3SlWF4/XWbdlTtu4d
+         e7IhLTysuMO8bJw5cHpsOk10uslNby/I2eVLn0pd5nJQbwTBlc+4cbSZF2UIjvzk0qRS
+         RpNl+MS2nse1361lqxI9cLflvT7Or5ZFmYCwla8No+4gXPGStIZRWevbx2pscv5HSCAv
+         odTWApaUrVrfk+Lup2wgMyOVPli+0UlrsGioc9sI3Fvb8N11ysw+NFH73wUY9zH3M6Zp
+         yBbw==
+X-Gm-Message-State: APjAAAXUF+EaWV/qQLWPKDku5WXEODo3yojg6W7FtQmjPehWfI1a1jR3
+        aHxY8GFW2ruU51a5szWo+6MB6zCiynPeBinqdOXhag==
+X-Google-Smtp-Source: APXvYqxHyULL/aZ+orTB4oPYdU/SUdg/07ZS2C52JueTMCjbvM79SmxwlCVeROmuMrojVdXYg3qOO5lAxDrvtJtHKSw=
+X-Received: by 2002:aca:da41:: with SMTP id r62mr21466808oig.47.1571014193872;
+ Sun, 13 Oct 2019 17:49:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-To:     unlisted-recipients:; (no To-header on input)
+References: <1568974038-13750-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1568974038-13750-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 14 Oct 2019 08:49:42 +0800
+Message-ID: <CANRm+Cy_eQ=m=bDfyw2yrAmDjJuc=f+siSQTrPpjCpBbYbfPeA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: LAPIC: micro-optimize fixed mode ipi delivery
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Lieber Freund
-
-
-Ich bin Herr Lipton, Rechtsberater. Ich m=C3=B6chte, dass Ihr Kontakt mir h=
-ilft, einen von meinem verstorbenen Kunden auf seinem Konto hinterlassenen =
-wertvollen Betrag (4,8 Mio. USD) wiederzugewinnen, bevor er von der Securit=
-y Finance-Firma, bei der der Betrag eingezahlt wurde, unbrauchbar beschlagn=
-ahmt oder ausgewertet wird.
-
-
-Ich bitte nur um ehrliche Zusammenarbeit, um diese Transaktion so schnell w=
-ie m=C3=B6glich zu sehen.
-
-
-Ich suche eine direkte Antwort auf weitere Klarstellungen.
-
-
-Gr=C3=BC=C3=9Fe
-
-
-Mr. Lipton Daveid (links)
+ping,
+On Fri, 20 Sep 2019 at 18:07, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> From: Wanpeng Li <wanpengli@tencent.com>
+>
+> After disabling mwait/halt/pause vmexits, RESCHEDULE_VECTOR and
+> CALL_FUNCTION_SINGLE_VECTOR etc IPI is one of the main remaining
+> cause of vmexits observed in product environment which can't be
+> optimized by PV IPIs. This patch is the follow-up on commit
+> 0e6d242eccdb (KVM: LAPIC: Micro optimize IPI latency), to optimize
+> redundancy logic before fixed mode ipi is delivered in the fast
+> path.
+>
+> - broadcast handling needs to go slow path, so the delivery mode repair
+>   can be delayed to before slow path.
+> - self-IPI will not be intervened by hypervisor any more after APICv is
+>   introduced and the boxes support APICv are popular now. In addition,
+>   kvm_apic_map_get_dest_lapic() can handle the self-IPI, so there is no
+>   need a shortcut for the non-APICv case.
+>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/irq_comm.c | 6 +++---
+>  arch/x86/kvm/lapic.c    | 5 -----
+>  2 files changed, 3 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 8ecd48d..aa88156 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -52,15 +52,15 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+>         unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
+>         unsigned int dest_vcpus = 0;
+>
+> +       if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
+> +               return r;
+> +
+>         if (irq->dest_mode == 0 && irq->dest_id == 0xff &&
+>                         kvm_lowest_prio_delivery(irq)) {
+>                 printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
+>                 irq->delivery_mode = APIC_DM_FIXED;
+>         }
+>
+> -       if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
+> -               return r;
+> -
+>         memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
+>
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 323bdca..d77fe29 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -955,11 +955,6 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+>
+>         *r = -1;
+>
+> -       if (irq->shorthand == APIC_DEST_SELF) {
+> -               *r = kvm_apic_set_irq(src->vcpu, irq, dest_map);
+> -               return true;
+> -       }
+> -
+>         rcu_read_lock();
+>         map = rcu_dereference(kvm->arch.apic_map);
+>
+> --
+> 2.7.4
+>
