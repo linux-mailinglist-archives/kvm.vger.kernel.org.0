@@ -2,94 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D517D5BBF
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 08:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3CA6D5BC4
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 08:59:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730035AbfJNG4u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 02:56:50 -0400
-Received: from mga12.intel.com ([192.55.52.136]:29821 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726618AbfJNG4u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 02:56:50 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Oct 2019 23:56:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,295,1566889200"; 
-   d="scan'208";a="207912597"
-Received: from zhangyu-optiplex-9020.bj.intel.com (HELO localhost) ([10.238.135.148])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Oct 2019 23:56:46 -0700
-Date:   Mon, 14 Oct 2019 14:47:53 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-mm@kvack.org, luto@kernel.org, peterz@infradead.org,
-        dave.hansen@intel.com, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, keescook@chromium.org,
-        kristen@linux.intel.com, deneen.t.dock@intel.com
-Subject: Re: [RFC PATCH 01/13] kvm: Enable MTRR to work with GFNs with perm
- bits
-Message-ID: <20191014064753.xv365y6oowmh6ho7@linux.intel.com>
-References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
- <20191003212400.31130-2-rick.p.edgecombe@intel.com>
+        id S1730171AbfJNG67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 02:58:59 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39448 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730128AbfJNG66 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 14 Oct 2019 02:58:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571036337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=fTMccw4yJmRrZCZ9gNo4nMTzO7ADWuT1mX49M7Icnho=;
+        b=Z6E2eVOOLBl/hs/JLfDLsLdK2UTxZo5xJu5dr0VqVRCo+Qy/5lXMoSc7PzEOl0hUtXHMyw
+        Bg0Qsd5GB1K8i53sJTnGMcAi0jz/Mk40jIuFI0ybxOH+jZy1+L670mddDoptQq1KZhRmjx
+        EN74q1IlkLuSzHVm8t0WvcHkHfMONp8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-30-6WkznHgqMLu4fqDjp6rA2Q-1; Mon, 14 Oct 2019 02:58:54 -0400
+Received: by mail-wr1-f69.google.com with SMTP id p8so3787489wrj.8
+        for <kvm@vger.kernel.org>; Sun, 13 Oct 2019 23:58:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qg9GPSpE2649WBDEVbobtu+jtSwl5swPTKuvxOPA1Ww=;
+        b=DdRx2LF0mc7LX/jTVJvPaX0rP59oTvHqMKWAxHuSe2mB1wbsDWSsz0QHZ5EM1iXYTz
+         xQ2zGqa6Su0FwG89KKr72Yqsk+lf1MOGuuy7XdkmipLxdxNe9jbloA33H4kM8uKLBl3q
+         TDjLKOdZwAo7t9z89RVLrPRL3aYSKJWsAVAbByDloeRSqllDIWuYvyBkQbD4+bjCnGxH
+         igeyTUejL98oC6sddOJ/y5DpfNbwguACQqtbpYtslz/a40Gb20wOeup60AN2E4+e/PWS
+         BHicd74VHHorqWfYLP+OoZof6/5FT3eNAdRBZ5ZCDrB5wey5LYQ/wogLez1Edbofvpeq
+         bJgg==
+X-Gm-Message-State: APjAAAXWK/+hQm9kuRvPEeHdrUa5osyhL2Q30DlvYW5B9gWoN2h5dHMm
+        tkoeNKDban2ou60HQitqRD/9HHkuHOaA/OVvXxtU98Oqfljq+UUVDwyvFKHGit0wuIS7e/JindQ
+        +4EYUSap1DLXQ
+X-Received: by 2002:a1c:106:: with SMTP id 6mr12661939wmb.134.1571036333214;
+        Sun, 13 Oct 2019 23:58:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx2OUyyPpyXE9W0ygYy2lBrXHn8KLvNfyvMNxm3vCpYPWzXJRiYFSSA6PpWL9tHhL0NCFDn6Q==
+X-Received: by 2002:a1c:106:: with SMTP id 6mr12661909wmb.134.1571036332956;
+        Sun, 13 Oct 2019 23:58:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
+        by smtp.gmail.com with ESMTPSA id q19sm35151293wra.89.2019.10.13.23.58.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Oct 2019 23:58:52 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 4/6] psci: Add hvc call service for ptp_kvm.
+To:     "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
+        "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        Suzuki Poulose <Suzuki.Poulose@arm.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Steve Capper <Steve.Capper@arm.com>,
+        "Kaly Xin (Arm Technology China)" <Kaly.Xin@arm.com>,
+        "Justin He (Arm Technology China)" <Justin.He@arm.com>,
+        nd <nd@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20190918080716.64242-1-jianyong.wu@arm.com>
+ <20190918080716.64242-5-jianyong.wu@arm.com>
+ <83ed7fac-277f-a31e-af37-8ec134f39d26@redhat.com>
+ <HE1PR0801MB1676F57B317AE85E3B934B32F48E0@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <629538ea-13fb-e666-8df6-8ad23f114755@redhat.com>
+ <HE1PR0801MB167639E2F025998058A77F86F4890@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <ef6ab8bd-41ad-88f8-9cfd-dc749ca65310@redhat.com>
+ <a1b554b8-4417-5305-3419-fe71a8c50842@kernel.org>
+ <56a5b885-62c8-c4ef-e2f8-e945c0eb700e@redhat.com>
+ <HE1PR0801MB1676115C248E6DF09F9DD5A6F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <1cc145ca-1af2-d46f-d530-0ae434005f0b@redhat.com>
+ <HE1PR0801MB1676B1AD68544561403C3196F4950@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+ <6b8b59b2-a07e-7e33-588c-1da7658e3f1e@redhat.com>
+ <HE1PR0801MB167635A4AA59FD93C45872E4F4900@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <fc847a82-49cb-c931-617c-82ef5531963e@redhat.com>
+Date:   Mon, 14 Oct 2019 08:58:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191003212400.31130-2-rick.p.edgecombe@intel.com>
-User-Agent: NeoMutt/20180622-66-b94505
+In-Reply-To: <HE1PR0801MB167635A4AA59FD93C45872E4F4900@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+Content-Language: en-US
+X-MC-Unique: 6WkznHgqMLu4fqDjp6rA2Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 03, 2019 at 02:23:48PM -0700, Rick Edgecombe wrote:
-> Mask gfn by maxphyaddr in kvm_mtrr_get_guest_memory_type so that the
-> guests view of gfn is used when high bits of the physical memory are
-> used as extra permissions bits. This supports the KVM XO feature.
-> 
-> TODO: Since MTRR is emulated using EPT permissions, the XO version of
-> the gpa range will not inherrit the MTRR type with this implementation.
-> There shouldn't be any legacy use of KVM XO, but hypothetically it could
-> interfere with the uncacheable MTRR type.
-> 
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
->  arch/x86/kvm/mtrr.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/mtrr.c b/arch/x86/kvm/mtrr.c
-> index 25ce3edd1872..da38f3b83e51 100644
-> --- a/arch/x86/kvm/mtrr.c
-> +++ b/arch/x86/kvm/mtrr.c
-> @@ -621,6 +621,14 @@ u8 kvm_mtrr_get_guest_memory_type(struct kvm_vcpu *vcpu, gfn_t gfn)
->  	const int wt_wb_mask = (1 << MTRR_TYPE_WRBACK)
->  			       | (1 << MTRR_TYPE_WRTHROUGH);
->  
-> +	/*
-> +	 * Handle situations where gfn bits are used as permissions bits by
-> +	 * masking KVMs view of the gfn with the guests physical address bits
-> +	 * in order to match the guests view of physical address. For normal
-> +	 * situations this will have no effect.
-> +	 */
-> +	gfn &= (1ULL << (cpuid_maxphyaddr(vcpu) - PAGE_SHIFT));
-> +
+On 14/10/19 07:50, Jianyong Wu (Arm Technology China) wrote:
+>>
+>> John (Stultz), does that sound good to you?  The context is that Jianyon=
+g
+>> would like to add a hypercall that returns a (cycles,
+>> nanoseconds) pair to the guest.  On x86 we're relying on the vclock_mode
+>> field that is already there for the vDSO, but being able to just use
+>> ktime_get_snapshot would be much nicer.
+>>
+> Could I add struct clocksource to system_time_snapshot struct in next ver=
+sion of my patch set?
 
-Won't this break the MTRR calculation for normal gfns?
-Are you suggesting use the same MTRR value for the XO range as the normal one's?
-If so, may be we should use:
+Yes, I say go ahead.  At least it will get closer to a final design.
 
-	if (guest_cpuid_has(vcpu, X86_FEATURE_KVM_XO))
-		gfn &= ~(1ULL << (cpuid_maxphyaddr(vcpu) - PAGE_SHIFT));
+Paolo
 
-
->  	start = gfn_to_gpa(gfn);
->  	end = start + PAGE_SIZE;
->  
-> -- 
-> 2.17.1
-> 
-
-B.R.
-Yu
