@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B9A2D68A9
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 19:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3FAD68D0
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 19:49:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388590AbfJNRjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 13:39:48 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52779 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730046AbfJNRjr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 13:39:47 -0400
-Received: by mail-wm1-f65.google.com with SMTP id r19so18138534wmh.2;
-        Mon, 14 Oct 2019 10:39:45 -0700 (PDT)
+        id S1730421AbfJNRtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 13:49:53 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41115 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729776AbfJNRtx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 13:49:53 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p4so4849866wrm.8;
+        Mon, 14 Oct 2019 10:49:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=lNZVpaEdmaJY1w+xpL+K9ZqQ92uD6Jfe5E6lniBjnvM=;
-        b=oY+W6FwfNZXtwQq+WhORdLOdfo+f4fhwM0p+Ers5h6CPfgtbEn9ww93kXBSsw2v60b
-         SMIu2UNR6PLQJQdTuB5CZKPD7tjM5zgAWc2F3LP1dYBp/mIWLyzvE+gzbroEFBRI7Dst
-         6kA8qKfdBDN33wxGZAOv+JGy3RovTItDZE4cjypr4TRa0AKUIYcxwviSXAuFpdNyQ3Ic
-         P5h5NDYnWvzIBkjBiYMxqf/jo1ONlCR+e27uF8WQwLTB2ZtajymWafYs1NlkszKw2+og
-         TjPkHU05jpgk0QnsRcXQ7aScuZgRRwSgOc6g7Xs1OdMStDrlfb3Y5KlSoZ09BW/JEGMk
-         I4Vw==
+        bh=XXUMrGZIb6oF2ZXlkY6NvVGKtm0a8dgxsmrS0PyzrVM=;
+        b=I/j8jtNurZb03wO5OtpFMwdIEKSI/vQc1BpvLpGl7ryBO321tGoGGD/dOPskkClYgw
+         od4t5zjq2+ndwxdNXh+zb0qgGfEDiYNC8CJI5nF9z0sOJtW/AfXcRs9u9iWNzfztTASm
+         zRmpLe4p98ADBn7rdM7pjSDzk7VKVIejQmclv2xjvGruv1pY+/Z3iKi3Ri2jzo/vZXKZ
+         U1CtlK0iIYAuWGsQk/PJUF6nLEzNapqKj/Nhjmq1INYWCFMOd1+W22by2mHCL9aIRP7o
+         dRogtOEYzA8TV/asYmxRHwEpPsFleBrtG5/5o48RbATHAQ6SxNYlqC7Ip8//tVEgp69R
+         zJfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=lNZVpaEdmaJY1w+xpL+K9ZqQ92uD6Jfe5E6lniBjnvM=;
-        b=D9UR3CoXewCGhtbjhNp34fGFEoYQeY1C08Ur0JPIb9bI9tC0tg0LxwIKVvB4xLKB6e
-         0aq4/IBm8QDfn+qcaHpt60v5AtjusUAU2lj0nOK5ZOxOJSKv10+neSU1TZGa8O/O/bqp
-         32eWqvoMfQyQUxWBmVxREsemXCJCdtfC/KgQJCJyeJV0HaPjfeOKvRkj1lL9oDkyIVXu
-         k97sJogKI5l/K39xei8qd7osC0kPI+Bcn4FL9scjcU0ark+p6iTChbpA8pXCdr35hzxB
-         kssXscgxJ5FrqLZ1v2kdpDnlYtvKVy9he1VBJNajjIm+DxtcYd9BGGlf6yHPHTo99VsJ
-         TdAA==
-X-Gm-Message-State: APjAAAXbTx4aqa4NX5v1jZvpPcd8EV5kecf0r6cREKI2vsnWVybpzwoU
-        c7+Yr5nynSeN/Hy+nNA46p4=
-X-Google-Smtp-Source: APXvYqxufY2enniRnRIxytq9WOwNI0dKAeSWrxef8cqdYzIseEmMuayKHSwg/1yhpjk+WboQkw4UeQ==
-X-Received: by 2002:a1c:bc07:: with SMTP id m7mr16018252wmf.117.1571074784999;
-        Mon, 14 Oct 2019 10:39:44 -0700 (PDT)
+        bh=XXUMrGZIb6oF2ZXlkY6NvVGKtm0a8dgxsmrS0PyzrVM=;
+        b=iDRSjREZaDKP5Nl1ZIDtb+r//1i4tkubJ4zWmetRoiPdlb8lgy2+BIK5rPvHL6sZtp
+         ImF4NY/a/hyHRrQCeexUiB2lTsvFxRMfaRwgwKofZvmYepbRMEwrFZPjqUdiZLJKF+YL
+         ouA58MaQRhrUpY9YS5DOXKjTDQFuO52TGDk35JYJhpuE2IUum3VjzM4XvTn5CgDGqpeQ
+         0HDMou1ApeI0JN3tPHNTzRGmFbBhmyHLnw/ENj/A1/qXaH66CgG/KgWtly5PdsUFwo7t
+         3acTWr4gUUf3fcgcRz3NMKWwNj7dySP19sfPBzperEXZJYgDNSLStL072CSAwlKhSqZk
+         1iOA==
+X-Gm-Message-State: APjAAAXuo8DuEGJjVZXJtylxFGpO5+TpNp9+f95232UhWL7TqAUawFyo
+        vnceqEb2zSAIh/SV3lWC9MM=
+X-Google-Smtp-Source: APXvYqy78vv8xomOjJzk/rQmkBz13qhvU+ercRByH/EBEIZm2MrjAU0AN+KF4wDSX2QXx60c7i4efw==
+X-Received: by 2002:adf:fa92:: with SMTP id h18mr26866005wrr.220.1571075388812;
+        Mon, 14 Oct 2019 10:49:48 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id p5sm25687450wmi.4.2019.10.14.10.39.43
+        by smtp.gmail.com with ESMTPSA id o70sm26093856wme.29.2019.10.14.10.49.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2019 10:39:44 -0700 (PDT)
-Date:   Mon, 14 Oct 2019 18:39:42 +0100
+        Mon, 14 Oct 2019 10:49:48 -0700 (PDT)
+Date:   Mon, 14 Oct 2019 18:49:46 +0100
 From:   Stefan Hajnoczi <stefanha@gmail.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -66,15 +66,14 @@ Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
         eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
         christophe.de.dinechin@gmail.com, kevin.tian@intel.com
-Subject: Re: [PATCH V3 6/7] virtio: introduce a mdev based transport
-Message-ID: <20191014173942.GB5359@stefanha-x1.localdomain>
+Subject: Re: [PATCH V3 0/7] mdev based hardware virtio offloading support
+Message-ID: <20191014174946.GC5359@stefanha-x1.localdomain>
 References: <20191011081557.28302-1-jasowang@redhat.com>
- <20191011081557.28302-7-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ftEhullJWpWg/VHq"
+        protocol="application/pgp-signature"; boundary="XMCwj5IQnwKtuyBG"
 Content-Disposition: inline
-In-Reply-To: <20191011081557.28302-7-jasowang@redhat.com>
+In-Reply-To: <20191011081557.28302-1-jasowang@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -82,58 +81,59 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---ftEhullJWpWg/VHq
+--XMCwj5IQnwKtuyBG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 11, 2019 at 04:15:56PM +0800, Jason Wang wrote:
-> +struct virtio_mdev_device {
-> +	struct virtio_device vdev;
-> +	struct mdev_device *mdev;
-> +	unsigned long version;
-> +
-> +	struct virtqueue **vqs;
-> +	/* The lock to protect virtqueue list */
-> +	spinlock_t lock;
-> +	struct list_head virtqueues;
+On Fri, Oct 11, 2019 at 04:15:50PM +0800, Jason Wang wrote:
+> There are hardware that can do virtio datapath offloading while having
+> its own control path. This path tries to implement a mdev based
+> unified API to support using kernel virtio driver to drive those
+> devices. This is done by introducing a new mdev transport for virtio
+> (virtio_mdev) and register itself as a new kind of mdev driver. Then
+> it provides a unified way for kernel virtio driver to talk with mdev
+> device implementation.
+>=20
+> Though the series only contains kernel driver support, the goal is to
+> make the transport generic enough to support userspace drivers. This
+> means vhost-mdev[1] could be built on top as well by resuing the
+> transport.
+>=20
+> A sample driver is also implemented which simulate a virito-net
+> loopback ethernet device on top of vringh + workqueue. This could be
+> used as a reference implementation for real hardware driver.
+>=20
+> Consider mdev framework only support VFIO device and driver right now,
+> this series also extend it to support other types. This is done
+> through introducing class id to the device and pairing it with
+> id_talbe claimed by the driver. On top, this seris also decouple
+> device specific parents ops out of the common ones.
 
-Is this a list of struct virtio_mdev_vq_info?  Please document the
-actual type in a comment.
+I was curious so I took a quick look and posted comments.
 
-> +static int virtio_mdev_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> +				struct virtqueue *vqs[],
-> +				vq_callback_t *callbacks[],
-> +				const char * const names[],
-> +				const bool *ctx,
-> +				struct irq_affinity *desc)
-> +{
-> +	struct virtio_mdev_device *vm_dev = to_virtio_mdev_device(vdev);
-> +	struct mdev_device *mdev = vm_get_mdev(vdev);
-> +	const struct virtio_mdev_device_ops *ops = mdev_get_dev_ops(mdev);
-> +	struct virtio_mdev_callback cb;
-> +	int i, err, queue_idx = 0;
-> +
-> +	vm_dev->vqs = kmalloc_array(queue_idx, sizeof(*vm_dev->vqs),
-> +				    GFP_KERNEL);
+I guess this driver runs inside the guest since it registers virtio
+devices?
 
-kmalloc_array(0, ...)?  I would have expected nvqs instead of queue_idx
-(0).
+If this is used with physical PCI devices that support datapath
+offloading then how are physical devices presented to the guest without
+SR-IOV?
 
-What is this the purpose of vm_dev->vqs and does anything ever access it?
+Stefan
 
---ftEhullJWpWg/VHq
+--XMCwj5IQnwKtuyBG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2kst4ACgkQnKSrs4Gr
-c8hQqggAsLqAScuEZRHgMYUxIlc4Hpdh283rOQFgRgPfZqq3hQ/nzKTqbn1k7DnZ
-MaXQk/GXc1/mFzEwjGVoMOJ+NiZKpj5xuVN9HqKEuDuBooykO5wKnbwkm6kAs/gG
-/10A4I5fkyOUHB+xRkaM/3g9UJgo/yB/oI7yQonKFI3VNQc/Q0vcAWUkUbyoZyZA
-WO5IJoOR9nF7g6kkYLT0ik26WZFVsBruKTsifLsCJTCQMWo8dJpvgJpGvo/k07YZ
-kWYC8J+K/SRA9gpvDBCfkPRQGMgq7CiE0C+VfoGVo11TuFd6FlkjjYmBIPXYek98
-rK1ONn6f4qY+67eRJ77oiNeFsj4eYw==
-=7Qm5
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2ktToACgkQnKSrs4Gr
+c8jgRgf/WWO5uJxyZLwosUbr+PGHcqci4COe1VGy3Aveab34yl0NQekiPT6CEG5k
+PLqiRN9UlPXnMq5H6tsIptfG1mBTxJpF0H7FVRGvwKnV+NizCllURp1Eb1y6ucTd
+j3Rg8JZAwDCdJsZ8d2o4JXQKv9CIavomjp0ZQNIdRiKJ8gOueiWydBgCOSO/l0dh
+t/YI7ENprVpSg56pZba9Y3eueA6Gt4oSfHZbgtQWXBueHkyN90em9JoDAktAOu1m
+PZAQykFnCUGV7RwfK2jUW+WIgh8mSrhu36zoyl9OAASnmHeiMBCTqpvHTKzRH180
+fEnf2WwIaOxFvEnbfxu/3ljKyhjEaA==
+=X6sM
 -----END PGP SIGNATURE-----
 
---ftEhullJWpWg/VHq--
+--XMCwj5IQnwKtuyBG--
