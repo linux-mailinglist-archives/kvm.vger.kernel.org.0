@@ -2,242 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD2EFD5D33
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 10:14:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA820D5D41
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 10:17:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730104AbfJNIOt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 04:14:49 -0400
-Received: from mail-vk1-f196.google.com ([209.85.221.196]:40517 "EHLO
-        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728883AbfJNIOt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 04:14:49 -0400
-Received: by mail-vk1-f196.google.com with SMTP id d126so3347856vkf.7
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 01:14:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=g8EVJz/I4DKJzBYbFuPEfYrvSDfQuFuU+oBfazSP8gs=;
-        b=h1JZhLCR+NUBW8xfqbTKiJ6aRMXX/n1ho8fP3rAgMJpdUOj8mVLsnvG47svMFQplj/
-         0VxeT5fs82EzbUJCcQpdp1teMxUWHmRjpv70g50ve9K0gODSMwhybLrtDDzcuZvBlt98
-         UJKmIxpwOwvHAxLQGPUxmswF9oIOutKBxpWfJ+DAbm8CFwOAqXuMOgZsTqfk+VoNcao/
-         FtlYGnSTSlr1FCt9cak47ecCpK7PsQSqDhqiGrE9FaIzjp8mDEp5TzNB9A8rfYpoP0dc
-         BRR5HsJQA4CQ1do8vztQY6ZYsM/DBQl212KFK9/YnOeZtdpLzBFxq+KnGlK5obDqb66t
-         P+ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=g8EVJz/I4DKJzBYbFuPEfYrvSDfQuFuU+oBfazSP8gs=;
-        b=kAKZzoytCm0I2m9F0Cpb8+WBKrWmiqdsNkbfqp231VxSw/5HHbl2/KHoT7GRXEpYfq
-         3kSCGet7qBXoykv+vnm7qCSOta6j3Es5Rfu8FCjuPhT51Cyg9av57PZE0QG19at0QvDR
-         f0xJlEBRw4GKlLx96k65k5x5eQKvl36DYE/2UqrVTmpyTkHCQXdRaOVTuvXXdFraXJmG
-         YtLTfhy9rB59v+Ru5n92MCGNKP8X3u7/4F24n5sEu0FCslTij0G1tciSRWkehJDZvx1D
-         nK9VmEpJPbY30vT61bCrx7Rbt29NbAPjXfHUb1JTNzirt4cTjKK4EktfB6b+DvwKJMLS
-         SaqQ==
-X-Gm-Message-State: APjAAAXbWZa89j5gNtzjymWLbrfxOK8yJneA9kqyNhU5qYNhYyFZqmab
-        aqh5yHk74z6X6BZ2qTsO4GBjc7jnb494THeeSLDy
-X-Google-Smtp-Source: APXvYqy6BDBIE4tawIeK1cABO6++1SqJq+RbrQeOc2XDmMy4hgx2dAkSDdTFiqHZBABMWt45udDVpyF/ZkPd70PLOGA=
-X-Received: by 2002:ac5:cb62:: with SMTP id l2mr15398973vkn.32.1571040887315;
- Mon, 14 Oct 2019 01:14:47 -0700 (PDT)
+        id S1730290AbfJNIR3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 04:17:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47202 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725936AbfJNIR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 04:17:29 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 79C4810C092A;
+        Mon, 14 Oct 2019 08:17:28 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 877E15D6A3;
+        Mon, 14 Oct 2019 08:17:25 +0000 (UTC)
+Date:   Mon, 14 Oct 2019 09:17:24 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>, kvm <kvm@vger.kernel.org>
+Subject: Re: [PATCH v4 1/5] vsock/virtio: limit the memory used per-socket
+Message-ID: <20191014081724.GD22963@stefanha-x1.localdomain>
+References: <20190717113030.163499-1-sgarzare@redhat.com>
+ <20190717113030.163499-2-sgarzare@redhat.com>
+ <20190729095956-mutt-send-email-mst@kernel.org>
+ <20190830094059.c7qo5cxrp2nkrncd@steredhat>
+ <20190901024525-mutt-send-email-mst@kernel.org>
+ <CAGxU2F7fA5UtkuMQbOHHy0noOGZUtpepBNKFg5afD81bynMVUQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
- <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com> <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
- <7f7fa66f-9e6c-2e48-03b2-64ebca36df99@redhat.com> <CAGG=3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h0V7SHbbEQ@mail.gmail.com>
- <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
-In-Reply-To: <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
-From:   Bill Wendling <morbo@google.com>
-Date:   Mon, 14 Oct 2019 01:14:36 -0700
-Message-ID: <CAGG=3QUurbcE-gESo8D3bj-tcdWwsc=umG3QTtZrTcVZp6PpWw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
- default argument promotion
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
-        David Gibson <dgibson@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="k4f25fnPtRuIRUb3"
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F7fA5UtkuMQbOHHy0noOGZUtpepBNKFg5afD81bynMVUQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Mon, 14 Oct 2019 08:17:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 12:57 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 11/10/2019 20.36, Bill Wendling wrote:
-> > I apologize for the breakage. I'm not sure how this escaped me. Here's
-> > a proposed fix. Thoughts?
-> >
-> > commit 5fa1940140fd75a97f3ac5ae2e4de9e1bef645d0
-> > Author: Bill Wendling <morbo@google.com>
-> > Date:   Fri Oct 11 11:26:03 2019 -0700
-> >
-> >     Use a status enum for reporting pass/fail
-> >
-> >     Some values passed into "report" as "pass/fail" are larger than the
-> >     size of the parameter. Use instead a status enum so that the size of the
-> >     argument no longer matters.
-> >
-> > diff --git a/lib/libcflat.h b/lib/libcflat.h
-> > index b6635d9..8f80a1c 100644
-> > --- a/lib/libcflat.h
-> > +++ b/lib/libcflat.h
-> > @@ -95,13 +95,22 @@ extern int vsnprintf(char *buf, int size, const
-> > char *fmt, va_list va)
-> >  extern int vprintf(const char *fmt, va_list va)
-> >   __attribute__((format(printf, 1, 0)));
-> >
-> > +enum status { PASSED, FAILED };
-> > +
-> > +#define STATUS(x) ((x) != 0 ? PASSED : FAILED)
-> > +
-> > +#define report(msg_fmt, status, ...) \
-> > + report_status(msg_fmt, STATUS(status) __VA_OPT__(,) __VA_ARGS__)
-> > +#define report_xfail(msg_fmt, xfail, status, ...) \
-> > + report_xfail_status(msg_fmt, xfail, STATUS(status) __VA_OPT__(,) __VA_ARGS__)
-> > +
-> >  void report_prefix_pushf(const char *prefix_fmt, ...)
-> >   __attribute__((format(printf, 1, 2)));
-> >  extern void report_prefix_push(const char *prefix);
-> >  extern void report_prefix_pop(void);
-> > -extern void report(const char *msg_fmt, unsigned pass, ...)
-> > +extern void report_status(const char *msg_fmt, unsigned pass, ...)
-> >   __attribute__((format(printf, 1, 3)));
-> > -extern void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
-> > +extern void report_xfail_status(const char *msg_fmt, bool xfail, enum
-> > status status, ...)
-> >   __attribute__((format(printf, 1, 4)));
-> >  extern void report_abort(const char *msg_fmt, ...)
-> >   __attribute__((format(printf, 1, 2)))
-> > diff --git a/lib/report.c b/lib/report.c
-> > index 2a5f549..4ba2ac0 100644
-> > --- a/lib/report.c
-> > +++ b/lib/report.c
-> > @@ -80,12 +80,12 @@ void report_prefix_pop(void)
-> >   spin_unlock(&lock);
-> >  }
-> >
-> > -static void va_report(const char *msg_fmt,
-> > - bool pass, bool xfail, bool skip, va_list va)
-> > +static void va_report(const char *msg_fmt, enum status status, bool xfail,
-> > +               bool skip, va_list va)
-> >  {
-> >   const char *prefix = skip ? "SKIP"
-> > -   : xfail ? (pass ? "XPASS" : "XFAIL")
-> > -   : (pass ? "PASS"  : "FAIL");
-> > +   : xfail ? (status == PASSED ? "XPASS" : "XFAIL")
-> > +   : (status == PASSED ? "PASS"  : "FAIL");
-> >
-> >   spin_lock(&lock);
-> >
-> > @@ -96,27 +96,27 @@ static void va_report(const char *msg_fmt,
-> >   puts("\n");
-> >   if (skip)
-> >   skipped++;
-> > - else if (xfail && !pass)
-> > + else if (xfail && status == FAILED)
-> >   xfailures++;
-> > - else if (xfail || !pass)
-> > + else if (xfail || status == FAILED)
-> >   failures++;
-> >
-> >   spin_unlock(&lock);
-> >  }
-> >
-> > -void report(const char *msg_fmt, unsigned pass, ...)
-> > +void report_status(const char *msg_fmt, enum status status, ...)
-> >  {
-> >   va_list va;
-> > - va_start(va, pass);
-> > - va_report(msg_fmt, pass, false, false, va);
-> > + va_start(va, status);
-> > + va_report(msg_fmt, status, false, false, va);
-> >   va_end(va);
-> >  }
-> >
-> > -void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
-> > +void report_xfail_status(const char *msg_fmt, bool xfail, enum status
-> > status, ...)
-> >  {
-> >   va_list va;
-> > - va_start(va, pass);
-> > - va_report(msg_fmt, pass, xfail, false, va);
-> > + va_start(va, status);
-> > + va_report(msg_fmt, status, xfail, false, va);
-> >   va_end(va);
-> >  }
->
-> That's certainly a solution... but I wonder whether it might be easier
-> to simply fix the failing tests instead, to make sure that they do not
-> pass a value > sizeof(int) to report() and report_xfail_status() ?
->
-It may be easier, but it won't stop future changes from encountering
-the same issue.
 
-> Another idea would be to swap the parameters of report() and
-> report_xfail_status() :
->
-It's a bit non-standard, but I don't have much of a preference. It
-would take changing tons of places in the code base though.
+--k4f25fnPtRuIRUb3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index b94d0ac..d6d1323 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -99,10 +99,10 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
->                                         __attribute__((format(printf, 1,
-> 2)));
->  extern void report_prefix_push(const char *prefix);
->  extern void report_prefix_pop(void);
-> -extern void report(const char *msg_fmt, bool pass, ...)
-> -                                       __attribute__((format(printf, 1,
-> 3)));
-> -extern void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
-> -                                       __attribute__((format(printf, 1,
-> 4)));
-> +extern void report(bool pass, const char *msg_fmt, ...)
-> +                                       __attribute__((format(printf, 2,
-> 3)));
-> +extern void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
-> +                                       __attribute__((format(printf, 3,
-> 4)));
->  extern void report_abort(const char *msg_fmt, ...)
->                                         __attribute__((format(printf, 1,
-> 2)))
->                                         __attribute__((noreturn));
-> diff --git a/lib/report.c b/lib/report.c
-> index ca9b4fd..2255dc3 100644
-> --- a/lib/report.c
-> +++ b/lib/report.c
-> @@ -104,18 +104,18 @@ static void va_report(const char *msg_fmt,
->         spin_unlock(&lock);
->  }
->
-> -void report(const char *msg_fmt, bool pass, ...)
-> +void report(bool pass, const char *msg_fmt, ...)
->  {
->         va_list va;
-> -       va_start(va, pass);
-> +       va_start(va, msg_fmt);
->         va_report(msg_fmt, pass, false, false, va);
->         va_end(va);
->  }
->
-> -void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
-> +void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
->  {
->         va_list va;
-> -       va_start(va, pass);
-> +       va_start(va, msg_fmt);
->         va_report(msg_fmt, pass, xfail, false, va);
->         va_end(va);
->  }
->
-> ... then we can keep the "bool" - but we have to fix all calling sites, too.
->
-> Paolo, any preferences?
->
->  Thomas
+On Fri, Oct 11, 2019 at 03:40:48PM +0200, Stefano Garzarella wrote:
+> On Sun, Sep 1, 2019 at 8:56 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Fri, Aug 30, 2019 at 11:40:59AM +0200, Stefano Garzarella wrote:
+> > > On Mon, Jul 29, 2019 at 10:04:29AM -0400, Michael S. Tsirkin wrote:
+> > > > On Wed, Jul 17, 2019 at 01:30:26PM +0200, Stefano Garzarella wrote:
+> > > > > Since virtio-vsock was introduced, the buffers filled by the host
+> > > > > and pushed to the guest using the vring, are directly queued in
+> > > > > a per-socket list. These buffers are preallocated by the guest
+> > > > > with a fixed size (4 KB).
+> > > > >
+> > > > > The maximum amount of memory used by each socket should be
+> > > > > controlled by the credit mechanism.
+> > > > > The default credit available per-socket is 256 KB, but if we use
+> > > > > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > > > > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > > > > guest will continue to fill the vring with new 4 KB free buffers
+> > > > > to avoid starvation of other sockets.
+> > > > >
+> > > > > This patch mitigates this issue copying the payload of small
+> > > > > packets (< 128 bytes) into the buffer of last packet queued, in
+> > > > > order to avoid wasting memory.
+> > > > >
+> > > > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > >
+> > > > This is good enough for net-next, but for net I think we
+> > > > should figure out how to address the issue completely.
+> > > > Can we make the accounting precise? What happens to
+> > > > performance if we do?
+> > > >
+> > >
+> > > Since I'm back from holidays, I'm restarting this thread to figure out
+> > > how to address the issue completely.
+> > >
+> > > I did a better analysis of the credit mechanism that we implemented in
+> > > virtio-vsock to get a clearer view and I'd share it with you:
+> > >
+> > >     This issue affect only the "host->guest" path. In this case, when=
+ the
+> > >     host wants to send a packet to the guest, it uses a "free" buffer
+> > >     allocated by the guest (4KB).
+> > >     The "free" buffers available for the host are shared between all
+> > >     sockets, instead, the credit mechanism is per-socket, I think to
+> > >     avoid the starvation of others sockets.
+> > >     The guests re-fill the "free" queue when the available buffers are
+> > >     less than half.
+> > >
+> > >     Each peer have these variables in the per-socket state:
+> > >        /* local vars */
+> > >        buf_alloc        /* max bytes usable by this socket
+> > >                            [exposed to the other peer] */
+> > >        fwd_cnt          /* increased when RX packet is consumed by the
+> > >                            user space [exposed to the other peer] */
+> > >        tx_cnt                 /* increased when TX packet is sent to =
+the other peer */
+> > >
+> > >        /* remote vars  */
+> > >        peer_buf_alloc   /* peer's buf_alloc */
+> > >        peer_fwd_cnt     /* peer's fwd_cnt */
+> > >
+> > >     When a peer sends a packet, it increases the 'tx_cnt'; when the
+> > >     receiver consumes the packet (copy it to the user-space buffer), =
+it
+> > >     increases the 'fwd_cnt'.
+> > >     Note: increments are made considering the payload length and not =
+the
+> > >     buffer length.
+> > >
+> > >     The value of 'buf_alloc' and 'fwd_cnt' are sent to the other peer=
+ in
+> > >     all packet headers or with an explicit CREDIT_UPDATE packet.
+> > >
+> > >     The local 'buf_alloc' value can be modified by the user space usi=
+ng
+> > >     setsockopt() with optname=3DSO_VM_SOCKETS_BUFFER_SIZE.
+> > >
+> > >     Before to send a packet, the peer checks the space available:
+> > >       credit_available =3D peer_buf_alloc - (tx_cnt - peer_fwd_cnt)
+> > >     and it will send up to credit_available bytes to the other peer.
+> > >
+> > > Possible solutions considering Michael's advice:
+> > > 1. Use the buffer length instead of the payload length when we increm=
+ent
+> > >    the counters:
+> > >   - This approach will account precisely the memory used per socket.
+> > >   - This requires changes in both guest and host.
+> > >   - It is not compatible with old drivers, so a feature should be neg=
+otiated.
+> > > 2. Decrease the advertised 'buf_alloc' taking count of bytes queued in
+> > >    the socket queue but not used. (e.g. 256 byte used on 4K available=
+ in
+> > >    the buffer)
+> > >   - pkt->hdr.buf_alloc =3D buf_alloc - bytes_not_used.
+> > >   - This should be compatible also with old drivers.
+> > >
+> > > Maybe the second is less invasive, but will it be too tricky?
+> > > Any other advice or suggestions?
+> > >
+> > > Thanks in advance,
+> > > Stefano
+> >
+> > OK let me try to clarify.  The idea is this:
+> >
+> > Let's say we queue a buffer of 4K, and we copy if len < 128 bytes.  This
+> > means that in the worst case (128 byte packets), each byte of credit in
+> > the socket uses up 4K/128 =3D 16 bytes of kernel memory. In fact we need
+> > to also account for the virtio_vsock_pkt since I think it's kept around
+> > until userspace consumes it.
+> >
+> > Thus given X buf alloc allowed in the socket, we should publish X/16
+> > credits to the other side. This will ensure the other side does not send
+> > more than X/16 bytes for a given socket and thus we won't need to
+> > allocate more than X bytes to hold the data.
+> >
+> > We can play with the copy break value to tweak this.
+> >
+>=20
+> Hi Michael,
+> sorry for the long silence, but I focused on multi-transport.
+>=20
+> Before to implement your idea, I tried to do some calculations and
+> looking better to our credit mechanism:
+>=20
+>   buf_alloc =3D 256 KB (default, tunable through setsockopt)
+>   sizeof(struct virtio_vsock_pkt) =3D 128
+>=20
+>   - guest (we use preallocated 4 KB buffers to receive packets, copying
+>     small packet - < 128 -)
+>     worst_case =3D 129
+>     buf_size =3D 4 KB
+>     credit2mem =3D (buf_size + sizeof(struct virtio_vsock_pkt)) / worst_c=
+ase =3D 32
+>=20
+>     credit_published =3D buf_alloc / credit2mem =3D ~8 KB
+>     Space for just 2 full packet (4 KB)
+>=20
+>   - host (we copy packets from the vring, allocating the space for the pa=
+yload)
+>     worst_case =3D 1
+>     buf_size =3D 1
+>     credit2mem =3D (buf_size + sizeof(struct virtio_vsock_pkt)) / worst_c=
+ase =3D 129
+>=20
+>     credit_published =3D buf_alloc / credit2mem =3D ~2 KB
+>     Less than a full packet (guest now can send up to 64 KB with a single
+>     packet, so it will be limited to 2 KB)
+>=20
+> Current memory consumption in the worst case if the RX queue is full:
+>   - guest
+>     mem =3D (buf_alloc / worst_case) *
+>           (buf_size + sizeof(struct virtio_vsock_pkt) =3D ~8MB
+>=20
+>   - host
+>     mem =3D (buf_alloc / worst_case) *
+>           (buf_size + sizeof(struct virtio_vsock_pkt) =3D ~32MB
+>=20
+> I think that the performance with big packets will be affected,
+> but I still have to try.
+>=20
+> Another approach that I want to explore is to play with buf_alloc
+> published to the peer.
+>=20
+> One thing that's not clear to me yet is the meaning of
+> SO_VM_SOCKETS_BUFFER_SIZE:
+> - max amount of memory used in the RX queue
+> - max amount of payload bytes in the RX queue (without overhead of
+>   struct virtio_vsock_pkt + preallocated buffer)
+>=20
+> From the 'include/uapi/linux/vm_sockets.h':
+>     /* Option name for STREAM socket buffer size.  Use as the option name=
+ in
+>      * setsockopt(3) or getsockopt(3) to set or get an unsigned long long=
+ that
+>      * specifies the size of the buffer underlying a vSockets STREAM sock=
+et.
+>      * Value is clamped to the MIN and MAX.
+>      */
+>=20
+>     #define SO_VM_SOCKETS_BUFFER_SIZE 0
+>=20
+> Regardless, I think we need to limit memory consumption in some way.
+> I'll check the implementation of other transports, to understand better.
+
+SO_VM_SOCKETS_BUFFER_SIZE might have been useful for VMCI-specific
+applications, but we should use SO_RCVBUF and SO_SNDBUF for portable
+applications in the future.  Those socket options also work with other
+address families.
+
+I guess these sockopts are bypassed by AF_VSOCK because it doesn't use
+the common skb queuing code in net/core/sock.c :(.  But one day we might
+migrate to it...
+
+Stefan
+
+--k4f25fnPtRuIRUb3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2kLxQACgkQnKSrs4Gr
+c8icQwf/ZRNeyaIkiIZwHbov8HDI2J5Ex0Q1vP56zK7G7A3gNTuGnBkrbzv7R0tR
+9Mt2gMYQg1GKhl9yUChS8RYqj3t95DdoYJoBqOF11aX/HL2DOYMjUkSwgnutlIU9
+GWYoUP8Dand1CoustleyCaVzAYqr/FetwRbaXIClCsgg8UOQEohkioMOdeRTAQ2x
+2+I3aYjBlaC80yO+yUrrYPbePjqDtph2Q/J2r6cr1G+VMn0e0lqY4e8hskd+eoFc
+tN/VpnfOhGII3H74W20DJK1U2srU38+VBL0SByrUiAgZwXCIRMnHs3nkBB312OaD
+3T9UCvgKBOR3CS1sRTLybhEMo05JCQ==
+=Qy/H
+-----END PGP SIGNATURE-----
+
+--k4f25fnPtRuIRUb3--
