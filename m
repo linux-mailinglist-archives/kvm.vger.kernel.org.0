@@ -2,168 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5658D677F
-	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 18:37:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CEA1D6766
+	for <lists+kvm@lfdr.de>; Mon, 14 Oct 2019 18:33:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388151AbfJNQhx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 12:37:53 -0400
-Received: from mga04.intel.com ([192.55.52.120]:2181 "EHLO mga04.intel.com"
+        id S2388125AbfJNQdM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 12:33:12 -0400
+Received: from foss.arm.com ([217.140.110.172]:48554 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732550AbfJNQhx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 12:37:53 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 09:37:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,296,1566889200"; 
-   d="scan'208";a="198343502"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.57])
-  by orsmga003.jf.intel.com with ESMTP; 14 Oct 2019 09:37:50 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: X86: Make fpu allocation a common function
-Date:   Tue, 15 Oct 2019 00:22:47 +0800
-Message-Id: <20191014162247.61461-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.19.1
+        id S1726637AbfJNQdM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 12:33:12 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CFB728;
+        Mon, 14 Oct 2019 09:33:11 -0700 (PDT)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF2443F718;
+        Mon, 14 Oct 2019 09:33:10 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/1] pci: use uint64_t for unsigned long
+ values
+To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     jmattson@google.com
+References: <81990077-23b0-b150-1373-2bb5734d4f23@arm.com>
+ <20191012082623.249497-1-morbo@google.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <69743a4f-4a1b-b84c-b58e-cfbac19583a8@arm.com>
+Date:   Mon, 14 Oct 2019 17:33:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191012082623.249497-1-morbo@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-They are duplicated codes to create vcpu.arch.{user,guest}_fpu in VMX
-and SVM. Make them common functions.
+Hi,
 
-No functional change intended.
+On 10/12/19 9:26 AM, Bill Wendling wrote:
+> The "pci_bar_*" functions use 64-bit masks, but the results are assigned
+> to 32-bit variables. Use 32-bit masks, since we're interested only in
+> the least significant 4-bits.
+>
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>  lib/linux/pci_regs.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
- arch/x86/kvm/svm.c     | 20 +++-----------------
- arch/x86/kvm/vmx/vmx.c | 20 +++-----------------
- arch/x86/kvm/x86.h     | 26 ++++++++++++++++++++++++++
- 3 files changed, 32 insertions(+), 34 deletions(-)
+In my first comment I didn't realize that the file is actually a copy of a Linux
+user API header file (it's taken from include/uapi/linux/pci_regs.h). I don't
+think relying on changes to our own copy of the file is the best idea, because we
+might forget to include them the next time we sync our version with Linux.
 
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index e479ea9bc9da..0116a3c37a07 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2156,21 +2156,9 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
- 		goto out;
- 	}
- 
--	svm->vcpu.arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
--						     GFP_KERNEL_ACCOUNT);
--	if (!svm->vcpu.arch.user_fpu) {
--		printk(KERN_ERR "kvm: failed to allocate kvm userspace's fpu\n");
--		err = -ENOMEM;
-+	err = kvm_vcpu_create_fpu(&svm->vcpu);
-+	if (err)
- 		goto free_partial_svm;
--	}
--
--	svm->vcpu.arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
--						     GFP_KERNEL_ACCOUNT);
--	if (!svm->vcpu.arch.guest_fpu) {
--		printk(KERN_ERR "kvm: failed to allocate vcpu's fpu\n");
--		err = -ENOMEM;
--		goto free_user_fpu;
--	}
- 
- 	err = kvm_vcpu_init(&svm->vcpu, kvm, id);
- 	if (err)
-@@ -2231,9 +2219,7 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
- uninit:
- 	kvm_vcpu_uninit(&svm->vcpu);
- free_svm:
--	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.guest_fpu);
--free_user_fpu:
--	kmem_cache_free(x86_fpu_cache, svm->vcpu.arch.user_fpu);
-+	kvm_vcpu_free_fpu(&svm->vcpu);
- free_partial_svm:
- 	kmem_cache_free(kvm_vcpu_cache, svm);
- out:
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e660e28e9ae0..53d9298ff648 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6710,21 +6710,9 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	if (!vmx)
- 		return ERR_PTR(-ENOMEM);
- 
--	vmx->vcpu.arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
--			GFP_KERNEL_ACCOUNT);
--	if (!vmx->vcpu.arch.user_fpu) {
--		printk(KERN_ERR "kvm: failed to allocate kvm userspace's fpu\n");
--		err = -ENOMEM;
-+	err = kvm_vcpu_create_fpu(&vmx->vcpu);
-+	if (err)
- 		goto free_partial_vcpu;
--	}
--
--	vmx->vcpu.arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
--			GFP_KERNEL_ACCOUNT);
--	if (!vmx->vcpu.arch.guest_fpu) {
--		printk(KERN_ERR "kvm: failed to allocate vcpu's fpu\n");
--		err = -ENOMEM;
--		goto free_user_fpu;
--	}
- 
- 	vmx->vpid = allocate_vpid();
- 
-@@ -6825,9 +6813,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	kvm_vcpu_uninit(&vmx->vcpu);
- free_vcpu:
- 	free_vpid(vmx->vpid);
--	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.guest_fpu);
--free_user_fpu:
--	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.user_fpu);
-+	kvm_vcpu_free_fpu(&vmx->vcpu);
- free_partial_vcpu:
- 	kmem_cache_free(kvm_vcpu_cache, vmx);
- 	return ERR_PTR(err);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 45d82b8277e5..c27e7ac91337 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -367,4 +367,30 @@ static inline bool kvm_pat_valid(u64 data)
- void kvm_load_guest_xcr0(struct kvm_vcpu *vcpu);
- void kvm_put_guest_xcr0(struct kvm_vcpu *vcpu);
- 
-+static inline int kvm_vcpu_create_fpu(struct kvm_vcpu *vcpu)
-+{
-+	vcpu->arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
-+			GFP_KERNEL_ACCOUNT);
-+	if (!vcpu->arch.user_fpu) {
-+		printk(KERN_ERR "kvm: failed to allocate kvm userspace's fpu\n");
-+		return -ENOMEM;
-+	}
-+
-+	vcpu->arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
-+			GFP_KERNEL_ACCOUNT);
-+	if (!vcpu->arch.guest_fpu) {
-+		printk(KERN_ERR "kvm: failed to allocate vcpu's fpu\n");
-+		kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline void kvm_vcpu_free_fpu(struct kvm_vcpu *vcpu)
-+{
-+	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
-+	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
-+}
-+
- #endif
--- 
-2.19.1
+I think the best approach would be to do the explicit cast to uint32_t in
+pci_bar_mask.
 
+Thanks,
+Alex
+>
+> diff --git a/lib/linux/pci_regs.h b/lib/linux/pci_regs.h
+> index 1becea8..3bc2b92 100644
+> --- a/lib/linux/pci_regs.h
+> +++ b/lib/linux/pci_regs.h
+> @@ -96,8 +96,8 @@
+>  #define  PCI_BASE_ADDRESS_MEM_TYPE_1M	0x02	/* Below 1M [obsolete] */
+>  #define  PCI_BASE_ADDRESS_MEM_TYPE_64	0x04	/* 64 bit address */
+>  #define  PCI_BASE_ADDRESS_MEM_PREFETCH	0x08	/* prefetchable? */
+> -#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fUL)
+> -#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03UL)
+> +#define  PCI_BASE_ADDRESS_MEM_MASK	(~0x0fU)
+> +#define  PCI_BASE_ADDRESS_IO_MASK	(~0x03U)
+>  /* bit 1 is reserved if address_space = 1 */
+>  
+>  /* Header type 0 (normal devices) */
