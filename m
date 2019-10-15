@@ -2,104 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F5FD6D65
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 04:58:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51470D6D87
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 05:16:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727568AbfJOC6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 22:58:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37338 "EHLO mx1.redhat.com"
+        id S1727703AbfJODQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 23:16:21 -0400
+Received: from mga09.intel.com ([134.134.136.24]:22884 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726248AbfJOC6T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 22:58:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6E5CB307D84D;
-        Tue, 15 Oct 2019 02:58:19 +0000 (UTC)
-Received: from [10.72.12.168] (ovpn-12-168.pek2.redhat.com [10.72.12.168])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 239CD60127;
-        Tue, 15 Oct 2019 02:58:14 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 0/5] vhost: ring format independence
-To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org
-References: <20191013113940.2863-1-mst@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <6c54460c-d958-78fb-cd6e-eac97cc2c00f@redhat.com>
-Date:   Tue, 15 Oct 2019 10:58:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727697AbfJODQV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 23:16:21 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 20:16:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; 
+   d="scan'208";a="208093307"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Oct 2019 20:16:19 -0700
+Date:   Mon, 14 Oct 2019 20:16:19 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH 02/14] KVM: monolithic: x86: disable linking vmx and svm
+ at the same time into the kernel
+Message-ID: <20191015031619.GD24895@linux.intel.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-3-aarcange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191013113940.2863-1-mst@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 15 Oct 2019 02:58:19 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190928172323.14663-3-aarcange@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Sep 28, 2019 at 01:23:11PM -0400, Andrea Arcangeli wrote:
+> Linking both vmx and svm into the kernel at the same time isn't
+> possible anymore or the kvm_x86/kvm_x86_pmu external function names
+> would collide.
+> 
+> Reported-by: kbuild test robot <lkp@intel.com>
+> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+> ---
+>  arch/x86/kvm/Kconfig | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 840e12583b85..e1601c54355e 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -59,9 +59,29 @@ config KVM
+>  
+>  	  If unsure, say N.
+>  
+> +if KVM=y
 
-On 2019/10/13 下午7:41, Michael S. Tsirkin wrote:
-> This adds infrastructure required for supporting
-> multiple ring formats.
->
-> The idea is as follows: we convert descriptors to an
-> independent format first, and process that converting to
-> iov later.
->
-> The point is that we have a tight loop that fetches
-> descriptors, which is good for cache utilization.
-> This will also allow all kind of batching tricks -
-> e.g. it seems possible to keep SMAP disabled while
-> we are fetching multiple descriptors.
->
-> This seems to perform exactly the same as the original
-> code already based on a microbenchmark.
-> Lightly tested.
-> More testing would be very much appreciated.
->
-> To use new code:
-> 	echo 1 > /sys/module/vhost_test/parameters/newcode
-> or
-> 	echo 1 > /sys/module/vhost_net/parameters/newcode
->
-> changes from v3:
->          - fixed error handling in case of indirect descriptors
->          - add BUG_ON to detect buffer overflow in case of bugs
->                  in response to comment by Jason Wang
->          - minor code tweaks
->
-> Changes from v2:
-> 	- fixed indirect descriptor batching
->                  reported by Jason Wang
->
-> Changes from v1:
-> 	- typo fixes
+Hmm, I see why the previous patch left KVM as a tristate.  I tried a
+variety of hacks to let KVM be a bool but nothing worked.
+
+> +
+> +choice
+> +	prompt "To link KVM statically into the kernel you need to choose"
+> +	help
+> +	  In order to build a kernel with support for both AMD and Intel
+> +	  CPUs, you need to set CONFIG_KVM=m.
+> +
+> +config KVM_AMD_STATIC
+> +	select KVM_AMD
+> +	bool "Link KVM AMD statically into the kernel"
+> +
+> +config KVM_INTEL_STATIC
+> +	select KVM_INTEL
+> +	bool "Link KVM Intel statically into the kernel"
+
+The prompt and choice text is way too long, e.g. in my usual window it
+cuts off at:
+
+  To link KVM statically into the kernel you need to choose (Link KVM Intel statically into
+
+Without the full text (the -> at the end), it's not obvious it's an option
+menu (AMD was selected by default for me and it took me a second to figure
+out what to hit enter on).
+
+I think short and sweet is enough for the prompt, with the details of how
+build both buried in the help text.
+
+choice
+	prompt "KVM built-in support"
+	help
+	  Here be a long and detailed help text.
+
+config KVM_AMD_STATIC
+	select KVM_AMD
+	bool "KVM AMD"
+
+config KVM_INTEL_STATIC
+	select KVM_INTEL
+	bool "KVM Intel"
+
+endchoice
 
 
-I've just done some quick benchmark with testpmd + vhost_net txonly.
+The ends up looking like:
 
-With 256 queue size, no difference but in 1024 queue size 1% regression 
-of PPS were found.
+   <*>   Kernel-based Virtual Machine (KVM) support
+           KVM built-in support (KVM Intel)  --->
+   -*-   KVM for Intel processors support
 
-Thanks
-
-
->
->
-> Michael S. Tsirkin (5):
->    vhost: option to fetch descriptors through an independent struct
->    vhost/test: add an option to test new code
->    vhost: batching fetches
->    vhost/net: add an option to test new code
->    vhost: last descriptor must have NEXT clear
->
->   drivers/vhost/net.c   |  32 ++++-
->   drivers/vhost/test.c  |  19 ++-
->   drivers/vhost/vhost.c | 328 +++++++++++++++++++++++++++++++++++++++++-
->   drivers/vhost/vhost.h |  20 ++-
->   4 files changed, 385 insertions(+), 14 deletions(-)
->
+> +
+> +endchoice
+> +
+> +endif
+> +
+>  config KVM_INTEL
+>  	tristate "KVM for Intel processors support"
+> -	depends on KVM
+> +	depends on (KVM && !KVM_AMD_STATIC) || KVM_INTEL_STATIC
+>  	# for perf_guest_get_msrs():
+>  	depends on CPU_SUP_INTEL
+>  	---help---
+> @@ -73,7 +93,7 @@ config KVM_INTEL
+>  
+>  config KVM_AMD
+>  	tristate "KVM for AMD processors support"
+> -	depends on KVM
+> +	depends on (KVM && !KVM_INTEL_STATIC) || KVM_AMD_STATIC
+>  	---help---
+>  	  Provides support for KVM on AMD processors equipped with the AMD-V
+>  	  (SVM) extensions.
