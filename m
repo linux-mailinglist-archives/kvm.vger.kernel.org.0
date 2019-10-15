@@ -2,156 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D36DCD70CC
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 10:12:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D518D70E2
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 10:22:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728583AbfJOIMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 04:12:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51965 "EHLO mx1.redhat.com"
+        id S1726538AbfJOIWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 04:22:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60510 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726192AbfJOIMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 04:12:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1726479AbfJOIWB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 04:22:01 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 18DC8801678;
-        Tue, 15 Oct 2019 08:12:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-75.ams2.redhat.com [10.36.117.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B9655D6A9;
-        Tue, 15 Oct 2019 08:12:19 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 3/3] Makefile: use "-Werror" in cc-option
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20191010183506.129921-1-morbo@google.com>
- <20191010183506.129921-4-morbo@google.com>
- <67d3c72f-1537-7765-4b8c-d631859a3204@redhat.com>
- <CAGG=3QUCRO3YjTFyTt6x2K9Cxi0oz=F1H3H41YYU0n-zc=_Xbw@mail.gmail.com>
-From:   Thomas Huth <thuth@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 2A6EA811DC
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 08:22:01 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id k184so8293573wmk.1
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 01:22:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4XCdYGBXgpm0bocpCasqCHuINSD48ZL6bGb+DpNrsjk=;
+        b=C6fF1jRmzveL0vUPLpJrZYqExSouY6HOea7cKRlyneagsfYCIzvXhbg7S1NrNAIAS0
+         3B461AazcuuJWA8RrNm6aaBHGnc4OvU1Oi6fM5FvlVSC/yMt0e8Pzuea/GeJ0FzWu1qT
+         xdzxcQtXvn8ZsQJQMfMw1rtD3P3lvbvwLrHbOukf02xcVuoA5q4jqud6yqozmDHmmmuP
+         V0k1olX+hhZTKp4jxPq8cfUxSa4GWmHr/HRzETHMSjpHyA1L3LOQo7eW/PwycKSqiZum
+         utbir89M39bzp/zrHZ7uKhzcoBnMAiIK+Ljlv3QiokmWnzMhIbIXzqKhV1ckOt1yCnV/
+         kIog==
+X-Gm-Message-State: APjAAAWQsHeSIeSydbjUmGCdgsXWabV88pAmR7wQWYh5vYdfDd+xZxKU
+        QJxG52lxSrJ37E15Gg4LO4XE2S3VCjDm49FqZTEiAAsMQz1vw8w3booJa7ONy+NCrJyiIb7Xvxb
+        6+TSdc0QyQf0H
+X-Received: by 2002:a1c:1a4c:: with SMTP id a73mr18125844wma.124.1571127719712;
+        Tue, 15 Oct 2019 01:21:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxKc8Jm/JgcHD/AD/1dyiUKrdBMoPSwMtLcSNr+lQLEPVUUfQPP0WRLafdscfoBCDPfVMeRYA==
+X-Received: by 2002:a1c:1a4c:: with SMTP id a73mr18125819wma.124.1571127719363;
+        Tue, 15 Oct 2019 01:21:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
+        by smtp.gmail.com with ESMTPSA id n1sm26097437wrg.67.2019.10.15.01.21.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2019 01:21:58 -0700 (PDT)
+Subject: Re: [PATCH 02/14] KVM: monolithic: x86: disable linking vmx and svm
+ at the same time into the kernel
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-3-aarcange@redhat.com>
+ <20191015031619.GD24895@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <e007b38e-d663-59af-cbd7-c2c4e6c24e83@redhat.com>
-Date:   Tue, 15 Oct 2019 10:12:18 +0200
+Message-ID: <94f1e36e-90b8-8b7d-57a5-031c65e415c4@redhat.com>
+Date:   Tue, 15 Oct 2019 10:21:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAGG=3QUCRO3YjTFyTt6x2K9Cxi0oz=F1H3H41YYU0n-zc=_Xbw@mail.gmail.com>
+In-Reply-To: <20191015031619.GD24895@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Tue, 15 Oct 2019 08:12:22 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/2019 09.57, Bill Wendling wrote:
-> On Tue, Oct 15, 2019 at 12:29 AM Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 10/10/2019 20.35, Bill Wendling wrote:
->>> The "cc-option" macro should use "-Werror" to determine if a flag is
->>> supported. Otherwise the test may not return a nonzero result. Also
->>> conditionalize some of the warning flags which aren't supported by
->>> clang.
->>>
->>> Signed-off-by: Bill Wendling <morbo@google.com>
->>> ---
->>>  Makefile | 19 +++++++++++--------
->>>  1 file changed, 11 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index 32414dc..3ec0458 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -46,30 +46,33 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
->>>  # cc-option
->>>  # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
->>>
->>> -cc-option = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null \
->>> +cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
->>>                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
->>>
->>>  COMMON_CFLAGS += -g $(autodepend-flags)
->>> -COMMON_CFLAGS += -Wall -Wwrite-strings -Wclobbered -Wempty-body -Wuninitialized
->>> -COMMON_CFLAGS += -Wignored-qualifiers -Wunused-but-set-parameter
->>> -COMMON_CFLAGS += -Werror
->>> +COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
->>> +COMMON_CFLAGS += -Wignored-qualifiers -Werror
->>> +
->>>  frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
->>>  fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
->>>  fnostack_protector := $(call cc-option, -fno-stack-protector, "")
->>>  fnostack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
->>> -wno_frame_address := $(call cc-option, -Wno-frame-address, "")
->>>  fno_pic := $(call cc-option, -fno-pic, "")
->>>  no_pie := $(call cc-option, -no-pie, "")
->>>  COMMON_CFLAGS += $(fomit_frame_pointer)
->>>  COMMON_CFLAGS += $(fno_stack_protector)
->>>  COMMON_CFLAGS += $(fno_stack_protector_all)
->>> -COMMON_CFLAGS += $(wno_frame_address)
->>>  COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
->>>  COMMON_CFLAGS += $(fno_pic) $(no_pie)
->>>
->>> +COMMON_CFLAGS += $(call cc-option, -Wno-frame-address, "")
->>
->> I think the old code used ":=" on purpose, so that the test is only done
->> once. With your new code, the test is now done each time COMMON_CFLAGS
->> gets evaluated, i.e. for each compiled object.
->>
->> Could you please rewrite this test to use the ":=" detour for all lines
->> that call cc-option?
->>
-> Does it rerun the "cc-option" call if the COMMON_CFLAGS is initially
-> defined with ":="?
+On 15/10/19 05:16, Sean Christopherson wrote:
+> I think short and sweet is enough for the prompt, with the details of how
+> build both buried in the help text.
+> 
+> choice
+> 	prompt "KVM built-in support"
+> 	help
+> 	  Here be a long and detailed help text.
+> 
+> config KVM_AMD_STATIC
+> 	select KVM_AMD
+> 	bool "KVM AMD"
+> 
+> config KVM_INTEL_STATIC
+> 	select KVM_INTEL
+> 	bool "KVM Intel"
 
-It does not rerun the "cc-option" call in that case, but compilation
-fails. I think it's likely due to the line that contains the "$(if
-$(U32_LONG_FMT),-D__U32_LONG_FMT__,)" since that likely needs to be
-evaluated dynamically.
+Or even just
 
- Thomas
+	bool "AMD"
+	...
+	bool "Intel"
 
+> endchoice
+> 
+> The ends up looking like:
+> 
+>    <*>   Kernel-based Virtual Machine (KVM) support
+>            KVM built-in support (KVM Intel)  --->
+>    -*-   KVM for Intel processors support
+
+On top of this, it's also nice to hide the KVM_INTEL/KVM_AMD prompts if
+linking statically.  You can achieve that with
+
+config KVM_INTEL
+    tristate
+    prompt "KVM for Intel processors support" if KVM=m
+    depends on (KVM=m && m) || KVM_INTEL_STATIC
+
+config KVM_AMD
+    tristate
+    prompt "KVM for AMD processors support" if KVM=m
+    depends on (KVM=m && m) || KVM_AMD_STATIC
+
+The left side of the "||" ensures that, if KVM=m, you can only choose
+module build for both KVM_INTEL and KVM_AMD.  Having just "depends on
+KVM" would allow a pre-existing .config to choose the now-invalid
+combination
+
+	CONFIG_KVM=y
+	CONFIG_KVM_INTEL=y
+	CONFIG_KVM_AMD=y
+
+The right side of the "||" part is just for documentation, to avoid that
+a selected symbol does not satisfy its dependencies.
+
+Thanks,
+
+Paolo
