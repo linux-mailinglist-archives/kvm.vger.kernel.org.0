@@ -2,93 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF66FD7C4D
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:50:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFADAD7C81
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:56:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388268AbfJOQtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 12:49:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40666 "EHLO mx1.redhat.com"
+        id S2388304AbfJOQz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 12:55:29 -0400
+Received: from mga11.intel.com ([192.55.52.93]:46844 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726362AbfJOQtz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 12:49:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D7ED7882FB;
-        Tue, 15 Oct 2019 16:49:54 +0000 (UTC)
-Received: from mail (ovpn-124-232.rdu2.redhat.com [10.10.124.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E4616031D;
-        Tue, 15 Oct 2019 16:49:53 +0000 (UTC)
-Date:   Tue, 15 Oct 2019 12:49:52 -0400
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1726362AbfJOQz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 12:55:28 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 09:55:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,300,1566889200"; 
+   d="scan'208";a="201811346"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.43.57])
+  by FMSMGA003.fm.intel.com with ESMTP; 15 Oct 2019 09:55:26 -0700
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-Message-ID: <20191015164952.GE331@redhat.com>
-References: <20190928172323.14663-1-aarcange@redhat.com>
- <20190928172323.14663-13-aarcange@redhat.com>
- <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] Refactor vcpu creation flow of x86 arch
+Date:   Wed, 16 Oct 2019 00:40:29 +0800
+Message-Id: <20191015164033.87276-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 15 Oct 2019 16:49:54 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 10:28:39AM +0200, Paolo Bonzini wrote:
-> If you're including EXIT_REASON_EPT_MISCONFIG (MMIO access) then you
-> should include EXIT_REASON_IO_INSTRUCTION too.  Depending on the devices
-> that are in the guest, the doorbell register might be MMIO or PIO.
+When reading the vcpu creationg flow of vmx, I find it hard to follow since it
+mixes the data structure allocation and initilization together.
 
-The fact outb/inb devices exists isn't the question here. The question
-you should clarify is: which of the PIO devices is performance
-critical as much as MMIO with virtio/vhost? I mean even on real
-hardware those devices aren't performance critical. I didn't run into
-PIO drivers with properly configured guests.
+This series tries to make the vcpu creation flow more clear that first
+allocating data structure and then initializing them. In this way, it helps
+move FPU allocation to generic x86 code (Patch 4).
 
-> So, the difference between my suggested list (which I admit is just
-> based on conjecture, not benchmarking) is that you add
-> EXIT_REASON_PAUSE_INSTRUCTION, EXIT_REASON_PENDING_INTERRUPT,
-> EXIT_REASON_EXTERNAL_INTERRUPT, EXIT_REASON_HLT, EXIT_REASON_MSR_READ,
-> EXIT_REASON_CPUID.
-> 
-> Which of these make a difference for the hrtimer testcase?  It's of
-> course totally fine to use benchmarks to prove that my intuition was
-> bad---but you must also use them to show why your intuition is right. :)
+This series intends to do no functional change. I just tested it with
+kvm_unit_tests for vmx since I have no AMD machine at hand.
 
-The hrtimer flood hits on this:
+Xiaoyao Li (4):
+  KVM: VMX: rename {vmx,nested_vmx}_vcpu_setup functions
+  KVM: VMX: Setup MSR bitmap only when has msr_bitmap capability
+  KVM: X86: Refactor kvm_arch_vcpu_create
+  KVM: X86: Make vcpu's FPU allocation a common function
 
-           MSR_WRITE     338793    56.54%     5.51%      0.33us     34.44us      0.44us ( +-   0.20% )
-   PENDING_INTERRUPT     168431    28.11%     2.52%      0.36us     32.06us      0.40us ( +-   0.28% )
-    PREEMPTION_TIMER      91723    15.31%     1.32%      0.34us     30.51us      0.39us ( +-   0.41% )
-  EXTERNAL_INTERRUPT        234     0.04%     0.00%      0.25us      5.53us      0.43us ( +-   5.67% )
-                 HLT         65     0.01%    90.64%      0.49us 319933.79us  37562.71us ( +-  21.68% )
-            MSR_READ          6     0.00%     0.00%      0.67us      1.96us      1.06us ( +-  17.97% )
-       EPT_MISCONFIG          6     0.00%     0.01%      3.09us    105.50us     26.76us ( +-  62.10% )
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kvm/svm.c              |  81 ++++++---------
+ arch/x86/kvm/vmx/nested.c       |   2 +-
+ arch/x86/kvm/vmx/nested.h       |   2 +-
+ arch/x86/kvm/vmx/vmx.c          | 173 ++++++++++++++------------------
+ arch/x86/kvm/x86.c              |  40 ++++++++
+ 6 files changed, 150 insertions(+), 149 deletions(-)
 
-PENDING_INTERRUPT is the big missing thing in your list. It probably
-accounts for the bulk of slowdown from your list.  However I could
-imagine other loads with higher external interrupt/hlt/rdmsr than the
-hrtimer one so I didn't drop those. Other loads are hitting on a flood
-of HLT and from host standpoint it's no a slow path. Not all OS have
-the cpuidle haltpoll governor to mitigate the HLT frequency.
+-- 
+2.19.1
 
-I'm pretty sure HLT/EXTERNAL_INTERRUPT/PENDING_INTERRUPT should be
-included.
-
-The least useful are PAUSE, CPUID and MSR_READ, we could considering
-dropping some of those (in the short term cpuid helps for benchmarking
-to more accurately measure the performance improvement of not hitting
-the retpoline there). I simply could imagine some load hitting
-frequently on those too so I didn't drop them.
-
-I also wonder if VMCALL should be added, certain loads hit on fairly
-frequent VMCALL, but none of the one I benchmarked.
