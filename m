@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89217D791B
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 16:52:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78079D7941
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 16:55:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733039AbfJOOtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 10:49:12 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:36709 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732599AbfJOOtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 10:49:06 -0400
-Received: by mail-oi1-f196.google.com with SMTP id k20so17040876oih.3
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 07:49:05 -0700 (PDT)
+        id S1732931AbfJOOxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 10:53:11 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:41096 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732539AbfJOOxL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 10:53:11 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w65so17047719oiw.8
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 07:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/kwSlXh6iJx2O0gCfEtXXAa4F2WK8uIGGEOp4n92JOM=;
-        b=LkjWXU/fZpk5VVnZObAdiPhF8A1Ozh6Fl7p+l0J7kmC3t20Uh+d+oCGGy3oF3r6NLe
-         hEMsy2Wbsoy88zOrL45mi3wV5z9sQOIlnfWr49WcGTrBZZFV2BGwb3FveDziPpo2JDHn
-         kpfwm1CHlRPfu67CpYnsHA+1wpF0ME1e5MUbXx5mtN+kOdrNVrNnJDBrZ1EIU+mV5Pdc
-         tzOgjKPkaHhXJTvyHhOC488MgyE1HprVgxyht758wl7rSo7bBSglCnMNh6dlHJRqWz03
-         BJmurMMAc0G60/VAehe5JtgYrsbOa1fAHAfsIw8/AbrFpjs06sppNhC+IkGXs5ZWKzIv
-         V3jA==
+        bh=pJHLxWBHfbqmvzOZUSxQLaGo5BYoxOcdXmYT8MESVjw=;
+        b=xub1vEGEH9eORcaWMny1wqHLHVDX8S+d+vqaqqeWA5aKqQSbiX7OrCIGAthe6hu1/d
+         Mrp97VpPtfEgTqcvJ62iH5fRPmM3VcGoRg/OBifl4WEPwpYj64dGvu8B6yBHQ82l5neY
+         eaEnn00p8ynrcNEPceCCijGcb42XzIddNsoN6st0PvBxXwPKwN/36BY7RG6KBgSmNy6p
+         7/IzPL33RNCtbClPxUtV7wBEfETxpz57wORrtVJodn0AlQ+9IEfAc2E46iFBGz54CXva
+         puTcYU/tgOJ3lLl32zPvdBjNWrRTFQjp+D+CFZksw41S9zGnVWzuT5WBCdW7khas7YPq
+         B/qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=/kwSlXh6iJx2O0gCfEtXXAa4F2WK8uIGGEOp4n92JOM=;
-        b=I5ldSUxhB4H8BOutVwAq/FvsOMMTnKuROuIgpj7DLNfpAXZxTduwN71Qo37TmSYV4n
-         abhpoOLgx02BVNLd1lndAvPh74HMnT6B8epXsiv2glmc9kSotkznzcCW1DfQUVu/vA8Y
-         bk4YuT0uKEegkXAYx4TGTMkHzNl1ov6D7+vgaHfFX0JPCueJ7epmwNukzIIqsHaEn1oF
-         +bjT+os0jyK5UZwAofENWeldoKx6+wbleA1FVnJl7FVdGOVN+DKBFF10yDOY2F49LAfC
-         ZMQVFLk1eidp3f2Wb345cSYUyzN+1y0rwzjknHiWeQBUUTyV6oodjBd8pt8kkbsaOfZj
-         C1dg==
-X-Gm-Message-State: APjAAAU8+0DNa/mjY7gcL3Bqi+9QM8I713gLXrQID+ErubvFWguYxOWp
-        m2enGT4QwEOHQuAsDAL99N7Oho9lUlWJVpB8qU+Z5Q==
-X-Google-Smtp-Source: APXvYqxulgZJq7+EMr7REicShnKhm+CUfM2qlJR9cQM8gDJsBL49U+8xBNQAEvwouzHYF6STEw9GWU7u1fqNxMz29Vg=
-X-Received: by 2002:aca:49c2:: with SMTP id w185mr29667804oia.163.1571150945480;
- Tue, 15 Oct 2019 07:49:05 -0700 (PDT)
+        bh=pJHLxWBHfbqmvzOZUSxQLaGo5BYoxOcdXmYT8MESVjw=;
+        b=EdPo28xbp7Dk0sd2pXAnr6NSbWXjDZXI25dw7jQFA5FesYY5y2jun1Cbgz3b2iqxLP
+         LzL91bXkAsjWLhI1VhWt3EWBvMK0D3Ymff+6aAhVDog2jYBnwfD7+3ClMTyQKMb+0Lkd
+         RmjDLYbbKNW+uOCewbrp2gQPWis4om9S/6Ia+X03WC+2BuWGXcQqsh4hl/3kdYOJAxeT
+         2szbsHHCYiex+tyStPJOJBAvFcqsr3TSlAV0/R/gZYtglHYuI3opibkD5lxb9mSL12BB
+         sFKmcuuXZhsiEsiQz18wFzfe43kHb8L2Coqb+JlQ/SdB5Qn28+3zzqMERH/GCtwbWONq
+         Usiw==
+X-Gm-Message-State: APjAAAWPvTUNVQAgBL1SFevtUZzXPp8SxYKDqYgo8nmHn0C1bH5VVUCX
+        SJMYsHDB9a3SKe4nyOsmhBVTi3mxP3YpcNHQuMCmqg==
+X-Google-Smtp-Source: APXvYqzqvQComCBgFaQw5Q1kH9xNYO35eAfDsvhDHQduxNV0EVl/ym25KkAdWnopvPsA8eHPMLcixw9oewjaRJjJJ+s=
+X-Received: by 2002:a54:4e83:: with SMTP id c3mr29597998oiy.170.1571151190401;
+ Tue, 15 Oct 2019 07:53:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191015140140.34748-1-zhengxiang9@huawei.com> <20191015140140.34748-6-zhengxiang9@huawei.com>
-In-Reply-To: <20191015140140.34748-6-zhengxiang9@huawei.com>
+References: <20191015140140.34748-1-zhengxiang9@huawei.com> <20191015140140.34748-4-zhengxiang9@huawei.com>
+In-Reply-To: <20191015140140.34748-4-zhengxiang9@huawei.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 15 Oct 2019 15:48:53 +0100
-Message-ID: <CAFEAcA-92YEgrBPDVVFEmjBYnw=keJWKUDnqNRakw-jKYaxK5Q@mail.gmail.com>
-Subject: Re: [PATCH v19 5/5] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
+Date:   Tue, 15 Oct 2019 15:52:59 +0100
+Message-ID: <CAFEAcA9CWPKF5XibFtZRwavVj4PboGoaM5368Omje6qrOjV3AQ@mail.gmail.com>
+Subject: Re: [PATCH v19 3/5] ACPI: Add APEI GHES table generation support
 To:     Xiang Zheng <zhengxiang9@huawei.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -74,63 +73,44 @@ On Tue, 15 Oct 2019 at 15:02, Xiang Zheng <zhengxiang9@huawei.com> wrote:
 >
 > From: Dongjiu Geng <gengdongjiu@huawei.com>
 >
-> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fills this PA
-> to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> type.
+> This patch implements APEI GHES Table generation via fw_cfg blobs. Now
+> it only supports ARMv8 SEA, a type of GHESv2 error source. Afterwards,
+> we can extend the supported types if needed. For the CPER section,
+> currently it is memory section because kernel mainly wants userspace to
+> handle the memory errors.
 >
-> When guest accesses the poisoned memory, it will generate a Synchronous
-> External Abort(SEA). Then host kernel gets an APEI notification and calls
-> memory_failure() to unmapped the affected page in stage 2, finally
-> returns to guest.
+> This patch follows the spec ACPI 6.2 to build the Hardware Error Source
+> table. For more detailed information, please refer to document:
+> docs/specs/acpi_hest_ghes.rst
 >
-> Guest continues to access the PG_hwpoison page, it will trap to KVM as
-> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> Qemu, Qemu records this error address into guest APEI GHES memory and
-> notifes guest using Synchronous-External-Abort(SEA).
->
-> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
-> in which we can setup the type of exception and the syndrome information.
-> When switching to guest, the target vcpu will jump to the synchronous
-> external abort vector table entry.
->
-> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
-> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> not valid and hold an UNKNOWN value. These values will be set to KVM
-> register structures through KVM_SET_ONE_REG IOCTL.
->
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
 > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 
-> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
-> +                                      uint64_t error_physical_addr,
-> +                                      uint32_t data_length)
-> +{
-> +    GArray *block;
-> +    uint64_t current_block_length;
-> +    /* Memory Error Section Type */
-> +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
-> +    QemuUUID fru_id = {0};
+> +    /* Error Status Address */
+> +    build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0,
+> +                     4 /* QWord access */, 0);
 
-Hi; this makes at least some versions of clang complain
-(this is a clang bug, but it's present in shipped versions):
+Hi; this doesn't seem to compile with clang:
 
-/home/petmay01/linaro/qemu-from-laptop/qemu/hw/acpi/acpi_ghes.c:135:24:
-error: suggest braces around
-      initialization of subobject [-Werror,-Wmissing-braces]
-    QemuUUID fru_id = {0};
-                       ^
-                       {}
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/acpi/acpi_ghes.c:330:34:
+error: implicit conversion from
+      enumeration type 'AmlRegionSpace' to different enumeration type
+'AmlAddressSpace'
+      [-Werror,-Wenum-conversion]
+    build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0,
+    ~~~~~~~~~~~~~~~~             ^~~~~~~~~~~~~~~~~
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/acpi/acpi_ghes.c:351:34:
+error: implicit conversion from
+      enumeration type 'AmlRegionSpace' to different enumeration type
+'AmlAddressSpace'
+      [-Werror,-Wenum-conversion]
+    build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0,
+    ~~~~~~~~~~~~~~~~             ^~~~~~~~~~~~~~~~~
+2 errors generated.
 
-We generally use "{}" as the generic zero-initializer for
-this reason (it's gcc/clang specific whereas "{0}" is
-in the standard, but all of the compilers we care about
-support it and don't warn about its use).
-
-> +    uint8_t fru_text[20] = {0};
-
-Clang doesn't mind this one because it's not initializing
-a struct type, but you could use "{}" here too for consistency.
+Should these be AML_AS_SYSTEM_MEMORY, or should the build_append_gas()
+function be taking an AmlRegionSpace rather than an AmlAddressSpace ?
 
 thanks
 -- PMM
