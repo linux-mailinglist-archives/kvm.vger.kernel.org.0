@@ -2,163 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C1F4D78D3
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 16:38:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89217D791B
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 16:52:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732883AbfJOOh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 10:37:27 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38863 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732825AbfJOOh0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 10:37:26 -0400
-Received: by mail-wr1-f68.google.com with SMTP id y18so14735131wrn.5;
-        Tue, 15 Oct 2019 07:37:24 -0700 (PDT)
+        id S1733039AbfJOOtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 10:49:12 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:36709 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732599AbfJOOtG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 10:49:06 -0400
+Received: by mail-oi1-f196.google.com with SMTP id k20so17040876oih.3
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 07:49:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=neBsjR3UuUvIqjWSRW2rTQl/yD7xf9xUmzZJeouSucY=;
-        b=Ha/JGsd50SAmjoukDYzVJ+uuPpyS6R2PO/eaw9gkiIRIoM/HGQIlw9cEAjxcehLXgX
-         xtPrKatNFAft1UWxIzn3Defz+Km3jvCRPXTsAq9Pq3ufY6HVgJoOWyGxGPfjPvEdYCas
-         nmFfVEj8/OM25w2meSCjx2zxPPI1LmHgXKvgVJTMlwuYyyzncaqGB6hSe47Jkm2BmDdE
-         7Q1oVk61trb1ophCLz3TyIvG+5B4wxLnGIWfh8XXAXF2YWMuNcBZpEq+5iu4OQD/KM2o
-         pmgr9RP7X7EJ6h82CRMMDcjBoylZdxySRDcK25cQYOVMInHl93hoNZ/0PIMDNaEQWzXg
-         37Ig==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/kwSlXh6iJx2O0gCfEtXXAa4F2WK8uIGGEOp4n92JOM=;
+        b=LkjWXU/fZpk5VVnZObAdiPhF8A1Ozh6Fl7p+l0J7kmC3t20Uh+d+oCGGy3oF3r6NLe
+         hEMsy2Wbsoy88zOrL45mi3wV5z9sQOIlnfWr49WcGTrBZZFV2BGwb3FveDziPpo2JDHn
+         kpfwm1CHlRPfu67CpYnsHA+1wpF0ME1e5MUbXx5mtN+kOdrNVrNnJDBrZ1EIU+mV5Pdc
+         tzOgjKPkaHhXJTvyHhOC488MgyE1HprVgxyht758wl7rSo7bBSglCnMNh6dlHJRqWz03
+         BJmurMMAc0G60/VAehe5JtgYrsbOa1fAHAfsIw8/AbrFpjs06sppNhC+IkGXs5ZWKzIv
+         V3jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=neBsjR3UuUvIqjWSRW2rTQl/yD7xf9xUmzZJeouSucY=;
-        b=KTyxvWZc2Mpu0Uv1gdnpIq1i8j6ULRyvjuGLWFIfaYipbtVk1kc9etfxf0PzaRUG8E
-         khX4gXyu2Npt1szc/dRIZ6NPW06gbRnKuiFvh2KR+p7Xer2kPVYyBZMvTYIRtBAB42al
-         T+z3Snh/ke33A7H+CAAG1LejRCrbgdyXy/tytCzixC0omIrgrL9Rx9mnRV6sLErpBB1M
-         dTONR0OBUBVfHj2V+K6O8ECur6J/zHu4cWp8piPW9Tx+tPfl8S8ESXUO3iqYE2FTMkdn
-         U8r2H4OG5IoUvamiFjDAxyopPEffSj6WpAdC2SX408E1hNqQnx2MqzPANm3vsKDif5CY
-         j3rQ==
-X-Gm-Message-State: APjAAAWtI8qxpRHampWBjXmwzszy581F2s3bXxwonINwcW31GSpKkmyI
-        IkP/gqKsjgm0AzGVeVLY/fk=
-X-Google-Smtp-Source: APXvYqzV3/RVLumtjzKMF39X/kb+3GTjFjA6Zi36mjTbF3VD42lPRp342ZlZGPdL0S+AnrxMQCU2bw==
-X-Received: by 2002:a5d:674e:: with SMTP id l14mr29799012wrw.45.1571150243309;
-        Tue, 15 Oct 2019 07:37:23 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id r20sm29954681wrg.61.2019.10.15.07.37.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2019 07:37:22 -0700 (PDT)
-Date:   Tue, 15 Oct 2019 15:37:20 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com
-Subject: Re: [PATCH V3 0/7] mdev based hardware virtio offloading support
-Message-ID: <20191015143720.GA13108@stefanha-x1.localdomain>
-References: <20191011081557.28302-1-jasowang@redhat.com>
- <20191014174946.GC5359@stefanha-x1.localdomain>
- <6d12ad8f-8137-e07d-d735-da59a326e8ed@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/kwSlXh6iJx2O0gCfEtXXAa4F2WK8uIGGEOp4n92JOM=;
+        b=I5ldSUxhB4H8BOutVwAq/FvsOMMTnKuROuIgpj7DLNfpAXZxTduwN71Qo37TmSYV4n
+         abhpoOLgx02BVNLd1lndAvPh74HMnT6B8epXsiv2glmc9kSotkznzcCW1DfQUVu/vA8Y
+         bk4YuT0uKEegkXAYx4TGTMkHzNl1ov6D7+vgaHfFX0JPCueJ7epmwNukzIIqsHaEn1oF
+         +bjT+os0jyK5UZwAofENWeldoKx6+wbleA1FVnJl7FVdGOVN+DKBFF10yDOY2F49LAfC
+         ZMQVFLk1eidp3f2Wb345cSYUyzN+1y0rwzjknHiWeQBUUTyV6oodjBd8pt8kkbsaOfZj
+         C1dg==
+X-Gm-Message-State: APjAAAU8+0DNa/mjY7gcL3Bqi+9QM8I713gLXrQID+ErubvFWguYxOWp
+        m2enGT4QwEOHQuAsDAL99N7Oho9lUlWJVpB8qU+Z5Q==
+X-Google-Smtp-Source: APXvYqxulgZJq7+EMr7REicShnKhm+CUfM2qlJR9cQM8gDJsBL49U+8xBNQAEvwouzHYF6STEw9GWU7u1fqNxMz29Vg=
+X-Received: by 2002:aca:49c2:: with SMTP id w185mr29667804oia.163.1571150945480;
+ Tue, 15 Oct 2019 07:49:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
-Content-Disposition: inline
-In-Reply-To: <6d12ad8f-8137-e07d-d735-da59a326e8ed@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <20191015140140.34748-1-zhengxiang9@huawei.com> <20191015140140.34748-6-zhengxiang9@huawei.com>
+In-Reply-To: <20191015140140.34748-6-zhengxiang9@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Tue, 15 Oct 2019 15:48:53 +0100
+Message-ID: <CAFEAcA-92YEgrBPDVVFEmjBYnw=keJWKUDnqNRakw-jKYaxK5Q@mail.gmail.com>
+Subject: Re: [PATCH v19 5/5] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        wanghaibin.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 15 Oct 2019 at 15:02, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>
+> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> translates the host VA delivered by host to guest PA, then fills this PA
+> to guest APEI GHES memory, then notifies guest according to the SIGBUS
+> type.
+>
+> When guest accesses the poisoned memory, it will generate a Synchronous
+> External Abort(SEA). Then host kernel gets an APEI notification and calls
+> memory_failure() to unmapped the affected page in stage 2, finally
+> returns to guest.
+>
+> Guest continues to access the PG_hwpoison page, it will trap to KVM as
+> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+> Qemu, Qemu records this error address into guest APEI GHES memory and
+> notifes guest using Synchronous-External-Abort(SEA).
+>
+> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
+> in which we can setup the type of exception and the syndrome information.
+> When switching to guest, the target vcpu will jump to the synchronous
+> external abort vector table entry.
+>
+> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
+> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+> not valid and hold an UNKNOWN value. These values will be set to KVM
+> register structures through KVM_SET_ONE_REG IOCTL.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 
---ew6BAiZeqk4r7MaW
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+> +                                      uint64_t error_physical_addr,
+> +                                      uint32_t data_length)
+> +{
+> +    GArray *block;
+> +    uint64_t current_block_length;
+> +    /* Memory Error Section Type */
+> +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
+> +    QemuUUID fru_id = {0};
 
-On Tue, Oct 15, 2019 at 11:37:17AM +0800, Jason Wang wrote:
->=20
-> On 2019/10/15 =E4=B8=8A=E5=8D=881:49, Stefan Hajnoczi wrote:
-> > On Fri, Oct 11, 2019 at 04:15:50PM +0800, Jason Wang wrote:
-> > > There are hardware that can do virtio datapath offloading while having
-> > > its own control path. This path tries to implement a mdev based
-> > > unified API to support using kernel virtio driver to drive those
-> > > devices. This is done by introducing a new mdev transport for virtio
-> > > (virtio_mdev) and register itself as a new kind of mdev driver. Then
-> > > it provides a unified way for kernel virtio driver to talk with mdev
-> > > device implementation.
-> > >=20
-> > > Though the series only contains kernel driver support, the goal is to
-> > > make the transport generic enough to support userspace drivers. This
-> > > means vhost-mdev[1] could be built on top as well by resuing the
-> > > transport.
-> > >=20
-> > > A sample driver is also implemented which simulate a virito-net
-> > > loopback ethernet device on top of vringh + workqueue. This could be
-> > > used as a reference implementation for real hardware driver.
-> > >=20
-> > > Consider mdev framework only support VFIO device and driver right now,
-> > > this series also extend it to support other types. This is done
-> > > through introducing class id to the device and pairing it with
-> > > id_talbe claimed by the driver. On top, this seris also decouple
-> > > device specific parents ops out of the common ones.
-> > I was curious so I took a quick look and posted comments.
-> >=20
-> > I guess this driver runs inside the guest since it registers virtio
-> > devices?
->=20
->=20
-> It could run in either guest or host. But the main focus is to run in the
-> host then we can use virtio drivers in containers.
->=20
->=20
-> >=20
-> > If this is used with physical PCI devices that support datapath
-> > offloading then how are physical devices presented to the guest without
-> > SR-IOV?
->=20
->=20
-> We will do control path meditation through vhost-mdev[1] and vhost-vfio[2=
-].
-> Then we will present a full virtio compatible ethernet device for guest.
->=20
-> SR-IOV is not a must, any mdev device that implements the API defined in
-> patch 5 can be used by this framework.
+Hi; this makes at least some versions of clang complain
+(this is a clang bug, but it's present in shipped versions):
 
-What I'm trying to understand is: if you want to present a virtio-pci
-device to the guest (e.g. using vhost-mdev or vhost-vfio), then how is
-that related to this patch series?
+/home/petmay01/linaro/qemu-from-laptop/qemu/hw/acpi/acpi_ghes.c:135:24:
+error: suggest braces around
+      initialization of subobject [-Werror,-Wmissing-braces]
+    QemuUUID fru_id = {0};
+                       ^
+                       {}
 
-Does this mean this patch series is useful mostly for presenting virtio
-devices to containers or the host?
+We generally use "{}" as the generic zero-initializer for
+this reason (it's gcc/clang specific whereas "{0}" is
+in the standard, but all of the compilers we care about
+support it and don't warn about its use).
 
-Stefan
+> +    uint8_t fru_text[20] = {0};
 
---ew6BAiZeqk4r7MaW
-Content-Type: application/pgp-signature; name="signature.asc"
+Clang doesn't mind this one because it's not initializing
+a struct type, but you could use "{}" here too for consistency.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2l2aAACgkQnKSrs4Gr
-c8ji7wf9FHyYry8VO4FqVBdQWMz/h/mmNTgeyBCpCasw+joJ3LRHOyyGPsu2BiOX
-IhAuZvK3azvtP7vh1etYaoBrCPmyFBTh2UXsIYoGK1qpUzPNkB7nuGYTBPJgZbxd
-jmJNDjc9wrrn9sWBJjkJaFYSjEDfob63FtUG2VM6f109LXI4bTyt03KqS1tZ75Hi
-SSjVt95GYQ1xENjKUcVqV9ULwfsv0Wz/WQ2XIvn8Oij7NK9bKHWl3HLirrUE62FP
-y6/3Y2fKKhes58jmY09L37Ym625X95M//6g2WYv+uR5rTTfo7jQBlLZ1tklwNY/k
-X8Sw0iHJKxZjvZqItbu49kJtRJwm9g==
-=nOrh
------END PGP SIGNATURE-----
-
---ew6BAiZeqk4r7MaW--
+thanks
+-- PMM
