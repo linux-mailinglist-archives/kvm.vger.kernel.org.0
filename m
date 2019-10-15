@@ -2,138 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3862D8085
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 21:47:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4367D80C2
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:13:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732539AbfJOTrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 15:47:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46846 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727478AbfJOTrC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 15:47:02 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 47348C04B940
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 19:47:01 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id j7so10660535wrx.14
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 12:47:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JUDMnzFf/AJg2T0GjQljTk8M2MDyg/AQ482kn8kGySo=;
-        b=Z76frE8nUnZ5dHPIAfySlLjCJ3LoF9skg9kBfqOFyEOb/7uzrWKOqUF4lKZ3Mz4oqg
-         Id6eXarPjn5Q3UMEmbO7wI6lJ2B32tMdAUP++swQBm5gIJT5AnIWnMM2HfRs+FlvQNEL
-         KyHoiNfpyJP4IL07CaORYHQkdxIT5mMN4zPS5p9gYHgJCq5pA1XWk8UXctrFrooizKAq
-         zR2tCHRS709S5MH4bccDpCH44/Y3Sbgzb+zOpHkFMfFbYGkgz6nRqiPzTsvV/CTOZ8Zu
-         UD7l5x9OheOIhihyRkRpHC+gLXr7lPAmmgdS9pBXjDmpO7nTl0N/T7XFqmZm2BoclRpn
-         PgFA==
-X-Gm-Message-State: APjAAAXp8EsegzydTuOCP82ifFROapfAq4GwXIHCx9fyuX7RZrj1kVpu
-        SEHDVtSVUeCu22H5B2xGgGZuijF+tFpbqIY8MhtemCnfSt1CcsSOhdvvdklJ2hb5mzzeH0IoufD
-        GmKH/oOpmDoky
-X-Received: by 2002:a5d:6b03:: with SMTP id v3mr33243546wrw.182.1571168819888;
-        Tue, 15 Oct 2019 12:46:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxKncfKk0ZDjD/mAm3dZRAQyVQ+iLyC2oCnuIGL0d4Nl3NDjg7qLC99QPB29CvDvGDpBauxtw==
-X-Received: by 2002:a5d:6b03:: with SMTP id v3mr33243530wrw.182.1571168819564;
-        Tue, 15 Oct 2019 12:46:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
-        by smtp.gmail.com with ESMTPSA id g13sm18499321wrm.42.2019.10.15.12.46.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2019 12:46:58 -0700 (PDT)
-Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190928172323.14663-1-aarcange@redhat.com>
- <20190928172323.14663-13-aarcange@redhat.com>
- <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
- <20191015164952.GE331@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
-Date:   Tue, 15 Oct 2019 21:46:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1733003AbfJOUNC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 16:13:02 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:46357 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727782AbfJOUNB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 16:13:01 -0400
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iKTBb-0007eQ-LO; Tue, 15 Oct 2019 22:12:51 +0200
+Date:   Tue, 15 Oct 2019 22:12:50 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Jianyong Wu <jianyong.wu@arm.com>
+cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        maz@kernel.org, richardcochran@gmail.com, Mark.Rutland@arm.com,
+        will@kernel.org, suzuki.poulose@arm.com,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        nd@arm.com
+Subject: Re: [PATCH v5 3/6] timekeeping: Add clocksource to
+ system_time_snapshot
+In-Reply-To: <20191015104822.13890-4-jianyong.wu@arm.com>
+Message-ID: <alpine.DEB.2.21.1910152047490.2518@nanos.tec.linutronix.de>
+References: <20191015104822.13890-1-jianyong.wu@arm.com> <20191015104822.13890-4-jianyong.wu@arm.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20191015164952.GE331@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/19 18:49, Andrea Arcangeli wrote:
-> On Tue, Oct 15, 2019 at 10:28:39AM +0200, Paolo Bonzini wrote:
->> If you're including EXIT_REASON_EPT_MISCONFIG (MMIO access) then you
->> should include EXIT_REASON_IO_INSTRUCTION too.  Depending on the devices
->> that are in the guest, the doorbell register might be MMIO or PIO.
-> 
-> The fact outb/inb devices exists isn't the question here. The question
-> you should clarify is: which of the PIO devices is performance
-> critical as much as MMIO with virtio/vhost?
+On Tue, 15 Oct 2019, Jianyong Wu wrote:
 
-virtio 0.9 uses PIO.
+> Sometimes, we need check current clocksource outside of
+> timekeeping area. Add clocksource to system_time_snapshot then
+> we can get clocksource as well as system time.
 
-> I mean even on real hardware those devices aren't performance critical.
+This changelog is telling absolutely nothing WHY anything outside of the
+timekeeping core code needs access to the current clocksource. Neither does
+it tell why it is safe to provide the pointer to random callers.
 
-On virtual machines they're actually faster than MMIO because they don't
-need to go through page table walks.
+> +/*
+> + * struct system_time_snapshot - simultaneous raw/real time capture with
+> + *	counter value
+> + * @sc:		Contains clocksource and clocksource counter value to produce
+> + * 	the system times
+> + * @real:	Realtime system time
+> + * @raw:	Monotonic raw system time
+> + * @clock_was_set_seq:	The sequence number of clock was set events
+> + * @cs_was_changed_seq:	The sequence number of clocksource change events
+> + */
+> +struct system_time_snapshot {
+> +	struct system_counterval_t sc;
+> +	ktime_t		real;
+> +	ktime_t		raw;
+> +	unsigned int	clock_was_set_seq;
+> +	u8		cs_was_changed_seq;
+> +};
+> +
+>  /*
+>   * Get cross timestamp between system clock and device clock
+>   */
+> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+> index 44b726bab4bd..66ff089605b3 100644
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -983,7 +983,8 @@ void ktime_get_snapshot(struct system_time_snapshot *systime_snapshot)
+>  		nsec_raw  = timekeeping_cycles_to_ns(&tk->tkr_raw, now);
+>  	} while (read_seqcount_retry(&tk_core.seq, seq));
+>  
+> -	systime_snapshot->cycles = now;
+> +	systime_snapshot->sc.cycles = now;
+> +	systime_snapshot->sc.cs = tk->tkr_mono.clock;
 
->> So, the difference between my suggested list (which I admit is just
->> based on conjecture, not benchmarking) is that you add
->> EXIT_REASON_PAUSE_INSTRUCTION, EXIT_REASON_PENDING_INTERRUPT,
->> EXIT_REASON_EXTERNAL_INTERRUPT, EXIT_REASON_HLT, EXIT_REASON_MSR_READ,
->> EXIT_REASON_CPUID.
->>
->> Which of these make a difference for the hrtimer testcase?  It's of
->> course totally fine to use benchmarks to prove that my intuition was
->> bad---but you must also use them to show why your intuition is right. :)
-> 
-> The hrtimer flood hits on this:
-> 
->            MSR_WRITE     338793    56.54%     5.51%      0.33us     34.44us      0.44us ( +-   0.20% )
->    PENDING_INTERRUPT     168431    28.11%     2.52%      0.36us     32.06us      0.40us ( +-   0.28% )
->     PREEMPTION_TIMER      91723    15.31%     1.32%      0.34us     30.51us      0.39us ( +-   0.41% )
->   EXTERNAL_INTERRUPT        234     0.04%     0.00%      0.25us      5.53us      0.43us ( +-   5.67% )
->                  HLT         65     0.01%    90.64%      0.49us 319933.79us  37562.71us ( +-  21.68% )
->             MSR_READ          6     0.00%     0.00%      0.67us      1.96us      1.06us ( +-  17.97% )
->        EPT_MISCONFIG          6     0.00%     0.01%      3.09us    105.50us     26.76us ( +-  62.10% )
-> 
-> PENDING_INTERRUPT is the big missing thing in your list. It probably
-> accounts for the bulk of slowdown from your list.
+The clock pointer can change right after the store, the underlying data can
+be freed .....
 
-Makes sense.
+Looking at the rest of the patch set the actual usage site is:
 
-> However I could imagine other loads with higher external
-> interrupt/hlt/rdmsr than the hrtimer one so I didn't drop those.
-External interrupts should only tick at 1 Hz on nohz_full kernels,
-and even at 1000 Hz (if physical CPUs are not isolated) it should not
-really matter.  We can include it since it has such a short handler so
-the cost of retpolines is in % much more than other exits.
+> +       case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> +               ktime_get_snapshot(&systime_snapshot);
+> +               if (!is_arm_arch_counter(systime_snapshot.sc.cs))
+> +                       return kvm_psci_call(vcpu);
 
-HLT is certainly a slow path, the guest only invokes if things such as
-NAPI interrupt mitigation have failed.  As long as the guest stays in
-halted state for a microsecond or so, the cost of retpoline will all but
-disappear.
+and that function does:
 
-RDMSR again shouldn't be there, guests sometimes read the PMTimer (which
-is an I/O port) or TSC but for example do not really ever read the APIC
-TMCCT.
+> +bool is_arm_arch_counter(void *cs)
 
-> I'm pretty sure HLT/EXTERNAL_INTERRUPT/PENDING_INTERRUPT should be
-> included.
-> I also wonder if VMCALL should be added, certain loads hit on fairly
-> frequent VMCALL, but none of the one I benchmarked.
+void *? Type safety is overrated, right? The type is well known....
 
-I agree for external interrupt and pending interrupt, and VMCALL is fine
-too.  In addition I'd add I/O instructions which are useful for some
-guests and also for benchmarking (e.g. vmexit.flat has both IN and OUT
-tests).
++{
++       return (struct clocksource *)cs == &clocksource_counter;
 
-Paolo
+That nonsensical typecast does not make up for that.
+
++}
+
+So while the access to the pointer is actually safe, this is not going to
+happen simply because you modify a generic interface in a way which will
+lead the next developer to insane assumptions about the validity of that
+pointer.
+
+While the kernel is pretty lax in terms of isolation due to the nature of
+the programming language, this does not justify to expose critical
+internals of core code to random callers. Guess why most of the timekeeping
+internals are carefully shielded from external access.
+
+Something like the completely untested (not even compiled) patch below
+gives you access to the information you need and allows to reuse the
+mechanism for other purposes without adding is_$FOO_timer() all over the
+place.
+
+Thanks,
+
+	tglx
+
+8<--------------
+--- a/include/linux/clocksource.h
++++ b/include/linux/clocksource.h
+@@ -9,6 +9,7 @@
+ #ifndef _LINUX_CLOCKSOURCE_H
+ #define _LINUX_CLOCKSOURCE_H
+ 
++#include <linux/clocksource_ids.h>
+ #include <linux/types.h>
+ #include <linux/timex.h>
+ #include <linux/time.h>
+@@ -49,6 +50,10 @@ struct module;
+  *			400-499: Perfect
+  *				The ideal clocksource. A must-use where
+  *				available.
++ * @id:			Defaults to CSID_GENERIC. The id value is captured
++ *			in certain snapshot functions to allow callers to
++ *			validate the clocksource from which the snapshot was
++ *			taken.
+  * @read:		returns a cycle value, passes clocksource as argument
+  * @enable:		optional function to enable the clocksource
+  * @disable:		optional function to disable the clocksource
+@@ -91,6 +96,7 @@ struct clocksource {
+ 	const char *name;
+ 	struct list_head list;
+ 	int rating;
++	enum clocksource_ids id;
+ 	int (*enable)(struct clocksource *cs);
+ 	void (*disable)(struct clocksource *cs);
+ 	unsigned long flags;
+--- /dev/null
++++ b/include/linux/clocksource_ids.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_CLOCKSOURCE_IDS_H
++#define _LINUX_CLOCKSOURCE_IDS_H
++
++/* Enum to give clocksources a unique identifier */
++enum clocksource_ids {
++	CSID_GENERIC		= 0,
++	CSID_ARM_ARCH_COUNTER,
++	CSID_MAX,
++};
++
++#endif
+--- a/include/linux/timekeeping.h
++++ b/include/linux/timekeeping.h
+@@ -2,6 +2,7 @@
+ #ifndef _LINUX_TIMEKEEPING_H
+ #define _LINUX_TIMEKEEPING_H
+ 
++#include <linux/clocksource_ids.h>
+ #include <linux/errno.h>
+ 
+ /* Included from linux/ktime.h */
+@@ -228,15 +229,17 @@ extern void timekeeping_inject_sleeptime
+  * @cycles:	Clocksource counter value to produce the system times
+  * @real:	Realtime system time
+  * @raw:	Monotonic raw system time
++ * @cs_id:	The id of the current clocksource which produced the snapshot
+  * @clock_was_set_seq:	The sequence number of clock was set events
+  * @cs_was_changed_seq:	The sequence number of clocksource change events
+  */
+ struct system_time_snapshot {
+-	u64		cycles;
+-	ktime_t		real;
+-	ktime_t		raw;
+-	unsigned int	clock_was_set_seq;
+-	u8		cs_was_changed_seq;
++	u64			cycles;
++	ktime_t			real;
++	ktime_t			raw;
++	enum clocksource_ids	cs_id;
++	unsigned int		clock_was_set_seq;
++	u8			cs_was_changed_seq;
+ };
+ 
+ /*
+--- a/kernel/time/clocksource.c
++++ b/kernel/time/clocksource.c
+@@ -921,6 +921,9 @@ int __clocksource_register_scale(struct
+ 
+ 	clocksource_arch_init(cs);
+ 
++	if (WARN_ON_ONCE((unsigned int)cs->id >= CSID_MAX))
++		cs->id = CSID_GENERIC;
++
+ 	/* Initialize mult/shift and max_idle_ns */
+ 	__clocksource_update_freq_scale(cs, scale, freq);
+ 
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -979,6 +979,7 @@ void ktime_get_snapshot(struct system_ti
+ 	do {
+ 		seq = read_seqcount_begin(&tk_core.seq);
+ 		now = tk_clock_read(&tk->tkr_mono);
++		systime_snapshot->cs_id = tk->tkr_mono.clock->id;
+ 		systime_snapshot->cs_was_changed_seq = tk->cs_was_changed_seq;
+ 		systime_snapshot->clock_was_set_seq = tk->clock_was_set_seq;
+ 		base_real = ktime_add(tk->tkr_mono.base,
+
+
+
