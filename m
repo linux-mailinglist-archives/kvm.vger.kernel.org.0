@@ -2,101 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D542D6C5C
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:04:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A038CD6C5D
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726895AbfJOAE2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 20:04:28 -0400
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:45740 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726885AbfJOAE2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 20:04:28 -0400
-Received: by mail-pg1-f202.google.com with SMTP id v10so1309171pge.12
-        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 17:04:28 -0700 (PDT)
+        id S1726798AbfJOAEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 20:04:36 -0400
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:45090 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726898AbfJOAEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 20:04:36 -0400
+Received: by mail-vs1-f68.google.com with SMTP id d204so11937429vsc.12
+        for <kvm@vger.kernel.org>; Mon, 14 Oct 2019 17:04:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/epx1jtpSVt829SAvdwTHPwrDv7PHVQvxA/5Eb/brYE=;
-        b=P84vo+oMgO+hC058P25Ph2dxwexJhp8/oZi+YFCAsZ+pC7EJ6pSbSW45q56I+rVJ/z
-         4E8dMozFwbmNxlp4nkJSllfEGfAcKE1azrcH5Z+YACj+s+LsHdRpuVYpDx6LnET21CWl
-         GlIdpHJ0k5CLL0IUK/spw6ZG6TBolSJnbXYQrnRJtilIWWbTa/TJ+e0R8/Tc5nwBfbT/
-         0bc+2uHvinWSLynuwTqCx8goX/SWb7az1mZZh5Xz6KO4CdxxtlXvAzqSR70LGmKgE7ok
-         jmz+Y6XBmHbVtYogPljh5f8UTsHq7yN8OUu3tKIyqRhWA/o0yZx5eMnTZRW1WGGkFivZ
-         AhIQ==
+        bh=XH97f0i+ClRovzD/jo8yU0mLoiuoNdbkeCq7ouSUzdU=;
+        b=i7vkiycL0AXDJKR6cQ/1qrbEPh0eJBmUQjQFS02feYZWEkYEVUYX1LhLRVNfxE7uBo
+         g/uMVr4hV3DxD24PPjjztNMqEj0eYlxc8wDcr02ocDZzeYzlxXuE+1/8+14bMhFrPVe9
+         CIs6CkWJftYneDD/cHDGgl5S5L0t/EVeV8sYaZ97xkoq0x9TKoO4XZwv/HbhBbK5sCqy
+         0BK8LsYu1YT8N3wpp3/076LeFeE3S1pUJ56hpJF29aiD5FZD4Up0MWBIA03S8QaIqyN7
+         +g8XT7DBsFFgtxp2b29SAENozom0QNgCDn6NZB0Qxu7EC3u8KNe5NOHoY2fjAgSG2k69
+         Im/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=/epx1jtpSVt829SAvdwTHPwrDv7PHVQvxA/5Eb/brYE=;
-        b=EW+QBlK5ZsxDT+kZZX3OeZNuzMhR/Fw9WFLUee3NoMNP1zevOlOeTG26jdgmxW4BzE
-         6XRBZXhMSGKQk7yQU2A73pX9mtPrG0ghailqiF2A+EPzWpg/WReKRUFCc1b+0FMYJz+q
-         AvUHV2kYRF25TdS7XPa/059txBNjRreW0qN+mgueYtnF2hT2cIPuJVbVDDetExQ6ye/I
-         xtbgig+nGtZcOPXGbQUQB6sRs/1YGiIQEgYiiI+ORYCREPTAHr/WCXQyJb2QriM1n8/y
-         Y/aKO5e5vCuK57+XEaL2iEZJFfY53E9x0nrm3gvBihMIyXItLE2al+ibmKOefDBU5WYS
-         SXpg==
-X-Gm-Message-State: APjAAAU2ks0mly/etpdPS/MhsgRYiXgCxz0w5noBxA0A7hqCnrBsB+pK
-        NcxjKqsJWJB4RQqjkwVaFsaF/kyA1hQqapdeJRpSv3BZrkLseScEcCnFp4XWX3GP5DomLIr3bEk
-        8NowFKbWHSjiSLimCTQ7MmsC/3fuMcoIfW+T2JGNR4e5c0vFb/Ztt6A==
-X-Google-Smtp-Source: APXvYqx/z8uL0rx1LaCc9nO1S3trt14XlurqiDKCODuJhO9VP+wu3zQX+ICHfI+U4XvRpt6RIZ6lfxfEbw==
-X-Received: by 2002:a63:10d:: with SMTP id 13mr36164727pgb.173.1571097867484;
- Mon, 14 Oct 2019 17:04:27 -0700 (PDT)
-Date:   Mon, 14 Oct 2019 17:04:11 -0700
-In-Reply-To: <20191015000411.59740-1-morbo@google.com>
-Message-Id: <20191015000411.59740-5-morbo@google.com>
-Mime-Version: 1.0
-References: <20191010183506.129921-1-morbo@google.com> <20191015000411.59740-1-morbo@google.com>
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests PATCH v2 4/4] Makefile: add "cxx-option" for C++ builds
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XH97f0i+ClRovzD/jo8yU0mLoiuoNdbkeCq7ouSUzdU=;
+        b=TH4f2Qk3+2dBF+7WkHypkHrWslI6eV2Bo2S/AxCcb7nziyzx3k56vaurILJyyUBmfM
+         opNbbbsE6Ik7H6dzGnyhkvqKcEFGY39TQL1MBApPth7NzYblvZADeKHwPSe8LIwBUJUB
+         vRkQ6njw4T+MIAoRTHefrCIFTObuL0iPf/1ZMTx99jfJTwVH3Zi1S2hI08n5Y4i/0Cjv
+         fwWnqaRvEFILDOrUrKQ4rLIpK0+pwNb58d2Jxrz8xcfeSmjO4t04zDWHgYon6esJ1g5Q
+         HxudIHeJ/xPkhHFF2ZigiNGkzIDsfkTdCqS/PZFi2AtNrsj7u1h00Tj5uD3fer9g6zjV
+         EDow==
+X-Gm-Message-State: APjAAAX2fjtZ53DMZQaahmUB6BnKYVabM/7RkvM1j0BuLeMY2w4VBwJw
+        BwLxyRjIQUN7y8cEUqe5C5+bBWKhAUJQc+IA9wFb
+X-Google-Smtp-Source: APXvYqyTPVS8cXekEbTOMU362Dy5xi8QcspnkVwCQ8bDbKUYHfWjBO5aOA7h+ZLAZzkyct0ygTjx3hZ+71Nq3cLbAZ0=
+X-Received: by 2002:a05:6102:3117:: with SMTP id e23mr18668944vsh.189.1571097874490;
+ Mon, 14 Oct 2019 17:04:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191010183506.129921-1-morbo@google.com> <20191014192431.137719-1-morbo@google.com>
+ <CAGG=3QVuCrD83TcfeaqJFCTgvx36V4gc-VuCoaMDOgB4EhH0EA@mail.gmail.com> <C82F208E-BE8C-4106-A9F2-37FCDE2E90E7@gmail.com>
+In-Reply-To: <C82F208E-BE8C-4106-A9F2-37FCDE2E90E7@gmail.com>
 From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
-        Bill Wendling <morbo@google.com>
+Date:   Mon, 14 Oct 2019 17:04:22 -0700
+Message-ID: <CAGG=3QWmkJ8Q7QmAjL=AOaaZP0eFYvdXqQQbpvf1SRtSCJVtqw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/4] Patches for clang compilation
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The C++ compiler may not support all of the same flags as the C
-compiler. Add a separate test for these flags.
+Done.
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- Makefile | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 3ec0458..b9ae791 100644
---- a/Makefile
-+++ b/Makefile
-@@ -48,6 +48,8 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
- 
- cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-               > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-+cxx-option = $(shell if $(CXX) -Werror $(1) -S -o /dev/null -xc++ /dev/null \
-+              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
- 
- COMMON_CFLAGS += -g $(autodepend-flags)
- COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
-@@ -68,13 +70,15 @@ COMMON_CFLAGS += $(fno_pic) $(no_pie)
- COMMON_CFLAGS += $(call cc-option, -Wno-frame-address, "")
- COMMON_CFLAGS += $(call cc-option, -Wclobbered, "")
- COMMON_CFLAGS += $(call cc-option, -Wunused-but-set-parameter, "")
--COMMON_CFLAGS += $(call cc-option, -Wmissing-parameter-type, "")
--COMMON_CFLAGS += $(call cc-option, -Wold-style-declaration, "")
- 
- CFLAGS += $(COMMON_CFLAGS)
-+CFLAGS += $(call cc-option, -Wmissing-parameter-type, "")
-+CFLAGS += $(call cc-option, -Wold-style-declaration, "")
- CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
- 
- CXXFLAGS += $(COMMON_CFLAGS)
-+CXXFLAGS += $(call cxx-option, -Wmissing-parameter-type, "")
-+CXXFLAGS += $(call cxx-option, -Wold-style-declaration, "")
- 
- autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
- 
--- 
-2.23.0.700.g56cf767bdb-goog
-
+On Mon, Oct 14, 2019 at 4:56 PM Nadav Amit <nadav.amit@gmail.com> wrote:
+>
+> On Oct 14, 2019, at 12:25 PM, Bill Wendling <morbo@google.com> wrote:
+> >
+> > Crap! I used what I thought were the correct command line arguments
+> > for "git send-email", but it didn't add the "v2" bit. My apologies.
+> > All of these patches should be v2 for the originals.
+>
+> I recommend that you send them again with v2 in the title to avoid
+> confusion.
