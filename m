@@ -2,56 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5263D80C9
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA97FD80E3
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:21:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733106AbfJOUNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 16:13:39 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:46370 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727962AbfJOUNj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 16:13:39 -0400
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1iKTCF-0007g6-KH; Tue, 15 Oct 2019 22:13:31 +0200
-Date:   Tue, 15 Oct 2019 22:13:30 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-cc:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com,
-        justin.he@arm.com, nd@arm.com
-Subject: Re: [PATCH v5 3/6] timekeeping: Add clocksource to
- system_time_snapshot
-In-Reply-To: <9274d21c-2c43-2e0d-f086-6aaba3863603@redhat.com>
-Message-ID: <alpine.DEB.2.21.1910152212580.2518@nanos.tec.linutronix.de>
-References: <20191015104822.13890-1-jianyong.wu@arm.com> <20191015104822.13890-4-jianyong.wu@arm.com> <9274d21c-2c43-2e0d-f086-6aaba3863603@redhat.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1732620AbfJOUUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 16:20:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3069 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732485AbfJOUUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 16:20:54 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6843CC0568FD
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 20:20:53 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id j2so1697078wrg.19
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 13:20:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=8GMAVQL2NP8TCu+G/gUvtl2ZtnzY76GnRz9u4ZClHjY=;
+        b=QO6DElzIHSahPNBXUN15NX3GV0l9Hd1MZ6IGlxsK5ew/BMT6RxFlzeFaK5RubxuFtm
+         YX0stbjLYhW2WLW6m8puoiz45jXCGMfA8cOD/4TSNrilXjuwZV4Y10xpSAdkO38gX0Kp
+         LiJzVFETFKSgd1TVgadm/4O9sZcYVDlsdF2z1R4R//xXuDTndyPngDreB94HS4ycdXG7
+         3an1/w2mviu4MURVZjRy47Kc+GqNKTQIMI/WIq7RvubxoZZZ9GtIIaz+X3VFCwTcT0Sb
+         oj/LqAoEmGg/WkznNVLYIW9SjqPURct3VhM1cflLRCDPLOKQrytfhzsk85FPZFYwbCPu
+         rzyw==
+X-Gm-Message-State: APjAAAVAE/KpaBbsHDr/UvbSWEK+ks0dOwxZzcsl8w0kYmoETTIJAiv1
+        gCpVQ/JDs78CGkzwzeD6FYaAxelcAM1t1VNqvNkBLu6s0s+lVRvMgcif5bhPiyet6bSfNgydJAK
+        SBiXz6uHavEgm
+X-Received: by 2002:a7b:cd89:: with SMTP id y9mr297822wmj.51.1571170851990;
+        Tue, 15 Oct 2019 13:20:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzh9v01jF2Ba/auCgYS73sLQ6h1NSdbRfqN5RREozaF93h2gJUeFMSOjFP8XokdJfsFY9RWMA==
+X-Received: by 2002:a7b:cd89:: with SMTP id y9mr297798wmj.51.1571170851664;
+        Tue, 15 Oct 2019 13:20:51 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id h63sm547409wmf.15.2019.10.15.13.20.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2019 13:20:49 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 16:20:41 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC v1 1/2] vhost: option to fetch descriptors through an
+ independent struct
+Message-ID: <20191014085806-mutt-send-email-mst@kernel.org>
+References: <20191011134358.16912-1-mst@redhat.com>
+ <20191011134358.16912-2-mst@redhat.com>
+ <3b2a6309-9d21-7172-a581-9f0f1d5c1427@redhat.com>
+ <20191012162445-mutt-send-email-mst@kernel.org>
+ <fea337ec-7c09-508b-3efa-b75afd6fe33b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fea337ec-7c09-508b-3efa-b75afd6fe33b@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Oct 2019, Paolo Bonzini wrote:
-> On 15/10/19 12:48, Jianyong Wu wrote:
-> >  
+On Mon, Oct 14, 2019 at 09:43:25AM +0800, Jason Wang wrote:
+> 
+> On 2019/10/13 上午4:27, Michael S. Tsirkin wrote:
+> > On Sat, Oct 12, 2019 at 03:28:49PM +0800, Jason Wang wrote:
+> > > On 2019/10/11 下午9:45, Michael S. Tsirkin wrote:
+> > > > The idea is to support multiple ring formats by converting
+> > > > to a format-independent array of descriptors.
+> > > > 
+> > > > This costs extra cycles, but we gain in ability
+> > > > to fetch a batch of descriptors in one go, which
+> > > > is good for code cache locality.
+> > > > 
+> > > > To simplify benchmarking, I kept the old code
+> > > > around so one can switch back and forth by
+> > > > writing into a module parameter.
+> > > > This will go away in the final submission.
+> > > > 
+> > > > This patch causes a minor performance degradation,
+> > > > it's been kept as simple as possible for ease of review.
+> > > > Next patch gets us back the performance by adding batching.
+> > > > 
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > ---
+> > > >    drivers/vhost/test.c  |  17 ++-
+> > > >    drivers/vhost/vhost.c | 299 +++++++++++++++++++++++++++++++++++++++++-
+> > > >    drivers/vhost/vhost.h |  16 +++
+> > > >    3 files changed, 327 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+> > > > index 056308008288..39a018a7af2d 100644
+> > > > --- a/drivers/vhost/test.c
+> > > > +++ b/drivers/vhost/test.c
+> > > > @@ -18,6 +18,9 @@
+> > > >    #include "test.h"
+> > > >    #include "vhost.h"
+> > > > +static int newcode = 0;
+> > > > +module_param(newcode, int, 0644);
+> > > > +
+> > > >    /* Max number of bytes transferred before requeueing the job.
+> > > >     * Using this limit prevents one virtqueue from starving others. */
+> > > >    #define VHOST_TEST_WEIGHT 0x80000
+> > > > @@ -58,10 +61,16 @@ static void handle_vq(struct vhost_test *n)
+> > > >    	vhost_disable_notify(&n->dev, vq);
+> > > >    	for (;;) {
+> > > > -		head = vhost_get_vq_desc(vq, vq->iov,
+> > > > -					 ARRAY_SIZE(vq->iov),
+> > > > -					 &out, &in,
+> > > > -					 NULL, NULL);
+> > > > +		if (newcode)
+> > > > +			head = vhost_get_vq_desc_batch(vq, vq->iov,
+> > > > +						       ARRAY_SIZE(vq->iov),
+> > > > +						       &out, &in,
+> > > > +						       NULL, NULL);
+> > > > +		else
+> > > > +			head = vhost_get_vq_desc(vq, vq->iov,
+> > > > +						 ARRAY_SIZE(vq->iov),
+> > > > +						 &out, &in,
+> > > > +						 NULL, NULL);
+> > > >    		/* On error, stop handling until the next kick. */
+> > > >    		if (unlikely(head < 0))
+> > > >    			break;
+> > > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > > > index 36ca2cf419bf..36661d6cb51f 100644
+> > > > --- a/drivers/vhost/vhost.c
+> > > > +++ b/drivers/vhost/vhost.c
+> > > > @@ -301,6 +301,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+> > > >    			   struct vhost_virtqueue *vq)
+> > > >    {
+> > > >    	vq->num = 1;
+> > > > +	vq->ndescs = 0;
+> > > >    	vq->desc = NULL;
+> > > >    	vq->avail = NULL;
+> > > >    	vq->used = NULL;
+> > > > @@ -369,6 +370,9 @@ static int vhost_worker(void *data)
+> > > >    static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+> > > >    {
+> > > > +	kfree(vq->descs);
+> > > > +	vq->descs = NULL;
+> > > > +	vq->max_descs = 0;
+> > > >    	kfree(vq->indirect);
+> > > >    	vq->indirect = NULL;
+> > > >    	kfree(vq->log);
+> > > > @@ -385,6 +389,10 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+> > > >    	for (i = 0; i < dev->nvqs; ++i) {
+> > > >    		vq = dev->vqs[i];
+> > > > +		vq->max_descs = dev->iov_limit;
+> > > > +		vq->descs = kmalloc_array(vq->max_descs,
+> > > > +					  sizeof(*vq->descs),
+> > > > +					  GFP_KERNEL);
+> > > 
+> > > Is iov_limit too much here? It can obviously increase the footprint. I guess
+> > > the batching can only be done for descriptor without indirect or next set.
+> > > Then we may batch 16 or 64.
+> > > 
+> > > Thanks
+> > Yes, next patch only batches up to 64.  But we do need iov_limit because
+> > guest can pass a long chain of scatter/gather.
+> > We already have iovecs in a huge array so this does not look like
+> > a big deal. If we ever teach the code to avoid the huge
+> > iov arrays by handling huge s/g lists piece by piece,
+> > we can make the desc array smaller at the same point.
 > > 
 > 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Another possible issue, if we try to batch descriptor chain when we've
+> already batched some descriptors, we may reach the limit then some of the
+> descriptors might need re-read.
+> 
+> Or we may need circular index (head, tail) in this case?
+> 
+> Thanks
 
-You're sure about having reviewed that in detail?
+We never supported more than IOV_MAX descriptors.
+And we don't batch more than iov_limit - IOV_MAX.
 
-Thanks,
+so buffer never overflows.
 
-	tglx
+-- 
+MST
