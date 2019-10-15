@@ -2,109 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF4BED83D1
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 00:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5328ED848C
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 01:43:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389953AbfJOWgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 18:36:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23552 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2389950AbfJOWgr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 18:36:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571179005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=wSh+n+8u5QLmMxe2hYGq+Rqu0J/BQ5npWNcVhzyY+e4=;
-        b=IAxU6c4ZWDiDLZQXzywuju9FMVFy3dTbcqQT8SEf2q2usAbv4w3nZhFaEN9RJw4cmhNRYY
-        AVdXfs9bCO3JqAjtJmHwWUmURdXLr9S8vz5WyUKozPBK3oZXLDdWH4s/Z1mUySUhqR1rY2
-        tpbkwbVFhW5tY2eHpqky1CMKDWGRIRQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308--8fc-qiHPkGeG-4U7RUMYg-1; Tue, 15 Oct 2019 18:36:44 -0400
-Received: by mail-wm1-f72.google.com with SMTP id c188so256708wmd.9
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 15:36:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lwwAcBIi9gz4rDVsHFX2Q7ZJ02GG7jdgtvkZrgQZWFY=;
-        b=ARXP7CRspNkUsy0SPKtymdmV7pnzE9lD3wQddGLHd4fuwAbSr3R0qDB1njXyhsupR7
-         8ikvqFFlaGzy8FiQQwPLIxV4ylW8Q+IpR2LuTMuwU5Bkxsb5amhpHz53powDQvqp2op5
-         eynlAxs2fDVWH0Mvw3wu6A/jfvkuw2r0CRQAZrifryuKyN9a1HhyIlBm8AuEphqaEZDj
-         6XcZsIsEF4CL0an1bFd41kuB5+inek4GRkqCOWEyQn7ksnMBkUNfRJE8KniQ4JHOdd3r
-         wIARmGJnkMYgCUVbu3VlCMR/wS1L2Xvbp4PVubhcmOA91vXLhOlh4W+8bsnUNyvUM8ib
-         c+JA==
-X-Gm-Message-State: APjAAAVlsL1F/W3mIZPVNvyderTYZy+FbPHRFRR+Upz/bGN6o7NOzT2m
-        i+Cqjvnf4b9fDqyal9njcJJMKJwVZs9PY7Db3QGYrxVzCtQBR2Sj7kvjJbLpVSLO5HzScs707xr
-        1vrNKRQH8faHB
-X-Received: by 2002:a05:600c:3cb:: with SMTP id z11mr537738wmd.134.1571179003423;
-        Tue, 15 Oct 2019 15:36:43 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyR41EszL4/UT/53Ec9vQZG6o/Omkzfs8QOJ0pfXMxxw7MFiXPeS9FywecPK4MHNGK9zwKlCQ==
-X-Received: by 2002:a05:600c:3cb:: with SMTP id z11mr537711wmd.134.1571179003137;
-        Tue, 15 Oct 2019 15:36:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
-        by smtp.gmail.com with ESMTPSA id c18sm20828908wrv.10.2019.10.15.15.36.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Oct 2019 15:36:42 -0700 (PDT)
-Subject: Re: [PATCH v5 3/6] timekeeping: Add clocksource to
- system_time_snapshot
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com,
-        justin.he@arm.com, nd@arm.com
-References: <20191015104822.13890-1-jianyong.wu@arm.com>
- <20191015104822.13890-4-jianyong.wu@arm.com>
- <9274d21c-2c43-2e0d-f086-6aaba3863603@redhat.com>
- <alpine.DEB.2.21.1910152212580.2518@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <aa1ec910-b7b6-2568-4583-5fa47aac367f@redhat.com>
-Date:   Wed, 16 Oct 2019 00:36:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2387844AbfJOXnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 19:43:21 -0400
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21487 "EHLO
+        sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387830AbfJOXnV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 19:43:21 -0400
+X-Greylist: delayed 903 seconds by postgrey-1.27 at vger.kernel.org; Tue, 15 Oct 2019 19:43:20 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1571182079; cv=none; 
+        d=zoho.com; s=zohoarc; 
+        b=F9lLo4l6DYZjDaKnp65MpjHOJ448CRPtcHFPJZ/N4AnB+MuSDK9gRfOuoZLSBmVTAHiG3+KgISzfwuEmB1tpsX/O1AQtsIimrRyfJqcxoKvrYmK4/EDAQ1ww9iKr+UcLkg7PWeJJiJC9FbNf9ZO+uWR/hC0mqSVkMGNqLnbyEZQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com; s=zohoarc; 
+        t=1571182079; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=NquMdh5cqrg+w/TM1tlktRlQRtwUKUgGaymy3L81CUg=; 
+        b=oJKALsYjx2vub/ii+CYC37H8/IaMIhDUoOQ7IUZh/SIlrTbzldZkjIH18x1lcgD/9OqpbOFCakx/BVGDrQoqb1XRaQAAtYPJ/UCtKVOsT4hRK2tOby52b5Yw3177+QWfYuL8fL5KF6yY5f5zDppP+GLOpW38myZPAJb+H9gJaE8=
+ARC-Authentication-Results: i=1; mx.zoho.com;
+        dkim=pass  header.i=patchew.org;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1571182076549352.5095287510885; Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
+In-Reply-To: <20191015140140.34748-1-zhengxiang9@huawei.com>
+Reply-To: <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v19 0/5] Add ARMv8 RAS virtualization support in QEMU
+Message-ID: <157118207403.5946.11773682662828159447@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1910152212580.2518@nanos.tec.linutronix.de>
-Content-Language: en-US
-X-MC-Unique: -8fc-qiHPkGeG-4U7RUMYg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     zhengxiang9@huawei.com
+Cc:     pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com,
+        shannon.zhaosl@gmail.com, peter.maydell@linaro.org,
+        lersek@redhat.com, james.morse@arm.com, gengdongjiu@huawei.com,
+        mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        jonathan.cameron@huawei.com, xuwei5@huawei.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+        linuxarm@huawei.com, wanghaibin.wang@huawei.com,
+        zhengxiang9@huawei.com
+Date:   Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/19 22:13, Thomas Gleixner wrote:
-> On Tue, 15 Oct 2019, Paolo Bonzini wrote:
->> On 15/10/19 12:48, Jianyong Wu wrote:
->>> =20
->>>
->>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->=20
-> You're sure about having reviewed that in detail?
-
-I did review the patch; the void* ugliness is not in this one, and I do
-have some other qualms on that one.
-
-> This changelog is telling absolutely nothing WHY anything outside of the
-> timekeeping core code needs access to the current clocksource. Neither do=
-es
-> it tell why it is safe to provide the pointer to random callers.
-
-Agreed on the changelog, but the pointer to a clocksource is already
-part of the timekeeping external API via struct system_counterval_t.
-get_device_system_crosststamp for example expects a clocksource pointer
-but provides no way to get such a pointer.
-
-Paolo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTE0MDE0MC4zNDc0
+OC0xLXpoZW5neGlhbmc5QGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
+ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
+QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
+IHFhcGkvcWFwaS1ldmVudHMtdHJhY2UubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy10cmFu
+c2FjdGlvbi5vCgpXYXJuaW5nLCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMv
+ZG9jcy9zcGVjcy9hY3BpX2hlc3RfZ2hlcy5yc3Q6OTM6RW51bWVyYXRlZCBsaXN0IGVuZHMgd2l0
+aG91dCBhIGJsYW5rIGxpbmU7IHVuZXhwZWN0ZWQgdW5pbmRlbnQuCiAgQ0MgICAgICBxb2JqZWN0
+L3FudW0ubwogIENDICAgICAgcW9iamVjdC9xbnVsbC5vCi0tLQogIENDICAgICAgcW9iamVjdC9q
+c29uLXN0cmVhbWVyLm8KICBDQyAgICAgIHFvYmplY3QvYmxvY2stcWRpY3QubwogIENDICAgICAg
+dHJhY2Uvc2ltcGxlLm8KbWFrZTogKioqIFtNYWtlZmlsZTo5OTc6IGRvY3Mvc3BlY3MvaW5kZXgu
+aHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
+ZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1mMDUyMGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZicsICctdScs
+ICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9Jywg
+Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
+LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzkwbmFydWsvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0x
+NS0xOS4yNi4wNy4yNDQyOTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zh
+ci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
+YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMDUy
+MGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
+cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
+LXRtcC1fOTBuYXJ1ay9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9y
+YV0gRXJyb3IgMgoKcmVhbCAgICAxbTQ3LjkzMXMKdXNlciAgICAwbTguMjM1cwoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMTUxNDAx
+NDAuMzQ3NDgtMS16aGVuZ3hpYW5nOUBodWF3ZWkuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZl
+ZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
