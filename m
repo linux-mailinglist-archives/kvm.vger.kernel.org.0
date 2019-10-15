@@ -2,90 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FC5BD6D97
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 05:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A82BD6DB4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 05:28:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727472AbfJODSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 23:18:30 -0400
-Received: from mga07.intel.com ([134.134.136.100]:38579 "EHLO mga07.intel.com"
+        id S1727781AbfJOD14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 23:27:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49094 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727195AbfJODSa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 23:18:30 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 20:18:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; 
-   d="scan'208";a="225283908"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga002.fm.intel.com with ESMTP; 14 Oct 2019 20:18:29 -0700
-Date:   Mon, 14 Oct 2019 20:18:28 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 01/14] KVM: monolithic: x86: remove kvm.ko
-Message-ID: <20191015031828.GE24895@linux.intel.com>
-References: <20190928172323.14663-1-aarcange@redhat.com>
- <20190928172323.14663-2-aarcange@redhat.com>
- <20191015013144.GC24895@linux.intel.com>
+        id S1727195AbfJOD1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 23:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2C69085543;
+        Tue, 15 Oct 2019 03:27:55 +0000 (UTC)
+Received: from [10.72.12.168] (ovpn-12-168.pek2.redhat.com [10.72.12.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 79BB75C1D6;
+        Tue, 15 Oct 2019 03:27:34 +0000 (UTC)
+Subject: Re: [PATCH V3 5/7] mdev: introduce virtio device and its device ops
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com
+References: <20191011081557.28302-1-jasowang@redhat.com>
+ <20191011081557.28302-6-jasowang@redhat.com>
+ <20191014172301.GA5359@stefanha-x1.localdomain>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <97d93729-9bc2-4cb5-5e4f-678285044c7f@redhat.com>
+Date:   Tue, 15 Oct 2019 11:27:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015013144.GC24895@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191014172301.GA5359@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 15 Oct 2019 03:27:55 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 06:31:44PM -0700, Sean Christopherson wrote:
-> On Sat, Sep 28, 2019 at 01:23:10PM -0400, Andrea Arcangeli wrote:
-> > This is the first commit of a patch series that aims to replace the
-> > modular kvm.ko kernel module with a monolithic kvm-intel/kvm-amd
-> > model. This change has the only possible cons of wasting some disk
-> > space in /lib/modules/. The pros are that it saves CPUS and some minor
-> > RAM which are more scarse resources than disk space.
-> > 
-> > The pointer to function virtual template model cannot provide any
-> > runtime benefit because kvm-intel and kvm-amd can't be loaded at the
-> > same time.
-> > 
-> > This removes kvm.ko and it links and duplicates all kvm.ko objects to
-> > both kvm-amd and kvm-intel.
-> 
-> The KVM config option should be changed to a bool and its help text
-> updated.  Maybe something similar to the help for VIRTUALIZATION to make
-> it clear that enabling KVM on its own does nothing.
 
-Making KVM a bool doesn't work well, keeping it a tristate and keying off
-KVM=y to force Intel or AMD (as done in the next patch) looks like the
-cleanest implementation.
+On 2019/10/15 上午1:23, Stefan Hajnoczi wrote:
+> On Fri, Oct 11, 2019 at 04:15:55PM +0800, Jason Wang wrote:
+>> + * @set_vq_cb:			Set the interrut calback function for
+> s/interrut/interrupt/
+>
+> s/calback/callback/
 
-The help text should still be updated though.
 
-> > 
-> > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
-> > ---
-> >  arch/x86/kvm/Makefile | 5 ++---
-> >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> > index 31ecf7a76d5a..68b81f381369 100644
-> > --- a/arch/x86/kvm/Makefile
-> > +++ b/arch/x86/kvm/Makefile
-> > @@ -12,9 +12,8 @@ kvm-y			+= x86.o mmu.o emulate.o i8259.o irq.o lapic.o \
-> >  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
-> >  			   hyperv.o page_track.o debugfs.o
-> >  
-> > -kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o vmx/evmcs.o vmx/nested.o
-> > -kvm-amd-y		+= svm.o pmu_amd.o
-> > +kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o vmx/evmcs.o vmx/nested.o $(kvm-y)
-> > +kvm-amd-y		+= svm.o pmu_amd.o $(kvm-y)
-> >  
-> > -obj-$(CONFIG_KVM)	+= kvm.o
-> >  obj-$(CONFIG_KVM_INTEL)	+= kvm-intel.o
-> >  obj-$(CONFIG_KVM_AMD)	+= kvm-amd.o
+Fixed.
+
+Thanks
+
