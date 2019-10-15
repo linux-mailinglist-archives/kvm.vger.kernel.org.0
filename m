@@ -2,61 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2FEBD7DDC
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 19:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5004CD7E02
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 19:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730524AbfJORcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 13:32:18 -0400
-Received: from mga06.intel.com ([134.134.136.31]:37927 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727096AbfJORcS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 13:32:18 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 10:32:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,300,1566889200"; 
-   d="scan'208";a="201822715"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 15 Oct 2019 10:32:17 -0700
-Date:   Tue, 15 Oct 2019 10:32:17 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Cross <dcross@google.com>, Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v4] KVM: nVMX: Don't leak L1 MMIO regions to L2
-Message-ID: <20191015173217.GH15015@linux.intel.com>
-References: <20191015001304.2304-1-jmattson@google.com>
- <20191015010740.GA24895@linux.intel.com>
- <CALMp9eQ-xcQSESs7et3voPU7-Jbs6X14S1U74_izYCSpyNbstg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eQ-xcQSESs7et3voPU7-Jbs6X14S1U74_izYCSpyNbstg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1727327AbfJORoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 13:44:19 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:34331 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbfJORoS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 13:44:18 -0400
+Received: by mail-pl1-f202.google.com with SMTP id 70so12525674ple.1
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 10:44:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Pj7EJ/s+9Kdru3qVsTpipfhWySxdmFUXdi38jGAkWaU=;
+        b=M91s3QfTNSD2A1aTfAentlt5eCqInU8BDMFdAQl8YZsVeNYWc87WGB24pJbWiE3tJV
+         qNuYFfTw6aUIO3gswM8fz9YDWw5Apvjqh1O7lX0v/x/ynnc5qA+WaijgoGZBLssaJccD
+         jaTePeg6mbUEQ8UOuGjVXV5CNKuVouo/K4GHj3abXfTUiJX16WyZEYNt47PIuB12w/Ks
+         n85si44Zac6h0K+uCWDMx3ez0BqyTLMN9c82dSQO4mJA/lYVgPNO3AQxYcUZxQ7vbbPl
+         M2yT7+syya6hC2yVITZ00i0tI5eeTnHgD3XBkH9nATrq5f22emhHLaZjtdY4QVgemJ9E
+         D7Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Pj7EJ/s+9Kdru3qVsTpipfhWySxdmFUXdi38jGAkWaU=;
+        b=rZWCbi0GRuI8y8lgZJyqjKXQzi6GsMPOy5eIpPxNuGclZ/YdStRTse+GWUcjGCQtAR
+         4IB4w6zjMwTZDD7dc6QoanjWgsd57anBQIHlp0ymgXhHCJE3VtBJbw+VXY5s+J/uagR9
+         CvV+feFjdzIrRLPp5DSLq00xb6GFcxOYwz0abzJlXifNp8SngzOB1ziuRJ9vz3NpMORC
+         9aZqi74Lvx1b93n/GEPrfhKSfpYURsEg7oPASEMCg/CRFmMZXBSqejf52GH4rJyifqDj
+         7aO7bbNV12mVQ6RmOWhkCCCDLbIiyYuw0E9VcRcY4Mdx6rnkDFW7uFExcxbBDJvCJRbM
+         ZoDQ==
+X-Gm-Message-State: APjAAAUd4SoYgKhVA4JxFgwqOZ3aTYCNOAujGsjIn3w0cXRSORxZ/rPl
+        2sHssnFXrREREqCvVKC8AN9MqZ42AbBEucNsiUX2igWeV0i5w59nDDZP9SRv11gUjEt3OHU6xrx
+        KkiowHcyKlT/DuDGriwan7zCFLvgWcRdtd81fShXWeA+UNXdndbPLqbS+Axh6q10=
+X-Google-Smtp-Source: APXvYqxT4RXntVrT1LOcAbktxIQqO9uVHUU3qUgtjnnkhQPVsDqFo92xDH0HnLHC48q/zg2M98o9fj8JhgxonQ==
+X-Received: by 2002:a65:5a8c:: with SMTP id c12mr2612169pgt.140.1571161457144;
+ Tue, 15 Oct 2019 10:44:17 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 10:44:05 -0700
+Message-Id: <20191015174405.163723-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
+Subject: [PATCH v5] KVM: nVMX: Don't leak L1 MMIO regions to L2
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Dan Cross <dcross@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 10:13:06AM -0700, Jim Mattson wrote:
-> On Mon, Oct 14, 2019 at 6:07 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> > KVM doesn't usually add (un)likely annotations for things that are under
-> > L1's control.  The "unlikely(vmx->fail)" in nested_vmx_exit_reflected() is
-> > there because it's true iff KVM missed a VM-Fail condition that was caught
-> > by hardware.
-> 
-> I would argue that it makes sense to optimize for the success path in
-> this case. If L1 is taking the failure path more frequently than the
-> success path, something is wrong. Moreover, you have already indicated
-> that the success path should be statically predicted taken by asking
-> me to move the failure path out-of-line. (Forward conditional branches
-> are statically predicted not taken, per section 3.4.1.3 of the Intel
-> 64 and IA-32 Architectures Optimization Reference Manual.) I'm just
-> asking the compiler not to undo that hint.
+If the "virtualize APIC accesses" VM-execution control is set in the
+VMCS, the APIC virtualization hardware is triggered when a page walk
+in VMX non-root mode terminates at a PTE wherein the address of the 4k
+page frame matches the APIC-access address specified in the VMCS. On
+hardware, the APIC-access address may be any valid 4k-aligned physical
+address.
 
-Fair enough.
+KVM's nVMX implementation enforces the additional constraint that the
+APIC-access address specified in the vmcs12 must be backed by
+a "struct page" in L1. If not, L0 will simply clear the "virtualize
+APIC accesses" VM-execution control in the vmcs02.
+
+The problem with this approach is that the L1 guest has arranged the
+vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
+VM-execution control is clear in the vmcs12--so that the L2 guest
+physical address(es)--or L2 guest linear address(es)--that reference
+the L2 APIC map to the APIC-access address specified in the
+vmcs12. Without the "virtualize APIC accesses" VM-execution control in
+the vmcs02, the APIC accesses in the L2 guest will directly access the
+APIC-access page in L1.
+
+When there is no mapping whatsoever for the APIC-access address in L1,
+the L2 VM just loses the intended APIC virtualization. However, when
+the APIC-access address is mapped to an MMIO region in L1, the L2
+guest gets direct access to the L1 MMIO device. For example, if the
+APIC-access address specified in the vmcs12 is 0xfee00000, then L2
+gets direct access to L1's APIC.
+
+Since this vmcs12 configuration is something that KVM cannot
+faithfully emulate, the appropriate response is to exit to userspace
+with KVM_INTERNAL_ERROR_EMULATION.
+
+Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and vmcs12")
+Reported-by: Dan Cross <dcross@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+v4 -> v5: Concatenated two lines
+v3 -> v4: Changed enum enter_vmx_status to enum nvmx_vmentry_status;
+          clarified debug message in nested_get_vmcs12_pages();
+          moved nested_vmx_enter_non_root_mode() error handling in
+          nested_vmx_run() out-of-line
+v2 -> v3: Added default case to new switch in nested_vmx_run
+v1 -> v2: Added enum enter_vmx_status
+
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/vmx/nested.c       | 64 ++++++++++++++++++---------------
+ arch/x86/kvm/vmx/nested.h       | 13 ++++++-
+ arch/x86/kvm/x86.c              |  8 +++--
+ 4 files changed, 55 insertions(+), 32 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 50eb430b0ad8..24d6598dea29 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1189,7 +1189,7 @@ struct kvm_x86_ops {
+ 	int (*set_nested_state)(struct kvm_vcpu *vcpu,
+ 				struct kvm_nested_state __user *user_kvm_nested_state,
+ 				struct kvm_nested_state *kvm_state);
+-	void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
++	bool (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
+ 
+ 	int (*smi_allowed)(struct kvm_vcpu *vcpu);
+ 	int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index e76eb4f07f6c..0e7c9301fe86 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2917,7 +2917,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 						 struct vmcs12 *vmcs12);
+ 
+-static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
++static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ {
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -2937,19 +2937,18 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 			vmx->nested.apic_access_page = NULL;
+ 		}
+ 		page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->apic_access_addr);
+-		/*
+-		 * If translation failed, no matter: This feature asks
+-		 * to exit when accessing the given address, and if it
+-		 * can never be accessed, this feature won't do
+-		 * anything anyway.
+-		 */
+ 		if (!is_error_page(page)) {
+ 			vmx->nested.apic_access_page = page;
+ 			hpa = page_to_phys(vmx->nested.apic_access_page);
+ 			vmcs_write64(APIC_ACCESS_ADDR, hpa);
+ 		} else {
+-			secondary_exec_controls_clearbit(vmx,
+-				SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
++			pr_debug_ratelimited("%s: no backing 'struct page' for APIC-access address in vmcs12\n",
++					     __func__);
++			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++			vcpu->run->internal.suberror =
++				KVM_INTERNAL_ERROR_EMULATION;
++			vcpu->run->internal.ndata = 0;
++			return false;
+ 		}
+ 	}
+ 
+@@ -2994,6 +2993,7 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 		exec_controls_setbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
+ 	else
+ 		exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
++	return true;
+ }
+ 
+ /*
+@@ -3032,13 +3032,15 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ /*
+  * If from_vmentry is false, this is being called from state restore (either RSM
+  * or KVM_SET_NESTED_STATE).  Otherwise it's called from vmlaunch/vmresume.
+-+ *
+-+ * Returns:
+-+ *   0 - success, i.e. proceed with actual VMEnter
+-+ *   1 - consistency check VMExit
+-+ *  -1 - consistency check VMFail
++ *
++ * Returns:
++ *	NVMX_ENTRY_SUCCESS: Entered VMX non-root mode
++ *	NVMX_ENTRY_VMFAIL:  Consistency check VMFail
++ *	NVMX_ENTRY_VMEXIT:  Consistency check VMExit
++ *	NVMX_ENTRY_KVM_INTERNAL_ERROR: KVM internal error
+  */
+-int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
++enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
++							bool from_vmentry)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+@@ -3081,11 +3083,12 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
+ 	prepare_vmcs02_early(vmx, vmcs12);
+ 
+ 	if (from_vmentry) {
+-		nested_get_vmcs12_pages(vcpu);
++		if (unlikely(!nested_get_vmcs12_pages(vcpu)))
++			return NVMX_VMENTRY_KVM_INTERNAL_ERROR;
+ 
+ 		if (nested_vmx_check_vmentry_hw(vcpu)) {
+ 			vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+-			return -1;
++			return NVMX_VMENTRY_VMFAIL;
+ 		}
+ 
+ 		if (nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
+@@ -3149,7 +3152,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
+ 	 * returned as far as L1 is concerned. It will only return (and set
+ 	 * the success flag) when L2 exits (see nested_vmx_vmexit()).
+ 	 */
+-	return 0;
++	return NVMX_VMENTRY_SUCCESS;
+ 
+ 	/*
+ 	 * A failed consistency check that leads to a VMExit during L1's
+@@ -3165,14 +3168,14 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
+ 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+ 
+ 	if (!from_vmentry)
+-		return 1;
++		return NVMX_VMENTRY_VMEXIT;
+ 
+ 	load_vmcs12_host_state(vcpu, vmcs12);
+ 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
+ 	vmcs12->exit_qualification = exit_qual;
+ 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
+ 		vmx->nested.need_vmcs12_to_shadow_sync = true;
+-	return 1;
++	return NVMX_VMENTRY_VMEXIT;
+ }
+ 
+ /*
+@@ -3182,9 +3185,9 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
+ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ {
+ 	struct vmcs12 *vmcs12;
++	enum nvmx_vmentry_status status;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
+-	int ret;
+ 
+ 	if (!nested_vmx_check_permission(vcpu))
+ 		return 1;
+@@ -3244,13 +3247,9 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 	 * the nested entry.
+ 	 */
+ 	vmx->nested.nested_run_pending = 1;
+-	ret = nested_vmx_enter_non_root_mode(vcpu, true);
+-	vmx->nested.nested_run_pending = !ret;
+-	if (ret > 0)
+-		return 1;
+-	else if (ret)
+-		return nested_vmx_failValid(vcpu,
+-			VMXERR_ENTRY_INVALID_CONTROL_FIELD);
++	status = nested_vmx_enter_non_root_mode(vcpu, true);
++	if (unlikely(status != NVMX_VMENTRY_SUCCESS))
++		goto vmentry_failed;
+ 
+ 	/* Hide L1D cache contents from the nested guest.  */
+ 	vmx->vcpu.arch.l1tf_flush_l1d = true;
+@@ -3281,6 +3280,15 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 		return kvm_vcpu_halt(vcpu);
+ 	}
+ 	return 1;
++
++vmentry_failed:
++	vmx->nested.nested_run_pending = 0;
++	if (status == NVMX_VMENTRY_KVM_INTERNAL_ERROR)
++		return 0;
++	if (status == NVMX_VMENTRY_VMEXIT)
++		return 1;
++	WARN_ON_ONCE(status != NVMX_VMENTRY_VMFAIL);
++	return nested_vmx_failValid(vcpu, VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+index 187d39bf0bf1..6280f33e5fa6 100644
+--- a/arch/x86/kvm/vmx/nested.h
++++ b/arch/x86/kvm/vmx/nested.h
+@@ -6,6 +6,16 @@
+ #include "vmcs12.h"
+ #include "vmx.h"
+ 
++/*
++ * Status returned by nested_vmx_enter_non_root_mode():
++ */
++enum nvmx_vmentry_status {
++	NVMX_VMENTRY_SUCCESS,		/* Entered VMX non-root mode */
++	NVMX_VMENTRY_VMFAIL,		/* Consistency check VMFail */
++	NVMX_VMENTRY_VMEXIT,		/* Consistency check VMExit */
++	NVMX_VMENTRY_KVM_INTERNAL_ERROR,/* KVM internal error */
++};
++
+ void vmx_leave_nested(struct kvm_vcpu *vcpu);
+ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
+ 				bool apicv);
+@@ -13,7 +23,8 @@ void nested_vmx_hardware_unsetup(void);
+ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
+ void nested_vmx_vcpu_setup(void);
+ void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
+-int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry);
++enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
++						     bool from_vmentry);
+ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
+ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+ 		       u32 exit_intr_info, unsigned long exit_qualification);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 661e2bf38526..2cf26f159071 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7941,8 +7941,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	bool req_immediate_exit = false;
+ 
+ 	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu))
+-			kvm_x86_ops->get_vmcs12_pages(vcpu);
++		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
++			if (unlikely(!kvm_x86_ops->get_vmcs12_pages(vcpu))) {
++				r = 0;
++				goto out;
++			}
++		}
+ 		if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
+ 			kvm_mmu_unload(vcpu);
+ 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
+-- 
+2.23.0.700.g56cf767bdb-goog
+
