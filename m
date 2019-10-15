@@ -2,82 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8FE4D6C9C
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:48:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5BBCD6CA7
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:53:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727183AbfJOAsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 20:48:07 -0400
-Received: from mga12.intel.com ([192.55.52.136]:23382 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727008AbfJOAsH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 20:48:07 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 17:48:07 -0700
-X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; 
-   d="scan'208";a="185654823"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 14 Oct 2019 17:48:05 -0700
-Subject: Re: [PATCH] KVM: X86: Make fpu allocation a common function
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20191014162247.61461-1-xiaoyao.li@intel.com>
- <87y2xn462e.fsf@vitty.brq.redhat.com>
- <20191014183723.GE22962@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <5a7aebc9-2d4d-e202-5f89-8f5f2bc462db@intel.com>
-Date:   Tue, 15 Oct 2019 08:48:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727268AbfJOAw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 20:52:59 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:59244 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727011AbfJOAw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 20:52:59 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F0nw9i188611;
+        Tue, 15 Oct 2019 00:52:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=hotD8gkd9LN3gSxavXQRklzT0OQBMnwsghE5Qo2RJzM=;
+ b=kHsDmBLSA7AJqwW51GMDXJH2RYkuYyngUq7RJUc3D521NHCc8TY1C7KxYSIgcW8id+g6
+ yARxRU3F9Ynrxhe8gHqfbzjzAS4DCv6fvQQaERTSrlMhQ5G56Vnj2Gt0emXEd6UbmlKO
+ 8wIe6l324qd6zSwdIlRGCcbETUqGzTI5hjMexPZ1aAeBxdv5Ik2KenLxOrz76J7wXx7Y
+ XlVEgZIWJjOfumKJedujNoF9USxH529QDP/6Kx4DpCR0r1mogrTRSSaeqaJK4yW95ups
+ rSw6+OgDL+fLRImEsl4dP4/yHlCTl6HqNZeguOpZxoHrPUTZEuqJXDeakK2lJovwqwF1 6w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2vk6sqcab7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Oct 2019 00:52:37 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F0mAFl077474;
+        Tue, 15 Oct 2019 00:52:37 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2vks07swna-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Oct 2019 00:52:37 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9F0qZEk005230;
+        Tue, 15 Oct 2019 00:52:36 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 15 Oct 2019 00:52:35 +0000
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, jmattson@google.com
+Subject: [PATCH 0/4]: kvm-unit-test: nVMX: Test deferring of error from VM-entry MSR-load area
+Date:   Mon, 14 Oct 2019 20:16:29 -0400
+Message-Id: <20191015001633.8603-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191014183723.GE22962@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=749
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910150007
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=826 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910150007
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/15/2019 2:37 AM, Sean Christopherson wrote:
-> On Mon, Oct 14, 2019 at 06:58:49PM +0200, Vitaly Kuznetsov wrote:
->> Xiaoyao Li <xiaoyao.li@intel.com> writes:
->>
->>> They are duplicated codes to create vcpu.arch.{user,guest}_fpu in VMX
->>> and SVM. Make them common functions.
->>>
->>> No functional change intended.
->>
->> Would it rather make sense to move this code to
->> kvm_arch_vcpu_create()/kvm_arch_vcpu_destroy() instead?
-> 
-> Does it make sense?  Yes.  Would it actually work?  No.  Well, not without
-> other shenanigans.
-> 
-> FPU allocation can't be placed after the call to .create_vcpu() becuase
-> it's consumed in kvm_arch_vcpu_init().   FPU allocation can't come before
-> .create_vcpu() because the vCPU struct itself hasn't been allocated.  The
-> latter could be solved by passed the FPU pointer into .create_vcpu(), but
-> that's a bit ugly and is not a precedent we want to set.
-> 
+Patch# 1: Replaces hard-coded value with instruction length read from VMCS
+	  field.
+Patch# 2: Adds an extra check to __enter_guest() so that it can distinguish
+	  between VM-entry failure due to invalid guest state and that due to
+	  invalid VM-entry MSR-load area.
+Patch# 3: Verifies that when VM-entry fails due to invalid VM-entry MSR-load
+	  area in vmcs12, the error is deferred and caught by hardware when
+	  it is done processing higher priority checks such as guest state etc.
+	  This patch also verifies that when VM-entry fails due to invalid
+	  VM-entry MSR-load area in vmcs12, MSRs that were loaded from  that
+	  MSR-load area are rolled back to their original values.
+Patch# 4: Replaces hard-coded value with corresponding #define.
 
-That's exactly what I found.
 
-> At a glance, FPU allocation can be moved to kvm_arch_vcpu_init(), maybe
-> right before the call to fx_init().
-> 
+[PATCH 1/4] kvm-unit-test: VMX: Replace hard-coded exit instruction length
+[PATCH 2/4] kvm-unit-test: nVMX: __enter_guest() needs to also check for
+[PATCH 3/4] kvm-unit-test: nVMX: Test deferring of error from VM-entry MSR-load area
+[PATCH 4/4] kvm-unit-test: nVMX: Use #defines for exit reason in
 
-Yeah, putting here is better.
+ x86/vmx.c       |   3 +-
+ x86/vmx_tests.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 136 insertions(+), 6 deletions(-)
 
-I'm wondering the semantic of create, init, setup. There are 
-vcpu_{create,init,setup}, and IIUC, vcpu_create is mainly for data 
-structure allocation and vcpu_{init,setup} should be for data structure 
-initialization/setup (and maybe they could/should merge into one)
+Krish Sadhukhan (4):
+      VMX: Replace hard-coded exit instruction length
+      VMX: __enter_guest() needs to also check for VMX_FAIL_STATE
+      nVMX: Test deferring of error from VM-entry MSR-load area
+      nVMX: Use #defines for exit reason in advance_guest_state_test()
 
-But I feel the current codes for vcpu creation a bit messed, especially 
-of vmx.
