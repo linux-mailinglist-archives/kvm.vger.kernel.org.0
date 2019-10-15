@@ -2,90 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EA1B7D6CA6
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:52:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 455E3D6CAF
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 02:57:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727084AbfJOAw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 20:52:56 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:59200 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726987AbfJOAwz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 20:52:55 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F0n2No188140;
-        Tue, 15 Oct 2019 00:52:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=gqPM86jL7ujSnfBfEoGk3RGIHzFJd3Vua4/5hTs2+9s=;
- b=hUa+M5gW6X/Kud1iqTKzYJq4UOy1JXv+FKHJB8Y4cwYSvz6I5YerPpKrxRVsqvcjzFtD
- 081vCp9BPrKz9SpPv9ryCCIVeUAI9+On9/mq0nlsCUmqDg2KnTSqzbUw0HJxEGAwut2v
- FiZ+U9XJbZQCFCCZ7nMANerJ3x+uKeT0B42Nh+dPik8vT6Ra1scPLwuRS70BRJzDtPwG
- w9o0tc98gHjeLTCr7goNjOzB8i3RrdYbLRW2BDYzHyV5CiJe2O5CV9dkc0p7DtNc4UJ5
- zUtpMt1S3wtjUcM/Hj6qJL+j+SmBbtC3Vj5dUO6/fWNveKY2RvsEk0C3qBQfLlatP2gS NA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2vk6sqcabc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 00:52:39 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F0mv4G101047;
-        Tue, 15 Oct 2019 00:52:39 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2vkrbkw0de-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 00:52:39 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9F0qboJ017529;
-        Tue, 15 Oct 2019 00:52:37 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 15 Oct 2019 00:52:37 +0000
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, jmattson@google.com
-Subject: [PATCH 4/4] kvm-unit-test: nVMX: Use #defines for exit reason in advance_guest_state_test()
-Date:   Mon, 14 Oct 2019 20:16:33 -0400
-Message-Id: <20191015001633.8603-5-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191015001633.8603-1-krish.sadhukhan@oracle.com>
-References: <20191015001633.8603-1-krish.sadhukhan@oracle.com>
+        id S1727216AbfJOA5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 20:57:48 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40172 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726921AbfJOA5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 20:57:48 -0400
+Received: by mail-pf1-f194.google.com with SMTP id x127so11321926pfb.7;
+        Mon, 14 Oct 2019 17:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Wsv1eeRYK3FckN4mPKM6Tyd9SrCDq1K6jdUYJvegRgw=;
+        b=qcf6YCz2nrdYS9t+vyxPGwCWBe+pJkCYK9K2IoXAFvzqMvXj+YTcU5kd1SC2AD/VMK
+         2zQuNPSdDJadMcQABTNlSDNX7o41OSKRswbHRAEWqfXkGwFB8nyAwrA0wGYUh0t/Y671
+         1wAnWZIWk9rKP4PpEZ5+CWO6AMqRmv0Kyj3X0qyXYJVdjBu4wy4P2ySlt6gUO/GauRpw
+         +VVTlCqmUPWrRBuKsBVgHhiIF8PT6J2VICiJc34MxhTqmiZ8bxaMs0m+gFP/PC+4IHNQ
+         MXYxKN0LyF0Lfh4JWvgu+t+KPUVcRR9Ax3NM1UA6L4E4lxgU3+MukujzgT+cPRcNSYr8
+         y22g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Wsv1eeRYK3FckN4mPKM6Tyd9SrCDq1K6jdUYJvegRgw=;
+        b=lfddC+EhEpg0qC0z4ngcaOcsnYpUlAkIaBXvgvl/Vx1+osXTvfa0yK44tNkLgBnuEa
+         VQKft82KgfvfUTkuLnbXmU55nq5SXJ3P3NxuUY0MZlUTL0GdQIqpVnp1eHIQALtbIlEQ
+         dQjgbF/FyD/8AWJWuo0XYChwdySnaFSo+ce+Z/+HYxWifNiYhM640kxm+Vtw2oT2DVRr
+         s1iLLOxSG2vd3Xd58nHCsKCXPHt2cubUmeLM7YmEONPQCsfheOaOMdy1DlyxtZHixpG2
+         f9vQ742FNsEYu6zwk7GU8tyvcdem8IO7aU1U8pVwpcmsnhsXRExjDWHSckr2m2naVW1P
+         f0IA==
+X-Gm-Message-State: APjAAAX+HV79YAkB3cwqDvXJT9Bn1ZoPbquzeTGexyG+n1cWcgitDUvW
+        Le5JItERRvOBhc9g2pCr2UgtGx6H
+X-Google-Smtp-Source: APXvYqxJBVBZFmeB7ozapEcpOz5kvEfy2Ogpgrpa/kA8ZCiYDBDztGekyX/rE9/CAELuXONhMbyL1A==
+X-Received: by 2002:a62:e40d:: with SMTP id r13mr35490542pfh.154.1571101065271;
+        Mon, 14 Oct 2019 17:57:45 -0700 (PDT)
+Received: from [172.20.20.156] ([222.151.198.97])
+        by smtp.gmail.com with ESMTPSA id s36sm20196820pgk.84.2019.10.14.17.57.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Oct 2019 17:57:44 -0700 (PDT)
+Subject: Re: [PATCH net-next 2/3] vhost_net: user tap recvmsg api to access
+ ptr ring
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@gmail.com>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20191012015357.1775-1-prashantbhole.linux@gmail.com>
+ <20191012015357.1775-3-prashantbhole.linux@gmail.com>
+ <20191012164059-mutt-send-email-mst@kernel.org>
+From:   Prashant Bhole <prashantbhole.linux@gmail.com>
+Message-ID: <a98a594c-f0ee-43f7-956b-159009dc6e0f@gmail.com>
+Date:   Tue, 15 Oct 2019 09:57:11 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=956
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910150007
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9410 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910150007
+In-Reply-To: <20191012164059-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
----
- x86/vmx_tests.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Michael,
+Thanks for reviewing.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index d68f0c0..759e24a 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -5043,7 +5043,7 @@ static void guest_state_test_main(void)
- static void advance_guest_state_test(void)
- {
- 	u32 reason = vmcs_read(EXI_REASON);
--	if (! (reason & 0x80000000)) {
-+	if (! (reason & VMX_ENTRY_FAILURE)) {
- 		u64 guest_rip = vmcs_read(GUEST_RIP);
- 		u32 insn_len = vmcs_read(EXI_INST_LEN);
- 		vmcs_write(GUEST_RIP, guest_rip + insn_len);
--- 
-2.20.1
+On 10/13/19 5:41 AM, Michael S. Tsirkin wrote:
+> On Sat, Oct 12, 2019 at 10:53:56AM +0900, prashantbhole.linux@gmail.com wrote:
+>> From: Prashant Bhole <prashantbhole.linux@gmail.com>
+>>
+>> Currently vhost_net directly accesses ptr ring of tap driver to
+>> fetch Rx packet pointers. In order to avoid it this patch modifies
+>> tap driver's recvmsg api to do additional task of fetching Rx packet
+>> pointers.
+>>
+>> A special struct tun_msg_ctl is already being usedd via msg_control
+>> for tun Rx XDP batching. This patch extends tun_msg_ctl usage to
+>> send sub commands to recvmsg api. recvmsg can now produce/unproduce
+>> pointers from ptr ring as an additional task.
+>>
+>> This will be useful in future in implementation of virtio-net XDP
+>> offload feature. Where packets will be XDP batch processed in
+>> tun_recvmsg.
+> 
+> I'd like to see that future patch, by itself this patchset
+> seems to be of limited usefulness.
 
+Agree, this set is just a reorganization. Next time this will be a part
+of set which actually uses it.
+
+Thanks
+
+> 
+>> Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+>> ---
+>>   drivers/net/tap.c      | 22 +++++++++++++++++++-
+>>   drivers/net/tun.c      | 24 +++++++++++++++++++++-
+>>   drivers/vhost/net.c    | 46 +++++++++++++++++++++++++++++++++---------
+>>   include/linux/if_tun.h |  3 +++
+>>   4 files changed, 83 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>> index 01bd260ce60c..3d0bf382dbbc 100644
+>> --- a/drivers/net/tap.c
+>> +++ b/drivers/net/tap.c
+>> @@ -1234,8 +1234,28 @@ static int tap_recvmsg(struct socket *sock, struct msghdr *m,
+>>   		       size_t total_len, int flags)
+>>   {
+>>   	struct tap_queue *q = container_of(sock, struct tap_queue, sock);
+>> -	struct sk_buff *skb = m->msg_control;
+>> +	struct tun_msg_ctl *ctl = m->msg_control;
+>> +	struct sk_buff *skb = NULL;
+>>   	int ret;
+>> +
+>> +	if (ctl) {
+>> +		switch (ctl->cmd) {
+>> +		case TUN_CMD_PACKET:
+>> +			skb = ctl->ptr;
+>> +			break;
+>> +		case TUN_CMD_PRODUCE_PTRS:
+>> +			return ptr_ring_consume_batched(&q->ring,
+>> +							ctl->ptr_array,
+>> +							ctl->num);
+>> +		case TUN_CMD_UNPRODUCE_PTRS:
+>> +			ptr_ring_unconsume(&q->ring, ctl->ptr_array, ctl->num,
+>> +					   tun_ptr_free);
+>> +			return 0;
+>> +		default:
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>>   	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC)) {
+>>   		kfree_skb(skb);
+>>   		return -EINVAL;
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index 29711671959b..7d4886f53389 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -2577,7 +2577,8 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
+>>   {
+>>   	struct tun_file *tfile = container_of(sock, struct tun_file, socket);
+>>   	struct tun_struct *tun = tun_get(tfile);
+>> -	void *ptr = m->msg_control;
+>> +	struct tun_msg_ctl *ctl = m->msg_control;
+>> +	void *ptr = NULL;
+>>   	int ret;
+>>   
+>>   	if (!tun) {
+>> @@ -2585,6 +2586,27 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
+>>   		goto out_free;
+>>   	}
+>>   
+>> +	if (ctl) {
+>> +		switch (ctl->cmd) {
+>> +		case TUN_CMD_PACKET:
+>> +			ptr = ctl->ptr;
+>> +			break;
+>> +		case TUN_CMD_PRODUCE_PTRS:
+>> +			ret = ptr_ring_consume_batched(&tfile->tx_ring,
+>> +						       ctl->ptr_array,
+>> +						       ctl->num);
+>> +			goto out;
+>> +		case TUN_CMD_UNPRODUCE_PTRS:
+>> +			ptr_ring_unconsume(&tfile->tx_ring, ctl->ptr_array,
+>> +					   ctl->num, tun_ptr_free);
+>> +			ret = 0;
+>> +			goto out;
+>> +		default:
+>> +			ret = -EINVAL;
+>> +			goto out_put_tun;
+>> +		}
+>> +	}
+>> +
+>>   	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC|MSG_ERRQUEUE)) {
+>>   		ret = -EINVAL;
+>>   		goto out_put_tun;
+>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>> index 5946d2775bd0..5e5c1063606c 100644
+>> --- a/drivers/vhost/net.c
+>> +++ b/drivers/vhost/net.c
+>> @@ -175,24 +175,44 @@ static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
+>>   
+>>   static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
+>>   {
+>> +	struct vhost_virtqueue *vq = &nvq->vq;
+>> +	struct socket *sock = vq->private_data;
+>>   	struct vhost_net_buf *rxq = &nvq->rxq;
+>> +	struct tun_msg_ctl ctl = {
+>> +		.cmd = TUN_CMD_PRODUCE_PTRS,
+>> +		.ptr_array = rxq->queue,
+>> +		.num = VHOST_NET_BATCH,
+>> +	};
+>> +	struct msghdr msg = {
+>> +		.msg_control = &ctl,
+>> +	};
+>>   
+>>   	rxq->head = 0;
+>> -	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
+>> -					      VHOST_NET_BATCH);
+>> +	rxq->tail = sock->ops->recvmsg(sock, &msg, 0, 0);
+>> +	if (rxq->tail < 0)
+>> +		rxq->tail = 0;
+>> +
+>>   	return rxq->tail;
+>>   }
+>>   
+>>   static void vhost_net_buf_unproduce(struct vhost_net_virtqueue *nvq)
+>>   {
+>> +	struct vhost_virtqueue *vq = &nvq->vq;
+>> +	struct socket *sock = vq->private_data;
+>>   	struct vhost_net_buf *rxq = &nvq->rxq;
+>> +	struct tun_msg_ctl ctl = {
+>> +		.cmd = TUN_CMD_UNPRODUCE_PTRS,
+>> +		.ptr_array = rxq->queue + rxq->head,
+>> +		.num = vhost_net_buf_get_size(rxq),
+>> +	};
+>> +	struct msghdr msg = {
+>> +		.msg_control = &ctl,
+>> +	};
+>>   
+>> -	if (nvq->rx_ring && !vhost_net_buf_is_empty(rxq)) {
+>> -		ptr_ring_unconsume(nvq->rx_ring, rxq->queue + rxq->head,
+>> -				   vhost_net_buf_get_size(rxq),
+>> -				   tun_ptr_free);
+>> -		rxq->head = rxq->tail = 0;
+>> -	}
+>> +	if (!vhost_net_buf_is_empty(rxq))
+>> +		sock->ops->recvmsg(sock, &msg, 0, 0);
+>> +
+>> +	rxq->head = rxq->tail = 0;
+>>   }
+>>   
+>>   static int vhost_net_buf_peek_len(void *ptr)
+>> @@ -1109,6 +1129,9 @@ static void handle_rx(struct vhost_net *net)
+>>   		.flags = 0,
+>>   		.gso_type = VIRTIO_NET_HDR_GSO_NONE
+>>   	};
+>> +	struct tun_msg_ctl ctl = {
+>> +		.cmd = TUN_CMD_PACKET,
+>> +	};
+>>   	size_t total_len = 0;
+>>   	int err, mergeable;
+>>   	s16 headcount;
+>> @@ -1166,8 +1189,11 @@ static void handle_rx(struct vhost_net *net)
+>>   			goto out;
+>>   		}
+>>   		busyloop_intr = false;
+>> -		if (nvq->rx_ring)
+>> -			msg.msg_control = vhost_net_buf_consume(&nvq->rxq);
+>> +		if (nvq->rx_ring) {
+>> +			ctl.cmd = TUN_CMD_PACKET;
+>> +			ctl.ptr = vhost_net_buf_consume(&nvq->rxq);
+>> +			msg.msg_control = &ctl;
+>> +		}
+>>   		/* On overrun, truncate and discard */
+>>   		if (unlikely(headcount > UIO_MAXIOV)) {
+>>   			iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
+>> diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
+>> index bdfa671612db..8608d4095143 100644
+>> --- a/include/linux/if_tun.h
+>> +++ b/include/linux/if_tun.h
+>> @@ -13,10 +13,13 @@
+>>   
+>>   #define TUN_CMD_PACKET 1
+>>   #define TUN_CMD_BATCH  2
+>> +#define TUN_CMD_PRODUCE_PTRS	3
+>> +#define TUN_CMD_UNPRODUCE_PTRS	4
+>>   struct tun_msg_ctl {
+>>   	unsigned short cmd;
+>>   	unsigned short num;
+>>   	void *ptr;
+>> +	void **ptr_array;
+>>   };
+>>   
+>>   struct tun_xdp_hdr {
+>> -- 
+>> 2.21.0
