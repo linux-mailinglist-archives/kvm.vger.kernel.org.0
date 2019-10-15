@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CDDD701A
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 09:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D684D7051
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 09:41:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfJOH3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 03:29:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31630 "EHLO mx1.redhat.com"
+        id S1727304AbfJOHlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 03:41:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59202 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726470AbfJOH3n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 03:29:43 -0400
+        id S1725890AbfJOHla (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 03:41:30 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 370D920F2;
-        Tue, 15 Oct 2019 07:29:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F24A7307D871;
+        Tue, 15 Oct 2019 07:41:29 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-117-75.ams2.redhat.com [10.36.117.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C3C419C68;
-        Tue, 15 Oct 2019 07:29:41 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 3/3] Makefile: use "-Werror" in cc-option
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CD62F19C68;
+        Tue, 15 Oct 2019 07:41:27 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 1/1] x86: use pointer for end of exception
+ table
 To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
+        pbonzini@redhat.com, alexandru.elisei@arm.com
 Cc:     jmattson@google.com
-References: <20191010183506.129921-1-morbo@google.com>
- <20191010183506.129921-4-morbo@google.com>
+References: <20191012074454.208377-2-morbo@google.com>
+ <20191013071824.222946-1-morbo@google.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,74 +71,103 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <67d3c72f-1537-7765-4b8c-d631859a3204@redhat.com>
-Date:   Tue, 15 Oct 2019 09:29:40 +0200
+Message-ID: <6656e70c-4866-55e8-108b-9bbb2c6fd081@redhat.com>
+Date:   Tue, 15 Oct 2019 09:41:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191010183506.129921-4-morbo@google.com>
+In-Reply-To: <20191013071824.222946-1-morbo@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.71]); Tue, 15 Oct 2019 07:29:43 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 15 Oct 2019 07:41:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/2019 20.35, Bill Wendling wrote:
-> The "cc-option" macro should use "-Werror" to determine if a flag is
-> supported. Otherwise the test may not return a nonzero result. Also
-> conditionalize some of the warning flags which aren't supported by
-> clang.
+On 13/10/2019 09.18, Bill Wendling wrote:
+> Two global objects can't have the same address in C. Clang uses this
+> fact to omit the check on the first iteration of the loop in
+> check_exception_table.
 > 
 > Signed-off-by: Bill Wendling <morbo@google.com>
 > ---
->  Makefile | 19 +++++++++++--------
->  1 file changed, 11 insertions(+), 8 deletions(-)
+>  lib/x86/desc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index 32414dc..3ec0458 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -46,30 +46,33 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
->  # cc-option
->  # Usage: OP_CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
+> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+> index 451f504..cfc449f 100644
+> --- a/lib/x86/desc.c
+> +++ b/lib/x86/desc.c
+> @@ -41,7 +41,7 @@ struct ex_record {
+>      unsigned long handler;
+>  };
 >  
-> -cc-option = $(shell if $(CC) $(1) -S -o /dev/null -xc /dev/null \
-> +cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
->                > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+> -extern struct ex_record exception_table_start, exception_table_end;
+> +extern struct ex_record exception_table_start, *exception_table_end;
 >  
->  COMMON_CFLAGS += -g $(autodepend-flags)
-> -COMMON_CFLAGS += -Wall -Wwrite-strings -Wclobbered -Wempty-body -Wuninitialized
-> -COMMON_CFLAGS += -Wignored-qualifiers -Wunused-but-set-parameter
-> -COMMON_CFLAGS += -Werror
-> +COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
-> +COMMON_CFLAGS += -Wignored-qualifiers -Werror
-> +
->  frame-pointer-flag=-f$(if $(KEEP_FRAME_POINTER),no-,)omit-frame-pointer
->  fomit_frame_pointer := $(call cc-option, $(frame-pointer-flag), "")
->  fnostack_protector := $(call cc-option, -fno-stack-protector, "")
->  fnostack_protector_all := $(call cc-option, -fno-stack-protector-all, "")
-> -wno_frame_address := $(call cc-option, -Wno-frame-address, "")
->  fno_pic := $(call cc-option, -fno-pic, "")
->  no_pie := $(call cc-option, -no-pie, "")
->  COMMON_CFLAGS += $(fomit_frame_pointer)
->  COMMON_CFLAGS += $(fno_stack_protector)
->  COMMON_CFLAGS += $(fno_stack_protector_all)
-> -COMMON_CFLAGS += $(wno_frame_address)
->  COMMON_CFLAGS += $(if $(U32_LONG_FMT),-D__U32_LONG_FMT__,)
->  COMMON_CFLAGS += $(fno_pic) $(no_pie)
+>  static const char* exception_mnemonic(int vector)
+>  {
+> @@ -113,7 +113,7 @@ static void check_exception_table(struct ex_regs *regs)
+>  		(((regs->rflags >> 16) & 1) << 8);
+>      asm("mov %0, %%gs:4" : : "r"(ex_val));
 >  
-> +COMMON_CFLAGS += $(call cc-option, -Wno-frame-address, "")
+> -    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
+> +    for (ex = &exception_table_start; ex != (void*)&exception_table_end; ++ex) {
+>          if (ex->rip == regs->rip) {
+>              regs->rip = ex->handler;
+>              return;
+> 
 
-I think the old code used ":=" on purpose, so that the test is only done
-once. With your new code, the test is now done each time COMMON_CFLAGS
-gets evaluated, i.e. for each compiled object.
+That looks like quite an ugly hack to me - and if clang gets a little
+bit smarter, I'm pretty sure it will optimize this away, too.
 
-Could you please rewrite this test to use the ":=" detour for all lines
-that call cc-option?
+Could you please check if something like this works, too:
 
- Thanks,
-  Thomas
+diff --git a/lib/x86/desc.c b/lib/x86/desc.c
+index 451f504..0e9779b 100644
+--- a/lib/x86/desc.c
++++ b/lib/x86/desc.c
+@@ -41,7 +41,8 @@ struct ex_record {
+     unsigned long handler;
+ };
+
+-extern struct ex_record exception_table_start, exception_table_end;
++extern struct ex_record exception_table_start;
++extern long exception_table_size;
+
+ static const char* exception_mnemonic(int vector)
+ {
+@@ -108,12 +109,13 @@ static void check_exception_table(struct ex_regs
+*regs)
+ {
+     struct ex_record *ex;
+     unsigned ex_val;
++    int cnt = exception_table_size / sizeof(struct ex_record);
+
+     ex_val = regs->vector | (regs->error_code << 16) |
+                (((regs->rflags >> 16) & 1) << 8);
+     asm("mov %0, %%gs:4" : : "r"(ex_val));
+
+-    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
++    for (ex = &exception_table_start; cnt-- > 0; ++ex) {
+         if (ex->rip == regs->rip) {
+             regs->rip = ex->handler;
+             return;
+diff --git a/x86/flat.lds b/x86/flat.lds
+index a278b56..108fad5 100644
+--- a/x86/flat.lds
++++ b/x86/flat.lds
+@@ -9,6 +9,7 @@ SECTIONS
+           exception_table_start = .;
+           *(.data.ex)
+          exception_table_end = .;
++          exception_table_size = exception_table_end -
+exception_table_start;
+          }
+     . = ALIGN(16);
+     .rodata : { *(.rodata) }
+
+ Thomas
