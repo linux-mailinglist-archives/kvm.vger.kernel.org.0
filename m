@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F173D7BBA
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BB8DD7BBC
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:33:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388166AbfJOQd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 12:33:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57340 "EHLO mx1.redhat.com"
+        id S2388168AbfJOQde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 12:33:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33914 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388164AbfJOQd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 12:33:27 -0400
+        id S2388156AbfJOQde (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 12:33:34 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 61EB97BDA9;
-        Tue, 15 Oct 2019 16:33:27 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9E87A882FB;
+        Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F265B4100;
-        Tue, 15 Oct 2019 16:33:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D044319C5B;
+        Tue, 15 Oct 2019 16:33:27 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -37,95 +37,114 @@ Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH 31/32] hw/pci-host: Rename incorrectly named 'piix' as 'i440fx'
-Date:   Tue, 15 Oct 2019 18:27:04 +0200
-Message-Id: <20191015162705.28087-32-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH 32/32] hw/pci-host/i440fx: Remove the last PIIX3 traces
+Date:   Tue, 15 Oct 2019 18:27:05 +0200
+Message-Id: <20191015162705.28087-33-philmd@redhat.com>
 In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 16:33:27 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 15 Oct 2019 16:33:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-We moved all the PIIX3 southbridge code out of hw/pci-host/piix.c,
-it now only contains i440FX northbridge code.
-Rename it to match the chipset modelled.
+The PIIX3 is not tied to the i440FX and can even be used without it.
+Move its creation to the machine code (pc_piix.c).
+We have now removed the last trace of southbridge code in the i440FX
+northbridge.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- MAINTAINERS                      | 2 +-
- hw/i386/Kconfig                  | 2 +-
- hw/pci-host/Kconfig              | 2 +-
- hw/pci-host/Makefile.objs        | 2 +-
- hw/pci-host/{piix.c => i440fx.c} | 0
- 5 files changed, 4 insertions(+), 4 deletions(-)
- rename hw/pci-host/{piix.c => i440fx.c} (100%)
+ hw/i386/pc_piix.c            | 8 +++++++-
+ hw/pci-host/i440fx.c         | 8 --------
+ include/hw/pci-host/i440fx.h | 3 +--
+ 3 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4845f47d93..1bc9959b8a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1225,7 +1225,7 @@ M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
- S: Supported
- F: include/hw/i386/
- F: hw/i386/
--F: hw/pci-host/piix.c
-+F: hw/pci-host/i440fx.c
- F: hw/pci-host/q35.c
- F: hw/pci-host/pam.c
- F: include/hw/pci-host/i440fx.h
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 589d75e26a..cfe94aede7 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -60,7 +60,7 @@ config I440FX
-     select PC_PCI
-     select PC_ACPI
-     select ACPI_SMBUS
--    select PCI_PIIX
-+    select PCI_I440FX
-     select PIIX3
-     select IDE_PIIX
-     select DIMM
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index 397043b289..b0aa8351c4 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -28,7 +28,7 @@ config PCI_SABRE
-     select PCI
-     bool
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 8ac4bf12ca..cb4f4fc94c 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -190,14 +190,20 @@ static void pc_init1(MachineState *machine,
+     gsi_state = pc_gsi_create(&pcms->gsi, pcmc->pci_enabled);
  
--config PCI_PIIX
-+config PCI_I440FX
-     bool
-     select PCI
-     select PAM
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index a9cd3e022d..efd752b766 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -13,7 +13,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) += versatile.o
+     if (pcmc->pci_enabled) {
++        PIIX3State *piix3;
++
+         pci_bus = i440fx_init(host_type,
+                               pci_type,
+-                              &i440fx_state, &piix3_devfn, &isa_bus, pcms->gsi,
++                              &i440fx_state,
+                               system_memory, system_io, machine->ram_size,
+                               pcms->below_4g_mem_size,
+                               pcms->above_4g_mem_size,
+                               pci_memory, ram_memory);
+         pcms->bus = pci_bus;
++
++        piix3 = piix3_create(pci_bus, &isa_bus);
++        piix3->pic = pcms->gsi;
++        piix3_devfn = piix3->dev.devfn;
+     } else {
+         pci_bus = NULL;
+         i440fx_state = NULL;
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index 79ecd58a2b..f27131102d 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -27,7 +27,6 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/pci-host/i440fx.h"
+-#include "hw/southbridge/piix.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
+ #include "qapi/error.h"
+@@ -272,8 +271,6 @@ static void i440fx_realize(PCIDevice *dev, Error **errp)
  
- common-obj-$(CONFIG_PCI_SABRE) += sabre.o
- common-obj-$(CONFIG_FULONG) += bonito.o
--common-obj-$(CONFIG_PCI_PIIX) += piix.o
-+common-obj-$(CONFIG_PCI_I440FX) += i440fx.o
- common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
- common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
- common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/i440fx.c
-similarity index 100%
-rename from hw/pci-host/piix.c
-rename to hw/pci-host/i440fx.c
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                     PCII440FXState **pi440fx_state,
+-                    int *piix3_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
+@@ -286,7 +283,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+     PCIBus *b;
+     PCIDevice *d;
+     PCIHostState *s;
+-    PIIX3State *piix3;
+     PCII440FXState *f;
+     unsigned i;
+     I440FXState *i440fx;
+@@ -339,10 +335,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                  PAM_EXPAN_SIZE);
+     }
+ 
+-    piix3 = piix3_create(b, isa_bus);
+-    piix3->pic = pic;
+-    *piix3_devfn = piix3->dev.devfn;
+-
+     ram_size = ram_size / 8 / 1024 / 1024;
+     if (ram_size > 255) {
+         ram_size = 255;
+diff --git a/include/hw/pci-host/i440fx.h b/include/hw/pci-host/i440fx.h
+index e327f9bf87..f54e6466e4 100644
+--- a/include/hw/pci-host/i440fx.h
++++ b/include/hw/pci-host/i440fx.h
+@@ -22,8 +22,7 @@ typedef struct PCII440FXState PCII440FXState;
+ #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+ 
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+-                    PCII440FXState **pi440fx_state, int *piix_devfn,
+-                    ISABus **isa_bus, qemu_irq *pic,
++                    PCII440FXState **pi440fx_state,
+                     MemoryRegion *address_space_mem,
+                     MemoryRegion *address_space_io,
+                     ram_addr_t ram_size,
 -- 
 2.21.0
 
