@@ -2,77 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACB9FD73D6
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 12:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A40BDD73F3
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 12:53:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731515AbfJOKt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 06:49:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:35240 "EHLO foss.arm.com"
+        id S1728107AbfJOKxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 06:53:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34220 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731470AbfJOKtZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 06:49:25 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1742D28;
-        Tue, 15 Oct 2019 03:49:25 -0700 (PDT)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 240B03F68E;
-        Tue, 15 Oct 2019 03:49:19 -0700 (PDT)
-From:   Jianyong Wu <jianyong.wu@arm.com>
-To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        jianyong.wu@arm.com, nd@arm.com
-Subject: [PATCH v5 6/6] kvm: arm64: Add capability check extension for ptp_kvm
-Date:   Tue, 15 Oct 2019 18:48:22 +0800
-Message-Id: <20191015104822.13890-7-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191015104822.13890-1-jianyong.wu@arm.com>
-References: <20191015104822.13890-1-jianyong.wu@arm.com>
+        id S1727073AbfJOKxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 06:53:24 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 950CD82DA
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 10:53:23 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id f3so9912704wrr.23
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 03:53:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=p/1yabDz8qKhRFkalHkrj4947RSYeZJkszdmHrfnxwc=;
+        b=eqMPbWcFOlWMA4iWqK/zS4gNlX6NKPiWQJ5R5gbhJN6pv1r4GFdR2v3NFjCH5rRtjQ
+         4nkoiLIMLbibCgrJ3qHZ/ggzCiz2IXILVyfRKTXL+I37oJfcZZN0NXhS7A430OfVl7Ar
+         AfAgdT/c8PZSznWvqFtE4hzyWLbmPXrqzyaQaGFt9BcEl2L0D88aJwC2ADZk6VMBUv/b
+         MnE8PD7OnE7bDfFSid520aJTRm/FNaqfzw0WmwYgtiGYmNnTYUX4Iz/B6l2lG4qRKzhC
+         Ug7RnLmIYEjJmydvs8K9MkRmiQaBJRpucrXa2fy4JrqjO/+iK6FwVLwR4LdkkrFtu9hf
+         8aDw==
+X-Gm-Message-State: APjAAAXMdSdtxeN6zAOcWmY1wbLu0RtOxPdPo7ZwVOfEdpWeRYaUooJK
+        xTuPCCAmhZxQWef+UI4W4NE6m/hXJLC2MNXP1iEnXyKYlCrEMlXXzeIUf5lZsmbzoIE3IyPHct1
+        RHJB48dDPmOXR
+X-Received: by 2002:adf:eb0f:: with SMTP id s15mr28329220wrn.97.1571136802294;
+        Tue, 15 Oct 2019 03:53:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwu0QYUpkH9lGGmecEb8XIlX9PlulVL8sYPAzG3x9q/fyyIX2pqIq4BlP6J6f9jD1VdvCLLWQ==
+X-Received: by 2002:adf:eb0f:: with SMTP id s15mr28329205wrn.97.1571136802066;
+        Tue, 15 Oct 2019 03:53:22 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id g17sm16952765wrq.58.2019.10.15.03.53.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2019 03:53:21 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] KVM: X86: Make fpu allocation a common function
+In-Reply-To: <20191014183723.GE22962@linux.intel.com>
+References: <20191014162247.61461-1-xiaoyao.li@intel.com> <87y2xn462e.fsf@vitty.brq.redhat.com> <20191014183723.GE22962@linux.intel.com>
+Date:   Tue, 15 Oct 2019 12:53:20 +0200
+Message-ID: <87v9sq46vz.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-before VMs migrate to a another host, VMM may check if this
-cap is available to determine the migration behaviour.
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
----
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/arm/arm.c       | 1 +
- 2 files changed, 2 insertions(+)
+> On Mon, Oct 14, 2019 at 06:58:49PM +0200, Vitaly Kuznetsov wrote:
+>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>> 
+>> > They are duplicated codes to create vcpu.arch.{user,guest}_fpu in VMX
+>> > and SVM. Make them common functions.
+>> >
+>> > No functional change intended.
+>> 
+>> Would it rather make sense to move this code to
+>> kvm_arch_vcpu_create()/kvm_arch_vcpu_destroy() instead?
+>
+> Does it make sense?  Yes.  Would it actually work?  No.  Well, not without
+> other shenanigans.
+>
+> FPU allocation can't be placed after the call to .create_vcpu() becuase
+> it's consumed in kvm_arch_vcpu_init().   FPU allocation can't come before
+> .create_vcpu() because the vCPU struct itself hasn't been allocated.
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..a0bff6002bd9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_KVM_PTP 173
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..80999985160b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -201,6 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_VCPU_EVENTS:
-+	case KVM_CAP_ARM_KVM_PTP:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+A very theoretical question: why do we have 'struct vcpu' embedded in
+vcpu_vmx/vcpu_svm and not the other way around (e.g. in a union)? That
+would've allowed us to allocate memory in common code and then fill in
+vendor-specific details in .create_vcpu().
+
 -- 
-2.17.1
-
+Vitaly
