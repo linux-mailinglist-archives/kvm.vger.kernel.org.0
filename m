@@ -2,169 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 49A33D7297
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 11:54:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2E1AD72AB
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 12:00:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727102AbfJOJyW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 05:54:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7158 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727033AbfJOJyW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Oct 2019 05:54:22 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9F9lxZ3057780
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 05:54:21 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vn8n175kg-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 05:54:20 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <maier@linux.ibm.com>;
-        Tue, 15 Oct 2019 10:54:18 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 15 Oct 2019 10:54:15 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9F9sEjQ54919300
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 09:54:14 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1E1D652052;
-        Tue, 15 Oct 2019 09:54:14 +0000 (GMT)
-Received: from oc4120165700.ibm.com (unknown [9.152.99.188])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BD86452054;
-        Tue, 15 Oct 2019 09:54:13 +0000 (GMT)
-Subject: Re: [RFC PATCH 3/4] vfio-ccw: Add a trace for asynchronous requests
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20191014180855.19400-1-farman@linux.ibm.com>
- <20191014180855.19400-4-farman@linux.ibm.com>
-From:   Steffen Maier <maier@linux.ibm.com>
-Date:   Tue, 15 Oct 2019 11:54:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727718AbfJOKAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 06:00:04 -0400
+Received: from foss.arm.com ([217.140.110.172]:34170 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727018AbfJOKAE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 06:00:04 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7936D28;
+        Tue, 15 Oct 2019 03:00:03 -0700 (PDT)
+Received: from localhost (unknown [10.37.6.20])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E89133F68E;
+        Tue, 15 Oct 2019 03:00:02 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 11:00:01 +0100
+From:   Andrew Murray <andrew.murray@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v3 4/4] KVM: arm64: pmu: Reset sample period on overflow
+ handling
+Message-ID: <20191015100000.GT42880@e119886-lin.cambridge.arm.com>
+References: <20191011123954.31378-1-maz@kernel.org>
+ <20191011123954.31378-5-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191014180855.19400-4-farman@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19101509-0016-0000-0000-000002B8305D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101509-0017-0000-0000-000033194E09
-Message-Id: <2fd50890-2d94-37ae-8266-1b41b9bf9a74@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-15_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910150091
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191011123954.31378-5-maz@kernel.org>
+User-Agent: Mutt/1.10.1+81 (426a6c1) (2018-08-26)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/14/19 8:08 PM, Eric Farman wrote:
-> Since the asynchronous requests are typically associated with
-> error recovery, let's add a simple trace when one of those is
-> issued to a device.
+On Fri, Oct 11, 2019 at 01:39:54PM +0100, Marc Zyngier wrote:
+> The PMU emulation code uses the perf event sample period to trigger
+> the overflow detection. This works fine  for the *first* overflow
+> handling, but results in a huge number of interrupts on the host,
+> unrelated to the number of interrupts handled in the guest (a x20
+> factor is pretty common for the cycle counter). On a slow system
+> (such as a SW model), this can result in the guest only making
+> forward progress at a glacial pace.
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> It turns out that the clue is in the name. The sample period is
+> exactly that: a period. And once the an overflow has occured,
+> the following period should be the full width of the associated
+> counter, instead of whatever the guest had initially programed.
+> 
+> Reset the sample period to the architected value in the overflow
+> handler, which now results in a number of host interrupts that is
+> much closer to the number of interrupts in the guest.
+> 
+> Fixes: b02386eb7dac ("arm64: KVM: Add PMU overflow interrupt routing")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   drivers/s390/cio/vfio_ccw_fsm.c   |  4 ++++
->   drivers/s390/cio/vfio_ccw_trace.c |  1 +
->   drivers/s390/cio/vfio_ccw_trace.h | 26 ++++++++++++++++++++++++++
->   3 files changed, 31 insertions(+)
+
+Reviewed-by: Andrew Murray <andrew.murray@arm.com>
+
+>  virt/kvm/arm/pmu.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-> index d4119e4c4a8c..23648a9aa721 100644
-> --- a/drivers/s390/cio/vfio_ccw_fsm.c
-> +++ b/drivers/s390/cio/vfio_ccw_fsm.c
-> @@ -341,6 +341,10 @@ static void fsm_async_request(struct vfio_ccw_private *private,
->   		/* should not happen? */
->   		cmd_region->ret_code = -EINVAL;
->   	}
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index f291d4ac3519..8731dfeced8b 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/perf_event.h>
+> +#include <linux/perf/arm_pmu.h>
+>  #include <linux/uaccess.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> @@ -442,8 +443,25 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>  				  struct pt_regs *regs)
+>  {
+>  	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> +	struct arm_pmu *cpu_pmu = to_arm_pmu(perf_event->pmu);
+>  	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+>  	int idx = pmc->idx;
+> +	u64 period;
 > +
-> +	trace_vfio_ccw_fsm_async_request(get_schid(private),
-> +					 cmd_region->command,
-> +					 cmd_region->ret_code);
->   }
-> 
->   /*
-> diff --git a/drivers/s390/cio/vfio_ccw_trace.c b/drivers/s390/cio/vfio_ccw_trace.c
-> index b37bc68e7f18..37ecbf8be805 100644
-> --- a/drivers/s390/cio/vfio_ccw_trace.c
-> +++ b/drivers/s390/cio/vfio_ccw_trace.c
-> @@ -9,5 +9,6 @@
->   #define CREATE_TRACE_POINTS
->   #include "vfio_ccw_trace.h"
-> 
-> +EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_async_request);
->   EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_event);
->   EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_io_fctl);
-> diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
-> index 24a8152acfdf..4be2e36242e6 100644
-> --- a/drivers/s390/cio/vfio_ccw_trace.h
-> +++ b/drivers/s390/cio/vfio_ccw_trace.h
-> @@ -17,6 +17,32 @@
-> 
->   #include <linux/tracepoint.h>
-> 
-> +TRACE_EVENT(vfio_ccw_fsm_async_request,
-> +	TP_PROTO(struct subchannel_id schid,
-> +		 int command,
-> +		 int errno),
-> +	TP_ARGS(schid, command, errno),
+> +	cpu_pmu->pmu.stop(perf_event, PERF_EF_UPDATE);
 > +
-> +	TP_STRUCT__entry(
-> +		__field_struct(struct subchannel_id, schid)
-
-Not sure: Does this allow the user to filter for fields of struct subchannel_id 
-or can the user express a filter on the entire combined struct subchannel_id?
-In the preceding patch you have the 3 parts of schid as explicit separate trace 
-fields in the tracepoint.
-
-> +		__field(int, command)
-> +		__field(int, errno)
-> +	),
+> +	/*
+> +	 * Reset the sample period to the architectural limit,
+> +	 * i.e. the point where the counter overflows.
+> +	 */
+> +	period = -(local64_read(&perf_event->count));
 > +
-> +	TP_fast_assign(
-> +		__entry->schid = schid;
-> +		__entry->command = command;
-> +		__entry->errno = errno;
-> +	),
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> +		period &= GENMASK(31, 0);
 > +
-> +	TP_printk("schid=%x.%x.%04x command=%d errno=%d",
-> +		  __entry->schid.cssid,
-> +		  __entry->schid.ssid,
-> +		  __entry->schid.sch_no,
-> +		  __entry->command,
-> +		  __entry->errno)
-> +);
+> +	local64_set(&perf_event->hw.period_left, 0);
+> +	perf_event->attr.sample_period = period;
+> +	perf_event->hw.sample_period = period;
+>  
+>  	__vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(idx);
+>  
+> @@ -451,6 +469,8 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>  		kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+>  		kvm_vcpu_kick(vcpu);
+>  	}
 > +
->   TRACE_EVENT(vfio_ccw_fsm_event,
->   	TP_PROTO(struct subchannel_id schid, int state, int event),
->   	TP_ARGS(schid, state, event),
+> +	cpu_pmu->pmu.start(perf_event, PERF_EF_RELOAD);
+>  }
+>  
+>  /**
+> -- 
+> 2.20.1
 > 
-
-
--- 
-Mit freundlichen Gruessen / Kind regards
-Steffen Maier
-
-Linux on IBM Z Development
-
-https://www.ibm.com/privacy/us/en/
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Matthias Hartmann
-Geschaeftsfuehrung: Dirk Wittkopp
-Sitz der Gesellschaft: Boeblingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
-
