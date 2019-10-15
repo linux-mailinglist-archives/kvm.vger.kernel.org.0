@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7689BD6CDD
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 03:22:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00128D6CD4
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 03:21:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727453AbfJOBWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 21:22:09 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:43332 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727011AbfJOBWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 21:22:09 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F1ENab020114;
-        Tue, 15 Oct 2019 01:19:47 GMT
+        id S1727362AbfJOBVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 21:21:34 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52154 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727225AbfJOBVd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 21:21:33 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F1ENDi031607;
+        Tue, 15 Oct 2019 01:19:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
- bh=Rba9xErGxwUOOcVXLsuAqyh9LPvNTmKNCGcbMviKams=;
- b=QHutwQe0QynFPLhWhntUiulAcR/rIgytbG17sJdB6uPK69w3U3jziPJT/eSRzd2JvWq9
- eH54OB/MILbxuE3pREaHHkzUHgjBM6UMVdrA3trCK2pmyJizcPFrbqQawsml27Bi44Nv
- 0brq+4WujMm7g8AZLcBUIPX0BqDWCl1zBFF+df5M0ujXvRa/okbm+l0Kh+ZV8KzXWsr+
- tyiqG7hn2zoM+Ir+u9b52Vf2wLuvQ8scgqe51DVl7b7WQcvuGbfA8fcuXNksJ/NsL14M
- 68yvBwv2JxO7tnMYT8ggRbSBVECpqrzVjaD7p1SPj0F1ixObGu5sj12dKNVR7rarN0lx 0A== 
+ bh=m2u7wIIh1G1CvWQOnHO+T8RoKMQn5Cd56TOwOJpzLVk=;
+ b=diDvu1AiLDFc19RH2L+oOoq7NXO5+PUG/kjI3DyJH0LAdTTf07rEk7UXZYRTOHbb10l+
+ P3DkVYI6Us4onF6upqqBoQ0ZDSizdjAN6Y5Ji3RdIroctFjUUDYXiUqC8Woi4CnFnJDf
+ 8ozS55jVOBvxclh8eBRfM/Zo5JxBtFZmvhg/5BDIIkvARwEl2SRiRJwXFwuhUc+m0uo5
+ 22he53Y/CJKS3qrvppDkU7HhwduzJrfA/j8dbTJ2btR5yfuQdqtmpLO5a+sySWKH9ZnS
+ CYdnE7+K3gGrr8UJFApM31HnFIwyaS/EqL0rlMjdvMNcuKDVs8LOAybkG+/f6nfqM2SP fA== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2vk7fr48qa-1
+        by userp2130.oracle.com with ESMTP id 2vk68ucdek-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 15 Oct 2019 01:19:47 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F1IYj5129321;
-        Tue, 15 Oct 2019 01:19:46 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2vks07txqb-1
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9F1IYj6129321;
+        Tue, 15 Oct 2019 01:19:47 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2vks07txqw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 15 Oct 2019 01:19:46 +0000
 Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9F1Jdn5030242;
-        Tue, 15 Oct 2019 01:19:41 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9F1JjZR003385;
+        Tue, 15 Oct 2019 01:19:45 GMT
 Received: from z2.cn.oracle.com (/10.182.70.159)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 14 Oct 2019 18:19:39 -0700
+        with ESMTP ; Mon, 14 Oct 2019 18:19:45 -0700
 From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     vkuznets@redhat.com, linux-hyperv@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc:     vkuznets@redhat.com, linux-hyperv@vger.kernel.org,
         sstabellini@kernel.org, peterz@infradead.org,
         Zhenzhong Duan <zhenzhong.duan@oracle.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v6 1/5] Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key get initialized"
-Date:   Tue, 15 Oct 2019 09:19:23 +0800
-Message-Id: <1571102367-31595-2-git-send-email-zhenzhong.duan@oracle.com>
+Subject: [PATCH v6 2/5] x86/kvm: Change print code to use pr_*() format
+Date:   Tue, 15 Oct 2019 09:19:24 +0800
+Message-Id: <1571102367-31595-3-git-send-email-zhenzhong.duan@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571102367-31595-1-git-send-email-zhenzhong.duan@oracle.com>
 References: <1571102367-31595-1-git-send-email-zhenzhong.duan@oracle.com>
@@ -73,16 +73,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This reverts commit 34226b6b70980a8f81fff3c09a2c889f77edeeff.
+pr_*() is preferred than printk(KERN_* ...), after change all the print
+in arch/x86/kernel/kvm.c will have "kvm_guest: xxx" style.
 
-Commit 8990cac6e5ea ("x86/jump_label: Initialize static branching
-early") adds jump_label_init() call in setup_arch() to make static
-keys initialized early, so we could use the original simpler code
-again.
-
-The similar change for XEN is in commit 090d54bcbc54 ("Revert
-"x86/paravirt: Set up the virt_spin_lock_key after static keys get
-initialized"")
+No functional change.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
 Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -98,47 +92,116 @@ Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
 ---
- arch/x86/kernel/kvm.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ arch/x86/kernel/kvm.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index e820568..3bc6a266 100644
+index 3bc6a266..249f14a 100644
 --- a/arch/x86/kernel/kvm.c
 +++ b/arch/x86/kernel/kvm.c
-@@ -527,13 +527,6 @@ static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
- 	}
+@@ -7,6 +7,8 @@
+  *   Authors: Anthony Liguori <aliguori@us.ibm.com>
+  */
+ 
++#define pr_fmt(fmt) "kvm_guest: " fmt
++
+ #include <linux/context_tracking.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
+@@ -286,8 +288,8 @@ static void kvm_register_steal_time(void)
+ 		return;
+ 
+ 	wrmsrl(MSR_KVM_STEAL_TIME, (slow_virt_to_phys(st) | KVM_MSR_ENABLED));
+-	pr_info("kvm-stealtime: cpu %d, msr %llx\n",
+-		cpu, (unsigned long long) slow_virt_to_phys(st));
++	pr_info("stealtime: cpu %d, msr %llx\n", cpu,
++		(unsigned long long) slow_virt_to_phys(st));
  }
  
--static void __init kvm_smp_prepare_cpus(unsigned int max_cpus)
--{
--	native_smp_prepare_cpus(max_cpus);
--	if (kvm_para_has_hint(KVM_HINTS_REALTIME))
--		static_branch_disable(&virt_spin_lock_key);
--}
--
- static void __init kvm_smp_prepare_boot_cpu(void)
+ static DEFINE_PER_CPU_DECRYPTED(unsigned long, kvm_apic_eoi) = KVM_PV_EOI_DISABLED;
+@@ -321,8 +323,7 @@ static void kvm_guest_cpu_init(void)
+ 
+ 		wrmsrl(MSR_KVM_ASYNC_PF_EN, pa);
+ 		__this_cpu_write(apf_reason.enabled, 1);
+-		printk(KERN_INFO"KVM setup async PF for cpu %d\n",
+-		       smp_processor_id());
++		pr_info("setup async PF for cpu %d\n", smp_processor_id());
+ 	}
+ 
+ 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI)) {
+@@ -347,8 +348,7 @@ static void kvm_pv_disable_apf(void)
+ 	wrmsrl(MSR_KVM_ASYNC_PF_EN, 0);
+ 	__this_cpu_write(apf_reason.enabled, 0);
+ 
+-	printk(KERN_INFO"Unregister pv shared memory for cpu %d\n",
+-	       smp_processor_id());
++	pr_info("Unregister PV shared memory for cpu %d\n", smp_processor_id());
+ }
+ 
+ static void kvm_pv_guest_cpu_reboot(void *unused)
+@@ -469,7 +469,8 @@ static void __send_ipi_mask(const struct cpumask *mask, int vector)
+ 		} else {
+ 			ret = kvm_hypercall4(KVM_HC_SEND_IPI, (unsigned long)ipi_bitmap,
+ 				(unsigned long)(ipi_bitmap >> BITS_PER_LONG), min, icr);
+-			WARN_ONCE(ret < 0, "KVM: failed to send PV IPI: %ld", ret);
++			WARN_ONCE(ret < 0, "kvm_guest: failed to send PV IPI: %ld",
++				  ret);
+ 			min = max = apic_id;
+ 			ipi_bitmap = 0;
+ 		}
+@@ -479,7 +480,8 @@ static void __send_ipi_mask(const struct cpumask *mask, int vector)
+ 	if (ipi_bitmap) {
+ 		ret = kvm_hypercall4(KVM_HC_SEND_IPI, (unsigned long)ipi_bitmap,
+ 			(unsigned long)(ipi_bitmap >> BITS_PER_LONG), min, icr);
+-		WARN_ONCE(ret < 0, "KVM: failed to send PV IPI: %ld", ret);
++		WARN_ONCE(ret < 0, "kvm_guest: failed to send PV IPI: %ld",
++			  ret);
+ 	}
+ 
+ 	local_irq_restore(flags);
+@@ -509,7 +511,7 @@ static void kvm_setup_pv_ipi(void)
  {
- 	/*
-@@ -633,7 +626,6 @@ static void __init kvm_guest_init(void)
- 		apic_set_eoi_write(kvm_guest_apic_eoi_write);
+ 	apic->send_IPI_mask = kvm_send_ipi_mask;
+ 	apic->send_IPI_mask_allbutself = kvm_send_ipi_mask_allbutself;
+-	pr_info("KVM setup pv IPIs\n");
++	pr_info("setup PV IPIs\n");
+ }
  
- #ifdef CONFIG_SMP
--	smp_ops.smp_prepare_cpus = kvm_smp_prepare_cpus;
- 	smp_ops.smp_prepare_boot_cpu = kvm_smp_prepare_boot_cpu;
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_SCHED_YIELD) &&
+ static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
+@@ -631,11 +633,11 @@ static void __init kvm_guest_init(void)
  	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
-@@ -835,8 +827,10 @@ void __init kvm_spinlock_init(void)
- 	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
- 		return;
+ 	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+ 		smp_ops.send_call_func_ipi = kvm_smp_send_call_func_ipi;
+-		pr_info("KVM setup pv sched yield\n");
++		pr_info("setup PV sched yield\n");
+ 	}
+ 	if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "x86/kvm:online",
+ 				      kvm_cpu_online, kvm_cpu_down_prepare) < 0)
+-		pr_err("kvm_guest: Failed to install cpu hotplug callbacks\n");
++		pr_err("failed to install cpu hotplug callbacks\n");
+ #else
+ 	sev_map_percpu_data();
+ 	kvm_guest_cpu_init();
+@@ -738,7 +740,7 @@ static __init int kvm_setup_pv_tlb_flush(void)
+ 			zalloc_cpumask_var_node(per_cpu_ptr(&__pv_tlb_mask, cpu),
+ 				GFP_KERNEL, cpu_to_node(cpu));
+ 		}
+-		pr_info("KVM setup pv remote TLB flush\n");
++		pr_info("setup PV remote TLB flush\n");
+ 	}
  
--	if (kvm_para_has_hint(KVM_HINTS_REALTIME))
-+	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
-+		static_branch_disable(&virt_spin_lock_key);
+ 	return 0;
+@@ -866,8 +868,8 @@ static void kvm_enable_host_haltpoll(void *i)
+ void arch_haltpoll_enable(unsigned int cpu)
+ {
+ 	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
+-		pr_err_once("kvm: host does not support poll control\n");
+-		pr_err_once("kvm: host upgrade recommended\n");
++		pr_err_once("host does not support poll control\n");
++		pr_err_once("host upgrade recommended\n");
  		return;
-+	}
+ 	}
  
- 	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
- 	if (num_possible_cpus() == 1)
 -- 
 1.8.3.1
 
