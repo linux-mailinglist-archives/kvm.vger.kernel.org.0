@@ -2,87 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE9F7D6CFF
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 03:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F359D6D03
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 03:50:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727493AbfJOBrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 21:47:47 -0400
-Received: from mga11.intel.com ([192.55.52.93]:57388 "EHLO mga11.intel.com"
+        id S1727509AbfJOBu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 21:50:27 -0400
+Received: from mga02.intel.com ([134.134.136.20]:42639 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726476AbfJOBrq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 21:47:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726440AbfJOBu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 21:50:27 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 18:47:46 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 18:50:26 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; 
-   d="scan'208";a="189204875"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.239.196.183]) ([10.239.196.183])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 14 Oct 2019 18:47:43 -0700
-Subject: Re: [PATCH v2 2/4] perf/core: Provide a kernel-internal interface to
- pause perf_event
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
-        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20191013091533.12971-1-like.xu@linux.intel.com>
- <20191013091533.12971-3-like.xu@linux.intel.com>
- <20191014115158.GC2328@hirez.programming.kicks-ass.net>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <1aa1fa7e-6d06-3ab0-f9f9-9e90c9c0921c@linux.intel.com>
-Date:   Tue, 15 Oct 2019 09:47:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+   d="scan'208";a="185666579"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by orsmga007.jf.intel.com with ESMTP; 14 Oct 2019 18:50:24 -0700
+Date:   Tue, 15 Oct 2019 09:53:27 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        yu.c.zhang@intel.com, alazar@bitdefender.com
+Subject: Re: [PATCH v5 2/9] vmx: spp: Add control flags for Sub-Page
+ Protection(SPP)
+Message-ID: <20191015015327.GA8343@local-michael-cet-test.sh.intel.com>
+References: <20190917085304.16987-1-weijiang.yang@intel.com>
+ <20190917085304.16987-3-weijiang.yang@intel.com>
+ <CALMp9eSEkZiFq3RhTuJSUCx3WDJy4EfYHk7GDoN=MO9tRt4=hQ@mail.gmail.com>
+ <20191004210221.GB19503@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191014115158.GC2328@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191004210221.GB19503@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019/10/14 19:51, Peter Zijlstra wrote:
-> On Sun, Oct 13, 2019 at 05:15:31PM +0800, Like Xu wrote:
->> Exporting perf_event_pause() as an external accessor for kernel users (such
->> as KVM) who may do both disable perf_event and read count with just one
->> time to hold perf_event_ctx_lock. Also the value could be reset optionally.
+On Fri, Oct 04, 2019 at 02:02:22PM -0700, Sean Christopherson wrote:
+> On Fri, Oct 04, 2019 at 01:48:34PM -0700, Jim Mattson wrote:
+> > On Tue, Sep 17, 2019 at 1:52 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
+> > > @@ -7521,6 +7527,10 @@ static __init int hardware_setup(void)
+> > >         if (!cpu_has_vmx_flexpriority())
+> > >                 flexpriority_enabled = 0;
+> > >
+> > > +       if (cpu_has_vmx_ept_spp() && enable_ept &&
+> > > +           boot_cpu_has(X86_FEATURE_SPP))
+> > > +               spp_supported = 1;
+> > 
+> > Don't cpu_has_vmx_ept_spp() and boot_cpu_has(X86_FEATURE_SPP) test
+> > exactly the same thing?
 > 
->> +u64 perf_event_pause(struct perf_event *event, bool reset)
->> +{
->> +	struct perf_event_context *ctx;
->> +	u64 count, enabled, running;
->> +
->> +	ctx = perf_event_ctx_lock(event);
-> 
->> +	_perf_event_disable(event);
->> +	count = __perf_event_read_value(event, &enabled, &running);
->> +	if (reset)
->> +		local64_set(&event->count, 0);
-> 
-> This local64_set() already assumes there are no child events, so maybe
-> write the thing like:
-> 
-> 	WARN_ON_ONCE(event->attr.inherit);
-> 	_perf_event_disable(event);
-> 	count = local64_read(&event->count);
-> 	local64_set(&event->count, 0);
-> 
+> More or less.  I'm about to hit 'send' on a series to eliminate the
+> synthetic VMX features flags.  If that goes through, the X86_FEATURE_SPP
+> flag can also go away.
 
-Thanks. It looks good to me and I will apply this.
-
-> 
->> +	perf_event_ctx_unlock(event, ctx);
->> +
->> +	return count;
->> +}
->> +EXPORT_SYMBOL_GPL(perf_event_pause);
-> 
-
+Thank you, these two are synonyms. I'll remove one next time.
