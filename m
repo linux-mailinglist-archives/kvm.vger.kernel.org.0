@@ -2,169 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D162DD72B2
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 12:01:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7755D732C
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 12:26:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727350AbfJOKBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 06:01:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4040 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726834AbfJOKBT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Oct 2019 06:01:19 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9F9lqIg054714
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 06:01:19 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vkaftphx2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 06:01:18 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <maier@linux.ibm.com>;
-        Tue, 15 Oct 2019 11:01:15 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 15 Oct 2019 11:01:14 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9FA1CdM43843812
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 10:01:12 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9CA0B52050;
-        Tue, 15 Oct 2019 10:01:12 +0000 (GMT)
-Received: from oc4120165700.ibm.com (unknown [9.152.99.188])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 62D955204F;
-        Tue, 15 Oct 2019 10:01:12 +0000 (GMT)
-Subject: Re: [RFC PATCH 2/4] vfio-ccw: Trace the FSM jumptable
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20191014180855.19400-1-farman@linux.ibm.com>
- <20191014180855.19400-3-farman@linux.ibm.com>
-From:   Steffen Maier <maier@linux.ibm.com>
-Date:   Tue, 15 Oct 2019 12:01:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1730619AbfJOK01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 06:26:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50072 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726508AbfJOK00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 06:26:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C3DBA306F4AB;
+        Tue, 15 Oct 2019 10:26:22 +0000 (UTC)
+Received: from gondolin (dhcp-192-233.str.redhat.com [10.33.192.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6ACB65DA8C;
+        Tue, 15 Oct 2019 10:26:09 +0000 (UTC)
+Date:   Tue, 15 Oct 2019 12:26:07 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com
+Subject: Re: [PATCH V3 1/7] mdev: class id support
+Message-ID: <20191015122607.126e3960.cohuck@redhat.com>
+In-Reply-To: <20191011081557.28302-2-jasowang@redhat.com>
+References: <20191011081557.28302-1-jasowang@redhat.com>
+        <20191011081557.28302-2-jasowang@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191014180855.19400-3-farman@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19101510-0016-0000-0000-000002B83110
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101510-0017-0000-0000-000033194ECB
-Message-Id: <96431f2f-774c-0be2-54ef-ebcaa4ae7298@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-15_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910150091
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 15 Oct 2019 10:26:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/14/19 8:08 PM, Eric Farman wrote:
-> It would be nice if we could track the sequence of events within
-> vfio-ccw, based on the state of the device/FSM and our calling
-> sequence within it.  So let's add a simple trace here so we can
-> watch the states change as things go, and allow it to be folded
-> into the rest of the other cio traces.
+On Fri, 11 Oct 2019 16:15:51 +0800
+Jason Wang <jasowang@redhat.com> wrote:
+
+> Mdev bus only supports vfio driver right now, so it doesn't implement
+> match method. But in the future, we may add drivers other than vfio,
+> the first driver could be virtio-mdev. This means we need to add
+> device class id support in bus match method to pair the mdev device
+> and mdev driver correctly.
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> So this patch adds id_table to mdev_driver and class_id for mdev
+> device with the match method for mdev bus.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->   drivers/s390/cio/vfio_ccw_private.h |  1 +
->   drivers/s390/cio/vfio_ccw_trace.c   |  1 +
->   drivers/s390/cio/vfio_ccw_trace.h   | 26 ++++++++++++++++++++++++++
->   3 files changed, 28 insertions(+)
+>  Documentation/driver-api/vfio-mediated-device.rst |  7 ++++++-
+>  drivers/gpu/drm/i915/gvt/kvmgt.c                  |  1 +
+>  drivers/s390/cio/vfio_ccw_ops.c                   |  1 +
+>  drivers/s390/crypto/vfio_ap_ops.c                 |  1 +
+>  drivers/vfio/mdev/mdev_core.c                     | 11 +++++++++++
+>  drivers/vfio/mdev/mdev_driver.c                   | 14 ++++++++++++++
+>  drivers/vfio/mdev/mdev_private.h                  |  1 +
+>  drivers/vfio/mdev/vfio_mdev.c                     |  6 ++++++
+>  include/linux/mdev.h                              |  8 ++++++++
+>  include/linux/mod_devicetable.h                   |  8 ++++++++
+>  samples/vfio-mdev/mbochs.c                        |  1 +
+>  samples/vfio-mdev/mdpy.c                          |  1 +
+>  samples/vfio-mdev/mtty.c                          |  1 +
+>  13 files changed, 60 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-> index bbe9babf767b..9b9bb4982972 100644
-> --- a/drivers/s390/cio/vfio_ccw_private.h
-> +++ b/drivers/s390/cio/vfio_ccw_private.h
-> @@ -135,6 +135,7 @@ extern fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS];
->   static inline void vfio_ccw_fsm_event(struct vfio_ccw_private *private,
->   				     int event)
->   {
-> +	trace_vfio_ccw_fsm_event(private->sch->schid, private->state, event);
->   	vfio_ccw_jumptable[private->state][event](private, event);
->   }
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_trace.c b/drivers/s390/cio/vfio_ccw_trace.c
-> index d5cc943c6864..b37bc68e7f18 100644
-> --- a/drivers/s390/cio/vfio_ccw_trace.c
-> +++ b/drivers/s390/cio/vfio_ccw_trace.c
-> @@ -9,4 +9,5 @@
->   #define CREATE_TRACE_POINTS
->   #include "vfio_ccw_trace.h"
-> 
-> +EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_event);
->   EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_io_fctl);
-> diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
-> index 2a2937a40124..24a8152acfdf 100644
-> --- a/drivers/s390/cio/vfio_ccw_trace.h
-> +++ b/drivers/s390/cio/vfio_ccw_trace.h
-> @@ -17,6 +17,32 @@
-> 
->   #include <linux/tracepoint.h>
-> 
-> +TRACE_EVENT(vfio_ccw_fsm_event,
-> +	TP_PROTO(struct subchannel_id schid, int state, int event),
-> +	TP_ARGS(schid, state, event),
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+> index 25eb7d5b834b..2035e48da7b2 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -102,12 +102,14 @@ structure to represent a mediated device's driver::
+>        * @probe: called when new device created
+>        * @remove: called when device removed
+>        * @driver: device driver structure
+> +      * @id_table: the ids serviced by this driver
+>        */
+>       struct mdev_driver {
+>  	     const char *name;
+>  	     int  (*probe)  (struct device *dev);
+>  	     void (*remove) (struct device *dev);
+>  	     struct device_driver    driver;
+> +	     const struct mdev_class_id *id_table;
+>       };
+>  
+>  A mediated bus driver for mdev should use this structure in the function calls
+> @@ -165,12 +167,15 @@ register itself with the mdev core driver::
+>  	extern int  mdev_register_device(struct device *dev,
+>  	                                 const struct mdev_parent_ops *ops);
+>  
+> +It is also required to specify the class_id through::
 > +
-> +	TP_STRUCT__entry(
-> +		__field(u8, cssid)
-> +		__field(u8, ssid)
-> +		__field(u16, schno)
-> +		__field(int, state)
-> +		__field(int, event)
-> +	),
+> +	extern int mdev_set_class(struct device *dev, u16 id);
+
+Should the document state explicitly that this should be done in the
+->create() callback? Also, I think that the class_id might be different
+for different mdevs (even if the parent is the same) -- should that be
+mentioned explicitly?
+
 > +
-> +	TP_fast_assign(
-> +		__entry->cssid = schid.cssid;
-> +		__entry->ssid = schid.ssid;
-> +		__entry->schno = schid.sch_no;
-> +		__entry->state = state;
-> +		__entry->event = event;
-> +	),
-> +
-> +	TP_printk("schid=%x.%x.%04x state=%x event=%x",
+>  However, the mdev_parent_ops structure is not required in the function call
+>  that a driver should use to unregister itself with the mdev core driver::
+>  
+>  	extern void mdev_unregister_device(struct device *dev);
+>  
+> -
+>  Mediated Device Management Interface Through sysfs
+>  ==================================================
+>  
+(...)
 
-/sys/kernel/debug/tracing/events](0)# grep -R '%[^%]*x'
-
-Many existing TPs often seem to format hex output with a 0x prefix (either 
-explicit with 0x%x or implicit with %#x). Since some of your other TPs also 
-output decimal integer values, I wonder if a distinction would help 
-unexperienced TP readers.
-
-> +		__entry->cssid, __entry->ssid, __entry->schno,
-> +		__entry->state,
-> +		__entry->event)
-> +);
-> +
->   TRACE_EVENT(vfio_ccw_io_fctl,
->   	TP_PROTO(int fctl, struct subchannel_id schid, int errno, char *errstr),
->   	TP_ARGS(fctl, schid, errno, errstr),
-> 
-
-
--- 
-Mit freundlichen Gruessen / Kind regards
-Steffen Maier
-
-Linux on IBM Z Development
-
-https://www.ibm.com/privacy/us/en/
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Matthias Hartmann
-Geschaeftsfuehrung: Dirk Wittkopp
-Sitz der Gesellschaft: Boeblingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
-
+Looks reasonable to me.
