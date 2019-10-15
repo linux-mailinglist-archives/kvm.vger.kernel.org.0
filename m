@@ -2,85 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AF3CD814F
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5120D81ED
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 23:19:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727673AbfJOUqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 16:46:19 -0400
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:37860 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389450AbfJOUqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 16:46:17 -0400
-Received: by mail-pg1-f201.google.com with SMTP id h189so15939119pgc.4
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 13:46:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=quKYm0mwun9UM5OyPYkD/7dKTJN6At1fRn2/XNsALnY=;
-        b=lsR2teOpZi0PGMPRfXOfIXhnjavNDWfV3OOfWXQhPJZXPHLWTHzFIuc1S3zOq4IpBS
-         g/8zKjnkQrLSohTosPcfGlmBjjXtbELDCSvqRk6+1uyjpUX1ugCW2Cg0iTXwpH48UN5w
-         uq2NDlykaAmlaiNbZq43O890o7fxBTe6oEw9EmbZGPNpIL/fZqXwLREj8szYYoA/9lUI
-         vxzDiyFB7k4EIVoQHIdP6haEzD8FjY90nDRony+en4dlHQpObKvGzzM6gqpCq5NYoBUM
-         t/pOXCoY2gqA4nYkmaGaErtFJT1E8LOv2BIxbIRXMrP88yPeGbRCRnRwx6n9YXnxTcUZ
-         nS+Q==
+        id S1727211AbfJOVTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 17:19:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34326 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726335AbfJOVTO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 17:19:14 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CFDC1368E2
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 21:19:14 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id n59so22573065qtd.8
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 14:19:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=quKYm0mwun9UM5OyPYkD/7dKTJN6At1fRn2/XNsALnY=;
-        b=TOR4ZWFeWxUA6ZR1dKJtgqht2vubY0IlQJoCihvQyaRT8OA4xGVVx1dzcRs3upEcJm
-         bw7/RrSr76ZE0tGoFF0zO+9sUm8ET9tne/7ncJQ5fGdQ3iFcCyaXvDr3W+D2qhBk/cY7
-         Dfc2SqHPyvEzIerUkLIksqZ/LVSJUiz4jCwF251D71Dd/qgTvsht9hHTTkmye10s5+CH
-         EK2RLtl3pCKLwvmBXjLRRyMWrdaIOgNwBv8GepkBN86ylQIzc6ecB8WBg+ocTxcdg7c3
-         k+tTaJQGAi7p2BJiaGmA9Wr+7QNOaiT5hW8Nm80Wu31wEeYUs1xbbI0pC4e46J4Zb1rc
-         Z/dg==
-X-Gm-Message-State: APjAAAUaf/4VozlvCL+PP3NzOmlFjvv1Kz8mbcBxscZScwOSctsb6EwR
-        LxwD6B9MrIK72Fs8S/myfMyHZAeCvk/MlCoKTL1vk6Ngv/j6N5udXGRZONigE3RAvnzR4t9FpY/
-        ERyN7YHvkQ6QUbQfiGqj5FnXERBB2pzt/YptromVtPlKecNFtSzZwMg==
-X-Google-Smtp-Source: APXvYqycK9pnKJEmTPgPTE5gxSPjSUqDAV4kyORDA3KCrLW21kuu43GDGOb6DdmMuUcBmxAlqyCUQyuNfQ==
-X-Received: by 2002:a63:cf4d:: with SMTP id b13mr39874674pgj.396.1571172374258;
- Tue, 15 Oct 2019 13:46:14 -0700 (PDT)
-Date:   Tue, 15 Oct 2019 13:46:03 -0700
-In-Reply-To: <20191015204603.47845-1-morbo@google.com>
-Message-Id: <20191015204603.47845-3-morbo@google.com>
-Mime-Version: 1.0
-References: <20191012074454.208377-1-morbo@google.com> <20191015204603.47845-1-morbo@google.com>
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [kvm-unit-tests v2 PATCH 2/2] x86: don't compare two global objects'
- addrs for inequality
-From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, alexandru.elisei@arm.com,
-        thuth@redhat.com
-Cc:     jmattson@google.com, Bill Wendling <morbo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=dL6rRUzanF/mngAS+r+PSLw0RQ+CPB/xDAExf30z58I=;
+        b=BRL2iG8IPbjCW3wiT7AjoMxJTeT59CZoRV1CQDOyRRm3pbgnGt460TDfCB9enm6k6+
+         GEYpcG2OuWEfT1LRdbB8aS/GluTPLLd0TSpCeT8o2+mc8EzXcwdL7MVR5XpY2S9CkomY
+         4RmC4r0jOqHr+oR/aW9aYbgT9+V/adtWhUlEks2PZrNVRgR9L4M8PuAWNoHSeWSCMtXI
+         XLfK1Ja18J8Zd0/dtLP20/sCZRVlxRsuGLY5rk0UNFTVPt58QlSdytJJ84BRy5ui8SJz
+         aQLg9nHT2RypDqKkoRe2pCcXR1kX8MmKKEIlbE0j21dHKvxsKI+PVyc/JsFLsO2nwAcS
+         Kn+Q==
+X-Gm-Message-State: APjAAAUnXk3o5y0Rpl7XgjxGAoCx0HGEYSKyiKabLp1RiWEUyHwsNj1T
+        zGXecPdY4aefOQ2Fev4u8qwE7c/0+Vjig4hoznelUDOlzfQAbdVXODRIi+PACGdnRy4OU/P5B5h
+        4rVFm0jIr6XHx
+X-Received: by 2002:a0c:f612:: with SMTP id r18mr38402297qvm.56.1571174353652;
+        Tue, 15 Oct 2019 14:19:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzMCqTGbwZd7p8eXtvsCO6t1D+F0697yJqDJ1oBBJZwAb7HGPZvXklyA5piJoGL8p8xGUaolQ==
+X-Received: by 2002:a0c:f612:: with SMTP id r18mr38402264qvm.56.1571174353431;
+        Tue, 15 Oct 2019 14:19:13 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id q44sm14292649qtk.16.2019.10.15.14.19.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2019 14:19:12 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 17:19:08 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jan.kiszka@web.de, mst@redhat.com
+Subject: [PULL] vhost: cleanups and fixes
+Message-ID: <20191015171908-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Two global objects can't have the same address in C. Clang uses this
-fact to omit the check on the first iteration of the loop in
-check_exception_table. Avoid compariting inequality by using less-than.
+The following changes since commit da0c9ea146cbe92b832f1b0f694840ea8eb33cce:
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- lib/x86/desc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Linux 5.4-rc2 (2019-10-06 14:27:30 -0700)
 
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index 451f504..4002203 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -113,7 +113,7 @@ static void check_exception_table(struct ex_regs *regs)
- 		(((regs->rflags >> 16) & 1) << 8);
-     asm("mov %0, %%gs:4" : : "r"(ex_val));
- 
--    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
-+    for (ex = &exception_table_start; ex < &exception_table_end; ++ex) {
-         if (ex->rip == regs->rip) {
-             regs->rip = ex->handler;
-             return;
--- 
-2.23.0.700.g56cf767bdb-goog
+are available in the Git repository at:
 
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 245cdd9fbd396483d501db83047116e2530f245f:
+
+  vhost/test: stop device before reset (2019-10-13 09:38:27 -0400)
+
+----------------------------------------------------------------
+virtio: fixes
+
+Some minor bugfixes
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Michael S. Tsirkin (3):
+      tools/virtio: more stubs
+      tools/virtio: xen stub
+      vhost/test: stop device before reset
+
+ drivers/vhost/test.c             | 2 ++
+ tools/virtio/crypto/hash.h       | 0
+ tools/virtio/linux/dma-mapping.h | 2 ++
+ tools/virtio/xen/xen.h           | 6 ++++++
+ 4 files changed, 10 insertions(+)
+ create mode 100644 tools/virtio/crypto/hash.h
+ create mode 100644 tools/virtio/xen/xen.h
