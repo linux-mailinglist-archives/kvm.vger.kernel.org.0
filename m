@@ -2,330 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5004CD7E02
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 19:44:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E032D7E40
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 19:57:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727327AbfJORoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 13:44:19 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:34331 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfJORoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 13:44:18 -0400
-Received: by mail-pl1-f202.google.com with SMTP id 70so12525674ple.1
-        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 10:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Pj7EJ/s+9Kdru3qVsTpipfhWySxdmFUXdi38jGAkWaU=;
-        b=M91s3QfTNSD2A1aTfAentlt5eCqInU8BDMFdAQl8YZsVeNYWc87WGB24pJbWiE3tJV
-         qNuYFfTw6aUIO3gswM8fz9YDWw5Apvjqh1O7lX0v/x/ynnc5qA+WaijgoGZBLssaJccD
-         jaTePeg6mbUEQ8UOuGjVXV5CNKuVouo/K4GHj3abXfTUiJX16WyZEYNt47PIuB12w/Ks
-         n85si44Zac6h0K+uCWDMx3ez0BqyTLMN9c82dSQO4mJA/lYVgPNO3AQxYcUZxQ7vbbPl
-         M2yT7+syya6hC2yVITZ00i0tI5eeTnHgD3XBkH9nATrq5f22emhHLaZjtdY4QVgemJ9E
-         D7Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Pj7EJ/s+9Kdru3qVsTpipfhWySxdmFUXdi38jGAkWaU=;
-        b=rZWCbi0GRuI8y8lgZJyqjKXQzi6GsMPOy5eIpPxNuGclZ/YdStRTse+GWUcjGCQtAR
-         4IB4w6zjMwTZDD7dc6QoanjWgsd57anBQIHlp0ymgXhHCJE3VtBJbw+VXY5s+J/uagR9
-         CvV+feFjdzIrRLPp5DSLq00xb6GFcxOYwz0abzJlXifNp8SngzOB1ziuRJ9vz3NpMORC
-         9aZqi74Lvx1b93n/GEPrfhKSfpYURsEg7oPASEMCg/CRFmMZXBSqejf52GH4rJyifqDj
-         7aO7bbNV12mVQ6RmOWhkCCCDLbIiyYuw0E9VcRcY4Mdx6rnkDFW7uFExcxbBDJvCJRbM
-         ZoDQ==
-X-Gm-Message-State: APjAAAUd4SoYgKhVA4JxFgwqOZ3aTYCNOAujGsjIn3w0cXRSORxZ/rPl
-        2sHssnFXrREREqCvVKC8AN9MqZ42AbBEucNsiUX2igWeV0i5w59nDDZP9SRv11gUjEt3OHU6xrx
-        KkiowHcyKlT/DuDGriwan7zCFLvgWcRdtd81fShXWeA+UNXdndbPLqbS+Axh6q10=
-X-Google-Smtp-Source: APXvYqxT4RXntVrT1LOcAbktxIQqO9uVHUU3qUgtjnnkhQPVsDqFo92xDH0HnLHC48q/zg2M98o9fj8JhgxonQ==
-X-Received: by 2002:a65:5a8c:: with SMTP id c12mr2612169pgt.140.1571161457144;
- Tue, 15 Oct 2019 10:44:17 -0700 (PDT)
-Date:   Tue, 15 Oct 2019 10:44:05 -0700
-Message-Id: <20191015174405.163723-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.23.0.700.g56cf767bdb-goog
-Subject: [PATCH v5] KVM: nVMX: Don't leak L1 MMIO regions to L2
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, Dan Cross <dcross@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1731408AbfJOR44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 13:56:56 -0400
+Received: from foss.arm.com ([217.140.110.172]:44770 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726973AbfJOR44 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 13:56:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15214337;
+        Tue, 15 Oct 2019 10:56:55 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E5813F6C4;
+        Tue, 15 Oct 2019 10:56:53 -0700 (PDT)
+Date:   Tue, 15 Oct 2019 18:56:51 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Steven Price <steven.price@arm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 01/10] KVM: arm64: Document PV-time interface
+Message-ID: <20191015175651.GF24604@lakrids.cambridge.arm.com>
+References: <20191011125930.40834-1-steven.price@arm.com>
+ <20191011125930.40834-2-steven.price@arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191011125930.40834-2-steven.price@arm.com>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the "virtualize APIC accesses" VM-execution control is set in the
-VMCS, the APIC virtualization hardware is triggered when a page walk
-in VMX non-root mode terminates at a PTE wherein the address of the 4k
-page frame matches the APIC-access address specified in the VMCS. On
-hardware, the APIC-access address may be any valid 4k-aligned physical
-address.
+Hi Steven,
 
-KVM's nVMX implementation enforces the additional constraint that the
-APIC-access address specified in the vmcs12 must be backed by
-a "struct page" in L1. If not, L0 will simply clear the "virtualize
-APIC accesses" VM-execution control in the vmcs02.
+On Fri, Oct 11, 2019 at 01:59:21PM +0100, Steven Price wrote:
+> Introduce a paravirtualization interface for KVM/arm64 based on the
+> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
 
-The problem with this approach is that the L1 guest has arranged the
-vmcs12 EPT tables--or shadow page tables, if the "enable EPT"
-VM-execution control is clear in the vmcs12--so that the L2 guest
-physical address(es)--or L2 guest linear address(es)--that reference
-the L2 APIC map to the APIC-access address specified in the
-vmcs12. Without the "virtualize APIC accesses" VM-execution control in
-the vmcs02, the APIC accesses in the L2 guest will directly access the
-APIC-access page in L1.
+I notice that as published, this is a BETA Draft, with the explicit
+note:
 
-When there is no mapping whatsoever for the APIC-access address in L1,
-the L2 VM just loses the intended APIC virtualization. However, when
-the APIC-access address is mapped to an MMIO region in L1, the L2
-guest gets direct access to the L1 MMIO device. For example, if the
-APIC-access address specified in the vmcs12 is 0xfee00000, then L2
-gets direct access to L1's APIC.
+| This document is for review purposes only and should not be used
+| for any implementation as changes are likely.
 
-Since this vmcs12 configuration is something that KVM cannot
-faithfully emulate, the appropriate response is to exit to userspace
-with KVM_INTERNAL_ERROR_EMULATION.
+... what's the plan for getting a finalised version published?
 
-Fixes: fe3ef05c7572 ("KVM: nVMX: Prepare vmcs02 from vmcs01 and vmcs12")
-Reported-by: Dan Cross <dcross@google.com>
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-v4 -> v5: Concatenated two lines
-v3 -> v4: Changed enum enter_vmx_status to enum nvmx_vmentry_status;
-          clarified debug message in nested_get_vmcs12_pages();
-          moved nested_vmx_enter_non_root_mode() error handling in
-          nested_vmx_run() out-of-line
-v2 -> v3: Added default case to new switch in nested_vmx_run
-v1 -> v2: Added enum enter_vmx_status
+> This only adds the details about "Stolen Time" as the details of "Live
+> Physical Time" have not been fully agreed.
 
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/nested.c       | 64 ++++++++++++++++++---------------
- arch/x86/kvm/vmx/nested.h       | 13 ++++++-
- arch/x86/kvm/x86.c              |  8 +++--
- 4 files changed, 55 insertions(+), 32 deletions(-)
+... and what do we expect to happen on this front?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 50eb430b0ad8..24d6598dea29 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1189,7 +1189,7 @@ struct kvm_x86_ops {
- 	int (*set_nested_state)(struct kvm_vcpu *vcpu,
- 				struct kvm_nested_state __user *user_kvm_nested_state,
- 				struct kvm_nested_state *kvm_state);
--	void (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
-+	bool (*get_vmcs12_pages)(struct kvm_vcpu *vcpu);
- 
- 	int (*smi_allowed)(struct kvm_vcpu *vcpu);
- 	int (*pre_enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e76eb4f07f6c..0e7c9301fe86 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2917,7 +2917,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 						 struct vmcs12 *vmcs12);
- 
--static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
-+static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -2937,19 +2937,18 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 			vmx->nested.apic_access_page = NULL;
- 		}
- 		page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->apic_access_addr);
--		/*
--		 * If translation failed, no matter: This feature asks
--		 * to exit when accessing the given address, and if it
--		 * can never be accessed, this feature won't do
--		 * anything anyway.
--		 */
- 		if (!is_error_page(page)) {
- 			vmx->nested.apic_access_page = page;
- 			hpa = page_to_phys(vmx->nested.apic_access_page);
- 			vmcs_write64(APIC_ACCESS_ADDR, hpa);
- 		} else {
--			secondary_exec_controls_clearbit(vmx,
--				SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES);
-+			pr_debug_ratelimited("%s: no backing 'struct page' for APIC-access address in vmcs12\n",
-+					     __func__);
-+			vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-+			vcpu->run->internal.suberror =
-+				KVM_INTERNAL_ERROR_EMULATION;
-+			vcpu->run->internal.ndata = 0;
-+			return false;
- 		}
- 	}
- 
-@@ -2994,6 +2993,7 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 		exec_controls_setbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
- 	else
- 		exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
-+	return true;
- }
- 
- /*
-@@ -3032,13 +3032,15 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- /*
-  * If from_vmentry is false, this is being called from state restore (either RSM
-  * or KVM_SET_NESTED_STATE).  Otherwise it's called from vmlaunch/vmresume.
--+ *
--+ * Returns:
--+ *   0 - success, i.e. proceed with actual VMEnter
--+ *   1 - consistency check VMExit
--+ *  -1 - consistency check VMFail
-+ *
-+ * Returns:
-+ *	NVMX_ENTRY_SUCCESS: Entered VMX non-root mode
-+ *	NVMX_ENTRY_VMFAIL:  Consistency check VMFail
-+ *	NVMX_ENTRY_VMEXIT:  Consistency check VMExit
-+ *	NVMX_ENTRY_KVM_INTERNAL_ERROR: KVM internal error
-  */
--int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
-+enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
-+							bool from_vmentry)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-@@ -3081,11 +3083,12 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 	prepare_vmcs02_early(vmx, vmcs12);
- 
- 	if (from_vmentry) {
--		nested_get_vmcs12_pages(vcpu);
-+		if (unlikely(!nested_get_vmcs12_pages(vcpu)))
-+			return NVMX_VMENTRY_KVM_INTERNAL_ERROR;
- 
- 		if (nested_vmx_check_vmentry_hw(vcpu)) {
- 			vmx_switch_vmcs(vcpu, &vmx->vmcs01);
--			return -1;
-+			return NVMX_VMENTRY_VMFAIL;
- 		}
- 
- 		if (nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
-@@ -3149,7 +3152,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 	 * returned as far as L1 is concerned. It will only return (and set
- 	 * the success flag) when L2 exits (see nested_vmx_vmexit()).
- 	 */
--	return 0;
-+	return NVMX_VMENTRY_SUCCESS;
- 
- 	/*
- 	 * A failed consistency check that leads to a VMExit during L1's
-@@ -3165,14 +3168,14 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
- 
- 	if (!from_vmentry)
--		return 1;
-+		return NVMX_VMENTRY_VMEXIT;
- 
- 	load_vmcs12_host_state(vcpu, vmcs12);
- 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
- 	vmcs12->exit_qualification = exit_qual;
- 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
- 		vmx->nested.need_vmcs12_to_shadow_sync = true;
--	return 1;
-+	return NVMX_VMENTRY_VMEXIT;
- }
- 
- /*
-@@ -3182,9 +3185,9 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- {
- 	struct vmcs12 *vmcs12;
-+	enum nvmx_vmentry_status status;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	u32 interrupt_shadow = vmx_get_interrupt_shadow(vcpu);
--	int ret;
- 
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
-@@ -3244,13 +3247,9 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	 * the nested entry.
- 	 */
- 	vmx->nested.nested_run_pending = 1;
--	ret = nested_vmx_enter_non_root_mode(vcpu, true);
--	vmx->nested.nested_run_pending = !ret;
--	if (ret > 0)
--		return 1;
--	else if (ret)
--		return nested_vmx_failValid(vcpu,
--			VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-+	status = nested_vmx_enter_non_root_mode(vcpu, true);
-+	if (unlikely(status != NVMX_VMENTRY_SUCCESS))
-+		goto vmentry_failed;
- 
- 	/* Hide L1D cache contents from the nested guest.  */
- 	vmx->vcpu.arch.l1tf_flush_l1d = true;
-@@ -3281,6 +3280,15 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 		return kvm_vcpu_halt(vcpu);
- 	}
- 	return 1;
-+
-+vmentry_failed:
-+	vmx->nested.nested_run_pending = 0;
-+	if (status == NVMX_VMENTRY_KVM_INTERNAL_ERROR)
-+		return 0;
-+	if (status == NVMX_VMENTRY_VMEXIT)
-+		return 1;
-+	WARN_ON_ONCE(status != NVMX_VMENTRY_VMFAIL);
-+	return nested_vmx_failValid(vcpu, VMXERR_ENTRY_INVALID_CONTROL_FIELD);
- }
- 
- /*
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 187d39bf0bf1..6280f33e5fa6 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -6,6 +6,16 @@
- #include "vmcs12.h"
- #include "vmx.h"
- 
-+/*
-+ * Status returned by nested_vmx_enter_non_root_mode():
-+ */
-+enum nvmx_vmentry_status {
-+	NVMX_VMENTRY_SUCCESS,		/* Entered VMX non-root mode */
-+	NVMX_VMENTRY_VMFAIL,		/* Consistency check VMFail */
-+	NVMX_VMENTRY_VMEXIT,		/* Consistency check VMExit */
-+	NVMX_VMENTRY_KVM_INTERNAL_ERROR,/* KVM internal error */
-+};
-+
- void vmx_leave_nested(struct kvm_vcpu *vcpu);
- void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
- 				bool apicv);
-@@ -13,7 +23,8 @@ void nested_vmx_hardware_unsetup(void);
- __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
- void nested_vmx_vcpu_setup(void);
- void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
--int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry);
-+enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
-+						     bool from_vmentry);
- bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
- void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 		       u32 exit_intr_info, unsigned long exit_qualification);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf38526..2cf26f159071 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7941,8 +7941,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	bool req_immediate_exit = false;
- 
- 	if (kvm_request_pending(vcpu)) {
--		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu))
--			kvm_x86_ops->get_vmcs12_pages(vcpu);
-+		if (kvm_check_request(KVM_REQ_GET_VMCS12_PAGES, vcpu)) {
-+			if (unlikely(!kvm_x86_ops->get_vmcs12_pages(vcpu))) {
-+				r = 0;
-+				goto out;
-+			}
-+		}
- 		if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu))
- 			kvm_mmu_unload(vcpu);
- 		if (kvm_check_request(KVM_REQ_MIGRATE_TIMER, vcpu))
--- 
-2.23.0.700.g56cf767bdb-goog
+AFAICT, the spec hasn't changed since I called out issues in that area:
 
+  https://lore.kernel.org/r/20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com
+
+... and I'd feel much happier about supporting this if that were dropped
+from the finalised spec.
+
+> User space can specify a reserved area of memory for the guest and
+> inform KVM to populate the memory with information on time that the host
+> kernel has stolen from the guest.
+> 
+> A hypercall interface is provided for the guest to interrogate the
+> hypervisor's support for this interface and the location of the shared
+> memory structures.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  Documentation/virt/kvm/arm/pvtime.rst   | 77 +++++++++++++++++++++++++
+>  Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
+>  2 files changed, 91 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/pvtime.rst
+> 
+> diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
+> new file mode 100644
+> index 000000000000..de949933ec78
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/pvtime.rst
+> @@ -0,0 +1,77 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +Paravirtualized time support for arm64
+> +======================================
+> +
+> +Arm specification DEN0057/A defines a standard for paravirtualised time
+> +support for AArch64 guests:
+> +
+> +https://developer.arm.com/docs/den0057/a
+> +
+> +KVM/arm64 implements the stolen time part of this specification by providing
+> +some hypervisor service calls to support a paravirtualized guest obtaining a
+> +view of the amount of time stolen from its execution.
+> +
+> +Two new SMCCC compatible hypercalls are defined:
+> +
+> +* PV_TIME_FEATURES: 0xC5000020
+> +* PV_TIME_ST:       0xC5000021
+> +
+> +These are only available in the SMC64/HVC64 calling convention as
+> +paravirtualized time is not available to 32 bit Arm guests. The existence of
+> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
+> +mechanism before calling it.
+> +
+> +PV_TIME_FEATURES
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0xC5000020
+> +    PV_call_id:   (uint32)    The function to query for support.
+> +                              Currently only PV_TIME_ST is supported.
+> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+> +                              PV-time feature is supported by the hypervisor.
+> +    ============= ========    ==========
+> +
+> +PV_TIME_ST
+> +    ============= ========    ==========
+> +    Function ID:  (uint32)    0xC5000021
+> +    Return value: (int64)     IPA of the stolen time data structure for this
+> +                              VCPU. On failure:
+> +                              NOT_SUPPORTED (-1)
+> +    ============= ========    ==========
+> +
+> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+> +with inner and outer write back caching attributes, in the inner shareable
+> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
+> +meaningfully filled by the hypervisor (see structure below).
+
+At what granularity is this allowed to share IPA space with other
+mappings? The spec doesn't provide any guidance here, and I strongly
+suspect that it should.
+
+To support a 64K guest, we must ensure that this doesn't share a 64K IPA
+granule with any MMIO, and it probably only makes sense for an instance
+of this structure to share that granule with another vCPU's structure.
+
+We probably _also_ want to ensure that this doesn't share a 64K granule
+with memory the guest sees as regular system RAM. Otherwise we're liable
+to force it into having mismatched attributes for any of that RAM it
+happens to map as part of mapping the PV_TIME_ST structure.
+
+> +
+> +PV_TIME_ST returns the structure for the calling VCPU.
+> +
+> +Stolen Time
+> +-----------
+> +
+> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
+> +
+> ++-------------+-------------+-------------+----------------------------+
+> +| Field       | Byte Length | Byte Offset | Description                |
+> ++=============+=============+=============+============================+
+> +| Revision    |      4      |      0      | Must be 0 for version 1.0  |
+> ++-------------+-------------+-------------+----------------------------+
+> +| Attributes  |      4      |      4      | Must be 0                  |
+> ++-------------+-------------+-------------+----------------------------+
+> +| Stolen time |      8      |      8      | Stolen time in unsigned    |
+> +|             |             |             | nanoseconds indicating how |
+> +|             |             |             | much time this VCPU thread |
+> +|             |             |             | was involuntarily not      |
+> +|             |             |             | running on a physical CPU. |
+> ++-------------+-------------+-------------+----------------------------+
+> +
+> +All values in the structure are stored little-endian.
+
+Looking at the published DEN 0057A, endianness is never stated. Is this
+going to be corrected in the next release?
+
+Thanks,
+Mark.
