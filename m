@@ -2,252 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F9E4D811D
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:33:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D399AD8124
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 22:35:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387980AbfJOUdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 16:33:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41602 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387777AbfJOUdt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 15 Oct 2019 16:33:49 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9FKVxc6079101;
-        Tue, 15 Oct 2019 16:33:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vnkcabssx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Oct 2019 16:33:43 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9FKW3ER079609;
-        Tue, 15 Oct 2019 16:33:43 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vnkcabssj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Oct 2019 16:33:43 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9FKPPQK014834;
-        Tue, 15 Oct 2019 20:33:42 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma03dal.us.ibm.com with ESMTP id 2vk6f8x3pp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 15 Oct 2019 20:33:42 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9FKXeF514615496
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 20:33:40 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76700B2065;
-        Tue, 15 Oct 2019 20:33:40 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D5BBEB205F;
-        Tue, 15 Oct 2019 20:33:39 +0000 (GMT)
-Received: from [9.85.158.63] (unknown [9.85.158.63])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 15 Oct 2019 20:33:39 +0000 (GMT)
-Subject: Re: [PATCH v6 00/10] s390: vfio-ap: dynamic configuration support
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        jjherne@linux.ibm.com
-References: <1568410018-10833-1-git-send-email-akrowiak@linux.ibm.com>
- <20191008124807.49022238.pasic@linux.ibm.com>
- <ddd4e91a-312d-99e4-1f54-7bf3b03fb63e@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <99390e19-58f6-0f7e-0632-451d138671bc@linux.ibm.com>
-Date:   Tue, 15 Oct 2019 16:33:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S2388082AbfJOUfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 16:35:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54800 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728737AbfJOUfR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 16:35:17 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 23A7D8E1CE8;
+        Tue, 15 Oct 2019 20:35:17 +0000 (UTC)
+Received: from mail (ovpn-124-232.rdu2.redhat.com [10.10.124.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D5FA95DA8C;
+        Tue, 15 Oct 2019 20:35:16 +0000 (UTC)
+Date:   Tue, 15 Oct 2019 16:35:16 -0400
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+Message-ID: <20191015203516.GF331@redhat.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+ <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ddd4e91a-312d-99e4-1f54-7bf3b03fb63e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-15_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910150176
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.69]); Tue, 15 Oct 2019 20:35:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/8/19 8:57 AM, Pierre Morel wrote:
+On Tue, Oct 15, 2019 at 09:46:58PM +0200, Paolo Bonzini wrote:
+> On 15/10/19 18:49, Andrea Arcangeli wrote:
+> > On Tue, Oct 15, 2019 at 10:28:39AM +0200, Paolo Bonzini wrote:
+> >> If you're including EXIT_REASON_EPT_MISCONFIG (MMIO access) then you
+> >> should include EXIT_REASON_IO_INSTRUCTION too.  Depending on the devices
+> >> that are in the guest, the doorbell register might be MMIO or PIO.
+> > 
+> > The fact outb/inb devices exists isn't the question here. The question
+> > you should clarify is: which of the PIO devices is performance
+> > critical as much as MMIO with virtio/vhost?
 > 
-> On 10/8/19 12:48 PM, Halil Pasic wrote:
->> On Fri, 13 Sep 2019 17:26:48 -0400
->> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>
->>> The current design for AP pass-through does not support making dynamic
->>> changes to the AP matrix of a running guest resulting in three 
->>> deficiencies
->>> this patch series is intended to mitigate:
->>>
->>> 1. Adapters, domains and control domains can not be added to or removed
->>>     from a running guest. In order to modify a guest's AP configuration,
->>>     the guest must be terminated; only then can AP resources be assigned
->>>     to or unassigned from the guest's matrix mdev. The new AP 
->>> configuration
->>>     becomes available to the guest when it is subsequently restarted.
->>>
->>> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->>>     be modified by a root user without any restrictions. A change to 
->>> either
->>>     mask can result in AP queue devices being unbound from the vfio_ap
->>>     device driver and bound to a zcrypt device driver even if a guest is
->>>     using the queues, thus giving the host access to the guest's private
->>>     crypto data and vice versa.
->>>
->>> 3. The APQNs derived from the Cartesian product of the APIDs of the
->>>     adapters and APQIs of the domains assigned to a matrix mdev must
->>>     reference an AP queue device bound to the vfio_ap device driver.
->>>
->>> This patch series introduces the following changes to the current design
->>> to alleviate the shortcomings described above as well as to implement 
->>> more
->>> of the AP architecture:
->>>
->>> 1. A root user will be prevented from making changes to the AP bus's
->>>     /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the ownership of an APQN
->>>     changes from the vfio_ap device driver to a zcrypt driver when 
->>> the APQN
->>>     is assigned to a matrix mdev.
->>>
->>> 2. The sysfs bind/unbind interfaces will be disabled for the vfio_ap
->>>     device driver.
->>>
->> Doesn't this have the potential of breaking some userspace stuff that
->> might be out there?
->>
->>> 3. Allow AP resources to be assigned to or removed from a matrix mdev
->>>     while a guest is using it and hot plug the resource into or hot 
->>> unplug
->>>     the resource from the running guest.
->> This looks like a natural extension of the interface -- i.e. should not
->> break any userspace.
->>
->>> 4. Allow assignment of an AP adapter or domain to a matrix mdev even 
->>> if it
->>>     results in assignment of an APQN that does not reference an AP queue
->>>     device bound to the vfio_ap device driver, as long as the APQN is 
->>> owned
->>>     by the vfio_ap driver. Allowing over-provisioning of AP resources
->>>     better models the architecture which does not preclude assigning AP
->>>     resources that are not yet available in the system. If/when the 
->>> queue
->>>     becomes available to the host, it will immediately also become 
->>> available
->>>     to the guest.
->> Same here -- I don't think this change breaks any userspace.
->>
->>> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
->>> ----------------------------------------------------------
->>> Due to the extremely sensitive nature of cryptographic data, it is
->>> imperative that great care be taken to ensure that such data is secured.
->>> Allowing a root user, either inadvertently or maliciously, to configure
->>> these masks such that a queue is shared between the host and a guest is
->>> not only avoidable, it is advisable.
-> 
-> Just curious: how is it possible to do such a configuration?
+> virtio 0.9 uses PIO.
 
-In the current implementation of dedicated crypto, there is nothing
-stopping a sysadmin from changing the apmask/aqmask in manner that
-transfers ownership of one more APQNs from the vfio_ap device driver to
-zcrypt which results in unbinding the queue devices from vfio_ap and
-binding them to the zcrypt drive. If a guest happens to be using the
-queue at the time, both the host and guest will have access. That is
-fixed by this series.
+0.9 is a 12 years old protocol replaced several years ago. Anybody who
+needs high performance won't be running it, the others can't perform
+well to begin with, so I'm not sure exactly how it's relevant in this
+microoptimization context. We're not optimizing for emulated devices
+or other old stuff either.
 
-> 
-> 
->>>   It was suggested that this scenario
->>> is better handled in user space with management software, but that does
->>> not preclude a malicious administrator from using the sysfs interfaces
->>> to gain access to a guest's crypto data. It was also suggested that this
->>> scenario could be avoided by taking access to the adapter away from the
->>> guest and zeroing out the queues prior to the vfio_ap driver 
->>> releasing the
->>> device; however, stealing an adapter in use from a guest as a by-product
->>> of an operation is bad and will likely cause problems for the guest
->>> unnecessarily. It was decided that the most effective solution with the
->>> least number of negative side effects is to prevent the situation at the
->>> source.
-> 
-> 
-> Stealing an adapter in use by a guest, insn't it what is done if we 
-> allow to unassign an AP/Domain using the unassign sysfs interface when 
-> the mediated device is in use by the guest?
+> On virtual machines they're actually faster than MMIO because they don't
+> need to go through page table walks.
 
-Yes, but that is a deliberate action as opposed to a side effect of
-bind/unbind. It is the very definition of dynamic configuration (a.k.a.,
-hot plug/unplug).
+And how does it help that they're faster if current virtio stopped
+using them and nothing else recent uses PIO?
 
-> 
-> 
->>>
->>> 2. Rationale for disabling bind/unbind interfaces for vfio_ap driver:
->>> -----------------------------------------------------------------
->>> By disabling the bind/unbind interfaces for the vfio_ap device driver,
->>> the user is forced to use the AP bus's apmask/aqmask interfaces to 
->>> control
->>> the probing and removing of AP queues. There are two primary reasons for
->>> disabling the bind/unbind interfaces for the vfio_ap device driver:
->>>
->>> * The device architecture does not provide a means to prevent unbinding
->>>    a device from a device driver, so an AP queue device can be unbound
->>>    from the vfio_ap driver even when the queue is in use by a guest. By
->>>    disabling the unbind interface, the user is forced to use the AP 
->>> bus's
->>>    apmask/aqmask interfaces which will prevent this.
->>>
->> Isn't this fixed by your filtering (if implemented correctly)? BTW I 
->> believe
->> it solves the problem regardless whether the unbind was triggered by the
->> drivers unbind attribute or by a[pq]mask
->>
->>> * Binding of AP queues is controlled by the AP bus /sys/bus/ap/apmask 
->>> and
->>>    /sys/bus/ap/aqmask interfaces. If the masks indicate that an APQN is
->>>    owned by zcrypt, trying to bind it to the vfio_ap device driver will
->>>    fail; therefore, the bind interface is somewhat redundant and 
->>> certainly
->>>    unnecessary.
->>>
->>>
->>> Tony Krowiak (10):
->>>    s390: vfio-ap: Refactor vfio_ap driver probe and remove callbacks
->>>    s390: vfio-ap: allow assignment of unavailable AP resources to mdev
->>>      device
->>>    s390: vfio-ap: allow hot plug/unplug of AP resources using mdev 
->>> device
->>>    s390: vfio-ap: filter CRYCB bits for unavailable queue devices
->>>    s390: vfio-ap: sysfs attribute to display the guest CRYCB
->>>    s390: vfio-ap: update guest CRYCB in vfio_ap probe and remove
->>>      callbacks
->>>    s390: zcrypt: driver callback to indicate resource in use
->>>    s390: vfio-ap: implement in-use callback for vfio_ap driver
->>>    s390: vfio-ap: added versioning to vfio_ap module
->>>    s390: vfio-ap: update documentation
->> I believe it would be worthwhile to reorder the patches (fixes and
->> re-factoring first, the features).
->>
->> Regards,
->> Halil
->>
->>>   Documentation/s390/vfio-ap.rst        | 899 
->>> +++++++++++++++++++++++++---------
->>>   drivers/s390/crypto/ap_bus.c          | 144 +++++-
->>>   drivers/s390/crypto/ap_bus.h          |   4 +
->>>   drivers/s390/crypto/vfio_ap_drv.c     |  27 +-
->>>   drivers/s390/crypto/vfio_ap_ops.c     | 610 ++++++++++++++---------
->>>   drivers/s390/crypto/vfio_ap_private.h |  12 +-
->>>   6 files changed, 1200 insertions(+), 496 deletions(-)
->>>
+> HLT is certainly a slow path, the guest only invokes if things such as
 
+Your idea that HLT is a certainly is a slow path is only correct if
+you assume the host is IDLE, but the host is never idle if you use
+virt for consolidation.
+
+From the point of view of the host, HLT is like every other vmexit.
+
+> NAPI interrupt mitigation have failed.  As long as the guest stays in
+> halted state for a microsecond or so, the cost of retpoline will all but
+> disappear.
+
+The only thing that matters is the number of HLT vmexit per second and
+you just need to measure the number of HLT vmexits to tell it's
+needed.
+
+I've several workloads including eBPF tracing, not related to
+interrupts (that in turn cannot be mitigated by NAPI) that schedule
+frequently and hit 100k+ of HLT vmexits per second and the host is all
+but idle. There's no need of hardware interrupt to wake up tasks and
+schedule in the guest, scheduler IPIs and timers are more than enough.
+
+The only thing that can mitigate that is the cpuidle haltpoll driver,
+but it hit upstream a few months ago, all most recent enterprise
+guest OS won't have it yet.
+
+All it matters is how many vmexits per second there are, everything
+else including "why" they happen and what those vmexists means for the
+guest, is irrelevant, or it would be relevant only if the host was
+guaranteed to be idle but there's no such guarantee.
+
+If the host is using all idle CPUs to compute in the background
+(i.e. building the kernel) with SCHED_IDLE the HLT retpoline cost will
+not be any different than any other vmexit retpoline cost and easy
++100k HLT exit per second certainly puts it in the measurable
+territory.
+
+Here's a random example:
+
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time 
+
+                 HLT     101128    75.33%    99.66%      0.43us 901000.66us    310.88us ( +-   8.46% )
+              VMCALL      14089    10.50%     0.10%      1.32us     84.99us      2.14us ( +-   0.90% )
+           MSR_WRITE       8246     6.14%     0.03%      0.33us     32.79us      1.05us ( +-   1.51% )
+       EPT_VIOLATION       6312     4.70%     0.18%      0.50us  26426.07us      8.90us ( +-  48.58% )
+    PREEMPTION_TIMER       1730     1.29%     0.01%      0.55us     26.81us      1.60us ( +-   3.48% )
+  EXTERNAL_INTERRUPT       1329     0.99%     0.03%      0.27us    944.88us      6.04us ( +-  20.52% )
+       EPT_MISCONFIG        982     0.73%     0.01%      0.42us    137.68us      2.05us ( +-   9.88% )
+   PENDING_INTERRUPT        308     0.23%     0.00%      0.44us      4.32us      0.73us ( +-   2.57% )
+   PAUSE_INSTRUCTION         58     0.04%     0.00%      0.32us     18.55us      1.48us ( +-  23.12% )
+            MSR_READ         35     0.03%     0.00%      0.78us      5.55us      2.07us ( +-  10.74% )
+               CPUID         24     0.02%     0.00%      0.27us      2.20us      0.59us ( +-  13.43% )
+
+# careful despite the verifier promise that eBPF shouldn't be kernel
+# crashing this may be kernel crashing because there's no verifier at
+# all that verifies that the eBPF function calls available depending
+# on the hooking point can actually be invoked from the kernel hooking
+# points they're invoked from. this is why I tested it in a VM
+bpftrace -e 'kprobe:*interrupt* { @ = count() }'
+
+Other example with a pipe loop that just bounces a byte across a pipe
+with two processes:
+
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time 
+
+           MSR_WRITE     498945    80.49%     4.10%      0.33us     42.73us      0.44us ( +-   0.12% )
+                 HLT     118474    19.11%    95.88%      0.33us 707693.05us     43.56us ( +-  24.23% )
+    PREEMPTION_TIMER       1004     0.16%     0.01%      0.38us     25.47us      0.67us ( +-   5.69% )
+   PENDING_INTERRUPT        894     0.14%     0.01%      0.37us     20.98us      0.49us ( +-   4.94% )
+  EXTERNAL_INTERRUPT        518     0.08%     0.00%      0.26us     20.59us      0.51us ( +-   8.09% )
+            MSR_READ          8     0.00%     0.00%      0.66us      1.37us      0.92us ( +-   9.19% )
+       EPT_MISCONFIG          6     0.00%     0.00%      3.18us     32.71us     12.60us ( +-  43.58% )
+   PAUSE_INSTRUCTION          3     0.00%     0.00%      0.59us      1.69us      1.07us ( +-  30.38% )
+
+We wouldn't need to apply the cpuidle-haltpoll driver if HLT wasn't
+such a frequent vmexit that deserves to have its retpoline cost, not
+multiplied by 100000 times per second.
+
+Over time if everything will turn out to use the cpuidle-haltpoll
+driver by default (that however can increase the host CPU usage on
+laptops) we can consider removing the HLT optimization, we're not
+remotely there yet.
+
+> RDMSR again shouldn't be there, guests sometimes read the PMTimer (which
+> is an I/O port) or TSC but for example do not really ever read the APIC
+> TMCCT.
+
+We can try to drop RDMSR, and see if it's measurable. I already tried
+to re-add some of those retpolines but it was slower and this was the
+fastest combination that I got, I don't recall if I tried with RDMSR
+and PAUSE alone but I can try again.
+
+> > I'm pretty sure HLT/EXTERNAL_INTERRUPT/PENDING_INTERRUPT should be
+> > included.
+> > I also wonder if VMCALL should be added, certain loads hit on fairly
+> > frequent VMCALL, but none of the one I benchmarked.
+> 
+> I agree for external interrupt and pending interrupt, and VMCALL is fine
+> too.  In addition I'd add I/O instructions which are useful for some
+> guests and also for benchmarking (e.g. vmexit.flat has both IN and OUT
+> tests).
+
+Isn't it faster to use cpuid for benchmarking? I mean we don't want to
+pay for more than one branch for benchmarking (even cpuid is
+questionable in the long term, but for now it's handy to have), and
+unlike inb/outb, cpuid runs occasionally in all real life workloads
+(including in guest userland) so between inb/outb, I'd rather prefer
+to use cpuid as the benchmark vector because at least it has a chance
+to help real workloads a bit too.
+
+Thanks,
+Andrea
