@@ -2,137 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51470D6D87
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 05:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC5BD6D97
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 05:18:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727703AbfJODQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 14 Oct 2019 23:16:21 -0400
-Received: from mga09.intel.com ([134.134.136.24]:22884 "EHLO mga09.intel.com"
+        id S1727472AbfJODSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 14 Oct 2019 23:18:30 -0400
+Received: from mga07.intel.com ([134.134.136.100]:38579 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727697AbfJODQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 14 Oct 2019 23:16:21 -0400
+        id S1727195AbfJODSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 14 Oct 2019 23:18:30 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 20:16:20 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 20:18:29 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,297,1566889200"; 
-   d="scan'208";a="208093307"
+   d="scan'208";a="225283908"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Oct 2019 20:16:19 -0700
-Date:   Mon, 14 Oct 2019 20:16:19 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 14 Oct 2019 20:18:29 -0700
+Date:   Mon, 14 Oct 2019 20:18:28 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Andrea Arcangeli <aarcange@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 02/14] KVM: monolithic: x86: disable linking vmx and svm
- at the same time into the kernel
-Message-ID: <20191015031619.GD24895@linux.intel.com>
+Subject: Re: [PATCH 01/14] KVM: monolithic: x86: remove kvm.ko
+Message-ID: <20191015031828.GE24895@linux.intel.com>
 References: <20190928172323.14663-1-aarcange@redhat.com>
- <20190928172323.14663-3-aarcange@redhat.com>
+ <20190928172323.14663-2-aarcange@redhat.com>
+ <20191015013144.GC24895@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190928172323.14663-3-aarcange@redhat.com>
+In-Reply-To: <20191015013144.GC24895@linux.intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 28, 2019 at 01:23:11PM -0400, Andrea Arcangeli wrote:
-> Linking both vmx and svm into the kernel at the same time isn't
-> possible anymore or the kvm_x86/kvm_x86_pmu external function names
-> would collide.
+On Mon, Oct 14, 2019 at 06:31:44PM -0700, Sean Christopherson wrote:
+> On Sat, Sep 28, 2019 at 01:23:10PM -0400, Andrea Arcangeli wrote:
+> > This is the first commit of a patch series that aims to replace the
+> > modular kvm.ko kernel module with a monolithic kvm-intel/kvm-amd
+> > model. This change has the only possible cons of wasting some disk
+> > space in /lib/modules/. The pros are that it saves CPUS and some minor
+> > RAM which are more scarse resources than disk space.
+> > 
+> > The pointer to function virtual template model cannot provide any
+> > runtime benefit because kvm-intel and kvm-amd can't be loaded at the
+> > same time.
+> > 
+> > This removes kvm.ko and it links and duplicates all kvm.ko objects to
+> > both kvm-amd and kvm-intel.
 > 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
-> ---
->  arch/x86/kvm/Kconfig | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index 840e12583b85..e1601c54355e 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -59,9 +59,29 @@ config KVM
->  
->  	  If unsure, say N.
->  
-> +if KVM=y
+> The KVM config option should be changed to a bool and its help text
+> updated.  Maybe something similar to the help for VIRTUALIZATION to make
+> it clear that enabling KVM on its own does nothing.
 
-Hmm, I see why the previous patch left KVM as a tristate.  I tried a
-variety of hacks to let KVM be a bool but nothing worked.
+Making KVM a bool doesn't work well, keeping it a tristate and keying off
+KVM=y to force Intel or AMD (as done in the next patch) looks like the
+cleanest implementation.
 
-> +
-> +choice
-> +	prompt "To link KVM statically into the kernel you need to choose"
-> +	help
-> +	  In order to build a kernel with support for both AMD and Intel
-> +	  CPUs, you need to set CONFIG_KVM=m.
-> +
-> +config KVM_AMD_STATIC
-> +	select KVM_AMD
-> +	bool "Link KVM AMD statically into the kernel"
-> +
-> +config KVM_INTEL_STATIC
-> +	select KVM_INTEL
-> +	bool "Link KVM Intel statically into the kernel"
+The help text should still be updated though.
 
-The prompt and choice text is way too long, e.g. in my usual window it
-cuts off at:
-
-  To link KVM statically into the kernel you need to choose (Link KVM Intel statically into
-
-Without the full text (the -> at the end), it's not obvious it's an option
-menu (AMD was selected by default for me and it took me a second to figure
-out what to hit enter on).
-
-I think short and sweet is enough for the prompt, with the details of how
-build both buried in the help text.
-
-choice
-	prompt "KVM built-in support"
-	help
-	  Here be a long and detailed help text.
-
-config KVM_AMD_STATIC
-	select KVM_AMD
-	bool "KVM AMD"
-
-config KVM_INTEL_STATIC
-	select KVM_INTEL
-	bool "KVM Intel"
-
-endchoice
-
-
-The ends up looking like:
-
-   <*>   Kernel-based Virtual Machine (KVM) support
-           KVM built-in support (KVM Intel)  --->
-   -*-   KVM for Intel processors support
-
-> +
-> +endchoice
-> +
-> +endif
-> +
->  config KVM_INTEL
->  	tristate "KVM for Intel processors support"
-> -	depends on KVM
-> +	depends on (KVM && !KVM_AMD_STATIC) || KVM_INTEL_STATIC
->  	# for perf_guest_get_msrs():
->  	depends on CPU_SUP_INTEL
->  	---help---
-> @@ -73,7 +93,7 @@ config KVM_INTEL
->  
->  config KVM_AMD
->  	tristate "KVM for AMD processors support"
-> -	depends on KVM
-> +	depends on (KVM && !KVM_INTEL_STATIC) || KVM_AMD_STATIC
->  	---help---
->  	  Provides support for KVM on AMD processors equipped with the AMD-V
->  	  (SVM) extensions.
+> > 
+> > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+> > ---
+> >  arch/x86/kvm/Makefile | 5 ++---
+> >  1 file changed, 2 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> > index 31ecf7a76d5a..68b81f381369 100644
+> > --- a/arch/x86/kvm/Makefile
+> > +++ b/arch/x86/kvm/Makefile
+> > @@ -12,9 +12,8 @@ kvm-y			+= x86.o mmu.o emulate.o i8259.o irq.o lapic.o \
+> >  			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+> >  			   hyperv.o page_track.o debugfs.o
+> >  
+> > -kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o vmx/evmcs.o vmx/nested.o
+> > -kvm-amd-y		+= svm.o pmu_amd.o
+> > +kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o vmx/evmcs.o vmx/nested.o $(kvm-y)
+> > +kvm-amd-y		+= svm.o pmu_amd.o $(kvm-y)
+> >  
+> > -obj-$(CONFIG_KVM)	+= kvm.o
+> >  obj-$(CONFIG_KVM_INTEL)	+= kvm-intel.o
+> >  obj-$(CONFIG_KVM_AMD)	+= kvm-amd.o
