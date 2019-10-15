@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC3C1D7B98
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:30:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B526D7B99
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 18:31:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388064AbfJOQa4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 12:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38400 "EHLO mx1.redhat.com"
+        id S2388072AbfJOQbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 12:31:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44198 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729840AbfJOQa4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 12:30:56 -0400
+        id S2388085AbfJOQbE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 12:31:04 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 84B7D3082B41;
-        Tue, 15 Oct 2019 16:30:55 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 51DDC3090FC6;
+        Tue, 15 Oct 2019 16:31:04 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A8F7219C58;
-        Tue, 15 Oct 2019 16:30:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B2C319C58;
+        Tue, 15 Oct 2019 16:30:55 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -37,175 +37,112 @@ Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH 19/32] hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c
-Date:   Tue, 15 Oct 2019 18:26:52 +0200
-Message-Id: <20191015162705.28087-20-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH 20/32] hw/i386/pc: Extract pc_gsi_create()
+Date:   Tue, 15 Oct 2019 18:26:53 +0200
+Message-Id: <20191015162705.28087-21-philmd@redhat.com>
 In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 15 Oct 2019 16:30:55 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 15 Oct 2019 16:31:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Now that we properly refactored the piix4_create() function, let's
-move it to hw/isa/piix4.c where it belongs, so it can be reused
-on other places.
+The GSI creation code is common to all PC machines, extract the
+common code.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/isa/piix4.c                | 30 ++++++++++++++++++++++++++++++
- hw/mips/gt64xxx_pci.c         |  1 +
- hw/mips/mips_malta.c          | 28 ----------------------------
- include/hw/i386/pc.h          |  2 --
- include/hw/southbridge/piix.h |  6 ++++++
- 5 files changed, 37 insertions(+), 30 deletions(-)
+ hw/i386/pc.c         | 15 +++++++++++++++
+ hw/i386/pc_piix.c    |  9 +--------
+ hw/i386/pc_q35.c     |  9 +--------
+ include/hw/i386/pc.h |  2 ++
+ 4 files changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 9f554747af..d90899e122 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -27,12 +27,14 @@
- #include "qapi/error.h"
- #include "hw/irq.h"
- #include "hw/i386/pc.h"
-+#include "hw/southbridge/piix.h"
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
- #include "hw/dma/i8257.h"
- #include "hw/timer/i8254.h"
- #include "hw/timer/mc146818rtc.h"
-+#include "hw/ide.h"
- #include "migration/vmstate.h"
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
-@@ -234,3 +236,31 @@ static void piix4_register_types(void)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bcda50efcc..a7597c6c44 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -357,6 +357,21 @@ void gsi_handler(void *opaque, int n, int level)
+     qemu_set_irq(s->ioapic_irq[n], level);
  }
  
- type_init(piix4_register_types)
-+
-+DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
-+                          I2CBus **smbus, size_t ide_buses)
++GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled)
 +{
-+    size_t ide_drives = ide_buses * MAX_IDE_DEVS;
-+    DriveInfo **hd;
-+    PCIDevice *pci;
-+    DeviceState *dev;
++    GSIState *s;
 +
-+    pci = pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
-+                                          true, TYPE_PIIX4_PCI_DEVICE);
-+    dev = DEVICE(pci);
-+    if (isa_bus) {
-+        *isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
++    s = g_new0(GSIState, 1);
++    if (kvm_ioapic_in_kernel()) {
++        kvm_pc_setup_irq_routing(pci_enabled);
++        *irqs = qemu_allocate_irqs(kvm_pc_gsi_handler, s, GSI_NUM_PINS);
++    } else {
++        *irqs = qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
 +    }
 +
-+    hd = g_new(DriveInfo *, ide_drives);
-+    ide_drive_get(hd, ide_drives);
-+    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
-+    g_free(hd);
-+    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
-+    if (smbus) {
-+        *smbus = piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
-+                               isa_get_irq(NULL, 9), NULL, 0, NULL);
-+   }
-+
-+    return dev;
++    return s;
 +}
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index f325bd6c1c..c277398c0d 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -28,6 +28,7 @@
- #include "hw/mips/mips.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
-+#include "hw/southbridge/piix.h"
- #include "migration/vmstate.h"
- #include "hw/i386/pc.h"
- #include "hw/irq.h"
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 0d4312840b..477a4725c0 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -1210,34 +1210,6 @@ static void mips_create_cpu(MachineState *ms, MaltaState *s,
-     }
- }
- 
--static DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
--                                 I2CBus **smbus, size_t ide_buses)
--{
--    const size_t ide_drives = ide_buses * MAX_IDE_DEVS;
--    DriveInfo **hd;
--    PCIDevice *pci;
--    DeviceState *dev;
--
--    pci = pci_create_simple_multifunction(pci_bus, PCI_DEVFN(10, 0),
--                                          true, TYPE_PIIX4_PCI_DEVICE);
--    dev = DEVICE(pci);
--    if (isa_bus) {
--        *isa_bus = ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
--    }
--
--    hd = g_new(DriveInfo *, ide_drives);
--    ide_drive_get(hd, ide_drives);
--    pci_piix4_ide_init(pci_bus, hd, pci->devfn + 1);
--    g_free(hd);
--    pci_create_simple(pci_bus, pci->devfn + 2, "piix4-usb-uhci");
--    if (smbus) {
--        *smbus = piix4_pm_init(pci_bus, pci->devfn + 3, 0x1100,
--                               isa_get_irq(NULL, 9), NULL, 0, NULL);
--   }
--
--    return dev;
--}
--
- static
- void mips_malta_init(MachineState *machine)
++
+ static void ioport80_write(void *opaque, hwaddr addr, uint64_t data,
+                            unsigned size)
  {
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 431965d921..452b107e1b 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -188,14 +188,7 @@ static void pc_init1(MachineState *machine,
+         xen_load_linux(pcms);
+     }
+ 
+-    gsi_state = g_malloc0(sizeof(*gsi_state));
+-    if (kvm_ioapic_in_kernel()) {
+-        kvm_pc_setup_irq_routing(pcmc->pci_enabled);
+-        pcms->gsi = qemu_allocate_irqs(kvm_pc_gsi_handler, gsi_state,
+-                                       GSI_NUM_PINS);
+-    } else {
+-        pcms->gsi = qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_PINS);
+-    }
++    gsi_state = pc_gsi_create(&pcms->gsi, pcmc->pci_enabled);
+ 
+     if (pcmc->pci_enabled) {
+         pci_bus = i440fx_init(host_type,
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 8fad20f314..52261962b8 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -210,14 +210,7 @@ static void pc_q35_init(MachineState *machine)
+     }
+ 
+     /* irq lines */
+-    gsi_state = g_malloc0(sizeof(*gsi_state));
+-    if (kvm_ioapic_in_kernel()) {
+-        kvm_pc_setup_irq_routing(pcmc->pci_enabled);
+-        pcms->gsi = qemu_allocate_irqs(kvm_pc_gsi_handler, gsi_state,
+-                                       GSI_NUM_PINS);
+-    } else {
+-        pcms->gsi = qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_PINS);
+-    }
++    gsi_state = pc_gsi_create(&pcms->gsi, pcmc->pci_enabled);
+ 
+     /* create pci host bus */
+     q35_host = Q35_HOST_DEVICE(qdev_create(NULL, TYPE_Q35_HOST_DEVICE));
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index c671c9fd2a..b63fc7631e 100644
+index b63fc7631e..d0c6b9d469 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -274,8 +274,6 @@ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
-                     MemoryRegion *ram_memory);
+@@ -174,6 +174,8 @@ typedef struct GSIState {
  
- PCIBus *find_i440fx(void);
--/* piix4.c */
--extern PCIDevice *piix4_dev;
+ void gsi_handler(void *opaque, int n, int level);
  
- /* pc_sysfw.c */
- void pc_system_flash_create(PCMachineState *pcms);
-diff --git a/include/hw/southbridge/piix.h b/include/hw/southbridge/piix.h
-index b8ce26fec4..add352456b 100644
---- a/include/hw/southbridge/piix.h
-+++ b/include/hw/southbridge/piix.h
-@@ -2,6 +2,7 @@
-  * QEMU PIIX South Bridge Emulation
-  *
-  * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2018 Hervé Poussineau
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-@@ -17,4 +18,9 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t smb_io_base,
-                       qemu_irq sci_irq, qemu_irq smi_irq,
-                       int smm_enabled, DeviceState **piix4_pm);
- 
-+extern PCIDevice *piix4_dev;
++GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
 +
-+DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
-+                          I2CBus **smbus, size_t ide_buses);
-+
- #endif
+ /* vmport.c */
+ #define TYPE_VMPORT "vmport"
+ typedef uint32_t (VMPortReadFunc)(void *opaque, uint32_t address);
 -- 
 2.21.0
 
