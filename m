@@ -2,90 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5328ED848C
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 01:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D40F4D848A
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 01:42:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387844AbfJOXnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 19:43:21 -0400
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21487 "EHLO
-        sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387830AbfJOXnV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 19:43:21 -0400
-X-Greylist: delayed 903 seconds by postgrey-1.27 at vger.kernel.org; Tue, 15 Oct 2019 19:43:20 EDT
-ARC-Seal: i=1; a=rsa-sha256; t=1571182079; cv=none; 
-        d=zoho.com; s=zohoarc; 
-        b=F9lLo4l6DYZjDaKnp65MpjHOJ448CRPtcHFPJZ/N4AnB+MuSDK9gRfOuoZLSBmVTAHiG3+KgISzfwuEmB1tpsX/O1AQtsIimrRyfJqcxoKvrYmK4/EDAQ1ww9iKr+UcLkg7PWeJJiJC9FbNf9ZO+uWR/hC0mqSVkMGNqLnbyEZQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com; s=zohoarc; 
-        t=1571182079; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=NquMdh5cqrg+w/TM1tlktRlQRtwUKUgGaymy3L81CUg=; 
-        b=oJKALsYjx2vub/ii+CYC37H8/IaMIhDUoOQ7IUZh/SIlrTbzldZkjIH18x1lcgD/9OqpbOFCakx/BVGDrQoqb1XRaQAAtYPJ/UCtKVOsT4hRK2tOby52b5Yw3177+QWfYuL8fL5KF6yY5f5zDppP+GLOpW38myZPAJb+H9gJaE8=
-ARC-Authentication-Results: i=1; mx.zoho.com;
-        dkim=pass  header.i=patchew.org;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1571182076549352.5095287510885; Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
-In-Reply-To: <20191015140140.34748-1-zhengxiang9@huawei.com>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v19 0/5] Add ARMv8 RAS virtualization support in QEMU
-Message-ID: <157118207403.5946.11773682662828159447@37313f22b938>
+        id S2388170AbfJOXma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 19:42:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40278 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387903AbfJOXma (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 19:42:30 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D9CF8757C2;
+        Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
+Received: from mail (ovpn-124-232.rdu2.redhat.com [10.10.124.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BA8C019C4F;
+        Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
+Date:   Tue, 15 Oct 2019 19:42:29 -0400
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+Message-ID: <20191015234229.GC6487@redhat.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+ <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+ <20191015203516.GF331@redhat.com>
+ <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     zhengxiang9@huawei.com
-Cc:     pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com,
-        shannon.zhaosl@gmail.com, peter.maydell@linaro.org,
-        lersek@redhat.com, james.morse@arm.com, gengdongjiu@huawei.com,
-        mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
-        jonathan.cameron@huawei.com, xuwei5@huawei.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        linuxarm@huawei.com, wanghaibin.wang@huawei.com,
-        zhengxiang9@huawei.com
-Date:   Tue, 15 Oct 2019 16:27:56 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTE0MDE0MC4zNDc0
-OC0xLXpoZW5neGlhbmc5QGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
-ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
-QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
-IHFhcGkvcWFwaS1ldmVudHMtdHJhY2UubwogIENDICAgICAgcWFwaS9xYXBpLWV2ZW50cy10cmFu
-c2FjdGlvbi5vCgpXYXJuaW5nLCB0cmVhdGVkIGFzIGVycm9yOgovdG1wL3FlbXUtdGVzdC9zcmMv
-ZG9jcy9zcGVjcy9hY3BpX2hlc3RfZ2hlcy5yc3Q6OTM6RW51bWVyYXRlZCBsaXN0IGVuZHMgd2l0
-aG91dCBhIGJsYW5rIGxpbmU7IHVuZXhwZWN0ZWQgdW5pbmRlbnQuCiAgQ0MgICAgICBxb2JqZWN0
-L3FudW0ubwogIENDICAgICAgcW9iamVjdC9xbnVsbC5vCi0tLQogIENDICAgICAgcW9iamVjdC9q
-c29uLXN0cmVhbWVyLm8KICBDQyAgICAgIHFvYmplY3QvYmxvY2stcWRpY3QubwogIENDICAgICAg
-dHJhY2Uvc2ltcGxlLm8KbWFrZTogKioqIFtNYWtlZmlsZTo5OTc6IGRvY3Mvc3BlY3MvaW5kZXgu
-aHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpU
-cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
-ZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
-Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
-bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
-bXUuaW5zdGFuY2UudXVpZD1mMDUyMGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZicsICctdScs
-ICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
-Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
-LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9Jywg
-Jy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcv
-LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtXzkwbmFydWsvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0x
-NS0xOS4yNi4wNy4yNDQyOTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zh
-ci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0
-YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMDUy
-MGZmYTliZDM0MGU3YWRmOTc1YWYwMTAxNmI2ZgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVy
-cm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVy
-LXRtcC1fOTBuYXJ1ay9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9y
-YV0gRXJyb3IgMgoKcmVhbCAgICAxbTQ3LjkzMXMKdXNlciAgICAwbTguMjM1cwoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMTUxNDAx
-NDAuMzQ3NDgtMS16aGVuZ3hpYW5nOUBodWF3ZWkuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZl
-ZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Oct 16, 2019 at 12:22:31AM +0200, Paolo Bonzini wrote:
+> Oh come on.  0.9 is not 12-years old.  virtio 1.0 is 3.5 years old
+> (March 2016).  Anything older than 2017 is going to use 0.9.
 
+Sorry if I got the date wrong, but still I don't see the point in
+optimizing for legacy virtio. I can't justify forcing everyone to
+execute that additional branch for inb/outb, in the attempt to make
+legacy virtio faster that nobody should use in combination with
+bleeding edge KVM in the host.
+
+> Your tables give:
+> 
+> 	Samples	  Samples%  Time%     Min Time  Max time       Avg time
+> HLT     101128    75.33%    99.66%    0.43us    901000.66us    310.88us
+> HLT     118474    19.11%    95.88%    0.33us    707693.05us    43.56us
+> 
+> If "avg time" means the average time to serve an HLT vmexit, I don't
+> understand how you can have an average time of 0.3ms (1/3000th of a
+> second) and 100000 samples per second.  Can you explain that to me?
+
+I described it wrong, the bpftrace record was a sleep 5, not a sleep
+1. The pipe loop was sure a sleep 1.
+
+I just wanted to show how even on things where you wouldn't even
+expected to get HLT like the bpftrace that is pure guest CPU load, you
+still get 100k of them (over 5 sec).
+
+The issue is that in production you get a flood more of those with
+hundred of CPUs, so the exact number doesn't move the needle.
+
+> Anyway, if the average time is indeed 310us and 43us, it is orders of
+> magnitude more than the time spent executing a retpoline.  That time
+> will be spent in an indirect branch miss (retpoline) instead of doing
+> while(!kvm_vcpu_check_block()), but it doesn't change anything.
+
+Doesn't cpuidle haltpoll disable that loop? Ideally there should be
+HLT vmexits then but I don't know how much fewer. This just needs to
+be frequent enough that the branch cost pay itself off, but the sure
+thing is that HLT vmexit will not go away unless you execute mwait in
+guest mode by isolating the CPU in the host.
+
+> Again: what is the real workload that does thousands of CPUIDs per second?
+
+None, but there are always background CPUID vmexits while there are
+never inb/outb vmexits.
+
+So the cpuid retpoline removal has a slight chance to pay for the cost
+of the branch, the inb/outb retpoline removal cannot pay off the cost
+of the branch.
+
+This is why I prefer cpuid as benchmark gadget for the short term
+unless inb/outb offers other benchmark related benefits.
+
+Thanks,
+Andrea
