@@ -2,179 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E032D7E40
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 19:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3862D8085
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 21:47:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731408AbfJOR44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 13:56:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:44770 "EHLO foss.arm.com"
+        id S1732539AbfJOTrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 15:47:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46846 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726973AbfJOR44 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 13:56:56 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15214337;
-        Tue, 15 Oct 2019 10:56:55 -0700 (PDT)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7E5813F6C4;
-        Tue, 15 Oct 2019 10:56:53 -0700 (PDT)
-Date:   Tue, 15 Oct 2019 18:56:51 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Steven Price <steven.price@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 01/10] KVM: arm64: Document PV-time interface
-Message-ID: <20191015175651.GF24604@lakrids.cambridge.arm.com>
-References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-2-steven.price@arm.com>
+        id S1727478AbfJOTrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 15:47:02 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 47348C04B940
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 19:47:01 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id j7so10660535wrx.14
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 12:47:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JUDMnzFf/AJg2T0GjQljTk8M2MDyg/AQ482kn8kGySo=;
+        b=Z76frE8nUnZ5dHPIAfySlLjCJ3LoF9skg9kBfqOFyEOb/7uzrWKOqUF4lKZ3Mz4oqg
+         Id6eXarPjn5Q3UMEmbO7wI6lJ2B32tMdAUP++swQBm5gIJT5AnIWnMM2HfRs+FlvQNEL
+         KyHoiNfpyJP4IL07CaORYHQkdxIT5mMN4zPS5p9gYHgJCq5pA1XWk8UXctrFrooizKAq
+         zR2tCHRS709S5MH4bccDpCH44/Y3Sbgzb+zOpHkFMfFbYGkgz6nRqiPzTsvV/CTOZ8Zu
+         UD7l5x9OheOIhihyRkRpHC+gLXr7lPAmmgdS9pBXjDmpO7nTl0N/T7XFqmZm2BoclRpn
+         PgFA==
+X-Gm-Message-State: APjAAAXp8EsegzydTuOCP82ifFROapfAq4GwXIHCx9fyuX7RZrj1kVpu
+        SEHDVtSVUeCu22H5B2xGgGZuijF+tFpbqIY8MhtemCnfSt1CcsSOhdvvdklJ2hb5mzzeH0IoufD
+        GmKH/oOpmDoky
+X-Received: by 2002:a5d:6b03:: with SMTP id v3mr33243546wrw.182.1571168819888;
+        Tue, 15 Oct 2019 12:46:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxKncfKk0ZDjD/mAm3dZRAQyVQ+iLyC2oCnuIGL0d4Nl3NDjg7qLC99QPB29CvDvGDpBauxtw==
+X-Received: by 2002:a5d:6b03:: with SMTP id v3mr33243530wrw.182.1571168819564;
+        Tue, 15 Oct 2019 12:46:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
+        by smtp.gmail.com with ESMTPSA id g13sm18499321wrm.42.2019.10.15.12.46.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2019 12:46:58 -0700 (PDT)
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+Date:   Tue, 15 Oct 2019 21:46:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191011125930.40834-2-steven.price@arm.com>
-User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+In-Reply-To: <20191015164952.GE331@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steven,
-
-On Fri, Oct 11, 2019 at 01:59:21PM +0100, Steven Price wrote:
-> Introduce a paravirtualization interface for KVM/arm64 based on the
-> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
-
-I notice that as published, this is a BETA Draft, with the explicit
-note:
-
-| This document is for review purposes only and should not be used
-| for any implementation as changes are likely.
-
-... what's the plan for getting a finalised version published?
-
-> This only adds the details about "Stolen Time" as the details of "Live
-> Physical Time" have not been fully agreed.
-
-... and what do we expect to happen on this front?
-
-AFAICT, the spec hasn't changed since I called out issues in that area:
-
-  https://lore.kernel.org/r/20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com
-
-... and I'd feel much happier about supporting this if that were dropped
-from the finalised spec.
-
-> User space can specify a reserved area of memory for the guest and
-> inform KVM to populate the memory with information on time that the host
-> kernel has stolen from the guest.
+On 15/10/19 18:49, Andrea Arcangeli wrote:
+> On Tue, Oct 15, 2019 at 10:28:39AM +0200, Paolo Bonzini wrote:
+>> If you're including EXIT_REASON_EPT_MISCONFIG (MMIO access) then you
+>> should include EXIT_REASON_IO_INSTRUCTION too.  Depending on the devices
+>> that are in the guest, the doorbell register might be MMIO or PIO.
 > 
-> A hypercall interface is provided for the guest to interrogate the
-> hypervisor's support for this interface and the location of the shared
-> memory structures.
+> The fact outb/inb devices exists isn't the question here. The question
+> you should clarify is: which of the PIO devices is performance
+> critical as much as MMIO with virtio/vhost?
+
+virtio 0.9 uses PIO.
+
+> I mean even on real hardware those devices aren't performance critical.
+
+On virtual machines they're actually faster than MMIO because they don't
+need to go through page table walks.
+
+>> So, the difference between my suggested list (which I admit is just
+>> based on conjecture, not benchmarking) is that you add
+>> EXIT_REASON_PAUSE_INSTRUCTION, EXIT_REASON_PENDING_INTERRUPT,
+>> EXIT_REASON_EXTERNAL_INTERRUPT, EXIT_REASON_HLT, EXIT_REASON_MSR_READ,
+>> EXIT_REASON_CPUID.
+>>
+>> Which of these make a difference for the hrtimer testcase?  It's of
+>> course totally fine to use benchmarks to prove that my intuition was
+>> bad---but you must also use them to show why your intuition is right. :)
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  Documentation/virt/kvm/arm/pvtime.rst   | 77 +++++++++++++++++++++++++
->  Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
->  2 files changed, 91 insertions(+)
->  create mode 100644 Documentation/virt/kvm/arm/pvtime.rst
+> The hrtimer flood hits on this:
 > 
-> diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
-> new file mode 100644
-> index 000000000000..de949933ec78
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/pvtime.rst
-> @@ -0,0 +1,77 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +Paravirtualized time support for arm64
-> +======================================
-> +
-> +Arm specification DEN0057/A defines a standard for paravirtualised time
-> +support for AArch64 guests:
-> +
-> +https://developer.arm.com/docs/den0057/a
-> +
-> +KVM/arm64 implements the stolen time part of this specification by providing
-> +some hypervisor service calls to support a paravirtualized guest obtaining a
-> +view of the amount of time stolen from its execution.
-> +
-> +Two new SMCCC compatible hypercalls are defined:
-> +
-> +* PV_TIME_FEATURES: 0xC5000020
-> +* PV_TIME_ST:       0xC5000021
-> +
-> +These are only available in the SMC64/HVC64 calling convention as
-> +paravirtualized time is not available to 32 bit Arm guests. The existence of
-> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
-> +mechanism before calling it.
-> +
-> +PV_TIME_FEATURES
-> +    ============= ========    ==========
-> +    Function ID:  (uint32)    0xC5000020
-> +    PV_call_id:   (uint32)    The function to query for support.
-> +                              Currently only PV_TIME_ST is supported.
-> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
-> +                              PV-time feature is supported by the hypervisor.
-> +    ============= ========    ==========
-> +
-> +PV_TIME_ST
-> +    ============= ========    ==========
-> +    Function ID:  (uint32)    0xC5000021
-> +    Return value: (int64)     IPA of the stolen time data structure for this
-> +                              VCPU. On failure:
-> +                              NOT_SUPPORTED (-1)
-> +    ============= ========    ==========
-> +
-> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
-> +with inner and outer write back caching attributes, in the inner shareable
-> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
-> +meaningfully filled by the hypervisor (see structure below).
+>            MSR_WRITE     338793    56.54%     5.51%      0.33us     34.44us      0.44us ( +-   0.20% )
+>    PENDING_INTERRUPT     168431    28.11%     2.52%      0.36us     32.06us      0.40us ( +-   0.28% )
+>     PREEMPTION_TIMER      91723    15.31%     1.32%      0.34us     30.51us      0.39us ( +-   0.41% )
+>   EXTERNAL_INTERRUPT        234     0.04%     0.00%      0.25us      5.53us      0.43us ( +-   5.67% )
+>                  HLT         65     0.01%    90.64%      0.49us 319933.79us  37562.71us ( +-  21.68% )
+>             MSR_READ          6     0.00%     0.00%      0.67us      1.96us      1.06us ( +-  17.97% )
+>        EPT_MISCONFIG          6     0.00%     0.01%      3.09us    105.50us     26.76us ( +-  62.10% )
+> 
+> PENDING_INTERRUPT is the big missing thing in your list. It probably
+> accounts for the bulk of slowdown from your list.
 
-At what granularity is this allowed to share IPA space with other
-mappings? The spec doesn't provide any guidance here, and I strongly
-suspect that it should.
+Makes sense.
 
-To support a 64K guest, we must ensure that this doesn't share a 64K IPA
-granule with any MMIO, and it probably only makes sense for an instance
-of this structure to share that granule with another vCPU's structure.
+> However I could imagine other loads with higher external
+> interrupt/hlt/rdmsr than the hrtimer one so I didn't drop those.
+External interrupts should only tick at 1 Hz on nohz_full kernels,
+and even at 1000 Hz (if physical CPUs are not isolated) it should not
+really matter.  We can include it since it has such a short handler so
+the cost of retpolines is in % much more than other exits.
 
-We probably _also_ want to ensure that this doesn't share a 64K granule
-with memory the guest sees as regular system RAM. Otherwise we're liable
-to force it into having mismatched attributes for any of that RAM it
-happens to map as part of mapping the PV_TIME_ST structure.
+HLT is certainly a slow path, the guest only invokes if things such as
+NAPI interrupt mitigation have failed.  As long as the guest stays in
+halted state for a microsecond or so, the cost of retpoline will all but
+disappear.
 
-> +
-> +PV_TIME_ST returns the structure for the calling VCPU.
-> +
-> +Stolen Time
-> +-----------
-> +
-> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
-> +
-> ++-------------+-------------+-------------+----------------------------+
-> +| Field       | Byte Length | Byte Offset | Description                |
-> ++=============+=============+=============+============================+
-> +| Revision    |      4      |      0      | Must be 0 for version 1.0  |
-> ++-------------+-------------+-------------+----------------------------+
-> +| Attributes  |      4      |      4      | Must be 0                  |
-> ++-------------+-------------+-------------+----------------------------+
-> +| Stolen time |      8      |      8      | Stolen time in unsigned    |
-> +|             |             |             | nanoseconds indicating how |
-> +|             |             |             | much time this VCPU thread |
-> +|             |             |             | was involuntarily not      |
-> +|             |             |             | running on a physical CPU. |
-> ++-------------+-------------+-------------+----------------------------+
-> +
-> +All values in the structure are stored little-endian.
+RDMSR again shouldn't be there, guests sometimes read the PMTimer (which
+is an I/O port) or TSC but for example do not really ever read the APIC
+TMCCT.
 
-Looking at the published DEN 0057A, endianness is never stated. Is this
-going to be corrected in the next release?
+> I'm pretty sure HLT/EXTERNAL_INTERRUPT/PENDING_INTERRUPT should be
+> included.
+> I also wonder if VMCALL should be added, certain loads hit on fairly
+> frequent VMCALL, but none of the one I benchmarked.
 
-Thanks,
-Mark.
+I agree for external interrupt and pending interrupt, and VMCALL is fine
+too.  In addition I'd add I/O instructions which are useful for some
+guests and also for benchmarking (e.g. vmexit.flat has both IN and OUT
+tests).
+
+Paolo
