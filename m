@@ -2,98 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 852EED7777
-	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 15:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DCAAD779A
+	for <lists+kvm@lfdr.de>; Tue, 15 Oct 2019 15:42:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731843AbfJON3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 09:29:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47493 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727745AbfJON3c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 09:29:32 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D31A7FDE5;
-        Tue, 15 Oct 2019 13:29:31 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B20B5C21F;
-        Tue, 15 Oct 2019 13:29:30 +0000 (UTC)
-Date:   Tue, 15 Oct 2019 10:29:29 -0300
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     "Kang, Luwei" <luwei.kang@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rth@twiddle.net" <rth@twiddle.net>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Message-ID: <20191015132929.GY4084@habkost.net>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
+        id S1732095AbfJONmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 09:42:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51932 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728880AbfJONmp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 15 Oct 2019 09:42:45 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9FDc72Z136888;
+        Tue, 15 Oct 2019 09:42:42 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vne46txx3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Oct 2019 09:42:41 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9FDcXPc139555;
+        Tue, 15 Oct 2019 09:42:41 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vne46txwd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Oct 2019 09:42:41 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9FDeoEG009261;
+        Tue, 15 Oct 2019 13:42:40 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma05wdc.us.ibm.com with ESMTP id 2vk6f73q23-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 15 Oct 2019 13:42:40 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9FDgdv441157046
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Oct 2019 13:42:39 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 85BC07805E;
+        Tue, 15 Oct 2019 13:42:39 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4E5317805F;
+        Tue, 15 Oct 2019 13:42:38 +0000 (GMT)
+Received: from [9.85.147.229] (unknown [9.85.147.229])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 15 Oct 2019 13:42:38 +0000 (GMT)
+Subject: Re: [RFC PATCH 2/4] vfio-ccw: Trace the FSM jumptable
+To:     Steffen Maier <maier@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20191014180855.19400-1-farman@linux.ibm.com>
+ <20191014180855.19400-3-farman@linux.ibm.com>
+ <96431f2f-774c-0be2-54ef-ebcaa4ae7298@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <b9d59763-4052-2dbb-ffc7-32f6cec9c426@linux.ibm.com>
+Date:   Tue, 15 Oct 2019 09:42:37 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 15 Oct 2019 13:29:31 +0000 (UTC)
+In-Reply-To: <96431f2f-774c-0be2-54ef-ebcaa4ae7298@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-15_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910150123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 12:51:48PM +0000, Kang, Luwei wrote:
-> qemu> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c index
-> > > f9f4cd1..097c953 100644
-> > > --- a/target/i386/kvm.c
-> > > +++ b/target/i386/kvm.c
-> > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-> > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
-> > >              }
-> > >          }
-> > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
-> > > +            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
-> > > +                                                    0x14, 1, R_EAX) &
-> > > + 0x7;
-> > > +
-> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > > +                            env->msr_rtit_ctrl);
-> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > > +                            env->msr_rtit_status);
-> > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> > > +                            env->msr_rtit_output_base);
-> > 
-> > This causes the following crash on some hosts:
-> > 
-> >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-> >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
-> > 
-> > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has additional conditions that might prevent writing to this MSR
-> > (PT_CAP_topa_output && PT_CAP_single_range_output).  This causes QEMU to crash if some of the conditions aren't met.
-> > 
-> > Writing and reading this MSR (and the ones below) need to be conditional on KVM_GET_MSR_INDEX_LIST.
-> > 
-> 
-> Hi Eduardo,
->     I found this issue can't be reproduced in upstream source code but can be reproduced on RHEL8.1. I haven't got the qemu source code of RHEL8.1. But after adding some trace in KVM, I found the KVM has reported the complete Intel PT CPUID information to qemu but the Intel PT CPUID (0x14) is lost when qemu setting the CPUID to KVM (cpuid level is 0xd). It looks like lost the below patch.
-> 
-> commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-> Author: Luwei Kang <luwei.kang@intel.com>
-> Date:   Tue Jan 29 18:52:59 2019 -0500
->     i386: extended the cpuid_level when Intel PT is enabled
-> 
->     Intel Processor Trace required CPUID[0x14] but the cpuid_level
->     have no change when create a kvm guest with
->     e.g. "-cpu qemu64,+intel-pt".
 
-Thanks for the pointer.  This may avoid triggering the bug in the
-default configuration, but we still need to make the MSR writing
-conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have
-x-intel-pt-auto-level=off, and the user may set `level` manually.
 
--- 
-Eduardo
+On 10/15/19 6:01 AM, Steffen Maier wrote:
+> On 10/14/19 8:08 PM, Eric Farman wrote:
+>> It would be nice if we could track the sequence of events within
+>> vfio-ccw, based on the state of the device/FSM and our calling
+>> sequence within it.  So let's add a simple trace here so we can
+>> watch the states change as things go, and allow it to be folded
+>> into the rest of the other cio traces.
+>>
+>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>> ---
+>>   drivers/s390/cio/vfio_ccw_private.h |  1 +
+>>   drivers/s390/cio/vfio_ccw_trace.c   |  1 +
+>>   drivers/s390/cio/vfio_ccw_trace.h   | 26 ++++++++++++++++++++++++++
+>>   3 files changed, 28 insertions(+)
+>>
+>> diff --git a/drivers/s390/cio/vfio_ccw_private.h
+>> b/drivers/s390/cio/vfio_ccw_private.h
+>> index bbe9babf767b..9b9bb4982972 100644
+>> --- a/drivers/s390/cio/vfio_ccw_private.h
+>> +++ b/drivers/s390/cio/vfio_ccw_private.h
+>> @@ -135,6 +135,7 @@ extern fsm_func_t
+>> *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS];
+>>   static inline void vfio_ccw_fsm_event(struct vfio_ccw_private *private,
+>>                        int event)
+>>   {
+>> +    trace_vfio_ccw_fsm_event(private->sch->schid, private->state,
+>> event);
+>>       vfio_ccw_jumptable[private->state][event](private, event);
+>>   }
+>>
+>> diff --git a/drivers/s390/cio/vfio_ccw_trace.c
+>> b/drivers/s390/cio/vfio_ccw_trace.c
+>> index d5cc943c6864..b37bc68e7f18 100644
+>> --- a/drivers/s390/cio/vfio_ccw_trace.c
+>> +++ b/drivers/s390/cio/vfio_ccw_trace.c
+>> @@ -9,4 +9,5 @@
+>>   #define CREATE_TRACE_POINTS
+>>   #include "vfio_ccw_trace.h"
+>>
+>> +EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_fsm_event);
+>>   EXPORT_TRACEPOINT_SYMBOL(vfio_ccw_io_fctl);
+>> diff --git a/drivers/s390/cio/vfio_ccw_trace.h
+>> b/drivers/s390/cio/vfio_ccw_trace.h
+>> index 2a2937a40124..24a8152acfdf 100644
+>> --- a/drivers/s390/cio/vfio_ccw_trace.h
+>> +++ b/drivers/s390/cio/vfio_ccw_trace.h
+>> @@ -17,6 +17,32 @@
+>>
+>>   #include <linux/tracepoint.h>
+>>
+>> +TRACE_EVENT(vfio_ccw_fsm_event,
+>> +    TP_PROTO(struct subchannel_id schid, int state, int event),
+>> +    TP_ARGS(schid, state, event),
+>> +
+>> +    TP_STRUCT__entry(
+>> +        __field(u8, cssid)
+>> +        __field(u8, ssid)
+>> +        __field(u16, schno)
+>> +        __field(int, state)
+>> +        __field(int, event)
+>> +    ),
+>> +
+>> +    TP_fast_assign(
+>> +        __entry->cssid = schid.cssid;
+>> +        __entry->ssid = schid.ssid;
+>> +        __entry->schno = schid.sch_no;
+>> +        __entry->state = state;
+>> +        __entry->event = event;
+>> +    ),
+>> +
+>> +    TP_printk("schid=%x.%x.%04x state=%x event=%x",
+> 
+> /sys/kernel/debug/tracing/events](0)# grep -R '%[^%]*x'
+> 
+> Many existing TPs often seem to format hex output with a 0x prefix
+> (either explicit with 0x%x or implicit with %#x). Since some of your
+> other TPs also output decimal integer values, I wonder if a distinction
+> would help unexperienced TP readers.
+
+Fair enough.  Since they're just enumerated values, they are probably
+better as %d; I don't have a good reason for picking %x (with or without
+a preceding 0x).
+
+> 
+>> +        __entry->cssid, __entry->ssid, __entry->schno,
+>> +        __entry->state,
+>> +        __entry->event)
+>> +);
+>> +
+>>   TRACE_EVENT(vfio_ccw_io_fctl,
+>>       TP_PROTO(int fctl, struct subchannel_id schid, int errno, char
+>> *errstr),
+>>       TP_ARGS(fctl, schid, errno, errstr),
+>>
+> 
+> 
