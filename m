@@ -2,153 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B0B8D8339
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 00:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC752D838C
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 00:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387771AbfJOWF1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 18:05:27 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60716 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727573AbfJOWF1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 18:05:27 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9FLxjVb100533;
-        Tue, 15 Oct 2019 22:05:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=KPP03hfrrXQ4Nsszrtqc/SzL79QsW11j9w/mUGBt86s=;
- b=nlZUuFWkWk5gzDyq5PkBnONz9nPKO9+D+TgGNcvG57cq/bbMqFjC00IA90N3beSmu3VD
- vqfy159fIujtSNqe9JflwD9f7QgHZ9Iakqr+L9J72aKad82ofCsUmJg/cWF+JTeQoOE9
- MqNii6ia6cMozivw/VwmPV1VVCDedr64SwakwSmhf4MfFQGT5jOMJlML5yS5lSvli5Wz
- m7tzH2JYxgxo0lrQQrfieiejG6yYej92IG7zgtp1FHG8G39P7r1O1CExX9J0N+lFYP9z
- IecDZthsOOeNxEdWqe3cGfupUym4o565i3OGSQuLxdQklU3tO7VV5gLOGKYtKoDlKcAE 1w== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2vk7frawmr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 22:05:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9FM43P6119202;
-        Tue, 15 Oct 2019 22:05:06 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 2vn71987su-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 15 Oct 2019 22:05:06 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9FM539h014007;
-        Tue, 15 Oct 2019 22:05:03 GMT
-Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 15 Oct 2019 22:05:03 +0000
-Subject: Re: [PATCH 1/4] KVM: VMX: rename {vmx,nested_vmx}_vcpu_setup
- functions
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S2389634AbfJOWWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 18:22:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56408 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732104AbfJOWWd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 18:22:33 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C9EED7BDA6
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 22:22:32 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id q9so292883wmj.9
+        for <kvm@vger.kernel.org>; Tue, 15 Oct 2019 15:22:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fiCu9Lkt0iLC5mxBsEL/QJGEmXdDuljE6cFfd5EN72c=;
+        b=dTHEUdQ3IY4pwQpsTExTo4cg4fT0O3627+cjE43Ofoj2lVgLM2n0ZtUYaQ4MA5AZ7v
+         Xp+1QZzGZ5xFklf7fnEfw/uiIwi5p2s4lnE4CK4/AMwc1aIDZ8rckdFpslmmVRz++Yya
+         Lvi8zV7OVTY+D2VTpqvc17nAMKQp8dkDHC06Pb4iY0VV/uKK4qXyvGRy5cHyNTaPECTl
+         UGYgjddU9bE6Fo/b9r63XEpevV8aIMeDfjEFo1ImvJqVShT+27IWkde3JGBsTxmVS+AN
+         cg+m4Ryv7ErJCsWT/9xivyAbfaHi3AYXlsrK5jV3eopIMJB9VyRR/ljpUIAbe0RStbMq
+         w73g==
+X-Gm-Message-State: APjAAAWYIWMV+6WdKYFHAxCVcwX9KQNXo/cUdxO+68kvLMhIS0A2YgT9
+        M/wolFWl5OjQxuXh4T/wZYR59+1xRIkAggQZU2RaGhL7OjSTc8oJBkvR72las2/PzRHQC9bnn8E
+        7+G2qM661IzOt
+X-Received: by 2002:a7b:c5c9:: with SMTP id n9mr606761wmk.28.1571178151394;
+        Tue, 15 Oct 2019 15:22:31 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxMMrxE/p8JBbpixpwdyHYMXy0PBoQ6zpd27bhjbx2gy+s9nO3NiGK9FxcZPv/D9Q+R9T+0tw==
+X-Received: by 2002:a7b:c5c9:: with SMTP id n9mr606734wmk.28.1571178151047;
+        Tue, 15 Oct 2019 15:22:31 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
+        by smtp.gmail.com with ESMTPSA id k24sm5156405wmi.1.2019.10.15.15.22.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2019 15:22:30 -0700 (PDT)
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191015164033.87276-1-xiaoyao.li@intel.com>
- <20191015164033.87276-2-xiaoyao.li@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <82a41967-98ca-1bc8-fce3-77aaf18b0c1a@oracle.com>
-Date:   Tue, 15 Oct 2019 15:05:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+ <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+ <20191015203516.GF331@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
+Date:   Wed, 16 Oct 2019 00:22:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191015164033.87276-2-xiaoyao.li@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191015203516.GF331@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9411 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=11 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910150189
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9411 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=11 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910150189
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 15/10/19 22:35, Andrea Arcangeli wrote:
+> On Tue, Oct 15, 2019 at 09:46:58PM +0200, Paolo Bonzini wrote:
+>> On 15/10/19 18:49, Andrea Arcangeli wrote:
+>>> On Tue, Oct 15, 2019 at 10:28:39AM +0200, Paolo Bonzini wrote:
+>>>> If you're including EXIT_REASON_EPT_MISCONFIG (MMIO access) then you
+>>>> should include EXIT_REASON_IO_INSTRUCTION too.  Depending on the devices
+>>>> that are in the guest, the doorbell register might be MMIO or PIO.
+>>>
+>>> The fact outb/inb devices exists isn't the question here. The question
+>>> you should clarify is: which of the PIO devices is performance
+>>> critical as much as MMIO with virtio/vhost?
+>>
+>> virtio 0.9 uses PIO.
+> 
+> 0.9 is a 12 years old protocol replaced several years ago.
 
+Oh come on.  0.9 is not 12-years old.  virtio 1.0 is 3.5 years old
+(March 2016).  Anything older than 2017 is going to use 0.9.
 
-On 10/15/2019 09:40 AM, Xiaoyao Li wrote:
-> Rename {vmx,nested_vmx}_vcpu_setup to {vmx,nested_vmx}_vmcs_setup,
-> to match what they really do.
+> Your idea that HLT is a certainly is a slow path is only correct if
+> you assume the host is IDLE, but the host is never idle if you use
+> virt for consolidation.
 >
-> No functional change.
+> I've several workloads including eBPF tracing, not related to
+> interrupts (that in turn cannot be mitigated by NAPI) that schedule
+> frequently and hit 100k+ of HLT vmexits per second and the host is all
+> but idle. There's no need of hardware interrupt to wake up tasks and
+> schedule in the guest, scheduler IPIs and timers are more than enough.
 >
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> ---
->   arch/x86/kvm/vmx/nested.c | 2 +-
->   arch/x86/kvm/vmx/nested.h | 2 +-
->   arch/x86/kvm/vmx/vmx.c    | 9 +++------
->   3 files changed, 5 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 5e231da00310..7935422d311f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5768,7 +5768,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->   	return ret;
->   }
->   
-> -void nested_vmx_vcpu_setup(void)
-> +void nested_vmx_vmcs_setup(void)
->   {
->   	if (enable_shadow_vmcs) {
->   		vmcs_write64(VMREAD_BITMAP, __pa(vmx_vmread_bitmap));
-> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-> index 187d39bf0bf1..2be1ba7482c9 100644
-> --- a/arch/x86/kvm/vmx/nested.h
-> +++ b/arch/x86/kvm/vmx/nested.h
-> @@ -11,7 +11,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
->   				bool apicv);
->   void nested_vmx_hardware_unsetup(void);
->   __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
-> -void nested_vmx_vcpu_setup(void);
-> +void nested_vmx_vmcs_setup(void);
->   void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
->   int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry);
->   bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e660e28e9ae0..58b77a882426 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4161,15 +4161,12 @@ static void ept_set_mmio_spte_mask(void)
->   
->   #define VMX_XSS_EXIT_BITMAP 0
->   
-> -/*
-> - * Sets up the vmcs for emulated real mode.
-> - */
-> -static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
-> +static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
->   {
->   	int i;
->   
->   	if (nested)
-> -		nested_vmx_vcpu_setup();
-> +		nested_vmx_vmcs_setup();
->   
->   	if (cpu_has_vmx_msr_bitmap())
->   		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
-> @@ -6777,7 +6774,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
->   	cpu = get_cpu();
->   	vmx_vcpu_load(&vmx->vcpu, cpu);
->   	vmx->vcpu.cpu = cpu;
-> -	vmx_vcpu_setup(vmx);
-> +	vmx_vmcs_setup(vmx);
->   	vmx_vcpu_put(&vmx->vcpu);
->   	put_cpu();
->   	if (cpu_need_virtualize_apic_accesses(&vmx->vcpu)) {
+> All it matters is how many vmexits per second there are, everything
+> else including "why" they happen and what those vmexists means for the
+> guest, is irrelevant, or it would be relevant only if the host was
+> guaranteed to be idle but there's no such guarantee.
 
-May be we should rename vmx_vcpu_reset() to vmx_vmcs_reset()  as well  ?
+Your tables give:
+
+	Samples	  Samples%  Time%     Min Time  Max time       Avg time
+HLT     101128    75.33%    99.66%    0.43us    901000.66us    310.88us
+HLT     118474    19.11%    95.88%    0.33us    707693.05us    43.56us
+
+If "avg time" means the average time to serve an HLT vmexit, I don't
+understand how you can have an average time of 0.3ms (1/3000th of a
+second) and 100000 samples per second.  Can you explain that to me?
+
+Anyway, if the average time is indeed 310us and 43us, it is orders of
+magnitude more than the time spent executing a retpoline.  That time
+will be spent in an indirect branch miss (retpoline) instead of doing
+while(!kvm_vcpu_check_block()), but it doesn't change anything.
+
+>>> I'm pretty sure HLT/EXTERNAL_INTERRUPT/PENDING_INTERRUPT should be
+>>> included.
+>>> I also wonder if VMCALL should be added, certain loads hit on fairly
+>>> frequent VMCALL, but none of the one I benchmarked.
+>>
+>> I agree for external interrupt and pending interrupt, and VMCALL is fine
+>> too.  In addition I'd add I/O instructions which are useful for some
+>> guests and also for benchmarking (e.g. vmexit.flat has both IN and OUT
+>> tests).
+> 
+> Isn't it faster to use cpuid for benchmarking? I mean we don't want to
+> pay for more than one branch for benchmarking (even cpuid is
+> questionable in the long term, but for now it's handy to have),
+
+outl is more or less the same as cpuid and vmcall.  You can measure it
+with vmexit.flat.  inl is slower.
+
+> and unlike inb/outb, cpuid runs occasionally in all real life workloads
+> (including in guest userland) so between inb/outb, I'd rather prefer
+> to use cpuid as the benchmark vector because at least it has a chance
+> to help real workloads a bit too.
+
+Again: what is the real workload that does thousands of CPUIDs per second?
+
+Paolo
