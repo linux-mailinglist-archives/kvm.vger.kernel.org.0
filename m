@@ -2,103 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D40F4D848A
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 01:42:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57D07D8501
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 02:43:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388170AbfJOXma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 19:42:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40278 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387903AbfJOXma (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 19:42:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D9CF8757C2;
-        Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
-Received: from mail (ovpn-124-232.rdu2.redhat.com [10.10.124.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BA8C019C4F;
-        Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
-Date:   Tue, 15 Oct 2019 19:42:29 -0400
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S2388227AbfJPAnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 20:43:04 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:45358 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728557AbfJPAnE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 20:43:04 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9G0dqH2003599;
+        Wed, 16 Oct 2019 00:42:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=RO+XrYrDaeBDBxb1QAxo3QY1K6pbqEr9rfJZhor0FR0=;
+ b=gkk5uU1QPz3pbW3mvR/PL+XZDaVfWIA3KgJD1tICgkTq04qP2LRQ4b9QQTxGdfae+vbD
+ MWqnAiZ1yKyo09CvbtkuXG5osuKUNnzs0mr9+qLxSM55L7THOJW+XGdDmIfCOoYKrn6Q
+ uBNh2sj6j9clhaoSjcDM3PmbUJqdr4BM70dnGctX09WWasq9eTEBiT1bOwP4Sosbi3lz
+ WU3ndcM4/66BpxDL9LLiaYQJFh879sJ3LTlrXWyJtzB4VSh7YYDcfYcDI3a++8tbhoWC
+ bYDy4CEiqjMBLaRonpcjNxWYqAdjnwb17XxqauDmvnQzoHXlAhofSFJ8FnT+/z9MXk2l +g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2vk6sqkfmv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Oct 2019 00:42:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9G0dKZL099099;
+        Wed, 16 Oct 2019 00:40:36 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2vnf7s7m4s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Oct 2019 00:40:35 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9G0eZvr007898;
+        Wed, 16 Oct 2019 00:40:35 GMT
+Received: from dhcp-10-132-91-76.usdhcp.oraclecorp.com (/10.132.91.76)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 16 Oct 2019 00:40:35 +0000
+Subject: Re: [PATCH 2/4] KVM: VMX: Setup MSR bitmap only when has msr_bitmap
+ capability
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
- vmx.c exit handlers
-Message-ID: <20191015234229.GC6487@redhat.com>
-References: <20190928172323.14663-1-aarcange@redhat.com>
- <20190928172323.14663-13-aarcange@redhat.com>
- <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
- <20191015164952.GE331@redhat.com>
- <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
- <20191015203516.GF331@redhat.com>
- <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20191015164033.87276-1-xiaoyao.li@intel.com>
+ <20191015164033.87276-3-xiaoyao.li@intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <05ff009e-5f60-54ff-a371-111763a1cb7f@oracle.com>
+Date:   Tue, 15 Oct 2019 17:40:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 15 Oct 2019 23:42:29 +0000 (UTC)
+In-Reply-To: <20191015164033.87276-3-xiaoyao.li@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9411 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=11 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910160002
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9411 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=11 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910160002
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 12:22:31AM +0200, Paolo Bonzini wrote:
-> Oh come on.  0.9 is not 12-years old.  virtio 1.0 is 3.5 years old
-> (March 2016).  Anything older than 2017 is going to use 0.9.
 
-Sorry if I got the date wrong, but still I don't see the point in
-optimizing for legacy virtio. I can't justify forcing everyone to
-execute that additional branch for inb/outb, in the attempt to make
-legacy virtio faster that nobody should use in combination with
-bleeding edge KVM in the host.
 
-> Your tables give:
-> 
-> 	Samples	  Samples%  Time%     Min Time  Max time       Avg time
-> HLT     101128    75.33%    99.66%    0.43us    901000.66us    310.88us
-> HLT     118474    19.11%    95.88%    0.33us    707693.05us    43.56us
-> 
-> If "avg time" means the average time to serve an HLT vmexit, I don't
-> understand how you can have an average time of 0.3ms (1/3000th of a
-> second) and 100000 samples per second.  Can you explain that to me?
+On 10/15/2019 09:40 AM, Xiaoyao Li wrote:
+> Move the MSR bitmap setup codes to vmx_vmcs_setup() and only setup them
+> when hardware has msr_bitmap capability.
+>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 39 ++++++++++++++++++++-------------------
+>   1 file changed, 20 insertions(+), 19 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 58b77a882426..7051511c27c2 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4164,12 +4164,30 @@ static void ept_set_mmio_spte_mask(void)
+>   static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
+>   {
+>   	int i;
+> +	unsigned long *msr_bitmap;
+>   
+>   	if (nested)
+>   		nested_vmx_vmcs_setup();
+>   
+> -	if (cpu_has_vmx_msr_bitmap())
+> -		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
+> +	if (cpu_has_vmx_msr_bitmap()) {
+> +		msr_bitmap = vmx->vmcs01.msr_bitmap;
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
 
-I described it wrong, the bpftrace record was a sleep 5, not a sleep
-1. The pipe loop was sure a sleep 1.
+vmx_disable_intercept_for_msr() also calls cpu_has_vmx_msr_bitmap(), 
+which means we are repeating the check. A cleaner approach is to remove 
+the call to cpu_has_vmx_msr_bitmap()  from 
+vmx_disable_intercept_for_msr()  and let its callers do the check just 
+like you are doing here.
 
-I just wanted to show how even on things where you wouldn't even
-expected to get HLT like the bpftrace that is pure guest CPU load, you
-still get 100k of them (over 5 sec).
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+> +		if (kvm_cstate_in_guest(vmx->vcpu.kvm)) {
+> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
+> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+> +		}
+> +
+> +		vmcs_write64(MSR_BITMAP, __pa(msr_bitmap));
+> +	}
+> +	vmx->msr_bitmap_mode = 0;
+>   
+>   	vmcs_write64(VMCS_LINK_POINTER, -1ull); /* 22.3.1.5 */
+>   
+> @@ -6697,7 +6715,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>   {
+>   	int err;
+>   	struct vcpu_vmx *vmx;
+> -	unsigned long *msr_bitmap;
+>   	int cpu;
+>   
+>   	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
+> @@ -6754,22 +6771,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>   	if (err < 0)
+>   		goto free_msrs;
+>   
+> -	msr_bitmap = vmx->vmcs01.msr_bitmap;
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+> -	if (kvm_cstate_in_guest(kvm)) {
+> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
+> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+> -	}
+> -	vmx->msr_bitmap_mode = 0;
+> -
+>   	vmx->loaded_vmcs = &vmx->vmcs01;
+>   	cpu = get_cpu();
+>   	vmx_vcpu_load(&vmx->vcpu, cpu);
 
-The issue is that in production you get a flood more of those with
-hundred of CPUs, so the exact number doesn't move the needle.
-
-> Anyway, if the average time is indeed 310us and 43us, it is orders of
-> magnitude more than the time spent executing a retpoline.  That time
-> will be spent in an indirect branch miss (retpoline) instead of doing
-> while(!kvm_vcpu_check_block()), but it doesn't change anything.
-
-Doesn't cpuidle haltpoll disable that loop? Ideally there should be
-HLT vmexits then but I don't know how much fewer. This just needs to
-be frequent enough that the branch cost pay itself off, but the sure
-thing is that HLT vmexit will not go away unless you execute mwait in
-guest mode by isolating the CPU in the host.
-
-> Again: what is the real workload that does thousands of CPUIDs per second?
-
-None, but there are always background CPUID vmexits while there are
-never inb/outb vmexits.
-
-So the cpuid retpoline removal has a slight chance to pay for the cost
-of the branch, the inb/outb retpoline removal cannot pay off the cost
-of the branch.
-
-This is why I prefer cpuid as benchmark gadget for the short term
-unless inb/outb offers other benchmark related benefits.
-
-Thanks,
-Andrea
