@@ -2,80 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA85FD858E
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 03:36:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80A11D859F
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 03:52:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390688AbfJPBgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 15 Oct 2019 21:36:22 -0400
-Received: from mga11.intel.com ([192.55.52.93]:13265 "EHLO mga11.intel.com"
+        id S1732405AbfJPBwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 15 Oct 2019 21:52:43 -0400
+Received: from mga05.intel.com ([192.55.52.43]:21397 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389359AbfJPBgT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 15 Oct 2019 21:36:19 -0400
+        id S1728338AbfJPBwm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 15 Oct 2019 21:52:42 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 18:36:19 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 18:52:42 -0700
 X-IronPort-AV: E=Sophos;i="5.67,302,1566889200"; 
-   d="scan'208";a="189532104"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.249.68.79]) ([10.249.68.79])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 15 Oct 2019 18:36:12 -0700
-Subject: Re: [RFC 0/2] Intel IFC VF driver for vdpa
-To:     Zhu Lingshan <lingshan.zhu@intel.com>, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
-        zhiyuan.lv@intel.com
-References: <20191016013050.3918-1-lingshan.zhu@intel.com>
-From:   Zhu Lingshan <lingshan.zhu@linux.intel.com>
-Message-ID: <37503c7d-c07d-e584-0b6f-3733d2ad1dc7@linux.intel.com>
-Date:   Wed, 16 Oct 2019 09:36:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+   d="scan'208";a="186007667"
+Received: from unknown (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 15 Oct 2019 18:52:40 -0700
+Subject: Re: [PATCH] KVM: X86: Make fpu allocation a common function
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20191014162247.61461-1-xiaoyao.li@intel.com>
+ <87y2xn462e.fsf@vitty.brq.redhat.com>
+ <d14d22e2-d74c-ed73-b5bb-3ed5eb087deb@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <6cc430c1-5729-c2d3-df11-3bf1ec1272f8@intel.com>
+Date:   Wed, 16 Oct 2019 09:52:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191016013050.3918-1-lingshan.zhu@intel.com>
+In-Reply-To: <d14d22e2-d74c-ed73-b5bb-3ed5eb087deb@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-failed to send to kvm list, resend, sorry for the inconvenience.
+On 10/15/2019 5:28 PM, Paolo Bonzini wrote:
+> On 14/10/19 18:58, Vitaly Kuznetsov wrote:
+>> Xiaoyao Li <xiaoyao.li@intel.com> writes:
+>>
+>>> They are duplicated codes to create vcpu.arch.{user,guest}_fpu in VMX
+>>> and SVM. Make them common functions.
+>>>
+>>> No functional change intended.
+>> Would it rather make sense to move this code to
+>> kvm_arch_vcpu_create()/kvm_arch_vcpu_destroy() instead?
+>>
+> 
+> user_fpu could be made percpu too...  That would save a bit of memory
+> for each vCPU.  I'm holding on Xiaoyao's patch because a lot of the code
+> he's touching would go away then.
 
-THanks,
-BR
-Zhu Lingshan
+Sorry, I don't get clear your attitude.
+Do you mean the generic common function is not so better that I'd better 
+to implement the percpu solution?
 
-On 10/16/2019 9:30 AM, Zhu Lingshan wrote:
-> Hi all:
->   
-> This series intends to introduce Intel IFC VF NIC driver for Vhost
-> Data Plane Acceleration.
->   
-> Here comes two main parts, one is ifcvf_base layer, which handles
-> hardware operations. The other is ifcvf_main layer handles VF
-> initialization, configuration and removal, which depends on
-> and complys to vhost_mdev https://lkml.org/lkml/2019/9/26/15
->   
-> This is a first RFC try, please help review.
->   
-> Thanks!
-> BR
-> Zhu Lingshan
->
->
-> Zhu Lingshan (2):
->    vhost: IFC VF hardware operation layer
->    vhost: IFC VF vdpa layer
->
->   drivers/vhost/ifcvf/ifcvf_base.c | 390 ++++++++++++++++++++++++++++
->   drivers/vhost/ifcvf/ifcvf_base.h | 137 ++++++++++
->   drivers/vhost/ifcvf/ifcvf_main.c | 541 +++++++++++++++++++++++++++++++++++++++
->   3 files changed, 1068 insertions(+)
->   create mode 100644 drivers/vhost/ifcvf/ifcvf_base.c
->   create mode 100644 drivers/vhost/ifcvf/ifcvf_base.h
->   create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
->
+> Paolo
+> 
