@@ -2,217 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9F9CD8F53
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 13:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C92D8F62
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 13:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403861AbfJPLY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 07:24:27 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46958 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403826AbfJPLY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 07:24:27 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q5so14505238pfg.13
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 04:24:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LOhxSmhltHVmCHIgrxp16EKj8XAolAsY7/5MxXVPJeg=;
-        b=qv0RwlQfuyAV06Rt87qK/UWtE06kLYJBl1B7flH3oYBYMZ3WBvvlBjWzQIAO17RosM
-         pWkGzHPPdw+nL4xc2/rX4dsVOjYbVG3eZ2AiWCwNH/M7Eyka4Fa12UVP9hZsbCSHZjKe
-         4aoy2dhnK4C5KifXK6Qvf/gd5EszL0madtYJd3fsd1wHPpgLEbgsXkMcr0a8l6a312Yc
-         FJPEYir3JsQ3j/xOB3WAySj5fuJowgpL8vNDsSiIDoKRZZNwBDm+k2mdAVG2uk8CgCt1
-         4arQqvc4oo5+56fvSgC+2XsAndZRThn3zBTxGN6W7zxoQDzdvXkpJz43BTbw4h4/HgPa
-         HnRQ==
+        id S2404909AbfJPL0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 07:26:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60288 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389701AbfJPL0i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 07:26:38 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CF58185360
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 11:26:37 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id z205so1063020wmb.7
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 04:26:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LOhxSmhltHVmCHIgrxp16EKj8XAolAsY7/5MxXVPJeg=;
-        b=dBpCgt4hqHy9JRl+ZBzBPJ0B17gQoWDl+nHzMCnmOS9SL1vXS7QzGnizdwgppESmlU
-         BBiN4aC+nrd6ISHq4giUqckV37duYXUhtCKydbwEu2hgxzzddHTVZ5QAGLGE7Anslaqy
-         A5+PWmPtJInsTvxujGZB+5JEg5R5eM18DxH/kxiNqAzWmRymSVPVBU/tt6MVdwujgLa3
-         r9FMhRiZf4Fxom0wPhzmyMilpkFr2xNnpqmDGFe4vXOly0qGcKw8+/k4Mx/tcg5WACEn
-         dMGBiGv1AvOzZyU8IrmuwigvQ8axO60a+4fs9KeJOoH3nXNf9Lm7FwqE6HWWFLbd0OhC
-         f3rA==
-X-Gm-Message-State: APjAAAVllpTiugElN0iHhVEBA1Aoe3nDBbG66Q6acRuhLwsB8BXw3wm0
-        BGCc1X2tHpRfVIByb/KaJdg9kLRp7fJsjYHONSY=
-X-Google-Smtp-Source: APXvYqx/K3HVs2y8kHeKYg41IQD9q1KLMW4BxhnkYePE6OPi6UiZwMnm8IQr0qxQpi9GF6ZNT6tQ0S1OQNNMywxKpWQ=
-X-Received: by 2002:a17:90a:e001:: with SMTP id u1mr4460927pjy.102.1571225066213;
- Wed, 16 Oct 2019 04:24:26 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AmDD8rV/4ss55aPkIj/Kxa/elLa9S+t5SdIR+jVrE6Y=;
+        b=Le+XXM7gUqFzBD3PVIo+GV1LHlJ+jCfNWpAiDUqNQ0wEzEMDcHmE3/gDAyZnkOwdEZ
+         3xb7gJm1qrT9AIYAzocnqc9Czw6s7oNX6DcA+xo714IfgnGdj+y85dMQYlP7GFzIHZee
+         3BpeVfJ3BEXIPY23njxcO9/SIeNmTNbqn6dp9HiD89pfBgd+S1Ml+6MUgKqR/v5bUCnr
+         hOjooyrqivZKA/5XXC855zQuCBTxlyURiJRRigoEKrblXmFdO2CltGifB798cS53/Zw+
+         PB8qtLDt77C3wQhRlUCQTTAw/nqT9fCyLVZpQOZFvr54pCHYB4mgymMMNPSxzA/fLx0I
+         +10g==
+X-Gm-Message-State: APjAAAWWShyLZP7C0axV0rojSupdniNYFe+b1dYchOuvYW1T0BO6DB+4
+        cgt1210Cb3BBWyVsOzrK3wGucIIBR/z3BwtijPVlsJSauxAJ7WCByWCzes5piHJFxis9RvdTKWx
+        VYuZKox8YqmQV
+X-Received: by 2002:a5d:4a87:: with SMTP id o7mr2366020wrq.374.1571225196188;
+        Wed, 16 Oct 2019 04:26:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzxt7Ch8OEk4m4oTfe5uVlwjGCFhsFo8DPHcaBp7QjGTURqov0ZV0Sbqg0WNheETxcfIkxchw==
+X-Received: by 2002:a5d:4a87:: with SMTP id o7mr2365992wrq.374.1571225195888;
+        Wed, 16 Oct 2019 04:26:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
+        by smtp.gmail.com with ESMTPSA id n22sm2163146wmk.19.2019.10.16.04.26.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2019 04:26:35 -0700 (PDT)
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+ <20190925180931.GG31852@linux.intel.com>
+ <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
+ <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
+ <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
+ <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
+Date:   Wed, 16 Oct 2019 13:26:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20191015162705.28087-1-philmd@redhat.com> <20191015162705.28087-28-philmd@redhat.com>
-In-Reply-To: <20191015162705.28087-28-philmd@redhat.com>
-From:   Paul Durrant <pdurrant@gmail.com>
-Date:   Wed, 16 Oct 2019 12:24:15 +0100
-Message-ID: <CACCGGhDsJ==Z_rVRNJ28N_p3Ar=dtbPZcgMaXiw=cLEvAiYSKQ@mail.gmail.com>
-Subject: Re: [PATCH 27/32] hw/pci-host/piix: Define and use the PIIX IRQ Route
- Control Registers
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org,
-        Aleksandar Markovic <amarkovic@wavecomp.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Paul Durrant <paul@xen.org>,
-        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        xen-devel <xen-devel@lists.xenproject.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 15 Oct 2019 at 17:34, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> The IRQ Route Control registers definitions belong to the PIIX
-> chipset. We were only defining the 'A' register. Define the other
-> B, C and D registers, and use them.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 16/10/19 13:23, Xiaoyao Li wrote:
+> KVM always traps #AC, and only advertises split-lock detection to guest
+> when the global variable split_lock_detection_enabled in host is true.
+> 
+> - If guest enables #AC (CPL3 alignment check or split-lock detection
+> enabled), injecting #AC back into guest since it's supposed capable of
+> handling it.
+> - If guest doesn't enable #AC, KVM reports #AC to userspace (like other
+> unexpected exceptions), and we can print a hint in kernel, or let
+> userspace (e.g., QEMU) tell the user guest is killed because there is a
+> split-lock in guest.
+> 
+> In this way, malicious guests always get killed by userspace and old
+> sane guests cannot survive as well if it causes split-lock. If we do
+> want old sane guests work we have to disable the split-lock detection
+> (through booting parameter or debugfs) in the host just the same as we
+> want to run an old and split-lock generating userspace binary.
 
-Xen change...
+Old guests are prevalent enough that enabling split-lock detection by
+default would be a big usability issue.  And even ignoring that, you
+would get the issue you describe below:
 
-Acked-by: Paul Durrant <paul@xen.org>
+> But there is an issue that we advertise split-lock detection to guest
+> based on the value of split_lock_detection_enabled to be true in host,
+> which can be turned into false dynamically when split-lock happens in
+> host kernel.
 
-> ---
->  hw/i386/xen/xen-hvm.c         | 5 +++--
->  hw/mips/gt64xxx_pci.c         | 4 ++--
->  hw/pci-host/piix.c            | 9 ++++-----
->  include/hw/southbridge/piix.h | 6 ++++++
->  4 files changed, 15 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index 6b5e5bb7f5..4ce2fb9c89 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -14,6 +14,7 @@
->  #include "hw/pci/pci.h"
->  #include "hw/pci/pci_host.h"
->  #include "hw/i386/pc.h"
-> +#include "hw/southbridge/piix.h"
->  #include "hw/irq.h"
->  #include "hw/hw.h"
->  #include "hw/i386/apic-msidef.h"
-> @@ -156,8 +157,8 @@ void xen_piix_pci_write_config_client(uint32_t addres=
-s, uint32_t val, int len)
->              v =3D 0;
->          }
->          v &=3D 0xf;
-> -        if (((address + i) >=3D 0x60) && ((address + i) <=3D 0x63)) {
-> -            xen_set_pci_link_route(xen_domid, address + i - 0x60, v);
-> +        if (((address + i) >=3D PIIX_PIRQCA) && ((address + i) <=3D PIIX=
-_PIRQCD)) {
-> +            xen_set_pci_link_route(xen_domid, address + i - PIIX_PIRQCA,=
- v);
->          }
->      }
->  }
-> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-> index c277398c0d..5cab9c1ee1 100644
-> --- a/hw/mips/gt64xxx_pci.c
-> +++ b/hw/mips/gt64xxx_pci.c
-> @@ -1013,12 +1013,12 @@ static void gt64120_pci_set_irq(void *opaque, int=
- irq_num, int level)
->
->      /* now we change the pic irq level according to the piix irq mapping=
-s */
->      /* XXX: optimize */
-> -    pic_irq =3D piix4_dev->config[0x60 + irq_num];
-> +    pic_irq =3D piix4_dev->config[PIIX_PIRQCA + irq_num];
->      if (pic_irq < 16) {
->          /* The pic level is the logical OR of all the PCI irqs mapped to=
- it. */
->          pic_level =3D 0;
->          for (i =3D 0; i < 4; i++) {
-> -            if (pic_irq =3D=3D piix4_dev->config[0x60 + i]) {
-> +            if (pic_irq =3D=3D piix4_dev->config[PIIX_PIRQCA + i]) {
->                  pic_level |=3D pci_irq_levels[i];
->              }
->          }
-> diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> index 3770575c1a..a450fc726e 100644
-> --- a/hw/pci-host/piix.c
-> +++ b/hw/pci-host/piix.c
-> @@ -61,7 +61,6 @@ typedef struct I440FXState {
->  #define PIIX_NUM_PIC_IRQS       16      /* i8259 * 2 */
->  #define PIIX_NUM_PIRQS          4ULL    /* PIRQ[A-D] */
->  #define XEN_PIIX_NUM_PIRQS      128ULL
-> -#define PIIX_PIRQC              0x60
->
->  typedef struct PIIX3State {
->      PCIDevice dev;
-> @@ -468,7 +467,7 @@ static void piix3_set_irq_level_internal(PIIX3State *=
-piix3, int pirq, int level)
->      int pic_irq;
->      uint64_t mask;
->
-> -    pic_irq =3D piix3->dev.config[PIIX_PIRQC + pirq];
-> +    pic_irq =3D piix3->dev.config[PIIX_PIRQCA + pirq];
->      if (pic_irq >=3D PIIX_NUM_PIC_IRQS) {
->          return;
->      }
-> @@ -482,7 +481,7 @@ static void piix3_set_irq_level(PIIX3State *piix3, in=
-t pirq, int level)
->  {
->      int pic_irq;
->
-> -    pic_irq =3D piix3->dev.config[PIIX_PIRQC + pirq];
-> +    pic_irq =3D piix3->dev.config[PIIX_PIRQCA + pirq];
->      if (pic_irq >=3D PIIX_NUM_PIC_IRQS) {
->          return;
->      }
-> @@ -501,7 +500,7 @@ static void piix3_set_irq(void *opaque, int pirq, int=
- level)
->  static PCIINTxRoute piix3_route_intx_pin_to_irq(void *opaque, int pin)
->  {
->      PIIX3State *piix3 =3D opaque;
-> -    int irq =3D piix3->dev.config[PIIX_PIRQC + pin];
-> +    int irq =3D piix3->dev.config[PIIX_PIRQCA + pin];
->      PCIINTxRoute route;
->
->      if (irq < PIIX_NUM_PIC_IRQS) {
-> @@ -530,7 +529,7 @@ static void piix3_write_config(PCIDevice *dev,
->                                 uint32_t address, uint32_t val, int len)
->  {
->      pci_default_write_config(dev, address, val, len);
-> -    if (ranges_overlap(address, len, PIIX_PIRQC, 4)) {
-> +    if (ranges_overlap(address, len, PIIX_PIRQCA, 4)) {
->          PIIX3State *piix3 =3D PIIX3_PCI_DEVICE(dev);
->          int pic_irq;
->
-> diff --git a/include/hw/southbridge/piix.h b/include/hw/southbridge/piix.=
-h
-> index 79ebe0089b..9c92c37a4d 100644
-> --- a/include/hw/southbridge/piix.h
-> +++ b/include/hw/southbridge/piix.h
-> @@ -18,6 +18,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn, uint32_t=
- smb_io_base,
->                        qemu_irq sci_irq, qemu_irq smi_irq,
->                        int smm_enabled, DeviceState **piix4_pm);
->
-> +/* PIRQRC[A:D]: PIRQx Route Control Registers */
-> +#define PIIX_PIRQCA 0x60
-> +#define PIIX_PIRQCB 0x61
-> +#define PIIX_PIRQCC 0x62
-> +#define PIIX_PIRQCD 0x63
-> +
->  /*
->   * Reset Control Register: PCI-accessible ISA-Compatible Register at add=
-ress
->   * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0, 8086:700=
-0).
-> --
-> 2.21.0
->
+... which means that supposedly safe guests become unsafe, and that is bad.
+
+> This causes guest's capability changes at run time and I
+> don't if there is a better way to inform guest? Maybe we need a pv
+> interface?
+
+Even a PV interface would not change the basic fact that a supposedly
+safe configuration becomes unsafe.
+
+Paolo
