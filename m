@@ -2,150 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B03F5D902D
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 13:59:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4F65D91FE
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387489AbfJPL7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 07:59:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45468 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732478AbfJPL7B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 07:59:01 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D83211A27
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 11:59:00 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id f63so887164wma.7
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 04:59:00 -0700 (PDT)
+        id S2405311AbfJPNHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 09:07:34 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:41163 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405306AbfJPNHe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 09:07:34 -0400
+Received: by mail-pf1-f193.google.com with SMTP id q7so14692453pfh.8
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 06:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=wQCJmNzmQsC9KNIjHMU1j2cgYJLfCM+agj01R4DYfjE=;
+        b=Oe2or1AEnGi2tuxYEI+dDM6EqbS93wmPnH5+gXDxmvkVXF7KJnYVqfREtqDuHPwtlL
+         KrhCNoGau/eOsWVoyWIgQSEtiJgmoJlgYtoltCXwYia7/dCmM7rbKoCes9HsTPyJrpE4
+         UOp/N0DqDyEmHKreDXM6Z+B27pUGnsIt744FeHQwu9mDIVqnQoX6t0y0nKRdmLE6ZSj4
+         wTSd9iRtTAYZOf0EEwxu/1ZzJozZUzpOFdPy4FPogV1acswssVFeQQq3Piiy0lx0J1zP
+         2HnANWPP62uVD0rRtGdzecsjICguXgfIPYag+D0RLBOHv19e1AEuTKSVYd1zwkNja7D4
+         q+tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iQqLr0072EPsnTxt9Tx21FXVuFvWLQZSEt/0llfkeOA=;
-        b=eWhUPmSzsOTkF9fOutkfas135lrByFixG1BLMFKAingho5AVfft9PxFlNxV84A9I3L
-         53omV2Ko9d2ayuSzeIkthX7Chm4JohlW4NW1/9Pz8fG+Iyeb8j5pQ24M5Kv1t2gZ3A2n
-         KJVE+L4Xqt3ZezWNd0Or2uEFvQ9eKjKUTznCVJOmP/Am5vhO7qDtxg7RjLeSdb8AKlo9
-         NwZXj6aT3gAJMsqIk0ibf86qjlrqGs6cf/YwmEt3A9QKD+dmsQ+u5ApSc+W1IPSv1879
-         lpxEy2Sw4EnMFqWoqHjeR4Rs2CseE+rmufiYrepNJk+xlOqu+qjz05TLMKK9ykjXTAKP
-         uYiQ==
-X-Gm-Message-State: APjAAAVVq1sIte7TiQKLz8fQsieamb5UtOCDeIZzJEZ3CEQFndJmDFE/
-        GoNfX+p8njUQd+hNnH/pBneNvXc+nf1HcdtEGwSf2NZPEGpKYnueh4neKiT44m/QWZ3YW5pD+lP
-        R5Ye67/1IZWNv
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr2398973wro.305.1571227138942;
-        Wed, 16 Oct 2019 04:58:58 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyPn2WqMqrALmzAf7rRPCploJic5/A4+kCdmkuSxok12U/qcGXOFuOtsmSdfRterPobr4w6Pg==
-X-Received: by 2002:adf:ecc7:: with SMTP id s7mr2398937wro.305.1571227138615;
-        Wed, 16 Oct 2019 04:58:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
-        by smtp.gmail.com with ESMTPSA id u11sm2148223wmd.32.2019.10.16.04.58.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2019 04:58:58 -0700 (PDT)
-Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
- lock
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
- <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
- <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
- <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
- <20190925180931.GG31852@linux.intel.com>
- <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
- <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
- <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <alpine.DEB.2.21.1910161244060.2046@nanos.tec.linutronix.de>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3a12810b-1196-b70a-aa2e-9fe17dc7341a@redhat.com>
-Date:   Wed, 16 Oct 2019 13:58:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1910161244060.2046@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=wQCJmNzmQsC9KNIjHMU1j2cgYJLfCM+agj01R4DYfjE=;
+        b=VctCe98zBAyHY1OWfmap7m5BkYelXZBr0YChMycuY0lJMA2Bg1dCgTOjuDjPV4kDx0
+         giJjeWBjDSBlcjcKlNcFcz5nD14R2CX1zkqdGhS0PNgyrdycty5RY2NuzdKInJxebmFi
+         Kdn1EhZY60AIz4B2YnnExzq0On1AyTRdbDM+7rkYokY8e9muE+DkeVQFCr+rbOt+l7QJ
+         uHHBl8+QQzIsAmH9iMZzh4jL1FE5e64eXrDEDOw3QnT1XRCX+HBX/u0MDGmdaO/7Wval
+         hOh3ru/6SD7ai9ThpFuoHOC4XN3dwqj/hjbccTlYAJAJdKNo+M/IsgfIupuqHxxZz1jA
+         Yc7A==
+X-Gm-Message-State: APjAAAWrGEl+sFdPVbWiayO9KJqwji+WBjCJJcaHhbwahCCYtUxr0v/z
+        1rX9w0wixMeguEGYIUnArRmtmbhEQ2U=
+X-Google-Smtp-Source: APXvYqz86v6HgU7P7jaCkPhMGAi8X8SUCsEErtJmXv76sPMHpWi5QQGtmQNnOcoKXrKc30+cx6p6Aw==
+X-Received: by 2002:aa7:96ba:: with SMTP id g26mr44752072pfk.45.1571231253825;
+        Wed, 16 Oct 2019 06:07:33 -0700 (PDT)
+Received: from localhost.corp.microsoft.com ([167.220.255.39])
+        by smtp.googlemail.com with ESMTPSA id s97sm2792296pjc.4.2019.10.16.06.07.30
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Oct 2019 06:07:33 -0700 (PDT)
+From:   lantianyu1986@gmail.com
+X-Google-Original-From: Tianyu.Lan@microsoft.com
+To:     mst@redhat.com, cohuck@redhat.com, pbonzini@redhat.com,
+        rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com,
+        rkagan@virtuozzo.com, vkuznets@redhat.com
+Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org
+Subject: [PATCH V3 0/2] target/i386/kvm: Add Hyper-V direct tlb flush support
+Date:   Wed, 16 Oct 2019 21:07:23 +0800
+Message-Id: <20191016130725.5045-1-Tianyu.Lan@microsoft.com>
+X-Mailer: git-send-email 2.14.5
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/10/19 13:49, Thomas Gleixner wrote:
-> On Wed, 16 Oct 2019, Paolo Bonzini wrote:
->> Yes it does.  But Sean's proposal, as I understand it, leads to the
->> guest receiving #AC when it wasn't expecting one.  So for an old guest,
->> as soon as the guest kernel happens to do a split lock, it gets an
->> unexpected #AC and crashes and burns.  And then, after much googling and
->> gnashing of teeth, people proceed to disable split lock detection.
-> 
-> I don't think that this was what he suggested/intended.
+From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 
-Xiaoyao's reply suggests that he also understood it like that.
+This patchset is to enable Hyper-V direct tlbflush
+feature. The feature is to let L0 hypervisor to handle
+tlb flush hypercall for L1 hypervisor.
 
->> In all of these cases, the common final result is that split-lock
->> detection is disabled on the host.  So might as well go with the
->> simplest one and not pretend to virtualize something that (without core
->> scheduling) is obviously not virtualizable.
-> 
-> You are completely ignoring any argument here and just leave it behind your
-> signature (instead of trimming your reply).
+Tianyu Lan (2):
+  linux headers: update against Linux 5.4-rc2
+  target/i386/kvm: Add Hyper-V direct tlb flush support
 
-I am not ignoring them, I think there is no doubt that this is the
-intended behavior.  I disagree that Sean's patches achieve it, however.
+ docs/hyperv.txt                              | 10 ++++
+ include/standard-headers/asm-x86/bootparam.h |  2 +
+ include/standard-headers/asm-x86/kvm_para.h  |  1 +
+ include/standard-headers/linux/ethtool.h     | 24 ++++++++++
+ include/standard-headers/linux/pci_regs.h    | 19 +++++++-
+ include/standard-headers/linux/virtio_ids.h  |  2 +
+ include/standard-headers/linux/virtio_pmem.h |  6 +--
+ linux-headers/asm-arm/kvm.h                  | 16 ++++++-
+ linux-headers/asm-arm/unistd-common.h        |  2 +
+ linux-headers/asm-arm64/kvm.h                | 21 +++++++-
+ linux-headers/asm-generic/mman-common.h      | 18 ++++---
+ linux-headers/asm-generic/mman.h             | 10 ++--
+ linux-headers/asm-generic/unistd.h           | 10 +++-
+ linux-headers/asm-mips/mman.h                |  3 ++
+ linux-headers/asm-mips/unistd_n32.h          |  2 +
+ linux-headers/asm-mips/unistd_n64.h          |  2 +
+ linux-headers/asm-mips/unistd_o32.h          |  2 +
+ linux-headers/asm-powerpc/mman.h             |  6 +--
+ linux-headers/asm-powerpc/unistd_32.h        |  2 +
+ linux-headers/asm-powerpc/unistd_64.h        |  2 +
+ linux-headers/asm-s390/kvm.h                 |  6 +++
+ linux-headers/asm-s390/unistd_32.h           |  2 +
+ linux-headers/asm-s390/unistd_64.h           |  2 +
+ linux-headers/asm-x86/kvm.h                  | 28 ++++++++---
+ linux-headers/asm-x86/unistd.h               |  2 +-
+ linux-headers/asm-x86/unistd_32.h            |  2 +
+ linux-headers/asm-x86/unistd_64.h            |  2 +
+ linux-headers/asm-x86/unistd_x32.h           |  2 +
+ linux-headers/linux/kvm.h                    | 12 ++++-
+ linux-headers/linux/psp-sev.h                |  5 +-
+ linux-headers/linux/vfio.h                   | 71 ++++++++++++++++++++--------
+ target/i386/cpu.c                            |  2 +
+ target/i386/cpu.h                            |  1 +
+ target/i386/kvm.c                            | 24 ++++++++++
+ 34 files changed, 262 insertions(+), 59 deletions(-)
 
->>> 1) Sane guest
->>>
->>> Guest kernel has #AC handler and you basically prevent it from
->>> detecting malicious user space and killing it. You also prevent #AC
->>> detection in the guest kernel which limits debugability.
-> 
-> That's a perfectly fine situation. Host has #AC enabled and exposes the
-> availability of #AC to the guest. Guest kernel has a proper handler and
-> does the right thing. So the host _CAN_ forward #AC to the guest and let it
-> deal with it. For that to work you need to expose the MSR so you know the
-> guest state in the host.
-> 
-> Your lazy 'solution' just renders #AC completely useless even for
-> debugging.
-> 
->>> 2) Malicious guest
->>>
->>> Trigger #AC to disable the host detection and then carry out the DoS 
->>> attack.
-> 
-> With your proposal you render #AC useless even on hosts which have SMT
-> disabled, which is just wrong. There are enough good reasons to disable
-> SMT.
+-- 
+2.14.5
 
-My lazy "solution" only applies to SMT enabled.  When SMT is either not
-supported, or disabled as in "nosmt=force", we can virtualize it like
-the posted patches have done so far.
-
-> I agree that with SMT enabled the situation is truly bad, but we surely can
-> be smarter than just disabling it globally unconditionally and forever.
-> 
-> Plus we want a knob which treats guests triggering #AC in the same way as
-> we treat user space, i.e. kill them with SIGBUS.
-
-Yes, that's a valid alternative.  But if SMT is possible, I think the
-only sane possibilities are global disable and SIGBUS.  SIGBUS (or
-better, a new KVM_RUN exit code) can be acceptable for debugging guests too.
-
-Paolo
