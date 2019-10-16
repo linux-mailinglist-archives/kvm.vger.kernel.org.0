@@ -2,55 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 19C03D88D3
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 08:58:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 043C8D88EF
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 09:07:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388047AbfJPG6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 02:58:11 -0400
-Received: from mga01.intel.com ([192.55.52.88]:64506 "EHLO mga01.intel.com"
+        id S2389398AbfJPHHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 03:07:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47652 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387860AbfJPG6L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 02:58:11 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 23:58:11 -0700
-X-IronPort-AV: E=Sophos;i="5.67,302,1566889200"; 
-   d="scan'208";a="186064631"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 15 Oct 2019 23:58:07 -0700
-Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
- lock
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Fenghua Yu <fenghua.yu@intel.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
- <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
- <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
- <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
- <20190925180931.GG31852@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <bc8f5850-ba7d-45b7-a30b-5560764edcc8@intel.com>
-Date:   Wed, 16 Oct 2019 14:58:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2388897AbfJPHHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 03:07:41 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D9CAEC0546F1
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 07:07:40 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id m16so559223wmg.8
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 00:07:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=N+9zhD6sQkjtyZn9LozIr63oV0xoTG40KqwCVlYDKHM=;
+        b=NB8Q9dnGri6NNaPbPEwwkgsqUfSUBtxc5GFjtcETEDOn7/fXio7K6FXdx+/MOC44Dx
+         mOwwFczuZcZKnyz+c6BBeGiUYM0YMS2G5N7AjYD1iqMJT1lMqSBrRW48/9yfP2qRIOMH
+         cF37GNz59p6EKExh+tG3smQpaNs107agkuIAkz0Z2j6f46LPOT/YEUV9ZtBxxUV9bbi9
+         ioJ4HGiZleoY7L6iYjoZJd6tEynfCfLGJGokklvIKkewZdr6IXCjEy1HnbvtkN/iSM04
+         zI2LiKB0lyYRQ008M8i6uJe/nNI+3rZ/oNHRI4T2VcNSUDlQI4s5ZARd9DRIa4HE4YgV
+         weZA==
+X-Gm-Message-State: APjAAAUHVl/GdDbHSofU+QCL54yucZkPwpk3aPAMiYSCojqGA5Gz2Ya+
+        VLciILStNwy3vNTLr4slv3ax5fTeH80FyTzPffE/bIwPgfCP+1Wyn70MuntAQctcUnuwDIUmnxx
+        vX4C1V3aTPHy0
+X-Received: by 2002:adf:8295:: with SMTP id 21mr1239229wrc.14.1571209659466;
+        Wed, 16 Oct 2019 00:07:39 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxoZ2u9pyRAua6Ul/ChncLAqQBC2pUX3xcLpP8/GnoCUcKnPgyeub7C/seFKjjOj2y3m+oRsg==
+X-Received: by 2002:adf:8295:: with SMTP id 21mr1239207wrc.14.1571209659089;
+        Wed, 16 Oct 2019 00:07:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
+        by smtp.gmail.com with ESMTPSA id a9sm2047772wmf.14.2019.10.16.00.07.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2019 00:07:38 -0700 (PDT)
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+ <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+ <20191015203516.GF331@redhat.com>
+ <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
+ <20191015234229.GC6487@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <27cc0d6b-6bd7-fcaf-10b4-37bb566871f8@redhat.com>
+Date:   Wed, 16 Oct 2019 09:07:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190925180931.GG31852@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191015234229.GC6487@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -58,140 +71,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/26/2019 2:09 AM, Sean Christopherson wrote:
-> On Wed, Jun 26, 2019 at 11:47:40PM +0200, Thomas Gleixner wrote:
->> So only one of the CPUs will win the cmpxchg race, set te variable to 1 and
->> warn, the other and any subsequent AC on any other CPU will not warn
->> either. So you don't need WARN_ONCE() at all. It's redundant and confusing
->> along with the atomic_set().
+On 16/10/19 01:42, Andrea Arcangeli wrote:
+> On Wed, Oct 16, 2019 at 12:22:31AM +0200, Paolo Bonzini wrote:
+>> Oh come on.  0.9 is not 12-years old.  virtio 1.0 is 3.5 years old
+>> (March 2016).  Anything older than 2017 is going to use 0.9.
+> 
+> Sorry if I got the date wrong, but still I don't see the point in
+> optimizing for legacy virtio. I can't justify forcing everyone to
+> execute that additional branch for inb/outb, in the attempt to make
+> legacy virtio faster that nobody should use in combination with
+> bleeding edge KVM in the host.
+
+Yet you would add CPUID to the list even though it is not even there in
+your benchmarks, and is *never* invoked in a hot path by *any* sane
+program? Some OSes have never gotten virtio 1.0 drivers.  OpenBSD only
+got it earlier this year.
+
+>> Your tables give:
 >>
->> Whithout reading that link [1], what Ingo proposed was surely not the
->> trainwreck which you decided to put into that debugfs thing.
+>> 	Samples	  Samples%  Time%     Min Time  Max time       Avg time
+>> HLT     101128    75.33%    99.66%    0.43us    901000.66us    310.88us
+>> HLT     118474    19.11%    95.88%    0.33us    707693.05us    43.56us
+>>
+>> If "avg time" means the average time to serve an HLT vmexit, I don't
+>> understand how you can have an average time of 0.3ms (1/3000th of a
+>> second) and 100000 samples per second.  Can you explain that to me?
 > 
-> We're trying to sort out the trainwreck, but there's an additional wrinkle
-> that I'd like your input on.
-> 
-> We overlooked the fact that MSR_TEST_CTRL is per-core, i.e. shared by
-> sibling hyperthreads.  This is especially problematic for KVM, as loading
-> MSR_TEST_CTRL during VM-Enter could cause spurious #AC faults in the kernel
-> and bounce MSR_TEST_CTRL.split_lock.
-> 
-> E.g. if CPU0 and CPU1 are siblings and CPU1 is running a KVM guest with
-> MSR_TEST_CTRL.split_lock=1, hitting an #AC on CPU0 in the host kernel will
-> lead to suprious #AC faults and constant toggling of of the MSR.
-> 
->    CPU0               CPU1
-> 
->           split_lock=enabled
-> 
->    #AC -> disabled
-> 
->                       VM-Enter -> enabled
-> 
->    #AC -> disabled
-> 
->                       VM-Enter -> enabled
-> 
->    #AC -> disabled
-> 
-> 
-> 
-> My thought to handle this:
-> 
->    - Remove the per-cpu cache.
-> 
->    - Rework the atomic variable to differentiate between "disabled globally"
->      and "disabled by kernel (on some CPUs)".
-> 
->    - Modify the #AC handler to test/set the same atomic variable as the
->      sysfs knob.  This is the "disabled by kernel" flow.
-> 
->    - Modify the debugfs/sysfs knob to only allow disabling split-lock
->      detection.  This is the "disabled globally" path, i.e. sends IPIs to
->      clear MSR_TEST_CTRL.split_lock on all online CPUs.
-> 
->    - Modify the resume/init flow to clear MSR_TEST_CTRL.split_lock if it's
->      been disabled on *any* CPU via #AC or via the knob.
-> 
->    - Modify the debugs/sysfs read function to either print the raw atomic
->      variable, or differentiate between "enabled", "disabled globally" and
->     "disabled by kernel".
-> 
->    - Remove KVM loading of MSR_TEST_CTRL, i.e. KVM *never* writes the CPU's
->      actual MSR_TEST_CTRL.  KVM still emulates MSR_TEST_CTRL so that the
->      guest can do WRMSR and handle its own #AC faults, but KVM doesn't
->      change the value in hardware.
-> 
->        * Allowing guest to enable split-lock detection can induce #AC on
->          the host after it has been explicitly turned off, e.g. the sibling
->          hyperthread hits an #AC in the host kernel, or worse, causes a
->          different process in the host to SIGBUS.
-> 
->        * Allowing guest to disable split-lock detection opens up the host
->          to DoS attacks.
-> 
->    - KVM advertises split-lock detection to guest/userspace if and only if
->      split_lock_detect_disabled is zero.
-> 
->    - Add a pr_warn_once() in KVM that triggers if split locks are disabled
->      after support has been advertised to a guest.
-> 
-> Does this sound sane?
-> 
-> The question at the forefront of my mind is: why not have the #AC handler
-> send a fire-and-forget IPI to online CPUs to disable split-lock detection
-> on all CPUs?  Would the IPI be problematic?  Globally disabling split-lock
-> on any #AC would (marginally) simplify the code and would eliminate the
-> oddity of userspace process (and KVM guest) #AC behavior varying based on
-> the physical CPU it's running on.
-> 
-> 
-> Something like:
-> 
-> #define SPLIT_LOCK_DISABLED_IN_KERNEL	BIT(0)
-> #define SPLIT_LOCK_DISABLED_GLOBALLY	BIT(1)
-> 
-> static atomic_t split_lock_detect_disabled = ATOMIT_INIT(0);
-> 
-> void split_lock_detect_ac(void)
-> {
-> 	lockdep_assert_irqs_disabled();
-> 
-> 	/* Disable split lock detection on this CPU to avoid reentrant #AC. */
-> 	wrmsrl(MSR_TEST_CTRL,
-> 	       rdmsrl(MSR_TEST_CTRL) & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
-> 
-> 	/*
-> 	 * If split-lock detection has not been disabled, either by the kernel
-> 	 * or globally, record that it has been disabled by the kernel and
-> 	 * WARN.  Guarding WARN with the atomic ensures only the first #AC due
-> 	 * to split-lock is logged, e.g. if multiple CPUs encounter #AC or if
-> 	 * #AC is retriggered by a perf context NMI that interrupts the
-> 	 * original WARN.
-> 	 */
-> 	if (atomic_cmpxchg(&split_lock_detect_disabled, 0,
-> 			   SPLIT_LOCK_DISABLED_IN_KERNEL) == 0)
-> 	        WARN(1, "split lock operation detected\n");
-> }
-> 
-> static ssize_t split_lock_detect_wr(struct file *f, const char __user *user_buf,
-> 				    size_t count, loff_t *ppos)
-> {
-> 	int old;
-> 
-> 	<parse or ignore input value?>
-> 	
-> 	old = atomic_fetch_or(SPLIT_LOCK_DISABLED_GLOBALLY,
-> 			      &split_lock_detect_disabled);
-> 
-> 	/* Update MSR_TEST_CTRL unless split-lock was already disabled. */
-> 	if (!(old & SPLIT_LOCK_DISABLED_GLOBALLY))
-> 		on_each_cpu(split_lock_update, NULL, 1);
-> 
-> 	return count;
-> }
-> 
+> I described it wrong, the bpftrace record was a sleep 5, not a sleep
+> 1. The pipe loop was sure a sleep 1.
 
-Hi Thomas,
+It still doesn't add up.  0.3ms / 5 is 1/15000th of a second; 43us is
+1/25000th of a second.  Do you have multiple vCPU perhaps?
 
-Could you please have a look at Sean's proposal and give your opinion.
+> The issue is that in production you get a flood more of those with
+> hundred of CPUs, so the exact number doesn't move the needle.
+> This just needs to be frequent enough that the branch cost pay itself off,
+> but the sure thing is that HLT vmexit will not go away unless you execute
+> mwait in guest mode by isolating the CPU in the host.
+
+The number of vmexits doesn't count (for HLT).  What counts is how long
+they take to be serviced, and as long as it's 1us or more the
+optimization is pointless.
+
+Consider these pictures
+
+         w/o optimization                   with optimization
+         ----------------------             -------------------------
+0us      vmexit                             vmexit
+500ns    retpoline                          call vmexit handler directly
+600ns    retpoline                          kvm_vcpu_check_block()
+700ns    retpoline                          kvm_vcpu_check_block()
+800ns    kvm_vcpu_check_block()             kvm_vcpu_check_block()
+900ns    kvm_vcpu_check_block()             kvm_vcpu_check_block()
+...
+39900ns  kvm_vcpu_check_block()             kvm_vcpu_check_block()
+
+                            <interrupt arrives>
+
+40000ns  kvm_vcpu_check_block()             kvm_vcpu_check_block()
+
+
+Unless the interrupt arrives exactly in the few nanoseconds that it
+takes to execute the retpoline, a direct handling of HLT vmexits makes
+*absolutely no difference*.
+
+>> Again: what is the real workload that does thousands of CPUIDs per second?
+> 
+> None, but there are always background CPUID vmexits while there are
+> never inb/outb vmexits.
+> 
+> So the cpuid retpoline removal has a slight chance to pay for the cost
+> of the branch, the inb/outb retpoline removal cannot pay off the cost
+> of the branch.
+
+Please stop considering only the exact configuration of your benchmarks.
+ There are known, valid configurations where outb is a very hot vmexit.
+
+Thanks,
+
+Paolo
