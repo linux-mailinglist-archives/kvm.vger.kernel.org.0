@@ -2,175 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACAFFD8727
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 06:14:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D9ABD8790
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 06:38:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733195AbfJPEOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 00:14:39 -0400
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21404 "EHLO
-        sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726155AbfJPEOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 00:14:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571199230; cv=none; 
-        d=zoho.com; s=zohoarc; 
-        b=U8dZk1H6yu9rfgOPOK2FLSPy/OwJUs4u/kV6xgPXnaSt77J97VAlECF5HOGR0sXC67omzLAwfFSpXCLHTBc55JO1jhwODS2zPENr77idzdksjQK6q2BIhGCQqafgEmXCrzayAHgrLZf7t1YioMZpCGw8m0NeP1lqA6fDeJPFWgU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com; s=zohoarc; 
-        t=1571199230; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=+jND/LegwPAicL7+Y3xp96y+HEfeFXtu1h0GmSvfQgM=; 
-        b=eJXbyX/JKkrUrze5japMaQyH5u1sPzR3uPsbcuM6Rxw+W9P/22B9VZxLihMUnwZE7sBBRIScRUMKuyJtj0mjQuRDv5m8CP0PHq+0nMroE3K6Hue/3DXGUZq6pRd57UfuO8cxEoYx4yX2YjgUxl4ULTql9uZKjZtHdWaqxPFvR/8=
-ARC-Authentication-Results: i=1; mx.zoho.com;
-        dkim=pass  header.i=patchew.org;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1571199227575731.7861531042065; Tue, 15 Oct 2019 21:13:47 -0700 (PDT)
-In-Reply-To: <20191015162705.28087-1-philmd@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH 00/32] hw/i386/pc: Split PIIX3 southbridge from i440FX northbridge
-Message-ID: <157119922523.5946.13253429873316869476@37313f22b938>
+        id S2389621AbfJPEid (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 00:38:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34654 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726502AbfJPEid (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 00:38:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id ABFD53082B40;
+        Wed, 16 Oct 2019 04:38:32 +0000 (UTC)
+Received: from [10.72.12.53] (ovpn-12-53.pek2.redhat.com [10.72.12.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2228819C5B;
+        Wed, 16 Oct 2019 04:38:19 +0000 (UTC)
+Subject: Re: [PATCH RFC v1 1/2] vhost: option to fetch descriptors through an
+ independent struct
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20191011134358.16912-1-mst@redhat.com>
+ <20191011134358.16912-2-mst@redhat.com>
+ <3b2a6309-9d21-7172-a581-9f0f1d5c1427@redhat.com>
+ <20191012162445-mutt-send-email-mst@kernel.org>
+ <fea337ec-7c09-508b-3efa-b75afd6fe33b@redhat.com>
+ <20191014085806-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <e0e9cf30-8db6-e83a-3a69-dc86efff919b@redhat.com>
+Date:   Wed, 16 Oct 2019 12:38:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     philmd@redhat.com
-Cc:     qemu-devel@nongnu.org, lvivier@redhat.com, thuth@redhat.com,
-        sstabellini@kernel.org, ehabkost@redhat.com, kvm@vger.kernel.org,
-        paul@xen.org, mst@redhat.com, pbonzini@redhat.com,
-        hpoussin@reactos.org, amarkovic@wavecomp.com,
-        xen-devel@lists.xenproject.org, anthony.perard@citrix.com,
-        imammedo@redhat.com, aleksandar.rikalo@rt-rk.com,
-        philmd@redhat.com, aurelien@aurel32.net, rth@twiddle.net
-Date:   Tue, 15 Oct 2019 21:13:47 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20191014085806-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 16 Oct 2019 04:38:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxNTE2MjcwNS4yODA4
-Ny0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggMDAvMzJdIGh3L2kzODYvcGM6IFNwbGl0IFBJSVgz
-IHNvdXRoYnJpZGdlIGZyb20gaTQ0MEZYIG5vcnRoYnJpZGdlClR5cGU6IHNlcmllcwpNZXNzYWdl
-LWlkOiAyMDE5MTAxNTE2MjcwNS4yODA4Ny0xLXBoaWxtZEByZWRoYXQuY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmUyOGZj
-MDcgaHcvcGNpLWhvc3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2VzCjQyNzhm
-YzUgaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBm
-eCcKYjViYjExYyBody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9ucyB0byBo
-dy9pc2EvcGlpeDMuYwoyNTZiNjRkIGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0eWxlIGlz
-c3VlcwplMmUzOGQ4IGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0aW9ucyB0
-byBody9wY2ktaG9zdC9pNDQwZnguaAplYzNlMGU3IGh3L3BjaS1ob3N0L3BpaXg6IERlZmluZSBh
-bmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0ZSBDb250cm9sIFJlZ2lzdGVycwo3ZGEwZGM0IGh3L3Bj
-aS1ob3N0L3BpaXg6IE1vdmUgUkNSX0lPUE9SVCByZWdpc3RlciBkZWZpbml0aW9uCmRlMmY4M2Ig
-aHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBwaWl4M19jcmVhdGUoKQoxZjMzYTE2IGh3L2kzODYv
-cGM6IFJlbW92ZSBrdm1faTM4Ni5oIGluY2x1ZGUKMTIwYmY2NCBody9pMzg2L3BjOiBFeHRyYWN0
-IHBjX2k4MjU5X2NyZWF0ZSgpCjdmNGFlZDYgaHcvaTM4Ni9wYzogTW92ZSBnc2lfc3RhdGUgY3Jl
-YXRpb24gY29kZQphZjA4NjNjIGh3L2kzODYvcGM6IFJlZHVjZSBnc2lfaGFuZGxlciBzY29wZQph
-M2Y5YWQ5IGh3L2kzODYvcGM6IEV4dHJhY3QgcGNfZ3NpX2NyZWF0ZSgpCjkzM2QxY2QgaHcvaXNh
-L3BpaXg0OiBNb3ZlIHBpaXg0X2NyZWF0ZSgpIHRvIGh3L2lzYS9waWl4NC5jCjIyM2M3MDEgaHcv
-bWlwcy9taXBzX21hbHRhOiBFeHRyYWN0IHRoZSBQSUlYNCBjcmVhdGlvbiBjb2RlIGFzIHBpaXg0
-X2NyZWF0ZSgpCjNkYjA1NzQgaHcvbWlwcy9taXBzX21hbHRhOiBDcmVhdGUgSURFIGhhcmQgZHJp
-dmUgYXJyYXkgZHluYW1pY2FsbHkKNTkyMjViOSBwaWl4NDogYWRkIGEgbWMxNDY4MThydGMgY29u
-dHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CmRhMDFkNTkgcGlpeDQ6IGFkZCBhIGk4
-MjU0IHBpdCBjb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKNDA1MThkYiBwaWl4
-NDogYWRkIGEgaTgyNTcgZG1hIGNvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldAow
-MTVkZTcxIHBpaXg0OiBjb252ZXJ0IHJlc2V0IGZ1bmN0aW9uIHRvIFFPTQozYTY4YzhmIHBpaXg0
-OiByZW5hbWUgUElJWDQgb2JqZWN0IHRvIHBpaXg0LWlzYQpkYTUxYzUyIFJldmVydCAiaXJxOiBp
-bnRyb2R1Y2UgcWVtdV9pcnFfcHJveHkoKSIKOGNkZWFjZiBwaWl4NDogYWRkIGEgaTgyNTkgaW50
-ZXJydXB0IGNvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldAplY2M5MmMyIHBpaXg0
-OiBhZGQgUmVzZXQgQ29udHJvbCBSZWdpc3RlcgpjMmNkNTU2IHBpaXg0OiByZW5hbWUgc29tZSB2
-YXJpYWJsZXMgaW4gcmVhbGl6ZSBmdW5jdGlvbgo2N2Q5YmU1IE1BSU5UQUlORVJTOiBLZWVwIFBJ
-SVg0IFNvdXRoIEJyaWRnZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzCjA1NjdlOWQgbWMxNDY4
-MThydGM6IGFsd2F5cyByZWdpc3RlciBydGMgdG8gcnRjIGxpc3QKM2Q5ODk3YSBtYzE0NjgxOHJ0
-YzogSW5jbHVkZSAibWMxNDY4MThydGNfcmVncy5oIiBkaXJlY3RseSBpbiBtYzE0NjgxOHJ0Yy5j
-CjRjMGZkZTAgbWMxNDY4MThydGM6IE1vdmUgUlRDX0lTQV9JUlEgZGVmaW5pdGlvbgoxYTg0Mjdl
-IG1jMTQ2ODE4cnRjOiBtb3ZlIHN0cnVjdHVyZSB0byBoZWFkZXIgZmlsZQowZTY1OTU2IGh3L2kz
-ODYvcGM6IE1vdmUga3ZtX2k4MjU5X2luaXQoKSBkZWNsYXJhdGlvbiB0byBzeXNlbXUva3ZtLmgK
-MDIwMWM5MCBody9pMzg2OiBSZW1vdmUgb2Jzb2xldGUgTG9hZFN0YXRlSGFuZGxlcjo6bG9hZF9z
-dGF0ZV9vbGQgaGFuZGxlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMzIgQ2hlY2tpbmcgY29t
-bWl0IDAyMDFjOTBlOGFhZiAoaHcvaTM4NjogUmVtb3ZlIG9ic29sZXRlIExvYWRTdGF0ZUhhbmRs
-ZXI6OmxvYWRfc3RhdGVfb2xkIGhhbmRsZXJzKQoyLzMyIENoZWNraW5nIGNvbW1pdCAwZTY1OTU2
-M2JiZDIgKGh3L2kzODYvcGM6IE1vdmUga3ZtX2k4MjU5X2luaXQoKSBkZWNsYXJhdGlvbiB0byBz
-eXNlbXUva3ZtLmgpCjMvMzIgQ2hlY2tpbmcgY29tbWl0IDFhODQyN2VjYWE5MiAobWMxNDY4MThy
-dGM6IG1vdmUgc3RydWN0dXJlIHRvIGhlYWRlciBmaWxlKQo0LzMyIENoZWNraW5nIGNvbW1pdCA0
-YzBmZGUwMGMxNTAgKG1jMTQ2ODE4cnRjOiBNb3ZlIFJUQ19JU0FfSVJRIGRlZmluaXRpb24pCjUv
-MzIgQ2hlY2tpbmcgY29tbWl0IDNkOTg5N2FlMmNmMCAobWMxNDY4MThydGM6IEluY2x1ZGUgIm1j
-MTQ2ODE4cnRjX3JlZ3MuaCIgZGlyZWN0bHkgaW4gbWMxNDY4MThydGMuYykKNi8zMiBDaGVja2lu
-ZyBjb21taXQgMDU2N2U5ZGYwNzk1IChtYzE0NjgxOHJ0YzogYWx3YXlzIHJlZ2lzdGVyIHJ0YyB0
-byBydGMgbGlzdCkKNy8zMiBDaGVja2luZyBjb21taXQgNjdkOWJlNTYxYzBjIChNQUlOVEFJTkVS
-UzogS2VlcCBQSUlYNCBTb3V0aCBCcmlkZ2Ugc2VwYXJhdGUgZnJvbSBQQyBDaGlwc2V0cykKOC8z
-MiBDaGVja2luZyBjb21taXQgYzJjZDU1NjFhZGY5IChwaWl4NDogcmVuYW1lIHNvbWUgdmFyaWFi
-bGVzIGluIHJlYWxpemUgZnVuY3Rpb24pCjkvMzIgQ2hlY2tpbmcgY29tbWl0IGVjYzkyYzI2Nzhi
-MCAocGlpeDQ6IGFkZCBSZXNldCBDb250cm9sIFJlZ2lzdGVyKQoxMC8zMiBDaGVja2luZyBjb21t
-aXQgOGNkZWFjZmYzNGI1IChwaWl4NDogYWRkIGEgaTgyNTkgaW50ZXJydXB0IGNvbnRyb2xsZXIg
-YXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldCkKMTEvMzIgQ2hlY2tpbmcgY29tbWl0IGRhNTFjNTI0
-N2QxZiAoUmV2ZXJ0ICJpcnE6IGludHJvZHVjZSBxZW11X2lycV9wcm94eSgpIikKMTIvMzIgQ2hl
-Y2tpbmcgY29tbWl0IDNhNjhjOGY1ZmYzMCAocGlpeDQ6IHJlbmFtZSBQSUlYNCBvYmplY3QgdG8g
-cGlpeDQtaXNhKQoxMy8zMiBDaGVja2luZyBjb21taXQgMDE1ZGU3MWI2ZTc1IChwaWl4NDogY29u
-dmVydCByZXNldCBmdW5jdGlvbiB0byBRT00pCjE0LzMyIENoZWNraW5nIGNvbW1pdCA0MDUxOGRi
-YmRjODIgKHBpaXg0OiBhZGQgYSBpODI1NyBkbWEgY29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4g
-ZGF0YXNoZWV0KQoxNS8zMiBDaGVja2luZyBjb21taXQgZGEwMWQ1OTRkOGRkIChwaWl4NDogYWRk
-IGEgaTgyNTQgcGl0IGNvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldCkKMTYvMzIg
-Q2hlY2tpbmcgY29tbWl0IDU5MjI1Yjk4ZDBkNiAocGlpeDQ6IGFkZCBhIG1jMTQ2ODE4cnRjIGNv
-bnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldCkKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTky
-OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDE2NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNi8zMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoxNy8zMiBDaGVja2luZyBjb21taXQgM2RiMDU3NGNmNjVhIChody9taXBzL21pcHNfbWFsdGE6
-IENyZWF0ZSBJREUgaGFyZCBkcml2ZSBhcnJheSBkeW5hbWljYWxseSkKMTgvMzIgQ2hlY2tpbmcg
-Y29tbWl0IDIyM2M3MDE0OTBkMCAoaHcvbWlwcy9taXBzX21hbHRhOiBFeHRyYWN0IHRoZSBQSUlY
-NCBjcmVhdGlvbiBjb2RlIGFzIHBpaXg0X2NyZWF0ZSgpKQoxOS8zMiBDaGVja2luZyBjb21taXQg
-OTMzZDFjZGQ2Y2Y5IChody9pc2EvcGlpeDQ6IE1vdmUgcGlpeDRfY3JlYXRlKCkgdG8gaHcvaXNh
-L3BpaXg0LmMpCjIwLzMyIENoZWNraW5nIGNvbW1pdCBhM2Y5YWQ5ODg3ZmYgKGh3L2kzODYvcGM6
-IEV4dHJhY3QgcGNfZ3NpX2NyZWF0ZSgpKQoyMS8zMiBDaGVja2luZyBjb21taXQgYWYwODYzYzM1
-Y2NiIChody9pMzg2L3BjOiBSZWR1Y2UgZ3NpX2hhbmRsZXIgc2NvcGUpCjIyLzMyIENoZWNraW5n
-IGNvbW1pdCA3ZjRhZWQ2MTIyYmEgKGh3L2kzODYvcGM6IE1vdmUgZ3NpX3N0YXRlIGNyZWF0aW9u
-IGNvZGUpCjIzLzMyIENoZWNraW5nIGNvbW1pdCAxMjBiZjY0YWU4OWMgKGh3L2kzODYvcGM6IEV4
-dHJhY3QgcGNfaTgyNTlfY3JlYXRlKCkpCjI0LzMyIENoZWNraW5nIGNvbW1pdCAxZjMzYTE2Zjk2
-NmUgKGh3L2kzODYvcGM6IFJlbW92ZSBrdm1faTM4Ni5oIGluY2x1ZGUpCjI1LzMyIENoZWNraW5n
-IGNvbW1pdCBkZTJmODNiYTQxZTcgKGh3L3BjaS1ob3N0L3BpaXg6IEV4dHJhY3QgcGlpeDNfY3Jl
-YXRlKCkpCjI2LzMyIENoZWNraW5nIGNvbW1pdCA3ZGEwZGM0MDM0ZTQgKGh3L3BjaS1ob3N0L3Bp
-aXg6IE1vdmUgUkNSX0lPUE9SVCByZWdpc3RlciBkZWZpbml0aW9uKQoyNy8zMiBDaGVja2luZyBj
-b21taXQgZWMzZTBlNzU1ZmE5IChody9wY2ktaG9zdC9waWl4OiBEZWZpbmUgYW5kIHVzZSB0aGUg
-UElJWCBJUlEgUm91dGUgQ29udHJvbCBSZWdpc3RlcnMpCjI4LzMyIENoZWNraW5nIGNvbW1pdCBl
-MmUzOGQ4NjllYzggKGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0aW9ucyB0
-byBody9wY2ktaG9zdC9pNDQwZnguaCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojOTc6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDEgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMjgvMzIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjkvMzIgQ2hlY2tpbmcg
-Y29tbWl0IDI1NmI2NGQyMmY5OSAoaHcvcGNpLWhvc3QvcGlpeDogRml4IGNvZGUgc3R5bGUgaXNz
-dWVzKQozMC8zMiBDaGVja2luZyBjb21taXQgYjViYjExY2I0ZDg1IChody9wY2ktaG9zdC9waWl4
-OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9ucyB0byBody9pc2EvcGlpeDMuYykKV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojNjQ6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiMzMTM6IEZJTEU6IGh3L2lzYS9waWl4My5jOjI0NToK
-KyAgICAuc3Vic2VjdGlvbnMgPSAoY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uKltdKSB7CiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9y
-cywgMSB3YXJuaW5ncywgOTM3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMwLzMyIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgozMS8zMiBDaGVja2luZyBjb21taXQgNDI3OGZjNWYxYTc5IChody9w
-Y2ktaG9zdDogUmVuYW1lIGluY29ycmVjdGx5IG5hbWVkICdwaWl4JyBhcyAnaTQ0MGZ4JykKV0FS
-TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
-ZWVkIHVwZGF0aW5nPwojNjg6IApyZW5hbWUgZnJvbSBody9wY2ktaG9zdC9waWl4LmMKCnRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMzEvMzIgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMzIvMzIgQ2hlY2tpbmcgY29tbWl0IGUyOGZjMDdjYzdj
-MSAoaHcvcGNpLWhvc3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2VzKQo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1
-bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAxNTE2
-MjcwNS4yODA4Ny0xLXBoaWxtZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
 
+On 2019/10/16 上午4:20, Michael S. Tsirkin wrote:
+> On Mon, Oct 14, 2019 at 09:43:25AM +0800, Jason Wang wrote:
+>> On 2019/10/13 上午4:27, Michael S. Tsirkin wrote:
+>>> On Sat, Oct 12, 2019 at 03:28:49PM +0800, Jason Wang wrote:
+>>>> On 2019/10/11 下午9:45, Michael S. Tsirkin wrote:
+>>>>> The idea is to support multiple ring formats by converting
+>>>>> to a format-independent array of descriptors.
+>>>>>
+>>>>> This costs extra cycles, but we gain in ability
+>>>>> to fetch a batch of descriptors in one go, which
+>>>>> is good for code cache locality.
+>>>>>
+>>>>> To simplify benchmarking, I kept the old code
+>>>>> around so one can switch back and forth by
+>>>>> writing into a module parameter.
+>>>>> This will go away in the final submission.
+>>>>>
+>>>>> This patch causes a minor performance degradation,
+>>>>> it's been kept as simple as possible for ease of review.
+>>>>> Next patch gets us back the performance by adding batching.
+>>>>>
+>>>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>> ---
+>>>>>     drivers/vhost/test.c  |  17 ++-
+>>>>>     drivers/vhost/vhost.c | 299 +++++++++++++++++++++++++++++++++++++++++-
+>>>>>     drivers/vhost/vhost.h |  16 +++
+>>>>>     3 files changed, 327 insertions(+), 5 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+>>>>> index 056308008288..39a018a7af2d 100644
+>>>>> --- a/drivers/vhost/test.c
+>>>>> +++ b/drivers/vhost/test.c
+>>>>> @@ -18,6 +18,9 @@
+>>>>>     #include "test.h"
+>>>>>     #include "vhost.h"
+>>>>> +static int newcode = 0;
+>>>>> +module_param(newcode, int, 0644);
+>>>>> +
+>>>>>     /* Max number of bytes transferred before requeueing the job.
+>>>>>      * Using this limit prevents one virtqueue from starving others. */
+>>>>>     #define VHOST_TEST_WEIGHT 0x80000
+>>>>> @@ -58,10 +61,16 @@ static void handle_vq(struct vhost_test *n)
+>>>>>     	vhost_disable_notify(&n->dev, vq);
+>>>>>     	for (;;) {
+>>>>> -		head = vhost_get_vq_desc(vq, vq->iov,
+>>>>> -					 ARRAY_SIZE(vq->iov),
+>>>>> -					 &out, &in,
+>>>>> -					 NULL, NULL);
+>>>>> +		if (newcode)
+>>>>> +			head = vhost_get_vq_desc_batch(vq, vq->iov,
+>>>>> +						       ARRAY_SIZE(vq->iov),
+>>>>> +						       &out, &in,
+>>>>> +						       NULL, NULL);
+>>>>> +		else
+>>>>> +			head = vhost_get_vq_desc(vq, vq->iov,
+>>>>> +						 ARRAY_SIZE(vq->iov),
+>>>>> +						 &out, &in,
+>>>>> +						 NULL, NULL);
+>>>>>     		/* On error, stop handling until the next kick. */
+>>>>>     		if (unlikely(head < 0))
+>>>>>     			break;
+>>>>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>>>>> index 36ca2cf419bf..36661d6cb51f 100644
+>>>>> --- a/drivers/vhost/vhost.c
+>>>>> +++ b/drivers/vhost/vhost.c
+>>>>> @@ -301,6 +301,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>>>>>     			   struct vhost_virtqueue *vq)
+>>>>>     {
+>>>>>     	vq->num = 1;
+>>>>> +	vq->ndescs = 0;
+>>>>>     	vq->desc = NULL;
+>>>>>     	vq->avail = NULL;
+>>>>>     	vq->used = NULL;
+>>>>> @@ -369,6 +370,9 @@ static int vhost_worker(void *data)
+>>>>>     static void vhost_vq_free_iovecs(struct vhost_virtqueue *vq)
+>>>>>     {
+>>>>> +	kfree(vq->descs);
+>>>>> +	vq->descs = NULL;
+>>>>> +	vq->max_descs = 0;
+>>>>>     	kfree(vq->indirect);
+>>>>>     	vq->indirect = NULL;
+>>>>>     	kfree(vq->log);
+>>>>> @@ -385,6 +389,10 @@ static long vhost_dev_alloc_iovecs(struct vhost_dev *dev)
+>>>>>     	for (i = 0; i < dev->nvqs; ++i) {
+>>>>>     		vq = dev->vqs[i];
+>>>>> +		vq->max_descs = dev->iov_limit;
+>>>>> +		vq->descs = kmalloc_array(vq->max_descs,
+>>>>> +					  sizeof(*vq->descs),
+>>>>> +					  GFP_KERNEL);
+>>>> Is iov_limit too much here? It can obviously increase the footprint. I guess
+>>>> the batching can only be done for descriptor without indirect or next set.
+>>>> Then we may batch 16 or 64.
+>>>>
+>>>> Thanks
+>>> Yes, next patch only batches up to 64.  But we do need iov_limit because
+>>> guest can pass a long chain of scatter/gather.
+>>> We already have iovecs in a huge array so this does not look like
+>>> a big deal. If we ever teach the code to avoid the huge
+>>> iov arrays by handling huge s/g lists piece by piece,
+>>> we can make the desc array smaller at the same point.
+>>>
+>> Another possible issue, if we try to batch descriptor chain when we've
+>> already batched some descriptors, we may reach the limit then some of the
+>> descriptors might need re-read.
+>>
+>> Or we may need circular index (head, tail) in this case?
+>>
+>> Thanks
+> We never supported more than IOV_MAX descriptors.
+> And we don't batch more than iov_limit - IOV_MAX.
+
+
+Ok, but what happens when we've already batched 63 descriptors then come 
+a 3 descriptor chain?
+
+And it looks to me we need forget the cached descriptor during 
+set_vring_base()
+
+Thanks
+
+
+>
+> so buffer never overflows.
+>
