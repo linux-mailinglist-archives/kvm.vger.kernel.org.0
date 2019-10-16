@@ -2,115 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0AC7D8845
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 07:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19C03D88D3
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 08:58:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387657AbfJPFx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 01:53:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45576 "EHLO mx1.redhat.com"
+        id S2388047AbfJPG6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 02:58:11 -0400
+Received: from mga01.intel.com ([192.55.52.88]:64506 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387456AbfJPFx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 01:53:29 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 497DC309BF09;
-        Wed, 16 Oct 2019 05:53:28 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-131.ams2.redhat.com [10.36.116.131])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A8E01601AC;
-        Wed, 16 Oct 2019 05:53:26 +0000 (UTC)
-Subject: Re: [kvm-unit-tests v2 PATCH 2/2] x86: don't compare two global
- objects' addrs for inequality
-To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, alexandru.elisei@arm.com
-Cc:     jmattson@google.com
-References: <20191012074454.208377-1-morbo@google.com>
- <20191015204603.47845-1-morbo@google.com>
- <20191015204603.47845-3-morbo@google.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <8436cd9d-a545-98be-8409-3384577594fb@redhat.com>
-Date:   Wed, 16 Oct 2019 07:53:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        id S2387860AbfJPG6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 02:58:11 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 23:58:11 -0700
+X-IronPort-AV: E=Sophos;i="5.67,302,1566889200"; 
+   d="scan'208";a="186064631"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 15 Oct 2019 23:58:07 -0700
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Fenghua Yu <fenghua.yu@intel.com>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+ <20190925180931.GG31852@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <bc8f5850-ba7d-45b7-a30b-5560764edcc8@intel.com>
+Date:   Wed, 16 Oct 2019 14:58:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191015204603.47845-3-morbo@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190925180931.GG31852@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 16 Oct 2019 05:53:28 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/2019 22.46, Bill Wendling wrote:
-> Two global objects can't have the same address in C. Clang uses this
-> fact to omit the check on the first iteration of the loop in
-> check_exception_table. Avoid compariting inequality by using less-than.
+On 9/26/2019 2:09 AM, Sean Christopherson wrote:
+> On Wed, Jun 26, 2019 at 11:47:40PM +0200, Thomas Gleixner wrote:
+>> So only one of the CPUs will win the cmpxchg race, set te variable to 1 and
+>> warn, the other and any subsequent AC on any other CPU will not warn
+>> either. So you don't need WARN_ONCE() at all. It's redundant and confusing
+>> along with the atomic_set().
+>>
+>> Whithout reading that link [1], what Ingo proposed was surely not the
+>> trainwreck which you decided to put into that debugfs thing.
 > 
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->  lib/x86/desc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> We're trying to sort out the trainwreck, but there's an additional wrinkle
+> that I'd like your input on.
 > 
-> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-> index 451f504..4002203 100644
-> --- a/lib/x86/desc.c
-> +++ b/lib/x86/desc.c
-> @@ -113,7 +113,7 @@ static void check_exception_table(struct ex_regs *regs)
->  		(((regs->rflags >> 16) & 1) << 8);
->      asm("mov %0, %%gs:4" : : "r"(ex_val));
->  
-> -    for (ex = &exception_table_start; ex != &exception_table_end; ++ex) {
-> +    for (ex = &exception_table_start; ex < &exception_table_end; ++ex) {
->          if (ex->rip == regs->rip) {
->              regs->rip = ex->handler;
->              return;
+> We overlooked the fact that MSR_TEST_CTRL is per-core, i.e. shared by
+> sibling hyperthreads.  This is especially problematic for KVM, as loading
+> MSR_TEST_CTRL during VM-Enter could cause spurious #AC faults in the kernel
+> and bounce MSR_TEST_CTRL.split_lock.
+> 
+> E.g. if CPU0 and CPU1 are siblings and CPU1 is running a KVM guest with
+> MSR_TEST_CTRL.split_lock=1, hitting an #AC on CPU0 in the host kernel will
+> lead to suprious #AC faults and constant toggling of of the MSR.
+> 
+>    CPU0               CPU1
+> 
+>           split_lock=enabled
+> 
+>    #AC -> disabled
+> 
+>                       VM-Enter -> enabled
+> 
+>    #AC -> disabled
+> 
+>                       VM-Enter -> enabled
+> 
+>    #AC -> disabled
+> 
+> 
+> 
+> My thought to handle this:
+> 
+>    - Remove the per-cpu cache.
+> 
+>    - Rework the atomic variable to differentiate between "disabled globally"
+>      and "disabled by kernel (on some CPUs)".
+> 
+>    - Modify the #AC handler to test/set the same atomic variable as the
+>      sysfs knob.  This is the "disabled by kernel" flow.
+> 
+>    - Modify the debugfs/sysfs knob to only allow disabling split-lock
+>      detection.  This is the "disabled globally" path, i.e. sends IPIs to
+>      clear MSR_TEST_CTRL.split_lock on all online CPUs.
+> 
+>    - Modify the resume/init flow to clear MSR_TEST_CTRL.split_lock if it's
+>      been disabled on *any* CPU via #AC or via the knob.
+> 
+>    - Modify the debugs/sysfs read function to either print the raw atomic
+>      variable, or differentiate between "enabled", "disabled globally" and
+>     "disabled by kernel".
+> 
+>    - Remove KVM loading of MSR_TEST_CTRL, i.e. KVM *never* writes the CPU's
+>      actual MSR_TEST_CTRL.  KVM still emulates MSR_TEST_CTRL so that the
+>      guest can do WRMSR and handle its own #AC faults, but KVM doesn't
+>      change the value in hardware.
+> 
+>        * Allowing guest to enable split-lock detection can induce #AC on
+>          the host after it has been explicitly turned off, e.g. the sibling
+>          hyperthread hits an #AC in the host kernel, or worse, causes a
+>          different process in the host to SIGBUS.
+> 
+>        * Allowing guest to disable split-lock detection opens up the host
+>          to DoS attacks.
+> 
+>    - KVM advertises split-lock detection to guest/userspace if and only if
+>      split_lock_detect_disabled is zero.
+> 
+>    - Add a pr_warn_once() in KVM that triggers if split locks are disabled
+>      after support has been advertised to a guest.
+> 
+> Does this sound sane?
+> 
+> The question at the forefront of my mind is: why not have the #AC handler
+> send a fire-and-forget IPI to online CPUs to disable split-lock detection
+> on all CPUs?  Would the IPI be problematic?  Globally disabling split-lock
+> on any #AC would (marginally) simplify the code and would eliminate the
+> oddity of userspace process (and KVM guest) #AC behavior varying based on
+> the physical CPU it's running on.
+> 
+> 
+> Something like:
+> 
+> #define SPLIT_LOCK_DISABLED_IN_KERNEL	BIT(0)
+> #define SPLIT_LOCK_DISABLED_GLOBALLY	BIT(1)
+> 
+> static atomic_t split_lock_detect_disabled = ATOMIT_INIT(0);
+> 
+> void split_lock_detect_ac(void)
+> {
+> 	lockdep_assert_irqs_disabled();
+> 
+> 	/* Disable split lock detection on this CPU to avoid reentrant #AC. */
+> 	wrmsrl(MSR_TEST_CTRL,
+> 	       rdmsrl(MSR_TEST_CTRL) & ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT);
+> 
+> 	/*
+> 	 * If split-lock detection has not been disabled, either by the kernel
+> 	 * or globally, record that it has been disabled by the kernel and
+> 	 * WARN.  Guarding WARN with the atomic ensures only the first #AC due
+> 	 * to split-lock is logged, e.g. if multiple CPUs encounter #AC or if
+> 	 * #AC is retriggered by a perf context NMI that interrupts the
+> 	 * original WARN.
+> 	 */
+> 	if (atomic_cmpxchg(&split_lock_detect_disabled, 0,
+> 			   SPLIT_LOCK_DISABLED_IN_KERNEL) == 0)
+> 	        WARN(1, "split lock operation detected\n");
+> }
+> 
+> static ssize_t split_lock_detect_wr(struct file *f, const char __user *user_buf,
+> 				    size_t count, loff_t *ppos)
+> {
+> 	int old;
+> 
+> 	<parse or ignore input value?>
+> 	
+> 	old = atomic_fetch_or(SPLIT_LOCK_DISABLED_GLOBALLY,
+> 			      &split_lock_detect_disabled);
+> 
+> 	/* Update MSR_TEST_CTRL unless split-lock was already disabled. */
+> 	if (!(old & SPLIT_LOCK_DISABLED_GLOBALLY))
+> 		on_each_cpu(split_lock_update, NULL, 1);
+> 
+> 	return count;
+> }
 > 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Hi Thomas,
+
+Could you please have a look at Sean's proposal and give your opinion.
