@@ -2,64 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C22F1D92EF
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33762D92F1
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:51:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405531AbfJPNu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 09:50:58 -0400
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:34285 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727154AbfJPNu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 09:50:58 -0400
-Received: by mail-vs1-f68.google.com with SMTP id d3so15664958vsr.1
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 06:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-        b=OtiZFwf92a1OjxtOV5TFLjBpljpNzYXbiAOClM8ODtXo8IP2bVW9p9ZvXVbJei7kY8
-         pt/x97zyG+5OHWJIviCtill3GnSUh0lkuZeS6TPK7Qrj2XtHYUsWLMKvXaR6Zkb3Qv+E
-         Js76F/Xr0zsGxOxdo43SnJlOY03x+oF5z0/aJSGtpj3RhZLJI4tIPtr/IfUxcltttZnc
-         JjO7oYs4MEsz2fovM+4sjcdazgFVPoO5bqM14ULQVFMHbgJU6v+W6+geGe7lwBGd+VQt
-         C4nAcUnzPWQ2mMdNIU8N2eioT2rxf+1sjTkF39QbCT6EXmYyy/zvJNovZA0FWO/BKeTz
-         uh7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-        b=eHTC9l0t98hU8tI23qvrDeoiPEeIP/E7Jm0qSyJw8rTzby+5f9YA3uASwIp+OKy+Uw
-         7r9OCc/HSFo6iG2LH7fbhf+rnCZd1Zzvcu5k4MrbS1IUu2q/Lb1a6I5uRBJhR7XKwfT/
-         Amov4PTh8uzPMTV3mx0AodOoJUDhVRhdQxyai2eqPdu0MN8CvD1mpVeCoLbAWyvGyCpE
-         j/fwm/oYXbVzBac6qKiX1nDbWbYUM87+3HWSB5JK3CebgdWI+zXaPDJhpOR5aVVj5h+e
-         AZVq0jf96s5WtxTCzX7nHQ7ojRYBVtdB1qF7c74tCMj4v+hPCeFIgLz2CIOlN1wdX0B2
-         FYKA==
-X-Gm-Message-State: APjAAAVVolbf0k7WMT4LCevalla2PaEyZycQ2L344P8WWLYMrKCb3BPu
-        vMDC27Z/QfNS+TNEr+qwUfXo4P2mggsCRnv9UfU=
-X-Google-Smtp-Source: APXvYqwurcJNC5idm2cwO6HdNLCy10DRw8dWpjSOBWuHB4/rPMe/X8hjNRKrb0zDNAVeF1JjJylsWwanOKzGepGqSPI=
-X-Received: by 2002:a67:f799:: with SMTP id j25mr24291453vso.116.1571233856960;
- Wed, 16 Oct 2019 06:50:56 -0700 (PDT)
+        id S2405552AbfJPNvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 09:51:11 -0400
+Received: from mga05.intel.com ([192.55.52.43]:64160 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405542AbfJPNvL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 09:51:11 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 06:51:11 -0700
+X-IronPort-AV: E=Sophos;i="5.67,304,1566889200"; 
+   d="scan'208";a="186154129"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Oct 2019 06:51:07 -0700
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+ <20190925180931.GG31852@linux.intel.com>
+ <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
+ <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
+ <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
+ <alpine.DEB.2.21.1910161244060.2046@nanos.tec.linutronix.de>
+ <3a12810b-1196-b70a-aa2e-9fe17dc7341a@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <b2c42a64-eb42-1f18-f609-42eec3faef18@intel.com>
+Date:   Wed, 16 Oct 2019 21:51:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Received: by 2002:a1f:ac16:0:0:0:0:0 with HTTP; Wed, 16 Oct 2019 06:50:53
- -0700 (PDT)
-From:   robert <okeyyoyopa7@gmail.com>
-Date:   Wed, 16 Oct 2019 06:50:53 -0700
-Message-ID: <CAH8nkvZCZFg-j5UEaUtC16m6qfTF-TJ7o0R23Xq=+zOfinakZg@mail.gmail.com>
-Subject: Dear friend, My name is Bar.robert anderson I am an attorney and a
- private account manager to my late client. In the Year 2014, my client by
- name Mr. Carlos, passed away,The reason why I contacted you is because you
- bear the same last name with the deceased, and I can present you as the
- beneficiary and next of kin to my late client funds then you will stand as
- his next of kin and claim the funds. leaving behind a cash inheritance of
- seven Million Five Hundred Thousand United States Dollars (US$7.500,000,00).My
- late client and bosom friend grew up in a "Motherless Babies Home". He had no
- family, no beneficiary nor next of kin to the inheritance Funds left behind
- at the Bank. You should contact me through my private email address:
- robertandersonhappy1@gmail.com Best Regards, Bar. robert anderson
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <3a12810b-1196-b70a-aa2e-9fe17dc7341a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/16/2019 7:58 PM, Paolo Bonzini wrote:
+> On 16/10/19 13:49, Thomas Gleixner wrote:
+>> On Wed, 16 Oct 2019, Paolo Bonzini wrote:
+>>> Yes it does.  But Sean's proposal, as I understand it, leads to the
+>>> guest receiving #AC when it wasn't expecting one.  So for an old guest,
+>>> as soon as the guest kernel happens to do a split lock, it gets an
+>>> unexpected #AC and crashes and burns.  And then, after much googling and
+>>> gnashing of teeth, people proceed to disable split lock detection.
+>>
+>> I don't think that this was what he suggested/intended.
+> 
+> Xiaoyao's reply suggests that he also understood it like that.
+>
 
+Actually, what I replied is a little different from what you stated 
+above that guest won't receive #AC when it wasn't expecting one but the 
+userspace receives this #AC.
+
+>>> In all of these cases, the common final result is that split-lock
+>>> detection is disabled on the host.  So might as well go with the
+>>> simplest one and not pretend to virtualize something that (without core
+>>> scheduling) is obviously not virtualizable.
+>>
+>> You are completely ignoring any argument here and just leave it behind your
+>> signature (instead of trimming your reply).
+> 
+> I am not ignoring them, I think there is no doubt that this is the
+> intended behavior.  I disagree that Sean's patches achieve it, however.
+> 
+>>>> 1) Sane guest
+>>>>
+>>>> Guest kernel has #AC handler and you basically prevent it from
+>>>> detecting malicious user space and killing it. You also prevent #AC
+>>>> detection in the guest kernel which limits debugability.
+>>
+>> That's a perfectly fine situation. Host has #AC enabled and exposes the
+>> availability of #AC to the guest. Guest kernel has a proper handler and
+>> does the right thing. So the host _CAN_ forward #AC to the guest and let it
+>> deal with it. For that to work you need to expose the MSR so you know the
+>> guest state in the host.
+>>
+>> Your lazy 'solution' just renders #AC completely useless even for
+>> debugging.
+>>
+>>>> 2) Malicious guest
+>>>>
+>>>> Trigger #AC to disable the host detection and then carry out the DoS
+>>>> attack.
+>>
+>> With your proposal you render #AC useless even on hosts which have SMT
+>> disabled, which is just wrong. There are enough good reasons to disable
+>> SMT.
+> 
+> My lazy "solution" only applies to SMT enabled.  When SMT is either not
+> supported, or disabled as in "nosmt=force", we can virtualize it like
+> the posted patches have done so far.
+> 
+
+Do we really need to divide it into two cases of SMT enabled and SMT 
+disabled?
+
+>> I agree that with SMT enabled the situation is truly bad, but we surely can
+>> be smarter than just disabling it globally unconditionally and forever.
+>>
+>> Plus we want a knob which treats guests triggering #AC in the same way as
+>> we treat user space, i.e. kill them with SIGBUS.
+> 
+> Yes, that's a valid alternative.  But if SMT is possible, I think the
+> only sane possibilities are global disable and SIGBUS.  SIGBUS (or
+> better, a new KVM_RUN exit code) can be acceptable for debugging guests too.
+
+If SIGBUS, why need to globally disable?
+
+When there is an #AC due to split-lock in guest, KVM only has below two 
+choices:
+1) inject back into guest.
+    - If kvm advertise this feature to guest, and guest kernel is 
+latest, and guest kernel must enable it too. It's the happy case that 
+guest can handler it on its own purpose.
+    - Any other cases, guest get an unexpected #AC and crash.
+2) report to userspace (I think the same like a SIGBUS)
+
+So for simplicity, we can do what Paolo suggested that don't advertise 
+this feature and report #AC to userspace when an #AC due to split-lock 
+in guest *but* we never disable the host's split-lock detection due to 
+guest's split-lock.
+
+> Paolo
+> 
