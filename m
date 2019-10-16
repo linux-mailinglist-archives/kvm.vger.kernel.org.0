@@ -2,100 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BA91D8963
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 09:28:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB037D8967
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 09:28:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387436AbfJPH2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 03:28:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27877 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726747AbfJPH2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 03:28:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571210899;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=orARpy9VRasxbGIspeFw1If4V+0a0FfvdhS9bjyo93c=;
-        b=fppGVp/0W0FXSqnhPNFe25Zruf/UvaiCCP6746zclDk/CcwKrR1Q0PccjxjSw119stdbUx
-        tYp4RrBuqV8i86QFBFUqdCjtBdQH3pxWQspLC8SI6mGB9/PcJTY7Pc7MdjkueZJDKP/LzQ
-        saRtEL3Yv6Jjva3YMkXSEH3A9mXBlmc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-rtchB41OOr6IJBp5kC0TOQ-1; Wed, 16 Oct 2019 03:28:17 -0400
-Received: by mail-wm1-f71.google.com with SMTP id p6so587832wmc.3
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 00:28:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7v786RFqnJJe2y+7zEeSjJrSBT0qBrvwn+uIieIG8Ms=;
-        b=k0UyHulWq7Nk2hO9dHgf4au5chL/s0vLpK5XSpqI91sn7it4Ifx3QzWgXgyScJMjNe
-         JqL9m5jdIg4p2/lsRHwipy9GWyEoiitE1De8rn5QcnTaprqzHywGjJX4HWKv/AVw0qOx
-         lQPrrcMTDEgurLvcnX+ltZfyl70ARu9j7W3kgQ0LZCmlcL/L11OP88V7G32BEeLfFKHg
-         dAaFbcWU1w6Wu1olHy8Gcpix4otAfzCeR6JnSQLR9DwmePGuZmrRqmhPjp7H5xY7YNF+
-         W1uP2v4756W+a704oxjXNJNPytsL2ac8FziW5G42Ir4/YAzgqcAtoacfHrGOy8/n669d
-         E+rg==
-X-Gm-Message-State: APjAAAWpCKj3t+YvQ6CysdWerkjjgg7UwwP9dEP87IBUEEU4R+0YfxHt
-        leZ5O+TLtNCAZ+JqeCyBMrIDhhCBY60NISp20Uk2MA2ONsIMOL1woyPsos++HW4DLjvQ/fK899C
-        8MuyBXLyGKYRP
-X-Received: by 2002:a5d:490e:: with SMTP id x14mr1424541wrq.340.1571210896146;
-        Wed, 16 Oct 2019 00:28:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzrga6sd4ikh+rWvg3KMNJWSZwdB+eC+kvA/j2r1CvW49OSSS+gZpwKzGXfYQFOXOcRgaXiSw==
-X-Received: by 2002:a5d:490e:: with SMTP id x14mr1424482wrq.340.1571210895296;
-        Wed, 16 Oct 2019 00:28:15 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ddc7:c53c:581a:7f3e? ([2001:b07:6468:f312:ddc7:c53c:581a:7f3e])
-        by smtp.gmail.com with ESMTPSA id x16sm17648210wrl.32.2019.10.16.00.28.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2019 00:28:14 -0700 (PDT)
-Subject: Re: PROBLEM: Regression of MMU causing guest VM application errors
-To:     Derek Yerger <derek@djy.llc>, kvm@vger.kernel.org
-References: <1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ae30e8c8-5893-5249-4c40-0278bb93a0a6@redhat.com>
-Date:   Wed, 16 Oct 2019 09:28:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2387581AbfJPH2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 03:28:42 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:48458 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726747AbfJPH2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 03:28:42 -0400
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iKdjU-0007KO-Cs; Wed, 16 Oct 2019 09:28:32 +0200
+Date:   Wed, 16 Oct 2019 09:28:31 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+cc:     Jianyong Wu <jianyong.wu@arm.com>, netdev@vger.kernel.org,
+        yangbo.lu@nxp.com, john.stultz@linaro.org,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Steve.Capper@arm.com, Kaly.Xin@arm.com,
+        justin.he@arm.com, nd@arm.com
+Subject: Re: [PATCH v5 3/6] timekeeping: Add clocksource to
+ system_time_snapshot
+In-Reply-To: <aa1ec910-b7b6-2568-4583-5fa47aac367f@redhat.com>
+Message-ID: <alpine.DEB.2.21.1910160914230.2518@nanos.tec.linutronix.de>
+References: <20191015104822.13890-1-jianyong.wu@arm.com> <20191015104822.13890-4-jianyong.wu@arm.com> <9274d21c-2c43-2e0d-f086-6aaba3863603@redhat.com> <alpine.DEB.2.21.1910152212580.2518@nanos.tec.linutronix.de>
+ <aa1ec910-b7b6-2568-4583-5fa47aac367f@redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc>
-Content-Language: en-US
-X-MC-Unique: rtchB41OOr6IJBp5kC0TOQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/10/19 06:49, Derek Yerger wrote:
-> In at least Linux 5.2.7 via Fedora, up to 5.2.18, guest OS applications
-> repeatedly crash with segfaults. The problem does not occur on 5.1.16.
->=20
-> System is running Fedora 29 with kernel 5.2.18. Guest OS is Windows 10
-> with an AMD Radeon 540 GPU passthrough. When on 5.2.7 or 5.2.18,
-> specific windows applications frequently and repeatedly crash, throwing
-> exceptions in random libraries. Going back to 5.1.16, the issue does not
-> occur.
->=20
-> The host system is unaffected by the regression.
->=20
-> Keywords: kvm mmu pci passthrough vfio vfio-pci amdgpu
->=20
-> Possibly related: Unmerged [PATCH] KVM: x86/MMU: Zap all when removing
-> memslot if VM has assigned device
->=20
-> Workaround: Use 5.1.16 kernel.
+On Wed, 16 Oct 2019, Paolo Bonzini wrote:
+> On 15/10/19 22:13, Thomas Gleixner wrote:
+> > On Tue, 15 Oct 2019, Paolo Bonzini wrote:
+> >> On 15/10/19 12:48, Jianyong Wu wrote:
+> >>>  
+> >>>
+> >>
+> >> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > 
+> > You're sure about having reviewed that in detail?
+> 
+> I did review the patch; the void* ugliness is not in this one, and I do
+> have some other qualms on that one.
+> 
+> > This changelog is telling absolutely nothing WHY anything outside of the
+> > timekeeping core code needs access to the current clocksource. Neither does
+> > it tell why it is safe to provide the pointer to random callers.
+> 
+> Agreed on the changelog, but the pointer to a clocksource is already
+> part of the timekeeping external API via struct system_counterval_t.
+> get_device_system_crosststamp for example expects a clocksource pointer
+> but provides no way to get such a pointer.
 
-This should have been fixed in 5.2.16 through the following patches:
+That's a completely different beast, really.
 
-- "[x86] Revert "KVM: x86/mmu: Zap only the relevant pages when removing
-a memslot" (5.2.11)
+The clocksource pointer is handed in by the caller and the core code
+validates if the clocksource is the same as the current system clocksource
+and not the other way round.
 
-- "KVM: x86/mmu: Reintroduce fast invalidate/zap for flushing memslot"
-(5.2.16).
+So there is no need for getting that pointer from the core code because the
+caller knows already which clocksource needs to be active to make.the whole
+cross device timestamp correlation work. And in that case it's the callers
+responsibility to ensure that the pointer is valid which is the case for
+the current use cases.
 
-Paolo
+From your other reply:
 
+> Why add a global id?  ARM can add it to archdata similar to how x86 has
+> vclock_mode.  But I still think the right thing to do is to include the
+> full system_counterval_t in the result of ktime_get_snapshot.  (More in
+> a second, feel free to reply to the other email only).
+
+No, the clocksource pointer is not going to be exposed as there is no
+guarantee that it will be still around after the call returns.
+
+It's not even guaranteed to be correct when the store happens in Wu's patch
+simply because the store is done outside of the seqcount protected region.
+
+Vs. arch data: arch data is an opaque struct, so you'd need to store a
+pointer which has the same issue as the clocksource pointer itself.
+
+If we want to convey information then it has to be in the generic part
+of struct clocksource.
+
+In fact we could even simplify the existing get_device_system_crosststamp()
+use case by using the ID field.
+
+Thanks,
+
+	tglx
