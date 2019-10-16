@@ -2,464 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E14E5D8E20
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 12:39:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98F26D8F4E
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 13:23:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392084AbfJPKjV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 06:39:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47272 "EHLO mx1.redhat.com"
+        id S2392737AbfJPLX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 07:23:27 -0400
+Received: from mga12.intel.com ([192.55.52.136]:20212 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726259AbfJPKjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 06:39:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 81A6D306F4AB;
-        Wed, 16 Oct 2019 10:39:20 +0000 (UTC)
-Received: from [10.72.12.53] (ovpn-12-53.pek2.redhat.com [10.72.12.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9368C19C68;
-        Wed, 16 Oct 2019 10:37:58 +0000 (UTC)
-Subject: Re: [PATCH V3 1/7] mdev: class id support
-To:     Parav Pandit <parav@mellanox.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>
-Cc:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        Ido Shamay <idos@mellanox.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-References: <20191011081557.28302-1-jasowang@redhat.com>
- <20191011081557.28302-2-jasowang@redhat.com>
- <AM0PR05MB4866481AEE614FDF766C6A25D1920@AM0PR05MB4866.eurprd05.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <302b3902-f065-b5e1-7fc9-5f8aaf826a99@redhat.com>
-Date:   Wed, 16 Oct 2019 18:37:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2392658AbfJPLX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 07:23:27 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 04:23:26 -0700
+X-IronPort-AV: E=Sophos;i="5.67,303,1566889200"; 
+   d="scan'208";a="186119904"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Oct 2019 04:23:23 -0700
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+ <20190925180931.GG31852@linux.intel.com>
+ <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
+ <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
+ <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
+Date:   Wed, 16 Oct 2019 19:23:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <AM0PR05MB4866481AEE614FDF766C6A25D1920@AM0PR05MB4866.eurprd05.prod.outlook.com>
+In-Reply-To: <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 16 Oct 2019 10:39:21 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/16/2019 6:16 PM, Paolo Bonzini wrote:
+> On 16/10/19 11:47, Thomas Gleixner wrote:
+>> On Wed, 16 Oct 2019, Paolo Bonzini wrote:
+>>> Just never advertise split-lock
+>>> detection to guests.  If the host has enabled split-lock detection,
+>>> trap #AC and forward it to the host handler---which would disable
+>>> split lock detection globally and reenter the guest.
+>>
+>> Which completely defeats the purpose.
+> 
+> Yes it does.  But Sean's proposal, as I understand it, leads to the
+> guest receiving #AC when it wasn't expecting one.  So for an old guest,
+> as soon as the guest kernel happens to do a split lock, it gets an
+> unexpected #AC and crashes and burns.  And then, after much googling and
+> gnashing of teeth, people proceed to disable split lock detection.
+> 
+> (Old guests are the common case: you're a cloud provider and your
+> customers run old stuff; it's a workstation and you want to play that
+> game that requires an old version of Windows; etc.).
+> 
+> To save them the googling and gnashing of teeth, I guess we can do a
+> pr_warn_ratelimited on the first split lock encountered by a guest.  (It
+> has to be ratelimited because userspace could create an arbitrary amount
+> of guests to spam the kernel logs).  But the end result is the same,
+> split lock detection is disabled by the user.
+> 
+> The first alternative I thought of was:
+> 
+> - Remove KVM loading of MSR_TEST_CTRL, i.e. KVM *never* writes the CPU's
+>    actual MSR_TEST_CTRL.  KVM still emulates MSR_TEST_CTRL so that the
+>    guest can do WRMSR and handle its own #AC faults, but KVM doesn't
+>    change the value in hardware.
+> 
+> - trap #AC if the guest encounters a split lock while detection is
+>    disabled, and then disable split-lock detection in the host.
+> 
+> But I discarded it because it still doesn't do anything for malicious
+> guests, which can trigger #AC as they prefer.  And it makes things
+> _worse_ for sane guests, because they think split-lock detection is
+> enabled but they become vulnerable as soon as there is only one
+> malicious guest on the same machine.
+> 
+> In all of these cases, the common final result is that split-lock
+> detection is disabled on the host.  So might as well go with the
+> simplest one and not pretend to virtualize something that (without core
+> scheduling) is obviously not virtualizable.
 
-On 2019/10/16 下午12:57, Parav Pandit wrote:
->
->> -----Original Message-----
->> From: Jason Wang <jasowang@redhat.com>
->> Sent: Friday, October 11, 2019 3:16 AM
->> To: kvm@vger.kernel.org; linux-s390@vger.kernel.org; linux-
->> kernel@vger.kernel.org; dri-devel@lists.freedesktop.org; intel-
->> gfx@lists.freedesktop.org; intel-gvt-dev@lists.freedesktop.org;
->> kwankhede@nvidia.com; alex.williamson@redhat.com; mst@redhat.com;
->> tiwei.bie@intel.com
->> Cc: virtualization@lists.linux-foundation.org; netdev@vger.kernel.org;
->> cohuck@redhat.com; maxime.coquelin@redhat.com;
->> cunming.liang@intel.com; zhihong.wang@intel.com;
->> rob.miller@broadcom.com; xiao.w.wang@intel.com;
->> haotian.wang@sifive.com; zhenyuw@linux.intel.com; zhi.a.wang@intel.com;
->> jani.nikula@linux.intel.com; joonas.lahtinen@linux.intel.com;
->> rodrigo.vivi@intel.com; airlied@linux.ie; daniel@ffwll.ch;
->> farman@linux.ibm.com; pasic@linux.ibm.com; sebott@linux.ibm.com;
->> oberpar@linux.ibm.com; heiko.carstens@de.ibm.com; gor@linux.ibm.com;
->> borntraeger@de.ibm.com; akrowiak@linux.ibm.com; freude@linux.ibm.com;
->> lingshan.zhu@intel.com; Ido Shamay <idos@mellanox.com>;
->> eperezma@redhat.com; lulu@redhat.com; Parav Pandit
->> <parav@mellanox.com>; christophe.de.dinechin@gmail.com;
->> kevin.tian@intel.com; Jason Wang <jasowang@redhat.com>
->> Subject: [PATCH V3 1/7] mdev: class id support
->>
->> Mdev bus only supports vfio driver right now, so it doesn't implement match
->> method. But in the future, we may add drivers other than vfio, the first
->> driver could be virtio-mdev. This means we need to add device class id
->> support in bus match method to pair the mdev device and mdev driver
->> correctly.
->>
->> So this patch adds id_table to mdev_driver and class_id for mdev device
->> with the match method for mdev bus.
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   Documentation/driver-api/vfio-mediated-device.rst |  7 ++++++-
->>   drivers/gpu/drm/i915/gvt/kvmgt.c                  |  1 +
->>   drivers/s390/cio/vfio_ccw_ops.c                   |  1 +
->>   drivers/s390/crypto/vfio_ap_ops.c                 |  1 +
->>   drivers/vfio/mdev/mdev_core.c                     | 11 +++++++++++
->>   drivers/vfio/mdev/mdev_driver.c                   | 14 ++++++++++++++
->>   drivers/vfio/mdev/mdev_private.h                  |  1 +
->>   drivers/vfio/mdev/vfio_mdev.c                     |  6 ++++++
->>   include/linux/mdev.h                              |  8 ++++++++
->>   include/linux/mod_devicetable.h                   |  8 ++++++++
->>   samples/vfio-mdev/mbochs.c                        |  1 +
->>   samples/vfio-mdev/mdpy.c                          |  1 +
->>   samples/vfio-mdev/mtty.c                          |  1 +
->>   13 files changed, 60 insertions(+), 1 deletion(-)
->>
->> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
->> b/Documentation/driver-api/vfio-mediated-device.rst
->> index 25eb7d5b834b..2035e48da7b2 100644
->> --- a/Documentation/driver-api/vfio-mediated-device.rst
->> +++ b/Documentation/driver-api/vfio-mediated-device.rst
->> @@ -102,12 +102,14 @@ structure to represent a mediated device's driver::
->>         * @probe: called when new device created
->>         * @remove: called when device removed
->>         * @driver: device driver structure
->> +      * @id_table: the ids serviced by this driver
->>         */
->>        struct mdev_driver {
->>   	     const char *name;
->>   	     int  (*probe)  (struct device *dev);
->>   	     void (*remove) (struct device *dev);
->>   	     struct device_driver    driver;
->> +	     const struct mdev_class_id *id_table;
->>        };
->>
->>   A mediated bus driver for mdev should use this structure in the function
->> calls @@ -165,12 +167,15 @@ register itself with the mdev core driver::
->>   	extern int  mdev_register_device(struct device *dev,
->>   	                                 const struct mdev_parent_ops *ops);
->>
->> +It is also required to specify the class_id through::
->> +
->> +	extern int mdev_set_class(struct device *dev, u16 id);
-> Drop extern.
-> In actual API you have correct signature, i.e. struct mdev_device.
-> s/struct device/struct mdev_device.
+Right, the nature of core-scope makes MSR_TEST_CTL impossible/hard to 
+virtualize.
 
+- Making old guests survive needs to disable split-lock detection in 
+host(hardware).
+- Defending malicious guests needs to enable split-lock detection in 
+host(hardware).
 
-Yes, will fix.
+We cannot achieve them at the same time.
 
+In my opinion, letting kvm disable the split-lock detection in host is 
+not acceptable that it just opens the door for malicious guests to 
+attack. I think we can use Sean's proposal like below.
 
->
->> +
->>   However, the mdev_parent_ops structure is not required in the function call
->> that a driver should use to unregister itself with the mdev core driver::
->>
->>   	extern void mdev_unregister_device(struct device *dev);
->>
->> -
->>   Mediated Device Management Interface Through sysfs
->> ==================================================
->>
->> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
->> b/drivers/gpu/drm/i915/gvt/kvmgt.c
->> index 343d79c1cb7e..17e9d4634c84 100644
->> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
->> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
->> @@ -678,6 +678,7 @@ static int intel_vgpu_create(struct kobject *kobj,
->> struct mdev_device *mdev)
->>   		     dev_name(mdev_dev(mdev)));
->>   	ret = 0;
->>
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   out:
->>   	return ret;
->>   }
->> diff --git a/drivers/s390/cio/vfio_ccw_ops.c
->> b/drivers/s390/cio/vfio_ccw_ops.c index f0d71ab77c50..b5d223882c6c
->> 100644
->> --- a/drivers/s390/cio/vfio_ccw_ops.c
->> +++ b/drivers/s390/cio/vfio_ccw_ops.c
->> @@ -129,6 +129,7 @@ static int vfio_ccw_mdev_create(struct kobject *kobj,
->> struct mdev_device *mdev)
->>   			   private->sch->schid.ssid,
->>   			   private->sch->schid.sch_no);
->>
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   	return 0;
->>   }
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 5c0f53c6dde7..47df1c593c35 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -343,6 +343,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj,
->> struct mdev_device *mdev)
->>   	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
->>   	mutex_unlock(&matrix_dev->lock);
->>
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   	return 0;
->>   }
->>
->> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
->> index b558d4cfd082..724e9b9841d8 100644
->> --- a/drivers/vfio/mdev/mdev_core.c
->> +++ b/drivers/vfio/mdev/mdev_core.c
->> @@ -45,6 +45,12 @@ void mdev_set_drvdata(struct mdev_device *mdev,
->> void *data)  }  EXPORT_SYMBOL(mdev_set_drvdata);
->>
->> +void mdev_set_class(struct mdev_device *mdev, u16 id) {
->> +	mdev->class_id = id;
->> +}
->> +EXPORT_SYMBOL(mdev_set_class);
->> +
-> Usually with every exported symbol we have signature comment block that describes when to use an API etc.
-> Please add it that describes that this API must be called during create() callback.
+KVM always traps #AC, and only advertises split-lock detection to guest 
+when the global variable split_lock_detection_enabled in host is true.
 
+- If guest enables #AC (CPL3 alignment check or split-lock detection 
+enabled), injecting #AC back into guest since it's supposed capable of 
+handling it.
+- If guest doesn't enable #AC, KVM reports #AC to userspace (like other 
+unexpected exceptions), and we can print a hint in kernel, or let 
+userspace (e.g., QEMU) tell the user guest is killed because there is a 
+split-lock in guest.
 
-Ok.
+In this way, malicious guests always get killed by userspace and old 
+sane guests cannot survive as well if it causes split-lock. If we do 
+want old sane guests work we have to disable the split-lock detection 
+(through booting parameter or debugfs) in the host just the same as we 
+want to run an old and split-lock generating userspace binary.
 
+But there is an issue that we advertise split-lock detection to guest 
+based on the value of split_lock_detection_enabled to be true in host, 
+which can be turned into false dynamically when split-lock happens in 
+host kernel. This causes guest's capability changes at run time and I 
+don't if there is a better way to inform guest? Maybe we need a pv 
+interface?
 
->
->>   struct device *mdev_dev(struct mdev_device *mdev)  {
->>   	return &mdev->dev;
->> @@ -135,6 +141,7 @@ static int mdev_device_remove_cb(struct device
->> *dev, void *data)
->>    * mdev_register_device : Register a device
->>    * @dev: device structure representing parent device.
->>    * @ops: Parent device operation structure to be registered.
->> + * @id: class id.
->>    *
->>    * Add device to list of registered parent devices.
->>    * Returns a negative value on error, otherwise 0.
->> @@ -324,6 +331,9 @@ int mdev_device_create(struct kobject *kobj,
->>   	if (ret)
->>   		goto ops_create_fail;
+> Thanks,
+> 
+> Paolo
+> 
+>> 1) Sane guest
 >>
->> +	if (!mdev->class_id)
->> +		goto class_id_fail;
->> +
->>   	ret = device_add(&mdev->dev);
->>   	if (ret)
->>   		goto add_fail;
->> @@ -340,6 +350,7 @@ int mdev_device_create(struct kobject *kobj,
+>> Guest kernel has #AC handler and you basically prevent it from
+>> detecting malicious user space and killing it. You also prevent #AC
+>> detection in the guest kernel which limits debugability.
 >>
->>   sysfs_fail:
->>   	device_del(&mdev->dev);
->> +class_id_fail:
-> No need for new label. Just use add_fail label.
-
-
-Ok.
-
-
->
->>   add_fail:
->>   	parent->ops->remove(mdev);
->>   ops_create_fail:
->> diff --git a/drivers/vfio/mdev/mdev_driver.c
->> b/drivers/vfio/mdev/mdev_driver.c index 0d3223aee20b..b7c40ce86ee3
->> 100644
->> --- a/drivers/vfio/mdev/mdev_driver.c
->> +++ b/drivers/vfio/mdev/mdev_driver.c
->> @@ -69,8 +69,22 @@ static int mdev_remove(struct device *dev)
->>   	return 0;
->>   }
+>> 2) Malicious guest
 >>
->> +static int mdev_match(struct device *dev, struct device_driver *drv) {
->> +	unsigned int i;
->> +	struct mdev_device *mdev = to_mdev_device(dev);
->> +	struct mdev_driver *mdrv = to_mdev_driver(drv);
->> +	const struct mdev_class_id *ids = mdrv->id_table;
->> +
->> +	for (i = 0; ids[i].id; i++)
->> +		if (ids[i].id == mdev->class_id)
->> +			return 1;
->> +	return 0;
->> +}
->> +
->>   struct bus_type mdev_bus_type = {
->>   	.name		= "mdev",
->> +	.match		= mdev_match,
->>   	.probe		= mdev_probe,
->>   	.remove		= mdev_remove,
->>   };
->> diff --git a/drivers/vfio/mdev/mdev_private.h
->> b/drivers/vfio/mdev/mdev_private.h
->> index 7d922950caaf..c65f436c1869 100644
->> --- a/drivers/vfio/mdev/mdev_private.h
->> +++ b/drivers/vfio/mdev/mdev_private.h
->> @@ -33,6 +33,7 @@ struct mdev_device {
->>   	struct kobject *type_kobj;
->>   	struct device *iommu_device;
->>   	bool active;
->> +	u16 class_id;
->>   };
->>
->>   #define to_mdev_device(dev)	container_of(dev, struct mdev_device, dev)
->> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
->> index 30964a4e0a28..fd2a4d9a3f26 100644
->> --- a/drivers/vfio/mdev/vfio_mdev.c
->> +++ b/drivers/vfio/mdev/vfio_mdev.c
->> @@ -120,10 +120,16 @@ static void vfio_mdev_remove(struct device *dev)
->>   	vfio_del_group_dev(dev);
->>   }
->>
->> +static struct mdev_class_id id_table[] = {
-> static const
-
-
-Fixed.
-
-
->
->> +	{ MDEV_ID_VFIO },
-> I guess you don't need extra braces for each entry.
-> Since this enum represents MDEV class id, it better to name it as MDEV_CLASS_ID_VFIO.
-> (Similar to  PCI_VENDOR_ID, PCI_DEVICE_ID)..
-
-
-Will do.
-
-
->> +	{ 0 },
->> +};
->> +
->>   static struct mdev_driver vfio_mdev_driver = {
->>   	.name	= "vfio_mdev",
->>   	.probe	= vfio_mdev_probe,
->>   	.remove	= vfio_mdev_remove,
->> +	.id_table = id_table,
->>   };
->>
->>   static int __init vfio_mdev_init(void)
->> diff --git a/include/linux/mdev.h b/include/linux/mdev.h index
->> 0ce30ca78db0..a7570cf13ba4 100644
->> --- a/include/linux/mdev.h
->> +++ b/include/linux/mdev.h
->> @@ -118,6 +118,7 @@ struct mdev_type_attribute
->> mdev_type_attr_##_name =		\
->>    * @probe: called when new device created
->>    * @remove: called when device removed
->>    * @driver: device driver structure
->> + * @id_table: the ids serviced by this driver
->>    *
->>    **/
->>   struct mdev_driver {
->> @@ -125,12 +126,14 @@ struct mdev_driver {
->>   	int  (*probe)(struct device *dev);
->>   	void (*remove)(struct device *dev);
->>   	struct device_driver driver;
->> +	const struct mdev_class_id *id_table;
->>   };
->>
->>   #define to_mdev_driver(drv)	container_of(drv, struct mdev_driver, driver)
->>
->>   void *mdev_get_drvdata(struct mdev_device *mdev);  void
->> mdev_set_drvdata(struct mdev_device *mdev, void *data);
->> +void mdev_set_class(struct mdev_device *mdev, u16 id);
-> Better to insert new API after mdev_uuid().
-
-
-Ok.
-
-Thanks
-
-
->
->>   const guid_t *mdev_uuid(struct mdev_device *mdev);
->>
->>   extern struct bus_type mdev_bus_type;
->> @@ -145,4 +148,9 @@ struct device *mdev_parent_dev(struct mdev_device
->> *mdev);  struct device *mdev_dev(struct mdev_device *mdev);  struct
->> mdev_device *mdev_from_dev(struct device *dev);
->>
->> +enum {
->> +	MDEV_ID_VFIO = 1,
->> +	/* New entries must be added here */
->> +};
->> +
->>   #endif /* MDEV_H */
->> diff --git a/include/linux/mod_devicetable.h
->> b/include/linux/mod_devicetable.h index 5714fd35a83c..f32c6e44fb1a
->> 100644
->> --- a/include/linux/mod_devicetable.h
->> +++ b/include/linux/mod_devicetable.h
->> @@ -821,4 +821,12 @@ struct wmi_device_id {
->>   	const void *context;
->>   };
->>
->> +/**
->> + * struct mdev_class_id - MDEV device class identifier
->> + * @id: Used to identify a specific class of device, e.g vfio-mdev device.
->> + */
->> +struct mdev_class_id {
->> +	__u16 id;
->> +};
->> +
->>   #endif /* LINUX_MOD_DEVICETABLE_H */
->> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
->> index ac5c8c17b1ff..fd8491e58fe2 100644
->> --- a/samples/vfio-mdev/mbochs.c
->> +++ b/samples/vfio-mdev/mbochs.c
->> @@ -561,6 +561,7 @@ static int mbochs_create(struct kobject *kobj, struct
->> mdev_device *mdev)
->>   	mbochs_reset(mdev);
->>
->>   	mbochs_used_mbytes += type->mbytes;
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   	return 0;
->>
->>   err_mem:
->> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c index
->> cc86bf6566e4..889472b06708 100644
->> --- a/samples/vfio-mdev/mdpy.c
->> +++ b/samples/vfio-mdev/mdpy.c
->> @@ -269,6 +269,7 @@ static int mdpy_create(struct kobject *kobj, struct
->> mdev_device *mdev)
->>   	mdpy_reset(mdev);
->>
->>   	mdpy_count++;
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   	return 0;
->>   }
->>
->> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c index
->> ce84a300a4da..618810ca4331 100644
->> --- a/samples/vfio-mdev/mtty.c
->> +++ b/samples/vfio-mdev/mtty.c
->> @@ -755,6 +755,7 @@ static int mtty_create(struct kobject *kobj, struct
->> mdev_device *mdev)
->>   	list_add(&mdev_state->next, &mdev_devices_list);
->>   	mutex_unlock(&mdev_list_lock);
->>
->> +	mdev_set_class(mdev, MDEV_ID_VFIO);
->>   	return 0;
->>   }
->>
->> --
->> 2.19.1
+>> Trigger #AC to disable the host detection and then carry out the DoS
+>> attack.
+> 
+> 
