@@ -2,115 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07775D9796
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:39:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8478D979E
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:39:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406283AbfJPQiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 12:38:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34626 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390211AbfJPQit (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:38:49 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 28E1785360
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 16:38:49 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id n18so11964566wro.11
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 09:38:49 -0700 (PDT)
+        id S2404348AbfJPQj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 12:39:29 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:42466 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388542AbfJPQj3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 12:39:29 -0400
+Received: by mail-io1-f66.google.com with SMTP id n197so54582210iod.9
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 09:39:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rqcsZwJUXTVhix3ZtuIDUey2+iFKqsDJTqHrmcJMzY4=;
+        b=Da2IzUkmMK/JDKlzTf+4T4wm44+yvlf699YPJ7iQU+/s4LGwImLRNPyvgykTANQCOT
+         grAVKqr2BGP3mPx7/LGbDVST8eMwu1EjjvqPnRwbkIAx8DUDpSbTDPdcDYmzY5ro0y71
+         5GRfdokkihnwuCVauqSF3mFtvHD1L8yXTDw3dv3f+waYDA2AaodheQ9IzTa/3nGqhkC9
+         dk4qr68nxwqUHhLoljYR40IovgJeK3qmLHLV67tbxKHK2TTrCMOli84AWhhG2JJ+FWrQ
+         j5OfANOrHg3YLwKIeQLgueYapu1AgAwQnD6UdP0Z034bSKwfi4HAh+WdrRRVmfXJfzab
+         qzMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vjbKDvVFPL0th2krdx8wMvub7uxuN9FX2tXsWBpSZGA=;
-        b=PxtaBDuzuBlg91sZzAwSl1kjUgAtN0jqoIjMT3nVV4SIZC/IzYwZgAIELExtOHaV0f
-         xegSOfl6npJIft7xnTqiiksa5pNyQilpccTVCUL+djO/T3DF0X9YFZOdoz+e9cljMKCE
-         9TgEmKA5KvdDgRMLK+kA9dvW1UwgS9lN8IjksSTFcy8ppOSuAFZHd+mO2NQOmvwYBNCw
-         m7XvtdXTIbjJ/bT6rYbfbOs9eCeYcHZnqFm4wuFp781BwPYno/dwDNnelaMraO69c56P
-         aT7yFR0vwIdUGH9Q83HyGn5eV/CkGx1x+owRL11S5pcVkGdkW2lBnVB4QfJNXptX8WKQ
-         5j8g==
-X-Gm-Message-State: APjAAAWgwX0RArRUqhTRtp3ZVkhY71C/yZdR89U58GcrxbeJRe+DVmbQ
-        3FQN2qEhpILckdtzLICKx9Jw/4B72MigD7NFvWvnDpyKb5pyjgnYoOarJ/XC+QVokCO/HJzwQ7R
-        pWSX953xnYZtT
-X-Received: by 2002:a1c:1bc5:: with SMTP id b188mr4397242wmb.88.1571243927611;
-        Wed, 16 Oct 2019 09:38:47 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyTRKkY7xojuOdJ8XLJRUq8YBcEngwDEOfnwMsHIoBx2ccVCj7UoQkvx5J80rejnnTYAPIXcw==
-X-Received: by 2002:a1c:1bc5:: with SMTP id b188mr4397221wmb.88.1571243927350;
-        Wed, 16 Oct 2019 09:38:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
-        by smtp.gmail.com with ESMTPSA id b62sm4008159wmc.13.2019.10.16.09.38.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Oct 2019 09:38:46 -0700 (PDT)
-Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
- lock
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
- <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
- <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
- <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
- <20190925180931.GG31852@linux.intel.com>
- <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
- <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
- <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
- <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
- <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
- <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
- <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
- <bea889c5-1599-1eb8-ff3a-3bde1e58afa3@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f9735fb8-650e-c263-36a7-61390ccbb662@redhat.com>
-Date:   Wed, 16 Oct 2019 18:38:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rqcsZwJUXTVhix3ZtuIDUey2+iFKqsDJTqHrmcJMzY4=;
+        b=b0POPd4uNJ9ydSiwKsHmM3h/+7uyFHk7Qm/xCh9YvC0b5lp9W5QVd4dWLbuKxI/gCM
+         SSPdGURWbD912L4ubIwmf79F5JfqsQMz8Dqr91vcUov9O4amnWl7JTAARNcqUGUvDegu
+         vzZS+0iF02B1SDCqpW7Ln3tW8h0vyq1ZsXSoglZxWGW2tOclFzjwlpNlU0Kaz+NkJdIB
+         M0cH5dfW6tiUkm+wF+wq+BmvBZrWX57uXnO1HHBsOFyVTisblk1834nHFeJO2jdfLXb1
+         zPpwzJKdP7nsQS7M7vui2ne7T0V3fL19CoNmF0a19j4rpcToQPSbC84EMgS1ugLMieu8
+         oxxg==
+X-Gm-Message-State: APjAAAXqivk4vP9h2t+ol8fkfJ9ONkXg8KkEGZlevMSrp+P7C1Si64mF
+        orTKdFqSq2ruaj+hSRbbnEhhnbLP/j7gvR+KUeld9A==
+X-Google-Smtp-Source: APXvYqyZCiTBrmaSQRw7+AG7gvbT+HupUE8vQnkxE6666u2aRv/5QdkILl7x5lEl04TRvkLIL7Rq3i0213GBxDTRqWI=
+X-Received: by 2002:a02:19c1:: with SMTP id b184mr42559098jab.54.1571243968266;
+ Wed, 16 Oct 2019 09:39:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <bea889c5-1599-1eb8-ff3a-3bde1e58afa3@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20191015001633.8603-1-krish.sadhukhan@oracle.com> <20191015001633.8603-2-krish.sadhukhan@oracle.com>
+In-Reply-To: <20191015001633.8603-2-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 16 Oct 2019 09:39:17 -0700
+Message-ID: <CALMp9eQ2xCx6++UaqoKkm9wB5FW8OtYLVrAJ-y-qD1tGgJLuuA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kvm-unit-test: VMX: Replace hard-coded exit
+ instruction length
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/10/19 18:25, Xiaoyao Li wrote:
->>
->>    3 | Y         |     Y       |  N  |   Y     |   x   | Switch
->> MSR_TEST_CTRL on
->>      |           |             |     |         |       | enter/exit,
->> plus:
->>      |           |             |     |         |       | A) #AC
->> forwarded to guest.
->>      |           |             |     |         |       | B) SIGBUS or
->> KVM exit code
->>
-> 
-> I just want to get confirmed that in (3), we should split into 2 case:
-> 
-> a) if host has it enabled, still apply the constraint that guest is
-> forcibly enabled? so we don't switch MSR_TEST_CTL.
-> 
-> b) if host has it disabled, we can switch MSR_TEST_CTL on enter/exit.
-
-That's doable, yes.
-
-Paolo
+On Mon, Oct 14, 2019 at 5:52 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+>   ..with value read from EXI_INST_LEN field.
+>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
