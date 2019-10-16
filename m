@@ -2,117 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FAD4D921C
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80DC6D92A5
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:35:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393515AbfJPNNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 09:13:10 -0400
-Received: from mga11.intel.com ([192.55.52.93]:54456 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390087AbfJPNNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 09:13:10 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 06:13:10 -0700
-X-IronPort-AV: E=Sophos;i="5.67,303,1566889200"; 
-   d="scan'208";a="186145335"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Oct 2019 06:13:06 -0700
-Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
- lock
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
- <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
- <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
- <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
- <20190925180931.GG31852@linux.intel.com>
- <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
- <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
- <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
- <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
-Date:   Wed, 16 Oct 2019 21:13:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+        id S2391854AbfJPNfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 09:35:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41158 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728986AbfJPNfp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 16 Oct 2019 09:35:45 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9GDRhwR196426;
+        Wed, 16 Oct 2019 09:35:40 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp39p2xrg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 09:35:39 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9GDSNNP003176;
+        Wed, 16 Oct 2019 09:35:39 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp39p2xr1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 09:35:39 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9GDU4qe006137;
+        Wed, 16 Oct 2019 13:35:38 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma02dal.us.ibm.com with ESMTP id 2vk6f7nw32-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 13:35:38 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9GDZbW152953496
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Oct 2019 13:35:37 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90D31AC05F;
+        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 633C1AC060;
+        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
+Received: from [9.60.75.213] (unknown [9.60.75.213])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
+Subject: Re: [PATCH v2 3/4] vfio-ccw: Add a trace for asynchronous requests
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Steffen Maier <maier@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20191016015822.72425-1-farman@linux.ibm.com>
+ <20191016015822.72425-4-farman@linux.ibm.com>
+ <20191016121543.2b3f0a88.cohuck@redhat.com>
+ <6c559ea3-4abd-d83b-4a20-d022a188545e@linux.ibm.com>
+ <20191016133919.6f8592e7.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <1e32a1ba-e187-c0db-05cc-ccea1dc3f7b0@linux.ibm.com>
+Date:   Wed, 16 Oct 2019 09:35:37 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191016133919.6f8592e7.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-16_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910160120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/16/2019 7:26 PM, Paolo Bonzini wrote:
-> On 16/10/19 13:23, Xiaoyao Li wrote:
->> KVM always traps #AC, and only advertises split-lock detection to guest
->> when the global variable split_lock_detection_enabled in host is true.
+
+
+On 10/16/19 7:39 AM, Cornelia Huck wrote:
+> On Wed, 16 Oct 2019 07:36:09 -0400
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> On 10/16/19 6:15 AM, Cornelia Huck wrote:
+>>> On Wed, 16 Oct 2019 03:58:21 +0200
+>>> Eric Farman <farman@linux.ibm.com> wrote:
+>>>   
+>>>> Since the asynchronous requests are typically associated with
+>>>> error recovery, let's add a simple trace when one of those is
+>>>> issued to a device.
+>>>>
+>>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>>>> ---
+>>>>  drivers/s390/cio/vfio_ccw_fsm.c   |  4 ++++
+>>>>  drivers/s390/cio/vfio_ccw_trace.c |  1 +
+>>>>  drivers/s390/cio/vfio_ccw_trace.h | 30 ++++++++++++++++++++++++++++++
+>>>>  3 files changed, 35 insertions(+)  
+>>>
+>>> (...)
+>>>   
+>>>> diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
+>>>> index 5005d57901b4..23b288eb53dc 100644
+>>>> --- a/drivers/s390/cio/vfio_ccw_trace.h
+>>>> +++ b/drivers/s390/cio/vfio_ccw_trace.h
+>>>> @@ -17,6 +17,36 @@
+>>>>  
+>>>>  #include <linux/tracepoint.h>
+>>>>  
+>>>> +TRACE_EVENT(vfio_ccw_fsm_async_request,
+>>>> +	TP_PROTO(struct subchannel_id schid,
+>>>> +		 int command,
+>>>> +		 int errno),
+>>>> +	TP_ARGS(schid, command, errno),
+>>>> +
+>>>> +	TP_STRUCT__entry(
+>>>> +		__field(u8, cssid)
+>>>> +		__field(u8, ssid)
+>>>> +		__field(u16, sch_no)
+>>>> +		__field(int, command)
+>>>> +		__field(int, errno)
+>>>> +	),
+>>>> +
+>>>> +	TP_fast_assign(
+>>>> +		__entry->cssid = schid.cssid;
+>>>> +		__entry->ssid = schid.ssid;
+>>>> +		__entry->sch_no = schid.sch_no;
+>>>> +		__entry->command = command;
+>>>> +		__entry->errno = errno;
+>>>> +	),
+>>>> +
+>>>> +	TP_printk("schid=%x.%x.%04x command=%d errno=%d",  
+>>>
+>>> I'd probably rather print the command as a hex value.  
 >>
->> - If guest enables #AC (CPL3 alignment check or split-lock detection
->> enabled), injecting #AC back into guest since it's supposed capable of
->> handling it.
->> - If guest doesn't enable #AC, KVM reports #AC to userspace (like other
->> unexpected exceptions), and we can print a hint in kernel, or let
->> userspace (e.g., QEMU) tell the user guest is killed because there is a
->> split-lock in guest.
+>> I'm fine with that too.  Want me to send an update?
+> 
+> I think that would be the easiest way.
+
+Will do.  Thanks for the reviews on the other ones!
+
+ - Eric
+
+> 
 >>
->> In this way, malicious guests always get killed by userspace and old
->> sane guests cannot survive as well if it causes split-lock. If we do
->> want old sane guests work we have to disable the split-lock detection
->> (through booting parameter or debugfs) in the host just the same as we
->> want to run an old and split-lock generating userspace binary.
-> 
-> Old guests are prevalent enough that enabling split-lock detection by
-> default would be a big usability issue.  And even ignoring that, you
-> would get the issue you describe below:
-
-Right, whether enabling split-lock detection is made by the 
-administrator. The administrator is supposed to know the consequence of 
-enabling it. Enabling it means don't want any split-lock happens in 
-userspace, of course VMM softwares are under control.
-
->> But there is an issue that we advertise split-lock detection to guest
->> based on the value of split_lock_detection_enabled to be true in host,
->> which can be turned into false dynamically when split-lock happens in
->> host kernel.
-> 
-> ... which means that supposedly safe guests become unsafe, and that is bad.
-> 
->> This causes guest's capability changes at run time and I
->> don't if there is a better way to inform guest? Maybe we need a pv
->> interface?
-> 
-> Even a PV interface would not change the basic fact that a supposedly
-> safe configuration becomes unsafe.
-
-I don't catch you about the unsafe?
-
-If host disables split-lock detection dynamically, then the 
-MST_TEST_CTL.split_lock is clear in the hardware and we can use the PV 
-interface to notify the guest so that guest knows it loses the 
-capability of split-lock detection. In this case, I think safety is 
-meaningless for both host and guest.
-
-> Paolo
+>>>   
+>>>> +		  __entry->cssid,
+>>>> +		  __entry->ssid,
+>>>> +		  __entry->sch_no,
+>>>> +		  __entry->command,
+>>>> +		  __entry->errno)
+>>>> +);
+>>>> +
+>>>>  TRACE_EVENT(vfio_ccw_fsm_event,
+>>>>  	TP_PROTO(struct subchannel_id schid, int state, int event),
+>>>>  	TP_ARGS(schid, state, event),  
+>>>   
 > 
