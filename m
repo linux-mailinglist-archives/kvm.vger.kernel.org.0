@@ -2,102 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E15EED97FF
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:55:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D923FD9816
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 19:01:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406464AbfJPQz3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 12:55:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46957 "EHLO mx1.redhat.com"
+        id S2436486AbfJPRB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 13:01:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39112 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725294AbfJPQz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:55:29 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        id S2406557AbfJPRB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 13:01:27 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1F59D2A09DA
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 16:55:29 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id k9so1476703wmb.0
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 09:55:29 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 714A584A5
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 17:01:26 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id i10so11994027wrb.20
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 10:01:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=5eauZ8UWoa8Teikz+lMqufdR9RWWOJTpe6HYZySF3XQ=;
-        b=UyqC2XNZpcfudZN58peMNvEJ1Eoyk5umJdqWJ3PxR6dUUZie4Za3+rLBBVagMStU8C
-         cTO5+oauyQ9T4I9HQ+nsDjf6YWUo8s4PGn/vnqadq75GhHmPV/Ib0p4j26BVBsnJ9IZ5
-         dM4g5jIPuJRqOpjRFvCH/JrTGYEZolTTp3jmRYYIGR4ICoTi4oQG5gO4BFltXW0OAp5N
-         XH5q5Qwyj+SH+QeTZ7Ak1lzh8RQPc5+c+9DPfkxinyAud2IWmyN7wYyqo7Qo7EuQNzmk
-         7MwHg9IoHx9WVxMsfj3Jdfj2reBK6fXdHKCPKZdAtizlrh+yxiAnpiTRLdSX2wwSazQ5
-         NySA==
-X-Gm-Message-State: APjAAAXOkpFtDfusEW6uiidULdfRtX0B/WjJO+d0DaU+XHvjwEHswZDt
-        igIUrIGnxF35QVE+B9fcv3wVvLEaCBRF49yAnDv+wcy+9w20CEw5ZAQCIbtsKklUT50jj3PeV5E
-        xQU2WcKiHw5iu
-X-Received: by 2002:a7b:cb03:: with SMTP id u3mr4252062wmj.126.1571244927627;
-        Wed, 16 Oct 2019 09:55:27 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyuvglafYRyO2dw3NYNU7hLZnq5YAdlC0kd1+/aDdwG5i7+O3zXN79X77AarslEyv0RfZFXgw==
-X-Received: by 2002:a7b:cb03:: with SMTP id u3mr4252040wmj.126.1571244927345;
-        Wed, 16 Oct 2019 09:55:27 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id a71sm2976147wme.11.2019.10.16.09.55.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2019 09:55:26 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Miaohe Lin <linmiaohe@huawei.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linmiaohe@huawei.com, mingfangsen@huawei.com, pbonzini@redhat.com,
-        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Subject: Re: [PATCH] KVM: SVM: Fix potential wrong physical id in avic_handle_ldr_update
-In-Reply-To: <1571217908-7693-1-git-send-email-linmiaohe@huawei.com>
-References: <1571217908-7693-1-git-send-email-linmiaohe@huawei.com>
-Date:   Wed, 16 Oct 2019 18:55:25 +0200
-Message-ID: <87zhi03a0y.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=upYwB/N4xOr/Zf5KHa95URT+5bIQEUVNJJQrCk7v8M8=;
+        b=brj5r2eg+Sji3ujfd12/GAaIFVOPjWzoM2a1Wy36zCTdOGvOopMuAuM8Gl3fz21sAY
+         3+wKo9VF3FtsC+sSbPBhpHoJqa5AHsSrIsDQ4IEAhDdqQXmLt0Z5c9JuLtI0Qbpxuis5
+         Qzi9XYPCPfabANLxydAG9NJIF/k17efupvifULtJNHU98q7HehRjij+IEJWZVDmRa8Pc
+         ZR4cNJ4P4aFDbH0OOkeyKgRlZty/2MbpPSqQRP/4GmWc4oTL+qBzVEMUEwlhInivHoKv
+         WIu8BU4GUrkCJZC4tYYHLUO2OOKOIIMtsNW8I6wki9oukRsFNG2CvqwJMrjvGeFghnJh
+         LMQA==
+X-Gm-Message-State: APjAAAWO+gZ/wCU2ff95pTR9u17v2ocQEi9LMBnOpvZgQVQj0zDXRkMD
+        VqkFfG3iEDI9DqyUVkJlYkW4aknmOm1FcvNs6dPxaLYn2ZNIIq4OMWoUj39/srOnfuPTF3qT+I5
+        ZVPe9aWR+ga3p
+X-Received: by 2002:adf:e488:: with SMTP id i8mr3608237wrm.302.1571245285030;
+        Wed, 16 Oct 2019 10:01:25 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzGJ1RJa5XRkUof+e00QM01ARDkvGSCrkuV55PLQw4Jq3hOnJV0Ei3CilXy8Sl4JrmzhL4Nuw==
+X-Received: by 2002:adf:e488:: with SMTP id i8mr3608206wrm.302.1571245284676;
+        Wed, 16 Oct 2019 10:01:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
+        by smtp.gmail.com with ESMTPSA id v6sm4038429wma.24.2019.10.16.10.01.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2019 10:01:24 -0700 (PDT)
+Subject: Re: [PATCH 12/14] KVM: retpolines: x86: eliminate retpoline from
+ vmx.c exit handlers
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190928172323.14663-1-aarcange@redhat.com>
+ <20190928172323.14663-13-aarcange@redhat.com>
+ <933ca564-973d-645e-fe9c-9afb64edba5b@redhat.com>
+ <20191015164952.GE331@redhat.com>
+ <870aaaf3-7a52-f91a-c5f3-fd3c7276a5d9@redhat.com>
+ <20191015203516.GF331@redhat.com>
+ <f375049a-6a45-c0df-a377-66418c8eb7e8@redhat.com>
+ <20191015234229.GC6487@redhat.com>
+ <27cc0d6b-6bd7-fcaf-10b4-37bb566871f8@redhat.com>
+ <20191016165057.GJ6487@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <0e290a9d-9d26-d24a-ba01-9fda4826a5ac@redhat.com>
+Date:   Wed, 16 Oct 2019 19:01:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20191016165057.GJ6487@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Miaohe Lin <linmiaohe@huawei.com> writes:
+On 16/10/19 18:50, Andrea Arcangeli wrote:
+>> It still doesn't add up.  0.3ms / 5 is 1/15000th of a second; 43us is
+>> 1/25000th of a second.  Do you have multiple vCPU perhaps?
+> 
+> Why would I run any test on UP guests? Rather then spending time doing
+> the math on my results, it's probably quicker that you run it yourself:
 
-> Guest physical APIC ID may not equal to vcpu->vcpu_id in some case.
-> We may set the wrong physical id in avic_handle_ldr_update as we
-> always use vcpu->vcpu_id.
+I don't know, but if you don't say how many vCPUs you have, I cannot do
+the math and review the patch.
+
+>> The number of vmexits doesn't count (for HLT).  What counts is how long
+>> they take to be serviced, and as long as it's 1us or more the
+>> optimization is pointless.
 >
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/svm.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index f8ecb6d..67cb5ba 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -4591,6 +4591,8 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
->  	int ret = 0;
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
-> +	u32 apic_id_reg = kvm_lapic_get_reg(vcpu->arch.apic, APIC_ID);
-> +	u32 id = (apic_id_reg >> 24) & 0xff;
+> Please note the single_task_running() check which immediately breaks
+> the kvm_vcpu_check_block() loop if there's even a single other task
+> that can be scheduled in the runqueue of the host CPU.
+> 
+> What happen when the host is not idle is quoted below:
+> 
+>          w/o optimization                   with optimization
+>          ----------------------             -------------------------
+> 0us      vmexit                             vmexit
+> 500ns    retpoline                          call vmexit handler directly
+> 600ns    retpoline                          kvm_vcpu_check_block()
+> 700ns    retpoline                          schedule()
+> 800ns    kvm_vcpu_check_block()
+> 900ns    schedule()
+> ...
+> 
+> Disclaimer: the numbers on the left are arbitrary and I just cut and
+> pasted them from yours, no idea how far off they are.
 
-If we reach here than we're guaranteed to be in xAPIC mode, right? Could
-you maybe export and use kvm_xapic_id() here then (and in
-avic_handle_apic_id_update() too)?
+Yes, of course.  But the idea is the same: yes, because of the retpoline
+you run the guest for perhaps 300ns more before schedule()ing, but does
+that really matter?  300ns * 20000 times/second is a 0.6% performance
+impact, and 300ns is already very generous.  I am not sure it would be
+measurable at all.
 
->  
->  	if (ldr == svm->ldr_reg)
->  		return 0;
-> @@ -4598,7 +4600,7 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
->  	avic_invalidate_logical_id_entry(vcpu);
->  
->  	if (ldr)
-> -		ret = avic_ldr_write(vcpu, vcpu->vcpu_id, ldr);
-> +		ret = avic_ldr_write(vcpu, id, ldr);
->  
->  	if (!ret)
->  		svm->ldr_reg = ldr;
+Paolo
 
--- 
-Vitaly
+> To be clear, I would find it very reasonable to be requested to proof
+> the benefit of the HLT optimization with benchmarks specifics for that
+> single one liner, but until then, the idea that we can drop the
+> retpoline optimization from the HLT vmexit by just thinking about it,
+> still doesn't make sense to me, because by thinking about it I come to
+> the opposite conclusion.
+> 
+> The lack of single_task_running() in the guest driver is also why the
+> guest cpuidle haltpoll risks to waste some CPU with host overcommit or
+> with the host loaded at full capacity and why we may not assume it to
+> be universally enabled.
+> 
+> Thanks,
+> Andrea
+> 
+
