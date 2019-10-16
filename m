@@ -2,31 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87AAED8CE0
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 11:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7E76D8D25
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 12:02:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392097AbfJPJtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 05:49:05 -0400
-Received: from mail-eopbgr80040.outbound.protection.outlook.com ([40.107.8.40]:56552
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        id S2404456AbfJPKCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 06:02:00 -0400
+Received: from mail-eopbgr10074.outbound.protection.outlook.com ([40.107.1.74]:49315
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2392065AbfJPJtE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 05:49:04 -0400
+        id S1727167AbfJPKCA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 06:02:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=md1nR1RKcd65vE73GmnLziOpKuVHsxBM/wC6YDptQMQ=;
- b=rJzxmKhToi3XOP7o48OaaNb6pmwjkemOR8HNU9P4fqjBPg27dsAEiuvqAVGjfxdhekI3+WY+wmtwl8nFj/chL7f21kiL4ES/+1PioBdTERoKbtpRoqLWKiTUUMzUNmWV2VeJq8TPRKjYmp+hKq0kEu6mb/kWOjElEhSiRL1uohk=
-Received: from VI1PR0802CA0042.eurprd08.prod.outlook.com
- (2603:10a6:800:a9::28) by DB7PR08MB3322.eurprd08.prod.outlook.com
- (2603:10a6:5:26::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2347.21; Wed, 16 Oct
- 2019 09:48:56 +0000
-Received: from DB5EUR03FT007.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e0a::209) by VI1PR0802CA0042.outlook.office365.com
- (2603:10a6:800:a9::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2347.17 via Frontend
- Transport; Wed, 16 Oct 2019 09:48:56 +0000
+ bh=K8TRsqDwVZn08Mk6fOZCA70fgGESjA+hOWLPYRCiXto=;
+ b=wATN8ippo+L3IIKTbleck138291Hh6xG9K51Pymsd0+9NCchG13HhVuVuppm50N3N4kCGgqWbzb9/X40dg03eAta0ypRaadGsSzgupJsHiYC6MC8X6hG503i4oxjvCu6hXtUqihvywMgpbEWXPfPwUD3kg2ck6quEkcRSqwjx5Q=
+Received: from HE1PR08CA0046.eurprd08.prod.outlook.com (2603:10a6:7:2a::17) by
+ HE1PR0801MB1817.eurprd08.prod.outlook.com (2603:10a6:3:84::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.19; Wed, 16 Oct 2019 10:01:50 +0000
+Received: from DB5EUR03FT048.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::209) by HE1PR08CA0046.outlook.office365.com
+ (2603:10a6:7:2a::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.2347.16 via Frontend
+ Transport; Wed, 16 Oct 2019 10:01:50 +0000
 Authentication-Results: spf=temperror (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=none action=none
@@ -34,47 +33,47 @@ Authentication-Results: spf=temperror (sender IP is 63.35.35.123)
 Received-SPF: TempError (protection.outlook.com: error in processing during
  lookup of arm.com: DNS Timeout)
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- DB5EUR03FT007.mail.protection.outlook.com (10.152.20.148) with Microsoft SMTP
+ DB5EUR03FT048.mail.protection.outlook.com (10.152.21.28) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.2305.15 via Frontend Transport; Wed, 16 Oct 2019 09:48:54 +0000
-Received: ("Tessian outbound e4042aced47b:v33"); Wed, 16 Oct 2019 09:48:52 +0000
+ 15.20.2305.15 via Frontend Transport; Wed, 16 Oct 2019 10:01:47 +0000
+Received: ("Tessian outbound 6481c7fa5a3c:v33"); Wed, 16 Oct 2019 10:01:47 +0000
 X-CR-MTA-TID: 64aa7808
-Received: from a94b262de10b.2 (ip-172-16-0-2.eu-west-1.compute.internal [104.47.10.51])
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id EE9EE450-8095-41AA-A1E6-80ECD47E18E2.1;
-        Wed, 16 Oct 2019 09:48:47 +0000
-Received: from EUR03-DB5-obe.outbound.protection.outlook.com (mail-db5eur03lp2051.outbound.protection.outlook.com [104.47.10.51])
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id a94b262de10b.2
-    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384);
-    Wed, 16 Oct 2019 09:48:47 +0000
+Received: from 4b22b2b9039b.2 (ip-172-16-0-2.eu-west-1.compute.internal [104.47.4.59])
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 9CAA2EE6-93E7-411B-99E7-1C0F982A53A8.1;
+        Wed, 16 Oct 2019 10:01:47 +0000
+Received: from EUR02-AM5-obe.outbound.protection.outlook.com (mail-am5eur02lp2059.outbound.protection.outlook.com [104.47.4.59])
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 4b22b2b9039b.2
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Wed, 16 Oct 2019 10:01:47 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C80+LbR2D9qOnBYC3+CHdrKI3OWh7f7ktLkeXRcVnm4mvRDArA+0f+LKsv2qxXWY5DlTtMK7/7/A3efA90bJSSLQVb49gvZfFwoCc4N44zHsKg48i2amwY7xsksu1c3C91BFzKTOgKZgTH9tttiutCc3HO9w3VUoBlJXSAzOLq2cYIcGZMJvXggHFaI66S30TKp/jG9S++2sMC3UXfpMLq87zYijY5AVcPP5v2vg6ZifqS67BxMne8PDXSp4ITkakfPT7FFzt5gyx4Ys5C+UCwiQUjHAZxmGm/rGZ8t4M6TWpWqy/JxhXmNjyVNTrlCry59zIdSNroLffF3HXOulUg==
+ b=Fzjzez7U/Za8jp0aP7kLDpg2aHNUGjrmrsYqcOZqgMTHn5cs86Oh8fZZBS/X618N8bHLz4u1EBY5pNl9CJ+58d6azB72T9X949ciaevXuAKPvkvhbEHv4B9wV71ERlFxgdXPHVawcWK2is9lC27QPQZpogJJhLORKs+Ov5wE0E/arQEweopq2WdhFcCRwtVUX1/0EK41xHQiv9xsq5P4nHXvCjx2ne/4YJHqnFxX6AEh7ycUSeOOinPVf6XEFXvUFwsXyguj9pb8V/BuY84k5nYQI2XFwH31cJW+rlwm8nrJH7oPcsSumy7tPCdIN5cP9ADQyKW9+qNP8WuH6dGqOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=md1nR1RKcd65vE73GmnLziOpKuVHsxBM/wC6YDptQMQ=;
- b=VwomxDPEapQkiBfO5XAftvOwoen8mOgtu997BtA3tlVXudDsguS2H8pRx2vFG9xWH+rBxEYO6gPWVfeYGtMFsTA1h3HKvqImASgkcdUHMQ+liR2MxtRLCIQTfVnD6JLX1KPpx1jgs8qtL1uyTBTATaS22ihA5AgUPdwOIdTE6l12lVYHoC1KK0/UDo8jDcjaU+/V+Ci3c/efbAwIV63r7ZVOxwy/FQ09Rv3ZlGj8cW5uu1cEeVN3kgsztowvtG7vagM4o7TMjNI4eS+lp5eAjoU5ILRBPyaPVKP3dz2DdKE6yjpxio4dXXm0UFSRf1t/WObJKTJONWnbQIZfwgrmtw==
+ bh=K8TRsqDwVZn08Mk6fOZCA70fgGESjA+hOWLPYRCiXto=;
+ b=UDaQkwYVplz8O9Yw8eLAjtbB/L+90zEHa6leAlkKpmT8i+L5YMPQVO+d/0SnRBx5QXq0qULYlaQNBVehExNCbqELf5y3XclgJD2fTWeUUBVU+eg+1/ghtrAXB6gcuCXc0zcrPs9wtvWQ1XCjXhQuGbFTzEUdXV6Awu96YUZ1wuDt3b8pa9bJSGvg9aalXzM6JZYWuvkX1smRKVnOAR96zhK6y+4vOh61doPRkZs6j9/RBP6LZH8PF1ssrWLmgRbBAlPRPZ8kTALH2fSRTicHs6+pjqxlPItV4V9TkPulWzklB5ZKKzBeOEhm5h11MtXtwv+FGgTAtfeiauo8BvlLbw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=md1nR1RKcd65vE73GmnLziOpKuVHsxBM/wC6YDptQMQ=;
- b=rJzxmKhToi3XOP7o48OaaNb6pmwjkemOR8HNU9P4fqjBPg27dsAEiuvqAVGjfxdhekI3+WY+wmtwl8nFj/chL7f21kiL4ES/+1PioBdTERoKbtpRoqLWKiTUUMzUNmWV2VeJq8TPRKjYmp+hKq0kEu6mb/kWOjElEhSiRL1uohk=
+ bh=K8TRsqDwVZn08Mk6fOZCA70fgGESjA+hOWLPYRCiXto=;
+ b=wATN8ippo+L3IIKTbleck138291Hh6xG9K51Pymsd0+9NCchG13HhVuVuppm50N3N4kCGgqWbzb9/X40dg03eAta0ypRaadGsSzgupJsHiYC6MC8X6hG503i4oxjvCu6hXtUqihvywMgpbEWXPfPwUD3kg2ck6quEkcRSqwjx5Q=
 Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com (10.168.146.150) by
- HE1PR0801MB1996.eurprd08.prod.outlook.com (10.168.97.23) with Microsoft SMTP
+ HE1PR0801MB1865.eurprd08.prod.outlook.com (10.168.94.149) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Wed, 16 Oct 2019 09:48:43 +0000
+ 15.20.2347.22; Wed, 16 Oct 2019 10:01:38 +0000
 Received: from HE1PR0801MB1676.eurprd08.prod.outlook.com
  ([fe80::b056:4113:e0bd:110d]) by HE1PR0801MB1676.eurprd08.prod.outlook.com
  ([fe80::b056:4113:e0bd:110d%6]) with mapi id 15.20.2347.023; Wed, 16 Oct 2019
- 09:48:43 +0000
+ 10:01:38 +0000
 From:   "Jianyong Wu (Arm Technology China)" <Jianyong.Wu@arm.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
 CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
         "yangbo.lu@nxp.com" <yangbo.lu@nxp.com>,
         "john.stultz@linaro.org" <john.stultz@linaro.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
         "maz@kernel.org" <maz@kernel.org>,
         "richardcochran@gmail.com" <richardcochran@gmail.com>,
@@ -94,62 +93,59 @@ Subject: RE: [PATCH v5 3/6] timekeeping: Add clocksource to
  system_time_snapshot
 Thread-Topic: [PATCH v5 3/6] timekeeping: Add clocksource to
  system_time_snapshot
-Thread-Index: AQHVg0Y1dymHk2OcFEiql6VhclDWladb5yqAgAA8TwCAACgCAIAAlJeAgAAfkWA=
-Date:   Wed, 16 Oct 2019 09:48:43 +0000
-Message-ID: <HE1PR0801MB1676EC775B7BFA5FC7E4F9D5F4920@HE1PR0801MB1676.eurprd08.prod.outlook.com>
+Thread-Index: AQHVg0Y1dymHk2OcFEiql6VhclDWladcI0kAgADkGvA=
+Date:   Wed, 16 Oct 2019 10:01:38 +0000
+Message-ID: <HE1PR0801MB1676B967505C44D385F21E6DF4920@HE1PR0801MB1676.eurprd08.prod.outlook.com>
 References: <20191015104822.13890-1-jianyong.wu@arm.com>
  <20191015104822.13890-4-jianyong.wu@arm.com>
- <9274d21c-2c43-2e0d-f086-6aaba3863603@redhat.com>
- <alpine.DEB.2.21.1910152212580.2518@nanos.tec.linutronix.de>
- <aa1ec910-b7b6-2568-4583-5fa47aac367f@redhat.com>
- <alpine.DEB.2.21.1910160914230.2518@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1910160914230.2518@nanos.tec.linutronix.de>
+ <alpine.DEB.2.21.1910152047490.2518@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1910152047490.2518@nanos.tec.linutronix.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ts-tracking-id: ad2c70a2-bd34-4e39-aaa2-98de92e436d4.1
+x-ts-tracking-id: 97110afe-7aa1-40f3-b592-beb9d63d0fb8.1
 x-checkrecipientchecked: true
 Authentication-Results-Original: spf=none (sender IP is )
  smtp.mailfrom=Jianyong.Wu@arm.com; 
 x-originating-ip: [113.29.88.7]
 x-ms-publictraffictype: Email
-X-MS-Office365-Filtering-Correlation-Id: f61a9ae5-054e-46b9-65a5-08d7521e0eda
+X-MS-Office365-Filtering-Correlation-Id: 08660416-6194-44cb-51b5-08d7521fdbd0
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB1996:|HE1PR0801MB1996:|DB7PR08MB3322:
+X-MS-TrafficTypeDiagnostic: HE1PR0801MB1865:|HE1PR0801MB1865:|HE1PR0801MB1817:
 x-ms-exchange-transport-forked: True
-X-Microsoft-Antispam-PRVS: <DB7PR08MB33225C0A00930C1DB774FE52F4920@DB7PR08MB3322.eurprd08.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <HE1PR0801MB181791800C5843B9D45E7571F4920@HE1PR0801MB1817.eurprd08.prod.outlook.com>
 x-checkrecipientrouted: true
-x-ms-oob-tlc-oobclassifiers: OLM:9508;OLM:9508;
+x-ms-oob-tlc-oobclassifiers: OLM:3631;OLM:3631;
 x-forefront-prvs: 0192E812EC
-X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(136003)(396003)(39860400002)(366004)(54534003)(13464003)(199004)(189003)(7416002)(66446008)(66556008)(14454004)(64756008)(33656002)(2906002)(11346002)(9686003)(66476007)(66066001)(7696005)(6246003)(74316002)(99286004)(446003)(186003)(76116006)(66946007)(76176011)(26005)(14444005)(256004)(6436002)(55016002)(25786009)(71200400001)(229853002)(81166006)(8676002)(102836004)(81156014)(6506007)(5660300002)(6116002)(8936002)(478600001)(53546011)(86362001)(4326008)(71190400001)(316002)(110136005)(54906003)(55236004)(486006)(305945005)(476003)(7736002)(52536014)(3846002);DIR:OUT;SFP:1101;SCL:1;SRVR:HE1PR0801MB1996;H:HE1PR0801MB1676.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(346002)(136003)(366004)(376002)(396003)(54534003)(13464003)(189003)(199004)(9686003)(86362001)(6436002)(55016002)(316002)(3846002)(71200400001)(229853002)(11346002)(486006)(446003)(6116002)(66066001)(476003)(71190400001)(76176011)(186003)(55236004)(6506007)(99286004)(53546011)(54906003)(7696005)(256004)(102836004)(26005)(33656002)(14444005)(7736002)(7416002)(74316002)(305945005)(52536014)(5660300002)(25786009)(2906002)(6916009)(478600001)(8936002)(76116006)(66946007)(4326008)(66556008)(66446008)(64756008)(6246003)(14454004)(81166006)(66476007)(81156014)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:HE1PR0801MB1865;H:HE1PR0801MB1676.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: arm.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: 9Snvoq8lL1JLJMP+38lHxCRE+PIej1tuIP3XSAk+w1B9yoRP10Mc3lTXjeM7kREmMYyJWLTOaWQxlgTc+2Cgex76TEnTUQugZ6SWKbnQUM8eiKnmspeoknnIR2n58axsJ8rgmVx23zlIZYY1eCXiX3tEnEjvllFjijiDThP6ecpVGAxeUP+waa7ZaHWLxtUx8inxkzbuGYN1xICYNOO/Drm1tAX1VmRNNEjjTwLV2BWo1WY9haRX0gcktRFELFylO1LEQejf0z8nmvGpbXyffc97mgRH5bravTWXdH0cpZ+pWUPWOnaCS3QVUtAuMZM7DbZDMyeU/3uM6u2EPa1ohIzXH3jay9YSpQ1LQmwfkLyKibraHW/tbUCyw3esRjUCRwLBMhz30r8wouFVBdJXUwTKhZoCkfeWwUMOI3G8vfM=
+X-Microsoft-Antispam-Message-Info-Original: 5rFsStGDx454gFQfOeewDLrIT/KDRNNAgij4zaGRt8E8CoI26BDxhI7vLUVQkU82v5jxAbYUfguyW9NXb7Kqf7GOedFEzEWv840pzNg7tn4qPRjek3T0cMyoSaSlIsKnJ757kEHQm9xDXU/IbGA7ARKymTGZ8t1BXGkLFkuQwKHyP27y/Tn96WjTFWxLZHOCLUvX/fgJxgO9zbOrh4Alw8Ow/6d71ScydieC6EejbtA4r6i+BewZQJSvi2UzDBMxZ6ID7mVwAM8m+bT6iv/ElKFH3P9xGmGut2mAnYs+fxWs9crQ4CHon9MV0LKjmM1mOmthi4dORJ+68eq2lVRdJMgkyFM4+AEK/rfLMUF6evfE9NYAZ3MQz4dbl9mrUUAFMniSAfvRmeQKruxhtn++FiQ58XzlamcRVTSfSkCNymU=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1996
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1865
 Original-Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Jianyong.Wu@arm.com; 
 X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT007.eop-EUR03.prod.protection.outlook.com
-X-Forefront-Antispam-Report: CIP:63.35.35.123;IPV:CAL;SCL:-1;CTRY:IE;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(376002)(39860400002)(396003)(136003)(346002)(189003)(199004)(54534003)(13464003)(55016002)(316002)(14454004)(99286004)(486006)(25786009)(186003)(11346002)(33656002)(7696005)(446003)(356004)(76176011)(47776003)(6116002)(23726003)(476003)(110136005)(81166006)(450100002)(81156014)(8936002)(8746002)(3846002)(6246003)(305945005)(46406003)(26005)(8676002)(4326008)(76130400001)(7736002)(336012)(478600001)(70206006)(50466002)(63350400001)(126002)(74316002)(66066001)(26826003)(54906003)(97756001)(2906002)(6506007)(102836004)(5660300002)(70586007)(53546011)(86362001)(52536014)(9686003)(229853002)(14444005)(22756006);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR08MB3322;H:64aa7808-outbound-1.mta.getcheckrecipient.com;FPR:;SPF:TempError;LANG:en;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;MX:1;A:1;
-X-MS-Office365-Filtering-Correlation-Id-Prvs: f9a840f1-f54a-4c21-bd4a-08d7521e0821
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT048.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123;IPV:CAL;SCL:-1;CTRY:IE;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(376002)(136003)(396003)(346002)(54534003)(13464003)(199004)(189003)(55016002)(22756006)(99286004)(52536014)(316002)(14444005)(356004)(97756001)(47776003)(8746002)(229853002)(9686003)(63350400001)(8936002)(6246003)(6862004)(14454004)(336012)(54906003)(446003)(11346002)(66066001)(2906002)(74316002)(6116002)(7696005)(76176011)(50466002)(23726003)(6506007)(186003)(53546011)(26005)(126002)(102836004)(3846002)(5660300002)(478600001)(25786009)(450100002)(26826003)(86362001)(81166006)(76130400001)(305945005)(70586007)(70206006)(33656002)(81156014)(476003)(8676002)(46406003)(7736002)(4326008)(486006);DIR:OUT;SFP:1101;SCL:1;SRVR:HE1PR0801MB1817;H:64aa7808-outbound-1.mta.getcheckrecipient.com;FPR:;SPF:TempError;LANG:en;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;A:1;MX:1;
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 60e1eb18-e756-47a4-17b7-08d7521fd5dd
 NoDisclaimer: True
 X-Forefront-PRVS: 0192E812EC
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QZ5f8dNZe2FoALDAwagt0BbeKYrnO4lRpbD+1bdPb82QWGPYVK+sRFDpoN++pNVgEyHWuDeOE1TIyN0MO5dX4F3yJQ7CFfSGgFrUUtv1aeNTUrZmpSBG2QVD/KDi45FetTXK209XD6K6yVTNQFCAoD/rtvq0RqYYtek7TB5HFJTAz7QgKI6OLm0eGieAGCB5rTn0Y8YTJUd9rw3+jkDOeGk5mbvXBEO2bDnaP1CZwuQ8gd8G762B7VfbjYMfwadohz9TdzM534C2sxkoYF8Jsu/Xxz+ISnYaOFuWbI+LLIQ9il2wA7VnVmML8FH0wnQLttgIn3M/d2JoZvnqcq9ZAVvdxT50v+3YxfJu6BPiDUDb5L+WPV1tD5ySOW2KLEXS3jP89uIReBCjHSrfGYE8LnABlEfH26gwP7EvczUz42U=
+X-Microsoft-Antispam-Message-Info: Rq2licjsffFNjjf6kaaGtEL8vk4TQ4OiW0Wonyb5zZGdZ94C1uYZCWAqtKOubFOkIpPh98JfewvHrDX1ZviA8MNh87HlxvhUDd9JCIdZggTSP4b7zR754sS5SCeo5JbCsguzy4ENT1HjHne+036kUDYCYqpuapKjoNh36flMp7RpVLdXzUeg4sAAYiTXzqEcs/K2uji/WvdOrijQaENoyskzvyLNTNmVrdgYnmb2Q4lTf7myO2zWISWQzz0MeqNBUGpYB2d7+e+2VyAIODobJE+L3/PhyCDxkmx2LlbCEsTXIqAJzjyYn0BBKzP3c6RZp5VbH09CaiDDD67mMYNbEwyXTFPSVdq/hgDpcjzmDabUYd9px1/yNgSpu99935rqyFNpDKRKZ6DSX+7oQ51ZzgeOL38csOuG3G1k4Gtg5vU=
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2019 09:48:54.7074
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2019 10:01:47.9459
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f61a9ae5-054e-46b9-65a5-08d7521e0eda
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08660416-6194-44cb-51b5-08d7521fdbd0
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3322
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1817
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -159,11 +155,10 @@ Hi tglx,
 
 > -----Original Message-----
 > From: Thomas Gleixner <tglx@linutronix.de>
-> Sent: Wednesday, October 16, 2019 3:29 PM
-> To: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Jianyong Wu (Arm Technology China) <Jianyong.Wu@arm.com>;
-> netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
-> sean.j.christopherson@intel.com; maz@kernel.org;
+> Sent: Wednesday, October 16, 2019 4:13 AM
+> To: Jianyong Wu (Arm Technology China) <Jianyong.Wu@arm.com>
+> Cc: netdev@vger.kernel.org; yangbo.lu@nxp.com; john.stultz@linaro.org;
+> pbonzini@redhat.com; sean.j.christopherson@intel.com; maz@kernel.org;
 > richardcochran@gmail.com; Mark Rutland <Mark.Rutland@arm.com>;
 > will@kernel.org; Suzuki Poulose <Suzuki.Poulose@arm.com>; linux-
 > kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
@@ -174,92 +169,222 @@ Hi tglx,
 > Subject: Re: [PATCH v5 3/6] timekeeping: Add clocksource to
 > system_time_snapshot
 >=20
-> On Wed, 16 Oct 2019, Paolo Bonzini wrote:
-> > On 15/10/19 22:13, Thomas Gleixner wrote:
-> > > On Tue, 15 Oct 2019, Paolo Bonzini wrote:
-> > >> On 15/10/19 12:48, Jianyong Wu wrote:
-> > >>>
-> > >>>
-> > >>
-> > >> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >
-> > > You're sure about having reviewed that in detail?
+> On Tue, 15 Oct 2019, Jianyong Wu wrote:
+>=20
+> > Sometimes, we need check current clocksource outside of timekeeping
+> > area. Add clocksource to system_time_snapshot then we can get
+> > clocksource as well as system time.
+>=20
+> This changelog is telling absolutely nothing WHY anything outside of the
+> timekeeping core code needs access to the current clocksource. Neither
+> does it tell why it is safe to provide the pointer to random callers.
+>=20
+Really need more information.
+
+> > +/*
+> > + * struct system_time_snapshot - simultaneous raw/real time capture
+> with
+> > + *	counter value
+> > + * @sc:		Contains clocksource and clocksource counter value
+> to produce
+> > + * 	the system times
+> > + * @real:	Realtime system time
+> > + * @raw:	Monotonic raw system time
+> > + * @clock_was_set_seq:	The sequence number of clock was set
+> events
+> > + * @cs_was_changed_seq:	The sequence number of clocksource change
+> events
+> > + */
+> > +struct system_time_snapshot {
+> > +	struct system_counterval_t sc;
+> > +	ktime_t		real;
+> > +	ktime_t		raw;
+> > +	unsigned int	clock_was_set_seq;
+> > +	u8		cs_was_changed_seq;
+> > +};
+> > +
+> >  /*
+> >   * Get cross timestamp between system clock and device clock
+> >   */
+> > diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+> > index 44b726bab4bd..66ff089605b3 100644
+> > --- a/kernel/time/timekeeping.c
+> > +++ b/kernel/time/timekeeping.c
+> > @@ -983,7 +983,8 @@ void ktime_get_snapshot(struct
+> system_time_snapshot *systime_snapshot)
+> >  		nsec_raw  =3D timekeeping_cycles_to_ns(&tk->tkr_raw, now);
+> >  	} while (read_seqcount_retry(&tk_core.seq, seq));
 > >
-> > I did review the patch; the void* ugliness is not in this one, and I
-> > do have some other qualms on that one.
-> >
-> > > This changelog is telling absolutely nothing WHY anything outside of
-> > > the timekeeping core code needs access to the current clocksource.
-> > > Neither does it tell why it is safe to provide the pointer to random =
-callers.
-> >
-> > Agreed on the changelog, but the pointer to a clocksource is already
-> > part of the timekeeping external API via struct system_counterval_t.
-> > get_device_system_crosststamp for example expects a clocksource
-> > pointer but provides no way to get such a pointer.
+> > -	systime_snapshot->cycles =3D now;
+> > +	systime_snapshot->sc.cycles =3D now;
+> > +	systime_snapshot->sc.cs =3D tk->tkr_mono.clock;
 >=20
-> That's a completely different beast, really.
+> The clock pointer can change right after the store, the underlying data c=
+an be
+> freed .....
 >=20
-> The clocksource pointer is handed in by the caller and the core code vali=
-dates
-> if the clocksource is the same as the current system clocksource and not =
-the
-> other way round.
->=20
-> So there is no need for getting that pointer from the core code because t=
-he
-> caller knows already which clocksource needs to be active to make.the who=
-le
-> cross device timestamp correlation work. And in that case it's the caller=
-s
-> responsibility to ensure that the pointer is valid which is the case for =
-the
-> current use cases.
->=20
-I thinks there is something misunderstanding of my patch. See patch 4/6, th=
-e reason why I add clocksource is that I want to check if the current clock=
-souce is
-arm_arch_counter in virt/kvm/arm/psci.c and nothing to do with get_device_s=
-ystem_crosststamp.
 
-So I really need a mechanism to do that check.
+Yeah, need put it into seqcount region.
 
-Thanks
-Jianyong
+> Looking at the rest of the patch set the actual usage site is:
+>=20
+> > +       case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+> > +               ktime_get_snapshot(&systime_snapshot);
+> > +               if (!is_arm_arch_counter(systime_snapshot.sc.cs))
+> > +                       return kvm_psci_call(vcpu);
+>=20
+> and that function does:
+>=20
+> > +bool is_arm_arch_counter(void *cs)
+>=20
+> void *? Type safety is overrated, right? The type is well known....
+>=20
+> +{
+> +       return (struct clocksource *)cs =3D=3D &clocksource_counter;
+>=20
+> That nonsensical typecast does not make up for that.
+>=20
 
-> From your other reply:
->=20
-> > Why add a global id?  ARM can add it to archdata similar to how x86
-> > has vclock_mode.  But I still think the right thing to do is to
-> > include the full system_counterval_t in the result of
-> > ktime_get_snapshot.  (More in a second, feel free to reply to the other
-> email only).
->=20
-> No, the clocksource pointer is not going to be exposed as there is no
-> guarantee that it will be still around after the call returns.
->=20
-> It's not even guaranteed to be correct when the store happens in Wu's pat=
-ch
-> simply because the store is done outside of the seqcount protected region=
-.
+It's really bad code and need fix.
 
-Yeah, all of the elements in system_time_snapshot should be captured in con=
-sistency. So
-I think the consistency will be guaranteed if the store ops added in the se=
-qcount region.
-
+> +}
 >=20
-> Vs. arch data: arch data is an opaque struct, so you'd need to store a po=
-inter
-> which has the same issue as the clocksource pointer itself.
+> So while the access to the pointer is actually safe, this is not going to=
+ happen
+> simply because you modify a generic interface in a way which will lead th=
+e
+> next developer to insane assumptions about the validity of that pointer.
 >=20
-> If we want to convey information then it has to be in the generic part of
-> struct clocksource.
+> While the kernel is pretty lax in terms of isolation due to the nature of=
+ the
+> programming language, this does not justify to expose critical internals =
+of
+> core code to random callers. Guess why most of the timekeeping internals
+> are carefully shielded from external access.
 >=20
-> In fact we could even simplify the existing get_device_system_crosststamp=
-()
-> use case by using the ID field.
+> Something like the completely untested (not even compiled) patch below
+> gives you access to the information you need and allows to reuse the
+> mechanism for other purposes without adding is_$FOO_timer() all over the
+> place.
 >=20
 > Thanks,
 >=20
 > 	tglx
+>=20
+> 8<--------------
+> --- a/include/linux/clocksource.h
+> +++ b/include/linux/clocksource.h
+> @@ -9,6 +9,7 @@
+>  #ifndef _LINUX_CLOCKSOURCE_H
+>  #define _LINUX_CLOCKSOURCE_H
+>=20
+> +#include <linux/clocksource_ids.h>
+>  #include <linux/types.h>
+>  #include <linux/timex.h>
+>  #include <linux/time.h>
+> @@ -49,6 +50,10 @@ struct module;
+>   *			400-499: Perfect
+>   *				The ideal clocksource. A must-use where
+>   *				available.
+> + * @id:			Defaults to CSID_GENERIC. The id value is
+> captured
+> + *			in certain snapshot functions to allow callers to
+> + *			validate the clocksource from which the snapshot
+> was
+> + *			taken.
+>   * @read:		returns a cycle value, passes clocksource as argument
+>   * @enable:		optional function to enable the clocksource
+>   * @disable:		optional function to disable the clocksource
+> @@ -91,6 +96,7 @@ struct clocksource {
+>  	const char *name;
+>  	struct list_head list;
+>  	int rating;
+> +	enum clocksource_ids id;
+>  	int (*enable)(struct clocksource *cs);
+>  	void (*disable)(struct clocksource *cs);
+>  	unsigned long flags;
+> --- /dev/null
+> +++ b/include/linux/clocksource_ids.h
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _LINUX_CLOCKSOURCE_IDS_H
+> +#define _LINUX_CLOCKSOURCE_IDS_H
+> +
+> +/* Enum to give clocksources a unique identifier */ enum
+> +clocksource_ids {
+> +	CSID_GENERIC		=3D 0,
+> +	CSID_ARM_ARCH_COUNTER,
+> +	CSID_MAX,
+> +};
+> +
+
+Does this mean I must add clocksource id for all kinds of ARCHs and update =
+all the code which have checked clocksource in the old way?
+
+Thanks
+Jianyong
+
+> +#endif
+> --- a/include/linux/timekeeping.h
+> +++ b/include/linux/timekeeping.h
+> @@ -2,6 +2,7 @@
+>  #ifndef _LINUX_TIMEKEEPING_H
+>  #define _LINUX_TIMEKEEPING_H
+>=20
+> +#include <linux/clocksource_ids.h>
+>  #include <linux/errno.h>
+>=20
+>  /* Included from linux/ktime.h */
+> @@ -228,15 +229,17 @@ extern void timekeeping_inject_sleeptime
+>   * @cycles:	Clocksource counter value to produce the system times
+>   * @real:	Realtime system time
+>   * @raw:	Monotonic raw system time
+> + * @cs_id:	The id of the current clocksource which produced the
+> snapshot
+>   * @clock_was_set_seq:	The sequence number of clock was set
+> events
+>   * @cs_was_changed_seq:	The sequence number of clocksource change
+> events
+>   */
+>  struct system_time_snapshot {
+> -	u64		cycles;
+> -	ktime_t		real;
+> -	ktime_t		raw;
+> -	unsigned int	clock_was_set_seq;
+> -	u8		cs_was_changed_seq;
+> +	u64			cycles;
+> +	ktime_t			real;
+> +	ktime_t			raw;
+> +	enum clocksource_ids	cs_id;
+> +	unsigned int		clock_was_set_seq;
+> +	u8			cs_was_changed_seq;
+>  };
+>=20
+>  /*
+> --- a/kernel/time/clocksource.c
+> +++ b/kernel/time/clocksource.c
+> @@ -921,6 +921,9 @@ int __clocksource_register_scale(struct
+>=20
+>  	clocksource_arch_init(cs);
+>=20
+> +	if (WARN_ON_ONCE((unsigned int)cs->id >=3D CSID_MAX))
+> +		cs->id =3D CSID_GENERIC;
+> +
+>  	/* Initialize mult/shift and max_idle_ns */
+>  	__clocksource_update_freq_scale(cs, scale, freq);
+>=20
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -979,6 +979,7 @@ void ktime_get_snapshot(struct system_ti
+>  	do {
+>  		seq =3D read_seqcount_begin(&tk_core.seq);
+>  		now =3D tk_clock_read(&tk->tkr_mono);
+> +		systime_snapshot->cs_id =3D tk->tkr_mono.clock->id;
+>  		systime_snapshot->cs_was_changed_seq =3D tk-
+> >cs_was_changed_seq;
+>  		systime_snapshot->clock_was_set_seq =3D tk-
+> >clock_was_set_seq;
+>  		base_real =3D ktime_add(tk->tkr_mono.base,
+>=20
+>=20
+
