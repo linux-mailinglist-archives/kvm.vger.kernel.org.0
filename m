@@ -2,161 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80DC6D92A5
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:35:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C22F1D92EF
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 15:50:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391854AbfJPNfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 09:35:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41158 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728986AbfJPNfp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Oct 2019 09:35:45 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9GDRhwR196426;
-        Wed, 16 Oct 2019 09:35:40 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp39p2xrg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Oct 2019 09:35:39 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9GDSNNP003176;
-        Wed, 16 Oct 2019 09:35:39 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2vp39p2xr1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Oct 2019 09:35:39 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9GDU4qe006137;
-        Wed, 16 Oct 2019 13:35:38 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02dal.us.ibm.com with ESMTP id 2vk6f7nw32-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 16 Oct 2019 13:35:38 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9GDZbW152953496
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Oct 2019 13:35:37 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90D31AC05F;
-        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 633C1AC060;
-        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
-Received: from [9.60.75.213] (unknown [9.60.75.213])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Oct 2019 13:35:37 +0000 (GMT)
-Subject: Re: [PATCH v2 3/4] vfio-ccw: Add a trace for asynchronous requests
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Steffen Maier <maier@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20191016015822.72425-1-farman@linux.ibm.com>
- <20191016015822.72425-4-farman@linux.ibm.com>
- <20191016121543.2b3f0a88.cohuck@redhat.com>
- <6c559ea3-4abd-d83b-4a20-d022a188545e@linux.ibm.com>
- <20191016133919.6f8592e7.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <1e32a1ba-e187-c0db-05cc-ccea1dc3f7b0@linux.ibm.com>
-Date:   Wed, 16 Oct 2019 09:35:37 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2405531AbfJPNu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 09:50:58 -0400
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:34285 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbfJPNu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 09:50:58 -0400
+Received: by mail-vs1-f68.google.com with SMTP id d3so15664958vsr.1
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 06:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        b=OtiZFwf92a1OjxtOV5TFLjBpljpNzYXbiAOClM8ODtXo8IP2bVW9p9ZvXVbJei7kY8
+         pt/x97zyG+5OHWJIviCtill3GnSUh0lkuZeS6TPK7Qrj2XtHYUsWLMKvXaR6Zkb3Qv+E
+         Js76F/Xr0zsGxOxdo43SnJlOY03x+oF5z0/aJSGtpj3RhZLJI4tIPtr/IfUxcltttZnc
+         JjO7oYs4MEsz2fovM+4sjcdazgFVPoO5bqM14ULQVFMHbgJU6v+W6+geGe7lwBGd+VQt
+         C4nAcUnzPWQ2mMdNIU8N2eioT2rxf+1sjTkF39QbCT6EXmYyy/zvJNovZA0FWO/BKeTz
+         uh7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        b=eHTC9l0t98hU8tI23qvrDeoiPEeIP/E7Jm0qSyJw8rTzby+5f9YA3uASwIp+OKy+Uw
+         7r9OCc/HSFo6iG2LH7fbhf+rnCZd1Zzvcu5k4MrbS1IUu2q/Lb1a6I5uRBJhR7XKwfT/
+         Amov4PTh8uzPMTV3mx0AodOoJUDhVRhdQxyai2eqPdu0MN8CvD1mpVeCoLbAWyvGyCpE
+         j/fwm/oYXbVzBac6qKiX1nDbWbYUM87+3HWSB5JK3CebgdWI+zXaPDJhpOR5aVVj5h+e
+         AZVq0jf96s5WtxTCzX7nHQ7ojRYBVtdB1qF7c74tCMj4v+hPCeFIgLz2CIOlN1wdX0B2
+         FYKA==
+X-Gm-Message-State: APjAAAVVolbf0k7WMT4LCevalla2PaEyZycQ2L344P8WWLYMrKCb3BPu
+        vMDC27Z/QfNS+TNEr+qwUfXo4P2mggsCRnv9UfU=
+X-Google-Smtp-Source: APXvYqwurcJNC5idm2cwO6HdNLCy10DRw8dWpjSOBWuHB4/rPMe/X8hjNRKrb0zDNAVeF1JjJylsWwanOKzGepGqSPI=
+X-Received: by 2002:a67:f799:: with SMTP id j25mr24291453vso.116.1571233856960;
+ Wed, 16 Oct 2019 06:50:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191016133919.6f8592e7.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-16_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910160120
+Received: by 2002:a1f:ac16:0:0:0:0:0 with HTTP; Wed, 16 Oct 2019 06:50:53
+ -0700 (PDT)
+From:   robert <okeyyoyopa7@gmail.com>
+Date:   Wed, 16 Oct 2019 06:50:53 -0700
+Message-ID: <CAH8nkvZCZFg-j5UEaUtC16m6qfTF-TJ7o0R23Xq=+zOfinakZg@mail.gmail.com>
+Subject: Dear friend, My name is Bar.robert anderson I am an attorney and a
+ private account manager to my late client. In the Year 2014, my client by
+ name Mr. Carlos, passed away,The reason why I contacted you is because you
+ bear the same last name with the deceased, and I can present you as the
+ beneficiary and next of kin to my late client funds then you will stand as
+ his next of kin and claim the funds. leaving behind a cash inheritance of
+ seven Million Five Hundred Thousand United States Dollars (US$7.500,000,00).My
+ late client and bosom friend grew up in a "Motherless Babies Home". He had no
+ family, no beneficiary nor next of kin to the inheritance Funds left behind
+ at the Bank. You should contact me through my private email address:
+ robertandersonhappy1@gmail.com Best Regards, Bar. robert anderson
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-On 10/16/19 7:39 AM, Cornelia Huck wrote:
-> On Wed, 16 Oct 2019 07:36:09 -0400
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> On 10/16/19 6:15 AM, Cornelia Huck wrote:
->>> On Wed, 16 Oct 2019 03:58:21 +0200
->>> Eric Farman <farman@linux.ibm.com> wrote:
->>>   
->>>> Since the asynchronous requests are typically associated with
->>>> error recovery, let's add a simple trace when one of those is
->>>> issued to a device.
->>>>
->>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->>>> ---
->>>>  drivers/s390/cio/vfio_ccw_fsm.c   |  4 ++++
->>>>  drivers/s390/cio/vfio_ccw_trace.c |  1 +
->>>>  drivers/s390/cio/vfio_ccw_trace.h | 30 ++++++++++++++++++++++++++++++
->>>>  3 files changed, 35 insertions(+)  
->>>
->>> (...)
->>>   
->>>> diff --git a/drivers/s390/cio/vfio_ccw_trace.h b/drivers/s390/cio/vfio_ccw_trace.h
->>>> index 5005d57901b4..23b288eb53dc 100644
->>>> --- a/drivers/s390/cio/vfio_ccw_trace.h
->>>> +++ b/drivers/s390/cio/vfio_ccw_trace.h
->>>> @@ -17,6 +17,36 @@
->>>>  
->>>>  #include <linux/tracepoint.h>
->>>>  
->>>> +TRACE_EVENT(vfio_ccw_fsm_async_request,
->>>> +	TP_PROTO(struct subchannel_id schid,
->>>> +		 int command,
->>>> +		 int errno),
->>>> +	TP_ARGS(schid, command, errno),
->>>> +
->>>> +	TP_STRUCT__entry(
->>>> +		__field(u8, cssid)
->>>> +		__field(u8, ssid)
->>>> +		__field(u16, sch_no)
->>>> +		__field(int, command)
->>>> +		__field(int, errno)
->>>> +	),
->>>> +
->>>> +	TP_fast_assign(
->>>> +		__entry->cssid = schid.cssid;
->>>> +		__entry->ssid = schid.ssid;
->>>> +		__entry->sch_no = schid.sch_no;
->>>> +		__entry->command = command;
->>>> +		__entry->errno = errno;
->>>> +	),
->>>> +
->>>> +	TP_printk("schid=%x.%x.%04x command=%d errno=%d",  
->>>
->>> I'd probably rather print the command as a hex value.  
->>
->> I'm fine with that too.  Want me to send an update?
-> 
-> I think that would be the easiest way.
-
-Will do.  Thanks for the reviews on the other ones!
-
- - Eric
-
-> 
->>
->>>   
->>>> +		  __entry->cssid,
->>>> +		  __entry->ssid,
->>>> +		  __entry->sch_no,
->>>> +		  __entry->command,
->>>> +		  __entry->errno)
->>>> +);
->>>> +
->>>>  TRACE_EVENT(vfio_ccw_fsm_event,
->>>>  	TP_PROTO(struct subchannel_id schid, int state, int event),
->>>>  	TP_ARGS(schid, state, event),  
->>>   
-> 
