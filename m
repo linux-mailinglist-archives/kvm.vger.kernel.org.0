@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B14C9D9429
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 16:43:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C2F5D944F
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 16:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404753AbfJPOnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 10:43:46 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50458 "EHLO
+        id S2393210AbfJPOus (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 10:50:48 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50475 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727291AbfJPOnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 10:43:46 -0400
+        with ESMTP id S2388751AbfJPOus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 10:50:48 -0400
 Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1iKkWM-0006wq-TK; Wed, 16 Oct 2019 16:43:26 +0200
-Date:   Wed, 16 Oct 2019 16:43:26 +0200 (CEST)
+        id 1iKkdJ-00073D-B5; Wed, 16 Oct 2019 16:50:37 +0200
+Date:   Wed, 16 Oct 2019 16:50:36 +0200 (CEST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -37,11 +37,11 @@ cc:     Paolo Bonzini <pbonzini@redhat.com>,
         x86 <x86@kernel.org>, kvm@vger.kernel.org
 Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
  lock
-In-Reply-To: <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
-Message-ID: <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
+In-Reply-To: <b2c42a64-eb42-1f18-f609-42eec3faef18@intel.com>
+Message-ID: <alpine.DEB.2.21.1910161646160.2046@nanos.tec.linutronix.de>
 References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com> <1560897679-228028-10-git-send-email-fenghua.yu@intel.com> <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de> <20190626203637.GC245468@romley-ivt3.sc.intel.com>
  <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de> <20190925180931.GG31852@linux.intel.com> <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com> <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de> <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com> <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com> <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
+ <alpine.DEB.2.21.1910161244060.2046@nanos.tec.linutronix.de> <3a12810b-1196-b70a-aa2e-9fe17dc7341a@redhat.com> <b2c42a64-eb42-1f18-f609-42eec3faef18@intel.com>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -51,72 +51,64 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, 16 Oct 2019, Xiaoyao Li wrote:
-> On 10/16/2019 7:26 PM, Paolo Bonzini wrote:
-> > Old guests are prevalent enough that enabling split-lock detection by
-> > default would be a big usability issue.  And even ignoring that, you
-> > would get the issue you describe below:
+> On 10/16/2019 7:58 PM, Paolo Bonzini wrote:
+> > > With your proposal you render #AC useless even on hosts which have SMT
+> > > disabled, which is just wrong. There are enough good reasons to disable
+> > > SMT.
+> > 
+> > My lazy "solution" only applies to SMT enabled.  When SMT is either not
+> > supported, or disabled as in "nosmt=force", we can virtualize it like
+> > the posted patches have done so far.
+> > 
 > 
-> Right, whether enabling split-lock detection is made by the administrator. The
-> administrator is supposed to know the consequence of enabling it. Enabling it
-> means don't want any split-lock happens in userspace, of course VMM softwares
-> are under control.
+> Do we really need to divide it into two cases of SMT enabled and SMT disabled?
 
-I have no idea what you are talking about, but the whole thing is trivial
-enough to describe in a decision matrix:
+Yes. See the matrix I just sent.
 
-N | #AC       | #AC enabled | SMT | Ctrl    | Guest | Action
-R | available | on host     |     | exposed | #AC   |
---|-----------|-------------|-----|---------|-------|---------------------
-  |           |             |     |         |       |
-0 | N         |     x       |  x  |   N     |   x   | None
-  |           |             |     |         |       |
-1 | Y         |     N       |  x  |   N     |   x   | None
-  |           |             |     |         |       |
-2 | Y         |     Y       |  x  |   Y     |   Y   | Forward to guest
-  |           |             |     |         |       |
-3 | Y         |     Y       |  N  |   Y     |   N   | A) Store in vCPU and
-  |           |             |     |         |       |    toggle on VMENTER/EXIT
-  |           |             |     |         |       |
-  |           |             |     |         |       | B) SIGBUS or KVM exit code
-  |           |             |     |         |       |
-4 | Y         |     Y       |  Y  |   Y     |   N   | A) Disable globally on
-  |           |             |     |         |       |    host. Store in vCPU/guest
-  |           |             |     |         |       |    state and evtl. reenable
-  |           |             |     |         |       |    when guest goes away.
-  |           |             |     |         |       | 
-  |           |             |     |         |       | B) SIGBUS or KVM exit code
+> > > I agree that with SMT enabled the situation is truly bad, but we surely
+> > > can
+> > > be smarter than just disabling it globally unconditionally and forever.
+> > > 
+> > > Plus we want a knob which treats guests triggering #AC in the same way as
+> > > we treat user space, i.e. kill them with SIGBUS.
+> > 
+> > Yes, that's a valid alternative.  But if SMT is possible, I think the
+> > only sane possibilities are global disable and SIGBUS.  SIGBUS (or
+> > better, a new KVM_RUN exit code) can be acceptable for debugging guests too.
+> 
+> If SIGBUS, why need to globally disable?
 
-  [234] need proper accounting and tracepoints in KVM
+See the matrix I just sent.
 
-  [34]  need a policy decision in KVM
+> When there is an #AC due to split-lock in guest, KVM only has below two
+> choices:
+> 1) inject back into guest.
+>    - If kvm advertise this feature to guest, and guest kernel is latest, and
+> guest kernel must enable it too. It's the happy case that guest can handler it
+> on its own purpose.
+>    - Any other cases, guest get an unexpected #AC and crash.
 
-Now there are a two possible state transitions:
+That's just wrong for obvious reasons.
 
- #AC enabled on host during runtime
+> 2) report to userspace (I think the same like a SIGBUS)
 
-   Existing guests are not notified. Nothing changes.
+No. What guarantees that userspace qemu handles the SIGBUS sanely?
 
+> So for simplicity, we can do what Paolo suggested that don't advertise this
+> feature and report #AC to userspace when an #AC due to split-lock in guest
+> *but* we never disable the host's split-lock detection due to guest's
+> split-lock.
 
- #AC disabled on host during runtime
+No, you can't.
 
-   That only affects state #2 from the above table and there are two
-   possible solutions:
+Guess what happens when you just boot some existing guest on a #AC enabled
+host without having updated qemu to handle the exit code/SIGBUS.
 
-     1) Do nothing.
-
-     2) Issue a notification to the guest. This would be doable at least
-     	for Linux guests because any guest kernel which handles #AC is
-	at least the same generation as the host which added #AC.
-
-   	Whether it's worth it, I don't know, but it makes sense at least
-	for consistency reasons.
-
-     For a first step I'd go for 'Do nothing'
-
-SMT state transitions could be handled in a similar way, but I don't think
-it's worth the trouble. The above should cover everything at least on a
-best effort basis.
+It simply will crash and burn in nonsensical ways. Same as reinjecting it
+into the guest and letting it crash.
 
 Thanks,
 
 	tglx
+
+
