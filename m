@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D89D965F
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4176D9664
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:08:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387435AbfJPQII (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 12:08:08 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:14144 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728234AbfJPQIH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:08:07 -0400
+        id S2391688AbfJPQI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 12:08:29 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:34733 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391376AbfJPQI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 12:08:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1571242086; x=1602778086;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=dfLLuN+la3iKy6ZX8Z5xrKNppveTKZfMpAZXhDH99yg=;
-  b=pV8AJmxdtMjDlDgqcv+rDixEpXjJu3XsECCsPzVVLSmZ/cS0LFVkTXUM
-   vgor1CCEcXMJkU18I1pTK2v2/2H38DzJohOv4rrCfNymeo/nyCWQvWQOC
-   7H7FPKZKEPrwDSnclHmRx5lBlswZve+4MknzxmXY7WPbc4cIeXRIiGp/8
-   YuEbkGtndMvTMXVGgIsU0lEIsZT5b0EJNyzlpc4/IxqeeWEyR2pTGxlOu
-   QHM/7MGCEBbRcjzqo9jlE4p2jhqgG2NfddpJ/c0r35VOVSnQvHy0WDEaG
-   KmYtw3cOzq/zMs/WwIOU4iaSUHoZg4MivJ09MaJeQxEeiQ9LsYnQtzCz3
+  t=1571242109; x=1602778109;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pJGJIS/ysA8yI6JN1fWlYWTPzJxxG3lRxMek57vYPN0=;
+  b=oLI/CT7FAkqXyDWXxM2w7rUtplwczvekzamMsjT4LFN8Plbm1VhT3M/c
+   5JURoMlLf8ZH7wknx2B+tJoVvaqpjnvhpI7yYFkxczsPS4GgljvSiK3pW
+   n7vkIdtuKrdOthkh5YErvCQZ2FnIFCQlOMB42Or/K+/MRwsD9/hEMZyTL
+   cCADLejvZTiyXRxQXY2Y/l2a5sLEJIDlEY7sZBfY/CW53bSb7do01AtUN
+   C+Tut0/FQ+SLQ61LsiApJ9hFOBgoI4BryxR2Jgd/9M9uYoMGelmIlHk0X
+   ILKN/VY4OasN+44JHqP5Ub7K35bff2s5x1NFcDecHxgIIGP3dUCQJD/4p
    Q==;
-IronPort-SDR: PyR8FXrA+Oo/TUxPkU/9BwGytWTeQhrkCIDMl1ai5zGXxvzBI6qQ42ZYyUBayq7SGwx79WMQ6u
- zkLb2T+Jhl9+CmykdoVBe8BWu+eW2whTKnNL2N1Lxv1nLWOI16OFxw+5/6/c5yKLRVPkkMt58k
- D49V6fi4BmzvTxYwVKcdafMDfB5IQCRvcduv7U403+M9nh5tJezd9DZMoM643GkyLtrjrXm2AH
- tZWMq2j72so9e08LuZxWs4CVBE+HjYWcOvIuSBfmGg4JKYmY0rwq8sZWP0S8U2EtpZxBq8b2N7
- biM=
+IronPort-SDR: 1OsA3JhEI744edCbz4ki7P/oKySWU3zAX5vDHGJP8ImVekJBGLSz9g6LFCjUqQfDugCQonDOga
+ xsvbJPUQq0zw6Wu0rZTNiBqvPN1mD2qdTAcRa4ba7qYEcmHeNo47pKsNUC7lerFW75djbTk1GQ
+ 9MLYM3Fh71SKRCQUIsc70UFjBGWJZZytdd2dYkTjenlul82qGlXhtYihOgQgAGchON1k5KaLhG
+ lODnPn0SHGcTozQ4ZUwtpQsDhUF1WDj2BFmbGcV3zQoQ8vRxinw2ACzYOd6NXXzM+RNitplF6C
+ FIU=
 X-IronPort-AV: E=Sophos;i="5.67,304,1566835200"; 
-   d="scan'208";a="121448168"
-Received: from mail-dm3nam03lp2052.outbound.protection.outlook.com (HELO NAM03-DM3-obe.outbound.protection.outlook.com) ([104.47.41.52])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Oct 2019 00:08:04 +0800
+   d="scan'208";a="122255431"
+Received: from mail-dm3nam05lp2050.outbound.protection.outlook.com (HELO NAM05-DM3-obe.outbound.protection.outlook.com) ([104.47.49.50])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Oct 2019 00:08:26 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f9YB1nY9fFoo/i2Ev2Ti0T1YDvbnTFY3AntianmfnjVAdBQZ15FE/MEBIudsrIFpBym9JlhJox1ngA9Dra7DYAbeIoQPpVvUjQu2wok4WwdwwKpb4SWQ48DGV32O6YGcuzv/3eixJ4ZvSnB1mGE9ypF5kwM2VkDNObA/T6sp9ViTOQlCnUjOK8TtBu6YUMYBxReWo4cuj85PvHFiaml/YosyekoO2umw+7yQreesCEjdGazp/hAQLVGUBzwA8nK2R0fzTm921FUMQjPxRt5Ux0/QnKoz/ByQtmDb+iXWjFIsoVWmyH4+DBrSVDF/W/QPL0iDpoyr/eoIATyH+AyikA==
+ b=hMWIF9VCsq3LUTTgszSX1dElVpLDHp0zH2AGYLIBx7crtKI1RoAA/EHfHpAjFOtOK7GYb9g+I8gCDpnWO3cdSsJWF7nFuYEcAtMyCtk8EMwYYDui/bHZz6jk86HEA7vtVbkf8nqHRT5rncHe199ZQQPltAMXFlyoyWKFzOEFN9N2YVlMWAZ8QnekCEe0cI1FNNPBsbg1b0j5AN09OxGF9QcJSzEkl/5vAaw2IgP0Kewn0W25aU5oL7ay+hg1kkh7E4+Vp/rqRhYzMDJ9Za0w9gDSMV84eUy4XLTrECjHGbxjYyNUlxFguYDCCK+1TpQIULgNrMuvHJWAcbevVpZ5KQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J91KfnOUqoFoWj199Ik90adrRRo0HPquPXLjl2e7yRY=;
- b=BuqFPWADAVIS223UIFGRNAJjZ75FuQ15wyao9EU7rbKBtDBS3Pa1lYxcqmBa7I4gG64ssLRq8OR2WBUr9NO6TkGkZk0yBQLRtcpS1T5pI7p6v6AHJqqrs8GmLqFztZqlmN8LiZ21QtNEVwGDkowZCLL9SAf+Yc+KGlq78k5EAUNGKJLe9XbEX58fV7uqqiV5g66leUM9BdcoCZ/IAiM+zAVwrBw6eXUNCxkxN/lUaKA1P2wRUVR5+Ktdbek1Cr8/6/KlA79iwgfXnAJAiVOymb7L3YnYsqiVM36Ft711wGqKh1cZzm2alN3W8vSnC6fUqQiqQpOS/STRAMKVrigRDA==
+ bh=yw6LGxYTP7bkwQ7jGBixNL373jB02un0ExmgMRYNunI=;
+ b=LGCQJD3d9ZPlgtu/V0Spk6mTqOkR1dAz4Gb5rtggnfRsfCDLhOH1lWxw4udFHvQegsuy2xdiFByYhw7bP6LgYr/I6MiMzPmdlhzOpKmRbHvLV3WqjzJeF9VOvfh8EhDn30SLzB3NTx3D2alLSw9FEWQDC7DAMhSZfZ2ZeK2ZSZqrQVhhs3D4wkAczNobjbtX0iKySfYXChVbuh0Snh7/QGU2MowYQjP4bM7/u4REnT7n5FIUc5+r5cyXcQw4l9rOKRLe9XmJdnq7qk1CNpb2uLK8weFE4eG32sYbufvVLxVeMtaJz5HSz9Ze09KQaNNDV0+p1xWEJ8Hq7u6N8PlEvQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J91KfnOUqoFoWj199Ik90adrRRo0HPquPXLjl2e7yRY=;
- b=FjpPncGwPMwNJG/1G4DOprGiW/Iinf+b9F4Kv+iyMf1nfp+MMn3X9qgAZdq4eq2CR97drqRWcd7jlmD0QNYiKMmLtvDmY5/NBOrbrY3gNCayNFk3UEU3MH/9Oxipshj2GDdSpVQmjofK9cp6WWfxlScSRpj0IdSljTjWHn25RdM=
+ bh=yw6LGxYTP7bkwQ7jGBixNL373jB02un0ExmgMRYNunI=;
+ b=dEp3w929F0ddofmcUrGkWr0gzgMea1JtjnovSCFSsoUj4q7uCWkC4vBN0Tziwf+jZYU2oFJ3vtIQ+2rGwy7ztu5M17/OWh3osxIsrJ646x5BAYcDaCnttkaWGgjn75kVQrYp2py7MVeshNZxFC05u1wSXkXay2p2r5ABJZXJcVU=
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
- MN2PR04MB6397.namprd04.prod.outlook.com (52.132.170.135) with Microsoft SMTP
+ MN2PR04MB7038.namprd04.prod.outlook.com (10.186.146.24) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.17; Wed, 16 Oct 2019 16:08:02 +0000
+ 15.20.2347.16; Wed, 16 Oct 2019 16:08:24 +0000
 Received: from MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::1454:87a:13b0:d3a]) by MN2PR04MB6061.namprd04.prod.outlook.com
  ([fe80::1454:87a:13b0:d3a%7]) with mapi id 15.20.2347.023; Wed, 16 Oct 2019
- 16:08:02 +0000
+ 16:08:24 +0000
 From:   Anup Patel <Anup.Patel@wdc.com>
 To:     Palmer Dabbelt <palmer@sifive.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -73,11 +73,15 @@ CC:     Daniel Lezcano <daniel.lezcano@linaro.org>,
         "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Anup Patel <Anup.Patel@wdc.com>
-Subject: [PATCH v9 00/22] KVM RISC-V Support
-Thread-Topic: [PATCH v9 00/22] KVM RISC-V Support
-Thread-Index: AQHVhDvjgWUSb1QOnEOpmdfhfnPxUQ==
-Date:   Wed, 16 Oct 2019 16:08:02 +0000
-Message-ID: <20191016160649.24622-1-anup.patel@wdc.com>
+Subject: [PATCH v9 01/22] RISC-V: Add bitmap reprensenting ISA features common
+ across CPUs
+Thread-Topic: [PATCH v9 01/22] RISC-V: Add bitmap reprensenting ISA features
+ common across CPUs
+Thread-Index: AQHVhDvvIKmoDfkSiUyU/8i6Kcn5bA==
+Date:   Wed, 16 Oct 2019 16:08:23 +0000
+Message-ID: <20191016160649.24622-2-anup.patel@wdc.com>
+References: <20191016160649.24622-1-anup.patel@wdc.com>
+In-Reply-To: <20191016160649.24622-1-anup.patel@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -91,224 +95,238 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.17.1
 x-originating-ip: [106.51.27.162]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 261cb235-cf59-4666-6d9f-08d75253057c
+x-ms-office365-filtering-correlation-id: 90b4e889-58fb-4af7-e4ae-08d7525311f0
 x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: MN2PR04MB6397:
-x-ms-exchange-purlcount: 3
+x-ms-traffictypediagnostic: MN2PR04MB7038:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB639769652E62FDC250C1244F8D920@MN2PR04MB6397.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <MN2PR04MB7038794E9DA9BB14F7423C018D920@MN2PR04MB7038.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:277;
+x-ms-oob-tlc-oobclassifiers: OLM:317;
 x-forefront-prvs: 0192E812EC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(346002)(396003)(376002)(39860400002)(136003)(199004)(189003)(71190400001)(71200400001)(66556008)(66476007)(66446008)(64756008)(66946007)(6116002)(3846002)(14444005)(66066001)(52116002)(256004)(99286004)(25786009)(7416002)(14454004)(4326008)(478600001)(966005)(7736002)(8676002)(305945005)(110136005)(476003)(54906003)(86362001)(2616005)(316002)(102836004)(81166006)(486006)(55236004)(44832011)(6306002)(5660300002)(50226002)(26005)(9456002)(186003)(8936002)(36756003)(1076003)(6436002)(6512007)(2906002)(6486002)(386003)(81156014)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB6397;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(366004)(376002)(396003)(136003)(346002)(39860400002)(199004)(189003)(102836004)(44832011)(486006)(2616005)(476003)(386003)(25786009)(446003)(52116002)(99286004)(186003)(76176011)(55236004)(66066001)(26005)(6506007)(5660300002)(36756003)(11346002)(64756008)(6436002)(66946007)(66446008)(66476007)(66556008)(86362001)(6486002)(4326008)(6512007)(1076003)(305945005)(14454004)(256004)(7736002)(7416002)(478600001)(6116002)(71190400001)(3846002)(54906003)(110136005)(2906002)(316002)(71200400001)(8936002)(9456002)(50226002)(81156014)(81166006)(8676002);DIR:OUT;SFP:1102;SCL:1;SRVR:MN2PR04MB7038;H:MN2PR04MB6061.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hpblZSej8o99pKKGUio2DnS/CuEHzt/vAZgGcbH7s/aFraIjTeeWKuU0RolJAeI1IGG47ZF7rSmTivIAc44cnCC7NJLJ6sdxi4cSSRpR9I3xGjLmSkr/fS4HelYJhU7NevcgjxwCGNCUM3e4rS/cW10/zYnXgKJs9kufHD65hGS1eA5RJbNUk8qvMH7Up9048Y+PLkJ0Ah8GAq7Hd5QAQfLnpmrG9Pb6x8Ut86TTAOF6TJEvDwz5rzzatw4/i5xaH4ogm1lkMg1rLYKbzFjHwtMu4eouw7vXzqA9uCI5r3UdELD8KZTSsiPYdugZi38eNwl9kAapqpjyuUyAbzA95AB7FuGwF7l+O5Q/cVlV8a/tYwk41fn4EUfTxSH8DNe9qLjaIWfqGojtQR7d9WLKdxff0C/CPo0qQW/4vvL0Ne+vxEC3HLw2Dhpm1ShR2UlMos/atmw/GQO4dy6XourizQ==
+x-microsoft-antispam-message-info: XtCSt5AppPyMsdkmH8FOkDLSJfWOjilSUUpqLc1iK+uyyz3guYLkPXH489qBAFCpQxGwd9X3gWNo+GLCfn/Hnnd077sA49LxeaoRd+e41Sx9vc4d43Pifrf7cbkO1UN+klqDhyRSlOK4rwpuUyNS7b3W0PBOIiXeYFB0ofd1/T0b94S2xdotEoe3IuhlGnBCvofY9MrP8XcbXlPg7BlA7Nc2ETnZ8chWdhc0cwaHl5Pag5RJZblo3VQgcKRIcuad0V1Z6fsGHJoHknMwErTxMggqQIcKx1765uryC7EeCwT5JzMv7N/ARMH5iWz1B4DiOINH8a3fpOg6QJZtjDYRgqFxxV3dWBjGzXGgZ9R/jxfap0Mjuth747nj8QFtffF3vS7FKrWR6SzYhB3oVYMNliMBPuCuiLRCB2TGi08VZq8=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 261cb235-cf59-4666-6d9f-08d75253057c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2019 16:08:02.6107
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90b4e889-58fb-4af7-e4ae-08d7525311f0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2019 16:08:23.9273
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WHOI3wvyQYz8gSHma6FaSJdWpE8MtiZartrjwyX3rRIAVlLcAn67exp/k2SX4DbOt1R+h76So10b/Iu7DB88nw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6397
+X-MS-Exchange-CrossTenant-userprincipalname: VHY9gvQBg7Z53H1Ihmn67mr+swXZRP3l40Ze9LuvxqCgOT+TllZkBZEtlWYnxz4bl40ojqLW37E+a4U+XBkBZw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB7038
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds initial KVM RISC-V support. Currently, we are able to boot
-RISC-V 64bit Linux Guests with multiple VCPUs.
+This patch adds riscv_isa bitmap which represents Host ISA features
+common across all Host CPUs. The riscv_isa is not same as elf_hwcap
+because elf_hwcap will only have ISA features relevant for user-space
+apps whereas riscv_isa will have ISA features relevant to both kernel
+and user-space apps.
 
-Few key aspects of KVM RISC-V added by this series are:
-1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
-2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
-3. KVM ONE_REG interface for VCPU register access from user-space.
-4. PLIC emulation is done in user-space.
-5. Timer and IPI emuation is done in-kernel.
-6. MMU notifiers supported.
-7. FP lazy save/restore supported.
-8. SBI v0.1 emulation for KVM Guest available.
-9. Forward unhandled SBI calls to KVM userspace.
-10. Hugepage support for Guest/VM
+One of the use-case for riscv_isa bitmap is in KVM hypervisor where
+we will use it to do following operations:
 
-Here's a brief TODO list which we will work upon after this series:
-1. SBI v0.2 emulation in-kernel
-2. SBI v0.2 hart hotplug emulation in-kernel
-3. In-kernel PLIC emulation
-4. ..... and more .....
+1. Check whether hypervisor extension is available
+2. Find ISA features that need to be virtualized (e.g. floating
+   point support, vector extension, etc.)
 
-This series can be found in riscv_kvm_v9 branch at:
-https//github.com/avpatel/linux.git
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Reviewed-by: Alexander Graf <graf@amazon.com>
+---
+ arch/riscv/include/asm/hwcap.h | 22 +++++++++
+ arch/riscv/kernel/cpufeature.c | 83 ++++++++++++++++++++++++++++++++--
+ 2 files changed, 102 insertions(+), 3 deletions(-)
 
-Our work-in-progress KVMTOOL RISC-V port can be found in riscv_v1 branch at=
-:
-https//github.com/avpatel/kvmtool.git
-
-The QEMU RISC-V hypervisor emulation is done by Alistair and is available
-in mainline/alistair/riscv-hyp-ext-v0.4.1 branch at:
-https://github.com/kvm-riscv/qemu.git
-
-To play around with KVM RISC-V, refer KVM RISC-V wiki at:
-https://github.com/kvm-riscv/howto/wiki
-https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU
-
-Changes since v8:
- - Rebased series on Linux-5.4-rc3 and Atish's SBI v0.2 patches
- - Use HRTIMER_MODE_REL instead of HRTIMER_MODE_ABS in timer emulation
- - Fixed kvm_riscv_stage2_map() to handle hugepages
- - Added patch to forward unhandled SBI calls to user-space
- - Added patch for iterative/recursive stage2 page table programming
- - Added patch to remove per-CPU vsip_shadow variable
- - Added patch to fix race-condition in kvm_riscv_vcpu_sync_interrupts()
-
-Changes since v7:
-- Rebased series on Linux-5.4-rc1 and Atish's SBI v0.2 patches
-- Removed PATCH1, PATCH3, and PATCH20 because these already merged
-- Use kernel doc style comments for ISA bitmap functions
-- Don't parse X, Y, and Z extension in riscv_fill_hwcap() because it will
-  be added in-future
-- Mark KVM RISC-V kconfig option as EXPERIMENTAL
-- Typo fix in commit description of PATCH6 of v7 series
-- Use separate structs for CORE and CSR registers of ONE_REG interface
-- Explicitly include asm/sbi.h in kvm/vcpu_sbi.c
-- Removed implicit switch-case fall-through in kvm_riscv_vcpu_exit()
-- No need to set VSSTATUS.MXR bit in kvm_riscv_vcpu_unpriv_read()
-- Removed register for instruction length in kvm_riscv_vcpu_unpriv_read()
-- Added defines for checking/decoding instruction length
-- Added separate patch to forward unhandled SBI calls to userspace tool
-
-Changes since v6:
-- Rebased patches on Linux-5.3-rc7
-- Added "return_handled" in struct kvm_mmio_decode to ensure that
-  kvm_riscv_vcpu_mmio_return() updates SEPC only once
-- Removed trap_stval parameter from kvm_riscv_vcpu_unpriv_read()
-- Updated git repo URL in MAINTAINERS entry
-
-Changes since v5:
-- Renamed KVM_REG_RISCV_CONFIG_TIMEBASE register to
-  KVM_REG_RISCV_CONFIG_TBFREQ register in ONE_REG interface
-- Update SPEC in kvm_riscv_vcpu_mmio_return() for MMIO exits
-- Use switch case instead of illegal instruction opcode table for simplicit=
-y
-- Improve comments in stage2_remote_tlb_flush() for a potential remote TLB
-  flush optimization
-- Handle all unsupported SBI calls in default case of
-  kvm_riscv_vcpu_sbi_ecall() function
-- Fixed kvm_riscv_vcpu_sync_interrupts() for software interrupts
-- Improved unprivilege reads to handle traps due to Guest stage1 page table
-- Added separate patch to document RISC-V specific things in
-  Documentation/virt/kvm/api.txt
-
-Changes since v4:
-- Rebased patches on Linux-5.3-rc5
-- Added Paolo's Acked-by and Reviewed-by
-- Updated mailing list in MAINTAINERS entry
-
-Changes since v3:
-- Moved patch for ISA bitmap from KVM prep series to this series
-- Make vsip_shadow as run-time percpu variable instead of compile-time
-- Flush Guest TLBs on all Host CPUs whenever we run-out of VMIDs
-
-Changes since v2:
-- Removed references of KVM_REQ_IRQ_PENDING from all patches
-- Use kvm->srcu within in-kernel KVM run loop
-- Added percpu vsip_shadow to track last value programmed in VSIP CSR
-- Added comments about irqs_pending and irqs_pending_mask
-- Used kvm_arch_vcpu_runnable() in-place-of kvm_riscv_vcpu_has_interrupt()
-  in system_opcode_insn()
-- Removed unwanted smp_wmb() in kvm_riscv_stage2_vmid_update()
-- Use kvm_flush_remote_tlbs() in kvm_riscv_stage2_vmid_update()
-- Use READ_ONCE() in kvm_riscv_stage2_update_hgatp() for vmid
-
-Changes since v1:
-- Fixed compile errors in building KVM RISC-V as module
-- Removed unused kvm_riscv_halt_guest() and kvm_riscv_resume_guest()
-- Set KVM_CAP_SYNC_MMU capability only after MMU notifiers are implemented
-- Made vmid_version as unsigned long instead of atomic
-- Renamed KVM_REQ_UPDATE_PGTBL to KVM_REQ_UPDATE_HGATP
-- Renamed kvm_riscv_stage2_update_pgtbl() to kvm_riscv_stage2_update_hgatp(=
-)
-- Configure HIDELEG and HEDELEG in kvm_arch_hardware_enable()
-- Updated ONE_REG interface for CSR access to user-space
-- Removed irqs_pending_lock and use atomic bitops instead
-- Added separate patch for FP ONE_REG interface
-- Added separate patch for updating MAINTAINERS file
-
-Anup Patel (18):
-  RISC-V: Add bitmap reprensenting ISA features common across CPUs
-  RISC-V: Add hypervisor extension related CSR defines
-  RISC-V: Add initial skeletal KVM support
-  RISC-V: KVM: Implement VCPU create, init and destroy functions
-  RISC-V: KVM: Implement VCPU interrupts and requests handling
-  RISC-V: KVM: Implement KVM_GET_ONE_REG/KVM_SET_ONE_REG ioctls
-  RISC-V: KVM: Implement VCPU world-switch
-  RISC-V: KVM: Handle MMIO exits for VCPU
-  RISC-V: KVM: Handle WFI exits for VCPU
-  RISC-V: KVM: Implement VMID allocator
-  RISC-V: KVM: Implement stage2 page table programming
-  RISC-V: KVM: Implement MMU notifiers
-  RISC-V: KVM: Forward unhandled SBI calls to userspace
-  RISC-V: KVM: Simplify stage2 page table programming
-  RISC-V: KVM: Remove per-CPU vsip_shadow variable
-  RISC-V: KVM: Fix race-condition in kvm_riscv_vcpu_sync_interrupts()
-  RISC-V: KVM: Document RISC-V specific parts of KVM API.
-  RISC-V: KVM: Add MAINTAINERS entry
-
-Atish Patra (4):
-  RISC-V: KVM: Add timer functionality
-  RISC-V: KVM: FP lazy save/restore
-  RISC-V: KVM: Implement ONE REG interface for FP registers
-  RISC-V: KVM: Add SBI v0.1 support
-
- Documentation/virt/kvm/api.txt          | 158 +++-
- MAINTAINERS                             |  10 +
- arch/riscv/Kconfig                      |   2 +
- arch/riscv/Makefile                     |   2 +
- arch/riscv/include/asm/csr.h            |  58 ++
- arch/riscv/include/asm/hwcap.h          |  22 +
- arch/riscv/include/asm/kvm_host.h       | 260 +++++++
- arch/riscv/include/asm/kvm_vcpu_timer.h |  30 +
- arch/riscv/include/asm/pgtable-bits.h   |   1 +
- arch/riscv/include/uapi/asm/kvm.h       | 111 +++
- arch/riscv/kernel/asm-offsets.c         | 148 ++++
- arch/riscv/kernel/cpufeature.c          |  83 +-
- arch/riscv/kvm/Kconfig                  |  34 +
- arch/riscv/kvm/Makefile                 |  14 +
- arch/riscv/kvm/main.c                   |  86 ++
- arch/riscv/kvm/mmu.c                    | 773 ++++++++++++++++++
- arch/riscv/kvm/tlb.S                    |  43 +
- arch/riscv/kvm/vcpu.c                   | 995 ++++++++++++++++++++++++
- arch/riscv/kvm/vcpu_exit.c              | 610 +++++++++++++++
- arch/riscv/kvm/vcpu_sbi.c               | 151 ++++
- arch/riscv/kvm/vcpu_switch.S            | 382 +++++++++
- arch/riscv/kvm/vcpu_timer.c             | 110 +++
- arch/riscv/kvm/vm.c                     |  86 ++
- arch/riscv/kvm/vmid.c                   | 123 +++
- drivers/clocksource/timer-riscv.c       |   8 +
- include/clocksource/timer-riscv.h       |  16 +
- include/uapi/linux/kvm.h                |   8 +
- 27 files changed, 4314 insertions(+), 10 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_host.h
- create mode 100644 arch/riscv/include/asm/kvm_vcpu_timer.h
- create mode 100644 arch/riscv/include/uapi/asm/kvm.h
- create mode 100644 arch/riscv/kvm/Kconfig
- create mode 100644 arch/riscv/kvm/Makefile
- create mode 100644 arch/riscv/kvm/main.c
- create mode 100644 arch/riscv/kvm/mmu.c
- create mode 100644 arch/riscv/kvm/tlb.S
- create mode 100644 arch/riscv/kvm/vcpu.c
- create mode 100644 arch/riscv/kvm/vcpu_exit.c
- create mode 100644 arch/riscv/kvm/vcpu_sbi.c
- create mode 100644 arch/riscv/kvm/vcpu_switch.S
- create mode 100644 arch/riscv/kvm/vcpu_timer.c
- create mode 100644 arch/riscv/kvm/vm.c
- create mode 100644 arch/riscv/kvm/vmid.c
- create mode 100644 include/clocksource/timer-riscv.h
-
---
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.=
+h
+index 7ecb7c6a57b1..5989dd4426d1 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -8,6 +8,7 @@
+ #ifndef __ASM_HWCAP_H
+ #define __ASM_HWCAP_H
+=20
++#include <linux/bits.h>
+ #include <uapi/asm/hwcap.h>
+=20
+ #ifndef __ASSEMBLY__
+@@ -22,5 +23,26 @@ enum {
+ };
+=20
+ extern unsigned long elf_hwcap;
++
++#define RISCV_ISA_EXT_a		('a' - 'a')
++#define RISCV_ISA_EXT_c		('c' - 'a')
++#define RISCV_ISA_EXT_d		('d' - 'a')
++#define RISCV_ISA_EXT_f		('f' - 'a')
++#define RISCV_ISA_EXT_h		('h' - 'a')
++#define RISCV_ISA_EXT_i		('i' - 'a')
++#define RISCV_ISA_EXT_m		('m' - 'a')
++#define RISCV_ISA_EXT_s		('s' - 'a')
++#define RISCV_ISA_EXT_u		('u' - 'a')
++
++#define RISCV_ISA_EXT_MAX	256
++
++unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap);
++
++#define riscv_isa_extension_mask(ext) BIT_MASK(RISCV_ISA_EXT_##ext)
++
++bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int =
+bit);
++#define riscv_isa_extension_available(isa_bitmap, ext)	\
++	__riscv_isa_extension_available(isa_bitmap, RISCV_ISA_EXT_##ext)
++
+ #endif
+ #endif
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.=
+c
+index eaad5aa07403..64068d36658d 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -6,21 +6,64 @@
+  * Copyright (C) 2017 SiFive
+  */
+=20
++#include <linux/bitmap.h>
+ #include <linux/of.h>
+ #include <asm/processor.h>
+ #include <asm/hwcap.h>
+ #include <asm/smp.h>
+=20
+ unsigned long elf_hwcap __read_mostly;
++
++/* Host ISA bitmap */
++static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
++
+ #ifdef CONFIG_FPU
+ bool has_fpu __read_mostly;
+ #endif
+=20
++/**
++ * riscv_isa_extension_base() - Get base extension word
++ *
++ * @isa_bitmap: ISA bitmap to use
++ * Return: base extension word as unsigned long value
++ *
++ * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
++ */
++unsigned long riscv_isa_extension_base(const unsigned long *isa_bitmap)
++{
++	if (!isa_bitmap)
++		return riscv_isa[0];
++	return isa_bitmap[0];
++}
++EXPORT_SYMBOL_GPL(riscv_isa_extension_base);
++
++/**
++ * __riscv_isa_extension_available() - Check whether given extension
++ * is available or not
++ *
++ * @isa_bitmap: ISA bitmap to use
++ * @bit: bit position of the desired extension
++ * Return: true or false
++ *
++ * NOTE: If isa_bitmap is NULL then Host ISA bitmap will be used.
++ */
++bool __riscv_isa_extension_available(const unsigned long *isa_bitmap, int =
+bit)
++{
++	const unsigned long *bmap =3D (isa_bitmap) ? isa_bitmap : riscv_isa;
++
++	if (bit >=3D RISCV_ISA_EXT_MAX)
++		return false;
++
++	return test_bit(bit, bmap) ? true : false;
++}
++EXPORT_SYMBOL_GPL(__riscv_isa_extension_available);
++
+ void riscv_fill_hwcap(void)
+ {
+ 	struct device_node *node;
+ 	const char *isa;
+-	size_t i;
++	char print_str[BITS_PER_LONG+1];
++	size_t i, j, isa_len;
+ 	static unsigned long isa2hwcap[256] =3D {0};
+=20
+ 	isa2hwcap['i'] =3D isa2hwcap['I'] =3D COMPAT_HWCAP_ISA_I;
+@@ -32,8 +75,11 @@ void riscv_fill_hwcap(void)
+=20
+ 	elf_hwcap =3D 0;
+=20
++	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
++
+ 	for_each_of_cpu_node(node) {
+ 		unsigned long this_hwcap =3D 0;
++		unsigned long this_isa =3D 0;
+=20
+ 		if (riscv_of_processor_hartid(node) < 0)
+ 			continue;
+@@ -41,8 +87,24 @@ void riscv_fill_hwcap(void)
+ 		if (riscv_read_check_isa(node, &isa) < 0)
+ 			continue;
+=20
+-		for (i =3D 0; i < strlen(isa); ++i)
++		i =3D 0;
++		isa_len =3D strlen(isa);
++#if IS_ENABLED(CONFIG_32BIT)
++		if (!strncmp(isa, "rv32", 4))
++			i +=3D 4;
++#elif IS_ENABLED(CONFIG_64BIT)
++		if (!strncmp(isa, "rv64", 4))
++			i +=3D 4;
++#endif
++		for (; i < isa_len; ++i) {
+ 			this_hwcap |=3D isa2hwcap[(unsigned char)(isa[i])];
++			/*
++			 * TODO: X, Y and Z extension parsing for Host ISA
++			 * bitmap will be added in-future.
++			 */
++			if ('a' <=3D isa[i] && isa[i] < 'x')
++				this_isa |=3D (1UL << (isa[i] - 'a'));
++		}
+=20
+ 		/*
+ 		 * All "okay" hart should have same isa. Set HWCAP based on
+@@ -53,6 +115,11 @@ void riscv_fill_hwcap(void)
+ 			elf_hwcap &=3D this_hwcap;
+ 		else
+ 			elf_hwcap =3D this_hwcap;
++
++		if (riscv_isa[0])
++			riscv_isa[0] &=3D this_isa;
++		else
++			riscv_isa[0] =3D this_isa;
+ 	}
+=20
+ 	/* We don't support systems with F but without D, so mask those out
+@@ -62,7 +129,17 @@ void riscv_fill_hwcap(void)
+ 		elf_hwcap &=3D ~COMPAT_HWCAP_ISA_F;
+ 	}
+=20
+-	pr_info("elf_hwcap is 0x%lx\n", elf_hwcap);
++	memset(print_str, 0, sizeof(print_str));
++	for (i =3D 0, j =3D 0; i < BITS_PER_LONG; i++)
++		if (riscv_isa[0] & BIT_MASK(i))
++			print_str[j++] =3D (char)('a' + i);
++	pr_info("riscv: ISA extensions %s\n", print_str);
++
++	memset(print_str, 0, sizeof(print_str));
++	for (i =3D 0, j =3D 0; i < BITS_PER_LONG; i++)
++		if (elf_hwcap & BIT_MASK(i))
++			print_str[j++] =3D (char)('a' + i);
++	pr_info("riscv: ELF capabilities %s\n", print_str);
+=20
+ #ifdef CONFIG_FPU
+ 	if (elf_hwcap & (COMPAT_HWCAP_ISA_F | COMPAT_HWCAP_ISA_D))
+--=20
 2.17.1
+
