@@ -2,87 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 595E4D93E4
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 16:30:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B14C9D9429
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 16:43:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393985AbfJPOav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 10:30:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50298 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728190AbfJPOav (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 16 Oct 2019 10:30:51 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9GEPE88103432
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 10:30:50 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vp396w1m5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 10:30:46 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Wed, 16 Oct 2019 15:30:37 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 16 Oct 2019 15:30:35 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9GEUXAY50200810
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Oct 2019 14:30:33 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37547AE045;
-        Wed, 16 Oct 2019 14:30:33 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DA9ACAE055;
-        Wed, 16 Oct 2019 14:30:32 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.193])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 16 Oct 2019 14:30:32 +0000 (GMT)
-Date:   Wed, 16 Oct 2019 16:30:21 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Steffen Maier <maier@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Jared Rossi <jrossi@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] vfio-ccw: A couple trace changes
-In-Reply-To: <20191016142040.14132-1-farman@linux.ibm.com>
-References: <20191016142040.14132-1-farman@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S2404753AbfJPOnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 10:43:46 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50458 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727291AbfJPOnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 10:43:46 -0400
+Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iKkWM-0006wq-TK; Wed, 16 Oct 2019 16:43:26 +0200
+Date:   Wed, 16 Oct 2019 16:43:26 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
+ lock
+In-Reply-To: <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
+Message-ID: <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com> <1560897679-228028-10-git-send-email-fenghua.yu@intel.com> <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de> <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de> <20190925180931.GG31852@linux.intel.com> <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com> <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de> <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
+ <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com> <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com> <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19101614-0020-0000-0000-000003799C97
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101614-0021-0000-0000-000021CFC133
-Message-Id: <20191016163021.1beb591c.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-16_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=726 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910160125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 16 Oct 2019 16:20:36 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
-
-> Here a couple updates to the vfio-ccw traces in the kernel,
-> based on things I've been using locally.  Perhaps they'll
-> be useful for future debugging.
+On Wed, 16 Oct 2019, Xiaoyao Li wrote:
+> On 10/16/2019 7:26 PM, Paolo Bonzini wrote:
+> > Old guests are prevalent enough that enabling split-lock detection by
+> > default would be a big usability issue.  And even ignoring that, you
+> > would get the issue you describe below:
 > 
+> Right, whether enabling split-lock detection is made by the administrator. The
+> administrator is supposed to know the consequence of enabling it. Enabling it
+> means don't want any split-lock happens in userspace, of course VMM softwares
+> are under control.
 
-Hi! I had a brief look, no full blown review though. You can add an ack
-by me for all the patches in this series.
+I have no idea what you are talking about, but the whole thing is trivial
+enough to describe in a decision matrix:
 
-Regards,
-Halil
+N | #AC       | #AC enabled | SMT | Ctrl    | Guest | Action
+R | available | on host     |     | exposed | #AC   |
+--|-----------|-------------|-----|---------|-------|---------------------
+  |           |             |     |         |       |
+0 | N         |     x       |  x  |   N     |   x   | None
+  |           |             |     |         |       |
+1 | Y         |     N       |  x  |   N     |   x   | None
+  |           |             |     |         |       |
+2 | Y         |     Y       |  x  |   Y     |   Y   | Forward to guest
+  |           |             |     |         |       |
+3 | Y         |     Y       |  N  |   Y     |   N   | A) Store in vCPU and
+  |           |             |     |         |       |    toggle on VMENTER/EXIT
+  |           |             |     |         |       |
+  |           |             |     |         |       | B) SIGBUS or KVM exit code
+  |           |             |     |         |       |
+4 | Y         |     Y       |  Y  |   Y     |   N   | A) Disable globally on
+  |           |             |     |         |       |    host. Store in vCPU/guest
+  |           |             |     |         |       |    state and evtl. reenable
+  |           |             |     |         |       |    when guest goes away.
+  |           |             |     |         |       | 
+  |           |             |     |         |       | B) SIGBUS or KVM exit code
 
+  [234] need proper accounting and tracepoints in KVM
+
+  [34]  need a policy decision in KVM
+
+Now there are a two possible state transitions:
+
+ #AC enabled on host during runtime
+
+   Existing guests are not notified. Nothing changes.
+
+
+ #AC disabled on host during runtime
+
+   That only affects state #2 from the above table and there are two
+   possible solutions:
+
+     1) Do nothing.
+
+     2) Issue a notification to the guest. This would be doable at least
+     	for Linux guests because any guest kernel which handles #AC is
+	at least the same generation as the host which added #AC.
+
+   	Whether it's worth it, I don't know, but it makes sense at least
+	for consistency reasons.
+
+     For a first step I'd go for 'Do nothing'
+
+SMT state transitions could be handled in a similar way, but I don't think
+it's worth the trouble. The above should cover everything at least on a
+best effort basis.
+
+Thanks,
+
+	tglx
