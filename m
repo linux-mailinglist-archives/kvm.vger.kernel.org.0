@@ -2,26 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B710D973E
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07775D9796
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 18:39:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406143AbfJPQZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 12:25:34 -0400
-Received: from mga17.intel.com ([192.55.52.151]:53038 "EHLO mga17.intel.com"
+        id S2406283AbfJPQiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 12:38:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34626 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392349AbfJPQZe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:25:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 09:25:33 -0700
-X-IronPort-AV: E=Sophos;i="5.67,304,1566889200"; 
-   d="scan'208";a="189729232"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.58]) ([10.255.31.58])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Oct 2019 09:25:29 -0700
+        id S2390211AbfJPQit (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 12:38:49 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 28E1785360
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 16:38:49 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id n18so11964566wro.11
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 09:38:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vjbKDvVFPL0th2krdx8wMvub7uxuN9FX2tXsWBpSZGA=;
+        b=PxtaBDuzuBlg91sZzAwSl1kjUgAtN0jqoIjMT3nVV4SIZC/IzYwZgAIELExtOHaV0f
+         xegSOfl6npJIft7xnTqiiksa5pNyQilpccTVCUL+djO/T3DF0X9YFZOdoz+e9cljMKCE
+         9TgEmKA5KvdDgRMLK+kA9dvW1UwgS9lN8IjksSTFcy8ppOSuAFZHd+mO2NQOmvwYBNCw
+         m7XvtdXTIbjJ/bT6rYbfbOs9eCeYcHZnqFm4wuFp781BwPYno/dwDNnelaMraO69c56P
+         aT7yFR0vwIdUGH9Q83HyGn5eV/CkGx1x+owRL11S5pcVkGdkW2lBnVB4QfJNXptX8WKQ
+         5j8g==
+X-Gm-Message-State: APjAAAWgwX0RArRUqhTRtp3ZVkhY71C/yZdR89U58GcrxbeJRe+DVmbQ
+        3FQN2qEhpILckdtzLICKx9Jw/4B72MigD7NFvWvnDpyKb5pyjgnYoOarJ/XC+QVokCO/HJzwQ7R
+        pWSX953xnYZtT
+X-Received: by 2002:a1c:1bc5:: with SMTP id b188mr4397242wmb.88.1571243927611;
+        Wed, 16 Oct 2019 09:38:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyTRKkY7xojuOdJ8XLJRUq8YBcEngwDEOfnwMsHIoBx2ccVCj7UoQkvx5J80rejnnTYAPIXcw==
+X-Received: by 2002:a1c:1bc5:: with SMTP id b188mr4397221wmb.88.1571243927350;
+        Wed, 16 Oct 2019 09:38:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d001:591b:c73b:6c41? ([2001:b07:6468:f312:d001:591b:c73b:6c41])
+        by smtp.gmail.com with ESMTPSA id b62sm4008159wmc.13.2019.10.16.09.38.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Oct 2019 09:38:46 -0700 (PDT)
 Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
  lock
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>,
@@ -52,62 +75,42 @@ References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
  <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
  <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
  <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <bea889c5-1599-1eb8-ff3a-3bde1e58afa3@intel.com>
-Date:   Thu, 17 Oct 2019 00:25:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <bea889c5-1599-1eb8-ff3a-3bde1e58afa3@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f9735fb8-650e-c263-36a7-61390ccbb662@redhat.com>
+Date:   Wed, 16 Oct 2019 18:38:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <bea889c5-1599-1eb8-ff3a-3bde1e58afa3@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/16/2019 11:37 PM, Paolo Bonzini wrote:
-> On 16/10/19 16:43, Thomas Gleixner wrote:
+On 16/10/19 18:25, Xiaoyao Li wrote:
 >>
->> N | #AC       | #AC enabled | SMT | Ctrl    | Guest | Action
->> R | available | on host     |     | exposed | #AC   |
->> --|-----------|-------------|-----|---------|-------|---------------------
->>    |           |             |     |         |       |
->> 0 | N         |     x       |  x  |   N     |   x   | None
->>    |           |             |     |         |       |
->> 1 | Y         |     N       |  x  |   N     |   x   | None
-> 
-> So far so good.
-> 
->> 2 | Y         |     Y       |  x  |   Y     |   Y   | Forward to guest
+>>    3 | Y         |     Y       |  N  |   Y     |   x   | Switch
+>> MSR_TEST_CTRL on
+>>      |           |             |     |         |       | enter/exit,
+>> plus:
+>>      |           |             |     |         |       | A) #AC
+>> forwarded to guest.
+>>      |           |             |     |         |       | B) SIGBUS or
+>> KVM exit code
 >>
->> 3 | Y         |     Y       |  N  |   Y     |   N   | A) Store in vCPU and
->>    |           |             |     |         |       |    toggle on VMENTER/EXIT
->>    |           |             |     |         |       |
->>    |           |             |     |         |       | B) SIGBUS or KVM exit code
 > 
-> (2) is problematic for the SMT=y case, because of what happens when #AC
-> is disabled on the host---safe guests can start to be susceptible to
-> DoS.
+> I just want to get confirmed that in (3), we should split into 2 case:
 > 
-> For (3), which is the SMT=n case,, the behavior is the same independent of
-> guest #AC.
+> a) if host has it enabled, still apply the constraint that guest is
+> forcibly enabled? so we don't switch MSR_TEST_CTL.
 > 
-> So I would change these two lines to:
-> 
->    2 | Y         |     Y       |  Y  |   N     |   x   | On first guest #AC,
->      |           |             |     |         |       | disable globally on host.
->      |           |             |     |         |       |
->    3 | Y         |     Y       |  N  |   Y     |   x   | Switch MSR_TEST_CTRL on
->      |           |             |     |         |       | enter/exit, plus:
->      |           |             |     |         |       | A) #AC forwarded to guest.
->      |           |             |     |         |       | B) SIGBUS or KVM exit code
->
+> b) if host has it disabled, we can switch MSR_TEST_CTL on enter/exit.
 
-I just want to get confirmed that in (3), we should split into 2 case:
+That's doable, yes.
 
-a) if host has it enabled, still apply the constraint that guest is 
-forcibly enabled? so we don't switch MSR_TEST_CTL.
-
-b) if host has it disabled, we can switch MSR_TEST_CTL on enter/exit.
+Paolo
