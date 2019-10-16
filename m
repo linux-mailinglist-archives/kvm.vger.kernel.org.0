@@ -2,169 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7124D98E4
-	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 20:10:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA6BDD99B1
+	for <lists+kvm@lfdr.de>; Wed, 16 Oct 2019 21:08:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732276AbfJPSKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 16 Oct 2019 14:10:14 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:56414 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbfJPSKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 14:10:14 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9GI3TB5114038;
-        Wed, 16 Oct 2019 18:10:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=A1msIco8vn35mUi9RwRz5PHZjiwBQKtO5H+Zka1OE08=;
- b=fPxPUbFPaYNfQI2v3Ik1BWWnMkTDegFEHNEvu6kyTPlGbiNA9NNLJN5RRtQMnx9efY3I
- YjNVg03lg2XmuS2U7+nyB1ZaukKvEEdWB3ED6gduu2Sy8hyHo+f82SpkqnMX8DjINtq9
- eDm/mO2XwitmRjwIlEdsM3SvOWkYlAfPFZ+zwF+WtG7Y6yeC+M3vmTia77iNhzqXUwiE
- T9f+AGw/1FL9xFJ+b8YdPuKZOJsN/UhUh8U4QQaP1k0T/l+Acce4lcZxNmaWBLeBW8oU
- XrDav+T7uNx6LH/RXosAf8IbWxFwDTpFnOxtsZw42q23GHYeQ41cFywiWpH0Q9sQqvG7 Eg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2vk6sqru58-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Oct 2019 18:10:02 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9GI48xP041255;
-        Wed, 16 Oct 2019 18:10:02 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2vp70nc4fb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Oct 2019 18:10:02 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9GIA0PO004509;
-        Wed, 16 Oct 2019 18:10:00 GMT
-Received: from [10.159.134.52] (/10.159.134.52)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 16 Oct 2019 18:09:59 +0000
-Subject: Re: [PATCH 1/4] KVM: VMX: rename {vmx,nested_vmx}_vcpu_setup
- functions
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191015164033.87276-1-xiaoyao.li@intel.com>
- <20191015164033.87276-2-xiaoyao.li@intel.com>
- <82a41967-98ca-1bc8-fce3-77aaf18b0c1a@oracle.com>
- <7d4f2202-d200-f24c-d4cb-dcdfdda7f3b7@intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <2cb1e187-c633-e11c-985c-24ad1e5434c2@oracle.com>
-Date:   Wed, 16 Oct 2019 11:09:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2436678AbfJPTID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 16 Oct 2019 15:08:03 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:42523 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730057AbfJPTID (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 16 Oct 2019 15:08:03 -0400
+Received: by mail-io1-f65.google.com with SMTP id n197so55167134iod.9
+        for <kvm@vger.kernel.org>; Wed, 16 Oct 2019 12:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1NjK6LrD99Gaxm5bLlaUAmgTHhn8gjMU8QSyUXujDFg=;
+        b=okkPmOWHiQpWGGnN2H1oD8oWpj5KihtTNxFrm5qU4a+FBryh1TZSRMkyCmr/x6TRFV
+         tEnz1aP0/g4MmAcXc8rX9YkcaCtI+FpYeB3jOFe4+MTnsogjEv6B7pPIJTmLZ91KsQw6
+         Dw6ju/X6hDFqy1GcGREmUTyn9m7R27tpIb0KPVMMLrNQ8wC0DV8eYNLBIK9Mnt4cjJlW
+         m6x5Vttx046iYm04NQaQbtnR7PD1MP3apnEQI/pDDlrde6OkuwePRaIUgnd8bhbIhRYJ
+         hzDov58F4McP+wmDBRGsic/p+JELgF4jwGQX8aH8NQ7/r0vnufIl6OEanlwb7gUOseWN
+         NzZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1NjK6LrD99Gaxm5bLlaUAmgTHhn8gjMU8QSyUXujDFg=;
+        b=C0KSYAv7cMALQ85bmkwBPwRzdRig9upvDRl5lGIQqo+020G6ie0SK6EmRd6sKic0ih
+         1x/WHj+104ch/HmjAtbUm9cezF2IkEreJfAfGZhszCmnb7QJGMrVvyuP8ZYdGfYR9UkA
+         iJlhz/hw9lDFP33T8GihriD4l2C0HhI/jYrnpFYNHnMCuLv6/xKVCoovmNApPy2uMTvE
+         XBixFgx/14gTRMeJ0DSov0/HzQmA+OJSh7KsKKybZMnBZkmzUh/T7EdkYlZbVwr7c1gy
+         OaVSApdX91/+VDCf4xXMBRs8omXtCLovSlBskAwu8C4b0We+s28uUWzR86lJUbHVfGtM
+         2adw==
+X-Gm-Message-State: APjAAAVuFnASRvqjsLkntzVGzFseu6pTe22axCaObBcHnG9A8R20rHI2
+        aP7rxB8j2K+0WEVtZ2eAvQXhPowOGT9nsIQZH0wMGg==
+X-Google-Smtp-Source: APXvYqyh0quZafqyQwJ+8lkAmHtDFinGaU3LZvZEEazu2+uaEx2gfRYbkcSIGAglxsEb6pFQ8EGMYwAdr45OAjj+3gY=
+X-Received: by 2002:a5d:8146:: with SMTP id f6mr29656177ioo.108.1571252881952;
+ Wed, 16 Oct 2019 12:08:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7d4f2202-d200-f24c-d4cb-dcdfdda7f3b7@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9412 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910160150
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9412 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910160150
+References: <20191012235859.238387-1-morbo@google.com> <20191012235859.238387-2-morbo@google.com>
+In-Reply-To: <20191012235859.238387-2-morbo@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 16 Oct 2019 12:07:50 -0700
+Message-ID: <CALMp9eSAG_1cFGG65hpbOpcSLi8MJRwmdXnkeaMAqfLee6faQQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: realmode: explicitly copy
+ structure to avoid memcpy
+To:     Bill Wendling <morbo@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, alexandru.elisei@arm.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 10/15/19 6:27 PM, Xiaoyao Li wrote:
-> On 10/16/2019 6:05 AM, Krish Sadhukhan wrote:
->>
->>
->> On 10/15/2019 09:40 AM, Xiaoyao Li wrote:
->>> Rename {vmx,nested_vmx}_vcpu_setup to {vmx,nested_vmx}_vmcs_setup,
->>> to match what they really do.
->>>
->>> No functional change.
->>>
->>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->>> ---
->>>   arch/x86/kvm/vmx/nested.c | 2 +-
->>>   arch/x86/kvm/vmx/nested.h | 2 +-
->>>   arch/x86/kvm/vmx/vmx.c    | 9 +++------
->>>   3 files changed, 5 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->>> index 5e231da00310..7935422d311f 100644
->>> --- a/arch/x86/kvm/vmx/nested.c
->>> +++ b/arch/x86/kvm/vmx/nested.c
->>> @@ -5768,7 +5768,7 @@ static int vmx_set_nested_state(struct 
->>> kvm_vcpu *vcpu,
->>>       return ret;
->>>   }
->>> -void nested_vmx_vcpu_setup(void)
->>> +void nested_vmx_vmcs_setup(void)
->>>   {
->>>       if (enable_shadow_vmcs) {
->>>           vmcs_write64(VMREAD_BITMAP, __pa(vmx_vmread_bitmap));
->>> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
->>> index 187d39bf0bf1..2be1ba7482c9 100644
->>> --- a/arch/x86/kvm/vmx/nested.h
->>> +++ b/arch/x86/kvm/vmx/nested.h
->>> @@ -11,7 +11,7 @@ void nested_vmx_setup_ctls_msrs(struct 
->>> nested_vmx_msrs *msrs, u32 ept_caps,
->>>                   bool apicv);
->>>   void nested_vmx_hardware_unsetup(void);
->>>   __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct 
->>> kvm_vcpu *));
->>> -void nested_vmx_vcpu_setup(void);
->>> +void nested_vmx_vmcs_setup(void);
->>>   void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
->>>   int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool 
->>> from_vmentry);
->>>   bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 
->>> exit_reason);
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>> index e660e28e9ae0..58b77a882426 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -4161,15 +4161,12 @@ static void ept_set_mmio_spte_mask(void)
->>>   #define VMX_XSS_EXIT_BITMAP 0
->>> -/*
->>> - * Sets up the vmcs for emulated real mode.
->>> - */
->>> -static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
->>> +static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
->>>   {
->>>       int i;
->>>       if (nested)
->>> -        nested_vmx_vcpu_setup();
->>> +        nested_vmx_vmcs_setup();
->>>       if (cpu_has_vmx_msr_bitmap())
->>>           vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
->>> @@ -6777,7 +6774,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct 
->>> kvm *kvm, unsigned int id)
->>>       cpu = get_cpu();
->>>       vmx_vcpu_load(&vmx->vcpu, cpu);
->>>       vmx->vcpu.cpu = cpu;
->>> -    vmx_vcpu_setup(vmx);
->>> +    vmx_vmcs_setup(vmx);
->>>       vmx_vcpu_put(&vmx->vcpu);
->>>       put_cpu();
->>>       if (cpu_need_virtualize_apic_accesses(&vmx->vcpu)) {
->>
->> May be we should rename vmx_vcpu_reset() to vmx_vmcs_reset()  as well  ?
+On Sat, Oct 12, 2019 at 4:59 PM Bill Wendling <morbo@google.com> wrote:
 >
-> Not really. vmx_vcpu_reset() not only resets vmcs but also the 
-> emulated field of vmx vcpu.
+> Clang prefers to use a "mempcy" (or equivalent) to copy the "regs"
+> structure. This doesn't work in 16-bit mode, as it will end up copying
+> over half the number of bytes. GCC performs a field-by-field copy of the
+> structure, so force clang to do the same thing.
+>
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>  x86/realmode.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/x86/realmode.c b/x86/realmode.c
+> index 303d093..cf45fd6 100644
+> --- a/x86/realmode.c
+> +++ b/x86/realmode.c
+> @@ -117,6 +117,19 @@ struct regs {
+>         u32 eip, eflags;
+>  };
+>
+> +#define COPY_REG(name, dst, src) (dst).name = (src).name
+> +#define COPY_REGS(dst, src)                            \
+> +       COPY_REG(eax, dst, src);                        \
+> +       COPY_REG(ebx, dst, src);                        \
+> +       COPY_REG(ecx, dst, src);                        \
+> +       COPY_REG(edx, dst, src);                        \
+> +       COPY_REG(esi, dst, src);                        \
+> +       COPY_REG(edi, dst, src);                        \
+> +       COPY_REG(esp, dst, src);                        \
+> +       COPY_REG(ebp, dst, src);                        \
+> +       COPY_REG(eip, dst, src);                        \
+> +       COPY_REG(eflags, dst, src)
+> +
 
-It would be a better organization of the code if the resetting of the 
-VMCS fields were placed in a separate function.
+This seems very fragile, too. Can we introduce our own
+address-space-size-independent "memcpy" and use that?
 
+I'm thinking something like:
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+static void bytecopy(void *dst, void *src, u32 count)
+{
+        asm volatile("rep movsb"
+             : "+D" (dst), "+S" (src), "+c" (count) : : "cc");
+}
 
+>  struct table_descr {
+>         u16 limit;
+>         void *base;
+> @@ -148,11 +161,11 @@ static void exec_in_big_real_mode(struct insn_desc *insn)
+>         extern u8 test_insn[], test_insn_end[];
+>
+>         for (i = 0; i < insn->len; ++i)
+> -           test_insn[i] = ((u8 *)(unsigned long)insn->ptr)[i];
+> +               test_insn[i] = ((u8 *)(unsigned long)insn->ptr)[i];
+>         for (; i < test_insn_end - test_insn; ++i)
+>                 test_insn[i] = 0x90; // nop
+>
+> -       save = inregs;
+> +       COPY_REGS(save, inregs);
+>         asm volatile(
+>                 "lgdtl %[gdt_descr] \n\t"
+>                 "mov %%cr0, %[tmp] \n\t"
+> @@ -196,7 +209,7 @@ static void exec_in_big_real_mode(struct insn_desc *insn)
+>                 : [gdt_descr]"m"(gdt_descr), [bigseg]"r"((short)16)
+>                 : "cc", "memory"
+>                 );
+> -       outregs = save;
+> +       COPY_REGS(outregs, save);
+>  }
+>
+>  #define R_AX 1
+> --
+> 2.23.0.700.g56cf767bdb-goog
+>
