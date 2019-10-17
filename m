@@ -2,65 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20374DBA24
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:28:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51023DBA26
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:28:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438560AbfJQX2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 19:28:08 -0400
-Received: from mail-il1-f196.google.com ([209.85.166.196]:45550 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389107AbfJQX2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 19:28:07 -0400
-Received: by mail-il1-f196.google.com with SMTP id u1so3784365ilq.12
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2019 16:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=knIyjHcpjILq0/zpZ6OZalQq3rfrC9s7MFS9cVXlUxk=;
-        b=ShxvTb2Cdfz4oDjazG1PuzFbSf1ZBe4wP+qLRdPzbXu204+Pi4ufV3rFHgKmITPJOU
-         VrNJIS13rxzDesKzunlVg0t+rEKeHKHtYdnIVq9fXrwf6qiKy0ev7moplAoKGX/67bUC
-         IDL5aag/70PmBLzDUmAFW/vShShERL/3lBj3VIj0k/4QkD3ap9DTq1oulBaQ4ayE59xm
-         VGchi0IqSneotxgEAV/Lsp4EFzNhbENzgronsWtrzywvBSr+hdzLXl1b9ytzTxtemGaA
-         zf0x9CzOUML2/NGpLuZnG9QTaZT2VsQ1nZ0u/04FO7RAbLL4x9LTQh+6fwm7u/Oa1OMZ
-         E6Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=knIyjHcpjILq0/zpZ6OZalQq3rfrC9s7MFS9cVXlUxk=;
-        b=Fdzl2adGxzdDW3ftgI+IFbQOc1Z+5ctqV+pO1cJATN3qOOO1+pJmy6OVEryFbP+k/1
-         yzvczcm+Yw8BWNmwYAVxKIJl1MtUr2cKdO/Thvkak2swKVMKsAhSz48PXFgtqSaFLmIA
-         BXTGAoIIhAnbgKqD8/jM8PfHlJPN6URaxFwq1UpKxeAa1B3UyFxSe9SDAKD//s0LSl0j
-         Z0hi+77tZcDTJEE2s5MiziPZzsYEpVkndD3xdyQUPyvrX6rpfcGXd4fdtYAi8GtZj0wG
-         RmpFSSCfwGqvgZWzF68Kt+Ewb5UvbZ4halQ/zKmrMaTfDt+eHXIeVCzOGmh5V0eunN8X
-         mMIA==
-X-Gm-Message-State: APjAAAUanV2oOzrlC7m2kF0g27Nk2Fsiy0KQUkDl/C9qqLZ/m6TfZ2WB
-        j7MUGaabFMpzhUFxgFwKYz67OAcgVmTkijcC5Si68Dbd
-X-Google-Smtp-Source: APXvYqxnLqc7zUW9IGAGqlF9gbtpweq8rLwg8vtwZXpMLIsA2qLYlQhQyrhhEFfQd1YBCeaR1ME4ICljyATtKA8kodY=
-X-Received: by 2002:a92:ccd0:: with SMTP id u16mr6948889ilq.296.1571354886596;
- Thu, 17 Oct 2019 16:28:06 -0700 (PDT)
+        id S2438711AbfJQX2O convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 17 Oct 2019 19:28:14 -0400
+Received: from mga18.intel.com ([134.134.136.126]:16176 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2438647AbfJQX2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 19:28:13 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 16:28:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; 
+   d="scan'208";a="190191437"
+Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
+  by orsmga008.jf.intel.com with ESMTP; 17 Oct 2019 16:28:13 -0700
+Received: from orsmsx115.amr.corp.intel.com ([169.254.4.146]) by
+ ORSMSX103.amr.corp.intel.com ([169.254.5.9]) with mapi id 14.03.0439.000;
+ Thu, 17 Oct 2019 16:28:13 -0700
+From:   "Luck, Tony" <tony.luck@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+CC:     "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "Yu, Fenghua" <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Radim Krcmar" <rkrcmar@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Prakhya, Sai Praneeth" <sai.praneeth.prakhya@intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [RFD] x86/split_lock: Request to Intel
+Thread-Topic: [RFD] x86/split_lock: Request to Intel
+Thread-Index: AQHVhOahH6iHJ8BHzEm2TNVz98K/g6dfc1fA
+Date:   Thu, 17 Oct 2019 23:28:12 +0000
+Message-ID: <3908561D78D1C84285E8C5FCA982C28F7F4A5F08@ORSMSX115.amr.corp.intel.com>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
+ <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+ <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
+ <20190925180931.GG31852@linux.intel.com>
+ <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
+ <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
+ <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
+ <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
+ <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
+ <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
+ <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
+ <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
+ <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiODljMjMyZjAtZTYxOS00NzY5LTgyMDctODdhNWE0NmQwZjUxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK1VhZ2syblhnNzhLZHpxcmNpaEd6OWdiOU90ZEwwRXI1V0g3cnhGemhROXMzejY3K3FaTzQrYTJmSnhXXC96UmYifQ==
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.22.254.140]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <20191012235859.238387-1-morbo@google.com> <20191017012502.186146-1-morbo@google.com>
- <20191017012502.186146-3-morbo@google.com>
-In-Reply-To: <20191017012502.186146-3-morbo@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 17 Oct 2019 16:27:55 -0700
-Message-ID: <CALMp9eT5NEdaihe31ZmmWHG8H=jNH9OeesixQw21_=YYq6p=8w@mail.gmail.com>
-Subject: Re: [kvm-unit-tests v2 PATCH 2/2] x86: realmode: fix esp in call test
-To:     Bill Wendling <morbo@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, alexandru.elisei@arm.com,
-        thuth@redhat.com
-Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 6:25 PM Bill Wendling <morbo@google.com> wrote:
->
-> esp needs to point at the end of the stack, or it will corrupt memory.
->
-> Signed-off-by: Bill Wendling <morbo@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> If that's not going to happen, then we just bury the whole thing and put it
+> on hold until a sane implementation of that functionality surfaces in
+> silicon some day in the not so foreseeable future.
+
+We will drop the patches to flip the MSR bits to enable checking.
+
+But we can fix the split lock issues that have already been found in the kernel.
+
+Two strategies:
+
+1) Adjust alignments of arrays passed to set_bit() et. al.
+
+2) Fix set_bit() et. al. to not issue atomic operations that cross boundaries.
+
+Fenghua had been pursuing option #1 in previous iterations. He found a few
+more places with the help of the "grep" patterns suggested by David Laight.
+So that path is up to ~8 patches now that do one of:
+	+ Change from u32 to u64
+	+ Force alignment with a union with a u64
+	+ Change to non-atomic (places that didn't need atomic)
+
+Downside of strategy #1 is that people will add new misaligned cases in the
+future. So this process has no defined end point.
+
+Strategy #2 begun when I looked at the split-lock issue I saw that with a
+constant bit argument set_bit() just does a "ORB" on the affected byte (i.e.
+no split lock). Similar for clear_bit() and change_bit(). Changing code to also
+do that for the variable bit case is easy.
+
+test_and_clr_bit() needs more care, but luckily, we had Peter Anvin nearby
+to give us a neat solution.
+
+So strategy #2 is being tried now (and Fenghua will post some patches
+soon).
+
+Strategy #2 does increase code size when the bit number argument isn't
+a constant. But that isn't the common case (Fenghua is counting and will
+give numbers when patches are ready).
+
+So take a look at the option #2 patches when they are posted. If the code
+size increase is unacceptable, we can go back to fixing each of the callers
+to get alignment right.
+
+-Tony
+
+
