@@ -2,102 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 268EFDBA51
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:50:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96A0FDBA5A
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:57:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441842AbfJQXus (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 19:50:48 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:63936 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2441804AbfJQXus (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 19:50:48 -0400
-X-IronPort-AV: E=Sophos;i="5.67,309,1566864000"; 
-   d="scan'208";a="760065658"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 17 Oct 2019 23:50:46 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com (Postfix) with ESMTPS id E70DFA1C0B;
-        Thu, 17 Oct 2019 23:50:45 +0000 (UTC)
-Received: from EX13D30UWB001.ant.amazon.com (10.43.161.80) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 17 Oct 2019 23:50:45 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
- EX13D30UWB001.ant.amazon.com (10.43.161.80) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 17 Oct 2019 23:50:45 +0000
-Received: from dev-dsk-surajjs-2c-3edee245.us-west-2.amazon.com (172.19.3.110)
- by mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Thu, 17 Oct 2019 23:50:45 +0000
-Received: by dev-dsk-surajjs-2c-3edee245.us-west-2.amazon.com (Postfix, from userid 10505755)
-        id 204DB89BAF; Thu, 17 Oct 2019 23:50:45 +0000 (UTC)
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     <kvm@vger.kernel.org>
-CC:     <surajjs@amazon.com>, <wanpengli@tencent.com>,
-        <rkrcmar@redhat.com>,
-        "Suraj Jitindar Singh" <sjitindarsingh@gmail.com>
-Subject: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
-Date:   Thu, 17 Oct 2019 23:50:36 +0000
-Message-ID: <20191017235036.25624-1-sjitindarsingh@gmail.com>
-X-Mailer: git-send-email 2.15.3.AMZN
+        id S2441847AbfJQX5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 19:57:37 -0400
+Received: from new-01-2.privateemail.com ([198.54.127.55]:4693 "EHLO
+        NEW-01-2.privateemail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729190AbfJQX5h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 19:57:37 -0400
+Received: from MTA-08-1.privateemail.com (unknown [10.20.147.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by NEW-01.privateemail.com (Postfix) with ESMTPS id 38D1A60959;
+        Thu, 17 Oct 2019 23:57:36 +0000 (UTC)
+Received: from MTA-08.privateemail.com (localhost [127.0.0.1])
+        by MTA-08.privateemail.com (Postfix) with ESMTP id 21EEF60038;
+        Thu, 17 Oct 2019 19:57:36 -0400 (EDT)
+Received: from zetta.local (unknown [10.20.151.244])
+        by MTA-08.privateemail.com (Postfix) with ESMTPA id 95BDF60033;
+        Thu, 17 Oct 2019 23:57:35 +0000 (UTC)
+From:   Derek Yerger <derek@djy.llc>
+Subject: Re: PROBLEM: Regression of MMU causing guest VM application errors
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, "Bonzini, Paolo" <pbonzini@redhat.com>
+References: <1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc>
+ <20191016112857.293a197d@x1.home> <20191016174943.GG5866@linux.intel.com>
+Message-ID: <53f506b3-e864-b3ca-f18f-f8e9a1612072@djy.llc>
+Date:   Thu, 17 Oct 2019 19:57:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20191016174943.GG5866@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Suraj Jitindar Singh <surajjs@amazon.com>
+On 10/16/19 1:49 PM, Sean Christopherson wrote:
+> On Wed, Oct 16, 2019 at 11:28:57AM -0600, Alex Williamson wrote:
+>> On Wed, 16 Oct 2019 00:49:51 -0400
+>> Derek Yerger<derek@djy.llc>  wrote:
+>>
+>>> In at least Linux 5.2.7 via Fedora, up to 5.2.18, guest OS applications
+>>> repeatedly crash with segfaults. The problem does not occur on 5.1.16.
+>>>
+>>> System is running Fedora 29 with kernel 5.2.18. Guest OS is Windows 10 with an
+>>> AMD Radeon 540 GPU passthrough. When on 5.2.7 or 5.2.18, specific windows
+>>> applications frequently and repeatedly crash, throwing exceptions in random
+>>> libraries. Going back to 5.1.16, the issue does not occur.
+>>>
+>>> The host system is unaffected by the regression.
+>>>
+>>> Keywords: kvm mmu pci passthrough vfio vfio-pci amdgpu
+>>>
+>>> Possibly related: Unmerged [PATCH] KVM: x86/MMU: Zap all when removing memslot
+>>> if VM has assigned device
+>> That was never merged because it was superseded by:
+>>
+>> d012a06ab1d2 Revert "KVM: x86/mmu: Zap only the relevant pages when removing a memslot"
+>>
+>> That revert also induced this commit:
+>>
+>> 002c5f73c508 KVM: x86/mmu: Reintroduce fast invalidate/zap for flushing memslot
+>>
+>> Both of these were merged to stable, showing up in 5.2.11 and 5.2.16
+>> respectively, so seeing these sorts of issues might be considered a
+>> known issue on 5.2.7, but not 5.2.18 afaik.  Do you have a specific
+>> test that reliably reproduces the issue?  Thanks,
+Test case 1: Kernel 5.2.18, PCI passthrough, Windows 10 guest, error condition.
+Error 1: Application error in Firefox, restarting firefox and restoring tabs 
+reliably causes application crash with stack overflow error.
+Error 2: Guest BSOD by the morning if left idle
+Error 3: Guest BSOD within 1 minute of using SolidWorks CAD software
 
-The test in x86/apic.c named test_pv_ipi is used to test for a kernel
-bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an out of
-bounds access.
+Test case 2: Kernel 5.2.18, no PCI passthrough, same environment. Guest BSOD 
+encountered.
 
-If the host doesn't implement this hcall then the out of bounds access
-cannot be triggered.
+Test case 3: Kernel 5.1.16, no PCI passthrough, same environment. Worked in 
+Solidworks for 10 minutes without BSOD. Opened firefox and restored tabs, no crash.
 
-Detect the case where the host doesn't implement the KVM_HC_SEND_IPI
-hcall and skip the test when this is the case, as the test doesn't
-apply.
+Test case 4: Kernel 5.1.16, with PCI passthrough, same environment. Worked in 
+Solidworks for a half hour. Opened firefox and restored tabs, no crash.
 
-Output without patch:
-FAIL: PV IPIs testing
+Other factors: The guest does not change between tests. Same drivers, software, 
+etc. I have reliably switched between 5.2.x and 5.1.x multiple times in the past 
+month and repeatably see issues with 5.2.x. At this point I'm unsure if it's PCI 
+passthrough causing the problem.
 
-With patch:
-SKIP: PV IPIs testing: h-call not available
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- x86/apic.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/x86/apic.c b/x86/apic.c
-index eb785c4..bd44b54 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -8,6 +8,8 @@
- #include "atomic.h"
- #include "fwcfg.h"
- 
-+#include <linux/kvm_para.h>
-+
- #define MAX_TPR			0xf
- 
- static void test_lapic_existence(void)
-@@ -638,6 +640,15 @@ static void test_pv_ipi(void)
-     unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
- 
-     asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
-+    /*
-+     * Detect the case where the hcall is not implemented by the hypervisor and
-+     * skip this test if this is the case. Is the hcall isn't implemented then
-+     * the bug that this test is trying to catch can't be triggered.
-+     */
-+    if (ret == -KVM_ENOSYS) {
-+	    report_skip("PV IPIs testing: h-call not available");
-+	    return;
-+    }
-     report("PV IPIs testing", !ret);
- }
- 
--- 
-2.15.3.AMZN
-
+I know I should probably start from fresh host and guest, but time isn't really 
+permitting.
+> Also, does the failure reproduce on on 5.2.1 - 5.2.6?  The memslot debacle
+> exists on all flavors of 5.2.x, if the errors showed up in 5.2.7 then they
+> are being caused by something else.
+After experiencing the issue in absence of PCI passthrough, I believe the 
+problem is unrelated to the memslot debacle. I'm stuck on 5.1.x for now, maybe 
+I'll give up and get a dedicated windows machine /s
