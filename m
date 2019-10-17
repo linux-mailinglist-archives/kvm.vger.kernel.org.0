@@ -2,58 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 93DEBDA380
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 04:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2755DA544
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 08:03:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390098AbfJQCMc convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 16 Oct 2019 22:12:32 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:35772 "EHLO huawei.com"
+        id S2404804AbfJQGDq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 02:03:46 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43594 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729268AbfJQCMc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 16 Oct 2019 22:12:32 -0400
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
-        by Forcepoint Email with ESMTP id 55D68A55E48D057E22C8;
-        Thu, 17 Oct 2019 10:12:30 +0800 (CST)
-Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 17 Oct 2019 10:12:29 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Thu, 17 Oct 2019 10:12:29 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Thu, 17 Oct 2019 10:12:29 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Mingfangsen <mingfangsen@huawei.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: SVM: Fix potential wrong physical id in
- avic_handle_ldr_update
-Thread-Topic: [PATCH] KVM: SVM: Fix potential wrong physical id in
- avic_handle_ldr_update
-Thread-Index: AdWEjr+4z8yau3AyRuWN8bh3iu3VDg==
-Date:   Thu, 17 Oct 2019 02:12:29 +0000
-Message-ID: <7db9f15500ab486b897bf1a7fa7e7161@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.184.189.20]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S2392531AbfJQGDp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 02:03:45 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id E14F230BF13D4765E53A;
+        Thu, 17 Oct 2019 14:03:42 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Thu, 17 Oct 2019
+ 14:03:32 +0800
+Subject: Re: [PATCH v19 5/5] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To:     Peter Maydell <peter.maydell@linaro.org>
+CC:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        gengdongjiu <gengdongjiu@huawei.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        "QEMU Developers" <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20191015140140.34748-1-zhengxiang9@huawei.com>
+ <20191015140140.34748-6-zhengxiang9@huawei.com>
+ <CAFEAcA-92YEgrBPDVVFEmjBYnw=keJWKUDnqNRakw-jKYaxK5Q@mail.gmail.com>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <c0ecb6af-c26f-0f97-c6dd-7745a03da94c@huawei.com>
+Date:   Thu, 17 Oct 2019 14:03:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-92YEgrBPDVVFEmjBYnw=keJWKUDnqNRakw-jKYaxK5Q@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -61,30 +56,81 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
->> Guest physical APIC ID may not equal to vcpu->vcpu_id in some case.
->> We may set the wrong physical id in avic_handle_ldr_update as we 
->> always use vcpu->vcpu_id.
-
-Hi, Vitaly, thanks for your reply.
-Do you think there may be a wrong physical id in avic_handle_ldr_update too ?
-
+On 2019/10/15 22:48, Peter Maydell wrote:
+> On Tue, 15 Oct 2019 at 15:02, Xiang Zheng <zhengxiang9@huawei.com> wrote:
 >>
->> @@ -4591,6 +4591,8 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
->>  	int ret = 0;
->>  	struct vcpu_svm *svm = to_svm(vcpu);
->>  	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
->> +	u32 apic_id_reg = kvm_lapic_get_reg(vcpu->arch.apic, APIC_ID);
->> +	u32 id = (apic_id_reg >> 24) & 0xff;
->
->If we reach here than we're guaranteed to be in xAPIC mode, right? Could you maybe export and use kvm_xapic_id() here then (and in
->avic_handle_apic_id_update() too)?
->
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+>> translates the host VA delivered by host to guest PA, then fills this PA
+>> to guest APEI GHES memory, then notifies guest according to the SIGBUS
+>> type.
+>>
+>> When guest accesses the poisoned memory, it will generate a Synchronous
+>> External Abort(SEA). Then host kernel gets an APEI notification and calls
+>> memory_failure() to unmapped the affected page in stage 2, finally
+>> returns to guest.
+>>
+>> Guest continues to access the PG_hwpoison page, it will trap to KVM as
+>> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+>> Qemu, Qemu records this error address into guest APEI GHES memory and
+>> notifes guest using Synchronous-External-Abort(SEA).
+>>
+>> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
+>> in which we can setup the type of exception and the syndrome information.
+>> When switching to guest, the target vcpu will jump to the synchronous
+>> external abort vector table entry.
+>>
+>> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
+>> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+>> not valid and hold an UNKNOWN value. These values will be set to KVM
+>> register structures through KVM_SET_ONE_REG IOCTL.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> 
+>> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+>> +                                      uint64_t error_physical_addr,
+>> +                                      uint32_t data_length)
+>> +{
+>> +    GArray *block;
+>> +    uint64_t current_block_length;
+>> +    /* Memory Error Section Type */
+>> +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
+>> +    QemuUUID fru_id = {0};
+> 
+> Hi; this makes at least some versions of clang complain
+> (this is a clang bug, but it's present in shipped versions):
+> 
+> /home/petmay01/linaro/qemu-from-laptop/qemu/hw/acpi/acpi_ghes.c:135:24:
+> error: suggest braces around
+>       initialization of subobject [-Werror,-Wmissing-braces]
+>     QemuUUID fru_id = {0};
+>                        ^
+>                        {}
+> 
+> We generally use "{}" as the generic zero-initializer for
+> this reason (it's gcc/clang specific whereas "{0}" is
+> in the standard, but all of the compilers we care about
+> support it and don't warn about its use).
+> 
+>> +    uint8_t fru_text[20] = {0};
+> 
+> Clang doesn't mind this one because it's not initializing
+> a struct type, but you could use "{}" here too for consistency.
+> 
 
-I think we're guaranteed to be in xAPIC mode when we reach here. I would have a try to export
-and use use kvm_xapic_id here and in avic_handle_apic_id_update too.
-Thanks for your suggestion.
+OK, I will replace all the "{0}" with "{}".
 
-Have a nice day.
-Best wishes.
+> thanks
+> -- PMM
+> 
+> .
+> 
+
+-- 
+
+Thanks,
+Xiang
+
