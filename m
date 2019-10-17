@@ -2,86 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07B77DAC3D
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 14:30:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9111ADAC50
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 14:33:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393875AbfJQMaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 08:30:02 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:52857 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728190AbfJQMaC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 08:30:02 -0400
-Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1iL4uY-0007rm-1f; Thu, 17 Oct 2019 14:29:46 +0200
-Date:   Thu, 17 Oct 2019 14:29:45 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-Subject: [RFD] x86/split_lock: Request to Intel
-In-Reply-To: <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
-Message-ID: <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com> <1560897679-228028-10-git-send-email-fenghua.yu@intel.com> <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de> <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de> <20190925180931.GG31852@linux.intel.com> <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com> <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de> <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com> <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com> <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com> <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
- <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S2502377AbfJQMdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 08:33:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40084 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727054AbfJQMdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 08:33:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6D92D30860C1;
+        Thu, 17 Oct 2019 12:33:01 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 63CED5C553;
+        Thu, 17 Oct 2019 12:32:51 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] lib: use an argument which doesn't require
+ default argument promotion
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Bill Wendling <morbo@google.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+        David Gibson <dgibson@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Andrew Jones <drjones@redhat.com>
+References: <CAGG=3QUL_OrjaWn+gF4z-R8brR2=3661hGk0uUAK2y8Dff7Mvg@mail.gmail.com>
+ <986a6fc2-ef7b-4df4-8d4e-a4ab94238b32@redhat.com>
+ <30edb4bd-535d-d29c-3f4e-592adfa41163@redhat.com>
+ <7f7fa66f-9e6c-2e48-03b2-64ebca36df99@redhat.com>
+ <CAGG=3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h0V7SHbbEQ@mail.gmail.com>
+ <df9c5f5d-c9ec-1a7b-1fec-67d1e7a5bbad@redhat.com>
+ <4d591c3f-82aa-dd9e-efce-8b7d73b2f64f@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ee0c6e4b-8384-a908-6760-5c338add02bc@redhat.com>
+Date:   Thu, 17 Oct 2019 14:32:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <4d591c3f-82aa-dd9e-efce-8b7d73b2f64f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 17 Oct 2019 12:33:01 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The more I look at this trainwreck, the less interested I am in merging any
-of this at all.
+On 14/10/2019 13.04, Paolo Bonzini wrote:
+> On 14/10/19 09:57, Thomas Huth wrote:
+>> -void report(const char *msg_fmt, bool pass, ...)
+>> +void report(bool pass, const char *msg_fmt, ...)
+>>  {
+>>         va_list va;
+>> -       va_start(va, pass);
+>> +       va_start(va, msg_fmt);
+>>         va_report(msg_fmt, pass, false, false, va);
+>>         va_end(va);
+>>  }
+>>
+>> -void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+>> +void report_xfail(bool xfail, bool pass, const char *msg_fmt, ...)
+>>  {
+>>         va_list va;
+>> -       va_start(va, pass);
+>> +       va_start(va, msg_fmt);
+>>         va_report(msg_fmt, pass, xfail, false, va);
+>>         va_end(va);
+>>  }
+>>
+>> ... then we can keep the "bool" - but we have to fix all calling sites, too.
+>>
+>> Paolo, any preferences?
+> 
+> Actually I had already pushed Bill's patch.  I also thought about
+> reordering the arguments, but it's a big change.  If someone wants to
+> try his hands at doing it with Coccinelle, I'm happy to apply it.
 
-The fact that it took Intel more than a year to figure out that the MSR is
-per core and not per thread is yet another proof that this industry just
-works by pure chance.
+This coccinelle script seems to do the job:
 
-There is a simple way out of this misery:
+@@
+expression fmt;
+expression pass;
+expression list args;
+@@
+ report(
+-fmt, pass
++pass, fmt
+ , args);
 
-  Intel issues a microcode update which does:
+@@
+expression fmt;
+expression pass;
+expression list args;
+@@
+ report_xfail(
+-fmt, xfail, pass
++xfail, pass, fmt
+ , args);
 
-    1) Convert the OR logic of the AC enable bit in the TEST_CTRL MSR to
-       AND logic, i.e. when one thread disables AC it's automatically
-       disabled on the core.
+I'll try to cook a patch with that.
 
-       Alternatively it supresses the #AC when the current thread has it
-       disabled.
-
-    2) Provide a separate bit which indicates that the AC enable logic is
-       actually AND based or that #AC is supressed when the current thread
-       has it disabled.
-
-    Which way I don't really care as long as it makes sense.
-
-If that's not going to happen, then we just bury the whole thing and put it
-on hold until a sane implementation of that functionality surfaces in
-silicon some day in the not so foreseeable future.
-
-Seriously, this makes only sense when it's by default enabled and not
-rendered useless by VIRT. Otherwise we never get any reports and none of
-the issues are going to be fixed.
-
-Thanks,
-
-	tglx
+ Thomas
