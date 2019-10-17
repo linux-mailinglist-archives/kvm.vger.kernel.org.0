@@ -2,156 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A621DB0D1
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:12:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A4C6DB0D4
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:13:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390441AbfJQPM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 11:12:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56066 "EHLO mx1.redhat.com"
+        id S2404522AbfJQPNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:13:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55590 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732650AbfJQPM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 11:12:27 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1732650AbfJQPNY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:13:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D572588311
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2019 15:12:26 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id n3so1308637wmf.3
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2019 08:12:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6URh6sfF5SY+GjIiIeygv7Pue70RSRcvYor9Y98FLzs=;
-        b=JEKLEF5HOf3LKtPoqBiMK32DMyRghR5G0rTDh2onkr2kCDw23tHtFYtFMM8rL9mh1Y
-         1jZsqe3F9SEYVPO134cKEmof3QIHVWzq1kaBo3zjBgHdL3VJ2GP6eCKRB9l3xDHiOwXu
-         WVoBzMAs+TtpdwlW7pEJMgsUUv2HocNPnHTyJj9LLCEuvFBwaoYL4Du8Lqsc2J/FYs0c
-         RbMTftlvBspTypSwslBBWJMJjBQwxuGYNmuNvxQTquMCwXjow21MhvKs2N1+qWjafwSB
-         Hzkk/EOS4xcLRHMmbZwzQhnpLBImf40mun3eiwKDdwysRC6lx0JPx390KieaIDVvsDdP
-         vMaA==
-X-Gm-Message-State: APjAAAWRhxn5zWjdErqKyLTMnwQ0Gzi8N+sdXC0gs9KerPpTihVMh3R6
-        yyu1O805RlihCj+1sY3PC+hOdmz1dodqctgXIJ6hf/ptMhNmMIATETXvDwA+eIw197Ic13KAFK5
-        zKiJOB4BsZHNt
-X-Received: by 2002:a5d:6506:: with SMTP id x6mr3498648wru.366.1571325145506;
-        Thu, 17 Oct 2019 08:12:25 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqySU6DS/RqeRVbBcOi9QO31rcYMYaBXaBuv0ezlv/Z4bgIg5NWR+I6f0LoIGcDuKW0FQqw/eg==
-X-Received: by 2002:a5d:6506:: with SMTP id x6mr3498623wru.366.1571325145314;
-        Thu, 17 Oct 2019 08:12:25 -0700 (PDT)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net. [88.26.246.243])
-        by smtp.gmail.com with ESMTPSA id a3sm2711161wmj.35.2019.10.17.08.12.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Oct 2019 08:12:24 -0700 (PDT)
-Subject: Re: [PATCH 04/32] mc146818rtc: Move RTC_ISA_IRQ definition
-To:     Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Paul Durrant <paul@xen.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Markovic <amarkovic@wavecomp.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        by mx1.redhat.com (Postfix) with ESMTPS id 0067F10DCC9F;
+        Thu, 17 Oct 2019 15:13:24 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C2D860C63;
+        Thu, 17 Oct 2019 15:13:14 +0000 (UTC)
+Subject: Re: [PATCH 08/32] piix4: rename some variables in realize function
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         Aurelien Jarno <aurelien@aurel32.net>,
-        Richard Henderson <rth@twiddle.net>
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        xen-devel@lists.xenproject.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
+        Markus Armbruster <armbru@redhat.com>
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-5-philmd@redhat.com>
- <CAL1e-=jOiMe2--=ht0Wgwh0a_At=sDhUzX7EkNU86nPt230a-g@mail.gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ff0603bb-ffef-ca67-6d0f-9e7a36abaa7f@redhat.com>
-Date:   Thu, 17 Oct 2019 17:12:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191015162705.28087-9-philmd@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <e935d554-cd6c-a9e5-9530-bb86c62a1fd1@redhat.com>
+Date:   Thu, 17 Oct 2019 17:13:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jOiMe2--=ht0Wgwh0a_At=sDhUzX7EkNU86nPt230a-g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191015162705.28087-9-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Thu, 17 Oct 2019 15:13:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/17/19 5:02 PM, Aleksandar Markovic wrote:
+On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
+> From: Hervé Poussineau <hpoussin@reactos.org>
 > 
-> 
-> On Tuesday, October 15, 2019, Philippe Mathieu-Daudé <philmd@redhat.com 
-> <mailto:philmd@redhat.com>> wrote:
-> 
->     From: Philippe Mathieu-Daudé <f4bug@amsat.org <mailto:f4bug@amsat.org>>
-> 
->     The ISA default number for the RTC devices is not related to its
->     registers neither. Move this definition to "hw/timer/mc146818rtc.h".
-> 
->     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com
->     <mailto:philmd@redhat.com>>
->     ---
->       include/hw/timer/mc146818rtc.h      | 2 ++
->       include/hw/timer/mc146818rtc_regs.h | 2 --
->       tests/rtc-test.c                    | 1 +
->       3 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> 
-> Philippe, do this and related patches clash with your recent 
-> reorganization of timers/rtcs?
+> PIIX4 structure is now 's'
+> PCI device is now 'pci_dev'
+> DeviceState is now 'dev'
 
-Indeed, but since big boring series take time to get merged, I prefer to 
-have it reviewed already, then I'll rebase and fix conflicts on the one 
-that isn't merged.
+Why? Just for the sake of it?
 
-Thanks for reviewing the other patches!
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+> Message-Id: <20171216090228.28505-6-hpoussin@reactos.org>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/isa/piix4.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+> index 3294056cd5..4202243e41 100644
+> --- a/hw/isa/piix4.c
+> +++ b/hw/isa/piix4.c
+> @@ -88,16 +88,17 @@ static const VMStateDescription vmstate_piix4 = {
+>      }
+>  };
+>  
+> -static void piix4_realize(PCIDevice *dev, Error **errp)
+> +static void piix4_realize(PCIDevice *pci_dev, Error **errp)
+>  {
+> -    PIIX4State *d = PIIX4_PCI_DEVICE(dev);
+> +    DeviceState *dev = DEVICE(pci_dev);
+> +    PIIX4State *s = DO_UPCAST(PIIX4State, dev, pci_dev);
 
-> A.
-> 
->     diff --git a/include/hw/timer/mc146818rtc.h
->     b/include/hw/timer/mc146818rtc.h
->     index 0f1c886e5b..17761cf6d9 100644
->     --- a/include/hw/timer/mc146818rtc.h
->     +++ b/include/hw/timer/mc146818rtc.h
->     @@ -39,6 +39,8 @@ typedef struct RTCState {
->           QLIST_ENTRY(RTCState) link;
->       } RTCState;
-> 
->     +#define RTC_ISA_IRQ 8
->     +
->       ISADevice *mc146818_rtc_init(ISABus *bus, int base_year,
->                                    qemu_irq intercept_irq);
->       void rtc_set_memory(ISADevice *dev, int addr, int val);
->     diff --git a/include/hw/timer/mc146818rtc_regs.h
->     b/include/hw/timer/mc146818rtc_regs.h
->     index bfbb57e570..631f71cfd9 100644
->     --- a/include/hw/timer/mc146818rtc_regs.h
->     +++ b/include/hw/timer/mc146818rtc_regs.h
->     @@ -27,8 +27,6 @@
-> 
->       #include "qemu/timer.h"
-> 
->     -#define RTC_ISA_IRQ 8
->     -
->       #define RTC_SECONDS             0
->       #define RTC_SECONDS_ALARM       1
->       #define RTC_MINUTES             2
->     diff --git a/tests/rtc-test.c b/tests/rtc-test.c
->     index 6309b0ef6c..18f895690f 100644
->     --- a/tests/rtc-test.c
->     +++ b/tests/rtc-test.c
->     @@ -15,6 +15,7 @@
-> 
->       #include "libqtest-single.h"
->       #include "qemu/timer.h"
->     +#include "hw/timer/mc146818rtc.h"
->       #include "hw/timer/mc146818rtc_regs.h"
-> 
->       #define UIP_HOLD_LENGTH           (8 * NANOSECONDS_PER_SECOND / 32768)
->     -- 
->     2.21.0
-> 
-> 
+AFAIK we rather want to get rid of DO_UPCAST in the long run, so please
+don't introduce new ones!
+
+See:
+https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg05244.html
+
+Unless there is a real need for the rename, I'd suggest to rather drop
+this patch.
+
+ Thomas
