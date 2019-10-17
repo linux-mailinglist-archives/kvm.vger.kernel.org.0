@@ -2,62 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EA68DA71D
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 10:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDFECDA761
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 10:28:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405179AbfJQIUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 04:20:18 -0400
-Received: from mail-qk1-f175.google.com ([209.85.222.175]:35397 "EHLO
-        mail-qk1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405166AbfJQIUS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 04:20:18 -0400
-Received: by mail-qk1-f175.google.com with SMTP id w2so1108092qkf.2
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2019 01:20:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=VLr6A+GuHyShcjJPiDYAx6zRrDRm2jat2pVrt52z7rw=;
-        b=HEFM2JxRbwJBxT9d6kfBnsn22htAT0iRI+fDialpmw3GyCpgc0J7QU+xiqyzrK/Gaz
-         YqarWOIUlzdqyDpa1qRGYW9tN0cewh9+ege9+HSY/1v/112lwVKsP4iRktO/wi9bzPoI
-         yS44/kwKz9BKYPVdkMfjYu9YhaAICCABCkOaOo5BVVfCsSOBJeNaB1gY3bc7XymcG9V4
-         lKwwl2WHJMsXlmq93F2RKQE5G2+szddMWgg2JHrI2JaC1056LQh0pAm93tQZh3f3rwnG
-         Z0MEN2CPQp0gFR93N2kKrV+gsMK9ZZ+b90kmfrCp3PSPRpfFZbwFL8SSYCGHZbUJrugq
-         QQyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=VLr6A+GuHyShcjJPiDYAx6zRrDRm2jat2pVrt52z7rw=;
-        b=TNHlEQyNgvawLZVlMkHSeep2BPNSpYNVevJvcoIWwuA1ueoW6f9DUVgQDtybWqvBbD
-         cKiCog8zEujP9xv3YHeZ1nMnKtfdtxDAiY1bFNMJfgb7EuteXMa+NHEVLEaQ0ZRB2Eni
-         VP0HUU/n0w2VqTuZjxIN9h7e4Mx8z4RQf9SQYjBOivAvpaTbnLcXcyF8QAwqGyIprBzM
-         /g59xv/HpdT6bebtMMUC298OGfstwWCZG7SMS8aF86h/KZnbcfdE0NQFEwganrW6JVdi
-         LP9ZPdPHuRd4zhyXroEqE09mC3LwnLI62Icvjr0WSYmZrqOM3gzrD9zqHDi8iTSy84lj
-         xqsg==
-X-Gm-Message-State: APjAAAXRzRwsIJzMvgufUtBBu4sQ5nBzb19fpY0GTvZbU7z4pmbCYy1h
-        ehQF0je6EYWw3trSldOG9gwgHLPz5vX/aWqb+LhJwjyOp1g=
-X-Google-Smtp-Source: APXvYqzptmso4QWc4fzonqbnWa+zMj2dQpARVfJyzKJuMaq0IjKCqIhX04Nmo8CYPUaahjL9WCyuFIlqBcQchSNfaJA=
-X-Received: by 2002:a37:a345:: with SMTP id m66mr2066441qke.487.1571300416088;
- Thu, 17 Oct 2019 01:20:16 -0700 (PDT)
+        id S2393193AbfJQI2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 04:28:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57518 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389585AbfJQI2M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 04:28:12 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6813018CB90E;
+        Thu, 17 Oct 2019 08:28:11 +0000 (UTC)
+Received: from [10.72.12.185] (ovpn-12-185.pek2.redhat.com [10.72.12.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6719F60BE1;
+        Thu, 17 Oct 2019 08:27:43 +0000 (UTC)
+Subject: Re: [PATCH V3 1/7] mdev: class id support
+To:     Parav Pandit <parav@mellanox.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        Ido Shamay <idos@mellanox.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>
+References: <20191011081557.28302-1-jasowang@redhat.com>
+ <20191011081557.28302-2-jasowang@redhat.com>
+ <AM0PR05MB4866481AEE614FDF766C6A25D1920@AM0PR05MB4866.eurprd05.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <67b645a6-1b70-094d-6a12-fc6591e07a13@redhat.com>
+Date:   Thu, 17 Oct 2019 16:27:41 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Thu, 17 Oct 2019 09:20:05 +0100
-Message-ID: <CAJSP0QWchnsEqCFiPr9-axrAx3rF6HxDBQ0HUgSg3WriVqSusw@mail.gmail.com>
-Subject: [Call for Presentations] FOSDEM 2020 Virtualization & IaaS Devroom
-To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <AM0PR05MB4866481AEE614FDF766C6A25D1920@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.63]); Thu, 17 Oct 2019 08:28:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The FOSDEM open source developer conference is taking place in
-Brussels, Belgium on February 1st & 2nd, 2020.  The call for
-virtualization presentations has been posted:
 
-https://lists.fosdem.org/pipermail/fosdem/2019q4/002889.html
+On 2019/10/16 下午12:57, Parav Pandit wrote:
+>> +static struct mdev_class_id id_table[] = {
+> static const
+>
+>> +	{ MDEV_ID_VFIO },
+> I guess you don't need extra braces for each entry.
+> Since this enum represents MDEV class id, it better to name it as MDEV_CLASS_ID_VFIO.
+> (Similar to  PCI_VENDOR_ID, PCI_DEVICE_ID)..
+>
 
-I just wanted to forward this because the CfP only went to
-qemu-discuss where developers may have missed it.  Hope to see you at
-FOSDEM!
+Gcc start to complain like:
 
-Stefan
+warning: missing braces around initializer [-Wmissing-braces]
+  static const struct mdev_class_id id_table[] = {
+                                                 ^
+   MDEV_ID_VFIO, 0,
+   {           } {
+  };
+  }
+
+So I will keep this part untouched.
+
+Thanks
+
+
+>> +	{ 0 },
+>> +};
