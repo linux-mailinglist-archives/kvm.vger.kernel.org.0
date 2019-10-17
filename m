@@ -2,171 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10D44DBA3A
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:38:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 268EFDBA51
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 01:50:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441751AbfJQXiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 19:38:25 -0400
-Received: from mga14.intel.com ([192.55.52.115]:32452 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2438560AbfJQXiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 19:38:25 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 16:38:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,309,1566889200"; 
-   d="scan'208";a="221564530"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Oct 2019 16:38:24 -0700
-Date:   Thu, 17 Oct 2019 16:38:24 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-Subject: Re: [RFD] x86/split_lock: Request to Intel
-Message-ID: <20191017233824.GA23654@linux.intel.com>
-References: <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
- <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
- <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
- <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
- <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
- <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
- <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
- <20191017172312.GC20903@linux.intel.com>
- <alpine.DEB.2.21.1910172207010.1869@nanos.tec.linutronix.de>
+        id S2441842AbfJQXus (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 19:50:48 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:63936 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2441804AbfJQXus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 19:50:48 -0400
+X-IronPort-AV: E=Sophos;i="5.67,309,1566864000"; 
+   d="scan'208";a="760065658"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com) ([10.124.125.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 17 Oct 2019 23:50:46 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-474bcd9f.us-east-1.amazon.com (Postfix) with ESMTPS id E70DFA1C0B;
+        Thu, 17 Oct 2019 23:50:45 +0000 (UTC)
+Received: from EX13D30UWB001.ant.amazon.com (10.43.161.80) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.249) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 17 Oct 2019 23:50:45 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
+ EX13D30UWB001.ant.amazon.com (10.43.161.80) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 17 Oct 2019 23:50:45 +0000
+Received: from dev-dsk-surajjs-2c-3edee245.us-west-2.amazon.com (172.19.3.110)
+ by mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
+ 15.0.1367.3 via Frontend Transport; Thu, 17 Oct 2019 23:50:45 +0000
+Received: by dev-dsk-surajjs-2c-3edee245.us-west-2.amazon.com (Postfix, from userid 10505755)
+        id 204DB89BAF; Thu, 17 Oct 2019 23:50:45 +0000 (UTC)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     <kvm@vger.kernel.org>
+CC:     <surajjs@amazon.com>, <wanpengli@tencent.com>,
+        <rkrcmar@redhat.com>,
+        "Suraj Jitindar Singh" <sjitindarsingh@gmail.com>
+Subject: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
+Date:   Thu, 17 Oct 2019 23:50:36 +0000
+Message-ID: <20191017235036.25624-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.15.3.AMZN
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1910172207010.1869@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 11:31:15PM +0200, Thomas Gleixner wrote:
-> On Thu, 17 Oct 2019, Sean Christopherson wrote:
-> > On Thu, Oct 17, 2019 at 02:29:45PM +0200, Thomas Gleixner wrote:
-> > > The more I look at this trainwreck, the less interested I am in merging any
-> > > of this at all.
-> > > 
-> > > The fact that it took Intel more than a year to figure out that the MSR is
-> > > per core and not per thread is yet another proof that this industry just
-> > > works by pure chance.
-> > > 
-> > > There is a simple way out of this misery:
-> > > 
-> > >   Intel issues a microcode update which does:
-> > > 
-> > >     1) Convert the OR logic of the AC enable bit in the TEST_CTRL MSR to
-> > >        AND logic, i.e. when one thread disables AC it's automatically
-> > >        disabled on the core.
-> > > 
-> > >        Alternatively it supresses the #AC when the current thread has it
-> > >        disabled.
-> > > 
-> > >     2) Provide a separate bit which indicates that the AC enable logic is
-> > >        actually AND based or that #AC is supressed when the current thread
-> > >        has it disabled.
-> > > 
-> > >     Which way I don't really care as long as it makes sense.
-> > 
-> > The #AC bit doesn't use OR-logic, it's straight up shared, i.e. writes on
-> > one CPU are immediately visible on its sibling CPU.
-> 
-> That's less horrible than I read out of your initial explanation.
-> 
-> Thankfully all of this is meticulously documented in the SDM ...
+From: Suraj Jitindar Singh <surajjs@amazon.com>
 
-Preaching to the choir on this one...
+The test in x86/apic.c named test_pv_ipi is used to test for a kernel
+bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an out of
+bounds access.
 
-> Though it changes the picture radically. The truly shared MSR allows
-> regular software synchronization without IPIs and without an insane amount
-> of corner case handling.
-> 
-> So as you pointed out we need a per core state, which is influenced by:
-> 
->  1) The global enablement switch
-> 
->  2) Host induced #AC
-> 
->  3) Guest induced #AC
-> 
->     A) Guest has #AC handling
-> 
->     B) Guest has no #AC handling
-> 
-> #1:
-> 
->    - OFF: #AC is globally disabled
-> 
->    - ON:  #AC is globally enabled
-> 
->    - FORCE: same as ON but #AC is enforced on guests
-> 
-> #2:
-> 
->    If the host triggers an #AC then the #AC has to be force disabled on the
->    affected core independent of the state of #1. Nothing we can do about
->    that and once the initial wave of #AC issues is fixed this should not
->    happen on production systems. That disables #3 even for the #3.A case
->    for simplicity sake.
-> 
-> #3:
-> 
->    A) Guest has #AC handling
->     
->       #AC is forwarded to the guest. No further action required aside of
->       accounting
-> 
->    B) Guest has no #AC handling
-> 
->       If #AC triggers the resulting action depends on the state of #1:
-> 
->       	 - FORCE: Guest is killed with SIGBUS or whatever the virt crowd
-> 	   	  thinks is the appropriate solution
->          - ON: #AC triggered state is recorded per vCPU and the MSR is
-> 	   	toggled on VMENTER/VMEXIT in software from that point on.
->
-> So the only interesting case is #3.B and #1.state == ON. There you need
-> serialization of the state and the MSR write between the cores, but only
-> when the vCPU triggered an #AC. Until then, nothing to do.
+If the host doesn't implement this hcall then the out of bounds access
+cannot be triggered.
 
-And "vCPU triggered an #AC" should include an explicit check in KVM's
-emulator.
+Detect the case where the host doesn't implement the KVM_HC_SEND_IPI
+hcall and skip the test when this is the case, as the test doesn't
+apply.
 
-> vmenter()
-> {
-> 	if (vcpu->ac_disable)
-> 		this_core_disable_ac();
-> }
-> 
-> vmexit()
-> {
-> 	if (vcpu->ac_disable) {
-> 		this_core_enable_ac();
-> }
-> 
-> this_core_dis/enable_ac() takes the global state into account and has the
-> necessary serialization in place.
+Output without patch:
+FAIL: PV IPIs testing
 
-Overall, looks good to me.  Although Tony's mail makes it obvious we need
-to sync internally...
+With patch:
+SKIP: PV IPIs testing: h-call not available
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+---
+ x86/apic.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/x86/apic.c b/x86/apic.c
+index eb785c4..bd44b54 100644
+--- a/x86/apic.c
++++ b/x86/apic.c
+@@ -8,6 +8,8 @@
+ #include "atomic.h"
+ #include "fwcfg.h"
+ 
++#include <linux/kvm_para.h>
++
+ #define MAX_TPR			0xf
+ 
+ static void test_lapic_existence(void)
+@@ -638,6 +640,15 @@ static void test_pv_ipi(void)
+     unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 = 0x0;
+ 
+     asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
++    /*
++     * Detect the case where the hcall is not implemented by the hypervisor and
++     * skip this test if this is the case. Is the hcall isn't implemented then
++     * the bug that this test is trying to catch can't be triggered.
++     */
++    if (ret == -KVM_ENOSYS) {
++	    report_skip("PV IPIs testing: h-call not available");
++	    return;
++    }
+     report("PV IPIs testing", !ret);
+ }
+ 
+-- 
+2.15.3.AMZN
+
