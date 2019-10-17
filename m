@@ -2,24 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8E15DB0E5
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:17:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD427DB0F5
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:19:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404628AbfJQPRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 11:17:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36380 "EHLO mx1.redhat.com"
+        id S2406310AbfJQPTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:19:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54082 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728994AbfJQPRI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 11:17:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S2405685AbfJQPTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:19:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9348718C4287;
-        Thu, 17 Oct 2019 15:17:07 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7CA6D300BEB1;
+        Thu, 17 Oct 2019 15:19:14 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F44A5C1D8;
-        Thu, 17 Oct 2019 15:16:57 +0000 (UTC)
-Subject: Re: [PATCH 11/32] Revert "irq: introduce qemu_irq_proxy()"
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D69860BE1;
+        Thu, 17 Oct 2019 15:19:11 +0000 (UTC)
+Subject: Re: [PATCH 14/32] piix4: add a i8257 dma controller as specified in
+ datasheet
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -36,10 +37,9 @@ Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-12-philmd@redhat.com>
+ <20191015162705.28087-15-philmd@redhat.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -85,33 +85,26 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <3b703346-8b42-bab8-4697-7101f5a41420@redhat.com>
-Date:   Thu, 17 Oct 2019 17:16:56 +0200
+Message-ID: <85d719ca-f394-6c6d-1d25-d2fc099b0a8f@redhat.com>
+Date:   Thu, 17 Oct 2019 17:19:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191015162705.28087-12-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-15-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 15:17:07 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 17 Oct 2019 15:19:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
-> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > 
-> This function isn't used anymore.
-> 
-> This reverts commit 22ec3283efba9ba0792790da786d6776d83f2a92.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/core/irq.c    | 14 --------------
->  include/hw/irq.h |  5 -----
->  2 files changed, 19 deletions(-)
->
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Remove i8257 instanciated in malta board, to not have it twice.
+
+s/instanciated/instantiated/
+
+ Thomas
