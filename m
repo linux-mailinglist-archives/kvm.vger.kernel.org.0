@@ -2,25 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41321DB145
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:40:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 86F5DDB149
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:41:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406373AbfJQPk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 11:40:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45318 "EHLO mx1.redhat.com"
+        id S2406211AbfJQPlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:41:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29498 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406356AbfJQPk3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 11:40:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1727291AbfJQPlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:41:39 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C38CEC05975D;
-        Thu, 17 Oct 2019 15:40:28 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 307B589F304;
+        Thu, 17 Oct 2019 15:41:38 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7DB55D713;
-        Thu, 17 Oct 2019 15:40:18 +0000 (UTC)
-Subject: Re: [PATCH 02/32] hw/i386/pc: Move kvm_i8259_init() declaration to
- sysemu/kvm.h
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D6109600C4;
+        Thu, 17 Oct 2019 15:41:30 +0000 (UTC)
+Subject: Re: [PATCH 21/32] hw/i386/pc: Reduce gsi_handler scope
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -39,9 +38,7 @@ Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-3-philmd@redhat.com>
- <1e8c724b-8846-255a-eace-6bf135471566@redhat.com>
- <1e1bffc6-a7cc-5beb-3f9f-da8e644c8d4b@redhat.com>
+ <20191015162705.28087-22-philmd@redhat.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -87,68 +84,58 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <2c9215bc-8b8e-3419-cef7-62e91139fcca@redhat.com>
-Date:   Thu, 17 Oct 2019 17:40:18 +0200
+Message-ID: <bf6f46fd-5573-4b44-5a43-6ec2b4bd65e1@redhat.com>
+Date:   Thu, 17 Oct 2019 17:41:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1e1bffc6-a7cc-5beb-3f9f-da8e644c8d4b@redhat.com>
+In-Reply-To: <20191015162705.28087-22-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 17 Oct 2019 15:40:28 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Thu, 17 Oct 2019 15:41:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/10/2019 17.31, Philippe Mathieu-Daudé wrote:
-> On 10/17/19 5:04 PM, Thomas Huth wrote:
->> On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
->>> Move the KVM-related call to "sysemu/kvm.h".
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> ---
->>>   include/hw/i386/pc.h | 1 -
->>>   include/sysemu/kvm.h | 1 +
->>>   2 files changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->>> index 6df4f4b6fb..09e74e7764 100644
->>> --- a/include/hw/i386/pc.h
->>> +++ b/include/hw/i386/pc.h
->>> @@ -158,7 +158,6 @@ typedef struct PCMachineClass {
->>>     extern DeviceState *isa_pic;
->>>   qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
->>> -qemu_irq *kvm_i8259_init(ISABus *bus);
->>>   int pic_read_irq(DeviceState *d);
->>>   int pic_get_output(DeviceState *d);
->>>   diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
->>> index 9d143282bc..da8aa9f5a8 100644
->>> --- a/include/sysemu/kvm.h
->>> +++ b/include/sysemu/kvm.h
->>> @@ -513,6 +513,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s,
->>> qemu_irq irq, int gsi);
->>>   void kvm_pc_gsi_handler(void *opaque, int n, int level);
->>>   void kvm_pc_setup_irq_routing(bool pci_enabled);
->>>   void kvm_init_irq_routing(KVMState *s);
->>> +qemu_irq *kvm_i8259_init(ISABus *bus);
->>
->> Why? The function is defined in hw/i386/kvm/ - so moving its prototype
->> to a generic header sounds wrong to me.
+On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
+> pc_gsi_create() is the single function that uses gsi_handler.
+> Make it a static variable.
 > 
-> This function is declared when compiling without KVM, and is available
-> on the Alpha/HPPA/MIPS which don't have it.
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/i386/pc.c         | 2 +-
+>  include/hw/i386/pc.h | 2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index a7597c6c44..59de0c8a1f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -346,7 +346,7 @@ GlobalProperty pc_compat_1_4[] = {
+>  };
+>  const size_t pc_compat_1_4_len = G_N_ELEMENTS(pc_compat_1_4);
+>  
+> -void gsi_handler(void *opaque, int n, int level)
+> +static void gsi_handler(void *opaque, int n, int level)
+>  {
+>      GSIState *s = opaque;
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d0c6b9d469..75b44e156c 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -172,8 +172,6 @@ typedef struct GSIState {
+>      qemu_irq ioapic_irq[IOAPIC_NUM_PINS];
+>  } GSIState;
+>  
+> -void gsi_handler(void *opaque, int n, int level);
+> -
+>  GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
+>  
+>  /* vmport.c */
+> 
 
-Sorry, I failed to parse your last sentence. It's only used by hw/i386
-code as far as I can see.
-
-> You'd rather move the kvm_pc_* declarations to hw/i386/kvm/?
-
-Maybe, but that's certainly something for a different patch series.
-
-This series here should focus on what you've mentioned in the cover
-letter, I think. It's already big enough.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
