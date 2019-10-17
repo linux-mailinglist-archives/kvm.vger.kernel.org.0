@@ -2,157 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF0AADB6CF
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 21:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3B67DB7F8
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 21:46:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393263AbfJQTHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 15:07:09 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36843 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503175AbfJQTHI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 15:07:08 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y22so2245359pfr.3
-        for <kvm@vger.kernel.org>; Thu, 17 Oct 2019 12:07:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=T8xAHlfkcXXy3tAV1rfOh1RH08qh99XamRpJlnNkuCs=;
-        b=WGOC2fW3eL810UxK2OyOTVUqrRlRaY0iNjVmxNOAEmof0riKtYccrkunE9/apbWrH1
-         EtkKYxJrIK7f/7C/KQKAIuRYZAAsWiRXHm6wagzHd/QlCWtjaa373xFQemLS1HE/cC6c
-         OGM1kH96dHWLpow6T/2IUPIUcXtP3LZ5uJ3UaUE521IegSRcqW2J7hH3x6kmiECXc1k9
-         0u7fVQ3wPFOFFYSx47ZxAFkm6uxEqLK4zqpdgf/TxcjvX6HQo7dI/F41UU5BDTx+mI0z
-         ejod0hKhi8zPWU5OOHD+NTSzc5dN77WKZtiR0gMvEOzhByD842QYtsBN3n8v88YF4ugn
-         BDKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=T8xAHlfkcXXy3tAV1rfOh1RH08qh99XamRpJlnNkuCs=;
-        b=X9w/oMZjiJyZbHRcrTJ9mPvD1OtOK8PXur8827WgzcFJMy2u2PcZNWcNFM3lr7a+Ic
-         DN33+DIl3FyKd8T4wX/ZmIWDoc3SiH6ZehJKhpbNQdAU1c0BBeagvQZ4yCruFKALrqBU
-         JsVGG/ZxaUJlubGBdPamWwc1IQJy+KCQflQRCyDyjtaAYaF275ui3UpIY3mc647fv0PP
-         rQJJfn1mi42xxil+5Yyg/61+FoY3k/yjE/KH9byUNyN/VRJSOC6qwpKyxGRLrv+3spBf
-         MS3oSFKVdarIxxsgPx2qFZT40WAr8R9xf6hvioXDNKKba6Y1nE4rWKstlZ4srl3XKuiK
-         OSXg==
-X-Gm-Message-State: APjAAAVjTEKS3HJIa2itPgv1SRicegDr7USyI9q6nvAkCM3fFQ/RIEQX
-        x2O68B1kO+JMRB/0Hbqx3pHGJD4qioOw+TddFwRjLw==
-X-Google-Smtp-Source: APXvYqx48LhISGcOzRtwaIhszXsRUYe5Kli1JNiMo5SrzNfO5jHqIrJS0QlR3iXZlDy9TTxurGoX3WwkbHUfLynZEK0=
-X-Received: by 2002:a63:541e:: with SMTP id i30mr5796978pgb.130.1571339227516;
- Thu, 17 Oct 2019 12:07:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1571333592.git.andreyknvl@google.com> <1b30d1c9e7f86c25425c5ee53d7facede289608e.1571333592.git.andreyknvl@google.com>
- <20191017181943.GC1094415@kroah.com>
-In-Reply-To: <20191017181943.GC1094415@kroah.com>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Thu, 17 Oct 2019 21:06:56 +0200
-Message-ID: <CAAeHK+zEoEbtk62raCU_10V_K97VAeebfJfuCRaf5DskT5yVhw@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/3] usb, kcov: collect coverage from hub_event
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     USB list <linux-usb@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
+        id S2440463AbfJQTqX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 15:46:23 -0400
+Received: from mga04.intel.com ([192.55.52.120]:15832 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387813AbfJQTqX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 15:46:23 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 12:46:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,308,1566889200"; 
+   d="scan'208";a="199471795"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 17 Oct 2019 12:46:22 -0700
+Date:   Thu, 17 Oct 2019 12:46:22 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v7 1/7] KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i)
+ enumeration
+Message-ID: <20191017194622.GI20903@linux.intel.com>
+References: <20190927021927.23057-1-weijiang.yang@intel.com>
+ <20190927021927.23057-2-weijiang.yang@intel.com>
+ <CALMp9eRXoyoX6GHQgVTXemJjm69MwqN+VDN47X=5BN36rvrAgA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eRXoyoX6GHQgVTXemJjm69MwqN+VDN47X=5BN36rvrAgA@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 8:19 PM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Thu, Oct 17, 2019 at 07:44:14PM +0200, Andrey Konovalov wrote:
-> > This patch adds kcov_remote_start/kcov_remote_stop annotations to the
-> > hub_event function, which is responsible for processing events on USB
-> > buses, in particular events that happen during USB device enumeration.
-> > Each USB bus gets a unique id, which can be used to attach a kcov device
-> > to a particular USB bus for coverage collection.
-> >
-> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > ---
-> >  drivers/usb/core/hub.c    | 4 ++++
-> >  include/linux/kcov.h      | 1 +
-> >  include/uapi/linux/kcov.h | 7 +++++++
-> >  3 files changed, 12 insertions(+)
-> >
-> > diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-> > index 236313f41f4a..03a40e41b099 100644
-> > --- a/drivers/usb/core/hub.c
-> > +++ b/drivers/usb/core/hub.c
-> > @@ -5374,6 +5374,8 @@ static void hub_event(struct work_struct *work)
-> >       hub_dev = hub->intfdev;
-> >       intf = to_usb_interface(hub_dev);
-> >
-> > +     kcov_remote_start(kcov_remote_handle_usb(hdev->bus->busnum));
-> > +
-> >       dev_dbg(hub_dev, "state %d ports %d chg %04x evt %04x\n",
-> >                       hdev->state, hdev->maxchild,
-> >                       /* NOTE: expects max 15 ports... */
-> > @@ -5480,6 +5482,8 @@ static void hub_event(struct work_struct *work)
-> >       /* Balance the stuff in kick_hub_wq() and allow autosuspend */
-> >       usb_autopm_put_interface(intf);
-> >       kref_put(&hub->kref, hub_release);
-> > +
-> > +     kcov_remote_stop();
+On Wed, Oct 02, 2019 at 10:26:10AM -0700, Jim Mattson wrote:
+> On Thu, Sep 26, 2019 at 7:17 PM Yang Weijiang <weijiang.yang@intel.com> wrote:
+> > @@ -414,6 +419,50 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+> >         }
 > >  }
 > >
-> >  static const struct usb_device_id hub_id_table[] = {
-> > diff --git a/include/linux/kcov.h b/include/linux/kcov.h
-> > index 702672d98d35..38a47e0b67c2 100644
-> > --- a/include/linux/kcov.h
-> > +++ b/include/linux/kcov.h
-> > @@ -30,6 +30,7 @@ void kcov_task_exit(struct task_struct *t);
-> >  /*
-> >   * Reserved handle ranges:
-> >   * 0000000000000000 - 0000ffffffffffff : common handles
-> > + * 0001000000000000 - 0001ffffffffffff : USB subsystem handles
->
-> So how many bits are you going to have for any in-kernel tasks?  Aren't
-> you going to run out quickly?
-
-With these patches we only collect coverage from hub_event threads,
-and we need one ID per USB bus, the number of which is quite limited.
-But then we might want to collect coverage from other parts of the USB
-subsystem, so we might need more IDs. I don't expect the number of
-different subsystem from which we want to collect coverage to be
-large, so the idea here is to use 2 bytes of an ID to denote the
-subsystem, and the other 6 to denote different coverage collection
-sections within it.
-
-But overall, which encoding scheme to use here is a good question.
-Ideas are welcome.
-
-> >   */
-> >  void kcov_remote_start(u64 handle);
-> >  void kcov_remote_stop(void);
-> > diff --git a/include/uapi/linux/kcov.h b/include/uapi/linux/kcov.h
-> > index 46f78f716ca9..45c9ae59cebc 100644
-> > --- a/include/uapi/linux/kcov.h
-> > +++ b/include/uapi/linux/kcov.h
-> > @@ -43,4 +43,11 @@ enum {
-> >  #define KCOV_CMP_SIZE(n)        ((n) << 1)
-> >  #define KCOV_CMP_MASK           KCOV_CMP_SIZE(3)
-> >
-> > +#define KCOV_REMOTE_HANDLE_USB  0x0001000000000000ull
-> > +
-> > +static inline __u64 kcov_remote_handle_usb(unsigned int bus)
+> > +static inline void do_cpuid_0xd_mask(struct kvm_cpuid_entry2 *entry, int index)
 > > +{
-> > +     return KCOV_REMOTE_HANDLE_USB + (__u64)bus;
-> > +}
->
-> Why is this function in a uapi .h file?  What userspace code would call
-> this?
+> > +       unsigned int f_xsaves = kvm_x86_ops->xsaves_supported() ? F(XSAVES) : 0;
+> 
+> Does Intel have CPUs that support XSAVES but don't support the "enable
+> XSAVES/XRSTORS" VM-execution control?
 
-A userspace process that wants to collect coverage from USB bus # N
-needs to pass kcov_remote_handle_usb(N) into KCOV_REMOTE_ENABLE ioctl.
+I doubt it.
+
+> If so, what is the behavior of XSAVESXRSTORS on those CPUs in VMX
+> non-root mode?
+
+#UD.  If not, the CPU would be in violation of the SDM:
+
+  If the "enable XSAVES/XRSTORS" VM-execution control is 0, XRSTORS causes
+  an invalid-opcode exception (#UD).
+
+> If not, why is this conditional F(XSAVES) here?
+
+Because it's technically legal for the control to not be supported even
+if the host doesn't have support.
+
+> > +       /* cpuid 0xD.1.eax */
+> > +       const u32 kvm_cpuid_D_1_eax_x86_features =
+> > +               F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | f_xsaves;
+> > +       u64 u_supported = kvm_supported_xcr0();
+> > +       u64 s_supported = kvm_supported_xss();
+> > +       u64 supported;
+> > +
+> > +       switch (index) {
+> > +       case 0:
+> > +               entry->eax &= u_supported;
+> > +               entry->ebx = xstate_required_size(u_supported, false);
+> 
+> EBX could actually be zero, couldn't it? Since this output is
+> context-dependent, I'm not sure how to interpret it when returned from
+> KVM_GET_SUPPORTED_CPUID.
+
+*sigh*.  It took me something like ten read throughs to understand what
+you're saying.
+
+Yes, it could be zero, though that ship may have sailed since the previous
+code reported a non-zero value.  Whatever is done, KVM should be consistent
+for all indices, i.e. either report zero or the max size.
+
+> > +               entry->ecx = entry->ebx;
+> > +               entry->edx = 0;
+> 
+> Shouldn't this be: entry->edx &= u_supported >> 32?
+
+Probably.  The confusion likely stems from this wording in the SDM, where
+it states the per-bit behavior and then also says all bits are reserved.
+I think it makes sense to do as Jim suggested, and defer the reserved bit
+handling to kvm_supported_{xcr0,xss}().
+
+  Bit 31 - 00: Reports the supported bits of the upper 32 bits of XCR0.
+  XCR0[n+32] can be set to 1 only if EDX[n] is 1.
+  Bits 31 - 00: Reserved
+ 
+> > +               break;
+> > +       case 1:
+> > +               supported = u_supported | s_supported;
+> > +               entry->eax &= kvm_cpuid_D_1_eax_x86_features;
+> > +               cpuid_mask(&entry->eax, CPUID_D_1_EAX);
+> > +               entry->ebx = 0;
+> > +               entry->edx = 0;
+> 
+> Shouldn't this be: entry->edx &= s_supported >> 32?
+
+Same as above.
+ 
+> > +               entry->ecx &= s_supported;
+> > +               if (entry->eax & (F(XSAVES) | F(XSAVEC)))
+> > +                       entry->ebx = xstate_required_size(supported, true);
+> 
+> As above, can't EBX just be zero, since it's context-dependent? What
+> is the context when processing KVM_GET_SUPPORTED_CPUID? And why do we
+> only fill this in when XSAVES or XSAVEC is supported?
+> 
+> > +               break;
+> > +       default:
+> > +               supported = (entry->ecx & 1) ? s_supported : u_supported;
+> > +               if (!(supported & ((u64)1 << index))) {
+> 
+> Nit: 1ULL << index.
+
+Even better:  BIT_ULL(index)
+
+> > +                       entry->eax = 0;
+> > +                       entry->ebx = 0;
+> > +                       entry->ecx = 0;
+> > +                       entry->edx = 0;
+> > +                       return;
+> > +               }
+> > +               if (entry->ecx)
+> > +                       entry->ebx = 0;
+> 
+> This seems to back up my claims above regarding the EBX output for
+> cases 0 and 1, but aside from those subleaves, is this correct? For
+> subleaves > 1, ECX bit 1 can be set for extended state components that
+> need to be cache-line aligned. Such components could map to a valid
+> bit in XCR0 and have a non-zero offset from the beginning of the
+> non-compacted XSAVE area.
+> 
+> > +               entry->edx = 0;
+> 
+> This seems too aggressive. See my comments above regarding EDX outputs
+> for cases 0 and 1.
+> 
+> > +               break;
+> > +       }
+> > +}
