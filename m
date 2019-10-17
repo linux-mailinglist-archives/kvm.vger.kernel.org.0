@@ -2,152 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3089DB848
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 22:30:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B5F5DB914
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 23:31:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438734AbfJQU34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 16:29:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55346 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392669AbfJQU3z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 16:29:55 -0400
-Received: from localhost (unknown [104.132.0.109])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 158E620872;
-        Thu, 17 Oct 2019 20:29:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571344194;
-        bh=PEewE7cb5xAZWn6VD0jRNI4cXRMWPcfpf8LoXljGvEA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=caek8QEbrHYk48IbnyN1/P119xslY0U+q6qPCikPPNyILCFyOmIuZMqk6hPo+5Iua
-         sv3td2jDvNARP64Uomzz3fDwMu1LeIHD2mUsmR6Rea0X0IQ+ioeQtMYixoh8R88RFB
-         C4t0n+FTQdJCIMcNk+cG9iBIs1peJGoWK0LflGuY=
-Date:   Thu, 17 Oct 2019 13:29:53 -0700
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     USB list <linux-usb@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
+        id S2441541AbfJQVbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 17:31:43 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:54518 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2441534AbfJQVbm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 17:31:42 -0400
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iLDMn-0007MJ-68; Thu, 17 Oct 2019 23:31:29 +0200
+Date:   Thu, 17 Oct 2019 23:31:15 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH RFC 2/3] usb, kcov: collect coverage from hub_event
-Message-ID: <20191017202953.GB1103978@kroah.com>
-References: <cover.1571333592.git.andreyknvl@google.com>
- <1b30d1c9e7f86c25425c5ee53d7facede289608e.1571333592.git.andreyknvl@google.com>
- <20191017181943.GC1094415@kroah.com>
- <CAAeHK+zEoEbtk62raCU_10V_K97VAeebfJfuCRaf5DskT5yVhw@mail.gmail.com>
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org
+Subject: Re: [RFD] x86/split_lock: Request to Intel
+In-Reply-To: <20191017172312.GC20903@linux.intel.com>
+Message-ID: <alpine.DEB.2.21.1910172207010.1869@nanos.tec.linutronix.de>
+References: <20190925180931.GG31852@linux.intel.com> <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com> <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de> <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com> <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
+ <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com> <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com> <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de> <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com> <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
+ <20191017172312.GC20903@linux.intel.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+zEoEbtk62raCU_10V_K97VAeebfJfuCRaf5DskT5yVhw@mail.gmail.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 09:06:56PM +0200, Andrey Konovalov wrote:
-> On Thu, Oct 17, 2019 at 8:19 PM Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Thu, Oct 17, 2019 at 07:44:14PM +0200, Andrey Konovalov wrote:
-> > > This patch adds kcov_remote_start/kcov_remote_stop annotations to the
-> > > hub_event function, which is responsible for processing events on USB
-> > > buses, in particular events that happen during USB device enumeration.
-> > > Each USB bus gets a unique id, which can be used to attach a kcov device
-> > > to a particular USB bus for coverage collection.
-> > >
-> > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > > ---
-> > >  drivers/usb/core/hub.c    | 4 ++++
-> > >  include/linux/kcov.h      | 1 +
-> > >  include/uapi/linux/kcov.h | 7 +++++++
-> > >  3 files changed, 12 insertions(+)
-> > >
-> > > diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-> > > index 236313f41f4a..03a40e41b099 100644
-> > > --- a/drivers/usb/core/hub.c
-> > > +++ b/drivers/usb/core/hub.c
-> > > @@ -5374,6 +5374,8 @@ static void hub_event(struct work_struct *work)
-> > >       hub_dev = hub->intfdev;
-> > >       intf = to_usb_interface(hub_dev);
-> > >
-> > > +     kcov_remote_start(kcov_remote_handle_usb(hdev->bus->busnum));
-> > > +
-> > >       dev_dbg(hub_dev, "state %d ports %d chg %04x evt %04x\n",
-> > >                       hdev->state, hdev->maxchild,
-> > >                       /* NOTE: expects max 15 ports... */
-> > > @@ -5480,6 +5482,8 @@ static void hub_event(struct work_struct *work)
-> > >       /* Balance the stuff in kick_hub_wq() and allow autosuspend */
-> > >       usb_autopm_put_interface(intf);
-> > >       kref_put(&hub->kref, hub_release);
-> > > +
-> > > +     kcov_remote_stop();
-> > >  }
-> > >
-> > >  static const struct usb_device_id hub_id_table[] = {
-> > > diff --git a/include/linux/kcov.h b/include/linux/kcov.h
-> > > index 702672d98d35..38a47e0b67c2 100644
-> > > --- a/include/linux/kcov.h
-> > > +++ b/include/linux/kcov.h
-> > > @@ -30,6 +30,7 @@ void kcov_task_exit(struct task_struct *t);
-> > >  /*
-> > >   * Reserved handle ranges:
-> > >   * 0000000000000000 - 0000ffffffffffff : common handles
-> > > + * 0001000000000000 - 0001ffffffffffff : USB subsystem handles
-> >
-> > So how many bits are you going to have for any in-kernel tasks?  Aren't
-> > you going to run out quickly?
+On Thu, 17 Oct 2019, Sean Christopherson wrote:
+> On Thu, Oct 17, 2019 at 02:29:45PM +0200, Thomas Gleixner wrote:
+> > The more I look at this trainwreck, the less interested I am in merging any
+> > of this at all.
+> > 
+> > The fact that it took Intel more than a year to figure out that the MSR is
+> > per core and not per thread is yet another proof that this industry just
+> > works by pure chance.
+> > 
+> > There is a simple way out of this misery:
+> > 
+> >   Intel issues a microcode update which does:
+> > 
+> >     1) Convert the OR logic of the AC enable bit in the TEST_CTRL MSR to
+> >        AND logic, i.e. when one thread disables AC it's automatically
+> >        disabled on the core.
+> > 
+> >        Alternatively it supresses the #AC when the current thread has it
+> >        disabled.
+> > 
+> >     2) Provide a separate bit which indicates that the AC enable logic is
+> >        actually AND based or that #AC is supressed when the current thread
+> >        has it disabled.
+> > 
+> >     Which way I don't really care as long as it makes sense.
 > 
-> With these patches we only collect coverage from hub_event threads,
-> and we need one ID per USB bus, the number of which is quite limited.
-> But then we might want to collect coverage from other parts of the USB
-> subsystem, so we might need more IDs. I don't expect the number of
-> different subsystem from which we want to collect coverage to be
-> large, so the idea here is to use 2 bytes of an ID to denote the
-> subsystem, and the other 6 to denote different coverage collection
-> sections within it.
-> 
-> But overall, which encoding scheme to use here is a good question.
-> Ideas are welcome.
-> 
-> > >   */
-> > >  void kcov_remote_start(u64 handle);
-> > >  void kcov_remote_stop(void);
-> > > diff --git a/include/uapi/linux/kcov.h b/include/uapi/linux/kcov.h
-> > > index 46f78f716ca9..45c9ae59cebc 100644
-> > > --- a/include/uapi/linux/kcov.h
-> > > +++ b/include/uapi/linux/kcov.h
-> > > @@ -43,4 +43,11 @@ enum {
-> > >  #define KCOV_CMP_SIZE(n)        ((n) << 1)
-> > >  #define KCOV_CMP_MASK           KCOV_CMP_SIZE(3)
-> > >
-> > > +#define KCOV_REMOTE_HANDLE_USB  0x0001000000000000ull
-> > > +
-> > > +static inline __u64 kcov_remote_handle_usb(unsigned int bus)
-> > > +{
-> > > +     return KCOV_REMOTE_HANDLE_USB + (__u64)bus;
-> > > +}
-> >
-> > Why is this function in a uapi .h file?  What userspace code would call
-> > this?
-> 
-> A userspace process that wants to collect coverage from USB bus # N
-> needs to pass kcov_remote_handle_usb(N) into KCOV_REMOTE_ENABLE ioctl.
+> The #AC bit doesn't use OR-logic, it's straight up shared, i.e. writes on
+> one CPU are immediately visible on its sibling CPU.
 
-Ugh, ok.  Then you should make "unsigned int bus" a __u64 so that this
-actually will work on all kernels properly.
+That's less horrible than I read out of your initial explanation.
 
-thanks,
+Thankfully all of this is meticulously documented in the SDM ...
 
-greg k-h
+Though it changes the picture radically. The truly shared MSR allows
+regular software synchronization without IPIs and without an insane amount
+of corner case handling.
+
+So as you pointed out we need a per core state, which is influenced by:
+
+ 1) The global enablement switch
+
+ 2) Host induced #AC
+
+ 3) Guest induced #AC
+
+    A) Guest has #AC handling
+
+    B) Guest has no #AC handling
+
+#1:
+
+   - OFF: #AC is globally disabled
+
+   - ON:  #AC is globally enabled
+
+   - FORCE: same as ON but #AC is enforced on guests
+
+#2:
+
+   If the host triggers an #AC then the #AC has to be force disabled on the
+   affected core independent of the state of #1. Nothing we can do about
+   that and once the initial wave of #AC issues is fixed this should not
+   happen on production systems. That disables #3 even for the #3.A case
+   for simplicity sake.
+
+#3:
+
+   A) Guest has #AC handling
+    
+      #AC is forwarded to the guest. No further action required aside of
+      accounting
+
+   B) Guest has no #AC handling
+
+      If #AC triggers the resulting action depends on the state of #1:
+
+      	 - FORCE: Guest is killed with SIGBUS or whatever the virt crowd
+	   	  thinks is the appropriate solution
+
+         - ON: #AC triggered state is recorded per vCPU and the MSR is
+	   	toggled on VMENTER/VMEXIT in software from that point on.
+
+So the only interesting case is #3.B and #1.state == ON. There you need
+serialization of the state and the MSR write between the cores, but only
+when the vCPU triggered an #AC. Until then, nothing to do.
+
+vmenter()
+{
+	if (vcpu->ac_disable)
+		this_core_disable_ac();
+}
+
+vmexit()
+{
+	if (vcpu->ac_disable) {
+		this_core_enable_ac();
+}
+
+this_core_dis/enable_ac() takes the global state into account and has the
+necessary serialization in place.
+
+Thanks,
+
+	tglx
