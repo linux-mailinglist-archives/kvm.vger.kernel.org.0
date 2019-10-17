@@ -2,137 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0342DB0B0
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:04:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCF81DB0BF
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:08:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406165AbfJQPEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 11:04:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39740 "EHLO mx1.redhat.com"
+        id S2406201AbfJQPIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:08:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12187 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727600AbfJQPEm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 11:04:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S2405952AbfJQPIZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:08:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 38FBDC057E3C;
-        Thu, 17 Oct 2019 15:04:41 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6BBE05DA60;
-        Thu, 17 Oct 2019 15:04:28 +0000 (UTC)
-Subject: Re: [PATCH 02/32] hw/i386/pc: Move kvm_i8259_init() declaration to
- sysemu/kvm.h
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Paul Durrant <paul@xen.org>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
-        xen-devel@lists.xenproject.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
-References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-3-philmd@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <1e8c724b-8846-255a-eace-6bf135471566@redhat.com>
-Date:   Thu, 17 Oct 2019 17:04:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mx1.redhat.com (Postfix) with ESMTPS id EC4F530789A0;
+        Thu, 17 Oct 2019 15:08:23 +0000 (UTC)
+Received: from gondolin (dhcp-192-202.str.redhat.com [10.33.192.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A8FD860872;
+        Thu, 17 Oct 2019 15:07:57 +0000 (UTC)
+Date:   Thu, 17 Oct 2019 17:07:55 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V4 3/6] mdev: introduce device specific ops
+Message-ID: <20191017170755.15506ada.cohuck@redhat.com>
+In-Reply-To: <20191017104836.32464-4-jasowang@redhat.com>
+References: <20191017104836.32464-1-jasowang@redhat.com>
+        <20191017104836.32464-4-jasowang@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191015162705.28087-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 17 Oct 2019 15:04:41 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 17 Oct 2019 15:08:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
-> Move the KVM-related call to "sysemu/kvm.h".
+On Thu, 17 Oct 2019 18:48:33 +0800
+Jason Wang <jasowang@redhat.com> wrote:
+
+> Currently, except for the create and remove, the rest of
+> mdev_parent_ops is designed for vfio-mdev driver only and may not help
+> for kernel mdev driver. With the help of class id, this patch
+> introduces device specific callbacks inside mdev_device
+> structure. This allows different set of callback to be used by
+> vfio-mdev and virtio-mdev.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  include/hw/i386/pc.h | 1 -
->  include/sysemu/kvm.h | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
+>  .../driver-api/vfio-mediated-device.rst       | 25 +++++----
+>  MAINTAINERS                                   |  1 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              | 18 ++++---
+>  drivers/s390/cio/vfio_ccw_ops.c               | 18 ++++---
+>  drivers/s390/crypto/vfio_ap_ops.c             | 14 +++--
+>  drivers/vfio/mdev/mdev_core.c                 | 18 +++++--
+>  drivers/vfio/mdev/mdev_private.h              |  1 +
+>  drivers/vfio/mdev/vfio_mdev.c                 | 37 ++++++-------
+>  include/linux/mdev.h                          | 45 ++++------------
+>  include/linux/vfio_mdev.h                     | 52 +++++++++++++++++++
+>  samples/vfio-mdev/mbochs.c                    | 20 ++++---
+>  samples/vfio-mdev/mdpy.c                      | 20 ++++---
+>  samples/vfio-mdev/mtty.c                      | 18 ++++---
+>  13 files changed, 184 insertions(+), 103 deletions(-)
+>  create mode 100644 include/linux/vfio_mdev.h
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 6df4f4b6fb..09e74e7764 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -158,7 +158,6 @@ typedef struct PCMachineClass {
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+> index f9a78d75a67a..0cca84d19603 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -152,11 +152,22 @@ callbacks per mdev parent device, per mdev type, or any other categorization.
+>  Vendor drivers are expected to be fully asynchronous in this respect or
+>  provide their own internal resource protection.)
 >  
->  extern DeviceState *isa_pic;
->  qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
-> -qemu_irq *kvm_i8259_init(ISABus *bus);
->  int pic_read_irq(DeviceState *d);
->  int pic_get_output(DeviceState *d);
+> -The callbacks in the mdev_parent_ops structure are as follows:
+> -
+> -* open: open callback of mediated device
+> -* close: close callback of mediated device
+> -* ioctl: ioctl callback of mediated device
+> +As multiple types of mediated devices may be supported, the device
+> +must set up the class id and the device specific callbacks in create()
+
+s/in create()/in the create()/
+
+> +callback. E.g for vfio-mdev device it needs to be done through:
+
+"Each class provides a helper function to do so; e.g. for vfio-mdev
+devices, the function to be called is:"
+
+?
+
+> +
+> +    int mdev_set_vfio_ops(struct mdev_device *mdev,
+> +                          const struct vfio_mdev_ops *vfio_ops);
+> +
+> +The class id (set to MDEV_CLASS_ID_VFIO) is used to match a device
+
+"(set by this helper function to MDEV_CLASS_ID_VFIO)" ?
+
+> +with an mdev driver via its id table. The device specific callbacks
+> +(specified in *ops) are obtainable via mdev_get_dev_ops() (for use by
+
+"(specified in *vfio_ops by the caller)" ?
+
+> +the mdev bus driver). A vfio-mdev device (class id MDEV_CLASS_ID_VFIO)
+> +uses the following device-specific ops:
+> +
+> +* open: open callback of vfio mediated device
+> +* close: close callback of vfio mediated device
+> +* ioctl: ioctl callback of vfio mediated device
+>  * read : read emulation callback
+>  * write: write emulation callback
+>  * mmap: mmap emulation callback
+> @@ -167,10 +178,6 @@ register itself with the mdev core driver::
+>  	extern int  mdev_register_device(struct device *dev,
+>  	                                 const struct mdev_parent_ops *ops);
 >  
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 9d143282bc..da8aa9f5a8 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -513,6 +513,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
->  void kvm_pc_gsi_handler(void *opaque, int n, int level);
->  void kvm_pc_setup_irq_routing(bool pci_enabled);
->  void kvm_init_irq_routing(KVMState *s);
-> +qemu_irq *kvm_i8259_init(ISABus *bus);
+> -It is also required to specify the class_id in create() callback through::
+> -
+> -	int mdev_set_class(struct mdev_device *mdev, u16 id);
+> -
 
-Why? The function is defined in hw/i386/kvm/ - so moving its prototype
-to a generic header sounds wrong to me.
+I'm wondering if this patch set should start out with introducing
+helper functions already (i.e. don't introduce mdev_set_class(), but
+start out with mdev_set_class_vfio() which will gain the *vfio_ops
+argument in this patch.)
 
- Thomas
+>  However, the mdev_parent_ops structure is not required in the function call
+>  that a driver should use to unregister itself with the mdev core driver::
+>  
+
+(...)
+
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index 3a9c52d71b4e..d0f3113c8071 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -45,15 +45,23 @@ void mdev_set_drvdata(struct mdev_device *mdev, void *data)
+>  }
+>  EXPORT_SYMBOL(mdev_set_drvdata);
+>  
+> -/* Specify the class for the mdev device, this must be called during
+> - * create() callback.
+> +/* Specify the VFIO device ops for the mdev device, this
+> + * must be called during create() callback for VFIO mdev device.
+>   */
+
+/*
+ * Specify the mdev device to be a VFIO mdev device, and set the
+ * VFIO devices ops for it. This must be called from the create()
+ * callback for VFIO mdev devices.
+ */
+
+?
+
+> -void mdev_set_class(struct mdev_device *mdev, u16 id)
+> +void mdev_set_vfio_ops(struct mdev_device *mdev,
+> +		       const struct vfio_mdev_device_ops *vfio_ops)
+>  {
+>  	WARN_ON(mdev->class_id);
+> -	mdev->class_id = id;
+> +	mdev->class_id = MDEV_CLASS_ID_VFIO;
+> +	mdev->device_ops = vfio_ops;
+>  }
+> -EXPORT_SYMBOL(mdev_set_class);
+> +EXPORT_SYMBOL(mdev_set_vfio_ops);
+> +
+> +const void *mdev_get_dev_ops(struct mdev_device *mdev)
+> +{
+> +	return mdev->device_ops;
+> +}
+> +EXPORT_SYMBOL(mdev_get_dev_ops);
+>  
+>  struct device *mdev_dev(struct mdev_device *mdev)
+>  {
+
+(...)
+
+The code change looks good to me; I'm just wondering if we should
+introduce mdev_set_class() at all (see above).
