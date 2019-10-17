@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A4C6DB0D4
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:13:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8E15DB0E5
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:17:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404522AbfJQPNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 11:13:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55590 "EHLO mx1.redhat.com"
+        id S2404628AbfJQPRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:17:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36380 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732650AbfJQPNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 11:13:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1728994AbfJQPRI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:17:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0067F10DCC9F;
-        Thu, 17 Oct 2019 15:13:24 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9348718C4287;
+        Thu, 17 Oct 2019 15:17:07 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C2D860C63;
-        Thu, 17 Oct 2019 15:13:14 +0000 (UTC)
-Subject: Re: [PATCH 08/32] piix4: rename some variables in realize function
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F44A5C1D8;
+        Thu, 17 Oct 2019 15:16:57 +0000 (UTC)
+Subject: Re: [PATCH 11/32] Revert "irq: introduce qemu_irq_proxy()"
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
@@ -37,9 +37,9 @@ Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
-        Markus Armbruster <armbru@redhat.com>
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 References: <20191015162705.28087-1-philmd@redhat.com>
- <20191015162705.28087-9-philmd@redhat.com>
+ <20191015162705.28087-12-philmd@redhat.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -85,62 +85,33 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <e935d554-cd6c-a9e5-9530-bb86c62a1fd1@redhat.com>
-Date:   Thu, 17 Oct 2019 17:13:13 +0200
+Message-ID: <3b703346-8b42-bab8-4697-7101f5a41420@redhat.com>
+Date:   Thu, 17 Oct 2019 17:16:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191015162705.28087-9-philmd@redhat.com>
+In-Reply-To: <20191015162705.28087-12-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Thu, 17 Oct 2019 15:13:24 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Thu, 17 Oct 2019 15:17:07 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
-> From: Hervé Poussineau <hpoussin@reactos.org>
+> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > 
-> PIIX4 structure is now 's'
-> PCI device is now 'pci_dev'
-> DeviceState is now 'dev'
-
-Why? Just for the sake of it?
-
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
-> Message-Id: <20171216090228.28505-6-hpoussin@reactos.org>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> This function isn't used anymore.
+> 
+> This reverts commit 22ec3283efba9ba0792790da786d6776d83f2a92.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/isa/piix4.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> index 3294056cd5..4202243e41 100644
-> --- a/hw/isa/piix4.c
-> +++ b/hw/isa/piix4.c
-> @@ -88,16 +88,17 @@ static const VMStateDescription vmstate_piix4 = {
->      }
->  };
->  
-> -static void piix4_realize(PCIDevice *dev, Error **errp)
-> +static void piix4_realize(PCIDevice *pci_dev, Error **errp)
->  {
-> -    PIIX4State *d = PIIX4_PCI_DEVICE(dev);
-> +    DeviceState *dev = DEVICE(pci_dev);
-> +    PIIX4State *s = DO_UPCAST(PIIX4State, dev, pci_dev);
-
-AFAIK we rather want to get rid of DO_UPCAST in the long run, so please
-don't introduce new ones!
-
-See:
-https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg05244.html
-
-Unless there is a real need for the rename, I'd suggest to rather drop
-this patch.
-
- Thomas
+>  hw/core/irq.c    | 14 --------------
+>  include/hw/irq.h |  5 -----
+>  2 files changed, 19 deletions(-)
+>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
