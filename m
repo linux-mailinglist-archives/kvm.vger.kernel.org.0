@@ -2,215 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4A6BDA89C
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 11:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08BF9DA8D6
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 11:44:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393745AbfJQJlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 05:41:23 -0400
-Received: from [217.140.110.172] ([217.140.110.172]:37042 "EHLO foss.arm.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S2408545AbfJQJlW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 05:41:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87CCC1993;
-        Thu, 17 Oct 2019 02:41:00 -0700 (PDT)
-Received: from [10.1.194.43] (unknown [10.1.194.43])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03C673F718;
-        Thu, 17 Oct 2019 02:40:58 -0700 (PDT)
-Subject: Re: [PATCH v6 01/10] KVM: arm64: Document PV-time interface
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-2-steven.price@arm.com>
- <20191015175651.GF24604@lakrids.cambridge.arm.com>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <be7ef86e-37f5-040b-bcb9-3c36df9f3fe3@arm.com>
-Date:   Thu, 17 Oct 2019 10:40:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2392993AbfJQJnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 05:43:47 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36036 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726750AbfJQJnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 05:43:46 -0400
+Received: by mail-wm1-f66.google.com with SMTP id m18so1821973wmc.1;
+        Thu, 17 Oct 2019 02:43:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=j33Q+AxJlhfJ2zQyBdLBD2zOlPBTBa+TDiJdmF/d4B0=;
+        b=PBJfc4iKYLoGVwZHVtTO0lO3ez5BpGeXPZAlj4Qxx0c4NWNvQiQJdK1Zm22yFqjtaV
+         XO4FHG92jwHETc95eBaAqW8My3/55VjWzgdzO1Z7VFGBKZ6/SSKp6CTcrfC3PtlNKUqL
+         Gz5RKw3w65f80M9hxVCyoUP5nbQbEGYqA7zONJtbqiZZSQ4kJoIXDkriUorZx149Ov6V
+         hp2VI/XVNAKT6jIOvk6lx29b+UyYLiw1dTHMppE7KWb8k9vetl5lYmF5oE0pBsoCnQOR
+         RSu0PTM8fVta3TCkFFq1fEmhNZJQ4CHICquFivetIufuHrOzmlAiCgVnt5JDfNQxaSMU
+         /cUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=j33Q+AxJlhfJ2zQyBdLBD2zOlPBTBa+TDiJdmF/d4B0=;
+        b=Qo9E6J49rYFa2ZNpWd2ckIpFOhYaaqhgw1JA7U44usOR5nqZEIACEj5Sl++pp7iID8
+         iZk+oJra5DXIVsEpr4uZzIjA8eFQZ7/Tq1LIQF3Imsh4M3luaLAu9gYzHZF3HUMWUjjd
+         xWfmUmuMhZPNfE/3Y/YOHYC2amv2e1ZLuOVsCan9hZOZ0pY8kHodcOH/uI9/SokJ1Qr6
+         VtrfU35FXnZPlku0iHy6L9BMJNBC3xdSbsmbvfEuUFdkv3qgPfYkLjSP3IVOyKrAsVtU
+         Oa7p+2S1HOzpIuU3EM/SLshKTT3xhdwjYmS+aMzMQh2pDJ+uMSTuypR2fO2Xbgje8g3l
+         ACJg==
+X-Gm-Message-State: APjAAAU3UptI2OkoEaNJNLcjJ2TJlY71ZsJoFAJw9VwbkcLyQyelt4PF
+        mTgJxKa92fQjHhlSDOcUB1U=
+X-Google-Smtp-Source: APXvYqxHJt9ec/ig4bgPywnDn38DGreAT5nDreVbx5QqzUYuzF0nTYOT9L67QUVhr9q6+o+HntA0Mw==
+X-Received: by 2002:a05:600c:21d2:: with SMTP id x18mr2121283wmj.146.1571305423433;
+        Thu, 17 Oct 2019 02:43:43 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id l6sm2029963wmg.2.2019.10.17.02.43.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2019 02:43:42 -0700 (PDT)
+Date:   Thu, 17 Oct 2019 10:43:41 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com
+Subject: Re: [PATCH V3 0/7] mdev based hardware virtio offloading support
+Message-ID: <20191017094341.GF23557@stefanha-x1.localdomain>
+References: <20191011081557.28302-1-jasowang@redhat.com>
+ <20191014174946.GC5359@stefanha-x1.localdomain>
+ <6d12ad8f-8137-e07d-d735-da59a326e8ed@redhat.com>
+ <20191015143720.GA13108@stefanha-x1.localdomain>
+ <ba81e603-cb7d-b152-8fae-97f070a7e460@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191015175651.GF24604@lakrids.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Pql/uPZNXIm1JCle"
+Content-Disposition: inline
+In-Reply-To: <ba81e603-cb7d-b152-8fae-97f070a7e460@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/10/2019 18:56, Mark Rutland wrote:
-> Hi Steven,
-> 
-> On Fri, Oct 11, 2019 at 01:59:21PM +0100, Steven Price wrote:
->> Introduce a paravirtualization interface for KVM/arm64 based on the
->> "Arm Paravirtualized Time for Arm-Base Systems" specification DEN 0057A.
-> 
-> I notice that as published, this is a BETA Draft, with the explicit
-> note:
-> 
-> | This document is for review purposes only and should not be used
-> | for any implementation as changes are likely.
-> 
-> ... what's the plan for getting a finalised version published?
 
-Sadly this wasn't handled very well, there's actually *two* documents
-called DEN/0057A:
+--Pql/uPZNXIm1JCle
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- * The draft[1] which contains the text above and previous postings were
-based on
+On Thu, Oct 17, 2019 at 09:42:53AM +0800, Jason Wang wrote:
+>=20
+> On 2019/10/15 =E4=B8=8B=E5=8D=8810:37, Stefan Hajnoczi wrote:
+> > On Tue, Oct 15, 2019 at 11:37:17AM +0800, Jason Wang wrote:
+> > > On 2019/10/15 =E4=B8=8A=E5=8D=881:49, Stefan Hajnoczi wrote:
+> > > > On Fri, Oct 11, 2019 at 04:15:50PM +0800, Jason Wang wrote:
+> > > > > There are hardware that can do virtio datapath offloading while h=
+aving
+> > > > > its own control path. This path tries to implement a mdev based
+> > > > > unified API to support using kernel virtio driver to drive those
+> > > > > devices. This is done by introducing a new mdev transport for vir=
+tio
+> > > > > (virtio_mdev) and register itself as a new kind of mdev driver. T=
+hen
+> > > > > it provides a unified way for kernel virtio driver to talk with m=
+dev
+> > > > > device implementation.
+> > > > >=20
+> > > > > Though the series only contains kernel driver support, the goal i=
+s to
+> > > > > make the transport generic enough to support userspace drivers. T=
+his
+> > > > > means vhost-mdev[1] could be built on top as well by resuing the
+> > > > > transport.
+> > > > >=20
+> > > > > A sample driver is also implemented which simulate a virito-net
+> > > > > loopback ethernet device on top of vringh + workqueue. This could=
+ be
+> > > > > used as a reference implementation for real hardware driver.
+> > > > >=20
+> > > > > Consider mdev framework only support VFIO device and driver right=
+ now,
+> > > > > this series also extend it to support other types. This is done
+> > > > > through introducing class id to the device and pairing it with
+> > > > > id_talbe claimed by the driver. On top, this seris also decouple
+> > > > > device specific parents ops out of the common ones.
+> > > > I was curious so I took a quick look and posted comments.
+> > > >=20
+> > > > I guess this driver runs inside the guest since it registers virtio
+> > > > devices?
+> > >=20
+> > > It could run in either guest or host. But the main focus is to run in=
+ the
+> > > host then we can use virtio drivers in containers.
+> > >=20
+> > >=20
+> > > > If this is used with physical PCI devices that support datapath
+> > > > offloading then how are physical devices presented to the guest wit=
+hout
+> > > > SR-IOV?
+> > >=20
+> > > We will do control path meditation through vhost-mdev[1] and vhost-vf=
+io[2].
+> > > Then we will present a full virtio compatible ethernet device for gue=
+st.
+> > >=20
+> > > SR-IOV is not a must, any mdev device that implements the API defined=
+ in
+> > > patch 5 can be used by this framework.
+> > What I'm trying to understand is: if you want to present a virtio-pci
+> > device to the guest (e.g. using vhost-mdev or vhost-vfio), then how is
+> > that related to this patch series?
+>=20
+>=20
+> This series introduce some infrastructure that would be used by vhost-mde=
+v:
+>=20
+> 1) allow new type of mdev devices/drivers other than vfio (through class_=
+id
+> and device ops)
+>=20
+> 2) a set of virtio specific callbacks that will be used by both vhost-mdev
+> and virtio-mdev defined in patch 5
+>=20
+> Then vhost-mdev can be implemented on top: a new mdev class id but reuse =
+the
+> callback defined in 2. Through this way the parent can provides a single =
+set
+> of callbacks (device ops) for both kernel virtio driver (through
+> virtio-mdev) or userspace virtio driver (through vhost-mdev).
 
- * The final[2] document which this latest series is updated to.
+Okay, thanks for explaining!
 
-At least for me if you visit the short form link[3] you can only get to
-the released version - the version drop down gives you two choices ('a'
-or 'a') but both get you to the same place.
+Stefan
 
-[1]
-https://static.docs.arm.com/den0057/a/den0057a_paravirtualized_time_for_arm-based_systems_beta-2.pdf
-[2]
-https://static.docs.arm.com/den0057/a/DEN0057A_Paravirtualized_Time_for_Arm-based_Systems_v1.0.pdf
-[3] https://developer.arm.com/docs/den0057/a
+--Pql/uPZNXIm1JCle
+Content-Type: application/pgp-signature; name="signature.asc"
 
->> This only adds the details about "Stolen Time" as the details of "Live
->> Physical Time" have not been fully agreed.
-> 
-> ... and what do we expect to happen on this front?
-> 
-> AFAICT, the spec hasn't changed since I called out issues in that area:
-> 
->   https://lore.kernel.org/r/20181210114047.tifwh6ilwzphsbqy@lakrids.cambridge.arm.com
-> 
-> ... and I'd feel much happier about supporting this if that were dropped
-> from the finalised spec.
+-----BEGIN PGP SIGNATURE-----
 
-LPT has been dropped from the final spec (and annoyingly the SMC values
-re-assigned). I can't say for sure what the long-term future of LPT is
-going to be, but for now it's gone.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2oN8wACgkQnKSrs4Gr
+c8gqswf/fQBq+qX21L3QGLUXUsf7OZ9kLP3ksR+9RYfGDJaFva/fV/aULknTmAiO
+OA0s+Eiw7K5Hy2ooKGPQXPYgAJhgnHqmhKgOEdsOGDWyCilYAiJzk/YXkpPvaCTp
+ovWC5Fz/shXyY3m2YGPXuwnWjbCam7cqMCRVPrmzJWoS6kdvsYsPxBVnhGFOm0Ms
+gbll/8mZQDQWsOZ8ZFeXLXCcHifXaiLa+yiGcZfxtV37oHsSapT+MOXEstGy4jEe
+uvos/V8tSLLMOJ+zgMYGOI0oOJIejMOrLU2zxPlktTbBVcM1RQtpJL69F30gi89K
+qCue5w57Z1UNfPVbXLiobIkPcZBGVw==
+=EXDt
+-----END PGP SIGNATURE-----
 
->> User space can specify a reserved area of memory for the guest and
->> inform KVM to populate the memory with information on time that the host
->> kernel has stolen from the guest.
->>
->> A hypercall interface is provided for the guest to interrogate the
->> hypervisor's support for this interface and the location of the shared
->> memory structures.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  Documentation/virt/kvm/arm/pvtime.rst   | 77 +++++++++++++++++++++++++
->>  Documentation/virt/kvm/devices/vcpu.txt | 14 +++++
->>  2 files changed, 91 insertions(+)
->>  create mode 100644 Documentation/virt/kvm/arm/pvtime.rst
->>
->> diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
->> new file mode 100644
->> index 000000000000..de949933ec78
->> --- /dev/null
->> +++ b/Documentation/virt/kvm/arm/pvtime.rst
->> @@ -0,0 +1,77 @@
->> +.. SPDX-License-Identifier: GPL-2.0
->> +
->> +Paravirtualized time support for arm64
->> +======================================
->> +
->> +Arm specification DEN0057/A defines a standard for paravirtualised time
->> +support for AArch64 guests:
->> +
->> +https://developer.arm.com/docs/den0057/a
->> +
->> +KVM/arm64 implements the stolen time part of this specification by providing
->> +some hypervisor service calls to support a paravirtualized guest obtaining a
->> +view of the amount of time stolen from its execution.
->> +
->> +Two new SMCCC compatible hypercalls are defined:
->> +
->> +* PV_TIME_FEATURES: 0xC5000020
->> +* PV_TIME_ST:       0xC5000021
->> +
->> +These are only available in the SMC64/HVC64 calling convention as
->> +paravirtualized time is not available to 32 bit Arm guests. The existence of
->> +the PV_FEATURES hypercall should be probed using the SMCCC 1.1 ARCH_FEATURES
->> +mechanism before calling it.
->> +
->> +PV_TIME_FEATURES
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC5000020
->> +    PV_call_id:   (uint32)    The function to query for support.
->> +                              Currently only PV_TIME_ST is supported.
->> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-time feature is supported by the hypervisor.
->> +    ============= ========    ==========
->> +
->> +PV_TIME_ST
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC5000021
->> +    Return value: (int64)     IPA of the stolen time data structure for this
->> +                              VCPU. On failure:
->> +                              NOT_SUPPORTED (-1)
->> +    ============= ========    ==========
->> +
->> +The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
->> +with inner and outer write back caching attributes, in the inner shareable
->> +domain. A total of 16 bytes from the IPA returned are guaranteed to be
->> +meaningfully filled by the hypervisor (see structure below).
-> 
-> At what granularity is this allowed to share IPA space with other
-> mappings? The spec doesn't provide any guidance here, and I strongly
-> suspect that it should.
-> 
-> To support a 64K guest, we must ensure that this doesn't share a 64K IPA
-> granule with any MMIO, and it probably only makes sense for an instance
-> of this structure to share that granule with another vCPU's structure.
-> 
-> We probably _also_ want to ensure that this doesn't share a 64K granule
-> with memory the guest sees as regular system RAM. Otherwise we're liable
-> to force it into having mismatched attributes for any of that RAM it
-> happens to map as part of mapping the PV_TIME_ST structure.
-
-Good points, but this is no different from any other 'device' that is
-mapped into the guest space (e.g. you don't want a serial port sharing
-the same 64K page with memory for the same reasons). Ultimately user
-space must arrange the memory layout appropriately for the guest. Of
-course we can request this guidance to be added in the next release of
-the spec.
-
->> +
->> +PV_TIME_ST returns the structure for the calling VCPU.
->> +
->> +Stolen Time
->> +-----------
->> +
->> +The structure pointed to by the PV_TIME_ST hypercall is as follows:
->> +
->> ++-------------+-------------+-------------+----------------------------+
->> +| Field       | Byte Length | Byte Offset | Description                |
->> ++=============+=============+=============+============================+
->> +| Revision    |      4      |      0      | Must be 0 for version 1.0  |
->> ++-------------+-------------+-------------+----------------------------+
->> +| Attributes  |      4      |      4      | Must be 0                  |
->> ++-------------+-------------+-------------+----------------------------+
->> +| Stolen time |      8      |      8      | Stolen time in unsigned    |
->> +|             |             |             | nanoseconds indicating how |
->> +|             |             |             | much time this VCPU thread |
->> +|             |             |             | was involuntarily not      |
->> +|             |             |             | running on a physical CPU. |
->> ++-------------+-------------+-------------+----------------------------+
->> +
->> +All values in the structure are stored little-endian.
-> 
-> Looking at the published DEN 0057A, endianness is never stated. Is this
-> going to be corrected in the next release?
-
-I've provided feedback that this should be explicit in the next revision
-of the spec. So yes, I expect this to be stated. For now though, Linux
-has to make a decision so I've documented it here.
-
-Steve
+--Pql/uPZNXIm1JCle--
