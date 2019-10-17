@@ -2,32 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6357BDAEE2
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 15:58:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0342DB0B0
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 17:04:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437363AbfJQN6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 09:58:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54498 "EHLO mx1.redhat.com"
+        id S2406165AbfJQPEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 11:04:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39740 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437326AbfJQN6Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 09:58:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1727600AbfJQPEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 11:04:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A74AF3082E10;
-        Thu, 17 Oct 2019 13:58:15 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 38FBDC057E3C;
+        Thu, 17 Oct 2019 15:04:41 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AFCF619C70;
-        Thu, 17 Oct 2019 13:58:11 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] Switch the order of the parameters in
- report() and report_xfail()
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        Bill Wendling <morbo@google.com>, kvm-ppc@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Laurent Vivier <lvivier@redhat.com>
-References: <20191017131552.30913-1-thuth@redhat.com>
- <20191017133031.wmc7y26nsd63zle6@kamzik.brq.redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6BBE05DA60;
+        Thu, 17 Oct 2019 15:04:28 +0000 (UTC)
+Subject: Re: [PATCH 02/32] hw/i386/pc: Move kvm_i8259_init() declaration to
+ sysemu/kvm.h
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Aleksandar Markovic <amarkovic@wavecomp.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        xen-devel@lists.xenproject.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-3-philmd@redhat.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,40 +85,54 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <2d46702a-58d2-5d42-14b0-a282313bb9e3@redhat.com>
-Date:   Thu, 17 Oct 2019 15:58:11 +0200
+Message-ID: <1e8c724b-8846-255a-eace-6bf135471566@redhat.com>
+Date:   Thu, 17 Oct 2019 17:04:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191017133031.wmc7y26nsd63zle6@kamzik.brq.redhat.com>
+In-Reply-To: <20191015162705.28087-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 17 Oct 2019 13:58:15 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 17 Oct 2019 15:04:41 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/10/2019 15.30, Andrew Jones wrote:
+On 15/10/2019 18.26, Philippe Mathieu-Daudé wrote:
+> Move the KVM-related call to "sysemu/kvm.h".
 > 
-> Hi Thomas and Paolo,
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  include/hw/i386/pc.h | 1 -
+>  include/sysemu/kvm.h | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 > 
-> This will conflict badly with "[kvm-unit-tests PATCH v2 0/6] arm: Use
-> stable test output lines" and likely with pretty much anything else
-> in flight - since pretty much everything adds report() lines. I'm not
-> sure why "[kvm-unit-tests PATCH v2 0/6] arm: Use stable test output
-> lines" hasn't been merged yet. Paolo, do you want me to do PULL
-> requests for all the arm-related patches? If so, I can do one tomorrow
-> for what's currently reviewed and waiting. I'd prefer they all get
-> merged before this patch. We should also confirm all other architectures
-> have their reviewed and waiting patches merged first too, IMHO.
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 6df4f4b6fb..09e74e7764 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -158,7 +158,6 @@ typedef struct PCMachineClass {
+>  
+>  extern DeviceState *isa_pic;
+>  qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
+> -qemu_irq *kvm_i8259_init(ISABus *bus);
+>  int pic_read_irq(DeviceState *d);
+>  int pic_get_output(DeviceState *d);
+>  
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 9d143282bc..da8aa9f5a8 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -513,6 +513,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
+>  void kvm_pc_gsi_handler(void *opaque, int n, int level);
+>  void kvm_pc_setup_irq_routing(bool pci_enabled);
+>  void kvm_init_irq_routing(KVMState *s);
+> +qemu_irq *kvm_i8259_init(ISABus *bus);
 
-I'm not aware of any pending ppc or s390x patches. Anyway, could we
-please revert the "lib: use an argument which doesn't require default
-argument promotion" for now, since it breaks many tests? Or take Bill's
-fix for the problem (we still can rework it later, I guess).
+Why? The function is defined in hw/i386/kvm/ - so moving its prototype
+to a generic header sounds wrong to me.
 
- Thanks,
-  Thomas
+ Thomas
