@@ -2,127 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A072ADB5C5
-	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 20:19:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5500FDB60D
+	for <lists+kvm@lfdr.de>; Thu, 17 Oct 2019 20:25:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441284AbfJQSTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 17 Oct 2019 14:19:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58280 "EHLO mail.kernel.org"
+        id S2389123AbfJQSZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 17 Oct 2019 14:25:00 -0400
+Received: from mga14.intel.com ([192.55.52.115]:11414 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2438684AbfJQSTo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 17 Oct 2019 14:19:44 -0400
-Received: from localhost (unknown [192.55.54.60])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7436B20659;
-        Thu, 17 Oct 2019 18:19:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571336383;
-        bh=d2CkK/TjWefe+aETPDcliT8tW3ji3ywfXQM4uR0Zey8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JdgltpGxueQH9B2zsQdKdVywPuJRGbeBqRqgfZUvqHWQ6Cmkpe9L+xCcSRtaFdtiY
-         bccFMNwTuPX3nTL4O/U2gYFyU/WLlgZymFynhRPQVfJ0DKc82IcWePUP/yV1qdJma9
-         wXtDiK3hzot8f4JkLeLC+5eB35zIaB9Nt/5A75Ks=
-Date:   Thu, 17 Oct 2019 11:19:43 -0700
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>
-Subject: Re: [PATCH RFC 2/3] usb, kcov: collect coverage from hub_event
-Message-ID: <20191017181943.GC1094415@kroah.com>
-References: <cover.1571333592.git.andreyknvl@google.com>
- <1b30d1c9e7f86c25425c5ee53d7facede289608e.1571333592.git.andreyknvl@google.com>
+        id S1730483AbfJQSZA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 17 Oct 2019 14:25:00 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 11:25:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,308,1566889200"; 
+   d="scan'208";a="208735773"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga001.fm.intel.com with ESMTP; 17 Oct 2019 11:24:59 -0700
+Date:   Thu, 17 Oct 2019 11:24:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 2/4] kvm-unit-test: nVMX: __enter_guest() needs to also
+ check for VMX_FAIL_STATE
+Message-ID: <20191017182459.GF20903@linux.intel.com>
+References: <20191015001633.8603-1-krish.sadhukhan@oracle.com>
+ <20191015001633.8603-3-krish.sadhukhan@oracle.com>
+ <CALMp9eSg-cY0ZDauS11HitF13b7G_=urszQ6d7m+kAm-4htArg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1b30d1c9e7f86c25425c5ee53d7facede289608e.1571333592.git.andreyknvl@google.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <CALMp9eSg-cY0ZDauS11HitF13b7G_=urszQ6d7m+kAm-4htArg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 07:44:14PM +0200, Andrey Konovalov wrote:
-> This patch adds kcov_remote_start/kcov_remote_stop annotations to the
-> hub_event function, which is responsible for processing events on USB
-> buses, in particular events that happen during USB device enumeration.
-> Each USB bus gets a unique id, which can be used to attach a kcov device
-> to a particular USB bus for coverage collection.
+On Wed, Oct 16, 2019 at 10:55:55AM -0700, Jim Mattson wrote:
+> On Mon, Oct 14, 2019 at 5:52 PM Krish Sadhukhan
+> <krish.sadhukhan@oracle.com> wrote:
+> >
+> >   ..as both VMX_ENTRY_FAILURE and VMX_FAIL_STATE together comprise the
+> >     exit eeason when VM-entry fails due invalid guest state.
 > 
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  drivers/usb/core/hub.c    | 4 ++++
->  include/linux/kcov.h      | 1 +
->  include/uapi/linux/kcov.h | 7 +++++++
->  3 files changed, 12 insertions(+)
+> Nit: s/reason/reason/
 > 
-> diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-> index 236313f41f4a..03a40e41b099 100644
-> --- a/drivers/usb/core/hub.c
-> +++ b/drivers/usb/core/hub.c
-> @@ -5374,6 +5374,8 @@ static void hub_event(struct work_struct *work)
->  	hub_dev = hub->intfdev;
->  	intf = to_usb_interface(hub_dev);
->  
-> +	kcov_remote_start(kcov_remote_handle_usb(hdev->bus->busnum));
-> +
->  	dev_dbg(hub_dev, "state %d ports %d chg %04x evt %04x\n",
->  			hdev->state, hdev->maxchild,
->  			/* NOTE: expects max 15 ports... */
-> @@ -5480,6 +5482,8 @@ static void hub_event(struct work_struct *work)
->  	/* Balance the stuff in kick_hub_wq() and allow autosuspend */
->  	usb_autopm_put_interface(intf);
->  	kref_put(&hub->kref, hub_release);
-> +
-> +	kcov_remote_stop();
->  }
->  
->  static const struct usb_device_id hub_id_table[] = {
-> diff --git a/include/linux/kcov.h b/include/linux/kcov.h
-> index 702672d98d35..38a47e0b67c2 100644
-> --- a/include/linux/kcov.h
-> +++ b/include/linux/kcov.h
-> @@ -30,6 +30,7 @@ void kcov_task_exit(struct task_struct *t);
->  /*
->   * Reserved handle ranges:
->   * 0000000000000000 - 0000ffffffffffff : common handles
-> + * 0001000000000000 - 0001ffffffffffff : USB subsystem handles
+> > Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> > ---
+> >  x86/vmx.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/x86/vmx.c b/x86/vmx.c
+> > index 647ab49..4ce0fb5 100644
+> > --- a/x86/vmx.c
+> > +++ b/x86/vmx.c
+> > @@ -1848,7 +1848,8 @@ static void __enter_guest(u8 abort_flag, struct vmentry_failure *failure)
+> >         vmx_enter_guest(failure);
+> >         if ((abort_flag & ABORT_ON_EARLY_VMENTRY_FAIL && failure->early) ||
+> >             (abort_flag & ABORT_ON_INVALID_GUEST_STATE &&
+> > -           vmcs_read(EXI_REASON) & VMX_ENTRY_FAILURE)) {
+> > +           (vmcs_read(EXI_REASON) & (VMX_ENTRY_FAILURE | VMX_FAIL_STATE))
+> > +           == (VMX_ENTRY_FAILURE | VMX_FAIL_STATE))) {
+> This shouldn't be a bitwise comparison. It should just be a value comparison:
+> 
+> vmcs_read(EXI_REASON) == VMX_ENTRY_FAILURE | VMX_FAIL_STATE
 
-So how many bits are you going to have for any in-kernel tasks?  Aren't
-you going to run out quickly?
+Hmm, but then we miss failed VM-Enter if something goes truly haywire,
+e.g. KVM signals a failed VM-Enter due to #MC.
+
+I'd do something like this:
+
+	u32 exit_reason;
+
+	...
+
+	vmx_enter_guest(failure);
+
+	if (failure->early) {
+		if (abort_flag & ABORT_ON_EARLY_VMENTRY_FAIL)
+			goto do_abort;
+		return;
+	}
+	exit_reason = vmcs_read(EXI_REASON);
+	if (exit_reason & VMX_ENTRY_FAILURE) {
+		if ((abort_flag & ABORT_ON_INVALID_GUEST_STATE) ||
+		    exit_reason != (VMX_ENTRY_FAILURE | VMX_FAIL_STATE))
+			goto do_abort;
+		return;
+	}
+
+	launched = 1;
+	check_for_guest_termination();
+	return;
+
+do_abort:
+	print_vmentry_failure_info(failure);
+	abort();
 
 
->   */
->  void kcov_remote_start(u64 handle);
->  void kcov_remote_stop(void);
-> diff --git a/include/uapi/linux/kcov.h b/include/uapi/linux/kcov.h
-> index 46f78f716ca9..45c9ae59cebc 100644
-> --- a/include/uapi/linux/kcov.h
-> +++ b/include/uapi/linux/kcov.h
-> @@ -43,4 +43,11 @@ enum {
->  #define KCOV_CMP_SIZE(n)        ((n) << 1)
->  #define KCOV_CMP_MASK           KCOV_CMP_SIZE(3)
->  
-> +#define KCOV_REMOTE_HANDLE_USB  0x0001000000000000ull
-> +
-> +static inline __u64 kcov_remote_handle_usb(unsigned int bus)
-> +{
-> +	return KCOV_REMOTE_HANDLE_USB + (__u64)bus;
-> +}
-
-Why is this function in a uapi .h file?  What userspace code would call
-this?
-
-thanks,
-
-greg k-h
