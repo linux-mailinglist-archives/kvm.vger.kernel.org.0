@@ -2,135 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A037BDC617
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 15:31:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60503DC662
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 15:43:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408471AbfJRNbN convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 18 Oct 2019 09:31:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45750 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729783AbfJRNbN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 09:31:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CE75D307D986;
-        Fri, 18 Oct 2019 13:31:12 +0000 (UTC)
-Received: from gondolin (dhcp-192-202.str.redhat.com [10.33.192.202])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 406EB60619;
-        Fri, 18 Oct 2019 13:30:45 +0000 (UTC)
-Date:   Fri, 18 Oct 2019 15:30:42 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        maxime.coquelin@redhat.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, rob.miller@broadcom.com,
-        xiao.w.wang@intel.com, haotian.wang@sifive.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
-        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
-        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V4 4/6] mdev: introduce virtio device and its device ops
-Message-ID: <20191018153042.3516cde1.cohuck@redhat.com>
-In-Reply-To: <733c0cfe-064f-c8ba-6bf8-165db88d7e07@redhat.com>
-References: <20191017104836.32464-1-jasowang@redhat.com>
-        <20191017104836.32464-5-jasowang@redhat.com>
-        <20191018114614.6f1e79dc.cohuck@redhat.com>
-        <733c0cfe-064f-c8ba-6bf8-165db88d7e07@redhat.com>
-Organization: Red Hat GmbH
+        id S2393921AbfJRNnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Oct 2019 09:43:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51823 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388989AbfJRNnO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Oct 2019 09:43:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571406192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=avekW70KdpjMc4FyUCIX6gB40ry+NKr1jUqoVsBz8lA=;
+        b=gz4SsWiejBc0717a4byoXCvZUuoz5lKdCVm7cTUblJlNO7HsBvduSIyMG24SjxdTFuUTWb
+        e32c6jgVDP7aPCbb2Oaq6qy2VJ1i/86G7baAxKo5hvb+kym+vAunYMCAKcSO9kZe0V7cdi
+        XQwTGzcmuY13ecupA7waRxjskJZ5lJY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-AZxbxpDLMg6sCTVOOVbaQg-1; Fri, 18 Oct 2019 09:42:59 -0400
+Received: by mail-wr1-f71.google.com with SMTP id v7so763990wrf.4
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2019 06:42:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PSGpxdY2p0addAHAYiert9spAPvfigx6YTt+FOH1FXs=;
+        b=Nxyygk/o7ep9dLkxRXCpl9d3qwBot9zdxafzgMAYg60mcx//xnluNDbCXcmoOqy2VK
+         b1L9R0iE3wTdmaeyTA96s0Sl0WwlJ81+aWRigxxPHTzxm2sayaGDmcCfOIQ8oHSL/bZj
+         DCtQI5N6J6lQmknzhdTlamvD9VQ3pZ6Uwx+7UuCLzwStI1wT1RZVYyMmEk8a3XnPuFIO
+         CHAMNxgAkECoNniYLeskoMQfijXBxEX0aig8uzYWOaKxjFDE/ofAvrzxPlIT08lV0Xq2
+         Eew0M3WiucnCoKf5FxbUmzAnraug1rlgBi7RBjeqcDvw34UKuoGjO/7nUJOt7n6Up7hE
+         qJew==
+X-Gm-Message-State: APjAAAXxvY4FRlZ5Y8ldZ9n8ONnfBuOS5lb77M5Kd/bH3mYNauxSV6pq
+        q4M/WDpO6ijFHTNhJgReHmUQSV8HEYYZv3Xz+Fngw6vZzjVIx6EDjhUh15PLHyXt7XWbfPrchzC
+        po+JSE4Rih+zY
+X-Received: by 2002:adf:f152:: with SMTP id y18mr8172896wro.285.1571406178383;
+        Fri, 18 Oct 2019 06:42:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyaIWZ6txvBwpjhI2bDGBt808E/H69KU1rYAb5fnDTWOgKNDuk3yaDaWG2nfZo1hkeNcBz9Mw==
+X-Received: by 2002:adf:f152:: with SMTP id y18mr8172875wro.285.1571406178083;
+        Fri, 18 Oct 2019 06:42:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:fb:851b:6f64:49ab? ([2001:b07:6468:f312:fb:851b:6f64:49ab])
+        by smtp.gmail.com with ESMTPSA id l6sm6444472wmg.2.2019.10.18.06.42.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Oct 2019 06:42:57 -0700 (PDT)
+Subject: Re: [RFC PATCH 00/28] kvm: mmu: Rework the x86 TDP direct mapped case
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20190926231824.149014-1-bgardon@google.com>
+ <20191017185002.GG20903@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8613605a-3e6e-ce8e-f2af-25bef2703348@redhat.com>
+Date:   Fri, 18 Oct 2019 15:42:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20191017185002.GG20903@linux.intel.com>
+Content-Language: en-US
+X-MC-Unique: AZxbxpDLMg6sCTVOOVbaQg-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Fri, 18 Oct 2019 13:31:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 18 Oct 2019 18:55:02 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On 17/10/19 20:50, Sean Christopherson wrote:
+> On Thu, Sep 26, 2019 at 04:17:56PM -0700, Ben Gardon wrote:
+>> Over the years, the needs for KVM's x86 MMU have grown from running smal=
+l
+>> guests to live migrating multi-terabyte VMs with hundreds of vCPUs. Wher=
+e
+>> we previously depended upon shadow paging to run all guests, we now have
+>> the use of two dimensional paging (TDP). This RFC proposes and
+>> demonstrates two major changes to the MMU. First, an iterator abstractio=
+n=20
+>> that simplifies traversal of TDP paging structures when running an L1
+>> guest. This abstraction takes advantage of the relative simplicity of TD=
+P
+>> to simplify the implementation of MMU functions. Second, this RFC change=
+s
+>> the synchronization model to enable more parallelism than the monolithic
+>> MMU lock. This "direct mode" MMU is currently in use at Google and has
+>> given us the performance necessary to live migrate our 416 vCPU, 12TiB
+>> m2-ultramem-416 VMs.
+>>
+>> The primary motivation for this work was to handle page faults in
+>> parallel. When VMs have hundreds of vCPUs and terabytes of memory, KVM's
+>> MMU lock suffers from extreme contention, resulting in soft-lockups and
+>> jitter in the guest. To demonstrate this I also written, and will submit
+>> a demand paging test to KVM selftests. The test creates N vCPUs, which
+>> each touch disjoint regions of memory. Page faults are picked up by N
+>> user fault FD handlers, one for each vCPU. Over a 1 second profile of
+>> the demand paging test, with 416 vCPUs and 4G per vCPU, 98% of the
+>> execution time was spent waiting for the MMU lock! With this patch
+>> series the total execution time for the test was reduced by 89% and the
+>> execution was dominated by get_user_pages and the user fault FD ioctl.
+>> As a secondary benefit, the iterator-based implementation does not use
+>> the rmap or struct kvm_mmu_pages, saving ~0.2% of guest memory in KVM
+>> overheads.
+>>
+>> The goal of this  RFC is to demonstrate and gather feedback on the
+>> iterator pattern, the memory savings it enables for the "direct case"
+>> and the changes to the synchronization model. Though they are interwoven
+>> in this series, I will separate the iterator from the synchronization
+>> changes in a future series. I recognize that some feature work will be
+>> needed to make this patch set ready for merging. That work is detailed
+>> at the end of this cover letter.
+>=20
+> Diving into this series is on my todo list, but realistically that's not
+> going to happen until after KVM forum.  Sorry I can't provide timely
+> feedback.
 
-> On 2019/10/18 下午5:46, Cornelia Huck wrote:
-> > On Thu, 17 Oct 2019 18:48:34 +0800
-> > Jason Wang <jasowang@redhat.com> wrote:
+Same here.  I was very lazily waiting to get the big picture from Ben's
+talk.
 
-> >> + * @get_vendor_id:		Get virtio vendor id
-> >> + *				@mdev: mediated device
-> >> + *				Returns u32: virtio vendor id  
-> > How is the vendor id defined? As for normal virtio-pci devices?  
-> 
-> 
-> The vendor that provides this device. So something like this
-> 
-> I notice that MMIO also had this so it looks to me it's not pci specific.
+Paolo
 
-Ok. Would be good to specify this more explicitly.
-
-> 
-> 
-> >  
-> >> + * @get_status: 		Get the device status
-> >> + *				@mdev: mediated device
-> >> + *				Returns u8: virtio device status
-> >> + * @set_status: 		Set the device status
-> >> + *				@mdev: mediated device
-> >> + *				@status: virtio device status
-> >> + * @get_config: 		Read from device specific configuration space
-> >> + *				@mdev: mediated device
-> >> + *				@offset: offset from the beginning of
-> >> + *				configuration space
-> >> + *				@buf: buffer used to read to
-> >> + *				@len: the length to read from
-> >> + *				configration space
-> >> + * @set_config: 		Write to device specific configuration space
-> >> + *				@mdev: mediated device
-> >> + *				@offset: offset from the beginning of
-> >> + *				configuration space
-> >> + *				@buf: buffer used to write from
-> >> + *				@len: the length to write to
-> >> + *				configration space
-> >> + * @get_mdev_features:		Get the feature of virtio mdev device
-> >> + *				@mdev: mediated device
-> >> + *				Returns the mdev features (API) support by
-> >> + *				the device.  
-> > What kind of 'features' are supposed to go in there? Are these bits,
-> > like you defined for VIRTIO_MDEV_F_VERSION_1 above?  
-> 
-> 
-> It's the API or mdev features other than virtio features. It could be 
-> used by driver to determine the capability of the mdev device. Besides 
-> _F_VERSION_1, we may add dirty page tracking etc which means we need new 
-> device ops.
-
-Ok, so that's supposed to be distinct bits that can be or'ed together?
-Makes sense, but probably needs some more documentation somewhere.
-
-> 
-> 
-> >  
-> >> + * @get_generation:		Get device generaton
-> >> + *				@mdev: mediated device
-> >> + *				Returns u32: device generation  
-> > Is that callback mandatory?  
-> 
-> 
-> I think so, it's hard to emulate that completely in virtio-mdev transport.
-
-IIRC, the generation stuff is not mandatory in the current version of
-virtio, as not all transports have that concept.
-
-Generally, are any of the callbacks optional, or are all of them
-mandatory? From what I understand, you plan to add new things that
-depend on features... would that mean non-mandatory callbacks?
