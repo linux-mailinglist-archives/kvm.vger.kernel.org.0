@@ -2,692 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5E28DBDBB
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 08:36:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7049FDBE6D
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 09:35:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504455AbfJRGgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Oct 2019 02:36:31 -0400
-Received: from mga05.intel.com ([192.55.52.43]:30427 "EHLO mga05.intel.com"
+        id S2389099AbfJRHfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Oct 2019 03:35:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55966 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2504449AbfJRGga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 02:36:30 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 23:36:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,310,1566889200"; 
-   d="scan'208";a="226439100"
-Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.255.30.7]) ([10.255.30.7])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Oct 2019 23:36:26 -0700
-Subject: Re: [RFC 2/2] vhost: IFC VF vdpa layer
-To:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
-        zhiyuan.lv@intel.com
-References: <20191016013050.3918-1-lingshan.zhu@intel.com>
- <20191016013050.3918-3-lingshan.zhu@intel.com>
- <9495331d-3c65-6f49-dcd9-bfdb17054cf0@redhat.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Message-ID: <0234bb73-4e05-2626-ec57-67454bf204ff@intel.com>
-Date:   Fri, 18 Oct 2019 14:36:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+        id S1728706AbfJRHfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Oct 2019 03:35:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A678F10DCC96;
+        Fri, 18 Oct 2019 07:35:14 +0000 (UTC)
+Received: from [10.72.12.183] (ovpn-12-183.pek2.redhat.com [10.72.12.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A27C960600;
+        Fri, 18 Oct 2019 07:34:48 +0000 (UTC)
+Subject: Re: [PATCH V4 3/6] mdev: introduce device specific ops
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+References: <20191017104836.32464-1-jasowang@redhat.com>
+ <20191017104836.32464-4-jasowang@redhat.com>
+ <20191017170755.15506ada.cohuck@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <a15f2cde-925a-cff0-d959-4a0cd510323a@redhat.com>
+Date:   Fri, 18 Oct 2019 15:34:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <9495331d-3c65-6f49-dcd9-bfdb17054cf0@redhat.com>
+In-Reply-To: <20191017170755.15506ada.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.64]); Fri, 18 Oct 2019 07:35:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Jason,
 
-Thanks for your comments, I am on a conference travel, I will reply next 
-Monday.
-
-Thanks,
-BR
-Zhu Lingshan
-On 10/16/2019 6:19 PM, Jason Wang wrote:
+On 2019/10/17 下午11:07, Cornelia Huck wrote:
+> On Thu, 17 Oct 2019 18:48:33 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
 >
-> On 2019/10/16 上午9:30, Zhu Lingshan wrote:
->> This commit introduced IFC VF operations for vdpa, which complys to
->> vhost_mdev interfaces, handles IFC VF initialization,
->> configuration and removal.
+>> Currently, except for the create and remove, the rest of
+>> mdev_parent_ops is designed for vfio-mdev driver only and may not help
+>> for kernel mdev driver. With the help of class id, this patch
+>> introduces device specific callbacks inside mdev_device
+>> structure. This allows different set of callback to be used by
+>> vfio-mdev and virtio-mdev.
 >>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
 >> ---
->>   drivers/vhost/ifcvf/ifcvf_main.c | 541 
->> +++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 541 insertions(+)
->>   create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
+>>   .../driver-api/vfio-mediated-device.rst       | 25 +++++----
+>>   MAINTAINERS                                   |  1 +
+>>   drivers/gpu/drm/i915/gvt/kvmgt.c              | 18 ++++---
+>>   drivers/s390/cio/vfio_ccw_ops.c               | 18 ++++---
+>>   drivers/s390/crypto/vfio_ap_ops.c             | 14 +++--
+>>   drivers/vfio/mdev/mdev_core.c                 | 18 +++++--
+>>   drivers/vfio/mdev/mdev_private.h              |  1 +
+>>   drivers/vfio/mdev/vfio_mdev.c                 | 37 ++++++-------
+>>   include/linux/mdev.h                          | 45 ++++------------
+>>   include/linux/vfio_mdev.h                     | 52 +++++++++++++++++++
+>>   samples/vfio-mdev/mbochs.c                    | 20 ++++---
+>>   samples/vfio-mdev/mdpy.c                      | 20 ++++---
+>>   samples/vfio-mdev/mtty.c                      | 18 ++++---
+>>   13 files changed, 184 insertions(+), 103 deletions(-)
+>>   create mode 100644 include/linux/vfio_mdev.h
 >>
->> diff --git a/drivers/vhost/ifcvf/ifcvf_main.c 
->> b/drivers/vhost/ifcvf/ifcvf_main.c
->> new file mode 100644
->> index 000000000000..c48a29969a85
->> --- /dev/null
->> +++ b/drivers/vhost/ifcvf/ifcvf_main.c
->> @@ -0,0 +1,541 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2019 Intel Corporation.
->> + */
+>> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+>> index f9a78d75a67a..0cca84d19603 100644
+>> --- a/Documentation/driver-api/vfio-mediated-device.rst
+>> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+>> @@ -152,11 +152,22 @@ callbacks per mdev parent device, per mdev type, or any other categorization.
+>>   Vendor drivers are expected to be fully asynchronous in this respect or
+>>   provide their own internal resource protection.)
+>>   
+>> -The callbacks in the mdev_parent_ops structure are as follows:
+>> -
+>> -* open: open callback of mediated device
+>> -* close: close callback of mediated device
+>> -* ioctl: ioctl callback of mediated device
+>> +As multiple types of mediated devices may be supported, the device
+>> +must set up the class id and the device specific callbacks in create()
+> s/in create()/in the create()/
+
+
+Will fix.
+
+
+>
+>> +callback. E.g for vfio-mdev device it needs to be done through:
+> "Each class provides a helper function to do so; e.g. for vfio-mdev
+> devices, the function to be called is:"
+>
+> ?
+
+
+This looks better.
+
+
+>
 >> +
->> +#include <linux/interrupt.h>
->> +#include <linux/module.h>
->> +#include <linux/mdev.h>
->> +#include <linux/pci.h>
->> +#include <linux/sysfs.h>
+>> +    int mdev_set_vfio_ops(struct mdev_device *mdev,
+>> +                          const struct vfio_mdev_ops *vfio_ops);
 >> +
->> +#include "ifcvf_base.h"
+>> +The class id (set to MDEV_CLASS_ID_VFIO) is used to match a device
+> "(set by this helper function to MDEV_CLASS_ID_VFIO)" ?
+
+
+Yes.
+
+
+>> +with an mdev driver via its id table. The device specific callbacks
+>> +(specified in *ops) are obtainable via mdev_get_dev_ops() (for use by
+> "(specified in *vfio_ops by the caller)" ?
+
+
+Yes.
+
+
+>> +the mdev bus driver). A vfio-mdev device (class id MDEV_CLASS_ID_VFIO)
+>> +uses the following device-specific ops:
 >> +
->> +#define VERSION_STRING    "0.1"
->> +#define DRIVER_AUTHOR    "Intel Corporation"
->> +#define IFCVF_DRIVER_NAME    "ifcvf"
+>> +* open: open callback of vfio mediated device
+>> +* close: close callback of vfio mediated device
+>> +* ioctl: ioctl callback of vfio mediated device
+>>   * read : read emulation callback
+>>   * write: write emulation callback
+>>   * mmap: mmap emulation callback
+>> @@ -167,10 +178,6 @@ register itself with the mdev core driver::
+>>   	extern int  mdev_register_device(struct device *dev,
+>>   	                                 const struct mdev_parent_ops *ops);
+>>   
+>> -It is also required to specify the class_id in create() callback through::
+>> -
+>> -	int mdev_set_class(struct mdev_device *mdev, u16 id);
+>> -
+> I'm wondering if this patch set should start out with introducing
+> helper functions already (i.e. don't introduce mdev_set_class(), but
+> start out with mdev_set_class_vfio() which will gain the *vfio_ops
+> argument in this patch.)
+
+
+I think it doesn't harm to keep it as is since in patch 1 we introduce 
+class_id and bus match method based on that without device ops there.  
+But if you stick I can change.
+
+Thanks
+
+
+>
+>>   However, the mdev_parent_ops structure is not required in the function call
+>>   that a driver should use to unregister itself with the mdev core driver::
+>>   
+> (...)
+>
+>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+>> index 3a9c52d71b4e..d0f3113c8071 100644
+>> --- a/drivers/vfio/mdev/mdev_core.c
+>> +++ b/drivers/vfio/mdev/mdev_core.c
+>> @@ -45,15 +45,23 @@ void mdev_set_drvdata(struct mdev_device *mdev, void *data)
+>>   }
+>>   EXPORT_SYMBOL(mdev_set_drvdata);
+>>   
+>> -/* Specify the class for the mdev device, this must be called during
+>> - * create() callback.
+>> +/* Specify the VFIO device ops for the mdev device, this
+>> + * must be called during create() callback for VFIO mdev device.
+>>    */
+> /*
+>   * Specify the mdev device to be a VFIO mdev device, and set the
+>   * VFIO devices ops for it. This must be called from the create()
+>   * callback for VFIO mdev devices.
+>   */
+>
+> ?
+>
+>> -void mdev_set_class(struct mdev_device *mdev, u16 id)
+>> +void mdev_set_vfio_ops(struct mdev_device *mdev,
+>> +		       const struct vfio_mdev_device_ops *vfio_ops)
+>>   {
+>>   	WARN_ON(mdev->class_id);
+>> -	mdev->class_id = id;
+>> +	mdev->class_id = MDEV_CLASS_ID_VFIO;
+>> +	mdev->device_ops = vfio_ops;
+>>   }
+>> -EXPORT_SYMBOL(mdev_set_class);
+>> +EXPORT_SYMBOL(mdev_set_vfio_ops);
 >> +
->> +static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
+>> +const void *mdev_get_dev_ops(struct mdev_device *mdev)
 >> +{
->> +    struct vring_info *vring = arg;
->> +
->> +    if (vring->cb.callback)
->> +        return vring->cb.callback(vring->cb.private);
->> +
->> +    return IRQ_HANDLED;
+>> +	return mdev->device_ops;
 >> +}
->> +
->> +static u64 ifcvf_mdev_get_features(struct mdev_device *mdev)
->> +{
->> +    return IFC_SUPPORTED_FEATURES;
+>> +EXPORT_SYMBOL(mdev_get_dev_ops);
+>>   
+>>   struct device *mdev_dev(struct mdev_device *mdev)
+>>   {
+> (...)
 >
->
-> I would expect this should be done by querying the hw. Or IFC VF can't 
-> get any update through its firmware?
->
->
->> +}
->> +
->> +static int ifcvf_mdev_set_features(struct mdev_device *mdev, u64 
->> features)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->req_features = features;
->> +
->> +    return 0;
->> +}
->> +
->> +static u64 ifcvf_mdev_get_vq_state(struct mdev_device *mdev, u16 qid)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    return vf->vring[qid].last_avail_idx;
->
->
-> Does this really work? I'd expect it should be fetched from hw since 
-> it's an internal state.
->
->
->> +}
->> +
->> +static int ifcvf_mdev_set_vq_state(struct mdev_device *mdev, u16 
->> qid, u64 num)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->vring[qid].last_used_idx = num;
->
->
-> I fail to understand why last_used_idx is needed. It looks to me the 
-> used idx in the used ring is sufficient.
->
->
->> +    vf->vring[qid].last_avail_idx = num;
->
->
-> Do we need a synchronization with hw immediately here?
->
->
->> +
->> +    return 0;
->> +}
->> +
->> +static int ifcvf_mdev_set_vq_address(struct mdev_device *mdev, u16 idx,
->> +                     u64 desc_area, u64 driver_area,
->> +                     u64 device_area)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->vring[idx].desc = desc_area;
->> +    vf->vring[idx].avail = driver_area;
->> +    vf->vring[idx].used = device_area;
->> +
->> +    return 0;
->> +}
->> +
->> +static void ifcvf_mdev_set_vq_num(struct mdev_device *mdev, u16 qid, 
->> u32 num)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->vring[qid].size = num;
->> +}
->> +
->> +static void ifcvf_mdev_set_vq_ready(struct mdev_device *mdev,
->> +                u16 qid, bool ready)
->> +{
->> +
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->vring[qid].ready = ready;
->> +}
->> +
->> +static bool ifcvf_mdev_get_vq_ready(struct mdev_device *mdev, u16 qid)
->> +{
->> +
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    return vf->vring[qid].ready;
->> +}
->> +
->> +static void ifcvf_mdev_set_vq_cb(struct mdev_device *mdev, u16 idx,
->> +                 struct virtio_mdev_callback *cb)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->vring[idx].cb = *cb;
->> +}
->> +
->> +static void ifcvf_mdev_kick_vq(struct mdev_device *mdev, u16 idx)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    ifcvf_notify_queue(vf, idx);
->> +}
->> +
->> +static u8 ifcvf_mdev_get_status(struct mdev_device *mdev)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    return vf->status;
->> +}
->> +
->> +static u32 ifcvf_mdev_get_generation(struct mdev_device *mdev)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    return vf->generation;
->> +}
->> +
->> +static int ifcvf_mdev_get_version(struct mdev_device *mdev)
->> +{
->> +    return VIRTIO_MDEV_VERSION;
->> +}
->> +
->> +static u32 ifcvf_mdev_get_device_id(struct mdev_device *mdev)
->> +{
->> +    return IFCVF_DEVICE_ID;
->> +}
->> +
->> +static u32 ifcvf_mdev_get_vendor_id(struct mdev_device *mdev)
->> +{
->> +    return IFCVF_VENDOR_ID;
->> +}
->> +
->> +static u16 ifcvf_mdev_get_vq_align(struct mdev_device *mdev)
->> +{
->> +    return IFCVF_QUEUE_ALIGNMENT;
->> +}
->> +
->> +static int ifcvf_start_datapath(void *private)
->> +{
->> +    int i, ret;
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(private);
->> +
->> +    for (i = 0; i < (IFCVF_MAX_QUEUE_PAIRS * 2); i++) {
->> +        if (!vf->vring[i].ready)
->> +            break;
->
->
-> Looks like error should be returned here?
->
->
->> +
->> +        if (!vf->vring[i].size)
->> +            break;
->> +
->> +        if (!vf->vring[i].desc || !vf->vring[i].avail ||
->> +            !vf->vring[i].used)
->> +            break;
->> +    }
->> +    vf->nr_vring = i;
->> +
->> +    ret = ifcvf_start_hw(vf);
->> +    return ret;
->> +}
->> +
->> +static int ifcvf_stop_datapath(void *private)
->> +{
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(private);
->> +    int i;
->> +
->> +    for (i = 0; i < IFCVF_MAX_QUEUES; i++)
->> +        vf->vring[i].cb.callback = NULL;
->
->
-> Any synchronization is needed for the vq irq handler?
->
->
->> +
->> +    ifcvf_stop_hw(vf);
->> +
->> +    return 0;
->> +}
->> +
->> +static void ifcvf_reset_vring(struct ifcvf_adapter *adapter)
->> +{
->> +    int i;
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
->> +        vf->vring[i].last_used_idx = 0;
->> +        vf->vring[i].last_avail_idx = 0;
->> +        vf->vring[i].desc = 0;
->> +        vf->vring[i].avail = 0;
->> +        vf->vring[i].used = 0;
->> +        vf->vring[i].ready = 0;
->> +        vf->vring->cb.callback = NULL;
->> +        vf->vring->cb.private = NULL;
->> +    }
->> +}
->> +
->> +static void ifcvf_mdev_set_status(struct mdev_device *mdev, u8 status)
->> +{
->> +    struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +
->> +    vf->status = status;
->> +
->> +    if (status == 0) {
->> +        ifcvf_stop_datapath(adapter);
->> +        ifcvf_reset_vring(adapter);
->> +        return;
->> +    }
->> +
->> +    if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
->> +        ifcvf_start_datapath(adapter);
->> +        return;
->> +    }
->> +}
->> +
->> +static u16 ifcvf_mdev_get_queue_max(struct mdev_device *mdev)
->> +{
->> +    return IFCVF_MAX_QUEUES;
->
->
-> The name is confusing, it was used to return the maximum queue size. 
-> In new version of virtio-mdev, the callback was renamed as 
-> get_vq_num_max().
->
->
->> +}
->> +
->> +static struct virtio_mdev_device_ops ifc_mdev_ops = {
->> +    .get_features  = ifcvf_mdev_get_features,
->> +    .set_features  = ifcvf_mdev_set_features,
->> +    .get_status    = ifcvf_mdev_get_status,
->> +    .set_status    = ifcvf_mdev_set_status,
->> +    .get_queue_max = ifcvf_mdev_get_queue_max,
->> +    .get_vq_state   = ifcvf_mdev_get_vq_state,
->> +    .set_vq_state   = ifcvf_mdev_set_vq_state,
->> +    .set_vq_cb      = ifcvf_mdev_set_vq_cb,
->> +    .set_vq_ready   = ifcvf_mdev_set_vq_ready,
->> +    .get_vq_ready    = ifcvf_mdev_get_vq_ready,
->> +    .set_vq_num     = ifcvf_mdev_set_vq_num,
->> +    .set_vq_address = ifcvf_mdev_set_vq_address,
->> +    .kick_vq        = ifcvf_mdev_kick_vq,
->> +    .get_generation    = ifcvf_mdev_get_generation,
->> +    .get_version    = ifcvf_mdev_get_version,
->> +    .get_device_id    = ifcvf_mdev_get_device_id,
->> +    .get_vendor_id    = ifcvf_mdev_get_vendor_id,
->> +    .get_vq_align    = ifcvf_mdev_get_vq_align,
->> +};
->
->
-> set_config/get_config is missing. It looks to me they are not hard, 
-> just implementing the access to dev_cfg. It's key to make kernel 
-> virtio driver to work.
->
-> And in the new version of virito-mdev, features like _F_LOG_ALL should 
-> be advertised through get_mdev_features.
->
->
->> +
->> +static int ifcvf_init_msix(struct ifcvf_adapter *adapter)
->> +{
->> +    int vector, i, ret, irq;
->> +    struct pci_dev *pdev = to_pci_dev(adapter->dev);
->> +    struct ifcvf_hw *vf = &adapter->vf;
->> +
->> +    ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
->> +            IFCVF_MAX_INTR, PCI_IRQ_MSIX);
->> +    if (ret < 0) {
->> +        IFC_ERR(adapter->dev, "Failed to alloc irq vectors.\n");
->> +        return ret;
->> +    }
->> +
->> +    for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
->> +        vector = i + IFCVF_MSI_QUEUE_OFF;
->> +        irq = pci_irq_vector(pdev, vector);
->> +        ret = request_irq(irq, ifcvf_intr_handler, 0,
->> +                pci_name(pdev), &vf->vring[i]);
->> +        if (ret) {
->> +            IFC_ERR(adapter->dev,
->> +                "Failed to request irq for vq %d.\n", i);
->> +            return ret;
->> +        }
->> +    }
->
->
-> Do we need to provide fallback when we can't do per vq MSIX?
->
->
->> +
->> +    return 0;
->> +}
->> +
->> +static void ifcvf_destroy_adapter(struct ifcvf_adapter *adapter)
->> +{
->> +    int i, vector, irq;
->> +    struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
->> +    struct pci_dev *pdev = to_pci_dev(adapter->dev);
->> +
->> +    for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
->> +        vector = i + IFCVF_MSI_QUEUE_OFF;
->> +        irq = pci_irq_vector(pdev, vector);
->> +        free_irq(irq, &vf->vring[i]);
->> +    }
->> +}
->> +
->> +static ssize_t name_show(struct kobject *kobj, struct device *dev, 
->> char *buf)
->> +{
->> +    const char *name = "vhost accelerator (virtio ring compatible)";
->> +
->> +    return sprintf(buf, "%s\n", name);
->> +}
->> +MDEV_TYPE_ATTR_RO(name);
->> +
->> +static ssize_t device_api_show(struct kobject *kobj, struct device 
->> *dev,
->> +                   char *buf)
->> +{
->> +    return sprintf(buf, "%s\n", VIRTIO_MDEV_DEVICE_API_STRING);
->> +}
->> +MDEV_TYPE_ATTR_RO(device_api);
->> +
->> +static ssize_t available_instances_show(struct kobject *kobj,
->> +                    struct device *dev, char *buf)
->> +{
->> +    struct pci_dev *pdev = to_pci_dev(dev);
->> +    struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
->> +
->> +    return sprintf(buf, "%d\n", adapter->mdev_count);
->> +}
->> +
->> +MDEV_TYPE_ATTR_RO(available_instances);
->> +
->> +static ssize_t type_show(struct kobject *kobj,
->> +            struct device *dev, char *buf)
->> +{
->> +    return sprintf(buf, "%s\n", "net");
->> +}
->> +
->> +MDEV_TYPE_ATTR_RO(type);
->> +
->> +
->> +static struct attribute *mdev_types_attrs[] = {
->> +    &mdev_type_attr_name.attr,
->> +    &mdev_type_attr_device_api.attr,
->> +    &mdev_type_attr_available_instances.attr,
->> +    &mdev_type_attr_type.attr,
->> +    NULL,
->> +};
->> +
->> +static struct attribute_group mdev_type_group = {
->> +    .name  = "vdpa_virtio",
->
->
-> To be consistent, it should be "vhost" or "virtio".
->
->
->> +    .attrs = mdev_types_attrs,
->> +};
->> +
->> +static struct attribute_group *mdev_type_groups[] = {
->> +    &mdev_type_group,
->> +    NULL,
->> +};
->> +
->> +const struct attribute_group *mdev_dev_groups[] = {
->> +    NULL,
->> +};
->> +
->> +static int ifcvf_mdev_create(struct kobject *kobj, struct 
->> mdev_device *mdev)
->> +{
->> +    struct device *dev = mdev_parent_dev(mdev);
->> +    struct pci_dev *pdev = to_pci_dev(dev);
->> +    struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
->> +    int ret = 0;
->> +
->> +    mutex_lock(&adapter->mdev_lock);
->> +
->> +    if (adapter->mdev_count < 1) {
->> +        ret = -EINVAL;
->> +        goto out;
->> +    }
->> +
->> +    mdev_set_class_id(mdev, MDEV_ID_VHOST);
->> +    mdev_set_dev_ops(mdev, &ifc_mdev_ops);
->> +
->> +    mdev_set_drvdata(mdev, adapter);
->> +    mdev_set_iommu_device(mdev_dev(mdev), dev);
->> +
->> +    INIT_LIST_HEAD(&adapter->dma_maps);
->> +    adapter->mdev_count--;
->> +
->> +out:
->> +    mutex_unlock(&adapter->mdev_lock);
->> +    return ret;
->> +}
->> +
->> +static int ifcvf_mdev_remove(struct mdev_device *mdev)
->> +{
->> +    struct device *dev = mdev_parent_dev(mdev);
->> +    struct pci_dev *pdev = to_pci_dev(dev);
->> +    struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
->> +
->> +    mutex_lock(&adapter->mdev_lock);
->> +    adapter->mdev_count++;
->> +    mutex_unlock(&adapter->mdev_lock);
->> +
->> +    return 0;
->> +}
->> +
->> +static struct mdev_parent_ops ifcvf_mdev_fops = {
->> +    .owner            = THIS_MODULE,
->> +    .supported_type_groups    = mdev_type_groups,
->> +    .mdev_attr_groups    = mdev_dev_groups,
->> +    .create            = ifcvf_mdev_create,
->> +    .remove            = ifcvf_mdev_remove,
->> +};
->> +
->> +static int ifcvf_probe(struct pci_dev *pdev, const struct 
->> pci_device_id *id)
->> +{
->> +    struct device *dev = &pdev->dev;
->> +    struct ifcvf_adapter *adapter;
->> +    struct ifcvf_hw *vf;
->> +    int ret, i;
->> +
->> +    adapter = kzalloc(sizeof(struct ifcvf_adapter), GFP_KERNEL);
->> +    if (adapter == NULL) {
->> +        ret = -ENOMEM;
->> +        goto fail;
->> +    }
->> +
->> +    mutex_init(&adapter->mdev_lock);
->> +    adapter->mdev_count = 1;
->
->
-> So this is per VF based vDPA implementation, which seems not 
-> convenient for management.  Anyhow we can control the creation in PF?
->
-> Thanks
->
->
->> +    adapter->dev = dev;
->> +
->> +    pci_set_drvdata(pdev, adapter);
->> +
->> +    ret = pci_enable_device(pdev);
->> +    if (ret) {
->> +        IFC_ERR(adapter->dev, "Failed to enable device.\n");
->> +        goto free_adapter;
->> +    }
->> +
->> +    ret = pci_request_regions(pdev, IFCVF_DRIVER_NAME);
->> +    if (ret) {
->> +        IFC_ERR(adapter->dev, "Failed to request MMIO region.\n");
->> +        goto disable_device;
->> +    }
->> +
->> +    pci_set_master(pdev);
->> +
->> +    ret = ifcvf_init_msix(adapter);
->> +    if (ret) {
->> +        IFC_ERR(adapter->dev, "Failed to initialize MSIX.\n");
->> +        goto free_msix;
->> +    }
->> +
->> +    vf = &adapter->vf;
->> +    for (i = 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
->> +        vf->mem_resource[i].phys_addr = pci_resource_start(pdev, i);
->> +        vf->mem_resource[i].len = pci_resource_len(pdev, i);
->> +        if (!vf->mem_resource[i].len) {
->> +            vf->mem_resource[i].addr = NULL;
->> +            continue;
->> +        }
->> +
->> +        vf->mem_resource[i].addr = pci_iomap_range(pdev, i, 0,
->> +                vf->mem_resource[i].len);
->> +        if (!vf->mem_resource[i].addr) {
->> +            IFC_ERR(adapter->dev, "Failed to map IO resource %d\n",
->> +                i);
->> +            return -1;
->> +        }
->> +    }
->> +
->> +    if (ifcvf_init_hw(vf, pdev) < 0)
->> +        return -1;
->> +
->> +    ret = mdev_register_device(dev, &ifcvf_mdev_fops);
->> +    if (ret) {
->> +        IFC_ERR(adapter->dev,  "Failed to register mdev device\n");
->> +        goto destroy_adapter;
->> +    }
->> +
->> +    return 0;
->> +
->> +destroy_adapter:
->> +    ifcvf_destroy_adapter(adapter);
->> +free_msix:
->> +    pci_free_irq_vectors(pdev);
->> +    pci_release_regions(pdev);
->> +disable_device:
->> +    pci_disable_device(pdev);
->> +free_adapter:
->> +    kfree(adapter);
->> +fail:
->> +    return ret;
->> +}
->> +
->> +static void ifcvf_remove(struct pci_dev *pdev)
->> +{
->> +    struct device *dev = &pdev->dev;
->> +    struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
->> +    struct ifcvf_hw *vf;
->> +    int i;
->> +
->> +    mdev_unregister_device(dev);
->> +
->> +    vf = &adapter->vf;
->> +    for (i = 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
->> +        if (vf->mem_resource[i].addr) {
->> +            pci_iounmap(pdev, vf->mem_resource[i].addr);
->> +            vf->mem_resource[i].addr = NULL;
->> +        }
->> +    }
->> +
->> +    ifcvf_destroy_adapter(adapter);
->> +    pci_free_irq_vectors(pdev);
->> +
->> +    pci_release_regions(pdev);
->> +    pci_disable_device(pdev);
->> +
->> +    kfree(adapter);
->> +}
->> +
->> +static struct pci_device_id ifcvf_pci_ids[] = {
->> +    { PCI_DEVICE_SUB(IFCVF_VENDOR_ID,
->> +            IFCVF_DEVICE_ID,
->> +            IFCVF_SUBSYS_VENDOR_ID,
->> +            IFCVF_SUBSYS_DEVICE_ID) },
->> +    { 0 },
->> +};
->> +MODULE_DEVICE_TABLE(pci, ifcvf_pci_ids);
->> +
->> +static struct pci_driver ifcvf_driver = {
->> +    .name     = IFCVF_DRIVER_NAME,
->> +    .id_table = ifcvf_pci_ids,
->> +    .probe    = ifcvf_probe,
->> +    .remove   = ifcvf_remove,
->> +};
->> +
->> +static int __init ifcvf_init_module(void)
->> +{
->> +    int ret;
->> +
->> +    ret = pci_register_driver(&ifcvf_driver);
->> +    return ret;
->> +}
->> +
->> +static void __exit ifcvf_exit_module(void)
->> +{
->> +    pci_unregister_driver(&ifcvf_driver);
->> +}
->> +
->> +module_init(ifcvf_init_module);
->> +module_exit(ifcvf_exit_module);
->> +
->> +MODULE_LICENSE("GPL v2");
->> +MODULE_VERSION(VERSION_STRING);
->> +MODULE_AUTHOR(DRIVER_AUTHOR);
+> The code change looks good to me; I'm just wondering if we should
+> introduce mdev_set_class() at all (see above).
