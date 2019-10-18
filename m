@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BC3DDCC0C
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 18:57:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CC23DCC4D
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 19:09:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409377AbfJRQ5M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Oct 2019 12:57:12 -0400
-Received: from mga11.intel.com ([192.55.52.93]:42333 "EHLO mga11.intel.com"
+        id S2634431AbfJRRJH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Oct 2019 13:09:07 -0400
+Received: from mga17.intel.com ([192.55.52.151]:64001 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405642AbfJRQ5M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 12:57:12 -0400
+        id S2393426AbfJRRJH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Oct 2019 13:09:07 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Oct 2019 09:57:11 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Oct 2019 10:09:06 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,312,1566889200"; 
-   d="scan'208";a="221800591"
+   d="scan'208";a="348140716"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga004.fm.intel.com with ESMTP; 18 Oct 2019 09:57:11 -0700
-Date:   Fri, 18 Oct 2019 09:57:11 -0700
+  by orsmga004.jf.intel.com with ESMTP; 18 Oct 2019 10:09:05 -0700
+Date:   Fri, 18 Oct 2019 10:09:05 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Xiaoyao Li <xiaoyao.li@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -30,148 +30,173 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] KVM: VMX: Move vmcs related resetting out of
- vmx_vcpu_reset()
-Message-ID: <20191018165711.GD26319@linux.intel.com>
+Subject: Re: [PATCH v2 2/3] KVM: VMX: Rename {vmx,nested_vmx}_vcpu_setup()
+ and minor cleanup
+Message-ID: <20191018170905.GE26319@linux.intel.com>
 References: <20191018093723.102471-1-xiaoyao.li@intel.com>
- <20191018093723.102471-2-xiaoyao.li@intel.com>
+ <20191018093723.102471-3-xiaoyao.li@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191018093723.102471-2-xiaoyao.li@intel.com>
+In-Reply-To: <20191018093723.102471-3-xiaoyao.li@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 18, 2019 at 05:37:21PM +0800, Xiaoyao Li wrote:
-> Move vmcs related codes into a new function vmx_vmcs_reset() from
-> vmx_vcpu_reset(). So that it's more clearer which data is related with
-> vmcs and can be held in vmcs.
+On Fri, Oct 18, 2019 at 05:37:22PM +0800, Xiaoyao Li wrote:
+> Rename {vmx,nested_vmx}_vcpu_setup() to {vmx,nested_vmx}_vmcs_setup,
+> to match what they really do.
 > 
-> Suggested-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Aslo remove the vmcs unrelated codes to vmx_vcpu_create().
+
+Do this in a separate patch, just in case there is a dependencies we're
+missing.
+
+> The initialization of vmx->hv_deadline_tsc can be removed here, because
+> it will be called in vmx_vcpu_reset() as the flow:
+> 
+> kvm_arch_vcpu_setup()
+>   -> kvm_vcpu_reset()
+>        -> vmx_vcpu_reset()
+
+Definitely needs to be in a separate patch.
+
+> 
 > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 65 ++++++++++++++++++++++++------------------
->  1 file changed, 37 insertions(+), 28 deletions(-)
+> Changes in v2:
+>   - move out the vmcs unrelated codes
+> ---
+>  arch/x86/kvm/vmx/nested.c |  2 +-
+>  arch/x86/kvm/vmx/nested.h |  2 +-
+>  arch/x86/kvm/vmx/vmx.c    | 45 +++++++++++++++++----------------------
+>  3 files changed, 22 insertions(+), 27 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 5e231da00310..7935422d311f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -5768,7 +5768,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>  	return ret;
+>  }
+>  
+> -void nested_vmx_vcpu_setup(void)
+> +void nested_vmx_vmcs_setup(void)
+
+"vmcs_setup" sounds like we're allocating and loading a VMCS.  Maybe
+{nested_,}vmx_set_initial_vmcs_state() a la vmx_set_constant_host_state()?
+
+>  {
+>  	if (enable_shadow_vmcs) {
+>  		vmcs_write64(VMREAD_BITMAP, __pa(vmx_vmread_bitmap));
+> diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
+> index 187d39bf0bf1..2be1ba7482c9 100644
+> --- a/arch/x86/kvm/vmx/nested.h
+> +++ b/arch/x86/kvm/vmx/nested.h
+> @@ -11,7 +11,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
+>  				bool apicv);
+>  void nested_vmx_hardware_unsetup(void);
+>  __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *));
+> -void nested_vmx_vcpu_setup(void);
+> +void nested_vmx_vmcs_setup(void);
+>  void nested_vmx_free_vcpu(struct kvm_vcpu *vcpu);
+>  int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry);
+>  bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e660e28e9ae0..ef567df344bf 100644
+> index ef567df344bf..b083316a598d 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4271,33 +4271,11 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
->  	}
->  }
+> @@ -4161,15 +4161,10 @@ static void ept_set_mmio_spte_mask(void)
 >  
-> -static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +static void vmx_vmcs_reset(struct kvm_vcpu *vcpu, bool init_event)
-
-I'd strongly prefer to keep the existing code.  For me, "vmcs_reset" means
-zeroing out the VMCS, i.e. reset the VMCS to a virgin state.  "vcpu_reset"
-means exactly that, stuff vCPU state to emulate RESET/INIT.
-
-And the split is arbitrary and funky, e.g. EFER is integrated into the
-VMCS on all recent CPUs, but here it's handled in vcpu_reset.  
-
+>  #define VMX_XSS_EXIT_BITMAP 0
+>  
+> -/*
+> - * Sets up the vmcs for emulated real mode.
+> - */
+> -static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
+> +static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
 >  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	struct msr_data apic_base_msr;
->  	u64 cr0;
+> -	int i;
+> -
+>  	if (nested)
+> -		nested_vmx_vcpu_setup();
+> +		nested_vmx_vmcs_setup();
 >  
-> -	vmx->rmode.vm86_active = 0;
-> -	vmx->spec_ctrl = 0;
-> -
-> -	vmx->msr_ia32_umwait_control = 0;
-> -
-> -	vcpu->arch.microcode_version = 0x100000000ULL;
-> -	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
+>  	if (cpu_has_vmx_msr_bitmap())
+>  		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
+> @@ -4178,7 +4173,6 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
+>  
+>  	/* Control */
+>  	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
 > -	vmx->hv_deadline_tsc = -1;
-> -	kvm_set_cr8(vcpu, 0);
+>  
+>  	exec_controls_set(vmx, vmx_exec_control(vmx));
+>  
+> @@ -4227,21 +4221,6 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
+>  	if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT)
+>  		vmcs_write64(GUEST_IA32_PAT, vmx->vcpu.arch.pat);
+>  
+> -	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i) {
+> -		u32 index = vmx_msr_index[i];
+> -		u32 data_low, data_high;
+> -		int j = vmx->nmsrs;
 > -
-> -	if (!init_event) {
-> -		apic_base_msr.data = APIC_DEFAULT_PHYS_BASE |
-> -				     MSR_IA32_APICBASE_ENABLE;
-> -		if (kvm_vcpu_is_reset_bsp(vcpu))
-> -			apic_base_msr.data |= MSR_IA32_APICBASE_BSP;
-> -		apic_base_msr.host_initiated = true;
-> -		kvm_set_apic_base(vcpu, &apic_base_msr);
+> -		if (rdmsr_safe(index, &data_low, &data_high) < 0)
+> -			continue;
+> -		if (wrmsr_safe(index, data_low, data_high) < 0)
+> -			continue;
+> -		vmx->guest_msrs[j].index = i;
+> -		vmx->guest_msrs[j].data = 0;
+> -		vmx->guest_msrs[j].mask = -1ull;
+> -		++vmx->nmsrs;
 > -	}
 > -
-> -	vmx_segment_cache_clear(vmx);
-> -
->  	seg_setup(VCPU_SREG_CS);
->  	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
->  	vmcs_writel(GUEST_CS_BASE, 0xffff0000ul);
-> @@ -4340,8 +4318,6 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	if (kvm_mpx_supported())
->  		vmcs_write64(GUEST_BNDCFGS, 0);
+>  	vm_exit_controls_set(vmx, vmx_vmexit_ctrl());
 >  
-> -	setup_msrs(vmx);
-> -
->  	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, 0);  /* 22.2.1 */
+>  	/* 22.2.1, 20.8.1 */
+> @@ -6710,7 +6689,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>  	int err;
+>  	struct vcpu_vmx *vmx;
+>  	unsigned long *msr_bitmap;
+> -	int cpu;
+> +	int i, cpu;
 >  
->  	if (cpu_has_vmx_tpr_shadow() && !init_event) {
-> @@ -4357,19 +4333,52 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	if (vmx->vpid != 0)
->  		vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->vpid);
->  
-> +	vpid_sync_context(vmx->vpid);
+>  	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
+>  		"struct kvm_vcpu must be at offset 0 for arch usercopy region");
+> @@ -6786,9 +6765,25 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>  	cpu = get_cpu();
+>  	vmx_vcpu_load(&vmx->vcpu, cpu);
+>  	vmx->vcpu.cpu = cpu;
+> -	vmx_vcpu_setup(vmx);
+> +	vmx_vmcs_setup(vmx);
+>  	vmx_vcpu_put(&vmx->vcpu);
+>  	put_cpu();
 > +
->  	cr0 = X86_CR0_NW | X86_CR0_CD | X86_CR0_ET;
-> -	vmx->vcpu.arch.cr0 = cr0;
-> +	vcpu->arch.cr0 = cr0;
->  	vmx_set_cr0(vcpu, cr0); /* enter rmode */
->  	vmx_set_cr4(vcpu, 0);
-> -	vmx_set_efer(vcpu, 0);
->  
->  	update_exception_bitmap(vcpu);
->  
-> -	vpid_sync_context(vmx->vpid);
->  	if (init_event)
->  		vmx_clear_hlt(vcpu);
->  }
->  
-> +static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	struct msr_data apic_base_msr;
+> +	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i) {
+> +		u32 index = vmx_msr_index[i];
+> +		u32 data_low, data_high;
+> +		int j = vmx->nmsrs;
 > +
-> +	vmx->rmode.vm86_active = 0;
-> +	vmx->spec_ctrl = 0;
-> +
-> +	vmx->msr_ia32_umwait_control = 0;
-> +
-> +	vcpu->arch.microcode_version = 0x100000000ULL;
-> +	kvm_rdx_write(vcpu, get_rdx_init_val());
-> +	vmx->hv_deadline_tsc = -1;
-> +	kvm_set_cr8(vcpu, 0);
-> +
-> +	if (!init_event) {
-> +		apic_base_msr.data = APIC_DEFAULT_PHYS_BASE |
-> +				     MSR_IA32_APICBASE_ENABLE;
-> +		if (kvm_vcpu_is_reset_bsp(vcpu))
-> +			apic_base_msr.data |= MSR_IA32_APICBASE_BSP;
-> +		apic_base_msr.host_initiated = true;
-> +		kvm_set_apic_base(vcpu, &apic_base_msr);
+> +		if (rdmsr_safe(index, &data_low, &data_high) < 0)
+> +			continue;
+> +		if (wrmsr_safe(index, data_low, data_high) < 0)
+> +			continue;
+> +		vmx->guest_msrs[j].index = i;
+> +		vmx->guest_msrs[j].data = 0;
+> +		vmx->guest_msrs[j].mask = -1ull;
+> +		++vmx->nmsrs;
 > +	}
-> +
-> +	vmx_segment_cache_clear(vmx);
-> +
-> +	setup_msrs(vmx);
-> +
-> +	vmx_set_efer(vcpu, 0);
 
-Setting EFER before CR0/CR4 is a functional change, and likely wrong, e.g.
-vmx_set_cr0() queries EFER_LME to trigger exit_lmode() if INIT/RESET is
-received while the vCPU is in long mode.
+I'd put this immediately after guest_msrs is allocated.  Yeah, we'll waste
+a few cycles if allocating vmcs01 fails, but that should be a very rare
+event.
 
-> +	vmx_vmcs_reset(vcpu, init_event);
-> +}
 > +
->  static void enable_irq_window(struct kvm_vcpu *vcpu)
->  {
->  	exec_controls_setbit(to_vmx(vcpu), CPU_BASED_VIRTUAL_INTR_PENDING);
+>  	if (cpu_need_virtualize_apic_accesses(&vmx->vcpu)) {
+>  		err = alloc_apic_access_page(kvm);
+>  		if (err)
 > -- 
 > 2.19.1
 > 
