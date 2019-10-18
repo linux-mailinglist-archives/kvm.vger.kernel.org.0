@@ -2,205 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6687DC1D8
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 11:52:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA9C3DC26F
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 12:15:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2633195AbfJRJwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Oct 2019 05:52:32 -0400
-Received: from mga17.intel.com ([192.55.52.151]:35375 "EHLO mga17.intel.com"
+        id S2633332AbfJRKN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Oct 2019 06:13:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45452 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2633188AbfJRJwb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 05:52:31 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Oct 2019 02:52:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,311,1566889200"; 
-   d="scan'208";a="221689702"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.43.57])
-  by fmsmga004.fm.intel.com with ESMTP; 18 Oct 2019 02:52:29 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] KVM: VMX: Some minor refactor of MSR bitmap
-Date:   Fri, 18 Oct 2019 17:37:23 +0800
-Message-Id: <20191018093723.102471-4-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20191018093723.102471-1-xiaoyao.li@intel.com>
-References: <20191018093723.102471-1-xiaoyao.li@intel.com>
+        id S2633317AbfJRKN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Oct 2019 06:13:28 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E9AEC50F63
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2019 10:13:27 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id 7so2419016wrl.2
+        for <kvm@vger.kernel.org>; Fri, 18 Oct 2019 03:13:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TtpeVOU0CB3Z5Pi14TfQb3eoNoka1C+7OsdVoDAEyJQ=;
+        b=LJPdukgL7joLreu3JdbMYVgNnh26jqgOADsSGCiEdoIOuw5c2zBWLuSFln/J3OUb1j
+         X4+QdpzZW0ixJid73JxHgYogxVUJugUQ7GcAI1KyQT8R0i+3j4iQqEaoLwvoQxd8fvJP
+         5/SRNSpfCQ8q88gIv7WhLhaawzx8739Pa58GFd3VZLs7YoxaW2EMCujZFvLVeGfUW2lD
+         B4JddTPRXqYwQocB+pSfVELlZ7ZjRsaM/WMYW+jqgPiW+9++Bl89u3Yas5cfnkn2JUA1
+         KE42OxBrjHmJevxyff2rMR8LxD+8k6PGkDpf+4RhrofQ/AZ33CeBI7MATYqZ2WYl7sck
+         Mnow==
+X-Gm-Message-State: APjAAAULtDeogazhfgH4IbKIyF38q4y5NaRWXpMhC7MkklvMRCZ0UOM9
+        7qeKAn/OT6fXz9TPSfAcPx14+4zRQOQC7C8NhQyDXusy7vM7HkxZtLsjcW7cQIr9cGPot76CDjD
+        HQUf6LaJjEbMv
+X-Received: by 2002:adf:f342:: with SMTP id e2mr7526489wrp.61.1571393606546;
+        Fri, 18 Oct 2019 03:13:26 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz+3NzNQn9FvsIQOtta1OOWdkuNxGj4MR/rBLllahR05nKUHca1ThqhXDg1PMLWRrtb4OsFgQ==
+X-Received: by 2002:adf:f342:: with SMTP id e2mr7526470wrp.61.1571393606316;
+        Fri, 18 Oct 2019 03:13:26 -0700 (PDT)
+Received: from [192.168.1.36] (14.red-88-21-201.staticip.rima-tde.net. [88.21.201.14])
+        by smtp.gmail.com with ESMTPSA id y3sm9244642wro.36.2019.10.18.03.13.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Oct 2019 03:13:25 -0700 (PDT)
+Subject: Re: [PATCH 26/32] hw/pci-host/piix: Move RCR_IOPORT register
+ definition
+To:     Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Aleksandar Markovic <amarkovic@wavecomp.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Richard Henderson <rth@twiddle.net>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-27-philmd@redhat.com>
+ <CAL1e-=jVr+idQKNdOGSrODeq7XU-0JcCFTwapqk9-JvAKxk6Pw@mail.gmail.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e149d24f-8d77-4126-8fc8-012b114dfe37@redhat.com>
+Date:   Fri, 18 Oct 2019 12:13:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <CAL1e-=jVr+idQKNdOGSrODeq7XU-0JcCFTwapqk9-JvAKxk6Pw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the MSR bitmap capability check from vmx_disable_intercept_for_msr()
-and vmx_enable_intercept_for_msr(), so that we can do the check far
-early before we really want to touch the bitmap.
+On 10/18/19 11:19 AM, Aleksandar Markovic wrote:
+> On Tuesday, October 15, 2019, Philippe Mathieu-Daudé <philmd@redhat.com 
+> <mailto:philmd@redhat.com>> wrote:
+> 
+>     From: Philippe Mathieu-Daudé <f4bug@amsat.org <mailto:f4bug@amsat.org>>
+> 
+>     The RCR_IOPORT register belongs to the PIIX chipset.
+>     Move the definition to "piix.h".
+> 
+>     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>       hw/pci-host/piix.c            | 1 +
+>       include/hw/i386/pc.h          | 6 ------
+>       include/hw/southbridge/piix.h | 6 ++++++
+>       3 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> 
+> Does it make sense to add prefix PIIX_ or a similar one to the register 
+> name?
 
-Also, we can move the common MSR not-intercept setup to where msr bitmap
-is actually used.
+Good idea, it will make the comment in hw/i386/acpi-build.c:213 cleaner:
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
----
-Changes in v2:
-  - Remove the check of cpu_has_vmx_msr_bitmap() from
-    vmx_{disable,enable}_intercept_for_msr (Krish)
----
- arch/x86/kvm/vmx/vmx.c | 65 +++++++++++++++++++++---------------------
- 1 file changed, 33 insertions(+), 32 deletions(-)
+     /* The above need not be conditional on machine type because the 
+reset port
+      * happens to be the same on PIIX (pc) and ICH9 (q35). */
+     QEMU_BUILD_BUG_ON(ICH9_RST_CNT_IOPORT != RCR_IOPORT);
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b083316a598d..017689d0144e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -343,8 +343,8 @@ module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
- 
- static bool guest_state_valid(struct kvm_vcpu *vcpu);
- static u32 vmx_segment_access_rights(struct kvm_segment *var);
--static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bitmap,
--							  u32 msr, int type);
-+static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
-+		u32 msr, int type, bool value);
- 
- void vmx_vmexit(void);
- 
-@@ -2000,9 +2000,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		 * in the merging. We update the vmcs01 here for L1 as well
- 		 * since it will end up touching the MSR anyway now.
- 		 */
--		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap,
--					      MSR_IA32_SPEC_CTRL,
--					      MSR_TYPE_RW);
-+		vmx_set_intercept_for_msr(vmx->vmcs01.msr_bitmap,
-+					  MSR_IA32_SPEC_CTRL,
-+					  MSR_TYPE_RW, false);
- 		break;
- 	case MSR_IA32_PRED_CMD:
- 		if (!msr_info->host_initiated &&
-@@ -2028,8 +2028,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		 * vmcs02.msr_bitmap here since it gets completely overwritten
- 		 * in the merging.
- 		 */
--		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap, MSR_IA32_PRED_CMD,
--					      MSR_TYPE_W);
-+		vmx_set_intercept_for_msr(vmx->vmcs01.msr_bitmap,
-+					  MSR_IA32_PRED_CMD,
-+					  MSR_TYPE_W, false);
- 		break;
- 	case MSR_IA32_CR_PAT:
- 		if (!kvm_pat_valid(data))
-@@ -3599,9 +3600,6 @@ static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bit
- {
- 	int f = sizeof(unsigned long);
- 
--	if (!cpu_has_vmx_msr_bitmap())
--		return;
--
- 	if (static_branch_unlikely(&enable_evmcs))
- 		evmcs_touch_msr_bitmap();
- 
-@@ -3637,9 +3635,6 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
- {
- 	int f = sizeof(unsigned long);
- 
--	if (!cpu_has_vmx_msr_bitmap())
--		return;
--
- 	if (static_branch_unlikely(&enable_evmcs))
- 		evmcs_touch_msr_bitmap();
- 
-@@ -3673,6 +3668,9 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
- static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
- 			     			      u32 msr, int type, bool value)
- {
-+	if (!cpu_has_vmx_msr_bitmap())
-+		return;
-+
- 	if (value)
- 		vmx_enable_intercept_for_msr(msr_bitmap, msr, type);
- 	else
-@@ -4163,11 +4161,30 @@ static void ept_set_mmio_spte_mask(void)
- 
- static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
- {
-+	unsigned long *msr_bitmap;
-+
- 	if (nested)
- 		nested_vmx_vmcs_setup();
- 
--	if (cpu_has_vmx_msr_bitmap())
-+	if (cpu_has_vmx_msr_bitmap()) {
-+		msr_bitmap = vmx->vmcs01.msr_bitmap;
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
-+		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
-+		if (kvm_cstate_in_guest(vmx->vcpu.kvm)) {
-+			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
-+			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
-+			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
-+			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
-+		}
-+
- 		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
-+	}
-+	vmx->msr_bitmap_mode = 0;
- 
- 	vmcs_write64(VMCS_LINK_POINTER, -1ull); /* 22.3.1.5 */
- 
-@@ -6074,7 +6091,8 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
- 	}
- 	secondary_exec_controls_set(vmx, sec_exec_control);
- 
--	vmx_update_msr_bitmap(vcpu);
-+	if (cpu_has_vmx_msr_bitmap())
-+		vmx_update_msr_bitmap(vcpu);
- }
- 
- static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
-@@ -6688,7 +6706,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- {
- 	int err;
- 	struct vcpu_vmx *vmx;
--	unsigned long *msr_bitmap;
- 	int i, cpu;
- 
- 	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
-@@ -6745,22 +6762,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	if (err < 0)
- 		goto free_msrs;
- 
--	msr_bitmap = vmx->vmcs01.msr_bitmap;
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
--	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
--	if (kvm_cstate_in_guest(kvm)) {
--		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
--		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
--		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
--		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
--	}
--	vmx->msr_bitmap_mode = 0;
--
- 	vmx->loaded_vmcs = &vmx->vmcs01;
- 	cpu = get_cpu();
- 	vmx_vcpu_load(&vmx->vcpu, cpu);
--- 
-2.19.1
+> 
+> In any case:
+> 
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com 
+> <mailto:amarkovic@wavecomp.com>>
 
+Thanks!
+
+> 
+>     diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+>     index 3292703de7..3770575c1a 100644
+>     --- a/hw/pci-host/piix.c
+>     +++ b/hw/pci-host/piix.c
+>     @@ -27,6 +27,7 @@
+>       #include "hw/irq.h"
+>       #include "hw/pci/pci.h"
+>       #include "hw/pci/pci_host.h"
+>     +#include "hw/southbridge/piix.h"
+>       #include "hw/qdev-properties.h"
+>       #include "hw/isa/isa.h"
+>       #include "hw/sysbus.h"
+>     diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>     index 183326d9fe..1c20b96571 100644
+>     --- a/include/hw/i386/pc.h
+>     +++ b/include/hw/i386/pc.h
+>     @@ -257,12 +257,6 @@ typedef struct PCII440FXState PCII440FXState;
+> 
+>       #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE
+>     "igd-passthrough-i440FX"
+> 
+>     -/*
+>     - * Reset Control Register: PCI-accessible ISA-Compatible Register
+>     at address
+>     - * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0,
+>     8086:7000).
+>     - */
+>     -#define RCR_IOPORT 0xcf9
+>     -
+>       PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+>                           PCII440FXState **pi440fx_state, int *piix_devfn,
+>                           ISABus **isa_bus, qemu_irq *pic,
+>     diff --git a/include/hw/southbridge/piix.h
+>     b/include/hw/southbridge/piix.h
+>     index add352456b..79ebe0089b 100644
+>     --- a/include/hw/southbridge/piix.h
+>     +++ b/include/hw/southbridge/piix.h
+>     @@ -18,6 +18,12 @@ I2CBus *piix4_pm_init(PCIBus *bus, int devfn,
+>     uint32_t smb_io_base,
+>                             qemu_irq sci_irq, qemu_irq smi_irq,
+>                             int smm_enabled, DeviceState **piix4_pm);
+> 
+>     +/*
+>     + * Reset Control Register: PCI-accessible ISA-Compatible Register
+>     at address
+>     + * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0,
+>     8086:7000).
+>     + */
+>     +#define RCR_IOPORT 0xcf9
+>     +
+>       extern PCIDevice *piix4_dev;
+> 
+>       DeviceState *piix4_create(PCIBus *pci_bus, ISABus **isa_bus,
+>     -- 
+>     2.21.0
+> 
+> 
