@@ -2,100 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61E5FDBC33
-	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 06:59:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 244D5DBDB7
+	for <lists+kvm@lfdr.de>; Fri, 18 Oct 2019 08:36:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407377AbfJRE6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Oct 2019 00:58:02 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47341 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730688AbfJRE6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 00:58:02 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Oct 2019 19:36:47 -0700
-X-IronPort-AV: E=Sophos;i="5.67,310,1566889200"; 
-   d="scan'208";a="371328089"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 17 Oct 2019 19:36:43 -0700
-Subject: Re: [RFD] x86/split_lock: Request to Intel
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Fenghua Yu <fenghua.yu@intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
- <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
- <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de>
- <20190626203637.GC245468@romley-ivt3.sc.intel.com>
- <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
- <20190925180931.GG31852@linux.intel.com>
- <3ec328dc-2763-9da5-28d6-e28970262c58@redhat.com>
- <alpine.DEB.2.21.1910161142560.2046@nanos.tec.linutronix.de>
- <57f40083-9063-5d41-f06d-fa1ae4c78ec6@redhat.com>
- <c3ff2fb3-4380-fb07-1fa3-15896a09e748@intel.com>
- <d30652bb-89fa-671a-5691-e2c76af231d0@redhat.com>
- <8808c9ac-0906-5eec-a31f-27cbec778f9c@intel.com>
- <alpine.DEB.2.21.1910161519260.2046@nanos.tec.linutronix.de>
- <ba2c0aab-1d7c-5cfd-0054-ac2c266c1df3@redhat.com>
- <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <5da90713-9a0d-6466-64f7-db435ba07dbe@intel.com>
-Date:   Fri, 18 Oct 2019 10:36:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2504439AbfJRGgK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 18 Oct 2019 02:36:10 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4720 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2392014AbfJRGgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 18 Oct 2019 02:36:09 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 670F2DC43CDADA423205;
+        Fri, 18 Oct 2019 10:50:11 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Fri, 18 Oct 2019
+ 10:50:02 +0800
+From:   Miaohe Lin <linmiaohe@huawei.com>
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>
+CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>,
+        <mingfangsen@huawei.com>
+Subject: [PATCH v2] KVM: SVM: Fix potential wrong physical id in avic_handle_ldr_update
+Date:   Fri, 18 Oct 2019 10:50:31 +0800
+Message-ID: <1571367031-6844-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1910171322530.1824@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/17/2019 8:29 PM, Thomas Gleixner wrote:
-> The more I look at this trainwreck, the less interested I am in merging any
-> of this at all.
-> 
-> The fact that it took Intel more than a year to figure out that the MSR is
-> per core and not per thread is yet another proof that this industry just
-> works by pure chance.
-> 
+Guest physical APIC ID may not equal to vcpu->vcpu_id in some case.
+We may set the wrong physical id in avic_handle_ldr_update as we
+always use vcpu->vcpu_id. Get physical APIC ID from vAPIC page
+instead.
+Export and use kvm_xapic_id here and in avic_handle_apic_id_update
+as suggested by Vitaly.
 
-Whether it's per-core or per-thread doesn't affect much how we implement 
-for host/native.
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+ arch/x86/kvm/lapic.c | 5 -----
+ arch/x86/kvm/lapic.h | 5 +++++
+ arch/x86/kvm/svm.c   | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-And also, no matter it's per-core or per-thread, we always can do 
-something in VIRT.
-
-Maybe what matters is below.
-
-> Seriously, this makes only sense when it's by default enabled and not
-> rendered useless by VIRT. Otherwise we never get any reports and none of
-> the issues are going to be fixed.
->
-
-For VIRT, it doesn't want old guest to be killed due to #AC. But for 
-native, it doesn't want VIRT to disable the #AC detection
-
-I think it's just about the default behavior that whether to disable the 
-host's #AC detection or kill the guest (SIGBUS or something else) once 
-there is an split-lock #AC in guest.
-
-So we can provide CONFIG option to set the default behavior and module 
-parameter to let KVM set/change the default behavior.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 87b0fcc23ef8..b29d00b661ff 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -111,11 +111,6 @@ static inline int apic_enabled(struct kvm_lapic *apic)
+ 	(LVT_MASK | APIC_MODE_MASK | APIC_INPUT_POLARITY | \
+ 	 APIC_LVT_REMOTE_IRR | APIC_LVT_LEVEL_TRIGGER)
+ 
+-static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+-{
+-	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+-}
+-
+ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ {
+ 	return apic->vcpu->vcpu_id;
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 2aad7e226fc0..1f5014852e20 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -242,4 +242,9 @@ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+ 	return apic_base & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
+ }
+ 
++static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
++{
++	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
++}
++
+ #endif
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index f8ecb6df5106..ca200b50cde4 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -4591,6 +4591,7 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
+ 	int ret = 0;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
++	u32 id = kvm_xapic_id(vcpu->arch.apic);
+ 
+ 	if (ldr == svm->ldr_reg)
+ 		return 0;
+@@ -4598,7 +4599,7 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
+ 	avic_invalidate_logical_id_entry(vcpu);
+ 
+ 	if (ldr)
+-		ret = avic_ldr_write(vcpu, vcpu->vcpu_id, ldr);
++		ret = avic_ldr_write(vcpu, id, ldr);
+ 
+ 	if (!ret)
+ 		svm->ldr_reg = ldr;
+@@ -4610,8 +4611,7 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *old, *new;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	u32 apic_id_reg = kvm_lapic_get_reg(vcpu->arch.apic, APIC_ID);
+-	u32 id = (apic_id_reg >> 24) & 0xff;
++	u32 id = kvm_xapic_id(vcpu->arch.apic);
+ 
+ 	if (vcpu->vcpu_id == id)
+ 		return 0;
+-- 
+2.19.1
 
