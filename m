@@ -2,241 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E12B7DD5F4
-	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2019 03:28:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C5BADD78E
+	for <lists+kvm@lfdr.de>; Sat, 19 Oct 2019 10:59:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726195AbfJSB2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 18 Oct 2019 21:28:45 -0400
-Received: from mga07.intel.com ([134.134.136.100]:54933 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726152AbfJSB2p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 18 Oct 2019 21:28:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Oct 2019 18:28:44 -0700
-X-IronPort-AV: E=Sophos;i="5.67,313,1566889200"; 
-   d="scan'208";a="190530675"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.171.209]) ([10.249.171.209])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 18 Oct 2019 18:28:42 -0700
-Subject: Re: [PATCH v2 3/3] KVM: VMX: Some minor refactor of MSR bitmap
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191018093723.102471-1-xiaoyao.li@intel.com>
- <20191018093723.102471-4-xiaoyao.li@intel.com>
- <20191018172741.GF26319@linux.intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <f6327d92-7b25-a621-2f5c-aacb6f30793a@intel.com>
-Date:   Sat, 19 Oct 2019 09:28:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728122AbfJSI7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 19 Oct 2019 04:59:05 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:45159 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725965AbfJSI7F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 19 Oct 2019 04:59:05 -0400
+Received: by mail-pg1-f195.google.com with SMTP id r1so4670459pgj.12
+        for <kvm@vger.kernel.org>; Sat, 19 Oct 2019 01:59:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=9P1Hc5zx6KpRJ1G0QDp0Is0b1Emh/h9sENDo50qYI+0=;
+        b=SLFAWYRRuzx0BVXm1R600VMfhtaXBl6PtH7su/FogBYhDtCIjomJmM39OqKr6+Wbwe
+         gTusfVa5GpPt+Qj7S24AfwOjwWhMvz/nBeioFA4uAerjvZsdmP2o58lmAFSE/Xke42Vx
+         aQZ6ELf9LeXI0LTYqr0+TuJkrmbOwZPxD1l5WhUn5ejUJepWWv29MATcr/I2WV4OzCU5
+         DZv1G5Ns7MYGsI0isGkelC4SlvkeCNAiOA2khWCUQ620NEKAAxSgRmcm+YsSaGUi1mJf
+         0cjlEryBk6hVzBw6ZjdmeTTsf5Xap7lI3a/D2f3vwvUdheBqOwEOApbEIb80dsJSjiZA
+         c9Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=9P1Hc5zx6KpRJ1G0QDp0Is0b1Emh/h9sENDo50qYI+0=;
+        b=kTs4MBF4rk+wzYtR1/7gzgPs7fjOmb4G1xCF4S/RKobn1MDM73fSnzRo1qH1gfUcOv
+         ksKPKjfRSs0WJeiE2qCYwYSnBz5CBLOEqzF/c+gZosvpXNCeSjjRRTUGquBLihSL+Wmk
+         Gjp9x7bqOFdL36plJrlhpiCHoOKAZoyV9HrqzaOHeg8rWmbtBquX5j+It7QRdkmJJcjW
+         0XtS7gl8G2p8kv/tFt+jUJCOlr98riXyYQi2COyZALcsn6X0p968XEqrOo/l5XHgeYis
+         quk/yCTfhx0Iz66sPozPw2gUf9c+gGB0rcJZXAk6cQ8opF5+Rzidzbz7K0uYSz2suXKv
+         /vbg==
+X-Gm-Message-State: APjAAAWcMALIlBLzlKOPEjfanwpUpIDNXRGuYaLGtjmzoAP0FzyJx7sq
+        TA07laOQdXqQVN59j/FJD44x3g==
+X-Google-Smtp-Source: APXvYqx01bELy8Vsdb65I8HmRPcBNWlKJoUuWytBKnuVV3b6pEgQDNnpTSe5QSXLIHzXuDLGD24tpg==
+X-Received: by 2002:aa7:9156:: with SMTP id 22mr11523471pfi.246.1571475543864;
+        Sat, 19 Oct 2019 01:59:03 -0700 (PDT)
+Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
+        by smtp.gmail.com with ESMTPSA id y20sm4045137pge.48.2019.10.19.01.59.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Oct 2019 01:59:02 -0700 (PDT)
+Date:   Sat, 19 Oct 2019 01:59:02 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+cc:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "info@metux.net" <info@metux.net>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
+ check failure.
+In-Reply-To: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+Message-ID: <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <20191018172741.GF26319@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/19/2019 1:27 AM, Sean Christopherson wrote:
-> On Fri, Oct 18, 2019 at 05:37:23PM +0800, Xiaoyao Li wrote:
->> Move the MSR bitmap capability check from vmx_disable_intercept_for_msr()
->> and vmx_enable_intercept_for_msr(), so that we can do the check far
->> early before we really want to touch the bitmap.
->>
->> Also, we can move the common MSR not-intercept setup to where msr bitmap
->> is actually used.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> Changes in v2:
->>    - Remove the check of cpu_has_vmx_msr_bitmap() from
->>      vmx_{disable,enable}_intercept_for_msr (Krish)
->> ---
->>   arch/x86/kvm/vmx/vmx.c | 65 +++++++++++++++++++++---------------------
->>   1 file changed, 33 insertions(+), 32 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index b083316a598d..017689d0144e 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -343,8 +343,8 @@ module_param_cb(vmentry_l1d_flush, &vmentry_l1d_flush_ops, NULL, 0644);
->>   
->>   static bool guest_state_valid(struct kvm_vcpu *vcpu);
->>   static u32 vmx_segment_access_rights(struct kvm_segment *var);
->> -static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bitmap,
->> -							  u32 msr, int type);
->> +static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
->> +		u32 msr, int type, bool value);
->>   
->>   void vmx_vmexit(void);
->>   
->> @@ -2000,9 +2000,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   		 * in the merging. We update the vmcs01 here for L1 as well
->>   		 * since it will end up touching the MSR anyway now.
->>   		 */
->> -		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap,
->> -					      MSR_IA32_SPEC_CTRL,
->> -					      MSR_TYPE_RW);
->> +		vmx_set_intercept_for_msr(vmx->vmcs01.msr_bitmap,
->> +					  MSR_IA32_SPEC_CTRL,
->> +					  MSR_TYPE_RW, false);
-> 
-> IMO this is a net negative.  The explicit "disable" is significantly more
-> intuitive than "set" with a %false param, e.g. at a quick glance it would
-> be easy to think this code is "setting", i.e. "enabling" interception.
->
+On Thu, 17 Oct 2019, Kalra, Ashish wrote:
 
-How about renaming it to vmx_switch_intercept_for_msr()?
-or just add the cpu_has_vmx_msr_bitmap() check outside because the check 
-is removed in vmx_disable_intercept_for_msr()
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> SEV INIT command loads the SEV related persistent data from NVS
+> and initializes the platform context. The firmware validates the
+> persistent state. If validation fails, the firmware will reset
+> the persisent state and return an integrity check failure status.
+> 
+> At this point, a subsequent INIT command should succeed, so retry
+> the command. The INIT command retry is only done during driver
+> initialization.
+> 
+> Additional enums along with SEV_RET_SECURE_DATA_INVALID are added
+> to sev_ret_code to maintain continuity and relevance of enum values.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  drivers/crypto/ccp/psp-dev.c | 12 ++++++++++++
+>  include/uapi/linux/psp-sev.h |  3 +++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index 6b17d179ef8a..f9318d4482f2 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -1064,6 +1064,18 @@ void psp_pci_init(void)
+>  
+>  	/* Initialize the platform */
+>  	rc = sev_platform_init(&error);
+> +	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> +		/*
+> +		 * INIT command returned an integrity check failure
+> +		 * status code, meaning that firmware load and
+> +		 * validation of SEV related persistent data has
+> +		 * failed and persistent state has been erased.
+> +		 * Retrying INIT command here should succeed.
+> +		 */
+> +		dev_dbg(sp->dev, "SEV: retrying INIT command");
+> +		rc = sev_platform_init(&error);
+> +	}
+> +
+>  	if (rc) {
+>  		dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
+>  		return;
 
->>   		break;
->>   	case MSR_IA32_PRED_CMD:
->>   		if (!msr_info->host_initiated &&
->> @@ -2028,8 +2028,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->>   		 * vmcs02.msr_bitmap here since it gets completely overwritten
->>   		 * in the merging.
->>   		 */
->> -		vmx_disable_intercept_for_msr(vmx->vmcs01.msr_bitmap, MSR_IA32_PRED_CMD,
->> -					      MSR_TYPE_W);
->> +		vmx_set_intercept_for_msr(vmx->vmcs01.msr_bitmap,
->> +					  MSR_IA32_PRED_CMD,
->> +					  MSR_TYPE_W, false);
->>   		break;
->>   	case MSR_IA32_CR_PAT:
->>   		if (!kvm_pat_valid(data))
->> @@ -3599,9 +3600,6 @@ static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bit
->>   {
->>   	int f = sizeof(unsigned long);
->>   
->> -	if (!cpu_has_vmx_msr_bitmap())
->> -		return;
-> 
-> As above, I'd rather keep these here.  Functionally it changes nothing on
-> CPUs with an MSR bitmap.  For old CPUs, it saves all of two uops in paths
-> that aren't performance critical.
-> 
->> -
->>   	if (static_branch_unlikely(&enable_evmcs))
->>   		evmcs_touch_msr_bitmap();
->>   
->> @@ -3637,9 +3635,6 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
->>   {
->>   	int f = sizeof(unsigned long);
->>   
->> -	if (!cpu_has_vmx_msr_bitmap())
->> -		return;
->> -
->>   	if (static_branch_unlikely(&enable_evmcs))
->>   		evmcs_touch_msr_bitmap();
->>   
->> @@ -3673,6 +3668,9 @@ static __always_inline void vmx_enable_intercept_for_msr(unsigned long *msr_bitm
->>   static __always_inline void vmx_set_intercept_for_msr(unsigned long *msr_bitmap,
->>   			     			      u32 msr, int type, bool value)
->>   {
->> +	if (!cpu_has_vmx_msr_bitmap())
->> +		return;
->> +
->>   	if (value)
->>   		vmx_enable_intercept_for_msr(msr_bitmap, msr, type);
->>   	else
->> @@ -4163,11 +4161,30 @@ static void ept_set_mmio_spte_mask(void)
->>   
->>   static void vmx_vmcs_setup(struct vcpu_vmx *vmx)
->>   {
->> +	unsigned long *msr_bitmap;
->> +
->>   	if (nested)
->>   		nested_vmx_vmcs_setup();
->>   
->> -	if (cpu_has_vmx_msr_bitmap())
->> +	if (cpu_has_vmx_msr_bitmap()) {
->> +		msr_bitmap = vmx->vmcs01.msr_bitmap;
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
->> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
->> +		if (kvm_cstate_in_guest(vmx->vcpu.kvm)) {
->> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
->> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
->> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
->> +			vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
->> +		}
->> +
->>   		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
->> +	}
->> +	vmx->msr_bitmap_mode = 0;
-> 
-> Zeroing msr_bitmap_mode can be skipped as well.
-> 
->>   	vmcs_write64(VMCS_LINK_POINTER, -1ull); /* 22.3.1.5 */
->>   
->> @@ -6074,7 +6091,8 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
->>   	}
->>   	secondary_exec_controls_set(vmx, sec_exec_control);
->>   
->> -	vmx_update_msr_bitmap(vcpu);
->> +	if (cpu_has_vmx_msr_bitmap())
->> +		vmx_update_msr_bitmap(vcpu);
->>   }
->>   
->>   static void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu, hpa_t hpa)
->> @@ -6688,7 +6706,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
->>   {
->>   	int err;
->>   	struct vcpu_vmx *vmx;
->> -	unsigned long *msr_bitmap;
->>   	int i, cpu;
->>   
->>   	BUILD_BUG_ON_MSG(offsetof(struct vcpu_vmx, vcpu) != 0,
->> @@ -6745,22 +6762,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
->>   	if (err < 0)
->>   		goto free_msrs;
->>   
->> -	msr_bitmap = vmx->vmcs01.msr_bitmap;
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_FS_BASE, MSR_TYPE_RW);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_GS_BASE, MSR_TYPE_RW);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
->> -	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
->> -	if (kvm_cstate_in_guest(kvm)) {
->> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
->> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
->> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
->> -		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
->> -	}
->> -	vmx->msr_bitmap_mode = 0;
-> 
-> Keep this code here to be consistent with the previous change that moved
-> the guest_msrs intialization *out* of the VMCS specific function.  Both
-> are collateral pages that are not directly part of the VMCS.
-> 
-> I'd be tempted to use a goto to skip the code, the line length is bad
-> enough as it is, e.g.:
-> 
-> 	if (!cpu_has_vmx_msr_bitmap())
-> 		goto skip_msr_bitmap;
-> 
-> 	vmx->msr_bitmap_mode = 0;
-> skip_msr_bitmap:
-> 
->> -
->>   	vmx->loaded_vmcs = &vmx->vmcs01;
->>   	cpu = get_cpu();
->>   	vmx_vcpu_load(&vmx->vcpu, cpu);
->> -- 
->> 2.19.1
->>
+Curious why this isn't done in __sev_platform_init_locked() since 
+sev_platform_init() can be called when loading the kvm module and the same 
+init failure can happen that way.
+
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+> index 8654b2442f6a..a8537f4e5e08 100644
+> --- a/include/uapi/linux/psp-sev.h
+> +++ b/include/uapi/linux/psp-sev.h
+> @@ -58,6 +58,9 @@ typedef enum {
+>  	SEV_RET_HWSEV_RET_PLATFORM,
+>  	SEV_RET_HWSEV_RET_UNSAFE,
+>  	SEV_RET_UNSUPPORTED,
+> +	SEV_RET_INVALID_PARAM,
+> +	SEV_RET_RESOURCE_LIMIT,
+> +	SEV_RET_SECURE_DATA_INVALID,
+>  	SEV_RET_MAX,
+>  } sev_ret_code;
+>  
