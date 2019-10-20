@@ -2,80 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71B8CDDE56
-	for <lists+kvm@lfdr.de>; Sun, 20 Oct 2019 13:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E35E3DE07A
+	for <lists+kvm@lfdr.de>; Sun, 20 Oct 2019 22:38:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbfJTLtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Oct 2019 07:49:18 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60264 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726282AbfJTLtR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Oct 2019 07:49:17 -0400
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1iM9hw-00084H-0h; Sun, 20 Oct 2019 13:49:12 +0200
-Date:   Sun, 20 Oct 2019 13:49:10 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@kernel.org>
-cc:     LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>
-Subject: Re: [RFC patch 01/15] entry: Provide generic syscall entry
- functionality
-In-Reply-To: <CALCETrXB92rZqHMyhSULWVY3Q5=t9q4N9aZFCTn4k0DMNPJfMQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.1910201347460.2090@nanos.tec.linutronix.de>
-References: <20190919150314.054351477@linutronix.de> <20190919150808.521907403@linutronix.de> <CALCETrXB92rZqHMyhSULWVY3Q5=t9q4N9aZFCTn4k0DMNPJfMQ@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1726545AbfJTUiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 20 Oct 2019 16:38:00 -0400
+Received: from mail-ot1-f52.google.com ([209.85.210.52]:46850 "EHLO
+        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbfJTUiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 20 Oct 2019 16:38:00 -0400
+Received: by mail-ot1-f52.google.com with SMTP id 89so9241155oth.13
+        for <kvm@vger.kernel.org>; Sun, 20 Oct 2019 13:38:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=t601pjcszREbDo+X4pa12O8Z4wM8iqIYuf9T1eWFEjA=;
+        b=UIZobsHdwtqy9z1iAgG9BRFI0pu4FMIcLMbWRVu3vcTM3BYIYmkcqaUts1rJkwuWy5
+         H4yOplPbNR/ZJVn72DMkvTa+Uhk7aUC94l25N1glWkBlGe/qlYuJko29+q0WkHqo4rxc
+         LFYzNkSsBFi37myfshV7PANMsZo6aDKTKbXZyzOHKUIM7ij6WHmMJehBd3ceZholBjXX
+         6xyOY2d1G1J4kS0JJeLDXnK3m/eSii8zVBDuZDPE5f1QcqYAGoTta7ZVM4uGy8ii/3sT
+         ptt3hij2ytLI/yuHi1cItCdF5ElHTRzraCI3eaUWjONTCWkt8GnnlR0Nt81RLMtUAL83
+         5CPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=t601pjcszREbDo+X4pa12O8Z4wM8iqIYuf9T1eWFEjA=;
+        b=Em3LAknqSUqIOwKxtABfLS0DgMtYi9GXJ8dn8s72uF2ndiY8YNtvpBAlfgTiBA2RPC
+         i/uzjT61R/i2RWpT2nLW+8JadhdDWDVuAbAxAdsRRn+jLxIYf+gv9M5wjBSfRz3uTPSk
+         Ph51Shn++WbprOmQTR5JiiXuSWt6smuysti2hVvKFcwKXcI4hX84Ba5WzOH6HcOov7jq
+         mMtO7eCCIApw3xoFxSnPhj8jHhbkwtzXE6m0eXymq2W1rWH70lHuupXJ0IXW6vDR21z/
+         cJ0pcxLDALvDsq6+6qeOzT4xFfrAAsWZvWN2oSU7l6v0DXF9TInn4tQxBIeQL20DFUvH
+         gqLA==
+X-Gm-Message-State: APjAAAXeeTczJAVWntwYHjV+gQrI1cMt5YPqi8dD8gKITXPnQjXhYmwv
+        sgOQkABOkyhFRr84MldOOoEpO6jqclEmpE8lgdFMrjbL
+X-Google-Smtp-Source: APXvYqxygAB4RUbBLkYcvSaADja3Ly33Z4f+QaPtUxZpfJgt5ulKLN98BOjbuCgIfJu1Z1bU5vUajSM5TZN59YgCiBk=
+X-Received: by 2002:a9d:5e82:: with SMTP id f2mr16502247otl.34.1571603879834;
+ Sun, 20 Oct 2019 13:37:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+From:   Mauricio Tavares <raubvogel@gmail.com>
+Date:   Sun, 20 Oct 2019 16:37:48 -0400
+Message-ID: <CAHEKYV7ko8B4G5VErntCzvXB3ZFDsQkJqn2k21yOgA6KGMZ98g@mail.gmail.com>
+Subject: Moving important files and dirs to fileserver
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Sep 2019, Andy Lutomirski wrote:
-> On Thu, Sep 19, 2019 at 8:09 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > +#ifndef _TIF_AUDIT
-> > +# define _TIF_AUDIT                    (0)
-> > +#endif
-> 
-> I'm wondering if these should be __TIF (double-underscore) or
-> MAYBE_TIF_ or something to avoid errors where people do flags |=
-> TIF_WHATEVER and get surprised.
+So I need to stop being a lazy ass and update my kvm host from centos
+6 to something newer. Since I can't just in-place update the OS like
+ubuntu, I would like to use this opportunity to do some housecleaning.
+One of the main things is move the important config dirs and files to
+my fileserver so the boot disk in this host can be completely
+expendable.
 
-That's what exists today already. See arch/*/include/asm/threadinfo.h
- 
-> > +/**
-> > + * syscall_enter_from_usermode - Check and handle work before invoking
-> > + *                              a syscall
-> > + * @regs:      Pointer to currents pt_regs
-> > + * @syscall:   The syscall number
-> > + *
-> > + * Invoked from architecture specific syscall entry code with interrupts
-> > + * enabled.
-> > + *
-> > + * Returns: The original or a modified syscall number
-> > + */
-> 
-> Maybe document that it can return -1 to skip the syscall and that, if
-> this happens, it may use syscall_set_error() or
-> syscall_set_return_value() first.  If neither of those is called and
-> -1 is returned, then the syscall will fail with ENOSYS.
-
-Sure.
-
-Thanks,
-
-	tglx
-
+What do I need to save for kvm? For instance, I would think I want to
+save /var/lib/libvirt and /var/run/libvirt/qemu; the vm guest disks
+are logical volumes so I do not care about them in this question (i.e.
+they are easy to deal with).
