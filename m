@@ -2,67 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42798DE265
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 04:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BCE6DE2E5
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 06:06:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726995AbfJUCwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 20 Oct 2019 22:52:34 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4737 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726768AbfJUCwe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 20 Oct 2019 22:52:34 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 93BB4285F04837690E45;
-        Mon, 21 Oct 2019 10:52:31 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 21 Oct 2019
- 10:52:24 +0800
-From:   Miaohe Lin <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>
-Subject: [PATCH] KVM: remove redundant code in kvm_arch_vm_ioctl
-Date:   Mon, 21 Oct 2019 10:52:56 +0800
-Message-ID: <1571626376-11357-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726994AbfJUEGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 00:06:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54785 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725468AbfJUEGW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 00:06:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46xNNq5r9cz9sPL; Mon, 21 Oct 2019 15:06:19 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1571630779; bh=0gIwOYRl+uLZLFdtC8UjqQo4XwJkG5ky/1miRAY9OXI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=uFrQ7d0o8UWnjar+mh+ZFxZ1mDSn3m5dIt9yNR6EqQjYSz1EYO+gIccKPoGpunI5w
+         0AIDCeEV2WBtpDEynARdN3dmOcdhJM/fktF67Gj2ra7tJr4gvR28m8CQBssIPjSIwN
+         U+u4hcS38D9+iwBu7BjxWGoo8+oFHHwNY4vNnciPhJ64J28qsWZqvIBSFwlYJtLfEH
+         bZybTxodoBoGatjBQtJDljCS71wqI6zuDjmg3XA9343R20BAZQS+pbXCIDJDjHm8qN
+         OdhRKdFynZLg5RyG/Xh6q1+iJlbfbEDRxoNwj79dGZ+VOCq7TUTKpG/Vvn//wnWYYs
+         40PcjWjjhHX3g==
+Date:   Mon, 21 Oct 2019 15:06:15 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] KVM: PPC: Book3S: HV: XIVE: Allocate less VPs in
+ OPAL
+Message-ID: <20191021040615.GA20714@oak.ozlabs.ibm.com>
+References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
+ <20191016234403.77cdf150@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191016234403.77cdf150@bahia.lan>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If we reach here with r = 0, we will reassign r = 0
-unnecesarry, then do the label set_irqchip_out work.
-If we reach here with r != 0, then we will do the label
-work directly. So this if statement and r = 0 assignment
-is redundant.
+On Wed, Oct 16, 2019 at 11:44:03PM +0200, Greg Kurz wrote:
+> On Fri, 27 Sep 2019 13:53:32 +0200
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+> > This brings some fixes and allows to start more VMs with an in-kernel
+> > XIVE or XICS-on-XIVE device.
+> > 
+> > Changes since v1 (https://patchwork.ozlabs.org/cover/1166099/):
+> > - drop a useless patch
+> > - add a patch to show VP ids in debugfs
+> > - update some changelogs
+> > - fix buggy check in patch 5
+> > - Cc: stable 
+> > 
+> > --
+> > Greg
+> > 
+> > ---
+> > 
+> > Greg Kurz (6):
+> >       KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
+> >       KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
+> >       KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
+> >       KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
+> >       KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
+> >       KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
+> > 
+> > 
+> >  Documentation/virt/kvm/devices/xics.txt |   14 +++
+> >  Documentation/virt/kvm/devices/xive.txt |    8 ++
+> >  arch/powerpc/include/uapi/asm/kvm.h     |    3 +
+> >  arch/powerpc/kvm/book3s_xive.c          |  142 ++++++++++++++++++++++++-------
+> >  arch/powerpc/kvm/book3s_xive.h          |   17 ++++
+> >  arch/powerpc/kvm/book3s_xive_native.c   |   40 +++------
+> >  6 files changed, 167 insertions(+), 57 deletions(-)
+> > 
+> 
+> Ping ?
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- arch/x86/kvm/x86.c | 3 ---
- 1 file changed, 3 deletions(-)
+I'm about to send a pull request to Paolo for 2/6 (to go into 5.4) and
+I'm preparing a tree of stuff for 5.5 that will include the rest of
+the patches.  However, I have been delayed by the fact that multipath
+SCSI is currently broken upstream on the P8 test box that I use, so I
+haven't been able to test things.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf38526..0b3ebc2afb3d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4916,9 +4916,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		if (!irqchip_kernel(kvm))
- 			goto set_irqchip_out;
- 		r = kvm_vm_ioctl_set_irqchip(kvm, chip);
--		if (r)
--			goto set_irqchip_out;
--		r = 0;
- 	set_irqchip_out:
- 		kfree(chip);
- 		break;
--- 
-2.19.1
-
+Paul.
