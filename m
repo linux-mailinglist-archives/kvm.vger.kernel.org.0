@@ -2,78 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D99CDE59B
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 09:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EE34DE605
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 10:12:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727482AbfJUH4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 03:56:02 -0400
-Received: from inca-roads.misterjones.org ([213.251.177.50]:47068 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727047AbfJUH4B (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 03:56:01 -0400
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iMSXe-0007gc-Fy; Mon, 21 Oct 2019 09:55:50 +0200
-To:     =?UTF-8?Q?J=C3=BCrgen_Gro=C3=9F?= <jgross@suse.com>
-Subject: Re: [PATCH v6 10/10] arm64: Retrieve stolen time as paravirtualized  guest
-X-PHP-Originating-Script: 0:main.inc
+        id S1727680AbfJUIMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 04:12:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53762 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727047AbfJUIMu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 04:12:50 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6CE4786662
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 08:12:50 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id o188so5540877wmo.5
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 01:12:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=iMBlsmTbyc1by6UD9+Cjcv74kSZEU4gLAG9XLb3vXMM=;
+        b=W/XkUy0ITwDDQpbEFAaJZDxt1i4sjbYmihYy1WTaddNqEh42kbIKhWBJSWnRpIzrw3
+         UiK9D+2CW/nvMTBO7UVA+Ogacqbxqw+v8KA8vj3mAgCsIfDBYIsc9llWJbM2WFIkrS30
+         uFc1l01PP3AZv1XqM0Mcne6gBrI6LvxkNtFepXyGBK6J9HFgxqvzkhA3nWn/nf3AMnWA
+         AcqgdnmDRtF9YHMritOgyUHJxjv02lgIsSRqrdgMDc773SsivMkVjF+jp2iaAq49eJO2
+         0Wh0c1W5coZeYRyXRBdfxcRzq98N/8gmVZWfX46TKkyo6VVI+6tPu2bT6ANXpmYcQdvM
+         ZjTA==
+X-Gm-Message-State: APjAAAVDWNJCpbijRpU/+x3MCN4OQ/L/9cVJDKD8cktC+DHPGNbQvI+j
+        Ef7QHxKMupFuXB/U9OHSwvTlwphPYY3j5AmzMV2NHINuAVhRGHBq+pGLlZu9PKBs7sVWx1ZxvsI
+        5WvbFm5qajE5N
+X-Received: by 2002:a05:600c:2503:: with SMTP id d3mr19263026wma.44.1571645568971;
+        Mon, 21 Oct 2019 01:12:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx9/+OXOzpeQV7Ni65kLbXS9IKEOhkhFOGoxsIe0Y4dR3AU7giY9RU0QnZvv+DPO6xdA+wWEw==
+X-Received: by 2002:a05:600c:2503:: with SMTP id d3mr19262990wma.44.1571645568652;
+        Mon, 21 Oct 2019 01:12:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:566:fc24:94f2:2f13? ([2001:b07:6468:f312:566:fc24:94f2:2f13])
+        by smtp.gmail.com with ESMTPSA id x7sm16385365wrg.63.2019.10.21.01.12.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Oct 2019 01:12:48 -0700 (PDT)
+Subject: Re: [PATCH v2 3/4] KVM: x86/vPMU: Reuse perf_event to avoid
+ unnecessary pmc_reprogram_counter
+To:     Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
+        peterz@infradead.org, Jim Mattson <jmattson@google.com>
+Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
+        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
+        linux-kernel@vger.kernel.org
+References: <20191013091533.12971-1-like.xu@linux.intel.com>
+ <20191013091533.12971-4-like.xu@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5020e826-e461-c28a-0b40-6e00aaa28163@redhat.com>
+Date:   Mon, 21 Oct 2019 10:12:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Mon, 21 Oct 2019 08:55:50 +0100
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-In-Reply-To: <237a3457-bcb3-c9b7-11ef-241b7ccc370e@suse.com>
-References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-11-steven.price@arm.com>
- <86a79wzdhk.wl-maz@kernel.org>
- <237a3457-bcb3-c9b7-11ef-241b7ccc370e@suse.com>
-Message-ID: <e8fa44e1e6bcb58ea07b5064ed40e088@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: jgross@suse.com, steven.price@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, pbonzini@redhat.com, rkrcmar@redhat.com, linux@armlinux.org.uk, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, mark.rutland@arm.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20191013091533.12971-4-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-10-21 06:01, Jürgen Groß wrote:
-> On 19.10.19 22:28, Marc Zyngier wrote:
+Just a naming tweak:
 
->> How about something like pv_time_init() instead? In the guest, this 
->> is
->> no way KVM specific, and I still hope for this to work on things 
->> like
->> Xen/HyperV/VMware (yeah, I'm foolishly optimistic). All the 
->> references
->> to KVM should go, and be replaced by something more generic (after
->> all, you're only implementing the spec, so feel free to call it
->> den0057_* if you really want).
->
-> Xen guests already have the needed functionality. On ARM this just 
-> needs
-> to be hooked up.
+On 13/10/19 11:15, Like Xu wrote:
+> +	/* the exact requested config to create perf_event */
+> +	u64 programed_config;
 
-Yes, Xen offers its own PV interface for that. But this code is about
-implementing support for a cross hypervisor functionnality (which 
-AFAICT
-is not implemented by Xen).
+	/*
+	 * eventsel value for general purpose counters, ctrl value for
+	 * fixed counters.
+	 */
+	u64 current_config;
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
