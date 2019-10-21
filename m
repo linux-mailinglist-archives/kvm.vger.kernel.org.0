@@ -2,50 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72C87DF8C5
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 01:47:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3686DF8D1
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 01:54:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730320AbfJUXrR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 19:47:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:62913 "EHLO mga07.intel.com"
+        id S1730186AbfJUXyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 19:54:33 -0400
+Received: from mga03.intel.com ([134.134.136.65]:14202 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728375AbfJUXrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 19:47:17 -0400
+        id S1728819AbfJUXyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 19:54:33 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 16:47:16 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 16:54:32 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="209545850"
+   d="scan'208";a="191284975"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 21 Oct 2019 16:47:15 -0700
+  by orsmga008.jf.intel.com with ESMTP; 21 Oct 2019 16:54:32 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        x86@kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@suse.de>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
         Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        Borislav Petkov <bp@suse.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v2 00/16] x86/cpu: Clean up handling of VMX features
-Date:   Mon, 21 Oct 2019 16:46:16 -0700
-Message-Id: <20191021234632.32363-1-sean.j.christopherson@intel.com>
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v2 01/16] x86/intel: Initialize IA32_FEATURE_CONTROL MSR at boot
+Date:   Mon, 21 Oct 2019 16:54:23 -0700
+Message-Id: <20191021235423.32733-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20191021234632.32363-1-sean.j.christopherson@intel.com>
+References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -53,126 +45,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Clean up a handful of interrelated warts in the kernel's handling of VMX:
+Opportunistically initialize IA32_FEATURE_CONTROL MSR to enable VMX when
+the MSR is left unlocked by BIOS.  Configuring IA32_FEATURE_CONTROL at
+boot time paves the way for similar enabling of other features, e.g.
+Software Guard Extensions (SGX).
 
-  - Enable VMX in IA32_FEATURE_CONTROL during boot instead of on-demand
-    during KVM load to avoid future contention over IA32_FEATURE_CONTROL.
+Temporarily leave equivalent KVM code in place in order to avoid
+introducing a regression on Centaur and Zhaoxin CPUs, e.g. removing
+KVM's code would leave the MSR unlocked on those CPUs and would break
+existing functionality if people are loading kvm_intel on Centaur and/or
+Zhaoxin.  Defer enablement of the boot-time configuration on Centaur and
+Zhaoxin to future patches to aid bisection.
 
-  - Rework VMX feature reporting so that it is accurate and up-to-date,
-    now and in the future.
+Note, Local Machine Check Exceptions (LMCE) are also supported by the
+kernel and enabled via IA32_FEATURE_CONTROL, but the kernel currently
+uses LMCE if and and only if the feature is explicitly enable by BIOS.
+Keep the current behavior to avoid introducing bugs, future patches can
+opt in to opportunistic enabling if it's deemed desirable to do so.
 
-  - Consolidate code across CPUs that support VMX.
+Always lock IA32_FEATURE_CONTROL if it exists, even if the CPU doesn't
+support VMX, so that other existing and future kernel code that queries
+IA32_FEATURE_CONTROL can assume it's locked.
 
-This series stems from two separate but related issues.  The first issue,
-pointed out by Boris in the SGX enabling series[1], is that the kernel
-currently doesn't ensure the IA32_FEATURE_CONTROL MSR is configured during
-boot.  The second issue is that the kernel's reporting of VMX features is
-stale, potentially inaccurate, and difficult to maintain.
+Start from a clean slate when constructing the value to write to
+IA32_FEATURE_CONTROL, i.e. ignore whatever value BIOS left in the MSR so
+as not to enable random features or fault on the WRMSR.
 
-Note, most non-x86 and non-KVM folks are cc'd only on the cover letter and
-on relevant patches.
-
-v2:
-  - Rebase to latest tip/x86/cpu (1edae1ae6258, "x86/Kconfig: Enforce...)
-  - Collect Jim's reviews.
-  - Fix a typo in setting of EPT capabilities [TonyWWang-oc].
-  - Remove defines for reserved VMX feature flags [Paolo].
-  - Print the VMX features under "flags" and maintain all existing names
-    to be backward compatible with the ABI [Paolo].
-  - Create aggregate APIC features to report FLEXPRIORITY and APICV, so
-    that the full feature *and* their associated individual features are
-    printed, e.g. to aid in recognizing why an APIC feature isn't being
-    used.
-  - Fix a few copy paste errors in changelogs.
-
-
-== IA32_FEATURE_CONTROL ==
-Lack of IA32_FEATURE_CONTROL configuration during boot isn't a functional
-issue in the current kernel as the majority of platforms set and lock
-IA32_FEATURE_CONTROL in firmware.  And when the MSR is left unlocked, KVM
-is the only subsystem that writes IA32_FEATURE_CONTROL.  That will change
-if/when SGX support is enabled, as SGX will also want to fully enable
-itself when IA32_FEATURE_CONTROL is unlocked.
-
-== VMX Feature Reporting ==
-VMX features are not enumerated via CPUID, but instead are enumerated
-through VMX MSRs.  As a result, new VMX features are not automatically
-reported via /proc/cpuinfo.
-
-An attempt was made long ago to report interesting and/or meaningful VMX
-features by synthesizing select features into a Linux-defined cpufeatures
-word.  Synthetic feature flags worked for the initial purpose, but the
-existence of the synthetic flags was forgotten almost immediately, e.g.
-only one new flag (EPT A/D) has been added in the the decade since the
-synthetic VMX features were introduced, while VMX and KVM have gained
-support for many new features.
-
-Placing the synthetic flags in x86_capability also allows them to be
-queried via cpu_has() and company, which is misleading as the flags exist
-purely for reporting via /proc/cpuinfo.  KVM, the only in-kernel user of
-VMX, ignores the flags.
-
-Last but not least, VMX features are reported in /proc/cpuinfo even
-when VMX is unusable due to lack of enabling in IA32_FEATURE_CONTROL.
-
-== Caveats ==
-All of the testing of non-standard flows was done in a VM, as I don't
-have a system that leaves IA32_FEATURE_CONTROL unlocked, or locks it with
-VMX disabled.
-
-The Centaur and Zhaoxin changes are somewhat speculative, as I haven't
-confirmed they actually support IA32_FEATURE_CONTROL, or that they want to
-gain "official" KVM support.  I assume they unofficially support KVM given
-that both CPUs went through the effort of enumerating VMX features.  That
-in turn would require them to support IA32_FEATURE_CONTROL since KVM will
-fault and refuse to load if the MSR doesn't exist.
-
-[1] https://lkml.kernel.org/r/20190925085156.GA3891@zn.tnic
-
-
-Sean Christopherson (16):
-  x86/intel: Initialize IA32_FEATURE_CONTROL MSR at boot
-  x86/mce: WARN once if IA32_FEATURE_CONTROL MSR is left unlocked
-  x86/centaur: Use common IA32_FEATURE_CONTROL MSR initialization
-  x86/zhaoxin: Use common IA32_FEATURE_CONTROL MSR initialization
-  KVM: VMX: Drop initialization of IA32_FEATURE_CONTROL MSR
-  x86/cpu: Clear VMX feature flag if VMX is not fully enabled
-  KVM: VMX: Use VMX feature flag to query BIOS enabling
-  KVM: VMX: Check for full VMX support when verifying CPU compatibility
-  x86/vmx: Introduce VMX_FEATURES_*
-  x86/cpu: Detect VMX features on Intel, Centaur and Zhaoxin CPUs
-  x86/cpu: Print VMX flags in /proc/cpuinfo using VMX_FEATURES_*
-  x86/cpufeatures: Drop synthetic VMX feature flags
-  KVM: VMX: Use VMX_FEATURE_* flags to define VMCS control bits
-  x86/cpufeatures: Clean up synthetic virtualization flags
-  perf/x86: Provide stubs of KVM helpers for non-Intel CPUs
-  KVM: VMX: Allow KVM_INTEL when building for Centaur and/or Zhaoxin
-    CPUs
-
- MAINTAINERS                           |   2 +-
- arch/x86/Kconfig.cpu                  |   8 ++
- arch/x86/boot/mkcpustr.c              |   1 +
- arch/x86/include/asm/cpufeatures.h    |  15 +---
- arch/x86/include/asm/perf_event.h     |  22 +++--
- arch/x86/include/asm/processor.h      |   4 +
- arch/x86/include/asm/vmx.h            | 105 ++++++++++++-----------
- arch/x86/include/asm/vmxfeatures.h    |  86 +++++++++++++++++++
- arch/x86/kernel/cpu/Makefile          |   6 +-
- arch/x86/kernel/cpu/centaur.c         |  35 +-------
- arch/x86/kernel/cpu/common.c          |   3 +
- arch/x86/kernel/cpu/cpu.h             |   4 +
- arch/x86/kernel/cpu/feature_control.c | 117 ++++++++++++++++++++++++++
- arch/x86/kernel/cpu/intel.c           |  49 +----------
- arch/x86/kernel/cpu/mce/intel.c       |   7 +-
- arch/x86/kernel/cpu/mkcapflags.sh     |  15 +++-
- arch/x86/kernel/cpu/proc.c            |  14 +++
- arch/x86/kernel/cpu/zhaoxin.c         |  35 +-------
- arch/x86/kvm/Kconfig                  |   9 +-
- arch/x86/kvm/vmx/vmx.c                |  41 ++-------
- 20 files changed, 343 insertions(+), 235 deletions(-)
- create mode 100644 arch/x86/include/asm/vmxfeatures.h
+Suggested-by: Borislav Petkov <bp@suse.de>
+Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/Kconfig.cpu                  |  4 ++++
+ arch/x86/kernel/cpu/Makefile          |  1 +
+ arch/x86/kernel/cpu/cpu.h             |  4 ++++
+ arch/x86/kernel/cpu/feature_control.c | 30 +++++++++++++++++++++++++++
+ arch/x86/kernel/cpu/intel.c           |  2 ++
+ 5 files changed, 41 insertions(+)
  create mode 100644 arch/x86/kernel/cpu/feature_control.c
 
+diff --git a/arch/x86/Kconfig.cpu b/arch/x86/Kconfig.cpu
+index af9c967782f6..aafc14a0abf7 100644
+--- a/arch/x86/Kconfig.cpu
++++ b/arch/x86/Kconfig.cpu
+@@ -387,6 +387,10 @@ config X86_DEBUGCTLMSR
+ 	def_bool y
+ 	depends on !(MK6 || MWINCHIPC6 || MWINCHIP3D || MCYRIXIII || M586MMX || M586TSC || M586 || M486SX || M486) && !UML
+ 
++config X86_FEATURE_CONTROL_MSR
++	def_bool y
++	depends on CPU_SUP_INTEL
++
+ menuconfig PROCESSOR_SELECT
+ 	bool "Supported processor vendors" if EXPERT
+ 	---help---
+diff --git a/arch/x86/kernel/cpu/Makefile b/arch/x86/kernel/cpu/Makefile
+index d7a1e5a9331c..df5ad0cfe3e9 100644
+--- a/arch/x86/kernel/cpu/Makefile
++++ b/arch/x86/kernel/cpu/Makefile
+@@ -29,6 +29,7 @@ obj-y			+= umwait.o
+ obj-$(CONFIG_PROC_FS)	+= proc.o
+ obj-$(CONFIG_X86_FEATURE_NAMES) += capflags.o powerflags.o
+ 
++obj-$(CONFIG_X86_FEATURE_CONTROL_MSR) += feature_control.o
+ ifdef CONFIG_CPU_SUP_INTEL
+ obj-y			+= intel.o intel_pconfig.o
+ obj-$(CONFIG_PM)	+= intel_epb.o
+diff --git a/arch/x86/kernel/cpu/cpu.h b/arch/x86/kernel/cpu/cpu.h
+index c0e2407abdd6..d2750f53a0cb 100644
+--- a/arch/x86/kernel/cpu/cpu.h
++++ b/arch/x86/kernel/cpu/cpu.h
+@@ -62,4 +62,8 @@ unsigned int aperfmperf_get_khz(int cpu);
+ 
+ extern void x86_spec_ctrl_setup_ap(void);
+ 
++#ifdef CONFIG_X86_FEATURE_CONTROL_MSR
++void init_feature_control_msr(struct cpuinfo_x86 *c);
++#endif
++
+ #endif /* ARCH_X86_CPU_H */
+diff --git a/arch/x86/kernel/cpu/feature_control.c b/arch/x86/kernel/cpu/feature_control.c
+new file mode 100644
+index 000000000000..57b928e64cf5
+--- /dev/null
++++ b/arch/x86/kernel/cpu/feature_control.c
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/tboot.h>
++
++#include <asm/cpufeature.h>
++#include <asm/msr-index.h>
++#include <asm/processor.h>
++
++void init_feature_control_msr(struct cpuinfo_x86 *c)
++{
++	u64 msr;
++
++	if (rdmsrl_safe(MSR_IA32_FEATURE_CONTROL, &msr))
++		return;
++
++	if (msr & FEATURE_CONTROL_LOCKED)
++		return;
++
++	/*
++	 * Ignore whatever value BIOS left in the MSR to avoid enabling random
++	 * features or faulting on the WRMSR.
++	 */
++	msr = FEATURE_CONTROL_LOCKED;
++
++	if (cpu_has(c, X86_FEATURE_VMX)) {
++		msr |= FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
++		if (tboot_enabled())
++			msr |= FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX;
++	}
++	wrmsrl(MSR_IA32_FEATURE_CONTROL, msr);
++}
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index c2fdc00df163..15d59224e2f8 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -755,6 +755,8 @@ static void init_intel(struct cpuinfo_x86 *c)
+ 	/* Work around errata */
+ 	srat_detect_node(c);
+ 
++	init_feature_control_msr(c);
++
+ 	if (cpu_has(c, X86_FEATURE_VMX))
+ 		detect_vmx_virtcap(c);
+ 
 -- 
 2.22.0
 
