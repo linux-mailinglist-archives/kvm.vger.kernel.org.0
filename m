@@ -2,79 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1354BDF368
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 18:44:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D22CDF3CD
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 19:07:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729905AbfJUQnf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 12:43:35 -0400
-Received: from mail-il1-f193.google.com ([209.85.166.193]:35267 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728567AbfJUQnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 12:43:35 -0400
-Received: by mail-il1-f193.google.com with SMTP id p8so2929837ilp.2
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 09:43:33 -0700 (PDT)
+        id S1727805AbfJURHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 13:07:38 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38697 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726847AbfJURHi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 13:07:38 -0400
+Received: by mail-wr1-f65.google.com with SMTP id v9so3610352wrq.5
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 10:07:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PZDOrPjmqSrWWmDNeMsYiaU9DThTpaLcyfeJYUbA7aI=;
-        b=teafmx6c+dcQ6z/nojJotclc/U31GiqRyYGsqAlQwuDFNG4gC3qur/CZreL7tiG+fI
-         gqrNB1aBGjfdyy7CJOEk8OtC5zVMT2knI1/eXEb0wEANBcSSuHVnK76ocW4KtQ+tam32
-         3wi+Wags0pUpX7eBEWEUzvSaKog5MXSCEEgtoESiz9H4diLl0I6YuzWVLjTlatZ/wUh/
-         ayKFrdCt+NGvbLwFpqBmBh3YGQlixTuvIw1h+ESzUJ8EPFK/CvO5gw8DNtWgle8vwmoY
-         CzoCKRa3oIdnU4q2TV5qDyRu11MNKyz24pJtyjzkj7W/TCuW0p+xNxzS2WNRx89Z469n
-         lmag==
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oz5guTpCU+BI0skIIQHdlX4fd7KpDc/8V5k4nfR1aRA=;
+        b=OAFoDQlSjTcKTNgeHLPnodG/40JaarX+hMqGz9GhIMo/JhcV4OpE/TMr8k+xK/IGUV
+         azcwmCzpqUEqTAmXVi8BY+5pZ0s2Wv4zMtFwqtfr/oPB6jDzVbZ5r4P+gg03jBG//n3r
+         15gG3/wAkSBRdR1Ny8eNDdSD4d4GrpR4f5i1YJ5HPiZsMAxB6xFF6mhUNILF2ZdDQZoc
+         R0VUAEUq9LUeKepz5xvy4RR7JVk1FVOAg1KJblgN4ERufw1o2SYDzZBPZpB7TwElbeiW
+         p8Eq54nZ1FG/nxAsZbhddyDYNP6X54qBiRUC95SsEJX7HH3Mqb54qs/0NqQKJVwPBqbR
+         bDTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PZDOrPjmqSrWWmDNeMsYiaU9DThTpaLcyfeJYUbA7aI=;
-        b=ASf0IhPyyYBLGK7l9SfAZ+1by3WJHDTNhEXPbNura4FDAEQUsh8/8S5cFgdg3sOJdG
-         qsa1Bc4T0dzYiSWrbG9gfzk0FssxXlxFVtf9l2w50wJebkAG+wRsdDQ63SmQEg4LZbl1
-         wIm9IddxL/OXO4iWIHa8k00oW9bmOiZyROo9nAFnnCEGb5tKUMdhdZ4QvLnXpaQVbAaK
-         C0CB8f7C4A4CsFA+46w6SA60yhiaCglziiLIUFTQC4uDBAlQpxk2fS22ECQv8zEGJ10b
-         13JFFq47+zkuMQGdBBpJuOjp42gP9A+VyqkAcnbf/0FEqANnzw4faokmJCMNUFlVT2ul
-         hL7Q==
-X-Gm-Message-State: APjAAAVVz03I5IHHowtKp18I4vdlOhb3oxXJ4zO1j2+gszhLmqt2oXLf
-        aRxfQE0ktCLlkpUFwpl++/uZMYnQ8FzSXNUkmdtivA==
-X-Google-Smtp-Source: APXvYqzf9aiYscKmehyRa9OWyiidFWDrnAPBilZ+zPXPOE4HbqyVIhBVA5oqF4DAihlhjodSGxLETEDoZnnfyTzf1Us=
-X-Received: by 2002:a92:c8cb:: with SMTP id c11mr25936288ilq.119.1571676212655;
- Mon, 21 Oct 2019 09:43:32 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=oz5guTpCU+BI0skIIQHdlX4fd7KpDc/8V5k4nfR1aRA=;
+        b=iXgag/HAlE060lP8Dgz8NG1EThTbAD4h1SZfJdsGmaSwgkYOSRBEAjOggV9zrsz/6w
+         TfBfLRTsEjbeFkTezUKlFKks7O6QEAwuLGOquBeJpBAvO7+OEHXLQ7f7/oYGSugEdag3
+         JflJmBsL4PesNlzGlBhoaeFUpt+yvfVqnPYD3VZ+froCoWEj71ZBjtpErDmspDZYKUjd
+         HHVoO3DICn4r9ARudzxIh+KmyhVVtFXuKyP5kOm5/8YoaeAQjQDvpMDnRVKyPNRYG6/E
+         FHjjpFaHaK1xaoghnzrvz3R5+x7ZFANY41XocC6ZB2oJedzLRBc5Y7VfApPOn3y/1MEX
+         DO2g==
+X-Gm-Message-State: APjAAAUhsujfk44Z5pgzTVP2HO4KpTO15RUkIiK9mttxZhAA8RQYILV3
+        ZB0X+lWkXu8s/gsUmGzp5et5PwhF
+X-Google-Smtp-Source: APXvYqzDGGzdYOLWNVUyofNDNjidCspPssY7nDDwQSKnzAswWIKWBr08i0pasP9aLvPbosRH9LQveA==
+X-Received: by 2002:adf:ef8b:: with SMTP id d11mr5416486wro.257.1571677655710;
+        Mon, 21 Oct 2019 10:07:35 -0700 (PDT)
+Received: from donizetti.redhat.com ([2001:b07:6468:f312:847b:6afc:17c:89dd])
+        by smtp.gmail.com with ESMTPSA id a5sm482619wrm.78.2019.10.21.10.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2019 10:07:34 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     jmattson@google.com
+Subject: [PATCH kvm-unit-tests] x86: realmode: use ARRAY_SIZE in test_long_jmp
+Date:   Mon, 21 Oct 2019 19:07:33 +0200
+Message-Id: <20191021170733.16876-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20191012235859.238387-1-morbo@google.com> <20191017012502.186146-1-morbo@google.com>
- <20191017012502.186146-3-morbo@google.com> <f40c1573-4cfe-4f51-c92c-4a22ba8f6287@redhat.com>
-In-Reply-To: <f40c1573-4cfe-4f51-c92c-4a22ba8f6287@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 21 Oct 2019 09:43:21 -0700
-Message-ID: <CALMp9eR4gmSX+bwz5wZdqjmp4z8KUHQXLJqWSkLy96OofYHJSg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests v2 PATCH 2/2] x86: realmode: fix esp in call test
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Bill Wendling <morbo@google.com>, kvm list <kvm@vger.kernel.org>,
-        alexandru.elisei@arm.com, thuth@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 8:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 17/10/19 03:25, Bill Wendling wrote:
-> > diff --git a/x86/realmode.c b/x86/realmode.c
-> > index 41b8592..f318910 100644
-> > --- a/x86/realmode.c
-> > +++ b/x86/realmode.c
-> > @@ -520,7 +520,7 @@ static void test_call(void)
-> >       u32 addr;
-> >
-> >       inregs = (struct regs){ 0 };
-> > -     inregs.esp = (u32)esp;
-> > +     inregs.esp = (u32)(esp+16);
->
-> Applied with
->
-> +       inregs.esp = (u32)&esp[ARRAY_SIZE(esp)];
->
-> Paolo
+Make the code a little bit more robust and self-explanatory.
 
-Would you mind doing the same for test_long_jmp?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ x86/realmode.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/x86/realmode.c b/x86/realmode.c
+index a1df515..5dbc2aa 100644
+--- a/x86/realmode.c
++++ b/x86/realmode.c
+@@ -606,7 +606,7 @@ static void test_long_jmp(void)
+ 	u32 esp[16];
+ 
+ 	inregs = (struct regs){ 0 };
+-	inregs.esp = (u32)(esp+16);
++	inregs.esp = (u32)&esp[ARRAY_SIZE(esp)];
+ 	MK_INSN(long_jmp, "call 1f\n\t"
+ 			  "jmp 2f\n\t"
+ 			  "1: jmp $0, $test_function\n\t"
+-- 
+2.21.0
+
