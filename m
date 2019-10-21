@@ -2,154 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C2AADFC05
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:47:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 47E29DFC18
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 05:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730796AbfJVCrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 22:47:32 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39336 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727264AbfJVCrc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 22:47:32 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M2d0HY062877;
-        Tue, 22 Oct 2019 02:45:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=IOP2qUmHyCzlOIB/E3Sa7AbeDULWgDap01khNwHbm4M=;
- b=sIWAClKUcSthzc19DVO3fJtVN9iPxF5iQ3IkEfLHBlw516NLxbu8OcK8x7eueE+uWOHQ
- HI4pRdJk7fxh9Yo74RI+6QEbToSAUKpb3yU//+HbpQvb3292WWgzek5lAK/RfaDhInbM
- FakgfhJgc5cDbi/H69B3nwav7yqceoZJE7nLvdZrZC5BGXMhQR5oum8ggp+akwE3hBCg
- ownomZDx6qyWSafh7BdHqJan4eGHLJw4UP86bB5X2nbxlTNw64onWZxe06nPt98Qo5MZ
- 7Z9o1Ugr81Nk1xap76XCy7uldiyPmV/doYPTgyXnVLgryB/SeYxwS9doGbfKYknbT18P PA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2vqswtbmku-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Oct 2019 02:45:39 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M2iDcS005685;
-        Tue, 22 Oct 2019 02:45:38 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2vrc00vt81-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Oct 2019 02:45:38 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9M2jYBq022586;
-        Tue, 22 Oct 2019 02:45:34 GMT
-Received: from [10.191.30.27] (/10.191.30.27)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 21 Oct 2019 19:45:33 -0700
-Subject: Re: [PATCH v6 3/5] x86/kvm: Add "nopvspin" parameter to disable PV
- spinlocks
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S2387476AbfJVDAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 23:00:36 -0400
+Received: from mga04.intel.com ([192.55.52.120]:10515 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387463AbfJVDAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 23:00:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 20:00:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
+   d="scan'208";a="398869385"
+Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
+  by fmsmga006.fm.intel.com with ESMTP; 21 Oct 2019 20:00:34 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, like.xu@linux.intel.com,
         linux-kernel@vger.kernel.org
-Cc:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        kys@microsoft.com, haiyangz@microsoft.com, sthemmin@microsoft.com,
-        sashal@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, boris.ostrovsky@oracle.com,
-        jgross@suse.com, sstabellini@kernel.org, peterz@infradead.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>, Will Deacon <will@kernel.org>
-References: <1571102367-31595-1-git-send-email-zhenzhong.duan@oracle.com>
- <1571102367-31595-4-git-send-email-zhenzhong.duan@oracle.com>
- <87k18y1hc1.fsf@vitty.brq.redhat.com>
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <a1a5b381-cd06-04ed-5d05-6cb7bfa070b8@oracle.com>
-Date:   Tue, 22 Oct 2019 10:45:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Subject: [PATCH] KVM: x86/vPMU: Declare kvm_pmu->reprogram_pmi field using DECLARE_BITMAP
+Date:   Mon, 21 Oct 2019 18:55:04 +0800
+Message-Id: <20191021105504.120838-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <2175c2cd-2c1e-22e8-2f67-3fc334ef2a40@redhat.com>
+References: <2175c2cd-2c1e-22e8-2f67-3fc334ef2a40@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87k18y1hc1.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9417 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910220025
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9417 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910220025
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Replace the explicit declaration of "u64 reprogram_pmi" with the generic
+macro DECLARE_BITMAP for all possible appropriate number of bits.
 
-On 2019/10/21 19:14, Vitaly Kuznetsov wrote:
->> index 249f14a..e9c76d8 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -825,18 +825,44 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
->>    */
->>   void __init kvm_spinlock_init(void)
->>   {
->> -	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
->> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
->> +	/*
->> +	 * PV spinlocks is disabled if no host side support, then native
->> +	 * qspinlock will be used. As native qspinlock is a fair lock, there is
->> +	 * lock holder preemption issue using it in a guest, imaging one pCPU
->> +	 * running 10 vCPUs of same guest contending same lock.
->> +	 *
->> +	 * virt_spin_lock() is introduced as an optimization for that scenario
->> +	 * which is enabled by virt_spin_lock_key key. To use that optimization,
->> +	 * virt_spin_lock_key isn't disabled here.
->> +	 */
-> My take (if I properly understood what you say) would be:
->
-> "In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> preferred over native qspinlock when vCPU is preempted."
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/pmu.c              | 15 +++++----------
+ 2 files changed, 6 insertions(+), 11 deletions(-)
 
-Yes, that's what I mean, maybe I didn't explain clearly due to my pool 
-english,
-
-I'll use your explanation instead.
-
->
->> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
->> +		pr_info("PV spinlocks disabled, no host support.\n");
->>   		return;
->> +	}
->>   
->> +	/*
->> +	 * Disable PV qspinlock and use native qspinlock when dedicated pCPUs
->> +	 * are available.
->> +	 */
->>   	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
->> +		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
->> +		static_branch_disable(&virt_spin_lock_key);
->> +		return;
->> +	}
->> +
->> +	if (num_possible_cpus() == 1) {
->> +		pr_info("PV spinlocks disabled, single CPU.\n");
->>   		static_branch_disable(&virt_spin_lock_key);
->>   		return;
->>   	}
->>   
->> -	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
->> -	if (num_possible_cpus() == 1)
->> +	if (nopvspin) {
->> +		pr_info("PV spinlocks disabled, forced by \"nopvspin\" parameter.\n");
->> +		static_branch_disable(&virt_spin_lock_key);
->>   		return;
-> You could've replaced this 'static_branch_disable(); return;' pattern
-> with a goto to the end of the function to save a few lines but this
-> looks good anyways.
->
-> Reviewed-by: Vitaly Kuznetsov<vkuznets@redhat.com>
-
-Ok, will do, thanks for review.
-
-Zhenzhong
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 50eb430b0ad8..236a876a5a2e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -469,7 +469,7 @@ struct kvm_pmu {
+ 	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
+ 	struct kvm_pmc fixed_counters[INTEL_PMC_MAX_FIXED];
+ 	struct irq_work irq_work;
+-	u64 reprogram_pmi;
++	DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
+ };
+ 
+ struct kvm_pmu_ops;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 46875bbd0419..75e8f9fae031 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -62,8 +62,7 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
+ 	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 
+-	if (!test_and_set_bit(pmc->idx,
+-			      (unsigned long *)&pmu->reprogram_pmi)) {
++	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+ 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+ 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+ 	}
+@@ -76,8 +75,7 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
+ 	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 
+-	if (!test_and_set_bit(pmc->idx,
+-			      (unsigned long *)&pmu->reprogram_pmi)) {
++	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+ 		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
+ 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
+ 
+@@ -137,7 +135,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+ 	}
+ 
+ 	pmc->perf_event = event;
+-	clear_bit(pmc->idx, (unsigned long*)&pmc_to_pmu(pmc)->reprogram_pmi);
++	clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
+ }
+ 
+ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+@@ -253,16 +251,13 @@ EXPORT_SYMBOL_GPL(reprogram_counter);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+-	u64 bitmask;
+ 	int bit;
+ 
+-	bitmask = pmu->reprogram_pmi;
+-
+-	for_each_set_bit(bit, (unsigned long *)&bitmask, X86_PMC_IDX_MAX) {
++	for_each_set_bit(bit, pmu->reprogram_pmi, X86_PMC_IDX_MAX) {
+ 		struct kvm_pmc *pmc = kvm_x86_ops->pmu_ops->pmc_idx_to_pmc(pmu, bit);
+ 
+ 		if (unlikely(!pmc || !pmc->perf_event)) {
+-			clear_bit(bit, (unsigned long *)&pmu->reprogram_pmi);
++			clear_bit(bit, pmu->reprogram_pmi);
+ 			continue;
+ 		}
+ 
+-- 
+2.21.0
 
