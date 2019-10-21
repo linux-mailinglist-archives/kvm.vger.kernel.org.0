@@ -2,95 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BCE6DE2E5
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 06:06:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51BADDE31C
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 06:19:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726994AbfJUEGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 00:06:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54785 "EHLO ozlabs.org"
+        id S1726939AbfJUETu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 00:19:50 -0400
+Received: from ozlabs.org ([203.11.71.1]:53351 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725468AbfJUEGW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 00:06:22 -0400
+        id S1725785AbfJUETu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 00:19:50 -0400
 Received: by ozlabs.org (Postfix, from userid 1003)
-        id 46xNNq5r9cz9sPL; Mon, 21 Oct 2019 15:06:19 +1100 (AEDT)
+        id 46xNhM73BQz9sPL; Mon, 21 Oct 2019 15:19:47 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1571630779; bh=0gIwOYRl+uLZLFdtC8UjqQo4XwJkG5ky/1miRAY9OXI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uFrQ7d0o8UWnjar+mh+ZFxZ1mDSn3m5dIt9yNR6EqQjYSz1EYO+gIccKPoGpunI5w
-         0AIDCeEV2WBtpDEynARdN3dmOcdhJM/fktF67Gj2ra7tJr4gvR28m8CQBssIPjSIwN
-         U+u4hcS38D9+iwBu7BjxWGoo8+oFHHwNY4vNnciPhJ64J28qsWZqvIBSFwlYJtLfEH
-         bZybTxodoBoGatjBQtJDljCS71wqI6zuDjmg3XA9343R20BAZQS+pbXCIDJDjHm8qN
-         OdhRKdFynZLg5RyG/Xh6q1+iJlbfbEDRxoNwj79dGZ+VOCq7TUTKpG/Vvn//wnWYYs
-         40PcjWjjhHX3g==
-Date:   Mon, 21 Oct 2019 15:06:15 +1100
+        t=1571631587; bh=tFDCZHiCpDGbaT0g9jIZjA6STP+v2L5+76W/D47yv9Y=;
+        h=Date:From:To:Cc:Subject:From;
+        b=tIY5F3uZeIgiqDlirqZ5oQdhDWT8xCCUei8csmJxyyxai9Et8lFhPTlP3SPUXars6
+         MAbJl0gE0dABKeiz3DiVEpnb3mJ+gf7Md+5TiQkgnNOen0Fhlgo12SN+Fdplu5uMHl
+         DlyhsOT3LK+9Eypnp5IpsO8DAJdDo699v0vTbTW1eT0QVktaJiqHVo77sit1o9BxNq
+         sYgGnpq9yA3bEOr6gp4xKoQafzbQLL69q2dxS/xkVQCPqQkD0Udfo4fEubsp7A80/2
+         dm/DKWXrw3CWNwK4S2IiKR0Cq0WnBP/seSVrS7TbPIH0+sgXAYqhZs98FV4V/4JNHH
+         WXvsVcSnS7ROw==
+Date:   Mon, 21 Oct 2019 15:19:41 +1100
 From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] KVM: PPC: Book3S: HV: XIVE: Allocate less VPs in
- OPAL
-Message-ID: <20191021040615.GA20714@oak.ozlabs.ibm.com>
-References: <156958521220.1503771.2119482814236775333.stgit@bahia.lan>
- <20191016234403.77cdf150@bahia.lan>
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
+Subject: [GIT PULL] Please pull my kvm-ppc-fixes-5.4-1 tag
+Message-ID: <20191021041941.GA17498@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191016234403.77cdf150@bahia.lan>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 11:44:03PM +0200, Greg Kurz wrote:
-> On Fri, 27 Sep 2019 13:53:32 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > This brings some fixes and allows to start more VMs with an in-kernel
-> > XIVE or XICS-on-XIVE device.
-> > 
-> > Changes since v1 (https://patchwork.ozlabs.org/cover/1166099/):
-> > - drop a useless patch
-> > - add a patch to show VP ids in debugfs
-> > - update some changelogs
-> > - fix buggy check in patch 5
-> > - Cc: stable 
-> > 
-> > --
-> > Greg
-> > 
-> > ---
-> > 
-> > Greg Kurz (6):
-> >       KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
-> >       KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
-> >       KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
-> >       KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
-> >       KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
-> >       KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
-> > 
-> > 
-> >  Documentation/virt/kvm/devices/xics.txt |   14 +++
-> >  Documentation/virt/kvm/devices/xive.txt |    8 ++
-> >  arch/powerpc/include/uapi/asm/kvm.h     |    3 +
-> >  arch/powerpc/kvm/book3s_xive.c          |  142 ++++++++++++++++++++++++-------
-> >  arch/powerpc/kvm/book3s_xive.h          |   17 ++++
-> >  arch/powerpc/kvm/book3s_xive_native.c   |   40 +++------
-> >  6 files changed, 167 insertions(+), 57 deletions(-)
-> > 
-> 
-> Ping ?
+Paolo or Radim,
 
-I'm about to send a pull request to Paolo for 2/6 (to go into 5.4) and
-I'm preparing a tree of stuff for 5.5 that will include the rest of
-the patches.  However, I have been delayed by the fact that multipath
-SCSI is currently broken upstream on the P8 test box that I use, so I
-haven't been able to test things.
+Please do a pull from my kvm-ppc-fixes-5.4-1 tag to get a commit which
+fixes a potential host crash.  I have based my tree on 5.4-rc3 because
+there is another KVM fix which is included in 5.4-rc3, having gone
+upstream via Michael Ellerman's tree.
 
+Thanks,
 Paul.
+
+The following changes since commit 4f5cafb5cb8471e54afdc9054d973535614f7675:
+
+  Linux 5.4-rc3 (2019-10-13 16:37:36 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-fixes-5.4-1
+
+for you to fetch changes up to 12ade69c1eb9958b13374edf5ef742ea20ccffde:
+
+  KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use (2019-10-15 16:09:11 +1100)
+
+----------------------------------------------------------------
+PPC KVM fix for 5.4
+
+- Fix a bug in the XIVE code which can cause a host crash.
+
+----------------------------------------------------------------
+Greg Kurz (1):
+      KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
+
+ arch/powerpc/kvm/book3s_xive.c        | 24 ++++++++++++++++--------
+ arch/powerpc/kvm/book3s_xive.h        | 12 ++++++++++++
+ arch/powerpc/kvm/book3s_xive_native.c |  6 ++++--
+ 3 files changed, 32 insertions(+), 10 deletions(-)
