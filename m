@@ -2,68 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF6CEDE613
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 10:16:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35408DE619
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 10:17:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727648AbfJUIQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 04:16:08 -0400
-Received: from mga07.intel.com ([134.134.136.100]:2946 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726480AbfJUIQI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 04:16:08 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 01:16:07 -0700
-X-IronPort-AV: E=Sophos;i="5.67,322,1566889200"; 
-   d="scan'208";a="191037080"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.239.196.130]) ([10.239.196.130])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 21 Oct 2019 01:16:04 -0700
-Subject: Re: [PATCH v2 3/4] KVM: x86/vPMU: Reuse perf_event to avoid
- unnecessary pmc_reprogram_counter
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        peterz@infradead.org, Jim Mattson <jmattson@google.com>
-Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
-        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20191013091533.12971-1-like.xu@linux.intel.com>
- <20191013091533.12971-4-like.xu@linux.intel.com>
- <5020e826-e461-c28a-0b40-6e00aaa28163@redhat.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <931ebe53-48c8-669d-72a6-9bd8da78b095@linux.intel.com>
-Date:   Mon, 21 Oct 2019 16:16:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727677AbfJUIRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 04:17:11 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:33647 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727650AbfJUIRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 04:17:11 -0400
+Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iMSrp-0004FX-Ek; Mon, 21 Oct 2019 10:16:41 +0200
+Date:   Mon, 21 Oct 2019 10:16:40 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Miaohe Lin <linmiaohe@huawei.com>
+cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: remove redundant code in kvm_arch_vm_ioctl
+In-Reply-To: <1571626376-11357-1-git-send-email-linmiaohe@huawei.com>
+Message-ID: <alpine.DEB.2.21.1910211015260.1904@nanos.tec.linutronix.de>
+References: <1571626376-11357-1-git-send-email-linmiaohe@huawei.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <5020e826-e461-c28a-0b40-6e00aaa28163@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Mon, 21 Oct 2019, Miaohe Lin wrote:
+> If we reach here with r = 0, we will reassign r = 0
+> unnecesarry, then do the label set_irqchip_out work.
+> If we reach here with r != 0, then we will do the label
+> work directly. So this if statement and r = 0 assignment
+> is redundant.
+> 
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 661e2bf38526..0b3ebc2afb3d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4916,9 +4916,6 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  		if (!irqchip_kernel(kvm))
+>  			goto set_irqchip_out;
+>  		r = kvm_vm_ioctl_set_irqchip(kvm, chip);
+> -		if (r)
+> -			goto set_irqchip_out;
+> -		r = 0;
+>  	set_irqchip_out:
+>  		kfree(chip);
+>  		break;
 
-On 2019/10/21 16:12, Paolo Bonzini wrote:
-> Just a naming tweak:
-> 
-> On 13/10/19 11:15, Like Xu wrote:
->> +	/* the exact requested config to create perf_event */
->> +	u64 programed_config;
-> 
-> 	/*
-> 	 * eventsel value for general purpose counters, ctrl value for
-> 	 * fixed counters.
-> 	 */
-> 	u64 current_config;
-> 
-> 
+Can you please get rid of that odd jump label completely?
 
-It looks good to me and I'll apply this.
-Is there more need for improvement？
+  		if (irqchip_kernel(kvm))
+			r = kvm_vm_ioctl_set_irqchip(kvm, chip);
+
+Hmm?
+
+
+Thanks,
+
+	tglx
