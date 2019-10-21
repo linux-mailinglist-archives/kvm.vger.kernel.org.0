@@ -2,107 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E526DE74A
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 10:59:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C449FDE837
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 11:36:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727433AbfJUI7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 04:59:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60782 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726725AbfJUI7I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 04:59:08 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727786AbfJUJgi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 05:36:38 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49896 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727284AbfJUJgh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 05:36:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571650596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FpZdScR+KHI00mbq34flCWHyvKtJnKCqm7Yan1K0IeI=;
+        b=CfmF4STpp9cTMmDyreZvb4bwNhCtuC97bnNllvBwIXN7QAijTFl9W49fvfqIjIQy7nj7Ge
+        hUw5vJWg2T4Hzp5KQ/HMGX7qXer6ZTud8yIK1UvZMAzIeHbWLw9lJabJ16yXSvwvsp6+C0
+        sXEfM8LYMMZlnn2UhzCNkhuOQMRv3IA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-gGQdN0OCO4edN38FnITm1A-1; Mon, 21 Oct 2019 05:36:33 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 86BA2C05168C
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 08:59:08 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id x9so545557wrq.5
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 01:59:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ydaHKAhxNtxQS4VcAKhbtvq4PL0/S2Byn9H2tf5UTNA=;
-        b=CMfqnBRH0JqatlqkrK57515a5KedGJrMgWqjYDrklxSgrBtruWIJ0peEsBMv5GIK0D
-         2hba67qF9wXoxpp2KCUzZrLYyMwHHeLU6e3e+ikB0FYR2YjZC5+R63Y/YjRMxdEChcdj
-         XWyCEJsxrFyIPBc9a9C5uTN+mYAr6CgOxXJBTx0YEwO4bTPe1ymcSe497KlVvqI9vah7
-         wtrFGwiB/NW+bLeVG8a3NOV1qWNw9UQHO9pkLj8bDJehzKnbupjdPPAFJUUT6Hak3QJZ
-         QaXQPpl96AMod+v9ZD/LlEwtiGgCGElaPNBygBEvKJ7We97sVO7AaPFjeSTsUsDGzqSa
-         Iebg==
-X-Gm-Message-State: APjAAAUTLexYve+dSm5CqFIe2wOb+VBS4nIl9DhrOfv0aLteSFsf+t/a
-        GnIGj1EDg6x83j2v5mL72j8UXA9X4rmAye/12XFYDtCHg42cFmVMGC2owYS+QFbESjVnf+PVJYi
-        kGjCUPLQlaBc0
-X-Received: by 2002:adf:e30a:: with SMTP id b10mr17977911wrj.44.1571648347076;
-        Mon, 21 Oct 2019 01:59:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzvTfGD2A4X2sMdz7QRyHNFtWkUa7wDlh66llhXCckLy8S8kW8+WYi24WlZubZvheN7zmlhjg==
-X-Received: by 2002:adf:e30a:: with SMTP id b10mr17977887wrj.44.1571648346781;
-        Mon, 21 Oct 2019 01:59:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:566:fc24:94f2:2f13? ([2001:b07:6468:f312:566:fc24:94f2:2f13])
-        by smtp.gmail.com with ESMTPSA id z9sm14958800wrl.35.2019.10.21.01.59.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2019 01:59:06 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: remove redundant code in kvm_arch_vm_ioctl
-To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1571647973-18657-1-git-send-email-linmiaohe@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e7b65d0a-8c68-10b6-5178-decfcea54e04@redhat.com>
-Date:   Mon, 21 Oct 2019 10:59:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E66A780183E;
+        Mon, 21 Oct 2019 09:36:25 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 499036012C;
+        Mon, 21 Oct 2019 09:36:09 +0000 (UTC)
+Date:   Mon, 21 Oct 2019 11:36:07 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V4 5/6] virtio: introduce a mdev based transport
+Message-ID: <20191021113607.16b26d9d.cohuck@redhat.com>
+In-Reply-To: <2bb5645b-5c46-9cae-0571-65c302f51cf2@redhat.com>
+References: <20191017104836.32464-1-jasowang@redhat.com>
+        <20191017104836.32464-6-jasowang@redhat.com>
+        <20191018162007.31631039.cohuck@redhat.com>
+        <2bb5645b-5c46-9cae-0571-65c302f51cf2@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <1571647973-18657-1-git-send-email-linmiaohe@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: gGQdN0OCO4edN38FnITm1A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/19 10:52, Miaohe Lin wrote:
-> If we reach here with r = 0, we will reassign r = 0
-> unnecesarry, then do the label set_irqchip_out work.
-> If we reach here with r != 0, then we will do the label
-> work directly. So this if statement and r = 0 assignment
-> is redundant. We remove them and therefore we can get rid
-> of odd set_irqchip_out lable further pointed out by tglx.
+On Mon, 21 Oct 2019 13:59:23 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-While Thomas's suggestion certainly makes sense, I prefer to keep the
-get and set cases similar to each other, so I queued your v1 patch.
-Thanks for making the KVM code cleaner!
+> On 2019/10/18 =E4=B8=8B=E5=8D=8810:20, Cornelia Huck wrote:
+> > On Thu, 17 Oct 2019 18:48:35 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> > =20
+> >> This patch introduces a new mdev transport for virtio. This is used to
+> >> use kernel virtio driver to drive the mediated device that is capable
+> >> of populating virtqueue directly.
+> >>
+> >> A new virtio-mdev driver will be registered to the mdev bus, when a
+> >> new virtio-mdev device is probed, it will register the device with
+> >> mdev based config ops. This means it is a software transport between
+> >> mdev driver and mdev device. The transport was implemented through
+> >> device specific ops which is a part of mdev_parent_ops now.
+> >>
+> >> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >> ---
+> >>   drivers/virtio/Kconfig       |   7 +
+> >>   drivers/virtio/Makefile      |   1 +
+> >>   drivers/virtio/virtio_mdev.c | 409 +++++++++++++++++++++++++++++++++=
+++
+> >>   3 files changed, 417 insertions(+) =20
+> > (...)
+> > =20
+> >> +static int virtio_mdev_probe(struct device *dev)
+> >> +{
+> >> +=09struct mdev_device *mdev =3D mdev_from_dev(dev);
+> >> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(mdev=
+);
+> >> +=09struct virtio_mdev_device *vm_dev;
+> >> +=09int rc;
+> >> +
+> >> +=09vm_dev =3D devm_kzalloc(dev, sizeof(*vm_dev), GFP_KERNEL);
+> >> +=09if (!vm_dev)
+> >> +=09=09return -ENOMEM;
+> >> +
+> >> +=09vm_dev->vdev.dev.parent =3D dev;
+> >> +=09vm_dev->vdev.dev.release =3D virtio_mdev_release_dev;
+> >> +=09vm_dev->vdev.config =3D &virtio_mdev_config_ops;
+> >> +=09vm_dev->mdev =3D mdev;
+> >> +=09INIT_LIST_HEAD(&vm_dev->virtqueues);
+> >> +=09spin_lock_init(&vm_dev->lock);
+> >> +
+> >> +=09vm_dev->version =3D ops->get_mdev_features(mdev);
+> >> +=09if (vm_dev->version !=3D VIRTIO_MDEV_F_VERSION_1) {
+> >> +=09=09dev_err(dev, "VIRTIO_MDEV_F_VERSION_1 is mandatory\n");
+> >> +=09=09return -ENXIO;
+> >> +=09} =20
+> > Hm, so how is that mdev features interface supposed to work? If
+> > VIRTIO_MDEV_F_VERSION_1 is a bit, I would expect this code to test for
+> > its presence, and not for identity. =20
+>=20
+>=20
+> This should be used by driver to detect the which sets of functions and=
+=20
+> their semantics that could be provided by the device. E.g when driver=20
+> support both version 2 and version 1 but device only support version 1,=
+=20
+> driver can switch to use version 1. Btw, Is there a easy way for to test=
+=20
+> its presence or do you mean doing sanity testing on existence of the=20
+> mandatory ops that provided by the device?
 
-Paolo
+What I meant was something like:
 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/x86.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 661e2bf38526..cd4ca8c2f7de 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4913,13 +4913,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		}
->  
->  		r = -ENXIO;
-> -		if (!irqchip_kernel(kvm))
-> -			goto set_irqchip_out;
-> -		r = kvm_vm_ioctl_set_irqchip(kvm, chip);
-> -		if (r)
-> -			goto set_irqchip_out;
-> -		r = 0;
-> -	set_irqchip_out:
-> +		if (irqchip_kernel(kvm))
-> +			r = kvm_vm_ioctl_set_irqchip(kvm, chip);
->  		kfree(chip);
->  		break;
->  	}
-> 
+features =3D ops->get_mdev_features(mdev);
+if (features & VIRTIO_MDEV_F_VERSION_1)
+=09vm_dev->version =3D 1;
+else
+=09//moan about missing support for version 1
+
+Can there be class id specific extra features, or is this only for core
+features? If the latter, maybe also do something like
+
+supported_features =3D ORED_LIST_OF_FEATURES;
+if (features & ~supported_features)
+=09//moan about extra feature bits
+
+>=20
+>=20
+> >
+> > What will happen if we come up with a version 2? If this is backwards
+> > compatible, will both version 2 and version 1 be set? =20
+>=20
+>=20
+> Yes, I think so, and version 2 should be considered as some extensions=20
+> of version 1. If it's completely, it should use a new class id.
+
+Ok, that makes sense.
 
