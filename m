@@ -2,286 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 875B5DE36C
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 07:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3B9DE3D2
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 07:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726237AbfJUFB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 01:01:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42424 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725886AbfJUFB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 01:01:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BB36EB236;
-        Mon, 21 Oct 2019 05:01:23 +0000 (UTC)
-Subject: Re: [PATCH v6 10/10] arm64: Retrieve stolen time as paravirtualized
- guest
-To:     Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-11-steven.price@arm.com> <86a79wzdhk.wl-maz@kernel.org>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <237a3457-bcb3-c9b7-11ef-241b7ccc370e@suse.com>
-Date:   Mon, 21 Oct 2019 07:01:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727090AbfJUFhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 01:37:36 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43430 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725802AbfJUFhc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 01:37:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571636250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tE5uTCurAopRyTHOj2V6FdY3SscvJMRhHjElCkCREn4=;
+        b=IqV3/p4BZR97uCK2aub+XqX2z4qvhO2ay37iqpEzBvjFBR57s/itzcUiA3UOjlZTkwtOS9
+        iMQxcafoEG4g7bj4KNxMBmgsp02pFRb+iVI1hglF5gxEz2LGiCnMV9dzz6ZQpFqtjFa5qT
+        ZFYzjVhpxxnQC4zwf3ZhDN0lcCHGpe8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-e3ln3-26PuSaJTQN-5zngA-1; Mon, 21 Oct 2019 01:37:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E079107AD31;
+        Mon, 21 Oct 2019 05:37:22 +0000 (UTC)
+Received: from [10.72.12.209] (ovpn-12-209.pek2.redhat.com [10.72.12.209])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B9D360BE2;
+        Mon, 21 Oct 2019 05:36:21 +0000 (UTC)
+Subject: Re: [PATCH V4 4/6] mdev: introduce virtio device and its device ops
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+References: <20191017104836.32464-1-jasowang@redhat.com>
+ <20191017104836.32464-5-jasowang@redhat.com>
+ <20191018114614.6f1e79dc.cohuck@redhat.com>
+ <733c0cfe-064f-c8ba-6bf8-165db88d7e07@redhat.com>
+ <20191018153042.3516cde1.cohuck@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4a34d071-2e78-c37c-1046-7f9f6bb9e67f@redhat.com>
+Date:   Mon, 21 Oct 2019 13:36:22 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <86a79wzdhk.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191018153042.3516cde1.cohuck@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: e3ln3-26PuSaJTQN-5zngA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.10.19 22:28, Marc Zyngier wrote:
-> On Fri, 11 Oct 2019 13:59:30 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> Enable paravirtualization features when running under a hypervisor
->> supporting the PV_TIME_ST hypercall.
->>
->> For each (v)CPU, we ask the hypervisor for the location of a shared
->> page which the hypervisor will use to report stolen time to us. We set
->> pv_time_ops to the stolen time function which simply reads the stolen
->> value from the shared page for a VCPU. We guarantee single-copy
->> atomicity using READ_ONCE which means we can also read the stolen
->> time for another VCPU than the currently running one while it is
->> potentially being updated by the hypervisor.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   .../admin-guide/kernel-parameters.txt         |   6 +-
->>   arch/arm64/include/asm/paravirt.h             |   9 +-
->>   arch/arm64/kernel/paravirt.c                  | 148 ++++++++++++++++++
->>   arch/arm64/kernel/time.c                      |   3 +
->>   include/linux/cpuhotplug.h                    |   1 +
->>   5 files changed, 163 insertions(+), 4 deletions(-)
->>
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
->> index c7ac2f3ac99f..346b1c7a4afb 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -3083,9 +3083,9 @@
->>   			[X86,PV_OPS] Disable paravirtualized VMware scheduler
->>   			clock and use the default one.
->>   
->> -	no-steal-acc	[X86,KVM] Disable paravirtualized steal time accounting.
->> -			steal time is computed, but won't influence scheduler
->> -			behaviour
->> +	no-steal-acc	[X86,KVM,ARM64] Disable paravirtualized steal time
->> +			accounting. steal time is computed, but won't
->> +			influence scheduler behaviour
->>   
->>   	nolapic		[X86-32,APIC] Do not enable or use the local APIC.
->>   
->> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
->> index 799d9dd6f7cc..125c26c42902 100644
->> --- a/arch/arm64/include/asm/paravirt.h
->> +++ b/arch/arm64/include/asm/paravirt.h
->> @@ -21,6 +21,13 @@ static inline u64 paravirt_steal_clock(int cpu)
->>   {
->>   	return pv_ops.time.steal_clock(cpu);
->>   }
->> -#endif
->> +
->> +int __init kvm_guest_init(void);
->> +
->> +#else
->> +
->> +#define kvm_guest_init()
->> +
->> +#endif // CONFIG_PARAVIRT
->>   
->>   #endif
->> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
->> index 4cfed91fe256..de73dbec238c 100644
->> --- a/arch/arm64/kernel/paravirt.c
->> +++ b/arch/arm64/kernel/paravirt.c
->> @@ -6,13 +6,161 @@
->>    * Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
->>    */
->>   
->> +#define pr_fmt(fmt) "kvmarm-pv: " fmt
->> +
->> +#include <linux/arm-smccc.h>
->> +#include <linux/cpuhotplug.h>
->>   #include <linux/export.h>
->> +#include <linux/io.h>
->>   #include <linux/jump_label.h>
->> +#include <linux/printk.h>
->> +#include <linux/psci.h>
->> +#include <linux/reboot.h>
->> +#include <linux/slab.h>
->>   #include <linux/types.h>
->> +
->>   #include <asm/paravirt.h>
->> +#include <asm/pvclock-abi.h>
->> +#include <asm/smp_plat.h>
->>   
->>   struct static_key paravirt_steal_enabled;
->>   struct static_key paravirt_steal_rq_enabled;
->>   
->>   struct paravirt_patch_template pv_ops;
->>   EXPORT_SYMBOL_GPL(pv_ops);
->> +
->> +struct kvmarm_stolen_time_region {
->> +	struct pvclock_vcpu_stolen_time *kaddr;
->> +};
->> +
->> +static DEFINE_PER_CPU(struct kvmarm_stolen_time_region, stolen_time_region);
->> +
->> +static bool steal_acc = true;
->> +static int __init parse_no_stealacc(char *arg)
->> +{
->> +	steal_acc = false;
->> +	return 0;
->> +}
->> +
->> +early_param("no-steal-acc", parse_no_stealacc);
->> +
->> +/* return stolen time in ns by asking the hypervisor */
->> +static u64 kvm_steal_clock(int cpu)
-> 
-> This isn't KVM specific.
-> 
->> +{
->> +	struct kvmarm_stolen_time_region *reg;
->> +
->> +	reg = per_cpu_ptr(&stolen_time_region, cpu);
->> +	if (!reg->kaddr) {
->> +		pr_warn_once("stolen time enabled but not configured for cpu %d\n",
->> +			     cpu);
->> +		return 0;
->> +	}
->> +
->> +	return le64_to_cpu(READ_ONCE(reg->kaddr->stolen_time));
->> +}
->> +
->> +static int disable_stolen_time_current_cpu(void)
->> +{
->> +	struct kvmarm_stolen_time_region *reg;
->> +
->> +	reg = this_cpu_ptr(&stolen_time_region);
->> +	if (!reg->kaddr)
->> +		return 0;
->> +
->> +	memunmap(reg->kaddr);
->> +	memset(reg, 0, sizeof(*reg));
->> +
->> +	return 0;
->> +}
->> +
->> +static int stolen_time_dying_cpu(unsigned int cpu)
->> +{
->> +	return disable_stolen_time_current_cpu();
->> +}
-> 
-> You can merge these two functions, as there is no other caller.
-> 
->> +
->> +static int init_stolen_time_cpu(unsigned int cpu)
->> +{
->> +	struct kvmarm_stolen_time_region *reg;
->> +	struct arm_smccc_res res;
->> +
->> +	reg = this_cpu_ptr(&stolen_time_region);
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_ST, &res);
->> +
->> +	if ((long)res.a0 < 0)
->> +		return -EINVAL;
-> 
-> I'd rather you check an actual error code, just in case the memory map
-> starts growing to a point where we have 64bit (I)PAs...
-> 
->> +
->> +	reg->kaddr = memremap(res.a0,
->> +			      sizeof(struct pvclock_vcpu_stolen_time),
->> +			      MEMREMAP_WB);
->> +
->> +	if (!reg->kaddr) {
->> +		pr_warn("Failed to map stolen time data structure\n");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	if (le32_to_cpu(reg->kaddr->revision) != 0 ||
->> +	    le32_to_cpu(reg->kaddr->attributes) != 0) {
->> +		pr_warn("Unexpected revision or attributes in stolen time data\n");
-> 
-> WARN_ONCE instead? You probably don't want to scream for each and
-> every CPU that boots...
-> 
->> +		return -ENXIO;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int kvm_arm_init_stolen_time(void)
->> +{
->> +	int ret;
->> +
->> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVMPV_STARTING,
->> +				"hypervisor/kvmarm/pv:starting",
->> +				init_stolen_time_cpu, stolen_time_dying_cpu);
->> +	if (ret < 0)
->> +		return ret;
->> +	return 0;
->> +}
->> +
->> +static bool has_kvm_steal_clock(void)
-> 
-> This is not KVM specific either.
-> 
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	/* To detect the presence of PV time support we require SMCCC 1.1+ */
->> +	if (psci_ops.smccc_version < SMCCC_VERSION_1_1)
->> +		return false;
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
->> +			     ARM_SMCCC_HV_PV_TIME_FEATURES, &res);
->> +
->> +	if (res.a0 != SMCCC_RET_SUCCESS)
->> +		return false;
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_TIME_FEATURES,
->> +			     ARM_SMCCC_HV_PV_TIME_ST, &res);
->> +
->> +	if (res.a0 != SMCCC_RET_SUCCESS)
->> +		return false;
->> +
->> +	return true;
-> 
-> 	return (res.a0 == SMCCC_RET_SUCCESS);
-> 
->> +}
->> +
->> +int __init kvm_guest_init(void)
-> 
-> How about something like pv_time_init() instead? In the guest, this is
-> no way KVM specific, and I still hope for this to work on things like
-> Xen/HyperV/VMware (yeah, I'm foolishly optimistic). All the references
-> to KVM should go, and be replaced by something more generic (after
-> all, you're only implementing the spec, so feel free to call it
-> den0057_* if you really want).
 
-Xen guests already have the needed functionality. On ARM this just needs
-to be hooked up.
+On 2019/10/18 =E4=B8=8B=E5=8D=889:30, Cornelia Huck wrote:
+> On Fri, 18 Oct 2019 18:55:02 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> On 2019/10/18 =E4=B8=8B=E5=8D=885:46, Cornelia Huck wrote:
+>>> On Thu, 17 Oct 2019 18:48:34 +0800
+>>> Jason Wang <jasowang@redhat.com> wrote:
+>>>> + * @get_vendor_id:=09=09Get virtio vendor id
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09Returns u32: virtio vendor id
+>>> How is the vendor id defined? As for normal virtio-pci devices?
+>>
+>> The vendor that provides this device. So something like this
+>>
+>> I notice that MMIO also had this so it looks to me it's not pci specific=
+.
+> Ok. Would be good to specify this more explicitly.
 
 
-Juergen
+Ok.
+
+
+>
+>>
+>>>  =20
+>>>> + * @get_status: =09=09Get the device status
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09Returns u8: virtio device status
+>>>> + * @set_status: =09=09Set the device status
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09@status: virtio device status
+>>>> + * @get_config: =09=09Read from device specific configuration space
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09@offset: offset from the beginning of
+>>>> + *=09=09=09=09configuration space
+>>>> + *=09=09=09=09@buf: buffer used to read to
+>>>> + *=09=09=09=09@len: the length to read from
+>>>> + *=09=09=09=09configration space
+>>>> + * @set_config: =09=09Write to device specific configuration space
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09@offset: offset from the beginning of
+>>>> + *=09=09=09=09configuration space
+>>>> + *=09=09=09=09@buf: buffer used to write from
+>>>> + *=09=09=09=09@len: the length to write to
+>>>> + *=09=09=09=09configration space
+>>>> + * @get_mdev_features:=09=09Get the feature of virtio mdev device
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09Returns the mdev features (API) support by
+>>>> + *=09=09=09=09the device.
+>>> What kind of 'features' are supposed to go in there? Are these bits,
+>>> like you defined for VIRTIO_MDEV_F_VERSION_1 above?
+>>
+>> It's the API or mdev features other than virtio features. It could be
+>> used by driver to determine the capability of the mdev device. Besides
+>> _F_VERSION_1, we may add dirty page tracking etc which means we need new
+>> device ops.
+> Ok, so that's supposed to be distinct bits that can be or'ed together?
+
+
+Yes.
+
+
+> Makes sense, but probably needs some more documentation somewhere.
+
+
+Let me add some doc above this helper.
+
+
+>
+>>
+>>>  =20
+>>>> + * @get_generation:=09=09Get device generaton
+>>>> + *=09=09=09=09@mdev: mediated device
+>>>> + *=09=09=09=09Returns u32: device generation
+>>> Is that callback mandatory?
+>>
+>> I think so, it's hard to emulate that completely in virtio-mdev transpor=
+t.
+> IIRC, the generation stuff is not mandatory in the current version of
+> virtio, as not all transports have that concept.
+
+
+It looks to me we can have workaround as what has been done by virtio.c.=20
+Return 0 if this helper is not provided.
+
+
+>
+> Generally, are any of the callbacks optional, or are all of them
+> mandatory? From what I understand, you plan to add new things that
+> depend on features... would that mean non-mandatory callbacks?
+
+
+Yes, not all of them were mandatory, I will explicit explain which are=20
+mandatory and which are not.
+
+Thanks
+
+
