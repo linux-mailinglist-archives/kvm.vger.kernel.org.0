@@ -2,68 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 537ECDF153
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 17:28:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D2A4DF191
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 17:31:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729379AbfJUP2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 11:28:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55752 "EHLO mx1.redhat.com"
+        id S1728934AbfJUPbB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 11:31:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56200 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727406AbfJUP2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 11:28:36 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        id S1727680AbfJUPbA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 11:31:00 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9DED985543
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 15:28:35 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id s9so7453832wrw.23
-        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 08:28:35 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 85BC2883C2
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 15:31:00 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id k184so6141673wmk.1
+        for <kvm@vger.kernel.org>; Mon, 21 Oct 2019 08:31:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HEmIeXds/Gv0xSpUczzsnAMQ34YFmWv/ybBjSlwqKDI=;
-        b=R42a2jmJpQpAUi86KS+Q2sb8nLlmhTzdR8uiWRe81evggLKgbwSIOkhXds3A5mRQUO
-         xztAjGcquQrkDcxvstY5+Y825IkQZiR1REGLsgpgAhqTsp3HAPv8dw7eHaLMBefIWa4d
-         2j9tEz/oIWWyqynlL5Ua2FbwMi72h98wRQdcedKPokZ1sExb5/zr0OWmek0mWTMS8GVA
-         VSW4JFCsaVRq+gd2hWud/sylyymcCToKILrZcWBcXY31D7GQl9xSMWF0u4ncLwbUBOe4
-         uXg/IQno8wIIPaHefYVpehYYhcPUnC3kVKiVamOFJd1MshJDA8NZtcYHtXLFxa82TA8y
-         jv9g==
-X-Gm-Message-State: APjAAAVWlM80F9EiFsCiP6oHkIXa3xpia67CGtne4kUTJK1qco1FXGal
-        o9cw8CATZuoUWExgGU44NjZqt1t0ZI1iNB8P7Hsfyg5sKZQdjEpDzvr7+SOFBAha2WKIPGxEnq2
-        TVtSsJ2yodxrO
-X-Received: by 2002:adf:fcd1:: with SMTP id f17mr4908313wrs.82.1571671714170;
-        Mon, 21 Oct 2019 08:28:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxbXQZvDtUPX3OgBdKqjnT8Xk1PJokt8PI4arS1ny3lsG5USqzk+Rt03RIBSFxDHJDa143s/g==
-X-Received: by 2002:adf:fcd1:: with SMTP id f17mr4908292wrs.82.1571671713880;
-        Mon, 21 Oct 2019 08:28:33 -0700 (PDT)
+        bh=HXpSYYKAOP8qmSkuN9OQPmoeggjz/B9bVdloCHt7b9Q=;
+        b=sfZ59/DGFKg7cnsehReri3Btnp6R71gEFplDJ2YNRJjOy2LIPyo7B21MF5a2ueguvQ
+         XFMs+EfHM28pIx/hwdh1TFJTzhDRYQBNpTcRiJFNTJGFW18GYtTMvvnC1pSNtC8DnZQv
+         Qun0W1uHNaAVUJpUxlaRXnHh2R4H30TWFhJ5BrWMHz1trrWcO5wqulszzcf7rp4xr/O2
+         zyfGGIiwhxyPhTnwihqXmZf+Ndv8pIoNsgoZnHdxFhnJHJzipuyLEU/M/gWZ4dRMzz6I
+         WDYmtSbTSt7hn0ypkjvdDoBti3L/+CeR/9XY+lOKzKRuXGrL7ylD5WMwuijn8zvyO8kR
+         kkcA==
+X-Gm-Message-State: APjAAAWWHBIMLjLaOir+h8r3/EwnuQc8EGqwvOZXq8i9YQHGZAVLCdBq
+        QDdOxCGXAEEj1F5PsSzuUmI5XalRIJSfn300ssgIiXuUsaMTet3BzW7zs/oogJ9Ss+vysBrZT4x
+        5LgEZcZ260yrh
+X-Received: by 2002:a7b:cf30:: with SMTP id m16mr19967239wmg.89.1571671859148;
+        Mon, 21 Oct 2019 08:30:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxTZ/lUVjW3sj3DfIBV7IL+Q0e6WVIFdjwvrO+qO4Vf7KPNSe2KjsRG/pv34P9t+UFKRzKAvw==
+X-Received: by 2002:a7b:cf30:: with SMTP id m16mr19967224wmg.89.1571671858896;
+        Mon, 21 Oct 2019 08:30:58 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:847b:6afc:17c:89dd? ([2001:b07:6468:f312:847b:6afc:17c:89dd])
-        by smtp.gmail.com with ESMTPSA id a2sm2635979wrv.39.2019.10.21.08.28.32
+        by smtp.gmail.com with ESMTPSA id d8sm2174955wrr.71.2019.10.21.08.30.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2019 08:28:33 -0700 (PDT)
-Subject: Re: [PATCH v2 4/4] KVM: x86/vPMU: Add lazy mechanism to release
- perf_event per vPMC
-To:     Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org
-Cc:     peterz@infradead.org, Jim Mattson <jmattson@google.com>,
-        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        ak@linux.intel.com, wei.w.wang@intel.com, kan.liang@intel.com,
-        like.xu@intel.com, ehankland@google.com, arbel.moshe@oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20191013091533.12971-1-like.xu@linux.intel.com>
- <20191013091533.12971-5-like.xu@linux.intel.com>
- <5eb638a3-5ebe-219a-c975-19808ab702b9@redhat.com>
- <c2979d05-4536-e3b5-e2f6-3e6740c1a82d@linux.intel.com>
+        Mon, 21 Oct 2019 08:30:58 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] Switch the order of the parameters in
+ report() and report_xfail()
+To:     Andrew Jones <drjones@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Bill Wendling <morbo@google.com>, kvm-ppc@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Laurent Vivier <lvivier@redhat.com>
+References: <20191017131552.30913-1-thuth@redhat.com>
+ <20191017133031.wmc7y26nsd63zle6@kamzik.brq.redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <2175c2cd-2c1e-22e8-2f67-3fc334ef2a40@redhat.com>
-Date:   Mon, 21 Oct 2019 17:28:31 +0200
+Message-ID: <b6982589-33ff-db3f-d6f2-941a70cd0783@redhat.com>
+Date:   Mon, 21 Oct 2019 17:30:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <c2979d05-4536-e3b5-e2f6-3e6740c1a82d@linux.intel.com>
+In-Reply-To: <20191017133031.wmc7y26nsd63zle6@kamzik.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,31 +66,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/10/19 16:04, Like Xu wrote:
-> 
->>
->> 2) introduce a new callback msr_idx_to_pmc that returns a struct
->> kvm_pmc*, and change kvm_pmu_is_valid_msr to do
-> 
-> For callback msr_idx_to_pmc,
-> how do we deal with the input 'MSR_CORE_PERF_FIXED_CTR_CTRL'
-> which may return several fixed kvm_pmcs not just one?
+On 17/10/19 15:30, Andrew Jones wrote:
+> Paolo, do you want me to do PULL
+> requests for all the arm-related patches?
 
-For RDMSR, do not do anything.  For WRMSR, you can handle it in the
-set_msr callback.
+Yes, that's why it's not merged. :)
 
->>
->> static int kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
-> 
-> s/static int/static void/.
-> 
->> {
->>     struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>     struct kvm_pmc *pmc = kvm_x86_ops->pmu_ops->msr_idx_to_pmc(vcpu, msr);
-> 
-> We need 'if(pmc)' here.
-
-Agreed, sorry for the sloppiness.  Never interpret my suggestions as
-more than pseudocode. :)
+This patch is mostly automatically generated, so Thomas can send me v2
+after your pull request is in, and I'll apply it.
 
 Paolo
