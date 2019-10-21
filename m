@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2882E005D
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 11:08:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD43EE0064
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 11:08:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388539AbfJVJIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 05:08:32 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:49388 "EHLO
+        id S2388601AbfJVJIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 05:08:44 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49570 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388522AbfJVJIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 05:08:31 -0400
+        with ESMTP id S2388519AbfJVJIo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 05:08:44 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M94J3i173426;
-        Tue, 22 Oct 2019 09:06:51 GMT
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M94Dxa173370;
+        Tue, 22 Oct 2019 09:06:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
- bh=M7GOAZyy9Y3a2U5J+r6a9sBRzXgKBxEx/+Et0RnKtcc=;
- b=MlkjeF5M7gvv8DpfJm/eTxe/WcxamAkQBxAwgVxXSRWeLNeqLnkTv0V7942VvP5COgNX
- b0WmcRjDyu6myoHF7mdNaYbocjRb4J6/Nw3GOwJm1ad2/B76XtrTOLSH37DrhX/rX5Nx
- cDWEt2OUw76CvB7bXu+06rMofXMeSc+YtaPnJlVpXk8/LLnrBoVoC0uenNR5JGrwKgdJ
- 9q990GgPvZLX8p8ntCDmDoXhPDQc4r6mVEaX45wIezpye07PvbDTXlKEG8DpaLdkey66
- odKIOI/WBzVMy9heZMMfBOf5iUd9IEarSHq22b95JZbAZjhEaMhHmg4L+QLxV9Tc11L5 Fw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2vqswtdbph-1
+ bh=qaL3Wn/zckv6LbHPeF9PDceDQSnByrsojCND7DKPF+c=;
+ b=c3hAboaiNU14cMu+NrC89lBPDj8oh8cQyu/dkDQLR/2pHUlPgJL0rmigjQR8qjBqTF2d
+ bhuWjzYYyJVYOkJFHAaPYivzew4Q7xMgNHr0ptTsS5tKXd3IICltZXaISz1TdxULsHh+
+ hSMbMshE972nujNEvrybfAqCJ2fSSEu98joZavahpG5CVkzLfT7XlcNK6wfmVTtskEQW
+ Yvpbr3E0zVgZFzqXCTmgcB3Ol1cvu+AXzYsD4PzM95NrFuRDxonLUquzoqT58ipDgtd1
+ t2VGei2mS34iu4wOfugp3Gdxwz1C6ZRPCXkaeHE7JvRvdGsOA2d7WSuXW5PhnDX4bDyN pg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2vqswtdbq5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Oct 2019 09:06:51 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M93AWu047918;
-        Tue, 22 Oct 2019 09:06:50 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2vrc01fjgk-1
+        Tue, 22 Oct 2019 09:06:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M94Gpd078959;
+        Tue, 22 Oct 2019 09:06:58 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2vsp3xqd22-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Oct 2019 09:06:50 +0000
+        Tue, 22 Oct 2019 09:06:57 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9M96mjU020744;
-        Tue, 22 Oct 2019 09:06:49 GMT
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9M96uL5024561;
+        Tue, 22 Oct 2019 09:06:56 GMT
 Received: from z2.cn.oracle.com (/10.182.70.159)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 22 Oct 2019 09:06:48 +0000
+        with ESMTP ; Tue, 22 Oct 2019 09:06:55 +0000
 From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
@@ -51,11 +51,10 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
         sthemmin@microsoft.com, sashal@kernel.org,
         Zhenzhong Duan <zhenzhong.duan@oracle.com>,
         Jonathan Corbet <corbet@lwn.net>,
-        Stefano Stabellini <sstabellini@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v7 4/5] xen: Mark "xen_nopvspin" parameter obsolete
-Date:   Mon, 21 Oct 2019 17:11:15 +0800
-Message-Id: <1571649076-2421-5-git-send-email-zhenzhong.duan@oracle.com>
+Subject: [PATCH v7 5/5] x86/hyperv: Mark "hv_nopvspin" parameter obsolete
+Date:   Mon, 21 Oct 2019 17:11:16 +0800
+Message-Id: <1571649076-2421-6-git-send-email-zhenzhong.duan@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
 References: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
@@ -75,70 +74,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Map "xen_nopvspin" to "nopvspin", fix stale description of "xen_nopvspin"
-as we use qspinlock now.
+Map "hv_nopvspin" to "nopvspin".
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Reviewed-by: Michael Kelley <mikelley@microsoft.com>
 Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Stephen Hemminger <sthemmin@microsoft.com>
+Cc: Sasha Levin <sashal@kernel.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
 ---
- Documentation/admin-guide/kernel-parameters.txt | 7 ++++---
- arch/x86/xen/spinlock.c                         | 4 ++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt | 6 +++++-
+ arch/x86/hyperv/hv_spinlock.c                   | 4 ++++
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index bd49ed2..85059dd 100644
+index 85059dd..78648bb 100644
 --- a/Documentation/admin-guide/kernel-parameters.txt
 +++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -5307,8 +5307,9 @@
- 			panic() code such as dumping handler.
+@@ -1436,6 +1436,10 @@
+ 	hv_nopvspin	[X86,HYPER_V] Disables the paravirt spinlock optimizations
+ 				      which allow the hypervisor to 'idle' the
+ 				      guest on lock contention.
++				      This parameter is obsoleted by "nopvspin"
++				      parameter, which has equivalent effect for
++				      HYPER_V platform.
++
  
- 	xen_nopvspin	[X86,XEN]
--			Disables the ticketlock slowpath using Xen PV
--			optimizations.
-+			Disables the qspinlock slowpath using Xen PV optimizations.
-+			This parameter is obsoleted by "nopvspin" parameter, which
-+			has equivalent effect for XEN platform.
- 
- 	xen_nopv	[X86]
- 			Disables the PV optimizations forcing the HVM guest to
-@@ -5334,7 +5335,7 @@
+ 	keep_bootcon	[KNL]
+ 			Do not unregister boot console at start. This is only
+@@ -5335,7 +5339,7 @@
  			as generic guest with no PV drivers. Currently support
  			XEN HVM, KVM, HYPER_V and VMWARE guest.
  
--	nopvspin	[X86,KVM]
-+	nopvspin	[X86,XEN,KVM]
+-	nopvspin	[X86,XEN,KVM]
++	nopvspin	[X86,XEN,KVM,HYPER_V]
  			Disables the qspinlock slow path using PV optimizations
  			which allow the hypervisor to 'idle' the guest on lock
  			contention.
-diff --git a/arch/x86/xen/spinlock.c b/arch/x86/xen/spinlock.c
-index 6deb490..799f4eb 100644
---- a/arch/x86/xen/spinlock.c
-+++ b/arch/x86/xen/spinlock.c
-@@ -114,9 +114,8 @@ void xen_uninit_lock_cpu(int cpu)
-  */
- void __init xen_init_spinlocks(void)
- {
--
- 	/*  Don't need to use pvqspinlock code if there is only 1 vCPU. */
--	if (num_possible_cpus() == 1)
-+	if (num_possible_cpus() == 1 || nopvspin)
- 		xen_pvspin = false;
+diff --git a/arch/x86/hyperv/hv_spinlock.c b/arch/x86/hyperv/hv_spinlock.c
+index 07f21a0..47c7d6c 100644
+--- a/arch/x86/hyperv/hv_spinlock.c
++++ b/arch/x86/hyperv/hv_spinlock.c
+@@ -64,6 +64,9 @@ __visible bool hv_vcpu_is_preempted(int vcpu)
  
- 	if (!xen_pvspin) {
-@@ -137,6 +136,7 @@ void __init xen_init_spinlocks(void)
- 
- static __init int xen_parse_nopvspin(char *arg)
+ void __init hv_init_spinlocks(void)
  {
-+	pr_notice("\"xen_nopvspin\" is deprecated, please use \"nopvspin\" instead\n");
- 	xen_pvspin = false;
++	if (nopvspin)
++		hv_pvspin = false;
++
+ 	if (!hv_pvspin || !apic ||
+ 	    !(ms_hyperv.hints & HV_X64_CLUSTER_IPI_RECOMMENDED) ||
+ 	    !(ms_hyperv.features & HV_X64_MSR_GUEST_IDLE_AVAILABLE)) {
+@@ -82,6 +85,7 @@ void __init hv_init_spinlocks(void)
+ 
+ static __init int hv_parse_nopvspin(char *arg)
+ {
++	pr_notice("\"hv_nopvspin\" is deprecated, please use \"nopvspin\" instead\n");
+ 	hv_pvspin = false;
  	return 0;
  }
 -- 
