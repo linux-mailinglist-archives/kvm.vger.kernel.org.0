@@ -2,141 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85D3FE000A
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 10:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF6E2E005E
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 11:08:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729458AbfJVIyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 04:54:08 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:33307 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728346AbfJVIyI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 04:54:08 -0400
-Received: by mail-ot1-f67.google.com with SMTP id 60so13507042otu.0
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 01:54:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dOQT7brDSLVHQZ5HYLvcbdrbSrflixmCqXUksIzgvXw=;
-        b=cZ1syUpG4BDXz4x9vbWpQpOBDQHUzdQVmv622hIDd9Iq8NqPyHYpyPGBK6L8luxWvW
-         1UAS+rL8Vo+ESS6ZFIHbq4YI+XlFzcO0sWM9XZRC9l1KGd4OjP6wjCdS36HV+8fN7xIF
-         9vApZeRLpgWm+Diwcr4F2Zz/jMN05W9vPl1yDfOizFICzf6iC/nNK7zODi0r+yqGL9yD
-         MW4RO5sTmVz4YNTTEcaAFC54naokSGcCFbXqDSe/Vho24zcDzaa7u0RtZOJx7HgzJMNC
-         lnXwvql6ny2jsFhMLNVnbBlnHT/RwlpqKZdeskTJZ5N/2M7fIS0+l9++eQt4DvBTcPGq
-         Ox5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dOQT7brDSLVHQZ5HYLvcbdrbSrflixmCqXUksIzgvXw=;
-        b=saD++4dSxpCQ0RMOtkvB7wmp/y4s63ghzciELCmzm1LgNJ+UHfuj9SHDUqv/2WOc5Y
-         L2xMqagskIm5ZE06BXWek5VvOyXdXCnEisTAV9VeQMBZtoKYHbmqYfwvM2Ngb/y/SryY
-         vQgjr0B9dSw3AGekrKsorI7+/YoerwyjZKhLNT68ueZUwQtsjNWy43h6pWxfw6jqEViO
-         EXDsulr6UcnKztiUIHp9SLNzZ4T3hqjGIBCddwrLEJ6rXjNluRN06adnbizfKGZjRtyY
-         PfP9U/hmU0PIDEXjbyXD77MK85tac1LLdXZRTDMcrYdPsU77jD0m+XIWWKwddeCPziho
-         jd/g==
-X-Gm-Message-State: APjAAAXLj1MYdkxkXmqm3kaQCufdCVsRbLWK8wWadJOuXG2B92WVLYjX
-        0ZOtcpN0beSxNDOPby6nNDwyc5PC7hXLvr6hvfA=
-X-Google-Smtp-Source: APXvYqz+PV8aHY2sm6m3qwOLsTh94rRDTl+fMhPUyv3gYhq+pnU2GkwOs8Pn1jFD59sHDXSzIHEe0twWwjEH342N3xU=
-X-Received: by 2002:a9d:61d1:: with SMTP id h17mr1670381otk.254.1571734447037;
- Tue, 22 Oct 2019 01:54:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191017235036.25624-1-sjitindarsingh@gmail.com>
- <87pniu0zcw.fsf@vitty.brq.redhat.com> <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
-In-Reply-To: <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 22 Oct 2019 16:53:56 +0800
-Message-ID: <CANRm+CyqTeE4XmqL0KFY=Un2=nfRb1degsJJz1m080mgeE10HQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Radim Krcmar <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2388570AbfJVJIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 05:08:35 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:50640 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388565AbfJVJIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 05:08:35 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M94JXw156336;
+        Tue, 22 Oct 2019 09:06:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=z26nZqDxzBOJ9BRfbSpqDpmsq0mVNNYQLDQL4WWklhc=;
+ b=HIgodUMs9ZAbI6mH8+OJx/CTveL/ZDZUlvQ1TK9BjEaPawvfoZ/ZJMPAIHKHTRF5mcs7
+ gYIuc8aYW2jcbW44bsg4ROuMW6xqNsp4r1l4ymwWmUfYbUS7HqZWApB30EQ15g7Wb14a
+ T2g7VLoL8sS7PWCkZ9LBgPwhutXZc37mDwtHSOPW45gpwV+smSPktILa9iaHAQmpvvHE
+ /EBvqORUSoxJDRg0DLAqf3ekx9PD3nkzlxffAJlvd/bSRWbGBZYJdW/z5O4yJuTtCeUD
+ C69XyztcMJ+z00Uemi3Jwoeb1r8/GzbJ1Mmp5n1/iJD0pxzxg0vc9EBo7iFuHzj8Q2Br 3A== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2vqtepn899-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Oct 2019 09:06:27 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9M937NR014871;
+        Tue, 22 Oct 2019 09:06:26 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2vsx2qbb6j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Oct 2019 09:06:26 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9M96H0I006689;
+        Tue, 22 Oct 2019 09:06:21 GMT
+Received: from z2.cn.oracle.com (/10.182.70.159)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 22 Oct 2019 09:06:17 +0000
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com, peterz@infradead.org,
+        will@kernel.org, linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org,
+        Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Subject: [PATCH v7 0/5] Add a unified parameter "nopvspin"
+Date:   Mon, 21 Oct 2019 17:11:11 +0800
+Message-Id: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9417 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910220086
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9417 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910220086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Oct 2019 at 06:51, Suraj Jitindar Singh
-<sjitindarsingh@gmail.com> wrote:
->
-> Hi,
->
-> On Fri, 2019-10-18 at 18:53 +0200, Vitaly Kuznetsov wrote:
-> > Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
-> >
-> > > From: Suraj Jitindar Singh <surajjs@amazon.com>
-> > >
-> > > The test in x86/apic.c named test_pv_ipi is used to test for a
-> > > kernel
-> > > bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an
-> > > out of
-> > > bounds access.
-> > >
-> > > If the host doesn't implement this hcall then the out of bounds
-> > > access
-> > > cannot be triggered.
-> > >
-> > > Detect the case where the host doesn't implement the
-> > > KVM_HC_SEND_IPI
-> > > hcall and skip the test when this is the case, as the test doesn't
-> > > apply.
-> > >
-> > > Output without patch:
-> > > FAIL: PV IPIs testing
-> > >
-> > > With patch:
-> > > SKIP: PV IPIs testing: h-call not available
-> > >
-> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > > ---
-> > >  x86/apic.c | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > >
-> > > diff --git a/x86/apic.c b/x86/apic.c
-> > > index eb785c4..bd44b54 100644
-> > > --- a/x86/apic.c
-> > > +++ b/x86/apic.c
-> > > @@ -8,6 +8,8 @@
-> > >  #include "atomic.h"
-> > >  #include "fwcfg.h"
-> > >
-> > > +#include <linux/kvm_para.h>
-> > > +
-> > >  #define MAX_TPR                    0xf
-> > >
-> > >  static void test_lapic_existence(void)
-> > > @@ -638,6 +640,15 @@ static void test_pv_ipi(void)
-> > >      unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 =
-> > > 0x0;
-> > >
-> > >      asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI),
-> > > "b"(a0), "c"(a1), "d"(a2), "S"(a3));
-> > > +    /*
-> > > +     * Detect the case where the hcall is not implemented by the
-> > > hypervisor and
-> > > +     * skip this test if this is the case. Is the hcall isn't
-> > > implemented then
-> > > +     * the bug that this test is trying to catch can't be
-> > > triggered.
-> > > +     */
-> > > +    if (ret == -KVM_ENOSYS) {
-> > > +       report_skip("PV IPIs testing: h-call not available");
-> > > +       return;
-> > > +    }
-> > >      report("PV IPIs testing", !ret);
-> > >  }
-> >
-> > Should we be checking CPUID bit (KVM_FEATURE_PV_SEND_IPI) instead?
-> >
->
-> That's also an option. It will produce the same result.
->
-> Would that be the preferred approach or is the method used in the
-> current patch ok?
+All the patches have Reviewed-by now, I think v7 could be the final
+version.
 
-Btw, is it amazon using pv ipis? I don't think. I suspect there is an
-extra hardware assistant to benefit broadcast ipis in amazon.
+There are cases folks want to disable spinlock optimization for
+debug/test purpose. Xen and hyperv already have parameters "xen_nopvspin"
+and "hv_nopvspin" to support that, but kvm doesn't.
 
-    Wanpeng
+The first patch adds that feature to KVM guest with "nopvspin".
+
+For compatibility reason original parameters "xen_nopvspin" and
+"hv_nopvspin" are retained and marked obsolete.
+
+v7:
+PATCH3: update comment and use goto, add RB              [Vitaly Kuznetsov]
+
+v6:
+PATCH1: add Reviewed-by                                  [Vitaly Kuznetsov]
+PATCH2: change 'pv' to 'PV', add Reviewed-by             [Vitaly Kuznetsov]
+PATCH3: refactor 'if' branch in kvm_spinlock_init()      [Vitaly Kuznetsov]
+
+v5:
+PATCH1: new patch to revert a currently unnecessory commit,
+        code is simpler a bit after that change.         [Boris Ostrovsky]
+PATCH3: fold 'if' statement,add comments on virt_spin_lock_key,
+        reorder with PATCH2 to better reflect dependency                               
+PATCH4: fold 'if' statement, add Reviewed-by             [Boris Ostrovsky]
+PATCH5: add Reviewed-by                                  [Michael Kelley]
+
+v4:
+PATCH1: use variable name nopvspin instead of pvspin and
+        defined it as __initdata, changed print message,
+        updated patch description                     [Sean Christopherson]
+PATCH2: remove Suggested-by, use "kvm-guest:" prefix  [Sean Christopherson]
+PATCH3: make variable nopvsin and xen_pvspin coexist
+        remove Reviewed-by due to code change         [Sean Christopherson]
+PATCH4: make variable nopvsin and hv_pvspin coexist   [Sean Christopherson]
+
+v3:
+PATCH2: Fix indentation
+
+v2:
+PATCH1: pick the print code change into separate PATCH2,
+        updated patch description             [Vitaly Kuznetsov]
+PATCH2: new patch with print code change      [Vitaly Kuznetsov]
+PATCH3: add Reviewed-by                       [Juergen Gross]
+
+Zhenzhong Duan (5):
+  Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key
+    get initialized"
+  x86/kvm: Change print code to use pr_*() format
+  x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+  xen: Mark "xen_nopvspin" parameter obsolete
+  x86/hyperv: Mark "hv_nopvspin" parameter obsolete
+
+ Documentation/admin-guide/kernel-parameters.txt | 14 ++++-
+ arch/x86/hyperv/hv_spinlock.c                   |  4 ++
+ arch/x86/include/asm/qspinlock.h                |  1 +
+ arch/x86/kernel/kvm.c                           | 74 +++++++++++++++----------
+ arch/x86/xen/spinlock.c                         |  4 +-
+ kernel/locking/qspinlock.c                      |  7 +++
+ 6 files changed, 71 insertions(+), 33 deletions(-)
+
+-- 
+1.8.3.1
+
