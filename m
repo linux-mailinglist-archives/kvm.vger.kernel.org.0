@@ -2,72 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB2A7DE925
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 12:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B510FDE944
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 12:20:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727775AbfJUKNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 06:13:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41226 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727517AbfJUKNn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 06:13:43 -0400
+        id S1728077AbfJUKUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 06:20:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36854 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727328AbfJUKUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 06:20:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571652822;
+        s=mimecast20190719; t=1571653209;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X10UFs7tuPUPd3D+40Rh0JtzksdyNoor8tHqygg664s=;
-        b=VzqovNX1kVyNEwPu5L4CM2VOP8igO0KlQYVs3lnk4BhYL26zxXUVbVBKMCHB0dLvuwWFGa
-        kUjeqO3cT1wqtG86g5HYOt+qxEdBbokRKINfA2KmLI4lTx2ZLEIzF/ozdAnXtlYwyBUUAl
-        FFpb4zmKpPfk/X9jNeuCIQVPVcHcAv4=
+        bh=fYrZFHZOW1YUmAoRCKQjGzYd6i7mjDB4UBqk3ydgai0=;
+        b=YEXgAcQ6Uh3KunbDWOJA4GBJ0TTVCS4jcmbD2+osiJOdmRLpKLFvCvDyhVjZd2oO06jxeQ
+        xcx2obvnbqte/GLJYaYuDA1RN5o+GiKd+NOXR0jwlzym7CFaWH5cRmHnDIddahB5tBl1tl
+        IYrqfkijegwzaWnkciY3yvhfI+tZu84=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-L7NxpIXqPOmlWs4WJm5E6w-1; Mon, 21 Oct 2019 06:13:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-59-DGgyACdxNFywAbDdAHZQfA-1; Mon, 21 Oct 2019 06:20:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE1ED800D49;
-        Mon, 21 Oct 2019 10:13:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA8A55ED;
+        Mon, 21 Oct 2019 10:20:06 +0000 (UTC)
 Received: from [10.72.12.22] (ovpn-12-22.pek2.redhat.com [10.72.12.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A0AB5D70E;
-        Mon, 21 Oct 2019 10:13:03 +0000 (UTC)
-Subject: Re: [PATCH V4 5/6] virtio: introduce a mdev based transport
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        maxime.coquelin@redhat.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, rob.miller@broadcom.com,
-        xiao.w.wang@intel.com, haotian.wang@sifive.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
-        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
-        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-References: <20191017104836.32464-1-jasowang@redhat.com>
- <20191017104836.32464-6-jasowang@redhat.com>
- <20191018162007.31631039.cohuck@redhat.com>
- <2bb5645b-5c46-9cae-0571-65c302f51cf2@redhat.com>
- <20191021113607.16b26d9d.cohuck@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 686441001B09;
+        Mon, 21 Oct 2019 10:19:54 +0000 (UTC)
+Subject: Re: [RFC 2/2] vhost: IFC VF vdpa layer
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
+        zhiyuan.lv@intel.com
+References: <20191016013050.3918-1-lingshan.zhu@intel.com>
+ <20191016013050.3918-3-lingshan.zhu@intel.com>
+ <9495331d-3c65-6f49-dcd9-bfdb17054cf0@redhat.com>
+ <f65358e9-6728-8260-74f7-176d7511e989@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <1aa59fea-cae5-6303-4a94-51493d5748ba@redhat.com>
-Date:   Mon, 21 Oct 2019 18:13:02 +0800
+Message-ID: <1cae60b6-938d-e2df-2dca-fbf545f06853@redhat.com>
+Date:   Mon, 21 Oct 2019 18:19:52 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191021113607.16b26d9d.cohuck@redhat.com>
+In-Reply-To: <f65358e9-6728-8260-74f7-176d7511e989@intel.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: L7NxpIXqPOmlWs4WJm5E6w-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: DGgyACdxNFywAbDdAHZQfA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -77,97 +63,647 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/10/21 =E4=B8=8B=E5=8D=885:36, Cornelia Huck wrote:
-> On Mon, 21 Oct 2019 13:59:23 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
+On 2019/10/21 =E4=B8=8B=E5=8D=885:53, Zhu, Lingshan wrote:
 >
->> On 2019/10/18 =E4=B8=8B=E5=8D=8810:20, Cornelia Huck wrote:
->>> On Thu, 17 Oct 2019 18:48:35 +0800
->>> Jason Wang <jasowang@redhat.com> wrote:
->>>  =20
->>>> This patch introduces a new mdev transport for virtio. This is used to
->>>> use kernel virtio driver to drive the mediated device that is capable
->>>> of populating virtqueue directly.
->>>>
->>>> A new virtio-mdev driver will be registered to the mdev bus, when a
->>>> new virtio-mdev device is probed, it will register the device with
->>>> mdev based config ops. This means it is a software transport between
->>>> mdev driver and mdev device. The transport was implemented through
->>>> device specific ops which is a part of mdev_parent_ops now.
->>>>
->>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>> ---
->>>>    drivers/virtio/Kconfig       |   7 +
->>>>    drivers/virtio/Makefile      |   1 +
->>>>    drivers/virtio/virtio_mdev.c | 409 ++++++++++++++++++++++++++++++++=
-+++
->>>>    3 files changed, 417 insertions(+)
->>> (...)
->>>  =20
->>>> +static int virtio_mdev_probe(struct device *dev)
->>>> +{
->>>> +=09struct mdev_device *mdev =3D mdev_from_dev(dev);
->>>> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(mdev=
-);
->>>> +=09struct virtio_mdev_device *vm_dev;
->>>> +=09int rc;
->>>> +
->>>> +=09vm_dev =3D devm_kzalloc(dev, sizeof(*vm_dev), GFP_KERNEL);
->>>> +=09if (!vm_dev)
->>>> +=09=09return -ENOMEM;
->>>> +
->>>> +=09vm_dev->vdev.dev.parent =3D dev;
->>>> +=09vm_dev->vdev.dev.release =3D virtio_mdev_release_dev;
->>>> +=09vm_dev->vdev.config =3D &virtio_mdev_config_ops;
->>>> +=09vm_dev->mdev =3D mdev;
->>>> +=09INIT_LIST_HEAD(&vm_dev->virtqueues);
->>>> +=09spin_lock_init(&vm_dev->lock);
->>>> +
->>>> +=09vm_dev->version =3D ops->get_mdev_features(mdev);
->>>> +=09if (vm_dev->version !=3D VIRTIO_MDEV_F_VERSION_1) {
->>>> +=09=09dev_err(dev, "VIRTIO_MDEV_F_VERSION_1 is mandatory\n");
->>>> +=09=09return -ENXIO;
->>>> +=09}
->>> Hm, so how is that mdev features interface supposed to work? If
->>> VIRTIO_MDEV_F_VERSION_1 is a bit, I would expect this code to test for
->>> its presence, and not for identity.
+> On 10/16/2019 6:19 PM, Jason Wang wrote:
 >>
->> This should be used by driver to detect the which sets of functions and
->> their semantics that could be provided by the device. E.g when driver
->> support both version 2 and version 1 but device only support version 1,
->> driver can switch to use version 1. Btw, Is there a easy way for to test
->> its presence or do you mean doing sanity testing on existence of the
->> mandatory ops that provided by the device?
-> What I meant was something like:
+>> On 2019/10/16 =E4=B8=8A=E5=8D=889:30, Zhu Lingshan wrote:
+>>> This commit introduced IFC VF operations for vdpa, which complys to
+>>> vhost_mdev interfaces, handles IFC VF initialization,
+>>> configuration and removal.
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>> =C2=A0 drivers/vhost/ifcvf/ifcvf_main.c | 541=20
+>>> +++++++++++++++++++++++++++++++++++++++
+>>> =C2=A0 1 file changed, 541 insertions(+)
+>>> =C2=A0 create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
+>>>
+>>> diff --git a/drivers/vhost/ifcvf/ifcvf_main.c=20
+>>> b/drivers/vhost/ifcvf/ifcvf_main.c
+>>> new file mode 100644
+>>> index 000000000000..c48a29969a85
+>>> --- /dev/null
+>>> +++ b/drivers/vhost/ifcvf/ifcvf_main.c
+>>> @@ -0,0 +1,541 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * Copyright (C) 2019 Intel Corporation.
+>>> + */
+>>> +
+>>> +#include <linux/interrupt.h>
+>>> +#include <linux/module.h>
+>>> +#include <linux/mdev.h>
+>>> +#include <linux/pci.h>
+>>> +#include <linux/sysfs.h>
+>>> +
+>>> +#include "ifcvf_base.h"
+>>> +
+>>> +#define VERSION_STRING=C2=A0=C2=A0=C2=A0 "0.1"
+>>> +#define DRIVER_AUTHOR=C2=A0=C2=A0=C2=A0 "Intel Corporation"
+>>> +#define IFCVF_DRIVER_NAME=C2=A0=C2=A0=C2=A0 "ifcvf"
+>>> +
+>>> +static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct vring_info *vring =3D arg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (vring->cb.callback)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return vring->cb.callback(v=
+ring->cb.private);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return IRQ_HANDLED;
+>>> +}
+>>> +
+>>> +static u64 ifcvf_mdev_get_features(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return IFC_SUPPORTED_FEATURES;
+>>
+>>
+>> I would expect this should be done by querying the hw. Or IFC VF=20
+>> can't get any update through its firmware?
 >
-> features =3D ops->get_mdev_features(mdev);
-> if (features & VIRTIO_MDEV_F_VERSION_1)
-> =09vm_dev->version =3D 1;
-> else
-> =09//moan about missing support for version 1
+> Hi Jason,
 >
-> Can there be class id specific extra features, or is this only for core
-> features? If the latter, maybe also do something like
->
-> supported_features =3D ORED_LIST_OF_FEATURES;
-> if (features & ~supported_features)
-> =09//moan about extra feature bits
+> Thanks for your comments, for now driver just support these features.
 
 
-Consider driver can claim to support a list of ids, so I this it's former.
+Ok, it should work but less flexible, we can change it in the future.
 
-Will do as what you proposed.
+
+>
+>>
+>>
+>>> +}
+>>> +
+>>> +static int ifcvf_mdev_set_features(struct mdev_device *mdev, u64=20
+>>> features)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->req_features =3D features;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static u64 ifcvf_mdev_get_vq_state(struct mdev_device *mdev, u16 qid)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return vf->vring[qid].last_avail_idx;
+>>
+>>
+>> Does this really work? I'd expect it should be fetched from hw since=20
+>> it's an internal state.
+> for now, it's working, we intend to support LM in next version drivers.
+
+
+I'm not sure I understand here, I don't see any synchronization between=20
+the hardware and last_avail_idx, so last_avail_idx should not change.
+
+Btw, what did "LM" mean :) ?
+
+
+>>
+>>
+>>> +}
+>>> +
+>>> +static int ifcvf_mdev_set_vq_state(struct mdev_device *mdev, u16=20
+>>> qid, u64 num)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[qid].last_used_idx =3D num;
+>>
+>>
+>> I fail to understand why last_used_idx is needed. It looks to me the=20
+>> used idx in the used ring is sufficient.
+> I will remove it.
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[qid].last_avail_idx =3D num;
+>>
+>>
+>> Do we need a synchronization with hw immediately here?
+>>
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static int ifcvf_mdev_set_vq_address(struct mdev_device *mdev, u16=20
+>>> idx,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64 desc_area, u64 driv=
+er_area,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64 device_area)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[idx].desc =3D desc_area;
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[idx].avail =3D driver_area;
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[idx].used =3D device_area;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_mdev_set_vq_num(struct mdev_device *mdev, u16=20
+>>> qid, u32 num)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[qid].size =3D num;
+>>> +}
+>>> +
+>>> +static void ifcvf_mdev_set_vq_ready(struct mdev_device *mdev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 u16 qid, bool ready)
+>>> +{
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[qid].ready =3D ready;
+>>> +}
+>>> +
+>>> +static bool ifcvf_mdev_get_vq_ready(struct mdev_device *mdev, u16 qid)
+>>> +{
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return vf->vring[qid].ready;
+>>> +}
+>>> +
+>>> +static void ifcvf_mdev_set_vq_cb(struct mdev_device *mdev, u16 idx,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct virtio_mdev_callback *cb)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->vring[idx].cb =3D *cb;
+>>> +}
+>>> +
+>>> +static void ifcvf_mdev_kick_vq(struct mdev_device *mdev, u16 idx)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_notify_queue(vf, idx);
+>>> +}
+>>> +
+>>> +static u8 ifcvf_mdev_get_status(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return vf->status;
+>>> +}
+>>> +
+>>> +static u32 ifcvf_mdev_get_generation(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return vf->generation;
+>>> +}
+>>> +
+>>> +static int ifcvf_mdev_get_version(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return VIRTIO_MDEV_VERSION;
+>>> +}
+>>> +
+>>> +static u32 ifcvf_mdev_get_device_id(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return IFCVF_DEVICE_ID;
+>>> +}
+>>> +
+>>> +static u32 ifcvf_mdev_get_vendor_id(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return IFCVF_VENDOR_ID;
+>>> +}
+>>> +
+>>> +static u16 ifcvf_mdev_get_vq_align(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return IFCVF_QUEUE_ALIGNMENT;
+>>> +}
+>>> +
+>>> +static int ifcvf_start_datapath(void *private)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i, ret;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(private);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < (IFCVF_MAX_QUEUE_PAIRS * 2); i++)=
+ {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!vf->vring[i].ready)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>
+>>
+>> Looks like error should be returned here?
+> agreed!
+>>
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!vf->vring[i].size)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!vf->vring[i].desc || !=
+vf->vring[i].avail ||
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !vf=
+->vring[i].used)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 vf->nr_vring =3D i;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ret =3D ifcvf_start_hw(vf);
+>>> +=C2=A0=C2=A0=C2=A0 return ret;
+>>> +}
+>>> +
+>>> +static int ifcvf_stop_datapath(void *private)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(private);
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < IFCVF_MAX_QUEUES; i++)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].cb.callback =
+=3D NULL;
+>>
+>>
+>> Any synchronization is needed for the vq irq handler?
+> I think even we set callback =3D NULL, the code is still there, on-going=
+=20
+> routines would not be effected.
+
+
+Ok I think you mean when ifcvf_stop_hw() return, hardware will not=20
+respond to e.g kick and other events etc.
+
+
+>>
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_stop_hw(vf);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_reset_vring(struct ifcvf_adapter *adapter)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].last_used_idx =
+=3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].last_avail_idx=
+ =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].desc =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].avail =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].used =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring[i].ready =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring->cb.callback =3D =
+NULL;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vf->vring->cb.private =3D N=
+ULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +}
+>>> +
+>>> +static void ifcvf_mdev_set_status(struct mdev_device *mdev, u8 status)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdata(=
+mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 vf->status =3D status;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (status =3D=3D 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ifcvf_stop_datapath(adapter=
+);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ifcvf_reset_vring(adapter);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ifcvf_start_datapath(adapte=
+r);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +}
+>>> +
+>>> +static u16 ifcvf_mdev_get_queue_max(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return IFCVF_MAX_QUEUES;
+>>
+>>
+>> The name is confusing, it was used to return the maximum queue size.=20
+>> In new version of virtio-mdev, the callback was renamed as=20
+>> get_vq_num_max().
+> will change that.
+>>
+>>
+>>> +}
+>>> +
+>>> +static struct virtio_mdev_device_ops ifc_mdev_ops =3D {
+>>> +=C2=A0=C2=A0=C2=A0 .get_features=C2=A0 =3D ifcvf_mdev_get_features,
+>>> +=C2=A0=C2=A0=C2=A0 .set_features=C2=A0 =3D ifcvf_mdev_set_features,
+>>> +=C2=A0=C2=A0=C2=A0 .get_status=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get_st=
+atus,
+>>> +=C2=A0=C2=A0=C2=A0 .set_status=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_set_st=
+atus,
+>>> +=C2=A0=C2=A0=C2=A0 .get_queue_max =3D ifcvf_mdev_get_queue_max,
+>>> +=C2=A0=C2=A0=C2=A0 .get_vq_state=C2=A0=C2=A0 =3D ifcvf_mdev_get_vq_sta=
+te,
+>>> +=C2=A0=C2=A0=C2=A0 .set_vq_state=C2=A0=C2=A0 =3D ifcvf_mdev_set_vq_sta=
+te,
+>>> +=C2=A0=C2=A0=C2=A0 .set_vq_cb=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D ifcvf_=
+mdev_set_vq_cb,
+>>> +=C2=A0=C2=A0=C2=A0 .set_vq_ready=C2=A0=C2=A0 =3D ifcvf_mdev_set_vq_rea=
+dy,
+>>> +=C2=A0=C2=A0=C2=A0 .get_vq_ready=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get_=
+vq_ready,
+>>> +=C2=A0=C2=A0=C2=A0 .set_vq_num=C2=A0=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_=
+set_vq_num,
+>>> +=C2=A0=C2=A0=C2=A0 .set_vq_address =3D ifcvf_mdev_set_vq_address,
+>>> +=C2=A0=C2=A0=C2=A0 .kick_vq=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+=3D ifcvf_mdev_kick_vq,
+>>> +=C2=A0=C2=A0=C2=A0 .get_generation=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_ge=
+t_generation,
+>>> +=C2=A0=C2=A0=C2=A0 .get_version=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get_v=
+ersion,
+>>> +=C2=A0=C2=A0=C2=A0 .get_device_id=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get=
+_device_id,
+>>> +=C2=A0=C2=A0=C2=A0 .get_vendor_id=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get=
+_vendor_id,
+>>> +=C2=A0=C2=A0=C2=A0 .get_vq_align=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_get_=
+vq_align,
+>>> +};
+>>
+>>
+>> set_config/get_config is missing. It looks to me they are not hard,=20
+>> just implementing the access to dev_cfg. It's key to make kernel=20
+>> virtio driver to work.
+>>
+>> And in the new version of virito-mdev, features like _F_LOG_ALL=20
+>> should be advertised through get_mdev_features.
+> IMHO, currently the driver can work without set/get_config, vhost_mdev=20
+> doesn't call them for now.
+
+
+Yes, but it was required by virtio_mdev for host driver to work, and it=20
+looks to me it's not hard to add them. If possible please add them and=20
+"virtio" type then we can use the ops for both the case of VM and=20
+containers.
+
+
+>>
+>>
+>>> +
+>>> +static int ifcvf_init_msix(struct ifcvf_adapter *adapter)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int vector, i, ret, irq;
+>>> +=C2=A0=C2=A0=C2=A0 struct pci_dev *pdev =3D to_pci_dev(adapter->dev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D &adapter->vf;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ret =3D pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+VF_MAX_INTR, PCI_IRQ_MSIX);
+>>> +=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(adapter->dev, "Fail=
+ed to alloc irq vectors.\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vector =3D i + IFCVF_MSI_QU=
+EUE_OFF;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 irq =3D pci_irq_vector(pdev=
+, vector);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D request_irq(irq, if=
+cvf_intr_handler, 0,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 pci_name(pdev), &vf->vring[i]);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_ERR(adapter->dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "Failed to request irq for vq %d.\n", i);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+urn ret;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>
+>>
+>> Do we need to provide fallback when we can't do per vq MSIX?
+> I think it would be very rarely that can not get enough vectors.
+
+
+Right.
+
+
+>>
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_destroy_adapter(struct ifcvf_adapter *adapter)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i, vector, irq;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter);
+>>> +=C2=A0=C2=A0=C2=A0 struct pci_dev *pdev =3D to_pci_dev(adapter->dev);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vector =3D i + IFCVF_MSI_QU=
+EUE_OFF;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 irq =3D pci_irq_vector(pdev=
+, vector);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 free_irq(irq, &vf->vring[i]=
+);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +}
+>>> +
+>>> +static ssize_t name_show(struct kobject *kobj, struct device *dev,=20
+>>> char *buf)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 const char *name =3D "vhost accelerator (virtio rin=
+g compatible)";
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return sprintf(buf, "%s\n", name);
+>>> +}
+>>> +MDEV_TYPE_ATTR_RO(name);
+>>> +
+>>> +static ssize_t device_api_show(struct kobject *kobj, struct device=20
+>>> *dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *buf)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return sprintf(buf, "%s\n", VIRTIO_MDEV_DEVICE_API_=
+STRING);
+>>> +}
+>>> +MDEV_TYPE_ATTR_RO(device_api);
+>>> +
+>>> +static ssize_t available_instances_show(struct kobject *kobj,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct device *dev, char *buf=
+)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct pci_dev *pdev =3D to_pci_dev(dev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D pci_get_drvdata(p=
+dev);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return sprintf(buf, "%d\n", adapter->mdev_count);
+>>> +}
+>>> +
+>>> +MDEV_TYPE_ATTR_RO(available_instances);
+>>> +
+>>> +static ssize_t type_show(struct kobject *kobj,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 str=
+uct device *dev, char *buf)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return sprintf(buf, "%s\n", "net");
+>>> +}
+>>> +
+>>> +MDEV_TYPE_ATTR_RO(type);
+>>> +
+>>> +
+>>> +static struct attribute *mdev_types_attrs[] =3D {
+>>> +=C2=A0=C2=A0=C2=A0 &mdev_type_attr_name.attr,
+>>> +=C2=A0=C2=A0=C2=A0 &mdev_type_attr_device_api.attr,
+>>> +=C2=A0=C2=A0=C2=A0 &mdev_type_attr_available_instances.attr,
+>>> +=C2=A0=C2=A0=C2=A0 &mdev_type_attr_type.attr,
+>>> +=C2=A0=C2=A0=C2=A0 NULL,
+>>> +};
+>>> +
+>>> +static struct attribute_group mdev_type_group =3D {
+>>> +=C2=A0=C2=A0=C2=A0 .name=C2=A0 =3D "vdpa_virtio",
+>>
+>>
+>> To be consistent, it should be "vhost" or "virtio".
+> agreed!
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 .attrs =3D mdev_types_attrs,
+>>> +};
+>>> +
+>>> +static struct attribute_group *mdev_type_groups[] =3D {
+>>> +=C2=A0=C2=A0=C2=A0 &mdev_type_group,
+>>> +=C2=A0=C2=A0=C2=A0 NULL,
+>>> +};
+>>> +
+>>> +const struct attribute_group *mdev_dev_groups[] =3D {
+>>> +=C2=A0=C2=A0=C2=A0 NULL,
+>>> +};
+>>> +
+>>> +static int ifcvf_mdev_create(struct kobject *kobj, struct=20
+>>> mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct device *dev =3D mdev_parent_dev(mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct pci_dev *pdev =3D to_pci_dev(dev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D pci_get_drvdata(p=
+dev);
+>>> +=C2=A0=C2=A0=C2=A0 int ret =3D 0;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mutex_lock(&adapter->mdev_lock);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (adapter->mdev_count < 1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D -EINVAL;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mdev_set_class_id(mdev, MDEV_ID_VHOST);
+>>> +=C2=A0=C2=A0=C2=A0 mdev_set_dev_ops(mdev, &ifc_mdev_ops);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mdev_set_drvdata(mdev, adapter);
+>>> +=C2=A0=C2=A0=C2=A0 mdev_set_iommu_device(mdev_dev(mdev), dev);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 INIT_LIST_HEAD(&adapter->dma_maps);
+>>> +=C2=A0=C2=A0=C2=A0 adapter->mdev_count--;
+>>> +
+>>> +out:
+>>> +=C2=A0=C2=A0=C2=A0 mutex_unlock(&adapter->mdev_lock);
+>>> +=C2=A0=C2=A0=C2=A0 return ret;
+>>> +}
+>>> +
+>>> +static int ifcvf_mdev_remove(struct mdev_device *mdev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct device *dev =3D mdev_parent_dev(mdev);
+>>> +=C2=A0=C2=A0=C2=A0 struct pci_dev *pdev =3D to_pci_dev(dev);
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D pci_get_drvdata(p=
+dev);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mutex_lock(&adapter->mdev_lock);
+>>> +=C2=A0=C2=A0=C2=A0 adapter->mdev_count++;
+>>> +=C2=A0=C2=A0=C2=A0 mutex_unlock(&adapter->mdev_lock);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static struct mdev_parent_ops ifcvf_mdev_fops =3D {
+>>> +=C2=A0=C2=A0=C2=A0 .owner=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 =3D THIS_MODULE,
+>>> +=C2=A0=C2=A0=C2=A0 .supported_type_groups=C2=A0=C2=A0=C2=A0 =3D mdev_t=
+ype_groups,
+>>> +=C2=A0=C2=A0=C2=A0 .mdev_attr_groups=C2=A0=C2=A0=C2=A0 =3D mdev_dev_gr=
+oups,
+>>> +=C2=A0=C2=A0=C2=A0 .create=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_create,
+>>> +=C2=A0=C2=A0=C2=A0 .remove=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 =3D ifcvf_mdev_remove,
+>>> +};
+>>> +
+>>> +static int ifcvf_probe(struct pci_dev *pdev, const struct=20
+>>> pci_device_id *id)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct device *dev =3D &pdev->dev;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf;
+>>> +=C2=A0=C2=A0=C2=A0 int ret, i;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 adapter =3D kzalloc(sizeof(struct ifcvf_adapter), G=
+FP_KERNEL);
+>>> +=C2=A0=C2=A0=C2=A0 if (adapter =3D=3D NULL) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D -ENOMEM;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mutex_init(&adapter->mdev_lock);
+>>> +=C2=A0=C2=A0=C2=A0 adapter->mdev_count =3D 1;
+>>
+>>
+>> So this is per VF based vDPA implementation, which seems not=20
+>> convenient for management.=C2=A0 Anyhow we can control the creation in P=
+F?
+>>
+>> Thanks
+> the driver scope for now doesn't support that, we can add these=20
+> feature in next releases.
+
+
+Not a must for this series, but to have a better interaction with=20
+management like libvirt, it's better.
+
+Btw, do you have the plan to post PF drivers?
 
 Thanks
 
-
->
->>
->>> What will happen if we come up with a version 2? If this is backwards
->>> compatible, will both version 2 and version 1 be set?
->>
->> Yes, I think so, and version 2 should be considered as some extensions
->> of version 1. If it's completely, it should use a new class id.
-> Ok, that makes sense.
->
 
