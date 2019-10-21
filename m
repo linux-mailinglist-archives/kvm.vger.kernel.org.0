@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F3B9DE3D2
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 07:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1ADDE43C
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 08:00:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727090AbfJUFhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 01:37:36 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43430 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725802AbfJUFhc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 01:37:32 -0400
+        id S1727281AbfJUGAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 02:00:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56934 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727056AbfJUGAG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 02:00:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571636250;
+        s=mimecast20190719; t=1571637605;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tE5uTCurAopRyTHOj2V6FdY3SscvJMRhHjElCkCREn4=;
-        b=IqV3/p4BZR97uCK2aub+XqX2z4qvhO2ay37iqpEzBvjFBR57s/itzcUiA3UOjlZTkwtOS9
-        iMQxcafoEG4g7bj4KNxMBmgsp02pFRb+iVI1hglF5gxEz2LGiCnMV9dzz6ZQpFqtjFa5qT
-        ZFYzjVhpxxnQC4zwf3ZhDN0lcCHGpe8=
+        bh=dDGATv3pDDt35nGamPbAiYICPiIcyMTX5D3TlrrxwFE=;
+        b=LO2LGnn5bRC+I8oL6PHluwuY2ZZehUCoevjG1bH6OmWvnyj+wt9HPHvILfcfEX03XlLQSd
+        YoV/Ki8wD3EZt8gCKH8TZAuKFC9IzydJSZ1w7L8Ih7oBa+3qYGkFtQduDt27T8MzvZWteH
+        HfvRSt1CwYSbO7+6/gMxLsj1G1sLypA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-e3ln3-26PuSaJTQN-5zngA-1; Mon, 21 Oct 2019 01:37:26 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-78-NR0dB1IIOm-f7cm23buKPw-1; Mon, 21 Oct 2019 02:00:01 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E079107AD31;
-        Mon, 21 Oct 2019 05:37:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F351100551E;
+        Mon, 21 Oct 2019 05:59:57 +0000 (UTC)
 Received: from [10.72.12.209] (ovpn-12-209.pek2.redhat.com [10.72.12.209])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B9D360BE2;
-        Mon, 21 Oct 2019 05:36:21 +0000 (UTC)
-Subject: Re: [PATCH V4 4/6] mdev: introduce virtio device and its device ops
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1919360606;
+        Mon, 21 Oct 2019 05:59:23 +0000 (UTC)
+Subject: Re: [PATCH V4 5/6] virtio: introduce a mdev based transport
 To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
@@ -54,20 +54,18 @@ Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
         stefanha@redhat.com
 References: <20191017104836.32464-1-jasowang@redhat.com>
- <20191017104836.32464-5-jasowang@redhat.com>
- <20191018114614.6f1e79dc.cohuck@redhat.com>
- <733c0cfe-064f-c8ba-6bf8-165db88d7e07@redhat.com>
- <20191018153042.3516cde1.cohuck@redhat.com>
+ <20191017104836.32464-6-jasowang@redhat.com>
+ <20191018162007.31631039.cohuck@redhat.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <4a34d071-2e78-c37c-1046-7f9f6bb9e67f@redhat.com>
-Date:   Mon, 21 Oct 2019 13:36:22 +0800
+Message-ID: <2bb5645b-5c46-9cae-0571-65c302f51cf2@redhat.com>
+Date:   Mon, 21 Oct 2019 13:59:23 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191018153042.3516cde1.cohuck@redhat.com>
+In-Reply-To: <20191018162007.31631039.cohuck@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: e3ln3-26PuSaJTQN-5zngA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: NR0dB1IIOm-f7cm23buKPw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -77,101 +75,89 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/10/18 =E4=B8=8B=E5=8D=889:30, Cornelia Huck wrote:
-> On Fri, 18 Oct 2019 18:55:02 +0800
+On 2019/10/18 =E4=B8=8B=E5=8D=8810:20, Cornelia Huck wrote:
+> On Thu, 17 Oct 2019 18:48:35 +0800
 > Jason Wang <jasowang@redhat.com> wrote:
 >
->> On 2019/10/18 =E4=B8=8B=E5=8D=885:46, Cornelia Huck wrote:
->>> On Thu, 17 Oct 2019 18:48:34 +0800
->>> Jason Wang <jasowang@redhat.com> wrote:
->>>> + * @get_vendor_id:=09=09Get virtio vendor id
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09Returns u32: virtio vendor id
->>> How is the vendor id defined? As for normal virtio-pci devices?
+>> This patch introduces a new mdev transport for virtio. This is used to
+>> use kernel virtio driver to drive the mediated device that is capable
+>> of populating virtqueue directly.
 >>
->> The vendor that provides this device. So something like this
+>> A new virtio-mdev driver will be registered to the mdev bus, when a
+>> new virtio-mdev device is probed, it will register the device with
+>> mdev based config ops. This means it is a software transport between
+>> mdev driver and mdev device. The transport was implemented through
+>> device specific ops which is a part of mdev_parent_ops now.
 >>
->> I notice that MMIO also had this so it looks to me it's not pci specific=
-.
-> Ok. Would be good to specify this more explicitly.
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   drivers/virtio/Kconfig       |   7 +
+>>   drivers/virtio/Makefile      |   1 +
+>>   drivers/virtio/virtio_mdev.c | 409 +++++++++++++++++++++++++++++++++++
+>>   3 files changed, 417 insertions(+)
+> (...)
+>
+>> +static int virtio_mdev_probe(struct device *dev)
+>> +{
+>> +=09struct mdev_device *mdev =3D mdev_from_dev(dev);
+>> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(mdev);
+>> +=09struct virtio_mdev_device *vm_dev;
+>> +=09int rc;
+>> +
+>> +=09vm_dev =3D devm_kzalloc(dev, sizeof(*vm_dev), GFP_KERNEL);
+>> +=09if (!vm_dev)
+>> +=09=09return -ENOMEM;
+>> +
+>> +=09vm_dev->vdev.dev.parent =3D dev;
+>> +=09vm_dev->vdev.dev.release =3D virtio_mdev_release_dev;
+>> +=09vm_dev->vdev.config =3D &virtio_mdev_config_ops;
+>> +=09vm_dev->mdev =3D mdev;
+>> +=09INIT_LIST_HEAD(&vm_dev->virtqueues);
+>> +=09spin_lock_init(&vm_dev->lock);
+>> +
+>> +=09vm_dev->version =3D ops->get_mdev_features(mdev);
+>> +=09if (vm_dev->version !=3D VIRTIO_MDEV_F_VERSION_1) {
+>> +=09=09dev_err(dev, "VIRTIO_MDEV_F_VERSION_1 is mandatory\n");
+>> +=09=09return -ENXIO;
+>> +=09}
+> Hm, so how is that mdev features interface supposed to work? If
+> VIRTIO_MDEV_F_VERSION_1 is a bit, I would expect this code to test for
+> its presence, and not for identity.
 
 
-Ok.
+This should be used by driver to detect the which sets of functions and=20
+their semantics that could be provided by the device. E.g when driver=20
+support both version 2 and version 1 but device only support version 1,=20
+driver can switch to use version 1. Btw, Is there a easy way for to test=20
+its presence or do you mean doing sanity testing on existence of the=20
+mandatory ops that provided by the device?
 
 
 >
->>
->>>  =20
->>>> + * @get_status: =09=09Get the device status
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09Returns u8: virtio device status
->>>> + * @set_status: =09=09Set the device status
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09@status: virtio device status
->>>> + * @get_config: =09=09Read from device specific configuration space
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09@offset: offset from the beginning of
->>>> + *=09=09=09=09configuration space
->>>> + *=09=09=09=09@buf: buffer used to read to
->>>> + *=09=09=09=09@len: the length to read from
->>>> + *=09=09=09=09configration space
->>>> + * @set_config: =09=09Write to device specific configuration space
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09@offset: offset from the beginning of
->>>> + *=09=09=09=09configuration space
->>>> + *=09=09=09=09@buf: buffer used to write from
->>>> + *=09=09=09=09@len: the length to write to
->>>> + *=09=09=09=09configration space
->>>> + * @get_mdev_features:=09=09Get the feature of virtio mdev device
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09Returns the mdev features (API) support by
->>>> + *=09=09=09=09the device.
->>> What kind of 'features' are supposed to go in there? Are these bits,
->>> like you defined for VIRTIO_MDEV_F_VERSION_1 above?
->>
->> It's the API or mdev features other than virtio features. It could be
->> used by driver to determine the capability of the mdev device. Besides
->> _F_VERSION_1, we may add dirty page tracking etc which means we need new
->> device ops.
-> Ok, so that's supposed to be distinct bits that can be or'ed together?
+> What will happen if we come up with a version 2? If this is backwards
+> compatible, will both version 2 and version 1 be set?
 
 
-Yes.
-
-
-> Makes sense, but probably needs some more documentation somewhere.
-
-
-Let me add some doc above this helper.
-
-
->
->>
->>>  =20
->>>> + * @get_generation:=09=09Get device generaton
->>>> + *=09=09=09=09@mdev: mediated device
->>>> + *=09=09=09=09Returns u32: device generation
->>> Is that callback mandatory?
->>
->> I think so, it's hard to emulate that completely in virtio-mdev transpor=
-t.
-> IIRC, the generation stuff is not mandatory in the current version of
-> virtio, as not all transports have that concept.
-
-
-It looks to me we can have workaround as what has been done by virtio.c.=20
-Return 0 if this helper is not provided.
-
-
->
-> Generally, are any of the callbacks optional, or are all of them
-> mandatory? From what I understand, you plan to add new things that
-> depend on features... would that mean non-mandatory callbacks?
-
-
-Yes, not all of them were mandatory, I will explicit explain which are=20
-mandatory and which are not.
+Yes, I think so, and version 2 should be considered as some extensions=20
+of version 1. If it's completely, it should use a new class id.
 
 Thanks
 
+
+>
+>> +
+>> +=09vm_dev->vdev.id.device =3D ops->get_device_id(mdev);
+>> +=09if (vm_dev->vdev.id.device =3D=3D 0)
+>> +=09=09return -ENODEV;
+>> +
+>> +=09vm_dev->vdev.id.vendor =3D ops->get_vendor_id(mdev);
+>> +=09rc =3D register_virtio_device(&vm_dev->vdev);
+>> +=09if (rc)
+>> +=09=09put_device(dev);
+>> +=09else
+>> +=09=09dev_set_drvdata(dev, vm_dev);
+>> +
+>> +=09return rc;
+>> +}
+> (...)
 
