@@ -2,390 +2,890 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9019FDE95F
-	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 12:22:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1BEDDE9A7
+	for <lists+kvm@lfdr.de>; Mon, 21 Oct 2019 12:37:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728088AbfJUKWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 06:22:32 -0400
-Received: from [217.140.110.172] ([217.140.110.172]:48162 "EHLO foss.arm.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1727990AbfJUKWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 06:22:32 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 480B7CA3;
-        Mon, 21 Oct 2019 03:22:03 -0700 (PDT)
-Received: from [10.1.194.43] (e112269-lin.cambridge.arm.com [10.1.194.43])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDC833F718;
-        Mon, 21 Oct 2019 03:22:00 -0700 (PDT)
-Subject: Re: [PATCH v6 05/10] KVM: arm64: Support stolen time reporting via
- shared structure
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-doc@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-References: <20191011125930.40834-1-steven.price@arm.com>
- <20191011125930.40834-6-steven.price@arm.com> <86eez9yoog.wl-maz@kernel.org>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <1bb10eb5-0fe8-57c9-3b67-9b3661a73d29@arm.com>
-Date:   Mon, 21 Oct 2019 11:21:59 +0100
+        id S1728184AbfJUKfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 06:35:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38118 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727840AbfJUKfm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 21 Oct 2019 06:35:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571654140;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0DnCthajA3/6lfuH0XJTCH6IdeBMpPURlRQY1CtCFEo=;
+        b=CDRdA0dd4GvoTDlSE1kePvstET3GknEBuOq2AvPuOG/TaG7H6zBy/hQXmAXcTtw/pEoO7V
+        dCx/aNgvfQZuICnTtzBr8Jtxy8015wDnhlGdeto3++1O5iRpn5JMcPtwaErsqKKVAgKu8n
+        unUBU+ZYi6SJPNylHV0Lhuf6ePstAZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143--6O332lDM9u_4VQHatygBg-1; Mon, 21 Oct 2019 06:35:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 038851800D79;
+        Mon, 21 Oct 2019 10:35:34 +0000 (UTC)
+Received: from [10.72.12.22] (ovpn-12-22.pek2.redhat.com [10.72.12.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7ACF5D9E2;
+        Mon, 21 Oct 2019 10:35:24 +0000 (UTC)
+Subject: Re: [RFC 1/2] vhost: IFC VF hardware operation layer
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
+        zhiyuan.lv@intel.com
+References: <20191016013050.3918-1-lingshan.zhu@intel.com>
+ <20191016013050.3918-2-lingshan.zhu@intel.com>
+ <991d41c6-4032-6341-f6c8-6e69d698f629@redhat.com>
+ <cc508c6d-4aea-cd3f-3487-4acf11f42b8c@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <07b241a8-ecb1-5baa-c931-f9afb3bb4de5@redhat.com>
+Date:   Mon, 21 Oct 2019 18:35:22 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <86eez9yoog.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <cc508c6d-4aea-cd3f-3487-4acf11f42b8c@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -6O332lDM9u_4VQHatygBg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/10/2019 12:12, Marc Zyngier wrote:
-> On Fri, 11 Oct 2019 13:59:25 +0100,
-> Steven Price <steven.price@arm.com> wrote:
+
+On 2019/10/21 =E4=B8=8B=E5=8D=886:00, Zhu, Lingshan wrote:
+>
+> On 10/16/2019 4:40 PM, Jason Wang wrote:
 >>
->> Implement the service call for configuring a shared structure between a
->> VCPU and the hypervisor in which the hypervisor can write the time
->> stolen from the VCPU's execution time by other tasks on the host.
->>
->> User space allocates memory which is placed at an IPA also chosen by user
->> space. The hypervisor then updates the shared structure using
->> kvm_put_guest() to ensure single copy atomicity of the 64-bit value
->> reporting the stolen time in nanoseconds.
->>
->> Whenever stolen time is enabled by the guest, the stolen time counter is
->> reset.
->>
->> The stolen time itself is retrieved from the sched_info structure
->> maintained by the Linux scheduler code. We enable SCHEDSTATS when
->> selecting KVM Kconfig to ensure this value is meaningful.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h   | 20 +++++++++++
->>  arch/arm64/include/asm/kvm_host.h | 21 +++++++++++-
->>  arch/arm64/kvm/Kconfig            |  1 +
->>  include/linux/kvm_types.h         |  2 ++
->>  virt/kvm/arm/arm.c                | 11 ++++++
->>  virt/kvm/arm/hypercalls.c         |  3 ++
->>  virt/kvm/arm/pvtime.c             | 56 +++++++++++++++++++++++++++++++
->>  7 files changed, 113 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 5a0c3569ebde..5c401482d62d 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -39,6 +39,7 @@
->>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
->> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>  
->>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>  
->> @@ -329,6 +330,25 @@ static inline long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>  	return SMCCC_RET_NOT_SUPPORTED;
->>  }
->>  
->> +static inline long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
->> +{
->> +	return SMCCC_RET_NOT_SUPPORTED;
->> +}
->> +
->> +static inline int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
->> +{
->> +	return -ENOTSUPP;
->> +}
->> +
->> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
->> +{
->> +}
->> +
->> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
->> +{
->> +	return false;
->> +}
->> +
->>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->>  
->>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 93b46d9526d0..1697e63f6dd8 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -44,6 +44,7 @@
->>  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->>  #define KVM_REQ_IRQ_PENDING	KVM_ARCH_REQ(1)
->>  #define KVM_REQ_VCPU_RESET	KVM_ARCH_REQ(2)
->> +#define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>  
->>  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
->>  
->> @@ -338,8 +339,14 @@ struct kvm_vcpu_arch {
->>  	/* True when deferrable sysregs are loaded on the physical CPU,
->>  	 * see kvm_vcpu_load_sysregs and kvm_vcpu_put_sysregs. */
->>  	bool sysregs_loaded_on_cpu;
->> -};
->>  
->> +	/* Guest PV state */
->> +	struct {
->> +		u64 steal;
->> +		u64 last_steal;
->> +		gpa_t base;
->> +	} steal;
->> +};
-> 
-> nit: Please keep an empty line at the end of the structure.
-> 
->>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->>  #define vcpu_sve_pffr(vcpu) ((void *)((char *)((vcpu)->arch.sve_state) + \
->>  				      sve_ffr_offset((vcpu)->arch.sve_max_vl)))
->> @@ -479,6 +486,18 @@ int kvm_perf_init(void);
->>  int kvm_perf_teardown(void);
->>  
->>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
->> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu);
->> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init);
->> +
->> +static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
->> +{
->> +	vcpu_arch->steal.base = GPA_INVALID;
->> +}
->> +
->> +static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
->> +{
->> +	return (vcpu_arch->steal.base != GPA_INVALID);
->> +}
->>  
->>  void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
->>  
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index a67121d419a2..d8b88e40d223 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -39,6 +39,7 @@ config KVM
->>  	select IRQ_BYPASS_MANAGER
->>  	select HAVE_KVM_IRQ_BYPASS
->>  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
->> +	select SCHEDSTATS
->>  	---help---
->>  	  Support hosting virtualized guest machines.
->>  	  We don't support KVM with 16K page tables yet, due to the multiple
->> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
->> index bde5374ae021..1c88e69db3d9 100644
->> --- a/include/linux/kvm_types.h
->> +++ b/include/linux/kvm_types.h
->> @@ -35,6 +35,8 @@ typedef unsigned long  gva_t;
->>  typedef u64            gpa_t;
->>  typedef u64            gfn_t;
->>  
->> +#define GPA_INVALID	(~(gpa_t)0)
->> +
->>  typedef unsigned long  hva_t;
->>  typedef u64            hpa_t;
->>  typedef u64            hfn_t;
->> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
->> index 86c6aa1cb58e..5d3059aeadb1 100644
->> --- a/virt/kvm/arm/arm.c
->> +++ b/virt/kvm/arm/arm.c
->> @@ -40,6 +40,10 @@
->>  #include <asm/kvm_coproc.h>
->>  #include <asm/sections.h>
->>  
->> +#include <kvm/arm_hypercalls.h>
->> +#include <kvm/arm_pmu.h>
->> +#include <kvm/arm_psci.h>
->> +
->>  #ifdef REQUIRES_VIRT
->>  __asm__(".arch_extension	virt");
->>  #endif
->> @@ -351,6 +355,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->>  
->>  	kvm_arm_reset_debug_ptr(vcpu);
->>  
->> +	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
->> +
->>  	return kvm_vgic_vcpu_init(vcpu);
->>  }
->>  
->> @@ -380,6 +386,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>  	kvm_vcpu_load_sysregs(vcpu);
->>  	kvm_arch_vcpu_load_fp(vcpu);
->>  	kvm_vcpu_pmu_restore_guest(vcpu);
->> +	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->> +		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->>  
->>  	if (single_task_running())
->>  		vcpu_clear_wfe_traps(vcpu);
->> @@ -645,6 +653,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->>  		 * that a VCPU sees new virtual interrupts.
->>  		 */
->>  		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
->> +
->> +		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
->> +			kvm_update_stolen_time(vcpu, false);
->>  	}
->>  }
->>  
->> diff --git a/virt/kvm/arm/hypercalls.c b/virt/kvm/arm/hypercalls.c
->> index 97ea8b133e77..5c333a64390e 100644
->> --- a/virt/kvm/arm/hypercalls.c
->> +++ b/virt/kvm/arm/hypercalls.c
->> @@ -56,6 +56,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
->>  		val = kvm_hypercall_pv_features(vcpu);
->>  		break;
->> +	case ARM_SMCCC_HV_PV_TIME_ST:
->> +		val = kvm_hypercall_stolen_time(vcpu);
->> +		break;
->>  	default:
->>  		return kvm_psci_call(vcpu);
->>  	}
->> diff --git a/virt/kvm/arm/pvtime.c b/virt/kvm/arm/pvtime.c
->> index 8d0fad671dcf..a90f1b4ebd13 100644
->> --- a/virt/kvm/arm/pvtime.c
->> +++ b/virt/kvm/arm/pvtime.c
->> @@ -3,8 +3,45 @@
->>  
->>  #include <linux/arm-smccc.h>
->>  
->> +#include <asm/pvclock-abi.h>
->> +
->>  #include <kvm/arm_hypercalls.h>
->>  
->> +int kvm_update_stolen_time(struct kvm_vcpu *vcpu, bool init)
->> +{
->> +	struct kvm *kvm = vcpu->kvm;
->> +	u64 steal;
->> +	u64 steal_le;
-> 
-> This should be __le64.
-> 
->> +	u64 offset;
->> +	int idx;
->> +	u64 base = vcpu->arch.steal.base;
->> +
->> +	if (base == GPA_INVALID)
->> +		return -ENOTSUPP;
->> +
->> +	/* Let's do the local bookkeeping */
->> +	steal = vcpu->arch.steal.steal;
->> +	steal += current->sched_info.run_delay - vcpu->arch.steal.last_steal;
->> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
->> +	vcpu->arch.steal.steal = steal;
->> +
->> +	steal_le = cpu_to_le64(steal);
->> +	idx = srcu_read_lock(&kvm->srcu);
->> +	if (init) {
->> +		struct pvclock_vcpu_stolen_time init_values = {
->> +			.revision = 0,
->> +			.attributes = 0
-> 
-> nit: 0 is the default initialiser.
-> 
->> +		};
->> +		kvm_write_guest(kvm, base, &init_values,
->> +				sizeof(init_values));
->> +	}
-> 
-> I'm not convinced by this init phase right in the middle of the normal
-> path. It looks ugly, and it'd be better if moved out of line. I'd
-> suggest:
-> 
-> static void kvm_init_stolen_time(struct kvm_vcpu *vcpu)
-> {
-> 	struct pvclock_vcpu_stolen_time init_values = { };
-> 
-> 	vcpu->arch.steal.steal = 0;
-> 	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
-> 
-> 	idx = srcu_read_lock(&kvm->srcu);
-> 	kvm_write_guest(kvm, base, &init_values, sizeof(init_values));
-> 	srcu_read_unlock(&kvm->srcu, idx);
-> }
-> 
-> and change the two callers accordingly. Or even better, move this code
-> to the hypercall handling function, because that's where it actually
-> belongs.
-
-Ok, it does add a little bit of duplicated code. But it also gets rid of
-the boolean argument that I never liked. As you suggest I might as well
-move this into kvm_hypercall_stolen_time().
-
->> +	offset = offsetof(struct pvclock_vcpu_stolen_time, stolen_time);
->> +	kvm_put_guest(kvm, base + offset, steal_le, u64);
->> +	srcu_read_unlock(&kvm->srcu, idx);
->> +
->> +	return 0;
->> +}
->> +
->>  long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>  {
->>  	u32 feature = smccc_get_arg1(vcpu);
->> @@ -12,6 +49,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>  
->>  	switch (feature) {
->>  	case ARM_SMCCC_HV_PV_TIME_FEATURES:
->> +	case ARM_SMCCC_HV_PV_TIME_ST:
->>  		val = SMCCC_RET_SUCCESS;
->>  		break;
->>  	}
->> @@ -19,3 +57,21 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
->>  	return val;
->>  }
->>  
->> +long kvm_hypercall_stolen_time(struct kvm_vcpu *vcpu)
-> 
-> Why long? If that's a base address, then it is either a phys_addr_t or
-> a gpa_t. I'd suggest you move the error check to the caller.
-
-This is a bit more tricky. It's a long because that's the declared type
-of the SMCCC return in kvm_hvc_call_handler(). I can't (easily) move the
-code into kvm_hvc_call_handler() because that is compiled for arm (as
-well as arm64) and we don't have the definitions for stolen time there.
-The best option I could come up with is to have a dummy stub for arm and
-use generic types for this function.
-
-This means we need a type which can contain both a gpa_t and the
-SMCCC_RET_NOT_SUPPORTED error code.
-
-I'm open to alternative suggestions on how to make this work.
-
-Thanks,
-
-Steve
-
->> +{
->> +	int err;
->> +
->> +	/*
->> +	 * Start counting stolen time from the time the guest requests
->> +	 * the feature enabled.
->> +	 */
->> +	vcpu->arch.steal.steal = 0;
->> +	vcpu->arch.steal.last_steal = current->sched_info.run_delay;
->> +
->> +	err = kvm_update_stolen_time(vcpu, true);
->> +
->> +	if (err)
->> +		return SMCCC_RET_NOT_SUPPORTED;
->> +
->> +	return vcpu->arch.steal.base;
->> +}
->> -- 
->> 2.20.1
+>> On 2019/10/16 =E4=B8=8A=E5=8D=889:30, Zhu Lingshan wrote:
+>>> This commit introduced ifcvf_base layer, which handles IFC VF NIC
+>>> hardware operations and configurations.
 >>
 >>
-> 
-> Thanks,
-> 
-> 	M.
-> 
+>> It's better to describe the difference between ifc vf and virtio in=20
+>> the commit log or is there a open doc for this?
+>>
+>>
+> Hi Jason,
+>
+> Sure, I will split these code into small patches with detailed commit=20
+> logs in v1 patchset.
+>>>
+>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>> ---
+>>> =C2=A0 drivers/vhost/ifcvf/ifcvf_base.c | 390=20
+>>> +++++++++++++++++++++++++++++++++++++++
+>>> =C2=A0 drivers/vhost/ifcvf/ifcvf_base.h | 137 ++++++++++++++
+>>> =C2=A0 2 files changed, 527 insertions(+)
+>>> =C2=A0 create mode 100644 drivers/vhost/ifcvf/ifcvf_base.c
+>>> =C2=A0 create mode 100644 drivers/vhost/ifcvf/ifcvf_base.h
+>>>
+>>> diff --git a/drivers/vhost/ifcvf/ifcvf_base.c=20
+>>> b/drivers/vhost/ifcvf/ifcvf_base.c
+>>> new file mode 100644
+>>> index 000000000000..b85e14c9bdcf
+>>> --- /dev/null
+>>> +++ b/drivers/vhost/ifcvf/ifcvf_base.c
+>>> @@ -0,0 +1,390 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * Copyright (C) 2019 Intel Corporation.
+>>> + */
+>>> +
+>>> +#include "ifcvf_base.h"
+>>> +
+>>> +static void *get_cap_addr(struct ifcvf_hw *hw, struct=20
+>>> virtio_pci_cap *cap)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u8 bar =3D cap->bar;
+>>> +=C2=A0=C2=A0=C2=A0 u32 length =3D cap->length;
+>>> +=C2=A0=C2=A0=C2=A0 u32 offset =3D cap->offset;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *ifcvf =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 container_of(hw, struct ifc=
+vf_adapter, vf);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (bar >=3D IFCVF_PCI_MAX_RESOURCE) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(ifcvf->dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "In=
+valid bar number %u to get capabilities.\n", bar);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (offset + length < offset) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(ifcvf->dev, "offset=
+(%u) + length(%u) overflows\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 off=
+set, length);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (offset + length > hw->mem_resource[cap->bar].le=
+n) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(ifcvf->dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "of=
+fset(%u) + len(%u) overflows bar%u to get=20
+>>> capabilities.\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 off=
+set, length, bar);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return hw->mem_resource[bar].addr + offset;
+>>> +}
+>>> +
+>>> +int ifcvf_read_config_range(struct pci_dev *dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uin=
+t32_t *val, int size, int where)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < size; i +=3D 4) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (pci_read_config_dword(d=
+ev, where + i, val + i / 4) < 0)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+urn -1;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int ret;
+>>> +=C2=A0=C2=A0=C2=A0 u8 pos;
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_pci_cap cap;
+>>> +=C2=A0=C2=A0=C2=A0 u32 i;
+>>> +=C2=A0=C2=A0=C2=A0 u16 notify_off;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ret =3D pci_read_config_byte(dev, PCI_CAPABILITY_LI=
+ST, &pos);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(&dev->dev, "failed =
+to read PCI capability list.\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 while (pos) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D ifcvf_read_config_r=
+ange(dev, (u32 *)&cap,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 sizeof(cap), pos);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_ERR(&dev->dev, "failed to get PCI capability at %x",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pos);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (cap.cap_vndr !=3D PCI_C=
+AP_ID_VNDR)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 got=
+o next;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_INFO(&dev->dev, "read P=
+CI config:\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "config type: %u.\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "PCI bar: %u.\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "PCI bar offset: %u.\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "PCI config len: %u.\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cap.cfg_type, cap.bar,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cap.offset, cap.length);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 switch (cap.cfg_type) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case VIRTIO_PCI_CAP_COMMON_=
+CFG:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw-=
+>common_cfg =3D get_cap_addr(hw, &cap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_INFO(&dev->dev, "hw->common_cfg =3D %p.\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw->common_cfg);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case VIRTIO_PCI_CAP_NOTIFY_=
+CFG:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pci=
+_read_config_dword(dev, pos + sizeof(cap),
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 &hw->notify_off_multiplier);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw-=
+>notify_bar =3D cap.bar;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw-=
+>notify_base =3D get_cap_addr(hw, &cap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_INFO(&dev->dev, "hw->notify_base =3D %p.\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw->notify_base);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case VIRTIO_PCI_CAP_ISR_CFG=
+:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw-=
+>isr =3D get_cap_addr(hw, &cap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_INFO(&dev->dev, "hw->isr =3D %p.\n", hw->isr);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case VIRTIO_PCI_CAP_DEVICE_=
+CFG:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw-=
+>dev_cfg =3D get_cap_addr(hw, &cap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_INFO(&dev->dev, "hw->dev_cfg =3D %p.\n", hw->dev_cfg);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
+ak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +next:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pos =3D cap.cap_next;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (hw->common_cfg =3D=3D NULL || hw->notify_base =
+=3D=3D NULL ||
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw->isr =3D=3D NULL || hw->=
+dev_cfg =3D=3D NULL) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(&dev->dev, "Incompl=
+ete PCI capabilities.\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < (IFCVF_MAX_QUEUE_PAIRS * 2); i++)=
+ {
+>>
+>>
+>> Any reason for using hard coded queue pairs limit other than the=20
+>> max_queue_pairs in the net config?
+> Hi Jason, Thanks for your kindly comments. For now the driver don't=20
+> support MQ, we intend to provide a minimal feature sets in this=20
+> version 1 driver.
+
+
+Ok, it's better to add comment above IFCVF_MAX_QUEUE_PAIRS.
+
+
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(i, &hw->common_cf=
+g->queue_select);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 notify_off =3D ioread16(&hw=
+->common_cfg->queue_notify_off);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hw->notify_addr[i] =3D (voi=
+d *)((u8 *)hw->notify_base +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 notify_off * hw->notify_off_multiplier);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 hw->lm_cfg =3D hw->mem_resource[4].addr;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 IFC_INFO(&dev->dev, "PCI capability mapping:\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "common cfg: %p\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "notify base: %p\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "isr cfg: %p\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "device cfg: %p\n"
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "multiplier: %u\n",
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 hw->common_cfg,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 hw->notify_base,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 hw->isr,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 hw->dev_cfg,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 hw->notify_off_multiplier);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static u8 ifcvf_get_status(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return ioread8(&hw->common_cfg->device_status);
+>>> +}
+>>> +
+>>> +static void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 iowrite8(status, &hw->common_cfg->device_status);
+>>> +}
+>>> +
+>>> +static void ifcvf_reset(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_set_status(hw, 0);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 /* flush status write */
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_get_status(hw);
+>>
+>>
+>> Why this flush is needed?
+>
+> accoring to PCIE requirements, this get_status() after a set_status()=20
+> is used to block the call chain, make sure the hardware has finished=20
+> the write operation.
+>
+> It is a bad comment anyway, I will remove it.
+
+
+Interesting, does this mean if we need also fix the vp_set_status for=20
+kernel virtio_pci driver?
+
+
+>
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 hw->generation++;
+>>> +}
+>>> +
+>>> +static void ifcvf_add_status(struct ifcvf_hw *hw, u8 status)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 if (status !=3D 0)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 status |=3D ifcvf_get_statu=
+s(hw);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_set_status(hw, status);
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_get_status(hw);
+>>> +}
+>>> +
+>>> +u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u32 features_lo, features_hi;
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_pci_common_cfg *cfg =3D hw->common_cf=
+g;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(0, &cfg->device_feature_select);
+>>> +=C2=A0=C2=A0=C2=A0 features_lo =3D ioread32(&cfg->device_feature);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(1, &cfg->device_feature_select);
+>>> +=C2=A0=C2=A0=C2=A0 features_hi =3D ioread32(&cfg->device_feature);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return ((u64)features_hi << 32) | features_lo;
+>>> +}
+>>> +static int ifcvf_with_feature(struct ifcvf_hw *hw, u64 bit)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return (hw->req_features & (1ULL << bit)) !=3D 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 void *dst, int length)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +=C2=A0=C2=A0=C2=A0 u8 *p;
+>>> +=C2=A0=C2=A0=C2=A0 u8 old_gen, new_gen;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 do {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 old_gen =3D ioread8(&hw->co=
+mmon_cfg->config_generation);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 p =3D dst;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < length; i=
+++)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *p+=
++ =3D ioread8((u8 *)hw->dev_cfg + offset + i);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 new_gen =3D ioread8(&hw->co=
+mmon_cfg->config_generation);
+>>> +=C2=A0=C2=A0=C2=A0 } while (old_gen !=3D new_gen);
+>>> +}
+>>> +
+>>> +void ifcvf_get_linkstatus(struct ifcvf_hw *hw, u8 *is_linkup)
+>>> +{
+>>
+>>
+>> Why not just return bollean?
+> sure, can do.
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 u16 status;
+>>> +=C2=A0=C2=A0=C2=A0 u64 host_features;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 host_features =3D ifcvf_get_features(hw);
+>>> +=C2=A0=C2=A0=C2=A0 if (ifcvf_with_feature(hw, VIRTIO_NET_F_STATUS)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ifcvf_read_dev_config(hw,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 offsetof(struct ifcvf_net_config, status),
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 &status, sizeof(status));
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((status & VIRTIO_NET_S_=
+LINK_UP) =3D=3D 0)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (*i=
+s_linkup) =3D 1;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (*i=
+s_linkup) =3D 0;
+>>> +=C2=A0=C2=A0=C2=A0 } else
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (*is_linkup) =3D 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_pci_common_cfg *cfg =3D hw->common_cf=
+g;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(0, &cfg->guest_feature_select);
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(features & ((1ULL << 32) - 1), &cfg->gues=
+t_feature);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(1, &cfg->guest_feature_select);
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(features >> 32, &cfg->guest_feature);
+>>> +}
+>>> +
+>>> +static int ifcvf_config_features(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u64 host_features;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *ifcvf =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 container_of(hw, struct ifc=
+vf_adapter, vf);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 host_features =3D ifcvf_get_features(hw);
+>>> +=C2=A0=C2=A0=C2=A0 hw->req_features &=3D host_features;
+>>
+>>
+>> Is this a must, can't device deal with this?
+> I will usehw->req_features directly, thanks for point it out.
+>>
+>>
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_set_features(hw, hw->req_features);
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATUR=
+ES_OK)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(ifcvf->dev, "Failed=
+ to set FEATURES_OK status\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static void io_write64_twopart(u64 val, u32 *lo, u32 *hi)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(val & ((1ULL << 32) - 1), lo);
+>>> +=C2=A0=C2=A0=C2=A0 iowrite32(val >> 32, hi);
+>>> +}
+>>> +
+>>> +static int ifcvf_hw_enable(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_pci_common_cfg *cfg;
+>>> +=C2=A0=C2=A0=C2=A0 u8 *lm_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 u32 i;
+>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *ifcvf =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 container_of(hw, struct ifc=
+vf_adapter, vf);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 cfg =3D hw->common_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 lm_cfg =3D hw->lm_cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite16(IFCVF_MSI_CONFIG_OFF, &cfg->msix_config);
+>>> +=C2=A0=C2=A0=C2=A0 if (ioread16(&cfg->msix_config) =3D=3D VIRTIO_MSI_N=
+O_VECTOR) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC_ERR(ifcvf->dev, "No msi=
+x vector for device config.\n");
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < hw->nr_vring; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(i, &cfg->queue_se=
+lect);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io_write64_twopart(hw->vrin=
+g[i].desc, &cfg->queue_desc_lo,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 &cfg->queue_desc_hi);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io_write64_twopart(hw->vrin=
+g[i].avail, &cfg->queue_avail_lo,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 &cfg->queue_avail_hi);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io_write64_twopart(hw->vrin=
+g[i].used, &cfg->queue_used_lo,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 &cfg->queue_used_hi);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(hw->vring[i].size=
+, &cfg->queue_size);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_=
+RING_STATE_OFFSET +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 (i / 2) * IFCVF_LM_CFG_SIZE + (i % 2) * 4) =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (u3=
+2)hw->vring[i].last_avail_idx |
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((u=
+32)hw->vring[i].last_used_idx << 16);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(i + IFCVF_MSI_QUE=
+UE_OFF, &cfg->queue_msix_vector);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ioread16(&cfg->queue_ms=
+ix_vector) =3D=3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 VIRTIO_MSI_NO_VECTOR) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IFC=
+_ERR(ifcvf->dev,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "No msix vector for queue %u.\n", i);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+urn -1;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(1, &cfg->queue_en=
+able);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static void ifcvf_hw_disable(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u32 i;
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_pci_common_cfg *cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 cfg =3D hw->common_cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->msix_config);
+>>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < hw->nr_vring; i++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(i, &cfg->queue_se=
+lect);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(0, &cfg->queue_en=
+able);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iowrite16(VIRTIO_MSI_NO_VEC=
+TOR, &cfg->queue_msix_vector);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +}
+>>> +
+>>> +int ifcvf_start_hw(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_reset(hw);
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_add_status(hw, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (ifcvf_config_features(hw) < 0)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 if (ifcvf_hw_enable(hw) < 0)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER_OK);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +void ifcvf_stop_hw(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_hw_disable(hw);
+>>> +=C2=A0=C2=A0=C2=A0 ifcvf_reset(hw);
+>>> +}
+>>> +
+>>> +void ifcvf_enable_logging_vf(struct ifcvf_hw *hw, u64 log_base, u64=20
+>>> log_size)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u8 *lm_cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 lm_cfg =3D hw->lm_cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_BASE_ADDR_LOW) =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log_base & IFCVF_32_BIT_MAS=
+K;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_BASE_ADDR_HIGH) =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (log_base >> 32) & IFCVF_32=
+_BIT_MASK;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_END_ADDR_LOW) =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (log_base + log_size) & IFC=
+VF_32_BIT_MASK;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_END_ADDR_HIGH) =3D
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((log_base + log_size) >> 3=
+2) & IFCVF_32_BIT_MASK;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_LOGGING_CTRL) =3D IFCVF_=
+LM_ENABLE_VF;
+>>> +}
+>>
+>>
+>> Is the device using iova or gpa for the logging?
+> gpa, I will remove all LM related functions since we plan to support=20
+> LM in next version driver.
+
+
+Ok, that's why vIOMMU is not fully supported in the case. So we need
+
+1) Filter out _F_IOMMU_PLATFORM for vhost-mdev
+
+2) Can keep it for virtio-mdev
+
+But one more question is: how device know which kinds of address it is=20
+used? Or I guess the device doesn't know the only problem is IOVA->GPA=20
+conversion in the case of vIOMMU. If this is true, maybe we can=20
+introduce API to sync dirty pages and do the conversion there instead of=20
+using share memory as the log as what current vhost did.
+
+
+>>
+>>
+>>> +
+>>> +void ifcvf_disable_logging(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 u8 *lm_cfg;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 lm_cfg =3D hw->lm_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 *(u32 *)(lm_cfg + IFCVF_LM_LOGGING_CTRL) =3D IFCVF_=
+LM_DISABLE;
+>>> +}
+>>> +
+>>> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid)
+>>> +{
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 iowrite16(qid, hw->notify_addr[qid]);
+>>> +}
+>>> +
+>>> +u8 ifcvf_get_notify_region(struct ifcvf_hw *hw)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return hw->notify_bar;
+>>> +}
+>>> +
+>>> +u64 ifcvf_get_queue_notify_off(struct ifcvf_hw *hw, int qid)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 return (u8 *)hw->notify_addr[qid] -
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (u8 *)hw->mem_resource[hw->=
+notify_bar].addr;
+>>> +}
+>>> diff --git a/drivers/vhost/ifcvf/ifcvf_base.h=20
+>>> b/drivers/vhost/ifcvf/ifcvf_base.h
+>>> new file mode 100644
+>>> index 000000000000..1ab1a1c40f24
+>>> --- /dev/null
+>>> +++ b/drivers/vhost/ifcvf/ifcvf_base.h
+>>> @@ -0,0 +1,137 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>>> +/*
+>>> + * Copyright (C) 2019 Intel Corporation.
+>>> + */
+>>> +
+>>> +#ifndef _IFCVF_H_
+>>> +#define _IFCVF_H_
+>>> +
+>>> +#include <linux/virtio_mdev.h>
+>>> +#include <linux/pci.h>
+>>> +#include <linux/pci_regs.h>
+>>> +#include <uapi/linux/virtio_net.h>
+>>> +#include <uapi/linux/virtio_config.h>
+>>> +#include <uapi/linux/virtio_pci.h>
+>>> +
+>>> +#define IFCVF_VENDOR_ID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x1AF4
+>>> +#define IFCVF_DEVICE_ID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x1041
+>>> +#define IFCVF_SUBSYS_VENDOR_ID=C2=A0 0x8086
+>>> +#define IFCVF_SUBSYS_DEVICE_ID=C2=A0 0x001A
+>>> +
+>>> +/*
+>>> + * Some ifcvf feature bits (currently bits 28 through 31) are
+>>> + * reserved for the transport being used (eg. ifcvf_ring), the
+>>> + * rest are per-device feature bits.
+>>> + */
+>>> +#define IFCVF_TRANSPORT_F_START 28
+>>> +#define IFCVF_TRANSPORT_F_END=C2=A0=C2=A0 34
+>>> +
+>>> +#define IFC_SUPPORTED_FEATURES \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((1ULL << VIRTIO_NET_F_MAC)=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_F_ANY=
+_LAYOUT)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_F_VER=
+SION_1) | \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VHOST_F_LOG_=
+ALL)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_NET_F=
+_GUEST_ANNOUNCE)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_NET_F=
+_CTRL_VQ)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ | \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_NET_F=
+_STATUS)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << VIRTIO_NET_F=
+_MRG_RXBUF)) /* not fully supported */
+>>> +
+>>> +#define IFCVF_MAX_QUEUE_PAIRS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 1
+>>> +#define IFCVF_MAX_QUEUES=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2
+>>> +
+>>> +#define IFCVF_QUEUE_ALIGNMENT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 PAGE_SIZE
+>>> +
+>>> +#define IFCVF_MSI_CONFIG_OFF=C2=A0=C2=A0=C2=A0 0
+>>> +#define IFCVF_MSI_QUEUE_OFF=C2=A0=C2=A0=C2=A0 1
+>>> +#define IFCVF_PCI_MAX_RESOURCE=C2=A0=C2=A0=C2=A0 6
+>>> +
+>>> +/* 46 bit CPU physical address, avoid overlap */
+>>> +#define LM_IOVA 0x400000000000
+>>> +
+>>> +#define IFCVF_LM_CFG_SIZE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x=
+40
+>>> +#define IFCVF_LM_RING_STATE_OFFSET=C2=A0=C2=A0=C2=A0 0x20
+>>> +
+>>> +#define IFCVF_LM_LOGGING_CTRL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x0
+>>> +
+>>> +#define IFCVF_LM_BASE_ADDR_LOW=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x10
+>>> +#define IFCVF_LM_BASE_ADDR_HIGH=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x14
+>>> +#define IFCVF_LM_END_ADDR_LOW=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x18
+>>> +#define IFCVF_LM_END_ADDR_HIGH=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 0x1c
+>>> +
+>>> +#define IFCVF_LM_DISABLE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x0
+>>> +#define IFCVF_LM_ENABLE_VF=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=
+x1
+>>> +#define IFCVF_LM_ENABLE_PF=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0=
+x3
+>>> +
+>>> +#define IFCVF_32_BIT_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x=
+ffffffff
+>>> +
+>>> +#define IFC_ERR(dev, fmt, ...)=C2=A0=C2=A0=C2=A0 dev_err(dev, fmt, ##_=
+_VA_ARGS__)
+>>> +#define IFC_INFO(dev, fmt, ...)=C2=A0=C2=A0=C2=A0 dev_info(dev, fmt, #=
+#__VA_ARGS__)
+>>> +
+>>> +struct ifcvf_net_config {
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 mac[6];
+>>> +=C2=A0=C2=A0=C2=A0 u16=C2=A0=C2=A0 status;
+>>> +=C2=A0=C2=A0=C2=A0 u16=C2=A0=C2=A0 max_virtqueue_pairs;
+>>> +} __packed;
+>>> +
+>>> +struct ifcvf_pci_mem_resource {
+>>> +=C2=A0=C2=A0=C2=A0 u64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 phys_addr; /**< P=
+hysical address, 0 if not resource. */
+>>> +=C2=A0=C2=A0=C2=A0 u64=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 len;=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 /**< Length of the resource. */
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *addr;=C2=A0=
+=C2=A0=C2=A0=C2=A0 /**< Virtual address, NULL when not mapped. */
+>>> +};
+>>> +
+>>> +struct vring_info {
+>>> +=C2=A0=C2=A0=C2=A0 u64 desc;
+>>> +=C2=A0=C2=A0=C2=A0 u64 avail;
+>>> +=C2=A0=C2=A0=C2=A0 u64 used;
+>>> +=C2=A0=C2=A0=C2=A0 u16 size;
+>>> +=C2=A0=C2=A0=C2=A0 u16 last_avail_idx;
+>>> +=C2=A0=C2=A0=C2=A0 u16 last_used_idx;
+>>> +=C2=A0=C2=A0=C2=A0 bool ready;
+>>> +=C2=A0=C2=A0=C2=A0 char msix_name[256];
+>>> +=C2=A0=C2=A0=C2=A0 struct virtio_mdev_callback cb;
+>>> +};
+>>> +
+>>> +struct ifcvf_hw {
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 *isr;
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 notify_bar;
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 *lm_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 status;
+>>> +=C2=A0=C2=A0=C2=A0 u8=C2=A0=C2=A0=C2=A0 nr_vring;
+>>
+>>
+>> Is the the number of queue currently used?
+> Do you mean nr_vring? Yes it is used in hardware enable / disable=20
+> functions.
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 u16=C2=A0=C2=A0=C2=A0 *notify_base;
+>>> +=C2=A0=C2=A0=C2=A0 u16=C2=A0=C2=A0=C2=A0 *notify_addr[IFCVF_MAX_QUEUE_=
+PAIRS * 2];
+>>> +=C2=A0=C2=A0=C2=A0 u32=C2=A0=C2=A0=C2=A0 generation;
+>>> +=C2=A0=C2=A0=C2=A0 u32=C2=A0=C2=A0=C2=A0 notify_off_multiplier;
+>>> +=C2=A0=C2=A0=C2=A0 u64=C2=A0=C2=A0=C2=A0 req_features;
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 virtio_pci_common_cfg *com=
+mon_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 ifcvf_net_config *dev_cfg;
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 vring_info vring[IFCVF_MAX=
+_QUEUE_PAIRS * 2];
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 ifcvf_pci_mem_resource=20
+>>> mem_resource[IFCVF_PCI_MAX_RESOURCE];
+>>> +};
+>>> +
+>>> +#define IFC_PRIVATE_TO_VF(adapter) \
+>>> +=C2=A0=C2=A0=C2=A0 (&((struct ifcvf_adapter *)adapter)->vf)
+>>> +
+>>> +#define IFCVF_MAX_INTR (IFCVF_MAX_QUEUE_PAIRS * 2 + 1)
+>>
+>>
+>> The extra one means the config interrupt?
+> Yes.
+
+
+Ok, when we support control vq, it should be changed to 2*N + 2.
+
+Thanks
+
+
+>>
+>>
+>>> +
+>>> +struct ifcvf_adapter {
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 device *dev;
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 mutex mdev_lock;
+>>
+>>
+>> Not used in the patch, move to next one?
+> Sure, these not used ones will be moved to small patches where they=20
+> are used in v1 patchset.
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 int=C2=A0=C2=A0=C2=A0 mdev_count;
+>>
+>>
+>> Not used.
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 list_head dma_maps;
+>>
+>>
+>> This is not used.
+>>
+>> Thanks
+>>
+>>
+>>> +=C2=A0=C2=A0=C2=A0 int=C2=A0=C2=A0=C2=A0 vectors;
+>>> +=C2=A0=C2=A0=C2=A0 struct=C2=A0=C2=A0=C2=A0 ifcvf_hw vf;
+>>> +};
+>>> +
+>>> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
+>>> +u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>>> +int ifcvf_start_hw(struct ifcvf_hw *hw);
+>>> +void ifcvf_stop_hw(struct ifcvf_hw *hw);
+>>> +void ifcvf_enable_logging(struct ifcvf_hw *hw, u64 log_base, u64=20
+>>> log_size);
+>>> +void ifcvf_enable_logging_vf(struct ifcvf_hw *hw, u64 log_base, u64=20
+>>> log_size);
+>>> +void ifcvf_disable_logging(struct ifcvf_hw *hw);
+>>> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
+>>> +void ifcvf_get_linkstatus(struct ifcvf_hw *hw, u8 *is_linkup);
+>>> +u8 ifcvf_get_notify_region(struct ifcvf_hw *hw);
+>>> +u64 ifcvf_get_queue_notify_off(struct ifcvf_hw *hw, int qid);
+>>> +
+>>> +#endif /* _IFCVF_H_ */
 
