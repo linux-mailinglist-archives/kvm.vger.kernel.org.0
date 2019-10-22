@@ -2,149 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 426BDE0574
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:48:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B737E0576
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387831AbfJVNs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 09:48:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53810 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2387479AbfJVNs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 09:48:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571752107;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=YQwrO8GtQidGZq2f7azyljtcZR53gRduboQc8qaX8xY=;
-        b=YQ5N6cUlHYpm3p2TAfUT8BbXtfvzUzToPbrPuHk1CCD4zJVWzJ4joufXqEUqoQz4Fw/Zls
-        uOUMi2kn8Rc7gkopUAWV2GgD6xNzk0Z1I86Xzj+v7FmumeXtMEioyGedg61PEZD0RV/ZPT
-        lMfmgiKMTyGfkOOINt+h1JNUihwI4c8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-gXq-Fua5M8O9bssVJY7MCw-1; Tue, 22 Oct 2019 09:48:25 -0400
-Received: by mail-wm1-f71.google.com with SMTP id m68so2545802wme.7
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:48:25 -0700 (PDT)
+        id S1732144AbfJVNuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 09:50:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62886 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732125AbfJVNuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 09:50:01 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1B5BA85538
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 13:50:01 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id m68so2547549wme.7
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:50:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UYJn44mofyK6oeM1TPcglwuAiq767n8XhKqzqOqMQHc=;
-        b=ZmvAGnjw2i1H0GWc187U7R1XZf7qEScyJxD4L47se7I08sa+Ow3Z/3QfYCXUWw9WV3
-         1Y1StX1KyJ7xLZiqkdjlq4EhoYVJqow3FnLFJAIK+BIeBMBMnSxIrJPGrCZ4NghFuPdL
-         LjTl/ZG5UmB2ruBjG/XSBYnAlOegoyfJNOl3aoI5Nw+FFPBhu1LV9q7sYCR2MYHFyVBJ
-         /tgcZXhvin4DjujxUWCP4v6zqocuR0munr8BTB8eizFTz5XRnt4NZaSvPaSetsGIQ+jN
-         E1YaAEcogOr6rpaQzY0Cmgvtk/C703TCJNU0M0dw+5GRhE7YAHQlnSxQSOg1EEUWEj4s
-         XSBA==
-X-Gm-Message-State: APjAAAXeyqR/8bvWxiEICs+DXLp2xWsvz0hdCdA1d135APv2x0s03Pt/
-        NulOwvvt+9/9/Nh4OEL9kzT39U8R9BzB8ncHFtS00vTcoIvKORbQ3a4DnDaepS//D/LjidIDGOu
-        Hs1897/8H0wgy
-X-Received: by 2002:a1c:9990:: with SMTP id b138mr3273041wme.176.1571752104663;
-        Tue, 22 Oct 2019 06:48:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzHk+GYrg529v9JGxZxCl7S47XjU1axJ+dEcu/TRPNHhCAWJsxo541JWQD8MYSKqsH1NPD1+A==
-X-Received: by 2002:a1c:9990:: with SMTP id b138mr3273018wme.176.1571752104277;
-        Tue, 22 Oct 2019 06:48:24 -0700 (PDT)
+        bh=3c9XeML5CjP2VNMoX20tRhRC9ZOt/gSgNIomZ/IX/KQ=;
+        b=irhaQMEQtfW1dF8mwgoG3KD2GRebJLWHoIhayzJPT9T5D16gYGOeBFE2qBkoPFoYLs
+         pfuoKKqTbgu/f6XRNS8cM17zjcJ79df9LfHGPodRnLQ+5WU4+iXffsiPXWDNTYKnADUp
+         nJnbvDg84z3Epa9AjXPr8I4lUPbE1bHIpO7nxHXXjF800O6GifTT4LAyFamHXqYNAhim
+         6jnMSChIPN5GpN3TSpt3I5OtZTRLaf1Gfa7T/jd9emkREbd3QPtQXhxRDqVXfudSWLQK
+         d/bpopounx96birKt+mEhxQwhg8mhPc3cFPp3QqIGkEtR3SVcvp7PdABEsICmk/FL2fI
+         6KYA==
+X-Gm-Message-State: APjAAAUls2aduT8LThnrGqb8+pa0y3nhkJk/rE94PFDGuA0DNCdA7Lu/
+        KNz3q5hF62ooeD234oSq4A5Lr3AJ8coopEyLqmxpTLfivPI5dwZn66vCvSWCIKqdHnaOey2ldQT
+        pC60mleA79/Fm
+X-Received: by 2002:a7b:c846:: with SMTP id c6mr3333948wml.68.1571752199710;
+        Tue, 22 Oct 2019 06:49:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwpZeWf9siyfF8zHfI2gJYK3W+BaDfTN9X194fXdua91Mf2zmTVr+dTirEp9YI7yL1+8RYFYg==
+X-Received: by 2002:a7b:c846:: with SMTP id c6mr3333921wml.68.1571752199316;
+        Tue, 22 Oct 2019 06:49:59 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19? ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
-        by smtp.gmail.com with ESMTPSA id u26sm19320818wrd.87.2019.10.22.06.48.23
+        by smtp.gmail.com with ESMTPSA id u7sm11923745wre.59.2019.10.22.06.49.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2019 06:48:23 -0700 (PDT)
-Subject: Re: [PATCH v3 0/9] Add support for XSAVES to AMD and unify it with
- Intel
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Babu Moger <Babu.Moger@amd.com>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>
-References: <20191021233027.21566-1-aaronlewis@google.com>
+        Tue, 22 Oct 2019 06:49:58 -0700 (PDT)
+Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
+ to kvm
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20191021225842.23941-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <1ea8025f-7481-d392-a5de-0b43fbb10705@redhat.com>
-Date:   Tue, 22 Oct 2019 15:48:23 +0200
+Message-ID: <5fe693ca-4699-778e-3f37-54d42adb1b4f@redhat.com>
+Date:   Tue, 22 Oct 2019 15:49:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191021233027.21566-1-aaronlewis@google.com>
+In-Reply-To: <20191021225842.23941-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: gXq-Fua5M8O9bssVJY7MCw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/10/19 01:30, Aaron Lewis wrote:
-> Unify AMD's and Intel's approach for supporting XSAVES.  To do this
-> change Intel's approach from using the MSR-load areas to writing
-> the guest/host values to IA32_XSS on a VM-enter/VM-exit.  Switching to
-> this strategy allows for a common approach between both AMD and Intel.
-> Additionally, define svm_xsaves_supported() based on AMD's feedback, and =
-add
-> vcpu->arch.xsaves_enabled to track whether XSAVES is enabled in the guest=
-.
->=20
-> This change sets up IA32_XSS to be a non-zero value in the future, which
-> may happen sooner than later with support for guest CET feature being
-> added.
->=20
-> v2 -> v3:
->  - Remove guest_xcr0_loaded from kvm_vcpu.
->  - Add vcpu->arch.xsaves_enabled.
->  - Add staged rollout to load the hardware IA32_XSS MSR with guest/host
->    values on VM-entry and VM-exit:
->      1) Introduce vcpu->arch->xsaves_enabled.
->      2) Add svm implementation for switching between guest and host IA32_=
-XSS.
->      3) Add vmx implementation for switching between guest and host IA32_=
-XSS.
->      4) Remove svm and vmx implementation and add it to common code.
->=20
-> v1 -> v2:
->  - Add the flag xsaves_enabled to kvm_vcpu_arch to track when XSAVES is
->    enabled in the guest, whether or not XSAVES is enumerated in the
->    guest CPUID.
->  - Remove code that sets the X86_FEATURE_XSAVES bit in the guest CPUID
->    which was added in patch "Enumerate XSAVES in guest CPUID when it is
->    available to the guest".  As a result we no longer need that patch.
->  - Added a comment to kvm_set_msr_common to describe how to save/restore
->    PT MSRS without using XSAVES/XRSTORS.
->  - Added more comments to the "Add support for XSAVES on AMD" patch.
->  - Replaced vcpu_set_msr_expect_result() with _vcpu_set_msr() in the
->    test library.
->=20
-> Aaron Lewis (9):
->   KVM: x86: Introduce vcpu->arch.xsaves_enabled
->   KVM: VMX: Fix conditions for guest IA32_XSS support
->   KVM: x86: Remove unneeded kvm_vcpu variable, guest_xcr0_loaded
->   KVM: SVM: Use wrmsr for switching between guest and host IA32_XSS on AM=
-D
->   KVM: VMX: Use wrmsr for switching between guest and host IA32_XSS on In=
-tel
->   KVM: x86: Move IA32_XSS-swapping on VM-entry/VM-exit to common x86 code
->   kvm: x86: Move IA32_XSS to kvm_{get,set}_msr_common
->   kvm: svm: Update svm_xsaves_supported
->   kvm: tests: Add test to verify MSR_IA32_XSS
->=20
->  arch/x86/include/asm/kvm_host.h               |  1 +
->  arch/x86/kvm/svm.c                            |  9 ++-
->  arch/x86/kvm/vmx/vmx.c                        | 41 ++--------
->  arch/x86/kvm/x86.c                            | 52 ++++++++++---
->  arch/x86/kvm/x86.h                            |  4 +-
->  include/linux/kvm_host.h                      |  1 -
->  tools/testing/selftests/kvm/.gitignore        |  1 +
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../selftests/kvm/include/x86_64/processor.h  |  7 +-
->  .../selftests/kvm/lib/x86_64/processor.c      | 72 +++++++++++++++---
->  .../selftests/kvm/x86_64/xss_msr_test.c       | 76 +++++++++++++++++++
->  11 files changed, 205 insertions(+), 60 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/xss_msr_test.c
->=20
+On 22/10/19 00:58, Sean Christopherson wrote:
+> Add a new helper, kvm_put_kvm_no_destroy(), to handle putting a borrowed
+> reference[*] to the VM when installing a new file descriptor fails.  KVM
+> expects the refcount to remain valid in this case, as the in-progress
+> ioctl() has an explicit reference to the VM.  The primary motiviation
+> for the helper is to document that the 'kvm' pointer is still valid
+> after putting the borrowed reference, e.g. to document that doing
+> mutex(&kvm->lock) immediately after putting a ref to kvm isn't broken.
+> 
+> [*] When exposing a new object to userspace via a file descriptor, e.g.
+>     a new vcpu, KVM grabs a reference to itself (the VM) prior to making
+>     the object visible to userspace to avoid prematurely freeing the VM
+>     in the scenario where userspace immediately closes file descriptor.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/powerpc/kvm/book3s_64_mmu_hv.c |  2 +-
+>  arch/powerpc/kvm/book3s_64_vio.c    |  2 +-
+>  include/linux/kvm_host.h            |  1 +
+>  virt/kvm/kvm_main.c                 | 16 ++++++++++++++--
+>  4 files changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> index 9a75f0e1933b..68678e31c84c 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> @@ -2000,7 +2000,7 @@ int kvm_vm_ioctl_get_htab_fd(struct kvm *kvm, struct kvm_get_htab_fd *ghf)
+>  	ret = anon_inode_getfd("kvm-htab", &kvm_htab_fops, ctx, rwflag | O_CLOEXEC);
+>  	if (ret < 0) {
+>  		kfree(ctx);
+> -		kvm_put_kvm(kvm);
+> +		kvm_put_kvm_no_destroy(kvm);
+>  		return ret;
+>  	}
+>  
+> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+> index 5834db0a54c6..883a66e76638 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio.c
+> @@ -317,7 +317,7 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+>  	if (ret >= 0)
+>  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
+>  	else
+> -		kvm_put_kvm(kvm);
+> +		kvm_put_kvm_no_destroy(kvm);
+>  
+>  	mutex_unlock(&kvm->lock);
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 719fc3e15ea4..90a2102605ef 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -622,6 +622,7 @@ void kvm_exit(void);
+>  
+>  void kvm_get_kvm(struct kvm *kvm);
+>  void kvm_put_kvm(struct kvm *kvm);
+> +void kvm_put_kvm_no_destroy(struct kvm *kvm);
+>  
+>  static inline struct kvm_memslots *__kvm_memslots(struct kvm *kvm, int as_id)
+>  {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 67ef3f2e19e8..b8534c6b8cf6 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -772,6 +772,18 @@ void kvm_put_kvm(struct kvm *kvm)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_put_kvm);
+>  
+> +/*
+> + * Used to put a reference that was taken on behalf of an object associated
+> + * with a user-visible file descriptor, e.g. a vcpu or device, if installation
+> + * of the new file descriptor fails and the reference cannot be transferred to
+> + * its final owner.  In such cases, the caller is still actively using @kvm and
+> + * will fail miserably if the refcount unexpectedly hits zero.
+> + */
+> +void kvm_put_kvm_no_destroy(struct kvm *kvm)
+> +{
+> +	WARN_ON(refcount_dec_and_test(&kvm->users_count));
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_put_kvm_no_destroy);
+>  
+>  static int kvm_vm_release(struct inode *inode, struct file *filp)
+>  {
+> @@ -2679,7 +2691,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>  	kvm_get_kvm(kvm);
+>  	r = create_vcpu_fd(vcpu);
+>  	if (r < 0) {
+> -		kvm_put_kvm(kvm);
+> +		kvm_put_kvm_no_destroy(kvm);
+>  		goto unlock_vcpu_destroy;
+>  	}
+>  
+> @@ -3117,7 +3129,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
+>  	kvm_get_kvm(kvm);
+>  	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
+>  	if (ret < 0) {
+> -		kvm_put_kvm(kvm);
+> +		kvm_put_kvm_no_destroy(kvm);
+>  		mutex_lock(&kvm->lock);
+>  		list_del(&dev->vm_node);
+>  		mutex_unlock(&kvm->lock);
+> 
 
 Queued, thanks.
 
 Paolo
-
