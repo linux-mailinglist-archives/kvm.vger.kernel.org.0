@@ -2,143 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6621DE098B
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 18:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D15BE0999
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 18:48:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389568AbfJVQqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 12:46:50 -0400
-Received: from mail-vs1-f74.google.com ([209.85.217.74]:40052 "EHLO
-        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389537AbfJVQqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 12:46:48 -0400
-Received: by mail-vs1-f74.google.com with SMTP id g126so1040968vsg.7
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 09:46:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=xeTajp2gTwNneRzmHl8dZLgjRVR+or7Oc8/MveRSES4=;
-        b=czPv6bG/woLawvFL6EeJ3IomrWe7WJLXIS8Q5s7BYzv4jeVZUhKcqUrBD6MHE4X3Wy
-         gaVhDh9xU1/SIXHSLB3HhPMakMrFItvpEYLIRd8RhTeumsOEr/W5opNycN3wSNR5Nfq+
-         8Uvg/NpAVip0msYuEOWDd/Xwyy3mpXkakREkO3YQmRdtrusv2aVekVFQ4qy0KchHUYZk
-         +EJV75GDzrZF1ylqrZahxNQZVzB02D9UYp4RkPTJWVv8C3gzX45NJnepvMKF4XDAM3hC
-         Al/gAJqFg/Q7YP5ygCC7hd/ANdsR33IrEuArt2jLW5EYKkKEipmUTt4vKFi6vvM+JTA0
-         rQRg==
+        id S1732849AbfJVQsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 12:48:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33382 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732047AbfJVQsB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 12:48:01 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 32CE585365
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 16:48:01 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id s9so9413085wrw.23
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 09:48:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=xeTajp2gTwNneRzmHl8dZLgjRVR+or7Oc8/MveRSES4=;
-        b=VkVWobA/PK7VaFhYHcCHdb0i+C0VeSRO3XI0E8Wn+MLkTnBinMMzKy8jlt/N7gtT9p
-         ijMlS5Ee+ie8JKcPzm9t+Mno/WaImIgeOTh3ccm9DjpDwSurt9dhO0MWnGT8WaWZNRXq
-         gihCmuO9qSe623AKui8KlUcd+CYbhVBPTJCX+80+GUdD9MA4crSUGz3jif0mIK4ueK0u
-         WvmsutihGoSwWGYdQtEvCxqzcpLBnnLV677+bn2xwimRty5qMMPZw+BrZChkTpNUoE/x
-         1gEAo2jV8NHgv+SWfUThVg7OVuDRtKndDSi8SEuVDJoTpY0Z/oXiYq5TQcrbUI0wO8ey
-         DmXw==
-X-Gm-Message-State: APjAAAURfOjlPns/1Qcj/2uds9v4C/pZ4Y5jqMAjpWInSzsGPfTkDH15
-        GtZVXJP5gwWaAL6YKuOxsErvVF4piZAwGk61
-X-Google-Smtp-Source: APXvYqztA3K2JUb94+WtUgiu0B8Mrp7aoBsl8U36U8bVoUlttXs4+RNS1hzM4glUCN7mveu0ffdpO/JosmE95cWz
-X-Received: by 2002:ab0:1896:: with SMTP id t22mr2506869uag.82.1571762807067;
- Tue, 22 Oct 2019 09:46:47 -0700 (PDT)
-Date:   Tue, 22 Oct 2019 18:46:33 +0200
-In-Reply-To: <cover.1571762488.git.andreyknvl@google.com>
-Message-Id: <26e088ae3ebcaa30afe957aeabaa9f0c653df7d0.1571762488.git.andreyknvl@google.com>
-Mime-Version: 1.0
-References: <cover.1571762488.git.andreyknvl@google.com>
-X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
-Subject: [PATCH 3/3] vhost, kcov: collect coverage from vhost_worker
-From:   Andrey Konovalov <andreyknvl@google.com>
-To:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Andrey Konovalov <andreyknvl@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6IUllQdC1JcBo53l0feki9O911eimyikofYh28oSUZI=;
+        b=p42xjgS1wCnUkyWX6wdrV6NHtrhOrJiatIUGypm8YIErIC6jIo4JY2gblpCPaW4/MT
+         bskiiBJWBp9ef3ljKjIYPTA55sbyoTt00r2eBkFFcnAqBlNzDK3j53u+b6+zKj5TbH8W
+         tc0A63mAm92pW5+UcJGNxRcD1wt24t5JJ9PLL7vFV543rcqdyPrbVKpkJB1sVm2/rxru
+         sxe5kb27vZmjdO2V4Yg/mNgI4tVjBS4Xj+dWjrHYEoXXDcfuvl7HzNQpvcFz3Xyt1x77
+         Mj8CaMYxf4UHHJ/qx5irOOoR026vNyzaSP/b4QHrYE2F+FLBmoTws/QKhm1ZEh/2D1ua
+         k6KQ==
+X-Gm-Message-State: APjAAAWe1whJkyFhmS6i0D5JMlSfuraHPouj5hK7pMqasMHklg3ucSHT
+        pAmLH5UOUAn6qnVWuXVUcDAHFBZMxdj0zNA6Igi4kwdNHdW2cQoPZQjkTh1hXV7ybsDiREGmI+j
+        NV48h8GENiTHp
+X-Received: by 2002:adf:f58b:: with SMTP id f11mr4198179wro.85.1571762879789;
+        Tue, 22 Oct 2019 09:47:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw5g3AibMbcuSwNUHwkkYHksej37syxRcre3u394uyNZoNjuqSAg5WvCAysQIXg0CChJznj0Q==
+X-Received: by 2002:adf:f58b:: with SMTP id f11mr4198151wro.85.1571762879474;
+        Tue, 22 Oct 2019 09:47:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19? ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
+        by smtp.gmail.com with ESMTPSA id f143sm34080587wme.40.2019.10.22.09.47.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Oct 2019 09:47:58 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: SVM: Fix potential wrong physical id in
+ avic_handle_ldr_update
+To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingfangsen@huawei.com
+References: <1571367031-6844-1-git-send-email-linmiaohe@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <696ae8db-fe41-4710-483c-0f30a06bdd32@redhat.com>
+Date:   Tue, 22 Oct 2019 18:47:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1571367031-6844-1-git-send-email-linmiaohe@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds kcov_remote_start()/kcov_remote_stop() annotations to the
-vhost_worker() function, which is responsible for processing vhost works.
-Since vhost_worker() threads are spawned per vhost device instance
-the common kcov handle is used for kcov_remote_start()/stop() annotations
-(see Documentation/dev-tools/kcov.rst for details). As the result kcov can
-now be used to collect coverage from vhost worker threads.
+On 18/10/19 04:50, Miaohe Lin wrote:
+> Guest physical APIC ID may not equal to vcpu->vcpu_id in some case.
+> We may set the wrong physical id in avic_handle_ldr_update as we
+> always use vcpu->vcpu_id. Get physical APIC ID from vAPIC page
+> instead.
+> Export and use kvm_xapic_id here and in avic_handle_apic_id_update
+> as suggested by Vitaly.
+> 
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/lapic.c | 5 -----
+>  arch/x86/kvm/lapic.h | 5 +++++
+>  arch/x86/kvm/svm.c   | 6 +++---
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 87b0fcc23ef8..b29d00b661ff 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -111,11 +111,6 @@ static inline int apic_enabled(struct kvm_lapic *apic)
+>  	(LVT_MASK | APIC_MODE_MASK | APIC_INPUT_POLARITY | \
+>  	 APIC_LVT_REMOTE_IRR | APIC_LVT_LEVEL_TRIGGER)
+>  
+> -static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+> -{
+> -	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+> -}
+> -
+>  static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+>  {
+>  	return apic->vcpu->vcpu_id;
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 2aad7e226fc0..1f5014852e20 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -242,4 +242,9 @@ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+>  	return apic_base & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
+>  }
+>  
+> +static inline u8 kvm_xapic_id(struct kvm_lapic *apic)
+> +{
+> +	return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+> +}
+> +
+>  #endif
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index f8ecb6df5106..ca200b50cde4 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -4591,6 +4591,7 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
+>  	int ret = 0;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	u32 ldr = kvm_lapic_get_reg(vcpu->arch.apic, APIC_LDR);
+> +	u32 id = kvm_xapic_id(vcpu->arch.apic);
+>  
+>  	if (ldr == svm->ldr_reg)
+>  		return 0;
+> @@ -4598,7 +4599,7 @@ static int avic_handle_ldr_update(struct kvm_vcpu *vcpu)
+>  	avic_invalidate_logical_id_entry(vcpu);
+>  
+>  	if (ldr)
+> -		ret = avic_ldr_write(vcpu, vcpu->vcpu_id, ldr);
+> +		ret = avic_ldr_write(vcpu, id, ldr);
+>  
+>  	if (!ret)
+>  		svm->ldr_reg = ldr;
+> @@ -4610,8 +4611,7 @@ static int avic_handle_apic_id_update(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 *old, *new;
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> -	u32 apic_id_reg = kvm_lapic_get_reg(vcpu->arch.apic, APIC_ID);
+> -	u32 id = (apic_id_reg >> 24) & 0xff;
+> +	u32 id = kvm_xapic_id(vcpu->arch.apic);
+>  
+>  	if (vcpu->vcpu_id == id)
+>  		return 0;
+> 
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- drivers/vhost/vhost.c | 6 ++++++
- drivers/vhost/vhost.h | 1 +
- 2 files changed, 7 insertions(+)
+Queued, thanks.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 36ca2cf419bf..a5a557c4b67f 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -30,6 +30,7 @@
- #include <linux/sched/signal.h>
- #include <linux/interval_tree_generic.h>
- #include <linux/nospec.h>
-+#include <linux/kcov.h>
- 
- #include "vhost.h"
- 
-@@ -357,7 +358,9 @@ static int vhost_worker(void *data)
- 		llist_for_each_entry_safe(work, work_next, node, node) {
- 			clear_bit(VHOST_WORK_QUEUED, &work->flags);
- 			__set_current_state(TASK_RUNNING);
-+			kcov_remote_start(dev->kcov_handle);
- 			work->fn(work);
-+			kcov_remote_stop();
- 			if (need_resched())
- 				schedule();
- 		}
-@@ -546,6 +549,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
- 
- 	/* No owner, become one */
- 	dev->mm = get_task_mm(current);
-+	dev->kcov_handle = current->kcov_handle;
- 	worker = kthread_create(vhost_worker, dev, "vhost-%d", current->pid);
- 	if (IS_ERR(worker)) {
- 		err = PTR_ERR(worker);
-@@ -571,6 +575,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
- 	if (dev->mm)
- 		mmput(dev->mm);
- 	dev->mm = NULL;
-+	dev->kcov_handle = 0;
- err_mm:
- 	return err;
- }
-@@ -682,6 +687,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
- 	if (dev->worker) {
- 		kthread_stop(dev->worker);
- 		dev->worker = NULL;
-+		dev->kcov_handle = 0;
- 	}
- 	if (dev->mm)
- 		mmput(dev->mm);
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index e9ed2722b633..a123fd70847e 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -173,6 +173,7 @@ struct vhost_dev {
- 	int iov_limit;
- 	int weight;
- 	int byte_weight;
-+	u64 kcov_handle;
- };
- 
- bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int total_len);
--- 
-2.23.0.866.gb869b98d4c-goog
-
+Paolo
