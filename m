@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B080DFB22
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F471DFB08
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:03:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388010AbfJVCDI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 22:03:08 -0400
+        id S2387461AbfJVB7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 21:59:43 -0400
 Received: from mga14.intel.com ([192.55.52.115]:61583 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730796AbfJVB7k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 21:59:40 -0400
+        id S2387437AbfJVB7l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 21:59:41 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:39 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:41 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="196293791"
+   d="scan'208";a="196293799"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:39 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:40 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -40,9 +40,9 @@ Cc:     James Morse <james.morse@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 11/45] KVM: PPC: e500mc: Add build-time assert that vcpu is at offset 0
-Date:   Mon, 21 Oct 2019 18:58:51 -0700
-Message-Id: <20191022015925.31916-12-sean.j.christopherson@intel.com>
+Subject: [PATCH 13/45] KVM: PPC: Book3S PR: Allocate book3s and shadow vcpu after common init
+Date:   Mon, 21 Oct 2019 18:58:53 -0700
+Message-Id: <20191022015925.31916-14-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
@@ -53,32 +53,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for moving vcpu allocation to common PPC code, add an
-explicit, albeit redundant, build-time assert to ensure the vcpu member
-is located at offset 0.  The assert is redundant in the sense that
-kvmppc_core_vcpu_create_e500() contains a functionally identical assert.
-The motiviation for adding the extra assert is to provide visual
-confirmation of the correctness of moving vcpu allocation to common
-code.
+Call kvm_vcpu_init() in kvmppc_core_vcpu_create_pr() prior to allocating
+the book3s and shadow_vcpu objects in preparation of moving said call to
+common PPC code.  Although kvm_vcpu_init() has an arch callback, the
+callback is empty for Book3S PR, i.e. barring unseen black magic, moving
+the allocation has no real functional impact.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/powerpc/kvm/e500mc.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/powerpc/kvm/book3s_pr.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index 318e65c65999..c51f4bb086fd 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -308,6 +308,8 @@ static struct kvm_vcpu *kvmppc_core_vcpu_create_e500mc(struct kvm *kvm,
- 	struct kvm_vcpu *vcpu;
- 	int err;
- 
-+	BUILD_BUG_ON(offsetof(struct kvmppc_vcpu_e500, vcpu) != 0);
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index 1e6b83908668..a933ba60bc7c 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -1712,12 +1712,18 @@ static int kvmppc_core_vcpu_create_pr(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 				      unsigned int id)
+ {
+ 	struct kvmppc_vcpu_book3s *vcpu_book3s;
+-	int err = -ENOMEM;
+ 	unsigned long p;
++	int err;
 +
- 	vcpu_e500 = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL);
- 	if (!vcpu_e500) {
- 		err = -ENOMEM;
++	err = kvm_vcpu_init(vcpu, kvm, id);
++	if (err)
++		return err;
++
++	err = -ENOMEM;
+ 
+ 	vcpu_book3s = vzalloc(sizeof(struct kvmppc_vcpu_book3s));
+ 	if (!vcpu_book3s)
+-		goto out;
++		goto uninit_vcpu;
+ 	vcpu->arch.book3s = vcpu_book3s;
+ 
+ #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
+@@ -1727,14 +1733,9 @@ static int kvmppc_core_vcpu_create_pr(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 		goto free_vcpu3s;
+ #endif
+ 
+-	err = kvm_vcpu_init(vcpu, kvm, id);
+-	if (err)
+-		goto free_shadow_vcpu;
+-
+-	err = -ENOMEM;
+ 	p = __get_free_page(GFP_KERNEL|__GFP_ZERO);
+ 	if (!p)
+-		goto uninit_vcpu;
++		goto free_shadow_vcpu;
+ 	vcpu->arch.shared = (void *)p;
+ #ifdef CONFIG_PPC_BOOK3S_64
+ 	/* Always start the shared struct in native endian mode */
+@@ -1770,15 +1771,14 @@ static int kvmppc_core_vcpu_create_pr(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 
+ free_shared_page:
+ 	free_page((unsigned long)vcpu->arch.shared);
+-uninit_vcpu:
+-	kvm_vcpu_uninit(vcpu);
+ free_shadow_vcpu:
+ #ifdef CONFIG_KVM_BOOK3S_32_HANDLER
+ 	kfree(vcpu->arch.shadow_vcpu);
+ free_vcpu3s:
+ #endif
+ 	vfree(vcpu_book3s);
+-out:
++uninit_vcpu:
++	kvm_vcpu_uninit(vcpu);
+ 	return err;
+ }
+ 
 -- 
 2.22.0
 
