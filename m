@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 861CCDFAC3
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E74BFDFABD
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:01:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387880AbfJVCBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 22:01:10 -0400
-Received: from mga14.intel.com ([192.55.52.115]:61616 "EHLO mga14.intel.com"
+        id S1728375AbfJVCBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 22:01:03 -0400
+Received: from mga14.intel.com ([192.55.52.115]:61621 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387688AbfJVB77 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 21:59:59 -0400
+        id S2387709AbfJVCAB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 22:00:01 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:59 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="196293898"
+   d="scan'208";a="196293906"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:58 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:59 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -40,9 +40,9 @@ Cc:     James Morse <james.morse@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 37/45] KVM: Drop kvm_arch_vcpu_setup()
-Date:   Mon, 21 Oct 2019 18:59:17 -0700
-Message-Id: <20191022015925.31916-38-sean.j.christopherson@intel.com>
+Subject: [PATCH 38/45] KVM: x86: Move all vcpu init code into kvm_arch_vcpu_create()
+Date:   Mon, 21 Oct 2019 18:59:18 -0700
+Message-Id: <20191022015925.31916-39-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
@@ -53,169 +53,263 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove kvm_arch_vcpu_setup() now that all arch specific implementations
-are nops.
+Fold init() into create() now that the two are called back-to-back by
+common KVM code (kvm_vcpu_init() calls kvm_arch_vcpu_init() as its last
+action, and kvm_vm_ioctl_create_vcpu() calls kvm_arch_vcpu_create()
+immediately thereafter).  This paves the way for removing
+kvm_arch_vcpu_init() entirely.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/arm/kvm/guest.c      | 5 -----
- arch/arm64/kvm/guest.c    | 5 -----
- arch/mips/kvm/mips.c      | 5 -----
- arch/powerpc/kvm/book3s.c | 5 -----
- arch/powerpc/kvm/booke.c  | 5 -----
- arch/s390/kvm/kvm-s390.c  | 5 -----
- arch/x86/kvm/x86.c        | 5 -----
- include/linux/kvm_host.h  | 1 -
- virt/kvm/kvm_main.c       | 5 -----
- 9 files changed, 41 deletions(-)
+ arch/x86/kvm/x86.c | 198 +++++++++++++++++++++++----------------------
+ 1 file changed, 100 insertions(+), 98 deletions(-)
 
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64b4033..39323d686448 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -30,11 +30,6 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	{ NULL }
- };
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- static u64 core_reg_offset_from_id(u64 id)
- {
- 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd626447482..483b02425ec8 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -43,11 +43,6 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	{ NULL }
- };
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- static bool core_reg_offset_is_vreg(u64 off)
- {
- 	return off >= KVM_REG_ARM_CORE_REG(fp_regs.vregs) &&
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index b3a4435af66b..06366e2415a6 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1244,11 +1244,6 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- static void kvm_mips_set_c0_status(void)
- {
- 	u32 status = read_c0_status();
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index fd049ede2487..2f0ca8237db0 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -496,11 +496,6 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
- }
- EXPORT_SYMBOL_GPL(kvmppc_load_last_inst);
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- int kvmppc_subarch_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	return 0;
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index b1b5073a22b1..35b781775d3d 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -1377,11 +1377,6 @@ static void kvmppc_set_tsr(struct kvm_vcpu *vcpu, u32 new_tsr)
- 	update_timer_ints(vcpu);
- }
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- int kvmppc_subarch_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	/* setup watchdog timer once */
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 3e3d242d6630..c3c855fd909c 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2934,11 +2934,6 @@ static void kvm_s390_vcpu_setup_model(struct kvm_vcpu *vcpu)
- 		vcpu->arch.sie_block->fac = (u32)(u64) model->fac_list;
- }
- 
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
- static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
- {
- 	int rc = 0;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index dbb939bd4949..e320e6f21202 100644
+index e320e6f21202..d8d3079af2c5 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9037,11 +9037,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+@@ -9021,11 +9021,78 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ 
+ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ {
+-	int ret;
++	struct page *page;
++	int r;
+ 
+-	ret = kvm_x86_ops->vcpu_create(vcpu);
+-	if (ret)
+-		return ret;
++	vcpu->arch.emulate_ctxt.ops = &emulate_ops;
++	if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
++		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
++	else
++		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
++
++	kvm_set_tsc_khz(vcpu, max_tsc_khz);
++
++	r = kvm_mmu_create(vcpu);
++	if (r < 0)
++		return r;
++
++	if (irqchip_in_kernel(vcpu->kvm)) {
++		vcpu->arch.apicv_active = kvm_x86_ops->get_enable_apicv(vcpu->kvm);
++		r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
++		if (r < 0)
++			goto fail_mmu_destroy;
++	} else
++		static_key_slow_inc(&kvm_no_apic_vcpu);
++
++	r = -ENOMEM;
++
++	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
++	if (!page)
++		goto fail_free_lapic;
++	vcpu->arch.pio_data = page_address(page);
++
++	vcpu->arch.mce_banks = kzalloc(KVM_MAX_MCE_BANKS * sizeof(u64) * 4,
++				       GFP_KERNEL_ACCOUNT);
++	if (!vcpu->arch.mce_banks)
++		goto fail_free_pio_data;
++	vcpu->arch.mcg_cap = KVM_MAX_MCE_BANKS;
++
++	if (!zalloc_cpumask_var(&vcpu->arch.wbinvd_dirty_mask,
++				GFP_KERNEL_ACCOUNT))
++		goto fail_free_mce_banks;
++
++	vcpu->arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
++						GFP_KERNEL_ACCOUNT);
++	if (!vcpu->arch.user_fpu) {
++		pr_err("kvm: failed to allocate userspace's fpu\n");
++		goto free_wbinvd_dirty_mask;
++	}
++
++	vcpu->arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
++						 GFP_KERNEL_ACCOUNT);
++	if (!vcpu->arch.guest_fpu) {
++		pr_err("kvm: failed to allocate vcpu's fpu\n");
++		goto free_user_fpu;
++	}
++	fx_init(vcpu);
++
++	vcpu->arch.guest_xstate_size = XSAVE_HDR_SIZE + XSAVE_HDR_OFFSET;
++
++	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
++
++	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
++
++	kvm_async_pf_hash_reset(vcpu);
++	kvm_pmu_init(vcpu);
++
++	vcpu->arch.pending_external_vector = -1;
++	vcpu->arch.preempted_in_kernel = false;
++
++	kvm_hv_vcpu_init(vcpu);
++
++	r = kvm_x86_ops->vcpu_create(vcpu);
++	if (r)
++		goto free_guest_fpu;
+ 
+ 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+@@ -9035,6 +9102,22 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	kvm_init_mmu(vcpu, false);
+ 	vcpu_put(vcpu);
  	return 0;
++
++free_guest_fpu:
++	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
++free_user_fpu:
++	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
++free_wbinvd_dirty_mask:
++	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
++fail_free_mce_banks:
++	kfree(vcpu->arch.mce_banks);
++fail_free_pio_data:
++	free_page((unsigned long)vcpu->arch.pio_data);
++fail_free_lapic:
++	kvm_free_lapic(vcpu);
++fail_mmu_destroy:
++	kvm_mmu_destroy(vcpu);
++	return r;
  }
  
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
--{
--	return 0;
--}
--
  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+@@ -9067,6 +9150,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  {
- 	struct msr_data msr;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index c36379824408..0b8b0f0ab4d7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -854,7 +854,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id);
- int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu);
--int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu);
++	int idx;
++
+ 	kvmclock_reset(vcpu);
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 4a4d2992d915..1ae98c1f12b0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2678,10 +2678,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	if (r)
- 		goto vcpu_uninit;
+ 	kvm_x86_ops->vcpu_free(vcpu);
+@@ -9074,6 +9159,17 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
+ 	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
+ 	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
++
++	kvm_hv_vcpu_uninit(vcpu);
++	kvm_pmu_destroy(vcpu);
++	kfree(vcpu->arch.mce_banks);
++	kvm_free_lapic(vcpu);
++	idx = srcu_read_lock(&vcpu->kvm->srcu);
++	kvm_mmu_destroy(vcpu);
++	srcu_read_unlock(&vcpu->kvm->srcu, idx);
++	free_page((unsigned long)vcpu->arch.pio_data);
++	if (!lapic_in_kernel(vcpu))
++		static_key_slow_dec(&kvm_no_apic_vcpu);
+ }
  
--	r = kvm_arch_vcpu_setup(vcpu);
--	if (r)
--		goto vcpu_destroy;
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+@@ -9309,106 +9405,12 @@ EXPORT_SYMBOL_GPL(kvm_no_apic_vcpu);
+ 
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+-	struct page *page;
+-	int r;
 -
- 	kvm_create_vcpu_debugfs(vcpu);
+-	vcpu->arch.emulate_ctxt.ops = &emulate_ops;
+-	if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
+-		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+-	else
+-		vcpu->arch.mp_state = KVM_MP_STATE_UNINITIALIZED;
+-
+-	kvm_set_tsc_khz(vcpu, max_tsc_khz);
+-
+-	r = kvm_mmu_create(vcpu);
+-	if (r < 0)
+-		return r;
+-
+-	if (irqchip_in_kernel(vcpu->kvm)) {
+-		vcpu->arch.apicv_active = kvm_x86_ops->get_enable_apicv(vcpu->kvm);
+-		r = kvm_create_lapic(vcpu, lapic_timer_advance_ns);
+-		if (r < 0)
+-			goto fail_mmu_destroy;
+-	} else
+-		static_key_slow_inc(&kvm_no_apic_vcpu);
+-
+-	r = -ENOMEM;
+-
+-	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+-	if (!page)
+-		goto fail_free_lapic;
+-	vcpu->arch.pio_data = page_address(page);
+-
+-	vcpu->arch.mce_banks = kzalloc(KVM_MAX_MCE_BANKS * sizeof(u64) * 4,
+-				       GFP_KERNEL_ACCOUNT);
+-	if (!vcpu->arch.mce_banks)
+-		goto fail_free_pio_data;
+-	vcpu->arch.mcg_cap = KVM_MAX_MCE_BANKS;
+-
+-	if (!zalloc_cpumask_var(&vcpu->arch.wbinvd_dirty_mask,
+-				GFP_KERNEL_ACCOUNT))
+-		goto fail_free_mce_banks;
+-
+-	vcpu->arch.user_fpu = kmem_cache_zalloc(x86_fpu_cache,
+-						GFP_KERNEL_ACCOUNT);
+-	if (!vcpu->arch.user_fpu) {
+-		pr_err("kvm: failed to allocate userspace's fpu\n");
+-		goto free_wbinvd_dirty_mask;
+-	}
+-
+-	vcpu->arch.guest_fpu = kmem_cache_zalloc(x86_fpu_cache,
+-						 GFP_KERNEL_ACCOUNT);
+-	if (!vcpu->arch.guest_fpu) {
+-		pr_err("kvm: failed to allocate vcpu's fpu\n");
+-		goto free_user_fpu;
+-	}
+-	fx_init(vcpu);
+-
+-	vcpu->arch.guest_xstate_size = XSAVE_HDR_SIZE + XSAVE_HDR_OFFSET;
+-
+-	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+-
+-	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
+-
+-	kvm_async_pf_hash_reset(vcpu);
+-	kvm_pmu_init(vcpu);
+-
+-	vcpu->arch.pending_external_vector = -1;
+-	vcpu->arch.preempted_in_kernel = false;
+-
+-	kvm_hv_vcpu_init(vcpu);
+-
+ 	return 0;
+-
+-free_user_fpu:
+-	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
+-free_wbinvd_dirty_mask:
+-	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
+-fail_free_mce_banks:
+-	kfree(vcpu->arch.mce_banks);
+-fail_free_pio_data:
+-	free_page((unsigned long)vcpu->arch.pio_data);
+-fail_free_lapic:
+-	kvm_free_lapic(vcpu);
+-fail_mmu_destroy:
+-	kvm_mmu_destroy(vcpu);
+-	return r;
+ }
  
- 	mutex_lock(&kvm->lock);
-@@ -2716,7 +2712,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- unlock_vcpu_destroy:
- 	mutex_unlock(&kvm->lock);
- 	debugfs_remove_recursive(vcpu->debugfs_dentry);
--vcpu_destroy:
- 	kvm_arch_vcpu_destroy(vcpu);
- vcpu_uninit:
- 	kvm_vcpu_uninit(vcpu);
+ void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
+ {
+-	int idx;
+ 
+-	kvm_hv_vcpu_uninit(vcpu);
+-	kvm_pmu_destroy(vcpu);
+-	kfree(vcpu->arch.mce_banks);
+-	kvm_free_lapic(vcpu);
+-	idx = srcu_read_lock(&vcpu->kvm->srcu);
+-	kvm_mmu_destroy(vcpu);
+-	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+-	free_page((unsigned long)vcpu->arch.pio_data);
+-	if (!lapic_in_kernel(vcpu))
+-		static_key_slow_dec(&kvm_no_apic_vcpu);
+ }
+ 
+ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
 -- 
 2.22.0
 
