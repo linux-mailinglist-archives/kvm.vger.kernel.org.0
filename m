@@ -2,728 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC1FE0512
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:31:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D52E0542
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:38:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731060AbfJVNbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 09:31:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28416 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732064AbfJVNbC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 09:31:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571751060;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aqfgTzYyyjwNir9aBEidZY2YXyw6cijRYkKXL3dpFUY=;
-        b=bth30Jauach2H7vABo162fXLubG+9kpO+Ihg8fPP1gOjGHNs+c4+wmAvNLH4nOyOnJ1T46
-        iPej13zKFs76amK60BZB+vdhZfs1ChpUWLljC0nt0zC6wlaZDgNa0PSq/bUCDDZUFT9GgG
-        nHGHVE3fnKmXzLQ9uaflvwQf/0+EZ/c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-cHX-FodvMUe-9PnCZqEIBg-1; Tue, 22 Oct 2019 09:30:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D4D107AD33;
-        Tue, 22 Oct 2019 13:30:55 +0000 (UTC)
-Received: from [10.72.12.23] (ovpn-12-23.pek2.redhat.com [10.72.12.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB90D6062D;
-        Tue, 22 Oct 2019 13:30:19 +0000 (UTC)
-Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, maxime.coquelin@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, lingshan.zhu@intel.com
-References: <20191022095230.2514-1-tiwei.bie@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <47a572fd-5597-1972-e177-8ee25ca51247@redhat.com>
-Date:   Tue, 22 Oct 2019 21:30:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191022095230.2514-1-tiwei.bie@intel.com>
+        id S1732092AbfJVNii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 09:38:38 -0400
+Received: from mail-eopbgr800050.outbound.protection.outlook.com ([40.107.80.50]:35012
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732064AbfJVNii (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 09:38:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jGdEoXEWiRcTtKNKwtmZnRhoe9sJk+Zk/822w5Y2HZYsdOQX/3d67xECVz3BWEl0SyxDutkILH2Fh7BXpEJvKgqN0EdERx/3IwK+50+aT9cJB2MWaWoENFF7qqgusgn24DH5R3VfVD43ok5Drs+k1Ef4tKvi1IT8/bStMVHtLgdElXNq5Wl/JEu2wQD5rTHY5+ftfnVhw7dc+LtWpfJeeVZPIWpYECx72jmIXSqg9hiUmjPIueIWu9Lj1Yip4woShs9s8AeiERg3bZ+65p9Q+hGCJaaGwXX0uOQRaFMi5EmIzxMkC1E/jrm+RMhnN3ZOvK6lX5Yq/Y1DUI1e3KFwAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WUVx25eyEVhaMDYtSn6AQODsbMxEvTyjMFvV19ED3+k=;
+ b=AAyNLa13W3iHF++EHjoIGu/E22woLZv9ooH3IhYXsmf+y47b4ZRZTfwb04f1Pj/nrd/uhbipjA2VwLP7VH91/CTdKi9k5kOUq+q7BvUsceRtCuPr8CbCx7pkOusC3EhPOz5KtzrNio/6s60UGkbknVHYNufhk184JHjYKi0bKy+i1wtXk7AzQ7e41u6KixptApAr5Vn1cUGnTC/Do1iHvSt0g4tgp+PICn+l+JUkX0sjm80FsBVyKLnP+uookQo2H03Zxbo0O0/5ARLqi4fc0oD4T2OveEu7XkZ8rZ+2NDgpdGAMlpnK4/7+OJL9K+i37j0lzrbdRm4nBFPCfgpGjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WUVx25eyEVhaMDYtSn6AQODsbMxEvTyjMFvV19ED3+k=;
+ b=TXTMKnPZg3AaLaijH1xbkHzkYoeY+sstO1GKCS3UEYFukqNGDOXypGk7yeqxQxlrAYpbOoIEaih/BtXGcNVmnZ/P1OHvfb25hfWrI5wzzQ1lMKTC41YnD7YUe53X9hS8FEC9SRRzu4n+WlYPF+Rvn4Igr14t7qSdVCDOV4Nxx9M=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB4218.namprd12.prod.outlook.com (10.141.186.208) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2367.24; Tue, 22 Oct 2019 13:38:33 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Tue, 22 Oct 2019
+ 13:38:33 +0000
+From:   "Singh, Brijesh" <brijesh.singh@amd.com>
+To:     David Rientjes <rientjes@google.com>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "info@metux.net" <info@metux.net>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
+ check failure.
+Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
+ integrity check failure.
+Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdhrHEAgAPAfICAAG/6gIAA1J0A
+Date:   Tue, 22 Oct 2019 13:38:33 +0000
+Message-ID: <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+ <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com>
+ <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com>
+ <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
+In-Reply-To: <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: cHX-FodvMUe-9PnCZqEIBg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR01CA0018.prod.exchangelabs.com (2603:10b6:805:b6::31)
+ To DM6PR12MB2682.namprd12.prod.outlook.com (2603:10b6:5:42::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 9a0756d9-fc36-429f-d175-08d756f521b0
+x-ms-traffictypediagnostic: DM6PR12MB4218:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR12MB4218E0A8C2D999E5E199E2A8E5680@DM6PR12MB4218.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 01986AE76B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(199004)(189003)(76176011)(8676002)(81166006)(81156014)(25786009)(66946007)(14454004)(64756008)(66446008)(66556008)(486006)(6916009)(8936002)(31686004)(71190400001)(71200400001)(99286004)(478600001)(53546011)(66066001)(6506007)(386003)(102836004)(186003)(26005)(52116002)(66476007)(256004)(14444005)(5660300002)(4326008)(6246003)(3846002)(6116002)(305945005)(7736002)(6486002)(6436002)(6512007)(7416002)(54906003)(316002)(11346002)(446003)(2906002)(229853002)(2616005)(476003)(36756003)(86362001)(31696002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB4218;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: jIygXWtAzOL+QTZm7367nSSrS1XuE+Vh7y6XhoFC5bO4YSGsFVLIuRCKiBjkIrylFZtB6EYAs/HQIojChBu5F51puUJ47OSiVO6arObG3nsJk7qMOEZZ0gxw0ydsekpcBcf1wTPvVLiW0fsnuawK6Dagmq+t6HK81VuS4BKb4VKpddzbeLP1/+8msuH0YccbW24zcYOAMPUWI7gzOdOmSUDYUT6wb/2DBen9FlEel9+6Sfjx9/H43x3HlKLqx3cecMERaeoF4wAqJGFMkbvuA8ryyNXxPzJIuN5C5T6DGcpFWoyUNFlVsCREsCAe/hXQ+e14qWxh2/w6m5ObSJ/4ag0wwVJphdZcB6nH2SBDxL9d+Nwjjr8L1mA0/4zsB5WEo/4E13xGQZscbk2m1TuVNFFEG809pQI/qaSWkfsvsw4xz+RQCbNl01Mku28xpDEI
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <468FC00634ABA3428AFE78F5CFD1C3F0@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a0756d9-fc36-429f-d175-08d756f521b0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2019 13:38:33.7451
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LjcnZOYSDvKXyKYQvJeOKxZIIw8J8/h5JHGNbzjDzOQS0uBFRUgA2vQTfPYoYQFdogz+b5XRiFvDVK9utyxoKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4218
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/10/22 =E4=B8=8B=E5=8D=885:52, Tiwei Bie wrote:
-> This patch introduces a mdev based hardware vhost backend.
-> This backend is built on top of the same abstraction used
-> in virtio-mdev and provides a generic vhost interface for
-> userspace to accelerate the virtio devices in guest.
->
-> This backend is implemented as a mdev device driver on top
-> of the same mdev device ops used in virtio-mdev but using
-> a different mdev class id, and it will register the device
-> as a VFIO device for userspace to use. Userspace can setup
-> the IOMMU with the existing VFIO container/group APIs and
-> then get the device fd with the device name. After getting
-> the device fd of this device, userspace can use vhost ioctls
-> to setup the backend.
->
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> ---
-> This patch depends on below series:
-> https://lkml.org/lkml/2019/10/17/286
->
-> v1 -> v2:
-> - Replace _SET_STATE with _SET_STATUS (MST);
-> - Check status bits at each step (MST);
-> - Report the max ring size and max number of queues (MST);
-> - Add missing MODULE_DEVICE_TABLE (Jason);
-> - Only support the network backend w/o multiqueue for now;
-
-
-Any idea on how to extend it to support devices other than net? I think=20
-we want a generic API or an API that could be made generic in the future.
-
-Do we want to e.g having a generic vhost mdev for all kinds of devices=20
-or introducing e.g vhost-net-mdev and vhost-scsi-mdev?
-
-
-> - Some minor fixes and improvements;
-> - Rebase on top of virtio-mdev series v4;
->
-> RFC v4 -> v1:
-> - Implement vhost-mdev as a mdev device driver directly and
->    connect it to VFIO container/group. (Jason);
-> - Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
->    meaningless HVA->GPA translations (Jason);
->
-> RFC v3 -> RFC v4:
-> - Build vhost-mdev on top of the same abstraction used by
->    virtio-mdev (Jason);
-> - Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
->
-> RFC v2 -> RFC v3:
-> - Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
->    based vhost protocol on top of vfio-mdev (Jason);
->
-> RFC v1 -> RFC v2:
-> - Introduce a new VFIO device type to build a vhost protocol
->    on top of vfio-mdev;
->
->   drivers/vfio/mdev/mdev_core.c |  12 +
->   drivers/vhost/Kconfig         |   9 +
->   drivers/vhost/Makefile        |   3 +
->   drivers/vhost/mdev.c          | 415 ++++++++++++++++++++++++++++++++++
->   include/linux/mdev.h          |   3 +
->   include/uapi/linux/vhost.h    |  13 ++
->   6 files changed, 455 insertions(+)
->   create mode 100644 drivers/vhost/mdev.c
->
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.=
-c
-> index 5834f6b7c7a5..2963f65e6648 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -69,6 +69,18 @@ void mdev_set_virtio_ops(struct mdev_device *mdev,
->   }
->   EXPORT_SYMBOL(mdev_set_virtio_ops);
->  =20
-> +/* Specify the vhost device ops for the mdev device, this
-> + * must be called during create() callback for vhost mdev device.
-> + */
-> +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> +=09=09=09const struct virtio_mdev_device_ops *vhost_ops)
-> +{
-> +=09WARN_ON(mdev->class_id);
-> +=09mdev->class_id =3D MDEV_CLASS_ID_VHOST;
-> +=09mdev->device_ops =3D vhost_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_set_vhost_ops);
-> +
->   const void *mdev_get_dev_ops(struct mdev_device *mdev)
->   {
->   =09return mdev->device_ops;
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 3d03ccbd1adc..7b5c2f655af7 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -34,6 +34,15 @@ config VHOST_VSOCK
->   =09To compile this driver as a module, choose M here: the module will b=
-e called
->   =09vhost_vsock.
->  =20
-> +config VHOST_MDEV
-> +=09tristate "Vhost driver for Mediated devices"
-> +=09depends on EVENTFD && VFIO && VFIO_MDEV
-> +=09select VHOST
-> +=09default n
-> +=09---help---
-> +=09Say M here to enable the vhost_mdev module for use with
-> +=09the mediated device based hardware vhost accelerators.
-> +
->   config VHOST
->   =09tristate
->   =09---help---
-> diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-> index 6c6df24f770c..ad9c0f8c6d8c 100644
-> --- a/drivers/vhost/Makefile
-> +++ b/drivers/vhost/Makefile
-> @@ -10,4 +10,7 @@ vhost_vsock-y :=3D vsock.o
->  =20
->   obj-$(CONFIG_VHOST_RING) +=3D vringh.o
->  =20
-> +obj-$(CONFIG_VHOST_MDEV) +=3D vhost_mdev.o
-> +vhost_mdev-y :=3D mdev.o
-> +
->   obj-$(CONFIG_VHOST)=09+=3D vhost.o
-> diff --git a/drivers/vhost/mdev.c b/drivers/vhost/mdev.c
-> new file mode 100644
-> index 000000000000..5f9cae61018c
-> --- /dev/null
-> +++ b/drivers/vhost/mdev.c
-> @@ -0,0 +1,415 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2018-2019 Intel Corporation.
-> + */
-> +
-> +#include <linux/compat.h>
-> +#include <linux/kernel.h>
-> +#include <linux/miscdevice.h>
-> +#include <linux/mdev.h>
-> +#include <linux/module.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vhost.h>
-> +#include <linux/virtio_mdev.h>
-> +#include <linux/virtio_ids.h>
-> +
-> +#include "vhost.h"
-> +
-> +/* Currently, only network backend w/o multiqueue is supported. */
-> +#define VHOST_MDEV_VQ_MAX=092
-> +
-> +struct vhost_mdev {
-> +=09/* The lock is to protect this structure. */
-> +=09struct mutex mutex;
-> +=09struct vhost_dev dev;
-> +=09struct vhost_virtqueue *vqs;
-> +=09int nvqs;
-> +=09u64 status;
-> +=09u64 features;
-> +=09u64 acked_features;
-> +=09bool opened;
-> +=09struct mdev_device *mdev;
-> +};
-> +
-> +static void handle_vq_kick(struct vhost_work *work)
-> +{
-> +=09struct vhost_virtqueue *vq =3D container_of(work, struct vhost_virtqu=
-eue,
-> +=09=09=09=09=09=09  poll.work);
-> +=09struct vhost_mdev *m =3D container_of(vq->dev, struct vhost_mdev, dev=
-);
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +
-> +=09ops->kick_vq(m->mdev, vq - m->vqs);
-> +}
-> +
-> +static irqreturn_t vhost_mdev_virtqueue_cb(void *private)
-> +{
-> +=09struct vhost_virtqueue *vq =3D private;
-> +=09struct eventfd_ctx *call_ctx =3D vq->call_ctx;
-> +
-> +=09if (call_ctx)
-> +=09=09eventfd_signal(call_ctx, 1);
-> +=09return IRQ_HANDLED;
-> +}
-> +
-> +static void vhost_mdev_reset(struct vhost_mdev *m)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(mdev);
-> +
-> +=09m->status =3D 0;
-> +=09return ops->set_status(mdev, m->status);
-> +}
-> +
-> +static long vhost_mdev_get_status(struct vhost_mdev *m, u8 __user *statu=
-sp)
-> +{
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09u8 status;
-> +
-> +=09status =3D ops->get_status(mdev);
-> +=09m->status =3D status;
-> +
-> +=09if (copy_to_user(statusp, &status, sizeof(status)))
-> +=09=09return -EFAULT;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_set_status(struct vhost_mdev *m, u8 __user *statu=
-sp)
-> +{
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09u8 status;
-> +
-> +=09if (copy_from_user(&status, statusp, sizeof(status)))
-> +=09=09return -EFAULT;
-> +
-> +=09/*
-> +=09 * Userspace shouldn't remove status bits unless reset the
-> +=09 * status to 0.
-> +=09 */
-> +=09if (status !=3D 0 && (m->status & ~status) !=3D 0)
-> +=09=09return -EINVAL;
-
-
-We don't cache vq ready information but we cache status and features=20
-here, any reason for this?
-
-
-> +
-> +=09ops->set_status(mdev, status);
-> +=09m->status =3D ops->get_status(mdev);
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_features(struct vhost_mdev *m, u64 __user *fe=
-aturep)
-> +{
-> +=09if (copy_to_user(featurep, &m->features, sizeof(m->features)))
-> +=09=09return -EFAULT;
-
-
-As discussed in previous version do we need to filter out MQ feature here?
-
-
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_set_features(struct vhost_mdev *m, u64 __user *fe=
-aturep)
-> +{
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09u64 features;
-> +
-> +=09/*
-> +=09 * It's not allowed to change the features after they have
-> +=09 * been negotiated.
-> +=09 */
-> +=09if (m->status & VIRTIO_CONFIG_S_FEATURES_OK)
-> +=09=09return -EPERM;
-
-
--EBUSY?
-
-
-> +
-> +=09if (copy_from_user(&features, featurep, sizeof(features)))
-> +=09=09return -EFAULT;
-> +
-> +=09if (features & ~m->features)
-> +=09=09return -EINVAL;
-> +
-> +=09m->acked_features =3D features;
-> +=09if (ops->set_features(mdev, m->acked_features))
-> +=09=09return -ENODEV;
-
-
--EINVAL should be better, this would be more obvious for parent that=20
-wants to force any feature.
-
-
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_vring_num(struct vhost_mdev *m, u16 __user *a=
-rgp)
-> +{
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09u16 num;
-> +
-> +=09num =3D ops->get_vq_num_max(mdev);
-> +
-> +=09if (copy_to_user(argp, &num, sizeof(num)))
-> +=09=09return -EFAULT;
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_queue_num(struct vhost_mdev *m, u32 __user *a=
-rgp)
-> +{
-> +=09u32 nvqs =3D m->nvqs;
-> +
-> +=09if (copy_to_user(argp, &nvqs, sizeof(nvqs)))
-> +=09=09return -EFAULT;
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_vring_ioctl(struct vhost_mdev *m, unsigned int cm=
-d,
-> +=09=09=09=09   void __user *argp)
-> +{
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(m->mdev=
-);
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09struct virtio_mdev_callback cb;
-> +=09struct vhost_virtqueue *vq;
-> +=09struct vhost_vring_state s;
-> +=09u32 idx;
-> +=09long r;
-> +
-> +=09r =3D get_user(idx, (u32 __user *)argp);
-> +=09if (r < 0)
-> +=09=09return r;
-> +=09if (idx >=3D m->nvqs)
-> +=09=09return -ENOBUFS;
-> +
-> +=09/*
-> +=09 * It's not allowed to detect and program vqs before
-> +=09 * features negotiation or after enabling driver.
-> +=09 */
-> +=09if (!(m->status & VIRTIO_CONFIG_S_FEATURES_OK) ||
-> +=09    (m->status & VIRTIO_CONFIG_S_DRIVER_OK))
-> +=09=09return -EPERM;
-
-
-So the question is: is it better to do this in parent or not?
-
-
-> +
-> +=09vq =3D &m->vqs[idx];
-> +
-> +=09if (cmd =3D=3D VHOST_MDEV_SET_VRING_ENABLE) {
-> +=09=09if (copy_from_user(&s, argp, sizeof(s)))
-> +=09=09=09return -EFAULT;
-> +=09=09ops->set_vq_ready(mdev, idx, s.num);
-> +=09=09return 0;
-> +=09}
-> +
-> +=09/*
-> +=09 * It's not allowed to detect and program vqs with
-> +=09 * vqs enabled.
-> +=09 */
-> +=09if (ops->get_vq_ready(mdev, idx))
-> +=09=09return -EPERM;
-> +
-> +=09if (cmd =3D=3D VHOST_GET_VRING_BASE)
-> +=09=09vq->last_avail_idx =3D ops->get_vq_state(m->mdev, idx);
-> +
-> +=09r =3D vhost_vring_ioctl(&m->dev, cmd, argp);
-> +=09if (r)
-> +=09=09return r;
-> +
-> +=09switch (cmd) {
-> +=09case VHOST_SET_VRING_ADDR:
-> +=09=09/*
-> +=09=09 * In vhost-mdev, the ring addresses set by userspace should
-> +=09=09 * be the DMA addresses within the VFIO container/group.
-> +=09=09 */
-> +=09=09if (ops->set_vq_address(mdev, idx, (u64)vq->desc,
-> +=09=09=09=09=09(u64)vq->avail, (u64)vq->used))
-> +=09=09=09r =3D -ENODEV;
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_BASE:
-> +=09=09if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
-> +=09=09=09r =3D -ENODEV;
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_CALL:
-> +=09=09if (vq->call_ctx) {
-> +=09=09=09cb.callback =3D vhost_mdev_virtqueue_cb;
-> +=09=09=09cb.private =3D vq;
-> +=09=09} else {
-> +=09=09=09cb.callback =3D NULL;
-> +=09=09=09cb.private =3D NULL;
-> +=09=09}
-> +=09=09ops->set_vq_cb(mdev, idx, &cb);
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_NUM:
-> +=09=09ops->set_vq_num(mdev, idx, vq->num);
-> +=09=09break;
-> +=09}
-> +
-> +=09return r;
-> +}
-> +
-> +static int vhost_mdev_open(void *device_data)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +=09struct vhost_dev *dev;
-> +=09struct vhost_virtqueue **vqs;
-> +=09int nvqs, i, r;
-> +
-> +=09if (!try_module_get(THIS_MODULE))
-> +=09=09return -ENODEV;
-> +
-> +=09mutex_lock(&m->mutex);
-> +
-> +=09if (m->opened) {
-> +=09=09r =3D -EBUSY;
-> +=09=09goto err;
-> +=09}
-> +
-> +=09nvqs =3D m->nvqs;
-> +=09vhost_mdev_reset(m);
-> +
-> +=09memset(&m->dev, 0, sizeof(m->dev));
-> +=09memset(m->vqs, 0, nvqs * sizeof(struct vhost_virtqueue));
-> +
-> +=09vqs =3D kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
-> +=09if (!vqs) {
-> +=09=09r =3D -ENOMEM;
-> +=09=09goto err;
-> +=09}
-> +
-> +=09dev =3D &m->dev;
-> +=09for (i =3D 0; i < nvqs; i++) {
-> +=09=09vqs[i] =3D &m->vqs[i];
-> +=09=09vqs[i]->handle_kick =3D handle_vq_kick;
-> +=09}
-> +=09vhost_dev_init(dev, vqs, nvqs, 0, 0, 0);
-> +=09m->opened =3D true;
-> +=09mutex_unlock(&m->mutex);
-> +
-> +=09return 0;
-> +
-> +err:
-> +=09mutex_unlock(&m->mutex);
-> +=09module_put(THIS_MODULE);
-> +=09return r;
-> +}
-> +
-> +static void vhost_mdev_release(void *device_data)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +
-> +=09mutex_lock(&m->mutex);
-> +=09vhost_mdev_reset(m);
-> +=09vhost_dev_stop(&m->dev);
-> +=09vhost_dev_cleanup(&m->dev);
-> +
-> +=09kfree(m->dev.vqs);
-> +=09m->opened =3D false;
-> +=09mutex_unlock(&m->mutex);
-> +=09module_put(THIS_MODULE);
-> +}
-> +
-> +static long vhost_mdev_unlocked_ioctl(void *device_data,
-> +=09=09=09=09      unsigned int cmd, unsigned long arg)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +=09void __user *argp =3D (void __user *)arg;
-> +=09long r;
-> +
-> +=09mutex_lock(&m->mutex);
-> +
-> +=09switch (cmd) {
-> +=09case VHOST_MDEV_GET_STATUS:
-> +=09=09r =3D vhost_mdev_get_status(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_SET_STATUS:
-> +=09=09r =3D vhost_mdev_set_status(m, argp);
-> +=09=09break;
-> +=09case VHOST_GET_FEATURES:
-> +=09=09r =3D vhost_mdev_get_features(m, argp);
-> +=09=09break;
-> +=09case VHOST_SET_FEATURES:
-> +=09=09r =3D vhost_mdev_set_features(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_GET_VRING_NUM:
-> +=09=09r =3D vhost_mdev_get_vring_num(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_GET_QUEUE_NUM:
-> +=09=09r =3D vhost_mdev_get_queue_num(m, argp);
-> +=09=09break;
-
-
-It's not clear to me that how this API will be used by userspace? I=20
-think e.g features without MQ implies the queue num here.
-
-
-> +=09default:
-> +=09=09r =3D vhost_dev_ioctl(&m->dev, cmd, argp);
-
-
-I believe having SET_MEM_TABLE/SET_LOG_BASE/SET_LOG_FD=C2=A0 is for future=
-=20
-support of those features. If it's true need add some comments on this.
-
-
-> +=09=09if (r =3D=3D -ENOIOCTLCMD)
-> +=09=09=09r =3D vhost_mdev_vring_ioctl(m, cmd, argp);
-> +=09}
-> +
-> +=09mutex_unlock(&m->mutex);
-> +=09return r;
-> +}
-> +
-> +static const struct vfio_device_ops vfio_vhost_mdev_dev_ops =3D {
-> +=09.name=09=09=3D "vfio-vhost-mdev",
-> +=09.open=09=09=3D vhost_mdev_open,
-> +=09.release=09=3D vhost_mdev_release,
-> +=09.ioctl=09=09=3D vhost_mdev_unlocked_ioctl,
-> +};
-> +
-> +static int vhost_mdev_probe(struct device *dev)
-> +{
-> +=09struct mdev_device *mdev =3D mdev_from_dev(dev);
-> +=09const struct virtio_mdev_device_ops *ops =3D mdev_get_dev_ops(mdev);
-> +=09struct vhost_mdev *m;
-> +=09int nvqs, r;
-> +
-> +=09/* Currently, only network backend is supported. */
-> +=09if (ops->get_device_id(mdev) !=3D VIRTIO_ID_NET)
-> +=09=09return -ENOTSUPP;
-
-
-If we decide to go with the way of vhost-net-mdev, probably need=20
-something smarter. E.g a vhost bus etc.
-
-
-> +
-> +=09if (ops->get_mdev_features(mdev) !=3D VIRTIO_MDEV_F_VERSION_1)
-> +=09=09return -ENOTSUPP;
-> +
-> +=09m =3D devm_kzalloc(dev, sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL)=
-;
-> +=09if (!m)
-> +=09=09return -ENOMEM;
-> +
-> +=09nvqs =3D VHOST_MDEV_VQ_MAX;
-> +=09m->nvqs =3D nvqs;
-> +
-> +=09m->vqs =3D devm_kmalloc_array(dev, nvqs, sizeof(struct vhost_virtqueu=
-e),
-> +=09=09=09=09    GFP_KERNEL);
-> +=09if (!m->vqs)
-> +=09=09return -ENOMEM;
-
-
-Is it better to move those allocation to open? Otherwise the memset=20
-there seems strange.
-
-
-> +
-> +=09r =3D vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, m);
-> +=09if (r)
-> +=09=09return r;
-> +
-> +=09mutex_init(&m->mutex);
-> +=09m->features =3D ops->get_features(mdev);
-> +=09m->mdev =3D mdev;
-> +=09return 0;
-> +}
-> +
-> +static void vhost_mdev_remove(struct device *dev)
-> +{
-> +=09struct vhost_mdev *m;
-> +
-> +=09m =3D vfio_del_group_dev(dev);
-> +=09mutex_destroy(&m->mutex);
-> +}
-> +
-> +static const struct mdev_class_id vhost_mdev_match[] =3D {
-> +=09{ MDEV_CLASS_ID_VHOST },
-> +=09{ 0 },
-> +};
-> +MODULE_DEVICE_TABLE(mdev, vhost_mdev_match);
-> +
-> +static struct mdev_driver vhost_mdev_driver =3D {
-> +=09.name=09=3D "vhost_mdev",
-> +=09.probe=09=3D vhost_mdev_probe,
-> +=09.remove=09=3D vhost_mdev_remove,
-> +=09.id_table =3D vhost_mdev_match,
-> +};
-> +
-> +static int __init vhost_mdev_init(void)
-> +{
-> +=09return mdev_register_driver(&vhost_mdev_driver, THIS_MODULE);
-> +}
-> +module_init(vhost_mdev_init);
-> +
-> +static void __exit vhost_mdev_exit(void)
-> +{
-> +=09mdev_unregister_driver(&vhost_mdev_driver);
-> +}
-> +module_exit(vhost_mdev_exit);
-> +
-> +MODULE_VERSION("0.0.1");
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_DESCRIPTION("Mediated device based accelerator for virtio");
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 13e045e09d3b..6060cdbe6d3e 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -114,6 +114,8 @@ void mdev_set_vfio_ops(struct mdev_device *mdev,
->   =09=09       const struct vfio_mdev_device_ops *vfio_ops);
->   void mdev_set_virtio_ops(struct mdev_device *mdev,
->                            const struct virtio_mdev_device_ops *virtio_op=
-s);
-> +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> +=09=09=09const struct virtio_mdev_device_ops *vhost_ops);
->   const void *mdev_get_dev_ops(struct mdev_device *mdev);
->  =20
->   extern struct bus_type mdev_bus_type;
-> @@ -131,6 +133,7 @@ struct mdev_device *mdev_from_dev(struct device *dev)=
-;
->   enum {
->   =09MDEV_CLASS_ID_VFIO =3D 1,
->   =09MDEV_CLASS_ID_VIRTIO =3D 2,
-> +=09MDEV_CLASS_ID_VHOST =3D 3,
->   =09/* New entries must be added here */
->   };
->  =20
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index 40d028eed645..dad3c62bd91b 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -116,4 +116,17 @@
->   #define VHOST_VSOCK_SET_GUEST_CID=09_IOW(VHOST_VIRTIO, 0x60, __u64)
->   #define VHOST_VSOCK_SET_RUNNING=09=09_IOW(VHOST_VIRTIO, 0x61, int)
->  =20
-> +/* VHOST_MDEV specific defines */
-> +
-> +/* Get and set the status of the backend. The status bits follow the
-> + * same definition of the device status defined in virtio-spec. */
-> +#define VHOST_MDEV_GET_STATUS=09=09_IOW(VHOST_VIRTIO, 0x70, __u8)
-> +#define VHOST_MDEV_SET_STATUS=09=09_IOW(VHOST_VIRTIO, 0x71, __u8)
-> +/* Enable/disable the ring. */
-> +#define VHOST_MDEV_SET_VRING_ENABLE=09_IOW(VHOST_VIRTIO, 0x72, struct vh=
-ost_vring_state)
-> +/* Get the max ring size. */
-> +#define VHOST_MDEV_GET_VRING_NUM=09_IOW(VHOST_VIRTIO, 0x73, __u16)
-> +/* Get the max number of queues. */
-> +#define VHOST_MDEV_GET_QUEUE_NUM=09_IOW(VHOST_VIRTIO, 0x74, __u32)
-
-
-Do we need API for userspace to get backend capability? (that calls=20
-get_mdev_device_features())
-
-Thanks
-
-
-> +
->   #endif
-
+DQoNCk9uIDEwLzIxLzE5IDc6NTcgUE0sIERhdmlkIFJpZW50amVzIHdyb3RlOg0KPiBPbiBNb24s
+IDIxIE9jdCAyMDE5LCBTaW5naCwgQnJpamVzaCB3cm90ZToNCj4gDQo+Pj4+IEZyb206IEFzaGlz
+aCBLYWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+DQo+Pj4+DQo+Pj4+IFNFViBJTklUIGNvbW1h
+bmQgbG9hZHMgdGhlIFNFViByZWxhdGVkIHBlcnNpc3RlbnQgZGF0YSBmcm9tIE5WUw0KPj4+PiBh
+bmQgaW5pdGlhbGl6ZXMgdGhlIHBsYXRmb3JtIGNvbnRleHQuIFRoZSBmaXJtd2FyZSB2YWxpZGF0
+ZXMgdGhlDQo+Pj4+IHBlcnNpc3RlbnQgc3RhdGUuIElmIHZhbGlkYXRpb24gZmFpbHMsIHRoZSBm
+aXJtd2FyZSB3aWxsIHJlc2V0DQo+Pj4+IHRoZSBwZXJzaXNlbnQgc3RhdGUgYW5kIHJldHVybiBh
+biBpbnRlZ3JpdHkgY2hlY2sgZmFpbHVyZSBzdGF0dXMuDQo+Pj4+DQo+Pj4+IEF0IHRoaXMgcG9p
+bnQsIGEgc3Vic2VxdWVudCBJTklUIGNvbW1hbmQgc2hvdWxkIHN1Y2NlZWQsIHNvIHJldHJ5DQo+
+Pj4+IHRoZSBjb21tYW5kLiBUaGUgSU5JVCBjb21tYW5kIHJldHJ5IGlzIG9ubHkgZG9uZSBkdXJp
+bmcgZHJpdmVyDQo+Pj4+IGluaXRpYWxpemF0aW9uLg0KPj4+Pg0KPj4+PiBBZGRpdGlvbmFsIGVu
+dW1zIGFsb25nIHdpdGggU0VWX1JFVF9TRUNVUkVfREFUQV9JTlZBTElEIGFyZSBhZGRlZA0KPj4+
+PiB0byBzZXZfcmV0X2NvZGUgdG8gbWFpbnRhaW4gY29udGludWl0eSBhbmQgcmVsZXZhbmNlIG9m
+IGVudW0gdmFsdWVzLg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBBc2hpc2ggS2FscmEgPGFz
+aGlzaC5rYWxyYUBhbWQuY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgZHJpdmVycy9jcnlwdG8vY2Nw
+L3BzcC1kZXYuYyB8IDEyICsrKysrKysrKysrKw0KPj4+PiAgICBpbmNsdWRlL3VhcGkvbGludXgv
+cHNwLXNldi5oIHwgIDMgKysrDQo+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9u
+cygrKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYu
+YyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9wc3AtZGV2LmMNCj4+Pj4gaW5kZXggNmIxN2QxNzllZjhh
+Li5mOTMxOGQ0NDgyZjIgMTAwNjQ0DQo+Pj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9wc3At
+ZGV2LmMNCj4+Pj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYw0KPj4+PiBAQCAt
+MTA2NCw2ICsxMDY0LDE4IEBAIHZvaWQgcHNwX3BjaV9pbml0KHZvaWQpDQo+Pj4+ICAgIA0KPj4+
+PiAgICAJLyogSW5pdGlhbGl6ZSB0aGUgcGxhdGZvcm0gKi8NCj4+Pj4gICAgCXJjID0gc2V2X3Bs
+YXRmb3JtX2luaXQoJmVycm9yKTsNCj4+Pj4gKwlpZiAocmMgJiYgKGVycm9yID09IFNFVl9SRVRf
+U0VDVVJFX0RBVEFfSU5WQUxJRCkpIHsNCj4+Pj4gKwkJLyoNCj4+Pj4gKwkJICogSU5JVCBjb21t
+YW5kIHJldHVybmVkIGFuIGludGVncml0eSBjaGVjayBmYWlsdXJlDQo+Pj4+ICsJCSAqIHN0YXR1
+cyBjb2RlLCBtZWFuaW5nIHRoYXQgZmlybXdhcmUgbG9hZCBhbmQNCj4+Pj4gKwkJICogdmFsaWRh
+dGlvbiBvZiBTRVYgcmVsYXRlZCBwZXJzaXN0ZW50IGRhdGEgaGFzDQo+Pj4+ICsJCSAqIGZhaWxl
+ZCBhbmQgcGVyc2lzdGVudCBzdGF0ZSBoYXMgYmVlbiBlcmFzZWQuDQo+Pj4+ICsJCSAqIFJldHJ5
+aW5nIElOSVQgY29tbWFuZCBoZXJlIHNob3VsZCBzdWNjZWVkLg0KPj4+PiArCQkgKi8NCj4+Pj4g
+KwkJZGV2X2RiZyhzcC0+ZGV2LCAiU0VWOiByZXRyeWluZyBJTklUIGNvbW1hbmQiKTsNCj4+Pj4g
+KwkJcmMgPSBzZXZfcGxhdGZvcm1faW5pdCgmZXJyb3IpOw0KPj4+PiArCX0NCj4+Pj4gKw0KPj4+
+PiAgICAJaWYgKHJjKSB7DQo+Pj4+ICAgIAkJZGV2X2VycihzcC0+ZGV2LCAiU0VWOiBmYWlsZWQg
+dG8gSU5JVCBlcnJvciAlI3hcbiIsIGVycm9yKTsNCj4+Pj4gICAgCQlyZXR1cm47DQo+Pj4NCj4+
+PiBDdXJpb3VzIHdoeSB0aGlzIGlzbid0IGRvbmUgaW4gX19zZXZfcGxhdGZvcm1faW5pdF9sb2Nr
+ZWQoKSBzaW5jZQ0KPj4+IHNldl9wbGF0Zm9ybV9pbml0KCkgY2FuIGJlIGNhbGxlZCB3aGVuIGxv
+YWRpbmcgdGhlIGt2bSBtb2R1bGUgYW5kIHRoZSBzYW1lDQo+Pj4gaW5pdCBmYWlsdXJlIGNhbiBo
+YXBwZW4gdGhhdCB3YXkuDQo+Pj4NCj4+DQo+PiBUaGUgRlcgaW5pdGlhbGl6YXRpb24gKGFrYSBQ
+TEFURk9STV9JTklUKSBpcyBjYWxsZWQgaW4gdGhlIGZvbGxvd2luZw0KPj4gY29kZSBwYXRoczoN
+Cj4+DQo+PiAxLiBEdXJpbmcgc3lzdGVtIGJvb3QgdXANCj4+DQo+PiBhbmQNCj4+DQo+PiAyLiBB
+ZnRlciB0aGUgcGxhdGZvcm0gcmVzZXQgY29tbWFuZCBpcyBpc3N1ZWQNCj4+DQo+PiBUaGUgcGF0
+Y2ggdGFrZXMgY2FyZSBvZiAjMS4gQmFzZWQgb24gdGhlIHNwZWMsIHBsYXRmb3JtIHJlc2V0IGNv
+bW1hbmQNCj4+IHNob3VsZCBlcmFzZSB0aGUgcGVyc2lzdGVudCBkYXRhIGFuZCB0aGUgUExBVEZP
+Uk1fSU5JVCBzaG91bGQgKm5vdCogZmFpbA0KPj4gd2l0aCBTRVZfUkVUX1NFQ1VSRV9EQVRBX0lO
+VkFMSUQgZXJyb3IgY29kZS4gU28sIEkgYW0gbm90IGFibGUgdG8gc2VlDQo+PiBhbnkgIHN0cm9u
+ZyByZWFzb24gdG8gbW92ZSB0aGUgcmV0cnkgY29kZSBpbg0KPj4gX19zZXZfcGxhdGZvcm1faW5p
+dF9sb2NrZWQoKS4NCj4+DQo+IA0KPiBIbW0sIGlzIHRoZSBzZXZfcGxhdGZvcm1faW5pdCgpIGNh
+bGwgaW4gc2V2X2d1ZXN0X2luaXQoKSBpbnRlbmRlZCB0byBkbw0KPiBTRVZfQ01EX0lOSVQgb25s
+eSBhZnRlciBwbGF0Zm9ybSByZXNldD8gIEkgd2FzIHVuZGVyIHRoZSBpbXByZXNzaW9uIGl0IHdh
+cw0KPiBkb25lIGluIGNhc2UgYW55IHByZXZpb3VzIGluaXQgZmFpbGVkLg0KPiANCg0KDQpUaGUg
+UExBVEZPUk1fSU5JVCBjb21tYW5kIGlzIGFsbG93ZWQgb25seSB3aGVuIEZXIGlzIGluIFVJTklU
+IHN0YXRlLiBPbg0KYm9vdCwgdGhlIEZXIHdpbGwgYmUgaW4gVU5JTklUIHN0YXRlIGFuZCBzaW1p
+bGFybHkgYWZ0ZXIgdGhlIHBsYXRmb3JtIA0KcmVzZXQgY29tbWFuZCB0aGUgRlcgZ29lcyBiYWNr
+IHRvIFVOSU5JVCBzdGF0ZS4NCg0KVGhlIF9fc2V2X3BsYXRmb3JtX2luaXRfbG9ja2VkKCkgY2hl
+Y2tzIHRoZSBGVyBzdGF0ZSBiZWZvcmUgaXNzdWluZyB0aGUNCmNvbW1hbmQsIGlmIEZXIGlzIGFs
+cmVhZHkgaW4gSU5JVCBzdGF0ZSB0aGVuIGl0IHJldHVybnMgaW1tZWRpYXRlbHkuDQoNCnRoYW5r
+cw0K
