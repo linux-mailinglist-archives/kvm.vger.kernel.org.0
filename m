@@ -2,90 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1E98E0250
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 12:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63B28E0262
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 12:53:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388617AbfJVKvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 06:51:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45568 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388578AbfJVKvF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 06:51:05 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AE8F259449
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 10:51:04 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id a6so6108323wru.1
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 03:51:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vdKl6DDKIlJEFdLjcPMS36s2s1FJIcIbFPms1LIdy0I=;
-        b=M7HRzZFChh8TkGAOHm44yFP1Jt3saqIu4N+LCYmt3+qiIhenIcdXdVK6nCB85tB466
-         NgRUxkuyGMlatokwdkLs2+0eI90faQAukcXS5zB+zSFCXDERluIIQfVueZN1OIxpcNBu
-         hYAto/eIHVBkb7MUqBGui9SM7IO9hWUxTK58MU/P9xzzkGSOtZPjVo/RSiZcSLH4hJdT
-         ssfx6wMkhyVwn2MK0D59r+wNh1qdTEHBdxhyboS29D5KF7wbei7SbFYY0EfNd0e+A/NT
-         VftfRdvwApVsyD+cTjnJ8XXlddXhsk8Gs2El9U+r3XG2QJSBOpcvVSM8XOMVtjsYhwmB
-         QBEg==
-X-Gm-Message-State: APjAAAVWYoLqLBfY+HcgHhd0fmFCvJJ3BOh7kDg0vViYqcw06TqIC6ms
-        5OR3AckyD26h/8AvlhQcCFfqhR4K4uXgfsZshtoEcZ65ZeKESWzCzklNuQ56fCZdV6ed3Sw0lWo
-        1XqCx0XhASxRB
-X-Received: by 2002:adf:e446:: with SMTP id t6mr2862403wrm.7.1571741463188;
-        Tue, 22 Oct 2019 03:51:03 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwLRJDFeoklnPCvIdpTLdkWG0AASVA51wAqpaeBkfAXh2wTKGAZAwI2bUd5RCu2qeXwOkem1Q==
-X-Received: by 2002:adf:e446:: with SMTP id t6mr2862368wrm.7.1571741462908;
-        Tue, 22 Oct 2019 03:51:02 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:45c:4f58:5841:71b2? ([2001:b07:6468:f312:45c:4f58:5841:71b2])
-        by smtp.gmail.com with ESMTPSA id b62sm25553598wmc.13.2019.10.22.03.51.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2019 03:51:02 -0700 (PDT)
-Subject: Re: [PATCH v2 05/16] KVM: VMX: Drop initialization of
- IA32_FEATURE_CONTROL MSR
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
- <20191022000820.1854-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <59cbc79a-fb06-f689-aa24-0ba923783345@redhat.com>
-Date:   Tue, 22 Oct 2019 12:51:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191022000820.1854-1-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1730345AbfJVKxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 06:53:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24334 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730331AbfJVKxM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Oct 2019 06:53:12 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9MAladA136731
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:53:12 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vsyux979n-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:53:11 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Tue, 22 Oct 2019 11:53:09 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 22 Oct 2019 11:53:06 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9MAr58D54067386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Oct 2019 10:53:05 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0158752050;
+        Tue, 22 Oct 2019 10:53:05 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id BB4CD5204F;
+        Tue, 22 Oct 2019 10:53:04 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v1 0/5] s390x: SCLP Unit test
+Date:   Tue, 22 Oct 2019 12:52:59 +0200
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19102210-4275-0000-0000-000003757597
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102210-4276-0000-0000-0000388898FB
+Message-Id: <1571741584-17621-1-git-send-email-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-22_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=370 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910220098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/10/19 02:08, Sean Christopherson wrote:
-> Remove the code to initialize IA32_FEATURE_CONTROL MSR when KVM is
-> loaded now that the MSR is initialized during boot on all CPUs that
-> support VMX, i.e. can possibly load kvm_intel.
-> 
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 48 +++++++++++++++++-------------------------
->  1 file changed, 19 insertions(+), 29 deletions(-)
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
 
-I am still not sure about this...  Enabling VMX is adding a possible
-attack vector for the kernel, we should not do it unless we plan to do a
-VMXON.  Why is it so important to operate with locked
-IA32_FEATURE_CONTROL (so that KVM can enable VMX and the kernel can
-still enable SGX if desired).
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
 
-Paolo
+Claudio Imbrenda (5):
+  s390x: remove redundant defines
+  s390x: improve error reporting for interrupts
+  s390x: sclp: expose ram_size and max_ram_size
+  s390x: sclp: add service call instruction wrapper
+  s390x: SCLP unit test
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  13 ++
+ lib/s390x/sclp.h         |   4 +-
+ lib/s390x/interrupt.c    |   4 +-
+ lib/s390x/sclp.c         |  16 +-
+ s390x/sclp.c             | 373 +++++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 7 files changed, 404 insertions(+), 10 deletions(-)
+ create mode 100644 s390x/sclp.c
+
+-- 
+2.7.4
+
