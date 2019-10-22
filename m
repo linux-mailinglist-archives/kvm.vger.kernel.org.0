@@ -2,271 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C76ABDFF2B
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 10:13:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80924DFFEE
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 10:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388301AbfJVIMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 04:12:36 -0400
-Received: from mga06.intel.com ([134.134.136.31]:64390 "EHLO mga06.intel.com"
+        id S2388462AbfJVIqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 04:46:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28819 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388287AbfJVIMf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 04:12:35 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 01:12:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,326,1566889200"; 
-   d="scan'208";a="200703530"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by orsmga003.jf.intel.com with ESMTP; 22 Oct 2019 01:12:32 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     pbonzini@redhat.com, peterz@infradead.org, kvm@vger.kernel.org
-Cc:     like.xu@intel.com, linux-kernel@vger.kernel.org,
-        jmattson@google.com, sean.j.christopherson@intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com
-Subject: [PATCH v3 6/6] KVM: x86/vPMU: Add lazy mechanism to release perf_event per vPMC
-Date:   Tue, 22 Oct 2019 00:06:51 +0800
-Message-Id: <20191021160651.49508-7-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191021160651.49508-1-like.xu@linux.intel.com>
-References: <20191021160651.49508-1-like.xu@linux.intel.com>
+        id S2387575AbfJVIqP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 04:46:15 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7A9F585363
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 08:46:14 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id u17so1564516wmd.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 01:46:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=3vFeOe+bYuDka4Ka2yl0bdvDmUhyxmNAPA43fQB+Vwo=;
+        b=ErCAbm+YsGHkdvuCkcVxaxX1NqyxXYzR8xC5Ccc0dE50+5sOvar4hokIBThUoqlKMh
+         ktzwJ409975Uc16HMDe0ERgaBy3EGXJxgybJ/Ad0Ps8GfZPAT1Z1LcPpKGRAUi6g8AxL
+         b7qRb9d5fPahfxKyxV+0DCm39FdD77IaBVFfP+k2hzsEhsWYp22QyY4yQwAx0bEjXtKj
+         JkQliZ5fr05/35O7XYam/jUOWN9L1rPstkUq9ga122rYW3My5YTYq6ej2ab0Vxm5lJvr
+         TEWpMcQ9TCaLvsGD8HCpAD/hmd8EWd4lmeccGkJ+HXslSckCFN6nCOH/gcefQufysCHv
+         kDgg==
+X-Gm-Message-State: APjAAAV4nGuvmhgqZMoOArU3BYfQky8oRSm4/GjaT9BnIc4vqeXk8L7e
+        pI6ZcCwTkZxqdU5FyyXZ6SK9YG84rflpYqRRNr1O6ruev7gug54RMohEvvBSKiJF34gDF+5AdQZ
+        ZXKwqIBBSaGmS
+X-Received: by 2002:adf:e34b:: with SMTP id n11mr2287667wrj.250.1571733972956;
+        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy6/EZb4JYeMXrDvX360zKNmzBLoFUiJOFM7/Ur73oRbIJaoO1FKmJioq7z4BpW58NSfwNr8A==
+X-Received: by 2002:adf:e34b:: with SMTP id n11mr2287649wrj.250.1571733972675;
+        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id q11sm7080488wmq.21.2019.10.22.01.46.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc:     wanpengli@tencent.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
+In-Reply-To: <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
+References: <20191017235036.25624-1-sjitindarsingh@gmail.com> <87pniu0zcw.fsf@vitty.brq.redhat.com> <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
+Date:   Tue, 22 Oct 2019 10:46:11 +0200
+Message-ID: <875zkh1830.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, a host perf_event is created for a vPMC functionality emulation.
-It’s unpredictable to determine if a disabled perf_event will be reused.
-If they are disabled and are not reused for a considerable period of time,
-those obsolete perf_events would increase host context switch overhead that
-could have been avoided.
+Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
 
-If the guest doesn't WRMSR any of the vPMC's MSRs during an entire vcpu
-sched time slice, and its independent enable bit of the vPMC isn't set,
-we can predict that the guest has finished the use of this vPMC, and then
-do request KVM_REQ_PMU in kvm_arch_sched_in and release those perf_events
-in the first call of kvm_pmu_handle_event() after the vcpu is scheduled in.
+> Hi,
+>
+> On Fri, 2019-10-18 at 18:53 +0200, Vitaly Kuznetsov wrote:
+>> Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
+>> 
+>> > From: Suraj Jitindar Singh <surajjs@amazon.com>
+>> > 
+>> > The test in x86/apic.c named test_pv_ipi is used to test for a
+>> > kernel
+>> > bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an
+>> > out of
+>> > bounds access.
+>> > 
+>> > If the host doesn't implement this hcall then the out of bounds
+>> > access
+>> > cannot be triggered.
+>> > 
+>> > Detect the case where the host doesn't implement the
+>> > KVM_HC_SEND_IPI
+>> > hcall and skip the test when this is the case, as the test doesn't
+>> > apply.
+>> > 
+>> > Output without patch:
+>> > FAIL: PV IPIs testing
+>> > 
+>> > With patch:
+>> > SKIP: PV IPIs testing: h-call not available
+>> > 
+>> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>> > ---
+>> >  x86/apic.c | 11 +++++++++++
+>> >  1 file changed, 11 insertions(+)
+>> > 
+>> > diff --git a/x86/apic.c b/x86/apic.c
+>> > index eb785c4..bd44b54 100644
+>> > --- a/x86/apic.c
+>> > +++ b/x86/apic.c
+>> > @@ -8,6 +8,8 @@
+>> >  #include "atomic.h"
+>> >  #include "fwcfg.h"
+>> >  
+>> > +#include <linux/kvm_para.h>
+>> > +
+>> >  #define MAX_TPR			0xf
+>> >  
+>> >  static void test_lapic_existence(void)
+>> > @@ -638,6 +640,15 @@ static void test_pv_ipi(void)
+>> >      unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 =
+>> > 0x0;
+>> >  
+>> >      asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI),
+>> > "b"(a0), "c"(a1), "d"(a2), "S"(a3));
+>> > +    /*
+>> > +     * Detect the case where the hcall is not implemented by the
+>> > hypervisor and
+>> > +     * skip this test if this is the case. Is the hcall isn't
+>> > implemented then
+>> > +     * the bug that this test is trying to catch can't be
+>> > triggered.
+>> > +     */
+>> > +    if (ret == -KVM_ENOSYS) {
+>> > +	    report_skip("PV IPIs testing: h-call not available");
+>> > +	    return;
+>> > +    }
+>> >      report("PV IPIs testing", !ret);
+>> >  }
+>> 
+>> Should we be checking CPUID bit (KVM_FEATURE_PV_SEND_IPI) instead?
+>> 
+>
+> That's also an option. It will produce the same result.
+>
 
-This lazy mechanism delays the event release time to the beginning of the
-next scheduled time slice if vPMC's MSRs aren't changed during this time
-slice. If guest comes back to use this vPMC in next time slice, a new perf
-event would be re-created via perf_event_create_kernel_counter() as usual.
+Generally yes, but CPUID announcement has its own advantages: when a
+feature bit is set we know the hypercall *must* exist so -KVM_ENOSYS
+would be a bug (think of a theoretical situation when the hypercall
+starts to return -KVM_ENOSYS erroneously - how do we catch this?)
 
-Suggested-by: Wei W Wang <wei.w.wang@intel.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/include/asm/kvm_host.h | 14 ++++++++
- arch/x86/kvm/pmu.c              | 58 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/pmu.h              |  2 ++
- arch/x86/kvm/pmu_amd.c          |  1 +
- arch/x86/kvm/vmx/pmu_intel.c    |  6 ++++
- arch/x86/kvm/x86.c              |  6 ++++
- 6 files changed, 87 insertions(+)
+> Would that be the preferred approach or is the method used in the
+> current patch ok?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ccce4aaa44df..b8ee62cf669b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -475,6 +475,20 @@ struct kvm_pmu {
- 	struct kvm_pmc fixed_counters[INTEL_PMC_MAX_FIXED];
- 	struct irq_work irq_work;
- 	u64 reprogram_pmi;
-+	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
-+	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
-+
-+	/*
-+	 * The gate to release perf_events not marked in
-+	 * pmc_in_use only once in a vcpu time slice.
-+	 */
-+	bool need_cleanup;
-+
-+	/*
-+	 * The total number of programmed perf_events and it helps to avoid
-+	 * redundant check before cleanup if guest don't use vPMU at all.
-+	 */
-+	u8 event_count;
- };
- 
- struct kvm_pmu_ops;
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 80a17377ec81..a8793f965941 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -137,6 +137,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	}
- 
- 	pmc->perf_event = event;
-+	pmc_to_pmu(pmc)->event_count++;
- 	clear_bit(pmc->idx, (unsigned long*)&pmc_to_pmu(pmc)->reprogram_pmi);
- }
- 
-@@ -309,6 +310,15 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- 
- 		reprogram_counter(pmu, bit);
- 	}
-+
-+	/*
-+	 * vPMU uses a lazy method to release the perf_events created for
-+	 * features emulation when the related MSRs weren't accessed during
-+	 * last vcpu time slice. Technically, this cleanup check happens on
-+	 * the first call of vcpu_enter_guest after the vcpu gets scheduled in.
-+	 */
-+	if (unlikely(pmu->need_cleanup))
-+		kvm_pmu_cleanup(vcpu);
- }
- 
- /* check if idx is a valid index to access PMU */
-@@ -384,6 +394,15 @@ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 		kvm_x86_ops->pmu_ops->is_valid_msr(vcpu, msr);
- }
- 
-+static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc = kvm_x86_ops->pmu_ops->msr_idx_to_pmc(vcpu, msr);
-+
-+	if (pmc)
-+		__set_bit(pmc->idx, pmu->pmc_in_use);
-+}
-+
- int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
- {
- 	return kvm_x86_ops->pmu_ops->get_msr(vcpu, msr, data);
-@@ -391,6 +410,7 @@ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
- 
- int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
-+	kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
- 	return kvm_x86_ops->pmu_ops->set_msr(vcpu, msr_info);
- }
- 
-@@ -418,9 +438,47 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
- 	memset(pmu, 0, sizeof(*pmu));
- 	kvm_x86_ops->pmu_ops->init(vcpu);
- 	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
-+	pmu->event_count = 0;
-+	pmu->need_cleanup = false;
- 	kvm_pmu_refresh(vcpu);
- }
- 
-+static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
-+{
-+	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-+
-+	if (pmc_is_fixed(pmc))
-+		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
-+			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-+
-+	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
-+}
-+
-+void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc = NULL;
-+	DECLARE_BITMAP(bitmask, X86_PMC_IDX_MAX);
-+	int i;
-+
-+	/* do cleanup before the first time of running vcpu after sched_in */
-+	pmu->need_cleanup = false;
-+
-+	bitmap_andnot(bitmask, pmu->all_valid_pmc_idx,
-+		      pmu->pmc_in_use, X86_PMC_IDX_MAX);
-+
-+	/* release events for unmarked vPMCs in the last sched time slice */
-+	for_each_set_bit(i, bitmask, X86_PMC_IDX_MAX) {
-+		pmc = kvm_x86_ops->pmu_ops->pmc_idx_to_pmc(pmu, i);
-+
-+		if (pmc && pmc->perf_event && !pmc_speculative_in_use(pmc))
-+			pmc_stop_counter(pmc);
-+	}
-+
-+	/* reset vPMC lazy-release bitmap for this sched time slice */
-+	bitmap_zero(pmu->pmc_in_use, X86_PMC_IDX_MAX);
-+}
-+
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kvm_pmu_reset(vcpu);
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 4bf1d25c92d3..325c12b5c9b4 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -62,6 +62,7 @@ static inline void pmc_release_perf_event(struct kvm_pmc *pmc)
- 		perf_event_release_kernel(pmc->perf_event);
- 		pmc->perf_event = NULL;
- 		pmc->current_config = 0;
-+		pmc_to_pmu(pmc)->event_count--;
- 	}
- }
- 
-@@ -126,6 +127,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
- void kvm_pmu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_init(struct kvm_vcpu *vcpu);
-+void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
- int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
- 
-diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-index 0ed2cc7c5902..f0aa291f9963 100644
---- a/arch/x86/kvm/pmu_amd.c
-+++ b/arch/x86/kvm/pmu_amd.c
-@@ -279,6 +279,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
- 	pmu->nr_arch_fixed_counters = 0;
- 	pmu->global_status = 0;
-+	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
- }
- 
- static void amd_pmu_init(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 002b98a8977e..a00197291f81 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -46,6 +46,7 @@ static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
- 		if (old_ctrl == new_ctrl)
- 			continue;
- 
-+		__set_bit(INTEL_PMC_IDX_FIXED + i, pmu->pmc_in_use);
- 		reprogram_fixed_counter(pmc, new_ctrl, i);
- 	}
- 
-@@ -329,6 +330,11 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	    (boot_cpu_has(X86_FEATURE_HLE) || boot_cpu_has(X86_FEATURE_RTM)) &&
- 	    (entry->ebx & (X86_FEATURE_HLE|X86_FEATURE_RTM)))
- 		pmu->reserved_bits ^= HSW_IN_TX|HSW_IN_TX_CHECKPOINTED;
-+
-+	bitmap_set(pmu->all_valid_pmc_idx,
-+		0, pmu->nr_arch_gp_counters);
-+	bitmap_set(pmu->all_valid_pmc_idx,
-+		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
- }
- 
- static void intel_pmu_init(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 72ce691fd45d..a18cb93e80d4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9415,7 +9415,13 @@ void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
- {
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+
- 	vcpu->arch.l1tf_flush_l1d = true;
-+	if (pmu->version && unlikely(pmu->event_count)) {
-+		pmu->need_cleanup = true;
-+		kvm_make_request(KVM_REQ_PMU, vcpu);
-+	}
- 	kvm_x86_ops->sched_in(vcpu, cpu);
- }
- 
+I'm not insisting, let's leave it up to Paolo :-)
+
 -- 
-2.21.0
-
+Vitaly
