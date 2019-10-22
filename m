@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10467DF949
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 02:10:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56FEADF94E
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 02:10:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387487AbfJVAIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 20:08:35 -0400
-Received: from mga05.intel.com ([192.55.52.43]:7797 "EHLO mga05.intel.com"
+        id S1730556AbfJVAIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 20:08:40 -0400
+Received: from mga09.intel.com ([134.134.136.24]:64364 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387479AbfJVAIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 20:08:34 -0400
+        id S1730538AbfJVAIj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 20:08:39 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 17:08:34 -0700
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 17:08:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="196274537"
+   d="scan'208";a="209551702"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 17:08:33 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 21 Oct 2019 17:08:37 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -31,103 +31,83 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v2 05/16] KVM: VMX: Drop initialization of IA32_FEATURE_CONTROL MSR
-Date:   Mon, 21 Oct 2019 17:08:20 -0700
-Message-Id: <20191022000820.1854-1-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 06/16] x86/cpu: Clear VMX feature flag if VMX is not fully enabled
+Date:   Mon, 21 Oct 2019 17:08:36 -0700
+Message-Id: <20191022000836.1907-1-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191021234632.32363-1-sean.j.christopherson@intel.com>
 References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the code to initialize IA32_FEATURE_CONTROL MSR when KVM is
-loaded now that the MSR is initialized during boot on all CPUs that
-support VMX, i.e. can possibly load kvm_intel.
+Now that the IA32_FEATURE_CONTROL MSR is guaranteed to be configured and
+locked, clear the VMX capability flag if the IA32_FEATURE_CONTROL MSR is
+not supported or if BIOS disabled VMX, i.e. locked IA32_FEATURE_CONTROL
+and did not set the appropriate VMX enable bit.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 48 +++++++++++++++++-------------------------
- 1 file changed, 19 insertions(+), 29 deletions(-)
+ arch/x86/kernel/cpu/feature_control.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d4575ffb3cec..23c9e4b91b31 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2192,24 +2192,26 @@ static __init int vmx_disabled_by_bios(void)
+diff --git a/arch/x86/kernel/cpu/feature_control.c b/arch/x86/kernel/cpu/feature_control.c
+index 57b928e64cf5..74c76159a046 100644
+--- a/arch/x86/kernel/cpu/feature_control.c
++++ b/arch/x86/kernel/cpu/feature_control.c
+@@ -7,13 +7,19 @@
+ 
+ void init_feature_control_msr(struct cpuinfo_x86 *c)
+ {
++	bool tboot = tboot_enabled();
  	u64 msr;
  
- 	rdmsrl(MSR_IA32_FEATURE_CONTROL, msr);
--	if (msr & FEATURE_CONTROL_LOCKED) {
--		/* launched w/ TXT and VMX disabled */
--		if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX)
--			&& tboot_enabled())
--			return 1;
--		/* launched w/o TXT and VMX only enabled w/ TXT */
--		if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX)
--			&& (msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX)
--			&& !tboot_enabled()) {
--			printk(KERN_WARNING "kvm: disable TXT in the BIOS or "
--				"activate TXT before enabling KVM\n");
--			return 1;
--		}
--		/* launched w/o TXT and VMX disabled */
--		if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX)
--			&& !tboot_enabled())
--			return 1;
-+
-+	if (WARN_ON_ONCE(!(msr & FEATURE_CONTROL_LOCKED)))
-+		return 1;
-+
-+	/* launched w/ TXT and VMX disabled */
-+	if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX) &&
-+	    tboot_enabled())
-+		return 1;
-+	/* launched w/o TXT and VMX only enabled w/ TXT */
-+	if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX) &&
-+	    (msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX) &&
-+	    !tboot_enabled()) {
-+		pr_warn("kvm: disable TXT in the BIOS or "
-+			"activate TXT before enabling KVM\n");
-+		return 1;
+-	if (rdmsrl_safe(MSR_IA32_FEATURE_CONTROL, &msr))
++	if (rdmsrl_safe(MSR_IA32_FEATURE_CONTROL, &msr)) {
++		if (cpu_has(c, X86_FEATURE_VMX)) {
++			pr_err_once("x86/cpu: VMX disabled, IA32_FEATURE_CONTROL MSR unsupported\n");
++			clear_cpu_cap(c, X86_FEATURE_VMX);
++		}
+ 		return;
++	}
+ 
+ 	if (msr & FEATURE_CONTROL_LOCKED)
+-		return;
++		goto update_caps;
+ 
+ 	/*
+ 	 * Ignore whatever value BIOS left in the MSR to avoid enabling random
+@@ -23,8 +29,19 @@ void init_feature_control_msr(struct cpuinfo_x86 *c)
+ 
+ 	if (cpu_has(c, X86_FEATURE_VMX)) {
+ 		msr |= FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
+-		if (tboot_enabled())
++		if (tboot)
+ 			msr |= FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX;
  	}
-+	/* launched w/o TXT and VMX disabled */
-+	if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX) &&
-+	    !tboot_enabled())
-+		return 1;
- 
- 	return 0;
+ 	wrmsrl(MSR_IA32_FEATURE_CONTROL, msr);
++
++update_caps:
++	if (!cpu_has(c, X86_FEATURE_VMX))
++		return;
++
++	if ((tboot && !(msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX)) ||
++	    (!tboot && !(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX))) {
++		pr_err_once("x86/cpu: VMX disabled by BIOS (TXT %s)\n",
++			    tboot ? "enabled" : "disabled");
++		clear_cpu_cap(c, X86_FEATURE_VMX);
++	}
  }
-@@ -2226,7 +2228,6 @@ static int hardware_enable(void)
- {
- 	int cpu = raw_smp_processor_id();
- 	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
--	u64 old, test_bits;
- 
- 	if (cr4_read_shadow() & X86_CR4_VMXE)
- 		return -EBUSY;
-@@ -2254,17 +2255,6 @@ static int hardware_enable(void)
- 	 */
- 	crash_enable_local_vmclear(cpu);
- 
--	rdmsrl(MSR_IA32_FEATURE_CONTROL, old);
--
--	test_bits = FEATURE_CONTROL_LOCKED;
--	test_bits |= FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
--	if (tboot_enabled())
--		test_bits |= FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX;
--
--	if ((old & test_bits) != test_bits) {
--		/* enable and lock */
--		wrmsrl(MSR_IA32_FEATURE_CONTROL, old | test_bits);
--	}
- 	kvm_cpu_vmxon(phys_addr);
- 	if (enable_ept)
- 		ept_sync_global();
 -- 
 2.22.0
 
