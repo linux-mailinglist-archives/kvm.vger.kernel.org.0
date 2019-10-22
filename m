@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 133BEDFA7C
+	by mail.lfdr.de (Postfix) with ESMTP id F1B50DFA7F
 	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 04:00:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387547AbfJVB7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 21 Oct 2019 21:59:47 -0400
-Received: from mga14.intel.com ([192.55.52.115]:61591 "EHLO mga14.intel.com"
+        id S2387571AbfJVB7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 21 Oct 2019 21:59:49 -0400
+Received: from mga14.intel.com ([192.55.52.115]:61596 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387518AbfJVB7r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 21 Oct 2019 21:59:47 -0400
+        id S2387558AbfJVB7t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 21 Oct 2019 21:59:49 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:46 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 18:59:48 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,325,1566889200"; 
-   d="scan'208";a="196293828"
+   d="scan'208";a="196293844"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:45 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 21 Oct 2019 18:59:48 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -40,9 +40,9 @@ Cc:     James Morse <james.morse@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 20/45] KVM: x86: Remove spurious kvm_mmu_unload() from vcpu destruction path
-Date:   Mon, 21 Oct 2019 18:59:00 -0700
-Message-Id: <20191022015925.31916-21-sean.j.christopherson@intel.com>
+Subject: [PATCH 23/45] KVM: Remove kvm_arch_vcpu_free() declaration
+Date:   Mon, 21 Oct 2019 18:59:03 -0700
+Message-Id: <20191022015925.31916-24-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191022015925.31916-1-sean.j.christopherson@intel.com>
 References: <20191022015925.31916-1-sean.j.christopherson@intel.com>
@@ -53,36 +53,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-x86 does not load its MMU until KVM_RUN, which cannot be invoked until
-after vCPU creation succeeds.  Given that kvm_arch_vcpu_destroy() is
-called if and only if vCPU creation fails, it is impossible for the MMU
-to be loaded.
+Remove KVM's declaration of kvm_arch_vcpu_free() now that the function
+is gone from all architectures (several architectures were relying on
+the forward declaration).
 
-Note, the bogus kvm_mmu_unload() call was added during an unrelated
-refactoring of vCPU allocation, i.e. was presumably added as an
-opportunstic "fix" for a perceived leak.
-
-Fixes: fb3f0f51d92d1 ("KVM: Dynamically allocate vcpus")
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 4 ----
- 1 file changed, 4 deletions(-)
+ include/linux/kvm_host.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3a6d8c4a9758..dd667df37d63 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9099,10 +9099,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.apf.msr_val = 0;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 719fc3e15ea4..ff31470aabd3 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -853,7 +853,6 @@ void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu);
  
--	vcpu_load(vcpu);
--	kvm_mmu_unload(vcpu);
--	vcpu_put(vcpu);
--
- 	kvm_arch_vcpu_free(vcpu);
- }
+ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu);
  
+-void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu);
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu);
+ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm, unsigned int id);
 -- 
 2.22.0
 
