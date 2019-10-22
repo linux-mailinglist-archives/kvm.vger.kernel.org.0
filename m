@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF59FE0561
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 426BDE0574
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:48:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731693AbfJVNnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 09:43:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38972 "EHLO
+        id S2387831AbfJVNs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 09:48:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53810 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731159AbfJVNnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 09:43:51 -0400
+        with ESMTP id S2387479AbfJVNs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 09:48:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571751829;
+        s=mimecast20190719; t=1571752107;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=MdIeP9IuSNsVFzUCf4DNuPIfbS2mDjhTYEIgXMSiNMs=;
-        b=Q0rYMjr/efwCxJslz89cWyqDMKkeL3LTB6kl35dv9naYRIyxYzTQH56PG0pAiSe4Ibd4qD
-        wCpjPm+9/uL7PwazcKsYVZooeHgFEQS+XmtsVW9gJoWYKEgItlTwhrmYuEWJpZzYbEiARK
-        U0ZHv1Jj1weFAf89CDKZwzaTcbWyn/4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-3inB7AU6M1yypS8nvDeDKg-1; Tue, 22 Oct 2019 09:43:48 -0400
-Received: by mail-wr1-f69.google.com with SMTP id k10so165097wrl.22
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:43:48 -0700 (PDT)
+        bh=YQwrO8GtQidGZq2f7azyljtcZR53gRduboQc8qaX8xY=;
+        b=YQ5N6cUlHYpm3p2TAfUT8BbXtfvzUzToPbrPuHk1CCD4zJVWzJ4joufXqEUqoQz4Fw/Zls
+        uOUMi2kn8Rc7gkopUAWV2GgD6xNzk0Z1I86Xzj+v7FmumeXtMEioyGedg61PEZD0RV/ZPT
+        lMfmgiKMTyGfkOOINt+h1JNUihwI4c8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-gXq-Fua5M8O9bssVJY7MCw-1; Tue, 22 Oct 2019 09:48:25 -0400
+Received: by mail-wm1-f71.google.com with SMTP id m68so2545802wme.7
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:48:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=vT/ksjCq33tMgRtUuxY/AwKVcsJUZyBBUQ6LWDa4TTs=;
-        b=D63Skt6LOGIDzqRGF6iywEeBnpUq8RKHjY2DvZROdEnrmk0jVi5BbEs+B7o+aLT7w1
-         ljFZEBmAIJ8ejB/pB1F3o/OdJtbnja83mX5aiocUWWn4Z/hsuJni34Z0c6bOhBD7oWd7
-         qk6HYo4Ug0RktGX1vDYZDpJhT+amLdHqPow3LWwVzUx8B1wof26NkloW/b+AtaCl/F2G
-         ubYqQnFcaSZbFVANTeqxs0UY8Y6wIE+LdvNXxD+S1piRdtX7gJaDpsezivV0TmLVN54x
-         mst2AzO5tMhLl79KU/KNcj3QSOJO2DxK7gsjal5Gyv9G9sSkM/1z5CZ/svrwk/QPbjiC
-         A+kw==
-X-Gm-Message-State: APjAAAV7moM7dqS+dAOB5XKETNwuIxWTkhUp0q+DgQL7pFsFBS6mSh5w
-        iUS8QX6ldYNrUI8anNEe7GdhVHvHFliYZuJRZAl6Uxdjb2gTmrfoOGl54qv0SPo3qEOyANFmLya
-        4LJJN7NGgrIDi
-X-Received: by 2002:a5d:630f:: with SMTP id i15mr3695864wru.226.1571751827363;
-        Tue, 22 Oct 2019 06:43:47 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz8K63imv6StZQHnuZ1zbN8WNQnY5uGHekiRu7mKBJAfkYS4FFsQlddobTuNpF5bnph2XlRKg==
-X-Received: by 2002:a5d:630f:: with SMTP id i15mr3695843wru.226.1571751827042;
-        Tue, 22 Oct 2019 06:43:47 -0700 (PDT)
+        bh=UYJn44mofyK6oeM1TPcglwuAiq767n8XhKqzqOqMQHc=;
+        b=ZmvAGnjw2i1H0GWc187U7R1XZf7qEScyJxD4L47se7I08sa+Ow3Z/3QfYCXUWw9WV3
+         1Y1StX1KyJ7xLZiqkdjlq4EhoYVJqow3FnLFJAIK+BIeBMBMnSxIrJPGrCZ4NghFuPdL
+         LjTl/ZG5UmB2ruBjG/XSBYnAlOegoyfJNOl3aoI5Nw+FFPBhu1LV9q7sYCR2MYHFyVBJ
+         /tgcZXhvin4DjujxUWCP4v6zqocuR0munr8BTB8eizFTz5XRnt4NZaSvPaSetsGIQ+jN
+         E1YaAEcogOr6rpaQzY0Cmgvtk/C703TCJNU0M0dw+5GRhE7YAHQlnSxQSOg1EEUWEj4s
+         XSBA==
+X-Gm-Message-State: APjAAAXeyqR/8bvWxiEICs+DXLp2xWsvz0hdCdA1d135APv2x0s03Pt/
+        NulOwvvt+9/9/Nh4OEL9kzT39U8R9BzB8ncHFtS00vTcoIvKORbQ3a4DnDaepS//D/LjidIDGOu
+        Hs1897/8H0wgy
+X-Received: by 2002:a1c:9990:: with SMTP id b138mr3273041wme.176.1571752104663;
+        Tue, 22 Oct 2019 06:48:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzHk+GYrg529v9JGxZxCl7S47XjU1axJ+dEcu/TRPNHhCAWJsxo541JWQD8MYSKqsH1NPD1+A==
+X-Received: by 2002:a1c:9990:: with SMTP id b138mr3273018wme.176.1571752104277;
+        Tue, 22 Oct 2019 06:48:24 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:c0e4:dcf4:b543:ce19? ([2001:b07:6468:f312:c0e4:dcf4:b543:ce19])
-        by smtp.gmail.com with ESMTPSA id r19sm11544786wrr.47.2019.10.22.06.43.46
+        by smtp.gmail.com with ESMTPSA id u26sm19320818wrd.87.2019.10.22.06.48.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Oct 2019 06:43:46 -0700 (PDT)
-Subject: Re: [PATCH v3 2/9] KVM: VMX: Fix conditions for guest IA32_XSS
- support
+        Tue, 22 Oct 2019 06:48:23 -0700 (PDT)
+Subject: Re: [PATCH v3 0/9] Add support for XSAVES to AMD and unify it with
+ Intel
 To:     Aaron Lewis <aaronlewis@google.com>,
         Babu Moger <Babu.Moger@amd.com>,
         Yang Weijiang <weijiang.yang@intel.com>,
@@ -59,17 +59,16 @@ To:     Aaron Lewis <aaronlewis@google.com>,
         kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>
 References: <20191021233027.21566-1-aaronlewis@google.com>
- <20191021233027.21566-3-aaronlewis@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <abc92661-2fce-ff17-b199-fb2773998454@redhat.com>
-Date:   Tue, 22 Oct 2019 15:43:46 +0200
+Message-ID: <1ea8025f-7481-d392-a5de-0b43fbb10705@redhat.com>
+Date:   Tue, 22 Oct 2019 15:48:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191021233027.21566-3-aaronlewis@google.com>
+In-Reply-To: <20191021233027.21566-1-aaronlewis@google.com>
 Content-Language: en-US
-X-MC-Unique: 3inB7AU6M1yypS8nvDeDKg-1
+X-MC-Unique: gXq-Fua5M8O9bssVJY7MCw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -79,75 +78,73 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 22/10/19 01:30, Aaron Lewis wrote:
-> Volume 4 of the SDM says that IA32_XSS is supported
-> if CPUID(EAX=3D0DH,ECX=3D1):EAX.XSS[bit 3] is set, so only the
-> X86_FEATURE_XSAVES check is necessary (X86_FEATURE_XSAVES is the Linux
-> name for CPUID(EAX=3D0DH,ECX=3D1):EAX.XSS[bit 3]).
+> Unify AMD's and Intel's approach for supporting XSAVES.  To do this
+> change Intel's approach from using the MSR-load areas to writing
+> the guest/host values to IA32_XSS on a VM-enter/VM-exit.  Switching to
+> this strategy allows for a common approach between both AMD and Intel.
+> Additionally, define svm_xsaves_supported() based on AMD's feedback, and =
+add
+> vcpu->arch.xsaves_enabled to track whether XSAVES is enabled in the guest=
+.
 >=20
-> Fixes: 4d763b168e9c5 ("KVM: VMX: check CPUID before allowing read/write o=
-f IA32_XSS")
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Change-Id: I9059b9f2e3595e4b09a4cdcf14b933b22ebad419
-> ---
->  arch/x86/kvm/vmx/vmx.c | 24 +++++++++++-------------
->  1 file changed, 11 insertions(+), 13 deletions(-)
+> This change sets up IA32_XSS to be a non-zero value in the future, which
+> may happen sooner than later with support for guest CET feature being
+> added.
 >=20
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 34525af44353..a9b070001c3e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1821,10 +1821,8 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, stru=
-ct msr_data *msr_info)
->  =09=09return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
->  =09=09=09=09       &msr_info->data);
->  =09case MSR_IA32_XSS:
-> -=09=09if (!vmx_xsaves_supported() ||
-> -=09=09    (!msr_info->host_initiated &&
-> -=09=09     !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-> -=09=09       guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
-> +=09=09if (!msr_info->host_initiated &&
-> +=09=09    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->  =09=09=09return 1;
->  =09=09msr_info->data =3D vcpu->arch.ia32_xss;
->  =09=09break;
-> @@ -2064,10 +2062,8 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, stru=
-ct msr_data *msr_info)
->  =09=09=09return 1;
->  =09=09return vmx_set_vmx_msr(vcpu, msr_index, data);
->  =09case MSR_IA32_XSS:
-> -=09=09if (!vmx_xsaves_supported() ||
-> -=09=09    (!msr_info->host_initiated &&
-> -=09=09     !(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-> -=09=09       guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
-> +=09=09if (!msr_info->host_initiated &&
-> +=09=09    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
->  =09=09=09return 1;
->  =09=09/*
->  =09=09 * The only supported bit as of Skylake is bit 8, but
-> @@ -2076,11 +2072,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, str=
-uct msr_data *msr_info)
->  =09=09if (data !=3D 0)
->  =09=09=09return 1;
->  =09=09vcpu->arch.ia32_xss =3D data;
-> -=09=09if (vcpu->arch.ia32_xss !=3D host_xss)
-> -=09=09=09add_atomic_switch_msr(vmx, MSR_IA32_XSS,
-> -=09=09=09=09vcpu->arch.ia32_xss, host_xss, false);
-> -=09=09else
-> -=09=09=09clear_atomic_switch_msr(vmx, MSR_IA32_XSS);
-> +=09=09if (vcpu->arch.xsaves_enabled) {
-> +=09=09=09if (vcpu->arch.ia32_xss !=3D host_xss)
-> +=09=09=09=09add_atomic_switch_msr(vmx, MSR_IA32_XSS,
-> +=09=09=09=09=09vcpu->arch.ia32_xss, host_xss, false);
-> +=09=09=09else
-> +=09=09=09=09clear_atomic_switch_msr(vmx, MSR_IA32_XSS);
-> +=09=09}
->  =09=09break;
->  =09case MSR_IA32_RTIT_CTL:
->  =09=09if ((pt_mode !=3D PT_MODE_HOST_GUEST) ||
+> v2 -> v3:
+>  - Remove guest_xcr0_loaded from kvm_vcpu.
+>  - Add vcpu->arch.xsaves_enabled.
+>  - Add staged rollout to load the hardware IA32_XSS MSR with guest/host
+>    values on VM-entry and VM-exit:
+>      1) Introduce vcpu->arch->xsaves_enabled.
+>      2) Add svm implementation for switching between guest and host IA32_=
+XSS.
+>      3) Add vmx implementation for switching between guest and host IA32_=
+XSS.
+>      4) Remove svm and vmx implementation and add it to common code.
+>=20
+> v1 -> v2:
+>  - Add the flag xsaves_enabled to kvm_vcpu_arch to track when XSAVES is
+>    enabled in the guest, whether or not XSAVES is enumerated in the
+>    guest CPUID.
+>  - Remove code that sets the X86_FEATURE_XSAVES bit in the guest CPUID
+>    which was added in patch "Enumerate XSAVES in guest CPUID when it is
+>    available to the guest".  As a result we no longer need that patch.
+>  - Added a comment to kvm_set_msr_common to describe how to save/restore
+>    PT MSRS without using XSAVES/XRSTORS.
+>  - Added more comments to the "Add support for XSAVES on AMD" patch.
+>  - Replaced vcpu_set_msr_expect_result() with _vcpu_set_msr() in the
+>    test library.
+>=20
+> Aaron Lewis (9):
+>   KVM: x86: Introduce vcpu->arch.xsaves_enabled
+>   KVM: VMX: Fix conditions for guest IA32_XSS support
+>   KVM: x86: Remove unneeded kvm_vcpu variable, guest_xcr0_loaded
+>   KVM: SVM: Use wrmsr for switching between guest and host IA32_XSS on AM=
+D
+>   KVM: VMX: Use wrmsr for switching between guest and host IA32_XSS on In=
+tel
+>   KVM: x86: Move IA32_XSS-swapping on VM-entry/VM-exit to common x86 code
+>   kvm: x86: Move IA32_XSS to kvm_{get,set}_msr_common
+>   kvm: svm: Update svm_xsaves_supported
+>   kvm: tests: Add test to verify MSR_IA32_XSS
+>=20
+>  arch/x86/include/asm/kvm_host.h               |  1 +
+>  arch/x86/kvm/svm.c                            |  9 ++-
+>  arch/x86/kvm/vmx/vmx.c                        | 41 ++--------
+>  arch/x86/kvm/x86.c                            | 52 ++++++++++---
+>  arch/x86/kvm/x86.h                            |  4 +-
+>  include/linux/kvm_host.h                      |  1 -
+>  tools/testing/selftests/kvm/.gitignore        |  1 +
+>  tools/testing/selftests/kvm/Makefile          |  1 +
+>  .../selftests/kvm/include/x86_64/processor.h  |  7 +-
+>  .../selftests/kvm/lib/x86_64/processor.c      | 72 +++++++++++++++---
+>  .../selftests/kvm/x86_64/xss_msr_test.c       | 76 +++++++++++++++++++
+>  11 files changed, 205 insertions(+), 60 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/xss_msr_test.c
 >=20
 
-The last hunk technically doesn't belong in this patch, but okay.
+Queued, thanks.
 
 Paolo
 
