@@ -2,139 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CAE19E0482
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:06:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5787E049F
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 15:11:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731969AbfJVNG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 09:06:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58738 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731955AbfJVNG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 09:06:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571749585;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Syfd0H8D/BZLCngMYW2+8Gfqpo3syPeWg7AigfxOHa0=;
-        b=T7IdaOvNunr1wNsBP9ffS7PduaqV/tkwfalTxTZHSFu2y5t0mfQs8spb0eri7IZW8uUrtV
-        rrb+UFDXuLjq9C914hc/Qfh3z7NWwhFOM7psQZVi80IMd0wQq7xXT9sKS+HmyyHwrji21v
-        YGXIuhVoFUdobL2AKLepAiu27t238w4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-71H0vHNaOHmN2MZTv4qjeg-1; Tue, 22 Oct 2019 09:06:22 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1731830AbfJVNLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 09:11:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40682 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727582AbfJVNLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 09:11:24 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABD6B800D4E;
-        Tue, 22 Oct 2019 13:06:20 +0000 (UTC)
-Received: from [10.72.12.23] (ovpn-12-23.pek2.redhat.com [10.72.12.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 514B819C69;
-        Tue, 22 Oct 2019 13:06:00 +0000 (UTC)
-Subject: Re: [RFC 2/2] vhost: IFC VF vdpa layer
-To:     Zhu Lingshan <lingshan.zhu@linux.intel.com>,
-        "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
-        zhiyuan.lv@intel.com
-References: <20191016013050.3918-1-lingshan.zhu@intel.com>
- <20191016013050.3918-3-lingshan.zhu@intel.com>
- <9495331d-3c65-6f49-dcd9-bfdb17054cf0@redhat.com>
- <f65358e9-6728-8260-74f7-176d7511e989@intel.com>
- <1cae60b6-938d-e2df-2dca-fbf545f06853@redhat.com>
- <ddf412c6-69e2-b3ca-d0c8-75de1db78ed9@linux.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b2adaab0-bbc3-b7f0-77da-e1e3cab93b76@redhat.com>
-Date:   Tue, 22 Oct 2019 21:05:57 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 75FCF85540
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 13:11:23 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id l184so4725373wmf.6
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 06:11:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=AWIpPvm7UprL2uTNf2oKMNhafTTRgSL5RG8YF9O+sQ0=;
+        b=Q4kSZ1J8A61MFyVcNKPVHR910iDDvZtI1NbHx1DkfPzXR2oBJnuSMI04+beymRb0Bd
+         NR7s1xb+87cjk71YSMoJgJgevbOjBk3nJRVquZmpI8MVnghNjeJ3PmKD8OHznQzuK6wd
+         hJJataxWxjPdg9neeOe8drgh3DJ279bJBBMwMKDiHb0Fo16fpSGHDSXTHPzVXZSN44Yh
+         cjQWDU8fAwvkDWW0GkBTCIpCCURFyLxSgOU5LTGYS8pWbGibE3ZAKy2F75g64sxkvujK
+         qOd0qW2ov4I+T3hXDHuUxfzE7MmoRrEPIFiqz4VtAh28X5mhN4gwIs0pKEMIEW07NkRJ
+         +1yA==
+X-Gm-Message-State: APjAAAW5Uw/Rtvbxouys82KrdJ3+v2vonUd9g47vvCraN2jMT3ZTi8+6
+        de53tiG1krsEuX/Mt4VaMi54fuIO7+8ew6IX5nDRFBYzTRE09z3RG068vLWb2iZwMTBejn0C7dy
+        nQRFAaIO+g41+
+X-Received: by 2002:a05:6000:118f:: with SMTP id g15mr245411wrx.242.1571749882076;
+        Tue, 22 Oct 2019 06:11:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzAEy/wjVyqz3gSBY2lKtBGQuAlLyTMHI7PFn5YaAc9NTp8p4NIJGat0PwLnzZzfUSMKXzEJw==
+X-Received: by 2002:a05:6000:118f:: with SMTP id g15mr245385wrx.242.1571749881755;
+        Tue, 22 Oct 2019 06:11:21 -0700 (PDT)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id c14sm11510623wru.24.2019.10.22.06.11.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2019 06:11:21 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>,
+        linux-kernel@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, peterz@infradead.org, will@kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v7 3/5] x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+In-Reply-To: <dbc50272-a4f5-ce7c-ba71-75031521f420@oracle.com>
+References: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com> <1571649076-2421-4-git-send-email-zhenzhong.duan@oracle.com> <8736fl1071.fsf@vitty.brq.redhat.com> <dbc50272-a4f5-ce7c-ba71-75031521f420@oracle.com>
+Date:   Tue, 22 Oct 2019 15:11:19 +0200
+Message-ID: <87tv81ylfs.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ddf412c6-69e2-b3ca-d0c8-75de1db78ed9@linux.intel.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 71H0vHNaOHmN2MZTv4qjeg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Zhenzhong Duan <zhenzhong.duan@oracle.com> writes:
 
-On 2019/10/22 =E4=B8=8B=E5=8D=882:53, Zhu Lingshan wrote:
+> Hi Vitaly,
 >
-> On 10/21/2019 6:19 PM, Jason Wang wrote:
->>
->> On 2019/10/21 =E4=B8=8B=E5=8D=885:53, Zhu, Lingshan wrote:
->>>
->>> On 10/16/2019 6:19 PM, Jason Wang wrote:
->>>>
->>>> On 2019/10/16 =E4=B8=8A=E5=8D=889:30, Zhu Lingshan wrote:
->>>>> This commit introduced IFC VF operations for vdpa, which complys to
->>>>> vhost_mdev interfaces, handles IFC VF initialization,
->>>>> configuration and removal.
->>>>>
->>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->>>>> ---
-
-
-[...]
-
-
->>
->>
->>>
->>>>
->>>>
->>>>> +}
->>>>> +
->>>>> +static int ifcvf_mdev_set_features(struct mdev_device *mdev, u64=20
->>>>> features)
->>>>> +{
->>>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdat=
-a(mdev);
->>>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter=
-);
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 vf->req_features =3D features;
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 return 0;
->>>>> +}
->>>>> +
->>>>> +static u64 ifcvf_mdev_get_vq_state(struct mdev_device *mdev, u16=20
->>>>> qid)
->>>>> +{
->>>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_adapter *adapter =3D mdev_get_drvdat=
-a(mdev);
->>>>> +=C2=A0=C2=A0=C2=A0 struct ifcvf_hw *vf =3D IFC_PRIVATE_TO_VF(adapter=
-);
->>>>> +
->>>>> +=C2=A0=C2=A0=C2=A0 return vf->vring[qid].last_avail_idx;
->>>>
->>>>
->>>> Does this really work? I'd expect it should be fetched from hw=20
->>>> since it's an internal state.
->>> for now, it's working, we intend to support LM in next version drivers.
->>
->>
->> I'm not sure I understand here, I don't see any synchronization=20
->> between the hardware and last_avail_idx, so last_avail_idx should not=20
->> change.
->>
->> Btw, what did "LM" mean :) ?
+> On 2019/10/22 19:36, Vitaly Kuznetsov wrote:
 >
-> I can add bar IO operations here, LM =3D live migration, sorry for the=20
-> abbreviation.
+>> Zhenzhong Duan<zhenzhong.duan@oracle.com>  writes:
+>>
+> ...snip
+>
+>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>>> index 249f14a..3945aa5 100644
+>>> --- a/arch/x86/kernel/kvm.c
+>>> +++ b/arch/x86/kernel/kvm.c
+>>> @@ -825,18 +825,36 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
+>>>    */
+>>>   void __init kvm_spinlock_init(void)
+>>>   {
+>>> -	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
+>>> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
+>>> +	/*
+>>> +	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
+>>> +	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
+>>> +	 * preferred over native qspinlock when vCPU is preempted.
+>>> +	 */
+>>> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
+>>> +		pr_info("PV spinlocks disabled, no host support.\n");
+>>>   		return;
+>>> +	}
+>>>   
+>>> +	/*
+>>> +	 * Disable PV qspinlock and use native qspinlock when dedicated pCPUs
+>>> +	 * are available.
+>>> +	 */
+>>>   	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
+>>> -		static_branch_disable(&virt_spin_lock_key);
+>>> -		return;
+>>> +		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
+>>> +		goto out;
+>>>   	}
+>>>   
+>>> -	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
+>>> -	if (num_possible_cpus() == 1)
+>>> -		return;
+>>> +	if (num_possible_cpus() == 1) {
+>>> +		pr_info("PV spinlocks disabled, single CPU.\n");
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	if (nopvspin) {
+>>> +		pr_info("PV spinlocks disabled, forced by \"nopvspin\" parameter.\n");
+>>> +		goto out;
+>>> +	}
+>>> +
+>>> +	pr_info("PV spinlocks enabled\n");
+>>>   
+>>>   	__pv_init_lock_hash();
+>>>   	pv_ops.lock.queued_spin_lock_slowpath = __pv_queued_spin_lock_slowpath;
+>>> @@ -849,6 +867,8 @@ void __init kvm_spinlock_init(void)
+>>>   		pv_ops.lock.vcpu_is_preempted =
+>>>   			PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
+>>>   	}
+>>> +out:
+>>> +	static_branch_disable(&virt_spin_lock_key);
+>> You probably need to add 'return' before 'out:' as it seems you're
+>> disabling virt_spin_lock_key in all cases now).
+>
+> virt_spin_lock_key is kept enabled in !kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)
+> case which is the only case virt_spin_lock() optimization is used.
+>
+> When PV qspinlock is enabled, virt_spin_lock() isn't called in
+> __pv_queued_spin_lock_slowpath() in which case we don't care
+> virt_spin_lock_key's value.
+>
 
+True, my bad: I though we still need it enabled for something.
 
-Just make sure I understand here, I believe you mean reading=20
-last_avail_idx through IO bar here?
+> So adding 'return' or not are both ok, I chosed to save a line,
+> let me know if you prefer to add a 'return' and I'll change it.
 
-Thanks
+No, please ignore.
 
+>
+> btw: __pv_queued_spin_lock_slowpath() is alias of queued_spin_lock_slowpath()
+>
+> Thanks
+> Zhenzhong
+>
 
+-- 
+Vitaly
