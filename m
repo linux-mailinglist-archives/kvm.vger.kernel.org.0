@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EF27E039B
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 14:11:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78AB9E03B2
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 14:16:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388966AbfJVMLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 08:11:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48738 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388963AbfJVMLb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 08:11:31 -0400
+        id S2388574AbfJVMQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 08:16:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26831 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388555AbfJVMQT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Oct 2019 08:16:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571746289;
+        s=mimecast20190719; t=1571746577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
-        bh=nF/aemxY09MGlFtMw3tXQRq4DDwmL34qivm6J70Ttu4=;
-        b=Cs3Fj/D60O5dtywdYr0o2aY/ty8F7rtOnvNKMlGcT5zD6y6vdaa94MnG/0+s90zlLIN1zE
-        Jzj7lX039gtBJA5LMhmLPE75n1p4QS0WfsxgGYhAZkkPIrK2eytovXV0c6W+xwUdsw47qo
-        kBrcab1yygEUx7+DcKZtGmXQ4r8RKxk=
+        bh=XsfsO64LihlNxy4Jev2KK2UkTr0OK+rZWX4ghrxRCDw=;
+        b=JtcaRr76lxYsC5Fseal/QlvS5MAkKMhCze0btmTlhJTXQu5aHV7yQAuSKKWlMBdnBuraR2
+        T5dbFSmNtCkRLHhAemHckg4v7AMa2ZJTKQp4Y5T24vv7eKaxh00pw8LYVUF0lElZXKFGNs
+        LARtyiRZqytKxQ5J4x1ub6aHkZ4T3dY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-X5te3EY7PNym_ctsGni6ew-1; Tue, 22 Oct 2019 08:11:26 -0400
+ us-mta-176-_euFQ_ATO_aJ1KYbHF-auw-1; Tue, 22 Oct 2019 08:16:14 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A87547B;
-        Tue, 22 Oct 2019 12:11:25 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49FEF800D4E;
+        Tue, 22 Oct 2019 12:16:13 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD3B15D6A5;
-        Tue, 22 Oct 2019 12:11:21 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v1 4/5] s390x: sclp: add service call
- instruction wrapper
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 113B75D6A5;
+        Tue, 22 Oct 2019 12:16:06 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 3/5] s390x: sclp: expose ram_size and
+ max_ram_size
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com,
         borntraeger@de.ibm.com, frankja@linux.ibm.com
 References: <1571741584-17621-1-git-send-email-imbrenda@linux.ibm.com>
- <1571741584-17621-5-git-send-email-imbrenda@linux.ibm.com>
+ <1571741584-17621-4-git-send-email-imbrenda@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -84,15 +84,15 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <8fb58f4d-d5ee-e4eb-ff58-b9d29b173f0a@redhat.com>
-Date:   Tue, 22 Oct 2019 14:11:21 +0200
+Message-ID: <4123dae6-bc6c-6177-3465-828f2cca086d@redhat.com>
+Date:   Tue, 22 Oct 2019 14:16:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1571741584-17621-5-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <1571741584-17621-4-git-send-email-imbrenda@linux.ibm.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: X5te3EY7PNym_ctsGni6ew-1
+X-MC-Unique: _euFQ_ATO_aJ1KYbHF-auw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -102,58 +102,49 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 22/10/2019 12.53, Claudio Imbrenda wrote:
-> Add a wrapper for the service call instruction, and use it for SCLP
-> interactions instead of using inline assembly everywhere.
+> Expose ram_size and max_ram_size through accessor functions.
+>=20
+> We only use get_ram_size in an upcoming patch, but having an accessor
+> for the other one does not hurt.
 >=20
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  lib/s390x/asm/arch_def.h | 13 +++++++++++++
->  lib/s390x/sclp.c         |  7 +------
->  2 files changed, 14 insertions(+), 6 deletions(-)
+>  lib/s390x/sclp.h | 2 ++
+>  lib/s390x/sclp.c | 9 +++++++++
+>  2 files changed, 11 insertions(+)
 >=20
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 96cca2e..b3caff6 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -269,4 +269,17 @@ static inline int stsi(void *addr, int fc, int sel1,=
- int sel2)
->  =09return cc;
->  }
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index f00c3df..6d40fb7 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -272,5 +272,7 @@ void sclp_console_setup(void);
+>  void sclp_print(const char *str);
+>  int sclp_service_call(unsigned int command, void *sccb);
+>  void sclp_memory_setup(void);
+> +uint64_t get_ram_size(void);
+> +uint64_t get_max_ram_size(void);
 > =20
-> +static inline int servc(uint32_t command, unsigned long sccb)
-> +{
-> +=09int cc;
-> +
-> +=09asm volatile(
-> +=09=09"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
-> +=09=09"       ipm     %0\n"
-> +=09=09"       srl     %0,28"
-> +=09=09: "=3D&d" (cc) : "d" (command), "a" (sccb)
-> +=09=09: "cc", "memory");
-> +=09return cc;
-> +}
-> +
->  #endif
+>  #endif /* SCLP_H */
 > diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index a57096c..376040e 100644
+> index 56fca0c..a57096c 100644
 > --- a/lib/s390x/sclp.c
 > +++ b/lib/s390x/sclp.c
-> @@ -116,12 +116,7 @@ int sclp_service_call(unsigned int command, void *sc=
-cb)
->  =09int cc;
+> @@ -167,3 +167,12 @@ void sclp_memory_setup(void)
 > =20
->  =09sclp_setup_int();
-> -=09asm volatile(
-> -=09=09"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
-> -=09=09"       ipm     %0\n"
-> -=09=09"       srl     %0,28"
-> -=09=09: "=3D&d" (cc) : "d" (command), "a" (__pa(sccb))
-> -=09=09: "cc", "memory");
-> +=09cc =3D servc(command, __pa(sccb));
->  =09sclp_wait_busy();
->  =09if (cc =3D=3D 3)
->  =09=09return -1;
->=20
+>  =09mem_init(ram_size);
+>  }
+> +
+> +uint64_t get_ram_size(void)
+> +{
+> +=09return ram_size;
+> +}
+> +uint64_t get_max_ram_size(void)
+> +{
+> +=09return max_ram_size;
+> +}
+
+In case you respin, please add an empty line between the two functions.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
