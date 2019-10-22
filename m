@@ -2,97 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17C81DFDA3
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 08:16:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AF50DFDCE
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 08:48:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387688AbfJVGQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 02:16:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:49039 "EHLO mga07.intel.com"
+        id S2387731AbfJVGst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 02:48:49 -0400
+Received: from mga14.intel.com ([192.55.52.115]:21797 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387508AbfJVGQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 02:16:31 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1728346AbfJVGst (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 02:48:49 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 23:16:30 -0700
-X-ExtLoop1: 1
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 23:48:49 -0700
 X-IronPort-AV: E=Sophos;i="5.67,326,1566889200"; 
-   d="scan'208";a="227583987"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Oct 2019 23:16:21 -0700
-Date:   Tue, 22 Oct 2019 14:19:15 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        yu.c.zhang@intel.com, alazar@bitdefender.com
-Subject: Re: [PATCH v5 0/9] Enable Sub-page Write Protection Support
-Message-ID: <20191022061915.GA18889@local-michael-cet-test>
-References: <20190917085304.16987-1-weijiang.yang@intel.com>
- <CALMp9eSTz+XbmLtWZLqWvSNjjb4Ado4s+SfABtRuVNQBXUHStQ@mail.gmail.com>
- <20191011075033.GA11817@local-michael-cet-test>
- <CALMp9eTnS+-FtoO29XFQ8-1=gczXYP0eDPUKZssJ73-=gf1MGg@mail.gmail.com>
+   d="scan'208";a="191365233"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.238.129.48]) ([10.238.129.48])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 21 Oct 2019 23:48:45 -0700
+Subject: Re: [RFC 1/2] vhost: IFC VF hardware operation layer
+To:     Jason Wang <jasowang@redhat.com>,
+        Simon Horman <simon.horman@netronome.com>,
+        "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, alex.williamson@redhat.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
+        zhiyuan.lv@intel.com
+References: <20191016011041.3441-1-lingshan.zhu@intel.com>
+ <20191016011041.3441-2-lingshan.zhu@intel.com>
+ <20191016095347.5sb43knc7eq44ivo@netronome.com>
+ <075be045-3a02-e7d8-672f-4a207c410ee8@intel.com>
+ <20191021163139.GC4486@netronome.com>
+ <15d94e61-9b3d-7854-b65e-6fea6db75450@redhat.com>
+From:   Zhu Lingshan <lingshan.zhu@linux.intel.com>
+Message-ID: <1f468365-4fe4-b13f-0841-cc5a60a8fe41@linux.intel.com>
+Date:   Tue, 22 Oct 2019 14:48:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eTnS+-FtoO29XFQ8-1=gczXYP0eDPUKZssJ73-=gf1MGg@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <15d94e61-9b3d-7854-b65e-6fea6db75450@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 11, 2019 at 09:11:54AM -0700, Jim Mattson wrote:
-> On Fri, Oct 11, 2019 at 12:48 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> >
-> > On Thu, Oct 10, 2019 at 02:42:51PM -0700, Jim Mattson wrote:
-> > > On Tue, Sep 17, 2019 at 1:52 AM Yang Weijiang <weijiang.yang@intel.com> wrote:
-> > > >
-> > > > EPT-Based Sub-Page write Protection(SPP)is a HW capability which allows
-> > > > Virtual Machine Monitor(VMM) to specify write-permission for guest
-> > > > physical memory at a sub-page(128 byte) granularity. When this
-> > > > capability is enabled, the CPU enforces write-access check for sub-pages
-> > > > within a 4KB page.
-> > > >
-> > > > The feature is targeted to provide fine-grained memory protection for
-> > > > usages such as device virtualization, memory check-point and VM
-> > > > introspection etc.
-> > > >
-> > > > SPP is active when the "sub-page write protection" (bit 23) is 1 in
-> > > > Secondary VM-Execution Controls. The feature is backed with a Sub-Page
-> > > > Permission Table(SPPT), SPPT is referenced via a 64-bit control field
-> > > > called Sub-Page Permission Table Pointer (SPPTP) which contains a
-> > > > 4K-aligned physical address.
-> > > >
-> > > > To enable SPP for certain physical page, the gfn should be first mapped
-> > > > to a 4KB entry, then set bit 61 of the corresponding EPT leaf entry.
-> > > > While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
-> > > > physical address to find out the sub-page permissions at the leaf entry.
-> > > > If the corresponding bit is set, write to sub-page is permitted,
-> > > > otherwise, SPP induced EPT violation is generated.
-> > >
-> > > How do you handle sub-page permissions for instructions emulated by kvm?
-> > How about checking if the gpa is SPP protected, if it is, inject some
-> > exception to guest?
-> The SPP semantics are well-defined. If a kvm-emulated instruction
-> tries to write to a sub-page that is write-protected, then an
-> SPP-induced EPT violation should be synthesized.
-Hi, Jim,
 
-Regarding the emulated instructions in KVM, there're quite a few
-instructions can write guest memory, such as MOVS, XCHG, INS etc.,
-check each destination against SPP protected area would be trivial if
-deals with them individually, and PIO/MMIO induced vmexit/page_fault also
-can link to a SPP protected page, e.g., a string instruction's the destination
-is SPP protected memory. Is there a good way to intercept these writes?
-emulate_ops.write_emulated() is called in most of the emulation cases to
-check and write guest memory, but not sure it's suitable.
-Do you have any suggestion?
-
-Thanks!
+On 10/22/2019 9:32 AM, Jason Wang wrote:
+>
+> On 2019/10/22 上午12:31, Simon Horman wrote:
+>> On Mon, Oct 21, 2019 at 05:55:33PM +0800, Zhu, Lingshan wrote:
+>>> On 10/16/2019 5:53 PM, Simon Horman wrote:
+>>>> Hi Zhu,
+>>>>
+>>>> thanks for your patch.
+>>>>
+>>>> On Wed, Oct 16, 2019 at 09:10:40AM +0800, Zhu Lingshan wrote:
+>> ...
+>>
+>>>>> +static void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
+>>>>> +               void *dst, int length)
+>>>>> +{
+>>>>> +    int i;
+>>>>> +    u8 *p;
+>>>>> +    u8 old_gen, new_gen;
+>>>>> +
+>>>>> +    do {
+>>>>> +        old_gen = ioread8(&hw->common_cfg->config_generation);
+>>>>> +
+>>>>> +        p = dst;
+>>>>> +        for (i = 0; i < length; i++)
+>>>>> +            *p++ = ioread8((u8 *)hw->dev_cfg + offset + i);
+>>>>> +
+>>>>> +        new_gen = ioread8(&hw->common_cfg->config_generation);
+>>>>> +    } while (old_gen != new_gen);
+>>>> Would it be wise to limit the number of iterations of the loop above?
+>>> Thanks but I don't quite get it. This is used to make sure the function
+>>> would get the latest config.
+>> I am worried about the possibility that it will loop forever.
+>> Could that happen?
+>>
+>> ...
+>
+>
+> My understanding is that the function here is similar to virtio config 
+> generation [1]. So this can only happen for a buggy hardware.
+>
+> Thanks
+>
+> [1] 
+> https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html 
+> Section 2.4.1
+Yes!
+>
+>
+>>
+>>>>> +static void io_write64_twopart(u64 val, u32 *lo, u32 *hi)
+>>>>> +{
+>>>>> +    iowrite32(val & ((1ULL << 32) - 1), lo);
+>>>>> +    iowrite32(val >> 32, hi);
+>>>>> +}
+>>>> I see this macro is also in virtio_pci_modern.c
+>>>>
+>>>> Assuming lo and hi aren't guaranteed to be sequential
+>>>> and thus iowrite64_hi_lo() cannot be used perhaps
+>>>> it would be good to add a common helper somewhere.
+>>> Thanks, I will try after this IFC patchwork, I will cc you.
+>> Thanks.
+>>
+>> ...
+>
