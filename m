@@ -2,144 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80924DFFEE
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 10:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85D3FE000A
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 10:54:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388462AbfJVIqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 04:46:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28819 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387575AbfJVIqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 04:46:15 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7A9F585363
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 08:46:14 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id u17so1564516wmd.3
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 01:46:14 -0700 (PDT)
+        id S1729458AbfJVIyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 04:54:08 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:33307 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728346AbfJVIyI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 04:54:08 -0400
+Received: by mail-ot1-f67.google.com with SMTP id 60so13507042otu.0
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 01:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dOQT7brDSLVHQZ5HYLvcbdrbSrflixmCqXUksIzgvXw=;
+        b=cZ1syUpG4BDXz4x9vbWpQpOBDQHUzdQVmv622hIDd9Iq8NqPyHYpyPGBK6L8luxWvW
+         1UAS+rL8Vo+ESS6ZFIHbq4YI+XlFzcO0sWM9XZRC9l1KGd4OjP6wjCdS36HV+8fN7xIF
+         9vApZeRLpgWm+Diwcr4F2Zz/jMN05W9vPl1yDfOizFICzf6iC/nNK7zODi0r+yqGL9yD
+         MW4RO5sTmVz4YNTTEcaAFC54naokSGcCFbXqDSe/Vho24zcDzaa7u0RtZOJx7HgzJMNC
+         lnXwvql6ny2jsFhMLNVnbBlnHT/RwlpqKZdeskTJZ5N/2M7fIS0+l9++eQt4DvBTcPGq
+         Ox5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=3vFeOe+bYuDka4Ka2yl0bdvDmUhyxmNAPA43fQB+Vwo=;
-        b=ErCAbm+YsGHkdvuCkcVxaxX1NqyxXYzR8xC5Ccc0dE50+5sOvar4hokIBThUoqlKMh
-         ktzwJ409975Uc16HMDe0ERgaBy3EGXJxgybJ/Ad0Ps8GfZPAT1Z1LcPpKGRAUi6g8AxL
-         b7qRb9d5fPahfxKyxV+0DCm39FdD77IaBVFfP+k2hzsEhsWYp22QyY4yQwAx0bEjXtKj
-         JkQliZ5fr05/35O7XYam/jUOWN9L1rPstkUq9ga122rYW3My5YTYq6ej2ab0Vxm5lJvr
-         TEWpMcQ9TCaLvsGD8HCpAD/hmd8EWd4lmeccGkJ+HXslSckCFN6nCOH/gcefQufysCHv
-         kDgg==
-X-Gm-Message-State: APjAAAV4nGuvmhgqZMoOArU3BYfQky8oRSm4/GjaT9BnIc4vqeXk8L7e
-        pI6ZcCwTkZxqdU5FyyXZ6SK9YG84rflpYqRRNr1O6ruev7gug54RMohEvvBSKiJF34gDF+5AdQZ
-        ZXKwqIBBSaGmS
-X-Received: by 2002:adf:e34b:: with SMTP id n11mr2287667wrj.250.1571733972956;
-        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy6/EZb4JYeMXrDvX360zKNmzBLoFUiJOFM7/Ur73oRbIJaoO1FKmJioq7z4BpW58NSfwNr8A==
-X-Received: by 2002:adf:e34b:: with SMTP id n11mr2287649wrj.250.1571733972675;
-        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id q11sm7080488wmq.21.2019.10.22.01.46.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2019 01:46:12 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc:     wanpengli@tencent.com, rkrcmar@redhat.com, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
-In-Reply-To: <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
-References: <20191017235036.25624-1-sjitindarsingh@gmail.com> <87pniu0zcw.fsf@vitty.brq.redhat.com> <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
-Date:   Tue, 22 Oct 2019 10:46:11 +0200
-Message-ID: <875zkh1830.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dOQT7brDSLVHQZ5HYLvcbdrbSrflixmCqXUksIzgvXw=;
+        b=saD++4dSxpCQ0RMOtkvB7wmp/y4s63ghzciELCmzm1LgNJ+UHfuj9SHDUqv/2WOc5Y
+         L2xMqagskIm5ZE06BXWek5VvOyXdXCnEisTAV9VeQMBZtoKYHbmqYfwvM2Ngb/y/SryY
+         vQgjr0B9dSw3AGekrKsorI7+/YoerwyjZKhLNT68ueZUwQtsjNWy43h6pWxfw6jqEViO
+         EXDsulr6UcnKztiUIHp9SLNzZ4T3hqjGIBCddwrLEJ6rXjNluRN06adnbizfKGZjRtyY
+         PfP9U/hmU0PIDEXjbyXD77MK85tac1LLdXZRTDMcrYdPsU77jD0m+XIWWKwddeCPziho
+         jd/g==
+X-Gm-Message-State: APjAAAXLj1MYdkxkXmqm3kaQCufdCVsRbLWK8wWadJOuXG2B92WVLYjX
+        0ZOtcpN0beSxNDOPby6nNDwyc5PC7hXLvr6hvfA=
+X-Google-Smtp-Source: APXvYqz+PV8aHY2sm6m3qwOLsTh94rRDTl+fMhPUyv3gYhq+pnU2GkwOs8Pn1jFD59sHDXSzIHEe0twWwjEH342N3xU=
+X-Received: by 2002:a9d:61d1:: with SMTP id h17mr1670381otk.254.1571734447037;
+ Tue, 22 Oct 2019 01:54:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20191017235036.25624-1-sjitindarsingh@gmail.com>
+ <87pniu0zcw.fsf@vitty.brq.redhat.com> <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
+In-Reply-To: <34e212a851eb0d490fad49f8b712b2c6e652db76.camel@gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 22 Oct 2019 16:53:56 +0800
+Message-ID: <CANRm+CyqTeE4XmqL0KFY=Un2=nfRb1degsJJz1m080mgeE10HQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86/apic: Skip pv ipi test if hcall not available
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Radim Krcmar <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
-
+On Tue, 22 Oct 2019 at 06:51, Suraj Jitindar Singh
+<sjitindarsingh@gmail.com> wrote:
+>
 > Hi,
 >
 > On Fri, 2019-10-18 at 18:53 +0200, Vitaly Kuznetsov wrote:
->> Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
->> 
->> > From: Suraj Jitindar Singh <surajjs@amazon.com>
->> > 
->> > The test in x86/apic.c named test_pv_ipi is used to test for a
->> > kernel
->> > bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an
->> > out of
->> > bounds access.
->> > 
->> > If the host doesn't implement this hcall then the out of bounds
->> > access
->> > cannot be triggered.
->> > 
->> > Detect the case where the host doesn't implement the
->> > KVM_HC_SEND_IPI
->> > hcall and skip the test when this is the case, as the test doesn't
->> > apply.
->> > 
->> > Output without patch:
->> > FAIL: PV IPIs testing
->> > 
->> > With patch:
->> > SKIP: PV IPIs testing: h-call not available
->> > 
->> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->> > ---
->> >  x86/apic.c | 11 +++++++++++
->> >  1 file changed, 11 insertions(+)
->> > 
->> > diff --git a/x86/apic.c b/x86/apic.c
->> > index eb785c4..bd44b54 100644
->> > --- a/x86/apic.c
->> > +++ b/x86/apic.c
->> > @@ -8,6 +8,8 @@
->> >  #include "atomic.h"
->> >  #include "fwcfg.h"
->> >  
->> > +#include <linux/kvm_para.h>
->> > +
->> >  #define MAX_TPR			0xf
->> >  
->> >  static void test_lapic_existence(void)
->> > @@ -638,6 +640,15 @@ static void test_pv_ipi(void)
->> >      unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 =
->> > 0x0;
->> >  
->> >      asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI),
->> > "b"(a0), "c"(a1), "d"(a2), "S"(a3));
->> > +    /*
->> > +     * Detect the case where the hcall is not implemented by the
->> > hypervisor and
->> > +     * skip this test if this is the case. Is the hcall isn't
->> > implemented then
->> > +     * the bug that this test is trying to catch can't be
->> > triggered.
->> > +     */
->> > +    if (ret == -KVM_ENOSYS) {
->> > +	    report_skip("PV IPIs testing: h-call not available");
->> > +	    return;
->> > +    }
->> >      report("PV IPIs testing", !ret);
->> >  }
->> 
->> Should we be checking CPUID bit (KVM_FEATURE_PV_SEND_IPI) instead?
->> 
+> > Suraj Jitindar Singh <sjitindarsingh@gmail.com> writes:
+> >
+> > > From: Suraj Jitindar Singh <surajjs@amazon.com>
+> > >
+> > > The test in x86/apic.c named test_pv_ipi is used to test for a
+> > > kernel
+> > > bug where a guest making the hcall KVM_HC_SEND_IPI can trigger an
+> > > out of
+> > > bounds access.
+> > >
+> > > If the host doesn't implement this hcall then the out of bounds
+> > > access
+> > > cannot be triggered.
+> > >
+> > > Detect the case where the host doesn't implement the
+> > > KVM_HC_SEND_IPI
+> > > hcall and skip the test when this is the case, as the test doesn't
+> > > apply.
+> > >
+> > > Output without patch:
+> > > FAIL: PV IPIs testing
+> > >
+> > > With patch:
+> > > SKIP: PV IPIs testing: h-call not available
+> > >
+> > > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > > ---
+> > >  x86/apic.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >
+> > > diff --git a/x86/apic.c b/x86/apic.c
+> > > index eb785c4..bd44b54 100644
+> > > --- a/x86/apic.c
+> > > +++ b/x86/apic.c
+> > > @@ -8,6 +8,8 @@
+> > >  #include "atomic.h"
+> > >  #include "fwcfg.h"
+> > >
+> > > +#include <linux/kvm_para.h>
+> > > +
+> > >  #define MAX_TPR                    0xf
+> > >
+> > >  static void test_lapic_existence(void)
+> > > @@ -638,6 +640,15 @@ static void test_pv_ipi(void)
+> > >      unsigned long a0 = 0xFFFFFFFF, a1 = 0, a2 = 0xFFFFFFFF, a3 =
+> > > 0x0;
+> > >
+> > >      asm volatile("vmcall" : "=a"(ret) :"a"(KVM_HC_SEND_IPI),
+> > > "b"(a0), "c"(a1), "d"(a2), "S"(a3));
+> > > +    /*
+> > > +     * Detect the case where the hcall is not implemented by the
+> > > hypervisor and
+> > > +     * skip this test if this is the case. Is the hcall isn't
+> > > implemented then
+> > > +     * the bug that this test is trying to catch can't be
+> > > triggered.
+> > > +     */
+> > > +    if (ret == -KVM_ENOSYS) {
+> > > +       report_skip("PV IPIs testing: h-call not available");
+> > > +       return;
+> > > +    }
+> > >      report("PV IPIs testing", !ret);
+> > >  }
+> >
+> > Should we be checking CPUID bit (KVM_FEATURE_PV_SEND_IPI) instead?
+> >
 >
 > That's also an option. It will produce the same result.
 >
-
-Generally yes, but CPUID announcement has its own advantages: when a
-feature bit is set we know the hypercall *must* exist so -KVM_ENOSYS
-would be a bug (think of a theoretical situation when the hypercall
-starts to return -KVM_ENOSYS erroneously - how do we catch this?)
-
 > Would that be the preferred approach or is the method used in the
 > current patch ok?
 
-I'm not insisting, let's leave it up to Paolo :-)
+Btw, is it amazon using pv ipis? I don't think. I suspect there is an
+extra hardware assistant to benefit broadcast ipis in amazon.
 
--- 
-Vitaly
+    Wanpeng
