@@ -2,150 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 95AE9E0DD8
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 23:45:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D958E0E28
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 00:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733176AbfJVVoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 17:44:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51004 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1733171AbfJVVoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 17:44:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571780664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PKEnwwvZkBoKQkKjGLBuPW/9OyQ9zYCnXgLkDtHA/wU=;
-        b=aFCksAJEuXcAYCOB/HflqKJ99Q9hnQunhOv5UOimbRnSlYV2FHp6nO9buk326Y62Biq/xS
-        BI/6w8JYgfmpQ7cGiWkPTuurcXLJhwOTytO4R3QFgU9IbkjTl7iuyLRIfblD+X8JWdRsyc
-        CCJbgexCpUObpBYosM9pa/WKkoQ1VYU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-BzegCTQAPeCZk_lTI7ZwPA-1; Tue, 22 Oct 2019 17:44:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A938476;
-        Tue, 22 Oct 2019 21:44:19 +0000 (UTC)
-Received: from localhost (ovpn-116-104.gru2.redhat.com [10.97.116.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 807745DA32;
-        Tue, 22 Oct 2019 21:44:18 +0000 (UTC)
-Date:   Tue, 22 Oct 2019 18:44:17 -0300
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     "Kang, Luwei" <luwei.kang@intel.com>
-Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rth@twiddle.net" <rth@twiddle.net>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
- Processor Trace feature
-Message-ID: <20191022214416.GA21651@habkost.net>
-References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
- <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
- <20191012031407.GK4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382A209@SHSMSX104.ccr.corp.intel.com>
- <20191015132929.GY4084@habkost.net>
- <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
+        id S2388287AbfJVW14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 18:27:56 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:42516 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388172AbfJVW1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 18:27:55 -0400
+Received: by mail-pg1-f193.google.com with SMTP id f14so10800523pgi.9;
+        Tue, 22 Oct 2019 15:27:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=J0Cde3YCRyKb7sVda9AuSr3SUq1DFyMrFHgfTQRevNg=;
+        b=kf9SehCNiEcM+GfhpzKh3NyW4ANcI4Qdoy/zWsrS/DaZYbQEvhhtjhO5o55SoORHVz
+         kSiuvyY8pV6mlTEHPalaOwwbRqM0mBd2Drmym4mBY7jVdS4C0PSddXT9sePiecgGvYUE
+         JVI1qNOYbEO0iOiOQETNouy/sRKJ/czZqmabrurDDThDhkLiBuj1+3o5c3LwXcFTAtxo
+         zjumP+IQlO/rDNVbhKHSlpcYKWBes7iePihLor2Nr6QdefABT76ujZbKFE7TfNyAe68e
+         84blhV53Q9HSAUfH72G4PO/cAqAjqbDo7slsDOGzq4P0drmRP/c+0FSDlgWpLM7Nhf8u
+         xi8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=J0Cde3YCRyKb7sVda9AuSr3SUq1DFyMrFHgfTQRevNg=;
+        b=EfdnMSy95i8jqNvlX5Ip+p0WnprYI9JORIzGwD9mWPyYYhrdJ/kKLiZBSHFtR+CRV6
+         wjf/VPfOzhlVBWg+AaoNGfy5eBnkatBTr72DLAxI97Bk4wxSh0PXZOZPcENMm6fsG7u7
+         33iNalFToYwIOEeMp8SSFzpdP0LnZxCBRnsHJIR66l2PfTKJN24jYcOcio3jIvWcr/Ox
+         n71hfB/o11zyJo/nfvqApRIKz7gSv1IJrAUupP1+gsPsPX612eXPfh5C7JdtkoszodSx
+         elzyC4nHrYwt+mKqH56WpuLy2y66IW2WPsutTS8Ce5UqQmobs0R5fJV+Q4MC/NNx1I6E
+         sYUw==
+X-Gm-Message-State: APjAAAVqaSdoB4jFZpHC1yB9nTBi+2c1g38sAweF3zhQ7GilWD/qahfE
+        Qxgq84C+WrCoA7DaonAfNQU=
+X-Google-Smtp-Source: APXvYqxUpZCIgjB/RhowJmJMcKSaevo7BJq4WvFJyIaGUi8Z6RPUU8dpXpcsYruoZJ6BMwX+j5xojA==
+X-Received: by 2002:aa7:9715:: with SMTP id a21mr6913876pfg.144.1571783274147;
+        Tue, 22 Oct 2019 15:27:54 -0700 (PDT)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id y15sm29621200pfp.111.2019.10.22.15.27.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 22 Oct 2019 15:27:53 -0700 (PDT)
+Subject: [PATCH v12 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
+        osalvador@suse.de
+Date:   Tue, 22 Oct 2019 15:27:52 -0700
+Message-ID: <20191022221223.17338.5860.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17382BB76@SHSMSX104.ccr.corp.intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: BzegCTQAPeCZk_lTI7ZwPA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 06:02:28AM +0000, Kang, Luwei wrote:
-> > > > > f9f4cd1..097c953 100644
-> > > > > --- a/target/i386/kvm.c
-> > > > > +++ b/target/i386/kvm.c
-> > > > > @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int l=
-evel)
-> > > > >                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask=
-);
-> > > > >              }
-> > > > >          }
-> > > > > +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT=
-) {
-> > > > > +            int addr_num =3D kvm_arch_get_supported_cpuid(kvm_st=
-ate,
-> > > > > +                                                    0x14, 1,
-> > > > > + R_EAX) & 0x7;
-> > > > > +
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
-> > > > > +                            env->msr_rtit_ctrl);
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
-> > > > > +                            env->msr_rtit_status);
-> > > > > +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
-> > > > > +                            env->msr_rtit_output_base);
-> > > >
-> > > > This causes the following crash on some hosts:
-> > > >
-> > > >   qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
-> > > >   qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Asserti=
-on `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
-> > > >
-> > > > Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
-> > > > additional conditions that might prevent writing to this MSR (PT_CA=
-P_topa_output && PT_CAP_single_range_output).  This
-> > causes QEMU to crash if some of the conditions aren't met.
-> > > >
-> > > > Writing and reading this MSR (and the ones below) need to be condit=
-ional on KVM_GET_MSR_INDEX_LIST.
-> > > >
-> > >
-> > > Hi Eduardo,
-> > >     I found this issue can't be reproduced in upstream source code bu=
-t can be reproduced on RHEL8.1. I haven't got the qemu source
-> > code of RHEL8.1. But after adding some trace in KVM, I found the KVM ha=
-s reported the complete Intel PT CPUID information to qemu
-> > but the Intel PT CPUID (0x14) is lost when qemu setting the CPUID to KV=
-M (cpuid level is 0xd). It looks like lost the below patch.
-> > >
-> > > commit f24c3a79a415042f6dc195f029a2ba7247d14cac
-> > > Author: Luwei Kang <luwei.kang@intel.com>
-> > > Date:   Tue Jan 29 18:52:59 2019 -0500
-> > >     i386: extended the cpuid_level when Intel PT is enabled
-> > >
-> > >     Intel Processor Trace required CPUID[0x14] but the cpuid_level
-> > >     have no change when create a kvm guest with
-> > >     e.g. "-cpu qemu64,+intel-pt".
-> >=20
-> > Thanks for the pointer.  This may avoid triggering the bug in the defau=
-lt configuration, but we still need to make the MSR writing
-> > conditional on KVM_GET_MSR_INDEX_LIST.  Older machine-types have x-inte=
-l-pt-auto-level=3Doff, and the user may set `level`
-> > manually.
->=20
-> Hi Eduardo,
-> Sorry for a delay reply because my mail filter. I tried with
-> the Q35 machine type and default, all looks work well (With
-> some old cpu type + "intel_pt" also work well).  KVM will check
-> the Intel PT work mode and HW to decide if Intel PT can be
-> exposed to guest, only extended the CPUID level is useless. If
-> the guest doesn't support Intel PT, any MSR read or write will
-> cause #GP. Please remind me if I lost something.
+This series provides an asynchronous means of reporting unused guest
+pages to a hypervisor so that the memory associated with those pages can
+be dropped and reused by other processes and/or guests.
 
-I understand you have tried q35 and pc, but have you tried with
-older machine-type versions?
+When enabled it will allocate a set of statistics to track the number of
+reported pages. When the nr_free for a given free_area is greater than
+this by the high water mark we will schedule a worker to begin allocating
+the non-reported memory and to provide it to the reporting interface via a
+scatterlist.
 
-Commit f24c3a79a415 doesn't change behavior on pc-*-3.1 and
-older, so it only avoids triggering the crash in the default
-case.  Doesn't QEMU crash if running:
-"-cpu qemu64,+intel-pt -machine pc-i440fx-3.1"?
+Currently this is only in use by virtio-balloon however there is the hope
+that at some point in the future other hypervisors might be able to make
+use of it. In the virtio-balloon/QEMU implementation the hypervisor is
+currently using MADV_DONTNEED to indicate to the host kernel that the page
+is currently unused. It will be faulted back into the guest the next time
+the page is accessed.
 
-KVM rejecting MSR writes when something is missing is correct.
-QEMU trying to write the MSR when something is missing (and
-crashing because of that) is a bug.
+To track if a page is reported or not the Uptodate flag was repurposed and
+used as a Reported flag for Buddy pages. While we are processing the pages
+in a given zone we have a set of pointers we track called
+reported_boundary that is used to keep our processing time to a minimum.
+Without these we would have to iterate through all of the reported pages
+which would become a significant burden. I measured as much as a 20%
+performance degradation without using the boundary pointers. In the event
+of something like compaction needing to process the zone at the same time
+it currently resorts to resetting the boundary if it is rearranging the
+list. However in the future it could choose to delay processing the zone
+if a flag is set indicating that a zone is being actively processed.
 
---=20
-Eduardo
+Below are the results from various benchmarks. I primarily focused on two
+tests. The first is the will-it-scale/page_fault2 test, and the other is
+a modified version of will-it-scale/page_fault1 that was enabled to use
+THP. I did this as it allows for better visibility into different parts
+of the memory subsystem. The guest is running on one node of a E5-2630 v3
+CPU with 48G of RAM that I split up into two logical nodes in the guest
+in order to test with NUMA as well.
 
+Test		    page_fault1 (THP)     page_fault2
+Baseline	 1  1256106.33  +/-0.09%   482202.67  +/-0.46%
+                16  8864441.67  +/-0.09%  3734692.00  +/-1.23%
+
+Patches applied  1  1257096.00  +/-0.06%   477436.00  +/-0.16%
+                16  8864677.33  +/-0.06%  3800037.00  +/-0.19%
+
+Patches enabled	 1  1258420.00  +/-0.04%   480080.00  +/-0.07%
+ MADV disabled  16  8753840.00  +/-1.27%  3782764.00  +/-0.37%
+
+Patches enabled	 1  1267916.33  +/-0.08%   472075.67  +/-0.39%
+                16  8287050.33  +/-0.67%  3774500.33  +/-0.11%
+
+The results above are for a baseline with a linux-next-20191021 kernel,
+that kernel with this patch set applied but page reporting disabled in
+virtio-balloon, patches applied but the madvise disabled by direct
+assigning a device, and the patches applied and page reporting fully
+enabled.  These results include the deviation seen between the average
+value reported here versus the high and/or low value. I observed that
+during the test the memory usage for the first three tests never dropped
+whereas with the patches fully enabled the VM would drop to using only a
+few GB of the host's memory when switching from memhog to page fault tests.
+
+Most of the overhead seen with this patch set fully enabled is due to the
+fact that accessing the reported pages will cause a page fault and the host
+will have to zero the page before giving it back to the guest. The overall
+guest size is kept fairly small to only a few GB while the test is running.
+This overhead is much more visible when using THP than with standard 4K
+pages. As such for the case where the host memory is not oversubscribed
+this results in a performance regression, however if the host memory were
+oversubscribed this patch set should result in a performance improvement
+as swapping memory from the host can be avoided.
+
+There is currently an alternative patch set[1] that has been under work
+for some time however the v12 version of that patch set could not be
+tested as it triggered a kernel panic when I attempted to test it. It
+requires multiple modifications to get up and running with performance
+comparable to this patch set. A follow-on set has yet to be posted. As
+such I have not included results from that patch set, and I would
+appreciate it if we could keep this patch set the focus of any discussion
+on this thread.
+
+For info on earlier versions you will need to follow the links provided
+with the respective versions.
+
+[1]: https://lore.kernel.org/lkml/20190812131235.27244-1-nitesh@redhat.com/
+
+Changes from v10:
+https://lore.kernel.org/lkml/20190918175109.23474.67039.stgit@localhost.localdomain/
+Rebased on "Add linux-next specific files for 20190930"
+Added page_is_reported() macro to prevent unneeded testing of PageReported bit
+Fixed several spots where comments referred to older aeration naming
+Set upper limit for phdev->capacity to page reporting high water mark
+Updated virtio page poison detection logic to also cover init_on_free
+Tweaked page_reporting_notify_free to reduce code size
+Removed dead code in non-reporting path
+
+Changes from v11:
+https://lore.kernel.org/lkml/20191001152441.27008.99285.stgit@localhost.localdomain/
+Removed unnecessary whitespace change from patch 2
+Minor tweak to get_unreported_page to avoid excess writes to boundary
+Rewrote cover page to lay out additional performance info.
+
+---
+
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce Reported pages
+      mm: Add device side and notifier for unused page reporting
+      virtio-balloon: Pull page poisoning config out of free page hinting
+      virtio-balloon: Add support for providing unused page reports to host
+
+
+ drivers/virtio/Kconfig              |    1 
+ drivers/virtio/virtio_balloon.c     |   88 ++++++++-
+ include/linux/mmzone.h              |   60 ++----
+ include/linux/page-flags.h          |   11 +
+ include/linux/page_reporting.h      |   31 +++
+ include/uapi/linux/virtio_balloon.h |    1 
+ mm/Kconfig                          |   11 +
+ mm/Makefile                         |    1 
+ mm/compaction.c                     |    5 
+ mm/memory_hotplug.c                 |    2 
+ mm/page_alloc.c                     |  194 +++++++++++++++----
+ mm/page_reporting.c                 |  353 +++++++++++++++++++++++++++++++++++
+ mm/page_reporting.h                 |  225 ++++++++++++++++++++++
+ mm/shuffle.c                        |   12 +
+ mm/shuffle.h                        |    6 +
+ 15 files changed, 899 insertions(+), 102 deletions(-)
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+ create mode 100644 mm/page_reporting.h
+
+--
