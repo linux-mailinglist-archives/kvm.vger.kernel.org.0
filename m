@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF57EE0379
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 13:54:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3D2E0384
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 13:56:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388290AbfJVLyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 07:54:31 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54747 "EHLO
+        id S2388922AbfJVL4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 07:56:24 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25078 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387888AbfJVLyb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 22 Oct 2019 07:54:31 -0400
+        by vger.kernel.org with ESMTP id S2388919AbfJVL4Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 22 Oct 2019 07:56:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571745270;
+        s=mimecast20190719; t=1571745382;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
-        bh=2kwc930HZhDQIEgOoaYmYGtp4jID5Cl1xAw0er8oD+U=;
-        b=gGhUua1729Q2ulzMdZbqFTHBqS/iz4IMXVIlhPf+U3LZCooXBp2s8vPu0qrCzOzsyrojvC
-        UOf3PKzF4OyGz0tWDwDiUtWuQsf9InpXF1D9pNhM8WOIukl1SO/cE3JITCfk7Gc15ld8FR
-        sFmRJy0wPOul+XbxVthb5CFGFvrLbzw=
+        bh=eMyociMOhA1lMODSfGfbzn5dQH+JfqtMLaN0uQOIERw=;
+        b=axKeXN9LjsKaeKcXoaUNXHl3XkP6MlXJ9tg0Zy0ANNk6Z0VLx0CyG3FTIlPEucDNQzug3y
+        WHCZxleSz0MTbUIhfFkB3cWmjCSi3ZAe6SgS+JvL8KItsI/+8PcVeTrvrkpNI7RnW8jfSk
+        5LcCgDAK8B2hWA4zsDKwljElh8TjldU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-N2wdPHSSPsO1rA6NXIu4cw-1; Tue, 22 Oct 2019 07:54:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-98-i3FCx6huNK-8GbGmST2_Dw-1; Tue, 22 Oct 2019 07:56:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04A7B800D4E;
-        Tue, 22 Oct 2019 11:54:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 423F31800DFA;
+        Tue, 22 Oct 2019 11:56:18 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 74E8A5C1D4;
-        Tue, 22 Oct 2019 11:54:22 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v1 1/5] s390x: remove redundant defines
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7CD65DD64;
+        Tue, 22 Oct 2019 11:56:14 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 2/5] s390x: improve error reporting for
+ interrupts
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com,
         borntraeger@de.ibm.com, frankja@linux.ibm.com
 References: <1571741584-17621-1-git-send-email-imbrenda@linux.ibm.com>
- <1571741584-17621-2-git-send-email-imbrenda@linux.ibm.com>
+ <1571741584-17621-3-git-send-email-imbrenda@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -83,15 +84,15 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <775bd0cb-0fdb-84c6-b0a6-bf8b4b603b3e@redhat.com>
-Date:   Tue, 22 Oct 2019 13:54:21 +0200
+Message-ID: <a2c50c36-e7e2-eae3-7dc8-65d3d352630b@redhat.com>
+Date:   Tue, 22 Oct 2019 13:56:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1571741584-17621-2-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <1571741584-17621-3-git-send-email-imbrenda@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: N2wdPHSSPsO1rA6NXIu4cw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: i3FCx6huNK-8GbGmST2_Dw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -101,26 +102,32 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 22/10/2019 12.53, Claudio Imbrenda wrote:
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  lib/s390x/sclp.h | 2 --
->  1 file changed, 2 deletions(-)
+> Improve error reporting for unexpected external interrupts to also
+> print the received external interrupt code.
 >=20
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 4e69845..f00c3df 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -27,8 +27,6 @@
->  #define SCLP_ASSIGN_STORAGE                     0x000D0001
->  #define SCLP_CMD_READ_EVENT_DATA                0x00770005
->  #define SCLP_CMD_WRITE_EVENT_DATA               0x00760005
-> -#define SCLP_CMD_READ_EVENT_DATA                0x00770005
-> -#define SCLP_CMD_WRITE_EVENT_DATA               0x00760005
->  #define SCLP_CMD_WRITE_EVENT_MASK               0x00780005
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  lib/s390x/interrupt.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 5cade23..1636207 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -118,8 +118,8 @@ void handle_ext_int(void)
+>  {
+>  =09if (!ext_int_expected &&
+>  =09    lc->ext_int_code !=3D EXT_IRQ_SERVICE_SIG) {
+> -=09=09report_abort("Unexpected external call interrupt: at %#lx",
+> -=09=09=09     lc->ext_old_psw.addr);
+> +=09=09report_abort("Unexpected external call interrupt (code %#x): at %#=
+lx",
+> +=09=09=09     lc->ext_int_code, lc->ext_old_psw.addr);
+>  =09=09return;
+>  =09}
 > =20
->  /* SCLP Memory hotplug codes */
 >=20
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
