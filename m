@@ -2,130 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B6AE0D9C
-	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 23:04:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D3AE0DD0
+	for <lists+kvm@lfdr.de>; Tue, 22 Oct 2019 23:34:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732044AbfJVVD5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 17:03:57 -0400
-Received: from mga11.intel.com ([192.55.52.93]:60522 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725874AbfJVVD5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 17:03:57 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 14:03:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,217,1569308400"; 
-   d="scan'208";a="349192117"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga004.jf.intel.com with ESMTP; 22 Oct 2019 14:03:55 -0700
-Date:   Tue, 22 Oct 2019 14:03:55 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, boris.ostrovsky@oracle.com, jgross@suse.com,
-        peterz@infradead.org, will@kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
-        sthemmin@microsoft.com, sashal@kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v7 3/5] x86/kvm: Add "nopvspin" parameter to disable PV
- spinlocks
-Message-ID: <20191022210355.GR2343@linux.intel.com>
-References: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
- <1571649076-2421-4-git-send-email-zhenzhong.duan@oracle.com>
- <8736fl1071.fsf@vitty.brq.redhat.com>
- <dbc50272-a4f5-ce7c-ba71-75031521f420@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dbc50272-a4f5-ce7c-ba71-75031521f420@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1733123AbfJVVd7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 17:33:59 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:33905 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731588AbfJVVd6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 17:33:58 -0400
+Received: by mail-pf1-f202.google.com with SMTP id a1so14392480pfn.1
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 14:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=maN1OI3C8rGLXYdMk46F5meV/56/Uajs3NmMIo+9ziM=;
+        b=oyIA2iT4jfp/E8ooWHHMvhhM6WbvbYalsKEiLc0XOXOoDEd+zOX7I+H0K2MEqy+YEx
+         X4lJemc+Ng0cG5WVp9oFRweqD3HLX3vLAPu/1jtZ/OS+o5L1qkz5yyomvwi4HNBl7/Od
+         XjGAb6c2B7eu0q1xLgY95xb0XpiG0+IkaLMxvziLyxByvjEfbah28+hUlru933B2G/oe
+         m0nOCvqrkx1pIY+cl6UAyh5mqlAMcI+YEyEJj8klk2t+GqJSGobZ+1CMnU0+Nme0+v5U
+         LWv7qygmH59Bfbu4I9/8m/Znlh4nY82S1wG1dhH2NP2jzCyyPIw7+sqKypcniETYzfLg
+         OsHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=maN1OI3C8rGLXYdMk46F5meV/56/Uajs3NmMIo+9ziM=;
+        b=FibtRO8DTRDTPMoB3TGgqf3NaT+ARlc6n5bB8lmGnxgAA8NrX74u7ytgWEAt5to8Hq
+         OjllCUh/9X6UEGPBx05xDcs41zqV5AKFtc/AFSVEvUvW7vbIxc2imb9CYqaGm2/b3qtc
+         mxrRX0Qe4+2S5qMq/TEmKGQt+NoANetOOZ6kGAJ2GfpFKOR7RSrWY5CHXZLmQJonamWn
+         u7nA07wySbBxKp4Pi8K6MzQGrvU2doa/WmLFE0NGFAZnK2iozTDHhbwOZozQjHcuGwB1
+         azR53yIFFkSU2CkA0tvfZhMJeuOtakcqDUEoB9taMNnSUGtmd/N2RUqemEfpHoyQWyAI
+         ROHg==
+X-Gm-Message-State: APjAAAVFUW3AhPfGHxNckFS51Mczfmn/sxnGK3jBoqI/+Ub0GIL+2Ixz
+        xEovko3HIn5eR+LG8g6sUffZmSmotZgIFLKhJLCMqzUeEKiNNpsCtMOH8C4uw7VINfFW87/8l4A
+        q8bQDecEcAqjNVchf5Kf0leKYqRuthIqVIEsrQlQ2c8p/pNRsplVSAuBhX97Hyqo=
+X-Google-Smtp-Source: APXvYqwpjchncx6hw+AHJpzPqGA9YF6OKMed2JbxzqV1MY//zXCXLpayE53iKxm98PU2+i8Y+R/+qCF1RTALjA==
+X-Received: by 2002:a63:ae02:: with SMTP id q2mr6196324pgf.210.1571780037817;
+ Tue, 22 Oct 2019 14:33:57 -0700 (PDT)
+Date:   Tue, 22 Oct 2019 14:33:49 -0700
+Message-Id: <20191022213349.54734-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
+Subject: [PATCH] kvm: cpuid: Expose leaves 0x80000005 and 0x80000006 to the guest
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 08:46:46PM +0800, Zhenzhong Duan wrote:
-> Hi Vitaly,
-> 
-> On 2019/10/22 19:36, Vitaly Kuznetsov wrote:
-> 
-> >Zhenzhong Duan<zhenzhong.duan@oracle.com>  writes:
-> >
-> ...snip
-> 
-> >>diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> >>index 249f14a..3945aa5 100644
-> >>--- a/arch/x86/kernel/kvm.c
-> >>+++ b/arch/x86/kernel/kvm.c
-> >>@@ -825,18 +825,36 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
-> >>   */
-> >>  void __init kvm_spinlock_init(void)
-> >>  {
-> >>-	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
-> >>-	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
-> >>+	/*
-> >>+	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> >>+	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> >>+	 * preferred over native qspinlock when vCPU is preempted.
-> >>+	 */
-> >>+	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> >>+		pr_info("PV spinlocks disabled, no host support.\n");
-> >>  		return;
-> >>+	}
-> >>+	/*
-> >>+	 * Disable PV qspinlock and use native qspinlock when dedicated pCPUs
-> >>+	 * are available.
-> >>+	 */
-> >>  	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
-> >>-		static_branch_disable(&virt_spin_lock_key);
-> >>-		return;
-> >>+		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
-> >>+		goto out;
-> >>  	}
-> >>-	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
-> >>-	if (num_possible_cpus() == 1)
-> >>-		return;
-> >>+	if (num_possible_cpus() == 1) {
-> >>+		pr_info("PV spinlocks disabled, single CPU.\n");
-> >>+		goto out;
-> >>+	}
-> >>+
-> >>+	if (nopvspin) {
-> >>+		pr_info("PV spinlocks disabled, forced by \"nopvspin\" parameter.\n");
-> >>+		goto out;
-> >>+	}
-> >>+
-> >>+	pr_info("PV spinlocks enabled\n");
-> >>  	__pv_init_lock_hash();
-> >>  	pv_ops.lock.queued_spin_lock_slowpath = __pv_queued_spin_lock_slowpath;
-> >>@@ -849,6 +867,8 @@ void __init kvm_spinlock_init(void)
-> >>  		pv_ops.lock.vcpu_is_preempted =
-> >>  			PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
-> >>  	}
-> >>+out:
-> >>+	static_branch_disable(&virt_spin_lock_key);
-> >You probably need to add 'return' before 'out:' as it seems you're
-> >disabling virt_spin_lock_key in all cases now).
-> 
-> virt_spin_lock_key is kept enabled in !kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)
-> case which is the only case virt_spin_lock() optimization is used.
-> 
-> When PV qspinlock is enabled, virt_spin_lock() isn't called in
-> __pv_queued_spin_lock_slowpath() in which case we don't care
-> virt_spin_lock_key's value.
-> 
-> So adding 'return' or not are both ok, I chosed to save a line,
-> let me know if you prefer to add a 'return' and I'll change it.
+Leaf 0x80000005 is "L1 Cache and TLB Information." Leaf 0x80000006 is
+"L2 Cache and TLB and L3 Cache Information." Include these leaves in
+the array returned by KVM_GET_SUPPORTED_CPUID.
 
-It'd be worth adding a comment here if you end up spinning another version
-to change the logging prefix.  The logic is sound and I like the end
-result, but I had the same knee jerk "this can't be right!?!?" reaction as
-Vitaly.
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/cpuid.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 9c5029cf6f3f..1b40d8277b84 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -730,6 +730,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 		entry->ecx &= kvm_cpuid_8000_0001_ecx_x86_features;
+ 		cpuid_mask(&entry->ecx, CPUID_8000_0001_ECX);
+ 		break;
++	case 0x80000005:
++	case 0x80000006:
++		break;
+ 	case 0x80000007: /* Advanced power management */
+ 		/* invariant TSC is CPUID.80000007H:EDX[8] */
+ 		entry->edx &= (1 << 8);
+-- 
+2.23.0.866.gb869b98d4c-goog
+
