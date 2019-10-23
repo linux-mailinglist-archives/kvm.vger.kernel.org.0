@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84133E2590
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 23:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D00DE25FA
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 23:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407593AbfJWVnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 17:43:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51546 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2407586AbfJWVnV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Oct 2019 17:43:21 -0400
+        id S2436658AbfJWV6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 17:58:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23711 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389112AbfJWV6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 17:58:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571866999;
+        s=mimecast20190719; t=1571867879;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6hpFFnPZykrPqLg3oDhEyOYsEg/U+o2e+slzG/d5mzQ=;
-        b=DJEOMJibX2fUf5gJXlnPKMitVY1S6TNQdFMHFd/vJeuwuoMeA9j3ExrFAfNFh56HXXddej
-        ChzMR5LH/ARdQAo5xirDggDrSFXbp1KA6v6tR5HQaw0CJpTVbbxJqRPq+akSbIEU3rNQMc
-        uweQ71rN2q8lWbss9ryEQ0rtvd9qYkY=
+        bh=eyH+HYRNmQqgIVvNR9cb6DK0ckOPAfgOAlp+FhC37To=;
+        b=aCPKtJdSaLZN63eVbGwruPUonAYiccbcoFX0qSvCUmP6VcxjN7ZCJp7bhzWoF/y/G16UTJ
+        A5uDKvOacmuDT9StM8TbvKkbuYQGyw1+eO72tqxFsy8rdoRyUWn/ZCNzo8XRE3nVWvYJXA
+        F+XRhK3bGYqnxcct+H8Zr8jkYQnn22U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-O4PFHJpqNaaC_G9ArySt4g-1; Wed, 23 Oct 2019 17:43:15 -0400
+ us-mta-72-iczMFMq-MHWX_XShiD9ruw-1; Wed, 23 Oct 2019 17:57:56 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEBC01800D6B;
-        Wed, 23 Oct 2019 21:43:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67A4880183D;
+        Wed, 23 Oct 2019 21:57:52 +0000 (UTC)
 Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0666F5D6D0;
-        Wed, 23 Oct 2019 21:42:45 +0000 (UTC)
-Date:   Wed, 23 Oct 2019 15:42:45 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E33E5D6D0;
+        Wed, 23 Oct 2019 21:57:43 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 15:57:28 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -55,15 +55,15 @@ Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
         christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
         stefanha@redhat.com
-Subject: Re: [PATCH V5 2/6] modpost: add support for mdev class id
-Message-ID: <20191023154245.32e4fa49@x1.home>
-In-Reply-To: <20191023130752.18980-3-jasowang@redhat.com>
+Subject: Re: [PATCH V5 4/6] mdev: introduce virtio device and its device ops
+Message-ID: <20191023155728.2a55bc71@x1.home>
+In-Reply-To: <20191023130752.18980-5-jasowang@redhat.com>
 References: <20191023130752.18980-1-jasowang@redhat.com>
-        <20191023130752.18980-3-jasowang@redhat.com>
+        <20191023130752.18980-5-jasowang@redhat.com>
 Organization: Red Hat
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: O4PFHJpqNaaC_G9ArySt4g-1
+X-MC-Unique: iczMFMq-MHWX_XShiD9ruw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -72,96 +72,288 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 21:07:48 +0800
+On Wed, 23 Oct 2019 21:07:50 +0800
 Jason Wang <jasowang@redhat.com> wrote:
 
-> Add support to parse mdev class id table.
+> This patch implements basic support for mdev driver that supports
+> virtio transport for kernel virtio driver.
 >=20
-> Reviewed-by: Parav Pandit <parav@mellanox.com>
 > Signed-off-by: Jason Wang <jasowang@redhat.com>
 > ---
->  drivers/vfio/mdev/vfio_mdev.c     |  2 ++
->  scripts/mod/devicetable-offsets.c |  3 +++
->  scripts/mod/file2alias.c          | 10 ++++++++++
->  3 files changed, 15 insertions(+)
+>  drivers/vfio/mdev/mdev_core.c    |  20 ++++
+>  drivers/vfio/mdev/mdev_private.h |   2 +
+>  include/linux/mdev.h             |   6 ++
+>  include/linux/virtio_mdev_ops.h  | 159 +++++++++++++++++++++++++++++++
+>  4 files changed, 187 insertions(+)
+>  create mode 100644 include/linux/virtio_mdev_ops.h
 >=20
-> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.=
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.=
 c
-> index 7b24ee9cb8dd..cb701cd646f0 100644
-> --- a/drivers/vfio/mdev/vfio_mdev.c
-> +++ b/drivers/vfio/mdev/vfio_mdev.c
-> @@ -125,6 +125,8 @@ static const struct mdev_class_id id_table[] =3D {
->  =09{ 0 },
+> index 555bd61d8c38..9b00c3513120 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -76,6 +76,26 @@ const struct vfio_mdev_device_ops *mdev_get_vfio_ops(s=
+truct mdev_device *mdev)
+>  }
+>  EXPORT_SYMBOL(mdev_get_vfio_ops);
+> =20
+> +/* Specify the virtio device ops for the mdev device, this
+> + * must be called during create() callback for virtio mdev device.
+> + */
+> +void mdev_set_virtio_ops(struct mdev_device *mdev,
+> +=09=09=09 const struct virtio_mdev_device_ops *virtio_ops)
+> +{
+> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VIRTIO);
+> +=09mdev->virtio_ops =3D virtio_ops;
+> +}
+> +EXPORT_SYMBOL(mdev_set_virtio_ops);
+> +
+> +/* Get the virtio device ops for the mdev device. */
+> +const struct virtio_mdev_device_ops *
+> +mdev_get_virtio_ops(struct mdev_device *mdev)
+> +{
+> +=09WARN_ON(mdev->class_id !=3D MDEV_CLASS_ID_VIRTIO);
+> +=09return mdev->virtio_ops;
+> +}
+> +EXPORT_SYMBOL(mdev_get_virtio_ops);
+> +
+>  struct device *mdev_dev(struct mdev_device *mdev)
+>  {
+>  =09return &mdev->dev;
+> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_pr=
+ivate.h
+> index 0770410ded2a..7b47890c34e7 100644
+> --- a/drivers/vfio/mdev/mdev_private.h
+> +++ b/drivers/vfio/mdev/mdev_private.h
+> @@ -11,6 +11,7 @@
+>  #define MDEV_PRIVATE_H
+> =20
+>  #include <linux/vfio_mdev_ops.h>
+> +#include <linux/virtio_mdev_ops.h>
+> =20
+>  int  mdev_bus_register(void);
+>  void mdev_bus_unregister(void);
+> @@ -38,6 +39,7 @@ struct mdev_device {
+>  =09u16 class_id;
+>  =09union {
+>  =09=09const struct vfio_mdev_device_ops *vfio_ops;
+> +=09=09const struct virtio_mdev_device_ops *virtio_ops;
+>  =09};
 >  };
 > =20
-> +MODULE_DEVICE_TABLE(mdev, id_table);
-> +
-
-Two questions, first we have:
-
-#define MODULE_DEVICE_TABLE(type, name)                                 \
-extern typeof(name) __mod_##type##__##name##_device_table               \
-  __attribute__ ((unused, alias(__stringify(name))))
-
-Therefore we're defining __mod_mdev__id_table_device_table with alias
-id_table.  When the virtio mdev bus driver is added in 5/6 it uses the
-same name value.  I see virtio types all register this way (virtio,
-id_table), so I assume there's no conflict, but pci types mostly (not
-entirely) seem to use unique names.  Is there a preference to one way
-or the other or it simply doesn't matter?
-
->  static struct mdev_driver vfio_mdev_driver =3D {
->  =09.name=09=3D "vfio_mdev",
->  =09.probe=09=3D vfio_mdev_probe,
-> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetable-=
-offsets.c
-> index 054405b90ba4..6cbb1062488a 100644
-> --- a/scripts/mod/devicetable-offsets.c
-> +++ b/scripts/mod/devicetable-offsets.c
-> @@ -231,5 +231,8 @@ int main(void)
->  =09DEVID(wmi_device_id);
->  =09DEVID_FIELD(wmi_device_id, guid_string);
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 4625f1a11014..9b69b0bbebfd 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -17,6 +17,7 @@
 > =20
-> +=09DEVID(mdev_class_id);
-> +=09DEVID_FIELD(mdev_class_id, id);
-> +
->  =09return 0;
->  }
-> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-> index c91eba751804..d365dfe7c718 100644
-> --- a/scripts/mod/file2alias.c
-> +++ b/scripts/mod/file2alias.c
-> @@ -1335,6 +1335,15 @@ static int do_wmi_entry(const char *filename, void=
- *symval, char *alias)
->  =09return 1;
->  }
+>  struct mdev_device;
+>  struct vfio_mdev_device_ops;
+> +struct virtio_mdev_device_ops;
 > =20
-> +/* looks like: "mdev:cN" */
-> +static int do_mdev_entry(const char *filename, void *symval, char *alias=
-)
-> +{
-> +=09DEF_FIELD(symval, mdev_class_id, id);
+>  /*
+>   * Called by the parent device driver to set the device which represents
+> @@ -112,6 +113,10 @@ void mdev_set_class(struct mdev_device *mdev, u16 id=
+);
+>  void mdev_set_vfio_ops(struct mdev_device *mdev,
+>  =09=09       const struct vfio_mdev_device_ops *vfio_ops);
+>  const struct vfio_mdev_device_ops *mdev_get_vfio_ops(struct mdev_device =
+*mdev);
+> +void mdev_set_virtio_ops(struct mdev_device *mdev,
+> +=09=09=09 const struct virtio_mdev_device_ops *virtio_ops);
+> +const struct virtio_mdev_device_ops *
+> +mdev_get_virtio_ops(struct mdev_device *mdev);
+> =20
+>  extern struct bus_type mdev_bus_type;
+> =20
+> @@ -127,6 +132,7 @@ struct mdev_device *mdev_from_dev(struct device *dev)=
+;
+> =20
+>  enum {
+>  =09MDEV_CLASS_ID_VFIO =3D 1,
+> +=09MDEV_CLASS_ID_VIRTIO =3D 2,
+>  =09/* New entries must be added here */
+>  };
+> =20
+> diff --git a/include/linux/virtio_mdev_ops.h b/include/linux/virtio_mdev_=
+ops.h
+> new file mode 100644
+> index 000000000000..d417b41f2845
+> --- /dev/null
+> +++ b/include/linux/virtio_mdev_ops.h
+> @@ -0,0 +1,159 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Virtio mediated device driver
+> + *
+> + * Copyright 2019, Red Hat Corp.
+> + *     Author: Jason Wang <jasowang@redhat.com>
+> + */
+> +#ifndef _LINUX_VIRTIO_MDEV_H
+> +#define _LINUX_VIRTIO_MDEV_H
 > +
-> +=09sprintf(alias, "mdev:c%02X", id);
+> +#include <linux/interrupt.h>
+> +#include <linux/mdev.h>
+> +#include <uapi/linux/vhost.h>
+> +
+> +#define VIRTIO_MDEV_DEVICE_API_STRING=09=09"virtio-mdev"
+> +#define VIRTIO_MDEV_F_VERSION_1 0x1
+> +
+> +struct virtio_mdev_callback {
+> +=09irqreturn_t (*callback)(void *data);
+> +=09void *private;
+> +};
+> +
+> +/**
+> + * struct vfio_mdev_device_ops - Structure to be registered for each
+> + * mdev device to register the device for virtio/vhost drivers.
+> + *
+> + * The device ops that is supported by VIRTIO_MDEV_F_VERSION_1, the
+> + * callbacks are mandatory unless explicity mentioned.
 
-A lot of entries call add_wildcard() here, should we?  Sorry for the
-basic questions, I haven't played in this code.  Thanks,
+If the version of the callbacks is returned by a callback within the
+structure defined by the version... isn't that a bit circular?  This
+seems redundant to me versus the class id.  The fact that the parent
+driver defines the device as MDEV_CLASS_ID_VIRTIO should tell us this
+already.  If it was incremented, we'd need an MDEV_CLASS_ID_VIRTIOv2,
+which the virtio-mdev bus driver could add to its id table and handle
+differently.
 
+> + *
+> + * @set_vq_address:=09=09Set the address of virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09@desc_area: address of desc area
+> + *=09=09=09=09@driver_area: address of driver area
+> + *=09=09=09=09@device_area: address of device area
+> + *=09=09=09=09Returns integer: success (0) or error (< 0)
+> + * @set_vq_num:=09=09=09Set the size of virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09@num: the size of virtqueue
+> + * @kick_vq:=09=09=09Kick the virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + * @set_vq_cb:=09=09=09Set the interrupt callback function for
+> + *=09=09=09=09a virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09@cb: virtio-mdev interrupt callback structure
+> + * @set_vq_ready:=09=09Set ready status for a virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09@ready: ready (true) not ready(false)
+> + * @get_vq_ready:=09=09Get ready status for a virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09Returns boolean: ready (true) or not (false)
+> + * @set_vq_state:=09=09Set the state for a virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09@state: virtqueue state (last_avail_idx)
+> + *=09=09=09=09Returns integer: success (0) or error (< 0)
+> + * @get_vq_state:=09=09Get the state for a virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@idx: virtqueue index
+> + *=09=09=09=09Returns virtqueue state (last_avail_idx)
+> + * @get_vq_align:=09=09Get the virtqueue align requirement
+> + *=09=09=09=09for the device
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns virtqueue algin requirement
+> + * @get_features:=09=09Get virtio features supported by the device
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns the virtio features support by the
+> + *=09=09=09=09device
+> + * @get_features:=09=09Set virtio features supported by the driver
+       ^ s/g/s/
+
+Thanks,
 Alex
 
-> +=09return 1;
-> +}
+
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@features: feature support by the driver
+> + *=09=09=09=09Returns integer: success (0) or error (< 0)
+> + * @set_config_cb:=09=09Set the config interrupt callback
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@cb: virtio-mdev interrupt callback structure
+> + * @get_vq_num_max:=09=09Get the max size of virtqueue
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns u16: max size of virtqueue
+> + * @get_device_id:=09=09Get virtio device id
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns u32: virtio device id
+> + * @get_vendor_id:=09=09Get id for the vendor that provides this device
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns u32: virtio vendor id
+> + * @get_status:=09=09=09Get the device status
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns u8: virtio device status
+> + * @set_status:=09=09=09Set the device status
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@status: virtio device status
+> + * @get_config:=09=09=09Read from device specific configuration space
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@offset: offset from the beginning of
+> + *=09=09=09=09configuration space
+> + *=09=09=09=09@buf: buffer used to read to
+> + *=09=09=09=09@len: the length to read from
+> + *=09=09=09=09configration space
+> + * @set_config:=09=09=09Write to device specific configuration space
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09@offset: offset from the beginning of
+> + *=09=09=09=09configuration space
+> + *=09=09=09=09@buf: buffer used to write from
+> + *=09=09=09=09@len: the length to write to
+> + *=09=09=09=09configration space
+> + * @get_mdev_features:=09=09Get a set of bits that demonstrate
+> + *=09=09=09=09thecapability of the mdev device. New
+> + *=09=09=09=09features bits must be added when
+> + *=09=09=09=09introducing new device ops.
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns the mdev features (API) support by
+> + *=09=09=09=09the device.
+> + * @get_generation:=09=09Get device config generaton (optionally)
+> + *=09=09=09=09@mdev: mediated device
+> + *=09=09=09=09Returns u32: device generation
+> + */
+> +struct virtio_mdev_device_ops {
+> +=09/* Virtqueue ops */
+> +=09int (*set_vq_address)(struct mdev_device *mdev,
+> +=09=09=09      u16 idx, u64 desc_area, u64 driver_area,
+> +=09=09=09      u64 device_area);
+> +=09void (*set_vq_num)(struct mdev_device *mdev, u16 idx, u32 num);
+> +=09void (*kick_vq)(struct mdev_device *mdev, u16 idx);
+> +=09void (*set_vq_cb)(struct mdev_device *mdev, u16 idx,
+> +=09=09=09  struct virtio_mdev_callback *cb);
+> +=09void (*set_vq_ready)(struct mdev_device *mdev, u16 idx, bool ready);
+> +=09bool (*get_vq_ready)(struct mdev_device *mdev, u16 idx);
+> +=09int (*set_vq_state)(struct mdev_device *mdev, u16 idx, u64 state);
+> +=09u64 (*get_vq_state)(struct mdev_device *mdev, u16 idx);
 > +
->  /* Does namelen bytes of name exactly match the symbol? */
->  static bool sym_is(const char *name, unsigned namelen, const char *symbo=
-l)
->  {
-> @@ -1407,6 +1416,7 @@ static const struct devtable devtable[] =3D {
->  =09{"typec", SIZE_typec_device_id, do_typec_entry},
->  =09{"tee", SIZE_tee_client_device_id, do_tee_entry},
->  =09{"wmi", SIZE_wmi_device_id, do_wmi_entry},
-> +=09{"mdev", SIZE_mdev_class_id, do_mdev_entry},
->  };
-> =20
->  /* Create MODULE_ALIAS() statements.
+> +=09/* Virtio device ops */
+> +=09u16 (*get_vq_align)(struct mdev_device *mdev);
+> +=09u64 (*get_features)(struct mdev_device *mdev);
+> +=09int (*set_features)(struct mdev_device *mdev, u64 features);
+> +=09void (*set_config_cb)(struct mdev_device *mdev,
+> +=09=09=09      struct virtio_mdev_callback *cb);
+> +=09u16 (*get_vq_num_max)(struct mdev_device *mdev);
+> +=09u32 (*get_device_id)(struct mdev_device *mdev);
+> +=09u32 (*get_vendor_id)(struct mdev_device *mdev);
+> +=09u8 (*get_status)(struct mdev_device *mdev);
+> +=09void (*set_status)(struct mdev_device *mdev, u8 status);
+> +=09void (*get_config)(struct mdev_device *mdev, unsigned int offset,
+> +=09=09=09   void *buf, unsigned int len);
+> +=09void (*set_config)(struct mdev_device *mdev, unsigned int offset,
+> +=09=09=09   const void *buf, unsigned int len);
+> +=09u32 (*get_generation)(struct mdev_device *mdev);
+> +
+> +=09/* Mdev device ops */
+> +=09u64 (*get_mdev_features)(struct mdev_device *mdev);
+> +};
+> +
+> +void mdev_set_virtio_ops(struct mdev_device *mdev,
+> +=09=09=09 const struct virtio_mdev_device_ops *virtio_ops);
+> +
+> +#endif
 
