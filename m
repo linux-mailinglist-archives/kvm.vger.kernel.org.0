@@ -2,81 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED67AE15B2
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 11:25:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76DB6E15E2
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 11:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403833AbfJWJZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 05:25:32 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:41720 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390165AbfJWJZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 05:25:32 -0400
-Received: by mail-oi1-f195.google.com with SMTP id g81so16765442oib.8;
-        Wed, 23 Oct 2019 02:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xOZIycxZoqDAGz7KsgdDi2o13zCj8SvRA6Ip/qqhkN4=;
-        b=twcPcqGtCkg8qT8yn47hunfOfw+d+KpXEL4mUyrwplPziE14jeztgY4tPCwGjUx7Ws
-         WdQjh38gNveMYTvtoy9dc+Fn28KbMlcvMUM+uGVsK8/K+vRoU/M3U9X/PGum0C7l4Kxg
-         oVMAr7g/i2+e8e7MgH8dv1OEyU8vYx3HS+53lt3mt2s6WKukF+/fPrsSFg08EoqSQ4q6
-         d2aLpUG0Cvyt2ZmZvOLWEqwk8IQUxpRV0L3M/Y+rfCwiJvk0WfMxoR0BHcp9vZLf+wMt
-         +UXXPD5GVryfCOYTg8AkcHXGn1WmFdPwGm95M/GOT41xCuv5jMM2YZrNyPoihHiv12SF
-         Y/2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xOZIycxZoqDAGz7KsgdDi2o13zCj8SvRA6Ip/qqhkN4=;
-        b=UJJFkPtnHhqOQaqn85hVRP9CAbvhdkDvNSNo5zGFWH02gMOpg0x+svLBuAiso3dnEA
-         N9PQ3zorQN+r6ROu9oYWh2Zhi5qL+tCAx0s4D2dvqT9mMtUyjTGJVilQK1whfV1oPwSq
-         rq401aJ8y0NBkyA24qQV3tKJPiBG8yMQCIHpk6lDR8pbaqO0TL4jnU3SvDVy1Wx450oR
-         bjnwNyT35PQFzt0NCKOwiMB48pZyYDy9NgM1BmqiP5eSWm3CcXEzMO6CwWaXR6WjwBKe
-         w+5862p+5+O0hor7RJYaSD4gLcS5b4qERt9SyTbc/iykFCX5V6uXWYluzZUvgQ/qRA1p
-         QX5Q==
-X-Gm-Message-State: APjAAAXwuX5oqGjhViX15lVJj2R3R4PXLdpcf+gTcbD19CUcdvZiHBHi
-        9E+ty9bSoeOkv6KwECgN1cbt0yRBggmxmDTTBtUhgws7
-X-Google-Smtp-Source: APXvYqxxcFA1OOhndJaGrk3WmTXq5vzdwjt8psRrLguMLfS6Ok88KCFLKHP7jg+QX/vN/EnTszqMoYw6V03i+z1uqIU=
-X-Received: by 2002:aca:39d6:: with SMTP id g205mr6761955oia.33.1571822731462;
- Wed, 23 Oct 2019 02:25:31 -0700 (PDT)
+        id S2403928AbfJWJ3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 05:29:39 -0400
+Received: from [217.140.110.172] ([217.140.110.172]:45844 "EHLO foss.arm.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1732648AbfJWJ3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 05:29:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 699E54F2;
+        Wed, 23 Oct 2019 02:29:15 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E83E23F718;
+        Wed, 23 Oct 2019 02:29:14 -0700 (PDT)
+Date:   Wed, 23 Oct 2019 11:29:13 +0200
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 02/15] KVM: Don't free new memslot if allocation of
+ said memslot fails
+Message-ID: <20191023092913.GE2652@e113682-lin.lund.arm.com>
+References: <20191022003537.13013-1-sean.j.christopherson@intel.com>
+ <20191022003537.13013-3-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
-References: <1561682593-12071-1-git-send-email-wanpengli@tencent.com>
- <20190628011012.GA19488@lerouge> <CANRm+CxUpwZ9KwOcQp=Ok64giyjjcJOGb2=zU6vayQzLqYvpXQ@mail.gmail.com>
- <alpine.DEB.2.21.1910231028250.2308@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1910231028250.2308@nanos.tec.linutronix.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 23 Oct 2019 17:25:20 +0800
-Message-ID: <CANRm+Cx41peFT9WpqGjZcYDHiXsSAoJ-ONgO-c9t6cJ0puQQuQ@mail.gmail.com>
-Subject: Re: [PATCH v2] sched/nohz: Optimize get_nohz_timer_target()
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191022003537.13013-3-sean.j.christopherson@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 at 16:29, Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Wed, 23 Oct 2019, Wanpeng Li wrote:
-> > I didn't see your refactor to get_nohz_timer_target() which you
-> > mentioned in IRC after four months, I can observe cyclictest drop from
-> > 4~5us to 8us in kvm guest(we offload the lapic timer emulation to
-> > housekeeping cpu to avoid timer fire external interrupt on the pCPU
-> > which vCPU resident incur a vCPU vmexit) w/o this patch in the case of
-> > there is no busy housekeeping cpu. The score can be recovered after I
-> > give stress to create a busy housekeeping cpu.
-> >
-> > Could you consider applying this patch for temporary since I'm not
-> > sure when the refactor can be ready.
->
-> Yeah. It's delayed (again).... Will pick that up.
+On Mon, Oct 21, 2019 at 05:35:24PM -0700, Sean Christopherson wrote:
+> The two implementations of kvm_arch_create_memslot() in x86 and PPC are
+> both good citizens and free up all local resources if creation fails.
+> Return immediately (via a superfluous goto) instead of calling
+> kvm_free_memslot().
+> 
+> Note, the call to kvm_free_memslot() is effectively an expensive nop in
+> this case as there are no resources to be freed.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 9afd706dc038..2cb38b2148cb 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1014,7 +1014,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  		new.userspace_addr = mem->userspace_addr;
+>  
+>  		if (kvm_arch_create_memslot(kvm, &new, npages))
+> -			goto out_free;
+> +			goto out;
+>  	}
+>  
+>  	/* Allocate page dirty bitmap if needed */
+> -- 
+> 2.22.0
+> 
 
-Sorry, you will pick up the patch or refactor? :)
-
-    Wanpeng
+Acked-by: Christoffer Dall <christoffer.dall@arm.com>
