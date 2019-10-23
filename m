@@ -2,112 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B03E2E149C
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 10:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 72B0BE1535
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 11:04:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390534AbfJWIrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 04:47:23 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42155 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390391AbfJWIrX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Oct 2019 04:47:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571820443;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BjjrmiYhb9Vayn2zyhbA3JP+Y6pXaN5xQ7y6mWAzc94=;
-        b=MRIBlxmcREaBIHvecheq5wXk9CmDZooKvRO1F4Andz3dd6w2WdVyk7LqMgqJorlUj7/jB2
-        YJz2/l8IDRPQzIub66PerPgn5P+EKIMyg+gVGBMwa/YaaTA1XDg373dvTYmtQmiWBYy56J
-        ck2ywKISxaKpxgELhT9anfJa0mJ7gAE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-OG6Gno-9MXyx5AsQZJzjWw-1; Wed, 23 Oct 2019 04:47:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3ED9800D54;
-        Wed, 23 Oct 2019 08:47:18 +0000 (UTC)
-Received: from [10.36.117.79] (ovpn-117-79.ams2.redhat.com [10.36.117.79])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1EB55DD79;
-        Wed, 23 Oct 2019 08:47:17 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] s390x: Fix selftest malloc check
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com
-References: <20191023084017.13142-1-frankja@linux.ibm.com>
- <b5363884-7360-ffc4-b572-f1942cbfae20@redhat.com>
- <cce26d3f-83d5-09e8-7a22-de37a2d117dc@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <c0710aad-7e40-5f4a-8608-5b5132379baa@redhat.com>
-Date:   Wed, 23 Oct 2019 10:47:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S2390846AbfJWJDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 05:03:47 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:35189 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390828AbfJWJDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 05:03:46 -0400
+Received: by mail-wm1-f68.google.com with SMTP id v6so1839673wmj.0
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 02:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=roq6c70I9GjqFiiJIml3zwcN2Gf7Xs/5uP2UjYMVVNs=;
+        b=tXiLamF0x3ALrB7lD6lXpSU2Bnm1OzuFcUxDSPnSK3yenyUrvbtMJBI6BxvWXdhM3U
+         BWrZPYfRxiAuIv2Fdg5WSwlkTzN0SZNEY9WiBp2XUKOdseqauAMqLKPkno/8iPu/VzBW
+         mrRCp3E5QS0LlE7JigmxCBwRA1FOMA3PSKFcUFJrVhgAWcRita3AjP5FOKSxQ6Srl6f1
+         lsZqIeKPwxEofFw0kVRld225z6Kor2VGszeP7GoeKte6zNd5FhymqOZFagZP4UjSVsbi
+         +3epGUgSk2oSe3d/fht0fiCMtNHwLt/uhTqmy89Utzgedi89fKvTGYsfdJbSw2kyyJeB
+         lpOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=roq6c70I9GjqFiiJIml3zwcN2Gf7Xs/5uP2UjYMVVNs=;
+        b=pautK0Megws82af+DnxbsSIKNJwG/5viIY3mxdbQBqgAvXeu2yGC95DHWt/VYK7OrP
+         /xMswAoypmTyDJraP/hvsAA6fE/VKT4Ku1h35Id5CbA7EBZo52HS1iXQbKe+NDFPjwiU
+         WYuXeO2gKEOMtnyQLZF+pffsrL+5EXN3fCm1lWkwZPzFc+0vpQNCss735i3YGwvZk7N2
+         Ghd9EzGvgACNW0+VadnRJ2y149vpD/CJ6pePsgdAjrGR+TwH5sRBX2BYZ82/Q/d+Sl2B
+         sCQF3RG+T/FB/GSqmv26OUnqY9dynDdHamCYYWKLNIxA1pJov4uFi4mIg35UifOuMnGC
+         JGdA==
+X-Gm-Message-State: APjAAAVfElO81ex0kcPShTrQH4H6NV6ArfkcjHXaMDVhikQc6AocMmyG
+        qU6K3z84ev2KFJWhVl+1Z3+fEYCG
+X-Google-Smtp-Source: APXvYqwyaVs2q4cjr8NVZAnNe9P2nAAKovR3WDd064gNU86GlGf8WQEeggEyxZDqHmZR3fJGJIwM1w==
+X-Received: by 2002:a7b:c24a:: with SMTP id b10mr6693651wmj.124.1571821424052;
+        Wed, 23 Oct 2019 02:03:44 -0700 (PDT)
+Received: from donizetti.lan ([2001:b07:6468:f312:51de:b137:4c45:7cea])
+        by smtp.gmail.com with ESMTPSA id u7sm14997531wre.59.2019.10.23.02.03.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2019 02:03:43 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>
+Subject: [PATCH kvm-unit-tests] Revert "lib: use an argument which doesn't require default argument promotion"
+Date:   Wed, 23 Oct 2019 11:03:43 +0200
+Message-Id: <20191023090343.7064-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <cce26d3f-83d5-09e8-7a22-de37a2d117dc@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: OG6Gno-9MXyx5AsQZJzjWw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.10.19 10:45, Janosch Frank wrote:
-> On 10/23/19 10:41 AM, David Hildenbrand wrote:
->> On 23.10.19 10:40, Janosch Frank wrote:
->>> Commit c09c54c ("lib: use an argument which doesn't require default
->>> argument promotion") broke the selftest. Let's fix it by converting
->>> the binary operations to bool.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>    s390x/selftest.c | 4 ++--
->>>    1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/s390x/selftest.c b/s390x/selftest.c
->>> index f4acdc4..9cd6943 100644
->>> --- a/s390x/selftest.c
->>> +++ b/s390x/selftest.c
->>> @@ -49,9 +49,9 @@ static void test_malloc(void)
->>>    =09*tmp2 =3D 123456789;
->>>    =09mb();
->>>   =20
->>> -=09report("malloc: got vaddr", (uintptr_t)tmp & 0xf000000000000000ul);
->>> +=09report("malloc: got vaddr", !!((uintptr_t)tmp & 0xf000000000000000u=
-l));
->>>    =09report("malloc: access works", *tmp =3D=3D 123456789);
->>> -=09report("malloc: got 2nd vaddr", (uintptr_t)tmp2 & 0xf00000000000000=
-0ul);
->>> +=09report("malloc: got 2nd vaddr", !!((uintptr_t)tmp2 & 0xf00000000000=
-0000ul));
->>>    =09report("malloc: access works", (*tmp2 =3D=3D 123456789));
->>>    =09report("malloc: addresses differ", tmp !=3D tmp2);
->>>   =20
->>>
->>
->> See
->>
->> https://lore.kernel.org/kvm/CAGG=3D3QUdVBg5JArMaBcRbBLrHqLLCpAcrtvgT4q1h=
-0V7SHbbEQ@mail.gmail.com/T/
->>
->=20
-> I completely missed that patch and only looked for fixpatches on the
-> list -_-
->=20
-> If possible CC me if something like this turns up, so I don't have the
-> CI flashing red lights at me unexpectedly :)
+This reverts commit c09c54c66b1df63cd11a75859cf53527d1c6e959.
+The s390x selftest, for example, passes a uintptr_t whose nonzero bits
+are all above bit 31.  Therefore, the argument is truncated to zero if
+it is unsigned rather than bool.
 
-Will do in case I don't forget :)
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ lib/libcflat.h | 4 ++--
+ lib/report.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
---=20
-
-Thanks,
-
-David / dhildenb
+diff --git a/lib/libcflat.h b/lib/libcflat.h
+index b6635d9..b94d0ac 100644
+--- a/lib/libcflat.h
++++ b/lib/libcflat.h
+@@ -99,9 +99,9 @@ void report_prefix_pushf(const char *prefix_fmt, ...)
+ 					__attribute__((format(printf, 1, 2)));
+ extern void report_prefix_push(const char *prefix);
+ extern void report_prefix_pop(void);
+-extern void report(const char *msg_fmt, unsigned pass, ...)
++extern void report(const char *msg_fmt, bool pass, ...)
+ 					__attribute__((format(printf, 1, 3)));
+-extern void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
++extern void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+ 					__attribute__((format(printf, 1, 4)));
+ extern void report_abort(const char *msg_fmt, ...)
+ 					__attribute__((format(printf, 1, 2)))
+diff --git a/lib/report.c b/lib/report.c
+index 2a5f549..ca9b4fd 100644
+--- a/lib/report.c
++++ b/lib/report.c
+@@ -104,7 +104,7 @@ static void va_report(const char *msg_fmt,
+ 	spin_unlock(&lock);
+ }
+ 
+-void report(const char *msg_fmt, unsigned pass, ...)
++void report(const char *msg_fmt, bool pass, ...)
+ {
+ 	va_list va;
+ 	va_start(va, pass);
+@@ -112,7 +112,7 @@ void report(const char *msg_fmt, unsigned pass, ...)
+ 	va_end(va);
+ }
+ 
+-void report_xfail(const char *msg_fmt, bool xfail, unsigned pass, ...)
++void report_xfail(const char *msg_fmt, bool xfail, bool pass, ...)
+ {
+ 	va_list va;
+ 	va_start(va, pass);
+-- 
+2.21.0
 
