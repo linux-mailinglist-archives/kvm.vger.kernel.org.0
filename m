@@ -2,150 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4638CE2651
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:22:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74A95E265D
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:24:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407728AbfJWWWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 18:22:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53940 "EHLO mail.kernel.org"
+        id S2436812AbfJWWYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 18:24:43 -0400
+Received: from mga03.intel.com ([134.134.136.65]:31336 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389112AbfJWWWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 18:22:18 -0400
-Received: from akpm3.svl.corp.google.com (unknown [104.133.8.65])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E28112173B;
-        Wed, 23 Oct 2019 22:22:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571869337;
-        bh=6Rbgh0+34r9cF1cQinXhfyAQRKfEhqrc9mI/6IrPXxw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Juvdf1ok/t8o2WngMzUbP/+XV4ybqjNmijrY09FnB08RG3NGsoLsiamQL+maUpXmO
-         tKJY8Zegt9n+3CzBYC60X379EO+qeCI6N7reZCJGGNqO70y5xuAHo77ekSmWKvri44
-         mwPmicsQP0sC+coJFExV89IehHmBhcoxII5e8jlM=
-Date:   Wed, 23 Oct 2019 15:22:16 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Alexander Potapenko <glider@google.com>,
-        Marco Elver <elver@google.com>
-Subject: Re: [PATCH v2 1/3] kcov: remote coverage support
-Message-Id: <20191023152216.796aeafd832ba5351d86d3ca@linux-foundation.org>
-In-Reply-To: <beeae42e313ef57b4630cc9f36e2e78ad42fd5b7.1571844200.git.andreyknvl@google.com>
-References: <cover.1571844200.git.andreyknvl@google.com>
-        <beeae42e313ef57b4630cc9f36e2e78ad42fd5b7.1571844200.git.andreyknvl@google.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S2405952AbfJWWYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 18:24:42 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 15:24:41 -0700
+X-IronPort-AV: E=Sophos;i="5.68,222,1569308400"; 
+   d="scan'208";a="191984438"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 15:24:41 -0700
+Message-ID: <29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com>
+Subject: Re: [PATCH v12 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, konrad.wilk@oracle.com, david@redhat.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Wed, 23 Oct 2019 15:24:41 -0700
+In-Reply-To: <c50e102c-f72e-df8a-714f-a33897ddbb9f@redhat.com>
+References: <20191022221223.17338.5860.stgit@localhost.localdomain>
+         <c50e102c-f72e-df8a-714f-a33897ddbb9f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 17:24:29 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+On Wed, 2019-10-23 at 07:35 -0400, Nitesh Narayan Lal wrote:
+> On 10/22/19 6:27 PM, Alexander Duyck wrote:
+> > This series provides an asynchronous means of reporting unused guest
+> > pages to a hypervisor so that the memory associated with those pages can
+> > be dropped and reused by other processes and/or guests.
+> > 
 
-> This patch adds background thread coverage collection ability to kcov.
-> 
-> With KCOV_ENABLE coverage is collected only for syscalls that are issued
-> from the current process. With KCOV_REMOTE_ENABLE it's possible to collect
-> coverage for arbitrary parts of the kernel code, provided that those parts
-> are annotated with kcov_remote_start()/kcov_remote_stop().
-> 
-> This allows to collect coverage from two types of kernel background
-> threads: the global ones, that are spawned during kernel boot and are
-> always running (e.g. USB hub_event()); and the local ones, that are
-> spawned when a user interacts with some kernel interface (e.g. vhost
-> workers).
-> 
-> To enable collecting coverage from a global background thread, a unique
-> global handle must be assigned and passed to the corresponding
-> kcov_remote_start() call. Then a userspace process can pass a list of such
-> handles to the KCOV_REMOTE_ENABLE ioctl in the handles array field of the
-> kcov_remote_arg struct. This will attach the used kcov device to the code
-> sections, that are referenced by those handles.
-> 
-> Since there might be many local background threads spawned from different
-> userspace processes, we can't use a single global handle per annotation.
-> Instead, the userspace process passes a non-zero handle through the
-> common_handle field of the kcov_remote_arg struct. This common handle gets
-> saved to the kcov_handle field in the current task_struct and needs to be
-> passed to the newly spawned threads via custom annotations. Those threads
-> should in turn be annotated with kcov_remote_start()/kcov_remote_stop().
-> 
-> Internally kcov stores handles as u64 integers. The top byte of a handle
-> is used to denote the id of a subsystem that this handle belongs to, and
-> the lower 4 bytes are used to denote a handle id within that subsystem.
-> A reserved value 0 is used as a subsystem id for common handles as they
-> don't belong to a particular subsystem. The bytes 4-7 are currently
-> reserved and must be zero. In the future the number of bytes used for the
-> subsystem or handle ids might be increased.
-> 
-> When a particular userspace proccess collects coverage by via a common
-> handle, kcov will collect coverage for each code section that is annotated
-> to use the common handle obtained as kcov_handle from the current
-> task_struct. However non common handles allow to collect coverage
-> selectively from different subsystems.
-> 
-> ...
->
-> +static struct kcov_remote *kcov_remote_add(struct kcov *kcov, u64 handle)
-> +{
-> +	struct kcov_remote *remote;
-> +
-> +	if (kcov_remote_find(handle))
-> +		return ERR_PTR(-EEXIST);
-> +	remote = kmalloc(sizeof(*remote), GFP_ATOMIC);
-> +	if (!remote)
-> +		return ERR_PTR(-ENOMEM);
-> +	remote->handle = handle;
-> +	remote->kcov = kcov;
-> +	hash_add(kcov_remote_map, &remote->hnode, handle);
-> +	return remote;
-> +}
-> +
->
-> ...
->
-> +		spin_lock(&kcov_remote_lock);
-> +		for (i = 0; i < remote_arg->num_handles; i++) {
-> +			kcov_debug("handle %llx\n", remote_arg->handles[i]);
-> +			if (!kcov_check_handle(remote_arg->handles[i],
-> +						false, true, false)) {
-> +				spin_unlock(&kcov_remote_lock);
-> +				kcov_disable(t, kcov);
-> +				return -EINVAL;
-> +			}
-> +			remote = kcov_remote_add(kcov, remote_arg->handles[i]);
-> +			if (IS_ERR(remote)) {
-> +				spin_unlock(&kcov_remote_lock);
-> +				kcov_disable(t, kcov);
-> +				return PTR_ERR(remote);
-> +			}
-> +		}
+<snip>
 
-It's worrisome that this code can perform up to 65536 GFP_ATOMIC
-allocations without coming up for air.  The possibility of ENOMEM or of
-causing collateral problems is significant.  It doesn't look too hard
-to change this to use GFP_KERNEL?
+> > 
+> I think Michal Hocko suggested us to include a brief detail about the background
+> explaining how we ended up with the current approach and what all things we have
+> already tried.
+> That would help someone reviewing the patch-series for the first time to
+> understand it in a better way.
 
-> +u64 kcov_common_handle(void)
-> +{
-> +	return current->kcov_handle;
-> +}
+I'm not entirely sure it helps. The problem is that even the "brief"
+version will probably be pretty long.
 
-I don't immediately understand what this "common handle" thing is all about. 
-Code is rather lacking in this sort of high-level commentary?
+From what I know the first real public discussion of guest memory
+overcommit and free page hinting dates back to the 2011 KVM forum and a
+presentation by Rik van Riel[0].
 
+Before I got started in the code there was already virtio-balloon free
+page hinting[1]. However it was meant to be an all-at-once reporting of
+the free pages in the system at a given point in time, and used only for
+VM migration. All it does is inflate a balloon until it encounters an OOM
+and then it frees the memory back to the guest. One interesting piece that
+came out of the work on that patch set was the suggestion by Linus to use
+an array based incremental approach[2] which is what I based my later
+implementation on.
+
+I believe Nitesh had already been working on his own approach for unused
+page hinting for some time at that point. Prior to submitting my RFC there
+was already a v7 that had been submitted by Nitesh back in mid 2018[3].
+The solution was an array based approach which appeared to instrument
+arch_alloc_page and arch_free_page and would prevent allocations while
+hinting was occurring.
+
+The first RFC I had written[4] was a synchronous approach that made use of
+arch_free_page to make a hypercall that would immediately flag the page as
+being unused. However a hypercall per page can be expensive and we ideally
+don't want the guest vCPU potentially being hung up while waiting on the
+host mmap_sem.
+
+At about this time I believe Nitesh's solution[5] was still trying to keep
+an array of pages that were unused and tracking that via arch_free_page.
+In the synchronous case it could cause OOM errors, and in the asynchronous
+approach it had issues with being overrun and not being able to track
+unused pages.
+
+Later I switched to an asynchronous approach[6], originally calling it
+"bubble hinting". With the asynchronous approach it is necessary to have a
+way to track what pages have been reported and what haven't. I originally
+was using the page type to track it as I had a Buddy and a TreatedBuddy,
+but ultimately that moved to a "Reported" page flag. In addition I pulled
+the counters and pointers out of the free_area/free_list  and instead now
+have a stand-alone set of pointers and keep the reported statistics in a
+separate dynamic allocation.
+
+Then Nitesh's solution had changed to the bitmap approach[7]. However it
+has been pointed out that this solution doesn't deal with sparse memory,
+hotplug, and various other issues.
+
+Since then both my approach and Nitesh's approach have been iterating with
+mostly minor changes.
+
+[0]: https://www.linux-kvm.org/images/f/ff/2011-forum-memory-overcommit.pdf
+[1]: https://lore.kernel.org/lkml/1535333539-32420-1-git-send-email-wei.w.wang@intel.com/
+[2]: https://lore.kernel.org/lkml/CA+55aFzqj8wxXnHAdUTiOomipgFONVbqKMjL_tfk7e5ar1FziQ@mail.gmail.com/
+[3]: https://www.spinics.net/lists/kvm/msg170113.html
+[4]: https://lore.kernel.org/lkml/20190204181118.12095.38300.stgit@localhost.localdomain/
+[5]: https://lore.kernel.org/lkml/20190204201854.2328-1-nitesh@redhat.com/
+[6]: https://lore.kernel.org/lkml/20190530215223.13974.22445.stgit@localhost.localdomain/
+[7]: https://lore.kernel.org/lkml/20190603170306.49099-1-nitesh@redhat.com/
 
