@@ -2,120 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE12CE1464
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 10:37:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D1BBE147B
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 10:40:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390417AbfJWIh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 04:37:26 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:40622 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390267AbfJWIhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 04:37:25 -0400
-Received: by mail-qt1-f196.google.com with SMTP id o49so23282642qta.7
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 01:37:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8lz7pb4FteEgyJv9IPQ/OLCtPnphrxWGvxhOP9Cg5xg=;
-        b=JwTjN6vydN0+Zf4u7pB30rwoE59an2gXmw4CK43Gw2mUgwv6sHB8dRu5ef+CPKrKi9
-         t37NRMXY7Pqn+GOXFnQVRUhDon6l/NVQ8pA0BemeHOS2xV5gnJeOluyURTVwqiqciHLr
-         qDsbygaUpKyOoJQGtYGQCZ1Z1qPmuIERBA+CkHYIsho9310tefDA69PATQdcjEBUxKvZ
-         zccwGPi/rBKb1ABlUBTM4DzoW7/ny0B2e4mksE9SWdW/VXPMMYWRkgwBwgTZmF6XoI/2
-         9Klci3Rpbj2E75wUXAhDRIwV2xUCPGOaB+CkTyurziCQ8SokD8YBhlXIMeY8vmxGNMh9
-         CpEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8lz7pb4FteEgyJv9IPQ/OLCtPnphrxWGvxhOP9Cg5xg=;
-        b=FZd28T3C/jvlLk+yJV9Q/QY0TsmWUGGMd3aHm4AgxdgSn2EiOlI4M8q3UzJNIVC57J
-         m2quCAbuzln7w9YhuyVoYwmHHy3rXXFRvRU9O8qQ3UQ7DqufmBtyh9MVCRDCVVPHxWI0
-         vLkO6yHXedBxXJI5W9N8RktFg3lPKI11ZRBYEx9fw9KcenGgkVtRNl7SY5KhnoqMkG5L
-         CUlfZVs33TJFxJTtfuYIQVVvgtT8ebtZWkq+orzuOQMji8nkEbDgDAdaWUtz1w94Xjvk
-         QNU4EgykUXCzD5sgDxLZ1UGdDAhva4TUhdtd07E6UHGTeOZjtuWmaZUFtHfhQlMajbwo
-         FluQ==
-X-Gm-Message-State: APjAAAXwGU4P1YtBCA1o6mDnTmAxInwk4HuWnsdSBr06w/F2jhjz1veI
-        FctTEHz7LbJ5cGhrsoL0Kg5ttVooarpG/e35DnNUfA==
-X-Google-Smtp-Source: APXvYqzx+Vk1M8As38RQ4hIHR6mJF2kC4m1fQbj0srob4XtBiTnVVZbS/2BQAN6f9QjBuuoyoWNpTyhH+FFLQW+4r9s=
-X-Received: by 2002:a0c:fec3:: with SMTP id z3mr7697922qvs.122.1571819843712;
- Wed, 23 Oct 2019 01:37:23 -0700 (PDT)
+        id S2390150AbfJWIka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 04:40:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43010 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2390034AbfJWIk3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Oct 2019 04:40:29 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9N8atcC023281
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 04:40:28 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vtgjrwr1w-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 04:40:28 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 23 Oct 2019 09:40:26 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 23 Oct 2019 09:40:23 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9N8eMNd41157048
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Oct 2019 08:40:23 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DB77611C050;
+        Wed, 23 Oct 2019 08:40:22 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02E5E11C058;
+        Wed, 23 Oct 2019 08:40:22 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.131])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 23 Oct 2019 08:40:21 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com
+Subject: [kvm-unit-tests PATCH] s390x: Fix selftest malloc check
+Date:   Wed, 23 Oct 2019 04:40:17 -0400
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <cover.1571762488.git.andreyknvl@google.com>
-In-Reply-To: <cover.1571762488.git.andreyknvl@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Wed, 23 Oct 2019 10:37:12 +0200
-Message-ID: <CACT4Y+aUf5_+U90BD=1FsS1vVFrH=kskkUJWFyg2cdeRjL1LVw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] kcov: collect coverage from usb and vhost
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     USB list <linux-usb@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19102308-0020-0000-0000-0000037CF971
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102308-0021-0000-0000-000021D339B5
+Message-Id: <20191023084017.13142-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-23_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=878 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910230086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 6:46 PM Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> This patchset extends kcov to allow collecting coverage from the USB
-> subsystem and vhost workers. See the first patch description for details
-> about the kcov extension. The other two patches apply this kcov extension
-> to USB and vhost.
->
-> These patches have been used to enable coverage-guided USB fuzzing with
-> syzkaller for the last few years, see the details here:
->
-> https://github.com/google/syzkaller/blob/master/docs/linux/external_fuzzing_usb.md
->
-> This patchset has been pushed to the public Linux kernel Gerrit instance:
->
-> https://linux-review.googlesource.com/c/linux/kernel/git/torvalds/linux/+/1524
+Commit c09c54c ("lib: use an argument which doesn't require default
+argument promotion") broke the selftest. Let's fix it by converting
+the binary operations to bool.
 
-Oh, so much easier to review with side-by-side diffs, context and
-smart in-line colouring!
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ s390x/selftest.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Changes from RFC v1:
-> - Remove unnecessary #ifdef's from drivers/vhost/vhost.c.
-> - Reset t->kcov when area allocation fails in kcov_remote_start().
-> - Use struct_size to calculate array size in kcov_ioctl().
-> - Add a limit on area_size in kcov_remote_arg.
-> - Added kcov_disable() helper.
-> - Changed encoding of kcov remote handle ids, see the documentation.
-> - Added a comment reference for kcov_sequence task_struct field.
-> - Change common_handle type to u32.
-> - Add checks for handle validity into kcov_ioctl_locked() and
->     kcov_remote_start().
-> - Updated documentation to reflect the changes.
->
-> Andrey Konovalov (3):
->   kcov: remote coverage support
->   usb, kcov: collect coverage from hub_event
->   vhost, kcov: collect coverage from vhost_worker
->
->  Documentation/dev-tools/kcov.rst | 120 ++++++++
->  drivers/usb/core/hub.c           |   5 +
->  drivers/vhost/vhost.c            |   6 +
->  drivers/vhost/vhost.h            |   1 +
->  include/linux/kcov.h             |   6 +
->  include/linux/sched.h            |   6 +
->  include/uapi/linux/kcov.h        |  20 ++
->  kernel/kcov.c                    | 464 ++++++++++++++++++++++++++++---
->  8 files changed, 593 insertions(+), 35 deletions(-)
->
-> --
-> 2.23.0.866.gb869b98d4c-goog
->
+diff --git a/s390x/selftest.c b/s390x/selftest.c
+index f4acdc4..9cd6943 100644
+--- a/s390x/selftest.c
++++ b/s390x/selftest.c
+@@ -49,9 +49,9 @@ static void test_malloc(void)
+ 	*tmp2 = 123456789;
+ 	mb();
+ 
+-	report("malloc: got vaddr", (uintptr_t)tmp & 0xf000000000000000ul);
++	report("malloc: got vaddr", !!((uintptr_t)tmp & 0xf000000000000000ul));
+ 	report("malloc: access works", *tmp == 123456789);
+-	report("malloc: got 2nd vaddr", (uintptr_t)tmp2 & 0xf000000000000000ul);
++	report("malloc: got 2nd vaddr", !!((uintptr_t)tmp2 & 0xf000000000000000ul));
+ 	report("malloc: access works", (*tmp2 == 123456789));
+ 	report("malloc: addresses differ", tmp != tmp2);
+ 
+-- 
+2.20.1
+
