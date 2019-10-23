@@ -2,86 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3721BE0F99
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 03:17:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F22FDE0FB3
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 03:32:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732556AbfJWBRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 21:17:02 -0400
-Received: from mga04.intel.com ([192.55.52.120]:50268 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727851AbfJWBRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 21:17:02 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 18:17:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,218,1569308400"; 
-   d="scan'208";a="372722536"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga005.jf.intel.com with ESMTP; 22 Oct 2019 18:17:00 -0700
-Date:   Wed, 23 Oct 2019 09:19:51 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
+        id S1733192AbfJWBcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 21:32:01 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41802 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732328AbfJWBcA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 21:32:00 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9N1TYmB187452;
+        Wed, 23 Oct 2019 01:29:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=96W3FPDJhryM0Yu0bJqmJW04IGZAfZeRYhjGh2J58yk=;
+ b=aAuGV7RIcAwioV8ozcoKQSHwwx8h7ou0osCQ5O/DEa+Io+3y2xmYwxFu4YwXRdPWk0m7
+ xt7INVTs6i7sMUxhVsdpeve1cJPMiArdV1mMOltn53x3o8YZEBWNV7jhclYD7ZYz+m4R
+ zGSeXEP6FMBPK+wrgCo4Wmv7AhiUO3fLC9EAXrQoTwV4eTcNqNOK2awevOZqGgD+ZECC
+ dgROHQRTux3+aHsJGtRWdcBHnwWZw++tRNva/4AV9udSp9W9gj7PoTdkiq7fwv8WPQgm
+ 1mfZDP4WHzyeAD1dHcsDwmtnSjCxvAgXeQ4kLNK2ugRl+KyCnMs9yEsKLTCInaA0I0B7 GQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2vqu4qt15m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Oct 2019 01:29:57 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9N1STcp088658;
+        Wed, 23 Oct 2019 01:29:56 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2vt2he7b79-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Oct 2019 01:29:56 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9N1TsJI021366;
+        Wed, 23 Oct 2019 01:29:54 GMT
+Received: from [10.191.28.118] (/10.191.28.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 22 Oct 2019 18:29:53 -0700
+Subject: Re: [PATCH v7 2/5] x86/kvm: Change print code to use pr_*() format
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v7 5/7] kvm: x86: Add CET CR4 bit and XSS support
-Message-ID: <20191023011951.GB27009@local-michael-cet-test>
-References: <20190927021927.23057-1-weijiang.yang@intel.com>
- <20190927021927.23057-6-weijiang.yang@intel.com>
- <CALMp9eStz-VCv5G60KFtumQ8W1Jqf9bOcK_=KwL1P3LLjgajnQ@mail.gmail.com>
- <20191017195642.GJ20903@linux.intel.com>
- <20191018015802.GD2286@local-michael-cet-test>
- <20191022201321.GN2343@linux.intel.com>
+Cc:     linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, pbonzini@redhat.com,
+        rkrcmar@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, boris.ostrovsky@oracle.com,
+        jgross@suse.com, peterz@infradead.org, will@kernel.org,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1571649076-2421-3-git-send-email-zhenzhong.duan@oracle.com>
+ <20191022210120.GQ2343@linux.intel.com>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <c72b01a4-f9a3-cc94-6e9a-3d7d576f232c@oracle.com>
+Date:   Wed, 23 Oct 2019 09:29:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191022201321.GN2343@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20191022210120.GQ2343@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910230012
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910230012
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 01:13:21PM -0700, Sean Christopherson wrote:
-> On Fri, Oct 18, 2019 at 09:58:02AM +0800, Yang Weijiang wrote:
-> > On Thu, Oct 17, 2019 at 12:56:42PM -0700, Sean Christopherson wrote:
-> > > On Wed, Oct 02, 2019 at 12:05:23PM -0700, Jim Mattson wrote:
-> > > > > +               u64 kvm_xss = kvm_supported_xss();
-> > > > > +
-> > > > > +               best->ebx =
-> > > > > +                       xstate_required_size(vcpu->arch.xcr0 | kvm_xss, true);
-> > > > 
-> > > > Shouldn't this size be based on the *current* IA32_XSS value, rather
-> > > > than the supported IA32_XSS bits? (i.e.
-> > > > s/kvm_xss/vcpu->arch.ia32_xss/)
-> > > 
-> > > Ya.
-> > >
-> > I'm not sure if I understand correctly, kvm_xss is what KVM supports,
-> > but arch.ia32_xss reflects what guest currently is using, shoudn't CPUID
-> > report what KVM supports instead of current status?
-> > Will CPUID match current IA32_XSS status if guest changes it runtime?
-> 
-> Not in this case.  Select CPUID output is dependent on current state as
-> opposed to being a constant defind by hardware.  Per the SDM, EBX is:
-> 
->   The size in bytes of the XSAVE area containing all states enabled by
->   XCRO | IA32_XSS
-> 
-> Since KVM is emulating CPUID for the guest, XCR0 and IA32_XSS in this
-> context refers to the guest's current/actual XCR0/IA32_XSS values.  The
-> purpose of this behavior is so that software can call CPUID to query the
-> actual amount of memory that is needed for XSAVE(S), as opposed to the
-> absolute max size that _might_ be needed.
-> 
-> MONITOR/MWAIT is the other case that comes to mind where CPUID dynamically
-> reflects configured state, e.g. MWAIT is reported as unsupported if it's
-> disabled via IA32_MISC_ENABLE MSR.
-Yep, make sense, thank you for explanation.
+
+On 2019/10/23 5:01, Sean Christopherson wrote:
+> On Mon, Oct 21, 2019 at 05:11:13PM +0800, Zhenzhong Duan wrote:
+>> pr_*() is preferred than printk(KERN_* ...), after change all the print
+>> in arch/x86/kernel/kvm.c will have "kvm_guest: xxx" style.
+>>
+>> No functional change.
+>>
+>> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Radim Krcmar <rkrcmar@redhat.com>
+>> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Cc: Wanpeng Li <wanpengli@tencent.com>
+>> Cc: Jim Mattson <jmattson@google.com>
+>> Cc: Joerg Roedel <joro@8bytes.org>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Ingo Molnar <mingo@redhat.com>
+>> Cc: Borislav Petkov <bp@alien8.de>
+>> Cc: "H. Peter Anvin" <hpa@zytor.com>
+>> ---
+>>   arch/x86/kernel/kvm.c | 30 ++++++++++++++++--------------
+>>   1 file changed, 16 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index 3bc6a266..249f14a 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -7,6 +7,8 @@
+>>    *   Authors: Anthony Liguori <aliguori@us.ibm.com>
+>>    */
+>>   
+>> +#define pr_fmt(fmt) "kvm_guest: " fmt
+> Sort of a silly nit, especially since I suggested kvm_guest...
+>
+> What about using kvm-guest instead of kvm_guest to be consistent with
+> kvm-clock, the other prolific logger in a KVM guest.
+>
+> E.g.
+>
+>    kvm-clock: cpu 1, msr 551e041, secondary cpu clock
+>    kvm-guest: setup async PF for cpu 1
+>    kvm-guest: stealtime: cpu 1, msr 277695f40
+>    kvm-clock: cpu 2, msr 551e081, secondary cpu clock
+>    kvm-guest: setup async PF for cpu 2
+>    kvm-guest: stealtime: cpu 2, msr 277715f40
+>    kvm-clock: cpu 3, msr 551e0c1, secondary cpu clock
+>    kvm-guest: setup async PF for cpu 3
+>    kvm-guest: stealtime: cpu 3, msr 277795f40
+>    kvm-clock: cpu 4, msr 551e101, secondary cpu clock
+>    
+> instead of
+>
+>    kvm-clock: cpu 1, msr 551e041, secondary cpu clock
+>    kvm_guest: setup async PF for cpu 1
+>    kvm_guest: stealtime: cpu 1, msr 277695f40
+>    kvm-clock: cpu 2, msr 551e081, secondary cpu clock
+>    kvm_guest: setup async PF for cpu 2
+>    kvm_guest: stealtime: cpu 2, msr 277715f40
+>    kvm-clock: cpu 3, msr 551e0c1, secondary cpu clock
+>    kvm_guest: setup async PF for cpu 3
+>    kvm_guest: stealtime: cpu 3, msr 277795f40
+>    kvm-clock: cpu 4, msr 551e101, secondary cpu clock
+
+Good suggestion, will do, thanks for point out.
+
+Zhenzhong
+
