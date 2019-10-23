@@ -2,126 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87A11E0EA1
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 01:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E4A7E0F29
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 02:23:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389778AbfJVXnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 19:43:25 -0400
-Received: from mga07.intel.com ([134.134.136.100]:55396 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732854AbfJVXnY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 19:43:24 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 16:43:23 -0700
-X-IronPort-AV: E=Sophos;i="5.68,218,1569308400"; 
-   d="scan'208";a="372703092"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 16:43:23 -0700
-Message-ID: <03b350f7de4b8f75cc3579e6c43f36aa09fd16b2.camel@linux.intel.com>
-Subject: Re: [PATCH v12 0/6] mm / virtio: Provide support for unused page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
-        david@redhat.com
-Cc:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        mgorman@techsingularity.net, vbabka@suse.cz,
-        yang.zhang.wz@gmail.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Tue, 22 Oct 2019 16:43:23 -0700
-In-Reply-To: <20191022160140.a6954868d59f47b36334b504@linux-foundation.org>
-References: <20191022221223.17338.5860.stgit@localhost.localdomain>
-         <20191022160140.a6954868d59f47b36334b504@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S1732523AbfJWAXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 20:23:49 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:36020 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728076AbfJWAXt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 20:23:49 -0400
+Received: by mail-pg1-f194.google.com with SMTP id 23so11002884pgk.3
+        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
+        b=PWMr/nMYg+m7WtNCPLVizhxiu8gyfLZI0qwKU6Yqp4oFhAsoLzwWin4tCq7I2oHIei
+         iAuxmHtpkNw44YwnJVo1QUoaReR9DmkDLXMTJedbn0+8dhb6RU6C+u9Ltmj4XbZ8fqWM
+         xP2Jj51dT1JuQLgl25G3zBtz6CXYBhEBscM0PODXuxtEddF9t/J3rU0w7Jp0y5yquS7/
+         5dX4qJZp8G15mW7nLthkGTyUcF3X+UYcgilTiWO9BvErNmqsj6sVk8JMFJL1eIPDd/f6
+         bIhlrg0o23AUNMSfTePJemTx+FFcPxq7SWdJIDlsC17QN2bhA1rtFuwcGr9ig5LnNbOf
+         o4dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
+        b=c2SJO9s6q51AT3dvkdELueLwsUh913L7nyMw1BOOctytVE6SFStScJsLGdIg7+XeqB
+         R/4gKNzRnR7/xZ21AoFJujlvZ+RJ20KI/+Ts7K7s9mizhscvpIuTb1e4guHl31NUIzi6
+         Eg7KW1Lyu1B1/pB0bLv3Wx8eLeymgwUFAgFCJ9vLFzZ1tUhrj89hGZHK/E79TDoSohuq
+         pVZuzUXXkF6TpQGMOde+1dbsBDM5MoIJgFnmSZYSDTmJubPij1oKjhC7a7THNwXwydjz
+         MIRvUITOByoZzja4kHCR/WvCH2mYX4mi+tCqjwVwnCrPI4swSFaEC4CzQ0hKS1DONcOz
+         +naw==
+X-Gm-Message-State: APjAAAXnY7yCT+9+IxKRmggGzLZjRZHQYH5DI4nPntRkFqBcpX/yFobR
+        yvOenTUWF1F7V7N7paV+HBPNqw==
+X-Google-Smtp-Source: APXvYqz+Z9nLdGje/5/GaGDSa9/q6bNKjeojhvbDbY03xj4oOhikScXlxlbbMaHu4V4ZTUwDYQLl8Q==
+X-Received: by 2002:a17:90a:eace:: with SMTP id ev14mr8128545pjb.57.1571790228097;
+        Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
+Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
+        by smtp.gmail.com with ESMTPSA id d7sm8201906pgv.6.2019.10.22.17.23.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Oct 2019 17:23:47 -0700 (PDT)
+Date:   Tue, 22 Oct 2019 17:23:46 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     "Singh, Brijesh" <brijesh.singh@amd.com>
+cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "info@metux.net" <info@metux.net>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
+ check failure.
+In-Reply-To: <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
+Message-ID: <alpine.DEB.2.21.1910221723220.126424@chino.kir.corp.google.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com> <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com> <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com> <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
+ <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2019-10-22 at 16:01 -0700, Andrew Morton wrote:
-> On Tue, 22 Oct 2019 15:27:52 -0700 Alexander Duyck <alexander.duyck@gmail.com> wrote:
+On Tue, 22 Oct 2019, Singh, Brijesh wrote:
+
+> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
+> >>>>
+> >>>> SEV INIT command loads the SEV related persistent data from NVS
+> >>>> and initializes the platform context. The firmware validates the
+> >>>> persistent state. If validation fails, the firmware will reset
+> >>>> the persisent state and return an integrity check failure status.
+> >>>>
+> >>>> At this point, a subsequent INIT command should succeed, so retry
+> >>>> the command. The INIT command retry is only done during driver
+> >>>> initialization.
+> >>>>
+> >>>> Additional enums along with SEV_RET_SECURE_DATA_INVALID are added
+> >>>> to sev_ret_code to maintain continuity and relevance of enum values.
+> >>>>
+> >>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> >>>> ---
+> >>>>    drivers/crypto/ccp/psp-dev.c | 12 ++++++++++++
+> >>>>    include/uapi/linux/psp-sev.h |  3 +++
+> >>>>    2 files changed, 15 insertions(+)
+> >>>>
+> >>>> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> >>>> index 6b17d179ef8a..f9318d4482f2 100644
+> >>>> --- a/drivers/crypto/ccp/psp-dev.c
+> >>>> +++ b/drivers/crypto/ccp/psp-dev.c
+> >>>> @@ -1064,6 +1064,18 @@ void psp_pci_init(void)
+> >>>>    
+> >>>>    	/* Initialize the platform */
+> >>>>    	rc = sev_platform_init(&error);
+> >>>> +	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
+> >>>> +		/*
+> >>>> +		 * INIT command returned an integrity check failure
+> >>>> +		 * status code, meaning that firmware load and
+> >>>> +		 * validation of SEV related persistent data has
+> >>>> +		 * failed and persistent state has been erased.
+> >>>> +		 * Retrying INIT command here should succeed.
+> >>>> +		 */
+> >>>> +		dev_dbg(sp->dev, "SEV: retrying INIT command");
+> >>>> +		rc = sev_platform_init(&error);
+> >>>> +	}
+> >>>> +
+> >>>>    	if (rc) {
+> >>>>    		dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
+> >>>>    		return;
+> >>>
+> >>> Curious why this isn't done in __sev_platform_init_locked() since
+> >>> sev_platform_init() can be called when loading the kvm module and the same
+> >>> init failure can happen that way.
+> >>>
+> >>
+> >> The FW initialization (aka PLATFORM_INIT) is called in the following
+> >> code paths:
+> >>
+> >> 1. During system boot up
+> >>
+> >> and
+> >>
+> >> 2. After the platform reset command is issued
+> >>
+> >> The patch takes care of #1. Based on the spec, platform reset command
+> >> should erase the persistent data and the PLATFORM_INIT should *not* fail
+> >> with SEV_RET_SECURE_DATA_INVALID error code. So, I am not able to see
+> >> any  strong reason to move the retry code in
+> >> __sev_platform_init_locked().
+> >>
+> > 
+> > Hmm, is the sev_platform_init() call in sev_guest_init() intended to do
+> > SEV_CMD_INIT only after platform reset?  I was under the impression it was
+> > done in case any previous init failed.
+> > 
 > 
-> > Below are the results from various benchmarks. I primarily focused on two
-> > tests. The first is the will-it-scale/page_fault2 test, and the other is
-> > a modified version of will-it-scale/page_fault1 that was enabled to use
-> > THP. I did this as it allows for better visibility into different parts
-> > of the memory subsystem. The guest is running on one node of a E5-2630 v3
-> > CPU with 48G of RAM that I split up into two logical nodes in the guest
-> > in order to test with NUMA as well.
-> > 
-> > Test		    page_fault1 (THP)     page_fault2
-> > Baseline	 1  1256106.33  +/-0.09%   482202.67  +/-0.46%
-> >                 16  8864441.67  +/-0.09%  3734692.00  +/-1.23%
-> > 
-> > Patches applied  1  1257096.00  +/-0.06%   477436.00  +/-0.16%
-> >                 16  8864677.33  +/-0.06%  3800037.00  +/-0.19%
-> > 
-> > Patches enabled	 1  1258420.00  +/-0.04%   480080.00  +/-0.07%
-> >  MADV disabled  16  8753840.00  +/-1.27%  3782764.00  +/-0.37%
-> > 
-> > Patches enabled	 1  1267916.33  +/-0.08%   472075.67  +/-0.39%
-> >                 16  8287050.33  +/-0.67%  3774500.33  +/-0.11%
-> > 
-> > The results above are for a baseline with a linux-next-20191021 kernel,
-> > that kernel with this patch set applied but page reporting disabled in
-> > virtio-balloon, patches applied but the madvise disabled by direct
-> > assigning a device, and the patches applied and page reporting fully
-> > enabled.  These results include the deviation seen between the average
-> > value reported here versus the high and/or low value. I observed that
-> > during the test the memory usage for the first three tests never dropped
-> > whereas with the patches fully enabled the VM would drop to using only a
-> > few GB of the host's memory when switching from memhog to page fault tests.
-> > 
-> > Most of the overhead seen with this patch set fully enabled is due to the
-> > fact that accessing the reported pages will cause a page fault and the host
-> > will have to zero the page before giving it back to the guest. The overall
-> > guest size is kept fairly small to only a few GB while the test is running.
-> > This overhead is much more visible when using THP than with standard 4K
-> > pages. As such for the case where the host memory is not oversubscribed
-> > this results in a performance regression, however if the host memory were
-> > oversubscribed this patch set should result in a performance improvement
-> > as swapping memory from the host can be avoided.
 > 
-> I'm trying to understand "how valuable is this patchset" and the above
-> resulted in some headscratching.
+> The PLATFORM_INIT command is allowed only when FW is in UINIT state. On
+> boot, the FW will be in UNINIT state and similarly after the platform 
+> reset command the FW goes back to UNINIT state.
 > 
-> Overall, how valuable is this patchset?  To real users running real
-> workloads?
-
-A more detailed reply is in my response to your comments on patch 3.
-Basically the value is for host memory overcommit in that we can avoid
-having to go to swap nearly as often and can potentially pack the guests
-even tighter with better performance.
-
-> > There is currently an alternative patch set[1] that has been under work
-> > for some time however the v12 version of that patch set could not be
-> > tested as it triggered a kernel panic when I attempted to test it. It
-> > requires multiple modifications to get up and running with performance
-> > comparable to this patch set. A follow-on set has yet to be posted. As
-> > such I have not included results from that patch set, and I would
-> > appreciate it if we could keep this patch set the focus of any discussion
-> > on this thread.
+> The __sev_platform_init_locked() checks the FW state before issuing the
+> command, if FW is already in INIT state then it returns immediately.
 > 
-> Actually, the rest of us would be interested in a comparison ;)  
 
-I understand that. However, the last time I tried benchmarking that patch
-set it blew up into a thread where we kept having to fix things on that
-patch set and by the time we were done we weren't benchmarking the v12
-patch set anymore since we had made so many modifications to it, and that 
-assumes Nitesh and I were in sync. Also I don't know what the current
-state of his patch set is as he was working on some additional changes
-when we last discussed things.
+Ah, got it, thanks.
 
-Ideally that patch set can be reposted with the necessary fixes and then
-we can go through any necessary debug, repair, and addressing limitations
-there.
-
-
+Acked-by: David Rientjes <rientjes@google.com>
