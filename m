@@ -2,108 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85D87E13E2
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 10:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AE49E1426
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 10:27:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390211AbfJWIRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 04:17:09 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:39661 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389987AbfJWIRI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 04:17:08 -0400
-Received: by mail-ot1-f65.google.com with SMTP id s22so16644346otr.6;
-        Wed, 23 Oct 2019 01:17:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pFfoWoAOi1Gcw21Dvgij8W69ZIOoeiIbU6wqQ9bvYIs=;
-        b=qyhPtzj+Q83LmFli8fCHnZNkQXis8IZzO3MVaa0FxB62+2mfVWi/37dqpW9Zymo/UF
-         NaLAdqwRO7psvPqF8oEse1+JFvHpHtlmasmDlS/69Al343m3dYlb3Iuu9lL07t6S4Xk3
-         84vkM9fVls39ER5OF2wdNVds3H89FhtrMUFkvtdn7jzyJcjUIwF3UOcWXbcRBGHSh6bb
-         h3jfAtPfJiWG93mxyw7x9k4zStqocpe5nixXmIfE5RyPox1H9Ukihn9MJMR3SxUFXZZ8
-         L7CTaFKW+kUB4IDuXCG0NP1k/+gsYa13SoYTrgLe32LAPtZ8q584KbVMpihol4Ig1tRx
-         66Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pFfoWoAOi1Gcw21Dvgij8W69ZIOoeiIbU6wqQ9bvYIs=;
-        b=O4grJiy/tnAVeEJ/7wd9wKafstqRMp24X0Gcd+nXpH/eLMMftiZWZMErQ8HfyZobkj
-         oSGM4TaN/gF0BuXIgDT8Y/EYdnHnRMBvsl8vhH9SoMt/IfDUc6hSOWowxtr/WzclIa5t
-         8gpDnqRbK1gmxsJsASHMASfrmLMxAkDZ/WBr4PGxlgEb9naoHJVXgg+DUcLWJDoCdM/9
-         Y3HJx7/DQiEWggKa8c7y3xm+SyIYJTe5bM7WOkE1uEyxOMRf4S37Neo6EiYt4GURmIat
-         TEIJ9ynmwpgctfOUGmLlxV5L1NEQmOK5MT4yXU0k6AZ7qSrh5h+urc5+7Ln7ctFu9QlJ
-         lnbQ==
-X-Gm-Message-State: APjAAAUXXY/9E+iWfN66CBeXPZVXdCR9WijGFvDI1J4OHdHQ1QXsSQw8
-        B1dcGtUZVX/FHcHTEy3GZc2L5ZDH+q6R8JvDE8A=
-X-Google-Smtp-Source: APXvYqzcv+GPuUgPESRDeCMqNkyh/xbdfpRDVj9dr96h1BCtFi1FqDllWpfX+LIbUpptSCrp0t1mCJjfD5nEkUqJ9O4=
-X-Received: by 2002:a9d:69c7:: with SMTP id v7mr867245oto.45.1571818626331;
- Wed, 23 Oct 2019 01:17:06 -0700 (PDT)
+        id S2390306AbfJWI0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 04:26:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55623 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390261AbfJWI0y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 04:26:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571819213;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HaclBkUySXchpujJDOKDQ24Kar8EqBHEiLvQYvykVcM=;
+        b=atLm8UqZ2P1diJTrhVLykLL10B3a+Wwfh7AxxPcMci8CPn7s7taOqQuVP/JBQWgPj4aTlr
+        QCqqjJqIQ8JtcVmdNutLl03qPQJMQvfc1C3DEJuxcv7D3eXxnsucNiRozuagRaxpB19vgr
+        NwBOmtV0cR3RWq8ZPxNzRLaWGKjQruQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-LuY7b88DMPqLlrFS4Rg2Ag-1; Wed, 23 Oct 2019 04:26:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE743100550E;
+        Wed, 23 Oct 2019 08:26:47 +0000 (UTC)
+Received: from [10.36.117.79] (ovpn-117-79.ams2.redhat.com [10.36.117.79])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B8CE19C78;
+        Wed, 23 Oct 2019 08:26:33 +0000 (UTC)
+Subject: Re: [PATCH v12 2/6] mm: Use zone and order instead of free area in
+ free_list manipulators
+To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+References: <20191022221223.17338.5860.stgit@localhost.localdomain>
+ <20191022222805.17338.3243.stgit@localhost.localdomain>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
+Date:   Wed, 23 Oct 2019 10:26:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <1561682593-12071-1-git-send-email-wanpengli@tencent.com> <20190628011012.GA19488@lerouge>
-In-Reply-To: <20190628011012.GA19488@lerouge>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 23 Oct 2019 16:16:55 +0800
-Message-ID: <CANRm+CxUpwZ9KwOcQp=Ok64giyjjcJOGb2=zU6vayQzLqYvpXQ@mail.gmail.com>
-Subject: Re: [PATCH v2] sched/nohz: Optimize get_nohz_timer_target()
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Frederic Weisbecker <frederic@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191022222805.17338.3243.stgit@localhost.localdomain>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: LuY7b88DMPqLlrFS4Rg2Ag-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 28 Jun 2019 at 09:10, Frederic Weisbecker <frederic@kernel.org> wrote:
->
-> On Fri, Jun 28, 2019 at 08:43:12AM +0800, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > On a machine, cpu 0 is used for housekeeping, the other 39 cpus in the
-> > same socket are in nohz_full mode. We can observe huge time burn in the
-> > loop for seaching nearest busy housekeeper cpu by ftrace.
-> >
-> >   2)               |       get_nohz_timer_target() {
-> >   2)   0.240 us    |         housekeeping_test_cpu();
-> >   2)   0.458 us    |         housekeeping_test_cpu();
-> >
-> >   ...
-> >
-> >   2)   0.292 us    |         housekeeping_test_cpu();
-> >   2)   0.240 us    |         housekeeping_test_cpu();
-> >   2)   0.227 us    |         housekeeping_any_cpu();
-> >   2) + 43.460 us   |       }
-> >
-> > This patch optimizes the searching logic by finding a nearest housekeeper
-> > cpu in the housekeeping cpumask, it can minimize the worst searching time
-> > from ~44us to < 10us in my testing. In addition, the last iterated busy
-> > housekeeper can become a random candidate while current CPU is a better
-> > fallback if it is a housekeeper.
-> >
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Frederic Weisbecker <frederic@kernel.org>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->
-> Reviewed-by: Frederic Weisbecker <frederic@kernel.org>
+On 23.10.19 00:28, Alexander Duyck wrote:
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+>=20
+> In order to enable the use of the zone from the list manipulator function=
+s
+> I will need access to the zone pointer. As it turns out most of the
+> accessors were always just being directly passed &zone->free_area[order]
+> anyway so it would make sense to just fold that into the function itself
+> and pass the zone and order as arguments instead of the free area.
+>=20
+> In order to be able to reference the zone we need to move the declaration
+> of the functions down so that we have the zone defined before we define t=
+he
+> list manipulation functions. Since the functions are only used in the fil=
+e
+> mm/page_alloc.c we can just move them there to reduce noise in the header=
+.
+>=20
+> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> ---
+>   include/linux/mmzone.h |   32 -----------------------
+>   mm/page_alloc.c        |   67 +++++++++++++++++++++++++++++++++++------=
+-------
+>   2 files changed, 49 insertions(+), 50 deletions(-)
 
-Hi Thomas,
+Did you see
 
-I didn't see your refactor to get_nohz_timer_target() which you
-mentioned in IRC after four months, I can observe cyclictest drop from
-4~5us to 8us in kvm guest(we offload the lapic timer emulation to
-housekeeping cpu to avoid timer fire external interrupt on the pCPU
-which vCPU resident incur a vCPU vmexit) w/o this patch in the case of
-there is no busy housekeeping cpu. The score can be recovered after I
-give stress to create a busy housekeeping cpu.
+https://lore.kernel.org/lkml/20191001152928.27008.8178.stgit@localhost.loca=
+ldomain/T/#m4d2bc2f37bd7bdc3ae35c4f197905c275d0ad2f9
 
-Could you consider applying this patch for temporary since I'm not
-sure when the refactor can be ready.
+this time?
 
-    Wanpeng
+And the difference to the old patch is only an empty line.
+
+--=20
+
+Thanks,
+
+David / dhildenb
+
