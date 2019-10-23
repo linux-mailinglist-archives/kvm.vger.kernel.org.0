@@ -2,85 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66AAFE260A
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 38E29E2612
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:04:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407815AbfJWWBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 18:01:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57870 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405035AbfJWWBU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 23 Oct 2019 18:01:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571868079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nEg2JMs7obRnwPmfQVBb4NG9WKsi5kJp3la0gsAnYkc=;
-        b=JLdjMe5+uCvIxGem/FvNnJKAql0wh8ZI1xeiNnglXZNstJC5Rx3JGbUaP0Z5jwo+eWk0eH
-        auJf1VhqYBRK7XUoIDLepJQufNyizuv8QT2wtw7Cmk4bJnZDhkMLxV1vNqghXhbql65Knn
-        Lv9A9/sVLCL8Xcw76zsMOYaIXXMCu9M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-Gi_XQU_ZPV2zJxaYVWjtRQ-1; Wed, 23 Oct 2019 18:01:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2407845AbfJWWER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 18:04:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50792 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405661AbfJWWER (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 18:04:17 -0400
+Received: from akpm3.svl.corp.google.com (unknown [104.133.8.65])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23F0D107AD31;
-        Wed, 23 Oct 2019 22:01:14 +0000 (UTC)
-Received: from treble (ovpn-121-225.rdu2.redhat.com [10.10.121.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E8FB919C77;
-        Wed, 23 Oct 2019 22:01:11 +0000 (UTC)
-Date:   Wed, 23 Oct 2019 17:01:09 -0500
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
-        Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [patch V2 05/17] x86/traps: Make interrupt enable/disable
- symmetric in C code
-Message-ID: <20191023220109.jmbrluyjxenblcij@treble>
-References: <20191023122705.198339581@linutronix.de>
- <20191023123118.084086112@linutronix.de>
-MIME-Version: 1.0
-In-Reply-To: <20191023123118.084086112@linutronix.de>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Gi_XQU_ZPV2zJxaYVWjtRQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+        by mail.kernel.org (Postfix) with ESMTPSA id 475632084C;
+        Wed, 23 Oct 2019 22:04:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571868254;
+        bh=ZxZ2bjgrY8LxhC2gxwLipAEf5uWwjrnOAtpoB5RPRXI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nNtl5XCv0j9A48YnWaF5iTudfCQq33+QXJgRHWDYDg2YmEqbZCLDe+NCQQetvnR/b
+         3CtLgVZL25LnwIFN+itO3rrgLffBBVQHhKExtJ614qS8GnmXP7HXLzSds5ViMnMXX/
+         nrTddbLuRTbdz423kAsG34HKFcGZ+DmZP7edoe2A=
+Date:   Wed, 23 Oct 2019 15:04:13 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        David Windsor <dwindsor@gmail.com>,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>
+Subject: Re: [PATCH v2 0/3] kcov: collect coverage from usb and vhost
+Message-Id: <20191023150413.8aa05549bd840deccfed5539@linux-foundation.org>
+In-Reply-To: <cover.1571844200.git.andreyknvl@google.com>
+References: <cover.1571844200.git.andreyknvl@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 23, 2019 at 02:27:10PM +0200, Thomas Gleixner wrote:
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -1500,10 +1500,13 @@ static noinline void
->  =09=09return;
-> =20
->  =09/* Was the fault on kernel-controlled part of the address space? */
-> -=09if (unlikely(fault_in_kernel_space(address)))
-> +=09if (unlikely(fault_in_kernel_space(address))) {
->  =09=09do_kern_addr_fault(regs, hw_error_code, address);
-> -=09else
-> +=09} else {
->  =09=09do_user_addr_fault(regs, hw_error_code, address);
-> +=09=09if (regs->flags & X86_EFLAGS_IF)
-> +=09=09=09local_irq_disable();
-> +=09}
+On Wed, 23 Oct 2019 17:24:28 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
 
-The corresponding irq enable is in do_user_addr_fault(), why not do the
-disable there?
+> This patchset extends kcov to allow collecting coverage from the USB
+> subsystem and vhost workers. See the first patch description for details
+> about the kcov extension. The other two patches apply this kcov extension
+> to USB and vhost.
+> 
+> These patches have been used to enable coverage-guided USB fuzzing with
+> syzkaller for the last few years
 
---=20
-Josh
+I find it surprising that this material is so focused on USB.  Is
+there something unique about USB that gave rise to this situation, or
+is it expected that the new kcov feature will be used elsewhere in the
+kernel?
 
+If the latter, which are the expected subsystems?
