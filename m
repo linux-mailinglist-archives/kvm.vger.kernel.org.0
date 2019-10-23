@@ -2,160 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E4A7E0F29
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 02:23:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 912D0E0F94
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 03:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732523AbfJWAXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 20:23:49 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:36020 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728076AbfJWAXt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 20:23:49 -0400
-Received: by mail-pg1-f194.google.com with SMTP id 23so11002884pgk.3
-        for <kvm@vger.kernel.org>; Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
-        b=PWMr/nMYg+m7WtNCPLVizhxiu8gyfLZI0qwKU6Yqp4oFhAsoLzwWin4tCq7I2oHIei
-         iAuxmHtpkNw44YwnJVo1QUoaReR9DmkDLXMTJedbn0+8dhb6RU6C+u9Ltmj4XbZ8fqWM
-         xP2Jj51dT1JuQLgl25G3zBtz6CXYBhEBscM0PODXuxtEddF9t/J3rU0w7Jp0y5yquS7/
-         5dX4qJZp8G15mW7nLthkGTyUcF3X+UYcgilTiWO9BvErNmqsj6sVk8JMFJL1eIPDd/f6
-         bIhlrg0o23AUNMSfTePJemTx+FFcPxq7SWdJIDlsC17QN2bhA1rtFuwcGr9ig5LnNbOf
-         o4dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
-        b=c2SJO9s6q51AT3dvkdELueLwsUh913L7nyMw1BOOctytVE6SFStScJsLGdIg7+XeqB
-         R/4gKNzRnR7/xZ21AoFJujlvZ+RJ20KI/+Ts7K7s9mizhscvpIuTb1e4guHl31NUIzi6
-         Eg7KW1Lyu1B1/pB0bLv3Wx8eLeymgwUFAgFCJ9vLFzZ1tUhrj89hGZHK/E79TDoSohuq
-         pVZuzUXXkF6TpQGMOde+1dbsBDM5MoIJgFnmSZYSDTmJubPij1oKjhC7a7THNwXwydjz
-         MIRvUITOByoZzja4kHCR/WvCH2mYX4mi+tCqjwVwnCrPI4swSFaEC4CzQ0hKS1DONcOz
-         +naw==
-X-Gm-Message-State: APjAAAXnY7yCT+9+IxKRmggGzLZjRZHQYH5DI4nPntRkFqBcpX/yFobR
-        yvOenTUWF1F7V7N7paV+HBPNqw==
-X-Google-Smtp-Source: APXvYqz+Z9nLdGje/5/GaGDSa9/q6bNKjeojhvbDbY03xj4oOhikScXlxlbbMaHu4V4ZTUwDYQLl8Q==
-X-Received: by 2002:a17:90a:eace:: with SMTP id ev14mr8128545pjb.57.1571790228097;
-        Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
-Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
-        by smtp.gmail.com with ESMTPSA id d7sm8201906pgv.6.2019.10.22.17.23.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2019 17:23:47 -0700 (PDT)
-Date:   Tue, 22 Oct 2019 17:23:46 -0700 (PDT)
-From:   David Rientjes <rientjes@google.com>
-X-X-Sender: rientjes@chino.kir.corp.google.com
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "allison@lohutok.net" <allison@lohutok.net>,
-        "info@metux.net" <info@metux.net>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
- check failure.
-In-Reply-To: <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
-Message-ID: <alpine.DEB.2.21.1910221723220.126424@chino.kir.corp.google.com>
-References: <20191017223459.64281-1-Ashish.Kalra@amd.com> <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com> <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com> <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
- <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1732186AbfJWBN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 21:13:57 -0400
+Received: from mga17.intel.com ([192.55.52.151]:19686 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727140AbfJWBN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 21:13:57 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Oct 2019 18:13:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,218,1569308400"; 
+   d="scan'208";a="188091893"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga007.jf.intel.com with ESMTP; 22 Oct 2019 18:13:54 -0700
+Date:   Wed, 23 Oct 2019 09:16:46 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v7 1/7] KVM: CPUID: Fix IA32_XSS support in CPUID(0xd,i)
+ enumeration
+Message-ID: <20191023011645.GA27009@local-michael-cet-test>
+References: <20190927021927.23057-1-weijiang.yang@intel.com>
+ <20190927021927.23057-2-weijiang.yang@intel.com>
+ <CALMp9eRXoyoX6GHQgVTXemJjm69MwqN+VDN47X=5BN36rvrAgA@mail.gmail.com>
+ <20191017194622.GI20903@linux.intel.com>
+ <20191018012809.GA2286@local-michael-cet-test>
+ <20191022194615.GM2343@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191022194615.GM2343@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Oct 2019, Singh, Brijesh wrote:
-
-> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>>
-> >>>> SEV INIT command loads the SEV related persistent data from NVS
-> >>>> and initializes the platform context. The firmware validates the
-> >>>> persistent state. If validation fails, the firmware will reset
-> >>>> the persisent state and return an integrity check failure status.
-> >>>>
-> >>>> At this point, a subsequent INIT command should succeed, so retry
-> >>>> the command. The INIT command retry is only done during driver
-> >>>> initialization.
-> >>>>
-> >>>> Additional enums along with SEV_RET_SECURE_DATA_INVALID are added
-> >>>> to sev_ret_code to maintain continuity and relevance of enum values.
-> >>>>
-> >>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> >>>> ---
-> >>>>    drivers/crypto/ccp/psp-dev.c | 12 ++++++++++++
-> >>>>    include/uapi/linux/psp-sev.h |  3 +++
-> >>>>    2 files changed, 15 insertions(+)
-> >>>>
-> >>>> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> >>>> index 6b17d179ef8a..f9318d4482f2 100644
-> >>>> --- a/drivers/crypto/ccp/psp-dev.c
-> >>>> +++ b/drivers/crypto/ccp/psp-dev.c
-> >>>> @@ -1064,6 +1064,18 @@ void psp_pci_init(void)
-> >>>>    
-> >>>>    	/* Initialize the platform */
-> >>>>    	rc = sev_platform_init(&error);
-> >>>> +	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-> >>>> +		/*
-> >>>> +		 * INIT command returned an integrity check failure
-> >>>> +		 * status code, meaning that firmware load and
-> >>>> +		 * validation of SEV related persistent data has
-> >>>> +		 * failed and persistent state has been erased.
-> >>>> +		 * Retrying INIT command here should succeed.
-> >>>> +		 */
-> >>>> +		dev_dbg(sp->dev, "SEV: retrying INIT command");
-> >>>> +		rc = sev_platform_init(&error);
-> >>>> +	}
-> >>>> +
-> >>>>    	if (rc) {
-> >>>>    		dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
-> >>>>    		return;
-> >>>
-> >>> Curious why this isn't done in __sev_platform_init_locked() since
-> >>> sev_platform_init() can be called when loading the kvm module and the same
-> >>> init failure can happen that way.
-> >>>
-> >>
-> >> The FW initialization (aka PLATFORM_INIT) is called in the following
-> >> code paths:
-> >>
-> >> 1. During system boot up
-> >>
-> >> and
-> >>
-> >> 2. After the platform reset command is issued
-> >>
-> >> The patch takes care of #1. Based on the spec, platform reset command
-> >> should erase the persistent data and the PLATFORM_INIT should *not* fail
-> >> with SEV_RET_SECURE_DATA_INVALID error code. So, I am not able to see
-> >> any  strong reason to move the retry code in
-> >> __sev_platform_init_locked().
-> >>
-> > 
-> > Hmm, is the sev_platform_init() call in sev_guest_init() intended to do
-> > SEV_CMD_INIT only after platform reset?  I was under the impression it was
-> > done in case any previous init failed.
-> > 
+On Tue, Oct 22, 2019 at 12:46:15PM -0700, Sean Christopherson wrote:
+> On Fri, Oct 18, 2019 at 09:28:09AM +0800, Yang Weijiang wrote:
+> > On Thu, Oct 17, 2019 at 12:46:22PM -0700, Sean Christopherson wrote:
+> > > On Wed, Oct 02, 2019 at 10:26:10AM -0700, Jim Mattson wrote:
+> > > > > +                       entry->eax = 0;
+> > > > > +                       entry->ebx = 0;
+> > > > > +                       entry->ecx = 0;
+> > > > > +                       entry->edx = 0;
+> > > > > +                       return;
+> > > > > +               }
+> > > > > +               if (entry->ecx)
+> > > > > +                       entry->ebx = 0;
+> > > > 
+> > > > This seems to back up my claims above regarding the EBX output for
+> > > > cases 0 and 1, but aside from those subleaves, is this correct? For
+> > > > subleaves > 1, ECX bit 1 can be set for extended state components that
+> > > > need to be cache-line aligned. Such components could map to a valid
+> > > > bit in XCR0 and have a non-zero offset from the beginning of the
+> > > > non-compacted XSAVE area.
+> > > > 
+> > > > > +               entry->edx = 0;
+> > > > 
+> > > > This seems too aggressive. See my comments above regarding EDX outputs
+> > > > for cases 0 and 1.
+> > > > 
+> > Sean, I don't know how to deal with entry->edx here as SDM says it's
+> > reserved for valid subleaf.
 > 
+> The SDM also states:
 > 
-> The PLATFORM_INIT command is allowed only when FW is in UINIT state. On
-> boot, the FW will be in UNINIT state and similarly after the platform 
-> reset command the FW goes back to UNINIT state.
+>   Bit 31 - 00: Reports the supported bits of the upper 32 bits of XCR0.
+>   XCR0[n+32] can be set to 1 only if EDX[n] is 1.
 > 
-> The __sev_platform_init_locked() checks the FW state before issuing the
-> command, if FW is already in INIT state then it returns immediately.
+> the second part, "Bits 31 - 00: Reserved" is at best superfluous, e.g. it
+> could be interpreted as saying that XCR0[63:32] are currently reserved,
+> and at worst the extra qualifier is an SDM bug and should be removed.
 > 
-
-Ah, got it, thanks.
-
-Acked-by: David Rientjes <rientjes@google.com>
+> TL;DR: Ignore the blurb about the bits being reserved.
+Thanks Sean, I'll follow it.
