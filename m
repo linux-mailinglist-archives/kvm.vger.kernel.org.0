@@ -2,259 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 70C34E1EDF
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 17:08:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 019F8E1F06
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 17:16:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406478AbfJWPIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 11:08:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35600 "EHLO mx1.redhat.com"
+        id S2406556AbfJWPQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 11:16:13 -0400
+Received: from mga14.intel.com ([192.55.52.115]:48105 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390530AbfJWPIH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 11:08:07 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2B11885540
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 15:08:06 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id c6so11161774wrp.3
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 08:08:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1L6W+k0nNg/tQAHowWr/1ED2GuKCPT//Gnu5zgyCNAI=;
-        b=FlQ9ZzQhKkTST15iHfVvz/d0zV8WSRRBa9nyDvCZeqzi3ma0iDeY8RbOb2Rwk8k3uN
-         BwGsKscWBPS8cwDvqloJVg1WVvjnKWxxVl/fQVDjmo0eGrl8zOLYAu01Ma2nHdFqZnog
-         dWegI8TwzjirSnkzEVGExIne0TV5CInX5VZlkioksA0ekoRKVLL1J6hInodMi3o+CMQK
-         LB7I7QBBPow35BNG3svCxEtVcviz/nPl6EvkdM1dg7g8xg4/BsGdTod8zklhbcvRBjgf
-         uNPSPjoG0/94gVgkv/+1pobsH2S0aPATtS4zXaM3hTZTMBtS8G8rAlSENXu8XejubnrK
-         5d6A==
-X-Gm-Message-State: APjAAAWIg8XU4f67g5+yQObMBnGqYtCbPS0vYPA8pNOvSJOV9G3XVL27
-        k3uCP+JIzwt+QbxRUmYBP4n7nJbTWidosfzbeL18QA6+Dls5uZ13mZJ7VVvdRovMYK5msnN2bbF
-        bqIh7qZdLrehd
-X-Received: by 2002:a5d:55c2:: with SMTP id i2mr1459748wrw.176.1571843284747;
-        Wed, 23 Oct 2019 08:08:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx1BkWFgjFt13kSOZhC5tHhC1h/h69jYbIAHFEuvb5Y1HTNMeyVSdSK6hLWHxU9/yDmdywCwA==
-X-Received: by 2002:a5d:55c2:: with SMTP id i2mr1459721wrw.176.1571843284393;
-        Wed, 23 Oct 2019 08:08:04 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it. [79.52.200.174])
-        by smtp.gmail.com with ESMTPSA id x2sm20845980wrn.81.2019.10.23.08.08.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2019 08:08:03 -0700 (PDT)
-Date:   Wed, 23 Oct 2019 17:08:01 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     netdev@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>
-Cc:     Sasha Levin <sashal@kernel.org>, linux-hyperv@vger.kernel.org,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next 11/14] vsock: add multi-transports support
-Message-ID: <CAGxU2F7n48kBy_y2GB=mcvraK=mw_2Jn8=2hvQnEOWqWuT9OjA@mail.gmail.com>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-12-sgarzare@redhat.com>
+        id S2406499AbfJWPQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 11:16:12 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 08:16:10 -0700
+X-IronPort-AV: E=Sophos;i="5.68,221,1569308400"; 
+   d="scan'208";a="372905884"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 08:16:07 -0700
+Message-ID: <860dda361b6e0b94908d94beb0ad9f5519c8f2cf.camel@linux.intel.com>
+Subject: Re: [PATCH v12 2/6] mm: Use zone and order instead of free area in
+ free_list manipulators
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Wed, 23 Oct 2019 08:16:07 -0700
+In-Reply-To: <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
+References: <20191022221223.17338.5860.stgit@localhost.localdomain>
+         <20191022222805.17338.3243.stgit@localhost.localdomain>
+         <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191023095554.11340-12-sgarzare@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 23, 2019 at 11:59 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> This patch adds the support of multiple transports in the
-> VSOCK core.
->
-> With the multi-transports support, we can use vsock with nested VMs
-> (using also different hypervisors) loading both guest->host and
-> host->guest transports at the same time.
->
-> Major changes:
-> - vsock core module can be loaded regardless of the transports
-> - vsock_core_init() and vsock_core_exit() are renamed to
->   vsock_core_register() and vsock_core_unregister()
-> - vsock_core_register() has a feature parameter (H2G, G2H, DGRAM)
->   to identify which directions the transport can handle and if it's
->   support DGRAM (only vmci)
-> - each stream socket is assigned to a transport when the remote CID
->   is set (during the connect() or when we receive a connection request
->   on a listener socket).
->   The remote CID is used to decide which transport to use:
->   - remote CID > VMADDR_CID_HOST will use host->guest transport
->   - remote CID <= VMADDR_CID_HOST will use guest->host transport
-> - listener sockets are not bound to any transports since no transport
->   operations are done on it. In this way we can create a listener
->   socket, also if the transports are not loaded or with VMADDR_CID_ANY
->   to listen on all transports.
-> - DGRAM sockets are handled as before, since only the vmci_transport
->   provides this feature.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
-> RFC -> v1:
-> - documented VSOCK_TRANSPORT_F_* flags
-> - fixed vsock_assign_transport() when the socket is already assigned
->   (e.g connection failed)
-> - moved features outside of struct vsock_transport, and used as
->   parameter of vsock_core_register()
-> ---
->  drivers/vhost/vsock.c                   |   5 +-
->  include/net/af_vsock.h                  |  17 +-
->  net/vmw_vsock/af_vsock.c                | 237 ++++++++++++++++++------
->  net/vmw_vsock/hyperv_transport.c        |  26 ++-
->  net/vmw_vsock/virtio_transport.c        |   7 +-
->  net/vmw_vsock/virtio_transport_common.c |  28 ++-
->  net/vmw_vsock/vmci_transport.c          |  31 +++-
->  7 files changed, 270 insertions(+), 81 deletions(-)
->
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 6d7e4f022748..b235f4bbe8ea 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -831,7 +831,8 @@ static int __init vhost_vsock_init(void)
->  {
->         int ret;
->
-> -       ret = vsock_core_init(&vhost_transport.transport);
-> +       ret = vsock_core_register(&vhost_transport.transport,
-> +                                 VSOCK_TRANSPORT_F_H2G);
->         if (ret < 0)
->                 return ret;
->         return misc_register(&vhost_vsock_misc);
-> @@ -840,7 +841,7 @@ static int __init vhost_vsock_init(void)
->  static void __exit vhost_vsock_exit(void)
->  {
->         misc_deregister(&vhost_vsock_misc);
-> -       vsock_core_exit();
-> +       vsock_core_unregister(&vhost_transport.transport);
->  };
->
->  module_init(vhost_vsock_init);
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index fa1570dc9f5c..27a3463e4892 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -91,6 +91,14 @@ struct vsock_transport_send_notify_data {
->         u64 data2; /* Transport-defined. */
->  };
->
-> +/* Transport features flags */
-> +/* Transport provides host->guest communication */
-> +#define VSOCK_TRANSPORT_F_H2G          0x00000001
-> +/* Transport provides guest->host communication */
-> +#define VSOCK_TRANSPORT_F_G2H          0x00000002
-> +/* Transport provides DGRAM communication */
-> +#define VSOCK_TRANSPORT_F_DGRAM                0x00000004
-> +
->  struct vsock_transport {
->         /* Initialize/tear-down socket. */
->         int (*init)(struct vsock_sock *, struct vsock_sock *);
-> @@ -154,12 +162,8 @@ struct vsock_transport {
->
->  /**** CORE ****/
->
-> -int __vsock_core_init(const struct vsock_transport *t, struct module *owner);
-> -static inline int vsock_core_init(const struct vsock_transport *t)
-> -{
-> -       return __vsock_core_init(t, THIS_MODULE);
-> -}
-> -void vsock_core_exit(void);
-> +int vsock_core_register(const struct vsock_transport *t, int features);
-> +void vsock_core_unregister(const struct vsock_transport *t);
->
->  /* The transport may downcast this to access transport-specific functions */
->  const struct vsock_transport *vsock_core_get_transport(struct vsock_sock *vsk);
-> @@ -190,6 +194,7 @@ struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->                                          struct sockaddr_vm *dst);
->  void vsock_remove_sock(struct vsock_sock *vsk);
->  void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
-> +int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
->
->  /**** TAP ****/
->
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index d89381166028..dddd85d9a147 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -130,7 +130,12 @@ static struct proto vsock_proto = {
->  #define VSOCK_DEFAULT_BUFFER_MAX_SIZE (1024 * 256)
->  #define VSOCK_DEFAULT_BUFFER_MIN_SIZE 128
->
-> -static const struct vsock_transport *transport_single;
-> +/* Transport used for host->guest communication */
-> +static const struct vsock_transport *transport_h2g;
-> +/* Transport used for guest->host communication */
-> +static const struct vsock_transport *transport_g2h;
-> +/* Transport used for DGRAM communication */
-> +static const struct vsock_transport *transport_dgram;
->  static DEFINE_MUTEX(vsock_register_mutex);
->
->  /**** UTILS ****/
-> @@ -182,7 +187,7 @@ static int vsock_auto_bind(struct vsock_sock *vsk)
->         return __vsock_bind(sk, &local_addr);
->  }
->
-> -static int __init vsock_init_tables(void)
-> +static void vsock_init_tables(void)
->  {
->         int i;
->
-> @@ -191,7 +196,6 @@ static int __init vsock_init_tables(void)
->
->         for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++)
->                 INIT_LIST_HEAD(&vsock_connected_table[i]);
-> -       return 0;
->  }
->
->  static void __vsock_insert_bound(struct list_head *list,
-> @@ -376,6 +380,62 @@ void vsock_enqueue_accept(struct sock *listener, struct sock *connected)
->  }
->  EXPORT_SYMBOL_GPL(vsock_enqueue_accept);
->
-> +/* Assign a transport to a socket and call the .init transport callback.
-> + *
-> + * Note: for stream socket this must be called when vsk->remote_addr is set
-> + * (e.g. during the connect() or when a connection request on a listener
-> + * socket is received).
-> + * The vsk->remote_addr is used to decide which transport to use:
-> + *  - remote CID > VMADDR_CID_HOST will use host->guest transport
-> + *  - remote CID <= VMADDR_CID_HOST will use guest->host transport
-> + */
-> +int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> +{
-> +       const struct vsock_transport *new_transport;
-> +       struct sock *sk = sk_vsock(vsk);
-> +
-> +       switch (sk->sk_type) {
-> +       case SOCK_DGRAM:
-> +               new_transport = transport_dgram;
-> +               break;
-> +       case SOCK_STREAM:
-> +               if (vsk->remote_addr.svm_cid > VMADDR_CID_HOST)
-> +                       new_transport = transport_h2g;
-> +               else
-> +                       new_transport = transport_g2h;
+On Wed, 2019-10-23 at 10:26 +0200, David Hildenbrand wrote:
+> On 23.10.19 00:28, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > 
+> > In order to enable the use of the zone from the list manipulator functions
+> > I will need access to the zone pointer. As it turns out most of the
+> > accessors were always just being directly passed &zone->free_area[order]
+> > anyway so it would make sense to just fold that into the function itself
+> > and pass the zone and order as arguments instead of the free area.
+> > 
+> > In order to be able to reference the zone we need to move the declaration
+> > of the functions down so that we have the zone defined before we define the
+> > list manipulation functions. Since the functions are only used in the file
+> > mm/page_alloc.c we can just move them there to reduce noise in the header.
+> > 
+> > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> > Reviewed-by: David Hildenbrand <david@redhat.com>
+> > Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > ---
+> >   include/linux/mmzone.h |   32 -----------------------
+> >   mm/page_alloc.c        |   67 +++++++++++++++++++++++++++++++++++-------------
+> >   2 files changed, 49 insertions(+), 50 deletions(-)
+> 
+> Did you see
+> 
+> https://lore.kernel.org/lkml/20191001152928.27008.8178.stgit@localhost.localdomain/T/#m4d2bc2f37bd7bdc3ae35c4f197905c275d0ad2f9
+> 
+> this time?
+> 
+> And the difference to the old patch is only an empty line.
+> 
 
-I just noticed that this break the loopback in the guest.
-As a fix, we should use 'transport_g2h' when remote_cid <= VMADDR_CID_HOST
-or remote_cid is the id of 'transport_g2h'.
+I saw the report. However I have not had much luck reproducing it in order
+to get root cause. Here are my results for linux-next 20191021 with that
+patch running page_fault2 over an average of 3 runs:
 
-To do that we also need to avoid that L2 guests can have the same CID of L1.
-For vhost_vsock I can call vsock_find_cid() in vhost_vsock_set_cid()
+Baseline:   3734692.00
+This patch: 3739878.67
 
-@Jorgen: for vmci we need to do the same? or it is guaranteed, since
-it's already support nested VMs, that a L2 guests cannot have the
-same CID as the L1.
+Also I am not so sure about these results as the same patch had passed
+previously before and instead it was patch 3 that was reported as having a
+-1.2% regression[1]. All I changed in response to that report was to add
+page_is_reported() which just wrapped the bit test for the reported flag
+in a #ifdef to avoid testing it for the blocks that were already #ifdef
+wrapped anyway.
 
-I'll send a v2 with this fix, but I'll wait a bit for other comments.
+I am still trying to see if I can get access to a system that would be a
+better match for the one that reported the issue. My working theory is
+that maybe it requires a high core count per node to reproduce. Either
+that or it is some combination of the kernel being tested on and the patch
+is causing some loop to go out of alignment and become more expensive.
 
-Thanks,
-Stefano
+I also included the page_fault2 results in my cover page as that seems to
+show a slight improvement with all of the patches applied.
+
+Thanks.
+
+- Alex
+
+[1]: https://lore.kernel.org/lkml/20190921152522.GU15734@shao2-debian/
+
