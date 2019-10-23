@@ -2,171 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90DD4E0FBF
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 03:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13CB5E0FBA
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 03:37:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733269AbfJWBjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 22 Oct 2019 21:39:20 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:47504 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730047AbfJWBjT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 22 Oct 2019 21:39:19 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9N1YOd8190852;
-        Wed, 23 Oct 2019 01:36:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=mgnTopzGZ8f1FGKvPSTHhrMy24Rq85HzQQkpuJIKlp0=;
- b=BuVelkAPmWzz/ViA5GxMxUd6Ilv/ZHMliID3HYO+ysbz6xcFLl0G7qwrW9ZnhZ5+fw5K
- ZZwhM1WQ1gpb5f91a2e/3a5K45dUKqz8th5DCDbvJQLQfhXq8imBPNdnNJzDlaNpoHbk
- MtpwAQQ9uayFJCsgXIPxV4TOl4+N6WL5OrEp1fWLAPHtJEr3Ae5bbcqtmT5o/9Nh6ytW
- BCV30iby7KyJaxOZfvfwdPZ6v+bRwsi0ufN6DxKVo9xw4OiXTuuAcdsjuY8Jq3hxlM9O
- YCK0rVUp3NoDs/PhwZcs9Sw9XoQZjTDwsW4wqZi80KUm3adpOAZZ4Jpw0VMvsphz52N8 lA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2vqu4qt1qa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Oct 2019 01:36:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9N1YE5W158224;
-        Wed, 23 Oct 2019 01:36:10 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2vsx23yaku-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Oct 2019 01:36:10 +0000
-Received: from abhmp0021.oracle.com (abhmp0021.oracle.com [141.146.116.27])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9N1a7iT001979;
-        Wed, 23 Oct 2019 01:36:08 GMT
-Received: from [10.191.28.118] (/10.191.28.118)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 23 Oct 2019 01:36:07 +0000
-Subject: Re: [PATCH v7 3/5] x86/kvm: Add "nopvspin" parameter to disable PV
- spinlocks
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, boris.ostrovsky@oracle.com, jgross@suse.com,
-        peterz@infradead.org, will@kernel.org,
-        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
-        sthemmin@microsoft.com, sashal@kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <1571649076-2421-1-git-send-email-zhenzhong.duan@oracle.com>
- <1571649076-2421-4-git-send-email-zhenzhong.duan@oracle.com>
- <8736fl1071.fsf@vitty.brq.redhat.com>
- <dbc50272-a4f5-ce7c-ba71-75031521f420@oracle.com>
- <20191022210355.GR2343@linux.intel.com>
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <f0065d49-36ae-8b1d-81b9-6e899042169f@oracle.com>
-Date:   Wed, 23 Oct 2019 09:36:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191022210355.GR2343@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        id S1733232AbfJWBg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 22 Oct 2019 21:36:58 -0400
+Received: from mail-eopbgr740042.outbound.protection.outlook.com ([40.107.74.42]:59852
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730047AbfJWBg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 22 Oct 2019 21:36:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JmrEnIyJs810ZC2tPtdrNkZbEBd+vGm1TKfqgda1kDwVevbpHAzmmO6cU91JdkoVfkGbZlD1Rxalfl7pgUHr+OZiCRZJ3J3AfeDlagEC6Jt1oGV/VfxxmMJKukxZxmNjfqNH6mJlNNHwZo3aaMs+Twn0HKABN2by4ufQJAxXVfSntmZrvpAiArJkFAkRd3qXHZa/e8elHXQWVHfBuny5x/lq6OrAsO7key6Z8QTX9cOVER+E7bLZTfqoRDH5J411YFDSdfjEFTKo//9xp8Q2gf1HPYSy3QPcLTS7Uhm8AyU+aCCgQ72Lfq5jrK+k8M3KAiOdpCqXMbVm+QhCJ7RlGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
+ b=H5Z7nzV72S6eHHsWeDWHcgM8bPBBEGtw1cURwvDyVVLleenylHczbqcIMn8m8dTJgjGzthFkvnQ5XlHJ53Kn9lN2lUtsYmvdmaog0Dyo9vtyTcGyqux6aoILK7r5mjG3kRGD0HqY5GviytXmi0DlJDoXhNDHwv5RcTfu3xA24R9jNKqHTNCibYvyXH37jkPCy6CnM8P+Epx4qduD90fIJBe/BF29OrATfomVOl+PLR0jIa21im8ZnKli8p31i/8U2x/VlmHY1dy5xZ0RmwLA+d0RyV4R5AyEtLwIbeIQqaELs3V9sRmE3dBWbpMmUIagYQxpFLpNOfHeaOFx2JClpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
+ b=VUzy3f++eFXBbw6E65d/Z+mHQZOz/NFCcc1QEzGu1e2mfG6ZsMvMsq2FHRVw+vn1XBG9lxepOSP0rJ5Rqno4COKLYQZB2nkjxiQGWZRjRVAU7U0J8GlvFTEHbF2UGdK71Wu2QB8Vo0cMqnkPsUa4gVdWlVaDJoLUDhz6jGRj9nU=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3387.namprd12.prod.outlook.com (20.178.198.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Wed, 23 Oct 2019 01:36:55 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Wed, 23 Oct 2019
+ 01:36:55 +0000
+From:   "Singh, Brijesh" <brijesh.singh@amd.com>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "info@metux.net" <info@metux.net>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>
+Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
+ check failure.
+Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
+ integrity check failure.
+Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdnezQA
+Date:   Wed, 23 Oct 2019 01:36:55 +0000
+Message-ID: <14a4cb7c-5909-189a-c5ba-56df4e4fb65a@amd.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+In-Reply-To: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1910230013
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9418 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910230013
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0201CA0069.namprd02.prod.outlook.com
+ (2603:10b6:803:20::31) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [70.112.153.56]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: e1ed6df2-5d95-481f-eb6e-08d757597cad
+x-ms-traffictypediagnostic: DM6PR12MB3387:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR12MB33873951F798C7F9E5F1725DE56B0@DM6PR12MB3387.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-forefront-prvs: 019919A9E4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(346002)(376002)(396003)(366004)(199004)(189003)(8676002)(4326008)(316002)(6246003)(110136005)(2501003)(8936002)(36756003)(229853002)(478600001)(81156014)(81166006)(1250700005)(305945005)(2201001)(6436002)(6486002)(2616005)(256004)(11346002)(76176011)(99286004)(5660300002)(66066001)(52116002)(26005)(102836004)(31686004)(25786009)(7736002)(4744005)(476003)(186003)(31696002)(71200400001)(71190400001)(6512007)(66476007)(3846002)(86362001)(64756008)(66946007)(66446008)(66556008)(2906002)(7416002)(486006)(6116002)(14444005)(14454004)(53546011)(6506007)(386003)(446003)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3387;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a+CVSCfScJzn9V5PiJGAD48cUuGT01MH0sI9xzG9zSsJj7VkqtoHdsQbbCNxPqckziDXknmIXI5K6F29UnJgrgbHsAEJt1f+nPVmf9zaPWG2zuke1nO0PPgQnmDJYoKD6ctX5iswaBNIgX8qrsDAAAcki6NVE25bl3342alc5o2MLtqY9U1QHvsqrem6rwJS0xrIZqlRwGtvzRAHbq0vbK3ov7s9wKqRKgR35zmoZZVo4g3cawzoR+8zULkxYTs4tsZ+B93z0LRilhtrzzIgI4IeIqB2b1hBcurSoXS78+yqhHuWn56yKOkJ3VL3kFI3nG55xyd7fHph4LUi4dfnQHaJkHuZ272G1jGIly/9D2BIKt+C2ZTMqwLs2XZ9qySt5/u9p/zkLvgDNZsrweifrsTJS694bzdD9HOH98eTviEhuSCWUFEYhjuiMeGb5QXR
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6762AD8AC12D40478F6CD182032E0368@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1ed6df2-5d95-481f-eb6e-08d757597cad
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2019 01:36:55.3791
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zPB+p3cGL3DIppZK98hE9y1xb+2SNDPZHfFm68H76DOfpwHE3VogIxb3NbboCrxkpeEwV4AKfxUCNwhH+vm8Bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3387
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/10/23 5:03, Sean Christopherson wrote:
-> On Tue, Oct 22, 2019 at 08:46:46PM +0800, Zhenzhong Duan wrote:
->> Hi Vitaly,
->>
->> On 2019/10/22 19:36, Vitaly Kuznetsov wrote:
->>
->>> Zhenzhong Duan<zhenzhong.duan@oracle.com>  writes:
->>>
->> ...snip
->>
->>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->>>> index 249f14a..3945aa5 100644
->>>> --- a/arch/x86/kernel/kvm.c
->>>> +++ b/arch/x86/kernel/kvm.c
->>>> @@ -825,18 +825,36 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
->>>>    */
->>>>   void __init kvm_spinlock_init(void)
->>>>   {
->>>> -	/* Does host kernel support KVM_FEATURE_PV_UNHALT? */
->>>> -	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
->>>> +	/*
->>>> +	 * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
->>>> +	 * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
->>>> +	 * preferred over native qspinlock when vCPU is preempted.
->>>> +	 */
->>>> +	if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
->>>> +		pr_info("PV spinlocks disabled, no host support.\n");
->>>>   		return;
->>>> +	}
->>>> +	/*
->>>> +	 * Disable PV qspinlock and use native qspinlock when dedicated pCPUs
->>>> +	 * are available.
->>>> +	 */
->>>>   	if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
->>>> -		static_branch_disable(&virt_spin_lock_key);
->>>> -		return;
->>>> +		pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints.\n");
->>>> +		goto out;
->>>>   	}
->>>> -	/* Don't use the pvqspinlock code if there is only 1 vCPU. */
->>>> -	if (num_possible_cpus() == 1)
->>>> -		return;
->>>> +	if (num_possible_cpus() == 1) {
->>>> +		pr_info("PV spinlocks disabled, single CPU.\n");
->>>> +		goto out;
->>>> +	}
->>>> +
->>>> +	if (nopvspin) {
->>>> +		pr_info("PV spinlocks disabled, forced by \"nopvspin\" parameter.\n");
->>>> +		goto out;
->>>> +	}
->>>> +
->>>> +	pr_info("PV spinlocks enabled\n");
->>>>   	__pv_init_lock_hash();
->>>>   	pv_ops.lock.queued_spin_lock_slowpath = __pv_queued_spin_lock_slowpath;
->>>> @@ -849,6 +867,8 @@ void __init kvm_spinlock_init(void)
->>>>   		pv_ops.lock.vcpu_is_preempted =
->>>>   			PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
->>>>   	}
->>>> +out:
->>>> +	static_branch_disable(&virt_spin_lock_key);
->>> You probably need to add 'return' before 'out:' as it seems you're
->>> disabling virt_spin_lock_key in all cases now).
->> virt_spin_lock_key is kept enabled in !kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)
->> case which is the only case virt_spin_lock() optimization is used.
->>
->> When PV qspinlock is enabled, virt_spin_lock() isn't called in
->> __pv_queued_spin_lock_slowpath() in which case we don't care
->> virt_spin_lock_key's value.
->>
->> So adding 'return' or not are both ok, I chosed to save a line,
->> let me know if you prefer to add a 'return' and I'll change it.
-> It'd be worth adding a comment here if you end up spinning another version
-> to change the logging prefix.  The logic is sound and I like the end
-> result, but I had the same knee jerk "this can't be right!?!?" reaction as
-> Vitaly.
-
-Sure, will do in next version.
-
-Thanks
-
-Zhenzhong
-
+DQpPbiAxMC8xNy8xOSAzOjM1IFBNLCBLYWxyYSwgQXNoaXNoIHdyb3RlOg0KPiBGcm9tOiBBc2hp
+c2ggS2FscmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPg0KPg0KPiBTRVYgSU5JVCBjb21tYW5kIGxv
+YWRzIHRoZSBTRVYgcmVsYXRlZCBwZXJzaXN0ZW50IGRhdGEgZnJvbSBOVlMNCj4gYW5kIGluaXRp
+YWxpemVzIHRoZSBwbGF0Zm9ybSBjb250ZXh0LiBUaGUgZmlybXdhcmUgdmFsaWRhdGVzIHRoZQ0K
+PiBwZXJzaXN0ZW50IHN0YXRlLiBJZiB2YWxpZGF0aW9uIGZhaWxzLCB0aGUgZmlybXdhcmUgd2ls
+bCByZXNldA0KPiB0aGUgcGVyc2lzZW50IHN0YXRlIGFuZCByZXR1cm4gYW4gaW50ZWdyaXR5IGNo
+ZWNrIGZhaWx1cmUgc3RhdHVzLg0KPg0KPiBBdCB0aGlzIHBvaW50LCBhIHN1YnNlcXVlbnQgSU5J
+VCBjb21tYW5kIHNob3VsZCBzdWNjZWVkLCBzbyByZXRyeQ0KPiB0aGUgY29tbWFuZC4gVGhlIElO
+SVQgY29tbWFuZCByZXRyeSBpcyBvbmx5IGRvbmUgZHVyaW5nIGRyaXZlcg0KPiBpbml0aWFsaXph
+dGlvbi4NCj4NCj4gQWRkaXRpb25hbCBlbnVtcyBhbG9uZyB3aXRoIFNFVl9SRVRfU0VDVVJFX0RB
+VEFfSU5WQUxJRCBhcmUgYWRkZWQNCj4gdG8gc2V2X3JldF9jb2RlIHRvIG1haW50YWluIGNvbnRp
+bnVpdHkgYW5kIHJlbGV2YW5jZSBvZiBlbnVtIHZhbHVlcy4NCj4NCj4gU2lnbmVkLW9mZi1ieTog
+QXNoaXNoIEthbHJhIDxhc2hpc2gua2FscmFAYW1kLmNvbT4NCg0KDQpSZXZpZXdlZC1ieTogQnJp
+amVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KDQp0aGFua3MNCg0K
