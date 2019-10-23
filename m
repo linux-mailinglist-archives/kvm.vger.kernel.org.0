@@ -2,87 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B71FCE1E4C
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 16:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F39D3E1E79
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 16:44:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390012AbfJWOhs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 10:37:48 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:49102 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732328AbfJWOhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 10:37:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=/PR2FEiCX+iu4eBmOZGHncjejUZSgrUpVLIkHmDbJhU=; b=FnXFrZo50dOrSKOXpol2prson
-        gTlqkVnD6hYYGZ5vX+QKIYp1tlmacAw4DtTMwHmAxJIz8Q9OKuTAMPacabb4rZ5rqtjYLz9yvhYdF
-        GcNTyDoOD67WxiR5GjT4fakBYjhOFKVV7t4OyCJKIdZrr8zB3dLn1H15qt0Affa7xuR1t4uqwHI52
-        1VA2EW8gfOT6fDr7m5ZgZcUL/iwEb/vckqEB9sgi56WyUtQVMOHWUKC2FTrpdYouJNrEtbdrj+dyl
-        TFTBGjr4n+MfeKN9HhzNCTcncRmr7a+/NTp57Gq4y45KRR9sGJc0CbqkXcufhl1DW+g88P30GgKhm
-        4hCq4S+kg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iNHlY-0007VJ-Ql; Wed, 23 Oct 2019 14:37:37 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 770C4300EBF;
-        Wed, 23 Oct 2019 16:36:36 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8643A2B1D776D; Wed, 23 Oct 2019 16:37:34 +0200 (CEST)
-Date:   Wed, 23 Oct 2019 16:37:34 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [patch V2 00/17] entry: Provide generic implementation for host
- and guest entry/exit work
-Message-ID: <20191023143734.GJ1800@hirez.programming.kicks-ass.net>
-References: <20191023122705.198339581@linutronix.de>
+        id S2392313AbfJWOox (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 10:44:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27488 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2392310AbfJWOox (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 10:44:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571841891;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uf7ftM+TjCWiiMzN8AYw8EZ8RI4SD6HnWbZiIXVhH+c=;
+        b=aXnNzRfPzV75mJN2oWn8bCAn2gVIgaryVjKrGJs8l/EptslGYjG/Kr++RkZQsin3WRFWBp
+        rTZ9DYhiwS/AxM9kNOdDfcznfr1Gmit0yXcBaSQDoGrVodIUiDgU1uOfZcXIdzpQsPW7ji
+        dn0+34ta+gOYLp3+UEVqb+9xwDZChy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-_rgTFrFcO-q0GmV5vlgQpQ-1; Wed, 23 Oct 2019 10:44:46 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C165C800D57
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 14:44:45 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68BF46375C;
+        Wed, 23 Oct 2019 14:44:44 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 352181051A3;
+        Wed, 23 Oct 2019 12:44:29 -0200 (BRST)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x9NEiPMY027777;
+        Wed, 23 Oct 2019 12:44:25 -0200
+Date:   Wed, 23 Oct 2019 12:44:25 -0200
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Radim Krcmar <rkrcmar@redhat.com>
+Subject: Re: [patch 1/2] KVM: x86: switch KVMCLOCK base to CLOCK_MONOTONIC_RAW
+Message-ID: <20191023144422.GA27674@amt.cnet>
+References: <20180809145245.722399627@amt.cnet>
+ <20180809145307.066923033@amt.cnet>
+ <76fc525a-0ccc-be8d-5d66-c41853f9051e@redhat.com>
+ <20180813125252.GA31066@amt.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180813125252.GA31066@amt.cnet>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: _rgTFrFcO-q0GmV5vlgQpQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20191023122705.198339581@linutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 23, 2019 at 02:27:05PM +0200, Thomas Gleixner wrote:
->  /Makefile                             |    3 
->  arch/Kconfig                          |    3 
->  arch/x86/Kconfig                      |    1 
->  arch/x86/entry/calling.h              |   12 +
->  arch/x86/entry/common.c               |  264 ++------------------------------
->  arch/x86/entry/entry_32.S             |   41 ----
->  arch/x86/entry/entry_64.S             |   32 ---
->  arch/x86/entry/entry_64_compat.S      |   30 ---
->  arch/x86/include/asm/irqflags.h       |    8 
->  arch/x86/include/asm/paravirt.h       |    9 -
->  arch/x86/include/asm/signal.h         |    1 
->  arch/x86/include/asm/thread_info.h    |    9 -
->  arch/x86/kernel/signal.c              |    2 
->  arch/x86/kernel/traps.c               |   33 ++--
->  arch/x86/kvm/x86.c                    |   17 --
->  arch/x86/mm/fault.c                   |    7 
->  b/arch/x86/include/asm/entry-common.h |  104 ++++++++++++
->  b/arch/x86/kvm/Kconfig                |    1 
->  b/include/linux/entry-common.h        |  280 ++++++++++++++++++++++++++++++++++
->  b/kernel/entry/common.c               |  184 ++++++++++++++++++++++
->  include/linux/kvm_host.h              |   64 +++++++
->  kernel/Makefile                       |    1 
->  virt/kvm/Kconfig                      |    3 
->  23 files changed, 735 insertions(+), 374 deletions(-)
+On Mon, Aug 13, 2018 at 09:52:55AM -0300, Marcelo Tosatti wrote:
+> On Fri, Aug 10, 2018 at 09:15:51AM +0200, Paolo Bonzini wrote:
+> > On 09/08/2018 16:52, Marcelo Tosatti wrote:
+> > > Commit 0bc48bea36d1 ("KVM: x86: update master clock before computing =
+kvmclock_offset")
+> > > switches the order of operations to avoid the conversion=20
+> > >=20
+> > > TSC (without frequency correction) ->
+> > > system_timestamp (with frequency correction),=20
+> > >=20
+> > > which might cause a time jump.
+> > >=20
+> > > However, it leaves any other masterclock update unsafe, which include=
+s,=20
+> > > at the moment:
+> > >=20
+> > >         * HV_X64_MSR_REFERENCE_TSC MSR write.
+> > >         * TSC writes.
+> > >         * Host suspend/resume.
+> > >=20
+> > > Avoid the time jump issue by using frequency uncorrected
+> > > CLOCK_MONOTONIC_RAW clock.=20
+> > >=20
+> > > Its the guests time keeping software responsability
+> > > to track and correct a reference clock such as UTC.
+> > >=20
+> > > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+> >=20
+> > What happens across migration?
+> >=20
+> > Paolo
+>=20
+> You mean between
+>=20
+> frequency corrected host -> frequency uncorrected host
+>=20
+> And vice-versa?=20
+>=20
+> I'll check NTP's/Chrony's behaviour and let you know.
+>=20
+> Thanks
 
-This looks really nice; esp. the cleaned up interrupt state.
+They will measure and adjust their frequency corrections
+(which is necessary anyway due to temperature variations=20
+for example).
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+http://doc.ntp.org/4.1.0/ntpd.htm
+
+Frequency Discipline
+
+The ntpd behavior at startup depends on whether the frequency file,
+usually ntp.drift, exists. This file contains the latest estimate of
+clock frequency error. When the ntpd is started and the file does not
+exist, the ntpd enters a special mode designed to quickly adapt to the
+particular system clock oscillator time and frequency error. This takes
+approximately 15 minutes, after which the time and frequency are set to
+nominal values and the ntpd enters normal mode, where the time and
+frequency are continuously tracked relative to the server. After one
+hour the frequency file is created and the current frequency offset
+written to it. When the ntpd is started and the file does exist, the
+ntpd frequency is initialized from the file and enters normal mode
+immediately. After that the current frequency offset is written to the
+file at hourly intervals.
+
