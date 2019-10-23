@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A6FEE1CCD
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 15:36:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 782A9E1CFF
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 15:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405915AbfJWNgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 09:36:16 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55777 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392044AbfJWNgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 09:36:09 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g24so12111912wmh.5
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 06:36:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=dVgB2gHwyu9BrwAHrTVrhxxTLMnU+GjkCtVmW3QXNgU=;
-        b=Zp1rNYOb7wPsdMPdMbYe//+9NYjGitazC3K4MBrZR7qVyf3SurlVK/iVTX8rXrD1MV
-         duJiT6vf8/dVRyCoGAADOWO6mdvdO7LXMGSTBsL1aPHRptzHVSr6EVhNUNTbTuXzEcJM
-         CBCb+Jmcnci8Xj7Z+C2D9+RBLni3QkUE+aLyNfm640DulCjNSyCQlNWPphsu43/xiaCJ
-         jGtO0Rf565kxFLQCtlztfZCV3214dAbiLSZKIvSf0BlByQ/4iOlt67agx4AGUfiCjZMI
-         RoTZ6xCVKLtvHbzydaTmcuGrVnWq27zH7gygGQ2YGfnHqhgxkVmC2lGKxGSiWzVcr6KU
-         QN9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=dVgB2gHwyu9BrwAHrTVrhxxTLMnU+GjkCtVmW3QXNgU=;
-        b=XuT6iSrxV2CeMajIxJW3jTAy9XAgO1bCdBf/tf2WqTbIGXhAXQVleHThrpHY9BeRld
-         aP/1M2dKWx0rh025tKl+iIseSkL+WujmblGJ+OnCF82LnS9ZoM7TQlZwUjQOmKDlwS/3
-         Bn3e4JIbSth0fCwp9I3oyBpYJ4/+v89aOPa7R5hyKv26m/e8TWLPQk2AZdXD5hC31VdQ
-         aZa1+O2oKahfxayl52D4XX6V3A3DCzLuQRejJg31fQ2gLGFnda9wpy2mWBObJZYwLaT7
-         WGooF8/bVzbgJLwff8pklo3e4i0bJ/f7rqTZrCYmZ/96rLLjnauQWYRvvqXCwQqwf5yZ
-         ig0A==
-X-Gm-Message-State: APjAAAXn/LZ2Rw1Nhc/Y0k7yp+VBLVQK3KpecnJv66MHT/IszaDuEGkm
-        gzQFWCUGkC5itpYVvnfPfy8OEhnX+CL73HUTrMA=
-X-Google-Smtp-Source: APXvYqzu60dP5ZzLHoNcR4C1Z90wK3ujHk4eIk60CblS8nkYpWGmu8JElmh7udCx+t1YVbQaCRFZhRaASS5NgAdsuk0=
-X-Received: by 2002:a7b:ce84:: with SMTP id q4mr4860246wmj.36.1571837768313;
- Wed, 23 Oct 2019 06:36:08 -0700 (PDT)
+        id S2391707AbfJWNoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 09:44:08 -0400
+Received: from mga06.intel.com ([134.134.136.31]:4403 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391072AbfJWNoH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 09:44:07 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 06:43:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,221,1569308400"; 
+   d="scan'208";a="223187281"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga004.fm.intel.com with ESMTP; 23 Oct 2019 06:43:45 -0700
+Date:   Wed, 23 Oct 2019 06:43:45 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [patch V2 01/17] x86/entry/32: Remove unused resume_userspace
+ label
+Message-ID: <20191023134345.GA329@linux.intel.com>
+References: <20191023122705.198339581@linutronix.de>
+ <20191023123117.686514045@linutronix.de>
 MIME-Version: 1.0
-Received: by 2002:a5d:400a:0:0:0:0:0 with HTTP; Wed, 23 Oct 2019 06:36:07
- -0700 (PDT)
-Reply-To: mrs.lisarobinson746@gmail.com
-From:   "Mrs. Lisa" <helpdesk.eit.ac.nz@gmail.com>
-Date:   Wed, 23 Oct 2019 06:36:07 -0700
-Message-ID: <CAK7Er8aKyL3H-yzE3WwHqgdy-pvjcQoKmcraD43WMg3fDh48xQ@mail.gmail.com>
-Subject: Mrs. Lisa Charity Donation
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191023123117.686514045@linutronix.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-I am Lisa Robinson, you have a donation of $1,200,000.00 USD. Contact
-me now for more information.
+On Wed, Oct 23, 2019 at 02:27:06PM +0200, Thomas Gleixner wrote:
+> The C reimplementation of SYSENTER left that unused ENTRY() label
+> around. Remove it.
+> 
+> Fixes: 5f310f739b4c ("x86/entry/32: Re-implement SYSENTER using the new C path")
+> Originally-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
