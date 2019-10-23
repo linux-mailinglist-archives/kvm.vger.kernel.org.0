@@ -2,236 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB4B9E12EE
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 09:16:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F6B7E130E
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 09:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389090AbfJWHQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 03:16:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59692 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727574AbfJWHQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 03:16:44 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2389867AbfJWHZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 03:25:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47451 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389801AbfJWHZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 03:25:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571815520;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t5zjHQpTeAkClNQhQEPJ3+MpaSkNKcTWow8Ri9dKxRU=;
+        b=gimglyuuhmLc5QxbcNDyyxMshLtV95QxW2cUHNa7/qMj8hKGIKxhTX0onyB15qIp664hBo
+        b1B1wH0i8y7UpfQuSibqFkcxgiz49J/l36aoqqBrc5IL1AQD73V7ivgaIIW1nbmzh+vbbe
+        kGl2khCiFF0glgxnpHNCQl1x/uYcFf0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-E_1lPYQvMbq6Oa_69H82bw-1; Wed, 23 Oct 2019 03:25:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 06A87C057F20
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 07:16:43 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id a6so7598579wru.1
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 00:16:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jwOtyVgHh4fXErSSQOuM/kzsF9twK281dOW0D19R2iQ=;
-        b=QorrND6Leo9zqnsaCDJNG2XWu8BAYDRWIbhRygpZ3mYiCzNxE6EXdMYZAZivcEN2RS
-         0q61GVY2LrNc7TuE/d233Awezhs00V45ndRWgcL48Xj/eM+8NofgUdEDq/awGOEC5PlO
-         dbASy2LfGPC27aeo21r8Vsz8jKbKx1CMgp0/0TtEIwIHJipRa9lp98AiEBR/I97rHdea
-         FOoJho2Tjbk6PdCQVsGkq9qCm7RKZ32TB7F6eaEmUz3nr/EBf1hnCJxwB6Gz/sHN5G7e
-         wI8yK+r6oYGrVf+dFpCRNhId+YadYYN04rLmSirqivhYxu5yF745r2ozFJ/Kr7TSeGXZ
-         1haA==
-X-Gm-Message-State: APjAAAXWn9W88h+OmWJp0kmeBRKdGMzek2nQ70aLTLkOSQ/Hjj96hZgG
-        vMssAM3UGHkgqs6AgE3n25vu+rJIuTTY9VpItu9cdflQPGT2k1ojxjCACuNSwnIHDaNVWnF2LPH
-        E9+NmMPbQ1xza
-X-Received: by 2002:a1c:f714:: with SMTP id v20mr6567462wmh.55.1571815001363;
-        Wed, 23 Oct 2019 00:16:41 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxEL40+6DQtzEWcUPXQXJhcsOA/uesoowP/wdVrCFut/Org2lg1krqm2IDjGjwbNA1POOLjvA==
-X-Received: by 2002:a1c:f714:: with SMTP id v20mr6567426wmh.55.1571815000912;
-        Wed, 23 Oct 2019 00:16:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:45c:4f58:5841:71b2? ([2001:b07:6468:f312:45c:4f58:5841:71b2])
-        by smtp.gmail.com with ESMTPSA id d4sm28058276wrc.54.2019.10.23.00.16.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2019 00:16:40 -0700 (PDT)
-Subject: Re: [PATCH V3 2/2] target/i386/kvm: Add Hyper-V direct tlb flush
- support
-To:     Roman Kagan <rkagan@virtuozzo.com>, lantianyu1986@gmail.com,
-        rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com,
-        vkuznets@redhat.com, Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20191016130725.5045-1-Tianyu.Lan@microsoft.com>
- <20191016130725.5045-3-Tianyu.Lan@microsoft.com>
- <7de12770-271e-d386-a105-d53b50aa731f@redhat.com>
- <20191022201418.GA22898@rkaganb.lan>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <76c02274-a68f-65a8-aca9-963076db1557@redhat.com>
-Date:   Wed, 23 Oct 2019 09:16:39 +0200
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94EB01800DD0;
+        Wed, 23 Oct 2019 07:25:14 +0000 (UTC)
+Received: from [10.72.12.161] (ovpn-12-161.pek2.redhat.com [10.72.12.161])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BCF725C1D4;
+        Wed, 23 Oct 2019 07:25:01 +0000 (UTC)
+Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     mst@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+References: <20191022095230.2514-1-tiwei.bie@intel.com>
+ <47a572fd-5597-1972-e177-8ee25ca51247@redhat.com>
+ <20191023030253.GA15401@___>
+ <ac36f1e3-b972-71ac-fe0c-3db03e016dcf@redhat.com>
+ <20191023070747.GA30533@___>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <106834b5-dae5-82b2-0f97-16951709d075@redhat.com>
+Date:   Wed, 23 Oct 2019 15:25:00 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191022201418.GA22898@rkaganb.lan>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191023070747.GA30533@___>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: E_1lPYQvMbq6Oa_69H82bw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/10/19 22:14, Roman Kagan wrote:
-> On Tue, Oct 22, 2019 at 07:04:11PM +0200, Paolo Bonzini wrote:
->> On 16/10/19 15:07, lantianyu1986@gmail.com wrote:
-> 
-> Somehow this patch never got through to me so I'll reply here.
-> 
->>> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
->>>
->>> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
->>> Enable direct TLB flush for its guests meaning that TLB
->>> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
->>> bypassing KVM in Level 1. Due to the different ABI for hypercall
->>> parameters between Hyper-V and KVM, KVM capabilities should be
->>> hidden when enable Hyper-V direct tlb flush otherwise KVM
->>> hypercalls may be intercepted by Hyper-V. Add new parameter
->>> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
->>> capability status before enabling the feature.
->>>
->>> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
->>> ---
->>> Change sicne v2:
->>>        - Update new feature description and name.
->>>        - Change failure print log.
->>>
->>> Change since v1:
->>>        - Add direct tlb flush's Hyper-V property and use
->>>        hv_cpuid_check_and_set() to check the dependency of tlbflush
->>>        feature.
->>>        - Make new feature work with Hyper-V passthrough mode.
->>> ---
->>>  docs/hyperv.txt   | 10 ++++++++++
->>>  target/i386/cpu.c |  2 ++
->>>  target/i386/cpu.h |  1 +
->>>  target/i386/kvm.c | 24 ++++++++++++++++++++++++
->>>  4 files changed, 37 insertions(+)
->>>
->>> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
->>> index 8fdf25c829..140a5c7e44 100644
->>> --- a/docs/hyperv.txt
->>> +++ b/docs/hyperv.txt
->>> @@ -184,6 +184,16 @@ enabled.
->>>  
->>>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
->>>  
->>> +3.18. hv-direct-tlbflush
->>> +=======================
->>> +Enable direct TLB flush for KVM when it is running as a nested
->>> +hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
->>> +guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
->>> +differences between Hyper-V and KVM hypercalls, L2 guests will not be
->>> +able to issue KVM hypercalls (as those could be mishanled by L0
->>> +Hyper-V), this requires KVM hypervisor signature to be hidden.
->>> +
->>> +Requires: hv-tlbflush, -kvm
->>>  
->>>  4. Development features
->>>  ========================
->>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->>> index 44f1bbdcac..7bc7fee512 100644
->>> --- a/target/i386/cpu.c
->>> +++ b/target/i386/cpu.c
->>> @@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
->>>                        HYPERV_FEAT_IPI, 0),
->>>      DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
->>>                        HYPERV_FEAT_STIMER_DIRECT, 0),
->>> +    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
->>> +                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
->>>      DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
->>>  
->>>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
->>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->>> index eaa5395aa5..3cb105f7d6 100644
->>> --- a/target/i386/cpu.h
->>> +++ b/target/i386/cpu.h
->>> @@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
->>>  #define HYPERV_FEAT_EVMCS               12
->>>  #define HYPERV_FEAT_IPI                 13
->>>  #define HYPERV_FEAT_STIMER_DIRECT       14
->>> +#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
->>>  
->>>  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
->>>  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
->>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>> index 11b9c854b5..043b66ab22 100644
->>> --- a/target/i386/kvm.c
->>> +++ b/target/i386/kvm.c
->>> @@ -900,6 +900,10 @@ static struct {
->>>          },
->>>          .dependencies = BIT(HYPERV_FEAT_STIMER)
->>>      },
->>> +    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
->>> +        .desc = "direct paravirtualized TLB flush (hv-direct-tlbflush)",
->>> +        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
->>> +    },
->>>  };
->>>  
->>>  static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
->>> @@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
->>>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
->>>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
->>>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
->>> +    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
-> 
-> AFAICS this will turn HYPERV_FEAT_DIRECT_TLBFLUSH on if
-> hyperv_passthrough is on, so ...
-> 
->>>  
->>>      /* Additional dependencies not covered by kvm_hyperv_properties[] */
->>>      if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
->>> @@ -1243,6 +1248,25 @@ static int hyperv_handle_properties(CPUState *cs,
->>>          goto free;
->>>      }
->>>  
->>> +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) ||
->>> +        cpu->hyperv_passthrough) {
-> 
-> ... the test for ->hyperv_passthrough is redundant, and ...
-> 
->>> +        if (!cpu->expose_kvm) {
->>> +            r = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0);
->>> +            if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) && r) {
-> 
-> ... , more importantly, this will abort QEMU if
-> HYPERV_FEAT_DIRECT_TLBFLUSH wasn't requested explicitly, but was
-> activated by ->hyperv_passthrough, and setting the capability failed.  I
-> think the meaning of hyperv_passthrough is "enable all hyperv features
-> supported by the KVM", so in this case it looks more correct to just
-> clear the feature bit and go ahead.
-> 
->>> +                fprintf(stderr,
->>> +                    "Hyper-V %s is not supported by kernel\n",
->>> +                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
->>> +                return -ENOSYS;
->>> +            }
->>> +        } else if (!cpu->hyperv_passthrough) {
->>> +            fprintf(stderr,
->>> +                "Hyper-V %s requires KVM hypervisor signature "
->>> +                "to be hidden (-kvm).\n",
->>> +                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
->>> +            return -ENOSYS;
->>> +        }
-> 
-> You reach here if ->expose_kvm && ->hyperv_passthrough, and no
-> capability is activated, and you go ahead with the feature bit set.
-> This doesn't look right either.
-> 
-> So in general it should probably look like
-> 
->     if (hyperv_feat_enabled(HYPERV_FEAT_DIRECT_TLBFLUSH)) {
->         if (kvm_vcpu_enable_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH)) {
->             if (!cpu->hyperv_passthrough) {
->                 ... report feature unsupported by kernel ...
->                 return -ENOSYS;
->             }
->             cpu->hyperv_features &= ~BIT(HYPERV_FEAT_DIRECT_TLBFLUSH);
->         } else if (cpu->expose_kvm) {
->             ... report conflict ...
->             return -ENOSYS;
->         }
->     }
-> 
-> [Yes, hyperv_passthrough hurts, but you've been warned ;)]
 
-Unqueued, thanks. :)
+On 2019/10/23 =E4=B8=8B=E5=8D=883:07, Tiwei Bie wrote:
+> On Wed, Oct 23, 2019 at 01:46:23PM +0800, Jason Wang wrote:
+>> On 2019/10/23 =E4=B8=8A=E5=8D=8811:02, Tiwei Bie wrote:
+>>> On Tue, Oct 22, 2019 at 09:30:16PM +0800, Jason Wang wrote:
+>>>> On 2019/10/22 =E4=B8=8B=E5=8D=885:52, Tiwei Bie wrote:
+>>>>> This patch introduces a mdev based hardware vhost backend.
+>>>>> This backend is built on top of the same abstraction used
+>>>>> in virtio-mdev and provides a generic vhost interface for
+>>>>> userspace to accelerate the virtio devices in guest.
+>>>>>
+>>>>> This backend is implemented as a mdev device driver on top
+>>>>> of the same mdev device ops used in virtio-mdev but using
+>>>>> a different mdev class id, and it will register the device
+>>>>> as a VFIO device for userspace to use. Userspace can setup
+>>>>> the IOMMU with the existing VFIO container/group APIs and
+>>>>> then get the device fd with the device name. After getting
+>>>>> the device fd of this device, userspace can use vhost ioctls
+>>>>> to setup the backend.
+>>>>>
+>>>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+>>>>> ---
+>>>>> This patch depends on below series:
+>>>>> https://lkml.org/lkml/2019/10/17/286
+>>>>>
+>>>>> v1 -> v2:
+>>>>> - Replace _SET_STATE with _SET_STATUS (MST);
+>>>>> - Check status bits at each step (MST);
+>>>>> - Report the max ring size and max number of queues (MST);
+>>>>> - Add missing MODULE_DEVICE_TABLE (Jason);
+>>>>> - Only support the network backend w/o multiqueue for now;
+>>>> Any idea on how to extend it to support devices other than net? I thin=
+k we
+>>>> want a generic API or an API that could be made generic in the future.
+>>>>
+>>>> Do we want to e.g having a generic vhost mdev for all kinds of devices=
+ or
+>>>> introducing e.g vhost-net-mdev and vhost-scsi-mdev?
+>>> One possible way is to do what vhost-user does. I.e. Apart from
+>>> the generic ring, features, ... related ioctls, we also introduce
+>>> device specific ioctls when we need them. As vhost-mdev just needs
+>>> to forward configs between parent and userspace and even won't
+>>> cache any info when possible,
+>>
+>> So it looks to me this is only possible if we expose e.g set_config and
+>> get_config to userspace.
+> The set_config and get_config interface isn't really everything
+> of device specific settings. We also have ctrlq in virtio-net.
 
-Paolo
+
+Yes, but it could be processed by the exist API. Isn't it? Just set ctrl=20
+vq address and let parent to deal with that.
+
+
+>
+>>
+>>> I think it might be better to do
+>>> this in one generic vhost-mdev module.
+>>
+>> Looking at definitions of VhostUserRequest in qemu, it mixed generic API
+>> with device specific API. If we want go this ways (a generic vhost-mdev)=
+,
+>> more questions needs to be answered:
+>>
+>> 1) How could userspace know which type of vhost it would use? Do we need=
+ to
+>> expose virtio subsystem device in for userspace this case?
+>>
+>> 2) That generic vhost-mdev module still need to filter out unsupported
+>> ioctls for a specific type. E.g if it probes a net device, it should ref=
+use
+>> API for other type. This in fact a vhost-mdev-net but just not modulariz=
+e it
+>> on top of vhost-mdev.
+>>
+>>
+>>>>> - Some minor fixes and improvements;
+>>>>> - Rebase on top of virtio-mdev series v4;
+> [...]
+>>>>> +
+>>>>> +static long vhost_mdev_get_features(struct vhost_mdev *m, u64 __user=
+ *featurep)
+>>>>> +{
+>>>>> +=09if (copy_to_user(featurep, &m->features, sizeof(m->features)))
+>>>>> +=09=09return -EFAULT;
+>>>> As discussed in previous version do we need to filter out MQ feature h=
+ere?
+>>> I think it's more straightforward to let the parent drivers to
+>>> filter out the unsupported features. Otherwise it would be tricky
+>>> when we want to add more features in vhost-mdev module,
+>>
+>> It's as simple as remove the feature from blacklist?
+> It's not really that easy. It may break the old drivers.
+
+
+I'm not sure I understand here, we do feature negotiation anyhow. For=20
+old drivers do you mean the guest drivers without MQ?
+
+
+>
+>>
+>>> i.e. if
+>>> the parent drivers may expose unsupported features and relay on
+>>> vhost-mdev to filter them out, these features will be exposed
+>>> to userspace automatically when they are enabled in vhost-mdev
+>>> in the future.
+>>
+>> The issue is, it's only that vhost-mdev knows its own limitation. E.g in
+>> this patch, vhost-mdev only implements a subset of transport API, but pa=
+rent
+>> doesn't know about that.
+>>
+>> Still MQ as an example, there's no way (or no need) for parent to know t=
+hat
+>> vhost-mdev does not support MQ.
+> The mdev is a MDEV_CLASS_ID_VHOST mdev device. When the parent
+> is being developed, it should know the currently supported features
+> of vhost-mdev.
+
+
+How can parent know MQ is not supported by vhost-mdev?
+
+
+>
+>> And this allows old kenrel to work with new
+>> parent drivers.
+> The new drivers should provide things like VIRTIO_MDEV_F_VERSION_1
+> to be compatible with the old kernels. When VIRTIO_MDEV_F_VERSION_1
+> is provided/negotiated, the behaviours should be consistent.
+
+
+To be clear, I didn't mean a change in virtio-mdev API, I meant:
+
+1) old vhost-mdev kernel driver that filters out MQ
+
+2) new parent driver that support MQ
+
+
+>
+>> So basically we have three choices here:
+>>
+>> 1) Implement what vhost-user did and implement a generic vhost-mdev (but=
+ may
+>> still have lots of device specific code). To support advanced feature wh=
+ich
+>> requires the access to config, still lots of API that needs to be added.
+>>
+>> 2) Implement what vhost-kernel did, have a generic vhost-mdev driver and=
+ a
+>> vhost bus on top for match a device specific API e.g vhost-mdev-net. We
+>> still have device specific API but limit them only to device specific
+>> module. Still require new ioctls for advanced feature like MQ.
+>>
+>> 3) Simply expose all virtio-mdev transport to userspace.
+> Currently, virtio-mdev transport is a set of function callbacks
+> defined in kernel. How to simply expose virtio-mdev transport to
+> userspace?
+
+
+The most straightforward way is to have an 1:1 mapping between ioctl and=20
+virito_mdev_device_ops.
+
+Thanks
+
+
+>
+>
+>> A generic module
+>> without any type specific code (like virtio-mdev). No need dedicated API=
+ for
+>> e.g MQ. But then the API will look much different than current vhost did=
+.
+>>
+>> Consider the limitation of 1) I tend to choose 2 or 3. What's you opinio=
+n?
+>>
+>>
 
