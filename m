@@ -2,207 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B061E1B37
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 14:48:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAFADE1BE4
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 15:11:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390874AbfJWMsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 08:48:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51921 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390489AbfJWMsi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 08:48:38 -0400
+        id S2405655AbfJWNLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 09:11:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50515 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726032AbfJWNLM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 23 Oct 2019 09:11:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571834917;
+        s=mimecast20190719; t=1571836270;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jEB9k2bbM07Ki73YIqhCrIwc5OH5gMP3iMawgmnXYFo=;
-        b=CjIyrI5LKAU90YevvZwT9eYyEVggWv8uTrNZ9A6lgn3UeGYi1lqiXBFO9IOeNtXnaHvTU9
-        RM4FOE1JSlYWJqgY3Zph98C3Lb0PTZYHJA6ewWnj6da4wJTgTcHf12psYAB1uMQBqgOSUk
-        StVpezy55Suvnvqor4euXIb+tTFcEnk=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=qtx994Rd94G9nH4lOA8VDgGSSgdKvPnh3lGGKTP7LFQ=;
+        b=SVdwwb3SZtWmAkLmuDWi8EZvmUmD4OvaVhUpkLUMoxSoEjFt5JzmStxkoldpJc0fDcrKgk
+        z3sT6purAl8lWn1ChrwyrsF/a1haJFPEqFEh3fKPN2Jgo+bvD3Bm9SHCSABu4QYqrlUzG/
+        jKK3OnRDS8VOeiYLH5h5Rp7pvE3SJe4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-0HSmgoqpMD6VWzIoeoToqg-1; Wed, 23 Oct 2019 08:48:34 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-295-RJarepR0PYeS969OfkOvEw-1; Wed, 23 Oct 2019 09:11:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6251B800D59;
-        Wed, 23 Oct 2019 12:48:33 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5783760BE1;
-        Wed, 23 Oct 2019 12:48:33 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4957A4EDA5;
-        Wed, 23 Oct 2019 12:48:33 +0000 (UTC)
-Date:   Wed, 23 Oct 2019 08:48:33 -0400 (EDT)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-Message-ID: <1189848719.8181299.1571834913066.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1571741584-17621-6-git-send-email-imbrenda@linux.ibm.com>
-References: <1571741584-17621-1-git-send-email-imbrenda@linux.ibm.com> <1571741584-17621-6-git-send-email-imbrenda@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 5/5] s390x: SCLP unit test
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E8E047B;
+        Wed, 23 Oct 2019 13:10:58 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-126.pek2.redhat.com [10.72.12.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB482600CC;
+        Wed, 23 Oct 2019 13:07:58 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V5 0/6] mdev based hardware virtio offloading support
+Date:   Wed, 23 Oct 2019 21:07:46 +0800
+Message-Id: <20191023130752.18980-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-Originating-IP: [149.14.88.107, 10.4.196.18, 10.5.100.50, 10.4.195.24]
-Thread-Topic: s390x: SCLP unit test
-Thread-Index: S3/WjISrqYkk7PIMxfWGvCuc3851gA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 0HSmgoqpMD6VWzIoeoToqg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: RJarepR0PYeS969OfkOvEw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
------ Original Message -----
-> From: "Claudio Imbrenda" <imbrenda@linux.ibm.com>
-> Sent: Tuesday, October 22, 2019 12:53:04 PM
->=20
-> SCLP unit test. Testing the following:
->=20
-> * Correctly ignoring instruction bits that should be ignored
-> * Privileged instruction check
-> * Check for addressing exceptions
-> * Specification exceptions:
->   - SCCB size less than 8
->   - SCCB unaligned
->   - SCCB overlaps prefix or lowcore
->   - SCCB address higher than 2GB
-> * Return codes for
->   - Invalid command
->   - SCCB too short (but at least 8)
->   - SCCB page boundary violation
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  s390x/Makefile      |   1 +
->  s390x/sclp.c        | 373
->  ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |   3 +
->  3 files changed, 377 insertions(+)
->  create mode 100644 s390x/sclp.c
->=20
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 3744372..ddb4b48 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -16,6 +16,7 @@ tests +=3D $(TEST_DIR)/diag288.elf
->  tests +=3D $(TEST_DIR)/stsi.elf
->  tests +=3D $(TEST_DIR)/skrf.elf
->  tests +=3D $(TEST_DIR)/smp.elf
-> +tests +=3D $(TEST_DIR)/sclp.elf
->  tests_binary =3D $(patsubst %.elf,%.bin,$(tests))
-> =20
->  all: directories test_cases test_cases_binary
-> diff --git a/s390x/sclp.c b/s390x/sclp.c
-> new file mode 100644
-> index 0000000..d7a9212
-> --- /dev/null
-> +++ b/s390x/sclp.c
-> @@ -0,0 +1,373 @@
-> +/*
-> + * Store System Information tests
+Hi all:
 
-Copy-n-paste from stsi.c ?
+There are hardwares that can do virtio datapath offloading while
+having its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-> + * Copyright (c) 2019 IBM Corp
-> + *
-> + * Authors:
-> + *  Claudio Imbrenda <imbrenda@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <sclp.h>
-[...]
-> +static int test_one_run(uint32_t cmd, uint64_t addr, uint16_t len,
-> +=09=09=09uint16_t clear, uint64_t exp_pgm, uint16_t exp_rc)
-> +{
-> +=09char sccb[4096];
-> +=09void *p =3D sccb;
-> +
-> +=09if (!len && !clear)
-> +=09=09p =3D NULL;
-> +=09else
-> +=09=09memset(sccb, 0, sizeof(sccb));
-> +=09((SCCBHeader *)sccb)->length =3D len;
-> +=09if (clear && (clear < 8))
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-Please remove the parentheses around "clear < 8".
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
-> +=09=09clear =3D 8;
-> +=09return test_one_sccb(cmd, addr, clear, p, exp_pgm, exp_rc);
-> +}
-> +
-> +#define PGM_BIT_SPEC=09(1ULL << PGM_INT_CODE_SPECIFICATION)
-> +#define PGM_BIT_ADDR=09(1ULL << PGM_INT_CODE_ADDRESSING)
-> +#define PGM_BIT_PRIV=09(1ULL << PGM_INT_CODE_PRIVILEGED_OPERATION)
-> +
-> +#define PGBUF=09((uintptr_t)pagebuf)
-> +#define VALID=09(valid_sclp_code)
-> +
-> +static void test_sccb_too_short(void)
-> +{
-> +=09int cx;
-> +
-> +=09for (cx =3D 0; cx < 8; cx++)
-> +=09=09if (!test_one_run(VALID, PGBUF, cx, 8, PGM_BIT_SPEC, 0))
-> +=09=09=09break;
-> +
-> +=09report("SCCB too short", cx =3D=3D 8);
-> +}
-> +
-> +static void test_sccb_unaligned(void)
-> +{
-> +=09int cx;
-> +
-> +=09for (cx =3D 1; cx < 8; cx++)
-> +=09=09if (!test_one_run(VALID, cx + PGBUF, 8, 8, PGM_BIT_SPEC, 0))
-> +=09=09=09break;
-> +=09report("SCCB unaligned", cx =3D=3D 8);
-> +}
-> +
-> +static void test_sccb_prefix(void)
-> +{
-> +=09uint32_t prefix, new_prefix;
-> +=09int cx;
-> +
-> +=09for (cx =3D 0; cx < 8192; cx +=3D 8)
-> +=09=09if (!test_one_run(VALID, cx, 0, 0, PGM_BIT_SPEC, 0))
-> +=09=09=09break;
-> +=09report("SCCB low pages", cx =3D=3D 8192);
-> +
-> +=09new_prefix =3D (uint32_t)(intptr_t)prefix_buf;
-> +=09memcpy(prefix_buf, 0, 8192);
-> +=09asm volatile("stpx %0": "+Q"(prefix));
+Also a real ICF VF driver was also posted here[2] which is a good
+reference for vendors who is interested in their own virtio datapath
+offloading product.
 
-Isn't "=3DQ" sufficient enough here?
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific parents ops out of the common ones.
 
-> +=09asm volatile("spx %0": "+Q"(new_prefix));
+Pktgen test was done with virito-net + mvnet loop back device.
 
-Shouldn't that be just an input parameter instead? ... and maybe also bette=
-r add "memory" to the clobber list, since the memory layout has changed.
+Please review.
 
-> +=09for (cx =3D 0; cx < 8192; cx +=3D 8)
-> +=09=09if (!test_one_run(VALID, new_prefix + cx, 8, 8, PGM_BIT_SPEC, 0))
-> +=09=09=09break;
-> +=09report("SCCB prefix pages", cx =3D=3D 8192);
-> +
-> +=09memcpy(prefix_buf, 0, 8192);
-> +=09asm volatile("spx %0": "+Q"(prefix));
+[1] https://lkml.org/lkml/2019/10/22/262
+[2] https://lkml.org/lkml/2019/10/15/1226
 
-dito?
+Changes from V4:
 
-> +}
+- keep mdev_set_class() for the device that doesn't use device ops
+- use union for device ops pointer in mdev_device
+- introduce class specific helper for getting is device ops
+- use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
+- explain details of get_mdev_features() and get_vendor_id()
+- distinguish the optional virito device ops from mandatory ones and
+  make get_generation() optional
+- rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
+  virtio_mdev_ops.h
+- don't abuse version fileds in virtio_mdev structure, use features
+  instead
+- fix warning during device remove
+- style & docs tweaks and typo fixes
 
- Thomas
+Changes from V3:
+
+- document that class id (device ops) must be specified in create()
+- add WARN() when trying to set class_id when it has already set
+- add WARN() when class_id is not specified in create() and correctly
+  return an error in this case
+- correct the prototype of mdev_set_class() in the doc
+- add documention of mdev_set_class()
+- remove the unnecessary "class_id_fail" label when class id is not
+  specified in create()
+- convert id_table in vfio_mdev to const
+- move mdev_set_class and its friends after mdev_uuid()
+- suqash the patch of bus uevent into patch of introducing class id
+- tweak the words in the docs per Cornelia suggestion
+- tie class_id and device ops through class specific initialization
+  routine like mdev_set_vfio_ops()
+- typos fixes in the docs of virtio-mdev callbacks
+- document the usage of virtqueues in struct virtio_mdev_device
+- remove the useless vqs array in struct virtio_mdev_device
+- rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
+
+Changes from V2:
+
+- fail when class_id is not specified
+- drop the vringh patch
+- match the doc to the code
+- tweak the commit log
+- move device_ops from parent to mdev device
+- remove the unused MDEV_ID_VHOST
+
+Changes from V1:
+
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  38 +-
+ MAINTAINERS                                   |   2 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
+ drivers/vfio/mdev/mdev_core.c                 |  59 ++
+ drivers/vfio/mdev/mdev_driver.c               |  22 +
+ drivers/vfio/mdev/mdev_private.h              |   8 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/virtio/Kconfig                        |   7 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 413 +++++++++++
+ include/linux/mdev.h                          |  57 +-
+ include/linux/mod_devicetable.h               |   8 +
+ include/linux/vfio_mdev_ops.h                 |  52 ++
+ include/linux/virtio_mdev_ops.h               | 159 ++++
+ samples/Kconfig                               |   7 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet.c                     | 691 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  10 +
+ 24 files changed, 1594 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/vfio_mdev_ops.h
+ create mode 100644 include/linux/virtio_mdev_ops.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+--=20
+2.19.1
 
