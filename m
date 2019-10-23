@@ -2,123 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74A95E265D
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:24:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A4CAE266C
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:36:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436812AbfJWWYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 18:24:43 -0400
-Received: from mga03.intel.com ([134.134.136.65]:31336 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405952AbfJWWYm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 18:24:42 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 15:24:41 -0700
-X-IronPort-AV: E=Sophos;i="5.68,222,1569308400"; 
-   d="scan'208";a="191984438"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 15:24:41 -0700
-Message-ID: <29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com>
-Subject: Re: [PATCH v12 0/6] mm / virtio: Provide support for unused page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, konrad.wilk@oracle.com, david@redhat.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Wed, 23 Oct 2019 15:24:41 -0700
-In-Reply-To: <c50e102c-f72e-df8a-714f-a33897ddbb9f@redhat.com>
-References: <20191022221223.17338.5860.stgit@localhost.localdomain>
-         <c50e102c-f72e-df8a-714f-a33897ddbb9f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S2407897AbfJWWfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 18:35:43 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:51240 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405970AbfJWWfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 18:35:43 -0400
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iNPE0-0002HD-Ee; Thu, 24 Oct 2019 00:35:29 +0200
+Date:   Thu, 24 Oct 2019 00:35:27 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Josh Poimboeuf <jpoimboe@redhat.com>
+cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
+        Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [patch V2 03/17] x86/traps: Remove pointless irq enable from
+ do_spurious_interrupt_bug()
+In-Reply-To: <20191023213107.m7ishskghswktspp@treble>
+Message-ID: <alpine.DEB.2.21.1910240018230.1852@nanos.tec.linutronix.de>
+References: <20191023122705.198339581@linutronix.de> <20191023123117.871608831@linutronix.de> <20191023213107.m7ishskghswktspp@treble>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="8323329-1616076872-1571870128=:1852"
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2019-10-23 at 07:35 -0400, Nitesh Narayan Lal wrote:
-> On 10/22/19 6:27 PM, Alexander Duyck wrote:
-> > This series provides an asynchronous means of reporting unused guest
-> > pages to a hypervisor so that the memory associated with those pages can
-> > be dropped and reused by other processes and/or guests.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--8323329-1616076872-1571870128=:1852
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+
+On Wed, 23 Oct 2019, Josh Poimboeuf wrote:
+
+> On Wed, Oct 23, 2019 at 02:27:08PM +0200, Thomas Gleixner wrote:
+> > That function returns immediately after conditionally reenabling interrupts which
+> > is more than pointless and requires the ASM code to disable interrupts again.
 > > 
-
-<snip>
-
+> > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> > ---
+> >  arch/x86/kernel/traps.c |    1 -
+> >  1 file changed, 1 deletion(-)
 > > 
-> I think Michal Hocko suggested us to include a brief detail about the background
-> explaining how we ended up with the current approach and what all things we have
-> already tried.
-> That would help someone reviewing the patch-series for the first time to
-> understand it in a better way.
+> > --- a/arch/x86/kernel/traps.c
+> > +++ b/arch/x86/kernel/traps.c
+> > @@ -871,7 +871,6 @@ do_simd_coprocessor_error(struct pt_regs
+> >  dotraplinkage void
+> >  do_spurious_interrupt_bug(struct pt_regs *regs, long error_code)
+> >  {
+> > -	cond_local_irq_enable(regs);
+> >  }
+> 
+> I think we can just remove this handler altogether.  The Intel and AMD
+> manuals say vector 15 (X86_TRAP_SPURIOUS) is reserved.
 
-I'm not entirely sure it helps. The problem is that even the "brief"
-version will probably be pretty long.
+Right, but this has history. Pentium Pro Erratum:
 
-From what I know the first real public discussion of guest memory
-overcommit and free page hinting dates back to the 2011 KVM forum and a
-presentation by Rik van Riel[0].
+  PROBLEM: If the APIC subsystem is configured in mixed mode with Virtual
+  Wire mode implemented through the local APIC, an interrupt vector of 0Fh
+  (Intel reserved encoding) may be generated by the local APIC (Int 15).
+  This vector may be generated upon receipt of a spurious interrupt (an
+  interrupt which is removed before the system receives the INTA sequence)
+  instead of the programmed 8259 spurious interrupt vector.
 
-Before I got started in the code there was already virtio-balloon free
-page hinting[1]. However it was meant to be an all-at-once reporting of
-the free pages in the system at a given point in time, and used only for
-VM migration. All it does is inflate a balloon until it encounters an OOM
-and then it frees the memory back to the guest. One interesting piece that
-came out of the work on that patch set was the suggestion by Linus to use
-an array based incremental approach[2] which is what I based my later
-implementation on.
+  IMPLICATION: The spurious interrupt vector programmed in the 8259 is
+  normally handled by an operating system’s spurious interrupt
+  handler. However, a vector of 0Fh is unknown to some operating systems,
+  which would crash if this erratum occurred.
 
-I believe Nitesh had already been working on his own approach for unused
-page hinting for some time at that point. Prior to submitting my RFC there
-was already a v7 that had been submitted by Nitesh back in mid 2018[3].
-The solution was an array based approach which appeared to instrument
-arch_alloc_page and arch_free_page and would prevent allocations while
-hinting was occurring.
+Initially (2.1.) there was a printk() in that handler, which later got
+ifdeffed out (2.1.54).
 
-The first RFC I had written[4] was a synchronous approach that made use of
-arch_free_page to make a hypercall that would immediately flag the page as
-being unused. However a hypercall per page can be expensive and we ideally
-don't want the guest vCPU potentially being hung up while waiting on the
-host mmap_sem.
+So I rather keep that thing at least as long as we support PPro :) Even if
+we ditch that the handler is not really hurting anyone.
 
-At about this time I believe Nitesh's solution[5] was still trying to keep
-an array of pages that were unused and tracking that via arch_free_page.
-In the synchronous case it could cause OOM errors, and in the asynchronous
-approach it had issues with being overrun and not being able to track
-unused pages.
+Thanks,
 
-Later I switched to an asynchronous approach[6], originally calling it
-"bubble hinting". With the asynchronous approach it is necessary to have a
-way to track what pages have been reported and what haven't. I originally
-was using the page type to track it as I had a Buddy and a TreatedBuddy,
-but ultimately that moved to a "Reported" page flag. In addition I pulled
-the counters and pointers out of the free_area/free_list  and instead now
-have a stand-alone set of pointers and keep the reported statistics in a
-separate dynamic allocation.
+	tglx
 
-Then Nitesh's solution had changed to the bitmap approach[7]. However it
-has been pointed out that this solution doesn't deal with sparse memory,
-hotplug, and various other issues.
 
-Since then both my approach and Nitesh's approach have been iterating with
-mostly minor changes.
 
-[0]: https://www.linux-kvm.org/images/f/ff/2011-forum-memory-overcommit.pdf
-[1]: https://lore.kernel.org/lkml/1535333539-32420-1-git-send-email-wei.w.wang@intel.com/
-[2]: https://lore.kernel.org/lkml/CA+55aFzqj8wxXnHAdUTiOomipgFONVbqKMjL_tfk7e5ar1FziQ@mail.gmail.com/
-[3]: https://www.spinics.net/lists/kvm/msg170113.html
-[4]: https://lore.kernel.org/lkml/20190204181118.12095.38300.stgit@localhost.localdomain/
-[5]: https://lore.kernel.org/lkml/20190204201854.2328-1-nitesh@redhat.com/
-[6]: https://lore.kernel.org/lkml/20190530215223.13974.22445.stgit@localhost.localdomain/
-[7]: https://lore.kernel.org/lkml/20190603170306.49099-1-nitesh@redhat.com/
 
+--8323329-1616076872-1571870128=:1852--
