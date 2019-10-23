@@ -2,70 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E29E2612
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:04:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 368C8E261B
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 00:06:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407845AbfJWWER (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 18:04:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50792 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405661AbfJWWER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 18:04:17 -0400
-Received: from akpm3.svl.corp.google.com (unknown [104.133.8.65])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S2436676AbfJWWG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 18:06:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23828 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731301AbfJWWG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 18:06:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571868388;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EBZdX8XYASZ/hcfjUquvBjt91Cclb0VNS3/vMpZYZLM=;
+        b=AJnwTDVsXqnhtGyUbS1aTs1R5KMeO7VGybkdc7tmurlhFBd9M6/c7GYiZ8S0u2pQH4Xup4
+        CIGDZjHjL7ri8pwKX8zzGROBIh1dIg7azYirX8Od9YvqvcK7lxDN51PjGqo13QuVbRB2He
+        7yNknj7VXbN2VbzGf5nNucSA9wEvM3U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-D38nSc7BMIG3e80ECrNc-w-1; Wed, 23 Oct 2019 18:06:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 475632084C;
-        Wed, 23 Oct 2019 22:04:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571868254;
-        bh=ZxZ2bjgrY8LxhC2gxwLipAEf5uWwjrnOAtpoB5RPRXI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nNtl5XCv0j9A48YnWaF5iTudfCQq33+QXJgRHWDYDg2YmEqbZCLDe+NCQQetvnR/b
-         3CtLgVZL25LnwIFN+itO3rrgLffBBVQHhKExtJ614qS8GnmXP7HXLzSds5ViMnMXX/
-         nrTddbLuRTbdz423kAsG34HKFcGZ+DmZP7edoe2A=
-Date:   Wed, 23 Oct 2019 15:04:13 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Alexander Potapenko <glider@google.com>,
-        Marco Elver <elver@google.com>
-Subject: Re: [PATCH v2 0/3] kcov: collect coverage from usb and vhost
-Message-Id: <20191023150413.8aa05549bd840deccfed5539@linux-foundation.org>
-In-Reply-To: <cover.1571844200.git.andreyknvl@google.com>
-References: <cover.1571844200.git.andreyknvl@google.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10E8F476;
+        Wed, 23 Oct 2019 22:06:23 +0000 (UTC)
+Received: from treble (ovpn-121-225.rdu2.redhat.com [10.10.121.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C114560C57;
+        Wed, 23 Oct 2019 22:06:20 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 17:06:18 -0500
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
+        Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [patch V2 07/17] x86/entry/64: Remove redundant interrupt disable
+Message-ID: <20191023220618.qsmog2k5oaagj27v@treble>
+References: <20191023122705.198339581@linutronix.de>
+ <20191023123118.296135499@linutronix.de>
+MIME-Version: 1.0
+In-Reply-To: <20191023123118.296135499@linutronix.de>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: D38nSc7BMIG3e80ECrNc-w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 17:24:28 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
+On Wed, Oct 23, 2019 at 02:27:12PM +0200, Thomas Gleixner wrote:
+> Now that the trap handlers return with interrupts disabled, the
+> unconditional disabling of interrupts in the low level entry code can be
+> removed along with the trace calls.
+>=20
+> Add debug checks where appropriate.
 
-> This patchset extends kcov to allow collecting coverage from the USB
-> subsystem and vhost workers. See the first patch description for details
-> about the kcov extension. The other two patches apply this kcov extension
-> to USB and vhost.
-> 
-> These patches have been used to enable coverage-guided USB fuzzing with
-> syzkaller for the last few years
+This seems a little scary.  Does anybody other than Andy actually run
+with CONFIG_DEBUG_ENTRY?  What happens if somebody accidentally leaves
+irqs enabled?  How do we know you found all the leaks?
 
-I find it surprising that this material is so focused on USB.  Is
-there something unique about USB that gave rise to this situation, or
-is it expected that the new kcov feature will be used elsewhere in the
-kernel?
+--=20
+Josh
 
-If the latter, which are the expected subsystems?
