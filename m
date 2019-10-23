@@ -2,78 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3242BE216C
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 19:08:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 734A3E2178
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 19:11:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727811AbfJWRI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 13:08:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51713 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727648AbfJWRI0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 13:08:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571850505;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=5i2V5gs6KA30KkIAaoVKaoCZzrYOsax9Xuom4ymjp0I=;
-        b=HSA3CAJQCcWfRrg5C4QFw1ua+dqI7FIP+K+yt7PSlewtX4IvVM8PUsAYAGv0MZA2zqG16x
-        R9sgK9PJzXj4SdfmAM/Hc2ezh9XOcDNMhNxBeiA/DHISf+dYO20/yI6JBY757XZHOcgtff
-        smkANaaRKOCkrMvPgvTlhdLomETVXqI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-k0Itp5FhNDqb_6KHYPi4AQ-1; Wed, 23 Oct 2019 13:08:23 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BC6C800D49;
-        Wed, 23 Oct 2019 17:08:23 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C424260BE1;
-        Wed, 23 Oct 2019 17:08:22 +0000 (UTC)
-Date:   Wed, 23 Oct 2019 11:08:22 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [GIT PULL] VFIO fixes for v5.4-rc5
-Message-ID: <20191023110822.6122562f@x1.home>
-Organization: Red Hat
+        id S1727595AbfJWRLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 13:11:22 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39577 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726589AbfJWRLW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 13:11:22 -0400
+Received: by mail-wm1-f68.google.com with SMTP id r141so10819207wme.4
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 10:11:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=8iXr1bCPucfV/BlXP7h0HwuQ+aEH9N73PCJr0os4hb4=;
+        b=a+beFt5hlK6LWDd39o4iUH2O4kIKkoGy0GQejP4br9DTQGzzZaqNpbXf7JfWhMz4QJ
+         9PgtlErWslt/jNEYZodCeT7c7mw+agWZZiD/GIOCOcEYcpNiXsqnV/DLbLkL84Kn+z+q
+         9l/GjwurRB2XpmkM3AxWiecfKk8ZQ7+Wc8pOo5wqxGnMKf5bO3m1Bi7F/mKRbsfCe8qg
+         J1ezNYNAlrUBlf6o/3YAWOAiGxeEvXT7SB6XmVU2fdchrO0UngUrn8HufSttMAm0/JZc
+         4qM3WFu00rI35leLynnYDAeJ0zY54CGeuEnbRqWOd8CPigj08oQVUJg8KvZNj7cIFfR+
+         Tn8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=8iXr1bCPucfV/BlXP7h0HwuQ+aEH9N73PCJr0os4hb4=;
+        b=REmnYSFWIUdODZmemlZDPqmBpPY2E+AFAEzKWxZXkoKLeHrrdyPrsn1OZkILiz1ePL
+         6RQCUe1Z7ZEoglGCo6h0uDQJ6qReXpE6C1T4tnwR7qLCefbvoDkq0hMTnolg0LxtyrjR
+         EFShIW0VdrnAEwddmffjwNJ03/htNjL+ReIimsW0vcORNi6gJWa7jJuy2oMXH/bNBr/7
+         POU5mhtd7ZwE2vqykRXCpUhMZ7I8CQDVr/SK20xmBdDR5JGI0/0sdhl2WKBizRGyJaU3
+         Q9oIJfZBXRsOtMEnKQnsONtWmWaMLmiggT2M6T11XqkkWWSPGP+tnI3aeYC30dENGSwj
+         rNug==
+X-Gm-Message-State: APjAAAUIAOsGXvlqQK7pSmQohzOq1NxFOgVw44y5nGit/LbhnTy33Gs5
+        XCcLG1+vPv71u3Ee5TVpS2qlLA==
+X-Google-Smtp-Source: APXvYqwpTE3GTWCdJrVBwx/BqQXBWybfQma1tOKgevAQzX9IySqj6rGT20KkOOOHSfYwnkJSswVfjA==
+X-Received: by 2002:a7b:c395:: with SMTP id s21mr946644wmj.114.1571850680225;
+        Wed, 23 Oct 2019 10:11:20 -0700 (PDT)
+Received: from netronome.com (fred-musen.rivierenbuurt.horms.nl. [2001:470:7eb3:404:a2a4:c5ff:fe4c:9ce9])
+        by smtp.gmail.com with ESMTPSA id a2sm9365644wrv.39.2019.10.23.10.11.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2019 10:11:19 -0700 (PDT)
+Date:   Wed, 23 Oct 2019 19:11:16 +0200
+From:   Simon Horman <simon.horman@netronome.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Zhu, Lingshan" <lingshan.zhu@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
+        zhiyuan.lv@intel.com
+Subject: Re: [RFC 1/2] vhost: IFC VF hardware operation layer
+Message-ID: <20191023171115.GA28355@netronome.com>
+References: <20191016011041.3441-1-lingshan.zhu@intel.com>
+ <20191016011041.3441-2-lingshan.zhu@intel.com>
+ <20191016095347.5sb43knc7eq44ivo@netronome.com>
+ <075be045-3a02-e7d8-672f-4a207c410ee8@intel.com>
+ <20191021163139.GC4486@netronome.com>
+ <15d94e61-9b3d-7854-b65e-6fea6db75450@redhat.com>
+ <20191023101329.GE8732@netronome.com>
+ <83356b5f-e2f4-ab79-79d7-20d4850c26a9@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: k0Itp5FhNDqb_6KHYPi4AQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <83356b5f-e2f4-ab79-79d7-20d4850c26a9@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+On Wed, Oct 23, 2019 at 06:36:13PM +0800, Jason Wang wrote:
+> 
+> On 2019/10/23 下午6:13, Simon Horman wrote:
+> > On Tue, Oct 22, 2019 at 09:32:36AM +0800, Jason Wang wrote:
+> > > On 2019/10/22 上午12:31, Simon Horman wrote:
+> > > > On Mon, Oct 21, 2019 at 05:55:33PM +0800, Zhu, Lingshan wrote:
+> > > > > On 10/16/2019 5:53 PM, Simon Horman wrote:
+> > > > > > Hi Zhu,
+> > > > > > 
+> > > > > > thanks for your patch.
+> > > > > > 
+> > > > > > On Wed, Oct 16, 2019 at 09:10:40AM +0800, Zhu Lingshan wrote:
+> > > > ...
+> > > > 
+> > > > > > > +static void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
+> > > > > > > +		       void *dst, int length)
+> > > > > > > +{
+> > > > > > > +	int i;
+> > > > > > > +	u8 *p;
+> > > > > > > +	u8 old_gen, new_gen;
+> > > > > > > +
+> > > > > > > +	do {
+> > > > > > > +		old_gen = ioread8(&hw->common_cfg->config_generation);
+> > > > > > > +
+> > > > > > > +		p = dst;
+> > > > > > > +		for (i = 0; i < length; i++)
+> > > > > > > +			*p++ = ioread8((u8 *)hw->dev_cfg + offset + i);
+> > > > > > > +
+> > > > > > > +		new_gen = ioread8(&hw->common_cfg->config_generation);
+> > > > > > > +	} while (old_gen != new_gen);
+> > > > > > Would it be wise to limit the number of iterations of the loop above?
+> > > > > Thanks but I don't quite get it. This is used to make sure the function
+> > > > > would get the latest config.
+> > > > I am worried about the possibility that it will loop forever.
+> > > > Could that happen?
+> > > > 
+> > > > ...
+> > > My understanding is that the function here is similar to virtio config
+> > > generation [1]. So this can only happen for a buggy hardware.
+> > Ok, so this circles back to my original question.
+> > Should we put a bound on the number of times the loop runs
+> > or should we accept that the kernel locks up if the HW is buggy?
+> > 
+> 
+> I'm not sure, and similar logic has been used by virtio-pci drivers for
+> years. Consider this logic is pretty simple and it should not be the only
+> place that virito hardware can lock kernel, we can keep it as is.
 
-The following changes since commit 4f5cafb5cb8471e54afdc9054d973535614f7675=
-:
+Ok, I accept that there isn't much use fixing this if its idomatic and
+there are other places virtio hardware can lock up the kernel.
 
-  Linux 5.4-rc3 (2019-10-13 16:37:36 -0700)
-
-are available in the Git repository at:
-
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.4-rc5
-
-for you to fetch changes up to 95f89e090618efca63918b658c2002e57d393036:
-
-  vfio/type1: Initialize resv_msi_base (2019-10-15 14:07:01 -0600)
-
-----------------------------------------------------------------
-VFIO fixes for v5.4-rc5
-
- - Fix (false) uninitialized variable warning (Joerg Roedel)
-
-----------------------------------------------------------------
-Joerg Roedel (1):
-      vfio/type1: Initialize resv_msi_base
-
- drivers/vfio/vfio_iommu_type1.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
+> Actually, there's no need for hardware to implement generation logic, it
+> could be emulated by software or even ignored. In new version of
+> virtio-mdev, get_generation() is optional, when it was not implemented, 0 is
+> simply returned by virtio-mdev transport.
+> 
+> Thanks
+> 
