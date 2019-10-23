@@ -2,127 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F39D3E1E79
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 16:44:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CB64E1E8F
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 16:49:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392313AbfJWOox (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 10:44:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27488 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2392310AbfJWOox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 10:44:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571841891;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uf7ftM+TjCWiiMzN8AYw8EZ8RI4SD6HnWbZiIXVhH+c=;
-        b=aXnNzRfPzV75mJN2oWn8bCAn2gVIgaryVjKrGJs8l/EptslGYjG/Kr++RkZQsin3WRFWBp
-        rTZ9DYhiwS/AxM9kNOdDfcznfr1Gmit0yXcBaSQDoGrVodIUiDgU1uOfZcXIdzpQsPW7ji
-        dn0+34ta+gOYLp3+UEVqb+9xwDZChy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-_rgTFrFcO-q0GmV5vlgQpQ-1; Wed, 23 Oct 2019 10:44:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C165C800D57
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 14:44:45 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68BF46375C;
-        Wed, 23 Oct 2019 14:44:44 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 352181051A3;
-        Wed, 23 Oct 2019 12:44:29 -0200 (BRST)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x9NEiPMY027777;
-        Wed, 23 Oct 2019 12:44:25 -0200
-Date:   Wed, 23 Oct 2019 12:44:25 -0200
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Radim Krcmar <rkrcmar@redhat.com>
-Subject: Re: [patch 1/2] KVM: x86: switch KVMCLOCK base to CLOCK_MONOTONIC_RAW
-Message-ID: <20191023144422.GA27674@amt.cnet>
-References: <20180809145245.722399627@amt.cnet>
- <20180809145307.066923033@amt.cnet>
- <76fc525a-0ccc-be8d-5d66-c41853f9051e@redhat.com>
- <20180813125252.GA31066@amt.cnet>
+        id S2392354AbfJWOst (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 10:48:49 -0400
+Received: from mga02.intel.com ([134.134.136.20]:30964 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389782AbfJWOst (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 10:48:49 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 07:48:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,221,1569308400"; 
+   d="scan'208";a="191852479"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga008.jf.intel.com with ESMTP; 23 Oct 2019 07:48:48 -0700
+Date:   Wed, 23 Oct 2019 07:48:48 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [patch V2 17/17] x86/kvm: Use generic exit to guest work function
+Message-ID: <20191023144848.GH329@linux.intel.com>
+References: <20191023122705.198339581@linutronix.de>
+ <20191023123119.271229148@linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20180813125252.GA31066@amt.cnet>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: _rgTFrFcO-q0GmV5vlgQpQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191023123119.271229148@linutronix.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 13, 2018 at 09:52:55AM -0300, Marcelo Tosatti wrote:
-> On Fri, Aug 10, 2018 at 09:15:51AM +0200, Paolo Bonzini wrote:
-> > On 09/08/2018 16:52, Marcelo Tosatti wrote:
-> > > Commit 0bc48bea36d1 ("KVM: x86: update master clock before computing =
-kvmclock_offset")
-> > > switches the order of operations to avoid the conversion=20
-> > >=20
-> > > TSC (without frequency correction) ->
-> > > system_timestamp (with frequency correction),=20
-> > >=20
-> > > which might cause a time jump.
-> > >=20
-> > > However, it leaves any other masterclock update unsafe, which include=
-s,=20
-> > > at the moment:
-> > >=20
-> > >         * HV_X64_MSR_REFERENCE_TSC MSR write.
-> > >         * TSC writes.
-> > >         * Host suspend/resume.
-> > >=20
-> > > Avoid the time jump issue by using frequency uncorrected
-> > > CLOCK_MONOTONIC_RAW clock.=20
-> > >=20
-> > > Its the guests time keeping software responsability
-> > > to track and correct a reference clock such as UTC.
-> > >=20
-> > > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-> >=20
-> > What happens across migration?
-> >=20
-> > Paolo
->=20
-> You mean between
->=20
-> frequency corrected host -> frequency uncorrected host
->=20
-> And vice-versa?=20
->=20
-> I'll check NTP's/Chrony's behaviour and let you know.
->=20
-> Thanks
+On Wed, Oct 23, 2019 at 02:27:22PM +0200, Thomas Gleixner wrote:
+> Use the generic infrastructure to check for and handle pending work before
+> entering into guest mode.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  arch/x86/kvm/Kconfig |    1 +
+>  arch/x86/kvm/x86.c   |   17 +++++------------
+>  2 files changed, 6 insertions(+), 12 deletions(-)
+> 
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -42,6 +42,7 @@ config KVM
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>  	select HAVE_KVM_NO_POLL
+> +	select KVM_EXIT_TO_GUEST_WORK
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select KVM_VFIO
+>  	select SRCU
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -52,6 +52,7 @@
+>  #include <linux/irqbypass.h>
+>  #include <linux/sched/stat.h>
+>  #include <linux/sched/isolation.h>
+> +#include <linux/entry-common.h>
+>  #include <linux/mem_encrypt.h>
+>  
+>  #include <trace/events/kvm.h>
+> @@ -8115,8 +8116,8 @@ static int vcpu_enter_guest(struct kvm_v
+>  	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
+>  		kvm_x86_ops->sync_pir_to_irr(vcpu);
+>  
+> -	if (vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu)
+> -	    || need_resched() || signal_pending(current)) {
+> +	if (vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu) ||
+> +	    exit_to_guestmode_work_pending()) {
 
-They will measure and adjust their frequency corrections
-(which is necessary anyway due to temperature variations=20
-for example).
+The terms EXIT_TO_GUEST and exit_to_guestmode are very confusing, as
+they're inverted from the usual virt terminology of VM-Enter (enter guest)
+and VM-Exit (exit guest).  The conflict is most obvious here, with the
+above "vcpu->mode == EXITING_GUEST_MODE", which is checking to see if the
+vCPU is being forced to exit *from* guest mode because was kicked by some
+other part of KVM.
 
-http://doc.ntp.org/4.1.0/ntpd.htm
+Maybe XFER_TO_GUEST?  I.e. avoid entry/exit entirely, so that neither the
+entry code or KVM ends up with a confusing name.
 
-Frequency Discipline
+>  		vcpu->mode = OUTSIDE_GUEST_MODE;
+>  		smp_wmb();
+>  		local_irq_enable();
+> @@ -8309,17 +8310,9 @@ static int vcpu_run(struct kvm_vcpu *vcp
+>  
+>  		kvm_check_async_pf_completion(vcpu);
+>  
+> -		if (signal_pending(current)) {
+> -			r = -EINTR;
+> -			vcpu->run->exit_reason = KVM_EXIT_INTR;
+> -			++vcpu->stat.signal_exits;
+> +		r = exit_to_guestmode(kvm, vcpu);
 
-The ntpd behavior at startup depends on whether the frequency file,
-usually ntp.drift, exists. This file contains the latest estimate of
-clock frequency error. When the ntpd is started and the file does not
-exist, the ntpd enters a special mode designed to quickly adapt to the
-particular system clock oscillator time and frequency error. This takes
-approximately 15 minutes, after which the time and frequency are set to
-nominal values and the ntpd enters normal mode, where the time and
-frequency are continuously tracked relative to the server. After one
-hour the frequency file is created and the current frequency offset
-written to it. When the ntpd is started and the file does exist, the
-ntpd frequency is initialized from the file and enters normal mode
-immediately. After that the current frequency offset is written to the
-file at hourly intervals.
+Ditto here.  If the run loop is stripped down to the core functionality,
+it effectively looks like:
 
+	for (;;) {
+		r = vcpu_enter_guest(vcpu);
+		if (r <= 0)
+			break;
+
+		...
+
+		r = exit_to_guestmode(kvm, vcpu);
+		if (r)
+			break;
+	}
+
+Appending _handle_work to the function would also be helpful so that it's
+somewhat clear the function isn't related to the core vcpu_enter_guest()
+functionality, e.g.:
+
+	for (;;) {
+		r = vcpu_enter_guest(vcpu);
+		if (r <= 0)
+			break;
+
+		...
+
+		r = xfer_to_guestmode_handle_work(kvm, vcpu);
+		if (r)
+			break;
+	}
+
+
+> +		if (r)
+>  			break;
+> -		}
+> -		if (need_resched()) {
+> -			srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> -			cond_resched();
+> -			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+> -		}
+>  	}
+>  
+>  	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+> 
+> 
