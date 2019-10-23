@@ -2,110 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 019F8E1F06
-	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 17:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F720E1F3C
+	for <lists+kvm@lfdr.de>; Wed, 23 Oct 2019 17:25:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406556AbfJWPQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 23 Oct 2019 11:16:13 -0400
-Received: from mga14.intel.com ([192.55.52.115]:48105 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406499AbfJWPQM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 23 Oct 2019 11:16:12 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 08:16:10 -0700
-X-IronPort-AV: E=Sophos;i="5.68,221,1569308400"; 
-   d="scan'208";a="372905884"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 08:16:07 -0700
-Message-ID: <860dda361b6e0b94908d94beb0ad9f5519c8f2cf.camel@linux.intel.com>
-Subject: Re: [PATCH v12 2/6] mm: Use zone and order instead of free area in
- free_list manipulators
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Wed, 23 Oct 2019 08:16:07 -0700
-In-Reply-To: <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
-References: <20191022221223.17338.5860.stgit@localhost.localdomain>
-         <20191022222805.17338.3243.stgit@localhost.localdomain>
-         <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
+        id S2406668AbfJWPYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 23 Oct 2019 11:24:38 -0400
+Received: from mail-wr1-f73.google.com ([209.85.221.73]:48575 "EHLO
+        mail-wr1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390590AbfJWPYi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 23 Oct 2019 11:24:38 -0400
+Received: by mail-wr1-f73.google.com with SMTP id h4so11169888wrx.15
+        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 08:24:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=sl8Rii3oW8FrPppkHNfXTlYWCFHCdXZbJp62ZIanwPg=;
+        b=ghJIP1Ctautskm3gCcyff8Fxk9XjUZJnGCzEtm3Rl/xa3OQaA7z8Hj2K2nk/9K0ZVV
+         OF+hfWb+AgK9wd8dgydPemrquzm2MQhbeGLmyaDDzkHnJbU6bTw4am6muwzKs1pG0gMl
+         ViCBVAS6V8lonROATMQ/xHp4LMBWEuofzZhWqM+57MOvtOV6KIQiMs91jjbuC1SjFMGQ
+         TJ/G+y0wWzii5SyCE4xCYBgtIQas6JpF8l6FkKmIrRdoyJTr31mPOxcMkwBwaQ7eOSIi
+         WNIVEkpKXUoPyA5U3Rj8yghYjCOUpqT2B9yQusYIqZ18ZfTLxbudeUdV6xgfDpt47nqA
+         jmNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=sl8Rii3oW8FrPppkHNfXTlYWCFHCdXZbJp62ZIanwPg=;
+        b=iI+KsYFY0t+md4Jk9EX4EO+jZE++uLm6GQPypZPZCuJ2LBXcyFEEOHqhuKcx6z/2rP
+         62fmCUZ0VRCJn4kECLrNB0A6q+Rehr/VqUljMthlG1DoW5jJ4wRX8j52HdlP8Htg+qj8
+         lTxDq8T2xauJGTZWuib6lX6SrixErGOjFfJDG7WmzN0IBm6RCMxp4OnTRSS5ZY2Tdbq8
+         kHTpoNp8X0OIoMYTpJCS+dih8KHlNPDC2Xo/AN9GHAnniDBwshuLpvgRxUp8jigI2AuC
+         7eGSgggC6Cer3pHBRDSEPjEjKObriGvEWy+cw2kxjR/JAlSgyVLYsLGzpSJjqsLJOokk
+         E+2A==
+X-Gm-Message-State: APjAAAWW/c2jwpQlpYBd6bxC3W36y5n5SAhdmAdOPQbak0+oOjsmzgLX
+        qc62o5hpXEOze0lZQHW12TR5UQG67ocJkOgi
+X-Google-Smtp-Source: APXvYqyjuZuZmULkMOG81SOZwdNmn4nrXac1sf+c/F+14+2oEH7lN31t5wlahvJCBOuTrGSQ8vrMv/7kGc0xWT1F
+X-Received: by 2002:a5d:4491:: with SMTP id j17mr8733249wrq.46.1571844275774;
+ Wed, 23 Oct 2019 08:24:35 -0700 (PDT)
+Date:   Wed, 23 Oct 2019 17:24:28 +0200
+Message-Id: <cover.1571844200.git.andreyknvl@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
+Subject: [PATCH v2 0/3] kcov: collect coverage from usb and vhost
+From:   Andrey Konovalov <andreyknvl@google.com>
+To:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        David Windsor <dwindsor@gmail.com>,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>,
+        Andrey Konovalov <andreyknvl@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2019-10-23 at 10:26 +0200, David Hildenbrand wrote:
-> On 23.10.19 00:28, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > 
-> > In order to enable the use of the zone from the list manipulator functions
-> > I will need access to the zone pointer. As it turns out most of the
-> > accessors were always just being directly passed &zone->free_area[order]
-> > anyway so it would make sense to just fold that into the function itself
-> > and pass the zone and order as arguments instead of the free area.
-> > 
-> > In order to be able to reference the zone we need to move the declaration
-> > of the functions down so that we have the zone defined before we define the
-> > list manipulation functions. Since the functions are only used in the file
-> > mm/page_alloc.c we can just move them there to reduce noise in the header.
-> > 
-> > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-> > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> > ---
-> >   include/linux/mmzone.h |   32 -----------------------
-> >   mm/page_alloc.c        |   67 +++++++++++++++++++++++++++++++++++-------------
-> >   2 files changed, 49 insertions(+), 50 deletions(-)
-> 
-> Did you see
-> 
-> https://lore.kernel.org/lkml/20191001152928.27008.8178.stgit@localhost.localdomain/T/#m4d2bc2f37bd7bdc3ae35c4f197905c275d0ad2f9
-> 
-> this time?
-> 
-> And the difference to the old patch is only an empty line.
-> 
+This patchset extends kcov to allow collecting coverage from the USB
+subsystem and vhost workers. See the first patch description for details
+about the kcov extension. The other two patches apply this kcov extension
+to USB and vhost.
 
-I saw the report. However I have not had much luck reproducing it in order
-to get root cause. Here are my results for linux-next 20191021 with that
-patch running page_fault2 over an average of 3 runs:
+These patches have been used to enable coverage-guided USB fuzzing with
+syzkaller for the last few years, see the details here:
 
-Baseline:   3734692.00
-This patch: 3739878.67
+https://github.com/google/syzkaller/blob/master/docs/linux/external_fuzzing_usb.md
 
-Also I am not so sure about these results as the same patch had passed
-previously before and instead it was patch 3 that was reported as having a
--1.2% regression[1]. All I changed in response to that report was to add
-page_is_reported() which just wrapped the bit test for the reported flag
-in a #ifdef to avoid testing it for the blocks that were already #ifdef
-wrapped anyway.
+This patchset has been pushed to the public Linux kernel Gerrit instance:
 
-I am still trying to see if I can get access to a system that would be a
-better match for the one that reported the issue. My working theory is
-that maybe it requires a high core count per node to reproduce. Either
-that or it is some combination of the kernel being tested on and the patch
-is causing some loop to go out of alignment and become more expensive.
+https://linux-review.googlesource.com/c/linux/kernel/git/torvalds/linux/+/1524
 
-I also included the page_fault2 results in my cover page as that seems to
-show a slight improvement with all of the patches applied.
+Changes v1 -> v2:
+- Changed common_handle type back to u64 (to allow extending it in the
+  future).
+- Reworked kcov_remote_handle() helpers.
+- Fixed vhost annotations when CONFIG_KCOV is not enabled.
+- Use kcov_disable() instead of kcov_remote_reset() when
+  KCOV_REMOTE_ENABLE fails.
 
-Thanks.
+Changes RFC v1 -> v1:
+- Remove unnecessary #ifdef's from drivers/vhost/vhost.c.
+- Reset t->kcov when area allocation fails in kcov_remote_start().
+- Use struct_size to calculate array size in kcov_ioctl().
+- Add a limit on area_size in kcov_remote_arg.
+- Added kcov_disable() helper.
+- Changed encoding of kcov remote handle ids, see the documentation.
+- Added a comment reference for kcov_sequence task_struct field.
+- Change common_handle type to u32.
+- Add checks for handle validity into kcov_ioctl_locked() and
+    kcov_remote_start().
+- Updated documentation to reflect the changes.
 
-- Alex
+Andrey Konovalov (3):
+  kcov: remote coverage support
+  usb, kcov: collect coverage from hub_event
+  vhost, kcov: collect coverage from vhost_worker
 
-[1]: https://lore.kernel.org/lkml/20190921152522.GU15734@shao2-debian/
+ Documentation/dev-tools/kcov.rst | 128 +++++++++
+ drivers/usb/core/hub.c           |   5 +
+ drivers/vhost/vhost.c            |   6 +
+ drivers/vhost/vhost.h            |   1 +
+ include/linux/kcov.h             |  23 ++
+ include/linux/sched.h            |   6 +
+ include/uapi/linux/kcov.h        |  25 ++
+ kernel/kcov.c                    | 480 ++++++++++++++++++++++++++++---
+ 8 files changed, 639 insertions(+), 35 deletions(-)
+
+-- 
+2.24.0.rc0.303.g954a862665-goog
 
