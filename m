@@ -2,115 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34C3DE2C0E
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 10:25:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A54CDE2C3C
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 10:33:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438163AbfJXIZL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 04:25:11 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:41308 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725947AbfJXIZK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 04:25:10 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q7so14654619pfh.8
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 01:25:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=hU4CSfYQ63kVLgy0WVaQhgAkxDVhbStNM/XZwCb+pGQ=;
-        b=U9u8BEdrLTYHLxCVdyQ0V3Y9WN+h7BAw+8VyGXYlT9ZP3asAjaEXBACXCqMN4KXHYe
-         uLywqbK455jhL6IPGKnE6y0j70ntK1RebrLODaHdhATZ2DD0pa0VwmRM5BodqYFaS5vI
-         eSrq1ykqx9GRBRlJNYTQdiJy4dnbKU8jI8ZlM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=hU4CSfYQ63kVLgy0WVaQhgAkxDVhbStNM/XZwCb+pGQ=;
-        b=YazfgeUmpx/5GTAlJDYzH/L1tA3AkeofcZx/DY0rIE/aGvoEKSNHoEVoB3viXkEnU8
-         62JN744hBoIneCxiLgYrTDo75rsSWY2nQnOPC4pbj5Fn09aqG0hf4dFQahxBld8d33Je
-         wIw4+hGJ3MXpECn1bte6FZ+hgeDfBOnXe8dJ6jZlBa3XMUwpzTNdkvKalTQ81Z5ofxrD
-         FOKH4gUEqNMo2zSWhZtXbWshFm0/FZMX1ropytbM/KyhkvHzMjb8lJfjjy2p8S3bjazS
-         pM4Ki1tJJDaaA1WWCmAxJq0mEkEawWEuQRBwHnwX8OjwpZudB5qLUqrzqUpaNJ1KqM2r
-         YK8Q==
-X-Gm-Message-State: APjAAAW29V+75kqFILLm9p46J+dURmt0Q4T1W22ui6tpJ+XXdywK7RGy
-        3wIcd1ghV9ZgEfEbAo7I5nHFXKm4Sdo=
-X-Google-Smtp-Source: APXvYqxYgKGNKdKEdxny+mlNOsqHTeUjdWWBTF7j0sC5yb+u8cuCSfcI6+ysPtBlh7uvWJTi2z+Anw==
-X-Received: by 2002:a62:2643:: with SMTP id m64mr15526339pfm.232.1571905509576;
-        Thu, 24 Oct 2019 01:25:09 -0700 (PDT)
-Received: from localhost ([2620:0:1002:19:d6d5:8aa1:4314:d1e6])
-        by smtp.gmail.com with ESMTPSA id b18sm25951736pfi.157.2019.10.24.01.25.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Oct 2019 01:25:08 -0700 (PDT)
-From:   Matt Delco <delco@chromium.org>
-To:     kvm@vger.kernel.org
-Cc:     Matt Delco <delco@chromium.org>
-Subject: [PATCH v2] KVM: x86: return length in KVM_GET_CPUID2.
-Date:   Thu, 24 Oct 2019 01:24:52 -0700
-Message-Id: <20191024082452.165627-1-delco@chromium.org>
-X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
-In-Reply-To: <20191024052918.140750-1-delco@chromium.org>
-References: <20191024052918.140750-1-delco@chromium.org>
+        id S2438252AbfJXIdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 04:33:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28949 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2438242AbfJXIdH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 04:33:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571905985;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GP6qD2J1CBmhiVD+sbR/nBuazK8LU9m7yhlITTEQS64=;
+        b=AOlZgQZOV2vsGc3u91nDFVabCURQZD0C6/X53vifylKMPYENkQwKEiDql68+dxKTLUyj/u
+        62wNz2SOtwZuyW1uAhWhfx9fKtMKBrnaPeVZCmDU4ELRdrNcovLpzn1lVTpIvlA7AoXpUH
+        bjrD/K/9iWYY79k6M7rGZB/pYIqfMq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-zHllE4ZJP_6HPNgUQkm_IQ-1; Thu, 24 Oct 2019 04:33:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B751A800D5A;
+        Thu, 24 Oct 2019 08:33:00 +0000 (UTC)
+Received: from [10.72.13.32] (ovpn-13-32.pek2.redhat.com [10.72.13.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A93A5D717;
+        Thu, 24 Oct 2019 08:32:43 +0000 (UTC)
+Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
+From:   Jason Wang <jasowang@redhat.com>
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     mst@redhat.com, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+References: <20191022095230.2514-1-tiwei.bie@intel.com>
+ <47a572fd-5597-1972-e177-8ee25ca51247@redhat.com>
+ <20191023030253.GA15401@___>
+ <ac36f1e3-b972-71ac-fe0c-3db03e016dcf@redhat.com>
+ <20191023070747.GA30533@___>
+ <106834b5-dae5-82b2-0f97-16951709d075@redhat.com> <20191023101135.GA6367@___>
+ <5a7bc5da-d501-2750-90bf-545dd55f85fa@redhat.com>
+ <20191024042155.GA21090@___>
+ <d37529e1-5147-bbe5-cb9d-299bd6d4aa1a@redhat.com>
+Message-ID: <d4cc4f4e-2635-4041-2f68-cd043a97f25a@redhat.com>
+Date:   Thu, 24 Oct 2019 16:32:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <d37529e1-5147-bbe5-cb9d-299bd6d4aa1a@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: zHllE4ZJP_6HPNgUQkm_IQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_GET_CPUID2 never indicates the array length it populates. If an app
-passes in an array that's too short then kvm_vcpu_ioctl_get_cpuid2() populates
-the required array length and returns -E2BIG.  However, its caller then just
-bails to "goto out", thus bypassing the copy_to_user(). If an app
-passes in an array that's not too short, then
-kvm_vcpu_ioctl_get_cpuid2() doesn't populate the array length. Its
-caller will then call copy_to_user(), which is pointless since no data
-values have been changed.
 
-This change attempts to have KVM_GET_CPUID2 populate the array length on
-both success and failure, and still indicate -E2BIG when a provided
-array is too short.  I'm not sure if this type of change is considered
-an API breakage and thus we need a KVM_GET_CPUID3.
+On 2019/10/24 =E4=B8=8B=E5=8D=884:03, Jason Wang wrote:
+>
+> On 2019/10/24 =E4=B8=8B=E5=8D=8812:21, Tiwei Bie wrote:
+>> On Wed, Oct 23, 2019 at 06:29:21PM +0800, Jason Wang wrote:
+>>> On 2019/10/23 =E4=B8=8B=E5=8D=886:11, Tiwei Bie wrote:
+>>>> On Wed, Oct 23, 2019 at 03:25:00PM +0800, Jason Wang wrote:
+>>>>> On 2019/10/23 =E4=B8=8B=E5=8D=883:07, Tiwei Bie wrote:
+>>>>>> On Wed, Oct 23, 2019 at 01:46:23PM +0800, Jason Wang wrote:
+>>>>>>> On 2019/10/23 =E4=B8=8A=E5=8D=8811:02, Tiwei Bie wrote:
+>>>>>>>> On Tue, Oct 22, 2019 at 09:30:16PM +0800, Jason Wang wrote:
+>>>>>>>>> On 2019/10/22 =E4=B8=8B=E5=8D=885:52, Tiwei Bie wrote:
+>>>>>>>>>> This patch introduces a mdev based hardware vhost backend.
+>>>>>>>>>> This backend is built on top of the same abstraction used
+>>>>>>>>>> in virtio-mdev and provides a generic vhost interface for
+>>>>>>>>>> userspace to accelerate the virtio devices in guest.
+>>>>>>>>>>
+>>>>>>>>>> This backend is implemented as a mdev device driver on top
+>>>>>>>>>> of the same mdev device ops used in virtio-mdev but using
+>>>>>>>>>> a different mdev class id, and it will register the device
+>>>>>>>>>> as a VFIO device for userspace to use. Userspace can setup
+>>>>>>>>>> the IOMMU with the existing VFIO container/group APIs and
+>>>>>>>>>> then get the device fd with the device name. After getting
+>>>>>>>>>> the device fd of this device, userspace can use vhost ioctls
+>>>>>>>>>> to setup the backend.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+>>>>>>>>>> ---
+>>>>>>>>>> This patch depends on below series:
+>>>>>>>>>> https://lkml.org/lkml/2019/10/17/286
+>>>>>>>>>>
+>>>>>>>>>> v1 -> v2:
+>>>>>>>>>> - Replace _SET_STATE with _SET_STATUS (MST);
+>>>>>>>>>> - Check status bits at each step (MST);
+>>>>>>>>>> - Report the max ring size and max number of queues (MST);
+>>>>>>>>>> - Add missing MODULE_DEVICE_TABLE (Jason);
+>>>>>>>>>> - Only support the network backend w/o multiqueue for now;
+>>>>>>>>> Any idea on how to extend it to support devices other than=20
+>>>>>>>>> net? I think we
+>>>>>>>>> want a generic API or an API that could be made generic in the=20
+>>>>>>>>> future.
+>>>>>>>>>
+>>>>>>>>> Do we want to e.g having a generic vhost mdev for all kinds of=20
+>>>>>>>>> devices or
+>>>>>>>>> introducing e.g vhost-net-mdev and vhost-scsi-mdev?
+>>>>>>>> One possible way is to do what vhost-user does. I.e. Apart from
+>>>>>>>> the generic ring, features, ... related ioctls, we also introduce
+>>>>>>>> device specific ioctls when we need them. As vhost-mdev just needs
+>>>>>>>> to forward configs between parent and userspace and even won't
+>>>>>>>> cache any info when possible,
+>>>>>>> So it looks to me this is only possible if we expose e.g=20
+>>>>>>> set_config and
+>>>>>>> get_config to userspace.
+>>>>>> The set_config and get_config interface isn't really everything
+>>>>>> of device specific settings. We also have ctrlq in virtio-net.
+>>>>> Yes, but it could be processed by the exist API. Isn't it? Just=20
+>>>>> set ctrl vq
+>>>>> address and let parent to deal with that.
+>>>> I mean how to expose ctrlq related settings to userspace?
+>>>
+>>> I think it works like:
+>>>
+>>> 1) userspace find ctrl_vq is supported
+>>>
+>>> 2) then it can allocate memory for ctrl vq and set its address through
+>>> vhost-mdev
+>>>
+>>> 3) userspace can populate ctrl vq itself
+>> I see. That is to say, userspace e.g. QEMU will program the
+>> ctrl vq with the existing VHOST_*_VRING_* ioctls, and parent
+>> drivers should know that the addresses used in ctrl vq are
+>> host virtual addresses in vhost-mdev's case.
+>
+>
+> That's really good point. And that means parent needs to differ vhost=20
+> from virtio. It should work.=20
 
-Fixes: 0771671749b59 ("KVM: Enhance guest cpuid management", 2007-11-21)
-Signed-off-by: Matt Delco <delco@chromium.org>
----
- arch/x86/kvm/cpuid.c | 1 +
- arch/x86/kvm/x86.c   | 8 ++++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index f68c0c753c38..ec013b68b266 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -274,6 +274,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
- 	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
- 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
- 		goto out;
-+	cpuid->nent = vcpu->arch.cpuid_nent;
- 	return 0;
- 
- out:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5863c38108d9..701bf4f4f6f8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4161,12 +4161,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			goto out;
- 		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
- 					      cpuid_arg->entries);
--		if (r)
-+		if (r && r != -E2BIG)
- 			goto out;
--		r = -EFAULT;
--		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
-+		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
-+			r = -EFAULT;
- 			goto out;
--		r = 0;
-+		}
- 		break;
- 	}
- 	case KVM_GET_MSRS: {
--- 
-2.23.0.866.gb869b98d4c-goog
+HVA may only work when we have something similar to VHOST_SET_OWNER=20
+which can reuse MM of its owner.
+
+
+> But is there any chance to use DMA address? I'm asking since the API=20
+> then tends to be device specific.=20
+
+
+I wonder whether we can introduce MAP IOMMU notifier and get DMA=20
+mappings from that.
+
+Thanks
 
