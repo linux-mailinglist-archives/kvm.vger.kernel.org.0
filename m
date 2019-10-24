@@ -2,168 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 128C3E2D6B
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 11:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6085E2E27
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 12:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403994AbfJXJdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 05:33:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53468 "EHLO
+        id S2393213AbfJXKId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 06:08:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28217 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1732686AbfJXJdO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 05:33:14 -0400
+        with ESMTP id S1733071AbfJXKId (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 06:08:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571909592;
+        s=mimecast20190719; t=1571911711;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+aHv+pR5mZId7afsfSJDGJh91jfDpKxvVOzesly6jTQ=;
-        b=eWH37P23sVSgLNwiu5tN4KAIMnhnRXB/Oau4+2FsIUqMcGq8jeBQRQ1DxHDSoo0aDtDi2F
-        HzQmN1lHgRJIvtxe8cOLnblpV/iMDyvokJCo1/Dg5qlLT6pJg+MtpmfeD5iZcqpuTbyq/b
-        Flw3Ht0ODTMuDyTFo1C0bhoi6L/cogI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-DFWeRJCOP32YI1hF-4AJrQ-1; Thu, 24 Oct 2019 05:33:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CD4C100550E;
-        Thu, 24 Oct 2019 09:33:06 +0000 (UTC)
-Received: from [10.36.117.225] (ovpn-117-225.ams2.redhat.com [10.36.117.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 05C535D6D0;
-        Thu, 24 Oct 2019 09:32:51 +0000 (UTC)
-Subject: Re: [PATCH v12 2/6] mm: Use zone and order instead of free area in
- free_list manipulators
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-References: <20191022221223.17338.5860.stgit@localhost.localdomain>
- <20191022222805.17338.3243.stgit@localhost.localdomain>
- <c3544859-606d-4e8f-2e48-2d7868e0fa13@redhat.com>
- <860dda361b6e0b94908d94beb0ad9f5519c8f2cf.camel@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <78caedba-fc29-20d8-3043-2d7598aa3652@redhat.com>
-Date:   Thu, 24 Oct 2019 11:32:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=esfJDYJMPsiYJ7u3DFXauyQeLcWZdIkwkXmgSu/9TW8=;
+        b=WWHSqdZ9eOGWI7w1V4Cyv1cOMy1QLQUKD+wfZTJZ5KCCP8ZmcqMcstdbnHs2BUlN2L/iC5
+        Qnvif2OTKHTpNPIQBWGpKHx+6g1str83uq3//FBUh3/n8U0Pa7fpZncch2MX5PqVBSLhyP
+        fG2fmia/wVWQMMRqmp0uu/ejE8MtwZI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-OrDZpQlHNlSXHvRd63u8Fg-1; Thu, 24 Oct 2019 06:08:29 -0400
+Received: by mail-wr1-f70.google.com with SMTP id a15so12660196wrr.0
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 03:08:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=esfJDYJMPsiYJ7u3DFXauyQeLcWZdIkwkXmgSu/9TW8=;
+        b=AsDIoe0OR9Aren21a2LVklLPPygSaKfG4Zp2kKAxomru0RV2x8V8JP8doQAj2KXZ68
+         T1Jbc+zu2/76NEA3h3a/16t8Qy5hOxD5fpB5IwCQm5f2i9p4IRXYl4zvcSrtQ0QcuQlm
+         mlGMbOvF2lBT8pijFI95T3PJnwp6vmENsvjA/It9AK7e/N7XSdLOWg8LA4JW6Bh/+Y6Q
+         cNNv/Rfzkee0/k9INpiBJzmlwa2KhHS4+vTh8H4xkb+Wr8ttiBtTz+izxepNg1QNS/Ye
+         gDtjmnZ3ME3lIuIbWkA0Sy6krurblB1PMxE6/geFfVSMJ52VbzSHD0ibTlTGCH3PIHnE
+         FkBQ==
+X-Gm-Message-State: APjAAAWD1rg90lmgTENE5QMM8K3RIhczd9A80lvWBTiERVhBeFGufmrH
+        L6smqbeHtPKM/FnPzEfPz0GwbnPRfICXKd5mcAybPXfva1Ql5alL398mpf/mMTMGmUmQYkOb+s0
+        LnTM5OmuSr6gE
+X-Received: by 2002:a1c:dd06:: with SMTP id u6mr4259500wmg.109.1571911708726;
+        Thu, 24 Oct 2019 03:08:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwoT31QViboEUM71fzfc96nrE841J4xIaOvKoEhYnhXjxkLBWS/1xAfeou95adRq9sBgr5PbA==
+X-Received: by 2002:a1c:dd06:: with SMTP id u6mr4259479wmg.109.1571911708456;
+        Thu, 24 Oct 2019 03:08:28 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:6887:47f9:72a7:24e6? ([2001:b07:6468:f312:6887:47f9:72a7:24e6])
+        by smtp.gmail.com with ESMTPSA id f8sm2054415wmb.37.2019.10.24.03.08.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2019 03:08:27 -0700 (PDT)
+Subject: Re: [PATCH] kvm: call kvm_arch_destroy_vm if vm creation fails
+To:     Junaid Shahid <junaids@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, John Sperbeck <jsperbeck@google.com>
+References: <20191023171435.46287-1-jmattson@google.com>
+ <20191023182106.GB26295@linux.intel.com>
+ <7e1fe902-65e3-5381-1ac8-b280f39a677d@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4d81887e-12d7-baaf-586b-b85020bd5eaf@redhat.com>
+Date:   Thu, 24 Oct 2019 12:08:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <860dda361b6e0b94908d94beb0ad9f5519c8f2cf.camel@linux.intel.com>
+In-Reply-To: <7e1fe902-65e3-5381-1ac8-b280f39a677d@google.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: DFWeRJCOP32YI1hF-4AJrQ-1
+X-MC-Unique: OrDZpQlHNlSXHvRd63u8Fg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.10.19 17:16, Alexander Duyck wrote:
-> On Wed, 2019-10-23 at 10:26 +0200, David Hildenbrand wrote:
->> On 23.10.19 00:28, Alexander Duyck wrote:
->>> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>>
->>> In order to enable the use of the zone from the list manipulator functi=
-ons
->>> I will need access to the zone pointer. As it turns out most of the
->>> accessors were always just being directly passed &zone->free_area[order=
-]
->>> anyway so it would make sense to just fold that into the function itsel=
-f
->>> and pass the zone and order as arguments instead of the free area.
->>>
->>> In order to be able to reference the zone we need to move the declarati=
-on
->>> of the functions down so that we have the zone defined before we define=
- the
->>> list manipulation functions. Since the functions are only used in the f=
-ile
->>> mm/page_alloc.c we can just move them there to reduce noise in the head=
-er.
->>>
->>> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
->>> Reviewed-by: David Hildenbrand <david@redhat.com>
->>> Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
->>> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
->>> ---
->>>    include/linux/mmzone.h |   32 -----------------------
->>>    mm/page_alloc.c        |   67 +++++++++++++++++++++++++++++++++++---=
-----------
->>>    2 files changed, 49 insertions(+), 50 deletions(-)
->>
->> Did you see
->>
->> https://lore.kernel.org/lkml/20191001152928.27008.8178.stgit@localhost.l=
-ocaldomain/T/#m4d2bc2f37bd7bdc3ae35c4f197905c275d0ad2f9
->>
->> this time?
->>
->> And the difference to the old patch is only an empty line.
->>
->=20
-> I saw the report. However I have not had much luck reproducing it in orde=
-r
-> to get root cause. Here are my results for linux-next 20191021 with that
-> patch running page_fault2 over an average of 3 runs:
+On 24/10/19 04:59, Junaid Shahid wrote:
+> AFAICT the kvm->users_count is already 0 before kvm_arch_destroy_vm()
+> is called from kvm_destroy_vm() in the normal case.
 
-It would have been good if you'd reply to the report or sth. like that.=20
-Then people (including me) are aware that you looked into it and what=20
-your results of your investigation were.
+Yes:
 
->=20
-> Baseline:   3734692.00
-> This patch: 3739878.67
->=20
-> Also I am not so sure about these results as the same patch had passed
-> previously before and instead it was patch 3 that was reported as having =
-a
-> -1.2% regression[1]. All I changed in response to that report was to add
+        if (refcount_dec_and_test(&kvm->users_count))
+                kvm_destroy_vm(kvm);
 
-Well, previously there was also a regression in the successor=20
-PageReported() patch, not sure how they bisect in this case.
+where
 
-> page_is_reported() which just wrapped the bit test for the reported flag
-> in a #ifdef to avoid testing it for the blocks that were already #ifdef
-> wrapped anyway.
->=20
-> I am still trying to see if I can get access to a system that would be a
-> better match for the one that reported the issue. My working theory is
+| int atomic_inc_and_test(atomic_t *v);
+| int atomic_dec_and_test(atomic_t *v);
+|
+| These two routines increment and decrement by 1, respectively, the
+| given atomic counter.  They return a boolean indicating whether the
+| resulting counter value was zero or not.
 
-I barely see false positives (well, I also barely see reports at all) on=20
-MM, that's why I asked.
+> So there really
+> shouldn't be any arch that does a kvm_put_kvm() inside
+> kvm_arch_destroy_vm(). I think it might be better to keep the
+> kvm_arch_destroy_vm() call after the refcount_set() to be consistent
+> with the normal path.
 
-> that maybe it requires a high core count per node to reproduce. Either
-> that or it is some combination of the kernel being tested on and the patc=
-h
-> is causing some loop to go out of alignment and become more expensive.
+I agree, so I am applying Jim's patch.  If anything, we may want to WARN
+if the refcount is not 1 before the refcount_set.
 
-Yes, double check that the config and the setup roughly matches what has=20
-been reported.
-
->=20
-> I also included the page_fault2 results in my cover page as that seems to
-> show a slight improvement with all of the patches applied.
->=20
-> Thanks.
->=20
-> - Alex
->=20
-> [1]: https://lore.kernel.org/lkml/20190921152522.GU15734@shao2-debian/
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+Paolo
 
