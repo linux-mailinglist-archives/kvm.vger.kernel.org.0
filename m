@@ -2,203 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 926E7E3F6B
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 00:34:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0E4CE3FDB
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 01:03:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731776AbfJXWeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 18:34:08 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:34266 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731152AbfJXWeI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 18:34:08 -0400
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1iNlg2-0002Uv-3P; Fri, 25 Oct 2019 00:33:55 +0200
-Date:   Fri, 25 Oct 2019 00:33:52 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Andy Lutomirski <luto@kernel.org>
-cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [patch V2 07/17] x86/entry/64: Remove redundant interrupt
- disable
-In-Reply-To: <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.1910242353330.1783@nanos.tec.linutronix.de>
-References: <20191023122705.198339581@linutronix.de> <20191023123118.296135499@linutronix.de> <20191023220618.qsmog2k5oaagj27v@treble> <alpine.DEB.2.21.1910240146200.1852@nanos.tec.linutronix.de> <CALCETrX+N_cR-HAmQyHxqUo0LPCk4GmqbzizXk-gq9qp00-RdA@mail.gmail.com>
- <alpine.DEB.2.21.1910242032080.1783@nanos.tec.linutronix.de> <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+        id S1732359AbfJXXDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 19:03:42 -0400
+Received: from mail-yb1-f202.google.com ([209.85.219.202]:32879 "EHLO
+        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726175AbfJXXDm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 19:03:42 -0400
+Received: by mail-yb1-f202.google.com with SMTP id p66so493877yba.0
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 16:03:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=H5UH2UlO9XnU36X6S3z2ls74WXsy5ReVfipmx8i1xro=;
+        b=iJ4AdUvwZcNjsp9MNh2e7CXdFwOQ3xnzFfUbrgHTzM1AFJNXvPVamVtjbsgKZkMToV
+         m2y5uIiCxxL+ZjGgH47GddWoGsx8XFqjNSLTLXX5fZ54c8+3aH9SfF6Vac8EwZ9LlWca
+         ps1F1EVyZmLto8ZvObns7FeRPqssZ/LHwkAXa3tnKzNCsIS81ntY3VYOhkTvnddz44OJ
+         cU1Mwn0N4MTm5J9U3x766uCEeOLfNE8BQ/FoeouIB2ueM3mcbDhNaoJ+dvXC7NvjS4qY
+         iBF8XoP4XH1Xo/7CKD7XY1oXHOPlwmvqU/mqoLJYeB3Gq5+NT9NEtT/SIAsIbp6zuFNT
+         +Vxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=H5UH2UlO9XnU36X6S3z2ls74WXsy5ReVfipmx8i1xro=;
+        b=BiNPFIEZ0vU12jK+/RDXH2drNh0UztkclVb2WiBSwwoHP7I3q2vbLckjwIN4h3EHqk
+         /FuaQZA2fs7TA4yUbOiB5CUDu7Lz2UB9lZ3AsLsLNCMPL54wb2pca8gbxwyuDGXwXy2+
+         xEZHTtEEh0vYc0VH+0glfePkwVrDLGVcuXCA28wOtTDROIa0ea7Nw0LiTjmzJg0OOazB
+         BkOFDbGpnjerMDBTbIhOcRZHPBlM+ExWMrZo5TZQ1h4KsoiPJLGopC55ONLkxUZmBq0X
+         1AdI+ULiczP45XmVsLS2NtuKbUGvDbODnCLInDVenPabPbjyODgWKPEPRurKqUKv0S8R
+         WIAw==
+X-Gm-Message-State: APjAAAV1lWanAxeMZM7eEReQfNKlfnkj2oVCYaAo+u6RZaZad+g5zZAL
+        qL958MRd9WiahuG4OshrNstqFBP8EXAhfFNRsaw6YjA+PNMgxy0QP86hdMGR8KCjjl52tTquiam
+        JJHF9eHjekzOWTdNK9faL/+s7VCw0RygRJVEbYsr1LANAoTSwg8UQnAa2+QviNgI=
+X-Google-Smtp-Source: APXvYqzkCyaGyRBtWf4UllraGDO7vSa/gmvBuHJarvPTSxVfu9/GCCzxD6q1D1UBeBeCzEEsUiMpvY8OzJPmew==
+X-Received: by 2002:a81:af49:: with SMTP id x9mr7450557ywj.421.1571958221359;
+ Thu, 24 Oct 2019 16:03:41 -0700 (PDT)
+Date:   Thu, 24 Oct 2019 16:03:24 -0700
+Message-Id: <20191024230327.140935-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
+Subject: [PATCH v3 0/3] kvm: call kvm_arch_destroy_vm if vm creation fails
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        John Sperbeck <jsperbeck@google.com>,
+        Junaid Shahid <junaids@google.com>
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019, Andy Lutomirski wrote:
-> On Thu, Oct 24, 2019 at 1:53 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > I spent quite some time digging deeper into this. Finding all corner cases
-> > which eventually enable interrupts from an exception handler is not as
-> > trivial as it looked in the first place. Especially the fault handler is a
-> > nightmare. Also PeterZ's approach of doing
-> >
-> >            if (regs->eflags & IF)
-> >                 local_irq_disable();
-> >
-> > is doomed due to sys_iopl(). See below.
-> 
-> I missed something in the discussion.  What breaks?
+Beginning with commit 44a95dae1d229a ("KVM: x86: Detect and Initialize
+AVIC support"), AMD's version of kvm_arch_init_vm() will allocate
+memory if the module parameter, avic, is enabled. (Note that this
+module parameter is disabled by default.) However, there are many
+possible failure exits from kvm_create_vm() *after* the call to
+kvm_arch_init_vm(), and the memory allocated by kvm_arch_init_vm() was
+leaked on these failure paths.
 
-Assume user space has issued CLI then the above check is giving the wrong
-answer because it assumes that all faults in user mode have IF set.
+The obvious solution is to call kvm_arch_destroy_vm() on these failure
+paths, since it will free the memory allocated by
+kvm_arch_init_vm(). However, kvm_arch_destroy_vm() may reference
+memslots and buses that were allocated later in kvm_create_vm(). So,
+before we can call kvm_arch_destroy_vm() on the failure paths out of
+kvm_create_vm(), we need to hoist the memslot and bus allocation up
+before the call to kvm_arch_init_vm().
 
-> Can you check user_mode(regs) too?
+The call to clear the reference count on (some) failure paths out of
+kvm_create_vm() just added to the potential confusion. By sinking the
+call to set the reference count below any possible failure exits, we
+can eliminate the call to clear the reference count on the failure
+paths.
 
-Yes, but I still hate it with a passion :)
+v1 -> v2: Call kvm_arch_destroy_vm before refcount_set
+v2 -> v3: Added two preparatory changes
 
-> > What's your plan with cr2? Stash it in pt_regs or something else?
-> 
-> Just read it from CR2.  I added a new idtentry macro arg called
-> "entry_work", and setting it to 0 causes the enter_from_user_mode to
-> be skipped.  Then C code calls enter_from_user_mode() after reading
-> CR2 (and DR7).  WIP code is here:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=x86/idtentry
-> 
-> The idea is that, if everything is converted, then we get rid of the
-> entry_work=1 case, which is easier if there's a macro.
-> 
-> So my suggestion is to use a macro for the 2-arg version and open-code
-> all the 3-arg cases.  Then, when the dust settles, we get rid of the
-> third arg and they can use the macro.
+Jim Mattson (2):
+  kvm: Don't clear reference count on kvm_create_vm() error path
+  kvm: Allocate memslots and buses before calling kvm_arch_init_vm
 
-I'll have a look tomorrow with brain awake.
- 
-> > The interesting bells and whistels result from sys_iopl(). If user space
-> > has been granted iopl(level = 3) it gains cli/sti priviledges. When the
-> > application has interrupts disabled in userspace:
-> >
-> >   - invocation of a syscall
-> >
-> >   - any exception (aside of NMI/MCE) which conditionally enables interrupts
-> >     depending on user_mode(regs) and therefor can be preempted and
-> >     schedule
-> >
-> > is just undefined behaviour and I personally consider it to be a plain bug.
-> >
-> > Just for the record: This results in running a resulting or even completely
-> > unrelated signal handler with interrupts disabled as well.
-> 
-> I am seriously tempted to say that the solution is to remove iopl(),
-> at least on 64-bit kernels.  Doing STI in user mode is BS :)
+John Sperbeck (1):
+  kvm: call kvm_arch_destroy_vm if vm creation fails
 
-STI would be halfways sane. CLI is the problem. And yes I agree it's BS :)
+ virt/kvm/kvm_main.c | 52 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 22 deletions(-)
 
-> Otherwise we need to give it semantics, no?  I personally have no
-> actual problem with the fact that an NMI can cause scheduling to
-> happen.  Big fscking deal.
+-- 
+2.24.0.rc0.303.g954a862665-goog
 
-Right, I don't care either. I do neither care that any exception/syscall
-which hits a user space CLI region might schedule. It's been that way
-forever.
-
-But giving this semantics is insanely hard at least if you want sensible,
-useful, consistent and understandable semantics. I know that's overrated.
-
-> > Whatever we decide it is, leaving it completely inconsistent is not a
-> > solution at all. The options are:
-> >
-> >   1)  Always do conditional tracing depending on the user_regs->eflags.IF
-> >       state.
-> 
-> I'm okay with always tracing like user mode means IRQs on or doing it
-> "correctly".  I consider the former to be simpler and therefore quite
-> possibly better.
-> 
-> >
-> >   2)  #1 + warn once when syscalls and exceptions (except NMI/MCE) happen
-> >       and user_regs->eflags.IF is cleared.
-> >
-> >   3a) #2 + enforce signal handling to run with interrupts enabled.
-> >
-> >   3b) #2 + set regs->eflags.IF. So the state is always correct from the
-> >       kernel POV. Of course that changes existing behaviour, but its
-> >       changing undefined and inconsistent behaviour.
-> >
-> >   4) Let iopl(level) return -EPERM if level == 3.
-> >
-> >      Yeah, I know it's not possible due to regressions (DPKD uses iopl(3)),
-> >      but TBH that'd be the sanest option of all.
-> >
-> >      Of course the infinite wisdom of hardware designers tied IN, INS, OUT,
-> >      OUTS and CLI/STI together on IOPL so we cannot even distangle them in
-> >      any way.
-> 
-> >
-> >      The only way out would be to actually use a full 8K sized I/O bitmap,
-> >      but that's a massive pain as it has to be copied on every context
-> >      switch.
-> 
-> Hmm.  This actually doesn't seem that bad.  We already have a TIF_
-> flag to optimize this.  So basically iopl() would effectively become
-> ioperm(everything on).
-
-Yes, and the insane user space would:
-
-     1) Pay the latency price for copying 8K bitmap on every context switch
-     	IN
-
-     2) Inflict latency on the next task due to requiring memset of 8K
-     	bitmap on every context switch OUT
-
-     3) #GP when issuing CLI/STI
-
-I personally have no problem with that. #1 and #3 are sane and as iopl()
-requires CAP_RAW_IO it's not available to Joe User, so the sysadmin is
-responsible for eventual issues resulting from #2.
-
-Though the no-regression hammer might pound on #3 as it breaks random
-engineering trainwrecks from hell.
-
-#1/#2 could be easily mitigated though.
-
-      struct tss_struct {
-      	struct x86_hw_tss       x86_tss;
-	unsigned long           io_bitmap[IO_BITMAP_LONGS + 1];
-      };
-
-and x86_tss has
-
-    u16	io_bitmap_base;
-
-which is either set to
-
-  INVALID_IO_BITMAP_OFFSET ( 0x8000 )
-
-or
-
-  IO_BITMAP_OFFSET
-    (offsetof(struct tss_struct, io_bitmap) - offsetof(struct tss_struct, x86_tss))
-
-So we could add
-
-	unsigned long           io_bitmap_all[IO_BITMAP_LONGS + 1];
-
-and just set the base to this one.
-
-But that involves also upping __KERNEL_TSS_LIMIT. Too tired to think about
-the implications of that right now.
-
-Thanks,
-
-	tglx
