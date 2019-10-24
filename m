@@ -2,98 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5915E3F59
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 00:28:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 926E7E3F6B
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 00:34:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731543AbfJXW2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 18:28:08 -0400
-Received: from mail-ua1-f73.google.com ([209.85.222.73]:35112 "EHLO
-        mail-ua1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727635AbfJXW2I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 18:28:08 -0400
-Received: by mail-ua1-f73.google.com with SMTP id z5so95091uae.2
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 15:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=a6D0LvDSWvcPBISgGIo9u1LrVZKZJkW1is0FU9Md0OY=;
-        b=QgIbbNPzQRq8lf+1LZBbxpjdewMwplI2ZoV9XkzgGYuAhNQyKZ1vHAPEiMbi7u04Gz
-         KqWNHCK1iD6mvnvff7f92kfMTMraxWFI5RMWoo8z7PQjgeH722jU5nrjQ+GgSn+WCgDW
-         0SG1fU3JnR9i3Ja4jYW1xVWDwRp034JHajPpa6sdU48Jt0pHAsfan3z5znxHJvxF8wIB
-         KKprUAHaz7qtACM0xK4KpKhD/0vphO2PWh0so/wb04Z2pkkJuIuLcE4L4jOk/1ymxtAk
-         kvbl1VbDxa70e2FgdW5ezpXQ7euebv7Ekn8RxST4yBiVWdGG9tBS0qJPShHxZUMiDpQm
-         SSlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=a6D0LvDSWvcPBISgGIo9u1LrVZKZJkW1is0FU9Md0OY=;
-        b=YXebimbvNbIjE5JSLePaDSM/ZC0dlb2VQq8sL16+aO+kMKtyvjbhBI9v2kACCV54PQ
-         8i7b4vl61jCElVSH6ROTCRtbObss789MXrZ6NV7qQb5p3Zcyzn50tvdNSotv9NKqJXSq
-         h2tmWW2noTPjNBLqX+P6btLOGVJhWOLiamXpg9ZKMu/K4KYU2/OUBzevMRruvTbHXlER
-         +zvZgg0azLXQMiCfRs3yUN9TKF8DyKYn6Aj+/ktTVPOhmcEv3ur/ZGpvBq1iE+7zuuDJ
-         nVqCNYv5qGYq1iz8Um2tPrjnpNCE3hW5yC7xzilJXZDtH3nFAR7uBk75zs9Cj5n+sYeQ
-         5pdQ==
-X-Gm-Message-State: APjAAAVij1yqwU3aO4jNh4Yr7b3poks45ATR4VH9AiJgQDW8Zvm51mvh
-        kJi5Oekyd+HE0AHi/kokZ18e8lB2jFsmOuLPgbxb8NhuYSUIZQ5ki5Xg+J8K8zOt79ooq6cEJ7i
-        N73Pw+9hDS5mMPY7e4Qg8EUTfUAbLF1cjbNkqJT7KNNg8E81ZkkvfM3NSuatPAcSbXPPV
-X-Google-Smtp-Source: APXvYqwrgkNXBSU0aSof+GA/FUiQFEnHAHvhzyeU3r+6GzVla+fja8N0iBVoMaF6B4paXluH4IHotiNN/1VQegH3
-X-Received: by 2002:a1f:b202:: with SMTP id b2mr453354vkf.59.1571956087093;
- Thu, 24 Oct 2019 15:28:07 -0700 (PDT)
-Date:   Thu, 24 Oct 2019 15:27:26 -0700
-Message-Id: <20191024222725.160835-1-aaronlewis@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH] x86: Fix the register order to match struct regs
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1731776AbfJXWeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 18:34:08 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:34266 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731152AbfJXWeI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 18:34:08 -0400
+Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1iNlg2-0002Uv-3P; Fri, 25 Oct 2019 00:33:55 +0200
+Date:   Fri, 25 Oct 2019 00:33:52 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Andy Lutomirski <luto@kernel.org>
+cc:     Josh Poimboeuf <jpoimboe@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [patch V2 07/17] x86/entry/64: Remove redundant interrupt
+ disable
+In-Reply-To: <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
+Message-ID: <alpine.DEB.2.21.1910242353330.1783@nanos.tec.linutronix.de>
+References: <20191023122705.198339581@linutronix.de> <20191023123118.296135499@linutronix.de> <20191023220618.qsmog2k5oaagj27v@treble> <alpine.DEB.2.21.1910240146200.1852@nanos.tec.linutronix.de> <CALCETrX+N_cR-HAmQyHxqUo0LPCk4GmqbzizXk-gq9qp00-RdA@mail.gmail.com>
+ <alpine.DEB.2.21.1910242032080.1783@nanos.tec.linutronix.de> <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the order the registers show up in SAVE_GPR and SAVE_GPR_C to ensure
-the correct registers get the correct values.  Previously, the registers
-were being written to (and read from) the wrong fields.
+On Thu, 24 Oct 2019, Andy Lutomirski wrote:
+> On Thu, Oct 24, 2019 at 1:53 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+> > I spent quite some time digging deeper into this. Finding all corner cases
+> > which eventually enable interrupts from an exception handler is not as
+> > trivial as it looked in the first place. Especially the fault handler is a
+> > nightmare. Also PeterZ's approach of doing
+> >
+> >            if (regs->eflags & IF)
+> >                 local_irq_disable();
+> >
+> > is doomed due to sys_iopl(). See below.
+> 
+> I missed something in the discussion.  What breaks?
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- x86/vmx.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Assume user space has issued CLI then the above check is giving the wrong
+answer because it assumes that all faults in user mode have IF set.
 
-diff --git a/x86/vmx.h b/x86/vmx.h
-index 8496be7..8527997 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -492,9 +492,9 @@ enum vm_instruction_error_number {
+> Can you check user_mode(regs) too?
+
+Yes, but I still hate it with a passion :)
+
+> > What's your plan with cr2? Stash it in pt_regs or something else?
+> 
+> Just read it from CR2.  I added a new idtentry macro arg called
+> "entry_work", and setting it to 0 causes the enter_from_user_mode to
+> be skipped.  Then C code calls enter_from_user_mode() after reading
+> CR2 (and DR7).  WIP code is here:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=x86/idtentry
+> 
+> The idea is that, if everything is converted, then we get rid of the
+> entry_work=1 case, which is easier if there's a macro.
+> 
+> So my suggestion is to use a macro for the 2-arg version and open-code
+> all the 3-arg cases.  Then, when the dust settles, we get rid of the
+> third arg and they can use the macro.
+
+I'll have a look tomorrow with brain awake.
  
- #define SAVE_GPR				\
- 	"xchg %rax, regs\n\t"			\
--	"xchg %rbx, regs+0x8\n\t"		\
--	"xchg %rcx, regs+0x10\n\t"		\
--	"xchg %rdx, regs+0x18\n\t"		\
-+	"xchg %rcx, regs+0x8\n\t"		\
-+	"xchg %rdx, regs+0x10\n\t"		\
-+	"xchg %rbx, regs+0x18\n\t"		\
- 	"xchg %rbp, regs+0x28\n\t"		\
- 	"xchg %rsi, regs+0x30\n\t"		\
- 	"xchg %rdi, regs+0x38\n\t"		\
-@@ -511,9 +511,9 @@ enum vm_instruction_error_number {
- 
- #define SAVE_GPR_C				\
- 	"xchg %%rax, regs\n\t"			\
--	"xchg %%rbx, regs+0x8\n\t"		\
--	"xchg %%rcx, regs+0x10\n\t"		\
--	"xchg %%rdx, regs+0x18\n\t"		\
-+	"xchg %%rcx, regs+0x8\n\t"		\
-+	"xchg %%rdx, regs+0x10\n\t"		\
-+	"xchg %%rbx, regs+0x18\n\t"		\
- 	"xchg %%rbp, regs+0x28\n\t"		\
- 	"xchg %%rsi, regs+0x30\n\t"		\
- 	"xchg %%rdi, regs+0x38\n\t"		\
--- 
-2.24.0.rc0.303.g954a862665-goog
+> > The interesting bells and whistels result from sys_iopl(). If user space
+> > has been granted iopl(level = 3) it gains cli/sti priviledges. When the
+> > application has interrupts disabled in userspace:
+> >
+> >   - invocation of a syscall
+> >
+> >   - any exception (aside of NMI/MCE) which conditionally enables interrupts
+> >     depending on user_mode(regs) and therefor can be preempted and
+> >     schedule
+> >
+> > is just undefined behaviour and I personally consider it to be a plain bug.
+> >
+> > Just for the record: This results in running a resulting or even completely
+> > unrelated signal handler with interrupts disabled as well.
+> 
+> I am seriously tempted to say that the solution is to remove iopl(),
+> at least on 64-bit kernels.  Doing STI in user mode is BS :)
 
+STI would be halfways sane. CLI is the problem. And yes I agree it's BS :)
+
+> Otherwise we need to give it semantics, no?  I personally have no
+> actual problem with the fact that an NMI can cause scheduling to
+> happen.  Big fscking deal.
+
+Right, I don't care either. I do neither care that any exception/syscall
+which hits a user space CLI region might schedule. It's been that way
+forever.
+
+But giving this semantics is insanely hard at least if you want sensible,
+useful, consistent and understandable semantics. I know that's overrated.
+
+> > Whatever we decide it is, leaving it completely inconsistent is not a
+> > solution at all. The options are:
+> >
+> >   1)  Always do conditional tracing depending on the user_regs->eflags.IF
+> >       state.
+> 
+> I'm okay with always tracing like user mode means IRQs on or doing it
+> "correctly".  I consider the former to be simpler and therefore quite
+> possibly better.
+> 
+> >
+> >   2)  #1 + warn once when syscalls and exceptions (except NMI/MCE) happen
+> >       and user_regs->eflags.IF is cleared.
+> >
+> >   3a) #2 + enforce signal handling to run with interrupts enabled.
+> >
+> >   3b) #2 + set regs->eflags.IF. So the state is always correct from the
+> >       kernel POV. Of course that changes existing behaviour, but its
+> >       changing undefined and inconsistent behaviour.
+> >
+> >   4) Let iopl(level) return -EPERM if level == 3.
+> >
+> >      Yeah, I know it's not possible due to regressions (DPKD uses iopl(3)),
+> >      but TBH that'd be the sanest option of all.
+> >
+> >      Of course the infinite wisdom of hardware designers tied IN, INS, OUT,
+> >      OUTS and CLI/STI together on IOPL so we cannot even distangle them in
+> >      any way.
+> 
+> >
+> >      The only way out would be to actually use a full 8K sized I/O bitmap,
+> >      but that's a massive pain as it has to be copied on every context
+> >      switch.
+> 
+> Hmm.  This actually doesn't seem that bad.  We already have a TIF_
+> flag to optimize this.  So basically iopl() would effectively become
+> ioperm(everything on).
+
+Yes, and the insane user space would:
+
+     1) Pay the latency price for copying 8K bitmap on every context switch
+     	IN
+
+     2) Inflict latency on the next task due to requiring memset of 8K
+     	bitmap on every context switch OUT
+
+     3) #GP when issuing CLI/STI
+
+I personally have no problem with that. #1 and #3 are sane and as iopl()
+requires CAP_RAW_IO it's not available to Joe User, so the sysadmin is
+responsible for eventual issues resulting from #2.
+
+Though the no-regression hammer might pound on #3 as it breaks random
+engineering trainwrecks from hell.
+
+#1/#2 could be easily mitigated though.
+
+      struct tss_struct {
+      	struct x86_hw_tss       x86_tss;
+	unsigned long           io_bitmap[IO_BITMAP_LONGS + 1];
+      };
+
+and x86_tss has
+
+    u16	io_bitmap_base;
+
+which is either set to
+
+  INVALID_IO_BITMAP_OFFSET ( 0x8000 )
+
+or
+
+  IO_BITMAP_OFFSET
+    (offsetof(struct tss_struct, io_bitmap) - offsetof(struct tss_struct, x86_tss))
+
+So we could add
+
+	unsigned long           io_bitmap_all[IO_BITMAP_LONGS + 1];
+
+and just set the base to this one.
+
+But that involves also upping __KERNEL_TSS_LIMIT. Too tired to think about
+the implications of that right now.
+
+Thanks,
+
+	tglx
