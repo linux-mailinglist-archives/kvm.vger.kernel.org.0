@@ -2,236 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01287E3E15
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 23:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B749E3EFA
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 00:18:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbfJXVYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 17:24:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51596 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729034AbfJXVYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 17:24:20 -0400
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 49F00222BE
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 21:24:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571952259;
-        bh=7M6g3d23nu+as4txKP7qhtwdggKIeiqbAUCLIQNX5tE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=D+Ji1qCqi6wEDbkfRtaHJsGTQoMB0ku3AvlncPFcTTOO+gps42gk8JAMqP6Dxlivh
-         GbcD6qM6Ux1ae6fDJULM7ykx3x/P68vMI61pp/B2KVYXsVEvHVHCB3ttK+RmRiwWot
-         aTTdsg7B/kRi624k4I9BS04MJMCYUZogTxFq+irk=
-Received: by mail-wm1-f42.google.com with SMTP id v6so3980582wmj.0
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 14:24:19 -0700 (PDT)
-X-Gm-Message-State: APjAAAUgkr2eSTcyxMpFIupsGSzYrhug7ujmOQKkGfR05MORA7AwgDXI
-        CZVDQU6cbkgoNU/68y2ayhdV7q/V6KD5CLffhcxLZQ==
-X-Google-Smtp-Source: APXvYqx3YbuVjjW90sEqQPfhPCRz3d4DpXfSdJJFWHTpqYg0Brg2oBFw6/G/nbDEGNRgrJMOsQbez2v6JlMOebzuFyY=
-X-Received: by 2002:a1c:20d8:: with SMTP id g207mr323194wmg.79.1571952257553;
- Thu, 24 Oct 2019 14:24:17 -0700 (PDT)
+        id S1730388AbfJXWSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 18:18:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40038 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730890AbfJXWSE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Oct 2019 18:18:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571955483;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=S5T3SACDgYsMyWdMvB+Axa39PeDk5Tdi7kLln/J1DFk=;
+        b=G0AMSz4pdualQLp+IEr33XA5P9DkU21OeG+2eo6PzwHPiGObe4qp0d0w03u/xdVEx45OBP
+        oBtWpcbGWh1onsaEmZqIgAMKmO2FPVPZnx0hGPfn+OGMMrpfADiWn7KS+Ap7ckYBfITNFz
+        n3411e1VW9CYmR6d6fDcFl8xNloJN1o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-NtSIC1OwOiSCL8d2CE41KQ-1; Thu, 24 Oct 2019 18:17:59 -0400
+Received: by mail-wm1-f70.google.com with SMTP id x23so201301wmj.7
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 15:17:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2IxEKDad2wxmQsINlVAKLFFPvON6bykz+bQBxVeDvH0=;
+        b=CoqQzcVf0udknx8TmtnG/PzOnlw32uPdfujvq8RdbZ1JcteM4Kh/UWhEF6BCxinbek
+         e1fWjrDwlaWnVgbDbpkLNvx2Z/J7cs5gmODDpUZhqbXgSKlao3qy6gSige4Ca1Vi34Dz
+         fY053yLtA2WN7laci6+JTYVtwCjeFFnmOaqUM1udWetc7Ft+V+NxOCj6VyQQiDBvDQr4
+         HlhBwrCK/WlwtGjKPX93LVVtKfjFYsTlOrM86pWqgXwvGGDQskXnhk8ysor9PIe/zNn4
+         3MBDmD1sknhDL8sm+/vwlvwoHZhSLP/+kOT8+Dg/4td2pu0EI4JkSPVAIzLplh8JyZUu
+         Fz8w==
+X-Gm-Message-State: APjAAAXvyyVc2XF8oQfG++d2ko0f0IG39Wi9PDJgUPUgjGBCjbXymRug
+        vdwCIaT0rJT/DZhS0yCEVHFFJWrzu9FWEE9JSD0AgbtPF7Ug52MIXJoLzchUX/QHerJtPAQoerz
+        HMjFD2Vq3+UKk
+X-Received: by 2002:a05:6000:34f:: with SMTP id e15mr6289764wre.232.1571955478510;
+        Thu, 24 Oct 2019 15:17:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwr+LRRTX08P9gvDuFTHNA2fdDFaKy0n8M1+sziqYeVdoUEBgZ3dkWkj3/scHHQQRwEdeYwsQ==
+X-Received: by 2002:a05:6000:34f:: with SMTP id e15mr6289749wre.232.1571955478261;
+        Thu, 24 Oct 2019 15:17:58 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:6887:47f9:72a7:24e6? ([2001:b07:6468:f312:6887:47f9:72a7:24e6])
+        by smtp.gmail.com with ESMTPSA id o4sm155314wre.91.2019.10.24.15.17.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Oct 2019 15:17:57 -0700 (PDT)
+Subject: Re: [PATCH v2] kvm: x86: Add cr3 to struct kvm_debug_exit_arch
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Ken Hofsass <hofsass@google.com>, Peter Shier <pshier@google.com>
+References: <20191024195431.183667-1-jmattson@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <895ce968-7f70-000b-0510-c9040125f93a@redhat.com>
+Date:   Fri, 25 Oct 2019 00:17:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20191023122705.198339581@linutronix.de> <20191023123118.296135499@linutronix.de>
- <20191023220618.qsmog2k5oaagj27v@treble> <alpine.DEB.2.21.1910240146200.1852@nanos.tec.linutronix.de>
- <CALCETrX+N_cR-HAmQyHxqUo0LPCk4GmqbzizXk-gq9qp00-RdA@mail.gmail.com> <alpine.DEB.2.21.1910242032080.1783@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1910242032080.1783@nanos.tec.linutronix.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Thu, 24 Oct 2019 14:24:06 -0700
-X-Gmail-Original-Message-ID: <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
-Message-ID: <CALCETrXyhnMwwOyWQ-FtsNFAsrcG41-pPrAp8Wj2vc0N9JzP-Q@mail.gmail.com>
-Subject: Re: [patch V2 07/17] x86/entry/64: Remove redundant interrupt disable
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Miroslav Benes <mbenes@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191024195431.183667-1-jmattson@google.com>
+Content-Language: en-US
+X-MC-Unique: NtSIC1OwOiSCL8d2CE41KQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 1:53 PM Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> On Thu, 24 Oct 2019, Andy Lutomirski wrote:
-> > On Wed, Oct 23, 2019 at 4:52 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > > On Wed, 23 Oct 2019, Josh Poimboeuf wrote:
-> > > > What happens if somebody accidentally leaves irqs enabled?  How do we
-> > > > know you found all the leaks?
-> > >
-> > > For the DO_ERROR() ones that's trivial:
-> > >
-> > >  #define DO_ERROR(trapnr, signr, sicode, addr, str, name)                  \
-> > >  dotraplinkage void do_##name(struct pt_regs *regs, long error_code)       \
-> > >  {                                                                         \
-> > >         do_error_trap(regs, error_code, str, trapnr, signr, sicode, addr); \
-> > > +       lockdep_assert_irqs_disabled();                                    \
-> > >  }
-> > >
-> > >  DO_ERROR(X86_TRAP_DE,     SIGFPE,  FPE_INTDIV,   IP, "divide error",        divide_error)
-> > >
-> > > Now for the rest we surely could do:
-> > >
-> > > dotraplinkage void do_bounds(struct pt_regs *regs, long error_code)
-> > > {
-> > >         __do_bounds(regs, error_code);
-> > >         lockdep_assert_irqs_disabled();
-> > > }
-> > >
-> > > and move the existing body into a static function so independent of any
-> > > (future) return path there the lockdep assert will be invoked.
-> > >
-> >
-> > If we do this, can we macro-ize it:
-> >
-> > DEFINE_IDTENTRY_HANDLER(do_bounds)
-> > {
-> >  ...
-> > }
-> >
-> > If you do this, please don't worry about the weird ones that take cr2
-> > as a third argument.  Once your series lands, I will send a follow-up
-> > to get rid of it.  It's 2/3 written already.
->
-> I spent quite some time digging deeper into this. Finding all corner cases
-> which eventually enable interrupts from an exception handler is not as
-> trivial as it looked in the first place. Especially the fault handler is a
-> nightmare. Also PeterZ's approach of doing
->
->            if (regs->eflags & IF)
->                 local_irq_disable();
->
-> is doomed due to sys_iopl(). See below.
+On 24/10/19 21:54, Jim Mattson wrote:
+> From: Ken Hofsass <hofsass@google.com>
+>=20
+> A userspace agent can use cr3 to quickly determine whether a
+> KVM_EXIT_DEBUG is associated with a guest process of interest.
+>=20
+> KVM_CAP_DEBUG_EVENT_PDBR indicates support for the extension.
+>=20
+> Signed-off-by: Ken Hofsass <hofsass@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Cc: Peter Shier <pshier@google.com>
+> ---
+> v1 -> v2: Changed KVM_CAP_DEBUG_EVENT_PG_BASE_ADDR to KVM_CAP_DEBUG_EVENT=
+_PDBR
+>           Set debug.arch.cr3 in kvm_vcpu_do_singlestep and
+> =09                        kvm_vcpu_check_breakpoint
+>           Added svm support
 
-I missed something in the discussion.  What breaks?  Can you check
-user_mode(regs) too?
+Perhaps you have already considered using KVM_CAP_SYNC_REGS instead,
+since Google contributed it in the first place, but anyway...  would it
+be enough for userspace to request KVM_SYNC_X86_SREGS when it enables
+breakpoints or singlestep?
 
->
-> I'm tempted to do pretty much the same thing as the syscall rework did
-> as a first step:
->
->   - Move the actual handler invocation to C
->
->   - Do the irq tracing on entry in C
->
->   - Move irq disable before return to ASM
->
-> Peter gave me some half finished patches which pretty much do that by
-> copying half of the linux/syscalls.h macro maze into the entry code. That's
-> one possible solution, but TBH it sucks big times.
->
-> We have the following variants:
->
-> do_divide_error(struct pt_regs *regs, long error_code);
-> do_debug(struct pt_regs *regs, long error_code);
-> do_nmi(struct pt_regs *regs, long error_code);
-> do_int3(struct pt_regs *regs, long error_code);
-> do_overflow(struct pt_regs *regs, long error_code);
-> do_bounds(struct pt_regs *regs, long error_code);
-> do_invalid_op(struct pt_regs *regs, long error_code);
-> do_device_not_available(struct pt_regs *regs, long error_code);
-> do_coprocessor_segment_overrun(struct pt_regs *regs, long error_code);
-> do_invalid_TSS(struct pt_regs *regs, long error_code);
-> do_segment_not_present(struct pt_regs *regs, long error_code);
-> do_stack_segment(struct pt_regs *regs, long error_code);
-> do_general_protection(struct pt_regs *regs, long error_code);
-> do_spurious_interrupt_bug(struct pt_regs *regs, long error_code);
-> do_coprocessor_error(struct pt_regs *regs, long error_code);
-> do_alignment_check(struct pt_regs *regs, long error_code);
-> do_machine_check(struct pt_regs *regs, long error_code);
-> do_simd_coprocessor_error(struct pt_regs *regs, long error_code);
-> do_iret_error(struct pt_regs *regs, long error_code);
-> do_mce(struct pt_regs *regs, long error_code);
->
-> do_async_page_fault(struct pt_regs *regs, unsigned long error_code, unsigned long address);
-> do_double_fault(struct pt_regs *regs, long error_code, unsigned long address);
-> do_page_fault(struct pt_regs *regs, unsigned long error_code, unsigned long address);
->
-> So if we can remove the third argument then we can spare most of the macro
-> maze and just have one common function without bells and whistels. The
-> other option would be to extend all handlers to have three arguments,
-> i.e. add 'long unused', which is not pretty either.
->
-> What's your plan with cr2? Stash it in pt_regs or something else?
+Thanks,
 
-Just read it from CR2.  I added a new idtentry macro arg called
-"entry_work", and setting it to 0 causes the enter_from_user_mode to
-be skipped.  Then C code calls enter_from_user_mode() after reading
-CR2 (and DR7).  WIP code is here:
+Paolo
 
-https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=x86/idtentry
-
-The idea is that, if everything is converted, then we get rid of the
-entry_work=1 case, which is easier if there's a macro.
-
-So my suggestion is to use a macro for the 2-arg version and open-code
-all the 3-arg cases.  Then, when the dust settles, we get rid of the
-third arg and they can use the macro.
-
->
-> The interesting bells and whistels result from sys_iopl(). If user space
-> has been granted iopl(level = 3) it gains cli/sti priviledges. When the
-> application has interrupts disabled in userspace:
->
->   - invocation of a syscall
->
->   - any exception (aside of NMI/MCE) which conditionally enables interrupts
->     depending on user_mode(regs) and therefor can be preempted and
->     schedule
->
-> is just undefined behaviour and I personally consider it to be a plain bug.
->
-> Just for the record: This results in running a resulting or even completely
-> unrelated signal handler with interrupts disabled as well.
-
-I am seriously tempted to say that the solution is to remove iopl(),
-at least on 64-bit kernels.  Doing STI in user mode is BS :)
-
-Otherwise we need to give it semantics, no?  I personally have no
-actual problem with the fact that an NMI can cause scheduling to
-happen.  Big fscking deal.
-
->
-> Whatever we decide it is, leaving it completely inconsistent is not a
-> solution at all. The options are:
->
->   1)  Always do conditional tracing depending on the user_regs->eflags.IF
->       state.
-
-I'm okay with always tracing like user mode means IRQs on or doing it
-"correctly".  I consider the former to be simpler and therefore quite
-possibly better.
-
->
->   2)  #1 + warn once when syscalls and exceptions (except NMI/MCE) happen
->       and user_regs->eflags.IF is cleared.
->
->   3a) #2 + enforce signal handling to run with interrupts enabled.
->
->   3b) #2 + set regs->eflags.IF. So the state is always correct from the
->       kernel POV. Of course that changes existing behaviour, but its
->       changing undefined and inconsistent behaviour.
->
->   4) Let iopl(level) return -EPERM if level == 3.
->
->      Yeah, I know it's not possible due to regressions (DPKD uses iopl(3)),
->      but TBH that'd be the sanest option of all.
->
->      Of course the infinite wisdom of hardware designers tied IN, INS, OUT,
->      OUTS and CLI/STI together on IOPL so we cannot even distangle them in
->      any way.
-
->
->      The only way out would be to actually use a full 8K sized I/O bitmap,
->      but that's a massive pain as it has to be copied on every context
->      switch.
-
-Hmm.  This actually doesn't seem that bad.  We already have a TIF_
-flag to optimize this.  So basically iopl() would effectively become
-ioperm(everything on).
