@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8FBAE4021
+	by mail.lfdr.de (Postfix) with ESMTP id 3F9B2E4020
 	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 01:08:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388026AbfJXXIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 19:08:46 -0400
-Received: from mga18.intel.com ([134.134.136.126]:23481 "EHLO mga18.intel.com"
+        id S2387960AbfJXXIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 19:08:45 -0400
+Received: from mga18.intel.com ([134.134.136.126]:23483 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387507AbfJXXHv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2387509AbfJXXHv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 24 Oct 2019 19:07:51 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 16:07:46 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,226,1569308400"; 
-   d="scan'208";a="202445850"
+   d="scan'208";a="202445853"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga006.jf.intel.com with ESMTP; 24 Oct 2019 16:07:46 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -42,9 +42,9 @@ Cc:     David Hildenbrand <david@redhat.com>,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>
-Subject: [PATCH v3 07/15] KVM: Refactor error handling for setting memory region
-Date:   Thu, 24 Oct 2019 16:07:36 -0700
-Message-Id: <20191024230744.14543-8-sean.j.christopherson@intel.com>
+Subject: [PATCH v3 08/15] KVM: Move setting of memslot into helper routine
+Date:   Thu, 24 Oct 2019 16:07:37 -0700
+Message-Id: <20191024230744.14543-9-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20191024230744.14543-1-sean.j.christopherson@intel.com>
 References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
@@ -55,132 +55,156 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace a big pile o' gotos with returns to make it more obvious what
-error code is being returned, and to prepare for refactoring the
-functional, i.e. post-checks, portion of __kvm_set_memory_region().
+Split out the core functionality of setting a memslot into a separate
+helper in preparation for moving memslot deletion into its own routine.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Tested-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- virt/kvm/kvm_main.c | 40 ++++++++++++++++++----------------------
- 1 file changed, 18 insertions(+), 22 deletions(-)
+ virt/kvm/kvm_main.c | 106 ++++++++++++++++++++++++++------------------
+ 1 file changed, 63 insertions(+), 43 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a43902d9036d..e2f47d60f696 100644
+index e2f47d60f696..860de4fadce6 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -942,34 +942,33 @@ int __kvm_set_memory_region(struct kvm *kvm,
+@@ -920,6 +920,66 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+ 	return old_memslots;
+ }
  
- 	r = check_memory_region_flags(mem);
- 	if (r)
--		goto out;
-+		return r;
- 
--	r = -EINVAL;
- 	as_id = mem->slot >> 16;
- 	id = (u16)mem->slot;
- 
- 	/* General sanity checks */
- 	if (mem->memory_size & (PAGE_SIZE - 1))
--		goto out;
-+		return -EINVAL;
- 	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
--		goto out;
-+		return -EINVAL;
- 	/* We can read the guest memory with __xxx_user() later on. */
- 	if ((id < KVM_USER_MEM_SLOTS) &&
- 	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
- 	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
- 			mem->memory_size)))
--		goto out;
-+		return -EINVAL;
- 	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
--		goto out;
-+		return -EINVAL;
- 	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
--		goto out;
-+		return -EINVAL;
- 
- 	slot = id_to_memslot(__kvm_memslots(kvm, as_id), id);
- 	base_gfn = mem->guest_phys_addr >> PAGE_SHIFT;
- 	npages = mem->memory_size >> PAGE_SHIFT;
- 
- 	if (npages > KVM_MEM_MAX_NR_PAGES)
--		goto out;
-+		return -EINVAL;
- 
- 	new = old = *slot;
- 
-@@ -986,20 +985,18 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 			if ((new.userspace_addr != old.userspace_addr) ||
- 			    (npages != old.npages) ||
- 			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
--				goto out;
-+				return -EINVAL;
- 
- 			if (base_gfn != old.base_gfn)
- 				change = KVM_MR_MOVE;
- 			else if (new.flags != old.flags)
- 				change = KVM_MR_FLAGS_ONLY;
--			else { /* Nothing to change. */
--				r = 0;
--				goto out;
--			}
-+			else /* Nothing to change. */
-+				return 0;
- 		}
- 	} else {
- 		if (!old.npages)
--			goto out;
-+			return -EINVAL;
- 
- 		change = KVM_MR_DELETE;
- 		new.base_gfn = 0;
-@@ -1008,29 +1005,29 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 
- 	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
- 		/* Check for overlaps */
--		r = -EEXIST;
- 		kvm_for_each_memslot(slot, __kvm_memslots(kvm, as_id)) {
- 			if (slot->id == id)
- 				continue;
- 			if (!((base_gfn + npages <= slot->base_gfn) ||
- 			      (base_gfn >= slot->base_gfn + slot->npages)))
--				goto out;
-+				return -EEXIST;
- 		}
- 	}
- 
--	r = -ENOMEM;
--
- 	/* Allocate/free page dirty bitmap as needed */
- 	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
- 		new.dirty_bitmap = NULL;
- 	else if (!new.dirty_bitmap) {
--		if (kvm_create_dirty_bitmap(&new) < 0)
--			goto out;
-+		r = kvm_create_dirty_bitmap(&new);
-+		if (r)
-+			return r;
- 	}
- 
- 	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
--	if (!slots)
-+	if (!slots) {
-+		r = -ENOMEM;
- 		goto out_bitmap;
++static int kvm_set_memslot(struct kvm *kvm,
++			   const struct kvm_userspace_memory_region *mem,
++			   const struct kvm_memory_slot *old,
++			   struct kvm_memory_slot *new, int as_id,
++			   enum kvm_mr_change change)
++{
++	struct kvm_memory_slot *slot;
++	struct kvm_memslots *slots;
++	int r;
++
++	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
++	if (!slots)
++		return -ENOMEM;
++	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
++
++	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
++		/*
++		 * Note, the INVALID flag needs to be in the appropriate entry
++		 * in the freshly allocated memslots, not in @old or @new.
++		 */
++		slot = id_to_memslot(slots, old->id);
++		slot->flags |= KVM_MEMSLOT_INVALID;
++
++		/*
++		 * We can re-use the old memslots, the only difference from the
++		 * newly installed memslots is the invalid flag, which will get
++		 * dropped by update_memslots anyway.  We'll also revert to the
++		 * old memslots if preparing the new memory region fails.
++		 */
++		slots = install_new_memslots(kvm, as_id, slots);
++
++		/* From this point no new shadow pages pointing to a deleted,
++		 * or moved, memslot will be created.
++		 *
++		 * validation of sp->gfn happens in:
++		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
++		 *	- kvm_is_visible_gfn (mmu_check_roots)
++		 */
++		kvm_arch_flush_shadow_memslot(kvm, slot);
 +	}
- 	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
++
++	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
++	if (r)
++		goto out_slots;
++
++	update_memslots(slots, new, change);
++	slots = install_new_memslots(kvm, as_id, slots);
++
++	kvm_arch_commit_memory_region(kvm, mem, old, new, change);
++
++	kvfree(slots);
++	return 0;
++
++out_slots:
++	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
++		slots = install_new_memslots(kvm, as_id, slots);
++	kvfree(slots);
++	return r;
++}
++
+ /*
+  * Allocate some memory and give it an address in the guest physical address
+  * space.
+@@ -936,7 +996,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	unsigned long npages;
+ 	struct kvm_memory_slot *slot;
+ 	struct kvm_memory_slot old, new;
+-	struct kvm_memslots *slots;
+ 	int as_id, id;
+ 	enum kvm_mr_change change;
  
- 	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
-@@ -1081,7 +1078,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
+@@ -1023,58 +1082,19 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			return r;
+ 	}
+ 
+-	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+-	if (!slots) {
+-		r = -ENOMEM;
+-		goto out_bitmap;
+-	}
+-	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
+-
+-	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
+-		slot = id_to_memslot(slots, id);
+-		slot->flags |= KVM_MEMSLOT_INVALID;
+-
+-		/*
+-		 * We can re-use the old memslots, the only difference from the
+-		 * newly installed memslots is the invalid flag, which will get
+-		 * dropped by update_memslots anyway.  We'll also revert to the
+-		 * old memslots if preparing the new memory region fails.
+-		 */
+-		slots = install_new_memslots(kvm, as_id, slots);
+-
+-		/* From this point no new shadow pages pointing to a deleted,
+-		 * or moved, memslot will be created.
+-		 *
+-		 * validation of sp->gfn happens in:
+-		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+-		 *	- kvm_is_visible_gfn (mmu_check_roots)
+-		 */
+-		kvm_arch_flush_shadow_memslot(kvm, slot);
+-	}
+-
+-	r = kvm_arch_prepare_memory_region(kvm, &new, mem, change);
+-	if (r)
+-		goto out_slots;
+-
+ 	/* actual memory is freed via old in kvm_free_memslot below */
+ 	if (change == KVM_MR_DELETE) {
+ 		new.dirty_bitmap = NULL;
+ 		memset(&new.arch, 0, sizeof(new.arch));
+ 	}
+ 
+-	update_memslots(slots, &new, change);
+-	slots = install_new_memslots(kvm, as_id, slots);
+-
+-	kvm_arch_commit_memory_region(kvm, mem, &old, &new, change);
++	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
++	if (r)
++		goto out_bitmap;
+ 
+ 	kvm_free_memslot(kvm, &old, &new);
+-	kvfree(slots);
+ 	return 0;
+ 
+-out_slots:
+-	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+-		slots = install_new_memslots(kvm, as_id, slots);
+-	kvfree(slots);
  out_bitmap:
  	if (new.dirty_bitmap && !old.dirty_bitmap)
  		kvm_destroy_dirty_bitmap(&new);
--out:
- 	return r;
- }
- EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
 -- 
 2.22.0
 
