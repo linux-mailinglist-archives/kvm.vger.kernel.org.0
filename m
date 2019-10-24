@@ -2,278 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 26BC2E3C4E
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 21:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C8F5E3C88
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 21:54:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437334AbfJXTrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 15:47:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39156 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2437276AbfJXTq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 15:46:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571946418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H9X0BtuoZ8Jvkk6PkqP3IQvdtLRJY5D+ojk6YTP+TA8=;
-        b=FpqgupQ/bzrF9eAzPRmY49TJu08LuDdukolw0bUpkwN37ko2Ic0yX+Kdvy0TLu6/0Mr6nh
-        Zgn4Sdwgi2pXAXL/ntjSiBjuQ1Va3XbiwtgYR+LduGrleF5DQlrto4KG1Zwoaro4zU33LU
-        x0Cy49PUWaYaOUHmqBaQrKU6+IJyyLA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-_h2FRMZQMb62lVvm9O8R9A-1; Thu, 24 Oct 2019 15:46:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3F8B107AD33;
-        Thu, 24 Oct 2019 19:46:50 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CDC055C21A;
-        Thu, 24 Oct 2019 19:46:36 +0000 (UTC)
-Date:   Thu, 24 Oct 2019 13:46:36 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V5 1/6] mdev: class id support
-Message-ID: <20191024134636.253131c5@x1.home>
-In-Reply-To: <38bdf762-524a-e0f1-6e9a-1102adfe8fb1@redhat.com>
-References: <20191023130752.18980-1-jasowang@redhat.com>
-        <20191023130752.18980-2-jasowang@redhat.com>
-        <20191023154204.31d74866@x1.home>
-        <38bdf762-524a-e0f1-6e9a-1102adfe8fb1@redhat.com>
-Organization: Red Hat
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: _h2FRMZQMb62lVvm9O8R9A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        id S2406693AbfJXTyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 15:54:39 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:42449 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390431AbfJXTyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 15:54:38 -0400
+Received: by mail-pf1-f202.google.com with SMTP id w16so9668pfj.9
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 12:54:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=haioOoskBRBydFeA6DvXJpqQ02xkMHKkeUpYLf3y49E=;
+        b=fXPWLXN627Q7gWb6DoS6HKE29fuTMr1aTKmoYNV461mC2ZGBYMccc55lnm8YkRRQzH
+         ftPGt/7KH++pWn7UT6KXAcQ7aaqARS5Tu0J6pKgOrJm0CwKInNwrwJ2OQY1cUqfdGiKp
+         AnJuWJy+ANtjIpoiRm078wPrxmypvC8aNok8U3XhO+i4cwDFTUrn0xF3BnuQnX4245jW
+         4uRai5bx5drZFYolaEtPBMcydBcwdf6/H9PyEANrCu/UJF6+50uf0/y+Ht0715NYMNX7
+         43KcC5rWdN0kpBXVzieO0JkZtfVDy0wlw3BzsGZubQ5jy+WuBJ4I0cbs3/7qi3poeyXD
+         7PeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=haioOoskBRBydFeA6DvXJpqQ02xkMHKkeUpYLf3y49E=;
+        b=FfPQMMtebECObpt9Kx1gOyUqzAYWSk3rbKdsfmb/t2Ehy91nakehiZMSrFBMfV25L3
+         tP1TQChlP5D3dgw8N9M1V2al6PoZbCzat+MkTr25cgNWEYxEM8wVKfx0kFj7IjAOIzf5
+         b6ksPHYAkx1lq8+p7OFvC0oh7hUKyF9i27Ez1+tOahiXtidjctEcGkVmTBSmHI4ucQld
+         Tgyw3uTILeaWIIM7D5P/Krd5sMlbJBIu9j2apH8hBe4a4sDQsWBtGLhq9E69qZ3aKL7X
+         Y7BaGkQl8Dclq3yczKYuMmCRZRt2b6GpCsk3qZ8R7W11CbvQ/dzZM7YkPdZnujy8PGY+
+         DA7g==
+X-Gm-Message-State: APjAAAXj9yCfjDlTv1XgW5a/IHulExb1R+TLa22p/mpMOdrdTRvjW0LX
+        rzwgYhZklHMpz2fvCJRVD3akk0GkDn6b/L6Dzxlbg1eBMGdesmTIlalv5ZkA+PyypdHJPSLtZRm
+        K3qdnaZFyD/vZdpsTvBVVMmGsZsexQ0ss12rh50LrXUdG8d9lLZYMz0n51wzZb1g=
+X-Google-Smtp-Source: APXvYqznf4QumgFLEDXHFFc5+Sm9/m/6dbDTp+S/bXlj9PS3/Axu98W9jxM6rAxNcNTWVBjOophFN/mmw+dX7g==
+X-Received: by 2002:a63:1e04:: with SMTP id e4mr11451964pge.4.1571946877360;
+ Thu, 24 Oct 2019 12:54:37 -0700 (PDT)
+Date:   Thu, 24 Oct 2019 12:54:31 -0700
+Message-Id: <20191024195431.183667-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
+Subject: [PATCH v2] kvm: x86: Add cr3 to struct kvm_debug_exit_arch
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ken Hofsass <hofsass@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 11:27:36 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+From: Ken Hofsass <hofsass@google.com>
 
-> On 2019/10/24 =E4=B8=8A=E5=8D=885:42, Alex Williamson wrote:
-> > On Wed, 23 Oct 2019 21:07:47 +0800
-> > Jason Wang <jasowang@redhat.com> wrote:
-> > =20
-> >> Mdev bus only supports vfio driver right now, so it doesn't implement
-> >> match method. But in the future, we may add drivers other than vfio,
-> >> the first driver could be virtio-mdev. This means we need to add
-> >> device class id support in bus match method to pair the mdev device
-> >> and mdev driver correctly.
-> >>
-> >> So this patch adds id_table to mdev_driver and class_id for mdev
-> >> device with the match method for mdev bus.
-> >>
-> >> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> >> ---
-> >>   .../driver-api/vfio-mediated-device.rst       |  5 +++++
-> >>   drivers/gpu/drm/i915/gvt/kvmgt.c              |  1 +
-> >>   drivers/s390/cio/vfio_ccw_ops.c               |  1 +
-> >>   drivers/s390/crypto/vfio_ap_ops.c             |  1 +
-> >>   drivers/vfio/mdev/mdev_core.c                 | 18 +++++++++++++++
-> >>   drivers/vfio/mdev/mdev_driver.c               | 22 +++++++++++++++++=
-++
-> >>   drivers/vfio/mdev/mdev_private.h              |  1 +
-> >>   drivers/vfio/mdev/vfio_mdev.c                 |  6 +++++
-> >>   include/linux/mdev.h                          |  8 +++++++
-> >>   include/linux/mod_devicetable.h               |  8 +++++++
-> >>   samples/vfio-mdev/mbochs.c                    |  1 +
-> >>   samples/vfio-mdev/mdpy.c                      |  1 +
-> >>   samples/vfio-mdev/mtty.c                      |  1 +
-> >>   13 files changed, 74 insertions(+)
-> >>
-> >> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Docum=
-entation/driver-api/vfio-mediated-device.rst
-> >> index 25eb7d5b834b..6709413bee29 100644
-> >> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> >> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> >> @@ -102,12 +102,14 @@ structure to represent a mediated device's drive=
-r::
-> >>         * @probe: called when new device created
-> >>         * @remove: called when device removed
-> >>         * @driver: device driver structure
-> >> +      * @id_table: the ids serviced by this driver
-> >>         */
-> >>        struct mdev_driver {
-> >>   =09     const char *name;
-> >>   =09     int  (*probe)  (struct device *dev);
-> >>   =09     void (*remove) (struct device *dev);
-> >>   =09     struct device_driver    driver;
-> >> +=09     const struct mdev_class_id *id_table;
-> >>        };
-> >>  =20
-> >>   A mediated bus driver for mdev should use this structure in the func=
-tion calls
-> >> @@ -170,6 +172,9 @@ that a driver should use to unregister itself with=
- the mdev core driver::
-> >>  =20
-> >>   =09extern void mdev_unregister_device(struct device *dev);
-> >>  =20
-> >> +It is also required to specify the class_id in create() callback thro=
-ugh::
-> >> +
-> >> +=09int mdev_set_class(struct mdev_device *mdev, u16 id);
-> >>  =20
-> >>   Mediated Device Management Interface Through sysfs
-> >>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/g=
-vt/kvmgt.c
-> >> index 343d79c1cb7e..6420f0dbd31b 100644
-> >> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> >> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> >> @@ -678,6 +678,7 @@ static int intel_vgpu_create(struct kobject *kobj,=
- struct mdev_device *mdev)
-> >>   =09=09     dev_name(mdev_dev(mdev)));
-> >>   =09ret =3D 0;
-> >>  =20
-> >> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
-> >>   out:
-> >>   =09return ret;
-> >>   }
-> >> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_c=
-cw_ops.c
-> >> index f0d71ab77c50..cf2c013ae32f 100644
-> >> --- a/drivers/s390/cio/vfio_ccw_ops.c
-> >> +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> >> @@ -129,6 +129,7 @@ static int vfio_ccw_mdev_create(struct kobject *ko=
-bj, struct mdev_device *mdev)
-> >>   =09=09=09   private->sch->schid.ssid,
-> >>   =09=09=09   private->sch->schid.sch_no);
-> >>  =20
-> >> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
-> >>   =09return 0;
-> >>   }
-> >>  =20
-> >> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/v=
-fio_ap_ops.c
-> >> index 5c0f53c6dde7..07c31070afeb 100644
-> >> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> >> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> >> @@ -343,6 +343,7 @@ static int vfio_ap_mdev_create(struct kobject *kob=
-j, struct mdev_device *mdev)
-> >>   =09list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
-> >>   =09mutex_unlock(&matrix_dev->lock);
-> >>  =20
-> >> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
-> >>   =09return 0;
-> >>   }
-> >>  =20
-> >> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_co=
-re.c
-> >> index b558d4cfd082..3a9c52d71b4e 100644
-> >> --- a/drivers/vfio/mdev/mdev_core.c
-> >> +++ b/drivers/vfio/mdev/mdev_core.c
-> >> @@ -45,6 +45,16 @@ void mdev_set_drvdata(struct mdev_device *mdev, voi=
-d *data)
-> >>   }
-> >>   EXPORT_SYMBOL(mdev_set_drvdata);
-> >>  =20
-> >> +/* Specify the class for the mdev device, this must be called during
-> >> + * create() callback.
-> >> + */
-> >> +void mdev_set_class(struct mdev_device *mdev, u16 id)
-> >> +{
-> >> +=09WARN_ON(mdev->class_id);
-> >> +=09mdev->class_id =3D id;
-> >> +}
-> >> +EXPORT_SYMBOL(mdev_set_class);
-> >> +
-> >>   struct device *mdev_dev(struct mdev_device *mdev)
-> >>   {
-> >>   =09return &mdev->dev;
-> >> @@ -135,6 +145,7 @@ static int mdev_device_remove_cb(struct device *de=
-v, void *data)
-> >>    * mdev_register_device : Register a device
-> >>    * @dev: device structure representing parent device.
-> >>    * @ops: Parent device operation structure to be registered.
-> >> + * @id: class id.
-> >>    *
-> >>    * Add device to list of registered parent devices.
-> >>    * Returns a negative value on error, otherwise 0.
-> >> @@ -324,6 +335,13 @@ int mdev_device_create(struct kobject *kobj,
-> >>   =09if (ret)
-> >>   =09=09goto ops_create_fail;
-> >>  =20
-> >> +=09if (!mdev->class_id) {
-> >> +=09=09ret =3D -EINVAL;
-> >> +=09=09WARN(1, "class id must be specified for device %s\n",
-> >> +=09=09     dev_name(dev)); =20
-> > Nit, dev_warn(dev, "mdev vendor driver failed to specify device class\n=
-"); =20
->=20
->=20
-> Will fix.
->=20
->=20
-> > =20
-> >> +=09=09goto add_fail;
-> >> +=09}
-> >> +
-> >>   =09ret =3D device_add(&mdev->dev);
-> >>   =09if (ret)
-> >>   =09=09goto add_fail;
-> >> diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_=
-driver.c
-> >> index 0d3223aee20b..319d886ffaf7 100644
-> >> --- a/drivers/vfio/mdev/mdev_driver.c
-> >> +++ b/drivers/vfio/mdev/mdev_driver.c
-> >> @@ -69,8 +69,30 @@ static int mdev_remove(struct device *dev)
-> >>   =09return 0;
-> >>   }
-> >>  =20
-> >> +static int mdev_match(struct device *dev, struct device_driver *drv)
-> >> +{
-> >> +=09unsigned int i;
-> >> +=09struct mdev_device *mdev =3D to_mdev_device(dev);
-> >> +=09struct mdev_driver *mdrv =3D to_mdev_driver(drv);
-> >> +=09const struct mdev_class_id *ids =3D mdrv->id_table;
-> >> + =20
-> > Nit, as we start to allow new mdev bus drivers, mdev-core might want to
-> > protect itself from a NULL id_table, by either failing the
-> > mdev_register_driver() or failing the match here.  I think such a
-> > condition would segfault as written here, but clearly we don't have
-> > such external drivers yet.  Thanks, =20
->=20
->=20
-> I'm not sure I get the point here. My understanding is that mdev-core=20
-> won't try to be matched here since it was not a complete mdev device.
+A userspace agent can use cr3 to quickly determine whether a
+KVM_EXIT_DEBUG is associated with a guest process of interest.
 
-The parent driver failing to set a type vs the parent driver failing to
-register with a struct mdev_driver where id_table is not null are
-different issues.  I agree that if a vendor driver was not updated for
-this series that they'd never successfully create a device because the
-mdev-core would reject it for not setting a class, but mdev_match() is
-called for devices that might be created by other vendor drivers, so
-loading a parent driver with a null id_table potentially breaks
-matching for everyone.  Thanks,
+KVM_CAP_DEBUG_EVENT_PDBR indicates support for the extension.
 
-Alex
+Signed-off-by: Ken Hofsass <hofsass@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Cc: Peter Shier <pshier@google.com>
+---
+v1 -> v2: Changed KVM_CAP_DEBUG_EVENT_PG_BASE_ADDR to KVM_CAP_DEBUG_EVENT_PDBR
+          Set debug.arch.cr3 in kvm_vcpu_do_singlestep and
+	                        kvm_vcpu_check_breakpoint
+          Added svm support
+	  
+ arch/x86/include/uapi/asm/kvm.h | 1 +
+ arch/x86/kvm/svm.c              | 3 +++
+ arch/x86/kvm/vmx/vmx.c          | 2 ++
+ arch/x86/kvm/x86.c              | 3 +++
+ include/uapi/linux/kvm.h        | 1 +
+ 5 files changed, 10 insertions(+)
+
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 503d3f42da167..cea355c7ee8e7 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -254,6 +254,7 @@ struct kvm_debug_exit_arch {
+ 	__u64 pc;
+ 	__u64 dr6;
+ 	__u64 dr7;
++	__u64 cr3; /* Depends on KVM_CAP_DEBUG_EVENT_PDBR */
+ };
+ 
+ #define KVM_GUESTDBG_USE_SW_BP		0x00010000
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index f8ecb6df51066..1a774d2c78eef 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -2738,6 +2738,7 @@ static int db_interception(struct vcpu_svm *svm)
+ 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+ 		kvm_run->debug.arch.pc =
+ 			svm->vmcb->save.cs.base + svm->vmcb->save.rip;
++		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 		kvm_run->debug.arch.exception = DB_VECTOR;
+ 		return 0;
+ 	}
+@@ -2748,9 +2749,11 @@ static int db_interception(struct vcpu_svm *svm)
+ static int bp_interception(struct vcpu_svm *svm)
+ {
+ 	struct kvm_run *kvm_run = svm->vcpu.run;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+ 	kvm_run->exit_reason = KVM_EXIT_DEBUG;
+ 	kvm_run->debug.arch.pc = svm->vmcb->save.cs.base + svm->vmcb->save.rip;
++	kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 	kvm_run->debug.arch.exception = BP_VECTOR;
+ 	return 0;
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e7970a2e8eae9..736284d293c4a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4690,6 +4690,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+ 		rip = kvm_rip_read(vcpu);
+ 		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
++		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 		kvm_run->debug.arch.exception = ex_no;
+ 		break;
+ 	default:
+@@ -4909,6 +4910,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+ 			vcpu->run->debug.arch.dr6 = vcpu->arch.dr6;
+ 			vcpu->run->debug.arch.dr7 = dr7;
+ 			vcpu->run->debug.arch.pc = kvm_get_linear_rip(vcpu);
++			vcpu->run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 			vcpu->run->debug.arch.exception = DB_VECTOR;
+ 			vcpu->run->exit_reason = KVM_EXIT_DEBUG;
+ 			return 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 661e2bf385266..2fd18b55462a9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3222,6 +3222,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_GET_MSR_FEATURES:
+ 	case KVM_CAP_MSR_PLATFORM_INFO:
+ 	case KVM_CAP_EXCEPTION_PAYLOAD:
++	case KVM_CAP_DEBUG_EVENT_PDBR:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SYNC_REGS:
+@@ -6490,6 +6491,7 @@ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
+ 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+ 		kvm_run->debug.arch.dr6 = DR6_BS | DR6_FIXED_1 | DR6_RTM;
+ 		kvm_run->debug.arch.pc = vcpu->arch.singlestep_rip;
++		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 		kvm_run->debug.arch.exception = DB_VECTOR;
+ 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+ 		return 0;
+@@ -6534,6 +6536,7 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+ 		if (dr6 != 0) {
+ 			kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1 | DR6_RTM;
+ 			kvm_run->debug.arch.pc = eip;
++			kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
+ 			kvm_run->debug.arch.exception = DB_VECTOR;
+ 			kvm_run->exit_reason = KVM_EXIT_DEBUG;
+ 			*r = 0;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52641d8ca9e83..cde4b28338482 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PMU_EVENT_FILTER 173
+ #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+ #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
++#define KVM_CAP_DEBUG_EVENT_PDBR 176
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.24.0.rc0.303.g954a862665-goog
 
