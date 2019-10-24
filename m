@@ -2,196 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84020E2F43
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 12:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 848D9E2FC1
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 13:02:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438814AbfJXKnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 06:43:10 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36318 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2436753AbfJXKnJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Oct 2019 06:43:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571913787;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4wI1HwBUjiSqLG+R/qGHQwon1lbGfQ/yWCz8YkSyTFo=;
-        b=RTffUVpbE/y/LlBFK4jS/B7AJeea2xIReKqJE+zdhzmA1GMZ6fEdBdqdMv8EM7TDLYLFdY
-        dohbGwl3lEAJP3RrTvSGexHdNFAzsToy9+pXtUUhgm+ocKvt8cPx12MRhDisWHLmPtf0Qh
-        P0EAoGQ9EV2o15pyaORCuwjfdxf17NM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-RTDyQiFIPI60gnHRQ8FavA-1; Thu, 24 Oct 2019 06:43:05 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDA801800DFB;
-        Thu, 24 Oct 2019 10:43:03 +0000 (UTC)
-Received: from [10.72.13.32] (ovpn-13-32.pek2.redhat.com [10.72.13.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B3701001B2B;
-        Thu, 24 Oct 2019 10:42:52 +0000 (UTC)
-Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
-To:     Tiwei Bie <tiwei.bie@intel.com>
-Cc:     mst@redhat.com, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-References: <47a572fd-5597-1972-e177-8ee25ca51247@redhat.com>
- <20191023030253.GA15401@___>
- <ac36f1e3-b972-71ac-fe0c-3db03e016dcf@redhat.com>
- <20191023070747.GA30533@___>
- <106834b5-dae5-82b2-0f97-16951709d075@redhat.com> <20191023101135.GA6367@___>
- <5a7bc5da-d501-2750-90bf-545dd55f85fa@redhat.com>
- <20191024042155.GA21090@___>
- <d37529e1-5147-bbe5-cb9d-299bd6d4aa1a@redhat.com>
- <d4cc4f4e-2635-4041-2f68-cd043a97f25a@redhat.com>
- <20191024091839.GA17463@___>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <fefc82a3-a137-bc03-e1c3-8de79b238080@redhat.com>
-Date:   Thu, 24 Oct 2019 18:42:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191024091839.GA17463@___>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: RTDyQiFIPI60gnHRQ8FavA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+        id S2392847AbfJXLCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 07:02:39 -0400
+Received: from foss.arm.com ([217.140.110.172]:47392 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732328AbfJXLCj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 07:02:39 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AE73497;
+        Thu, 24 Oct 2019 04:02:23 -0700 (PDT)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 757673F71A;
+        Thu, 24 Oct 2019 04:02:18 -0700 (PDT)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, nd@arm.com
+Subject: [RFC PATCH v6 0/7] Enable ptp_kvm for arm64
+Date:   Thu, 24 Oct 2019 19:02:02 +0800
+Message-Id: <20191024110209.21328-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+kvm ptp targets to provide high precision time sync between guest
+and host in virtualization environment. This patch enable kvm ptp
+for arm64.
+This patch set base on [1][2][3]
 
-On 2019/10/24 =E4=B8=8B=E5=8D=885:18, Tiwei Bie wrote:
-> On Thu, Oct 24, 2019 at 04:32:42PM +0800, Jason Wang wrote:
->> On 2019/10/24 =E4=B8=8B=E5=8D=884:03, Jason Wang wrote:
->>> On 2019/10/24 =E4=B8=8B=E5=8D=8812:21, Tiwei Bie wrote:
->>>> On Wed, Oct 23, 2019 at 06:29:21PM +0800, Jason Wang wrote:
->>>>> On 2019/10/23 =E4=B8=8B=E5=8D=886:11, Tiwei Bie wrote:
->>>>>> On Wed, Oct 23, 2019 at 03:25:00PM +0800, Jason Wang wrote:
->>>>>>> On 2019/10/23 =E4=B8=8B=E5=8D=883:07, Tiwei Bie wrote:
->>>>>>>> On Wed, Oct 23, 2019 at 01:46:23PM +0800, Jason Wang wrote:
->>>>>>>>> On 2019/10/23 =E4=B8=8A=E5=8D=8811:02, Tiwei Bie wrote:
->>>>>>>>>> On Tue, Oct 22, 2019 at 09:30:16PM +0800, Jason Wang wrote:
->>>>>>>>>>> On 2019/10/22 =E4=B8=8B=E5=8D=885:52, Tiwei Bie wrote:
->>>>>>>>>>>> This patch introduces a mdev based hardware vhost backend.
->>>>>>>>>>>> This backend is built on top of the same abstraction used
->>>>>>>>>>>> in virtio-mdev and provides a generic vhost interface for
->>>>>>>>>>>> userspace to accelerate the virtio devices in guest.
->>>>>>>>>>>>
->>>>>>>>>>>> This backend is implemented as a mdev device driver on top
->>>>>>>>>>>> of the same mdev device ops used in virtio-mdev but using
->>>>>>>>>>>> a different mdev class id, and it will register the device
->>>>>>>>>>>> as a VFIO device for userspace to use. Userspace can setup
->>>>>>>>>>>> the IOMMU with the existing VFIO container/group APIs and
->>>>>>>>>>>> then get the device fd with the device name. After getting
->>>>>>>>>>>> the device fd of this device, userspace can use vhost ioctls
->>>>>>>>>>>> to setup the backend.
->>>>>>>>>>>>
->>>>>>>>>>>> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
->>>>>>>>>>>> ---
->>>>>>>>>>>> This patch depends on below series:
->>>>>>>>>>>> https://lkml.org/lkml/2019/10/17/286
->>>>>>>>>>>>
->>>>>>>>>>>> v1 -> v2:
->>>>>>>>>>>> - Replace _SET_STATE with _SET_STATUS (MST);
->>>>>>>>>>>> - Check status bits at each step (MST);
->>>>>>>>>>>> - Report the max ring size and max number of queues (MST);
->>>>>>>>>>>> - Add missing MODULE_DEVICE_TABLE (Jason);
->>>>>>>>>>>> - Only support the network backend w/o multiqueue for now;
->>>>>>>>>>> Any idea on how to extend it to support
->>>>>>>>>>> devices other than net? I think we
->>>>>>>>>>> want a generic API or an API that could
->>>>>>>>>>> be made generic in the future.
->>>>>>>>>>>
->>>>>>>>>>> Do we want to e.g having a generic vhost
->>>>>>>>>>> mdev for all kinds of devices or
->>>>>>>>>>> introducing e.g vhost-net-mdev and vhost-scsi-mdev?
->>>>>>>>>> One possible way is to do what vhost-user does. I.e. Apart from
->>>>>>>>>> the generic ring, features, ... related ioctls, we also introduc=
-e
->>>>>>>>>> device specific ioctls when we need them. As vhost-mdev just nee=
-ds
->>>>>>>>>> to forward configs between parent and userspace and even won't
->>>>>>>>>> cache any info when possible,
->>>>>>>>> So it looks to me this is only possible if we
->>>>>>>>> expose e.g set_config and
->>>>>>>>> get_config to userspace.
->>>>>>>> The set_config and get_config interface isn't really everything
->>>>>>>> of device specific settings. We also have ctrlq in virtio-net.
->>>>>>> Yes, but it could be processed by the exist API. Isn't
->>>>>>> it? Just set ctrl vq
->>>>>>> address and let parent to deal with that.
->>>>>> I mean how to expose ctrlq related settings to userspace?
->>>>> I think it works like:
->>>>>
->>>>> 1) userspace find ctrl_vq is supported
->>>>>
->>>>> 2) then it can allocate memory for ctrl vq and set its address throug=
-h
->>>>> vhost-mdev
->>>>>
->>>>> 3) userspace can populate ctrl vq itself
->>>> I see. That is to say, userspace e.g. QEMU will program the
->>>> ctrl vq with the existing VHOST_*_VRING_* ioctls, and parent
->>>> drivers should know that the addresses used in ctrl vq are
->>>> host virtual addresses in vhost-mdev's case.
->>>
->>> That's really good point. And that means parent needs to differ vhost
->>> from virtio. It should work.
->>
->> HVA may only work when we have something similar to VHOST_SET_OWNER whic=
-h
->> can reuse MM of its owner.
-> We already have VHOST_SET_OWNER in vhost now, parent can handle
-> the commands in its .kick_vq() which is called by vq's .handle_kick
-> callback. Virtio-user did something similar:
->
-> https://github.com/DPDK/dpdk/blob/0da7f445df445630c794897347ee360d6fe6348=
-b/drivers/net/virtio/virtio_user_ethdev.c#L313-L322
+change log:
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
 
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
 
-This probably means a process context is required, something like=20
-kthread that is used by vhost which seems a burden for parent. Or we can=20
-extend ioctl to processing kick in the system call context.
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
 
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
 
->
->>
->>> But is there any chance to use DMA address? I'm asking since the API
->>> then tends to be device specific.
->>
->> I wonder whether we can introduce MAP IOMMU notifier and get DMA mapping=
-s
->> from that.
-> I think this will complicate things unnecessarily and may
-> bring pains. Because, in vhost-mdev, mdev's ctrl vq is
-> supposed to be managed by host.
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
 
+[1]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=125ea89e4a21e2fc5235410f966a996a1a7148bf
+[2]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+[3]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
+[4]https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/
+commit/?h=for-next/smccc-conduit-cleanup&id=6b7fe77c334ae59fed9500140e08f4f896b36871
 
-Yes.
+Jianyong Wu (6):
+  psci: let arm_smccc_1_1_invoke available by modules
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+  psci: Add hvc call service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm64
+  kvm: arm64: Add capability check extension for ptp_kvm
 
+Mark Rutland (1):
+  arm/arm64: smccc/psci: add arm_smccc_1_1_get_conduit()
 
->   And we should try to avoid
-> putting ctrl vq and Rx/Tx vqs in the same DMA space to prevent
-> guests having the chance to bypass the host (e.g. QEMU) to
-> setup the backend accelerator directly.
+ drivers/clocksource/arm_arch_timer.c        | 24 ++++++
+ drivers/firmware/psci/psci.c                | 16 ++++
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 +++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 77 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 87 +++++++++++++++++++++
+ include/asm-generic/ptp_kvm.h               | 12 +++
+ include/clocksource/arm_arch_timer.h        |  4 +
+ include/linux/arm-smccc.h                   | 30 ++++++-
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/arm/arm.c                          |  1 +
+ virt/kvm/arm/psci.c                         | 22 ++++++
+ 17 files changed, 286 insertions(+), 66 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/asm-generic/ptp_kvm.h
 
-
-That's really good point.=C2=A0 So when "vhost" type is created, parent=20
-should assume addr of ctrl_vq is hva.
-
-Thanks
-
-
->
->> Thanks
->>
+-- 
+2.17.1
 
