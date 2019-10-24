@@ -2,48 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0E4CE3FDB
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 01:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57FC6E3FDC
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 01:03:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732359AbfJXXDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 19:03:42 -0400
-Received: from mail-yb1-f202.google.com ([209.85.219.202]:32879 "EHLO
-        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726175AbfJXXDm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 19:03:42 -0400
-Received: by mail-yb1-f202.google.com with SMTP id p66so493877yba.0
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 16:03:41 -0700 (PDT)
+        id S1733191AbfJXXDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 19:03:45 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:54296 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726175AbfJXXDo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 19:03:44 -0400
+Received: by mail-pf1-f202.google.com with SMTP id 2so334095pfv.21
+        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 16:03:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=H5UH2UlO9XnU36X6S3z2ls74WXsy5ReVfipmx8i1xro=;
-        b=iJ4AdUvwZcNjsp9MNh2e7CXdFwOQ3xnzFfUbrgHTzM1AFJNXvPVamVtjbsgKZkMToV
-         m2y5uIiCxxL+ZjGgH47GddWoGsx8XFqjNSLTLXX5fZ54c8+3aH9SfF6Vac8EwZ9LlWca
-         ps1F1EVyZmLto8ZvObns7FeRPqssZ/LHwkAXa3tnKzNCsIS81ntY3VYOhkTvnddz44OJ
-         cU1Mwn0N4MTm5J9U3x766uCEeOLfNE8BQ/FoeouIB2ueM3mcbDhNaoJ+dvXC7NvjS4qY
-         iBF8XoP4XH1Xo/7CKD7XY1oXHOPlwmvqU/mqoLJYeB3Gq5+NT9NEtT/SIAsIbp6zuFNT
-         +Vxw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=ZvUs3prfac8nMA+DjbJb3Eq53kw+EBDussXq7EoWCTQ=;
+        b=mVOmSWgmDo0egTO90mOaE4VXzmf3Bq6O7o3NZvERc/MGcS6+uvLJMZ920I5g9KWx58
+         XZc55Extb5ex2bRzZIjvTuzgaUZGXsC2iI4N5ZmQRtpmpSV/F33ZSJXKkSsISO4xEEZ8
+         6w8aM9JHrPm0XCV+wZoTrTsv0D3YiIepzQJE1PbNP9oUwXmUGXdv1gxoEdrTSN/n4dno
+         FdXs7UNTheUp0tNxp/KY4btiffb20ebFTFBfgQJRTBhxMG80SpZjkYZMZ6EZeOjIbMcj
+         psoo0VoLjoWQEiZ9o+bpRiff67LnkHk1WB00KsuJhOX9aBWKTbIyqwfQS3lgmRG3nsFY
+         LX4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=H5UH2UlO9XnU36X6S3z2ls74WXsy5ReVfipmx8i1xro=;
-        b=BiNPFIEZ0vU12jK+/RDXH2drNh0UztkclVb2WiBSwwoHP7I3q2vbLckjwIN4h3EHqk
-         /FuaQZA2fs7TA4yUbOiB5CUDu7Lz2UB9lZ3AsLsLNCMPL54wb2pca8gbxwyuDGXwXy2+
-         xEZHTtEEh0vYc0VH+0glfePkwVrDLGVcuXCA28wOtTDROIa0ea7Nw0LiTjmzJg0OOazB
-         BkOFDbGpnjerMDBTbIhOcRZHPBlM+ExWMrZo5TZQ1h4KsoiPJLGopC55ONLkxUZmBq0X
-         1AdI+ULiczP45XmVsLS2NtuKbUGvDbODnCLInDVenPabPbjyODgWKPEPRurKqUKv0S8R
-         WIAw==
-X-Gm-Message-State: APjAAAV1lWanAxeMZM7eEReQfNKlfnkj2oVCYaAo+u6RZaZad+g5zZAL
-        qL958MRd9WiahuG4OshrNstqFBP8EXAhfFNRsaw6YjA+PNMgxy0QP86hdMGR8KCjjl52tTquiam
-        JJHF9eHjekzOWTdNK9faL/+s7VCw0RygRJVEbYsr1LANAoTSwg8UQnAa2+QviNgI=
-X-Google-Smtp-Source: APXvYqzkCyaGyRBtWf4UllraGDO7vSa/gmvBuHJarvPTSxVfu9/GCCzxD6q1D1UBeBeCzEEsUiMpvY8OzJPmew==
-X-Received: by 2002:a81:af49:: with SMTP id x9mr7450557ywj.421.1571958221359;
- Thu, 24 Oct 2019 16:03:41 -0700 (PDT)
-Date:   Thu, 24 Oct 2019 16:03:24 -0700
-Message-Id: <20191024230327.140935-1-jmattson@google.com>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=ZvUs3prfac8nMA+DjbJb3Eq53kw+EBDussXq7EoWCTQ=;
+        b=cPvzciJG769C3Hc4G8+xAjq7HjPghwQae5MHHDzdn2S7CmaLWc0av05pJwAnqn4vBS
+         bmciJEzWiOcVTkiEh3tUGCR0wHVODXQxXr8NDxEaxUzRviUYLtl+1SnAT1r0iDRAUA8K
+         B9V0nw7ppgmeS1XOUqaIsA67mBVFfjE+DeqsYsFho3WduQetXsH9aTp1nIoRbktUnaxR
+         W9MvaGUcfyNLehsCdA4DJKLZ5ozEYpmmB7rLMWxtueH5870DYkCz3YpKt2tltIWriXJh
+         55fsVGilQj5m/o8mf69CYrBFVY8L/m7lYMITsxdlH91cYtdmvoH5LVnHzwkEpgadWDY4
+         +uJw==
+X-Gm-Message-State: APjAAAUYx1rwA7QYFcEGTo40OmUKmtAY2FyjXcRMUJdrwIUwnBmBeXtH
+        F3+KvsXYCri3xd5B8YeuYwQM6Y059j4QMytKX9MyiHU49TI/z7XvfmUmDT1hqW5VUDdz5wCdVMh
+        9d6JJorVTbAqKtQSa+fIdHCnCrB0DC/CP/AEnc0Ss7Y0BdK+CgTIc4VGcq/nJoWE=
+X-Google-Smtp-Source: APXvYqwMZOA/EZw6RnhifiGMxU/lx0Ye19kKB++dqwgcMu7FkCg+tIUYfuOZdrDAmi9Q3cdzb673eRPo/wrzZw==
+X-Received: by 2002:a63:778f:: with SMTP id s137mr532709pgc.147.1571958223448;
+ Thu, 24 Oct 2019 16:03:43 -0700 (PDT)
+Date:   Thu, 24 Oct 2019 16:03:25 -0700
+In-Reply-To: <20191024230327.140935-1-jmattson@google.com>
+Message-Id: <20191024230327.140935-2-jmattson@google.com>
 Mime-Version: 1.0
+References: <20191024230327.140935-1-jmattson@google.com>
 X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH v3 0/3] kvm: call kvm_arch_destroy_vm if vm creation fails
+Subject: [PATCH v3 1/3] kvm: Don't clear reference count on kvm_create_vm()
+ error path
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
@@ -56,41 +61,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Beginning with commit 44a95dae1d229a ("KVM: x86: Detect and Initialize
-AVIC support"), AMD's version of kvm_arch_init_vm() will allocate
-memory if the module parameter, avic, is enabled. (Note that this
-module parameter is disabled by default.) However, there are many
-possible failure exits from kvm_create_vm() *after* the call to
-kvm_arch_init_vm(), and the memory allocated by kvm_arch_init_vm() was
-leaked on these failure paths.
+Defer setting the reference count, kvm->users_count, until the VM is
+guaranteed to be created, so that the reference count need not be
+cleared on the error path.
 
-The obvious solution is to call kvm_arch_destroy_vm() on these failure
-paths, since it will free the memory allocated by
-kvm_arch_init_vm(). However, kvm_arch_destroy_vm() may reference
-memslots and buses that were allocated later in kvm_create_vm(). So,
-before we can call kvm_arch_destroy_vm() on the failure paths out of
-kvm_create_vm(), we need to hoist the memslot and bus allocation up
-before the call to kvm_arch_init_vm().
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Junaid Shahid <junaids@google.com>
+---
+ virt/kvm/kvm_main.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-The call to clear the reference count on (some) failure paths out of
-kvm_create_vm() just added to the potential confusion. By sinking the
-call to set the reference count below any possible failure exits, we
-can eliminate the call to clear the reference count on the failure
-paths.
-
-v1 -> v2: Call kvm_arch_destroy_vm before refcount_set
-v2 -> v3: Added two preparatory changes
-
-Jim Mattson (2):
-  kvm: Don't clear reference count on kvm_create_vm() error path
-  kvm: Allocate memslots and buses before calling kvm_arch_init_vm
-
-John Sperbeck (1):
-  kvm: call kvm_arch_destroy_vm if vm creation fails
-
- virt/kvm/kvm_main.c | 52 ++++++++++++++++++++++++++-------------------
- 1 file changed, 30 insertions(+), 22 deletions(-)
-
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fd68fbe0a75d2..525e0dbc623f9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -640,7 +640,6 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	mutex_init(&kvm->lock);
+ 	mutex_init(&kvm->irq_lock);
+ 	mutex_init(&kvm->slots_lock);
+-	refcount_set(&kvm->users_count, 1);
+ 	INIT_LIST_HEAD(&kvm->devices);
+ 
+ 	r = kvm_arch_init_vm(kvm, type);
+@@ -682,6 +681,12 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	if (r)
+ 		goto out_err;
+ 
++	/*
++	 * kvm_get_kvm() isn't legal while the vm is being created
++	 * (e.g. in kvm_arch_init_vm).
++	 */
++	refcount_set(&kvm->users_count, 1);
++
+ 	mutex_lock(&kvm_lock);
+ 	list_add(&kvm->vm_list, &vm_list);
+ 	mutex_unlock(&kvm_lock);
+@@ -697,7 +702,6 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ out_err_no_srcu:
+ 	hardware_disable_all();
+ out_err_no_disable:
+-	refcount_set(&kvm->users_count, 0);
+ 	for (i = 0; i < KVM_NR_BUSES; i++)
+ 		kfree(kvm_get_bus(kvm, i));
+ 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
 -- 
 2.24.0.rc0.303.g954a862665-goog
 
