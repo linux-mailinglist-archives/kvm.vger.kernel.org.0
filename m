@@ -2,103 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CC54E32B6
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 14:47:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23616E333F
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 15:01:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502089AbfJXMrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 08:47:45 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:36065 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502084AbfJXMro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 08:47:44 -0400
-Received: by mail-pl1-f195.google.com with SMTP id j11so11814484plk.3
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 05:47:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=y4ncbMnMEtA1qAkMboIsumwXax5XKlWZu/q81F2wabk=;
-        b=e9cDGPbmTXAb+YkQ5S9s/56Z3uqMXqW4gHBFBYz+bV8KTh+3a88UQhYXRpHyqfS7BQ
-         PZjycwx3cT+k8sYG3mRd/HCMFByN7OaZoZMSlL2GtMemaxTqL1OD/141ilU1oAQDIQzu
-         KJ8b1+Xgpgx7uzXiyKXPuHr305ouKpNkWXI4QUQqkq7rQw5SdhRKXiKyR90E+32RbAQ2
-         9d3SAKAhXu5dQLF2kIUO84ixKJ6jd6PDlOYtXKMUEdlr5huB+x89yciHSBUVzv3u2+aX
-         DIKfp1Al2ETSdaXfA/OXTVeO1KdXE6I8sYlnIK3l75Hp1dPLGynIRgIqGtEhlk5GhPBp
-         Es5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=y4ncbMnMEtA1qAkMboIsumwXax5XKlWZu/q81F2wabk=;
-        b=SRmgKqftFO+Z7oToRwyo2jnISVKIPN83wC492Oknhfz5xqtb/QvHDr0JCJQTaGR49F
-         XsN0z0nEqmkrecF9pBPnt/W9vRtg+cxd6ItzQN+5WxQH6XH4q185Rk9/6+Iy6aPCt/xW
-         b/NTi3TnOtSKQtm8TZAHVxfrDkky/l3zZMwBfoSHQYbnPXjkRKBzPp+bgJ26L/mMCoVb
-         2yLVLBRv52TK9OTrM9qigWao315Y55QK5wZTbdMHPu8Gp0gx1rtzu9tIX1z7JrbEvssO
-         qwR1BS6Yk6VkF7VwroUtKpjzHQN2aArT6BqjAkQWdLfAe9Y86rscNMWk7Lcgywa1Koys
-         tGAA==
-X-Gm-Message-State: APjAAAWVApHXvR24UzPOZx6t1cxwTPO0u3jmL95ciWtxFbg2NIzRKqFH
-        kjLgk3rhg3r7YF86+xEoBOhw4i6VhstxhzN19oKEfw==
-X-Google-Smtp-Source: APXvYqxRS6HGNnHzHSPymtVkY09S+iBm4JI3sHN15mEeri6ajpLBq2/r8E0WfqlqHp2woWQhXECmk6sxOT239ePNQY8=
-X-Received: by 2002:a17:902:9002:: with SMTP id a2mr16175819plp.147.1571921263469;
- Thu, 24 Oct 2019 05:47:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1571844200.git.andreyknvl@google.com> <20191023150413.8aa05549bd840deccfed5539@linux-foundation.org>
-In-Reply-To: <20191023150413.8aa05549bd840deccfed5539@linux-foundation.org>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Thu, 24 Oct 2019 14:47:31 +0200
-Message-ID: <CAAeHK+xLS8TVioJeqYrf9Kso9TsiWiH0O-k+RrRBCKPPS9_Hrg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] kcov: collect coverage from usb and vhost
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     USB list <linux-usb@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Alexander Potapenko <glider@google.com>,
-        Marco Elver <elver@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2502250AbfJXNBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 09:01:10 -0400
+Received: from mga04.intel.com ([192.55.52.120]:5155 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726484AbfJXNBK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 09:01:10 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 06:01:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; 
+   d="scan'208";a="210156134"
+Received: from iov.bj.intel.com ([10.238.145.67])
+  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2019 06:01:06 -0700
+From:   Liu Yi L <yi.l.liu@intel.com>
+To:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, peterx@redhat.com
+Cc:     eric.auger@redhat.com, david@gibson.dropbear.id.au,
+        tianyu.lan@intel.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jacob.jun.pan@linux.intel.com, kvm@vger.kernel.org
+Subject: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
+Date:   Thu, 24 Oct 2019 08:34:21 -0400
+Message-Id: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 12:04 AM Andrew Morton
-<akpm@linux-foundation.org> wrote:
->
-> On Wed, 23 Oct 2019 17:24:28 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> > This patchset extends kcov to allow collecting coverage from the USB
-> > subsystem and vhost workers. See the first patch description for details
-> > about the kcov extension. The other two patches apply this kcov extension
-> > to USB and vhost.
-> >
-> > These patches have been used to enable coverage-guided USB fuzzing with
-> > syzkaller for the last few years
->
-> I find it surprising that this material is so focused on USB.  Is
-> there something unique about USB that gave rise to this situation, or
+Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on Intel
+platforms allow address space sharing between device DMA and applications.
+SVA can reduce programming complexity and enhance security.
+This series is intended to expose SVA capability to VMs. i.e. shared guest
+application address space with passthru devices. The whole SVA virtualization
+requires QEMU/VFIO/IOMMU changes. This series includes the QEMU changes, for
+VFIO and IOMMU changes, they are in separate series (listed in the "Related
+series").
 
-USB fuzzing is the thing that I've been working on that requires this
-functionality. But the idea is to make the interface generic enough to
-make it useful for other subsystems as well as long as the annotations
-are added.
+The high-level architecture for SVA virtualization is as below:
 
-> is it expected that the new kcov feature will be used elsewhere in the
-> kernel?
->
-> If the latter, which are the expected subsystems?
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
 
-Currently we encountered two cases where this is useful: USB and vhost
-workers. Most probably there are more subsystems that will benefit
-from this kcov extension to get better fuzzing coverage. I don't have
-a list of them, but the provided interface should be easy to use when
-more of such cases are encountered.
+The complete vSVA upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. Page Request Services (PRS) support
+    3. Mediated device assignment
+
+This RFC patchset is aiming for the phase 1. Works together with the VT-d
+driver[1] changes and VFIO changes[2].
+
+Related series:
+[1] [PATCH v6 00/10] Nested Shared Virtual Address (SVA) VT-d support:
+https://lkml.org/lkml/2019/10/22/953
+<This series is based on this kernel series from Jacob Pan>
+
+[2] [RFC v2 0/3] vfio: support Shared Virtual Addressing from Yi Liu
+
+There are roughly four parts:
+ 1. Introduce IOMMUContext as abstract layer between vIOMMU emulator and
+    VFIO to avoid direct calling between the two
+ 2. Passdown PASID allocation and free to host
+ 3. Passdown guest PASID binding to host
+ 4. Passdown guest IOMMU cache invalidation to host
+
+The full set can be found in below link:
+https://github.com/luxis1999/qemu.git: sva_vtd_v6_qemu_rfc_v2
+
+Changelog:
+	- RFC v1 -> v2:
+	  Introduce IOMMUContext to abstract the connection between VFIO
+	  and vIOMMU emulator, which is a replacement of the PCIPASIDOps
+	  in RFC v1. Modify x-scalable-mode to be string option instead of
+	  adding a new option as RFC v1 did. Refined the pasid cache management
+	  and addressed the TODOs mentioned in RFC v1. 
+	  RFC v1: https://patchwork.kernel.org/cover/11033657/
+
+Eric Auger (1):
+  update-linux-headers: Import iommu.h
+
+Liu Yi L (20):
+  header update VFIO/IOMMU vSVA APIs against 5.4.0-rc3+
+  intel_iommu: modify x-scalable-mode to be string option
+  vfio/common: add iommu_ctx_notifier in container
+  hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
+  hw/pci: introduce pci_device_iommu_context()
+  intel_iommu: provide get_iommu_context() callback
+  vfio/pci: add iommu_context notifier for pasid alloc/free
+  intel_iommu: add virtual command capability support
+  intel_iommu: process pasid cache invalidation
+  intel_iommu: add present bit check for pasid table entries
+  intel_iommu: add PASID cache management infrastructure
+  vfio/pci: add iommu_context notifier for pasid bind/unbind
+  intel_iommu: bind/unbind guest page table to host
+  intel_iommu: replay guest pasid bindings to host
+  intel_iommu: replay pasid binds after context cache invalidation
+  intel_iommu: do not passdown pasid bind for PASID #0
+  vfio/pci: add iommu_context notifier for PASID-based iotlb flush
+  intel_iommu: process PASID-based iotlb invalidation
+  intel_iommu: propagate PASID-based iotlb invalidation to host
+  intel_iommu: process PASID-based Device-TLB invalidation
+
+Peter Xu (1):
+  hw/iommu: introduce IOMMUContext
+
+ hw/Makefile.objs                |    1 +
+ hw/alpha/typhoon.c              |    6 +-
+ hw/arm/smmu-common.c            |    6 +-
+ hw/hppa/dino.c                  |    6 +-
+ hw/i386/amd_iommu.c             |    6 +-
+ hw/i386/intel_iommu.c           | 1249 +++++++++++++++++++++++++++++++++++++--
+ hw/i386/intel_iommu_internal.h  |  109 ++++
+ hw/i386/trace-events            |    6 +
+ hw/iommu/Makefile.objs          |    1 +
+ hw/iommu/iommu.c                |   66 +++
+ hw/pci-host/designware.c        |    6 +-
+ hw/pci-host/ppce500.c           |    6 +-
+ hw/pci-host/prep.c              |    6 +-
+ hw/pci-host/sabre.c             |    6 +-
+ hw/pci/pci.c                    |   27 +-
+ hw/ppc/ppc440_pcix.c            |    6 +-
+ hw/ppc/spapr_pci.c              |    6 +-
+ hw/s390x/s390-pci-bus.c         |    8 +-
+ hw/vfio/common.c                |   10 +
+ hw/vfio/pci.c                   |  149 +++++
+ include/hw/i386/intel_iommu.h   |   58 +-
+ include/hw/iommu/iommu.h        |  113 ++++
+ include/hw/pci/pci.h            |   13 +-
+ include/hw/pci/pci_bus.h        |    2 +-
+ include/hw/vfio/vfio-common.h   |    9 +
+ linux-headers/linux/iommu.h     |  324 ++++++++++
+ linux-headers/linux/vfio.h      |   83 +++
+ scripts/update-linux-headers.sh |    2 +-
+ 28 files changed, 2232 insertions(+), 58 deletions(-)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/iommu.c
+ create mode 100644 include/hw/iommu/iommu.h
+ create mode 100644 linux-headers/linux/iommu.h
+
+-- 
+2.7.4
+
