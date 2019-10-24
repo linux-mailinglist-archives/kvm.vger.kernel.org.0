@@ -2,178 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8F5E3C88
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 21:54:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 197F7E3C94
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 21:55:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406693AbfJXTyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 15:54:39 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:42449 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390431AbfJXTyi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 15:54:38 -0400
-Received: by mail-pf1-f202.google.com with SMTP id w16so9668pfj.9
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 12:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=haioOoskBRBydFeA6DvXJpqQ02xkMHKkeUpYLf3y49E=;
-        b=fXPWLXN627Q7gWb6DoS6HKE29fuTMr1aTKmoYNV461mC2ZGBYMccc55lnm8YkRRQzH
-         ftPGt/7KH++pWn7UT6KXAcQ7aaqARS5Tu0J6pKgOrJm0CwKInNwrwJ2OQY1cUqfdGiKp
-         AnJuWJy+ANtjIpoiRm078wPrxmypvC8aNok8U3XhO+i4cwDFTUrn0xF3BnuQnX4245jW
-         4uRai5bx5drZFYolaEtPBMcydBcwdf6/H9PyEANrCu/UJF6+50uf0/y+Ht0715NYMNX7
-         43KcC5rWdN0kpBXVzieO0JkZtfVDy0wlw3BzsGZubQ5jy+WuBJ4I0cbs3/7qi3poeyXD
-         7PeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=haioOoskBRBydFeA6DvXJpqQ02xkMHKkeUpYLf3y49E=;
-        b=FfPQMMtebECObpt9Kx1gOyUqzAYWSk3rbKdsfmb/t2Ehy91nakehiZMSrFBMfV25L3
-         tP1TQChlP5D3dgw8N9M1V2al6PoZbCzat+MkTr25cgNWEYxEM8wVKfx0kFj7IjAOIzf5
-         b6ksPHYAkx1lq8+p7OFvC0oh7hUKyF9i27Ez1+tOahiXtidjctEcGkVmTBSmHI4ucQld
-         Tgyw3uTILeaWIIM7D5P/Krd5sMlbJBIu9j2apH8hBe4a4sDQsWBtGLhq9E69qZ3aKL7X
-         Y7BaGkQl8Dclq3yczKYuMmCRZRt2b6GpCsk3qZ8R7W11CbvQ/dzZM7YkPdZnujy8PGY+
-         DA7g==
-X-Gm-Message-State: APjAAAXj9yCfjDlTv1XgW5a/IHulExb1R+TLa22p/mpMOdrdTRvjW0LX
-        rzwgYhZklHMpz2fvCJRVD3akk0GkDn6b/L6Dzxlbg1eBMGdesmTIlalv5ZkA+PyypdHJPSLtZRm
-        K3qdnaZFyD/vZdpsTvBVVMmGsZsexQ0ss12rh50LrXUdG8d9lLZYMz0n51wzZb1g=
-X-Google-Smtp-Source: APXvYqznf4QumgFLEDXHFFc5+Sm9/m/6dbDTp+S/bXlj9PS3/Axu98W9jxM6rAxNcNTWVBjOophFN/mmw+dX7g==
-X-Received: by 2002:a63:1e04:: with SMTP id e4mr11451964pge.4.1571946877360;
- Thu, 24 Oct 2019 12:54:37 -0700 (PDT)
-Date:   Thu, 24 Oct 2019 12:54:31 -0700
-Message-Id: <20191024195431.183667-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH v2] kvm: x86: Add cr3 to struct kvm_debug_exit_arch
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ken Hofsass <hofsass@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2408273AbfJXTzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 15:55:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45854 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2392902AbfJXTzB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 24 Oct 2019 15:55:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571946900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=46JWhWsVeq/tB0Aj5YNxoiRSmrwdl+Kq9BaeK3ujO0U=;
+        b=DFyau+12Pf776Ra8ToZbfReIJM3hr50lO1EqlGKpxMWpK9hKxLtlHi8EfiH8kRtmVZdQoy
+        JpVJ1IDyNc/Pr/+n55GZM09pcm0m0bUta4d7Y+ih7FqD71L+yAQS45IKjw0MPpLgdzHqOs
+        uuu/uL7ZxjoMq54T7hQLBG/3061NeOg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-rQGSdyFqNNOUITf7Nv_epw-1; Thu, 24 Oct 2019 15:54:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85A4947B;
+        Thu, 24 Oct 2019 19:54:54 +0000 (UTC)
+Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EB675D9D5;
+        Thu, 24 Oct 2019 19:54:42 +0000 (UTC)
+Date:   Thu, 24 Oct 2019 13:54:41 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V5 2/6] modpost: add support for mdev class id
+Message-ID: <20191024135441.160daa56@x1.home>
+In-Reply-To: <555a101e-0ed1-2e9d-c1a4-e3b37d76bd18@redhat.com>
+References: <20191023130752.18980-1-jasowang@redhat.com>
+        <20191023130752.18980-3-jasowang@redhat.com>
+        <20191023154245.32e4fa49@x1.home>
+        <555a101e-0ed1-2e9d-c1a4-e3b37d76bd18@redhat.com>
+Organization: Red Hat
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rQGSdyFqNNOUITf7Nv_epw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ken Hofsass <hofsass@google.com>
+On Thu, 24 Oct 2019 11:31:04 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-A userspace agent can use cr3 to quickly determine whether a
-KVM_EXIT_DEBUG is associated with a guest process of interest.
+> On 2019/10/24 =E4=B8=8A=E5=8D=885:42, Alex Williamson wrote:
+> > On Wed, 23 Oct 2019 21:07:48 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> > =20
+> >> Add support to parse mdev class id table.
+> >>
+> >> Reviewed-by: Parav Pandit <parav@mellanox.com>
+> >> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >> ---
+> >>   drivers/vfio/mdev/vfio_mdev.c     |  2 ++
+> >>   scripts/mod/devicetable-offsets.c |  3 +++
+> >>   scripts/mod/file2alias.c          | 10 ++++++++++
+> >>   3 files changed, 15 insertions(+)
+> >>
+> >> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_md=
+ev.c
+> >> index 7b24ee9cb8dd..cb701cd646f0 100644
+> >> --- a/drivers/vfio/mdev/vfio_mdev.c
+> >> +++ b/drivers/vfio/mdev/vfio_mdev.c
+> >> @@ -125,6 +125,8 @@ static const struct mdev_class_id id_table[] =3D {
+> >>   =09{ 0 },
+> >>   };
+> >>  =20
+> >> +MODULE_DEVICE_TABLE(mdev, id_table);
+> >> + =20
+> > Two questions, first we have:
+> >
+> > #define MODULE_DEVICE_TABLE(type, name)                                =
+ \
+> > extern typeof(name) __mod_##type##__##name##_device_table              =
+ \
+> >    __attribute__ ((unused, alias(__stringify(name))))
+> >
+> > Therefore we're defining __mod_mdev__id_table_device_table with alias
+> > id_table.  When the virtio mdev bus driver is added in 5/6 it uses the
+> > same name value.  I see virtio types all register this way (virtio,
+> > id_table), so I assume there's no conflict, but pci types mostly (not
+> > entirely) seem to use unique names.  Is there a preference to one way
+> > or the other or it simply doesn't matter? =20
+>=20
+>=20
+> It looks to me that those symbol were local, so it doesn't matter. But=20
+> if you wish I can switch to use unique name.
 
-KVM_CAP_DEBUG_EVENT_PDBR indicates support for the extension.
+I don't have a strong opinion, I'm just trying to make sure we're not
+doing something obviously broken.
 
-Signed-off-by: Ken Hofsass <hofsass@google.com>
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Cc: Peter Shier <pshier@google.com>
----
-v1 -> v2: Changed KVM_CAP_DEBUG_EVENT_PG_BASE_ADDR to KVM_CAP_DEBUG_EVENT_PDBR
-          Set debug.arch.cr3 in kvm_vcpu_do_singlestep and
-	                        kvm_vcpu_check_breakpoint
-          Added svm support
-	  
- arch/x86/include/uapi/asm/kvm.h | 1 +
- arch/x86/kvm/svm.c              | 3 +++
- arch/x86/kvm/vmx/vmx.c          | 2 ++
- arch/x86/kvm/x86.c              | 3 +++
- include/uapi/linux/kvm.h        | 1 +
- 5 files changed, 10 insertions(+)
+> >>   static struct mdev_driver vfio_mdev_driver =3D {
+> >>   =09.name=09=3D "vfio_mdev",
+> >>   =09.probe=09=3D vfio_mdev_probe,
+> >> diff --git a/scripts/mod/devicetable-offsets.c b/scripts/mod/devicetab=
+le-offsets.c
+> >> index 054405b90ba4..6cbb1062488a 100644
+> >> --- a/scripts/mod/devicetable-offsets.c
+> >> +++ b/scripts/mod/devicetable-offsets.c
+> >> @@ -231,5 +231,8 @@ int main(void)
+> >>   =09DEVID(wmi_device_id);
+> >>   =09DEVID_FIELD(wmi_device_id, guid_string);
+> >>  =20
+> >> +=09DEVID(mdev_class_id);
+> >> +=09DEVID_FIELD(mdev_class_id, id);
+> >> +
+> >>   =09return 0;
+> >>   }
+> >> diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+> >> index c91eba751804..d365dfe7c718 100644
+> >> --- a/scripts/mod/file2alias.c
+> >> +++ b/scripts/mod/file2alias.c
+> >> @@ -1335,6 +1335,15 @@ static int do_wmi_entry(const char *filename, v=
+oid *symval, char *alias)
+> >>   =09return 1;
+> >>   }
+> >>  =20
+> >> +/* looks like: "mdev:cN" */
+> >> +static int do_mdev_entry(const char *filename, void *symval, char *al=
+ias)
+> >> +{
+> >> +=09DEF_FIELD(symval, mdev_class_id, id);
+> >> +
+> >> +=09sprintf(alias, "mdev:c%02X", id); =20
+> > A lot of entries call add_wildcard() here, should we?  Sorry for the
+> > basic questions, I haven't played in this code.  Thanks, =20
+>=20
+>=20
+> It's really good question. My understanding is we won't have a module=20
+> that can deal with all kinds of classes like CLASS_ID_ANY. So there's=20
+> probably no need for the wildcard.
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 503d3f42da167..cea355c7ee8e7 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -254,6 +254,7 @@ struct kvm_debug_exit_arch {
- 	__u64 pc;
- 	__u64 dr6;
- 	__u64 dr7;
-+	__u64 cr3; /* Depends on KVM_CAP_DEBUG_EVENT_PDBR */
- };
- 
- #define KVM_GUESTDBG_USE_SW_BP		0x00010000
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index f8ecb6df51066..1a774d2c78eef 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -2738,6 +2738,7 @@ static int db_interception(struct vcpu_svm *svm)
- 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
- 		kvm_run->debug.arch.pc =
- 			svm->vmcb->save.cs.base + svm->vmcb->save.rip;
-+		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 		kvm_run->debug.arch.exception = DB_VECTOR;
- 		return 0;
- 	}
-@@ -2748,9 +2749,11 @@ static int db_interception(struct vcpu_svm *svm)
- static int bp_interception(struct vcpu_svm *svm)
- {
- 	struct kvm_run *kvm_run = svm->vcpu.run;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
- 	kvm_run->exit_reason = KVM_EXIT_DEBUG;
- 	kvm_run->debug.arch.pc = svm->vmcb->save.cs.base + svm->vmcb->save.rip;
-+	kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 	kvm_run->debug.arch.exception = BP_VECTOR;
- 	return 0;
- }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e7970a2e8eae9..736284d293c4a 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4690,6 +4690,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
- 		rip = kvm_rip_read(vcpu);
- 		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
-+		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 		kvm_run->debug.arch.exception = ex_no;
- 		break;
- 	default:
-@@ -4909,6 +4910,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
- 			vcpu->run->debug.arch.dr6 = vcpu->arch.dr6;
- 			vcpu->run->debug.arch.dr7 = dr7;
- 			vcpu->run->debug.arch.pc = kvm_get_linear_rip(vcpu);
-+			vcpu->run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 			vcpu->run->debug.arch.exception = DB_VECTOR;
- 			vcpu->run->exit_reason = KVM_EXIT_DEBUG;
- 			return 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf385266..2fd18b55462a9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3222,6 +3222,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_GET_MSR_FEATURES:
- 	case KVM_CAP_MSR_PLATFORM_INFO:
- 	case KVM_CAP_EXCEPTION_PAYLOAD:
-+	case KVM_CAP_DEBUG_EVENT_PDBR:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -6490,6 +6491,7 @@ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
- 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
- 		kvm_run->debug.arch.dr6 = DR6_BS | DR6_FIXED_1 | DR6_RTM;
- 		kvm_run->debug.arch.pc = vcpu->arch.singlestep_rip;
-+		kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 		kvm_run->debug.arch.exception = DB_VECTOR;
- 		kvm_run->exit_reason = KVM_EXIT_DEBUG;
- 		return 0;
-@@ -6534,6 +6536,7 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
- 		if (dr6 != 0) {
- 			kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1 | DR6_RTM;
- 			kvm_run->debug.arch.pc = eip;
-+			kvm_run->debug.arch.cr3 = kvm_read_cr3(vcpu);
- 			kvm_run->debug.arch.exception = DB_VECTOR;
- 			kvm_run->exit_reason = KVM_EXIT_DEBUG;
- 			*r = 0;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52641d8ca9e83..cde4b28338482 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PMU_EVENT_FILTER 173
- #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
- #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
-+#define KVM_CAP_DEBUG_EVENT_PDBR 176
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.24.0.rc0.303.g954a862665-goog
+The comment for add_wildcard() indicates future extension, so it's hard
+to know what we might need in the future until we do need it.  The
+majority of modules.alias entries on my laptop (even if I exclude pci
+aliases) end with a wildcard.  Thanks,
+
+Alex
 
