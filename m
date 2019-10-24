@@ -2,101 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71DE9E336B
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 15:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1B81E336D
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 15:07:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393513AbfJXNHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 09:07:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57407 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2393510AbfJXNHJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 24 Oct 2019 09:07:09 -0400
+        id S2393537AbfJXNHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 09:07:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39928 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2393528AbfJXNHO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 09:07:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571922427;
+        s=mimecast20190719; t=1571922433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=H/iWffyJRiYvzY9mn8fv0wMywOEHlPukE8X8vQ9C3BE=;
-        b=JJUluO96Ccy3GPF/yQojqyyb6yFTeyR4/orNyA6GfidxvgWxheQSiH3cxNsn29sicRAV0Z
-        nBo3cQBYw8gWJxZczHO/hfgCeYOkVRaerW592OfuqAEy7dS2cVksde4Hpv/h0hCi3ynRPp
-        xJtksJlA/jeC26AYojUZpcLLiNYzjV0=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mx2vnlJNR1H+BwVBhLpFkf4hbUqMBk6qNpXvPCTht54=;
+        b=PqkQRrWHlg9djbi9XdY6ZmcAPFnjimUf8xbItOVa+a6LjK/UYwZkb7ISeuHjItEC9unEvP
+        7FBtkdgEh3zXhdQjLNS4kTSKWfrWq0SxaN1JuSdHMUo1+cnToCakP6XAGf82rxeNiuKFzc
+        cVwuvK5HeCLxefu1rVDY3KEd8JADPow=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-b_Ujd3lTPJiR2IcNZRRfGQ-1; Thu, 24 Oct 2019 09:07:05 -0400
+ us-mta-154-WZ_bPr6_Og2X583XrRUEzQ-1; Thu, 24 Oct 2019 09:07:06 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B0FC800D49
-        for <kvm@vger.kernel.org>; Thu, 24 Oct 2019 13:07:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 997031800E00;
+        Thu, 24 Oct 2019 13:07:05 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 739F361F21;
-        Thu, 24 Oct 2019 13:07:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9237354560;
+        Thu, 24 Oct 2019 13:07:04 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-Subject: [PULL kvm-unit-tests 00/10] arm/arm64 updates
-Date:   Thu, 24 Oct 2019 15:06:51 +0200
-Message-Id: <20191024130701.31238-1-drjones@redhat.com>
+Cc:     pbonzini@redhat.com, Andre Przywara <andre.przywara@arm.com>
+Subject: [PULL 01/10] arm: gic: check_acked: add test description
+Date:   Thu, 24 Oct 2019 15:06:52 +0200
+Message-Id: <20191024130701.31238-2-drjones@redhat.com>
+In-Reply-To: <20191024130701.31238-1-drjones@redhat.com>
+References: <20191024130701.31238-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: b_Ujd3lTPJiR2IcNZRRfGQ-1
+X-MC-Unique: WZ_bPr6_Og2X583XrRUEzQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit ac033c9a2cb287c1bb5ebe414c63067563a05bbb=
-:
+From: Andre Przywara <andre.przywara@arm.com>
 
-  Revert "lib: use an argument which doesn't require default argument promo=
-tion" (2019-10-23 11:03:31 +0200)
+At the moment the check_acked() IRQ helper function just prints a
+generic "Completed" or "Timed out" message, without given a more
+detailed test description.
 
-are available in the Git repository at:
+To be able to tell the different IRQ tests apart, and also to allow
+re-using it more easily, add a "description" parameter string,
+which is prefixing the output line. This gives more information on what
+exactly was tested.
 
-  https://github.com/rhdrjones/kvm-unit-tests pull-arm-oct-24-2019
+This also splits the variable output part of the line (duration of IRQ
+delivery) into a separate INFO: line, to not confuse testing frameworks.
 
-for you to fetch changes up to 00d7e26501263263877465d2a74a330897de1e70:
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/gic.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-  arm: Add PL031 test (2019-10-24 14:41:01 +0200)
-
-----------------------------------------------------------------
-Alexander Graf (1):
-  arm: Add PL031 test
-
-Alexandru Elisei (3):
-  lib: arm64: Add missing ISB in flush_tlb_page
-  lib: arm/arm64: Add function to clear the PTE_USER bit
-  arm64: Add cache code generation test
-
-Andre Przywara (6):
-  arm: gic: check_acked: add test description
-  arm: gic: Split variable output data from test name
-  arm: timer: Split variable output data from test name
-  arm: selftest: Split variable output data from test name
-  arm: selftest: Make MPIDR output stable
-  arm: Add missing test name prefix calls
-
- arm/Makefile.arm64    |   1 +
- arm/Makefile.common   |   1 +
- arm/cache.c           | 122 ++++++++++++++++++++
- arm/gic.c             |  64 ++++++-----
- arm/pci-test.c        |   2 +
- arm/pl031.c           | 262 ++++++++++++++++++++++++++++++++++++++++++
- arm/psci.c            |   2 +
- arm/selftest.c        |  23 +++-
- arm/timer.c           |   3 +-
- arm/unittests.cfg     |   6 +
- lib/arm/asm/gic.h     |   1 +
- lib/arm/asm/mmu-api.h |   1 +
- lib/arm/mmu.c         |  15 +++
- lib/arm64/asm/mmu.h   |   1 +
- 14 files changed, 472 insertions(+), 32 deletions(-)
- create mode 100644 arm/cache.c
- create mode 100644 arm/pl031.c
-
+diff --git a/arm/gic.c b/arm/gic.c
+index ed5642e74f70..2ec4070fbaf9 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -60,7 +60,7 @@ static void stats_reset(void)
+ =09smp_wmb();
+ }
+=20
+-static void check_acked(cpumask_t *mask)
++static void check_acked(const char *testname, cpumask_t *mask)
+ {
+ =09int missing =3D 0, extra =3D 0, unexpected =3D 0;
+ =09int nr_pass, cpu, i;
+@@ -88,7 +88,9 @@ static void check_acked(cpumask_t *mask)
+ =09=09=09}
+ =09=09}
+ =09=09if (nr_pass =3D=3D nr_cpus) {
+-=09=09=09report("Completed in %d ms", !bad, ++i * 100);
++=09=09=09report("%s", !bad, testname);
++=09=09=09if (i)
++=09=09=09=09report_info("took more than %d ms", i * 100);
+ =09=09=09return;
+ =09=09}
+ =09}
+@@ -105,8 +107,9 @@ static void check_acked(cpumask_t *mask)
+ =09=09}
+ =09}
+=20
+-=09report("Timed-out (5s). ACKS: missing=3D%d extra=3D%d unexpected=3D%d",
+-=09       false, missing, extra, unexpected);
++=09report("%s", false, testname);
++=09report_info("Timed-out (5s). ACKS: missing=3D%d extra=3D%d unexpected=
+=3D%d",
++=09=09    missing, extra, unexpected);
+ }
+=20
+ static void check_spurious(void)
+@@ -185,7 +188,7 @@ static void ipi_test_self(void)
+ =09cpumask_clear(&mask);
+ =09cpumask_set_cpu(smp_processor_id(), &mask);
+ =09gic->ipi.send_self();
+-=09check_acked(&mask);
++=09check_acked("IPI: self", &mask);
+ =09report_prefix_pop();
+ }
+=20
+@@ -200,7 +203,7 @@ static void ipi_test_smp(void)
+ =09for (i =3D smp_processor_id() & 1; i < nr_cpus; i +=3D 2)
+ =09=09cpumask_clear_cpu(i, &mask);
+ =09gic_ipi_send_mask(IPI_IRQ, &mask);
+-=09check_acked(&mask);
++=09check_acked("IPI: directed", &mask);
+ =09report_prefix_pop();
+=20
+ =09report_prefix_push("broadcast");
+@@ -208,7 +211,7 @@ static void ipi_test_smp(void)
+ =09cpumask_copy(&mask, &cpu_present_mask);
+ =09cpumask_clear_cpu(smp_processor_id(), &mask);
+ =09gic->ipi.send_broadcast();
+-=09check_acked(&mask);
++=09check_acked("IPI: broadcast", &mask);
+ =09report_prefix_pop();
+ }
+=20
 --=20
 2.21.0
 
