@@ -2,88 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1207EE3A41
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 19:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D517E3AB9
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 20:14:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503925AbfJXRkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 13:40:51 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:38946 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729458AbfJXRku (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 13:40:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=sTRjbq+OPzLWUvcUX+QGFONGylrzn8uKiZz+7VSqigI=; b=PJZB6Tpzh5Aa/T8Oj7iXr+SiH
-        KSLUJzsBbcu4Wt4VQZOV0+q7a0ezabFIdj/GsokzzbOMRdXkAt6K64HUq8HjMEU1wzyLmJYtQGw/A
-        MTR1caxgCqtx4M2Kyu2JFRZfyrBYKseRn9ZWlgsbj6uOp90nQsuQTAEVQfjQhAdwH5RYJdgwzBbFH
-        mZvimTAcQ08s6HinxaD/LnZ1R6Ko/ig1ePM2YFjXRXyWgynIuuHGqrxWKjRcEvpSL0FujLqfbS6W5
-        lmSrLuaG+XME4tOyCKf6znNZ8DHEkwM7z39DBmkRxWrz4foFJiK5BoqbdgRTxDvO7R1zuzwjhkr8q
-        jM8puMTDQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iNh6M-0003eN-T2; Thu, 24 Oct 2019 17:40:47 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C5F5C306CF9;
-        Thu, 24 Oct 2019 19:39:45 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 6109A2B1D8927; Thu, 24 Oct 2019 19:40:44 +0200 (CEST)
-Date:   Thu, 24 Oct 2019 19:40:44 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [patch V2 08/17] x86/entry: Move syscall irq tracing to C code
-Message-ID: <20191024174044.GJ4114@hirez.programming.kicks-ass.net>
-References: <20191023122705.198339581@linutronix.de>
- <20191023123118.386844979@linutronix.de>
- <CALCETrWLk9LKV4+_mrOKDc3GUvXbCjqA5R6cdpqq02xoRCBOHw@mail.gmail.com>
- <CALCETrV79pw7-nisp4VdEkQ4=fr2nfJFOMCtyKmWZR6PG3=oWg@mail.gmail.com>
+        id S2504038AbfJXSOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 14:14:04 -0400
+Received: from mga03.intel.com ([134.134.136.65]:46110 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2504015AbfJXSOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 14:14:04 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 11:14:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,225,1569308400"; 
+   d="scan'208";a="399854248"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 24 Oct 2019 11:14:03 -0700
+Date:   Thu, 24 Oct 2019 11:14:03 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        John Sperbeck <jsperbeck@google.com>
+Subject: Re: [PATCH] kvm: call kvm_arch_destroy_vm if vm creation fails
+Message-ID: <20191024181403.GD20633@linux.intel.com>
+References: <20191023171435.46287-1-jmattson@google.com>
+ <20191023182106.GB26295@linux.intel.com>
+ <7e1fe902-65e3-5381-1ac8-b280f39a677d@google.com>
+ <4d81887e-12d7-baaf-586b-b85020bd5eaf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALCETrV79pw7-nisp4VdEkQ4=fr2nfJFOMCtyKmWZR6PG3=oWg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <4d81887e-12d7-baaf-586b-b85020bd5eaf@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 09:24:13AM -0700, Andy Lutomirski wrote:
-> On Wed, Oct 23, 2019 at 2:30 PM Andy Lutomirski <luto@kernel.org> wrote:
-> >
-> > On Wed, Oct 23, 2019 at 5:31 AM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > >
-> > > Interrupt state tracing can be safely done in C code. The few stack
-> > > operations in assembly do not need to be covered.
-> > >
-> > > Remove the now pointless indirection via .Lsyscall_32_done and jump to
-> > > swapgs_restore_regs_and_return_to_usermode directly.
-> >
-> > This doesn't look right.
+On Thu, Oct 24, 2019 at 12:08:29PM +0200, Paolo Bonzini wrote:
+> On 24/10/19 04:59, Junaid Shahid wrote:
+> > AFAICT the kvm->users_count is already 0 before kvm_arch_destroy_vm()
+> > is called from kvm_destroy_vm() in the normal case.
 > 
-> Well, I feel a bit silly.  I read this:
+> Yes:
 > 
-> >
-> > >  #define SYSCALL_EXIT_WORK_FLAGS                                \
-> > > @@ -279,6 +282,9 @@ static void syscall_slow_exit_work(struc
+>         if (refcount_dec_and_test(&kvm->users_count))
+>                 kvm_destroy_vm(kvm);
 > 
-> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> where
 > 
-> and I applied the diff in my head to the wrong function, and I didn't
-> notice that it didn't really apply there.  Oddly, gitweb gets this
+> | int atomic_inc_and_test(atomic_t *v);
+> | int atomic_dec_and_test(atomic_t *v);
+> |
+> | These two routines increment and decrement by 1, respectively, the
+> | given atomic counter.  They return a boolean indicating whether the
+> | resulting counter value was zero or not.
+> 
+> > So there really
+> > shouldn't be any arch that does a kvm_put_kvm() inside
+> > kvm_arch_destroy_vm(). I think it might be better to keep the
+> > kvm_arch_destroy_vm() call after the refcount_set() to be consistent
+> > with the normal path.
+> 
+> I agree, so I am applying Jim's patch.
 
-I had the same when reviewing these patches; I was almost going to ask
-tglx about it on IRC when the penny dropped.
+Junaid also pointed out that x86 will dereference a NULL kvm->memslots[].
+
+> If anything, we may want to WARN if the refcount is not 1 before the
+> refcount_set.
+
+What about moving "refcount_set(&kvm->users_count, 1)" to right before the
+VM is added to vm_list, i.e. after arch code and init'ing the mmu_notifier?
+Along with a comment explaining the kvm_get_kvm() is illegal while the VM
+is being created.
+
+That'd eliminate the atmoic_set() in the error path, which is confusing,
+at least for me.  It'd also obviate the need for an explicit WARN since
+running with refcount debugging would immediately flag any arch that
+tried to use kvm_get_kvm() during kvm_arch_create_vm().
+
+Moving the refcount_set() could be done along with rearranging the memslots
+and buses allocation/cleanup in a preparatory patch before adding the call
+to kvm_arch_destroy_vm().
