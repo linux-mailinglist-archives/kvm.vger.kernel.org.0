@@ -2,112 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC318E29E9
-	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 07:29:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 188FFE2A03
+	for <lists+kvm@lfdr.de>; Thu, 24 Oct 2019 07:38:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406766AbfJXF3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 24 Oct 2019 01:29:33 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:37266 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404071AbfJXF3d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 24 Oct 2019 01:29:33 -0400
-Received: by mail-pl1-f195.google.com with SMTP id p13so37006pll.4
-        for <kvm@vger.kernel.org>; Wed, 23 Oct 2019 22:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MePgjdi/Ed9y573bxV4jUy7lIcKKe70AG165bjiiX1k=;
-        b=ahC/OJwgE1PgJ1qiAk9afmQHhtoAHR7R2WcyYbYckM9pt/LuRx8EYKvyTQhdj/snUd
-         e06jNlIcf3AqkY2U3oGo0cNTxgDAx3yN+lkOHOJBMHUN5vU5x6JodQPq1bCC2JYaEJRt
-         8pTfmW0wr0YTXTBii9CYct252hl0oS78EwqBY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MePgjdi/Ed9y573bxV4jUy7lIcKKe70AG165bjiiX1k=;
-        b=GC5unEfHPCTEZ0e16S1dOiTfJ+8qYC1ktXhGinavbD93qTie6YYW5RsNw6j8iIcRQV
-         Dl3u/Yif1rOT+NGVzIAqiEmBO+Na4N5XKCu/PwaR4ECtgkv538vmThpA9qtCllkzh8MN
-         91aKnavDctJEVD4UBr/cdC0HvdhQJK3vdH8nnKEhTNHqesV6RtYIAqUcv09cMtdKDQFF
-         /9YHMYKm4JjHvykgEGxOnXuchGr4J9Co9vlgpV0/tG8t7YxQgGUEjYCvbLlbCwUcmkX2
-         f/8GsPyosz1dVh1hfKaRgqZ1jLjrMeKB5gKh3PfHRzEaCjcgkrCO3+F1aPiXUzR2mJx8
-         wbqw==
-X-Gm-Message-State: APjAAAU/TpAj8iLko2PPK4tIq6PlGPRM39vhkNPnHFsfHtzBdi68iHFt
-        /sjajJ4IgnuTPM/nPJAdypglSN9Z798=
-X-Google-Smtp-Source: APXvYqxL10Pw/zaVUwgC6Nbc/IXk/HSCieVNPHD0W/L0t7bMoGTzhj2/TB9vNI5bkE7vGJ9C//4R2A==
-X-Received: by 2002:a17:902:be0f:: with SMTP id r15mr354746pls.72.1571894972396;
-        Wed, 23 Oct 2019 22:29:32 -0700 (PDT)
-Received: from localhost ([2620:0:1002:19:d6d5:8aa1:4314:d1e6])
-        by smtp.gmail.com with ESMTPSA id o123sm14765923pfg.161.2019.10.23.22.29.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2019 22:29:31 -0700 (PDT)
-From:   Matt Delco <delco@chromium.org>
-To:     kvm@vger.kernel.org
-Cc:     Matt Delco <delco@chromium.org>
-Subject: [PATCH] KVM: x86: return length in KVM_GET_CPUID2.
-Date:   Wed, 23 Oct 2019 22:29:18 -0700
-Message-Id: <20191024052918.140750-1-delco@chromium.org>
-X-Mailer: git-send-email 2.23.0.866.gb869b98d4c-goog
+        id S2436466AbfJXFip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 24 Oct 2019 01:38:45 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:42683 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390947AbfJXFio (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 24 Oct 2019 01:38:44 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 46zGJ202kzz9sPL; Thu, 24 Oct 2019 16:38:41 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1571895522; bh=TUkzeiEyrlAUHxalg6s6mY7dJHYRmYW79iZASyM/640=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BWnwSCNk45l4kLN+O6YLQLTdGPX1nJUMXoxXPjEGCZsKz/cxhC8tbMiIzMtnk+H5M
+         fTwYEvnoS7a0n8hu0jBrz4GM5BwhRagsTBpHRZTt7CwhcYQDippMFLBbOYUioA2m6r
+         wckeQII21TTH8thi0vc8EAnI1F/zutb1zDXrN6xfsU410dhDANOIsVOmdB3gvUzhHC
+         SfPYCXQuUA1Qw/Fnd3uixK1YtyWGKPAQOQ4YplqGvNolaeAP5+9O8vcjT17g3K+swb
+         vuT8fAWbsn6+V/zHxqmWo7m4+E81NbftMETe/DYZWUilRsoml7/b2q7Afvy5m0gKvI
+         dO78GlmiuzQTQ==
+Date:   Thu, 24 Oct 2019 14:43:43 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/23] KVM: PPC: Book3S HV: Nested: Infrastructure for
+ nested hpt guest setup
+Message-ID: <20191024034343.GA773@oak.ozlabs.ibm.com>
+References: <20190826062109.7573-1-sjitindarsingh@gmail.com>
+ <20190826062109.7573-14-sjitindarsingh@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190826062109.7573-14-sjitindarsingh@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_GET_CPUID2 never indicates the array length it populates. If an app
-passes in an array that's too short then kvm_vcpu_ioctl_get_cpuid2() populates
-the required array length and returns -E2BIG.  However, its caller then just
-bails to "goto out", thus bypassing the copy_to_user(). If an app
-passes in an array that's not too short, then
-kvm_vcpu_ioctl_get_cpuid2() doesn't populate the array length. Its
-caller will then call copy_to_user(), which is pointless since no data
-values have been changed.
+On Mon, Aug 26, 2019 at 04:20:59PM +1000, Suraj Jitindar Singh wrote:
+> Add the infrastructure to book3s_hv_nested.c to allow a nested hpt (hash
+> page table) guest to be setup. As this patch doesn't add the capability
+> of creating or removing mmu translations return H_PARAMETER when an
+> attempt to actually run a nested hpt guest is made.
+> 
+> Add fields to the nested guest struct to store the hpt and the vrma slb
+> entry.
+> 
+> Update kvmhv_update_ptbl_cache() to determine when a nested guest is
+> switching from radix to hpt or hpt to radix and perform the required
+> setup. A page table (radix) or hpt (hash) must be allocated with any
+> existing table being freed and the radix field in the nested guest
+> struct being updated under the mmu_lock (this means that when holding
+> the mmu_lock the radix field can be tested and the existance of the
+> correct type of page table guaranteed). Also remove all of the nest rmap
+> entries which belong to this nested guest since a nested rmap entry is
+> specific to whether the nested guest is hash or radix.
+> 
+> When a nested guest is initially created or when the partition table
+> entry is empty we assume a radix guest since it is much less expensive
+> to allocate a radix page table compared to a hpt.
+> 
+> The hpt which is allocated in the hypervisor for the nested guest
+> (called the shadow hpt) is identical in size to the one allocated in the
+> guest hypervisor to ensure a 1-to-1 mapping between page table entries.
+> This simplifies handling of the entries however this requirement could
+> be relaxed in future if support was added.
+> 
+> Introduce a hash nested_page_fault function to be envoked when the
+> nested guest which experiences a page fault is hash, returns -EINVAL for
+> now. Also return -EINVAL when handling the H_TLB_INVALIDATE hcall. Also
+> lacking support for the hypervisor paging out a guest page which has
+> been mapped through to a nested guest. These 3 portions of functionality
+> added in proceeding patches.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-This change attempts to have KVM_GET_CPUID2 populate the array length on
-both success and failure, and still indicate -E2BIG when a provided
-array is too short.  I'm not sure if this type of change is considered
-an API breakage and thus we need a KVM_GET_CPUID3.
+Small nit below...
 
-Fixes: 0771671749b59 ("KVM: Enhance guest cpuid management", 2007-11-21)
-Signed-off-by: Matt Delco <delco@chromium.org>
----
- arch/x86/kvm/cpuid.c | 1 +
- arch/x86/kvm/x86.c   | 7 ++++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+> +/* Caller must hold gp->tlb_lock */
+> +static int kvmhv_switch_to_radix_nested(struct kvm_nested_guest *gp)
+> +{
+> +	struct kvm *kvm = gp->l1_host;
+> +	pgd_t *pgtable;
+> +
+> +	/* try to allocate a radix tree */
+> +	pgtable = pgd_alloc(kvm->mm);
+> +	if (!pgtable) {
+> +		pr_err_ratelimited("KVM: Couldn't alloc nested radix tree\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/* mmu_lock protects shadow_hpt & radix in nested guest struct */
+> +	spin_lock(&kvm->mmu_lock);
+> +	kvmppc_free_hpt(&gp->shadow_hpt);
+> +	gp->radix = 1;
+> +	gp->shadow_pgtable = pgtable;
+> +	spin_unlock(&kvm->mmu_lock);
+> +
+> +	/* remove all nested rmap entries and perform global invalidation */
+> +	kvmhv_remove_all_nested_rmap_lpid(kvm, gp->l1_lpid);
+> +	kvmhv_flush_lpid(gp->shadow_lpid, gp->radix);
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index f68c0c753c38..ec013b68b266 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -274,6 +274,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
- 	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
- 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
- 		goto out;
-+	cpuid->nent = vcpu->arch.cpuid_nent;
- 	return 0;
- 
- out:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5863c38108d9..4998d3bafbfd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4161,11 +4161,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			goto out;
- 		r = kvm_vcpu_ioctl_get_cpuid2(vcpu, &cpuid,
- 					      cpuid_arg->entries);
--		if (r)
-+		if (r && r != -E2BIG)
- 			goto out;
--		r = -EFAULT;
--		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid)))
-+		if (copy_to_user(cpuid_arg, &cpuid, sizeof(cpuid))) {
-+			r = -EFAULT;
- 			goto out;
-+		}
- 		r = 0;
- 		break;
- 	}
--- 
-2.23.0.866.gb869b98d4c-goog
+Shouldn't this flush be done using the old value of gp->radix, i.e. 0?
+Both because we want to flush the old translations for the guest, and
+because we haven't changed the partition table entry for the guest at
+this point, so it still says HPT.
 
+> +
+> +	return 0;
+> +}
+> +
+> +/* Caller must hold gp->tlb_lock */
+> +static int kvmhv_switch_to_hpt_nested(struct kvm_nested_guest *gp, int order)
+> +{
+> +	struct kvm *kvm = gp->l1_host;
+> +	struct kvm_hpt_info info;
+> +	int rc;
+> +
+> +	/* try to allocate an hpt */
+> +	rc = kvmppc_allocate_hpt(&info, order);
+> +	if (rc) {
+> +		pr_err_ratelimited("KVM: Couldn't alloc nested hpt\n");
+> +		return rc;
+> +	}
+> +
+> +	/* mmu_lock protects shadow_pgtable & radix in nested guest struct */
+> +	spin_lock(&kvm->mmu_lock);
+> +	kvmppc_free_pgtable_radix(kvm, gp->shadow_pgtable, gp->shadow_lpid);
+> +	pgd_free(kvm->mm, gp->shadow_pgtable);
+> +	gp->shadow_pgtable = NULL;
+> +	gp->radix = 0;
+> +	gp->shadow_hpt = info;
+> +	spin_unlock(&kvm->mmu_lock);
+> +
+> +	/* remove all nested rmap entries and perform global invalidation */
+> +	kvmhv_remove_all_nested_rmap_lpid(kvm, gp->l1_lpid);
+> +	kvmhv_flush_lpid(gp->shadow_lpid, gp->radix);
+
+Similarly, shouldn't this be a radix flush?
+
+> +
+> +	return 0;
+> +}
+
+Paul.
