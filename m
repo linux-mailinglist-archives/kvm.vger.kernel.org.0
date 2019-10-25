@@ -2,53 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A17E55FB
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 23:35:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE31E567D
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 00:29:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726144AbfJYVfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 17:35:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60898 "EHLO mail.kernel.org"
+        id S1726689AbfJYW3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 18:29:12 -0400
+Received: from mga07.intel.com ([134.134.136.100]:25993 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfJYVfF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 17:35:05 -0400
-Subject: Re: [GIT PULL] KVM changes for Linux 5.4-rc5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572039305;
-        bh=pcJg0LOXnS2SS0hUm6EUQCdRc08q50KmG7tFF5hdh14=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=g1c1/hIze9UYEMThUbJC3/kTH6MLN9giuAD+kRknJ+1wbTUoUTD9Kz3dnN8RqUID8
-         TTbdg3duymEcdX3OLFnFLInHw7DgkjPeDlx1pyMG7nPP/6pQEEn/gqI881kFCMscdU
-         RfvHtdOQG4EOU8l4VvUSiReFLRHpeLd7AA5VFb3c=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1572003959-43063-1-git-send-email-pbonzini@redhat.com>
-References: <1572003959-43063-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1572003959-43063-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: 671ddc700fd08b94967b1e2a937020e30c838609
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8c123380b30f408647f3b159831c863cd56b1400
-Message-Id: <157203930529.23557.6500819875416650825.pr-tracker-bot@kernel.org>
-Date:   Fri, 25 Oct 2019 21:35:05 +0000
+        id S1726388AbfJYW3M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 18:29:12 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 15:29:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,230,1569308400"; 
+   d="scan'208";a="201943372"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga003.jf.intel.com with ESMTP; 25 Oct 2019 15:29:11 -0700
+Date:   Fri, 25 Oct 2019 15:29:11 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        John Sperbeck <jsperbeck@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v3 3/3] kvm: call kvm_arch_destroy_vm if vm creation fails
+Message-ID: <20191025222911.GA24952@linux.intel.com>
+References: <20191024230327.140935-1-jmattson@google.com>
+ <20191024230327.140935-4-jmattson@google.com>
+ <20191024232943.GJ28043@linux.intel.com>
+ <48109ee1-f204-b7d4-6c4f-458b59f7c428@redhat.com>
+ <20191025144848.GA17290@linux.intel.com>
+ <7fa85679-7325-4373-55a1-bb2cd274fec3@redhat.com>
+ <20191025152201.GD17290@linux.intel.com>
+ <637f0a19-e182-ed58-9fc2-0556a9a37be5@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <637f0a19-e182-ed58-9fc2-0556a9a37be5@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri, 25 Oct 2019 13:45:59 +0200:
+On Fri, Oct 25, 2019 at 05:23:54PM +0200, Paolo Bonzini wrote:
+> On 25/10/19 17:22, Sean Christopherson wrote:
+> > On Fri, Oct 25, 2019 at 04:56:23PM +0200, Paolo Bonzini wrote:
+> >> On 25/10/19 16:48, Sean Christopherson wrote:
+> >>>> It seems to me that kvm_get_kvm() in 
+> >>>> kvm_arch_init_vm() should be okay as long as it is balanced in 
+> >>>> kvm_arch_destroy_vm().  So we can apply patch 2 first, and then:
+> >>> No, this will effectively leak the VM because you'll end up with a cyclical
+> >>> reference to kvm_put_kvm(), i.e. users_count will never hit zero.
+> >>>
+> >>> void kvm_put_kvm(struct kvm *kvm)
+> >>> {
+> >>> 	if (refcount_dec_and_test(&kvm->users_count))
+> >>> 		kvm_destroy_vm(kvm);
+> >>> 		|
+> >>> 		-> kvm_arch_destroy_vm()
+> >>> 		   |
+> >>> 		   -> kvm_put_kvm()
+> >>> }
+> >>
+> >> There's two parts to this:
+> >>
+> >> - if kvm_arch_init_vm() calls kvm_get_kvm(), then kvm_arch_destroy_vm()
+> >> won't be called until the corresponding kvm_put_kvm().
+> >>
+> >> - if the error case causes kvm_arch_destroy_vm() to be called early,
+> >> however, that'd be okay and would not leak memory, as long as
+> >> kvm_arch_destroy_vm() detects the situation and calls kvm_put_kvm() itself.
+> >>
+> >> One case could be where you have some kind of delayed work, where the
+> >> callback does kvm_put_kvm.  You'd have to cancel the work item and call
+> >> kvm_put_kvm in kvm_arch_destroy_vm, and you would go through that path
+> >> if kvm_create_vm() fails after kvm_arch_init_vm().
+> > 
+> > But do we really want/need to allow handing out references to KVM during
+> > kvm_arch_init_vm()?  AFAICT, it's not currently required by any arch.
+> 
+> Probably not, but the full code paths are long, so I don't see much
+> value in outright forbidding it.  There are very few kvm_get_kvm() calls
+> anyway in arch-dependent code, so it's easy to check that they're not
+> causing reference cycles.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8c123380b30f408647f3b159831c863cd56b1400
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+I wasn't thinking forbid it for all eternity, more like add a landmine to
+force an arch to implement more robust handling in order to enable
+kvm_get_kvm() during init_vm().
