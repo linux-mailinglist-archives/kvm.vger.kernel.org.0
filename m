@@ -2,98 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E2CEAE5173
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 18:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8673E518A
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 18:48:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440793AbfJYQkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 12:40:04 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:53424 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387769AbfJYQkE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 12:40:04 -0400
-Received: from zn.tnic (p200300EC2F0D3C00114ACBE854FF623C.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:3c00:114a:cbe8:54ff:623c])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F32741EC0CEA;
-        Fri, 25 Oct 2019 18:39:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1572021599;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=0BspKpTHhDFSD1ZazQbF6BaHRpi/K3Vkd5wkOxwr3Uw=;
-        b=VB/qqTmGFF8Yi8RkacH5DLJuVU0U9IqUfWngALGk+fTOeRrDA/+T4P/36rsat5pU8IeTew
-        CJU2MTqabu5iSd1V54Ac/1opw9t7EsALqLAAlEYfzXwWqJJFbvxKitLo2X8743kggIYmj/
-        CQt2vMAFjwy+idp4WfLS+C2kGNx14h8=
-Date:   Fri, 25 Oct 2019 18:39:58 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 05/16] KVM: VMX: Drop initialization of
- IA32_FEATURE_CONTROL MSR
-Message-ID: <20191025163958.GG6483@zn.tnic>
-References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
- <20191022000820.1854-1-sean.j.christopherson@intel.com>
- <20191025162645.GE6483@zn.tnic>
+        id S2404889AbfJYQsI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 12:48:08 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34071 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390972AbfJYQsI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 12:48:08 -0400
+Received: by mail-io1-f67.google.com with SMTP id q1so3189262ion.1
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 09:48:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CFUDDKaFpcSfEv5bHLUnGieP3g9sV6ToGbRF8r26X/Q=;
+        b=O3Sy/4FurlMwn1ds3dGLK+Lrt6W9ABvUmZSuelCAO7nvyjEvL7dfFvHibJxnCMcZVf
+         486YU8TFjd8R1XlRKb3glWjVvSek8jUdUgmuhyzHyaGIs9HFY0odDVcbQIpl0eJytYup
+         Tcoe+P09owb5/e6Rx0EBtkAvRWhTQnlghPmA0sVCI+u8SUUCSuOnNkFfLV5zm25KP0md
+         Rk3BzZLTyhQQM64W0Kp1PCsA0a84+F/GS6FJKnnOKRehSFe2OMqo1zcSo6DyHal2STAK
+         8gdyPeQ3VGiJLpcX8+f/pfe5mW/uoNaRyEG10ysVwFHHotFMGd0jC519hTSAVrA+iWSM
+         gOMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CFUDDKaFpcSfEv5bHLUnGieP3g9sV6ToGbRF8r26X/Q=;
+        b=mhN4/1mNAAPHXiij9wuW9bcTok0Sx7mAxNcj2rXOUih09hz/DC+kCoVTytlYiDv0zu
+         wO3JlWxt60Yxh0Zf059wzwDMtZk+Adxw46UZxZMqcnmVM1BkKQHUVaGxmNXUcj5SMWC8
+         2KgF+sgVpYjKkEz/VE82lzH8e6OLUakUVun0FbKfPGSN5dQ5fxtBYf7oTRHBwlY+jzLN
+         qDv7j9AmaltKJEFQqOAiHyqz6bWIuJZ7K2mY6xCBNK2rdv578CFk0sjGQT//GD2o7aIS
+         yId/mcTO7XdPDDZZMqPjwjuxYajDKodsP8Ee68B269H/VvIKCzx5MNYceb+uuEQo8JAD
+         OMuw==
+X-Gm-Message-State: APjAAAUzJ1mCpy4D0EpeJsp+X1TmfOYnsPrH4qBcRie78dcSe6G7MuSQ
+        fqVwkbWlcOoujk9sUNA5l1jWQKb6oaOkgBWa7tG1Dw==
+X-Google-Smtp-Source: APXvYqxxY+/BIu9/+JPTpgSOOtleemGhb3JXTddRj9IkVqTuJXYU6L6KROzcsTaQLS6J3HU9nZ2phl6M7dBx70xrtag=
+X-Received: by 2002:a5d:8d8f:: with SMTP id b15mr4788472ioj.296.1572022087687;
+ Fri, 25 Oct 2019 09:48:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191025162645.GE6483@zn.tnic>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191024222725.160835-1-aaronlewis@google.com>
+In-Reply-To: <20191024222725.160835-1-aaronlewis@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 25 Oct 2019 16:47:56 +0000
+Message-ID: <CALMp9eSacBm6=c8_5eAUOWeLVjkr1CH8yppXXE5E4gi5FfcYPw@mail.gmail.com>
+Subject: Re: [PATCH] x86: Fix the register order to match struct regs
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 06:26:45PM +0200, Borislav Petkov wrote:
-> On Mon, Oct 21, 2019 at 05:08:20PM -0700, Sean Christopherson wrote:
-> > +	if (WARN_ON_ONCE(!(msr & FEATURE_CONTROL_LOCKED)))
-> > +		return 1;
-> > +
-> > +	/* launched w/ TXT and VMX disabled */
-> > +	if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX) &&
-> > +	    tboot_enabled())
-> > +		return 1;
-> > +	/* launched w/o TXT and VMX only enabled w/ TXT */
-> > +	if (!(msr & FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX) &&
-> > +	    (msr & FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX) &&
-> > +	    !tboot_enabled()) {
-> > +		pr_warn("kvm: disable TXT in the BIOS or "
-> > +			"activate TXT before enabling KVM\n");
-> > +		return 1;
-> 
-> Might as well fix that with a cleanup patch ontop:
-> 
-> WARNING: quoted string split across lines
-> #69: FILE: arch/x86/kvm/vmx/vmx.c:2208:
-> +               pr_warn("kvm: disable TXT in the BIOS or "
-> +                       "activate TXT before enabling KVM\n");
-> 
-> 
-> Also in that same cleanup patch, if the order of those tests doesn't
-> matter, you can simplify them a bit:
-> 
-> 	if (tboot_enabled()) {
-> 		/* msr flag test here */
-> 
-> 	/* tboot disabled */
-> 	} else {
-> 		/* other two tests here */
-> 	}
-> 
-> Should make it a bit easier to parse.
+On Thu, Oct 24, 2019 at 10:28 PM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> Fix the order the registers show up in SAVE_GPR and SAVE_GPR_C to ensure
+> the correct registers get the correct values.  Previously, the registers
+> were being written to (and read from) the wrong fields.
+>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 
-Nevermind - just saw patch 7. :)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Subject should have been [kvm-unit-tests PATCH] x86: Fix the register
+order to match struct regs
