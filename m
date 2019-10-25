@@ -2,105 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 95CAAE469A
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 11:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ACB4E46CB
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 11:14:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438224AbfJYJE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 05:04:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34299 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2437447AbfJYJE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 05:04:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571994296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r6EtAtoX5oupHpGZ0bBxA2I7EmQRkVr1qP+CrHfc+uw=;
-        b=SwELlRDmLaCjVJrCuP9FyrbmKjpjrj9RI3vDkH20vLgG/cJqh6oOGSWs9DLqgCMy5EE6GY
-        qEDsF4/N8ZTTZtYY4GkwaoAYHwYLuna+/w7NuLzV0FIVVYKtoaeYBeXbcn8H/kOUDYTZG8
-        M0g4G0WsgAeHX2LKc+aaRcq0BwZ/vbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-UpfcuMk4NvaZqMoApZ9rEw-1; Fri, 25 Oct 2019 05:04:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8C58800D41;
-        Fri, 25 Oct 2019 09:04:51 +0000 (UTC)
-Received: from [10.36.116.205] (ovpn-116-205.ams2.redhat.com [10.36.116.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D4E4910013D9;
-        Fri, 25 Oct 2019 09:04:49 +0000 (UTC)
-Subject: Re: [RFC 05/37] s390: KVM: Export PV handle to gmap
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-6-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <ff7418ed-ce4b-2343-8f08-01eeac6f816e@redhat.com>
-Date:   Fri, 25 Oct 2019 11:04:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-6-frankja@linux.ibm.com>
+        id S2438083AbfJYJOM convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 25 Oct 2019 05:14:12 -0400
+Received: from mga05.intel.com ([192.55.52.43]:2296 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2436963AbfJYJOM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 05:14:12 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 02:14:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,228,1569308400"; 
+   d="scan'208";a="202559334"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga006.jf.intel.com with ESMTP; 25 Oct 2019 02:14:11 -0700
+Received: from fmsmsx102.amr.corp.intel.com (10.18.124.200) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 02:14:10 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ FMSMSX102.amr.corp.intel.com (10.18.124.200) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 02:14:10 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
+ SHSMSX151.ccr.corp.intel.com ([10.239.6.50]) with mapi id 14.03.0439.000;
+ Fri, 25 Oct 2019 17:14:08 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [RFC v2 1/3] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Thread-Topic: [RFC v2 1/3] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Thread-Index: AQHVimn1rvX5HzPhr02lzW/6Sk2+b6drEC7g
+Date:   Fri, 25 Oct 2019 09:14:07 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5D04AD@SHSMSX104.ccr.corp.intel.com>
+References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
+ <1571919983-3231-2-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1571919983-3231-2-git-send-email-yi.l.liu@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: UpfcuMk4NvaZqMoApZ9rEw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZmZkY2FkMjMtYWM2YS00YTgxLTliMWItZmUyNmY3NzdkNGU4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWTVIcmVmVHR4NUZLUVhIbFloVG95UGRQZEVQOTJxRXJiU3F5Y2o2Y2VyRkFaY1hTeElzbW9GZDFudE5qT1h2ayJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.10.19 13:40, Janosch Frank wrote:
-> We need it in the next patch, when doing memory management for the
-> guest in the kernel's fault handler, where otherwise we wouldn't have
-> access to the handle.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> From: Liu, Yi L
+> Sent: Thursday, October 24, 2019 8:26 PM
+> 
+> From: Liu Yi L <yi.l.liu@linux.intel.com>
+> 
+> When the guest "owns" the stage 1 translation structures,  the host
+> IOMMU driver has no knowledge of caching structure updates unless
+> the guest invalidation requests are trapped and passed down to the
+> host.
+> 
+> This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
+> at propagating guest stage1 IOMMU cache invalidations to the host.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@linux.intel.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > ---
->   arch/s390/include/asm/gmap.h | 1 +
->   arch/s390/kvm/pv.c           | 1 +
->   2 files changed, 2 insertions(+)
->=20
-> diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
-> index 37f96b6f0e61..6efc0b501227 100644
-> --- a/arch/s390/include/asm/gmap.h
-> +++ b/arch/s390/include/asm/gmap.h
-> @@ -61,6 +61,7 @@ struct gmap {
->   =09spinlock_t shadow_lock;
->   =09struct gmap *parent;
->   =09unsigned long orig_asce;
-> +=09unsigned long se_handle;
->   =09int edat_level;
->   =09bool removed;
->   =09bool initialized;
-> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
-> index 94cf16f40f25..80aecd5bea9e 100644
-> --- a/arch/s390/kvm/pv.c
-> +++ b/arch/s390/kvm/pv.c
-> @@ -169,6 +169,7 @@ int kvm_s390_pv_create_vm(struct kvm *kvm)
->   =09=09kvm_s390_pv_dealloc_vm(kvm);
->   =09=09return -EINVAL;
->   =09}
-> +=09kvm->arch.gmap->se_handle =3D uvcb.guest_handle;
->   =09return rc;
->   }
->  =20
->=20
+>  drivers/vfio/vfio_iommu_type1.c | 55
+> +++++++++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       | 13 ++++++++++
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c
+> b/drivers/vfio/vfio_iommu_type1.c
+> index 96fddc1d..cd8d3a5 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -124,6 +124,34 @@ struct vfio_regions {
+>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
+>  					(!list_empty(&iommu->domain_list))
+> 
+> +struct domain_capsule {
+> +	struct iommu_domain *domain;
+> +	void *data;
+> +};
+> +
+> +/* iommu->lock must be held */
+> +static int
+> +vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
+> +		      int (*fn)(struct device *dev, void *data),
+> +		      void *data)
 
-I'd suggest squashing that into the patch that needs it.
+'lookup' usually means find a device and then return. But
+the real purpose here is to loop all the devices within this
+container and then do something. Does it make more 
+sense to be vfio_iommu_for_each_dev?
 
---=20
+> +{
+> +	struct domain_capsule dc = {.data = data};
+> +	struct vfio_domain *d;
+> +	struct vfio_group *g;
+> +	int ret = 0;
+> +
+> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> +		dc.domain = d->domain;
+> +		list_for_each_entry(g, &d->group_list, next) {
+> +			ret = iommu_group_for_each_dev(g-
+> >iommu_group,
+> +						       &dc, fn);
+> +			if (ret)
+> +				break;
+> +		}
+> +	}
+> +	return ret;
+> +}
+> +
+>  static int put_pfn(unsigned long pfn, int prot);
+> 
+>  /*
+> @@ -2211,6 +2239,15 @@ static int vfio_iommu_iova_build_caps(struct
+> vfio_iommu *iommu,
+>  	return ret;
+>  }
+> 
+> +static int vfio_cache_inv_fn(struct device *dev, void *data)
+> +{
+> +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> +	struct vfio_iommu_type1_cache_invalidate *ustruct =
+> +		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
+> +
+> +	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -2315,6 +2352,24 @@ static long vfio_iommu_type1_ioctl(void
+> *iommu_data,
+> 
+>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>  			-EFAULT : 0;
+> +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
+> +		struct vfio_iommu_type1_cache_invalidate ustruct;
 
-Thanks,
+it's weird to call a variable as struct.
 
-David / dhildenb
+> +		int ret;
+> +
+> +		minsz = offsetofend(struct
+> vfio_iommu_type1_cache_invalidate,
+> +				    info);
+> +
+> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (ustruct.argsz < minsz || ustruct.flags)
+> +			return -EINVAL;
+> +
+> +		mutex_lock(&iommu->lock);
+> +		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
+> +					    &ustruct);
+> +		mutex_unlock(&iommu->lock);
+> +		return ret;
+>  	}
+> 
+>  	return -ENOTTY;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9e843a1..ccf60a2 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -794,6 +794,19 @@ struct vfio_iommu_type1_dma_unmap {
+>  #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+>  #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+> 
+> +/**
+> + * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE +
+> 24,
+> + *			struct vfio_iommu_type1_cache_invalidate)
+> + *
+> + * Propagate guest IOMMU cache invalidation to the host.
+
+guest or first-level/stage-1? Ideally userspace application may also
+bind its own address space as stage-1 one day...
+
+> + */
+> +struct vfio_iommu_type1_cache_invalidate {
+> +	__u32   argsz;
+> +	__u32   flags;
+> +	struct iommu_cache_invalidate_info info;
+> +};
+> +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE
+> + 24)
+> +
+>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU --------
+> */
+> 
+>  /*
+> --
+> 2.7.4
 
