@@ -2,93 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91787E4ED7
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 16:23:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51A3BE4F83
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 16:48:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392836AbfJYOWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 10:22:55 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:54056 "EHLO mail.skyhub.de"
+        id S2395388AbfJYOsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 10:48:50 -0400
+Received: from mga02.intel.com ([134.134.136.20]:12049 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730051AbfJYOWz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 10:22:55 -0400
-Received: from zn.tnic (p200300EC2F0D3C00E44239D1C9BE3FA7.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:3c00:e442:39d1:c9be:3fa7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D0D9F1EC0CD7;
-        Fri, 25 Oct 2019 16:22:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1572013374;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=iLT7/FA+jxa/DCuxDSyuhoJdyith+QPQWFGJS46avAU=;
-        b=nPhjqJORT9hY9M4rCp5ditj4nlo+4eHRIuR7edUUE44I9CJLWFxn04vyjHR1iD6I14oiAj
-        9bgh4p/sJX89DDRDTTzZZUxS25q3v4uQYIu6K5E6/RMeoFYUQdaNfkGdTtPr67BsIOmoyZ
-        1rqrlq5iZui5ZSENyS/8pxGA1KD4Tcc=
-Date:   Fri, 25 Oct 2019 16:22:48 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Tony Luck <tony.luck@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-edac@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 02/16] x86/mce: WARN once if IA32_FEATURE_CONTROL MSR
- is left unlocked
-Message-ID: <20191025142248.GD6483@zn.tnic>
-References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
- <20191021235642.418-1-sean.j.christopherson@intel.com>
+        id S2395385AbfJYOsu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 10:48:50 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 07:48:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,229,1569308400"; 
+   d="scan'208";a="197445114"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga008.fm.intel.com with ESMTP; 25 Oct 2019 07:48:49 -0700
+Date:   Fri, 25 Oct 2019 07:48:49 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        John Sperbeck <jsperbeck@google.com>,
+        Junaid Shahid <junaids@google.com>
+Subject: Re: [PATCH v3 3/3] kvm: call kvm_arch_destroy_vm if vm creation fails
+Message-ID: <20191025144848.GA17290@linux.intel.com>
+References: <20191024230327.140935-1-jmattson@google.com>
+ <20191024230327.140935-4-jmattson@google.com>
+ <20191024232943.GJ28043@linux.intel.com>
+ <48109ee1-f204-b7d4-6c4f-458b59f7c428@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191021235642.418-1-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <48109ee1-f204-b7d4-6c4f-458b59f7c428@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 04:56:42PM -0700, Sean Christopherson wrote:
-> WARN if the IA32_FEATURE_CONTROL MSR is somehow left unlocked now that
-> CPU initialization unconditionally locks the MSR.
+On Fri, Oct 25, 2019 at 01:37:56PM +0200, Paolo Bonzini wrote:
+> On 25/10/19 01:29, Sean Christopherson wrote:
+> > On Thu, Oct 24, 2019 at 04:03:27PM -0700, Jim Mattson wrote:
+> >> From: John Sperbeck <jsperbeck@google.com>
+> >>
+> >> In kvm_create_vm(), if we've successfully called kvm_arch_init_vm(), but
+> >> then fail later in the function, we need to call kvm_arch_destroy_vm()
+> >> so that it can do any necessary cleanup (like freeing memory).
+> >>
+> >> Fixes: 44a95dae1d229a ("KVM: x86: Detect and Initialize AVIC support")
+> >>
+> >> Signed-off-by: John Sperbeck <jsperbeck@google.com>
+> >> Signed-off-by: Jim Mattson <jmattson@google.com>
+> >> Reviewed-by: Junaid Shahid <junaids@google.com>
+> >> ---
+> >>  virt/kvm/kvm_main.c | 10 ++++++----
+> >>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kernel/cpu/mce/intel.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/cpu/mce/intel.c b/arch/x86/kernel/cpu/mce/intel.c
-> index 88cd9598fa57..1008f14b803b 100644
-> --- a/arch/x86/kernel/cpu/mce/intel.c
-> +++ b/arch/x86/kernel/cpu/mce/intel.c
-> @@ -117,11 +117,10 @@ static bool lmce_supported(void)
->  	 * generate a #GP fault.
->  	 */
->  	rdmsrl(MSR_IA32_FEATURE_CONTROL, tmp);
-> -	if ((tmp & (FEATURE_CONTROL_LOCKED | FEATURE_CONTROL_LMCE)) ==
-> -		   (FEATURE_CONTROL_LOCKED | FEATURE_CONTROL_LMCE))
-> -		return true;
-> +	if (WARN_ON_ONCE(!(tmp & FEATURE_CONTROL_LOCKED)))
-> +		return false;
->  
-> -	return false;
-> +	return tmp & FEATURE_CONTROL_LMCE;
->  }
->  
->  bool mce_intel_cmci_poll(void)
-> -- 
+> Sorry for the back and forth on this---I actually preferred the version 
+> that did not move refcount_set.  It seems to me that kvm_get_kvm() in 
+> kvm_arch_init_vm() should be okay as long as it is balanced in 
+> kvm_arch_destroy_vm().  So we can apply patch 2 first, and then:
 
-Reviewed-by: Borislav Petkov <bp@suse.de>
+No, this will effectively leak the VM because you'll end up with a cyclical
+reference to kvm_put_kvm(), i.e. users_count will never hit zero.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+void kvm_put_kvm(struct kvm *kvm)
+{
+	if (refcount_dec_and_test(&kvm->users_count))
+		kvm_destroy_vm(kvm);
+		|
+		-> kvm_arch_destroy_vm()
+		   |
+		   -> kvm_put_kvm()
+}
