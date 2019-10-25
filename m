@@ -2,111 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9E96E4A45
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 13:47:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15006E4AAB
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 14:02:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502243AbfJYLqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 07:46:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53890 "EHLO mx1.redhat.com"
+        id S2503976AbfJYMCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 08:02:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58214 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730727AbfJYLqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 07:46:55 -0400
+        id S1729969AbfJYMCX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 08:02:23 -0400
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E37594E832
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 11:46:54 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id u17so842480wmd.3
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 04:46:54 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1648D4E8AC
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 12:02:23 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id a81so1019207wma.4
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 05:02:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=JFxVTkuWS3kQBWJGbndYa5A8WjnfR9HWKV7Q51mjf4g=;
-        b=Ltjy8TIY6WeTUSVZPak/1MC2HAYBTMexqmMDeolMvNXs/obQ+eC2uGe1vk8MT5yLpn
-         KOnUXKMoUSxPrDFQQATAUOpOqTcLlr7RNBFEKG06xv0HKQVCxb7bBRlWcgIw4AdfcNw4
-         cSTm3G/k6czsvePC1AhO/q4LMemSlxRhFPf80f4mSTaek+URCYpGBAbRSdPFYMdVuyJo
-         qKbJtshUl4STNCzx2t7YGuQBRdPf5H3al7RYq3C8HRt3DKvdD24QFFNy3kqlwX9BnhDh
-         py5fTK/DcyXXne8t2OT6wJxqpljNBJL2fdVmF2RyNEyIQAVXQBn9/0WonBObPuCmsGs0
-         YC4w==
-X-Gm-Message-State: APjAAAXjTPp3uVPd/9CQz+98h/v+JF9a5Cdl+UQscXIKZCD+TbutmGdq
-        i2ezMKBS9rPFEGMdOtfSiLugPgcJTdwCFy5ZxwiBABzGfQAwiZpcyOISKSkmnvkYAQkKA7sYedK
-        +PBlsXtbOFHT8
-X-Received: by 2002:adf:fcc7:: with SMTP id f7mr2682960wrs.345.1572004013391;
-        Fri, 25 Oct 2019 04:46:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx0N+07IZUEvJWWb7N83GBppYgQj1HmvMn6Q1GmAwZLzX0L4MctCmq7ANIVvVFt7HSefCOVbg==
-X-Received: by 2002:adf:fcc7:: with SMTP id f7mr2682929wrs.345.1572004013107;
-        Fri, 25 Oct 2019 04:46:53 -0700 (PDT)
+        bh=nhnGjNYl34BBej/G9IX/zdJYT44shCWthBnaow9hDa0=;
+        b=oLWKwRW1Mbzt4UcIp8Oq5lNDag9MlKvXWweTY3QGOu0L8sC39i1Lo92PCdRiZSJOUV
+         lc0xX1GnsT4FFNNeTOJwfjOdK7O5xp5W8vxtWw7c+zYzHP38CzxsZ49oHZFdVOuQAa1f
+         Ns8sNCi1glSTv+vuthZKUMOpV+ftoXmdiMczBzd1FKiSJlhPxsv8b8VVCwxH0NitefL2
+         c1ghQMeWdeNsVTTD+QIrfeIQYXpDL4ALf9HfkqM6ZNDFhJrXq3rVI2reQEruNIVFjuAk
+         AHEyaI0UbVxphKwruJ6kmQ3MllUlXV9gNWmeRHcbkvtGYrnPal162L1nSQBZsYFepWcR
+         2a8Q==
+X-Gm-Message-State: APjAAAX5EXCe5bhw2v6ev1BD7GVHKi/rlDJOD8/IBn8IkryrwL40V3Ni
+        rWk18Kj9nIENPKuF68MWYTRxCpTonvsMrAetB7kaOXR4TH8pUNjjK7uKu7GBSuuhd47oIA9Npa1
+        2YiiL6cyUmKoE
+X-Received: by 2002:a1c:9847:: with SMTP id a68mr3155401wme.18.1572004941656;
+        Fri, 25 Oct 2019 05:02:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxwsMVOR60a0YiZNHpidmA8uSmWVIC5eakJiKfRUewwkkwxWAf6JFvuj/ZwuF4qfke5tp78TQ==
+X-Received: by 2002:a1c:9847:: with SMTP id a68mr3155367wme.18.1572004941369;
+        Fri, 25 Oct 2019 05:02:21 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9c7b:17ec:2a40:d29? ([2001:b07:6468:f312:9c7b:17ec:2a40:d29])
-        by smtp.gmail.com with ESMTPSA id o73sm1723689wme.34.2019.10.25.04.46.51
+        by smtp.gmail.com with ESMTPSA id 79sm2637628wmb.7.2019.10.25.05.02.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2019 04:46:52 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: x86: get rid of odd out jump label in
- pdptrs_changed
-To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1572000874-28259-1-git-send-email-linmiaohe@huawei.com>
+        Fri, 25 Oct 2019 05:02:20 -0700 (PDT)
+Subject: Re: [PATCH] x86/kvm: Fix -Wmissing-prototypes warnings
+To:     wang.yi59@zte.com.cn, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        up2wing@gmail.com, wang.liang82@zte.com.cn
+References: <201910250958273740534@zte.com.cn>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <365321df-2f66-95ef-4bf3-4e250f0a99a7@redhat.com>
-Date:   Fri, 25 Oct 2019 13:46:51 +0200
+Message-ID: <07bbeb02-e8fe-36d5-a761-402a48fe076f@redhat.com>
+Date:   Fri, 25 Oct 2019 14:02:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1572000874-28259-1-git-send-email-linmiaohe@huawei.com>
+In-Reply-To: <201910250958273740534@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks (but it likely won't be on git.kernel.org until after the
-end of KVM Forum, sorry about that).
+Queued, thanks.  It may not appear on git.kernel.org until after KVM
+Forum though.
 
 Paolo
 
-On 25/10/19 12:54, Miaohe Lin wrote:
-> The odd out jump label is really not needed. Get rid of
-> it by return true directly while r < 0 as suggested by
-> Paolo. This further lead to var changed being unused.
-> Remove it too.
+On 25/10/19 03:58, wang.yi59@zte.com.cn wrote:
+> Gentle Ping :)
 > 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+>> We get two warning when build kernel with W=1:
+>> arch/x86/kernel/kvm.c:872:6: warning: no previous prototype for ‘arch_haltpoll_enable’ [-Wmissing-prototypes]
+>> arch/x86/kernel/kvm.c:885:6: warning: no previous prototype for ‘arch_haltpoll_disable’ [-Wmissing-prototypes]
+>>
+>> Including the missing head file can fix this.
+>>
+>> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+>> ---
+>>  arch/x86/kernel/kvm.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+>> index e820568..32ef1ee 100644
+>> --- a/arch/x86/kernel/kvm.c
+>> +++ b/arch/x86/kernel/kvm.c
+>> @@ -33,6 +33,7 @@
+>>  #include <asm/apicdef.h>
+>>  #include <asm/hypervisor.h>
+>>  #include <asm/tlb.h>
+>> +#include <asm/cpuidle_haltpoll.h>
+>>
+>>  static int kvmapf = 1;
+> 
+> 
 > ---
->  arch/x86/kvm/x86.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ff395f812719..8b0d594a3b90 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -721,7 +721,6 @@ EXPORT_SYMBOL_GPL(load_pdptrs);
->  bool pdptrs_changed(struct kvm_vcpu *vcpu)
->  {
->  	u64 pdpte[ARRAY_SIZE(vcpu->arch.walk_mmu->pdptrs)];
-> -	bool changed = true;
->  	int offset;
->  	gfn_t gfn;
->  	int r;
-> @@ -738,11 +737,9 @@ bool pdptrs_changed(struct kvm_vcpu *vcpu)
->  	r = kvm_read_nested_guest_page(vcpu, gfn, pdpte, offset, sizeof(pdpte),
->  				       PFERR_USER_MASK | PFERR_WRITE_MASK);
->  	if (r < 0)
-> -		goto out;
-> -	changed = memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
-> -out:
-> +		return true;
->  
-> -	return changed;
-> +	return memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
->  }
->  EXPORT_SYMBOL_GPL(pdptrs_changed);
->  
+> Best wishes
+> Yi Wang
 > 
 
