@@ -2,86 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 886B5E5685
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 00:38:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EA6EE56F2
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 01:10:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbfJYWiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 18:38:11 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46961 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725947AbfJYWiL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 18:38:11 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n15so3976773wrw.13
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 15:38:10 -0700 (PDT)
+        id S1726365AbfJYXKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 19:10:47 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:36552 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725847AbfJYXKq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 19:10:46 -0400
+Received: by mail-io1-f68.google.com with SMTP id c16so4244238ioc.3
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 16:10:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=GpNdYRES46RfzpVIgTMPzZ6u6WQI6KIHaSlhSlcg/+c=;
-        b=nP/pCRtZWRmRbwvliYdbne/0SNnvV7eciXHvSzwf6ej+xiPAhBce+whNRUHKzzuJmo
-         KU66Q5yt5BadJw9WZ3Jphc2h5zEnk69onrGc7V0SvNOtd0YE59Ycd7GZY/R2TZ1eXTbP
-         nL+Dv0T7+TBk+LJ8DBSbygp98Dop/rPXsIvSwRS1EYaMwPIxkCOcYA5ZEM70BPGIxFCr
-         als20eTceaaglUveGBYgsiUEPf2+pyzF8xGt4UhX2aaTLYIkRTB8NcKIYk6Q3wyR4a7A
-         npMZVFMOuz0kVQA2pC7XirhUhIh1jrbrVYaH0TOq8pfim6CgNN1ivFypbtD8EIcZ+jop
-         x4hA==
+        d=sifive.com; s=google;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=Nw2n9QTFh5kHjw8cqYYhuXZ+PymsFnyOpi7WiO2JCuo=;
+        b=C5PVodu/0MW6W82UHHNT1HEG10+OYbI9GS0eNEymZeA/7BqJWFvlAA+UABDMo1KlR7
+         KhrSi65xovCBcBeJjja/4QdhiHUONlY1lP5QkiN5o2J5GQJLPXD1Oj8JVraZcMrbAQLv
+         wu4tYpl70lY6bVa7lvDZWBovLJFZXAWMu+lz218bMd5r2muD8k7oU6RF4Ygne7oUa/hE
+         /OTFHWPbXIDiGNKGAfEGzW/G6C/rLKsx5BqsoUAUA4yCcwN6oB4M6Brf8BPXkuzPaMa8
+         wgjcMQIqLnZEygzWAlhI/9oc3jcADO8k2c3cJHeawEqzK+d58qwFyAGx4sN/tXklxQ+1
+         qlQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=GpNdYRES46RfzpVIgTMPzZ6u6WQI6KIHaSlhSlcg/+c=;
-        b=OLn7DyTCfPbpB25T2IHutGMcBgpbFFqEVkoBXSDPeKm8FOPmLh1hBsLdJWfBfcYZYG
-         Z/2NjCbxCDy6B304BDjYBFW/9WsNoIOR3fkUSeGd4LrmH0E61ThhtQ7+x6X6zmqK8B1Q
-         s6t46a6pvq+Vh4nUnZUDBb17fFzwAoZnXIbBHSEH2KEG3EbAWKBHktk5p03saD9IKV27
-         Va4hfvb8auwyBAtcUyEzxj0HFZ3S/FB0wV+No7K60Rb+dcFk+2DTC8KHfHRRUgP3Iqty
-         rmWUrN+RPt/o3IaOl/beFqqTDPjIgYrwgK0imTCkttUgPzZ1/Yq60lnqF4PEXTTsSYzr
-         wOJg==
-X-Gm-Message-State: APjAAAXWmYGlTksDq4UU5KAhrcc2eNWfe1NQsYir1YgJbUEA9gWkPsRJ
-        riZY+ZutYrWybgB7YpTUVdQtX2NGi5kaa8I/Xbg=
-X-Google-Smtp-Source: APXvYqzb/b6nYKmoXsjVpQTdPTGBel4IlAd83tpNSlsSI6zNtSIL7EIkDcpVmIAZOBFdRmFS5g3aHVYb9GgxwuEoLhc=
-X-Received: by 2002:a5d:6651:: with SMTP id f17mr5205822wrw.175.1572043089481;
- Fri, 25 Oct 2019 15:38:09 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=Nw2n9QTFh5kHjw8cqYYhuXZ+PymsFnyOpi7WiO2JCuo=;
+        b=S2jYFQrCTs7RtS/pehwWZlInApgmYQtfQ0yKgVofB0dIJ/9CeO2PP1XfjCsz3bHS70
+         0X9A+p6mw5xx+4zKydUlmihsqjyQHn/suu5xy/AtfYTlpQyU6pYR4aI3Crc9AAl8oZG8
+         Cli2uklNIP7e3IVu+UvuueSNRiTQ4UFnMeOwtxPBj+zvOSLEkKLgLxESO9iJ9HhOf7qH
+         HQif6qxHtoVZxmeELUKVgrZ2g5XZW/870KqYJfobroyG7+mUunHjZ2vdzPbpa+tCV/7G
+         TuN0ztEtBLSuCqBwX8S/YFKeCO8H0UaE3Jp1QPOTdytxbt9sJUERk5l5RdYa90pbGYSX
+         mhHw==
+X-Gm-Message-State: APjAAAUpH5TqXZ0gZjcc9keYqEZQt61XFZEeKMfVTSYmVkfehgsiwnOR
+        +tTOrLa1CRRhu8j9otzVY3m5Xg==
+X-Google-Smtp-Source: APXvYqz9QtjxasedL+eeZEZOfOFKJkfn7+/rp0EGhSA9G0+osf8i+y4YZrwICvDdaAfSp7dhwzACWA==
+X-Received: by 2002:a5d:9dce:: with SMTP id 14mr2147247ioo.166.1572045045576;
+        Fri, 25 Oct 2019 16:10:45 -0700 (PDT)
+Received: from localhost ([64.62.168.194])
+        by smtp.gmail.com with ESMTPSA id j22sm375958iok.42.2019.10.25.16.10.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2019 16:10:44 -0700 (PDT)
+Date:   Fri, 25 Oct 2019 16:10:42 -0700 (PDT)
+From:   Paul Walmsley <paul.walmsley@sifive.com>
+X-X-Sender: paulw@viisi.sifive.com
+To:     Anup Patel <Anup.Patel@wdc.com>
+cc:     Palmer Dabbelt <palmer@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Anup Patel <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v9 00/22] KVM RISC-V Support
+In-Reply-To: <20191016160649.24622-1-anup.patel@wdc.com>
+Message-ID: <alpine.DEB.2.21.9999.1910251609500.12828@viisi.sifive.com>
+References: <20191016160649.24622-1-anup.patel@wdc.com>
+User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
 MIME-Version: 1.0
-Received: by 2002:a5d:44c4:0:0:0:0:0 with HTTP; Fri, 25 Oct 2019 15:38:08
- -0700 (PDT)
-Reply-To: kylieelizabethwatson2019@gmail.com
-From:   "Sgt,Kylie Elizabeth Watson" <alasanahmad200@gmail.com>
-Date:   Sat, 26 Oct 2019 03:08:08 +0430
-Message-ID: <CACLpcxyYa+_2bjPw++MJ58iHZ9bRcVYrA+ba84Pry0Sy_hn3cQ@mail.gmail.com>
-Subject: Assist Request From You
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Accept my greetings to you
+Hi Anup,
 
-Assist Request From You
+On Wed, 16 Oct 2019, Anup Patel wrote:
 
-I am 28 years old single an orphan my parents died when I am five
-years old nobody to help me,I send you my business proposal with tears
-and sorrow,Please let this not be a surprised message to you because I
-decided to contact you on this magnitude and lucrative transaction for
-our present and future survival in life. Moreover, I have laid all the
-solemn trust in you before i decided to disclose this successful and
-confidential transaction to you.
+> This series adds initial KVM RISC-V support. Currently, we are able to boot
+> RISC-V 64bit Linux Guests with multiple VCPUs.
+> 
+> Few key aspects of KVM RISC-V added by this series are:
+> 1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
+> 2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
+> 3. KVM ONE_REG interface for VCPU register access from user-space.
+> 4. PLIC emulation is done in user-space.
+> 5. Timer and IPI emuation is done in-kernel.
+> 6. MMU notifiers supported.
+> 7. FP lazy save/restore supported.
+> 8. SBI v0.1 emulation for KVM Guest available.
+> 9. Forward unhandled SBI calls to KVM userspace.
+> 10. Hugepage support for Guest/VM
 
-I am  Kylie Elizabeth Watson ,I hope all is well with you? I am female
-soldier working as United Nations peace keeping troop in Afghanistan
-on war against terrorism. I have in my possession the sum of
-$3.5million USD Which I made here in Afghanistan 2014,I deposited this
-money with a Red Cross agent. I want you to stand as my beneficiary
-and receive the fund And keep it safe so that as soon as am through
-with my mission here in Afghanistan.
+Several patches in this series cause 'checkpatch.pl --strict' to flag 
+issues.  When you respin this series, could you fix those, please?
 
-You will assist me to invest it in a good profitable Venture or you
-keep it for me until I arrive your country, I will give You 40% of the
-total money for your assistance after you have receive The money.
-Please reply back to me if you are willing to work with me so that I
-can send you the information where the money is been deposited, your
-urgent reply is needed in my email address below
-(kylieelizabethwatson2019@gmail.com) so i can send you more details.
 
-Thank Yours
-Sgt,Kylie Elizabeth Watson
+thanks,
+
+- Paul
