@@ -2,143 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71131E491B
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 13:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C20B7E49AC
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 13:16:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409888AbfJYLAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 07:00:14 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:63656 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407262AbfJYLAN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 07:00:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1572001212; x=1603537212;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=V2Jn6XbW2xiy/TKvBN/MhcDOh1lT8VoZ3oiAsRp4Qec=;
-  b=t+mXo8NEhQTlK7gqorxjxlDjsxePt7mRt1us/oPcOPthLAunNuIo7GiB
-   31Jn/42v9Zh5xcCCFYO2EQ4ddirp0lUD8nRHWm1MGSZx0atydkJykiwg1
-   XBTg5IQehzZjXQ9QfyIaEupoDADeJqcbylZKO+4jk9UoBBNNnW7XSwHDj
-   Q=;
-IronPort-SDR: 0cbJVlmODRDZWjkXv7NNGIs8qa04HoihJeofI/kE+OhOKykhynD7SkvXm6qFZ27cdzp8xGR33L
- y8FbXnn7d6zw==
-X-IronPort-AV: E=Sophos;i="5.68,228,1569283200"; 
-   d="scan'208";a="79873"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 25 Oct 2019 11:00:10 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
-        by email-inbound-relay-2c-6f38efd9.us-west-2.amazon.com (Postfix) with ESMTPS id 0BE87A0172;
-        Fri, 25 Oct 2019 11:00:09 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 25 Oct 2019 11:00:09 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.162.16) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 25 Oct 2019 11:00:05 +0000
-Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>
-References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
- <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
-Date:   Fri, 25 Oct 2019 13:00:03 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
+        id S2439207AbfJYLQq convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 25 Oct 2019 07:16:46 -0400
+Received: from mga18.intel.com ([134.134.136.126]:47728 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727283AbfJYLQq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 07:16:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 04:16:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,228,1569308400"; 
+   d="scan'208";a="210693430"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga002.jf.intel.com with ESMTP; 25 Oct 2019 04:16:45 -0700
+Received: from fmsmsx112.amr.corp.intel.com (10.18.116.6) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 04:16:45 -0700
+Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
+ FMSMSX112.amr.corp.intel.com (10.18.116.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 25 Oct 2019 04:16:44 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.166]) by
+ shsmsx102.ccr.corp.intel.com ([169.254.2.176]) with mapi id 14.03.0439.000;
+ Fri, 25 Oct 2019 19:16:43 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>
+CC:     "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Topic: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Thread-Index: AQHVimn7Rf6XEKLwVUSEQeOMJH4V9adqnLmAgACUdcA=
+Date:   Fri, 25 Oct 2019 11:16:42 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0D7BD8@SHSMSX104.ccr.corp.intel.com>
+References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
+ <1571919983-3231-3-git-send-email-yi.l.liu@intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D5D05D5@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D5D05D5@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Originating-IP: [10.43.162.16]
-X-ClientProxiedBy: EX13D16UWC002.ant.amazon.com (10.43.162.161) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiN2U1MGIzZmQtNTFmNy00YWY0LThlZGQtZjcxNzFhYWRkMzNjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiVHFmdkM4Q1ZsaWRGbG1kQWlTd1c3eTU1ZzRcLzhCcFZJZjBhMVg4c09DWFV2eWtcL3VTNjJWbGtRQ2xyRTNlb1dFIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTcuMDkuMTkgMTc6MTQsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4gT24gMjcvMDgvMTkgMjM6
-NDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6Cj4+IFJld29yayB0aGUgZW11bGF0b3IgYW5k
-IGl0cyB1c2VycyB0byBoYW5kbGUgZmFpbHVyZSBzY2VuYXJpb3MgZW50aXJlbHkKPj4gd2l0aGlu
-IHRoZSBlbXVsYXRvci4KPj4KPj4ge3g4Nixrdm19X2VtdWxhdGVfaW5zdHJ1Y3Rpb24oKSBjdXJy
-ZW50bHkgcmV0dXJucyBhIHRyaS1zdGF0ZSB2YWx1ZSB0bwo+PiBpbmRpY2F0ZSBzdWNjZXNzL2Nv
-bnRpbnVlLCB1c2Vyc3BhY2UgZXhpdCBuZWVkZWQsIGFuZCBmYWlsdXJlLiAgVGhlCj4+IGludGVu
-dCBvZiByZXR1cm5pbmcgRU1VTEFURV9GQUlMIGlzIHRvIGxldCB0aGUgY2FsbGVyIGhhbmRsZSBm
-YWlsdXJlIGluCj4+IGEgbWFubmVyIHRoYXQgaXMgYXBwcm9wcmlhdGUgZm9yIHRoZSBjdXJyZW50
-IGNvbnRleHQuICBJbiBwcmFjdGljZSwKPj4gdGhlIGVtdWxhdG9yIGhhcyBlbmRlZCB1cCB3aXRo
-IGEgbWl4dHVyZSBvZiBmYWlsdXJlIGhhbmRsaW5nLCBpLmUuCj4+IHdoZXRoZXIgb3Igbm90IHRo
-ZSBlbXVsYXRvciB0YWtlcyBhY3Rpb24gb24gZmFpbHVyZSBpcyBkZXBlbmRlbnQgb24gdGhlCj4+
-IHNwZWNpZmljIGZsYXZvciBvZiBlbXVsYXRpb24uCj4+Cj4+IFRoZSBtaXhlZCBoYW5kbGluZyBo
-YXMgcHJvdmVuIHRvIGJlIHJhdGhlciBmcmFnaWxlLCBlLmcuIG1hbnkgZmxvd3MKPj4gaW5jb3Jy
-ZWN0bHkgYXNzdW1lIHRoZWlyIHNwZWNpZmljIGZsYXZvciBvZiBlbXVsYXRpb24gY2Fubm90IGZh
-aWwgb3IKPj4gdGhhdCB0aGUgZW11bGF0b3Igc2V0cyBzdGF0ZSB0byByZXBvcnQgdGhlIGZhaWx1
-cmUgYmFjayB0byB1c2Vyc3BhY2UuCj4+Cj4+IE1vdmUgZXZlcnl0aGluZyBpbnNpZGUgdGhlIGVt
-dWxhdG9yLCBwaWVjZSBieSBwaWVjZSwgc28gdGhhdCB0aGUKPj4gZW11bGF0aW9uIHJvdXRpbmVz
-IGNhbiByZXR1cm4gJzAnIGZvciBleGl0IHRvIHVzZXJzcGFjZSBhbmQgJzEnIGZvcgo+PiByZXN1
-bWUgdGhlIGd1ZXN0LCBqdXN0IGxpa2UgZXZlcnkgb3RoZXIgVk0tRXhpdCBoYW5kbGVyLgo+Pgo+
-PiBQYXRjaCAxMy8xNCBpcyBhIHRhbmdlbnRpYWxseSByZWxhdGVkIGJ1ZyBmaXggdGhhdCBjb25m
-bGljdHMgaGVhdmlseSB3aXRoCj4+IHRoaXMgc2VyaWVzLCBzbyBJIHRhY2tlZCBpdCBvbiBoZXJl
-Lgo+Pgo+PiBQYXRjaCAxNC8xNCBkb2N1bWVudHMgdGhlIGVtdWxhdGlvbiB0eXBlcy4gIEkgYWRk
-ZWQgaXQgYXMgYSBzZXBhcmF0ZQo+PiBwYXRjaCBhdCB0aGUgdmVyeSBlbmQgc28gdGhhdCB0aGUg
-Y29tbWVudHMgY291bGQgcmVmZXJlbmNlIHRoZSBmaW5hbAo+PiBzdGF0ZSBvZiB0aGUgY29kZSBi
-YXNlLCBlLmcuIGluY29ycG9yYXRlIHRoZSBydWxlIGNoYW5nZSBmb3IgdXNpbmcKPj4gRU1VTFRZ
-UEVfU0tJUCB0aGF0IGlzIGludHJvZHVjZWQgaW4gcGF0Y2ggMTMvMTQuCj4+Cj4+IHYxOgo+PiAg
-ICAtIGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvY292ZXIvMTExMTAzMzEvCj4+Cj4+IHYy
-Ogo+PiAgICAtIENvbGxlY3QgcmV2aWV3cy4gW1ZpdGFseSBhbmQgTGlyYW5dCj4+ICAgIC0gU3F1
-YXNoIFZNd2FyZSBlbXVsdHlwZSBjaGFuZ2VzIGludG8gYSBzaW5nbGUgcGF0Y2guIFtMaXJhbl0K
-Pj4gICAgLSBBZGQgY29tbWVudHMgaW4gVk1YL1NWTSBmb3IgVk13YXJlICNHUCBoYW5kbGluZy4g
-W1ZpdGFseV0KPj4gICAgLSBUYWNrIG9uIHRoZSBFUFQgbWlzY29uZmlnIGJ1ZyBmaXguCj4+ICAg
-IC0gQWRkIGEgcGF0Y2ggdG8gY29tbWVudC9kb2N1bWVudCB0aGUgZW11bHR5cGVzLiBbTGlyYW5d
-Cj4+Cj4+IFNlYW4gQ2hyaXN0b3BoZXJzb24gKDE0KToKPj4gICAgS1ZNOiB4ODY6IFJlbG9jYXRl
-IE1NSU8gZXhpdCBzdGF0cyBjb3VudGluZwo+PiAgICBLVk06IHg4NjogQ2xlYW4gdXAgaGFuZGxl
-X2VtdWxhdGlvbl9mYWlsdXJlKCkKPj4gICAgS1ZNOiB4ODY6IFJlZmFjdG9yIGt2bV92Y3B1X2Rv
-X3NpbmdsZXN0ZXAoKSB0byByZW1vdmUgb3V0IHBhcmFtCj4+ICAgIEtWTTogeDg2OiBEb24ndCBh
-dHRlbXB0IFZNV2FyZSBlbXVsYXRpb24gb24gI0dQIHdpdGggbm9uLXplcm8gZXJyb3IKPj4gICAg
-ICBjb2RlCj4+ICAgIEtWTTogeDg2OiBNb3ZlICNHUCBpbmplY3Rpb24gZm9yIFZNd2FyZSBpbnRv
-IHg4Nl9lbXVsYXRlX2luc3RydWN0aW9uKCkKPj4gICAgS1ZNOiB4ODY6IEFkZCBleHBsaWNpdCBm
-bGFnIGZvciBmb3JjZWQgZW11bGF0aW9uIG9uICNVRAo+PiAgICBLVk06IHg4NjogTW92ZSAjVUQg
-aW5qZWN0aW9uIGZvciBmYWlsZWQgZW11bGF0aW9uIGludG8gZW11bGF0aW9uIGNvZGUKPj4gICAg
-S1ZNOiB4ODY6IEV4aXQgdG8gdXNlcnNwYWNlIG9uIGVtdWxhdGlvbiBza2lwIGZhaWx1cmUKPj4g
-ICAgS1ZNOiB4ODY6IEhhbmRsZSBlbXVsYXRpb24gZmFpbHVyZSBkaXJlY3RseSBpbiBrdm1fdGFz
-a19zd2l0Y2goKQo+PiAgICBLVk06IHg4NjogTW92ZSB0cmlwbGUgZmF1bHQgcmVxdWVzdCBpbnRv
-IFJNIGludCBpbmplY3Rpb24KPj4gICAgS1ZNOiBWTVg6IFJlbW92ZSBFTVVMQVRFX0ZBSUwgaGFu
-ZGxpbmcgaW4gaGFuZGxlX2ludmFsaWRfZ3Vlc3Rfc3RhdGUoKQo+PiAgICBLVk06IHg4NjogUmVt
-b3ZlIGVtdWxhdGlvbl9yZXN1bHQgZW51bXMsIEVNVUxBVEVfe0RPTkUsRkFJTCxVU0VSX0VYSVR9
-Cj4+ICAgIEtWTTogVk1YOiBIYW5kbGUgc2luZ2xlLXN0ZXAgI0RCIGZvciBFTVVMVFlQRV9TS0lQ
-IG9uIEVQVCBtaXNjb25maWcKPj4gICAgS1ZNOiB4ODY6IEFkZCBjb21tZW50cyB0byBkb2N1bWVu
-dCB2YXJpb3VzIGVtdWxhdGlvbiB0eXBlcwo+Pgo+PiAgIGFyY2gveDg2L2luY2x1ZGUvYXNtL2t2
-bV9ob3N0LmggfCAgNDAgKysrKysrKy0tCj4+ICAgYXJjaC94ODYva3ZtL21tdS5jICAgICAgICAg
-ICAgICB8ICAxNiArLS0tCj4+ICAgYXJjaC94ODYva3ZtL3N2bS5jICAgICAgICAgICAgICB8ICA2
-MiArKysrKystLS0tLS0tLQo+PiAgIGFyY2gveDg2L2t2bS92bXgvdm14LmMgICAgICAgICAgfCAx
-NDcgKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0KPj4gICBhcmNoL3g4Ni9rdm0veDg2
-LmMgICAgICAgICAgICAgIHwgMTMzICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tCj4+ICAg
-YXJjaC94ODYva3ZtL3g4Ni5oICAgICAgICAgICAgICB8ICAgMiArLQo+PiAgIDYgZmlsZXMgY2hh
-bmdlZCwgMTk1IGluc2VydGlvbnMoKyksIDIwNSBkZWxldGlvbnMoLSkKPj4KPiAKPiBRdWV1ZWQs
-IHRoYW5rcyAoYSBjb3VwbGUgY29uZmxpY3RzIGhhZCB0byBiZSBzb3J0ZWQgb3V0LCBidXQgbm90
-aGluZwo+IHJlcXVpcmluZyBhIHJlc3BpbikuCgpVZ2gsIEkganVzdCBzdHVtYmxlZCBvdmVyIHRo
-aXMgY29tbWl0LiBJcyB0aGlzIHJlYWxseSB0aGUgcmlnaHQgCmRpcmVjdGlvbiB0byBtb3ZlIHRv
-d2FyZHM/CgpJIGFwcHJlY2lhdGUgdGhlIG1vdmUgdG8gcmVkdWNlIHRoZSBlbXVsYXRvciBsb2dp
-YyBmcm9tIHRoZSBtYW55LWZvbGQgCmVudW0gaW50byBhIHNpbXBsZSBiaW5hcnkgIndvcmtlZCIg
-b3IgIm5lZWRzIGEgdXNlciBzcGFjZSBleGl0Ii4gQnV0IGFyZSAKIjAiIGFuZCAiMSIgcmVhbGx5
-IHRoZSByaWdodCBuYW1lcyBmb3IgdGhhdD8gSSBmaW5kIHRoZSByZWFkYWJpbGl0eSBvZiAKdGhl
-IGN1cnJlbnQgaW50ZXJjZXB0IGhhbmRsZXJzIGJhZCBlbm91Z2gsIHRyaWNrbGluZyB0aGF0IGlu
-dG8gZXZlbiBtb3JlIApjb2RlIHNvdW5kcyBsaWtlIGEgc2l0dWF0aW9uIHRoYXQgd2lsbCBkZWNy
-ZWFzZSByZWFkYWJpbGl0eSBldmVuIG1vcmUuCgpXaHkgY2FuJ3Qgd2UganVzdCB1c2UgbmFtZXMg
-dGhyb3VnaG91dD8gU29tZXRoaW5nIGxpa2UKCmVudW0ga3ZtX3JldHVybiB7CiAgICAgS1ZNX1JF
-VF9VU0VSX0VYSVQgPSAwLAogICAgIEtWTV9SRVRfR1VFU1QgPSAxLAp9OwoKYW5kIHRoZW4gY29u
-c2lzdGVudGx5IHVzZSB0aGVtIGFzIHJldHVybiB2YWx1ZXM/IFRoYXQgd2F5IGFueW9uZSB3aG8g
-aGFzIApub3Qgd29ya2VkIG9uIGt2bSBiZWZvcmUgY2FuIHN0aWxsIG1ha2Ugc2Vuc2Ugb2YgdGhl
-IGNvZGUuCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
-cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
-U2NobGFlZ2VyLCBSYWxmIEhlcmJyaWNoCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0IENoYXJs
-b3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBERSAyODkg
-MjM3IDg3OQoKCg==
+Hi Kevin,
 
+> From: Tian, Kevin
+> Sent: Friday, October 25, 2019 6:06 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
+> Subject: RE: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
+> 
+> > From: Liu Yi L
+> > Sent: Thursday, October 24, 2019 8:26 PM
+> >
+> > This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims to passdown
+> > PASID allocation/free request from the virtual iommu. This is required
+> > to get PASID managed in system-wide.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 114
+> > ++++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/vfio.h       |  25 +++++++++
+> >  2 files changed, 139 insertions(+)
+> >
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c
+> > b/drivers/vfio/vfio_iommu_type1.c index cd8d3a5..3d73a7d 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -2248,6 +2248,83 @@ static int vfio_cache_inv_fn(struct device
+> > *dev, void *data)
+> >  	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);  }
+> >
+> > +static int vfio_iommu_type1_pasid_alloc(struct vfio_iommu *iommu,
+> > +					 int min_pasid,
+> > +					 int max_pasid)
+> > +{
+> > +	int ret;
+> > +	ioasid_t pasid;
+> > +	struct mm_struct *mm = NULL;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > +		ret = -EINVAL;
+> > +		goto out_unlock;
+> > +	}
+> > +	mm = get_task_mm(current);
+> > +	/* Track ioasid allocation owner by mm */
+> below is purely allocation. Where does 'track' come to play?
+
+ioasid_set is kind of owner track. As allocation is separate with
+bind, here set the "owner" could be used to do sanity check when
+a pasid bind comes.
+
+> > +	pasid = ioasid_alloc((struct ioasid_set *)mm, min_pasid,
+> > +				max_pasid, NULL);
+> > +	if (pasid == INVALID_IOASID) {
+> > +		ret = -ENOSPC;
+> > +		goto out_unlock;
+> > +	}
+> > +	ret = pasid;
+> > +out_unlock:
+> > +	mutex_unlock(&iommu->lock);
+> > +	if (mm)
+> > +		mmput(mm);
+> > +	return ret;
+> > +}
+> > +
+> > +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu,
+> > +				       unsigned int pasid)
+> > +{
+> > +	struct mm_struct *mm = NULL;
+> > +	void *pdata;
+> > +	int ret = 0;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > +		ret = -EINVAL;
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	/**
+> > +	 * REVISIT:
+> > +	 * There are two cases free could fail:
+> > +	 * 1. free pasid by non-owner, we use ioasid_set to track mm, if
+> > +	 * the set does not match, caller is not permitted to free.
+> > +	 * 2. free before unbind all devices, we can check if ioasid private
+> > +	 * data, if data != NULL, then fail to free.
+> > +	 */
+> 
+> Does REVISIT mean that above comment is the right way but the code doesn't follow
+> yet, or the comment itself should be revisited?
+
+Sorry, it's a mistake... should be removed. It's added in the development phase
+for remind. Will remove it.
+
+> 
+> should we have some notification mechanism, so the guy who holds the reference to
+> the pasid can be notified to release its usage?
+
+Do you mean the ioasid itself to provide such a notification mechanism?
+
+Currently, we prevent pasid free before all user (iommu driver, guest) released
+their usage. This is achieved by checking the private data, in which there is
+a user_cnt of a pasid. e.g. struct intel_svm. A fresh guest pasid bind will allocate
+the private data. A second guest pasid bind will increase the user_cnt. guest pasid
+unbind decreases the user_cnt. The private data will be freed by the last guest
+pasid unbind. Do you think it is sufficient? or we may want to have a notification
+mechanism to allow such pasid free and keep the user updated?
+
+Thanks,
+Yi Liu
