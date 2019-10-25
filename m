@@ -2,233 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 618C8E46FF
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 11:21:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B59FE4794
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 11:42:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438379AbfJYJVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 05:21:20 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42309 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726389AbfJYJVU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Oct 2019 05:21:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571995278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8phOtogGp2hjHHsbOvvLJ37RndyQ/0HIf14DtfEUvNU=;
-        b=MqgBLdqDemm3iHVuArZl4MgBnD1FcIdg3M7psK10vmAv1r67Pp5nOwwe4qsY01OGb+XhwB
-        6Qp+UEjA/L9rofVY766c5XNO5mcaiYQWa0kDzyw/duX2+NNMnI6H1wct5/OvM9WJwfk7F1
-        kaH95XoT6joqiCUu6o/U1yH4hcLtZzY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-3DsX7h63OzGrr5p2x6GtaA-1; Fri, 25 Oct 2019 05:21:15 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2407894AbfJYJmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 05:42:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56958 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728813AbfJYJmv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 05:42:51 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E265E1800DFB;
-        Fri, 25 Oct 2019 09:21:13 +0000 (UTC)
-Received: from [10.36.116.205] (ovpn-116-205.ams2.redhat.com [10.36.116.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E05B60BF3;
-        Fri, 25 Oct 2019 09:21:05 +0000 (UTC)
-Subject: Re: [RFC 03/37] s390/protvirt: add ultravisor initialization
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-4-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <d0bc545a-fdbb-2aa9-4f0a-2e0ea1abce5b@redhat.com>
-Date:   Fri, 25 Oct 2019 11:21:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        by mx1.redhat.com (Postfix) with ESMTPS id 20DA9C057F20
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 09:42:51 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id o8so805162wmc.2
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 02:42:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Su5mUmgqqoSKIbW4drXCkRx6lRPLA56dSafb0hwckxU=;
+        b=fHhvXXDe2KBbYPrTlfzhLB0aEedqQwZw6OfiAgCMc79TJ1AQY9iJtvxOlN6o3eUy7X
+         5e268t4r1x6W7ARe063ulXrP8FDF/EdC528vTc7Hr1C3QdK85L34ikn2WRKi0gZvy9bs
+         C0XMi1hHGUyVGoZNCqBhqYrYvJng+4TOU/xU+WrvMJLCJs8GchXRs1/SAZGFHUrcckct
+         N4JXzMK+xHh6vt4+crBf/jtOHHw8tj7PdMVYTMZAAst68tQk73nJP41aiQtdm4yuUrvy
+         qc8A1uqEqIUKHD8dGNTz0BH7RpoYzlmtWrEnl6Hc3OdRchGWcS+afwLpljhOVwVM7ifm
+         Ntfw==
+X-Gm-Message-State: APjAAAW2Jf+aGYl093PFIxfXWQR9Cd8xPjKzsfjooEDxBZRJ7Rmers2l
+        hFNqxmPi8WHAM1HA/OQM1C0DTjwgSyWnYfQ/pTWu1TjcFifNH/XUldr93Ge0GjoXkwgItNurtkp
+        9XY5DZYmnV2WU
+X-Received: by 2002:a5d:6203:: with SMTP id y3mr2121334wru.142.1571996569676;
+        Fri, 25 Oct 2019 02:42:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw+TyMMcilll6N+0gfpVvf2epd/Br+KvMYhqCFFBhyze59q+zNxmdA4a3YGx9+9ftzm75BhtA==
+X-Received: by 2002:a5d:6203:: with SMTP id y3mr2121303wru.142.1571996569391;
+        Fri, 25 Oct 2019 02:42:49 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:302c:998e:a769:c583? ([2001:b07:6468:f312:302c:998e:a769:c583])
+        by smtp.gmail.com with ESMTPSA id w9sm1705905wrt.85.2019.10.25.02.42.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Oct 2019 02:42:48 -0700 (PDT)
+Subject: Re: [PATCH] KVM: avoid unnecessary bitmap clear ops
+To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1571970281-20083-1-git-send-email-linmiaohe@huawei.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <fcb852b8-d391-63d5-e0b6-558005481e45@redhat.com>
+Date:   Fri, 25 Oct 2019 11:42:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-4-frankja@linux.ibm.com>
+In-Reply-To: <1571970281-20083-1-git-send-email-linmiaohe@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 3DsX7h63OzGrr5p2x6GtaA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.10.19 13:40, Janosch Frank wrote:
-> From: Vasily Gorbik <gor@linux.ibm.com>
->=20
-> Before being able to host protected virtual machines, donate some of
-> the memory to the ultravisor. Besides that the ultravisor might impose
-> addressing limitations for memory used to back protected VM storage. Trea=
-t
-> that limit as protected virtualization host's virtual memory limit.
->=20
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-> ---
->   arch/s390/include/asm/uv.h | 16 ++++++++++++
->   arch/s390/kernel/setup.c   |  3 +++
->   arch/s390/kernel/uv.c      | 53 ++++++++++++++++++++++++++++++++++++++
->   3 files changed, 72 insertions(+)
->=20
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 6db1bc495e67..82a46fb913e7 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -23,12 +23,14 @@
->   #define UVC_RC_NO_RESUME=090x0007
->  =20
->   #define UVC_CMD_QUI=09=09=090x0001
-> +#define UVC_CMD_INIT_UV=09=09=090x000f
->   #define UVC_CMD_SET_SHARED_ACCESS=090x1000
->   #define UVC_CMD_REMOVE_SHARED_ACCESS=090x1001
->  =20
->   /* Bits in installed uv calls */
->   enum uv_cmds_inst {
->   =09BIT_UVC_CMD_QUI =3D 0,
-> +=09BIT_UVC_CMD_INIT_UV =3D 1,
->   =09BIT_UVC_CMD_SET_SHARED_ACCESS =3D 8,
->   =09BIT_UVC_CMD_REMOVE_SHARED_ACCESS =3D 9,
->   };
-> @@ -59,6 +61,15 @@ struct uv_cb_qui {
->   =09u64 reserved98;
->   } __packed __aligned(8);
->  =20
-> +struct uv_cb_init {
-> +=09struct uv_cb_header header;
-> +=09u64 reserved08[2];
-> +=09u64 stor_origin;
-> +=09u64 stor_len;
-> +=09u64 reserved28[4];
-> +
-> +} __packed __aligned(8);
-> +
->   struct uv_cb_share {
->   =09struct uv_cb_header header;
->   =09u64 reserved08[3];
-> @@ -158,8 +169,13 @@ static inline int is_prot_virt_host(void)
->   {
->   =09return prot_virt_host;
->   }
-> +
-> +void setup_uv(void);
-> +void adjust_to_uv_max(unsigned long *vmax);
->   #else
->   #define is_prot_virt_host() 0
-> +static inline void setup_uv(void) {}
-> +static inline void adjust_to_uv_max(unsigned long *vmax) {}
->   #endif
->  =20
->   #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) ||                  =
-        \
-> diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
-> index f36370f8af38..d29d83c0b8df 100644
-> --- a/arch/s390/kernel/setup.c
-> +++ b/arch/s390/kernel/setup.c
-> @@ -567,6 +567,8 @@ static void __init setup_memory_end(void)
->   =09=09=09vmax =3D _REGION1_SIZE; /* 4-level kernel page table */
->   =09}
->  =20
-> +=09adjust_to_uv_max(&vmax);
+On 25/10/19 04:24, Miaohe Lin wrote:
+> When set one bit in bitmap, there is no need to
+> clear it before.
 
-I do wonder what would happen if vmax < max_physmem_end. Not sure if=20
-that is relevant at all.
+Hi,
 
-> +
->   =09/* module area is at the end of the kernel address space. */
->   =09MODULES_END =3D vmax;
->   =09MODULES_VADDR =3D MODULES_END - MODULES_LEN;
-> @@ -1147,6 +1149,7 @@ void __init setup_arch(char **cmdline_p)
->   =09 */
->   =09memblock_trim_memory(1UL << (MAX_ORDER - 1 + PAGE_SHIFT));
->  =20
-> +=09setup_uv();
->   =09setup_memory_end();
->   =09setup_memory();
->   =09dma_contiguous_reserve(memory_end);
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index 35ce89695509..f7778493e829 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -45,4 +45,57 @@ static int __init prot_virt_setup(char *val)
->   =09return rc;
->   }
->   early_param("prot_virt", prot_virt_setup);
-> +
-> +static int __init uv_init(unsigned long stor_base, unsigned long stor_le=
-n)
-> +{
-> +=09struct uv_cb_init uvcb =3D {
-> +=09=09.header.cmd =3D UVC_CMD_INIT_UV,
-> +=09=09.header.len =3D sizeof(uvcb),
-> +=09=09.stor_origin =3D stor_base,
-> +=09=09.stor_len =3D stor_len,
-> +=09};
-> +=09int cc;
-> +
-> +=09cc =3D uv_call(0, (uint64_t)&uvcb);
-> +=09if (cc || uvcb.header.rc !=3D UVC_RC_EXECUTED) {
-> +=09=09pr_err("Ultravisor init failed with cc: %d rc: 0x%hx\n", cc,
-> +=09=09       uvcb.header.rc);
-> +=09=09return -1;
-> +=09}
-> +=09return 0;
-> +}
-> +
-> +void __init setup_uv(void)
-> +{
-> +=09unsigned long uv_stor_base;
-> +
-> +=09if (!prot_virt_host)
-> +=09=09return;
-> +
-> +=09uv_stor_base =3D (unsigned long)memblock_alloc_try_nid(
-> +=09=09uv_info.uv_base_stor_len, SZ_1M, SZ_2G,
-> +=09=09MEMBLOCK_ALLOC_ACCESSIBLE, NUMA_NO_NODE);
-> +=09if (!uv_stor_base) {
-> +=09=09pr_info("Failed to reserve %lu bytes for ultravisor base storage\n=
-",
-> +=09=09=09uv_info.uv_base_stor_len);
-> +=09=09goto fail;
-> +=09}
+in general the Linux coding style prefers:
 
-If I'm not wrong, we could setup/reserve a CMA area here and defer the=20
-actual allocation. Then, any MOVABLE data can end up on this CMA area=20
-until needed.
+	a = x;
+	if (...);
+		a = y;
 
-But I am neither an expert on CMA nor on UV, so most probably what I say=20
-is wrong ;)
+to
 
-> +
-> +=09if (uv_init(uv_stor_base, uv_info.uv_base_stor_len)) {
-> +=09=09memblock_free(uv_stor_base, uv_info.uv_base_stor_len);
-> +=09=09goto fail;
-> +=09}
-> +
-> +=09pr_info("Reserving %luMB as ultravisor base storage\n",
-> +=09=09uv_info.uv_base_stor_len >> 20);
-> +=09return;
-> +fail:
-> +=09prot_virt_host =3D 0;
-> +}
-> +
-> +void adjust_to_uv_max(unsigned long *vmax)
-> +{
-> +=09if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
-> +=09=09*vmax =3D uv_info.max_sec_stor_addr;
-> +}
->   #endif
->=20
+	if (...)
+		a = y;
+	else
+		a = x;
 
-Looks good to me from what I can tell.
-
---=20
+which is why these lines were written this way.
 
 Thanks,
 
-David / dhildenb
+Paolo
+
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/svm.c | 3 ++-
+>  arch/x86/kvm/x86.c | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index ca200b50cde4..d997d011a942 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -2044,9 +2044,10 @@ static void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
+>  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
+>  
+> -	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+>  	if (svm->avic_is_running)
+>  		entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+> +	else
+> +		entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+>  
+>  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+>  	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ff395f812719..9b535888ea90 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1036,9 +1036,10 @@ static void kvm_update_dr7(struct kvm_vcpu *vcpu)
+>  	else
+>  		dr7 = vcpu->arch.dr7;
+>  	kvm_x86_ops->set_dr7(vcpu, dr7);
+> -	vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_BP_ENABLED;
+>  	if (dr7 & DR7_BP_EN_MASK)
+>  		vcpu->arch.switch_db_regs |= KVM_DEBUGREG_BP_ENABLED;
+> +	else
+> +		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_BP_ENABLED;
+>  }
+>  
+>  static u64 kvm_dr6_fixed(struct kvm_vcpu *vcpu)
+> 
 
