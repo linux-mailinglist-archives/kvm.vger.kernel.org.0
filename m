@@ -2,105 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15006E4AAB
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 14:02:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7635E4ADC
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 14:16:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503976AbfJYMCX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 08:02:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58214 "EHLO mx1.redhat.com"
+        id S2504417AbfJYMQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 08:16:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51366 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729969AbfJYMCX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 08:02:23 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        id S2504370AbfJYMQf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 08:16:35 -0400
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1648D4E8AC
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 12:02:23 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id a81so1019207wma.4
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 05:02:23 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id B11D4C049E17
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 12:16:34 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id n34so1840604qta.12
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 05:16:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nhnGjNYl34BBej/G9IX/zdJYT44shCWthBnaow9hDa0=;
-        b=oLWKwRW1Mbzt4UcIp8Oq5lNDag9MlKvXWweTY3QGOu0L8sC39i1Lo92PCdRiZSJOUV
-         lc0xX1GnsT4FFNNeTOJwfjOdK7O5xp5W8vxtWw7c+zYzHP38CzxsZ49oHZFdVOuQAa1f
-         Ns8sNCi1glSTv+vuthZKUMOpV+ftoXmdiMczBzd1FKiSJlhPxsv8b8VVCwxH0NitefL2
-         c1ghQMeWdeNsVTTD+QIrfeIQYXpDL4ALf9HfkqM6ZNDFhJrXq3rVI2reQEruNIVFjuAk
-         AHEyaI0UbVxphKwruJ6kmQ3MllUlXV9gNWmeRHcbkvtGYrnPal162L1nSQBZsYFepWcR
-         2a8Q==
-X-Gm-Message-State: APjAAAX5EXCe5bhw2v6ev1BD7GVHKi/rlDJOD8/IBn8IkryrwL40V3Ni
-        rWk18Kj9nIENPKuF68MWYTRxCpTonvsMrAetB7kaOXR4TH8pUNjjK7uKu7GBSuuhd47oIA9Npa1
-        2YiiL6cyUmKoE
-X-Received: by 2002:a1c:9847:: with SMTP id a68mr3155401wme.18.1572004941656;
-        Fri, 25 Oct 2019 05:02:21 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxwsMVOR60a0YiZNHpidmA8uSmWVIC5eakJiKfRUewwkkwxWAf6JFvuj/ZwuF4qfke5tp78TQ==
-X-Received: by 2002:a1c:9847:: with SMTP id a68mr3155367wme.18.1572004941369;
-        Fri, 25 Oct 2019 05:02:21 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:9c7b:17ec:2a40:d29? ([2001:b07:6468:f312:9c7b:17ec:2a40:d29])
-        by smtp.gmail.com with ESMTPSA id 79sm2637628wmb.7.2019.10.25.05.02.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Oct 2019 05:02:20 -0700 (PDT)
-Subject: Re: [PATCH] x86/kvm: Fix -Wmissing-prototypes warnings
-To:     wang.yi59@zte.com.cn, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        up2wing@gmail.com, wang.liang82@zte.com.cn
-References: <201910250958273740534@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <07bbeb02-e8fe-36d5-a761-402a48fe076f@redhat.com>
-Date:   Fri, 25 Oct 2019 14:02:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=lDtOQyoiNI8iBD+BJV41nuz3/0N81N8+l8LN/u4t5zU=;
+        b=hHfza8ji6JE2muHxwKZRGm4SGBe5jLLCgOfSETt/cigaZW0uvokasHFF+g7XjqexRK
+         OSK2vlAZOI/RU9tTWgI6oyDSY+KCATiaxS86UWzMhyv8IH14UnfOh9CnwoVcOC8LLwLb
+         g7++fGf1+LQ9FyRWG9MaYAh+nFhNuNrN3SZDa4KGaz8xc0Q8bmYtjUHn0dMWLJydMXgp
+         0jagwupCYoENPh0qHK83WC1PpL2tm0MbA8KZyGiV9S1RXjOjslEftWgIY+F1A0pyC+XC
+         lSci8xYTJRLICsHoQZyaV2KtooFwAKfrcfueFU75h7HwZkJpRRLX6A0IBSlqsgqsZ22k
+         i9TQ==
+X-Gm-Message-State: APjAAAVOcabg8yPHRDN2w39r7HoEftaUabcaAqZtv80cVwihoGtjJL/l
+        YBWFnlUHRuje11g0iVuBhSS7t9AfGlzzpXM/KYjTIlCVaynvcO+ImEoTCkVz25PPwcUCIaj5q/A
+        gEx78KtgeWR8I
+X-Received: by 2002:ac8:1109:: with SMTP id c9mr2661813qtj.10.1572005794008;
+        Fri, 25 Oct 2019 05:16:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwK3+y0bW2iZzlHnWckL9qOZZ46Wovnc/341JCURY96Ut9tQ0zB6Sv5xfgv85VGvBF7MyqL9g==
+X-Received: by 2002:ac8:1109:: with SMTP id c9mr2661774qtj.10.1572005793671;
+        Fri, 25 Oct 2019 05:16:33 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id s21sm1555600qtc.12.2019.10.25.05.16.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2019 05:16:32 -0700 (PDT)
+Date:   Fri, 25 Oct 2019 08:16:26 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Tiwei Bie <tiwei.bie@intel.com>, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
+Message-ID: <20191025080143-mutt-send-email-mst@kernel.org>
+References: <20191023070747.GA30533@___>
+ <106834b5-dae5-82b2-0f97-16951709d075@redhat.com>
+ <20191023101135.GA6367@___>
+ <5a7bc5da-d501-2750-90bf-545dd55f85fa@redhat.com>
+ <20191024042155.GA21090@___>
+ <d37529e1-5147-bbe5-cb9d-299bd6d4aa1a@redhat.com>
+ <d4cc4f4e-2635-4041-2f68-cd043a97f25a@redhat.com>
+ <20191024091839.GA17463@___>
+ <fefc82a3-a137-bc03-e1c3-8de79b238080@redhat.com>
+ <e7e239ba-2461-4f8d-7dd7-0f557ac7f4bf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <201910250958273740534@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e7e239ba-2461-4f8d-7dd7-0f557ac7f4bf@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Queued, thanks.  It may not appear on git.kernel.org until after KVM
-Forum though.
+On Fri, Oct 25, 2019 at 05:54:55PM +0800, Jason Wang wrote:
+> 
+> On 2019/10/24 下午6:42, Jason Wang wrote:
+> > 
+> > Yes.
+> > 
+> > 
+> > >   And we should try to avoid
+> > > putting ctrl vq and Rx/Tx vqs in the same DMA space to prevent
+> > > guests having the chance to bypass the host (e.g. QEMU) to
+> > > setup the backend accelerator directly.
+> > 
+> > 
+> > That's really good point.  So when "vhost" type is created, parent
+> > should assume addr of ctrl_vq is hva.
+> > 
+> > Thanks
+> 
+> 
+> This works for vhost but not virtio since there's no way for virtio kernel
+> driver to differ ctrl_vq with the rest when doing DMA map. One possible
+> solution is to provide DMA domain isolation between virtqueues. Then ctrl vq
+> can use its dedicated DMA domain for the work.
+> 
+> Anyway, this could be done in the future. We can have a version first that
+> doesn't support ctrl_vq.
+> 
+> Thanks
 
-Paolo
+Well no ctrl_vq implies either no offloads, or no XDP (since XDP needs
+to disable offloads dynamically).
 
-On 25/10/19 03:58, wang.yi59@zte.com.cn wrote:
-> Gentle Ping :)
-> 
->> We get two warning when build kernel with W=1:
->> arch/x86/kernel/kvm.c:872:6: warning: no previous prototype for ‘arch_haltpoll_enable’ [-Wmissing-prototypes]
->> arch/x86/kernel/kvm.c:885:6: warning: no previous prototype for ‘arch_haltpoll_disable’ [-Wmissing-prototypes]
->>
->> Including the missing head file can fix this.
->>
->> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
->> ---
->>  arch/x86/kernel/kvm.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index e820568..32ef1ee 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -33,6 +33,7 @@
->>  #include <asm/apicdef.h>
->>  #include <asm/hypervisor.h>
->>  #include <asm/tlb.h>
->> +#include <asm/cpuidle_haltpoll.h>
->>
->>  static int kvmapf = 1;
-> 
-> 
-> ---
-> Best wishes
-> Yi Wang
-> 
+        if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)
+            && (virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
+                virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO6) ||
+                virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ECN) ||
+                virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_UFO) ||
+                virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_CSUM))) {
+                NL_SET_ERR_MSG_MOD(extack, "Can't set XDP while host is implementing LRO/CSUM, disable LRO/CSUM first");
+                return -EOPNOTSUPP;
+        }
 
+neither is very attractive.
+
+So yes ok just for development but we do need to figure out how it will
+work down the road in production.
+
+So really this specific virtio net device does not support control vq,
+instead it supports a different transport specific way to send commands
+to device.
+
+Some kind of extension to the transport? Ideas?
+
+
+-- 
+MST
