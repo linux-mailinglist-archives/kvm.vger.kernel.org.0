@@ -2,93 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE31E567D
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 00:29:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 886B5E5685
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 00:38:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbfJYW3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 18:29:12 -0400
-Received: from mga07.intel.com ([134.134.136.100]:25993 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726388AbfJYW3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 18:29:12 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 15:29:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,230,1569308400"; 
-   d="scan'208";a="201943372"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga003.jf.intel.com with ESMTP; 25 Oct 2019 15:29:11 -0700
-Date:   Fri, 25 Oct 2019 15:29:11 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        John Sperbeck <jsperbeck@google.com>,
-        Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v3 3/3] kvm: call kvm_arch_destroy_vm if vm creation fails
-Message-ID: <20191025222911.GA24952@linux.intel.com>
-References: <20191024230327.140935-1-jmattson@google.com>
- <20191024230327.140935-4-jmattson@google.com>
- <20191024232943.GJ28043@linux.intel.com>
- <48109ee1-f204-b7d4-6c4f-458b59f7c428@redhat.com>
- <20191025144848.GA17290@linux.intel.com>
- <7fa85679-7325-4373-55a1-bb2cd274fec3@redhat.com>
- <20191025152201.GD17290@linux.intel.com>
- <637f0a19-e182-ed58-9fc2-0556a9a37be5@redhat.com>
+        id S1726063AbfJYWiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 18:38:11 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46961 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725947AbfJYWiL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 18:38:11 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n15so3976773wrw.13
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 15:38:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=GpNdYRES46RfzpVIgTMPzZ6u6WQI6KIHaSlhSlcg/+c=;
+        b=nP/pCRtZWRmRbwvliYdbne/0SNnvV7eciXHvSzwf6ej+xiPAhBce+whNRUHKzzuJmo
+         KU66Q5yt5BadJw9WZ3Jphc2h5zEnk69onrGc7V0SvNOtd0YE59Ycd7GZY/R2TZ1eXTbP
+         nL+Dv0T7+TBk+LJ8DBSbygp98Dop/rPXsIvSwRS1EYaMwPIxkCOcYA5ZEM70BPGIxFCr
+         als20eTceaaglUveGBYgsiUEPf2+pyzF8xGt4UhX2aaTLYIkRTB8NcKIYk6Q3wyR4a7A
+         npMZVFMOuz0kVQA2pC7XirhUhIh1jrbrVYaH0TOq8pfim6CgNN1ivFypbtD8EIcZ+jop
+         x4hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=GpNdYRES46RfzpVIgTMPzZ6u6WQI6KIHaSlhSlcg/+c=;
+        b=OLn7DyTCfPbpB25T2IHutGMcBgpbFFqEVkoBXSDPeKm8FOPmLh1hBsLdJWfBfcYZYG
+         Z/2NjCbxCDy6B304BDjYBFW/9WsNoIOR3fkUSeGd4LrmH0E61ThhtQ7+x6X6zmqK8B1Q
+         s6t46a6pvq+Vh4nUnZUDBb17fFzwAoZnXIbBHSEH2KEG3EbAWKBHktk5p03saD9IKV27
+         Va4hfvb8auwyBAtcUyEzxj0HFZ3S/FB0wV+No7K60Rb+dcFk+2DTC8KHfHRRUgP3Iqty
+         rmWUrN+RPt/o3IaOl/beFqqTDPjIgYrwgK0imTCkttUgPzZ1/Yq60lnqF4PEXTTsSYzr
+         wOJg==
+X-Gm-Message-State: APjAAAXWmYGlTksDq4UU5KAhrcc2eNWfe1NQsYir1YgJbUEA9gWkPsRJ
+        riZY+ZutYrWybgB7YpTUVdQtX2NGi5kaa8I/Xbg=
+X-Google-Smtp-Source: APXvYqzb/b6nYKmoXsjVpQTdPTGBel4IlAd83tpNSlsSI6zNtSIL7EIkDcpVmIAZOBFdRmFS5g3aHVYb9GgxwuEoLhc=
+X-Received: by 2002:a5d:6651:: with SMTP id f17mr5205822wrw.175.1572043089481;
+ Fri, 25 Oct 2019 15:38:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <637f0a19-e182-ed58-9fc2-0556a9a37be5@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Received: by 2002:a5d:44c4:0:0:0:0:0 with HTTP; Fri, 25 Oct 2019 15:38:08
+ -0700 (PDT)
+Reply-To: kylieelizabethwatson2019@gmail.com
+From:   "Sgt,Kylie Elizabeth Watson" <alasanahmad200@gmail.com>
+Date:   Sat, 26 Oct 2019 03:08:08 +0430
+Message-ID: <CACLpcxyYa+_2bjPw++MJ58iHZ9bRcVYrA+ba84Pry0Sy_hn3cQ@mail.gmail.com>
+Subject: Assist Request From You
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 05:23:54PM +0200, Paolo Bonzini wrote:
-> On 25/10/19 17:22, Sean Christopherson wrote:
-> > On Fri, Oct 25, 2019 at 04:56:23PM +0200, Paolo Bonzini wrote:
-> >> On 25/10/19 16:48, Sean Christopherson wrote:
-> >>>> It seems to me that kvm_get_kvm() in 
-> >>>> kvm_arch_init_vm() should be okay as long as it is balanced in 
-> >>>> kvm_arch_destroy_vm().  So we can apply patch 2 first, and then:
-> >>> No, this will effectively leak the VM because you'll end up with a cyclical
-> >>> reference to kvm_put_kvm(), i.e. users_count will never hit zero.
-> >>>
-> >>> void kvm_put_kvm(struct kvm *kvm)
-> >>> {
-> >>> 	if (refcount_dec_and_test(&kvm->users_count))
-> >>> 		kvm_destroy_vm(kvm);
-> >>> 		|
-> >>> 		-> kvm_arch_destroy_vm()
-> >>> 		   |
-> >>> 		   -> kvm_put_kvm()
-> >>> }
-> >>
-> >> There's two parts to this:
-> >>
-> >> - if kvm_arch_init_vm() calls kvm_get_kvm(), then kvm_arch_destroy_vm()
-> >> won't be called until the corresponding kvm_put_kvm().
-> >>
-> >> - if the error case causes kvm_arch_destroy_vm() to be called early,
-> >> however, that'd be okay and would not leak memory, as long as
-> >> kvm_arch_destroy_vm() detects the situation and calls kvm_put_kvm() itself.
-> >>
-> >> One case could be where you have some kind of delayed work, where the
-> >> callback does kvm_put_kvm.  You'd have to cancel the work item and call
-> >> kvm_put_kvm in kvm_arch_destroy_vm, and you would go through that path
-> >> if kvm_create_vm() fails after kvm_arch_init_vm().
-> > 
-> > But do we really want/need to allow handing out references to KVM during
-> > kvm_arch_init_vm()?  AFAICT, it's not currently required by any arch.
-> 
-> Probably not, but the full code paths are long, so I don't see much
-> value in outright forbidding it.  There are very few kvm_get_kvm() calls
-> anyway in arch-dependent code, so it's easy to check that they're not
-> causing reference cycles.
+-- 
+Accept my greetings to you
 
-I wasn't thinking forbid it for all eternity, more like add a landmine to
-force an arch to implement more robust handling in order to enable
-kvm_get_kvm() during init_vm().
+Assist Request From You
+
+I am 28 years old single an orphan my parents died when I am five
+years old nobody to help me,I send you my business proposal with tears
+and sorrow,Please let this not be a surprised message to you because I
+decided to contact you on this magnitude and lucrative transaction for
+our present and future survival in life. Moreover, I have laid all the
+solemn trust in you before i decided to disclose this successful and
+confidential transaction to you.
+
+I am  Kylie Elizabeth Watson ,I hope all is well with you? I am female
+soldier working as United Nations peace keeping troop in Afghanistan
+on war against terrorism. I have in my possession the sum of
+$3.5million USD Which I made here in Afghanistan 2014,I deposited this
+money with a Red Cross agent. I want you to stand as my beneficiary
+and receive the fund And keep it safe so that as soon as am through
+with my mission here in Afghanistan.
+
+You will assist me to invest it in a good profitable Venture or you
+keep it for me until I arrive your country, I will give You 40% of the
+total money for your assistance after you have receive The money.
+Please reply back to me if you are willing to work with me so that I
+can send you the information where the money is been deposited, your
+urgent reply is needed in my email address below
+(kylieelizabethwatson2019@gmail.com) so i can send you more details.
+
+Thank Yours
+Sgt,Kylie Elizabeth Watson
