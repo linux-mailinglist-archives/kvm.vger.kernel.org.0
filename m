@@ -2,136 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1A04E4A3C
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 13:46:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9E96E4A45
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 13:47:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502063AbfJYLqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 07:46:04 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52392 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730088AbfJYLqE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 07:46:04 -0400
-Received: by mail-wm1-f66.google.com with SMTP id p21so1785710wmg.2;
-        Fri, 25 Oct 2019 04:46:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=ef0+hHhWKCL6Ca0t5L5+DnFrjs6xNw6+Odbfva8qwPs=;
-        b=MweLNAF2NZ7iEpk6wMj4PgBgpG0sqWOQGUnZ5/A9SGuzDzfVMXAN5EOmXw054lnilC
-         JpvmjXsT/o5JUWHkilzQ2uVNbpRohLVa7vT3MLWYjKbzLw0zfei+xFbAfcpkzUMVHcNT
-         1yuGX4/2mATN/KrU26ulSjsIbQhVgWDlKT89ksOjIDjRWMF97PGryx1U/4GKJcCWlN3Q
-         FEJIHXFkbTrYjPv+N/bdFEOW1ghAqmjl+ZUX4kwlH3mBK5/tH9GhXQEFjxOsG3Uf7DF1
-         8rliUCEFFCibiUJens7WliBKOngilDkc+PKmVWT4F1ICYgPD7EDjpsafY4vWcdZi+n9Z
-         dtiw==
+        id S2502243AbfJYLqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 07:46:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53890 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730727AbfJYLqz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 07:46:55 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E37594E832
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 11:46:54 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id u17so842480wmd.3
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 04:46:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=ef0+hHhWKCL6Ca0t5L5+DnFrjs6xNw6+Odbfva8qwPs=;
-        b=HjcyKQ93uuk7clM+wMechRaJcC2vhSYsVuJ1ZqtCvh6g9dkz/QiXDvvezF6KqLtEaz
-         N2zugzszywtnFlti8woXMZhdm7+o4bE5Gb45ErydCgjiGDlAWvq75PxJMhtrYTUOcoQy
-         vmT3y/fzzQhiQvUuo9mr/joR0zH+wCYK/3jMAeOlIc5M/aZtzsFbrLsE3nBINXMJZCKo
-         mdnhqwxtD+MiP01iT/N/+Q2sTaHI1ewLGoUYwmJcOV/Yc9HEnxV/4ktEZvtuvaIosegG
-         LPu0ulnzKgw1A2tU/ldI6KESu2R6uJL2Ul5LO5rrCRZS7QT4SWXmDgWjq4Az2OUE5jr0
-         rIzw==
-X-Gm-Message-State: APjAAAVQo8HIMTdum7YuiiPOPiEoDpCAe3ds1wunF7VKuf3cWZ0fYQZN
-        qaFpGRaZARq4eiO5pz21LNo=
-X-Google-Smtp-Source: APXvYqxyiXMNCEwujviBcaGWHHKgI5g4AoZaYE7MQ718Qwr4MDjEGH3/HrmtiPExX3WW7QD0UVNFjg==
-X-Received: by 2002:a1c:f305:: with SMTP id q5mr3127071wmq.137.1572003961887;
-        Fri, 25 Oct 2019 04:46:01 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id g69sm1881335wme.31.2019.10.25.04.46.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Oct 2019 04:46:01 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JFxVTkuWS3kQBWJGbndYa5A8WjnfR9HWKV7Q51mjf4g=;
+        b=Ltjy8TIY6WeTUSVZPak/1MC2HAYBTMexqmMDeolMvNXs/obQ+eC2uGe1vk8MT5yLpn
+         KOnUXKMoUSxPrDFQQATAUOpOqTcLlr7RNBFEKG06xv0HKQVCxb7bBRlWcgIw4AdfcNw4
+         cSTm3G/k6czsvePC1AhO/q4LMemSlxRhFPf80f4mSTaek+URCYpGBAbRSdPFYMdVuyJo
+         qKbJtshUl4STNCzx2t7YGuQBRdPf5H3al7RYq3C8HRt3DKvdD24QFFNy3kqlwX9BnhDh
+         py5fTK/DcyXXne8t2OT6wJxqpljNBJL2fdVmF2RyNEyIQAVXQBn9/0WonBObPuCmsGs0
+         YC4w==
+X-Gm-Message-State: APjAAAXjTPp3uVPd/9CQz+98h/v+JF9a5Cdl+UQscXIKZCD+TbutmGdq
+        i2ezMKBS9rPFEGMdOtfSiLugPgcJTdwCFy5ZxwiBABzGfQAwiZpcyOISKSkmnvkYAQkKA7sYedK
+        +PBlsXtbOFHT8
+X-Received: by 2002:adf:fcc7:: with SMTP id f7mr2682960wrs.345.1572004013391;
+        Fri, 25 Oct 2019 04:46:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx0N+07IZUEvJWWb7N83GBppYgQj1HmvMn6Q1GmAwZLzX0L4MctCmq7ANIVvVFt7HSefCOVbg==
+X-Received: by 2002:adf:fcc7:: with SMTP id f7mr2682929wrs.345.1572004013107;
+        Fri, 25 Oct 2019 04:46:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9c7b:17ec:2a40:d29? ([2001:b07:6468:f312:9c7b:17ec:2a40:d29])
+        by smtp.gmail.com with ESMTPSA id o73sm1723689wme.34.2019.10.25.04.46.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Oct 2019 04:46:52 -0700 (PDT)
+Subject: Re: [PATCH v2] KVM: x86: get rid of odd out jump label in
+ pdptrs_changed
+To:     Miaohe Lin <linmiaohe@huawei.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1572000874-28259-1-git-send-email-linmiaohe@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for Linux 5.4-rc5
-Date:   Fri, 25 Oct 2019 13:45:59 +0200
-Message-Id: <1572003959-43063-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Openpgp: preference=signencrypt
+Message-ID: <365321df-2f66-95ef-4bf3-4e250f0a99a7@redhat.com>
+Date:   Fri, 25 Oct 2019 13:46:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1572000874-28259-1-git-send-email-linmiaohe@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Queued, thanks (but it likely won't be on git.kernel.org until after the
+end of KVM Forum, sorry about that).
 
-The following changes since commit 3b7c59a1950c75f2c0152e5a9cd77675b09233d6:
+Paolo
 
-  Merge tag 'pinctrl-v5.4-2' of git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-pinctrl (2019-10-22 06:40:07 -0400)
+On 25/10/19 12:54, Miaohe Lin wrote:
+> The odd out jump label is really not needed. Get rid of
+> it by return true directly while r < 0 as suggested by
+> Paolo. This further lead to var changed being unused.
+> Remove it too.
+> 
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/x86.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ff395f812719..8b0d594a3b90 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -721,7 +721,6 @@ EXPORT_SYMBOL_GPL(load_pdptrs);
+>  bool pdptrs_changed(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 pdpte[ARRAY_SIZE(vcpu->arch.walk_mmu->pdptrs)];
+> -	bool changed = true;
+>  	int offset;
+>  	gfn_t gfn;
+>  	int r;
+> @@ -738,11 +737,9 @@ bool pdptrs_changed(struct kvm_vcpu *vcpu)
+>  	r = kvm_read_nested_guest_page(vcpu, gfn, pdpte, offset, sizeof(pdpte),
+>  				       PFERR_USER_MASK | PFERR_WRITE_MASK);
+>  	if (r < 0)
+> -		goto out;
+> -	changed = memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
+> -out:
+> +		return true;
+>  
+> -	return changed;
+> +	return memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
+>  }
+>  EXPORT_SYMBOL_GPL(pdptrs_changed);
+>  
+> 
 
-are available in the git repository at:
-
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 671ddc700fd08b94967b1e2a937020e30c838609:
-
-  KVM: nVMX: Don't leak L1 MMIO regions to L2 (2019-10-22 19:04:40 +0200)
-
-----------------------------------------------------------------
-Bugfixes for ARM, PPC and x86, plus selftest improvements.
-
-----------------------------------------------------------------
-Greg Kurz (1):
-      KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use
-
-Jim Mattson (2):
-      kvm: x86: Expose RDPID in KVM_GET_SUPPORTED_CPUID
-      KVM: nVMX: Don't leak L1 MMIO regions to L2
-
-Liran Alon (1):
-      KVM: VMX: Remove specialized handling of unexpected exit-reasons
-
-Marc Zyngier (4):
-      KVM: arm64: pmu: Fix cycle counter truncation
-      arm64: KVM: Handle PMCR_EL0.LC as RES1 on pure AArch64 systems
-      KVM: arm64: pmu: Set the CHAINED attribute before creating the in-kernel event
-      KVM: arm64: pmu: Reset sample period on overflow handling
-
-Miaohe Lin (1):
-      KVM: SVM: Fix potential wrong physical id in avic_handle_ldr_update
-
-Paolo Bonzini (3):
-      kvm: clear kvmclock MSR on reset
-      Merge tag 'kvmarm-fixes-5.4-2' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
-      Merge tag 'kvm-ppc-fixes-5.4-1' of git://git.kernel.org/.../paulus/powerpc into HEAD
-
-Vitaly Kuznetsov (5):
-      selftests: kvm: synchronize .gitignore to Makefile
-      selftests: kvm: vmx_set_nested_state_test: don't check for VMX support twice
-      selftests: kvm: consolidate VMX support checks
-      selftests: kvm: vmx_dirty_log_test: skip the test when VMX is not supported
-      selftests: kvm: fix sync_regs_test with newer gccs
-
-Wanpeng Li (1):
-      KVM: Don't shrink/grow vCPU halt_poll_ns if host side polling is disabled
-
-kbuild test robot (1):
-      KVM: x86: fix bugon.cocci warnings
-
- arch/arm64/kvm/sys_regs.c                          |  4 ++
- arch/powerpc/kvm/book3s_xive.c                     | 24 +++++---
- arch/powerpc/kvm/book3s_xive.h                     | 12 ++++
- arch/powerpc/kvm/book3s_xive_native.c              |  6 +-
- arch/x86/include/asm/kvm_host.h                    |  2 +-
- arch/x86/kvm/cpuid.c                               |  2 +-
- arch/x86/kvm/lapic.c                               |  5 --
- arch/x86/kvm/lapic.h                               |  5 ++
- arch/x86/kvm/svm.c                                 |  6 +-
- arch/x86/kvm/vmx/nested.c                          | 64 ++++++++++++----------
- arch/x86/kvm/vmx/nested.h                          | 13 ++++-
- arch/x86/kvm/vmx/vmx.c                             | 12 ----
- arch/x86/kvm/x86.c                                 | 19 ++++---
- tools/testing/selftests/kvm/.gitignore             |  2 +
- tools/testing/selftests/kvm/include/x86_64/vmx.h   |  2 +
- tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 10 ++++
- .../testing/selftests/kvm/x86_64/sync_regs_test.c  | 21 +++----
- .../kvm/x86_64/vmx_close_while_nested_test.c       |  6 +-
- .../selftests/kvm/x86_64/vmx_dirty_log_test.c      |  2 +
- .../kvm/x86_64/vmx_set_nested_state_test.c         | 13 +----
- .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c     |  6 +-
- virt/kvm/arm/pmu.c                                 | 48 +++++++++++-----
- virt/kvm/kvm_main.c                                | 29 +++++-----
- 23 files changed, 186 insertions(+), 127 deletions(-)
