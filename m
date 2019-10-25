@@ -2,98 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C675E51D7
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 19:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FBAEE51F7
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 19:06:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409574AbfJYRBd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 13:01:33 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:33741 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407149AbfJYRB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 13:01:27 -0400
-Received: by mail-pf1-f202.google.com with SMTP id z4so2384062pfn.0
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 10:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=a6D0LvDSWvcPBISgGIo9u1LrVZKZJkW1is0FU9Md0OY=;
-        b=HvfRaXXBnGrJSskwO0aa3yK7r+fVk0GhnUvg8UuwljtMvXv/KUagkTPmoVgEVUkq9Q
-         sRYAcnWBSCQkCNI4xtJsuZ47zKbDmg+Ql2+80FxQjKqH1gDRubxox973Olwc0pzVWeOc
-         4hfk0I+7tw7P+JyaINX52bPHkJRjzvaQZiG5pz6Sza/ZzR/l+/h8twyra8ntCwfu0Ai6
-         wbK7aOTcLUZUTYPLQVsYMi63Z3Y2L4Z31NBSwo3UJNzELEpy0FOXP+Kl/mfl8oQqaEPQ
-         XaBOtjkeW04gFuxGfUxC3LWNTFaGGspYJM6BavaDn6ssdpW0CRra8zrI7Dob2/HVLFpf
-         E/UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=a6D0LvDSWvcPBISgGIo9u1LrVZKZJkW1is0FU9Md0OY=;
-        b=rxpKOy1r6R4aTb4PSDBOMkVoIB4VJuTsqppusIg4ExfTzlr7T4Efng/IOO+qBMValT
-         NVqEOwalwzW/AkOOz+LoIbfSaFfoM86Ke/Y7IyyTYVmVGddHrf+ZC0LB1O/Zuh6ZIPVn
-         P3nibn7VSsOXmXcN87Ibvt1diSa5LAgyJpRjvM7qPTZtvK28uCiyM2mGxDGnFDzyjuDD
-         Bst4fCpEJTfClyDlhlRer7FyiXojutQx5lp7XAngqVa2vvCVMVf+MssAAT9tlWH9BH7Y
-         OEnzJX/s/RDz7i/NWxEJfLnrskR2Q9FOFcpCVUiX1X77fqFc0zNUl0b8ZY4IBzilM9jg
-         p/fQ==
-X-Gm-Message-State: APjAAAWb6MXq1Io+EvQu2EsMYpPZMKOXlXgVZjtve+E+jgSIu9Y0Yxto
-        xroaTpcpzh53VsVPlJve5o4qG3yjoXZC2GIs9g0RNsDfkXuqvUZsn1M5uPFGJLoH80WFSmn8plU
-        YU4idGGT8Ox25El7SzDOLADbaqcEDOfmIySTdN7SL8d26uGahXLMDOIKzHHj+NV7M/dQe
-X-Google-Smtp-Source: APXvYqzM+PZUsiUM0XEyTdAz47yojmWnA/U//ZUx038MVrVrkkLbzob+ZLq40EC7C0Er45FGIR1DW5A0X5YxwzuU
-X-Received: by 2002:a63:28f:: with SMTP id 137mr2506003pgc.301.1572022886509;
- Fri, 25 Oct 2019 10:01:26 -0700 (PDT)
-Date:   Fri, 25 Oct 2019 10:00:57 -0700
-Message-Id: <20191025170056.109755-1-aaronlewis@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [kvm-unit-tests PATCH] x86: Fix the register order to match struct regs
-From:   Aaron Lewis <aaronlewis@google.com>
+        id S2505790AbfJYRGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 13:06:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10500 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2409759AbfJYRGn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 25 Oct 2019 13:06:43 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9PH4BqR018501
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 13:06:42 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vv51d0955-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 13:06:41 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Fri, 25 Oct 2019 18:06:39 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 25 Oct 2019 18:06:37 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9PH6ZYH60817498
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Oct 2019 17:06:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62D47A405B;
+        Fri, 25 Oct 2019 17:06:35 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2AC11A4053;
+        Fri, 25 Oct 2019 17:06:35 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 25 Oct 2019 17:06:35 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/5] s390x: SCLP Unit test
+Date:   Fri, 25 Oct 2019 19:06:29 +0200
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19102517-4275-0000-0000-00000377A609
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102517-4276-0000-0000-0000388AD48D
+Message-Id: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-25_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=524 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910250157
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix the order the registers show up in SAVE_GPR and SAVE_GPR_C to ensure
-the correct registers get the correct values.  Previously, the registers
-were being written to (and read from) the wrong fields.
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- x86/vmx.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
 
-diff --git a/x86/vmx.h b/x86/vmx.h
-index 8496be7..8527997 100644
---- a/x86/vmx.h
-+++ b/x86/vmx.h
-@@ -492,9 +492,9 @@ enum vm_instruction_error_number {
- 
- #define SAVE_GPR				\
- 	"xchg %rax, regs\n\t"			\
--	"xchg %rbx, regs+0x8\n\t"		\
--	"xchg %rcx, regs+0x10\n\t"		\
--	"xchg %rdx, regs+0x18\n\t"		\
-+	"xchg %rcx, regs+0x8\n\t"		\
-+	"xchg %rdx, regs+0x10\n\t"		\
-+	"xchg %rbx, regs+0x18\n\t"		\
- 	"xchg %rbp, regs+0x28\n\t"		\
- 	"xchg %rsi, regs+0x30\n\t"		\
- 	"xchg %rdi, regs+0x38\n\t"		\
-@@ -511,9 +511,9 @@ enum vm_instruction_error_number {
- 
- #define SAVE_GPR_C				\
- 	"xchg %%rax, regs\n\t"			\
--	"xchg %%rbx, regs+0x8\n\t"		\
--	"xchg %%rcx, regs+0x10\n\t"		\
--	"xchg %%rdx, regs+0x18\n\t"		\
-+	"xchg %%rcx, regs+0x8\n\t"		\
-+	"xchg %%rdx, regs+0x10\n\t"		\
-+	"xchg %%rbx, regs+0x18\n\t"		\
- 	"xchg %%rbp, regs+0x28\n\t"		\
- 	"xchg %%rsi, regs+0x30\n\t"		\
- 	"xchg %%rdi, regs+0x38\n\t"		\
+v1 -> v2
+* fix many small issues that came up during the first round of reviews
+* add comments to each function
+* use a static buffer for the SCCP template when used
+
+Claudio Imbrenda (5):
+  s390x: remove redundant defines
+  s390x: improve error reporting for interrupts
+  s390x: sclp: expose ram_size and max_ram_size
+  s390x: sclp: add service call instruction wrapper
+  s390x: SCLP unit test
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  13 ++
+ lib/s390x/sclp.h         |   4 +-
+ lib/s390x/interrupt.c    |   4 +-
+ lib/s390x/sclp.c         |  17 +-
+ s390x/sclp.c             | 413 +++++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 7 files changed, 445 insertions(+), 10 deletions(-)
+ create mode 100644 s390x/sclp.c
+
 -- 
-2.24.0.rc0.303.g954a862665-goog
+2.7.4
 
