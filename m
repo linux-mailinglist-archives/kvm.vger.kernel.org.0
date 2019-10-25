@@ -2,69 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FAF5E48FD
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 12:54:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC7A8E48FC
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 12:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502780AbfJYKyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 06:54:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42762 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2502766AbfJYKyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 06:54:21 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E045621929;
-        Fri, 25 Oct 2019 10:54:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572000860;
-        bh=jjn8O1fddhIJx8i6+ifmbnuM77N9ePQrNyFvwOWY57U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EcAY83h2xusU+VLo9oXK6DO+Rf44eghHHOnM02fWS+QXE2uN3R/oA1PBVVi/2D/mf
-         3lixdn9607C+Aj3dLMOmrpAmgEekZC2HZtEG8lnVu+xSqFQ8lYh3z5nbl0Z1IMHgel
-         uzw+ACkaDfTcwUUhdkBd+s2+JEKE9LDR6X6aBfPI=
-Date:   Fri, 25 Oct 2019 11:54:16 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH kvmtool] virtio: Ensure virt_queue is always initialised
-Message-ID: <20191025105415.GB9746@willie-the-truck>
-References: <20191010142852.15437-1-will@kernel.org>
- <20191025114100.70238d61@donnerap.cambridge.arm.com>
+        id S2502707AbfJYKyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 06:54:17 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5186 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2502594AbfJYKyR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 06:54:17 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 8D4AF84C3F8D4F971006;
+        Fri, 25 Oct 2019 18:54:14 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Fri, 25 Oct 2019
+ 18:54:07 +0800
+From:   Miaohe Lin <linmiaohe@huawei.com>
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>
+CC:     <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linmiaohe@huawei.com>
+Subject: [PATCH v2] KVM: x86: get rid of odd out jump label in pdptrs_changed
+Date:   Fri, 25 Oct 2019 18:54:34 +0800
+Message-ID: <1572000874-28259-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191025114100.70238d61@donnerap.cambridge.arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 11:41:00AM +0100, Andre Przywara wrote:
-> On Thu, 10 Oct 2019 15:28:52 +0100
-> Will Deacon <will@kernel.org> wrote:
-> > Failing to initialise the virt_queue via virtio_init_device_vq() leaves,
-> > amongst other things, the endianness unspecified. On arm/arm64 this
-> > results in virtio_guest_to_host_uxx() treating the queue as big-endian
-> > and trying to translate bogus addresses:
-> > 
-> >   Warning: unable to translate guest address 0x80b8249800000000 to host
-> 
-> Ouch, a user! ;-)
-> 
-> > Ensure the virt_queue is always initialised by the virtio device during
-> > setup.
-> 
-> Indeed, this is also what the other virtio devices do.
-> Confirmed to fix rng and balloon.
-> 
-> Thanks for spotting this!
-> 
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> Tested-by: Andre Przywara <andre.przywara@arm.com>
+The odd out jump label is really not needed. Get rid of
+it by return true directly while r < 0 as suggested by
+Paolo. This further lead to var changed being unused.
+Remove it too.
 
-Cheers, Andre. Now pushed with your tags.
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+ arch/x86/kvm/x86.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Will
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff395f812719..8b0d594a3b90 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -721,7 +721,6 @@ EXPORT_SYMBOL_GPL(load_pdptrs);
+ bool pdptrs_changed(struct kvm_vcpu *vcpu)
+ {
+ 	u64 pdpte[ARRAY_SIZE(vcpu->arch.walk_mmu->pdptrs)];
+-	bool changed = true;
+ 	int offset;
+ 	gfn_t gfn;
+ 	int r;
+@@ -738,11 +737,9 @@ bool pdptrs_changed(struct kvm_vcpu *vcpu)
+ 	r = kvm_read_nested_guest_page(vcpu, gfn, pdpte, offset, sizeof(pdpte),
+ 				       PFERR_USER_MASK | PFERR_WRITE_MASK);
+ 	if (r < 0)
+-		goto out;
+-	changed = memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
+-out:
++		return true;
+ 
+-	return changed;
++	return memcmp(pdpte, vcpu->arch.walk_mmu->pdptrs, sizeof(pdpte)) != 0;
+ }
+ EXPORT_SYMBOL_GPL(pdptrs_changed);
+ 
+-- 
+2.19.1
+
