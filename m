@@ -2,183 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D69B0E45FD
-	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 10:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8C92E462C
+	for <lists+kvm@lfdr.de>; Fri, 25 Oct 2019 10:49:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408361AbfJYInV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 04:43:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42888 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2408405AbfJYInU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 25 Oct 2019 04:43:20 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9P8hFnx028485
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 04:43:19 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vuw339d1p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 04:43:16 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Fri, 25 Oct 2019 09:43:01 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 25 Oct 2019 09:42:59 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9P8gO9121823880
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Oct 2019 08:42:24 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7767911C04C;
-        Fri, 25 Oct 2019 08:42:57 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE65411C050;
-        Fri, 25 Oct 2019 08:42:56 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.50.181])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 25 Oct 2019 08:42:56 +0000 (GMT)
-Subject: Re: [RFC 06/37] s390: UV: Add import and export to UV library
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+        id S2393107AbfJYIto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 04:49:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27478 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731524AbfJYIto (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 04:49:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571993382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pSGri+f/M7/xWpKJG9j+HerX9L+eGDjKax0gbGzHiOQ=;
+        b=HbiCRRoFbSOww2XqJ+6CU83kuDKeo4nC5PVgZ9zytK0GB2Ex07UBtG45oRRtBJ4zy/SEFH
+        1mhtR9kM7p1DOpAYfnpR1W0ivMv58FMXLxY8QYQXB7hwb8JrXIKxKmQaoCbYqHcRvynhKB
+        uqV9aiOToNwKvz4EP+pWCiQI/oVmySU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-JyPZvvG4OpWlV9J-HV6dBg-1; Fri, 25 Oct 2019 04:49:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AB6F1800E00;
+        Fri, 25 Oct 2019 08:49:37 +0000 (UTC)
+Received: from [10.36.116.205] (ovpn-116-205.ams2.redhat.com [10.36.116.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF2860BE0;
+        Fri, 25 Oct 2019 08:49:35 +0000 (UTC)
+Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
         borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
         mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
         gor@linux.ibm.com
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-7-frankja@linux.ibm.com>
- <32166470-43c1-f454-440f-3f660b995ca2@redhat.com>
- <ed8860e6-176a-64dd-e697-5ed80dd3c872@linux.ibm.com>
- <257d9326-9af9-5986-aeb0-4323fb66c81d@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Fri, 25 Oct 2019 10:42:56 +0200
+ <20191024114059.102802-10-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
+Date:   Fri, 25 Oct 2019 10:49:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <257d9326-9af9-5986-aeb0-4323fb66c81d@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6skXUzixN5Qi5HVOxqnOjlrIZKm4JQKu2"
-X-TM-AS-GCONF: 00
-x-cbid: 19102508-0008-0000-0000-0000032755A0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19102508-0009-0000-0000-00004A468BF5
-Message-Id: <5de9ace7-a635-d758-276e-942c5f95e18f@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-25_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=881 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910250082
+In-Reply-To: <20191024114059.102802-10-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: JyPZvvG4OpWlV9J-HV6dBg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6skXUzixN5Qi5HVOxqnOjlrIZKm4JQKu2
-Content-Type: multipart/mixed; boundary="Gd0evvNHPAA9G1tLqEauLZv7MBzQ0gNzM"
-
---Gd0evvNHPAA9G1tLqEauLZv7MBzQ0gNzM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10/25/19 10:40 AM, David Hildenbrand wrote:
-> On 25.10.19 10:39, Janosch Frank wrote:
->> On 10/25/19 10:31 AM, David Hildenbrand wrote:
->>> On 24.10.19 13:40, Janosch Frank wrote:
->>>> The convert to/from secure (or also "import/export") ultravisor call=
-s
->>>> are need for page management, i.e. paging, of secure execution VM.
->>>>
->>>> Export encrypts a secure guest's page and makes it accessible to the=
-
->>>> guest for paging.
->>>
->>> How does paging play along with pinning the pages (from
->>> uv_convert_to_secure() -> kvm_s390_pv_pin_page()) in a follow up patc=
-h?
->>> Can you paint me the bigger picture?
->>
->> That's a stale comment I should have removed before sending...
->> The current patches do not support paging.
+On 24.10.19 13:40, Janosch Frank wrote:
+> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 >=20
-> Note that once you pin you really have to disable the balloon in the=20
-> QEMU (inhibit it).
+> Pin the guest pages when they are first accessed, instead of all at
+> the same time when starting the guest.
+
+Please explain why you do stuff. Why do we have to pin the hole guest=20
+memory? Why can't we mlock() the hole memory to avoid swapping in user=20
+space?
+
+This really screams for a proper explanation.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/gmap.h |  1 +
+>   arch/s390/include/asm/uv.h   |  6 +++++
+>   arch/s390/kernel/uv.c        | 20 ++++++++++++++
+>   arch/s390/kvm/kvm-s390.c     |  2 ++
+>   arch/s390/kvm/pv.c           | 51 ++++++++++++++++++++++++++++++------
+>   5 files changed, 72 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/arch/s390/include/asm/gmap.h b/arch/s390/include/asm/gmap.h
+> index 99b3eedda26e..483f64427c0e 100644
+> --- a/arch/s390/include/asm/gmap.h
+> +++ b/arch/s390/include/asm/gmap.h
+> @@ -63,6 +63,7 @@ struct gmap {
+>   =09struct gmap *parent;
+>   =09unsigned long orig_asce;
+>   =09unsigned long se_handle;
+> +=09struct page **pinned_pages;
+>   =09int edat_level;
+>   =09bool removed;
+>   =09bool initialized;
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 99cdd2034503..9ce9363aee1c 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -298,6 +298,7 @@ static inline int uv_convert_from_secure(unsigned lon=
+g paddr)
+>   =09return -EINVAL;
+>   }
+>  =20
+> +int kvm_s390_pv_pin_page(struct gmap *gmap, unsigned long gpa);
+>   /*
+>    * Requests the Ultravisor to make a page accessible to a guest
+>    * (import). If it's brought in the first time, it will be cleared. If
+> @@ -317,6 +318,11 @@ static inline int uv_convert_to_secure(struct gmap *=
+gmap, unsigned long gaddr)
+>   =09=09.gaddr =3D gaddr
+>   =09};
+>  =20
+> +=09down_read(&gmap->mm->mmap_sem);
+> +=09cc =3D kvm_s390_pv_pin_page(gmap, gaddr);
+> +=09up_read(&gmap->mm->mmap_sem);
+> +=09if (cc)
+> +=09=09return cc;
+>   =09cc =3D uv_call(0, (u64)&uvcb);
+>  =20
+>   =09if (!cc)
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index f7778493e829..36554402b5c6 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -98,4 +98,24 @@ void adjust_to_uv_max(unsigned long *vmax)
+>   =09if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
+>   =09=09*vmax =3D uv_info.max_sec_stor_addr;
+>   }
+> +
+> +int kvm_s390_pv_pin_page(struct gmap *gmap, unsigned long gpa)
+> +{
+> +=09unsigned long hva, gfn =3D gpa / PAGE_SIZE;
+> +=09int rc;
+> +
+> +=09if (!gmap->pinned_pages)
+> +=09=09return -EINVAL;
+> +=09hva =3D __gmap_translate(gmap, gpa);
+> +=09if (IS_ERR_VALUE(hva))
+> +=09=09return -EFAULT;
+> +=09if (gmap->pinned_pages[gfn])
+> +=09=09return -EEXIST;
+> +=09rc =3D get_user_pages_fast(hva, 1, FOLL_WRITE, gmap->pinned_pages + g=
+fn);
+> +=09if (rc < 0)
+> +=09=09return rc;
+> +=09return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pv_pin_page);
+> +
+>   #endif
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d1ba12f857e7..490fde080107 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2196,6 +2196,7 @@ static int kvm_s390_handle_pv(struct kvm *kvm, stru=
+ct kvm_pv_cmd *cmd)
+>   =09=09/* All VCPUs have to be destroyed before this call. */
+>   =09=09mutex_lock(&kvm->lock);
+>   =09=09kvm_s390_vcpu_block_all(kvm);
+> +=09=09kvm_s390_pv_unpin(kvm);
+>   =09=09r =3D kvm_s390_pv_destroy_vm(kvm);
+>   =09=09if (!r)
+>   =09=09=09kvm_s390_pv_dealloc_vm(kvm);
+> @@ -2680,6 +2681,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>   =09kvm_s390_gisa_destroy(kvm);
+>   =09if (IS_ENABLED(CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST) &&
+>   =09    kvm_s390_pv_is_protected(kvm)) {
+> +=09=09kvm_s390_pv_unpin(kvm);
+>   =09=09kvm_s390_pv_destroy_vm(kvm);
+>   =09=09kvm_s390_pv_dealloc_vm(kvm);
+>   =09}
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 80aecd5bea9e..383e660e2221 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -15,8 +15,35 @@
+>   #include <asm/mman.h>
+>   #include "kvm-s390.h"
+>  =20
+> +static void unpin_destroy(struct page **pages, int nr)
+> +{
+> +=09int i;
+> +=09struct page *page;
+> +=09u8 *val;
+> +
+> +=09for (i =3D 0; i < nr; i++) {
+> +=09=09page =3D pages[i];
+> +=09=09if (!page)=09/* page was never used */
+> +=09=09=09continue;
+> +=09=09val =3D (void *)page_to_phys(page);
+> +=09=09READ_ONCE(*val);
+> +=09=09put_page(page);
+> +=09}
+> +}
+> +
+> +void kvm_s390_pv_unpin(struct kvm *kvm)
+> +{
+> +=09unsigned long npages =3D kvm->arch.pv.guest_len / PAGE_SIZE;
+> +
+> +=09mutex_lock(&kvm->slots_lock);
+> +=09unpin_destroy(kvm->arch.gmap->pinned_pages, npages);
+> +=09mutex_unlock(&kvm->slots_lock);
+> +}
+> +
+>   void kvm_s390_pv_dealloc_vm(struct kvm *kvm)
+>   {
+> +=09vfree(kvm->arch.gmap->pinned_pages);
+> +=09kvm->arch.gmap->pinned_pages =3D NULL;
+>   =09vfree(kvm->arch.pv.stor_var);
+>   =09free_pages(kvm->arch.pv.stor_base,
+>   =09=09   get_order(uv_info.guest_base_stor_len));
+> @@ -28,7 +55,6 @@ int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+>   =09unsigned long base =3D uv_info.guest_base_stor_len;
+>   =09unsigned long virt =3D uv_info.guest_virt_var_stor_len;
+>   =09unsigned long npages =3D 0, vlen =3D 0;
+> -=09struct kvm_memslots *slots;
+>   =09struct kvm_memory_slot *memslot;
+>  =20
+>   =09kvm->arch.pv.stor_var =3D NULL;
+> @@ -43,22 +69,26 @@ int kvm_s390_pv_alloc_vm(struct kvm *kvm)
+>   =09 * Slots are sorted by GFN
+>   =09 */
+>   =09mutex_lock(&kvm->slots_lock);
+> -=09slots =3D kvm_memslots(kvm);
+> -=09memslot =3D slots->memslots;
+> +=09memslot =3D kvm_memslots(kvm)->memslots;
+>   =09npages =3D memslot->base_gfn + memslot->npages;
+> -
+>   =09mutex_unlock(&kvm->slots_lock);
+> +
+> +=09kvm->arch.gmap->pinned_pages =3D vzalloc(npages * sizeof(struct page =
+*));
+> +=09if (!kvm->arch.gmap->pinned_pages)
+> +=09=09goto out_err;
+>   =09kvm->arch.pv.guest_len =3D npages * PAGE_SIZE;
+>  =20
+>   =09/* Allocate variable storage */
+>   =09vlen =3D ALIGN(virt * ((npages * PAGE_SIZE) / HPAGE_SIZE), PAGE_SIZE=
+);
+>   =09vlen +=3D uv_info.guest_virt_base_stor_len;
+>   =09kvm->arch.pv.stor_var =3D vzalloc(vlen);
+> -=09if (!kvm->arch.pv.stor_var) {
+> -=09=09kvm_s390_pv_dealloc_vm(kvm);
+> -=09=09return -ENOMEM;
+> -=09}
+> +=09if (!kvm->arch.pv.stor_var)
+> +=09=09goto out_err;
+>   =09return 0;
+> +
+> +out_err:
+> +=09kvm_s390_pv_dealloc_vm(kvm);
+> +=09return -ENOMEM;
+>   }
+>  =20
+>   int kvm_s390_pv_destroy_vm(struct kvm *kvm)
+> @@ -216,6 +246,11 @@ int kvm_s390_pv_unpack(struct kvm *kvm, unsigned lon=
+g addr, unsigned long size,
+>   =09for (i =3D 0; i < size / PAGE_SIZE; i++) {
+>   =09=09uvcb.gaddr =3D addr + i * PAGE_SIZE;
+>   =09=09uvcb.tweak[1] =3D i * PAGE_SIZE;
+> +=09=09down_read(&kvm->mm->mmap_sem);
+> +=09=09rc =3D kvm_s390_pv_pin_page(kvm->arch.gmap, uvcb.gaddr);
+> +=09=09up_read(&kvm->mm->mmap_sem);
+> +=09=09if (rc && (rc !=3D -EEXIST))
+> +=09=09=09break;
+>   retry:
+>   =09=09rc =3D uv_call(0, (u64)&uvcb);
+>   =09=09if (!rc)
 >=20
 
-Yes, and you need the iommu for virtio.
-We didn't yet fully discuss how to handle that.
 
+--=20
 
+Thanks,
 
---Gd0evvNHPAA9G1tLqEauLZv7MBzQ0gNzM--
-
---6skXUzixN5Qi5HVOxqnOjlrIZKm4JQKu2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl2ytZAACgkQ41TmuOI4
-ufh+WQ//U7uCWIaS1WtgrMqyVdi7syehMxI74UXuA2nC+zMvNw21ZPV7bsE6E/e7
-5Iu2t5joiKbFKC/+eAXYp8IVgKm/miDIKv5HGLVrYhh3yCtAj0A0QtTn3plCF3n/
-AUx/oJj7pC6kQymm8hc2HC3a4IEK3+hP70rQDK6tUNJwgZAkjTC2AZyZA3p+9Cdo
-wcXxlZM635fgB/AhkU/xP9dGC27GNpwKpK/fSjWVi6SdWlZoYZZLmuTCSRv4Tz8d
-uin5NnB4gnk0lbdAMrEeRyhf94ZvqDnIKQJW9WOfx+jfmEZSHOW6rEUn3aghXBJY
-32yjzzz0dhJttJKVS+jbmyPZ3Eg+yUhVGAl0tT+Ih87vZ2VslagNL5NDwOw/PdwJ
-YJTfVV3VkYXUNrzGAVUx5OKv570UHvF6PEcLiuqAzCJWUFG13mt7tPmZCdwHfTRH
-xQQlAGGlhF19xkJ34jJqbVucyvEzaQInqe46mXKBh2q+BbhpWMRNAM1X6hC2OlSj
-itk8+ZU7xYAuqoe8P6lPM+d6MVA/wRnJH4sFTLI4AgqUi7fNoIwJCPu7iPGUVIjD
-8+aAbGcYmQDHCT3eOVbkCO66gcpGXE619PrmekBT1VXf3babVKiubi2eVuiCM8Tk
-54WZyTEO2vl6jLSEv5cn4ICWmdqjXcbMvlnymCANw0cTsSS1uEg=
-=2v4M
------END PGP SIGNATURE-----
-
---6skXUzixN5Qi5HVOxqnOjlrIZKm4JQKu2--
+David / dhildenb
 
