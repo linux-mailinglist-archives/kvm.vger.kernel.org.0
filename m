@@ -2,81 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A6CE58BE
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 07:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 635BDE58C8
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 07:33:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726258AbfJZF3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Oct 2019 01:29:01 -0400
-Received: from mga07.intel.com ([134.134.136.100]:24207 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725976AbfJZF3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 26 Oct 2019 01:29:00 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 22:28:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,230,1569308400"; 
-   d="scan'208";a="202798209"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 25 Oct 2019 22:28:56 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1iOEdE-000Aqe-83; Sat, 26 Oct 2019 13:28:56 +0800
-Date:   Sat, 26 Oct 2019 13:28:36 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     kbuild-all@lists.01.org, pbonzini@redhat.com, peterz@infradead.org,
-        kvm@vger.kernel.org, like.xu@intel.com,
-        linux-kernel@vger.kernel.org, jmattson@google.com,
-        sean.j.christopherson@intel.com, wei.w.wang@intel.com,
-        kan.liang@intel.com
-Subject: Re: [PATCH v3 4/6] KVM: x86/vPMU: Introduce a new
- kvm_pmu_ops->msr_idx_to_pmc callback
-Message-ID: <201910261319.61sNCjSs%lkp@intel.com>
-References: <20191021160651.49508-5-like.xu@linux.intel.com>
+        id S1726074AbfJZFdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Oct 2019 01:33:18 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:50504 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725976AbfJZFdS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 26 Oct 2019 01:33:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=rBFZM3Rm7F2y0bq2NvCIIQKubp4uvyGCLsoRcmsizGo=; b=gkngM0TLz8m0hzgQ5czLiVB6i
+        2632tiJPfM/BaQ31vYmEZyQLaIfKETslrkSwJnCpYhjTkuYt/5W274FTZsSlRpIIE+SyQiGbSpXm7
+        rw4xiO/zzqzWLQ3sdYSw9PfClT66v7FgyzK3JUM3Qb8ZsFZxjw8msi4aDENNDPcBE7PSJ3zcKoDiX
+        +sTpkpqTpQZ+k4i8zgpwwhPWioOccVKXoYLjI25B3h56G7Y/lpfvOrGUYMYo81AlJ0CiTCtS2ND/s
+        nMkcGXQor+sy5C3cqcHtvX3iVaPYsP4Z1o3z4Sw8Wpu6dDaB0uD7KO3BrdU2cQV6jXfn9ScHnxXUD
+        GOy1KT84g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iOEhC-0003Eu-J1; Sat, 26 Oct 2019 05:33:02 +0000
+Date:   Fri, 25 Oct 2019 22:33:02 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <Anup.Patel@wdc.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v9 00/22] KVM RISC-V Support
+Message-ID: <20191026053302.GA12368@infradead.org>
+References: <20191016160649.24622-1-anup.patel@wdc.com>
+ <alpine.DEB.2.21.9999.1910251609500.12828@viisi.sifive.com>
+ <CAAhSdy1zfL2kPM-Le6TZSqS2TU1RkgC+zTbB4y31t8TXwVjhEg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191021160651.49508-5-like.xu@linux.intel.com>
-X-Patchwork-Hint: ignore
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <CAAhSdy1zfL2kPM-Le6TZSqS2TU1RkgC+zTbB4y31t8TXwVjhEg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Like,
+On Sat, Oct 26, 2019 at 08:52:16AM +0530, Anup Patel wrote:
+> I generally run checkpatch.pl every time before sending patches.
+> 
+> I will try checkpatch.pl with --strict parameter as well in v10 series.
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on kvm/linux-next]
-[cannot apply to v5.4-rc4 next-20191025]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
-
-url:    https://github.com/0day-ci/linux/commits/Like-Xu/KVM-x86-vPMU-Efficiency-optimization-by-reusing-last-created-perf_event/20191024-164128
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-dirty
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
-
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> arch/x86/kvm/vmx/pmu_intel.c:165:16: sparse: sparse: symbol 'intel_msr_idx_to_pmc' was not declared. Should it be static?
---
->> arch/x86/kvm/pmu_amd.c:207:16: sparse: sparse: symbol 'amd_msr_idx_to_pmc' was not declared. Should it be static?
-
-Please review and possibly fold the followup patch.
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+--strict is a load of bullshit.  Please don't do that.
