@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A5B0E5852
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 05:27:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2C27E584E
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 05:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfJZD1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 23:27:16 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60514 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726074AbfJZD1P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 23:27:15 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3PxxT037712;
-        Sat, 26 Oct 2019 03:26:49 GMT
+        id S1726303AbfJZDZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 23:25:18 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:43440 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfJZDZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 23:25:14 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3OPgI051029;
+        Sat, 26 Oct 2019 03:24:52 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
- bh=GAD53LJIDAlRMuq0ujQb7sRDQvwZBR3lHpUfNYQyzRw=;
- b=emoRtX2taVpbl0COt6aH3LFB8PSzDNJr81cNQFCgJYXe8nWJNDZfehs0pFe6xFYe5Rli
- Y1GLydjtPXyWRd2/JkxeNDP2/vBLcPzNXyB809QF4sM8yHNQK0pSxe9E3lo7tOdUelCb
- r16ywIz9HLWssPVMD06HQfj/nRuSzBYnCdvWdhlf0+zh9iBvmUxJZ5T66tDeM9x5NE5Y
- DJvpIfd8zdEppGTobtCNa+MROE5Uw3/SoioeuL42lA2+IeNYTz9w4IHBTzae8z/ZcobH
- pUuV0gwNZkepMmEDbQZJQW5Hkq7cR8FOomv+OzQFSXL3oQ61Id4HYwM05s4wtqiXmzdT sA== 
+ bh=JH5g7kGl18GmOwGR9exKyCwwdZcdLzKY/dznWLlvQQA=;
+ b=F+wGFwf3/iCqaqO3tACZ9VBzsZnhkahSeBlmxuAVt93LTYHTgF6aLfc8S9hXR0DAsDqj
+ 6+mE2DfrYXWU9YHcQ0BYx/WS1c6G0hGgueOQ8f8dJxlqV/J7A6DqVoS2n8H/mRQkfH9n
+ Nklx70T+kQ2sSqgYaG9aYf3XRXOQ8Z9QX00g89fD9qqnCrn7curvDvkaOxavlx3C+b87
+ FkwpRq2OYrwyC3aVTBXHVPk5xn6NUjlMnyF3X6KgLj9gdKo5tCimntE6JGC651l1CH31
+ zSQM/Zg9rIamN2C4IcHJTxsRsI5u4vBzjUNPCUemOcqhE+Ev/ZNZlbkTZqWSwi4UC8y3 Dg== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2vve3pr11k-1
+        by userp2130.oracle.com with ESMTP id 2vvdjtr51n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Oct 2019 03:26:49 +0000
+        Sat, 26 Oct 2019 03:24:51 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3OKvK082899;
-        Sat, 26 Oct 2019 03:24:48 GMT
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3OJEc082815;
+        Sat, 26 Oct 2019 03:24:51 GMT
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2vvc6mmwjw-1
+        by aserp3030.oracle.com with ESMTP id 2vvc6mmwkp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Oct 2019 03:24:48 +0000
+        Sat, 26 Oct 2019 03:24:50 +0000
 Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9Q3OmRc025649;
-        Sat, 26 Oct 2019 03:24:48 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9Q3OoJl025657;
+        Sat, 26 Oct 2019 03:24:50 GMT
 Received: from z2.cn.oracle.com (/10.182.71.218)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 25 Oct 2019 20:24:47 -0700
+        with ESMTP ; Fri, 25 Oct 2019 20:24:50 -0700
 From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, mtosatti@redhat.com,
         joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
         rkrcmar@redhat.com, pbonzini@redhat.com,
         Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Subject: [PATCH 3/5] KVM: ensure pool time is longer than block_ns
-Date:   Sat, 26 Oct 2019 11:23:57 +0800
-Message-Id: <1572060239-17401-4-git-send-email-zhenzhong.duan@oracle.com>
+Subject: [PATCH 4/5] cpuidle-haltpoll: add a check to ensure grow start value is nonzero
+Date:   Sat, 26 Oct 2019 11:23:58 +0800
+Message-Id: <1572060239-17401-5-git-send-email-zhenzhong.duan@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
 References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9421 signatures=668683
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=911
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=875
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1908290000 definitions=main-1910260033
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9421 signatures=668683
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=998 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=954 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
  definitions=main-1910260034
 Sender: kvm-owner@vger.kernel.org
@@ -67,27 +67,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When (block_ns == vcpu->halt_poll_ns), there is not a margin so that
-vCPU may still get into block state unnecessorily.
+dev->poll_limit_ns could be zeroed in certain cases (e.g. by
+guest_halt_poll_shrink). If guest_halt_poll_grow_start is zero,
+dev->poll_limit_ns will never be larger than zero.
 
 Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/cpuidle/governors/haltpoll.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 1b6fe3b..48a1f1a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2371,7 +2371,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 		if (!vcpu_valid_wakeup(vcpu)) {
- 			shrink_halt_poll_ns(vcpu);
- 		} else if (halt_poll_ns) {
--			if (block_ns <= vcpu->halt_poll_ns)
-+			if (block_ns < vcpu->halt_poll_ns)
- 				;
- 			/* we had a short halt and our poll time is too small */
- 			else if (block_ns < halt_poll_ns)
+diff --git a/drivers/cpuidle/governors/haltpoll.c b/drivers/cpuidle/governors/haltpoll.c
+index 7a703d2..4b00d7a 100644
+--- a/drivers/cpuidle/governors/haltpoll.c
++++ b/drivers/cpuidle/governors/haltpoll.c
+@@ -77,7 +77,7 @@ static int haltpoll_select(struct cpuidle_driver *drv,
+ 
+ static void adjust_poll_limit(struct cpuidle_device *dev, unsigned int block_us)
+ {
+-	unsigned int val;
++	unsigned int val, grow_start;
+ 	u64 block_ns = block_us*NSEC_PER_USEC;
+ 
+ 	/* Grow cpu_halt_poll_us if
+@@ -86,8 +86,17 @@ static void adjust_poll_limit(struct cpuidle_device *dev, unsigned int block_us)
+ 	if (block_ns > dev->poll_limit_ns && block_ns <= guest_halt_poll_ns) {
+ 		val = dev->poll_limit_ns * guest_halt_poll_grow;
+ 
+-		if (val < guest_halt_poll_grow_start)
+-			val = guest_halt_poll_grow_start;
++		/*
++		 * vcpu->halt_poll_ns needs a nonzero start point to grow if
++		 * it's zero.
++		 */
++		grow_start = guest_halt_poll_grow_start;
++		if (!grow_start)
++			grow_start = 1;
++
++		if (val < grow_start)
++			val = grow_start;
++
+ 		if (val > guest_halt_poll_ns)
+ 			val = guest_halt_poll_ns;
+ 
 -- 
 1.8.3.1
 
