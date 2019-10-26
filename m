@@ -2,66 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 635BDE58C8
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 07:33:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C519E5996
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 12:21:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfJZFdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 26 Oct 2019 01:33:18 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:50504 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725976AbfJZFdS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 26 Oct 2019 01:33:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=rBFZM3Rm7F2y0bq2NvCIIQKubp4uvyGCLsoRcmsizGo=; b=gkngM0TLz8m0hzgQ5czLiVB6i
-        2632tiJPfM/BaQ31vYmEZyQLaIfKETslrkSwJnCpYhjTkuYt/5W274FTZsSlRpIIE+SyQiGbSpXm7
-        rw4xiO/zzqzWLQ3sdYSw9PfClT66v7FgyzK3JUM3Qb8ZsFZxjw8msi4aDENNDPcBE7PSJ3zcKoDiX
-        +sTpkpqTpQZ+k4i8zgpwwhPWioOccVKXoYLjI25B3h56G7Y/lpfvOrGUYMYo81AlJ0CiTCtS2ND/s
-        nMkcGXQor+sy5C3cqcHtvX3iVaPYsP4Z1o3z4Sw8Wpu6dDaB0uD7KO3BrdU2cQV6jXfn9ScHnxXUD
-        GOy1KT84g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iOEhC-0003Eu-J1; Sat, 26 Oct 2019 05:33:02 +0000
-Date:   Fri, 25 Oct 2019 22:33:02 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v9 00/22] KVM RISC-V Support
-Message-ID: <20191026053302.GA12368@infradead.org>
-References: <20191016160649.24622-1-anup.patel@wdc.com>
- <alpine.DEB.2.21.9999.1910251609500.12828@viisi.sifive.com>
- <CAAhSdy1zfL2kPM-Le6TZSqS2TU1RkgC+zTbB4y31t8TXwVjhEg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAhSdy1zfL2kPM-Le6TZSqS2TU1RkgC+zTbB4y31t8TXwVjhEg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        id S1726139AbfJZKUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 26 Oct 2019 06:20:44 -0400
+Received: from inca-roads.misterjones.org ([213.251.177.50]:34308 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726098AbfJZKUo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 26 Oct 2019 06:20:44 -0400
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=big-swifty.misterjones.org)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iOJBU-0003Pg-TZ; Sat, 26 Oct 2019 12:20:37 +0200
+Date:   Sat, 26 Oct 2019 11:20:35 +0100
+Message-ID: <8636ffzu30.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     James Morse <james.morse@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Subject: Re: [PATCH v2 4/5] arm64: KVM: Prevent speculative S1 PTW when restoring vcpu context
+In-Reply-To: <151fc868-6709-3017-e34d-649ec0e1812c@arm.com>
+References: <20191019095521.31722-1-maz@kernel.org>
+        <20191019095521.31722-5-maz@kernel.org>
+        <151fc868-6709-3017-e34d-649ec0e1812c@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: james.morse@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, mark.rutland@arm.com, suzuki.poulose@arm.com, julien.thierry.kdev@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 26, 2019 at 08:52:16AM +0530, Anup Patel wrote:
-> I generally run checkpatch.pl every time before sending patches.
-> 
-> I will try checkpatch.pl with --strict parameter as well in v10 series.
+On Thu, 24 Oct 2019 17:10:44 +0100,
+James Morse <james.morse@arm.com> wrote:
 
---strict is a load of bullshit.  Please don't do that.
+Hi James,
+
+> Hi Marc,
+> 
+> On 19/10/2019 10:55, Marc Zyngier wrote:
+> > When handling erratum 1319367, we must ensure that the page table
+> > walker cannot parse the S1 page tables while the guest is in an
+> > inconsistent state. This is done as follows:
+> > 
+> > On guest entry:
+> > - TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> > - all system registers are restored, except for TCR_EL1 and SCTLR_EL1
+> > - stage-2 is restored
+> > - SCTLR_EL1 and TCR_EL1 are restored
+> > 
+> > On guest exit:
+> > - SCTLR_EL1.M and TCR_EL1.EPD{0,1} are set, ensuring that no PTW can occur
+> > - stage-2 is disabled
+> > - All host system registers are restored
+> 
+> Reviewed-by: James Morse <james.morse@arm.com>
+> 
+> (whitespace nit below)
+> 
+> 
+> > diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> > index 69e10b29cbd0..5765b17c38c7 100644
+> > --- a/arch/arm64/kvm/hyp/switch.c
+> > +++ b/arch/arm64/kvm/hyp/switch.c
+> > @@ -118,6 +118,20 @@ static void __hyp_text __activate_traps_nvhe(struct kvm_vcpu *vcpu)
+> >  	}
+> >  
+> >  	write_sysreg(val, cptr_el2);
+> > +
+> > +	if (cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> > +		struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+> > +
+> > +		isb();
+> > +		/*
+> > +		 * At this stage, and thanks to the above isb(), S2 is
+> > +		 * configured and enabled. We can now restore the guest's S1
+> > +		 * configuration: SCTLR, and only then TCR.
+> > +		 */
+> 
+> (note for my future self: because the guest may have had M=0 and rubbish in the TTBRs)
+> 
+> > +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +		isb();
+> > +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+> > +	}
+> >  }
+> >  
+> 
+> 
+> > diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > index 7ddbc849b580..fb97547bfa79 100644
+> > --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> > +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> > @@ -117,12 +117,26 @@ static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+> >  {
+> >  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
+> >  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
+> > -	write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +
+> > +	if (!cpus_have_const_cap(ARM64_WORKAROUND_1319367)) {
+> > +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL1],	SYS_SCTLR);
+> > +		write_sysreg_el1(ctxt->sys_regs[TCR_EL1],	SYS_TCR);
+> > +	} else	if (!ctxt->__hyp_running_vcpu) {
+> > +		/*
+> > +		 * Must only be done for guest registers, hence the context
+> > +		 * test. We'recoming from the host, so SCTLR.M is already
+> 
+> (Nit: We'recoming?)
+
+Well spotted, now fixed. And thanks for the reviewing, much appreciated.
+
+Catalin, Will: given that this series conflicts with the workaround for
+erratum 1542419, do you mind taking it via the arm64 tree?
+
+To make things a bit simpler, I've updated the series with James' tags at
+[1], and pushed out a resolution of the merge with arm64/for-next/core [2].
+
+Thanks,
+
+	M.
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/erratum-1319367
+[2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/erratum-1319367-resolved
+
+-- 
+Jazz is not dead, it just smells funny.
