@@ -2,105 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B344E583F
-	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 05:22:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7087E5844
+	for <lists+kvm@lfdr.de>; Sat, 26 Oct 2019 05:25:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726203AbfJZDWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 25 Oct 2019 23:22:30 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38127 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbfJZDWa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 25 Oct 2019 23:22:30 -0400
-Received: by mail-wr1-f67.google.com with SMTP id v9so4406783wrq.5
-        for <kvm@vger.kernel.org>; Fri, 25 Oct 2019 20:22:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FDkPt2vxGvwt3QPswZka6NmewYvhNdxaRnBgmjWNMNE=;
-        b=C9LwTpoMiaGEtarmKKTOEugKrY4v8PqKTr/nwd8Q6hsQ0nXW13bIbP+NnYd8Zvv+Fu
-         rZ+9G77bPVots2ydjdBiOh9zuet8WyKKEyOBGhEkknv5Me+seTlOfxgxy0GiRD4vxU3N
-         dy9s9GpEj1dYi8+E9wftSWMDmtnsuw0o+zgvOHHvCkWvwK2WZf2E4TBaI8hdZC3H0uUA
-         VFikOoun+D4A5NnI/tYjBEBX9r35NzIbkqSON1Sa/RT1x6hQjDlPwHiKOevFW9W9vKmq
-         NkPp/8DD38VvRZ9FLUFWSqRpdnKG6jlP8HTBD4GXjW8h9s+MmJZeW42sEoeGFkkUfx/i
-         VlVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FDkPt2vxGvwt3QPswZka6NmewYvhNdxaRnBgmjWNMNE=;
-        b=U5NvoEoxW5svs/6GIKh05hZCM4JKm4SqqC8PNR7TcoOm27D7G2487npsL+aGxnl1Gt
-         Ojj8uXRW1PbF07uNuE9fxSNWY9G1og9xYItRkaRz43pTFOXrovWfuOX3QEzA7qCvh2/s
-         clk8S/hnwtrCC7vBJf8Hb2E02obg30gdQYntLdgeVULbe0sdb3zxC+q3KUmw11oE0mnr
-         cW/nL42bLu+/SZCrm7lQMZtwA/jXmrItTSAog4mAmBMLH18K1QvyM7XL/TllAuFq0vAn
-         6m+IU2H30ZqjIHtH1RChmt+RWqIU2N4V1L0wR/A5L/PFv7pqNQiTZK547VkaIcLiw4Pm
-         AloA==
-X-Gm-Message-State: APjAAAXtzb/Zf2QItv/lAO7SLO3ew1ndMIlQnWyK0cV7lVCYpUX4RfLP
-        y9Eo8VoThRZrTtmVDceYb86ryR9vRGEAl8iL1eCuWg==
-X-Google-Smtp-Source: APXvYqzGZAwZcrHBPmOgmCPHvyvMfVI74sgWBPVAhX27aA6UWJHfjZjS6tcIVVoOKyt4lXWyW/tRQWr+XDi0GMbCxqI=
-X-Received: by 2002:a05:6000:351:: with SMTP id e17mr5324719wre.96.1572060147773;
- Fri, 25 Oct 2019 20:22:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191016160649.24622-1-anup.patel@wdc.com> <alpine.DEB.2.21.9999.1910251609500.12828@viisi.sifive.com>
-In-Reply-To: <alpine.DEB.2.21.9999.1910251609500.12828@viisi.sifive.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sat, 26 Oct 2019 08:52:16 +0530
-Message-ID: <CAAhSdy1zfL2kPM-Le6TZSqS2TU1RkgC+zTbB4y31t8TXwVjhEg@mail.gmail.com>
-Subject: Re: [PATCH v9 00/22] KVM RISC-V Support
-To:     Paul Walmsley <paul.walmsley@sifive.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim K <rkrcmar@redhat.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexander Graf <graf@amazon.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726258AbfJZDZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 25 Oct 2019 23:25:15 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:58298 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726189AbfJZDZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 25 Oct 2019 23:25:14 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3OTDY036445;
+        Sat, 26 Oct 2019 03:24:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=88h25RwWxlkFw6Utuvr/Tusi+Xq0QgqhBFiEZkcA1vg=;
+ b=QeZz5+ID73y0yzcg5x4A69Hds90xi+60cWXgo22tM2uhiuxhhQQvzxVeg+UYrMDINSK7
+ rVNBB1csBTOTxLn3RfAgZdnO+f540YkgkKM6sqmpn1QP++mjotnZuKspki3a1xe+GKy/
+ co7eMhSQi496Y6PWtrcpvs6nGKE95Y1S/qJo8PjZpLtoPGwVHqjF4QlaD9fWLBxHCkit
+ 7ggJWFQYDdkR8QZixKErS28G1VTOa8klDcxp8WJ/DcwM3x8In4yev2f/sfbaiPrnt8cq
+ mr0zvkX8gkTHmHIRP9eEZrvlJrEQxbMOSie6uNwZH5K7g0/TML0M8iE0x+Jn8JbMzbXk 5A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2vve3pr0sp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 26 Oct 2019 03:24:42 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9Q3OKVV082854;
+        Sat, 26 Oct 2019 03:24:42 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2vvc6mmwfm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 26 Oct 2019 03:24:42 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x9Q3Of0X022211;
+        Sat, 26 Oct 2019 03:24:41 GMT
+Received: from z2.cn.oracle.com (/10.182.71.218)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 25 Oct 2019 20:24:40 -0700
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, mtosatti@redhat.com,
+        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
+        rkrcmar@redhat.com, pbonzini@redhat.com,
+        Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Subject: [PATCH 0/5] misc fixes on halt-poll code both KVM and guest
+Date:   Sat, 26 Oct 2019 11:23:54 +0800
+Message-Id: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9421 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910260033
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9421 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910260034
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 26, 2019 at 4:40 AM Paul Walmsley <paul.walmsley@sifive.com> wrote:
->
-> Hi Anup,
->
-> On Wed, 16 Oct 2019, Anup Patel wrote:
->
-> > This series adds initial KVM RISC-V support. Currently, we are able to boot
-> > RISC-V 64bit Linux Guests with multiple VCPUs.
-> >
-> > Few key aspects of KVM RISC-V added by this series are:
-> > 1. Minimal possible KVM world-switch which touches only GPRs and few CSRs.
-> > 2. Full Guest/VM switch is done via vcpu_get/vcpu_put infrastructure.
-> > 3. KVM ONE_REG interface for VCPU register access from user-space.
-> > 4. PLIC emulation is done in user-space.
-> > 5. Timer and IPI emuation is done in-kernel.
-> > 6. MMU notifiers supported.
-> > 7. FP lazy save/restore supported.
-> > 8. SBI v0.1 emulation for KVM Guest available.
-> > 9. Forward unhandled SBI calls to KVM userspace.
-> > 10. Hugepage support for Guest/VM
->
-> Several patches in this series cause 'checkpatch.pl --strict' to flag
-> issues.  When you respin this series, could you fix those, please?
+The last two patches are similar with 2nd and 3rd, but counterpart for guest.
 
-I generally run checkpatch.pl every time before sending patches.
+Zhenzhong Duan (5):
+  KVM: simplify branch check in host poll code
+  KVM: add a check to ensure grow start value is nonzero
+  KVM: ensure pool time is longer than block_ns
+  cpuidle-haltpoll: add a check to ensure grow start value is nonzero
+  cpuidle-haltpoll: fix up the branch check
 
-I will try checkpatch.pl with --strict parameter as well in v10 series.
+ drivers/cpuidle/governors/haltpoll.c | 21 +++++++++++++++------
+ virt/kvm/kvm_main.c                  | 18 ++++++++++++------
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
-Regards,
-Anup
+-- 
+1.8.3.1
 
->
->
-> thanks,
->
-> - Paul
