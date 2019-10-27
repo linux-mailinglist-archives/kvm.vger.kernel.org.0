@@ -2,104 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F8FDE6335
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2019 15:44:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC8E4E63B6
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2019 16:23:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727212AbfJ0On4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Oct 2019 10:43:56 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38436 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726690AbfJ0Onh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Oct 2019 10:43:37 -0400
-Received: by mail-wr1-f68.google.com with SMTP id v9so7233336wrq.5;
-        Sun, 27 Oct 2019 07:43:35 -0700 (PDT)
+        id S1727269AbfJ0PXa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Oct 2019 11:23:30 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42272 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726682AbfJ0PX3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Oct 2019 11:23:29 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r1so7274644wrs.9;
+        Sun, 27 Oct 2019 08:23:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=8m+44Vom44C3KhaUynaGnY+KEBMnlLX9FyMyBId8qoU=;
-        b=NQH/OeWG8WdxJzcEjzA4jcs0prQEWO9Pvc/hRibnmA2kGfBX9GXKEPzG8QBt0r5gt5
-         WjLH9+UgxdiMjt+Upsns+/VTt4xZduF/oj+56GLFkWyGTeKIpVPddDxRQ18hMU6VTzeS
-         Q3APORHOhFrh88B0ZczEmBrll1sBbpDk005nfDYQ/7lqddPN6exe7WgjGRpcLNfCPILS
-         +14lN+4eH5gYalHUk+tGCUcgJEewmLLRDKhU7lLUE4pyu4YYaZl3gnGoFEdH1F25bdIf
-         XVk9yXZgNi8mgQrhxWHxwRSseL6MeWEYAlASPhmRobVUJyTznxd8fFxLT1eXbZbR6cvB
-         bVdg==
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6igW15FTNZ7FtCx0WIgyCMA7DFyAcrqLMXtjwXRNmLA=;
+        b=IpzaTN653x/VMl1PRi17h+qZEKf0SkYms86/7yjWeyCLKorH0aA4rIJZCOEtoKR7hs
+         zXrChV5UqjC6nwsIt8LeW3HgC7I/FAAQwcftiLpA88QJp7Dt/j/0XSsWXC6/kffekQ33
+         b4bHt4zO7n/L0w6m7irP8CA50P0yGXoyQTigACshScNaWvf65llgJp1MYokVU1l5wKzQ
+         td4WcUNEzvSZyU9tgSrCNxod3e6IJg45eGAt9p5cJtn/KaRUyr5/IKeMxs2gKQHjoyfC
+         tE/WhkzB9IFfyFXbE+k0F3GHieLdiFZSKc/eu639a1+DK/RhB3AJMyZFcpykePl+CuFz
+         A5ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=8m+44Vom44C3KhaUynaGnY+KEBMnlLX9FyMyBId8qoU=;
-        b=rD7xonPjPw2V2NGlaZyxGxwFs34j3r58fKoXukBX8bXjL9qXBk0Hh57toN2tiwIkp3
-         nT+GNmOpkJghtN4jBA+ke0kSwfLIg5MVhMy++nRhF6a46aTJZn+Tetkv3xp3TfsdzN4u
-         tiUFa0q09oxHhG7Gfpkj2SevgBF4Y8vMaPtzmL4JLXeYr7xYO+LjVCfzuqimz8aXkfAd
-         J0P+f3fchnqR22CHxNr8pwO7fsXoSbo26KqlJ6WzdRqCTFI/J6P//pOUPym1Y3b+EMxX
-         gwpXhBac6xYK06L5X067hHB53r6whBVCJ2Whzv+8AsLaSYRzn6JIQsfYXm8jPTE+3WAR
-         r+bw==
-X-Gm-Message-State: APjAAAXfBajN564otYlbOLr34mb6/XQnoDYqbY65mqUHq5WXRSH7fr3m
-        ZLNPNUzKEeo6pCqa90XvmZM=
-X-Google-Smtp-Source: APXvYqyiG2KCZCSee9Vwv5D88dH0uhGwkGZqT0L2pQDFD9DyKBWheclB6McEARrC/xn+QILCohGoMQ==
-X-Received: by 2002:a05:6000:92:: with SMTP id m18mr11842859wrx.105.1572187415060;
-        Sun, 27 Oct 2019 07:43:35 -0700 (PDT)
-Received: from localhost (94.222.26.109.rev.sfr.net. [109.26.222.94])
-        by smtp.gmail.com with ESMTPSA id f17sm8378029wrs.66.2019.10.27.07.43.34
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=6igW15FTNZ7FtCx0WIgyCMA7DFyAcrqLMXtjwXRNmLA=;
+        b=a7I6mdG2Ii8T6JZwmVObw1kt8jpLpX+AmEVyfNmbxwPkTPuDHanA6GriDwvt9s6A2e
+         DoJrRKubbGprhe7Wcita7Dc18RVoH8E0y2Wx7KPK4ZHYv1efbIh34nWOpwPBBs/dVbfc
+         ao/T8xGLQdxXgbWyCsIoUW/XEE+MkC8uYhIJngvU4g1HuG4ch9+lx8w0Mg1EPHOWfoTt
+         AWaJmOuNjPXhmpway7XEYLaUK1AF/lVvmJc8AlWu341x7FuF+MJibEHUBcYHArnSor74
+         QvPqJlPJ3mvxd0YGtL3uLX2Vcf0gfJEW/oYjrTqSm/SxUIgMEkt8VRDXiKsmWIbW1WMT
+         pXNQ==
+X-Gm-Message-State: APjAAAU/oWc0kr74xNqEAkyJXGgjQ/2JPp3+tO21+5rnEyvfeH31E52B
+        6qVCYummTVXdEyeoOQvsZDL8frQt
+X-Google-Smtp-Source: APXvYqyUIc8eYKFqH39Ikktps0DnWgYsp2ek8Y5cJ/Z2DcRo5ITOuExB++Squxhm8XxeSkzWItMuWw==
+X-Received: by 2002:adf:f4cb:: with SMTP id h11mr12546506wrp.260.1572189806902;
+        Sun, 27 Oct 2019 08:23:26 -0700 (PDT)
+Received: from localhost.localdomain (mob-2-43-145-251.net.vodafone.it. [2.43.145.251])
+        by smtp.gmail.com with ESMTPSA id z15sm8490315wrr.19.2019.10.27.08.23.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Oct 2019 07:43:34 -0700 (PDT)
-Date:   Sun, 27 Oct 2019 09:17:52 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
-        linux-hyperv@vger.kernel.org,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [PATCH net-next 12/14] vsock/vmci: register vmci_transport only
- when VMCI guest/host are active
-Message-ID: <20191027081752.GD4472@stefanha-x1.localdomain>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-13-sgarzare@redhat.com>
+        Sun, 27 Oct 2019 08:23:26 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Joerg Roedel <jroedel@suse.de>
+Subject: [PATCH] KVM: vmx, svm: always run with EFER.NXE=1 when shadow paging is active
+Date:   Sun, 27 Oct 2019 16:23:23 +0100
+Message-Id: <20191027152323.24326-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
-Content-Disposition: inline
-In-Reply-To: <20191023095554.11340-13-sgarzare@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+VMX already does so if the host has SMEP, in order to support the combination of
+CR0.WP=1 and CR4.SMEP=1.  However, it is perfectly safe to always do so, and in
+fact VMX already ends up running with EFER.NXE=1 on old processors that lack the
+"load EFER" controls, because it may help avoiding a slow MSR write.  Removing
+all the conditionals simplifies the code.
 
---C1iGAkRnbeBonpVg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+SVM does not have similar code, but it should since recent AMD processors do
+support SMEP.  So this patch also makes the code for the two vendors more similar
+while fixing NPT=0, CR0.WP=1 and CR4.SMEP=1 on AMD processors.
 
-On Wed, Oct 23, 2019 at 11:55:52AM +0200, Stefano Garzarella wrote:
-> +static int __init vmci_transport_init(void)
-> +{
-> +	int features = VSOCK_TRANSPORT_F_DGRAM;
+Cc: stable@vger.kernel.org
+Cc: Joerg Roedel <jroedel@suse.de>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm.c     | 10 ++++++++--
+ arch/x86/kvm/vmx/vmx.c | 14 +++-----------
+ 2 files changed, 11 insertions(+), 13 deletions(-)
 
-Where is this variable used?
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index b6feb6a11a8d..2c452293c7cc 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -732,8 +732,14 @@ static int get_npt_level(struct kvm_vcpu *vcpu)
+ static void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+ {
+ 	vcpu->arch.efer = efer;
+-	if (!npt_enabled && !(efer & EFER_LMA))
+-		efer &= ~EFER_LME;
++
++	if (!npt_enabled) {
++		/* Shadow paging assumes NX to be available.  */
++		efer |= EFER_NX;
++
++		if (!(efer & EFER_LMA))
++			efer &= ~EFER_LME;
++	}
+ 
+ 	to_svm(vcpu)->vmcb->save.efer = efer | EFER_SVME;
+ 	mark_dirty(to_svm(vcpu)->vmcb, VMCB_CR);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2a2ba277c676..e191d41afb34 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -896,17 +896,9 @@ static bool update_transition_efer(struct vcpu_vmx *vmx, int efer_offset)
+ 	u64 guest_efer = vmx->vcpu.arch.efer;
+ 	u64 ignore_bits = 0;
+ 
+-	if (!enable_ept) {
+-		/*
+-		 * NX is needed to handle CR0.WP=1, CR4.SMEP=1.  Testing
+-		 * host CPUID is more efficient than testing guest CPUID
+-		 * or CR4.  Host SMEP is anyway a requirement for guest SMEP.
+-		 */
+-		if (boot_cpu_has(X86_FEATURE_SMEP))
+-			guest_efer |= EFER_NX;
+-		else if (!(guest_efer & EFER_NX))
+-			ignore_bits |= EFER_NX;
+-	}
++	/* Shadow paging assumes NX to be available.  */
++	if (!enable_ept)
++		guest_efer |= EFER_NX;
+ 
+ 	/*
+ 	 * LMA and LME handled by hardware; SCE meaningless outside long mode.
+-- 
+2.21.0
 
---C1iGAkRnbeBonpVg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl21UrAACgkQnKSrs4Gr
-c8iGGgf/YjP9kPT916spdjeVdu2Wg8PPuw60Kt/da2i6Qp1hdl0CTXaK1RJxoH8F
-FYtdWNROfs6CPSHEP5xVD4xBeHvZEST4BgeVr/hFZYbw4F5vVb9OIDpSln7JkN/r
-zldMb0Q+UjbvTUZm9buMeb08nbzn9CdeaCJDGPIRHOZjDNw+wL0cilfVm5NMDR4L
-pNbLtyJJliiIZeh2CxCu0k8Kd25OUlwDfqHHuFvDn/kmcNyQlVOUwb0VRnDts8mW
-ian+XNpRXDY24xdyZ9F2UxA6wvwOleFhEN/La2euNs8Iv38liHKNgiCDHe/+br/t
-vuMWadKe9tonhgk7iUlCA5hNDKgKiQ==
-=CXM0
------END PGP SIGNATURE-----
-
---C1iGAkRnbeBonpVg--
