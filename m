@@ -2,114 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0170E6196
-	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2019 09:20:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C3FE61F1
+	for <lists+kvm@lfdr.de>; Sun, 27 Oct 2019 11:04:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726579AbfJ0IUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Oct 2019 04:20:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20930 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726002AbfJ0IUL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 27 Oct 2019 04:20:11 -0400
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9R8CXsp096943;
-        Sun, 27 Oct 2019 04:20:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vvgy24um5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Oct 2019 04:19:59 -0400
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9R8Chbv097267;
-        Sun, 27 Oct 2019 04:19:59 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vvgy24uky-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Oct 2019 04:19:59 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9R8Gse5015131;
-        Sun, 27 Oct 2019 08:19:58 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma04wdc.us.ibm.com with ESMTP id 2vvds6gxpk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 27 Oct 2019 08:19:58 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9R8JvEr24248630
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 27 Oct 2019 08:19:57 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A73706E050;
-        Sun, 27 Oct 2019 08:19:57 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE2FB6E04E;
-        Sun, 27 Oct 2019 08:19:55 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.36.74])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Sun, 27 Oct 2019 08:19:55 +0000 (GMT)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH] KVM: arm/arm64: show halt poll counters in debugfs
-Date:   Sun, 27 Oct 2019 09:19:50 +0100
-Message-Id: <1572164390-5851-1-git-send-email-borntraeger@de.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-27_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=567 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910270086
+        id S1726795AbfJ0KEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Oct 2019 06:04:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39070 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726316AbfJ0KER (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Oct 2019 06:04:17 -0400
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D3FADC049E10
+        for <kvm@vger.kernel.org>; Sun, 27 Oct 2019 10:04:16 +0000 (UTC)
+Received: by mail-qk1-f200.google.com with SMTP id m189so7330327qkc.7
+        for <kvm@vger.kernel.org>; Sun, 27 Oct 2019 03:04:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DIl+XjLva0/Mm7Hs+GCeYJOa+yDwPi8Nqp5nHz6nVLQ=;
+        b=qXaZAom64KGuz6wwpBxw4v6oV/Q5JBQj4m0xjp8gdWs0WJ7xfJ5TBkpMcfksq98Pi9
+         Jda8A+O+AzjOjIEqbsT8JPUMpLzQ4Q/aiK5UsYqN2tOsSjVsalve8q7PnWAWLbT3AHx/
+         re4cbd309t3w/3wWuHN3NXKppTO9dxDMH+hPwJ7L2ufHhUmy2tRbhcCkCDuXuJfJHxuI
+         1IwK/uv5YdYRObLPo1E6OFn+MDem+ANdCgtQpLKBz3mt553cB5vUUMK2cthL8Q1WDMsY
+         ypL69V8DKQaSfncUeWFO7M9e6i00yZZP94gZXgv3cvfu35PnxumugWPVdq0MOz0hBXYK
+         Dyaw==
+X-Gm-Message-State: APjAAAUCBPTNKpgTMc54fbfG/PoLDdAjQuNFahr9YSOAVS0K4/QsQxbR
+        kkzZk4pm9IeXz1I2cD1nS4ogVlfaFYw6smoQKvBlJCnnZUqOeiFASzU0HGMnr+obcmTdFIhvkUJ
+        hTOvxBNXdhkre
+X-Received: by 2002:ac8:18eb:: with SMTP id o40mr12230184qtk.304.1572170656208;
+        Sun, 27 Oct 2019 03:04:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxGQTCutbRGwG/hqehf3CeyndAKewdMdeoJOADviHDVuig69eSpbDhlBsX3tnjDPNRXLTAZiA==
+X-Received: by 2002:ac8:18eb:: with SMTP id o40mr12230171qtk.304.1572170655989;
+        Sun, 27 Oct 2019 03:04:15 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id b185sm5051949qkg.45.2019.10.27.03.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Oct 2019 03:04:14 -0700 (PDT)
+Date:   Sun, 27 Oct 2019 06:04:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] vringh: fix copy direction of
+ vringh_iov_push_kern()
+Message-ID: <20191027060328-mutt-send-email-mst@kernel.org>
+References: <20191024035718.7690-1-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191024035718.7690-1-jasowang@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ARM/ARM64 has counters halt_successful_poll, halt_attempted_poll,
-halt_poll_invalid, and halt_wakeup but never exposed those in debugfs.
+On Thu, Oct 24, 2019 at 11:57:18AM +0800, Jason Wang wrote:
+> We want to copy from iov to buf, so the direction was wrong.
+> 
+> Note: no real user for the helper, but it will be used by future
+> features.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
-This patch is untested
- arch/arm/kvm/guest.c   | 4 ++++
- arch/arm64/kvm/guest.c | 4 ++++
- 2 files changed, 8 insertions(+)
+I'm still inclined to merge it now, incorrect code tends to
+proliferate.
 
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64..6696464 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -21,6 +21,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index dfd6264..260ea31 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -34,6 +34,10 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(halt_successful_poll),
-+	VCPU_STAT(halt_attempted_poll),
-+	VCPU_STAT(halt_poll_invalid),
-+	VCPU_STAT(halt_wakeup),
- 	VCPU_STAT(hvc_exit_stat),
- 	VCPU_STAT(wfe_exit_stat),
- 	VCPU_STAT(wfi_exit_stat),
--- 
-1.8.3.1
-
+> ---
+>  drivers/vhost/vringh.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> index 08ad0d1f0476..a0a2d74967ef 100644
+> --- a/drivers/vhost/vringh.c
+> +++ b/drivers/vhost/vringh.c
+> @@ -852,6 +852,12 @@ static inline int xfer_kern(void *src, void *dst, size_t len)
+>  	return 0;
+>  }
+>  
+> +static inline int kern_xfer(void *dst, void *src, size_t len)
+> +{
+> +	memcpy(dst, src, len);
+> +	return 0;
+> +}
+> +
+>  /**
+>   * vringh_init_kern - initialize a vringh for a kernelspace vring.
+>   * @vrh: the vringh to initialize.
+> @@ -958,7 +964,7 @@ EXPORT_SYMBOL(vringh_iov_pull_kern);
+>  ssize_t vringh_iov_push_kern(struct vringh_kiov *wiov,
+>  			     const void *src, size_t len)
+>  {
+> -	return vringh_iov_xfer(wiov, (void *)src, len, xfer_kern);
+> +	return vringh_iov_xfer(wiov, (void *)src, len, kern_xfer);
+>  }
+>  EXPORT_SYMBOL(vringh_iov_push_kern);
+>  
+> -- 
+> 2.19.1
