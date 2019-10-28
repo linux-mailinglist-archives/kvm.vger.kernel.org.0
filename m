@@ -2,86 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABB20E726C
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 14:11:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30361E72DF
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 14:50:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727812AbfJ1NLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 09:11:50 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:45132 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727007AbfJ1NLu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 09:11:50 -0400
-Received: by mail-oi1-f193.google.com with SMTP id k2so687716oij.12
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 06:11:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HyBAqeapYuxtXuJfIQdZix/p7r93MkELXxCsBd6FUY0=;
-        b=d3gLT2gnqwgF4vTsJWZG2UcUvIo2shVw4quoZlQ619do68aYEqet/Gkytufd9Y47QW
-         1OAJLtOmor5P3hloUEhEgf1qewgfieyCwLY/J2el3oBg4D2RpG1SHN8njt5GE6oXY1ZA
-         5wI0j/gyjN8QMZliHHlHIQJSlw6uUPP87ylJyqDQM7JseBWpS7pexOdBdpYZZSHR8GQ6
-         K3GVtBiJ+tCFru3960DZtJr54RnHX5rOP/DDry7XYs7WfAlcKKiqKTdJiQ22t7BjXqBS
-         awciiSNMtPxFW3ca9QA68yNiRKvLZP2RaDmJJxT9vAIHLKshpAtfvZXNN2bY1QyqDDle
-         ZXAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HyBAqeapYuxtXuJfIQdZix/p7r93MkELXxCsBd6FUY0=;
-        b=BqJrEiBHAdPmeZVPPWla4vHIYgp6EgaHN+gP+zMdQgBMLycZhmADY3mfAQnGt+nMoK
-         JtA4uKMOFJt9u7ZxGAidjlARDdTqNdUYOZ0ayAGbeku5iDBGvoujCf4blvtmRRrpkjO2
-         gHyVp/nEGJajjcGfWN0/71GGpR/TyPPdC1kFqtMa4f0c6fu2jicL7gQ+Kc9EP/F27diJ
-         nHtU315HiX3WN4YtjEH4cZLJVXlKVs3FFDZFdxrTUc++Qqwtz/b+iSCMfGRqRFyShvx1
-         5wT5eUuqc455v0ZX6LJ8aNQCIMqOwKFxkZjO6M8PHcLX+wtyIY/47CiRtWLp8mjIxYhJ
-         VufA==
-X-Gm-Message-State: APjAAAXkx0YZ2hdHHSVXtpkNWGsdwui4MoK+7bvxHG9916UT68M7RGiM
-        6tR1JsEyffB/CXhN7YevYmg5VegY96AOsfwZgOzmNQ==
-X-Google-Smtp-Source: APXvYqwVpkGGXygFILUaoGHg5RHvXOv0ZlsxyMz9ioegP3kMBRg6K49wBY1vUSlOnuTspz71c9XrupumfPXIVhI0G60=
-X-Received: by 2002:aca:3b41:: with SMTP id i62mr13367511oia.48.1572268309051;
- Mon, 28 Oct 2019 06:11:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191026032447.20088-1-zhengxiang9@huawei.com> <20191027061450-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20191027061450-mutt-send-email-mst@kernel.org>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 28 Oct 2019 13:11:48 +0000
-Message-ID: <CAFEAcA-gkBFgqYfFOPera15x2cK_a54Abw_0Gad1Jq+tGcC8rQ@mail.gmail.com>
+        id S2389067AbfJ1Nuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 09:50:37 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5203 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725774AbfJ1Nuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 09:50:37 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 479FFA6EC6C943B0D695;
+        Mon, 28 Oct 2019 21:50:33 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 28 Oct 2019
+ 21:50:23 +0800
 Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
 To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xiang Zheng <zhengxiang9@huawei.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        gengdongjiu <gengdongjiu@huawei.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>,
-        wanghaibin.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+CC:     <peter.maydell@linaro.org>, <ehabkost@redhat.com>,
+        <kvm@vger.kernel.org>, <wanghaibin.wang@huawei.com>,
+        <mtosatti@redhat.com>, <qemu-devel@nongnu.org>,
+        <linuxarm@huawei.com>, <shannon.zhaosl@gmail.com>,
+        Xiang Zheng <zhengxiang9@huawei.com>, <qemu-arm@nongnu.org>,
+        <james.morse@arm.com>, <jonathan.cameron@huawei.com>,
+        <imammedo@redhat.com>, <pbonzini@redhat.com>, <xuwei5@huawei.com>,
+        <lersek@redhat.com>, <rth@twiddle.net>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+ <6c44268a-2676-3fa1-226d-29877b21dbea@huawei.com>
+ <20191028042645-mutt-send-email-mst@kernel.org>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <1edda59a-8b3d-1eec-659a-05356d55ed22@huawei.com>
+Date:   Mon, 28 Oct 2019 21:50:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
+MIME-Version: 1.0
+In-Reply-To: <20191028042645-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 27 Oct 2019 at 10:17, Michael S. Tsirkin <mst@redhat.com> wrote:
-> This looks mostly OK to me.  I sent some minor style comments but they
-> can be addressed by follow up patches.
->
-> Maybe it's a good idea to merge this before soft freeze to make sure it
-> gets some testing.  I'll leave this decision to the ARM maintainer.  For
-> ACPI parts:
->
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Hi Michael,
 
-Thanks for the review. Unfortunately this has missed the softfreeze,
-given I'm away for the conference already and not in a position
-to do any more review/merging of arm stuff. It'll have to wait for 5.0.
+On 2019/10/28 16:28, Michael S. Tsirkin wrote:
+>>> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+>>> ACPI parts:
+>>>
+>>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> Got it, Thanks for the Reviewed-by from Michael.
+>>
+>> Hi Michael,
+>>   According to discussion with QEMU community, I finished and developed the whole ARM RAS virtualization solution, and introduce the ARM APEI table in the first time.
+>> For the newly created files, which are mainly about ARM APEI/GHES part,I would like to maintain them. If you agree it, whether I can add new maintainers[1]? thanks a lot.
+>>
+>>
+>> [1]:
+>> +ARM APEI Subsystem
+>> +M: Dongjiu Geng <gengdongjiu@huawei.com>
+>> +M: Xiang zheng <zhengxiang9@huawei.com>
+>> +L: qemu-arm@nongnu.org
+>> +S: Maintained
+>> +F: hw/acpi/acpi_ghes.c
+>> +F: include/hw/acpi/acpi_ghes.h
+>> +F: docs/specs/acpi_hest_ghes.rst
+>>
+> I think for now you want to be a designated reviewer.  So I'd use an R:
+> tag.
 
-thanks
--- PMM
+ Thanks for the reply.
+ I want to be a maintainer for my newly created files, so whether I can use M: tag. I would like to contribute some time to maintain that, thanks a lot.
+
+> 
+>>>
+>>>> ---
+
