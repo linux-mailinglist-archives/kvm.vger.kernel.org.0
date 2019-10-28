@@ -2,124 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03680E741B
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:55:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C238E742A
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:58:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390404AbfJ1OzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 10:55:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27929 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727227AbfJ1OzO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Oct 2019 10:55:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572274513;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8Jp7CpqTm0L+bqd2B7yrvKaIM5Cq2LYfQcPQByUtcdc=;
-        b=hy6+ywhn8uLXDrcQV0KHr9UrsxCuPTCaJdGHBaH9EksAsK7w1M85T4wcmG5ye55PMuf8tL
-        mAe3rM1aiEuVaTHWyMSJSxGroRuaaq4rsiBYY3Dm4CTxEDMBeYZgI5IyU+jd1O7lUv775B
-        36GYx2KF6v8Ye12MKp+Eq2BagpT0tPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-hlh2CZ35PJCPStbZhnNq4w-1; Mon, 28 Oct 2019 10:55:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S2390470AbfJ1O4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 10:56:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40442 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390448AbfJ1O4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 10:56:51 -0400
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 643FC85B6EE;
-        Mon, 28 Oct 2019 14:55:07 +0000 (UTC)
-Received: from gondolin (ovpn-117-206.ams2.redhat.com [10.36.117.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C63160FA2;
-        Mon, 28 Oct 2019 14:54:56 +0000 (UTC)
-Date:   Mon, 28 Oct 2019 15:54:53 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
-Message-ID: <20191028155453.4b142994.cohuck@redhat.com>
-In-Reply-To: <20191024114059.102802-3-frankja@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-3-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id ACF7681F0D
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 14:56:50 +0000 (UTC)
+Received: by mail-qk1-f200.google.com with SMTP id m189so10560753qkc.7
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 07:56:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QtNd0UMqofsV+XZWmGpconlIFxP5DQnlNLXPHI1qYVA=;
+        b=SLUG3ZSSkEW/7hdVLAlDKwEiiVeOBvfXbYk1Kig6OfsBxSsKgCutJKF/0jFejylkbN
+         rYSyxPRw5HJVBuc5i2r9Q6Ed6EMDNjQmypfjMQEYAu/ZzG8hT7KgCHU1q4FwYTDLDYdC
+         CiAxgJpj48gj0/l4oDNdf1X05zBfZEE3gXbB1kt17xq+TSLbQnLF9uBSfDOXIY43X/jr
+         TcX9BN4xDRDbK1xOrOendo3GOiREKwKI5kWvk2VzlO/Ly5A9WFJObhbEuHxF+2m6o5rE
+         3V58ljlY2REvzHE2W+oVHghbOGaDGNUOv8ZrPBMmHwv9sqQTkY4fA1zhJoYjxe+y3fZr
+         hkHg==
+X-Gm-Message-State: APjAAAXWYxGM/ZLtAuMnZS78q88RT8t4v349tMrCGlMVoJqAlr+kWaFe
+        CXul1R/P9bv0hjcjTgWgTgqgN+piQHnJOxwj0LuqPtkuQ2J0wmexPdVYHbbHpTF0mKujtpoWWCC
+        +P4aoKavf+b9+
+X-Received: by 2002:a37:610f:: with SMTP id v15mr15487586qkb.98.1572274609945;
+        Mon, 28 Oct 2019 07:56:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwVqh1AavhfAL3N/XFU4xnwB0M3GWSLGvejcePz3nI6KDoPRMDZQjnEw5dr2p7IfEnb9i2/Zg==
+X-Received: by 2002:a37:610f:: with SMTP id v15mr15487560qkb.98.1572274609617;
+        Mon, 28 Oct 2019 07:56:49 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+        by smtp.gmail.com with ESMTPSA id p17sm5696481qkm.135.2019.10.28.07.56.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Oct 2019 07:56:48 -0700 (PDT)
+Date:   Mon, 28 Oct 2019 10:56:41 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     gengdongjiu <gengdongjiu@huawei.com>
+Cc:     peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+        wanghaibin.wang@huawei.com, mtosatti@redhat.com,
+        qemu-devel@nongnu.org, linuxarm@huawei.com,
+        shannon.zhaosl@gmail.com, Xiang Zheng <zhengxiang9@huawei.com>,
+        qemu-arm@nongnu.org, james.morse@arm.com,
+        jonathan.cameron@huawei.com, imammedo@redhat.com,
+        pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com,
+        rth@twiddle.net
+Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
+Message-ID: <20191028104834-mutt-send-email-mst@kernel.org>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+ <6c44268a-2676-3fa1-226d-29877b21dbea@huawei.com>
+ <20191028042645-mutt-send-email-mst@kernel.org>
+ <1edda59a-8b3d-1eec-659a-05356d55ed22@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: hlh2CZ35PJCPStbZhnNq4w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1edda59a-8b3d-1eec-659a-05356d55ed22@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 07:40:24 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Mon, Oct 28, 2019 at 09:50:21PM +0800, gengdongjiu wrote:
+> Hi Michael,
+> 
+> On 2019/10/28 16:28, Michael S. Tsirkin wrote:
+> >>> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+> >>> ACPI parts:
+> >>>
+> >>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> >> Got it, Thanks for the Reviewed-by from Michael.
+> >>
+> >> Hi Michael,
+> >>   According to discussion with QEMU community, I finished and developed the whole ARM RAS virtualization solution, and introduce the ARM APEI table in the first time.
+> >> For the newly created files, which are mainly about ARM APEI/GHES part,I would like to maintain them. If you agree it, whether I can add new maintainers[1]? thanks a lot.
+> >>
+> >>
+> >> [1]:
+> >> +ARM APEI Subsystem
+> >> +M: Dongjiu Geng <gengdongjiu@huawei.com>
+> >> +M: Xiang zheng <zhengxiang9@huawei.com>
+> >> +L: qemu-arm@nongnu.org
+> >> +S: Maintained
+> >> +F: hw/acpi/acpi_ghes.c
+> >> +F: include/hw/acpi/acpi_ghes.h
+> >> +F: docs/specs/acpi_hest_ghes.rst
+> >>
+> > I think for now you want to be a designated reviewer.  So I'd use an R:
+> > tag.
+> 
+>  Thanks for the reply.
+>  I want to be a maintainer for my newly created files, so whether I can use M: tag. I would like to contribute some time to maintain that, thanks a lot.
 
-> From: Vasily Gorbik <gor@linux.ibm.com>
->=20
-> Introduce KVM_S390_PROTECTED_VIRTUALIZATION_HOST kbuild option for
-> protected virtual machines hosting support code.
->=20
-> Add "prot_virt" command line option which controls if the kernel
-> protected VMs support is enabled at runtime.
->=20
-> Extend ultravisor info definitions and expose it via uv_info struct
-> filled in during startup.
->=20
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-> ---
->  .../admin-guide/kernel-parameters.txt         |  5 ++
->  arch/s390/boot/Makefile                       |  2 +-
->  arch/s390/boot/uv.c                           | 20 +++++++-
->  arch/s390/include/asm/uv.h                    | 46 ++++++++++++++++--
->  arch/s390/kernel/Makefile                     |  1 +
->  arch/s390/kernel/setup.c                      |  4 --
->  arch/s390/kernel/uv.c                         | 48 +++++++++++++++++++
->  arch/s390/kvm/Kconfig                         |  9 ++++
->  8 files changed, 126 insertions(+), 9 deletions(-)
->  create mode 100644 arch/s390/kernel/uv.c
+This will fundamentally be up to Peter.
 
-(...)
+Reviewing patches is generally the best way to become a maintainer,
+that's why I suggested the R: tag.
 
-> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
-> index d3db3d7ed077..652b36f0efca 100644
-> --- a/arch/s390/kvm/Kconfig
-> +++ b/arch/s390/kvm/Kconfig
-> @@ -55,6 +55,15 @@ config KVM_S390_UCONTROL
-> =20
->  =09  If unsure, say N.
-> =20
-> +config KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> +=09bool "Protected guests execution support"
-> +=09depends on KVM
-> +=09---help---
-> +=09  Support hosting protected virtual machines isolated from the
-> +=09  hypervisor.
 
-I'm currently in the process of glancing across this patch set (won't
-be able to get around to properly looking at it until next week the
-earliest), so just a very high level comment:
-
-I think there's not enough information in here to allow someone
-configuring the kernel to decide what this is and if it would be useful
-to them. This should probably be at least point to some document giving
-some more details. Also, can you add a sentence where this feature is
-actually expected to be available?
-
-> +
-> +=09  If unsure, say Y.
-
-Is 'Y' really the safe choice here? AFAICS, this is introducing new
-code and not only trying to call new interfaces, if available. Is there
-any drawback to enabling this on a kernel that won't run on a platform
-supporting this feature? Is this supposed to be a common setup?
-
-> +
->  # OK, it's a little counter-intuitive to do this, but it puts it neatly =
-under
->  # the virtualization menu.
->  source "drivers/vhost/Kconfig"
-
+> > 
+> >>>
+> >>>> ---
