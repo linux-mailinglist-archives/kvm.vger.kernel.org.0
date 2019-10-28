@@ -2,144 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 98118E73BA
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:35:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F7E4E73C9
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:37:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390134AbfJ1Oea (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 10:34:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31466 "EHLO
+        id S2390195AbfJ1Og6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 10:36:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23888 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2390129AbfJ1Oea (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 10:34:30 -0400
+        with ESMTP id S1729377AbfJ1Og5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 10:36:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572273268;
+        s=mimecast20190719; t=1572273416;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
-        bh=2zSLFnT78SObCjRc2kcWtLSkTCoW74eGKHeMYdeeQeY=;
-        b=HCzG50pLMaTo3fnals8zaLoBJ2Gc3rA9HgMcI5x732/HuCh/KppTXpbUxPs1gXhu8RR/qN
-        R1K48/uFGmvSeV+Ts/YiEMrzvfCgV0xk0jecP+DxH3+fqD5n1G4hIOLeV6KzhqThyfMi82
-        2bsil0Lsz3QdbTy0tLDm1gEyveEinBU=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1tDPTKYm0gFl0ElnSqLHmBt0Ic2EiYyOwiQjqnXl2sU=;
+        b=Yj16+7d0I+62dNWIEo+1xle/yq4IWH0X5rZXZXP+pIWyzYqSwD89ZMBP2GIdY1TL6XTET4
+        jhcnlUM82lHH0fq0dXdSKA7i2AM0DnhzGSKpuczQu1xUDx6Kfv25FZxtI2XuRk/x7oFn3B
+        aRu5ZoR0NCP1ODRMi4Ie4Qf44gsd3L4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-pN3RLijUNBGf8cXbvpCiQA-1; Mon, 28 Oct 2019 10:34:25 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-196-eRFzfWePNUSNu7Gi3UzFWg-1; Mon, 28 Oct 2019 10:36:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 187E1107AD28;
-        Mon, 28 Oct 2019 14:34:21 +0000 (UTC)
-Received: from [10.40.204.213] (ovpn-204-213.brq.redhat.com [10.40.204.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 09FD93D8F;
-        Mon, 28 Oct 2019 14:34:03 +0000 (UTC)
-Subject: Re: [PATCH v12 0/6] mm / virtio: Provide support for unused page
- reporting
-To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, konrad.wilk@oracle.com, david@redhat.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-References: <20191022221223.17338.5860.stgit@localhost.localdomain>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFl4pQoBEADT/nXR2JOfsCjDgYmE2qonSGjkM1g8S6p9UWD+bf7YEAYYYzZsLtbilFTe
- z4nL4AV6VJmC7dBIlTi3Mj2eymD/2dkKP6UXlliWkq67feVg1KG+4UIp89lFW7v5Y8Muw3Fm
- uQbFvxyhN8n3tmhRe+ScWsndSBDxYOZgkbCSIfNPdZrHcnOLfA7xMJZeRCjqUpwhIjxQdFA7
- n0s0KZ2cHIsemtBM8b2WXSQG9CjqAJHVkDhrBWKThDRF7k80oiJdEQlTEiVhaEDURXq+2XmG
- jpCnvRQDb28EJSsQlNEAzwzHMeplddfB0vCg9fRk/kOBMDBtGsTvNT9OYUZD+7jaf0gvBvBB
- lbKmmMMX7uJB+ejY7bnw6ePNrVPErWyfHzR5WYrIFUtgoR3LigKnw5apzc7UIV9G8uiIcZEn
- C+QJCK43jgnkPcSmwVPztcrkbC84g1K5v2Dxh9amXKLBA1/i+CAY8JWMTepsFohIFMXNLj+B
- RJoOcR4HGYXZ6CAJa3Glu3mCmYqHTOKwezJTAvmsCLd3W7WxOGF8BbBjVaPjcZfavOvkin0u
- DaFvhAmrzN6lL0msY17JCZo046z8oAqkyvEflFbC0S1R/POzehKrzQ1RFRD3/YzzlhmIowkM
- BpTqNBeHEzQAlIhQuyu1ugmQtfsYYq6FPmWMRfFPes/4JUU/PQARAQABtCVOaXRlc2ggTmFy
- YXlhbiBMYWwgPG5pbGFsQHJlZGhhdC5jb20+iQI9BBMBCAAnBQJZeKUKAhsjBQkJZgGABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheAAAoJEKOGQNwGMqM56lEP/A2KMs/pu0URcVk/kqVwcBhU
- SnvB8DP3lDWDnmVrAkFEOnPX7GTbactQ41wF/xwjwmEmTzLrMRZpkqz2y9mV0hWHjqoXbOCS
- 6RwK3ri5e2ThIPoGxFLt6TrMHgCRwm8YuOSJ97o+uohCTN8pmQ86KMUrDNwMqRkeTRW9wWIQ
- EdDqW44VwelnyPwcmWHBNNb1Kd8j3xKlHtnS45vc6WuoKxYRBTQOwI/5uFpDZtZ1a5kq9Ak/
- MOPDDZpd84rqd+IvgMw5z4a5QlkvOTpScD21G3gjmtTEtyfahltyDK/5i8IaQC3YiXJCrqxE
- r7/4JMZeOYiKpE9iZMtS90t4wBgbVTqAGH1nE/ifZVAUcCtycD0f3egX9CHe45Ad4fsF3edQ
- ESa5tZAogiA4Hc/yQpnnf43a3aQ67XPOJXxS0Qptzu4vfF9h7kTKYWSrVesOU3QKYbjEAf95
- NewF9FhAlYqYrwIwnuAZ8TdXVDYt7Z3z506//sf6zoRwYIDA8RDqFGRuPMXUsoUnf/KKPrtR
- ceLcSUP/JCNiYbf1/QtW8S6Ca/4qJFXQHp0knqJPGmwuFHsarSdpvZQ9qpxD3FnuPyo64S2N
- Dfq8TAeifNp2pAmPY2PAHQ3nOmKgMG8Gn5QiORvMUGzSz8Lo31LW58NdBKbh6bci5+t/HE0H
- pnyVf5xhNC/FuQINBFl4pQoBEACr+MgxWHUP76oNNYjRiNDhaIVtnPRqxiZ9v4H5FPxJy9UD
- Bqr54rifr1E+K+yYNPt/Po43vVL2cAyfyI/LVLlhiY4yH6T1n+Di/hSkkviCaf13gczuvgz4
- KVYLwojU8+naJUsiCJw01MjO3pg9GQ+47HgsnRjCdNmmHiUQqksMIfd8k3reO9SUNlEmDDNB
- XuSzkHjE5y/R/6p8uXaVpiKPfHoULjNRWaFc3d2JGmxJpBdpYnajoz61m7XJlgwl/B5Ql/6B
- dHGaX3VHxOZsfRfugwYF9CkrPbyO5PK7yJ5vaiWre7aQ9bmCtXAomvF1q3/qRwZp77k6i9R3
- tWfXjZDOQokw0u6d6DYJ0Vkfcwheg2i/Mf/epQl7Pf846G3PgSnyVK6cRwerBl5a68w7xqVU
- 4KgAh0DePjtDcbcXsKRT9D63cfyfrNE+ea4i0SVik6+N4nAj1HbzWHTk2KIxTsJXypibOKFX
- 2VykltxutR1sUfZBYMkfU4PogE7NjVEU7KtuCOSAkYzIWrZNEQrxYkxHLJsWruhSYNRsqVBy
- KvY6JAsq/i5yhVd5JKKU8wIOgSwC9P6mXYRgwPyfg15GZpnw+Fpey4bCDkT5fMOaCcS+vSU1
- UaFmC4Ogzpe2BW2DOaPU5Ik99zUFNn6cRmOOXArrryjFlLT5oSOe4IposgWzdwARAQABiQIl
- BBgBCAAPBQJZeKUKAhsMBQkJZgGAAAoJEKOGQNwGMqM5ELoP/jj9d9gF1Al4+9bngUlYohYu
- 0sxyZo9IZ7Yb7cHuJzOMqfgoP4tydP4QCuyd9Q2OHHL5AL4VFNb8SvqAxxYSPuDJTI3JZwI7
- d8JTPKwpulMSUaJE8ZH9n8A/+sdC3CAD4QafVBcCcbFe1jifHmQRdDrvHV9Es14QVAOTZhnJ
- vweENyHEIxkpLsyUUDuVypIo6y/Cws+EBCWt27BJi9GH/EOTB0wb+2ghCs/i3h8a+bi+bS7L
- FCCm/AxIqxRurh2UySn0P/2+2eZvneJ1/uTgfxnjeSlwQJ1BWzMAdAHQO1/lnbyZgEZEtUZJ
- x9d9ASekTtJjBMKJXAw7GbB2dAA/QmbA+Q+Xuamzm/1imigz6L6sOt2n/X/SSc33w8RJUyor
- SvAIoG/zU2Y76pKTgbpQqMDmkmNYFMLcAukpvC4ki3Sf086TdMgkjqtnpTkEElMSFJC8npXv
- 3QnGGOIfFug/qs8z03DLPBz9VYS26jiiN7QIJVpeeEdN/LKnaz5LO+h5kNAyj44qdF2T2AiF
- HxnZnxO5JNP5uISQH3FjxxGxJkdJ8jKzZV7aT37sC+Rp0o3KNc+GXTR+GSVq87Xfuhx0LRST
- NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <3888d486-d046-b35f-a365-655f8c4d3bf2@redhat.com>
-Date:   Mon, 28 Oct 2019 10:34:00 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52CD7180491C
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 14:36:53 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A6AAE5D6AE;
+        Mon, 28 Oct 2019 14:36:45 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 31BFB105153;
+        Mon, 28 Oct 2019 12:36:27 -0200 (BRST)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x9SEaMxL014838;
+        Mon, 28 Oct 2019 12:36:22 -0200
+Date:   Mon, 28 Oct 2019 12:36:22 -0200
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>
+Subject: KVM: x86: switch KVMCLOCK base to monotonic raw clock
+Message-ID: <20191028143619.GA14370@amt.cnet>
 MIME-Version: 1.0
-In-Reply-To: <20191022221223.17338.5860.stgit@localhost.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: pN3RLijUNBGf8cXbvpCiQA-1
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: eRFzfWePNUSNu7Gi3UzFWg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 10/22/19 6:27 PM, Alexander Duyck wrote:
+Commit 0bc48bea36d1 ("KVM: x86: update master clock before computing
+kvmclock_offset")
+switches the order of operations to avoid the conversion=20
 
+TSC (without frequency correction) ->
+system_timestamp (with frequency correction),=20
 
-[...]
-> Below are the results from various benchmarks. I primarily focused on two
-> tests. The first is the will-it-scale/page_fault2 test, and the other is
-> a modified version of will-it-scale/page_fault1 that was enabled to use
-> THP. I did this as it allows for better visibility into different parts
-> of the memory subsystem. The guest is running on one node of a E5-2630 v3
-> CPU with 48G of RAM that I split up into two logical nodes in the guest
-> in order to test with NUMA as well.
->
-> Test=09=09    page_fault1 (THP)     page_fault2
-> Baseline=09 1  1256106.33  +/-0.09%   482202.67  +/-0.46%
->                 16  8864441.67  +/-0.09%  3734692.00  +/-1.23%
->
-> Patches applied  1  1257096.00  +/-0.06%   477436.00  +/-0.16%
->                 16  8864677.33  +/-0.06%  3800037.00  +/-0.19%
->
-> Patches enabled=09 1  1258420.00  +/-0.04%   480080.00  +/-0.07%
->  MADV disabled  16  8753840.00  +/-1.27%  3782764.00  +/-0.37%
->
-> Patches enabled=09 1  1267916.33  +/-0.08%   472075.67  +/-0.39%
->                 16  8287050.33  +/-0.67%  3774500.33  +/-0.11%
+which might cause a time jump.
 
-If I am not mistaken then you are only observing the number of processes (a=
-nd
-not the number of threads) launched over the 1st and the 16th vcpu=C2=A0 re=
-ported by
-will-it-scale?
+However, it leaves any other masterclock update unsafe, which includes,=20
+at the moment:
 
---=20
-Thanks
-Nitesh
+        * HV_X64_MSR_REFERENCE_TSC MSR write.
+        * TSC writes.
+        * Host suspend/resume.
+
+Avoid the time jump issue by using frequency uncorrected
+CLOCK_MONOTONIC_RAW clock.=20
+
+Its the guests time keeping software responsability
+to track and correct a reference clock such as UTC.
+
+This fixes forward time jump (which can result in=20
+failure to bring up a vCPU) during vCPU hotplug:
+
+Oct 11 14:48:33 storage kernel: CPU2 has been hot-added
+Oct 11 14:48:34 storage kernel: CPU3 has been hot-added
+Oct 11 14:49:22 storage kernel: smpboot: Booting Node 0 Processor 2 APIC 0x=
+2          <-- time jump of almost 1 minute
+Oct 11 14:49:22 storage kernel: smpboot: do_boot_cpu failed(-1) to wakeup C=
+PU#2
+Oct 11 14:49:23 storage kernel: smpboot: Booting Node 0 Processor 3 APIC 0x=
+3
+Oct 11 14:49:23 storage kernel: kvm-clock: cpu 3, msr 0:7ff640c1, secondary=
+ cpu clock
+
+Which happens because:
+
+                /*                                                         =
+     =20
+                 * Wait 10s total for a response from AP                   =
+     =20
+                 */                                                        =
+     =20
+                boot_error =3D -1;                                         =
+       =20
+                timeout =3D jiffies + 10*HZ;                               =
+       =20
+                while (time_before(jiffies, timeout)) {=20
+                         ...
+                }
+
+Analyzed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 661e2bf..ff713a1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1521,20 +1521,25 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsign=
+ed index, u64 *data)
+ }
+=20
+ #ifdef CONFIG_X86_64
++struct pvclock_clock {
++=09int vclock_mode;
++=09u64 cycle_last;
++=09u64 mask;
++=09u32 mult;
++=09u32 shift;
++};
++
+ struct pvclock_gtod_data {
+ =09seqcount_t=09seq;
+=20
+-=09struct { /* extract of a clocksource struct */
+-=09=09int vclock_mode;
+-=09=09u64=09cycle_last;
+-=09=09u64=09mask;
+-=09=09u32=09mult;
+-=09=09u32=09shift;
+-=09} clock;
++=09struct pvclock_clock clock; /* extract of a clocksource struct */
++=09struct pvclock_clock raw_clock; /* extract of a clocksource struct */
+=20
++=09u64=09=09boot_ns_raw;
+ =09u64=09=09boot_ns;
+ =09u64=09=09nsec_base;
+ =09u64=09=09wall_time_sec;
++=09u64=09=09monotonic_raw_nsec;
+ };
+=20
+ static struct pvclock_gtod_data pvclock_gtod_data;
+@@ -1542,10 +1547,20 @@ struct pvclock_gtod_data {
+ static void update_pvclock_gtod(struct timekeeper *tk)
+ {
+ =09struct pvclock_gtod_data *vdata =3D &pvclock_gtod_data;
+-=09u64 boot_ns;
++=09u64 boot_ns, boot_ns_raw;
+=20
+ =09boot_ns =3D ktime_to_ns(ktime_add(tk->tkr_mono.base, tk->offs_boot));
+=20
++=09/*
++=09 * FIXME: tk->offs_boot should be converted to CLOCK_MONOTONIC_RAW
++=09 * interval (that is, without frequency adjustment for that interval).
++=09 *
++=09 * Lack of this fix can cause system_timestamp to not be equal to
++=09 * CLOCK_MONOTONIC_RAW (which happen if the host uses
++=09 * suspend/resume).
++=09 */
++=09boot_ns_raw =3D ktime_to_ns(ktime_add(tk->tkr_raw.base, tk->offs_boot))=
+;
++
+ =09write_seqcount_begin(&vdata->seq);
+=20
+ =09/* copy pvclock gtod data */
+@@ -1555,11 +1570,20 @@ static void update_pvclock_gtod(struct timekeeper *=
+tk)
+ =09vdata->clock.mult=09=09=3D tk->tkr_mono.mult;
+ =09vdata->clock.shift=09=09=3D tk->tkr_mono.shift;
+=20
++=09vdata->raw_clock.vclock_mode=09=3D tk->tkr_raw.clock->archdata.vclock_m=
+ode;
++=09vdata->raw_clock.cycle_last=09=3D tk->tkr_raw.cycle_last;
++=09vdata->raw_clock.mask=09=09=3D tk->tkr_raw.mask;
++=09vdata->raw_clock.mult=09=09=3D tk->tkr_raw.mult;
++=09vdata->raw_clock.shift=09=09=3D tk->tkr_raw.shift;
++
+ =09vdata->boot_ns=09=09=09=3D boot_ns;
+ =09vdata->nsec_base=09=09=3D tk->tkr_mono.xtime_nsec;
+=20
+ =09vdata->wall_time_sec            =3D tk->xtime_sec;
+=20
++=09vdata->boot_ns_raw=09=09=3D boot_ns_raw;
++=09vdata->monotonic_raw_nsec=09=3D tk->tkr_raw.xtime_nsec;
++
+ =09write_seqcount_end(&vdata->seq);
+ }
+ #endif
+@@ -1983,21 +2007,21 @@ static u64 read_tsc(void)
+ =09return last;
+ }
+=20
+-static inline u64 vgettsc(u64 *tsc_timestamp, int *mode)
++static inline u64 vgettsc(struct pvclock_clock *clock, u64 *tsc_timestamp,
++=09=09=09  int *mode)
+ {
+ =09long v;
+-=09struct pvclock_gtod_data *gtod =3D &pvclock_gtod_data;
+ =09u64 tsc_pg_val;
+=20
+-=09switch (gtod->clock.vclock_mode) {
++=09switch (clock->vclock_mode) {
+ =09case VCLOCK_HVCLOCK:
+ =09=09tsc_pg_val =3D hv_read_tsc_page_tsc(hv_get_tsc_page(),
+ =09=09=09=09=09=09  tsc_timestamp);
+ =09=09if (tsc_pg_val !=3D U64_MAX) {
+ =09=09=09/* TSC page valid */
+ =09=09=09*mode =3D VCLOCK_HVCLOCK;
+-=09=09=09v =3D (tsc_pg_val - gtod->clock.cycle_last) &
+-=09=09=09=09gtod->clock.mask;
++=09=09=09v =3D (tsc_pg_val - clock->cycle_last) &
++=09=09=09=09clock->mask;
+ =09=09} else {
+ =09=09=09/* TSC page invalid */
+ =09=09=09*mode =3D VCLOCK_NONE;
+@@ -2006,8 +2030,8 @@ static inline u64 vgettsc(u64 *tsc_timestamp, int *mo=
+de)
+ =09case VCLOCK_TSC:
+ =09=09*mode =3D VCLOCK_TSC;
+ =09=09*tsc_timestamp =3D read_tsc();
+-=09=09v =3D (*tsc_timestamp - gtod->clock.cycle_last) &
+-=09=09=09gtod->clock.mask;
++=09=09v =3D (*tsc_timestamp - clock->cycle_last) &
++=09=09=09clock->mask;
+ =09=09break;
+ =09default:
+ =09=09*mode =3D VCLOCK_NONE;
+@@ -2016,10 +2040,10 @@ static inline u64 vgettsc(u64 *tsc_timestamp, int *=
+mode)
+ =09if (*mode =3D=3D VCLOCK_NONE)
+ =09=09*tsc_timestamp =3D v =3D 0;
+=20
+-=09return v * gtod->clock.mult;
++=09return v * clock->mult;
+ }
+=20
+-static int do_monotonic_boot(s64 *t, u64 *tsc_timestamp)
++static int do_monotonic_raw(s64 *t, u64 *tsc_timestamp)
+ {
+ =09struct pvclock_gtod_data *gtod =3D &pvclock_gtod_data;
+ =09unsigned long seq;
+@@ -2028,10 +2052,10 @@ static int do_monotonic_boot(s64 *t, u64 *tsc_times=
+tamp)
+=20
+ =09do {
+ =09=09seq =3D read_seqcount_begin(&gtod->seq);
+-=09=09ns =3D gtod->nsec_base;
+-=09=09ns +=3D vgettsc(tsc_timestamp, &mode);
++=09=09ns =3D gtod->monotonic_raw_nsec;
++=09=09ns +=3D vgettsc(&gtod->raw_clock, tsc_timestamp, &mode);
+ =09=09ns >>=3D gtod->clock.shift;
+-=09=09ns +=3D gtod->boot_ns;
++=09=09ns +=3D gtod->boot_ns_raw;
+ =09} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
+ =09*t =3D ns;
+=20
+@@ -2049,7 +2073,7 @@ static int do_realtime(struct timespec64 *ts, u64 *ts=
+c_timestamp)
+ =09=09seq =3D read_seqcount_begin(&gtod->seq);
+ =09=09ts->tv_sec =3D gtod->wall_time_sec;
+ =09=09ns =3D gtod->nsec_base;
+-=09=09ns +=3D vgettsc(tsc_timestamp, &mode);
++=09=09ns +=3D vgettsc(&gtod->clock, tsc_timestamp, &mode);
+ =09=09ns >>=3D gtod->clock.shift;
+ =09} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
+=20
+@@ -2066,7 +2090,7 @@ static bool kvm_get_time_and_clockread(s64 *kernel_ns=
+, u64 *tsc_timestamp)
+ =09if (!gtod_is_based_on_tsc(pvclock_gtod_data.clock.vclock_mode))
+ =09=09return false;
+=20
+-=09return gtod_is_based_on_tsc(do_monotonic_boot(kernel_ns,
++=09return gtod_is_based_on_tsc(do_monotonic_raw(kernel_ns,
+ =09=09=09=09=09=09      tsc_timestamp));
+ }
+=20
 
