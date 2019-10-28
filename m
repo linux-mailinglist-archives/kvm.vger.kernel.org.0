@@ -2,286 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F7E4E73C9
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:37:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DAABE740B
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 15:53:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390195AbfJ1Og6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 10:36:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23888 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729377AbfJ1Og5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 10:36:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572273416;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1tDPTKYm0gFl0ElnSqLHmBt0Ic2EiYyOwiQjqnXl2sU=;
-        b=Yj16+7d0I+62dNWIEo+1xle/yq4IWH0X5rZXZXP+pIWyzYqSwD89ZMBP2GIdY1TL6XTET4
-        jhcnlUM82lHH0fq0dXdSKA7i2AM0DnhzGSKpuczQu1xUDx6Kfv25FZxtI2XuRk/x7oFn3B
-        aRu5ZoR0NCP1ODRMi4Ie4Qf44gsd3L4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-eRFzfWePNUSNu7Gi3UzFWg-1; Mon, 28 Oct 2019 10:36:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52CD7180491C
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 14:36:53 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A6AAE5D6AE;
-        Mon, 28 Oct 2019 14:36:45 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 31BFB105153;
-        Mon, 28 Oct 2019 12:36:27 -0200 (BRST)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x9SEaMxL014838;
-        Mon, 28 Oct 2019 12:36:22 -0200
-Date:   Mon, 28 Oct 2019 12:36:22 -0200
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>
-Subject: KVM: x86: switch KVMCLOCK base to monotonic raw clock
-Message-ID: <20191028143619.GA14370@amt.cnet>
+        id S2390352AbfJ1Owv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 10:52:51 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:43277 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390341AbfJ1Owv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 10:52:51 -0400
+Received: by mail-pg1-f196.google.com with SMTP id l24so7016641pgh.10
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 07:52:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r/ZN69HHuOFnS9cWLYatlx74ffqaKAQaJ3cnRG1cgls=;
+        b=aYv5EUsMiW22UOQ3r/keTuM97nEFS7f6ZnG3TZWZMk+mlgYkg4IPxuYkN0Ea4JiUU/
+         RElwSY1CO0apdpylRiD7LAH0A0vxxyK6eC5MsPMYyO7+beA2XWP5B8BiuH0qeTxiH58g
+         w+ENEpCMoEWBO9SMWbHJiCFtLSrm9RVKJdQokxGtrg2oHB5ItmeUs8QrMCRZMKtkPLGm
+         qQYG5ARTACj25YopzDiso2dRnkYI7kahXYxE2u0uHQ+0meSnpFMzZPQjej6/N1QVVZVn
+         B7aMxwYXeMo3dbSs4V6iT7ZkJjj18GD2NtFExxOpTqv6kC8vpVCVb4daHG6TnxMfjdc5
+         7KQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=r/ZN69HHuOFnS9cWLYatlx74ffqaKAQaJ3cnRG1cgls=;
+        b=bhbyRXrDl7pCv3zAlCw+Is7Ggo975M8aDGOg8EdmE5c+f+FTZABB60KIpEkkRahpT+
+         6pdk0cGxGNE530cYdvl0YfjICjIEXPiw83RMjyxXGtbMtvAFpW9DA5dm0T/+8mwS7uPa
+         clWvC8QSdihGufnjPwCPiivDpdhXr8eSQcissXr4GARGlqNCoNwLYOPmtV6KFnwgCNJ8
+         toEH7Z2fMWPGRr2pWLB9Lel4NpP4HIKRVYtjItamrhZaSywWcdE8EjN2g20ca9KgXWdv
+         KS5q9eOhyTXUyuvmm4vOs2S0oo4QYWFgKtkHZfRBXOW8BEhzeGBcatwV2josz3Y2kCmc
+         IOYA==
+X-Gm-Message-State: APjAAAUJHek7Q9WrTx0hTamoV/gd5dGyHvPyr3IpO1Nbl7QOc7zlxiI5
+        CHGdJ5tTJxkGMEBDtMzH6RdUNGkaNzKpwaqUGYcjEw==
+X-Google-Smtp-Source: APXvYqwHpzWpxsE157pTd0mjJtwumeSC9OekC0v14esCLBGinGof1IJSWYv8UJE8cKXcYcgUJhJTTVpDOSWILpO90Fo=
+X-Received: by 2002:a63:6bc2:: with SMTP id g185mr2756564pgc.286.1572274370362;
+ Mon, 28 Oct 2019 07:52:50 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: eRFzfWePNUSNu7Gi3UzFWg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+References: <cover.1571844200.git.andreyknvl@google.com> <beeae42e313ef57b4630cc9f36e2e78ad42fd5b7.1571844200.git.andreyknvl@google.com>
+ <CACT4Y+a6t08RmtSYfF=3TuASx9ReCEe0Qp0AP=GbCtNyL2j+TA@mail.gmail.com>
+In-Reply-To: <CACT4Y+a6t08RmtSYfF=3TuASx9ReCEe0Qp0AP=GbCtNyL2j+TA@mail.gmail.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 28 Oct 2019 15:52:38 +0100
+Message-ID: <CAAeHK+w+Q_mM-WEiGFGJXiZQsn1-dnNcPU6i_8YpfispDYv1HA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] kcov: remote coverage support
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     USB list <linux-usb@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        David Windsor <dwindsor@gmail.com>,
+        Elena Reshetova <elena.reshetova@intel.com>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Alexander Potapenko <glider@google.com>,
+        Marco Elver <elver@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Oct 24, 2019 at 9:27 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> On Wed, Oct 23, 2019 at 5:24 PM Andrey Konovalov <andreyknvl@google.com> wrote:
+> >
+> > This patch adds background thread coverage collection ability to kcov.
+> ...
+> > +static struct kcov_remote *kcov_remote_add(struct kcov *kcov, u64 handle)
+> > +{
+> > +       struct kcov_remote *remote;
+> > +
+> > +       if (kcov_remote_find(handle))
+> > +               return ERR_PTR(-EEXIST);
+> > +       remote = kmalloc(sizeof(*remote), GFP_ATOMIC);
+> > +       if (!remote)
+> > +               return ERR_PTR(-ENOMEM);
+> > +       remote->handle = handle;
+> > +       remote->kcov = kcov;
+> > +       hash_add(kcov_remote_map, &remote->hnode, handle);
+>
+> I think it will make sense to check that there is no existing kcov
+> with the same handle registered. Such condition will be extremely hard
+> to debug based on episodically missing coverage.
 
-Commit 0bc48bea36d1 ("KVM: x86: update master clock before computing
-kvmclock_offset")
-switches the order of operations to avoid the conversion=20
+Although looking at this again: we already check that by calling
+kcov_remote_find().
 
-TSC (without frequency correction) ->
-system_timestamp (with frequency correction),=20
-
-which might cause a time jump.
-
-However, it leaves any other masterclock update unsafe, which includes,=20
-at the moment:
-
-        * HV_X64_MSR_REFERENCE_TSC MSR write.
-        * TSC writes.
-        * Host suspend/resume.
-
-Avoid the time jump issue by using frequency uncorrected
-CLOCK_MONOTONIC_RAW clock.=20
-
-Its the guests time keeping software responsability
-to track and correct a reference clock such as UTC.
-
-This fixes forward time jump (which can result in=20
-failure to bring up a vCPU) during vCPU hotplug:
-
-Oct 11 14:48:33 storage kernel: CPU2 has been hot-added
-Oct 11 14:48:34 storage kernel: CPU3 has been hot-added
-Oct 11 14:49:22 storage kernel: smpboot: Booting Node 0 Processor 2 APIC 0x=
-2          <-- time jump of almost 1 minute
-Oct 11 14:49:22 storage kernel: smpboot: do_boot_cpu failed(-1) to wakeup C=
-PU#2
-Oct 11 14:49:23 storage kernel: smpboot: Booting Node 0 Processor 3 APIC 0x=
-3
-Oct 11 14:49:23 storage kernel: kvm-clock: cpu 3, msr 0:7ff640c1, secondary=
- cpu clock
-
-Which happens because:
-
-                /*                                                         =
-     =20
-                 * Wait 10s total for a response from AP                   =
-     =20
-                 */                                                        =
-     =20
-                boot_error =3D -1;                                         =
-       =20
-                timeout =3D jiffies + 10*HZ;                               =
-       =20
-                while (time_before(jiffies, timeout)) {=20
-                         ...
-                }
-
-Analyzed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 661e2bf..ff713a1 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1521,20 +1521,25 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsign=
-ed index, u64 *data)
- }
-=20
- #ifdef CONFIG_X86_64
-+struct pvclock_clock {
-+=09int vclock_mode;
-+=09u64 cycle_last;
-+=09u64 mask;
-+=09u32 mult;
-+=09u32 shift;
-+};
-+
- struct pvclock_gtod_data {
- =09seqcount_t=09seq;
-=20
--=09struct { /* extract of a clocksource struct */
--=09=09int vclock_mode;
--=09=09u64=09cycle_last;
--=09=09u64=09mask;
--=09=09u32=09mult;
--=09=09u32=09shift;
--=09} clock;
-+=09struct pvclock_clock clock; /* extract of a clocksource struct */
-+=09struct pvclock_clock raw_clock; /* extract of a clocksource struct */
-=20
-+=09u64=09=09boot_ns_raw;
- =09u64=09=09boot_ns;
- =09u64=09=09nsec_base;
- =09u64=09=09wall_time_sec;
-+=09u64=09=09monotonic_raw_nsec;
- };
-=20
- static struct pvclock_gtod_data pvclock_gtod_data;
-@@ -1542,10 +1547,20 @@ struct pvclock_gtod_data {
- static void update_pvclock_gtod(struct timekeeper *tk)
- {
- =09struct pvclock_gtod_data *vdata =3D &pvclock_gtod_data;
--=09u64 boot_ns;
-+=09u64 boot_ns, boot_ns_raw;
-=20
- =09boot_ns =3D ktime_to_ns(ktime_add(tk->tkr_mono.base, tk->offs_boot));
-=20
-+=09/*
-+=09 * FIXME: tk->offs_boot should be converted to CLOCK_MONOTONIC_RAW
-+=09 * interval (that is, without frequency adjustment for that interval).
-+=09 *
-+=09 * Lack of this fix can cause system_timestamp to not be equal to
-+=09 * CLOCK_MONOTONIC_RAW (which happen if the host uses
-+=09 * suspend/resume).
-+=09 */
-+=09boot_ns_raw =3D ktime_to_ns(ktime_add(tk->tkr_raw.base, tk->offs_boot))=
-;
-+
- =09write_seqcount_begin(&vdata->seq);
-=20
- =09/* copy pvclock gtod data */
-@@ -1555,11 +1570,20 @@ static void update_pvclock_gtod(struct timekeeper *=
-tk)
- =09vdata->clock.mult=09=09=3D tk->tkr_mono.mult;
- =09vdata->clock.shift=09=09=3D tk->tkr_mono.shift;
-=20
-+=09vdata->raw_clock.vclock_mode=09=3D tk->tkr_raw.clock->archdata.vclock_m=
-ode;
-+=09vdata->raw_clock.cycle_last=09=3D tk->tkr_raw.cycle_last;
-+=09vdata->raw_clock.mask=09=09=3D tk->tkr_raw.mask;
-+=09vdata->raw_clock.mult=09=09=3D tk->tkr_raw.mult;
-+=09vdata->raw_clock.shift=09=09=3D tk->tkr_raw.shift;
-+
- =09vdata->boot_ns=09=09=09=3D boot_ns;
- =09vdata->nsec_base=09=09=3D tk->tkr_mono.xtime_nsec;
-=20
- =09vdata->wall_time_sec            =3D tk->xtime_sec;
-=20
-+=09vdata->boot_ns_raw=09=09=3D boot_ns_raw;
-+=09vdata->monotonic_raw_nsec=09=3D tk->tkr_raw.xtime_nsec;
-+
- =09write_seqcount_end(&vdata->seq);
- }
- #endif
-@@ -1983,21 +2007,21 @@ static u64 read_tsc(void)
- =09return last;
- }
-=20
--static inline u64 vgettsc(u64 *tsc_timestamp, int *mode)
-+static inline u64 vgettsc(struct pvclock_clock *clock, u64 *tsc_timestamp,
-+=09=09=09  int *mode)
- {
- =09long v;
--=09struct pvclock_gtod_data *gtod =3D &pvclock_gtod_data;
- =09u64 tsc_pg_val;
-=20
--=09switch (gtod->clock.vclock_mode) {
-+=09switch (clock->vclock_mode) {
- =09case VCLOCK_HVCLOCK:
- =09=09tsc_pg_val =3D hv_read_tsc_page_tsc(hv_get_tsc_page(),
- =09=09=09=09=09=09  tsc_timestamp);
- =09=09if (tsc_pg_val !=3D U64_MAX) {
- =09=09=09/* TSC page valid */
- =09=09=09*mode =3D VCLOCK_HVCLOCK;
--=09=09=09v =3D (tsc_pg_val - gtod->clock.cycle_last) &
--=09=09=09=09gtod->clock.mask;
-+=09=09=09v =3D (tsc_pg_val - clock->cycle_last) &
-+=09=09=09=09clock->mask;
- =09=09} else {
- =09=09=09/* TSC page invalid */
- =09=09=09*mode =3D VCLOCK_NONE;
-@@ -2006,8 +2030,8 @@ static inline u64 vgettsc(u64 *tsc_timestamp, int *mo=
-de)
- =09case VCLOCK_TSC:
- =09=09*mode =3D VCLOCK_TSC;
- =09=09*tsc_timestamp =3D read_tsc();
--=09=09v =3D (*tsc_timestamp - gtod->clock.cycle_last) &
--=09=09=09gtod->clock.mask;
-+=09=09v =3D (*tsc_timestamp - clock->cycle_last) &
-+=09=09=09clock->mask;
- =09=09break;
- =09default:
- =09=09*mode =3D VCLOCK_NONE;
-@@ -2016,10 +2040,10 @@ static inline u64 vgettsc(u64 *tsc_timestamp, int *=
-mode)
- =09if (*mode =3D=3D VCLOCK_NONE)
- =09=09*tsc_timestamp =3D v =3D 0;
-=20
--=09return v * gtod->clock.mult;
-+=09return v * clock->mult;
- }
-=20
--static int do_monotonic_boot(s64 *t, u64 *tsc_timestamp)
-+static int do_monotonic_raw(s64 *t, u64 *tsc_timestamp)
- {
- =09struct pvclock_gtod_data *gtod =3D &pvclock_gtod_data;
- =09unsigned long seq;
-@@ -2028,10 +2052,10 @@ static int do_monotonic_boot(s64 *t, u64 *tsc_times=
-tamp)
-=20
- =09do {
- =09=09seq =3D read_seqcount_begin(&gtod->seq);
--=09=09ns =3D gtod->nsec_base;
--=09=09ns +=3D vgettsc(tsc_timestamp, &mode);
-+=09=09ns =3D gtod->monotonic_raw_nsec;
-+=09=09ns +=3D vgettsc(&gtod->raw_clock, tsc_timestamp, &mode);
- =09=09ns >>=3D gtod->clock.shift;
--=09=09ns +=3D gtod->boot_ns;
-+=09=09ns +=3D gtod->boot_ns_raw;
- =09} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
- =09*t =3D ns;
-=20
-@@ -2049,7 +2073,7 @@ static int do_realtime(struct timespec64 *ts, u64 *ts=
-c_timestamp)
- =09=09seq =3D read_seqcount_begin(&gtod->seq);
- =09=09ts->tv_sec =3D gtod->wall_time_sec;
- =09=09ns =3D gtod->nsec_base;
--=09=09ns +=3D vgettsc(tsc_timestamp, &mode);
-+=09=09ns +=3D vgettsc(&gtod->clock, tsc_timestamp, &mode);
- =09=09ns >>=3D gtod->clock.shift;
- =09} while (unlikely(read_seqcount_retry(&gtod->seq, seq)));
-=20
-@@ -2066,7 +2090,7 @@ static bool kvm_get_time_and_clockread(s64 *kernel_ns=
-, u64 *tsc_timestamp)
- =09if (!gtod_is_based_on_tsc(pvclock_gtod_data.clock.vclock_mode))
- =09=09return false;
-=20
--=09return gtod_is_based_on_tsc(do_monotonic_boot(kernel_ns,
-+=09return gtod_is_based_on_tsc(do_monotonic_raw(kernel_ns,
- =09=09=09=09=09=09      tsc_timestamp));
- }
-=20
-
+>
+> ...
+> >  void kcov_task_exit(struct task_struct *t)
+> >  {
+> >         struct kcov *kcov;
+> > @@ -256,15 +401,23 @@ void kcov_task_exit(struct task_struct *t)
+> >         kcov = t->kcov;
+> >         if (kcov == NULL)
+> >                 return;
+> > +
+> >         spin_lock(&kcov->lock);
+> > +       kcov_debug("t = %px, kcov->t = %px\n", t, kcov->t);
+> > +       /*
+> > +        * If !kcov->remote, this checks that t->kcov->t == t.
+> > +        * If kcov->remote == true then the exiting task is either:
+> > +        * 1. a remote task between kcov_remote_start() and kcov_remote_stop(),
+> > +        *    in this case t != kcov->t and we'll print a warning; or
+>
+> Why? Is kcov->t == NULL for remote kcov's? May be worth mentioning in
+> the comment b/c it's a very condensed form to check lots of different
+> things at once.
+>
+> Otherwise the series look good to me:
+>
+> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+>
+> But Andrew's comments stand. It's possible I understand all of this
+> only because I already know how it works and why it works this way.
