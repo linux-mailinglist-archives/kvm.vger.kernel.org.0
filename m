@@ -2,111 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 025E0E74FF
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 16:24:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A9FEE7574
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 16:49:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729156AbfJ1PYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 11:24:17 -0400
-Received: from mail-il1-f194.google.com ([209.85.166.194]:35394 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726789AbfJ1PYR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 11:24:17 -0400
-Received: by mail-il1-f194.google.com with SMTP id p8so8536564ilp.2;
-        Mon, 28 Oct 2019 08:24:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=d5lAMRfHtk2EQ8kdZ9OB3W0LQMkhl/amzHwPWCWvW14=;
-        b=Z6vYaxKPcOGy25FF9pf7qir9Rqlme+c8mQkk8btbXmmVTT6UYwfOsWMly7W9XEBI8o
-         HgHhJ9AIO22Uuqga8nvRkREa14Tot8KYdkJYmaQV4aLJEuxiRnEnGyopc36qgx47eVwQ
-         b3alzoWycnAQaPezRAm/VrlBY/C2qzw2fG/lFzRhHuf6vNIJMuf+sxbrykS33gOIZ1ai
-         IFSna665SU1lHebs9BEOZwxW+MLBL3wk79T+hm1g5RlSo4wbP2ar3eE49gDiP+rtSP07
-         A8KAmicIlutBIEc579NOBUdeHFKSvtwXKaLzxAil4m13JC2TeI6SlhgwE8i9Cwn+okdC
-         SVMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=d5lAMRfHtk2EQ8kdZ9OB3W0LQMkhl/amzHwPWCWvW14=;
-        b=tVuWr9OA3e1g2pezHrCFb7R5DDB2ME8DKnSX9itBLsQ/s5OMwPrBgbCS1jwgPOvEr5
-         ohyO3T3zfLEcMHbmmMKsJz7avwo+GdCggMzutan4shHmJqsMPgVuYHkuSQDySYJata8k
-         OBcQi/ywbbktc20FQHachYiHHGVFnpIe4u84dT/iGwLDlAX5XFNkihIDsEj94Zp6QK17
-         Ya6LiBqniZs/uf+0i2CqRuVrHiMJOfflh7tXPtlsG21xhDVMT1gwCl2ODPkfPEH6/nDa
-         APA8XFS5PubMdBRChpnYeJyHEl66H38OlsPnUz5fcPMHpX7FQraLzfPC+63t1UpWRv3X
-         rbrQ==
-X-Gm-Message-State: APjAAAWaAYKNHuSyrCU1uJmIvjqdmIPzKYK+nqKa+iRYFZasFEe6guqu
-        V0AslAob+6DY4mAIeVPN9TCYdQcmsFJ9VngQqw0=
-X-Google-Smtp-Source: APXvYqyfgTgUajiGv2w6khwqi9U4IsCrcrOyR1GO4gPo2AlNqjopyIrCsEicGQbR4CIN0pp166szPL4Do0g9w/mvrSU=
-X-Received: by 2002:a92:9f1c:: with SMTP id u28mr19473440ili.97.1572276256522;
- Mon, 28 Oct 2019 08:24:16 -0700 (PDT)
+        id S2389930AbfJ1PtB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 11:49:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43972 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726097AbfJ1PtA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Oct 2019 11:49:00 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9SFmBnC109442
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 11:48:59 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vx2xm8v86-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 11:48:59 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <gor@linux.ibm.com>;
+        Mon, 28 Oct 2019 15:48:57 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 28 Oct 2019 15:48:54 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9SFmq8A26476626
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Oct 2019 15:48:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 82989A4065;
+        Mon, 28 Oct 2019 15:48:52 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 35934A4067;
+        Mon, 28 Oct 2019 15:48:52 +0000 (GMT)
+Received: from localhost (unknown [9.152.212.73])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 28 Oct 2019 15:48:52 +0000 (GMT)
+Date:   Mon, 28 Oct 2019 16:48:50 +0100
+From:   Vasily Gorbik <gor@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com
+Subject: Re: [RFC 03/37] s390/protvirt: add ultravisor initialization
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-4-frankja@linux.ibm.com>
+ <d0bc545a-fdbb-2aa9-4f0a-2e0ea1abce5b@redhat.com>
 MIME-Version: 1.0
-References: <20191022221223.17338.5860.stgit@localhost.localdomain> <3888d486-d046-b35f-a365-655f8c4d3bf2@redhat.com>
-In-Reply-To: <3888d486-d046-b35f-a365-655f8c4d3bf2@redhat.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Mon, 28 Oct 2019 08:24:05 -0700
-Message-ID: <CAKgT0UdkPwsc8KrSAURt1FuD8nX8o50CLDcd21RQw8AW7PVMVg@mail.gmail.com>
-Subject: Re: [PATCH v12 0/6] mm / virtio: Provide support for unused page reporting
-To:     Nitesh Narayan Lal <nitesh@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Oscar Salvador <osalvador@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d0bc545a-fdbb-2aa9-4f0a-2e0ea1abce5b@redhat.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19102815-0028-0000-0000-000003B06BD3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102815-0029-0000-0000-00002472A97D
+Message-Id: <your-ad-here.call-01572277730-ext-9266@work.hours>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-28_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=5 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=838 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910280159
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 28, 2019 at 7:34 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
->
->
-> On 10/22/19 6:27 PM, Alexander Duyck wrote:
->
->
-> [...]
-> > Below are the results from various benchmarks. I primarily focused on two
-> > tests. The first is the will-it-scale/page_fault2 test, and the other is
-> > a modified version of will-it-scale/page_fault1 that was enabled to use
-> > THP. I did this as it allows for better visibility into different parts
-> > of the memory subsystem. The guest is running on one node of a E5-2630 v3
-> > CPU with 48G of RAM that I split up into two logical nodes in the guest
-> > in order to test with NUMA as well.
-> >
-> > Test              page_fault1 (THP)     page_fault2
-> > Baseline       1  1256106.33  +/-0.09%   482202.67  +/-0.46%
-> >                 16  8864441.67  +/-0.09%  3734692.00  +/-1.23%
-> >
-> > Patches applied  1  1257096.00  +/-0.06%   477436.00  +/-0.16%
-> >                 16  8864677.33  +/-0.06%  3800037.00  +/-0.19%
-> >
-> > Patches enabled        1  1258420.00  +/-0.04%   480080.00  +/-0.07%
-> >  MADV disabled  16  8753840.00  +/-1.27%  3782764.00  +/-0.37%
-> >
-> > Patches enabled        1  1267916.33  +/-0.08%   472075.67  +/-0.39%
-> >                 16  8287050.33  +/-0.67%  3774500.33  +/-0.11%
->
-> If I am not mistaken then you are only observing the number of processes (and
-> not the number of threads) launched over the 1st and the 16th vcpu  reported by
-> will-it-scale?
+On Fri, Oct 25, 2019 at 11:21:05AM +0200, David Hildenbrand wrote:
+> On 24.10.19 13:40, Janosch Frank wrote:
+> > From: Vasily Gorbik <gor@linux.ibm.com>
+> > 
+> > Before being able to host protected virtual machines, donate some of
+> > the memory to the ultravisor. Besides that the ultravisor might impose
+> > addressing limitations for memory used to back protected VM storage. Treat
+> > that limit as protected virtualization host's virtual memory limit.
+> > 
+> > Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> > ---
+> >   arch/s390/include/asm/uv.h | 16 ++++++++++++
+> >   arch/s390/kernel/setup.c   |  3 +++
+> >   arch/s390/kernel/uv.c      | 53 ++++++++++++++++++++++++++++++++++++++
+> >   3 files changed, 72 insertions(+)
+> > 
+> > --- a/arch/s390/kernel/setup.c
+> > +++ b/arch/s390/kernel/setup.c
+> > @@ -567,6 +567,8 @@ static void __init setup_memory_end(void)
+> >   			vmax = _REGION1_SIZE; /* 4-level kernel page table */
+> >   	}
+> > +	adjust_to_uv_max(&vmax);
+> 
+> I do wonder what would happen if vmax < max_physmem_end. Not sure if that is
+> relevant at all.
 
-You are correct these results are for the processes. I monitored them
-for 1 - 16, but only included the results for 1 and 16 since those
-seem to be the most relevant data points.
+Then identity mapping would be shorter then actual physical memory available
+and everything above would be lost. But in reality "max_sec_stor_addr"
+is big enough to not worry about it in the foreseeable future at all.
+
+> > +void __init setup_uv(void)
+> > +{
+> > +	unsigned long uv_stor_base;
+> > +
+> > +	if (!prot_virt_host)
+> > +		return;
+> > +
+> > +	uv_stor_base = (unsigned long)memblock_alloc_try_nid(
+> > +		uv_info.uv_base_stor_len, SZ_1M, SZ_2G,
+> > +		MEMBLOCK_ALLOC_ACCESSIBLE, NUMA_NO_NODE);
+> > +	if (!uv_stor_base) {
+> > +		pr_info("Failed to reserve %lu bytes for ultravisor base storage\n",
+> > +			uv_info.uv_base_stor_len);
+> > +		goto fail;
+> > +	}
+> 
+> If I'm not wrong, we could setup/reserve a CMA area here and defer the
+> actual allocation. Then, any MOVABLE data can end up on this CMA area until
+> needed.
+> 
+> But I am neither an expert on CMA nor on UV, so most probably what I say is
+> wrong ;)
+
+From pure memory management this sounds like a good idea. And I tried
+it and cma_declare_contiguous fulfills our needs, just had to export
+cma_alloc/cma_release symbols. Nevertheless, delaying ultravisor init means we
+would be potentially left with vmax == max_sec_stor_addr even if we wouldn't
+be able to run protected VMs after all (currently setup_uv() is called
+before kernel address space layout setup). Another much more fundamental
+reason is that ultravisor init has to be called with a single cpu running,
+which means it's easy to do before bringing other cpus up and we currently
+don't have api to stop cpus at a later point (stop_machine won't cut it).
+
+> > +
+> > +	if (uv_init(uv_stor_base, uv_info.uv_base_stor_len)) {
+> > +		memblock_free(uv_stor_base, uv_info.uv_base_stor_len);
+> > +		goto fail;
+> > +	}
+> > +
+> > +	pr_info("Reserving %luMB as ultravisor base storage\n",
+> > +		uv_info.uv_base_stor_len >> 20);
+> > +	return;
+> > +fail:
+> > +	prot_virt_host = 0;
+> > +}
+> > +
+> > +void adjust_to_uv_max(unsigned long *vmax)
+> > +{
+> > +	if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
+> > +		*vmax = uv_info.max_sec_stor_addr;
+> > +}
+> >   #endif
+> > 
+> 
+> Looks good to me from what I can tell.
+> 
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
+> 
+
