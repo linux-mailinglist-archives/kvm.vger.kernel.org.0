@@ -2,150 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB3A2E7592
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 16:54:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD8EDE76E5
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 17:43:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390178AbfJ1Pyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 11:54:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37041 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726387AbfJ1Pyo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 11:54:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572278083;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iWxllc1G8SHq1RkOK7kCt83EB2YbceKdCT0ElOAOVVk=;
-        b=ab8+/fyFLk7oVARGRieNNkHVAZCvmR/afvq91VFV5L/n5mgmPadxFIEAdApMa9d7hbMPGe
-        VCY9KgW4wwrNUahSUbY8JYBqOzx1yHGTeggke8nRnnBrpH0jBT0OnQoGjwfn1uD7LaHCil
-        y++tOOlxIE2EX0kj9fty9rg6fxy4NMk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-FgDxBwwEOaeigqXAT-gtiw-1; Mon, 28 Oct 2019 11:54:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3D34801E64;
-        Mon, 28 Oct 2019 15:54:38 +0000 (UTC)
-Received: from [10.36.117.63] (ovpn-117-63.ams2.redhat.com [10.36.117.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D15C55C1B2;
-        Mon, 28 Oct 2019 15:54:36 +0000 (UTC)
-Subject: Re: [RFC 03/37] s390/protvirt: add ultravisor initialization
-To:     Vasily Gorbik <gor@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-4-frankja@linux.ibm.com>
- <d0bc545a-fdbb-2aa9-4f0a-2e0ea1abce5b@redhat.com>
- <your-ad-here.call-01572277730-ext-9266@work.hours>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <6a5b7e54-ca44-4341-9772-e782aa67cd53@redhat.com>
-Date:   Mon, 28 Oct 2019 16:54:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S2403855AbfJ1Qnu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 12:43:50 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40796 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733000AbfJ1Qnu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 12:43:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=g5yZ/J7rj95A/9mEJqR2HV55CqslV5uoj7lv7XPA0rc=; b=dJwW5ArCzatGekooY+ha+CWwu
+        ThNNd7ykejxHNKbVeSj0xbgKJfcUO8ZrxVjr9jxoAjrHZbyaNWo3tFg6xpfhXReTENzgkalslfbLK
+        G6xld+FPgAKkTO2yg2lMv1wLIZaKF0adCUafWcFBU3yryjAdGKUXp2Im4PBn8JjpACBBfg9cu7VlB
+        bZqHKbWR/VdDj4Xb5yS9yekFFPh6uiwbffZbP+nJSKvUl+ufQWu6LLWYpGvGhDtKKoJapaIZnW413
+        G5Ht3EEUAkxGVT/jHWpLOmxMICqmGFAS2T+pFfHKIKlKfdEZjoC9hx96neWSyp05WWQ1wMBJnTqTU
+        P6tgWCi6Q==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iP874-0001H0-Ak; Mon, 28 Oct 2019 16:43:26 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id D3E95306098;
+        Mon, 28 Oct 2019 17:42:23 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 31B0D2B400ACC; Mon, 28 Oct 2019 17:43:24 +0100 (CET)
+Date:   Mon, 28 Oct 2019 17:43:24 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Jiri Olsa <jolsa@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kan.liang@intel.com,
+        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v4 0/6]  KVM: x86/vPMU: Efficiency optimization by
+ reusing last created perf_event
+Message-ID: <20191028164324.GJ4097@hirez.programming.kicks-ass.net>
+References: <20191027105243.34339-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <your-ad-here.call-01572277730-ext-9266@work.hours>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: FgDxBwwEOaeigqXAT-gtiw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191027105243.34339-1-like.xu@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.10.19 16:48, Vasily Gorbik wrote:
-> On Fri, Oct 25, 2019 at 11:21:05AM +0200, David Hildenbrand wrote:
->> On 24.10.19 13:40, Janosch Frank wrote:
->>> From: Vasily Gorbik <gor@linux.ibm.com>
->>>
->>> Before being able to host protected virtual machines, donate some of
->>> the memory to the ultravisor. Besides that the ultravisor might impose
->>> addressing limitations for memory used to back protected VM storage. Tr=
-eat
->>> that limit as protected virtualization host's virtual memory limit.
->>>
->>> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
->>> ---
->>>    arch/s390/include/asm/uv.h | 16 ++++++++++++
->>>    arch/s390/kernel/setup.c   |  3 +++
->>>    arch/s390/kernel/uv.c      | 53 ++++++++++++++++++++++++++++++++++++=
-++
->>>    3 files changed, 72 insertions(+)
->>>
->>> --- a/arch/s390/kernel/setup.c
->>> +++ b/arch/s390/kernel/setup.c
->>> @@ -567,6 +567,8 @@ static void __init setup_memory_end(void)
->>>    =09=09=09vmax =3D _REGION1_SIZE; /* 4-level kernel page table */
->>>    =09}
->>> +=09adjust_to_uv_max(&vmax);
->>
->> I do wonder what would happen if vmax < max_physmem_end. Not sure if tha=
-t is
->> relevant at all.
->=20
-> Then identity mapping would be shorter then actual physical memory availa=
-ble
-> and everything above would be lost. But in reality "max_sec_stor_addr"
-> is big enough to not worry about it in the foreseeable future at all.
->=20
->>> +void __init setup_uv(void)
->>> +{
->>> +=09unsigned long uv_stor_base;
->>> +
->>> +=09if (!prot_virt_host)
->>> +=09=09return;
->>> +
->>> +=09uv_stor_base =3D (unsigned long)memblock_alloc_try_nid(
->>> +=09=09uv_info.uv_base_stor_len, SZ_1M, SZ_2G,
->>> +=09=09MEMBLOCK_ALLOC_ACCESSIBLE, NUMA_NO_NODE);
->>> +=09if (!uv_stor_base) {
->>> +=09=09pr_info("Failed to reserve %lu bytes for ultravisor base storage=
-\n",
->>> +=09=09=09uv_info.uv_base_stor_len);
->>> +=09=09goto fail;
->>> +=09}
->>
->> If I'm not wrong, we could setup/reserve a CMA area here and defer the
->> actual allocation. Then, any MOVABLE data can end up on this CMA area un=
-til
->> needed.
->>
->> But I am neither an expert on CMA nor on UV, so most probably what I say=
- is
->> wrong ;)
->=20
->  From pure memory management this sounds like a good idea. And I tried
-> it and cma_declare_contiguous fulfills our needs, just had to export
-> cma_alloc/cma_release symbols. Nevertheless, delaying ultravisor init mea=
-ns we
-> would be potentially left with vmax =3D=3D max_sec_stor_addr even if we w=
-ouldn't
-> be able to run protected VMs after all (currently setup_uv() is called
-> before kernel address space layout setup). Another much more fundamental
-> reason is that ultravisor init has to be called with a single cpu running=
-,
-> which means it's easy to do before bringing other cpus up and we currentl=
-y
-> don't have api to stop cpus at a later point (stop_machine won't cut it).
+On Sun, Oct 27, 2019 at 06:52:37PM +0800, Like Xu wrote:
+> For perf subsystem, please help review first two patches.
 
-Interesting point, I guess. One could hack around that. Emphasis on=20
-*hack* :) In stop_machine() you caught all CPUs. You could just=20
-temporarily SIGP STOP all running ones, issue the UV init call, and SIGP=20
-START them again. Not sure how that works with SMP, though ...
+> Like Xu (6):
+>   perf/core: Provide a kernel-internal interface to recalibrate event
+>     period
+>   perf/core: Provide a kernel-internal interface to pause perf_event
 
-But yeah, this is stuff for the future, just an idea from my side :)
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
