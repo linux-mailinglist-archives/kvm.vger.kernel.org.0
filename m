@@ -2,177 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61306E778B
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 18:23:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31880E79F5
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 21:20:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404173AbfJ1RXX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 13:23:23 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:41273 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404155AbfJ1RXT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 28 Oct 2019 13:23:19 -0400
-Received: by mail-pf1-f194.google.com with SMTP id p26so3188313pfq.8
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 10:23:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UflXfL3dwhO51RWNtr30ZieO/LUtszv77VC5R3Td5p4=;
-        b=djoanQkiGA3fqiuTCeMp3PS0KDhFi1gk6EjakgwdacK8Hqk8l3UxxOnnkSpDAvM+ZD
-         tljXKBoM/Gl5mK8Ort4gG8L54R4wqn5HKR5qrEPSHNovOdL1GqR6CBgB+WEjAyr1smkG
-         RXSyvwASJ+KQCGxGJmBSvJC4ZdCK0PsvSUOtqtl8COFWH3EG9a15NN1IeB2tqZBWko/0
-         cQ1SPDIoC3nO8FtJaVzKO5dDuENqFfiOk5axnAjDEMM1O6mD1sHR5yxBwMUg1RqPnrZP
-         fvkc7EbqnRJoVLNXND4vGBALh7PmRcbUeD9eQNcbz7HfnHCjag9qCo5s31LIMqZfHIAX
-         CUsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UflXfL3dwhO51RWNtr30ZieO/LUtszv77VC5R3Td5p4=;
-        b=Y+RTeCNZgyICyZIOB0+cH7PvhGKxgCtq5qzInBKlQHfbsG0FMFFbxYGpW8Iod4TbLK
-         UPCt8UtmJI+X8pcqNftZm0tyHKTjTO1x3t5qazC4qff5dyC45SS82g7c5ZJN0LTMNSN7
-         iA4jlxvcnG/oOWvXsGr8r9lDtWYiao6Mdy9qxHsyl6hFrScjTMYW9H57d7wZ3k3hdKs/
-         BhVKXXQldgAmr5zkzhIBf5PlFoOMB//gFAI3towiLrrMeo3znCNZE4QPF9vEwt8VaNeg
-         Vm17305oHdofYM++Z4sX4Z/6koA/+e6n31qbfvPp5GPrFWJZHJM2Bx4Y68KRjcEKc6Bw
-         Ruuw==
-X-Gm-Message-State: APjAAAWi0WJwJVCoEYYTcuxQSFJiymBF/dd9D0oaTWkV5pJo4G1dU5RE
-        pBLUCFrcZdqEdAKVvfQsI+mUvmieOjSO4vTn4F4Dwg==
-X-Google-Smtp-Source: APXvYqytcmgUBglTw+96rAxyA8UoLZEEWQtQv6S5qGrK/cGa88KPzT32foKerAZ8x0LkY9vPTs4Gdwj3wPvVn1QVv48=
-X-Received: by 2002:a17:90a:6509:: with SMTP id i9mr449000pjj.47.1572283397935;
- Mon, 28 Oct 2019 10:23:17 -0700 (PDT)
+        id S1732888AbfJ1UUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 16:20:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61106 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727870AbfJ1UUN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 28 Oct 2019 16:20:13 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9SKHGja010641
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 16:20:12 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vvhstddc6-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 16:20:11 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 28 Oct 2019 20:20:08 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 28 Oct 2019 20:20:06 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9SKK4J248889966
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Oct 2019 20:20:04 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 797C7AE04D;
+        Mon, 28 Oct 2019 20:20:04 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2D7DAE056;
+        Mon, 28 Oct 2019 20:20:03 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.64.10])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 28 Oct 2019 20:20:03 +0000 (GMT)
+Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, imbrenda@linux.ibm.com, mihajlov@linux.ibm.com,
+        mimu@linux.ibm.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-3-frankja@linux.ibm.com>
+ <20191028155453.4b142994.cohuck@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Mon, 28 Oct 2019 21:20:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <cover.1571844200.git.andreyknvl@google.com> <beeae42e313ef57b4630cc9f36e2e78ad42fd5b7.1571844200.git.andreyknvl@google.com>
- <20191023152216.796aeafd832ba5351d86d3ca@linux-foundation.org>
-In-Reply-To: <20191023152216.796aeafd832ba5351d86d3ca@linux-foundation.org>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Mon, 28 Oct 2019 18:23:06 +0100
-Message-ID: <CAAeHK+w1SB7Z7ndB3nocO3vKwBhPrr6GFZa6EYeApyppx7gYYw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] kcov: remote coverage support
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     USB list <linux-usb@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Alexander Potapenko <glider@google.com>,
-        Marco Elver <elver@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191028155453.4b142994.cohuck@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19102820-0020-0000-0000-0000038059F9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19102820-0021-0000-0000-000021D65F8F
+Message-Id: <7e14305d-bec4-27d6-c723-ee231817b855@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-28_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=477 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910280192
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 12:22 AM Andrew Morton
-<akpm@linux-foundation.org> wrote:
->
-> On Wed, 23 Oct 2019 17:24:29 +0200 Andrey Konovalov <andreyknvl@google.com> wrote:
->
-> > This patch adds background thread coverage collection ability to kcov.
-> >
-> > With KCOV_ENABLE coverage is collected only for syscalls that are issued
-> > from the current process. With KCOV_REMOTE_ENABLE it's possible to collect
-> > coverage for arbitrary parts of the kernel code, provided that those parts
-> > are annotated with kcov_remote_start()/kcov_remote_stop().
-> >
-> > This allows to collect coverage from two types of kernel background
-> > threads: the global ones, that are spawned during kernel boot and are
-> > always running (e.g. USB hub_event()); and the local ones, that are
-> > spawned when a user interacts with some kernel interface (e.g. vhost
-> > workers).
-> >
-> > To enable collecting coverage from a global background thread, a unique
-> > global handle must be assigned and passed to the corresponding
-> > kcov_remote_start() call. Then a userspace process can pass a list of such
-> > handles to the KCOV_REMOTE_ENABLE ioctl in the handles array field of the
-> > kcov_remote_arg struct. This will attach the used kcov device to the code
-> > sections, that are referenced by those handles.
-> >
-> > Since there might be many local background threads spawned from different
-> > userspace processes, we can't use a single global handle per annotation.
-> > Instead, the userspace process passes a non-zero handle through the
-> > common_handle field of the kcov_remote_arg struct. This common handle gets
-> > saved to the kcov_handle field in the current task_struct and needs to be
-> > passed to the newly spawned threads via custom annotations. Those threads
-> > should in turn be annotated with kcov_remote_start()/kcov_remote_stop().
-> >
-> > Internally kcov stores handles as u64 integers. The top byte of a handle
-> > is used to denote the id of a subsystem that this handle belongs to, and
-> > the lower 4 bytes are used to denote a handle id within that subsystem.
-> > A reserved value 0 is used as a subsystem id for common handles as they
-> > don't belong to a particular subsystem. The bytes 4-7 are currently
-> > reserved and must be zero. In the future the number of bytes used for the
-> > subsystem or handle ids might be increased.
-> >
-> > When a particular userspace proccess collects coverage by via a common
-> > handle, kcov will collect coverage for each code section that is annotated
-> > to use the common handle obtained as kcov_handle from the current
-> > task_struct. However non common handles allow to collect coverage
-> > selectively from different subsystems.
-> >
-> > ...
-> >
-> > +static struct kcov_remote *kcov_remote_add(struct kcov *kcov, u64 handle)
-> > +{
-> > +     struct kcov_remote *remote;
-> > +
-> > +     if (kcov_remote_find(handle))
-> > +             return ERR_PTR(-EEXIST);
-> > +     remote = kmalloc(sizeof(*remote), GFP_ATOMIC);
-> > +     if (!remote)
-> > +             return ERR_PTR(-ENOMEM);
-> > +     remote->handle = handle;
-> > +     remote->kcov = kcov;
-> > +     hash_add(kcov_remote_map, &remote->hnode, handle);
-> > +     return remote;
-> > +}
-> > +
-> >
-> > ...
-> >
-> > +             spin_lock(&kcov_remote_lock);
-> > +             for (i = 0; i < remote_arg->num_handles; i++) {
-> > +                     kcov_debug("handle %llx\n", remote_arg->handles[i]);
-> > +                     if (!kcov_check_handle(remote_arg->handles[i],
-> > +                                             false, true, false)) {
-> > +                             spin_unlock(&kcov_remote_lock);
-> > +                             kcov_disable(t, kcov);
-> > +                             return -EINVAL;
-> > +                     }
-> > +                     remote = kcov_remote_add(kcov, remote_arg->handles[i]);
-> > +                     if (IS_ERR(remote)) {
-> > +                             spin_unlock(&kcov_remote_lock);
-> > +                             kcov_disable(t, kcov);
-> > +                             return PTR_ERR(remote);
-> > +                     }
-> > +             }
->
-> It's worrisome that this code can perform up to 65536 GFP_ATOMIC
-> allocations without coming up for air.  The possibility of ENOMEM or of
-> causing collateral problems is significant.  It doesn't look too hard
-> to change this to use GFP_KERNEL?
 
-Looking at this again: it seems easy to get rid of locking
-kcov_remote_lock when doing kmalloc, but a bit harder to get rid of
-kcov->lock. Andrew, would it be OK to just change the max number of
-GFP_ATOMIC allocations to 256?
 
->
-> > +u64 kcov_common_handle(void)
-> > +{
-> > +     return current->kcov_handle;
-> > +}
->
-> I don't immediately understand what this "common handle" thing is all about.
-> Code is rather lacking in this sort of high-level commentary?
->
->
+On 28.10.19 15:54, Cornelia Huck wrote:
+
+> I think there's not enough information in here to allow someone
+> configuring the kernel to decide what this is and if it would be useful
+> to them. This should probably be at least point to some document giving
+> some more details. Also, can you add a sentence where this feature is
+> actually expected to be available?
+> 
+>> +
+>> +	  If unsure, say Y.
+> 
+> Is 'Y' really the safe choice here? AFAICS, this is introducing new
+> code and not only trying to call new interfaces, if available. Is there
+> any drawback to enabling this on a kernel that won't run on a platform
+> supporting this feature? Is this supposed to be a common setup?
+
+I would expect that this is enabled on distributions in the future. So
+I think we should actually get rid of this Kconfig and always enable that code.
+We just must pay attention to fence of all the new code if the user does 
+not opt in. (e.g. prot_virt=0). We need to do that anyway and not hanving a
+Kconfig forces us to be extra careful.
+
