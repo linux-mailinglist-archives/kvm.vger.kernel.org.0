@@ -2,281 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B81CAE6B3A
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 03:59:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66302E6B5F
+	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 04:17:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731100AbfJ1C6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 27 Oct 2019 22:58:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:35133 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731082AbfJ1C6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 27 Oct 2019 22:58:43 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Oct 2019 19:58:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,238,1569308400"; 
-   d="scan'208";a="229552534"
-Received: from sqa-gate.sh.intel.com (HELO clx-ap-likexu.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 27 Oct 2019 19:58:38 -0700
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Jiri Olsa <jolsa@redhat.com>, Joerg Roedel <joro@8bytes.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kan.liang@intel.com,
-        wei.w.wang@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v4 6/6] KVM: x86/vPMU: Add lazy mechanism to release perf_event per vPMC
-Date:   Sun, 27 Oct 2019 18:52:43 +0800
-Message-Id: <20191027105243.34339-7-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191027105243.34339-1-like.xu@linux.intel.com>
-References: <20191027105243.34339-1-like.xu@linux.intel.com>
+        id S1728255AbfJ1DRD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 27 Oct 2019 23:17:03 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:44018 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726711AbfJ1DRD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 27 Oct 2019 23:17:03 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 732D27EEE96640117F5;
+        Mon, 28 Oct 2019 11:17:00 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 28 Oct 2019
+ 11:16:53 +0800
+Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
+To:     "Michael S. Tsirkin" <mst@redhat.com>, <peter.maydell@linaro.org>
+CC:     <pbonzini@redhat.com>, <imammedo@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <lersek@redhat.com>,
+        <james.morse@arm.com>, <gengdongjiu@huawei.com>,
+        <mtosatti@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <b4cba864-6689-a425-af8e-4fb4a95d4482@huawei.com>
+Date:   Mon, 28 Oct 2019 11:16:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191027061450-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, a host perf_event is created for a vPMC functionality emulation.
-It’s unpredictable to determine if a disabled perf_event will be reused.
-If they are disabled and are not reused for a considerable period of time,
-those obsolete perf_events would increase host context switch overhead that
-could have been avoided.
 
-If the guest doesn't WRMSR any of the vPMC's MSRs during an entire vcpu
-sched time slice, and its independent enable bit of the vPMC isn't set,
-we can predict that the guest has finished the use of this vPMC, and then
-do request KVM_REQ_PMU in kvm_arch_sched_in and release those perf_events
-in the first call of kvm_pmu_handle_event() after the vcpu is scheduled in.
 
-This lazy mechanism delays the event release time to the beginning of the
-next scheduled time slice if vPMC's MSRs aren't changed during this time
-slice. If guest comes back to use this vPMC in next time slice, a new perf
-event would be re-created via perf_event_create_kernel_counter() as usual.
+On 2019/10/27 18:17, Michael S. Tsirkin wrote:
+> On Sat, Oct 26, 2019 at 11:24:42AM +0800, Xiang Zheng wrote:
+>> In the ARMv8 platform, the CPU error types are synchronous external abort(SEA)
+>> and SError Interrupt (SEI). If exception happens in guest, sometimes it's better
+>> for guest to perform the recovery, because host does not know the detailed
+>> information of guest. For example, if an exception happens in a user-space
+>> application within guest, host does not know which application encounters
+>> errors.
+>>
+>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+>> After user space gets the notification, it will record the CPER into guest GHES
+>> buffer and inject an exception or IRQ into guest.
+>>
+>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+>> notification type after recording CPER into guest.
+>>
+>> This series of patches are based on Qemu 4.1, which include two parts:
+>> 1. Generate APEI/GHES table.
+>> 2. Handle the SIGBUS signal, record the CPER in runtime and fill it into guest
+>>    memory, then notify guest according to the type of SIGBUS.
+>>
+>> The whole solution was suggested by James(james.morse@arm.com); The solution of
+>> APEI section was suggested by Laszlo(lersek@redhat.com).
+>> Show some discussions in [1].
+>>
+>> This series of patches have already been tested on ARM64 platform with RAS
+>> feature enabled:
+>> Show the APEI part verification result in [2].
+>> Show the BUS_MCEERR_AR SIGBUS handling verification result in [3].
+> 
+> 
+> This looks mostly OK to me.  I sent some minor style comments but they
+> can be addressed by follow up patches.
+> 
+> Maybe it's a good idea to merge this before soft freeze to make sure it
+> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+> ACPI parts:
+> 
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> 
 
-Suggested-by: Wei Wang <wei.w.wang@intel.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/include/asm/kvm_host.h | 14 ++++++++
- arch/x86/kvm/pmu.c              | 58 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/pmu.h              |  2 ++
- arch/x86/kvm/pmu_amd.c          |  1 +
- arch/x86/kvm/vmx/pmu_intel.c    |  6 ++++
- arch/x86/kvm/x86.c              |  6 ++++
- 6 files changed, 87 insertions(+)
+Hi Peter,
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c4e0da8e899c..1f489ffa3e9b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -475,6 +475,20 @@ struct kvm_pmu {
- 	struct kvm_pmc fixed_counters[INTEL_PMC_MAX_FIXED];
- 	struct irq_work irq_work;
- 	u64 reprogram_pmi;
-+	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
-+	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
-+
-+	/*
-+	 * The gate to release perf_events not marked in
-+	 * pmc_in_use only once in a vcpu time slice.
-+	 */
-+	bool need_cleanup;
-+
-+	/*
-+	 * The total number of programmed perf_events and it helps to avoid
-+	 * redundant check before cleanup if guest don't use vPMU at all.
-+	 */
-+	u8 event_count;
- };
- 
- struct kvm_pmu_ops;
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 47a01a75a8fa..0655fcde190f 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -137,6 +137,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	}
- 
- 	pmc->perf_event = event;
-+	pmc_to_pmu(pmc)->event_count++;
- 	clear_bit(pmc->idx, (unsigned long*)&pmc_to_pmu(pmc)->reprogram_pmi);
- }
- 
-@@ -309,6 +310,15 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- 
- 		reprogram_counter(pmu, bit);
- 	}
-+
-+	/*
-+	 * vPMU uses a lazy method to release the perf_events created for
-+	 * features emulation when the related MSRs weren't accessed during
-+	 * last vcpu time slice. Technically, this cleanup check happens on
-+	 * the first call of vcpu_enter_guest after the vcpu gets scheduled in.
-+	 */
-+	if (unlikely(pmu->need_cleanup))
-+		kvm_pmu_cleanup(vcpu);
- }
- 
- /* check if idx is a valid index to access PMU */
-@@ -384,6 +394,15 @@ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 		kvm_x86_ops->pmu_ops->is_valid_msr(vcpu, msr);
- }
- 
-+static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc = kvm_x86_ops->pmu_ops->msr_idx_to_pmc(vcpu, msr);
-+
-+	if (pmc)
-+		__set_bit(pmc->idx, pmu->pmc_in_use);
-+}
-+
- int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
- {
- 	return kvm_x86_ops->pmu_ops->get_msr(vcpu, msr, data);
-@@ -391,6 +410,7 @@ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *data)
- 
- int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
-+	kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
- 	return kvm_x86_ops->pmu_ops->set_msr(vcpu, msr_info);
- }
- 
-@@ -418,9 +438,47 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
- 	memset(pmu, 0, sizeof(*pmu));
- 	kvm_x86_ops->pmu_ops->init(vcpu);
- 	init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
-+	pmu->event_count = 0;
-+	pmu->need_cleanup = false;
- 	kvm_pmu_refresh(vcpu);
- }
- 
-+static inline bool pmc_speculative_in_use(struct kvm_pmc *pmc)
-+{
-+	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-+
-+	if (pmc_is_fixed(pmc))
-+		return fixed_ctrl_field(pmu->fixed_ctr_ctrl,
-+			pmc->idx - INTEL_PMC_IDX_FIXED) & 0x3;
-+
-+	return pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE;
-+}
-+
-+void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+	struct kvm_pmc *pmc = NULL;
-+	DECLARE_BITMAP(bitmask, X86_PMC_IDX_MAX);
-+	int i;
-+
-+	/* do cleanup before the first time of running vcpu after sched_in */
-+	pmu->need_cleanup = false;
-+
-+	bitmap_andnot(bitmask, pmu->all_valid_pmc_idx,
-+		      pmu->pmc_in_use, X86_PMC_IDX_MAX);
-+
-+	/* release events for unmarked vPMCs in the last sched time slice */
-+	for_each_set_bit(i, bitmask, X86_PMC_IDX_MAX) {
-+		pmc = kvm_x86_ops->pmu_ops->pmc_idx_to_pmc(pmu, i);
-+
-+		if (pmc && pmc->perf_event && !pmc_speculative_in_use(pmc))
-+			pmc_stop_counter(pmc);
-+	}
-+
-+	/* reset vPMC lazy-release bitmap for this sched time slice */
-+	bitmap_zero(pmu->pmc_in_use, X86_PMC_IDX_MAX);
-+}
-+
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kvm_pmu_reset(vcpu);
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 7eba298587dc..b7a625874203 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -62,6 +62,7 @@ static inline void pmc_release_perf_event(struct kvm_pmc *pmc)
- 		perf_event_release_kernel(pmc->perf_event);
- 		pmc->perf_event = NULL;
- 		pmc->current_config = 0;
-+		pmc_to_pmu(pmc)->event_count--;
- 	}
- }
- 
-@@ -126,6 +127,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
- void kvm_pmu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_init(struct kvm_vcpu *vcpu);
-+void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
- int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
- 
-diff --git a/arch/x86/kvm/pmu_amd.c b/arch/x86/kvm/pmu_amd.c
-index aaa065989ea1..e5223ff83a56 100644
---- a/arch/x86/kvm/pmu_amd.c
-+++ b/arch/x86/kvm/pmu_amd.c
-@@ -279,6 +279,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
- 	pmu->nr_arch_fixed_counters = 0;
- 	pmu->global_status = 0;
-+	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
- }
- 
- static void amd_pmu_init(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 9b1ddc42f604..b5a16379f534 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -46,6 +46,7 @@ static void reprogram_fixed_counters(struct kvm_pmu *pmu, u64 data)
- 		if (old_ctrl == new_ctrl)
- 			continue;
- 
-+		__set_bit(INTEL_PMC_IDX_FIXED + i, pmu->pmc_in_use);
- 		reprogram_fixed_counter(pmc, new_ctrl, i);
- 	}
- 
-@@ -329,6 +330,11 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	    (boot_cpu_has(X86_FEATURE_HLE) || boot_cpu_has(X86_FEATURE_RTM)) &&
- 	    (entry->ebx & (X86_FEATURE_HLE|X86_FEATURE_RTM)))
- 		pmu->reserved_bits ^= HSW_IN_TX|HSW_IN_TX_CHECKPOINTED;
-+
-+	bitmap_set(pmu->all_valid_pmc_idx,
-+		0, pmu->nr_arch_gp_counters);
-+	bitmap_set(pmu->all_valid_pmc_idx,
-+		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
- }
- 
- static void intel_pmu_init(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 726a74e1c6a1..66da24253452 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9416,7 +9416,13 @@ void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
- {
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+
- 	vcpu->arch.l1tf_flush_l1d = true;
-+	if (pmu->version && unlikely(pmu->event_count)) {
-+		pmu->need_cleanup = true;
-+		kvm_make_request(KVM_REQ_PMU, vcpu);
-+	}
- 	kvm_x86_ops->sched_in(vcpu, cpu);
- }
- 
+I can address the style comments and send the series of patches before soft
+freeze if needed. And if there is no window before soft freeze, I can also
+address them by follow up patches. :)
+
 -- 
-2.21.0
+
+Thanks,
+Xiang
 
