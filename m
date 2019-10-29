@@ -2,87 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F349BE8499
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 10:41:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B20FAE84F1
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 10:57:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732697AbfJ2JlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 05:41:14 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35376 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728575AbfJ2JlO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 05:41:14 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d13so8095941pfq.2;
-        Tue, 29 Oct 2019 02:41:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=CAwKwW00jVJm51PG91lfRY/TjBZMpZIpgU/Tpy8p9zA=;
-        b=j9criezCX7eU0jJjWFTxMlc2b+idSvhrzjxVluwqNar9ukM81im9ZVYrPuM8JcGaPV
-         X3fHe7ZsPocJiki6ovRutrBu/PFxi257dA2t9gIz7bUxkWX0VLtscV8pLt7rpI7d2sX3
-         6wM6Sy8fPpIDQwhXgvqz6FBB8W/1+U03argQsOO3H3Tg1jM3hX212sN5GJOwbtyUZ/jt
-         clkcw/lrbfiz9xwE5JiAYjK5CUEzC/UA51JwZjUYPCCE5/OYsq5P5YKzPOJ2wxGwt3d8
-         t9UncDYXCkJXkGphbT2+cjxYsvlh1lou5Xtrkik0/1WUnkWhbjdIczBdwBicfoM0NUtl
-         arCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=CAwKwW00jVJm51PG91lfRY/TjBZMpZIpgU/Tpy8p9zA=;
-        b=bVps3cnUJhR+QnrTT2I4v3LSTI1i4PCmOB7Jz+jwnhNfU1IA3SdZso+ot80t19DLCa
-         H87zp9kTO92MUlybjTmA7TUtztWqThete4lfzLi2kzcJdGPZwRgDZyDfIeTi3mAyx48x
-         beWZVCBf+rqGV6xgVMqVVxXBfghXD5DxRHVq/R72a+SX5qwIjLiYKnwjqgNIwb1xgaBX
-         bmoTxXBQp6hvzI0K/LHJDjWh0M7a/wYj48SYfzTVF+0NI0d7fgu+YlFGY1n1oPQ3tDF/
-         sNIQtQM/Hh8SoPpGfqwadQm5SVZ4I6135arX7qK2s81IO4/Zcc+JBVpRo4h7+EIpTcYq
-         sbMQ==
-X-Gm-Message-State: APjAAAULJhS+ND+vNUDv0o8WO4S/fp9f5dNrDjvwIe399iVJbR0gXGOx
-        MqFnZnSVym/iuBnAbXyEucKsHArkwe8=
-X-Google-Smtp-Source: APXvYqw86yuRdfHlvx/v3GOZgKl4ljAECR5j49//D1MsdQt1P0dDSM3APydSUDfp9PJvAghARaHOXQ==
-X-Received: by 2002:a17:90a:17ad:: with SMTP id q42mr5375829pja.100.1572342073174;
-        Tue, 29 Oct 2019 02:41:13 -0700 (PDT)
-Received: from saurav ([27.62.167.137])
-        by smtp.gmail.com with ESMTPSA id q3sm16251023pgj.54.2019.10.29.02.41.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2019 02:41:12 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 15:11:04 +0530
-From:   Saurav Girepunje <saurav.girepunje@gmail.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     saurav.girepunje@hotmail.com
-Subject: [PATCH] arch: x86: kvm: mmu.c: use true/false for bool type
-Message-ID: <20191029094104.GA11220@saurav>
+        id S1727240AbfJ2J4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 05:56:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:31715 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726342AbfJ2J4u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 05:56:50 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 02:56:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,243,1569308400"; 
+   d="scan'208";a="374497156"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
+  by orsmga005.jf.intel.com with ESMTP; 29 Oct 2019 02:56:47 -0700
+Date:   Tue, 29 Oct 2019 17:57:38 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, alex.williamson@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        lingshan.zhu@intel.com
+Subject: Re: [PATCH v2] vhost: introduce mdev based hardware backend
+Message-ID: <20191029095738.GA7228@___>
+References: <5a7bc5da-d501-2750-90bf-545dd55f85fa@redhat.com>
+ <20191024042155.GA21090@___>
+ <d37529e1-5147-bbe5-cb9d-299bd6d4aa1a@redhat.com>
+ <d4cc4f4e-2635-4041-2f68-cd043a97f25a@redhat.com>
+ <20191024091839.GA17463@___>
+ <fefc82a3-a137-bc03-e1c3-8de79b238080@redhat.com>
+ <e7e239ba-2461-4f8d-7dd7-0f557ac7f4bf@redhat.com>
+ <20191025080143-mutt-send-email-mst@kernel.org>
+ <20191028015842.GA9005@___>
+ <5e8a623d-9d91-607a-1f9e-7a7086ba9a68@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5e8a623d-9d91-607a-1f9e-7a7086ba9a68@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use true/false for bool type "dbg" in mmu.c
+On Mon, Oct 28, 2019 at 11:50:49AM +0800, Jason Wang wrote:
+> On 2019/10/28 上午9:58, Tiwei Bie wrote:
+> > On Fri, Oct 25, 2019 at 08:16:26AM -0400, Michael S. Tsirkin wrote:
+> > > On Fri, Oct 25, 2019 at 05:54:55PM +0800, Jason Wang wrote:
+> > > > On 2019/10/24 下午6:42, Jason Wang wrote:
+> > > > > Yes.
+> > > > > 
+> > > > > 
+> > > > > >    And we should try to avoid
+> > > > > > putting ctrl vq and Rx/Tx vqs in the same DMA space to prevent
+> > > > > > guests having the chance to bypass the host (e.g. QEMU) to
+> > > > > > setup the backend accelerator directly.
+> > > > > 
+> > > > > That's really good point.  So when "vhost" type is created, parent
+> > > > > should assume addr of ctrl_vq is hva.
+> > > > > 
+> > > > > Thanks
+> > > > 
+> > > > This works for vhost but not virtio since there's no way for virtio kernel
+> > > > driver to differ ctrl_vq with the rest when doing DMA map. One possible
+> > > > solution is to provide DMA domain isolation between virtqueues. Then ctrl vq
+> > > > can use its dedicated DMA domain for the work.
+> > It might not be a bad idea to let the parent drivers distinguish
+> > between virtio-mdev mdevs and vhost-mdev mdevs in ctrl-vq handling
+> > by mdev's class id.
+> 
+> 
+> Yes, that should work, I have something probable better, see below.
+> 
+> 
+> > 
+> > > > Anyway, this could be done in the future. We can have a version first that
+> > > > doesn't support ctrl_vq.
+> > +1, thanks
+> > 
+> > > > Thanks
+> > > Well no ctrl_vq implies either no offloads, or no XDP (since XDP needs
+> > > to disable offloads dynamically).
+> > > 
+> > >          if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)
+> > >              && (virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
+> > >                  virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO6) ||
+> > >                  virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_ECN) ||
+> > >                  virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_UFO) ||
+> > >                  virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_CSUM))) {
+> > >                  NL_SET_ERR_MSG_MOD(extack, "Can't set XDP while host is implementing LRO/CSUM, disable LRO/CSUM first");
+> > >                  return -EOPNOTSUPP;
+> > >          }
+> > > 
+> > > neither is very attractive.
+> > > 
+> > > So yes ok just for development but we do need to figure out how it will
+> > > work down the road in production.
+> > Totally agree.
+> > 
+> > > So really this specific virtio net device does not support control vq,
+> > > instead it supports a different transport specific way to send commands
+> > > to device.
+> > > 
+> > > Some kind of extension to the transport? Ideas?
+> 
+> 
+> So it's basically an issue of isolating DMA domains. Maybe we can start with
+> transport API for querying per vq DMA domain/ASID?
+> 
+> - for vhost-mdev, userspace can query the DMA domain for each specific
+> virtqueue. For control vq, mdev can return id for software domain, for the
+> rest mdev will return id of VFIO domain. Then userspace know that it should
+> use different API for preparing the virtqueue, e.g for vq other than control
+> vq, it should use VFIO DMA API. The control vq it should use hva instead.
+> 
+> - for virito-mdev, we can introduce per-vq DMA device, and route DMA mapping
+> request for control vq back to mdev instead of the hardware. (We can wrap
+> them into library or helpers to ease the development of vendor physical
+> drivers).
 
-Signed-off-by: Saurav Girepunje <saurav.girepunje@gmail.com>
----
- arch/x86/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for this proposal! I'm thinking about it these days.
+I think it might be too complicated. I'm wondering whether we
+can have something simpler. I will post a RFC patch to show
+my idea today.
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 24c23c66b226..c0b1df69ce0f 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -68,7 +68,7 @@ enum {
- #undef MMU_DEBUG
- 
- #ifdef MMU_DEBUG
--static bool dbg = 0;
-+static bool dbg = true;
- module_param(dbg, bool, 0644);
- 
- #define pgprintk(x...) do { if (dbg) printk(x); } while (0)
--- 
-2.20.1
+Thanks,
+Tiwei
 
+> 
+> Thanks
+> 
+> 
+> > > 
+> > > 
+> > > -- 
+> > > MST
+> 
