@@ -2,143 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31880E79F5
-	for <lists+kvm@lfdr.de>; Mon, 28 Oct 2019 21:20:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53B95E7E0D
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 02:35:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732888AbfJ1UUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 28 Oct 2019 16:20:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61106 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727870AbfJ1UUN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 28 Oct 2019 16:20:13 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9SKHGja010641
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 16:20:12 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vvhstddc6-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 28 Oct 2019 16:20:11 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 28 Oct 2019 20:20:08 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 28 Oct 2019 20:20:06 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9SKK4J248889966
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Oct 2019 20:20:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 797C7AE04D;
-        Mon, 28 Oct 2019 20:20:04 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2D7DAE056;
-        Mon, 28 Oct 2019 20:20:03 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.64.10])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 28 Oct 2019 20:20:03 +0000 (GMT)
-Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, imbrenda@linux.ibm.com, mihajlov@linux.ibm.com,
-        mimu@linux.ibm.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-3-frankja@linux.ibm.com>
- <20191028155453.4b142994.cohuck@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Mon, 28 Oct 2019 21:20:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        id S1727648AbfJ2Bfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 28 Oct 2019 21:35:41 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48888 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726211AbfJ2Bfk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 28 Oct 2019 21:35:40 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9T1T2BK097401;
+        Tue, 29 Oct 2019 01:33:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=1QUjjGC1YE4Daj4tnRMfZjU7tGJjeHUbiYia35CGU+Q=;
+ b=UBvcWjJ3wVrUaDWOvolEun+19hgc7V8LByC07kM/vYaktqYS/3+UmORWTEqm2qJzTcoW
+ 0pJfBgHzHvDJIA6R5EPyUkUioJ23CqK8qTe2uZ9Fah4gYPY62hNcG/npbS3lX5r7pju1
+ zMzJuSX/nKfmZZdMXEZ6j6UseD9pkvYnXRRQ2yZmGmJiC9qvf8eNqsUwv6uz64ULs8jh
+ o+h+09miusUXunjwcs0PMB9a5hHi1moPHd9sEHIgXt+g373DUkvxOD5tjooJz/mkV7S4
+ 4EMgzlTJLJwKFP4zf/rZFT+TsN8S4tHs7SQnOv3bRpxQSLrToDJrJNnPmoPEZvwpSJYd 1A== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2vvdju5qek-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Oct 2019 01:33:43 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x9T1X4og086957;
+        Tue, 29 Oct 2019 01:33:43 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2vw09gtewe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 29 Oct 2019 01:33:43 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x9T1XYfg008271;
+        Tue, 29 Oct 2019 01:33:37 GMT
+Received: from [10.191.21.100] (/10.191.21.100)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 28 Oct 2019 18:33:34 -0700
+Subject: Re: [PATCH v8 0/5] Add a unified parameter "nopvspin"
+To:     linux-kernel@vger.kernel.org, tglx@linutronix.de,
+        pbonzini@redhat.com
+Cc:     mingo@redhat.com, bp@alien8.de, x86@kernel.org, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        boris.ostrovsky@oracle.com, jgross@suse.com, peterz@infradead.org,
+        will@kernel.org, linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org
+References: <1571829384-5309-1-git-send-email-zhenzhong.duan@oracle.com>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <86263ee3-f94f-8a6b-3842-f15fb0316798@oracle.com>
+Date:   Tue, 29 Oct 2019 09:33:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191028155453.4b142994.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+In-Reply-To: <1571829384-5309-1-git-send-email-zhenzhong.duan@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19102820-0020-0000-0000-0000038059F9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19102820-0021-0000-0000-000021D65F8F
-Message-Id: <7e14305d-bec4-27d6-c723-ee231817b855@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-28_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=477 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910280192
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9424 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1910290015
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9424 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910290014
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Baolo, Thomas
 
+This patchset is reviewed pass and keep silent for a while, will anyone 
+of you
 
-On 28.10.19 15:54, Cornelia Huck wrote:
+consider to pick it up? Thanks
 
-> I think there's not enough information in here to allow someone
-> configuring the kernel to decide what this is and if it would be useful
-> to them. This should probably be at least point to some document giving
-> some more details. Also, can you add a sentence where this feature is
-> actually expected to be available?
-> 
->> +
->> +	  If unsure, say Y.
-> 
-> Is 'Y' really the safe choice here? AFAICS, this is introducing new
-> code and not only trying to call new interfaces, if available. Is there
-> any drawback to enabling this on a kernel that won't run on a platform
-> supporting this feature? Is this supposed to be a common setup?
+Zhenzhong
 
-I would expect that this is enabled on distributions in the future. So
-I think we should actually get rid of this Kconfig and always enable that code.
-We just must pay attention to fence of all the new code if the user does 
-not opt in. (e.g. prot_virt=0). We need to do that anyway and not hanving a
-Kconfig forces us to be extra careful.
-
+On 2019/10/23 19:16, Zhenzhong Duan wrote:
+> There are cases folks want to disable spinlock optimization for
+> debug/test purpose. Xen and hyperv already have parameters "xen_nopvspin"
+> and "hv_nopvspin" to support that, but kvm doesn't.
+>
+> The first patch adds that feature to KVM guest with "nopvspin".
+>
+> For compatibility reason original parameters "xen_nopvspin" and
+> "hv_nopvspin" are retained and marked obsolete.
+>
+> v8:
+> PATCH2: use 'kvm-guest' instead of 'kvm_guest'        [Sean Christopherson]
+> PATCH3: add a comment to explain missed 'return'      [Sean Christopherson]
+>
+> v7:
+> PATCH3: update comment and use goto, add RB              [Vitaly Kuznetsov]
+>
+> v6:
+> PATCH1: add Reviewed-by                                  [Vitaly Kuznetsov]
+> PATCH2: change 'pv' to 'PV', add Reviewed-by             [Vitaly Kuznetsov]
+> PATCH3: refactor 'if' branch in kvm_spinlock_init()      [Vitaly Kuznetsov]
+>
+> v5:
+> PATCH1: new patch to revert a currently unnecessory commit,
+>          code is simpler a bit after that change.         [Boris Ostrovsky]
+> PATCH3: fold 'if' statement,add comments on virt_spin_lock_key,
+>          reorder with PATCH2 to better reflect dependency
+> PATCH4: fold 'if' statement, add Reviewed-by             [Boris Ostrovsky]
+> PATCH5: add Reviewed-by                                  [Michael Kelley]
+>
+> v4:
+> PATCH1: use variable name nopvspin instead of pvspin and
+>          defined it as __initdata, changed print message,
+>          updated patch description                     [Sean Christopherson]
+> PATCH2: remove Suggested-by, use "kvm-guest:" prefix  [Sean Christopherson]
+> PATCH3: make variable nopvsin and xen_pvspin coexist
+>          remove Reviewed-by due to code change         [Sean Christopherson]
+> PATCH4: make variable nopvsin and hv_pvspin coexist   [Sean Christopherson]
+>
+> v3:
+> PATCH2: Fix indentation
+>
+> v2:
+> PATCH1: pick the print code change into separate PATCH2,
+>          updated patch description             [Vitaly Kuznetsov]
+> PATCH2: new patch with print code change      [Vitaly Kuznetsov]
+> PATCH3: add Reviewed-by                       [Juergen Gross]
+>
+> Zhenzhong Duan (5):
+>    Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key
+>      get initialized"
+>    x86/kvm: Change print code to use pr_*() format
+>    x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
+>    xen: Mark "xen_nopvspin" parameter obsolete
+>    x86/hyperv: Mark "hv_nopvspin" parameter obsolete
+>
+>   Documentation/admin-guide/kernel-parameters.txt | 14 ++++-
+>   arch/x86/hyperv/hv_spinlock.c                   |  4 ++
+>   arch/x86/include/asm/qspinlock.h                |  1 +
+>   arch/x86/kernel/kvm.c                           | 79 ++++++++++++++++---------
+>   arch/x86/xen/spinlock.c                         |  4 +-
+>   kernel/locking/qspinlock.c                      |  7 +++
+>   6 files changed, 76 insertions(+), 33 deletions(-)
+>
