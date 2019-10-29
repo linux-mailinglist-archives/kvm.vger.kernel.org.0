@@ -2,145 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE621E8CC7
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 17:33:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFBC6E8CD4
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 17:35:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390524AbfJ2Qct (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 12:32:49 -0400
-Received: from mail-ua1-f73.google.com ([209.85.222.73]:52266 "EHLO
-        mail-ua1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390499AbfJ2Qcs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 12:32:48 -0400
-Received: by mail-ua1-f73.google.com with SMTP id w5so2343527uan.19
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 09:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=5pfhpJx7UO/QNtR11zCiFnLuGkt6GlpMBjgSmMf75Tg=;
-        b=FC4xXf2uZAMPwsrS2OpWFIPtkzQx1/R/4h+oW4oVwrQSAmMY3j5rAXXvMIeTt9HmO9
-         bMgeC7X+vkpdUJYjwYDUosbLI4zFUtwgcVTuzIWYTJ9hUePQyte5w3EAEsvviWkBiDBw
-         ZvatJYjaTa//8dRWOc9DabyKXKa7mCRRFBFM1LTwR2cQ6+Fn89H6Txtv25QUDc8ApcUh
-         DCvHhH1qFVpZ78NPfAOQdj2EGmuC0sFyJ/fiN3XEPYw+XSTxfk+ZPF3+Ww2kZSkK9H0X
-         om/im8oCdPDqb+vmEjGkPIrKOJ4wy/QciLWGnGESCIAjXG98sVXNPhY5BNk1hcMY2nep
-         Zm+A==
+        id S2390494AbfJ2QfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 12:35:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29768 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390472AbfJ2QfW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 12:35:22 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EA7F154F5B
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 16:35:21 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id 7so8853883wrl.2
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 09:35:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=5pfhpJx7UO/QNtR11zCiFnLuGkt6GlpMBjgSmMf75Tg=;
-        b=MwqtWCOFoSQ4GIk4EroK+0dkhTmfq8z75ll32wbtHOmRRY4C5wpD0yknovULm3KPoq
-         S5G7GtdAoxt3kx47PgabZlNoT3PSLd3SnGeI5z8DXuza9sBzfRX8i65PXhqz2zni97IJ
-         vOJND4FwsDwRsB6DYPBDzYN5x7VajpY/9g5G2cHB+gaxzk/88/76UFF6y1mIM6ylaMdv
-         7rLNpwPALlgea8H48y/dVjHmAvekUGh7dE6XamJ8Lawr5EwgokPkiuYSydITcOAYYKLp
-         fOamSDCR3soSe2pEKK8iuVHG2q+0xf3eXc7hcuGqD29smlB+t8exz+ULNzHmBDeM3ExI
-         bPjQ==
-X-Gm-Message-State: APjAAAVRo2qdQsjaU/ZVPMOObhYTQakrx2g+VBcc5JspVzzhQ1LPMI87
-        y/0V43A0JIGUh0B+AKVPKRbBud0Co1fnx7Jf
-X-Google-Smtp-Source: APXvYqxnbDwJOsZb5FOgMj5h3yqf55yEZtrdQcWRE/7f4Xr3yFQjgNOipnGlkQAkFoahpht83RtnwLlnW8nrG+uK
-X-Received: by 2002:a1f:41c4:: with SMTP id o187mr12070271vka.102.1572366766673;
- Tue, 29 Oct 2019 09:32:46 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 17:32:29 +0100
-In-Reply-To: <cover.1572366574.git.andreyknvl@google.com>
-Message-Id: <e49d5d154e5da6c9ada521d2b7ce10a49ce9f98b.1572366574.git.andreyknvl@google.com>
-Mime-Version: 1.0
-References: <cover.1572366574.git.andreyknvl@google.com>
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH v3 3/3] vhost, kcov: collect coverage from vhost_worker
-From:   Andrey Konovalov <andreyknvl@google.com>
-To:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=FQnLYx2QWY4cuAKWiCGGUv4yf2h+qdP8BhSsdB+2sT0=;
+        b=gMHqrwKb4PcjDI2tt6aiStHMpEBWXT7lIF/OT7o1sRAGNXpM+Myb6uChEUPEsaXiMp
+         LV0jSbOG3k0Nhuo2x3mbPbo7M0ej4D93cpf+X7ZIByjAmWqWDq5wtmJgvnj2HrLWP1Nc
+         1ca9x1SPeMuNloDunI5idvjHhsLRPRuuRuvRN7uoMcgYHYkvuovAnEL5SdzWUNbMXVWb
+         SZd7ftJdvhxkksXGCfUgFRpMfVKIM4I3rIRSyirJ/vpHR4NzikouqPsYyqiNmx0vms6v
+         pGG7Onf68dZwTwjIXzdkqY3HffxrZGk5Sl5oscrfynyCVoBdWeeLnaQ86G9diu30lmiM
+         sGjQ==
+X-Gm-Message-State: APjAAAWV8PKmZTekLVGEf/RSpZaVg6AOTS4C6Dmq5NBu1v+lxyf/1Qyj
+        wbQA5kUDNxZZhAooIZwHg0bn6DLH9pcmhNvBz+VkqqabBq8cBjM7sbsTGAljyOx/T3vAPgQV+2z
+        Q69Vtn1/v7q2k
+X-Received: by 2002:a1c:a9cb:: with SMTP id s194mr5321612wme.92.1572366920614;
+        Tue, 29 Oct 2019 09:35:20 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx29BHLiojOUxFUuXNicrwQ7MqELEUWM6W1qCELpsBAD/xgXR4ttLraQVt+y1hgrjzLl0jEJQ==
+X-Received: by 2002:a1c:a9cb:: with SMTP id s194mr5321583wme.92.1572366920428;
+        Tue, 29 Oct 2019 09:35:20 -0700 (PDT)
+Received: from steredhat (94.222.26.109.rev.sfr.net. [109.26.222.94])
+        by smtp.gmail.com with ESMTPSA id r19sm18295914wrr.47.2019.10.29.09.35.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2019 09:35:19 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 17:35:16 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+        linux-hyperv@vger.kernel.org,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        David Windsor <dwindsor@gmail.com>,
-        Elena Reshetova <elena.reshetova@intel.com>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Alexander Potapenko <glider@google.com>,
-        Marco Elver <elver@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [PATCH net-next 12/14] vsock/vmci: register vmci_transport only
+ when VMCI guest/host are active
+Message-ID: <20191029163516.td6wk7lf5pmytwtk@steredhat>
+References: <20191023095554.11340-1-sgarzare@redhat.com>
+ <20191023095554.11340-13-sgarzare@redhat.com>
+ <20191027081752.GD4472@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191027081752.GD4472@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds kcov_remote_start()/kcov_remote_stop() annotations to the
-vhost_worker() function, which is responsible for processing vhost works.
-Since vhost_worker() threads are spawned per vhost device instance
-the common kcov handle is used for kcov_remote_start()/stop() annotations
-(see Documentation/dev-tools/kcov.rst for details). As the result kcov can
-now be used to collect coverage from vhost worker threads.
+On Sun, Oct 27, 2019 at 09:17:52AM +0100, Stefan Hajnoczi wrote:
+> On Wed, Oct 23, 2019 at 11:55:52AM +0200, Stefano Garzarella wrote:
+> > +static int __init vmci_transport_init(void)
+> > +{
+> > +	int features = VSOCK_TRANSPORT_F_DGRAM;
+> 
+> Where is this variable used?
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- drivers/vhost/vhost.c | 6 ++++++
- drivers/vhost/vhost.h | 1 +
- 2 files changed, 7 insertions(+)
+It is introduced in the previous patch "vsock: add multi-transports support",
+and it is used in the vsock_core_register(), but since now the
+vmci_transport_init() registers the vmci_transport only with DGRAM
+feature, I can remove this variable and I can use directly the
+VSOCK_TRANSPORT_F_DGRAM.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 36ca2cf419bf..f44340b41494 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -30,6 +30,7 @@
- #include <linux/sched/signal.h>
- #include <linux/interval_tree_generic.h>
- #include <linux/nospec.h>
-+#include <linux/kcov.h>
- 
- #include "vhost.h"
- 
-@@ -357,7 +358,9 @@ static int vhost_worker(void *data)
- 		llist_for_each_entry_safe(work, work_next, node, node) {
- 			clear_bit(VHOST_WORK_QUEUED, &work->flags);
- 			__set_current_state(TASK_RUNNING);
-+			kcov_remote_start_common(dev->kcov_handle);
- 			work->fn(work);
-+			kcov_remote_stop();
- 			if (need_resched())
- 				schedule();
- 		}
-@@ -546,6 +549,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
- 
- 	/* No owner, become one */
- 	dev->mm = get_task_mm(current);
-+	dev->kcov_handle = kcov_common_handle();
- 	worker = kthread_create(vhost_worker, dev, "vhost-%d", current->pid);
- 	if (IS_ERR(worker)) {
- 		err = PTR_ERR(worker);
-@@ -571,6 +575,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
- 	if (dev->mm)
- 		mmput(dev->mm);
- 	dev->mm = NULL;
-+	dev->kcov_handle = 0;
- err_mm:
- 	return err;
- }
-@@ -682,6 +687,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
- 	if (dev->worker) {
- 		kthread_stop(dev->worker);
- 		dev->worker = NULL;
-+		dev->kcov_handle = 0;
- 	}
- 	if (dev->mm)
- 		mmput(dev->mm);
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index e9ed2722b633..a123fd70847e 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -173,6 +173,7 @@ struct vhost_dev {
- 	int iov_limit;
- 	int weight;
- 	int byte_weight;
-+	u64 kcov_handle;
- };
- 
- bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int total_len);
--- 
-2.24.0.rc0.303.g954a862665-goog
+I'll fix in the v3.
 
+Thanks,
+Stefano
