@@ -2,109 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A433E8483
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 10:32:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F349BE8499
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 10:41:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727869AbfJ2Jca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 05:32:30 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47870 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725791AbfJ2Jc3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 05:32:29 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E24A2B277;
-        Tue, 29 Oct 2019 09:32:27 +0000 (UTC)
-Date:   Tue, 29 Oct 2019 10:32:26 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: vmx, svm: always run with EFER.NXE=1 when shadow
- paging is active
-Message-ID: <20191029093226.GE838@suse.de>
-References: <20191027152323.24326-1-pbonzini@redhat.com>
+        id S1732697AbfJ2JlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 05:41:14 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:35376 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728575AbfJ2JlO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 05:41:14 -0400
+Received: by mail-pf1-f196.google.com with SMTP id d13so8095941pfq.2;
+        Tue, 29 Oct 2019 02:41:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=CAwKwW00jVJm51PG91lfRY/TjBZMpZIpgU/Tpy8p9zA=;
+        b=j9criezCX7eU0jJjWFTxMlc2b+idSvhrzjxVluwqNar9ukM81im9ZVYrPuM8JcGaPV
+         X3fHe7ZsPocJiki6ovRutrBu/PFxi257dA2t9gIz7bUxkWX0VLtscV8pLt7rpI7d2sX3
+         6wM6Sy8fPpIDQwhXgvqz6FBB8W/1+U03argQsOO3H3Tg1jM3hX212sN5GJOwbtyUZ/jt
+         clkcw/lrbfiz9xwE5JiAYjK5CUEzC/UA51JwZjUYPCCE5/OYsq5P5YKzPOJ2wxGwt3d8
+         t9UncDYXCkJXkGphbT2+cjxYsvlh1lou5Xtrkik0/1WUnkWhbjdIczBdwBicfoM0NUtl
+         arCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=CAwKwW00jVJm51PG91lfRY/TjBZMpZIpgU/Tpy8p9zA=;
+        b=bVps3cnUJhR+QnrTT2I4v3LSTI1i4PCmOB7Jz+jwnhNfU1IA3SdZso+ot80t19DLCa
+         H87zp9kTO92MUlybjTmA7TUtztWqThete4lfzLi2kzcJdGPZwRgDZyDfIeTi3mAyx48x
+         beWZVCBf+rqGV6xgVMqVVxXBfghXD5DxRHVq/R72a+SX5qwIjLiYKnwjqgNIwb1xgaBX
+         bmoTxXBQp6hvzI0K/LHJDjWh0M7a/wYj48SYfzTVF+0NI0d7fgu+YlFGY1n1oPQ3tDF/
+         sNIQtQM/Hh8SoPpGfqwadQm5SVZ4I6135arX7qK2s81IO4/Zcc+JBVpRo4h7+EIpTcYq
+         sbMQ==
+X-Gm-Message-State: APjAAAULJhS+ND+vNUDv0o8WO4S/fp9f5dNrDjvwIe399iVJbR0gXGOx
+        MqFnZnSVym/iuBnAbXyEucKsHArkwe8=
+X-Google-Smtp-Source: APXvYqw86yuRdfHlvx/v3GOZgKl4ljAECR5j49//D1MsdQt1P0dDSM3APydSUDfp9PJvAghARaHOXQ==
+X-Received: by 2002:a17:90a:17ad:: with SMTP id q42mr5375829pja.100.1572342073174;
+        Tue, 29 Oct 2019 02:41:13 -0700 (PDT)
+Received: from saurav ([27.62.167.137])
+        by smtp.gmail.com with ESMTPSA id q3sm16251023pgj.54.2019.10.29.02.41.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2019 02:41:12 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 15:11:04 +0530
+From:   Saurav Girepunje <saurav.girepunje@gmail.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     saurav.girepunje@hotmail.com
+Subject: [PATCH] arch: x86: kvm: mmu.c: use true/false for bool type
+Message-ID: <20191029094104.GA11220@saurav>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191027152323.24326-1-pbonzini@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Use true/false for bool type "dbg" in mmu.c
 
-On Sun, Oct 27, 2019 at 04:23:23PM +0100, Paolo Bonzini wrote:
-> VMX already does so if the host has SMEP, in order to support the combination of
-> CR0.WP=1 and CR4.SMEP=1.  However, it is perfectly safe to always do so, and in
-> fact VMX already ends up running with EFER.NXE=1 on old processors that lack the
-> "load EFER" controls, because it may help avoiding a slow MSR write.  Removing
-> all the conditionals simplifies the code.
-> 
-> SVM does not have similar code, but it should since recent AMD processors do
-> support SMEP.  So this patch also makes the code for the two vendors more similar
-> while fixing NPT=0, CR0.WP=1 and CR4.SMEP=1 on AMD processors.
-> 
-> Cc: stable@vger.kernel.org
-> Cc: Joerg Roedel <jroedel@suse.de>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Saurav Girepunje <saurav.girepunje@gmail.com>
+---
+ arch/x86/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looks good to me.
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 24c23c66b226..c0b1df69ce0f 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -68,7 +68,7 @@ enum {
+ #undef MMU_DEBUG
+ 
+ #ifdef MMU_DEBUG
+-static bool dbg = 0;
++static bool dbg = true;
+ module_param(dbg, bool, 0644);
+ 
+ #define pgprintk(x...) do { if (dbg) printk(x); } while (0)
+-- 
+2.20.1
 
-Reviewed-by: Joerg Roedel <jroedel@suse.de>
-
-> ---
->  arch/x86/kvm/svm.c     | 10 ++++++++--
->  arch/x86/kvm/vmx/vmx.c | 14 +++-----------
->  2 files changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index b6feb6a11a8d..2c452293c7cc 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -732,8 +732,14 @@ static int get_npt_level(struct kvm_vcpu *vcpu)
->  static void svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  {
->  	vcpu->arch.efer = efer;
-> -	if (!npt_enabled && !(efer & EFER_LMA))
-> -		efer &= ~EFER_LME;
-> +
-> +	if (!npt_enabled) {
-> +		/* Shadow paging assumes NX to be available.  */
-> +		efer |= EFER_NX;
-> +
-> +		if (!(efer & EFER_LMA))
-> +			efer &= ~EFER_LME;
-> +	}
->  
->  	to_svm(vcpu)->vmcb->save.efer = efer | EFER_SVME;
->  	mark_dirty(to_svm(vcpu)->vmcb, VMCB_CR);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2a2ba277c676..e191d41afb34 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -896,17 +896,9 @@ static bool update_transition_efer(struct vcpu_vmx *vmx, int efer_offset)
->  	u64 guest_efer = vmx->vcpu.arch.efer;
->  	u64 ignore_bits = 0;
->  
-> -	if (!enable_ept) {
-> -		/*
-> -		 * NX is needed to handle CR0.WP=1, CR4.SMEP=1.  Testing
-> -		 * host CPUID is more efficient than testing guest CPUID
-> -		 * or CR4.  Host SMEP is anyway a requirement for guest SMEP.
-> -		 */
-> -		if (boot_cpu_has(X86_FEATURE_SMEP))
-> -			guest_efer |= EFER_NX;
-> -		else if (!(guest_efer & EFER_NX))
-> -			ignore_bits |= EFER_NX;
-> -	}
-> +	/* Shadow paging assumes NX to be available.  */
-> +	if (!enable_ept)
-> +		guest_efer |= EFER_NX;
->  
->  	/*
->  	 * LMA and LME handled by hardware; SCE meaningless outside long mode.
-> -- 
-> 2.21.0
