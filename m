@@ -2,77 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4FBEE8531
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 11:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D45F3E8556
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 11:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728964AbfJ2KOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 06:14:30 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:38782 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725867AbfJ2KOa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 06:14:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=X1R5IVBASQ5ORVml6FyX2cr6AOsLH2Mknjf9io4LIe8=; b=1yhI3BeqAbf7io9KPunNhkjBt
-        DMZBPHf0OXV1rwba2CMC0qnqdHjFe9PEA3U2Wu7gxdBkYxL0gSBOvFmqGmo+R4N9NpV+r9/rW67If
-        5y2uJfVHiA3Mp48dL6Ips2wGNBOH0dEhxahiI83qaal1nVyKAnqlzTF3v9wj6cFt0jqhP1Y4SqfCa
-        XiHp26Pg7OL3p72pAbQjP+WK9ZkKWxzlhmja24RX9SS1LVQzLZbHxN6r4e82qHUC6/+PYbmnZ8fCb
-        NhH/c7qrHGi+OzmWM/xr7+1C3vA5zdJ7ZsYrkcDU6mG4K+1BVgKKK6X5M/5RmhBYIMW9QMJGyubTF
-        EcN6dbBZA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iPOUo-0001oh-Km; Tue, 29 Oct 2019 10:13:55 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 2F656300596;
-        Tue, 29 Oct 2019 11:11:59 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 5F1392B3F7754; Tue, 29 Oct 2019 11:13:00 +0100 (CET)
-Date:   Tue, 29 Oct 2019 11:13:00 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Saurav Girepunje <saurav.girepunje@gmail.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        saurav.girepunje@hotmail.com
-Subject: Re: [PATCH] arch: x86: kvm: mmu.c: use true/false for bool type
-Message-ID: <20191029101300.GK4114@hirez.programming.kicks-ass.net>
-References: <20191029094104.GA11220@saurav>
+        id S1730298AbfJ2KRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 06:17:00 -0400
+Received: from mga17.intel.com ([192.55.52.151]:33370 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728868AbfJ2KRA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 06:17:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 03:16:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,243,1569308400"; 
+   d="scan'208";a="283199335"
+Received: from dpdk-virtio-tbie-2.sh.intel.com ([10.67.104.74])
+  by orsmga001.jf.intel.com with ESMTP; 29 Oct 2019 03:16:57 -0700
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com, tiwei.bie@intel.com
+Subject: [RFC] vhost_mdev: add network control vq support
+Date:   Tue, 29 Oct 2019 18:17:26 +0800
+Message-Id: <20191029101726.12699-1-tiwei.bie@intel.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191029094104.GA11220@saurav>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 29, 2019 at 03:11:04PM +0530, Saurav Girepunje wrote:
-> Use true/false for bool type "dbg" in mmu.c
-> 
-> Signed-off-by: Saurav Girepunje <saurav.girepunje@gmail.com>
-> ---
->  arch/x86/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 24c23c66b226..c0b1df69ce0f 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -68,7 +68,7 @@ enum {
->  #undef MMU_DEBUG
->  
->  #ifdef MMU_DEBUG
-> -static bool dbg = 0;
-> +static bool dbg = true;
+This patch adds the network control vq support in vhost-mdev.
+A vhost-mdev specific op is introduced to allow parent drivers
+to handle the network control commands come from userspace.
 
-You're actually changing the value from false to true. Please, if you
-don't know C, don't touch things.
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+---
+This patch depends on below patch:
+https://lkml.org/lkml/2019/10/29/335
+
+ drivers/vhost/mdev.c             | 37 ++++++++++++++++++++++++++++++--
+ include/linux/virtio_mdev_ops.h  | 10 +++++++++
+ include/uapi/linux/vhost.h       |  7 ++++++
+ include/uapi/linux/vhost_types.h |  6 ++++++
+ 4 files changed, 58 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vhost/mdev.c b/drivers/vhost/mdev.c
+index 35b2fb33e686..c9b3eaa77405 100644
+--- a/drivers/vhost/mdev.c
++++ b/drivers/vhost/mdev.c
+@@ -47,6 +47,13 @@ enum {
+ 		(1ULL << VIRTIO_NET_F_HOST_UFO) |
+ 		(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+ 		(1ULL << VIRTIO_NET_F_STATUS) |
++		(1ULL << VIRTIO_NET_F_CTRL_GUEST_OFFLOADS) |
++		(1ULL << VIRTIO_NET_F_CTRL_VQ) |
++		(1ULL << VIRTIO_NET_F_CTRL_RX) |
++		(1ULL << VIRTIO_NET_F_CTRL_VLAN) |
++		(1ULL << VIRTIO_NET_F_CTRL_RX_EXTRA) |
++		(1ULL << VIRTIO_NET_F_GUEST_ANNOUNCE) |
++		(1ULL << VIRTIO_NET_F_CTRL_MAC_ADDR) |
+ 		(1ULL << VIRTIO_NET_F_SPEED_DUPLEX),
+ };
+ 
+@@ -362,6 +369,29 @@ static long vhost_mdev_vring_ioctl(struct vhost_mdev *m, unsigned int cmd,
+ 	return r;
+ }
+ 
++/*
++ * Device specific (e.g. network) ioctls.
++ */
++static long vhost_mdev_dev_ioctl(struct vhost_mdev *m, unsigned int cmd,
++				 void __user *argp)
++{
++	struct mdev_device *mdev = m->mdev;
++	const struct virtio_mdev_device_ops *ops = mdev_get_vhost_ops(mdev);
++
++	switch (m->virtio_id) {
++	case VIRTIO_ID_NET:
++		switch (cmd) {
++		case VHOST_MDEV_NET_CTRL:
++			if (!ops->net.ctrl)
++				return -ENOTSUPP;
++			return ops->net.ctrl(mdev, argp);
++		}
++		break;
++	}
++
++	return -ENOIOCTLCMD;
++}
++
+ static int vhost_mdev_open(void *device_data)
+ {
+ 	struct vhost_mdev *m = device_data;
+@@ -460,8 +490,11 @@ static long vhost_mdev_unlocked_ioctl(void *device_data,
+ 		 * VHOST_SET_LOG_FD are not used yet.
+ 		 */
+ 		r = vhost_dev_ioctl(&m->dev, cmd, argp);
+-		if (r == -ENOIOCTLCMD)
+-			r = vhost_mdev_vring_ioctl(m, cmd, argp);
++		if (r == -ENOIOCTLCMD) {
++			r = vhost_mdev_dev_ioctl(m, cmd, argp);
++			if (r == -ENOIOCTLCMD)
++				r = vhost_mdev_vring_ioctl(m, cmd, argp);
++		}
+ 	}
+ 
+ 	mutex_unlock(&m->mutex);
+diff --git a/include/linux/virtio_mdev_ops.h b/include/linux/virtio_mdev_ops.h
+index d417b41f2845..622861804ebd 100644
+--- a/include/linux/virtio_mdev_ops.h
++++ b/include/linux/virtio_mdev_ops.h
+@@ -20,6 +20,8 @@ struct virtio_mdev_callback {
+ 	void *private;
+ };
+ 
++struct vhost_mdev_net_ctrl;
++
+ /**
+  * struct vfio_mdev_device_ops - Structure to be registered for each
+  * mdev device to register the device for virtio/vhost drivers.
+@@ -151,6 +153,14 @@ struct virtio_mdev_device_ops {
+ 
+ 	/* Mdev device ops */
+ 	u64 (*get_mdev_features)(struct mdev_device *mdev);
++
++	/* Vhost-mdev (MDEV_CLASS_ID_VHOST) specific ops */
++	union {
++		struct {
++			int (*ctrl)(struct mdev_device *mdev,
++				    struct vhost_mdev_net_ctrl __user *ctrl);
++		} net;
++	};
+ };
+ 
+ void mdev_set_virtio_ops(struct mdev_device *mdev,
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index 061a2824a1b3..3693b2cba0c4 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -134,4 +134,11 @@
+ /* Get the max ring size. */
+ #define VHOST_MDEV_GET_VRING_NUM	_IOR(VHOST_VIRTIO, 0x76, __u16)
+ 
++/* VHOST_MDEV device specific defines */
++
++/* Send virtio-net commands. The commands follow the same definition
++ * of the virtio-net commands defined in virtio-spec.
++ */
++#define VHOST_MDEV_NET_CTRL		_IOW(VHOST_VIRTIO, 0x77, struct vhost_mdev_net_ctrl *)
++
+ #endif
+diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+index 7b105d0b2fb9..e76b4d8e35e5 100644
+--- a/include/uapi/linux/vhost_types.h
++++ b/include/uapi/linux/vhost_types.h
+@@ -127,6 +127,12 @@ struct vhost_mdev_config {
+ 	__u8 buf[0];
+ };
+ 
++struct vhost_mdev_net_ctrl {
++	__u8 class;
++	__u8 cmd;
++	__u8 cmd_data[0];
++} __attribute__((packed));
++
+ /* Feature bits */
+ /* Log all write descriptors. Can be changed while device is active. */
+ #define VHOST_F_LOG_ALL 26
+-- 
+2.23.0
+
