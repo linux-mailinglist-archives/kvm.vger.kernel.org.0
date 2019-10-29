@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E27E9136
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 22:06:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5F64E9137
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 22:06:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728339AbfJ2VGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 17:06:13 -0400
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:50580 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725840AbfJ2VGN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 17:06:13 -0400
-Received: by mail-pf1-f201.google.com with SMTP id y191so12370959pfg.17
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 14:06:11 -0700 (PDT)
+        id S1728575AbfJ2VGR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 17:06:17 -0400
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:43087 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728374AbfJ2VGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 17:06:16 -0400
+Received: by mail-pg1-f202.google.com with SMTP id k7so8579398pgq.10
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 14:06:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=W9TmDvzIpvVvMh9ub0E4eq3Yi9eArcf8ZO+zuv8WQrQ=;
-        b=dnwnfKnb9LznXfooKlHBCD3nDnHj7i29u4P50wfU8RS1Z6IcHtJL8+pyAO0+NzVNPz
-         h1C3ez6pqwVDSJiuIOaHvDOBXRw6MwohdqK96V7KrL3IeIERwx6OifF0bLo2D+1//iey
-         viubex1XFg6kK3g1F0/uD3w8mSfnu95jJrxB3Jv+75njyRG2GKF/uaTDqGP/gs3U/3PL
-         aCBtxIOtnmgiNZmxmjvFZ1h4At8bH3LI3+E81V5+/ZknVsZS60uy8sPsoyohjnG8kmqv
-         EwPmH0o6LlQZc8JpVQJBMx2d5u/Yusw+cMXvjRG66qWtIBIRFv5pig09bIQ0Ay7P2nLm
-         Y3Cw==
+        bh=s0LL3QMWsuiEqCtNWEPr0+snNyRy5wSt166tuiwJ1PM=;
+        b=GDuEgQa5IzN1Fs+AjMXv74Y0vW8FkJDnokCMD6F3f8Mb8DoBDgfhNjG81LUUAT/Tka
+         V7Kx4kWnD/EzCK6q3xJ53Ylv+494y5Q6C9u+w32d6jqwesx6+H98Kzk5CcGmrgOvDVuD
+         kZGJdfrKe2xXCVQFrZiQlNQcvNtuuETinTkh4Z5/WaClVdWIxAH964RuvRWOmMQghl9P
+         Ey4qATHzZxIYdoqCIjpW92hUIPJMppxLIN87D62fzsMH/b985eIiPkccfYMDdI/THyUL
+         p5roOI0L7ipwo22QWUdXulyYkNku1IZfukknZIPkntBdW+1KMeb+PDdjiUZtkogyVY6U
+         Xiiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=W9TmDvzIpvVvMh9ub0E4eq3Yi9eArcf8ZO+zuv8WQrQ=;
-        b=LrQj8sskM5f6x/EZAmsS4sg9Ctx4V3Ap20GbJq6ngWCAYoZ+LHO3YlCLRTCVULlJdW
-         g9+YEOHCcfsYqYE0q/CZ7JtEtwTEWpUAhzIvW+NQlMg/uRytzySwVMqUXzdz+KyGRVE5
-         xX3nnxFszXmVTQiMUCWrIhxfTCqPADwta2ZRNCWimbYnN00egqsyML3O6bg2agrX0QPc
-         t5d+Eoh+lvBzPoI9T49J+St5SGN9FCHqXci2+Spa9iGruwYEh0870n1vKj3DOVS3NR/s
-         f2YrS5ejjtfH8LKUI0iKPlmOAKjOQbJ5YR3QsoaCwH4Ll0sLTcv5pNQTR9dHMuVE8FXX
-         tBgg==
-X-Gm-Message-State: APjAAAVluBEpnHgUr+kD2ePt9tT95LwF8O/qM0M/Kkh6MWU/22wUyAOR
-        UuTz0pl/l3ZRFh0BNUt2TiifS5zqqbHRE4Hiu8ACjyBuLeks+UtN+sVYK6hNZ5LZMqiqV0HZDXf
-        oHC3QKO/bMhEN4sUYfc5lidyFBb7pzDCyRl7QCzoH8eimb8+o/Ka/9dMOYKXgtIoHh2p7
-X-Google-Smtp-Source: APXvYqw6qwdYZn2QAO9KRRcHT9+jwhmrkdZyYbz/rpIZlb5i3BWHg+po/FEv5+Zk74fdNg3wFoe5xrOWH4x+w8KG
-X-Received: by 2002:a63:4a50:: with SMTP id j16mr26630256pgl.308.1572383170907;
- Tue, 29 Oct 2019 14:06:10 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 14:05:52 -0700
+        bh=s0LL3QMWsuiEqCtNWEPr0+snNyRy5wSt166tuiwJ1PM=;
+        b=VbGHLUW7BqFAz/17m+MoBCEqWtGnmW3TepMWVNeeb5yVgepTna3WvAUKR1xVGOaSgT
+         cKvBzqyd8dvyROiO2d4YixGdVRwmn9iqQHaMw/9L/Wt3eFin4AiRQ6ti4TdHug/DwbVd
+         fhxiQWfvSmepLJslbHXzd3MEgiHm83VikVO6MdHV92jBGM/FuUSxVn6/CWVQ++X6AwNc
+         Q1hDss+OnGPNZRdcGjn+yXz4+nFskGM01x1ssCcrrvRIeEY2oZ8A5cV7WYq8SJ9wZ6If
+         6WjOMb1XazmcskMHlOJ8y7dLu6rN31dBEwbG4aZJqbKE4dulWzV1d6T+25hh7JUzHFR2
+         AljA==
+X-Gm-Message-State: APjAAAWMW/Cc1jfeGexxm/pxD3Q28LIE8JnnanhDISWHPBxy43Mzd1hA
+        zfjog1woLzkNvc6QlaXJdIgrG3WdPRPCVP5oXlD+U9N3+r50lN398AJGteKc72COGMIVDQWvfy9
+        fHBgs9qWT+Z39SukKiKHrJKVoQXiBVq7SC0agQ3D1cO5I1MHA5UGhZz2PmCzzxHeOdY+w
+X-Google-Smtp-Source: APXvYqxo02XGwLjhsXtFXwWeHw2JstknZEPNsFIkO9Pq29AoeISRzLuLrLGI7985CNrp2QRnUkcY87qCczZFXJ1A
+X-Received: by 2002:a63:d802:: with SMTP id b2mr29766690pgh.414.1572383174296;
+ Tue, 29 Oct 2019 14:06:14 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 14:05:53 -0700
 In-Reply-To: <20191029210555.138393-1-aaronlewis@google.com>
-Message-Id: <20191029210555.138393-2-aaronlewis@google.com>
+Message-Id: <20191029210555.138393-3-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20191029210555.138393-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH 1/4] kvm: nested: Introduce read_and_check_msr_entry()
+Subject: [PATCH 2/4] kvm: vmx: Rename NR_AUTOLOAD_MSRS to NR_MSR_ENTRIES
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Aaron Lewis <aaronlewis@google.com>
@@ -57,71 +57,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the function read_and_check_msr_entry() which just pulls some code
-out of nested_vmx_store_msr() for now, however, this is in preparation
-for a change later in this series were we reuse the code in
-read_and_check_msr_entry().
+Rename NR_AUTOLOAD_MSRS to NR_MSR_ENTRIES.  This needs to be done
+due to the addition of the MSR-autostore area that will be added later
+in this series.  After that the name AUTOLOAD will no longer make sense.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Change-Id: Iaf8787198c06674e8b0555982a962f5bd288e43f
+Change-Id: Iafe7c3bfb90842a93d7c453a1d8c84a48d5fe7b0
 ---
- arch/x86/kvm/vmx/nested.c | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 4 ++--
+ arch/x86/kvm/vmx/vmx.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index e76eb4f07f6c..7b058d7b9fcc 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -929,6 +929,26 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- 	return i + 1;
- }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index e7970a2e8eae..c0160ca9ddba 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -940,8 +940,8 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
+ 	if (!entry_only)
+ 		j = find_msr(&m->host, msr);
  
-+static bool read_and_check_msr_entry(struct kvm_vcpu *vcpu, u64 gpa, int i,
-+				     struct vmx_msr_entry *e)
-+{
-+	if (kvm_vcpu_read_guest(vcpu,
-+				gpa + i * sizeof(*e),
-+				e, 2 * sizeof(u32))) {
-+		pr_debug_ratelimited(
-+			"%s cannot read MSR entry (%u, 0x%08llx)\n",
-+			__func__, i, gpa + i * sizeof(*e));
-+		return false;
-+	}
-+	if (nested_vmx_store_msr_check(vcpu, e)) {
-+		pr_debug_ratelimited(
-+			"%s check failed (%u, 0x%x, 0x%x)\n",
-+			__func__, i, e->index, e->reserved);
-+		return false;
-+	}
-+	return true;
-+}
-+
- static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- {
- 	u64 data;
-@@ -940,20 +960,9 @@ static int nested_vmx_store_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- 		if (unlikely(i >= max_msr_list_size))
- 			return -EINVAL;
+-	if ((i < 0 && m->guest.nr == NR_AUTOLOAD_MSRS) ||
+-		(j < 0 &&  m->host.nr == NR_AUTOLOAD_MSRS)) {
++	if ((i < 0 && m->guest.nr == NR_MSR_ENTRIES) ||
++		(j < 0 &&  m->host.nr == NR_MSR_ENTRIES)) {
+ 		printk_once(KERN_WARNING "Not enough msr switch entries. "
+ 				"Can't add msr %x\n", msr);
+ 		return;
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index bee16687dc0b..0c6835bd6945 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -22,11 +22,11 @@ extern u32 get_umwait_control_msr(void);
  
--		if (kvm_vcpu_read_guest(vcpu,
--					gpa + i * sizeof(e),
--					&e, 2 * sizeof(u32))) {
--			pr_debug_ratelimited(
--				"%s cannot read MSR entry (%u, 0x%08llx)\n",
--				__func__, i, gpa + i * sizeof(e));
-+		if (!read_and_check_msr_entry(vcpu, gpa, i, &e))
- 			return -EINVAL;
--		}
--		if (nested_vmx_store_msr_check(vcpu, &e)) {
--			pr_debug_ratelimited(
--				"%s check failed (%u, 0x%x, 0x%x)\n",
--				__func__, i, e.index, e.reserved);
--			return -EINVAL;
--		}
-+
- 		if (kvm_get_msr(vcpu, e.index, &data)) {
- 			pr_debug_ratelimited(
- 				"%s cannot read MSR (%u, 0x%x)\n",
+ #define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
+ 
+-#define NR_AUTOLOAD_MSRS 8
++#define NR_MSR_ENTRIES 8
+ 
+ struct vmx_msrs {
+ 	unsigned int		nr;
+-	struct vmx_msr_entry	val[NR_AUTOLOAD_MSRS];
++	struct vmx_msr_entry	val[NR_MSR_ENTRIES];
+ };
+ 
+ struct shared_msr_entry {
 -- 
 2.24.0.rc0.303.g954a862665-goog
 
