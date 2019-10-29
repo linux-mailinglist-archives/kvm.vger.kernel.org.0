@@ -2,89 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A37CE8C11
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 16:44:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CD38E8CA5
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 17:27:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390094AbfJ2Pou (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 11:44:50 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:41644 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389319AbfJ2Pou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 11:44:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=bLHQ9ES4uovIMte4KF6pdSi3ymLKQ1bfJF3BoDC+60k=; b=fTsOHwCQIjRAPhsfX254qq39K
-        jmouMXV3yl64qNXPS4xoGatOntk7xk1mGlfaHoKtgMkkSgonqH3SdbbAKvFQjVq7blK1ElK8fHdnz
-        on9YVhgZlr25/7ykRYjMly0W6VrxYv9PqnssxjObuB2p78hkkErd38umaCbUUq3vHAnKwXiSKyt1s
-        wq4aU5IiD3T8aXqWt1oRiU3kYkfJAzJir3TXLQ6jl1znYLvmQtu727DdGcYA1xM9iNXILS6NIcO7u
-        IFeJGggENsVIqOdUT4FXjDC+0lTLlSCJ05r/X6X4NwbpEMfbSENvKFbJLPCjIGpI67U6qGWsWeJ7+
-        nYp2MO3ew==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iPTfV-0006VB-Kf; Tue, 29 Oct 2019 15:44:25 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 9B14E30025A;
-        Tue, 29 Oct 2019 16:43:22 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 64D2F2B438360; Tue, 29 Oct 2019 16:44:23 +0100 (CET)
-Date:   Tue, 29 Oct 2019 16:44:23 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     SAURAV GIREPUNJE <saurav.girepunje@gmail.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        saurav.girepunje@hotmail.com
-Subject: Re: [PATCH] arch: x86: kvm: mmu.c: use true/false for bool type
-Message-ID: <20191029154423.GN4131@hirez.programming.kicks-ass.net>
-References: <20191029094104.GA11220@saurav>
- <20191029101300.GK4114@hirez.programming.kicks-ass.net>
- <20191029134246.GA4943@saurav>
+        id S2390394AbfJ2Q1Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 12:27:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36920 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390345AbfJ2Q1X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 12:27:23 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8561781F0F
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 16:27:23 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id 7so8841624wrl.2
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 09:27:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=C6bDuPajdG9JVS65/nNfvWestag5Xwy94+uZABzDGas=;
+        b=F4hgANapyYeQkvHtvcVRvW3wboBUngEJgtZWb9vzHRYDfRYBhmQorK7Mb84ACaaQaE
+         YxkbR2dex93d1S7Gp2zk50PQrI3hTZDd7MkrRx+m9sLTxO05ReYiFPWF/fxSGVB36i5j
+         XpIgPp73pvoPGINkep8v29wMGXndQpqopz7Ftf3ublgUTtdB8I5BtyVTN4ZtXFEqrqyu
+         uvVOyOdvZ17Hp2/iYa34Fycycg6Km2kEmN3+9bv+3RyQZtEsqOP6pIzImhiGXrXvIUWE
+         +OFBrOxy/8xupz1jXCz9XUlb++p/k19f77wwSFF1uFInyjVkD5Va8Mae302/N7Dja60Z
+         Xr5w==
+X-Gm-Message-State: APjAAAVvOaU+1Wvcsz1ZdnxVD0Y0zIKEQEWOwVdc08kESu84dQDoTymX
+        +2FOQXJBf7mOA9v70YpJlr7SW0smJ6qfWxLSYdSD5AOqmbv2XqtckPKOfZ5Q0rc7pAtoKqh4Qvi
+        i5JZ+xZIrjea8
+X-Received: by 2002:a7b:c924:: with SMTP id h4mr5203725wml.143.1572366442238;
+        Tue, 29 Oct 2019 09:27:22 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwqcoHXB/eGlbAvP8/zQv1DhxCc9oHsJCpQ0Me1i12d1jrxIWteVIy4TZqjG4WQmNpAjkkq4g==
+X-Received: by 2002:a7b:c924:: with SMTP id h4mr5203696wml.143.1572366441980;
+        Tue, 29 Oct 2019 09:27:21 -0700 (PDT)
+Received: from steredhat (94.222.26.109.rev.sfr.net. [109.26.222.94])
+        by smtp.gmail.com with ESMTPSA id v10sm4015055wmg.48.2019.10.29.09.27.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2019 09:27:21 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 17:27:12 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>, Andy king <acking@vmware.com>,
+        Aditya Sarwade <asarwade@vmware.com>,
+        George Zhang <georgezhang@vmware.com>,
+        Jorgen Hansen <jhansen@vmware.com>
+Cc:     netdev@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+        linux-hyperv@vger.kernel.org,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next 00/14] vsock: add multi-transports support
+Message-ID: <20191029162712.fn5rgxrwdrbxuehw@steredhat>
+References: <20191023095554.11340-1-sgarzare@redhat.com>
+ <20191027080146.GA4472@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191029134246.GA4943@saurav>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191027080146.GA4472@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 29, 2019 at 07:12:46PM +0530, SAURAV GIREPUNJE wrote:
-> On Tue, Oct 29, 2019 at 11:13:00AM +0100, Peter Zijlstra wrote:
-> > On Tue, Oct 29, 2019 at 03:11:04PM +0530, Saurav Girepunje wrote:
-> > > Use true/false for bool type "dbg" in mmu.c
-> > > 
-> > > Signed-off-by: Saurav Girepunje <saurav.girepunje@gmail.com>
-> > > ---
-> > >  arch/x86/kvm/mmu.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> > > index 24c23c66b226..c0b1df69ce0f 100644
-> > > --- a/arch/x86/kvm/mmu.c
-> > > +++ b/arch/x86/kvm/mmu.c
-> > > @@ -68,7 +68,7 @@ enum {
-> > >  #undef MMU_DEBUG
-> > >  
-> > >  #ifdef MMU_DEBUG
-> > > -static bool dbg = 0;
-> > > +static bool dbg = true;
+On Sun, Oct 27, 2019 at 09:01:46AM +0100, Stefan Hajnoczi wrote:
+> On Wed, Oct 23, 2019 at 11:55:40AM +0200, Stefano Garzarella wrote:
+> > This series adds the multi-transports support to vsock, following
+> > this proposal: https://www.spinics.net/lists/netdev/msg575792.html
 > > 
-> > You're actually changing the value from false to true. Please, if you
-> > don't know C, don't touch things.
-> Hi,
+> > With the multi-transports support, we can use VSOCK with nested VMs
+> > (using also different hypervisors) loading both guest->host and
+> > host->guest transports at the same time.
+> > Before this series, vmci-transport supported this behavior but only
+> > using VMware hypervisor on L0, L1, etc.
+> > 
+> > RFC: https://patchwork.ozlabs.org/cover/1168442/
+> > RFC -> v1:
+> > - Added R-b/A-b from Dexuan and Stefan
+> > - Fixed comments and typos in several patches (Stefan)
+> > - Patch 7: changed .notify_buffer_size return to void (Stefan)
+> > - Added patch 8 to simplify the API exposed to the transports (Stefan)
+> > - Patch 11:
+> >   + documented VSOCK_TRANSPORT_F_* flags (Stefan)
+> >   + fixed vsock_assign_transport() when the socket is already assigned
+> >   + moved features outside of struct vsock_transport, and used as
+> >     parameter of vsock_core_register() as a preparation of Patch 12
+> > - Removed "vsock: add 'transport_hg' to handle g2h\h2g transports" patch
+> > - Added patch 12 to register vmci_transport only when VMCI guest/host
+> >   are active
 > 
-> Thanks for your review.
-> I accept that I have given wrong value "true" to debug variable. It's my bad my typo mistake.  
-> I will make sure that I will not touch your exclusive C code where we can assign 0/1 to a bool variable,
-> As you have given me a free advice, I also request you to please don't review such small patches from newbie to discourage them.
+> Has there been feedback from Jorgen or someone else from VMware?  A
+> Reviewed-by or Acked-by would be nice since this patch series affects
+> VMCI AF_VSOCK.
+> 
 
-I will most certainly review whatever I want, and clearly it is needed.
+Unfortunately not for now, I'm adding to this thread some VMware guys that
+reviewed latest vmci patches.
+
+Would be nice to have your feedback for these changes.
+
+Thanks in advance,
+Stefano
