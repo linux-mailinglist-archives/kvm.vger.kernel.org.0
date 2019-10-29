@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9039BE8CCB
-	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 17:33:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE621E8CC7
+	for <lists+kvm@lfdr.de>; Tue, 29 Oct 2019 17:33:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390564AbfJ2QdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 29 Oct 2019 12:33:02 -0400
-Received: from mail-qt1-f201.google.com ([209.85.160.201]:44217 "EHLO
-        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390444AbfJ2Qco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 29 Oct 2019 12:32:44 -0400
-Received: by mail-qt1-f201.google.com with SMTP id t16so14936289qtp.11
-        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 09:32:44 -0700 (PDT)
+        id S2390524AbfJ2Qct (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 29 Oct 2019 12:32:49 -0400
+Received: from mail-ua1-f73.google.com ([209.85.222.73]:52266 "EHLO
+        mail-ua1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390499AbfJ2Qcs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 29 Oct 2019 12:32:48 -0400
+Received: by mail-ua1-f73.google.com with SMTP id w5so2343527uan.19
+        for <kvm@vger.kernel.org>; Tue, 29 Oct 2019 09:32:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=faKSwlSmrf00HoJTd4USGLoBTwV5dEP/8paqFstcDoc=;
-        b=Nz75YSFZjOcoohsJhZXuh9r/j4u1xAgcPaQgz0lBLSkZB2ODDE+MdTXxZYEaD3E62c
-         OmHFv8rFSi6NgwdSYY87X4qz9DqBuzDtjhscnrtadxPQqsLvxLnhZk8IF5dGmrm5sYF3
-         zbHUml+6nzeqwHzOnd4QXiailc4uT1Uc97LBlxaZGNw/m/1ZX5DtOnjciKnKaBFyEzVG
-         FmRZSLCSe7zpFw8fmmMsJJDD49ekY58ES32VAIFMX6SDAbdl6YB8NsVCSzi1ZXeqXrg3
-         CVlmxM7WVDV+7TQVXrEnGE4ahQRTguLirKt9jxD/SXcMtRziKOweOl0IyXDTWXCz32Gc
-         XteQ==
+        bh=5pfhpJx7UO/QNtR11zCiFnLuGkt6GlpMBjgSmMf75Tg=;
+        b=FC4xXf2uZAMPwsrS2OpWFIPtkzQx1/R/4h+oW4oVwrQSAmMY3j5rAXXvMIeTt9HmO9
+         bMgeC7X+vkpdUJYjwYDUosbLI4zFUtwgcVTuzIWYTJ9hUePQyte5w3EAEsvviWkBiDBw
+         ZvatJYjaTa//8dRWOc9DabyKXKa7mCRRFBFM1LTwR2cQ6+Fn89H6Txtv25QUDc8ApcUh
+         DCvHhH1qFVpZ78NPfAOQdj2EGmuC0sFyJ/fiN3XEPYw+XSTxfk+ZPF3+Ww2kZSkK9H0X
+         om/im8oCdPDqb+vmEjGkPIrKOJ4wy/QciLWGnGESCIAjXG98sVXNPhY5BNk1hcMY2nep
+         Zm+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=faKSwlSmrf00HoJTd4USGLoBTwV5dEP/8paqFstcDoc=;
-        b=NeBRJIiemVOoum5/s7mh8XqUixWJ+GMhdO06+exo+WUKbmmoki+JtYne21Lyr/lAXl
-         RHKpocCxKMUntbr95AXbxXIj0FU6nCZB4THP8SAU61fP56tpc0SKIHVlW67RI/3H+p7m
-         KadAnIFdDxU3Sz3Lfzt2q6upeiUGrQjNzZxNSUvwtPs4fEVSPRvcMY+ebaP0SkcvUp2l
-         T7Vw4OZJBfftkYBtuWCMDR4aR4SsPipbNvgvYCEy7qvy4sGwJfL+giJhG5LstjidyV2v
-         BPFRo493t/yIc1N3wMfqq7yiesNRUKo4Ym0zffrZfJmBQiP+xAoIBdQ7tWSlUq9SOU4U
-         twBA==
-X-Gm-Message-State: APjAAAXh00UNfqnXgpEJzJ25MoPIfChd9dI4nFnLniNWNPuNhdonpExu
-        G7yCO/wcP3lz8bPj21k3Ouq7G0AGra0MKSmm
-X-Google-Smtp-Source: APXvYqwTWzu3ovaXFQhXn10N2hQ7GnlWOKOp8q2TyEUZqeMzmyCmDkxG3BUDYq5XUqxyUSVreMdyPbCjexQr1vIG
-X-Received: by 2002:a0c:e8cb:: with SMTP id m11mr17810316qvo.182.1572366763616;
- Tue, 29 Oct 2019 09:32:43 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 17:32:28 +0100
+        bh=5pfhpJx7UO/QNtR11zCiFnLuGkt6GlpMBjgSmMf75Tg=;
+        b=MwqtWCOFoSQ4GIk4EroK+0dkhTmfq8z75ll32wbtHOmRRY4C5wpD0yknovULm3KPoq
+         S5G7GtdAoxt3kx47PgabZlNoT3PSLd3SnGeI5z8DXuza9sBzfRX8i65PXhqz2zni97IJ
+         vOJND4FwsDwRsB6DYPBDzYN5x7VajpY/9g5G2cHB+gaxzk/88/76UFF6y1mIM6ylaMdv
+         7rLNpwPALlgea8H48y/dVjHmAvekUGh7dE6XamJ8Lawr5EwgokPkiuYSydITcOAYYKLp
+         fOamSDCR3soSe2pEKK8iuVHG2q+0xf3eXc7hcuGqD29smlB+t8exz+ULNzHmBDeM3ExI
+         bPjQ==
+X-Gm-Message-State: APjAAAVRo2qdQsjaU/ZVPMOObhYTQakrx2g+VBcc5JspVzzhQ1LPMI87
+        y/0V43A0JIGUh0B+AKVPKRbBud0Co1fnx7Jf
+X-Google-Smtp-Source: APXvYqxnbDwJOsZb5FOgMj5h3yqf55yEZtrdQcWRE/7f4Xr3yFQjgNOipnGlkQAkFoahpht83RtnwLlnW8nrG+uK
+X-Received: by 2002:a1f:41c4:: with SMTP id o187mr12070271vka.102.1572366766673;
+ Tue, 29 Oct 2019 09:32:46 -0700 (PDT)
+Date:   Tue, 29 Oct 2019 17:32:29 +0100
 In-Reply-To: <cover.1572366574.git.andreyknvl@google.com>
-Message-Id: <de4fe1c219db2d002d905dc1736e2a3bfa1db997.1572366574.git.andreyknvl@google.com>
+Message-Id: <e49d5d154e5da6c9ada521d2b7ce10a49ce9f98b.1572366574.git.andreyknvl@google.com>
 Mime-Version: 1.0
 References: <cover.1572366574.git.andreyknvl@google.com>
 X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH v3 2/3] usb, kcov: collect coverage from hub_event
+Subject: [PATCH v3 3/3] vhost, kcov: collect coverage from vhost_worker
 From:   Andrey Konovalov <andreyknvl@google.com>
 To:     linux-usb@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
@@ -71,49 +71,76 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This patch adds kcov_remote_start()/kcov_remote_stop() annotations to the
-hub_event() function, which is responsible for processing events on USB
-buses, in particular events that happen during USB device enumeration.
-Since hub_event() is run in a global background kernel thread (see
-Documentation/dev-tools/kcov.rst for details), each USB bus gets a unique
-global handle from the USB subsystem kcov handle range. As the result kcov
-can now be used to collect coverage from events that happen on a
-particular USB bus.
+vhost_worker() function, which is responsible for processing vhost works.
+Since vhost_worker() threads are spawned per vhost device instance
+the common kcov handle is used for kcov_remote_start()/stop() annotations
+(see Documentation/dev-tools/kcov.rst for details). As the result kcov can
+now be used to collect coverage from vhost worker threads.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- drivers/usb/core/hub.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/vhost/vhost.c | 6 ++++++
+ drivers/vhost/vhost.h | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/drivers/usb/core/hub.c b/drivers/usb/core/hub.c
-index 236313f41f4a..823dd675f6db 100644
---- a/drivers/usb/core/hub.c
-+++ b/drivers/usb/core/hub.c
-@@ -29,6 +29,7 @@
- #include <linux/random.h>
- #include <linux/pm_qos.h>
- #include <linux/kobject.h>
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 36ca2cf419bf..f44340b41494 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -30,6 +30,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/interval_tree_generic.h>
+ #include <linux/nospec.h>
 +#include <linux/kcov.h>
  
- #include <linux/uaccess.h>
- #include <asm/byteorder.h>
-@@ -5374,6 +5375,8 @@ static void hub_event(struct work_struct *work)
- 	hub_dev = hub->intfdev;
- 	intf = to_usb_interface(hub_dev);
+ #include "vhost.h"
  
-+	kcov_remote_start_usb((u64)hdev->bus->busnum);
-+
- 	dev_dbg(hub_dev, "state %d ports %d chg %04x evt %04x\n",
- 			hdev->state, hdev->maxchild,
- 			/* NOTE: expects max 15 ports... */
-@@ -5480,6 +5483,8 @@ static void hub_event(struct work_struct *work)
- 	/* Balance the stuff in kick_hub_wq() and allow autosuspend */
- 	usb_autopm_put_interface(intf);
- 	kref_put(&hub->kref, hub_release);
-+
-+	kcov_remote_stop();
+@@ -357,7 +358,9 @@ static int vhost_worker(void *data)
+ 		llist_for_each_entry_safe(work, work_next, node, node) {
+ 			clear_bit(VHOST_WORK_QUEUED, &work->flags);
+ 			__set_current_state(TASK_RUNNING);
++			kcov_remote_start_common(dev->kcov_handle);
+ 			work->fn(work);
++			kcov_remote_stop();
+ 			if (need_resched())
+ 				schedule();
+ 		}
+@@ -546,6 +549,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+ 
+ 	/* No owner, become one */
+ 	dev->mm = get_task_mm(current);
++	dev->kcov_handle = kcov_common_handle();
+ 	worker = kthread_create(vhost_worker, dev, "vhost-%d", current->pid);
+ 	if (IS_ERR(worker)) {
+ 		err = PTR_ERR(worker);
+@@ -571,6 +575,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+ 	if (dev->mm)
+ 		mmput(dev->mm);
+ 	dev->mm = NULL;
++	dev->kcov_handle = 0;
+ err_mm:
+ 	return err;
  }
+@@ -682,6 +687,7 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+ 	if (dev->worker) {
+ 		kthread_stop(dev->worker);
+ 		dev->worker = NULL;
++		dev->kcov_handle = 0;
+ 	}
+ 	if (dev->mm)
+ 		mmput(dev->mm);
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index e9ed2722b633..a123fd70847e 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -173,6 +173,7 @@ struct vhost_dev {
+ 	int iov_limit;
+ 	int weight;
+ 	int byte_weight;
++	u64 kcov_handle;
+ };
  
- static const struct usb_device_id hub_id_table[] = {
+ bool vhost_exceeds_weight(struct vhost_virtqueue *vq, int pkts, int total_len);
 -- 
 2.24.0.rc0.303.g954a862665-goog
 
