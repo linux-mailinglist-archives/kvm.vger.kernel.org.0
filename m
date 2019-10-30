@@ -2,101 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09BD3EA357
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 19:29:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B962EA37B
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 19:38:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727560AbfJ3S3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 14:29:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55517 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727500AbfJ3S3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 14:29:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572460192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sD9ilt7E0eF8ebEenHyF+oLBsdtqCiop9f34SpTYO9U=;
-        b=OGYSnVU8OCSc3LQTXPe/e6mOV4/qKMPdjDZ10nTjm3FvDnFjMbTvuVyW9MS2voV6K+NY0+
-        oG/lLVplVpz3abLsl5SsvwJhpL8zb2jk90kjUjtBuVjmD7TH1Pcd/H8KFiV+zSQ9IH+/vG
-        gWx8x0ahmTeFzgR049QkBpGBA5vtoXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-fsqSqvcaMyCho3W8c_yCWA-1; Wed, 30 Oct 2019 14:29:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EECC9800D49;
-        Wed, 30 Oct 2019 18:29:47 +0000 (UTC)
-Received: from [10.36.116.178] (ovpn-116-178.ams2.redhat.com [10.36.116.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BAAE5C1C3;
-        Wed, 30 Oct 2019 18:29:45 +0000 (UTC)
-Subject: Re: [RFC 27/37] KVM: s390: protvirt: SIGP handling
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-28-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <37df8c9a-091b-4da6-e1dc-294f432cb743@redhat.com>
-Date:   Wed, 30 Oct 2019 19:29:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727377AbfJ3SgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 14:36:23 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:36971 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726403AbfJ3SgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 14:36:23 -0400
+Received: by mail-pf1-f196.google.com with SMTP id u9so2183522pfn.4
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 11:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ewz3zGoQ/oT5sufHB6AjuO7iLzPrn+V2j8p2b6vWOYM=;
+        b=j9ShH8T6jz5E6OrGiP0hvGkLhPbya+dw5H60tZ92Gksg1qYjPxxq5wfrXbGL+ZiZeo
+         btNWixMcREdlNj/24ebkecof9Hz2OdRon/7KFD02WdvlSP9H3u0+Q1DG+1JP5N8cRgLr
+         1WjV1UHgu3iE7sp7rbhafhaV+dGRci8vNX5K8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ewz3zGoQ/oT5sufHB6AjuO7iLzPrn+V2j8p2b6vWOYM=;
+        b=ne3mkPEMELvYZbc6PJfoDEu7wfU7k9+QAHkAifx0Ye/CnYDJAa52r8bZJyfFLSSFTx
+         sWzc8Hesy4KMo28e6GsK7zcjZFJsCv1GMhG/PtgDze4mV/lUDRDUXU5G5bTKRjqSIKpU
+         5Wv2b0x3rdjITOMZB9TEgb0AdXz6iJPcAF8JQJ+P1cXvnCpraKivJkM1SlGgi4PtZYEy
+         st+Im4eO/XL1l4vQGsmxaGToJslZAWI1ExC5OiM+lx09p14ZoFLsSeAxlbJPj6bFXMC4
+         TdwuqVezCDMxJM0vCa7J69/IVu4pte01ibFLIaQlQzChm+qjEcr3UUUSIqmKszeCbyay
+         B94g==
+X-Gm-Message-State: APjAAAUM4qx1U/vNAGUkdPZSS4/ojsrp6yKTHgK86IObEJW3CqQXLhyy
+        SXmvVAu23BqGnKT88kI2dPKEuA==
+X-Google-Smtp-Source: APXvYqwEtldzCMnvxhg77NCeWsf2VanRztD/Ae5V4HsJ7lg7BT821TOwACbTkrdMpNcTlSy+1+dsBw==
+X-Received: by 2002:a17:90a:304:: with SMTP id 4mr878674pje.128.1572460582367;
+        Wed, 30 Oct 2019 11:36:22 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id a8sm678123pff.5.2019.10.30.11.36.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2019 11:36:21 -0700 (PDT)
+Date:   Wed, 30 Oct 2019 11:36:20 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Dock, Deneen T" <deneen.t.dock@intel.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kristen@linux.intel.com" <kristen@linux.intel.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>
+Subject: Re: [RFC PATCH 13/13] x86/Kconfig: Add Kconfig for KVM based XO
+Message-ID: <201910301135.BDC4C7696@keescook>
+References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
+ <20191003212400.31130-14-rick.p.edgecombe@intel.com>
+ <201910291634.7993D32374@keescook>
+ <d645473f01c445a70bc1f2472217f1ae426b7020.camel@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-28-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: fsqSqvcaMyCho3W8c_yCWA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d645473f01c445a70bc1f2472217f1ae426b7020.camel@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.10.19 13:40, Janosch Frank wrote:
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+On Wed, Oct 30, 2019 at 12:01:18AM +0000, Edgecombe, Rick P wrote:
+> On Tue, 2019-10-29 at 16:36 -0700, Kees Cook wrote:
+> > On Thu, Oct 03, 2019 at 02:24:00PM -0700, Rick Edgecombe wrote:
+> > > Add CONFIG_KVM_XO for supporting KVM based execute only memory.
+> > 
+> > I would expect this config to be added earlier in the series so that the
+> > code being added that depends on it can be incrementally build tested...
+> > 
+> > (Also, if this is default=y, why have a Kconfig for it at all? Guests
+> > need to know to use this already, yes?)
+> > 
+> > -Kees
+> Hmm, good point. One reason could be that this requires SPARSEMEM_VMEMMAP due to
+> some pre-processor tricks that need a compile time known max physical address
+> size. So maybe someone could want KVM_GUEST and !SPARSEMEM_VMEMMAP. I'm not
+> sure.
 
-Can you add why this is necessary and how handle_stop() is intended to=20
-work in prot mode?
+Good point about the combination of other CONFIGs. All the more reason
+to move it earlier, though.
 
-How is SIGP handled in general in prot mode? (which intercepts are=20
-handled by QEMU)
-Would it be valid for user space to inject a STOP interrupt with "flags=20
-& KVM_S390_STOP_FLAG_STORE_STATUS" - I think not (legacy QEMU only)
+-Kees
 
-I think we should rather disallow injecting such stop interrupts=20
-(KVM_S390_STOP_FLAG_STORE_STATUS) in prot mode in the first place. Also,=20
-we should disallow prot virt without user_sigp.
+> 
+> > > 
+> > > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > > ---
+> > >  arch/x86/Kconfig | 13 +++++++++++++
+> > >  1 file changed, 13 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> > > index 222855cc0158..3a3af2a456e8 100644
+> > > --- a/arch/x86/Kconfig
+> > > +++ b/arch/x86/Kconfig
+> > > @@ -802,6 +802,19 @@ config KVM_GUEST
+> > >  	  underlying device model, the host provides the guest with
+> > >  	  timing infrastructure such as time of day, and system time
+> > >  
+> > > +config KVM_XO
+> > > +	bool "Support for KVM based execute only virtual memory permissions"
+> > > +	select DYNAMIC_PHYSICAL_MASK
+> > > +	select SPARSEMEM_VMEMMAP
+> > > +	depends on KVM_GUEST && X86_64
+> > > +	default y
+> > > +	help
+> > > +	  This option enables support for execute only memory for KVM guests. If
+> > > +	  support from the underlying VMM is not detected at boot, this
+> > > +	  capability will automatically disable.
+> > > +
+> > > +	  If you are unsure how to answer this question, answer Y.
+> > > +
+> > >  config PVH
+> > >  	bool "Support for running PVH guests"
+> > >  	---help---
+> > > -- 
+> > > 2.17.1
+> > > 
+> > 
+> > 
 
-> ---
->   arch/s390/kvm/intercept.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-> index 37cb62bc261b..a89738e4f761 100644
-> --- a/arch/s390/kvm/intercept.c
-> +++ b/arch/s390/kvm/intercept.c
-> @@ -72,7 +72,8 @@ static int handle_stop(struct kvm_vcpu *vcpu)
->   =09if (!stop_pending)
->   =09=09return 0;
->  =20
-> -=09if (flags & KVM_S390_STOP_FLAG_STORE_STATUS) {
-> +=09if (flags & KVM_S390_STOP_FLAG_STORE_STATUS &&
-> +=09    !kvm_s390_pv_is_protected(vcpu->kvm)) {
->   =09=09rc =3D kvm_s390_vcpu_store_status(vcpu,
->   =09=09=09=09=09=09KVM_S390_STORE_STATUS_NOADDR);
->   =09=09if (rc)
->=20
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+-- 
+Kees Cook
