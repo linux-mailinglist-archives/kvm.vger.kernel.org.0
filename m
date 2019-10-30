@@ -2,132 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B962EA37B
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 19:38:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D60BEA516
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:02:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727377AbfJ3SgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 14:36:23 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36971 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726403AbfJ3SgX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 14:36:23 -0400
-Received: by mail-pf1-f196.google.com with SMTP id u9so2183522pfn.4
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 11:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ewz3zGoQ/oT5sufHB6AjuO7iLzPrn+V2j8p2b6vWOYM=;
-        b=j9ShH8T6jz5E6OrGiP0hvGkLhPbya+dw5H60tZ92Gksg1qYjPxxq5wfrXbGL+ZiZeo
-         btNWixMcREdlNj/24ebkecof9Hz2OdRon/7KFD02WdvlSP9H3u0+Q1DG+1JP5N8cRgLr
-         1WjV1UHgu3iE7sp7rbhafhaV+dGRci8vNX5K8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ewz3zGoQ/oT5sufHB6AjuO7iLzPrn+V2j8p2b6vWOYM=;
-        b=ne3mkPEMELvYZbc6PJfoDEu7wfU7k9+QAHkAifx0Ye/CnYDJAa52r8bZJyfFLSSFTx
-         sWzc8Hesy4KMo28e6GsK7zcjZFJsCv1GMhG/PtgDze4mV/lUDRDUXU5G5bTKRjqSIKpU
-         5Wv2b0x3rdjITOMZB9TEgb0AdXz6iJPcAF8JQJ+P1cXvnCpraKivJkM1SlGgi4PtZYEy
-         st+Im4eO/XL1l4vQGsmxaGToJslZAWI1ExC5OiM+lx09p14ZoFLsSeAxlbJPj6bFXMC4
-         TdwuqVezCDMxJM0vCa7J69/IVu4pte01ibFLIaQlQzChm+qjEcr3UUUSIqmKszeCbyay
-         B94g==
-X-Gm-Message-State: APjAAAUM4qx1U/vNAGUkdPZSS4/ojsrp6yKTHgK86IObEJW3CqQXLhyy
-        SXmvVAu23BqGnKT88kI2dPKEuA==
-X-Google-Smtp-Source: APXvYqwEtldzCMnvxhg77NCeWsf2VanRztD/Ae5V4HsJ7lg7BT821TOwACbTkrdMpNcTlSy+1+dsBw==
-X-Received: by 2002:a17:90a:304:: with SMTP id 4mr878674pje.128.1572460582367;
-        Wed, 30 Oct 2019 11:36:22 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id a8sm678123pff.5.2019.10.30.11.36.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2019 11:36:21 -0700 (PDT)
-Date:   Wed, 30 Oct 2019 11:36:20 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1727025AbfJ3VCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 17:02:05 -0400
+Received: from mga18.intel.com ([134.134.136.126]:12375 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726969AbfJ3VCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 17:02:05 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2019 14:02:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,248,1569308400"; 
+   d="scan'208";a="203312286"
+Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
+  by orsmga003.jf.intel.com with ESMTP; 30 Oct 2019 14:02:04 -0700
+Received: from orsmsx113.amr.corp.intel.com (10.22.240.9) by
+ ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 30 Oct 2019 14:02:04 -0700
+Received: from orsmsx112.amr.corp.intel.com ([169.254.3.185]) by
+ ORSMSX113.amr.corp.intel.com ([169.254.9.28]) with mapi id 14.03.0439.000;
+ Wed, 30 Oct 2019 14:02:03 -0700
+From:   "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+To:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "peterz@infradead.org" <peterz@infradead.org>,
+        "keescook@chromium.org" <keescook@chromium.org>,
         "Dock, Deneen T" <deneen.t.dock@intel.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "x86@kernel.org" <x86@kernel.org>,
         "kristen@linux.intel.com" <kristen@linux.intel.com>,
         "luto@kernel.org" <luto@kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "Hansen, Dave" <dave.hansen@intel.com>
-Subject: Re: [RFC PATCH 13/13] x86/Kconfig: Add Kconfig for KVM based XO
-Message-ID: <201910301135.BDC4C7696@keescook>
+Subject: Re: [RFC PATCH 09/13] x86/cpufeature: Add detection of KVM XO
+Thread-Topic: [RFC PATCH 09/13] x86/cpufeature: Add detection of KVM XO
+Thread-Index: AQHVejL7mBDeeBJOYUiqz0B6Xhz7/Kdy452AgAAFHYCAAPxSAIAAZnyA
+Date:   Wed, 30 Oct 2019 21:02:02 +0000
+Message-ID: <217403c0f9790c1142b51231d5b4ccfd6d83cf61.camel@intel.com>
 References: <20191003212400.31130-1-rick.p.edgecombe@intel.com>
- <20191003212400.31130-14-rick.p.edgecombe@intel.com>
- <201910291634.7993D32374@keescook>
- <d645473f01c445a70bc1f2472217f1ae426b7020.camel@intel.com>
+         <20191003212400.31130-10-rick.p.edgecombe@intel.com>
+         <201910291633.927254B10@keescook>
+         <40cb4ea3b351c25074cf47ae92a189eec12161fb.camel@intel.com>
+         <20191030145520.GA14391@linux.intel.com>
+In-Reply-To: <20191030145520.GA14391@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.54.75.11]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <68AFE186A011404BBA6BFA697DF6A0BD@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d645473f01c445a70bc1f2472217f1ae426b7020.camel@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 12:01:18AM +0000, Edgecombe, Rick P wrote:
-> On Tue, 2019-10-29 at 16:36 -0700, Kees Cook wrote:
-> > On Thu, Oct 03, 2019 at 02:24:00PM -0700, Rick Edgecombe wrote:
-> > > Add CONFIG_KVM_XO for supporting KVM based execute only memory.
-> > 
-> > I would expect this config to be added earlier in the series so that the
-> > code being added that depends on it can be incrementally build tested...
-> > 
-> > (Also, if this is default=y, why have a Kconfig for it at all? Guests
-> > need to know to use this already, yes?)
-> > 
-> > -Kees
-> Hmm, good point. One reason could be that this requires SPARSEMEM_VMEMMAP due to
-> some pre-processor tricks that need a compile time known max physical address
-> size. So maybe someone could want KVM_GUEST and !SPARSEMEM_VMEMMAP. I'm not
-> sure.
-
-Good point about the combination of other CONFIGs. All the more reason
-to move it earlier, though.
-
--Kees
-
-> 
-> > > 
-> > > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> > > ---
-> > >  arch/x86/Kconfig | 13 +++++++++++++
-> > >  1 file changed, 13 insertions(+)
-> > > 
-> > > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> > > index 222855cc0158..3a3af2a456e8 100644
-> > > --- a/arch/x86/Kconfig
-> > > +++ b/arch/x86/Kconfig
-> > > @@ -802,6 +802,19 @@ config KVM_GUEST
-> > >  	  underlying device model, the host provides the guest with
-> > >  	  timing infrastructure such as time of day, and system time
-> > >  
-> > > +config KVM_XO
-> > > +	bool "Support for KVM based execute only virtual memory permissions"
-> > > +	select DYNAMIC_PHYSICAL_MASK
-> > > +	select SPARSEMEM_VMEMMAP
-> > > +	depends on KVM_GUEST && X86_64
-> > > +	default y
-> > > +	help
-> > > +	  This option enables support for execute only memory for KVM guests. If
-> > > +	  support from the underlying VMM is not detected at boot, this
-> > > +	  capability will automatically disable.
-> > > +
-> > > +	  If you are unsure how to answer this question, answer Y.
-> > > +
-> > >  config PVH
-> > >  	bool "Support for running PVH guests"
-> > >  	---help---
-> > > -- 
-> > > 2.17.1
-> > > 
-> > 
-> > 
-
--- 
-Kees Cook
+T24gV2VkLCAyMDE5LTEwLTMwIGF0IDA3OjU1IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBUdWUsIE9jdCAyOSwgMjAxOSBhdCAwNDo1MjowOFBNIC0wNzAwLCBFZGdlY29t
+YmUsIFJpY2sgUCB3cm90ZToNCj4gPiBPbiBUdWUsIDIwMTktMTAtMjkgYXQgMTY6MzMgLTA3MDAs
+IEtlZXMgQ29vayB3cm90ZToNCj4gPiA+IE9uIFRodSwgT2N0IDAzLCAyMDE5IGF0IDAyOjIzOjU2
+UE0gLTA3MDAsIFJpY2sgRWRnZWNvbWJlIHdyb3RlOg0KPiA+ID4gPiBBZGQgYSBuZXcgQ1BVSUQg
+bGVhZiB0byBob2xkIHRoZSBjb250ZW50cyBvZiBDUFVJRCAweDQwMDAwMDMwIEVBWCB0bw0KPiA+
+ID4gPiBkZXRlY3QgS1ZNIGRlZmluZWQgZ2VuZXJpYyBWTU0gZmVhdHVyZXMuDQo+ID4gPiA+IA0K
+PiA+ID4gPiBUaGUgbGVhZiB3YXMgcHJvcG9zZWQgdG8gYWxsb3cgS1ZNIHRvIGNvbW11bmljYXRl
+IGZlYXR1cmVzIHRoYXQgYXJlDQo+ID4gPiA+IGRlZmluZWQgYnkgS1ZNLCBidXQgYXZhaWxhYmxl
+IGZvciBhbnkgVk1NIHRvIGltcGxlbWVudC4NCj4gDQo+IFRoaXMgZG9lc24ndCBuZWNlc3Nhcmls
+eSB3b3JrIHRoZSB3YXkgeW91IGludGVuZCwgS1ZNJ3MgYmFzZSBDUFVJRCBpc24ndA0KPiBndWFy
+YW50ZWVkIHRvIGJlIDB4NDAwMDAwMDAuICBFLmcuIEtWTSBzdXBwb3J0cyBhZHZlcnRpc2luZyBp
+dHNlbGYgYXMNCj4gSHlwZXJWICphbmQqIEtWTSwgaW4gd2hpY2ggY2FzZSBLVk0ncyBDUFVJRCBi
+YXNlIHdpbGwgYmUgMHg0MDAwMDEwMC4NCj4gDQo+IEkgdGhpbmsgeW91J3JlIGJldHRlciBvZmYg
+anVzdCBtYWtpbmcgdGhpcyBhIHN0YW5kYXJkIEtWTSBDUFVJRCBmZWF0dXJlLg0KPiBJZiBhIGRp
+ZmZlcmVudCBoeXBlcnZpc29yIHdhbnRzIHRvIHJldXNlIGd1ZXN0IHN1cHBvcnQgYXMgaXMsIGl0
+IGNhbg0KPiBhZHZlcnRpc2UgS1ZNIHN1cHBvcnQgYXQgYSBsb3dlciBwcmlvcml0eS4NCj4gDQpP
+aywgSSdtIGZpbmUgZ29pbmcgd2l0aCB0aGUgc2ltcGxlciBLVk0gQ1BVSUQgYml0LiBJdCdzIG5v
+dCBsaWtlIHBlci1WTU0gQ1BVSUQNCmxlYWYgbWVhbmluZ3MgYXJlIGEgbmV3IHNjZW5hcmlvIHdp
+dGggdGhpcy4NCg0KPiBOb3RlLCBxdWVyeWluZyBndWVzdCBDUFVJRCBpc24ndCBzdHJhaWdodGZv
+cndhcmQgaW4gZWl0aGVyIGNhc2UuICBCdXQsDQo+IEtWTSBkb2Vzbid0IHN1cHBvcnQgZGlzYWJs
+aW5nIGl0cyBvdGhlciBDUFVJRC1iYXNlIHBhcmF2aXJ0IGZlYXR1cmVzLCBlLmcuDQo+IEtWTSBl
+bXVsYXRlcyB0aGUga3ZtX2Nsb2NrIE1TUnMgcmVnYXJkbGVzcyBvZiB3aGF0IHVzZXJzcGFjZSBh
+ZHZlcnRpc2VzIHRvDQo+IHRoZSBndWVzdC4gIERlcGVuZGluZyBvbiB3aGF0IGNoYW5nZXMgYXJl
+IHJlcXVpcmVkIGluIEtWTSdzIE1NVSwgdGhpcyBtYXkNCj4gYWxzbyBuZWVkIHRvIGJlIGEgS1ZN
+LXdpZGUgZmVhdHVyZSwgaS5lLiBjb250cm9sbGVkIHZpYSBhIG1vZHVsZSBwYXJhbS4NCj4gPiA+
+ID4gQWRkIGNwdV9mZWF0dXJlX2VuYWJsZWQoKSBzdXBwb3J0IGZvciBmZWF0dXJlcyBpbiB0aGlz
+IGxlYWYgKEtWTSBYTyksDQo+ID4gPiA+IGFuZA0KPiA+ID4gPiBhIHBndGFibGVfa3ZteG9fZW5h
+YmxlZCgpIGhlbHBlciBzaW1pbGFyIHRvIHBndGFibGVfbDVfZW5hYmxlZCgpIHNvIHRoYXQNCj4g
+PiA+ID4gcGd0YWJsZV9rdm14b19lbmFibGVkKCkgY2FuIGJlIHVzZWQgaW4gZWFybHkgY29kZSB0
+aGF0IGluY2x1ZGVzDQo+ID4gPiA+IGFyY2gveDg2L2luY2x1ZGUvYXNtL3NwYXJzZW1lbS5oLg0K
+PiA+ID4gPiANCj4gPiA+ID4gTGFzdGx5LCBpbiBoZWFkNjQuYyBkZXRlY3QgYW5kIHRoaXMgZmVh
+dHVyZSBhbmQgcGVyZm9ybSBuZWNlc3NhcnkNCj4gPiA+ID4gYWRqdXN0bWVudHMgdG8gcGh5c2lj
+YWxfbWFzay4NCj4gPiA+IA0KPiA+ID4gQ2FuIHRoaXMgYmUgZXhwb3NlZCB0byAvcHJvYy9jcHVp
+bmZvIHNvIGEgZ3Vlc3QgdXNlcnNwYWNlIGNhbiBkZXRlcm1pbmUNCj4gPiA+IGlmIHRoaXMgZmVh
+dHVyZSBpcyBlbmFibGVkPw0KPiA+ID4gDQo+ID4gPiAtS2Vlcw0KPiA+IA0KPiA+IElzIHRoZXJl
+IGEgZ29vZCBwbGFjZSB0byBleHBvc2UgdGhlIGluZm9ybWF0aW9uIHRoYXQgdGhlIFBST1RfRVhF
+QyBhbmQNCj4gPiAhUFJPVF9SRUFEIGNvbWJvIGNyZWF0ZXMgZXhlY3V0ZS1vbmx5IG1lbW9yeT8g
+VGhpcyB3YXkgYXBwcyBjYW4gY2hlY2sgb25lDQo+ID4gcGxhY2UNCj4gPiBmb3IgdGhlIHN1cHBv
+cnQgYW5kIG5vdCB3b3JyeSBhYm91dCB0aGUgaW1wbGVtZW50YXRpb24gd2hldGhlciBpdCdzIHRo
+aXMsDQo+ID4geDg2DQo+ID4gcGtleXMsIGFybSBvciBvdGhlci4NCj4gDQo+IEkgZG9uJ3QgdGhp
+bmsgc28/ICBBc3N1bWluZyB0aGVyZSdzIG5vIGNvbW1vbiBtZXRob2QsIGl0IGNhbiBiZSBkaXNw
+bGF5ZWQNCj4gaW4gL3Byb2MvY3B1aW5mbyBieSBhZGRpbmcgYSBzeW50aGV0aWMgYml0LCBlLmcu
+IGluIExpbnV4LWRlZmluZWQgd29yZCA4DQo+ICh2aXJ0dWFsaXphdGlvbikgaW5zdGVhZCBvZiBh
+IGRlZGljYXRlZCB3b3JkLiAgVGhlIGJpdCBjYW4gdGhlbiBiZQ0KPiBzZXQgaWYgdGhlIGZlYXR1
+cmVzIGV4aXN0cyBhbmQgaXMgZW5hYmxlZCAoYnkgdGhlIGd1ZXN0KS4NCj4gDQo+IEknZCBhbHNv
+IG5hbWUgdGhlIGZlYXR1cmUgRVhFQ19PTkxZLiAgWE8gaXMgdW5uZWNlc3NhcmlseSB0ZXJzZSBJ
+TU8sIGFuZA0KPiBpbmNsdWRpbmcgIktWTSIgaW4gdGhlIG5hbWUgbWF5IGJlIG1pc2NvbnN0cnVl
+ZCBhcyBhIGhvc3QgS1ZNIGZlYXR1cmUgYW5kDQo+IHdpbGwgYmUgZmxhdCBvdXQgd3JvbmcgaWYg
+aGFyZHdhcmUgZXZlciBzdXBwb3J0cyBYTyBuYXRpdmVseS4NCg0KT2ssIGlmIHRoZXJlIGlzIG5v
+IGdlbmVyaWMgd2F5IEkgZ3Vlc3MgSSdsbCBkbyB0aGlzLg0KDQoNCg==
