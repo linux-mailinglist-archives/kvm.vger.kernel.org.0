@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15A74E9582
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 05:06:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 717EFE9585
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 05:06:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726821AbfJ3EGk convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 30 Oct 2019 00:06:40 -0400
-Received: from mga02.intel.com ([134.134.136.20]:43128 "EHLO mga02.intel.com"
+        id S1727021AbfJ3EGq convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 30 Oct 2019 00:06:46 -0400
+Received: from mga05.intel.com ([192.55.52.43]:56188 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725308AbfJ3EGk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 00:06:40 -0400
+        id S1727006AbfJ3EGp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 00:06:45 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 21:06:39 -0700
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 21:06:45 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; 
-   d="scan'208";a="401376330"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga006.fm.intel.com with ESMTP; 29 Oct 2019 21:06:38 -0700
-Received: from fmsmsx126.amr.corp.intel.com (10.18.125.43) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 29 Oct 2019 21:06:38 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX126.amr.corp.intel.com (10.18.125.43) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 29 Oct 2019 21:06:38 -0700
+   d="scan'208";a="205679945"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+  by FMSMGA003.fm.intel.com with ESMTP; 29 Oct 2019 21:06:45 -0700
+Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 29 Oct 2019 21:06:44 -0700
+Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
+ FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 29 Oct 2019 21:06:44 -0700
 Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.2]) with mapi id 14.03.0439.000;
- Wed, 30 Oct 2019 12:06:36 +0800
+ SHSMSX107.ccr.corp.intel.com ([169.254.9.63]) with mapi id 14.03.0439.000;
+ Wed, 30 Oct 2019 12:06:42 +0800
 From:   "Kang, Luwei" <luwei.kang@intel.com>
 To:     Peter Zijlstra <peterz@infradead.org>
 CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -52,23 +52,23 @@ CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         <alexander.shishkin@linux.intel.com>,
         "jolsa@redhat.com" <jolsa@redhat.com>,
         "namhyung@kernel.org" <namhyung@kernel.org>
-Subject: RE: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Topic: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Index: AQHVjLd13+lWyOpx00qD/bA0eE059qdxL6sAgAEppjA=
-Date:   Wed, 30 Oct 2019 04:06:36 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com>
+Subject: RE: [PATCH v1 4/8] KVM: x86: Aviod clear the PEBS counter when PEBS
+ enabled in guest
+Thread-Topic: [PATCH v1 4/8] KVM: x86: Aviod clear the PEBS counter when
+ PEBS enabled in guest
+Thread-Index: AQHVjLd4hZIWJ8IukEOg3V+5ZZvUU6dxMmCAgAE4tMA=
+Date:   Wed, 30 Oct 2019 04:06:42 +0000
+Message-ID: <82D7661F83C1A047AF7DC287873BF1E173835B24@SHSMSX104.ccr.corp.intel.com>
 References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-4-git-send-email-luwei.kang@intel.com>
- <20191029144612.GK4097@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191029144612.GK4097@hirez.programming.kicks-ass.net>
+ <1572217877-26484-5-git-send-email-luwei.kang@intel.com>
+ <20191029145553.GL4097@hirez.programming.kicks-ass.net>
+In-Reply-To: <20191029145553.GL4097@hirez.programming.kicks-ass.net>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzhhOGQ4NDktZWMwMC00OThjLTkxYWUtMDFiNWMyNzVhMDJhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicUhZQTJjUzF2dnRRSWp6T0dYbGRWTW9UYmMxRnlWRVwvc1wvb3k4Qm1LZFo4d1lLM2gyK1JkMGsxSW42cDhBSEFoIn0=
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDAzMWRiNDgtOWQwOC00YzAxLThhNDktM2Q3MTJjMDlkOTAxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiOFZESXpSTkRXSmJNT1NjR3dkWlwvSHRWTElYWk1xWHhwN1wvYWpTaE5aSFk2bTB0WThsZmNpRUJ2Unk3ZGNiaHhBIn0=
 dlp-product: dlpe-windows
 dlp-version: 11.2.0.6
 dlp-reaction: no-action
@@ -81,26 +81,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> >  				  unsigned config, bool exclude_user,
-> >  				  bool exclude_kernel, bool intr,
-> > -				  bool in_tx, bool in_tx_cp)
-> > +				  bool in_tx, bool in_tx_cp, bool pebs)
-> >  {
-> >  	struct perf_event *event;
-> >  	struct perf_event_attr attr = {
-> > @@ -111,9 +111,12 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> >  		.exclude_user = exclude_user,
-> >  		.exclude_kernel = exclude_kernel,
-> >  		.config = config,
-> > +		.precise_ip = pebs ? 1 : 0,
-> > +		.aux_output = pebs ? 1 : 0,
+> > This patch introduce a parameter that avoid clear the PEBS event
+> > counter while running in the guest. The performance counter which use
+> > for PEBS event can be enabled through VM-entry when PEBS is enabled in
+> > guest by PEBS output to Intel PT.
 > 
-> srsly?
+> Please write coherent Changelogs. I have no clue what you're trying to say.
+> 
+> Also, maybe this attrocious coding style is accepted in KVM, but I'm not having it. Pretty much all your linebreaks and subsequent
+> indenting is against style.
 
-Hi Peter,
-    Thanks for review. For aux_output, I think it should be set 1 when the guest wants to enabled PEBS by Intel PT.
-     For precise_ip, it is the precise level in perf and set by perf command line in KVM guest, this may not reflect the accurate value (can be 0~3) here. Here set to 1 is used to allocate a counter for PEBS event and set the MSR_IA32_PEBS_ENABLE register. For PMU virtualization, KVM will trap the guest's write operation to PMU registers and allocate/free event counter from host if a counter enable/disable in guest. We can't always deduce the exact parameter of perf command line from the value of the guest writers to the register.
+Sorry. I mean the performance counter for PEBS event must be disabled before VM-entry at present. After PEBS enabled in guest by PEBS via PT, we don't need to disable the PEBS counters.
+We be corrected in next version.
 
 Thanks,
 Luwei Kang
