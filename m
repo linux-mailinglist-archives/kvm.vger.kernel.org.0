@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C30F7EA51B
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C51EA51D
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:04:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbfJ3VEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 17:04:38 -0400
-Received: from mail-qk1-f202.google.com ([209.85.222.202]:48512 "EHLO
-        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727099AbfJ3VEi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 17:04:38 -0400
-Received: by mail-qk1-f202.google.com with SMTP id z64so3423923qkc.15
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:04:37 -0700 (PDT)
+        id S1727128AbfJ3VEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 17:04:42 -0400
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:49380 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727102AbfJ3VEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 17:04:42 -0400
+Received: by mail-pf1-f201.google.com with SMTP id r187so2678555pfc.16
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:04:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=tP5VYyMFPyBsAqSM/e1ZfMjzucbp+c4GqFLPI5mcuDg=;
-        b=AW992fJCZXBx956qeE2JdFQG1Vbfq3pWYaq+IPi3Lpg3GnG1Y7pF//+kjV7+NX+5wv
-         t8eq4dBnSo4W2WGY3SOhICBGhR7E+gshJWwuB/qCYYIUvY+9m6yhACdODJLtIRlkwQQw
-         oobIqJVsKs/8ujsx15RmPXd2gZEan2J0MgpsBs9bZUVFTyiUpfB9LYdk9gLm2j6B2ZBl
-         zhbXCl6chkpJ4xc7DjivyJBd29wUk7sRL5mb4wxILJlnGWui8eC2ZzzIlFpwgGC0apmU
-         bWE7JPxHbaziTsgmGlYASzh+4xdx6wWMdMQhFGYC28TvaZWakSaL05izMVLe+8MWymvO
-         aK+A==
+        bh=R5YsaR9bKKV9fNP9YXtzeLSXtxZmX8iRMZjNRdp+oWI=;
+        b=m+cB/6qw1KFnvVJTUAVjF63cRK+2BS5naiUQ/mPU3UB1puPunOF7RogUGah/bOmqKf
+         mWgFO/3eVEQatwHCUdsyAph8CD7LNxR9mzp/mKaMYe+z3OPNsGY2fH1TVXgDLrvVrMGa
+         DG6SSaVzJ06IV8bv+CJ2ETTHsF/Zqo6FqNNt22gY4ZbV76mXon4sADKkjBtsWOlt9gZd
+         Ygzh3o9zPwmOiMULDbxDS+2W5CHoSZAZqLrWKJOKR8/u9kq258EN6Vaa/4mASV5xsQhN
+         yBfVUifHg5qHH/17yIO7Rq5SbEDsYBegSbxRty0yAHDlS39gXtKqiUPeF896BKbPO79Q
+         EahA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=tP5VYyMFPyBsAqSM/e1ZfMjzucbp+c4GqFLPI5mcuDg=;
-        b=UfTNGGV5UKkoWvSS2gk0TMc424yZuiSW3dBaujz1K14Ld2K2weetZvFx6Uxw0Wxrt/
-         XK2wupNjqzshJs0FflCKW5i5DFqQQRrcYZ5HGv08dwhJ5n0ERmIdfT1VzE6flsYlNbeo
-         nRin1zOfkR5MrXKrW566DyC32jw+/wJsgh4kvdiGO6oYK0UHsiSNcattkV7203RxxZpQ
-         PUSvhrKcO3TBZ5x8ayzcA55LaWdK0Rd5QblBAOY2y2MGxSv3iQjath9DLeilHvkyrgpX
-         fNl7WLUBLUTwdsXBomK/BLcZiCGilaD7Jl054KNXdkzAqrVo6OYqt/7I7Up8mq9NaRHO
-         siuA==
-X-Gm-Message-State: APjAAAWlZhzMIyLLY120FywPqa1wqcpR3xy5L2lDOUdJ2zGhjx+3s1/N
-        OkOYttfi+yIysiRp0hcUu60lKApt3mOnKKcPKiPusZpXGvTIOT+tQa+q4BYmGlQ5AaQwH/+y/aP
-        pw9hmVB94LRXVDUXJvH5+OgZO+Wo1O//lQP/Mt/Wcdu51HsnYJGqgpQ==
-X-Google-Smtp-Source: APXvYqyUJSCQqD3c0drhPQWOD2pFYe3h6vIeLr8FWx5hYto5aXXcfgL5N3jXcc6KZgh9Rv4dEHzZpd9GuQ==
-X-Received: by 2002:a37:4ccb:: with SMTP id z194mr2044245qka.128.1572469476958;
- Wed, 30 Oct 2019 14:04:36 -0700 (PDT)
-Date:   Wed, 30 Oct 2019 14:04:17 -0700
+        bh=R5YsaR9bKKV9fNP9YXtzeLSXtxZmX8iRMZjNRdp+oWI=;
+        b=XErjjI+qJnt/Eo6IyAz4cX1UQ5a9FMrE3wE6GtG6/DKxrImJvmB9zJhQ9RVpsRV+yw
+         RJOal53HLlkdpkHXMd+Qs9T/blURE9FHWsfuKmvjScZudWZdpDmGayN2tHef9dDsVugL
+         DS7c9FNBumLHFrzFRPU6Id5AnXvAlQGHe8AtiDPAlaAW3q3Zcev+DsqlakokgnkJZLdM
+         KXcj6Voe6U6R/wwjHzT6P8zHyX/QrWcj/6Fi2wc27NQ7QfzUf8ACe5RAHOp7qdzESs/7
+         omU9EzZ6zhx8/ofVkTEO8TJ7Cz6sJKbSI7YPx/f0yVjUiwW0TGeH0M7LPX6HGQQ+Cdsh
+         6VXA==
+X-Gm-Message-State: APjAAAVkiC1v+S8k+pVkzEJnvr+fQmaDX0H1rE8RwThRAswbWync27oN
+        +bYxp5QtHfY3CYvMsfyWcCTF8LMtY/jPbcR3TuULv0zql1MMLONotQ9iZS0Rfw1ojV5tgPg+KrJ
+        P716VgSJgMwR3RnfTDP+4MSfTU7eXOHFa4eM4Y7cuDRDgqjkBiuFr7g==
+X-Google-Smtp-Source: APXvYqyF447WabAiYT/xTJmpjQsFAKB55cNNHE+8uaKTOBhkKbYeg72WGZF+ig55ZS5vp8vO+JQW4J5+gA==
+X-Received: by 2002:a63:234c:: with SMTP id u12mr1562056pgm.384.1572469479458;
+ Wed, 30 Oct 2019 14:04:39 -0700 (PDT)
+Date:   Wed, 30 Oct 2019 14:04:18 -0700
 In-Reply-To: <20191030210419.213407-1-morbo@google.com>
-Message-Id: <20191030210419.213407-5-morbo@google.com>
+Message-Id: <20191030210419.213407-6-morbo@google.com>
 Mime-Version: 1.0
 References: <20191015000411.59740-1-morbo@google.com> <20191030210419.213407-1-morbo@google.com>
 X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
-Subject: [kvm-unit-tests PATCH v3 4/6] Makefile: add "cxx-option" for C++ builds
+Subject: [kvm-unit-tests PATCH v3 5/6] x86: use a non-negative number in shift
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com
 Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
@@ -58,48 +58,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The C++ compiler may not support all of the same flags as the C
-compiler. Add a separate test for these flags.
+Shifting a negative number is undefined. Clang complains about it:
+
+x86/svm.c:1131:38: error: shifting a negative signed value is undefined [-Werror,-Wshift-negative-value]
+    test->vmcb->control.tsc_offset = TSC_OFFSET_VALUE;
+
+Using "~0ull" results in identical asm code:
+
+	before: movabsq $-281474976710656, %rsi
+	after:  movabsq $-281474976710656, %rsi
 
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- Makefile | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ x86/svm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 6201c45..9cb47e6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -48,6 +48,8 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
+diff --git a/x86/svm.c b/x86/svm.c
+index 4ddfaa4..cef43d5 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -1122,7 +1122,7 @@ static bool npt_rw_l1mmio_check(struct test *test)
+ }
  
- cc-option = $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/null \
-               > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
-+cxx-option = $(shell if $(CXX) -Werror $(1) -S -o /dev/null -xc++ /dev/null \
-+              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;)
+ #define TSC_ADJUST_VALUE    (1ll << 32)
+-#define TSC_OFFSET_VALUE    (-1ll << 48)
++#define TSC_OFFSET_VALUE    (~0ull << 48)
+ static bool ok;
  
- COMMON_CFLAGS += -g $(autodepend-flags)
- COMMON_CFLAGS += -Wall -Wwrite-strings -Wempty-body -Wuninitialized
-@@ -73,9 +75,19 @@ COMMON_CFLAGS += $(wclobbered)
- COMMON_CFLAGS += $(wunused_but_set_parameter)
- 
- CFLAGS += $(COMMON_CFLAGS)
-+CXXFLAGS += $(COMMON_CFLAGS)
-+
-+wmissing_parameter_type := $(call cc-option, -Wmissing-parameter-type, "")
-+wold_style_declaration := $(call cc-option, -Wold-style-declaration, "")
-+CFLAGS += $(wmissing_parameter_type)
-+CFLAGS += $(wold_style_declaration)
- CFLAGS += -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
- 
--CXXFLAGS += $(COMMON_CFLAGS)
-+# Clang's C++ compiler doesn't support some of the flags its C compiler does.
-+wmissing_parameter_type := $(call cxx-option, -Wmissing-parameter-type, "")
-+wold_style_declaration := $(call cxx-option, -Wold-style-declaration, "")
-+CXXFLAGS += $(wmissing_parameter_type)
-+CXXFLAGS += $(wold_style_declaration)
- 
- autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d
- 
+ static void tsc_adjust_prepare(struct test *test)
 -- 
 2.24.0.rc1.363.gb1bccd3e3d-goog
 
