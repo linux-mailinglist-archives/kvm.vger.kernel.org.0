@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9C51EA51D
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:04:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49F89EA51E
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:04:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727128AbfJ3VEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 17:04:42 -0400
-Received: from mail-pf1-f201.google.com ([209.85.210.201]:49380 "EHLO
-        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727102AbfJ3VEm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 17:04:42 -0400
-Received: by mail-pf1-f201.google.com with SMTP id r187so2678555pfc.16
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:04:40 -0700 (PDT)
+        id S1727110AbfJ3VEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 17:04:43 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:53174 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727129AbfJ3VEn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 17:04:43 -0400
+Received: by mail-pl1-f202.google.com with SMTP id g4so1180108plj.19
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:04:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=R5YsaR9bKKV9fNP9YXtzeLSXtxZmX8iRMZjNRdp+oWI=;
-        b=m+cB/6qw1KFnvVJTUAVjF63cRK+2BS5naiUQ/mPU3UB1puPunOF7RogUGah/bOmqKf
-         mWgFO/3eVEQatwHCUdsyAph8CD7LNxR9mzp/mKaMYe+z3OPNsGY2fH1TVXgDLrvVrMGa
-         DG6SSaVzJ06IV8bv+CJ2ETTHsF/Zqo6FqNNt22gY4ZbV76mXon4sADKkjBtsWOlt9gZd
-         Ygzh3o9zPwmOiMULDbxDS+2W5CHoSZAZqLrWKJOKR8/u9kq258EN6Vaa/4mASV5xsQhN
-         yBfVUifHg5qHH/17yIO7Rq5SbEDsYBegSbxRty0yAHDlS39gXtKqiUPeF896BKbPO79Q
-         EahA==
+        bh=lhVsM4FQB61bpLTEu+wM1raoKVMWWZdSz94pZzLGKoc=;
+        b=YKOji3VtEg9GP4M9W1hLFkEHzud1IjevHtTgkkJb/AF8GltzeAdn8mWyLPrGRQUDnJ
+         U1kVxLt9mOaAOSF56zDNfB47cj1PdtiXstQ/hcWILuYcG5qbAZao7O3KHOR+a2okvSnM
+         JOaj1hdMepa+pzkpLtRgIji7IjdrsHxxVE7Dw2RoLzRiI5uB5t0Oh820oMiTNWj5hMcf
+         8LKQVDd00M0g9y+1xAzlvmuhnP14tWAvbKxC19x2NDjdG4D68snzJNQCAOYI9ACdZxN6
+         zD6fOcxV4u/fVvjmcGM9MwJggaVFNY6ye8AnzMj1kHt0bNmkTjq5Y7djC6WDs86IhjOs
+         jUNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=R5YsaR9bKKV9fNP9YXtzeLSXtxZmX8iRMZjNRdp+oWI=;
-        b=XErjjI+qJnt/Eo6IyAz4cX1UQ5a9FMrE3wE6GtG6/DKxrImJvmB9zJhQ9RVpsRV+yw
-         RJOal53HLlkdpkHXMd+Qs9T/blURE9FHWsfuKmvjScZudWZdpDmGayN2tHef9dDsVugL
-         DS7c9FNBumLHFrzFRPU6Id5AnXvAlQGHe8AtiDPAlaAW3q3Zcev+DsqlakokgnkJZLdM
-         KXcj6Voe6U6R/wwjHzT6P8zHyX/QrWcj/6Fi2wc27NQ7QfzUf8ACe5RAHOp7qdzESs/7
-         omU9EzZ6zhx8/ofVkTEO8TJ7Cz6sJKbSI7YPx/f0yVjUiwW0TGeH0M7LPX6HGQQ+Cdsh
-         6VXA==
-X-Gm-Message-State: APjAAAVkiC1v+S8k+pVkzEJnvr+fQmaDX0H1rE8RwThRAswbWync27oN
-        +bYxp5QtHfY3CYvMsfyWcCTF8LMtY/jPbcR3TuULv0zql1MMLONotQ9iZS0Rfw1ojV5tgPg+KrJ
-        P716VgSJgMwR3RnfTDP+4MSfTU7eXOHFa4eM4Y7cuDRDgqjkBiuFr7g==
-X-Google-Smtp-Source: APXvYqyF447WabAiYT/xTJmpjQsFAKB55cNNHE+8uaKTOBhkKbYeg72WGZF+ig55ZS5vp8vO+JQW4J5+gA==
-X-Received: by 2002:a63:234c:: with SMTP id u12mr1562056pgm.384.1572469479458;
- Wed, 30 Oct 2019 14:04:39 -0700 (PDT)
-Date:   Wed, 30 Oct 2019 14:04:18 -0700
+        bh=lhVsM4FQB61bpLTEu+wM1raoKVMWWZdSz94pZzLGKoc=;
+        b=rqLthGREVDWaG+Y8RInKrTAA8Mxfxw8lj8eHoXqjIEYxHep98weZtpsEbdoNs+068C
+         dKCrI0ghPAbCNeJofY1awc6XlpXFqUZmuyJAh8w/Tug4oOh8/rexBRPKkxRS7oVeveQx
+         3cyEbWTOP5DJ31t0mTZ4x68q/H2Rl5i7f3JeU7KXXsJmPmGnXAg6MuIHRUhNlewRqo14
+         Oz7NHMDKHS7oJxKojDatTZQzhVaYQadAYq+yYPDg9lPCt96N3QkxF9bbJbO63OnKRdPn
+         2c/7atbbtl/0l8FbG7T51S952xaAfTgmyHlkrlXCjtrC1CDcuEpXOkxDPK8s8ccrWSRz
+         vTCA==
+X-Gm-Message-State: APjAAAUsVdW2Hz5pICc4505y5QHzSGK7XxzpPySfEf7jEcn8JgA7DhHn
+        jKSxweEJY4BOwAPDhuzSPLbPix2uk/gLdVYcKIj/ioHkVoGl3m7yQkFFQbRuDxHrRij6Casw9SI
+        7G9zVgHrh6UFudHwV/+t/eJjXlPekxfFjIxRHACPzSWWX2N+mHaCyRg==
+X-Google-Smtp-Source: APXvYqwJ4A+cwb37fiyKOWBi6v/anubjM6fhdkdMJyrSm+NE1glPYlPeupMFqsLwX1YPK0B8/iJdtKJf2A==
+X-Received: by 2002:a63:6744:: with SMTP id b65mr1593294pgc.13.1572469482038;
+ Wed, 30 Oct 2019 14:04:42 -0700 (PDT)
+Date:   Wed, 30 Oct 2019 14:04:19 -0700
 In-Reply-To: <20191030210419.213407-1-morbo@google.com>
-Message-Id: <20191030210419.213407-6-morbo@google.com>
+Message-Id: <20191030210419.213407-7-morbo@google.com>
 Mime-Version: 1.0
 References: <20191015000411.59740-1-morbo@google.com> <20191030210419.213407-1-morbo@google.com>
 X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
-Subject: [kvm-unit-tests PATCH v3 5/6] x86: use a non-negative number in shift
+Subject: [kvm-unit-tests PATCH v3 6/6] x86: use inline asm to retrieve stack pointer
 From:   Bill Wendling <morbo@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com
 Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
@@ -58,34 +58,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Shifting a negative number is undefined. Clang complains about it:
-
-x86/svm.c:1131:38: error: shifting a negative signed value is undefined [-Werror,-Wshift-negative-value]
-    test->vmcb->control.tsc_offset = TSC_OFFSET_VALUE;
-
-Using "~0ull" results in identical asm code:
-
-	before: movabsq $-281474976710656, %rsi
-	after:  movabsq $-281474976710656, %rsi
+According to GCC's documentation, the only supported use for specifying
+registers for local variables is "to specify registers for input and
+output operands when calling Extended asm." Using it as a shortcut to
+get the value in a register isn't guaranteed to work, and clang
+complains that the variable is uninitialized.
 
 Signed-off-by: Bill Wendling <morbo@google.com>
 ---
- x86/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ x86/vmx_tests.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 4ddfaa4..cef43d5 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -1122,7 +1122,7 @@ static bool npt_rw_l1mmio_check(struct test *test)
- }
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 4aebc3f..565b69b 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -2138,7 +2138,9 @@ static void into_guest_main(void)
+ 		.offset = (uintptr_t)&&into,
+ 		.selector = KERNEL_CS32,
+ 	};
+-	register uintptr_t rsp asm("rsp");
++	uintptr_t rsp;
++
++	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
  
- #define TSC_ADJUST_VALUE    (1ll << 32)
--#define TSC_OFFSET_VALUE    (-1ll << 48)
-+#define TSC_OFFSET_VALUE    (~0ull << 48)
- static bool ok;
+ 	if (fp.offset != (uintptr_t)&&into) {
+ 		printf("Code address too high.\n");
+@@ -3221,7 +3223,9 @@ static void try_compat_invvpid(void *unused)
+ 		.offset = (uintptr_t)&&invvpid,
+ 		.selector = KERNEL_CS32,
+ 	};
+-	register uintptr_t rsp asm("rsp");
++	uintptr_t rsp;
++
++	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
  
- static void tsc_adjust_prepare(struct test *test)
+ 	TEST_ASSERT_MSG(fp.offset == (uintptr_t)&&invvpid,
+ 			"Code address too high.");
 -- 
 2.24.0.rc1.363.gb1bccd3e3d-goog
 
