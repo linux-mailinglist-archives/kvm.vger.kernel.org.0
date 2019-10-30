@@ -2,42 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E50D8E9983
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 10:51:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42314E9986
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 10:52:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbfJ3Jva (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 05:51:30 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:49498 "EHLO
+        id S1726187AbfJ3Jwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 05:52:35 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:49528 "EHLO
         merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726345AbfJ3Jva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 05:51:30 -0400
+        with ESMTP id S1726046AbfJ3Jwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 05:52:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=jRKyx6SUKkvSDFCEAwskilfMXwesN//eLUYzavH2RME=; b=jh1p16GUGKSUFIb0/7OtclVI3
-        VctW84x95IpvzyFDdpO6S+2eWDs/4+uadm3iTDheOQhCt4DWeW1g7EBmHhCeVxB/duNb4CTn/u+nh
-        vZHLNS8K3JmOSzqvw0NgghuKJtSCDz870/ds4FejeMaQaN/pROYJImGeGQ7o/ADYseRaN1q67bSAm
-        l5adZJ4SaCpp7sIkP58clVP0R2/0cJ/BZISe0wQurnuVDTd3lGWZAcmI16ghrwMdZVed5u8zhzz5A
-        cDVloQdpOv0mXEEwTbCQQ4u+MyPzrQVpRZBJbnh/HLyCA+jkuDz/R1NUOCCEKUiX5GGLLUREfmD4Y
-        J6gT0z/aA==;
+         bh=hZscaMFd68WRefJPnNBfniqTe1cBPy4JDMz4CwY8NGY=; b=DUWupKwPEmaunrC1ogUx+eZHy
+        l2XFgEOn5TTw5Wuvnxoi64xvV6W5/nP/wVHeCUP39qG1J+2z36HELIAkOYU6IlCQPQslBP8NhnnU3
+        5RENZlhc/mJznfvOhFk3eTwK2Q6SI0nUxKDzqfdfs807tYZztCxRL/NjRsCwKjpTTcq0caJGj/2tZ
+        nQl7kbtAukhAfttOROrGSr4LHf0WbOSOmrPeh1DuVS95pH0c5nSRaS87JSjS/fynG12/WzUV8VKeW
+        DgyHRzE/LMTM71Y6qAqnCfmgv4ltTqRzVA3dNlIFoOZJ6c0mZYBKjNl/ade2P5bOH+uC8qfGRPv/k
+        efNOfvTCg==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iPkdA-00070s-Q6; Wed, 30 Oct 2019 09:51:08 +0000
+        id 1iPkeF-00072R-TD; Wed, 30 Oct 2019 09:52:16 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 538F5306B4A;
-        Wed, 30 Oct 2019 10:50:06 +0100 (CET)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8475B300596;
+        Wed, 30 Oct 2019 10:51:13 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 736102B4574F3; Wed, 30 Oct 2019 10:51:07 +0100 (CET)
-Date:   Wed, 30 Oct 2019 10:51:07 +0100
+        id A5EB52B4574F3; Wed, 30 Oct 2019 10:52:14 +0100 (CET)
+Date:   Wed, 30 Oct 2019 10:52:14 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     "Kang, Luwei" <luwei.kang@intel.com>
-Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
@@ -54,54 +53,34 @@ Cc:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
         "acme@kernel.org" <acme@kernel.org>,
         "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
         "jolsa@redhat.com" <jolsa@redhat.com>,
         "namhyung@kernel.org" <namhyung@kernel.org>
-Subject: Re: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Message-ID: <20191030095107.GS4097@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH v1 7/8] KVM: x86: Expose PEBS feature to guest
+Message-ID: <20191030095214.GT4097@hirez.programming.kicks-ass.net>
 References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-4-git-send-email-luwei.kang@intel.com>
- <20191029144612.GK4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com>
- <87o8xyg2f1.fsf@ashishki-desk.ger.corp.intel.com>
- <82D7661F83C1A047AF7DC287873BF1E173835CAA@SHSMSX104.ccr.corp.intel.com>
+ <1572217877-26484-8-git-send-email-luwei.kang@intel.com>
+ <20191029150531.GN4097@hirez.programming.kicks-ass.net>
+ <82D7661F83C1A047AF7DC287873BF1E173835B45@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E173835CAA@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E173835B45@SHSMSX104.ccr.corp.intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 06:49:42AM +0000, Kang, Luwei wrote:
-> > >> >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> > >> >  				  unsigned config, bool exclude_user,
-> > >> >  				  bool exclude_kernel, bool intr,
-> > >> > -				  bool in_tx, bool in_tx_cp)
-> > >> > +				  bool in_tx, bool in_tx_cp, bool pebs)
-> > >> >  {
-> > >> >  	struct perf_event *event;
-> > >> >  	struct perf_event_attr attr = {
-> > >> > @@ -111,9 +111,12 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> > >> >  		.exclude_user = exclude_user,
-> > >> >  		.exclude_kernel = exclude_kernel,
-> > >> >  		.config = config,
-> > >> > +		.precise_ip = pebs ? 1 : 0,
-> > >> > +		.aux_output = pebs ? 1 : 0,
-> > >>
-> > >> srsly?
-> > >
-> > > Hi Peter,
-> > >     Thanks for review. For aux_output, I think it should be set 1 when the guest wants to enabled PEBS by Intel PT.
+On Wed, Oct 30, 2019 at 04:07:03AM +0000, Kang, Luwei wrote:
+> > > Expose PEBS feature to guest by IA32_MISC_ENABLE[bit12].
+> > > IA32_MISC_ENABLE[bit12] is Processor Event Based Sampling (PEBS)
+> > > Unavailable (RO) flag:
+> > > 1 = PEBS is not supported; 0 = PEBS is supported.
 > > 
-> > attr.aux_output==1 means your group leader should be an intel_pt event for this to succeed. Luckily for this instance,
-> > perf_event_create_kernel_counter() doesn't actually check the attr.aux_output.
-> > 
-> > Also, does 'bool pebs' mean PEBS-via-PT or just a PEBS counter? Or does it mean that in kvm it's the same thing?
+> > Why does it make sense to expose this on SVM?
 > 
-> It is the same thing. Allocate a counter for PEBS event and use PEBS-via-PT.
+> Thanks for the review. This patch won't expose the pebs feature to SVM and return not supported.
 
-It is not the same thing, obviously. It strictly means pebs-over-pt
-here.
+AFAICT it exposes/emulates an Intel MSR on AMD, which is just weird.
