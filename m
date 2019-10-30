@@ -2,97 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89EEBE9B2A
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 12:53:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E291E9C7C
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 14:41:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726269AbfJ3Lxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 07:53:46 -0400
-Received: from mga06.intel.com ([134.134.136.31]:43399 "EHLO mga06.intel.com"
+        id S1726370AbfJ3NlM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 09:41:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:45426 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726065AbfJ3Lxq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 07:53:46 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1726222AbfJ3NlL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 09:41:11 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2019 04:53:45 -0700
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2019 06:41:11 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,247,1569308400"; 
-   d="scan'208";a="401479933"
-Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
-  by fmsmga006.fm.intel.com with ESMTP; 30 Oct 2019 04:53:43 -0700
-Date:   Wed, 30 Oct 2019 19:54:33 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, lingshan.zhu@intel.com
-Subject: Re: [RFC] vhost_mdev: add network control vq support
-Message-ID: <20191030115433.GA27220@___>
-References: <20191029101726.12699-1-tiwei.bie@intel.com>
- <59474431-9e77-567c-9a46-a3965f587f65@redhat.com>
- <20191030061711.GA11968@___>
- <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
+   d="scan'208";a="283555445"
+Received: from um.fi.intel.com (HELO um) ([10.237.72.57])
+  by orsmga001.jf.intel.com with ESMTP; 30 Oct 2019 06:41:05 -0700
+From:   Alexander Shishkin <alexander.shishkin@linux.intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        "Kang\, Luwei" <luwei.kang@intel.com>
+Cc:     "kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar\@redhat.com" <rkrcmar@redhat.com>,
+        "Christopherson\, Sean J" <sean.j.christopherson@intel.com>,
+        "vkuznets\@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli\@tencent.com" <wanpengli@tencent.com>,
+        "jmattson\@google.com" <jmattson@google.com>,
+        "joro\@8bytes.org" <joro@8bytes.org>,
+        "tglx\@linutronix.de" <tglx@linutronix.de>,
+        "mingo\@redhat.com" <mingo@redhat.com>,
+        "bp\@alien8.de" <bp@alien8.de>, "hpa\@zytor.com" <hpa@zytor.com>,
+        "x86\@kernel.org" <x86@kernel.org>,
+        "ak\@linux.intel.com" <ak@linux.intel.com>,
+        "thomas.lendacky\@amd.com" <thomas.lendacky@amd.com>,
+        "acme\@kernel.org" <acme@kernel.org>,
+        "mark.rutland\@arm.com" <mark.rutland@arm.com>,
+        "jolsa\@redhat.com" <jolsa@redhat.com>,
+        "namhyung\@kernel.org" <namhyung@kernel.org>,
+        alexander.shishkin@linux.intel.com
+Subject: Re: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS event
+In-Reply-To: <20191030094941.GQ4097@hirez.programming.kicks-ass.net>
+References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com> <1572217877-26484-4-git-send-email-luwei.kang@intel.com> <20191029144612.GK4097@hirez.programming.kicks-ass.net> <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com> <20191030094941.GQ4097@hirez.programming.kicks-ass.net>
+Date:   Wed, 30 Oct 2019 15:41:04 +0200
+Message-ID: <87k18mfj0v.fsf@ashishki-desk.ger.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 03:04:37PM +0800, Jason Wang wrote:
-> On 2019/10/30 下午2:17, Tiwei Bie wrote:
-> > On Tue, Oct 29, 2019 at 06:51:32PM +0800, Jason Wang wrote:
-> >> On 2019/10/29 下午6:17, Tiwei Bie wrote:
-> >>> This patch adds the network control vq support in vhost-mdev.
-> >>> A vhost-mdev specific op is introduced to allow parent drivers
-> >>> to handle the network control commands come from userspace.
-> >> Probably work for userspace driver but not kernel driver.
-> > Exactly. This is only for userspace.
-> >
-> > I got your point now. In virtio-mdev kernel driver case,
-> > the ctrl-vq can be special as well.
-> >
-> 
-> Then maybe it's better to introduce vhost-mdev-net on top?
-> 
-> Looking at the other type of virtio device:
-> 
-> - console have two control virtqueues when multiqueue port is enabled
-> 
-> - SCSI has controlq + eventq
-> 
-> - GPU has controlq
-> 
-> - Crypto device has one controlq
-> 
-> - Socket has eventq
-> 
-> ...
+Peter Zijlstra <peterz@infradead.org> writes:
 
-Thanks for the list! It looks dirty to define specific
-commands and types in vhost UAPI for each of them in the
-future. It's definitely much better to find an approach
-to solve it once for all if possible..
+> On Wed, Oct 30, 2019 at 04:06:36AM +0000, Kang, Luwei wrote:
+>> > >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>> > >  				  unsigned config, bool exclude_user,
+>> > >  				  bool exclude_kernel, bool intr,
+>> > > -				  bool in_tx, bool in_tx_cp)
+>> > > +				  bool in_tx, bool in_tx_cp, bool pebs)
+>> > >  {
+>> > >  	struct perf_event *event;
+>> > >  	struct perf_event_attr attr = {
+>> > > @@ -111,9 +111,12 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>> > >  		.exclude_user = exclude_user,
+>> > >  		.exclude_kernel = exclude_kernel,
+>> > >  		.config = config,
+>> > > +		.precise_ip = pebs ? 1 : 0,
+>> > > +		.aux_output = pebs ? 1 : 0,
+>> > 
+>> > srsly?
+>> 
+>> Hi Peter,
+>>     Thanks for review. For aux_output, I think it should be set 1 when the guest wants to enabled PEBS by Intel PT.
+>>      For precise_ip, it is the precise level in perf and set by perf command line in KVM guest, this may not reflect the accurate value (can be 0~3) here. Here set to 1 is used to allocate a counter for PEBS event and set the MSR_IA32_PEBS_ENABLE register. For PMU virtualization, KVM will trap the guest's write operation to PMU registers and allocate/free event counter from host if a counter enable/disable in guest. We can't always deduce the exact parameter of perf command line from the value of the guest writers to the register.
+>
+> Please, teach your MUA to wrap on 78 chars.
+>
+> The thing I really fell over is the gratuitous 'bool ? 1 : 0'. But yes,
 
-Just a quick thought, considering all vhost-mdev does
-is just to forward settings between parent and userspace,
-I'm wondering whether it's possible to make the argp
-opaque in vhost-mdev UAPI and just introduce one generic
-ioctl command to deliver these device specific commands
-(which are opaque in vhost-mdev as vhost-mdev just pass
-the pointer -- argp) defined by spec.
+Notice the .exclude_kernel assignment above that does the same thing the
+other way around.
 
-I'm also fine with exposing ctrlq to userspace directly.
-PS. It's interesting that some devices have more than
-one ctrlq. I need to take a close look first..
-
-
-> 
-> Thanks
-> 
+Regards,
+--
+Alex
