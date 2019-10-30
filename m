@@ -2,113 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD54BEA2E0
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 18:58:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A20ABEA2EB
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 19:02:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbfJ3R6S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 13:58:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12332 "EHLO
+        id S1727719AbfJ3SCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 14:02:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17932 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727657AbfJ3R6S (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 30 Oct 2019 13:58:18 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9UHJ3Ib134155
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 13:58:17 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyea82vce-1
+        by vger.kernel.org with ESMTP id S1727714AbfJ3SCX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Oct 2019 14:02:23 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9UHvF1X021120
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:02:22 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyfcc87q6-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 13:58:16 -0400
+        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:02:22 -0400
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 30 Oct 2019 17:58:14 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 30 Oct 2019 18:02:20 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 30 Oct 2019 17:58:11 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9UHwA8a42729704
+        Wed, 30 Oct 2019 18:02:18 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9UI2Gva57933830
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 30 Oct 2019 17:58:10 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F01B442041;
-        Wed, 30 Oct 2019 17:58:09 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58E0B42045;
-        Wed, 30 Oct 2019 17:58:09 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.34.29])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 30 Oct 2019 17:58:09 +0000 (GMT)
-Subject: Re: [RFC 12/37] KVM: s390: protvirt: Handle SE notification
- interceptions
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-13-frankja@linux.ibm.com>
- <a3d3923a-4047-9d6e-8caf-a07c294e8c7a@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Wed, 30 Oct 2019 18:58:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        Wed, 30 Oct 2019 18:02:16 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43AA94C050;
+        Wed, 30 Oct 2019 18:02:16 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 825EB4C040;
+        Wed, 30 Oct 2019 18:02:15 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.93.237])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 30 Oct 2019 18:02:15 +0000 (GMT)
+Subject: Re: [PATCH] s390: vfio-ap: disable IRQ in remove callback results in
+ kernel OOPS
+To:     Tony Krowiak <akrowiak@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, jjherne@linux.ibm.com
+References: <1572386946-22566-1-git-send-email-akrowiak@linux.ibm.com>
+ <0565c250-726f-dd99-f933-f91162dc107e@linux.ibm.com>
+ <97cf7863-d6d0-418a-09c1-50d9e84fd855@linux.ibm.com>
+ <2ea83094-46c6-ef92-f39c-579f88979320@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 30 Oct 2019 19:02:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <a3d3923a-4047-9d6e-8caf-a07c294e8c7a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9njPz0MR3Ie7OdJLYN1ViX9BYSDd8kC5A"
+In-Reply-To: <2ea83094-46c6-ef92-f39c-579f88979320@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
-x-cbid: 19103017-0012-0000-0000-0000035F386F
+x-cbid: 19103018-4275-0000-0000-000003794733
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19103017-0013-0000-0000-0000219A7F89
-Message-Id: <5a9facd2-3981-ff55-d861-e818cad3fd18@linux.ibm.com>
+x-cbparentid: 19103018-4276-0000-0000-0000388C826E
+Message-Id: <c404a796-dfc3-1da1-46b7-fe26d1be18f9@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-30_07:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910300152
@@ -117,119 +78,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9njPz0MR3Ie7OdJLYN1ViX9BYSDd8kC5A
-Content-Type: multipart/mixed; boundary="o2tJgswU0X4rSbn7KY5x9f3YsFhghwkUP"
 
---o2tJgswU0X4rSbn7KY5x9f3YsFhghwkUP
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 10/30/19 4:50 PM, David Hildenbrand wrote:
-> On 24.10.19 13:40, Janosch Frank wrote:
->> Since KVM doesn't emulate any form of load control and load psw
->> instructions anymore, we wouldn't get an interception if PSWs or CRs
->> are changed in the guest. That means we can't inject IRQs right after
->> the guest is enabled for them.
+On 10/30/19 5:51 PM, Tony Krowiak wrote:
+> On 10/30/19 10:00 AM, Pierre Morel wrote:
 >>
->> The new interception codes solve that problem by being a notification
->> for changes to IRQ enablement relevant bits in CRs 0, 6 and 14, as
->> well a the machine check mask bit in the PSW.
 >>
->> No special handling is needed for these interception codes, the KVM
->> pre-run code will consult all necessary CRs and PSW bits and inject
->> IRQs the guest is enabled for.
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h |  2 ++
->>   arch/s390/kvm/intercept.c        | 18 ++++++++++++++++++
->>   2 files changed, 20 insertions(+)
+>> On 10/30/19 8:44 AM, Harald Freudenberger wrote:
+>>> On 29.10.19 23:09, Tony Krowiak wrote:
+>>>> From: aekrowia <akrowiak@linux.ibm.com>
+>>>>
+>>>> When an AP adapter card is configured off via the SE or the SCLP
+>>>> Deconfigure Adjunct Processor command and the AP bus subsequently 
+>>>> detects
+>>>> that the adapter card is no longer in the AP configuration, the card
+>>>> device representing the adapter card as well as each of its associated
+>>>> AP queue devices will be removed by the AP bus. If one or more of the
+>>>> affected queue devices is bound to the VFIO AP device driver, its 
+>>>> remove
+>>>> callback will be invoked for each queue to be removed. The remove 
+>>>> callback
+>>>> resets the queue and disables IRQ processing. If interrupt 
+>>>> processing was
+>>>> never enabled for the queue, disabling IRQ processing will fail 
+>>>> resulting
+>>>> in a kernel OOPS.
+>>>>
+>>>> This patch verifies IRQ processing is enabled before attempting to 
+>>>> disable
+>>>> interrupts for the queue.
+>>>>
+>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>> Signed-off-by: aekrowia <akrowiak@linux.ibm.com>
+>>>> ---
+>>>>   drivers/s390/crypto/vfio_ap_drv.c | 3 ++-
+>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c 
+>>>> b/drivers/s390/crypto/vfio_ap_drv.c
+>>>> index be2520cc010b..42d8308fd3a1 100644
+>>>> --- a/drivers/s390/crypto/vfio_ap_drv.c
+>>>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+>>>> @@ -79,7 +79,8 @@ static void vfio_ap_queue_dev_remove(struct 
+>>>> ap_device *apdev)
+>>>>       apid = AP_QID_CARD(q->apqn);
+>>>>       apqi = AP_QID_QUEUE(q->apqn);
+>>>>       vfio_ap_mdev_reset_queue(apid, apqi, 1);
+>>>> -    vfio_ap_irq_disable(q);
+>>>> +    if (q->saved_isc != VFIO_AP_ISC_INVALID)
+>>>> +        vfio_ap_irq_disable(q);
+>>>>       kfree(q);
+>>>>       mutex_unlock(&matrix_dev->lock);
+>>>>   }
+>>> Reset of an APQN does also clear IRQ processing. I don't say that the
+>>> resources associated with IRQ handling for the APQN are also cleared.
+>>> But when you call PQAP(AQIC) after an PQAP(RAPQ) or PQAP(ZAPQ)
+>>> it is superfluous. However, there should not appear any kernel OOPS.
+>>> So can you please give me more details about this kernel oops - maybe
+>>> I need to add exception handler code to the inline ap_aqic() function.
+>>>
+>>> regards, Harald Freudenberger
+>>>
 >>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/=
-kvm_host.h
->> index d4fd0f3af676..6cc3b73ca904 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -210,6 +210,8 @@ struct kvm_s390_sie_block {
->>   #define ICPT_PARTEXEC	0x38
->>   #define ICPT_IOINST	0x40
->>   #define ICPT_KSS	0x5c
->> +#define ICPT_PV_MCHKR	0x60
->> +#define ICPT_PV_INT_EN	0x64
->>   	__u8	icptcode;		/* 0x0050 */
->>   	__u8	icptstatus;		/* 0x0051 */
->>   	__u16	ihcpu;			/* 0x0052 */
->> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
->> index a389fa85cca2..acc1710fc472 100644
->> --- a/arch/s390/kvm/intercept.c
->> +++ b/arch/s390/kvm/intercept.c
->> @@ -480,6 +480,24 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcp=
-u)
->>   	case ICPT_KSS:
->>   		rc =3D kvm_s390_skey_check_enable(vcpu);
->>   		break;
->> +	case ICPT_PV_MCHKR:
->> +		/*
->> +		 * A protected guest changed PSW bit 13 to one and is now
->> +		 * enabled for interrupts. The pre-run code will check
->> +		 * the registers and inject pending MCHKs based on the
->> +		 * PSW and CRs. No additional work to do.
->> +		 */
->> +		rc =3D 0;
->> +		break;
->> +	case  ICPT_PV_INT_EN:
->> +		/*
->> +		 * A protected guest changed CR 0,6,14 and may now be
->> +		 * enabled for interrupts. The pre-run code will check
->> +		 * the registers and inject pending IRQs based on the
->> +		 * CRs. No additional work to do.
->> +		 */
->> +		rc =3D 0;
->> +	break;
->=20
-> Wrong indentation.
->=20
-> Maybe simply
->=20
-> case ICPT_PV_MCHKR:
-> ICPT_PV_INT_EN:
-> 	/*
-> 	 * PSW bit 13 or a CR (0, 6, 14) changed and we might now be
->           * able to deliver interrupts. pre-run code will take care of
->           * this.
-> 	 */
-> 	rc =3D 0;
-> 	break;
-
-Sounds good, I'll fix it
+>> Hi Tony,
+>>
+>> wasn't it already solved by the patch 5c4c2126  from Christian ?
+>
+> No, that patch merely sets the 'matrix_mdev' field of the
+> 'struct vfio_ap_queue' to NULL in the vfio_ap_free_aqic_resources()
+> function. Also, with the latest master branch which has 5c4c2126
+> installed, the failure occurs.
+>
+>>
+>> Can you send the trace to me please?
+>
+> [  266.989476] crw_info : CRW reports slct=0, oflw=0, chn=0, rsc=B, 
+> anc=0, erc=0, rsid=0
+> [  266.989617] ------------[ cut here ]------------
+> [  266.989622] vfio_ap_wait_for_irqclear: tapq rc 03: 0504
+> [  266.989681] WARNING: CPU: 0 PID: 7 at 
+> drivers/s390/crypto/vfio_ap_ops.c:101 vfio_ap_irq_disable+0x13c/0x1b0 
+> [vfio_ap]
 
 
+Hi Tony,
 
---o2tJgswU0X4rSbn7KY5x9f3YsFhghwkUP--
+This is not a oops this is the warning written in 
+vfio_ap_wait_for_irqclear() because the AP has been deconfigured.
 
---9njPz0MR3Ie7OdJLYN1ViX9BYSDd8kC5A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Note that, IIUC, this (the warning) does not happen for devices bound to 
+the vfio_ap driver but not currently assigned to a mediated device.
 
------BEGIN PGP SIGNATURE-----
+I do not think we should avoid sending a warning in this case because 
+this is not a normal administration good practice to forcefully take an 
+AP away like this without smoothly removing the device from the mediated 
+device.
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl25zzAACgkQ41TmuOI4
-ufhnohAAsMxqj1o3usNXOyEMnqZ24bQqsAeI7ah1WRUKybCAnmGGGIT2MIJrmrJz
-2PlzVXV1WVlyY0aJPmO+JR10WDlcSDgzEwErogeNlnG56FNpw5GQgwtOHTxQU6m7
-411lxMoU1dtAsxRKtKEBSyg4s0g6AAz632MtRor6SQ7hF7e24ZSodeCX6wctuoen
-CHaBoD92+LqwYWdsiPiescldlQuGixxdy0UIXtoalYSpKrLZZWhllslX+6Pa7R6M
-ncy/Lx53Fotg+qnYukuzwLFNfTmweYbUrkX5rH0WmBPfGPP71mr1P0aiHbvM/SlB
-kHGf0ccsVD9hUmYSiIMZkJN8zfVmojRq6mf6N7whAUvrhZAT19uNpFGvIezIBlG3
-/tpacBdl4Lpsh2KT4sNFlU1WAPvZa6LHeZmmSn/6Erym7HG5pIl+EpHmuGwW2n73
-HPfjDqLkvU5Bi2RrQdEHzYG6BI48e/XYSwRv6GJaPeKFcp54GHhqMbgFQ5H9xSU5
-PNhyxacUhPkjgXj+EdZ4zDSMozQ4yAQ4FsLqnM/9I4fpa8Zvlz6VeTCm2ftTNrfU
-6MpuDAFyskJya54woLA5/NmU+/aceHGXOK+lyi3MS5UpLMVCBi41PMZ1bZu/6XP6
-+C6to7DeYQy+a3qkRiL+4W2g0/gr0rfKunvD0f2A/7coVKNvi8k=
-=ATAQ
------END PGP SIGNATURE-----
+Regards,
 
---9njPz0MR3Ie7OdJLYN1ViX9BYSDd8kC5A--
+Pierre
+
+
+> [ 266.989682] Modules linked in: xt_CHECKSUM xt_MASQUERADE tun bridge 
+> stp llc ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack 
+> ebtable_nat ip6table_nat ip6table_mangle ip6table_raw 
+> ip6table_security iptable_nat nf_nat iptable_mangle iptable_raw 
+> iptable_security nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c 
+> ip_set nfnetlink ebtable_filter ebtables ip6table_filter ip6_tables 
+> sunrpc ghash_s390 prng aes_s390 des_s390 libdes vfio_ccw sha512_s390 
+> sha1_s390 eadm_sch zcrypt_cex4 qeth_l2 crc32_vx_s390 dasd_eckd_mod 
+> sha256_s390 qeth sha_common dasd_mod ccwgroup qdio pkey zcrypt vfio_ap 
+> kvm
+> [  266.989704] CPU: 0 PID: 7 Comm: kworker/0:1 Not tainted 5.4.0-rc5 #81
+> [  266.989705] Hardware name: IBM 2964 NE1 749 (LPAR)
+> [  266.989710] Workqueue: events_long ap_scan_bus
+> [  266.989711] Krnl PSW : 0704c00180000000 000003ff8007d89c 
+> (vfio_ap_irq_disable+0x13c/0x1b0 [vfio_ap])
+> [  266.989714]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 
+> CC:0 PM:0 RI:0 EA:3
+> [  266.989716] Krnl GPRS: 000000000000000a 0000000000000006 
+> 000000000000002b 0000000000000007
+> [  266.989717]            0000000000000007 000000007fe06000 
+> 000003ff00000005 0000000000000000
+> [  266.989718]            0000000100000504 0000000000000003 
+> 00000001f9d27e40 000003e00003bb5c
+> [  266.989719]            00000001fe765d00 0000000000000504 
+> 000003ff8007d898 000003e00003ba60
+> [  266.989724] Krnl Code: 000003ff8007d88c: c02000000ce6    larl 
+> %r2,3ff8007f258
+>                           000003ff8007d892: c0e5fffff4c7    brasl 
+> %r14,3ff8007c220
+>                          #000003ff8007d898: a7f40001        brc 
+> 15,3ff8007d89a
+>                          >000003ff8007d89c: a7f4ff9d        brc 
+> 15,3ff8007d7d6
+>                           000003ff8007d8a0: a7100100 tmlh    %r1,256
+>                           000003ff8007d8a4: a784ff99        brc 
+> 8,3ff8007d7d6
+>                           000003ff8007d8a8: a7290014 lghi    %r2,20
+>                           000003ff8007d8ac: c0e5fffff4b0    brasl 
+> %r14,3ff8007c20c
+> [  266.989772] Call Trace:
+> [  266.989777] ([<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+> [vfio_ap])
+> [  266.989779]  [<000003ff8007c4d2>] 
+> vfio_ap_queue_dev_remove+0x6a/0x90 [vfio_ap]
+> [  266.989782]  [<00000000bf0f24f0>] ap_device_remove+0x50/0x110
+> [  266.989784]  [<00000000beffbaac>] 
+> device_release_driver_internal+0x114/0x1f0
+> [  266.989787]  [<00000000beff9c88>] bus_remove_device+0x108/0x190
+> [  266.989789]  [<00000000beff5418>] device_del+0x178/0x3a0
+> [  266.989790]  [<00000000beff5670>] device_unregister+0x30/0x90
+> [  266.989791]  [<00000000bf0f0f04>] 
+> __ap_queue_devices_with_id_unregister+0x44/0x50
+> [  266.989793]  [<00000000beff86ea>] bus_for_each_dev+0x82/0xb0
+> [  266.989794]  [<00000000bf0f2aba>] ap_scan_bus+0x262/0x878
+> [  266.989798]  [<00000000beb4785c>] process_one_work+0x1e4/0x410
+> [  266.989800]  [<00000000beb47ca8>] worker_thread+0x220/0x460
+> [  266.989802]  [<00000000beb4e99a>] kthread+0x12a/0x160
+> [  266.989805]  [<00000000bf2d8eb0>] ret_from_fork+0x28/0x2c
+> [  266.989806]  [<00000000bf2d8eb4>] kernel_thread_starter+0x0/0xc
+> [  266.989807] Last Breaking-Event-Address:
+> [  266.989809]  [<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+> [vfio_ap]
+> [  266.989810] ---[ end trace 59b4020890dbd391 ]---
+>
+>
+>>
+>> Thanks,
+>>
+>> Pierre
+>>
+>>
+>>
+>
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
