@@ -2,99 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 49F89EA51E
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:04:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A98DEA557
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 22:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727110AbfJ3VEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 17:04:43 -0400
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:53174 "EHLO
-        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727129AbfJ3VEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 17:04:43 -0400
-Received: by mail-pl1-f202.google.com with SMTP id g4so1180108plj.19
-        for <kvm@vger.kernel.org>; Wed, 30 Oct 2019 14:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=lhVsM4FQB61bpLTEu+wM1raoKVMWWZdSz94pZzLGKoc=;
-        b=YKOji3VtEg9GP4M9W1hLFkEHzud1IjevHtTgkkJb/AF8GltzeAdn8mWyLPrGRQUDnJ
-         U1kVxLt9mOaAOSF56zDNfB47cj1PdtiXstQ/hcWILuYcG5qbAZao7O3KHOR+a2okvSnM
-         JOaj1hdMepa+pzkpLtRgIji7IjdrsHxxVE7Dw2RoLzRiI5uB5t0Oh820oMiTNWj5hMcf
-         8LKQVDd00M0g9y+1xAzlvmuhnP14tWAvbKxC19x2NDjdG4D68snzJNQCAOYI9ACdZxN6
-         zD6fOcxV4u/fVvjmcGM9MwJggaVFNY6ye8AnzMj1kHt0bNmkTjq5Y7djC6WDs86IhjOs
-         jUNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=lhVsM4FQB61bpLTEu+wM1raoKVMWWZdSz94pZzLGKoc=;
-        b=rqLthGREVDWaG+Y8RInKrTAA8Mxfxw8lj8eHoXqjIEYxHep98weZtpsEbdoNs+068C
-         dKCrI0ghPAbCNeJofY1awc6XlpXFqUZmuyJAh8w/Tug4oOh8/rexBRPKkxRS7oVeveQx
-         3cyEbWTOP5DJ31t0mTZ4x68q/H2Rl5i7f3JeU7KXXsJmPmGnXAg6MuIHRUhNlewRqo14
-         Oz7NHMDKHS7oJxKojDatTZQzhVaYQadAYq+yYPDg9lPCt96N3QkxF9bbJbO63OnKRdPn
-         2c/7atbbtl/0l8FbG7T51S952xaAfTgmyHlkrlXCjtrC1CDcuEpXOkxDPK8s8ccrWSRz
-         vTCA==
-X-Gm-Message-State: APjAAAUsVdW2Hz5pICc4505y5QHzSGK7XxzpPySfEf7jEcn8JgA7DhHn
-        jKSxweEJY4BOwAPDhuzSPLbPix2uk/gLdVYcKIj/ioHkVoGl3m7yQkFFQbRuDxHrRij6Casw9SI
-        7G9zVgHrh6UFudHwV/+t/eJjXlPekxfFjIxRHACPzSWWX2N+mHaCyRg==
-X-Google-Smtp-Source: APXvYqwJ4A+cwb37fiyKOWBi6v/anubjM6fhdkdMJyrSm+NE1glPYlPeupMFqsLwX1YPK0B8/iJdtKJf2A==
-X-Received: by 2002:a63:6744:: with SMTP id b65mr1593294pgc.13.1572469482038;
- Wed, 30 Oct 2019 14:04:42 -0700 (PDT)
-Date:   Wed, 30 Oct 2019 14:04:19 -0700
-In-Reply-To: <20191030210419.213407-1-morbo@google.com>
-Message-Id: <20191030210419.213407-7-morbo@google.com>
-Mime-Version: 1.0
-References: <20191015000411.59740-1-morbo@google.com> <20191030210419.213407-1-morbo@google.com>
-X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
-Subject: [kvm-unit-tests PATCH v3 6/6] x86: use inline asm to retrieve stack pointer
-From:   Bill Wendling <morbo@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com,
-        Bill Wendling <morbo@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727143AbfJ3VXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 17:23:14 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:35622 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726261AbfJ3VXO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 17:23:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=87X+oyehu7JN6cXbNSmkqxhLbbV13utM66QLaFqOq30=; b=C0K0acY3VsFEjNSc5aNiAJFe4
+        d54AjrBqdl31EiwE3juEmhzyVlbqM+vV8tLM0pK41NKkIBPSSjSJhZxLTJf1ZR1dUzQPd3P7Bfepo
+        N5/Js2feq2atD6kIsq2nEI0zR7hMtJPFvxme4ObJ++6o7y3Lv9Q2ez3hM7Ym6z9j6MFfCzNt1u3UN
+        DH4xUDvfwjWGNhxU+bGtqYo33RhrKWLa7yiZ4XkUlrrgYqN77HzLVIF3OHkXVDSNjno7AvoAzFX22
+        YURfaj2i3xyAz42tT3zZ7C5c1fxke8BVtS/Kq2nwouudZaM5RtFilstS8C0cp7b25PYnwqyWSHF/R
+        PnCRVVR8Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iPvQu-00034L-4b; Wed, 30 Oct 2019 21:23:12 +0000
+Date:   Wed, 30 Oct 2019 14:23:12 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V6 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+Message-ID: <20191030212312.GA4251@infradead.org>
+References: <20191030064444.21166-1-jasowang@redhat.com>
+ <20191030064444.21166-7-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191030064444.21166-7-jasowang@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to GCC's documentation, the only supported use for specifying
-registers for local variables is "to specify registers for input and
-output operands when calling Extended asm." Using it as a shortcut to
-get the value in a register isn't guaranteed to work, and clang
-complains that the variable is uninitialized.
+On Wed, Oct 30, 2019 at 02:44:44PM +0800, Jason Wang wrote:
+> This sample driver creates mdev device that simulate virtio net device
+> over virtio mdev transport. The device is implemented through vringh
+> and workqueue. A device specific dma ops is to make sure HVA is used
+> directly as the IOVA. This should be sufficient for kernel virtio
+> driver to work.
+> 
+> Only 'virtio' type is supported right now. I plan to add 'vhost' type
+> on top which requires some virtual IOMMU implemented in this sample
+> driver.
 
-Signed-off-by: Bill Wendling <morbo@google.com>
----
- x86/vmx_tests.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 4aebc3f..565b69b 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -2138,7 +2138,9 @@ static void into_guest_main(void)
- 		.offset = (uintptr_t)&&into,
- 		.selector = KERNEL_CS32,
- 	};
--	register uintptr_t rsp asm("rsp");
-+	uintptr_t rsp;
-+
-+	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
- 
- 	if (fp.offset != (uintptr_t)&&into) {
- 		printf("Code address too high.\n");
-@@ -3221,7 +3223,9 @@ static void try_compat_invvpid(void *unused)
- 		.offset = (uintptr_t)&&invvpid,
- 		.selector = KERNEL_CS32,
- 	};
--	register uintptr_t rsp asm("rsp");
-+	uintptr_t rsp;
-+
-+	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
- 
- 	TEST_ASSERT_MSG(fp.offset == (uintptr_t)&&invvpid,
- 			"Code address too high.");
--- 
-2.24.0.rc1.363.gb1bccd3e3d-goog
-
+Can we please submit a real driver for it?  A more or less useless
+sample driver doesn't really qualify for our normal kernel requirements
+that infrastructure should have a real user.
