@@ -2,145 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99AB0E9F48
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 16:40:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D89E1E9FA6
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 16:51:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727221AbfJ3PkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 11:40:10 -0400
-Received: from mail-eopbgr700045.outbound.protection.outlook.com ([40.107.70.45]:63968
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726302AbfJ3PkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 11:40:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BTWmVKCBvLcveUa7heIEJSz5GFAkv8nmmlQzRoqbZQrfACX3giVPstiON2J+0+SiKsyqhFFiIOE+WSd2NASAo74QPpdOvl9/sg7NtXWIAxH2aIMBr7GY6JsSNv5qhT++OiI2CzySnZ/cn5QczRHAzBCi02CI63+P0kOSmWqzcNx+mbyM1EvtkzoOdNlUineNJ7sN+IotzK35anOsmU0gwQFFVkeGTey07eO+6nCI36cz+UE+JnfHRU4aoDY8Dl5OTQnmtgOOPvXQ0TqrYVBNjrJzUqZeV3kfWnaLwD7Mys49d/4GNRfK+mpimcCKgaZIEWTIMjxn06WgbLzk/pK04w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vc07ImVMgNVyLiULifycZRo6xqCv5Ysb5B4Llv8uH6k=;
- b=ONv7/B3fU82AAHksjsl0HAQtr8IIPltC8D0TUR1cXDv+Hgg8Gp46U3LFLRLwBeM6kyxF1THqNctHoZAPF7+1GtTpOjBPpQpXeVbSnRvl2go2GIgg9NfxFmyLFpdaqnBbqyn+X9xsHdm32eDuB2zVOqlJe0Koe941Den1I0aYJ8HrVS5t00wyfp117+fJrOrvrOuE+DYZvA18OmkDjfF1zq5BMtXFkAolp2rNJoXGqBzuaHdZCVBMsdjlTiVbAkaruNCdS9VQwJK8T+Z1ltyD/4YoWTY7IsSa0lGwg38OSjspGD5LAlCGCKj5avwpO+n0U8+tsVoxOd1ALO6KGJkRcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vc07ImVMgNVyLiULifycZRo6xqCv5Ysb5B4Llv8uH6k=;
- b=P4sJgcQ7fTR3kYfo4kNOmjNRxzxgjLpBaPNAciBibbddM0Fc9XpcCNOOZnppPEIDF3z4921YTb/fzJwid2OLzp3aRl2GxA0NejmLIvomW1MkGadp+UBYz9Dcz+IMB2Rm3DtJpwB6T3ogxZTAQUvyYL1M7bg1tmy604MOczB9oFk=
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com (10.174.175.149) by
- MWHPR05MB2957.namprd05.prod.outlook.com (10.168.246.11) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.15; Wed, 30 Oct 2019 15:40:05 +0000
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209]) by MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209%7]) with mapi id 15.20.2408.018; Wed, 30 Oct 2019
- 15:40:05 +0000
-From:   Jorgen Hansen <jhansen@vmware.com>
-To:     'Stefano Garzarella' <sgarzare@redhat.com>
-CC:     Sasha Levin <sashal@kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next 11/14] vsock: add multi-transports support
-Thread-Topic: [PATCH net-next 11/14] vsock: add multi-transports support
-Thread-Index: AQHViYhm3+s3qIN1EEmJgzgCfyvFAqdoVEGAgAsGKDA=
-Date:   Wed, 30 Oct 2019 15:40:05 +0000
-Message-ID: <MWHPR05MB3376E623764F54D39D8135A9DA600@MWHPR05MB3376.namprd05.prod.outlook.com>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-12-sgarzare@redhat.com>
- <CAGxU2F7n48kBy_y2GB=mcvraK=mw_2Jn8=2hvQnEOWqWuT9OjA@mail.gmail.com>
-In-Reply-To: <CAGxU2F7n48kBy_y2GB=mcvraK=mw_2Jn8=2hvQnEOWqWuT9OjA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jhansen@vmware.com; 
-x-originating-ip: [146.247.47.49]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0bc0d4f6-649e-4161-7d74-08d75d4f6fb3
-x-ms-traffictypediagnostic: MWHPR05MB2957:
-x-microsoft-antispam-prvs: <MWHPR05MB295719D2CCD818E455543E0DDA600@MWHPR05MB2957.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 02065A9E77
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(396003)(136003)(366004)(376002)(199004)(189003)(8936002)(66476007)(305945005)(64756008)(66446008)(316002)(7416002)(7736002)(66556008)(81166006)(81156014)(74316002)(478600001)(52536014)(55016002)(66066001)(8676002)(9686003)(54906003)(6246003)(86362001)(25786009)(66946007)(5660300002)(33656002)(4326008)(76116006)(6436002)(6506007)(14454004)(76176011)(6916009)(476003)(2906002)(7696005)(186003)(71200400001)(71190400001)(6116002)(99286004)(26005)(3846002)(102836004)(256004)(229853002)(446003)(486006)(14444005)(11346002);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR05MB2957;H:MWHPR05MB3376.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: vmware.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lWTiDen5iXKOdLsNU+yjRrfkfy4j2Ny7Ga3uNA4mVYRmgAurEhkdxyahG/ldTgLkslcAbLp3lfkhNFOqWnS5uaFo8AUA0bTkElB0/fzbdv9sVc2OfnOJO67FNY82viBZcW0/8LQFU0ptaum1nnTJ6hDk7YuynnIz+loPrTdHOoX9uIpw+7DppTrOB52qwnwQAlST1M+/9Sobw2qGe6V1XVf6VPgqewSFNYJIFjx/t7lj3Ww5zwS2XZSCTtS7fAg7pqDFrr7YqyB4Y9x9wCzYj470kZFTGQ42lwxWtfcp/OXFySGH+sBByPCUo1rUD4aqK7iQu/NDcAsBnY2W6UFin05yKWB1H+G+ouo0c0idmHTzPXS6Ud3rNxp1xUct8FKPxAvgfgU4MrXqFkli31mwew/UHxnrbpkFRVDuygCRqA76KGUdsmWp+v5JZWpk2GXg
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727625AbfJ3Put (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 11:50:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52172 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727624AbfJ3Pus (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 11:50:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572450648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9S6/4tSu/lCAjI7kwvb6uvrrsEY/A8TSedOLT0uS31M=;
+        b=K2g8ujlaGC7YjqLd46U1kNjQHK2/LoViPF35OnD8Ir7r5CZiPxvbH47CJ5ChyuFn6gcA4F
+        FIcUcYBewFFwEB5R4yqB0PErZmvov4iz3k80r9rbpIP36PUbQ5ycarVe2xZIaU+RXQ5WpJ
+        rvqHcNIqEl+fK8EKX5TdJAt/G8gAAv0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-tPq6ZYrHPee7w3P6rtA6zw-1; Wed, 30 Oct 2019 11:50:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 777B61800D55;
+        Wed, 30 Oct 2019 15:50:43 +0000 (UTC)
+Received: from [10.36.116.178] (ovpn-116-178.ams2.redhat.com [10.36.116.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D9165C1C3;
+        Wed, 30 Oct 2019 15:50:41 +0000 (UTC)
+Subject: Re: [RFC 12/37] KVM: s390: protvirt: Handle SE notification
+ interceptions
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-13-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <a3d3923a-4047-9d6e-8caf-a07c294e8c7a@redhat.com>
+Date:   Wed, 30 Oct 2019 16:50:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bc0d4f6-649e-4161-7d74-08d75d4f6fb3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2019 15:40:05.2998
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ri/s3DjZk4FvNg+1W27BHZSABEN1A34AsICGmdjBsfrxKBRrFkqV2yB8GZfZLBGk64e3FNuMcYv8s9nlESoi/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR05MB2957
+In-Reply-To: <20191024114059.102802-13-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: tPq6ZYrHPee7w3P6rtA6zw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> > +/* Assign a transport to a socket and call the .init transport callbac=
-k.
-> > + *
-> > + * Note: for stream socket this must be called when vsk->remote_addr
-> > +is set
-> > + * (e.g. during the connect() or when a connection request on a
-> > +listener
-> > + * socket is received).
-> > + * The vsk->remote_addr is used to decide which transport to use:
-> > + *  - remote CID > VMADDR_CID_HOST will use host->guest transport
-> > + *  - remote CID <=3D VMADDR_CID_HOST will use guest->host transport
-> > +*/ int vsock_assign_transport(struct vsock_sock *vsk, struct
-> > +vsock_sock *psk) {
-> > +       const struct vsock_transport *new_transport;
-> > +       struct sock *sk =3D sk_vsock(vsk);
-> > +
-> > +       switch (sk->sk_type) {
-> > +       case SOCK_DGRAM:
-> > +               new_transport =3D transport_dgram;
-> > +               break;
-> > +       case SOCK_STREAM:
-> > +               if (vsk->remote_addr.svm_cid > VMADDR_CID_HOST)
-> > +                       new_transport =3D transport_h2g;
-> > +               else
-> > +                       new_transport =3D transport_g2h;
+On 24.10.19 13:40, Janosch Frank wrote:
+> Since KVM doesn't emulate any form of load control and load psw
+> instructions anymore, we wouldn't get an interception if PSWs or CRs
+> are changed in the guest. That means we can't inject IRQs right after
+> the guest is enabled for them.
 >=20
-> I just noticed that this break the loopback in the guest.
-> As a fix, we should use 'transport_g2h' when remote_cid <=3D
-> VMADDR_CID_HOST or remote_cid is the id of 'transport_g2h'.
+> The new interception codes solve that problem by being a notification
+> for changes to IRQ enablement relevant bits in CRs 0, 6 and 14, as
+> well a the machine check mask bit in the PSW.
 >=20
-> To do that we also need to avoid that L2 guests can have the same CID of =
-L1.
-> For vhost_vsock I can call vsock_find_cid() in vhost_vsock_set_cid()
+> No special handling is needed for these interception codes, the KVM
+> pre-run code will consult all necessary CRs and PSW bits and inject
+> IRQs the guest is enabled for.
 >=20
-> @Jorgen: for vmci we need to do the same? or it is guaranteed, since it's
-> already support nested VMs, that a L2 guests cannot have the same CID as
-> the L1.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_host.h |  2 ++
+>   arch/s390/kvm/intercept.c        | 18 ++++++++++++++++++
+>   2 files changed, 20 insertions(+)
+>=20
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm=
+_host.h
+> index d4fd0f3af676..6cc3b73ca904 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -210,6 +210,8 @@ struct kvm_s390_sie_block {
+>   #define ICPT_PARTEXEC=090x38
+>   #define ICPT_IOINST=090x40
+>   #define ICPT_KSS=090x5c
+> +#define ICPT_PV_MCHKR=090x60
+> +#define ICPT_PV_INT_EN=090x64
+>   =09__u8=09icptcode;=09=09/* 0x0050 */
+>   =09__u8=09icptstatus;=09=09/* 0x0051 */
+>   =09__u16=09ihcpu;=09=09=09/* 0x0052 */
+> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+> index a389fa85cca2..acc1710fc472 100644
+> --- a/arch/s390/kvm/intercept.c
+> +++ b/arch/s390/kvm/intercept.c
+> @@ -480,6 +480,24 @@ int kvm_handle_sie_intercept(struct kvm_vcpu *vcpu)
+>   =09case ICPT_KSS:
+>   =09=09rc =3D kvm_s390_skey_check_enable(vcpu);
+>   =09=09break;
+> +=09case ICPT_PV_MCHKR:
+> +=09=09/*
+> +=09=09 * A protected guest changed PSW bit 13 to one and is now
+> +=09=09 * enabled for interrupts. The pre-run code will check
+> +=09=09 * the registers and inject pending MCHKs based on the
+> +=09=09 * PSW and CRs. No additional work to do.
+> +=09=09 */
+> +=09=09rc =3D 0;
+> +=09=09break;
+> +=09case  ICPT_PV_INT_EN:
+> +=09=09/*
+> +=09=09 * A protected guest changed CR 0,6,14 and may now be
+> +=09=09 * enabled for interrupts. The pre-run code will check
+> +=09=09 * the registers and inject pending IRQs based on the
+> +=09=09 * CRs. No additional work to do.
+> +=09=09 */
+> +=09=09rc =3D 0;
+> +=09break;
 
-As far as I can tell, we have the same issue with the current support for n=
-ested VMs in
-VMCI. If we have an L2 guest with the same CID as the L1 guest, we will alw=
-ays send to
-the L2 guest, and we may assign an L2 guest the same CID as L1. It should b=
-e straight
-forward to avoid this, though.
+Wrong indentation.
+
+Maybe simply
+
+case ICPT_PV_MCHKR:
+ICPT_PV_INT_EN:
+=09/*
+=09 * PSW bit 13 or a CR (0, 6, 14) changed and we might now be
+          * able to deliver interrupts. pre-run code will take care of
+          * this.
+=09 */
+=09rc =3D 0;
+=09break;
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
