@@ -2,117 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C267E96C3
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 07:49:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B17AE96F2
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 08:05:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727414AbfJ3Gts convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 30 Oct 2019 02:49:48 -0400
-Received: from mga06.intel.com ([134.134.136.31]:22962 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726262AbfJ3Gtr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 02:49:47 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 23:49:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; 
-   d="scan'208";a="198591325"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by fmsmga008.fm.intel.com with ESMTP; 29 Oct 2019 23:49:46 -0700
-Received: from fmsmsx161.amr.corp.intel.com (10.18.125.9) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 29 Oct 2019 23:49:46 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX161.amr.corp.intel.com (10.18.125.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 29 Oct 2019 23:49:46 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Wed, 30 Oct 2019 14:49:43 +0800
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "acme@kernel.org" <acme@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "jolsa@redhat.com" <jolsa@redhat.com>,
-        "namhyung@kernel.org" <namhyung@kernel.org>
-Subject: RE: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Topic: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Index: AQHVjLd13+lWyOpx00qD/bA0eE059qdxL6sAgAEppjD//+FzAIAAhsSA
-Date:   Wed, 30 Oct 2019 06:49:42 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E173835CAA@SHSMSX104.ccr.corp.intel.com>
-References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-4-git-send-email-luwei.kang@intel.com>
- <20191029144612.GK4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com>
- <87o8xyg2f1.fsf@ashishki-desk.ger.corp.intel.com>
-In-Reply-To: <87o8xyg2f1.fsf@ashishki-desk.ger.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjc4NDBlYjItZGZmYS00ODBlLWFiMTYtYWIxZThhZjYwOTY2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoia2Y3VGpQRitMU3g0MW9pXC9NQjlKRjBOWlRCaFwvcFdQWmhnT1RxSWh3OHU2eUFTTlFhcEZTRTNwSDhtbFRGMFJEIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726262AbfJ3HFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 03:05:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43964 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725855AbfJ3HFJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 03:05:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572419108;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZYjavpYNdju7uQHCnPbWIWk6TuX9M9rpxBlmDPHLt1Y=;
+        b=Pvhk0p71nt9o+LkkuKdT/OgPSqRuAYr1netE/Y0pifR63sXhcIoXKOdSbl6t9963tK9nTB
+        ZsX7zsBSslOHphnwx2/tC/4MXLYaSjDfn9MynKUvulRSLXHUmU9AobXJcDwV/I4rpjcoKl
+        BqM4C7KO+Z6yZRic3ntYxkbQgIur1cU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-OCSk8MvqNOiwx4R9AcJRYQ-1; Wed, 30 Oct 2019 03:05:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EDA0180496F;
+        Wed, 30 Oct 2019 07:05:05 +0000 (UTC)
+Received: from [10.72.12.223] (ovpn-12-223.pek2.redhat.com [10.72.12.223])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0CC0210016EB;
+        Wed, 30 Oct 2019 07:04:37 +0000 (UTC)
+Subject: Re: [RFC] vhost_mdev: add network control vq support
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com
+References: <20191029101726.12699-1-tiwei.bie@intel.com>
+ <59474431-9e77-567c-9a46-a3965f587f65@redhat.com>
+ <20191030061711.GA11968@___>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
+Date:   Wed, 30 Oct 2019 15:04:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20191030061711.GA11968@___>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: OCSk8MvqNOiwx4R9AcJRYQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >> >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> >> >  				  unsigned config, bool exclude_user,
-> >> >  				  bool exclude_kernel, bool intr,
-> >> > -				  bool in_tx, bool in_tx_cp)
-> >> > +				  bool in_tx, bool in_tx_cp, bool pebs)
-> >> >  {
-> >> >  	struct perf_event *event;
-> >> >  	struct perf_event_attr attr = {
-> >> > @@ -111,9 +111,12 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> >> >  		.exclude_user = exclude_user,
-> >> >  		.exclude_kernel = exclude_kernel,
-> >> >  		.config = config,
-> >> > +		.precise_ip = pebs ? 1 : 0,
-> >> > +		.aux_output = pebs ? 1 : 0,
-> >>
-> >> srsly?
-> >
-> > Hi Peter,
-> >     Thanks for review. For aux_output, I think it should be set 1 when the guest wants to enabled PEBS by Intel PT.
-> 
-> attr.aux_output==1 means your group leader should be an intel_pt event for this to succeed. Luckily for this instance,
-> perf_event_create_kernel_counter() doesn't actually check the attr.aux_output.
-> 
-> Also, does 'bool pebs' mean PEBS-via-PT or just a PEBS counter? Or does it mean that in kvm it's the same thing?
 
-It is the same thing. Allocate a counter for PEBS event and use PEBS-via-PT.
+On 2019/10/30 =E4=B8=8B=E5=8D=882:17, Tiwei Bie wrote:
+> On Tue, Oct 29, 2019 at 06:51:32PM +0800, Jason Wang wrote:
+>> On 2019/10/29 =E4=B8=8B=E5=8D=886:17, Tiwei Bie wrote:
+>>> This patch adds the network control vq support in vhost-mdev.
+>>> A vhost-mdev specific op is introduced to allow parent drivers
+>>> to handle the network control commands come from userspace.
+>> Probably work for userspace driver but not kernel driver.
+> Exactly. This is only for userspace.
+>
+> I got your point now. In virtio-mdev kernel driver case,
+> the ctrl-vq can be special as well.
+>
 
-Thanks,
-Luwei Kang
+Then maybe it's better to introduce vhost-mdev-net on top?
 
-> 
-> Regards,
-> --
-> Alex
+Looking at the other type of virtio device:
+
+- console have two control virtqueues when multiqueue port is enabled
+
+- SCSI has controlq + eventq
+
+- GPU has controlq
+
+- Crypto device has one controlq
+
+- Socket has eventq
+
+...
+
+Thanks
+
