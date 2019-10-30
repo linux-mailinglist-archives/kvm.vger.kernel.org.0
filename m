@@ -2,77 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82240E9A83
-	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 11:56:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89EEBE9B2A
+	for <lists+kvm@lfdr.de>; Wed, 30 Oct 2019 12:53:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbfJ3K4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 06:56:49 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:59254 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726761AbfJ3K4s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 06:56:48 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id AD30DCE6CB8B683BAC3B;
-        Wed, 30 Oct 2019 18:56:45 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Wed, 30 Oct 2019
- 18:56:39 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <alex.williamson@redhat.com>, <cohuck@redhat.com>,
-        <eric.auger@redhat.com>, <aik@ozlabs.ru>, <mpe@ellerman.id.au>,
-        <bhelgaas@google.com>, <tglx@linutronix.de>, <hexin.op@gmail.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] VFIO: PCI: eliminate unnecessary overhead in vfio_pci_reflck_find
-Date:   Wed, 30 Oct 2019 18:57:10 +0800
-Message-ID: <1572433030-6267-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726269AbfJ3Lxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 07:53:46 -0400
+Received: from mga06.intel.com ([134.134.136.31]:43399 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726065AbfJ3Lxq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Oct 2019 07:53:46 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2019 04:53:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,247,1569308400"; 
+   d="scan'208";a="401479933"
+Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
+  by fmsmga006.fm.intel.com with ESMTP; 30 Oct 2019 04:53:43 -0700
+Date:   Wed, 30 Oct 2019 19:54:33 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com
+Subject: Re: [RFC] vhost_mdev: add network control vq support
+Message-ID: <20191030115433.GA27220@___>
+References: <20191029101726.12699-1-tiwei.bie@intel.com>
+ <59474431-9e77-567c-9a46-a3965f587f65@redhat.com>
+ <20191030061711.GA11968@___>
+ <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+On Wed, Oct 30, 2019 at 03:04:37PM +0800, Jason Wang wrote:
+> On 2019/10/30 下午2:17, Tiwei Bie wrote:
+> > On Tue, Oct 29, 2019 at 06:51:32PM +0800, Jason Wang wrote:
+> >> On 2019/10/29 下午6:17, Tiwei Bie wrote:
+> >>> This patch adds the network control vq support in vhost-mdev.
+> >>> A vhost-mdev specific op is introduced to allow parent drivers
+> >>> to handle the network control commands come from userspace.
+> >> Probably work for userspace driver but not kernel driver.
+> > Exactly. This is only for userspace.
+> >
+> > I got your point now. In virtio-mdev kernel driver case,
+> > the ctrl-vq can be special as well.
+> >
+> 
+> Then maybe it's better to introduce vhost-mdev-net on top?
+> 
+> Looking at the other type of virtio device:
+> 
+> - console have two control virtqueues when multiqueue port is enabled
+> 
+> - SCSI has controlq + eventq
+> 
+> - GPU has controlq
+> 
+> - Crypto device has one controlq
+> 
+> - Socket has eventq
+> 
+> ...
 
-The driver of the pci device may not equal to vfio_pci_driver,
-but we fetch vfio_device from pci_dev unconditionally in func
-vfio_pci_reflck_find. This overhead, such as the competition
-of vfio.group_lock, can be eliminated by check pci_dev_driver
-with vfio_pci_driver first.
+Thanks for the list! It looks dirty to define specific
+commands and types in vhost UAPI for each of them in the
+future. It's definitely much better to find an approach
+to solve it once for all if possible..
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- drivers/vfio/pci/vfio_pci.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Just a quick thought, considering all vhost-mdev does
+is just to forward settings between parent and userspace,
+I'm wondering whether it's possible to make the argp
+opaque in vhost-mdev UAPI and just introduce one generic
+ioctl command to deliver these device specific commands
+(which are opaque in vhost-mdev as vhost-mdev just pass
+the pointer -- argp) defined by spec.
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 379a02c36e37..1e21970543a6 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -1466,15 +1466,14 @@ static int vfio_pci_reflck_find(struct pci_dev *pdev, void *data)
- 	struct vfio_device *device;
- 	struct vfio_pci_device *vdev;
- 
--	device = vfio_device_get_from_dev(&pdev->dev);
--	if (!device)
--		return 0;
--
- 	if (pci_dev_driver(pdev) != &vfio_pci_driver) {
--		vfio_device_put(device);
- 		return 0;
- 	}
- 
-+	device = vfio_device_get_from_dev(&pdev->dev);
-+	if (!device)
-+		return 0;
-+
- 	vdev = vfio_device_data(device);
- 
- 	if (vdev->reflck) {
--- 
-2.19.1
+I'm also fine with exposing ctrlq to userspace directly.
+PS. It's interesting that some devices have more than
+one ctrlq. I need to take a close look first..
 
+
+> 
+> Thanks
+> 
