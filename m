@@ -2,86 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B62ADEBA7E
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 00:36:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6F24EBA86
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 00:37:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728368AbfJaXgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 19:36:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56096 "EHLO mx1.redhat.com"
+        id S1728397AbfJaXhZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 19:37:25 -0400
+Received: from mga12.intel.com ([192.55.52.136]:61371 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728074AbfJaXgz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 19:36:55 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E48BD328E
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 23:36:54 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id 2so628700wmd.3
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 16:36:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4LJgE7uoxIgv6lOFWTa4lMXDWH86arAwN/3SBbtX42c=;
-        b=k7wHpEUQHu7TrpVpqKxYhsxcnwS2xeUp2Jx49HM+MnosY5mUijuGA12WH0xRAuztKY
-         JsagNpUwuMbN9Vhannflysn94gOa6U/vWX9cGRPmtPoUQhzLbClZSfqGHfdPgibsYebP
-         LZjDqDIosO1/gevSUmlb0RgkEUe0T9tt2OnUsidJ1734efCY1tspnGt7J3QnDvT6usAK
-         /NoMqsJeBr7RmQblFIdA9ogip7OYLWhiNfW3dk426Kc6JFsvMU680IOHBX7lF7PSv+dD
-         rmhRVxU6mCPj5X9Ex7NLj5b9FgFabntUMIY11f526bTxULhm3gn6mw5HOeTPzjvaUcRp
-         O71g==
-X-Gm-Message-State: APjAAAXtMcFjxqRNw+FdaSmdqMGvj5kdOmWVGBVUfiJ7FKHoc6xCa9od
-        KT4+1AHrXf16TJVwd4Vg+RCod9EJtU3GdEHK6Sx8fEcXUIkdl32FIpTPyUE67Ep8d4MwsiAAdPK
-        3uCEq2TsRDGhr
-X-Received: by 2002:a1c:1d41:: with SMTP id d62mr7465988wmd.32.1572565013604;
-        Thu, 31 Oct 2019 16:36:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxycS8wEB4d15ZosyhgQfZLFlZUbJ9aGHOZxYeJp6qJNPUEq3M8FNWBrhbLOmRzr7qE7Vkx8A==
-X-Received: by 2002:a1c:1d41:: with SMTP id d62mr7465969wmd.32.1572565013331;
-        Thu, 31 Oct 2019 16:36:53 -0700 (PDT)
-Received: from [192.168.20.72] (94.222.26.109.rev.sfr.net. [109.26.222.94])
-        by smtp.gmail.com with ESMTPSA id q14sm7476510wre.27.2019.10.31.16.36.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2019 16:36:52 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.5-1 tag
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20191031111349.GA8045@blackberry>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <f41d26fb-de5e-83d1-4ec6-11c66b93c076@redhat.com>
-Date:   Fri, 1 Nov 2019 00:36:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727922AbfJaXhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 19:37:25 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Oct 2019 16:37:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,253,1569308400"; 
+   d="scan'208";a="204356863"
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
+  by orsmga006.jf.intel.com with ESMTP; 31 Oct 2019 16:37:22 -0700
+Date:   Thu, 31 Oct 2019 16:37:22 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 10/19] fs/io_uring: set FOLL_PIN via pin_user_pages()
+Message-ID: <20191031233721.GJ14771@iweiny-DESK2.sc.intel.com>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-11-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191031111349.GA8045@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191030224930.3990755-11-jhubbard@nvidia.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/10/19 12:13, Paul Mackerras wrote:
-> Paolo or Radim,
+On Wed, Oct 30, 2019 at 03:49:21PM -0700, John Hubbard wrote:
+> Convert fs/io_uring to use the new pin_user_pages() call, which sets
+> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+> tracking of pinned pages, and therefore for any code that calls
+> put_user_page().
 > 
-> Please do a pull from my kvm-ppc-next-5.5-1 tag to get a PPC KVM
-> update for v5.5.
-> 
-> Thanks,
-> Paul.
-> 
-> The following changes since commit 12ade69c1eb9958b13374edf5ef742ea20ccffde:
-> 
->   KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use (2019-10-15 16:09:11 +1100)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.5-1
 
-Pushed to kvm/queue for now.  It may take a couple days after I get
-back, before I test all the pending x86 patches and push out to kvm/next.
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-Paolo
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  fs/io_uring.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index a30c4f622cb3..d3924b1760eb 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -3431,9 +3431,8 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+>  
+>  		ret = 0;
+>  		down_read(&current->mm->mmap_sem);
+> -		pret = get_user_pages(ubuf, nr_pages,
+> -				      FOLL_WRITE | FOLL_LONGTERM,
+> -				      pages, vmas);
+> +		pret = pin_longterm_pages(ubuf, nr_pages, FOLL_WRITE, pages,
+> +					  vmas);
+>  		if (pret == nr_pages) {
+>  			/* don't support file backed memory */
+>  			for (j = 0; j < nr_pages; j++) {
+> -- 
+> 2.23.0
+> 
+> 
