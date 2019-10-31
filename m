@@ -2,126 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FF6FEABF0
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 09:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D8CEAC70
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 10:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727237AbfJaIyw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 04:54:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58556 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727244AbfJaIyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 04:54:47 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726949AbfJaJPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 05:15:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55497 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726911AbfJaJPK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 05:15:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572513308;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=fV189GecbF6shY5F2XIcIMOovOUPUGkE6EQHhrde7+0=;
+        b=JEZi4gmjFZ7+ek5SnRY0iTk/qnOuFpCeMrgtUW5kRGB4ajJR3tfdrfER+er4++9n29ysbv
+        xdviqvqHSHXvr+7hTJT4Qu/8dchiJzUs8Q5CW8nepDwdzpPGi+aM/eYnfy252iWGVeQ5gq
+        j+HQBHlXplM9N6AK6v4S4qhf6T1pGYw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-VueF31jePVeLePIyNDqIxA-1; Thu, 31 Oct 2019 05:15:05 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DFB9AC057FA6
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 08:54:46 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f2so2085614wmf.8
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 01:54:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wIxff/xeNXe1wb8LPDwW/yTYgkSfAil2vq+uYePEE2c=;
-        b=eULX/sLYvAujOP3BHI2un1w0kQJREEQ+7AIDla6VW2N2VQgzF3efDJucgqLY8Z+2NG
-         pKTbxquki2e2f9kIaLdaqeo0vpYimxc0b3bQPiFsnSeMa88dtiH78Pok61tX5NytkvNu
-         b1JahOAQqJPDDy2+6cdYlpmR2IBixCz7ncwAJZr3vVeOyuIYHv0Rj1vomNl3NU9VikyK
-         sfMV8NXacw2KliR930VC5Ipt7x95y9yo4mjttt1LJdil/3JWZBsbgsGhHDARU4EeR9DX
-         JOsmEbwgECpfQcVi26qpROalkGCUvcq5YoxpC2Cm1cpUeOGhrG1bwY9Wq29+/PQLs0oY
-         Nw7w==
-X-Gm-Message-State: APjAAAWlX10ayRncKeOMIO3wu2D/hjDRPvTCZo5Bu+UMWZsxsuu5MfY2
-        mUApV3/npqwHN5Lg4ZTrsJU6HbWHCawCxLOKqsD6A6fEfSv6QlgooRtK6u0jVd6fhwuTI44rgT8
-        Dj245CVSUJuzK
-X-Received: by 2002:a05:600c:2248:: with SMTP id a8mr3992692wmm.176.1572512085582;
-        Thu, 31 Oct 2019 01:54:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwljnfXIFUbhpOVjeOyn7RSMG1RK8ExAwGTNSA6Ok15JomaTkrWe27dOdJI/ge/KJL7MFrKYQ==
-X-Received: by 2002:a05:600c:2248:: with SMTP id a8mr3992677wmm.176.1572512085348;
-        Thu, 31 Oct 2019 01:54:45 -0700 (PDT)
-Received: from steredhat ([91.217.168.176])
-        by smtp.gmail.com with ESMTPSA id l8sm3361933wru.22.2019.10.31.01.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2019 01:54:44 -0700 (PDT)
-Date:   Thu, 31 Oct 2019 09:54:42 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jorgen Hansen <jhansen@vmware.com>
-Cc:     Sasha Levin <sashal@kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>, kvm <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 11/14] vsock: add multi-transports support
-Message-ID: <20191031085442.vkb5tnchfsa6n4dh@steredhat>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-12-sgarzare@redhat.com>
- <CAGxU2F7n48kBy_y2GB=mcvraK=mw_2Jn8=2hvQnEOWqWuT9OjA@mail.gmail.com>
- <MWHPR05MB3376E623764F54D39D8135A9DA600@MWHPR05MB3376.namprd05.prod.outlook.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 081871800D55;
+        Thu, 31 Oct 2019 09:15:04 +0000 (UTC)
+Received: from [10.36.117.246] (ovpn-117-246.ams2.redhat.com [10.36.117.246])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E160E1001B23;
+        Thu, 31 Oct 2019 09:15:01 +0000 (UTC)
+Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
+ controls
+To:     mimu@linux.ibm.com, Janosch Frank <frankja@linux.ibm.com>,
+        kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, cohuck@redhat.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-14-frankja@linux.ibm.com>
+ <c09046eb-380f-d930-8e99-42b9cc8a62ae@redhat.com>
+ <26dfdefa-edbe-40e5-5b41-a4de86d47d15@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <5e8c5e1c-d08a-6ba4-da28-ee387522c257@redhat.com>
+Date:   Thu, 31 Oct 2019 10:15:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MWHPR05MB3376E623764F54D39D8135A9DA600@MWHPR05MB3376.namprd05.prod.outlook.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <26dfdefa-edbe-40e5-5b41-a4de86d47d15@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: VueF31jePVeLePIyNDqIxA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 03:40:05PM +0000, Jorgen Hansen wrote:
-> > From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> > > +/* Assign a transport to a socket and call the .init transport callback.
-> > > + *
-> > > + * Note: for stream socket this must be called when vsk->remote_addr
-> > > +is set
-> > > + * (e.g. during the connect() or when a connection request on a
-> > > +listener
-> > > + * socket is received).
-> > > + * The vsk->remote_addr is used to decide which transport to use:
-> > > + *  - remote CID > VMADDR_CID_HOST will use host->guest transport
-> > > + *  - remote CID <= VMADDR_CID_HOST will use guest->host transport
-> > > +*/ int vsock_assign_transport(struct vsock_sock *vsk, struct
-> > > +vsock_sock *psk) {
-> > > +       const struct vsock_transport *new_transport;
-> > > +       struct sock *sk = sk_vsock(vsk);
-> > > +
-> > > +       switch (sk->sk_type) {
-> > > +       case SOCK_DGRAM:
-> > > +               new_transport = transport_dgram;
-> > > +               break;
-> > > +       case SOCK_STREAM:
-> > > +               if (vsk->remote_addr.svm_cid > VMADDR_CID_HOST)
-> > > +                       new_transport = transport_h2g;
-> > > +               else
-> > > +                       new_transport = transport_g2h;
-> > 
-> > I just noticed that this break the loopback in the guest.
-> > As a fix, we should use 'transport_g2h' when remote_cid <=
-> > VMADDR_CID_HOST or remote_cid is the id of 'transport_g2h'.
-> > 
-> > To do that we also need to avoid that L2 guests can have the same CID of L1.
-> > For vhost_vsock I can call vsock_find_cid() in vhost_vsock_set_cid()
-> > 
-> > @Jorgen: for vmci we need to do the same? or it is guaranteed, since it's
-> > already support nested VMs, that a L2 guests cannot have the same CID as
-> > the L1.
-> 
-> As far as I can tell, we have the same issue with the current support for nested VMs in
-> VMCI. If we have an L2 guest with the same CID as the L1 guest, we will always send to
-> the L2 guest, and we may assign an L2 guest the same CID as L1. It should be straight
-> forward to avoid this, though.
-> 
+On 31.10.19 09:48, Michael Mueller wrote:
+>=20
+>=20
+> On 30.10.19 16:53, David Hildenbrand wrote:
+>>> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 oai;=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00e2 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 armid;=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00e3 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 reservede4[4];=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00e4 */
+>>> -=C2=A0=C2=A0=C2=A0 __u64=C2=A0=C2=A0=C2=A0 tecmc;=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00e8 */
+>>> -=C2=A0=C2=A0=C2=A0 __u8=C2=A0=C2=A0=C2=A0 reservedf0[12];=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00f0 */
+>>> +=C2=A0=C2=A0=C2=A0 union {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u64=C2=A0=C2=A0=C2=A0 tec=
+mc;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x00e8 */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u=
+16=C2=A0=C2=A0=C2=A0 subchannel_id;=C2=A0=C2=A0=C2=A0 /* 0x00e8 */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u=
+16=C2=A0=C2=A0=C2=A0 subchannel_nr;=C2=A0=C2=A0=C2=A0 /* 0x00ea */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u=
+32=C2=A0=C2=A0=C2=A0 io_int_parm;=C2=A0=C2=A0=C2=A0 /* 0x00ec */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u=
+32=C2=A0=C2=A0=C2=A0 io_int_word;=C2=A0=C2=A0=C2=A0 /* 0x00f0 */
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>
+>> I only wonder if we should give this member a fitting name, e.g.,=20
+>> "ioparams"
+>=20
+> Do you see a real gain for that? We have a lot of other unnamed structs
+> defined here as well.
 
-Yes, I think so.
+I was wondering if we could just copy the whole struct when delivering
+the interrupt.
 
-For the v2 I'm exposing the vsock_find_cid() to the transports, in this
-way I can reject requests to set the same L1 CID for L2 guests.
+You could even reuse  "struct kvm_s390_io_info" here to make that more
+clear.
+
+--=20
 
 Thanks,
-Stefano
+
+David / dhildenb
+
