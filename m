@@ -2,96 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F1D9FEAFB9
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 12:58:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05419EAFED
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 13:12:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbfJaL6X convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 31 Oct 2019 07:58:23 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:55244 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbfJaLzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 07:55:04 -0400
-Received: from [5.158.153.53] (helo=tip-bot2.lab.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tip-bot2@linutronix.de>)
-        id 1iQ92Z-0002rW-H8; Thu, 31 Oct 2019 12:54:59 +0100
-Received: from [127.0.1.1] (localhost [IPv6:::1])
-        by tip-bot2.lab.linutronix.de (Postfix) with ESMTP id 1654C1C0070;
-        Thu, 31 Oct 2019 12:54:56 +0100 (CET)
-Date:   Thu, 31 Oct 2019 11:54:55 -0000
-From:   "tip-bot2 for Paul E. McKenney" <tip-bot2@linutronix.de>
-Reply-to: linux-kernel@vger.kernel.org
-To:     linux-tip-commits@vger.kernel.org
-Subject: [tip: core/rcu] x86/kvm/pmu: Replace rcu_swap_protected() with
- rcu_replace_pointer()
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?b?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, <x86@kernel.org>,
-        <kvm@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>,
-        linux-kernel@vger.kernel.org
+        id S1726916AbfJaMMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 08:12:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35270 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726540AbfJaMMw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 31 Oct 2019 08:12:52 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9VCCdJu074501
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 08:12:51 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyya3g56m-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 08:12:41 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Thu, 31 Oct 2019 12:10:08 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 31 Oct 2019 12:10:05 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9VCA3TE28508234
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Oct 2019 12:10:03 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 83C2BAE057;
+        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 26D14AE045;
+        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
+Received: from [9.152.96.213] (unknown [9.152.96.213])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
+ controls
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, cohuck@redhat.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-14-frankja@linux.ibm.com>
+ <c09046eb-380f-d930-8e99-42b9cc8a62ae@redhat.com>
+ <26dfdefa-edbe-40e5-5b41-a4de86d47d15@linux.ibm.com>
+ <5e8c5e1c-d08a-6ba4-da28-ee387522c257@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Thu, 31 Oct 2019 13:10:02 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.0
 MIME-Version: 1.0
-Message-ID: <157252289579.29376.8178836820582764127.tip-bot2@tip-bot2>
-X-Mailer: tip-git-log-daemon
-Robot-ID: <tip-bot2.linutronix.de>
-Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <5e8c5e1c-d08a-6ba4-da28-ee387522c257@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19103112-0020-0000-0000-000003814FC7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19103112-0021-0000-0000-000021D76583
+Message-Id: <63976ad0-745e-204b-f7c1-55f5a7465ca6@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-31_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=786 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910310125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following commit has been merged into the core/rcu branch of tip:
 
-Commit-ID:     12e78e6902134c9e49b2481c2515555e6f7b12dc
-Gitweb:        https://git.kernel.org/tip/12e78e6902134c9e49b2481c2515555e6f7b12dc
-Author:        Paul E. McKenney <paulmck@kernel.org>
-AuthorDate:    Mon, 23 Sep 2019 15:15:35 -07:00
-Committer:     Paul E. McKenney <paulmck@kernel.org>
-CommitterDate: Wed, 30 Oct 2019 08:43:51 -07:00
 
-x86/kvm/pmu: Replace rcu_swap_protected() with rcu_replace_pointer()
+On 31.10.19 10:15, David Hildenbrand wrote:
+> On 31.10.19 09:48, Michael Mueller wrote:
+>>
+>>
+>> On 30.10.19 16:53, David Hildenbrand wrote:
+>>>> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
+>>>>        __u8    oai;            /* 0x00e2 */
+>>>>        __u8    armid;            /* 0x00e3 */
+>>>>        __u8    reservede4[4];        /* 0x00e4 */
+>>>> -    __u64    tecmc;            /* 0x00e8 */
+>>>> -    __u8    reservedf0[12];        /* 0x00f0 */
+>>>> +    union {
+>>>> +        __u64    tecmc;        /* 0x00e8 */
+>>>> +        struct {
+>>>> +            __u16    subchannel_id;    /* 0x00e8 */
+>>>> +            __u16    subchannel_nr;    /* 0x00ea */
+>>>> +            __u32    io_int_parm;    /* 0x00ec */
+>>>> +            __u32    io_int_word;    /* 0x00f0 */
+>>>> +        };
+>>>
+>>> I only wonder if we should give this member a fitting name, e.g.,
+>>> "ioparams"
+>>
+>> Do you see a real gain for that? We have a lot of other unnamed structs
+>> defined here as well.
+> 
+> I was wondering if we could just copy the whole struct when delivering
+> the interrupt.
+> 
+> You could even reuse  "struct kvm_s390_io_info" here to make that more
+> clear.
 
-This commit replaces the use of rcu_swap_protected() with the more
-intuitively appealing rcu_replace_pointer() as a step towards removing
-rcu_swap_protected().
+I want to keep it the way it is to have the fields in the SCB
+declaration explicit.
 
-Link: https://lore.kernel.org/lkml/CAHk-=wiAsJLw1egFEE=Z7-GGtM6wcvtyytXZA1+BHqta4gg6Hw@mail.gmail.com/
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-[ paulmck: From rcu_replace() to rcu_replace_pointer() per Ingo Molnar. ]
-Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Radim Krčmář" <rkrcmar@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: <x86@kernel.org>
-Cc: <kvm@vger.kernel.org>
----
- arch/x86/kvm/pmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
+Michael
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 46875bb..5ddb05a 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -416,8 +416,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
- 	*filter = tmp;
- 
- 	mutex_lock(&kvm->lock);
--	rcu_swap_protected(kvm->arch.pmu_event_filter, filter,
--			   mutex_is_locked(&kvm->lock));
-+	filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
-+				     mutex_is_locked(&kvm->lock));
- 	mutex_unlock(&kvm->lock);
- 
- 	synchronize_srcu_expedited(&kvm->srcu);
