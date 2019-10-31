@@ -2,181 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A5FBEA77E
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 00:05:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EBE3EA8EE
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 02:46:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727381AbfJ3XF2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Oct 2019 19:05:28 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:17582 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727064AbfJ3XF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Oct 2019 19:05:28 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dba17390001>; Wed, 30 Oct 2019 16:05:29 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Wed, 30 Oct 2019 16:05:23 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Wed, 30 Oct 2019 16:05:23 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 30 Oct
- 2019 23:05:22 +0000
-Subject: Re: [PATCH 14/19] vfio, mm: pin_longterm_pages (FOLL_PIN) and
- put_user_page() conversion
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-15-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <cfa579f0-999c-9712-494a-9d519bbc4314@nvidia.com>
-Date:   Wed, 30 Oct 2019 16:05:22 -0700
+        id S1726540AbfJaBoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Oct 2019 21:44:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60817 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726322AbfJaBoY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 30 Oct 2019 21:44:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572486262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4tc+kGwmBYkHh3r+P2hKVHCMVc/QGj3NROan5F4N/4I=;
+        b=OrEB0O0cTPVrKKFY3kRbDS1m+afKuwRyVp2KxiK1anbj0UZt9WKQl6ohyHTnWPMqa+PkAg
+        ZPBG3yTp6IBI5YI6CCzY97snHMznV5F2eFsEzg/KqkMT818roJXmLOUpPnJJNa+J6XgtU/
+        yC9J18HdWCbzqku8b4w5xlZvtRRE++Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-EZPixSApMXCjMTJG_WhWEw-1; Wed, 30 Oct 2019 21:44:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A8A11005500;
+        Thu, 31 Oct 2019 01:44:18 +0000 (UTC)
+Received: from [10.72.12.100] (ovpn-12-100.pek2.redhat.com [10.72.12.100])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7771160132;
+        Thu, 31 Oct 2019 01:44:12 +0000 (UTC)
+Subject: Re: [RFC] vhost_mdev: add network control vq support
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com
+References: <20191029101726.12699-1-tiwei.bie@intel.com>
+ <59474431-9e77-567c-9a46-a3965f587f65@redhat.com>
+ <20191030061711.GA11968@___>
+ <39aa9f66-8e58-ea63-5795-7df8861ff3a0@redhat.com>
+ <20191030115433.GA27220@___>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <b1ab03ec-edb0-f955-2719-beb0653feed1@redhat.com>
+Date:   Thu, 31 Oct 2019 09:44:11 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191030224930.3990755-15-jhubbard@nvidia.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191030115433.GA27220@___>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572476729; bh=53l+EYxovXaJJmkDDYPwp5PBwN0eKGoaifL7qKM0Mds=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=md/zgeBc2zml8TuAaTKRK2oyv1Btng0H6ozq8zn2sRJiXmTfxKbYsvkGcjK6gQS+q
-         3nPYnJq+1Eps5VG6ooIJSjGzkjOCMYIGUlSFcOJoUyjFNZ1H0vd+dWvWBSOqDkH5Uc
-         dvFo63nthImmg9iCDmU6xj0EE8b8pgUM6g95EetFKN1/r0QnPl5BygVRpoyVLlCyiH
-         iCMwhme/pZSwh1q5oOeHae8CYEOAkIwb1y6ebulV3/7WSgE5bb3SmwuYCg/xWfmbmX
-         iPDY0K1xyswztlMvQmBw8+uJFpl2scC5scONZ/nlQeN+ZcWegNbDORlz6y4lLuTxuj
-         WJ+vmX9yZfaww==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: EZPixSApMXCjMTJG_WhWEw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/30/19 3:49 PM, John Hubbard wrote:
-> This also fixes one or two likely bugs.
 
-Well, actually just one...
+On 2019/10/30 =E4=B8=8B=E5=8D=887:54, Tiwei Bie wrote:
+> On Wed, Oct 30, 2019 at 03:04:37PM +0800, Jason Wang wrote:
+>> On 2019/10/30 =E4=B8=8B=E5=8D=882:17, Tiwei Bie wrote:
+>>> On Tue, Oct 29, 2019 at 06:51:32PM +0800, Jason Wang wrote:
+>>>> On 2019/10/29 =E4=B8=8B=E5=8D=886:17, Tiwei Bie wrote:
+>>>>> This patch adds the network control vq support in vhost-mdev.
+>>>>> A vhost-mdev specific op is introduced to allow parent drivers
+>>>>> to handle the network control commands come from userspace.
+>>>> Probably work for userspace driver but not kernel driver.
+>>> Exactly. This is only for userspace.
+>>>
+>>> I got your point now. In virtio-mdev kernel driver case,
+>>> the ctrl-vq can be special as well.
+>>>
+>> Then maybe it's better to introduce vhost-mdev-net on top?
+>>
+>> Looking at the other type of virtio device:
+>>
+>> - console have two control virtqueues when multiqueue port is enabled
+>>
+>> - SCSI has controlq + eventq
+>>
+>> - GPU has controlq
+>>
+>> - Crypto device has one controlq
+>>
+>> - Socket has eventq
+>>
+>> ...
+> Thanks for the list! It looks dirty to define specific
+> commands and types in vhost UAPI for each of them in the
+> future. It's definitely much better to find an approach
+> to solve it once for all if possible..
+>
+> Just a quick thought, considering all vhost-mdev does
+> is just to forward settings between parent and userspace,
+> I'm wondering whether it's possible to make the argp
+> opaque in vhost-mdev UAPI and just introduce one generic
+> ioctl command to deliver these device specific commands
+> (which are opaque in vhost-mdev as vhost-mdev just pass
+> the pointer -- argp) defined by spec.
 
-> 
-> 1. Change vfio from get_user_pages(FOLL_LONGTERM), to
-> pin_longterm_pages(), which sets both FOLL_LONGTERM and FOLL_PIN.
-> 
-> Note that this is a change in behavior, because the
-> get_user_pages_remote() call was not setting FOLL_LONGTERM, but the
-> new pin_user_pages_remote() call that replaces it, *is* setting
-> FOLL_LONGTERM. It is important to set FOLL_LONGTERM, because the
-> DMA case requires it. Please see the FOLL_PIN documentation in
-> include/linux/mm.h, and Documentation/pin_user_pages.rst for details.
 
-Correction: the above comment is stale and wrong. I wrote it before 
-getting further into the details, and the patch doesn't do this. 
-
-Instead, it keeps exactly the old behavior: pin_longterm_pages_remote()
-is careful to avoid setting FOLL_LONGTERM. Instead of setting that flag,
-it drops in a "TODO" comment nearby. :)
-
-I'll update the commit description in the next version of the series.
+It looks that using opaque pointer is probably not good for UAPI. And we=20
+need also invent API for eventq.
 
 
-thanks,
+>
+> I'm also fine with exposing ctrlq to userspace directly.
+> PS. It's interesting that some devices have more than
+> one ctrlq. I need to take a close look first..
 
-John Hubbard
-NVIDIA
 
-> 
-> 2. Because all FOLL_PIN-acquired pages must be released via
-> put_user_page(), also convert the put_page() call over to
-> put_user_pages().
-> 
-> Note that this effectively changes the code's behavior in
-> vfio_iommu_type1.c: put_pfn(): it now ultimately calls
-> set_page_dirty_lock(), instead of set_page_dirty(). This is
-> probably more accurate.
-> 
-> As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
-> dealing with a file backed page where we have reference on the inode it
-> hangs off." [1]
-> 
-> [1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..795e13f3ef08 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -327,9 +327,8 @@ static int put_pfn(unsigned long pfn, int prot)
->  {
->  	if (!is_invalid_reserved_pfn(pfn)) {
->  		struct page *page = pfn_to_page(pfn);
-> -		if (prot & IOMMU_WRITE)
-> -			SetPageDirty(page);
-> -		put_page(page);
-> +
-> +		put_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
->  		return 1;
->  	}
->  	return 0;
-> @@ -349,11 +348,11 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  
->  	down_read(&mm->mmap_sem);
->  	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> +		ret = pin_longterm_pages(vaddr, 1, flags, page, vmas);
->  	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> +		ret = pin_longterm_pages_remote(NULL, mm, vaddr, 1,
-> +						flags, page, vmas,
-> +						NULL);
->  		/*
->  		 * The lifetime of a vaddr_get_pfn() page pin is
->  		 * userspace-controlled. In the fs-dax case this could
-> @@ -363,7 +362,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		 */
->  		if (ret > 0 && vma_is_fsdax(vmas[0])) {
->  			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> +			put_user_page(page[0]);
->  		}
->  	}
->  	up_read(&mm->mmap_sem);
-> 
+Thanks.
+
+
+>
+>
+>> Thanks
+>>
+
