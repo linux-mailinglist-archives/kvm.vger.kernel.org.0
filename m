@@ -2,120 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05419EAFED
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 13:12:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83C7CEB0D4
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 14:07:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726916AbfJaMMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 08:12:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35270 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726540AbfJaMMw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 31 Oct 2019 08:12:52 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9VCCdJu074501
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 08:12:51 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyya3g56m-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 31 Oct 2019 08:12:41 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Thu, 31 Oct 2019 12:10:08 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 31 Oct 2019 12:10:05 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9VCA3TE28508234
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Oct 2019 12:10:03 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83C2BAE057;
-        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26D14AE045;
-        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
-Received: from [9.152.96.213] (unknown [9.152.96.213])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 31 Oct 2019 12:10:03 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
- controls
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, cohuck@redhat.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-14-frankja@linux.ibm.com>
- <c09046eb-380f-d930-8e99-42b9cc8a62ae@redhat.com>
- <26dfdefa-edbe-40e5-5b41-a4de86d47d15@linux.ibm.com>
- <5e8c5e1c-d08a-6ba4-da28-ee387522c257@redhat.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Thu, 31 Oct 2019 13:10:02 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
+        id S1726761AbfJaNHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 09:07:38 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5240 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726462AbfJaNHi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 09:07:38 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 1D02563FB0F6D69357FD;
+        Thu, 31 Oct 2019 21:07:35 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Thu, 31 Oct 2019
+ 21:07:24 +0800
+Subject: Re: [RFC PATCH 1/2] kvm/arm: add capability to forward hypercall to
+ user space
+To:     James Morse <james.morse@arm.com>
+References: <1569338454-26202-1-git-send-email-guoheyi@huawei.com>
+ <1569338454-26202-2-git-send-email-guoheyi@huawei.com>
+ <e097fb69-1e68-4082-d310-e7666e30b5d6@arm.com>
+ <d62b84ac-1a7e-de05-a1c1-c52dfb463462@huawei.com>
+ <22aa23e0-cd4e-3692-ee94-e110ace49adb@arm.com>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <qemu-arm@nongnu.org>, <wanghaibin.wang@huawei.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Russell King <linux@armlinux.org.uk>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>
+From:   Guoheyi <guoheyi@huawei.com>
+Message-ID: <4af47d1c-40cc-8440-d834-d721e1c0a758@huawei.com>
+Date:   Thu, 31 Oct 2019 21:07:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <5e8c5e1c-d08a-6ba4-da28-ee387522c257@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19103112-0020-0000-0000-000003814FC7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19103112-0021-0000-0000-000021D76583
-Message-Id: <63976ad0-745e-204b-f7c1-55f5a7465ca6@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-31_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=786 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910310125
+In-Reply-To: <22aa23e0-cd4e-3692-ee94-e110ace49adb@arm.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sorry for the late, for it took some time for me to think it over...
 
 
-On 31.10.19 10:15, David Hildenbrand wrote:
-> On 31.10.19 09:48, Michael Mueller wrote:
+On 2019/10/22 0:42, James Morse wrote:
+> Hi Heyi,
+>
+> On 09/10/2019 13:33, Guoheyi wrote:
+>> On 2019/10/2 1:19, James Morse wrote:
+>>> On 24/09/2019 16:20, Heyi Guo wrote:
+>>>> As more SMC/HVC usages emerge on arm64 platforms, like SDEI, it makes
+>>>> sense for kvm to have the capability of forwarding such calls to user
+>>>> space for further emulation.
+>>> (what do you mean by further? Doesn't user-space have to do all of it?)
+>> For kvm will always handle hvc/smc guest exit for the first step, even if it is only a
+>> simple forwarding, I called the user-space processing as "further emulation".
 >>
->>
->> On 30.10.19 16:53, David Hildenbrand wrote:
->>>> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
->>>>        __u8    oai;            /* 0x00e2 */
->>>>        __u8    armid;            /* 0x00e3 */
->>>>        __u8    reservede4[4];        /* 0x00e4 */
->>>> -    __u64    tecmc;            /* 0x00e8 */
->>>> -    __u8    reservedf0[12];        /* 0x00f0 */
->>>> +    union {
->>>> +        __u64    tecmc;        /* 0x00e8 */
->>>> +        struct {
->>>> +            __u16    subchannel_id;    /* 0x00e8 */
->>>> +            __u16    subchannel_nr;    /* 0x00ea */
->>>> +            __u32    io_int_parm;    /* 0x00ec */
->>>> +            __u32    io_int_word;    /* 0x00f0 */
->>>> +        };
+>>>> We reuse the existing term "hypercall" for SMC/HVC, as well as the
+>>>> hypercall structure in kvm_run to exchange arguments and return
+>>>> values. The definition on arm64 is as below:
+>>>>
+>>>> exit_reason: KVM_EXIT_HYPERCALL
+>>>>
+>>>> Input:
+>>>>     nr: the immediate value of SMC/HVC calls; not really used today.
+>>>>     args[6]: x0..x5 (This is not fully conform with SMCCC which requires
+>>>>              x6 as argument as well, but use space can use GET_ONE_REG
+>>>>              ioctl for such rare case).
+>>> If this structure isn't right for us, we could define a different one for arm/arm64.
+>>> (we did this for kvm_vcpu_events)
+>> Do you mean that we can move the hypercall struct definition to arch specific kvm_host.h?
+>> For it is in the common kvm_run structure, we'll need to change every kvm supported
+>> architectures, including x86, mips, powerpc, s390. Is it acceptable?
+> Ah! Sorry, I'd missed this was in the kvm_run structure. The get-events example doesn't
+> apply here as that was a separate ioctl().
+>
+>
+>>>> Return:
+>>>>     args[0..3]: x0..x3 as defined in SMCCC. We need to extract
+>>>>                 args[0..3] and write them to x0..x3 when hypercall exit
+>>>>                 returns.
+>>> Are we saying that KVM_EXIT_HYPERCALL expects to be used with SMC-CC?
+>>> (if so, we should state that).
+>> Yes I followed SMC-CC when writing this.
+>>> I'm not certain we should tie this to SMC-CC.
 >>>
->>> I only wonder if we should give this member a fitting name, e.g.,
->>> "ioparams"
->>
->> Do you see a real gain for that? We have a lot of other unnamed structs
->> defined here as well.
-> 
-> I was wondering if we could just copy the whole struct when delivering
-> the interrupt.
-> 
-> You could even reuse  "struct kvm_s390_io_info" here to make that more
-> clear.
+>>> If we don't tie it to SMC-CC this selection of in/out registers looks odd, there is
+>>> nothing about HVC/SMC that uses these registers, its just the SMC convention.
+>> Maybe we don't need to tie it to SMC-CC, and simply load all values in args[6] to GP
+>> registers...
+>> And then there is either no strong reason to extend hypercall structure for ARM.
+>
+>>>> Flag hypercall_forward is added to turn on/off hypercall forwarding
+>>>> and the default is false. Another flag hypercall_excl_psci is to
+>>>> exclude PSCI from forwarding for backward compatible, and it only
+>>>> makes sense to check its value when hypercall_forward is enabled.
+>>> Calling out PSCI like this is something we shouldn't do. There will be, (are!) other
+>>> SMC-CC calls that the kernel provides emulation for, we can't easily add to this list.
+>> Yes; I didn't figure out good way to keep compatibility and future extension...
+> I think the best trick is not to interpret the SMC/HVC calls from the guest. The kernel
+> obviously does, but the API shouldn't force us to.
+>
+>
+>>> I think the best way to avoid this, is to say the hypercall mechanism forwards 'unhandled
+>>> SMC/HVC' to user-space. Which things the kernel chooses to handle can change.
+>>>
+>>> We need a way for user-space to know which SMC/HVC calls the kernel will handle, and will
+>>> not forward. A suggestion is to add a co-processor that lists these by #imm and r0/x0
+>>> value. User-space can then query any call to find out if it would be exported if the guest
+>>> made that call. Something like kvm_arm_get_fw_reg().
+>> Do you mean we add only one co-processor to list all SMC/HVC calls kernel will handle?
+> Yes, some way of listing them.
+> e.g. user-space wants to handle HVC's with #imm==0 and w0==0x84000000, this co-processor
+> would list that as one of the things that the kernel will handle.
+>
+> If we can find a way of describing 64bit register values that would save them from being a
+> problem in the future, but it may be too complicated to describe a 64bit register space
+> and 16 bits of immediate.
+>
+> I think its okay for this co-processor to be SMC-CC specific, as its describing what the
+> kernel supports. The KVM-api in contrast should be flexible enough to describe anything
+> any guest may wish to do.
+>
+>
+>> So
+>> the reg size should be large enough to hold the list, each entry of which contains a #imm
+>> and r0/x0 pair? Is the reg size fixed by definition or it can be queried by user-space? If
+>> it is fixed, what's the size should we choose?
+> (fixed/not-fixed - its a trade-off for complexity now, but no-one may ever use the full
+> flexibility).
+>
+> I think we can assume the kernel will only offer things that look like SMC-CC to the
+> guest. If the guest does something outside this space, its up to user-space to handle. (so
+> the KVM-API must support non-SMC-CC stuff). I think we should define a co-processor for
+> SMC/HVC where the #imm is 0. This then gives us 32bits of space we can map directly onto
+> the w0 values.
+Shall we setup a new class of co-processor and use the following id bit 
+patterns (assuming the type index to be 0x0016)?
 
-I want to keep it the way it is to have the fields in the SCB
-declaration explicit.
+0x6030 <high 16 bits of SMC-CC function ID> 0016 <low 16 bits of SMC-CC 
+function ID>
 
-Thanks,
-Michael
+And the value of the co-processor returned to user space can be 0 (KVM 
+will not handle) or 1 (KVM will handle)?
+
+>
+>
+>> Does it make sense to extend the entry to hold the function ID base and limit, so that it
+>> can describe the whole range for each function group, like PSCI, SDEI, etc?
+> This may be over-complex, user-space would always need to enumerate the whole thing. I
+> think commonly user-space would only want to know about one entry: For cases where we know
+> the structure, user-space can just query the '_VERSION' call. If that isn't supported,
+> user-space can assume the rest of that space is unimplemented. (the kernel shouldn't
+> provide an incomplete emulation of these APIs)
+>
+>
+>>> For 32bit, are we going to export SMC/HVC calls that failed their condition-code checks?
+>> I'm not familiar with 32bit, either we don't have 32bit platforms to test the code. So my
+>> preference is not to make many changes to 32bit...
+> I'm not that familiar with it either ... You don't have anything with aarch32 support at
+> EL1? I don't think we should add an API that only works with Aarch64 guests.
+We have some D05 which is based on cortex A72 and should support aarch32 
+guest. I can take a try.
+
+Our object is to support aarch32 guest on an aarch64 hypervisor, but not 
+on an aarch32 hypervisor, isn't it?
+
+>
+> For 32bit, we either need to expose these condition-code bits, and say user-space should
+> work out if it needs to do anything. Or, handle this in the kernel, in which case we don't
+> need to expose the condition-code bits, but we should document that the kernel will do the
+> check.
+>
+>
+> Nested-virt may cause some 'fun' here. If user-space starts an aarch64 guest at EL2, it
+> may start its own aarch32 guest at EL1. If the aarch32 guest makes an SMC, who handles it?
+> If user-space's aarch64 guest didn't set the traps for SMC, I think this should be
+> delivered to user-space, which may be surprised by the request from an aarch32 guest.
+>
+> (its also possible nested-virt has me confused, it is pretty mind bending!)
+>
+>
+>>> The hypercall structure should probably indicate whether the SMC/HVC call came from
+>>> aarch32 or aarch64, as the behaviour may be different.
+>> How about to use the longmode field in hypercall structure? Standard service calls will
+>> indicate this in function ID, but we may need to know before parsing the function ID,
+>> isn't it?
+> Sure, as its a __u32, we could dump the guest PSTATE from SPSR in there.
+>
+>
+> I think the last thing is 'ret', and whether we should provide a way of passing 'x0' back
+> to the guest, or expect user-space to use set-one-reg. Most of the time user-space will
+> only want to set x0, and doing this would let us initialise it to all-ones in the kernel,
+> which means the guest gets the unknown-smc value back if user-space ignores the exit.
+The current RFC is not expecting user-space to use set-one-reg to set GP 
+registers for returning, to reduce ioctl() invocations for better 
+performance.
+I didn't use "ret" for guest to hold the returned x0, but still used 
+"args[6]" to exchange x0~x5. I agree to set quick path for x0 only, and 
+kvm doesn't bother to set the other 5 GP registers.
+
+Thanks a lot,
+
+Heyi
+
+>
+>
+> Thanks,
+>
+> James
+>
+> .
+>
+
 
