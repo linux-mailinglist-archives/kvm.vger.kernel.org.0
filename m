@@ -2,127 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A1DEEB976
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 23:01:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50A15EBA04
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 23:53:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728579AbfJaWBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 18:01:14 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:14553 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728345AbfJaWBN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 18:01:13 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dbb59aa0000>; Thu, 31 Oct 2019 15:01:14 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Thu, 31 Oct 2019 15:01:08 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Thu, 31 Oct 2019 15:01:08 -0700
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 31 Oct
- 2019 22:01:07 +0000
-Subject: Re: [PATCH 02/19] mm/gup: factor out duplicate code from four
- routines
-To:     Ira Weiny <ira.weiny@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-3-jhubbard@nvidia.com>
- <20191031183549.GC14771@iweiny-DESK2.sc.intel.com>
- <75b557f7-24b2-740c-2640-2f914d131600@nvidia.com>
- <20191031210954.GE14771@iweiny-DESK2.sc.intel.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <5cb84804-be12-82e8-11d8-7e593fd05619@nvidia.com>
-Date:   Thu, 31 Oct 2019 15:01:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728235AbfJaWxs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 18:53:48 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42514 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726540AbfJaWxs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 18:53:48 -0400
+Received: by mail-wr1-f66.google.com with SMTP id a15so7975829wrf.9;
+        Thu, 31 Oct 2019 15:53:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sAzljLRgSt0T4SkgYsaqgvjH5/V1zSYWw1k97qxMfJk=;
+        b=DdnQ2aG41QAJSboenV4wySHF2meXgLSRA649oxBw9RAPNghNJEHSiFM5YwuLI8CfeO
+         df5hfVi+DcA4OKQihRG6s5omuAbGxCR0URTee3j4Jg12CTsH/YdWWd+nh2eUmUXZYFXL
+         CcDRMGPtcCa527wuEKWJ8tCjBX10DrMrAplEzF4N9JEKS0LniqTiIhNfm4KwTjO+FUB+
+         dTi6qDoHGsoHcK+UJY2SyU72bOIWNXelJKWzO+O3toJQGOrHGTWBXGShL1gF2MXio8Xn
+         EcPWDxo/sH4akb07nPs+3Q9KmL/TK6/eZjMMROlvPWUgs3g/cp9L4UQZSL+Co8p5yLMq
+         RcQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=sAzljLRgSt0T4SkgYsaqgvjH5/V1zSYWw1k97qxMfJk=;
+        b=cov24UiiLokjumC/QDmFykp3+YctReUcRoRhE+53gswRffYZBnvqScKwv29rYCUCLj
+         SSM2hReK+l0HcdqDzx4MIAwRxXlz0hagwHdeVcwuw/0+wWgw9uewtQzfvSkWbflVOdCX
+         KDOucDjJOwGaF2fDfn+s2BEJu+JPKD78qPmHIuhusZNuGjuSp3GHbs4V5va8ViZD9dQw
+         aYF/CWao0ueujQzZkm+0Yvgc6MofkGe9XlPqFEOLyQU2x2TaPZAUnATt4KurepaM6m7h
+         2o1uDLuTSXRNnSVt+KaeMdFS/fMnIeDRz0YeFh79NmFowWcYysnzQPvut9NG/OrcU+Cq
+         3kbQ==
+X-Gm-Message-State: APjAAAWcGJLz4nOg/SsQ4Kt8+ui4zVSAOkzPH0f6JkGY6t7kLBWjD3+2
+        DMjCWvf9y+sPsH3xB0qZBAuyTd2OZQo=
+X-Google-Smtp-Source: APXvYqz1p8qVO3J188bjhlrVa1hJ4uYvoW5VQM0J2M2QgJVLMiEUUEHEjKw1yL5l5r9CQzgCBegF9A==
+X-Received: by 2002:a5d:6448:: with SMTP id d8mr5306172wrw.88.1572562425910;
+        Thu, 31 Oct 2019 15:53:45 -0700 (PDT)
+Received: from donizetti.redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
+        by smtp.gmail.com with ESMTPSA id l4sm4673235wml.33.2019.10.31.15.53.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2019 15:53:44 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@kernel.org,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM patches for Linux 5.4-rc6
+Date:   Thu, 31 Oct 2019 23:53:47 +0100
+Message-Id: <20191031225347.26587-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191031210954.GE14771@iweiny-DESK2.sc.intel.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572559274; bh=St3Rf/REgq/1do28NhYtGJF/+ie61nX3HJRKUe+Kv+8=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ikqeCXUqsTwoQB5CbB+62UgGOxuiKLZDrBsuVMEaD9IjjDxXb09OkVp8xOPRF5wct
-         ee5DhXFx3ncNZEuTcZeSOQivxIJokuWUNeY+2vtv3ZOkk1HWJjkj1h2EH0AXlwb+WX
-         k+12VWYeIpYnIAMc/9Jx/3qdPSGK+huRjsgTXXwezXTbb/FzDozYDlQdAsy+QX8f3z
-         guPaB2LcynNr/sr3xHEr7wV68E214NkgY5BRukBI2Kt+YqGU/HP5jxWqLsbWsS/eGt
-         xEDw4hf53LcGHOIM9YJEHjAqS/wG8o7OePI2ydIId+OliMRlMyINElUiwkTZonGlbb
-         If9KlbJQJnB+Q==
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/31/19 2:09 PM, Ira Weiny wrote:
-> On Thu, Oct 31, 2019 at 11:43:37AM -0700, John Hubbard wrote:
->> On 10/31/19 11:35 AM, Ira Weiny wrote:
->>> On Wed, Oct 30, 2019 at 03:49:13PM -0700, John Hubbard wrote:
->> ...
->>>> +
->>>> +static int __huge_pt_done(struct page *head, int nr_recorded_pages, int *nr)
->>>> +{
->>>> +	*nr += nr_recorded_pages;
->>>> +	SetPageReferenced(head);
->>>> +	return 1;
->>>
->>> When will this return anything but 1?
->>>
->>
->> Never, but it saves a line at all four call sites, by having it return like that.
->>
->> I could see how maybe people would prefer to just have it be a void function,
->> and return 1 directly at the call sites. Since this was a lower line count I
->> thought maybe it would be slightly better, but it's hard to say really.
-> 
-> It is a NIT perhaps but I feel like the signature of a function should stand on
-> it's own.  What this does is mix the meaning of this function with those
-> calling it.  Which IMO is not good style.
-> 
-> We can see what others say.
-> 
+Linus,
 
-Sure. I'll plan on changing it to a void return type, then, unless someone else
-pipes up.
+The following changes since commit 671ddc700fd08b94967b1e2a937020e30c838609:
 
+  KVM: nVMX: Don't leak L1 MMIO regions to L2 (2019-10-22 19:04:40 +0200)
 
-thanks,
+are available in the Git repository at:
 
-John Hubbard
-NVIDIA
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 9167ab79936206118cc60e47dcb926c3489f3bd5:
+
+  KVM: vmx, svm: always run with EFER.NXE=1 when shadow paging is active (2019-10-31 12:13:44 +0100)
+
+----------------------------------------------------------------
+Generic: fix memory leak failure to create VM.
+x86: fix MMU corner case with AMD nested paging disabled.
+
+----------------------------------------------------------------
+Jim Mattson (2):
+      kvm: Allocate memslots and buses before calling kvm_arch_init_vm
+      kvm: call kvm_arch_destroy_vm if vm creation fails
+
+Paolo Bonzini (1):
+      KVM: vmx, svm: always run with EFER.NXE=1 when shadow paging is active
+
+ arch/x86/kvm/svm.c     | 10 ++++++++--
+ arch/x86/kvm/vmx/vmx.c | 14 +++-----------
+ virt/kvm/kvm_main.c    | 48 ++++++++++++++++++++++++++----------------------
+ 3 files changed, 37 insertions(+), 35 deletions(-)
