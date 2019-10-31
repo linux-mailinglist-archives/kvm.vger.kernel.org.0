@@ -2,117 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A8C1EB629
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 18:30:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74A5DEB6C7
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 19:18:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728561AbfJaRam (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 13:30:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35557 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728742AbfJaRal (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 31 Oct 2019 13:30:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572543040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UGSSoPW9SbtoPw1zyBmx41eOb8KWOrUeRgITIL6IQKY=;
-        b=hUqW6xJu+tYQPlpEe2L+G5itmkXtIn8CE9K5MC7zJei46S6UwtgvoM5t56oMoN56HfosDr
-        VghQqG0CGaVKYuF7Y9PvWX3UVhgE8antUG3CAju4IHh6HNx5bh1jzj2v1jRgV9/bCImVIV
-        eR4u17rFOhaVtPw0qTQw4/yvErkz8Ck=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-GHoi6ENEO_Gu0KdCE_Y4Cw-1; Thu, 31 Oct 2019 13:30:36 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61324800C80;
-        Thu, 31 Oct 2019 17:30:35 +0000 (UTC)
-Received: from [10.36.116.51] (ovpn-116-51.ams2.redhat.com [10.36.116.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9928F19C7F;
-        Thu, 31 Oct 2019 17:30:31 +0000 (UTC)
-Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        cohuck@redhat.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-10-frankja@linux.ibm.com>
- <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
- <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
-Date:   Thu, 31 Oct 2019 18:30:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1729268AbfJaSSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 14:18:49 -0400
+Received: from mga02.intel.com ([134.134.136.20]:23109 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729027AbfJaSSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 14:18:48 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Oct 2019 11:18:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,252,1569308400"; 
+   d="scan'208";a="375329849"
+Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
+  by orsmga005.jf.intel.com with ESMTP; 31 Oct 2019 11:18:45 -0700
+Date:   Thu, 31 Oct 2019 11:18:44 -0700
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH 01/19] mm/gup: pass flags arg to __gup_device_* functions
+Message-ID: <20191031181844.GB14771@iweiny-DESK2.sc.intel.com>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-2-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: GHoi6ENEO_Gu0KdCE_Y4Cw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191030224930.3990755-2-jhubbard@nvidia.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31.10.19 16:41, Christian Borntraeger wrote:
->=20
->=20
-> On 25.10.19 10:49, David Hildenbrand wrote:
->> On 24.10.19 13:40, Janosch Frank wrote:
->>> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>>
->>> Pin the guest pages when they are first accessed, instead of all at
->>> the same time when starting the guest.
->>
->> Please explain why you do stuff. Why do we have to pin the hole guest me=
-mory? Why can't we mlock() the hole memory to avoid swapping in user space?
->=20
-> Basically we pin the guest for the same reason as AMD did it for their SE=
-V. It is hard
+On Wed, Oct 30, 2019 at 03:49:12PM -0700, John Hubbard wrote:
+> A subsequent patch requires access to gup flags, so
+> pass the flags argument through to the __gup_device_*
+> functions.
+> 
+> Also placate checkpatch.pl by shortening a nearby line.
+> 
 
-Pinning all guest memory is very ugly. What you want is "don't page",=20
-what you get is unmovable pages all over the place. I was hoping that=20
-you could get around this by having an automatic back-and-forth=20
-conversion in place (due to the special new exceptions).
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-> to synchronize page import/export with the I/O for paging. For example yo=
-u can actually
-> fault in a page that is currently under paging I/O. What do you do? impor=
-t (so that the
-> guest can run) or export (so that the I/O will work). As this turned out =
-to be harder then
-> we though we decided to defer paging to a later point in time.
-
-I don't quite see the issue yet. If you page out, the page will=20
-automatically (on access) be converted to !secure/encrypted memory. If=20
-the UV/guest wants to access it, it will be automatically converted to=20
-secure/unencrypted memory. If you have concurrent access, it will be=20
-converted back and forth until one party is done.
-
-A proper automatic conversion should make this work. What am I missing?
-
->=20
-> As we do not want to rely on the userspace to do the mlock this is now do=
-ne in the kernel.
-
-I wonder if we could come up with an alternative (similar to how we=20
-override VM_MERGEABLE in the kernel) that can be called and ensured in=20
-the kernel. E.g., marking whole VMAs as "don't page" (I remember=20
-something like "special VMAs" like used for VDSOs that achieve exactly=20
-that, but I am absolutely no expert on that). That would be much nicer=20
-than pinning all pages and remembering what you pinned in huge page=20
-arrays ...
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  mm/gup.c | 28 ++++++++++++++++++----------
+>  1 file changed, 18 insertions(+), 10 deletions(-)
+> 
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 8f236a335ae9..85caf76b3012 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -1890,7 +1890,8 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+>  
+>  #if defined(CONFIG_ARCH_HAS_PTE_DEVMAP) && defined(CONFIG_TRANSPARENT_HUGEPAGE)
+>  static int __gup_device_huge(unsigned long pfn, unsigned long addr,
+> -		unsigned long end, struct page **pages, int *nr)
+> +			     unsigned long end, unsigned int flags,
+> +			     struct page **pages, int *nr)
+>  {
+>  	int nr_start = *nr;
+>  	struct dev_pagemap *pgmap = NULL;
+> @@ -1916,13 +1917,14 @@ static int __gup_device_huge(unsigned long pfn, unsigned long addr,
+>  }
+>  
+>  static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> -		unsigned long end, struct page **pages, int *nr)
+> +				 unsigned long end, unsigned int flags,
+> +				 struct page **pages, int *nr)
+>  {
+>  	unsigned long fault_pfn;
+>  	int nr_start = *nr;
+>  
+>  	fault_pfn = pmd_pfn(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
+> -	if (!__gup_device_huge(fault_pfn, addr, end, pages, nr))
+> +	if (!__gup_device_huge(fault_pfn, addr, end, flags, pages, nr))
+>  		return 0;
+>  
+>  	if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
+> @@ -1933,13 +1935,14 @@ static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>  }
+>  
+>  static int __gup_device_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
+> -		unsigned long end, struct page **pages, int *nr)
+> +				 unsigned long end, unsigned int flags,
+> +				 struct page **pages, int *nr)
+>  {
+>  	unsigned long fault_pfn;
+>  	int nr_start = *nr;
+>  
+>  	fault_pfn = pud_pfn(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
+> -	if (!__gup_device_huge(fault_pfn, addr, end, pages, nr))
+> +	if (!__gup_device_huge(fault_pfn, addr, end, flags, pages, nr))
+>  		return 0;
+>  
+>  	if (unlikely(pud_val(orig) != pud_val(*pudp))) {
+> @@ -1950,14 +1953,16 @@ static int __gup_device_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
+>  }
+>  #else
+>  static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+> -		unsigned long end, struct page **pages, int *nr)
+> +				 unsigned long end, unsigned int flags,
+> +				 struct page **pages, int *nr)
+>  {
+>  	BUILD_BUG();
+>  	return 0;
+>  }
+>  
+>  static int __gup_device_huge_pud(pud_t pud, pud_t *pudp, unsigned long addr,
+> -		unsigned long end, struct page **pages, int *nr)
+> +				 unsigned long end, unsigned int flags,
+> +				 struct page **pages, int *nr)
+>  {
+>  	BUILD_BUG();
+>  	return 0;
+> @@ -2062,7 +2067,8 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>  	if (pmd_devmap(orig)) {
+>  		if (unlikely(flags & FOLL_LONGTERM))
+>  			return 0;
+> -		return __gup_device_huge_pmd(orig, pmdp, addr, end, pages, nr);
+> +		return __gup_device_huge_pmd(orig, pmdp, addr, end, flags,
+> +					     pages, nr);
+>  	}
+>  
+>  	refs = 0;
+> @@ -2092,7 +2098,8 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
+>  }
+>  
+>  static int gup_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
+> -		unsigned long end, unsigned int flags, struct page **pages, int *nr)
+> +			unsigned long end, unsigned int flags,
+> +			struct page **pages, int *nr)
+>  {
+>  	struct page *head, *page;
+>  	int refs;
+> @@ -2103,7 +2110,8 @@ static int gup_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
+>  	if (pud_devmap(orig)) {
+>  		if (unlikely(flags & FOLL_LONGTERM))
+>  			return 0;
+> -		return __gup_device_huge_pud(orig, pudp, addr, end, pages, nr);
+> +		return __gup_device_huge_pud(orig, pudp, addr, end, flags,
+> +					     pages, nr);
+>  	}
+>  
+>  	refs = 0;
+> -- 
+> 2.23.0
+> 
