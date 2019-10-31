@@ -2,104 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9441EA9E1
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 05:21:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38E07EA9EB
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 05:34:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbfJaEVR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 31 Oct 2019 00:21:17 -0400
-Received: from mga07.intel.com ([134.134.136.100]:19141 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725816AbfJaEVR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 00:21:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2019 21:21:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,250,1569308400"; 
-   d="scan'208";a="204086732"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by orsmga006.jf.intel.com with ESMTP; 30 Oct 2019 21:21:15 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 30 Oct 2019 21:21:10 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 30 Oct 2019 21:21:09 -0700
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 30 Oct 2019 21:21:09 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.63]) with mapi id 14.03.0439.000;
- Thu, 31 Oct 2019 12:21:08 +0800
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S1726370AbfJaEeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 00:34:02 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22174 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725816AbfJaEeC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 31 Oct 2019 00:34:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572496441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j5qcyVpwDqk90mJ8Py1Gxg6f818uFbFkJ4UO0Lw3UAI=;
+        b=E0k70NUcfUYOAQJlJxUhLGopP5L/VVCfIe1wsnO/d4qhBcb2T99JXOIqc1JI+3VcVOPEQL
+        UlVZKMGk0us160ez2vpd0tkO57fV/FCbJGQDJViSrOu5Zqs+nUJccuFULdQSiMHo8XQ8/y
+        u1nY3ZcvA7UwQNiUNb/uUQ55C0lU38g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-pwcln2pkOUya02HzONlt1Q-1; Thu, 31 Oct 2019 00:33:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22B688017E0;
+        Thu, 31 Oct 2019 04:33:56 +0000 (UTC)
+Received: from [10.72.12.100] (ovpn-12-100.pek2.redhat.com [10.72.12.100])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B8616600CD;
+        Thu, 31 Oct 2019 04:33:23 +0000 (UTC)
+Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to
+ VM
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "acme@kernel.org" <acme@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "jolsa@redhat.com" <jolsa@redhat.com>,
-        "namhyung@kernel.org" <namhyung@kernel.org>
-Subject: RE: [PATCH v1 7/8] KVM: x86: Expose PEBS feature to guest
-Thread-Topic: [PATCH v1 7/8] KVM: x86: Expose PEBS feature to guest
-Thread-Index: AQHVjLd7lPe74bngJEyQFMJJsvDDF6dxNRGAgAFBajD///ljAIABnNRg
-Date:   Thu, 31 Oct 2019 04:21:08 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E1738361DB@SHSMSX104.ccr.corp.intel.com>
-References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-8-git-send-email-luwei.kang@intel.com>
- <20191029150531.GN4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E173835B45@SHSMSX104.ccr.corp.intel.com>
- <20191030095214.GT4097@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191030095214.GT4097@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzk5YzY4YjktNzUwZi00N2EwLThkMzEtYzhhMTE2ZmQ3MTM0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSXloeDFuM3JwOVdoaXBsWEJZcEQyOVN5UnhCblN1UDk5ODlUT2hoR2poRWdpNXE1clFseStRdGwzWk1IQ1VGOCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+Cc:     "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
+Date:   Thu, 31 Oct 2019 12:33:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: pwcln2pkOUya02HzONlt1Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > Expose PEBS feature to guest by IA32_MISC_ENABLE[bit12].
-> > > > IA32_MISC_ENABLE[bit12] is Processor Event Based Sampling (PEBS)
-> > > > Unavailable (RO) flag:
-> > > > 1 = PEBS is not supported; 0 = PEBS is supported.
-> > >
-> > > Why does it make sense to expose this on SVM?
-> >
-> > Thanks for the review. This patch won't expose the pebs feature to SVM and return not supported.
-> 
-> AFAICT it exposes/emulates an Intel MSR on AMD, which is just weird.
 
-I checked with the "AMD64 Architecture Programmer's Manual" and didn't found this register (IA32_MISC_ENABLE).
-Will move this register to vmx.c in next version.
+On 2019/10/25 =E4=B8=8B=E5=8D=886:12, Tian, Kevin wrote:
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Friday, October 25, 2019 5:49 PM
+>>
+>>
+>> On 2019/10/24 =E4=B8=8B=E5=8D=888:34, Liu Yi L wrote:
+>>> Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on Int=
+el
+>>> platforms allow address space sharing between device DMA and
+>> applications.
+>>
+>>
+>> Interesting, so the below figure demonstrates the case of VM. I wonder
+>> how much differences if we compare it with doing SVM between device
+>> and
+>> an ordinary process (e.g dpdk)?
+>>
+>> Thanks
+> One difference is that ordinary process requires only stage-1 translation=
+,
+> while VM requires nested translation.
 
-Thanks,
-Luwei Kang
+
+A silly question, then I believe there's no need for VFIO DMA API in=20
+this case consider the page table is shared between MMU and IOMMU?
+
+Thanks
+
+>
 
