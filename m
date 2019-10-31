@@ -2,130 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ECEEEAE7C
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 12:10:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C81BEAE87
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 12:14:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbfJaLKW convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 31 Oct 2019 07:10:22 -0400
-Received: from mga06.intel.com ([134.134.136.31]:12603 "EHLO mga06.intel.com"
+        id S1727286AbfJaLOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 07:14:15 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:48755 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727277AbfJaLKV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 07:10:21 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Oct 2019 04:10:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,250,1569308400"; 
-   d="scan'208";a="400460813"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
-  by fmsmga005.fm.intel.com with ESMTP; 31 Oct 2019 04:10:20 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 31 Oct 2019 04:10:20 -0700
-Received: from fmsmsx607.amr.corp.intel.com (10.18.126.87) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 31 Oct 2019 04:10:20 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- fmsmsx607.amr.corp.intel.com (10.18.126.87) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 31 Oct 2019 04:10:19 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.2]) with mapi id 14.03.0439.000;
- Thu, 31 Oct 2019 19:10:18 +0800
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "acme@kernel.org" <acme@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "jolsa@redhat.com" <jolsa@redhat.com>,
-        "namhyung@kernel.org" <namhyung@kernel.org>
-Subject: RE: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Topic: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Index: AQHVjLd13+lWyOpx00qD/bA0eE059qdxL6sAgAEppjCAABXXgIACK7fw
-Date:   Thu, 31 Oct 2019 11:10:18 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E17383642D@SHSMSX104.ccr.corp.intel.com>
-References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-4-git-send-email-luwei.kang@intel.com>
- <20191029144612.GK4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com>
- <20191030094941.GQ4097@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191030094941.GQ4097@hirez.programming.kicks-ass.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzE3NjQyYjEtYmE2OS00YjI4LTk2MjUtMmVlZTIwM2Y2M2UzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiR2xDRGN4bHZSakV6S01JcHJMaVJnZFFmcTl3NHRyN0U4UkNOTmoxR0RsXC8rVmJKV1g4WGx0NWVDQTlvT3hFXC9EIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726722AbfJaLOP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 31 Oct 2019 07:14:15 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 473jPv2Vmzz9sPJ; Thu, 31 Oct 2019 22:14:11 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1572520451; bh=YPLeyvpRHfFhn4xyIHHwVnQ9E5S2/47CprDiBRowXkc=;
+        h=Date:From:To:Cc:Subject:From;
+        b=nWkaP5yaFuxj4hVYUWCGMFmI9ATh4mIakiiEHPuzlbkxPMUOWMbqCX3lqH/7mvh+m
+         9ivIfNAiUByM1yyz1fm9LDNjbblApMYx4xCbpGraiq/QQ4Yr2mjjQerVUtteuGUfjd
+         H5bKET4cWLIZ6GJ4twKiLPt0y68rJ2mYyt9xqAHyQxOS/Cz3kXNw8rbj2mc+DtnPm7
+         /RrZidpuX7dw766e3mGNpLh6Ngwu8AKONAspg1Kq+RwzKP2xQ/ISHx3RBuul8ukg1d
+         4rK4cmR5G5KE2wxXPADBKmKmOCSqM7QTqrCVBe8KXBCRWosOQy/+CStWOkSRYTyXSE
+         eWI3dbVBgBD3A==
+Date:   Thu, 31 Oct 2019 12:13:49 +0100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.5-1 tag
+Message-ID: <20191031111349.GA8045@blackberry>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> > > >  				  unsigned config, bool exclude_user,
-> > > >  				  bool exclude_kernel, bool intr,
-> > > > -				  bool in_tx, bool in_tx_cp)
-> > > > +				  bool in_tx, bool in_tx_cp, bool pebs)
-> > > >  {
-> > > >  	struct perf_event *event;
-> > > >  	struct perf_event_attr attr = {
-> > > > @@ -111,9 +111,12 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc,
-> u32 type,
-> > > >  		.exclude_user = exclude_user,
-> > > >  		.exclude_kernel = exclude_kernel,
-> > > >  		.config = config,
-> > > > +		.precise_ip = pebs ? 1 : 0,
-> > > > +		.aux_output = pebs ? 1 : 0,
-> > >
-> > > srsly?
-> >
-> > Hi Peter,
-> >     Thanks for review. For aux_output, I think it should be set 1 when the guest wants to
-> enabled PEBS by Intel PT.
-> >      For precise_ip, it is the precise level in perf and set by perf command line in KVM
-> guest, this may not reflect the accurate value (can be 0~3) here. Here set to 1 is used to
-> allocate a counter for PEBS event and set the MSR_IA32_PEBS_ENABLE register. For
-> PMU virtualization, KVM will trap the guest's write operation to PMU registers and
-> allocate/free event counter from host if a counter enable/disable in guest. We can't
-> always deduce the exact parameter of perf command line from the value of the guest
-> writers to the register.
-> 
-> Please, teach your MUA to wrap on 78 chars.
-> 
-> The thing I really fell over is the gratuitous 'bool ? 1 : 0'. But yes, the aux_output without
-> a group leader is dead wrong. We'll go fix
-> perf_event_create_kernel_counter() to refuse that.
+Paolo or Radim,
 
-Yes, I also think it is a little gratuitous here. But it is a little hard to reconstruct the guest perf parameters from the register value, especially the "precise_ip". Do you have any advice?
-
-About refuse the perf_event_create_kernel_counter() request w/o aux_ouput, I think I need to allocate the PT event as group leader here,  is that right?
+Please do a pull from my kvm-ppc-next-5.5-1 tag to get a PPC KVM
+update for v5.5.
 
 Thanks,
-Luwei Kang
+Paul.
+
+The following changes since commit 12ade69c1eb9958b13374edf5ef742ea20ccffde:
+
+  KVM: PPC: Book3S HV: XIVE: Ensure VP isn't already in use (2019-10-15 16:09:11 +1100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.5-1
+
+for you to fetch changes up to 55d7004299eb917767761f01a208d50afad4f535:
+
+  KVM: PPC: Book3S HV: Reject mflags=2 (LPCR[AIL]=2) ADDR_TRANS_MODE mode (2019-10-22 16:29:02 +1100)
+
+----------------------------------------------------------------
+KVM PPC update for 5.5
+
+* Add capability to tell userspace whether we can single-step the guest.
+
+* Improve the allocation of XIVE virtual processor IDs, to reduce the
+  risk of running out of IDs when running many VMs on POWER9.
+
+* Rewrite interrupt synthesis code to deliver interrupts in virtual
+  mode when appropriate.
+
+* Minor cleanups and improvements.
+
+----------------------------------------------------------------
+Fabiano Rosas (1):
+      KVM: PPC: Report single stepping capability
+
+Greg Kurz (5):
+      KVM: PPC: Book3S HV: XIVE: Set kvm->arch.xive when VPs are allocated
+      KVM: PPC: Book3S HV: XIVE: Show VP id in debugfs
+      KVM: PPC: Book3S HV: XIVE: Compute the VP id in a common helper
+      KVM: PPC: Book3S HV: XIVE: Make VP block size configurable
+      KVM: PPC: Book3S HV: XIVE: Allow userspace to set the # of VPs
+
+Leonardo Bras (2):
+      KVM: PPC: Reduce calls to get current->mm by storing the value locally
+      KVM: PPC: E500: Replace current->mm by kvm->mm
+
+Nicholas Piggin (5):
+      KVM: PPC: Book3S: Define and use SRR1_MSR_BITS
+      KVM: PPC: Book3S: Replace reset_msr mmu op with inject_interrupt arch op
+      KVM: PPC: Book3S HV: Reuse kvmppc_inject_interrupt for async guest delivery
+      KVM: PPC: Book3S HV: Implement LPCR[AIL]=3 mode for injected interrupts
+      KVM: PPC: Book3S HV: Reject mflags=2 (LPCR[AIL]=2) ADDR_TRANS_MODE mode
+
+ Documentation/virt/kvm/api.txt          |   3 +
+ Documentation/virt/kvm/devices/xics.txt |  14 +++-
+ Documentation/virt/kvm/devices/xive.txt |   8 ++
+ arch/powerpc/include/asm/kvm_host.h     |   1 -
+ arch/powerpc/include/asm/kvm_ppc.h      |   1 +
+ arch/powerpc/include/asm/reg.h          |  12 +++
+ arch/powerpc/include/uapi/asm/kvm.h     |   3 +
+ arch/powerpc/kvm/book3s.c               |  27 +------
+ arch/powerpc/kvm/book3s.h               |   3 +
+ arch/powerpc/kvm/book3s_32_mmu.c        |   6 --
+ arch/powerpc/kvm/book3s_64_mmu.c        |  15 ----
+ arch/powerpc/kvm/book3s_64_mmu_hv.c     |  24 ++----
+ arch/powerpc/kvm/book3s_hv.c            |  28 ++-----
+ arch/powerpc/kvm/book3s_hv_builtin.c    |  82 ++++++++++++++++----
+ arch/powerpc/kvm/book3s_hv_nested.c     |   2 +-
+ arch/powerpc/kvm/book3s_pr.c            |  40 +++++++++-
+ arch/powerpc/kvm/book3s_xive.c          | 128 +++++++++++++++++++++++++-------
+ arch/powerpc/kvm/book3s_xive.h          |   5 ++
+ arch/powerpc/kvm/book3s_xive_native.c   |  38 ++++------
+ arch/powerpc/kvm/e500_mmu_host.c        |   6 +-
+ arch/powerpc/kvm/powerpc.c              |   2 +
+ include/uapi/linux/kvm.h                |   1 +
+ 22 files changed, 288 insertions(+), 161 deletions(-)
