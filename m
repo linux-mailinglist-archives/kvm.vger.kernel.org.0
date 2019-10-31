@@ -2,228 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83C7CEB0D4
-	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 14:07:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7EA2EB127
+	for <lists+kvm@lfdr.de>; Thu, 31 Oct 2019 14:26:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbfJaNHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 31 Oct 2019 09:07:38 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5240 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726462AbfJaNHi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 31 Oct 2019 09:07:38 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 1D02563FB0F6D69357FD;
-        Thu, 31 Oct 2019 21:07:35 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Thu, 31 Oct 2019
- 21:07:24 +0800
-Subject: Re: [RFC PATCH 1/2] kvm/arm: add capability to forward hypercall to
- user space
-To:     James Morse <james.morse@arm.com>
-References: <1569338454-26202-1-git-send-email-guoheyi@huawei.com>
- <1569338454-26202-2-git-send-email-guoheyi@huawei.com>
- <e097fb69-1e68-4082-d310-e7666e30b5d6@arm.com>
- <d62b84ac-1a7e-de05-a1c1-c52dfb463462@huawei.com>
- <22aa23e0-cd4e-3692-ee94-e110ace49adb@arm.com>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <qemu-arm@nongnu.org>, <wanghaibin.wang@huawei.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <kvmarm@lists.cs.columbia.edu>
-From:   Guoheyi <guoheyi@huawei.com>
-Message-ID: <4af47d1c-40cc-8440-d834-d721e1c0a758@huawei.com>
-Date:   Thu, 31 Oct 2019 21:07:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1727133AbfJaN0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 31 Oct 2019 09:26:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58934 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726728AbfJaN0a (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 31 Oct 2019 09:26:30 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9VDMQqa125574;
+        Thu, 31 Oct 2019 09:26:29 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyya3ju99-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Oct 2019 09:26:28 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9VDMf5s127056;
+        Thu, 31 Oct 2019 09:26:27 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vyya3ju80-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Oct 2019 09:26:27 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9VDOip8024333;
+        Thu, 31 Oct 2019 13:26:26 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma03dal.us.ibm.com with ESMTP id 2vxwh6b8w8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 31 Oct 2019 13:26:26 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9VDQN7B46072156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Oct 2019 13:26:23 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CD83DAC05E;
+        Thu, 31 Oct 2019 13:26:23 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7018CAC05B;
+        Thu, 31 Oct 2019 13:26:23 +0000 (GMT)
+Received: from [9.60.75.238] (unknown [9.60.75.238])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 31 Oct 2019 13:26:23 +0000 (GMT)
+Subject: Re: [PATCH] s390: vfio-ap: disable IRQ in remove callback results in
+ kernel OOPS
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, jjherne@linux.ibm.com
+References: <1572386946-22566-1-git-send-email-akrowiak@linux.ibm.com>
+ <0565c250-726f-dd99-f933-f91162dc107e@linux.ibm.com>
+ <97cf7863-d6d0-418a-09c1-50d9e84fd855@linux.ibm.com>
+ <2ea83094-46c6-ef92-f39c-579f88979320@linux.ibm.com>
+ <c404a796-dfc3-1da1-46b7-fe26d1be18f9@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <adcd01f1-0b0d-04a7-d784-e734fb82add9@linux.ibm.com>
+Date:   Thu, 31 Oct 2019 09:26:23 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <22aa23e0-cd4e-3692-ee94-e110ace49adb@arm.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
+In-Reply-To: <c404a796-dfc3-1da1-46b7-fe26d1be18f9@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-31_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910310139
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry for the late, for it took some time for me to think it over...
-
-
-On 2019/10/22 0:42, James Morse wrote:
-> Hi Heyi,
->
-> On 09/10/2019 13:33, Guoheyi wrote:
->> On 2019/10/2 1:19, James Morse wrote:
->>> On 24/09/2019 16:20, Heyi Guo wrote:
->>>> As more SMC/HVC usages emerge on arm64 platforms, like SDEI, it makes
->>>> sense for kvm to have the capability of forwarding such calls to user
->>>> space for further emulation.
->>> (what do you mean by further? Doesn't user-space have to do all of it?)
->> For kvm will always handle hvc/smc guest exit for the first step, even if it is only a
->> simple forwarding, I called the user-space processing as "further emulation".
+On 10/30/19 2:02 PM, Pierre Morel wrote:
+> 
+> On 10/30/19 5:51 PM, Tony Krowiak wrote:
+>> On 10/30/19 10:00 AM, Pierre Morel wrote:
+>>>
+>>>
+>>>
+>>> On 10/30/19 8:44 AM, Harald Freudenberger wrote:
+>>>> On 29.10.19 23:09, Tony Krowiak wrote:
+>>>>> From: aekrowia <akrowiak@linux.ibm.com>
+>>>>>
+>>>>> When an AP adapter card is configured off via the SE or the SCLP
+>>>>> Deconfigure Adjunct Processor command and the AP bus subsequently 
+>>>>> detects
+>>>>> that the adapter card is no longer in the AP configuration, the card
+>>>>> device representing the adapter card as well as each of its associated
+>>>>> AP queue devices will be removed by the AP bus. If one or more of the
+>>>>> affected queue devices is bound to the VFIO AP device driver, its 
+>>>>> remove
+>>>>> callback will be invoked for each queue to be removed. The remove 
+>>>>> callback
+>>>>> resets the queue and disables IRQ processing. If interrupt 
+>>>>> processing was
+>>>>> never enabled for the queue, disabling IRQ processing will fail 
+>>>>> resulting
+>>>>> in a kernel OOPS.
+>>>>>
+>>>>> This patch verifies IRQ processing is enabled before attempting to 
+>>>>> disable
+>>>>> interrupts for the queue.
+>>>>>
+>>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>>> Signed-off-by: aekrowia <akrowiak@linux.ibm.com>
+>>>>> ---
+>>>>>   drivers/s390/crypto/vfio_ap_drv.c | 3 ++-
+>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c 
+>>>>> b/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> index be2520cc010b..42d8308fd3a1 100644
+>>>>> --- a/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> @@ -79,7 +79,8 @@ static void vfio_ap_queue_dev_remove(struct 
+>>>>> ap_device *apdev)
+>>>>>       apid = AP_QID_CARD(q->apqn);
+>>>>>       apqi = AP_QID_QUEUE(q->apqn);
+>>>>>       vfio_ap_mdev_reset_queue(apid, apqi, 1);
+>>>>> -    vfio_ap_irq_disable(q);
+>>>>> +    if (q->saved_isc != VFIO_AP_ISC_INVALID)
+>>>>> +        vfio_ap_irq_disable(q);
+>>>>>       kfree(q);
+>>>>>       mutex_unlock(&matrix_dev->lock);
+>>>>>   }
+>>>> Reset of an APQN does also clear IRQ processing. I don't say that the
+>>>> resources associated with IRQ handling for the APQN are also cleared.
+>>>> But when you call PQAP(AQIC) after an PQAP(RAPQ) or PQAP(ZAPQ)
+>>>> it is superfluous. However, there should not appear any kernel OOPS.
+>>>> So can you please give me more details about this kernel oops - maybe
+>>>> I need to add exception handler code to the inline ap_aqic() function.
+>>>>
+>>>> regards, Harald Freudenberger
+>>>>
+>>>
+>>> Hi Tony,
+>>>
+>>> wasn't it already solved by the patch 5c4c2126  from Christian ?
 >>
->>>> We reuse the existing term "hypercall" for SMC/HVC, as well as the
->>>> hypercall structure in kvm_run to exchange arguments and return
->>>> values. The definition on arm64 is as below:
->>>>
->>>> exit_reason: KVM_EXIT_HYPERCALL
->>>>
->>>> Input:
->>>>     nr: the immediate value of SMC/HVC calls; not really used today.
->>>>     args[6]: x0..x5 (This is not fully conform with SMCCC which requires
->>>>              x6 as argument as well, but use space can use GET_ONE_REG
->>>>              ioctl for such rare case).
->>> If this structure isn't right for us, we could define a different one for arm/arm64.
->>> (we did this for kvm_vcpu_events)
->> Do you mean that we can move the hypercall struct definition to arch specific kvm_host.h?
->> For it is in the common kvm_run structure, we'll need to change every kvm supported
->> architectures, including x86, mips, powerpc, s390. Is it acceptable?
-> Ah! Sorry, I'd missed this was in the kvm_run structure. The get-events example doesn't
-> apply here as that was a separate ioctl().
->
->
->>>> Return:
->>>>     args[0..3]: x0..x3 as defined in SMCCC. We need to extract
->>>>                 args[0..3] and write them to x0..x3 when hypercall exit
->>>>                 returns.
->>> Are we saying that KVM_EXIT_HYPERCALL expects to be used with SMC-CC?
->>> (if so, we should state that).
->> Yes I followed SMC-CC when writing this.
->>> I'm not certain we should tie this to SMC-CC.
+>> No, that patch merely sets the 'matrix_mdev' field of the
+>> 'struct vfio_ap_queue' to NULL in the vfio_ap_free_aqic_resources()
+>> function. Also, with the latest master branch which has 5c4c2126
+>> installed, the failure occurs.
+>>
 >>>
->>> If we don't tie it to SMC-CC this selection of in/out registers looks odd, there is
->>> nothing about HVC/SMC that uses these registers, its just the SMC convention.
->> Maybe we don't need to tie it to SMC-CC, and simply load all values in args[6] to GP
->> registers...
->> And then there is either no strong reason to extend hypercall structure for ARM.
->
->>>> Flag hypercall_forward is added to turn on/off hypercall forwarding
->>>> and the default is false. Another flag hypercall_excl_psci is to
->>>> exclude PSCI from forwarding for backward compatible, and it only
->>>> makes sense to check its value when hypercall_forward is enabled.
->>> Calling out PSCI like this is something we shouldn't do. There will be, (are!) other
->>> SMC-CC calls that the kernel provides emulation for, we can't easily add to this list.
->> Yes; I didn't figure out good way to keep compatibility and future extension...
-> I think the best trick is not to interpret the SMC/HVC calls from the guest. The kernel
-> obviously does, but the API shouldn't force us to.
->
->
->>> I think the best way to avoid this, is to say the hypercall mechanism forwards 'unhandled
->>> SMC/HVC' to user-space. Which things the kernel chooses to handle can change.
+>>> Can you send the trace to me please?
+>>
+>> [  266.989476] crw_info : CRW reports slct=0, oflw=0, chn=0, rsc=B, 
+>> anc=0, erc=0, rsid=0
+>> [  266.989617] ------------[ cut here ]------------
+>> [  266.989622] vfio_ap_wait_for_irqclear: tapq rc 03: 0504
+>> [  266.989681] WARNING: CPU: 0 PID: 7 at 
+>> drivers/s390/crypto/vfio_ap_ops.c:101 vfio_ap_irq_disable+0x13c/0x1b0 
+>> [vfio_ap]
+> 
+> 
+> Hi Tony,
+> 
+> This is not a oops this is the warning written in 
+> vfio_ap_wait_for_irqclear() because the AP has been deconfigured.
+
+Yes, I was mistaken about that. I had seen an oops earlier from
+something else in code on which I was working and mistakenly thought
+this was a repeat.
+
+> 
+> Note that, IIUC, this (the warning) does not happen for devices bound to 
+> the vfio_ap driver but not currently assigned to a mediated device.
+
+That is the case in point, but I suspect it will happen whenever
+interrupts are not enabled.
+
+> 
+> I do not think we should avoid sending a warning in this case because 
+> this is not a normal administration good practice to forcefully take an 
+> AP away like this without smoothly removing the device from the mediated 
+> device.
+
+The scenario in which I encountered this was when a queue was bound to
+the vfio_ap driver but not assigned to a mediated device and the queue
+was unbound due to deconfiguration of the adapter from the SE. So, the
+queue was not being forcefully taken away from a mediated device. In
+other words, this was normal administration.
+
+> 
+> Regards,
+> 
+> Pierre
+> 
+> 
+>> [ 266.989682] Modules linked in: xt_CHECKSUM xt_MASQUERADE tun bridge 
+>> stp llc ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack 
+>> ebtable_nat ip6table_nat ip6table_mangle ip6table_raw 
+>> ip6table_security iptable_nat nf_nat iptable_mangle iptable_raw 
+>> iptable_security nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c 
+>> ip_set nfnetlink ebtable_filter ebtables ip6table_filter ip6_tables 
+>> sunrpc ghash_s390 prng aes_s390 des_s390 libdes vfio_ccw sha512_s390 
+>> sha1_s390 eadm_sch zcrypt_cex4 qeth_l2 crc32_vx_s390 dasd_eckd_mod 
+>> sha256_s390 qeth sha_common dasd_mod ccwgroup qdio pkey zcrypt vfio_ap 
+>> kvm
+>> [  266.989704] CPU: 0 PID: 7 Comm: kworker/0:1 Not tainted 5.4.0-rc5 #81
+>> [  266.989705] Hardware name: IBM 2964 NE1 749 (LPAR)
+>> [  266.989710] Workqueue: events_long ap_scan_bus
+>> [  266.989711] Krnl PSW : 0704c00180000000 000003ff8007d89c 
+>> (vfio_ap_irq_disable+0x13c/0x1b0 [vfio_ap])
+>> [  266.989714]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 
+>> CC:0 PM:0 RI:0 EA:3
+>> [  266.989716] Krnl GPRS: 000000000000000a 0000000000000006 
+>> 000000000000002b 0000000000000007
+>> [  266.989717]            0000000000000007 000000007fe06000 
+>> 000003ff00000005 0000000000000000
+>> [  266.989718]            0000000100000504 0000000000000003 
+>> 00000001f9d27e40 000003e00003bb5c
+>> [  266.989719]            00000001fe765d00 0000000000000504 
+>> 000003ff8007d898 000003e00003ba60
+>> [  266.989724] Krnl Code: 000003ff8007d88c: c02000000ce6    larl 
+>> %r2,3ff8007f258
+>>                           000003ff8007d892: c0e5fffff4c7    brasl 
+>> %r14,3ff8007c220
+>>                          #000003ff8007d898: a7f40001        brc 
+>> 15,3ff8007d89a
+>>                          >000003ff8007d89c: a7f4ff9d        brc 
+>> 15,3ff8007d7d6
+>>                           000003ff8007d8a0: a7100100 tmlh    %r1,256
+>>                           000003ff8007d8a4: a784ff99        brc 
+>> 8,3ff8007d7d6
+>>                           000003ff8007d8a8: a7290014 lghi    %r2,20
+>>                           000003ff8007d8ac: c0e5fffff4b0    brasl 
+>> %r14,3ff8007c20c
+>> [  266.989772] Call Trace:
+>> [  266.989777] ([<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+>> [vfio_ap])
+>> [  266.989779]  [<000003ff8007c4d2>] 
+>> vfio_ap_queue_dev_remove+0x6a/0x90 [vfio_ap]
+>> [  266.989782]  [<00000000bf0f24f0>] ap_device_remove+0x50/0x110
+>> [  266.989784]  [<00000000beffbaac>] 
+>> device_release_driver_internal+0x114/0x1f0
+>> [  266.989787]  [<00000000beff9c88>] bus_remove_device+0x108/0x190
+>> [  266.989789]  [<00000000beff5418>] device_del+0x178/0x3a0
+>> [  266.989790]  [<00000000beff5670>] device_unregister+0x30/0x90
+>> [  266.989791]  [<00000000bf0f0f04>] 
+>> __ap_queue_devices_with_id_unregister+0x44/0x50
+>> [  266.989793]  [<00000000beff86ea>] bus_for_each_dev+0x82/0xb0
+>> [  266.989794]  [<00000000bf0f2aba>] ap_scan_bus+0x262/0x878
+>> [  266.989798]  [<00000000beb4785c>] process_one_work+0x1e4/0x410
+>> [  266.989800]  [<00000000beb47ca8>] worker_thread+0x220/0x460
+>> [  266.989802]  [<00000000beb4e99a>] kthread+0x12a/0x160
+>> [  266.989805]  [<00000000bf2d8eb0>] ret_from_fork+0x28/0x2c
+>> [  266.989806]  [<00000000bf2d8eb4>] kernel_thread_starter+0x0/0xc
+>> [  266.989807] Last Breaking-Event-Address:
+>> [  266.989809]  [<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+>> [vfio_ap]
+>> [  266.989810] ---[ end trace 59b4020890dbd391 ]---
+>>
+>>
 >>>
->>> We need a way for user-space to know which SMC/HVC calls the kernel will handle, and will
->>> not forward. A suggestion is to add a co-processor that lists these by #imm and r0/x0
->>> value. User-space can then query any call to find out if it would be exported if the guest
->>> made that call. Something like kvm_arm_get_fw_reg().
->> Do you mean we add only one co-processor to list all SMC/HVC calls kernel will handle?
-> Yes, some way of listing them.
-> e.g. user-space wants to handle HVC's with #imm==0 and w0==0x84000000, this co-processor
-> would list that as one of the things that the kernel will handle.
->
-> If we can find a way of describing 64bit register values that would save them from being a
-> problem in the future, but it may be too complicated to describe a 64bit register space
-> and 16 bits of immediate.
->
-> I think its okay for this co-processor to be SMC-CC specific, as its describing what the
-> kernel supports. The KVM-api in contrast should be flexible enough to describe anything
-> any guest may wish to do.
->
->
->> So
->> the reg size should be large enough to hold the list, each entry of which contains a #imm
->> and r0/x0 pair? Is the reg size fixed by definition or it can be queried by user-space? If
->> it is fixed, what's the size should we choose?
-> (fixed/not-fixed - its a trade-off for complexity now, but no-one may ever use the full
-> flexibility).
->
-> I think we can assume the kernel will only offer things that look like SMC-CC to the
-> guest. If the guest does something outside this space, its up to user-space to handle. (so
-> the KVM-API must support non-SMC-CC stuff). I think we should define a co-processor for
-> SMC/HVC where the #imm is 0. This then gives us 32bits of space we can map directly onto
-> the w0 values.
-Shall we setup a new class of co-processor and use the following id bit 
-patterns (assuming the type index to be 0x0016)?
-
-0x6030 <high 16 bits of SMC-CC function ID> 0016 <low 16 bits of SMC-CC 
-function ID>
-
-And the value of the co-processor returned to user space can be 0 (KVM 
-will not handle) or 1 (KVM will handle)?
-
->
->
->> Does it make sense to extend the entry to hold the function ID base and limit, so that it
->> can describe the whole range for each function group, like PSCI, SDEI, etc?
-> This may be over-complex, user-space would always need to enumerate the whole thing. I
-> think commonly user-space would only want to know about one entry: For cases where we know
-> the structure, user-space can just query the '_VERSION' call. If that isn't supported,
-> user-space can assume the rest of that space is unimplemented. (the kernel shouldn't
-> provide an incomplete emulation of these APIs)
->
->
->>> For 32bit, are we going to export SMC/HVC calls that failed their condition-code checks?
->> I'm not familiar with 32bit, either we don't have 32bit platforms to test the code. So my
->> preference is not to make many changes to 32bit...
-> I'm not that familiar with it either ... You don't have anything with aarch32 support at
-> EL1? I don't think we should add an API that only works with Aarch64 guests.
-We have some D05 which is based on cortex A72 and should support aarch32 
-guest. I can take a try.
-
-Our object is to support aarch32 guest on an aarch64 hypervisor, but not 
-on an aarch32 hypervisor, isn't it?
-
->
-> For 32bit, we either need to expose these condition-code bits, and say user-space should
-> work out if it needs to do anything. Or, handle this in the kernel, in which case we don't
-> need to expose the condition-code bits, but we should document that the kernel will do the
-> check.
->
->
-> Nested-virt may cause some 'fun' here. If user-space starts an aarch64 guest at EL2, it
-> may start its own aarch32 guest at EL1. If the aarch32 guest makes an SMC, who handles it?
-> If user-space's aarch64 guest didn't set the traps for SMC, I think this should be
-> delivered to user-space, which may be surprised by the request from an aarch32 guest.
->
-> (its also possible nested-virt has me confused, it is pretty mind bending!)
->
->
->>> The hypercall structure should probably indicate whether the SMC/HVC call came from
->>> aarch32 or aarch64, as the behaviour may be different.
->> How about to use the longmode field in hypercall structure? Standard service calls will
->> indicate this in function ID, but we may need to know before parsing the function ID,
->> isn't it?
-> Sure, as its a __u32, we could dump the guest PSTATE from SPSR in there.
->
->
-> I think the last thing is 'ret', and whether we should provide a way of passing 'x0' back
-> to the guest, or expect user-space to use set-one-reg. Most of the time user-space will
-> only want to set x0, and doing this would let us initialise it to all-ones in the kernel,
-> which means the guest gets the unknown-smc value back if user-space ignores the exit.
-The current RFC is not expecting user-space to use set-one-reg to set GP 
-registers for returning, to reduce ioctl() invocations for better 
-performance.
-I didn't use "ret" for guest to hold the returned x0, but still used 
-"args[6]" to exchange x0~x5. I agree to set quick path for x0 only, and 
-kvm doesn't bother to set the other 5 GP registers.
-
-Thanks a lot,
-
-Heyi
-
->
->
-> Thanks,
->
-> James
->
-> .
->
-
+>>> Thanks,
+>>>
+>>> Pierre
+>>>
+>>>
+>>>
+>>
 
