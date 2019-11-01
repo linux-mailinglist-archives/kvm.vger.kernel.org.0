@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1210EEC520
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 15:55:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECCA9EC52E
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 15:57:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727867AbfKAOzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 10:55:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33324 "EHLO mx1.redhat.com"
+        id S1727873AbfKAO57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 10:57:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47284 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727334AbfKAOzI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 10:55:08 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        id S1727365AbfKAO56 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 10:57:58 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 28A898553A
-        for <kvm@vger.kernel.org>; Fri,  1 Nov 2019 14:55:08 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id e25so5651775wra.9
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 07:55:08 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id B99D981F01
+        for <kvm@vger.kernel.org>; Fri,  1 Nov 2019 14:57:57 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id f4so5630736wrj.12
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 07:57:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=k15X9zqJVfW3oC0HT7dnDU0xGIS3I2u3p6fKi7ClOn0=;
-        b=dqRd8jMU/qvL2Z+IwQqjvt3a9yjrux4viw5n6wlOgmw/4ztaJvyiXv2nr+a7uAueeG
-         jaW2vZP+yZGDg4WSDkkjGip5oezRAPz7y958g1Lf02KQwngmOoTrO5W1J2XQDlmp9DqY
-         qe4TclpIxy/2GsoIhy4AUSXpRM7AhE+ha2nKGcoDfNzwYX8GM2agOP99hnDnGT7AiDzR
-         397Mwzo0+BcGmV1zbKfZ8UzQz4WYPrZTz4ryywxU6tywVmRstskcInikTmmq+9CNb1ZN
-         2BZHM4dBNyfdwm3QvWzK+FDhQ/2/S+0yiEsId1dXG1zkH1lORLYAO9Q0I0i3giEmSYZs
-         ScFQ==
-X-Gm-Message-State: APjAAAUxXGxoayw+gAEVDWzsS2D8flirZBYgy5TTW3lOEhwifyK1ohTA
-        Hno8vSh/zke1VOfAyNehd4kZsj2ClsopGTI3apNBv2Q7ddvYJkdR2vpA7yGn3iPixHWMnOP8i7l
-        s+WVIVFop59Sw
-X-Received: by 2002:a7b:c747:: with SMTP id w7mr11206531wmk.62.1572620106485;
-        Fri, 01 Nov 2019 07:55:06 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwSAkwj4/WJI+mK4RnP3iTmSlwbqfZTGcpQ6d11+q5qMJ/2ycB4ozpO4qLetVrQ6gMGRzVoeQ==
-X-Received: by 2002:a7b:c747:: with SMTP id w7mr11206506wmk.62.1572620106261;
-        Fri, 01 Nov 2019 07:55:06 -0700 (PDT)
+        bh=mxbhV/T/CvsMOMyGYwlWuXmCgdmHOLkaW1oOJvRLs5U=;
+        b=sBuaJeFVHnC2sY86APNK45QOjvoC2suNlzEsorZSF13jWisySnedIgGYI31u5kuVEV
+         X7ta6Unr0r4KzeyJsg27H2rLeuwY1Z/T7xw6p68pyu1e1ognM0rhPOqJQ8i7cuXFJp9m
+         11aCrQ+rbBm0SixnSuSYAzJCXetN+SpNkdJLX/kUpSETwffFjLm0P+qbGttstu2K6zJZ
+         HNgB4DAvk1J6LwHFbV/usSG0l4um1gs0yBfZZgSqWoSseQpBCGckJYCJrIxfr2GszdAk
+         Rm2kAg3lWmg33g4WDbprzyEvOcEnHaI5cVycQyvrtg1KKbaDv70gOBTBcyLYvWEbDu/H
+         BoCg==
+X-Gm-Message-State: APjAAAUsX+hGXyGl1o7KXgGROCgosi/8bTGgJU77CJySHnR+w1dgQI0q
+        RnoUPAsAsW/fsad3V36HtmJ0Kx3mAfoBhKV+Uf0KP+647EwK0kf0/PkvIbb7AS1yyHSIIoEKDjr
+        5Ui0IH/fILX1p
+X-Received: by 2002:adf:9dca:: with SMTP id q10mr11007747wre.183.1572620276514;
+        Fri, 01 Nov 2019 07:57:56 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy3RPaeRKKYjy99njnTtrRhDleSomhc57v9Y+qUEuftHEy0zp6kpuXrxOSkCRCWs1qec44ivA==
+X-Received: by 2002:adf:9dca:: with SMTP id q10mr11007730wre.183.1572620276332;
+        Fri, 01 Nov 2019 07:57:56 -0700 (PDT)
 Received: from xz-x1.metropole.lan ([91.217.168.176])
-        by smtp.gmail.com with ESMTPSA id l18sm8252323wrn.48.2019.11.01.07.55.04
+        by smtp.gmail.com with ESMTPSA id y1sm7962105wrw.6.2019.11.01.07.57.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2019 07:55:05 -0700 (PDT)
-Date:   Fri, 1 Nov 2019 15:55:03 +0100
+        Fri, 01 Nov 2019 07:57:55 -0700 (PDT)
+Date:   Fri, 1 Nov 2019 15:57:53 +0100
 From:   Peter Xu <peterx@redhat.com>
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
@@ -50,103 +50,131 @@ Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
         kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
         jacob.jun.pan@linux.intel.com, kvm@vger.kernel.org,
         Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v2 08/22] intel_iommu: provide get_iommu_context() callback
-Message-ID: <20191101145503.GB8888@xz-x1.metropole.lan>
+Subject: Re: [RFC v2 03/22] intel_iommu: modify x-scalable-mode to be string
+ option
+Message-ID: <20191101145753.GC8888@xz-x1.metropole.lan>
 References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-9-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-4-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1571920483-3382-9-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1571920483-3382-4-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 08:34:29AM -0400, Liu Yi L wrote:
-> This patch adds get_iommu_context() callback to return an iommu_context
-> Intel VT-d platform.
+On Thu, Oct 24, 2019 at 08:34:24AM -0400, Liu Yi L wrote:
+> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
+> related to scalable mode translation, thus there are multiple combinations.
+> While this vIOMMU implementation wants simplify it for user by providing
+> typical combinations. User could config it by "x-scalable-mode" option. The
+> usage is as below:
+> 
+> "-device intel-iommu,x-scalable-mode=["legacy"|"modern"]"
+> 
+>  - "legacy": gives support for SL page table
+>  - "modern": gives support for FL page table, pasid, virtual command
+>  -  if not configured, means no scalable mode support, if not proper
+>     configured, will throw error
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > Cc: Peter Xu <peterx@redhat.com>
 > Cc: Yi Sun <yi.y.sun@linux.intel.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 > ---
->  hw/i386/intel_iommu.c         | 57 ++++++++++++++++++++++++++++++++++++++-----
->  include/hw/i386/intel_iommu.h | 14 ++++++++++-
->  2 files changed, 64 insertions(+), 7 deletions(-)
+>  hw/i386/intel_iommu.c          | 15 +++++++++++++--
+>  hw/i386/intel_iommu_internal.h |  3 +++
+>  include/hw/i386/intel_iommu.h  |  2 +-
+>  3 files changed, 17 insertions(+), 3 deletions(-)
 > 
 > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 67a7836..e9f8692 100644
+> index 771bed2..4a1a07a 100644
 > --- a/hw/i386/intel_iommu.c
 > +++ b/hw/i386/intel_iommu.c
-> @@ -3288,22 +3288,33 @@ static const MemoryRegionOps vtd_mem_ir_ops = {
->      },
+> @@ -3019,7 +3019,7 @@ static Property vtd_properties[] = {
+>      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+>                        VTD_HOST_ADDRESS_WIDTH),
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+> -    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
+> +    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode),
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+>      DEFINE_PROP_END_OF_LIST(),
 >  };
+> @@ -3581,7 +3581,12 @@ static void vtd_init(IntelIOMMUState *s)
 >  
-> -VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> +static VTDBus *vtd_find_add_bus(IntelIOMMUState *s, PCIBus *bus)
->  {
->      uintptr_t key = (uintptr_t)bus;
-> -    VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
-> -    VTDAddressSpace *vtd_dev_as;
-> -    char name[128];
-> +    VTDBus *vtd_bus;
->  
-> +    vtd_iommu_lock(s);
+>      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+>      if (s->scalable_mode) {
+> -        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        if (!strcmp(s->scalable_mode, "legacy")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        } else if (!strcmp(s->scalable_mode, "modern")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+> +                       | VTD_ECAP_FLTS | VTD_ECAP_PSS;
+> +        }
 
-Why explicitly take the IOMMU lock here?  I mean, it's fine to take
-it, but if so why not take it to cover the whole vtd_find_add_as()?
+Shall we do this string op only once in vtd_decide_config() then keep
+it somewhere?
 
-For now it'll be fine in either way because I believe iommu_lock is
-not really functioning when we're still with BQL here, however if you
-add that explicitly then I don't see why it's not covering that.
+Something like:
 
-> +    vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
->      if (!vtd_bus) {
->          uintptr_t *new_key = g_malloc(sizeof(*new_key));
->          *new_key = (uintptr_t)bus;
->          /* No corresponding free() */
-> -        vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
-> -                            PCI_DEVFN_MAX);
-> +        vtd_bus = g_malloc0(sizeof(VTDBus) + PCI_DEVFN_MAX * \
-> +                    (sizeof(VTDAddressSpace *) + sizeof(VTDIOMMUContext *)));
+  - s->scalable_mode_str to keep the string
+  - s->scalable_mode still as a bool to cache the global enablement
+  - s->scalable_modern as a bool to keep the mode
 
-Should this be as simple as g_malloc0(sizeof(VTDBus) since [1]?
+?
 
-Otherwise the patch looks sane to me.
+These could be used in some MMIO path (I think) and parsing strings
+always could be a bit overkill.
 
->          vtd_bus->bus = bus;
->          g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
 >      }
-> +    vtd_iommu_unlock(s);
-> +    return vtd_bus;
-> +}
-
-[...]
-
->  struct VTDBus {
->      PCIBus* bus;		/* A reference to the bus to provide translation for */
-> -    VTDAddressSpace *dev_as[0];	/* A table of VTDAddressSpace objects indexed by devfn */
-> +    /* A table of VTDAddressSpace objects indexed by devfn */
-> +    VTDAddressSpace *dev_as[PCI_DEVFN_MAX];
-> +    /* A table of VTDIOMMUContext objects indexed by devfn */
-> +    VTDIOMMUContext *dev_ic[PCI_DEVFN_MAX];
-
-[1]
-
->  };
 >  
->  struct VTDIOTLBEntry {
-> @@ -282,5 +293,6 @@ struct IntelIOMMUState {
->   * create a new one if none exists
->   */
->  VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn);
-> +VTDIOMMUContext *vtd_find_add_ic(IntelIOMMUState *s, PCIBus *bus, int devfn);
+>      vtd_reset_caches(s);
+> @@ -3700,6 +3705,12 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+>          return false;
+>      }
 >  
->  #endif
+> +    if (s->scalable_mode &&
+> +        (strcmp(s->scalable_mode, "modern") &&
+> +         strcmp(s->scalable_mode, "legacy"))) {
+> +            error_setg(errp, "Invalid x-scalable-mode config");
+> +    }
+> +
+>      return true;
+>  }
+>  
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index c1235a7..be7b30a 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -190,8 +190,11 @@
+>  #define VTD_ECAP_PT                 (1ULL << 6)
+>  #define VTD_ECAP_MHMV               (15ULL << 20)
+>  #define VTD_ECAP_SRS                (1ULL << 31)
+> +#define VTD_ECAP_PSS                (19ULL << 35)
+> +#define VTD_ECAP_PASID              (1ULL << 40)
+>  #define VTD_ECAP_SMTS               (1ULL << 43)
+>  #define VTD_ECAP_SLTS               (1ULL << 46)
+> +#define VTD_ECAP_FLTS               (1ULL << 47)
+>  
+>  /* CAP_REG */
+>  /* (offset >> 4) << 24 */
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 66b931e..6062588 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -231,7 +231,7 @@ struct IntelIOMMUState {
+>      uint32_t version;
+>  
+>      bool caching_mode;              /* RO - is cap CM enabled? */
+> -    bool scalable_mode;             /* RO - is Scalable Mode supported? */
+> +    char *scalable_mode;            /* RO - Scalable Mode model */
+>  
+>      dma_addr_t root;                /* Current root table pointer */
+>      bool root_scalable;             /* Type of root table (scalable or not) */
 > -- 
 > 2.7.4
 > 
