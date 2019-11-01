@@ -2,471 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E59B6EC948
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 20:55:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AEF7EC954
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 21:04:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727437AbfKATzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 15:55:19 -0400
-Received: from mail-eopbgr50063.outbound.protection.outlook.com ([40.107.5.63]:46337
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        id S1727555AbfKAUEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 16:04:20 -0400
+Received: from mail-eopbgr790041.outbound.protection.outlook.com ([40.107.79.41]:36055
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726477AbfKATzS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 15:55:18 -0400
+        id S1726709AbfKAUEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 16:04:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bFMorDuJeF0BjXmCiXsnNGQkq/+Q9n35U6eZUteEcuR35czKu2N6LW6TnbXl386n7bXFUJngUEoI2Ckk0wxt5o7T7IPo2iqWtg0yVqghAPaFxDO6C4F0WWhDRQz9+rNvAcUQZYHgY+BI7cOCPCmqEynM30OShMHNxnC1zWAfWjqX8Y87wWw0ekTfEsYepW7ZRUt3dsYNf+5KxJ1RLe7PMX8mNF0Oj1BK2cF+ombdwNgKy0p73ZEIQC24xoaJUhG4gloR4mNbrvSAIb1zZ2TYB0VbBbXBzjnBRsaG27F1omwkC+A9yf2XAlRVIdpAY6PNGICVVIxxA/IT/n9eRc0Idw==
+ b=guGQyvQwphYG7fyi1B7aeh6jM7Yp9xQZDOoja5nWqplM1ZgkcxYvz/mCQnizX/DUAUVPHSt2qKB9GVcmohEvxBlQY+5qFOluf2LYoNiwMpERqRx3wfLfNXMambCH8vIz/ViJUEcqRxtAgP+1gRLamWiObhp0UOFgk0kPvRO8+ATZSp4aRQh1zjKsgXXSQ3udrA+boIuv7WaoyZ/jSaI5pwT5fB2RtMcl3v7M3SP4fzxNraDslPS0S5XUBo8AaSUVSIpG+5WJLKigeXB6q9TbqAzmSZUkCe7dNnS8FHcm4454sm6AWdN5drJTuGt6cDnKbL1HWEqyLs/eX8Eugk5RlA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aB3DTF5kN4EM4BulyxImLm/PczaCHSttekXKc8J1TP4=;
- b=Ps5prY6fU60yOKhcrTU+XiNn7JAtdh+KbyvIVeiv+WqWhdpXM/pmR1DNTSos9SAkXiCdC9gpLa0YjeA7PGWaJN++AytgJeMnroBRFa0ToIvGEC2MvsZhu3VhLxeQXS5tacFOz+iz5pVHAAW//gPPLtQBsljl4EwodXEQ0sOvcYYOe0rPz3vGsAv0jZ/VymY3MBwDuRbdkmcXeToS5Qf2w7NUygJjfJjJ6ngaX5ND3V766SN1T1CwU+K43U2az9sI0qtjA2v+YFEbmatolZIY55ko8O3bj6Udcpel82zCr4dljMucP0EpwEU7Wj+HsYrSaSU0KP85CLWx+usJwWqwug==
+ bh=y8wDkdP/KDt9U856s3zw4MYP+UYCRzLgJZbrMfhF7D4=;
+ b=VSfONP24rra1G310Cl6O4wns5xLVe76RN542XME1Xm0PT0fUjZhFnQabDHrUjOsJTxcowK6KdgD8zi03ll2+VdrYG18L9Y8GOkhsbtFH6KsgZXR/WNlXeMm0Xe5QTtcaMhlCFsgvYDyoQnOdQYlIV+JAbzOerup7DddfBqlv6TWAtOArpKeLn/gUslHtLVoiMluSxVis9adlWDSX6knsy8i2FeHqc6bAOdJ+/rNjmOcX4Y2LZaVkgBq1eoy70VQgs+D+v9UNJy7f5PdGElj8ViUTa83gmuLuxInRKqsRyXk15lhK5Pn+MKi0u/sqQX4fti3jP+qj9bhq0XGVTuzFow==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aB3DTF5kN4EM4BulyxImLm/PczaCHSttekXKc8J1TP4=;
- b=hrFsLAgcc9YPb9mYormx5l0cKSRUsJxUfGTmmYyPz1WtEpp8ZK91OESVvIesKgyFTgqoTv0AQDIIo4etiLQmLBC9yPCoSIJL6cqz/e3FDL6DzNFQLapBJ3TXYcSowc5lULhNEuJ2U771sDXTeAyUPeElCKILBaAG1+xMoiFCga8=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6547.eurprd05.prod.outlook.com (20.179.33.144) with Microsoft SMTP
+ bh=y8wDkdP/KDt9U856s3zw4MYP+UYCRzLgJZbrMfhF7D4=;
+ b=Zw8AvEe/LhempXsr5Vry9ZUxxJ7MvgbvKiIMIzLDQvpp+Wq5JGmxuQ0mMjV77IOZhc/OZYmLttcUlMCJPvqXC/ihEAh8yVSEQ7xadVrp9yi8Bj2kTkiICezgNZ02xAquzAMn6KoEmpCCtr8zgQVWcwR1+EOSzhJ+fCs3TgXRzgs=
+Received: from BL0PR12MB2468.namprd12.prod.outlook.com (52.132.30.157) by
+ BL0PR12MB2371.namprd12.prod.outlook.com (52.132.27.146) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.25; Fri, 1 Nov 2019 19:55:08 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::64b2:6eb4:f000:3432]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::64b2:6eb4:f000:3432%7]) with mapi id 15.20.2387.028; Fri, 1 Nov 2019
- 19:55:07 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ 15.20.2408.24; Fri, 1 Nov 2019 20:04:15 +0000
+Received: from BL0PR12MB2468.namprd12.prod.outlook.com
+ ([fe80::748c:1f32:1a4d:acca]) by BL0PR12MB2468.namprd12.prod.outlook.com
+ ([fe80::748c:1f32:1a4d:acca%7]) with mapi id 15.20.2387.028; Fri, 1 Nov 2019
+ 20:04:15 +0000
+From:   "Moger, Babu" <Babu.Moger@amd.com>
+To:     Andy Lutomirski <luto@kernel.org>
+CC:     Jim Mattson <jmattson@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>
-CC:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        Ido Shamay <idos@mellanox.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>
-Subject: RE: [PATCH V6 1/6] mdev: class id support
-Thread-Topic: [PATCH V6 1/6] mdev: class id support
-Thread-Index: AQHVju2yGvQTvqp5E0i6CNNjQ6wmVad2vnxA
-Date:   Fri, 1 Nov 2019 19:55:07 +0000
-Message-ID: <AM0PR05MB486655EC2CC3EDA9D8C9C8E3D1620@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191030064444.21166-1-jasowang@redhat.com>
- <20191030064444.21166-2-jasowang@redhat.com>
-In-Reply-To: <20191030064444.21166-2-jasowang@redhat.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
+Thread-Topic: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
+Thread-Index: AQHVkNqD+3M/4HqTrkKsDppH5BsZ1qd2otoA//+6a4CAAFUPgIAACwUA
+Date:   Fri, 1 Nov 2019 20:04:15 +0000
+Message-ID: <91a05d64-36c0-c4c4-fe49-83a4db1ade10@amd.com>
+References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com>
+ <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
+ <CALMp9eQT=a99YhraQZ+awMKOWK=3tg=m9NppZnsvK0Q1PWxbAw@mail.gmail.com>
+ <669031a1-b9a6-8a45-9a05-a6ce5fb7fa8b@amd.com>
+ <CALCETrXdo2arN=s9Bt1LmYkPajcBj1NuTPC8dwuw2mMZqT0tRw@mail.gmail.com>
+In-Reply-To: <CALCETrXdo2arN=s9Bt1LmYkPajcBj1NuTPC8dwuw2mMZqT0tRw@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR01CA0008.prod.exchangelabs.com (2603:10b6:805:b6::21)
+ To BL0PR12MB2468.namprd12.prod.outlook.com (2603:10b6:207:44::29)
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
+ smtp.mailfrom=Babu.Moger@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 1e10740a-c974-4194-eabd-08d75f056588
-x-ms-traffictypediagnostic: AM0PR05MB6547:|AM0PR05MB6547:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB65479326219D06C64CF3345ED1620@AM0PR05MB6547.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
+x-ms-office365-filtering-correlation-id: 8b9453c6-95c7-4a62-7d2a-08d75f06abb1
+x-ms-traffictypediagnostic: BL0PR12MB2371:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <BL0PR12MB23716968BB2EF2CB73C4178995620@BL0PR12MB2371.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 020877E0CB
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(366004)(136003)(39860400002)(346002)(396003)(199004)(189003)(13464003)(71190400001)(71200400001)(66556008)(5660300002)(66476007)(64756008)(66446008)(76116006)(86362001)(66946007)(186003)(6506007)(2201001)(2906002)(7696005)(102836004)(6116002)(53546011)(3846002)(110136005)(446003)(305945005)(11346002)(54906003)(81166006)(81156014)(7736002)(8676002)(26005)(486006)(6246003)(478600001)(99286004)(7406005)(7416002)(2501003)(476003)(74316002)(229853002)(6436002)(316002)(66066001)(33656002)(52536014)(256004)(76176011)(14454004)(8936002)(9686003)(30864003)(14444005)(4326008)(55016002)(25786009)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6547;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(346002)(39860400002)(396003)(376002)(54534003)(189003)(199004)(81166006)(81156014)(8676002)(478600001)(229853002)(6436002)(14454004)(6246003)(6486002)(64756008)(25786009)(26005)(54906003)(6306002)(8936002)(99286004)(66946007)(4326008)(66476007)(66556008)(316002)(966005)(386003)(36756003)(6506007)(53546011)(52116002)(102836004)(76176011)(31686004)(71200400001)(186003)(6512007)(66446008)(7736002)(6916009)(66066001)(305945005)(2906002)(86362001)(486006)(256004)(5660300002)(7416002)(3846002)(2616005)(476003)(6116002)(11346002)(446003)(31696002)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:BL0PR12MB2371;H:BL0PR12MB2468.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ley2WbDfJG4Z+yszxUFyvp1CoHBaD0QtNoMmFJSBukU0BkjypSxSHiav9ZwwDm/qPyLzP1exNYx5B+Wv4DiVu5p8ib67zlZw1u2NCmu/cGi/0LyFNWfQ2KxaXSa5ZH9Jr5scsN8dIEYnZhXd8UtKETMv8FY9NfRrpHsj/6ySFhIKkcTcP1RwPVxQJHoFvqJJbSHtPS5MqD0OsdZpm30NM9VuJZLAA4pjNli/gVMrmQ5OENbjL8TQjigEBPrwSewx3JNRlD3FfN9S1n6AmihQkYz6Xvi42zDlAgfLwYhVmT+47mc2ca2uHShGzts5ALggK4rRVOAeZxDz4P01kMyz8DegwHYl6FBzG7zpnAQCsKWtO4OdWp09/wUs3Ov5snGZvPGD8UFq5N4aWMrcxDN74Sb199Sw/BaOOhUH34n9S8lMfXkH854Yn+SjXXDbQpOr
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+x-microsoft-antispam-message-info: dPVkRepFg4Peol5Y2Y4LdWv0wbBC+x8tFQGop6aC8ZnTqtuRoeW3ATIWnIFqFJi00XTeIbIgG6VhYGh7fWPIid/fGQLD4FCM3yRO7Jn9V8WziifvBpaNlPf3YF3tSPgOkuKX+Ru2kG2XiOOA1c1BkMnmXB9CKP2JJY2Nk5HTpuCQC57nQBQj5oeet0IVUkis7MEPxjasnrx6jrwOTB/A2rnRtCLB/I43mp4lUNAYX2b5lOPT/H0cijy2uo5Tj+sQAzuGconzVm0lYxOdwGWhsIB88nJN/YNnu4jxrrV/YgMvtN5w3ZIoJLXsTH7eSJaVXc/GZoW/WS/Hv9am5jA9eld8Tq3cgXb2CW0T6YksTkp62L2cizvXELsJ75AOnwsqocnher8AiVOGu6/shpBK3GQfX6fn25AKvP3x6sWsL7cuPzlLXQikAs6dMuZe/0SyOvs0qjd44RteV5LWgYuM27bTBukkW/LQKApTgcy4CLk=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D207B20A2FC497499AF29652E29CBC24@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e10740a-c974-4194-eabd-08d75f056588
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2019 19:55:07.7222
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b9453c6-95c7-4a62-7d2a-08d75f06abb1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2019 20:04:15.4401
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VXhlroZdhIg86pEbqMVZUdT61jgSmfnEKwMOhEpAymFgp7IdHYrWCibv+PKwZjKAoTaAnGKajjVX7e4LvRemhg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6547
+X-MS-Exchange-CrossTenant-userprincipalname: zoKBIFZfCm/UP3cOo7+7N1B55tZKDw1e7damYTT7+ielzdIerrriW4Ew3szLtdMu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2371
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On Behalf
-> Of Jason Wang
-> Sent: Wednesday, October 30, 2019 1:45 AM
-> To: kvm@vger.kernel.org; linux-s390@vger.kernel.org; linux-
-> kernel@vger.kernel.org; dri-devel@lists.freedesktop.org; intel-
-> gfx@lists.freedesktop.org; intel-gvt-dev@lists.freedesktop.org;
-> kwankhede@nvidia.com; alex.williamson@redhat.com; mst@redhat.com;
-> tiwei.bie@intel.com
-> Cc: virtualization@lists.linux-foundation.org; netdev@vger.kernel.org;
-> cohuck@redhat.com; maxime.coquelin@redhat.com;
-> cunming.liang@intel.com; zhihong.wang@intel.com;
-> rob.miller@broadcom.com; xiao.w.wang@intel.com;
-> haotian.wang@sifive.com; zhenyuw@linux.intel.com; zhi.a.wang@intel.com;
-> jani.nikula@linux.intel.com; joonas.lahtinen@linux.intel.com;
-> rodrigo.vivi@intel.com; airlied@linux.ie; daniel@ffwll.ch;
-> farman@linux.ibm.com; pasic@linux.ibm.com; sebott@linux.ibm.com;
-> oberpar@linux.ibm.com; heiko.carstens@de.ibm.com; gor@linux.ibm.com;
-> borntraeger@de.ibm.com; akrowiak@linux.ibm.com; freude@linux.ibm.com;
-> lingshan.zhu@intel.com; Ido Shamay <idos@mellanox.com>;
-> eperezma@redhat.com; lulu@redhat.com; Parav Pandit
-> <parav@mellanox.com>; christophe.de.dinechin@gmail.com;
-> kevin.tian@intel.com; stefanha@redhat.com; Jason Wang
-> <jasowang@redhat.com>
-> Subject: [PATCH V6 1/6] mdev: class id support
->=20
-> Mdev bus only supports vfio driver right now, so it doesn't implement mat=
-ch
-> method. But in the future, we may add drivers other than vfio, the first =
-driver
-> could be virtio-mdev. This means we need to add device class id support i=
-n bus
-> match method to pair the mdev device and mdev driver correctly.
->=20
-> So this patch adds id_table to mdev_driver and class_id for mdev device w=
-ith
-> the match method for mdev bus.
->=20
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  .../driver-api/vfio-mediated-device.rst       |  5 ++++
->  drivers/gpu/drm/i915/gvt/kvmgt.c              |  1 +
->  drivers/s390/cio/vfio_ccw_ops.c               |  1 +
->  drivers/s390/crypto/vfio_ap_ops.c             |  1 +
->  drivers/vfio/mdev/mdev_core.c                 | 16 ++++++++++++
->  drivers/vfio/mdev/mdev_driver.c               | 25 +++++++++++++++++++
->  drivers/vfio/mdev/mdev_private.h              |  1 +
->  drivers/vfio/mdev/vfio_mdev.c                 |  6 +++++
->  include/linux/mdev.h                          |  8 ++++++
->  include/linux/mod_devicetable.h               |  8 ++++++
->  samples/vfio-mdev/mbochs.c                    |  1 +
->  samples/vfio-mdev/mdpy.c                      |  1 +
->  samples/vfio-mdev/mtty.c                      |  1 +
->  13 files changed, 75 insertions(+)
->=20
-> diff --git a/Documentation/driver-api/vfio-mediated-device.rst
-> b/Documentation/driver-api/vfio-mediated-device.rst
-> index 25eb7d5b834b..6709413bee29 100644
-> --- a/Documentation/driver-api/vfio-mediated-device.rst
-> +++ b/Documentation/driver-api/vfio-mediated-device.rst
-> @@ -102,12 +102,14 @@ structure to represent a mediated device's driver::
->        * @probe: called when new device created
->        * @remove: called when device removed
->        * @driver: device driver structure
-> +      * @id_table: the ids serviced by this driver
->        */
->       struct mdev_driver {
->  	     const char *name;
->  	     int  (*probe)  (struct device *dev);
->  	     void (*remove) (struct device *dev);
->  	     struct device_driver    driver;
-> +	     const struct mdev_class_id *id_table;
->       };
->=20
->  A mediated bus driver for mdev should use this structure in the function=
- calls
-> @@ -170,6 +172,9 @@ that a driver should use to unregister itself with th=
-e
-> mdev core driver::
->=20
->  	extern void mdev_unregister_device(struct device *dev);
->=20
-> +It is also required to specify the class_id in create() callback through=
-::
-> +
-> +	int mdev_set_class(struct mdev_device *mdev, u16 id);
->=20
->  Mediated Device Management Interface Through sysfs
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> index 343d79c1cb7e..6420f0dbd31b 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -678,6 +678,7 @@ static int intel_vgpu_create(struct kobject *kobj, st=
-ruct
-> mdev_device *mdev)
->  		     dev_name(mdev_dev(mdev)));
->  	ret =3D 0;
->=20
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  out:
->  	return ret;
->  }
-> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_=
-ops.c
-> index f0d71ab77c50..cf2c013ae32f 100644
-> --- a/drivers/s390/cio/vfio_ccw_ops.c
-> +++ b/drivers/s390/cio/vfio_ccw_ops.c
-> @@ -129,6 +129,7 @@ static int vfio_ccw_mdev_create(struct kobject *kobj,
-> struct mdev_device *mdev)
->  			   private->sch->schid.ssid,
->  			   private->sch->schid.sch_no);
->=20
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  	return 0;
->  }
->=20
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
-> b/drivers/s390/crypto/vfio_ap_ops.c
-> index 5c0f53c6dde7..07c31070afeb 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -343,6 +343,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj,
-> struct mdev_device *mdev)
->  	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
->  	mutex_unlock(&matrix_dev->lock);
->=20
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  	return 0;
->  }
->=20
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.=
-c
-> index b558d4cfd082..d23ca39e3be6 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -45,6 +45,16 @@ void mdev_set_drvdata(struct mdev_device *mdev, void
-> *data)  }  EXPORT_SYMBOL(mdev_set_drvdata);
->=20
-> +/* Specify the class for the mdev device, this must be called during
-> + * create() callback.
-> + */
-> +void mdev_set_class(struct mdev_device *mdev, u16 id) {
-> +	WARN_ON(mdev->class_id);
-> +	mdev->class_id =3D id;
-> +}
-> +EXPORT_SYMBOL(mdev_set_class);
-> +
->  struct device *mdev_dev(struct mdev_device *mdev)  {
->  	return &mdev->dev;
-> @@ -324,6 +334,12 @@ int mdev_device_create(struct kobject *kobj,
->  	if (ret)
->  		goto ops_create_fail;
->=20
-> +	if (!mdev->class_id) {
-> +		ret =3D -EINVAL;
-> +		dev_warn(dev, "mdev vendor driver failed to specify device
-> class\n");
-> +		goto add_fail;
-> +	}
-> +
->  	ret =3D device_add(&mdev->dev);
->  	if (ret)
->  		goto add_fail;
-> diff --git a/drivers/vfio/mdev/mdev_driver.c
-> b/drivers/vfio/mdev/mdev_driver.c index 0d3223aee20b..ed06433693e8
-> 100644
-> --- a/drivers/vfio/mdev/mdev_driver.c
-> +++ b/drivers/vfio/mdev/mdev_driver.c
-> @@ -69,8 +69,33 @@ static int mdev_remove(struct device *dev)
->  	return 0;
->  }
->=20
-> +static int mdev_match(struct device *dev, struct device_driver *drv) {
-> +	unsigned int i;
-> +	struct mdev_device *mdev =3D to_mdev_device(dev);
-> +	struct mdev_driver *mdrv =3D to_mdev_driver(drv);
-> +	const struct mdev_class_id *ids =3D mdrv->id_table;
-> +
-> +	if (!ids)
-> +		return 0;
-> +
-> +	for (i =3D 0; ids[i].id; i++)
-> +		if (ids[i].id =3D=3D mdev->class_id)
-> +			return 1;
-> +	return 0;
-> +}
-> +
-> +static int mdev_uevent(struct device *dev, struct kobj_uevent_env *env)
-> +{
-> +	struct mdev_device *mdev =3D to_mdev_device(dev);
-> +
-> +	return add_uevent_var(env, "MODALIAS=3Dmdev:c%02X", mdev-
-> >class_id); }
-> +
->  struct bus_type mdev_bus_type =3D {
->  	.name		=3D "mdev",
-> +	.match		=3D mdev_match,
-> +	.uevent		=3D mdev_uevent,
->  	.probe		=3D mdev_probe,
->  	.remove		=3D mdev_remove,
->  };
-> diff --git a/drivers/vfio/mdev/mdev_private.h
-> b/drivers/vfio/mdev/mdev_private.h
-> index 7d922950caaf..c65f436c1869 100644
-> --- a/drivers/vfio/mdev/mdev_private.h
-> +++ b/drivers/vfio/mdev/mdev_private.h
-> @@ -33,6 +33,7 @@ struct mdev_device {
->  	struct kobject *type_kobj;
->  	struct device *iommu_device;
->  	bool active;
-> +	u16 class_id;
->  };
->=20
->  #define to_mdev_device(dev)	container_of(dev, struct mdev_device, dev)
-> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.=
-c
-> index 30964a4e0a28..38431e9ef7f5 100644
-> --- a/drivers/vfio/mdev/vfio_mdev.c
-> +++ b/drivers/vfio/mdev/vfio_mdev.c
-> @@ -120,10 +120,16 @@ static void vfio_mdev_remove(struct device *dev)
->  	vfio_del_group_dev(dev);
->  }
->=20
-> +static const struct mdev_class_id vfio_id_table[] =3D {
-> +	{ MDEV_CLASS_ID_VFIO },
-> +	{ 0 },
-> +};
-> +
->  static struct mdev_driver vfio_mdev_driver =3D {
->  	.name	=3D "vfio_mdev",
->  	.probe	=3D vfio_mdev_probe,
->  	.remove	=3D vfio_mdev_remove,
-> +	.id_table =3D vfio_id_table,
->  };
->=20
->  static int __init vfio_mdev_init(void)
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h index
-> 0ce30ca78db0..78b69d09eb54 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -118,6 +118,7 @@ struct mdev_type_attribute mdev_type_attr_##_name
-> =3D		\
->   * @probe: called when new device created
->   * @remove: called when device removed
->   * @driver: device driver structure
-> + * @id_table: the ids serviced by this driver
->   *
->   **/
->  struct mdev_driver {
-> @@ -125,6 +126,7 @@ struct mdev_driver {
->  	int  (*probe)(struct device *dev);
->  	void (*remove)(struct device *dev);
->  	struct device_driver driver;
-> +	const struct mdev_class_id *id_table;
->  };
->=20
->  #define to_mdev_driver(drv)	container_of(drv, struct mdev_driver, driver=
-)
-> @@ -132,6 +134,7 @@ struct mdev_driver {  void *mdev_get_drvdata(struct
-> mdev_device *mdev);  void mdev_set_drvdata(struct mdev_device *mdev, void
-> *data);  const guid_t *mdev_uuid(struct mdev_device *mdev);
-> +void mdev_set_class(struct mdev_device *mdev, u16 id);
->=20
->  extern struct bus_type mdev_bus_type;
->=20
-> @@ -145,4 +148,9 @@ struct device *mdev_parent_dev(struct mdev_device
-> *mdev);  struct device *mdev_dev(struct mdev_device *mdev);  struct
-> mdev_device *mdev_from_dev(struct device *dev);
->=20
-> +enum {
-> +	MDEV_CLASS_ID_VFIO =3D 1,
-> +	/* New entries must be added here */
-> +};
-> +
->  #endif /* MDEV_H */
-> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_deviceta=
-ble.h
-> index 5714fd35a83c..f32c6e44fb1a 100644
-> --- a/include/linux/mod_devicetable.h
-> +++ b/include/linux/mod_devicetable.h
-> @@ -821,4 +821,12 @@ struct wmi_device_id {
->  	const void *context;
->  };
->=20
-> +/**
-> + * struct mdev_class_id - MDEV device class identifier
-> + * @id: Used to identify a specific class of device, e.g vfio-mdev devic=
-e.
-> + */
-> +struct mdev_class_id {
-> +	__u16 id;
-> +};
-> +
->  #endif /* LINUX_MOD_DEVICETABLE_H */
-> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c inde=
-x
-> ac5c8c17b1ff..115bc5074656 100644
-> --- a/samples/vfio-mdev/mbochs.c
-> +++ b/samples/vfio-mdev/mbochs.c
-> @@ -561,6 +561,7 @@ static int mbochs_create(struct kobject *kobj, struct
-> mdev_device *mdev)
->  	mbochs_reset(mdev);
->=20
->  	mbochs_used_mbytes +=3D type->mbytes;
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  	return 0;
->=20
->  err_mem:
-> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c index
-> cc86bf6566e4..665614574d50 100644
-> --- a/samples/vfio-mdev/mdpy.c
-> +++ b/samples/vfio-mdev/mdpy.c
-> @@ -269,6 +269,7 @@ static int mdpy_create(struct kobject *kobj, struct
-> mdev_device *mdev)
->  	mdpy_reset(mdev);
->=20
->  	mdpy_count++;
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  	return 0;
->  }
->=20
-> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c index
-> ce84a300a4da..90da12ff7fd9 100644
-> --- a/samples/vfio-mdev/mtty.c
-> +++ b/samples/vfio-mdev/mtty.c
-> @@ -755,6 +755,7 @@ static int mtty_create(struct kobject *kobj, struct
-> mdev_device *mdev)
->  	list_add(&mdev_state->next, &mdev_devices_list);
->  	mutex_unlock(&mdev_list_lock);
->=20
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
->  	return 0;
->  }
->=20
-> --
-> 2.19.1
-Reviewed-by: Parav Pandit <parav@mellanox.com>
+DQoNCk9uIDExLzEvMTkgMjoyNCBQTSwgQW5keSBMdXRvbWlyc2tpIHdyb3RlOg0KPiBPbiBGcmks
+IE5vdiAxLCAyMDE5IGF0IDEyOjIwIFBNIE1vZ2VyLCBCYWJ1IDxCYWJ1Lk1vZ2VyQGFtZC5jb20+
+IHdyb3RlOg0KPj4NCj4+DQo+Pg0KPj4gT24gMTEvMS8xOSAxOjI5IFBNLCBKaW0gTWF0dHNvbiB3
+cm90ZToNCj4+PiBPbiBGcmksIE5vdiAxLCAyMDE5IGF0IDEwOjMzIEFNIE1vZ2VyLCBCYWJ1IDxC
+YWJ1Lk1vZ2VyQGFtZC5jb20+IHdyb3RlOg0KPj4+Pg0KPj4+PiBBTUQgMm5kIGdlbmVyYXRpb24g
+RVBZQyBwcm9jZXNzb3JzIHN1cHBvcnQgVU1JUCAoVXNlci1Nb2RlIEluc3RydWN0aW9uDQo+Pj4+
+IFByZXZlbnRpb24pIGZlYXR1cmUuIFRoZSBVTUlQIGZlYXR1cmUgcHJldmVudHMgdGhlIGV4ZWN1
+dGlvbiBvZiBjZXJ0YWluDQo+Pj4+IGluc3RydWN0aW9ucyBpZiB0aGUgQ3VycmVudCBQcml2aWxl
+Z2UgTGV2ZWwgKENQTCkgaXMgZ3JlYXRlciB0aGFuIDAuDQo+Pj4+IElmIGFueSBvZiB0aGVzZSBp
+bnN0cnVjdGlvbnMgYXJlIGV4ZWN1dGVkIHdpdGggQ1BMID4gMCBhbmQgVU1JUA0KPj4+PiBpcyBl
+bmFibGVkLCB0aGVuIGtlcm5lbCByZXBvcnRzIGEgI0dQIGV4Y2VwdGlvbi4NCj4+Pj4NCj4+Pj4g
+VGhlIGlkZWEgaXMgdGFrZW4gZnJvbSBhcnRpY2xlczoNCj4+Pj4gaHR0cHM6Ly9sd24ubmV0L0Fy
+dGljbGVzLzczODIwOS8NCj4+Pj4gaHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzY5NDM4NS8NCj4+
+Pj4NCj4+Pj4gRW5hYmxlIHRoZSBmZWF0dXJlIGlmIHN1cHBvcnRlZCBvbiBiYXJlIG1ldGFsIGFu
+ZCBlbXVsYXRlIGluc3RydWN0aW9ucw0KPj4+PiB0byByZXR1cm4gZHVtbXkgdmFsdWVzIGZvciBj
+ZXJ0YWluIGNhc2VzLg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBCYWJ1IE1vZ2VyIDxiYWJ1
+Lm1vZ2VyQGFtZC5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgYXJjaC94ODYva3ZtL3N2bS5jIHwgICAy
+MSArKysrKysrKysrKysrKysrLS0tLS0NCj4+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRp
+b25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYv
+a3ZtL3N2bS5jIGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+Pj4+IGluZGV4IDQxNTNjYThjZGRiNy4u
+NzlhYmJkZWNhMTQ4IDEwMDY0NA0KPj4+PiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCj4+Pj4g
+KysrIGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+Pj4+IEBAIC0yNTMzLDYgKzI1MzMsMTEgQEAgc3Rh
+dGljIHZvaWQgc3ZtX2RlY2FjaGVfY3I0X2d1ZXN0X2JpdHMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+KQ0KPj4+PiAgew0KPj4+PiAgfQ0KPj4+Pg0KPj4+PiArc3RhdGljIGJvb2wgc3ZtX3VtaXBfZW11
+bGF0ZWQodm9pZCkNCj4+Pj4gK3sNCj4+Pj4gKyAgICAgICByZXR1cm4gYm9vdF9jcHVfaGFzKFg4
+Nl9GRUFUVVJFX1VNSVApOw0KPj4+PiArfQ0KPj4+DQo+Pj4gVGhpcyBtYWtlcyBubyBzZW5zZSB0
+byBtZS4gSWYgdGhlIGhhcmR3YXJlIGFjdHVhbGx5IHN1cHBvcnRzIFVNSVAsDQo+Pj4gdGhlbiBp
+dCBkb2Vzbid0IGhhdmUgdG8gYmUgZW11bGF0ZWQuDQo+PiBNeSB1bmRlcnN0YW5kaW5nLi4NCj4+
+DQo+PiBJZiB0aGUgaGFyZHdhcmUgc3VwcG9ydHMgdGhlIFVNSVAsIGl0IHdpbGwgZ2VuZXJhdGUg
+dGhlICNHUCBmYXVsdCB3aGVuDQo+PiB0aGVzZSBpbnN0cnVjdGlvbnMgYXJlIGV4ZWN1dGVkIGF0
+IENQTCA+IDAuIFB1cnBvc2Ugb2YgdGhlIGVtdWxhdGlvbiBpcyB0bw0KPj4gdHJhcCB0aGUgR1Ag
+YW5kIHJldHVybiBhIGR1bW15IHZhbHVlLiBTZWVtcyBsaWtlIHRoaXMgcmVxdWlyZWQgaW4gY2Vy
+dGFpbg0KPj4gbGVnYWN5IE9TZXMgcnVubmluZyBpbiBwcm90ZWN0ZWQgYW5kIHZpcnR1YWwtODA4
+NiBtb2Rlcy4gSW4gbG9uZyBtb2RlIG5vDQo+PiBuZWVkIHRvIGVtdWxhdGUuIEhlcmUgaXMgdGhl
+IGJpdCBleHBsYW5hdGlvbiBodHRwczovL2x3bi5uZXQvQXJ0aWNsZXMvNzM4MjA5Lw0KPj4NCj4g
+DQo+IEluZGVlZC4gIEFnYWluLCB3aGF0IGRvZXMgdGhpcyBoYXZlIHRvIGRvIHdpdGggeW91ciBw
+YXRjaD8NCj4gDQo+Pg0KPj4+DQo+Pj4gVG8gdGhlIGV4dGVudCB0aGF0IGt2bSBlbXVsYXRlcyBV
+TUlQIG9uIEludGVsIENQVXMgd2l0aG91dCBoYXJkd2FyZQ0KPj4+IFVNSVAgKGkuZS4gc21zdyBp
+cyBzdGlsbCBhbGxvd2VkIGF0IENQTD4wKSwgd2UgY2FuIGFsd2F5cyBkbyB0aGUgc2FtZQ0KPj4+
+IGVtdWxhdGlvbiBvbiBBTUQsIGJlY2F1c2UgU1ZNIGhhcyBhbHdheXMgb2ZmZXJlZCBpbnRlcmNl
+cHRzIG9mIHNnZHQsDQo+Pj4gc2lkdCwgc2xkdCwgYW5kIHN0ci4gU28sIGlmIHlvdSByZWFsbHkg
+d2FudCB0byBvZmZlciB0aGlzIGVtdWxhdGlvbiBvbg0KPj4+IHByZS1FUFlDIDIgQ1BVcywgdGhp
+cyBmdW5jdGlvbiBzaG91bGQganVzdCByZXR1cm4gdHJ1ZS4gQnV0LCBJIGhhdmUgdG8NCj4+PiBh
+c2ssICJ3aHk/Ig0KPj4NCj4+DQo+PiBUcnlpbmcgdG8gc3VwcG9ydCBVTUlQIGZlYXR1cmUgb25s
+eSBvbiBFUFlDIDIgaGFyZHdhcmUuIE5vIGludGVudGlvbiB0bw0KPj4gc3VwcG9ydCBwcmUtRVBZ
+QyAyLg0KPj4NCj4gDQo+IEkgdGhpbmsgeW91IG5lZWQgdG8gdG90YWxseSByZXdyaXRlIHlvdXIg
+Y2hhbmdlbG9nIHRvIGV4cGxhaW4gd2hhdCB5b3UNCj4gYXJlIGRvaW5nLg0KPiANCj4gQXMgSSB1
+bmRlcnN0YW5kIGl0LCB0aGVyZSBhcmUgYSBjb3VwbGUgb2YgdGhpbmdzIEtWTSBjYW4gZG86DQo+
+IA0KPiAxLiBJZiB0aGUgdW5kZXJseWluZyBoYXJkd2FyZSBzdXBwb3J0cyBVTUlQLCBLVk0gY2Fu
+IGV4cG9zZSBVTUlQIHRvDQo+IHRoZSBndWVzdC4gIFNFViBzaG91bGQgYmUgaXJyZWxldmFudCBo
+ZXJlLg0KPiANCj4gMi4gUmVnYXJkbGVzcyBvZiB3aGV0aGVyIHRoZSB1bmRlcmx5aW5nIGhhcmR3
+YXJlIHN1cHBvcnRzIFVNSVAsIEtWTQ0KPiBjYW4gdHJ5IHRvIGVtdWxhdGUgVU1JUCBpbiB0aGUg
+Z3Vlc3QuICBUaGlzIG1heSBiZSBpbXBvc3NpYmxlIGlmIFNFVg0KPiBpcyBlbmFibGVkLg0KPiAN
+Cj4gV2hpY2ggb2YgdGhlc2UgYXJlIHlvdSBkb2luZz8NCj4gDQpNeSBpbnRlbnRpb24gd2FzIHRv
+IGRvIDEuICBMZXQgbWUgZ28gYmFjayBhbmQgdGhpbmsgYWJvdXQgdGhpcyBhZ2Fpbi4NCg==
