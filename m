@@ -2,272 +2,370 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF50AEC107
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 11:08:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4CD3EC136
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 11:20:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729466AbfKAKIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 06:08:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33592 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729452AbfKAKIF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Nov 2019 06:08:05 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA1A7VR5006783
-        for <kvm@vger.kernel.org>; Fri, 1 Nov 2019 06:08:04 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w0jku869x-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 06:08:03 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 1 Nov 2019 10:08:01 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 1 Nov 2019 10:07:57 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA1A7uEg46989578
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Nov 2019 10:07:56 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 169BA4C052;
-        Fri,  1 Nov 2019 10:07:56 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96F7C4C04A;
-        Fri,  1 Nov 2019 10:07:55 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.72.35])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  1 Nov 2019 10:07:55 +0000 (GMT)
-Subject: Re: [RFC 03/37] s390/protvirt: add ultravisor initialization
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        cohuck@redhat.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-4-frankja@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Fri, 1 Nov 2019 11:07:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729553AbfKAKUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 06:20:15 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35454 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729466AbfKAKUP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 1 Nov 2019 06:20:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572603613;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JhH3fpCQilR/LG5xSJSwv1PIJQRkTfOdcfx/P18x+tY=;
+        b=hhgJKf+2uPycT/5uBlYhfmdUwMhjE9eO6StUZ1P3CmPn4FjGNLLJ21tpP06okmLEEFe4Je
+        xSR/cRlSL6BuyYC6tVPe9KVlANzMaOz0czPKLo62ORG5mgZoBA9KPwWnXDtwtjAd1PmdXA
+        ukpD56aPjCHIXkvQLEHxP+KClr/gEb0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-MDk7S9bxNyONZ7fYixJMfw-1; Fri, 01 Nov 2019 06:20:09 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E9D62AD;
+        Fri,  1 Nov 2019 10:20:07 +0000 (UTC)
+Received: from work-vm (ovpn-116-155.ams2.redhat.com [10.36.116.155])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E9BF600D1;
+        Fri,  1 Nov 2019 10:19:54 +0000 (UTC)
+Date:   Fri, 1 Nov 2019 10:19:51 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Aleksandar Markovic <amarkovic@wavecomp.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        xen-devel@lists.xenproject.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 01/32] hw/i386: Remove obsolete
+ LoadStateHandler::load_state_old handlers
+Message-ID: <20191101101951.GB2432@work-vm>
+References: <20191015162705.28087-1-philmd@redhat.com>
+ <20191015162705.28087-2-philmd@redhat.com>
+ <cb2a33d5-16a7-67bb-b155-1e3d8e2e2cbc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19110110-0028-0000-0000-000003B1C18A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110110-0029-0000-0000-000024740EEB
-Message-Id: <f00cf177-246d-8da8-ddfd-a0b1bea930d6@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-01_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911010102
+In-Reply-To: <cb2a33d5-16a7-67bb-b155-1e3d8e2e2cbc@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: MDk7S9bxNyONZ7fYixJMfw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> I forgot to Cc David and Daniel for this one.
+>=20
+> On 10/15/19 6:26 PM, Philippe Mathieu-Daud=E9 wrote:
+> > These devices implemented their load_state_old() handler 10 years
+> > ago, previous to QEMU v0.12.
+> > Since commit cc425b5ddf removed the pc-0.10 and pc-0.11 machines,
+> > we can drop this code.
+> >=20
+> > Note: the mips_r4k machine started to use the i8254 device just
+> > after QEMU v0.5.0, but the MIPS machine types are not versioned,
+> > so there is no migration compatibility issue removing this handler.
+> >=20
+> > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > ---
+> >   hw/acpi/piix4.c         | 40 ---------------------------------
+> >   hw/intc/apic_common.c   | 49 ----------------------------------------=
+-
+> >   hw/pci-host/piix.c      | 25 ---------------------
+> >   hw/timer/i8254_common.c | 40 ---------------------------------
+> >   4 files changed, 154 deletions(-)
+> >=20
+> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > index 5742c3df87..1d29d438c7 100644
+> > --- a/hw/acpi/piix4.c
+> > +++ b/hw/acpi/piix4.c
+> > @@ -42,7 +42,6 @@
+> >   #include "hw/acpi/memory_hotplug.h"
+> >   #include "hw/acpi/acpi_dev_interface.h"
+> >   #include "hw/xen/xen.h"
+> > -#include "migration/qemu-file-types.h"
+> >   #include "migration/vmstate.h"
+> >   #include "hw/core/cpu.h"
+> >   #include "trace.h"
+> > @@ -205,43 +204,6 @@ static const VMStateDescription vmstate_pci_status=
+ =3D {
+> >       }
+> >   };
+> > -static int acpi_load_old(QEMUFile *f, void *opaque, int version_id)
+> > -{
+> > -    PIIX4PMState *s =3D opaque;
+> > -    int ret, i;
+> > -    uint16_t temp;
+> > -
+> > -    ret =3D pci_device_load(PCI_DEVICE(s), f);
+> > -    if (ret < 0) {
+> > -        return ret;
+> > -    }
+> > -    qemu_get_be16s(f, &s->ar.pm1.evt.sts);
+> > -    qemu_get_be16s(f, &s->ar.pm1.evt.en);
+> > -    qemu_get_be16s(f, &s->ar.pm1.cnt.cnt);
+> > -
+> > -    ret =3D vmstate_load_state(f, &vmstate_apm, &s->apm, 1);
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > -
+> > -    timer_get(f, s->ar.tmr.timer);
+> > -    qemu_get_sbe64s(f, &s->ar.tmr.overflow_time);
+> > -
+> > -    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.sts);
+> > -    for (i =3D 0; i < 3; i++) {
+> > -        qemu_get_be16s(f, &temp);
+> > -    }
+> > -
+> > -    qemu_get_be16s(f, (uint16_t *)s->ar.gpe.en);
+> > -    for (i =3D 0; i < 3; i++) {
+> > -        qemu_get_be16s(f, &temp);
+> > -    }
+> > -
+> > -    ret =3D vmstate_load_state(f, &vmstate_pci_status,
+> > -        &s->acpi_pci_hotplug.acpi_pcihp_pci_status[ACPI_PCIHP_BSEL_DEF=
+AULT], 1);
+> > -    return ret;
+> > -}
+> > -
+> >   static bool vmstate_test_use_acpi_pci_hotplug(void *opaque, int versi=
+on_id)
+> >   {
+> >       PIIX4PMState *s =3D opaque;
+> > @@ -313,8 +275,6 @@ static const VMStateDescription vmstate_acpi =3D {
+> >       .name =3D "piix4_pm",
+> >       .version_id =3D 3,
+> >       .minimum_version_id =3D 3,
+> > -    .minimum_version_id_old =3D 1,
+> > -    .load_state_old =3D acpi_load_old,
 
+Can you exlain why this is old enough?  That was chnanged by b0b873a
+that was some version id specific hack, but also 4cf3e6f3d85 - isn't
+that before 0.12.0 ?
 
-On 24.10.19 13:40, Janosch Frank wrote:
-> From: Vasily Gorbik <gor@linux.ibm.com>
-> 
-> Before being able to host protected virtual machines, donate some of
-> the memory to the ultravisor. Besides that the ultravisor might impose
-> addressing limitations for memory used to back protected VM storage. Treat
-> that limit as protected virtualization host's virtual memory limit.
-> 
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> >       .post_load =3D vmstate_acpi_post_load,
+> >       .fields =3D (VMStateField[]) {
+> >           VMSTATE_PCI_DEVICE(parent_obj, PIIX4PMState),
+> > diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+> > index aafd8e0e33..375cb6abe9 100644
+> > --- a/hw/intc/apic_common.c
+> > +++ b/hw/intc/apic_common.c
+> > @@ -31,7 +31,6 @@
+> >   #include "sysemu/kvm.h"
+> >   #include "hw/qdev-properties.h"
+> >   #include "hw/sysbus.h"
+> > -#include "migration/qemu-file-types.h"
+> >   #include "migration/vmstate.h"
+> >   static int apic_irq_delivered;
+> > @@ -262,52 +261,6 @@ static void apic_reset_common(DeviceState *dev)
+> >       apic_init_reset(dev);
+> >   }
+> > -/* This function is only used for old state version 1 and 2 */
+> > -static int apic_load_old(QEMUFile *f, void *opaque, int version_id)
+> > -{
+> > -    APICCommonState *s =3D opaque;
+> > -    APICCommonClass *info =3D APIC_COMMON_GET_CLASS(s);
+> > -    int i;
+> > -
+> > -    if (version_id > 2) {
+> > -        return -EINVAL;
+> > -    }
+> > -
+> > -    /* XXX: what if the base changes? (registered memory regions) */
+> > -    qemu_get_be32s(f, &s->apicbase);
+> > -    qemu_get_8s(f, &s->id);
+> > -    qemu_get_8s(f, &s->arb_id);
+> > -    qemu_get_8s(f, &s->tpr);
+> > -    qemu_get_be32s(f, &s->spurious_vec);
+> > -    qemu_get_8s(f, &s->log_dest);
+> > -    qemu_get_8s(f, &s->dest_mode);
+> > -    for (i =3D 0; i < 8; i++) {
+> > -        qemu_get_be32s(f, &s->isr[i]);
+> > -        qemu_get_be32s(f, &s->tmr[i]);
+> > -        qemu_get_be32s(f, &s->irr[i]);
+> > -    }
+> > -    for (i =3D 0; i < APIC_LVT_NB; i++) {
+> > -        qemu_get_be32s(f, &s->lvt[i]);
+> > -    }
+> > -    qemu_get_be32s(f, &s->esr);
+> > -    qemu_get_be32s(f, &s->icr[0]);
+> > -    qemu_get_be32s(f, &s->icr[1]);
+> > -    qemu_get_be32s(f, &s->divide_conf);
+> > -    s->count_shift =3D qemu_get_be32(f);
+> > -    qemu_get_be32s(f, &s->initial_count);
+> > -    s->initial_count_load_time =3D qemu_get_be64(f);
+> > -    s->next_time =3D qemu_get_be64(f);
+> > -
+> > -    if (version_id >=3D 2) {
+> > -        s->timer_expiry =3D qemu_get_be64(f);
+> > -    }
+> > -
+> > -    if (info->post_load) {
+> > -        info->post_load(s);
+> > -    }
+> > -    return 0;
+> > -}
+> > -
+> >   static const VMStateDescription vmstate_apic_common;
+> >   static void apic_common_realize(DeviceState *dev, Error **errp)
+> > @@ -408,8 +361,6 @@ static const VMStateDescription vmstate_apic_common=
+ =3D {
+> >       .name =3D "apic",
+> >       .version_id =3D 3,
+> >       .minimum_version_id =3D 3,
+> > -    .minimum_version_id_old =3D 1,
+> > -    .load_state_old =3D apic_load_old,
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+OK, I see that was changed by 695dcf71 in 2009 before 0.12.0
 
+> >       .pre_load =3D apic_pre_load,
+> >       .pre_save =3D apic_dispatch_pre_save,
+> >       .post_load =3D apic_dispatch_post_load,
+> > diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+> > index 135c645535..2f4cbcbfe9 100644
+> > --- a/hw/pci-host/piix.c
+> > +++ b/hw/pci-host/piix.c
+> > @@ -33,7 +33,6 @@
+> >   #include "qapi/error.h"
+> >   #include "qemu/range.h"
+> >   #include "hw/xen/xen.h"
+> > -#include "migration/qemu-file-types.h"
+> >   #include "migration/vmstate.h"
+> >   #include "hw/pci-host/pam.h"
+> >   #include "sysemu/reset.h"
+> > @@ -174,28 +173,6 @@ static void i440fx_write_config(PCIDevice *dev,
+> >       }
+> >   }
+> > -static int i440fx_load_old(QEMUFile* f, void *opaque, int version_id)
+> > -{
+> > -    PCII440FXState *d =3D opaque;
+> > -    PCIDevice *pd =3D PCI_DEVICE(d);
+> > -    int ret, i;
+> > -    uint8_t smm_enabled;
+> > -
+> > -    ret =3D pci_device_load(pd, f);
+> > -    if (ret < 0)
+> > -        return ret;
+> > -    i440fx_update_memory_mappings(d);
+> > -    qemu_get_8s(f, &smm_enabled);
+> > -
+> > -    if (version_id =3D=3D 2) {
+> > -        for (i =3D 0; i < PIIX_NUM_PIRQS; i++) {
+> > -            qemu_get_be32(f); /* dummy load for compatibility */
+> > -        }
+> > -    }
+> > -
+> > -    return 0;
+> > -}
+> > -
+> >   static int i440fx_post_load(void *opaque, int version_id)
+> >   {
+> >       PCII440FXState *d =3D opaque;
+> > @@ -208,8 +185,6 @@ static const VMStateDescription vmstate_i440fx =3D =
+{
+> >       .name =3D "I440FX",
+> >       .version_id =3D 3,
+> >       .minimum_version_id =3D 3,
+> > -    .minimum_version_id_old =3D 1,
+> > -    .load_state_old =3D i440fx_load_old,
 
-> ---
->  arch/s390/include/asm/uv.h | 16 ++++++++++++
->  arch/s390/kernel/setup.c   |  3 +++
->  arch/s390/kernel/uv.c      | 53 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 72 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 6db1bc495e67..82a46fb913e7 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -23,12 +23,14 @@
->  #define UVC_RC_NO_RESUME	0x0007
->  
->  #define UVC_CMD_QUI			0x0001
-> +#define UVC_CMD_INIT_UV			0x000f
->  #define UVC_CMD_SET_SHARED_ACCESS	0x1000
->  #define UVC_CMD_REMOVE_SHARED_ACCESS	0x1001
->  
->  /* Bits in installed uv calls */
->  enum uv_cmds_inst {
->  	BIT_UVC_CMD_QUI = 0,
-> +	BIT_UVC_CMD_INIT_UV = 1,
->  	BIT_UVC_CMD_SET_SHARED_ACCESS = 8,
->  	BIT_UVC_CMD_REMOVE_SHARED_ACCESS = 9,
->  };
-> @@ -59,6 +61,15 @@ struct uv_cb_qui {
->  	u64 reserved98;
->  } __packed __aligned(8);
->  
-> +struct uv_cb_init {
-> +	struct uv_cb_header header;
-> +	u64 reserved08[2];
-> +	u64 stor_origin;
-> +	u64 stor_len;
-> +	u64 reserved28[4];
-> +
-> +} __packed __aligned(8);
-> +
->  struct uv_cb_share {
->  	struct uv_cb_header header;
->  	u64 reserved08[3];
-> @@ -158,8 +169,13 @@ static inline int is_prot_virt_host(void)
->  {
->  	return prot_virt_host;
->  }
-> +
-> +void setup_uv(void);
-> +void adjust_to_uv_max(unsigned long *vmax);
->  #else
->  #define is_prot_virt_host() 0
-> +static inline void setup_uv(void) {}
-> +static inline void adjust_to_uv_max(unsigned long *vmax) {}
->  #endif
->  
->  #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) ||                          \
-> diff --git a/arch/s390/kernel/setup.c b/arch/s390/kernel/setup.c
-> index f36370f8af38..d29d83c0b8df 100644
-> --- a/arch/s390/kernel/setup.c
-> +++ b/arch/s390/kernel/setup.c
-> @@ -567,6 +567,8 @@ static void __init setup_memory_end(void)
->  			vmax = _REGION1_SIZE; /* 4-level kernel page table */
->  	}
->  
-> +	adjust_to_uv_max(&vmax);
-> +
->  	/* module area is at the end of the kernel address space. */
->  	MODULES_END = vmax;
->  	MODULES_VADDR = MODULES_END - MODULES_LEN;
-> @@ -1147,6 +1149,7 @@ void __init setup_arch(char **cmdline_p)
->  	 */
->  	memblock_trim_memory(1UL << (MAX_ORDER - 1 + PAGE_SHIFT));
->  
-> +	setup_uv();
->  	setup_memory_end();
->  	setup_memory();
->  	dma_contiguous_reserve(memory_end);
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index 35ce89695509..f7778493e829 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -45,4 +45,57 @@ static int __init prot_virt_setup(char *val)
->  	return rc;
->  }
->  early_param("prot_virt", prot_virt_setup);
-> +
-> +static int __init uv_init(unsigned long stor_base, unsigned long stor_len)
-> +{
-> +	struct uv_cb_init uvcb = {
-> +		.header.cmd = UVC_CMD_INIT_UV,
-> +		.header.len = sizeof(uvcb),
-> +		.stor_origin = stor_base,
-> +		.stor_len = stor_len,
-> +	};
-> +	int cc;
-> +
-> +	cc = uv_call(0, (uint64_t)&uvcb);
-> +	if (cc || uvcb.header.rc != UVC_RC_EXECUTED) {
-> +		pr_err("Ultravisor init failed with cc: %d rc: 0x%hx\n", cc,
-> +		       uvcb.header.rc);
-> +		return -1;
-> +	}
-> +	return 0;
-> +}
-> +
-> +void __init setup_uv(void)
-> +{
-> +	unsigned long uv_stor_base;
-> +
-> +	if (!prot_virt_host)
-> +		return;
-> +
-> +	uv_stor_base = (unsigned long)memblock_alloc_try_nid(
-> +		uv_info.uv_base_stor_len, SZ_1M, SZ_2G,
-> +		MEMBLOCK_ALLOC_ACCESSIBLE, NUMA_NO_NODE);
-> +	if (!uv_stor_base) {
-> +		pr_info("Failed to reserve %lu bytes for ultravisor base storage\n",
-> +			uv_info.uv_base_stor_len);
-> +		goto fail;
-> +	}
-> +
-> +	if (uv_init(uv_stor_base, uv_info.uv_base_stor_len)) {
-> +		memblock_free(uv_stor_base, uv_info.uv_base_stor_len);
-> +		goto fail;
-> +	}
-> +
-> +	pr_info("Reserving %luMB as ultravisor base storage\n",
-> +		uv_info.uv_base_stor_len >> 20);
-> +	return;
-> +fail:
-> +	prot_virt_host = 0;
-> +}
-> +
-> +void adjust_to_uv_max(unsigned long *vmax)
-> +{
-> +	if (prot_virt_host && *vmax > uv_info.max_sec_stor_addr)
-> +		*vmax = uv_info.max_sec_stor_addr;
-> +}
->  #endif
-> 
+Changed in 2009 before 0.12; OK
+
+> >       .post_load =3D i440fx_post_load,
+> >       .fields =3D (VMStateField[]) {
+> >           VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+> > diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
+> > index 57bf10cc94..050875b497 100644
+> > --- a/hw/timer/i8254_common.c
+> > +++ b/hw/timer/i8254_common.c
+> > @@ -29,7 +29,6 @@
+> >   #include "qemu/timer.h"
+> >   #include "hw/timer/i8254.h"
+> >   #include "hw/timer/i8254_internal.h"
+> > -#include "migration/qemu-file-types.h"
+> >   #include "migration/vmstate.h"
+> >   /* val must be 0 or 1 */
+> > @@ -202,43 +201,6 @@ static const VMStateDescription vmstate_pit_channe=
+l =3D {
+> >       }
+> >   };
+> > -static int pit_load_old(QEMUFile *f, void *opaque, int version_id)
+> > -{
+> > -    PITCommonState *pit =3D opaque;
+> > -    PITCommonClass *c =3D PIT_COMMON_GET_CLASS(pit);
+> > -    PITChannelState *s;
+> > -    int i;
+> > -
+> > -    if (version_id !=3D 1) {
+> > -        return -EINVAL;
+> > -    }
+> > -
+> > -    for (i =3D 0; i < 3; i++) {
+> > -        s =3D &pit->channels[i];
+> > -        s->count =3D qemu_get_be32(f);
+> > -        qemu_get_be16s(f, &s->latched_count);
+> > -        qemu_get_8s(f, &s->count_latched);
+> > -        qemu_get_8s(f, &s->status_latched);
+> > -        qemu_get_8s(f, &s->status);
+> > -        qemu_get_8s(f, &s->read_state);
+> > -        qemu_get_8s(f, &s->write_state);
+> > -        qemu_get_8s(f, &s->write_latch);
+> > -        qemu_get_8s(f, &s->rw_mode);
+> > -        qemu_get_8s(f, &s->mode);
+> > -        qemu_get_8s(f, &s->bcd);
+> > -        qemu_get_8s(f, &s->gate);
+> > -        s->count_load_time =3D qemu_get_be64(f);
+> > -        s->irq_disabled =3D 0;
+> > -        if (i =3D=3D 0) {
+> > -            s->next_transition_time =3D qemu_get_be64(f);
+> > -        }
+> > -    }
+> > -    if (c->post_load) {
+> > -        c->post_load(pit);
+> > -    }
+> > -    return 0;
+> > -}
+> > -
+> >   static int pit_dispatch_pre_save(void *opaque)
+> >   {
+> >       PITCommonState *s =3D opaque;
+> > @@ -266,8 +228,6 @@ static const VMStateDescription vmstate_pit_common =
+=3D {
+> >       .name =3D "i8254",
+> >       .version_id =3D 3,
+> >       .minimum_version_id =3D 2,
+> > -    .minimum_version_id_old =3D 1,
+> > -    .load_state_old =3D pit_load_old,
+
+Also 2009 pre 0.12
+
+> >       .pre_save =3D pit_dispatch_pre_save,
+> >       .post_load =3D pit_dispatch_post_load,
+> >       .fields =3D (VMStateField[]) {
+> >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
