@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BB5DEC87C
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 19:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF3DEEC890
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 19:36:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727358AbfKAS3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 14:29:35 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:34804 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727197AbfKAS3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 14:29:34 -0400
-Received: by mail-io1-f66.google.com with SMTP id q1so11913088ion.1
-        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 11:29:34 -0700 (PDT)
+        id S1727269AbfKASfy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 14:35:54 -0400
+Received: from mail-il1-f196.google.com ([209.85.166.196]:44086 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726846AbfKASfy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 14:35:54 -0400
+Received: by mail-il1-f196.google.com with SMTP id w1so634184ilq.11
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 11:35:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9TFUU0VzHDXJnyCpiU6F6S+f4IqiuMpQ1VoUi3wfR0c=;
-        b=MaxHt/+mx78gQBGBk76n6MGcKzQD/d2Q//mL/eFBppnw/fSrPNexufzC/trzGpMows
-         +NxstIC6SvnZoYWezP6XxWiIkGMuzmdIvVxi7TurEd4laj8KpnvVjYhM6kWx+CwVbiQg
-         nb6VUf/cgygiG7jtOV8zbWD8D64Md/6xPzEOYve7x8YaiHo7cgpuHhP5PXo5Qh1DFpzn
-         zvmPxvv9GtfDIk4zkyaw6iilTXIdBdeRf1WH4KTQKalfPuoUVikvDYCkId6S0hs9D2JN
-         1B5FCy+WJMm8ipl19rAxxRjJ/eZLBerMOSr9G2r7TOkTdY0QpG83DZeieQ7bb1N66DKF
-         nNmA==
+        bh=GfaxDeopuNa0dXDvZ92N+KU9hxmW5s0v5yugFygMjC0=;
+        b=G+srrPkOdg6Gn6KDILn67Ot0L8IsUkUbFo9C5u/X4dPXxgM/+1TmEewkrPK8AR+BA3
+         KNg+IVuG18plQ9mwpeil2HvEejEJtx/iuhIE107LA3Fb33K1SauVlSD0eQZ7ogLtghwh
+         6YOR4XLneLs2DSPNXCZzY7MBeOwFK5ZST9B3ippqK3Zw1AgC+NH8fSxvP20GWW4HXC1P
+         5k4kEXcszA9C85DGP0fwdtYijWiq+7h59bQ5QToP6mX112UaBRI6jnNCmpmq4L5bJA08
+         Qb5OJ3PQUp02nEgqZpQLvy9Ye1oFhtb/9++m07SkujICwsNOGAdELW9bi2hPu706u8ZH
+         SWaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9TFUU0VzHDXJnyCpiU6F6S+f4IqiuMpQ1VoUi3wfR0c=;
-        b=Gg/7UhIIVgHdphM5yprA6Y4RiXbonThYiCSBur/oYeNIPqhvw7beEanpBvbtK4f/BB
-         8FK6aK4pxwgqHu7aOGX/M5lg4lBDOwNEuQyXdYFnH0lfbXepAkXdHKwy16IuCoGmgeWT
-         Nzdch9MaJ+49yWAsJmeQOOhLUhIkWF2MhB1Xa8aiVh091Tzxv2zHv9OoAdDVVrklNaZt
-         g/Cp6eJ694xp57rNht0LvIopYvAJ+fGMvUXj/114Dr/opwVqflN8voz2WTyshFhXyPOD
-         art7fhOOmdsttpZ71InZ09ltvv+8Umlhai3FZIES7FOE7cof/ZhSWHFavRVM2zcaoxZD
-         wHcw==
-X-Gm-Message-State: APjAAAUNkoVjQqDrRyfXt0bH1ttRWP+CEy6hvXnPHMfrmQ6ZwDoZEQpZ
-        evZ4s9p/fBikZpP+IKGlAsG3RzEioV1Y/SEwLSu3PQ==
-X-Google-Smtp-Source: APXvYqzyPELcJRJA3nMkmapdmScZGN/ssHdPP+UN3xZEGE0xW/JvB+kQlDAhixvAMBGT15CYnNzHe3AmR2jC03wcJUs=
-X-Received: by 2002:a5d:8d8f:: with SMTP id b15mr11847661ioj.296.1572632973507;
- Fri, 01 Nov 2019 11:29:33 -0700 (PDT)
+        bh=GfaxDeopuNa0dXDvZ92N+KU9hxmW5s0v5yugFygMjC0=;
+        b=Wmg3ZSm8GAEpFjluIA5zpm78a2vCoF+Wy6TU5q6mp1J7c9Md9kCO4VV7sRTr5spTDf
+         bxmA2yIpUCLZ33YkT3Yr/evYFlYh1d4OoCqeDUYpIaILsXkRGzgAgMwRa4WzH0pFXOtZ
+         pdnzChcdZ4OsZUNve9Eb03iVAp2TTT5WsE4t+axVux65xKlafddzVvruL115N9Chccyp
+         xatQX3v9Nn+/Fo4sUPzOokMmv2CJDTdBc/U9YyuUXwxemp32I1MMN+D4M2m8Ao7R9+WG
+         Rmb6p30IQwQGI/BtdRGqeO6nkUkxDXDOsirSFs59T+touKBMdpXG7sLDTeNx4FCAngeh
+         cY7g==
+X-Gm-Message-State: APjAAAUDJTUAI/1IbIDMskDFe+4GPO5LaMGE6So5kXuGEV4mf7hFBtNM
+        naVMZkBl2fZxKtGSjBNOV5U0SDHNJDeCW72alZdK1Q==
+X-Google-Smtp-Source: APXvYqzOn7ah6e5vdLNDoO5HN6CVIW1sVXN9pQz44iNP/TMk3A841MlGik3ysrzpLSLNTr0J7P2ReSu8pUDjDYt7cb4=
+X-Received: by 2002:a05:6e02:4c3:: with SMTP id f3mr3852324ils.296.1572633353353;
+ Fri, 01 Nov 2019 11:35:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com> <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
-In-Reply-To: <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
+References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com> <157262961597.2838.16953618909905259198.stgit@naples-babu.amd.com>
+In-Reply-To: <157262961597.2838.16953618909905259198.stgit@naples-babu.amd.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 1 Nov 2019 11:29:22 -0700
-Message-ID: <CALMp9eQT=a99YhraQZ+awMKOWK=3tg=m9NppZnsvK0Q1PWxbAw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
+Date:   Fri, 1 Nov 2019 11:35:42 -0700
+Message-ID: <CALMp9eTb8N-WxgQ_J5_siU=8=DGNUjM=UZCN5YkAQoofZHx1hA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kvm: x86: Dont set UMIP feature bit unconditionally
 To:     "Moger, Babu" <Babu.Moger@amd.com>
 Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
@@ -72,87 +72,33 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Nov 1, 2019 at 10:33 AM Moger, Babu <Babu.Moger@amd.com> wrote:
 >
-> AMD 2nd generation EPYC processors support UMIP (User-Mode Instruction
-> Prevention) feature. The UMIP feature prevents the execution of certain
-> instructions if the Current Privilege Level (CPL) is greater than 0.
-> If any of these instructions are executed with CPL > 0 and UMIP
-> is enabled, then kernel reports a #GP exception.
+> The UMIP (User-Mode Instruction Prevention) feature bit should be
+> set if the emulation (kvm_x86_ops->umip_emulated) is supported
+> which is done already.
 >
-> The idea is taken from articles:
-> https://lwn.net/Articles/738209/
-> https://lwn.net/Articles/694385/
+> Remove the unconditional setting of this bit.
 >
-> Enable the feature if supported on bare metal and emulate instructions
-> to return dummy values for certain cases.
+> Fixes: ae3e61e1c28338d0 ("KVM: x86: add support for UMIP")
 >
 > Signed-off-by: Babu Moger <babu.moger@amd.com>
 > ---
->  arch/x86/kvm/svm.c |   21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/cpuid.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 4153ca8cddb7..79abbdeca148 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -2533,6 +2533,11 @@ static void svm_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
->  {
->  }
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index f68c0c753c38..5b81ba5ad428 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -364,7 +364,7 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>         /* cpuid 7.0.ecx*/
+>         const u32 kvm_cpuid_7_0_ecx_x86_features =
+>                 F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
+> -               F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+> +               F(AVX512_VPOPCNTDQ) | F(AVX512_VBMI2) | F(GFNI) |
+>                 F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+>                 F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/;
 >
-> +static bool svm_umip_emulated(void)
-> +{
-> +       return boot_cpu_has(X86_FEATURE_UMIP);
-> +}
 
-This makes no sense to me. If the hardware actually supports UMIP,
-then it doesn't have to be emulated.
-
-To the extent that kvm emulates UMIP on Intel CPUs without hardware
-UMIP (i.e. smsw is still allowed at CPL>0), we can always do the same
-emulation on AMD, because SVM has always offered intercepts of sgdt,
-sidt, sldt, and str. So, if you really want to offer this emulation on
-pre-EPYC 2 CPUs, this function should just return true. But, I have to
-ask, "why?"
-
-*Virtualization* of UMIP on EPYC 2 already works without any of these changes.
-
->  static void update_cr0_intercept(struct vcpu_svm *svm)
->  {
->         ulong gcr0 = svm->vcpu.arch.cr0;
-> @@ -4438,6 +4443,13 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
->         return 1;
->  }
->
-> +static int umip_interception(struct vcpu_svm *svm)
-> +{
-> +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> +
-> +       return kvm_emulate_instruction(vcpu, 0);
-> +}
-> +
->  static int pause_interception(struct vcpu_svm *svm)
->  {
->         struct kvm_vcpu *vcpu = &svm->vcpu;
-> @@ -4775,6 +4787,10 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
->         [SVM_EXIT_SMI]                          = nop_on_interception,
->         [SVM_EXIT_INIT]                         = nop_on_interception,
->         [SVM_EXIT_VINTR]                        = interrupt_window_interception,
-> +       [SVM_EXIT_IDTR_READ]                    = umip_interception,
-> +       [SVM_EXIT_GDTR_READ]                    = umip_interception,
-> +       [SVM_EXIT_LDTR_READ]                    = umip_interception,
-> +       [SVM_EXIT_TR_READ]                      = umip_interception,
->         [SVM_EXIT_RDPMC]                        = rdpmc_interception,
->         [SVM_EXIT_CPUID]                        = cpuid_interception,
->         [SVM_EXIT_IRET]                         = iret_interception,
-> @@ -5976,11 +5992,6 @@ static bool svm_xsaves_supported(void)
->         return boot_cpu_has(X86_FEATURE_XSAVES);
->  }
->
-> -static bool svm_umip_emulated(void)
-> -{
-> -       return false;
-> -}
-> -
->  static bool svm_pt_supported(void)
->  {
->         return false;
->
+This isn't unconditional. This is masked by the features on the boot
+CPU. Since UMIP can be virtualized (without emulation) on CPUs that
+support UMIP, you should leave this alone.
