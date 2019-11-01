@@ -2,163 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AEF7EC954
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 21:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3CB4EC957
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 21:04:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727555AbfKAUEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 16:04:20 -0400
-Received: from mail-eopbgr790041.outbound.protection.outlook.com ([40.107.79.41]:36055
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726709AbfKAUEU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 16:04:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=guGQyvQwphYG7fyi1B7aeh6jM7Yp9xQZDOoja5nWqplM1ZgkcxYvz/mCQnizX/DUAUVPHSt2qKB9GVcmohEvxBlQY+5qFOluf2LYoNiwMpERqRx3wfLfNXMambCH8vIz/ViJUEcqRxtAgP+1gRLamWiObhp0UOFgk0kPvRO8+ATZSp4aRQh1zjKsgXXSQ3udrA+boIuv7WaoyZ/jSaI5pwT5fB2RtMcl3v7M3SP4fzxNraDslPS0S5XUBo8AaSUVSIpG+5WJLKigeXB6q9TbqAzmSZUkCe7dNnS8FHcm4454sm6AWdN5drJTuGt6cDnKbL1HWEqyLs/eX8Eugk5RlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y8wDkdP/KDt9U856s3zw4MYP+UYCRzLgJZbrMfhF7D4=;
- b=VSfONP24rra1G310Cl6O4wns5xLVe76RN542XME1Xm0PT0fUjZhFnQabDHrUjOsJTxcowK6KdgD8zi03ll2+VdrYG18L9Y8GOkhsbtFH6KsgZXR/WNlXeMm0Xe5QTtcaMhlCFsgvYDyoQnOdQYlIV+JAbzOerup7DddfBqlv6TWAtOArpKeLn/gUslHtLVoiMluSxVis9adlWDSX6knsy8i2FeHqc6bAOdJ+/rNjmOcX4Y2LZaVkgBq1eoy70VQgs+D+v9UNJy7f5PdGElj8ViUTa83gmuLuxInRKqsRyXk15lhK5Pn+MKi0u/sqQX4fti3jP+qj9bhq0XGVTuzFow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y8wDkdP/KDt9U856s3zw4MYP+UYCRzLgJZbrMfhF7D4=;
- b=Zw8AvEe/LhempXsr5Vry9ZUxxJ7MvgbvKiIMIzLDQvpp+Wq5JGmxuQ0mMjV77IOZhc/OZYmLttcUlMCJPvqXC/ihEAh8yVSEQ7xadVrp9yi8Bj2kTkiICezgNZ02xAquzAMn6KoEmpCCtr8zgQVWcwR1+EOSzhJ+fCs3TgXRzgs=
-Received: from BL0PR12MB2468.namprd12.prod.outlook.com (52.132.30.157) by
- BL0PR12MB2371.namprd12.prod.outlook.com (52.132.27.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Fri, 1 Nov 2019 20:04:15 +0000
-Received: from BL0PR12MB2468.namprd12.prod.outlook.com
- ([fe80::748c:1f32:1a4d:acca]) by BL0PR12MB2468.namprd12.prod.outlook.com
- ([fe80::748c:1f32:1a4d:acca%7]) with mapi id 15.20.2387.028; Fri, 1 Nov 2019
- 20:04:15 +0000
-From:   "Moger, Babu" <Babu.Moger@amd.com>
-To:     Andy Lutomirski <luto@kernel.org>
-CC:     Jim Mattson <jmattson@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
-Thread-Topic: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
-Thread-Index: AQHVkNqD+3M/4HqTrkKsDppH5BsZ1qd2otoA//+6a4CAAFUPgIAACwUA
-Date:   Fri, 1 Nov 2019 20:04:15 +0000
-Message-ID: <91a05d64-36c0-c4c4-fe49-83a4db1ade10@amd.com>
-References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com>
- <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
- <CALMp9eQT=a99YhraQZ+awMKOWK=3tg=m9NppZnsvK0Q1PWxbAw@mail.gmail.com>
- <669031a1-b9a6-8a45-9a05-a6ce5fb7fa8b@amd.com>
- <CALCETrXdo2arN=s9Bt1LmYkPajcBj1NuTPC8dwuw2mMZqT0tRw@mail.gmail.com>
-In-Reply-To: <CALCETrXdo2arN=s9Bt1LmYkPajcBj1NuTPC8dwuw2mMZqT0tRw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR01CA0008.prod.exchangelabs.com (2603:10b6:805:b6::21)
- To BL0PR12MB2468.namprd12.prod.outlook.com (2603:10b6:207:44::29)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 8b9453c6-95c7-4a62-7d2a-08d75f06abb1
-x-ms-traffictypediagnostic: BL0PR12MB2371:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <BL0PR12MB23716968BB2EF2CB73C4178995620@BL0PR12MB2371.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 020877E0CB
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(346002)(39860400002)(396003)(376002)(54534003)(189003)(199004)(81166006)(81156014)(8676002)(478600001)(229853002)(6436002)(14454004)(6246003)(6486002)(64756008)(25786009)(26005)(54906003)(6306002)(8936002)(99286004)(66946007)(4326008)(66476007)(66556008)(316002)(966005)(386003)(36756003)(6506007)(53546011)(52116002)(102836004)(76176011)(31686004)(71200400001)(186003)(6512007)(66446008)(7736002)(6916009)(66066001)(305945005)(2906002)(86362001)(486006)(256004)(5660300002)(7416002)(3846002)(2616005)(476003)(6116002)(11346002)(446003)(31696002)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:BL0PR12MB2371;H:BL0PR12MB2468.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dPVkRepFg4Peol5Y2Y4LdWv0wbBC+x8tFQGop6aC8ZnTqtuRoeW3ATIWnIFqFJi00XTeIbIgG6VhYGh7fWPIid/fGQLD4FCM3yRO7Jn9V8WziifvBpaNlPf3YF3tSPgOkuKX+Ru2kG2XiOOA1c1BkMnmXB9CKP2JJY2Nk5HTpuCQC57nQBQj5oeet0IVUkis7MEPxjasnrx6jrwOTB/A2rnRtCLB/I43mp4lUNAYX2b5lOPT/H0cijy2uo5Tj+sQAzuGconzVm0lYxOdwGWhsIB88nJN/YNnu4jxrrV/YgMvtN5w3ZIoJLXsTH7eSJaVXc/GZoW/WS/Hv9am5jA9eld8Tq3cgXb2CW0T6YksTkp62L2cizvXELsJ75AOnwsqocnher8AiVOGu6/shpBK3GQfX6fn25AKvP3x6sWsL7cuPzlLXQikAs6dMuZe/0SyOvs0qjd44RteV5LWgYuM27bTBukkW/LQKApTgcy4CLk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D207B20A2FC497499AF29652E29CBC24@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1727608AbfKAUE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 16:04:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31696 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726709AbfKAUE3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 1 Nov 2019 16:04:29 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA1K3jUZ125668;
+        Fri, 1 Nov 2019 16:04:28 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w0srvb5d2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Nov 2019 16:04:27 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA1K4RI5132461;
+        Fri, 1 Nov 2019 16:04:27 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w0srvb5bw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Nov 2019 16:04:27 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA1K0r38001573;
+        Fri, 1 Nov 2019 20:04:26 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma04wdc.us.ibm.com with ESMTP id 2vxwh5uapu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Nov 2019 20:04:26 +0000
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA1K4LtT61079892
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Nov 2019 20:04:21 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8D743C605A;
+        Fri,  1 Nov 2019 20:04:21 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 925B0C6059;
+        Fri,  1 Nov 2019 20:04:20 +0000 (GMT)
+Received: from [9.60.75.238] (unknown [9.60.75.238])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri,  1 Nov 2019 20:04:20 +0000 (GMT)
+Subject: Re: [PATCH] s390: vfio-ap: disable IRQ in remove callback results in
+ kernel OOPS
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, jjherne@linux.ibm.com
+References: <1572386946-22566-1-git-send-email-akrowiak@linux.ibm.com>
+ <0565c250-726f-dd99-f933-f91162dc107e@linux.ibm.com>
+ <97cf7863-d6d0-418a-09c1-50d9e84fd855@linux.ibm.com>
+ <2ea83094-46c6-ef92-f39c-579f88979320@linux.ibm.com>
+ <c404a796-dfc3-1da1-46b7-fe26d1be18f9@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <c007c372-5a7d-9e05-9510-cef62bbcee98@linux.ibm.com>
+Date:   Fri, 1 Nov 2019 16:04:20 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b9453c6-95c7-4a62-7d2a-08d75f06abb1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2019 20:04:15.4401
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zoKBIFZfCm/UP3cOo7+7N1B55tZKDw1e7damYTT7+ielzdIerrriW4Ew3szLtdMu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB2371
+In-Reply-To: <c404a796-dfc3-1da1-46b7-fe26d1be18f9@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-01_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1911010181
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCk9uIDExLzEvMTkgMjoyNCBQTSwgQW5keSBMdXRvbWlyc2tpIHdyb3RlOg0KPiBPbiBGcmks
-IE5vdiAxLCAyMDE5IGF0IDEyOjIwIFBNIE1vZ2VyLCBCYWJ1IDxCYWJ1Lk1vZ2VyQGFtZC5jb20+
-IHdyb3RlOg0KPj4NCj4+DQo+Pg0KPj4gT24gMTEvMS8xOSAxOjI5IFBNLCBKaW0gTWF0dHNvbiB3
-cm90ZToNCj4+PiBPbiBGcmksIE5vdiAxLCAyMDE5IGF0IDEwOjMzIEFNIE1vZ2VyLCBCYWJ1IDxC
-YWJ1Lk1vZ2VyQGFtZC5jb20+IHdyb3RlOg0KPj4+Pg0KPj4+PiBBTUQgMm5kIGdlbmVyYXRpb24g
-RVBZQyBwcm9jZXNzb3JzIHN1cHBvcnQgVU1JUCAoVXNlci1Nb2RlIEluc3RydWN0aW9uDQo+Pj4+
-IFByZXZlbnRpb24pIGZlYXR1cmUuIFRoZSBVTUlQIGZlYXR1cmUgcHJldmVudHMgdGhlIGV4ZWN1
-dGlvbiBvZiBjZXJ0YWluDQo+Pj4+IGluc3RydWN0aW9ucyBpZiB0aGUgQ3VycmVudCBQcml2aWxl
-Z2UgTGV2ZWwgKENQTCkgaXMgZ3JlYXRlciB0aGFuIDAuDQo+Pj4+IElmIGFueSBvZiB0aGVzZSBp
-bnN0cnVjdGlvbnMgYXJlIGV4ZWN1dGVkIHdpdGggQ1BMID4gMCBhbmQgVU1JUA0KPj4+PiBpcyBl
-bmFibGVkLCB0aGVuIGtlcm5lbCByZXBvcnRzIGEgI0dQIGV4Y2VwdGlvbi4NCj4+Pj4NCj4+Pj4g
-VGhlIGlkZWEgaXMgdGFrZW4gZnJvbSBhcnRpY2xlczoNCj4+Pj4gaHR0cHM6Ly9sd24ubmV0L0Fy
-dGljbGVzLzczODIwOS8NCj4+Pj4gaHR0cHM6Ly9sd24ubmV0L0FydGljbGVzLzY5NDM4NS8NCj4+
-Pj4NCj4+Pj4gRW5hYmxlIHRoZSBmZWF0dXJlIGlmIHN1cHBvcnRlZCBvbiBiYXJlIG1ldGFsIGFu
-ZCBlbXVsYXRlIGluc3RydWN0aW9ucw0KPj4+PiB0byByZXR1cm4gZHVtbXkgdmFsdWVzIGZvciBj
-ZXJ0YWluIGNhc2VzLg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBCYWJ1IE1vZ2VyIDxiYWJ1
-Lm1vZ2VyQGFtZC5jb20+DQo+Pj4+IC0tLQ0KPj4+PiAgYXJjaC94ODYva3ZtL3N2bS5jIHwgICAy
-MSArKysrKysrKysrKysrKysrLS0tLS0NCj4+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRp
-b25zKCspLCA1IGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYv
-a3ZtL3N2bS5jIGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+Pj4+IGluZGV4IDQxNTNjYThjZGRiNy4u
-NzlhYmJkZWNhMTQ4IDEwMDY0NA0KPj4+PiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCj4+Pj4g
-KysrIGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+Pj4+IEBAIC0yNTMzLDYgKzI1MzMsMTEgQEAgc3Rh
-dGljIHZvaWQgc3ZtX2RlY2FjaGVfY3I0X2d1ZXN0X2JpdHMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-KQ0KPj4+PiAgew0KPj4+PiAgfQ0KPj4+Pg0KPj4+PiArc3RhdGljIGJvb2wgc3ZtX3VtaXBfZW11
-bGF0ZWQodm9pZCkNCj4+Pj4gK3sNCj4+Pj4gKyAgICAgICByZXR1cm4gYm9vdF9jcHVfaGFzKFg4
-Nl9GRUFUVVJFX1VNSVApOw0KPj4+PiArfQ0KPj4+DQo+Pj4gVGhpcyBtYWtlcyBubyBzZW5zZSB0
-byBtZS4gSWYgdGhlIGhhcmR3YXJlIGFjdHVhbGx5IHN1cHBvcnRzIFVNSVAsDQo+Pj4gdGhlbiBp
-dCBkb2Vzbid0IGhhdmUgdG8gYmUgZW11bGF0ZWQuDQo+PiBNeSB1bmRlcnN0YW5kaW5nLi4NCj4+
-DQo+PiBJZiB0aGUgaGFyZHdhcmUgc3VwcG9ydHMgdGhlIFVNSVAsIGl0IHdpbGwgZ2VuZXJhdGUg
-dGhlICNHUCBmYXVsdCB3aGVuDQo+PiB0aGVzZSBpbnN0cnVjdGlvbnMgYXJlIGV4ZWN1dGVkIGF0
-IENQTCA+IDAuIFB1cnBvc2Ugb2YgdGhlIGVtdWxhdGlvbiBpcyB0bw0KPj4gdHJhcCB0aGUgR1Ag
-YW5kIHJldHVybiBhIGR1bW15IHZhbHVlLiBTZWVtcyBsaWtlIHRoaXMgcmVxdWlyZWQgaW4gY2Vy
-dGFpbg0KPj4gbGVnYWN5IE9TZXMgcnVubmluZyBpbiBwcm90ZWN0ZWQgYW5kIHZpcnR1YWwtODA4
-NiBtb2Rlcy4gSW4gbG9uZyBtb2RlIG5vDQo+PiBuZWVkIHRvIGVtdWxhdGUuIEhlcmUgaXMgdGhl
-IGJpdCBleHBsYW5hdGlvbiBodHRwczovL2x3bi5uZXQvQXJ0aWNsZXMvNzM4MjA5Lw0KPj4NCj4g
-DQo+IEluZGVlZC4gIEFnYWluLCB3aGF0IGRvZXMgdGhpcyBoYXZlIHRvIGRvIHdpdGggeW91ciBw
-YXRjaD8NCj4gDQo+Pg0KPj4+DQo+Pj4gVG8gdGhlIGV4dGVudCB0aGF0IGt2bSBlbXVsYXRlcyBV
-TUlQIG9uIEludGVsIENQVXMgd2l0aG91dCBoYXJkd2FyZQ0KPj4+IFVNSVAgKGkuZS4gc21zdyBp
-cyBzdGlsbCBhbGxvd2VkIGF0IENQTD4wKSwgd2UgY2FuIGFsd2F5cyBkbyB0aGUgc2FtZQ0KPj4+
-IGVtdWxhdGlvbiBvbiBBTUQsIGJlY2F1c2UgU1ZNIGhhcyBhbHdheXMgb2ZmZXJlZCBpbnRlcmNl
-cHRzIG9mIHNnZHQsDQo+Pj4gc2lkdCwgc2xkdCwgYW5kIHN0ci4gU28sIGlmIHlvdSByZWFsbHkg
-d2FudCB0byBvZmZlciB0aGlzIGVtdWxhdGlvbiBvbg0KPj4+IHByZS1FUFlDIDIgQ1BVcywgdGhp
-cyBmdW5jdGlvbiBzaG91bGQganVzdCByZXR1cm4gdHJ1ZS4gQnV0LCBJIGhhdmUgdG8NCj4+PiBh
-c2ssICJ3aHk/Ig0KPj4NCj4+DQo+PiBUcnlpbmcgdG8gc3VwcG9ydCBVTUlQIGZlYXR1cmUgb25s
-eSBvbiBFUFlDIDIgaGFyZHdhcmUuIE5vIGludGVudGlvbiB0bw0KPj4gc3VwcG9ydCBwcmUtRVBZ
-QyAyLg0KPj4NCj4gDQo+IEkgdGhpbmsgeW91IG5lZWQgdG8gdG90YWxseSByZXdyaXRlIHlvdXIg
-Y2hhbmdlbG9nIHRvIGV4cGxhaW4gd2hhdCB5b3UNCj4gYXJlIGRvaW5nLg0KPiANCj4gQXMgSSB1
-bmRlcnN0YW5kIGl0LCB0aGVyZSBhcmUgYSBjb3VwbGUgb2YgdGhpbmdzIEtWTSBjYW4gZG86DQo+
-IA0KPiAxLiBJZiB0aGUgdW5kZXJseWluZyBoYXJkd2FyZSBzdXBwb3J0cyBVTUlQLCBLVk0gY2Fu
-IGV4cG9zZSBVTUlQIHRvDQo+IHRoZSBndWVzdC4gIFNFViBzaG91bGQgYmUgaXJyZWxldmFudCBo
-ZXJlLg0KPiANCj4gMi4gUmVnYXJkbGVzcyBvZiB3aGV0aGVyIHRoZSB1bmRlcmx5aW5nIGhhcmR3
-YXJlIHN1cHBvcnRzIFVNSVAsIEtWTQ0KPiBjYW4gdHJ5IHRvIGVtdWxhdGUgVU1JUCBpbiB0aGUg
-Z3Vlc3QuICBUaGlzIG1heSBiZSBpbXBvc3NpYmxlIGlmIFNFVg0KPiBpcyBlbmFibGVkLg0KPiAN
-Cj4gV2hpY2ggb2YgdGhlc2UgYXJlIHlvdSBkb2luZz8NCj4gDQpNeSBpbnRlbnRpb24gd2FzIHRv
-IGRvIDEuICBMZXQgbWUgZ28gYmFjayBhbmQgdGhpbmsgYWJvdXQgdGhpcyBhZ2Fpbi4NCg==
+On 10/30/19 2:02 PM, Pierre Morel wrote:
+> 
+> On 10/30/19 5:51 PM, Tony Krowiak wrote:
+>> On 10/30/19 10:00 AM, Pierre Morel wrote:
+>>>
+>>>
+>>>
+>>> On 10/30/19 8:44 AM, Harald Freudenberger wrote:
+>>>> On 29.10.19 23:09, Tony Krowiak wrote:
+>>>>> From: aekrowia <akrowiak@linux.ibm.com>
+>>>>>
+>>>>> When an AP adapter card is configured off via the SE or the SCLP
+>>>>> Deconfigure Adjunct Processor command and the AP bus subsequently 
+>>>>> detects
+>>>>> that the adapter card is no longer in the AP configuration, the card
+>>>>> device representing the adapter card as well as each of its associated
+>>>>> AP queue devices will be removed by the AP bus. If one or more of the
+>>>>> affected queue devices is bound to the VFIO AP device driver, its 
+>>>>> remove
+>>>>> callback will be invoked for each queue to be removed. The remove 
+>>>>> callback
+>>>>> resets the queue and disables IRQ processing. If interrupt 
+>>>>> processing was
+>>>>> never enabled for the queue, disabling IRQ processing will fail 
+>>>>> resulting
+>>>>> in a kernel OOPS.
+>>>>>
+>>>>> This patch verifies IRQ processing is enabled before attempting to 
+>>>>> disable
+>>>>> interrupts for the queue.
+>>>>>
+>>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>>>> Signed-off-by: aekrowia <akrowiak@linux.ibm.com>
+>>>>> ---
+>>>>>   drivers/s390/crypto/vfio_ap_drv.c | 3 ++-
+>>>>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c 
+>>>>> b/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> index be2520cc010b..42d8308fd3a1 100644
+>>>>> --- a/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+>>>>> @@ -79,7 +79,8 @@ static void vfio_ap_queue_dev_remove(struct 
+>>>>> ap_device *apdev)
+>>>>>       apid = AP_QID_CARD(q->apqn);
+>>>>>       apqi = AP_QID_QUEUE(q->apqn);
+>>>>>       vfio_ap_mdev_reset_queue(apid, apqi, 1);
+>>>>> -    vfio_ap_irq_disable(q);
+>>>>> +    if (q->saved_isc != VFIO_AP_ISC_INVALID)
+>>>>> +        vfio_ap_irq_disable(q);
+>>>>>       kfree(q);
+>>>>>       mutex_unlock(&matrix_dev->lock);
+>>>>>   }
+>>>> Reset of an APQN does also clear IRQ processing. I don't say that the
+>>>> resources associated with IRQ handling for the APQN are also cleared.
+>>>> But when you call PQAP(AQIC) after an PQAP(RAPQ) or PQAP(ZAPQ)
+>>>> it is superfluous. However, there should not appear any kernel OOPS.
+>>>> So can you please give me more details about this kernel oops - maybe
+>>>> I need to add exception handler code to the inline ap_aqic() function.
+>>>>
+>>>> regards, Harald Freudenberger
+>>>>
+>>>
+>>> Hi Tony,
+>>>
+>>> wasn't it already solved by the patch 5c4c2126  from Christian ?
+>>
+>> No, that patch merely sets the 'matrix_mdev' field of the
+>> 'struct vfio_ap_queue' to NULL in the vfio_ap_free_aqic_resources()
+>> function. Also, with the latest master branch which has 5c4c2126
+>> installed, the failure occurs.
+>>
+>>>
+>>> Can you send the trace to me please?
+>>
+>> [  266.989476] crw_info : CRW reports slct=0, oflw=0, chn=0, rsc=B, 
+>> anc=0, erc=0, rsid=0
+>> [  266.989617] ------------[ cut here ]------------
+>> [  266.989622] vfio_ap_wait_for_irqclear: tapq rc 03: 0504
+>> [  266.989681] WARNING: CPU: 0 PID: 7 at 
+>> drivers/s390/crypto/vfio_ap_ops.c:101 vfio_ap_irq_disable+0x13c/0x1b0 
+>> [vfio_ap]
+> 
+> 
+> Hi Tony,
+> 
+> This is not a oops this is the warning written in 
+> vfio_ap_wait_for_irqclear() because the AP has been deconfigured.
+> 
+> Note that, IIUC, this (the warning) does not happen for devices bound to 
+> the vfio_ap driver but not currently assigned to a mediated device.
+> 
+> I do not think we should avoid sending a warning in this case because 
+> this is not a normal administration good practice to forcefully take an 
+> AP away like this without smoothly removing the device from the mediated 
+> device.
+> 
+> Regards,
+> 
+> Pierre
+
+After further review, I see this warning is actually issued as a
+WARN_ONCE in the vfio_ap_wait_for_irqclear() function when the
+PQAP(TAPQ) returns with response code 3, AP adapter deconfigured.
+I wasn't aware that the WARN_ONCE macro put out a stack trace.
+That doesn't negate the fact that it makes no sense to disable
+interrupts if they are not enabled, nor does it make sense to
+disable interrrupts subsequent to a reset because the reset will
+disable interrupts. For now, this patch can be ignored pending
+further review of these issues.
+
+> 
+> 
+>> [ 266.989682] Modules linked in: xt_CHECKSUM xt_MASQUERADE tun bridge 
+>> stp llc ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack 
+>> ebtable_nat ip6table_nat ip6table_mangle ip6table_raw 
+>> ip6table_security iptable_nat nf_nat iptable_mangle iptable_raw 
+>> iptable_security nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c 
+>> ip_set nfnetlink ebtable_filter ebtables ip6table_filter ip6_tables 
+>> sunrpc ghash_s390 prng aes_s390 des_s390 libdes vfio_ccw sha512_s390 
+>> sha1_s390 eadm_sch zcrypt_cex4 qeth_l2 crc32_vx_s390 dasd_eckd_mod 
+>> sha256_s390 qeth sha_common dasd_mod ccwgroup qdio pkey zcrypt vfio_ap 
+>> kvm
+>> [  266.989704] CPU: 0 PID: 7 Comm: kworker/0:1 Not tainted 5.4.0-rc5 #81
+>> [  266.989705] Hardware name: IBM 2964 NE1 749 (LPAR)
+>> [  266.989710] Workqueue: events_long ap_scan_bus
+>> [  266.989711] Krnl PSW : 0704c00180000000 000003ff8007d89c 
+>> (vfio_ap_irq_disable+0x13c/0x1b0 [vfio_ap])
+>> [  266.989714]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 
+>> CC:0 PM:0 RI:0 EA:3
+>> [  266.989716] Krnl GPRS: 000000000000000a 0000000000000006 
+>> 000000000000002b 0000000000000007
+>> [  266.989717]            0000000000000007 000000007fe06000 
+>> 000003ff00000005 0000000000000000
+>> [  266.989718]            0000000100000504 0000000000000003 
+>> 00000001f9d27e40 000003e00003bb5c
+>> [  266.989719]            00000001fe765d00 0000000000000504 
+>> 000003ff8007d898 000003e00003ba60
+>> [  266.989724] Krnl Code: 000003ff8007d88c: c02000000ce6    larl 
+>> %r2,3ff8007f258
+>>                           000003ff8007d892: c0e5fffff4c7    brasl 
+>> %r14,3ff8007c220
+>>                          #000003ff8007d898: a7f40001        brc 
+>> 15,3ff8007d89a
+>>                          >000003ff8007d89c: a7f4ff9d        brc 
+>> 15,3ff8007d7d6
+>>                           000003ff8007d8a0: a7100100 tmlh    %r1,256
+>>                           000003ff8007d8a4: a784ff99        brc 
+>> 8,3ff8007d7d6
+>>                           000003ff8007d8a8: a7290014 lghi    %r2,20
+>>                           000003ff8007d8ac: c0e5fffff4b0    brasl 
+>> %r14,3ff8007c20c
+>> [  266.989772] Call Trace:
+>> [  266.989777] ([<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+>> [vfio_ap])
+>> [  266.989779]  [<000003ff8007c4d2>] 
+>> vfio_ap_queue_dev_remove+0x6a/0x90 [vfio_ap]
+>> [  266.989782]  [<00000000bf0f24f0>] ap_device_remove+0x50/0x110
+>> [  266.989784]  [<00000000beffbaac>] 
+>> device_release_driver_internal+0x114/0x1f0
+>> [  266.989787]  [<00000000beff9c88>] bus_remove_device+0x108/0x190
+>> [  266.989789]  [<00000000beff5418>] device_del+0x178/0x3a0
+>> [  266.989790]  [<00000000beff5670>] device_unregister+0x30/0x90
+>> [  266.989791]  [<00000000bf0f0f04>] 
+>> __ap_queue_devices_with_id_unregister+0x44/0x50
+>> [  266.989793]  [<00000000beff86ea>] bus_for_each_dev+0x82/0xb0
+>> [  266.989794]  [<00000000bf0f2aba>] ap_scan_bus+0x262/0x878
+>> [  266.989798]  [<00000000beb4785c>] process_one_work+0x1e4/0x410
+>> [  266.989800]  [<00000000beb47ca8>] worker_thread+0x220/0x460
+>> [  266.989802]  [<00000000beb4e99a>] kthread+0x12a/0x160
+>> [  266.989805]  [<00000000bf2d8eb0>] ret_from_fork+0x28/0x2c
+>> [  266.989806]  [<00000000bf2d8eb4>] kernel_thread_starter+0x0/0xc
+>> [  266.989807] Last Breaking-Event-Address:
+>> [  266.989809]  [<000003ff8007d898>] vfio_ap_irq_disable+0x138/0x1b0 
+>> [vfio_ap]
+>> [  266.989810] ---[ end trace 59b4020890dbd391 ]---
+>>
+>>
+>>>
+>>> Thanks,
+>>>
+>>> Pierre
+>>>
+>>>
+>>>
+>>
+
