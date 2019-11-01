@@ -2,125 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 334CDEBE78
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 08:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8233BEBE9D
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 08:46:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727383AbfKAHa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 03:30:26 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54410 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725784AbfKAHa0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 1 Nov 2019 03:30:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572593425;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6KsUiQYdyNLyb5aUkASLMu4wDADVn4VnI/FHfv9fstE=;
-        b=EIVV7nqMuyzejWpjFF98aoe5p7di8Q/QVJuP+nV3AkrrX9D3FN7Sjhq3zhtF7lqWmd1hOZ
-        6PKkYQfdXCidFpk9CXsk30RLdV29mk10Zn84gkD3B0sKHqk6CqaM0v+I02conXeIedTUVg
-        BmRYZ6A5bwsrWKoHegbPjXs9ajVaVLE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-ptN-xec8NNGqZ_IpHXCAmA-1; Fri, 01 Nov 2019 03:30:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8931005500;
-        Fri,  1 Nov 2019 07:30:19 +0000 (UTC)
-Received: from [10.72.12.30] (ovpn-12-30.pek2.redhat.com [10.72.12.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D851B60852;
-        Fri,  1 Nov 2019 07:29:51 +0000 (UTC)
-Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to
- VM
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
+        id S1730212AbfKAHqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 03:46:15 -0400
+Received: from mga11.intel.com ([192.55.52.93]:5374 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730012AbfKAHqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 03:46:14 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 00:46:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,254,1569308400"; 
+   d="scan'208";a="402149365"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by fmsmga006.fm.intel.com with ESMTP; 01 Nov 2019 00:46:14 -0700
+Received: from fmsmsx117.amr.corp.intel.com (10.18.116.17) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 1 Nov 2019 00:46:14 -0700
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ fmsmsx117.amr.corp.intel.com (10.18.116.17) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 1 Nov 2019 00:46:13 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.2]) with mapi id 14.03.0439.000;
+ Fri, 1 Nov 2019 15:46:11 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
         "mst@redhat.com" <mst@redhat.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "peterx@redhat.com" <peterx@redhat.com>
-Cc:     "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
+CC:     "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
         "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
         "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "Sun, Yi Y" <yi.y.sun@intel.com>,
         "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to
+ VM
+Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VM
+Thread-Index: AQHVimskKWib+KQlOUaXXMOVBk8bu6dql/6AgACL3iCACInPAIAAoJWAgAEjFoCAAIoK8A==
+Date:   Fri, 1 Nov 2019 07:46:11 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5E17C7@SHSMSX104.ccr.corp.intel.com>
 References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
  <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
  <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
  <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
  <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
-Date:   Fri, 1 Nov 2019 15:29:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
+ <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
+In-Reply-To: <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ptN-xec8NNGqZ_IpHXCAmA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTdhNzUyNzUtYjk5YS00ZTAwLThjMjMtMzVjZWVkNzU5YWNiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNXJrYm5tMEhaakxEQk1UUjFpSloxRzVWVTJUUDhvQUxlZWI0MkV6UE9VWmpDcUpmS3JEanhkdVhsZTVDeGZuaCJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/10/31 =E4=B8=8B=E5=8D=8810:07, Liu, Yi L wrote:
->> From: Jason Wang [mailto:jasowang@redhat.com]
->> Sent: Thursday, October 31, 2019 5:33 AM
->> Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressin=
-g to VM
->>
->>
->> On 2019/10/25 =E4=B8=8B=E5=8D=886:12, Tian, Kevin wrote:
->>>> From: Jason Wang [mailto:jasowang@redhat.com]
->>>> Sent: Friday, October 25, 2019 5:49 PM
->>>>
->>>>
->>>> On 2019/10/24 =E4=B8=8B=E5=8D=888:34, Liu Yi L wrote:
->>>>> Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on
->>>>> Intel platforms allow address space sharing between device DMA and
->>>> applications.
->>>>
->>>>
->>>> Interesting, so the below figure demonstrates the case of VM. I
->>>> wonder how much differences if we compare it with doing SVM between
->>>> device and an ordinary process (e.g dpdk)?
->>>>
->>>> Thanks
->>> One difference is that ordinary process requires only stage-1
->>> translation, while VM requires nested translation.
->>
->> A silly question, then I believe there's no need for VFIO DMA API in thi=
-s case consider
->> the page table is shared between MMU and IOMMU?
-> Echo Kevin's reply. We use nested translation here. For stage-1, yes, no =
-need to use
-> VFIO DMA API. For stage-2, we still use VFIO DMA API to program the GPA->=
-HPA
-> mapping to host. :-)
-
-
-Cool, two more questions:
-
-- Can EPT shares its page table with IOMMU L2?
-
-- Similar to EPT, when GPA->HPA (actually HVA->HPA) is modified by mm,=20
-VFIO need to use MMU notifier do modify L2 accordingly besides DMA API?
-
-Thanks
-
-
->
-> Regards,
-> Yi Liu
->> Thanks
->>
-
+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
+RnJpZGF5LCBOb3ZlbWJlciAxLCAyMDE5IDM6MzAgUE0NCj4gDQo+IA0KPiBPbiAyMDE5LzEwLzMx
+IOS4i+WNiDEwOjA3LCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4+IEZyb206IEphc29uIFdhbmcgW21h
+aWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+PiBTZW50OiBUaHVyc2RheSwgT2N0b2JlciAz
+MSwgMjAxOSA1OjMzIEFNDQo+ID4+IFN1YmplY3Q6IFJlOiBbUkZDIHYyIDAwLzIyXSBpbnRlbF9p
+b21tdTogZXhwb3NlIFNoYXJlZCBWaXJ0dWFsDQo+IEFkZHJlc3NpbmcgdG8gVk0NCj4gPj4NCj4g
+Pj4NCj4gPj4gT24gMjAxOS8xMC8yNSDkuIvljYg2OjEyLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4g
+Pj4+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gPj4+
+PiBTZW50OiBGcmlkYXksIE9jdG9iZXIgMjUsIDIwMTkgNTo0OSBQTQ0KPiA+Pj4+DQo+ID4+Pj4N
+Cj4gPj4+PiBPbiAyMDE5LzEwLzI0IOS4i+WNiDg6MzQsIExpdSBZaSBMIHdyb3RlOg0KPiA+Pj4+
+PiBTaGFyZWQgdmlydHVhbCBhZGRyZXNzIChTVkEpLCBhLmsuYSwgU2hhcmVkIHZpcnR1YWwgbWVt
+b3J5IChTVk0pIG9uDQo+ID4+Pj4+IEludGVsIHBsYXRmb3JtcyBhbGxvdyBhZGRyZXNzIHNwYWNl
+IHNoYXJpbmcgYmV0d2VlbiBkZXZpY2UgRE1BDQo+IGFuZA0KPiA+Pj4+IGFwcGxpY2F0aW9ucy4N
+Cj4gPj4+Pg0KPiA+Pj4+DQo+ID4+Pj4gSW50ZXJlc3RpbmcsIHNvIHRoZSBiZWxvdyBmaWd1cmUg
+ZGVtb25zdHJhdGVzIHRoZSBjYXNlIG9mIFZNLiBJDQo+ID4+Pj4gd29uZGVyIGhvdyBtdWNoIGRp
+ZmZlcmVuY2VzIGlmIHdlIGNvbXBhcmUgaXQgd2l0aCBkb2luZyBTVk0NCj4gYmV0d2Vlbg0KPiA+
+Pj4+IGRldmljZSBhbmQgYW4gb3JkaW5hcnkgcHJvY2VzcyAoZS5nIGRwZGspPw0KPiA+Pj4+DQo+
+ID4+Pj4gVGhhbmtzDQo+ID4+PiBPbmUgZGlmZmVyZW5jZSBpcyB0aGF0IG9yZGluYXJ5IHByb2Nl
+c3MgcmVxdWlyZXMgb25seSBzdGFnZS0xDQo+ID4+PiB0cmFuc2xhdGlvbiwgd2hpbGUgVk0gcmVx
+dWlyZXMgbmVzdGVkIHRyYW5zbGF0aW9uLg0KPiA+Pg0KPiA+PiBBIHNpbGx5IHF1ZXN0aW9uLCB0
+aGVuIEkgYmVsaWV2ZSB0aGVyZSdzIG5vIG5lZWQgZm9yIFZGSU8gRE1BIEFQSSBpbiB0aGlzDQo+
+IGNhc2UgY29uc2lkZXINCj4gPj4gdGhlIHBhZ2UgdGFibGUgaXMgc2hhcmVkIGJldHdlZW4gTU1V
+IGFuZCBJT01NVT8NCj4gPiBFY2hvIEtldmluJ3MgcmVwbHkuIFdlIHVzZSBuZXN0ZWQgdHJhbnNs
+YXRpb24gaGVyZS4gRm9yIHN0YWdlLTEsIHllcywgbm8NCj4gbmVlZCB0byB1c2UNCj4gPiBWRklP
+IERNQSBBUEkuIEZvciBzdGFnZS0yLCB3ZSBzdGlsbCB1c2UgVkZJTyBETUEgQVBJIHRvIHByb2dy
+YW0gdGhlDQo+IEdQQS0+SFBBDQo+ID4gbWFwcGluZyB0byBob3N0LiA6LSkNCj4gDQo+IA0KPiBD
+b29sLCB0d28gbW9yZSBxdWVzdGlvbnM6DQo+IA0KPiAtIENhbiBFUFQgc2hhcmVzIGl0cyBwYWdl
+IHRhYmxlIHdpdGggSU9NTVUgTDI/DQoNCnllcywgdGhlaXIgZm9ybWF0cyBhcmUgY29tcGF0aWJs
+ZS4NCg0KPiANCj4gLSBTaW1pbGFyIHRvIEVQVCwgd2hlbiBHUEEtPkhQQSAoYWN0dWFsbHkgSFZB
+LT5IUEEpIGlzIG1vZGlmaWVkIGJ5IG1tLA0KPiBWRklPIG5lZWQgdG8gdXNlIE1NVSBub3RpZmll
+ciBkbyBtb2RpZnkgTDIgYWNjb3JkaW5nbHkgYmVzaWRlcyBETUEgQVBJPw0KPiANCg0KVkZJTyBk
+ZXZpY2VzIG5lZWQgdG8gcGluLWRvd24gZ3Vlc3QgbWVtb3J5IHBhZ2VzIHRoYXQgYXJlIG1hcHBl
+ZA0KaW4gSU9NTVUuIFNvIG5vdGlmaWVyIGlzIG5vdCByZXF1aXJlZCBzaW5jZSBtbSB3b24ndCBj
+aGFuZ2UgdGhlIG1hcHBpbmcNCmZvciB0aG9zZSBwYWdlcy4NCg0KVGhhbmtzDQpLZXZpbg0K
