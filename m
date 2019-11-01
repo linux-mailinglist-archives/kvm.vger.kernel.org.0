@@ -2,177 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FCAFEC41A
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 14:55:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CC45EC471
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 15:14:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727719AbfKANzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 09:55:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:1155 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726622AbfKANzn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 09:55:43 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Nov 2019 06:55:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,255,1569308400"; 
-   d="scan'208";a="190964201"
-Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
-  by orsmga007.jf.intel.com with ESMTP; 01 Nov 2019 06:55:40 -0700
-Date:   Fri, 1 Nov 2019 21:56:28 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-Subject: Re: [PATCH v4] vhost: introduce mdev based hardware backend
-Message-ID: <20191101135628.GA18045@___>
-References: <20191031140114.25615-1-tiwei.bie@intel.com>
- <f9036643-7aaf-7107-8bf0-85975ab95d4b@redhat.com>
+        id S1727036AbfKAOOU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 10:14:20 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:58508 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726912AbfKAOOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 10:14:19 -0400
+Received: from [91.217.168.176] (helo=localhost.localdomain)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <cascardo@canonical.com>)
+        id 1iQXgv-00060W-R9
+        for kvm@vger.kernel.org; Fri, 01 Nov 2019 14:14:17 +0000
+From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+To:     kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] x86/tscdeadline_delay: test busy-wait loop in host
+Date:   Fri,  1 Nov 2019 11:14:08 -0300
+Message-Id: <20191101141408.17838-1-cascardo@canonical.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f9036643-7aaf-7107-8bf0-85975ab95d4b@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 01, 2019 at 03:17:39PM +0800, Jason Wang wrote:
-> On 2019/10/31 下午10:01, Tiwei Bie wrote:
-> > This patch introduces a mdev based hardware vhost backend.
-> > This backend is built on top of the same abstraction used
-> > in virtio-mdev and provides a generic vhost interface for
-> > userspace to accelerate the virtio devices in guest.
-> > 
-> > This backend is implemented as a mdev device driver on top
-> > of the same mdev device ops used in virtio-mdev but using
-> > a different mdev class id, and it will register the device
-> > as a VFIO device for userspace to use. Userspace can setup
-> > the IOMMU with the existing VFIO container/group APIs and
-> > then get the device fd with the device name. After getting
-> > the device fd of this device, userspace can use vhost ioctls
-> > to setup the backend.
-> > 
-> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > ---
-> > This patch depends on below series:
-> > https://lkml.org/lkml/2019/10/30/62
-> > 
-> > v3 -> v4:
-> > - Rebase on top of virtio-mdev series v6;
-> > - Some minor tweaks and improvements;
-> > 
-> > v2 -> v3:
-> > - Fix the return value (Jason);
-> > - Don't cache unnecessary information in vhost-mdev (Jason);
-> > - Get rid of the memset in open (Jason);
-> > - Add comments for VHOST_SET_MEM_TABLE, ... (Jason);
-> > - Filter out unsupported features in vhost-mdev (Jason);
-> > - Add _GET_DEVICE_ID ioctl (Jason);
-> > - Add _GET_CONFIG/_SET_CONFIG ioctls (Jason);
-> > - Drop _GET_QUEUE_NUM ioctl (Jason);
-> > - Fix the copy-paste errors in _IOW/_IOR usage;
-> > - Some minor fixes and improvements;
-> > 
-> > v1 -> v2:
-> > - Replace _SET_STATE with _SET_STATUS (MST);
-> > - Check status bits at each step (MST);
-> > - Report the max ring size and max number of queues (MST);
-> > - Add missing MODULE_DEVICE_TABLE (Jason);
-> > - Only support the network backend w/o multiqueue for now;
-> > - Some minor fixes and improvements;
-> > - Rebase on top of virtio-mdev series v4;
-> > 
-> > RFC v4 -> v1:
-> > - Implement vhost-mdev as a mdev device driver directly and
-> >    connect it to VFIO container/group. (Jason);
-> > - Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
-> >    meaningless HVA->GPA translations (Jason);
-> > 
-> > RFC v3 -> RFC v4:
-> > - Build vhost-mdev on top of the same abstraction used by
-> >    virtio-mdev (Jason);
-> > - Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
-> > 
-> > RFC v2 -> RFC v3:
-> > - Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
-> >    based vhost protocol on top of vfio-mdev (Jason);
-> > 
-> > RFC v1 -> RFC v2:
-> > - Introduce a new VFIO device type to build a vhost protocol
-> >    on top of vfio-mdev;
-> > 
-> >   drivers/vfio/mdev/mdev_core.c    |  20 ++
-> >   drivers/vfio/mdev/mdev_private.h |   1 +
-> >   drivers/vhost/Kconfig            |  12 +
-> >   drivers/vhost/Makefile           |   3 +
-> >   drivers/vhost/mdev.c             | 556 +++++++++++++++++++++++++++++++
-> >   include/linux/mdev.h             |   5 +
-> >   include/uapi/linux/vhost.h       |  18 +
-> >   include/uapi/linux/vhost_types.h |   8 +
-> >   8 files changed, 623 insertions(+)
-> >   create mode 100644 drivers/vhost/mdev.c
-> > 
-> > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> > index 22ca589750d8..109dbac01a8f 100644
-> > --- a/drivers/vfio/mdev/mdev_core.c
-> > +++ b/drivers/vfio/mdev/mdev_core.c
-> > @@ -96,6 +96,26 @@ mdev_get_virtio_ops(struct mdev_device *mdev)
-> >   }
-> >   EXPORT_SYMBOL(mdev_get_virtio_ops);
-> > +/* Specify the vhost device ops for the mdev device, this
-> > + * must be called during create() callback for vhost mdev device.
-> > + */
-> > +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> > +			const struct virtio_mdev_device_ops *vhost_ops)
-> > +{
-> > +	mdev_set_class(mdev, MDEV_CLASS_ID_VHOST);
-> > +	mdev->vhost_ops = vhost_ops;
-> > +}
-> > +EXPORT_SYMBOL(mdev_set_vhost_ops);
-> > +
-> > +/* Get the vhost device ops for the mdev device. */
-> > +const struct virtio_mdev_device_ops *
-> > +mdev_get_vhost_ops(struct mdev_device *mdev)
-> > +{
-> > +	WARN_ON(mdev->class_id != MDEV_CLASS_ID_VHOST);
-> > +	return mdev->vhost_ops;
-> > +}
-> > +EXPORT_SYMBOL(mdev_get_vhost_ops);
-> > +
-> >   struct device *mdev_dev(struct mdev_device *mdev)
-> >   {
-> >   	return &mdev->dev;
-> > diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-> > index 7b47890c34e7..5597c846e52f 100644
-> > --- a/drivers/vfio/mdev/mdev_private.h
-> > +++ b/drivers/vfio/mdev/mdev_private.h
-> > @@ -40,6 +40,7 @@ struct mdev_device {
-> >   	union {
-> >   		const struct vfio_mdev_device_ops *vfio_ops;
-> >   		const struct virtio_mdev_device_ops *virtio_ops;
-> > +		const struct virtio_mdev_device_ops *vhost_ops;
-> 
-> 
-> Any reason why virtio_ops is not used for vhost here?
+When the tsc deadline is used, the host might use a busy wait loop, which
+might sleep for up to the TSC offset/adjust, which is set when the guest
+sets the TSC MSR.
 
-I don't have a strong opinion on this.
-Will use virtio_ops directly.
+Linux commit b606f189c7 ("KVM: LAPIC: cap __delay at lapic_timer_advance_ns")
+fixes the issue and this test check for its regression.
 
-> 
-> Other looks good.
+On a kernel without that fix, the test fails with:
+FAIL: delta: 4296500469
 
-Thanks!
+On a kernel with the fix, the max_delta is usually reported as very low
+compared to that one:
+max delta: 12423150
 
-> 
-> Thanks
-> 
-> 
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+---
+ x86/Makefile.x86_64     |   1 +
+ x86/tscdeadline_delay.c | 105 ++++++++++++++++++++++++++++++++++++++++
+ x86/unittests.cfg       |   4 ++
+ 3 files changed, 110 insertions(+)
+ create mode 100644 x86/tscdeadline_delay.c
+
+diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
+index 010102b600f9..ac0e4858a29c 100644
+--- a/x86/Makefile.x86_64
++++ b/x86/Makefile.x86_64
+@@ -17,6 +17,7 @@ tests += $(TEST_DIR)/syscall.flat
+ tests += $(TEST_DIR)/svm.flat
+ tests += $(TEST_DIR)/vmx.flat
+ tests += $(TEST_DIR)/tscdeadline_latency.flat
++tests += $(TEST_DIR)/tscdeadline_delay.flat
+ tests += $(TEST_DIR)/intel-iommu.flat
+ tests += $(TEST_DIR)/vmware_backdoors.flat
+ tests += $(TEST_DIR)/rdpru.flat
+diff --git a/x86/tscdeadline_delay.c b/x86/tscdeadline_delay.c
+new file mode 100644
+index 000000000000..01498da2d0ce
+--- /dev/null
++++ b/x86/tscdeadline_delay.c
+@@ -0,0 +1,105 @@
++/* Test regression for bug fixed by linux commit b606f189c7 */
++
++#include "libcflat.h"
++#include "apic.h"
++#include "vm.h"
++#include "smp.h"
++#include "desc.h"
++#include "isr.h"
++#include "msr.h"
++
++static u64 expire;
++
++static void test_lapic_existence(void)
++{
++    u32 lvr;
++
++    lvr = apic_read(APIC_LVR);
++    printf("apic version: %x\n", lvr);
++    report("apic existence", (u16)lvr == 0x14);
++}
++
++#define TSC_DEADLINE_TIMER_VECTOR 0xef
++
++static u64 expire;
++static u64 delta;
++
++static void tsc_deadline_timer_isr(isr_regs_t *regs)
++{
++    apic_write(APIC_EOI, 0);
++}
++
++static void start_tsc_deadline_timer(void)
++{
++    u64 tsc;
++
++    handle_irq(TSC_DEADLINE_TIMER_VECTOR, tsc_deadline_timer_isr);
++    irq_enable();
++
++    wrmsr(MSR_IA32_TSC, delta + 1);
++    tsc = rdmsr(MSR_IA32_TSC);
++    expire = tsc + delta;
++    wrmsr(MSR_IA32_TSCDEADLINE, expire);
++    asm volatile ("nop");
++    wrmsr(MSR_IA32_TSC, 1);
++    asm volatile ("nop");
++}
++
++static int enable_tsc_deadline_timer(void)
++{
++    uint32_t lvtt;
++
++    if (cpuid(1).c & (1 << 24)) {
++        lvtt = APIC_LVT_TIMER_TSCDEADLINE | TSC_DEADLINE_TIMER_VECTOR;
++        apic_write(APIC_LVTT, lvtt);
++        start_tsc_deadline_timer();
++        return 1;
++    } else {
++        return 0;
++    }
++}
++
++static void test_tsc_deadline_timer(void)
++{
++    if (enable_tsc_deadline_timer()) {
++        printf("tsc deadline timer enabled\n");
++    } else {
++        printf("tsc deadline timer not detected, aborting\n");
++        abort();
++    }
++}
++
++int main(int argc, char **argv)
++{
++    u64 now;
++    u64 then;
++    u64 max_delta = 0;
++
++    setup_vm();
++    smp_init();
++
++    test_lapic_existence();
++
++    mask_pic_interrupts();
++
++    delta = 1UL << 32;
++
++    test_tsc_deadline_timer();
++    irq_enable();
++
++    now = rdtsc();
++    do {
++        then = now;
++        now = rdtsc();
++        if (now - then > (delta / 2)) {
++            report("delta: %lu\n", false, now - then);
++        }
++        if (now - then > max_delta) {
++            max_delta = now - then;
++        }
++    } while (now < expire + delta);
++
++    printf("max delta: %lu\n", max_delta);
++
++    return report_summary();
++}
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 5ecb9bba535b..b26202d32240 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -186,6 +186,10 @@ extra_params = -cpu kvm64,+rdtscp
+ file = tsc_adjust.flat
+ extra_params = -cpu host
+ 
++[tscdeadline_delay]
++file = tscdeadline_delay.flat
++extra_params = -cpu host,+tsc-deadline
++
+ [xsave]
+ file = xsave.flat
+ arch = x86_64
+-- 
+2.20.1
+
