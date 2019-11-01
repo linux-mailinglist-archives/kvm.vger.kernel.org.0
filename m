@@ -2,54 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1142EBE62
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 08:18:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 334CDEBE78
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 08:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729971AbfKAHSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 03:18:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45433 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbfKAHSG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 03:18:06 -0400
+        id S1727383AbfKAHa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 03:30:26 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54410 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725784AbfKAHa0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 1 Nov 2019 03:30:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572592684;
+        s=mimecast20190719; t=1572593425;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=E4yFBfK6P5qO2iGdElvY9cHWNWW3eh/j179BCPUqcV0=;
-        b=atr6DPzXqG24fiSPKZjBqqEode72e5PWQ++EiXtYCIrVayoB4I14fd6brNN1huYZzwCYbh
-        c/8bU93URiQkHf3dcdZLXdodo2+RM6paH3uDQdZXEBU4BP6IKL3TGDCfFAz8PlqazmSDH7
-        KxPyam/Eonss+Fh7UP1YkTR0N5bdfvs=
+        bh=6KsUiQYdyNLyb5aUkASLMu4wDADVn4VnI/FHfv9fstE=;
+        b=EIVV7nqMuyzejWpjFF98aoe5p7di8Q/QVJuP+nV3AkrrX9D3FN7Sjhq3zhtF7lqWmd1hOZ
+        6PKkYQfdXCidFpk9CXsk30RLdV29mk10Zn84gkD3B0sKHqk6CqaM0v+I02conXeIedTUVg
+        BmRYZ6A5bwsrWKoHegbPjXs9ajVaVLE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-vmEXXq4tO1KNPerKdQYPQA-1; Fri, 01 Nov 2019 03:17:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-279-ptN-xec8NNGqZ_IpHXCAmA-1; Fri, 01 Nov 2019 03:30:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B13F5107ACC0;
-        Fri,  1 Nov 2019 07:17:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8931005500;
+        Fri,  1 Nov 2019 07:30:19 +0000 (UTC)
 Received: from [10.72.12.30] (ovpn-12-30.pek2.redhat.com [10.72.12.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 30C515D6A7;
-        Fri,  1 Nov 2019 07:17:40 +0000 (UTC)
-Subject: Re: [PATCH v4] vhost: introduce mdev based hardware backend
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, maxime.coquelin@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, lingshan.zhu@intel.com
-References: <20191031140114.25615-1-tiwei.bie@intel.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D851B60852;
+        Fri,  1 Nov 2019 07:29:51 +0000 (UTC)
+Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to
+ VM
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>
+Cc:     "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
+ <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <f9036643-7aaf-7107-8bf0-85975ab95d4b@redhat.com>
-Date:   Fri, 1 Nov 2019 15:17:39 +0800
+Message-ID: <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
+Date:   Fri, 1 Nov 2019 15:29:49 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191031140114.25615-1-tiwei.bie@intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: vmEXXq4tO1KNPerKdQYPQA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: ptN-xec8NNGqZ_IpHXCAmA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -59,129 +72,55 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/10/31 =E4=B8=8B=E5=8D=8810:01, Tiwei Bie wrote:
-> This patch introduces a mdev based hardware vhost backend.
-> This backend is built on top of the same abstraction used
-> in virtio-mdev and provides a generic vhost interface for
-> userspace to accelerate the virtio devices in guest.
->
-> This backend is implemented as a mdev device driver on top
-> of the same mdev device ops used in virtio-mdev but using
-> a different mdev class id, and it will register the device
-> as a VFIO device for userspace to use. Userspace can setup
-> the IOMMU with the existing VFIO container/group APIs and
-> then get the device fd with the device name. After getting
-> the device fd of this device, userspace can use vhost ioctls
-> to setup the backend.
->
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> ---
-> This patch depends on below series:
-> https://lkml.org/lkml/2019/10/30/62
->
-> v3 -> v4:
-> - Rebase on top of virtio-mdev series v6;
-> - Some minor tweaks and improvements;
->
-> v2 -> v3:
-> - Fix the return value (Jason);
-> - Don't cache unnecessary information in vhost-mdev (Jason);
-> - Get rid of the memset in open (Jason);
-> - Add comments for VHOST_SET_MEM_TABLE, ... (Jason);
-> - Filter out unsupported features in vhost-mdev (Jason);
-> - Add _GET_DEVICE_ID ioctl (Jason);
-> - Add _GET_CONFIG/_SET_CONFIG ioctls (Jason);
-> - Drop _GET_QUEUE_NUM ioctl (Jason);
-> - Fix the copy-paste errors in _IOW/_IOR usage;
-> - Some minor fixes and improvements;
->
-> v1 -> v2:
-> - Replace _SET_STATE with _SET_STATUS (MST);
-> - Check status bits at each step (MST);
-> - Report the max ring size and max number of queues (MST);
-> - Add missing MODULE_DEVICE_TABLE (Jason);
-> - Only support the network backend w/o multiqueue for now;
-> - Some minor fixes and improvements;
-> - Rebase on top of virtio-mdev series v4;
->
-> RFC v4 -> v1:
-> - Implement vhost-mdev as a mdev device driver directly and
->    connect it to VFIO container/group. (Jason);
-> - Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
->    meaningless HVA->GPA translations (Jason);
->
-> RFC v3 -> RFC v4:
-> - Build vhost-mdev on top of the same abstraction used by
->    virtio-mdev (Jason);
-> - Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
->
-> RFC v2 -> RFC v3:
-> - Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
->    based vhost protocol on top of vfio-mdev (Jason);
->
-> RFC v1 -> RFC v2:
-> - Introduce a new VFIO device type to build a vhost protocol
->    on top of vfio-mdev;
->
->   drivers/vfio/mdev/mdev_core.c    |  20 ++
->   drivers/vfio/mdev/mdev_private.h |   1 +
->   drivers/vhost/Kconfig            |  12 +
->   drivers/vhost/Makefile           |   3 +
->   drivers/vhost/mdev.c             | 556 +++++++++++++++++++++++++++++++
->   include/linux/mdev.h             |   5 +
->   include/uapi/linux/vhost.h       |  18 +
->   include/uapi/linux/vhost_types.h |   8 +
->   8 files changed, 623 insertions(+)
->   create mode 100644 drivers/vhost/mdev.c
->
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.=
-c
-> index 22ca589750d8..109dbac01a8f 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -96,6 +96,26 @@ mdev_get_virtio_ops(struct mdev_device *mdev)
->   }
->   EXPORT_SYMBOL(mdev_get_virtio_ops);
->  =20
-> +/* Specify the vhost device ops for the mdev device, this
-> + * must be called during create() callback for vhost mdev device.
-> + */
-> +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> +=09=09=09const struct virtio_mdev_device_ops *vhost_ops)
-> +{
-> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VHOST);
-> +=09mdev->vhost_ops =3D vhost_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_set_vhost_ops);
-> +
-> +/* Get the vhost device ops for the mdev device. */
-> +const struct virtio_mdev_device_ops *
-> +mdev_get_vhost_ops(struct mdev_device *mdev)
-> +{
-> +=09WARN_ON(mdev->class_id !=3D MDEV_CLASS_ID_VHOST);
-> +=09return mdev->vhost_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_get_vhost_ops);
-> +
->   struct device *mdev_dev(struct mdev_device *mdev)
->   {
->   =09return &mdev->dev;
-> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_pr=
-ivate.h
-> index 7b47890c34e7..5597c846e52f 100644
-> --- a/drivers/vfio/mdev/mdev_private.h
-> +++ b/drivers/vfio/mdev/mdev_private.h
-> @@ -40,6 +40,7 @@ struct mdev_device {
->   =09union {
->   =09=09const struct vfio_mdev_device_ops *vfio_ops;
->   =09=09const struct virtio_mdev_device_ops *virtio_ops;
-> +=09=09const struct virtio_mdev_device_ops *vhost_ops;
+On 2019/10/31 =E4=B8=8B=E5=8D=8810:07, Liu, Yi L wrote:
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Thursday, October 31, 2019 5:33 AM
+>> Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressin=
+g to VM
+>>
+>>
+>> On 2019/10/25 =E4=B8=8B=E5=8D=886:12, Tian, Kevin wrote:
+>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>> Sent: Friday, October 25, 2019 5:49 PM
+>>>>
+>>>>
+>>>> On 2019/10/24 =E4=B8=8B=E5=8D=888:34, Liu Yi L wrote:
+>>>>> Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on
+>>>>> Intel platforms allow address space sharing between device DMA and
+>>>> applications.
+>>>>
+>>>>
+>>>> Interesting, so the below figure demonstrates the case of VM. I
+>>>> wonder how much differences if we compare it with doing SVM between
+>>>> device and an ordinary process (e.g dpdk)?
+>>>>
+>>>> Thanks
+>>> One difference is that ordinary process requires only stage-1
+>>> translation, while VM requires nested translation.
+>>
+>> A silly question, then I believe there's no need for VFIO DMA API in thi=
+s case consider
+>> the page table is shared between MMU and IOMMU?
+> Echo Kevin's reply. We use nested translation here. For stage-1, yes, no =
+need to use
+> VFIO DMA API. For stage-2, we still use VFIO DMA API to program the GPA->=
+HPA
+> mapping to host. :-)
 
 
-Any reason why virtio_ops is not used for vhost here?
+Cool, two more questions:
 
-Other looks good.
+- Can EPT shares its page table with IOMMU L2?
+
+- Similar to EPT, when GPA->HPA (actually HVA->HPA) is modified by mm,=20
+VFIO need to use MMU notifier do modify L2 accordingly besides DMA API?
 
 Thanks
 
+
+>
+> Regards,
+> Yi Liu
+>> Thanks
+>>
 
