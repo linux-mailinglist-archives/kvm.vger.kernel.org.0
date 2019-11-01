@@ -2,194 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CC45EC471
-	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 15:14:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 508D8EC501
+	for <lists+kvm@lfdr.de>; Fri,  1 Nov 2019 15:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727036AbfKAOOU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 1 Nov 2019 10:14:20 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:58508 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726912AbfKAOOT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 1 Nov 2019 10:14:19 -0400
-Received: from [91.217.168.176] (helo=localhost.localdomain)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <cascardo@canonical.com>)
-        id 1iQXgv-00060W-R9
-        for kvm@vger.kernel.org; Fri, 01 Nov 2019 14:14:17 +0000
-From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-To:     kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH] x86/tscdeadline_delay: test busy-wait loop in host
-Date:   Fri,  1 Nov 2019 11:14:08 -0300
-Message-Id: <20191101141408.17838-1-cascardo@canonical.com>
-X-Mailer: git-send-email 2.20.1
+        id S1727555AbfKAOts (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 1 Nov 2019 10:49:48 -0400
+Received: from mail-il1-f195.google.com ([209.85.166.195]:36009 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727556AbfKAOtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 1 Nov 2019 10:49:46 -0400
+Received: by mail-il1-f195.google.com with SMTP id s75so8904659ilc.3
+        for <kvm@vger.kernel.org>; Fri, 01 Nov 2019 07:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=OvG/qWeSbh1TxLgtmArlVNDYsoALFmkQsSm7UaGBE/U=;
+        b=I8fTjuu/6Ne32KB3TzlkLHNc34FVVQHy/sTVoKvVYeIrGIs/zEWpPkdT4X2FTYZjfJ
+         UM4GFAou96icNjK1AVI5vEOtitRVjbXgZfqaanuntVF/vhTirkZT/9E+CWJUq7E2TQj0
+         StXEuMWcR5zlKYK8R7EGKhYIJ+Gb4ciY1IEMBuLWPRJg6NDyeWhuiAg3JUaKBbPDkQbL
+         sElozNdk4t7DFMJr/2GTc4DXhCqAVsopLQpS5jb3DWebvxakkqFHF/FpNq1kpaMflaeM
+         i/d5Nr3Kf7lOCXzSXk2CZXk0I+pfGJSDm0die6SS7xUqTydNbrFVI18tKwuFsQOAi/MB
+         kf9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OvG/qWeSbh1TxLgtmArlVNDYsoALFmkQsSm7UaGBE/U=;
+        b=deLlAc54zkdczu8jdLCwpLIza91N3IN3YKZPipYCaqcV3LlMlxOgPBLwYjJJIHQ+HE
+         /1OlrUcerqICDYKVwW3faFCNYiz9al1wIa9OHyVgkVFkBjRcmwXNlxYAyuTdIfwWT50i
+         CQ2qqPjbNlyr6iQeEJbT+cguUvT5s0mBV2M5k5da8K83LYNKyzAeiEEHzrSInOPgF3U9
+         U26S5fuRPzx0SBjboiEWVrVaSDjqXOM7Lz+wj6XU0sM5rsFMNsHarQtA9+3nams9TC2N
+         +B1TKG/4bGnj5t4XQiUech0tr8fuoyF4ZFGGi81oIQwrIvX0+B1zKOrJeiwV5ffngPms
+         WtIA==
+X-Gm-Message-State: APjAAAXxSmNl7e35lYH3XQGgvVA9r0KMEZZpuIuGgpytuXAq99x/AjLg
+        4LODt21frijCupBwEze0nkHqPg==
+X-Google-Smtp-Source: APXvYqxr+bs1ScRWYKeCxmeXCSlj6Q4Lr6KXKYyS2zYjKblHkVBUMc7IPKJ+YzvkERiHaP9xr0/5Lg==
+X-Received: by 2002:a92:5d8f:: with SMTP id e15mr13331860ilg.173.1572619783709;
+        Fri, 01 Nov 2019 07:49:43 -0700 (PDT)
+Received: from [192.168.1.159] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f73sm1107827ild.59.2019.11.01.07.49.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 01 Nov 2019 07:49:42 -0700 (PDT)
+Subject: Re: [PATCH 10/19] fs/io_uring: set FOLL_PIN via pin_user_pages()
+To:     John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-11-jhubbard@nvidia.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <979ba2a3-ee04-fb12-204d-1b68c7b6e141@kernel.dk>
+Date:   Fri, 1 Nov 2019 08:49:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191030224930.3990755-11-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the tsc deadline is used, the host might use a busy wait loop, which
-might sleep for up to the TSC offset/adjust, which is set when the guest
-sets the TSC MSR.
+On 10/30/19 4:49 PM, John Hubbard wrote:
+> Convert fs/io_uring to use the new pin_user_pages() call, which sets
+> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+> tracking of pinned pages, and therefore for any code that calls
+> put_user_page().
 
-Linux commit b606f189c7 ("KVM: LAPIC: cap __delay at lapic_timer_advance_ns")
-fixes the issue and this test check for its regression.
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-On a kernel without that fix, the test fails with:
-FAIL: delta: 4296500469
-
-On a kernel with the fix, the max_delta is usually reported as very low
-compared to that one:
-max delta: 12423150
-
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
----
- x86/Makefile.x86_64     |   1 +
- x86/tscdeadline_delay.c | 105 ++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg       |   4 ++
- 3 files changed, 110 insertions(+)
- create mode 100644 x86/tscdeadline_delay.c
-
-diff --git a/x86/Makefile.x86_64 b/x86/Makefile.x86_64
-index 010102b600f9..ac0e4858a29c 100644
---- a/x86/Makefile.x86_64
-+++ b/x86/Makefile.x86_64
-@@ -17,6 +17,7 @@ tests += $(TEST_DIR)/syscall.flat
- tests += $(TEST_DIR)/svm.flat
- tests += $(TEST_DIR)/vmx.flat
- tests += $(TEST_DIR)/tscdeadline_latency.flat
-+tests += $(TEST_DIR)/tscdeadline_delay.flat
- tests += $(TEST_DIR)/intel-iommu.flat
- tests += $(TEST_DIR)/vmware_backdoors.flat
- tests += $(TEST_DIR)/rdpru.flat
-diff --git a/x86/tscdeadline_delay.c b/x86/tscdeadline_delay.c
-new file mode 100644
-index 000000000000..01498da2d0ce
---- /dev/null
-+++ b/x86/tscdeadline_delay.c
-@@ -0,0 +1,105 @@
-+/* Test regression for bug fixed by linux commit b606f189c7 */
-+
-+#include "libcflat.h"
-+#include "apic.h"
-+#include "vm.h"
-+#include "smp.h"
-+#include "desc.h"
-+#include "isr.h"
-+#include "msr.h"
-+
-+static u64 expire;
-+
-+static void test_lapic_existence(void)
-+{
-+    u32 lvr;
-+
-+    lvr = apic_read(APIC_LVR);
-+    printf("apic version: %x\n", lvr);
-+    report("apic existence", (u16)lvr == 0x14);
-+}
-+
-+#define TSC_DEADLINE_TIMER_VECTOR 0xef
-+
-+static u64 expire;
-+static u64 delta;
-+
-+static void tsc_deadline_timer_isr(isr_regs_t *regs)
-+{
-+    apic_write(APIC_EOI, 0);
-+}
-+
-+static void start_tsc_deadline_timer(void)
-+{
-+    u64 tsc;
-+
-+    handle_irq(TSC_DEADLINE_TIMER_VECTOR, tsc_deadline_timer_isr);
-+    irq_enable();
-+
-+    wrmsr(MSR_IA32_TSC, delta + 1);
-+    tsc = rdmsr(MSR_IA32_TSC);
-+    expire = tsc + delta;
-+    wrmsr(MSR_IA32_TSCDEADLINE, expire);
-+    asm volatile ("nop");
-+    wrmsr(MSR_IA32_TSC, 1);
-+    asm volatile ("nop");
-+}
-+
-+static int enable_tsc_deadline_timer(void)
-+{
-+    uint32_t lvtt;
-+
-+    if (cpuid(1).c & (1 << 24)) {
-+        lvtt = APIC_LVT_TIMER_TSCDEADLINE | TSC_DEADLINE_TIMER_VECTOR;
-+        apic_write(APIC_LVTT, lvtt);
-+        start_tsc_deadline_timer();
-+        return 1;
-+    } else {
-+        return 0;
-+    }
-+}
-+
-+static void test_tsc_deadline_timer(void)
-+{
-+    if (enable_tsc_deadline_timer()) {
-+        printf("tsc deadline timer enabled\n");
-+    } else {
-+        printf("tsc deadline timer not detected, aborting\n");
-+        abort();
-+    }
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    u64 now;
-+    u64 then;
-+    u64 max_delta = 0;
-+
-+    setup_vm();
-+    smp_init();
-+
-+    test_lapic_existence();
-+
-+    mask_pic_interrupts();
-+
-+    delta = 1UL << 32;
-+
-+    test_tsc_deadline_timer();
-+    irq_enable();
-+
-+    now = rdtsc();
-+    do {
-+        then = now;
-+        now = rdtsc();
-+        if (now - then > (delta / 2)) {
-+            report("delta: %lu\n", false, now - then);
-+        }
-+        if (now - then > max_delta) {
-+            max_delta = now - then;
-+        }
-+    } while (now < expire + delta);
-+
-+    printf("max delta: %lu\n", max_delta);
-+
-+    return report_summary();
-+}
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 5ecb9bba535b..b26202d32240 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -186,6 +186,10 @@ extra_params = -cpu kvm64,+rdtscp
- file = tsc_adjust.flat
- extra_params = -cpu host
- 
-+[tscdeadline_delay]
-+file = tscdeadline_delay.flat
-+extra_params = -cpu host,+tsc-deadline
-+
- [xsave]
- file = xsave.flat
- arch = x86_64
 -- 
-2.20.1
+Jens Axboe
 
