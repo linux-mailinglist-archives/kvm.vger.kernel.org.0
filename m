@@ -2,91 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5540CECDEC
-	for <lists+kvm@lfdr.de>; Sat,  2 Nov 2019 11:01:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08591ECE3B
+	for <lists+kvm@lfdr.de>; Sat,  2 Nov 2019 12:02:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbfKBKBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Nov 2019 06:01:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58942 "EHLO mx1.redhat.com"
+        id S1726663AbfKBLB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Nov 2019 07:01:56 -0400
+Received: from mga18.intel.com ([134.134.136.126]:24973 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726095AbfKBKBL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Nov 2019 06:01:11 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9B8D7882FF
-        for <kvm@vger.kernel.org>; Sat,  2 Nov 2019 10:01:10 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id 92so7077597wro.14
-        for <kvm@vger.kernel.org>; Sat, 02 Nov 2019 03:01:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9XNTKc5genliBm4pwVnGp5ocSwuijOny5znRUr/6AeE=;
-        b=jxcsDo2KCWPmA7IyEZGt9PdyhbLgvPzxVh5rmBOtsqOHzktgG1gG6sWjK+ze3piFCB
-         Hxlp92oreG2iP41+0XgstqRjIMW0pct1q9bOzIHRa8nRxo/wOBTeiFxYP8MHSmtuK/fD
-         NFhtkuaP6STL1B0C6OxbY+iSs9v6uvgc8PeAFBTfF7b1hdyXhKg/Vpg0iG7PLlfq0bjE
-         fXR5Ezk9xw4ADcn+eOMche1isB8mMPhlkOzWoc5tIWWnBUdQt7ZwXcxYh38lJS1nAraw
-         ID2cBC+xbye7Kgpkx34zYUcXvqdTq93EGWdEIQvaJp5cu8xf0deSaj8M/bMU/FhZdTih
-         4Gnw==
-X-Gm-Message-State: APjAAAWZKgOK9iDaZZPSTxa84wrdNIp+G6Q1137OevxZ+UmrBV4bo38r
-        ceacMgITNt9LZtGmxWWkzub7ZlJboMNw8t+YntbwB/tBLB+sAfkkhiKC6EpiDdLXdLrSQNnN8vt
-        1/PHM9bVehYmL
-X-Received: by 2002:adf:b1d2:: with SMTP id r18mr14095110wra.138.1572688869238;
-        Sat, 02 Nov 2019 03:01:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzAbnbtaVvZ/Im2kHYX6IDEmFoBtWlaf3txs0fR9HacSgsiPdOBQBsCH7wyWCpWDEDQIlgeIg==
-X-Received: by 2002:adf:b1d2:: with SMTP id r18mr14095088wra.138.1572688868989;
-        Sat, 02 Nov 2019 03:01:08 -0700 (PDT)
-Received: from [192.168.42.35] (mob-31-159-163-247.net.vodafone.it. [31.159.163.247])
-        by smtp.gmail.com with ESMTPSA id w15sm10084861wro.65.2019.11.02.03.01.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Nov 2019 03:01:08 -0700 (PDT)
-Subject: Re: [PATCH v4 12/17] svm: Temporary deactivate AVIC during ExtINT
- handling
-To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "rkagan@virtuozzo.com" <rkagan@virtuozzo.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-References: <1572648072-84536-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1572648072-84536-13-git-send-email-suravee.suthikulpanit@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e57e11f4-ec24-6ad1-22ce-97da1910ed02@redhat.com>
-Date:   Sat, 2 Nov 2019 11:01:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726163AbfKBLBz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 2 Nov 2019 07:01:55 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Nov 2019 04:01:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,259,1569308400"; 
+   d="scan'208";a="206632673"
+Received: from mohseni-mobl2.ger.corp.intel.com (HELO btopel-mobl.ger.intel.com) ([10.252.42.93])
+  by FMSMGA003.fm.intel.com with ESMTP; 02 Nov 2019 04:01:44 -0700
+Subject: Re: [PATCH 11/19] net/xdp: set FOLL_PIN via pin_user_pages()
+To:     John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+References: <20191030224930.3990755-1-jhubbard@nvidia.com>
+ <20191030224930.3990755-12-jhubbard@nvidia.com>
+From:   =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>
+Message-ID: <67cd4960-bc17-9603-8d4d-b7b2f68bb373@intel.com>
+Date:   Sat, 2 Nov 2019 12:01:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <1572648072-84536-13-git-send-email-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191030224930.3990755-12-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/11/19 23:41, Suthikulpanit, Suravee wrote:
-> +		/*
-> +		 * IRQ window is not needed when AVIC is enabled,
-> +		 * unless we have pending ExtINT since it cannot be injected
-> +		 * via AVIC. In such case, we need to temporarily disable AVIC,
-> +		 * and fallback to injecting IRQ via V_IRQ.
-> +		 */
-> +		if (kvm_vcpu_apicv_active(vcpu))
-> +			svm_request_update_avic(vcpu, false);
+On 2019-10-30 23:49, John Hubbard wrote:
+> Convert net/xdp to use the new pin_longterm_pages() call, which sets
+> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
+> tracking of pinned pages.
+> 
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-This must be pretty heavy-weight on SMP VMs, even if most ExtINT guests
-do not need SMP in the guest.  One alternative is to enable/disable
-APICv when LVT or IOAPIC registers are written with ExtINT mode.  Not a
-blocker, just an idea to consider.
+Acked-by: Björn Töpel <bjorn.topel@intel.com>
 
-Paolo
+> ---
+>   net/xdp/xdp_umem.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+> index 16d5f353163a..4d56dfb1139a 100644
+> --- a/net/xdp/xdp_umem.c
+> +++ b/net/xdp/xdp_umem.c
+> @@ -285,8 +285,8 @@ static int xdp_umem_pin_pages(struct xdp_umem *umem)
+>   		return -ENOMEM;
+>   
+>   	down_read(&current->mm->mmap_sem);
+> -	npgs = get_user_pages(umem->address, umem->npgs,
+> -			      gup_flags | FOLL_LONGTERM, &umem->pgs[0], NULL);
+> +	npgs = pin_longterm_pages(umem->address, umem->npgs, gup_flags,
+> +				  &umem->pgs[0], NULL);
+>   	up_read(&current->mm->mmap_sem);
+>   
+>   	if (npgs != umem->npgs) {
+> 
