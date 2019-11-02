@@ -2,131 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32F7AECDA8
-	for <lists+kvm@lfdr.de>; Sat,  2 Nov 2019 08:35:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC29EECDC9
+	for <lists+kvm@lfdr.de>; Sat,  2 Nov 2019 09:53:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbfKBHfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 2 Nov 2019 03:35:25 -0400
-Received: from mga04.intel.com ([192.55.52.120]:5806 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726014AbfKBHfY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 2 Nov 2019 03:35:24 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Nov 2019 00:35:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,258,1569308400"; 
-   d="scan'208";a="204080629"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by orsmga003.jf.intel.com with ESMTP; 02 Nov 2019 00:35:23 -0700
-Received: from fmsmsx153.amr.corp.intel.com (10.18.125.6) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 2 Nov 2019 00:35:23 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX153.amr.corp.intel.com (10.18.125.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 2 Nov 2019 00:35:22 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Sat, 2 Nov 2019 15:35:21 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>
-CC:     "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
-Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to
- VM
-Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VM
-Thread-Index: AQHVimskKWib+KQlOUaXXMOVBk8bu6dql/6AgACL3iCACInPAIAAoJWAgAEjFoCAAIoK8P//f5WAgAABiYCAAg37kA==
-Date:   Sat, 2 Nov 2019 07:35:19 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5E2309@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
- <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
- <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5E17C7@SHSMSX104.ccr.corp.intel.com>
- <18534f1b-3488-994b-73e2-17e7d8ccb4c2@redhat.com>
- <4fae7d47-93c6-1278-b55e-ec06fa3ca7f1@redhat.com>
-In-Reply-To: <4fae7d47-93c6-1278-b55e-ec06fa3ca7f1@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTk1MDM1NTItOTQ0Yi00NGQxLTk1NWItMWY3NmRkMTQxNjVhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiYkJLM1ZGZmxDSE9ISDZuXC9SVXFPelc4azh4UnhYU3p2NWRmcld2K1hKZkdmZkdBNlEzaXFuSEF1eXJSRHhvbjEifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727458AbfKBIxK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 2 Nov 2019 04:53:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11416 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727364AbfKBIxJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 2 Nov 2019 04:53:09 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA28Wtpd074361
+        for <kvm@vger.kernel.org>; Sat, 2 Nov 2019 04:53:08 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w144autub-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sat, 02 Nov 2019 04:53:08 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Sat, 2 Nov 2019 08:53:06 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sat, 2 Nov 2019 08:53:04 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA28r2dl38862934
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 2 Nov 2019 08:53:02 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 63D8CA404D;
+        Sat,  2 Nov 2019 08:53:02 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 07A11A4051;
+        Sat,  2 Nov 2019 08:53:02 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.10.62])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sat,  2 Nov 2019 08:53:01 +0000 (GMT)
+Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
+        cohuck@redhat.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-10-frankja@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Sat, 2 Nov 2019 09:53:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20191024114059.102802-10-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19110208-0016-0000-0000-000002C0086E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19110208-0017-0000-0000-000033217375
+Message-Id: <6ff87f0a-6fad-797f-dc12-e6031933d74a@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-02_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=813 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1911020084
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
-RnJpZGF5LCBOb3ZlbWJlciAxLCAyMDE5IDQ6MTAgUE0NCj4gDQo+IA0KPiBPbiAyMDE5LzExLzEg
-5LiL5Y2INDowNCwgSmFzb24gV2FuZyB3cm90ZToNCj4gPg0KPiA+IE9uIDIwMTkvMTEvMSDkuIvl
-jYgzOjQ2LCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPj4+IEZyb206IEphc29uIFdhbmcgW21haWx0
-bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+Pj4gU2VudDogRnJpZGF5LCBOb3ZlbWJlciAxLCAy
-MDE5IDM6MzAgUE0NCj4gPj4+DQo+ID4+Pg0KPiA+Pj4gT24gMjAxOS8xMC8zMSDkuIvljYgxMDow
-NywgTGl1LCBZaSBMIHdyb3RlOg0KPiA+Pj4+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFz
-b3dhbmdAcmVkaGF0LmNvbV0NCj4gPj4+Pj4gU2VudDogVGh1cnNkYXksIE9jdG9iZXIgMzEsIDIw
-MTkgNTozMyBBTQ0KPiA+Pj4+PiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMC8yMl0gaW50ZWxfaW9t
-bXU6IGV4cG9zZSBTaGFyZWQgVmlydHVhbA0KPiA+Pj4gQWRkcmVzc2luZyB0byBWTQ0KPiA+Pj4+
-Pg0KPiA+Pj4+PiBPbiAyMDE5LzEwLzI1IOS4i+WNiDY6MTIsIFRpYW4sIEtldmluIHdyb3RlOg0K
-PiA+Pj4+Pj4+IEZyb206IEphc29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0K
-PiA+Pj4+Pj4+IFNlbnQ6IEZyaWRheSwgT2N0b2JlciAyNSwgMjAxOSA1OjQ5IFBNDQo+ID4+Pj4+
-Pj4NCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+IE9uIDIwMTkvMTAvMjQg5LiL5Y2IODozNCwgTGl1IFlp
-IEwgd3JvdGU6DQo+ID4+Pj4+Pj4+IFNoYXJlZCB2aXJ0dWFsIGFkZHJlc3MgKFNWQSksIGEuay5h
-LCBTaGFyZWQgdmlydHVhbCBtZW1vcnkNCj4gPj4+Pj4+Pj4gKFNWTSkgb24NCj4gPj4+Pj4+Pj4g
-SW50ZWwgcGxhdGZvcm1zIGFsbG93IGFkZHJlc3Mgc3BhY2Ugc2hhcmluZyBiZXR3ZWVuIGRldmlj
-ZSBETUENCj4gPj4+IGFuZA0KPiA+Pj4+Pj4+IGFwcGxpY2F0aW9ucy4NCj4gPj4+Pj4+Pg0KPiA+
-Pj4+Pj4+DQo+ID4+Pj4+Pj4gSW50ZXJlc3RpbmcsIHNvIHRoZSBiZWxvdyBmaWd1cmUgZGVtb25z
-dHJhdGVzIHRoZSBjYXNlIG9mIFZNLiBJDQo+ID4+Pj4+Pj4gd29uZGVyIGhvdyBtdWNoIGRpZmZl
-cmVuY2VzIGlmIHdlIGNvbXBhcmUgaXQgd2l0aCBkb2luZyBTVk0NCj4gPj4+IGJldHdlZW4NCj4g
-Pj4+Pj4+PiBkZXZpY2UgYW5kIGFuIG9yZGluYXJ5IHByb2Nlc3MgKGUuZyBkcGRrKT8NCj4gPj4+
-Pj4+Pg0KPiA+Pj4+Pj4+IFRoYW5rcw0KPiA+Pj4+Pj4gT25lIGRpZmZlcmVuY2UgaXMgdGhhdCBv
-cmRpbmFyeSBwcm9jZXNzIHJlcXVpcmVzIG9ubHkgc3RhZ2UtMQ0KPiA+Pj4+Pj4gdHJhbnNsYXRp
-b24sIHdoaWxlIFZNIHJlcXVpcmVzIG5lc3RlZCB0cmFuc2xhdGlvbi4NCj4gPj4+Pj4gQSBzaWxs
-eSBxdWVzdGlvbiwgdGhlbiBJIGJlbGlldmUgdGhlcmUncyBubyBuZWVkIGZvciBWRklPIERNQSBB
-UEkNCj4gPj4+Pj4gaW4gdGhpcw0KPiA+Pj4gY2FzZSBjb25zaWRlcg0KPiA+Pj4+PiB0aGUgcGFn
-ZSB0YWJsZSBpcyBzaGFyZWQgYmV0d2VlbiBNTVUgYW5kIElPTU1VPw0KPiA+Pj4+IEVjaG8gS2V2
-aW4ncyByZXBseS4gV2UgdXNlIG5lc3RlZCB0cmFuc2xhdGlvbiBoZXJlLiBGb3Igc3RhZ2UtMSwN
-Cj4gPj4+PiB5ZXMsIG5vDQo+ID4+PiBuZWVkIHRvIHVzZQ0KPiA+Pj4+IFZGSU8gRE1BIEFQSS4g
-Rm9yIHN0YWdlLTIsIHdlIHN0aWxsIHVzZSBWRklPIERNQSBBUEkgdG8gcHJvZ3JhbSB0aGUNCj4g
-Pj4+IEdQQS0+SFBBDQo+ID4+Pj4gbWFwcGluZyB0byBob3N0LiA6LSkNCj4gPj4+DQo+ID4+PiBD
-b29sLCB0d28gbW9yZSBxdWVzdGlvbnM6DQo+ID4+Pg0KPiA+Pj4gLSBDYW4gRVBUIHNoYXJlcyBp
-dHMgcGFnZSB0YWJsZSB3aXRoIElPTU1VIEwyPw0KPiA+PiB5ZXMsIHRoZWlyIGZvcm1hdHMgYXJl
-IGNvbXBhdGlibGUuDQo+ID4+DQo+ID4+PiAtIFNpbWlsYXIgdG8gRVBULCB3aGVuIEdQQS0+SFBB
-IChhY3R1YWxseSBIVkEtPkhQQSkgaXMgbW9kaWZpZWQgYnkNCj4gbW0sDQo+ID4+PiBWRklPIG5l
-ZWQgdG8gdXNlIE1NVSBub3RpZmllciBkbyBtb2RpZnkgTDIgYWNjb3JkaW5nbHkgYmVzaWRlcyBE
-TUENCj4gQVBJPw0KPiA+Pj4NCj4gPj4gVkZJTyBkZXZpY2VzIG5lZWQgdG8gcGluLWRvd24gZ3Vl
-c3QgbWVtb3J5IHBhZ2VzIHRoYXQgYXJlIG1hcHBlZA0KPiA+PiBpbiBJT01NVS4gU28gbm90aWZp
-ZXIgaXMgbm90IHJlcXVpcmVkIHNpbmNlIG1tIHdvbid0IGNoYW5nZSB0aGUNCj4gbWFwcGluZw0K
-PiA+PiBmb3IgdGhvc2UgcGFnZXMuDQo+ID4NCj4gPg0KPiA+IFRoZSBHVVAgdGVuZHMgdG8gbGVh
-ZCBhIGxvdCBvZiBpc3N1ZXMsIHdlIG1heSBjb25zaWRlciB0byBhbGxvdw0KPiA+IHVzZXJzcGFj
-ZSB0byBjaG9vc2UgdG8gbm90IHBpbiB0aGVtIGluIHRoZSBmdXR1cmUuDQo+IA0KPiANCj4gQnR3
-LCBJJ20gYXNraW5nIHNpbmNlIEkgc2VlIE1NVSBub3RpZmllciBpcyB1c2VkIGJ5IGludGVsLXN2
-bS5jIHRvIGZsdXNoDQo+IElPVExCLiAoSSBkb24ndCBzZWUgYW55IHVzZXJzIGluIGtlcm5lbCBz
-b3VyY2UgdGhhdCB1c2UgdGhhdCBBUEkgdGhvdWdoDQo+IGUuZyBpbnRlbF9zdm1fYmluZF9tbSgp
-KS4NCj4gDQoNCmludGVsLXN2bS5jIHJlcXVpcmVzIE1NVSBub3RpZmllciB0byBpbnZhbGlkYXRl
-IElPVExCIHVwb24gYW55IGNoYW5nZQ0Kb24gdGhlIENQVSBwYWdlIHRhYmxlLCB3aGVuIHRoZSBs
-YXR0ZXIgaXMgc2hhcmVkIHdpdGggZGV2aWNlIGluIFNWQQ0KY2FzZS4gQnV0IGZvciBWRklPIHVz
-YWdlLCB3aGljaCBpcyBiYXNlZCBvbiBzdGFnZTIsIHRoZSBtYXAvdW5tYXAgDQpyZXF1ZXN0cyBl
-eHBsaWNpdGx5IGNvbWUgZnJvbSB1c2Vyc3BhY2UuIHRoZXJlIGlzIG5vIG5lZWQgdG8gc3luYyB3
-aXRoDQptbS4NCg0KVGhhbmtzDQpLZXZpbg0K
+
+
+On 24.10.19 13:40, Janosch Frank wrote:
+> From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+> Pin the guest pages when they are first accessed, instead of all at
+> the same time when starting the guest.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+[...]
+> diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+> index 80aecd5bea9e..383e660e2221 100644
+> --- a/arch/s390/kvm/pv.c
+> +++ b/arch/s390/kvm/pv.c
+> @@ -15,8 +15,35 @@
+>  #include <asm/mman.h>
+>  #include "kvm-s390.h"
+>  
+> +static void unpin_destroy(struct page **pages, int nr)
+> +{
+> +	int i;
+> +	struct page *page;
+> +	u8 *val;
+> +
+> +	for (i = 0; i < nr; i++) {
+> +		page = pages[i];
+> +		if (!page)	/* page was never used */
+> +			continue;
+> +		val = (void *)page_to_phys(page);
+
+Why dont we call the convert from secure directly here to avoid the fault overhead?
+
+> +		READ_ONCE(*val);
+> +		put_page(page);
+
+as we also do the export here (via implicit reading that page) this can take a while.
+I think we must add a cond_resched here. 
+
+> +	}
+> +}
+> +
+
+[...]
+> -
+>  	mutex_unlock(&kvm->slots_lock);
+> +
+> +	kvm->arch.gmap->pinned_pages = vzalloc(npages * sizeof(struct page *));
+> +	if (!kvm->arch.gmap->pinned_pages)
+> +		goto out_err;
+>  	kvm->arch.pv.guest_len = npages * PAGE_SIZE;
+>  
+>  	/* Allocate variable storage */
+>  	vlen = ALIGN(virt * ((npages * PAGE_SIZE) / HPAGE_SIZE), PAGE_SIZE);
+>  	vlen += uv_info.guest_virt_base_stor_len;
+>  	kvm->arch.pv.stor_var = vzalloc(vlen);
+> -	if (!kvm->arch.pv.stor_var) {
+> -		kvm_s390_pv_dealloc_vm(kvm);
+> -		return -ENOMEM;
+> -	}
+> +	if (!kvm->arch.pv.stor_var)
+> +		goto out_err;
+>  	return 0;
+> +
+> +out_err:
+> +	kvm_s390_pv_dealloc_vm(kvm);
+> +	return -ENOMEM;
+>  }
+>  
+>  int kvm_s390_pv_destroy_vm(struct kvm *kvm)
+> @@ -216,6 +246,11 @@ int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
+>  	for (i = 0; i < size / PAGE_SIZE; i++) {
+>  		uvcb.gaddr = addr + i * PAGE_SIZE;
+>  		uvcb.tweak[1] = i * PAGE_SIZE;
+> +		down_read(&kvm->mm->mmap_sem);
+> +		rc = kvm_s390_pv_pin_page(kvm->arch.gmap, uvcb.gaddr);
+> +		up_read(&kvm->mm->mmap_sem);
+
+Here we should also have a cond_resched();
+
+> +		if (rc && (rc != -EEXIST))
+> +			break;
+>  retry:
+>  		rc = uv_call(0, (u64)&uvcb);
+>  		if (!rc)
+> 
+
