@@ -2,91 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 702C9EE045
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 13:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92EACEE17E
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 14:48:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728903AbfKDMoB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 07:44:01 -0500
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21879 "EHLO
-        sender4-of-o58.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727236AbfKDMoA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 07:44:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1572871412; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=ZGGX4IiQmFpfjgydc5Xn3ayaHUnZg5ayc1LgN+2EPAEWadlQ72zdOWTHjWwWf463miX0+AQduBQOwrZZGDWGqGQg9RXjYQU/UgNLOTWKMHHGwVhJAg9XdayW3ORX/ipIds8MeKjQhM9LJCYoJCwmZ0pT2Q7XjsREIdqT1UkQTYs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1572871412; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=6Ln4BdVwFHO2I5x/J3dmCMdBNcZGsmz/4+6/IHcamSs=; 
-        b=OXHSlHABKLoE/hqE1f3/eQLMEHQH+AidsnP2yoeYe4Qz5s3+azo1sI0zcMwQEpMxEKYXYqKdTAGrp1j35ct3daqdXcwBags9mh6M4a5BqzIHRxGHBO4zaAlBTofir9euc9yn3DpsM7i+6pE+Qegqzwhyq/2ev0FbQnnXK9GOLWA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=patchew.org;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1572871409656174.88674502333663; Mon, 4 Nov 2019 04:43:29 -0800 (PST)
-In-Reply-To: <20191104121458.29208-1-zhengxiang9@huawei.com>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v21 0/6] Add ARMv8 RAS virtualization support in QEMU
-Message-ID: <157287140443.27285.11755911437215821061@37313f22b938>
+        id S1728807AbfKDNsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 08:48:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20627 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727838AbfKDNsC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 08:48:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572875280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3Qs5Gcd0AWtT+lt6/5wDKSv9UZDPYYjnMGQycZ7Fazk=;
+        b=P3Lotzuhis59p/mUnEd+6AHZ87f5fYhmVfYYjPIL/lxZjVsAVulgSSZps/mPScDQ/J1Q6/
+        /2eK7DTXs6Ej0Mt/y5s6k+hvzWBQ+KXbU50f44kMrhqewczv/vknQJy9oWEA+CfprOU1Ta
+        MlihBWP3yeMXbrs7vZ4eb+gghskeYvY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-ondfIdnPN2GwjegsllH4hA-1; Mon, 04 Nov 2019 08:47:57 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52631800C73;
+        Mon,  4 Nov 2019 13:47:56 +0000 (UTC)
+Received: from [10.36.117.96] (ovpn-117-96.ams2.redhat.com [10.36.117.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BD171001B03;
+        Mon,  4 Nov 2019 13:47:54 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: SCLP unit test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
+ <1572023194-14370-6-git-send-email-imbrenda@linux.ibm.com>
+ <1df14176-20a7-a9af-5622-2853425d973e@redhat.com>
+ <20191104122931.0774ff7a@p-imbrenda.boeblingen.de.ibm.com>
+ <56ce2fe9-1a6a-ffd6-3776-0be1b622032b@redhat.com>
+ <20191104124912.7cb58664@p-imbrenda.boeblingen.de.ibm.com>
+ <73d233c8-6599-ab1c-6da3-88a4fa719c82@redhat.com>
+ <20191104130626.460261a1@p-imbrenda.boeblingen.de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <3a551500-102b-c80e-8b4e-9ff2c498d5df@redhat.com>
+Date:   Mon, 4 Nov 2019 14:47:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     zhengxiang9@huawei.com
-Cc:     pbonzini@redhat.com, mst@redhat.com, imammedo@redhat.com,
-        shannon.zhaosl@gmail.com, peter.maydell@linaro.org,
-        lersek@redhat.com, james.morse@arm.com, gengdongjiu@huawei.com,
-        mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
-        jonathan.cameron@huawei.com, xuwei5@huawei.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-        linuxarm@huawei.com, wanghaibin.wang@huawei.com,
-        zhengxiang9@huawei.com
-Date:   Mon, 4 Nov 2019 04:43:29 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191104130626.460261a1@p-imbrenda.boeblingen.de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: ondfIdnPN2GwjegsllH4hA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNDEyMTQ1OC4yOTIw
-OC0xLXpoZW5neGlhbmc5QGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
-MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
-MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNr
-LXVuaXQ6IHRlc3RzL3Rlc3QtdGhyb3R0bGUKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rl
-c3QtdGhyZWFkLXBvb2wKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlv
-bi10ZXN0LmM6OTAzOndhaXRfZm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAo
-IXN0cmNtcChzdGF0dXMsICJzZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwg
-KGFsbG93X2FjdGl2ZSAmJiAhc3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKRVJST1IgLSBCYWls
-IG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0LmM6OTAz
-OndhaXRfZm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAoIXN0cmNtcChzdGF0
-dXMsICJzZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwgKGFsbG93X2FjdGl2
-ZSAmJiAhc3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC1h
-YXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
-CiAgVEVTVCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWhiaXRtYXAKICBURVNUICAgIGlvdGVz
-dC1xY293MjogMDEzCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNt
-ZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbics
-ICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0yNjA3
-YWIzYWExOGY0ZTY1OGUyMWVjMjQ4ZGQ4MGMwYycsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHkt
-b3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScs
-ICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcs
-ICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92
-YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1j
-Y2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLWd6MnQ4eTZtL3NyYy9kb2NrZXItc3JjLjIwMTktMTEtMDQtMDcuMzIuMjAuOTU3NTovdmFy
-L3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rl
-c3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmls
-dGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MjYwN2FiM2FhMThmNGU2NThlMjFlYzI0
-OGRkODBjMGMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZp
-bmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZ3oydDh5Nm0vc3JjJwpt
-YWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAg
-IDExbTQuNjkzcwp1c2VyICAgIDBtOC45MTRzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEwNDEyMTQ1OC4yOTIwOC0xLXpoZW5neGlh
-bmc5QGh1YXdlaS5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+On 04.11.19 13:06, Claudio Imbrenda wrote:
+> On Mon, 4 Nov 2019 12:55:48 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 04.11.19 12:49, Claudio Imbrenda wrote:
+>>> On Mon, 4 Nov 2019 12:31:32 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   =20
+>>>> On 04.11.19 12:29, Claudio Imbrenda wrote:
+>>>>> On Mon, 4 Nov 2019 11:58:20 +0100
+>>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>>
+>>>>> [...]
+>>>>>      =20
+>>>>>> Can we just please rename all "cx" into something like "len"? Or
+>>>>>> is there a real need to have "cx" in there?
+>>>>>
+>>>>> if cx is such a nuisance to you, sure, I can rename it to i
+>>>>
+>>>> better than random characters :)
+>>>
+>>> will be in v3
+>>>   =20
+>>>>>      =20
+>>>>>> Also, I still dislike "test_one_sccb". Can't we just just do
+>>>>>> something like
+>>>>>>
+>>>>>> expect_pgm_int();
+>>>>>> rc =3D test_one_sccb(...)
+>>>>>> report("whatever pgm", rc =3D=3D WHATEVER);
+>>>>>> report("whatever rc", lc->pgm_int_code =3D=3D WHATEVER);
+>>>>>>
+>>>>>> In the callers to make these tests readable and cleanup
+>>>>>> test_one_sccb(). I don't care if that produces more LOC as long
+>>>>>> as I can actually read and understand the test cases.
+>>>>>
+>>>>> if you think that makes it more readable, ok I guess...
+>>>>>
+>>>>> consider that the output will be unreadable, though
+>>>>>      =20
+>>>>
+>>>> I think his will turn out more readable.
+>>>
+>>> two output lines per SCLP call? I  don't think so
+>>
+>> To clarify, we don't always need two checks. E.g., I would like to
+>> see instead of
+>>
+>> +static void test_sccb_too_short(void)
+>> +{
+>> +=09int cx;
+>> +
+>> +=09for (cx =3D 0; cx < 8; cx++)
+>> +=09=09if (!test_one_run(valid_code, pagebuf, cx, 8,
+>> PGM_BIT_SPEC, 0))
+>> +=09=09=09break;
+>> +
+>> +=09report("SCCB too short", cx =3D=3D 8);
+>> +}
+>>
+>> Something like
+>>
+>> static void test_sccb_too_short(void)
+>> {
+>> =09int i;
+>>
+>> =09for (i =3D 0; i < 8; i++) {
+>> =09=09expect_pgm_int();
+>> =09=09test_one_sccb(...); // or however that will be called
+>> =09=09check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+>> =09}
+>> }
+>>
+>> If possible.
+>>
+>=20
+> so, thousands of output lines for the whole test, ok
+>=20
+
+A couple of things to note
+
+a) You perform 8 checks, so report the result of 8 checks
+b) We really don't care about the number of lines in a log file as long=20
+as we can roughly identify what went wrong (e.g., push/pop a prefix here)
+c) We really *don't* need full coverage here. The same applies to other=20
+tests. Simply testing against the boundary conditions is good enough.
+
+
+expect_pgm_int();
+test_one_sccb(..., 0, ...);
+check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+
+expect_pgm_int();
+test_one_sccb(..., 7, ...);
+check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+
+Just as we handle it in other tests.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
