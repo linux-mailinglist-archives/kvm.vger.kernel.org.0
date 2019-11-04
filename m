@@ -2,147 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84EF5EDF46
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 12:54:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A029BEDF50
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 12:56:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729262AbfKDLyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 06:54:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60458 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728377AbfKDLyE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 06:54:04 -0500
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1728812AbfKDLz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 06:55:56 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21165 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728346AbfKDLz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 06:55:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572868555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wy35btpntBTMjiVNCiOtVBVNDH1EykTq0NwzLXwUWUc=;
+        b=d57+aaZvYKSayMcf6zL9/vyxBz5WsHIFsLGF1VTv2KxQhC3qYr0ejD+8W6K3HwJPSmHRvr
+        YMDQf0sbL3K0aa+evyBj/SI8Mx0sx/oxHpIIUBfaDHj0AjOTB4gVC+wKbpEoBaT1CPUD1K
+        U/4+QC0x6JHTMBjH0DLNQuwh5UlXKec=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-4rdHAQ8tPWag0qL8P1a_LA-1; Mon, 04 Nov 2019 06:55:52 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A01C0C057F23
-        for <kvm@vger.kernel.org>; Mon,  4 Nov 2019 11:54:03 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id f191so2253074wme.1
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 03:54:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K9ShbQwUl3JT1wY9fwM0LVfIdQxr/5VaXCx33ZJ5yec=;
-        b=pnFUcaCDTu1R6eYCKMET6Mmt8gWID+gZQzvqllbTQxsfMyRaMh4QhWlcxXeHKpvWhz
-         5My8nmfW/aG8iRQEdZ9nnS4YfOkJptI9CwNZzq4+O2Ow4GPNSuH/p0kLVeaBkYOo7TZI
-         S6wia+eYagcwk8GEOLZhmwmSOW+VFw+zOJShT6zIhmJAaTONKM+BbAROxqpQ9bViu60e
-         UDhnKlnDO4xZDpu0uIaOO6aB7d+EK0VNcgBp4lnO8mtiowhIOMTPfbfXzeQ3depUB+LH
-         1IqazabRmWee2CANnzhiuQo8VFBNbSHDWi/vgr4h3/Mn80xjonYIIKA6+sM5RFpguxkh
-         rNXw==
-X-Gm-Message-State: APjAAAX3tZL8ro4wZmNqOWpCSJx8jKVndqU6IFbc6k7rHN0BqUOSG8aT
-        l5XeGnAZERNvzVeHDcVhXFL9E622/zvJeXqceO66daljlz2hGjFt56n8osQNc/Y6Qag9XOUxUuW
-        wpeS8Pl2D2KC+
-X-Received: by 2002:adf:e5cf:: with SMTP id a15mr24119475wrn.143.1572868442063;
-        Mon, 04 Nov 2019 03:54:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxFiK0uysITL0qyqhqzQe9IaQU3kN4T5tUMeyIETkHAy9fg1Ec1DQbcA/YXPxCfHYIp7okHUA==
-X-Received: by 2002:adf:e5cf:: with SMTP id a15mr24119450wrn.143.1572868441791;
-        Mon, 04 Nov 2019 03:54:01 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id i71sm22623611wri.68.2019.11.04.03.54.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2019 03:54:01 -0800 (PST)
-Subject: Re: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
-To:     "Moger, Babu" <Babu.Moger@amd.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com>
- <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <37c61050-e315-fc84-9699-bb92e5afacda@redhat.com>
-Date:   Mon, 4 Nov 2019 12:54:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C88B91800D53;
+        Mon,  4 Nov 2019 11:55:50 +0000 (UTC)
+Received: from [10.36.118.62] (unknown [10.36.118.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9971D60863;
+        Mon,  4 Nov 2019 11:55:49 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: SCLP unit test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
+ <1572023194-14370-6-git-send-email-imbrenda@linux.ibm.com>
+ <1df14176-20a7-a9af-5622-2853425d973e@redhat.com>
+ <20191104122931.0774ff7a@p-imbrenda.boeblingen.de.ibm.com>
+ <56ce2fe9-1a6a-ffd6-3776-0be1b622032b@redhat.com>
+ <20191104124912.7cb58664@p-imbrenda.boeblingen.de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <73d233c8-6599-ab1c-6da3-88a4fa719c82@redhat.com>
+Date:   Mon, 4 Nov 2019 12:55:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191104124912.7cb58664@p-imbrenda.boeblingen.de.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 4rdHAQ8tPWag0qL8P1a_LA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/11/19 18:33, Moger, Babu wrote:
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 4153ca8cddb7..79abbdeca148 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -2533,6 +2533,11 @@ static void svm_decache_cr4_guest_bits(struct kvm_vcpu *vcpu)
->  {
->  }
->  
-> +static bool svm_umip_emulated(void)
-> +{
-> +	return boot_cpu_has(X86_FEATURE_UMIP);
-> +}
+On 04.11.19 12:49, Claudio Imbrenda wrote:
+> On Mon, 4 Nov 2019 12:31:32 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 04.11.19 12:29, Claudio Imbrenda wrote:
+>>> On Mon, 4 Nov 2019 11:58:20 +0100
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>> [...]
+>>>   =20
+>>>> Can we just please rename all "cx" into something like "len"? Or is
+>>>> there a real need to have "cx" in there?
+>>>
+>>> if cx is such a nuisance to you, sure, I can rename it to i
+>>
+>> better than random characters :)
+>=20
+> will be in v3
+>=20
+>>>   =20
+>>>> Also, I still dislike "test_one_sccb". Can't we just just do
+>>>> something like
+>>>>
+>>>> expect_pgm_int();
+>>>> rc =3D test_one_sccb(...)
+>>>> report("whatever pgm", rc =3D=3D WHATEVER);
+>>>> report("whatever rc", lc->pgm_int_code =3D=3D WHATEVER);
+>>>>
+>>>> In the callers to make these tests readable and cleanup
+>>>> test_one_sccb(). I don't care if that produces more LOC as long as
+>>>> I can actually read and understand the test cases.
+>>>
+>>> if you think that makes it more readable, ok I guess...
+>>>
+>>> consider that the output will be unreadable, though
+>>>   =20
+>>
+>> I think his will turn out more readable.
+>=20
+> two output lines per SCLP call? I  don't think so
 
-For hardware that supports UMIP, this is only needed because of your
-patch 1.  Without it, X86_FEATURE_UMIP should already be enabled on
-processors that natively support UMIP.
+To clarify, we don't always need two checks. E.g., I would like to see=20
+instead of
 
-If you want UMIP *emulation* instead, this should become "return true".
++static void test_sccb_too_short(void)
++{
++=09int cx;
++
++=09for (cx =3D 0; cx < 8; cx++)
++=09=09if (!test_one_run(valid_code, pagebuf, cx, 8, PGM_BIT_SPEC, 0))
++=09=09=09break;
++
++=09report("SCCB too short", cx =3D=3D 8);
++}
 
->  static void update_cr0_intercept(struct vcpu_svm *svm)
->  {
->  	ulong gcr0 = svm->vcpu.arch.cr0;
-> @@ -4438,6 +4443,13 @@ static int interrupt_window_interception(struct vcpu_svm *svm)
->  	return 1;
->  }
->  
-> +static int umip_interception(struct vcpu_svm *svm)
-> +{
-> +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> +
-> +	return kvm_emulate_instruction(vcpu, 0);
-> +}
-> +
->  static int pause_interception(struct vcpu_svm *svm)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
-> @@ -4775,6 +4787,10 @@ static int (*const svm_exit_handlers[])(struct vcpu_svm *svm) = {
->  	[SVM_EXIT_SMI]				= nop_on_interception,
->  	[SVM_EXIT_INIT]				= nop_on_interception,
->  	[SVM_EXIT_VINTR]			= interrupt_window_interception,
-> +	[SVM_EXIT_IDTR_READ]			= umip_interception,
-> +	[SVM_EXIT_GDTR_READ]			= umip_interception,
-> +	[SVM_EXIT_LDTR_READ]			= umip_interception,
-> +	[SVM_EXIT_TR_READ]			= umip_interception,
+Something like
 
-This is missing enabling the intercepts.  Also, this can be just
-emulate_on_interception instead of a new function.
+static void test_sccb_too_short(void)
+{
+=09int i;
 
-Paolo
+=09for (i =3D 0; i < 8; i++) {
+=09=09expect_pgm_int();
+=09=09test_one_sccb(...); // or however that will be called
+=09=09check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
+=09}
+}
 
->  	[SVM_EXIT_RDPMC]			= rdpmc_interception,
->  	[SVM_EXIT_CPUID]			= cpuid_interception,
->  	[SVM_EXIT_IRET]                         = iret_interception,
-> @@ -5976,11 +5992,6 @@ static bool svm_xsaves_supported(void)
->  	return boot_cpu_has(X86_FEATURE_XSAVES);
->  }
->  
-> -static bool svm_umip_emulated(void)
-> -{
-> -	return false;
-> -}
-> -
->  static bool svm_pt_supported(void)
->  {
->  	return false;
-> 
+If possible.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
