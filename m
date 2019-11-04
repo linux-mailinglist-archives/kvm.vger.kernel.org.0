@@ -2,125 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2EB4EEA29
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 21:49:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87813EEA70
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 21:51:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729547AbfKDUsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 15:48:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36718 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729573AbfKDUso (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 15:48:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572900523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mn5RsMcwjgSz4Uc3SsLk9u7OdhxITCoqvev72K3k0/w=;
-        b=hQ9+wUclM/gzvrwXlA0dBmvh/ki8tPcPI4NMrzUSwOoLjc6TTXi4ppLn6A8JYvsmhSCT/q
-        9xJ9ZYZR1XsNeEJ6PbCbPyMze2ZLL00duT3IgVl7S51Ld6Zf0Dtf0e8LS6qh+AhfwtBiPB
-        MvLGtYW2tZJFAys78ar8r6R6dU8re+M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-XtiEJ6MJOtixJceTBvorsw-1; Mon, 04 Nov 2019 15:48:39 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 279BB1800DFD;
-        Mon,  4 Nov 2019 20:48:35 +0000 (UTC)
-Received: from redhat.com (unknown [10.20.6.178])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AEACB5C3F8;
-        Mon,  4 Nov 2019 20:48:29 +0000 (UTC)
-Date:   Mon, 4 Nov 2019 15:48:28 -0500
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     David Rientjes <rientjes@google.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 05/18] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-Message-ID: <20191104204828.GC7731@redhat.com>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-6-jhubbard@nvidia.com>
- <alpine.DEB.2.21.1911041231520.74801@chino.kir.corp.google.com>
+        id S1729904AbfKDUuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 15:50:06 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:46476 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728409AbfKDUuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 15:50:05 -0500
+Received: by mail-il1-f195.google.com with SMTP id m16so16080467iln.13
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 12:50:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=q3So3ZLQhkdEtF05u3Qylu9NmVpm+eaQVGAjmXYO7mY=;
+        b=vy92WCqbsRqR7Pl3etSKn8C+cZczIdHD6qCtgpXLeTGu7BrjvJ2GCtdN8ETWhiHFxe
+         /R+/OiSZT4K3Y1ZzQMeqEeFTb4fH8d0oBUdGktvz0dIVrujYCEr+O99DD/RamSb2VFXU
+         0livgCt4RykjBCN+hTFP5Kj9/wfmtOsFhRhb5j+pS7PiLNm0eeNUaM6NO/ElJQaJ+ezG
+         3uPUTuNWx05GOCQXQ1XUT5f+gh2E+4ma2LIDOwa8HqV9HngGKu05ChalBIu4OmGsmhIc
+         kjg6n33c9ShlCa37QzyQYEyVOu/VYcksDQBJy8bZf862XS2A1H/ooNXqPIcpy3JVZrUd
+         bUAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=q3So3ZLQhkdEtF05u3Qylu9NmVpm+eaQVGAjmXYO7mY=;
+        b=gBTidwOmp2Ke4t+1MtteeEhg/Efh0GuB1Z+MBp8s5dlpcHmelvexbhzYRsFZy/GLkk
+         8d9J7NgHUGEtBTU8fiHQed1ZHjx+3bKGckpPuZe/slrtm0ymvvN68tdwVC7+z5ufoC+H
+         J8p05qupC14k+CMby3X0IY0eA4kQ/CquPhIzUaNRRTNElnpGEYzkUJtEuQBaahPn6POe
+         /UHv6hQPknmfceUII6F2tAArywMg34oX06VDWmwnlDirC5o0NEaPxglQo4C3/s5Lg+Wn
+         zomaPUANteHRf/s5gbSyC5ZEmFNCtY4LQTS9RWje1tr+4CJGRshRZf/dWZMEa4cnaKne
+         TeVw==
+X-Gm-Message-State: APjAAAVWWXV+F2eH2jGGzqm+a1x6YSlG5mnpKtLH54hejjrlE/64aUEG
+        816jBPZ/izUy58ASSnMTKLWbyCcQaAnQvA4WvPgCbndC
+X-Google-Smtp-Source: APXvYqwceEtJy1zPgR3gC3cxgJNzdoYsveSpVoeYDZ8GqnL/pG8kqiiLm1lDXLcJw3Evpfz+1x1PlM93Cmc9u0+Osqk=
+X-Received: by 2002:a92:6e0a:: with SMTP id j10mr25483198ilc.26.1572900604129;
+ Mon, 04 Nov 2019 12:50:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1911041231520.74801@chino.kir.corp.google.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: XtiEJ6MJOtixJceTBvorsw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+References: <20191022213349.54734-1-jmattson@google.com>
+In-Reply-To: <20191022213349.54734-1-jmattson@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 4 Nov 2019 12:49:53 -0800
+Message-ID: <CALMp9eR7temnM2XssLbRF0Op+=t0f-vwY-Pn4XgZ4uEaTW57Yw@mail.gmail.com>
+Subject: Re: [PATCH] kvm: cpuid: Expose leaves 0x80000005 and 0x80000006 to
+ the guest
+To:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 12:33:09PM -0800, David Rientjes wrote:
->=20
->=20
-> On Sun, 3 Nov 2019, John Hubbard wrote:
->=20
-> > Introduce pin_user_pages*() variations of get_user_pages*() calls,
-> > and also pin_longterm_pages*() variations.
-> >=20
-> > These variants all set FOLL_PIN, which is also introduced, and
-> > thoroughly documented.
-> >=20
-> > The pin_longterm*() variants also set FOLL_LONGTERM, in addition
-> > to FOLL_PIN:
-> >=20
-> >     pin_user_pages()
-> >     pin_user_pages_remote()
-> >     pin_user_pages_fast()
-> >=20
-> >     pin_longterm_pages()
-> >     pin_longterm_pages_remote()
-> >     pin_longterm_pages_fast()
-> >=20
-> > All pages that are pinned via the above calls, must be unpinned via
-> > put_user_page().
-> >=20
->=20
-> Hi John,
->=20
-> I'm curious what consideration is given to what pageblock migrate types=
-=20
-> that FOLL_PIN and FOLL_LONGTERM pages originate from, assuming that=20
-> longterm would want to originate from MIGRATE_UNMOVABLE pageblocks for th=
-e=20
-> purposes of anti-fragmentation?
-
-We do not control page block, GUP can happens on _any_ page that is
-map inside a process (anonymous private vma or regular file back one).
-
-Cheers,
-J=E9r=F4me
-
+On Tue, Oct 22, 2019 at 2:33 PM Jim Mattson <jmattson@google.com> wrote:
+>
+> Leaf 0x80000005 is "L1 Cache and TLB Information." Leaf 0x80000006 is
+> "L2 Cache and TLB and L3 Cache Information." Include these leaves in
+> the array returned by KVM_GET_SUPPORTED_CPUID.
+>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 9c5029cf6f3f..1b40d8277b84 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -730,6 +730,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>                 entry->ecx &= kvm_cpuid_8000_0001_ecx_x86_features;
+>                 cpuid_mask(&entry->ecx, CPUID_8000_0001_ECX);
+>                 break;
+> +       case 0x80000005:
+> +       case 0x80000006:
+> +               break;
+>         case 0x80000007: /* Advanced power management */
+>                 /* invariant TSC is CPUID.80000007H:EDX[8] */
+>                 entry->edx &= (1 << 8);
+> --
+> 2.23.0.866.gb869b98d4c-goog
+>
+Ping.
