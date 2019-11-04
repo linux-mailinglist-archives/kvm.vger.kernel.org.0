@@ -2,99 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8096EDDB7
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 12:29:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5295EDDBC
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 12:31:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728783AbfKDL3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 06:29:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41750 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728765AbfKDL3w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 06:29:52 -0500
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727322AbfKDLbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 06:31:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53681 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726526AbfKDLbj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 06:31:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572867097;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fg+dIsggzNdBe2Q81yBQkduLrHYqV3b7P7UZKCEcy7c=;
+        b=SdR5E6GXf5FfrM/CnIDCvsQ6bjiMiWcOVQATLvPynziNocoZqnPJrStAhKjRmZmx1XdPlb
+        Gq8O//jBn+w+X1y8Rq8UOfJtwsumhMtBN+9y/n9nbqaGlOan5XzPFt8OVg2lRuxFtOhdAG
+        wc6RF+Nw4qWau9pFNxKO9P1oWBjfhu4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-BhaLVjeuO3aUBo4qDE04vA-1; Mon, 04 Nov 2019 06:31:36 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8289F368CF
-        for <kvm@vger.kernel.org>; Mon,  4 Nov 2019 11:29:52 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id v26so6003531wmh.2
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 03:29:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sliMAq689AXP1CSa4D8rZKhWJpwJH/rqk3D+xYMxetc=;
-        b=CoXDE9TnxuowbZLR8LOWL7jL0Ppd/Kb8iHgtr9H1awn6wV93YC4CSDI4gHJ9iK8tyO
-         vGNqFCf7G6ZfLnbFo2enPcVeEKVpGtYChqozB4LCxG5VBUKIuMbfAqqSiuo3/PI34BGA
-         3HfKTcs2OBo4xINvMT2D0oxxR6TV+kHPogDrngjbsZWTeB6cVA4eMAROBllLW/mQV9UB
-         GB0wB1SFuTuXQ5QZLCiiVlntVjiLIj+yNUvzUGujRZD35suUis8XF+NPXzwtHZZ0EmqF
-         /94WsKpiOVa7nPjKLm80eNhgdEwwLVddPK1skYL7Ka11d5DIzEhMuYDuLBpepPd4W4iT
-         gQOg==
-X-Gm-Message-State: APjAAAXkV43bLZO9bqwUncgq6Stsa2o15xX3i5VC3FFbMTcvn50iJIux
-        wJgNWrdNloaRR5+iuupmyAZct0KUc4xcNjUm8ZV4o/JDteE6VZSfWhDBa/1M6xGJ92KV3zDTBDS
-        UzB3pCkVrv7f1
-X-Received: by 2002:adf:f010:: with SMTP id j16mr23256815wro.317.1572866990935;
-        Mon, 04 Nov 2019 03:29:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxZQ6JMvSiXiZGalH5INdSXWYWRHGN5o69FJ1DgJGdWMXpeNYFi91gfgetyFrzWpGzZL77zHA==
-X-Received: by 2002:adf:f010:: with SMTP id j16mr23256787wro.317.1572866990642;
-        Mon, 04 Nov 2019 03:29:50 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id l5sm14871500wmj.44.2019.11.04.03.29.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2019 03:29:49 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2] alloc: Add memalign error checks
-To:     Andrew Jones <drjones@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        thuth@redhat.com
-References: <20191104102916.10554-1-frankja@linux.ibm.com>
- <61db264b-6d29-66bc-ea60-053b5aa8b995@redhat.com>
- <20191104105417.xt2z5gcuk5xqf4bi@kamzik.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <a91a1828-017a-b0c6-442f-5b31263f3568@redhat.com>
-Date:   Mon, 4 Nov 2019 12:29:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84F88107ACC2;
+        Mon,  4 Nov 2019 11:31:35 +0000 (UTC)
+Received: from [10.36.118.62] (unknown [10.36.118.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D6451001B23;
+        Mon,  4 Nov 2019 11:31:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: SCLP unit test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
+ <1572023194-14370-6-git-send-email-imbrenda@linux.ibm.com>
+ <1df14176-20a7-a9af-5622-2853425d973e@redhat.com>
+ <20191104122931.0774ff7a@p-imbrenda.boeblingen.de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <56ce2fe9-1a6a-ffd6-3776-0be1b622032b@redhat.com>
+Date:   Mon, 4 Nov 2019 12:31:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191104105417.xt2z5gcuk5xqf4bi@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191104122931.0774ff7a@p-imbrenda.boeblingen.de.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: BhaLVjeuO3aUBo4qDE04vA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/11/19 11:54, Andrew Jones wrote:
-> 
-> diff --git a/lib/alloc.c b/lib/alloc.c
-> index ecdbbc44dbf9..ed8f5f94c9b0 100644
-> --- a/lib/alloc.c
-> +++ b/lib/alloc.c
-> @@ -46,15 +46,17 @@ void *memalign(size_t alignment, size_t size)
->  	uintptr_t blkalign;
->  	uintptr_t mem;
->  
-> +	if (!size)
-> +		return NULL;
-> +
-> +	assert(alignment >= sizeof(void *) && is_power_of_2(alignment));
->  	assert(alloc_ops && alloc_ops->memalign);
-> -	if (alignment <= sizeof(uintptr_t))
-> -		alignment = sizeof(uintptr_t);
-> -	else
-> -		size += alignment - 1;
->  
-> +	size += alignment - 1;
->  	blkalign = MAX(alignment, alloc_ops->align_min);
->  	size = ALIGN(size + METADATA_EXTRA, alloc_ops->align_min);
->  	p = alloc_ops->memalign(blkalign, size);
-> +	assert(p);
->  
->  	/* Leave room for metadata before aligning the result.  */
->  	mem = (uintptr_t)p + METADATA_EXTRA;
+On 04.11.19 12:29, Claudio Imbrenda wrote:
+> On Mon, 4 Nov 2019 11:58:20 +0100
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+> [...]
+>=20
+>> Can we just please rename all "cx" into something like "len"? Or is
+>> there a real need to have "cx" in there?
+>=20
+> if cx is such a nuisance to you, sure, I can rename it to i
 
-Looks good, this is what I am queuing.
+better than random characters :)
 
-Paolo
+>=20
+>> Also, I still dislike "test_one_sccb". Can't we just just do
+>> something like
+>>
+>> expect_pgm_int();
+>> rc =3D test_one_sccb(...)
+>> report("whatever pgm", rc =3D=3D WHATEVER);
+>> report("whatever rc", lc->pgm_int_code =3D=3D WHATEVER);
+>>
+>> In the callers to make these tests readable and cleanup
+>> test_one_sccb(). I don't care if that produces more LOC as long as I
+>> can actually read and understand the test cases.
+>=20
+> if you think that makes it more readable, ok I guess...
+>=20
+> consider that the output will be unreadable, though
+>=20
+
+I think his will turn out more readable.
+
+--=20
+
+Thanks,
+
+David / dhildenb
+
