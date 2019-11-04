@@ -2,182 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99391EE932
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 21:09:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7607BEE96C
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 21:26:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729461AbfKDUJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 15:09:10 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:3877 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728332AbfKDUJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 15:09:09 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc085690000>; Mon, 04 Nov 2019 12:09:14 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 04 Nov 2019 12:09:07 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 04 Nov 2019 12:09:07 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 Nov
- 2019 20:09:05 +0000
-Subject: Re: [PATCH v2 05/18] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-To:     Jerome Glisse <jglisse@redhat.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-6-jhubbard@nvidia.com>
- <20191104173325.GD5134@redhat.com>
- <be9de35c-57e9-75c3-2e86-eae50904bbdf@nvidia.com>
- <20191104191811.GI5134@redhat.com>
- <e9656d47-b4a1-da8a-e8cc-ebcfb8cc06d6@nvidia.com>
- <20191104195248.GA7731@redhat.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <25ec4bc0-caaa-2a01-2ae7-2d79663a40e1@nvidia.com>
-Date:   Mon, 4 Nov 2019 12:09:05 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728634AbfKDU0E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 15:26:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58152 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728322AbfKDU0D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 15:26:03 -0500
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 20F5AC057F2E
+        for <kvm@vger.kernel.org>; Mon,  4 Nov 2019 20:26:03 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id k53so20071152qtk.0
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 12:26:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Ysl8NWdDLKSUrg85+bpwcp6e6w5APOGKBa/p26qI3+M=;
+        b=NsLXfwvw5K2OauELAB5yWaYy/IhNcXO1x7MbgjNqmrjVDO0CCmU9bzKCHsE499UhKq
+         cuwOLeoXOEC8VICDXiMXhX+Xa/88hTJc9/xHZgpEI9RxjCniWoZDl+qDhIEZkOMEDLyx
+         ton1/Pvc6+CgtG+Qm8jP0T2zSa4J5iSY2Rbuw4ryFmNNyMI683OduPVnuhhRmyeWul8L
+         tHlCGYZlPwZ4EIwOnzww/pRJGQ9lfhbd40AtLpbzF0fQBAe4Hkj2Sl6tw4eiHl6dq9dj
+         /U1HolgwW8LEwP6KScNQMdHI3+PdhiXP76w87Em+ROEGIr724sfI2tRVOqR3AG2oNw57
+         8Ksg==
+X-Gm-Message-State: APjAAAWAYwWpd/IW6LyakRrHUQtRkdItekYIzd/2qchgrtXP01qbs7Ez
+        jom69Tu0GJLDS7Eu5NMSpUSGqJUIq70kufvPXigd/2NZPuLb0iiHMe8LXFsivTzsgBnuwtscdKO
+        pqyIBgWWy+eyH
+X-Received: by 2002:ac8:67c1:: with SMTP id r1mr13529704qtp.83.1572899161920;
+        Mon, 04 Nov 2019 12:26:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy8Dq5DjD6bLYpyps2CBjCCGJAYCgzonb0DT/m01USeUYHURZZmjew0quIs7Nuji0SwjQBkhg==
+X-Received: by 2002:ac8:67c1:: with SMTP id r1mr13529677qtp.83.1572899161683;
+        Mon, 04 Nov 2019 12:26:01 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id b2sm2155440qtc.21.2019.11.04.12.26.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2019 12:26:00 -0800 (PST)
+Date:   Mon, 4 Nov 2019 15:25:59 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, eric.auger@redhat.com,
+        david@gibson.dropbear.id.au, tianyu.lan@intel.com,
+        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        jacob.jun.pan@linux.intel.com, kvm@vger.kernel.org,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v2 15/22] intel_iommu: bind/unbind guest page table to host
+Message-ID: <20191104202559.GA12619@xz-x1>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-16-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191104195248.GA7731@redhat.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572898154; bh=AZ3ymuIlfRc3w4rthQkiIY3Jv3VQvtZMfCQrByMbt/I=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=a1s4cFm/krClFLPv0/gGIzoAubroBwrxV++jio7G263hv7Kqd894mJLgyr0Kykvfu
-         E22eZRsWgS82IfVuknmQjT6loOqA9gwu9uWFSuwxGjrMpxiVLz3gspis/scqyrUM8C
-         V6nOQNjxdOZQpCSi9tZuwj/NT7Qad5kYkY0U2dz2agukymc6b2UDmCgdrtVLwMy+f3
-         QtSOoNDJwHdTVrVqqJcnOKhTpEZCUMCLI/PJyjZAopcsX3CoJLmMWVSKvLvEBN88aE
-         +2SZRTKEAYlSxIg6b9bcQPtRuIkgnhRasSHve+6EqdhZWTSQoe8j4euTWFVlDE/iaG
-         Y8A3JNrgij6ag==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1571920483-3382-16-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jason, a question for you at the bottom.
-
-On 11/4/19 11:52 AM, Jerome Glisse wrote:
-...
->> CASE 3: ODP
->> -----------
->> RDMA hardware with page faulting support. Here, a well-written driver doesn't
+On Thu, Oct 24, 2019 at 08:34:36AM -0400, Liu Yi L wrote:
+> This patch captures the guest PASID table entry modifications and
+> propagates the changes to host to setup nested translation. The
+> guest page table is configured as 1st level page table (GVA->GPA)
+> whose translation result would further go through host VT-d 2nd
+> level page table(GPA->HPA) under nested translation mode. This is
+> a key part of vSVA support.
 > 
-> CASE3: Hardware with page fault support
-> ---------------------------------------
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 81 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/intel_iommu_internal.h | 20 +++++++++++
+>  2 files changed, 101 insertions(+)
 > 
-> Here, a well-written ....
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index d8827c9..793b0de 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -41,6 +41,7 @@
+>  #include "migration/vmstate.h"
+>  #include "trace.h"
+>  #include "qemu/jhash.h"
+> +#include <linux/iommu.h>
+>  
+>  /* context entry operations */
+>  #define VTD_CE_GET_RID2PASID(ce) \
+> @@ -695,6 +696,16 @@ static inline uint16_t vtd_pe_get_domain_id(VTDPASIDEntry *pe)
+>      return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
+>  }
+>  
+> +static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
+> +{
+> +    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
+> +}
+> +
+> +static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
+> +{
+> +    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
+> +}
+> +
+>  static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
+>  {
+>      return pdire->val & 1;
+> @@ -1850,6 +1861,67 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+>      vtd_iommu_replay_all(s);
+>  }
+>  
+> +static void vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
+> +            int devfn, int pasid, VTDPASIDEntry *pe, VTDPASIDOp op)
+> +{
+> +#ifdef __linux__
+> +    VTDIOMMUContext *vtd_ic;
+> +    IOMMUCTXEventData event_data;
+> +    IOMMUCTXPASIDBindData bind;
+> +    struct iommu_gpasid_bind_data *g_bind_data;
+> +
+> +    vtd_ic = vtd_bus->dev_ic[devfn];
+> +    if (!vtd_ic) {
+> +        return;
+> +    }
+> +
+> +    g_bind_data = g_malloc0(sizeof(*g_bind_data));
+> +    bind.flag = 0;
+> +    g_bind_data->flags = 0;
+> +    g_bind_data->vtd.flags = 0;
+> +    switch (op) {
+> +    case VTD_PASID_BIND:
+> +    case VTD_PASID_UPDATE:
+> +        g_bind_data->version = IOMMU_GPASID_BIND_VERSION_1;
+> +        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
+> +        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
+> +        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
+> +        g_bind_data->hpasid = pasid;
+> +        g_bind_data->gpasid = pasid;
+> +        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
+> +        g_bind_data->vtd.flags =
+> +                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ? 1 : 0)
+> +                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ? 1 : 0)
+> +                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ? 1 : 0)
+> +                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ? 1 : 0)
+> +                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ? 1 : 0)
+> +                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ? 1 : 0);
+> +        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
+> +        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
+> +        bind.flag |= IOMMU_CTX_BIND_PASID;
+> +        break;
+> +
+> +    case VTD_PASID_UNBIND:
+> +        g_bind_data->gpgd = 0;
+> +        g_bind_data->addr_width = 0;
+> +        g_bind_data->hpasid = pasid;
+> +        bind.flag |= IOMMU_CTX_UNBIND_PASID;
+> +        break;
+> +
+> +    default:
+> +        printf("Unknown VTDPASIDOp!!\n");
+
+Please don't use printf()..  Here assert() suits.
+
+> +        break;
+> +    }
+> +    if (bind.flag) {
+
+Will this be untrue?  If not, assert() works too.
+
+> +        event_data.event = IOMMU_CTX_EVENT_PASID_BIND;
+> +        bind.data = g_bind_data;
+> +        event_data.data = &bind;
+> +        iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
+> +    }
+> +    g_free(g_bind_data);
+> +#endif
+> +}
+> +
+>  /* Do a context-cache device-selective invalidation.
+>   * @func_mask: FM field after shifting
+>   */
+> @@ -2528,12 +2600,17 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
+>                  pc_entry->pasid_cache_gen = s->pasid_cache_gen;
+>                  if (!vtd_pasid_entry_compare(&pe, &pc_entry->pasid_entry)) {
+>                      pc_entry->pasid_entry = pe;
+> +                    vtd_bind_guest_pasid(s, vtd_bus, devfn,
+> +                                     pasid, &pe, VTD_PASID_UPDATE);
+>                      /*
+>                       * TODO: when pasid-base-iotlb(piotlb) infrastructure is
+>                       * ready, should invalidate QEMU piotlb togehter with this
+>                       * change.
+>                       */
+>                  }
+> +            } else {
+> +                vtd_bind_guest_pasid(s, vtd_bus, devfn,
+> +                                  pasid, NULL, VTD_PASID_UNBIND);
+
+Please see the reply in the other thread on vtd_flush_pasid().  I've
+filled in where I feel like this UNBIND should exist, I feel like your
+current code could miss some places where you should unbind but didn't.
+
+>              }
+>          }
+>      }
+> @@ -2623,6 +2700,10 @@ static inline void vtd_fill_in_pe_cache(
+>  
+>      pc_entry->pasid_entry = *pe;
+>      pc_entry->pasid_cache_gen = s->pasid_cache_gen;
+> +    vtd_bind_guest_pasid(s, vtd_pasid_as->vtd_bus,
+> +                         vtd_pasid_as->devfn,
+> +                         vtd_pasid_as->pasid,
+> +                         pe, VTD_PASID_UPDATE);
+>  }
+>  
+>  static int vtd_pasid_cache_psi(IntelIOMMUState *s,
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 12873e1..13e02e8 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -483,6 +483,14 @@ struct VTDRootEntry {
+>  };
+>  typedef struct VTDRootEntry VTDRootEntry;
+>  
+> +enum VTDPASIDOp {
+> +    VTD_PASID_BIND,
+> +    VTD_PASID_UNBIND,
+> +    VTD_PASID_UPDATE,
+> +    VTD_OP_NUM
+> +};
+> +typedef enum VTDPASIDOp VTDPASIDOp;
+> +
+>  struct VTDPASIDCacheInfo {
+>  #define VTD_PASID_CACHE_DOMSI   (1ULL << 0);
+>  #define VTD_PASID_CACHE_PASIDSI (1ULL << 1);
+> @@ -549,6 +557,18 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+>  #define VTD_SM_PASID_ENTRY_AW          7ULL /* Adjusted guest-address-width */
+>  #define VTD_SM_PASID_ENTRY_DID(val)    ((val) & VTD_DOMAIN_ID_MASK)
+>  
+> +/* Adjusted guest-address-width */
+> +#define VTD_SM_PASID_ENTRY_FLPM          3ULL
+> +#define VTD_SM_PASID_ENTRY_FLPTPTR       (~0xfffULL)
+> +#define VTD_SM_PASID_ENTRY_SRE_BIT(val)  (!!((val) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_EAFE_BIT(val) (!!(((val) >> 7) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_PCD_BIT(val)  (!!(((val) >> 31) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_PWT_BIT(val)  (!!(((val) >> 30) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_EMTE_BIT(val) (!!(((val) >> 26) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_CD_BIT(val)   (!!(((val) >> 25) & 1ULL))
+> +#define VTD_SM_PASID_ENTRY_PAT(val)      (((val) >> 32) & 0xFFFFFFFFULL)
+> +#define VTD_SM_PASID_ENTRY_EMT(val)      (((val) >> 27) & 0x7ULL)
+> +
+>  /* Second Level Page Translation Pointer*/
+>  #define VTD_SM_PASID_ENTRY_SLPTPTR     (~0xfffULL)
+>  
+> -- 
+> 2.7.4
 > 
 
-Ah, OK. So just drop the first sentence, yes.
-
-...
->>>>>> +	 */
->>>>>> +	gup_flags |= FOLL_REMOTE | FOLL_PIN;
->>>>>
->>>>> Wouldn't it be better to not add pin_longterm_pages_remote() until
->>>>> it can be properly implemented ?
->>>>>
->>>>
->>>> Well, the problem is that I need each call site that requires FOLL_PIN
->>>> to use a proper wrapper. It's the FOLL_PIN that is the focus here, because
->>>> there is a hard, bright rule, which is: if and only if a caller sets
->>>> FOLL_PIN, then the dma-page tracking happens, and put_user_page() must
->>>> be called.
->>>>
->>>> So this leaves me with only two reasonable choices:
->>>>
->>>> a) Convert the call site as above: pin_longterm_pages_remote(), which sets
->>>> FOLL_PIN (the key point!), and leaves the FOLL_LONGTERM situation exactly
->>>> as it has been so far. When the FOLL_LONGTERM situation is fixed, the call
->>>> site *might* not need any changes to adopt the working gup.c code.
->>>>
->>>> b) Convert the call site to pin_user_pages_remote(), which also sets
->>>> FOLL_PIN, and also leaves the FOLL_LONGTERM situation exactly as before.
->>>> There would also be a comment at the call site, to the effect of, "this
->>>> is the wrong call to make: it really requires FOLL_LONGTERM behavior".
->>>>
->>>> When the FOLL_LONGTERM situation is fixed, the call site will need to be
->>>> changed to pin_longterm_pages_remote().
->>>>
->>>> So you can probably see why I picked (a).
->>>
->>> But right now nobody has FOLL_LONGTERM and FOLL_REMOTE. So you should
->>> never have the need for pin_longterm_pages_remote(). My fear is that
->>> longterm has implication and it would be better to not drop this implication
->>> by adding a wrapper that does not do what the name says.
->>>
->>> So do not introduce pin_longterm_pages_remote() until its first user
->>> happens. This is option c)
->>>
->>
->> Almost forgot, though: there is already another user: Infiniband:
->>
->> drivers/infiniband/core/umem_odp.c:646:         npages = pin_longterm_pages_remote(owning_process, owning_mm,
-> 
-> odp do not need that, i thought the HMM convertion was already upstream
-> but seems not, in any case odp do not need the longterm case it only
-> so best is to revert that user to gup_fast or something until it get
-> converted to HMM.
-> 
-
-Note for Jason: the (a) or (b) items are talking about the vfio case, which is
-one of the two call sites that now use pin_longterm_pages_remote(), and the
-other one is infiniband:
-
-drivers/infiniband/core/umem_odp.c:646:         npages = pin_longterm_pages_remote(owning_process, owning_mm,
-drivers/vfio/vfio_iommu_type1.c:353:            ret = pin_longterm_pages_remote(NULL, mm, vaddr, 1,
-
-
-Jerome, Jason: I really don't want to revert the put_page() to put_user_page() 
-conversions that are already throughout the IB driver--pointless churn, right?
-I'd rather either delete them in Jason's tree, or go with what I have here
-while waiting for the deletion.
-
-Maybe we should just settle on (a) or (b), so that the IB driver ends up with
-the wrapper functions? In fact, if it's getting deleted, then I'd prefer leaving
-it at (a), since that's simple...
-
-Jason should weigh in on how he wants this to go, with respect to branching
-and merging, since it sounds like that will conflict with the hmm branch 
-(ha, I'm overdue in reviewing his mmu notifier series, that's what I get for
-being late).
-
-thanks,
-
-John Hubbard
-NVIDIA
+-- 
+Peter Xu
