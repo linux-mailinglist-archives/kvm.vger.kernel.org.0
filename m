@@ -2,199 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D19CEDA71
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 09:19:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C955EEDAAD
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 09:41:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727520AbfKDITF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 03:19:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33470 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726633AbfKDITF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 03:19:05 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA48HnJG175535
-        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 03:19:03 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w2fm99epw-1
+        id S1727322AbfKDIlb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 03:41:31 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50304 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726441AbfKDIlb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 03:41:31 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA48eYrw018028
+        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 03:41:30 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w2dr15ws3-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 03:19:03 -0500
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 03:41:29 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 4 Nov 2019 08:19:00 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Mon, 4 Nov 2019 08:41:27 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 4 Nov 2019 08:18:58 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA48IvYs59310154
+        Mon, 4 Nov 2019 08:41:25 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA48fOXI28573954
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Nov 2019 08:18:57 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EAE5F11C054;
-        Mon,  4 Nov 2019 08:18:56 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84D3311C04C;
-        Mon,  4 Nov 2019 08:18:56 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.123])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Nov 2019 08:18:56 +0000 (GMT)
+        Mon, 4 Nov 2019 08:41:24 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25A9452051;
+        Mon,  4 Nov 2019 08:41:24 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.70.20])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9D14252057;
+        Mon,  4 Nov 2019 08:41:23 +0000 (GMT)
 Subject: Re: [RFC 04/37] KVM: s390: protvirt: Add initial lifecycle handling
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+To:     Christian Borntraeger <borntraeger@de.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
         imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
         cohuck@redhat.com, gor@linux.ibm.com
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
  <20191024114059.102802-5-frankja@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Mon, 4 Nov 2019 09:18:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ <d87e2322-2dc6-0633-b64b-e3286186ea4c@de.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Mon, 4 Nov 2019 09:41:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-5-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <d87e2322-2dc6-0633-b64b-e3286186ea4c@de.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cmgjGry7htCKaf8L3hCrXC6JvZwASoIyh"
 X-TM-AS-GCONF: 00
-x-cbid: 19110408-0012-0000-0000-000003607022
+x-cbid: 19110408-0020-0000-0000-000003824B77
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110408-0013-0000-0000-0000219BC3A1
-Message-Id: <d87e2322-2dc6-0633-b64b-e3286186ea4c@de.ibm.com>
+x-cbparentid: 19110408-0021-0000-0000-000021D86DC7
+Message-Id: <44dde437-a73b-8a57-ab7f-c2d9e9ea4b4e@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-04_06:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=944 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911040081
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1911040085
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cmgjGry7htCKaf8L3hCrXC6JvZwASoIyh
+Content-Type: multipart/mixed; boundary="M4JPJqBAkan5Ymz4Lu2q2exZXUYC2Qx3r"
+
+--M4JPJqBAkan5Ymz4Lu2q2exZXUYC2Qx3r
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 11/4/19 9:18 AM, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.10.19 13:40, Janosch Frank wrote:
+>> Let's add a KVM interface to create and destroy protected VMs.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h |  24 +++-
+>>  arch/s390/include/asm/uv.h       | 110 ++++++++++++++
+>>  arch/s390/kvm/Makefile           |   2 +-
+>>  arch/s390/kvm/kvm-s390.c         | 173 +++++++++++++++++++++-
+>>  arch/s390/kvm/kvm-s390.h         |  47 ++++++
+>>  arch/s390/kvm/pv.c               | 237 ++++++++++++++++++++++++++++++=
++
+>>  include/uapi/linux/kvm.h         |  33 +++++
+>>  7 files changed, 622 insertions(+), 4 deletions(-)
+>>  create mode 100644 arch/s390/kvm/pv.c
+> [...]
+>=20
+>> +	case KVM_PV_VM_UNPACK: {
+>> +		struct kvm_s390_pv_unp unp =3D {};
+>> +
+>> +		r =3D -EFAULT;
+>> +		if (copy_from_user(&unp, argp, sizeof(unp)))
+>> +			break;
+>> +
+>> +		r =3D kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak);
+>> +		break;
+>> +	}
+>=20
+>=20
+>=20
+> [....]
+>=20
+>> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned =
+long size,
+>> +		       unsigned long tweak)
+>> +{
+>> +	int i, rc =3D 0;
+>> +	struct uv_cb_unp uvcb =3D {
+>> +		.header.cmd =3D UVC_CMD_UNPACK_IMG,
+>> +		.header.len =3D sizeof(uvcb),
+>> +		.guest_handle =3D kvm_s390_pv_handle(kvm),
+>> +		.tweak[0] =3D tweak
+>> +	};
+>> +
+>> +	if (addr & ~PAGE_MASK || size & ~PAGE_MASK)
+>> +		return -EINVAL;
+>> +
+>> +
+>> +	VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
+>> +		 addr, size);
+>=20
+> Does it make sense to check for addr and addr+size to be within the mem=
+ory
+> size of the guest? The uv_call or gmap_fault will fail later on, but we=
+=20
+> could do an early exit if the the site is wrong.=20
+
+Yeah, Marc already brought that up because of a testcase of his.
+I'll add a check, but before that I need to understand what makes us
+loop so long that we get RCU warnings.
+
+>=20
+>=20
+>=20
+>=20
+>> +	for (i =3D 0; i < size / PAGE_SIZE; i++) {
+>> +		uvcb.gaddr =3D addr + i * PAGE_SIZE;
+>> +		uvcb.tweak[1] =3D i * PAGE_SIZE;
+>=20
+>=20
+>> +retry:
+>=20
+>> +		rc =3D uv_call(0, (u64)&uvcb);
+>> +		if (!rc)
+>> +			continue;
+>> +		/* If not yet mapped fault and retry */
+>> +		if (uvcb.header.rc =3D=3D 0x10a) {
+>> +			rc =3D gmap_fault(kvm->arch.gmap, uvcb.gaddr,
+>> +					FAULT_FLAG_WRITE);
+>> +			if (rc)
+>> +				return rc;
+>> +			goto retry;
+>> +		}
+>> +		VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: failed addr %llx rc %x rrc %x=
+",
+>> +			 uvcb.gaddr, uvcb.header.rc, uvcb.header.rrc);
+>> +		break;
+>> +	}
+> [...]
+>=20
 
 
-On 24.10.19 13:40, Janosch Frank wrote:
-> Let's add a KVM interface to create and destroy protected VMs.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  24 +++-
->  arch/s390/include/asm/uv.h       | 110 ++++++++++++++
->  arch/s390/kvm/Makefile           |   2 +-
->  arch/s390/kvm/kvm-s390.c         | 173 +++++++++++++++++++++-
->  arch/s390/kvm/kvm-s390.h         |  47 ++++++
->  arch/s390/kvm/pv.c               | 237 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h         |  33 +++++
->  7 files changed, 622 insertions(+), 4 deletions(-)
->  create mode 100644 arch/s390/kvm/pv.c
-[...]
 
-> +	case KVM_PV_VM_UNPACK: {
-> +		struct kvm_s390_pv_unp unp = {};
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&unp, argp, sizeof(unp)))
-> +			break;
-> +
-> +		r = kvm_s390_pv_unpack(kvm, unp.addr, unp.size, unp.tweak);
-> +		break;
-> +	}
+--M4JPJqBAkan5Ymz4Lu2q2exZXUYC2Qx3r--
 
+--cmgjGry7htCKaf8L3hCrXC6JvZwASoIyh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-[....]
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl2/5DMACgkQ41TmuOI4
+ufgNxg/+JxkvbvHXrscDwohfLjwfM+h/g+/GSON95MHAjYH84YuNYTgW7Jcd1GM5
+96VCYbAq3J0WlRKf7LV1vAOoyiVuRev1v2g++inBRGEHA1PmseShfQiaWSsxQTWg
+pJ/dC4W6blmw83LuK3lW8upQNhcD55D7M5g1rMdTeSmdn4pitAjqinRViu0pO7hb
+zr1YTufhw5AtfznamFcQWCbZbkXW2vEPNUJ+r65d9Jma/Gd/7h086e+Cqprnf49p
+1oY+VkgRjazA6OHJ4L9r2vs4G5yI+yuVSUV/Y+eZdR3V+suNGF9fbd+YWxeXkRkO
+/ShQwgOFGFFHDWsXlDx/SLQXmSuHe7YHi4GRoT88NOm4dtfYKlWZ4/UC8nzwtbku
+iPL2tAeQiCkNZdvjAqh7UIvP2s3ZEOfPY7Z9qgwZxagxYf9Dmb3W/xVq1Gg2Mly1
+vG5KxSbUqrx/pH16wcnteX31ZURDRYwf0J0OxWdBAggkfoULmYSCYVHGVoIQbjWn
+bXR72tm05k8yyJh4/O9EiydlwlyRhduGciicAxH3iKw7+tZPO73seL1dBOmBWMJq
+K+GCOZpfOvj1yzX9Dmxtmtj+mT9RDuF7Chk3Qhc1H6x7RvkxjvylVGYvvBFtIzS3
+Ec6F6ZRN1ofsxYBmpNgNpjF3CbuiZU7HgU4Lo6edGr1mEtyOwiU=
+=mlqE
+-----END PGP SIGNATURE-----
 
-> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned long size,
-> +		       unsigned long tweak)
-> +{
-> +	int i, rc = 0;
-> +	struct uv_cb_unp uvcb = {
-> +		.header.cmd = UVC_CMD_UNPACK_IMG,
-> +		.header.len = sizeof(uvcb),
-> +		.guest_handle = kvm_s390_pv_handle(kvm),
-> +		.tweak[0] = tweak
-> +	};
-> +
-> +	if (addr & ~PAGE_MASK || size & ~PAGE_MASK)
-> +		return -EINVAL;
-> +
-> +
-> +	VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
-> +		 addr, size);
-
-Does it make sense to check for addr and addr+size to be within the memory
-size of the guest? The uv_call or gmap_fault will fail later on, but we 
-could do an early exit if the the site is wrong. 
-
-
-
-
-> +	for (i = 0; i < size / PAGE_SIZE; i++) {
-> +		uvcb.gaddr = addr + i * PAGE_SIZE;
-> +		uvcb.tweak[1] = i * PAGE_SIZE;
-
-
-> +retry:
-
-> +		rc = uv_call(0, (u64)&uvcb);
-> +		if (!rc)
-> +			continue;
-> +		/* If not yet mapped fault and retry */
-> +		if (uvcb.header.rc == 0x10a) {
-> +			rc = gmap_fault(kvm->arch.gmap, uvcb.gaddr,
-> +					FAULT_FLAG_WRITE);
-> +			if (rc)
-> +				return rc;
-> +			goto retry;
-> +		}
-> +		VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: failed addr %llx rc %x rrc %x",
-> +			 uvcb.gaddr, uvcb.header.rc, uvcb.header.rrc);
-> +		break;
-> +	}
-[...]
+--cmgjGry7htCKaf8L3hCrXC6JvZwASoIyh--
 
