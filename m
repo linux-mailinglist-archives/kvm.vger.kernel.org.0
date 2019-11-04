@@ -2,165 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 167AFEDC49
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 11:16:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23597EDC56
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 11:19:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727553AbfKDKQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 05:16:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41084 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727419AbfKDKQa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 05:16:30 -0500
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727976AbfKDKTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 05:19:12 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47839 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727419AbfKDKTM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 05:19:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572862751;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OQmuTzvK0kauEjAiX2TIjBp+3C2Io50adAm181rzj3s=;
+        b=Uky1zfdvzZ/TGAmhvQtatH/YY5xtTk9sNRNx0jq+Fs8pq9HdOXK0h7WhF0+Yg5N4zc3Tyx
+        xOon6nw4W2CUPGY1orW/U85CJgJJhScxVKTzYwgAh+rT8IVNMw2rG0HSBqlY7APVh9vFpo
+        WhdnLxnPMVp2+00/355qt2YJ1p/WWCA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-xtIxTS1nNDeF1KavHaSo6g-1; Mon, 04 Nov 2019 05:19:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3560259455
-        for <kvm@vger.kernel.org>; Mon,  4 Nov 2019 10:16:30 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id z9so10212882wrq.11
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 02:16:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to;
-        bh=k1A6jbXxrCBgnswfdth1gpmzXKl2QeS+K8DubNEMx0g=;
-        b=hAAoVfKLxHY86k/V4tMpempSwaEuOltfqerzEaWDnkmLMDfb9TMPRlM2m1UIwCjPrt
-         8nTWMOrOuDOXLF9U7Z4sJ0EE7LtFBk8U7MapEd7uhJJ9y+jtd6+FD4C1NGW8GRlk2MPl
-         zChtPvscpn+emqXYxWDDg61UWNzKCNjtkiV0ar488iEpor3Uh/rL4tvwqvlC1BW4PpPo
-         CBJSuJuNrkeq+ZC9zqr7+jRB3BL4lOaxNsI37BGH7Mszk3aEsbhtOiQiKJl0pKRUd0pq
-         WSQzweAmtmT8DnaRJLXNTDrsFMSzeT2F/yLhdvn3tOgMbyLWSJTAiCDPm5t/ZMzd5BrJ
-         uO7w==
-X-Gm-Message-State: APjAAAWMmCEhtsd6lvxasi/JOpisTfso4WAr8XQd3exMMuYtKO7qgX5U
-        9J2LLCYE4fQEXTBzIEFkqqpP+L3YyuRPxsLFDPeQ4p7etPmn3JhYg3kzc/hUpPRh/lwWRECVK1A
-        ktUWvhvb7IsRt
-X-Received: by 2002:a05:6000:12c4:: with SMTP id l4mr6872709wrx.110.1572862588848;
-        Mon, 04 Nov 2019 02:16:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzERWGioGx3f8WYSq2i81Wv5llnwZkSIhySkY+oKX6yyRLdj7CDqXU1idtDdvovdCCN4ei/OA==
-X-Received: by 2002:a05:6000:12c4:: with SMTP id l4mr6872692wrx.110.1572862588554;
-        Mon, 04 Nov 2019 02:16:28 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id v8sm18530222wra.79.2019.11.04.02.16.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2019 02:16:27 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH] alloc: Add more memalign asserts
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, david@redhat.com
-References: <20191104092055.5679-1-frankja@linux.ibm.com>
- <6f7795ac-5700-c132-e3b1-708e9451956f@redhat.com>
- <af428ca3-09b2-a1dc-61f8-a6eee290e36b@linux.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <16f0867d-a190-593e-1225-f83eed00efa0@redhat.com>
-Date:   Mon, 4 Nov 2019 11:16:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CBE21800D53;
+        Mon,  4 Nov 2019 10:19:06 +0000 (UTC)
+Received: from [10.36.118.62] (unknown [10.36.118.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F0275D9CD;
+        Mon,  4 Nov 2019 10:19:01 +0000 (UTC)
+Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
+        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
+        cohuck@redhat.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-10-frankja@linux.ibm.com>
+ <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
+ <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
+ <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
+ <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
+Date:   Mon, 4 Nov 2019 11:19:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <af428ca3-09b2-a1dc-61f8-a6eee290e36b@linux.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BSkQJNWKUVIDxEYWWv2mKwkscEiiH4cdS"
+In-Reply-To: <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: xtIxTS1nNDeF1KavHaSo6g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BSkQJNWKUVIDxEYWWv2mKwkscEiiH4cdS
-Content-Type: multipart/mixed; boundary="f5cgDWBGpWHlAg2IgutcBhOzWbMsb21gF";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc: thuth@redhat.com, david@redhat.com
-Message-ID: <16f0867d-a190-593e-1225-f83eed00efa0@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] alloc: Add more memalign asserts
-References: <20191104092055.5679-1-frankja@linux.ibm.com>
- <6f7795ac-5700-c132-e3b1-708e9451956f@redhat.com>
- <af428ca3-09b2-a1dc-61f8-a6eee290e36b@linux.ibm.com>
-In-Reply-To: <af428ca3-09b2-a1dc-61f8-a6eee290e36b@linux.ibm.com>
-
---f5cgDWBGpWHlAg2IgutcBhOzWbMsb21gF
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 04/11/19 11:12, Janosch Frank wrote:
-> On 11/4/19 11:07 AM, Paolo Bonzini wrote:
->> On 04/11/19 10:20, Janosch Frank wrote:
->>> Let's test for size and alignment in memalign to catch invalid input
->>> data. Also we need to test for NULL after calling the memalign
->>> function of the registered alloc operations.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>
->>> Tested only under s390, tests under other architectures are highly
->>> appreciated.
->>>
->>> ---
->>>  lib/alloc.c | 3 +++
->>>  1 file changed, 3 insertions(+)
->>>
->>> diff --git a/lib/alloc.c b/lib/alloc.c
->>> index ecdbbc4..eba9dd6 100644
->>> --- a/lib/alloc.c
->>> +++ b/lib/alloc.c
->>> @@ -46,6 +46,7 @@ void *memalign(size_t alignment, size_t size)
->>>  	uintptr_t blkalign;
->>>  	uintptr_t mem;
->>> =20
->>> +	assert(size && alignment);
+>>> to synchronize page import/export with the I/O for paging. For example =
+you can actually
+>>> fault in a page that is currently under paging I/O. What do you do? imp=
+ort (so that the
+>>> guest can run) or export (so that the I/O will work). As this turned ou=
+t to be harder then
+>>> we though we decided to defer paging to a later point in time.
 >>
->> Do we want to return NULL instead on !size?  This is how malloc(3) is
->> documented.
->>
->> Paolo
+>> I don't quite see the issue yet. If you page out, the page will
+>> automatically (on access) be converted to !secure/encrypted memory. If
+>> the UV/guest wants to access it, it will be automatically converted to
+>> secure/unencrypted memory. If you have concurrent access, it will be
+>> converted back and forth until one party is done.
 >=20
-> I myself never check for NULL on a unit test and therefore added the
-> asserts to have it fail visibly.
+> IO does not trigger an export on an imported page, but an error
+> condition in the IO subsystem. The page code does not read pages through
+
+Ah, that makes it much clearer. Thanks!
+
+> the cpu, but often just asks the device to read directly and that's
+> where everything goes wrong. We could bounce swapping, but chose to pin
+> for now until we find a proper solution to that problem which nicely
+> integrates into linux.
+
+How hard would it be to
+
+1. Detect the error condition
+2. Try a read on the affected page from the CPU (will will automatically=20
+convert to encrypted/!secure)
+3. Restart the I/O
+
+I assume that this is a corner case where we don't really have to care=20
+about performance in the first shot.
+
 >=20
-> But sure, we can return NULL for both asserts.
-
-Hmm yeah for ->memalign it makes sense since unit tests won't SIGSEGV.
-For !size let's return NULL, it can simplify code a bit.
-
-Paolo
-
 >>
->>>  	assert(alloc_ops && alloc_ops->memalign);
->>>  	if (alignment <=3D sizeof(uintptr_t))
->>>  		alignment =3D sizeof(uintptr_t);
->>> @@ -56,6 +57,8 @@ void *memalign(size_t alignment, size_t size)
->>>  	size =3D ALIGN(size + METADATA_EXTRA, alloc_ops->align_min);
->>>  	p =3D alloc_ops->memalign(blkalign, size);
->>> =20
->>> +	assert(p !=3D NULL);
->>> +
->>>  	/* Leave room for metadata before aligning the result.  */
->>>  	mem =3D (uintptr_t)p + METADATA_EXTRA;
->>>  	mem =3D ALIGN(mem, alignment);
+>> A proper automatic conversion should make this work. What am I missing?
+>>
 >>>
+>>> As we do not want to rely on the userspace to do the mlock this is now =
+done in the kernel.
 >>
+>> I wonder if we could come up with an alternative (similar to how we
+>> override VM_MERGEABLE in the kernel) that can be called and ensured in
+>> the kernel. E.g., marking whole VMAs as "don't page" (I remember
+>> something like "special VMAs" like used for VDSOs that achieve exactly
+>> that, but I am absolutely no expert on that). That would be much nicer
+>> than pinning all pages and remembering what you pinned in huge page
+>> arrays ...
 >=20
+> It might be more worthwhile to just accept one or two releases with
+> pinning and fix the root of the problem than design a nice stopgap.
+
+Quite honestly, to me this feels like a prototype hack that deserves a=20
+proper solution first. The issue with this hack is that it affects user=20
+space (esp. MADV_DONTNEED no longer working correctly). It's not just=20
+something you once fix in the kernel and be done with it.
 >=20
+> Btw. s390 is not alone with the problem and we'll try to have another
+> discussion tomorrow with AMD to find a solution which works for more
+> than one architecture.
 
+Let me know if there was an interesting outcome.
 
+--=20
 
---f5cgDWBGpWHlAg2IgutcBhOzWbMsb21gF--
+Thanks,
 
---BSkQJNWKUVIDxEYWWv2mKwkscEiiH4cdS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+David / dhildenb
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2/+nsACgkQv/vSX3jH
-roPG6Qf9FF4IC6qtBxQul91q0lNyk+SGe51Ky6LbNQlc8//Gans3GAA6FKamKPxn
-1YvbDYc5NQMoDwgHlES2A2oc/LV3fhWhMsBl5VwMmLgXHHSS5MzviMpX9jvGGTpP
-d019Oo4UNaKooRb3PdyEA4dyghsUJqlotKXjPATL30zx8rGmcfjLCtPRL2p/hUgy
-uKP0utQgSjT3+RsWsEU5qotX7BrcMxBcTw8+2nXOSes1o2MztvuJ0hRB61Iandgr
-toc1G6N8ef4gR3xcvFRM1uSe0hrVOYGqliAFMK3wkhkNCq4jvd2lpt5B7B3N6Exf
-+H3ZzqT/e2+5ID937uxucTFTYewphQ==
-=olIo
------END PGP SIGNATURE-----
-
---BSkQJNWKUVIDxEYWWv2mKwkscEiiH4cdS--
