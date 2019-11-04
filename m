@@ -2,129 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F7AFEDC17
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 11:07:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 103C8EDC18
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 11:07:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726441AbfKDKHJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 05:07:09 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34346 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726526AbfKDKHJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 05:07:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572862027;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aLBM9ztVIgwQzoa6Qr2AYGwE9HzR9DYDrMj+26HVhms=;
-        b=EHAnbnYbhR1nsZnmI+wEGY3g2bIeEdMQIKXXzMotXygTfvsv73XD+0hZ0NrzEBZOqVjsm6
-        nyk395u69FJI+nr8nZdYf8YM6ZgZuquyWYioXokxo63UprQBpUy31qvBoHrFA0cxoL1y0R
-        OEo2YUBOU4iKUIhLoFf07X6sSnNzGSs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-kSzloL58P6SCr-brpUnicA-1; Mon, 04 Nov 2019 05:07:02 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727663AbfKDKHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 05:07:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60480 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727332AbfKDKHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 05:07:13 -0500
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1AE7800C73;
-        Mon,  4 Nov 2019 10:07:01 +0000 (UTC)
-Received: from [10.36.118.62] (unknown [10.36.118.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 694E026FAA;
-        Mon,  4 Nov 2019 10:07:00 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 4/5] s390x: sclp: add service call
- instruction wrapper
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
- <1572023194-14370-5-git-send-email-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <1427281c-9493-9889-a37f-81c6c603b91a@redhat.com>
-Date:   Mon, 4 Nov 2019 11:06:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        by mx1.redhat.com (Postfix) with ESMTPS id CB206C0568FA
+        for <kvm@vger.kernel.org>; Mon,  4 Nov 2019 10:07:12 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id c6so10223304wrp.3
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 02:07:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=r1Q5+m83R8H0rZ1vKDsC4OW6950yz/tdIpCOKBzw7ZE=;
+        b=jR1REScuvPU7M6UJuB8mAyHCWz4jgObGobCNxJTL4U0sg5A3R4uiVeSqia+G6SvqHl
+         ah1JKgpVtbXh5zR2G5/2h9Jxnhz7npM1k1A7rl10oJXcZb358hXvSX4CvawA0bb9JdG1
+         3jxW7wAm/QhT9n+Hxb+IXyC6E9zcpmz15OjLEFopqvy9jKqk8pqvcnWvxNxGAWYxSvZO
+         C4T2QHj8EFc1F+djr9YhjNVNyfaU//AD3RhtO0TgZklgTPX8GBloQRDnptd3tycimZZO
+         esmSBsCRZJr7MBkfoXsOwnBrJu4pWHFD5wEAj5ZLCQz0KpdQDvSW6aeXwYMsUXEtgOtz
+         eQrg==
+X-Gm-Message-State: APjAAAWsPMGGRVzUAUcyB17A+LFmMF0etiEDJ/PqHzXoe42Dox9POZgn
+        OGSkYjXTLYoTku0lHgCtQdI0W2KN0pjVM7FTZrEx70AT4NHZRwo8Xbq6ZlQdRvRUXLGLXY7EUBA
+        U51/dz5e55Vkc
+X-Received: by 2002:adf:aa92:: with SMTP id h18mr23558113wrc.150.1572862031534;
+        Mon, 04 Nov 2019 02:07:11 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyJb9X/dTzarYF/30xpOoI87xgTeAWv4+0CjgTgjEyxkyBwnnpeEmjCM/C8qkdiXnJTA/OCcA==
+X-Received: by 2002:adf:aa92:: with SMTP id h18mr23558079wrc.150.1572862031250;
+        Mon, 04 Nov 2019 02:07:11 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
+        by smtp.gmail.com with ESMTPSA id z14sm5356620wrl.60.2019.11.04.02.07.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2019 02:07:10 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] alloc: Add more memalign asserts
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com
+References: <20191104092055.5679-1-frankja@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6f7795ac-5700-c132-e3b1-708e9451956f@redhat.com>
+Date:   Mon, 4 Nov 2019 11:07:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1572023194-14370-5-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <20191104092055.5679-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: kSzloL58P6SCr-brpUnicA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25.10.19 19:06, Claudio Imbrenda wrote:
-> Add a wrapper for the service call instruction, and use it for SCLP
-> interactions instead of using inline assembly everywhere.
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 04/11/19 10:20, Janosch Frank wrote:
+> Let's test for size and alignment in memalign to catch invalid input
+> data. Also we need to test for NULL after calling the memalign
+> function of the registered alloc operations.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   lib/s390x/asm/arch_def.h | 13 +++++++++++++
->   lib/s390x/sclp.c         |  7 +------
->   2 files changed, 14 insertions(+), 6 deletions(-)
->=20
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 96cca2e..b3caff6 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -269,4 +269,17 @@ static inline int stsi(void *addr, int fc, int sel1,=
- int sel2)
->   =09return cc;
->   }
->  =20
-> +static inline int servc(uint32_t command, unsigned long sccb)
-> +{
-> +=09int cc;
+> 
+> Tested only under s390, tests under other architectures are highly
+> appreciated.
+> 
+> ---
+>  lib/alloc.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/lib/alloc.c b/lib/alloc.c
+> index ecdbbc4..eba9dd6 100644
+> --- a/lib/alloc.c
+> +++ b/lib/alloc.c
+> @@ -46,6 +46,7 @@ void *memalign(size_t alignment, size_t size)
+>  	uintptr_t blkalign;
+>  	uintptr_t mem;
+>  
+> +	assert(size && alignment);
+
+Do we want to return NULL instead on !size?  This is how malloc(3) is
+documented.
+
+Paolo
+
+>  	assert(alloc_ops && alloc_ops->memalign);
+>  	if (alignment <= sizeof(uintptr_t))
+>  		alignment = sizeof(uintptr_t);
+> @@ -56,6 +57,8 @@ void *memalign(size_t alignment, size_t size)
+>  	size = ALIGN(size + METADATA_EXTRA, alloc_ops->align_min);
+>  	p = alloc_ops->memalign(blkalign, size);
+>  
+> +	assert(p != NULL);
 > +
-> +=09asm volatile(
-> +=09=09"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
-> +=09=09"       ipm     %0\n"
-> +=09=09"       srl     %0,28"
-> +=09=09: "=3D&d" (cc) : "d" (command), "a" (sccb)
-> +=09=09: "cc", "memory");
-> +=09return cc;
-> +}
-> +
->   #endif
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 7798f04..e35c282 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -116,12 +116,7 @@ int sclp_service_call(unsigned int command, void *sc=
-cb)
->   =09int cc;
->  =20
->   =09sclp_setup_int();
-> -=09asm volatile(
-> -=09=09"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
-> -=09=09"       ipm     %0\n"
-> -=09=09"       srl     %0,28"
-> -=09=09: "=3D&d" (cc) : "d" (command), "a" (__pa(sccb))
-> -=09=09: "cc", "memory");
-> +=09cc =3D servc(command, __pa(sccb));
->   =09sclp_wait_busy();
->   =09if (cc =3D=3D 3)
->   =09=09return -1;
->=20
-
-I do wonder if we should really do that. Shouldn't we always set/wait if=20
-busy (especially, if testing for an error condition that won't trigger)?=20
-IOW, shouldn't we have a modified sclp_service_call() that returns the=20
-CC (and also calls sclp_setup_int()/sclp_wait_busy())?
-
-We could also simply make sclp_service_call() return the cc and handle=20
-the cc in the existing callers.
-
---=20
-
-Thanks,
-
-David / dhildenb
+>  	/* Leave room for metadata before aligning the result.  */
+>  	mem = (uintptr_t)p + METADATA_EXTRA;
+>  	mem = ALIGN(mem, alignment);
+> 
 
