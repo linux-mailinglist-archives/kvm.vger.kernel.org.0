@@ -2,123 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2277DED821
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 04:50:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F7AED8FC
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 07:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727322AbfKDDuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Nov 2019 22:50:06 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:50444 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbfKDDuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Nov 2019 22:50:06 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA43dALC065594;
-        Mon, 4 Nov 2019 03:49:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=u/WWylMqnru69Kx+UbRelHGNozBuMEoTTsvhB55jFes=;
- b=l00JYOymmHOq2jVkSyc6w/vGcmRLS3li6KjWd8J3+GzsQGOTXmyPJhYu3QpMxy1+SaFR
- DycWeDN15RsiP9++pBicFCviBPVxu4+dZ0bd39x8PMzL1GfjA8kD5Sn891tjp9Z2GRZC
- mFXdpbk9kztg/MVl+VWd+/68NaO/oP8epIhG+2sy8CyjACsrCbp0ysGxTHD3nVBBH0Us
- amQykCybgQzF7aXQ1rcN4l/hHyDpKiD7Nult+KlRsT+TTooYzr6fk1tFhUXBSUq52uqy
- 3XAWmswva8uf4jV+rqBRywd7x4H7hqrefHPzLx5TcAsO5bIoAd1TRaL2xfZYFzqHPXm5 hQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2w11rpmnk9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 03:49:41 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA43blSi070038;
-        Mon, 4 Nov 2019 03:49:40 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2w1kxkm8j3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Nov 2019 03:49:40 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA43neED027567;
-        Mon, 4 Nov 2019 03:49:40 GMT
-Received: from [10.159.157.81] (/10.159.157.81)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 03 Nov 2019 19:49:39 -0800
-Subject: Re: [PATCH 1/5] KVM: simplify branch check in host poll code
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
-        rkrcmar@redhat.com, pbonzini@redhat.com
-References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
- <1572060239-17401-2-git-send-email-zhenzhong.duan@oracle.com>
- <20191101210331.GA20061@amt.cnet>
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <c6a23208-4432-6fc4-a3f8-56a6aff07fd8@oracle.com>
-Date:   Mon, 4 Nov 2019 11:49:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191101210331.GA20061@amt.cnet>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911040035
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911040035
+        id S1728332AbfKDG2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 01:28:10 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40432 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727911AbfKDG2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 01:28:09 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 15so10602674pgt.7;
+        Sun, 03 Nov 2019 22:28:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=ZYR0xt4j6M9ghT6gn2+jBhsiyfXvuB7wHMizn4V6mhs=;
+        b=bi7os8MneiCUSdHm3w8wp6PYtlt3SIcJpGjVPC3e9PC3Q7uf1JJ/E2TQSeIP+gqb3N
+         D3FMWZI+HlqfshmITItNDVbMPqlniVZRuFlIt/FhUHWSDA7zXLRJ5btK6I7DiKQqerjW
+         kPgBxmJSEx8H8XwSlpqIzbZ0Kkij1iTwhHr9xrzJVbImrHUpc10HxAQfctJ5ZIwv8Tp0
+         RrdynQhshXrRMJbsFEoJxc9Qih15/k9oYheyVLasu0NeSUNATDb8AYGRrgSfKNlg7E6o
+         GQDJESuDTlAgRmrlTCYupV6HbZ/BuhHTKPmKgbrT+Zyg5txGL2Ha/y/MpQVkBwWobKuz
+         xfxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ZYR0xt4j6M9ghT6gn2+jBhsiyfXvuB7wHMizn4V6mhs=;
+        b=e7Xj4HOCJtISrSryKgwFTvlYew/iwyn/HgOXWBMRZSQns0VVPc1hQ4fGBcYGpE1cL+
+         +CETdfVF435rfwckyM8QjxZaZufait46EpN5CzQOXWdPGvtzWSBHnwcpSgYU71dR8xlt
+         lPHtA3b3J2wrepZbAbhN20jCtbT50c9fvaubrFYIyGknePUlrwVwrfXm+28Djbs4sxvV
+         5YvAOJmfq2NPWNx9VWNBfAFHrZK+a+1mBa/YvBYTFW5y+MHdqvVvHt7pyD0AzCSLS8er
+         nJM5qKkrm8rzw4xkY8dabyAm77hsnkmuyclvPs/dd052pNoU4+mlcWKT7MNQSyqnNlG3
+         Zd4Q==
+X-Gm-Message-State: APjAAAXV73YGyhHkyfGXQXPIrmLyrXf/59DDyzCOtIy3H7RGp7zoM6sk
+        vr9RZDXP5OYg8jNxUB2oNRaD/kCP
+X-Google-Smtp-Source: APXvYqxkJtkIRCkBSJNATceZJHKNaDtsagBi74sUOjSxtwBqNhWjB7hIbN0o0A/qXdoLJzjQSsqBFg==
+X-Received: by 2002:a17:90a:bb0a:: with SMTP id u10mr33656628pjr.14.1572848887315;
+        Sun, 03 Nov 2019 22:28:07 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id z7sm7810505pgk.10.2019.11.03.22.28.04
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Sun, 03 Nov 2019 22:28:06 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: [PATCH 1/2] KVM: Fix NULL-ptr defer after kvm_create_vm fails
+Date:   Mon,  4 Nov 2019 14:27:58 +0800
+Message-Id: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-On 2019/11/2 5:03, Marcelo Tosatti wrote:
-> On Sat, Oct 26, 2019 at 11:23:55AM +0800, Zhenzhong Duan wrote:
->> Remove redundant check.
->>
->> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
->> ---
->>   virt/kvm/kvm_main.c | 9 ++++-----
->>   1 file changed, 4 insertions(+), 5 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 67ef3f2..2ca2979 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2366,13 +2366,12 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>   		} else if (halt_poll_ns) {
->>   			if (block_ns <= vcpu->halt_poll_ns)
->>   				;
->> -			/* we had a long block, shrink polling */
->> -			else if (vcpu->halt_poll_ns && block_ns > halt_poll_ns)
->> -				shrink_halt_poll_ns(vcpu);
->>   			/* we had a short halt and our poll time is too small */
->> -			else if (vcpu->halt_poll_ns < halt_poll_ns &&
-> This is not a redundant check: it avoids from calling
-> into grow_halt_poll_ns, which will do:
->
-> 	1) Multiplication
-> 	2) Cap that back to halt_poll_ns
-> 	3) Invoke the trace_kvm_halt_poll_ns_grow tracepoint
-> 	   (when in fact vcpu->halt_poll_ns did not grow).
+Reported by syzkaller:
 
-In this branch, vcpu->halt_poll_ns < block_ns is true, and if block_ns < 
-halt_poll_ns,
+    kasan: CONFIG_KASAN_INLINE enabled
+    kasan: GPF could be caused by NULL-ptr deref or user memory access
+    general protection fault: 0000 [#1] PREEMPT SMP KASAN
+    CPU: 0 PID: 14727 Comm: syz-executor.3 Not tainted 5.4.0-rc4+ #0
+    RIP: 0010:kvm_coalesced_mmio_init+0x5d/0x110 arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:121
+    Call Trace:
+     kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:3446 [inline]
+     kvm_dev_ioctl+0x781/0x1490 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3494
+     vfs_ioctl fs/ioctl.c:46 [inline]
+     file_ioctl fs/ioctl.c:509 [inline]
+     do_vfs_ioctl+0x196/0x1150 fs/ioctl.c:696
+     ksys_ioctl+0x62/0x90 fs/ioctl.c:713
+     __do_sys_ioctl fs/ioctl.c:720 [inline]
+     __se_sys_ioctl fs/ioctl.c:718 [inline]
+     __x64_sys_ioctl+0x6e/0xb0 fs/ioctl.c:718
+     do_syscall_64+0xca/0x5d0 arch/x86/entry/common.c:290
+     entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-then vcpu->halt_poll_ns < halt_poll_ns is always true, isn't it?
+Commit 9121923c457d ("kvm: Allocate memslots and buses before calling kvm_arch_init_vm") 
+moves memslots and buses allocations around, however, if kvm->srcu/irq_srcu fails 
+initialization, NULL will be returned instead of error code, NULL will not be intercepted 
+in kvm_dev_ioctl_create_vm() and be deferenced by kvm_coalesced_mmio_init(), this patch 
+fixes it.
 
+syz repro: https://syzkaller.appspot.com/x/repro.syz?x=13509b84e00000
 
-I realized I ignored the situation that halt_poll_ns and 
-halt_poll_ns_grow could be
+Reported-by: syzbot+89a8060879fa0bd2db4f@syzkaller.appspotmail.com
+Fixes: 9121923c457d ("kvm: Allocate memslots and buses before calling kvm_arch_init_vm") 
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ virt/kvm/kvm_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-updated at runtime, so pls ignore this patch, I'll fix it by following 
-the guest haltpoll code.
-
-Thanks
-
-Zhenzhong
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d6f0696..8c272eb 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -675,6 +675,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
+ #endif
+ 
++	r = -ENOMEM;
+ 	if (init_srcu_struct(&kvm->srcu))
+ 		goto out_err_no_srcu;
+ 	if (init_srcu_struct(&kvm->irq_srcu))
+-- 
+2.7.4
 
