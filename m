@@ -2,123 +2,308 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5237CEE840
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 20:22:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0068EE85C
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 20:30:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729248AbfKDTWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 14:22:47 -0500
-Received: from mail-eopbgr820087.outbound.protection.outlook.com ([40.107.82.87]:53408
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728761AbfKDTWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 14:22:47 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UUs5WSr6gV28imt1YuKUtuRniP/xg3tZ7Z01se2uW6Xv8AuLVSjCr7LYT2X8+mN38R4D91dUqzM9ij7Ih6rnGBerPjM55gaeiTGSx6Kb5LZzQ66EXpr3gqidQsMfeuap0ChTjFjaHiRSQ6RZKbD319n5iNEkTV9a9n1Fe9+1Xp6VV4EQ2MlI7+CRsMYXlw4phz196KkVfGVXyrIc3oqPwd05Fdi+JZ5jcYAlxbMOSZ2KQF6x4lHc1sLWp539ps5DVmJTohfkp+KEmDoulC5SQG7uadAL/jM8DqndUBIVVI1/YFnsQtQXGulsT3qzqMwwySdc5U8JcCELNOrQlZc3OQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rkEJLUr6eETY8oSz5eP/66yJTSEuDSFMDhnsUF35kjc=;
- b=OW3S8nUE7fp3BaLhMw7Kn+zZG7ZZWYu6/Ir/S8iAw6VmtalKvBTPXPYevfbGuIi5tckuHO5ahWzbKnKfBmfBC1ro2boQwEVonMUDUX5C3pGQxolBrHb4M4q6UmWs/QD3iybzIQSht1SByzoybVVJ0KNVyW/Du3vXNCfhmm92EIt2Vzoga3gb3K0Al+l5d67c0qkrqxmQwswwEtmgfbwwy2HKwcOcTziplAmCRDhb0XdX6YLrD17BioE+oUqRcK7eH/ugnX3blHd8tBzM9Bv1q2ZxsKzwjNQyN6dQwjRuWIAZWoFPPZpKDMkRibYOXVIGeWNcaL/eCrCQx+gMH3dTNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rkEJLUr6eETY8oSz5eP/66yJTSEuDSFMDhnsUF35kjc=;
- b=wjMvY796V15eq2kMdqMhGPEX6pPPiEFegoCmlD4KQ/o3en+meP3E4PU5OawvsEmmltzLvtNHoUMPTjHfgjwaT5BxCC0zPa65c73LDPr4KB3QcLRBl7L8neBPeo836kvawU0UI/ChHx1oR4MoioauDTa5e8krX7D4W3G+UmnTtYg=
-Received: from DM6PR12MB3865.namprd12.prod.outlook.com (10.255.173.210) by
- DM6PR12MB3274.namprd12.prod.outlook.com (20.179.106.18) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Mon, 4 Nov 2019 19:22:44 +0000
-Received: from DM6PR12MB3865.namprd12.prod.outlook.com
- ([fe80::4898:93e0:3c0c:d862]) by DM6PR12MB3865.namprd12.prod.outlook.com
- ([fe80::4898:93e0:3c0c:d862%6]) with mapi id 15.20.2408.024; Mon, 4 Nov 2019
- 19:22:44 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "rkagan@virtuozzo.com" <rkagan@virtuozzo.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-Subject: Re: [PATCH v4 04/17] kvm: x86: Add support for activate/de-activate
- APICv at runtime
-Thread-Topic: [PATCH v4 04/17] kvm: x86: Add support for activate/de-activate
- APICv at runtime
-Thread-Index: AQHVkQV/8CsVLszkbEWXIyta1bn49Kd3pGIAgAPEBQA=
-Date:   Mon, 4 Nov 2019 19:22:43 +0000
-Message-ID: <32d5c485-7ee8-fffd-a461-4c01101a2396@amd.com>
-References: <1572648072-84536-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1572648072-84536-5-git-send-email-suravee.suthikulpanit@amd.com>
- <c83eb23c-2d4f-fd22-ed9f-d4eeffa8bcd6@redhat.com>
-In-Reply-To: <c83eb23c-2d4f-fd22-ed9f-d4eeffa8bcd6@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.2.0
-x-originating-ip: [165.204.25.250]
-x-clientproxiedby: BN6PR22CA0051.namprd22.prod.outlook.com
- (2603:10b6:404:ca::13) To DM6PR12MB3865.namprd12.prod.outlook.com
- (2603:10b6:5:1c8::18)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6ffe8cf3-5e49-40e6-7e92-08d7615c5dee
-x-ms-traffictypediagnostic: DM6PR12MB3274:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB3274538B791FB5DED8B4B841F37F0@DM6PR12MB3274.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 0211965D06
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(346002)(39860400002)(396003)(136003)(189003)(199004)(305945005)(4744005)(31696002)(99286004)(7416002)(110136005)(54906003)(316002)(6512007)(66066001)(65806001)(65956001)(58126008)(229853002)(6436002)(71190400001)(71200400001)(66946007)(2201001)(5660300002)(6246003)(3846002)(6116002)(2906002)(4326008)(14444005)(256004)(31686004)(26005)(53546011)(14454004)(386003)(102836004)(6506007)(8936002)(8676002)(81156014)(81166006)(6486002)(64756008)(66556008)(66446008)(66476007)(86362001)(478600001)(2501003)(476003)(36756003)(11346002)(446003)(2616005)(186003)(486006)(52116002)(76176011)(25786009)(7736002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3274;H:DM6PR12MB3865.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Q1BUFwtucBab17Bpst9JvuQNuVyQCgUed+7aNIXMuoeBUsqP+DvrfDuepjhgy7p49k6m3XGXKxWs07zr75R4tesDy27s+9VPnWZVwl48QFweddCfypCw4QfgJih9WR9iFt2sdLQjNOwiC52wh+l1zR2QKs7UhmBoV+InFW1sBhgxw2f7k7PqZU8DByidRLHlXp1VxKxr8xL5psG2FKb7KRd3VlbwQyIgwF+zqFb0IONSKn1Y9TBAvy+zV6sb/MrjYLCO4C3B3V1lUPSUm7Exm4fAO+5T/pFBouCp2Kq39C+SPp9ki/zbLep2nrmhtmZ8WlAthBlqod3thhGlg2zjwW0xPB8UC07E6PK2+ba2XeBLPLOnSNkoMdU67HE5nrqyQK9lGvVGx/VNW6iVPx9hivuk/F2M+EvG81WZl4okomfnoacJbCJksw7ab8Ze27Jd
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E6EC74D100AA0B4E96B6B27190E5EFAB@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1728882AbfKDTaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 14:30:35 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:2050 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728174AbfKDTaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 14:30:35 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dc07c5f0000>; Mon, 04 Nov 2019 11:30:39 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 04 Nov 2019 11:30:33 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 04 Nov 2019 11:30:33 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 Nov
+ 2019 19:30:32 +0000
+Subject: Re: [PATCH v2 05/18] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     Jerome Glisse <jglisse@redhat.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191103211813.213227-1-jhubbard@nvidia.com>
+ <20191103211813.213227-6-jhubbard@nvidia.com>
+ <20191104173325.GD5134@redhat.com>
+ <be9de35c-57e9-75c3-2e86-eae50904bbdf@nvidia.com>
+ <20191104191811.GI5134@redhat.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <e9656d47-b4a1-da8a-e8cc-ebcfb8cc06d6@nvidia.com>
+Date:   Mon, 4 Nov 2019 11:30:32 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ffe8cf3-5e49-40e6-7e92-08d7615c5dee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2019 19:22:43.9849
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jchNoby3v07VlqhslL9UTkuigJXR4exoKWA8h30xqGRcwIyiKP+TX5JMNHybHVHQlgMriWDzeVu7yK9HdstuoA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3274
+In-Reply-To: <20191104191811.GI5134@redhat.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1572895839; bh=4bBXDhcnAvf/UNaIaERnnHztx1MZo0i9KcDepWFrcDI=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=N7o5kNr/onfpbpTkDkcET17D1txOG2LPXemOd+E+RUCurbTzfnK4HybyAK4eO9VMh
+         /WA6Gjpr3d+HnPyWwcFQjIWqh6PFu25AQdh6E4cPKroXl6Z6PiXQQNZd9O8NbKe2VJ
+         EALC1QWpHVawx3KHhJ4QlFBaBQaAtVQmfTfjtc1ixIWfqESqAK5r4Iwv5NkSGDw7Ru
+         RX+Qmp3UxOLe+pMgAfJDtJmiX1zSTnb30+KbUkFzsr+NuVeSs4gFqmy/tdw2feg3JN
+         c47Fjq2XnouO8SaER8nRQLLk9EaLzIhVe73FJUSIkcSD+fYv0Gi7WxfIP0kuBSYref
+         5Xxmg51W0i3PQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGFvbG8sDQoNCk9uIDExLzIvMTkgNDo1MiBBTSwgUGFvbG8gQm9uemluaSB3cm90ZToNCj4gT24g
-MDEvMTEvMTkgMjM6NDEsIFN1dGhpa3VscGFuaXQsIFN1cmF2ZWUgd3JvdGU6DQo+PiArdm9pZCBr
-dm1fcmVxdWVzdF9hcGljdl91cGRhdGUoc3RydWN0IGt2bSAqa3ZtLCBib29sIGFjdGl2YXRlLCB1
-bG9uZyBiaXQpDQo+PiArew0KPj4gKwlpZiAoYWN0aXZhdGUpIHsNCj4+ICsJCWlmICghdGVzdF9h
-bmRfY2xlYXJfYml0KGJpdCwgJmt2bS0+YXJjaC5hcGljdl9kZWFjdF9tc2spIHx8DQo+PiArCQkg
-ICAgIWt2bV9hcGljdl9hY3RpdmF0ZWQoa3ZtKSkNCj4+ICsJCQlyZXR1cm47DQo+PiArCX0gZWxz
-ZSB7DQo+PiArCQlpZiAodGVzdF9hbmRfc2V0X2JpdChiaXQsICZrdm0tPmFyY2guYXBpY3ZfZGVh
-Y3RfbXNrKSB8fA0KPj4gKwkJICAgIGt2bV9hcGljdl9hY3RpdmF0ZWQoa3ZtKSkNCj4+ICsJCQly
-ZXR1cm47DQo+PiArCX0NCj4+ICsNCj4+ICsJa3ZtX21ha2VfYWxsX2NwdXNfcmVxdWVzdChrdm0s
-IEtWTV9SRVFfQVBJQ1ZfVVBEQVRFKTsNCj4+ICt9DQo+PiArRVhQT1JUX1NZTUJPTF9HUEwoa3Zt
-X3JlcXVlc3RfYXBpY3ZfdXBkYXRlKTsNCj4+ICsNCj4gDQo+IEl0J3Mgd29ydGggZG9jdW1lbnRp
-bmcgdGhlIGxvY2tpbmcgcmVxdWlyZW1lbnRzIG9mDQo+IGt2bV9yZXF1ZXN0X2FwaWN2X3VwZGF0
-ZSAoaXQgY2FuIGFsc28gYmUgbmVnYXRpdmUgcmVxdWlyZW1lbnRzLCBzdWNoIGFzDQo+ICJkb24n
-dCBob2xkIGFueSBsb2NrIiksIGJlY2F1c2Uga3ZtX21ha2VfYWxsX2NwdXNfcmVxdWVzdCBpcyBh
-IHNvbWV3aGF0DQo+IGRlYWRsb2NrLXByb25lIEFQSS4NCg0KQ3VycmVudGx5LCBJIGhhdmUgYSBj
-b21tZW50IGluIHRoZSBzdm1fcmVxdWVzdF91cGRhdGVfYXZpYygpLCB3aGVyZSBpdCANCmNhbGxz
-IGt2bV9yZXF1ZXN0X2FwaWN2X3VwZGF0ZS4gSSdsbCBtb3ZlIGl0IGhlcmUgaW5zdGVhZCBhbmQg
-ZW5oYW5jZSANCnRoZSBjb21tZW50Lg0KDQpUaGFua3MsDQpTdXJhdmVlDQo=
+On 11/4/19 11:18 AM, Jerome Glisse wrote:
+> On Mon, Nov 04, 2019 at 11:04:38AM -0800, John Hubbard wrote:
+>> On 11/4/19 9:33 AM, Jerome Glisse wrote:
+>> ...
+>>>
+>>> Few nitpick belows, nonetheless:
+>>>
+>>> Reviewed-by: J=E9r=F4me Glisse <jglisse@redhat.com>
+>>> [...]
+>>>> +
+>>>> +CASE 3: ODP
+>>>> +-----------
+>>>> +(Mellanox/Infiniband On Demand Paging: the hardware supports
+>>>> +replayable page faulting). There are GUP references to pages serving =
+as DMA
+>>>> +buffers. For ODP, MMU notifiers are used to synchronize with page_mkc=
+lean()
+>>>> +and munmap(). Therefore, normal GUP calls are sufficient, so neither =
+flag
+>>>> +needs to be set.
+>>>
+>>> I would not include ODP or anything like it here, they do not use
+>>> GUP anymore and i believe it is more confusing here. I would how-
+>>> ever include some text in this documentation explaining that hard-
+>>> ware that support page fault is superior as it does not incur any
+>>> of the issues described here.
+>>
+>> OK, agreed, here's a new write up that I'll put in v3:
+>>
+>>
+>> CASE 3: ODP
+>> -----------
+>=20
+> ODP is RDMA, maybe Hardware with page fault support instead
+>=20
+>> Advanced, but non-CPU (DMA) hardware that supports replayable page fault=
+s.
+
+OK, so:
+
+    "RDMA hardware with page faulting support."
+
+for the first sentence.
+
+
+>> Here, a well-written driver doesn't normally need to pin pages at all. H=
+owever,
+>> if the driver does choose to do so, it can register MMU notifiers for th=
+e range,
+>> and will be called back upon invalidation. Either way (avoiding page pin=
+ning, or
+>> using MMU notifiers to unpin upon request), there is proper synchronizat=
+ion with=20
+>> both filesystem and mm (page_mkclean(), munmap(), etc).
+>>
+>> Therefore, neither flag needs to be set.
+>=20
+> In fact GUP should never be use with those.
+
+
+Yes. The next paragraph says that, but maybe not strong enough.
+
+
+>>
+>> It's worth mentioning here that pinning pages should not be the first de=
+sign
+>> choice. If page fault capable hardware is available, then the software s=
+hould
+>> be written so that it does not pin pages. This allows mm and filesystems=
+ to
+>> operate more efficiently and reliably.
+
+Here's what we have after the above changes:
+
+CASE 3: ODP
+-----------
+RDMA hardware with page faulting support. Here, a well-written driver doesn=
+'t
+normally need to pin pages at all. However, if the driver does choose to do=
+ so,
+it can register MMU notifiers for the range, and will be called back upon
+invalidation. Either way (avoiding page pinning, or using MMU notifiers to =
+unpin
+upon request), there is proper synchronization with both filesystem and mm
+(page_mkclean(), munmap(), etc).
+
+Therefore, neither flag needs to be set.
+
+In this case, ideally, neither get_user_pages() nor pin_user_pages() should=
+ be=20
+called. Instead, the software should be written so that it does not pin pag=
+es.=20
+This allows mm and filesystems to operate more efficiently and reliably.
+
+>>> [...]
+>>>
+>>>> @@ -1014,7 +1018,16 @@ static __always_inline long __get_user_pages_lo=
+cked(struct task_struct *tsk,
+>>>>  		BUG_ON(*locked !=3D 1);
+>>>>  	}
+>>>> =20
+>>>> -	if (pages)
+>>>> +	/*
+>>>> +	 * FOLL_PIN and FOLL_GET are mutually exclusive. Traditional behavio=
+r
+>>>> +	 * is to set FOLL_GET if the caller wants pages[] filled in (but has
+>>>> +	 * carelessly failed to specify FOLL_GET), so keep doing that, but o=
+nly
+>>>> +	 * for FOLL_GET, not for the newer FOLL_PIN.
+>>>> +	 *
+>>>> +	 * FOLL_PIN always expects pages to be non-null, but no need to asse=
+rt
+>>>> +	 * that here, as any failures will be obvious enough.
+>>>> +	 */
+>>>> +	if (pages && !(flags & FOLL_PIN))
+>>>>  		flags |=3D FOLL_GET;
+>>>
+>>> Did you look at user that have pages and not FOLL_GET set ?
+>>> I believe it would be better to first fix them to end up
+>>> with FOLL_GET set and then error out if pages is !=3D NULL but
+>>> nor FOLL_GET or FOLL_PIN is set.
+>>>
+>>
+>> I was perhaps overly cautious, and didn't go there. However, it's probab=
+ly
+>> doable, given that there was already the following in __get_user_pages()=
+:
+>>
+>>     VM_BUG_ON(!!pages !=3D !!(gup_flags & FOLL_GET));
+>>
+>> ...which will have conditioned people and code to set FOLL_GET together =
+with
+>> pages. So I agree that the time is right.
+>>
+>> In order to make bisecting future failures simpler, I can insert a patch=
+ right=20
+>> before this one, that changes the FOLL_GET setting into an assert, like =
+this:
+>>
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index 8f236a335ae9..be338961e80d 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>> @@ -1014,8 +1014,8 @@ static __always_inline long __get_user_pages_locke=
+d(struct task_struct *tsk,
+>>                 BUG_ON(*locked !=3D 1);
+>>         }
+>> =20
+>> -       if (pages)
+>> -               flags |=3D FOLL_GET;
+>> +       if (pages && WARN_ON_ONCE(!(gup_flags & FOLL_GET)))
+>> +               return -EINVAL;
+>> =20
+>>         pages_done =3D 0;
+>>         lock_dropped =3D false;
+>>
+>>
+>> ...and then add in FOLL_PIN, with this patch.
+>=20
+> looks good but double check that it should not happens, i will try
+> to check on my side too.
+
+Yes, I'll look.
+
+...
+>>>> +	 */
+>>>> +	gup_flags |=3D FOLL_REMOTE | FOLL_PIN;
+>>>
+>>> Wouldn't it be better to not add pin_longterm_pages_remote() until
+>>> it can be properly implemented ?
+>>>
+>>
+>> Well, the problem is that I need each call site that requires FOLL_PIN
+>> to use a proper wrapper. It's the FOLL_PIN that is the focus here, becau=
+se
+>> there is a hard, bright rule, which is: if and only if a caller sets
+>> FOLL_PIN, then the dma-page tracking happens, and put_user_page() must
+>> be called.
+>>
+>> So this leaves me with only two reasonable choices:
+>>
+>> a) Convert the call site as above: pin_longterm_pages_remote(), which se=
+ts
+>> FOLL_PIN (the key point!), and leaves the FOLL_LONGTERM situation exactl=
+y
+>> as it has been so far. When the FOLL_LONGTERM situation is fixed, the ca=
+ll
+>> site *might* not need any changes to adopt the working gup.c code.
+>>
+>> b) Convert the call site to pin_user_pages_remote(), which also sets
+>> FOLL_PIN, and also leaves the FOLL_LONGTERM situation exactly as before.
+>> There would also be a comment at the call site, to the effect of, "this
+>> is the wrong call to make: it really requires FOLL_LONGTERM behavior".
+>>
+>> When the FOLL_LONGTERM situation is fixed, the call site will need to be
+>> changed to pin_longterm_pages_remote().
+>>
+>> So you can probably see why I picked (a).
+>=20
+> But right now nobody has FOLL_LONGTERM and FOLL_REMOTE. So you should
+> never have the need for pin_longterm_pages_remote(). My fear is that
+> longterm has implication and it would be better to not drop this implicat=
+ion
+> by adding a wrapper that does not do what the name says.
+>=20
+> So do not introduce pin_longterm_pages_remote() until its first user
+> happens. This is option c)
+>=20
+
+Almost forgot, though: there is already another user: Infiniband:
+
+drivers/infiniband/core/umem_odp.c:646:         npages =3D pin_longterm_pag=
+es_remote(owning_process, owning_mm,
+
+
+
+thanks,
+
+John Hubbard
+NVIDIA
