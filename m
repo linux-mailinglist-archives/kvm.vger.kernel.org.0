@@ -2,133 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40B5EEE2C5
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 15:42:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1575EE35F
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 16:16:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbfKDOmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 09:42:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42325 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728321AbfKDOmW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 09:42:22 -0500
+        id S1729253AbfKDPQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 10:16:45 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39216 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728346AbfKDPQp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 10:16:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572878541;
+        s=mimecast20190719; t=1572880604;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m/hSgM7HsKsQD8PfkIMz0SRCUEy0RHMIGBFVNz7s3MA=;
-        b=E+lOn4XNBQxHuc/ZqXqikey1LEiSySbzc/ttaVVbPeaCgt8U4Memy1YAxo7fnjvhdjoB7X
-        +nIDvgFfSDwj/fQ0JcBFExtq6Z+eWaVmqqyfFaJgCB5CfoUoNXclhhNVXsQmcX+8EESJDo
-        iYBSpftDF+ShZJM7x3/bl3JS83Jl1kI=
+        bh=94jUXg8YSFsR6CfFNt9OsbURbL8UvhaFzbBwaFpwKq0=;
+        b=UIv0vT+eKktLq/2L5LBoHgSoR2lPUNoQryACjDC6cl3ucd8ZzxD72SznekXyRGwzWb6CUv
+        NJf144CLqpwtjB/t1oHl6B8xcs1iz9qnsjh8cQ/LR4YtiaY6DzVyZ/ayNa4Dy8gIEWlt8F
+        7RIZz9bOxSg9cMIpqdpDXEy4k2DVk1w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-rS3O_QJeM62VlGA1e7hrNQ-1; Mon, 04 Nov 2019 09:42:18 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-268-JLq42j5JNbqeO_nbIuntlA-1; Mon, 04 Nov 2019 10:16:40 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BACE31800D53;
-        Mon,  4 Nov 2019 14:42:16 +0000 (UTC)
-Received: from [10.36.117.96] (ovpn-117-96.ams2.redhat.com [10.36.117.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E11E600CC;
-        Mon,  4 Nov 2019 14:42:12 +0000 (UTC)
-Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
-From:   David Hildenbrand <david@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        cohuck@redhat.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-10-frankja@linux.ibm.com>
- <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
- <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
- <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
- <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
- <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
- <69ddb6a7-8f69-fbc4-63a4-4f5695117078@de.ibm.com>
- <1fad0466-1eeb-7d24-8015-98af9b564f74@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <8a68fcbb-1dea-414f-7d48-e4647f7985fe@redhat.com>
-Date:   Mon, 4 Nov 2019 15:42:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABB63800C73;
+        Mon,  4 Nov 2019 15:16:39 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-10.gru2.redhat.com [10.97.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3A7026FA8;
+        Mon,  4 Nov 2019 15:16:36 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 5E810105157;
+        Mon,  4 Nov 2019 13:01:15 -0200 (BRST)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id xA4F1AkN016482;
+        Mon, 4 Nov 2019 13:01:10 -0200
+Date:   Mon, 4 Nov 2019 13:01:06 -0200
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
+        rkrcmar@redhat.com, pbonzini@redhat.com
+Subject: Re: [PATCH 5/5] cpuidle-haltpoll: fix up the branch check
+Message-ID: <20191104150103.GA14887@amt.cnet>
+References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1572060239-17401-6-git-send-email-zhenzhong.duan@oracle.com>
+ <20191101212613.GB20672@amt.cnet>
+ <bafc1688-02ea-77a4-fb1c-2fe6afa8a7cc@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1fad0466-1eeb-7d24-8015-98af9b564f74@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: rS3O_QJeM62VlGA1e7hrNQ-1
+In-Reply-To: <bafc1688-02ea-77a4-fb1c-2fe6afa8a7cc@oracle.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: JLq42j5JNbqeO_nbIuntlA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.11.19 15:08, David Hildenbrand wrote:
-> On 04.11.19 14:58, Christian Borntraeger wrote:
->>
->>
->> On 04.11.19 11:19, David Hildenbrand wrote:
->>>>>> to synchronize page import/export with the I/O for paging. For examp=
-le you can actually
->>>>>> fault in a page that is currently under paging I/O. What do you do? =
-import (so that the
->>>>>> guest can run) or export (so that the I/O will work). As this turned=
- out to be harder then
->>>>>> we though we decided to defer paging to a later point in time.
->>>>>
->>>>> I don't quite see the issue yet. If you page out, the page will
->>>>> automatically (on access) be converted to !secure/encrypted memory. I=
-f
->>>>> the UV/guest wants to access it, it will be automatically converted t=
-o
->>>>> secure/unencrypted memory. If you have concurrent access, it will be
->>>>> converted back and forth until one party is done.
->>>>
->>>> IO does not trigger an export on an imported page, but an error
->>>> condition in the IO subsystem. The page code does not read pages throu=
-gh
->>>
->>> Ah, that makes it much clearer. Thanks!
->>>
->>>> the cpu, but often just asks the device to read directly and that's
->>>> where everything goes wrong. We could bounce swapping, but chose to pi=
-n
->>>> for now until we find a proper solution to that problem which nicely
->>>> integrates into linux.
->>>
->>> How hard would it be to
->>>
->>> 1. Detect the error condition
->>> 2. Try a read on the affected page from the CPU (will will automaticall=
-y convert to encrypted/!secure)
->>> 3. Restart the I/O
->>>
->>> I assume that this is a corner case where we don't really have to care =
-about performance in the first shot.
->>
->> We have looked into this. You would need to implement this in the low le=
-vel
->> handler for every I/O. DASD, FCP, PCI based NVME, iscsi. Where do you wa=
-nt
->> to stop?
+On Mon, Nov 04, 2019 at 11:10:25AM +0800, Zhenzhong Duan wrote:
 >=20
-> If that's the real fix, we should do that. Maybe one can focus on the
-> real use cases first. But I am no I/O expert, so my judgment might be
-> completely wrong.
+> On 2019/11/2 5:26, Marcelo Tosatti wrote:
+> >On Sat, Oct 26, 2019 at 11:23:59AM +0800, Zhenzhong Duan wrote:
+> >>Ensure pool time is longer than block_ns, so there is a margin to
+> >>avoid vCPU get into block state unnecessorily.
+> >>
+> >>Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
+> >>---
+> >>  drivers/cpuidle/governors/haltpoll.c | 6 +++---
+> >>  1 file changed, 3 insertions(+), 3 deletions(-)
+> >>
+> >>diff --git a/drivers/cpuidle/governors/haltpoll.c b/drivers/cpuidle/gov=
+ernors/haltpoll.c
+> >>index 4b00d7a..59eadaf 100644
+> >>--- a/drivers/cpuidle/governors/haltpoll.c
+> >>+++ b/drivers/cpuidle/governors/haltpoll.c
+> >>@@ -81,9 +81,9 @@ static void adjust_poll_limit(struct cpuidle_device *=
+dev, unsigned int block_us)
+> >>  =09u64 block_ns =3D block_us*NSEC_PER_USEC;
+> >>  =09/* Grow cpu_halt_poll_us if
+> >>-=09 * cpu_halt_poll_us < block_ns < guest_halt_poll_us
+> >>+=09 * cpu_halt_poll_us <=3D block_ns < guest_halt_poll_us
+> >>  =09 */
+> >>-=09if (block_ns > dev->poll_limit_ns && block_ns <=3D guest_halt_poll_=
+ns) {
+> >>+=09if (block_ns >=3D dev->poll_limit_ns && block_ns < guest_halt_poll_=
+ns) {
+> >=09=09=09=09=09      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >
+> >If block_ns =3D=3D guest_halt_poll_ns, you won't allow dev->poll_limit_n=
+s to
+> >grow. Why is that?
 >=20
+> Maybe I'm too strict here. My understanding is: if block_ns =3D guest_hal=
+t_poll_ns,
+> dev->poll_limit_ns will grow to guest_halt_poll_ns,=20
 
-Oh, and by the way, as discussed you really only have to care about=20
-accesses via "real" I/O devices (IOW, not via the CPU). When accessing=20
-via the CPU, you should have automatic conversion back and forth. As I=20
-am no expert on I/O, I have no idea how iscsi fits into this picture=20
-here (especially on s390x).
+OK.
 
---=20
+> then block_ns =3D dev->poll_limit_ns,
 
-Thanks,
+block_ns =3D dev->poll_limit_ns =3D guest_halt_poll_ns. OK.
 
-David / dhildenb
+> there is not a margin to ensure poll time is enough to cover the equal bl=
+ock time.
+> In this case, shrinking may be a better choice?
+
+Ok, so you are considering _on the next_ halt instance, if block_ns =3D
+guest_halt_poll_ns again?
+
+Then without the suggested modification: we don't shrink, poll for
+guest_halt_poll_ns again.
+
+With your modification: we shrink, because block_ns =3D=3D
+guest_halt_poll_ns.
+
+IMO what really clarifies things here is either the real sleep pattern=20
+or a synthetic sleep pattern similar to the real thing.
+
+Do you have a scenario where the current algorithm is maintaining
+a low dev->poll_limit_ns and performance is hurt?
+
+If you could come up with examples, such as the client/server pair at
+https://lore.kernel.org/lkml/20190514135022.GD4392@amt.cnet/T/
+
+or just a sequence of delays:=20
+block_ns, block_ns, block_ns-1,...
+
+It would be easier to visualize this.
+
+> >>@@ -101,7 +101,7 @@ static void adjust_poll_limit(struct cpuidle_device=
+ *dev, unsigned int block_us)
+> >>  =09=09=09val =3D guest_halt_poll_ns;
+> >>  =09=09dev->poll_limit_ns =3D val;
+> >>-=09} else if (block_ns > guest_halt_poll_ns &&
+> >>+=09} else if (block_ns >=3D guest_halt_poll_ns &&
+> >>  =09=09   guest_halt_poll_allow_shrink) {
+> >>  =09=09unsigned int shrink =3D guest_halt_poll_shrink;
+> >And here you shrink if block_ns =3D=3D guest_halt_poll_ns. Not sure
+> >why that makes sense either.
+>=20
+> See above explanation.
+>=20
+> Zhenzhong
 
