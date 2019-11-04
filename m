@@ -2,78 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E6D4EDFCF
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 13:16:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91E54EDFD7
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 13:17:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728940AbfKDMQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 07:16:38 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5260 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728926AbfKDMQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 07:16:37 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id B4798D099811236B78DF;
-        Mon,  4 Nov 2019 20:16:35 +0800 (CST)
-Received: from HGHY4Z004218071.china.huawei.com (10.133.224.57) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 4 Nov 2019 20:16:27 +0800
-From:   Xiang Zheng <zhengxiang9@huawei.com>
-To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>,
-        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
-        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
-        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <linuxarm@huawei.com>
-CC:     <zhengxiang9@huawei.com>, <wanghaibin.wang@huawei.com>
-Subject: [PATCH v21 6/6] MAINTAINERS: Add APCI/APEI/GHES entries
-Date:   Mon, 4 Nov 2019 20:14:58 +0800
-Message-ID: <20191104121458.29208-7-zhengxiang9@huawei.com>
-X-Mailer: git-send-email 2.15.1.windows.2
-In-Reply-To: <20191104121458.29208-1-zhengxiang9@huawei.com>
-References: <20191104121458.29208-1-zhengxiang9@huawei.com>
+        id S1728988AbfKDMRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 07:17:06 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:46333 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728481AbfKDMRG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 07:17:06 -0500
+Received: by mail-ot1-f65.google.com with SMTP id n23so3928511otr.13;
+        Mon, 04 Nov 2019 04:17:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=47JQeuFealI4jSM8NIAlNeCFyhat+1KtTcPGYTc+/B8=;
+        b=FPu6E5dGuSRTF6T/chyqu3HS3QEMsl5rfwZPsGs0ptx4/DFVAWuoxW4eupR2kW6pLB
+         YzkXisGoHccl2mdW/jxtTSupOn6Xz+LQask4MV4S3TD3xNI27X2Hq1UEatMuGosoPXE8
+         rHgxMMVgoP96+VFrD3+hA6OKb2042UKfJtHTcJ3re5M3lPEmsZ12f7RKIPCmqdQ8h4mw
+         QDvRZgP5bRoAg0DfUyjxAljiCDCMN0zJWS/Mj3xNjCNHp+c2d6xcfOLFJPuhN5U5RN2D
+         0AJMjvEZdCFcuNzb6YjqqqssJUTokMhoHpdp+Svm9U5mWxOcEdC4PqFDnTqky2UrKLSS
+         C/6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=47JQeuFealI4jSM8NIAlNeCFyhat+1KtTcPGYTc+/B8=;
+        b=e6ni6SIsngQd3O4btfQmt0S4W8O2cOIlDbieYzCcfU8yALSUU4UL+oc/zBiV8Tx3Uz
+         x0IepCY5APOjzbkBo9Deqetn0Un8JSA2ZgXkzmadEsOr06gUzjWg2yDmeJxBqEUFhcLm
+         JCZZWx2a6jG6lvyEUePbN3QYIxSC3dZGF3mpTQ8jfkfX6DID0oOY+TDWoo0C1IGfc+rJ
+         Nj7k/s+Adwe6jK5uaGp0Dqa9s18aiFV/KhhUIJdU9n2YHSJwUaOxG3x4F0u+JWesoVKd
+         PWxB4yEgW3wZ55t/7zXlVCT+ADLCvkdyLeymMYQAtM7GUW0n6XhKdre4Y72FjLwdrGMf
+         MuAw==
+X-Gm-Message-State: APjAAAV/96etiBSWJ/BER2AdiIJ9wjnj5pgiMJu9rKc4CkfH1RPTma37
+        6dHWN3TkfXExfF52mn3EumjTlPC2AI5eirDTJKI=
+X-Google-Smtp-Source: APXvYqy9eyChpvYwt1pJ3TRds008moU69SaOBiaC6RH8bQb1NPio/GjYEzuL+cmwtrnLMDcu8iGwlKWXjA/XvAmUyuY=
+X-Received: by 2002:a9d:7b43:: with SMTP id f3mr17403056oto.254.1572869825122;
+ Mon, 04 Nov 2019 04:17:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
+References: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
+ <1572848879-21011-2-git-send-email-wanpengli@tencent.com> <c32d632b-8fb0-f7c6-4937-07c30769b924@redhat.com>
+In-Reply-To: <c32d632b-8fb0-f7c6-4937-07c30769b924@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 4 Nov 2019 20:16:58 +0800
+Message-ID: <CANRm+CzkbrbE2C2yFKL1=mQCBCZMfVH8Tue3eXXqTL5Z1VUB5w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: Fix rcu splat if vm creation fails
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dongjiu Geng <gengdongjiu@huawei.com>
+On Mon, 4 Nov 2019 at 19:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 04/11/19 07:27, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Reported by syzkaller:
+> >
+> >    =============================
+> >    WARNING: suspicious RCU usage
+> >    -----------------------------
+> >    ./include/linux/kvm_host.h:536 suspicious rcu_dereference_check() usage!
+> >
+> >    other info that might help us debug this:
+> >
+> >    rcu_scheduler_active = 2, debug_locks = 1
+> >    no locks held by repro_11/12688.
+> >
+> >    stack backtrace:
+> >    Call Trace:
+> >     dump_stack+0x7d/0xc5
+> >     lockdep_rcu_suspicious+0x123/0x170
+> >     kvm_dev_ioctl+0x9a9/0x1260 [kvm]
+> >     do_vfs_ioctl+0x1a1/0xfb0
+> >     ksys_ioctl+0x6d/0x80
+> >     __x64_sys_ioctl+0x73/0xb0
+> >     do_syscall_64+0x108/0xaa0
+> >     entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> >
+> > Commit a97b0e773e4 (kvm: call kvm_arch_destroy_vm if vm creation fails)
+> > sets users_count to 1 before kvm_arch_init_vm(), however, if kvm_arch_init_vm()
+> > fails, we need to dec this count. Or, we can move the sets refcount after
+> > kvm_arch_init_vm().
+>
+> I don't understand this one, hasn't
+>
+>         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
+>
+> decreased the conut already?  With your patch the refcount would then
+> underflow.
 
-I and Xiang are willing to review the APEI-related patches and
-volunteer as the reviewers for the APEI/GHES part.
+r = kvm_arch_init_vm(kvm, type);
+if (r)
+    goto out_err_no_arch_destroy_vm;
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+out_err_no_disable:
+    kvm_arch_destroy_vm(kvm);
+    WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
+out_err_no_arch_destroy_vm:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 325e67a04e..043f7a928e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1414,6 +1414,15 @@ F: tests/bios-tables-test.c
- F: tests/acpi-utils.[hc]
- F: tests/data/acpi/
- 
-+ACPI/APEI/GHES
-+R: Dongjiu Geng <gengdongjiu@huawei.com>
-+R: Xiang Zheng <zhengxiang9@huawei.com>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/acpi/acpi_ghes.c
-+F: include/hw/acpi/acpi_ghes.h
-+F: docs/specs/acpi_hest_ghes.rst
-+
- ppc4xx
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
--- 
-2.19.1
+So, if kvm_arch_init_vm() fails, we will not execute
+WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
 
-
+    Wanpeng
