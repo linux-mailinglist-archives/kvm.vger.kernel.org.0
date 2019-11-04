@@ -2,125 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F404ED8FE
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 07:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B2D0ED91B
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 07:41:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728367AbfKDG2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 01:28:12 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43078 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727911AbfKDG2L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 01:28:11 -0500
-Received: by mail-pf1-f193.google.com with SMTP id 3so11458799pfb.10;
-        Sun, 03 Nov 2019 22:28:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=2OtwjKZ1o9BlPFo9MmqlnhkpjgLbY+pfS9lNNjoKCmc=;
-        b=T/npz0RdlYaEe1kuqJUtS2GEYAu4quFvYbf+oWj2p+3Wp8NDVAB0OFV7UcoxLCA/He
-         tdIwotd2rfdjNJD5CeuzxfQTg6+zChJAnv7hmmIbA/JIjLUqnSdSUvMZHrthlYChwj4J
-         Ng/cPF95vWdp4OCv/MLzzvnIQWAc/jG5RhMBXI4CWFCsDx083wqTW7XtEk8hbK0aM9nU
-         t1v1nUrRNRQ+WomXz77Oz4Qgb29/SX9zqEif27/5MR24mv8FLdAjBdEwcr2ZrIv1x4lx
-         Xb9bXFDSvZwRhG19G5FfF9kVSDcdfiiYcTLD0mB40AIGfoRRlJ92gygyu8vnkbk+Plfx
-         cXGQ==
+        id S1727705AbfKDGlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 01:41:09 -0500
+Received: from mail-il1-f200.google.com ([209.85.166.200]:37211 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727444AbfKDGlI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 01:41:08 -0500
+Received: by mail-il1-f200.google.com with SMTP id u68so14917750ilc.4
+        for <kvm@vger.kernel.org>; Sun, 03 Nov 2019 22:41:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=2OtwjKZ1o9BlPFo9MmqlnhkpjgLbY+pfS9lNNjoKCmc=;
-        b=fG9BViyoY3aNGI5A2QG16XqgKyKNc6UOkSeuD25UcnnoHoKzuAt4m8emIHuhZi6aNQ
-         7goXUvmwVXxqKZ1fN2/dwDvoMehl2iZdtcf7wZ6mnO84idAN2tkoAgIAt9c+pk9XLbkc
-         Z6pjCUVQYtUMdDfbkyYn/I39Jh5qnEyGpJrPQ+sc/RFzOHsb7Mo92hxlwFzTEqjhwcUz
-         PEnr71k22qQhDLzBTl3mM2Zl4AsUGkprHCxuD//A9fCvSdXfkPjxldSQmKqvExf0twBG
-         cSMEKNdNUw1Lf9gJKbrnrAa98gsJrowLc5YSc5hxoda9xCo6cMMyvQ4qmIlN++TgEfHv
-         FGDw==
-X-Gm-Message-State: APjAAAWu8Hqsw3bmfoh4XiF7m2Euc3pkufWaeTij5ESfTVdOaq9zA0DR
-        oLzLjYGzpzvHLaEzjrPh05XUDp2v
-X-Google-Smtp-Source: APXvYqweKAOvqr9QdiEMGxa1aKPl9xbFKqkAQoidoD1IYf0AjKuuICSneWHAk66sEBNGKRmOMZadIw==
-X-Received: by 2002:a63:6cb:: with SMTP id 194mr1871805pgg.327.1572848890353;
-        Sun, 03 Nov 2019 22:28:10 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id z7sm7810505pgk.10.2019.11.03.22.28.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 03 Nov 2019 22:28:09 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH 2/2] KVM: Fix rcu splat if vm creation fails
-Date:   Mon,  4 Nov 2019 14:27:59 +0800
-Message-Id: <1572848879-21011-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
-References: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=zjUEm4n2QGZiAjQ0l6i1nAlpzkEMT32Bo7zHdLCO1XU=;
+        b=Uyy2QKPpWoSEICKLPB0WALN8EGIOuVP2mmoyJjYNrYzAmvEWlfj6mSZ5t9IF6Et3ox
+         zLExl3Vb493sTglInnHmXLcdJRC7CaA8J91k9FpNYiFG/8SJsKjKuRYyl7vBksnCo+MF
+         38ACAMM5sirvpGDi9GwEkC1rV9l7oOIhDLwpUtjGyekHT4eW9C+uCjCoQypBr57dJWrI
+         nIzJl9g1crlofpY5TqPOwA5bV/0IZHuw/QqIsUYiLIAhk8sg625eGhLm5KaQUN9hkzfk
+         tLALxYVdWTdUyqnFIHRPB4QNVtlmh17QJh+ZwuSzv9LazsJyWUjrz/jXhFDrPWzlu+gm
+         ihnw==
+X-Gm-Message-State: APjAAAX87bdncXr9SJou51UM2BVZG8d4i55asO2gOb4OXnQ1o4PViX+N
+        ENIoiHHRlfpBqF/6M6A/PJC7I90LZWK7lOJww3pnGuPS1/fK
+X-Google-Smtp-Source: APXvYqw+nreieLrPYdIUFcEgEIU44O5Aj8bhewrX26iSFPuIizX+8N8mif2nt3olFQIV1G+LODV1ZggdSh1NHF3G1yy+tzwEuBRx
+MIME-Version: 1.0
+X-Received: by 2002:a5e:d716:: with SMTP id v22mr21059204iom.152.1572849667938;
+ Sun, 03 Nov 2019 22:41:07 -0800 (PST)
+Date:   Sun, 03 Nov 2019 22:41:07 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000be219705967f9963@google.com>
+Subject: general protection fault in kvm_coalesced_mmio_init
+From:   syzbot <syzbot+e27e7027eb2b80e44225@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hello,
 
-Reported by syzkaller:
+syzbot found the following crash on:
 
-   =============================
-   WARNING: suspicious RCU usage
-   -----------------------------
-   ./include/linux/kvm_host.h:536 suspicious rcu_dereference_check() usage!
-   
-   other info that might help us debug this:
+HEAD commit:    9d234505 Merge tag 'hwmon-for-v5.4-rc6' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1780f6a4e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cbbed3e8d4eb64bf
+dashboard link: https://syzkaller.appspot.com/bug?extid=e27e7027eb2b80e44225
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
-   rcu_scheduler_active = 2, debug_locks = 1
-   no locks held by repro_11/12688.
-    
-   stack backtrace:
-   Call Trace:
-    dump_stack+0x7d/0xc5
-    lockdep_rcu_suspicious+0x123/0x170
-    kvm_dev_ioctl+0x9a9/0x1260 [kvm]
-    do_vfs_ioctl+0x1a1/0xfb0
-    ksys_ioctl+0x6d/0x80
-    __x64_sys_ioctl+0x73/0xb0
-    do_syscall_64+0x108/0xaa0
-    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+Unfortunately, I don't have any reproducer for this crash yet.
 
-Commit a97b0e773e4 (kvm: call kvm_arch_destroy_vm if vm creation fails)
-sets users_count to 1 before kvm_arch_init_vm(), however, if kvm_arch_init_vm()
-fails, we need to dec this count. Or, we can move the sets refcount after 
-kvm_arch_init_vm().
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+e27e7027eb2b80e44225@syzkaller.appspotmail.com
 
-syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=15209b84e00000
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 19030 Comm: syz-executor.1 Not tainted 5.4.0-rc5+ #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+RIP: 0010:kvm_coalesced_mmio_init+0x67/0x120  
+arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:121
+Code: 00 48 01 c3 48 89 fa 48 b8 00 00 00 00 80 88 ff ff 48 c1 fb 06 48 c1  
+ea 03 48 c1 e3 0c 48 01 c3 48 b8 00 00 00 00 00 fc ff df <80> 3c 02 00 0f  
+85 9a 00 00 00 49 89 9c 24 d8 96 00 00 48 c7 c2 60
+RSP: 0018:ffff88808e5cfc08 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: ffff88809a815000 RCX: ffffc90008156000
+RDX: 00000000000012db RSI: ffffffff8108569c RDI: 00000000000096d8
+RBP: ffff88808e5cfc18 R08: 0000000000000000 R09: ffffed1015d06b75
+R10: ffffed1015d06b74 R11: ffff8880ae835ba3 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffffc90001921000 R15: ffff88805bf80000
+FS:  00007f1e8b8a5700(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020800000 CR3: 0000000097aee000 CR4: 00000000001406f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:3448  
+[inline]
+  kvm_dev_ioctl+0x81e/0x1610 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3496
+  vfs_ioctl fs/ioctl.c:46 [inline]
+  file_ioctl fs/ioctl.c:509 [inline]
+  do_vfs_ioctl+0xdb6/0x13e0 fs/ioctl.c:696
+  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
+  __do_sys_ioctl fs/ioctl.c:720 [inline]
+  __se_sys_ioctl fs/ioctl.c:718 [inline]
+  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
+  do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x459f49
+Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f1e8b8a4c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000459f49
+RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
+RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f1e8b8a56d4
+R13: 00000000004c30a8 R14: 00000000004d7018 R15: 00000000ffffffff
+Modules linked in:
+---[ end trace bc86b75fc185a9a9 ]---
+RIP: 0010:kvm_coalesced_mmio_init+0x67/0x120  
+arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:121
+Code: 00 48 01 c3 48 89 fa 48 b8 00 00 00 00 80 88 ff ff 48 c1 fb 06 48 c1  
+ea 03 48 c1 e3 0c 48 01 c3 48 b8 00 00 00 00 00 fc ff df <80> 3c 02 00 0f  
+85 9a 00 00 00 49 89 9c 24 d8 96 00 00 48 c7 c2 60
+RSP: 0018:ffff88808e5cfc08 EFLAGS: 00010286
+RAX: dffffc0000000000 RBX: ffff88809a815000 RCX: ffffc90008156000
+RDX: 00000000000012db RSI: ffffffff8108569c RDI: 00000000000096d8
+RBP: ffff88808e5cfc18 R08: 0000000000000000 R09: ffffed1015d06b75
+R10: ffffed1015d06b74 R11: ffff8880ae835ba3 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffffc90001921000 R15: ffff88805bf80000
+FS:  00007f1e8b8a5700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fbe165b8330 CR3: 0000000097aee000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Reported-by: syzbot+75475908cd0910f141ee@syzkaller.appspotmail.com
-Fixes: a97b0e773e49 ("kvm: call kvm_arch_destroy_vm if vm creation fails")
-Cc: Jim Mattson <jmattson@google.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d6f0696..62ae0c9 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -662,11 +662,11 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 			goto out_err_no_arch_destroy_vm;
- 	}
- 
--	refcount_set(&kvm->users_count, 1);
- 	r = kvm_arch_init_vm(kvm, type);
- 	if (r)
- 		goto out_err_no_arch_destroy_vm;
- 
-+	refcount_set(&kvm->users_count, 1);
- 	r = hardware_enable_all();
- 	if (r)
- 		goto out_err_no_disable;
--- 
-2.7.4
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
