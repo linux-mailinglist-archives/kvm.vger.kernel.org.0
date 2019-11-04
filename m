@@ -2,200 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 507B4ED596
-	for <lists+kvm@lfdr.de>; Sun,  3 Nov 2019 22:20:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53AB4ED7D9
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 03:52:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728219AbfKCVUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Nov 2019 16:20:31 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:17507 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728332AbfKCVSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Nov 2019 16:18:21 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dbf44200001>; Sun, 03 Nov 2019 13:18:25 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Sun, 03 Nov 2019 13:18:19 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Sun, 03 Nov 2019 13:18:19 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 3 Nov
- 2019 21:18:19 +0000
-Received: from hqnvemgw01.nvidia.com (172.20.150.20) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Sun, 3 Nov 2019 21:18:19 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dbf441a0005>; Sun, 03 Nov 2019 13:18:18 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 18/18] mm/gup: remove support for gup(FOLL_LONGTERM)
-Date:   Sun, 3 Nov 2019 13:18:13 -0800
-Message-ID: <20191103211813.213227-19-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191103211813.213227-1-jhubbard@nvidia.com>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
+        id S1729130AbfKDCwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Nov 2019 21:52:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37724 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728781AbfKDCwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Nov 2019 21:52:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572835951;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AXjYrGIsHqKdgGAtBr7HEpIjQtsm9UUKtuxj6Twt+UY=;
+        b=RVZRRJU4LWQme1tbNNbzKqlsFPVDGtYGVVV71VhCWd52Px6osGA8AOTDo6RNqO24G6Z7gr
+        EnOgLd2zADDjviY7mwnYsjjb56vxkWrPgjK0zbxgBIqkeF3FAcvNPxnVzJJF/cY55o2hje
+        lbwtc4d3CgwzCJnSvkYhEF617S2vgts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215--hfYGEOLOBaATEUH2p7Y3g-1; Sun, 03 Nov 2019 21:52:27 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58B2B800A1A;
+        Mon,  4 Nov 2019 02:52:23 +0000 (UTC)
+Received: from [10.72.12.188] (ovpn-12-188.pek2.redhat.com [10.72.12.188])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CFF69600C4;
+        Mon,  4 Nov 2019 02:51:55 +0000 (UTC)
+Subject: Re: [PATCH V6 3/6] mdev: introduce device specific ops
+To:     Parav Pandit <parav@mellanox.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "tiwei.bie@intel.com" <tiwei.bie@intel.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
+        "cunming.liang@intel.com" <cunming.liang@intel.com>,
+        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
+        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
+        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
+        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
+        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
+        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
+        "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
+        "airlied@linux.ie" <airlied@linux.ie>,
+        "daniel@ffwll.ch" <daniel@ffwll.ch>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
+        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
+        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "freude@linux.ibm.com" <freude@linux.ibm.com>,
+        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
+        Ido Shamay <idos@mellanox.com>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "lulu@redhat.com" <lulu@redhat.com>,
+        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>
+References: <20191030064444.21166-1-jasowang@redhat.com>
+ <20191030064444.21166-4-jasowang@redhat.com>
+ <AM0PR05MB4866E91139617C9F2380BBAFD1620@AM0PR05MB4866.eurprd05.prod.outlook.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <495efacd-4898-fb89-2599-dce3a5a277f0@redhat.com>
+Date:   Mon, 4 Nov 2019 10:51:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-NVConfidentiality: public
+In-Reply-To: <AM0PR05MB4866E91139617C9F2380BBAFD1620@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: -hfYGEOLOBaATEUH2p7Y3g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1572815905; bh=LhpBvPrZELtAUQMy6bjxFv5Hb6pi3TX++tJGx6mahjM=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=c5t7HOOtcA6T3DL6EnWGaqdMn3bnk0Sst6NLwaZXKVSSdUxVIcj0Ds96Kind5ogBw
-         OpePkjaGMnFUaJkwUo2GqHJ623qdpJkHe6Pv8fmsp3C1ijehkUj+K+K7czY6MqFduD
-         7Ka60Lv0qRDRUigYpz+ayEQGmqYsI0+wSZWMlNf1Qory9cMhkcbH0Y9aFCKfgv23AH
-         MwEJKHVQyq8VYfAIMozi5LR5/7Zg0r+WQDkSbptLzVgajtcRmjQoK5fYoPsogQUxdL
-         Z55SfQc9JYW9f7WlgOVSQkJp+PxRSXl++vSDmWNTvAnuc0vH80MVKrZm8LB2a+Pg7q
-         hzeY5OLedn/Rw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that all other kernel callers of get_user_pages(FOLL_LONGTERM)
-have been converted to pin_longterm_pages(), lock it down:
 
-1) Add an assertion to get_user_pages(), preventing callers from
-   passing FOLL_LONGTERM (in addition to the existing assertion that
-   prevents FOLL_PIN).
+On 2019/11/2 =E4=B8=8A=E5=8D=884:11, Parav Pandit wrote:
+>
+>> -----Original Message-----
+>> From: Jason Wang <jasowang@redhat.com>
+>> Sent: Wednesday, October 30, 2019 1:45 AM
+>> To: kvm@vger.kernel.org; linux-s390@vger.kernel.org; linux-
+>> kernel@vger.kernel.org; dri-devel@lists.freedesktop.org; intel-
+>> gfx@lists.freedesktop.org; intel-gvt-dev@lists.freedesktop.org;
+>> kwankhede@nvidia.com; alex.williamson@redhat.com; mst@redhat.com;
+>> tiwei.bie@intel.com
+>> Cc: virtualization@lists.linux-foundation.org; netdev@vger.kernel.org;
+>> cohuck@redhat.com; maxime.coquelin@redhat.com;
+>> cunming.liang@intel.com; zhihong.wang@intel.com;
+>> rob.miller@broadcom.com; xiao.w.wang@intel.com;
+>> haotian.wang@sifive.com; zhenyuw@linux.intel.com; zhi.a.wang@intel.com;
+>> jani.nikula@linux.intel.com; joonas.lahtinen@linux.intel.com;
+>> rodrigo.vivi@intel.com; airlied@linux.ie; daniel@ffwll.ch;
+>> farman@linux.ibm.com; pasic@linux.ibm.com; sebott@linux.ibm.com;
+>> oberpar@linux.ibm.com; heiko.carstens@de.ibm.com; gor@linux.ibm.com;
+>> borntraeger@de.ibm.com; akrowiak@linux.ibm.com; freude@linux.ibm.com;
+>> lingshan.zhu@intel.com; Ido Shamay <idos@mellanox.com>;
+>> eperezma@redhat.com; lulu@redhat.com; Parav Pandit
+>> <parav@mellanox.com>; christophe.de.dinechin@gmail.com;
+>> kevin.tian@intel.com; stefanha@redhat.com; Jason Wang
+>> <jasowang@redhat.com>
+>> Subject: [PATCH V6 3/6] mdev: introduce device specific ops
+>>
+>> Currently, except for the create and remove, the rest of mdev_parent_ops=
+ is
+>> designed for vfio-mdev driver only and may not help for kernel mdev driv=
+er.
+>> With the help of class id, this patch introduces device specific callbac=
+ks inside
+>> mdev_device structure. This allows different set of callback to be used =
+by vfio-
+>> mdev and virtio-mdev.
+>>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+> [ ..]
+>
+>> diff --git a/include/linux/vfio_mdev_ops.h b/include/linux/vfio_mdev_ops=
+.h
+>> new file mode 100644 index 000000000000..3907c5371c2b
+>> --- /dev/null
+>> +++ b/include/linux/vfio_mdev_ops.h
+>> @@ -0,0 +1,52 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * VFIO Mediated device definition
+>> + */
+>> +
+>> +#ifndef VFIO_MDEV_H
+>> +#define VFIO_MDEV_H
+>> +
+> I should have noticed this before. :-(
+> APIs exposed are by the mdev module and named with mdev_ prefix.
+> And file name is _ops.h,
+>
+> We should name this file as mdev_vfio_ops.h
+>
+> And #define should be MDEV_VFIO_OPS_H
+>
+>> +#include <linux/mdev.h>
+>> +
+>> +/**
+>> + * struct vfio_mdev_device_ops - Structure to be registered for each
+> s/vfio_mdev_device_ops/mdev_vfio_device_ops/
+>
+> Similarly for virtio in future patches.
+>
 
-2) Remove the associated GUP_LONGTERM_BENCHMARK test.
+Will fix in V7.
 
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- mm/gup.c                                   | 8 ++++----
- mm/gup_benchmark.c                         | 9 +--------
- tools/testing/selftests/vm/gup_benchmark.c | 7 ++-----
- 3 files changed, 7 insertions(+), 17 deletions(-)
 
-diff --git a/mm/gup.c b/mm/gup.c
-index c9727e65fad3..317f7602495d 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -1732,11 +1732,11 @@ long get_user_pages(unsigned long start, unsigned l=
-ong nr_pages,
- 		struct vm_area_struct **vmas)
- {
- 	/*
--	 * FOLL_PIN must only be set internally by the pin_user_page*() and
--	 * pin_longterm_*() APIs, never directly by the caller, so enforce that
--	 * with an assertion:
-+	 * FOLL_PIN and FOLL_LONGTERM must only be set internally by the
-+	 * pin_user_page*() and pin_longterm_*() APIs, never directly by the
-+	 * caller, so enforce that with an assertion:
- 	 */
--	if (WARN_ON_ONCE(gup_flags & FOLL_PIN))
-+	if (WARN_ON_ONCE(gup_flags & (FOLL_PIN | FOLL_LONGTERM)))
- 		return -EINVAL;
-=20
- 	return __gup_longterm_locked(current, current->mm, start, nr_pages,
-diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
-index 2bb0f5df4803..de6941855b7e 100644
---- a/mm/gup_benchmark.c
-+++ b/mm/gup_benchmark.c
-@@ -6,7 +6,7 @@
- #include <linux/debugfs.h>
-=20
- #define GUP_FAST_BENCHMARK	_IOWR('g', 1, struct gup_benchmark)
--#define GUP_LONGTERM_BENCHMARK	_IOWR('g', 2, struct gup_benchmark)
-+/* Command 2 has been deleted. */
- #define GUP_BENCHMARK		_IOWR('g', 3, struct gup_benchmark)
- #define PIN_FAST_BENCHMARK	_IOWR('g', 4, struct gup_benchmark)
- #define PIN_LONGTERM_BENCHMARK	_IOWR('g', 5, struct gup_benchmark)
-@@ -28,7 +28,6 @@ static void put_back_pages(int cmd, struct page **pages, =
-unsigned long nr_pages)
-=20
- 	switch (cmd) {
- 	case GUP_FAST_BENCHMARK:
--	case GUP_LONGTERM_BENCHMARK:
- 	case GUP_BENCHMARK:
- 		for (i =3D 0; i < nr_pages; i++)
- 			put_page(pages[i]);
-@@ -94,11 +93,6 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
- 			nr =3D get_user_pages_fast(addr, nr, gup->flags & 1,
- 						 pages + i);
- 			break;
--		case GUP_LONGTERM_BENCHMARK:
--			nr =3D get_user_pages(addr, nr,
--					    (gup->flags & 1) | FOLL_LONGTERM,
--					    pages + i, NULL);
--			break;
- 		case GUP_BENCHMARK:
- 			nr =3D get_user_pages(addr, nr, gup->flags & 1, pages + i,
- 					    NULL);
-@@ -157,7 +151,6 @@ static long gup_benchmark_ioctl(struct file *filep, uns=
-igned int cmd,
-=20
- 	switch (cmd) {
- 	case GUP_FAST_BENCHMARK:
--	case GUP_LONGTERM_BENCHMARK:
- 	case GUP_BENCHMARK:
- 	case PIN_FAST_BENCHMARK:
- 	case PIN_LONGTERM_BENCHMARK:
-diff --git a/tools/testing/selftests/vm/gup_benchmark.c b/tools/testing/sel=
-ftests/vm/gup_benchmark.c
-index c5c934c0f402..5ef3cf8f3da5 100644
---- a/tools/testing/selftests/vm/gup_benchmark.c
-+++ b/tools/testing/selftests/vm/gup_benchmark.c
-@@ -15,7 +15,7 @@
- #define PAGE_SIZE sysconf(_SC_PAGESIZE)
-=20
- #define GUP_FAST_BENCHMARK	_IOWR('g', 1, struct gup_benchmark)
--#define GUP_LONGTERM_BENCHMARK	_IOWR('g', 2, struct gup_benchmark)
-+/* Command 2 has been deleted. */
- #define GUP_BENCHMARK		_IOWR('g', 3, struct gup_benchmark)
-=20
- /*
-@@ -46,7 +46,7 @@ int main(int argc, char **argv)
- 	char *file =3D "/dev/zero";
- 	char *p;
-=20
--	while ((opt =3D getopt(argc, argv, "m:r:n:f:abctTLUuwSH")) !=3D -1) {
-+	while ((opt =3D getopt(argc, argv, "m:r:n:f:abctTUuwSH")) !=3D -1) {
- 		switch (opt) {
- 		case 'a':
- 			cmd =3D PIN_FAST_BENCHMARK;
-@@ -72,9 +72,6 @@ int main(int argc, char **argv)
- 		case 'T':
- 			thp =3D 0;
- 			break;
--		case 'L':
--			cmd =3D GUP_LONGTERM_BENCHMARK;
--			break;
- 		case 'U':
- 			cmd =3D GUP_BENCHMARK;
- 			break;
---=20
-2.23.0
+>   static void mtty_device_release(struct device *dev)
+> --
+> 2.19.1
+> With above small nit changes to rename the fields and file,
+>
+> Reviewed-by: Parav Pandit <parav@mellanox.com>
+
+
+Appreciate that, thanks.
+
 
