@@ -2,172 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B306EE779
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 19:38:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DEE2EEE799
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 19:45:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728882AbfKDSii (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 13:38:38 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30176 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727998AbfKDSih (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 13:38:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572892717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QFWqR6y5kr5x8dSoxmtAiWOMS/fTMSEKD3OFl5F0zsU=;
-        b=bQ03jHr7Yop8JnHk3p+NsQaJ3f2nrjXNsxypshoR856sQH4LyESQmJdaVt7rGWBWxTKTrp
-        CzREm38XfMAXWF1bWKL7OPr2i55B4qEe6jA7WoeIe94N7QZnfB1jKelvvm6sCrlfYY1n9w
-        p3yckUBuosTGUrCq1sD/2bTSH0eSj0w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-jDyMq2_GO5uZvm3jDNUHaQ-1; Mon, 04 Nov 2019 13:38:33 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 984BE1005500;
-        Mon,  4 Nov 2019 18:38:32 +0000 (UTC)
-Received: from [10.36.117.96] (ovpn-117-96.ams2.redhat.com [10.36.117.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F6245D6C8;
-        Mon,  4 Nov 2019 18:38:27 +0000 (UTC)
-Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-10-frankja@linux.ibm.com>
- <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
- <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
- <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
- <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
- <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
- <69ddb6a7-8f69-fbc4-63a4-4f5695117078@de.ibm.com>
- <1fad0466-1eeb-7d24-8015-98af9b564f74@redhat.com>
- <8a68fcbb-1dea-414f-7d48-e4647f7985fe@redhat.com>
- <20191104181743.3792924a.cohuck@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <2c36b668-e6a7-4497-62da-f2be09350896@redhat.com>
-Date:   Mon, 4 Nov 2019 19:38:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191104181743.3792924a.cohuck@redhat.com>
+        id S1729312AbfKDSpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 13:45:52 -0500
+Received: from mail-eopbgr770077.outbound.protection.outlook.com ([40.107.77.77]:23431
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728322AbfKDSpw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 13:45:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vlk44fRfsIjjqhroRRQ830507XMJ07dBSSFX91awRsA2u5+76IU+pFxE9uRqScrSVkp7+DHNW62jq2zTnh5QaIgRN8vXePOBA7pOagUWjn0j1bCUGkJPbWC5itg+m+dl3iWdHi3fueuoQzclZYJYew8e5mabD1/2UBh97KGfwL/REj3ltn4IF//GHtljF73bJWm0wj5ngzgA/igUudNAucK7VUCp6cWDiCX3//cXa03z9Qv/0bZnrtYmip4cmtZ3RuzMUqGkOijWW6aTIB3H2Bi8bYE3BNWU1hWng9sLsaFjWJAo7FdvBxiJ6TED25tdGDeFL+GCcU3hoylg+wEzzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B0iB+VWwJ4LDy/hlbatE2rqqhaJ+93T8hF1Voe2/rQE=;
+ b=Of31cqBKksUJPPEQ+sNZ03OGH1yYeHUgojDgorzLcJxUtCpQqQZR3UwXVxa0zGn4DQyfo5uUnEqAnfjUgSqlp7DXsdGF0tj0LtAt0CGGcWIXX/heyqRItTk+WDU+BB4no9rmIzKQ4EVobiyhOzibsQsREOEz0oKMSsJ5bioLvFfw8sTVK/GutXul2K8h8H7OstR9ZBqad6s3cTLC42eiJMSeuK+Qo6jMIEVRJYw+l47JD9febIwr5HaayJmqouBzJIzC6zqcgUHRvGCmAs3NcVE+e+T8AQQeCCknf3mBqJOEfLvwVCEOLy5ahY9MrCxScFoT4JuLACTAP8F8xwqM9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B0iB+VWwJ4LDy/hlbatE2rqqhaJ+93T8hF1Voe2/rQE=;
+ b=F8FHjl29VZMGIF5GSqWrbk9jQ34GwkB+4RD9xI7vmEo91rSEBiDvuqqso5FtnyagW3e5La8Q1vEDGm1RjLW04MxafLtI62dVvLcXIM4DTO3FrmrxqiUXRpCMSxK3CHxFEPOBWiW214VoJX4e1w3JRQ6UBtpg77fBVjW7dhagB8w=
+Received: from DM5PR12MB2471.namprd12.prod.outlook.com (52.132.141.138) by
+ DM5PR12MB1211.namprd12.prod.outlook.com (10.168.239.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2408.24; Mon, 4 Nov 2019 18:45:48 +0000
+Received: from DM5PR12MB2471.namprd12.prod.outlook.com
+ ([fe80::c5a3:6a2e:8699:1999]) by DM5PR12MB2471.namprd12.prod.outlook.com
+ ([fe80::c5a3:6a2e:8699:1999%6]) with mapi id 15.20.2408.024; Mon, 4 Nov 2019
+ 18:45:48 +0000
+From:   "Moger, Babu" <Babu.Moger@amd.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
+Thread-Topic: [PATCH 2/4] kvm: svm: Enable UMIP feature on AMD
+Thread-Index: AQHVkNqD+3M/4HqTrkKsDppH5BsZ1qd662IAgABzC4A=
+Date:   Mon, 4 Nov 2019 18:45:48 +0000
+Message-ID: <2f61ae5c-0658-e5c9-754c-9ca80148a54d@amd.com>
+References: <157262960837.2838.17520432516398899751.stgit@naples-babu.amd.com>
+ <157262962352.2838.15656190309312238595.stgit@naples-babu.amd.com>
+ <37c61050-e315-fc84-9699-bb92e5afacda@redhat.com>
+In-Reply-To: <37c61050-e315-fc84-9699-bb92e5afacda@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: jDyMq2_GO5uZvm3jDNUHaQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR15CA0030.namprd15.prod.outlook.com
+ (2603:10b6:805:16::43) To DM5PR12MB2471.namprd12.prod.outlook.com
+ (2603:10b6:4:b5::10)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 27a7e77c-28e1-4f7a-44c0-08d76157353e
+x-ms-traffictypediagnostic: DM5PR12MB1211:
+x-microsoft-antispam-prvs: <DM5PR12MB12117CA525A02B0A875AE3E8957F0@DM5PR12MB1211.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5236;
+x-forefront-prvs: 0211965D06
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(136003)(39860400002)(346002)(376002)(199004)(189003)(2616005)(6116002)(2501003)(3846002)(66946007)(478600001)(7736002)(25786009)(76176011)(6486002)(386003)(6506007)(6246003)(7416002)(52116002)(6436002)(11346002)(446003)(305945005)(110136005)(4326008)(8676002)(476003)(81166006)(66066001)(316002)(486006)(8936002)(2906002)(186003)(31696002)(36756003)(229853002)(2201001)(5660300002)(102836004)(54906003)(14444005)(26005)(81156014)(53546011)(256004)(99286004)(31686004)(14454004)(66446008)(71190400001)(71200400001)(6512007)(66556008)(64756008)(86362001)(66476007)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1211;H:DM5PR12MB2471.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: V4lfZxC0iwkj70pF7ukvuyztUHfPp79AKAp2rtQc50P3AAPFeoEkbeOQ/IgaN2CQTXenqF5n0fiEUK70k87R9EbyTzx9rHLDTOlb/trgllnOnWh9YtAqU94mvzZrwckBdgEgigqva4JIrFBMeul82AbxZuQFfreklTs+dHa47GkJrl7RoIT/JejiReLn7XdT8ypsclKbiI6L+RD1XT/DUbppNDzbn9DY7wwsc4ZgX7qtea54BFBJhrjc24sEB71+cSS/2LfxYHPj/4mjvBJ9qbslJoRZveXaEKWRU6pDPLF9vG5CCllhv/0E/0L5PyILf+VUbxLPqSTbPdQ9+3kcTetqeZPmOccWMHwLbi6tdBGBUpUMiVbqav6yUAbGSDOlLK+Sn5bf8fx7qn4CryWsB5ivuofgxuxFU4sbrTlKzSgmyjH9gwH7YayQrkN3mJhk
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8D4C479EB3B38C40B08E87EDC1A8C05D@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27a7e77c-28e1-4f7a-44c0-08d76157353e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2019 18:45:48.3494
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: u8QOKVv4wlfAyH/NX/stxF+09tEtMzifrfuuzEHCHFECv1zJvNiB6BVQssc+hpbi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1211
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.11.19 18:17, Cornelia Huck wrote:
-> On Mon, 4 Nov 2019 15:42:11 +0100
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> On 04.11.19 15:08, David Hildenbrand wrote:
->>> On 04.11.19 14:58, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 04.11.19 11:19, David Hildenbrand wrote:
->>>>>>>> to synchronize page import/export with the I/O for paging. For exa=
-mple you can actually
->>>>>>>> fault in a page that is currently under paging I/O. What do you do=
-? import (so that the
->>>>>>>> guest can run) or export (so that the I/O will work). As this turn=
-ed out to be harder then
->>>>>>>> we though we decided to defer paging to a later point in time.
->>>>>>>
->>>>>>> I don't quite see the issue yet. If you page out, the page will
->>>>>>> automatically (on access) be converted to !secure/encrypted memory.=
- If
->>>>>>> the UV/guest wants to access it, it will be automatically converted=
- to
->>>>>>> secure/unencrypted memory. If you have concurrent access, it will b=
-e
->>>>>>> converted back and forth until one party is done.
->>>>>>
->>>>>> IO does not trigger an export on an imported page, but an error
->>>>>> condition in the IO subsystem. The page code does not read pages thr=
-ough
->>>>>
->>>>> Ah, that makes it much clearer. Thanks!
->>>>>  =20
->>>>>> the cpu, but often just asks the device to read directly and that's
->>>>>> where everything goes wrong. We could bounce swapping, but chose to =
-pin
->>>>>> for now until we find a proper solution to that problem which nicely
->>>>>> integrates into linux.
->>>>>
->>>>> How hard would it be to
->>>>>
->>>>> 1. Detect the error condition
->>>>> 2. Try a read on the affected page from the CPU (will will automatica=
-lly convert to encrypted/!secure)
->>>>> 3. Restart the I/O
->>>>>
->>>>> I assume that this is a corner case where we don't really have to car=
-e about performance in the first shot.
->>>>
->>>> We have looked into this. You would need to implement this in the low =
-level
->>>> handler for every I/O. DASD, FCP, PCI based NVME, iscsi. Where do you =
-want
->>>> to stop?
->>>
->>> If that's the real fix, we should do that. Maybe one can focus on the
->>> real use cases first. But I am no I/O expert, so my judgment might be
->>> completely wrong.
->>>   =20
->>
->> Oh, and by the way, as discussed you really only have to care about
->> accesses via "real" I/O devices (IOW, not via the CPU). When accessing
->> via the CPU, you should have automatic conversion back and forth. As I
->> am no expert on I/O, I have no idea how iscsi fits into this picture
->> here (especially on s390x).
->>
->=20
-> By "real" I/O devices, you mean things like channel devices, right? (So
-> everything where you basically hand off control to a different kind of
-> processor.)
->=20
-> For classic channel I/O (as used by dasd), I'd expect something like
-> getting a check condition on a ccw if the CU or device cannot access
-> the memory. You will know how far the channel program has progressed,
-> and might be able to restart (from the beginning or from that point).
-> Probably has a chance of working for a subset of channel programs.
->=20
-> For QDIO (as used by FCP), I have no idea how this is could work, as we
-> have long-running channel programs there and any error basically kills
-> the queues, which you would have to re-setup from the beginning.
->=20
-> For PCI devices, I have no idea how the instructions even act.
->=20
->  From my point of view, that error/restart approach looks nice on paper,
-> but it seems hard to make it work in the general case (and I'm unsure
-> if it's possible at all.)
-
-One thought: If all we do during an I/O request is read or write (or=20
-even a mixture), can we simply restart the whole I/O again, although we=20
-did partial reads/writes? This would eliminate the "know how far the=20
-channel program has progressed". On error, one would have to touch each=20
-involved page (e.g., try to read first byte to trigger a conversion) and=20
-restart the I/O. I can understand that this might sound simpler than it=20
-is (if it is even possible) and might still be problematic for QDIO as=20
-far as I understand. Just a thought.
-
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+DQoNCk9uIDExLzQvMTkgNTo1NCBBTSwgUGFvbG8gQm9uemluaSB3cm90ZToNCj4gT24gMDEvMTEv
+MTkgMTg6MzMsIE1vZ2VyLCBCYWJ1IHdyb3RlOg0KPj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2
+bS9zdm0uYyBiL2FyY2gveDg2L2t2bS9zdm0uYw0KPj4gaW5kZXggNDE1M2NhOGNkZGI3Li43OWFi
+YmRlY2ExNDggMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCj4+ICsrKyBiL2Fy
+Y2gveDg2L2t2bS9zdm0uYw0KPj4gQEAgLTI1MzMsNiArMjUzMywxMSBAQCBzdGF0aWMgdm9pZCBz
+dm1fZGVjYWNoZV9jcjRfZ3Vlc3RfYml0cyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+PiAgew0K
+Pj4gIH0NCj4+ICANCj4+ICtzdGF0aWMgYm9vbCBzdm1fdW1pcF9lbXVsYXRlZCh2b2lkKQ0KPj4g
+K3sNCj4+ICsJcmV0dXJuIGJvb3RfY3B1X2hhcyhYODZfRkVBVFVSRV9VTUlQKTsNCj4+ICt9DQo+
+IA0KPiBGb3IgaGFyZHdhcmUgdGhhdCBzdXBwb3J0cyBVTUlQLCB0aGlzIGlzIG9ubHkgbmVlZGVk
+IGJlY2F1c2Ugb2YgeW91cg0KPiBwYXRjaCAxLiAgV2l0aG91dCBpdCwgWDg2X0ZFQVRVUkVfVU1J
+UCBzaG91bGQgYWxyZWFkeSBiZSBlbmFibGVkIG9uDQo+IHByb2Nlc3NvcnMgdGhhdCBuYXRpdmVs
+eSBzdXBwb3J0IFVNSVAuDQoNClllcywgVGhhdCBpcyBjb3JyZWN0LiBXaWxsIHJlbW92ZSB0aGUg
+cGF0Y2ggIzEuIEludGVudGlvbiB3YXMgdG8gZW5hYmxlDQpVTUlQIGZvciB0aGUgaGFyZHdhcmUg
+dGhhdCBzdXBwb3J0cyBpdC4gV2lsbCBzZW5kIG91dCBvbmx5IHRoZSBjb25maWcNCmNoYW5nZXMo
+UGF0Y2ggIzQpLiAgQWxzbyB0aGVyZSBpcyBhIGNvbXBsZXhpdHkgd2l0aCBzdXBwb3J0aW5nIGVt
+dWxhdGlvbg0Kb24gU0VWIGd1ZXN0Lg0KDQo+IA0KPiBJZiB5b3Ugd2FudCBVTUlQICplbXVsYXRp
+b24qIGluc3RlYWQsIHRoaXMgc2hvdWxkIGJlY29tZSAicmV0dXJuIHRydWUiLg0KPiANCj4+ICBz
+dGF0aWMgdm9pZCB1cGRhdGVfY3IwX2ludGVyY2VwdChzdHJ1Y3QgdmNwdV9zdm0gKnN2bSkNCj4+
+ICB7DQo+PiAgCXVsb25nIGdjcjAgPSBzdm0tPnZjcHUuYXJjaC5jcjA7DQo+PiBAQCAtNDQzOCw2
+ICs0NDQzLDEzIEBAIHN0YXRpYyBpbnQgaW50ZXJydXB0X3dpbmRvd19pbnRlcmNlcHRpb24oc3Ry
+dWN0IHZjcHVfc3ZtICpzdm0pDQo+PiAgCXJldHVybiAxOw0KPj4gIH0NCj4+ICANCj4+ICtzdGF0
+aWMgaW50IHVtaXBfaW50ZXJjZXB0aW9uKHN0cnVjdCB2Y3B1X3N2bSAqc3ZtKQ0KPj4gK3sNCj4+
+ICsJc3RydWN0IGt2bV92Y3B1ICp2Y3B1ID0gJnN2bS0+dmNwdTsNCj4+ICsNCj4+ICsJcmV0dXJu
+IGt2bV9lbXVsYXRlX2luc3RydWN0aW9uKHZjcHUsIDApOw0KPj4gK30NCj4+ICsNCj4+ICBzdGF0
+aWMgaW50IHBhdXNlX2ludGVyY2VwdGlvbihzdHJ1Y3QgdmNwdV9zdm0gKnN2bSkNCj4+ICB7DQo+
+PiAgCXN0cnVjdCBrdm1fdmNwdSAqdmNwdSA9ICZzdm0tPnZjcHU7DQo+PiBAQCAtNDc3NSw2ICs0
+Nzg3LDEwIEBAIHN0YXRpYyBpbnQgKCpjb25zdCBzdm1fZXhpdF9oYW5kbGVyc1tdKShzdHJ1Y3Qg
+dmNwdV9zdm0gKnN2bSkgPSB7DQo+PiAgCVtTVk1fRVhJVF9TTUldCQkJCT0gbm9wX29uX2ludGVy
+Y2VwdGlvbiwNCj4+ICAJW1NWTV9FWElUX0lOSVRdCQkJCT0gbm9wX29uX2ludGVyY2VwdGlvbiwN
+Cj4+ICAJW1NWTV9FWElUX1ZJTlRSXQkJCT0gaW50ZXJydXB0X3dpbmRvd19pbnRlcmNlcHRpb24s
+DQo+PiArCVtTVk1fRVhJVF9JRFRSX1JFQURdCQkJPSB1bWlwX2ludGVyY2VwdGlvbiwNCj4+ICsJ
+W1NWTV9FWElUX0dEVFJfUkVBRF0JCQk9IHVtaXBfaW50ZXJjZXB0aW9uLA0KPj4gKwlbU1ZNX0VY
+SVRfTERUUl9SRUFEXQkJCT0gdW1pcF9pbnRlcmNlcHRpb24sDQo+PiArCVtTVk1fRVhJVF9UUl9S
+RUFEXQkJCT0gdW1pcF9pbnRlcmNlcHRpb24sDQo+IA0KPiBUaGlzIGlzIG1pc3NpbmcgZW5hYmxp
+bmcgdGhlIGludGVyY2VwdHMuICBBbHNvLCB0aGlzIGNhbiBiZSBqdXN0DQo+IGVtdWxhdGVfb25f
+aW50ZXJjZXB0aW9uIGluc3RlYWQgb2YgYSBuZXcgZnVuY3Rpb24uDQo+IA0KPiBQYW9sbw0KPiAN
+Cj4+ICAJW1NWTV9FWElUX1JEUE1DXQkJCT0gcmRwbWNfaW50ZXJjZXB0aW9uLA0KPj4gIAlbU1ZN
+X0VYSVRfQ1BVSURdCQkJPSBjcHVpZF9pbnRlcmNlcHRpb24sDQo+PiAgCVtTVk1fRVhJVF9JUkVU
+XSAgICAgICAgICAgICAgICAgICAgICAgICA9IGlyZXRfaW50ZXJjZXB0aW9uLA0KPj4gQEAgLTU5
+NzYsMTEgKzU5OTIsNiBAQCBzdGF0aWMgYm9vbCBzdm1feHNhdmVzX3N1cHBvcnRlZCh2b2lkKQ0K
+Pj4gIAlyZXR1cm4gYm9vdF9jcHVfaGFzKFg4Nl9GRUFUVVJFX1hTQVZFUyk7DQo+PiAgfQ0KPj4g
+IA0KPj4gLXN0YXRpYyBib29sIHN2bV91bWlwX2VtdWxhdGVkKHZvaWQpDQo+PiAtew0KPj4gLQly
+ZXR1cm4gZmFsc2U7DQo+PiAtfQ0KPj4gLQ0KPj4gIHN0YXRpYyBib29sIHN2bV9wdF9zdXBwb3J0
+ZWQodm9pZCkNCj4+ICB7DQo+PiAgCXJldHVybiBmYWxzZTsNCj4+DQo+IA0K
