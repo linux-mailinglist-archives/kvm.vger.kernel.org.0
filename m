@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32173EDB99
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 10:22:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6370EEDB9E
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 10:23:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728322AbfKDJWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 04:22:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49420 "EHLO
+        id S1728397AbfKDJXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 04:23:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17360 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728064AbfKDJWz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 04:22:55 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA49HEmC062512
-        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 04:22:54 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w2euvcwv2-1
+        by vger.kernel.org with ESMTP id S1727322AbfKDJXS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 04:23:18 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA49LqwF034358
+        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 04:23:16 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2w2ea7x6xt-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 04:22:30 -0500
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 04:23:07 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Mon, 4 Nov 2019 09:22:20 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 4 Nov 2019 09:23:01 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 4 Nov 2019 09:22:17 -0000
+        Mon, 4 Nov 2019 09:22:58 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA49MGlf262566
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA49Musu47513942
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Nov 2019 09:22:16 GMT
+        Mon, 4 Nov 2019 09:22:56 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E7AD5204F;
-        Mon,  4 Nov 2019 09:22:16 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D51FF5204F;
+        Mon,  4 Nov 2019 09:22:56 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.70.20])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DFB7052050;
-        Mon,  4 Nov 2019 09:22:15 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 3/5] s390x: sclp: expose ram_size and
- max_ram_size
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 83B845204E;
+        Mon,  4 Nov 2019 09:22:56 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] s390x: sclp: add service call
+ instruction wrapper
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
         borntraeger@de.ibm.com
 References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
- <1572023194-14370-4-git-send-email-imbrenda@linux.ibm.com>
+ <1572023194-14370-5-git-send-email-imbrenda@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -86,19 +86,19 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Mon, 4 Nov 2019 10:22:15 +0100
+Date:   Mon, 4 Nov 2019 10:22:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1572023194-14370-4-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <1572023194-14370-5-git-send-email-imbrenda@linux.ibm.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="cEaQwYbAN250IzQ20hs73u4TgHoDAE3SW"
+ boundary="YPrNEOhWAleduR4UqGl7Gb59wIlVhuQIW"
 X-TM-AS-GCONF: 00
-x-cbid: 19110409-0012-0000-0000-000003607508
+x-cbid: 19110409-0028-0000-0000-000003B2713C
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110409-0013-0000-0000-0000219BC8C3
-Message-Id: <a93da22b-4306-42da-1f6d-82141bab361a@linux.ibm.com>
+x-cbparentid: 19110409-0029-0000-0000-00002474C3CE
+Message-Id: <8b634cc6-6675-66f2-f4e7-2a36256915a1@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-04_06:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -112,91 +112,98 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cEaQwYbAN250IzQ20hs73u4TgHoDAE3SW
-Content-Type: multipart/mixed; boundary="BciYyPTjWnF4fzBglZr2CKNeFF3iTKC0O"
+--YPrNEOhWAleduR4UqGl7Gb59wIlVhuQIW
+Content-Type: multipart/mixed; boundary="qeEJT3seud3JZET4BgvxSkkrJWKXjvppk"
 
---BciYyPTjWnF4fzBglZr2CKNeFF3iTKC0O
+--qeEJT3seud3JZET4BgvxSkkrJWKXjvppk
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 10/25/19 7:06 PM, Claudio Imbrenda wrote:
-> Expose ram_size and max_ram_size through accessor functions.
->=20
-> We only use get_ram_size in an upcoming patch, but having an accessor
-> for the other one does not hurt.
+> Add a wrapper for the service call instruction, and use it for SCLP
+> interactions instead of using inline assembly everywhere.
 
 Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-I already use it for WIP patches :-)
-
 >=20
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Reviewed-by: David Hildenbrand <david@redhat.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  lib/s390x/sclp.h |  2 ++
->  lib/s390x/sclp.c | 10 ++++++++++
->  2 files changed, 12 insertions(+)
+>  lib/s390x/asm/arch_def.h | 13 +++++++++++++
+>  lib/s390x/sclp.c         |  7 +------
+>  2 files changed, 14 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index f00c3df..6d40fb7 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -272,5 +272,7 @@ void sclp_console_setup(void);
->  void sclp_print(const char *str);
->  int sclp_service_call(unsigned int command, void *sccb);
->  void sclp_memory_setup(void);
-> +uint64_t get_ram_size(void);
-> +uint64_t get_max_ram_size(void);
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 96cca2e..b3caff6 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -269,4 +269,17 @@ static inline int stsi(void *addr, int fc, int sel=
+1, int sel2)
+>  	return cc;
+>  }
 > =20
->  #endif /* SCLP_H */
+> +static inline int servc(uint32_t command, unsigned long sccb)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
+> +		"       ipm     %0\n"
+> +		"       srl     %0,28"
+> +		: "=3D&d" (cc) : "d" (command), "a" (sccb)
+> +		: "cc", "memory");
+> +	return cc;
+> +}
+> +
+>  #endif
 > diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 56fca0c..7798f04 100644
+> index 7798f04..e35c282 100644
 > --- a/lib/s390x/sclp.c
 > +++ b/lib/s390x/sclp.c
-> @@ -167,3 +167,13 @@ void sclp_memory_setup(void)
+> @@ -116,12 +116,7 @@ int sclp_service_call(unsigned int command, void *=
+sccb)
+>  	int cc;
 > =20
->  	mem_init(ram_size);
->  }
-> +
-> +uint64_t get_ram_size(void)
-> +{
-> +	return ram_size;
-> +}
-> +
-> +uint64_t get_max_ram_size(void)
-> +{
-> +	return max_ram_size;
-> +}
+>  	sclp_setup_int();
+> -	asm volatile(
+> -		"       .insn   rre,0xb2200000,%1,%2\n"  /* servc %1,%2 */
+> -		"       ipm     %0\n"
+> -		"       srl     %0,28"
+> -		: "=3D&d" (cc) : "d" (command), "a" (__pa(sccb))
+> -		: "cc", "memory");
+> +	cc =3D servc(command, __pa(sccb));
+>  	sclp_wait_busy();
+>  	if (cc =3D=3D 3)
+>  		return -1;
 >=20
 
 
 
---BciYyPTjWnF4fzBglZr2CKNeFF3iTKC0O--
+--qeEJT3seud3JZET4BgvxSkkrJWKXjvppk--
 
---cEaQwYbAN250IzQ20hs73u4TgHoDAE3SW
+--YPrNEOhWAleduR4UqGl7Gb59wIlVhuQIW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl2/7ccACgkQ41TmuOI4
-ufjIIQ/+POocjny6VKWaxGCDJkkyyHt3sWcrLt8qxAVvPzZSEWnwxlTis2u1U7Gq
-wUlSI4fGXVExkd+B23+3Uqfqrhkcq5O5NXEalmijEXhseoqYoBM2MOZAiFknQQFF
-lewcpDWDsDdSFhFly0OBVAGIEjHI7rceOzVd4UUxt7kYg6ZTTJQiLoSVbkuXH3tI
-efQ/bxOCY406AtA0EviV7Xyima5PZ48U5z+vA4KcvND1mfhl4+qXX6XBy/wmPA5+
-Id8KgrndkuqHweKTKgUhuHjQUsD/dhs64js/tdHm90kz8fTLflifounrKaCYZyuO
-4MOiMH5mXA1YhXNKsbQIl1xWzBvDCR749UkYzqf/lrRtX5/BIhSkVJzascz24QJW
-3cjtpkHUYCa2pymYF7UI7jrwPB8JHVDqNBZYY7sPXQv1FdxgK+fcRHgOKrB/86in
-qGXKkD/+Be9hK5qUlpGIp1jLgZEUd/R0rBL05qgKTgj1zjHo1O9TlmS/JKVkaPNn
-1tcE9enWhpT1fNJYSkx6dc4bUstErqUwHYxwnftO0hjbhEVILargEIOPHcUskYyS
-KWo7J+JCtb9sbrwlpXm4NmyHrcU17ZjTaUvkCpupafzruS/bLEwwjs2QuKhjsLd1
-nzMtMzNmPkh/zY8whqxy0Ty/Y37Y6PJ+uVXJEipJUZsHF+WGweQ=
-=8WlR
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl2/7fAACgkQ41TmuOI4
+ufiJKw/+OsLZx9LFAmmSTtmzNlYo8g4bGzl8PX+TvbklXoOhXlaZITHEFyApLSQH
+9FQQkAq/h0eQYKhAt55OyNcinldStRnKDtMREXNdmeHrYQvHqmXu7hbsXanMI5G0
++yWf18yAzIsGRdVKE4XONyV88eiHm9waRkHR8CU1FaSnbTk89WOD9cJLh3BKO7f1
++vHfQq+9v/EhXBuIbSYzMA+liB5aScDf34YdtbliBVVoU+YZZHZie3LOy1zB0J0W
+GSiW1IJaKXOi5fxAc5BDa1Ckwd28MlX1J33ZqT5F/OrZ6shnfuHZTddmHriA5Kw6
+rcMt97CxW2ynFHJ2ddSgQvFJWF4QbvZAoOUpQAbD435MK8X0BHlocYY98Vw80Z7n
+FNXUafjCEATuYQsVmw1HXaZm+dB31jAvnvSYrYHXEzESYOHktmmo1F1LANVlAmnm
+dDP/7E719hATshwQT4ItKx7QE9CqHHFqdk+wezabfRhOEuqq9bI5r1+gSuyXP9a4
+23EKWeY2kHy9GOYECmbRkWobz/s03SxVSAWP+EFg9ZlAPWkD5jb/mexcbNa99C5k
+nxw0/dj1d3i+i8Yvb+Y+Qy3dcz6CTSFhZjMe2hEjk6QhNY273MViB4Iox6JHzewx
+seno8k0mdNjcfveV4yznOqyjRxAp7hy+zxmEunvsq9Wg6yTp7yc=
+=SBAF
 -----END PGP SIGNATURE-----
 
---cEaQwYbAN250IzQ20hs73u4TgHoDAE3SW--
+--YPrNEOhWAleduR4UqGl7Gb59wIlVhuQIW--
 
