@@ -2,135 +2,392 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33C32EE7BF
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 19:55:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82C7FEE7EB
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 20:04:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729035AbfKDSzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 13:55:40 -0500
-Received: from mail-eopbgr720062.outbound.protection.outlook.com ([40.107.72.62]:4141
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728268AbfKDSzk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 13:55:40 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cf4aze0GAJ3lRQm+QUV98wt5NKbO5elslYSsnUsMOmvx+rJkpWE0WbInbhCh5DMU/aTMSq1H6eHywswmqUAKQ/1E+IrYQojw/1JGckqAk+2GMptgv/lpbfZmvCbATW/3XzF/w/TMklP/VWxOYFfbH6YUMvYfYnCT/xIa4uPpP+t1eXAVt8s3GY/SV8buenIZ8nZXp7T5/c8dM6ard0++QB0kAdhF8818rdWA+VX8U+FehhfrXNVTLyv1/2+7kUa1WraIZOEYJQznm+vv85wKz/KVwt+SOlUbLaAvxg9Rxq2DujAnZalylzO7VZ5CJUAjoXU7d4FvWEr9i1oDaidTMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DkCrKEFENQ5NkLIhAmkV5Rrdz/wQ2JVQsCmVuU40x1Y=;
- b=FhfB+pwUA4tT59VX4QShuA2IIQTNDfc5mUkLDPPdDov6jiak2zD/nGyz8jIkDmjTQ9MjN2Coe3gmkpjqcT5PEBc+qCbs4AF/euKS0UhIwcVkBYlPFcZJBtYIizUVkxEanEdNMKNe62DZkrNdGnF0imGCHlzj24X7yeSKL7L+/AzmQxLDabMPSmVqU0Z3JaeSCV29yBk18CuNmw5lwa1e86Ds8fCHuip5KnNFqrU24CQ0TDzifCsBd0iiDDMyEvDcUH++8Zq/3ksoGstwyXuwx26hABVyhpb03AZoVpFj43549eHVGXyARqcCdHa5JgJr2f8gZxSHQ4+QW/ftq5cr0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DkCrKEFENQ5NkLIhAmkV5Rrdz/wQ2JVQsCmVuU40x1Y=;
- b=NflsDGMn48S9zhToNDlMWBce2djn6UGiqbdrJ/UxbhX70AsvJWWssQTJVIuRfa1dy7QMi8X7m0MyhuQlAYJlLrB7o5BgNjQ8rAv4lTeyMDW5GkPp1w823B3YxzaZCdpFDuFI8rD/nGhtwJdTENuVLajtLLUERvd5CqOWYHJvmgw=
-Received: from DM6PR12MB3865.namprd12.prod.outlook.com (10.255.173.210) by
- DM6PR12MB3916.namprd12.prod.outlook.com (10.255.174.85) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Mon, 4 Nov 2019 18:54:58 +0000
-Received: from DM6PR12MB3865.namprd12.prod.outlook.com
- ([fe80::4898:93e0:3c0c:d862]) by DM6PR12MB3865.namprd12.prod.outlook.com
- ([fe80::4898:93e0:3c0c:d862%6]) with mapi id 15.20.2408.024; Mon, 4 Nov 2019
- 18:54:57 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "rkagan@virtuozzo.com" <rkagan@virtuozzo.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-Subject: Re: [PATCH v4 13/17] kvm: i8254: Deactivate APICv when using
- in-kernel PIT re-injection mode.
-Thread-Topic: [PATCH v4 13/17] kvm: i8254: Deactivate APICv when using
- in-kernel PIT re-injection mode.
-Thread-Index: AQHVkQWFwL1+c1CZPkWuTq14KdLXDad3peqAgAO6uQA=
-Date:   Mon, 4 Nov 2019 18:54:57 +0000
-Message-ID: <b4e61499-7247-d39e-cd46-c53388ba347a@amd.com>
-References: <1572648072-84536-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1572648072-84536-14-git-send-email-suravee.suthikulpanit@amd.com>
- <70fb2b49-2198-bde4-a38b-f37bc8bc9847@redhat.com>
-In-Reply-To: <70fb2b49-2198-bde4-a38b-f37bc8bc9847@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.2.0
-x-originating-ip: [165.204.25.250]
-x-clientproxiedby: BN6PR12CA0042.namprd12.prod.outlook.com
- (2603:10b6:405:70::28) To DM6PR12MB3865.namprd12.prod.outlook.com
- (2603:10b6:5:1c8::18)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6988c91a-be43-47e0-8d21-08d761587cc3
-x-ms-traffictypediagnostic: DM6PR12MB3916:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB39162904F7B331C6E5467D5DF37F0@DM6PR12MB3916.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0211965D06
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(366004)(346002)(136003)(376002)(39860400002)(189003)(199004)(2201001)(99286004)(25786009)(71200400001)(65806001)(229853002)(66066001)(14444005)(256004)(31686004)(81166006)(2906002)(8936002)(8676002)(71190400001)(81156014)(6512007)(6436002)(305945005)(478600001)(7736002)(486006)(476003)(4326008)(6486002)(66446008)(2616005)(14454004)(6246003)(65956001)(5660300002)(11346002)(446003)(64756008)(36756003)(386003)(6506007)(53546011)(2501003)(3846002)(102836004)(52116002)(76176011)(6116002)(26005)(54906003)(186003)(7416002)(86362001)(31696002)(316002)(110136005)(58126008)(66946007)(66476007)(66556008);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3916;H:DM6PR12MB3865.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jixSI+jtlyLvpNb5yIECnOi4yU5LzRseEWYBsoPBIC/LzN7KCf0MWwsjeJpNHNtDOk7a44c+79DojVvV3fd/dSuAZOhIGvszA7T3TAryhFpZ+Xzpr7Lhvdge5nzOFeRcqd4WfXaLIHQEaMIpWrzE5PbYSSgEp6MIRkXTS8wFkUJJfnAxiRM44wqj3hDJfxKWclZcAcJv840IHGeh0GcCtJSFxScsGXcumW4foSpNMI47g6xcIOX0lRJLUzZYhL0nLR3YwlJ5jaeDehDjlo0+VzrjPGAbRC4Lrq5owsZuVetIqHV0clY3TFvWL57EjJn1fEhda27oo38qgcu2o8B37bT0ee34uuTZUAVJYLoXjBh9YPwK1kponK+D1ZxyrVi0W1+Zqxl5n7GLzP4U5vTMwWdV5B+nxGExQ7U+levP6tteII9IJ9ADeq2SxL+TdM7E
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BA05608FF90A9B448651DE7A951AF675@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1729248AbfKDTEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 14:04:42 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:16344 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728322AbfKDTEl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 14:04:41 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dc0764e0000>; Mon, 04 Nov 2019 11:04:46 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 04 Nov 2019 11:04:39 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 04 Nov 2019 11:04:39 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 4 Nov
+ 2019 19:04:38 +0000
+Subject: Re: [PATCH v2 05/18] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     Jerome Glisse <jglisse@redhat.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191103211813.213227-1-jhubbard@nvidia.com>
+ <20191103211813.213227-6-jhubbard@nvidia.com>
+ <20191104173325.GD5134@redhat.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <be9de35c-57e9-75c3-2e86-eae50904bbdf@nvidia.com>
+Date:   Mon, 4 Nov 2019 11:04:38 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6988c91a-be43-47e0-8d21-08d761587cc3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2019 18:54:57.6290
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4YBmfc1gPGP1DmBotnbgdYhlApHmhOY27x2cu9xJ/0WaACOlhqOyOa1tX5TAg56QyJgd9WbL8VyFz37boORMWw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3916
+In-Reply-To: <20191104173325.GD5134@redhat.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1572894286; bh=kXFfoa96CjeMxu/yNlagPA6LLNAu70eBUsA06ExlOtg=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=CGhErLefJ4Rd4fl6xSTC12CgERoyFjHWQGLEBwXbgJ2nZYGGuplhwaAucXTJzeeNK
+         7KRJyNQnA11L4vItnHz1sLBsORlDWdAkA/ZWVdCe/zvdJMM52vn/1Yk2OBp/W/Dq1T
+         cFSSDEh86RVrVz/0q78GLgUN0uUGLFJZUZdX2Fl6rpKC6TlU/Ir0hTy7uItCyFW8Za
+         W+S8GdUZi+MhpaV5QT4z4khopwYOYhIHRBDl1hUf1rvr4b1dc8B1ZAcRLRgjjchNom
+         s2Ey6jwAxh3PTYyEBkc6VY0f/i8pk0d/xLfZmGpLvA4HcRrg88VOSkXk7tAEv24uKR
+         Y51dSM7lMwnHw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGFvbG8sDQoNClRoYW5rcyBmb3IgcXVpY2sgcmVzcG9uc2UuDQoNCk9uIDExLzIvMTkgNDo1NyBB
-TSwgUGFvbG8gQm9uemluaSB3cm90ZToNCj4gT24gMDEvMTEvMTkgMjM6NDEsIFN1dGhpa3VscGFu
-aXQsIFN1cmF2ZWUgd3JvdGU6DQo+PiArCS8qDQo+PiArCSAqIEFNRCBTVk0gQVZJQyBhY2NlbGVy
-YXRlcyBFT0kgd3JpdGUgYW5kIGRvZXMgbm90IHRyYXAuDQo+PiArCSAqIFRoaXMgY2F1c2UgaW4t
-a2VybmVsIFBJVCByZS1pbmplY3QgbW9kZSB0byBmYWlsDQo+PiArCSAqIHNpbmNlIGl0IGNoZWNr
-cyBwcy0+aXJxX2FjayBiZWZvcmUga3ZtX3NldF9pcnEoKQ0KPj4gKwkgKiBhbmQgcmVsaWVzIG9u
-IHRoZSBhY2sgbm90aWZpZXIgdG8gdGltZWx5IHF1ZXVlDQo+PiArCSAqIHRoZSBwdC0+d29ya2Vy
-IHdvcmsgaXRlcm0gYW5kIHJlaW5qZWN0IHRoZSBtaXNzZWQgdGljay4NCj4+ICsJICogU28sIGRl
-YWN0aXZhdGUgQVBJQ3Ygd2hlbiBQSVQgaXMgaW4gcmVpbmplY3QgbW9kZS4NCj4+ICsJICovDQo+
-PiAgIAlpZiAocmVpbmplY3QpIHsNCj4+ICsJCWt2bV9yZXF1ZXN0X2FwaWN2X3VwZGF0ZShrdm0s
-IGZhbHNlLCBBUElDVl9ERUFDVF9CSVRfUElUX1JFSU5KKTsNCj4+ICAgCQkvKiBUaGUgaW5pdGlh
-bCBzdGF0ZSBpcyBwcmVzZXJ2ZWQgd2hpbGUgcHMtPnJlaW5qZWN0ID09IDAuICovDQo+PiAgIAkJ
-a3ZtX3BpdF9yZXNldF9yZWluamVjdChwaXQpOw0KPj4gICAJCWt2bV9yZWdpc3Rlcl9pcnFfYWNr
-X25vdGlmaWVyKGt2bSwgJnBzLT5pcnFfYWNrX25vdGlmaWVyKTsNCj4+ICAgCQlrdm1fcmVnaXN0
-ZXJfaXJxX21hc2tfbm90aWZpZXIoa3ZtLCAwLCAmcGl0LT5tYXNrX25vdGlmaWVyKTsNCj4+ICAg
-CX0gZWxzZSB7DQo+PiArCQlrdm1fcmVxdWVzdF9hcGljdl91cGRhdGUoa3ZtLCB0cnVlLCBBUElD
-Vl9ERUFDVF9CSVRfUElUX1JFSU5KKTsNCj4+ICAgCQlrdm1fdW5yZWdpc3Rlcl9pcnFfYWNrX25v
-dGlmaWVyKGt2bSwgJnBzLT5pcnFfYWNrX25vdGlmaWVyKTsNCj4+ICAgCQlrdm1fdW5yZWdpc3Rl
-cl9pcnFfbWFza19ub3RpZmllcihrdm0sIDAsICZwaXQtPm1hc2tfbm90aWZpZXIpOw0KPiANCj4g
-VGhpcyBpcyBub3QgdG9vIG5pY2UgZm9yIEludGVsIHdoaWNoIGRvZXMgc3VwcG9ydCAodGhyb3Vn
-aCB0aGUgRU9JIGV4aXQNCj4gbWFzaykgQVBJQ3YgZXZlbiBpZiBQSVQgcmVpbmplY3Rpb24gYWN0
-aXZlLg0KDQpJIHNlZSB5b3UgcG9pbnQuDQoNCj4gV2UgY2FuIHdvcmsgYXJvdW5kIGl0IGJ5IGFk
-ZGluZyBhIGdsb2JhbCBtYXNrIG9mIGluaGliaXQgcmVhc29ucyB0aGF0DQo+IGFwcGx5IHRvIHRo
-ZSB2ZW5kb3IsIGFuZCBpbml0aWFsaXppbmcgaXQgYXMgc29vbiBhcyBwb3NzaWJsZSBpbiB2bXgu
-Yy9zdm0uYy4NCj4gDQo+IFRoZW4ga3ZtX3JlcXVlc3RfYXBpY3ZfdXBkYXRlIGNhbiBpZ25vcmUg
-cmVhc29ucyB0aGF0IHRoZSB2ZW5kb3IgZG9lc24ndA0KPiBjYXJlIGFib3V0Lg0KPiANCj4gUGFv
-bG8NCj4gDQoNCldoYXQgYWJvdXQgd2UgZW5oYW5jZSB0aGUgcHJlX3VwZGF0ZV9hcGl2Y19leGVj
-X2N0cmwoKSB0byBhbHNvIHJldHVybiANCnN1Y2Nlc3MvZmFpbC4gSW4gaGVyZSwgdGhlIHZlbmRv
-ciBzcGVjaWZpYyBjb2RlIGNhbiBkZWNpZGUgdG8gdXBkYXRlIA0KQVBJQ3Ygc3RhdGUgb3Igbm90
-Lg0KDQpUaGFua3MsDQpTdXJhdmVlDQo=
+On 11/4/19 9:33 AM, Jerome Glisse wrote:
+...
+>=20
+> Few nitpick belows, nonetheless:
+>=20
+> Reviewed-by: J=E9r=F4me Glisse <jglisse@redhat.com>
+> [...]
+>> +
+>> +CASE 3: ODP
+>> +-----------
+>> +(Mellanox/Infiniband On Demand Paging: the hardware supports
+>> +replayable page faulting). There are GUP references to pages serving as=
+ DMA
+>> +buffers. For ODP, MMU notifiers are used to synchronize with page_mkcle=
+an()
+>> +and munmap(). Therefore, normal GUP calls are sufficient, so neither fl=
+ag
+>> +needs to be set.
+>=20
+> I would not include ODP or anything like it here, they do not use
+> GUP anymore and i believe it is more confusing here. I would how-
+> ever include some text in this documentation explaining that hard-
+> ware that support page fault is superior as it does not incur any
+> of the issues described here.
+
+OK, agreed, here's a new write up that I'll put in v3:
+
+
+CASE 3: ODP
+-----------
+Advanced, but non-CPU (DMA) hardware that supports replayable page faults.
+Here, a well-written driver doesn't normally need to pin pages at all. Howe=
+ver,
+if the driver does choose to do so, it can register MMU notifiers for the r=
+ange,
+and will be called back upon invalidation. Either way (avoiding page pinnin=
+g, or
+using MMU notifiers to unpin upon request), there is proper synchronization=
+ with=20
+both filesystem and mm (page_mkclean(), munmap(), etc).
+
+Therefore, neither flag needs to be set.
+
+It's worth mentioning here that pinning pages should not be the first desig=
+n
+choice. If page fault capable hardware is available, then the software shou=
+ld
+be written so that it does not pin pages. This allows mm and filesystems to
+operate more efficiently and reliably.
+
+> [...]
+>=20
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index 199da99e8ffc..1aea48427879 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>=20
+> [...]
+>=20
+>> @@ -1014,7 +1018,16 @@ static __always_inline long __get_user_pages_lock=
+ed(struct task_struct *tsk,
+>>  		BUG_ON(*locked !=3D 1);
+>>  	}
+>> =20
+>> -	if (pages)
+>> +	/*
+>> +	 * FOLL_PIN and FOLL_GET are mutually exclusive. Traditional behavior
+>> +	 * is to set FOLL_GET if the caller wants pages[] filled in (but has
+>> +	 * carelessly failed to specify FOLL_GET), so keep doing that, but onl=
+y
+>> +	 * for FOLL_GET, not for the newer FOLL_PIN.
+>> +	 *
+>> +	 * FOLL_PIN always expects pages to be non-null, but no need to assert
+>> +	 * that here, as any failures will be obvious enough.
+>> +	 */
+>> +	if (pages && !(flags & FOLL_PIN))
+>>  		flags |=3D FOLL_GET;
+>=20
+> Did you look at user that have pages and not FOLL_GET set ?
+> I believe it would be better to first fix them to end up
+> with FOLL_GET set and then error out if pages is !=3D NULL but
+> nor FOLL_GET or FOLL_PIN is set.
+>=20
+
+I was perhaps overly cautious, and didn't go there. However, it's probably
+doable, given that there was already the following in __get_user_pages():
+
+    VM_BUG_ON(!!pages !=3D !!(gup_flags & FOLL_GET));
+
+...which will have conditioned people and code to set FOLL_GET together wit=
+h
+pages. So I agree that the time is right.
+
+In order to make bisecting future failures simpler, I can insert a patch ri=
+ght=20
+before this one, that changes the FOLL_GET setting into an assert, like thi=
+s:
+
+diff --git a/mm/gup.c b/mm/gup.c
+index 8f236a335ae9..be338961e80d 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -1014,8 +1014,8 @@ static __always_inline long __get_user_pages_locked(s=
+truct task_struct *tsk,
+                BUG_ON(*locked !=3D 1);
+        }
+=20
+-       if (pages)
+-               flags |=3D FOLL_GET;
++       if (pages && WARN_ON_ONCE(!(gup_flags & FOLL_GET)))
++               return -EINVAL;
+=20
+        pages_done =3D 0;
+        lock_dropped =3D false;
+
+
+...and then add in FOLL_PIN, with this patch.
+
+>> =20
+>>  	pages_done =3D 0;
+>=20
+>> @@ -2373,24 +2402,9 @@ static int __gup_longterm_unlocked(unsigned long =
+start, int nr_pages,
+>>  	return ret;
+>>  }
+>> =20
+>> -/**
+>> - * get_user_pages_fast() - pin user pages in memory
+>> - * @start:	starting user address
+>> - * @nr_pages:	number of pages from start to pin
+>> - * @gup_flags:	flags modifying pin behaviour
+>> - * @pages:	array that receives pointers to the pages pinned.
+>> - *		Should be at least nr_pages long.
+>> - *
+>> - * Attempt to pin user pages in memory without taking mm->mmap_sem.
+>> - * If not successful, it will fall back to taking the lock and
+>> - * calling get_user_pages().
+>> - *
+>> - * Returns number of pages pinned. This may be fewer than the number
+>> - * requested. If nr_pages is 0 or negative, returns 0. If no pages
+>> - * were pinned, returns -errno.
+>> - */
+>> -int get_user_pages_fast(unsigned long start, int nr_pages,
+>> -			unsigned int gup_flags, struct page **pages)
+>> +static int internal_get_user_pages_fast(unsigned long start, int nr_pag=
+es,
+>> +					unsigned int gup_flags,
+>> +					struct page **pages)
+>=20
+> Usualy function are rename to _old_func_name ie add _ in front. So
+> here it would become _get_user_pages_fast but i know some people
+> don't like that as sometimes we endup with ___function_overloaded :)
+
+Exactly: the __get_user_pages* names were already used for *non*-internal
+routines, so I attempted to pick the next best naming prefix.
+
+>=20
+>>  {
+>>  	unsigned long addr, len, end;
+>>  	int nr =3D 0, ret =3D 0;
+>=20
+>=20
+>> @@ -2435,4 +2449,215 @@ int get_user_pages_fast(unsigned long start, int=
+ nr_pages,
+>=20
+> [...]
+>=20
+>> +/**
+>> + * pin_user_pages_remote() - pin pages for (typically) use by Direct IO=
+, and
+>> + * return the pages to the user.
+>=20
+> Not a fan of (typically) maybe:
+> pin_user_pages_remote() - pin pages of a remote process (task !=3D curren=
+t)
+>=20
+> I think here the remote part if more important that DIO. Remote is use by
+> other thing that DIO.
+
+Yes, good point. I'll use your wording:
+
+ * pin_user_pages_remote() - pin pages of a remote process (task !=3D curre=
+nt)
+
+
+
+>=20
+>> + *
+>> + * Nearly the same as get_user_pages_remote(), except that FOLL_PIN is =
+set. See
+>> + * get_user_pages_remote() for documentation on the function arguments,=
+ because
+>> + * the arguments here are identical.
+>> + *
+>> + * FOLL_PIN means that the pages must be released via put_user_page(). =
+Please
+>> + * see Documentation/vm/pin_user_pages.rst for details.
+>> + *
+>> + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_pages=
+.rst. It
+>> + * is NOT intended for Case 2 (RDMA: long-term pins).
+>> + */
+>> +long pin_user_pages_remote(struct task_struct *tsk, struct mm_struct *m=
+m,
+>> +			   unsigned long start, unsigned long nr_pages,
+>> +			   unsigned int gup_flags, struct page **pages,
+>> +			   struct vm_area_struct **vmas, int *locked)
+>> +{
+>> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+>> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+>> +		return -EINVAL;
+>> +
+>> +	gup_flags |=3D FOLL_TOUCH | FOLL_REMOTE | FOLL_PIN;
+>> +
+>> +	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
+>> +				       locked, gup_flags);
+>> +}
+>> +EXPORT_SYMBOL(pin_user_pages_remote);
+>> +
+>> +/**
+>> + * pin_longterm_pages_remote() - pin pages for (typically) use by Direc=
+t IO, and
+>> + * return the pages to the user.
+>=20
+> I think you copy pasted this from pin_user_pages_remote() :)
+
+I admit to nothing, with respect to copy-paste! :)
+
+This one can simply be:
+
+ * pin_longterm_pages_remote() - pin pages of a remote process (task !=3D c=
+urrent)
+
+
+>=20
+>> + *
+>> + * Nearly the same as get_user_pages_remote(), but note that FOLL_TOUCH=
+ is not
+>> + * set, and FOLL_PIN and FOLL_LONGTERM are set. See get_user_pages_remo=
+te() for
+>> + * documentation on the function arguments, because the arguments here =
+are
+>> + * identical.
+>> + *
+>> + * FOLL_PIN means that the pages must be released via put_user_page(). =
+Please
+>> + * see Documentation/vm/pin_user_pages.rst for further details.
+>> + *
+>> + * FOLL_LONGTERM means that the pages are being pinned for "long term" =
+use,
+>> + * typically by a non-CPU device, and we cannot be sure that waiting fo=
+r a
+>> + * pinned page to become unpin will be effective.
+>> + *
+>> + * This is intended for Case 2 (RDMA: long-term pins) in
+>> + * Documentation/vm/pin_user_pages.rst.
+>> + */
+>> +long pin_longterm_pages_remote(struct task_struct *tsk, struct mm_struc=
+t *mm,
+>> +			       unsigned long start, unsigned long nr_pages,
+>> +			       unsigned int gup_flags, struct page **pages,
+>> +			       struct vm_area_struct **vmas, int *locked)
+>> +{
+>> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
+>> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+>> +		return -EINVAL;
+>> +
+>> +	/*
+>> +	 * FIXME: as noted in the get_user_pages_remote() implementation, it
+>> +	 * is not yet possible to safely set FOLL_LONGTERM here. FOLL_LONGTERM
+>> +	 * needs to be set, but for now the best we can do is a "TODO" item.
+>> +	 */
+>> +	gup_flags |=3D FOLL_REMOTE | FOLL_PIN;
+>=20
+> Wouldn't it be better to not add pin_longterm_pages_remote() until
+> it can be properly implemented ?
+>=20
+
+Well, the problem is that I need each call site that requires FOLL_PIN
+to use a proper wrapper. It's the FOLL_PIN that is the focus here, because
+there is a hard, bright rule, which is: if and only if a caller sets
+FOLL_PIN, then the dma-page tracking happens, and put_user_page() must
+be called.
+
+So this leaves me with only two reasonable choices:
+
+a) Convert the call site as above: pin_longterm_pages_remote(), which sets
+FOLL_PIN (the key point!), and leaves the FOLL_LONGTERM situation exactly
+as it has been so far. When the FOLL_LONGTERM situation is fixed, the call
+site *might* not need any changes to adopt the working gup.c code.
+
+b) Convert the call site to pin_user_pages_remote(), which also sets
+FOLL_PIN, and also leaves the FOLL_LONGTERM situation exactly as before.
+There would also be a comment at the call site, to the effect of, "this
+is the wrong call to make: it really requires FOLL_LONGTERM behavior".
+
+When the FOLL_LONGTERM situation is fixed, the call site will need to be
+changed to pin_longterm_pages_remote().
+
+So you can probably see why I picked (a).
+
+
+thanks,
+
+John Hubbard
+NVIDIA
