@@ -2,187 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53AB4ED7D9
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 03:52:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D04E3ED7E9
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 03:59:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729130AbfKDCwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Nov 2019 21:52:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37724 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728781AbfKDCwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Nov 2019 21:52:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572835951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AXjYrGIsHqKdgGAtBr7HEpIjQtsm9UUKtuxj6Twt+UY=;
-        b=RVZRRJU4LWQme1tbNNbzKqlsFPVDGtYGVVV71VhCWd52Px6osGA8AOTDo6RNqO24G6Z7gr
-        EnOgLd2zADDjviY7mwnYsjjb56vxkWrPgjK0zbxgBIqkeF3FAcvNPxnVzJJF/cY55o2hje
-        lbwtc4d3CgwzCJnSvkYhEF617S2vgts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215--hfYGEOLOBaATEUH2p7Y3g-1; Sun, 03 Nov 2019 21:52:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58B2B800A1A;
-        Mon,  4 Nov 2019 02:52:23 +0000 (UTC)
-Received: from [10.72.12.188] (ovpn-12-188.pek2.redhat.com [10.72.12.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CFF69600C4;
-        Mon,  4 Nov 2019 02:51:55 +0000 (UTC)
-Subject: Re: [PATCH V6 3/6] mdev: introduce device specific ops
-To:     Parav Pandit <parav@mellanox.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "tiwei.bie@intel.com" <tiwei.bie@intel.com>
-Cc:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "maxime.coquelin@redhat.com" <maxime.coquelin@redhat.com>,
-        "cunming.liang@intel.com" <cunming.liang@intel.com>,
-        "zhihong.wang@intel.com" <zhihong.wang@intel.com>,
-        "rob.miller@broadcom.com" <rob.miller@broadcom.com>,
-        "xiao.w.wang@intel.com" <xiao.w.wang@intel.com>,
-        "haotian.wang@sifive.com" <haotian.wang@sifive.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
-        "jani.nikula@linux.intel.com" <jani.nikula@linux.intel.com>,
-        "joonas.lahtinen@linux.intel.com" <joonas.lahtinen@linux.intel.com>,
-        "rodrigo.vivi@intel.com" <rodrigo.vivi@intel.com>,
-        "airlied@linux.ie" <airlied@linux.ie>,
-        "daniel@ffwll.ch" <daniel@ffwll.ch>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "sebott@linux.ibm.com" <sebott@linux.ibm.com>,
-        "oberpar@linux.ibm.com" <oberpar@linux.ibm.com>,
-        "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "freude@linux.ibm.com" <freude@linux.ibm.com>,
-        "lingshan.zhu@intel.com" <lingshan.zhu@intel.com>,
-        Ido Shamay <idos@mellanox.com>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "lulu@redhat.com" <lulu@redhat.com>,
-        "christophe.de.dinechin@gmail.com" <christophe.de.dinechin@gmail.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "stefanha@redhat.com" <stefanha@redhat.com>
-References: <20191030064444.21166-1-jasowang@redhat.com>
- <20191030064444.21166-4-jasowang@redhat.com>
- <AM0PR05MB4866E91139617C9F2380BBAFD1620@AM0PR05MB4866.eurprd05.prod.outlook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <495efacd-4898-fb89-2599-dce3a5a277f0@redhat.com>
-Date:   Mon, 4 Nov 2019 10:51:53 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728795AbfKDC7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Nov 2019 21:59:02 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:36362 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728643AbfKDC7C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Nov 2019 21:59:02 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA42wgtK051862;
+        Mon, 4 Nov 2019 02:58:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=rXYd9T5xcZlsJtJKgMbmBfCyv/t8roaEHfDXUqifZr8=;
+ b=c6HRIjK9RWPYu6kDZAqSih+48aVDf44jeIQBwUSJpBOa3vQyTJ9yeJ69+6axMwAzibdd
+ indoHEbNFeC6Dw90cobujEEO/gSlEo1+EntznGdJXe8fAyd+lvYvz5mKbcx4Toa5T82I
+ QWQtQIKF3/8H21UlNlrt6QjTlqEmW27vbRM5/tkZsMk0XUHZRI1uzStiT8+paVqAqLim
+ eU2P1/7vd46W/HLCEJ/W+mPUvH88p46ws/W7OAvdfoeDsYoi8KPL7rEzvxlx49I+0EDB
+ 1JeJ4EJJ2vrRKZUB3nx9mJ39UOsVT8p8PLCIPuSSS1H5nol3TpPU+iT4MnyZ6pbeBrl6 WQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2w117tmjqh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 04 Nov 2019 02:58:42 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA42sTRe047440;
+        Mon, 4 Nov 2019 02:56:41 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2w1ka94s6n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 04 Nov 2019 02:56:41 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA42udoX011586;
+        Mon, 4 Nov 2019 02:56:39 GMT
+Received: from [192.168.0.4] (/111.206.84.95)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 03 Nov 2019 18:56:38 -0800
+Subject: Re: [PATCH 4/5] cpuidle-haltpoll: add a check to ensure grow start
+ value is nonzero
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
+        rkrcmar@redhat.com, pbonzini@redhat.com
+References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1572060239-17401-5-git-send-email-zhenzhong.duan@oracle.com>
+ <20191101211908.GA20672@amt.cnet>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <7245089f-788e-03d6-9833-6ce4d313f4ce@oracle.com>
+Date:   Mon, 4 Nov 2019 10:56:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <AM0PR05MB4866E91139617C9F2380BBAFD1620@AM0PR05MB4866.eurprd05.prod.outlook.com>
+In-Reply-To: <20191101211908.GA20672@amt.cnet>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: -hfYGEOLOBaATEUH2p7Y3g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1911040029
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9430 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1911040030
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/11/2 =E4=B8=8A=E5=8D=884:11, Parav Pandit wrote:
->
->> -----Original Message-----
->> From: Jason Wang <jasowang@redhat.com>
->> Sent: Wednesday, October 30, 2019 1:45 AM
->> To: kvm@vger.kernel.org; linux-s390@vger.kernel.org; linux-
->> kernel@vger.kernel.org; dri-devel@lists.freedesktop.org; intel-
->> gfx@lists.freedesktop.org; intel-gvt-dev@lists.freedesktop.org;
->> kwankhede@nvidia.com; alex.williamson@redhat.com; mst@redhat.com;
->> tiwei.bie@intel.com
->> Cc: virtualization@lists.linux-foundation.org; netdev@vger.kernel.org;
->> cohuck@redhat.com; maxime.coquelin@redhat.com;
->> cunming.liang@intel.com; zhihong.wang@intel.com;
->> rob.miller@broadcom.com; xiao.w.wang@intel.com;
->> haotian.wang@sifive.com; zhenyuw@linux.intel.com; zhi.a.wang@intel.com;
->> jani.nikula@linux.intel.com; joonas.lahtinen@linux.intel.com;
->> rodrigo.vivi@intel.com; airlied@linux.ie; daniel@ffwll.ch;
->> farman@linux.ibm.com; pasic@linux.ibm.com; sebott@linux.ibm.com;
->> oberpar@linux.ibm.com; heiko.carstens@de.ibm.com; gor@linux.ibm.com;
->> borntraeger@de.ibm.com; akrowiak@linux.ibm.com; freude@linux.ibm.com;
->> lingshan.zhu@intel.com; Ido Shamay <idos@mellanox.com>;
->> eperezma@redhat.com; lulu@redhat.com; Parav Pandit
->> <parav@mellanox.com>; christophe.de.dinechin@gmail.com;
->> kevin.tian@intel.com; stefanha@redhat.com; Jason Wang
->> <jasowang@redhat.com>
->> Subject: [PATCH V6 3/6] mdev: introduce device specific ops
+On 2019/11/2 5:19, Marcelo Tosatti wrote:
+> On Sat, Oct 26, 2019 at 11:23:58AM +0800, Zhenzhong Duan wrote:
+>> dev->poll_limit_ns could be zeroed in certain cases (e.g. by
+>> guest_halt_poll_shrink). If guest_halt_poll_grow_start is zero,
+>> dev->poll_limit_ns will never be larger than zero.
 >>
->> Currently, except for the create and remove, the rest of mdev_parent_ops=
- is
->> designed for vfio-mdev driver only and may not help for kernel mdev driv=
-er.
->> With the help of class id, this patch introduces device specific callbac=
-ks inside
->> mdev_device structure. This allows different set of callback to be used =
-by vfio-
->> mdev and virtio-mdev.
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
 >> ---
-> [ ..]
->
->> diff --git a/include/linux/vfio_mdev_ops.h b/include/linux/vfio_mdev_ops=
-.h
->> new file mode 100644 index 000000000000..3907c5371c2b
->> --- /dev/null
->> +++ b/include/linux/vfio_mdev_ops.h
->> @@ -0,0 +1,52 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * VFIO Mediated device definition
->> + */
->> +
->> +#ifndef VFIO_MDEV_H
->> +#define VFIO_MDEV_H
->> +
-> I should have noticed this before. :-(
-> APIs exposed are by the mdev module and named with mdev_ prefix.
-> And file name is _ops.h,
->
-> We should name this file as mdev_vfio_ops.h
->
-> And #define should be MDEV_VFIO_OPS_H
->
->> +#include <linux/mdev.h>
->> +
->> +/**
->> + * struct vfio_mdev_device_ops - Structure to be registered for each
-> s/vfio_mdev_device_ops/mdev_vfio_device_ops/
->
-> Similarly for virtio in future patches.
->
+>>   drivers/cpuidle/governors/haltpoll.c | 15 ++++++++++++---
+>>   1 file changed, 12 insertions(+), 3 deletions(-)
+> I would rather disallow setting grow_start to zero rather
+> than silently setting it to one on the back of the user.
 
-Will fix in V7.
+Ok, will do.
 
+Thanks
 
->   static void mtty_device_release(struct device *dev)
-> --
-> 2.19.1
-> With above small nit changes to rename the fields and file,
->
-> Reviewed-by: Parav Pandit <parav@mellanox.com>
-
-
-Appreciate that, thanks.
-
+Zhenzhong
 
