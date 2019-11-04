@@ -2,56 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EA83EE1BA
-	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 14:58:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41855EE1D7
+	for <lists+kvm@lfdr.de>; Mon,  4 Nov 2019 15:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728561AbfKDN6M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 08:58:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11610 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727891AbfKDN6M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 08:58:12 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA4DshI4130694
-        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 08:58:11 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w2m8cbvj8-1
+        id S1729236AbfKDOFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 09:05:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728595AbfKDOFR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 09:05:17 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA4DrojR107941
+        for <kvm@vger.kernel.org>; Mon, 4 Nov 2019 09:05:16 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2w2n51gyrk-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 08:58:10 -0500
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 09:05:16 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 4 Nov 2019 13:58:07 -0000
+        Mon, 4 Nov 2019 14:05:14 -0000
 Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 4 Nov 2019 13:58:04 -0000
+        Mon, 4 Nov 2019 14:05:10 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA4Dw2Q144499266
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA4E59uB42533362
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Nov 2019 13:58:02 GMT
+        Mon, 4 Nov 2019 14:05:09 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ABD04A4069;
-        Mon,  4 Nov 2019 13:58:02 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 626DAA406A;
+        Mon,  4 Nov 2019 14:05:09 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 48DDDA4066;
-        Mon,  4 Nov 2019 13:58:02 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0ED3CA4054;
+        Mon,  4 Nov 2019 14:05:09 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.123])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Nov 2019 13:58:02 +0000 (GMT)
-Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
+        Mon,  4 Nov 2019 14:05:08 +0000 (GMT)
+Subject: Re: [RFC 14/37] KVM: s390: protvirt: Implement interruption injection
 To:     David Hildenbrand <david@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
         imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
         cohuck@redhat.com, gor@linux.ibm.com
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-10-frankja@linux.ibm.com>
- <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
- <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
- <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
- <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
- <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
+ <20191024114059.102802-15-frankja@linux.ibm.com>
+ <f51f2146-834c-ba48-1015-b83c4fe6cd54@redhat.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -97,25 +93,25 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Mon, 4 Nov 2019 14:58:02 +0100
+Date:   Mon, 4 Nov 2019 15:05:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
+In-Reply-To: <f51f2146-834c-ba48-1015-b83c4fe6cd54@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19110413-0020-0000-0000-0000038266AC
+x-cbid: 19110414-4275-0000-0000-0000037AA23C
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110413-0021-0000-0000-000021D88B19
-Message-Id: <69ddb6a7-8f69-fbc4-63a4-4f5695117078@de.ibm.com>
+x-cbparentid: 19110414-4276-0000-0000-0000388DE913
+Message-Id: <b48afe44-8195-e9ed-d005-bfecbcebb1ca@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-04_08:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=316 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1911040136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -124,76 +120,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 04.11.19 11:19, David Hildenbrand wrote:
->>>> to synchronize page import/export with the I/O for paging. For example you can actually
->>>> fault in a page that is currently under paging I/O. What do you do? import (so that the
->>>> guest can run) or export (so that the I/O will work). As this turned out to be harder then
->>>> we though we decided to defer paging to a later point in time.
->>>
->>> I don't quite see the issue yet. If you page out, the page will
->>> automatically (on access) be converted to !secure/encrypted memory. If
->>> the UV/guest wants to access it, it will be automatically converted to
->>> secure/unencrypted memory. If you have concurrent access, it will be
->>> converted back and forth until one party is done.
+On 04.11.19 11:29, David Hildenbrand wrote:
+> On 24.10.19 13:40, Janosch Frank wrote:
+>> From: Michael Mueller <mimu@linux.ibm.com>
 >>
->> IO does not trigger an export on an imported page, but an error
->> condition in the IO subsystem. The page code does not read pages through
-> 
-> Ah, that makes it much clearer. Thanks!
-> 
->> the cpu, but often just asks the device to read directly and that's
->> where everything goes wrong. We could bounce swapping, but chose to pin
->> for now until we find a proper solution to that problem which nicely
->> integrates into linux.
-> 
-> How hard would it be to
-> 
-> 1. Detect the error condition
-> 2. Try a read on the affected page from the CPU (will will automatically convert to encrypted/!secure)
-> 3. Restart the I/O
-> 
-> I assume that this is a corner case where we don't really have to care about performance in the first shot.
-
-We have looked into this. You would need to implement this in the low level
-handler for every I/O. DASD, FCP, PCI based NVME, iscsi. Where do you want
-to stop?
-There is no proper global bounce buffer that works for everything. 
-
->>>
->>> A proper automatic conversion should make this work. What am I missing?
->>>
->>>>
->>>> As we do not want to rely on the userspace to do the mlock this is now done in the kernel.
->>>
->>> I wonder if we could come up with an alternative (similar to how we
->>> override VM_MERGEABLE in the kernel) that can be called and ensured in
->>> the kernel. E.g., marking whole VMAs as "don't page" (I remember
->>> something like "special VMAs" like used for VDSOs that achieve exactly
->>> that, but I am absolutely no expert on that). That would be much nicer
->>> than pinning all pages and remembering what you pinned in huge page
->>> arrays ...
+>> The patch implements interruption injection for the following
+>> list of interruption types:
 >>
->> It might be more worthwhile to just accept one or two releases with
->> pinning and fix the root of the problem than design a nice stopgap.
-> 
-> Quite honestly, to me this feels like a prototype hack that deserves a proper solution first. The issue with this hack is that it affects user space (esp. MADV_DONTNEED no longer working correctly). It's not just something you once fix in the kernel and be done with it.
-
-I disagree. Pinning is a valid initial version. I would find it strange to
-allow it for AMD SEV, but not allowing it for s390x. 
-As far as I can tell  MADV_DONTNEED continues to work within the bounds
-of specification. In fact, it does work (or does not depending on your 
-perspective :-) ) exactly in the same way as on hugetlbfs,which is also
-a way of pinning.
-
-And yes, I am in full agreement that we must work on lifting that
-restriction. 
-
-
+>>    - I/O
+>>      __deliver_io (III)
 >>
->> Btw. s390 is not alone with the problem and we'll try to have another
->> discussion tomorrow with AMD to find a solution which works for more
->> than one architecture.
+>>    - External
+>>      __deliver_cpu_timer (IEI)
+>>      __deliver_ckc (IEI)
+>>      __deliver_emergency_signal (IEI)
+>>      __deliver_external_call (IEI)
+>>      __deliver_service (IEI)
+>>
+>>    - cpu restart
+>>      __deliver_restart (IRI)
 > 
-> Let me know if there was an interesting outcome.
+> What exactly is IRQ_PEND_EXT_SERVICE_EV? Can you add some comments whet the new interrupt does and why it is needed in this context? Thanks
 
+I did that code. What about the following add-on description.
+
+The ultravisor does several checks on injected interrupts. For example it will
+check that for an sclp interrupt with an sccb address we had an servc exit
+and exit with a validity intercept. 
+As the hypervisor must avoid valitity intercepts we now mask invalid interrupts.
+
+There are also sclp interrupts that only inject an event (e.g. an input event
+on the sclp consoles) those interrupts must not be masked.
+Let us split out these "event interupts" from the normal sccb interrupts into
+IRQ_PEND_EXT_SERVICE_EV. 
 
