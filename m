@@ -2,150 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4F0DF04FF
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 19:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7863EF050C
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 19:29:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390681AbfKESXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 13:23:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37162 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390233AbfKESXN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 13:23:13 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA5IFFBJ122199
-        for <kvm@vger.kernel.org>; Tue, 5 Nov 2019 13:23:12 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w3dd0sywx-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 13:23:12 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 5 Nov 2019 18:23:10 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 5 Nov 2019 18:23:06 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA5IMUAa43516368
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Nov 2019 18:22:30 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A99CC52051;
-        Tue,  5 Nov 2019 18:23:05 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.151.13])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 651E95204F;
-        Tue,  5 Nov 2019 18:23:05 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 0/2] s390x: Improve architectural
- compliance for diag308
-To:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20191105162828.2490-1-frankja@linux.ibm.com>
- <70BDB5DE-489D-4718-B6C2-0EABD89414D2@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Tue, 5 Nov 2019 19:23:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S2390706AbfKES31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 13:29:27 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58396 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2390613AbfKES31 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 13:29:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572978566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T1F4u3DloqEz3yiZIn87LfiBjLlR9eBatWsYBJzun54=;
+        b=MLTg0/LzqhpUwOxpdbOAzJFrjfUaEK1uQ3fUWp1VBJEgA04hNfdaf7jnwHFH0g1gk1aj+S
+        ah3PHg1j4H3SN70f+IkJRVic3hGwcbk1h8rif2KjNkWrVZNoZngC57rrvIKckJ6HkMJ/vS
+        Al7h69Ea84bcUEfYRRGt3SG4ibvb3Ys=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-jIcey9tJN-e2IZXzaHrR-g-1; Tue, 05 Nov 2019 13:29:22 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65285800C73;
+        Tue,  5 Nov 2019 18:29:18 +0000 (UTC)
+Received: from gondolin (unknown [10.36.118.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02D575C1BB;
+        Tue,  5 Nov 2019 18:28:54 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 19:28:51 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V8 3/6] mdev: introduce device specific ops
+Message-ID: <20191105192851.40548978.cohuck@redhat.com>
+In-Reply-To: <20191105104418.1735d800@x1.home>
+References: <20191105093240.5135-1-jasowang@redhat.com>
+        <20191105093240.5135-4-jasowang@redhat.com>
+        <20191105175025.1a620844.cohuck@redhat.com>
+        <20191105104418.1735d800@x1.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <70BDB5DE-489D-4718-B6C2-0EABD89414D2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19110518-4275-0000-0000-0000037B0FA9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110518-4276-0000-0000-0000388E5B17
-Message-Id: <0560e27d-dac8-a569-2e3f-f8188724c822@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-05_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911050153
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: jIcey9tJN-e2IZXzaHrR-g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 5 Nov 2019 10:44:18 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
+> On Tue, 5 Nov 2019 17:50:25 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
+>=20
+> > On Tue,  5 Nov 2019 17:32:37 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> >  =20
+> > > Currently, except for the create and remove, the rest of
+> > > mdev_parent_ops is designed for vfio-mdev driver only and may not hel=
+p
+> > > for kernel mdev driver. With the help of class id, this patch
+> > > introduces device specific callbacks inside mdev_device
+> > > structure. This allows different set of callback to be used by
+> > > vfio-mdev and virtio-mdev.
+> > >=20
+> > > Reviewed-by: Parav Pandit <parav@mellanox.com>
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > ---
+> > >  .../driver-api/vfio-mediated-device.rst       | 35 +++++++++----
+> > >  MAINTAINERS                                   |  1 +
+> > >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 18 ++++---
+> > >  drivers/s390/cio/vfio_ccw_ops.c               | 18 ++++---
+> > >  drivers/s390/crypto/vfio_ap_ops.c             | 14 +++--
+> > >  drivers/vfio/mdev/mdev_core.c                 | 24 ++++++++-
+> > >  drivers/vfio/mdev/mdev_private.h              |  5 ++
+> > >  drivers/vfio/mdev/vfio_mdev.c                 | 37 ++++++-------
+> > >  include/linux/mdev.h                          | 43 ++++-----------
+> > >  include/linux/mdev_vfio_ops.h                 | 52 +++++++++++++++++=
+++
+> > >  samples/vfio-mdev/mbochs.c                    | 20 ++++---
+> > >  samples/vfio-mdev/mdpy.c                      | 20 ++++---
+> > >  samples/vfio-mdev/mtty.c                      | 18 ++++---
+> > >  13 files changed, 206 insertions(+), 99 deletions(-)
+> > >  create mode 100644 include/linux/mdev_vfio_ops.h
+> > >    =20
+> >=20
+> > (...)
+> >  =20
+> > > @@ -172,10 +163,34 @@ that a driver should use to unregister itself w=
+ith the mdev core driver::
+> > > =20
+> > >  =09extern void mdev_unregister_device(struct device *dev);
+> > > =20
+> > > -It is also required to specify the class_id in create() callback thr=
+ough::
+> > > +As multiple types of mediated devices may be supported, class id nee=
+ds
+> > > +to be specified in the create callback(). This could be done   =20
+> >=20
+> > The brackets should probably go behind 'create'?
+> >  =20
+> > > +explicitly for the device that does not use on mdev bus for its   =
+=20
+> >=20
+> > "for devices that do not use the mdev bus" ?
+> >=20
+> > But why wouldn't they? I feel like I've missed some discussion here :/ =
+=20
+>=20
+> The device ops provide a route through mdev-core for known callbacks,
+> which is primarily useful when we have 1:N relation between mdev bus
+> driver and vendor drivers.  The obvious example here is vfio-mdev,
+> where we have GVT-g, vfio-ap, vfio-ccw, NVIDIA GRID, and various sample
+> drivers all advertising vfio-mdev support via their class id.  However,
+> if we have a tightly coupled vendor driver and mdev bus driver, as the
+> mlx5 support that Parav is developing, the claim is that they prefer
+> not to expose any device ops and intend to interact directly with the
+> mdev device.  At least that's my understanding.  Thanks,
+>=20
+> Alex
 
-On 05.11.19 18:34, David Hildenbrand wrote:
-> 
-> 
->> Am 05.11.2019 um 17:29 schrieb Janosch Frank <frankja@linux.ibm.com>:
->>
->> ﻿When testing diag308 subcodes 0/1 on lpar with virtual mem set up, I
->> experienced spec PGMs and addressing PGMs due to the tests not setting
->> short psw bit 12 and leaving the DAT bit on.
->>
->> The problem was not found under KVM/QEMU, because Qemu just ignores
->> all cpu mask bits... I'm working on a fix for that too.
->>
-> 
-> I don‘t have access to documentation. Is what LPAR does documented behavior or is this completely undocumented and therefore undefined behavior? Then we should remove these test cases completely instead.
+Ah, ok.
 
-Yes. It was just that KVM/QEMU never looked at the mask and just used a default
-one. The short PSW on address 0 clearly contains a mask and we should better set
-it.
-> 
->> Janosch Frank (2):
->>  s390x: Add CR save area
->>  s390x: Remove DAT and add short indication psw bits on diag308 reset
->>
->> lib/s390x/asm-offsets.c  |  3 ++-
->> lib/s390x/asm/arch_def.h |  5 +++--
->> lib/s390x/interrupt.c    |  4 ++--
->> lib/s390x/smp.c          |  2 +-
->> s390x/cstart64.S         | 29 ++++++++++++++++++++---------
->> 5 files changed, 28 insertions(+), 15 deletions(-)
->>
->> -- 
->> 2.20.1
->>
+So maybe use the phrasing "devices that interact with the mdev device
+directly" vs "devices that use device-specific ops" instead?
+
+Not a strong critique, though.
+
+>=20
+> > > +operation through:
+> > > =20
+> > >  =09int mdev_set_class(struct mdev_device *mdev, u16 id);
+> > > =20
+> > > +For the device that uses on the mdev bus for its operation, the
+> > > class   =20
+> >=20
+> > "For devices that use the mdev bus..."
+> >=20
+> > But same comment as above.
+> >  =20
+> > > +should provide helper function to set class id and device
+> > > specific +ops. E.g for vfio-mdev devices, the function to be
+> > > called is:: +
+> > > +=09int mdev_set_vfio_ops(struct mdev_device *mdev,
+> > > +                              const struct mdev_vfio_device_ops
+> > > *vfio_ops); +
+> > > +The class id (set by this function to MDEV_CLASS_ID_VFIO) is
+> > > used to +match a device with an mdev driver via its id table. The
+> > > device +specific callbacks (specified in *vfio_ops) are
+> > > obtainable via +mdev_get_vfio_ops() (for use by the mdev bus
+> > > driver). A vfio-mdev +device (class id MDEV_CLASS_ID_VFIO) uses
+> > > the following +device-specific ops:
+> > > +
+> > > +* open: open callback of vfio mediated device
+> > > +* close: close callback of vfio mediated device
+> > > +* ioctl: ioctl callback of vfio mediated device
+> > > +* read : read emulation callback
+> > > +* write: write emulation callback
+> > > +* mmap: mmap emulation callback
+> > > +
+> > >  Mediated Device Management Interface Through sysfs
+> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D   =20
+> >=20
+> > Otherwise, looks good. =20
+>=20
 
