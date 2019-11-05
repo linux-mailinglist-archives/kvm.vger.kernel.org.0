@@ -2,52 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D374F0462
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 18:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C61BF0495
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 18:59:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390562AbfKERvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 12:51:38 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50446 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2389356AbfKERvi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 12:51:38 -0500
+        id S2390558AbfKER66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 12:58:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22404 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2390194AbfKER66 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 12:58:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572976297;
+        s=mimecast20190719; t=1572976736;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Uo9kjmswlhWUUNuwyPvpSw/SqNl9A5yqvoUJKzoDx4I=;
-        b=EmIkIGc9oylb8YfM8QoEGlTMs4DVwuFNOsg4gIC5nPY5/Yypoh1CGJh/t67U8GYn5tPNpf
-        nR3x/KonVOyAzuNTxvcNqME64WQWFczFHswvrnipM0FVeD7HdhL68Z2BRXsN2xekuCS5Ya
-        /jQyW3p0/VgwvmQw1jsumJSAcdrrpMA=
+        bh=6tu1v4G9fE/ChX8bRQ38WG0hz1iaA5qDIbKie9vJH4o=;
+        b=OGvjmcl+1limUf2GkEkJwjghjeSB80IqjEl1TXQ+9WbunBhMAjbZipFyjfZF63v0EFNEZu
+        /Beadxq3H0y5Q+YpXXUCv/ipfijwm0/bL1qwIBMIlWeRsLum3FeDIcvpGRKvaqkvb9+V5E
+        Zk4KOVMEqKDBFV0t2fM0LS0k5Fohx/Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-_WxGERA5PQWJiQ_5J89lFA-1; Tue, 05 Nov 2019 12:51:34 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-174-vstKXwaEPzyCzJ10MyBS1A-1; Tue, 05 Nov 2019 12:58:52 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9BD18017DE;
-        Tue,  5 Nov 2019 17:51:32 +0000 (UTC)
-Received: from gondolin (unknown [10.36.118.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C4AA19757;
-        Tue,  5 Nov 2019 17:51:27 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 18:51:24 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
- controls
-Message-ID: <20191105185124.495d4820.cohuck@redhat.com>
-In-Reply-To: <20191024114059.102802-14-frankja@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-14-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03AE21800D4A;
+        Tue,  5 Nov 2019 17:58:46 +0000 (UTC)
+Received: from x1.home (ovpn-116-110.phx2.redhat.com [10.3.116.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 31C85100164D;
+        Tue,  5 Nov 2019 17:58:35 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 10:58:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V8 0/6] mdev based hardware virtio offloading support
+Message-ID: <20191105105834.469675f0@x1.home>
+In-Reply-To: <20191105093240.5135-1-jasowang@redhat.com>
+References: <20191105093240.5135-1-jasowang@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: _WxGERA5PQWJiQ_5J89lFA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: vstKXwaEPzyCzJ10MyBS1A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -56,78 +71,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 07:40:35 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue,  5 Nov 2019 17:32:34 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-> From: Michael Mueller <mimu@linux.ibm.com>
+> Hi all:
 >=20
-> Define the interruption injection codes and the related fields in the
-> sie control block for PVM interruption injection.
+> There are hardwares that can do virtio datapath offloading while
+> having its own control path. This path tries to implement a mdev based
+> unified API to support using kernel virtio driver to drive those
+> devices. This is done by introducing a new mdev transport for virtio
+> (virtio_mdev) and register itself as a new kind of mdev driver. Then
+> it provides a unified way for kernel virtio driver to talk with mdev
+> device implementation.
 >=20
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
+> Though the series only contains kernel driver support, the goal is to
+> make the transport generic enough to support userspace drivers. This
+> means vhost-mdev[1] could be built on top as well by resuing the
+> transport.
 >=20
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm=
-_host.h
-> index 6cc3b73ca904..82443236d4cc 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -215,7 +215,15 @@ struct kvm_s390_sie_block {
->  =09__u8=09icptcode;=09=09/* 0x0050 */
->  =09__u8=09icptstatus;=09=09/* 0x0051 */
->  =09__u16=09ihcpu;=09=09=09/* 0x0052 */
-> -=09__u8=09reserved54[2];=09=09/* 0x0054 */
-> +=09__u8=09reserved54;=09=09/* 0x0054 */
-> +#define IICTL_CODE_NONE=09=09 0x00
-> +#define IICTL_CODE_MCHK=09=09 0x01
-> +#define IICTL_CODE_EXT=09=09 0x02
-> +#define IICTL_CODE_IO=09=09 0x03
-> +#define IICTL_CODE_RESTART=09 0x04
-> +#define IICTL_CODE_SPECIFICATION 0x10
-> +#define IICTL_CODE_OPERAND=09 0x11
-> +=09__u8=09iictl;=09=09=09/* 0x0055 */
->  =09__u16=09ipa;=09=09=09/* 0x0056 */
->  =09__u32=09ipb;=09=09=09/* 0x0058 */
->  =09__u32=09scaoh;=09=09=09/* 0x005c */
-> @@ -252,7 +260,8 @@ struct kvm_s390_sie_block {
->  #define HPID_KVM=090x4
->  #define HPID_VSIE=090x5
->  =09__u8=09hpid;=09=09=09/* 0x00b8 */
-> -=09__u8=09reservedb9[11];=09=09/* 0x00b9 */
-> +=09__u8=09reservedb9[7];=09=09/* 0x00b9 */
-> +=09__u32=09eiparams;=09=09/* 0x00c0 */
->  =09__u16=09extcpuaddr;=09=09/* 0x00c4 */
->  =09__u16=09eic;=09=09=09/* 0x00c6 */
->  =09__u32=09reservedc8;=09=09/* 0x00c8 */
-> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
->  =09__u8=09oai;=09=09=09/* 0x00e2 */
->  =09__u8=09armid;=09=09=09/* 0x00e3 */
->  =09__u8=09reservede4[4];=09=09/* 0x00e4 */
-> -=09__u64=09tecmc;=09=09=09/* 0x00e8 */
-> -=09__u8=09reservedf0[12];=09=09/* 0x00f0 */
-> +=09union {
-> +=09=09__u64=09tecmc;=09=09/* 0x00e8 */
-> +=09=09struct {
-> +=09=09=09__u16=09subchannel_id;=09/* 0x00e8 */
-> +=09=09=09__u16=09subchannel_nr;=09/* 0x00ea */
-> +=09=09=09__u32=09io_int_parm;=09/* 0x00ec */
-> +=09=09=09__u32=09io_int_word;=09/* 0x00f0 */
-> +=09=09};
-> +=09} __packed;
-> +=09__u8=09reservedf4[8];=09=09/* 0x00f4 */
+> A sample driver is also implemented which simulate a virito-net
+> loopback ethernet device on top of vringh + workqueue. This could be
+> used as a reference implementation for real hardware driver.
+>=20
+> Also a real ICF VF driver was also posted here[2] which is a good
+> reference for vendors who is interested in their own virtio datapath
+> offloading product.
+>=20
+> Consider mdev framework only support VFIO device and driver right now,
+> this series also extend it to support other types. This is done
+> through introducing class id to the device and pairing it with
+> id_talbe claimed by the driver. On top, this seris also decouple
+> device specific parents ops out of the common ones.
+>=20
+> Pktgen test was done with virito-net + mvnet loop back device.
+>=20
+> Please review.
+>=20
+> [1] https://lkml.org/lkml/2019/10/31/440
+> [2] https://lkml.org/lkml/2019/10/15/1226
+>=20
+> Changes from V7:
+> - drop {set|get}_mdev_features for virtio
+> - typo and comment style fixes
 
-IIUC, for protected guests, you won't get an interception for which
-tecmc would be valid anymore, but need to put the I/O interruption
-stuff at the same place, right?
 
-My main issue is that this makes the control block definition a bit
-ugly, since the f0 value that's unused in the non-protvirt case is not
-obvious anymore; but I don't know how to express this without making it
-even uglier :(
+Seems we're nearly there, all the remaining comments are relatively
+superficial, though I would appreciate a v9 addressing them as well as
+the checkpatch warnings:
 
->  #define CRYCB_FORMAT_MASK 0x00000003
->  #define CRYCB_FORMAT0 0x00000000
->  #define CRYCB_FORMAT1 0x00000001
+https://patchwork.freedesktop.org/series/68977/
+
+Consider this a last call for reviews or acks (or naks) from affected
+mdev vendor drivers, mdev-core sub-maintainers (Hi Kirti), virtio
+stakeholders, etc.  Thanks,
+
+Alex
 
