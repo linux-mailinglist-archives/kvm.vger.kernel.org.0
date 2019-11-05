@@ -2,150 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF9BEFA02
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:49:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 254A5EFA61
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 11:04:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730756AbfKEJtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 04:49:43 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39158 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730693AbfKEJtm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 04:49:42 -0500
-Received: by mail-wm1-f68.google.com with SMTP id t26so15258970wmi.4
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 01:49:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=sender:date:from:to:cc:subject:message-id:mail-followup-to
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oRi35sDRRYSuldGaopElz5IjGs2HKuOAcqpcVoq2wdY=;
-        b=KE3dP9KvcLUq0hJbOhSYMXJr4Z1Cuc2Vc3sYtj3A588K1AxiPBhNRv2jLPVvg3HpiB
-         asO9jGRsCrrAGrGXQuynbnaqIOtPdku/48txDbkC3jyEv0zbAYA99l9MmTsEF4lXmu4c
-         UlGTi/e9P81uVhAoSbMh6OU7HFW5tO869wbeU=
+        id S2388093AbfKEKEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 05:04:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44574 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730571AbfKEKEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 05:04:20 -0500
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 97B49821CC
+        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 10:04:19 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id o202so6099035wme.5
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 02:04:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=oRi35sDRRYSuldGaopElz5IjGs2HKuOAcqpcVoq2wdY=;
-        b=dc0A2XqUXqmockPcN8OV2IvK0Pw2xmygNnnqf1dEjS95J4MZL1CylZDz89Dp6W5bvz
-         Wh+qCQ2YSlMCp2rUeTki+MDTKj6279uRsR1ogDp/0YAXnCKEA3fXC0ULvbTSWvPY/d1A
-         VF06FqZS2QhzCrHVYazDrMRwQ9fmxyWzHK6BeLxGEOvGEcbvH/6pLX4lpj6tehBcy881
-         rpZ6wO693t7tNUFe7e9AN+oltAeAvRDZgIMlpZLcTAu6+M1K8l+yf0ofCnKoHNDGIo3K
-         1GCSO4ul/+ZxPNBLJBTH5mDemsv2Jjlyw7LSxfBc3MD05liTDqxT0lT9OGO4g3wt3leo
-         4SEw==
-X-Gm-Message-State: APjAAAVW+sM9jy+qxf9jXHlQoaE3YFruSnoh4IEPdAWr5pf7ZiE+v/5O
-        2bWqcoBTB07PU3JN/WT1xavq1g==
-X-Google-Smtp-Source: APXvYqy+m+ZJ5zxOn/Dji3l65qB+TEfMmH5EiR/oP/iFPjGmYGokusjpTK+YoOlM7MNeuKLe8vHIRQ==
-X-Received: by 2002:a7b:c925:: with SMTP id h5mr3591415wml.115.1572947379914;
-        Tue, 05 Nov 2019 01:49:39 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id j19sm25704277wre.0.2019.11.05.01.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2019 01:49:39 -0800 (PST)
-Date:   Tue, 5 Nov 2019 10:49:36 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 09/19] drm/via: set FOLL_PIN via pin_user_pages_fast()
-Message-ID: <20191105094936.GZ10326@phenom.ffwll.local>
-Mail-Followup-To: John Hubbard <jhubbard@nvidia.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>, David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20191030224930.3990755-1-jhubbard@nvidia.com>
- <20191030224930.3990755-10-jhubbard@nvidia.com>
- <20191031233628.GI14771@iweiny-DESK2.sc.intel.com>
- <20191104181055.GP10326@phenom.ffwll.local>
- <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lrDn3WRTg+rwGOnenXl0j0b2dvVQo5Nmi58gDUT8LNE=;
+        b=NVerztxMOeS9+1ge/rYCDSSyrSPQyY62OCfs6udRiMpCHd7uFsdm2LS7JLO5Xy6/Ja
+         CR6TUg911Cr/hDFHX9xLAL2hh/f2bcKzITBAuOfMGpuveMOT+b1+AR7GEj6dfF1r7iHI
+         0B64pIYOq9m6IEF9pYvJc4ApNoK++Blsk+hUIdx8CaEmQb6D01JN3lowP+qBDwiWHcBg
+         XNZjJTl+qwyV5KbQ8K64xB9OSH8u6KksnsBnTJTbgmmLFR9K3QOnGkESo4xwVYQHWfMj
+         dyhC7FWhUF35X3jP0MIys4axrAiGKT+abUKQizVQjMD7Uhdgyrij0SLK2jJPDoUPC+K8
+         Djrg==
+X-Gm-Message-State: APjAAAWk8ggnqdL+wx66eVFsoebdoXkixEuAcFpahtmb+IGPWXUi8o3r
+        bDd2XbE5ulh0JHd6uXwL5Rwndq9iIgQcJMfzqhnabQiScAr0csb/3b2097bMG5YKcVTqHghjcir
+        ifOXouxje5ufw
+X-Received: by 2002:a05:6000:12d1:: with SMTP id l17mr13486380wrx.261.1572948258199;
+        Tue, 05 Nov 2019 02:04:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyjNhFV5qF8IUjCi16O1NoaQu8sSVoDIfgxCmNd9O29UA3q2m/52eCf5DqgEb0rGOHyGFqzUg==
+X-Received: by 2002:a05:6000:12d1:: with SMTP id l17mr13486352wrx.261.1572948257905;
+        Tue, 05 Nov 2019 02:04:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
+        by smtp.gmail.com with ESMTPSA id t24sm30988243wra.55.2019.11.05.02.04.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2019 02:04:17 -0800 (PST)
+Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
+To:     Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20191104230001.27774-1-aarcange@redhat.com>
+ <20191104230001.27774-4-aarcange@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
+Date:   Tue, 5 Nov 2019 11:04:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48d22c77-c313-59ff-4847-bc9a9813b8a7@nvidia.com>
-X-Operating-System: Linux phenom 5.2.0-3-amd64 
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191104230001.27774-4-aarcange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 11:20:38AM -0800, John Hubbard wrote:
-> On 11/4/19 10:10 AM, Daniel Vetter wrote:
-> > On Thu, Oct 31, 2019 at 04:36:28PM -0700, Ira Weiny wrote:
-> >> On Wed, Oct 30, 2019 at 03:49:20PM -0700, John Hubbard wrote:
-> >>> Convert drm/via to use the new pin_user_pages_fast() call, which sets
-> >>> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> >>> tracking of pinned pages, and therefore for any code that calls
-> >>> put_user_page().
-> >>>
-> >>
-> >> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> > 
-> > No one's touching the via driver anymore, so feel free to merge this
-> > through whatever tree suits best (aka I'll drop this on the floor and
-> > forget about it now).
-> > 
-> > Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> > 
+On 04/11/19 23:59, Andrea Arcangeli wrote:
+> kvm_x86_set_hv_timer and kvm_x86_cancel_hv_timer needs to be defined
+> to succeed the 32bit kernel build, but they can't be called.
 > 
-> OK, great. Yes, in fact, I'm hoping Andrew can just push the whole series
-> in through the mm tree, because that would allow it to be done in one 
-> shot, in 5.5
+> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bd17ad61f7e3..1a58ae38c8f2 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7195,6 +7195,17 @@ void kvm_x86_cancel_hv_timer(struct kvm_vcpu *vcpu)
+>  {
+>  	to_vmx(vcpu)->hv_deadline_tsc = -1;
+>  }
+> +#else
+> +int kvm_x86_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+> +			 bool *expired)
+> +{
+> +	BUG();
+> +}
+> +
+> +void kvm_x86_cancel_hv_timer(struct kvm_vcpu *vcpu)
+> +{
+> +	BUG();
+> +}
+>  #endif
+>  
+>  void kvm_x86_sched_in(struct kvm_vcpu *vcpu, int cpu)
+> 
 
-btw is there more? We should have a bunch more userptr stuff in various
-drivers, so was really surprised that drm/via is the only thing in your
-series.
--Daniel
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+I'll check for how long this has been broken.  It may be the proof that
+we can actually drop 32-bit KVM support.
+
+Paolo
