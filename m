@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E3C0F06EB
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 21:30:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E31F5F06E3
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 21:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728400AbfKEU35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 15:29:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:59866 "EHLO foss.arm.com"
+        id S1729524AbfKEU36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 15:29:58 -0500
+Received: from foss.arm.com ([217.140.110.172]:59886 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727339AbfKEU35 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1725806AbfKEU35 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 5 Nov 2019 15:29:57 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9120064F;
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9213468D;
         Tue,  5 Nov 2019 12:29:56 -0800 (PST)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C9EE3FE14;
-        Tue,  5 Nov 2019 03:04:00 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0018D3FE49;
+        Tue,  5 Nov 2019 03:04:02 -0800 (PST)
 From:   Christoffer Dall <christoffer.dall@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     kvmarm@lists.cs.columbia.edu,
@@ -36,85 +36,86 @@ Cc:     kvmarm@lists.cs.columbia.edu,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Mike Rapoport <rppt@linux.ibm.com>
-Subject: [PATCH v4 0/5] KVM: Unify mmu_memory_cache functionality across architectures
-Date:   Tue,  5 Nov 2019 12:03:52 +0100
-Message-Id: <20191105110357.8607-1-christoffer.dall@arm.com>
+Subject: [PATCH v4 1/5] KVM: x86: Move memcache allocation to GFP_PGTABLE_USER
+Date:   Tue,  5 Nov 2019 12:03:53 +0100
+Message-Id: <20191105110357.8607-2-christoffer.dall@arm.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20191105110357.8607-1-christoffer.dall@arm.com>
+References: <20191105110357.8607-1-christoffer.dall@arm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We currently have duplicated functionality for the mmu_memory_cache used
-to pre-allocate memory for the page table manipulation code which cannot
-allocate memory while holding spinlocks.  This functionality is
-duplicated across x86, arm/arm64, and mips.
+Recent commit 50f11a8a4620eee6b6831e69ab5d42456546d7d8 moved page table
+allocations for both KVM and normal user page table allocations to
+GFP_PGTABLE_USER in order to get __GFP_ACCOUNT for the page tables.
 
-This was motivated by a debate of modifying the arm code to be more in
-line with the x86 code and some discussions around changing the page
-flags used for allocation.  This series should make it easier to take a
-uniform approach across architectures.
+However, while KVM on other architectures such as arm64 were included in
+this change, curiously KVM on x86 was not.
 
-While there's not a huge amount of code sharing, we come out with a net
-gain, and the real win is in the consistency of how we allocate memory
-for page tables used by secondary MMUs driven by KVM in Linux.
+Currently, KVM on x86 uses kmem_cache_zalloc(GFP_KERNEL_ACCOUNT) for
+kmem_cache-based allocations, which expands in the following way:
+  kmem_cache_zalloc(..., GFP_KERNEL_ACCOUNT) =>
+  kmem_cache_alloc(..., GFP_KERNEL_ACCOUNT | __GFP_ZERO) =>
+  kmem_cache_alloc(..., GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO)
 
-Only tested on arm/arm64, and only compile-tested on x86 and mips.  I'm
-especially curious on getting feedback on the change of GFP flags for
-x86 (patch 1) and on the use of __GFP_ACCOUNT for mips.
+It so happens that GFP_PGTABLE_USER expands as:
+  GFP_PGTABLE_USER =>
+  (GFP_PGTABLE_KERNEL | __GFP_ACCOUNT) =>
+  ((GFP_KERNEL | __GFP_ZERO) | __GFP_ACCOUNT) =>
+  (GFP_KERNEL | __GFP_ACCOUNT | __GFP_ZERO)
 
-Changes since v3:
- - Moved to common GFP_PGTABLE_USER definition for page allocations in
-   the MMU cache for all three architectures.  This follows recent work
-   which already did this for arm/arm64.
- - Rebased on v5.4-rc4.
+Which means that we can replace the current KVM on x86 call as:
+-  obj = kmem_cache_zalloc(base_cache, GFP_KERNEL_ACCOUNT);
++  obj = kmem_cache_alloc(base_cache, GFP_PGTABLE_USER);
 
-Changes since v2:
- - Simplified kalloc flag definitions as per Paolo's review comment.
+For the single page cache topup allocation, KVM on x86 currently uses
+__get_free_page(GFP_KERNEL_ACCOUNT).  It seems to me that is equivalent
+to the above, except that the allocated page is not guaranteed to be
+zero (unless I missed the place where __get_free_page(!__GFP_ZERO) is
+still guaranteed to be zeroed.  It seems natural (and in fact desired)
+to have both topup functions implement the same expectations towards the
+caller, and we therefore move to GFP_PGTABLE_USER here as well.
 
-Changes since v1:
- - Split out rename from initial x86 patch to have separate patches to
-   move the logic to common code and to rename.
- - Introduce KVM_ARCH_WANT_MMU_MEMCACHE to avoid compile breakage on
-   architectures that don't use this functionality.
- - Rename KVM_NR_MEM_OBJS to KVM_MMU_NR_MEMCACHE_OBJS
+This will make it easier to unify the memchace implementation between
+architectures.
 
-Christoffer Dall (5):
-  KVM: x86: Move memcache allocation to GFP_PGTABLE_USER
-  KVM: x86: Move mmu_memory_cache functions to common code
-  KVM: x86: Rename mmu_memory_cache to kvm_mmu_memcache
-  KVM: arm/arm64: Move to common kvm_mmu_memcache infrastructure
-  KVM: mips: Move to common kvm_mmu_memcache infrastructure
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+---
+ arch/x86/kvm/mmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- arch/arm/include/asm/kvm_host.h      | 13 +---
- arch/arm/include/asm/kvm_mmu.h       |  2 +-
- arch/arm/include/asm/kvm_types.h     |  9 +++
- arch/arm64/include/asm/kvm_host.h    | 13 +---
- arch/arm64/include/asm/kvm_mmu.h     |  2 +-
- arch/arm64/include/asm/kvm_types.h   |  9 +++
- arch/mips/include/asm/kvm_host.h     | 15 +----
- arch/mips/include/asm/kvm_types.h    |  9 +++
- arch/mips/kvm/mips.c                 |  2 +-
- arch/mips/kvm/mmu.c                  | 54 +++-------------
- arch/powerpc/include/asm/kvm_types.h |  5 ++
- arch/s390/include/asm/kvm_types.h    |  5 ++
- arch/x86/include/asm/kvm_host.h      | 17 +----
- arch/x86/include/asm/kvm_types.h     |  9 +++
- arch/x86/kvm/mmu.c                   | 97 ++++++----------------------
- arch/x86/kvm/paging_tmpl.h           |  4 +-
- include/linux/kvm_host.h             | 11 ++++
- include/linux/kvm_types.h            | 13 ++++
- virt/kvm/arm/arm.c                   |  2 +-
- virt/kvm/arm/mmu.c                   | 68 +++++--------------
- virt/kvm/kvm_main.c                  | 61 +++++++++++++++++
- 21 files changed, 190 insertions(+), 230 deletions(-)
- create mode 100644 arch/arm/include/asm/kvm_types.h
- create mode 100644 arch/arm64/include/asm/kvm_types.h
- create mode 100644 arch/mips/include/asm/kvm_types.h
- create mode 100644 arch/powerpc/include/asm/kvm_types.h
- create mode 100644 arch/s390/include/asm/kvm_types.h
- create mode 100644 arch/x86/include/asm/kvm_types.h
-
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 24c23c66b226..540190cee3cb 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -40,6 +40,7 @@
+ 
+ #include <asm/page.h>
+ #include <asm/pat.h>
++#include <asm/pgalloc.h>
+ #include <asm/cmpxchg.h>
+ #include <asm/e820/api.h>
+ #include <asm/io.h>
+@@ -1025,7 +1026,7 @@ static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+ 	if (cache->nobjs >= min)
+ 		return 0;
+ 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+-		obj = kmem_cache_zalloc(base_cache, GFP_KERNEL_ACCOUNT);
++		obj = kmem_cache_alloc(base_cache, GFP_PGTABLE_USER);
+ 		if (!obj)
+ 			return cache->nobjs >= min ? 0 : -ENOMEM;
+ 		cache->objects[cache->nobjs++] = obj;
+@@ -1053,7 +1054,7 @@ static int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache,
+ 	if (cache->nobjs >= min)
+ 		return 0;
+ 	while (cache->nobjs < ARRAY_SIZE(cache->objects)) {
+-		page = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
++		page = (void *)__get_free_page(GFP_PGTABLE_USER);
+ 		if (!page)
+ 			return cache->nobjs >= min ? 0 : -ENOMEM;
+ 		cache->objects[cache->nobjs++] = page;
 -- 
 2.18.0
 
