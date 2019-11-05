@@ -2,96 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D223AF0949
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 23:26:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 207C4F0966
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 23:28:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730140AbfKEW0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 17:26:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48796 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729680AbfKEW0k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 17:26:40 -0500
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0078DC057F23
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 22:26:40 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id z5so339974wma.5
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 14:26:39 -0800 (PST)
+        id S1730719AbfKEW1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 17:27:39 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:40832 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730653AbfKEW1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 17:27:25 -0500
+Received: by mail-io1-f67.google.com with SMTP id p6so24601250iod.7
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 14:27:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=N1L5hejAwelBSI6ftPQGE8SHNcJP1/ApWbURo1gX+OY=;
+        b=DgpQ33kNaYbORqi/+Bnvaur9WFdvkj58cHtsUyH2UNC89wce0xXJxYpYoKEcxn08tX
+         Ym09MNBnnSIMmqV5OHjos0qc0O04z/1IPaHZcrfKIhAqso1sYti/SWGAdDbqFYo3Tc15
+         ysFyDkTKZbOZGvS1dfwSuj4u0sd8NVbxOwy/+c8anMezJqO/Q6AjovxWUPRZk2h2LRCh
+         ynBUL3oqU8W8ukHUueg1HDlAQu0MCVDKKkydB+kal1wWF2cwarnGN8sMf3eW/C/9hjyA
+         a3qhqCYdBGdhDSjto5KcDqkwIWwau5+mTLQXwosRo3L5A8l0Th4hzdikr+T5Eno0Yvd2
+         mxSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OzIlqC4IvfN8DuZvjiiv7hFGOZvskq8g+LoumBgxFeo=;
-        b=lm+L+yPjHcRp0QGflZ2VNc82tI5J9mVqFAM7J3KULOZK1eV7ES/8WesXpwBqz6R7I8
-         i9RBHaa56E6O04QMFgOmJsfLUtkgZbBJvdvJ5IondOnt0fnfyuvBK841aYNjq0RyYjCE
-         xbAQkXCZxhabDM23EJgAdg2ToYOvgo/esqfFCD4WKuDUFiga6c8lb/r9POsn16VoQmSa
-         LKf2lbWwQGQ6owPHuqYuC3s9tVUkMit1iuRf9uTUIwEW+TeuXDj0CJLOhOAPfBuLXEbu
-         5M7ReHvRsJIUG34+br6b6DBOBeaXEj9GYtorNKbh/RuVBG+veF3kyZxBaXhJiPxnIiyw
-         Qr2w==
-X-Gm-Message-State: APjAAAVegLRwU+RA3JyurME6dX+6zynQilBg01BHZ4Hpx5QnePGmKsRt
-        SyIGgy+19u+NOc3U2apzsb9sQYOKZI2otTwG2sxjSyUnJi/AzLyD85DciBE40xNQ2B1X41qgyu7
-        k7lFgr4lvlp1B
-X-Received: by 2002:a5d:5591:: with SMTP id i17mr28783712wrv.151.1572992798493;
-        Tue, 05 Nov 2019 14:26:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw4OZ+Lpo2ngMUT/3RbmTOvLaRXzjq3nAcu7llOyQmVes00mcotaieUNdeq8zMDHArIZPV+bg==
-X-Received: by 2002:a5d:5591:: with SMTP id i17mr28783697wrv.151.1572992798200;
-        Tue, 05 Nov 2019 14:26:38 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 62sm26716406wre.38.2019.11.05.14.26.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 14:26:37 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v3 1/2] x86: realmode: save and restore %es
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Bill Wendling <morbo@google.com>, kvm list <kvm@vger.kernel.org>,
-        thuth@redhat.com, alexandru.elisei@arm.com
-References: <20191101203353.150049-1-morbo@google.com>
- <20191101203353.150049-2-morbo@google.com>
- <119b3e09-1907-5c7f-7c47-753ce7effe23@redhat.com>
- <CALMp9eTUgxB5+K-eun-NXKdQbaObBFJDaL6r5=A3myoW4ZH4hA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1f1f35dd-11cc-ca87-10c4-f67a01f1e91c@redhat.com>
-Date:   Tue, 5 Nov 2019 23:26:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=N1L5hejAwelBSI6ftPQGE8SHNcJP1/ApWbURo1gX+OY=;
+        b=Q4wGLHHDUj+c+BrKT1FWmkQ37femNd7rH2AtzT2d/lwkkMhZoyK0SVd3mvk+/aPxcO
+         XcL6EPRTL7VOCl3ilEoE8orb9WNiloEY7P6ByGk9AuLnpCi9YfVidYfBmQ/crdppO98g
+         c/fsqc5eD4M9ZtKYWYEU2Et0MJ3mSaY7I4krtHbhGqGmw8Wl+Gxz15cB3xWxxMHupMq4
+         ODN/nfQiDUBpl9KZZbqo9CDqAdblS+4ODSJ+2KO8o/NPeKoV4s1H1Wnc5PWpeobXaMaq
+         3lhjEyB6LpfM7q2rqJ/+eweCjTMkn4l6Qudb5OLZZ4gB+Thu7nnTz0GAqjDZdj5/pOue
+         kAFw==
+X-Gm-Message-State: APjAAAUehLjk78o2btmxjLIjrIFebnEYzwz21wPYaihF4csN93SV9AXK
+        vskngoBREpUr0WV3Ob3D/Xr0hYuCGmybTBg40z95Dw==
+X-Google-Smtp-Source: APXvYqwfJik91G8T1Zw6oWcsrV2+ViP9skh2XqVaPWIh1V+/j/uuCpPvgPL3QpH+ZWnsRdtkbgO35o8VnExGbhfmE3w=
+X-Received: by 2002:a6b:908a:: with SMTP id s132mr30981149iod.118.1572992844385;
+ Tue, 05 Nov 2019 14:27:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eTUgxB5+K-eun-NXKdQbaObBFJDaL6r5=A3myoW4ZH4hA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191105191910.56505-1-aaronlewis@google.com> <20191105191910.56505-5-aaronlewis@google.com>
+ <E7BEE4C5-F129-43B2-A70C-F7143E8665C9@oracle.com>
+In-Reply-To: <E7BEE4C5-F129-43B2-A70C-F7143E8665C9@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 5 Nov 2019 14:27:13 -0800
+Message-ID: <CALMp9eQ7Z7oVADx+f+2H38=-EDYw-fRqdvOUudRpPXP7ziHCUg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: nVMX: Add support for capturing highest
+ observable L2 TSC
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/19 19:07, Jim Mattson wrote:
-> On Mon, Nov 4, 2019 at 4:08 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 01/11/19 21:33, Bill Wendling wrote:
->>> Some of the code test sequences (e.g. push_es) clobber ES. That causes
->>> trouble for future rep string instructions. So save and restore ES
->>> around the test code sequence in exec_in_big_real_mode.
->>
->> You mean pop_es.  Applied with that change.
-> 
-> I think push_es and pop_es are both guilty of clobbering %es:
-> 
-> MK_INSN(push_es, "mov $0x231, %bx\n\t" //Just write a dummy value to
-> see if it gets overwritten
-> "mov $0x123, %ax\n\t"
-> "mov %ax, %es\n\t"   <======= Here
-> "push %es\n\t"
-> "pop %bx \n\t"
-> );
-> 
-> MK_INSN(pop_es, "push %ax\n\t"
-> "pop %es\n\t"          <======== Here
-> "mov %es, %bx\n\t"
-> );
+On Tue, Nov 5, 2019 at 1:58 PM Liran Alon <liran.alon@oracle.com> wrote:
+>
+>
+>
+> > On 5 Nov 2019, at 21:19, Aaron Lewis <aaronlewis@google.com> wrote:
+> >
+> > The L1 hypervisor may include the IA32_TIME_STAMP_COUNTER MSR in the
+> > vmcs12 MSR VM-exit MSR-store area as a way of determining the highest
+> > TSC value that might have been observed by L2 prior to VM-exit. The
+> > current implementation does not capture a very tight bound on this
+> > value.  To tighten the bound, add the IA32_TIME_STAMP_COUNTER MSR to the
+> > vmcs02 VM-exit MSR-store area whenever it appears in the vmcs12 VM-exit
+> > MSR-store area.  When L0 processes the vmcs12 VM-exit MSR-store area
+> > during the emulation of an L2->L1 VM-exit, special-case the
+> > IA32_TIME_STAMP_COUNTER MSR, using the value stored in the vmcs02
+> > VM-exit MSR-store area to derive the value to be stored in the vmcs12
+> > VM-exit MSR-store area.
+> >
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+>
+> The patch looks correct to me and I had only some minor style comments below.
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
+>
+> I think you may also consider to separate this patch into two:
+> First patch add all framework code without still using it specifically for MSR_IA32_TSC
+> and a second patch to use the framework for MSR_IA32_TSC case.
+>
+> Just out of curiosity, may I ask which L1 hypervisor use this technique that you encountered this issue?
 
-Intel vs AT&T always gets me...
+It's a proprietary type 2 hypervisor that runs on Linux.
 
-Paolo
-
+> -Liran
