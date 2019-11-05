@@ -2,218 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 512EAEFF89
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 15:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB6B4F006B
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 15:57:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389092AbfKEOTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 09:19:06 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56169 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730875AbfKEOTF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 09:19:05 -0500
+        id S2389681AbfKEO5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 09:57:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48336 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2389628AbfKEO5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 09:57:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572963544;
+        s=mimecast20190719; t=1572965827;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lWyqB0TKfXlcDLzUAJzsgjh7obOHr2/IsYDuWicDi+Q=;
-        b=MPLq1nf2XhUDnxvJL2TSXPuQ+C4eimv3xylJl0RrRBabt5xT6YsVppI2T12CpK/QicrXoL
-        Qpfnw0FqAiUGdw45DvZWXc4AAPtOq0qUVAeSvplzG08Y3sPPF2kiMsv3WG+SfhUzLDFylG
-        SEeMfvchP4pytGe7zs4E5/Xq/vkvXfA=
+        bh=lEZHakZ/d1soyr+G6fFBZtfVSOtoyc+a/+kprjYqw1o=;
+        b=LJo/Lmae5ueVpRtxTUbvdXG0TUMEPkKTNFj8qC3x6jAy+F2zgKexO69Btge1f2egoFm/Ax
+        ho28aIM/MtVxc2aLEnVsU06nYuZ6q8murgoVHTJPVv059RX3k4j0YvC28lRu3n8OhPOyRT
+        vZGILjlQsq7tJEzJdYhd8yyg4QhZZKU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-9w6fIKKIPKC3fEeMx0-ORA-1; Tue, 05 Nov 2019 09:19:01 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-74-pODoF3CRNrSfU86NQQcmKg-1; Tue, 05 Nov 2019 09:57:03 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08329107ACC3;
-        Tue,  5 Nov 2019 14:19:00 +0000 (UTC)
-Received: from [10.36.116.43] (ovpn-116-43.ams2.redhat.com [10.36.116.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1DAA60C88;
-        Tue,  5 Nov 2019 14:18:57 +0000 (UTC)
-Subject: Re: [RFC 19/37] KVM: s390: protvirt: Add new gprs location handling
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        cohuck@redhat.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-20-frankja@linux.ibm.com>
- <2eba24a5-063d-1e93-acf0-1153963facfe@redhat.com>
- <8f7a9da4-2a49-9e3f-573e-199cd71fc99c@de.ibm.com>
- <1588a5e9-9bd9-428d-5b05-114a9307ceee@linux.ibm.com>
- <658457c3-398b-7dde-2c6d-073e4d3feac8@redhat.com>
- <6a013d0c-e056-05e4-f9e4-276a0d57b51c@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <3426936a-7a7a-82af-41b2-63095aab5aba@redhat.com>
-Date:   Tue, 5 Nov 2019 15:18:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A272C477;
+        Tue,  5 Nov 2019 14:57:01 +0000 (UTC)
+Received: from mail (ovpn-121-157.rdu2.redhat.com [10.10.121.157])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CE891001DC0;
+        Tue,  5 Nov 2019 14:56:52 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 09:56:51 -0500
+From:   Andrea Arcangeli <aarcange@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Jessica Yu <jeyu@kernel.org>,
+        Matthias Maennich <maennich@google.com>
+Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
+Message-ID: <20191105145651.GD30717@redhat.com>
+References: <20191104230001.27774-1-aarcange@redhat.com>
+ <20191104230001.27774-4-aarcange@redhat.com>
+ <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
+ <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
+ <20191105135414.GA30717@redhat.com>
+ <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6a013d0c-e056-05e4-f9e4-276a0d57b51c@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 9w6fIKKIPKC3fEeMx0-ORA-1
+In-Reply-To: <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: pODoF3CRNrSfU86NQQcmKg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.11.19 15:11, Janosch Frank wrote:
-> On 11/5/19 2:55 PM, David Hildenbrand wrote:
->> On 05.11.19 13:39, Janosch Frank wrote:
->>> On 11/5/19 1:01 PM, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 04.11.19 12:25, David Hildenbrand wrote:
->>>>> On 24.10.19 13:40, Janosch Frank wrote:
->>>>>> Guest registers for protected guests are stored at offset 0x380.
->>>>>>
->>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>> ---
->>>>>>   =C2=A0 arch/s390/include/asm/kvm_host.h |=C2=A0 4 +++-
->>>>>>   =C2=A0 arch/s390/kvm/kvm-s390.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 | 11 +++++++++++
->>>>>>   =C2=A0 2 files changed, 14 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/as=
-m/kvm_host.h
->>>>>> index 0ab309b7bf4c..5deabf9734d9 100644
->>>>>> --- a/arch/s390/include/asm/kvm_host.h
->>>>>> +++ b/arch/s390/include/asm/kvm_host.h
->>>>>> @@ -336,7 +336,9 @@ struct kvm_s390_itdb {
->>>>>>   =C2=A0 struct sie_page {
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_s390_sie_block sie_block=
-;
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct mcck_volatile_info mcck_info=
-;=C2=A0=C2=A0=C2=A0 /* 0x0200 */
->>>>>> -=C2=A0=C2=A0=C2=A0 __u8 reserved218[1000];=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 /* 0x0218 */
->>>>>> +=C2=A0=C2=A0=C2=A0 __u8 reserved218[360];=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 /* 0x0218 */
->>>>>> +=C2=A0=C2=A0=C2=A0 __u64 pv_grregs[16];=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 /* 0x380 */
->>>>>> +=C2=A0=C2=A0=C2=A0 __u8 reserved400[512];
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct kvm_s390_itdb itdb;=C2=A0=C2=
-=A0=C2=A0 /* 0x0600 */
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __u8 reserved700[2304];=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 0x0700 */
->>>>>>   =C2=A0 };
->>>>>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>>>>> index 490fde080107..97d3a81e5074 100644
->>>>>> --- a/arch/s390/kvm/kvm-s390.c
->>>>>> +++ b/arch/s390/kvm/kvm-s390.c
->>>>>> @@ -3965,6 +3965,7 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu=
-, int exit_reason)
->>>>>>   =C2=A0 static int __vcpu_run(struct kvm_vcpu *vcpu)
->>>>>>   =C2=A0 {
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int rc, exit_reason;
->>>>>> +=C2=A0=C2=A0=C2=A0 struct sie_page *sie_page =3D (struct sie_page *=
-)vcpu->arch.sie_block;
->>>>>>   =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * We try to hold kvm->srcu du=
-ring most of vcpu_run (except when run-
->>>>>> @@ -3986,8 +3987,18 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 guest_enter=
-_irqoff();
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __disable_c=
-pu_timer_accounting(vcpu);
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local_irq_e=
-nable();
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_s390_pv_is_prote=
-cted(vcpu->kvm)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-memcpy(sie_page->pv_grregs,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->run->s.regs.gprs,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(sie_page->pv_grregs));
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit_reason=
- =3D sie64a(vcpu->arch.sie_block,
->>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->ru=
-n->s.regs.gprs);
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_s390_pv_is_prote=
-cted(vcpu->kvm)) {
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-memcpy(vcpu->run->s.regs.gprs,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sie_page->pv_grregs,
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(sie_page->pv_grregs));
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>
->>>>> sie64a will load/save gprs 0-13 from to vcpu->run->s.regs.gprs.
->>>>>
->>>>> I would have assume that this is not required for prot virt, because =
-the HW has direct access via the sie block?
->>>>
->>>> Yes, that is correct. The load/save in sie64a is not necessary for pv =
-guests.
->>>>
->>>>>
->>>>>
->>>>> 1. Would it make sense to have a specialized sie64a() (or a parameter=
-, e.g., if you pass in NULL in r3), that optimizes this loading/saving? Eve=
-ntually we can also optimize which host registers to save/restore then.
->>>>
->>>> Having 2 kinds of sie64a seems not very nice for just saving a small n=
-umber of cycles.
->>>>
->>>>>
->>>>> 2. Avoid this copying here. We have to store the state to vcpu->run->=
-s.regs.gprs when returning to user space and restore the state when coming =
-from user space.
->>>>
->>>> I like this proposal better than the first one and
->>
->> It was actually an additional proposal :)
->>
->> 1. avoids unnecessary saving/loading/saving/restoring
->> 2. avoids the two memcpy
->>
->>>>>
->>>>> Also, we access the GPRS from interception handlers, there we might u=
-se wrappers like
->>>>>
->>>>> kvm_s390_set_gprs()
->>>>> kvm_s390_get_gprs()
->>>>
->>>> having register accessors might be useful anyway.
->>>> But I would like to defer that to a later point in time to keep the ch=
-anges in here
->>>> minimal?
->>>>
->>>> We can add a "TODO" comment in here so that we do not forget about thi=
-s
->>>> for a future patch. Makes sense?
->>
->> While it makes sense, I guess one could come up with a patch for 2. in
->> less than 30 minutes ... but yeah, whatever you prefer. ;)
->>
+On Tue, Nov 05, 2019 at 03:09:37PM +0100, Paolo Bonzini wrote:
+> You can reorder patches so that kvm_x86_ops assignments never happen.
+> That way, 4/13 for example would be moved to the very beginning.
+
+Ok 3/13 and 4/14 can both go before 2/13, I reordered them fine, the
+end result at least is the same and the intermediate result should
+improve. Hopefully this is the best solution for those two outliers.
+
+Once this is committed I expect Sean to take over 4/14 with a more
+optimal version to get rid of that branch like he proposed initially.
+
+> >> - look into how to remove the modpost warnings.  A simple (though
+> >> somewhat ugly) way is to keep a kvm.ko module that includes common
+> >> virt/kvm/ code as well as, for x86 only, page_track.o.  A few function=
+s,
+> >> such as kvm_mmu_gfn_disallow_lpage and kvm_mmu_gfn_allow_lpage, would
+> >> have to be moved into mmu.h, but that's not a big deal.
+> >=20
+> > I think we should:
+> >=20
+> > 1) whitelist to shut off the warnings on demand
 >=20
-> Just to get it fully right we'd need to:
-> a. Synchronize registers into/from vcpu run in sync_regs/store_regs
-> b. Sprinkle get/set_gpr(int nr) over most of the files in arch/s390/kvm
+> Do you mean adding a whitelist to modpost?  That would work, though I am
+> not sure if the module maintainer (Jessica Yu) would accept that.
+
+Yes that's exactly what I meant.
+
+> > 2) verify that if two modules are registering the same export symbol
+> >    the second one fails to load and the module code is robust about
+> >    that, this hopefully should already be the case
+> >=20
+> > Provided verification of 2), the whitelist is more efficient than
+> > losing 4k of ram in all KVM hypervisors out there.
 >=20
-> That's your proposal?
+> I agree.
 
-Yes. Patch 1, factor out gprs access. Patch 2, avoid the memcpy by=20
-fixing the gprs access functions and removing the memcpys. (both as=20
-addons to this patch)
+Ok, so I enlarged the CC list accordingly to check how the whitelist
+can be done in modpost.
 
-I guess that should be it ... but maybe we'll stumble over surprises :)
+> >> - provide at least some examples of replacing the NULL kvm_x86_ops
+> >> checks with error codes in the function (or just early "return"s).  I
+> >> can help with the others, but remember that for the patch to be merged=
+,
+> >> kvm_x86_ops must be removed completely.
+> >=20
+> > Even if kvm_x86_ops wouldn't be guaranteed to go away, this would
+> > already provide all the performance benefit to the KVM users, so I
+> > wouldn't see a reason not to apply it even if kvm_x86_ops cannot go
+> > away.
+>=20
+> The answer is maintainability.  My suggestion is that we start looking
+> into removing all assignments and tests of kvm_x86_ops, one step at a
+> time.  Until this is done, unfortunately we won't be able to reap the
+> performance benefit.  But the advantage is that this can be done in many
 
---=20
+There's not much performance benefit left from the removal
+kvm_x86_ops. It'll only remove a few branches at best (and only if we
+don't have to replace the branches on the pointer check with other
+branches on a static variable to disambiguate the different cases).
+
+> separate submissions; it doesn't have to be one huge patch.
+>=20
+> Once this is done, removing kvm_x86_ops is trivial in the end.  It's
+> okay if the intermediate step has minimal performance regressions, we
+> know what it will look like.  I have to order patches with maintenance
+> first and performance second, if possible.
+
+The removal of kvm_x86_ops is just a badly needed code cleanup and of
+course I agree it must happen sooner than later. I'm just trying to
+avoid running into rejects on those further commit cleanups too.
+
+> By the way, we are already planning to make some module parameters
+> per-VM instead of global, so this refactoring would also help that effort=
+.
+>
+> > Said that it will go away and there's no concern about it. It's
+> > just that the patchset seems large enough already and it rejects
+> > heavily already at every port. I simply stopped at the first self
+> > contained step that provides all performance benefits.
+>=20
+> That is good enough to prove the feasibility of the idea, so I agree
+> that was a good plan.
+
+All right, so I'm not exactly sure what's the plan and if it's ok to
+do it over time or if I should go ahead doing all logic changes while
+the big patch remains out of tree.
+
+If you apply it and reorder 4/13 and 3/13 before 2/13 in a rebase like
+I did locally, it should already be good starting point in my view and
+the modpost also can be fixed over time too, the warnings appears
+harmless so far.
 
 Thanks,
-
-David / dhildenb
+Andrea
 
