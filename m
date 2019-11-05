@@ -2,54 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7882FEF8A8
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:27:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FD4DEF96D
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:33:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730686AbfKEJ1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 04:27:11 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32114 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729996AbfKEJ1L (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 04:27:11 -0500
+        id S2387917AbfKEJdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 04:33:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26961 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730693AbfKEJdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 04:33:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572946029;
+        s=mimecast20190719; t=1572946429;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z6oXO+w1kG2LU3Uz4K2Ql0X2btU89ZDyOzedgLPs8ro=;
-        b=LqYHM8R1ku82SmlnrdhQpypcRsUiCPtVUjE86P4oo9UAxqwTiZs1MKDm6qdulE3MhGANDG
-        CHtfM6hvSwPUMaP7cX5OBEJra1g2+3cbvAKFPKgTosiDyb0VzTYyNhJSlVnfKqV435bHJm
-        zY0SflGeFZ3DGj7b/1/4r+UGT7MzwOo=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=E12QQhoLkodtr7tObwU2tg4h6lVPBMRwKLoDjj8IKNc=;
+        b=YM36kONIdLW/acsucHq4hbC3waoVWoIaMlrOxnedoIxZGxP+NZRNPbs4MqIG5EuGZjU1bL
+        0kAcN7QdeBbXT8MbCbYxgW8c6c3FwaiYhjMl7BhrzMEZAZ0dytZOrELHPYkiU8shtpb8uG
+        1Afa/ME8MpcJueW0jfUde2OoLKFNTxc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-Vghasg0SMJqmBL2qRL8mbw-1; Tue, 05 Nov 2019 04:27:08 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-235-AOn84NNqPKWIK3fMNPFBLw-1; Tue, 05 Nov 2019 04:33:45 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB8A28017DD;
-        Tue,  5 Nov 2019 09:27:06 +0000 (UTC)
-Received: from gondolin (unknown [10.36.118.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 297771001B00;
-        Tue,  5 Nov 2019 09:26:56 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 10:26:54 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        gor@linux.ibm.com
-Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
-Message-ID: <20191105102654.223e7b42.cohuck@redhat.com>
-In-Reply-To: <5a34febd-8abc-84f5-195e-43decbb366a5@de.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-3-frankja@linux.ibm.com>
-        <20191104165427.0e5e6da4.cohuck@redhat.com>
-        <5a34febd-8abc-84f5-195e-43decbb366a5@de.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFDCD107ACC2;
+        Tue,  5 Nov 2019 09:33:40 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-252.pek2.redhat.com [10.72.12.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 255BC5C1B2;
+        Tue,  5 Nov 2019 09:32:45 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V8 0/6] mdev based hardware virtio offloading support
+Date:   Tue,  5 Nov 2019 17:32:34 +0800
+Message-Id: <20191105093240.5135-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: Vghasg0SMJqmBL2qRL8mbw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: AOn84NNqPKWIK3fMNPFBLw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -58,144 +66,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 Nov 2019 18:50:12 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Hi all:
 
-> On 04.11.19 16:54, Cornelia Huck wrote:
-> > On Thu, 24 Oct 2019 07:40:24 -0400
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
+There are hardwares that can do virtio datapath offloading while
+having its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-> >> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
-> >> index ed007f4a6444..88cf8825d169 100644
-> >> --- a/arch/s390/boot/uv.c
-> >> +++ b/arch/s390/boot/uv.c
-> >> @@ -3,7 +3,12 @@
-> >>  #include <asm/facility.h>
-> >>  #include <asm/sections.h>
-> >> =20
-> >> +#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-> >>  int __bootdata_preserved(prot_virt_guest);
-> >> +#endif
-> >> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
-> >> +struct uv_info __bootdata_preserved(uv_info);
-> >> +#endif =20
-> >=20
-> > Two functions with the same name, but different signatures look really
-> > ugly.
-> >=20
-> > Also, what happens if I want to build just a single kernel image for
-> > both guest and host? =20
->=20
-> This is not two functions with the same name. It is 2 variable declaratio=
-ns with
-> the __bootdata_preserved helper. We expect to have all distro kernels to =
-enable
-> both.=20
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-Ah ok, I misread that. (I'm blaming lack of sleep :/)
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
->=20
-> >  =20
-> >> =20
-> >>  void uv_query_info(void)
-> >>  {
-> >> @@ -18,7 +23,20 @@ void uv_query_info(void)
-> >>  =09if (uv_call(0, (uint64_t)&uvcb))
-> >>  =09=09return;
-> >> =20
-> >> -=09if (test_bit_inv(BIT_UVC_CMD_SET_SHARED_ACCESS, (unsigned long *)u=
-vcb.inst_calls_list) &&
-> >> +=09if (IS_ENABLED(CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST)) { =
-=20
-> >=20
-> > Do we always have everything needed for a host if uv_call() is
-> > successful? =20
->=20
-> The uv_call is the query call. It will provide the list of features. We c=
-heck that
-> later on.
+Also a real ICF VF driver was also posted here[2] which is a good
+reference for vendors who is interested in their own virtio datapath
+offloading product.
 
-Hm yes. I'm just seeing the guest side check for features, while the
-host code just seems to go ahead and copies things. (later on =3D=3D later
-patches?)
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific parents ops out of the common ones.
 
->=20
-> >  =20
-> >> +=09=09memcpy(uv_info.inst_calls_list, uvcb.inst_calls_list, sizeof(uv=
-_info.inst_calls_list));
-> >> +=09=09uv_info.uv_base_stor_len =3D uvcb.uv_base_stor_len;
-> >> +=09=09uv_info.guest_base_stor_len =3D uvcb.conf_base_phys_stor_len;
-> >> +=09=09uv_info.guest_virt_base_stor_len =3D uvcb.conf_base_virt_stor_l=
-en;
-> >> +=09=09uv_info.guest_virt_var_stor_len =3D uvcb.conf_virt_var_stor_len=
-;
-> >> +=09=09uv_info.guest_cpu_stor_len =3D uvcb.cpu_stor_len;
-> >> +=09=09uv_info.max_sec_stor_addr =3D ALIGN(uvcb.max_guest_stor_addr, P=
-AGE_SIZE);
-> >> +=09=09uv_info.max_num_sec_conf =3D uvcb.max_num_sec_conf;
-> >> +=09=09uv_info.max_guest_cpus =3D uvcb.max_guest_cpus;
-> >> +=09}
-> >> +
-> >> +=09if (IS_ENABLED(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) &&
-> >> +=09    test_bit_inv(BIT_UVC_CMD_SET_SHARED_ACCESS, (unsigned long *)u=
-vcb.inst_calls_list) &&
-> >>  =09    test_bit_inv(BIT_UVC_CMD_REMOVE_SHARED_ACCESS, (unsigned long =
-*)uvcb.inst_calls_list)) =20
-> >=20
-> > Especially as it looks like we need to test for those two commands to
-> > determine whether we have support for a guest.
-> >  =20
-> >>  =09=09prot_virt_guest =3D 1;
-> >>  }
-> >> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> >> index ef3c00b049ab..6db1bc495e67 100644
-> >> --- a/arch/s390/include/asm/uv.h
-> >> +++ b/arch/s390/include/asm/uv.h
-> >> @@ -44,7 +44,19 @@ struct uv_cb_qui {
-> >>  =09struct uv_cb_header header;
-> >>  =09u64 reserved08;
-> >>  =09u64 inst_calls_list[4];
-> >> -=09u64 reserved30[15];
-> >> +=09u64 reserved30[2];
-> >> +=09u64 uv_base_stor_len;
-> >> +=09u64 reserved48;
-> >> +=09u64 conf_base_phys_stor_len;
-> >> +=09u64 conf_base_virt_stor_len;
-> >> +=09u64 conf_virt_var_stor_len;
-> >> +=09u64 cpu_stor_len;
-> >> +=09u32 reserved68[3];
-> >> +=09u32 max_num_sec_conf;
-> >> +=09u64 max_guest_stor_addr;
-> >> +=09u8  reserved80[150-128];
-> >> +=09u16 max_guest_cpus;
-> >> +=09u64 reserved98;
-> >>  } __packed __aligned(8);
-> >> =20
-> >>  struct uv_cb_share {
-> >> @@ -69,9 +81,21 @@ static inline int uv_call(unsigned long r1, unsigne=
-d long r2)
-> >>  =09return cc;
-> >>  }
-> >> =20
-> >> -#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-> >> +struct uv_info {
-> >> +=09unsigned long inst_calls_list[4];
-> >> +=09unsigned long uv_base_stor_len;
-> >> +=09unsigned long guest_base_stor_len;
-> >> +=09unsigned long guest_virt_base_stor_len;
-> >> +=09unsigned long guest_virt_var_stor_len;
-> >> +=09unsigned long guest_cpu_stor_len;
-> >> +=09unsigned long max_sec_stor_addr;
-> >> +=09unsigned int max_num_sec_conf;
-> >> +=09unsigned short max_guest_cpus;
-> >> +}; =20
-> >=20
-> > What is the main difference between uv_info and uv_cb_qui? The
-> > alignment of max_sec_stor_addr? =20
->=20
-> One is the hardware data structure for query, the other one is the Linux
-> internal state.
+Pktgen test was done with virito-net + mvnet loop back device.
 
-That's clear; I'm mainly wondering about what is simply copied vs. what
-needs to be calculated.
+Please review.
+
+[1] https://lkml.org/lkml/2019/10/31/440
+[2] https://lkml.org/lkml/2019/10/15/1226
+
+Changes from V7:
+- drop {set|get}_mdev_features for virtio
+- typo and comment style fixes
+
+Changes from V6:
+
+- rename ops files and compile guard
+
+Changes from V5:
+
+- use dev_warn() instead of WARN(1) when class id is not set
+- validate id_table before trying to do matching between device and
+  driver
+- add wildcard for modpost script
+- use unique name for id_table
+- move get_mdev_features() to be the first member of virtio_device_ops
+  and more comments for it
+- typo fixes for the comments above virtio_mdev_ops
+
+Changes from V4:
+
+- keep mdev_set_class() for the device that doesn't use device ops
+- use union for device ops pointer in mdev_device
+- introduce class specific helper for getting is device ops
+- use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
+- explain details of get_mdev_features() and get_vendor_id()
+- distinguish the optional virito device ops from mandatory ones and
+  make get_generation() optional
+- rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
+  virtio_mdev_ops.h
+- don't abuse version fileds in virtio_mdev structure, use features
+  instead
+- fix warning during device remove
+- style & docs tweaks and typo fixes
+
+Changes from V3:
+
+- document that class id (device ops) must be specified in create()
+- add WARN() when trying to set class_id when it has already set
+- add WARN() when class_id is not specified in create() and correctly
+  return an error in this case
+- correct the prototype of mdev_set_class() in the doc
+- add documention of mdev_set_class()
+- remove the unnecessary "class_id_fail" label when class id is not
+  specified in create()
+- convert id_table in vfio_mdev to const
+- move mdev_set_class and its friends after mdev_uuid()
+- suqash the patch of bus uevent into patch of introducing class id
+- tweak the words in the docs per Cornelia suggestion
+- tie class_id and device ops through class specific initialization
+  routine like mdev_set_vfio_ops()
+- typos fixes in the docs of virtio-mdev callbacks
+- document the usage of virtqueues in struct virtio_mdev_device
+- remove the useless vqs array in struct virtio_mdev_device
+- rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
+
+Changes from V2:
+
+- fail when class_id is not specified
+- drop the vringh patch
+- match the doc to the code
+- tweak the commit log
+- move device_ops from parent to mdev device
+- remove the unused MDEV_ID_VHOST
+
+Changes from V1:
+
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  38 +-
+ MAINTAINERS                                   |   2 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
+ drivers/vfio/mdev/mdev_core.c                 |  60 ++
+ drivers/vfio/mdev/mdev_driver.c               |  25 +
+ drivers/vfio/mdev/mdev_private.h              |   8 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/virtio/Kconfig                        |   7 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 407 +++++++++++
+ include/linux/mdev.h                          |  57 +-
+ include/linux/mdev_vfio_ops.h                 |  52 ++
+ include/linux/mdev_virtio_ops.h               | 149 ++++
+ include/linux/mod_devicetable.h               |   8 +
+ samples/Kconfig                               |   7 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet.c                     | 685 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  11 +
+ 24 files changed, 1577 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/mdev_vfio_ops.h
+ create mode 100644 include/linux/mdev_virtio_ops.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+--=20
+2.19.1
 
