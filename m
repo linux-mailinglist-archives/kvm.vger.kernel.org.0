@@ -2,156 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B952EF863
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:15:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D91AEF879
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:20:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730618AbfKEJPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 04:15:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47932 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730598AbfKEJPv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 04:15:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572945350;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FCD6QGoJF3F+fwV3iJLHrFr6PnYTZpQBq4NvDPTmGUE=;
-        b=ZuhBXdzlvX0EDFk98fcdwihxHqOBt1Hg4miCC1gu4iAn8mHqniJmThwpx+Wmie7Z2MxQHt
-        Wt7dAFk6hV6aY0cGVVplVGd8x0+NKyLACjnywbvUi7JVw8B58FcoFRgjVpmq0XRiXQreCz
-        tzyQGxpeyg6GEWKJRkHYBBxS5CmNgNc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-HO-ATHYPPOmPWoLMM96aAw-1; Tue, 05 Nov 2019 04:15:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E32AF477;
-        Tue,  5 Nov 2019 09:15:44 +0000 (UTC)
-Received: from gondolin (unknown [10.36.118.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C4085D70D;
-        Tue,  5 Nov 2019 09:15:39 +0000 (UTC)
-Date:   Tue, 5 Nov 2019 10:15:36 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com,
-        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
-        gor@linux.ibm.com
-Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
-Message-ID: <20191105101536.7df8f3bb.cohuck@redhat.com>
-In-Reply-To: <2c36b668-e6a7-4497-62da-f2be09350896@redhat.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-10-frankja@linux.ibm.com>
-        <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
-        <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
-        <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
-        <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
-        <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
-        <69ddb6a7-8f69-fbc4-63a4-4f5695117078@de.ibm.com>
-        <1fad0466-1eeb-7d24-8015-98af9b564f74@redhat.com>
-        <8a68fcbb-1dea-414f-7d48-e4647f7985fe@redhat.com>
-        <20191104181743.3792924a.cohuck@redhat.com>
-        <2c36b668-e6a7-4497-62da-f2be09350896@redhat.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: HO-ATHYPPOmPWoLMM96aAw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+        id S1730574AbfKEJUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 04:20:30 -0500
+Received: from mga01.intel.com ([192.55.52.88]:41924 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727093AbfKEJUa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 04:20:30 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 01:20:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,270,1569308400"; 
+   d="scan'208";a="353093772"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+  by orsmga004.jf.intel.com with ESMTP; 05 Nov 2019 01:20:25 -0800
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH] KVM: X86: Dynamically allocating MSR number lists(msrs_to_save[], emulated_msrs[], msr_based_features[])
+Date:   Tue,  5 Nov 2019 17:20:31 +0800
+Message-Id: <20191105092031.8064-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 4 Nov 2019 19:38:27 +0100
-David Hildenbrand <david@redhat.com> wrote:
+The three msr number lists(msrs_to_save[], emulated_msrs[] and
+msr_based_features[]) are global arrays of kvm.ko, which are
+initialized/adjusted (copy supported MSRs forward to override the
+unsupported MSRs) when installing kvm-{intel,amd}.ko, but it doesn't
+reset these three arrays to their initial value when uninstalling
+kvm-{intel,amd}.ko. Thus, at the next installation, kvm-{intel,amd}.ko
+will initialize the modified arrays with some MSRs lost and some MSRs
+duplicated.
 
-> On 04.11.19 18:17, Cornelia Huck wrote:
-> > On Mon, 4 Nov 2019 15:42:11 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >  =20
-> >> On 04.11.19 15:08, David Hildenbrand wrote: =20
-> >>> On 04.11.19 14:58, Christian Borntraeger wrote: =20
+So allocate and initialize these three MSR number lists dynamically when
+installing kvm-{intel,amd}.ko and free them when uninstalling.
 
-> >>>>> How hard would it be to
-> >>>>>
-> >>>>> 1. Detect the error condition
-> >>>>> 2. Try a read on the affected page from the CPU (will will automati=
-cally convert to encrypted/!secure)
-> >>>>> 3. Restart the I/O
-> >>>>>
-> >>>>> I assume that this is a corner case where we don't really have to c=
-are about performance in the first shot. =20
-> >>>>
-> >>>> We have looked into this. You would need to implement this in the lo=
-w level
-> >>>> handler for every I/O. DASD, FCP, PCI based NVME, iscsi. Where do yo=
-u want
-> >>>> to stop? =20
-> >>>
-> >>> If that's the real fix, we should do that. Maybe one can focus on the
-> >>> real use cases first. But I am no I/O expert, so my judgment might be
-> >>> completely wrong.
-> >>>     =20
-> >>
-> >> Oh, and by the way, as discussed you really only have to care about
-> >> accesses via "real" I/O devices (IOW, not via the CPU). When accessing
-> >> via the CPU, you should have automatic conversion back and forth. As I
-> >> am no expert on I/O, I have no idea how iscsi fits into this picture
-> >> here (especially on s390x).
-> >> =20
-> >=20
-> > By "real" I/O devices, you mean things like channel devices, right? (So
-> > everything where you basically hand off control to a different kind of
-> > processor.)
-> >=20
-> > For classic channel I/O (as used by dasd), I'd expect something like
-> > getting a check condition on a ccw if the CU or device cannot access
-> > the memory. You will know how far the channel program has progressed,
-> > and might be able to restart (from the beginning or from that point).
-> > Probably has a chance of working for a subset of channel programs.
+Cc: stable@vger.kernel.org
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+---
+ arch/x86/kvm/x86.c | 86 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 57 insertions(+), 29 deletions(-)
 
-NB that there's more than simple reads/writes... could also be control
-commands, some of which do read/writes as well.
-
-> >=20
-> > For QDIO (as used by FCP), I have no idea how this is could work, as we
-> > have long-running channel programs there and any error basically kills
-> > the queues, which you would have to re-setup from the beginning.
-> >=20
-> > For PCI devices, I have no idea how the instructions even act.
-> >=20
-> >  From my point of view, that error/restart approach looks nice on paper=
-,
-> > but it seems hard to make it work in the general case (and I'm unsure
-> > if it's possible at all.) =20
->=20
-> One thought: If all we do during an I/O request is read or write (or=20
-> even a mixture), can we simply restart the whole I/O again, although we=
-=20
-> did partial reads/writes? This would eliminate the "know how far the=20
-> channel program has progressed". On error, one would have to touch each=
-=20
-> involved page (e.g., try to read first byte to trigger a conversion) and=
-=20
-> restart the I/O. I can understand that this might sound simpler than it=
-=20
-> is (if it is even possible)
-
-Any control commands might have side effects, though. Problems there
-should be uncommon; there's still the _general_ case, though :(
-
-Also, there's stuff like rewriting the channel program w/o prefetch,
-jumping with TIC, etc. Linux probably does not do the former, but at
-least the dasd driver uses NOP/TIC for error recovery.
-
-> and might still be problematic for QDIO as=20
-> far as I understand. Just a thought.
-
-Yes, given that for QDIO, establishing the queues is simply one
-long-running channel program...
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff395f812719..08efcf6351cc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1132,13 +1132,15 @@ EXPORT_SYMBOL_GPL(kvm_rdpmc);
+  * List of msr numbers which we expose to userspace through KVM_GET_MSRS
+  * and KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.
+  *
+- * This list is modified at module load time to reflect the
++ * The three msr number lists(msrs_to_save, emulated_msrs, msr_based_features)
++ * are allocated and initialized at module load time and freed at unload time.
++ * msrs_to_save is selected from the msrs_to_save_all to reflect the
+  * capabilities of the host cpu. This capabilities test skips MSRs that are
+- * kvm-specific. Those are put in emulated_msrs; filtering of emulated_msrs
++ * kvm-specific. Those are put in emulated_msrs_all; filtering of emulated_msrs
+  * may depend on host virtualization features rather than host cpu features.
+  */
+ 
+-static u32 msrs_to_save[] = {
++const u32 msrs_to_save_all[] = {
+ 	MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP, MSR_IA32_SYSENTER_EIP,
+ 	MSR_STAR,
+ #ifdef CONFIG_X86_64
+@@ -1179,9 +1181,10 @@ static u32 msrs_to_save[] = {
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+ };
+ 
++static u32 *msrs_to_save;
+ static unsigned num_msrs_to_save;
+ 
+-static u32 emulated_msrs[] = {
++const u32 emulated_msrs_all[] = {
+ 	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+ 	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+ 	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+@@ -1220,7 +1223,7 @@ static u32 emulated_msrs[] = {
+ 	 * by arch/x86/kvm/vmx/nested.c based on CPUID or other MSRs.
+ 	 * We always support the "true" VMX control MSRs, even if the host
+ 	 * processor does not, so I am putting these registers here rather
+-	 * than in msrs_to_save.
++	 * than in msrs_to_save_all.
+ 	 */
+ 	MSR_IA32_VMX_BASIC,
+ 	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+@@ -1239,13 +1242,14 @@ static u32 emulated_msrs[] = {
+ 	MSR_KVM_POLL_CONTROL,
+ };
+ 
++static u32 *emulated_msrs;
+ static unsigned num_emulated_msrs;
+ 
+ /*
+  * List of msr numbers which are used to expose MSR-based features that
+  * can be used by a hypervisor to validate requested CPU features.
+  */
+-static u32 msr_based_features[] = {
++const u32 msr_based_features_all[] = {
+ 	MSR_IA32_VMX_BASIC,
+ 	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+ 	MSR_IA32_VMX_PINBASED_CTLS,
+@@ -1270,6 +1274,7 @@ static u32 msr_based_features[] = {
+ 	MSR_IA32_ARCH_CAPABILITIES,
+ };
+ 
++static u32 *msr_based_features;
+ static unsigned int num_msr_based_features;
+ 
+ static u64 kvm_get_arch_capabilities(void)
+@@ -3311,11 +3316,11 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 		if (n < msr_list.nmsrs)
+ 			goto out;
+ 		r = -EFAULT;
+-		if (copy_to_user(user_msr_list->indices, &msrs_to_save,
++		if (copy_to_user(user_msr_list->indices, msrs_to_save,
+ 				 num_msrs_to_save * sizeof(u32)))
+ 			goto out;
+ 		if (copy_to_user(user_msr_list->indices + num_msrs_to_save,
+-				 &emulated_msrs,
++				 emulated_msrs,
+ 				 num_emulated_msrs * sizeof(u32)))
+ 			goto out;
+ 		r = 0;
+@@ -3364,7 +3369,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+ 		if (n < msr_list.nmsrs)
+ 			goto out;
+ 		r = -EFAULT;
+-		if (copy_to_user(user_msr_list->indices, &msr_based_features,
++		if (copy_to_user(user_msr_list->indices, msr_based_features,
+ 				 num_msr_based_features * sizeof(u32)))
+ 			goto out;
+ 		r = 0;
+@@ -5086,26 +5091,41 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 	return r;
+ }
+ 
+-static void kvm_init_msr_list(void)
++static int kvm_init_msr_list(void)
+ {
+ 	struct x86_pmu_capability x86_pmu;
+ 	u32 dummy[2];
+ 	unsigned i, j;
+ 
+ 	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
+-			 "Please update the fixed PMCs in msrs_to_save[]");
++			 "Please update the fixed PMCs in msrs_to_saved_all[]");
+ 
+ 	perf_get_x86_pmu_capability(&x86_pmu);
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
+-		if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
++	msrs_to_save = kmalloc(sizeof(msrs_to_save_all),
++							GFP_KERNEL_ACCOUNT);
++	if (!msrs_to_save)
++		return -ENOMEM;
++
++	emulated_msrs = kmalloc(sizeof(emulated_msrs_all),
++							GFP_KERNEL_ACCOUNT);
++	if (!emulated_msrs)
++		goto free_msrs_to_save;
++
++	msr_based_features = kmalloc(sizeof(msr_based_features_all),
++							GFP_KERNEL_ACCOUNT);
++	if (!msr_based_features)
++		goto free_emulated_msrs;
++
++	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save_all); i++) {
++		if (rdmsr_safe(msrs_to_save_all[i], &dummy[0], &dummy[1]) < 0)
+ 			continue;
+ 
+ 		/*
+ 		 * Even MSRs that are valid in the host may not be exposed
+ 		 * to the guests in some cases.
+ 		 */
+-		switch (msrs_to_save[i]) {
++		switch (msrs_to_save_all[i]) {
+ 		case MSR_IA32_BNDCFGS:
+ 			if (!kvm_mpx_supported())
+ 				continue;
+@@ -5133,17 +5153,17 @@ static void kvm_init_msr_list(void)
+ 			break;
+ 		case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B: {
+ 			if (!kvm_x86_ops->pt_supported() ||
+-				msrs_to_save[i] - MSR_IA32_RTIT_ADDR0_A >=
++				msrs_to_save_all[i] - MSR_IA32_RTIT_ADDR0_A >=
+ 				intel_pt_validate_hw_cap(PT_CAP_num_address_ranges) * 2)
+ 				continue;
+ 			break;
+ 		case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
+-			if (msrs_to_save[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
++			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
+ 			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+ 				continue;
+ 			break;
+ 		case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 17:
+-			if (msrs_to_save[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
++			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+ 			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+ 				continue;
+ 		}
+@@ -5151,34 +5171,40 @@ static void kvm_init_msr_list(void)
+ 			break;
+ 		}
+ 
+-		if (j < i)
+-			msrs_to_save[j] = msrs_to_save[i];
++		if (j <= i)
++			msrs_to_save[j] = msrs_to_save_all[i];
+ 		j++;
+ 	}
+ 	num_msrs_to_save = j;
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(emulated_msrs); i++) {
+-		if (!kvm_x86_ops->has_emulated_msr(emulated_msrs[i]))
++	for (i = j = 0; i < ARRAY_SIZE(emulated_msrs_all); i++) {
++		if (!kvm_x86_ops->has_emulated_msr(emulated_msrs_all[i]))
+ 			continue;
+ 
+-		if (j < i)
+-			emulated_msrs[j] = emulated_msrs[i];
++		if (j <= i)
++			emulated_msrs[j] = emulated_msrs_all[i];
+ 		j++;
+ 	}
+ 	num_emulated_msrs = j;
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(msr_based_features); i++) {
++	for (i = j = 0; i < ARRAY_SIZE(msr_based_features_all); i++) {
+ 		struct kvm_msr_entry msr;
+ 
+-		msr.index = msr_based_features[i];
++		msr.index = msr_based_features_all[i];
+ 		if (kvm_get_msr_feature(&msr))
+ 			continue;
+ 
+-		if (j < i)
+-			msr_based_features[j] = msr_based_features[i];
++		if (j <= i)
++			msr_based_features[j] = msr_based_features_all[i];
+ 		j++;
+ 	}
+ 	num_msr_based_features = j;
++	return 0;
++free_emulated_msrs:
++	kfree(emulated_msrs);
++free_msrs_to_save:
++	kfree(msrs_to_save);
++	return -ENOMEM;
+ }
+ 
+ static int vcpu_mmio_write(struct kvm_vcpu *vcpu, gpa_t addr, int len,
+@@ -9294,12 +9320,14 @@ int kvm_arch_hardware_setup(void)
+ 		kvm_default_tsc_scaling_ratio = 1ULL << kvm_tsc_scaling_ratio_frac_bits;
+ 	}
+ 
+-	kvm_init_msr_list();
+-	return 0;
++	return kvm_init_msr_list();
+ }
+ 
+ void kvm_arch_hardware_unsetup(void)
+ {
++	kfree(msr_based_features);
++	kfree(emulated_msrs);
++	kfree(msrs_to_save);
+ 	kvm_x86_ops->hardware_unsetup();
+ }
+ 
+-- 
+2.17.1
 
