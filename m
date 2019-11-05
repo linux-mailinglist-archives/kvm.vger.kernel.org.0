@@ -2,62 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03DC9EFAB2
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 11:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 967A1EFAE6
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 11:23:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388307AbfKEKQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 05:16:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51362 "EHLO mx1.redhat.com"
+        id S2388411AbfKEKWu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 05:22:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56702 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388264AbfKEKQt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 05:16:49 -0500
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        id S2388387AbfKEKWt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 05:22:49 -0500
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3220F85541
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 10:16:48 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id e3so9621765wrs.17
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 02:16:48 -0800 (PST)
+        by mx1.redhat.com (Postfix) with ESMTPS id 59B4481F01
+        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 10:22:48 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id k10so12078714wrl.22
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 02:22:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6YtyP3d7GKpXhJ6iYMKzsdpoIP+eq3/ULbzl9sQyXQs=;
-        b=huMpGoBMo1DxsRJ8TYfqE+ZQNDMLrKeH0EdvCWQqBwz4bD9NvAStyHBke4dpN/HaVL
-         YwkHGapSFMhgJ7J5LkF1h6VFoMjL/wmQAis7Ry8vJHn9zSWfrq6SKW+q3hZA7vFyhtc4
-         bCRvmWl5ZktLJS5USoTc8fAclhjt8Tx4VNBfShEgR0WoUryJThUAqp+dm3fJ/n99eqbE
-         KQ3mGOPc/cEfZw+cC0PlGS5EM9jtybNV9MTU9faIwykgAaD+1d6kDpE5t5EcA9Nloory
-         PhtIEcbg7ECOv3xgyuLlaPs54UmUoJ6zA26pLlXOkBHEIepqqfmT8ZJrcWLfntAWXfgP
-         zkog==
-X-Gm-Message-State: APjAAAVcs5h+F3/3QWqqhHEwie2gIyYWeg8WXJtPrMvHW3prtqyRFZ+a
-        2NPadWSy+eYFSAOjdwSYbsII3uXn0vwyayZxCxwYulSll9suNQxMS3qEqoDGFN7lN2YSkJAWwi6
-        VV7VUWkOeuN9V
-X-Received: by 2002:a7b:c444:: with SMTP id l4mr3340051wmi.21.1572949006663;
-        Tue, 05 Nov 2019 02:16:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxSugFwDORDpXlrwFVvaxhfFpS6c5x8NYGUS1Dg05584PC5BTDigbHHMSor4ZJ+ODtZhvK2dg==
-X-Received: by 2002:a7b:c444:: with SMTP id l4mr3340025wmi.21.1572949006357;
-        Tue, 05 Nov 2019 02:16:46 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id s13sm18919608wmc.28.2019.11.05.02.16.45
+        bh=YBVh0Q0FQpGu1wxG4fQf09T3nf67n77DWG5mfPvNWJI=;
+        b=QlK7ah8XinfTSqdkPb2i8a9TQwMh0bMxFK9SkvUNACmpWxmUYikKNTRKBerUlVlyln
+         Bo86neEdbdbH4rBMLyDChfnWknPAl+Z/dfgQX9Ecbehn3FvP8Ax2GTuGk+q39Q7tHF5Q
+         q07oKfNB3kT0E+zsABxV5Sn1TCD7y5V5jEAOlCsO12oYDQz2P+s1NsEQSg4L/iahzfne
+         +i2nQ6tx1zmvUMv+Cd9xRtNImoQdwUeQ0+gko4dShvtgG3VYiTBEo8sKqbZ2Y9wyF41J
+         jItsjNtUdAiq/RLbNnOLs2AlW8G8SL8XlhG7pVdbpwFLCUV2duNFa0bPAg0q/pzPagrm
+         TsCw==
+X-Gm-Message-State: APjAAAW9RtoCGBlQ2rfd31ApHi+OCaV0OeHjdyuCDcwZtLjTbb0xQIv4
+        3NAcybF8DkYmCjKgWQYfRRHYaJSB8RyUGAnDtpLi8VWOsk7zuWI6SbKtAs3oMoPnaLGLhMSyUe5
+        DGRl6763u68K3
+X-Received: by 2002:adf:f44e:: with SMTP id f14mr26168414wrp.56.1572949366906;
+        Tue, 05 Nov 2019 02:22:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy9SYxmOaejXMxfGfmZ/5V1utDQAFfW554v2shot8/5xTWsThuesqZvWtP731Z0rsryf0sqmA==
+X-Received: by 2002:adf:f44e:: with SMTP id f14mr26168388wrp.56.1572949366567;
+        Tue, 05 Nov 2019 02:22:46 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id w17sm20505631wra.34.2019.11.05.02.22.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 02:16:45 -0800 (PST)
-Subject: Re: [PATCH 07/13] KVM: monolithic: x86: remove __init section prefix
- from kvm_x86_cpu_has_kvm_support
+        Tue, 05 Nov 2019 02:22:46 -0800 (PST)
+Subject: Re: [PATCH 10/13] KVM: x86: optimize more exit handlers in vmx.c
 To:     Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
 References: <20191104230001.27774-1-aarcange@redhat.com>
- <20191104230001.27774-8-aarcange@redhat.com>
+ <20191104230001.27774-11-aarcange@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <232b6fcf-c441-7d85-00a4-43187e3393a6@redhat.com>
-Date:   Tue, 5 Nov 2019 11:16:45 +0100
+Message-ID: <5f512823-531b-6c17-f8f4-f11870e2e4a2@redhat.com>
+Date:   Tue, 5 Nov 2019 11:20:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191104230001.27774-8-aarcange@redhat.com>
+In-Reply-To: <20191104230001.27774-11-aarcange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -67,64 +66,79 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 04/11/19 23:59, Andrea Arcangeli wrote:
-> Adjusts the section prefixes of some KVM x86 code function because
-> with the monolithic KVM model the section checker can now do a more
-> accurate static analysis at build time. This also allows to build
-> without CONFIG_SECTION_MISMATCH_WARN_ONLY=n.
-> 
-> The __init needs to be removed on vmx despite it's only svm calling it
-> from kvm_x86_hardware_enable which is eventually called by
-> hardware_enable_nolock() or there's a (potentially false positive)
-> warning (false positive because this function isn't called in the vmx
-> case). If this isn't needed the right cleanup isn't to put it in the
-> __init section, but to drop it. As long as it's defined in vmx as a
-> kvm_x86 operation, it's expectable that might eventually be called at
-> runtime while hot plugging new CPUs.
+> Eliminate wasteful call/ret non RETPOLINE case and unnecessary fentry
+> dynamic tracing hooking points.
 > 
 > Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
 > ---
->  arch/x86/include/asm/kvm_host.h | 4 ++--
->  arch/x86/kvm/vmx/vmx.c          | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c | 30 +++++-------------------------
+>  1 file changed, 5 insertions(+), 25 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 2b03ec80f6d7..2ddc61fdcd09 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -998,7 +998,7 @@ struct kvm_lapic_irq {
->  	bool msi_redir_hint;
->  };
->  
-> -extern __init int kvm_x86_cpu_has_kvm_support(void);
-> +extern int kvm_x86_cpu_has_kvm_support(void);
->  extern __init int kvm_x86_disabled_by_bios(void);
->  extern int kvm_x86_hardware_enable(void);
->  extern void kvm_x86_hardware_disable(void);
-> @@ -1190,7 +1190,7 @@ extern bool kvm_x86_apic_init_signal_blocked(struct kvm_vcpu *vcpu);
->  extern int kvm_x86_enable_direct_tlbflush(struct kvm_vcpu *vcpu);
->  
->  struct kvm_x86_ops {
-> -	int (*cpu_has_kvm_support)(void);          /* __init */
-> +	int (*cpu_has_kvm_support)(void);
->  	int (*disabled_by_bios)(void);             /* __init */
->  	int (*hardware_enable)(void);
->  	void (*hardware_disable)(void);
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e406707381a4..87e5d7276ea4 100644
+> index 222467b2040e..a6afa5f4a01c 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2178,7 +2178,7 @@ void kvm_x86_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
->  	}
+> @@ -4694,7 +4694,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>  	return 0;
 >  }
 >  
-> -__init int kvm_x86_cpu_has_kvm_support(void)
-> +int kvm_x86_cpu_has_kvm_support(void)
+> -static int handle_external_interrupt(struct kvm_vcpu *vcpu)
+> +static __always_inline int handle_external_interrupt(struct kvm_vcpu *vcpu)
 >  {
->  	return cpu_has_vmx();
+>  	++vcpu->stat.irq_exits;
+>  	return 1;
+> @@ -4965,21 +4965,6 @@ void kvm_x86_set_dr7(struct kvm_vcpu *vcpu, unsigned long val)
+>  	vmcs_writel(GUEST_DR7, val);
 >  }
+>  
+> -static int handle_cpuid(struct kvm_vcpu *vcpu)
+> -{
+> -	return kvm_emulate_cpuid(vcpu);
+> -}
+> -
+> -static int handle_rdmsr(struct kvm_vcpu *vcpu)
+> -{
+> -	return kvm_emulate_rdmsr(vcpu);
+> -}
+> -
+> -static int handle_wrmsr(struct kvm_vcpu *vcpu)
+> -{
+> -	return kvm_emulate_wrmsr(vcpu);
+> -}
+> -
+>  static int handle_tpr_below_threshold(struct kvm_vcpu *vcpu)
+>  {
+>  	kvm_apic_update_ppr(vcpu);
+> @@ -4996,11 +4981,6 @@ static int handle_interrupt_window(struct kvm_vcpu *vcpu)
+>  	return 1;
+>  }
+>  
+> -static int handle_halt(struct kvm_vcpu *vcpu)
+> -{
+> -	return kvm_emulate_halt(vcpu);
+> -}
+> -
+>  static int handle_vmcall(struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_emulate_hypercall(vcpu);
+> @@ -5548,11 +5528,11 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>  	[EXIT_REASON_IO_INSTRUCTION]          = handle_io,
+>  	[EXIT_REASON_CR_ACCESS]               = handle_cr,
+>  	[EXIT_REASON_DR_ACCESS]               = handle_dr,
+> -	[EXIT_REASON_CPUID]                   = handle_cpuid,
+> -	[EXIT_REASON_MSR_READ]                = handle_rdmsr,
+> -	[EXIT_REASON_MSR_WRITE]               = handle_wrmsr,
+> +	[EXIT_REASON_CPUID]                   = kvm_emulate_cpuid,
+> +	[EXIT_REASON_MSR_READ]                = kvm_emulate_rdmsr,
+> +	[EXIT_REASON_MSR_WRITE]               = kvm_emulate_wrmsr,
+>  	[EXIT_REASON_PENDING_INTERRUPT]       = handle_interrupt_window,
+> -	[EXIT_REASON_HLT]                     = handle_halt,
+> +	[EXIT_REASON_HLT]                     = kvm_emulate_halt,
+>  	[EXIT_REASON_INVD]		      = handle_invd,
+>  	[EXIT_REASON_INVLPG]		      = handle_invlpg,
+>  	[EXIT_REASON_RDPMC]                   = handle_rdpmc,
 > 
 
-I think we should eliminate all the complications in cpu_has_svm(), so
-that svm_hardware_enable can use it.  I'll post a patch.
+Queued, thanks.
 
 Paolo
