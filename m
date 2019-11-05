@@ -2,47 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A422EF2EE
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 02:44:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 237E9EF2FF
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 02:48:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729823AbfKEBny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 20:43:54 -0500
-Received: from mail-eopbgr680047.outbound.protection.outlook.com ([40.107.68.47]:36966
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+        id S1729987AbfKEBr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 20:47:56 -0500
+Received: from mail-eopbgr790050.outbound.protection.outlook.com ([40.107.79.50]:60373
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728987AbfKEBnx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 20:43:53 -0500
+        id S1728987AbfKEBrz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 20:47:55 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LhPIqeh3DfMDsSklT6DZQLkv//RXn0M7FM62sWP3Uolwz7ITlGeheSnsccSlFQHGBTHhbCoGSB0r+tDUTp1mqTZ4Rj4zpukfXq9WYz4dodU0kRFrzebkTqGV7LeuQI/yccgTblRYfsFS1DV+/fxYMIqi9s98Qc3FePi0MBgCFotvwSgNpHi0bkaYwmBBr601TLOa++bZi6wkpbfdGH7yPkqleBQnDOyBBPVdg2ScVIswp6fASW2e9t/oGjy0kRy5WjEH+ZGl+SoDNs4mMIMy/hqS1Ib6ldTWyhl1ovy+tx92YPtybN4gmaxWhzVPTobUzycnQVa4nZdNtxNdJiBncg==
+ b=VS8GdFyTMmdN1uoEBid9ZfFnA3D6X4qu8ICBMrDBVEeOf+i5BBA1RhU84lxRi3YusZoK0St2hBYWG12n53V1cfHjumoG2O4GHBWlS/K0DrkBrdbf/sGwJf33kePW9DP6BrOQQuutnVuEvFhQaFM5CBrknFQ99YSF4eZAxMaIBL2V513aPGMnjO6tWAkT/tcbsiYC0JW5XU081PB2FVE82OkRgI4LBYRkbdLVMz7knQb5p77cPXyC7aRj8MekFKvEOPhwrdnvB0OpxKBeGKJCthcwACK42jAKEEnRiMGptikap1CbrRmrfQ2XqgGYEMmFzQtf11iyiL9yBy/ydKxSZg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jPVoCDG2IiT6up052c1p+MnX/feFXoKzmV27jwwOnCs=;
- b=gH4Ih5I2BEad1vvUZVZtSu9iRZnHRR+mPy1vnce01NDb2s5cdO+xNueJbQRLuRXMQTWQF5ofPHipAn8+uKzAFdL+clQvM4AWZoDyx3ZNaJZlN5TXXDHj8et8g/iF0SfLfzn9qGQWZLKWrX1EFnnnSEzHCdQd+gB6/OP3NvhnH/ilPG2zGVzYiDjITpI1lky/p6heMneCV+NcB6YgxG/pqklTc/EM1bVxGlx12cWgrvxYq0QdOqO2tU1mVVR1lj0Jmo0hNLWYK3s33Vf1hrjY8ztsYEopziWzV6XoG22b1bUAf6qtjaJw9llqC5o0swwIy6L0AKRrBkrvEjh71SNP5A==
+ bh=H5qmlbrJB5LhBxfZttqmf9adn0itvRN+X8QjliwTl5A=;
+ b=DescLQCRv919EZl0Q96VC5GThf8sjV+EuX52dh5sZOm9ZFKepEYzLRqrEfvps5t5knKUzjLjHWCyFq+ZGnf5boxTf8gKy/Y6Xk30ViO3/QUradIB8lTw+6Gh4Jk1UMPQcr0lzL6OTl4Erx5qvTFyhN7oBsQaDdVPo92MqzW+cpTClHDgUCpVnWI6l5ytygxo7Q0FxH1A44RBSCQe1+2iP7xTWGaU5ep2dCg5RNs152WmhE/bESmRXcIM0yKxLvs86yvptskOIoTA8+/pODtfolJTjqSn7M9LImkLPkFWkeH2yvTSALSR9viVqFjo6eaE1g/fcsHWSt/2o1Vka2gDrg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jPVoCDG2IiT6up052c1p+MnX/feFXoKzmV27jwwOnCs=;
- b=ku4oNAwB5NUBv/K2rC4W3rZKEb7+QKMZSVtwqc2SNOKVSnx6PnvsP0KsLxgyBRp67CzUtyOM5X9UNOfrnlqE0MP+OYDXkfyoONCR9cR9Pu+7aSveiZtxeTEqHjPzEi8uzqTpuCRzGu7aaVWlzuKN8A4yKVLx+605fql7K429bwc=
+ bh=H5qmlbrJB5LhBxfZttqmf9adn0itvRN+X8QjliwTl5A=;
+ b=Ax/1K9LtOZxBSTnBm2JXROPcnuEPct0BvzfHpBixKJaf445kWDJPGDtnMgUJ+ZAnf/wYHi9voE7EVQ39up6MFGKveJYFD0eUXC9i+yZNhCRApQ+7f6LIqbT7dly4+tjgGeO6F08Tig45R0uMB5uEmY/hsPbN851UR5dsktu8zpA=
 Received: from DM5PR12MB2471.namprd12.prod.outlook.com (52.132.141.138) by
  DM5PR12MB1484.namprd12.prod.outlook.com (10.172.40.138) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Tue, 5 Nov 2019 01:43:09 +0000
+ 15.20.2408.24; Tue, 5 Nov 2019 01:47:52 +0000
 Received: from DM5PR12MB2471.namprd12.prod.outlook.com
  ([fe80::c5a3:6a2e:8699:1999]) by DM5PR12MB2471.namprd12.prod.outlook.com
  ([fe80::c5a3:6a2e:8699:1999%6]) with mapi id 15.20.2408.024; Tue, 5 Nov 2019
- 01:43:09 +0000
+ 01:47:52 +0000
 From:   "Moger, Babu" <Babu.Moger@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         "wanpengli@tencent.com" <wanpengli@tencent.com>,
         "jmattson@google.com" <jmattson@google.com>,
@@ -56,12 +55,12 @@ CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Subject: RE: [PATCH v2] x86/Kconfig: Rename UMIP config parameter
 Thread-Topic: [PATCH v2] x86/Kconfig: Rename UMIP config parameter
-Thread-Index: AQHVk1GLQf345nN80kenPnepADNDDqd7jEsAgABBiYA=
-Date:   Tue, 5 Nov 2019 01:43:09 +0000
-Message-ID: <DM5PR12MB2471E24B40B96E3863B69955957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+Thread-Index: AQHVk1GLQf345nN80kenPnepADNDDqd7jKeAgABB91A=
+Date:   Tue, 5 Nov 2019 01:47:52 +0000
+Message-ID: <DM5PR12MB2471206F9EC8E443B00E6B36957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
 References: <157290058655.2477.5193340480187879024.stgit@naples-babu.amd.com>
- <20191104214734.GB7862@zn.tnic>
-In-Reply-To: <20191104214734.GB7862@zn.tnic>
+ <20191104214851.GD5960@linux.intel.com>
+In-Reply-To: <20191104214851.GD5960@linux.intel.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -71,71 +70,164 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [2600:1700:270:e9d0:3c89:875f:4410:7d2c]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 506033a6-7ec6-40a2-f153-08d761918312
+x-ms-office365-filtering-correlation-id: 95422326-c629-485b-cd48-08d761922c18
 x-ms-traffictypediagnostic: DM5PR12MB1484:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <DM5PR12MB1484A27F4D09C4704FD82631957E0@DM5PR12MB1484.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-microsoft-antispam-prvs: <DM5PR12MB14843D99F8116AEA2D480EDD957E0@DM5PR12MB1484.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 0212BDE3BE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(189003)(199004)(13464003)(55016002)(76176011)(7416002)(71200400001)(53546011)(476003)(76116006)(99286004)(66476007)(6436002)(46003)(102836004)(5660300002)(6246003)(9686003)(229853002)(54906003)(316002)(6506007)(6306002)(7696005)(52536014)(8676002)(66946007)(81156014)(81166006)(186003)(8936002)(478600001)(305945005)(66446008)(966005)(6116002)(6916009)(64756008)(66556008)(486006)(14454004)(7736002)(74316002)(446003)(86362001)(11346002)(25786009)(256004)(33656002)(4326008)(14444005)(71190400001)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1484;H:DM5PR12MB2471.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(189003)(199004)(13464003)(55016002)(76176011)(7416002)(71200400001)(53546011)(476003)(76116006)(99286004)(66476007)(6436002)(46003)(102836004)(5660300002)(6246003)(9686003)(229853002)(54906003)(316002)(6506007)(7696005)(52536014)(8676002)(66946007)(81156014)(81166006)(186003)(8936002)(478600001)(305945005)(66446008)(6116002)(6916009)(64756008)(66556008)(486006)(14454004)(7736002)(74316002)(446003)(86362001)(11346002)(25786009)(256004)(33656002)(4326008)(14444005)(71190400001)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1484;H:DM5PR12MB2471.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kOZ18tG7ETmvlBRqf9/nQSxdnzKHD7I1T/B4CfytFpqLwMxklWq1HeS062lX1kmiqjs4meiB+ZTKNxv1ZkxXwcKC0qFbkNOb/oVZ5+sODvDKB12bTLLTDPNsft5btPnTKSvl3xdzS/zbHHOga3GJzTaNgSHFVi4BFS9Gz+ykQtA62E2SZ9MsogY5fGCh3vzYtjaIuUdZ9unFkbRXmTSGaaOvXByM8K9w0Tq88WK8+BfMXuh0rc0K+UJR+DsVR0bP8EWvAVrC0w3nbPmJ1omDKPZ5ohDOVrEcBHKnAN1Aj9xQeVIKu9NA8DGT42ANe50W6Vho3CUQjd36RKQYIWQQ3T1baOUafzB4PftUETxQ0r/VbE5mqlp9QWctUxSL5tBd1E9TIsFTGA8gwKxfrnFj1t9mXOmEML+YgklYOv1ZDqmzG/ZYb88zb7yvkpW+UOtzI31AshUfPWONx4WUPcD3iRGErmx3ub94Gn1iYMiZwWM=
+x-microsoft-antispam-message-info: Dlf8Cc6AtY6kby5J8sVmoGfSfIX4nVLNCe78FvVdi8l3KHc5C9P9opdq9eoUbIi/m1BFKkTF/UoCFmHMQeSjn8oqy5HTDYycKhrcw1LL9b3lGW/KaoDzWhhGd3eyv/ZotkqNuGwu+2WNUeilMiMskj7lX9i63w5+uqaUrxL9eT+2tbNIWlLhCmNynpcyqNDqgOhZuSAqmvAe6iVSvzLZ66K3zYBt53ST0VzOHoN1V0igOgWrazkaEvQTAdYOg87RcRk+KJOkCZtzTy0Hne7mncop9gQ3T1YA5auBfA9sdbcUSxhBq02lyJWHBZ39k06LFW6SiiJU20OVWQYIgTSbVHLuionFXT8oOnVIf5fPEChcxdQ1TCkOC9XTF7dCv8+UCU4lnN3PXxi0tuwb6MkizZPlVfQNgdD74Sk6ip9UfP0zyHJwbo+QAp0RU3FA0Diu
 x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 506033a6-7ec6-40a2-f153-08d761918312
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2019 01:43:09.2084
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95422326-c629-485b-cd48-08d761922c18
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2019 01:47:52.6598
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qx5rAHvbTYtmQ5AU973RciAVtYaTnk2DqmCdRgQH68q3v2G3BRvDp/Oy1HnRR4GZ
+X-MS-Exchange-CrossTenant-userprincipalname: CsUhnfUpBzxnqoTgWy2SW58agXkOkCCTYrQq+bW1vhMsrZDEwHH+2UAMVjf2BDVC
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1484
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQm9yaXNsYXYgUGV0a292
-IDxicEBhbGllbjguZGU+DQo+IFNlbnQ6IE1vbmRheSwgTm92ZW1iZXIgNCwgMjAxOSAzOjQ4IFBN
-DQo+IFRvOiBNb2dlciwgQmFidSA8QmFidS5Nb2dlckBhbWQuY29tPg0KPiBDYzogdGdseEBsaW51
-dHJvbml4LmRlOyBtaW5nb0ByZWRoYXQuY29tOyBocGFAenl0b3IuY29tOw0KPiBwYm9uemluaUBy
-ZWRoYXQuY29tOyBya3JjbWFyQHJlZGhhdC5jb207IHNlYW4uai5jaHJpc3RvcGhlcnNvbkBpbnRl
-bC5jb207DQo+IHZrdXpuZXRzQHJlZGhhdC5jb207IHdhbnBlbmdsaUB0ZW5jZW50LmNvbTsgam1h
-dHRzb25AZ29vZ2xlLmNvbTsNCj4geDg2QGtlcm5lbC5vcmc7IGpvcm9AOGJ5dGVzLm9yZzsgbHV0
-b0BrZXJuZWwub3JnOyB6b2hhckBsaW51eC5pYm0uY29tOw0KPiB5YW1hZGEubWFzYWhpcm9Ac29j
-aW9uZXh0LmNvbTsgbmF5bmFAbGludXguaWJtLmNvbTsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtl
-cm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2Ml0g
-eDg2L0tjb25maWc6IFJlbmFtZSBVTUlQIGNvbmZpZyBwYXJhbWV0ZXINCj4gDQo+IE9uIE1vbiwg
-Tm92IDA0LCAyMDE5IGF0IDA4OjUwOjUxUE0gKzAwMDAsIE1vZ2VyLCBCYWJ1IHdyb3RlOg0KPiA+
-IEFNRCAybmQgZ2VuZXJhdGlvbiBFUFlDIHByb2Nlc3NvcnMgc3VwcG9ydCB0aGUgVU1JUCAoVXNl
-ci1Nb2RlDQo+ID4gSW5zdHJ1Y3Rpb24gUHJldmVudGlvbikgZmVhdHVyZS4gU28sIHJlbmFtZSBY
-ODZfSU5URUxfVU1JUCB0bw0KPiA+IGdlbmVyaWMgWDg2X1VNSVAgYW5kIG1vZGlmeSB0aGUgdGV4
-dCB0byBjb3ZlciBib3RoIEludGVsIGFuZCBBTUQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBC
-YWJ1IE1vZ2VyIDxiYWJ1Lm1vZ2VyQGFtZC5jb20+DQo+ID4gLS0tDQo+ID4gdjI6DQo+ID4gICBM
-ZWFybmVkIHRoYXQgZm9yIHRoZSBoYXJkd2FyZSB0aGF0IHN1cHBvcnQgVU1JUCwgd2UgZG9udCBu
-ZWVkIHRvDQo+ID4gICBlbXVsYXRlLiBSZW1vdmVkIHRoZSBlbXVsYXRpb24gcmVsYXRlZCBjb2Rl
-IGFuZCBqdXN0IHN1Ym1pdHRpbmcNCj4gPiAgIHRoZSBjb25maWcgY2hhbmdlcy4NCj4gPg0KPiA+
-ICBhcmNoL3g4Ni9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAgOCArKysrLS0t
-LQ0KPiA+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9kaXNhYmxlZC1mZWF0dXJlcy5oIHwgICAgMiAr
-LQ0KPiA+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS91bWlwLmggICAgICAgICAgICAgIHwgICAgNCAr
-Ky0tDQo+ID4gIGFyY2gveDg2L2tlcm5lbC9NYWtlZmlsZSAgICAgICAgICAgICAgICAgfCAgICAy
-ICstDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygt
-KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L0tjb25maWcgYi9hcmNoL3g4Ni9LY29u
-ZmlnDQo+ID4gaW5kZXggZDZlMWZhYTI4YzU4Li44MjFiN2NlYmZmMzEgMTAwNjQ0DQo+ID4gLS0t
-IGEvYXJjaC94ODYvS2NvbmZpZw0KPiA+ICsrKyBiL2FyY2gveDg2L0tjb25maWcNCj4gPiBAQCAt
-MTg4MCwxMyArMTg4MCwxMyBAQCBjb25maWcgWDg2X1NNQVANCj4gPg0KPiA+ICAJICBJZiB1bnN1
-cmUsIHNheSBZLg0KPiA+DQo+ID4gLWNvbmZpZyBYODZfSU5URUxfVU1JUA0KPiA+ICtjb25maWcg
-WDg2X1VNSVANCj4gPiAgCWRlZl9ib29sIHkNCj4gPiAtCWRlcGVuZHMgb24gQ1BVX1NVUF9JTlRF
-TA0KPiA+IC0JcHJvbXB0ICJJbnRlbCBVc2VyIE1vZGUgSW5zdHJ1Y3Rpb24gUHJldmVudGlvbiIg
-aWYgRVhQRVJUDQo+ID4gKwlkZXBlbmRzIG9uIFg4NiAmJiAoQ1BVX1NVUF9JTlRFTCB8fCBDUFVf
-U1VQX0FNRCkNCj4gCQkgICBeXl4NCj4gDQo+IFdoYXQncyB0aGUgZGVwZW5kZW5jeSBvbiBYODYg
-Zm9yPw0KPiANCj4gQXJlbid0IHRoZSBDUFVfU1VQXyogdGhpbmdzIGVub3VnaD8NCg0KWWVzLiBJ
-dCBzaG91bGQgYmUgZ29vZCBlbm91Z2guIFdpbGwgdXBkYXRlLg0KPiANCj4gLS0NCj4gUmVnYXJk
-cy9HcnVzcywNCj4gICAgIEJvcmlzLg0KPiANCj4gaHR0cHM6Ly9wZW9wbGUua2VybmVsLm9yZy90
-Z2x4L25vdGVzLWFib3V0LW5ldGlxdWV0dGUNCg==
+
+
+> -----Original Message-----
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> Sent: Monday, November 4, 2019 3:49 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: tglx@linutronix.de; mingo@redhat.com; bp@alien8.de; hpa@zytor.com;
+> pbonzini@redhat.com; rkrcmar@redhat.com; vkuznets@redhat.com;
+> wanpengli@tencent.com; jmattson@google.com; x86@kernel.org;
+> joro@8bytes.org; luto@kernel.org; zohar@linux.ibm.com;
+> yamada.masahiro@socionext.com; nayna@linux.ibm.com; linux-
+> kernel@vger.kernel.org; kvm@vger.kernel.org
+> Subject: Re: [PATCH v2] x86/Kconfig: Rename UMIP config parameter
+>=20
+> On Mon, Nov 04, 2019 at 08:50:51PM +0000, Moger, Babu wrote:
+> > AMD 2nd generation EPYC processors support the UMIP (User-Mode
+> > Instruction Prevention) feature. So, rename X86_INTEL_UMIP to
+> > generic X86_UMIP and modify the text to cover both Intel and AMD.
+>=20
+> There's a similar comment in the umip.c documentation that needs to be
+> updated, and a grammatical error that can be opportunistically fixed, i.e=
+.
+>=20
+>  * The feature User-Mode Instruction Prevention present in recent Intel
+>  * processor
+>=20
+> to
+>=20
+>  * The feature User-Mode Instruction Prevention present in recent x86
+>  * processors
+>=20
+Sure.
+>=20
+> IMO, the whole opening paragraph of the umip.c docs is weirdly worded and
+> could be rewritten to something similar to the Kconfig help text, e.g.
+>=20
+>  * User-Mode Instruction Prevention is a security feature present in rece=
+nt x86
+>  * processors that, when enabled, prevents a group of instructions (SGDT,=
+ SIDT,
+>  * SLDT, SMSW and STR) from being run in user mode by issuing a general
+>  * protection fault if the instruction is executed with CPL > 0.
+
+Sure. Will update it. Will add as patch #2 as this is separate from config =
+file.
+
+>=20
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > ---
+> > v2:
+> >   Learned that for the hardware that support UMIP, we dont need to
+> >   emulate. Removed the emulation related code and just submitting
+> >   the config changes.
+> >
+> >  arch/x86/Kconfig                         |    8 ++++----
+> >  arch/x86/include/asm/disabled-features.h |    2 +-
+> >  arch/x86/include/asm/umip.h              |    4 ++--
+> >  arch/x86/kernel/Makefile                 |    2 +-
+> >  4 files changed, 8 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> > index d6e1faa28c58..821b7cebff31 100644
+> > --- a/arch/x86/Kconfig
+> > +++ b/arch/x86/Kconfig
+> > @@ -1880,13 +1880,13 @@ config X86_SMAP
+> >
+> >  	  If unsure, say Y.
+> >
+> > -config X86_INTEL_UMIP
+> > +config X86_UMIP
+> >  	def_bool y
+> > -	depends on CPU_SUP_INTEL
+> > -	prompt "Intel User Mode Instruction Prevention" if EXPERT
+> > +	depends on X86 && (CPU_SUP_INTEL || CPU_SUP_AMD)
+> > +	prompt "User Mode Instruction Prevention" if EXPERT
+> >  	---help---
+> >  	  The User Mode Instruction Prevention (UMIP) is a security
+>=20
+> Maybe opportunistically drop "The"?
+Sure.
+>=20
+> > -	  feature in newer Intel processors. If enabled, a general
+> > +	  feature in newer x86 processors. If enabled, a general
+> >  	  protection fault is issued if the SGDT, SLDT, SIDT, SMSW
+> >  	  or STR instructions are executed in user mode. These instructions
+> >  	  unnecessarily expose information about the hardware state.
+> > diff --git a/arch/x86/include/asm/disabled-features.h
+> b/arch/x86/include/asm/disabled-features.h
+> > index a5ea841cc6d2..8e1d0bb46361 100644
+> > --- a/arch/x86/include/asm/disabled-features.h
+> > +++ b/arch/x86/include/asm/disabled-features.h
+> > @@ -22,7 +22,7 @@
+> >  # define DISABLE_SMAP	(1<<(X86_FEATURE_SMAP & 31))
+> >  #endif
+> >
+> > -#ifdef CONFIG_X86_INTEL_UMIP
+> > +#ifdef CONFIG_X86_UMIP
+> >  # define DISABLE_UMIP	0
+> >  #else
+> >  # define DISABLE_UMIP	(1<<(X86_FEATURE_UMIP & 31))
+> > diff --git a/arch/x86/include/asm/umip.h b/arch/x86/include/asm/umip.h
+> > index db43f2a0d92c..aeed98c3c9e1 100644
+> > --- a/arch/x86/include/asm/umip.h
+> > +++ b/arch/x86/include/asm/umip.h
+> > @@ -4,9 +4,9 @@
+> >  #include <linux/types.h>
+> >  #include <asm/ptrace.h>
+> >
+> > -#ifdef CONFIG_X86_INTEL_UMIP
+> > +#ifdef CONFIG_X86_UMIP
+> >  bool fixup_umip_exception(struct pt_regs *regs);
+> >  #else
+> >  static inline bool fixup_umip_exception(struct pt_regs *regs) { return=
+ false; }
+> > -#endif  /* CONFIG_X86_INTEL_UMIP */
+> > +#endif  /* CONFIG_X86_UMIP */
+> >  #endif  /* _ASM_X86_UMIP_H */
+> > diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+> > index 3578ad248bc9..52ce1e239525 100644
+> > --- a/arch/x86/kernel/Makefile
+> > +++ b/arch/x86/kernel/Makefile
+> > @@ -134,7 +134,7 @@ obj-$(CONFIG_EFI)			+=3D sysfb_efi.o
+> >  obj-$(CONFIG_PERF_EVENTS)		+=3D perf_regs.o
+> >  obj-$(CONFIG_TRACING)			+=3D tracepoint.o
+> >  obj-$(CONFIG_SCHED_MC_PRIO)		+=3D itmt.o
+> > -obj-$(CONFIG_X86_INTEL_UMIP)		+=3D umip.o
+> > +obj-$(CONFIG_X86_UMIP)			+=3D umip.o
+> >
+> >  obj-$(CONFIG_UNWINDER_ORC)		+=3D unwind_orc.o
+> >  obj-$(CONFIG_UNWINDER_FRAME_POINTER)	+=3D unwind_frame.o
+> >
