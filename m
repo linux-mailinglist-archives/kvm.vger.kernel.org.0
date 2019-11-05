@@ -2,152 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09541EF380
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 03:32:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6EAFEF3EB
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 04:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730439AbfKECcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 21:32:39 -0500
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:38843 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730416AbfKECci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 21:32:38 -0500
-Received: by mail-qt1-f194.google.com with SMTP id p20so8943265qtq.5
-        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 18:32:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
-        b=RrEUUprScGGCs1P3lOuGj4a5RoiWbVbfDZ4+HpgRvyTXCYVlJAXQB+MYamRZtedVHY
-         f5+sxNxk2K5wkp7PjMMeD8HJWFAJHo3RtLYXlCrUl00LuH1GNIO+43+qB9VoRPGoMtd2
-         MhxxJSrVmcyNdw2dcAOft+ieDHmjkqcbx3xo51HlgztpG3sVxpkHZVlG9m+fgORfqdhb
-         XySrfwIPRDIjnSUQNZ9F7DSfvHrKSEQZxN/D+pZKoiFoN1H+0mMnDQ/zYc1NegbKO5Qw
-         fR/889wgnwS9AagFL4h4X1w9N0H+8w+Cg8HTo2zBy3ABWuxHxMoo0KJgJWvcNzShW5B1
-         QLlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
-        b=Ewh+VVQc6m1FV7qUavJYmuGUmUFZ2AXEoj5IgAxzb23WlFcG8FdPluXTHLn4SGvtFK
-         UfFfJtAUDOowHYtXJb0SBLMWBFl+Xi71K9ybMEdSGAPF4V3o0d6xf3/E2mWZJxf5X6Wq
-         IFMxLwjIHx2LwBUt9E6cd8wG8SWWmqOkYdFWE5mdC37aXkYS5uVknDlkrDMSV7tNNBTA
-         TLac7w+n9mmgIdGQlkH13ojnpxTROuANOyvlAt6tD0Jo21CoH37t2ArWY+maI1lTFwYy
-         d0RwoUAJYlkd9kQQvmZcwlWUMgjT8REfHLOXocTab54MNu54WxEqKAos+cZbeAkmvRHh
-         Yorg==
-X-Gm-Message-State: APjAAAXTuiphs/7gr0qfu5Nvrzd9IzM/V2340rYdodHgg8TFMQjaLhB5
-        OZA3CsA7O1dA4Xhrd5kYAcDUoQ==
-X-Google-Smtp-Source: APXvYqzymmufBg1PiSWGxkk4f7LXgsvyOrzTuuRBB+uFmwh9UO+iQP682ubsI0h94l7eDVroneUqZg==
-X-Received: by 2002:a0c:9838:: with SMTP id c53mr25556531qvd.250.1572921156814;
-        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id t65sm8907102qkh.23.2019.11.04.18.32.36
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iRoe3-0002uH-K9; Mon, 04 Nov 2019 22:32:35 -0400
-Date:   Mon, 4 Nov 2019 22:32:35 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 07/18] infiniband: set FOLL_PIN, FOLL_LONGTERM via
- pin_longterm_pages*()
-Message-ID: <20191105023235.GA11093@ziepe.ca>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-8-jhubbard@nvidia.com>
- <20191104203346.GF30938@ziepe.ca>
- <578c1760-7221-4961-9f7d-c07c22e5c259@nvidia.com>
- <20191104205738.GH30938@ziepe.ca>
- <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
+        id S1730302AbfKEDSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 22:18:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38146 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730176AbfKEDSO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Nov 2019 22:18:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572923892;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kWoXCWgC74qwKyM0/t+PNexMRUtw6/VHE8jdEP5dslk=;
+        b=KDsXTxgbgoC9VEQIGtDVyoAx6PuVs3GPeaAa8SqI0MI1wHfNcGjyvQqaCEB886n/k7iZhO
+        WHJqK1R0mQuVXljcQ9EJhJ3hlL7fURFUx2JdE2u4lkxbqXMTpQIqIH6qvTx1AUoluHh8a/
+        UP+QDWuO/M+fQOOaHvz0BqiFpD1qvrM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-398-lTxSoeIcNKuLlLIrabzbhg-1; Mon, 04 Nov 2019 22:18:08 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B7DD1800D56;
+        Tue,  5 Nov 2019 03:18:04 +0000 (UTC)
+Received: from [10.72.12.252] (ovpn-12-252.pek2.redhat.com [10.72.12.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7792C60E1C;
+        Tue,  5 Nov 2019 03:16:24 +0000 (UTC)
+Subject: Re: [PATCH V7 1/6] mdev: class id support
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+References: <20191104123952.17276-1-jasowang@redhat.com>
+ <20191104123952.17276-2-jasowang@redhat.com>
+ <20191104145002.4dfed0c4@x1.home>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <faaa43d8-662e-9b1e-a25a-5f242341a974@redhat.com>
+Date:   Tue, 5 Nov 2019 11:16:21 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20191104145002.4dfed0c4@x1.home>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: lTxSoeIcNKuLlLIrabzbhg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 04, 2019 at 02:03:43PM -0800, John Hubbard wrote:
-> On 11/4/19 12:57 PM, Jason Gunthorpe wrote:
-> > On Mon, Nov 04, 2019 at 12:48:13PM -0800, John Hubbard wrote:
-> >> On 11/4/19 12:33 PM, Jason Gunthorpe wrote:
-> >> ...
-> >>>> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
-> >>>> index 24244a2f68cc..c5a78d3e674b 100644
-> >>>> +++ b/drivers/infiniband/core/umem.c
-> >>>> @@ -272,11 +272,10 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
-> >>>>  
-> >>>>  	while (npages) {
-> >>>>  		down_read(&mm->mmap_sem);
-> >>>> -		ret = get_user_pages(cur_base,
-> >>>> +		ret = pin_longterm_pages(cur_base,
-> >>>>  				     min_t(unsigned long, npages,
-> >>>>  					   PAGE_SIZE / sizeof (struct page *)),
-> >>>> -				     gup_flags | FOLL_LONGTERM,
-> >>>> -				     page_list, NULL);
-> >>>> +				     gup_flags, page_list, NULL);
-> >>>
-> >>> FWIW, this one should be converted to fast as well, I think we finally
-> >>> got rid of all the blockers for that?
-> >>>
-> >>
-> >> I'm not aware of any blockers on the gup.c end, anyway. The only broken thing we
-> >> have there is "gup remote + FOLL_LONGTERM". But we can do "gup fast + LONGTERM". 
-> > 
-> > I mean the use of the mmap_sem here is finally in a way where we can
-> > just delete the mmap_sem and use _fast
-> >  
-> > ie, AFAIK there is no need for the mmap_sem to be held during
-> > ib_umem_add_sg_table()
-> > 
-> > This should probably be a standalone patch however
-> > 
-> 
-> Yes. Oh, actually I guess the patch flow should be: change to 
-> get_user_pages_fast() and remove the mmap_sem calls, as one patch. And then change 
-> to pin_longterm_pages_fast() as the next patch. Otherwise, the internal fallback
-> from _fast to slow gup would attempt to take the mmap_sem (again) in the same
-> thread, which is not good. :)
-> 
-> Or just defer the change until after this series. Either way is fine, let me
-> know if you prefer one over the other.
-> 
-> The patch itself is trivial, but runtime testing to gain confidence that
-> it's solid is much harder. Is there a stress test you would recommend for that?
-> (I'm not promising I can quickly run it yet--my local IB setup is still nascent 
-> at best.)
 
-If you make a patch we can probably get it tested, it is something
-we should do I keep forgetting about.
+On 2019/11/5 =E4=B8=8A=E5=8D=885:50, Alex Williamson wrote:
+> On Mon,  4 Nov 2019 20:39:47 +0800
+> Jason Wang<jasowang@redhat.com>  wrote:
+>
+>> Mdev bus only supports vfio driver right now, so it doesn't implement
+>> match method. But in the future, we may add drivers other than vfio,
+>> the first driver could be virtio-mdev. This means we need to add
+>> device class id support in bus match method to pair the mdev device
+>> and mdev driver correctly.
+>>
+>> So this patch adds id_table to mdev_driver and class_id for mdev
+>> device with the match method for mdev bus.
+>>
+>> Reviewed-by: Parav Pandit<parav@mellanox.com>
+>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+>> ---
+>>   .../driver-api/vfio-mediated-device.rst       |  5 ++++
+>>   drivers/gpu/drm/i915/gvt/kvmgt.c              |  1 +
+>>   drivers/s390/cio/vfio_ccw_ops.c               |  1 +
+>>   drivers/s390/crypto/vfio_ap_ops.c             |  1 +
+>>   drivers/vfio/mdev/mdev_core.c                 | 16 ++++++++++++
+>>   drivers/vfio/mdev/mdev_driver.c               | 25 +++++++++++++++++++
+>>   drivers/vfio/mdev/mdev_private.h              |  1 +
+>>   drivers/vfio/mdev/vfio_mdev.c                 |  6 +++++
+>>   include/linux/mdev.h                          |  8 ++++++
+>>   include/linux/mod_devicetable.h               |  8 ++++++
+>>   samples/vfio-mdev/mbochs.c                    |  1 +
+>>   samples/vfio-mdev/mdpy.c                      |  1 +
+>>   samples/vfio-mdev/mtty.c                      |  1 +
+>>   13 files changed, 75 insertions(+)
+>>
+>> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documen=
+tation/driver-api/vfio-mediated-device.rst
+>> index 25eb7d5b834b..6709413bee29 100644
+>> --- a/Documentation/driver-api/vfio-mediated-device.rst
+>> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+>> @@ -102,12 +102,14 @@ structure to represent a mediated device's driver:=
+:
+>>         * @probe: called when new device created
+>>         * @remove: called when device removed
+>>         * @driver: device driver structure
+>> +      * @id_table: the ids serviced by this driver
+>>         */
+>>        struct mdev_driver {
+>>   =09     const char *name;
+>>   =09     int  (*probe)  (struct device *dev);
+>>   =09     void (*remove) (struct device *dev);
+>>   =09     struct device_driver    driver;
+>> +=09     const struct mdev_class_id *id_table;
+>>        };
+>>  =20
+>>   A mediated bus driver for mdev should use this structure in the functi=
+on calls
+>> @@ -170,6 +172,9 @@ that a driver should use to unregister itself with t=
+he mdev core driver::
+>>  =20
+>>   =09extern void mdev_unregister_device(struct device *dev);
+>>  =20
+>> +It is also required to specify the class_id in create() callback throug=
+h::
+>> +
+>> +=09int mdev_set_class(struct mdev_device *mdev, u16 id);
+>>  =20
+>>   Mediated Device Management Interface Through sysfs
+>>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt=
+/kvmgt.c
+>> index 343d79c1cb7e..6420f0dbd31b 100644
+>> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+>> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+>> @@ -678,6 +678,7 @@ static int intel_vgpu_create(struct kobject *kobj, s=
+truct mdev_device *mdev)
+>>   =09=09     dev_name(mdev_dev(mdev)));
+>>   =09ret =3D 0;
+>>  =20
+>> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>>   out:
+>>   =09return ret;
+>>   }
+>> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw=
+_ops.c
+>> index f0d71ab77c50..cf2c013ae32f 100644
+>> --- a/drivers/s390/cio/vfio_ccw_ops.c
+>> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+>> @@ -129,6 +129,7 @@ static int vfio_ccw_mdev_create(struct kobject *kobj=
+, struct mdev_device *mdev)
+>>   =09=09=09   private->sch->schid.ssid,
+>>   =09=09=09   private->sch->schid.sch_no);
+>>  =20
+>> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>>   =09return 0;
+>>   }
+>>  =20
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfi=
+o_ap_ops.c
+>> index 5c0f53c6dde7..07c31070afeb 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -343,6 +343,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj,=
+ struct mdev_device *mdev)
+>>   =09list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+>>   =09mutex_unlock(&matrix_dev->lock);
+>>  =20
+>> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>>   =09return 0;
+>>   }
+>>  =20
+>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core=
+.c
+>> index b558d4cfd082..d23ca39e3be6 100644
+>> --- a/drivers/vfio/mdev/mdev_core.c
+>> +++ b/drivers/vfio/mdev/mdev_core.c
+>> @@ -45,6 +45,16 @@ void mdev_set_drvdata(struct mdev_device *mdev, void =
+*data)
+>>   }
+>>   EXPORT_SYMBOL(mdev_set_drvdata);
+>>  =20
+>> +/* Specify the class for the mdev device, this must be called during
+>> + * create() callback.
+>> + */
+> Standard non-networking multi-line comment style please, ie.
+>
+> /*
+>   * Multi-
+>   * line
+>   * comment
+>   */
+>
+> Thanks,
+> Alex
+>
 
-Jason
+Will fix.
+
+Thanks
+
