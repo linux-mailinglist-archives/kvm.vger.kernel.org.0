@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 988DDF0858
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 22:29:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9921DF0866
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 22:31:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730159AbfKEV3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 16:29:54 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:57692 "EHLO
+        id S1730048AbfKEVbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 16:31:43 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:59328 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729698AbfKEV3y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 16:29:54 -0500
+        with ESMTP id S1729761AbfKEVbn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 16:31:43 -0500
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5LTd1N153304;
-        Tue, 5 Nov 2019 21:29:39 GMT
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5LTR6N152966;
+        Tue, 5 Nov 2019 21:31:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
  mime-version : subject : from : in-reply-to : date : cc :
  content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=5yhVejoHF8kE0kkkT56KSiD9oyvzyII2Nowc/FEjwXw=;
- b=QB5T3Gpbb39hJWoGVPhK2CiMe1IIMLN3B9HBQ9m7D6ekxhpD1LWTCVFISjTjalK3Bg0s
- fgArLqX6ckUMcQjoRuINuEjDdAep0oL1J7a9oipW2Lyt9v728cg8A+pWelZIqNt0lLsw
- O8blfxi4/Mn0TjrBM4xhyZc9s+hMdbOz6lwbM7aFATCGz/JHU6bs6A/H+OjfYfUMhYFx
- XhvTiBTJdO1uC0bLNmd7HTde6k7gy4iaDCiZsUe6vKK+qhZlqCQldhNbm6UzfiE+q6zL
- ZoUSFckcyi8oH5wmTUo2xkzOlMcLRQi8RErxTVGUUsyvq1TnSiTNsY+RPpZEUaMHM6sQ Fg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2w12er9db8-1
+ s=corp-2019-08-05; bh=lkgB7qAPLHqwA6OY+jclpzLSMmufyu7QQAUSycTp+fU=;
+ b=e9NbpZcedZCLTIowFyQ9WCNGapmoGX9WKH9ud1rf2V9XRdzsLBTY3z/I2k+/cZvS/s67
+ Ohj2+WBvlovsiK1asA63rBsbdB+JFLKGpzxjhZunTCMV1gUu228FfnEGUOayVQMrROyX
+ rOq+GKZ2bmC7UPSoQn7NkarHPRG+WeN/tm78wgdFy4z7w2G82eZ9pGQAIbYHvEN7Xw50
+ HrHhntj7FK5S2QwfDW3vQbN1cXqz41tBAhe/fsN9KjFjB6otDalnv5dJbm0c9HdhnrmR
+ IXpR2QhCdtxTRTEC2+xZAa+D7UKalmZXkF2402wUiDAjxAgCyy7GQ/A14/x8+djdZBxG mA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2w12er9dmx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 05 Nov 2019 21:29:39 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5LSpc9018620;
-        Tue, 5 Nov 2019 21:29:39 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2w31623adj-1
+        Tue, 05 Nov 2019 21:31:30 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5LT1hW161214;
+        Tue, 5 Nov 2019 21:31:30 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2w333w06tp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 05 Nov 2019 21:29:31 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA5LSrHO018009;
-        Tue, 5 Nov 2019 21:28:53 GMT
+        Tue, 05 Nov 2019 21:31:30 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA5LVTQa016030;
+        Tue, 5 Nov 2019 21:31:29 GMT
 Received: from [192.168.14.112] (/79.180.234.250)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 05 Nov 2019 13:28:52 -0800
+        with ESMTP ; Tue, 05 Nov 2019 13:31:29 -0800
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH v2 2/4] kvm: vmx: Rename NR_AUTOLOAD_MSRS to
- NR_MSR_ENTRIES
+Subject: Re: [PATCH v2 3/4] kvm: vmx: Rename function find_msr() to
+ vmx_find_msr_index()
 From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20191105191910.56505-3-aaronlewis@google.com>
-Date:   Tue, 5 Nov 2019 23:28:49 +0200
+In-Reply-To: <20191105191910.56505-4-aaronlewis@google.com>
+Date:   Tue, 5 Nov 2019 23:31:26 +0200
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <32A62E45-2C2A-436B-85E9-5A15C03EFB2E@oracle.com>
+Message-Id: <3BEC7F65-1EE2-446F-9AC2-15FB4ED342B0@oracle.com>
 References: <20191105191910.56505-1-aaronlewis@google.com>
- <20191105191910.56505-3-aaronlewis@google.com>
+ <20191105191910.56505-4-aaronlewis@google.com>
 To:     Aaron Lewis <aaronlewis@google.com>
 X-Mailer: Apple Mail (2.3445.4.7)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432 signatures=668685
@@ -76,60 +76,88 @@ X-Mailing-List: kvm@vger.kernel.org
 
 > On 5 Nov 2019, at 21:19, Aaron Lewis <aaronlewis@google.com> wrote:
 >=20
-> Rename NR_AUTOLOAD_MSRS to NR_MSR_ENTRIES.  This needs to be done
-> due to the addition of the MSR-autostore area that will be added later
-> in this series.  After that the name AUTOLOAD will no longer make =
-sense.
+> Rename function find_msr() to vmx_find_msr_index() to share
+> implementations between vmx.c and nested.c in an upcoming change.
 >=20
 > Reviewed-by: Jim Mattson <jmattson@google.com>
 > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+> arch/x86/kvm/vmx/vmx.c | 10 +++++-----
+> arch/x86/kvm/vmx/vmx.h |  1 +
+> 2 files changed, 6 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c0160ca9ddba..39c701730297 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -835,7 +835,7 @@ static void clear_atomic_switch_msr_special(struct =
+vcpu_vmx *vmx,
+> 	vm_exit_controls_clearbit(vmx, exit);
+> }
+>=20
+> -static int find_msr(struct vmx_msrs *m, unsigned int msr)
+> +int vmx_find_msr_index(struct vmx_msrs *m, u32 msr)
 
-NR_MSR_ENTRIES is a bit too generic in my opinion.
-I would prefer to rename to NR_AUTO_LOADSTORE_MSRS.
-The change itself is fine.
+The change from static to non-static should happen in the next patch =
+instead of this rename patch.
+Otherwise, if the next patch is reverted, compiling vmx.c will result in =
+a warning.
+
+The rest of the patch looks fine.
 
 -Liran
 
-> ---
-> arch/x86/kvm/vmx/vmx.c | 4 ++--
-> arch/x86/kvm/vmx/vmx.h | 4 ++--
-> 2 files changed, 4 insertions(+), 4 deletions(-)
+> {
+> 	unsigned int i;
 >=20
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e7970a2e8eae..c0160ca9ddba 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -940,8 +940,8 @@ static void add_atomic_switch_msr(struct vcpu_vmx =
-*vmx, unsigned msr,
-> 	if (!entry_only)
-> 		j =3D find_msr(&m->host, msr);
+> @@ -869,7 +869,7 @@ static void clear_atomic_switch_msr(struct =
+vcpu_vmx *vmx, unsigned msr)
+> 		}
+> 		break;
+> 	}
+> -	i =3D find_msr(&m->guest, msr);
+> +	i =3D vmx_find_msr_index(&m->guest, msr);
+> 	if (i < 0)
+> 		goto skip_guest;
+> 	--m->guest.nr;
+> @@ -877,7 +877,7 @@ static void clear_atomic_switch_msr(struct =
+vcpu_vmx *vmx, unsigned msr)
+> 	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
 >=20
-> -	if ((i < 0 && m->guest.nr =3D=3D NR_AUTOLOAD_MSRS) ||
-> -		(j < 0 &&  m->host.nr =3D=3D NR_AUTOLOAD_MSRS)) {
-> +	if ((i < 0 && m->guest.nr =3D=3D NR_MSR_ENTRIES) ||
-> +		(j < 0 &&  m->host.nr =3D=3D NR_MSR_ENTRIES)) {
-> 		printk_once(KERN_WARNING "Not enough msr switch entries. =
-"
-> 				"Can't add msr %x\n", msr);
+> skip_guest:
+> -	i =3D find_msr(&m->host, msr);
+> +	i =3D vmx_find_msr_index(&m->host, msr);
+> 	if (i < 0)
 > 		return;
+>=20
+> @@ -936,9 +936,9 @@ static void add_atomic_switch_msr(struct vcpu_vmx =
+*vmx, unsigned msr,
+> 		wrmsrl(MSR_IA32_PEBS_ENABLE, 0);
+> 	}
+>=20
+> -	i =3D find_msr(&m->guest, msr);
+> +	i =3D vmx_find_msr_index(&m->guest, msr);
+> 	if (!entry_only)
+> -		j =3D find_msr(&m->host, msr);
+> +		j =3D vmx_find_msr_index(&m->host, msr);
+>=20
+> 	if ((i < 0 && m->guest.nr =3D=3D NR_MSR_ENTRIES) ||
+> 		(j < 0 &&  m->host.nr =3D=3D NR_MSR_ENTRIES)) {
 > diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index bee16687dc0b..0c6835bd6945 100644
+> index 0c6835bd6945..34b5fef603d8 100644
 > --- a/arch/x86/kvm/vmx/vmx.h
 > +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -22,11 +22,11 @@ extern u32 get_umwait_control_msr(void);
+> @@ -334,6 +334,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu =
+*vcpu);
+> struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 =
+msr);
+> void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
+> void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long =
+host_rsp);
+> +int vmx_find_msr_index(struct vmx_msrs *m, u32 msr);
 >=20
-> #define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
->=20
-> -#define NR_AUTOLOAD_MSRS 8
-> +#define NR_MSR_ENTRIES 8
->=20
-> struct vmx_msrs {
-> 	unsigned int		nr;
-> -	struct vmx_msr_entry	val[NR_AUTOLOAD_MSRS];
-> +	struct vmx_msr_entry	val[NR_MSR_ENTRIES];
-> };
->=20
-> struct shared_msr_entry {
+> #define POSTED_INTR_ON  0
+> #define POSTED_INTR_SN  1
 > --
 > 2.24.0.rc1.363.gb1bccd3e3d-goog
 >=20
