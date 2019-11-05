@@ -2,138 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BCBF7EF85A
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:14:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B952EF863
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 10:15:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730715AbfKEJOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 04:14:14 -0500
-Received: from mga12.intel.com ([192.55.52.136]:54415 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730673AbfKEJON (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 04:14:13 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 01:14:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,270,1569308400"; 
-   d="scan'208";a="376625625"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga005.jf.intel.com with ESMTP; 05 Nov 2019 01:14:12 -0800
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 5 Nov 2019 01:14:12 -0800
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 5 Nov 2019 01:14:10 -0800
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 5 Nov 2019 01:14:09 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Tue, 5 Nov 2019 17:14:08 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [RFC v2 03/22] intel_iommu: modify x-scalable-mode to be string
- option
-Thread-Topic: [RFC v2 03/22] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Index: AQHVimsn7SVAI/DYekGpKA287OuKO6d17oaAgAZs2aA=
-Date:   Tue, 5 Nov 2019 09:14:08 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EE30A@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-4-git-send-email-yi.l.liu@intel.com>
- <20191101145753.GC8888@xz-x1.metropole.lan>
-In-Reply-To: <20191101145753.GC8888@xz-x1.metropole.lan>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmU4OWIyNGItMDVlNS00YTMwLWIwNWYtOTRjYzZhMjkxMmE0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZVBqaDhlNzhLVVd0UXBkdDJLSkZJb1lYdGptTjNtbDhLbUVIcW5hU1JVTU43XC9FRzdjczRoV3B0VHl1SEIxelwvIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1730618AbfKEJPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 04:15:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47932 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730598AbfKEJPv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 04:15:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572945350;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FCD6QGoJF3F+fwV3iJLHrFr6PnYTZpQBq4NvDPTmGUE=;
+        b=ZuhBXdzlvX0EDFk98fcdwihxHqOBt1Hg4miCC1gu4iAn8mHqniJmThwpx+Wmie7Z2MxQHt
+        Wt7dAFk6hV6aY0cGVVplVGd8x0+NKyLACjnywbvUi7JVw8B58FcoFRgjVpmq0XRiXQreCz
+        tzyQGxpeyg6GEWKJRkHYBBxS5CmNgNc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-HO-ATHYPPOmPWoLMM96aAw-1; Tue, 05 Nov 2019 04:15:46 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E32AF477;
+        Tue,  5 Nov 2019 09:15:44 +0000 (UTC)
+Received: from gondolin (unknown [10.36.118.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C4085D70D;
+        Tue,  5 Nov 2019 09:15:39 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 10:15:36 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, thuth@redhat.com,
+        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
+        gor@linux.ibm.com
+Subject: Re: [RFC 09/37] KVM: s390: protvirt: Implement on-demand pinning
+Message-ID: <20191105101536.7df8f3bb.cohuck@redhat.com>
+In-Reply-To: <2c36b668-e6a7-4497-62da-f2be09350896@redhat.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-10-frankja@linux.ibm.com>
+        <b76ae1ca-d211-d1c7-63d9-9b45c789f261@redhat.com>
+        <7465141c-27b7-a89e-f02d-ab05cdd8505d@de.ibm.com>
+        <4abdc1dc-884e-a819-2e9d-2b8b15030394@redhat.com>
+        <2a7c4644-d718-420a-9bd7-723baccfb302@linux.ibm.com>
+        <84bd87f0-37bf-caa8-5762-d8da58f37a8f@redhat.com>
+        <69ddb6a7-8f69-fbc4-63a4-4f5695117078@de.ibm.com>
+        <1fad0466-1eeb-7d24-8015-98af9b564f74@redhat.com>
+        <8a68fcbb-1dea-414f-7d48-e4647f7985fe@redhat.com>
+        <20191104181743.3792924a.cohuck@redhat.com>
+        <2c36b668-e6a7-4497-62da-f2be09350896@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: HO-ATHYPPOmPWoLMM96aAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
-YXksIE5vdmVtYmVyIDEsIDIwMTkgMTA6NTggUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMy8yMl0gaW50ZWxfaW9tbXU6IG1v
-ZGlmeSB4LXNjYWxhYmxlLW1vZGUgdG8gYmUgc3RyaW5nIG9wdGlvbg0KPiANCj4gT24gVGh1LCBP
-Y3QgMjQsIDIwMTkgYXQgMDg6MzQ6MjRBTSAtMDQwMCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gSW50
-ZWwgVlQtZCAzLjAgaW50cm9kdWNlcyBzY2FsYWJsZSBtb2RlLCBhbmQgaXQgaGFzIGEgYnVuY2gg
-b2YNCj4gPiBjYXBhYmlsaXRpZXMgcmVsYXRlZCB0byBzY2FsYWJsZSBtb2RlIHRyYW5zbGF0aW9u
-LCB0aHVzIHRoZXJlIGFyZSBtdWx0aXBsZQ0KPiBjb21iaW5hdGlvbnMuDQo+ID4gV2hpbGUgdGhp
-cyB2SU9NTVUgaW1wbGVtZW50YXRpb24gd2FudHMgc2ltcGxpZnkgaXQgZm9yIHVzZXIgYnkNCj4g
-PiBwcm92aWRpbmcgdHlwaWNhbCBjb21iaW5hdGlvbnMuIFVzZXIgY291bGQgY29uZmlnIGl0IGJ5
-DQo+ID4gIngtc2NhbGFibGUtbW9kZSIgb3B0aW9uLiBUaGUgdXNhZ2UgaXMgYXMgYmVsb3c6DQo+
-ID4NCj4gPiAiLWRldmljZSBpbnRlbC1pb21tdSx4LXNjYWxhYmxlLW1vZGU9WyJsZWdhY3kifCJt
-b2Rlcm4iXSINCj4gPg0KPiA+ICAtICJsZWdhY3kiOiBnaXZlcyBzdXBwb3J0IGZvciBTTCBwYWdl
-IHRhYmxlDQo+ID4gIC0gIm1vZGVybiI6IGdpdmVzIHN1cHBvcnQgZm9yIEZMIHBhZ2UgdGFibGUs
-IHBhc2lkLCB2aXJ0dWFsIGNvbW1hbmQNCj4gPiAgLSAgaWYgbm90IGNvbmZpZ3VyZWQsIG1lYW5z
-IG5vIHNjYWxhYmxlIG1vZGUgc3VwcG9ydCwgaWYgbm90IHByb3Blcg0KPiA+ICAgICBjb25maWd1
-cmVkLCB3aWxsIHRocm93IGVycm9yDQo+ID4NCj4gPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4udGlh
-bkBpbnRlbC5jb20+DQo+ID4gQ2M6IEphY29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRl
-bC5jb20+DQo+ID4gQ2M6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiBDYzogWWkg
-U3VuIDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGl1IFlp
-IEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBZaSBTdW4gPHlpLnku
-c3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5j
-ICAgICAgICAgIHwgMTUgKysrKysrKysrKysrKy0tDQo+ID4gIGh3L2kzODYvaW50ZWxfaW9tbXVf
-aW50ZXJuYWwuaCB8ICAzICsrKw0KPiA+IGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oICB8
-ICAyICstDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlv
-bnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9p
-Mzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiA3NzFiZWQyLi40YTFhMDdhIDEwMDY0NA0KPiA+
-IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9t
-bXUuYw0KPiA+IEBAIC0zMDE5LDcgKzMwMTksNyBAQCBzdGF0aWMgUHJvcGVydHkgdnRkX3Byb3Bl
-cnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9QUk9QX1VJTlQ4KCJhdy1iaXRzIiwgSW50ZWxJ
-T01NVVN0YXRlLCBhd19iaXRzLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgVlREX0hPU1Rf
-QUREUkVTU19XSURUSCksDQo+ID4gICAgICBERUZJTkVfUFJPUF9CT09MKCJjYWNoaW5nLW1vZGUi
-LCBJbnRlbElPTU1VU3RhdGUsIGNhY2hpbmdfbW9kZSwNCj4gRkFMU0UpLA0KPiA+IC0gICAgREVG
-SU5FX1BST1BfQk9PTCgieC1zY2FsYWJsZS1tb2RlIiwgSW50ZWxJT01NVVN0YXRlLCBzY2FsYWJs
-ZV9tb2RlLA0KPiBGQUxTRSksDQo+ID4gKyAgICBERUZJTkVfUFJPUF9TVFJJTkcoIngtc2NhbGFi
-bGUtbW9kZSIsIEludGVsSU9NTVVTdGF0ZSwNCj4gPiArIHNjYWxhYmxlX21vZGUpLA0KPiA+ICAg
-ICAgREVGSU5FX1BST1BfQk9PTCgiZG1hLWRyYWluIiwgSW50ZWxJT01NVVN0YXRlLCBkbWFfZHJh
-aW4sIHRydWUpLA0KPiA+ICAgICAgREVGSU5FX1BST1BfRU5EX09GX0xJU1QoKSwNCj4gPiAgfTsN
-Cj4gPiBAQCAtMzU4MSw3ICszNTgxLDEyIEBAIHN0YXRpYyB2b2lkIHZ0ZF9pbml0KEludGVsSU9N
-TVVTdGF0ZSAqcykNCj4gPg0KPiA+ICAgICAgLyogVE9ETzogcmVhZCBjYXAvZWNhcCBmcm9tIGhv
-c3QgdG8gZGVjaWRlIHdoaWNoIGNhcCB0byBiZSBleHBvc2VkLiAqLw0KPiA+ICAgICAgaWYgKHMt
-PnNjYWxhYmxlX21vZGUpIHsNCj4gPiAtICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQX1NNVFMg
-fCBWVERfRUNBUF9TUlMgfCBWVERfRUNBUF9TTFRTOw0KPiA+ICsgICAgICAgIGlmICghc3RyY21w
-KHMtPnNjYWxhYmxlX21vZGUsICJsZWdhY3kiKSkgew0KPiA+ICsgICAgICAgICAgICBzLT5lY2Fw
-IHw9IFZURF9FQ0FQX1NNVFMgfCBWVERfRUNBUF9TUlMgfCBWVERfRUNBUF9TTFRTOw0KPiA+ICsg
-ICAgICAgIH0gZWxzZSBpZiAoIXN0cmNtcChzLT5zY2FsYWJsZV9tb2RlLCAibW9kZXJuIikpIHsN
-Cj4gPiArICAgICAgICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9TTVRTIHwgVlREX0VDQVBfU1JT
-IHwgVlREX0VDQVBfUEFTSUQNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICB8IFZURF9FQ0FQ
-X0ZMVFMgfCBWVERfRUNBUF9QU1M7DQo+ID4gKyAgICAgICAgfQ0KPiANCj4gU2hhbGwgd2UgZG8g
-dGhpcyBzdHJpbmcgb3Agb25seSBvbmNlIGluIHZ0ZF9kZWNpZGVfY29uZmlnKCkgdGhlbiBrZWVw
-IGl0IHNvbWV3aGVyZT8NCg0KQWdyZWVkLiBJJ2xsIG1vdmUgaXQgdG8gdnRkX2RlY2lkZV9jb25m
-aWcoKS4NCg0KPiBTb21ldGhpbmcgbGlrZToNCj4gDQo+ICAgLSBzLT5zY2FsYWJsZV9tb2RlX3N0
-ciB0byBrZWVwIHRoZSBzdHJpbmcNCj4gICAtIHMtPnNjYWxhYmxlX21vZGUgc3RpbGwgYXMgYSBi
-b29sIHRvIGNhY2hlIHRoZSBnbG9iYWwgZW5hYmxlbWVudA0KPiAgIC0gcy0+c2NhbGFibGVfbW9k
-ZXJuIGFzIGEgYm9vbCB0byBrZWVwIHRoZSBtb2RlDQo+IA0KPiA/DQoNClNvIHgtc2NhbGFibGUt
-bW9kZSBpcyBzdGlsbCBhIHN0cmluZyBvcHRpb24sIGp1c3QgdG8gaGF2ZSBhIG5ldyBmaWVsZCB0
-byBzdG9yZSBpdD8NCg0KPiANCj4gVGhlc2UgY291bGQgYmUgdXNlZCBpbiBzb21lIE1NSU8gcGF0
-aCAoSSB0aGluaykgYW5kIHBhcnNpbmcgc3RyaW5ncyBhbHdheXMgY291bGQgYmUNCj4gYSBiaXQg
-b3ZlcmtpbGwuDQoNCkkgdGhpbmsgc28uIExldCdzIGp1c3QgYWxpZ24gb24gdGhlIGRpcmVjdGlv
-biBhYm92ZS4NCg0KUmVnYXJkcywNCllpIExpdQ0KDQo=
+On Mon, 4 Nov 2019 19:38:27 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 04.11.19 18:17, Cornelia Huck wrote:
+> > On Mon, 4 Nov 2019 15:42:11 +0100
+> > David Hildenbrand <david@redhat.com> wrote:
+> >  =20
+> >> On 04.11.19 15:08, David Hildenbrand wrote: =20
+> >>> On 04.11.19 14:58, Christian Borntraeger wrote: =20
+
+> >>>>> How hard would it be to
+> >>>>>
+> >>>>> 1. Detect the error condition
+> >>>>> 2. Try a read on the affected page from the CPU (will will automati=
+cally convert to encrypted/!secure)
+> >>>>> 3. Restart the I/O
+> >>>>>
+> >>>>> I assume that this is a corner case where we don't really have to c=
+are about performance in the first shot. =20
+> >>>>
+> >>>> We have looked into this. You would need to implement this in the lo=
+w level
+> >>>> handler for every I/O. DASD, FCP, PCI based NVME, iscsi. Where do yo=
+u want
+> >>>> to stop? =20
+> >>>
+> >>> If that's the real fix, we should do that. Maybe one can focus on the
+> >>> real use cases first. But I am no I/O expert, so my judgment might be
+> >>> completely wrong.
+> >>>     =20
+> >>
+> >> Oh, and by the way, as discussed you really only have to care about
+> >> accesses via "real" I/O devices (IOW, not via the CPU). When accessing
+> >> via the CPU, you should have automatic conversion back and forth. As I
+> >> am no expert on I/O, I have no idea how iscsi fits into this picture
+> >> here (especially on s390x).
+> >> =20
+> >=20
+> > By "real" I/O devices, you mean things like channel devices, right? (So
+> > everything where you basically hand off control to a different kind of
+> > processor.)
+> >=20
+> > For classic channel I/O (as used by dasd), I'd expect something like
+> > getting a check condition on a ccw if the CU or device cannot access
+> > the memory. You will know how far the channel program has progressed,
+> > and might be able to restart (from the beginning or from that point).
+> > Probably has a chance of working for a subset of channel programs.
+
+NB that there's more than simple reads/writes... could also be control
+commands, some of which do read/writes as well.
+
+> >=20
+> > For QDIO (as used by FCP), I have no idea how this is could work, as we
+> > have long-running channel programs there and any error basically kills
+> > the queues, which you would have to re-setup from the beginning.
+> >=20
+> > For PCI devices, I have no idea how the instructions even act.
+> >=20
+> >  From my point of view, that error/restart approach looks nice on paper=
+,
+> > but it seems hard to make it work in the general case (and I'm unsure
+> > if it's possible at all.) =20
+>=20
+> One thought: If all we do during an I/O request is read or write (or=20
+> even a mixture), can we simply restart the whole I/O again, although we=
+=20
+> did partial reads/writes? This would eliminate the "know how far the=20
+> channel program has progressed". On error, one would have to touch each=
+=20
+> involved page (e.g., try to read first byte to trigger a conversion) and=
+=20
+> restart the I/O. I can understand that this might sound simpler than it=
+=20
+> is (if it is even possible)
+
+Any control commands might have side effects, though. Problems there
+should be uncommon; there's still the _general_ case, though :(
+
+Also, there's stuff like rewriting the channel program w/o prefetch,
+jumping with TIC, etc. Linux probably does not do the former, but at
+least the dasd driver uses NOP/TIC for error recovery.
+
+> and might still be problematic for QDIO as=20
+> far as I understand. Just a thought.
+
+Yes, given that for QDIO, establishing the queues is simply one
+long-running channel program...
+
