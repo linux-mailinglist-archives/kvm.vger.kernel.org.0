@@ -2,128 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DAF1CEFB85
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 11:37:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67EB0EFB8E
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 11:39:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388494AbfKEKhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 05:37:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51356 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388197AbfKEKhu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 05:37:50 -0500
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4DDF4368E7
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 10:37:50 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id g17so7493926wmc.4
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 02:37:50 -0800 (PST)
+        id S2388395AbfKEKjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 05:39:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45588 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388335AbfKEKjR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 05:39:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572950357;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=2LvMAR7qEYceOIruV/PyzgaBYUpYPnN7jnQsKYSS5rg=;
+        b=Kq6HDNXigJTFdU+urpmY9jQCFNNAluzBi0s+kfto+SiiTkSlQ/6eDgfPpgoo0MBonSh/ot
+        6sB3gFKQVANwL/iqQcOZcfaDJz519hzx+P30WhNCrfFbOIL0ad0Nj+QxJkcy3gBTPfhN4+
+        Nvn1gGr3Aih0HLVd6pmvbpppUMAzczk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-2NVL4rfcMl6ix6mZCyf25Q-1; Tue, 05 Nov 2019 05:39:14 -0500
+Received: by mail-wr1-f70.google.com with SMTP id e3so9646952wrs.17
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 02:39:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=5cw8GDJPXQLnatGSID8Q9w4LNZL4p4hbxD6vnBr55xg=;
-        b=kG7h06LCpbIsMYe0nfhsctMItIiwgw6N452TxzmYsM7XVGXSHoAtL6BRZlnBabnSJr
-         DzqYG92MWr15HukGyk7coxAeIbMQ8I5C2A0iZXbAgmPvdXADycqGASP7aaeoSmptkQyT
-         3jV95OovytGGZIFQ9G+LSN06eMNJEYjZ37N80bGg4Gq0NeTOb8tOvt+UcrkCo0rYaYQZ
-         GhH0QZkX5q+mDIMk+LyzVket/HXCJ6QB990Q4bPTwMO2cXtD0tg3VoN5jnelUjsvce2Y
-         33XTR297mzSXx1CodbVj1Ms7RlQKkxytg5L8tRX3HKu4/2aZXMlntF/fpdQtS6rlONyP
-         svcQ==
-X-Gm-Message-State: APjAAAXsw0KE7ClHH5at/b0pDXIHYYVE41BhZHpZBFrOdlh+ENqYzy+C
-        BMdWVUgYTXRg7+chqjxY7OcagNn8eE/lBl9BesG5BBkFRfNH6s5buIEY45104RWAuT81XgOcQjZ
-        oQIYgtpCN9Dn7
-X-Received: by 2002:a7b:c94f:: with SMTP id i15mr3748233wml.31.1572950268969;
-        Tue, 05 Nov 2019 02:37:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxF5epxLQok+brbRRt0k9QSuXdiKu5CG4toGSZdQQ703//pOdWltPeXeEv9m1cS09wsZvQ7Zg==
-X-Received: by 2002:a7b:c94f:: with SMTP id i15mr3748207wml.31.1572950268637;
-        Tue, 05 Nov 2019 02:37:48 -0800 (PST)
+        bh=FQ7KNUBzf77wNn2thS7O/9SDCA29U2fDLBv0oypYUBs=;
+        b=bvCkSlmdPFkt/xpl0f57/J+Gw5iDk6/NizIZ+aE6AhTOly4pxjuYCW7JCjiYjL5I/N
+         n04jncDwDz3e06lALHfbldRQd8+emg82TfkylFkYXOqDRDmVPBIkwnVpcyT65FchjfrH
+         fBrJfeAilrAxLx7PQotoBCytqShNTMD9Q5TB5iEYMwnkQ1zlKJ59EDYGvLj1qfNH2VXv
+         QzFCdZB8o5ERukOCe/2D+uZ3bcby3ambNi3uZtDgTHfvEFrehS+MxMRhE/i1pb+AkFGQ
+         XEoeWQFzpSMce0IR6mUAHQ1uEwSbbSFbF8dlhWXyifF+zL8nzajFC70prnkvIX4cDJRa
+         uKfQ==
+X-Gm-Message-State: APjAAAWiS8KKtdG2jUF0Nne38HS787bIli3jRvZyfr3qLoeTqTDYXrOz
+        JmTmoufEAj0fyplRNPD//AlIoXyytQeClC6WylaE5KwViAqrW2k8yZLI8LNnoxq2ksLPJY1kyae
+        Oq25Nx1vuGOD4
+X-Received: by 2002:a1c:a9cb:: with SMTP id s194mr3776068wme.92.1572950352541;
+        Tue, 05 Nov 2019 02:39:12 -0800 (PST)
+X-Google-Smtp-Source: APXvYqySoQAJvIlF1vGOb45cphI3Izmbvr5QW4TLhFheXcM+rcB+CvVBm3cdOFdSMsff8CVY53J9iQ==
+X-Received: by 2002:a1c:a9cb:: with SMTP id s194mr3776043wme.92.1572950352278;
+        Tue, 05 Nov 2019 02:39:12 -0800 (PST)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id g8sm7670330wmk.23.2019.11.05.02.37.47
+        by smtp.gmail.com with ESMTPSA id j3sm12570845wrs.70.2019.11.05.02.39.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 02:37:48 -0800 (PST)
-Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
+        Tue, 05 Nov 2019 02:39:11 -0800 (PST)
+Subject: Re: [PATCH] kvm: cpuid: Expose leaves 0x80000005 and 0x80000006 to
+ the guest
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Jim Mattson <jmattson@google.com>,
+        kvm list <kvm@vger.kernel.org>
+References: <20191022213349.54734-1-jmattson@google.com>
+ <CALMp9eR7temnM2XssLbRF0Op+=t0f-vwY-Pn4XgZ4uEaTW57Yw@mail.gmail.com>
+ <6e847c96-46f7-bd60-1b0f-2b6cdb5d4bca@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20191104230001.27774-1-aarcange@redhat.com>
- <20191104230001.27774-4-aarcange@redhat.com>
- <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
-Message-ID: <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
-Date:   Tue, 5 Nov 2019 11:37:47 +0100
+Openpgp: preference=signencrypt
+Message-ID: <2bd3a7c2-bcc6-9479-151c-f3067366cd7c@redhat.com>
+Date:   Tue, 5 Nov 2019 11:39:11 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6e847c96-46f7-bd60-1b0f-2b6cdb5d4bca@oracle.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MC-Unique: 2NVL4rfcMl6ix6mZCyf25Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/19 11:04, Paolo Bonzini wrote:
-> On 04/11/19 23:59, Andrea Arcangeli wrote:
->> kvm_x86_set_hv_timer and kvm_x86_cancel_hv_timer needs to be defined
->> to succeed the 32bit kernel build, but they can't be called.
->>
->> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
->> ---
->>  arch/x86/kvm/vmx/vmx.c | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index bd17ad61f7e3..1a58ae38c8f2 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -7195,6 +7195,17 @@ void kvm_x86_cancel_hv_timer(struct kvm_vcpu *vcpu)
->>  {
->>  	to_vmx(vcpu)->hv_deadline_tsc = -1;
->>  }
->> +#else
->> +int kvm_x86_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
->> +			 bool *expired)
->> +{
->> +	BUG();
->> +}
->> +
->> +void kvm_x86_cancel_hv_timer(struct kvm_vcpu *vcpu)
->> +{
->> +	BUG();
->> +}
->>  #endif
->>  
->>  void kvm_x86_sched_in(struct kvm_vcpu *vcpu, int cpu)
->>
-> 
-> I'll check for how long this has been broken.  It may be the proof that
-> we can actually drop 32-bit KVM support.
+On 05/11/19 03:02, Krish Sadhukhan wrote:
+>>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 0x80000005:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 0x80000006:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 break;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 0x80000007: /* Ad=
+vanced power management */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* invariant TSC is CPUID.80000007H:EDX[8] */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 entry->edx &=3D (1 << 8);
+>>> --=20
+>>> 2.23.0.866.gb869b98d4c-goog
+>>>
+>> Ping.
+>=20
+> Just curious about where we are actually setting the information for
+> these two leaves. I don't see it either in __do_cpuid_func() or in
+> kvm_x86_ops->set_supported_cpuid().
 
-Ah no, I was confused because this series is not bisectable (in addition
-to doing two things at a same time, namely the monolithic kvm.ko and the
-retpoline eliminations).
+do_cpuid_1_ent simply passes down the host information.
 
-I have picked up the patches that are independent of the monolithic
-kvm.ko work or can be considered bugfixes.
-
-For the rest, please do this before posting again:
-
-- ensure that everything is bisectable
-
-- look into how to remove the modpost warnings.  A simple (though
-somewhat ugly) way is to keep a kvm.ko module that includes common
-virt/kvm/ code as well as, for x86 only, page_track.o.  A few functions,
-such as kvm_mmu_gfn_disallow_lpage and kvm_mmu_gfn_allow_lpage, would
-have to be moved into mmu.h, but that's not a big deal.
-
-- provide at least some examples of replacing the NULL kvm_x86_ops
-checks with error codes in the function (or just early "return"s).  I
-can help with the others, but remember that for the patch to be merged,
-kvm_x86_ops must be removed completely.
-
-Thanks,
+Patch queued, thanks.
 
 Paolo
+
