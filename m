@@ -2,108 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9470EF32D
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 03:03:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09541EF380
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 03:32:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729967AbfKECDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Nov 2019 21:03:04 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:57972 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729428AbfKECDE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Nov 2019 21:03:04 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA51xIR0152653;
-        Tue, 5 Nov 2019 02:02:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=4qBStdgRL0xiXQEEeE1k+jSq4+HxPdlQr7tsBPnj3pY=;
- b=jD0lJaLWboCUPWPaqSU9bGelZKQTsIHbS9Vx8iEndT08L16PVpDB6jhD7Rl97sSMAFNv
- DLB7N2tOXkm1ujW7S56lymnU7CpoJZjlHF/zYIVY8p/wgBkZJYoAyjdQeSr6GBEF2qZy
- cB+JIZzBHSFNybZ/6D0c+nowDjz1QWz5sZBPlLxreYgbDClVebxFYD32KTR3R4OeBzKG
- KrzkTstDclvA5vhl08xjeAYK4nDnU8fbjDloCFAH21+Nbs48pqtCWLSXCih1gtCNYHHK
- 9jDDs1ZnWV5W5RHrBni2bGVKGOMhoF3f7C0JF2trYSS1Jpap+WRr3DfyAsgWr/JJu6Vf wQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2w12er2x16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 05 Nov 2019 02:02:59 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA51xNAU011448;
-        Tue, 5 Nov 2019 02:02:58 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2w1kxndsnn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 05 Nov 2019 02:02:57 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA522vb3013152;
-        Tue, 5 Nov 2019 02:02:57 GMT
-Received: from dhcp-10-132-95-157.usdhcp.oraclecorp.com (/10.132.95.157)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 04 Nov 2019 18:02:57 -0800
-Subject: Re: [PATCH] kvm: cpuid: Expose leaves 0x80000005 and 0x80000006 to
- the guest
-To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20191022213349.54734-1-jmattson@google.com>
- <CALMp9eR7temnM2XssLbRF0Op+=t0f-vwY-Pn4XgZ4uEaTW57Yw@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <6e847c96-46f7-bd60-1b0f-2b6cdb5d4bca@oracle.com>
-Date:   Mon, 4 Nov 2019 18:02:56 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1730439AbfKECcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Nov 2019 21:32:39 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:38843 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730416AbfKECci (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Nov 2019 21:32:38 -0500
+Received: by mail-qt1-f194.google.com with SMTP id p20so8943265qtq.5
+        for <kvm@vger.kernel.org>; Mon, 04 Nov 2019 18:32:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
+        b=RrEUUprScGGCs1P3lOuGj4a5RoiWbVbfDZ4+HpgRvyTXCYVlJAXQB+MYamRZtedVHY
+         f5+sxNxk2K5wkp7PjMMeD8HJWFAJHo3RtLYXlCrUl00LuH1GNIO+43+qB9VoRPGoMtd2
+         MhxxJSrVmcyNdw2dcAOft+ieDHmjkqcbx3xo51HlgztpG3sVxpkHZVlG9m+fgORfqdhb
+         XySrfwIPRDIjnSUQNZ9F7DSfvHrKSEQZxN/D+pZKoiFoN1H+0mMnDQ/zYc1NegbKO5Qw
+         fR/889wgnwS9AagFL4h4X1w9N0H+8w+Cg8HTo2zBy3ABWuxHxMoo0KJgJWvcNzShW5B1
+         QLlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=4urm9i82HUz7ctZoqeaJ+eDwbY+Le9I8/NmP0pY1rnA=;
+        b=Ewh+VVQc6m1FV7qUavJYmuGUmUFZ2AXEoj5IgAxzb23WlFcG8FdPluXTHLn4SGvtFK
+         UfFfJtAUDOowHYtXJb0SBLMWBFl+Xi71K9ybMEdSGAPF4V3o0d6xf3/E2mWZJxf5X6Wq
+         IFMxLwjIHx2LwBUt9E6cd8wG8SWWmqOkYdFWE5mdC37aXkYS5uVknDlkrDMSV7tNNBTA
+         TLac7w+n9mmgIdGQlkH13ojnpxTROuANOyvlAt6tD0Jo21CoH37t2ArWY+maI1lTFwYy
+         d0RwoUAJYlkd9kQQvmZcwlWUMgjT8REfHLOXocTab54MNu54WxEqKAos+cZbeAkmvRHh
+         Yorg==
+X-Gm-Message-State: APjAAAXTuiphs/7gr0qfu5Nvrzd9IzM/V2340rYdodHgg8TFMQjaLhB5
+        OZA3CsA7O1dA4Xhrd5kYAcDUoQ==
+X-Google-Smtp-Source: APXvYqzymmufBg1PiSWGxkk4f7LXgsvyOrzTuuRBB+uFmwh9UO+iQP682ubsI0h94l7eDVroneUqZg==
+X-Received: by 2002:a0c:9838:: with SMTP id c53mr25556531qvd.250.1572921156814;
+        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
+        by smtp.gmail.com with ESMTPSA id t65sm8907102qkh.23.2019.11.04.18.32.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 04 Nov 2019 18:32:36 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iRoe3-0002uH-K9; Mon, 04 Nov 2019 22:32:35 -0400
+Date:   Mon, 4 Nov 2019 22:32:35 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 07/18] infiniband: set FOLL_PIN, FOLL_LONGTERM via
+ pin_longterm_pages*()
+Message-ID: <20191105023235.GA11093@ziepe.ca>
+References: <20191103211813.213227-1-jhubbard@nvidia.com>
+ <20191103211813.213227-8-jhubbard@nvidia.com>
+ <20191104203346.GF30938@ziepe.ca>
+ <578c1760-7221-4961-9f7d-c07c22e5c259@nvidia.com>
+ <20191104205738.GH30938@ziepe.ca>
+ <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eR7temnM2XssLbRF0Op+=t0f-vwY-Pn4XgZ4uEaTW57Yw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911050014
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911050014
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1560fa00-0c2b-0f3b-091c-d628f021ce09@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 04, 2019 at 02:03:43PM -0800, John Hubbard wrote:
+> On 11/4/19 12:57 PM, Jason Gunthorpe wrote:
+> > On Mon, Nov 04, 2019 at 12:48:13PM -0800, John Hubbard wrote:
+> >> On 11/4/19 12:33 PM, Jason Gunthorpe wrote:
+> >> ...
+> >>>> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
+> >>>> index 24244a2f68cc..c5a78d3e674b 100644
+> >>>> +++ b/drivers/infiniband/core/umem.c
+> >>>> @@ -272,11 +272,10 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
+> >>>>  
+> >>>>  	while (npages) {
+> >>>>  		down_read(&mm->mmap_sem);
+> >>>> -		ret = get_user_pages(cur_base,
+> >>>> +		ret = pin_longterm_pages(cur_base,
+> >>>>  				     min_t(unsigned long, npages,
+> >>>>  					   PAGE_SIZE / sizeof (struct page *)),
+> >>>> -				     gup_flags | FOLL_LONGTERM,
+> >>>> -				     page_list, NULL);
+> >>>> +				     gup_flags, page_list, NULL);
+> >>>
+> >>> FWIW, this one should be converted to fast as well, I think we finally
+> >>> got rid of all the blockers for that?
+> >>>
+> >>
+> >> I'm not aware of any blockers on the gup.c end, anyway. The only broken thing we
+> >> have there is "gup remote + FOLL_LONGTERM". But we can do "gup fast + LONGTERM". 
+> > 
+> > I mean the use of the mmap_sem here is finally in a way where we can
+> > just delete the mmap_sem and use _fast
+> >  
+> > ie, AFAIK there is no need for the mmap_sem to be held during
+> > ib_umem_add_sg_table()
+> > 
+> > This should probably be a standalone patch however
+> > 
+> 
+> Yes. Oh, actually I guess the patch flow should be: change to 
+> get_user_pages_fast() and remove the mmap_sem calls, as one patch. And then change 
+> to pin_longterm_pages_fast() as the next patch. Otherwise, the internal fallback
+> from _fast to slow gup would attempt to take the mmap_sem (again) in the same
+> thread, which is not good. :)
+> 
+> Or just defer the change until after this series. Either way is fine, let me
+> know if you prefer one over the other.
+> 
+> The patch itself is trivial, but runtime testing to gain confidence that
+> it's solid is much harder. Is there a stress test you would recommend for that?
+> (I'm not promising I can quickly run it yet--my local IB setup is still nascent 
+> at best.)
 
+If you make a patch we can probably get it tested, it is something
+we should do I keep forgetting about.
 
-On 11/04/2019 12:49 PM, Jim Mattson wrote:
-> On Tue, Oct 22, 2019 at 2:33 PM Jim Mattson <jmattson@google.com> wrote:
->> Leaf 0x80000005 is "L1 Cache and TLB Information." Leaf 0x80000006 is
->> "L2 Cache and TLB and L3 Cache Information." Include these leaves in
->> the array returned by KVM_GET_SUPPORTED_CPUID.
->>
->> Signed-off-by: Jim Mattson <jmattson@google.com>
->> ---
->>   arch/x86/kvm/cpuid.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->> index 9c5029cf6f3f..1b40d8277b84 100644
->> --- a/arch/x86/kvm/cpuid.c
->> +++ b/arch/x86/kvm/cpuid.c
->> @@ -730,6 +730,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
->>                  entry->ecx &= kvm_cpuid_8000_0001_ecx_x86_features;
->>                  cpuid_mask(&entry->ecx, CPUID_8000_0001_ECX);
->>                  break;
->> +       case 0x80000005:
->> +       case 0x80000006:
->> +               break;
->>          case 0x80000007: /* Advanced power management */
->>                  /* invariant TSC is CPUID.80000007H:EDX[8] */
->>                  entry->edx &= (1 << 8);
->> --
->> 2.23.0.866.gb869b98d4c-goog
->>
-> Ping.
-
-Just curious about where we are actually setting the information for 
-these two leaves. I don't see it either in __do_cpuid_func() or in 
-kvm_x86_ops->set_supported_cpuid().
+Jason
