@@ -2,124 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08CECF00D8
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 16:10:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A8FDF00E1
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 16:12:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389578AbfKEPKv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 10:10:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46640 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388985AbfKEPKv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 10:10:51 -0500
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S2389015AbfKEPMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 10:12:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28347 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727889AbfKEPMh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 10:12:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572966756;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OlkoVdflSMC+hZrDHTdU7MNDmd7YVwliCib2kuv9TNg=;
+        b=ZZOis8xCVhpqZGrP7W5WooBxB3w5CLlvIUtpBBINt2d++aNIYQWwrEvcCqvAnngFH1Tgk0
+        /wiqH/jFal+2aPuJdS+UfPqZTFS2LCZLwcHD13GSHYzN4RoGIPDZ+7yUWFFM7nslrrOfl9
+        PYrr7ennUwjLPyw3/jZ+lReazuYzaHg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-_6cQfoz1MrCDdL_Xh9BPSw-1; Tue, 05 Nov 2019 10:12:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9749E369AC
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 15:10:50 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id 92so12499652wro.14
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 07:10:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZVrAMio36Q6kKW94w/mV9hSJkALDbxmAtiCfECylkvk=;
-        b=uiIMcppHmpyKf5yDjpKc+Q6Kcp2q6hv8hmp++T5mC4YUGxJ7UFZ6EWmLecm5Rklo6N
-         MT47ybrMmE6TKr9FKVId770nmuBMfo2UPgsnM1mTCUt9Bf8ImcWYu4PZVQnhNKDlXOAN
-         gKoBjb+OJ3LWFM4HGFj0rlUNfFq9y5tWqJ1C0e9Z2ISm+REbeJx9GsyDI8I8EKtIXz1t
-         7Y83PipCZrlL8rvRKgRYPFELghcotBE90QbqXNa4cdpPKIHNwyTh7plQqUWQ5XXKWJze
-         6Ub/gIe98Kz4zubNEFVPTtgU3MJ/hjIYE3l+Bd/Hpu6rBlZMyyxxo2MPTXZcmPEyTMh+
-         2IPQ==
-X-Gm-Message-State: APjAAAXWv6vw1zDSlQdZEv2exX6y6/flDDKwep6ZFXZCQ6/d+PY1GRdU
-        s52HeJdspEnXoc9qey+ro64mysaymHxYz4uom0spTREs4oJ8/g61ZB8E4n1gwsusaUAb+GsmgwV
-        lMIxji+2Y6lnH
-X-Received: by 2002:a1c:67d7:: with SMTP id b206mr4554596wmc.68.1572966649245;
-        Tue, 05 Nov 2019 07:10:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy4i4e/q0Sa4nnexI0PLDlDkB5K02RJOOefw63TuKDz9JzNgSQf8/7dd6FWjGMKPDiJFaP+8Q==
-X-Received: by 2002:a1c:67d7:: with SMTP id b206mr4554564wmc.68.1572966648914;
-        Tue, 05 Nov 2019 07:10:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id s21sm1905806wmh.28.2019.11.05.07.10.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 07:10:48 -0800 (PST)
-Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Jessica Yu <jeyu@kernel.org>,
-        Matthias Maennich <maennich@google.com>
-References: <20191104230001.27774-1-aarcange@redhat.com>
- <20191104230001.27774-4-aarcange@redhat.com>
- <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
- <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
- <20191105135414.GA30717@redhat.com>
- <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
- <20191105145651.GD30717@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
-Date:   Tue, 5 Nov 2019 16:10:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C3BC1005500
+        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 15:12:34 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-120-170.rdu2.redhat.com [10.10.120.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA7975C3F8;
+        Tue,  5 Nov 2019 15:12:33 +0000 (UTC)
+From:   Cathy Avery <cavery@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: [PATCH kvm-unit-tests] svm: Verify a pending interrupt queued before entering the guest is not lost
+Date:   Tue,  5 Nov 2019 10:12:34 -0500
+Message-Id: <20191105151234.28160-1-cavery@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191105145651.GD30717@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: _6cQfoz1MrCDdL_Xh9BPSw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/19 15:56, Andrea Arcangeli wrote:
->>> I think we should:
->>>
->>> 1) whitelist to shut off the warnings on demand
->>
->> Do you mean adding a whitelist to modpost?  That would work, though I am
->> not sure if the module maintainer (Jessica Yu) would accept that.
-> 
-> Yes that's exactly what I meant.
+This patch is based on Liran Aloni <liran.alon@oracle.com>
+commit fd056f5b89ac for vmx.
 
-Ok, thanks.  Jessica, the issue here is that we have two (mutually
-exclusive) modules providing the same interface to a third module.
+The test configures VMCB to intercept external-interrupts and then
+queues an interrupt by disabling interrupts and issue a self-IPI.
+At this point, we enter guest and we expect CPU to immediately exit
+guest on external-interrupt. To complete the test, we then re-enable
+interrupts, verify interrupt is dispatched and re-enter guest to verify
+it completes execution.
 
-Andrea will check that, when the same symbol is exported by two modules,
-the second-loaded module correctly fails insmod.  If that is okay, we
-will also need modpost not to warn for these symbols in sym_add_exported.
+Signed-off-by: Cathy Avery <cavery@redhat.com>
+---
+ x86/svm.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
->> The answer is maintainability.  My suggestion is that we start looking
->> into removing all assignments and tests of kvm_x86_ops, one step at a
->> time.  Until this is done, unfortunately we won't be able to reap the
->> performance benefit.  But the advantage is that this can be done in many
-> 
-> There's not much performance benefit left from the removal
-> kvm_x86_ops.
+diff --git a/x86/svm.c b/x86/svm.c
+index 4ddfaa4..6d2ab98 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -7,6 +7,8 @@
+ #include "smp.h"
+ #include "types.h"
+ #include "alloc_page.h"
++#include "isr.h"
++#include "apic.h"
+=20
+ #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
+=20
+@@ -774,6 +776,13 @@ static int get_test_stage(struct test *test)
+     return test->scratch;
+ }
+=20
++static void set_test_stage(struct test *test, int s)
++{
++    barrier();
++    test->scratch =3D s;
++    barrier();
++}
++
+ static void inc_test_stage(struct test *test)
+ {
+     barrier();
+@@ -1292,6 +1301,88 @@ static bool lat_svm_insn_check(struct test *test)
+             latclgi_min, clgi_sum / LATENCY_RUNS);
+     return true;
+ }
++
++bool pending_event_ipi_fired;
++bool pending_event_guest_run;
++
++static void pending_event_ipi_isr(isr_regs_t *regs)
++{
++    pending_event_ipi_fired =3D true;
++    eoi();
++}
++
++static void pending_event_prepare(struct test *test)
++{
++    int ipi_vector =3D 0xf1;
++
++    default_prepare(test);
++
++    pending_event_ipi_fired =3D false;
++
++    handle_irq(ipi_vector, pending_event_ipi_isr);
++
++    pending_event_guest_run =3D false;
++
++    test->vmcb->control.intercept |=3D (1ULL << INTERCEPT_INTR);
++    test->vmcb->control.int_ctl |=3D V_INTR_MASKING_MASK;
++
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
++                  APIC_DM_FIXED | ipi_vector, 0);
++
++    set_test_stage(test, 0);
++}
++
++static void pending_event_test(struct test *test)
++{
++    pending_event_guest_run =3D true;
++}
++
++static bool pending_event_finished(struct test *test)
++{
++    switch (get_test_stage(test)) {
++    case 0:
++        if (test->vmcb->control.exit_code !=3D SVM_EXIT_INTR) {
++            report("VMEXIT not due to pending interrupt. Exit reason 0x%x"=
+,
++            false, test->vmcb->control.exit_code);
++            return true;
++        }
++
++        test->vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_INTR);
++        test->vmcb->control.int_ctl &=3D ~V_INTR_MASKING_MASK;
++
++        if (pending_event_guest_run) {
++            report("Guest ran before host received IPI\n", false);
++            return true;
++        }
++
++        irq_enable();
++        asm volatile ("nop");
++        irq_disable();
++
++        if (!pending_event_ipi_fired) {
++            report("Pending interrupt not dispatched after IRQ enabled\n",=
+ false);
++            return true;
++        }
++        break;
++
++    case 1:
++        if (!pending_event_guest_run) {
++            report("Guest did not resume when no interrupt\n", false);
++            return true;
++        }
++        break;
++    }
++
++    inc_test_stage(test);
++
++    return get_test_stage(test) =3D=3D 2;
++}
++
++static bool pending_event_check(struct test *test)
++{
++    return get_test_stage(test) =3D=3D 2;
++}
++
+ static struct test tests[] =3D {
+     { "null", default_supported, default_prepare, null_test,
+       default_finished, null_check },
+@@ -1342,6 +1433,8 @@ static struct test tests[] =3D {
+       latency_finished, latency_check },
+     { "latency_svm_insn", default_supported, lat_svm_insn_prepare, null_te=
+st,
+       lat_svm_insn_finished, lat_svm_insn_check },
++    { "pending_event", default_supported, pending_event_prepare,
++      pending_event_test, pending_event_finished, pending_event_check },
+ };
+=20
+ int main(int ac, char **av)
+--=20
+2.20.1
 
-Indeed; what I mean is that until then we will have to keep the
-retpolines.  Not removing kvm_x86_ops leaves an unsustainable mess in
-terms of maintainability, therefore we will need to first refactor the
-code.  Once the refactoring is over, kvm_x86_ops can be dropped easily,
-just like kvm_pmu_ops in this version of the series.
-
-The good thing is that the modpost discussion can proceed in parallel.
-
-> The removal of kvm_x86_ops is just a badly needed code cleanup and of
-> course I agree it must happen sooner than later. I'm just trying to
-> avoid running into rejects on those further commit cleanups too.
-
->> That is good enough to prove the feasibility of the idea, so I agree
->> that was a good plan.
-> 
-> All right, so I'm not exactly sure what's the plan and if it's ok to
-> do it over time or if I should go ahead doing all logic changes while
-> the big patch remains out of tree.
-
-Yes, the changes to remove tests and assignments to kvm_x86_ops must
-happen first.  I understand that the big patch is a conflict magnet, but
-once all the refactoring is done it will be very easy to review and it
-will get in quickly.
-
-Paolo
