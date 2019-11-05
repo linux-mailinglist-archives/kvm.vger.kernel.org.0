@@ -2,167 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 202F2F0653
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 20:53:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2237F0681
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 20:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbfKETxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 14:53:22 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23966 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726368AbfKETxV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 14:53:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572983599;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cs8rrq4D6iWgBd/KEbQ97aB2BdD9wmZzx9N28weGUpo=;
-        b=U4v6h0OB5s7V6ZULhNw+6qslPOVUHO6jBrEKYwgwLCKMXG//gIRu9QOt9VYijvqiLJ4vWv
-        R8L0W/UCbZ1uZS44aqA+l6hXNmu5IP3XEEk+XfiSvG6fRyTisgE7iNgQ79s3ZpVJenDbkP
-        LILaHlQLK9Txy8yDvvxDdnwpfgKnDGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-BNB7lTiQOwONKOtuyzk4DQ-1; Tue, 05 Nov 2019 14:53:16 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BD0D107ACC3;
-        Tue,  5 Nov 2019 19:53:15 +0000 (UTC)
-Received: from [10.36.116.98] (ovpn-116-98.ams2.redhat.com [10.36.116.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 843BD60BF4;
-        Tue,  5 Nov 2019 19:53:14 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: Remove DAT and add short
- indication psw bits on diag308 reset
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20191105162828.2490-1-frankja@linux.ibm.com>
- <20191105162828.2490-3-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <15a9d438-d906-dcc6-0bda-8c6b049c946d@redhat.com>
-Date:   Tue, 5 Nov 2019 20:53:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727093AbfKET7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 14:59:42 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40684 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725806AbfKET7m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 14:59:42 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f3so683762wmc.5
+        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 11:59:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wYiiTK8+8X//EoRaX/jA9TQ7WcxpYaPKRs+Wl0gwfyM=;
+        b=VX4B8D98QoTArfCr8KqBFl4OXb5K5lXOf1gtbPYcIyVE/bp2Y2lOQZ57RnRN02zV7M
+         KkNd3XwrdM1KJNZWxFxbGr/9B150oW+mLLcFLL75c4qzc+bLIsBnRrhfKI/7AA4APi9p
+         5I7PV3mbidCYxiU8FT0cwCyoYANSnn9PnZthYPGwKm5sOUhkb2ajgAJJVQTxBNBozI0v
+         GXQ0I7Vi59qRPLTc2Wt7RldhuLjDU6LJIbLgOtOMe/d6QwYTcQC/qmcRlWCmk9YWUJuu
+         XF6P2+lA7ECP4OQKH7kRzjLwM6PeE1rsA/YNH2avIMzLg9q0ID9WFwc60P0Fsq5pSA0t
+         NApA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wYiiTK8+8X//EoRaX/jA9TQ7WcxpYaPKRs+Wl0gwfyM=;
+        b=QrYYHA9AWhuTHrXwAyd5VPb6mqzvzf/O9k9I5HvyWHyj+K7W3Ptua100ddsN8U/cv2
+         qICDLLqxinRW1tzdOacy1EXlvtk25uM0DgJ3jIWxOBFwFmoyB2tD2VVGBwxq9sqswV6J
+         4tmzX8osvhs7LtIRk1CBKAq4I45CakmZxp4ZWPCMN2Ixus3RMVdWKEULIUaa17ckpMT2
+         yAVCsFVgL4oSoURpDSeXnMztKDCkjHgZyqZ+TboTeEaWrU2BTs1WZ0pwq65amkhvIUqz
+         +jnr5kJ/A/FnYxS1Y2wTacmV4nhvCo0JAjQsgkffBAp7ylFrkG30q2sYixnRStblvCKD
+         YwRw==
+X-Gm-Message-State: APjAAAWviaf9AKaBHpYQN9oV6T7BZX+Hcgj3lxkKpJOONU7efGjHDCf9
+        FeEx8R6Izh2DqcD7mB/NcrATKRl92iZQmAFW48/y102G
+X-Google-Smtp-Source: APXvYqy+XrNKtKI0uOcQ43hs9nP1Nbtayr3OaRvsBQoOo4KYv5haQRnGQ3Mpfmn07g6cT4FXlzK1YIsmY6td7y0MTdM=
+X-Received: by 2002:a05:600c:21d9:: with SMTP id x25mr710399wmj.50.1572983979789;
+ Tue, 05 Nov 2019 11:59:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191105162828.2490-3-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: BNB7lTiQOwONKOtuyzk4DQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+References: <20191024195431.183667-1-jmattson@google.com> <895ce968-7f70-000b-0510-c9040125f93a@redhat.com>
+ <CAL1xVq00-EwHfiZgsFLm3GuAdbDajCBxuKxm7xTbKKUaf0wzPQ@mail.gmail.com>
+In-Reply-To: <CAL1xVq00-EwHfiZgsFLm3GuAdbDajCBxuKxm7xTbKKUaf0wzPQ@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 5 Nov 2019 11:59:28 -0800
+Message-ID: <CALMp9eQ3-njTpV1oDMGTEdPs12X1DWon7rHRyCefzxHhpnyeVg@mail.gmail.com>
+Subject: Re: [PATCH v2] kvm: x86: Add cr3 to struct kvm_debug_exit_arch
+To:     Ken Hofsass <hofsass@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.11.19 17:28, Janosch Frank wrote:
+On Fri, Oct 25, 2019 at 10:07 AM Ken Hofsass <hofsass@google.com> wrote:
+>
+> On Thu, Oct 24, 2019 at 3:18 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > On 24/10/19 21:54, Jim Mattson wrote:
+> > > From: Ken Hofsass <hofsass@google.com>
+> > >
+> > > A userspace agent can use cr3 to quickly determine whether a
+> > > KVM_EXIT_DEBUG is associated with a guest process of interest.
+> > >
+> > > KVM_CAP_DEBUG_EVENT_PDBR indicates support for the extension.
+> > >
+> > > Signed-off-by: Ken Hofsass <hofsass@google.com>
+> > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > Cc: Peter Shier <pshier@google.com>
+> > > ---
+> > > v1 -> v2: Changed KVM_CAP_DEBUG_EVENT_PG_BASE_ADDR to KVM_CAP_DEBUG_EVENT_PDBR
+> > >           Set debug.arch.cr3 in kvm_vcpu_do_singlestep and
+> > >                               kvm_vcpu_check_breakpoint
+> > >           Added svm support
+> >
+> > Perhaps you have already considered using KVM_CAP_SYNC_REGS instead,
+> > since Google contributed it in the first place, but anyway...  would it
+> > be enough for userspace to request KVM_SYNC_X86_SREGS when it enables
+> > breakpoints or singlestep?
+>
+> Hi Paolo, from a functional perspective, using KVM_SYNC_X86_SREGS is
+> totally reasonable. But it currently introduces a non-trivial amount
+> of overhead because it affects all exits.
+>
+> This change is a targeted optimization for use in instrumentation
+> scenarios. Specifically where debug breakpoint exits are a small
+> percentage of total exits and only a small percentage of the debug
+> exits are from processes of interest.
+>
+> thanks,
+> Ken
 
-In the subject "Disable" vs. "Remove" ?
-
-> On a diag308 subcode 0 CRs will be reset, so we need to mask of PSW
-> DAT indication until we restore our CRs.
->=20
-> Also we need to set the short psw indication to be compliant with the
-> architecture.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   lib/s390x/asm-offsets.c  |  1 +
->   lib/s390x/asm/arch_def.h |  3 ++-
->   s390x/cstart64.S         | 20 ++++++++++++++------
->   3 files changed, 17 insertions(+), 7 deletions(-)
->=20
-> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
-> index 4b213f8..61d2658 100644
-> --- a/lib/s390x/asm-offsets.c
-> +++ b/lib/s390x/asm-offsets.c
-> @@ -58,6 +58,7 @@ int main(void)
->   =09OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
->   =09OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
->   =09OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
-> +=09OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
->   =09OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
->   =09OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
->   =09OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index 07d4e5e..7d25e4f 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -79,7 +79,8 @@ struct lowcore {
->   =09uint32_t=09sw_int_fpc;=09=09=09/* 0x0300 */
->   =09uint8_t=09=09pad_0x0304[0x0308 - 0x0304];=09/* 0x0304 */
->   =09uint64_t=09sw_int_crs[16];=09=09=09/* 0x0308 */
-> -=09uint8_t=09=09pad_0x0310[0x11b0 - 0x0388];=09/* 0x0388 */
-> +=09struct psw=09sw_int_psw;=09=09=09/* 0x0388 */
-> +=09uint8_t=09=09pad_0x0310[0x11b0 - 0x0390];=09/* 0x0390 */
->   =09uint64_t=09mcck_ext_sa_addr;=09=09/* 0x11b0 */
->   =09uint8_t=09=09pad_0x11b8[0x1200 - 0x11b8];=09/* 0x11b8 */
->   =09uint64_t=09fprs_sa[16];=09=09=09/* 0x1200 */
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 0455591..2e0dcf5 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -129,8 +129,15 @@ memsetxc:
->   .globl diag308_load_reset
->   diag308_load_reset:
->   =09SAVE_REGS
-> -=09/* Save the first PSW word to the IPL PSW */
-> +=09/* Backup current PSW */
-
-/*
-  * Backup the current PSW MASK, as we have to restore it on
-  * success.
-  */
-
->   =09epsw=09%r0, %r1
-> +=09st=09%r0, GEN_LC_SW_INT_PSW
-> +=09st=09%r1, GEN_LC_SW_INT_PSW + 4
-
-I was confused at first, but then I realized that you really only store=20
-the PSW mask here and not also the PSW address ...
-
-
-> +=09/* Disable DAT as the CRs will be reset too */
-> +=09nilh=09%r0, 0xfbff
-> +=09/* Add psw bit 12 to indicate short psw */
-> +=09oilh=09%r0, 0x0008
-
-Why care about the old PSW mask here at all? Wouldn't it be easier to=20
-just construct a new PSW mask from scratch? (64bit, PSW bit 12 set ...)
-
-Save it somewhere and just load it directly from memory.
-
-> +=09/* Save the first PSW word to the IPL PSW */
->   =09st=09%r0, 0
->   =09/* Store the address and the bit for 31 bit addressing */
->   =09larl    %r0, 0f
-> @@ -142,12 +149,13 @@ diag308_load_reset:
->   =09xgr=09%r2, %r2
->   =09br=09%r14
->   =09/* Success path */
-> -=09/* We lost cr0 due to the reset */
-> -0:=09larl=09%r1, initial_cr0
-> -=09lctlg=09%c0, %c0, 0(%r1)
-> -=09RESTORE_REGS
-> +=09/* Switch to z/Architecture mode and 64-bit */
-> +0:=09RESTORE_REGS
->   =09lhi=09%r2, 1
-> -=09br=09%r14
-> +=09larl=09%r0, 1f
-> +=09stg=09%r0, GEN_LC_SW_INT_PSW + 8
-> +=09lpswe=09GEN_LC_SW_INT_PSW
-> +1:=09br=09%r14
->  =20
->   .globl smp_cpu_setup_state
->   smp_cpu_setup_state:
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
-
+Another possibility would be to add flags to KVM_SET_GET_DEBUG that
+request a SYNC_REGS on a breakpoint or single step.
