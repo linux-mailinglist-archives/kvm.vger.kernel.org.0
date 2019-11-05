@@ -2,153 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA450F0359
-	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 17:45:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D3ECF0364
+	for <lists+kvm@lfdr.de>; Tue,  5 Nov 2019 17:51:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390289AbfKEQp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 11:45:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:22682 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390179AbfKEQp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 11:45:29 -0500
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1731058AbfKEQu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 11:50:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60124 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727830AbfKEQuz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 11:50:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1572972655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DEq/4N6z16D+kibBkGDa/kA9t8KJGrCRdBUQy6uE194=;
+        b=aCP80+BpFVXW9q2bKK9XWMdMd4FPzGixMyzL3PJTFsHfjG8BjohepaqUWrP6C9w0BJDSML
+        RMhlsHdaXhsf6Anm5JpmpvdJJEQUPrSbB9hW5Kdor3ZMN9yGa6dvnkbzWH1iWI6vwRQbG6
+        MHVZ9/q1GZy+k5i8yLyPQ4E6LfUw0xc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-Dv4NBosnMKiU07dNahgicg-1; Tue, 05 Nov 2019 11:50:51 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7683FC049E17
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 16:45:28 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id f14so4855wmc.0
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 08:45:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jdYpSx2fv35lwEDQsxW/nJKQ15ZD+jtULvUxT5NCflg=;
-        b=JFkIlxE+ONHPdTTh2ux5Q7fAA9NyLZBxCThxmEV0CDsJITx5xW5IiAubFIU9O9hE0X
-         Acr+Hr525iKtPw4yXwRlMaovqqEPqnIaUTBJ7h9QUP/VkuUX03O9R8TPKgnxUGP80mLs
-         SR9xEqKngn9cPdqyJviQCLkFq43CogRwO9gmHPdh1H21wWC+H+8REtjxfkZgbb0tb/HM
-         8/k+DZMcoATG+w15dZjRmfbUvwFP8tP1q7PFRNIweYEWpj5vv756p0DLu4S4sg8K3QBP
-         RMzu/O91tvTIV4rYy0gVYrH8vRIgRNckeOVXb39purWlH8H3t+hgf4gUtJHgXbNEdHN5
-         AJiw==
-X-Gm-Message-State: APjAAAVSI2iho4rbQPSpllITcJMr/vKPXKaDuhgokqJnz0OIgwWAV+PI
-        FlXgtKh1Qpu9H6jXg54BeEBvaxCb/nEcCrMbEn7hwwqt7+t4bpnbW8r9mIwcOFUQjcd9GR1TehO
-        ZDQLLKwAuDzic
-X-Received: by 2002:adf:b1dc:: with SMTP id r28mr25786748wra.363.1572972326699;
-        Tue, 05 Nov 2019 08:45:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyiGRXprkbiwQ5tmKEpKhpMrPCwGQ9GWpq+cEuolVCUmSsS4lfle12P1pyke5oaGahJMUGeyA==
-X-Received: by 2002:adf:b1dc:: with SMTP id r28mr25786733wra.363.1572972326364;
-        Tue, 05 Nov 2019 08:45:26 -0800 (PST)
-Received: from [192.168.182.3] (net-93-146-44-156.cust.vodafonedsl.it. [93.146.44.156])
-        by smtp.gmail.com with ESMTPSA id b1sm14226332wrw.77.2019.11.05.08.45.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 08:45:25 -0800 (PST)
-Subject: Re: [PATCH kvm-unit-tests] svm: Verify a pending interrupt queued
- before entering the guest is not lost
-To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
-References: <20191105151234.28160-1-cavery@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8f2763c0-138e-6a05-a3c1-ed1043356c3f@redhat.com>
-Date:   Tue, 5 Nov 2019 17:45:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99D18800C73;
+        Tue,  5 Nov 2019 16:50:47 +0000 (UTC)
+Received: from gondolin (unknown [10.36.118.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2771608AC;
+        Tue,  5 Nov 2019 16:50:27 +0000 (UTC)
+Date:   Tue, 5 Nov 2019 17:50:25 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V8 3/6] mdev: introduce device specific ops
+Message-ID: <20191105175025.1a620844.cohuck@redhat.com>
+In-Reply-To: <20191105093240.5135-4-jasowang@redhat.com>
+References: <20191105093240.5135-1-jasowang@redhat.com>
+        <20191105093240.5135-4-jasowang@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191105151234.28160-1-cavery@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Dv4NBosnMKiU07dNahgicg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/19 16:12, Cathy Avery wrote:
-> +static void pending_event_prepare(struct test *test)
-> +{
-> +    int ipi_vector = 0xf1;
+On Tue,  5 Nov 2019 17:32:37 +0800
+Jason Wang <jasowang@redhat.com> wrote:
+
+> Currently, except for the create and remove, the rest of
+> mdev_parent_ops is designed for vfio-mdev driver only and may not help
+> for kernel mdev driver. With the help of class id, this patch
+> introduces device specific callbacks inside mdev_device
+> structure. This allows different set of callback to be used by
+> vfio-mdev and virtio-mdev.
+>=20
+> Reviewed-by: Parav Pandit <parav@mellanox.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  .../driver-api/vfio-mediated-device.rst       | 35 +++++++++----
+>  MAINTAINERS                                   |  1 +
+>  drivers/gpu/drm/i915/gvt/kvmgt.c              | 18 ++++---
+>  drivers/s390/cio/vfio_ccw_ops.c               | 18 ++++---
+>  drivers/s390/crypto/vfio_ap_ops.c             | 14 +++--
+>  drivers/vfio/mdev/mdev_core.c                 | 24 ++++++++-
+>  drivers/vfio/mdev/mdev_private.h              |  5 ++
+>  drivers/vfio/mdev/vfio_mdev.c                 | 37 ++++++-------
+>  include/linux/mdev.h                          | 43 ++++-----------
+>  include/linux/mdev_vfio_ops.h                 | 52 +++++++++++++++++++
+>  samples/vfio-mdev/mbochs.c                    | 20 ++++---
+>  samples/vfio-mdev/mdpy.c                      | 20 ++++---
+>  samples/vfio-mdev/mtty.c                      | 18 ++++---
+>  13 files changed, 206 insertions(+), 99 deletions(-)
+>  create mode 100644 include/linux/mdev_vfio_ops.h
+>=20
+
+(...)
+
+> @@ -172,10 +163,34 @@ that a driver should use to unregister itself with =
+the mdev core driver::
+> =20
+>  =09extern void mdev_unregister_device(struct device *dev);
+> =20
+> -It is also required to specify the class_id in create() callback through=
+::
+> +As multiple types of mediated devices may be supported, class id needs
+> +to be specified in the create callback(). This could be done
+
+The brackets should probably go behind 'create'?
+
+> +explicitly for the device that does not use on mdev bus for its
+
+"for devices that do not use the mdev bus" ?
+
+But why wouldn't they? I feel like I've missed some discussion here :/
+
+> +operation through:
+> =20
+>  =09int mdev_set_class(struct mdev_device *mdev, u16 id);
+> =20
+> +For the device that uses on the mdev bus for its operation, the class
+
+"For devices that use the mdev bus..."
+
+But same comment as above.
+
+> +should provide helper function to set class id and device specific
+> +ops. E.g for vfio-mdev devices, the function to be called is::
 > +
-> +    default_prepare(test);
+> +=09int mdev_set_vfio_ops(struct mdev_device *mdev,
+> +                              const struct mdev_vfio_device_ops *vfio_op=
+s);
 > +
-
-I think this test should call VMRUN with EFLAGS.IF=1.  The GIF/IF
-interaction is as follows:
-
-- in the host, IF is simply ignored with GIF=0.  VMRUN atomically sets
-GIF to 1. Therefore, interrupts are wholly masked between CLGI and VMRUN
-and between VMRUN and STGI, but not during VMRUN.  Currently, interrupts
-are masked during all of VMRUN actually, because default_prepare clears
-the interrupt flag.
-
-- in the guest, if VINTR_MASKING=0 (in kvm-unit-tests: bit 24 of
-int_ctl), IF governs whether host interrupts are delivered even while
-the guest is running.
-
-- if VINTR_MASKING=1, however, the pre-VMRUN value of IF (that's stored
-in HF_HIF_MASK, let's call it HIF from now on) governs whether host
-interrupts are delivered.
-
-Actually, I think HIF=1 is a good default for most tests, so I would
-start with something like
-
-diff --git a/x86/svm.c b/x86/svm.c
-index 4ddfaa4..7db3798 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -254,6 +255,7 @@ static void test_run(struct test *test,
-     u64 vmcb_phys = virt_to_phys(vmcb);
-     u64 guest_stack[10000];
-
-+    irq_disable();
-     test->vmcb = vmcb;
-     test->prepare(test);
-     vmcb->save.rip = (ulong)test_thunk;
-@@ -269,7 +271,9 @@ static void test_run(struct test *test,
-             "mov regs, %%r15\n\t"       // rax
-             "mov %%r15, 0x1f8(%0)\n\t"
-             LOAD_GPR_C
-+            "sti \n\t"		// only used if V_INTR_MASKING=1
-             "vmrun \n\t"
-+            "cli \n\t"
-             SAVE_GPR_C
-             "mov 0x170(%0), %%r15\n\t"  // rflags
-             "mov %%r15, regs+0x80\n\t"
-@@ -284,6 +288,7 @@ static void test_run(struct test *test, struct vmcb
-*vmcb)
- 	tsc_end = rdtsc();
-         ++test->exits;
-     } while (!test->finished(test));
-+    irq_enable();
-
-     report("%s", test->succeeded(test), test->name);
- }
-@@ -301,7 +306,6 @@ static bool default_supported(void)
- static void default_prepare(struct test *test)
- {
-     vmcb_ident(test->vmcb);
--    cli();
- }
-
- static bool default_finished(struct test *test)
-
-and see if it breaks something.  Then, it's probably useful to modify
-your prepare callback to set IF=1 in the regs.rflags, since otherwise
-the interrupts shouldn't be processed anyway.
-
-> +        test->vmcb->control.intercept &= ~(1ULL << INTERCEPT_INTR);
-> +        test->vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
+> +The class id (set by this function to MDEV_CLASS_ID_VFIO) is used to
+> +match a device with an mdev driver via its id table. The device
+> +specific callbacks (specified in *vfio_ops) are obtainable via
+> +mdev_get_vfio_ops() (for use by the mdev bus driver). A vfio-mdev
+> +device (class id MDEV_CLASS_ID_VFIO) uses the following
+> +device-specific ops:
 > +
+> +* open: open callback of vfio mediated device
+> +* close: close callback of vfio mediated device
+> +* ioctl: ioctl callback of vfio mediated device
+> +* read : read emulation callback
+> +* write: write emulation callback
+> +* mmap: mmap emulation callback
+> +
+>  Mediated Device Management Interface Through sysfs
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
 
-I think these adjustments are not needed.  However, you could add two
-other tests:
+Otherwise, looks good.
 
-- one which runs with V_INTR_MASKING=1 and HIF=0.  In that case, the
-VMMCALL should be reached without a prior SVM_EXIT_INTR vmexit.
-
-- one which runs with V_INTR_MASKING=0 and EFLAGS.IF=1.  In that case,
-the VMMCALL should be reached without a prior SVM_EXIT_INTR vmexit, and
-the interrupt should be delivered while in guest mode, before
-pending_event_guest_run is set.
-
-Thanks,
-
-Paolo
