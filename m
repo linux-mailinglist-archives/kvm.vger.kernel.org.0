@@ -2,155 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F1E2F1EB2
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 20:25:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C929F1FD8
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 21:26:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731608AbfKFTZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 14:25:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40234 "EHLO mx1.redhat.com"
+        id S1732191AbfKFU02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 15:26:28 -0500
+Received: from mga02.intel.com ([134.134.136.20]:55890 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727432AbfKFTZi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 14:25:38 -0500
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5273081105
-        for <kvm@vger.kernel.org>; Wed,  6 Nov 2019 19:25:38 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id g65so25845860qkf.19
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 11:25:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=J/Zt/NfiTx+Ld2uAQJIUZCZlEBcXHtsRtDQxesGEOxE=;
-        b=JfVp0cwS24KiVjxkMTQ6QIiS0Veu46dUnF8Yp+jkvtVS1sGP44l276093m3wd1aKjw
-         2Sm/CwtvRBbK3fd2C/JSqA2x+KSvewCePymR6DYhQ1EhtF19rIDzXKvb6GKuBU9MyH+S
-         2cBRjABA/3JTQKg0c/E+7zSrZBZ/cRO8PVypyywiEu3qtyRrUg0VGao+q2F1Jgyo0HLm
-         E+7oTm1cERVk+bkXq51NEgg29hwjLQum6MLiOpPhSyJML3M36nKGrwx6e7iIIPBSVtDF
-         HCSnIZXM14RakA10XQJEaqaRuJv5Lngrbmzj/D1WLrrkfC2YlINpmGFaCh5RIDg6pSPz
-         79ZQ==
-X-Gm-Message-State: APjAAAUCFJYgTizvVoDnY3XJxFP3VNcpmT8yGvOehEOnB7dreP/xd6N3
-        rJGtmaVTe8z/S9SfO8XQZIWyC/+MHS2a/MOZTZm8V35AOPqClxrT7+bh2Vvveh84wsE7NzGjUT3
-        entOKgnXo4+UN
-X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3561041qkm.393.1573068337480;
-        Wed, 06 Nov 2019 11:25:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwVUeLBA9o5ynyS/oZRBUg3gqW1DOYZfoi4p5JLJ/1OKZhj6MjBGfohoGDCJio3vEXQLJQBsQ==
-X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3560981qkm.393.1573068337135;
-        Wed, 06 Nov 2019 11:25:37 -0800 (PST)
-Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
-        by smtp.gmail.com with ESMTPSA id f39sm13094663qtb.26.2019.11.06.11.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2019 11:25:35 -0800 (PST)
-Date:   Wed, 6 Nov 2019 14:25:23 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        tiwei.bie@intel.com, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, cohuck@redhat.com,
-        maxime.coquelin@redhat.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, rob.miller@broadcom.com,
-        xiao.w.wang@intel.com, haotian.wang@sifive.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
-        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
-        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
-        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
-        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V8 0/6] mdev based hardware virtio offloading support
-Message-ID: <20191106142449-mutt-send-email-mst@kernel.org>
-References: <20191105093240.5135-1-jasowang@redhat.com>
- <20191105105834.469675f0@x1.home>
- <393f2dc9-8c67-d3c9-6553-640b80c15aaf@redhat.com>
- <20191106120312.77a6a318@x1.home>
+        id S1727721AbfKFU02 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 15:26:28 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 12:26:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,275,1569308400"; 
+   d="scan'208";a="353587051"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga004.jf.intel.com with ESMTP; 06 Nov 2019 12:26:27 -0800
+Date:   Wed, 6 Nov 2019 12:26:27 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
+ reserved
+Message-ID: <20191106202627.GF16249@linux.intel.com>
+References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
+ <20191106170727.14457-2-sean.j.christopherson@intel.com>
+ <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191106120312.77a6a318@x1.home>
+In-Reply-To: <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 12:03:12PM -0700, Alex Williamson wrote:
-> On Wed, 6 Nov 2019 11:56:46 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
+On Wed, Nov 06, 2019 at 10:04:22AM -0800, Dan Williams wrote:
+> On Wed, Nov 6, 2019 at 9:07 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > Explicitly exempt ZONE_DEVICE pages from kvm_is_reserved_pfn() and
+> > instead manually handle ZONE_DEVICE on a case-by-case basis.  For things
+> > like page refcounts, KVM needs to treat ZONE_DEVICE pages like normal
+> > pages, e.g. put pages grabbed via gup().  But KVM needs special handling
+> > in other flows where ZONE_DEVICE pages lack the underlying machinery,
+> > e.g. when setting accessed/dirty bits and shifting refcounts for
+> > transparent huge pages.
+> >
+> > This fixes a hang reported by Adam Borowski[*] in dev_pagemap_cleanup()
+> > when running a KVM guest backed with /dev/dax memory, as KVM straight up
+> > doesn't put any references to ZONE_DEVICE pages acquired by gup().
+> >
+> > [*] http://lkml.kernel.org/r/20190919115547.GA17963@angband.pl
+> >
+> > Reported-by: Adam Borowski <kilobyte@angband.pl>
+> > Debugged-by: David Hildenbrand <david@redhat.com>
+> > Cc: Dan Williams <dan.j.williams@intel.com>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kvm/mmu.c       |  8 ++++----
+> >  include/linux/kvm_host.h |  1 +
+> >  virt/kvm/kvm_main.c      | 19 +++++++++++++++----
+> >  3 files changed, 20 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> > index 24c23c66b226..bf82b1f2e834 100644
+> > --- a/arch/x86/kvm/mmu.c
+> > +++ b/arch/x86/kvm/mmu.c
+> > @@ -3306,7 +3306,7 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
+> >          * here.
+> >          */
+> >         if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
+> > -           level == PT_PAGE_TABLE_LEVEL &&
+> > +           !kvm_is_zone_device_pfn(pfn) && level == PT_PAGE_TABLE_LEVEL &&
+> >             PageTransCompoundMap(pfn_to_page(pfn)) &&
+> >             !mmu_gfn_lpage_is_disallowed(vcpu, gfn, PT_DIRECTORY_LEVEL)) {
+> >                 unsigned long mask;
+> > @@ -5914,9 +5914,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+> >                  * the guest, and the guest page table is using 4K page size
+> >                  * mapping if the indirect sp has level = 1.
+> >                  */
+> > -               if (sp->role.direct &&
+> > -                       !kvm_is_reserved_pfn(pfn) &&
+> > -                       PageTransCompoundMap(pfn_to_page(pfn))) {
+> > +               if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
+> > +                   !kvm_is_zone_device_pfn(pfn) &&
+> > +                   PageTransCompoundMap(pfn_to_page(pfn))) {
+> >                         pte_list_remove(rmap_head, sptep);
+> >
+> >                         if (kvm_available_flush_tlb_with_range())
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index a817e446c9aa..4ad1cd7d2d4d 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -966,6 +966,7 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
+> >  void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+> >
+> >  bool kvm_is_reserved_pfn(kvm_pfn_t pfn);
+> > +bool kvm_is_zone_device_pfn(kvm_pfn_t pfn);
+> >
+> >  struct kvm_irq_ack_notifier {
+> >         struct hlist_node link;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index b8534c6b8cf6..0a781b1fb8f0 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -151,12 +151,23 @@ __weak int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+> >
+> >  bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+> >  {
+> > +       /*
+> > +        * ZONE_DEVICE pages currently set PG_reserved, but from a refcounting
+> > +        * perspective they are "normal" pages, albeit with slightly different
+> > +        * usage rules.
+> > +        */
+> >         if (pfn_valid(pfn))
+> > -               return PageReserved(pfn_to_page(pfn));
+> > +               return PageReserved(pfn_to_page(pfn)) &&
+> > +                      !is_zone_device_page(pfn_to_page(pfn));
 > 
-> > On 2019/11/6 上午1:58, Alex Williamson wrote:
-> > > On Tue,  5 Nov 2019 17:32:34 +0800
-> > > Jason Wang <jasowang@redhat.com> wrote:
-> > >  
-> > >> Hi all:
-> > >>
-> > >> There are hardwares that can do virtio datapath offloading while
-> > >> having its own control path. This path tries to implement a mdev based
-> > >> unified API to support using kernel virtio driver to drive those
-> > >> devices. This is done by introducing a new mdev transport for virtio
-> > >> (virtio_mdev) and register itself as a new kind of mdev driver. Then
-> > >> it provides a unified way for kernel virtio driver to talk with mdev
-> > >> device implementation.
-> > >>
-> > >> Though the series only contains kernel driver support, the goal is to
-> > >> make the transport generic enough to support userspace drivers. This
-> > >> means vhost-mdev[1] could be built on top as well by resuing the
-> > >> transport.
-> > >>
-> > >> A sample driver is also implemented which simulate a virito-net
-> > >> loopback ethernet device on top of vringh + workqueue. This could be
-> > >> used as a reference implementation for real hardware driver.
-> > >>
-> > >> Also a real ICF VF driver was also posted here[2] which is a good
-> > >> reference for vendors who is interested in their own virtio datapath
-> > >> offloading product.
-> > >>
-> > >> Consider mdev framework only support VFIO device and driver right now,
-> > >> this series also extend it to support other types. This is done
-> > >> through introducing class id to the device and pairing it with
-> > >> id_talbe claimed by the driver. On top, this seris also decouple
-> > >> device specific parents ops out of the common ones.
-> > >>
-> > >> Pktgen test was done with virito-net + mvnet loop back device.
-> > >>
-> > >> Please review.
-> > >>
-> > >> [1] https://lkml.org/lkml/2019/10/31/440
-> > >> [2] https://lkml.org/lkml/2019/10/15/1226
-> > >>
-> > >> Changes from V7:
-> > >> - drop {set|get}_mdev_features for virtio
-> > >> - typo and comment style fixes  
-> > >
-> > > Seems we're nearly there, all the remaining comments are relatively
-> > > superficial, though I would appreciate a v9 addressing them as well as
-> > > the checkpatch warnings:
-> > >
-> > > https://patchwork.freedesktop.org/series/68977/  
-> > 
-> > 
-> > Will do.
-> > 
-> > Btw, do you plan to merge vhost-mdev patch on top? Or you prefer it to 
-> > go through Michael's vhost tree?
-> 
-> I can include it if you wish.  The mdev changes are isolated enough in
-> that patch that I wouldn't presume it, but clearly it would require
-> less merge coordination to drop it in my tree.  Let me know.  Thanks,
-> 
-> Alex
+> This is racy unless you can be certain that the pfn and resulting page
+> has already been pinned by get_user_pages(). This is why I told David
+> to steer clear of adding more is_zone_device_page() usage, it's
+> difficult to audit. Without an existing pin the metadata to determine
+> whether a page is ZONE_DEVICE or not could be in the process of being
+> torn down.
 
-I'm fine with merging through your tree. If you do, feel free to
-include
+Ouch, that's brutal.  Makes perfect sense why you'd want to avoid
+is_zone_device_page().
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Ideally KVM would pass around a struct { struct page *page,
+> unsigned long pfn } tuple so it would not have to do this "recall
+> context" dance on every pfn operation.
 
-
--- 
-MST
+Implementing something of that nature is doable, but it's going to be a
+significant overhaul as it will require updating every architecture.  So
+yeah, let's go with David's suggestion of fixing the immediate bug with
+your quick and dirty change and punting a more complete rework to future
+cleanup.  There are still multiple KVM flows that don't correctly handle
+ZONE_DEVICE, especially outside of x86, but I don't think there's a quick
+fix for those issues.
