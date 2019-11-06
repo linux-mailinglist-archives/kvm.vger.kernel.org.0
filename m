@@ -2,334 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECE4CF16EC
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 14:27:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01799F1742
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 14:37:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728140AbfKFN1s convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 6 Nov 2019 08:27:48 -0500
-Received: from mga02.intel.com ([134.134.136.20]:20751 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726882AbfKFN1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 08:27:48 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 05:27:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; 
-   d="scan'208";a="377046284"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga005.jf.intel.com with ESMTP; 06 Nov 2019 05:27:46 -0800
-Received: from fmsmsx152.amr.corp.intel.com (10.18.125.5) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 05:27:30 -0800
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX152.amr.corp.intel.com (10.18.125.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 05:27:29 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 21:27:28 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Thread-Topic: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Thread-Index: AQHVimn7Rf6XEKLwVUSEQeOMJH4V9ad8yIOAgAFk6nA=
-Date:   Wed, 6 Nov 2019 13:27:26 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF41B@SHSMSX104.ccr.corp.intel.com>
-References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
-        <1571919983-3231-3-git-send-email-yi.l.liu@intel.com>
- <20191105163537.1935291c@x1.home>
-In-Reply-To: <20191105163537.1935291c@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMjMzNWI0OTYtYTFkOC00MzRmLWFhMWItNmNmMDA2NDBkNTcwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicDFZWlRwSjQxcUJCZW5PajhsWVZmejlaUHZuSDZvejMwYThNb01zU3BsZ1M5RVdLcXBhazhleFkrN3NYWWNGRCJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1731752AbfKFNhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 08:37:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36421 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731734AbfKFNhb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 08:37:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573047450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/s0k4qOLB5UOKCj30GSBInNIxwTgiYyppdT2vH2+WjY=;
+        b=gmpRpEJEe9WA8/VON8MCK3hKz35Iv88V5XwL2X4ogTWY9PKGGgE5dRWpjOwtcQejTaiHmG
+        jIe1FgCdRVEhM5fg/rwgocs69V3jBdE1SHZqB261Gpy7zmx2CKVIiVg4ayJcfs1jjWSRXD
+        dCHGEPs8KN7gu/6r2Joqe4338xu30uM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-L9tT79FEPFObmEa3AfYP2Q-1; Wed, 06 Nov 2019 08:37:27 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24B2C8017E0;
+        Wed,  6 Nov 2019 13:37:23 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-193.pek2.redhat.com [10.72.12.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2235A27067;
+        Wed,  6 Nov 2019 13:35:45 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V10 0/6] mdev based hardware virtio offloading support
+Date:   Wed,  6 Nov 2019 21:35:25 +0800
+Message-Id: <20191106133531.693-1-jasowang@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: L9tT79FEPFObmEa3AfYP2Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Wednesday, November 6, 2019 7:36 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
-> 
-> On Thu, 24 Oct 2019 08:26:22 -0400
-> Liu Yi L <yi.l.liu@intel.com> wrote:
-> 
-> > This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims
-> > to passdown PASID allocation/free request from the virtual
-> > iommu. This is required to get PASID managed in system-wide.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 114
-> ++++++++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/vfio.h       |  25 +++++++++
-> >  2 files changed, 139 insertions(+)
-> >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index cd8d3a5..3d73a7d 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -2248,6 +2248,83 @@ static int vfio_cache_inv_fn(struct device *dev, void
-> *data)
-> >  	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
-> >  }
-> >
-> > +static int vfio_iommu_type1_pasid_alloc(struct vfio_iommu *iommu,
-> > +					 int min_pasid,
-> > +					 int max_pasid)
-> > +{
-> > +	int ret;
-> > +	ioasid_t pasid;
-> > +	struct mm_struct *mm = NULL;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +	mm = get_task_mm(current);
-> > +	/* Track ioasid allocation owner by mm */
-> > +	pasid = ioasid_alloc((struct ioasid_set *)mm, min_pasid,
-> > +				max_pasid, NULL);
-> 
-> Are we sure we want to tie this to the task mm vs perhaps the
-> vfio_iommu pointer?
+Hi all:
 
-Here we want to have a kind of per-VM mark, which can be used to do
-ownership check on whether a pasid is held by a specific VM. This is
-very important to prevent across VM affect. vfio_iommu pointer is
-competent for vfio as vfio is both pasid alloc requester and pasid
-consumer. e.g. vfio requests pasid alloc from ioasid and also it will
-invoke bind_gpasid(). vfio can either check ownership before invoking
-bind_gpasid() or pass vfio_iommu pointer to iommu driver. But in future,
-there may be other modules which are just consumers of pasid. And they
-also want to do ownership check for a pasid. Then, it would be hard for
-them as they are not the pasid alloc requester. So here better to have
-a system wide structure to perform as the per-VM mark. task mm looks
-to be much competent.
+There are hardwares that can do virtio datapath offloading while
+having its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-> > +	if (pasid == INVALID_IOASID) {
-> > +		ret = -ENOSPC;
-> > +		goto out_unlock;
-> > +	}
-> > +	ret = pasid;
-> > +out_unlock:
-> > +	mutex_unlock(&iommu->lock);
-> > +	if (mm)
-> > +		mmput(mm);
-> > +	return ret;
-> > +}
-> > +
-> > +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu,
-> > +				       unsigned int pasid)
-> > +{
-> > +	struct mm_struct *mm = NULL;
-> > +	void *pdata;
-> > +	int ret = 0;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	/**
-> > +	 * REVISIT:
-> > +	 * There are two cases free could fail:
-> > +	 * 1. free pasid by non-owner, we use ioasid_set to track mm, if
-> > +	 * the set does not match, caller is not permitted to free.
-> > +	 * 2. free before unbind all devices, we can check if ioasid private
-> > +	 * data, if data != NULL, then fail to free.
-> > +	 */
-> > +	mm = get_task_mm(current);
-> > +	pdata = ioasid_find((struct ioasid_set *)mm, pasid, NULL);
-> > +	if (IS_ERR(pdata)) {
-> > +		if (pdata == ERR_PTR(-ENOENT))
-> > +			pr_err("PASID %u is not allocated\n", pasid);
-> > +		else if (pdata == ERR_PTR(-EACCES))
-> > +			pr_err("Free PASID %u by non-owner, denied", pasid);
-> > +		else
-> > +			pr_err("Error searching PASID %u\n", pasid);
-> 
-> This should be removed, errno is sufficient for the user, this just
-> provides the user with a trivial DoS vector filling logs.
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-sure, will fix it. thanks.
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
-> > +		ret = -EPERM;
-> 
-> But why not return PTR_ERR(pdata)?
+Also a real IFC VF driver was also posted here[2] which is a good
+reference for vendors who is interested in their own virtio datapath
+offloading product.
 
-aha, would do it.
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific ops out of the common ones for implementing class
+specific operations over mdev bus.
 
-> > +		goto out_unlock;
-> > +	}
-> > +	if (pdata) {
-> > +		pr_debug("Cannot free pasid %d with private data\n", pasid);
-> > +		/* Expect PASID has no private data if not bond */
-> > +		ret = -EBUSY;
-> > +		goto out_unlock;
-> > +	}
-> > +	ioasid_free(pasid);
-> 
-> We only ever get here with pasid == NULL?! 
+Pktgen test was done with virito-net + mvnet loop back device.
 
-I guess you meant only when pdata==NULL.
+Please review.
 
-> Something is wrong.  Should
-> that be 'if (!pdata)'?  (which also makes that pr_debug another DoS
-> vector)
+[1] https://lkml.org/lkml/2019/11/5/424
+[2] https://lkml.org/lkml/2019/11/5/227
 
-Oh, yes, just do it as below:
+Changes from V9:
+- Tweak the help text for virito-mdev kconfig
 
-if (!pdata) {
-	ioasid_free(pasid);
-	ret = SUCCESS;
-} else
-	ret = -EBUSY;
+Changes from V8:
+- try silent checkpatch, some are still there becuase they were inherited
+  from virtio_config_ops which needs to be resolved in an independent serie=
+s
+- tweak on the comment and doc
+- remove VIRTIO_MDEV_F_VERSION_1 completely
+- rename CONFIG_VIRTIO_MDEV_DEVICE to CONFIG_VIRTIO_MDEV
 
-Is it what you mean?
+Changes from V7:
+- drop {set|get}_mdev_features for virtio
+- typo and comment style fixes
 
-> > +
-> > +out_unlock:
-> > +	if (mm)
-> > +		mmput(mm);
-> > +	mutex_unlock(&iommu->lock);
-> > +	return ret;
-> > +}
-> > +
-> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  				   unsigned int cmd, unsigned long arg)
-> >  {
-> > @@ -2370,6 +2447,43 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  					    &ustruct);
-> >  		mutex_unlock(&iommu->lock);
-> >  		return ret;
-> > +
-> > +	} else if (cmd == VFIO_IOMMU_PASID_REQUEST) {
-> > +		struct vfio_iommu_type1_pasid_request req;
-> > +		int min_pasid, max_pasid, pasid;
-> > +
-> > +		minsz = offsetofend(struct vfio_iommu_type1_pasid_request,
-> > +				    flag);
-> > +
-> > +		if (copy_from_user(&req, (void __user *)arg, minsz))
-> > +			return -EFAULT;
-> > +
-> > +		if (req.argsz < minsz)
-> > +			return -EINVAL;
-> > +
-> > +		switch (req.flag) {
-> 
-> This works, but it's strange.  Let's make the code a little easier for
-> the next flag bit that gets used so they don't need to rework this case
-> statement.  I'd suggest creating a VFIO_IOMMU_PASID_OPS_MASK that is
-> the OR of the ALLOC/FREE options, test that no bits are set outside of
-> that mask, then AND that mask as the switch arg with the code below.
+Changes from V6:
+- rename ops files and compile guard
 
-Got it. Let me fix it in next version.
+Changes from V5:
+- use dev_warn() instead of WARN(1) when class id is not set
+- validate id_table before trying to do matching between device and
+  driver
+- add wildcard for modpost script
+- use unique name for id_table
+- move get_mdev_features() to be the first member of virtio_device_ops
+  and more comments for it
+- typo fixes for the comments above virtio_mdev_ops
 
-> > +		/**
-> > +		 * TODO: min_pasid and max_pasid align with
-> > +		 * typedef unsigned int ioasid_t
-> > +		 */
-> > +		case VFIO_IOMMU_PASID_ALLOC:
-> > +			if (copy_from_user(&min_pasid,
-> > +				(void __user *)arg + minsz, sizeof(min_pasid)))
-> > +				return -EFAULT;
-> > +			if (copy_from_user(&max_pasid,
-> > +				(void __user *)arg + minsz + sizeof(min_pasid),
-> > +				sizeof(max_pasid)))
-> > +				return -EFAULT;
-> > +			return vfio_iommu_type1_pasid_alloc(iommu,
-> > +						min_pasid, max_pasid);
-> > +		case VFIO_IOMMU_PASID_FREE:
-> > +			if (copy_from_user(&pasid,
-> > +				(void __user *)arg + minsz, sizeof(pasid)))
-> > +				return -EFAULT;
-> > +			return vfio_iommu_type1_pasid_free(iommu, pasid);
-> > +		default:
-> > +			return -EINVAL;
-> > +		}
-> >  	}
-> >
-> >  	return -ENOTTY;
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index ccf60a2..04de290 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -807,6 +807,31 @@ struct vfio_iommu_type1_cache_invalidate {
-> >  };
-> >  #define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
-> >
-> > +/*
-> > + * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @min_pasid and
-> @max_pasid fields
-> > + * @flag=VFIO_IOMMU_PASID_FREE, refer to @pasid field
-> > + */
-> > +struct vfio_iommu_type1_pasid_request {
-> > +	__u32	argsz;
-> > +#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
-> > +#define VFIO_IOMMU_PASID_FREE	(1 << 1)
-> > +	__u32	flag;
-> > +	union {
-> > +		struct {
-> > +			int min_pasid;
-> > +			int max_pasid;
-> > +		};
-> > +		int pasid;
-> 
-> Perhaps:
-> 
-> 		struct {
-> 			u32 min;
-> 			u32 max;
-> 		} alloc_pasid;
-> 		u32 free_pasid;
-> 
-> (note also the s/int/u32/)
+Changes from V4:
+- keep mdev_set_class() for the device that doesn't use device ops
+- use union for device ops pointer in mdev_device
+- introduce class specific helper for getting is device ops
+- use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
+- explain details of get_mdev_features() and get_vendor_id()
+- distinguish the optional virito device ops from mandatory ones and
+  make get_generation() optional
+- rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
+  virtio_mdev_ops.h
+- don't abuse version fileds in virtio_mdev structure, use features
+  instead
+- fix warning during device remove
+- style & docs tweaks and typo fixes
 
-got it. will fix it in next version. Thanks.
+Changes from V3:
+- document that class id (device ops) must be specified in create()
+- add WARN() when trying to set class_id when it has already set
+- add WARN() when class_id is not specified in create() and correctly
+  return an error in this case
+- correct the prototype of mdev_set_class() in the doc
+- add documention of mdev_set_class()
+- remove the unnecessary "class_id_fail" label when class id is not
+  specified in create()
+- convert id_table in vfio_mdev to const
+- move mdev_set_class and its friends after mdev_uuid()
+- suqash the patch of bus uevent into patch of introducing class id
+- tweak the words in the docs per Cornelia suggestion
+- tie class_id and device ops through class specific initialization
+  routine like mdev_set_vfio_ops()
+- typos fixes in the docs of virtio-mdev callbacks
+- document the usage of virtqueues in struct virtio_mdev_device
+- remove the useless vqs array in struct virtio_mdev_device
+- rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
 
-> > +	};
-> > +};
-> > +
-> > +/**
-> > + * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 27,
-> > + *				struct vfio_iommu_type1_pasid_request)
-> > + *
-> > + */
-> > +#define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 27)
-> > +
-> >  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
-> >
-> >  /*
+Changes from V2:
+- fail when class_id is not specified
+- drop the vringh patch
+- match the doc to the code
+- tweak the commit log
+- move device_ops from parent to mdev device
+- remove the unused MDEV_ID_VHOST
 
-Regards,
-Yi Liu
+Changes from V1:
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  38 +-
+ MAINTAINERS                                   |   3 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
+ drivers/vfio/mdev/mdev_core.c                 |  60 ++
+ drivers/vfio/mdev/mdev_driver.c               |  25 +
+ drivers/vfio/mdev/mdev_private.h              |   8 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/virtio/Kconfig                        |  13 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 406 +++++++++++
+ include/linux/mdev.h                          |  57 +-
+ include/linux/mdev_vfio_ops.h                 |  52 ++
+ include/linux/mdev_virtio_ops.h               | 147 ++++
+ include/linux/mod_devicetable.h               |   8 +
+ samples/Kconfig                               |  10 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet.c                     | 686 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  11 +
+ 24 files changed, 1585 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/mdev_vfio_ops.h
+ create mode 100644 include/linux/mdev_virtio_ops.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+--=20
+2.19.1
+
