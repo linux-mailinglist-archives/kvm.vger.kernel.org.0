@@ -2,891 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A6BA3F15F7
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 13:22:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6915AF1633
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 13:40:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729501AbfKFMWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 07:22:15 -0500
-Received: from mga03.intel.com ([134.134.136.65]:29603 "EHLO mga03.intel.com"
+        id S1729151AbfKFMkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 07:40:49 -0500
+Received: from mga14.intel.com ([192.55.52.115]:34700 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727961AbfKFMWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 07:22:15 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727652AbfKFMkt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 07:40:49 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 04:22:14 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 04:40:46 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; 
-   d="scan'208";a="377032520"
-Received: from dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.74])
-  by orsmga005.jf.intel.com with ESMTP; 06 Nov 2019 04:22:06 -0800
-Date:   Wed, 6 Nov 2019 20:22:50 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, alex.williamson@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        lingshan.zhu@intel.com
-Subject: Re: [PATCH v5] vhost: introduce mdev based hardware backend
-Message-ID: <20191106122249.GA3235@___>
-References: <20191105115332.11026-1-tiwei.bie@intel.com>
- <16f31c27-3a0e-09d7-3925-dc9777f5e229@redhat.com>
+   d="scan'208";a="353469259"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+  by orsmga004.jf.intel.com with ESMTP; 06 Nov 2019 04:40:46 -0800
+Received: from fmsmsx152.amr.corp.intel.com (10.18.125.5) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:40:45 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ FMSMSX152.amr.corp.intel.com (10.18.125.5) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:40:45 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.215]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 20:40:42 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: RE: [RFC v2 10/22] intel_iommu: add virtual command capability
+ support
+Thread-Topic: [RFC v2 10/22] intel_iommu: add virtual command capability
+ support
+Thread-Index: AQHVimsyhY7jFLVgM0KoETku2fYgDqd2IwOAgAgCthA=
+Date:   Wed, 6 Nov 2019 12:40:41 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF337@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-11-git-send-email-yi.l.liu@intel.com>
+ <20191101180544.GF8888@xz-x1.metropole.lan>
+In-Reply-To: <20191101180544.GF8888@xz-x1.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDIxNTYyZWYtYzAyMy00NjY1LWFkMDItMjg1ZDg0MjNmMWNhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidEFYTllhN1lqRWxQdUpadmo3N3ByWFJDTEVXR2M4NmZHcHcxdTZHblNNMm5WMXUxK09na1Rwa0RzUEZZT0ZxaiJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <16f31c27-3a0e-09d7-3925-dc9777f5e229@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 03:54:45PM +0800, Jason Wang wrote:
-> On 2019/11/5 下午7:53, Tiwei Bie wrote:
-> > This patch introduces a mdev based hardware vhost backend.
-> > This backend is built on top of the same abstraction used
-> > in virtio-mdev and provides a generic vhost interface for
-> > userspace to accelerate the virtio devices in guest.
-> > 
-> > This backend is implemented as a mdev device driver on top
-> > of the same mdev device ops used in virtio-mdev but using
-> > a different mdev class id, and it will register the device
-> > as a VFIO device for userspace to use. Userspace can setup
-> > the IOMMU with the existing VFIO container/group APIs and
-> > then get the device fd with the device name. After getting
-> > the device fd, userspace can use vhost ioctls on top of it
-> > to setup the backend.
-> > 
-> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> 
-> 
-> Looks good to me. Only minor nits which could be addressed on top.
-> 
-> Reviewed-by: Jason Wang <jasowang@redhat.com>
-
-Thanks!
-
-> 
-> 
-> > ---
-> > This patch depends on below series:
-> > https://lkml.org/lkml/2019/11/5/217
-> > 
-> > v4 -> v5:
-> > - Rebase on top of virtio-mdev series v8;
-> > - Use the virtio_ops of mdev_device in vhost-mdev (Jason);
-> > - Some minor improvements on commit log;
-> > 
-> > v3 -> v4:
-> > - Rebase on top of virtio-mdev series v6;
-> > - Some minor tweaks and improvements;
-> > 
-> > v2 -> v3:
-> > - Fix the return value (Jason);
-> > - Don't cache unnecessary information in vhost-mdev (Jason);
-> > - Get rid of the memset in open (Jason);
-> > - Add comments for VHOST_SET_MEM_TABLE, ... (Jason);
-> > - Filter out unsupported features in vhost-mdev (Jason);
-> > - Add _GET_DEVICE_ID ioctl (Jason);
-> > - Add _GET_CONFIG/_SET_CONFIG ioctls (Jason);
-> > - Drop _GET_QUEUE_NUM ioctl (Jason);
-> > - Fix the copy-paste errors in _IOW/_IOR usage;
-> > - Some minor fixes and improvements;
-> > 
-> > v1 -> v2:
-> > - Replace _SET_STATE with _SET_STATUS (MST);
-> > - Check status bits at each step (MST);
-> > - Report the max ring size and max number of queues (MST);
-> > - Add missing MODULE_DEVICE_TABLE (Jason);
-> > - Only support the network backend w/o multiqueue for now;
-> > - Some minor fixes and improvements;
-> > - Rebase on top of virtio-mdev series v4;
-> > 
-> > RFC v4 -> v1:
-> > - Implement vhost-mdev as a mdev device driver directly and
-> >    connect it to VFIO container/group. (Jason);
-> > - Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
-> >    meaningless HVA->GPA translations (Jason);
-> > 
-> > RFC v3 -> RFC v4:
-> > - Build vhost-mdev on top of the same abstraction used by
-> >    virtio-mdev (Jason);
-> > - Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
-> > 
-> > RFC v2 -> RFC v3:
-> > - Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
-> >    based vhost protocol on top of vfio-mdev (Jason);
-> > 
-> > RFC v1 -> RFC v2:
-> > - Introduce a new VFIO device type to build a vhost protocol
-> >    on top of vfio-mdev;
-> > 
-> >   drivers/vfio/mdev/mdev_core.c    |  21 ++
-> >   drivers/vhost/Kconfig            |  12 +
-> >   drivers/vhost/Makefile           |   3 +
-> >   drivers/vhost/mdev.c             | 553 +++++++++++++++++++++++++++++++
-> >   include/linux/mdev.h             |   5 +
-> >   include/uapi/linux/vhost.h       |  18 +
-> >   include/uapi/linux/vhost_types.h |   8 +
-> >   7 files changed, 620 insertions(+)
-> >   create mode 100644 drivers/vhost/mdev.c
-> > 
-> > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> > index c58253404ed5..d855be5afbae 100644
-> > --- a/drivers/vfio/mdev/mdev_core.c
-> > +++ b/drivers/vfio/mdev/mdev_core.c
-> > @@ -99,6 +99,27 @@ mdev_get_virtio_ops(struct mdev_device *mdev)
-> >   }
-> >   EXPORT_SYMBOL(mdev_get_virtio_ops);
-> > +/*
-> > + * Specify the vhost device ops for the mdev device, this
-> > + * must be called during create() callback for vhost mdev device.
-> > + */
-> > +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> > +			const struct mdev_virtio_device_ops *vhost_ops)
-> > +{
-> > +	mdev_set_class(mdev, MDEV_CLASS_ID_VHOST);
-> > +	mdev->virtio_ops = vhost_ops;
-> > +}
-> > +EXPORT_SYMBOL(mdev_set_vhost_ops);
-> > +
-> > +/* Get the vhost device ops for the mdev device. */
-> > +const struct mdev_virtio_device_ops *
-> > +mdev_get_vhost_ops(struct mdev_device *mdev)
-> > +{
-> > +	WARN_ON(mdev->class_id != MDEV_CLASS_ID_VHOST);
-> > +	return mdev->virtio_ops;
-> > +}
-> > +EXPORT_SYMBOL(mdev_get_vhost_ops);
-> > +
-> >   struct device *mdev_dev(struct mdev_device *mdev)
-> >   {
-> >   	return &mdev->dev;
-> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > index 3d03ccbd1adc..062cada28f89 100644
-> > --- a/drivers/vhost/Kconfig
-> > +++ b/drivers/vhost/Kconfig
-> > @@ -34,6 +34,18 @@ config VHOST_VSOCK
-> >   	To compile this driver as a module, choose M here: the module will be called
-> >   	vhost_vsock.
-> > +config VHOST_MDEV
-> > +	tristate "Vhost driver for Mediated devices"
-> > +	depends on EVENTFD && VFIO && VFIO_MDEV
-> > +	select VHOST
-> > +	default n
-> > +	---help---
-> > +	This kernel module can be loaded in host kernel to accelerate
-> > +	guest virtio devices with the mediated device based backends.
-> > +
-> > +	To compile this driver as a module, choose M here: the module will
-> > +	be called vhost_mdev.
-> > +
-> >   config VHOST
-> >   	tristate
-> >   	---help---
-> > diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-> > index 6c6df24f770c..ad9c0f8c6d8c 100644
-> > --- a/drivers/vhost/Makefile
-> > +++ b/drivers/vhost/Makefile
-> > @@ -10,4 +10,7 @@ vhost_vsock-y := vsock.o
-> >   obj-$(CONFIG_VHOST_RING) += vringh.o
-> > +obj-$(CONFIG_VHOST_MDEV) += vhost_mdev.o
-> > +vhost_mdev-y := mdev.o
-> > +
-> >   obj-$(CONFIG_VHOST)	+= vhost.o
-> > diff --git a/drivers/vhost/mdev.c b/drivers/vhost/mdev.c
-> > new file mode 100644
-> > index 000000000000..0bcde0f3a9cd
-> > --- /dev/null
-> > +++ b/drivers/vhost/mdev.c
-> > @@ -0,0 +1,553 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Vhost driver for mediated device based backends.
-> > + *
-> > + * Copyright (C) 2018-2019 Intel Corporation.
-> > + *
-> > + * Author: Tiwei Bie <tiwei.bie@intel.com>
-> > + *
-> > + * Thanks to Jason Wang and Michael S. Tsirkin for the valuable
-> > + * comments and suggestions.  And thanks to Cunming Liang and
-> > + * Zhihong Wang for all their supports.
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/mdev.h>
-> > +#include <linux/mdev_virtio_ops.h>
-> > +#include <linux/nospec.h>
-> > +#include <linux/vfio.h>
-> > +#include <linux/vhost.h>
-> > +#include <linux/virtio_net.h>
-> > +
-> > +#include "vhost.h"
-> > +
-> > +enum {
-> > +	VHOST_MDEV_FEATURES =
-> > +		(1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
-> > +		(1ULL << VIRTIO_F_ANY_LAYOUT) |
-> > +		(1ULL << VIRTIO_F_VERSION_1) |
-> > +		(1ULL << VIRTIO_F_IOMMU_PLATFORM) |
-> > +		(1ULL << VIRTIO_F_RING_PACKED) |
-> > +		(1ULL << VIRTIO_F_ORDER_PLATFORM) |
-> > +		(1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-> > +		(1ULL << VIRTIO_RING_F_EVENT_IDX),
-> > +
-> > +	VHOST_MDEV_NET_FEATURES = VHOST_MDEV_FEATURES |
-> > +		(1ULL << VIRTIO_NET_F_CSUM) |
-> > +		(1ULL << VIRTIO_NET_F_GUEST_CSUM) |
-> > +		(1ULL << VIRTIO_NET_F_MTU) |
-> > +		(1ULL << VIRTIO_NET_F_MAC) |
-> > +		(1ULL << VIRTIO_NET_F_GUEST_TSO4) |
-> > +		(1ULL << VIRTIO_NET_F_GUEST_TSO6) |
-> > +		(1ULL << VIRTIO_NET_F_GUEST_ECN) |
-> > +		(1ULL << VIRTIO_NET_F_GUEST_UFO) |
-> > +		(1ULL << VIRTIO_NET_F_HOST_TSO4) |
-> > +		(1ULL << VIRTIO_NET_F_HOST_TSO6) |
-> > +		(1ULL << VIRTIO_NET_F_HOST_ECN) |
-> > +		(1ULL << VIRTIO_NET_F_HOST_UFO) |
-> > +		(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> > +		(1ULL << VIRTIO_NET_F_STATUS) |
-> > +		(1ULL << VIRTIO_NET_F_SPEED_DUPLEX),
-> > +};
-> > +
-> > +/* Currently, only network backend w/o multiqueue is supported. */
-> > +#define VHOST_MDEV_VQ_MAX	2
-> > +
-> > +struct vhost_mdev {
-> > +	/* The lock is to protect this structure. */
-> > +	struct mutex mutex;
-> > +	struct vhost_dev dev;
-> > +	struct vhost_virtqueue *vqs;
-> > +	int nvqs;
-> > +	int virtio_id;
-> > +	bool opened;
-> > +	struct mdev_device *mdev;
-> > +};
-> > +
-> > +static const u64 vhost_mdev_features[] = {
-> > +	[VIRTIO_ID_NET] = VHOST_MDEV_NET_FEATURES,
-> > +};
-> > +
-> > +static void handle_vq_kick(struct vhost_work *work)
-> > +{
-> > +	struct vhost_virtqueue *vq = container_of(work, struct vhost_virtqueue,
-> > +						  poll.work);
-> > +	struct vhost_mdev *m = container_of(vq->dev, struct vhost_mdev, dev);
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(m->mdev);
-> > +
-> > +	ops->kick_vq(m->mdev, vq - m->vqs);
-> > +}
-> > +
-> > +static irqreturn_t vhost_mdev_virtqueue_cb(void *private)
-> > +{
-> > +	struct vhost_virtqueue *vq = private;
-> > +	struct eventfd_ctx *call_ctx = vq->call_ctx;
-> > +
-> > +	if (call_ctx)
-> > +		eventfd_signal(call_ctx, 1);
-> > +
-> > +	return IRQ_HANDLED;
-> > +}
-> > +
-> > +static void vhost_mdev_reset(struct vhost_mdev *m)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +
-> > +	ops->set_status(mdev, 0);
-> > +}
-> > +
-> > +static long vhost_mdev_get_device_id(struct vhost_mdev *m, u8 __user *argp)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u32 device_id;
-> > +
-> > +	device_id = ops->get_device_id(mdev);
-> > +
-> > +	if (copy_to_user(argp, &device_id, sizeof(device_id)))
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_get_status(struct vhost_mdev *m, u8 __user *statusp)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u8 status;
-> > +
-> > +	status = ops->get_status(mdev);
-> > +
-> > +	if (copy_to_user(statusp, &status, sizeof(status)))
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_set_status(struct vhost_mdev *m, u8 __user *statusp)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u8 status;
-> > +
-> > +	if (copy_from_user(&status, statusp, sizeof(status)))
-> > +		return -EFAULT;
-> > +
-> > +	/*
-> > +	 * Userspace shouldn't remove status bits unless reset the
-> > +	 * status to 0.
-> > +	 */
-> > +	if (status != 0 && (ops->get_status(mdev) & ~status) != 0)
-> > +		return -EINVAL;
-> > +
-> > +	ops->set_status(mdev, status);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int vhost_mdev_config_validate(struct vhost_mdev *m,
-> > +				      struct vhost_mdev_config *c)
-> > +{
-> > +	long size = 0;
-> > +
-> > +	switch (m->virtio_id) {
-> > +	case VIRTIO_ID_NET:
-> > +		size = sizeof(struct virtio_net_config);
-> > +		break;
-> > +	}
-> > +
-> > +	if (c->len == 0)
-> > +		return -EINVAL;
-> > +
-> > +	if (c->off >= size || c->len > size || c->off + c->len > size)
-> > +		return -E2BIG;
-> 
-> 
-> Nit: It should be the same as check with c->off + c->len > size only.
-
-I did a quick test with below program:
-
-#include <stdio.h>
-
-int main(void)
-{
-	unsigned int a, b;
-	long c;
-
-	scanf("%u%u%ld", &a, &b, &c);
-	printf("%d\n", a + b > c);
-	printf("%d\n", (long)a + b > c);
-
-	return 0;
-}
-
-And I got this:
-
-$ echo 4294967295 1 1 | ./a.out
-0
-1
-
-As c->off and c->len are __u32, we would need to cast one of
-them to long if we want to just check c->off + c->len > size,
-e.g. (long)c->off + c->len > size
-
-Off the topic, one thing I'm not quite sure about and want to
-confirm is that, will it be better to define c->off and c->len
-as __u64 (they are parts of UAPI)?
-
-> 
-> 
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_get_config(struct vhost_mdev *m,
-> > +				  struct vhost_mdev_config __user *c)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	struct vhost_mdev_config config;
-> > +	unsigned long size = offsetof(struct vhost_mdev_config, buf);
-> > +	u8 *buf;
-> > +
-> > +	if (copy_from_user(&config, c, size))
-> > +		return -EFAULT;
-> > +	if (vhost_mdev_config_validate(m, &config))
-> > +		return -EINVAL;
-> > +	buf = kvzalloc(config.len, GFP_KERNEL);
-> > +	if (!buf)
-> > +		return -ENOMEM;
-> > +
-> > +	ops->get_config(mdev, config.off, buf, config.len);
-> > +
-> > +	if (copy_to_user(c->buf, buf, config.len)) {
-> > +		kvfree(buf);
-> > +		return -EFAULT;
-> > +	}
-> > +
-> > +	kvfree(buf);
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_set_config(struct vhost_mdev *m,
-> > +				  struct vhost_mdev_config __user *c)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	struct vhost_mdev_config config;
-> > +	unsigned long size = offsetof(struct vhost_mdev_config, buf);
-> > +	u8 *buf;
-> > +
-> > +	if (copy_from_user(&config, c, size))
-> > +		return -EFAULT;
-> > +	if (vhost_mdev_config_validate(m, &config))
-> > +		return -EINVAL;
-> > +	buf = kvzalloc(config.len, GFP_KERNEL);
-> > +	if (!buf)
-> > +		return -ENOMEM;
-> > +
-> > +	if (copy_from_user(buf, c->buf, config.len)) {
-> > +		kvfree(buf);
-> > +		return -EFAULT;
-> > +	}
-> > +
-> > +	ops->set_config(mdev, config.off, buf, config.len);
-> > +
-> > +	kvfree(buf);
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_get_features(struct vhost_mdev *m, u64 __user *featurep)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u64 features;
-> > +
-> > +	features = ops->get_features(mdev);
-> > +	features &= vhost_mdev_features[m->virtio_id];
-> > +
-> > +	if (copy_to_user(featurep, &features, sizeof(features)))
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_set_features(struct vhost_mdev *m, u64 __user *featurep)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u64 features;
-> > +
-> > +	/*
-> > +	 * It's not allowed to change the features after they have
-> > +	 * been negotiated.
-> > +	 */
-> > +	if (ops->get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK)
-> > +		return -EBUSY;
-> > +
-> > +	if (copy_from_user(&features, featurep, sizeof(features)))
-> > +		return -EFAULT;
-> > +
-> > +	if (features & ~vhost_mdev_features[m->virtio_id])
-> > +		return -EINVAL;
-> > +
-> > +	if (ops->set_features(mdev, features))
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_get_vring_num(struct vhost_mdev *m, u16 __user *argp)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	u16 num;
-> > +
-> > +	num = ops->get_vq_num_max(mdev);
-> > +
-> > +	if (copy_to_user(argp, &num, sizeof(num)))
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static long vhost_mdev_vring_ioctl(struct vhost_mdev *m, unsigned int cmd,
-> > +				   void __user *argp)
-> > +{
-> > +	struct mdev_device *mdev = m->mdev;
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	struct virtio_mdev_callback cb;
-> > +	struct vhost_virtqueue *vq;
-> > +	struct vhost_vring_state s;
-> > +	u8 status;
-> > +	u32 idx;
-> > +	long r;
-> > +
-> > +	r = get_user(idx, (u32 __user *)argp);
-> > +	if (r < 0)
-> > +		return r;
-> > +	if (idx >= m->nvqs)
-> > +		return -ENOBUFS;
-> > +
-> > +	idx = array_index_nospec(idx, m->nvqs);
-> > +	vq = &m->vqs[idx];
-> > +
-> > +	status = ops->get_status(mdev);
-> > +
-> > +	/*
-> > +	 * It's not allowed to detect and program vqs before
-> > +	 * features negotiation or after enabling driver.
-> > +	 */
-> > +	if (!(status & VIRTIO_CONFIG_S_FEATURES_OK) ||
-> > +	    (status & VIRTIO_CONFIG_S_DRIVER_OK))
-> > +		return -EBUSY;
-> > +
-> > +	if (cmd == VHOST_MDEV_SET_VRING_ENABLE) {
-> > +		if (copy_from_user(&s, argp, sizeof(s)))
-> > +			return -EFAULT;
-> > +		ops->set_vq_ready(mdev, idx, s.num);
-> > +		return 0;
-> > +	}
-> > +
-> > +	/*
-> > +	 * It's not allowed to detect and program vqs with
-> > +	 * vqs enabled.
-> > +	 */
-> > +	if (ops->get_vq_ready(mdev, idx))
-> > +		return -EBUSY;
-> > +
-> > +	if (cmd == VHOST_GET_VRING_BASE)
-> > +		vq->last_avail_idx = ops->get_vq_state(m->mdev, idx);
-> > +
-> > +	r = vhost_vring_ioctl(&m->dev, cmd, argp);
-> > +	if (r)
-> > +		return r;
-> > +
-> > +	switch (cmd) {
-> > +	case VHOST_SET_VRING_ADDR:
-> > +		/*
-> > +		 * In vhost-mdev, the ring addresses set by userspace should
-> > +		 * be the DMA addresses within the VFIO container/group.
-> > +		 */
-> > +		if (ops->set_vq_address(mdev, idx, (u64)vq->desc,
-> > +					(u64)vq->avail, (u64)vq->used))
-> > +			r = -EINVAL;
-> > +		break;
-> > +
-> > +	case VHOST_SET_VRING_BASE:
-> > +		if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
-> > +			r = -EINVAL;
-> > +		break;
-> > +
-> > +	case VHOST_SET_VRING_CALL:
-> > +		if (vq->call_ctx) {
-> > +			cb.callback = vhost_mdev_virtqueue_cb;
-> > +			cb.private = vq;
-> > +		} else {
-> > +			cb.callback = NULL;
-> > +			cb.private = NULL;
-> > +		}
-> > +		ops->set_vq_cb(mdev, idx, &cb);
-> > +		break;
-> > +
-> > +	case VHOST_SET_VRING_NUM:
-> > +		ops->set_vq_num(mdev, idx, vq->num);
-> > +		break;
-> > +	}
-> > +
-> > +	return r;
-> > +}
-> > +
-> > +static int vhost_mdev_open(void *device_data)
-> > +{
-> > +	struct vhost_mdev *m = device_data;
-> > +	struct vhost_dev *dev;
-> > +	struct vhost_virtqueue **vqs;
-> > +	int nvqs, i, r;
-> > +
-> > +	if (!try_module_get(THIS_MODULE))
-> > +		return -ENODEV;
-> > +
-> > +	mutex_lock(&m->mutex);
-> > +
-> > +	if (m->opened) {
-> > +		r = -EBUSY;
-> > +		goto err;
-> > +	}
-> > +
-> > +	nvqs = m->nvqs;
-> > +	vhost_mdev_reset(m);
-> > +
-> > +	vqs = kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
-> > +	if (!vqs) {
-> > +		r = -ENOMEM;
-> > +		goto err;
-> > +	}
-> > +
-> > +	dev = &m->dev;
-> > +	for (i = 0; i < nvqs; i++) {
-> > +		vqs[i] = &m->vqs[i];
-> > +		vqs[i]->handle_kick = handle_vq_kick;
-> > +	}
-> > +	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0);
-> > +	m->opened = true;
-> > +	mutex_unlock(&m->mutex);
-> > +
-> > +	return 0;
-> > +
-> > +err:
-> > +	mutex_unlock(&m->mutex);
-> > +	module_put(THIS_MODULE);
-> > +	return r;
-> > +}
-> > +
-> > +static void vhost_mdev_release(void *device_data)
-> > +{
-> > +	struct vhost_mdev *m = device_data;
-> > +
-> > +	mutex_lock(&m->mutex);
-> > +	vhost_mdev_reset(m);
-> > +	vhost_dev_stop(&m->dev);
-> > +	vhost_dev_cleanup(&m->dev);
-> > +
-> > +	kfree(m->dev.vqs);
-> > +	m->opened = false;
-> > +	mutex_unlock(&m->mutex);
-> > +	module_put(THIS_MODULE);
-> > +}
-> > +
-> > +static long vhost_mdev_unlocked_ioctl(void *device_data,
-> > +				      unsigned int cmd, unsigned long arg)
-> > +{
-> > +	struct vhost_mdev *m = device_data;
-> > +	void __user *argp = (void __user *)arg;
-> > +	long r;
-> > +
-> > +	mutex_lock(&m->mutex);
-> > +
-> > +	switch (cmd) {
-> > +	case VHOST_MDEV_GET_DEVICE_ID:
-> > +		r = vhost_mdev_get_device_id(m, argp);
-> > +		break;
-> > +	case VHOST_MDEV_GET_STATUS:
-> > +		r = vhost_mdev_get_status(m, argp);
-> > +		break;
-> > +	case VHOST_MDEV_SET_STATUS:
-> > +		r = vhost_mdev_set_status(m, argp);
-> > +		break;
-> > +	case VHOST_MDEV_GET_CONFIG:
-> > +		r = vhost_mdev_get_config(m, argp);
-> > +		break;
-> > +	case VHOST_MDEV_SET_CONFIG:
-> > +		r = vhost_mdev_set_config(m, argp);
-> > +		break;
-> > +	case VHOST_GET_FEATURES:
-> > +		r = vhost_mdev_get_features(m, argp);
-> > +		break;
-> > +	case VHOST_SET_FEATURES:
-> > +		r = vhost_mdev_set_features(m, argp);
-> > +		break;
-> > +	case VHOST_MDEV_GET_VRING_NUM:
-> > +		r = vhost_mdev_get_vring_num(m, argp);
-> > +		break;
-> > +	default:
-> > +		/*
-> > +		 * VHOST_SET_MEM_TABLE, VHOST_SET_LOG_BASE, and
-> > +		 * VHOST_SET_LOG_FD are not used yet.
-> > +		 */
-> 
-> 
-> If we don't even use them, there's probably no need to call
-> vhost_dev_ioctl(). This may help to avoid confusion when we want to develop
-> new API for e.g dirty page tracking.
-
-Good point. It's better to reject these ioctls for now.
-
-PS. One thing I may need to clarify is that, we need the
-VHOST_SET_OWNER ioctl to get the vq->handle_kick to work.
-So if we don't call vhost_dev_ioctl(), we will need to
-call vhost_dev_set_owner() directly.
-
-> 
-> 
-> > +		r = vhost_dev_ioctl(&m->dev, cmd, argp);
-> > +		if (r == -ENOIOCTLCMD)
-> > +			r = vhost_mdev_vring_ioctl(m, cmd, argp);
-> > +	}
-> > +
-> > +	mutex_unlock(&m->mutex);
-> > +	return r;
-> > +}
-> > +
-> > +static const struct vfio_device_ops vfio_vhost_mdev_dev_ops = {
-> > +	.name		= "vfio-vhost-mdev",
-> > +	.open		= vhost_mdev_open,
-> > +	.release	= vhost_mdev_release,
-> > +	.ioctl		= vhost_mdev_unlocked_ioctl,
-> > +};
-> > +
-> > +static int vhost_mdev_probe(struct device *dev)
-> > +{
-> > +	struct mdev_device *mdev = mdev_from_dev(dev);
-> > +	const struct mdev_virtio_device_ops *ops = mdev_get_vhost_ops(mdev);
-> > +	struct vhost_mdev *m;
-> > +	int nvqs, r;
-> > +
-> > +	/* Currently, we only accept the network devices. */
-> > +	if (ops->get_device_id(mdev) != VIRTIO_ID_NET)
-> > +		return -ENOTSUPP;
-> > +
-> > +	m = devm_kzalloc(dev, sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
-> > +	if (!m)
-> > +		return -ENOMEM;
-> > +
-> > +	nvqs = VHOST_MDEV_VQ_MAX;
-> 
-> 
-> On top. I think we probably need a better way other than hard-coded value
-> here.
-> 
-> E.g we can read config and detect the max virtqueue supported based on
-> device id.
-
-Totally agree. We do need a better way than the hardcoded
-value in the future. For now, it might be better to keep
-it as is for simplicity before we have the MQ support.
-
-
-> 
-> Thanks
-> 
-> 
-> > +
-> > +	m->vqs = devm_kmalloc_array(dev, nvqs, sizeof(struct vhost_virtqueue),
-> > +				    GFP_KERNEL);
-> > +	if (!m->vqs)
-> > +		return -ENOMEM;
-> > +
-> > +	mutex_init(&m->mutex);
-> > +
-> > +	m->mdev = mdev;
-> > +	m->nvqs = nvqs;
-> > +	m->virtio_id = ops->get_device_id(mdev);
-> > +
-> > +	r = vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, m);
-> > +	if (r) {
-> > +		mutex_destroy(&m->mutex);
-> > +		return r;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static void vhost_mdev_remove(struct device *dev)
-> > +{
-> > +	struct vhost_mdev *m;
-> > +
-> > +	m = vfio_del_group_dev(dev);
-> > +	mutex_destroy(&m->mutex);
-> > +}
-> > +
-> > +static const struct mdev_class_id vhost_mdev_match[] = {
-> > +	{ MDEV_CLASS_ID_VHOST },
-> > +	{ 0 },
-> > +};
-> > +MODULE_DEVICE_TABLE(mdev, vhost_mdev_match);
-> > +
-> > +static struct mdev_driver vhost_mdev_driver = {
-> > +	.name	= "vhost_mdev",
-> > +	.probe	= vhost_mdev_probe,
-> > +	.remove	= vhost_mdev_remove,
-> > +	.id_table = vhost_mdev_match,
-> > +};
-> > +
-> > +static int __init vhost_mdev_init(void)
-> > +{
-> > +	return mdev_register_driver(&vhost_mdev_driver, THIS_MODULE);
-> > +}
-> > +module_init(vhost_mdev_init);
-> > +
-> > +static void __exit vhost_mdev_exit(void)
-> > +{
-> > +	mdev_unregister_driver(&vhost_mdev_driver);
-> > +}
-> > +module_exit(vhost_mdev_exit);
-> > +
-> > +MODULE_VERSION("0.0.1");
-> > +MODULE_LICENSE("GPL v2");
-> > +MODULE_AUTHOR("Intel Corporation");
-> > +MODULE_DESCRIPTION("Mediated device based accelerator for virtio");
-> > diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> > index f3d75a60c2b5..8af7fb9e0149 100644
-> > --- a/include/linux/mdev.h
-> > +++ b/include/linux/mdev.h
-> > @@ -117,6 +117,10 @@ void mdev_set_virtio_ops(struct mdev_device *mdev,
-> >   			 const struct mdev_virtio_device_ops *virtio_ops);
-> >   const struct mdev_virtio_device_ops *
-> >   mdev_get_virtio_ops(struct mdev_device *mdev);
-> > +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> > +			const struct mdev_virtio_device_ops *vhost_ops);
-> > +const struct mdev_virtio_device_ops *
-> > +mdev_get_vhost_ops(struct mdev_device *mdev);
-> >   extern struct bus_type mdev_bus_type;
-> > @@ -133,6 +137,7 @@ struct mdev_device *mdev_from_dev(struct device *dev);
-> >   enum {
-> >   	MDEV_CLASS_ID_VFIO = 1,
-> >   	MDEV_CLASS_ID_VIRTIO = 2,
-> > +	MDEV_CLASS_ID_VHOST = 3,
-> >   	/* New entries must be added here */
-> >   };
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index 40d028eed645..061a2824a1b3 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -116,4 +116,22 @@
-> >   #define VHOST_VSOCK_SET_GUEST_CID	_IOW(VHOST_VIRTIO, 0x60, __u64)
-> >   #define VHOST_VSOCK_SET_RUNNING		_IOW(VHOST_VIRTIO, 0x61, int)
-> > +/* VHOST_MDEV specific defines */
-> > +
-> > +/* Get the device id. The device ids follow the same definition of
-> > + * the device id defined in virtio-spec. */
-> > +#define VHOST_MDEV_GET_DEVICE_ID	_IOR(VHOST_VIRTIO, 0x70, __u32)
-> > +/* Get and set the status. The status bits follow the same definition
-> > + * of the device status defined in virtio-spec. */
-> > +#define VHOST_MDEV_GET_STATUS		_IOR(VHOST_VIRTIO, 0x71, __u8)
-> > +#define VHOST_MDEV_SET_STATUS		_IOW(VHOST_VIRTIO, 0x72, __u8)
-> > +/* Get and set the device config. The device config follows the same
-> > + * definition of the device config defined in virtio-spec. */
-> > +#define VHOST_MDEV_GET_CONFIG		_IOR(VHOST_VIRTIO, 0x73, struct vhost_mdev_config)
-> > +#define VHOST_MDEV_SET_CONFIG		_IOW(VHOST_VIRTIO, 0x74, struct vhost_mdev_config)
-> > +/* Enable/disable the ring. */
-> > +#define VHOST_MDEV_SET_VRING_ENABLE	_IOW(VHOST_VIRTIO, 0x75, struct vhost_vring_state)
-> > +/* Get the max ring size. */
-> > +#define VHOST_MDEV_GET_VRING_NUM	_IOR(VHOST_VIRTIO, 0x76, __u16)
-> > +
-> >   #endif
-> > diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
-> > index c907290ff065..7b105d0b2fb9 100644
-> > --- a/include/uapi/linux/vhost_types.h
-> > +++ b/include/uapi/linux/vhost_types.h
-> > @@ -119,6 +119,14 @@ struct vhost_scsi_target {
-> >   	unsigned short reserved;
-> >   };
-> > +/* VHOST_MDEV specific definitions */
-> > +
-> > +struct vhost_mdev_config {
-> > +	__u32 off;
-> > +	__u32 len;
-> > +	__u8 buf[0];
-> > +};
-> > +
-> >   /* Feature bits */
-> >   /* Log all write descriptors. Can be changed while device is active. */
-> >   #define VHOST_F_LOG_ALL 26
-> 
+PiBGcm9tOiBQZXRlciBYdQ0KPiBTZW50OiBTYXR1cmRheSwgTm92ZW1iZXIgMiwgMjAxOSAyOjA2
+IEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6
+IFtSRkMgdjIgMTAvMjJdIGludGVsX2lvbW11OiBhZGQgdmlydHVhbCBjb21tYW5kIGNhcGFiaWxp
+dHkgc3VwcG9ydA0KPiANCj4gT24gVGh1LCBPY3QgMjQsIDIwMTkgYXQgMDg6MzQ6MzFBTSAtMDQw
+MCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gVGhpcyBwYXRjaCBhZGRzIHZpcnR1YWwgY29tbWFuZCBz
+dXBwb3J0IHRvIEludGVsIHZJT01NVSBwZXINCj4gPiBJbnRlbCBWVC1kIDMuMSBzcGVjLiBBbmQg
+YWRkcyB0d28gdmlydHVhbCBjb21tYW5kczogYWxsb2NfcGFzaWQNCj4gPiBhbmQgZnJlZV9wYXNp
+ZC4NCj4gPg0KPiA+IENjOiBLZXZpbiBUaWFuIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBD
+YzogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogUGV0
+ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4
+LmludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMaXUgWWkgTCA8eWkubC5saXVAaW50ZWwu
+Y29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29t
+Pg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAgfCAxNjINCj4g
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0NCj4gPiAgaHcvaTM4Ni9p
+bnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgIDM4ICsrKysrKysrKysNCj4gPiAgaHcvaTM4Ni90cmFj
+ZS1ldmVudHMgICAgICAgICAgIHwgICAxICsNCj4gPiAgaW5jbHVkZS9ody9pMzg2L2ludGVsX2lv
+bW11LmggIHwgICA2ICstDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMjA1IGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9pb21t
+dS5jIGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gaW5kZXggZTlmODY5Mi4uODhiODQzZiAx
+MDA2NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPiArKysgYi9ody9pMzg2
+L2ludGVsX2lvbW11LmMNCj4gPiBAQCAtOTQ0LDYgKzk0NCw3IEBAIHN0YXRpYyBWVERCdXMNCj4g
+KnZ0ZF9maW5kX2FzX2Zyb21fYnVzX251bShJbnRlbElPTU1VU3RhdGUgKnMsIHVpbnQ4X3QgYnVz
+X251bSkNCj4gPiAgICAgICAgICAgICAgICAgIHJldHVybiB2dGRfYnVzOw0KPiA+ICAgICAgICAg
+ICAgICB9DQo+ID4gICAgICAgICAgfQ0KPiA+ICsgICAgICAgIHZ0ZF9idXMgPSBOVUxMOw0KPiAN
+Cj4gSSBmZWVsIGxpa2UgSSd2ZSBjb21tZW50ZWQgb24gdGhpcy4uDQo+IA0KPiBTaG91bGQgdGhp
+cyBiZSBhIHN0YW5kYWxvbmUgcGF0Y2g/DQoNCk9vcHMsIEkgc2hvdWxkIGhhdmUgbWFkZSBpdCBp
+biBhIHNlcGFyYXRlIHBhdGNoLiB3aWxsIGRvIGl0IGluIG5leHQgdmVyc2lvbi4NCg0KPiA+ICAg
+ICAgfQ0KPiA+ICAgICAgcmV0dXJuIHZ0ZF9idXM7DQo+ID4gIH0NCj4gPiBAQCAtMjU5MCw2ICsy
+NTkxLDE0MCBAQCBzdGF0aWMgdm9pZCB2dGRfaGFuZGxlX2llY3RsX3dyaXRlKEludGVsSU9NTVVT
+dGF0ZQ0KPiAqcykNCj4gPiAgICAgIH0NCj4gPiAgfQ0KPiA+DQo+ID4gK3N0YXRpYyBpbnQgdnRk
+X3JlcXVlc3RfcGFzaWRfYWxsb2MoSW50ZWxJT01NVVN0YXRlICpzKQ0KPiA+ICt7DQo+ID4gKyAg
+ICBWVERCdXMgKnZ0ZF9idXM7DQo+ID4gKyAgICBpbnQgYnVzX24sIGRldmZuOw0KPiA+ICsgICAg
+SU9NTVVDVFhFdmVudERhdGEgZXZlbnRfZGF0YTsNCj4gPiArICAgIElPTU1VQ1RYUEFTSURSZXFE
+ZXNjIHJlcTsNCj4gPiArICAgIFZURElPTU1VQ29udGV4dCAqdnRkX2ljOw0KPiA+ICsNCj4gPiAr
+ICAgIGV2ZW50X2RhdGEuZXZlbnQgPSBJT01NVV9DVFhfRVZFTlRfUEFTSURfQUxMT0M7DQo+ID4g
+KyAgICBldmVudF9kYXRhLmRhdGEgPSAmcmVxOw0KPiA+ICsgICAgcmVxLm1pbl9wYXNpZCA9IFZU
+RF9NSU5fSFBBU0lEOw0KPiA+ICsgICAgcmVxLm1heF9wYXNpZCA9IFZURF9NQVhfSFBBU0lEOw0K
+PiA+ICsgICAgcmVxLmFsbG9jX3Jlc3VsdCA9IDA7DQo+ID4gKyAgICBldmVudF9kYXRhLmxlbmd0
+aCA9IHNpemVvZihyZXEpOw0KPiANCj4gQXMgbWVudGlvbmVkIGluIHRoZSBvdGhlciB0aHJlYWQs
+IGRvIHlvdSB0aGluayB3ZSBjYW4gZHJvcCB0aGlzIGxlbmd0aA0KPiBmaWVsZD8NCg0KeWVwLCB3
+aWxsIGRvIGl0Lg0KDQo+IA0KPiA+ICsgICAgZm9yIChidXNfbiA9IDA7IGJ1c19uIDwgUENJX0JV
+U19NQVg7IGJ1c19uKyspIHsNCj4gPiArICAgICAgICB2dGRfYnVzID0gdnRkX2ZpbmRfYXNfZnJv
+bV9idXNfbnVtKHMsIGJ1c19uKTsNCj4gPiArICAgICAgICBpZiAoIXZ0ZF9idXMpIHsNCj4gPiAr
+ICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIGZvciAo
+ZGV2Zm4gPSAwOyBkZXZmbiA8IFBDSV9ERVZGTl9NQVg7IGRldmZuKyspIHsNCj4gPiArICAgICAg
+ICAgICAgdnRkX2ljID0gdnRkX2J1cy0+ZGV2X2ljW2RldmZuXTsNCj4gPiArICAgICAgICAgICAg
+aWYgKCF2dGRfaWMpIHsNCj4gPiArICAgICAgICAgICAgICAgIGNvbnRpbnVlOw0KPiA+ICsgICAg
+ICAgICAgICB9DQo+ID4gKyAgICAgICAgICAgIGlvbW11X2N0eF9ldmVudF9ub3RpZnkoJnZ0ZF9p
+Yy0+aW9tbXVfY29udGV4dCwgJmV2ZW50X2RhdGEpOw0KPiANCj4gQ29uc2lkZXJpbmcgdGhhdCB3
+ZSdsbCBmaWxsIGluIHRoZSByZXN1bHQgaW50byBldmVudF9kYXRhLCBpdCBjb3VsZCBiZQ0KPiBh
+IGJpdCBtaXNsZWFkaW5nIHRvIHN0aWxsIGNhbGwgaXQgIm5vdGlmeSIgaGVyZSBiZWNhdXNlIG5v
+cm1hbGx5IGl0DQo+IHNob3VsZCBvbmx5IGdldCBkYXRhIGZyb20gdGhlIG5vdGlmaWVyIGNhbGxl
+ciByYXRoZXIgdGhhbiByZXR1cm5pbmcgYQ0KPiBtZWFuaW5nZnVsIHZhbHVlLi4gIFRoaW5ncyBs
+aWtlIFNVQ0NFU1MvRkFJTCB3b3VsZCBiZSBmaW5lLCBidXQgaGVyZQ0KPiB3ZSdyZSByZXR1cm5p
+bmcgYSBwYXNpZCBmcm9tIHRoZSBub3RpZmllciB3aGljaCBzZWVtcyBhIGJpdCBvZGQuDQo+IA0K
+PiBNYXliZSByZW5hbWUgaXQgdG8gaW9tbXVfY3R4X2V2ZW50X2RlbGl2ZXIoKT8gIFRoZW4gd2Ug
+anVzdCByZW5hbWUgYWxsDQo+IHRoZSByZWZlcmVuY2VzIG9mICJub3RpZnkiIHRoaW5neXMgaW50
+byAiaG9vayIgb3Igc29tZXRoaW5nIGNsZWFyZXI/DQoNCmdvdCBpdC4gV2lsbCBkbyBpdCB3aGVu
+IHdlIGdvdCBhZ3JlZW1lbnQgb24gdGhlIGNvbW1lbnRzIHJlZ2FyZHMgdG8NCltSRkMgdjIgMDkv
+MjJdIHZmaW8vcGNpOiBhZGQgaW9tbXVfY29udGV4dCBub3RpZmllciBmb3IgcGFzaWQgYWxsb2Mv
+ZnJlZQ0Kb2YgdGhpcyBzZXJpZXMuDQoNCj4gPiArICAgICAgICAgICAgaWYgKHJlcS5hbGxvY19y
+ZXN1bHQgPiAwKSB7DQo+IA0KPiBJJ2Qgc3VnZ2VzdCB3ZSBjb21tZW50IG9uIHRoaXM6DQo+IA0K
+PiAgICAgV2UnbGwgcmV0dXJuIHRoZSBmaXJzdCB2YWxpZCByZXN1bHQgd2UgZ290LiAgSXQncyBh
+IGJpdCBoYWNraXNoIGluDQo+ICAgICB0aGF0IHdlIGRvbid0IGhhdmUgYSBnb29kIGdsb2JhbCBp
+bnRlcmZhY2UgeWV0IHRvIHRhbGsgdG8gbW9kdWxlcw0KPiAgICAgbGlrZSB2ZmlvIHRvIGRlbGl2
+ZXIgdGhpcyBhbGxvY2F0aW9uIHJlcXVlc3QsIHNvIHdlJ3JlIGxldmVyYWdpbmcNCj4gICAgIHRo
+aXMgcGVyLWRldmljZSBjb250ZXh0IHRvIGRvIHRoZSBzYW1lIHRoaW5nIGp1c3QgdG8gbWFrZSBz
+dXJlIHRoZQ0KPiAgICAgYWxsb2NhdGlvbiBoYXBwZW5zIG9ubHkgb25jZS4NCj4gDQo+IFNhbWUg
+dG8gdGhlIHBhc2lkX2ZyZWUoKSBiZWxvdywgdGhvdWdoIHlvdSBjYW4gcmVmZXJlbmNlIHRoZSBj
+b21tZW50DQo+IGhlcmUgZnJvbSB0aGVyZSB0byBiZSBzaW1wbGUuDQoNCkdvdCBpdC4gV2lsbCBh
+ZGQgaXQgaW4gYm90aCBwbGFjZS4NCg0KPiANCj4gPiArICAgICAgICAgICAgICAgIHJldHVybiBy
+ZXEuYWxsb2NfcmVzdWx0Ow0KPiA+ICsgICAgICAgICAgICB9DQo+ID4gKyAgICAgICAgfQ0KPiA+
+ICsgICAgfQ0KPiA+ICsgICAgcmV0dXJuIC0xOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMg
+aW50IHZ0ZF9yZXF1ZXN0X3Bhc2lkX2ZyZWUoSW50ZWxJT01NVVN0YXRlICpzLCB1aW50MzJfdCBw
+YXNpZCkNCj4gPiArew0KPiA+ICsgICAgVlREQnVzICp2dGRfYnVzOw0KPiA+ICsgICAgaW50IGJ1
+c19uLCBkZXZmbjsNCj4gPiArICAgIElPTU1VQ1RYRXZlbnREYXRhIGV2ZW50X2RhdGE7DQo+ID4g
+KyAgICBJT01NVUNUWFBBU0lEUmVxRGVzYyByZXE7DQo+ID4gKyAgICBWVERJT01NVUNvbnRleHQg
+KnZ0ZF9pYzsNCj4gPiArDQo+ID4gKyAgICBldmVudF9kYXRhLmV2ZW50ID0gSU9NTVVfQ1RYX0VW
+RU5UX1BBU0lEX0ZSRUU7DQo+ID4gKyAgICBldmVudF9kYXRhLmRhdGEgPSAmcmVxOw0KPiA+ICsg
+ICAgcmVxLnBhc2lkID0gcGFzaWQ7DQo+ID4gKyAgICByZXEuZnJlZV9yZXN1bHQgPSAwOw0KPiA+
+ICsgICAgZXZlbnRfZGF0YS5sZW5ndGggPSBzaXplb2YocmVxKTsNCj4gPiArICAgIGZvciAoYnVz
+X24gPSAwOyBidXNfbiA8IFBDSV9CVVNfTUFYOyBidXNfbisrKSB7DQo+ID4gKyAgICAgICAgdnRk
+X2J1cyA9IHZ0ZF9maW5kX2FzX2Zyb21fYnVzX251bShzLCBidXNfbik7DQo+ID4gKyAgICAgICAg
+aWYgKCF2dGRfYnVzKSB7DQo+ID4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiA+ICsgICAgICAg
+IH0NCj4gPiArICAgICAgICBmb3IgKGRldmZuID0gMDsgZGV2Zm4gPCBQQ0lfREVWRk5fTUFYOyBk
+ZXZmbisrKSB7DQo+ID4gKyAgICAgICAgICAgIHZ0ZF9pYyA9IHZ0ZF9idXMtPmRldl9pY1tkZXZm
+bl07DQo+ID4gKyAgICAgICAgICAgIGlmICghdnRkX2ljKSB7DQo+ID4gKyAgICAgICAgICAgICAg
+ICBjb250aW51ZTsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgICAgICBpb21tdV9j
+dHhfZXZlbnRfbm90aWZ5KCZ2dGRfaWMtPmlvbW11X2NvbnRleHQsICZldmVudF9kYXRhKTsNCj4g
+PiArICAgICAgICAgICAgaWYgKHJlcS5mcmVlX3Jlc3VsdCA9PSAwKSB7DQo+ID4gKyAgICAgICAg
+ICAgICAgICByZXR1cm4gMDsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgIH0NCj4g
+PiArICAgIH0NCj4gPiArICAgIHJldHVybiAtMTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArLyoNCj4g
+PiArICogSWYgSVAgaXMgbm90IHNldCwgc2V0IGl0IGFuZCByZXR1cm4gMA0KPiA+ICsgKiBJZiBJ
+UCBpcyBhbHJlYWR5IHNldCwgcmV0dXJuIC0xDQo+ID4gKyAqLw0KPiA+ICtzdGF0aWMgaW50IHZ0
+ZF92Y21kX3JzcF9pcF9jaGVjayhJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gK3sNCj4gPiArICAg
+IGlmICghKHMtPnZjY2FwICYgVlREX1ZDQ0FQX1BBUykgfHwNCj4gPiArICAgICAgICAgKHMtPnZj
+cnNwICYgMSkpIHsNCj4gPiArICAgICAgICByZXR1cm4gLTE7DQo+ID4gKyAgICB9DQo+IA0KPiBW
+VERfVkNDQVBfUEFTIGlzIG5vdCBhIElQIGNoZWNrLCBzbyBtYXliZSBzaW1wbHkgbW92ZSB0aGVz
+ZSBjaHVuayBvdXQNCj4gdG8gdnRkX2hhbmRsZV92Y21kX3dyaXRlPyAgVGhlbiB3ZSBjYW4gcmVu
+YW1lIHRoaXMgZnVuY3Rpb24gdG8NCj4gInZvaWQgdnRkX3ZjbWRfaXBfc2V0KC4uLikiLg0KDQp5
+ZXMsIGl0IGlzLiB3aWxsIGRvIGl0IGluIG5leHQgdmVyc2lvbi4NCg0KPiANCj4gPiArICAgIHMt
+PnZjcnNwID0gMTsNCj4gPiArICAgIHZ0ZF9zZXRfcXVhZF9yYXcocywgRE1BUl9WQ1JTUF9SRUcs
+DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICgodWludDY0X3QpIHMtPnZjcnNwKSk7DQo+ID4g
+KyAgICByZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIHZvaWQgdnRkX3ZjbWRf
+Y2xlYXJfaXAoSW50ZWxJT01NVVN0YXRlICpzKQ0KPiA+ICt7DQo+ID4gKyAgICBzLT52Y3JzcCAm
+PSAofigodWludDY0X3QpKDB4MSkpKTsNCj4gPiArICAgIHZ0ZF9zZXRfcXVhZF9yYXcocywgRE1B
+Ul9WQ1JTUF9SRUcsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICgodWludDY0X3QpIHMtPnZj
+cnNwKSk7DQo+ID4gK30NCj4gPiArDQo+ID4gKy8qIEhhbmRsZSB3cml0ZSB0byBWaXJ0dWFsIENv
+bW1hbmQgUmVnaXN0ZXIgKi8NCj4gPiArc3RhdGljIGludCB2dGRfaGFuZGxlX3ZjbWRfd3JpdGUo
+SW50ZWxJT01NVVN0YXRlICpzLCB1aW50NjRfdCB2YWwpDQo+ID4gK3sNCj4gPiArICAgIHVpbnQz
+Ml90IHBhc2lkOw0KPiA+ICsgICAgaW50IHJldCA9IC0xOw0KPiA+ICsNCj4gPiArICAgIHRyYWNl
+X3Z0ZF9yZWdfd3JpdGVfdmNtZChzLT52Y3JzcCwgdmFsKTsNCj4gPiArDQo+ID4gKyAgICAvKg0K
+PiA+ICsgICAgICogU2luY2UgdkNQVSBzaG91bGQgYmUgYmxvY2tlZCB3aGVuIHRoZSBndWVzdCBW
+TUNEDQo+ID4gKyAgICAgKiB3cml0ZSB3YXMgdHJhcHBlZCB0byBoZXJlLiBTaG91bGQgYmUgbm8g
+b3RoZXIgdkNQVXMNCj4gPiArICAgICAqIHRyeSB0byBhY2Nlc3MgVkNNRCBpZiBndWVzdCBzb2Z0
+d2FyZSBpcyB3ZWxsIHdyaXR0ZW4uDQo+ID4gKyAgICAgKiBIb3dldmVyLCB3ZSBzdGlsbCBlbXVs
+YXRlIHRoZSBJUCBiaXQgaGVyZSBpbiBjYXNlIG9mDQo+ID4gKyAgICAgKiBiYWQgZ3Vlc3Qgc29m
+dHdhcmUuIEFsc28gYWxpZ24gd2l0aCB0aGUgc3BlYy4NCj4gPiArICAgICAqLw0KPiA+ICsgICAg
+cmV0ID0gdnRkX3ZjbWRfcnNwX2lwX2NoZWNrKHMpOw0KPiA+ICsgICAgaWYgKHJldCkgew0KPiA+
+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4gKyAgICBzd2l0Y2ggKHZhbCAm
+IFZURF9WQ01EX0NNRF9NQVNLKSB7DQo+ID4gKyAgICBjYXNlIFZURF9WQ01EX0FMTE9DX1BBU0lE
+Og0KPiA+ICsgICAgICAgIHJldCA9IHZ0ZF9yZXF1ZXN0X3Bhc2lkX2FsbG9jKHMpOw0KPiA+ICsg
+ICAgICAgIGlmIChyZXQgPCAwKSB7DQo+ID4gKyAgICAgICAgICAgIHMtPnZjcnNwIHw9IFZURF9W
+Q1JTUF9TQyhWVERfVkNNRF9OT19BVkFJTEFCTEVfUEFTSUQpOw0KPiA+ICsgICAgICAgIH0gZWxz
+ZSB7DQo+ID4gKyAgICAgICAgICAgIHMtPnZjcnNwIHw9IFZURF9WQ1JTUF9SU0xUKHJldCk7DQo+
+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgIGNhc2Ug
+VlREX1ZDTURfRlJFRV9QQVNJRDoNCj4gPiArICAgICAgICBwYXNpZCA9IFZURF9WQ01EX1BBU0lE
+X1ZBTFVFKHZhbCk7DQo+ID4gKyAgICAgICAgcmV0ID0gdnRkX3JlcXVlc3RfcGFzaWRfZnJlZShz
+LCBwYXNpZCk7DQo+ID4gKyAgICAgICAgaWYgKHJldCA8IDApIHsNCj4gPiArICAgICAgICAgICAg
+cy0+dmNyc3AgfD0gVlREX1ZDUlNQX1NDKFZURF9WQ01EX0ZSRUVfSU5WQUxJRF9QQVNJRCk7DQo+
+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgIGRlZmF1
+bHQ6DQo+ID4gKyAgICAgICAgcy0+dmNyc3AgfD0gVlREX1ZDUlNQX1NDKFZURF9WQ01EX1VOREVG
+SU5FRF9DTUQpOw0KPiA+ICsgICAgICAgIHByaW50ZigiVmlydHVhbCBDb21tYW5kOiB1bnN1cHBv
+cnRlZCBjb21tYW5kISEhXG4iKTsNCj4gDQo+IFBlcmhhcHMgZXJyb3JfcmVwb3J0X29uY2UoKT8N
+Cg0Kd2lsbCBmaXggaXQgaW4gbmV4dCB2ZXJzaW9uLiB0aHh+DQoNCj4gPiArICAgICAgICBicmVh
+azsNCj4gPiArICAgIH0NCj4gPiArICAgIHZ0ZF92Y21kX2NsZWFyX2lwKHMpOw0KPiA+ICsgICAg
+cmV0dXJuIDA7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyB1aW50NjRfdCB2dGRfbWVtX3Jl
+YWQodm9pZCAqb3BhcXVlLCBod2FkZHIgYWRkciwgdW5zaWduZWQgc2l6ZSkNCj4gPiAgew0KPiA+
+ICAgICAgSW50ZWxJT01NVVN0YXRlICpzID0gb3BhcXVlOw0KPiA+IEBAIC0yODc5LDYgKzMwMTQs
+MjMgQEAgc3RhdGljIHZvaWQgdnRkX21lbV93cml0ZSh2b2lkICpvcGFxdWUsIGh3YWRkciBhZGRy
+LA0KPiA+ICAgICAgICAgIHZ0ZF9zZXRfbG9uZyhzLCBhZGRyLCB2YWwpOw0KPiA+ICAgICAgICAg
+IGJyZWFrOw0KPiA+DQo+ID4gKyAgICBjYXNlIERNQVJfVkNNRF9SRUc6DQo+ID4gKyAgICAgICAg
+aWYgKCF2dGRfaGFuZGxlX3ZjbWRfd3JpdGUocywgdmFsKSkgew0KPiA+ICsgICAgICAgICAgICBp
+ZiAoc2l6ZSA9PSA0KSB7DQo+ID4gKyAgICAgICAgICAgICAgICB2dGRfc2V0X2xvbmcocywgYWRk
+ciwgdmFsKTsNCj4gPiArICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAgICAgICAgICAgICAg
+IHZ0ZF9zZXRfcXVhZChzLCBhZGRyLCB2YWwpOw0KPiA+ICsgICAgICAgICAgICB9DQo+ID4gKyAg
+ICAgICAgfQ0KPiA+ICsgICAgICAgIGJyZWFrOw0KPiA+ICsNCj4gPiArICAgIGNhc2UgRE1BUl9W
+Q01EX1JFR19ISToNCj4gPiArICAgICAgICBhc3NlcnQoc2l6ZSA9PSA0KTsNCj4gDQo+IFRoaXMg
+YXNzZXJ0KCkgc2VlbXMgc2NhcnksIGJ1dCBvZiBjb3Vyc2Ugbm90IGEgcHJvYmxlbSBvZiB0aGlz
+IHBhdGNoDQo+IGJlY2F1c2UgcGxlbnR5IG9mIHRoYXQgYXJlIHRoZXJlIGluIHZ0ZF9tZW1fd3Jp
+dGUuLiAgU28gd2UgY2FuIGZpeA0KPiB0aGF0IGxhdGVyLg0KDQpnb3QgaXQuDQoNCj4gDQo+IERv
+IHlvdSBrbm93IHdoYXQgc2hvdWxkIGhhcHBlbiBvbiBiYXJlLW1ldGFsIGZyb20gc3BlYy13aXNl
+IHRoYXQgd2hlbg0KPiB0aGUgZ3Vlc3QgZS5nLiB3cml0ZXMgMiBieXRlcyB0byB0aGVzZSBtbWlv
+IHJlZ2lvbnM/DQoNCkkndmUgbm8gaWRlYSB0byB5b3VyIHF1ZXN0aW9uLiBJdCBpcyBub3QgYSBi
+YXJlLW1ldGFsIGNhcGFiaWxpdHkuIFBlcnNvbmFsbHksIEkNCnByZWZlciB0byBoYXZlIGEgdG9n
+Z2xlIGJpdCB0byBtYXJrIHRoZSBmdWxsIHdyaXR0ZW4gb2YgYSBjbWQgdG8gVk1DRF9SRUcuDQpS
+ZWFzb24gaXMgdGhhdCB3ZSBoYXZlIG5vIGNvbnRyb2wgb24gZ3Vlc3Qgc29mdHdhcmUuIEl0IG1h
+eSB3cml0ZSBuZXcgY21kDQp0byBWQ01EX1JFRyBpbiBhIGJhZCBtYW5uZXIuIGUuZy4gd3JpdGUg
+aGlnaCAzMiBiaXRzIGZpcnN0IGFuZCB0aGVuIHdyaXRlIHRoZQ0KbG93IDMyIGJpdHMuIFRoZW4g
+aXQgd2lsbCBoYXZlIHR3byB0cmFwcy4gQXBwYXJlbnRseSwgZm9yIHRoZSBmaXJzdCB0cmFwLCBp
+dCBmaWxscw0KaW4gdGhlIFZDTURfUkVHIGFuZCBubyBuZWVkIHRvIGhhbmRsZSBpdCBzaW5jZSBp
+dCBpcyBub3QgYSBmdWxsIHdyaXR0ZW4uIEknbQ0KY2hlY2tpbmcgaXQgYW5kIGV2YWx1YXRpbmcg
+aXQuIEhvdyBkbyB5b3UgdGhpbmsgb24gaXQ/DQoNCj4gDQo+ID4gKyAgICAgICAgaWYgKCF2dGRf
+aGFuZGxlX3ZjbWRfd3JpdGUocywgdmFsKSkgew0KPiA+ICsgICAgICAgICAgICB2dGRfc2V0X2xv
+bmcocywgYWRkciwgdmFsKTsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+
+ID4gKw0KPiA+ICAgICAgZGVmYXVsdDoNCj4gPiAgICAgICAgICBpZiAoc2l6ZSA9PSA0KSB7DQo+
+ID4gICAgICAgICAgICAgIHZ0ZF9zZXRfbG9uZyhzLCBhZGRyLCB2YWwpOw0KPiA+IEBAIC0zNjE3
+LDcgKzM3NjksOCBAQCBzdGF0aWMgdm9pZCB2dGRfaW5pdChJbnRlbElPTU1VU3RhdGUgKnMpDQo+
+ID4gICAgICAgICAgICAgIHMtPmVjYXAgfD0gVlREX0VDQVBfU01UUyB8IFZURF9FQ0FQX1NSUyB8
+IFZURF9FQ0FQX1NMVFM7DQo+ID4gICAgICAgICAgfSBlbHNlIGlmICghc3RyY21wKHMtPnNjYWxh
+YmxlX21vZGUsICJtb2Rlcm4iKSkgew0KPiA+ICAgICAgICAgICAgICBzLT5lY2FwIHw9IFZURF9F
+Q0FQX1NNVFMgfCBWVERfRUNBUF9TUlMgfCBWVERfRUNBUF9QQVNJRA0KPiA+IC0gICAgICAgICAg
+ICAgICAgICAgICAgIHwgVlREX0VDQVBfRkxUUyB8IFZURF9FQ0FQX1BTUzsNCj4gPiArICAgICAg
+ICAgICAgICAgICAgICAgICB8IFZURF9FQ0FQX0ZMVFMgfCBWVERfRUNBUF9QU1MgfCBWVERfRUNB
+UF9WQ1M7DQo+ID4gKyAgICAgICAgICAgIHMtPnZjY2FwIHw9IFZURF9WQ0NBUF9QQVM7DQo+ID4g
+ICAgICAgICAgfQ0KPiA+ICAgICAgfQ0KPiA+DQo+IA0KPiBbLi4uXQ0KPiANCj4gPiArI2RlZmlu
+ZSBWVERfVkNNRF9DTURfTUFTSyAgICAgICAgICAgMHhmZlVMDQo+ID4gKyNkZWZpbmUgVlREX1ZD
+TURfUEFTSURfVkFMVUUodmFsKSAgICgoKHZhbCkgPj4gOCkgJiAweGZmZmZmKQ0KPiA+ICsNCj4g
+PiArI2RlZmluZSBWVERfVkNSU1BfUlNMVCh2YWwpICAgICAgICAgKCh2YWwpIDw8IDgpDQo+ID4g
+KyNkZWZpbmUgVlREX1ZDUlNQX1NDKHZhbCkgICAgICAgICAgICgoKHZhbCkgJiAweDMpIDw8IDEp
+DQo+ID4gKw0KPiA+ICsjZGVmaW5lIFZURF9WQ01EX1VOREVGSU5FRF9DTUQgICAgICAgICAxVUxM
+DQo+ID4gKyNkZWZpbmUgVlREX1ZDTURfTk9fQVZBSUxBQkxFX1BBU0lEICAgIDJVTEwNCj4gDQo+
+IEFjY29yZGluZyB0byAxMC40LjQ0IC0gc2hvdWxkIHRoaXMgYmUgMT8NCg0KSXQncyAyIG5vdyBw
+ZXIgVlQtZCBzcGVjIDMuMSAoMjAxOSBKdW5lKS4gSSBzaG91bGQgaGF2ZSBtZW50aW9uZWQgaXQg
+aW4gdGhlIGNvdmVyDQpsZXR0ZXIuLi4NCg0KUmVnYXJkcywNCllpIExpdQ0KDQo=
