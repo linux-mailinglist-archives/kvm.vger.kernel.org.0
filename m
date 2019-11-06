@@ -2,626 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 199A4F1367
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 11:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E760BF13BE
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 11:19:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731260AbfKFKJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 05:09:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38165 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730019AbfKFKJv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 05:09:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573034990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fyCnjsS5Fr1x57FB71TWjKrF0PPoXy8TukWSnaTEGNY=;
-        b=XgEpmxOWcpYkT8ZJaPJur81BzVxbyDfBJ1W5T0MH4IXJs/+l8AOuGLT25oSvDg2ysjDb8y
-        ZYX+QBAUhhLs8la/IGwNcAulu0HitD1gqapoMCMA4BMbC3xzWcF2d50Pqz8mESjmrmwdpp
-        7fUHHqY5zUpKypHEKpVc1tLW7UE2Tz8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-n2XZEeSkMe2v5tM7bF782Q-1; Wed, 06 Nov 2019 05:09:47 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A74731800D53;
-        Wed,  6 Nov 2019 10:09:45 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9467D600C4;
-        Wed,  6 Nov 2019 10:09:45 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 705FD1802213;
-        Wed,  6 Nov 2019 10:09:45 +0000 (UTC)
-Date:   Wed, 6 Nov 2019 05:09:44 -0500 (EST)
-From:   Jason Wang <jasowang@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     mst@redhat.com, alex williamson <alex.williamson@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan daly <dan.daly@intel.com>,
-        cunming liang <cunming.liang@intel.com>,
-        tiwei bie <tiwei.bie@intel.com>,
-        jason zeng <jason.zeng@intel.com>
-Message-ID: <485376113.12775534.1573034984498.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1572946660-26265-2-git-send-email-lingshan.zhu@intel.com>
-References: <1572946660-26265-1-git-send-email-lingshan.zhu@intel.com> <1572946660-26265-2-git-send-email-lingshan.zhu@intel.com>
-Subject: Re: [PATCH 1/2] IFC hardware operation layer
+        id S1729301AbfKFKTm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 05:19:42 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18418 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726143AbfKFKTm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 05:19:42 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA69uUgB116683
+        for <kvm@vger.kernel.org>; Wed, 6 Nov 2019 05:19:41 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w3ue524w0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 05:19:41 -0500
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 6 Nov 2019 10:19:39 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 6 Nov 2019 10:19:36 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA6AJZWA24510940
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 6 Nov 2019 10:19:35 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0ED8A11C04A;
+        Wed,  6 Nov 2019 10:19:35 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CBA9811C05B;
+        Wed,  6 Nov 2019 10:19:34 +0000 (GMT)
+Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  6 Nov 2019 10:19:34 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: Remove DAT and add short
+ indication psw bits on diag308 reset
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com
+References: <20191105162828.2490-1-frankja@linux.ibm.com>
+ <20191105162828.2490-3-frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Wed, 6 Nov 2019 11:19:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Originating-IP: [10.68.5.20, 10.4.195.20]
-Thread-Topic: IFC hardware operation layer
-Thread-Index: FsBfjW5Zoy9a7+TY0AAHFCwQ5mGXrA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: n2XZEeSkMe2v5tM7bF782Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191105162828.2490-3-frankja@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="j4ML4Gy1U04lLyaz2OBIvyEIFgfoEoO27"
+X-TM-AS-GCONF: 00
+x-cbid: 19110610-4275-0000-0000-0000037B423A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19110610-4276-0000-0000-0000388E8F86
+Message-Id: <c53bab1c-3158-f9c2-bd36-c3eca857d26f@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-06_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=5 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1911060102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019/11/5 =E4=B8=8B=E5=8D=885:37, Zhu Lingshan wrote:
-> This commit introduced ifcvf_base layer, which handles hardware
-> operations and configurations.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--j4ML4Gy1U04lLyaz2OBIvyEIFgfoEoO27
+Content-Type: multipart/mixed; boundary="SRfEZYxOf5YPbrjPL2QwqalbagPRCb2rx"
 
-It looks like the PCI layout is pretty similar to virtio. Can we reuse
-e.g virtio_pci_modern_probe() (or helpers in virtio_pci_modern.c) to
-do the probing?
+--SRfEZYxOf5YPbrjPL2QwqalbagPRCb2rx
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->
-> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+On 11/5/19 5:28 PM, Janosch Frank wrote:
+> On a diag308 subcode 0 CRs will be reset, so we need to mask of PSW
+> DAT indication until we restore our CRs.
+>=20
+> Also we need to set the short psw indication to be compliant with the
+> architecture.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  drivers/vhost/ifcvf/ifcvf_base.c | 344 +++++++++++++++++++++++++++++++++=
-++++++
->  drivers/vhost/ifcvf/ifcvf_base.h | 132 +++++++++++++++
->  2 files changed, 476 insertions(+)
->  create mode 100644 drivers/vhost/ifcvf/ifcvf_base.c
->  create mode 100644 drivers/vhost/ifcvf/ifcvf_base.h
->
-> diff --git a/drivers/vhost/ifcvf/ifcvf_base.c b/drivers/vhost/ifcvf/ifcvf=
-_base.c
-> new file mode 100644
-> index 0000000..0659f41
-> --- /dev/null
-> +++ b/drivers/vhost/ifcvf/ifcvf_base.c
-> @@ -0,0 +1,344 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2019 Intel Corporation.
-> + */
-> +
-> +#include "ifcvf_base.h"
-> +
-> +static void *get_cap_addr(struct ifcvf_hw *hw, struct virtio_pci_cap *ca=
-p)
-> +{
-> +=09struct ifcvf_adapter *ifcvf;
-> +=09u32 length, offset;
-> +=09u8 bar;
-> +
-> +=09length =3D le32_to_cpu(cap->length);
-> +=09offset =3D le32_to_cpu(cap->offset);
-> +=09bar =3D le32_to_cpu(cap->bar);
-> +
-> +=09ifcvf =3D container_of(hw, struct ifcvf_adapter, vf);
-> +
-> +=09if (bar >=3D IFCVF_PCI_MAX_RESOURCE) {
-> +=09=09IFC_DBG(ifcvf->dev,
-> +=09=09=09"Invalid bar number %u to get capabilities.\n", bar);
-> +=09=09return NULL;
-> +=09}
-> +
-> +=09if (offset + length < offset) {
+>  lib/s390x/asm-offsets.c  |  1 +
+>  lib/s390x/asm/arch_def.h |  3 ++-
+>  s390x/cstart64.S         | 20 ++++++++++++++------
+>  3 files changed, 17 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
+> index 4b213f8..61d2658 100644
+> --- a/lib/s390x/asm-offsets.c
+> +++ b/lib/s390x/asm-offsets.c
+> @@ -58,6 +58,7 @@ int main(void)
+>  	OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
+>  	OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
+>  	OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
+> +	OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
+>  	OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
+>  	OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
+>  	OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 07d4e5e..7d25e4f 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -79,7 +79,8 @@ struct lowcore {
+>  	uint32_t	sw_int_fpc;			/* 0x0300 */
+>  	uint8_t		pad_0x0304[0x0308 - 0x0304];	/* 0x0304 */
+>  	uint64_t	sw_int_crs[16];			/* 0x0308 */
+> -	uint8_t		pad_0x0310[0x11b0 - 0x0388];	/* 0x0388 */
+> +	struct psw	sw_int_psw;			/* 0x0388 */
+> +	uint8_t		pad_0x0310[0x11b0 - 0x0390];	/* 0x0390 */
 
-Can this really happen? Both offset and length are u32.
+That's obviously not correct, the psw is two DWORDS long, not one...
 
-> +=09=09IFC_DBG(ifcvf->dev, "offset(%u) + length(%u) overflows\n",
-> +=09=09=09offset, length);
-> +=09=09return NULL;
-> +=09}
-> +
-> +=09if (offset + length > hw->mem_resource[cap->bar].len) {
-> +=09=09IFC_DBG(ifcvf->dev,
-> +=09=09=09"offset(%u) + len(%u) overflows bar%u to get capabilities.\n",
-> +=09=09=09offset, length, bar);
-> +=09=09return NULL;
-> +=09}
-> +
-> +=09return hw->mem_resource[bar].addr + offset;
+>  	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
+>  	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
+>  	uint64_t	fprs_sa[16];			/* 0x1200 */
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 0455591..2e0dcf5 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -129,8 +129,15 @@ memsetxc:
+>  .globl diag308_load_reset
+>  diag308_load_reset:
+>  	SAVE_REGS
+> -	/* Save the first PSW word to the IPL PSW */
+> +	/* Backup current PSW */
+>  	epsw	%r0, %r1
+> +	st	%r0, GEN_LC_SW_INT_PSW
+> +	st	%r1, GEN_LC_SW_INT_PSW + 4
+> +	/* Disable DAT as the CRs will be reset too */
+> +	nilh	%r0, 0xfbff
+> +	/* Add psw bit 12 to indicate short psw */
+> +	oilh	%r0, 0x0008
+> +	/* Save the first PSW word to the IPL PSW */
+>  	st	%r0, 0
+>  	/* Store the address and the bit for 31 bit addressing */
+>  	larl    %r0, 0f
+> @@ -142,12 +149,13 @@ diag308_load_reset:
+>  	xgr	%r2, %r2
+>  	br	%r14
+>  	/* Success path */
+> -	/* We lost cr0 due to the reset */
+> -0:	larl	%r1, initial_cr0
+> -	lctlg	%c0, %c0, 0(%r1)
+> -	RESTORE_REGS
+> +	/* Switch to z/Architecture mode and 64-bit */
+> +0:	RESTORE_REGS
+>  	lhi	%r2, 1
+> -	br	%r14
+> +	larl	%r0, 1f
+> +	stg	%r0, GEN_LC_SW_INT_PSW + 8
+> +	lpswe	GEN_LC_SW_INT_PSW
+> +1:	br	%r14
+> =20
+>  .globl smp_cpu_setup_state
+>  smp_cpu_setup_state:
+>=20
 
-I don't see the initialization of mem_resource in the patch, I wonder
-whether it's better to squash this patch just into patch 2.
 
-> +}
-> +
-> +int ifcvf_read_config_range(struct pci_dev *dev,
-> +=09=09=09uint32_t *val, int size, int where)
-> +{
-> +=09int ret, i;
-> +
-> +=09for (i =3D 0; i < size; i +=3D 4) {
-> +=09=09ret =3D pci_read_config_dword(dev, where + i, val + i / 4);
-> +=09=09if (ret < 0)
-> +=09=09=09return ret;
-> +=09}
-> +
-> +=09return 0;
-> +}
-> +
-> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev)
-> +{
-> +=09struct virtio_pci_cap cap;
-> +=09u16 notify_off;
-> +=09int ret;
-> +=09u8 pos;
-> +=09u32 i;
-> +
-> +=09ret =3D pci_read_config_byte(dev, PCI_CAPABILITY_LIST, &pos);
-> +
-> +=09if (ret < 0) {
-> +=09=09IFC_ERR(&dev->dev, "Failed to read PCI capability list.\n");
-> +=09=09return -EIO;
-> +=09}
-> +
-> +=09while (pos) {
-> +=09=09ret =3D ifcvf_read_config_range(dev, (u32 *)&cap,
-> +=09=09=09=09=09      sizeof(cap), pos);
-> +
-> +=09=09if (ret < 0) {
-> +=09=09=09IFC_ERR(&dev->dev, "Failed to get PCI capability at %x",
-> +=09=09=09=09pos);
-> +=09=09=09break;
-> +=09=09}
-> +
-> +=09=09if (cap.cap_vndr !=3D PCI_CAP_ID_VNDR)
-> +=09=09=09goto next;
-> +
-> +=09=09IFC_DBG(&dev->dev, "read PCI config: config type: %u, PCI bar: %u,=
-\
-> +=09=09=09 PCI bar offset: %u, PCI config len: %u.\n",
-> +=09=09=09cap.cfg_type, cap.bar, cap.offset, cap.length);
-> +
-> +=09=09switch (cap.cfg_type) {
-> +=09=09case VIRTIO_PCI_CAP_COMMON_CFG:
-> +=09=09=09hw->common_cfg =3D get_cap_addr(hw, &cap);
-> +=09=09=09IFC_INFO(&dev->dev, "hw->common_cfg =3D %p.\n",
-> +=09=09=09=09 hw->common_cfg);
-> +=09=09=09break;
-> +=09=09case VIRTIO_PCI_CAP_NOTIFY_CFG:
-> +=09=09=09pci_read_config_dword(dev, pos + sizeof(cap),
-> +=09=09=09=09=09      &hw->notify_off_multiplier);
-> +=09=09=09hw->notify_bar =3D cap.bar;
-> +=09=09=09hw->notify_base =3D get_cap_addr(hw, &cap);
-> +=09=09=09IFC_INFO(&dev->dev, "hw->notify_base =3D %p.\n",
-> +=09=09=09=09 hw->notify_base);
-> +=09=09=09break;
-> +=09=09case VIRTIO_PCI_CAP_ISR_CFG:
-> +=09=09=09hw->isr =3D get_cap_addr(hw, &cap);
-> +=09=09=09IFC_INFO(&dev->dev, "hw->isr =3D %p.\n", hw->isr);
-> +=09=09=09break;
-> +=09=09case VIRTIO_PCI_CAP_DEVICE_CFG:
-> +=09=09=09hw->net_cfg =3D get_cap_addr(hw, &cap);
-> +=09=09=09IFC_INFO(&dev->dev, "hw->net_cfg =3D %p.\n", hw->net_cfg);
-> +=09=09=09break;
 
-I think at least you can try to reuse e.g:
-virtio_pci_find_capability() to aovid duplicating codes.
+--SRfEZYxOf5YPbrjPL2QwqalbagPRCb2rx--
 
-> +=09=09}
-> +next:
-> +=09=09pos =3D cap.cap_next;
-> +=09}
-> +
-> +=09if (hw->common_cfg =3D=3D NULL || hw->notify_base =3D=3D NULL ||
-> +=09    hw->isr =3D=3D NULL || hw->net_cfg =3D=3D NULL) {
-> +=09=09IFC_DBG(&dev->dev, "Incomplete PCI capabilities.\n");
-> +=09=09return -1;
+--j4ML4Gy1U04lLyaz2OBIvyEIFgfoEoO27
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Maybe it's better to fail eailier.
+-----BEGIN PGP SIGNATURE-----
 
-> +=09}
-> +
-> +=09for (i =3D 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-> +=09=09iowrite16(i, &hw->common_cfg->queue_select);
-> +=09=09notify_off =3D ioread16(&hw->common_cfg->queue_notify_off);
-> +=09=09hw->notify_addr[i] =3D (void *)((u8 *)hw->notify_base +
-> +=09=09=09=09     notify_off * hw->notify_off_multiplier);
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3CnjYACgkQ41TmuOI4
+ufiMTBAAqT4SiXuVUybd2PMwg2w+wRrEMgvWLJBvIPfATV2SlrN9GbA925GHcgvd
+gl+jGv613xGsH4egnx9AzaY2MSbebQOeNf8zIObmYagvxlba9qtrjKeh+PZw2SeT
++OAErjAp1IRtN/SQ3dT8QHyVnamhxeVGVQ3UWOE/lI3QyL3TkhmL1Gz6qDy+/BFg
+kdw1yu9m19mQjEXSADGi17wB20ibLcYUHTobbjy05cUTcksMmrh8VNK9Wqhe2Z3q
+MjkLc1yFLFE8rajICDO812eK39WmiDcY3R5zherPp7gHAKSW2mw6qQ9XNKXKY/t/
+iMMyDfYOnNMiGt6M13wDlr9RXdhi7OpTaDwT+SXwddLaY6BKzuQ8N9tLMz8Np6Xt
+1P8U4Mqfme3IhsvwiWByQZNRwHdK/CbmMu5g7LlYi4eLUvihWYkQQJIeBrrHmhQF
+818vFt1D9uriG2a5JmbQZuFmhLCYPH8Nz1F/NFJjokE6Paxt6DjJyw9+2ttzifvT
+2wAWO0cZDRQHhvG8fjYSapMC+aZoaULfI3dclLdCSgIYDVGkRiFHAh36YI+BHbbn
+Hh8ZJHyCiYnvJbprOAXL+FpoGvbmT5ukRyNmRvKG4jMbpMm4LRCjUJQ4M4+P1gfI
+HQ8M9Pu+nWyPt++vHwv9ETvPFKXwfhTMmYSzh1ssAVCgQVx2D3U=
+=9n94
+-----END PGP SIGNATURE-----
 
-It might be better to store notify_addr inside the vring_info for
-better locality.
-
-> +=09}
-> +
-> +=09hw->lm_cfg =3D hw->mem_resource[IFCVF_LM_BAR].addr;
-> +
-> +=09IFC_DBG(&dev->dev, "PCI capability mapping: common cfg: %p,\
-> +=09=09notify base: %p\n, isr cfg: %p, device cfg: %p,\
-> +=09=09multiplier: %u\n",
-> +=09=09hw->common_cfg, hw->notify_base, hw->isr,
-> +=09=09hw->net_cfg, hw->notify_off_multiplier);
-> +
-> +=09return 0;
-> +}
-> +
-> +u8 ifcvf_get_status(struct ifcvf_hw *hw)
-> +{
-> +=09u8 old_gen, new_gen, status;
-> +
-> +=09do {
-> +=09=09old_gen =3D ioread8(&hw->common_cfg->config_generation);
-> +=09=09status =3D ioread8(&hw->common_cfg->device_status);
-> +=09=09new_gen =3D ioread8(&hw->common_cfg->config_generation);
-
-config generation should be only used for config access not status,
-and even it did, it should be called from virtio core.
-
-> +=09} while (old_gen !=3D new_gen);
-> +
-> +=09return status;
-> +}
-> +
-> +void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
-> +{
-> +=09iowrite8(status, &hw->common_cfg->device_status);
-> +}
-> +
-> +void ifcvf_reset(struct ifcvf_hw *hw)
-> +{
-> +=09ifcvf_set_status(hw, 0);
-> +=09ifcvf_get_status(hw);
-> +}
-> +
-> +static void ifcvf_add_status(struct ifcvf_hw *hw, u8 status)
-> +{
-> +=09if (status !=3D 0)
-> +=09=09status |=3D ifcvf_get_status(hw);
-> +
-> +=09ifcvf_set_status(hw, status);
-> +=09ifcvf_get_status(hw);
-> +}
-> +
-> +u64 ifcvf_get_features(struct ifcvf_hw *hw)
-> +{
-> +=09struct virtio_pci_common_cfg *cfg =3D hw->common_cfg;
-> +=09u32 features_lo, features_hi;
-> +
-> +=09iowrite32(0, &cfg->device_feature_select);
-> +=09features_lo =3D ioread32(&cfg->device_feature);
-> +
-> +=09iowrite32(1, &cfg->device_feature_select);
-> +=09features_hi =3D ioread32(&cfg->device_feature);
-> +
-> +=09return ((u64)features_hi << 32) | features_lo;
-> +}
-> +
-> +void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-> +=09=09       void *dst, int length)
-> +{
-> +=09u8 old_gen, new_gen, *p;
-> +=09int i;
-> +
-> +=09WARN_ON(offset + length > sizeof (struct ifcvf_net_config));
-> +
-> +=09do {
-> +=09=09old_gen =3D ioread8(&hw->common_cfg->config_generation);
-
-Same here, virtio core has did the call for generation, so no need do
-do it again here.
-
-> +=09=09p =3D dst;
-> +
-> +=09=09for (i =3D 0; i < length; i++)
-> +=09=09=09*p++ =3D ioread8((u8 *)hw->net_cfg + offset + i);
-> +
-> +=09=09new_gen =3D ioread8(&hw->common_cfg->config_generation);
-> +=09} while (old_gen !=3D new_gen);
-> +}
-> +
-> +void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-> +=09=09=09    const void *src, int length)
-> +{
-> +=09const u8 *p;
-> +=09int i;
-> +
-> +=09p =3D src;
-> +=09WARN_ON(offset + length > sizeof (struct ifcvf_net_config));
-> +
-> +=09for (i =3D 0; i < length; i++)
-> +=09=09iowrite8(*p++, (u8 *)hw->net_cfg + offset + i);
-> +}
-> +
-> +static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
-> +{
-> +=09struct virtio_pci_common_cfg *cfg =3D hw->common_cfg;
-> +
-> +=09iowrite32(0, &cfg->guest_feature_select);
-> +=09iowrite32(features & ((1ULL << 32) - 1), &cfg->guest_feature);
-
-(u32)features ?
-
-> +
-> +=09iowrite32(1, &cfg->guest_feature_select);
-> +=09iowrite32(features >> 32, &cfg->guest_feature);
-> +}
-> +
-> +static int ifcvf_config_features(struct ifcvf_hw *hw)
-> +{
-> +=09struct ifcvf_adapter *ifcvf;
-> +
-> +=09ifcvf =3D=09container_of(hw, struct ifcvf_adapter, vf);
-> +=09ifcvf_set_features(hw, hw->req_features);
-> +=09ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
-> +
-> +=09if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATURES_OK)) {
-> +=09=09IFC_ERR(ifcvf->dev, "Failed to set FEATURES_OK status\n");
-> +=09=09return -EIO;
-> +=09}
-> +
-> +=09return 0;
-> +}
-> +
-> +void io_write64_twopart(u64 val, u32 *lo, u32 *hi)
-> +{
-> +=09iowrite32(val & ((1ULL << 32) - 1), lo);
-> +=09iowrite32(val >> 32, hi);
-> +}
-> +
-> +static int ifcvf_hw_enable(struct ifcvf_hw *hw)
-> +{
-> +=09struct virtio_pci_common_cfg *cfg;
-> +=09struct ifcvf_adapter *ifcvf;
-> +=09u8 *lm_cfg;
-> +=09u32 i;
-> +
-> +=09ifcvf =3D container_of(hw, struct ifcvf_adapter, vf);
-> +=09cfg =3D hw->common_cfg;
-> +=09lm_cfg =3D hw->lm_cfg;
-> +=09iowrite16(IFCVF_MSI_CONFIG_OFF, &cfg->msix_config);
-> +
-> +=09if (ioread16(&cfg->msix_config) =3D=3D VIRTIO_MSI_NO_VECTOR) {
-> +=09=09IFC_ERR(ifcvf->dev, "No msix vector for device config.\n");
-> +=09=09return -1;
-> +=09}
-> +
-> +=09for (i =3D 0; i < hw->nr_vring; i++) {
-> +=09=09iowrite16(i, &cfg->queue_select);
-> +=09=09io_write64_twopart(hw->vring[i].desc, &cfg->queue_desc_lo,
-> +=09=09=09=09&cfg->queue_desc_hi);
-> +=09=09io_write64_twopart(hw->vring[i].avail, &cfg->queue_avail_lo,
-> +=09=09=09=09&cfg->queue_avail_hi);
-> +=09=09io_write64_twopart(hw->vring[i].used, &cfg->queue_used_lo,
-> +=09=09=09=09&cfg->queue_used_hi);
-> +=09=09iowrite16(hw->vring[i].size, &cfg->queue_size);
-> +
-> +=09=09*(u32 *)(lm_cfg + IFCVF_LM_RING_STATE_OFFSET +
-> +=09=09=09=09(i / 2) * IFCVF_LM_CFG_SIZE + (i % 2) * 4) =3D
-> +=09=09=09(u32)hw->vring[i].last_avail_idx |
-> +=09=09=09((u32)hw->vring[i].last_used_idx << 16);
-
-As pointed out by Michael, it's better to formalize lm_cfg as a
-structure instead of doing math here.
-
-> +
-> +=09=09iowrite16(i + IFCVF_MSI_QUEUE_OFF, &cfg->queue_msix_vector);
-> +=09=09if (ioread16(&cfg->queue_msix_vector) =3D=3D
-> +=09=09    VIRTIO_MSI_NO_VECTOR) {
-> +=09=09=09IFC_ERR(ifcvf->dev,
-> +=09=09=09=09"No msix vector for queue %u.\n", i);
-> +=09=09=09return -1;
-> +=09=09}
-> +
-> +=09=09iowrite16(1, &cfg->queue_enable);
-
-This queue_enable should be done through set_vq_ready() from virtio core.
-
-> +=09}
-> +
-> +=09return 0;
-> +}
-> +
-> +static void ifcvf_hw_disable(struct ifcvf_hw *hw)
-> +{
-> +=09struct virtio_pci_common_cfg *cfg;
-> +=09u32 i;
-> +
-> +=09cfg =3D hw->common_cfg;
-> +=09iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->msix_config);
-> +
-> +=09for (i =3D 0; i < hw->nr_vring; i++) {
-> +=09=09iowrite16(i, &cfg->queue_select);
-> +=09=09iowrite16(0, &cfg->queue_enable);
-> +=09=09iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->queue_msix_vector);
-> +=09}
-> +}
-> +
-> +int ifcvf_start_hw(struct ifcvf_hw *hw)
-> +{
-> +=09ifcvf_reset(hw);
-> +=09ifcvf_add_status(hw, VIRTIO_CONFIG_S_ACKNOWLEDGE);
-> +=09ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER);
-> +
-> +=09if (ifcvf_config_features(hw) < 0)
-> +=09=09return -1;
-
-It's better to set status to CONFIG_S_FAILED when fail.
-
-> +
-> +=09if (ifcvf_hw_enable(hw) < 0)
-> +=09=09return -1;
-> +
-> +=09ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER_OK);
-> +
-> +=09return 0;
-> +}
-> +
-> +void ifcvf_stop_hw(struct ifcvf_hw *hw)
-> +{
-> +=09ifcvf_hw_disable(hw);
-> +=09ifcvf_reset(hw);
-> +}
-> +
-> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid)
-> +{
-> +=09iowrite16(qid, hw->notify_addr[qid]);
-> +}
-> +
-> +u64 ifcvf_get_queue_notify_off(struct ifcvf_hw *hw, int qid)
-> +{
-> +=09return (u8 *)hw->notify_addr[qid] -
-> +=09=09(u8 *)hw->mem_resource[hw->notify_bar].addr;
-> +}
-> diff --git a/drivers/vhost/ifcvf/ifcvf_base.h b/drivers/vhost/ifcvf/ifcvf=
-_base.h
-> new file mode 100644
-> index 0000000..c97f0eb
-> --- /dev/null
-> +++ b/drivers/vhost/ifcvf/ifcvf_base.h
-> @@ -0,0 +1,132 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright (C) 2019 Intel Corporation.
-> + */
-> +
-> +#ifndef _IFCVF_H_
-> +#define _IFCVF_H_
-> +
-> +#include <linux/virtio_mdev_ops.h>
-> +#include <linux/mdev.h>
-> +#include <linux/pci.h>
-> +#include <linux/pci_regs.h>
-> +#include <uapi/linux/virtio_net.h>
-> +#include <uapi/linux/virtio_config.h>
-> +#include <uapi/linux/virtio_pci.h>
-> +
-> +#define IFCVF_VENDOR_ID         0x1AF4
-> +#define IFCVF_DEVICE_ID         0x1041
-> +#define IFCVF_SUBSYS_VENDOR_ID  0x8086
-> +#define IFCVF_SUBSYS_DEVICE_ID  0x001A
-> +
-> +#define IFCVF_MDEV_LIMIT=091
-> +
-> +/*
-> + * Some ifcvf feature bits (currently bits 28 through 31) are
-> + * reserved for the transport being used (eg. ifcvf_ring), the
-> + * rest are per-device feature bits.
-> + */
-> +#define IFCVF_TRANSPORT_F_START 28
-> +#define IFCVF_TRANSPORT_F_END   34
-> +
-> +#define IFC_SUPPORTED_FEATURES \
-> +=09=09((1ULL << VIRTIO_NET_F_MAC)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_F_ANY_LAYOUT)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_F_VERSION_1)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_F_ORDER_PLATFORM)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_NET_F_GUEST_ANNOUNCE)=09=09| \
-> +=09=09 (1ULL << VIRTIO_NET_F_CTRL_VQ)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_NET_F_STATUS)=09=09=09| \
-> +=09=09 (1ULL << VIRTIO_NET_F_MRG_RXBUF)) /* not fully supported */
-
-If it was not fully supported, we need to remove it.
-
-> +
-> +//Not support MQ, only one queue pair for now.
-> +#define IFCVF_MAX_QUEUE_PAIRS=09=091
-> +#define IFCVF_MAX_QUEUES=09=092
-> +
-> +#define IFCVF_QUEUE_ALIGNMENT=09=09PAGE_SIZE
-> +
-> +#define IFCVF_MSI_CONFIG_OFF=090
-> +#define IFCVF_MSI_QUEUE_OFF=091
-> +#define IFCVF_PCI_MAX_RESOURCE=096
-> +
-> +#define IFCVF_LM_CFG_SIZE=09=090x40
-> +#define IFCVF_LM_RING_STATE_OFFSET=090x20
-> +#define IFCVF_LM_BAR=094
-> +
-> +#define IFCVF_32_BIT_MASK=09=090xffffffff
-> +
-> +#define IFC_ERR(dev, fmt, ...)=09dev_err(dev, fmt, ##__VA_ARGS__)
-> +#define IFC_DBG(dev, fmt, ...)=09dev_dbg(dev, fmt, ##__VA_ARGS__)
-> +#define IFC_INFO(dev, fmt, ...)=09dev_info(dev, fmt, ##__VA_ARGS__)
-> +
-> +#define IFC_PRIVATE_TO_VF(adapter) \
-> +=09(&((struct ifcvf_adapter *)adapter)->vf)
-> +
-> +#define IFCVF_MAX_INTR (IFCVF_MAX_QUEUE_PAIRS * 2 + 1)
-> +
-> +struct ifcvf_net_config {
-> +=09u8    mac[6];
-> +=09u16   status;
-> +=09u16   max_virtqueue_pairs;
-> +} __packed;
-
-Why not just use virtio_net_config?
-
-> +
-> +struct ifcvf_pci_mem_resource {
-> +=09/* Physical address, 0 if not resource. */
-> +=09u64      phys_addr;
-> +=09/* Length of the resource. */
-> +=09u64      len;
-> +=09/* Virtual address, NULL when not mapped. */
-> +=09u8       *addr;
-> +};
-> +
-> +struct vring_info {
-> +=09u64 desc;
-> +=09u64 avail;
-> +=09u64 used;
-> +=09u16 size;
-> +=09u16 last_avail_idx;
-> +=09u16 last_used_idx;
-> +=09bool ready;
-> +=09char msix_name[256];
-> +=09struct virtio_mdev_callback cb;
-> +};
-> +
-> +struct ifcvf_hw {
-> +=09u8=09*isr;
-> +=09u8=09notify_bar;
-> +=09u8=09*lm_cfg;
-> +=09u8=09nr_vring;
-> +=09u16=09*notify_base;
-> +=09u16=09*notify_addr[IFCVF_MAX_QUEUE_PAIRS * 2];
-> +=09u32=09notify_off_multiplier;
-> +=09u64=09req_features;
-> +=09struct=09virtio_pci_common_cfg *common_cfg;
-> +=09struct=09ifcvf_net_config *net_cfg;
-> +=09struct=09vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
-> +=09struct=09ifcvf_pci_mem_resource mem_resource[IFCVF_PCI_MAX_RESOURCE];
-> +};
-
-It's better to add comments to explain each field.
-
-> +
-> +struct ifcvf_adapter {
-> +=09struct=09device *dev;
-> +=09struct=09mutex mdev_lock;
-> +=09int=09mdev_count;
-> +=09int=09vectors;
-> +=09struct=09ifcvf_hw vf;
-> +};
-> +
-> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
-> +int ifcvf_start_hw(struct ifcvf_hw *hw);
-> +void ifcvf_stop_hw(struct ifcvf_hw *hw);
-> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
-> +u8 ifcvf_get_linkstatus(struct ifcvf_hw *hw);
-> +void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-> +=09=09=09   void *dst, int length);
-> +void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-> +=09=09=09    const void *src, int length);
-> +u8 ifcvf_get_status(struct ifcvf_hw *hw);
-> +void ifcvf_set_status(struct ifcvf_hw *hw, u8 status);
-> +void io_write64_twopart(u64 val, u32 *lo, u32 *hi);
-> +void ifcvf_reset(struct ifcvf_hw *hw);
-> +u64 ifcvf_get_features(struct ifcvf_hw *hw);
-> +
-> +#endif /* _IFCVF_H_ */
-> --=20
-> 1.8.3.1
->
+--j4ML4Gy1U04lLyaz2OBIvyEIFgfoEoO27--
 
