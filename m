@@ -2,71 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B49E6F1CBC
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 18:46:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D90BEF1CFE
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 18:57:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732239AbfKFRqx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 12:46:53 -0500
-Received: from mga18.intel.com ([134.134.136.126]:24378 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727894AbfKFRqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 12:46:53 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 09:46:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,275,1569308400"; 
-   d="scan'208";a="228407130"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Nov 2019 09:46:52 -0800
-Date:   Wed, 6 Nov 2019 09:46:52 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        id S1732492AbfKFR5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 12:57:51 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:59272 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727872AbfKFR5u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 12:57:50 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6HsKGa015768;
+        Wed, 6 Nov 2019 17:56:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2019-08-05;
+ bh=uBEGSNLJVxXMk9u64tP8o0TzUbcsZmdPCKdTVcSvJeg=;
+ b=Z0gJMfyMXtJfFJvsCCk7dUZmTg2FxtLGV8ypVvVVh/r2U2ssB4M1JSKBCZ7ngUiSP63l
+ TdlbQUPyRWyP6ztuSsDxHSmanSKzk6xbmNL7F9k60eduhnRKaZWaIT7iccE3JaaSVlDc
+ YgmzhK8+aS0tRuuVYkD+6m3tuE6psYaKTD8q9+MJSVIpzYD/iLCj2feZBsnDdzsIQbEZ
+ 2GEscujetQ+ao/bCwK0nePNYneRimlznnObMkFA5mFK4rpd19CIKIbJ8giZO/k9rZrRd
+ NsJLqYYIBn3R6Wq5a70K9RGXb5XAwtvBzcJhV2944sWfiSDAYu401kbJ6hFTFSuAYuH9 Jg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2w41w10m56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 17:56:27 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6Hreox022490;
+        Wed, 6 Nov 2019 17:56:26 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2w41wcvewg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 17:56:26 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA6HuNS0003881;
+        Wed, 6 Nov 2019 17:56:24 GMT
+Received: from paddy.uk.oracle.com (/10.175.178.239)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 06 Nov 2019 09:56:23 -0800
+From:   Joao Martins <joao.m.martins@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Adam Borowski <kilobyte@angband.pl>,
-        David Hildenbrand <david@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
- reserved
-Message-ID: <20191106174652.GE16249@linux.intel.com>
-References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
- <20191106170727.14457-2-sean.j.christopherson@intel.com>
- <8ba98630-9ca0-85c2-3c94-45d54a448fca@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+Subject: [PATCH v1 0/3] KVM: VMX: Posted Interrupts fixes
+Date:   Wed,  6 Nov 2019 17:55:59 +0000
+Message-Id: <20191106175602.4515-1-joao.m.martins@oracle.com>
+X-Mailer: git-send-email 2.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ba98630-9ca0-85c2-3c94-45d54a448fca@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=600
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911060173
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=680 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911060174
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 06:14:40PM +0100, Paolo Bonzini wrote:
-> On 06/11/19 18:07, Sean Christopherson wrote:
-> >  void kvm_get_pfn(kvm_pfn_t pfn)
-> >  {
-> > -	if (!kvm_is_reserved_pfn(pfn))
-> > +	if (!kvm_is_reserved_pfn(pfn) && !WARN_ON(kvm_is_zone_device_pfn(pfn)))
-> >  		get_page(pfn_to_page(pfn));
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_get_pfn);
-> 
-> Can you call remap_pfn_range with a source address that is ZONE_DEVICE?
->  If so, you would get a WARN from the kvm_get_pfn call in
-> hva_to_pfn_remapped.
+Hey,
 
-I don't know, at a quick glance I'm guessing it's possible via /dev/mem?
-But, get_page() isn't sufficient to properly grab a ZONE_DEVICE page, so
-the WARN is a good thing and intentional.
+This mini-series addresses two bugs plus a small cleanup: 
 
-So assuming the answer is "yes", perhaps hva_to_pfn_remapped() should
-adds its own check on kvm_is_zone_device_pfn() and return -EINVAL or
-something?  That'd likely end up kill the guest, but wouldn't break the
-kernel.
+ 1) Considering PID.PIR as opposed to just PID.ON for pending interrupt checks
+    in the direct yield code path;
+ 
+ 2) Not changing NDST in vmx_vcpu_pi_load(), which addresses a regression. 
+    Prior to this, we would observe Win2K12 guests hanging momentarily.
+ 
+ 3) Small cleanup to streamline PIR checks with a common helper.
+
+The cleanup is done last to simplify backports.
+
+	Joao
+
+Joao Martins (3):
+  KVM: VMX: Consider PID.PIR to determine if vCPU has pending interrupts
+  KVM: VMX: Do not change PID.NDST when loading a blocked vCPU
+  KVM: VMX: Introduce pi_is_pir_empty() helper
+
+ arch/x86/kvm/vmx/vmx.c | 20 ++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h | 11 +++++++++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
+
+-- 
+2.11.0
+
