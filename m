@@ -2,280 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 116E7F1B9C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 17:48:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE0FEF1B9E
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 17:49:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732224AbfKFQsx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 11:48:53 -0500
-Received: from foss.arm.com ([217.140.110.172]:43046 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731959AbfKFQsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 11:48:52 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D280346A;
-        Wed,  6 Nov 2019 08:48:51 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC5753F719;
-        Wed,  6 Nov 2019 08:48:50 -0800 (PST)
-Date:   Wed, 6 Nov 2019 16:48:48 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Suzuki Poulose <suzuki.poulose@arm.com>,
-        Julien Grall <julien.grall.oss@gmail.com>
-Subject: Re: [PATCH kvmtool 04/16] kvmtool: Add helper to sanitize arch
- specific KVM configuration
-Message-ID: <20191106164848.4f2e1fbc@donnerap.cambridge.arm.com>
-In-Reply-To: <1569245722-23375-5-git-send-email-alexandru.elisei@arm.com>
-References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
-        <1569245722-23375-5-git-send-email-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1732312AbfKFQtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 11:49:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25313 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728462AbfKFQtI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 11:49:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573058948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y3J2bTTmOsm3d0BAKb6B0gbVdRBPy0F4WDWyUAlOHcU=;
+        b=O7cYDDycYmYLVuh/J/BXugBqWpqIR2c6QCmJqj8bHqyBPonkACE7vt2uqxD8dWCcn02bhO
+        zOf0WbdhTSvV+xFFyL6+fdbuivV8JZKE504O6GgGsuqweO6Jda2H3CGScIt8YyRdS+IOMF
+        JA5W+BC1M2Dl2O0rnRC3ZOTg/K3+GGY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-cjq_llWXMLqIfbsPfkmCPA-1; Wed, 06 Nov 2019 11:49:04 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE5FD1800D53;
+        Wed,  6 Nov 2019 16:49:02 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BE13D60872;
+        Wed,  6 Nov 2019 16:48:57 +0000 (UTC)
+Date:   Wed, 6 Nov 2019 17:48:55 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 30/37] DOCUMENTATION: protvirt: Diag 308 IPL
+Message-ID: <20191106174855.13a50f42.cohuck@redhat.com>
+In-Reply-To: <20191024114059.102802-31-frankja@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-31-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: cjq_llWXMLqIfbsPfkmCPA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Sep 2019 14:35:10 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, 24 Oct 2019 07:40:52 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Hi,
-
-> kvmtool accepts generic and architecture specific parameters. When creating
-> a virtual machine, only the generic parameters are checked against sane
-> values. Add a function to sanitize the architecture specific configuration
-> options and call it before the initialization routines.
-> 
-> This patch was inspired by Julien Grall's patch.
-> 
-> Signed-off-by: Julien Grall <julien.grall@arm.com>
-
-That's a bit confusing: If it is based on Julien's patch, you should keep him as the author, adding a short comment here about what *you* changed.
-If it's not, you should not have a S-o-b: line from Julien.
-
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-The code looks good to me:
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
+> Description of changes that are necessary to move a KVM VM into
+> Protected Virtualization mode.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arm/aarch64/include/kvm/kvm-arch.h |  2 +-
->  arm/include/arm-common/kvm-arch.h  |  4 ++++
->  arm/kvm.c                          | 11 +++++++++--
->  builtin-run.c                      |  2 ++
->  mips/include/kvm/kvm-arch.h        |  4 ++++
->  mips/kvm.c                         |  5 +++++
->  powerpc/include/kvm/kvm-arch.h     |  4 ++++
->  powerpc/kvm.c                      |  5 +++++
->  x86/include/kvm/kvm-arch.h         |  4 ++++
->  x86/kvm.c                          | 24 ++++++++++++------------
->  10 files changed, 50 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-> index 9de623ac6cb9..1b3d0a5fb1b4 100644
-> --- a/arm/aarch64/include/kvm/kvm-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-arch.h
-> @@ -5,7 +5,7 @@
->  				0x8000				:	\
->  				0x80000)
->  
-> -#define ARM_MAX_MEMORY(kvm)	((kvm)->cfg.arch.aarch32_guest	?	\
-> +#define ARM_MAX_MEMORY(cfg)	((cfg)->arch.aarch32_guest	?	\
->  				ARM_LOMAP_MAX_MEMORY		:	\
->  				ARM_HIMAP_MAX_MEMORY)
->  
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index b9d486d5eac2..965978d7cfb5 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -74,4 +74,8 @@ struct kvm_arch {
->  	u64	dtb_guest_start;
->  };
->  
-> +struct kvm_config;
+>  Documentation/virtual/kvm/s390-pv-boot.txt | 62 ++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/s390-pv-boot.txt
+>=20
+> diff --git a/Documentation/virtual/kvm/s390-pv-boot.txt b/Documentation/v=
+irtual/kvm/s390-pv-boot.txt
+> new file mode 100644
+> index 000000000000..af883c928c08
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/s390-pv-boot.txt
+> @@ -0,0 +1,62 @@
+> +Boot/IPL of Protected VMs
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 > +
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg);
+> +Summary:
 > +
->  #endif /* ARM_COMMON__KVM_ARCH_H */
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index 198cee5c0997..5decc138fd3e 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -57,11 +57,18 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
->  {
->  }
->  
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> +{
-> +	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
-> +		cfg->ram_size = ARM_MAX_MEMORY(cfg);
-> +		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
-> +	}
-> +}
+> +Protected VMs are encrypted while not running. On IPL a small
+> +plaintext bootloader is started which provides information about the
+> +encrypted components and necessary metadata to KVM to decrypt it.
 > +
->  void kvm__arch_init(struct kvm *kvm)
->  {
->  	unsigned long alignment;
->  	/* Convenience aliases */
-> -	u64 ram_size = kvm->cfg.ram_size;
->  	const char *hugetlbfs_path = kvm->cfg.hugetlbfs_path;
->  
->  	/*
-> @@ -87,7 +94,7 @@ void kvm__arch_init(struct kvm *kvm)
->  			alignment = SZ_2M;
->  	}
->  
-> -	kvm->ram_size = min(ram_size, (u64)ARM_MAX_MEMORY(kvm));
-> +	kvm->ram_size = kvm->cfg.ram_size;
->  	kvm->arch.ram_alloc_size = kvm->ram_size + alignment;
->  	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
->  						kvm->arch.ram_alloc_size);
-> diff --git a/builtin-run.c b/builtin-run.c
-> index c867c8ba0892..532c06f90ba0 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -642,6 +642,8 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
->  
->  	kvm->cfg.real_cmdline = real_cmdline;
->  
-> +	kvm__arch_sanitize_cfg(&kvm->cfg);
+> +Based on this data, KVM will make the PV known to the Ultravisor and
+> +instruct it to secure its memory, decrypt the components and verify
+> +the data and address list hashes, to ensure integrity. Afterwards KVM
+> +can run the PV via SIE which the UV will intercept and execute on
+> +KVM's behalf.
 > +
->  	if (kvm->cfg.kernel_filename) {
->  		printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
->  		       kvm->cfg.kernel_filename,
-> diff --git a/mips/include/kvm/kvm-arch.h b/mips/include/kvm/kvm-arch.h
-> index fdc09d830263..f0bfff50c7c9 100644
-> --- a/mips/include/kvm/kvm-arch.h
-> +++ b/mips/include/kvm/kvm-arch.h
-> @@ -47,4 +47,8 @@ struct kvm_arch {
->  	bool is64bit;
->  };
->  
-> +struct kvm_config;
+> +The switch into PV mode lets us load encrypted guest executables and
+> +data via every available method (network, dasd, scsi, direct kernel,
+> +...) without the need to change the boot process.
 > +
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg);
 > +
->  #endif /* KVM__KVM_ARCH_H */
-> diff --git a/mips/kvm.c b/mips/kvm.c
-> index e2a0c63b14b8..63d651f29f70 100644
-> --- a/mips/kvm.c
-> +++ b/mips/kvm.c
-> @@ -56,6 +56,11 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
->  
->  }
->  
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> +{
-> +	/* We don't have any arch specific configuration. */
-> +}
+> +Diag308:
 > +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm)
->  {
-> diff --git a/powerpc/include/kvm/kvm-arch.h b/powerpc/include/kvm/kvm-arch.h
-> index 8126b96cb66a..42ea7df1325f 100644
-> --- a/powerpc/include/kvm/kvm-arch.h
-> +++ b/powerpc/include/kvm/kvm-arch.h
-> @@ -64,4 +64,8 @@ struct kvm_arch {
->  	struct spapr_phb	*phb;
->  };
->  
-> +struct kvm_config;
+> +This diagnose instruction is the basis vor VM IPL. The VM can set and
+
+s/vor/for/
+
+> +retrieve IPL information blocks, that specify the IPL method/devices
+> +and request VM memory and subsystem resets, as well as IPLs.
 > +
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg);
+> +For PVs this concept has been continued with new subcodes:
 > +
->  #endif /* KVM__KVM_ARCH_H */
-> diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-> index 034bc4608ad9..73965640cf82 100644
-> --- a/powerpc/kvm.c
-> +++ b/powerpc/kvm.c
-> @@ -87,6 +87,11 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
->  	/* We don't need anything unusual in here. */
->  }
->  
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> +{
-> +	/* We don't have any arch specific configuration. */
-> +}
+> +Subcode 8: Set an IPL Information Block of type 5.
+> +Subcode 9: Store the saved block in guest memory
+> +Subcode 10: Move into Protected Virtualization mode
 > +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm)
->  {
-> diff --git a/x86/include/kvm/kvm-arch.h b/x86/include/kvm/kvm-arch.h
-> index bfdd3438a9de..2cc65f30fcd2 100644
-> --- a/x86/include/kvm/kvm-arch.h
-> +++ b/x86/include/kvm/kvm-arch.h
-> @@ -40,4 +40,8 @@ struct kvm_arch {
->  	struct interrupt_table	interrupt_table;
->  };
->  
-> +struct kvm_config;
+> +The new PV load-device-specific-parameters field specifies all data,
+> +that is necessary to move into PV mode.
 > +
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg);
+> +* PV Header origin
+> +* PV Header length
+> +* List of Components composed of:
+> +  * AES-XTS Tweak prefix
+> +  * Origin
+> +  * Size
 > +
->  #endif /* KVM__KVM_ARCH_H */
-> diff --git a/x86/kvm.c b/x86/kvm.c
-> index 5abb41e370bb..df5d48106c80 100644
-> --- a/x86/kvm.c
-> +++ b/x86/kvm.c
-> @@ -129,6 +129,17 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
->  		strcat(cmdline, " earlyprintk=serial i8042.noaux=1");
->  }
->  
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> +{
-> +	/* vidmode should be either specified or set by default */
-> +	if (cfg->vnc || cfg->sdl || cfg->gtk) {
-> +		if (!cfg->arch.vidmode)
-> +			cfg->arch.vidmode = 0x312;
-> +	} else {
-> +		cfg->arch.vidmode = 0;
-> +	}
-> +}
+> +The PV header contains the keys and hashes, which the UV will use to
+> +decrypt and verify the PV, as well as control flags and a start PSW.
 > +
->  /* Architecture-specific KVM init */
->  void kvm__arch_init(struct kvm *kvm)
->  {
-> @@ -239,7 +250,6 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  	size_t cmdline_size;
->  	ssize_t file_size;
->  	void *p;
-> -	u16 vidmode;
->  
->  	/*
->  	 * See Documentation/x86/boot.txt for details no bzImage on-disk and
-> @@ -282,23 +292,13 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
->  		memcpy(p, kernel_cmdline, cmdline_size - 1);
->  	}
->  
-> -	/* vidmode should be either specified or set by default */
-> -	if (kvm->cfg.vnc || kvm->cfg.sdl || kvm->cfg.gtk) {
-> -		if (!kvm->cfg.arch.vidmode)
-> -			vidmode = 0x312;
-> -		else
-> -			vidmode = kvm->cfg.arch.vidmode;
-> -	} else {
-> -		vidmode = 0;
-> -	}
-> -
->  	kern_boot	= guest_real_to_host(kvm, BOOT_LOADER_SELECTOR, 0x00);
->  
->  	kern_boot->hdr.cmd_line_ptr	= BOOT_CMDLINE_OFFSET;
->  	kern_boot->hdr.type_of_loader	= 0xff;
->  	kern_boot->hdr.heap_end_ptr	= 0xfe00;
->  	kern_boot->hdr.loadflags	|= CAN_USE_HEAP;
-> -	kern_boot->hdr.vid_mode		= vidmode;
-> +	kern_boot->hdr.vid_mode		= kvm->cfg.arch.vidmode;
->  
->  	/*
->  	 * Read initrd image into guest memory
+> +The components are for instance an encrypted kernel, kernel cmd and
+> +initrd. The components are decrypted by the UV.
+> +
+> +All non-decrypted data of the non-PV guest instance are zero on first
+> +access of the PV.
+> +
+> +
+> +When running in a protected mode some subcodes will result in
+> +exceptions or return error codes.
+> +
+> +Subcodes 4 and 7 will result in specification exceptions.
+> +When removing a secure VM, the UV will clear all memory, so we can't
+> +have non-clearing IPL subcodes.
+> +
+> +Subcodes 8, 9, 10 will result in specification exceptions.
+> +Re-IPL into a protected mode is only possible via a detour into non
+> +protected mode.
+
+So... what do we IPL from? Is there still a need for the bios?
+
+(Sorry, I'm a bit confused here.)
 
