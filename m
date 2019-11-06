@@ -2,98 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CDE0F1A64
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 16:51:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40FBEF1A82
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 16:56:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728457AbfKFPvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 10:51:22 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:41914 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726926AbfKFPvW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 10:51:22 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6FmqSn087241;
-        Wed, 6 Nov 2019 15:50:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=PO5xmk8/u2tGcx69lrZ2ukP6AxC0vWVORGFcZZoWIYs=;
- b=h4YefMSV8UO5B8PpOmCvsc6dc7N/uPcBlLU1j372VyQS4pmZda2oXwHzBQzWqIn1MtRw
- ER76GbT6kBLaD/Z48fK82XHsOWYKu4KvRt30Fz1kqVCL0DmCSwd9x5e2YQV2wB2kXHuH
- 9GbfqPD8kqtV1noMusHNHPvqRLSaUz5Gq5MV+0kP/nfJV/cIAT40/iEoRdbQZIL/yyAe
- HCK9XNX8FCWK97TWkttwTa8o+NLduFSLguG9+Pm5iDmNWEkKUA1PX2zUXIoNBQzORCWg
- nS6kpR1RlR3sd15SXaiDm/wAoUaFuEsGLDtEQbVNvdhfDrFRt8u0KIH2CjwcPdPy/gO1 Sg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w117u7pvn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 15:50:48 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6FnAVt109387;
-        Wed, 6 Nov 2019 15:50:48 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2w3xc2vkww-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 15:50:48 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA6FoivW011280;
-        Wed, 6 Nov 2019 15:50:44 GMT
-Received: from [10.39.238.145] (/10.39.238.145)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Nov 2019 07:50:44 -0800
-Subject: Re: [patch V2 04/17] x86/entry: Make DEBUG_ENTRY_ASSERT_IRQS_OFF
- available for 32bit
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>
-References: <20191023122705.198339581@linutronix.de>
- <20191023123117.976831752@linutronix.de>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <9a1170f8-819b-9d30-9d77-66c60cd4cafb@oracle.com>
-Date:   Wed, 6 Nov 2019 16:50:41 +0100
+        id S1732127AbfKFP4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 10:56:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43852 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732066AbfKFP43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 10:56:29 -0500
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9EBE64E8B8
+        for <kvm@vger.kernel.org>; Wed,  6 Nov 2019 15:56:28 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id m17so14324991wrb.20
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 07:56:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:openpgp:subject:message-id:date
+         :user-agent:mime-version:content-language:content-transfer-encoding;
+        bh=adnAFhGiXiXMI1/JdENa+YHqmjAgGKvDDZ+BBbEYKBw=;
+        b=BT9YBXSRlw+/i4VDRI9jCXh4jc9SfvlThtQa8lPQ3trMetO5gf32Z/Nh6c1koTkrl3
+         Jb/zldpk3a9nd9MmWK809Z5oJE/TVwe+UY/oka5glHrwwVkbki4llaRm+XgslvxbykdA
+         TRw2EUPdr71zfHLjdHC7yp8fchO1SJwyfHqBSgza0RHrqNNDFmDUJwZ2q6h9cdeaYGZz
+         2FElx3aPdrY8vLK34N2CGSNCp/FHDrZhUyX8QktkmKMr9bMZKEclnqHcE+gP28EvxpP4
+         EU1qzU7fpfl/V7aRWVs+lI/NM6EA5NXxeqDeJMPN0j36YYuCGh/QFuc5WT3//sldusAa
+         1ZUQ==
+X-Gm-Message-State: APjAAAU1d8vlgb8hwT0T1ZCUbKn69Dr+DhfqxKg+6yrS5otZlH0SQ4Un
+        6wazo170OnMrtwZ1NVWYJ9rBgWTww+RY9cmfUHyKiLpSef2GYeBn2X+/cCmLVCoA9IzrhrMByI0
+        jaLM0l+mr2mD0
+X-Received: by 2002:adf:e747:: with SMTP id c7mr3345854wrn.384.1573055787160;
+        Wed, 06 Nov 2019 07:56:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwKBaPCeFoVmwA2ST7J6MvuQIUzl8uWwWIGuEvX483jWqFdwyKqjtdJNCbdHJtF6kF87RjQFQ==
+X-Received: by 2002:adf:e747:: with SMTP id c7mr3345813wrn.384.1573055786805;
+        Wed, 06 Nov 2019 07:56:26 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
+        by smtp.gmail.com with ESMTPSA id w81sm3783002wmg.5.2019.11.06.07.56.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Nov 2019 07:56:26 -0800 (PST)
+To:     KVM list <kvm@vger.kernel.org>
+Cc:     Steven Rostedt <rostedt@goodmis.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Subject: "statsfs" API design
+Message-ID: <5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com>
+Date:   Wed, 6 Nov 2019 16:56:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191023123117.976831752@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911060152
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911060152
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi all,
 
-On 10/23/19 2:27 PM, Thomas Gleixner wrote:
-> Move the interrupt state verification debug macro to common code and fixup
-> the irqflags and paravirt components so it can be used in 32bit code later.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
->   arch/x86/entry/calling.h        |   12 ++++++++++++
->   arch/x86/entry/entry_64.S       |   12 ------------
->   arch/x86/include/asm/irqflags.h |    8 ++++++--
->   arch/x86/include/asm/paravirt.h |    9 +++++----
->   4 files changed, 23 insertions(+), 18 deletions(-)
-> 
+statsfs is a proposal for a new Linux kernel synthetic filesystem, to be
+mounted in /sys/kernel/stats, which exposes subsystem-level statistics
+in sysfs.  Reading need not be particularly lightweight, but writing
+must be fast.  Therefore, statistics are gathered at a fine-grain level
+in order to avoid locking or atomic operations, and then aggregated by
+statsfs until the desired granularity.
 
-Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+The first user of statsfs would be KVM, which is currently exposing its
+stats in debugfs.  However, debugfs access is now limited by the
+security lock down patches, and in addition statsfs aims to be a
+more-or-less stable API, hence the idea of making it a separate
+filesystem and mount point.
 
-alex.
+A few people have already expressed interest in this.  Christian
+Borntraeger presented on the kvm_stat tool recently at KVM Forum and was
+also thinking about using some high-level API in debugfs.  Google has
+KVM patches to gather statistics in a binary format; it may be useful to
+add this kind of functionality (and some kind of introspection similar
+to what tracing does) to statsfs too in the future, but this is
+independent from the kernel API.  I'm also CCing Alex Williamson, in
+case VFIO is interested in something similar, and Steven Rostedt because
+apparently he has enough free time to write poetry in addition to code.
+
+There are just two concepts in statsfs, namely "values" (aka files) and
+"sources" (directories).
+
+A value represents a single quantity that is gathered by the statsfs
+client.  It could be the number of vmexits of a given kind, the amount
+of memory used by some data structure, the length of the longest hash
+table chain, or anything like that.
+
+Values are described by a struct like this one:
+
+	struct statsfs_value {
+		const char *name;
+		enum stat_type type;	/* STAT_TYPE_{BOOL,U64,...} */
+		u16 aggr_kind;		/* Bitmask with zero or more of
+					 * STAT_AGGR_{MIN,MAX,SUM,...}
+					 */
+		u16 mode;		/* File mode */
+		int offset;		/* Offset from base address
+					 * to field containing the value
+					 */
+	};
+
+As you can see, values are basically integers stored somewhere in a
+struct.   The statsfs_value struct also includes information on which
+operations (for example sum, min, max, average, count nonzero) it makes
+sense to expose when the values are aggregated.
+
+Sources form the bulk of the statsfs API.  They can include two kinds of
+elements:
+
+- values as described above.  The common case is to have many values
+with the same base address, which are represented by an array of struct
+statsfs_value
+
+- subordinate sources
+
+Adding a subordinate source has two effects:
+
+- it creates a subdirectory for each subordinate source
+
+- for each value in the subordinate sources which has aggr_kind != 0,
+corresponding values will be created in the parent directory too.  If
+multiple subordinate sources are backed by the same array of struct
+statsfs_value, values from all those sources will be aggregated.  That
+is, statsfs will compute these from the values of all items in the list
+and show them in the parent directory.
+
+Writable values can only be written with a value of zero. Writing zero
+to an aggregate zeroes all the corresponding values in the subordinate
+sources.
+
+Sources are manipulated with these four functions:
+
+	struct statsfs_source *statsfs_source_create(const char *fmt,
+						     ...);
+	void statsfs_source_add_values(struct statsfs_source *source,
+				       struct statsfs_value *stat,
+				       int n, void *ptr);
+	void statsfs_source_add_subordinate(
+					struct statsfs_source *source,
+					struct statsfs_source *sub);
+	void statsfs_source_remove_subordinate(
+					struct statsfs_source *source,
+					struct statsfs_source *sub);
+
+Sources are reference counted, and for this reason there is also a pair
+of functions in the usual style:
+
+	void statsfs_source_get(struct statsfs_source *);
+	void statsfs_source_put(struct statsfs_source *);
+
+Finally,
+
+	void statsfs_source_register(struct statsfs_source *source);
+
+lets you create a toplevel statsfs directory.
+
+As a practical example, KVM's usage of debugfs could be replaced by
+something like this:
+
+/* Globals */
+	struct statsfs_value vcpu_stats[] = ...;
+	struct statsfs_value vm_stats[] = ...;
+	static struct statsfs_source *kvm_source;
+
+/* On module creation */
+	kvm_source = statsfs_source_create("kvm");
+	statsfs_source_register(kvm_source);
+
+/* On VM creation */
+	kvm->src = statsfs_source_create("%d-%d\n",
+				         task_pid_nr(current), fd);
+	statsfs_source_add_values(kvm->src, vm_stats,
+				  ARRAY_SIZE(vm_stats),
+				  &kvm->stats);
+	statsfs_source_add_subordinate(kvm_source, kvm->src);
+
+/* On vCPU creation */
+	vcpu_src = statsfs_source_create("vcpu%d\n", vcpu->vcpu_id);
+	statsfs_source_add_values(vcpu_src, vcpu_stats,
+				  ARRAY_SIZE(vcpu_stats),
+				  &vcpu->stats);
+	statsfs_source_add_subordinate(kvm->src, vcpu_src);
+	/*
+	 * No need to keep the vcpu_src around since there's no
+	 * separate vCPU deletion event; rely on refcount
+	 * exclusively.
+	 */
+	statsfs_source_put(vcpu_src);
+
+/* On VM deletion */
+	statsfs_source_remove_subordinate(kvm_source, kvm->src);
+	statsfs_source_put(kvm->src);
+
+/* On KVM exit */
+	statsfs_source_put(kvm_source);
+
+How does this look?
+
+Paolo
