@@ -2,111 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CCEBFF0A86
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 00:56:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 224D2F0B53
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 01:58:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730555AbfKEX4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 18:56:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:15505 "EHLO mx1.redhat.com"
+        id S1729864AbfKFA60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 19:58:26 -0500
+Received: from mga01.intel.com ([192.55.52.88]:57238 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729494AbfKEX4U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 18:56:20 -0500
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8646A83F3F
-        for <kvm@vger.kernel.org>; Tue,  5 Nov 2019 23:56:20 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id c2so6517180wrt.1
-        for <kvm@vger.kernel.org>; Tue, 05 Nov 2019 15:56:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=06M8EIegAgG0v07Clyq4kGwN0RVfmrVZoqQU2t3v1Zs=;
-        b=Z/MVoLQQnHXnbsCLgxPJtFqzzv34vGh14mnbXoKoqsHK331m9UxPDGQLFKrqb3uxNd
-         ovCdG7skUxlDj3zqWc3ZqpXOeBsFV8dR/NBoR1qmbd3KHrvxAMxUa3cB50dutQMmZbSF
-         ziGSWUuakEpR1HYggy/cS9dMyjvPKoxPYidkaw/8k2Qhzz9zcsPKoH98+1/mX2YO86Nq
-         emIv70UXMRTjM/lwkrBECir3lvmiGMJhe4qBl3dMIJJFYrfR9Ou/WpMujNwkxHlT92Gm
-         zlxnrgTRpiyLrzkFu4xjLe30ma8LDiKSuq4HCDa23vsl7KRy1DA0YHRve83wHzrXNQaR
-         vjrA==
-X-Gm-Message-State: APjAAAV4cnctLA1GcEfslKrkAFrq3ZEb2hVtJK1++BKE6ZIO7XVIkElf
-        xaCDdhyL7BuOf/WUgz1RK+tThnrgABlftSMA54KLr5DD+TZwjNETZqlxYoLB317a6O30hTaKwKr
-        Y5s6V0sC4MqaO
-X-Received: by 2002:a1c:4606:: with SMTP id t6mr1208600wma.73.1572998179159;
-        Tue, 05 Nov 2019 15:56:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzo4uEw1UA97/7uwCK1BrInQ2RF0IfORXDnQy0cW0ZN2MjlHjscwGDB2jkOL9nU2PO9JMXwbg==
-X-Received: by 2002:a1c:4606:: with SMTP id t6mr1208582wma.73.1572998178811;
-        Tue, 05 Nov 2019 15:56:18 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 4sm1154288wmd.33.2019.11.05.15.56.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2019 15:56:18 -0800 (PST)
-Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
- trustworthy
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1728810AbfKFA60 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 19:58:26 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 16:58:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,272,1569308400"; 
+   d="scan'208";a="403557226"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Nov 2019 16:58:06 -0800
+Date:   Tue, 5 Nov 2019 16:58:06 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>
-References: <20191105161737.21395-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <de3cade3-c069-dc6b-1d2d-aa10abe365b8@redhat.com>
-Date:   Wed, 6 Nov 2019 00:56:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
+Message-ID: <20191106005806.GK23297@linux.intel.com>
+References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
+ <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
+ <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <20191105161737.21395-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/11/19 17:17, Vitaly Kuznetsov wrote:
-> There is also one additional piece of the information missing. A VM can be
-> sharing physical cores with other VMs (or other userspace tasks on the
-> host) so does KVM_FEATURE_TRUSTWORTHY_SMT imply that it's not the case or
-> not? It is unclear if this changes anything and can probably be left out
-> of scope (just don't do that).
+On Fri, Oct 25, 2019 at 01:00:03PM +0200, Alexander Graf wrote:
+> On 17.09.19 17:14, Paolo Bonzini wrote:
+> >On 27/08/19 23:40, Sean Christopherson wrote:
+> >>Rework the emulator and its users to handle failure scenarios entirely
+> >>within the emulator.
+> >>
+> >>{x86,kvm}_emulate_instruction() currently returns a tri-state value to
+> >>indicate success/continue, userspace exit needed, and failure.  The
+> >>intent of returning EMULATE_FAIL is to let the caller handle failure in
+> >>a manner that is appropriate for the current context.  In practice,
+> >>the emulator has ended up with a mixture of failure handling, i.e.
+> >>whether or not the emulator takes action on failure is dependent on the
+> >>specific flavor of emulation.
+> >>
+> >>The mixed handling has proven to be rather fragile, e.g. many flows
+> >>incorrectly assume their specific flavor of emulation cannot fail or
+> >>that the emulator sets state to report the failure back to userspace.
+> >>
+> >>Move everything inside the emulator, piece by piece, so that the
+> >>emulation routines can return '0' for exit to userspace and '1' for
+> >>resume the guest, just like every other VM-Exit handler.
+> >>
+> >>Patch 13/14 is a tangentially related bug fix that conflicts heavily with
+> >>this series, so I tacked it on here.
+> >>
+> >>Patch 14/14 documents the emulation types.  I added it as a separate
+> >>patch at the very end so that the comments could reference the final
+> >>state of the code base, e.g. incorporate the rule change for using
+> >>EMULTYPE_SKIP that is introduced in patch 13/14.
+> >>
+> >>v1:
+> >>   - https://patchwork.kernel.org/cover/11110331/
+> >>
+> >>v2:
+> >>   - Collect reviews. [Vitaly and Liran]
+> >>   - Squash VMware emultype changes into a single patch. [Liran]
+> >>   - Add comments in VMX/SVM for VMware #GP handling. [Vitaly]
+> >>   - Tack on the EPT misconfig bug fix.
+> >>   - Add a patch to comment/document the emultypes. [Liran]
+> >>
+> >>Sean Christopherson (14):
+> >>   KVM: x86: Relocate MMIO exit stats counting
+> >>   KVM: x86: Clean up handle_emulation_failure()
+> >>   KVM: x86: Refactor kvm_vcpu_do_singlestep() to remove out param
+> >>   KVM: x86: Don't attempt VMWare emulation on #GP with non-zero error
+> >>     code
+> >>   KVM: x86: Move #GP injection for VMware into x86_emulate_instruction()
+> >>   KVM: x86: Add explicit flag for forced emulation on #UD
+> >>   KVM: x86: Move #UD injection for failed emulation into emulation code
+> >>   KVM: x86: Exit to userspace on emulation skip failure
+> >>   KVM: x86: Handle emulation failure directly in kvm_task_switch()
+> >>   KVM: x86: Move triple fault request into RM int injection
+> >>   KVM: VMX: Remove EMULATE_FAIL handling in handle_invalid_guest_state()
+> >>   KVM: x86: Remove emulation_result enums, EMULATE_{DONE,FAIL,USER_EXIT}
+> >>   KVM: VMX: Handle single-step #DB for EMULTYPE_SKIP on EPT misconfig
+> >>   KVM: x86: Add comments to document various emulation types
+> >>
+> >>  arch/x86/include/asm/kvm_host.h |  40 +++++++--
+> >>  arch/x86/kvm/mmu.c              |  16 +---
+> >>  arch/x86/kvm/svm.c              |  62 ++++++--------
+> >>  arch/x86/kvm/vmx/vmx.c          | 147 +++++++++++++-------------------
+> >>  arch/x86/kvm/x86.c              | 133 ++++++++++++++++-------------
+> >>  arch/x86/kvm/x86.h              |   2 +-
+> >>  6 files changed, 195 insertions(+), 205 deletions(-)
+> >>
+> >
+> >Queued, thanks (a couple conflicts had to be sorted out, but nothing
+> >requiring a respin).
 > 
-> Similar to the already existent 'NoNonArchitecturalCoreSharing' Hyper-V
-> enlightenment, the default value of KVM_HINTS_TRUSTWORTHY_SMT is set to
-> !cpu_smt_possible(). KVM userspace is thus supposed to pass it to guest's
-> CPUIDs in case it is '1' (meaning no SMT on the host at all) or do some
-> extra work (like CPU pinning and exposing the correct topology) before
-> passing '1' to the guest.
+> Ugh, I just stumbled over this commit. Is this really the right direction to
+> move towards?
+
+As you basically surmised below, removing the enum was just a side effect
+of cleaning up the emulation error handling, it wasn't really a goal in
+and of itself.
+
+> I appreciate the move to reduce the emulator logic from the many-fold enum
+> into a simple binary "worked" or "needs a user space exit". But are "0" and
+> "1" really the right names for that? I find the readability of the current
+> intercept handlers bad enough, trickling that into even more code sounds
+> like a situation that will decrease readability even more.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  Documentation/virt/kvm/cpuid.rst     | 27 +++++++++++++++++++--------
->  arch/x86/include/uapi/asm/kvm_para.h |  2 ++
->  arch/x86/kvm/cpuid.c                 |  7 ++++++-
->  3 files changed, 27 insertions(+), 9 deletions(-)
+> Why can't we just use names throughout? Something like
 > 
-> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
-> index 01b081f6e7ea..64b94103fc90 100644
-> --- a/Documentation/virt/kvm/cpuid.rst
-> +++ b/Documentation/virt/kvm/cpuid.rst
-> @@ -86,6 +86,10 @@ KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
->                                                before using paravirtualized
->                                                sched yield.
->  
-> +KVM_FEATURE_TRUSTWORTHY_SMT       14          set when host supports 'SMT
-> +                                              topology is trustworthy' hint
-> +                                              (KVM_HINTS_TRUSTWORTHY_SMT).
-> +
+> enum kvm_return {
+>     KVM_RET_USER_EXIT = 0,
+>     KVM_RET_GUEST = 1,
+> };
+> 
+> and then consistently use them as return values? That way anyone who has not
+> worked on kvm before can still make sense of the code.
 
-Instead of defining a one-off bit, can we make:
+Hmm, I think it'd make more sense to use #define instead of enum to
+hopefully make it clear that they aren't the *only* values that can be
+returned.  That'd also prevent anyone from changing the return types from
+'int' to 'enum kvm_return', which IMO would hurt readability overall.
 
-ecx = the set of known "hints" (defaults to edx if zero)
-
-edx = the set of hints that apply to the virtual machine
-
-Paolo
+And maybe KVM_EXIT_TO_USERSPACE and KVM_RETURN_TO_GUEST?
