@@ -2,54 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 917CCF110A
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 09:29:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AB69F110F
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 09:30:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730308AbfKFI3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 03:29:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37080 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729881AbfKFI3T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 03:29:19 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA68Nr2F144142
-        for <kvm@vger.kernel.org>; Wed, 6 Nov 2019 03:29:18 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w3qnewqb2-1
+        id S1731411AbfKFIaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 03:30:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42278 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730212AbfKFIaO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 03:30:14 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA68P6aT084432
+        for <kvm@vger.kernel.org>; Wed, 6 Nov 2019 03:30:14 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w3tky07fn-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 03:29:18 -0500
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 03:30:13 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 6 Nov 2019 08:29:16 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Wed, 6 Nov 2019 08:30:10 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 6 Nov 2019 08:29:11 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA68TAGF52428926
+        Wed, 6 Nov 2019 08:30:06 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA68U5Zd54395096
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 Nov 2019 08:29:10 GMT
+        Wed, 6 Nov 2019 08:30:05 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 959C642042;
-        Wed,  6 Nov 2019 08:29:10 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 5130B42042;
+        Wed,  6 Nov 2019 08:30:05 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44BAD42045;
-        Wed,  6 Nov 2019 08:29:10 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0D41C4203F;
+        Wed,  6 Nov 2019 08:30:05 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.123])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  6 Nov 2019 08:29:10 +0000 (GMT)
-Subject: Re: [PATCH 1/2] KVM: Fix NULL-ptr defer after kvm_create_vm fails
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
+        Wed,  6 Nov 2019 08:30:04 +0000 (GMT)
+Subject: Re: [PATCH] kvm: Fix NULL dereference doing kvm_create_vm()
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Junaid Shahid <junaids@google.com>, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>
+References: <20191106082636.GB31923@mwanda>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -95,77 +92,49 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Wed, 6 Nov 2019 09:29:09 +0100
+Date:   Wed, 6 Nov 2019 09:30:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1572848879-21011-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <20191106082636.GB31923@mwanda>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19110608-0028-0000-0000-000003B321E7
+x-cbid: 19110608-0008-0000-0000-0000032B2612
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110608-0029-0000-0000-000024757CB0
-Message-Id: <98cdd241-e252-82c6-dc25-a7bc1988ad13@de.ibm.com>
+x-cbparentid: 19110608-0009-0000-0000-00004A4A82E0
+Message-Id: <8f7e33e9-9ae0-4f56-3bb6-b9f3db807d38@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-06_02:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=942 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=932 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1911060088
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The same patch was already sent by Wanpeng Li.
 
+See 
+https://lore.kernel.org/lkml/1572848879-21011-1-git-send-email-wanpengli@tencent.com/
 
-On 04.11.19 07:27, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 06.11.19 09:26, Dan Carpenter wrote:
+> If init_srcu_struct() or init_srcu_struct() fails then this function
+> returns ERR_PTR(0) which is NULL.  It leads to a NULL dereference in the
+> caller.
 > 
-> Reported by syzkaller:
-> 
->     kasan: CONFIG_KASAN_INLINE enabled
->     kasan: GPF could be caused by NULL-ptr deref or user memory access
->     general protection fault: 0000 [#1] PREEMPT SMP KASAN
->     CPU: 0 PID: 14727 Comm: syz-executor.3 Not tainted 5.4.0-rc4+ #0
->     RIP: 0010:kvm_coalesced_mmio_init+0x5d/0x110 arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:121
->     Call Trace:
->      kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:3446 [inline]
->      kvm_dev_ioctl+0x781/0x1490 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3494
->      vfs_ioctl fs/ioctl.c:46 [inline]
->      file_ioctl fs/ioctl.c:509 [inline]
->      do_vfs_ioctl+0x196/0x1150 fs/ioctl.c:696
->      ksys_ioctl+0x62/0x90 fs/ioctl.c:713
->      __do_sys_ioctl fs/ioctl.c:720 [inline]
->      __se_sys_ioctl fs/ioctl.c:718 [inline]
->      __x64_sys_ioctl+0x6e/0xb0 fs/ioctl.c:718
->      do_syscall_64+0xca/0x5d0 arch/x86/entry/common.c:290
->      entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Commit 9121923c457d ("kvm: Allocate memslots and buses before calling kvm_arch_init_vm") 
-> moves memslots and buses allocations around, however, if kvm->srcu/irq_srcu fails 
-> initialization, NULL will be returned instead of error code, NULL will not be intercepted 
-> in kvm_dev_ioctl_create_vm() and be deferenced by kvm_coalesced_mmio_init(), this patch 
-> fixes it.
-> 
-> syz repro: https://syzkaller.appspot.com/x/repro.syz?x=13509b84e00000
-> 
-> Reported-by: syzbot+89a8060879fa0bd2db4f@syzkaller.appspotmail.com
-> Fixes: 9121923c457d ("kvm: Allocate memslots and buses before calling kvm_arch_init_vm") 
-> Cc: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+> Fixes: 9121923c457d ("kvm: Allocate memslots and buses before calling kvm_arch_init_vm")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
 >  virt/kvm/kvm_main.c | 1 +
 >  1 file changed, 1 insertion(+)
 > 
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d6f0696..8c272eb 100644
+> index d16d2054e937..91971811fa5f 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
 > @@ -675,6 +675,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
