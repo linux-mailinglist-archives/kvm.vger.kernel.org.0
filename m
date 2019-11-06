@@ -2,145 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 224D2F0B53
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 01:58:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E788EF0B5C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 02:01:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729864AbfKFA60 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 19:58:26 -0500
-Received: from mga01.intel.com ([192.55.52.88]:57238 "EHLO mga01.intel.com"
+        id S1730656AbfKFBBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 20:01:22 -0500
+Received: from mga09.intel.com ([134.134.136.24]:35686 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728810AbfKFA60 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 19:58:26 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1729614AbfKFBBV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 20:01:21 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 16:58:25 -0800
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 17:01:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,272,1569308400"; 
-   d="scan'208";a="403557226"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Nov 2019 16:58:06 -0800
-Date:   Tue, 5 Nov 2019 16:58:06 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+   d="scan'208";a="205687897"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.239.198.110]) ([10.239.198.110])
+  by orsmga006.jf.intel.com with ESMTP; 05 Nov 2019 17:01:18 -0800
+Subject: Re: [PATCH] KVM: X86: Dynamically allocating MSR number
+ lists(msrs_to_save[], emulated_msrs[], msr_based_features[])
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
-Message-ID: <20191106005806.GK23297@linux.intel.com>
-References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
- <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
- <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20191105092031.8064-1-chenyi.qiang@intel.com>
+ <4a5fd5b4-64b7-726a-57a5-a5c669ce84f6@redhat.com>
+ <477da390-4bdb-c25d-24b1-5b57c3bf78bb@intel.com>
+ <cd930947-2621-550c-8a41-e1a396650928@redhat.com>
+From:   cqiang <chenyi.qiang@intel.com>
+Message-ID: <f55f719d-7aca-a0e4-54cd-8a2420dc2618@intel.com>
+Date:   Wed, 6 Nov 2019 09:01:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <cd930947-2621-550c-8a41-e1a396650928@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 01:00:03PM +0200, Alexander Graf wrote:
-> On 17.09.19 17:14, Paolo Bonzini wrote:
-> >On 27/08/19 23:40, Sean Christopherson wrote:
-> >>Rework the emulator and its users to handle failure scenarios entirely
-> >>within the emulator.
-> >>
-> >>{x86,kvm}_emulate_instruction() currently returns a tri-state value to
-> >>indicate success/continue, userspace exit needed, and failure.  The
-> >>intent of returning EMULATE_FAIL is to let the caller handle failure in
-> >>a manner that is appropriate for the current context.  In practice,
-> >>the emulator has ended up with a mixture of failure handling, i.e.
-> >>whether or not the emulator takes action on failure is dependent on the
-> >>specific flavor of emulation.
-> >>
-> >>The mixed handling has proven to be rather fragile, e.g. many flows
-> >>incorrectly assume their specific flavor of emulation cannot fail or
-> >>that the emulator sets state to report the failure back to userspace.
-> >>
-> >>Move everything inside the emulator, piece by piece, so that the
-> >>emulation routines can return '0' for exit to userspace and '1' for
-> >>resume the guest, just like every other VM-Exit handler.
-> >>
-> >>Patch 13/14 is a tangentially related bug fix that conflicts heavily with
-> >>this series, so I tacked it on here.
-> >>
-> >>Patch 14/14 documents the emulation types.  I added it as a separate
-> >>patch at the very end so that the comments could reference the final
-> >>state of the code base, e.g. incorporate the rule change for using
-> >>EMULTYPE_SKIP that is introduced in patch 13/14.
-> >>
-> >>v1:
-> >>   - https://patchwork.kernel.org/cover/11110331/
-> >>
-> >>v2:
-> >>   - Collect reviews. [Vitaly and Liran]
-> >>   - Squash VMware emultype changes into a single patch. [Liran]
-> >>   - Add comments in VMX/SVM for VMware #GP handling. [Vitaly]
-> >>   - Tack on the EPT misconfig bug fix.
-> >>   - Add a patch to comment/document the emultypes. [Liran]
-> >>
-> >>Sean Christopherson (14):
-> >>   KVM: x86: Relocate MMIO exit stats counting
-> >>   KVM: x86: Clean up handle_emulation_failure()
-> >>   KVM: x86: Refactor kvm_vcpu_do_singlestep() to remove out param
-> >>   KVM: x86: Don't attempt VMWare emulation on #GP with non-zero error
-> >>     code
-> >>   KVM: x86: Move #GP injection for VMware into x86_emulate_instruction()
-> >>   KVM: x86: Add explicit flag for forced emulation on #UD
-> >>   KVM: x86: Move #UD injection for failed emulation into emulation code
-> >>   KVM: x86: Exit to userspace on emulation skip failure
-> >>   KVM: x86: Handle emulation failure directly in kvm_task_switch()
-> >>   KVM: x86: Move triple fault request into RM int injection
-> >>   KVM: VMX: Remove EMULATE_FAIL handling in handle_invalid_guest_state()
-> >>   KVM: x86: Remove emulation_result enums, EMULATE_{DONE,FAIL,USER_EXIT}
-> >>   KVM: VMX: Handle single-step #DB for EMULTYPE_SKIP on EPT misconfig
-> >>   KVM: x86: Add comments to document various emulation types
-> >>
-> >>  arch/x86/include/asm/kvm_host.h |  40 +++++++--
-> >>  arch/x86/kvm/mmu.c              |  16 +---
-> >>  arch/x86/kvm/svm.c              |  62 ++++++--------
-> >>  arch/x86/kvm/vmx/vmx.c          | 147 +++++++++++++-------------------
-> >>  arch/x86/kvm/x86.c              | 133 ++++++++++++++++-------------
-> >>  arch/x86/kvm/x86.h              |   2 +-
-> >>  6 files changed, 195 insertions(+), 205 deletions(-)
-> >>
-> >
-> >Queued, thanks (a couple conflicts had to be sorted out, but nothing
-> >requiring a respin).
-> 
-> Ugh, I just stumbled over this commit. Is this really the right direction to
-> move towards?
 
-As you basically surmised below, removing the enum was just a side effect
-of cleaning up the emulation error handling, it wasn't really a goal in
-and of itself.
 
-> I appreciate the move to reduce the emulator logic from the many-fold enum
-> into a simple binary "worked" or "needs a user space exit". But are "0" and
-> "1" really the right names for that? I find the readability of the current
-> intercept handlers bad enough, trickling that into even more code sounds
-> like a situation that will decrease readability even more.
+On 11/5/2019 9:03 PM, Paolo Bonzini wrote:
+> On 05/11/19 13:51, Xiaoyao Li wrote:
+>> On 11/5/2019 7:30 PM, Paolo Bonzini wrote:
+>>> On 05/11/19 10:20, Chenyi Qiang wrote:
+>>>> The three msr number lists(msrs_to_save[], emulated_msrs[] and
+>>>> msr_based_features[]) are global arrays of kvm.ko, which are
+>>>> initialized/adjusted (copy supported MSRs forward to override the
+>>>> unsupported MSRs) when installing kvm-{intel,amd}.ko, but it doesn't
+>>>> reset these three arrays to their initial value when uninstalling
+>>>> kvm-{intel,amd}.ko. Thus, at the next installation, kvm-{intel,amd}.ko
+>>>> will initialize the modified arrays with some MSRs lost and some MSRs
+>>>> duplicated.
+>>>>
+>>>> So allocate and initialize these three MSR number lists dynamically when
+>>>> installing kvm-{intel,amd}.ko and free them when uninstalling.
+>>>>
+>>>> Cc: stable@vger.kernel.org
+>>>> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>>>> ---
+>>>>    arch/x86/kvm/x86.c | 86 ++++++++++++++++++++++++++++++----------------
+>>>>    1 file changed, 57 insertions(+), 29 deletions(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>> index ff395f812719..08efcf6351cc 100644
+>>>> --- a/arch/x86/kvm/x86.c
+>>>> +++ b/arch/x86/kvm/x86.c
+>>>> @@ -1132,13 +1132,15 @@ EXPORT_SYMBOL_GPL(kvm_rdpmc);
+>>>>     * List of msr numbers which we expose to userspace through
+>>>> KVM_GET_MSRS
+>>>>     * and KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.
+>>>>     *
+>>>> - * This list is modified at module load time to reflect the
+>>>> + * The three msr number lists(msrs_to_save, emulated_msrs,
+>>>> msr_based_features)
+>>>> + * are allocated and initialized at module load time and freed at
+>>>> unload time.
+>>>> + * msrs_to_save is selected from the msrs_to_save_all to reflect the
+>>>>     * capabilities of the host cpu. This capabilities test skips MSRs
+>>>> that are
+>>>> - * kvm-specific. Those are put in emulated_msrs; filtering of
+>>>> emulated_msrs
+>>>> + * kvm-specific. Those are put in emulated_msrs_all; filtering of
+>>>> emulated_msrs
+>>>>     * may depend on host virtualization features rather than host cpu
+>>>> features.
+>>>>     */
+>>>>    -static u32 msrs_to_save[] = {
+>>>> +const u32 msrs_to_save_all[] = {
+>>>
+>>> This can remain static.
+>>
+>> How about static const u32 msrs_to_save_all[] ?
+>>
+>> Or you think static is enough?
 > 
-> Why can't we just use names throughout? Something like
+> "static const" is best indeed (that's what I meant, but I wasn't very
+> clear).
 > 
-> enum kvm_return {
->     KVM_RET_USER_EXIT = 0,
->     KVM_RET_GUEST = 1,
-> };
-> 
-> and then consistently use them as return values? That way anyone who has not
-> worked on kvm before can still make sense of the code.
 
-Hmm, I think it'd make more sense to use #define instead of enum to
-hopefully make it clear that they aren't the *only* values that can be
-returned.  That'd also prevent anyone from changing the return types from
-'int' to 'enum kvm_return', which IMO would hurt readability overall.
+Yes, considering the read-only property and scope of these arrays, 
+"static const" is more accurate. Thanks.
 
-And maybe KVM_EXIT_TO_USERSPACE and KVM_RETURN_TO_GUEST?
+> Paolo
+> 
+>>>>        MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP,
+>>>> MSR_IA32_SYSENTER_EIP,
+>>>>        MSR_STAR,
+>>>>    #ifdef CONFIG_X86_64
+>>>> @@ -1179,9 +1181,10 @@ static u32 msrs_to_save[] = {
+>>>>        MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+>>>>    };
+>>>>    +static u32 *msrs_to_save;
+>>>
+>>> You can use ARRAY_SIZE to allocate the destination arrays statically.
+>>
+>> It's much better, then we don't need to allocation and free.
+>>
+
+Got it. Thanks!
+
+>>> Paolo
+>>>
+> 
