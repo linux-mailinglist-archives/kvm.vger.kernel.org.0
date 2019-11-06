@@ -2,92 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDA97F21AE
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 23:27:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54F0DF2221
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 23:50:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732748AbfKFW1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 17:27:09 -0500
-Received: from mga17.intel.com ([192.55.52.151]:26990 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727154AbfKFW1I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 17:27:08 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 14:27:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,275,1569308400"; 
-   d="scan'208";a="353613712"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga004.jf.intel.com with ESMTP; 06 Nov 2019 14:27:07 -0800
-Date:   Wed, 6 Nov 2019 14:27:07 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexander Graf <graf@amazon.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
-Message-ID: <20191106222707.GB21617@linux.intel.com>
-References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
- <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
- <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
- <20191106005806.GK23297@linux.intel.com>
- <3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com>
+        id S1727642AbfKFWui (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 17:50:38 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:51038 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726004AbfKFWuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 17:50:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=S+NDVwxnw7pUxx3P5o8f+I/8HtJJXwHD+rPflie4cnM=; b=pMQRdpKIQCx3SN9Vl5hh63a0q
+        NN9hM0Rdx0FKjbRc5iGGjxbdKBzcS60ZVcKZX3pcxvoMr4KualdndEDr47JlzlgcGEmw70yQfewI1
+        T7bj38nguBRwOjJHbfR5kz1aDqZ015cYLHqHBgeIMUOqld6zyuIA3N5V6zdW6x9UObSW4us0x+Qz4
+        kUgZP3BVbKCZ2SoXTdv7WaUdAelz4i/YSG84yCv78On6N1pDStA1x/uK/u+lwrYTKCzIhLfi3J9bi
+        +8mALHWxYMUbvB1tFVeq03G484MQcFQavQi2yCJuwxOzS9J58eV4AgmbpLY2iffnv5aR7Yu8gdBt7
+        g9cvCQqnA==;
+Received: from [2601:1c0:6280:3f0::4ba1]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iSU8G-0006ML-Gr; Wed, 06 Nov 2019 22:50:32 +0000
+Subject: Re: [PATCH V9 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+To:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+References: <20191106070548.18980-1-jasowang@redhat.com>
+ <20191106070548.18980-7-jasowang@redhat.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <88efad07-70aa-3879-31e7-ace4d2ad63a1@infradead.org>
+Date:   Wed, 6 Nov 2019 14:50:30 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191106070548.18980-7-jasowang@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 01:17:40PM +0100, Paolo Bonzini wrote:
-> On 06/11/19 01:58, Sean Christopherson wrote:
-> >> enum kvm_return {
-> >>     KVM_RET_USER_EXIT = 0,
-> >>     KVM_RET_GUEST = 1,
-> >> };
-> >>
-> >> and then consistently use them as return values? That way anyone who has not
-> >> worked on kvm before can still make sense of the code.
-> > Hmm, I think it'd make more sense to use #define instead of enum to
-> > hopefully make it clear that they aren't the *only* values that can be
-> > returned.  That'd also prevent anyone from changing the return types from
-> > 'int' to 'enum kvm_return', which IMO would hurt readability overall.
-> > 
-> > And maybe KVM_EXIT_TO_USERSPACE and KVM_RETURN_TO_GUEST?
-> 
-> That would be quite some work.  Right now there is some consistency
-> between all of:
-> 
-> - x86_emulate_instruction and its callers
-> 
-> - vcpu->arch.complete_userspace_io
-> 
-> - vcpu_enter_guest/vcpu_block
-> 
-> - kvm_x86_ops->handle_exit
-> 
-> so it would be very easy to end up with a half-int-half-enum state that
-> is more confusing than before...
- 
-Ya, my thought was to update the obvious cases, essentially the ones you
-listed above, to use the define.  So almost intentionally end up in a
-half-n-half state, at least in the short term, the thought being that the
-extra annotation would do more harm than good.  But there's really no way
-to determine whether or not it would actually be a net positive without
-writing the code...
+On 11/5/19 11:05 PM, Jason Wang wrote:
+> diff --git a/samples/Kconfig b/samples/Kconfig
+> index c8dacb4dda80..13a2443e18e0 100644
+> --- a/samples/Kconfig
+> +++ b/samples/Kconfig
+> @@ -131,6 +131,16 @@ config SAMPLE_VFIO_MDEV_MDPY
+>  	  mediated device.  It is a simple framebuffer and supports
+>  	  the region display interface (VFIO_GFX_PLANE_TYPE_REGION).
+>  
+> +config SAMPLE_VIRTIO_MDEV_NET
+> +	tristate "Build VIRTIO net example mediated device sample code -- loadable modules only"
+> +	depends on VIRTIO_MDEV && VHOST_RING && m
+> +	help
+> +	  Build a networking sample device for use as a virtio
+> +	  mediated device. The device coopreates with virtio-mdev bus
 
-> I'm more worried about cases where we have functions returning either 0
-> or -errno, but 0 lets you enter the guest.  I'm not sure if the only one
-> is kvm_mmu_reload or there are others.
+typo here:
+	                              cooperates
 
-There are lots of those, e.g. basically all of the helpers for nested
-consistency checks.
+> +	  driver to present an virtio ethernet driver for
+> +	  kernel. It simply loopbacks all packets from its TX
+> +	  virtqueue to its RX virtqueue.
+> +
+>  config SAMPLE_VFIO_MDEV_MDPY_FB
+>  	tristate "Build VFIO mdpy example guest fbdev driver -- loadable module only"
+>  	depends on FB && m
+
+ciao.
+-- 
+~Randy
+
