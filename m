@@ -2,211 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40FBEF1A82
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 16:56:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A798F1A8C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 16:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732127AbfKFP4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 10:56:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43852 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732066AbfKFP43 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 10:56:29 -0500
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1732195AbfKFP5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 10:57:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20755 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727231AbfKFP5U (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 10:57:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573055839;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
+        bh=4XBocO404UvJWNVCOgyaoQws+FJzp3wcDLJ3PBROiUg=;
+        b=MSslsXKMipN6hH54dStADeoemxqMJawajsetUf39mzQHDXuThWeLe3tGBrBZ2wzR8mjZs0
+        n1cj8w1qaHM+oqhGyKrxMxt1Qzm1OrIyOrlWWfxpz4em95Ao+TaHWmVLcy9BKRDks1ilQ1
+        V/7r9xvcwgci7aBpzONdX1QJUT9lDhU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-etHT-JttOmWv7bYQ2r2Z_w-1; Wed, 06 Nov 2019 10:57:16 -0500
+X-MC-Unique: etHT-JttOmWv7bYQ2r2Z_w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9EBE64E8B8
-        for <kvm@vger.kernel.org>; Wed,  6 Nov 2019 15:56:28 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id m17so14324991wrb.20
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 07:56:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:openpgp:subject:message-id:date
-         :user-agent:mime-version:content-language:content-transfer-encoding;
-        bh=adnAFhGiXiXMI1/JdENa+YHqmjAgGKvDDZ+BBbEYKBw=;
-        b=BT9YBXSRlw+/i4VDRI9jCXh4jc9SfvlThtQa8lPQ3trMetO5gf32Z/Nh6c1koTkrl3
-         Jb/zldpk3a9nd9MmWK809Z5oJE/TVwe+UY/oka5glHrwwVkbki4llaRm+XgslvxbykdA
-         TRw2EUPdr71zfHLjdHC7yp8fchO1SJwyfHqBSgza0RHrqNNDFmDUJwZ2q6h9cdeaYGZz
-         2FElx3aPdrY8vLK34N2CGSNCp/FHDrZhUyX8QktkmKMr9bMZKEclnqHcE+gP28EvxpP4
-         EU1qzU7fpfl/V7aRWVs+lI/NM6EA5NXxeqDeJMPN0j36YYuCGh/QFuc5WT3//sldusAa
-         1ZUQ==
-X-Gm-Message-State: APjAAAU1d8vlgb8hwT0T1ZCUbKn69Dr+DhfqxKg+6yrS5otZlH0SQ4Un
-        6wazo170OnMrtwZ1NVWYJ9rBgWTww+RY9cmfUHyKiLpSef2GYeBn2X+/cCmLVCoA9IzrhrMByI0
-        jaLM0l+mr2mD0
-X-Received: by 2002:adf:e747:: with SMTP id c7mr3345854wrn.384.1573055787160;
-        Wed, 06 Nov 2019 07:56:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwKBaPCeFoVmwA2ST7J6MvuQIUzl8uWwWIGuEvX483jWqFdwyKqjtdJNCbdHJtF6kF87RjQFQ==
-X-Received: by 2002:adf:e747:: with SMTP id c7mr3345813wrn.384.1573055786805;
-        Wed, 06 Nov 2019 07:56:26 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:4051:461:136e:3f74? ([2001:b07:6468:f312:4051:461:136e:3f74])
-        by smtp.gmail.com with ESMTPSA id w81sm3783002wmg.5.2019.11.06.07.56.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2019 07:56:26 -0800 (PST)
-To:     KVM list <kvm@vger.kernel.org>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B7E2107ACC3;
+        Wed,  6 Nov 2019 15:57:14 +0000 (UTC)
+Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0013A600D3;
+        Wed,  6 Nov 2019 15:57:06 +0000 (UTC)
+Subject: Re: [Patch v1 1/2] KVM: remember position in kvm->vcpus array
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mtosatti@redhat.com, rkrcmar@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org
+References: <1573047398-7665-1-git-send-email-nitesh@redhat.com>
+ <1573047398-7665-2-git-send-email-nitesh@redhat.com>
+ <20191106144326.GA16249@linux.intel.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
-Subject: "statsfs" API design
-Message-ID: <5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com>
-Date:   Wed, 6 Nov 2019 16:56:25 +0100
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <58c040b7-ac4a-1d8e-3cd6-7d3aeb6ba4f1@redhat.com>
+Date:   Wed, 6 Nov 2019 10:57:05 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191106144326.GA16249@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="iR0hOeQ36LDK9x8KBMJOlrp4IugMqitvk"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iR0hOeQ36LDK9x8KBMJOlrp4IugMqitvk
+Content-Type: multipart/mixed; boundary="ty28LAXe3TVfuOL18dtbmg3cPBr1cDIKB";
+ protected-headers="v1"
+From: Nitesh Narayan Lal <nitesh@redhat.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ mtosatti@redhat.com, rkrcmar@redhat.com, vkuznets@redhat.com,
+ wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Message-ID: <58c040b7-ac4a-1d8e-3cd6-7d3aeb6ba4f1@redhat.com>
+Subject: Re: [Patch v1 1/2] KVM: remember position in kvm->vcpus array
+References: <1573047398-7665-1-git-send-email-nitesh@redhat.com>
+ <1573047398-7665-2-git-send-email-nitesh@redhat.com>
+ <20191106144326.GA16249@linux.intel.com>
+In-Reply-To: <20191106144326.GA16249@linux.intel.com>
 
-statsfs is a proposal for a new Linux kernel synthetic filesystem, to be
-mounted in /sys/kernel/stats, which exposes subsystem-level statistics
-in sysfs.  Reading need not be particularly lightweight, but writing
-must be fast.  Therefore, statistics are gathered at a fine-grain level
-in order to avoid locking or atomic operations, and then aggregated by
-statsfs until the desired granularity.
+--ty28LAXe3TVfuOL18dtbmg3cPBr1cDIKB
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
 
-The first user of statsfs would be KVM, which is currently exposing its
-stats in debugfs.  However, debugfs access is now limited by the
-security lock down patches, and in addition statsfs aims to be a
-more-or-less stable API, hence the idea of making it a separate
-filesystem and mount point.
 
-A few people have already expressed interest in this.  Christian
-Borntraeger presented on the kvm_stat tool recently at KVM Forum and was
-also thinking about using some high-level API in debugfs.  Google has
-KVM patches to gather statistics in a binary format; it may be useful to
-add this kind of functionality (and some kind of introspection similar
-to what tracing does) to statsfs too in the future, but this is
-independent from the kernel API.  I'm also CCing Alex Williamson, in
-case VFIO is interested in something similar, and Steven Rostedt because
-apparently he has enough free time to write poetry in addition to code.
+On 11/6/19 9:43 AM, Sean Christopherson wrote:
+> On Wed, Nov 06, 2019 at 08:36:37AM -0500, Nitesh Narayan Lal wrote:
+>> From: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>>
+>> Fetching an index for any vcpu in kvm->vcpus array by traversing
+>> the entire array everytime is costly.
+>> This patch remembers the position of each vcpu in kvm->vcpus array
+>> by storing it in vcpus_idx under kvm_vcpu structure.
+>>
+>> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>> ---
+>>  include/linux/kvm_host.h | 11 +++--------
+>>  virt/kvm/kvm_main.c      |  5 ++++-
+>>  2 files changed, 7 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 719fc3e..31c4fde 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -266,7 +266,8 @@ struct kvm_vcpu {
+>>  =09struct preempt_notifier preempt_notifier;
+>>  #endif
+>>  =09int cpu;
+>> -=09int vcpu_id;
+>> +=09int vcpu_id; /* id given by userspace at creation */
+>> +=09int vcpus_idx; /* index in kvm->vcpus array */
+> I'd probably prefer vcpu_idx or vcpu_index, but it's not a strong
+> preference by any means.
 
-There are just two concepts in statsfs, namely "values" (aka files) and
-"sources" (directories).
+Sure, I will probably replace it with vcpu_idx.
 
-A value represents a single quantity that is gathered by the statsfs
-client.  It could be the number of vmexits of a given kind, the amount
-of memory used by some data structure, the length of the longest hash
-table chain, or anything like that.
+>
+>>  =09int srcu_idx;
+>>  =09int mode;
+>>  =09u64 requests;
+>> @@ -571,13 +572,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(s=
+truct kvm *kvm, int id)
+>> =20
+>>  static inline int kvm_vcpu_get_idx(struct kvm_vcpu *vcpu)
+>>  {
+>> -=09struct kvm_vcpu *tmp;
+>> -=09int idx;
+>> -
+>> -=09kvm_for_each_vcpu(idx, tmp, vcpu->kvm)
+>> -=09=09if (tmp =3D=3D vcpu)
+>> -=09=09=09return idx;
+>> -=09BUG();
+>> +=09return vcpu->vcpus_idx;
+>>  }
+>> =20
+>>  #define kvm_for_each_memslot(memslot, slots)=09\
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 67ef3f2..24ab711 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -2673,7 +2673,10 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *k=
+vm, u32 id)
+>>  =09=09goto unlock_vcpu_destroy;
+>>  =09}
+>> =20
+>> -=09BUG_ON(kvm->vcpus[atomic_read(&kvm->online_vcpus)]);
+>> +=09vcpu->vcpus_idx =3D atomic_read(&kvm->online_vcpus);
+>> +
+> Nit: I'd omit this newline since the assignment and BUG_ON() are directly
+> related.
 
-Values are described by a struct like this one:
+Makes sense to me.
 
-	struct statsfs_value {
-		const char *name;
-		enum stat_type type;	/* STAT_TYPE_{BOOL,U64,...} */
-		u16 aggr_kind;		/* Bitmask with zero or more of
-					 * STAT_AGGR_{MIN,MAX,SUM,...}
-					 */
-		u16 mode;		/* File mode */
-		int offset;		/* Offset from base address
-					 * to field containing the value
-					 */
-	};
+>
+>> +=09BUG_ON(kvm->vcpus[vcpu->vcpus_idx]);
+> The assignment to kvm->vcpus a few lines below should be updated to use
+> the new index.
 
-As you can see, values are basically integers stored somewhere in a
-struct.   The statsfs_value struct also includes information on which
-operations (for example sum, min, max, average, count nonzero) it makes
-sense to expose when the values are aggregated.
+Ah yes.
+Thanks for pointing this out.
 
-Sources form the bulk of the statsfs API.  They can include two kinds of
-elements:
+>
+>> +
+>> =20
+>>  =09/* Now it's all set up, let userspace reach it */
+>>  =09kvm_get_kvm(kvm);
+>> --=20
+>> 1.8.3.1
+>>
+--=20
+Nitesh
 
-- values as described above.  The common case is to have many values
-with the same base address, which are represented by an array of struct
-statsfs_value
 
-- subordinate sources
+--ty28LAXe3TVfuOL18dtbmg3cPBr1cDIKB--
 
-Adding a subordinate source has two effects:
+--iR0hOeQ36LDK9x8KBMJOlrp4IugMqitvk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-- it creates a subdirectory for each subordinate source
+-----BEGIN PGP SIGNATURE-----
 
-- for each value in the subordinate sources which has aggr_kind != 0,
-corresponding values will be created in the parent directory too.  If
-multiple subordinate sources are backed by the same array of struct
-statsfs_value, values from all those sources will be aggregated.  That
-is, statsfs will compute these from the values of all items in the list
-and show them in the parent directory.
+iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAl3C7VEACgkQo4ZA3AYy
+oznJChAAn/49v6/9S+zOUVx2Ww8EkOcZ5HiYdrMpQC2Zyb47a6gYwNVonHdf0t2I
+KTTMCygGVH7x4W5gcqyEaQ9XWCpjkDxZZbVsH+y4PD+T6Jk4ykawgbk+WfWhFUCl
+Q3CN/59C5gUYuT025OVq7RRJTa7W4oQ1JGi+oZeQD+qK4LjhYA46SFFLAyz58wJ8
+OmyRUA6Z6H027CerSEYmN7i6gpNpZGVFY7pnbe3YnQGY91+w3Vr6xlTtZD/zz4L0
+mnJv+uuV6Yu6nYDdFgIMpYB7o8bP180BvxDQl4lVjvtkpV/SUIoEcOFOSqlotjFF
+/0b1wPeGr2gJa0U6MRo/lmRZxJgPRiYXN1YSJyXQo1RqeK8VMZ//5MDyb0ke4Wfa
+Ogd/9i2upKAVgXMuwscJ9/UtKo+vdARa0p2anYSDglnNqYQLEw1IYpsOGTqb5LA6
+C3VnNwVjo5aoAHEfoPuDAcib8pTfNnsJ7Sm2hwkhGrnmZwxjOyp/U+MD4cbxG6v2
+ntfnE8JIX9pU3D8tRnVlGtlmpGWjs4ZcWhikMl5UTPlMTzaobRua3wg2kG8PswRO
+ywmb9YAl8rSsyZlbgE1rnXlSFn9mcI69BFEbiyFyCK/rb9oDRj+1UDefz/qeCQPY
+DeJAkSesMCi8yBHYBmt1Qhtjmd6lJzlzS2jOgllhHbC7yZhZC6c=
+=IwmN
+-----END PGP SIGNATURE-----
 
-Writable values can only be written with a value of zero. Writing zero
-to an aggregate zeroes all the corresponding values in the subordinate
-sources.
+--iR0hOeQ36LDK9x8KBMJOlrp4IugMqitvk--
 
-Sources are manipulated with these four functions:
-
-	struct statsfs_source *statsfs_source_create(const char *fmt,
-						     ...);
-	void statsfs_source_add_values(struct statsfs_source *source,
-				       struct statsfs_value *stat,
-				       int n, void *ptr);
-	void statsfs_source_add_subordinate(
-					struct statsfs_source *source,
-					struct statsfs_source *sub);
-	void statsfs_source_remove_subordinate(
-					struct statsfs_source *source,
-					struct statsfs_source *sub);
-
-Sources are reference counted, and for this reason there is also a pair
-of functions in the usual style:
-
-	void statsfs_source_get(struct statsfs_source *);
-	void statsfs_source_put(struct statsfs_source *);
-
-Finally,
-
-	void statsfs_source_register(struct statsfs_source *source);
-
-lets you create a toplevel statsfs directory.
-
-As a practical example, KVM's usage of debugfs could be replaced by
-something like this:
-
-/* Globals */
-	struct statsfs_value vcpu_stats[] = ...;
-	struct statsfs_value vm_stats[] = ...;
-	static struct statsfs_source *kvm_source;
-
-/* On module creation */
-	kvm_source = statsfs_source_create("kvm");
-	statsfs_source_register(kvm_source);
-
-/* On VM creation */
-	kvm->src = statsfs_source_create("%d-%d\n",
-				         task_pid_nr(current), fd);
-	statsfs_source_add_values(kvm->src, vm_stats,
-				  ARRAY_SIZE(vm_stats),
-				  &kvm->stats);
-	statsfs_source_add_subordinate(kvm_source, kvm->src);
-
-/* On vCPU creation */
-	vcpu_src = statsfs_source_create("vcpu%d\n", vcpu->vcpu_id);
-	statsfs_source_add_values(vcpu_src, vcpu_stats,
-				  ARRAY_SIZE(vcpu_stats),
-				  &vcpu->stats);
-	statsfs_source_add_subordinate(kvm->src, vcpu_src);
-	/*
-	 * No need to keep the vcpu_src around since there's no
-	 * separate vCPU deletion event; rely on refcount
-	 * exclusively.
-	 */
-	statsfs_source_put(vcpu_src);
-
-/* On VM deletion */
-	statsfs_source_remove_subordinate(kvm_source, kvm->src);
-	statsfs_source_put(kvm->src);
-
-/* On KVM exit */
-	statsfs_source_put(kvm_source);
-
-How does this look?
-
-Paolo
