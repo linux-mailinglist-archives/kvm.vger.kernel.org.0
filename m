@@ -2,139 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F22F5F1E2B
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 20:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F1E2F1EB2
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 20:25:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728779AbfKFTDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 14:03:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23676 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727422AbfKFTDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 14:03:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573067020;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mg3JgW1BuhTCB4NFaQyIC8Smk9WRddoCBLHgtm+TXAs=;
-        b=iMIDHSNT7gr26XTPRz3osxiVjbF/Y2oP7YkWKF+ToGNeqe8Zyhs7SWuKmWk4Z/P2CI6kBk
-        2R19so2URLyk41Zz4GLB5JEK80fJ96ICroU0OtVoI7bZtB1MKRtnb9xI2+4HfDVwLZVVN8
-        nqdRTYy/fVyMuhfskINu6i8H4f033ro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-MkavMd-mPku2TkqD8XFDEg-1; Wed, 06 Nov 2019 14:03:34 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1731608AbfKFTZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 14:25:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40234 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727432AbfKFTZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 14:25:38 -0500
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3930477;
-        Wed,  6 Nov 2019 19:03:30 +0000 (UTC)
-Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA38F5C6DC;
-        Wed,  6 Nov 2019 19:03:12 +0000 (UTC)
-Date:   Wed, 6 Nov 2019 12:03:12 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
+        by mx1.redhat.com (Postfix) with ESMTPS id 5273081105
+        for <kvm@vger.kernel.org>; Wed,  6 Nov 2019 19:25:38 +0000 (UTC)
+Received: by mail-qk1-f199.google.com with SMTP id g65so25845860qkf.19
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 11:25:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=J/Zt/NfiTx+Ld2uAQJIUZCZlEBcXHtsRtDQxesGEOxE=;
+        b=JfVp0cwS24KiVjxkMTQ6QIiS0Veu46dUnF8Yp+jkvtVS1sGP44l276093m3wd1aKjw
+         2Sm/CwtvRBbK3fd2C/JSqA2x+KSvewCePymR6DYhQ1EhtF19rIDzXKvb6GKuBU9MyH+S
+         2cBRjABA/3JTQKg0c/E+7zSrZBZ/cRO8PVypyywiEu3qtyRrUg0VGao+q2F1Jgyo0HLm
+         E+7oTm1cERVk+bkXq51NEgg29hwjLQum6MLiOpPhSyJML3M36nKGrwx6e7iIIPBSVtDF
+         HCSnIZXM14RakA10XQJEaqaRuJv5Lngrbmzj/D1WLrrkfC2YlINpmGFaCh5RIDg6pSPz
+         79ZQ==
+X-Gm-Message-State: APjAAAUCFJYgTizvVoDnY3XJxFP3VNcpmT8yGvOehEOnB7dreP/xd6N3
+        rJGtmaVTe8z/S9SfO8XQZIWyC/+MHS2a/MOZTZm8V35AOPqClxrT7+bh2Vvveh84wsE7NzGjUT3
+        entOKgnXo4+UN
+X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3561041qkm.393.1573068337480;
+        Wed, 06 Nov 2019 11:25:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwVUeLBA9o5ynyS/oZRBUg3gqW1DOYZfoi4p5JLJ/1OKZhj6MjBGfohoGDCJio3vEXQLJQBsQ==
+X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3560981qkm.393.1573068337135;
+        Wed, 06 Nov 2019 11:25:37 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+        by smtp.gmail.com with ESMTPSA id f39sm13094663qtb.26.2019.11.06.11.25.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2019 11:25:35 -0800 (PST)
+Date:   Wed, 6 Nov 2019 14:25:23 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
         intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        tiwei.bie@intel.com, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, cohuck@redhat.com,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
         freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
         eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
         christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
         stefanha@redhat.com
 Subject: Re: [PATCH V8 0/6] mdev based hardware virtio offloading support
-Message-ID: <20191106120312.77a6a318@x1.home>
-In-Reply-To: <393f2dc9-8c67-d3c9-6553-640b80c15aaf@redhat.com>
+Message-ID: <20191106142449-mutt-send-email-mst@kernel.org>
 References: <20191105093240.5135-1-jasowang@redhat.com>
-        <20191105105834.469675f0@x1.home>
-        <393f2dc9-8c67-d3c9-6553-640b80c15aaf@redhat.com>
-Organization: Red Hat
+ <20191105105834.469675f0@x1.home>
+ <393f2dc9-8c67-d3c9-6553-640b80c15aaf@redhat.com>
+ <20191106120312.77a6a318@x1.home>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: MkavMd-mPku2TkqD8XFDEg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191106120312.77a6a318@x1.home>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 6 Nov 2019 11:56:46 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On Wed, Nov 06, 2019 at 12:03:12PM -0700, Alex Williamson wrote:
+> On Wed, 6 Nov 2019 11:56:46 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+> 
+> > On 2019/11/6 上午1:58, Alex Williamson wrote:
+> > > On Tue,  5 Nov 2019 17:32:34 +0800
+> > > Jason Wang <jasowang@redhat.com> wrote:
+> > >  
+> > >> Hi all:
+> > >>
+> > >> There are hardwares that can do virtio datapath offloading while
+> > >> having its own control path. This path tries to implement a mdev based
+> > >> unified API to support using kernel virtio driver to drive those
+> > >> devices. This is done by introducing a new mdev transport for virtio
+> > >> (virtio_mdev) and register itself as a new kind of mdev driver. Then
+> > >> it provides a unified way for kernel virtio driver to talk with mdev
+> > >> device implementation.
+> > >>
+> > >> Though the series only contains kernel driver support, the goal is to
+> > >> make the transport generic enough to support userspace drivers. This
+> > >> means vhost-mdev[1] could be built on top as well by resuing the
+> > >> transport.
+> > >>
+> > >> A sample driver is also implemented which simulate a virito-net
+> > >> loopback ethernet device on top of vringh + workqueue. This could be
+> > >> used as a reference implementation for real hardware driver.
+> > >>
+> > >> Also a real ICF VF driver was also posted here[2] which is a good
+> > >> reference for vendors who is interested in their own virtio datapath
+> > >> offloading product.
+> > >>
+> > >> Consider mdev framework only support VFIO device and driver right now,
+> > >> this series also extend it to support other types. This is done
+> > >> through introducing class id to the device and pairing it with
+> > >> id_talbe claimed by the driver. On top, this seris also decouple
+> > >> device specific parents ops out of the common ones.
+> > >>
+> > >> Pktgen test was done with virito-net + mvnet loop back device.
+> > >>
+> > >> Please review.
+> > >>
+> > >> [1] https://lkml.org/lkml/2019/10/31/440
+> > >> [2] https://lkml.org/lkml/2019/10/15/1226
+> > >>
+> > >> Changes from V7:
+> > >> - drop {set|get}_mdev_features for virtio
+> > >> - typo and comment style fixes  
+> > >
+> > > Seems we're nearly there, all the remaining comments are relatively
+> > > superficial, though I would appreciate a v9 addressing them as well as
+> > > the checkpatch warnings:
+> > >
+> > > https://patchwork.freedesktop.org/series/68977/  
+> > 
+> > 
+> > Will do.
+> > 
+> > Btw, do you plan to merge vhost-mdev patch on top? Or you prefer it to 
+> > go through Michael's vhost tree?
+> 
+> I can include it if you wish.  The mdev changes are isolated enough in
+> that patch that I wouldn't presume it, but clearly it would require
+> less merge coordination to drop it in my tree.  Let me know.  Thanks,
+> 
+> Alex
 
-> On 2019/11/6 =E4=B8=8A=E5=8D=881:58, Alex Williamson wrote:
-> > On Tue,  5 Nov 2019 17:32:34 +0800
-> > Jason Wang <jasowang@redhat.com> wrote:
-> > =20
-> >> Hi all:
-> >>
-> >> There are hardwares that can do virtio datapath offloading while
-> >> having its own control path. This path tries to implement a mdev based
-> >> unified API to support using kernel virtio driver to drive those
-> >> devices. This is done by introducing a new mdev transport for virtio
-> >> (virtio_mdev) and register itself as a new kind of mdev driver. Then
-> >> it provides a unified way for kernel virtio driver to talk with mdev
-> >> device implementation.
-> >>
-> >> Though the series only contains kernel driver support, the goal is to
-> >> make the transport generic enough to support userspace drivers. This
-> >> means vhost-mdev[1] could be built on top as well by resuing the
-> >> transport.
-> >>
-> >> A sample driver is also implemented which simulate a virito-net
-> >> loopback ethernet device on top of vringh + workqueue. This could be
-> >> used as a reference implementation for real hardware driver.
-> >>
-> >> Also a real ICF VF driver was also posted here[2] which is a good
-> >> reference for vendors who is interested in their own virtio datapath
-> >> offloading product.
-> >>
-> >> Consider mdev framework only support VFIO device and driver right now,
-> >> this series also extend it to support other types. This is done
-> >> through introducing class id to the device and pairing it with
-> >> id_talbe claimed by the driver. On top, this seris also decouple
-> >> device specific parents ops out of the common ones.
-> >>
-> >> Pktgen test was done with virito-net + mvnet loop back device.
-> >>
-> >> Please review.
-> >>
-> >> [1] https://lkml.org/lkml/2019/10/31/440
-> >> [2] https://lkml.org/lkml/2019/10/15/1226
-> >>
-> >> Changes from V7:
-> >> - drop {set|get}_mdev_features for virtio
-> >> - typo and comment style fixes =20
-> >
-> > Seems we're nearly there, all the remaining comments are relatively
-> > superficial, though I would appreciate a v9 addressing them as well as
-> > the checkpatch warnings:
-> >
-> > https://patchwork.freedesktop.org/series/68977/ =20
->=20
->=20
-> Will do.
->=20
-> Btw, do you plan to merge vhost-mdev patch on top? Or you prefer it to=20
-> go through Michael's vhost tree?
+I'm fine with merging through your tree. If you do, feel free to
+include
 
-I can include it if you wish.  The mdev changes are isolated enough in
-that patch that I wouldn't presume it, but clearly it would require
-less merge coordination to drop it in my tree.  Let me know.  Thanks,
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Alex
 
+-- 
+MST
