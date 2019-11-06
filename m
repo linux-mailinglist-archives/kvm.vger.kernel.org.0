@@ -2,162 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EEBDAF0E87
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 06:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DEB4F0EF7
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 07:35:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbfKFFzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 00:55:25 -0500
-Received: from mga05.intel.com ([192.55.52.43]:31173 "EHLO mga05.intel.com"
+        id S1729858AbfKFGfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 01:35:14 -0500
+Received: from mga01.intel.com ([192.55.52.88]:15587 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725616AbfKFFzZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 00:55:25 -0500
+        id S1727795AbfKFGfO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 01:35:14 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 21:55:24 -0800
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 22:35:13 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,272,1569308400"; 
-   d="scan'208";a="205222652"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by orsmga003.jf.intel.com with ESMTP; 05 Nov 2019 21:55:23 -0800
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 5 Nov 2019 21:55:22 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.200]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 13:55:21 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: RE: [RFC v2 11/22] intel_iommu: process pasid cache invalidation
-Thread-Topic: [RFC v2 11/22] intel_iommu: process pasid cache invalidation
-Thread-Index: AQHVims0gnJtva3dYk2Lhkg1plkVR6d3k9OAgATO/oA=
-Date:   Wed, 6 Nov 2019 05:55:20 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EEE4E@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-12-git-send-email-yi.l.liu@intel.com>
- <20191102160547.GA26023@xz-x1.metropole.lan>
-In-Reply-To: <20191102160547.GA26023@xz-x1.metropole.lan>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjU5OGVkOWQtMzk2ZS00MDZmLTgzZTItZmM3ODI4N2RlNGJmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicklxV1BaQnNQSFhyWjFtYlwvd3dtUkV3R3dPam8zeThoRlBnWkRKQW9YZE1LRnhSRDRRXC85dkFmWnk0Uktzd0hYIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+   d="scan'208";a="232754499"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.72])
+  by fmsmga002.fm.intel.com with ESMTP; 05 Nov 2019 22:35:11 -0800
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH v2] KVM: X86: Fix initialization of MSR lists(msrs_to_save[], emulated_msrs[] and msr_based_features[])
+Date:   Wed,  6 Nov 2019 14:35:20 +0800
+Message-Id: <20191106063520.1915-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBTdW5k
-YXksIE5vdmVtYmVyIDMsIDIwMTkgMTI6MDYgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAxMS8yMl0gaW50ZWxfaW9tbXU6IHBy
-b2Nlc3MgcGFzaWQgY2FjaGUgaW52YWxpZGF0aW9uDQo+IA0KPiBPbiBUaHUsIE9jdCAyNCwgMjAx
-OSBhdCAwODozNDozMkFNIC0wNDAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFk
-ZHMgUEFTSUQgY2FjaGUgaW52YWxpZGF0aW9uIGhhbmRsaW5nLiBXaGVuIGd1ZXN0IGVuYWJsZWQN
-Cj4gPiBQQVNJRCB1c2FnZXMgKGUuZy4gU1ZBKSwgZ3Vlc3Qgc29mdHdhcmUgc2hvdWxkIGlzc3Vl
-IGEgcHJvcGVyIFBBU0lEDQo+ID4gY2FjaGUgaW52YWxpZGF0aW9uIHdoZW4gY2FjaGluZy1tb2Rl
-IGlzIGV4cG9zZWQuIFRoaXMgcGF0Y2ggb25seSBhZGRzDQo+ID4gdGhlIGRyYWZ0IGhhbmRsaW5n
-IG9mIHBhc2lkIGNhY2hlIGludmFsaWRhdGlvbi4gRGV0YWlsZWQgaGFuZGxpbmcgd2lsbA0KPiA+
-IGJlIGFkZGVkIGluIHN1YnNlcXVlbnQgcGF0Y2hlcy4NCj4gPg0KPiA+IENjOiBLZXZpbiBUaWFu
-IDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBDYzogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFu
-QGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0K
-PiA+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBTaWduZWQtb2Zm
-LWJ5OiBMaXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2
-L2ludGVsX2lvbW11LmMgICAgICAgICAgfCA2NiArKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKy0tDQo+IC0tDQo+ID4gIGh3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaCB8
-IDEyICsrKysrKysrDQo+ID4gIGh3L2kzODYvdHJhY2UtZXZlbnRzICAgICAgICAgICB8ICAzICsr
-DQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgNzYgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkN
-Cj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2lu
-dGVsX2lvbW11LmMNCj4gPiBpbmRleCA4OGI4NDNmLi44NGZmNmYwIDEwMDY0NA0KPiA+IC0tLSBh
-L2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0K
-PiA+IEBAIC0yMzM1LDYgKzIzMzUsNjMgQEAgc3RhdGljIGJvb2wgdnRkX3Byb2Nlc3NfaW90bGJf
-ZGVzYyhJbnRlbElPTU1VU3RhdGUNCj4gKnMsIFZUREludkRlc2MgKmludl9kZXNjKQ0KPiA+ICAg
-ICAgcmV0dXJuIHRydWU7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgaW50IHZ0ZF9wYXNpZF9j
-YWNoZV9kc2koSW50ZWxJT01NVVN0YXRlICpzLCB1aW50MTZfdCBkb21haW5faWQpDQo+ID4gK3sN
-Cj4gPiArICAgIHJldHVybiAwOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgaW50IHZ0ZF9w
-YXNpZF9jYWNoZV9wc2koSW50ZWxJT01NVVN0YXRlICpzLA0KPiA+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdWludDE2X3QgZG9tYWluX2lkLCB1aW50MzJfdCBwYXNpZCkNCj4gPiAr
-ew0KPiA+ICsgICAgcmV0dXJuIDA7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdnRk
-X3Bhc2lkX2NhY2hlX2dzaShJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gK3sNCj4gPiArICAgIHJl
-dHVybiAwOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgYm9vbCB2dGRfcHJvY2Vzc19wYXNp
-ZF9kZXNjKEludGVsSU9NTVVTdGF0ZSAqcywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBWVERJbnZEZXNjICppbnZfZGVzYykNCj4gPiArew0KPiA+ICsgICAgdWludDE2
-X3QgZG9tYWluX2lkOw0KPiA+ICsgICAgdWludDMyX3QgcGFzaWQ7DQo+ID4gKyAgICBpbnQgcmV0
-ID0gMDsNCj4gPiArDQo+ID4gKyAgICBpZiAoKGludl9kZXNjLT52YWxbMF0gJiBWVERfSU5WX0RF
-U0NfUEFTSURDX1JTVkRfVkFMMCkgfHwNCj4gPiArICAgICAgICAoaW52X2Rlc2MtPnZhbFsxXSAm
-IFZURF9JTlZfREVTQ19QQVNJRENfUlNWRF9WQUwxKSB8fA0KPiA+ICsgICAgICAgIChpbnZfZGVz
-Yy0+dmFsWzJdICYgVlREX0lOVl9ERVNDX1BBU0lEQ19SU1ZEX1ZBTDIpIHx8DQo+ID4gKyAgICAg
-ICAgKGludl9kZXNjLT52YWxbM10gJiBWVERfSU5WX0RFU0NfUEFTSURDX1JTVkRfVkFMMykpIHsN
-Cj4gPiArICAgICAgICBlcnJvcl9yZXBvcnRfb25jZSgibm9uLXplcm8tZmllbGQtaW4tcGNfaW52
-X2Rlc2MgaGk6IDB4JSIgUFJJeDY0DQo+ID4gKyAgICAgICAgICAgICAgICAgICIgbG86IDB4JSIg
-UFJJeDY0LCBpbnZfZGVzYy0+dmFsWzFdLCBpbnZfZGVzYy0+dmFsWzBdKTsNCj4gPiArICAgICAg
-ICByZXR1cm4gZmFsc2U7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgZG9tYWluX2lkID0g
-VlREX0lOVl9ERVNDX1BBU0lEQ19ESUQoaW52X2Rlc2MtPnZhbFswXSk7DQo+ID4gKyAgICBwYXNp
-ZCA9IFZURF9JTlZfREVTQ19QQVNJRENfUEFTSUQoaW52X2Rlc2MtPnZhbFswXSk7DQo+ID4gKw0K
-PiA+ICsgICAgc3dpdGNoIChpbnZfZGVzYy0+dmFsWzBdICYgVlREX0lOVl9ERVNDX1BBU0lEQ19H
-KSB7DQo+ID4gKyAgICBjYXNlIFZURF9JTlZfREVTQ19QQVNJRENfRFNJOg0KPiA+ICsgICAgICAg
-IHJldCA9IHZ0ZF9wYXNpZF9jYWNoZV9kc2kocywgZG9tYWluX2lkKTsNCj4gPiArICAgICAgICBi
-cmVhazsNCj4gPiArDQo+ID4gKyAgICBjYXNlIFZURF9JTlZfREVTQ19QQVNJRENfUEFTSURfU0k6
-DQo+ID4gKyAgICAgICAgcmV0ID0gdnRkX3Bhc2lkX2NhY2hlX3BzaShzLCBkb21haW5faWQsIHBh
-c2lkKTsNCj4gPiArICAgICAgICBicmVhazsNCj4gPiArDQo+ID4gKyAgICBjYXNlIFZURF9JTlZf
-REVTQ19QQVNJRENfR0xPQkFMOg0KPiA+ICsgICAgICAgIHJldCA9IHZ0ZF9wYXNpZF9jYWNoZV9n
-c2kocyk7DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gKw0KPiA+ICsgICAgZGVmYXVsdDoNCj4g
-PiArICAgICAgICBlcnJvcl9yZXBvcnRfb25jZSgiaW52YWxpZC1pbnYtZ3JhbnUtaW4tcGNfaW52
-X2Rlc2MgaGk6IDB4JSIgUFJJeDY0DQo+ID4gKyAgICAgICAgICAgICAgICAgICIgbG86IDB4JSIg
-UFJJeDY0LCBpbnZfZGVzYy0+dmFsWzFdLCBpbnZfZGVzYy0+dmFsWzBdKTsNCj4gPiArICAgICAg
-ICByZXR1cm4gZmFsc2U7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIChyZXQg
-PT0gMCkgPyB0cnVlIDogZmFsc2U7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBib29sIHZ0
-ZF9wcm9jZXNzX2ludl9pZWNfZGVzYyhJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBWVERJbnZEZXNjICppbnZfZGVzYykNCj4gPiAg
-ew0KPiA+IEBAIC0yNDQxLDEyICsyNDk4LDExIEBAIHN0YXRpYyBib29sIHZ0ZF9wcm9jZXNzX2lu
-dl9kZXNjKEludGVsSU9NTVVTdGF0ZQ0KPiAqcykNCj4gPiAgICAgICAgICB9DQo+ID4gICAgICAg
-ICAgYnJlYWs7DQo+ID4NCj4gPiAtICAgIC8qDQo+ID4gLSAgICAgKiBUT0RPOiB0aGUgZW50aXR5
-IG9mIGJlbG93IHR3byBjYXNlcyB3aWxsIGJlIGltcGxlbWVudGVkIGluIGZ1dHVyZSBzZXJpZXMu
-DQo+ID4gLSAgICAgKiBUbyBtYWtlIGd1ZXN0ICh3aGljaCBpbnRlZ3JhdGVzIHNjYWxhYmxlIG1v
-ZGUgc3VwcG9ydCBwYXRjaCBzZXQgaW4NCj4gPiAtICAgICAqIGlvbW11IGRyaXZlcikgd29yaywg
-anVzdCByZXR1cm4gdHJ1ZSBpcyBlbm91Z2ggc28gZmFyLg0KPiA+IC0gICAgICovDQo+ID4gICAg
-ICBjYXNlIFZURF9JTlZfREVTQ19QQzoNCj4gPiArICAgICAgICB0cmFjZV92dGRfaW52X2Rlc2Mo
-InBhc2lkLWNhY2hlIiwgaW52X2Rlc2MudmFsWzFdLCBpbnZfZGVzYy52YWxbMF0pOw0KPiANCj4g
-Q291bGQgYmUgaGVscGZ1bCBpZiB5b3UgZHVtcCBbMnwzXSB0b2dldGhlciBoZXJlLi4uDQoNCnN1
-cmUuIExldCBtZSBhZGQgaXQgaW4gbmV4dCB2ZXJzaW9uLg0KDQo+ID4gKyAgICAgICAgaWYgKCF2
-dGRfcHJvY2Vzc19wYXNpZF9kZXNjKHMsICZpbnZfZGVzYykpIHsNCj4gPiArICAgICAgICAgICAg
-cmV0dXJuIGZhbHNlOw0KPiA+ICsgICAgICAgIH0NCj4gPiAgICAgICAgICBicmVhazsNCj4gPg0K
-PiA+ICAgICAgY2FzZSBWVERfSU5WX0RFU0NfUElPVExCOg0KPiA+IGRpZmYgLS1naXQgYS9ody9p
-Mzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggYi9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFs
-LmgNCj4gPiBpbmRleCA4NjY4NzcxLi5jNmNiMjhiIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYv
-aW50ZWxfaW9tbXVfaW50ZXJuYWwuaA0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXVfaW50
-ZXJuYWwuaA0KPiA+IEBAIC00NDUsNiArNDQ1LDE4IEBAIHR5cGVkZWYgdW5pb24gVlRESW52RGVz
-YyBWVERJbnZEZXNjOw0KPiA+ICAjZGVmaW5lIFZURF9TUFRFX0xQQUdFX0w0X1JTVkRfTUFTSyhh
-dykgXA0KPiA+ICAgICAgICAgICgweDg4MFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9T
-TF9JR05fQ09NKSkNCj4gPg0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfRyAgICAg
-ICAgICAoM1VMTCA8PCA0KQ0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfUEFTSUQo
-dmFsKSAoKCh2YWwpID4+IDMyKSAmIDB4ZmZmZmZVTEwpDQo+ID4gKyNkZWZpbmUgVlREX0lOVl9E
-RVNDX1BBU0lEQ19ESUQodmFsKSAgICgoKHZhbCkgPj4gMTYpICYNCj4gVlREX0RPTUFJTl9JRF9N
-QVNLKQ0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfUlNWRF9WQUwwICAweGZmZjAw
-MDAwMDAwMGZmYzBVTEwNCj4gDQo+IE5pdDogTWluZCB0byBjb21tZW50IGhlcmUgdGhhdCBiaXQg
-OS0xMSBpcyBtYXJrZWQgYXMgemVybyByYXRoZXIgdGhhbg0KPiByZXNlcnZlZD8gIFRoaXMgc2Vl
-bXMgdG8gd29yayBidXQgaWYgYml0IDktMTEgY2FuIGJlIG5vbi16ZXJvIGluIHNvbWUNCj4gb3Ro
-ZXIgZGVzY3JpcHRvcnMgdGhlbiBpdCB3b3VsZCBiZSBjbGVhcmVyIHRvIGRlZmluZSBpdCBhcw0K
-PiAweGZmZjAwMDAwMDAwMGYxYzBVTEwgdGhlbiBleHBsaWNpdGx5IGNoZWNrIGJpdHMgOS0xMS4N
-Cj4gDQo+IE90aGVyd2lzZSBsb29rcyBnb29kIHRvIG1lLg0KDQpZb3UgYXJlIHJpZ2h0LiBUaGlz
-IGlzIG5vdCByZXNlcnZlZC4gSXQncyBwYXJ0cyBvZiB0aGUgZGVzY3JpcHRvciB0eXBlIG5vdy4g
-V2lsbA0KZml4IGl0IGluIG5leHQgdmVyc2lvbi4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+The three MSR lists(msrs_to_save[], emulated_msrs[] and
+msr_based_features[]) are global arrays of kvm.ko, which are
+adjusted (copy supported MSRs forward to override the unsupported MSRs)
+when insmod kvm-{intel,amd}.ko, but it doesn't reset these three arrays
+to their initial value when rmmod kvm-{intel,amd}.ko. Thus, at the next
+installation, kvm-{intel,amd}.ko will do operations on the modified
+arrays with some MSRs lost and some MSRs duplicated.
+
+So define three constant arrays to hold the initial MSR lists and
+initialize msrs_to_save[], emulated_msrs[] and msr_based_features[]
+based on the constant arrays.
+
+Cc: stable@vger.kernel.org
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+---
+Changes in v2:
+ - define initial MSR lists with static const.
+ - change the dynamic allocation of supported MSR lists to static allocation.
+
+ arch/x86/kvm/x86.c | 51 +++++++++++++++++++++++++---------------------
+ 1 file changed, 28 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 89621025577a..0b4b6db5b13f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1138,13 +1138,15 @@ EXPORT_SYMBOL_GPL(kvm_rdpmc);
+  * List of msr numbers which we expose to userspace through KVM_GET_MSRS
+  * and KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.
+  *
+- * This list is modified at module load time to reflect the
++ * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features)
++ * extract the supported MSRs from the related const lists.
++ * msrs_to_save is selected from the msrs_to_save_all to reflect the
+  * capabilities of the host cpu. This capabilities test skips MSRs that are
+- * kvm-specific. Those are put in emulated_msrs; filtering of emulated_msrs
++ * kvm-specific. Those are put in emulated_msrs_all; filtering of emulated_msrs
+  * may depend on host virtualization features rather than host cpu features.
+  */
+ 
+-static u32 msrs_to_save[] = {
++static const u32 msrs_to_save_all[] = {
+ 	MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP, MSR_IA32_SYSENTER_EIP,
+ 	MSR_STAR,
+ #ifdef CONFIG_X86_64
+@@ -1185,9 +1187,10 @@ static u32 msrs_to_save[] = {
+ 	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+ };
+ 
++static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+ static unsigned num_msrs_to_save;
+ 
+-static u32 emulated_msrs[] = {
++static const u32 emulated_msrs_all[] = {
+ 	MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+ 	MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+ 	HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+@@ -1226,7 +1229,7 @@ static u32 emulated_msrs[] = {
+ 	 * by arch/x86/kvm/vmx/nested.c based on CPUID or other MSRs.
+ 	 * We always support the "true" VMX control MSRs, even if the host
+ 	 * processor does not, so I am putting these registers here rather
+-	 * than in msrs_to_save.
++	 * than in msrs_to_save_all.
+ 	 */
+ 	MSR_IA32_VMX_BASIC,
+ 	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+@@ -1245,13 +1248,14 @@ static u32 emulated_msrs[] = {
+ 	MSR_KVM_POLL_CONTROL,
+ };
+ 
++static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
+ static unsigned num_emulated_msrs;
+ 
+ /*
+  * List of msr numbers which are used to expose MSR-based features that
+  * can be used by a hypervisor to validate requested CPU features.
+  */
+-static u32 msr_based_features[] = {
++static const u32 msr_based_features_all[] = {
+ 	MSR_IA32_VMX_BASIC,
+ 	MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+ 	MSR_IA32_VMX_PINBASED_CTLS,
+@@ -1276,6 +1280,7 @@ static u32 msr_based_features[] = {
+ 	MSR_IA32_ARCH_CAPABILITIES,
+ };
+ 
++static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
+ static unsigned int num_msr_based_features;
+ 
+ static u64 kvm_get_arch_capabilities(void)
+@@ -5131,19 +5136,19 @@ static void kvm_init_msr_list(void)
+ 	unsigned i, j;
+ 
+ 	BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED != 4,
+-			 "Please update the fixed PMCs in msrs_to_save[]");
++			 "Please update the fixed PMCs in msrs_to_saved_all[]");
+ 
+ 	perf_get_x86_pmu_capability(&x86_pmu);
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save); i++) {
+-		if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
++	for (i = j = 0; i < ARRAY_SIZE(msrs_to_save_all); i++) {
++		if (rdmsr_safe(msrs_to_save_all[i], &dummy[0], &dummy[1]) < 0)
+ 			continue;
+ 
+ 		/*
+ 		 * Even MSRs that are valid in the host may not be exposed
+ 		 * to the guests in some cases.
+ 		 */
+-		switch (msrs_to_save[i]) {
++		switch (msrs_to_save_all[i]) {
+ 		case MSR_IA32_BNDCFGS:
+ 			if (!kvm_mpx_supported())
+ 				continue;
+@@ -5171,17 +5176,17 @@ static void kvm_init_msr_list(void)
+ 			break;
+ 		case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B: {
+ 			if (!kvm_x86_ops->pt_supported() ||
+-				msrs_to_save[i] - MSR_IA32_RTIT_ADDR0_A >=
++				msrs_to_save_all[i] - MSR_IA32_RTIT_ADDR0_A >=
+ 				intel_pt_validate_hw_cap(PT_CAP_num_address_ranges) * 2)
+ 				continue;
+ 			break;
+ 		case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
+-			if (msrs_to_save[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
++			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=
+ 			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+ 				continue;
+ 			break;
+ 		case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 17:
+-			if (msrs_to_save[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
++			if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=
+ 			    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+ 				continue;
+ 		}
+@@ -5189,31 +5194,31 @@ static void kvm_init_msr_list(void)
+ 			break;
+ 		}
+ 
+-		if (j < i)
+-			msrs_to_save[j] = msrs_to_save[i];
++		if (j <= i)
++			msrs_to_save[j] = msrs_to_save_all[i];
+ 		j++;
+ 	}
+ 	num_msrs_to_save = j;
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(emulated_msrs); i++) {
+-		if (!kvm_x86_ops->has_emulated_msr(emulated_msrs[i]))
++	for (i = j = 0; i < ARRAY_SIZE(emulated_msrs_all); i++) {
++		if (!kvm_x86_ops->has_emulated_msr(emulated_msrs_all[i]))
+ 			continue;
+ 
+-		if (j < i)
+-			emulated_msrs[j] = emulated_msrs[i];
++		if (j <= i)
++			emulated_msrs[j] = emulated_msrs_all[i];
+ 		j++;
+ 	}
+ 	num_emulated_msrs = j;
+ 
+-	for (i = j = 0; i < ARRAY_SIZE(msr_based_features); i++) {
++	for (i = j = 0; i < ARRAY_SIZE(msr_based_features_all); i++) {
+ 		struct kvm_msr_entry msr;
+ 
+-		msr.index = msr_based_features[i];
++		msr.index = msr_based_features_all[i];
+ 		if (kvm_get_msr_feature(&msr))
+ 			continue;
+ 
+-		if (j < i)
+-			msr_based_features[j] = msr_based_features[i];
++		if (j <= i)
++			msr_based_features[j] = msr_based_features_all[i];
+ 		j++;
+ 	}
+ 	num_msr_based_features = j;
+-- 
+2.17.1
+
