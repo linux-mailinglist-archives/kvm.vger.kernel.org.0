@@ -2,262 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65C2EF0F5F
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 07:58:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A698FF0FDC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 08:07:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731145AbfKFG6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 01:58:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48854 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726772AbfKFG6r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 01:58:47 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA66vUWR121895
-        for <kvm@vger.kernel.org>; Wed, 6 Nov 2019 01:58:46 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w3csxn09w-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 01:58:45 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 6 Nov 2019 06:58:39 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 6 Nov 2019 06:58:37 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA66wa6951839022
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 Nov 2019 06:58:36 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F93242045;
-        Wed,  6 Nov 2019 06:58:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F9DA42047;
-        Wed,  6 Nov 2019 06:58:35 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.24.181])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  6 Nov 2019 06:58:35 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: Remove DAT and add short
- indication psw bits on diag308 reset
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20191105162828.2490-1-frankja@linux.ibm.com>
- <20191105162828.2490-3-frankja@linux.ibm.com>
- <15a9d438-d906-dcc6-0bda-8c6b049c946d@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Wed, 6 Nov 2019 07:58:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1731423AbfKFHHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 02:07:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49689 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1731172AbfKFHHT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 02:07:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573024037;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=hZQT3duyyndR+0G+CA+4t+0Dt0ILcfgLE6OucGmmjrQ=;
+        b=O3Je4FWHx3LyynioWJIxAOuCbXIxAF+FLn1tQZxIldAWHudUr5JlHg3l74UC/Ybl3ZhIcJ
+        ayhyjTRUB6cz9XtOCDAFF/aZS06tBNAYzEGM+DAdDuGKIp6GK409V0zCGrLMOJQs1w9s/A
+        TpWMaUkLnNlm6DGe2TDpdbxNMyVD0ZQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-sS4JHO2DNtCxuysVDg7ijQ-1; Wed, 06 Nov 2019 02:07:13 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40F08477;
+        Wed,  6 Nov 2019 07:07:09 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-193.pek2.redhat.com [10.72.12.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 90FEB1001B39;
+        Wed,  6 Nov 2019 07:05:54 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V9 0/6] mdev based hardware virtio offloading support
+Date:   Wed,  6 Nov 2019 15:05:42 +0800
+Message-Id: <20191106070548.18980-1-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <15a9d438-d906-dcc6-0bda-8c6b049c946d@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qs1tlpGuylshWuc6dJwZ6ZcL6csuQxYAJ"
-X-TM-AS-GCONF: 00
-x-cbid: 19110606-0020-0000-0000-00000382F910
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110606-0021-0000-0000-000021D925E4
-Message-Id: <5147b7e8-0531-30a0-a25b-c36ba0dc9b30@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-06_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911060072
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: sS4JHO2DNtCxuysVDg7ijQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qs1tlpGuylshWuc6dJwZ6ZcL6csuQxYAJ
-Content-Type: multipart/mixed; boundary="u0Qzj72axJ1BERBQZEffiS220yOqOQLst"
+Hi all:
 
---u0Qzj72axJ1BERBQZEffiS220yOqOQLst
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+There are hardwares that can do virtio datapath offloading while
+having its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-On 11/5/19 8:53 PM, David Hildenbrand wrote:
-> On 05.11.19 17:28, Janosch Frank wrote:
->=20
-> In the subject "Disable" vs. "Remove" ?
->=20
->> On a diag308 subcode 0 CRs will be reset, so we need to mask of PSW
->> DAT indication until we restore our CRs.
->>
->> Also we need to set the short psw indication to be compliant with the
->> architecture.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/asm-offsets.c  |  1 +
->>   lib/s390x/asm/arch_def.h |  3 ++-
->>   s390x/cstart64.S         | 20 ++++++++++++++------
->>   3 files changed, 17 insertions(+), 7 deletions(-)
->>
->> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
->> index 4b213f8..61d2658 100644
->> --- a/lib/s390x/asm-offsets.c
->> +++ b/lib/s390x/asm-offsets.c
->> @@ -58,6 +58,7 @@ int main(void)
->>   	OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
->>   	OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
->>   	OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
->> +	OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
->>   	OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
->>   	OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
->>   	OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index 07d4e5e..7d25e4f 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -79,7 +79,8 @@ struct lowcore {
->>   	uint32_t	sw_int_fpc;			/* 0x0300 */
->>   	uint8_t		pad_0x0304[0x0308 - 0x0304];	/* 0x0304 */
->>   	uint64_t	sw_int_crs[16];			/* 0x0308 */
->> -	uint8_t		pad_0x0310[0x11b0 - 0x0388];	/* 0x0388 */
->> +	struct psw	sw_int_psw;			/* 0x0388 */
->> +	uint8_t		pad_0x0310[0x11b0 - 0x0390];	/* 0x0390 */
->>   	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
->>   	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
->>   	uint64_t	fprs_sa[16];			/* 0x1200 */
->> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
->> index 0455591..2e0dcf5 100644
->> --- a/s390x/cstart64.S
->> +++ b/s390x/cstart64.S
->> @@ -129,8 +129,15 @@ memsetxc:
->>   .globl diag308_load_reset
->>   diag308_load_reset:
->>   	SAVE_REGS
->> -	/* Save the first PSW word to the IPL PSW */
->> +	/* Backup current PSW */
->=20
-> /*
->   * Backup the current PSW MASK, as we have to restore it on
->   * success.
->   */
->=20
->>   	epsw	%r0, %r1
->> +	st	%r0, GEN_LC_SW_INT_PSW
->> +	st	%r1, GEN_LC_SW_INT_PSW + 4
->=20
-> I was confused at first, but then I realized that you really only store=
-=20
-> the PSW mask here and not also the PSW address ...
->=20
->=20
->> +	/* Disable DAT as the CRs will be reset too */
->> +	nilh	%r0, 0xfbff
->> +	/* Add psw bit 12 to indicate short psw */
->> +	oilh	%r0, 0x0008
->=20
-> Why care about the old PSW mask here at all? Wouldn't it be easier to=20
-> just construct a new PSW mask from scratch? (64bit, PSW bit 12 set ...)=
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
->=20
-> Save it somewhere and just load it directly from memory.
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
-Sounds like a good idea, will do
+Also a real IFC VF driver was also posted here[2] which is a good
+reference for vendors who is interested in their own virtio datapath
+offloading product.
 
->=20
->> +	/* Save the first PSW word to the IPL PSW */
->>   	st	%r0, 0
->>   	/* Store the address and the bit for 31 bit addressing */
->>   	larl    %r0, 0f
->> @@ -142,12 +149,13 @@ diag308_load_reset:
->>   	xgr	%r2, %r2
->>   	br	%r14
->>   	/* Success path */
->> -	/* We lost cr0 due to the reset */
->> -0:	larl	%r1, initial_cr0
->> -	lctlg	%c0, %c0, 0(%r1)
->> -	RESTORE_REGS
->> +	/* Switch to z/Architecture mode and 64-bit */
->> +0:	RESTORE_REGS
->>   	lhi	%r2, 1
->> -	br	%r14
->> +	larl	%r0, 1f
->> +	stg	%r0, GEN_LC_SW_INT_PSW + 8
->> +	lpswe	GEN_LC_SW_INT_PSW
->> +1:	br	%r14
->>  =20
->>   .globl smp_cpu_setup_state
->>   smp_cpu_setup_state:
->>
->=20
->=20
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific parents ops out of the common ones.
 
+Pktgen test was done with virito-net + mvnet loop back device.
 
+Please review.
 
---u0Qzj72axJ1BERBQZEffiS220yOqOQLst--
+[1] https://lkml.org/lkml/2019/11/5/424
+[2] https://lkml.org/lkml/2019/11/5/227
 
---qs1tlpGuylshWuc6dJwZ6ZcL6csuQxYAJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Changes from V8:
+- try silent checkpatch, some are still there becuase they were inherited
+  from virtio_config_ops which needs to be resolved in an independent serie=
+s
+- tweak on the comment and doc
+- remove VIRTIO_MDEV_F_VERSION_1 completely
+- rename CONFIG_VIRTIO_MDEV_DEVICE to CONFIG_VIRTIO_MDEV
 
------BEGIN PGP SIGNATURE-----
+Changes from V7:
+- drop {set|get}_mdev_features for virtio
+- typo and comment style fixes
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3CbxsACgkQ41TmuOI4
-ufiIOQ/+Pw7kbOK8m2UiEUv4nkxxgWWvrZZi65Go1e0FtziUHs05sVD8vUUYc4iw
-YwqjJOs2chOD1fRVTP7meBwFNCiYMWn7sYKVYW0irp1Uldz3ffNyNfBCozD2JGco
-ix+pUfL5Mv7kRL9z+kFhyzLa1iam9G/6keDQZDtqn3O8yPSefk5OC33+ZEVlFmTh
-DAjNjWasMaiz38JSBI8WwJ/P10co2s0FOUa0E9+bCf2iBPeItBkXLTdVfMX7R+Rc
-d6CdY8EkM7OVd+Qc7TB8PBJNn0oIyjZeXM3gNkd6NkINjxuSlL89YWEc06vNrRHt
-w6CEThkjMSj6p6auk0JfGg0ZLdx5DBKSV6d4kMxD/AegKgWxUKdhOtGYB0m2FOQu
-hjQEMDIsPmtEyndaPEzLaoXXJZtm6inwkBzi5LqRFtQWQUlCWCV86RstZRyte+n2
-vZSKWHLDXpLXNL7ZJTVRhURv0E9IE8UbfFI8JAyhGBN0bUt3dfRUAaFqgsqapMNd
-mKbVwGQHjOtVaDt+ZPKQSwUu+vQDAyIINTW8164FlLxvwdbViJUrCoEgdE3+SerD
-4rGqlNqUMIPPA0udrs0VMgfsyVII3z4zuGfopQp8QIeErHDfe63QGVxFOWHqx6zE
-c+4dfw6iM69g7M81p9QSVEkCSRy4YoxzrVwgxZHOg4krSWbOCnQ=
-=h+Id
------END PGP SIGNATURE-----
+Changes from V6:
+- rename ops files and compile guard
 
---qs1tlpGuylshWuc6dJwZ6ZcL6csuQxYAJ--
+Changes from V5:
+- use dev_warn() instead of WARN(1) when class id is not set
+- validate id_table before trying to do matching between device and
+  driver
+- add wildcard for modpost script
+- use unique name for id_table
+- move get_mdev_features() to be the first member of virtio_device_ops
+  and more comments for it
+- typo fixes for the comments above virtio_mdev_ops
+
+Changes from V4:
+- keep mdev_set_class() for the device that doesn't use device ops
+- use union for device ops pointer in mdev_device
+- introduce class specific helper for getting is device ops
+- use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
+- explain details of get_mdev_features() and get_vendor_id()
+- distinguish the optional virito device ops from mandatory ones and
+  make get_generation() optional
+- rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
+  virtio_mdev_ops.h
+- don't abuse version fileds in virtio_mdev structure, use features
+  instead
+- fix warning during device remove
+- style & docs tweaks and typo fixes
+
+Changes from V3:
+- document that class id (device ops) must be specified in create()
+- add WARN() when trying to set class_id when it has already set
+- add WARN() when class_id is not specified in create() and correctly
+  return an error in this case
+- correct the prototype of mdev_set_class() in the doc
+- add documention of mdev_set_class()
+- remove the unnecessary "class_id_fail" label when class id is not
+  specified in create()
+- convert id_table in vfio_mdev to const
+- move mdev_set_class and its friends after mdev_uuid()
+- suqash the patch of bus uevent into patch of introducing class id
+- tweak the words in the docs per Cornelia suggestion
+- tie class_id and device ops through class specific initialization
+  routine like mdev_set_vfio_ops()
+- typos fixes in the docs of virtio-mdev callbacks
+- document the usage of virtqueues in struct virtio_mdev_device
+- remove the useless vqs array in struct virtio_mdev_device
+- rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
+
+Changes from V2:
+- fail when class_id is not specified
+- drop the vringh patch
+- match the doc to the code
+- tweak the commit log
+- move device_ops from parent to mdev device
+- remove the unused MDEV_ID_VHOST
+
+Changes from V1:
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  38 +-
+ MAINTAINERS                                   |   3 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
+ drivers/vfio/mdev/mdev_core.c                 |  60 ++
+ drivers/vfio/mdev/mdev_driver.c               |  25 +
+ drivers/vfio/mdev/mdev_private.h              |   8 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/virtio/Kconfig                        |  13 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 406 +++++++++++
+ include/linux/mdev.h                          |  57 +-
+ include/linux/mdev_vfio_ops.h                 |  52 ++
+ include/linux/mdev_virtio_ops.h               | 147 ++++
+ include/linux/mod_devicetable.h               |   8 +
+ samples/Kconfig                               |  10 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet.c                     | 686 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  11 +
+ 24 files changed, 1585 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/mdev_vfio_ops.h
+ create mode 100644 include/linux/mdev_virtio_ops.h
+ create mode 100644 samples/vfio-mdev/mvnet.c
+
+--=20
+2.19.1
 
