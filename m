@@ -2,193 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74612F0DB3
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 05:20:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEBDAF0E87
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 06:55:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727879AbfKFEUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 23:20:51 -0500
-Received: from mga07.intel.com ([134.134.136.100]:10800 "EHLO mga07.intel.com"
+        id S1725828AbfKFFzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 00:55:25 -0500
+Received: from mga05.intel.com ([192.55.52.43]:31173 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726368AbfKFEUv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Nov 2019 23:20:51 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725616AbfKFFzZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 00:55:25 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 20:20:50 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 21:55:24 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,272,1569308400"; 
-   d="asc'?scan'208";a="205206893"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
-  by orsmga003.jf.intel.com with ESMTP; 05 Nov 2019 20:20:48 -0800
-Date:   Wed, 6 Nov 2019 12:20:31 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>, kvm@vger.kernel.org,
-        kwankhede@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        Jonathon Jongsma <jjongsma@redhat.com>
-Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
-Message-ID: <20191106042031.GJ1769@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <20191105141042.17dd2d7d@x1.home>
+   d="scan'208";a="205222652"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by orsmga003.jf.intel.com with ESMTP; 05 Nov 2019 21:55:23 -0800
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 5 Nov 2019 21:55:22 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.200]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 13:55:21 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: RE: [RFC v2 11/22] intel_iommu: process pasid cache invalidation
+Thread-Topic: [RFC v2 11/22] intel_iommu: process pasid cache invalidation
+Thread-Index: AQHVims0gnJtva3dYk2Lhkg1plkVR6d3k9OAgATO/oA=
+Date:   Wed, 6 Nov 2019 05:55:20 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EEE4E@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-12-git-send-email-yi.l.liu@intel.com>
+ <20191102160547.GA26023@xz-x1.metropole.lan>
+In-Reply-To: <20191102160547.GA26023@xz-x1.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjU5OGVkOWQtMzk2ZS00MDZmLTgzZTItZmM3ODI4N2RlNGJmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicklxV1BaQnNQSFhyWjFtYlwvd3dtUkV3R3dPam8zeThoRlBnWkRKQW9YZE1LRnhSRDRRXC85dkFmWnk0Uktzd0hYIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="dWJ7k1c3mh7Yseyi"
-Content-Disposition: inline
-In-Reply-To: <20191105141042.17dd2d7d@x1.home>
-User-Agent: Mutt/1.10.0 (2018-05-17)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---dWJ7k1c3mh7Yseyi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 2019.11.05 14:10:42 -0700, Alex Williamson wrote:
-> On Thu, 24 Oct 2019 13:08:23 +0800
-> Zhenyu Wang <zhenyuw@linux.intel.com> wrote:
->=20
-> > Hi,
-> >=20
-> > This is a refresh for previous send of this series. I got impression th=
-at
-> > some SIOV drivers would still deploy their own create and config method=
- so
-> > stopped effort on this. But seems this would still be useful for some o=
-ther
-> > SIOV driver which may simply want capability to aggregate resources. So=
- here's
-> > refreshed series.
-> >=20
-> > Current mdev device create interface depends on fixed mdev type, which =
-get uuid
-> > from user to create instance of mdev device. If user wants to use custo=
-mized
-> > number of resource for mdev device, then only can create new mdev type =
-for that
-> > which may not be flexible. This requirement comes not only from to be a=
-ble to
-> > allocate flexible resources for KVMGT, but also from Intel scalable IO
-> > virtualization which would use vfio/mdev to be able to allocate arbitra=
-ry
-> > resources on mdev instance. More info on [1] [2] [3].
-> >=20
-> > To allow to create user defined resources for mdev, it trys to extend m=
-dev
-> > create interface by adding new "aggregate=3Dxxx" parameter following UU=
-ID, for
-> > target mdev type if aggregation is supported, it can create new mdev de=
-vice
-> > which contains resources combined by number of instances, e.g
-> >=20
-> >     echo "<uuid>,aggregate=3D10" > create
-> >=20
-> > VM manager e.g libvirt can check mdev type with "aggregation" attribute=
- which
-> > can support this setting. If no "aggregation" attribute found for mdev =
-type,
-> > previous behavior is still kept for one instance allocation. And new sy=
-sfs
-> > attribute "aggregated_instances" is created for each mdev device to sho=
-w allocated number.
->=20
-> Given discussions we've had recently around libvirt interacting with
-> mdev, I think that libvirt would rather have an abstract interface via
-> mdevctl[1].  Therefore can you evaluate how mdevctl would support this
-> creation extension?  It seems like it would fit within the existing
-> mdev and mdevctl framework if aggregation were simply a sysfs attribute
-> for the device.  For example, the mdevctl steps might look like this:
->=20
-> mdevctl define -u UUID -p PARENT -t TYPE
-> mdevctl modify -u UUID --addattr=3Dmdev/aggregation --value=3D2
-> mdevctl start -u UUID
->=20
-> When mdevctl starts the mdev, it will first create it using the
-> existing mechanism, then apply aggregation attribute, which can consume
-> the necessary additional instances from the parent device, or return an
-> error, which would unwind and return a failure code to the caller
-> (libvirt).  I think the vendor driver would then have freedom to decide
-> when the attribute could be modified, for instance it would be entirely
-> reasonable to return -EBUSY if the user attempts to modify the
-> attribute while the mdev device is in-use.  Effectively aggregation
-> simply becomes a standardized attribute with common meaning.  Thoughts?
-> [cc libvirt folks for their impression] Thanks,
-
-I think one problem is that before mdevctl start to create mdev you
-don't know what vendor attributes are, as we apply mdev attributes
-after create. You may need some lookup depending on parent.. I think
-making aggregation like other vendor attribute for mdev might be the
-simplest way, but do we want to define its behavior in formal? e.g
-like previous discussed it should show maxium instances for aggregation, et=
-c.
-
-The behavior change for driver is that previously aggregation is
-handled at create time, but for sysfs attr it should handle any
-resource allocation before it's really in-use. I think some SIOV
-driver which already requires some specific config should be ok,
-but not sure for other driver which might not be explored in this before.
-Would that be a problem? Kevin?
-
-Thanks
-
->=20
-> Alex
->=20
-> [1] https://github.com/mdevctl/mdevctl
->=20
-> > References:
-> > [1] https://software.intel.com/en-us/download/intel-virtualization-tech=
-nology-for-directed-io-architecture-specification
-> > [2] https://software.intel.com/en-us/download/intel-scalable-io-virtual=
-ization-technical-specification
-> > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
-> >=20
-> > Zhenyu Wang (6):
-> >   vfio/mdev: Add new "aggregate" parameter for mdev create
-> >   vfio/mdev: Add "aggregation" attribute for supported mdev type
-> >   vfio/mdev: Add "aggregated_instances" attribute for supported mdev
-> >     device
-> >   Documentation/driver-api/vfio-mediated-device.rst: Update for
-> >     vfio/mdev aggregation support
-> >   Documentation/ABI/testing/sysfs-bus-vfio-mdev: Update for vfio/mdev
-> >     aggregation support
-> >   drm/i915/gvt: Add new type with aggregation support
-> >=20
-> >  Documentation/ABI/testing/sysfs-bus-vfio-mdev | 24 ++++++
-> >  .../driver-api/vfio-mediated-device.rst       | 23 ++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.c                |  4 +-
-> >  drivers/gpu/drm/i915/gvt/gvt.h                | 11 ++-
-> >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 53 ++++++++++++-
-> >  drivers/gpu/drm/i915/gvt/vgpu.c               | 56 ++++++++++++-
-> >  drivers/vfio/mdev/mdev_core.c                 | 36 ++++++++-
-> >  drivers/vfio/mdev/mdev_private.h              |  6 +-
-> >  drivers/vfio/mdev/mdev_sysfs.c                | 79 ++++++++++++++++++-
-> >  include/linux/mdev.h                          | 19 +++++
-> >  10 files changed, 294 insertions(+), 17 deletions(-)
-> >=20
->=20
-
---=20
-Open Source Technology Center, Intel ltd.
-
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---dWJ7k1c3mh7Yseyi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXcJKDwAKCRCxBBozTXgY
-J1CdAKCO1WyGM9C6s6VOHIxnQiieIzDJ3QCfQtozNpS6OvS1MGtV9LElKcUeSyo=
-=mcEH
------END PGP SIGNATURE-----
-
---dWJ7k1c3mh7Yseyi--
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBTdW5k
+YXksIE5vdmVtYmVyIDMsIDIwMTkgMTI6MDYgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAxMS8yMl0gaW50ZWxfaW9tbXU6IHBy
+b2Nlc3MgcGFzaWQgY2FjaGUgaW52YWxpZGF0aW9uDQo+IA0KPiBPbiBUaHUsIE9jdCAyNCwgMjAx
+OSBhdCAwODozNDozMkFNIC0wNDAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBUaGlzIHBhdGNoIGFk
+ZHMgUEFTSUQgY2FjaGUgaW52YWxpZGF0aW9uIGhhbmRsaW5nLiBXaGVuIGd1ZXN0IGVuYWJsZWQN
+Cj4gPiBQQVNJRCB1c2FnZXMgKGUuZy4gU1ZBKSwgZ3Vlc3Qgc29mdHdhcmUgc2hvdWxkIGlzc3Vl
+IGEgcHJvcGVyIFBBU0lEDQo+ID4gY2FjaGUgaW52YWxpZGF0aW9uIHdoZW4gY2FjaGluZy1tb2Rl
+IGlzIGV4cG9zZWQuIFRoaXMgcGF0Y2ggb25seSBhZGRzDQo+ID4gdGhlIGRyYWZ0IGhhbmRsaW5n
+IG9mIHBhc2lkIGNhY2hlIGludmFsaWRhdGlvbi4gRGV0YWlsZWQgaGFuZGxpbmcgd2lsbA0KPiA+
+IGJlIGFkZGVkIGluIHN1YnNlcXVlbnQgcGF0Y2hlcy4NCj4gPg0KPiA+IENjOiBLZXZpbiBUaWFu
+IDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gPiBDYzogSmFjb2IgUGFuIDxqYWNvYi5qdW4ucGFu
+QGxpbnV4LmludGVsLmNvbT4NCj4gPiBDYzogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0K
+PiA+IENjOiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBMaXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2
+L2ludGVsX2lvbW11LmMgICAgICAgICAgfCA2NiArKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKy0tDQo+IC0tDQo+ID4gIGh3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaCB8
+IDEyICsrKysrKysrDQo+ID4gIGh3L2kzODYvdHJhY2UtZXZlbnRzICAgICAgICAgICB8ICAzICsr
+DQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgNzYgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkN
+Cj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2lu
+dGVsX2lvbW11LmMNCj4gPiBpbmRleCA4OGI4NDNmLi44NGZmNmYwIDEwMDY0NA0KPiA+IC0tLSBh
+L2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0K
+PiA+IEBAIC0yMzM1LDYgKzIzMzUsNjMgQEAgc3RhdGljIGJvb2wgdnRkX3Byb2Nlc3NfaW90bGJf
+ZGVzYyhJbnRlbElPTU1VU3RhdGUNCj4gKnMsIFZUREludkRlc2MgKmludl9kZXNjKQ0KPiA+ICAg
+ICAgcmV0dXJuIHRydWU7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgaW50IHZ0ZF9wYXNpZF9j
+YWNoZV9kc2koSW50ZWxJT01NVVN0YXRlICpzLCB1aW50MTZfdCBkb21haW5faWQpDQo+ID4gK3sN
+Cj4gPiArICAgIHJldHVybiAwOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgaW50IHZ0ZF9w
+YXNpZF9jYWNoZV9wc2koSW50ZWxJT01NVVN0YXRlICpzLA0KPiA+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgdWludDE2X3QgZG9tYWluX2lkLCB1aW50MzJfdCBwYXNpZCkNCj4gPiAr
+ew0KPiA+ICsgICAgcmV0dXJuIDA7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgdnRk
+X3Bhc2lkX2NhY2hlX2dzaShJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gK3sNCj4gPiArICAgIHJl
+dHVybiAwOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgYm9vbCB2dGRfcHJvY2Vzc19wYXNp
+ZF9kZXNjKEludGVsSU9NTVVTdGF0ZSAqcywNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBWVERJbnZEZXNjICppbnZfZGVzYykNCj4gPiArew0KPiA+ICsgICAgdWludDE2
+X3QgZG9tYWluX2lkOw0KPiA+ICsgICAgdWludDMyX3QgcGFzaWQ7DQo+ID4gKyAgICBpbnQgcmV0
+ID0gMDsNCj4gPiArDQo+ID4gKyAgICBpZiAoKGludl9kZXNjLT52YWxbMF0gJiBWVERfSU5WX0RF
+U0NfUEFTSURDX1JTVkRfVkFMMCkgfHwNCj4gPiArICAgICAgICAoaW52X2Rlc2MtPnZhbFsxXSAm
+IFZURF9JTlZfREVTQ19QQVNJRENfUlNWRF9WQUwxKSB8fA0KPiA+ICsgICAgICAgIChpbnZfZGVz
+Yy0+dmFsWzJdICYgVlREX0lOVl9ERVNDX1BBU0lEQ19SU1ZEX1ZBTDIpIHx8DQo+ID4gKyAgICAg
+ICAgKGludl9kZXNjLT52YWxbM10gJiBWVERfSU5WX0RFU0NfUEFTSURDX1JTVkRfVkFMMykpIHsN
+Cj4gPiArICAgICAgICBlcnJvcl9yZXBvcnRfb25jZSgibm9uLXplcm8tZmllbGQtaW4tcGNfaW52
+X2Rlc2MgaGk6IDB4JSIgUFJJeDY0DQo+ID4gKyAgICAgICAgICAgICAgICAgICIgbG86IDB4JSIg
+UFJJeDY0LCBpbnZfZGVzYy0+dmFsWzFdLCBpbnZfZGVzYy0+dmFsWzBdKTsNCj4gPiArICAgICAg
+ICByZXR1cm4gZmFsc2U7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgZG9tYWluX2lkID0g
+VlREX0lOVl9ERVNDX1BBU0lEQ19ESUQoaW52X2Rlc2MtPnZhbFswXSk7DQo+ID4gKyAgICBwYXNp
+ZCA9IFZURF9JTlZfREVTQ19QQVNJRENfUEFTSUQoaW52X2Rlc2MtPnZhbFswXSk7DQo+ID4gKw0K
+PiA+ICsgICAgc3dpdGNoIChpbnZfZGVzYy0+dmFsWzBdICYgVlREX0lOVl9ERVNDX1BBU0lEQ19H
+KSB7DQo+ID4gKyAgICBjYXNlIFZURF9JTlZfREVTQ19QQVNJRENfRFNJOg0KPiA+ICsgICAgICAg
+IHJldCA9IHZ0ZF9wYXNpZF9jYWNoZV9kc2kocywgZG9tYWluX2lkKTsNCj4gPiArICAgICAgICBi
+cmVhazsNCj4gPiArDQo+ID4gKyAgICBjYXNlIFZURF9JTlZfREVTQ19QQVNJRENfUEFTSURfU0k6
+DQo+ID4gKyAgICAgICAgcmV0ID0gdnRkX3Bhc2lkX2NhY2hlX3BzaShzLCBkb21haW5faWQsIHBh
+c2lkKTsNCj4gPiArICAgICAgICBicmVhazsNCj4gPiArDQo+ID4gKyAgICBjYXNlIFZURF9JTlZf
+REVTQ19QQVNJRENfR0xPQkFMOg0KPiA+ICsgICAgICAgIHJldCA9IHZ0ZF9wYXNpZF9jYWNoZV9n
+c2kocyk7DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gKw0KPiA+ICsgICAgZGVmYXVsdDoNCj4g
+PiArICAgICAgICBlcnJvcl9yZXBvcnRfb25jZSgiaW52YWxpZC1pbnYtZ3JhbnUtaW4tcGNfaW52
+X2Rlc2MgaGk6IDB4JSIgUFJJeDY0DQo+ID4gKyAgICAgICAgICAgICAgICAgICIgbG86IDB4JSIg
+UFJJeDY0LCBpbnZfZGVzYy0+dmFsWzFdLCBpbnZfZGVzYy0+dmFsWzBdKTsNCj4gPiArICAgICAg
+ICByZXR1cm4gZmFsc2U7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIChyZXQg
+PT0gMCkgPyB0cnVlIDogZmFsc2U7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBib29sIHZ0
+ZF9wcm9jZXNzX2ludl9pZWNfZGVzYyhJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBWVERJbnZEZXNjICppbnZfZGVzYykNCj4gPiAg
+ew0KPiA+IEBAIC0yNDQxLDEyICsyNDk4LDExIEBAIHN0YXRpYyBib29sIHZ0ZF9wcm9jZXNzX2lu
+dl9kZXNjKEludGVsSU9NTVVTdGF0ZQ0KPiAqcykNCj4gPiAgICAgICAgICB9DQo+ID4gICAgICAg
+ICAgYnJlYWs7DQo+ID4NCj4gPiAtICAgIC8qDQo+ID4gLSAgICAgKiBUT0RPOiB0aGUgZW50aXR5
+IG9mIGJlbG93IHR3byBjYXNlcyB3aWxsIGJlIGltcGxlbWVudGVkIGluIGZ1dHVyZSBzZXJpZXMu
+DQo+ID4gLSAgICAgKiBUbyBtYWtlIGd1ZXN0ICh3aGljaCBpbnRlZ3JhdGVzIHNjYWxhYmxlIG1v
+ZGUgc3VwcG9ydCBwYXRjaCBzZXQgaW4NCj4gPiAtICAgICAqIGlvbW11IGRyaXZlcikgd29yaywg
+anVzdCByZXR1cm4gdHJ1ZSBpcyBlbm91Z2ggc28gZmFyLg0KPiA+IC0gICAgICovDQo+ID4gICAg
+ICBjYXNlIFZURF9JTlZfREVTQ19QQzoNCj4gPiArICAgICAgICB0cmFjZV92dGRfaW52X2Rlc2Mo
+InBhc2lkLWNhY2hlIiwgaW52X2Rlc2MudmFsWzFdLCBpbnZfZGVzYy52YWxbMF0pOw0KPiANCj4g
+Q291bGQgYmUgaGVscGZ1bCBpZiB5b3UgZHVtcCBbMnwzXSB0b2dldGhlciBoZXJlLi4uDQoNCnN1
+cmUuIExldCBtZSBhZGQgaXQgaW4gbmV4dCB2ZXJzaW9uLg0KDQo+ID4gKyAgICAgICAgaWYgKCF2
+dGRfcHJvY2Vzc19wYXNpZF9kZXNjKHMsICZpbnZfZGVzYykpIHsNCj4gPiArICAgICAgICAgICAg
+cmV0dXJuIGZhbHNlOw0KPiA+ICsgICAgICAgIH0NCj4gPiAgICAgICAgICBicmVhazsNCj4gPg0K
+PiA+ICAgICAgY2FzZSBWVERfSU5WX0RFU0NfUElPVExCOg0KPiA+IGRpZmYgLS1naXQgYS9ody9p
+Mzg2L2ludGVsX2lvbW11X2ludGVybmFsLmggYi9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFs
+LmgNCj4gPiBpbmRleCA4NjY4NzcxLi5jNmNiMjhiIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYv
+aW50ZWxfaW9tbXVfaW50ZXJuYWwuaA0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXVfaW50
+ZXJuYWwuaA0KPiA+IEBAIC00NDUsNiArNDQ1LDE4IEBAIHR5cGVkZWYgdW5pb24gVlRESW52RGVz
+YyBWVERJbnZEZXNjOw0KPiA+ICAjZGVmaW5lIFZURF9TUFRFX0xQQUdFX0w0X1JTVkRfTUFTSyhh
+dykgXA0KPiA+ICAgICAgICAgICgweDg4MFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9T
+TF9JR05fQ09NKSkNCj4gPg0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfRyAgICAg
+ICAgICAoM1VMTCA8PCA0KQ0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfUEFTSUQo
+dmFsKSAoKCh2YWwpID4+IDMyKSAmIDB4ZmZmZmZVTEwpDQo+ID4gKyNkZWZpbmUgVlREX0lOVl9E
+RVNDX1BBU0lEQ19ESUQodmFsKSAgICgoKHZhbCkgPj4gMTYpICYNCj4gVlREX0RPTUFJTl9JRF9N
+QVNLKQ0KPiA+ICsjZGVmaW5lIFZURF9JTlZfREVTQ19QQVNJRENfUlNWRF9WQUwwICAweGZmZjAw
+MDAwMDAwMGZmYzBVTEwNCj4gDQo+IE5pdDogTWluZCB0byBjb21tZW50IGhlcmUgdGhhdCBiaXQg
+OS0xMSBpcyBtYXJrZWQgYXMgemVybyByYXRoZXIgdGhhbg0KPiByZXNlcnZlZD8gIFRoaXMgc2Vl
+bXMgdG8gd29yayBidXQgaWYgYml0IDktMTEgY2FuIGJlIG5vbi16ZXJvIGluIHNvbWUNCj4gb3Ro
+ZXIgZGVzY3JpcHRvcnMgdGhlbiBpdCB3b3VsZCBiZSBjbGVhcmVyIHRvIGRlZmluZSBpdCBhcw0K
+PiAweGZmZjAwMDAwMDAwMGYxYzBVTEwgdGhlbiBleHBsaWNpdGx5IGNoZWNrIGJpdHMgOS0xMS4N
+Cj4gDQo+IE90aGVyd2lzZSBsb29rcyBnb29kIHRvIG1lLg0KDQpZb3UgYXJlIHJpZ2h0LiBUaGlz
+IGlzIG5vdCByZXNlcnZlZC4gSXQncyBwYXJ0cyBvZiB0aGUgZGVzY3JpcHRvciB0eXBlIG5vdy4g
+V2lsbA0KZml4IGl0IGluIG5leHQgdmVyc2lvbi4NCg0KUmVnYXJkcywNCllpIExpdQ0K
