@@ -2,130 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 707C6F1CFF
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 18:58:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC82F1D1C
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 19:04:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732249AbfKFR5s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 12:57:48 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:45030 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727872AbfKFR5s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 12:57:48 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6HsKcq003208;
-        Wed, 6 Nov 2019 17:56:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=MdbVWmDz8xkvlQ078mvBd8bDaGm/LTI2iHt8U7Q0AT0=;
- b=IkEA0Vxf9r2AB6/pbXp0iZ+ah6dQ9X4x/J11RYbAPKt/64+mZur6Dfye99u+b6VZLUTs
- jtluOOQRHlvgqgiCy/epmfAu/iNjvw4Uj7K4jNovK8QtnIFlKJRDjnvjEY7KI1XdYIam
- XRN659HAZJkBZD5vfSZDm17HRRymQo8tkL36Sf2O1jAy3BvP87mlEotAvdrZNGRJvviS
- sLLPZIZwOBwFAqZZPEQIQtetlM7vUKGwgPpxL3Q6aGGVtUlY+Eo0rFlxU+w/faxYlNDe
- ziWODqW2IoKfLJB9THUyrYSG0GMpHzPxKTMQAL6EF1o1pJtIKma8C6Aih0UdfaD4iFj3 fA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2w41w0rkrp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 17:56:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6Hre4C022398;
-        Wed, 6 Nov 2019 17:56:34 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2w41wcvfav-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 17:56:33 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA6HuXYZ032009;
-        Wed, 6 Nov 2019 17:56:33 GMT
-Received: from paddy.uk.oracle.com (/10.175.178.239)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Nov 2019 09:56:32 -0800
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1728370AbfKFSEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 13:04:35 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:43032 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726713AbfKFSEf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 13:04:35 -0500
+Received: by mail-oi1-f193.google.com with SMTP id l20so9757935oie.10
+        for <kvm@vger.kernel.org>; Wed, 06 Nov 2019 10:04:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/0n4m9isT+Ck0ZHgj9nNKHVTcK5i7dBz9IQntg3gksQ=;
+        b=h75vWf1kfqT7WCo9oPzlH2IwFP6eMdStUMP0AfAWnCe9OTYcu6TEsPQN+yx0WoqEfq
+         E9HYz+A8UEG4Su4we8xTN//jPaDiLogimAXPPq7m0mNmordt3w8sFggaWtnyUYem3jnV
+         6YlDe2ZG+OUVXEku1BqAlx0/+2QNx95Nabu6PSJOBfwuZ+nVV7z5t51ZXYtFHS66k90N
+         GVDBPQilrV8oMQ7DNQWzztigOCU2RVft+4pAWjC/QdLhQ/XhuHntvIeT7H1UOhmG8tMz
+         llLeRyvDxLSm3aV446uh3sdLt05Xn/RhAJAmzbveqLU3H+9a7DKOraTRf5EWciCNfYOw
+         VwtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/0n4m9isT+Ck0ZHgj9nNKHVTcK5i7dBz9IQntg3gksQ=;
+        b=Ml2RxzNW5AZrLuSp5Ij5VfAAP8PhOm1dokvEyZu2segdyTG/WWFUgEINzIQT4hRVlZ
+         i83mXBgOjYT+lPzovi9SlUeD/cc8TmQQqNXKLbw9bu5tUH5gNwIqcfbgBZotfoCZfk2Y
+         msmVZdSD5iqtTGNVQ0FpKF66n/xzMq2lN9DOhh0CKRza/mqnT11y16uMtOVV4RGKska4
+         nWkFEaQUyeLY/k7mk323WgypvZlCXHioAI66+4HEpntoRmXd11kusRNlN0sJbtNKrKW8
+         DRgFVGwPtoZTPJyxhoPVVmzfytGL8tVNxWAXFiojjpeJtZ9JnBXkogOsTXLPG8xGyRyp
+         tXLw==
+X-Gm-Message-State: APjAAAVaHZjGyhn3qKvaVaaJDLZ2Pr6i33BnBouJ1VjihZrZzT1sDnBF
+        LXaGZEkEaMhPqLvUwa9AEmeMCULzRJUPoekL5ytGiw==
+X-Google-Smtp-Source: APXvYqz322KPWE0McOPQ2HU7vzGL4faH1DPYPThcfro4U804rY+815CpZXkhVTFxQRmu8DE2tmavfFznwplkC4fdonI=
+X-Received: by 2002:aca:ead7:: with SMTP id i206mr3543339oih.0.1573063474058;
+ Wed, 06 Nov 2019 10:04:34 -0800 (PST)
+MIME-Version: 1.0
+References: <20191106170727.14457-1-sean.j.christopherson@intel.com> <20191106170727.14457-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20191106170727.14457-2-sean.j.christopherson@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 6 Nov 2019 10:04:22 -0800
+Message-ID: <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being reserved
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Jag Raman <jag.raman@oracle.com>
-Subject: [PATCH v1 3/3] KVM: VMX: Introduce pi_is_pir_empty() helper
-Date:   Wed,  6 Nov 2019 17:56:02 +0000
-Message-Id: <20191106175602.4515-4-joao.m.martins@oracle.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20191106175602.4515-1-joao.m.martins@oracle.com>
-References: <20191106175602.4515-1-joao.m.martins@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=634
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911060173
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=712 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911060174
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Streamline the PID.PIR check and change its call sites to use
-the newly added helper.
+On Wed, Nov 6, 2019 at 9:07 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> Explicitly exempt ZONE_DEVICE pages from kvm_is_reserved_pfn() and
+> instead manually handle ZONE_DEVICE on a case-by-case basis.  For things
+> like page refcounts, KVM needs to treat ZONE_DEVICE pages like normal
+> pages, e.g. put pages grabbed via gup().  But KVM needs special handling
+> in other flows where ZONE_DEVICE pages lack the underlying machinery,
+> e.g. when setting accessed/dirty bits and shifting refcounts for
+> transparent huge pages.
+>
+> This fixes a hang reported by Adam Borowski[*] in dev_pagemap_cleanup()
+> when running a KVM guest backed with /dev/dax memory, as KVM straight up
+> doesn't put any references to ZONE_DEVICE pages acquired by gup().
+>
+> [*] http://lkml.kernel.org/r/20190919115547.GA17963@angband.pl
+>
+> Reported-by: Adam Borowski <kilobyte@angband.pl>
+> Debugged-by: David Hildenbrand <david@redhat.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  arch/x86/kvm/mmu.c       |  8 ++++----
+>  include/linux/kvm_host.h |  1 +
+>  virt/kvm/kvm_main.c      | 19 +++++++++++++++----
+>  3 files changed, 20 insertions(+), 8 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 24c23c66b226..bf82b1f2e834 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -3306,7 +3306,7 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
+>          * here.
+>          */
+>         if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
+> -           level == PT_PAGE_TABLE_LEVEL &&
+> +           !kvm_is_zone_device_pfn(pfn) && level == PT_PAGE_TABLE_LEVEL &&
+>             PageTransCompoundMap(pfn_to_page(pfn)) &&
+>             !mmu_gfn_lpage_is_disallowed(vcpu, gfn, PT_DIRECTORY_LEVEL)) {
+>                 unsigned long mask;
+> @@ -5914,9 +5914,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>                  * the guest, and the guest page table is using 4K page size
+>                  * mapping if the indirect sp has level = 1.
+>                  */
+> -               if (sp->role.direct &&
+> -                       !kvm_is_reserved_pfn(pfn) &&
+> -                       PageTransCompoundMap(pfn_to_page(pfn))) {
+> +               if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
+> +                   !kvm_is_zone_device_pfn(pfn) &&
+> +                   PageTransCompoundMap(pfn_to_page(pfn))) {
+>                         pte_list_remove(rmap_head, sptep);
+>
+>                         if (kvm_available_flush_tlb_with_range())
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index a817e446c9aa..4ad1cd7d2d4d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -966,6 +966,7 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+>
+>  bool kvm_is_reserved_pfn(kvm_pfn_t pfn);
+> +bool kvm_is_zone_device_pfn(kvm_pfn_t pfn);
+>
+>  struct kvm_irq_ack_notifier {
+>         struct hlist_node link;
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index b8534c6b8cf6..0a781b1fb8f0 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -151,12 +151,23 @@ __weak int kvm_arch_mmu_notifier_invalidate_range(struct kvm *kvm,
+>
+>  bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
+>  {
+> +       /*
+> +        * ZONE_DEVICE pages currently set PG_reserved, but from a refcounting
+> +        * perspective they are "normal" pages, albeit with slightly different
+> +        * usage rules.
+> +        */
+>         if (pfn_valid(pfn))
+> -               return PageReserved(pfn_to_page(pfn));
+> +               return PageReserved(pfn_to_page(pfn)) &&
+> +                      !is_zone_device_page(pfn_to_page(pfn));
 
-Suggested-by: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
----
- arch/x86/kvm/vmx/vmx.c | 5 ++---
- arch/x86/kvm/vmx/vmx.h | 5 +++++
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 75d903455e1c..8e8dbb174d14 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1311,7 +1311,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 */
- 	smp_mb__after_atomic();
- 
--	if (!bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS))
-+	if (!pi_is_pir_empty(pi_desc))
- 		pi_set_on(pi_desc);
- }
- 
-@@ -6157,8 +6157,7 @@ static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	return pi_test_on(pi_desc) ||
--		!bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
-+	return pi_test_on(pi_desc) || !pi_is_pir_empty(pi_desc);
- }
- 
- static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 1e32ab54fc2d..5a0f34b1e226 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -355,6 +355,11 @@ static inline int pi_test_and_set_pir(int vector, struct pi_desc *pi_desc)
- 	return test_and_set_bit(vector, (unsigned long *)pi_desc->pir);
- }
- 
-+static inline bool pi_is_pir_empty(struct pi_desc *pi_desc)
-+{
-+	return bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
-+}
-+
- static inline void pi_set_sn(struct pi_desc *pi_desc)
- {
- 	set_bit(POSTED_INTR_SN,
--- 
-2.11.0
-
+This is racy unless you can be certain that the pfn and resulting page
+has already been pinned by get_user_pages(). This is why I told David
+to steer clear of adding more is_zone_device_page() usage, it's
+difficult to audit. Without an existing pin the metadata to determine
+whether a page is ZONE_DEVICE or not could be in the process of being
+torn down. Ideally KVM would pass around a struct { struct page *page,
+unsigned long pfn } tuple so it would not have to do this "recall
+context" dance on every pfn operation.
