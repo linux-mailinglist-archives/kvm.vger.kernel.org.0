@@ -2,88 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8EDF111A
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 09:32:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C600FF11C1
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 10:09:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731477AbfKFIcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 03:32:51 -0500
-Received: from merlin.infradead.org ([205.233.59.134]:47640 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730271AbfKFIcu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 03:32:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=GGL1v+c1ltlTqawzPHu/3IiNRPhlH8S8qHZKrdhagc8=; b=Fmf5NiRHFmpiEsnYT7W3L8dUB
-        fjHSATuLCvcX3stZRtGuJ76Q1zhXzKbASr1NDuJlt467yL8PbFD6g9idJs9v3rt5+SuKCMIb8zHhN
-        dNqa1k5wKfWZgXAaGDF4wIK7xRuzSb8kIVrQ3ai4oXxaJVMYYvBHsz01Kek6tGoUhE1RJFoLDq8jn
-        VG0yNPUV33BDNvP879ae8Zmw4XIwiQ+5s+C1Qucd6jVbuE17FXTJYSSIpzhIeTeS+yEiu98kTJsu3
-        9rJWADESIAsRwirz4FWOkElJZMOT41aq3zDr6qGq9dxc9+onGHhkI3JG02Bli1ZesnNis/QljDPzH
-        YLNhACftw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iSGk1-0004S3-B7; Wed, 06 Nov 2019 08:32:37 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B456C303DDD;
-        Wed,  6 Nov 2019 09:31:31 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id BAD032020D8FD; Wed,  6 Nov 2019 09:32:35 +0100 (CET)
-Date:   Wed, 6 Nov 2019 09:32:35 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
- trustworthy
-Message-ID: <20191106083235.GP4131@hirez.programming.kicks-ass.net>
-References: <20191105161737.21395-1-vkuznets@redhat.com>
- <20191105200218.GF3079@worktop.programming.kicks-ass.net>
- <20191105232528.GF23297@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191105232528.GF23297@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1728256AbfKFJJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 04:09:35 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:45618 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727041AbfKFJJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 04:09:34 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6990N6090942;
+        Wed, 6 Nov 2019 09:09:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2019-08-05;
+ bh=vtOUSXhJOWeZNpYZPR4dz6ez1tfCq89k9rogWBbRY90=;
+ b=j2sxpBb/lPk6e1dqkColY5vG17mDQmIPt4iVQK1+2HUYK5wbbvi6oMc1BF3ahclFly3l
+ E+eLHsmK/xeAnBrlQJGA5/1O8OrSPd3DT75xwFL914AdOK8ALKt5x8mqFR4frnMd7+z7
+ qFKGRf82F909hXBBkpKrLrogskVGebi7mXWMPsXXfS5yQ4wSP/7j26UD2WXAOU+pArip
+ b8RorxKwywk0k4PCn5tWZv953Mo/quv2oXWRr9ie3oI+WDuUzPOAlhfw47dAIrWO618A
+ uBBFOBZtsPPDus3sqdggL9usJRw8C59LIym6ehNTTC8P+Xf2wW18qrXpK+7179CQe/Oh Cw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2w12erca4k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 09:09:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA698rXT015312;
+        Wed, 6 Nov 2019 09:09:22 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2w31631dsm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 09:09:22 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA699LR2006042;
+        Wed, 6 Nov 2019 09:09:21 GMT
+Received: from z2.cn.oracle.com (/10.182.71.218)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 06 Nov 2019 01:09:21 -0800
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        rafael.j.wysocki@intel.com, joao.m.martins@oracle.com,
+        mtosatti@redhat.com, Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Subject: [PATCH v2 0/4] misc fixes on halt-poll code both KVM and guest
+Date:   Wed,  6 Nov 2019 17:08:48 +0800
+Message-Id: <1573031332-2121-1-git-send-email-zhenzhong.duan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1911060096
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1911060096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 05, 2019 at 03:25:28PM -0800, Sean Christopherson wrote:
-> On Tue, Nov 05, 2019 at 09:02:18PM +0100, Peter Zijlstra wrote:
-> > On Tue, Nov 05, 2019 at 05:17:37PM +0100, Vitaly Kuznetsov wrote:
-> > > Virtualized guests may pick a different strategy to mitigate hardware
-> > > vulnerabilities when it comes to hyper-threading: disable SMT completely,
-> > > use core scheduling, or, for example, opt in for STIBP. Making the
-> > > decision, however, requires an extra bit of information which is currently
-> > > missing: does the topology the guest see match hardware or if it is 'fake'
-> > > and two vCPUs which look like different cores from guest's perspective can
-> > > actually be scheduled on the same physical core. Disabling SMT or doing
-> > > core scheduling only makes sense when the topology is trustworthy.
-> > > 
-> > > Add two feature bits to KVM: KVM_FEATURE_TRUSTWORTHY_SMT with the meaning
-> > > that KVM_HINTS_TRUSTWORTHY_SMT bit answers the question if the exposed SMT
-> > > topology is actually trustworthy. It would, of course, be possible to get
-> > > away with a single bit (e.g. 'KVM_FEATURE_FAKE_SMT') and not lose backwards
-> > > compatibility but the current approach looks more straightforward.
-> > 
-> > The only way virt topology can make any sense what so ever is if the
-> > vcpus are pinned to physical CPUs.
-> >
-> > And I was under the impression we already had a bit for that (isn't it
-> > used to disable paravirt spinlocks and the like?). But I cannot seem to
-> > find it in a hurry.
-> 
-> Yep, KVM_HINTS_REALTIME does what you describe.
+This patchset tries to fix below issues:
 
-*sigh*, that's a pretty shit name for it :/
+1. Admin could set halt_poll_ns to 0 at runtime to disable poll and kernel
+behave just like the generic halt driver. Then If guest_halt_poll_grow_start
+is set to 0 and guest_halt_poll_ns set to nonzero later, cpu_halt_poll_us will
+never grow beyond 0. The first two patches fix this issue from both kvm and
+guest side.
+
+2. guest_halt_poll_grow_start and guest_halt_poll_ns could be adjusted at
+runtime by admin, this could make a window where cpu_halt_poll_us jump out
+of the boundary. the window could be long in some cases(e.g. guest_halt_poll_grow_start
+is bumped and cpu_halt_poll_us is shrinking) The last two patches fix this
+issue from both kvm and guest side.
+
+3. The 4th patch also simplifies branch check code.
+
+v2:
+Rewrite the patches and drop unnecessory changes
+
+Zhenzhong Duan (4):
+  cpuidle-haltpoll: ensure grow start value is nonzero
+  KVM: ensure grow start value is nonzero
+  cpuidle-haltpoll: ensure cpu_halt_poll_us in right scope
+  KVM: ensure vCPU halt_poll_us in right scope
+
+ drivers/cpuidle/governors/haltpoll.c | 50 ++++++++++++++++++++++++-----------
+ virt/kvm/kvm_main.c                  | 51 ++++++++++++++++++++++++------------
+ 2 files changed, 68 insertions(+), 33 deletions(-)
+
+-- 
+1.8.3.1
+
