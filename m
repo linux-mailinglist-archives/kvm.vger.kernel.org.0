@@ -2,895 +2,631 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BEA7F10A6
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 08:55:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4894F10AC
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 08:56:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730126AbfKFHzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 02:55:35 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57717 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729931AbfKFHzf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Nov 2019 02:55:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573026933;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U0Pd3tcAV+CUgdcuXdCUtGK/IbD1JrdhdY71Ri1NRu8=;
-        b=LnUDQKLLnmTu2cpnkASeKMLbagK4hJ//g0mEAa7Zm0wrqRW9fG4pcK5nKzK7SqdMLVWSFJ
-        jpb1Ezhze6y4L7Y7zQHjbw9LgnmeMDsh4ibdIqLPKrjciN1Cdrye/4+lwIyS8P7oEQh/2b
-        0tGZ1duwiHYlfKMfnjkiYshGh6GyBQo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-GCWkykU8Mi2YAeMcJADttw-1; Wed, 06 Nov 2019 02:55:31 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8F8B1800D53;
-        Wed,  6 Nov 2019 07:55:29 +0000 (UTC)
-Received: from [10.72.12.193] (ovpn-12-193.pek2.redhat.com [10.72.12.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC3FF5D9CD;
-        Wed,  6 Nov 2019 07:54:48 +0000 (UTC)
-Subject: Re: [PATCH v5] vhost: introduce mdev based hardware backend
-To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
-        alex.williamson@redhat.com, maxime.coquelin@redhat.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, lingshan.zhu@intel.com
-References: <20191105115332.11026-1-tiwei.bie@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <16f31c27-3a0e-09d7-3925-dc9777f5e229@redhat.com>
-Date:   Wed, 6 Nov 2019 15:54:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191105115332.11026-1-tiwei.bie@intel.com>
+        id S1731335AbfKFH41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 02:56:27 -0500
+Received: from mga17.intel.com ([192.55.52.151]:17639 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729881AbfKFH41 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 02:56:27 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 23:56:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; 
+   d="scan'208";a="214163223"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga002.jf.intel.com with ESMTP; 05 Nov 2019 23:56:25 -0800
+Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 5 Nov 2019 23:56:25 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 5 Nov 2019 23:56:24 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.215]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 15:56:22 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: RE: [RFC v2 13/22] intel_iommu: add PASID cache management
+ infrastructure
+Thread-Topic: [RFC v2 13/22] intel_iommu: add PASID cache management
+ infrastructure
+Thread-Index: AQHVims0e/zt5Spafk+xfIVf42xCf6d6+9OAgALEypA=
+Date:   Wed, 6 Nov 2019 07:56:21 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EEF2C@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-14-git-send-email-yi.l.liu@intel.com>
+ <20191104200647.GA8825@xz-x1>
+In-Reply-To: <20191104200647.GA8825@xz-x1>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: GCWkykU8Mi2YAeMcJADttw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDlmYzIzYTMtOGQ0My00MTdhLTgwMmQtYzg4YWFlNjVjZTdiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidUs4T1dCYmw0ejcxaFwvdHhTYmd2dEN6Z3JFSGhqb3NINTlmaWtwcGFRRkhnUVRFRE1vWlpQUE5acUZIeEVNengifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2019/11/5 =E4=B8=8B=E5=8D=887:53, Tiwei Bie wrote:
-> This patch introduces a mdev based hardware vhost backend.
-> This backend is built on top of the same abstraction used
-> in virtio-mdev and provides a generic vhost interface for
-> userspace to accelerate the virtio devices in guest.
->
-> This backend is implemented as a mdev device driver on top
-> of the same mdev device ops used in virtio-mdev but using
-> a different mdev class id, and it will register the device
-> as a VFIO device for userspace to use. Userspace can setup
-> the IOMMU with the existing VFIO container/group APIs and
-> then get the device fd with the device name. After getting
-> the device fd, userspace can use vhost ioctls on top of it
-> to setup the backend.
->
-> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-
-
-Looks good to me. Only minor nits which could be addressed on top.
-
-Reviewed-by: Jason Wang <jasowang@redhat.com>
-
-
-> ---
-> This patch depends on below series:
-> https://lkml.org/lkml/2019/11/5/217
->
-> v4 -> v5:
-> - Rebase on top of virtio-mdev series v8;
-> - Use the virtio_ops of mdev_device in vhost-mdev (Jason);
-> - Some minor improvements on commit log;
->
-> v3 -> v4:
-> - Rebase on top of virtio-mdev series v6;
-> - Some minor tweaks and improvements;
->
-> v2 -> v3:
-> - Fix the return value (Jason);
-> - Don't cache unnecessary information in vhost-mdev (Jason);
-> - Get rid of the memset in open (Jason);
-> - Add comments for VHOST_SET_MEM_TABLE, ... (Jason);
-> - Filter out unsupported features in vhost-mdev (Jason);
-> - Add _GET_DEVICE_ID ioctl (Jason);
-> - Add _GET_CONFIG/_SET_CONFIG ioctls (Jason);
-> - Drop _GET_QUEUE_NUM ioctl (Jason);
-> - Fix the copy-paste errors in _IOW/_IOR usage;
-> - Some minor fixes and improvements;
->
-> v1 -> v2:
-> - Replace _SET_STATE with _SET_STATUS (MST);
-> - Check status bits at each step (MST);
-> - Report the max ring size and max number of queues (MST);
-> - Add missing MODULE_DEVICE_TABLE (Jason);
-> - Only support the network backend w/o multiqueue for now;
-> - Some minor fixes and improvements;
-> - Rebase on top of virtio-mdev series v4;
->
-> RFC v4 -> v1:
-> - Implement vhost-mdev as a mdev device driver directly and
->    connect it to VFIO container/group. (Jason);
-> - Pass ring addresses as GPAs/IOVAs in vhost-mdev to avoid
->    meaningless HVA->GPA translations (Jason);
->
-> RFC v3 -> RFC v4:
-> - Build vhost-mdev on top of the same abstraction used by
->    virtio-mdev (Jason);
-> - Introduce vhost fd and pass VFIO fd via SET_BACKEND ioctl (MST);
->
-> RFC v2 -> RFC v3:
-> - Reuse vhost's ioctls instead of inventing a VFIO regions/irqs
->    based vhost protocol on top of vfio-mdev (Jason);
->
-> RFC v1 -> RFC v2:
-> - Introduce a new VFIO device type to build a vhost protocol
->    on top of vfio-mdev;
->
->   drivers/vfio/mdev/mdev_core.c    |  21 ++
->   drivers/vhost/Kconfig            |  12 +
->   drivers/vhost/Makefile           |   3 +
->   drivers/vhost/mdev.c             | 553 +++++++++++++++++++++++++++++++
->   include/linux/mdev.h             |   5 +
->   include/uapi/linux/vhost.h       |  18 +
->   include/uapi/linux/vhost_types.h |   8 +
->   7 files changed, 620 insertions(+)
->   create mode 100644 drivers/vhost/mdev.c
->
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.=
-c
-> index c58253404ed5..d855be5afbae 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -99,6 +99,27 @@ mdev_get_virtio_ops(struct mdev_device *mdev)
->   }
->   EXPORT_SYMBOL(mdev_get_virtio_ops);
->  =20
-> +/*
-> + * Specify the vhost device ops for the mdev device, this
-> + * must be called during create() callback for vhost mdev device.
-> + */
-> +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> +=09=09=09const struct mdev_virtio_device_ops *vhost_ops)
-> +{
-> +=09mdev_set_class(mdev, MDEV_CLASS_ID_VHOST);
-> +=09mdev->virtio_ops =3D vhost_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_set_vhost_ops);
-> +
-> +/* Get the vhost device ops for the mdev device. */
-> +const struct mdev_virtio_device_ops *
-> +mdev_get_vhost_ops(struct mdev_device *mdev)
-> +{
-> +=09WARN_ON(mdev->class_id !=3D MDEV_CLASS_ID_VHOST);
-> +=09return mdev->virtio_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_get_vhost_ops);
-> +
->   struct device *mdev_dev(struct mdev_device *mdev)
->   {
->   =09return &mdev->dev;
-> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> index 3d03ccbd1adc..062cada28f89 100644
-> --- a/drivers/vhost/Kconfig
-> +++ b/drivers/vhost/Kconfig
-> @@ -34,6 +34,18 @@ config VHOST_VSOCK
->   =09To compile this driver as a module, choose M here: the module will b=
-e called
->   =09vhost_vsock.
->  =20
-> +config VHOST_MDEV
-> +=09tristate "Vhost driver for Mediated devices"
-> +=09depends on EVENTFD && VFIO && VFIO_MDEV
-> +=09select VHOST
-> +=09default n
-> +=09---help---
-> +=09This kernel module can be loaded in host kernel to accelerate
-> +=09guest virtio devices with the mediated device based backends.
-> +
-> +=09To compile this driver as a module, choose M here: the module will
-> +=09be called vhost_mdev.
-> +
->   config VHOST
->   =09tristate
->   =09---help---
-> diff --git a/drivers/vhost/Makefile b/drivers/vhost/Makefile
-> index 6c6df24f770c..ad9c0f8c6d8c 100644
-> --- a/drivers/vhost/Makefile
-> +++ b/drivers/vhost/Makefile
-> @@ -10,4 +10,7 @@ vhost_vsock-y :=3D vsock.o
->  =20
->   obj-$(CONFIG_VHOST_RING) +=3D vringh.o
->  =20
-> +obj-$(CONFIG_VHOST_MDEV) +=3D vhost_mdev.o
-> +vhost_mdev-y :=3D mdev.o
-> +
->   obj-$(CONFIG_VHOST)=09+=3D vhost.o
-> diff --git a/drivers/vhost/mdev.c b/drivers/vhost/mdev.c
-> new file mode 100644
-> index 000000000000..0bcde0f3a9cd
-> --- /dev/null
-> +++ b/drivers/vhost/mdev.c
-> @@ -0,0 +1,553 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Vhost driver for mediated device based backends.
-> + *
-> + * Copyright (C) 2018-2019 Intel Corporation.
-> + *
-> + * Author: Tiwei Bie <tiwei.bie@intel.com>
-> + *
-> + * Thanks to Jason Wang and Michael S. Tsirkin for the valuable
-> + * comments and suggestions.  And thanks to Cunming Liang and
-> + * Zhihong Wang for all their supports.
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/mdev.h>
-> +#include <linux/mdev_virtio_ops.h>
-> +#include <linux/nospec.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vhost.h>
-> +#include <linux/virtio_net.h>
-> +
-> +#include "vhost.h"
-> +
-> +enum {
-> +=09VHOST_MDEV_FEATURES =3D
-> +=09=09(1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
-> +=09=09(1ULL << VIRTIO_F_ANY_LAYOUT) |
-> +=09=09(1ULL << VIRTIO_F_VERSION_1) |
-> +=09=09(1ULL << VIRTIO_F_IOMMU_PLATFORM) |
-> +=09=09(1ULL << VIRTIO_F_RING_PACKED) |
-> +=09=09(1ULL << VIRTIO_F_ORDER_PLATFORM) |
-> +=09=09(1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-> +=09=09(1ULL << VIRTIO_RING_F_EVENT_IDX),
-> +
-> +=09VHOST_MDEV_NET_FEATURES =3D VHOST_MDEV_FEATURES |
-> +=09=09(1ULL << VIRTIO_NET_F_CSUM) |
-> +=09=09(1ULL << VIRTIO_NET_F_GUEST_CSUM) |
-> +=09=09(1ULL << VIRTIO_NET_F_MTU) |
-> +=09=09(1ULL << VIRTIO_NET_F_MAC) |
-> +=09=09(1ULL << VIRTIO_NET_F_GUEST_TSO4) |
-> +=09=09(1ULL << VIRTIO_NET_F_GUEST_TSO6) |
-> +=09=09(1ULL << VIRTIO_NET_F_GUEST_ECN) |
-> +=09=09(1ULL << VIRTIO_NET_F_GUEST_UFO) |
-> +=09=09(1ULL << VIRTIO_NET_F_HOST_TSO4) |
-> +=09=09(1ULL << VIRTIO_NET_F_HOST_TSO6) |
-> +=09=09(1ULL << VIRTIO_NET_F_HOST_ECN) |
-> +=09=09(1ULL << VIRTIO_NET_F_HOST_UFO) |
-> +=09=09(1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> +=09=09(1ULL << VIRTIO_NET_F_STATUS) |
-> +=09=09(1ULL << VIRTIO_NET_F_SPEED_DUPLEX),
-> +};
-> +
-> +/* Currently, only network backend w/o multiqueue is supported. */
-> +#define VHOST_MDEV_VQ_MAX=092
-> +
-> +struct vhost_mdev {
-> +=09/* The lock is to protect this structure. */
-> +=09struct mutex mutex;
-> +=09struct vhost_dev dev;
-> +=09struct vhost_virtqueue *vqs;
-> +=09int nvqs;
-> +=09int virtio_id;
-> +=09bool opened;
-> +=09struct mdev_device *mdev;
-> +};
-> +
-> +static const u64 vhost_mdev_features[] =3D {
-> +=09[VIRTIO_ID_NET] =3D VHOST_MDEV_NET_FEATURES,
-> +};
-> +
-> +static void handle_vq_kick(struct vhost_work *work)
-> +{
-> +=09struct vhost_virtqueue *vq =3D container_of(work, struct vhost_virtqu=
-eue,
-> +=09=09=09=09=09=09  poll.work);
-> +=09struct vhost_mdev *m =3D container_of(vq->dev, struct vhost_mdev, dev=
-);
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(m->md=
-ev);
-> +
-> +=09ops->kick_vq(m->mdev, vq - m->vqs);
-> +}
-> +
-> +static irqreturn_t vhost_mdev_virtqueue_cb(void *private)
-> +{
-> +=09struct vhost_virtqueue *vq =3D private;
-> +=09struct eventfd_ctx *call_ctx =3D vq->call_ctx;
-> +
-> +=09if (call_ctx)
-> +=09=09eventfd_signal(call_ctx, 1);
-> +
-> +=09return IRQ_HANDLED;
-> +}
-> +
-> +static void vhost_mdev_reset(struct vhost_mdev *m)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +
-> +=09ops->set_status(mdev, 0);
-> +}
-> +
-> +static long vhost_mdev_get_device_id(struct vhost_mdev *m, u8 __user *ar=
-gp)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u32 device_id;
-> +
-> +=09device_id =3D ops->get_device_id(mdev);
-> +
-> +=09if (copy_to_user(argp, &device_id, sizeof(device_id)))
-> +=09=09return -EFAULT;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_status(struct vhost_mdev *m, u8 __user *statu=
-sp)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u8 status;
-> +
-> +=09status =3D ops->get_status(mdev);
-> +
-> +=09if (copy_to_user(statusp, &status, sizeof(status)))
-> +=09=09return -EFAULT;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_set_status(struct vhost_mdev *m, u8 __user *statu=
-sp)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u8 status;
-> +
-> +=09if (copy_from_user(&status, statusp, sizeof(status)))
-> +=09=09return -EFAULT;
-> +
-> +=09/*
-> +=09 * Userspace shouldn't remove status bits unless reset the
-> +=09 * status to 0.
-> +=09 */
-> +=09if (status !=3D 0 && (ops->get_status(mdev) & ~status) !=3D 0)
-> +=09=09return -EINVAL;
-> +
-> +=09ops->set_status(mdev, status);
-> +
-> +=09return 0;
-> +}
-> +
-> +static int vhost_mdev_config_validate(struct vhost_mdev *m,
-> +=09=09=09=09      struct vhost_mdev_config *c)
-> +{
-> +=09long size =3D 0;
-> +
-> +=09switch (m->virtio_id) {
-> +=09case VIRTIO_ID_NET:
-> +=09=09size =3D sizeof(struct virtio_net_config);
-> +=09=09break;
-> +=09}
-> +
-> +=09if (c->len =3D=3D 0)
-> +=09=09return -EINVAL;
-> +
-> +=09if (c->off >=3D size || c->len > size || c->off + c->len > size)
-> +=09=09return -E2BIG;
-
-
-Nit: It should be the same as check with c->off + c->len > size only.
-
-
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_config(struct vhost_mdev *m,
-> +=09=09=09=09  struct vhost_mdev_config __user *c)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09struct vhost_mdev_config config;
-> +=09unsigned long size =3D offsetof(struct vhost_mdev_config, buf);
-> +=09u8 *buf;
-> +
-> +=09if (copy_from_user(&config, c, size))
-> +=09=09return -EFAULT;
-> +=09if (vhost_mdev_config_validate(m, &config))
-> +=09=09return -EINVAL;
-> +=09buf =3D kvzalloc(config.len, GFP_KERNEL);
-> +=09if (!buf)
-> +=09=09return -ENOMEM;
-> +
-> +=09ops->get_config(mdev, config.off, buf, config.len);
-> +
-> +=09if (copy_to_user(c->buf, buf, config.len)) {
-> +=09=09kvfree(buf);
-> +=09=09return -EFAULT;
-> +=09}
-> +
-> +=09kvfree(buf);
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_set_config(struct vhost_mdev *m,
-> +=09=09=09=09  struct vhost_mdev_config __user *c)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09struct vhost_mdev_config config;
-> +=09unsigned long size =3D offsetof(struct vhost_mdev_config, buf);
-> +=09u8 *buf;
-> +
-> +=09if (copy_from_user(&config, c, size))
-> +=09=09return -EFAULT;
-> +=09if (vhost_mdev_config_validate(m, &config))
-> +=09=09return -EINVAL;
-> +=09buf =3D kvzalloc(config.len, GFP_KERNEL);
-> +=09if (!buf)
-> +=09=09return -ENOMEM;
-> +
-> +=09if (copy_from_user(buf, c->buf, config.len)) {
-> +=09=09kvfree(buf);
-> +=09=09return -EFAULT;
-> +=09}
-> +
-> +=09ops->set_config(mdev, config.off, buf, config.len);
-> +
-> +=09kvfree(buf);
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_features(struct vhost_mdev *m, u64 __user *fe=
-aturep)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u64 features;
-> +
-> +=09features =3D ops->get_features(mdev);
-> +=09features &=3D vhost_mdev_features[m->virtio_id];
-> +
-> +=09if (copy_to_user(featurep, &features, sizeof(features)))
-> +=09=09return -EFAULT;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_set_features(struct vhost_mdev *m, u64 __user *fe=
-aturep)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u64 features;
-> +
-> +=09/*
-> +=09 * It's not allowed to change the features after they have
-> +=09 * been negotiated.
-> +=09 */
-> +=09if (ops->get_status(mdev) & VIRTIO_CONFIG_S_FEATURES_OK)
-> +=09=09return -EBUSY;
-> +
-> +=09if (copy_from_user(&features, featurep, sizeof(features)))
-> +=09=09return -EFAULT;
-> +
-> +=09if (features & ~vhost_mdev_features[m->virtio_id])
-> +=09=09return -EINVAL;
-> +
-> +=09if (ops->set_features(mdev, features))
-> +=09=09return -EINVAL;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_get_vring_num(struct vhost_mdev *m, u16 __user *a=
-rgp)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09u16 num;
-> +
-> +=09num =3D ops->get_vq_num_max(mdev);
-> +
-> +=09if (copy_to_user(argp, &num, sizeof(num)))
-> +=09=09return -EFAULT;
-> +
-> +=09return 0;
-> +}
-> +
-> +static long vhost_mdev_vring_ioctl(struct vhost_mdev *m, unsigned int cm=
-d,
-> +=09=09=09=09   void __user *argp)
-> +{
-> +=09struct mdev_device *mdev =3D m->mdev;
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09struct virtio_mdev_callback cb;
-> +=09struct vhost_virtqueue *vq;
-> +=09struct vhost_vring_state s;
-> +=09u8 status;
-> +=09u32 idx;
-> +=09long r;
-> +
-> +=09r =3D get_user(idx, (u32 __user *)argp);
-> +=09if (r < 0)
-> +=09=09return r;
-> +=09if (idx >=3D m->nvqs)
-> +=09=09return -ENOBUFS;
-> +
-> +=09idx =3D array_index_nospec(idx, m->nvqs);
-> +=09vq =3D &m->vqs[idx];
-> +
-> +=09status =3D ops->get_status(mdev);
-> +
-> +=09/*
-> +=09 * It's not allowed to detect and program vqs before
-> +=09 * features negotiation or after enabling driver.
-> +=09 */
-> +=09if (!(status & VIRTIO_CONFIG_S_FEATURES_OK) ||
-> +=09    (status & VIRTIO_CONFIG_S_DRIVER_OK))
-> +=09=09return -EBUSY;
-> +
-> +=09if (cmd =3D=3D VHOST_MDEV_SET_VRING_ENABLE) {
-> +=09=09if (copy_from_user(&s, argp, sizeof(s)))
-> +=09=09=09return -EFAULT;
-> +=09=09ops->set_vq_ready(mdev, idx, s.num);
-> +=09=09return 0;
-> +=09}
-> +
-> +=09/*
-> +=09 * It's not allowed to detect and program vqs with
-> +=09 * vqs enabled.
-> +=09 */
-> +=09if (ops->get_vq_ready(mdev, idx))
-> +=09=09return -EBUSY;
-> +
-> +=09if (cmd =3D=3D VHOST_GET_VRING_BASE)
-> +=09=09vq->last_avail_idx =3D ops->get_vq_state(m->mdev, idx);
-> +
-> +=09r =3D vhost_vring_ioctl(&m->dev, cmd, argp);
-> +=09if (r)
-> +=09=09return r;
-> +
-> +=09switch (cmd) {
-> +=09case VHOST_SET_VRING_ADDR:
-> +=09=09/*
-> +=09=09 * In vhost-mdev, the ring addresses set by userspace should
-> +=09=09 * be the DMA addresses within the VFIO container/group.
-> +=09=09 */
-> +=09=09if (ops->set_vq_address(mdev, idx, (u64)vq->desc,
-> +=09=09=09=09=09(u64)vq->avail, (u64)vq->used))
-> +=09=09=09r =3D -EINVAL;
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_BASE:
-> +=09=09if (ops->set_vq_state(mdev, idx, vq->last_avail_idx))
-> +=09=09=09r =3D -EINVAL;
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_CALL:
-> +=09=09if (vq->call_ctx) {
-> +=09=09=09cb.callback =3D vhost_mdev_virtqueue_cb;
-> +=09=09=09cb.private =3D vq;
-> +=09=09} else {
-> +=09=09=09cb.callback =3D NULL;
-> +=09=09=09cb.private =3D NULL;
-> +=09=09}
-> +=09=09ops->set_vq_cb(mdev, idx, &cb);
-> +=09=09break;
-> +
-> +=09case VHOST_SET_VRING_NUM:
-> +=09=09ops->set_vq_num(mdev, idx, vq->num);
-> +=09=09break;
-> +=09}
-> +
-> +=09return r;
-> +}
-> +
-> +static int vhost_mdev_open(void *device_data)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +=09struct vhost_dev *dev;
-> +=09struct vhost_virtqueue **vqs;
-> +=09int nvqs, i, r;
-> +
-> +=09if (!try_module_get(THIS_MODULE))
-> +=09=09return -ENODEV;
-> +
-> +=09mutex_lock(&m->mutex);
-> +
-> +=09if (m->opened) {
-> +=09=09r =3D -EBUSY;
-> +=09=09goto err;
-> +=09}
-> +
-> +=09nvqs =3D m->nvqs;
-> +=09vhost_mdev_reset(m);
-> +
-> +=09vqs =3D kmalloc_array(nvqs, sizeof(*vqs), GFP_KERNEL);
-> +=09if (!vqs) {
-> +=09=09r =3D -ENOMEM;
-> +=09=09goto err;
-> +=09}
-> +
-> +=09dev =3D &m->dev;
-> +=09for (i =3D 0; i < nvqs; i++) {
-> +=09=09vqs[i] =3D &m->vqs[i];
-> +=09=09vqs[i]->handle_kick =3D handle_vq_kick;
-> +=09}
-> +=09vhost_dev_init(dev, vqs, nvqs, 0, 0, 0);
-> +=09m->opened =3D true;
-> +=09mutex_unlock(&m->mutex);
-> +
-> +=09return 0;
-> +
-> +err:
-> +=09mutex_unlock(&m->mutex);
-> +=09module_put(THIS_MODULE);
-> +=09return r;
-> +}
-> +
-> +static void vhost_mdev_release(void *device_data)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +
-> +=09mutex_lock(&m->mutex);
-> +=09vhost_mdev_reset(m);
-> +=09vhost_dev_stop(&m->dev);
-> +=09vhost_dev_cleanup(&m->dev);
-> +
-> +=09kfree(m->dev.vqs);
-> +=09m->opened =3D false;
-> +=09mutex_unlock(&m->mutex);
-> +=09module_put(THIS_MODULE);
-> +}
-> +
-> +static long vhost_mdev_unlocked_ioctl(void *device_data,
-> +=09=09=09=09      unsigned int cmd, unsigned long arg)
-> +{
-> +=09struct vhost_mdev *m =3D device_data;
-> +=09void __user *argp =3D (void __user *)arg;
-> +=09long r;
-> +
-> +=09mutex_lock(&m->mutex);
-> +
-> +=09switch (cmd) {
-> +=09case VHOST_MDEV_GET_DEVICE_ID:
-> +=09=09r =3D vhost_mdev_get_device_id(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_GET_STATUS:
-> +=09=09r =3D vhost_mdev_get_status(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_SET_STATUS:
-> +=09=09r =3D vhost_mdev_set_status(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_GET_CONFIG:
-> +=09=09r =3D vhost_mdev_get_config(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_SET_CONFIG:
-> +=09=09r =3D vhost_mdev_set_config(m, argp);
-> +=09=09break;
-> +=09case VHOST_GET_FEATURES:
-> +=09=09r =3D vhost_mdev_get_features(m, argp);
-> +=09=09break;
-> +=09case VHOST_SET_FEATURES:
-> +=09=09r =3D vhost_mdev_set_features(m, argp);
-> +=09=09break;
-> +=09case VHOST_MDEV_GET_VRING_NUM:
-> +=09=09r =3D vhost_mdev_get_vring_num(m, argp);
-> +=09=09break;
-> +=09default:
-> +=09=09/*
-> +=09=09 * VHOST_SET_MEM_TABLE, VHOST_SET_LOG_BASE, and
-> +=09=09 * VHOST_SET_LOG_FD are not used yet.
-> +=09=09 */
-
-
-If we don't even use them, there's probably no need to call=20
-vhost_dev_ioctl(). This may help to avoid confusion when we want to=20
-develop new API for e.g dirty page tracking.
-
-
-> +=09=09r =3D vhost_dev_ioctl(&m->dev, cmd, argp);
-> +=09=09if (r =3D=3D -ENOIOCTLCMD)
-> +=09=09=09r =3D vhost_mdev_vring_ioctl(m, cmd, argp);
-> +=09}
-> +
-> +=09mutex_unlock(&m->mutex);
-> +=09return r;
-> +}
-> +
-> +static const struct vfio_device_ops vfio_vhost_mdev_dev_ops =3D {
-> +=09.name=09=09=3D "vfio-vhost-mdev",
-> +=09.open=09=09=3D vhost_mdev_open,
-> +=09.release=09=3D vhost_mdev_release,
-> +=09.ioctl=09=09=3D vhost_mdev_unlocked_ioctl,
-> +};
-> +
-> +static int vhost_mdev_probe(struct device *dev)
-> +{
-> +=09struct mdev_device *mdev =3D mdev_from_dev(dev);
-> +=09const struct mdev_virtio_device_ops *ops =3D mdev_get_vhost_ops(mdev)=
-;
-> +=09struct vhost_mdev *m;
-> +=09int nvqs, r;
-> +
-> +=09/* Currently, we only accept the network devices. */
-> +=09if (ops->get_device_id(mdev) !=3D VIRTIO_ID_NET)
-> +=09=09return -ENOTSUPP;
-> +
-> +=09m =3D devm_kzalloc(dev, sizeof(*m), GFP_KERNEL | __GFP_RETRY_MAYFAIL)=
-;
-> +=09if (!m)
-> +=09=09return -ENOMEM;
-> +
-> +=09nvqs =3D VHOST_MDEV_VQ_MAX;
-
-
-On top. I think we probably need a better way other than hard-coded=20
-value here.
-
-E.g we can read config and detect the max virtqueue supported based on=20
-device id.
-
-Thanks
-
-
-> +
-> +=09m->vqs =3D devm_kmalloc_array(dev, nvqs, sizeof(struct vhost_virtqueu=
-e),
-> +=09=09=09=09    GFP_KERNEL);
-> +=09if (!m->vqs)
-> +=09=09return -ENOMEM;
-> +
-> +=09mutex_init(&m->mutex);
-> +
-> +=09m->mdev =3D mdev;
-> +=09m->nvqs =3D nvqs;
-> +=09m->virtio_id =3D ops->get_device_id(mdev);
-> +
-> +=09r =3D vfio_add_group_dev(dev, &vfio_vhost_mdev_dev_ops, m);
-> +=09if (r) {
-> +=09=09mutex_destroy(&m->mutex);
-> +=09=09return r;
-> +=09}
-> +
-> +=09return 0;
-> +}
-> +
-> +static void vhost_mdev_remove(struct device *dev)
-> +{
-> +=09struct vhost_mdev *m;
-> +
-> +=09m =3D vfio_del_group_dev(dev);
-> +=09mutex_destroy(&m->mutex);
-> +}
-> +
-> +static const struct mdev_class_id vhost_mdev_match[] =3D {
-> +=09{ MDEV_CLASS_ID_VHOST },
-> +=09{ 0 },
-> +};
-> +MODULE_DEVICE_TABLE(mdev, vhost_mdev_match);
-> +
-> +static struct mdev_driver vhost_mdev_driver =3D {
-> +=09.name=09=3D "vhost_mdev",
-> +=09.probe=09=3D vhost_mdev_probe,
-> +=09.remove=09=3D vhost_mdev_remove,
-> +=09.id_table =3D vhost_mdev_match,
-> +};
-> +
-> +static int __init vhost_mdev_init(void)
-> +{
-> +=09return mdev_register_driver(&vhost_mdev_driver, THIS_MODULE);
-> +}
-> +module_init(vhost_mdev_init);
-> +
-> +static void __exit vhost_mdev_exit(void)
-> +{
-> +=09mdev_unregister_driver(&vhost_mdev_driver);
-> +}
-> +module_exit(vhost_mdev_exit);
-> +
-> +MODULE_VERSION("0.0.1");
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_AUTHOR("Intel Corporation");
-> +MODULE_DESCRIPTION("Mediated device based accelerator for virtio");
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index f3d75a60c2b5..8af7fb9e0149 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -117,6 +117,10 @@ void mdev_set_virtio_ops(struct mdev_device *mdev,
->   =09=09=09 const struct mdev_virtio_device_ops *virtio_ops);
->   const struct mdev_virtio_device_ops *
->   mdev_get_virtio_ops(struct mdev_device *mdev);
-> +void mdev_set_vhost_ops(struct mdev_device *mdev,
-> +=09=09=09const struct mdev_virtio_device_ops *vhost_ops);
-> +const struct mdev_virtio_device_ops *
-> +mdev_get_vhost_ops(struct mdev_device *mdev);
->  =20
->   extern struct bus_type mdev_bus_type;
->  =20
-> @@ -133,6 +137,7 @@ struct mdev_device *mdev_from_dev(struct device *dev)=
-;
->   enum {
->   =09MDEV_CLASS_ID_VFIO =3D 1,
->   =09MDEV_CLASS_ID_VIRTIO =3D 2,
-> +=09MDEV_CLASS_ID_VHOST =3D 3,
->   =09/* New entries must be added here */
->   };
->  =20
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index 40d028eed645..061a2824a1b3 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -116,4 +116,22 @@
->   #define VHOST_VSOCK_SET_GUEST_CID=09_IOW(VHOST_VIRTIO, 0x60, __u64)
->   #define VHOST_VSOCK_SET_RUNNING=09=09_IOW(VHOST_VIRTIO, 0x61, int)
->  =20
-> +/* VHOST_MDEV specific defines */
-> +
-> +/* Get the device id. The device ids follow the same definition of
-> + * the device id defined in virtio-spec. */
-> +#define VHOST_MDEV_GET_DEVICE_ID=09_IOR(VHOST_VIRTIO, 0x70, __u32)
-> +/* Get and set the status. The status bits follow the same definition
-> + * of the device status defined in virtio-spec. */
-> +#define VHOST_MDEV_GET_STATUS=09=09_IOR(VHOST_VIRTIO, 0x71, __u8)
-> +#define VHOST_MDEV_SET_STATUS=09=09_IOW(VHOST_VIRTIO, 0x72, __u8)
-> +/* Get and set the device config. The device config follows the same
-> + * definition of the device config defined in virtio-spec. */
-> +#define VHOST_MDEV_GET_CONFIG=09=09_IOR(VHOST_VIRTIO, 0x73, struct vhost=
-_mdev_config)
-> +#define VHOST_MDEV_SET_CONFIG=09=09_IOW(VHOST_VIRTIO, 0x74, struct vhost=
-_mdev_config)
-> +/* Enable/disable the ring. */
-> +#define VHOST_MDEV_SET_VRING_ENABLE=09_IOW(VHOST_VIRTIO, 0x75, struct vh=
-ost_vring_state)
-> +/* Get the max ring size. */
-> +#define VHOST_MDEV_GET_VRING_NUM=09_IOR(VHOST_VIRTIO, 0x76, __u16)
-> +
->   #endif
-> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
-types.h
-> index c907290ff065..7b105d0b2fb9 100644
-> --- a/include/uapi/linux/vhost_types.h
-> +++ b/include/uapi/linux/vhost_types.h
-> @@ -119,6 +119,14 @@ struct vhost_scsi_target {
->   =09unsigned short reserved;
->   };
->  =20
-> +/* VHOST_MDEV specific definitions */
-> +
-> +struct vhost_mdev_config {
-> +=09__u32 off;
-> +=09__u32 len;
-> +=09__u8 buf[0];
-> +};
-> +
->   /* Feature bits */
->   /* Log all write descriptors. Can be changed while device is active. */
->   #define VHOST_F_LOG_ALL 26
-
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
+ZGF5LCBOb3ZlbWJlciA1LCAyMDE5IDQ6MDcgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAxMy8yMl0gaW50ZWxfaW9tbXU6IGFk
+ZCBQQVNJRCBjYWNoZSBtYW5hZ2VtZW50DQo+IGluZnJhc3RydWN0dXJlDQo+IA0KPiBPbiBUaHUs
+IE9jdCAyNCwgMjAxOSBhdCAwODozNDozNEFNIC0wNDAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBU
+aGlzIHBhdGNoIGFkZHMgYSBQQVNJRCBjYWNoZSBtYW5hZ2VtZW50IGluZnJhc3RydWN0dXJlIGJh
+c2VkIG9uDQo+ID4gbmV3IGFkZGVkIHN0cnVjdHVyZSBWVERQQVNJREFkZHJlc3NTcGFjZSwgd2hp
+Y2ggaXMgdXNlZCB0byB0cmFjaw0KPiA+IHRoZSBQQVNJRCB1c2FnZSBhbmQgZnV0dXJlIFBBU0lE
+IHRhZ2dlZCBETUEgYWRkcmVzcyB0cmFuc2xhdGlvbg0KPiA+IHN1cHBvcnQgaW4gdklPTU1VLg0K
+PiA+DQo+ID4gICAgIHN0cnVjdCBWVERQQVNJREFkZHJlc3NTcGFjZSB7DQo+ID4gICAgICAgICBW
+VERCdXMgKnZ0ZF9idXM7DQo+ID4gICAgICAgICB1aW50OF90IGRldmZuOw0KPiA+ICAgICAgICAg
+QWRkcmVzc1NwYWNlIGFzOw0KPiA+ICAgICAgICAgdWludDMyX3QgcGFzaWQ7DQo+ID4gICAgICAg
+ICBJbnRlbElPTU1VU3RhdGUgKmlvbW11X3N0YXRlOw0KPiA+ICAgICAgICAgVlREQ29udGV4dENh
+Y2hlRW50cnkgY29udGV4dF9jYWNoZV9lbnRyeTsNCj4gPiAgICAgICAgIFFMSVNUX0VOVFJZKFZU
+RFBBU0lEQWRkcmVzc1NwYWNlKSBuZXh0Ow0KPiA+ICAgICAgICAgVlREUEFTSURDYWNoZUVudHJ5
+IHBhc2lkX2NhY2hlX2VudHJ5Ow0KPiA+ICAgICB9Ow0KPiA+DQo+ID4gSWRlYWxseSwgYSBWVERQ
+QVNJREFkZHJlc3NTcGFjZSBpbnN0YW5jZSBpcyBjcmVhdGVkIHdoZW4gYSBQQVNJRA0KPiA+IGlz
+IGJvdW5kIHdpdGggYSBETUEgQWRkcmVzc1NwYWNlLiBJbnRlbCBWVC1kIHNwZWMgcmVxdWlyZXMg
+Z3Vlc3QNCj4gPiBzb2Z0d2FyZSB0byBpc3N1ZSBwYXNpZCBjYWNoZSBpbnZhbGlkYXRpb24gd2hl
+biBiaW5kIG9yIHVuYmluZCBhDQo+ID4gcGFzaWQgd2l0aCBhbiBhZGRyZXNzIHNwYWNlIHVuZGVy
+IGNhY2hpbmctbW9kZS4gSG93ZXZlciwgYXMNCj4gPiBWVERQQVNJREFkZHJlc3NTcGFjZSBpbnN0
+YW5jZXMgYWxzbyBhY3QgYXMgcGFzaWQgY2FjaGUgaW4gdGhpcw0KPiA+IGltcGxlbWVudGF0aW9u
+LCBpdHMgY3JlYXRpb24gYWxzbyBoYXBwZW5zIGR1cmluZyB2SU9NTVUgUEFTSUQNCj4gPiB0YWdn
+ZWQgRE1BIHRyYW5zbGF0aW9uLiBUaGUgY3JlYXRpb24gaW4gdGhpcyBwYXRoIHdpbGwgbm90IGJl
+DQo+ID4gYWRkZWQgaW4gdGhpcyBwYXRjaCBzaW5jZSBubyBQQVNJRC1jYXBhYmxlIGVtdWxhdGVk
+IGRldmljZXMgZm9yDQo+ID4gbm93Lg0KPiA+DQo+ID4gVGhlIGltcGxlbWVudGF0aW9uIGluIHRo
+aXMgcGF0Y2ggbWFuYWdlcyBWVERQQVNJREFkZHJlc3NTcGFjZQ0KPiA+IGluc3RhbmNlcyBwZXIg
+UEFTSUQrQkRGIChsb29rdXAgYW5kIGluc2VydCB3aWxsIHVzZSBQQVNJRCBhbmQNCj4gPiBCREYp
+IHNpbmNlIEludGVsIFZULWQgc3BlYyBhbGxvd3MgcGVyLUJERiBQQVNJRCBUYWJsZS4gV2hlbiBh
+DQo+ID4gZ3Vlc3QgYmluZCBhIFBBU0lEIHdpdGggYW4gQWRkcmVzc1NwYWNlLCBRRU1VIHdpbGwg
+Y2FwdHVyZSB0aGUNCj4gPiBndWVzdCBwYXNpZCBzZWxlY3RpdmUgcGFzaWQgY2FjaGUgaW52YWxp
+ZGF0aW9uLCBhbmQgYWxsb2NhdGUNCj4gPiByZW1vdmUgYSBWVERQQVNJREFkZHJlc3NTcGFjZSBp
+bnN0YW5jZSBwZXIgdGhlIGludmFsaWRhdGlvbg0KPiA+IHJlYXNvbnM6DQo+ID4NCj4gPiAgICAg
+KikgYSBwcmVzZW50IHBhc2lkIGVudHJ5IG1vdmVkIHRvIG5vbi1wcmVzZW50DQo+ID4gICAgICop
+IGEgcHJlc2VudCBwYXNpZCBlbnRyeSB0byBiZSBhIHByZXNlbnQgZW50cnkNCj4gPiAgICAgKikg
+YSBub24tcHJlc2VudCBwYXNpZCBlbnRyeSBtb3ZlZCB0byBwcmVzZW50DQo+ID4NCj4gPiB2SU9N
+TVUgZW11bGF0b3IgY291bGQgZmlndXJlIG91dCB0aGUgcmVhc29uIGJ5IGZldGNoaW5nIGxhdGVz
+dA0KPiA+IGd1ZXN0IHBhc2lkIGVudHJ5Lg0KPiA+DQo+ID4gQ2M6IEtldmluIFRpYW4gPGtldmlu
+LnRpYW5AaW50ZWwuY29tPg0KPiA+IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXgu
+aW50ZWwuY29tPg0KPiA+IENjOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gQ2M6
+IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExp
+dSBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+IA0KPiBPayBmZWVsIGZyZWUgdG8gaWdub3Jl
+IG15IHByZXZpb3VzIHJlcGx5Li4uIEkgZGlkbid0IG5vdGljZSBpdCdzDQo+IGFjdHVhbGx5IHRo
+ZSBwYXNpZCBlbnRyeSBjYWNoZSBsYXllciByYXRoZXIgdGhhbiB0aGUgd2hvbGUgcGFzaWQNCj4g
+bGF5ZXIgKGluY2x1ZGluZyBwaW90bGIpLiAgQ29tbWVudHMgYmVsb3cuDQoNCnllcC4gSXQgaXMg
+aW4gYW5vdGhlciBwYXRjaCBhbmQgdGhpcyBwYXRjaCBzZXQgd29uJ3QgaW1wbGVtZW50IHBpb3Rs
+Yg0KY2FjaGUgaW5mcmFzdHJ1Y3R1cmUgYXMgbm8gZW11bGF0ZWQgc3ZhLWNhcGFibGUgZGV2aWNl
+IHNvIGZhci4NCg0KPiA+IC0tLQ0KPiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAg
+fCAzNTYNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAg
+aHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgIDEwICsrDQo+ID4gIGh3L2kzODYvdHJh
+Y2UtZXZlbnRzICAgICAgICAgICB8ICAgMSArDQo+ID4gIGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9p
+b21tdS5oICB8ICAzNiArKysrLQ0KPiA+ICA0IGZpbGVzIGNoYW5nZWQsIDQwMiBpbnNlcnRpb25z
+KCspLCAxIGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9p
+b21tdS5jIGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gaW5kZXggOTBiOGY2Yy4uZDg4Mjdj
+OSAxMDA2NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPiArKysgYi9ody9p
+Mzg2L2ludGVsX2lvbW11LmMNCj4gPiBAQCAtNDAsNiArNDAsNyBAQA0KPiA+ICAjaW5jbHVkZSAi
+a3ZtX2kzODYuaCINCj4gPiAgI2luY2x1ZGUgIm1pZ3JhdGlvbi92bXN0YXRlLmgiDQo+ID4gICNp
+bmNsdWRlICJ0cmFjZS5oIg0KPiA+ICsjaW5jbHVkZSAicWVtdS9qaGFzaC5oIg0KPiA+DQo+ID4g
+IC8qIGNvbnRleHQgZW50cnkgb3BlcmF0aW9ucyAqLw0KPiA+ICAjZGVmaW5lIFZURF9DRV9HRVRf
+UklEMlBBU0lEKGNlKSBcDQo+ID4gQEAgLTY1LDYgKzY2LDggQEANCj4gPiAgc3RhdGljIHZvaWQg
+dnRkX2FkZHJlc3Nfc3BhY2VfcmVmcmVzaF9hbGwoSW50ZWxJT01NVVN0YXRlICpzKTsNCj4gPiAg
+c3RhdGljIHZvaWQgdnRkX2FkZHJlc3Nfc3BhY2VfdW5tYXAoVlREQWRkcmVzc1NwYWNlICphcywg
+SU9NTVVOb3RpZmllciAqbik7DQo+ID4NCj4gPiArc3RhdGljIHZvaWQgdnRkX3Bhc2lkX2NhY2hl
+X3Jlc2V0KEludGVsSU9NTVVTdGF0ZSAqcyk7DQo+ID4gKw0KPiA+ICBzdGF0aWMgdm9pZCB2dGRf
+cGFuaWNfcmVxdWlyZV9jYWNoaW5nX21vZGUodm9pZCkNCj4gPiAgew0KPiA+ICAgICAgZXJyb3Jf
+cmVwb3J0KCJXZSBuZWVkIHRvIHNldCBjYWNoaW5nLW1vZGU9b24gZm9yIGludGVsLWlvbW11IHRv
+IGVuYWJsZSAiDQo+ID4gQEAgLTI3Niw2ICsyNzksNyBAQCBzdGF0aWMgdm9pZCB2dGRfcmVzZXRf
+Y2FjaGVzKEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiAgICAgIHZ0ZF9pb21tdV9sb2NrKHMpOw0K
+PiA+ICAgICAgdnRkX3Jlc2V0X2lvdGxiX2xvY2tlZChzKTsNCj4gPiAgICAgIHZ0ZF9yZXNldF9j
+b250ZXh0X2NhY2hlX2xvY2tlZChzKTsNCj4gPiArICAgIHZ0ZF9wYXNpZF9jYWNoZV9yZXNldChz
+KTsNCj4gPiAgICAgIHZ0ZF9pb21tdV91bmxvY2socyk7DQo+ID4gIH0NCj4gPg0KPiA+IEBAIC02
+ODYsNiArNjkwLDExIEBAIHN0YXRpYyBpbmxpbmUgYm9vbCB2dGRfcGVfdHlwZV9jaGVjayhYODZJ
+T01NVVN0YXRlDQo+ICp4ODZfaW9tbXUsDQo+ID4gICAgICByZXR1cm4gdHJ1ZTsNCj4gPiAgfQ0K
+PiA+DQo+ID4gK3N0YXRpYyBpbmxpbmUgdWludDE2X3QgdnRkX3BlX2dldF9kb21haW5faWQoVlRE
+UEFTSURFbnRyeSAqcGUpDQo+ID4gK3sNCj4gPiArICAgIHJldHVybiBWVERfU01fUEFTSURfRU5U
+UllfRElEKChwZSktPnZhbFsxXSk7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbmxpbmUg
+Ym9vbCB2dGRfcGRpcmVfcHJlc2VudChWVERQQVNJRERpckVudHJ5ICpwZGlyZSkNCj4gPiAgew0K
+PiA+ICAgICAgcmV0dXJuIHBkaXJlLT52YWwgJiAxOw0KPiA+IEBAIC0yMzg5LDE5ICsyMzk4LDM2
+MSBAQCBzdGF0aWMgYm9vbA0KPiB2dGRfcHJvY2Vzc19pb3RsYl9kZXNjKEludGVsSU9NTVVTdGF0
+ZSAqcywgVlRESW52RGVzYyAqaW52X2Rlc2MpDQo+ID4gICAgICByZXR1cm4gdHJ1ZTsNCj4gPiAg
+fQ0KPiA+DQo+ID4gK3N0YXRpYyBpbmxpbmUgc3RydWN0IHBhc2lkX2tleSAqdnRkX2dldF9wYXNp
+ZF9rZXkodWludDMyX3QgcGFzaWQsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgdWludDE2X3Qgc2lkKQ0KPiA+ICt7DQo+ID4gKyAgICBzdHJ1
+Y3QgcGFzaWRfa2V5ICprZXkgPSBnX21hbGxvYzAoc2l6ZW9mKCprZXkpKTsNCj4gDQo+IEkgdGhp
+bmsgeW91IGNhbiBzaW1wbHkgcmV0dXJuIHRoZSBwYXNpZF9rZXkgZGlyZWN0bHkgbWF5YmUgb3Ro
+ZXJ3aXNlDQo+IHNob3VsZCBiZSBjYXJlZnVsIG9uIG1lbSBsZWFrLiAgQWN0dWFsbHkgSSB0aGlu
+ayBpdCdzIGxlYWtlZCBiZWxvdy4uLg0KDQpzdXJlLCBJIGNhbiBkbyBpdC4gRm9yIHRoZSBsZWFr
+LCBpdCBpcyBhIGtub3duIGlzc3VlIGFzIGJlbG93IGNvbW1lbnQNCmluZGljYXRlcy4gTm90IHN1
+cmUgd2h5IGl0IHdhcyBsZWZ0IGFzIGl0IGlzLiBQZXJoYXBzLCB0aGUga2V5IHBvaW50IGlzDQp1
+c2VkIGluIHRoZSBoYXNoIHRhYmxlLiBQZXIgbXkgdW5kZXJzdGFuZGluZywgaGFzaCB0YWJsZSBz
+aG91bGQgaGF2ZQ0KaXRzIG93biBmaWVsZCB0byBzdG9yZSB0aGUga2V5IGNvbnRlbnQuIERvIHlv
+dSBoYXZlIGFueSBpZGVhPw0KDQogICAgaWYgKCF2dGRfYnVzKSB7DQogICAgICAgIHVpbnRwdHJf
+dCAqbmV3X2tleSA9IGdfbWFsbG9jKHNpemVvZigqbmV3X2tleSkpOw0KICAgICAgICAqbmV3X2tl
+eSA9ICh1aW50cHRyX3QpYnVzOw0KICAgICAgICAvKiBObyBjb3JyZXNwb25kaW5nIGZyZWUoKSAq
+Lw0KDQo+IA0KPiA+ICsgICAga2V5LT5wYXNpZCA9IHBhc2lkOw0KPiA+ICsgICAga2V5LT5zaWQg
+PSBzaWQ7DQo+ID4gKyAgICByZXR1cm4ga2V5Ow0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMg
+Z3VpbnQgdnRkX3Bhc2lkX2FzX2tleV9oYXNoKGdjb25zdHBvaW50ZXIgdikNCj4gPiArew0KPiA+
+ICsgICAgc3RydWN0IHBhc2lkX2tleSAqa2V5ID0gKHN0cnVjdCBwYXNpZF9rZXkgKil2Ow0KPiA+
+ICsgICAgdWludDMyX3QgYSwgYiwgYzsNCj4gPiArDQo+ID4gKyAgICAvKiBKZW5raW5zIGhhc2gg
+Ki8NCj4gPiArICAgIGEgPSBiID0gYyA9IEpIQVNIX0lOSVRWQUwgKyBzaXplb2YoKmtleSk7DQo+
+ID4gKyAgICBhICs9IGtleS0+c2lkOw0KPiA+ICsgICAgYiArPSBleHRyYWN0MzIoa2V5LT5wYXNp
+ZCwgMCwgMTYpOw0KPiA+ICsgICAgYyArPSBleHRyYWN0MzIoa2V5LT5wYXNpZCwgMTYsIDE2KTsN
+Cj4gPiArDQo+ID4gKyAgICBfX2poYXNoX21peChhLCBiLCBjKTsNCj4gPiArICAgIF9famhhc2hf
+ZmluYWwoYSwgYiwgYyk7DQo+IA0KPiBJJ20gdG90YWxseSBub3QgZ29vZCBhdCBoYXNoLCBidXQg
+SSdtIGN1cmlvdXMgd2h5IG5vIG9uZSB3YW50cyB0bw0KPiBpbnRyb2R1Y2UgYXQgbGVhc3QgYSBq
+aGFzaCgpIHNvIHdlIGRvbid0IG5lZWQgdG8gY2FsbCB0aGVzZSBpbnRlcm5hbHMNCj4gKEkgYmVs
+aWV2ZSB0aGF0J3MgaG93IGtlcm5lbCBkaWQgaXQpLiANCg0Kd2VsbCwgSSdtIGFsc28gY3VyaW91
+cyBhYm91dCBpdC4NCg0KPiBBdCB0aGUgbWVhbnRpbWUgSSBkb24ndCBzZWUgaG93DQo+IGl0IHdv
+dWxkIGJlIGJldHRlciB0aGFuIHRoaW5ncyBsaWtlIGdfc3RyX2hhc2goKSB0b28gc28gSSdkIGJl
+IGdsYWQgaWYNCj4gYW55b25lIGNvdWxkIGhlbHAgZXhwbGFpbiBhIGJpdC4uLg0KDQpJIHVzZWQg
+dG8gdXNlIGdfc3RyX2hhc2goKSwgYW5kIHVzZWQgc3RyaW5nIGFzIGtleS4NCmh0dHBzOi8vbGlz
+dHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTA3L21zZzAyMTI4Lmh0bWwN
+Cg0KRG8geW91IHdhbnQgbWUgdG8ga2VlcCB0aGUgcGFzaWRfa2V5IHN0cnVjdHVyZSBoZXJlIGFu
+ZCBzd2l0Y2ggdG8NCnVzZSBnX3N0cl9oYXNoKCk/IFRoZW4gdGhlIHBhc2lkIGtleSBjb250ZW50
+IHdvdWxkIGJlIGNvbXBhcmVkIGFzDQpzdHJpbmdzLiBJIHRoaW5rIGl0IHNob3VsZCB3b3JrLiBC
+dXQsIEkgbWF5IGJlIHdyb25nIGFsbCB0aGUgc2FtZS4NCg0KPiA+ICsNCj4gPiArICAgIHJldHVy
+biBjOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgZ2Jvb2xlYW4gdnRkX3Bhc2lkX2FzX2tl
+eV9lcXVhbChnY29uc3Rwb2ludGVyIHYxLCBnY29uc3Rwb2ludGVyIHYyKQ0KPiA+ICt7DQo+ID4g
+KyAgICBjb25zdCBzdHJ1Y3QgcGFzaWRfa2V5ICprMSA9IHYxOw0KPiA+ICsgICAgY29uc3Qgc3Ry
+dWN0IHBhc2lkX2tleSAqazIgPSB2MjsNCj4gPiArDQo+ID4gKyAgICByZXR1cm4gKGsxLT5wYXNp
+ZCA9PSBrMi0+cGFzaWQpICYmIChrMS0+c2lkID09IGsyLT5zaWQpOw0KPiA+ICt9DQo+ID4gKw0K
+PiA+ICtzdGF0aWMgaW5saW5lIGJvb2wgdnRkX3BjX2lzX2RvbV9zaShzdHJ1Y3QgVlREUEFTSURD
+YWNoZUluZm8gKnBjX2luZm8pDQo+ID4gK3sNCj4gPiArICAgIHJldHVybiBwY19pbmZvLT5mbGFn
+cyAmIFZURF9QQVNJRF9DQUNIRV9ET01TSTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljIGlu
+bGluZSBib29sIHZ0ZF9wY19pc19wYXNpZF9zaShzdHJ1Y3QgVlREUEFTSURDYWNoZUluZm8gKnBj
+X2luZm8pDQo+ID4gK3sNCj4gPiArICAgIHJldHVybiBwY19pbmZvLT5mbGFncyAmIFZURF9QQVNJ
+RF9DQUNIRV9QQVNJRFNJOw0KPiANCj4gQUZBSVMgdGhlc2Ugb25seSB1c2VkIG9uY2UuICBIb3cg
+YWJvdXQgcmVtb3ZpbmcgdGhlc2UgaGVscGVycz8gIEkNCj4gZG9uJ3Qgc2VlIG11Y2ggb24gaGVs
+cGluZyByZWFkYWJpbGl0eSBvciBhbnl0aGluZy4uLiAgcGxlYXNlIHNlZSBiZWxvdw0KPiBhdCBb
+MV0uDQoNCkFncmVlZC4gV2lsbCBkbyBpdC4gQlRXLiBJIGZhaWxlZCB0byBsb2NhdGUgWzFdLiBN
+YXkgeW91IHBvaW50IGl0IG91dC4gU3VyZWx5DQpJIGRvbuKAmXQgd2FudCB0byBtaXNzIGFueSBj
+b21tZW50cy4NCg0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgaW5saW5lIGludCB2dGRfZGV2
+X2dldF9wZV9mcm9tX3Bhc2lkKEludGVsSU9NTVVTdGF0ZSAqcywNCj4gPiArICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90IGJ1c19udW0sDQo+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDhfdCBkZXZmbiwN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJf
+dCBwYXNpZCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBWVERQQVNJREVudHJ5ICpwZSkNCj4gPiArew0KPiA+ICsgICAgVlREQ29udGV4dEVudHJ5IGNl
+Ow0KPiA+ICsgICAgaW50IHJldDsNCj4gPiArICAgIGRtYV9hZGRyX3QgcGFzaWRfZGlyX2Jhc2U7
+DQo+ID4gKw0KPiA+ICsgICAgaWYgKCFzLT5yb290X3NjYWxhYmxlKSB7DQo+ID4gKyAgICAgICAg
+cmV0dXJuIC1WVERfRlJfUEFTSURfVEFCTEVfSU5WOw0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAr
+ICAgIHJldCA9IHZ0ZF9kZXZfdG9fY29udGV4dF9lbnRyeShzLCBidXNfbnVtLCBkZXZmbiwgJmNl
+KTsNCj4gPiArICAgIGlmIChyZXQpIHsNCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsg
+ICAgfQ0KPiA+ICsNCj4gPiArICAgIHBhc2lkX2Rpcl9iYXNlID0gVlREX0NFX0dFVF9QQVNJRF9E
+SVJfVEFCTEUoJmNlKTsNCj4gPiArICAgIHJldCA9IHZ0ZF9nZXRfcGVfZnJvbV9wYXNpZF90YWJs
+ZShzLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGFzaWRfZGlyX2Jh
+c2UsIHBhc2lkLCBwZSk7DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIHJldDsNCj4gPiArfQ0KPiA+
+ICsNCj4gPiArc3RhdGljIGJvb2wgdnRkX3Bhc2lkX2VudHJ5X2NvbXBhcmUoVlREUEFTSURFbnRy
+eSAqcDEsIFZURFBBU0lERW50cnkgKnAyKQ0KPiA+ICt7DQo+ID4gKyAgICBpbnQgaSA9IDA7DQo+
+ID4gKyAgICB3aGlsZSAoaSA8IHNpemVvZigqcDEpIC8gc2l6ZW9mKHAxLT52YWwpKSB7DQo+ID4g
+KyAgICAgICAgaWYgKHAxLT52YWxbaV0gIT0gcDItPnZhbFtpXSkgew0KPiA+ICsgICAgICAgICAg
+ICByZXR1cm4gZmFsc2U7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIGkrKzsNCj4gPiAr
+ICAgIH0NCj4gPiArICAgIHJldHVybiB0cnVlOw0KPiANCj4gV2lsbCB0aGlzIHdvcms/DQo+IA0K
+PiAgIHJldHVybiAhbWVtY21wKHAxLCBwMiwgc2l6ZW9mKCpwMSkpOw0KDQpvaCwgeWVzLiBXaWxs
+IHJlcGxhY2Ugd2l0aCBpdC4NCg0KPiA+ICt9DQo+ID4gKw0KPiA+ICsvKioNCj4gPiArICogVGhp
+cyBmdW5jdGlvbiBpcyB1c2VkIHRvIGNsZWFyIHBhc2lkX2NhY2hlX2dlbiBvZiBjYWNoZWQgcGFz
+aWQNCj4gPiArICogZW50cnkgaW4gdnRkX3Bhc2lkX2FzIGluc3RhbmNlcy4gQ2FsbGVyIG9mIHRo
+aXMgZnVuY3Rpb24gc2hvdWxkDQo+ID4gKyAqIGhvbGQgaW9tbXVfbG9jay4NCj4gPiArICovDQo+
+ID4gK3N0YXRpYyBnYm9vbGVhbiB2dGRfZmx1c2hfcGFzaWQoZ3BvaW50ZXIga2V5LCBncG9pbnRl
+ciB2YWx1ZSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBncG9pbnRlciB1
+c2VyX2RhdGEpDQo+ID4gK3sNCj4gPiArICAgIFZURFBBU0lEQ2FjaGVJbmZvICpwY19pbmZvID0g
+dXNlcl9kYXRhOw0KPiA+ICsgICAgVlREUEFTSURBZGRyZXNzU3BhY2UgKnZ0ZF9wYXNpZF9hcyA9
+IHZhbHVlOw0KPiA+ICsgICAgSW50ZWxJT01NVVN0YXRlICpzID0gdnRkX3Bhc2lkX2FzLT5pb21t
+dV9zdGF0ZTsNCj4gPiArICAgIFZURFBBU0lEQ2FjaGVFbnRyeSAqcGNfZW50cnkgPSAmdnRkX3Bh
+c2lkX2FzLT5wYXNpZF9jYWNoZV9lbnRyeTsNCj4gPiArICAgIFZUREJ1cyAqdnRkX2J1cyA9IHZ0
+ZF9wYXNpZF9hcy0+dnRkX2J1czsNCj4gPiArICAgIFZURFBBU0lERW50cnkgcGU7DQo+ID4gKyAg
+ICB1aW50MTZfdCBkaWQ7DQo+ID4gKyAgICB1aW50MzJfdCBwYXNpZDsNCj4gPiArICAgIHVpbnQx
+Nl90IGRldmZuOw0KPiA+ICsgICAgZ2Jvb2xlYW4gcmVtb3ZlID0gZmFsc2U7DQo+ID4gKw0KPiA+
+ICsgICAgZGlkID0gdnRkX3BlX2dldF9kb21haW5faWQoJnBjX2VudHJ5LT5wYXNpZF9lbnRyeSk7
+DQo+ID4gKyAgICBwYXNpZCA9IHZ0ZF9wYXNpZF9hcy0+cGFzaWQ7DQo+ID4gKyAgICBkZXZmbiA9
+IHZ0ZF9wYXNpZF9hcy0+ZGV2Zm47DQo+ID4gKw0KPiA+ICsgICAgaWYgKHBjX2VudHJ5LT5wYXNp
+ZF9jYWNoZV9nZW4gJiYNCj4gPiArICAgICAgICAodnRkX3BjX2lzX2RvbV9zaShwY19pbmZvKSA/
+IChwY19pbmZvLT5kb21haW5faWQgPT0gZGlkKSA6IDEpICYmDQo+ID4gKyAgICAgICAgKHZ0ZF9w
+Y19pc19wYXNpZF9zaShwY19pbmZvKSA/IChwY19pbmZvLT5wYXNpZCA9PSBwYXNpZCkgOiAxKSkg
+ew0KPiANCj4gVGhpcyBjaHVuayBpcyBhIGJpdCBvZGQgdG8gbWUuICBIb3cgYWJvdXQgc29tZXRo
+aW5nIGxpa2UgdGhpcz8NCj4gDQo+ICAgLi4uDQo+IA0KPiAgIGlmICghcGNfZW50cnktPnBhc2lk
+X2NhY2hlX2dlbikNCj4gICAgIHJldHVybiBmYWxzZTsNCj4gDQo+ICAgc3dpdGNoIChwY19pbmZv
+LT5mbGFncykgew0KPiAgICAgY2FzZSBET01BSU46DQo+ICAgICAgIGlmIChwY19pbmZvLT5kb21h
+aW5faWQgIT0gZGlkKSB7DQo+ICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgICAgICB9DQo+ICAg
+ICAgIGJyZWFrOw0KPiAgICAgY2FzZSBQQVNJRDoNCj4gICAgICAgaWYgKHBjX2luZm8tPnBhc2lk
+ICE9IHBhc2lkKSB7DQo+ICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiAgICAgICB9DQo+ICAgICAg
+IGJyZWFrOw0KPiAgICAgLi4uIChJIHRoaW5rIHlvdSdsbCBhZGQgbW9yZSBpbiB0aGUgZm9sbG93
+IHVwIHBhdGNoZXMpDQo+ICAgfQ0KDQp5ZXAsIEkgY2FuIGRvIGl0Lg0KDQo+ID4gKyAgICAgICAg
+LyoNCj4gPiArICAgICAgICAgKiBNb2RpZnkgcGFzaWRfY2FjaGVfZ2VuIHRvIGJlIDAsIHRoZSBj
+YWNoZWQgcGFzaWQgZW50cnkgaW4NCj4gPiArICAgICAgICAgKiB2dGRfcGFzaWRfYXMgaW5zdGFu
+Y2UgaXMgaW52YWxpZC4gQW5kIHZ0ZF9wYXNpZF9hcyBpbnN0YW5jZQ0KPiA+ICsgICAgICAgICAq
+IHdvdWxkIGJlIHRyZWF0ZWQgYXMgaW52YWxpZCBpbiBRRU1VIHNjb3BlIHVudGlsIHRoZSBwYXNp
+ZA0KPiA+ICsgICAgICAgICAqIGNhY2hlIGdlbiBpcyB1cGRhdGVkIGluIGEgbmV3IHBhc2lkIGJp
+bmRpbmcgb3IgdXBkYXRlZCBpbg0KPiA+ICsgICAgICAgICAqIGJlbG93IGxvZ2ljIGlmIGZvdW5k
+IGd1ZXN0IHBhc2lkIGVudHJ5IGV4aXN0cy4NCj4gPiArICAgICAgICAgKi8NCj4gPiArICAgICAg
+ICByZW1vdmUgPSB0cnVlOw0KPiANCj4gV2h5IHNldCByZW1vdmUgaGVyZT8gIFNob3VsZCB3ZSBz
+ZXQgaXQgb25seSBpZiB3ZSBmb3VuZCB0aGF0IHRoZSBlbnRyeQ0KPiBpcyBjbGVhcmVkPw0KDQpZ
+ZXMsIHlvdSBhcmUgcmlnaHQuIEJ1dCBpdCBpcyBvbmx5IGZvciBwYXNzdGhydSBkZXZpY2VzLiBG
+b3IgZW11bGF0ZWQNCnN2YS1jYXBhYmxlIGRldmljZSwgSSB0aGluayBpdCB3b3VsZCBzaW1wbGUg
+dG8gYWx3YXlzIHJlbW92ZSBjYWNoZWQNCnBhc2lkLWVudHJ5IGlmIGd1ZXN0IGlzc3VlcyBwYXNp
+ZCBjYWNoZSBpbnZhbGlkYXRpb24uIFRoaXMgaXMgYmVjYXVzZQ0KY2FjaGluZy1tb2RlIGlzIG5v
+dCBuZWNlc3NhcnkgZm9yIGVtdWxhdGVkIGRldmljZXMsIHdoaWNoIG1lYW5zIHBhc2lkDQpjYWNo
+ZSBpbnZhbGlkYXRpb24gZm9yIGVtdWxhdGVkIGRldmljZXMgb25seSBtZWFucyBjYWNoZSBmbHVz
+aC4gVGhpcw0KaXMgZW5vdWdoIGFzIHRoZSBwYXNpZCBlbnRyeSBjYW4gYmUgcmUtY2FjaGVkIGR1
+cmluZyBQQVNJRCB0YWdnZWQgRE1BDQp0cmFuc2xhdGlvbiBpbiBkb190cmFuc2xhdGUoKS4gQWx0
+aG91Z2ggaXQgaXMgbm90IHlldCBhZGRlZCBhcyBJDQptZW50aW9uZWQgaW4gdGhlIHBhdGNoIGNv
+bW1pdCBtZXNzYWdlLiBXaGlsZSBmb3IgcGFzc3RocnUgZGV2aWNlcywNCnBhc2lkIGNhY2hlIGlu
+dmFsaWRhdGlvbiBkb2VzIG5vdCBvbmx5IG1lYW4gY2FjaGUgZmx1c2guIEluc3RlYWQsIGl0DQpy
+ZWxpZXMgb24gdGhlIGxhdGVzdCBndWVzdCBwYXNpZCBlbnRyeSBwcmVzZW5jZSBzdGF0dXMuDQoN
+CkJhc2VkIG9uIHRoZSBhYm92ZSBpZGVhLCBJIG1ha2UgdGhlIHJlbW92ZT10cnVlIGF0IHRoZSBi
+ZWdpbm5pbmcsIGFuZA0KaWYgdGhlIHN1YnNlcXVlbnQgbG9naWMgZmluZHMgb3V0IGl0IGlzIGZv
+ciBwYXNzdGhydSBkZXZpY2VzLCBpdCB3aWxsDQpjaGVjayBndWVzdCBwYXNpZCBlbnRyeSBhbmQg
+dGhlbiBkZWNpZGUgaG93IHRvIGhhbmRsZSB0aGUgcGFzaWQgY2FjaGUNCmludmFsaWRhdGlvbiBy
+ZXF1ZXN0LiAicmVtb3ZlIiB3aWxsIGJlIHNldCB0byBiZSBmYWxzZSB3aGVuIGd1ZXN0IHBhc2lk
+DQplbnRyeSBleGlzdHMuDQoNCj4gDQo+ID4gKyAgICAgICAgcGNfZW50cnktPnBhc2lkX2NhY2hl
+X2dlbiA9IDA7DQo+ID4gKyAgICAgICAgaWYgKHZ0ZF9idXMtPmRldl9pY1tkZXZmbl0pIHsNCj4g
+PiArICAgICAgICAgICAgaWYgKCF2dGRfZGV2X2dldF9wZV9mcm9tX3Bhc2lkKHMsDQo+ID4gKyAg
+ICAgICAgICAgICAgICAgICAgICBwY2lfYnVzX251bSh2dGRfYnVzLT5idXMpLCBkZXZmbiwgcGFz
+aWQsICZwZSkpIHsNCj4gPiArICAgICAgICAgICAgICAgIC8qDQo+ID4gKyAgICAgICAgICAgICAg
+ICAgKiBwYXNpZCBlbnRyeSBleGlzdHMsIHNvIGtlZXAgdGhlIHZ0ZF9wYXNpZF9hcywgYW5kIG5l
+ZWRzDQo+ID4gKyAgICAgICAgICAgICAgICAgKiB1cGRhdGUgdGhlIHBhc2lkIGVudHJ5IGNhY2hl
+ZCBpbiB2dGRfcGFzaWRfYXMuIEFsc28sIGlmDQo+ID4gKyAgICAgICAgICAgICAgICAgKiB0aGUg
+Z3Vlc3QgcGFzaWQgZW50cnkgZG9lc24ndCBlcXVhbCB0byBjYWNoZWQgcGFzaWQgZW50cnkNCj4g
+PiArICAgICAgICAgICAgICAgICAqIG5lZWRzIHRvIGlzc3VlIGEgcGFzaWQgYmluZCB0byBob3N0
+IGZvciBwYXNzdGhydSBkZXZpZXMuDQo+ID4gKyAgICAgICAgICAgICAgICAgKi8NCj4gPiArICAg
+ICAgICAgICAgICAgIHJlbW92ZSA9IGZhbHNlOw0KPiA+ICsgICAgICAgICAgICAgICAgcGNfZW50
+cnktPnBhc2lkX2NhY2hlX2dlbiA9IHMtPnBhc2lkX2NhY2hlX2dlbjsNCj4gPiArICAgICAgICAg
+ICAgICAgIGlmICghdnRkX3Bhc2lkX2VudHJ5X2NvbXBhcmUoJnBlLCAmcGNfZW50cnktPnBhc2lk
+X2VudHJ5KSkgew0KPiA+ICsgICAgICAgICAgICAgICAgICAgIHBjX2VudHJ5LT5wYXNpZF9lbnRy
+eSA9IHBlOw0KPiANCj4gV2hhdCBpZiB0aGUgcGFzaWQgZW50cnkgY2hhbmdlZCBmcm9tIHZhbGlk
+IHRvIGFsbCB6ZXJvcz8gIFNob3VsZCB3ZQ0KPiB1bmJpbmQvcmVtb3ZlIGl0IGFzIHdlbGw/DQoN
+CklmIGl0IGlzIGZyb20gdmFsaWQgdG8gYWxsIHplcm8sIHZ0ZF9kZXZfZ2V0X3BlX2Zyb21fcGFz
+aWQoKSBzaG91bGQNCnJldHVybiBub24temVyby4gVGhlbiBpdCB3b3VsZCBrZWVwICJyZW1vdmUi
+PXRydWUgYW5kIHBhc2lkX2NhY2hlX2dlbj0wLg0KVW5iaW5kIHdpbGwgYmUgYWRkZWQgd2l0aCBi
+aW5kIGluIHBhdGNoIDE1LiBIZXJlIGp1c3QgaGFuZGxlIHRoZSBjYWNoZWQNCnBhc2lkIGVudHJ5
+IHdpdGhpbiB2SU9NTVUuDQoNCjAwMTUtaW50ZWxfaW9tbXUtYmluZC11bmJpbmQtZ3Vlc3QtcGFn
+ZS10YWJsZS10by1ob3N0LnBhdGNoDQoNCj4gDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgLyoN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgKiBUT0RPOiB3aGVuIHBhc2lkLWJhc2UtaW90bGIo
+cGlvdGxiKSBpbmZyYXN0cnVjdHVyZSBpcw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAqIHJl
+YWR5LCBzaG91bGQgaW52YWxpZGF0ZSBRRU1VIHBpb3RsYiB0b2dlaHRlciB3aXRoIHRoaXMNCj4g
+PiArICAgICAgICAgICAgICAgICAgICAgKiBjaGFuZ2UuDQo+ID4gKyAgICAgICAgICAgICAgICAg
+ICAgICovDQo+ID4gKyAgICAgICAgICAgICAgICB9DQo+ID4gKyAgICAgICAgICAgIH0NCj4gPiAr
+ICAgICAgICB9DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIHJlbW92ZTsNCj4g
+DQo+IEluIHN1bW1hcnksIElNSE8gdGhpcyBjaHVuayBjb3VsZCBiZSBjbGVhcmVyIGlmIGxpa2Ug
+dGhpczoNCj4gDQo+ICAgLi4uIChjb250aW51ZXMgd2l0aCBhYm92ZSBwZXN1ZG8gY29kZSkNCj4g
+DQo+ICAgcmV0ID0gdnRkX2Rldl9nZXRfcGVfZnJvbV9wYXNpZCguLi4sICZwZSk7DQo+ICAgaWYg
+KHJldCkgew0KPiAgICAgZ290byByZW1vdmU7DQo+ICAgfQ0KPiAgIC8vIGRldGVjdGVkIGNvcnJl
+Y3QgcGFzaWQgZW50cnkNCj4gICBpZiAoIXZ0ZF9wYXNpZF9lbnRyeV9jb21wYXJlKCZwZSwgLi4u
+KSkgew0KPiAgICAgIC8vIHBhc2lkIGVudHJ5IGNoYW5nZWQNCj4gICAgICBpZiAodnRkX3Bhc2lk
+X2NsZWFyZWQoJnBlKSkgew0KPiAgICAgICAgLy8gdGhlIHBhc2lkIGlzIGNsZWFyZWQgdG8gYWxs
+IHplcm8sIGRyb3ANCj4gICAgICAgIGdvdG8gcmVtb3ZlOw0KPiAgICAgIH0NCj4gICAgICAvLyBh
+IG5ldyBwYXNpZCBpcyBzZXR1cA0KPiANCj4gICAgICAvLyBTZW5kIFVOQklORCBpZiBjYWNoZSB2
+YWxpZA0KPiAgICAgIC4uLg0KPiAgICAgIC8vIFNlbmQgQklORA0KPiAgICAgIC4uLg0KPiAgICAg
+IC8vIFVwZGF0ZSBjYWNoZQ0KPiAgICAgIHBjX2VudHJ5LT5wYXNpZF9lbnRyeSA9IHBlOw0KPiAg
+ICAgIHBjX2VudHJ5LT5wYXNpZF9jYWNoZV9nZW4gPSBzLT5wYXNpZF9jYWNoZV9nZW47DQo+ICAg
+fQ0KPiANCj4gcmVtb3ZlOg0KPiAgIC8vIFNlbmQgVU5CSU5EIGlmIGNhY2hlIHZhbGlkDQo+ICAg
+Li4uDQo+ICAgcmV0dXJuIHRydWU7DQoNCnllcCwgSSBjYW4gZG8gaXQuIG5pY2UgaWRlYS4gOi0p
+DQoNCj4gSSBmZWVsIGxpa2UgeW91IHNob3VsZG4ndCBib3RoZXIgY2hlY2tpbmcgYWdhaW5zdA0K
+PiB2dGRfYnVzLT5kZXZfaWNbZGV2Zm5dIGF0IGFsbCBoZXJlIGJlY2F1c2UgaWYgdGhhdCB3YXMg
+c2V0IHRoZW4gaXQNCj4gbWVhbnMgd2UgbmVlZCB0byBwYXNzIHRoZXNlIGluZm9ybWF0aW9uIGRv
+d24gdG8gaG9zdCwgYW5kIGl0J2xsIGJlDQo+IGNoZWNrZWQgYXV0b21hdGljYWxseSBiZWNhdXNl
+IHdoZW4gd2Ugc2VuZCBCSU5EL1VOQklORCBldmVudCB3ZSdsbA0KPiBkZWZpbml0ZWx5IGNoZWNr
+IHRoYXQgdG9vIG90aGVyd2lzZSB0aG9zZSBldmVudHMgd2lsbCBiZSBub29wcy4NCg0KSSBuZWVk
+IGl0LiBCZWNhdXNlIEkgd2FudCB0byBkaWZmZXIgcGFzc3RocnUgZGV2aWNlcyBhbmQgZW11bGF0
+ZWQNCmRldmljZXMuIElkZWFsbHksIGVtdWxhdGVkIGRldmljZXMgd29uJ3QgaGF2ZSB2dGRfYnVz
+LT5kZXZfaWNbZGV2Zm5dLg0KDQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQgdnRkX3Bh
+c2lkX2NhY2hlX2RzaShJbnRlbElPTU1VU3RhdGUgKnMsIHVpbnQxNl90IGRvbWFpbl9pZCkNCj4g
+PiAgew0KPiA+ICsgICAgVlREUEFTSURDYWNoZUluZm8gcGNfaW5mbzsNCj4gPiArDQo+ID4gKyAg
+ICB0cmFjZV92dGRfcGFzaWRfY2FjaGVfZHNpKGRvbWFpbl9pZCk7DQo+ID4gKw0KPiA+ICsgICAg
+cGNfaW5mby5mbGFncyA9IFZURF9QQVNJRF9DQUNIRV9ET01TSTsNCj4gPiArICAgIHBjX2luZm8u
+ZG9tYWluX2lkID0gZG9tYWluX2lkOw0KPiA+ICsNCj4gPiArICAgIC8qDQo+ID4gKyAgICAgKiBM
+b29wIGFsbCBleGlzdGluZyBwYXNpZCBjYWNoZXMgYW5kIHVwZGF0ZSB0aGVtLg0KPiA+ICsgICAg
+ICovDQo+ID4gKyAgICB2dGRfaW9tbXVfbG9jayhzKTsNCj4gPiArICAgIGdfaGFzaF90YWJsZV9m
+b3JlYWNoX3JlbW92ZShzLT52dGRfcGFzaWRfYXMsIHZ0ZF9mbHVzaF9wYXNpZCwgJnBjX2luZm8p
+Ow0KPiA+ICsgICAgdnRkX2lvbW11X3VubG9jayhzKTsNCj4gPiArDQo+ID4gKyAgICAvKg0KPiA+
+ICsgICAgICogVE9ETzogRG9tYWluIHNlbGVjdGl2ZSBQQVNJRCBjYWNoZSBpbnZhbGlkYXRpb24N
+Cj4gPiArICAgICAqIG1heSBiZSBpc3N1ZWQgd3JvbmdseSBieSBwcm9ncmFtbWVyLCB0byBiZSBz
+YWZlLA0KPiANCj4gSU1ITyBpdCdzIG5vdCB3cm9uZyBldmVuIGlmIHRoZSBndWVzdCBzZW5kcyB0
+aGF0LCBiZWNhdXNlIGxvZ2ljYWxseQ0KPiB0aGUgZ3Vlc3QgY2FuIHNlbmQgaW52YWxpZGF0aW9u
+IGFzIGl0IHdpc2hlcywgYW5kIHdlIHNob3VsZCBoYXZlDQo+IHNpbWlsYXIgaXNzdWUgYmVmb3Jl
+IG9uIHRoZSAybmQgbGV2ZWwgcGFnZSB0YWJsZSBpbnZhbGlkYXRpb25zLi4uIGFuZA0KPiB0aGF0
+J3Mgd2h5IHdlIG5lZWQgdG8ga2VlcCB0aGUgaW92YSBtYXBwaW5nIGluc2lkZSBxZW11IEkgc3Vw
+cG9zZS4uLg0KDQp5ZXMsIHdlIGFyZSBhbGlnbmVkIG9uIHRoaXMgcG9pbnQuIEkgY2FuIHVwZGF0
+ZSB0aGUgZGVzY3JpcHRpb24gYWJvdmUuDQoNCj4gDQo+ID4gKyAgICAgKiBhZnRlciBpbnZhbGlk
+YXRpbmcgdGhlIHBhc2lkIGNhY2hlcywgZW11bGF0b3INCj4gPiArICAgICAqIG5lZWRzIHRvIHJl
+cGxheSB0aGUgcGFzaWQgYmluZGluZ3MgYnkgd2Fsa2luZyBndWVzdA0KPiA+ICsgICAgICogcGFz
+aWQgZGlyIGFuZCBwYXNpZCB0YWJsZS4NCj4gDQo+IFRoaXMgaXMgdHJ1ZS4uLg0KDQpoYW5kc2hh
+a2UgaGVyZS4NCg0KPiANCj4gPiArICAgICAqLw0KPiA+ICAgICAgcmV0dXJuIDA7DQo+ID4gIH0N
+Cj4gPg0KPiA+ICsvKioNCj4gPiArICogVGhpcyBmdW5jdGlvbiBmaW5kcyBvciBhZGRzIGEgVlRE
+UEFTSURBZGRyZXNzU3BhY2UgZm9yIGEgZGV2aWNlDQo+ID4gKyAqIHdoZW4gaXQgaXMgYm91bmQg
+dG8gYSBwYXNpZC4gQ2FsbGVyIG9mIHRoaXMgZnVuY3Rpb24gc2hvdWxkIGhvbGQNCj4gPiArICog
+aW9tbXVfbG9jay4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBWVERQQVNJREFkZHJlc3NTcGFjZSAq
+dnRkX2FkZF9maW5kX3Bhc2lkX2FzKEludGVsSU9NTVVTdGF0ZSAqcywNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVlREQnVzICp2dGRfYnVz
+LA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBpbnQgZGV2Zm4sDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHVpbnQzMl90IHBhc2lkLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib29sIGFsbG9jYXRlKQ0KPiA+ICt7DQo+ID4g
+KyAgICBzdHJ1Y3QgcGFzaWRfa2V5ICprZXk7DQo+ID4gKyAgICBzdHJ1Y3QgcGFzaWRfa2V5ICpu
+ZXdfa2V5Ow0KPiA+ICsgICAgVlREUEFTSURBZGRyZXNzU3BhY2UgKnZ0ZF9wYXNpZF9hczsNCj4g
+PiArICAgIHVpbnQxNl90IHNpZDsNCj4gPiArDQo+ID4gKyAgICBzaWQgPSB2dGRfbWFrZV9zb3Vy
+Y2VfaWQocGNpX2J1c19udW0odnRkX2J1cy0+YnVzKSwgZGV2Zm4pOw0KPiA+ICsgICAga2V5ID0g
+dnRkX2dldF9wYXNpZF9rZXkocGFzaWQsIHNpZCk7DQo+ID4gKyAgICB2dGRfcGFzaWRfYXMgPSBn
+X2hhc2hfdGFibGVfbG9va3VwKHMtPnZ0ZF9wYXNpZF9hcywga2V5KTsNCj4gPiArDQo+ID4gKyAg
+ICBpZiAoIXZ0ZF9wYXNpZF9hcyAmJiBhbGxvY2F0ZSkgew0KPiA+ICsgICAgICAgIG5ld19rZXkg
+PSB2dGRfZ2V0X3Bhc2lkX2tleShwYXNpZCwgc2lkKTsNCj4gDQo+IElzIHRoaXMgdGhlIHNhbWUg
+YXMga2V5IG5vIG1hdHRlciB3aGF0Pw0KDQpJdCBpcyB0aGUga2V5IGNvbnRlbnQgbWF0dGVycy4g
+SSdkIG5lZWQgdG8gcmVmaW5lIHRoZSBrZXkgYWxsb2MvZnJlZSBpbg0KbmV4dCB2ZXJzaW9uLg0K
+DQo+IA0KPiA+ICsgICAgICAgIC8qDQo+ID4gKyAgICAgICAgICogSW5pdGlhdGUgdGhlIHZ0ZF9w
+YXNpZF9hcyBzdHJ1Y3R1cmUuDQo+ID4gKyAgICAgICAgICoNCj4gPiArICAgICAgICAgKiBUaGlz
+IHN0cnVjdHVyZSBoZXJlIGlzIHVzZWQgdG8gdHJhY2sgdGhlIGd1ZXN0IHBhc2lkDQo+ID4gKyAg
+ICAgICAgICogYmluZGluZyBhbmQgYWxzbyBzZXJ2ZXMgYXMgcGFzaWQtY2FjaGUgbWFuZ2VtZW50
+IGVudHJ5Lg0KPiA+ICsgICAgICAgICAqDQo+ID4gKyAgICAgICAgICogVE9ETzogaW4gZnV0dXJl
+LCBpZiB3YW50cyB0byBzdXBwb3J0IHRoZSBTVkEtYXdhcmUgRE1BDQo+ID4gKyAgICAgICAgICog
+ICAgICAgZW11bGF0aW9uLCB0aGUgdnRkX3Bhc2lkX2FzIHNob3VsZCBiZSBmdWxseSBpbml0aWFs
+aXplZC4NCj4gPiArICAgICAgICAgKiAgICAgICBlLmcuIHRoZSBhZGRyZXNzX3NwYWNlIGFuZCBt
+ZW1vcnkgcmVnaW9uIGZpZWxkcy4NCj4gPiArICAgICAgICAgKi8NCj4gPiArICAgICAgICB2dGRf
+cGFzaWRfYXMgPSBnX21hbGxvYzAoc2l6ZW9mKFZURFBBU0lEQWRkcmVzc1NwYWNlKSk7DQo+ID4g
+KyAgICAgICAgdnRkX3Bhc2lkX2FzLT5pb21tdV9zdGF0ZSA9IHM7DQo+ID4gKyAgICAgICAgdnRk
+X3Bhc2lkX2FzLT52dGRfYnVzID0gdnRkX2J1czsNCj4gPiArICAgICAgICB2dGRfcGFzaWRfYXMt
+PmRldmZuID0gZGV2Zm47DQo+ID4gKyAgICAgICAgdnRkX3Bhc2lkX2FzLT5jb250ZXh0X2NhY2hl
+X2VudHJ5LmNvbnRleHRfY2FjaGVfZ2VuID0gMDsNCj4gPiArICAgICAgICB2dGRfcGFzaWRfYXMt
+PnBhc2lkID0gcGFzaWQ7DQo+ID4gKyAgICAgICAgdnRkX3Bhc2lkX2FzLT5wYXNpZF9jYWNoZV9l
+bnRyeS5wYXNpZF9jYWNoZV9nZW4gPSAwOw0KPiA+ICsgICAgICAgIGdfaGFzaF90YWJsZV9pbnNl
+cnQocy0+dnRkX3Bhc2lkX2FzLCBuZXdfa2V5LCB2dGRfcGFzaWRfYXMpOw0KPiA+ICsgICAgfQ0K
+PiA+ICsgICAgcmV0dXJuIHZ0ZF9wYXNpZF9hczsNCj4gPiArfQ0KPiA+ICsNCj4gPiArIC8qKg0K
+PiA+ICsgICogVGhpcyBmdW5jdGlvbiB1cGRhdGVzIHRoZSBwYXNpZCBlbnRyeSBjYWNoZWQgaW4g
+JnZ0ZF9wYXNpZF9hcy4NCj4gPiArICAqIENhbGxlciBvZiB0aGlzIGZ1bmN0aW9uIHNob3VsZCBo
+b2xkIGlvbW11X2xvY2suDQo+ID4gKyAgKi8NCj4gPiArc3RhdGljIGlubGluZSB2b2lkIHZ0ZF9m
+aWxsX2luX3BlX2NhY2hlKA0KPiA+ICsgICAgICAgICAgICAgIFZURFBBU0lEQWRkcmVzc1NwYWNl
+ICp2dGRfcGFzaWRfYXMsIFZURFBBU0lERW50cnkgKnBlKQ0KPiA+ICt7DQo+ID4gKyAgICBJbnRl
+bElPTU1VU3RhdGUgKnMgPSB2dGRfcGFzaWRfYXMtPmlvbW11X3N0YXRlOw0KPiA+ICsgICAgVlRE
+UEFTSURDYWNoZUVudHJ5ICpwY19lbnRyeSA9ICZ2dGRfcGFzaWRfYXMtPnBhc2lkX2NhY2hlX2Vu
+dHJ5Ow0KPiA+ICsNCj4gPiArICAgIHBjX2VudHJ5LT5wYXNpZF9lbnRyeSA9ICpwZTsNCj4gPiAr
+ICAgIHBjX2VudHJ5LT5wYXNpZF9jYWNoZV9nZW4gPSBzLT5wYXNpZF9jYWNoZV9nZW47DQo+ID4g
+K30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQgdnRkX3Bhc2lkX2NhY2hlX3BzaShJbnRlbElPTU1V
+U3RhdGUgKnMsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBk
+b21haW5faWQsIHVpbnQzMl90IHBhc2lkKQ0KPiA+ICB7DQo+ID4gKyAgICBWVERQQVNJRENhY2hl
+SW5mbyBwY19pbmZvOw0KPiA+ICsgICAgVlREUEFTSURFbnRyeSBwZTsNCj4gPiArICAgIFZUREJ1
+cyAqdnRkX2J1czsNCj4gPiArICAgIGludCBidXNfbiwgZGV2Zm47DQo+ID4gKyAgICBWVERQQVNJ
+REFkZHJlc3NTcGFjZSAqdnRkX3Bhc2lkX2FzOw0KPiA+ICsgICAgVlRESU9NTVVDb250ZXh0ICp2
+dGRfaWM7DQo+ID4gKw0KPiA+ICsgICAgcGNfaW5mby5mbGFncyA9IFZURF9QQVNJRF9DQUNIRV9E
+T01TSTsNCj4gPiArICAgIHBjX2luZm8uZG9tYWluX2lkID0gZG9tYWluX2lkOw0KPiA+ICsgICAg
+cGNfaW5mby5mbGFncyB8PSBWVERfUEFTSURfQ0FDSEVfUEFTSURTSTsNCj4gPiArICAgIHBjX2lu
+Zm8ucGFzaWQgPSBwYXNpZDsNCj4gPiArDQo+ID4gKyAgICAvKg0KPiA+ICsgICAgICogUmVnYXJk
+cyB0byBhIHBhc2lkIHNlbGVjdGl2ZSBwYXNpZCBjYWNoZSBpbnZhbGlkYXRpb24gKFBTSSksIGl0
+DQo+ID4gKyAgICAgKiBjb3VsZCBiZSBlaXRoZXIgY2FzZXMgb2YgYmVsb3c6DQo+ID4gKyAgICAg
+KiBhKSBhIHByZXNlbnQgcGFzaWQgZW50cnkgbW92ZWQgdG8gbm9uLXByZXNlbnQNCj4gPiArICAg
+ICAqIGIpIGEgcHJlc2VudCBwYXNpZCBlbnRyeSB0byBiZSBhIHByZXNlbnQgZW50cnkNCj4gPiAr
+ICAgICAqIGMpIGEgbm9uLXByZXNlbnQgcGFzaWQgZW50cnkgbW92ZWQgdG8gcHJlc2VudA0KPiA+
+ICsgICAgICoNCj4gPiArICAgICAqIEhlcmUgdGhlIGhhbmRsaW5nIG9mIGEgUFNJIGlzOg0KPiA+
+ICsgICAgICogMSkgbG9vcCBhbGwgdGhlIGV4aXNpdG5nIHZ0ZF9wYXNpZF9hcyBpbnN0YW5jZXMg
+dG8gdXBkYXRlIHRoZW0NCj4gPiArICAgICAqICAgIGFjY29yZGluZyB0byB0aGUgbGF0ZXN0IGd1
+ZXN0IHBhc2lkIGVudHJ5IGluIHBhc2lkIHRhYmxlLg0KPiA+ICsgICAgICogICAgdGhpcyB3aWxs
+IG1ha2Ugc3VyZSBhZmZlY3RlZCBleGlzdGluZyB2dGRfcGFzaWRfYXMgaW5zdGFuY2VzDQo+ID4g
+KyAgICAgKiAgICBjYWNoZWQgdGhlIGxhdGVzdCBwYXNpZCBlbnRyaWVzLiBBbHNvLCBkdXJpbmcg
+dGhlIGxvb3AsIHRoZQ0KPiA+ICsgICAgICogICAgaG9zdCBzaG91bGQgYmUgbm90aWZpZWQgaWYg
+bmVlZGVkLiBlLmcuIHBhc2lkIHVuYmluZCBvciBwYXNpZA0KPiA+ICsgICAgICogICAgdXBkYXRl
+LiBTaG91bGQgYmUgYWJsZSB0byBjb3ZlciBjYXNlIGEpIGFuZCBjYXNlIGIpLg0KPiA+ICsgICAg
+ICoNCj4gPiArICAgICAqIDIpIGxvb3AgYWxsIGRldmljZXMgdG8gY292ZXIgY2FzZSBjKQ0KPiA+
+ICsgICAgICogICAgSG93ZXZlciwgaXQgaXMgbm90IGdvb2QgdG8gYWx3YXlzIGxvb3AgYWxsIGRl
+dmljZXMuIEluIHRoaXMNCj4gPiArICAgICAqICAgIGltcGxlbWVudGF0aW9uLiBXZSBkbyBpdCBp
+biB0aGlzIHdheXM6DQo+ID4gKyAgICAgKiAgICAtIEZvciBkZXZpY2VzIHdoaWNoIGhhdmUgVlRE
+SU9NTVVDb250ZXh0IGluc3RhbmNlcywgd2UgbG9vcA0KPiA+ICsgICAgICogICAgICB0aGVtIGFu
+ZCBjaGVjayBpZiBndWVzdCBwYXNpZCBlbnRyeSBleGlzdHMuIElmIHllcywgaXQgaXMNCj4gPiAr
+ICAgICAqICAgICAgY2FzZSBjKSwgd2UgdXBkYXRlIHRoZSBwYXNpZCBjYWNoZSBhbmQgYWxzbyBu
+b3RpZnkgaG9zdC4NCj4gPiArICAgICAqICAgIC0gRm9yIGRldmljZXMgd2hpY2ggaGF2ZSBubyBW
+VERJT01NVUNvbnRleHQgaW5zdGFuY2VzLCBpdCBpcw0KPiA+ICsgICAgICogICAgICBub3QgbmVj
+ZXNzYXJ5IHRvIGNyZWF0ZSBwYXNpZCBjYWNoZSBhdCB0aGlzIHBoYXNlIHNpbmNlIGl0DQo+ID4g
+KyAgICAgKiAgICAgIGNvdWxkIGJlIGNyZWF0ZWQgd2hlbiB2SU9NTVUgZG8gRE1BIGFkZHJlc3Mg
+dHJhbnNsYXRpb24uDQo+ID4gKyAgICAgKiAgICAgIFRoaXMgaXMgbm90IGltcGxlbWVudGVkIHll
+dCBzaW5jZSBubyBQQVNJRC1jYXBhYmxlIGVtdWxhdGVkDQo+ID4gKyAgICAgKiAgICAgIGRldmlj
+ZXMgdG9kYXkuIElmIHdlIGhhdmUgaXQgaW4gZnV0dXJlLCB0aGUgcGFzaWQgY2FjaGUgc2hhbGwN
+Cj4gPiArICAgICAqICAgICAgYmUgY3JlYXRlZCB0aGVyZS4NCj4gPiArICAgICAqLw0KPiA+ICsN
+Cj4gPiArICAgIHZ0ZF9pb21tdV9sb2NrKHMpOw0KPiA+ICsgICAgZ19oYXNoX3RhYmxlX2ZvcmVh
+Y2hfcmVtb3ZlKHMtPnZ0ZF9wYXNpZF9hcywgdnRkX2ZsdXNoX3Bhc2lkLCAmcGNfaW5mbyk7DQo+
+ID4gKyAgICB2dGRfaW9tbXVfdW5sb2NrKHMpOw0KPiANCj4gWzJdDQo+IA0KPiA+ICsNCj4gPiAr
+ICAgIHZ0ZF9pb21tdV9sb2NrKHMpOw0KPiANCj4gRG8geW91IHdhbnQgdG8gZXhwbGljaXRseSBy
+ZWxlYXNlIHRoZSBsb2NrIGZvciBvdGhlciB0aHJlYWQ/DQo+IE90aGVyd2lzZSBJIGRvbid0IHNl
+ZSBhIHBvaW50IHRvIHVubG9jay9sb2NrIGluIHNlcXVlbmNlLi4NCg0KSSBmZWx0IGxpa2UgdG8g
+aGF2ZSBzaG9ydGVyIHByb3RlY3RlZCBzbmlwcGV0cy4gQnV0LCBJIGRvbuKAmXQgaGF2ZSBzdHJv
+bmcNCnJlYXNvbiBlaXRoZXIgYWZ0ZXIgcmVjb25zaWRlcmluZyBpdC4gSSdsbCByZW1vdmUgaXQg
+YW55aG93Lg0KDQo+ID4gKyAgICBRTElTVF9GT1JFQUNIKHZ0ZF9pYywgJnMtPnZ0ZF9kZXZfaWNf
+bGlzdCwgbmV4dCkgew0KPiA+ICsgICAgICAgIHZ0ZF9idXMgPSB2dGRfaWMtPnZ0ZF9idXM7DQo+
+ID4gKyAgICAgICAgZGV2Zm4gPSB2dGRfaWMtPmRldmZuOw0KPiA+ICsgICAgICAgIGJ1c19uID0g
+cGNpX2J1c19udW0odnRkX2J1cy0+YnVzKTsNCj4gPiArDQo+ID4gKyAgICAgICAgLyogU3RlcCAx
+OiBmZXRjaCB2dGRfcGFzaWRfYXMgYW5kIGNoZWNrIGlmIGl0IGlzIHZhbGlkICovDQo+ID4gKyAg
+ICAgICAgdnRkX3Bhc2lkX2FzID0gdnRkX2FkZF9maW5kX3Bhc2lkX2FzKHMsIHZ0ZF9idXMsDQo+
+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXZmbiwgcGFzaWQs
+IHRydWUpOw0KPiA+ICsgICAgICAgIGlmICh2dGRfcGFzaWRfYXMgJiYNCj4gPiArICAgICAgICAg
+ICAgKHMtPnBhc2lkX2NhY2hlX2dlbiA9PQ0KPiA+ICsgICAgICAgICAgICAgdnRkX3Bhc2lkX2Fz
+LT5wYXNpZF9jYWNoZV9lbnRyeS5wYXNpZF9jYWNoZV9nZW4pKSB7DQo+ID4gKyAgICAgICAgICAg
+IC8qDQo+ID4gKyAgICAgICAgICAgICAqIHBhc2lkX2NhY2hlX2dlbiBlcXVhbHMgdG8gcy0+cGFz
+aWRfY2FjaGVfZ2VuIG1lYW5zDQo+ID4gKyAgICAgICAgICAgICAqIHZ0ZF9wYXNpZF9hcyBpcyB2
+YWxpZCBhZnRlciB0aGUgYWJvdmUgcy0+dnRkX3Bhc2lkX2FzDQo+ID4gKyAgICAgICAgICAgICAq
+IHVwZGF0ZXMuIFRodXMgbm8gbmVlZCBmb3IgdGhlIGJlbG93IHN0ZXBzLg0KPiA+ICsgICAgICAg
+ICAgICAgKi8NCj4gPiArICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAgfQ0KPiA+
+ICsNCj4gPiArICAgICAgICAvKg0KPiA+ICsgICAgICAgICAqIFN0ZXAgMjogdnRkX3Bhc2lkX2Fz
+IGlzIG5vdCB2YWxpZCwgaXQncyBwb3RlbnRhaWxseSBhDQo+ID4gKyAgICAgICAgICogbmV3IHBh
+c2lkIGJpbmQuIEZldGNoIGd1ZXN0IHBhc2lkIGVudHJ5Lg0KPiA+ICsgICAgICAgICAqLw0KPiA+
+ICsgICAgICAgIGlmICh2dGRfZGV2X2dldF9wZV9mcm9tX3Bhc2lkKHMsIGJ1c19uLCBkZXZmbiwg
+cGFzaWQsICZwZSkpIHsNCj4gPiArICAgICAgICAgICAgY29udGludWU7DQo+ID4gKyAgICAgICAg
+fQ0KPiA+ICsNCj4gPiArICAgICAgICAvKg0KPiA+ICsgICAgICAgICAqIFN0ZXAgMzogcGFzaWQg
+ZW50cnkgZXhpc3RzLCB1cGRhdGUgcGFzaWQgY2FjaGUNCj4gPiArICAgICAgICAgKg0KPiA+ICsg
+ICAgICAgICAqIEhlcmUgbmVlZCB0byBjaGVjayBkb21haW4gSUQgc2luY2UgZ3Vlc3QgcGFzaWQg
+ZW50cnkNCj4gPiArICAgICAgICAgKiBleGlzdHMuIFdoYXQgbmVlZHMgdG8gZG8gYXJlOg0KPiA+
+ICsgICAgICAgICAqICAgLSB1cGRhdGUgdGhlIHBjX2VudHJ5IGluIHRoZSB2dGRfcGFzaWRfYXMN
+Cj4gPiArICAgICAgICAgKiAgIC0gc2V0IHByb3BlciBwY19lbnRyeS5wYXNpZF9jYWNoZV9nZW4N
+Cj4gPiArICAgICAgICAgKiAgIC0gcGFzc2Rvd24gdGhlIGxhdGVzdCBndWVzdCBwYXNpZCBlbnRy
+eSBjb25maWcgdG8gaG9zdA0KPiA+ICsgICAgICAgICAqICAgICAod2lsbCBiZSBhZGRlZCBpbiBs
+YXRlciBwYXRjaCkNCj4gPiArICAgICAgICAgKi8NCj4gPiArICAgICAgICBpZiAoZG9tYWluX2lk
+ID09IHZ0ZF9wZV9nZXRfZG9tYWluX2lkKCZwZSkpIHsNCj4gPiArICAgICAgICAgICAgdnRkX2Zp
+bGxfaW5fcGVfY2FjaGUodnRkX3Bhc2lkX2FzLCAmcGUpOw0KPiA+ICsgICAgICAgIH0NCj4gPiAr
+ICAgIH0NCj4gDQo+IENvdWxkIHlvdSBleHBsYWluIHdoeSBkbyB3ZSBuZWVkIHRoaXMgd2hvbGUg
+Y2h1bmsgaWYgd2l0aCBbMl0gYWJvdmU/DQo+IEkgZmVlbCBsaWtlIHRoYXQnbGwgZG8gYWxsIHRo
+ZSB0aGluZ3Mgd2UgbmVlZCBhbHJlYWR5IChzZW5kDQo+IEJJTkQvVU5CSU5ELCB1cGRhdGUgcGFz
+aWQgZW50cnkgY2FjaGUpLg0KDQpZb3UgbWF5IHJlZmVyIHRvIHRoZSBjb21tZW50cyBhZGRlZCBm
+b3IgdGhpcyBmdW5jdGlvbiBpbiB0aGUgcGF0Y2gNCml0c2VsZi4gQWxzbywgSSdkIGxpa2UgdG8g
+dGFsayBtb3JlIHRvIGFzc2lzdCB5b3VyIHJldmlldy4gVGhlIGJhc2ljDQppZGVhIGlzIHRoYXQg
+dGhlIGFib3ZlIGNodW5rIFsyXSBvbmx5IGhhbmRsZXMgdGhlIGFscmVhZHkgY2FjaGVkDQpwYXNp
+ZC1lbnRyaWVzLiByaWdodD8gSXQgY292ZXJzIHRoZSBtb2RpZmljYXRpb25zIGZyb20gcHJlc2Vu
+dCBwYXNpZA0KZW50cnkgdG8gYmUgZWl0aGVyIG5vbi1wcmVzZW50IG9yIHByZXNlbnQgbW9kaWZp
+Y2F0aW9ucy4gV2hpbGUgZm9yIGENCm5vbi1wcmVzZW50IHBhc2lkIGVudHJ5IHRvIHByZXNlbnQg
+bW9kaWZpY2F0aW9uLCBjaHVuayBbMl0gaGFzIG5vIGlkZWEuDQpUbyBjb3ZlciBzdWNoIHBvc3Np
+YmlsaXRpZXMsIG5lZWRzIHRvIGxvb3AgYWxsIGRldmljZXMgYW5kIGNoZWNrIHRoZQ0KY29ycmVz
+cG9uZGluZyBwYXNpZCBlbnRyaWVzLiBUaGlzIGlzIHdoYXQgSSBwcm9wb3NlZCBpbiBSRkMgdjEu
+IEJ1dCBJDQpkb27igJl0IGxpa2UgaXQuIFRvIGJlIG1vcmUgZWZmaWNpZW50LCBJIHRoaW5rIHdl
+IGNhbiBqdXN0IGxvb3AgYWxsDQpwYXNzdGhydSBkZXZpY2VzIHNpbmNlIG9ubHkgcGFzc3RocnUg
+ZGV2aWNlcyBjYXJlIGFib3V0IHRoZQ0Kbm9uLXByZXNlbnQgdG8gcHJlc2VudCBjaGFuZ2VzLiBG
+b3IgZW11bGF0ZWQgZGV2aWNlcywgaXRzIHBhc2lkIGNhY2hlDQpjYW4gYmUgY3JlYXRlZCBpbiBk
+b190cmFuc2xhdGUoKSBmb3IgZW11bGF0ZWQgUEFTSUQgdGFnZ2VkIERNQXMuDQoNCj4gDQo+ID4g
+KyAgICB2dGRfaW9tbXVfdW5sb2NrKHMpOw0KPiA+ICAgICAgcmV0dXJuIDA7DQo+ID4gIH0NCj4g
+Pg0KPiA+ICsvKioNCj4gPiArICogQ2FsbGVyIG9mIHRoaXMgZnVuY3Rpb24gc2hvdWxkIGhvbGQg
+aW9tbXVfbG9jaw0KPiA+ICsgKi8NCj4gPiArc3RhdGljIHZvaWQgdnRkX3Bhc2lkX2NhY2hlX3Jl
+c2V0KEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiArew0KPiA+ICsgICAgVlREUEFTSURDYWNoZUlu
+Zm8gcGNfaW5mbzsNCj4gPiArDQo+ID4gKyAgICB0cmFjZV92dGRfcGFzaWRfY2FjaGVfcmVzZXQo
+KTsNCj4gPiArDQo+ID4gKyAgICBwY19pbmZvLmZsYWdzID0gMDsNCj4gDQo+IE1heWJlIGFsc28g
+aW50cm9kdWNlIGEgZmxhZyBmb3IgR0xPQkFMIGZsdXNoIHRvIGJlIGNsZWFyPw0KDQpXaWxsIGRv
+IGl0LiBUaGFua3MuDQoNCj4gPiArDQo+ID4gKyAgICAvKg0KPiA+ICsgICAgICogUmVzZXQgcGFz
+aWQgY2FjaGUgaXMgYSBiaWcgaGFtbWVyLCBzbyB1c2UgZ19oYXNoX3RhYmxlX2ZvcmVhY2hfcmVt
+b3ZlDQo+ID4gKyAgICAgKiB3aGljaCB3aWxsIGZyZWUgdGhlIHZ0ZF9wYXNpZF9hcyBpbnN0YW5j
+ZXMuDQo+ID4gKyAgICAgKi8NCj4gPiArICAgIGdfaGFzaF90YWJsZV9mb3JlYWNoX3JlbW92ZShz
+LT52dGRfcGFzaWRfYXMsIHZ0ZF9mbHVzaF9wYXNpZCwgJnBjX2luZm8pOw0KPiA+ICsgICAgcy0+
+cGFzaWRfY2FjaGVfZ2VuID0gMTsNCj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIGludCB2dGRf
+cGFzaWRfY2FjaGVfZ3NpKEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiAgew0KPiA+ICsgICAgdHJh
+Y2VfdnRkX3Bhc2lkX2NhY2hlX2dzaSgpOw0KPiA+ICsNCj4gPiArICAgIHZ0ZF9pb21tdV9sb2Nr
+KHMpOw0KPiA+ICsgICAgdnRkX3Bhc2lkX2NhY2hlX3Jlc2V0KHMpOw0KPiA+ICsgICAgdnRkX2lv
+bW11X3VubG9jayhzKTsNCj4gPiArDQo+ID4gKyAgICAvKg0KPiA+ICsgICAgICogVE9ETzogR2xv
+YmFsIFBBU0lEIGNhY2hlIGludmFsaWRhdGlvbiBtYXkgYmUNCj4gPiArICAgICAqIGlzc3VlZCB3
+cm9uZ2x5IGJ5IHByb2dyYW1tZXIsIHRvIGJlIHNhZmUsIGFmdGVyDQo+ID4gKyAgICAgKiBpbnZh
+bGlkYXRpbmcgdGhlIHBhc2lkIGNhY2hlcywgZW11bGF0b3IgbmVlZHMNCj4gPiArICAgICAqIHRv
+IHJlcGxheSB0aGUgcGFzaWQgYmluZGluZ3MgYnkgd2Fsa2luZyBndWVzdA0KPiA+ICsgICAgICog
+cGFzaWQgZGlyIGFuZCBwYXNpZCB0YWJsZS4NCj4gPiArICAgICAqLw0KPiA+ICAgICAgcmV0dXJu
+IDA7DQo+ID4gIH0NCj4gPg0KPiA+IEBAIC0zNjYwLDcgKzQwMTEsOSBAQCBWVERJT01NVUNvbnRl
+eHQNCj4gKnZ0ZF9maW5kX2FkZF9pYyhJbnRlbElPTU1VU3RhdGUgKnMsDQo+ID4gICAgICAgICAg
+dnRkX2Rldl9pYy0+ZGV2Zm4gPSAodWludDhfdClkZXZmbjsNCj4gPiAgICAgICAgICB2dGRfZGV2
+X2ljLT5pb21tdV9zdGF0ZSA9IHM7DQo+ID4gICAgICAgICAgaW9tbXVfY29udGV4dF9pbml0KCZ2
+dGRfZGV2X2ljLT5pb21tdV9jb250ZXh0KTsNCj4gPiArICAgICAgICBRTElTVF9JTlNFUlRfSEVB
+RCgmcy0+dnRkX2Rldl9pY19saXN0LCB2dGRfZGV2X2ljLCBuZXh0KTsNCj4gPiAgICAgIH0NCj4g
+PiArDQo+ID4gICAgICByZXR1cm4gdnRkX2Rldl9pYzsNCj4gPiAgfQ0KPiA+DQo+ID4gQEAgLTQw
+NzQsNiArNDQyNyw3IEBAIHN0YXRpYyB2b2lkIHZ0ZF9yZWFsaXplKERldmljZVN0YXRlICpkZXYs
+IEVycm9yICoqZXJycCkNCj4gPiAgICAgIH0NCj4gPg0KPiA+ICAgICAgUUxJU1RfSU5JVCgmcy0+
+dnRkX2FzX3dpdGhfbm90aWZpZXJzKTsNCj4gPiArICAgIFFMSVNUX0lOSVQoJnMtPnZ0ZF9kZXZf
+aWNfbGlzdCk7DQo+ID4gICAgICBxZW11X211dGV4X2luaXQoJnMtPmlvbW11X2xvY2spOw0KPiA+
+ICAgICAgbWVtc2V0KHMtPnZ0ZF9hc19ieV9idXNfbnVtLCAwLCBzaXplb2Yocy0+dnRkX2FzX2J5
+X2J1c19udW0pKTsNCj4gPiAgICAgIG1lbW9yeV9yZWdpb25faW5pdF9pbygmcy0+Y3NybWVtLCBP
+QkpFQ1QocyksICZ2dGRfbWVtX29wcywgcywNCj4gPiBAQCAtNDA5OSw2ICs0NDUzLDggQEAgc3Rh
+dGljIHZvaWQgdnRkX3JlYWxpemUoRGV2aWNlU3RhdGUgKmRldiwgRXJyb3IgKiplcnJwKQ0KPiA+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ19mcmVlLCBnX2ZyZWUpOw0K
+PiA+ICAgICAgcy0+dnRkX2FzX2J5X2J1c3B0ciA9IGdfaGFzaF90YWJsZV9uZXdfZnVsbCh2dGRf
+dWludDY0X2hhc2gsDQo+IHZ0ZF91aW50NjRfZXF1YWwsDQo+ID4gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnX2ZyZWUsIGdfZnJlZSk7DQo+ID4gKyAgICBz
+LT52dGRfcGFzaWRfYXMgPSBnX2hhc2hfdGFibGVfbmV3X2Z1bGwodnRkX3Bhc2lkX2FzX2tleV9o
+YXNoLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZ0ZF9wYXNpZF9h
+c19rZXlfZXF1YWwsIGdfZnJlZSwgZ19mcmVlKTsNCj4gPiAgICAgIHZ0ZF9pbml0KHMpOw0KPiA+
+ICAgICAgc3lzYnVzX21taW9fbWFwKFNZU19CVVNfREVWSUNFKHMpLCAwLCBRMzVfSE9TVF9CUklE
+R0VfSU9NTVVfQUREUik7DQo+ID4gICAgICBwY2lfc2V0dXBfaW9tbXUoYnVzLCAmdnRkX2lvbW11
+X29wcywgZGV2KTsNCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5h
+bC5oIGIvaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oDQo+ID4gaW5kZXggODc5MjExZS4u
+MTI4NzNlMSAxMDA2NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgN
+Cj4gPiArKysgYi9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiBAQCAtMzExLDYg
+KzMxMSw3IEBAIHR5cGVkZWYgZW51bSBWVERGYXVsdFJlYXNvbiB7DQo+ID4gICAgICBWVERfRlJf
+SVJfU0lEX0VSUiA9IDB4MjYsICAgLyogSW52YWxpZCBTb3VyY2UtSUQgKi8NCj4gPg0KPiA+ICAg
+ICAgVlREX0ZSX1BBU0lEX1RBQkxFX0lOViA9IDB4NTgsICAvKkludmFsaWQgUEFTSUQgdGFibGUg
+ZW50cnkgKi8NCj4gPiArICAgIFZURF9GUl9QQVNJRF9FTlRSWV9QID0gMHg1OSwgLyogVGhlIFBy
+ZXNlbnQoUCkgZmllbGQgb2YgcGFzaWR0LWVudHJ5IGlzIDAgKi8NCj4gPg0KPiA+ICAgICAgLyog
+VGhpcyBpcyBub3QgYSBub3JtYWwgZmF1bHQgcmVhc29uLiBXZSB1c2UgdGhpcyB0byBpbmRpY2F0
+ZSBzb21lIGZhdWx0cw0KPiA+ICAgICAgICogdGhhdCBhcmUgbm90IHJlZmVyZW5jZWQgYnkgdGhl
+IFZULWQgc3BlY2lmaWNhdGlvbi4NCj4gPiBAQCAtNDgyLDYgKzQ4MywxNSBAQCBzdHJ1Y3QgVlRE
+Um9vdEVudHJ5IHsNCj4gPiAgfTsNCj4gPiAgdHlwZWRlZiBzdHJ1Y3QgVlREUm9vdEVudHJ5IFZU
+RFJvb3RFbnRyeTsNCj4gPg0KPiA+ICtzdHJ1Y3QgVlREUEFTSURDYWNoZUluZm8gew0KPiA+ICsj
+ZGVmaW5lIFZURF9QQVNJRF9DQUNIRV9ET01TSSAgICgxVUxMIDw8IDApOw0KPiA+ICsjZGVmaW5l
+IFZURF9QQVNJRF9DQUNIRV9QQVNJRFNJICgxVUxMIDw8IDEpOw0KPiA+ICsgICAgdWludDMyX3Qg
+ZmxhZ3M7DQo+ID4gKyAgICB1aW50MTZfdCBkb21haW5faWQ7DQo+ID4gKyAgICB1aW50MzJfdCBw
+YXNpZDsNCj4gPiArfTsNCj4gPiArdHlwZWRlZiBzdHJ1Y3QgVlREUEFTSURDYWNoZUluZm8gVlRE
+UEFTSURDYWNoZUluZm87DQo+ID4gKw0KPiA+ICAvKiBNYXNrcyBmb3Igc3RydWN0IFZURFJvb3RF
+bnRyeSAqLw0KPiA+ICAjZGVmaW5lIFZURF9ST09UX0VOVFJZX1AgICAgICAgICAgICAxVUxMDQo+
+ID4gICNkZWZpbmUgVlREX1JPT1RfRU5UUllfQ1RQICAgICAgICAgICh+MHhmZmZVTEwpDQo+ID4g
+ZGlmZiAtLWdpdCBhL2h3L2kzODYvdHJhY2UtZXZlbnRzIGIvaHcvaTM4Ni90cmFjZS1ldmVudHMN
+Cj4gPiBpbmRleCA2ZGE4YmQyLi43OTEyYWUxIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvdHJh
+Y2UtZXZlbnRzDQo+ID4gKysrIGIvaHcvaTM4Ni90cmFjZS1ldmVudHMNCj4gPiBAQCAtMjIsNiAr
+MjIsNyBAQCB2dGRfaW52X3FpX2hlYWQodWludDE2X3QgaGVhZCkgInJlYWQgaGVhZCAlZCINCj4g
+PiAgdnRkX2ludl9xaV90YWlsKHVpbnQxNl90IGhlYWQpICJ3cml0ZSB0YWlsICVkIg0KPiA+ICB2
+dGRfaW52X3FpX2ZldGNoKHZvaWQpICIiDQo+ID4gIHZ0ZF9jb250ZXh0X2NhY2hlX3Jlc2V0KHZv
+aWQpICIiDQo+ID4gK3Z0ZF9wYXNpZF9jYWNoZV9yZXNldCh2b2lkKSAiIg0KPiA+ICB2dGRfcGFz
+aWRfY2FjaGVfZ3NpKHZvaWQpICIiDQo+ID4gIHZ0ZF9wYXNpZF9jYWNoZV9kc2kodWludDE2X3Qg
+ZG9tYWluKSAiRG9taWFuIHNsZWN0aXZlIFBDIGludmFsaWRhdGlvbiBkb21haW4NCj4gMHglIlBS
+SXgxNg0KPiA+ICB2dGRfcGFzaWRfY2FjaGVfcHNpKHVpbnQxNl90IGRvbWFpbiwgdWludDMyX3Qg
+cGFzaWQpICJQQVNJRCBzbGVjdGl2ZSBQQw0KPiBpbnZhbGlkYXRpb24gZG9tYWluIDB4JSJQUkl4
+MTYiIHBhc2lkIDB4JSJQUkl4MzINCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9ody9pMzg2L2lu
+dGVsX2lvbW11LmggYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+IGluZGV4IDBk
+NDk0ODAuLmQ2OTNmNzEgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS9ody9pMzg2L2ludGVsX2lv
+bW11LmgNCj4gPiArKysgYi9pbmNsdWRlL2h3L2kzODYvaW50ZWxfaW9tbXUuaA0KPiA+IEBAIC02
+OSw2ICs2OSw4IEBAIHR5cGVkZWYgdW5pb24gVlREX0lSX01TSUFkZHJlc3MgVlREX0lSX01TSUFk
+ZHJlc3M7DQo+ID4gIHR5cGVkZWYgc3RydWN0IFZURFBBU0lERGlyRW50cnkgVlREUEFTSUREaXJF
+bnRyeTsNCj4gPiAgdHlwZWRlZiBzdHJ1Y3QgVlREUEFTSURFbnRyeSBWVERQQVNJREVudHJ5Ow0K
+PiA+ICB0eXBlZGVmIHN0cnVjdCBWVERJT01NVUNvbnRleHQgVlRESU9NTVVDb250ZXh0Ow0KPiA+
+ICt0eXBlZGVmIHN0cnVjdCBWVERQQVNJRENhY2hlRW50cnkgVlREUEFTSURDYWNoZUVudHJ5Ow0K
+PiA+ICt0eXBlZGVmIHN0cnVjdCBWVERQQVNJREFkZHJlc3NTcGFjZSBWVERQQVNJREFkZHJlc3NT
+cGFjZTsNCj4gPg0KPiA+ICAvKiBDb250ZXh0LUVudHJ5ICovDQo+ID4gIHN0cnVjdCBWVERDb250
+ZXh0RW50cnkgew0KPiA+IEBAIC0xMDEsNiArMTAzLDMxIEBAIHN0cnVjdCBWVERQQVNJREVudHJ5
+IHsNCj4gPiAgICAgIHVpbnQ2NF90IHZhbFs4XTsNCj4gPiAgfTsNCj4gPg0KPiA+ICtzdHJ1Y3Qg
+cGFzaWRfa2V5IHsNCj4gPiArICAgIHVpbnQzMl90IHBhc2lkOw0KPiA+ICsgICAgdWludDE2X3Qg
+c2lkOw0KPiA+ICt9Ow0KPiA+ICsNCj4gPiArc3RydWN0IFZURFBBU0lEQ2FjaGVFbnRyeSB7DQo+
+ID4gKyAgICAvKg0KPiA+ICsgICAgICogVGhlIGNhY2hlIGVudHJ5IGlzIG9ic29sZXRlIGlmDQo+
+ID4gKyAgICAgKiBwYXNpZF9jYWNoZV9nZW4hPUludGVsSU9NTVVTdGF0ZS5wYXNpZF9jYWNoZV9n
+ZW4NCj4gPiArICAgICAqLw0KPiA+ICsgICAgdWludDMyX3QgcGFzaWRfY2FjaGVfZ2VuOw0KPiA+
+ICsgICAgc3RydWN0IFZURFBBU0lERW50cnkgcGFzaWRfZW50cnk7DQo+ID4gK307DQo+ID4gKw0K
+PiA+ICtzdHJ1Y3QgVlREUEFTSURBZGRyZXNzU3BhY2Ugew0KPiA+ICsgICAgVlREQnVzICp2dGRf
+YnVzOw0KPiA+ICsgICAgdWludDhfdCBkZXZmbjsNCj4gPiArICAgIEFkZHJlc3NTcGFjZSBhczsN
+Cj4gPiArICAgIHVpbnQzMl90IHBhc2lkOw0KPiA+ICsgICAgSW50ZWxJT01NVVN0YXRlICppb21t
+dV9zdGF0ZTsNCj4gPiArICAgIFZURENvbnRleHRDYWNoZUVudHJ5IGNvbnRleHRfY2FjaGVfZW50
+cnk7DQo+ID4gKyAgICBRTElTVF9FTlRSWShWVERQQVNJREFkZHJlc3NTcGFjZSkgbmV4dDsNCj4g
+PiArICAgIFZURFBBU0lEQ2FjaGVFbnRyeSBwYXNpZF9jYWNoZV9lbnRyeTsNCj4gPiArfTsNCj4g
+PiArDQo+ID4gIHN0cnVjdCBWVERBZGRyZXNzU3BhY2Ugew0KPiA+ICAgICAgUENJQnVzICpidXM7
+DQo+ID4gICAgICB1aW50OF90IGRldmZuOw0KPiA+IEBAIC0xMjEsNiArMTQ4LDcgQEAgc3RydWN0
+IFZURElPTU1VQ29udGV4dCB7DQo+ID4gICAgICBWVERCdXMgKnZ0ZF9idXM7DQo+ID4gICAgICB1
+aW50OF90IGRldmZuOw0KPiA+ICAgICAgSU9NTVVDb250ZXh0IGlvbW11X2NvbnRleHQ7DQo+ID4g
+KyAgICBRTElTVF9FTlRSWShWVERJT01NVUNvbnRleHQpIG5leHQ7DQo+ID4gICAgICBJbnRlbElP
+TU1VU3RhdGUgKmlvbW11X3N0YXRlOw0KPiA+ICB9Ow0KPiA+DQo+ID4gQEAgLTI2OSw5ICsyOTcs
+MTQgQEAgc3RydWN0IEludGVsSU9NTVVTdGF0ZSB7DQo+ID4NCj4gPiAgICAgIEdIYXNoVGFibGUg
+KnZ0ZF9hc19ieV9idXNwdHI7ICAgLyogVlREQnVzIG9iamVjdHMgaW5kZXhlZCBieSBQQ0lCdXMq
+DQo+IHJlZmVyZW5jZSAqLw0KPiA+ICAgICAgVlREQnVzICp2dGRfYXNfYnlfYnVzX251bVtWVERf
+UENJX0JVU19NQVhdOyAvKiBWVERCdXMgb2JqZWN0cyBpbmRleGVkDQo+IGJ5IGJ1cyBudW1iZXIg
+Ki8NCj4gPiArICAgIEdIYXNoVGFibGUgKnZ0ZF9wYXNpZF9hczsgICAvKiBWVERQQVNJREFkZHJl
+c3NTcGFjZSBvYmplY3RzICovDQo+ID4gKyAgICB1aW50MzJfdCBwYXNpZF9jYWNoZV9nZW47ICAg
+LyogU2hvdWxkIGJlIGluIFsxLE1BWF0gKi8NCj4gPiAgICAgIC8qIGxpc3Qgb2YgcmVnaXN0ZXJl
+ZCBub3RpZmllcnMgKi8NCj4gPiAgICAgIFFMSVNUX0hFQUQoLCBWVERBZGRyZXNzU3BhY2UpIHZ0
+ZF9hc193aXRoX25vdGlmaWVyczsNCj4gPg0KPiA+ICsgICAgLyogbGlzdCBvZiByZWdpc3RlcmVk
+IG5vdGlmaWVycyAqLw0KPiA+ICsgICAgUUxJU1RfSEVBRCgsIFZURElPTU1VQ29udGV4dCkgdnRk
+X2Rldl9pY19saXN0Ow0KPiA+ICsNCj4gPiAgICAgIC8qIGludGVycnVwdCByZW1hcHBpbmcgKi8N
+Cj4gPiAgICAgIGJvb2wgaW50cl9lbmFibGVkOyAgICAgICAgICAgICAgLyogV2hldGhlciBndWVz
+dCBlbmFibGVkIElSICovDQo+ID4gICAgICBkbWFfYWRkcl90IGludHJfcm9vdDsgICAgICAgICAg
+IC8qIEludGVycnVwdCByZW1hcHBpbmcgdGFibGUgcG9pbnRlciAqLw0KPiA+IEBAIC0yODgsNyAr
+MzIxLDggQEAgc3RydWN0IEludGVsSU9NTVVTdGF0ZSB7DQo+ID4NCj4gPiAgICAgIC8qDQo+ID4g
+ICAgICAgKiBQcm90ZWN0cyBJT01NVSBzdGF0ZXMgaW4gZ2VuZXJhbC4gIEN1cnJlbnRseSBpdCBw
+cm90ZWN0cyB0aGUNCj4gPiAtICAgICAqIHBlci1JT01NVSBJT1RMQiBjYWNoZSwgYW5kIGNvbnRl
+eHQgZW50cnkgY2FjaGUgaW4gVlREQWRkcmVzc1NwYWNlLg0KPiA+ICsgICAgICogcGVyLUlPTU1V
+IElPVExCIGNhY2hlLCBhbmQgY29udGV4dCBlbnRyeSBjYWNoZSBpbiBWVERBZGRyZXNzU3BhY2Us
+DQo+ID4gKyAgICAgKiBhbmQgcGFzaWQgY2FjaGUgaW4gVlREUEFTSURBZGRyZXNzU3BhY2UuDQo+
+ID4gICAgICAgKi8NCj4gPiAgICAgIFFlbXVNdXRleCBpb21tdV9sb2NrOw0KPiA+ICB9Ow0KPiA+
+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiANCj4gLS0NCj4gUGV0ZXIgWHUNCg0KVGhhbmtzLA0KWWkg
+TGl1DQo=
