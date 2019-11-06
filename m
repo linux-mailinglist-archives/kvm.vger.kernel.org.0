@@ -2,140 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B077F157C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 12:56:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EB7EF15E6
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 13:15:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729847AbfKFL4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 06:56:04 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:40140 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfKFL4D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 06:56:03 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6BsJOu050056;
-        Wed, 6 Nov 2019 11:55:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
- bh=ITh4bqD9xE5YeUegJCsH0m9UXI6eEn2CS5ZImoYu/nk=;
- b=eKPgNEYLBCRGh1Pax3oS6cIJQHd5BE6cCoIie94e2RzspGhfduHmCKVrIGdWJ1CnVZ7O
- 2vnFPgOVNuJXhZ1hwynUHMZbzzdbuNrTTBuZHwK1xMzJB7DyOAsoyVRi79Vl6heh6AD4
- PVDPj25M9Vb23d80Ah9JIJYVc+xu5BEsvh9VPSwwkkZg2VRm85XY/L+dg5fVmoi9Idx9
- loyZVrJcHsP+7LjxMMcfsPv+ZYmJDctwQGUf4XPeO63deomVN/kIVSwjFjjK3J7/XXKj
- 3QIW2+oIfSjZuscvP3Wi38JJz6NS5XHp2A/8ZLzs8wo1MdYUzN+iAbnIkjPswuYprsEH 4w== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2w11rq5m73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 11:55:51 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6Btgxv061288;
-        Wed, 6 Nov 2019 11:55:51 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2w3vr25smd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 11:55:51 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA6BtnVQ027585;
-        Wed, 6 Nov 2019 11:55:49 GMT
-Received: from z2.cn.oracle.com (/10.182.71.218)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Nov 2019 03:55:48 -0800
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        rafael.j.wysocki@intel.com, joao.m.martins@oracle.com,
-        mtosatti@redhat.com, kvm@vger.kernel.org, linux-pm@vger.kernel.org,
-        Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Subject: [PATCH RESEND v2 4/4] KVM: ensure vCPU halt_poll_us in right scope
-Date:   Wed,  6 Nov 2019 19:55:02 +0800
-Message-Id: <1573041302-4904-5-git-send-email-zhenzhong.duan@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1573041302-4904-1-git-send-email-zhenzhong.duan@oracle.com>
-References: <1573041302-4904-1-git-send-email-zhenzhong.duan@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=990
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911060119
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911060119
+        id S1730103AbfKFMPG convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 6 Nov 2019 07:15:06 -0500
+Received: from mga04.intel.com ([192.55.52.120]:50828 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727391AbfKFMPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 07:15:06 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 04:15:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; 
+   d="scan'208";a="214226967"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by orsmga002.jf.intel.com with ESMTP; 06 Nov 2019 04:15:03 -0800
+Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:15:03 -0800
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:14:55 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.248]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 20:14:50 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: RE: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Thread-Topic: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Thread-Index: AQHVimsw6XlsA5+cTkCxXGelXmRQYKdxCjoAgA0JSAA=
+Date:   Wed, 6 Nov 2019 12:14:50 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF2CE@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
+ <20191029121544.GS3552@umbus.metropole.lan>
+In-Reply-To: <20191029121544.GS3552@umbus.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDk5OWNhMzAtNjA3Mi00Y2U4LWE3NWItNTU5NDM1MWMyYmRmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib3d1cEpFa1NObE9rU0JQMHdXcm1lNDhDeE94VW5QMXY2ZkdGaVlDaTBrVHZMdXNcL3p2NnNBSWREYVJhK1d2T3MifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As user can adjust halt_poll_ns_grow_start and halt_poll_ns which
-leads to vcpu->halt_poll_ns beyond the two boundaries. This patch
-ensures vcpu->halt_poll_ns in that scope after growing or shrinking.
+> From: David Gibson [mailto:david@gibson.dropbear.id.au]
+> Sent: Tuesday, October 29, 2019 8:16 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid alloc/free
+> 
+> On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
+> > This patch adds pasid alloc/free notifiers for vfio-pci. It is
+> > supposed to be fired by vIOMMU. VFIO then sends PASID allocation
+> > or free request to host.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/vfio/common.c         |  9 ++++++
+> >  hw/vfio/pci.c            | 81
+> ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/iommu/iommu.h | 15 +++++++++
+> >  3 files changed, 105 insertions(+)
+> >
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index d418527..e6ad21c 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >      if (QLIST_EMPTY(&container->group_list)) {
+> >          VFIOAddressSpace *space = container->space;
+> >          VFIOGuestIOMMU *giommu, *tmp;
+> > +        VFIOIOMMUContext *giommu_ctx, *ctx;
+> >
+> >          QLIST_REMOVE(container, next);
+> >
+> > @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >              g_free(giommu);
+> >          }
+> >
+> > +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
+> > +                                                   iommu_ctx_next, ctx) {
+> > +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
+> > +                                                      &giommu_ctx->n);
+> > +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
+> > +            g_free(giommu_ctx);
+> > +        }
+> > +
+> >          trace_vfio_disconnect_container(container->fd);
+> >          close(container->fd);
+> >          g_free(container);
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 12fac39..8721ff6 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2699,11 +2699,80 @@ static void
+> vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> >      vdev->req_enabled = false;
+> >  }
+> >
+> > +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
+> > +                                             IOMMUContext *iommu_ctx,
+> > +                                             IOMMUCTXNotifyFn fn,
+> > +                                             IOMMUCTXEvent event)
+> > +{
+> > +    VFIOContainer *container = vdev->vbasedev.group->container;
+> > +    VFIOIOMMUContext *giommu_ctx;
+> > +
+> > +    giommu_ctx = g_malloc0(sizeof(*giommu_ctx));
+> > +    giommu_ctx->container = container;
+> > +    giommu_ctx->iommu_ctx = iommu_ctx;
+> > +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
+> > +                      giommu_ctx,
+> > +                      iommu_ctx_next);
+> > +    iommu_ctx_notifier_register(iommu_ctx,
+> > +                                &giommu_ctx->n,
+> > +                                fn,
+> > +                                event);
+> > +}
+> > +
+> > +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
+> > +                                          IOMMUCTXEventData *event_data)
+> > +{
+> > +    VFIOIOMMUContext *giommu_ctx = container_of(n, VFIOIOMMUContext, n);
+> > +    VFIOContainer *container = giommu_ctx->container;
+> > +    IOMMUCTXPASIDReqDesc *pasid_req =
+> > +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int pasid;
+> > +
+> > +    argsz = sizeof(req);
+> > +    req.argsz = argsz;
+> > +    req.flag = VFIO_IOMMU_PASID_ALLOC;
+> > +    req.min_pasid = pasid_req->min_pasid;
+> > +    req.max_pasid = pasid_req->max_pasid;
+> > +
+> > +    pasid = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (pasid < 0) {
+> > +        error_report("%s: %d, alloc failed", __func__, -errno);
+> > +    }
+> > +    pasid_req->alloc_result = pasid;
+> 
+> Altering the event data from the notifier doesn't make sense.  By
+> definition there can be multiple notifiers on the chain, so in that
+> case which one is responsible for updating the writable field?
 
-If halt_poll_ns_shrink is 0, shrink vcpu->halt_poll_ns to
-halt_poll_ns_grow_start instead of 0. To disable poll we can set
-halt_poll_ns to 0.
+I guess you mean multiple pasid_alloc nofitiers. right?
 
-In case user wrongly set halt_poll_ns_grow_start > halt_poll_ns > 0,
-halt_poll_ns take precedency and poll time is a fixed value of
-halt_poll_ns.
+It works for VT-d now, as Intel vIOMMU maintains the IOMMUContext
+per-bdf. And there will be only 1 pasid_alloc notifier in the chain. But, I
+agree it is not good if other module just share an IOMMUConext across
+devices. Definitely, it would have multiple pasid_alloc notifiers.
 
-This patch also simplifies branch check based on the guest haltpoll
-code.
+How about enforcing IOMMUContext layer to only invoke one successful
+pasid_alloc/free notifier if PASID_ALLOC/FREE event comes? pasid
+alloc/free are really special as it requires feedback. And a potential
+benefit is that the pasid_alloc/free will not be affected by hot plug
+scenario. There will be always a notifier to work for pasid_alloc/free
+work unless all passthru devices are hot plugged. How do you think? Or
+if any other idea?
 
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
----
- virt/kvm/kvm_main.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+> > +}
+> > +
+> > +static void vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
+> > +                                          IOMMUCTXEventData *event_data)
+> > +{
+> > +    VFIOIOMMUContext *giommu_ctx = container_of(n, VFIOIOMMUContext, n);
+> > +    VFIOContainer *container = giommu_ctx->container;
+> > +    IOMMUCTXPASIDReqDesc *pasid_req =
+> > +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int ret = 0;
+> > +
+> > +    argsz = sizeof(req);
+> > +    req.argsz = argsz;
+> > +    req.flag = VFIO_IOMMU_PASID_FREE;
+> > +    req.pasid = pasid_req->pasid;
+> > +
+> > +    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (ret != 0) {
+> > +        error_report("%s: %d, pasid %u free failed",
+> > +                   __func__, -errno, (unsigned) pasid_req->pasid);
+> > +    }
+> > +    pasid_req->free_result = ret;
+> 
+> Same problem here.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 359516b..b4fca66 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2308,9 +2308,15 @@ static void shrink_halt_poll_ns(struct kvm_vcpu *vcpu)
- 	old = val = vcpu->halt_poll_ns;
- 	shrink = READ_ONCE(halt_poll_ns_shrink);
- 	if (shrink == 0)
--		val = 0;
--	else
-+		val = halt_poll_ns_grow_start;
-+	else {
- 		val /= shrink;
-+		if (val < halt_poll_ns_grow_start)
-+			val = halt_poll_ns_grow_start;
-+	}
-+
-+	if (val > halt_poll_ns)
-+		val = halt_poll_ns;
- 
- 	vcpu->halt_poll_ns = val;
- 	trace_kvm_halt_poll_ns_shrink(vcpu->vcpu_id, val, old);
-@@ -2385,21 +2391,12 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
- 	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
- 
- 	if (!kvm_arch_no_poll(vcpu)) {
--		if (!vcpu_valid_wakeup(vcpu)) {
-+		/* we had a long block, shrink polling */
-+		if (!vcpu_valid_wakeup(vcpu) || block_ns > halt_poll_ns)
- 			shrink_halt_poll_ns(vcpu);
--		} else if (halt_poll_ns) {
--			if (block_ns <= vcpu->halt_poll_ns)
--				;
--			/* we had a long block, shrink polling */
--			else if (vcpu->halt_poll_ns && block_ns > halt_poll_ns)
--				shrink_halt_poll_ns(vcpu);
--			/* we had a short halt and our poll time is too small */
--			else if (vcpu->halt_poll_ns < halt_poll_ns &&
--				block_ns < halt_poll_ns)
--				grow_halt_poll_ns(vcpu);
--		} else {
--			vcpu->halt_poll_ns = 0;
--		}
-+		/* we had a short block and our poll time is too small */
-+		else if (block_ns > vcpu->halt_poll_ns)
-+			grow_halt_poll_ns(vcpu);
- 	}
- 
- 	trace_kvm_vcpu_wakeup(block_ns, waited, vcpu_valid_wakeup(vcpu));
--- 
-1.8.3.1
+yep, as above proposal.
+
+> > +}
+> > +
+> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  {
+> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+> >      VFIODevice *vbasedev_iter;
+> >      VFIOGroup *group;
+> > +    IOMMUContext *iommu_context;
+> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+> >      Error *err = NULL;
+> >      ssize_t len;
+> > @@ -3000,6 +3069,18 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >      vfio_register_req_notifier(vdev);
+> >      vfio_setup_resetfn_quirk(vdev);
+> >
+> > +    iommu_context = pci_device_iommu_context(pdev);
+> > +    if (iommu_context) {
+> > +        vfio_register_iommu_ctx_notifier(vdev,
+> > +                                         iommu_context,
+> > +                                         vfio_iommu_pasid_alloc_notify,
+> > +                                         IOMMU_CTX_EVENT_PASID_ALLOC);
+> > +        vfio_register_iommu_ctx_notifier(vdev,
+> > +                                         iommu_context,
+> > +                                         vfio_iommu_pasid_free_notify,
+> > +                                         IOMMU_CTX_EVENT_PASID_FREE);
+> > +    }
+> > +
+> >      return;
+> >
+> >  out_teardown:
+> > diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
+> > index c22c442..4352afd 100644
+> > --- a/include/hw/iommu/iommu.h
+> > +++ b/include/hw/iommu/iommu.h
+> > @@ -31,10 +31,25 @@
+> >  typedef struct IOMMUContext IOMMUContext;
+> >
+> >  enum IOMMUCTXEvent {
+> > +    IOMMU_CTX_EVENT_PASID_ALLOC,
+> > +    IOMMU_CTX_EVENT_PASID_FREE,
+> >      IOMMU_CTX_EVENT_NUM,
+> >  };
+> >  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
+> >
+> > +union IOMMUCTXPASIDReqDesc {
+> > +    struct {
+> > +        uint32_t min_pasid;
+> > +        uint32_t max_pasid;
+> > +        int32_t alloc_result; /* pasid allocated for the alloc request */
+> > +    };
+> > +    struct {
+> > +        uint32_t pasid; /* pasid to be free */
+> > +        int free_result;
+> > +    };
+> > +};
+> 
+> Apart from theproblem with writable fields, using a big union for
+> event data is pretty ugly.  If you need this different information for
+> the different events, it might make more sense to have a separate
+> notifier chain with a separate call interface for each event type,
+> rather than trying to multiplex them together.
+
+sure, I'll de-couple them. Nice catch.
+
+Thanks,
+Yi Liu
 
