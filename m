@@ -2,112 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36961F20D5
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 22:30:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3322F2124
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 22:55:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732107AbfKFVaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 16:30:35 -0500
-Received: from mga06.intel.com ([134.134.136.31]:14326 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726779AbfKFVaf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 16:30:35 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 13:30:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,275,1569308400"; 
-   d="scan'208";a="212860856"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 06 Nov 2019 13:30:33 -0800
-Date:   Wed, 6 Nov 2019 13:30:32 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        id S1727186AbfKFVz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 16:55:27 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:55850 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726779AbfKFVz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 16:55:27 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6Ln1cH021513;
+        Wed, 6 Nov 2019 21:54:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=vIL2tbRV1GqHfQf+9syRO8Bt6EoOv6KdSH/7zyet7Iw=;
+ b=JSTw5pcSpLy3yebcEHKt+X2IJPvW25osHzm6/Gwmq5dg+fVsgDkvylW+tqZh1hwfXuvO
+ zBXkmsG3zph24DQxuX9D5q8uGCg6z9gB3KLY6x9mbgn9r7X9HbzNIDtPz+UpgflLwddf
+ E6bcZKeNXIchnTjzaaZb2Lx9NzMdVw7JhUDVM/6a4onWPdbqMMT6oB2+gpAAxoi3LgK0
+ 8zwJMw2qLAmBhcmLzDmwgcmHQ7zfWhnTo5Eje35lTSMXHApV5g5UaCf6XA96iKL4GGI2
+ TqC+Bqs7d6cdL1WekOfqcouvRKKx5ZHVrHNkgxxjugUp01831HwjHyc06tAzgrsF2BXf bQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2w41w11y7j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 21:54:20 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6Ln8X6018397;
+        Wed, 6 Nov 2019 21:54:19 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2w41wen7e0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Nov 2019 21:54:19 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA6LsGKI023701;
+        Wed, 6 Nov 2019 21:54:16 GMT
+Received: from [192.168.1.67] (/94.61.1.144)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 06 Nov 2019 13:54:16 -0800
+Subject: Re: [PATCH v1 2/3] KVM: VMX: Do not change PID.NDST when loading a
+ blocked vCPU
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Adam Borowski <kilobyte@angband.pl>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
- reserved
-Message-ID: <20191106213032.GA20475@linux.intel.com>
-References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
- <20191106170727.14457-2-sean.j.christopherson@intel.com>
- <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
- <1cf71906-ba99-e637-650f-fc08ac4f3d5f@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+References: <20191106175602.4515-1-joao.m.martins@oracle.com>
+ <20191106175602.4515-3-joao.m.martins@oracle.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <f66d3738-c015-3abe-c912-47d0c0d8deaa@oracle.com>
+Date:   Wed, 6 Nov 2019 21:54:11 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1cf71906-ba99-e637-650f-fc08ac4f3d5f@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191106175602.4515-3-joao.m.martins@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911060211
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911060211
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 10:09:29PM +0100, Paolo Bonzini wrote:
-> On 06/11/19 19:04, Dan Williams wrote:
-> > On Wed, Nov 6, 2019 at 9:07 AM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > This is racy unless you can be certain that the pfn and resulting page
-> > has already been pinned by get_user_pages().
+On 11/6/19 5:56 PM, Joao Martins wrote:
+> When vCPU enters block phase, pi_pre_block() inserts vCPU to a per pCPU
+> linked list of all vCPUs that are blocked on this pCPU. Afterwards, it
+> changes PID.NV to POSTED_INTR_WAKEUP_VECTOR which its handler
+> (wakeup_handler()) is responsible to kick (unblock) any vCPU on that
+> linked list that now has pending posted interrupts.
 > 
-> What is the race exactly?
-
-The check in kvm_get_pfn() is guaranteed to be racy, but that's already
-broken with respect to ZONE_DEVICE.
- 
-> In general KVM does not use pfn's until after having gotten them from
-> get_user_pages (or follow_pfn for VM_IO | VM_PFNMAP vmas, for which
-> get_user_pages fails, but this is not an issue here).  It then creates
-> the page tables and releases the reference to the struct page.
+> While vCPU is blocked (in kvm_vcpu_block()), it may be preempted which
+> will cause vmx_vcpu_pi_put() to set PID.SN.  If later the vCPU will be
+> scheduled to run on a different pCPU, vmx_vcpu_pi_load() will clear
+> PID.SN but will also *overwrite PID.NDST to this different pCPU*.
+> Instead of keeping it with original pCPU which vCPU had entered block
+> phase on.
 > 
-> Anything else happens _after_ the reference has been released, but still
-> from an mmu notifier; this is why KVM uses pfn_to_page quite pervasively.
+> This results in an issue because when a posted interrupt is delivered,
+> the wakeup_handler() will be executed and fail to find blocked vCPU on
+> its per pCPU linked list of all vCPUs that are blocked on this pCPU.
+> Which is due to the vCPU being placed on a *different* per pCPU
+> linked list than the original pCPU that it had entered block phase.
 > 
-> If this is enough to avoid races, then I prefer Sean's patch.  If it is
-> racy, we need to fix kvm_set_pfn_accessed and kvm_set_pfn_dirty first,
-> and second at transparent_hugepage_adjust and kvm_mmu_zap_collapsible_spte:
-
-transparent_hugepage_adjust() would be ok, it's called before the original
-reference is put back.
-
-> - if accessed/dirty state need not be tracked properly for ZONE_DEVICE,
-> then I suppose David's patch is okay (though I'd like to have a big
-> comment explaining all the things that went on in these emails).  If
-> they need to work, however, Sean's patch 1 is the right thing to do.
+> The regression is introduced by commit c112b5f50232 ("KVM: x86:
+> Recompute PID.ON when clearing PID.SN"). Therefore, partially revert
+> it and reintroduce the condition in vmx_vcpu_pi_load() responsible for
+> avoiding changing PID.NDST when loading a blocked vCPU.
 > 
-> - if we need Sean's patch 1, but it is racy to use is_zone_device_page,
-> we could first introduce a helper similar to kvm_is_hugepage_allowed()
-> from his patch 2, but using pfn_to_online_page() to filter out
-> ZONE_DEVICE pages.  This would cover both transparent_hugepage_adjust
-> and kvm_mmu_zap_collapsible_spte.
+> Fixes: c112b5f50232 ("KVM: x86: Recompute PID.ON when clearing PID.SN")
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 
-After more thought, I agree with Paolo that adding kvm_is_zone_device_pfn()
-is preferably if blocking with mmu_notifier is sufficient to avoid races.
-The only caller that isn't protected by mmu_notifier (or holding a gup()-
-obtained referece) is kvm_get_pfn(), but again, that's completely borked
-anyways.   Adding a WARN_ON(page_count()) in kvm_is_zone_device_pfn() would
-help with the auditing issue.
+Sorry, I missed a Tb tag:
 
-The scope of the changes required to completely avoid is_zone_device_page()
-is massive, and probably would result in additional trickery :-(
+	Tested-by: Nathan Ni <nathan.ni@oracle.com>
 
-> > This is why I told David
-> > to steer clear of adding more is_zone_device_page() usage, it's
-> > difficult to audit. Without an existing pin the metadata to determine
-> > whether a page is ZONE_DEVICE or not could be in the process of being
-> > torn down. Ideally KVM would pass around a struct { struct page *page,
-> > unsigned long pfn } tuple so it would not have to do this "recall
-> > context" dance on every pfn operation.
+I can resend it, if preferred.
+
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
+>  arch/x86/kvm/vmx/vmx.h |  6 ++++++
+>  2 files changed, 20 insertions(+)
 > 
-> Unfortunately once KVM has created its own page tables, the struct page*
-> reference is lost, as the PFN is the only thing that is stored in there.
-
-Ya, the horrible idea I had in mind was to steal a bit from KVM_PFN_ERR_MASK
-to track whether or not the PFN is associated with a struct page.
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 18b0bee662a5..75d903455e1c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1274,6 +1274,18 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (!pi_test_sn(pi_desc) && vcpu->cpu == cpu)
+>  		return;
+>  
+> +	/*
+> +	 * If the 'nv' field is POSTED_INTR_WAKEUP_VECTOR, do not change
+> +	 * PI.NDST: pi_post_block is the one expected to change PID.NDST and the
+> +	 * wakeup handler expects the vCPU to be on the blocked_vcpu_list that
+> +	 * matches PI.NDST. Otherwise, a vcpu may not be able to be woken up
+> +	 * correctly.
+> +	 */
+> +	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR || vcpu->cpu == cpu) {
+> +		pi_clear_sn(pi_desc);
+> +		goto after_clear_sn;
+> +	}
+> +
+>  	/* The full case.  */
+>  	do {
+>  		old.control = new.control = pi_desc->control;
+> @@ -1289,6 +1301,8 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  	} while (cmpxchg64(&pi_desc->control, old.control,
+>  			   new.control) != old.control);
+>  
+> +after_clear_sn:
+> +
+>  	/*
+>  	 * Clear SN before reading the bitmap.  The VT-d firmware
+>  	 * writes the bitmap and reads SN atomically (5.2.3 in the
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index bee16687dc0b..1e32ab54fc2d 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -373,6 +373,12 @@ static inline void pi_clear_on(struct pi_desc *pi_desc)
+>  		(unsigned long *)&pi_desc->control);
+>  }
+>  
+> +static inline void pi_clear_sn(struct pi_desc *pi_desc)
+> +{
+> +	clear_bit(POSTED_INTR_SN,
+> +		(unsigned long *)&pi_desc->control);
+> +}
+> +
+>  static inline int pi_test_on(struct pi_desc *pi_desc)
+>  {
+>  	return test_bit(POSTED_INTR_ON,
+> 
