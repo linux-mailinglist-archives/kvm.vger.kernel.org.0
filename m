@@ -2,140 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F4EEF1095
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 08:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81B99F108B
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 08:43:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731348AbfKFHoz convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 6 Nov 2019 02:44:55 -0500
-Received: from mga04.intel.com ([192.55.52.120]:30171 "EHLO mga04.intel.com"
+        id S1731068AbfKFHmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 02:42:42 -0500
+Received: from mga06.intel.com ([134.134.136.31]:15128 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731147AbfKFHoz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 02:44:55 -0500
+        id S1726772AbfKFHmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 02:42:42 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 23:44:54 -0800
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2019 23:42:41 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; 
-   d="scan'208";a="227138250"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
-  by FMSMGA003.fm.intel.com with ESMTP; 05 Nov 2019 23:44:54 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 5 Nov 2019 23:44:54 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 5 Nov 2019 23:44:54 -0800
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 5 Nov 2019 23:44:53 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.108]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 15:44:52 +0800
-From:   "Kang, Luwei" <luwei.kang@intel.com>
-To:     'Peter Zijlstra' <peterz@infradead.org>
-CC:     "'kvm@vger.kernel.org'" <kvm@vger.kernel.org>,
-        "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
-        "'pbonzini@redhat.com'" <pbonzini@redhat.com>,
-        "'rkrcmar@redhat.com'" <rkrcmar@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "'vkuznets@redhat.com'" <vkuznets@redhat.com>,
-        "'wanpengli@tencent.com'" <wanpengli@tencent.com>,
-        "'jmattson@google.com'" <jmattson@google.com>,
-        "'joro@8bytes.org'" <joro@8bytes.org>,
-        "'tglx@linutronix.de'" <tglx@linutronix.de>,
-        "'mingo@redhat.com'" <mingo@redhat.com>,
-        "'bp@alien8.de'" <bp@alien8.de>, "'hpa@zytor.com'" <hpa@zytor.com>,
-        "'x86@kernel.org'" <x86@kernel.org>,
-        "'ak@linux.intel.com'" <ak@linux.intel.com>,
-        "'thomas.lendacky@amd.com'" <thomas.lendacky@amd.com>,
-        "'acme@kernel.org'" <acme@kernel.org>,
-        "'mark.rutland@arm.com'" <mark.rutland@arm.com>,
-        "'alexander.shishkin@linux.intel.com'" 
-        <alexander.shishkin@linux.intel.com>,
-        "'jolsa@redhat.com'" <jolsa@redhat.com>,
-        "'namhyung@kernel.org'" <namhyung@kernel.org>
-Subject: RE: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Topic: [PATCH v1 3/8] KVM: x86: Allocate performance counter for PEBS
- event
-Thread-Index: AQHVjLd13+lWyOpx00qD/bA0eE059qdxL6sAgAEppjCAABXXgIACK7fwgAk3MFA=
-Date:   Wed, 6 Nov 2019 07:44:51 +0000
-Message-ID: <82D7661F83C1A047AF7DC287873BF1E1738387F8@SHSMSX104.ccr.corp.intel.com>
-References: <1572217877-26484-1-git-send-email-luwei.kang@intel.com>
- <1572217877-26484-4-git-send-email-luwei.kang@intel.com>
- <20191029144612.GK4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E173835B1A@SHSMSX104.ccr.corp.intel.com>
- <20191030094941.GQ4097@hirez.programming.kicks-ass.net>
- <82D7661F83C1A047AF7DC287873BF1E17383642D@SHSMSX104.ccr.corp.intel.com>
-In-Reply-To: <82D7661F83C1A047AF7DC287873BF1E17383642D@SHSMSX104.ccr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzE3NjQyYjEtYmE2OS00YjI4LTk2MjUtMmVlZTIwM2Y2M2UzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiR2xDRGN4bHZSakV6S01JcHJMaVJnZFFmcTl3NHRyN0U4UkNOTmoxR0RsXC8rVmJKV1g4WGx0NWVDQTlvT3hFXC9EIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+   d="scan'208";a="232770668"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by fmsmga002.fm.intel.com with ESMTP; 05 Nov 2019 23:42:39 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v6 0/9] Enable Sub-Page Write Protection Support
+Date:   Wed,  6 Nov 2019 15:44:55 +0800
+Message-Id: <20191106074504.14858-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > >  static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-> > > > >  				  unsigned config, bool exclude_user,
-> > > > >  				  bool exclude_kernel, bool intr,
-> > > > > -				  bool in_tx, bool in_tx_cp)
-> > > > > +				  bool in_tx, bool in_tx_cp, bool pebs)
-> > > > >  {
-> > > > >  	struct perf_event *event;
-> > > > >  	struct perf_event_attr attr = { @@ -111,9 +111,12 @@ static
-> > > > > void pmc_reprogram_counter(struct kvm_pmc *pmc,
-> > u32 type,
-> > > > >  		.exclude_user = exclude_user,
-> > > > >  		.exclude_kernel = exclude_kernel,
-> > > > >  		.config = config,
-> > > > > +		.precise_ip = pebs ? 1 : 0,
-> > > > > +		.aux_output = pebs ? 1 : 0,
-> > > >
-> > > > srsly?
-> > >
-> > > Hi Peter,
-> > >     Thanks for review. For aux_output, I think it should be set 1
-> > > when the guest wants to
-> > enabled PEBS by Intel PT.
-> > >      For precise_ip, it is the precise level in perf and set by perf
-> > > command line in KVM
-> > guest, this may not reflect the accurate value (can be 0~3) here. Here
-> > set to 1 is used to allocate a counter for PEBS event and set the
-> > MSR_IA32_PEBS_ENABLE register. For PMU virtualization, KVM will trap
-> > the guest's write operation to PMU registers and allocate/free event
-> > counter from host if a counter enable/disable in guest. We can't
-> > always deduce the exact parameter of perf command line from the value of the guest
-> writers to the register.
-> >
-> > Please, teach your MUA to wrap on 78 chars.
-> >
-> > The thing I really fell over is the gratuitous 'bool ? 1 : 0'. But
-> > yes, the aux_output without a group leader is dead wrong. We'll go fix
-> > perf_event_create_kernel_counter() to refuse that.
-> 
-> Yes, I also think it is a little gratuitous here. But it is a little hard to reconstruct the guest
-> perf parameters from the register value, especially the "precise_ip". Do you have any
-> advice?
-> 
-> About refuse the perf_event_create_kernel_counter() request w/o aux_ouput, I think I
-> need to allocate the PT event as group leader here,  is that right?
+EPT-Based Sub-Page write Protection(SPP) allows Virtual Machine Monitor(VMM)
+specify write-permission for guest physical memory at a sub-page(128 byte)
+granularity. When SPP works, HW enforces write-access check for sub-pages
+within a protected 4KB page.
 
-Hi Peter,
-     What's your opinion?
+The feature targets to provide fine-grained memory protection for
+usages such as memory guard and VM introspection etc.
 
-Thanks,
-Luwei Kang
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), and subpage permission vector is stored in the
+leaf entry of SPPT. The root page is referenced via a Sub-Page Permission
+Table Pointer (SPPTP) in VMCS.
+
+To enable SPP for guest memory, the guest page should be first mapped
+to a 4KB EPT entry, then set SPP bit 61 of the corresponding entry. 
+While HW walks EPT, it traverses SPPT with the gpa to look up the sub-page
+permission vector within SPPT leaf entry. If the corresponding bit is set,
+write to sub-page is permitted, otherwise, SPP induced EPT violation is generated.
+
+This patch serial passed SPP function test and selftest on Ice-Lake platform.
+
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
+
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+SPP selftest patch:
+https://lkml.org/lkml/2019/6/18/1197
+
+Previous patch:
+https://lkml.org/lkml/2019/9/17/180
+
+Patch 1: Documentation for SPP and related API.
+Patch 2: Add control flags for Sub-Page Protection(SPP).
+Patch 3: Add SPP Table setup functions.
+Patch 4: Add functions to create/destroy SPP bitmap block.
+Patch 5: Introduce user-space SPP IOCTLs.
+Patch 6: Set up SPP paging table at vmentry/vmexit.
+Patch 7: Enable Lazy mode SPP protection.
+Patch 8: Handle SPP protected pages when VM memory changes.
+Patch 9: Add SPP protection check in emulation case.
+
+
+Change logs:
+
+V5 -> V6:
+  1. Added SPP protection patch for emulation cases per Jim's review.
+  2. Modified documentation and added API description per Jim's review.
+  3. Other minior changes suggested by Jim.
+
+V4 -> V5:
+  1. Enable SPP support for Hugepage(1GB/2MB) to extend application.
+  2. Make SPP miss vm-exit handler as the unified place to set up SPPT.
+  3. If SPP protected pages are access-tracked or dirty-page-tracked,
+     store SPP flag in reserved address bit, restore it in
+     fast_page_fault() handler.
+  4. Move SPP specific functions to vmx/spp.c and vmx/spp.h
+  5. Rebased code to kernel v5.3
+  6. Other change suggested by KVM community.
+  
+V3 -> V4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+V2 -> V3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+V2 -> V1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+
+Yang Weijiang (9):
+  Documentation: Introduce EPT based Subpage Protection and related
+    ioctls
+  vmx: spp: Add control flags for Sub-Page Protection(SPP)
+  mmu: spp: Add SPP Table setup functions
+  mmu: spp: Add functions to create/destroy SPP bitmap block
+  x86: spp: Introduce user-space SPP IOCTLs
+  vmx: spp: Set up SPP paging table at vmentry/vmexit
+  mmu: spp: Enable Lazy mode SPP protection
+  mmu: spp: Handle SPP protected pages when VM memory changes
+  x86: spp: Add SPP protection check in emulation.
+
+ Documentation/virt/kvm/api.txt        |  46 ++
+ Documentation/virtual/kvm/spp_kvm.txt | 180 +++++++
+ arch/x86/include/asm/cpufeatures.h    |   1 +
+ arch/x86/include/asm/kvm_host.h       |  10 +-
+ arch/x86/include/asm/vmx.h            |  10 +
+ arch/x86/include/uapi/asm/vmx.h       |   2 +
+ arch/x86/kernel/cpu/intel.c           |   4 +
+ arch/x86/kvm/mmu.c                    |  78 +++-
+ arch/x86/kvm/mmu.h                    |   2 +
+ arch/x86/kvm/vmx/capabilities.h       |   5 +
+ arch/x86/kvm/vmx/spp.c                | 649 ++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/spp.h                |  28 ++
+ arch/x86/kvm/vmx/vmx.c                |  97 ++++
+ arch/x86/kvm/x86.c                    |  87 ++++
+ include/uapi/linux/kvm.h              |  17 +
+ 15 files changed, 1214 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+ create mode 100644 arch/x86/kvm/vmx/spp.c
+ create mode 100644 arch/x86/kvm/vmx/spp.h
+
+-- 
+2.17.2
+
