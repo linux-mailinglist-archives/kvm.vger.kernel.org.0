@@ -2,105 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 549E2F2144
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 23:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDA97F21AE
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 23:27:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727254AbfKFWAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 17:00:20 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:32870 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726798AbfKFWAT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 17:00:19 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6LnCuD021588;
-        Wed, 6 Nov 2019 21:58:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=qq7rR/SNaAPmM1KeC/QtRZmmpY96r1t2fWo0M2z1Y2w=;
- b=U4JAPh1rRXqMPjixJF66qbLVNpNQRau2Iu+l4VBCMMhWA7qMXXB2pssRQkqkKLu6+qor
- 2cg2NRsVDOVlwAv6YXpWc9J+ZY4bd/WKe7Wytu5L6LNOarugvUFwuwnngMpLwmbRSH0N
- va3fTX3vkaqtyL8EpmWcV9mSQgsUOwnehbN+WcgiqVoPMRjEf/6oHuk9Q9BXMqeWygCr
- qgl6s4rzRiUaZhX/K5OWiPSiylHayXbnqU46uFVxvYP2F86eQt5UKjdKkRlIRxBJyHIC
- WDxbM1C7GwFs3P3o7r5qZmWjotHQpBK/d/rqc0FNYBhE8D2pL5QZPhNUMLUXTNEkMn4M lw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w41w11ywe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 21:58:27 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6LmMHw076597;
-        Wed, 6 Nov 2019 21:56:26 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2w41w83rvk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Nov 2019 21:56:26 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA6LuOvZ028453;
-        Wed, 6 Nov 2019 21:56:24 GMT
-Received: from char.us.oracle.com (/10.152.32.25)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Nov 2019 13:56:23 -0800
-Received: by char.us.oracle.com (Postfix, from userid 1000)
-        id 556416A0123; Wed,  6 Nov 2019 16:59:45 -0500 (EST)
-Date:   Wed, 6 Nov 2019 16:59:45 -0500
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To:     Mathieu Tarral <mathieu.tarral@protonmail.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Tamas K Lengyel <tamas@tklengyel.com>,
-        "patrick.colp@oracle.com" <patrick.colp@oracle.com>,
-        "mdontu@bitdefender.com" <mdontu@bitdefender.com>
-Subject: Re: Talk publication - Leveraging KVM as a Debugging Platform
-Message-ID: <20191106215945.GA3731@char.us.oracle.com>
-References: <sl3TLCS0smnynp96Xa7kv5gHsbFIjQ9gzxPC1O5BYVb_QtXi6ZFQNR73zmrWSbicaUlBq54De6vAMkbIg0U2uWxEAUd1Q4-vaxn5mbc8LKE=@protonmail.com>
+        id S1732748AbfKFW1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 17:27:09 -0500
+Received: from mga17.intel.com ([192.55.52.151]:26990 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727154AbfKFW1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 17:27:08 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Nov 2019 14:27:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,275,1569308400"; 
+   d="scan'208";a="353613712"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga004.jf.intel.com with ESMTP; 06 Nov 2019 14:27:07 -0800
+Date:   Wed, 6 Nov 2019 14:27:07 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Liran Alon <liran.alon@oracle.com>
+Subject: Re: [PATCH v2 00/14] KVM: x86: Remove emulation_result enums
+Message-ID: <20191106222707.GB21617@linux.intel.com>
+References: <20190827214040.18710-1-sean.j.christopherson@intel.com>
+ <8dec39ac-7d69-b1fd-d07c-cf9d014c4af3@redhat.com>
+ <686b499e-7700-228e-3602-8e0979177acb@amazon.com>
+ <20191106005806.GK23297@linux.intel.com>
+ <3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <sl3TLCS0smnynp96Xa7kv5gHsbFIjQ9gzxPC1O5BYVb_QtXi6ZFQNR73zmrWSbicaUlBq54De6vAMkbIg0U2uWxEAUd1Q4-vaxn5mbc8LKE=@protonmail.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911060211
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911060211
+In-Reply-To: <3d827e8b-a04e-0a93-4bb4-e0e9d59036da@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 30, 2019 at 05:53:31PM +0000, Mathieu Tarral wrote:
-> Hi,
+On Wed, Nov 06, 2019 at 01:17:40PM +0100, Paolo Bonzini wrote:
+> On 06/11/19 01:58, Sean Christopherson wrote:
+> >> enum kvm_return {
+> >>     KVM_RET_USER_EXIT = 0,
+> >>     KVM_RET_GUEST = 1,
+> >> };
+> >>
+> >> and then consistently use them as return values? That way anyone who has not
+> >> worked on kvm before can still make sense of the code.
+> > Hmm, I think it'd make more sense to use #define instead of enum to
+> > hopefully make it clear that they aren't the *only* values that can be
+> > returned.  That'd also prevent anyone from changing the return types from
+> > 'int' to 'enum kvm_return', which IMO would hurt readability overall.
+> > 
+> > And maybe KVM_EXIT_TO_USERSPACE and KVM_RETURN_TO_GUEST?
 > 
-> I wanted to publish a talk that I did last week at hack.lu 2019 conference in Luxembourg.
+> That would be quite some work.  Right now there is some consistency
+> between all of:
+> 
+> - x86_emulate_instruction and its callers
+> 
+> - vcpu->arch.complete_userspace_io
+> 
+> - vcpu_enter_guest/vcpu_block
+> 
+> - kvm_x86_ops->handle_exit
+> 
+> so it would be very easy to end up with a half-int-half-enum state that
+> is more confusing than before...
+ 
+Ya, my thought was to update the obvious cases, essentially the ones you
+listed above, to use the define.  So almost intentionally end up in a
+half-n-half state, at least in the short term, the thought being that the
+extra annotation would do more harm than good.  But there's really no way
+to determine whether or not it would actually be a net positive without
+writing the code...
 
-That is neat! Thank you for sharing it!
-> 
-> The talk was about showing the new introspection capabilities of KVM, still in development,
-> and plugging a "smart" GDB stub on top that would understand the guest execution context.
-> 
-> There are 2 demos:
-> 1. I demonstrate the integration in LibVMI (intercepting CR3, memory events and MSR)
-> 2. I demonstrate debugging Microsoft Paint inside a Windows 10 VM, setting a breakpoint
->    on NtWriteFile in the kernel, and avoid other processes's hits.
-> 
-> Abstract:
-> https://cfp.hack.lu/hacklu19/talk/MLPXAF/
-> 
-> Slides:
-> https://drive.google.com/file/d/1nFoCM62BWKSz2TKhNkrOjVwD8gP51VGK/view
-> 
-> Video:
-> https://www.youtube.com/watch?v=U-wDpvItPUU
-> 
-> Project:
-> https://github.com/Wenzel/pyvmidbg
-> 
-> I thought it might be interesting to share it with the KVM community.
-> 
-> Thanks.
-> 
+> I'm more worried about cases where we have functions returning either 0
+> or -errno, but 0 lets you enter the guest.  I'm not sure if the only one
+> is kvm_mmu_reload or there are others.
+
+There are lots of those, e.g. basically all of the helpers for nested
+consistency checks.
