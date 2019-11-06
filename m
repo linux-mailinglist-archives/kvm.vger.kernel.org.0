@@ -2,173 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0728F1C7C
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 18:29:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60015F1C95
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 18:38:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729143AbfKFR3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Nov 2019 12:29:18 -0500
-Received: from foss.arm.com ([217.140.110.172]:43588 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727572AbfKFR3S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Nov 2019 12:29:18 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 619E146A;
-        Wed,  6 Nov 2019 09:29:17 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B27F3F719;
-        Wed,  6 Nov 2019 09:29:16 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/16] arm: Allow use of hugepage with 16K
- pagesize host
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki Poulose <suzuki.poulose@arm.com>,
-        Julien Grall <julien.grall.oss@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
- <1569245722-23375-2-git-send-email-alexandru.elisei@arm.com>
- <20191106164711.77673d43@donnerap.cambridge.arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <de4ec309-f6b8-c2fc-0936-0e6266756900@arm.com>
-Date:   Wed, 6 Nov 2019 17:29:15 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1732289AbfKFRiR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Nov 2019 12:38:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44465 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727286AbfKFRiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Nov 2019 12:38:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573061895;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2K0Oz02jNxfjdTmm8k8SnXt42GxVvZTo5vju30J6EFY=;
+        b=d+D62oGm7KEmLy0Frk6GZa20+eFL2YqPszqdK7Ll8xXxzAz/jDtDG/zpvAIFV/lE1CZwIX
+        n0BF+onDQjKsOeREv0Lt25OA/OocxDqd5/ByATnd7WE5HCcUU5G5Ouz3fQAQ7Rds/P+Py8
+        kWxiP1cb0Bher31mrLGWVQKWOlT6qs4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-wQV1i4JHNt6URo7WCkd3tA-1; Wed, 06 Nov 2019 12:38:13 -0500
+X-MC-Unique: wQV1i4JHNt6URo7WCkd3tA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55C89107ACC3;
+        Wed,  6 Nov 2019 17:38:12 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A91065D9E1;
+        Wed,  6 Nov 2019 17:38:06 +0000 (UTC)
+Date:   Wed, 6 Nov 2019 18:37:54 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 30/37] DOCUMENTATION: protvirt: Diag 308 IPL
+Message-ID: <20191106183754.68e1be0f.cohuck@redhat.com>
+In-Reply-To: <6dd98dfe-63ce-374c-9b04-00cdeceee905@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-31-frankja@linux.ibm.com>
+        <20191106174855.13a50f42.cohuck@redhat.com>
+        <6dd98dfe-63ce-374c-9b04-00cdeceee905@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191106164711.77673d43@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/KFFssDcS.y.elHxVLw6NCDc";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+--Sig_/KFFssDcS.y.elHxVLw6NCDc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 11/6/19 4:47 PM, Andre Przywara wrote:
-> On Mon, 23 Sep 2019 14:35:07 +0100
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> With 16K pagesize, the hugepage size is 32M. Align the guest
->> memory to the hugepagesize for 16K.
->>
->> To query the host page size, we use sysconf(_SC_PAGESIZE) instead of
->> getpagesize, as suggested by man 2 getpagesize for portable applications.
->> Also use the sysconf function instead of getpagesize when setting
->> kvm->ram_pagesize.
->>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Cc: Andre Przywara <andre.przywara@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Julien Grall <julien.grall@arm.com>
->> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->>  arm/kvm.c     | 36 +++++++++++++++++++++++++++++-------
->>  builtin-run.c |  4 ++--
->>  util/util.c   |  2 +-
->>  3 files changed, 32 insertions(+), 10 deletions(-)
->>
->> diff --git a/arm/kvm.c b/arm/kvm.c
->> index 1f85fc60588f..1c5bdb8026bf 100644
->> --- a/arm/kvm.c
->> +++ b/arm/kvm.c
->> @@ -59,14 +59,33 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
->>  
->>  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
->>  {
->> +	unsigned long alignment;
->> +
->>  	/*
->> -	 * Allocate guest memory. We must align our buffer to 64K to
->> -	 * correlate with the maximum guest page size for virtio-mmio.
->> -	 * If using THP, then our minimal alignment becomes 2M.
->> -	 * 2M trumps 64K, so let's go with that.
->> +	 * Allocate guest memory. If the user wants to use hugetlbfs, then the
->> +	 * specified guest memory size must be a multiple of the host huge page
->> +	 * size in order for the allocation to succeed. The mmap return adress
->> +	 * is naturally aligned to the huge page size, so in this case we don't
->> +	 * need to perform any alignment.
->> +	 *
->> +	 * Otherwise, we must align our buffer to 64K to correlate with the
->> +	 * maximum guest page size for virtio-mmio. If using THP, then our
->> +	 * minimal alignment becomes 2M with a 4K page size. With a 16K page
->> +	 * size, the alignment becomes 32M. 32M and 2M trump 64K, so let's go
->> +	 * with the largest alignment supported by the host.
->>  	 */
->> +	if (hugetlbfs_path) {
->> +		/* Don't do any alignment. */
->> +		alignment = 0;
->> +	} else {
->> +		if (sysconf(_SC_PAGESIZE) == SZ_16K)
->> +			alignment = SZ_32M;
->> +		else
->> +			alignment = SZ_2M;
->> +	}
->> +
->>  	kvm->ram_size = min(ram_size, (u64)ARM_MAX_MEMORY(kvm));
->> -	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
->> +	kvm->arch.ram_alloc_size = kvm->ram_size + alignment;
-> So that means that on a 16K page size host we always allocate 32MB more memory than requested. In practise the pages before the new start should stay unpopulated, but I wonder if we should munmap that unused region before the new start?
-> Just thinking that people tend to use kvmtool because of its smaller memory footprint ...
+On Wed, 6 Nov 2019 18:05:22 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-I don't think it matters, kvmtool will not touch that region, so the process'
-resident set size will stay the same.
+> On 11/6/19 5:48 PM, Cornelia Huck wrote:
+> > On Thu, 24 Oct 2019 07:40:52 -0400
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >  =20
+> >> Description of changes that are necessary to move a KVM VM into
+> >> Protected Virtualization mode.
+> >>
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >> ---
+> >>  Documentation/virtual/kvm/s390-pv-boot.txt | 62 +++++++++++++++++++++=
++
+> >>  1 file changed, 62 insertions(+)
+> >>  create mode 100644 Documentation/virtual/kvm/s390-pv-boot.txt
 
-Thanks,
-Alex
-> Otherwise the code looks alright.
->
-> Cheers,
-> Andre.
->
->>  	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
->>  						kvm->arch.ram_alloc_size);
->>  
->> @@ -74,8 +93,11 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
->>  		die("Failed to map %lld bytes for guest memory (%d)",
->>  		    kvm->arch.ram_alloc_size, errno);
->>  
->> -	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
->> -					SZ_2M);
->> +	kvm->ram_start = kvm->arch.ram_alloc_start;
->> +	/* The result of aligning to 0 is 0. Let's avoid that. */
->> +	if (alignment)
->> +		kvm->ram_start = (void *)ALIGN((unsigned long)kvm->ram_start,
->> +					       alignment);
->>  
->>  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
->>  		MADV_MERGEABLE);
->> diff --git a/builtin-run.c b/builtin-run.c
->> index f8dc6c7229b0..c867c8ba0892 100644
->> --- a/builtin-run.c
->> +++ b/builtin-run.c
->> @@ -127,8 +127,8 @@ void kvm_run_set_wrapper_sandbox(void)
->>  			"Run this script when booting into custom"	\
->>  			" rootfs"),					\
->>  	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
->> -			"Hugetlbfs path"),				\
->> -									\
->> +			"Hugetlbfs path. Memory size must be a multiple"\
->> +			" of the huge page size"),			\
->>  	OPT_GROUP("Kernel options:"),					\
->>  	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
->>  			"Kernel to boot in virtual machine"),		\
->> diff --git a/util/util.c b/util/util.c
->> index 1877105e3c08..217addd75e6f 100644
->> --- a/util/util.c
->> +++ b/util/util.c
->> @@ -127,7 +127,7 @@ void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 si
->>  		 */
->>  		return mmap_hugetlbfs(kvm, hugetlbfs_path, size);
->>  	else {
->> -		kvm->ram_pagesize = getpagesize();
->> +		kvm->ram_pagesize = sysconf(_SC_PAGESIZE);
->>  		return mmap(NULL, size, PROT_RW, MAP_ANON_NORESERVE, -1, 0);
->>  	}
->>  }
+> > So... what do we IPL from? Is there still a need for the bios?
+> >=20
+> > (Sorry, I'm a bit confused here.)
+> >  =20
+>=20
+> We load a blob via the bios (all methods are supported) and that blob
+> moves itself into protected mode. I.e. it has a small unprotected stub,
+> the rest is an encrypted kernel.
+>=20
+
+Ok. The magic is in the loaded kernel, and we don't need modifications
+to the bios?
+
+--Sig_/KFFssDcS.y.elHxVLw6NCDc
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3DBPIACgkQ3s9rk8bw
+L68O9Q/+PNV0FWP35V+Byn2eX/IP2pwYzdpktSY2sS/oEIJ2PnUHuJbTqazcwyul
+JEJx6NWOunSsqLE4kJHUqncbfLzq+LkbuO+/IXVW7SWuf+J3XhMbT8JyHSSksI6e
+LVZgI4D40G4kfCmMT4UubszAnpmpwnxZcgIiCy7Ry5qZEx2jPVxAo6HR3zQ9nkW2
+yk+xhrjGmjk0uVR5Ec76jmSTeqMlcDNNQ+wjrZI5TV8HlrxOyaAaJd27MJPuaoPL
+GvWjYvVzt8MePAa+T8OXTwR4JSI6YMwUx9X4OuOFIunfgg18f8rWwVqJ0Y/DPw8g
+c/rhM3wTfWnOOKCl8qFSBbYXv3ps7YSuJHUIMjRdbNIj4JWXEjpEC4oolMJe5gT7
+rNf14r6ERv2y5jMgojSKjwCuh7ZO0ocPeJCTuYxOt3GM8bZ9kSJXE2oxnXXrRchS
+MaLTVQj/GUmgowh/8yyBBksrXRapzQ9V08iBkATKn5fUN89/xcVFTZnCUe3VkZfI
+KQ15yj7LrDKMAMBwJh3G7MHaNoQnO7GlOFpRluWVNaLRmw84jFBHufxKnm7urTHe
+YhC+KH4rPuAerO+VtTHWqSFH3UPyP/8w96q1LLj9kCXXutYKQwcyg29m98L/MCFV
+qeNEKJfWDyw+PQl5CVtX6hogkMfhpzWQ2eDeTDkLn544d7DeR1E=
+=VQrj
+-----END PGP SIGNATURE-----
+
+--Sig_/KFFssDcS.y.elHxVLw6NCDc--
+
