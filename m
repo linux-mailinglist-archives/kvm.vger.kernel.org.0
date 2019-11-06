@@ -2,143 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47CACF0D76
-	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 04:59:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDF22F0D7E
+	for <lists+kvm@lfdr.de>; Wed,  6 Nov 2019 05:00:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731162AbfKFD67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Nov 2019 22:58:59 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32735 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725768AbfKFD64 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Nov 2019 22:58:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573012734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gr71+XtimEL2u6AzLjyEgsguFtJGvEEF2xUegKTV/h0=;
-        b=PYlPgvFk/IGlthBT0Uy2XvRiRiL850ZAbjAwAB+qr7+tPvvvjTbw9h0hJwgMDjAEqpbSOM
-        FKkCS4fJihkpkZzIG5xMEyekUQd6mVrM30Cuk1+A35k+XRIJe3oc2xwZzE9ld8BqRGKvP6
-        Rg329xgx1Qsg85rHtr2J+C924pOUMY8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-vwBxFsjROy-3Zo-U4aD9YA-1; Tue, 05 Nov 2019 22:58:44 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1731015AbfKFEAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Nov 2019 23:00:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42600 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727266AbfKFEAY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Nov 2019 23:00:24 -0500
+Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97EBA8017DE;
-        Wed,  6 Nov 2019 03:58:40 +0000 (UTC)
-Received: from [10.72.12.193] (ovpn-12-193.pek2.redhat.com [10.72.12.193])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8514210013D9;
-        Wed,  6 Nov 2019 03:57:01 +0000 (UTC)
-Subject: Re: [PATCH V8 0/6] mdev based hardware virtio offloading support
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        mst@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
-        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-References: <20191105093240.5135-1-jasowang@redhat.com>
- <20191105105834.469675f0@x1.home>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <393f2dc9-8c67-d3c9-6553-640b80c15aaf@redhat.com>
-Date:   Wed, 6 Nov 2019 11:56:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191105105834.469675f0@x1.home>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: vwBxFsjROy-3Zo-U4aD9YA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+        by mail.kernel.org (Postfix) with ESMTPSA id BF06F2087E;
+        Wed,  6 Nov 2019 04:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573012824;
+        bh=EHB0u3MVxEhZWTCAi5ESkXM4zpATJfaJBa2YTknoRTg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ED+AyhOAGBVb9eR7kmanZ6wkAt4L+7d3LzYOhxHrTEdk65Q6f+V6vk5gZxfwJuoLL
+         qbbGHBThIPKa5oqbpA8lBNoUPrjZ/vauXJeSdCFvF1FM6/NL8a7CqBQxXfMecOsBMp
+         ciWGs8vlr8ZM46fm58Xbgd5Q2FC3L1aBBgaZEHWM=
+Date:   Tue, 5 Nov 2019 20:00:22 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        mgorman@techsingularity.net, vbabka@suse.cz,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
+        osalvador@suse.de
+Subject: Re: [PATCH v13 3/6] mm: Introduce Reported pages
+Message-Id: <20191105200022.ed3b5f803bef55377bcc5d30@linux-foundation.org>
+In-Reply-To: <20191105220219.15144.69031.stgit@localhost.localdomain>
+References: <20191105215940.15144.65968.stgit@localhost.localdomain>
+        <20191105220219.15144.69031.stgit@localhost.localdomain>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 05 Nov 2019 14:02:19 -0800 Alexander Duyck <alexander.duyck@gmail.com> wrote:
 
-On 2019/11/6 =E4=B8=8A=E5=8D=881:58, Alex Williamson wrote:
-> On Tue,  5 Nov 2019 17:32:34 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->
->> Hi all:
->>
->> There are hardwares that can do virtio datapath offloading while
->> having its own control path. This path tries to implement a mdev based
->> unified API to support using kernel virtio driver to drive those
->> devices. This is done by introducing a new mdev transport for virtio
->> (virtio_mdev) and register itself as a new kind of mdev driver. Then
->> it provides a unified way for kernel virtio driver to talk with mdev
->> device implementation.
->>
->> Though the series only contains kernel driver support, the goal is to
->> make the transport generic enough to support userspace drivers. This
->> means vhost-mdev[1] could be built on top as well by resuing the
->> transport.
->>
->> A sample driver is also implemented which simulate a virito-net
->> loopback ethernet device on top of vringh + workqueue. This could be
->> used as a reference implementation for real hardware driver.
->>
->> Also a real ICF VF driver was also posted here[2] which is a good
->> reference for vendors who is interested in their own virtio datapath
->> offloading product.
->>
->> Consider mdev framework only support VFIO device and driver right now,
->> this series also extend it to support other types. This is done
->> through introducing class id to the device and pairing it with
->> id_talbe claimed by the driver. On top, this seris also decouple
->> device specific parents ops out of the common ones.
->>
->> Pktgen test was done with virito-net + mvnet loop back device.
->>
->> Please review.
->>
->> [1] https://lkml.org/lkml/2019/10/31/440
->> [2] https://lkml.org/lkml/2019/10/15/1226
->>
->> Changes from V7:
->> - drop {set|get}_mdev_features for virtio
->> - typo and comment style fixes
->
-> Seems we're nearly there, all the remaining comments are relatively
-> superficial, though I would appreciate a v9 addressing them as well as
-> the checkpatch warnings:
->
-> https://patchwork.freedesktop.org/series/68977/
+> In order to pave the way for free page reporting in virtualized
+> environments we will need a way to get pages out of the free lists and
+> identify those pages after they have been returned. To accomplish this,
+> this patch adds the concept of a Reported Buddy, which is essentially
+> meant to just be the Uptodate flag used in conjunction with the Buddy
+> page type.
 
+build fix
 
-Will do.
-
-Btw, do you plan to merge vhost-mdev patch on top? Or you prefer it to=20
-go through Michael's vhost tree?
-
-Thanks
-
-
->
-> Consider this a last call for reviews or acks (or naks) from affected
-> mdev vendor drivers, mdev-core sub-maintainers (Hi Kirti), virtio
-> stakeholders, etc.  Thanks,
->
-> Alex
->
+--- a/mm/page_reporting.h~mm-introduce-reported-pages-fix
++++ a/mm/page_reporting.h
+@@ -158,7 +158,7 @@ free_area_reporting(struct zone *zone, u
+ 	return false;
+ }
+ static inline struct list_head *
+-get_unreported_tail(struct zone *zone, unsigned int order, int migratetype)
++get_unreported_tail(unsigned int order, int migratetype)
+ {
+ 	return NULL;
+ }
+_
 
