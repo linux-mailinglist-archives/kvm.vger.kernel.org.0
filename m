@@ -2,162 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C42F3059
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:46:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7D4FF3075
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:51:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388641AbfKGNqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 08:46:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:56468 "EHLO foss.arm.com"
+        id S2389125AbfKGNvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 08:51:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59384 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727858AbfKGNqn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 08:46:43 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4921531B;
-        Thu,  7 Nov 2019 05:46:42 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 339223F71A;
-        Thu,  7 Nov 2019 05:46:41 -0800 (PST)
-Date:   Thu, 7 Nov 2019 13:46:38 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Suzuki Poulose <suzuki.poulose@arm.com>,
-        Julien Grall <julien.grall.oss@gmail.com>
-Subject: Re: [PATCH kvmtool 08/16] arm: Move anything related to RAM
- initialization in kvm__init_ram
-Message-ID: <20191107134638.147f9712@donnerap.cambridge.arm.com>
-In-Reply-To: <1569245722-23375-9-git-send-email-alexandru.elisei@arm.com>
-References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
-        <1569245722-23375-9-git-send-email-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S2388980AbfKGNvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 08:51:01 -0500
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DD1AA4ACA5
+        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 13:51:00 +0000 (UTC)
+Received: by mail-qk1-f200.google.com with SMTP id m83so2323832qke.14
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 05:51:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=nkZBN+5zxQ42o26GlAg4Gu8zR9MU5cE0CTJ+GrFRdeo=;
+        b=gfgLnL6AXk3kAPQMbEbLOHvNEEBgdv882eaO0NBa3nY4TqtdTKk15lC9qTs+meRkXP
+         WLg7JpomRDclLxCoY+FJCSn9YYycb3QLpT0u7STK4SZsji2LuSLEI0lyMK8UJyX3jmns
+         vzh3IbtqrDI3vLuTD5qniyub2t3nyZ0g4apPUzuRku2dlWHIvo0OU6DFBwsIR6NOiNje
+         9lBVGC0UkNdNhXQ1X06WOanK1jwe9o/YvhMO38yjYuit2O0q/LlHBvcG81eC2vJpexOd
+         iUlApABnexOcHfAqTCeYzh05sJ07vqcZXFePVviCD5rfARzAGmmm/kMij38lV1esSX2S
+         RwEw==
+X-Gm-Message-State: APjAAAVvRgLXj7aVCE1Fdf8RQLpIs+hAAyWf2HDiCQvIKfGEBnuj7TZ9
+        siA9xG9FHAm43a2KMkg8+lgKNk10s5dCPpIIHin36SO6EjSx2oTozbD0M7NCrHbTfaXHTFM+eOg
+        uXzYSy/xQJbq7
+X-Received: by 2002:a37:f605:: with SMTP id y5mr2957980qkj.288.1573134659999;
+        Thu, 07 Nov 2019 05:50:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwR0XN8Xkg7npgZmypT2TC+6FrvcOeN+9aUQy/VsChc7srS+8pQqGTXKUbO8NQlTjtab+Vs0A==
+X-Received: by 2002:a37:f605:: with SMTP id y5mr2957932qkj.288.1573134659680;
+        Thu, 07 Nov 2019 05:50:59 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+        by smtp.gmail.com with ESMTPSA id p3sm1052072qkf.107.2019.11.07.05.50.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 05:50:58 -0800 (PST)
+Date:   Thu, 7 Nov 2019 08:50:46 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V10 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+Message-ID: <20191107085013-mutt-send-email-mst@kernel.org>
+References: <20191106133531.693-1-jasowang@redhat.com>
+ <20191106133531.693-7-jasowang@redhat.com>
+ <20191107040700-mutt-send-email-mst@kernel.org>
+ <bd2f7796-8d88-0eb3-b55b-3ec062b186b7@redhat.com>
+ <20191107061942-mutt-send-email-mst@kernel.org>
+ <d09229bc-c3e4-8d4b-c28f-565fe150ced2@redhat.com>
+ <20191107080834-mutt-send-email-mst@kernel.org>
+ <b2265e3a-6f86-c21a-2ebd-d0e4eea2886f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b2265e3a-6f86-c21a-2ebd-d0e4eea2886f@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Sep 2019 14:35:14 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> From: Julien Grall <julien.grall@arm.com>
+On Thu, Nov 07, 2019 at 09:32:29PM +0800, Jason Wang wrote:
 > 
-> RAM initialization is currently split between kvm__init_ram and
-> kvm__arch_init.  Move all code related to RAM initialization to
-> kvm__init_ram.
-
-The diff is a bit confusing to read, but indeed this just moves the code from arch_init() to init_ram() (confirmed by moving the code and comparing).
-One thing to note is that this changes the order of initialisation slightly: the GIC is now created before the RAM (since we call arch_init() before init_ram()).
-
-Nevertheless:
-
-> Signed-off-by: Julien Grall <julien.grall@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre.
-
-> ---
->  arm/kvm.c | 75 +++++++++++++++++++++++++++++++--------------------------------
->  1 file changed, 37 insertions(+), 38 deletions(-)
+> On 2019/11/7 下午9:08, Michael S. Tsirkin wrote:
+> > On Thu, Nov 07, 2019 at 08:43:29PM +0800, Jason Wang wrote:
+> > > On 2019/11/7 下午7:21, Michael S. Tsirkin wrote:
+> > > > On Thu, Nov 07, 2019 at 06:18:45PM +0800, Jason Wang wrote:
+> > > > > On 2019/11/7 下午5:08, Michael S. Tsirkin wrote:
+> > > > > > On Wed, Nov 06, 2019 at 09:35:31PM +0800, Jason Wang wrote:
+> > > > > > > This sample driver creates mdev device that simulate virtio net device
+> > > > > > > over virtio mdev transport. The device is implemented through vringh
+> > > > > > > and workqueue. A device specific dma ops is to make sure HVA is used
+> > > > > > > directly as the IOVA. This should be sufficient for kernel virtio
+> > > > > > > driver to work.
+> > > > > > > 
+> > > > > > > Only 'virtio' type is supported right now. I plan to add 'vhost' type
+> > > > > > > on top which requires some virtual IOMMU implemented in this sample
+> > > > > > > driver.
+> > > > > > > 
+> > > > > > > Acked-by: Cornelia Huck<cohuck@redhat.com>
+> > > > > > > Signed-off-by: Jason Wang<jasowang@redhat.com>
+> > > > > > I'd prefer it that we call this something else, e.g.
+> > > > > > mvnet-loopback. Just so people don't expect a fully
+> > > > > > functional device somehow. Can be renamed when applying?
+> > > > > Actually, I plan to extend it as another standard network interface for
+> > > > > kernel. It could be either a standalone pseudo device or a stack device.
+> > > > > Does this sounds good to you?
+> > > > > 
+> > > > > Thanks
+> > > > That's a big change in an interface so it's a good reason
+> > > > to rename the driver at that point right?
+> > > > Oherwise users of an old kernel would expect a stacked driver
+> > > > and get a loopback instead.
+> > > > 
+> > > > Or did I miss something?
+> > > 
+> > > My understanding is that it was a sample driver in /doc. It should not be
+> > > used in production environment. Otherwise we need to move it to
+> > > driver/virtio.
+> > > 
+> > > But if you insist, I can post a V11.
+> > > 
+> > > Thanks
+> > this can be a patch on top.
 > 
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index 5decc138fd3e..3e49db7704aa 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -29,44 +29,6 @@ void kvm__init_ram(struct kvm *kvm)
->  	int err;
->  	u64 phys_start, phys_size;
->  	void *host_mem;
-> -
-> -	phys_start	= ARM_MEMORY_AREA;
-> -	phys_size	= kvm->ram_size;
-> -	host_mem	= kvm->ram_start;
-> -
-> -	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> -	if (err)
-> -		die("Failed to register %lld bytes of memory at physical "
-> -		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-> -
-> -	kvm->arch.memory_guest_start = phys_start;
-> -}
-> -
-> -void kvm__arch_delete_ram(struct kvm *kvm)
-> -{
-> -	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-> -}
-> -
-> -void kvm__arch_read_term(struct kvm *kvm)
-> -{
-> -	serial8250__update_consoles(kvm);
-> -	virtio_console__inject_interrupt(kvm);
-> -}
-> -
-> -void kvm__arch_set_cmdline(char *cmdline, bool video)
-> -{
-> -}
-> -
-> -void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> -{
-> -	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
-> -		cfg->ram_size = ARM_MAX_MEMORY(cfg);
-> -		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
-> -	}
-> -}
-> -
-> -void kvm__arch_init(struct kvm *kvm)
-> -{
->  	unsigned long alignment;
->  	/* Convenience aliases */
->  	const char *hugetlbfs_path = kvm->cfg.hugetlbfs_path;
-> @@ -115,6 +77,43 @@ void kvm__arch_init(struct kvm *kvm)
->  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
->  		MADV_HUGEPAGE);
->  
-> +	phys_start	= ARM_MEMORY_AREA;
-> +	phys_size	= kvm->ram_size;
-> +	host_mem	= kvm->ram_start;
-> +
-> +	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
-> +	if (err)
-> +		die("Failed to register %lld bytes of memory at physical "
-> +		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-> +
-> +	kvm->arch.memory_guest_start = phys_start;
-> +}
-> +
-> +void kvm__arch_delete_ram(struct kvm *kvm)
-> +{
-> +	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
-> +}
-> +
-> +void kvm__arch_read_term(struct kvm *kvm)
-> +{
-> +	serial8250__update_consoles(kvm);
-> +	virtio_console__inject_interrupt(kvm);
-> +}
-> +
-> +void kvm__arch_set_cmdline(char *cmdline, bool video)
-> +{
-> +}
-> +
-> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
-> +{
-> +	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
-> +		cfg->ram_size = ARM_MAX_MEMORY(cfg);
-> +		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
-> +	}
-> +}
-> +
-> +void kvm__arch_init(struct kvm *kvm)
-> +{
->  	/* Create the virtual GIC. */
->  	if (gic__create(kvm, kvm->cfg.arch.irqchip))
->  		die("Failed to create virtual GIC");
+> 
+> Then maybe it's better just extend it to work as a normal networking device
+> on top?
+> 
+> Thanks
+
+That would be a substantial change. Maybe drop 6/6 for now until
+we have a better handle on this?
 
