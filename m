@@ -2,104 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5974CF2D23
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 12:12:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C428F2D54
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 12:21:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388322AbfKGLMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 06:12:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38090 "EHLO mx1.redhat.com"
+        id S2388266AbfKGLVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 06:21:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56882 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388120AbfKGLMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 06:12:09 -0500
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        id S1727732AbfKGLVj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 06:21:39 -0500
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 09A2F83F42
-        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 11:12:09 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id g14so863340wmk.9
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 03:12:08 -0800 (PST)
+        by mx1.redhat.com (Postfix) with ESMTPS id D086B37E7B
+        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 11:21:39 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id x21so2205344qtp.1
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 03:21:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wb7dO8DsKF7yscVCT8cl3F3QgHxyR2FGMLetiHh29tE=;
-        b=NbIIUuAWCDuws/tjEXfVzm8KtZoNvNbFqOa+nsCItUTqErxGs1zcWldnqBD/Y0WEFV
-         GWVH8Yc3oQSdaA0YG94Ayo41Y/XsXOS3/IK2T4tCiDBivhgVOxyihem78iQpj2asgl5e
-         h7VuxzvWgot3FRM2oCjmUdJ438a7nU568wFtPblrQHGerZMRUmLFSLG5ltSuqvKMVuZ7
-         SsSo7cC7Tr2dCK73bm9it/YVd+t5Vi2H7vqbBCWvuKAukgNcRPARxjqgS+ElC+iIXfEZ
-         Tx7E73FwsqLyV9cs9/UPvQnv3FsUmLahMdfdu6vdIXNTvuHIvroQLBCOMGddD4qZ5sCH
-         kEzQ==
-X-Gm-Message-State: APjAAAXYboiMmevNLYqgSZN0kX8lNefGh3djbsQRC4fGhCm5h7snebgK
-        UoG4ymB3UUZNDArEG4C4Xi6qnKbxd3Zopwn4T1J0psGhWdfeUjX3VW/18eLT1G1Dk+zbrqc4Kh4
-        KxY395XNPzJvw
-X-Received: by 2002:adf:ea42:: with SMTP id j2mr2286535wrn.384.1573125127617;
-        Thu, 07 Nov 2019 03:12:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzsSQDxaFh5QeJ49rl6vQ2cGJ313lfE7wHNWd3mB8/6HiMhtvtIu+qvazulIg9vS3Pv7aJksw==
-X-Received: by 2002:adf:ea42:: with SMTP id j2mr2286502wrn.384.1573125127327;
-        Thu, 07 Nov 2019 03:12:07 -0800 (PST)
-Received: from [10.201.49.199] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id w19sm1678225wmk.36.2019.11.07.03.12.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2019 03:12:06 -0800 (PST)
-Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
- reserved
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Adam Borowski <kilobyte@angband.pl>,
-        David Hildenbrand <david@redhat.com>
-References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
- <20191106170727.14457-2-sean.j.christopherson@intel.com>
- <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
- <1cf71906-ba99-e637-650f-fc08ac4f3d5f@redhat.com>
- <CAPcyv4hMOxPDKAZtTvWKEMPBwE_kPrKPB_JxE2YfV5EKkKj_dQ@mail.gmail.com>
- <20191106233913.GC21617@linux.intel.com>
- <CAPcyv4jysxEu54XK2kUYnvTqUL7zf2fJvv7jWRR=P4Shy+3bOQ@mail.gmail.com>
- <CAPcyv4i3M18V9Gmx3x7Ad12VjXbq94NsaUG9o71j59mG9-6H9Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <0db7c328-1543-55db-bc02-c589deb3db22@redhat.com>
-Date:   Thu, 7 Nov 2019 12:12:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=wnfHxd+h5ByIy6pNIpYUPsi2zmTYpBRj65XvOkNtL/w=;
+        b=EX4TCOshTSWpppDJcj0d/XVaKgjMNnh+uXSryrAC0bbAYwk+2mhyZ8BLphez9nWUqD
+         6GLqHTr8DmNJjkQnfeXaqlLXupoxqrsX+7wLpcGfniDcX627E9Uzw4cu0DzCEaBBq9UJ
+         w4Gqb5rAH8SiHomOKDuOIL/h4+s33omN9nqDGyJ5DZQpf7Ozg00UCh9PCbIKEvfX8c+t
+         odbUDVNEuVCjOGBppeYAUG5+xocQbjnQFUpOkZ0YUB2JEv4XkevNfZ89KqZWb3m+CcxF
+         2XhrsPjA67jd4OrO5FmyKjN66S81PHzUMMsG5S27wk6Z7aDrG0icpZw6GRRb6wR950Q6
+         Md4g==
+X-Gm-Message-State: APjAAAUsIYtxBET0wGnocudbVm66OwGiTSziO4JEUHYwOYpRiU163YqZ
+        MRmvMn12WeusJB3RhoKN9oWClJnDdfACmCyP+t6zp6LJeuj2GycdDiRq1Yfqe4g484+KnEsWOj0
+        6UnXx1m3C0zAX
+X-Received: by 2002:ac8:289d:: with SMTP id i29mr3319298qti.24.1573125698885;
+        Thu, 07 Nov 2019 03:21:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwLKHqje2IEEYthZFjXYN+ipb1SMK7JO7Dpv9RPMHrWqUxiMCMx6JeRQige0AiW+TwcjzGM5w==
+X-Received: by 2002:ac8:289d:: with SMTP id i29mr3319270qti.24.1573125698659;
+        Thu, 07 Nov 2019 03:21:38 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+        by smtp.gmail.com with ESMTPSA id u27sm1182961qtj.5.2019.11.07.03.21.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 03:21:37 -0800 (PST)
+Date:   Thu, 7 Nov 2019 06:21:26 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+Subject: Re: [PATCH V10 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+Message-ID: <20191107061942-mutt-send-email-mst@kernel.org>
+References: <20191106133531.693-1-jasowang@redhat.com>
+ <20191106133531.693-7-jasowang@redhat.com>
+ <20191107040700-mutt-send-email-mst@kernel.org>
+ <bd2f7796-8d88-0eb3-b55b-3ec062b186b7@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4i3M18V9Gmx3x7Ad12VjXbq94NsaUG9o71j59mG9-6H9Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bd2f7796-8d88-0eb3-b55b-3ec062b186b7@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/11/19 06:48, Dan Williams wrote:
->> How do mmu notifiers get held off by page references and does that
->> machinery work with ZONE_DEVICE? Why is this not a concern for the
->> VM_IO and VM_PFNMAP case?
-> Put another way, I see no protection against truncate/invalidate
-> afforded by a page pin. If you need guarantees that the page remains
-> valid in the VMA until KVM can install a mmu notifier that needs to
-> happen under the mmap_sem as far as I can see. Otherwise gup just
-> weakly asserts "this pinned page was valid in this vma at one point in
-> time".
+On Thu, Nov 07, 2019 at 06:18:45PM +0800, Jason Wang wrote:
+> 
+> On 2019/11/7 下午5:08, Michael S. Tsirkin wrote:
+> > On Wed, Nov 06, 2019 at 09:35:31PM +0800, Jason Wang wrote:
+> > > This sample driver creates mdev device that simulate virtio net device
+> > > over virtio mdev transport. The device is implemented through vringh
+> > > and workqueue. A device specific dma ops is to make sure HVA is used
+> > > directly as the IOVA. This should be sufficient for kernel virtio
+> > > driver to work.
+> > > 
+> > > Only 'virtio' type is supported right now. I plan to add 'vhost' type
+> > > on top which requires some virtual IOMMU implemented in this sample
+> > > driver.
+> > > 
+> > > Acked-by: Cornelia Huck<cohuck@redhat.com>
+> > > Signed-off-by: Jason Wang<jasowang@redhat.com>
+> > I'd prefer it that we call this something else, e.g.
+> > mvnet-loopback. Just so people don't expect a fully
+> > functional device somehow. Can be renamed when applying?
+> 
+> 
+> Actually, I plan to extend it as another standard network interface for
+> kernel. It could be either a standalone pseudo device or a stack device.
+> Does this sounds good to you?
+> 
+> Thanks
 
-The MMU notifier is installed before gup, so any invalidation will be
-preceded by a call to the MMU notifier.  In turn,
-invalidate_range_start/end is called with mmap_sem held so there should
-be no race.
+That's a big change in an interface so it's a good reason
+to rename the driver at that point right?
+Oherwise users of an old kernel would expect a stacked driver
+and get a loopback instead.
 
-However, as Sean mentioned, early put_page of ZONE_DEVICE pages would be
-racy, because we need to keep the reference between the gup and the last
-time we use the corresponding struct page.
+Or did I miss something?
 
-Based on this, I think Sean's patches should work fine, and I prefer
-them over David's approach.  Either way, adding some documentation is in
-order.
-
-Paolo
+> 
+> > 
+> > 
