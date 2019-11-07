@@ -2,167 +2,379 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80AFCF3753
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 19:35:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6D16F38B8
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 20:36:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbfKGSfd convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 7 Nov 2019 13:35:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57458 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbfKGSfd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 13:35:33 -0500
-From:   bugzilla-daemon@bugzilla.kernel.org
-Authentication-Results: mail.kernel.org; dkim=permerror (bad message/signature format)
-To:     kvm@vger.kernel.org
-Subject: [Bug 205441] Enabling KVM causes any Linux VM reboot on kernel boot
-Date:   Thu, 07 Nov 2019 18:35:22 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: t.lamprecht@proxmox.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-205441-28872-sXzQULF0jR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-205441-28872@https.bugzilla.kernel.org/>
-References: <bug-205441-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726292AbfKGTgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 14:36:02 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:2146 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725785AbfKGTgB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 14:36:01 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dc471d90001>; Thu, 07 Nov 2019 11:34:50 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 07 Nov 2019 11:35:46 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 07 Nov 2019 11:35:46 -0800
+Received: from [10.25.75.102] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 7 Nov
+ 2019 19:35:29 +0000
+Subject: Re: [PATCH V11 1/6] mdev: class id support
+To:     Jason Wang <jasowang@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>,
+        <intel-gvt-dev@lists.freedesktop.org>,
+        <alex.williamson@redhat.com>, <mst@redhat.com>,
+        <tiwei.bie@intel.com>
+CC:     <virtualization@lists.linux-foundation.org>,
+        <netdev@vger.kernel.org>, <cohuck@redhat.com>,
+        <maxime.coquelin@redhat.com>, <cunming.liang@intel.com>,
+        <zhihong.wang@intel.com>, <rob.miller@broadcom.com>,
+        <xiao.w.wang@intel.com>, <haotian.wang@sifive.com>,
+        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
+        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
+        <rodrigo.vivi@intel.com>, <airlied@linux.ie>, <daniel@ffwll.ch>,
+        <farman@linux.ibm.com>, <pasic@linux.ibm.com>,
+        <sebott@linux.ibm.com>, <oberpar@linux.ibm.com>,
+        <heiko.carstens@de.ibm.com>, <gor@linux.ibm.com>,
+        <borntraeger@de.ibm.com>, <akrowiak@linux.ibm.com>,
+        <freude@linux.ibm.com>, <lingshan.zhu@intel.com>,
+        <eperezma@redhat.com>, <lulu@redhat.com>, <parav@mellanox.com>,
+        <christophe.de.dinechin@gmail.com>, <kevin.tian@intel.com>,
+        <stefanha@redhat.com>
+References: <20191107151109.23261-1-jasowang@redhat.com>
+ <20191107151109.23261-2-jasowang@redhat.com>
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <ba7d7b97-85f3-4596-6ae0-8dfa57c94b8c@nvidia.com>
+Date:   Fri, 8 Nov 2019 01:05:19 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
+In-Reply-To: <20191107151109.23261-2-jasowang@redhat.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573155290; bh=/EXrnlwfJbtB2dfkiHy1I5m8c/7sbDj9nW2Y2Fur0F4=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=nESaiR8+mxVXejiYLAHUq3/pOZlOBGtFAwQiStFOScdoeIXKxPqhdyEm7XoMCc2+e
+         8aJ0QpQ7Pj3JhfVGtWw3Tw+Oi938s7g9cMs3iYi1ILvIOXo70u8oE8gIQI6fyHJAjX
+         zXvyedhXtqTQQ99W0HYlF3ESK+EPnWJDUXdzuM1/NgjiI4ff/Ewg23kxY92bhcPYPQ
+         fNwWS+Lf8eBVublzKDHSOoPzO1Ux43SGjuCx3rM0AA4ZglKYTNc5WgxkTiIVpx4I0n
+         DIrwuSQLSiN3WMOh2Vv+h6+sYXhCtSveV+HeGoApb+er3DFKQf706OdgxXne7LYAxo
+         40J2lowQheE8Q==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=205441
-
-Thomas Lamprecht (t.lamprecht@proxmox.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |t.lamprecht@proxmox.com
-
---- Comment #1 from Thomas Lamprecht (t.lamprecht@proxmox.com) ---
-We had some similar issues reported from our users (Proxmox VE), they had all
-older Intel CPUs like you, and had issues with booting most types of Linux VMs.
-
-I bisected this here, with following result:
-git bisect log 
-# bad: [3b931173c97b0d73f80ea55b72bb2966a246167f] UBUNTU: Ubuntu-5.0.0-33.35
-# good: [5d5a6b36e94909962297fae609bff487de3cc43a] UBUNTU: Ubuntu-5.0.0-30.32
-git bisect start '3b931173c97b0d73f80ea55b72bb2966a246167f'
-'5d5a6b36e94909962297fae609bff487de3cc43a'
-# good: [7b4f844b33969ab166800f8936beef153fab736e] net/ibmvnic: free reset work
-of removed device from queue
-git bisect good 7b4f844b33969ab166800f8936beef153fab736e
-# bad: [6c1fc88702a4f33886b44ce5b6f374893b95e369] arm64: tlb: Ensure we execute
-an ISB following walk cache invalidation
-git bisect bad 6c1fc88702a4f33886b44ce5b6f374893b95e369
-# good: [e627a027b54eccc95f9e374d69aead7f1498877b] loop: Add LOOP_SET_DIRECT_IO
-to compat ioctl
-git bisect good e627a027b54eccc95f9e374d69aead7f1498877b
-# good: [29919eff6333bc67ec580b454afdd8b49883df2f] libata/ahci: Drop PCS quirk
-for Denverton and beyond
-git bisect good 29919eff6333bc67ec580b454afdd8b49883df2f
-# good: [cb44193f94af73928f8df049ffbb6b4a0be136ae] PM / devfreq: passive: fix
-compiler warning
-git bisect good cb44193f94af73928f8df049ffbb6b4a0be136ae
-# good: [b1d479b27b26966aea931094b31864979d7f8102] scsi: implement .cleanup_rq
-callback
-git bisect good b1d479b27b26966aea931094b31864979d7f8102
-# bad: [ec15813844b05d8cbd4352c65a20e57d16f9f936] media: sn9c20x: Add MSI
-MS-1039 laptop to flip_dmi_table
-git bisect bad ec15813844b05d8cbd4352c65a20e57d16f9f936
-# good: [e83601f51a90d9739ced9ff42b6f202f8f802c72] parisc: Disable HP HSC-PCI
-Cards to prevent kernel crash
-git bisect good e83601f51a90d9739ced9ff42b6f202f8f802c72
-# good: [6d393bdf3b3f4b629070329488d3c6a3e142602b] KVM: x86: set
-ctxt->have_exception in x86_decode_insn()
-git bisect good 6d393bdf3b3f4b629070329488d3c6a3e142602b
-# bad: [208007519a7385a57b0c0a3c180142a521594876] KVM: x86: Manually calculate
-reserved bits when loading PDPTRS
-git bisect bad 208007519a7385a57b0c0a3c180142a521594876
-# first bad commit: [208007519a7385a57b0c0a3c180142a521594876] KVM: x86:
-Manually calculate reserved bits when loading PDPTRS
-
-Which is:
-
-   KVM: x86: Manually calculate reserved bits when loading PDPTRS
-
-    BugLink: https://bugs.launchpad.net/bugs/1848367
-
-    commit 16cfacc8085782dab8e365979356ce1ca87fd6cc upstream.
-
-    Manually generate the PDPTR reserved bit mask when explicitly loading
-    PDPTRs.  The reserved bits that are being tracked by the MMU reflect the
-    current paging mode, which is unlikely to be PAE paging in the vast
-    majority of flows that use load_pdptrs(), e.g. CR0 and CR4 emulation,
-    __set_sregs(), etc...  This can cause KVM to incorrectly signal a bad
-    PDPTR, or more likely, miss a reserved bit check and subsequently fail
-    a VM-Enter due to a bad VMCS.GUEST_PDPTR.
-
-    Add a one off helper to generate the reserved bits instead of sharing
-    code across the MMU's calculations and the PDPTR emulation.  The PDPTR
-    reserved bits are basically set in stone, and pushing a helper into
-    the MMU's calculation adds unnecessary complexity without improving
-    readability.
-
-    Oppurtunistically fix/update the comment for load_pdptrs().
-
-    Note, the buggy commit also introduced a deliberate functional change,
-    "Also remove bit 5-6 from rsvd_bits_mask per latest SDM.", which was
-    effectively (and correctly) reverted by commit cd9ae5fe47df ("KVM: x86:
-    Fix page-tables reserved bits").  A bit of SDM archaeology shows that
-    the SDM from late 2008 had a bug (likely a copy+paste error) where it
-    listed bits 6:5 as AVL and A for PDPTEs used for 4k entries but reserved
-    for 2mb entries.  I.e. the SDM contradicted itself, and bits 6:5 are and
-    always have been reserved.
-
-    Fixes: 20c466b56168d ("KVM: Use rsvd_bits_mask in load_pdptrs()")
-    Cc: stable@vger.kernel.org
-    Cc: Nadav Amit <nadav.amit@gmail.com>
-    Reported-by: Doug Reiland <doug.reiland@intel.com>
-    Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-    Reviewed-by: Peter Xu <peterx@redhat.com>
-    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-    Signed-off-by: Kamal Mostafa <kamal@canonical.com>
-    Signed-off-by: Kleber Sacilotto de Souza <kleber.souza@canonical.com>
 
 
-This one is also included in the 4.19.81 (or more correctly, it's there since 
-v4.19.77) with commit 496cf984a60edb5534118a596613cc9971e406e8 [0] or
-upstream commit 16cfacc8085782dab8e365979356ce1ca87fd6cc [1].
+On 11/7/2019 8:41 PM, Jason Wang wrote:
+> Mdev bus only supports vfio driver right now, so it doesn't implement
+> match method. But in the future, we may add drivers other than vfio,
+> the first driver could be virtio-mdev. This means we need to add
+> device class id support in bus match method to pair the mdev device
+> and mdev driver correctly.
+> 
+> So this patch adds id_table to mdev_driver and class_id for mdev
+> device with the match method for mdev bus.
+> 
+> Reviewed-by: Parav Pandit <parav@mellanox.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
-[0]:
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/commit/?h=v4.19.82&id=496cf984a60edb5534118a596613cc9971e406e8
-[1]: https://git.kernel.org/torvalds/c/16cfacc8085782dab8e365979356ce1ca87fd6cc
+Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
 
-Funny thing is: I cannot reproduce this with a 5.3.7 kernel, which _also_
-includes above commit. So possible another patch is missing in the backport,
-did not find anything obvious though...
+Thanks,
+Kirti
 
-So summary for reproducer:
-* dust of an host with old Intel CPU, e.g.: Intel Core2Duo CPU E8500 @3.16GHz
-  (something else westmer, conroe or the like should work too, or if it's
-released
-   over 10 years ago. 
-* Install a Linux Distro or just boot the installer of that in a VM, I used
-Debian 9,
-  as our users had issues with that but not with an ubuntu 19.10 VM.
-* see how it boot loops once a stable-kernel with above[0] backported
-  is used on the host
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+> ---
+>   .../driver-api/vfio-mediated-device.rst       |  5 ++++
+>   drivers/gpu/drm/i915/gvt/kvmgt.c              |  1 +
+>   drivers/s390/cio/vfio_ccw_ops.c               |  1 +
+>   drivers/s390/crypto/vfio_ap_ops.c             |  1 +
+>   drivers/vfio/mdev/mdev_core.c                 | 17 +++++++++++++
+>   drivers/vfio/mdev/mdev_driver.c               | 25 +++++++++++++++++++
+>   drivers/vfio/mdev/mdev_private.h              |  1 +
+>   drivers/vfio/mdev/vfio_mdev.c                 |  6 +++++
+>   include/linux/mdev.h                          |  8 ++++++
+>   include/linux/mod_devicetable.h               |  8 ++++++
+>   samples/vfio-mdev/mbochs.c                    |  1 +
+>   samples/vfio-mdev/mdpy.c                      |  1 +
+>   samples/vfio-mdev/mtty.c                      |  1 +
+>   13 files changed, 76 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+> index 25eb7d5b834b..6709413bee29 100644
+> --- a/Documentation/driver-api/vfio-mediated-device.rst
+> +++ b/Documentation/driver-api/vfio-mediated-device.rst
+> @@ -102,12 +102,14 @@ structure to represent a mediated device's driver::
+>         * @probe: called when new device created
+>         * @remove: called when device removed
+>         * @driver: device driver structure
+> +      * @id_table: the ids serviced by this driver
+>         */
+>        struct mdev_driver {
+>   	     const char *name;
+>   	     int  (*probe)  (struct device *dev);
+>   	     void (*remove) (struct device *dev);
+>   	     struct device_driver    driver;
+> +	     const struct mdev_class_id *id_table;
+>        };
+>   
+>   A mediated bus driver for mdev should use this structure in the function calls
+> @@ -170,6 +172,9 @@ that a driver should use to unregister itself with the mdev core driver::
+>   
+>   	extern void mdev_unregister_device(struct device *dev);
+>   
+> +It is also required to specify the class_id in create() callback through::
+> +
+> +	int mdev_set_class(struct mdev_device *mdev, u16 id);
+>   
+>   Mediated Device Management Interface Through sysfs
+>   ==================================================
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> index 343d79c1cb7e..6420f0dbd31b 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -678,6 +678,7 @@ static int intel_vgpu_create(struct kobject *kobj, struct mdev_device *mdev)
+>   		     dev_name(mdev_dev(mdev)));
+>   	ret = 0;
+>   
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   out:
+>   	return ret;
+>   }
+> diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+> index f0d71ab77c50..cf2c013ae32f 100644
+> --- a/drivers/s390/cio/vfio_ccw_ops.c
+> +++ b/drivers/s390/cio/vfio_ccw_ops.c
+> @@ -129,6 +129,7 @@ static int vfio_ccw_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>   			   private->sch->schid.ssid,
+>   			   private->sch->schid.sch_no);
+>   
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   	return 0;
+>   }
+>   
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 5c0f53c6dde7..07c31070afeb 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -343,6 +343,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>   	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+>   	mutex_unlock(&matrix_dev->lock);
+>   
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   	return 0;
+>   }
+>   
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index b558d4cfd082..7bfa2e46e829 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -45,6 +45,17 @@ void mdev_set_drvdata(struct mdev_device *mdev, void *data)
+>   }
+>   EXPORT_SYMBOL(mdev_set_drvdata);
+>   
+> +/*
+> + * Specify the class for the mdev device, this must be called during
+> + * create() callback.
+> + */
+> +void mdev_set_class(struct mdev_device *mdev, u16 id)
+> +{
+> +	WARN_ON(mdev->class_id);
+> +	mdev->class_id = id;
+> +}
+> +EXPORT_SYMBOL(mdev_set_class);
+> +
+>   struct device *mdev_dev(struct mdev_device *mdev)
+>   {
+>   	return &mdev->dev;
+> @@ -324,6 +335,12 @@ int mdev_device_create(struct kobject *kobj,
+>   	if (ret)
+>   		goto ops_create_fail;
+>   
+> +	if (!mdev->class_id) {
+> +		ret = -EINVAL;
+> +		dev_warn(dev, "mdev vendor driver failed to specify device class\n");
+> +		goto add_fail;
+> +	}
+> +
+>   	ret = device_add(&mdev->dev);
+>   	if (ret)
+>   		goto add_fail;
+> diff --git a/drivers/vfio/mdev/mdev_driver.c b/drivers/vfio/mdev/mdev_driver.c
+> index 0d3223aee20b..ed06433693e8 100644
+> --- a/drivers/vfio/mdev/mdev_driver.c
+> +++ b/drivers/vfio/mdev/mdev_driver.c
+> @@ -69,8 +69,33 @@ static int mdev_remove(struct device *dev)
+>   	return 0;
+>   }
+>   
+> +static int mdev_match(struct device *dev, struct device_driver *drv)
+> +{
+> +	unsigned int i;
+> +	struct mdev_device *mdev = to_mdev_device(dev);
+> +	struct mdev_driver *mdrv = to_mdev_driver(drv);
+> +	const struct mdev_class_id *ids = mdrv->id_table;
+> +
+> +	if (!ids)
+> +		return 0;
+> +
+> +	for (i = 0; ids[i].id; i++)
+> +		if (ids[i].id == mdev->class_id)
+> +			return 1;
+> +	return 0;
+> +}
+> +
+> +static int mdev_uevent(struct device *dev, struct kobj_uevent_env *env)
+> +{
+> +	struct mdev_device *mdev = to_mdev_device(dev);
+> +
+> +	return add_uevent_var(env, "MODALIAS=mdev:c%02X", mdev->class_id);
+> +}
+> +
+>   struct bus_type mdev_bus_type = {
+>   	.name		= "mdev",
+> +	.match		= mdev_match,
+> +	.uevent		= mdev_uevent,
+>   	.probe		= mdev_probe,
+>   	.remove		= mdev_remove,
+>   };
+> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
+> index 7d922950caaf..c65f436c1869 100644
+> --- a/drivers/vfio/mdev/mdev_private.h
+> +++ b/drivers/vfio/mdev/mdev_private.h
+> @@ -33,6 +33,7 @@ struct mdev_device {
+>   	struct kobject *type_kobj;
+>   	struct device *iommu_device;
+>   	bool active;
+> +	u16 class_id;
+>   };
+>   
+>   #define to_mdev_device(dev)	container_of(dev, struct mdev_device, dev)
+> diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
+> index 30964a4e0a28..38431e9ef7f5 100644
+> --- a/drivers/vfio/mdev/vfio_mdev.c
+> +++ b/drivers/vfio/mdev/vfio_mdev.c
+> @@ -120,10 +120,16 @@ static void vfio_mdev_remove(struct device *dev)
+>   	vfio_del_group_dev(dev);
+>   }
+>   
+> +static const struct mdev_class_id vfio_id_table[] = {
+> +	{ MDEV_CLASS_ID_VFIO },
+> +	{ 0 },
+> +};
+> +
+>   static struct mdev_driver vfio_mdev_driver = {
+>   	.name	= "vfio_mdev",
+>   	.probe	= vfio_mdev_probe,
+>   	.remove	= vfio_mdev_remove,
+> +	.id_table = vfio_id_table,
+>   };
+>   
+>   static int __init vfio_mdev_init(void)
+> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
+> index 0ce30ca78db0..78b69d09eb54 100644
+> --- a/include/linux/mdev.h
+> +++ b/include/linux/mdev.h
+> @@ -118,6 +118,7 @@ struct mdev_type_attribute mdev_type_attr_##_name =		\
+>    * @probe: called when new device created
+>    * @remove: called when device removed
+>    * @driver: device driver structure
+> + * @id_table: the ids serviced by this driver
+>    *
+>    **/
+>   struct mdev_driver {
+> @@ -125,6 +126,7 @@ struct mdev_driver {
+>   	int  (*probe)(struct device *dev);
+>   	void (*remove)(struct device *dev);
+>   	struct device_driver driver;
+> +	const struct mdev_class_id *id_table;
+>   };
+>   
+>   #define to_mdev_driver(drv)	container_of(drv, struct mdev_driver, driver)
+> @@ -132,6 +134,7 @@ struct mdev_driver {
+>   void *mdev_get_drvdata(struct mdev_device *mdev);
+>   void mdev_set_drvdata(struct mdev_device *mdev, void *data);
+>   const guid_t *mdev_uuid(struct mdev_device *mdev);
+> +void mdev_set_class(struct mdev_device *mdev, u16 id);
+>   
+>   extern struct bus_type mdev_bus_type;
+>   
+> @@ -145,4 +148,9 @@ struct device *mdev_parent_dev(struct mdev_device *mdev);
+>   struct device *mdev_dev(struct mdev_device *mdev);
+>   struct mdev_device *mdev_from_dev(struct device *dev);
+>   
+> +enum {
+> +	MDEV_CLASS_ID_VFIO = 1,
+> +	/* New entries must be added here */
+> +};
+> +
+>   #endif /* MDEV_H */
+> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+> index 5714fd35a83c..f32c6e44fb1a 100644
+> --- a/include/linux/mod_devicetable.h
+> +++ b/include/linux/mod_devicetable.h
+> @@ -821,4 +821,12 @@ struct wmi_device_id {
+>   	const void *context;
+>   };
+>   
+> +/**
+> + * struct mdev_class_id - MDEV device class identifier
+> + * @id: Used to identify a specific class of device, e.g vfio-mdev device.
+> + */
+> +struct mdev_class_id {
+> +	__u16 id;
+> +};
+> +
+>   #endif /* LINUX_MOD_DEVICETABLE_H */
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index ac5c8c17b1ff..115bc5074656 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -561,6 +561,7 @@ static int mbochs_create(struct kobject *kobj, struct mdev_device *mdev)
+>   	mbochs_reset(mdev);
+>   
+>   	mbochs_used_mbytes += type->mbytes;
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   	return 0;
+>   
+>   err_mem:
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index cc86bf6566e4..665614574d50 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -269,6 +269,7 @@ static int mdpy_create(struct kobject *kobj, struct mdev_device *mdev)
+>   	mdpy_reset(mdev);
+>   
+>   	mdpy_count++;
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   	return 0;
+>   }
+>   
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index ce84a300a4da..90da12ff7fd9 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -755,6 +755,7 @@ static int mtty_create(struct kobject *kobj, struct mdev_device *mdev)
+>   	list_add(&mdev_state->next, &mdev_devices_list);
+>   	mutex_unlock(&mdev_list_lock);
+>   
+> +	mdev_set_class(mdev, MDEV_CLASS_ID_VFIO);
+>   	return 0;
+>   }
+>   
+> 
