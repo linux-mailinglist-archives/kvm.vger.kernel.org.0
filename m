@@ -2,165 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAE36F2E46
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 13:42:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E295F2E4C
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 13:43:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388643AbfKGMmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 07:42:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54952 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1733250AbfKGMmL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Nov 2019 07:42:11 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA7Cc1Og137590
-        for <kvm@vger.kernel.org>; Thu, 7 Nov 2019 07:42:10 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w4jw4j8fq-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 07:42:09 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Thu, 7 Nov 2019 12:42:07 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 7 Nov 2019 12:42:05 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA7CfSGk42009074
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Nov 2019 12:41:28 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A659AA405C;
-        Thu,  7 Nov 2019 12:42:03 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 420CBA405B;
-        Thu,  7 Nov 2019 12:42:03 +0000 (GMT)
-Received: from [9.152.224.49] (unknown [9.152.224.49])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  7 Nov 2019 12:42:03 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
- controls
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-14-frankja@linux.ibm.com>
- <20191105185124.495d4820.cohuck@redhat.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Thu, 7 Nov 2019 13:42:03 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.1
+        id S2388592AbfKGMnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 07:43:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35048 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388307AbfKGMnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 07:43:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573130632;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pATjVuxpgA+rUzNn2lzZ9Qgz3lzYzBUuXos2KOBhUA8=;
+        b=V/nFimh8jiR45m70yKJXar3TIbl+K8V+IjUOKa+Ct/GANAshtNranAnmL2N8+hEUIBmX8U
+        TX/JuEh53syYtY+5H4QzBFeFX1f3rEbT+QlO5IboW+ElnAsMZR2dpg6v3ewAI+8uXzkxhB
+        9p4c+er9tDwi3aBMtvuQXgVMQAsOs0g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-8LDROsBLN-2gMmnotsVoag-1; Thu, 07 Nov 2019 07:43:49 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CEED477;
+        Thu,  7 Nov 2019 12:43:45 +0000 (UTC)
+Received: from [10.72.12.21] (ovpn-12-21.pek2.redhat.com [10.72.12.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A587D608AC;
+        Thu,  7 Nov 2019 12:43:31 +0000 (UTC)
+Subject: Re: [PATCH V10 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, tiwei.bie@intel.com,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, idos@mellanox.com,
+        eperezma@redhat.com, lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com
+References: <20191106133531.693-1-jasowang@redhat.com>
+ <20191106133531.693-7-jasowang@redhat.com>
+ <20191107040700-mutt-send-email-mst@kernel.org>
+ <bd2f7796-8d88-0eb3-b55b-3ec062b186b7@redhat.com>
+ <20191107061942-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d09229bc-c3e4-8d4b-c28f-565fe150ced2@redhat.com>
+Date:   Thu, 7 Nov 2019 20:43:29 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191105185124.495d4820.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20191107061942-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19110712-4275-0000-0000-0000037BA4BE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110712-4276-0000-0000-0000388EF602
-Message-Id: <ea08a16a-fd00-9335-f471-62cfd54334b0@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-07_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911070127
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 8LDROsBLN-2gMmnotsVoag-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-
-On 05.11.19 18:51, Cornelia Huck wrote:
-> On Thu, 24 Oct 2019 07:40:35 -0400
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> From: Michael Mueller <mimu@linux.ibm.com>
+On 2019/11/7 =E4=B8=8B=E5=8D=887:21, Michael S. Tsirkin wrote:
+> On Thu, Nov 07, 2019 at 06:18:45PM +0800, Jason Wang wrote:
+>> On 2019/11/7 =E4=B8=8B=E5=8D=885:08, Michael S. Tsirkin wrote:
+>>> On Wed, Nov 06, 2019 at 09:35:31PM +0800, Jason Wang wrote:
+>>>> This sample driver creates mdev device that simulate virtio net device
+>>>> over virtio mdev transport. The device is implemented through vringh
+>>>> and workqueue. A device specific dma ops is to make sure HVA is used
+>>>> directly as the IOVA. This should be sufficient for kernel virtio
+>>>> driver to work.
+>>>>
+>>>> Only 'virtio' type is supported right now. I plan to add 'vhost' type
+>>>> on top which requires some virtual IOMMU implemented in this sample
+>>>> driver.
+>>>>
+>>>> Acked-by: Cornelia Huck<cohuck@redhat.com>
+>>>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+>>> I'd prefer it that we call this something else, e.g.
+>>> mvnet-loopback. Just so people don't expect a fully
+>>> functional device somehow. Can be renamed when applying?
+>> Actually, I plan to extend it as another standard network interface for
+>> kernel. It could be either a standalone pseudo device or a stack device.
+>> Does this sounds good to you?
 >>
->> Define the interruption injection codes and the related fields in the
->> sie control block for PVM interruption injection.
->>
->> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
->> ---
->>   arch/s390/include/asm/kvm_host.h | 25 +++++++++++++++++++++----
->>   1 file changed, 21 insertions(+), 4 deletions(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index 6cc3b73ca904..82443236d4cc 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -215,7 +215,15 @@ struct kvm_s390_sie_block {
->>   	__u8	icptcode;		/* 0x0050 */
->>   	__u8	icptstatus;		/* 0x0051 */
->>   	__u16	ihcpu;			/* 0x0052 */
->> -	__u8	reserved54[2];		/* 0x0054 */
->> +	__u8	reserved54;		/* 0x0054 */
->> +#define IICTL_CODE_NONE		 0x00
->> +#define IICTL_CODE_MCHK		 0x01
->> +#define IICTL_CODE_EXT		 0x02
->> +#define IICTL_CODE_IO		 0x03
->> +#define IICTL_CODE_RESTART	 0x04
->> +#define IICTL_CODE_SPECIFICATION 0x10
->> +#define IICTL_CODE_OPERAND	 0x11
->> +	__u8	iictl;			/* 0x0055 */
->>   	__u16	ipa;			/* 0x0056 */
->>   	__u32	ipb;			/* 0x0058 */
->>   	__u32	scaoh;			/* 0x005c */
->> @@ -252,7 +260,8 @@ struct kvm_s390_sie_block {
->>   #define HPID_KVM	0x4
->>   #define HPID_VSIE	0x5
->>   	__u8	hpid;			/* 0x00b8 */
->> -	__u8	reservedb9[11];		/* 0x00b9 */
->> +	__u8	reservedb9[7];		/* 0x00b9 */
->> +	__u32	eiparams;		/* 0x00c0 */
->>   	__u16	extcpuaddr;		/* 0x00c4 */
->>   	__u16	eic;			/* 0x00c6 */
->>   	__u32	reservedc8;		/* 0x00c8 */
->> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
->>   	__u8	oai;			/* 0x00e2 */
->>   	__u8	armid;			/* 0x00e3 */
->>   	__u8	reservede4[4];		/* 0x00e4 */
->> -	__u64	tecmc;			/* 0x00e8 */
->> -	__u8	reservedf0[12];		/* 0x00f0 */
->> +	union {
->> +		__u64	tecmc;		/* 0x00e8 */
->> +		struct {
->> +			__u16	subchannel_id;	/* 0x00e8 */
->> +			__u16	subchannel_nr;	/* 0x00ea */
->> +			__u32	io_int_parm;	/* 0x00ec */
->> +			__u32	io_int_word;	/* 0x00f0 */
->> +		};
->> +	} __packed;
->> +	__u8	reservedf4[8];		/* 0x00f4 */
-> 
-> IIUC, for protected guests, you won't get an interception for which
-> tecmc would be valid anymore, but need to put the I/O interruption
-> stuff at the same place, right?
+>> Thanks
+> That's a big change in an interface so it's a good reason
+> to rename the driver at that point right?
+> Oherwise users of an old kernel would expect a stacked driver
+> and get a loopback instead.
+>
+> Or did I miss something?
 
-Yes, the format 4 architecture defines this.
 
-> 
-> My main issue is that this makes the control block definition a bit
-> ugly, since the f0 value that's unused in the non-protvirt case is not
-> obvious anymore; but I don't know how to express this without making it
-> even uglier :(
+My understanding is that it was a sample driver in /doc. It should not=20
+be used in production environment. Otherwise we need to move it to=20
+driver/virtio.
 
-:)
-
-> 
->>   #define CRYCB_FORMAT_MASK 0x00000003
->>   #define CRYCB_FORMAT0 0x00000000
->>   #define CRYCB_FORMAT1 0x00000001
-> 
+But if you insist, I can post a V11.
 
 Thanks
-Michael
 
