@@ -2,97 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 151DAF2BDF
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 11:10:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E627F2BF6
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 11:17:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733222AbfKGKKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 05:10:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46256 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727528AbfKGKKi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 05:10:38 -0500
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1733306AbfKGKRW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 05:17:22 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42403 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1733142AbfKGKRW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Nov 2019 05:17:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573121841;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JfV7Ui0H34lc92hzIDp9GSS0/7fG2fsW51TyX4HtAsI=;
+        b=CfEHg1PJYo5wBamWhOPfDIxIqwFz6blp3vY/u4lgx//DVMrfYJkwa60EBdjmhDq+fTuaTr
+        b5czqTM2Y3i98riOyNV67izXrxAjfwaZjdpeCr54vHYfzJhTrub1i4mK8hsk7iM6O+zjR/
+        A5sjC+b9Sk2FBTGqx1PJ8w2JIQ6FIFA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-328-DKf9nbPbNFy35g1M123gRg-1; Thu, 07 Nov 2019 05:17:18 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 66ED67C0A7
-        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 10:10:38 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id b10so497274wmh.6
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 02:10:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OCIqyJJdOW00bPyctKLkzxNP0EVAczBbs1eO7W8t2tM=;
-        b=fR1iY418qnY1SqGTZxoHbg0xOsXSpsGp5mtMZ1+R1MrbR5s6tWbya2DzF66Yx2Zr/v
-         Fh+SkF2dE1SFfwe3QPXWyHPQ4myBp31GhGionLGVsLWGJR+KqTocuqT78LIEoJCaKhvY
-         l6xguKfjBbmbo2jnBBNzsJG+RO3s83lhKOEsC2spTp+0ZDN2XfsWrl8/s8/0WFd47+Sw
-         oawjFyr2v6Bkl6kvtjdXqYmfi3YPsygXjix2WlEGrUDJ2CEfNo+xcsqNj9bkk5jwPAiS
-         DwkrY6eptIz+xc1MXzDTq+moZLw0q7PvHxjFuR85BiIqL42fe12a09pSkyL5/kB84Pvk
-         9Ytg==
-X-Gm-Message-State: APjAAAUblPHbUQ1kuAcyFaeJ3rG3EGfXXvF85a9+JVYyaBRdZZTFKtJx
-        bhzd7Ph+JXLvoGsRQ6ASa3sYvfnNLNT2JGP5Yq6cQTtt53zDsLboYiO6Zjqt97rk6IYBLEeAHd7
-        Xc4hzCqyq2KI0
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr2001967wru.344.1573121436852;
-        Thu, 07 Nov 2019 02:10:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwVrO1kZIfHP7MQ5tgPYumXgK/TKMlvQ8AyGBFuR4+U8dCNxxCN3OTkTO6xgcYkWl6NDneBuw==
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr2001944wru.344.1573121436558;
-        Thu, 07 Nov 2019 02:10:36 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id y17sm1836077wrs.58.2019.11.07.02.10.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 02:10:35 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: coalesced_mmio: cleanup kvm_coalesced_mmio_init()
-Date:   Thu,  7 Nov 2019 11:10:34 +0100
-Message-Id: <20191107101034.29675-1-vkuznets@redhat.com>
-X-Mailer: git-send-email 2.20.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D398F800C61;
+        Thu,  7 Nov 2019 10:17:16 +0000 (UTC)
+Received: from [10.72.12.214] (ovpn-12-214.pek2.redhat.com [10.72.12.214])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 446925C290;
+        Thu,  7 Nov 2019 10:16:49 +0000 (UTC)
+Subject: Re: [PATCH v6] vhost: introduce mdev based hardware backend
+To:     Tiwei Bie <tiwei.bie@intel.com>, mst@redhat.com,
+        alex.williamson@redhat.com, maxime.coquelin@redhat.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, lingshan.zhu@intel.com
+References: <20191107073530.15291-1-tiwei.bie@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <1b60cc37-1c85-df85-1f4d-3f9a10ecef54@redhat.com>
+Date:   Thu, 7 Nov 2019 18:16:46 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191107073530.15291-1-tiwei.bie@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: DKf9nbPbNFy35g1M123gRg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Neither 'ret' variable nor 'out_err' label is really needed.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- virt/kvm/coalesced_mmio.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+On 2019/11/7 =E4=B8=8B=E5=8D=883:35, Tiwei Bie wrote:
+> This patch introduces a mdev based hardware vhost backend.
+> This backend is built on top of the same abstraction used
+> in virtio-mdev and provides a generic vhost interface for
+> userspace to accelerate the virtio devices in guest.
+>
+> This backend is implemented as a mdev device driver on top
+> of the same mdev device ops used in virtio-mdev but using
+> a different mdev class id, and it will register the device
+> as a VFIO device for userspace to use. Userspace can setup
+> the IOMMU with the existing VFIO container/group APIs and
+> then get the device fd with the device name. After getting
+> the device fd, userspace can use vhost ioctls on top of it
+> to setup the backend.
+>
+> Signed-off-by: Tiwei Bie<tiwei.bie@intel.com>
+> ---
+> This patch depends on below series:
+> https://lkml.org/lkml/2019/11/6/538
 
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 8ffd07e2a160..00c747dbc82e 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -110,14 +110,11 @@ static const struct kvm_io_device_ops coalesced_mmio_ops = {
- int kvm_coalesced_mmio_init(struct kvm *kvm)
- {
- 	struct page *page;
--	int ret;
- 
--	ret = -ENOMEM;
- 	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
- 	if (!page)
--		goto out_err;
-+		return -ENOMEM;
- 
--	ret = 0;
- 	kvm->coalesced_mmio_ring = page_address(page);
- 
- 	/*
-@@ -128,8 +125,7 @@ int kvm_coalesced_mmio_init(struct kvm *kvm)
- 	spin_lock_init(&kvm->ring_lock);
- 	INIT_LIST_HEAD(&kvm->coalesced_zones);
- 
--out_err:
--	return ret;
-+	return 0;
- }
- 
- void kvm_coalesced_mmio_free(struct kvm *kvm)
--- 
-2.20.1
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks!
 
