@@ -2,113 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABC90F33FA
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 16:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E267F3407
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 17:01:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730280AbfKGP6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 10:58:48 -0500
-Received: from mga17.intel.com ([192.55.52.151]:40076 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727727AbfKGP6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 10:58:47 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Nov 2019 07:58:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,278,1569308400"; 
-   d="scan'208";a="286027072"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga001.jf.intel.com with ESMTP; 07 Nov 2019 07:58:46 -0800
-Date:   Thu, 7 Nov 2019 07:58:46 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        id S1730114AbfKGQBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 11:01:32 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:38414 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729871AbfKGQBc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 11:01:32 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7Fx2nh125294;
+        Thu, 7 Nov 2019 16:00:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=c12rUaycNzO7zYCgriemaWn5qIFSRzTDdlQlHvFHXos=;
+ b=LuQR1i9OBvPBvjpBfVlpLdELDgfFY6IplMlZg/jTd8QxGL7HERIg+V88h/ajR3H+eB/M
+ K5jx7YsAFRdT7YrBpvSoyF5P9svwH+JeIxPSCwSYdSCZ4T3dsXoegnh2tp6s3jnjytsn
+ 6gTq6bYIu1Gxx0EOEiBwwBcqQjr/IpoxldXsFKxBG5rUUy8VkQnOhQstlk+UIHmv3xPW
+ zDTGHUltK2GjBoGOOG3mqJzKTQV3Y9eXp7lng+z7UE3OioYEJ0JD1CU3pBui6ZBI8wID
+ k18VYcPm6sHTFhJWh73HScT74JD77dzj9aZWes7G10gSUQRYQQDyuaxFu8cgOCmrIYhH /w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2w41w17711-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 07 Nov 2019 16:00:08 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7FwWAJ073212;
+        Thu, 7 Nov 2019 16:00:07 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2w41whgh2w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 07 Nov 2019 16:00:07 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA7G04HN028891;
+        Thu, 7 Nov 2019 16:00:04 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 07 Nov 2019 16:00:04 +0000
+Subject: Re: [PATCH v1 1/3] KVM: VMX: Consider PID.PIR to determine if vCPU
+ has pending interrupts
+To:     Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Adam Borowski <kilobyte@angband.pl>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
- reserved
-Message-ID: <20191107155846.GA7760@linux.intel.com>
-References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
- <20191106170727.14457-2-sean.j.christopherson@intel.com>
- <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
- <1cf71906-ba99-e637-650f-fc08ac4f3d5f@redhat.com>
- <CAPcyv4hMOxPDKAZtTvWKEMPBwE_kPrKPB_JxE2YfV5EKkKj_dQ@mail.gmail.com>
- <20191106233913.GC21617@linux.intel.com>
- <CAPcyv4jysxEu54XK2kUYnvTqUL7zf2fJvv7jWRR=P4Shy+3bOQ@mail.gmail.com>
- <CAPcyv4i3M18V9Gmx3x7Ad12VjXbq94NsaUG9o71j59mG9-6H9Q@mail.gmail.com>
- <0db7c328-1543-55db-bc02-c589deb3db22@redhat.com>
- <CAPcyv4gMu547patcROaqBqbwxut5au-WyE_M=XsKxyCLbLXHTg@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>
+References: <20191106175602.4515-1-joao.m.martins@oracle.com>
+ <20191106175602.4515-2-joao.m.martins@oracle.com>
+From:   Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <84b00baf-0fb9-919c-fabc-ae990e854257@oracle.com>
+Date:   Thu, 7 Nov 2019 11:00:03 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4gMu547patcROaqBqbwxut5au-WyE_M=XsKxyCLbLXHTg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191106175602.4515-2-joao.m.martins@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911070152
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911070152
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 07, 2019 at 07:36:45AM -0800, Dan Williams wrote:
-> On Thu, Nov 7, 2019 at 3:12 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 07/11/19 06:48, Dan Williams wrote:
-> > >> How do mmu notifiers get held off by page references and does that
-> > >> machinery work with ZONE_DEVICE? Why is this not a concern for the
-> > >> VM_IO and VM_PFNMAP case?
-> > > Put another way, I see no protection against truncate/invalidate
-> > > afforded by a page pin. If you need guarantees that the page remains
-> > > valid in the VMA until KVM can install a mmu notifier that needs to
-> > > happen under the mmap_sem as far as I can see. Otherwise gup just
-> > > weakly asserts "this pinned page was valid in this vma at one point in
-> > > time".
-> >
-> > The MMU notifier is installed before gup, so any invalidation will be
-> > preceded by a call to the MMU notifier.  In turn,
-> > invalidate_range_start/end is called with mmap_sem held so there should
-> > be no race.
-> >
-> > However, as Sean mentioned, early put_page of ZONE_DEVICE pages would be
-> > racy, because we need to keep the reference between the gup and the last
-> > time we use the corresponding struct page.
+
+
+On 11/6/2019 12:56 PM, Joao Martins wrote:
+> Commit 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
+> introduced vmx_dy_apicv_has_pending_interrupt() in order to determine
+> if a vCPU have a pending posted interrupt. This routine is used by
+> kvm_vcpu_on_spin() when searching for a a new runnable vCPU to schedule
+> on pCPU instead of a vCPU doing busy loop.
 > 
-> If KVM is establishing the mmu_notifier before gup then there is
-> nothing left to do with that ZONE_DEVICE page, so I'm struggling to
-> see what further qualification of kvm_is_reserved_pfn() buys the
-> implementation.
+> vmx_dy_apicv_has_pending_interrupt() determines if a
+> vCPU has a pending posted interrupt solely based on PID.ON. However,
+> when a vCPU is preempted, vmx_vcpu_pi_put() sets PID.SN which cause
+> raised posted interrupts to only set bit in PID.PIR without setting
+> PID.ON (and without sending notification vector), as depicted in VT-d
+> manual section 5.2.3 "Interrupt-Posting Hardware Operation".
+> 
+> Therefore, checking PID.ON is insufficient to determine if a vCPU has
+> pending posted interrupts and instead we should also check if there is
+> some bit set on PID.PIR.
+> 
+> Fixes: 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 
-Insertion into KVM's secondary MMU is mutually exclusive with an invalidate
-from the mmu_notifier.  KVM holds a reference to the to-be-inserted page
-until the page has been inserted, which ensures that the page is pinned and
-thus won't be invalidated until after the page is inserted.  This prevents
-an invalidate from racing with insertion.  Dropping the reference
-immediately after gup() would allow the invalidate to run prior to the page
-being inserted, and so KVM would map the stale PFN into the guest's page
-tables after it was invalidated in the host.
+Reviewed-by: Jagannathan Raman <jag.raman@oracle.com>
 
-The other benefit of treating ZONE_DEVICE pages as not-reserved is that it
-allows KVM to do proper sanity checks, e.g. when removing pages from its
-secondary MMU, KVM asserts that page_count() for present pages is non-zero
-to help detect bugs where KVM didn't properly zap the page from its MMU.
-Enabling the assertion for ZONE_DEVICE pages would be very nice to have as
-it's the most explicit indicator that we done messed up, e.g. without the
-associated WARN, errors manifest as random corruption or weird behavior in
-the guest.
-
-> However, if you're attracted to the explicitness of Sean's approach
-> can I at least ask for comments asserting that KVM knows it already
-> holds a reference on that page so the is_zone_device_page() usage is
-> safe?
-
-Ya, I'll update the patch to add comments and a WARN.
-
-> David and I are otherwise trying to reduce is_zone_device_page() to
-> easy to audit "obviously safe" cases and converting the others with
-> additional synchronization.
+> ---
+>   arch/x86/kvm/vmx/vmx.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 31ce6bc2c371..18b0bee662a5 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6141,7 +6141,10 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>   
+>   static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
+>   {
+> -	return pi_test_on(vcpu_to_pi_desc(vcpu));
+> +	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+> +
+> +	return pi_test_on(pi_desc) ||
+> +		!bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
+>   }
+>   
+>   static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+> 
