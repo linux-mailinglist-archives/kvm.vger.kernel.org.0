@@ -2,183 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72336F31E9
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 16:03:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27856F325F
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 16:11:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729811AbfKGPDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 10:03:34 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:54462 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726810AbfKGPDd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 10:03:33 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7EiQQf050951;
-        Thu, 7 Nov 2019 15:02:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=WIrFjT89+Gu5N4D3hmBKexKVwTCS1SDwd3tM6/hO4o4=;
- b=Y5YC+/pSrp7sYP+/eudVtCqXnEXyWhvFJX5hW5Z5b9kAbLphFmM3cAxSIIcLJIqmUp6s
- Ee/R5jK2gZCgBz3FILobpIxrkRN4cTUz2en9wOT74i5ZBzCAdmEVJCzf79pf20dOmCLu
- 7jhRoQ/Psrc/Yf2D4n20RKyrxx2/EFVj3COe+3//SihJwC5f67ZdifrPEaIzMdur5YC0
- RResaZS9Edmvzy2r6tWCwIvYyipTk8z1/y66uZ2Q+viVO7Ngjtv8iuPFZHxmcUXSXp3H
- y/sM2sSELo2G5q1F6i8gJiRgWkBv4IUAtbB6R3YrvNfMdF+49eDFdG30FDHuvvpm/iQ/ AA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2w41w16s7e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 07 Nov 2019 15:02:38 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7Eia3k131529;
-        Thu, 7 Nov 2019 15:02:38 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2w4k2vee2x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 07 Nov 2019 15:02:36 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA7F2WhJ024079;
-        Thu, 7 Nov 2019 15:02:34 GMT
-Received: from [192.168.14.112] (/79.182.207.213)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 07 Nov 2019 07:02:32 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
- trustworthy
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <943488A8-2DD7-4471-B3C7-9F21A0B0BCF9@dinechin.org>
-Date:   Thu, 7 Nov 2019 17:02:26 +0200
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>
+        id S2389452AbfKGPLt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 10:11:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32826 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388519AbfKGPLt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Nov 2019 10:11:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573139507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=FrBgMaUl+cnUHfuZj6Cms+/UBTPhWI76SfAU6TTRzaU=;
+        b=YcS14Fee3afaGxDGDnM9ZR+5aA8cEpCsVnKaQ43/DZYowgNj31hphwReNmDlNF8ldeqaxP
+        pmwBPFyeyrCgPXu7V5aSCu1jMC0lfhce1B1f9eKJKgaXeAL/O1VN+pn7ENTwuPcm55l4rl
+        V5amn/Y022HIWjXwJbqjx59FTAqzIJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-cC6C2CnIObebYy1VhuzwIg-1; Thu, 07 Nov 2019 10:11:41 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5061D800C61;
+        Thu,  7 Nov 2019 15:11:37 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com (ovpn-12-21.pek2.redhat.com [10.72.12.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 019B2600D1;
+        Thu,  7 Nov 2019 15:11:11 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        cohuck@redhat.com, maxime.coquelin@redhat.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, xiao.w.wang@intel.com,
+        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
+        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
+        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
+        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: [PATCH V11 0/6] mdev based hardware virtio offloading support
+Date:   Thu,  7 Nov 2019 23:11:03 +0800
+Message-Id: <20191107151109.23261-1-jasowang@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: cC6C2CnIObebYy1VhuzwIg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <713ECF67-6A6C-4956-8AC6-7F4C05961328@oracle.com>
-References: <20191105161737.21395-1-vkuznets@redhat.com>
- <20191105193749.GA20225@linux.intel.com>
- <20191105232500.GA25887@linux.intel.com>
- <943488A8-2DD7-4471-B3C7-9F21A0B0BCF9@dinechin.org>
-To:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911070144
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911070144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi all:
 
+There are hardwares that can do virtio datapath offloading while
+having its own control path. This path tries to implement a mdev based
+unified API to support using kernel virtio driver to drive those
+devices. This is done by introducing a new mdev transport for virtio
+(virtio_mdev) and register itself as a new kind of mdev driver. Then
+it provides a unified way for kernel virtio driver to talk with mdev
+device implementation.
 
-> On 7 Nov 2019, at 16:00, Christophe de Dinechin =
-<christophe.de.dinechin@gmail.com> wrote:
->=20
->=20
->=20
->> On 6 Nov 2019, at 00:25, Sean Christopherson =
-<sean.j.christopherson@intel.com> wrote:
->>=20
->> On Tue, Nov 05, 2019 at 11:37:50AM -0800, Sean Christopherson wrote:
->>> On Tue, Nov 05, 2019 at 05:17:37PM +0100, Vitaly Kuznetsov wrote:
->>>> Virtualized guests may pick a different strategy to mitigate =
-hardware
->>>> vulnerabilities when it comes to hyper-threading: disable SMT =
-completely,
->>>> use core scheduling, or, for example, opt in for STIBP. Making the
->>>> decision, however, requires an extra bit of information which is =
-currently
->>>> missing: does the topology the guest see match hardware or if it is =
-'fake'
->>>> and two vCPUs which look like different cores from guest's =
-perspective can
->>>> actually be scheduled on the same physical core. Disabling SMT or =
-doing
->>>> core scheduling only makes sense when the topology is trustworthy.
->>>>=20
->>>> Add two feature bits to KVM: KVM_FEATURE_TRUSTWORTHY_SMT with the =
-meaning
->>>> that KVM_HINTS_TRUSTWORTHY_SMT bit answers the question if the =
-exposed SMT
->>>> topology is actually trustworthy. It would, of course, be possible =
-to get
->>>> away with a single bit (e.g. 'KVM_FEATURE_FAKE_SMT') and not lose =
-backwards
->>>> compatibility but the current approach looks more straightforward.
->>>=20
->>> I'd stay away from "trustworthy", especially if this is controlled =
-by
->>> userspace.  Whether or not the hint is trustworthy is purely up to =
-the
->>> guest.  Right now it doesn't really matter, but that will change as =
-we
->>> start moving pieces of the host out of the guest's TCB.
->>>=20
->>> It may make sense to split the two (or even three?) cases, e.g.
->>> KVM_FEATURE_NO_SMT and KVM_FEATURE_ACCURATE_TOPOLOGY.  KVM can =
-easily
->>> enforce NO_SMT _today_, i.e. allow it to be set if and only if SMT =
-is
->>> truly disabled.  Verifying that the topology exposed to the guest is =
-legit
->>> is a completely different beast.
->>=20
->> Scratch the ACCURATE_TOPOLOGY idea, I doubt there's a real use case =
-for
->> setting ACCURATE_TOPOLOGY and not KVM_HINTS_REALTIME.  A feature flag =
-to
->> state that SMT is disabled seems simple and useful.
+Though the series only contains kernel driver support, the goal is to
+make the transport generic enough to support userspace drivers. This
+means vhost-mdev[1] could be built on top as well by resuing the
+transport.
 
-A bit such as NoNonArchitecturalCoreSharing can be set even when host =
-SMT is enabled.
-For example, when host use core-scheduling to group together vCPUs that =
-run as sibling hyperthreads.
-Therefore, I wouldn=E2=80=99t want to tie the feature-flag semantics to =
-host SMT being enabled/disabled.
-It=E2=80=99s just true that this bit can be set when host SMT is =
-disabled.
+A sample driver is also implemented which simulate a virito-net
+loopback ethernet device on top of vringh + workqueue. This could be
+used as a reference implementation for real hardware driver.
 
->=20
-> I share that concern about the naming, although I do see some
-> value in exposing the cpu_smt_possible() result. I think it=E2=80=99s =
-easier
-> to state that something does not work than to state something does
-> work.
->=20
-> Also, with respect to mitigation, we may want to split the two cases
-> that Paolo outlined, i.e. have KVM_HINTS_REALTIME,
-> KVM_HINTS_CORES_CROSSTALK and
-> KVM_HINTS_CORES_LEAKING,
-> where CORES_CROSSTALKS indicates there may be some
-> cross-talk between what the guest thinks are isolated cores,
-> and CORES_LEAKING indicates that cores may leak data
-> to some other guest.
->=20
-> The problem with my approach is that it is shouting =E2=80=9Cdon=E2=80=99=
-t trust me=E2=80=9D
-> a bit too loudly.
+Also a real IFC VF driver was also posted here[2] which is a good
+reference for vendors who is interested in their own virtio datapath
+offloading product.
 
-I don=E2=80=99t see a value in exposing CORES_LEAKING to guest. As guest =
-have nothing to do with it.
+Consider mdev framework only support VFIO device and driver right now,
+this series also extend it to support other types. This is done
+through introducing class id to the device and pairing it with
+id_talbe claimed by the driver. On top, this seris also decouple
+device specific ops out of the common ones for implementing class
+specific operations over mdev bus.
 
--Liran
+Pktgen test was done with virito-net + mvnet loop back device.
 
+Please review.
 
+[1] https://lkml.org/lkml/2019/11/5/424
+[2] https://lkml.org/lkml/2019/11/5/227
 
+Changes from V10:
+- rename mvnet to mvnet_loopback
+- fix typo in the help text for sample Kconfig
 
+Changes from V9:
+- Tweak the help text for virito-mdev kconfig
 
+Changes from V8:
+- try silent checkpatch, some are still there becuase they were inherited
+  from virtio_config_ops which needs to be resolved in an independent serie=
+s
+- tweak on the comment and doc
+- remove VIRTIO_MDEV_F_VERSION_1 completely
+- rename CONFIG_VIRTIO_MDEV_DEVICE to CONFIG_VIRTIO_MDEV
 
+Changes from V7:
+- drop {set|get}_mdev_features for virtio
+- typo and comment style fixes
 
+Changes from V6:
+- rename ops files and compile guard
 
+Changes from V5:
+- use dev_warn() instead of WARN(1) when class id is not set
+- validate id_table before trying to do matching between device and
+  driver
+- add wildcard for modpost script
+- use unique name for id_table
+- move get_mdev_features() to be the first member of virtio_device_ops
+  and more comments for it
+- typo fixes for the comments above virtio_mdev_ops
+
+Changes from V4:
+- keep mdev_set_class() for the device that doesn't use device ops
+- use union for device ops pointer in mdev_device
+- introduce class specific helper for getting is device ops
+- use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
+- explain details of get_mdev_features() and get_vendor_id()
+- distinguish the optional virito device ops from mandatory ones and
+  make get_generation() optional
+- rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
+  virtio_mdev_ops.h
+- don't abuse version fileds in virtio_mdev structure, use features
+  instead
+- fix warning during device remove
+- style & docs tweaks and typo fixes
+
+Changes from V3:
+- document that class id (device ops) must be specified in create()
+- add WARN() when trying to set class_id when it has already set
+- add WARN() when class_id is not specified in create() and correctly
+  return an error in this case
+- correct the prototype of mdev_set_class() in the doc
+- add documention of mdev_set_class()
+- remove the unnecessary "class_id_fail" label when class id is not
+  specified in create()
+- convert id_table in vfio_mdev to const
+- move mdev_set_class and its friends after mdev_uuid()
+- suqash the patch of bus uevent into patch of introducing class id
+- tweak the words in the docs per Cornelia suggestion
+- tie class_id and device ops through class specific initialization
+  routine like mdev_set_vfio_ops()
+- typos fixes in the docs of virtio-mdev callbacks
+- document the usage of virtqueues in struct virtio_mdev_device
+- remove the useless vqs array in struct virtio_mdev_device
+- rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
+
+Changes from V2:
+- fail when class_id is not specified
+- drop the vringh patch
+- match the doc to the code
+- tweak the commit log
+- move device_ops from parent to mdev device
+- remove the unused MDEV_ID_VHOST
+
+Changes from V1:
+- move virtio_mdev.c to drivers/virtio
+- store class_id in mdev_device instead of mdev_parent
+- store device_ops in mdev_device instead of mdev_parent
+- reorder the patch, vringh fix comes first
+- really silent compiling warnings
+- really switch to use u16 for class_id
+- uevent and modpost support for mdev class_id
+- vraious tweaks per comments from Parav
+
+Changes from RFC-V2:
+- silent compile warnings on some specific configuration
+- use u16 instead u8 for class id
+- reseve MDEV_ID_VHOST for future vhost-mdev work
+- introduce "virtio" type for mvnet and make "vhost" type for future
+  work
+- add entries in MAINTAINER
+- tweak and typos fixes in commit log
+
+Changes from RFC-V1:
+- rename device id to class id
+- add docs for class id and device specific ops (device_ops)
+- split device_ops into seperate headers
+- drop the mdev_set_dma_ops()
+- use device_ops to implement the transport API, then it's not a part
+  of UAPI any more
+- use GFP_ATOMIC in mvnet sample device and other tweaks
+- set_vring_base/get_vring_base support for mvnet device
+
+Jason Wang (6):
+  mdev: class id support
+  modpost: add support for mdev class id
+  mdev: introduce device specific ops
+  mdev: introduce virtio device and its device ops
+  virtio: introduce a mdev based transport
+  docs: sample driver to demonstrate how to implement virtio-mdev
+    framework
+
+ .../driver-api/vfio-mediated-device.rst       |  38 +-
+ MAINTAINERS                                   |   3 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
+ drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
+ drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
+ drivers/vfio/mdev/mdev_core.c                 |  60 ++
+ drivers/vfio/mdev/mdev_driver.c               |  25 +
+ drivers/vfio/mdev/mdev_private.h              |   8 +
+ drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
+ drivers/virtio/Kconfig                        |  13 +
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio_mdev.c                  | 406 +++++++++++
+ include/linux/mdev.h                          |  57 +-
+ include/linux/mdev_vfio_ops.h                 |  52 ++
+ include/linux/mdev_virtio_ops.h               | 147 ++++
+ include/linux/mod_devicetable.h               |   8 +
+ samples/Kconfig                               |  10 +
+ samples/vfio-mdev/Makefile                    |   1 +
+ samples/vfio-mdev/mbochs.c                    |  19 +-
+ samples/vfio-mdev/mdpy.c                      |  19 +-
+ samples/vfio-mdev/mtty.c                      |  17 +-
+ samples/vfio-mdev/mvnet_loopback.c            | 687 ++++++++++++++++++
+ scripts/mod/devicetable-offsets.c             |   3 +
+ scripts/mod/file2alias.c                      |  11 +
+ 24 files changed, 1586 insertions(+), 91 deletions(-)
+ create mode 100644 drivers/virtio/virtio_mdev.c
+ create mode 100644 include/linux/mdev_vfio_ops.h
+ create mode 100644 include/linux/mdev_virtio_ops.h
+ create mode 100644 samples/vfio-mdev/mvnet_loopback.c
+
+--=20
+2.19.1
 
