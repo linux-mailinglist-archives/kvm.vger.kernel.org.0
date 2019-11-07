@@ -2,262 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D65FF33DD
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 16:54:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC90F33FA
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 16:58:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389080AbfKGPyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 10:54:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33044 "EHLO mx1.redhat.com"
+        id S1730280AbfKGP6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 10:58:48 -0500
+Received: from mga17.intel.com ([192.55.52.151]:40076 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727142AbfKGPyh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 10:54:37 -0500
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1AF228553D
-        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 15:54:37 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id k53so3125364qtk.0
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 07:54:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BBCrA8jI8FYav5dUH4JsIvDsqU9jbzWbW4UmAoXMTfU=;
-        b=A/Ger6uxrVkgtCHjw/n4vj8Puk7Y+uWcP6k2jiyUhTen3y6PJ6G6w7JHUI4zzWtOEp
-         H/JyDPRuXrIlA2MDx6ihZTFoZQY/yti6zpz7nknc9YofNSdSkmVVGCfMiuAzZckzCwgQ
-         TXLHhe6umP+ADuE9WCU2JBJppKc6127GvMEylZUgnp1baMYZYmGhBNq7AGWjLqJOa/0+
-         uo4CcPcdgxg6FrcYJoGm2eMfdfXS5w0kX1Cpz9Ax6nJrzpqDQ0C8o4yxwQCMAntScyM3
-         MdjEh9EeFoXkq4Nw5MqrKgwfCq/crpar+n9769a071FJCEGnPHS70kX49iJe0QCgqTme
-         wlDg==
-X-Gm-Message-State: APjAAAU73xQxWPHM86acYDzf/qo+hT6GjJGsKRZTCSOpMYelQjrdPce/
-        vHkb1mx1Stl898YzRXvS/io8Sikwy0aEB6yKR32eiTnm/91nNcrMAe4u0gcGtr70dOunryYkn9P
-        Gihvrqf2UGvlD
-X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3459332qkm.393.1573142076280;
-        Thu, 07 Nov 2019 07:54:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxSgLzGIZB2AaYtHaY2RkdEidB2NeRk+OXmCkV1uMYYneoFbHELGewocRRkI4W/JRZGPMhgWA==
-X-Received: by 2002:a05:620a:226:: with SMTP id u6mr3459254qkm.393.1573142075868;
-        Thu, 07 Nov 2019 07:54:35 -0800 (PST)
-Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
-        by smtp.gmail.com with ESMTPSA id 50sm2019631qtv.88.2019.11.07.07.54.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 07:54:34 -0800 (PST)
-Date:   Thu, 7 Nov 2019 10:54:22 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, eperezma@redhat.com,
-        lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com, rdunlap@infradead.org
-Subject: Re: [PATCH V11 0/6] mdev based hardware virtio offloading support
-Message-ID: <20191107105412-mutt-send-email-mst@kernel.org>
-References: <20191107151109.23261-1-jasowang@redhat.com>
+        id S1727727AbfKGP6r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 10:58:47 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Nov 2019 07:58:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,278,1569308400"; 
+   d="scan'208";a="286027072"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga001.jf.intel.com with ESMTP; 07 Nov 2019 07:58:46 -0800
+Date:   Thu, 7 Nov 2019 07:58:46 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
+ reserved
+Message-ID: <20191107155846.GA7760@linux.intel.com>
+References: <20191106170727.14457-1-sean.j.christopherson@intel.com>
+ <20191106170727.14457-2-sean.j.christopherson@intel.com>
+ <CAPcyv4gJk2cXLdT2dZwCH2AssMVNxUfdx-bYYwJwy1LwFxOs0w@mail.gmail.com>
+ <1cf71906-ba99-e637-650f-fc08ac4f3d5f@redhat.com>
+ <CAPcyv4hMOxPDKAZtTvWKEMPBwE_kPrKPB_JxE2YfV5EKkKj_dQ@mail.gmail.com>
+ <20191106233913.GC21617@linux.intel.com>
+ <CAPcyv4jysxEu54XK2kUYnvTqUL7zf2fJvv7jWRR=P4Shy+3bOQ@mail.gmail.com>
+ <CAPcyv4i3M18V9Gmx3x7Ad12VjXbq94NsaUG9o71j59mG9-6H9Q@mail.gmail.com>
+ <0db7c328-1543-55db-bc02-c589deb3db22@redhat.com>
+ <CAPcyv4gMu547patcROaqBqbwxut5au-WyE_M=XsKxyCLbLXHTg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191107151109.23261-1-jasowang@redhat.com>
+In-Reply-To: <CAPcyv4gMu547patcROaqBqbwxut5au-WyE_M=XsKxyCLbLXHTg@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 07, 2019 at 11:11:03PM +0800, Jason Wang wrote:
-> Hi all:
+On Thu, Nov 07, 2019 at 07:36:45AM -0800, Dan Williams wrote:
+> On Thu, Nov 7, 2019 at 3:12 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 07/11/19 06:48, Dan Williams wrote:
+> > >> How do mmu notifiers get held off by page references and does that
+> > >> machinery work with ZONE_DEVICE? Why is this not a concern for the
+> > >> VM_IO and VM_PFNMAP case?
+> > > Put another way, I see no protection against truncate/invalidate
+> > > afforded by a page pin. If you need guarantees that the page remains
+> > > valid in the VMA until KVM can install a mmu notifier that needs to
+> > > happen under the mmap_sem as far as I can see. Otherwise gup just
+> > > weakly asserts "this pinned page was valid in this vma at one point in
+> > > time".
+> >
+> > The MMU notifier is installed before gup, so any invalidation will be
+> > preceded by a call to the MMU notifier.  In turn,
+> > invalidate_range_start/end is called with mmap_sem held so there should
+> > be no race.
+> >
+> > However, as Sean mentioned, early put_page of ZONE_DEVICE pages would be
+> > racy, because we need to keep the reference between the gup and the last
+> > time we use the corresponding struct page.
 > 
-> There are hardwares that can do virtio datapath offloading while
-> having its own control path. This path tries to implement a mdev based
-> unified API to support using kernel virtio driver to drive those
-> devices. This is done by introducing a new mdev transport for virtio
-> (virtio_mdev) and register itself as a new kind of mdev driver. Then
-> it provides a unified way for kernel virtio driver to talk with mdev
-> device implementation.
-> 
-> Though the series only contains kernel driver support, the goal is to
-> make the transport generic enough to support userspace drivers. This
-> means vhost-mdev[1] could be built on top as well by resuing the
-> transport.
-> 
-> A sample driver is also implemented which simulate a virito-net
-> loopback ethernet device on top of vringh + workqueue. This could be
-> used as a reference implementation for real hardware driver.
-> 
-> Also a real IFC VF driver was also posted here[2] which is a good
-> reference for vendors who is interested in their own virtio datapath
-> offloading product.
-> 
-> Consider mdev framework only support VFIO device and driver right now,
-> this series also extend it to support other types. This is done
-> through introducing class id to the device and pairing it with
-> id_talbe claimed by the driver. On top, this seris also decouple
-> device specific ops out of the common ones for implementing class
-> specific operations over mdev bus.
-> 
-> Pktgen test was done with virito-net + mvnet loop back device.
-> 
-> Please review.
-> 
-> [1] https://lkml.org/lkml/2019/11/5/424
-> [2] https://lkml.org/lkml/2019/11/5/227
-> 
-> Changes from V10:
-> - rename mvnet to mvnet_loopback
-> - fix typo in the help text for sample Kconfig
+> If KVM is establishing the mmu_notifier before gup then there is
+> nothing left to do with that ZONE_DEVICE page, so I'm struggling to
+> see what further qualification of kvm_is_reserved_pfn() buys the
+> implementation.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Insertion into KVM's secondary MMU is mutually exclusive with an invalidate
+from the mmu_notifier.  KVM holds a reference to the to-be-inserted page
+until the page has been inserted, which ensures that the page is pinned and
+thus won't be invalidated until after the page is inserted.  This prevents
+an invalidate from racing with insertion.  Dropping the reference
+immediately after gup() would allow the invalidate to run prior to the page
+being inserted, and so KVM would map the stale PFN into the guest's page
+tables after it was invalidated in the host.
 
+The other benefit of treating ZONE_DEVICE pages as not-reserved is that it
+allows KVM to do proper sanity checks, e.g. when removing pages from its
+secondary MMU, KVM asserts that page_count() for present pages is non-zero
+to help detect bugs where KVM didn't properly zap the page from its MMU.
+Enabling the assertion for ZONE_DEVICE pages would be very nice to have as
+it's the most explicit indicator that we done messed up, e.g. without the
+associated WARN, errors manifest as random corruption or weird behavior in
+the guest.
 
-> Changes from V9:
-> - Tweak the help text for virito-mdev kconfig
-> 
-> Changes from V8:
-> - try silent checkpatch, some are still there becuase they were inherited
->   from virtio_config_ops which needs to be resolved in an independent series
-> - tweak on the comment and doc
-> - remove VIRTIO_MDEV_F_VERSION_1 completely
-> - rename CONFIG_VIRTIO_MDEV_DEVICE to CONFIG_VIRTIO_MDEV
-> 
-> Changes from V7:
-> - drop {set|get}_mdev_features for virtio
-> - typo and comment style fixes
-> 
-> Changes from V6:
-> - rename ops files and compile guard
-> 
-> Changes from V5:
-> - use dev_warn() instead of WARN(1) when class id is not set
-> - validate id_table before trying to do matching between device and
->   driver
-> - add wildcard for modpost script
-> - use unique name for id_table
-> - move get_mdev_features() to be the first member of virtio_device_ops
->   and more comments for it
-> - typo fixes for the comments above virtio_mdev_ops
-> 
-> Changes from V4:
-> - keep mdev_set_class() for the device that doesn't use device ops
-> - use union for device ops pointer in mdev_device
-> - introduce class specific helper for getting is device ops
-> - use WARN_ON instead of BUG_ON in mdev_set_virtio_ops
-> - explain details of get_mdev_features() and get_vendor_id()
-> - distinguish the optional virito device ops from mandatory ones and
->   make get_generation() optional
-> - rename vfio_mdev.h to vfio_mdev_ops.h, rename virito_mdev.h to
->   virtio_mdev_ops.h
-> - don't abuse version fileds in virtio_mdev structure, use features
->   instead
-> - fix warning during device remove
-> - style & docs tweaks and typo fixes
-> 
-> Changes from V3:
-> - document that class id (device ops) must be specified in create()
-> - add WARN() when trying to set class_id when it has already set
-> - add WARN() when class_id is not specified in create() and correctly
->   return an error in this case
-> - correct the prototype of mdev_set_class() in the doc
-> - add documention of mdev_set_class()
-> - remove the unnecessary "class_id_fail" label when class id is not
->   specified in create()
-> - convert id_table in vfio_mdev to const
-> - move mdev_set_class and its friends after mdev_uuid()
-> - suqash the patch of bus uevent into patch of introducing class id
-> - tweak the words in the docs per Cornelia suggestion
-> - tie class_id and device ops through class specific initialization
->   routine like mdev_set_vfio_ops()
-> - typos fixes in the docs of virtio-mdev callbacks
-> - document the usage of virtqueues in struct virtio_mdev_device
-> - remove the useless vqs array in struct virtio_mdev_device
-> - rename MDEV_ID_XXX to MDEV_CLASS_ID_XXX
-> 
-> Changes from V2:
-> - fail when class_id is not specified
-> - drop the vringh patch
-> - match the doc to the code
-> - tweak the commit log
-> - move device_ops from parent to mdev device
-> - remove the unused MDEV_ID_VHOST
-> 
-> Changes from V1:
-> - move virtio_mdev.c to drivers/virtio
-> - store class_id in mdev_device instead of mdev_parent
-> - store device_ops in mdev_device instead of mdev_parent
-> - reorder the patch, vringh fix comes first
-> - really silent compiling warnings
-> - really switch to use u16 for class_id
-> - uevent and modpost support for mdev class_id
-> - vraious tweaks per comments from Parav
-> 
-> Changes from RFC-V2:
-> - silent compile warnings on some specific configuration
-> - use u16 instead u8 for class id
-> - reseve MDEV_ID_VHOST for future vhost-mdev work
-> - introduce "virtio" type for mvnet and make "vhost" type for future
->   work
-> - add entries in MAINTAINER
-> - tweak and typos fixes in commit log
-> 
-> Changes from RFC-V1:
-> - rename device id to class id
-> - add docs for class id and device specific ops (device_ops)
-> - split device_ops into seperate headers
-> - drop the mdev_set_dma_ops()
-> - use device_ops to implement the transport API, then it's not a part
->   of UAPI any more
-> - use GFP_ATOMIC in mvnet sample device and other tweaks
-> - set_vring_base/get_vring_base support for mvnet device
-> 
-> Jason Wang (6):
->   mdev: class id support
->   modpost: add support for mdev class id
->   mdev: introduce device specific ops
->   mdev: introduce virtio device and its device ops
->   virtio: introduce a mdev based transport
->   docs: sample driver to demonstrate how to implement virtio-mdev
->     framework
-> 
->  .../driver-api/vfio-mediated-device.rst       |  38 +-
->  MAINTAINERS                                   |   3 +
->  drivers/gpu/drm/i915/gvt/kvmgt.c              |  17 +-
->  drivers/s390/cio/vfio_ccw_ops.c               |  17 +-
->  drivers/s390/crypto/vfio_ap_ops.c             |  13 +-
->  drivers/vfio/mdev/mdev_core.c                 |  60 ++
->  drivers/vfio/mdev/mdev_driver.c               |  25 +
->  drivers/vfio/mdev/mdev_private.h              |   8 +
->  drivers/vfio/mdev/vfio_mdev.c                 |  45 +-
->  drivers/virtio/Kconfig                        |  13 +
->  drivers/virtio/Makefile                       |   1 +
->  drivers/virtio/virtio_mdev.c                  | 406 +++++++++++
->  include/linux/mdev.h                          |  57 +-
->  include/linux/mdev_vfio_ops.h                 |  52 ++
->  include/linux/mdev_virtio_ops.h               | 147 ++++
->  include/linux/mod_devicetable.h               |   8 +
->  samples/Kconfig                               |  10 +
->  samples/vfio-mdev/Makefile                    |   1 +
->  samples/vfio-mdev/mbochs.c                    |  19 +-
->  samples/vfio-mdev/mdpy.c                      |  19 +-
->  samples/vfio-mdev/mtty.c                      |  17 +-
->  samples/vfio-mdev/mvnet_loopback.c            | 687 ++++++++++++++++++
->  scripts/mod/devicetable-offsets.c             |   3 +
->  scripts/mod/file2alias.c                      |  11 +
->  24 files changed, 1586 insertions(+), 91 deletions(-)
->  create mode 100644 drivers/virtio/virtio_mdev.c
->  create mode 100644 include/linux/mdev_vfio_ops.h
->  create mode 100644 include/linux/mdev_virtio_ops.h
->  create mode 100644 samples/vfio-mdev/mvnet_loopback.c
-> 
-> -- 
-> 2.19.1
+> However, if you're attracted to the explicitness of Sean's approach
+> can I at least ask for comments asserting that KVM knows it already
+> holds a reference on that page so the is_zone_device_page() usage is
+> safe?
+
+Ya, I'll update the patch to add comments and a WARN.
+
+> David and I are otherwise trying to reduce is_zone_device_page() to
+> easy to audit "obviously safe" cases and converting the others with
+> additional synchronization.
