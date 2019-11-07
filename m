@@ -2,79 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B37EFF2BD6
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 11:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BF1BF2BD9
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 11:08:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387670AbfKGKIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 05:08:05 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:40946 "EHLO mail.skyhub.de"
+        id S2387560AbfKGKIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 05:08:50 -0500
+Received: from foss.arm.com ([217.140.110.172]:53340 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727434AbfKGKIE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 05:08:04 -0500
-Received: from zn.tnic (p200300EC2F0EAD00C81A2814AF5F9B0A.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:ad00:c81a:2814:af5f:9b0a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D330D1EC0CDE;
-        Thu,  7 Nov 2019 11:08:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1573121281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=TYuFODDsl5EPYP782EO8AGwRCN0zWDyo4h6kYC2FsNQ=;
-        b=J4gtl72wPdw0aAPd2zhkBAUYLyv55kKd4MyzqZNQ4hjnh/CCj6GFm5qFqnsDkIqKmFYS/3
-        bqUHdLn/ZNWtyEru6Bf5t4zKl/WJwu1UtS51zGK1mbsLPdmNnpIbkizOAiVa1VzAVdxKOL
-        LFFnjYaWctquWHSjSiaoXuvvBJKJkUw=
-Date:   Thu, 7 Nov 2019 11:07:57 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
-Cc:     "Moger, Babu" <Babu.Moger@amd.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "ebiederm@xmission.com" <ebiederm@xmission.com>,
-        "bshanks@codeweavers.com" <bshanks@codeweavers.com>
-Subject: Re: [PATCH v3 1/2] x86/Kconfig: Rename UMIP config parameter
-Message-ID: <20191107100757.GB19501@zn.tnic>
-References: <157298900783.17462.2778215498449243912.stgit@naples-babu.amd.com>
- <157298912544.17462.2018334793891409521.stgit@naples-babu.amd.com>
- <20191107013136.GA9028@ranerica-svr.sc.intel.com>
+        id S1733205AbfKGKIu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 05:08:50 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A91F246A;
+        Thu,  7 Nov 2019 02:08:49 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B80503F71A;
+        Thu,  7 Nov 2019 02:08:48 -0800 (PST)
+Subject: Re: [PATCH kvmtool 06/16] builtin-run.c: Always use ram_size in bytes
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki Poulose <suzuki.poulose@arm.com>,
+        Julien Grall <julien.grall.oss@gmail.com>
+References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
+ <1569245722-23375-7-git-send-email-alexandru.elisei@arm.com>
+ <20191106164923.1d501e9a@donnerap.cambridge.arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <684204ae-f229-6a61-63fd-1692b60eaa24@arm.com>
+Date:   Thu, 7 Nov 2019 10:08:47 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20191106164923.1d501e9a@donnerap.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191107013136.GA9028@ranerica-svr.sc.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 05:31:36PM -0800, Ricardo Neri wrote:
-> > +	  feature in newer x86 processors. If enabled, a general
-> 
-> Better to say certain x86 processors? Intel and AMD have it but what
-> about others?
+Hi,
 
-Changed it to "some x86 processors".
+On 11/6/19 4:49 PM, Andre Przywara wrote:
+> On Mon, 23 Sep 2019 14:35:12 +0100
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+>> The user can specify the virtual machine memory size, in MB, which is saved
+>> in cfg->ram_size. kvmtool validates it against the host memory size,
+>> converted from bytes to MB. ram_size is aftwerwards converted to bytes, and
+>> this is how it is used throughout the rest of the program.
+>>
+>> Let's avoid any confusion about the unit of measurement and always use
+>> cfg->ram_size in bytes.
+> ... which also means you can get rid of MIN_RAM_SIZE_MB in include/kvm/kvm-config.h.
 
-Thx.
+I'll do that, thanks for spotting it.
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Alex
+>
+> Otherwise:
+>  
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>
+> Cheers,
+> Andre
+>
+>> ---
+>>  builtin-run.c            | 19 ++++++++++---------
+>>  include/kvm/kvm-config.h |  2 +-
+>>  include/kvm/kvm.h        |  2 +-
+>>  3 files changed, 12 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/builtin-run.c b/builtin-run.c
+>> index cff44047bb1c..4e0c52b3e027 100644
+>> --- a/builtin-run.c
+>> +++ b/builtin-run.c
+>> @@ -262,7 +262,7 @@ static u64 host_ram_size(void)
+>>  		return 0;
+>>  	}
+>>  
+>> -	return (nr_pages * page_size) >> MB_SHIFT;
+>> +	return nr_pages * page_size;
+>>  }
+>>  
+>>  /*
+>> @@ -276,11 +276,11 @@ static u64 get_ram_size(int nr_cpus)
+>>  	u64 available;
+>>  	u64 ram_size;
+>>  
+>> -	ram_size	= 64 * (nr_cpus + 3);
+>> +	ram_size	= (64 * (nr_cpus + 3)) << MB_SHIFT;
+>>  
+>>  	available	= host_ram_size() * RAM_SIZE_RATIO;
+>>  	if (!available)
+>> -		available = MIN_RAM_SIZE_MB;
+>> +		available = MIN_RAM_SIZE_BYTE;
+>>  
+>>  	if (ram_size > available)
+>>  		ram_size	= available;
+>> @@ -531,13 +531,14 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>>  
+>>  	if (!kvm->cfg.ram_size)
+>>  		kvm->cfg.ram_size = get_ram_size(kvm->cfg.nrcpus);
+>> +	else
+>> +		/* The user specifies the memory in MB. */
+>> +		kvm->cfg.ram_size <<= MB_SHIFT;
+>>  
+>>  	if (kvm->cfg.ram_size > host_ram_size())
+>>  		pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",
+>> -			(unsigned long long)kvm->cfg.ram_size,
+>> -			(unsigned long long)host_ram_size());
+>> -
+>> -	kvm->cfg.ram_size <<= MB_SHIFT;
+>> +			(unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+>> +			(unsigned long long)host_ram_size() >> MB_SHIFT);
+>>  
+>>  	if (!kvm->cfg.dev)
+>>  		kvm->cfg.dev = DEFAULT_KVM_DEV;
+>> @@ -647,12 +648,12 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>>  	if (kvm->cfg.kernel_filename) {
+>>  		printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+>>  		       kvm->cfg.kernel_filename,
+>> -		       (unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
+>> +		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+>>  		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
+>>  	} else if (kvm->cfg.firmware_filename) {
+>>  		printf("  # %s run --firmware %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+>>  		       kvm->cfg.firmware_filename,
+>> -		       (unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
+>> +		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+>>  		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
+>>  	}
+>>  
+>> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+>> index a052b0bc7582..e0c9ee14e103 100644
+>> --- a/include/kvm/kvm-config.h
+>> +++ b/include/kvm/kvm-config.h
+>> @@ -22,7 +22,7 @@ struct kvm_config {
+>>  	struct kvm_config_arch arch;
+>>  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
+>>  	struct vfio_device_params *vfio_devices;
+>> -	u64 ram_size;
+>> +	u64 ram_size;		/* Guest memory size, in bytes */
+>>  	u8  image_count;
+>>  	u8 num_net_devices;
+>>  	u8 num_vfio_devices;
+>> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+>> index 635ce0f40b1e..a866d5a825c4 100644
+>> --- a/include/kvm/kvm.h
+>> +++ b/include/kvm/kvm.h
+>> @@ -68,7 +68,7 @@ struct kvm {
+>>  	struct kvm_cpu		**cpus;
+>>  
+>>  	u32			mem_slots;	/* for KVM_SET_USER_MEMORY_REGION */
+>> -	u64			ram_size;
+>> +	u64			ram_size;	/* Guest memory size, in bytes */
+>>  	void			*ram_start;
+>>  	u64			ram_pagesize;
+>>  	struct list_head	mem_banks;
