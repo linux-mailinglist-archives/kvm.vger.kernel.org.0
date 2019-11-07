@@ -2,353 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C777F38E3
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 20:43:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87414F393C
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 21:10:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727162AbfKGTnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 14:43:15 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:2558 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbfKGTnO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 14:43:14 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dc473970000>; Thu, 07 Nov 2019 11:42:15 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 07 Nov 2019 11:43:11 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 07 Nov 2019 11:43:11 -0800
-Received: from [10.25.75.102] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 7 Nov
- 2019 19:42:46 +0000
-Subject: Re: [PATCH V11 4/6] mdev: introduce virtio device and its device ops
-To:     Jason Wang <jasowang@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <alex.williamson@redhat.com>, <mst@redhat.com>,
-        <tiwei.bie@intel.com>
-CC:     <virtualization@lists.linux-foundation.org>,
-        <netdev@vger.kernel.org>, <cohuck@redhat.com>,
-        <maxime.coquelin@redhat.com>, <cunming.liang@intel.com>,
-        <zhihong.wang@intel.com>, <rob.miller@broadcom.com>,
-        <xiao.w.wang@intel.com>, <haotian.wang@sifive.com>,
-        <zhenyuw@linux.intel.com>, <zhi.a.wang@intel.com>,
-        <jani.nikula@linux.intel.com>, <joonas.lahtinen@linux.intel.com>,
-        <rodrigo.vivi@intel.com>, <airlied@linux.ie>, <daniel@ffwll.ch>,
-        <farman@linux.ibm.com>, <pasic@linux.ibm.com>,
-        <sebott@linux.ibm.com>, <oberpar@linux.ibm.com>,
-        <heiko.carstens@de.ibm.com>, <gor@linux.ibm.com>,
-        <borntraeger@de.ibm.com>, <akrowiak@linux.ibm.com>,
-        <freude@linux.ibm.com>, <lingshan.zhu@intel.com>,
-        <eperezma@redhat.com>, <lulu@redhat.com>, <parav@mellanox.com>,
-        <christophe.de.dinechin@gmail.com>, <kevin.tian@intel.com>,
-        <stefanha@redhat.com>, <rdunlap@infradead.org>
-References: <20191107151109.23261-1-jasowang@redhat.com>
- <20191107151109.23261-5-jasowang@redhat.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <301e5741-6745-5884-61e7-ba82fcc49f55@nvidia.com>
-Date:   Fri, 8 Nov 2019 01:12:42 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <20191107151109.23261-5-jasowang@redhat.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+        id S1726251AbfKGUKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 15:10:52 -0500
+Received: from mail-eopbgr50060.outbound.protection.outlook.com ([40.107.5.60]:19170
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725823AbfKGUKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 15:10:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TwU3r7ogLOMFmcuVGDsrvQeQVZBj5z2u4XvNIS+3894dSCH7ukjuFFpc0D0AloqxHZtCgjwfh1jW3bk20azARFkdQ8OUs5jb62yPJpUzPsQ0Xszc2lb+cS8LKfKIUEsZaUJ8KgPdbb+RWMar5X93hWzsoQismLJUP66313cz4EFs7J8kmRICS+Q8p8yx5oo4mLC58p8rju+JdKvvDI+vvSjegLAoWur4ETtHmsGgXbDAkFvA0lFLINxhx+Zm3lOJos3VbJJ/J3CB4GyAXLPjQ0TZXzoBRWUTyp3FD8qXPll2607vOjuM4OqmR1a9a8EbrJ6NSwA/8V1UH431falg4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d+m/+uQQys3tzVTJUMV+0bku3PbZl9JbTni0PStXgu4=;
+ b=nBjW8UIp/bUoOSRGIFD0yQcCy/MVUTRDpQDQbsDveOFakDOHD1+TUi255mpcOUAnDvehBCKiT619aggc8K7Le0rIl7x2/hcFH6g8zejtyJ5oesfwQMkV5vhxZFmNyv+Ja64dusYVnI4cMtAcMdTyuQ9BTuTwdqqkMDt5KcCAFwxO1hhLjhnsyUSpUyDUYr/d8BcrOzWUQRHNSFyDyAqwvkdtGQrJXKDaMDTIFK7SwwuCYmyeG3PQF/qYJWosgRQMhQ5sjITYkjFHB6BgYDtjMMrQpjlX0ACP+Bkql9iXmWyO8NnaEkWZNl5yiAphFldONJJK6JOsu1HfKS8RcK8OQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d+m/+uQQys3tzVTJUMV+0bku3PbZl9JbTni0PStXgu4=;
+ b=so49M7sK6otLNx3mFTUcek83iFD9OcI735pOsAa+qVGp8OM3agi6OV2oPrSu+lQJJ/S851jqqBTyVOhrEGBI/oVqnbO+2HM5NmfWMbgxxysH2HnPoexFIy7r3D+gnOgdGDmMZtiIS4tCougVTmBbmZAfpgILz6h0VDxgrZa9zp4=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB4532.eurprd05.prod.outlook.com (52.133.55.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.20; Thu, 7 Nov 2019 20:10:45 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Thu, 7 Nov 2019
+ 20:10:45 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Leon Romanovsky <leon@kernel.org>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: RE: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Thread-Topic: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Thread-Index: AQHVlYUoVUzzBv4k4UmQHUerp08scad/75GAgAAxHKA=
+Date:   Thu, 7 Nov 2019 20:10:45 +0000
+Message-ID: <AM0PR05MB4866BE0BA3BEA9523A034EDDD1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107170341.GM6763@unreal>
+In-Reply-To: <20191107170341.GM6763@unreal>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573155735; bh=DmkpPaqW07geXEtNLCi0eY3fMLBaOMVl4Y8y3i+qm0s=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=To4w6dEkS+YPzafmkTrf+L0+Y+SbOseJHVQN3aT/Qkkpzo51qpseGGMzj/u5Joux8
-         bbtHqezk+UUuMwRLoCQ17jypPhnpjL2QmFKMen8Fcq4H0nyqxUnEKVVUXEVMQAtQ6/
-         daKhhS+G5Z7e1hkk23nZlq9HrCCYFkjy6deFgw4CMhT7gYKaC4X+tX+DxdGJh9p2MD
-         MKkKYsdsGrR6xEhJRKUC/8C7IF/gxIg0RO78glHOQ4ahSgHowP3PO2f5UsdBn8t6jD
-         yyVPJH96JQNubLDSIFtJTnerQGzXXDhblM1iuWhwK+Gfy+iCx3msqhd+VVH8vbDpAO
-         ByqptBufScNsQ==
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [208.176.44.194]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a50ad319-855e-4762-a490-08d763be92e4
+x-ms-traffictypediagnostic: AM0PR05MB4532:|AM0PR05MB4532:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB4532A73F922940083A7D86F1D1780@AM0PR05MB4532.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1091;
+x-forefront-prvs: 0214EB3F68
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(366004)(39850400004)(396003)(376002)(136003)(13464003)(199004)(189003)(316002)(66476007)(476003)(14454004)(478600001)(25786009)(7736002)(186003)(66446008)(66946007)(66556008)(64756008)(76116006)(102836004)(256004)(7696005)(6116002)(3846002)(11346002)(76176011)(26005)(81166006)(486006)(81156014)(446003)(6506007)(53546011)(99286004)(4326008)(305945005)(33656002)(5660300002)(2906002)(54906003)(6916009)(6246003)(71190400001)(71200400001)(6436002)(229853002)(8676002)(52536014)(86362001)(55016002)(9686003)(8936002)(74316002)(66066001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4532;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dS73FkBFIRJ1fJcD/+gNPpHkaCIgwmS+m1hfrPMZ7WWp2noahXTlbCeqp1qlAMl8l5FdvDpSAPB3O+xz7T5m12ttLgMLpO7B3hCOJH7fO8sc4eSJ58d6Ai8QkM6vVN3qfbVsNC5qrPMrMUduSdUqfVzpDe5k9zGDruWZp96hqRNnLSLO9ZmluwqaP4xkkdblRDPRD1ywS92ikBAnxpZvBLwcwTJrzHyNlZCdlD+w4DZIrL1Le+SP/lnSm0ZjTR025bMun86nrSGhcQBY5rns/SKFCxhAm4LbtUch5u8MpiGd2iB2s5TiXUyLaLeWpY3ipT31TCDj36IDyXOI6KoeOVtGaB1ewAGfiLSWPt1QvEkkqVlSA2xHFvZYNLcgIc/eXK1gifj43cLMMXJfVUyoB29nV16fTWz1e5K4B6SER7mD8sHJeNjQF9lS5WB7id7r
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a50ad319-855e-4762-a490-08d763be92e4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2019 20:10:45.4129
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BZLuPRRbpKk1WhJdFQATGueQRajjAhh9CTOOA6+B/q5ApzMNixLk7FoBkNItaqqvQnBU6mK9bVc5bVLcYkLykw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4532
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Leon,
 
+> -----Original Message-----
+> From: Leon Romanovsky <leon@kernel.org>
+> Sent: Thursday, November 7, 2019 11:04 AM
+> To: Parav Pandit <parav@mellanox.com>
+> Cc: alex.williamson@redhat.com; davem@davemloft.net;
+> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
+> <saeedm@mellanox.com>; kwankhede@nvidia.com; cohuck@redhat.com; Jiri
+> Pirko <jiri@mellanox.com>; linux-rdma@vger.kernel.org
+> Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+>=20
+> On Thu, Nov 07, 2019 at 10:04:48AM -0600, Parav Pandit wrote:
+> > Hi Dave, Jiri, Alex,
+> >
+>=20
+> <...>
+>=20
+> > - View netdevice and (optionally) RDMA device using iproute2 tools
+> >     $ ip link show
+> >     $ rdma dev show
+>=20
+> You perfectly explained how ETH devices will be named, but what about
+> RDMA?
+> How will be named? I feel that rdma-core needs to be extended to support =
+such
+> mediated devices.
+>=20
+rdma devices are named by default using mlx_X.
+After your persistent naming patches, I thought we have GUID based naming s=
+cheme which doesn't care about its underlying bus.
+So mdevs will be able to use current GUID based naming scheme we already ha=
+ve.
 
-On 11/7/2019 8:41 PM, Jason Wang wrote:
-> This patch implements basic support for mdev driver that supports
-> virtio transport for kernel virtio driver.
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-
-I'm not expert on virtio part, my ack is from mdev perspective.
-
-Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
-
-Thanks,
-Kirti
-
-> ---
->   MAINTAINERS                      |   1 +
->   drivers/vfio/mdev/mdev_core.c    |  21 +++++
->   drivers/vfio/mdev/mdev_private.h |   2 +
->   include/linux/mdev.h             |   6 ++
->   include/linux/mdev_virtio_ops.h  | 147 +++++++++++++++++++++++++++++++
->   5 files changed, 177 insertions(+)
->   create mode 100644 include/linux/mdev_virtio_ops.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f661d13344d6..4997957443df 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -17248,6 +17248,7 @@ F:	include/linux/virtio*.h
->   F:	include/uapi/linux/virtio_*.h
->   F:	drivers/crypto/virtio/
->   F:	mm/balloon_compaction.c
-> +F:	include/linux/mdev_virtio_ops.h
->   
->   VIRTIO BLOCK AND SCSI DRIVERS
->   M:	"Michael S. Tsirkin" <mst@redhat.com>
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index 4e70f19ac145..c58253404ed5 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -78,6 +78,27 @@ const struct mdev_vfio_device_ops *mdev_get_vfio_ops(struct mdev_device *mdev)
->   }
->   EXPORT_SYMBOL(mdev_get_vfio_ops);
->   
-> +/*
-> + * Specify the virtio device ops for the mdev device, this
-> + * must be called during create() callback for virtio mdev device.
-> + */
-> +void mdev_set_virtio_ops(struct mdev_device *mdev,
-> +			 const struct mdev_virtio_device_ops *virtio_ops)
-> +{
-> +	mdev_set_class(mdev, MDEV_CLASS_ID_VIRTIO);
-> +	mdev->virtio_ops = virtio_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_set_virtio_ops);
-> +
-> +/* Get the virtio device ops for the mdev device. */
-> +const struct mdev_virtio_device_ops *
-> +mdev_get_virtio_ops(struct mdev_device *mdev)
-> +{
-> +	WARN_ON(mdev->class_id != MDEV_CLASS_ID_VIRTIO);
-> +	return mdev->virtio_ops;
-> +}
-> +EXPORT_SYMBOL(mdev_get_virtio_ops);
-> +
->   struct device *mdev_dev(struct mdev_device *mdev)
->   {
->   	return &mdev->dev;
-> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-> index 411227373625..2c74dd032409 100644
-> --- a/drivers/vfio/mdev/mdev_private.h
-> +++ b/drivers/vfio/mdev/mdev_private.h
-> @@ -11,6 +11,7 @@
->   #define MDEV_PRIVATE_H
->   
->   #include <linux/mdev_vfio_ops.h>
-> +#include <linux/mdev_virtio_ops.h>
->   
->   int  mdev_bus_register(void);
->   void mdev_bus_unregister(void);
-> @@ -38,6 +39,7 @@ struct mdev_device {
->   	u16 class_id;
->   	union {
->   		const struct mdev_vfio_device_ops *vfio_ops;
-> +		const struct mdev_virtio_device_ops *virtio_ops;
->   	};
->   };
->   
-> diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-> index 9e37506d1987..f3d75a60c2b5 100644
-> --- a/include/linux/mdev.h
-> +++ b/include/linux/mdev.h
-> @@ -17,6 +17,7 @@
->   
->   struct mdev_device;
->   struct mdev_vfio_device_ops;
-> +struct mdev_virtio_device_ops;
->   
->   /*
->    * Called by the parent device driver to set the device which represents
-> @@ -112,6 +113,10 @@ void mdev_set_class(struct mdev_device *mdev, u16 id);
->   void mdev_set_vfio_ops(struct mdev_device *mdev,
->   		       const struct mdev_vfio_device_ops *vfio_ops);
->   const struct mdev_vfio_device_ops *mdev_get_vfio_ops(struct mdev_device *mdev);
-> +void mdev_set_virtio_ops(struct mdev_device *mdev,
-> +			 const struct mdev_virtio_device_ops *virtio_ops);
-> +const struct mdev_virtio_device_ops *
-> +mdev_get_virtio_ops(struct mdev_device *mdev);
->   
->   extern struct bus_type mdev_bus_type;
->   
-> @@ -127,6 +132,7 @@ struct mdev_device *mdev_from_dev(struct device *dev);
->   
->   enum {
->   	MDEV_CLASS_ID_VFIO = 1,
-> +	MDEV_CLASS_ID_VIRTIO = 2,
->   	/* New entries must be added here */
->   };
->   
-> diff --git a/include/linux/mdev_virtio_ops.h b/include/linux/mdev_virtio_ops.h
-> new file mode 100644
-> index 000000000000..8951331c6629
-> --- /dev/null
-> +++ b/include/linux/mdev_virtio_ops.h
-> @@ -0,0 +1,147 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Virtio mediated device driver
-> + *
-> + * Copyright 2019, Red Hat Corp.
-> + *     Author: Jason Wang <jasowang@redhat.com>
-> + */
-> +#ifndef MDEV_VIRTIO_OPS_H
-> +#define MDEV_VIRTIO_OPS_H
-> +
-> +#include <linux/interrupt.h>
-> +#include <linux/mdev.h>
-> +#include <uapi/linux/vhost.h>
-> +
-> +#define VIRTIO_MDEV_DEVICE_API_STRING		"virtio-mdev"
-> +
-> +struct virtio_mdev_callback {
-> +	irqreturn_t (*callback)(void *data);
-> +	void *private;
-> +};
-> +
-> +/**
-> + * struct mdev_virtio_device_ops - Structure to be registered for each
-> + * mdev device to register the device for virtio/vhost drivers.
-> + *
-> + * The callbacks are mandatory unless explicitly mentioned.
-> + *
-> + * @set_vq_address:		Set the address of virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				@desc_area: address of desc area
-> + *				@driver_area: address of driver area
-> + *				@device_area: address of device area
-> + *				Returns integer: success (0) or error (< 0)
-> + * @set_vq_num:			Set the size of virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				@num: the size of virtqueue
-> + * @kick_vq:			Kick the virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + * @set_vq_cb:			Set the interrupt callback function for
-> + *				a virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				@cb: virtio-mdev interrupt callback structure
-> + * @set_vq_ready:		Set ready status for a virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				@ready: ready (true) not ready(false)
-> + * @get_vq_ready:		Get ready status for a virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				Returns boolean: ready (true) or not (false)
-> + * @set_vq_state:		Set the state for a virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				@state: virtqueue state (last_avail_idx)
-> + *				Returns integer: success (0) or error (< 0)
-> + * @get_vq_state:		Get the state for a virtqueue
-> + *				@mdev: mediated device
-> + *				@idx: virtqueue index
-> + *				Returns virtqueue state (last_avail_idx)
-> + * @get_vq_align:		Get the virtqueue align requirement
-> + *				for the device
-> + *				@mdev: mediated device
-> + *				Returns virtqueue algin requirement
-> + * @get_features:		Get virtio features supported by the device
-> + *				@mdev: mediated device
-> + *				Returns the virtio features support by the
-> + *				device
-> + * @set_features:		Set virtio features supported by the driver
-> + *				@mdev: mediated device
-> + *				@features: feature support by the driver
-> + *				Returns integer: success (0) or error (< 0)
-> + * @set_config_cb:		Set the config interrupt callback
-> + *				@mdev: mediated device
-> + *				@cb: virtio-mdev interrupt callback structure
-> + * @get_vq_num_max:		Get the max size of virtqueue
-> + *				@mdev: mediated device
-> + *				Returns u16: max size of virtqueue
-> + * @get_device_id:		Get virtio device id
-> + *				@mdev: mediated device
-> + *				Returns u32: virtio device id
-> + * @get_vendor_id:		Get id for the vendor that provides this device
-> + *				@mdev: mediated device
-> + *				Returns u32: virtio vendor id
-> + * @get_status:			Get the device status
-> + *				@mdev: mediated device
-> + *				Returns u8: virtio device status
-> + * @set_status:			Set the device status
-> + *				@mdev: mediated device
-> + *				@status: virtio device status
-> + * @get_config:			Read from device specific configuration space
-> + *				@mdev: mediated device
-> + *				@offset: offset from the beginning of
-> + *				configuration space
-> + *				@buf: buffer used to read to
-> + *				@len: the length to read from
-> + *				configration space
-> + * @set_config:			Write to device specific configuration space
-> + *				@mdev: mediated device
-> + *				@offset: offset from the beginning of
-> + *				configuration space
-> + *				@buf: buffer used to write from
-> + *				@len: the length to write to
-> + *				configration space
-> + * @get_generation:		Get device config generaton (optional)
-> + *				@mdev: mediated device
-> + *				Returns u32: device generation
-> + */
-> +struct mdev_virtio_device_ops {
-> +	/* Virtqueue ops */
-> +	int (*set_vq_address)(struct mdev_device *mdev,
-> +			      u16 idx, u64 desc_area, u64 driver_area,
-> +			      u64 device_area);
-> +	void (*set_vq_num)(struct mdev_device *mdev, u16 idx, u32 num);
-> +	void (*kick_vq)(struct mdev_device *mdev, u16 idx);
-> +	void (*set_vq_cb)(struct mdev_device *mdev, u16 idx,
-> +			  struct virtio_mdev_callback *cb);
-> +	void (*set_vq_ready)(struct mdev_device *mdev, u16 idx, bool ready);
-> +	bool (*get_vq_ready)(struct mdev_device *mdev, u16 idx);
-> +	int (*set_vq_state)(struct mdev_device *mdev, u16 idx, u64 state);
-> +	u64 (*get_vq_state)(struct mdev_device *mdev, u16 idx);
-> +
-> +	/* Virtio device ops */
-> +	u16 (*get_vq_align)(struct mdev_device *mdev);
-> +	u64 (*get_features)(struct mdev_device *mdev);
-> +	int (*set_features)(struct mdev_device *mdev, u64 features);
-> +	void (*set_config_cb)(struct mdev_device *mdev,
-> +			      struct virtio_mdev_callback *cb);
-> +	u16 (*get_vq_num_max)(struct mdev_device *mdev);
-> +	u32 (*get_device_id)(struct mdev_device *mdev);
-> +	u32 (*get_vendor_id)(struct mdev_device *mdev);
-> +	u8 (*get_status)(struct mdev_device *mdev);
-> +	void (*set_status)(struct mdev_device *mdev, u8 status);
-> +	void (*get_config)(struct mdev_device *mdev, unsigned int offset,
-> +			   void *buf, unsigned int len);
-> +	void (*set_config)(struct mdev_device *mdev, unsigned int offset,
-> +			   const void *buf, unsigned int len);
-> +	u32 (*get_generation)(struct mdev_device *mdev);
-> +};
-> +
-> +void mdev_set_virtio_ops(struct mdev_device *mdev,
-> +			 const struct mdev_virtio_device_ops *virtio_ops);
-> +
-> +#endif
-> 
+Additionally, if user prefers, mdev alias, we can extend systemd/udev to us=
+e mdev alias based names (like PCI bdf).
+Such as,
+rocem<alias1>
+ibm<alias2>
+Format is:
+<link_layer><m><alias>
+m -> stands for mdev device (similar to 'p' for PCI)
