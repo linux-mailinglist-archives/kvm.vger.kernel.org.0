@@ -2,133 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2D73F3A8C
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 22:30:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 460B2F3AEC
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 23:07:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725945AbfKGVas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 16:30:48 -0500
-Received: from mail-eopbgr20045.outbound.protection.outlook.com ([40.107.2.45]:43173
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725870AbfKGVar (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 16:30:47 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d0l96ssHOVukiKmfPkz0Bi1bkSvuN7SIQM+kJZoeB8I/jKi4H2v7bh91MEtpqjBYKD5nj+3mHXyAbIBodd1IdOIstHfRDEHPOtJmeqvG55rrWUmc26doTE0m9yBu9xqBixTqHla9Y5LzftBYpLhP/bzLcdl/OIv6vwkFdD1n0cjDoQxWqCbNMwesXtoKG4nM6NZ85Rc/cn8cHU8F4CDRGYaw5vN9yXwub+xq9K1JKlIclDyjcTmaSUXD+aXcaBBxdXVbXowU9vq48ex1CnbCU3mEqIELDONlsbpg/4LabYFBbSemFIZ7m8ipJF1f1wrpSXvdPQoBLtDCluIMx74lhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rXbrmdEAqb3OZIiYWdCN68iy9WbAlX/G0ZbQ1MhKjrk=;
- b=fcDEfv2YzcbAlejMvO/Nzky+PvfVjGTqlPMrqLQBgaoWqDHLuvPqYjPC5gRUxOJCS8agUF3fybuRWpP2vpnNzDFBn/YGICB3U4Jw/AqMcO0lTjocO8djqxYdRZSQxZMRn4SmiUh30+Vdg+0oXnZMtOpuZZZ5ro+4wJxnQXn3XmrvnuHRk8JWDcC5IoT5LNTU8FayYEwuz/fiHuHhB9xk6PAmda2a/Rabb9wgcRjBRQgx5LzjwpXAt2v8Mt+pN+iCbDe+em43KXZtKUblWK2kDrilryMCMJxxsg87M8IX9vupso6OmuRcEDNuu96UE7uF/OZRAO7Qwt6s4vkuEJKJdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rXbrmdEAqb3OZIiYWdCN68iy9WbAlX/G0ZbQ1MhKjrk=;
- b=EyllDdOFhkZBMXkgxQV6HjT1AcQqE4NjqX9/w/Bn/fIJZWilpQdwsrR9+/cC0Wp+iS4kTLpzd2G618rCqyz8ctJwJACxeOEpTsD1ThJwzrl/IpG26VVPKMyB1erR8RDEjo+cylTv+v9+XLLyp1pMzbGGNaYAbBEWHgDJJF2Kacc=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6322.eurprd05.prod.outlook.com (20.179.34.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.24; Thu, 7 Nov 2019 21:30:42 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Thu, 7 Nov 2019
- 21:30:42 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: RE: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params for
- mediated device
-Thread-Topic: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params
- for mediated device
-Thread-Index: AQHVlYXHkdSYLcgDMEK1TOINymJcnaeALNIAgAAGo5A=
-Date:   Thu, 7 Nov 2019 21:30:41 +0000
-Message-ID: <AM0PR05MB486634DCB2778C2DFDBF752FD1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191107160448.20962-1-parav@mellanox.com>
-        <20191107160834.21087-1-parav@mellanox.com>
-        <20191107160834.21087-16-parav@mellanox.com>
- <20191107154256.21629e5a@cakuba.netronome.com>
-In-Reply-To: <20191107154256.21629e5a@cakuba.netronome.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: dd15820f-7aad-417e-eb24-08d763c9bdd4
-x-ms-traffictypediagnostic: AM0PR05MB6322:|AM0PR05MB6322:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB63226F1131D2A28034788B45D1780@AM0PR05MB6322.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 0214EB3F68
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39850400004)(376002)(346002)(366004)(136003)(189003)(199004)(13464003)(8676002)(33656002)(476003)(486006)(53546011)(6506007)(6916009)(66066001)(7736002)(26005)(6436002)(102836004)(305945005)(9686003)(4326008)(76176011)(7696005)(8936002)(55016002)(74316002)(229853002)(81156014)(81166006)(256004)(11346002)(446003)(186003)(99286004)(66946007)(66476007)(66556008)(64756008)(66446008)(76116006)(54906003)(25786009)(86362001)(316002)(2906002)(52536014)(6116002)(3846002)(5660300002)(6246003)(478600001)(14454004)(71200400001)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6322;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cgL2HYA2boK9D9czD3TR6+IqmZJKsdlkmEYKTnHY+0JAj09KMyRcOvkaO2sqd09hqQP64GiPmNSQNK+4o8rnZiXV3b26NNAcT4fpG4HWif3DKcll8pwaqPVarlSDqiDRpxCeIzCirF7ibEUwr9TOKDcSOLYhZuE8NJOv/ofkAfMVW3GZ6mIUPrRddHvXuw9nma4D/2nBTDs103ULXi+ERxCLS1nxrlF+n95JU/B1usK+fWOI34k8qNbMHy8Df5k2aDL4jsk9XxUY6R+/6Ho9RJkfTvuB0pEydaUyQXP6YLe1ZYA08ZRHQJF80G/l7esP29SOZSUQje7p9Ljyuo7aOHI62ug79XTA2tHiQE36P6cPzImXKushWI04pqVHZjgZfSAtF6H5Cbn3QC6gDxgkGH2vWKKsMnCnq+T9eg7CELfh2N8YZr3hPA6rElkRVwUv
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726094AbfKGWHN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 17:07:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40850 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725882AbfKGWHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 17:07:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573164431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R0UmnkLDjusGSCUVvdNsHvrGUiPkBm9TfGqIAmtUPCs=;
+        b=CRLA8imOHJdgRs1RvLfkYkf9w9tHchqzOzlDo2xlOzzTMQ66EOCFFVT3V2bwtc+jBJ5jOd
+        EJlDPnaLmWIIukcrPlVUOFRVdK9qluTioReTmPZmxaP0diC3IDcOxN9rz7EOYuzzCttahs
+        oLTXf7Qpr2nH1/Tvjhfj6/YCcwfl670=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-vz4bgv7SNTyhQ_6UT9weCw-1; Thu, 07 Nov 2019 17:07:07 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F7D58017DD;
+        Thu,  7 Nov 2019 22:07:06 +0000 (UTC)
+Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 341905C3FA;
+        Thu,  7 Nov 2019 22:07:00 +0000 (UTC)
+Date:   Thu, 7 Nov 2019 15:06:59 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
+Message-ID: <20191107150659.05fa7548@x1.home>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EF41B@SHSMSX104.ccr.corp.intel.com>
+References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
+        <1571919983-3231-3-git-send-email-yi.l.liu@intel.com>
+        <20191105163537.1935291c@x1.home>
+        <A2975661238FB949B60364EF0F2C25743A0EF41B@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd15820f-7aad-417e-eb24-08d763c9bdd4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2019 21:30:41.9509
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2LvWV7zNBp6MUSUmgx7zTf5AcerSFA3vHXYCJE2dtbWafvI/j0TSYJb68yE2CdJv5jmEr3KTgo1tfp6Id8UB5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6322
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: vz4bgv7SNTyhQ_6UT9weCw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 6 Nov 2019 13:27:26 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On Behalf
-> Of Jakub Kicinski
-> Sent: Thursday, November 7, 2019 2:43 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: alex.williamson@redhat.com; davem@davemloft.net;
-> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
-> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
-> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
-> rdma@vger.kernel.org
-> Subject: Re: [PATCH net-next 16/19] net/mlx5: Implement dma ops and param=
-s
-> for mediated device
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, November 6, 2019 7:36 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/fr=
+ee)
+> >=20
+> > On Thu, 24 Oct 2019 08:26:22 -0400
+> > Liu Yi L <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which aims
+> > > to passdown PASID allocation/free request from the virtual
+> > > iommu. This is required to get PASID managed in system-wide.
+> > >
+> > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > ---
+> > >  drivers/vfio/vfio_iommu_type1.c | 114 =20
+> > ++++++++++++++++++++++++++++++++++++++++ =20
+> > >  include/uapi/linux/vfio.h       |  25 +++++++++
+> > >  2 files changed, 139 insertions(+)
+> > >
+> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iomm=
+u_type1.c
+> > > index cd8d3a5..3d73a7d 100644
+> > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > @@ -2248,6 +2248,83 @@ static int vfio_cache_inv_fn(struct device *de=
+v, void =20
+> > *data) =20
+> > >  =09return iommu_cache_invalidate(dc->domain, dev, &ustruct->info);
+> > >  }
+> > >
+> > > +static int vfio_iommu_type1_pasid_alloc(struct vfio_iommu *iommu,
+> > > +=09=09=09=09=09 int min_pasid,
+> > > +=09=09=09=09=09 int max_pasid)
+> > > +{
+> > > +=09int ret;
+> > > +=09ioasid_t pasid;
+> > > +=09struct mm_struct *mm =3D NULL;
+> > > +
+> > > +=09mutex_lock(&iommu->lock);
+> > > +=09if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > > +=09=09ret =3D -EINVAL;
+> > > +=09=09goto out_unlock;
+> > > +=09}
+> > > +=09mm =3D get_task_mm(current);
+> > > +=09/* Track ioasid allocation owner by mm */
+> > > +=09pasid =3D ioasid_alloc((struct ioasid_set *)mm, min_pasid,
+> > > +=09=09=09=09max_pasid, NULL); =20
+> >=20
+> > Are we sure we want to tie this to the task mm vs perhaps the
+> > vfio_iommu pointer? =20
 >=20
-> On Thu,  7 Nov 2019 10:08:31 -0600, Parav Pandit wrote:
-> > Implement dma ops wrapper to divert dma ops to its parent PCI device
-> > because Intel IOMMU (and may be other IOMMU) is limited to PCI devices.
-> >
-> > Reviewed-by: Saeed Mahameed <saeedm@mellanox.com>
-> > Signed-off-by: Parav Pandit <parav@mellanox.com>
->=20
-> Isn't this supposed to use PASSID or whatnot? Could you explain a little?=
- This
-> mdev stuff is pretty new to networking folks..
+> Here we want to have a kind of per-VM mark, which can be used to do
+> ownership check on whether a pasid is held by a specific VM. This is
+> very important to prevent across VM affect. vfio_iommu pointer is
+> competent for vfio as vfio is both pasid alloc requester and pasid
+> consumer. e.g. vfio requests pasid alloc from ioasid and also it will
+> invoke bind_gpasid(). vfio can either check ownership before invoking
+> bind_gpasid() or pass vfio_iommu pointer to iommu driver. But in future,
+> there may be other modules which are just consumers of pasid. And they
+> also want to do ownership check for a pasid. Then, it would be hard for
+> them as they are not the pasid alloc requester. So here better to have
+> a system wide structure to perform as the per-VM mark. task mm looks
+> to be much competent.
 
-Currently series doesn't support PCI PASID.
-While doing dma mapping, Intel IOMMU expects dma device to be PCI device in=
- few function traces like, find_or_alloc_domain(),=20
-Since mdev bus is not a PCI bus, DMA mapping needs to go through its parent=
- PCI device.
-Otherwise dma ops on mdev devices fails, as I think it fails to identify ho=
-w to perform the translations.
-(It doesn't seem to consult its parent device).
+Ok, so it's intentional to have a VM-wide token.  Elsewhere in the
+type1 code (vfio_dma_do_map) we record the task_struct per dma mapping
+so that we can get the task mm as needed.  Would the task_struct
+pointer provide any advantage?
+
+Also, an overall question, this provides userspace with pasid alloc and
+free ioctls, (1) what prevents a userspace process from consuming every
+available pasid, and (2) if the process exits or crashes without
+freeing pasids, how are they recovered aside from a reboot?
+
+> > > +=09if (pasid =3D=3D INVALID_IOASID) {
+> > > +=09=09ret =3D -ENOSPC;
+> > > +=09=09goto out_unlock;
+> > > +=09}
+> > > +=09ret =3D pasid;
+> > > +out_unlock:
+> > > +=09mutex_unlock(&iommu->lock);
+
+What does holding this lock protect?  That the vfio_iommu remains
+backed by an iommu during this operation, even though we don't do
+anything to release allocated pasids when that iommu backing is removed?
+
+> > > +=09if (mm)
+> > > +=09=09mmput(mm);
+> > > +=09return ret;
+> > > +}
+> > > +
+> > > +static int vfio_iommu_type1_pasid_free(struct vfio_iommu *iommu,
+> > > +=09=09=09=09       unsigned int pasid)
+> > > +{
+> > > +=09struct mm_struct *mm =3D NULL;
+> > > +=09void *pdata;
+> > > +=09int ret =3D 0;
+> > > +
+> > > +=09mutex_lock(&iommu->lock);
+> > > +=09if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > > +=09=09ret =3D -EINVAL;
+> > > +=09=09goto out_unlock;
+> > > +=09}
+> > > +
+> > > +=09/**
+> > > +=09 * REVISIT:
+> > > +=09 * There are two cases free could fail:
+> > > +=09 * 1. free pasid by non-owner, we use ioasid_set to track mm, if
+> > > +=09 * the set does not match, caller is not permitted to free.
+> > > +=09 * 2. free before unbind all devices, we can check if ioasid priv=
+ate
+> > > +=09 * data, if data !=3D NULL, then fail to free.
+> > > +=09 */
+> > > +=09mm =3D get_task_mm(current);
+> > > +=09pdata =3D ioasid_find((struct ioasid_set *)mm, pasid, NULL);
+> > > +=09if (IS_ERR(pdata)) {
+> > > +=09=09if (pdata =3D=3D ERR_PTR(-ENOENT))
+> > > +=09=09=09pr_err("PASID %u is not allocated\n", pasid);
+> > > +=09=09else if (pdata =3D=3D ERR_PTR(-EACCES))
+> > > +=09=09=09pr_err("Free PASID %u by non-owner, denied", pasid);
+> > > +=09=09else
+> > > +=09=09=09pr_err("Error searching PASID %u\n", pasid); =20
+> >=20
+> > This should be removed, errno is sufficient for the user, this just
+> > provides the user with a trivial DoS vector filling logs. =20
+>=20
+> sure, will fix it. thanks.
+>=20
+> > > +=09=09ret =3D -EPERM; =20
+> >=20
+> > But why not return PTR_ERR(pdata)? =20
+>=20
+> aha, would do it.
+>=20
+> > > +=09=09goto out_unlock;
+> > > +=09}
+> > > +=09if (pdata) {
+> > > +=09=09pr_debug("Cannot free pasid %d with private data\n", pasid);
+> > > +=09=09/* Expect PASID has no private data if not bond */
+> > > +=09=09ret =3D -EBUSY;
+> > > +=09=09goto out_unlock;
+> > > +=09}
+> > > +=09ioasid_free(pasid); =20
+> >=20
+> > We only ever get here with pasid =3D=3D NULL?!  =20
+>=20
+> I guess you meant only when pdata=3D=3DNULL.
+>=20
+> > Something is wrong.  Should
+> > that be 'if (!pdata)'?  (which also makes that pr_debug another DoS
+> > vector) =20
+>=20
+> Oh, yes, just do it as below:
+>=20
+> if (!pdata) {
+> =09ioasid_free(pasid);
+> =09ret =3D SUCCESS;
+> } else
+> =09ret =3D -EBUSY;
+>=20
+> Is it what you mean?
+
+No, I think I was just confusing pdata and pasid, but I am still
+confused about testing pdata.  We call ioasid_alloc() with private =3D
+NULL, and I don't see any of your patches calling ioasid_set_data() to
+change the private data after allocation, so how could this ever be
+set?  Should this just be a BUG_ON(pdata) as the integrity of the
+system is in question should this state ever occur?  Thanks,
+
+Alex
+=20
+> > > +
+> > > +out_unlock:
+> > > +=09if (mm)
+> > > +=09=09mmput(mm);
+> > > +=09mutex_unlock(&iommu->lock);
+> > > +=09return ret;
+> > > +}
+> > > +
+> > >  static long vfio_iommu_type1_ioctl(void *iommu_data,
+> > >  =09=09=09=09   unsigned int cmd, unsigned long arg)
+> > >  {
+> > > @@ -2370,6 +2447,43 @@ static long vfio_iommu_type1_ioctl(void *iommu=
+_data,
+> > >  =09=09=09=09=09    &ustruct);
+> > >  =09=09mutex_unlock(&iommu->lock);
+> > >  =09=09return ret;
+> > > +
+> > > +=09} else if (cmd =3D=3D VFIO_IOMMU_PASID_REQUEST) {
+> > > +=09=09struct vfio_iommu_type1_pasid_request req;
+> > > +=09=09int min_pasid, max_pasid, pasid;
+> > > +
+> > > +=09=09minsz =3D offsetofend(struct vfio_iommu_type1_pasid_request,
+> > > +=09=09=09=09    flag);
+> > > +
+> > > +=09=09if (copy_from_user(&req, (void __user *)arg, minsz))
+> > > +=09=09=09return -EFAULT;
+> > > +
+> > > +=09=09if (req.argsz < minsz)
+> > > +=09=09=09return -EINVAL;
+> > > +
+> > > +=09=09switch (req.flag) { =20
+> >=20
+> > This works, but it's strange.  Let's make the code a little easier for
+> > the next flag bit that gets used so they don't need to rework this case
+> > statement.  I'd suggest creating a VFIO_IOMMU_PASID_OPS_MASK that is
+> > the OR of the ALLOC/FREE options, test that no bits are set outside of
+> > that mask, then AND that mask as the switch arg with the code below. =
+=20
+>=20
+> Got it. Let me fix it in next version.
+>=20
+> > > +=09=09/**
+> > > +=09=09 * TODO: min_pasid and max_pasid align with
+> > > +=09=09 * typedef unsigned int ioasid_t
+> > > +=09=09 */
+> > > +=09=09case VFIO_IOMMU_PASID_ALLOC:
+> > > +=09=09=09if (copy_from_user(&min_pasid,
+> > > +=09=09=09=09(void __user *)arg + minsz, sizeof(min_pasid)))
+> > > +=09=09=09=09return -EFAULT;
+> > > +=09=09=09if (copy_from_user(&max_pasid,
+> > > +=09=09=09=09(void __user *)arg + minsz + sizeof(min_pasid),
+> > > +=09=09=09=09sizeof(max_pasid)))
+> > > +=09=09=09=09return -EFAULT;
+> > > +=09=09=09return vfio_iommu_type1_pasid_alloc(iommu,
+> > > +=09=09=09=09=09=09min_pasid, max_pasid);
+> > > +=09=09case VFIO_IOMMU_PASID_FREE:
+> > > +=09=09=09if (copy_from_user(&pasid,
+> > > +=09=09=09=09(void __user *)arg + minsz, sizeof(pasid)))
+> > > +=09=09=09=09return -EFAULT;
+> > > +=09=09=09return vfio_iommu_type1_pasid_free(iommu, pasid);
+> > > +=09=09default:
+> > > +=09=09=09return -EINVAL;
+> > > +=09=09}
+> > >  =09}
+> > >
+> > >  =09return -ENOTTY;
+> > > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > > index ccf60a2..04de290 100644
+> > > --- a/include/uapi/linux/vfio.h
+> > > +++ b/include/uapi/linux/vfio.h
+> > > @@ -807,6 +807,31 @@ struct vfio_iommu_type1_cache_invalidate {
+> > >  };
+> > >  #define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + =
+24)
+> > >
+> > > +/*
+> > > + * @flag=3DVFIO_IOMMU_PASID_ALLOC, refer to the @min_pasid and =20
+> > @max_pasid fields =20
+> > > + * @flag=3DVFIO_IOMMU_PASID_FREE, refer to @pasid field
+> > > + */
+> > > +struct vfio_iommu_type1_pasid_request {
+> > > +=09__u32=09argsz;
+> > > +#define VFIO_IOMMU_PASID_ALLOC=09(1 << 0)
+> > > +#define VFIO_IOMMU_PASID_FREE=09(1 << 1)
+> > > +=09__u32=09flag;
+> > > +=09union {
+> > > +=09=09struct {
+> > > +=09=09=09int min_pasid;
+> > > +=09=09=09int max_pasid;
+> > > +=09=09};
+> > > +=09=09int pasid; =20
+> >=20
+> > Perhaps:
+> >=20
+> > =09=09struct {
+> > =09=09=09u32 min;
+> > =09=09=09u32 max;
+> > =09=09} alloc_pasid;
+> > =09=09u32 free_pasid;
+> >=20
+> > (note also the s/int/u32/) =20
+>=20
+> got it. will fix it in next version. Thanks.
+>=20
+> > > +=09};
+> > > +};
+> > > +
+> > > +/**
+> > > + * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 27,
+> > > + *=09=09=09=09struct vfio_iommu_type1_pasid_request)
+> > > + *
+> > > + */
+> > > +#define VFIO_IOMMU_PASID_REQUEST=09_IO(VFIO_TYPE, VFIO_BASE + 27)
+> > > +
+> > >  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU ----=
+---- */
+> > >
+> > >  /* =20
+>=20
+> Regards,
+> Yi Liu
+
