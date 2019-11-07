@@ -2,70 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C71EF3014
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:42:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C42F3059
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:46:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389323AbfKGNmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 08:42:18 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:49181 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389228AbfKGNmL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 08:42:11 -0500
-Received: by mail-il1-f199.google.com with SMTP id c2so2631627ilj.16
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 05:42:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=e82UTgwLSYIZvR2zraa9Nggc087nss86NXJiBWUJu+E=;
-        b=PAfWHW+L0Y9ipgDwhl82jbkETuTG5TC9XakwzRntzp1SShgcCb2rWKTrQP6ZFVNLVB
-         ppaOvTa3Hv2mkhqEaKV9pVin5n+Icrr88uT2K3mRBxjhDgGh6lRNm1cNFmbr1K4eUsOD
-         D6hkl9BtKe5cdZpV/TogW8gH8mGYlytnR9/jqrvZ25PsYf3uLX5wOlmSumRwHBnFT8sH
-         3ilWlFMLL1WdvXEx4fh90Mi6jm+9H5bVv7SAgdbFjOustfYb0u/K3Pnlh50Q4pSg50eo
-         BuTwCHmyp8dyL6IBRhOgYsIL0W3ubARrzEqpg3tY/71vkEnLqMAZHtEy+7Q22YB89Ozf
-         ocIw==
-X-Gm-Message-State: APjAAAVn3hr5qxZyRaqnF0kOXnoHjqIzpFZhq0aBfIhjBWrC4DM/JDqk
-        3iB7pSh2xVutfj+PFxB3tjv/PTXiVJeH94WWZrnKu4nt6yjX
-X-Google-Smtp-Source: APXvYqy2SR949y+R/aVsMmYYpVrF/WYb/9SXBHKSkoi9zyTyoMPvuzLrrPMK2lAbn35Yo+YCSE2zXinrZz2HbDMgOboAl0ltcz5n
+        id S2388641AbfKGNqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 08:46:43 -0500
+Received: from foss.arm.com ([217.140.110.172]:56468 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727858AbfKGNqn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 08:46:43 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4921531B;
+        Thu,  7 Nov 2019 05:46:42 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 339223F71A;
+        Thu,  7 Nov 2019 05:46:41 -0800 (PST)
+Date:   Thu, 7 Nov 2019 13:46:38 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki Poulose <suzuki.poulose@arm.com>,
+        Julien Grall <julien.grall.oss@gmail.com>
+Subject: Re: [PATCH kvmtool 08/16] arm: Move anything related to RAM
+ initialization in kvm__init_ram
+Message-ID: <20191107134638.147f9712@donnerap.cambridge.arm.com>
+In-Reply-To: <1569245722-23375-9-git-send-email-alexandru.elisei@arm.com>
+References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
+        <1569245722-23375-9-git-send-email-alexandru.elisei@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-X-Received: by 2002:a92:35dd:: with SMTP id c90mr4277087ilf.191.1573134129105;
- Thu, 07 Nov 2019 05:42:09 -0800 (PST)
-Date:   Thu, 07 Nov 2019 05:42:09 -0800
-In-Reply-To: <0000000000000cc0de0572736043@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f3131f0596c1d4ed@google.com>
-Subject: Re: KASAN: use-after-free Read in __schedule (2)
-From:   syzbot <syzbot+ceded3495a1d59f2d244@syzkaller.appspotmail.com>
-To:     hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liran.alon@oracle.com, luto@kernel.org, mark.kanda@oracle.com,
-        mingo@redhat.com, patrick.colp@oracle.com, pbonzini@redhat.com,
-        rkrcmar@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot suspects this bug was fixed by commit:
+On Mon, 23 Sep 2019 14:35:14 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-commit 26b471c7e2f7befd0f59c35b257749ca57e0ed70
-Author: Liran Alon <liran.alon@oracle.com>
-Date:   Sun Sep 16 11:28:20 2018 +0000
+> From: Julien Grall <julien.grall@arm.com>
+> 
+> RAM initialization is currently split between kvm__init_ram and
+> kvm__arch_init.  Move all code related to RAM initialization to
+> kvm__init_ram.
 
-     KVM: nVMX: Fix bad cleanup on error of get/set nested state IOCTLs
+The diff is a bit confusing to read, but indeed this just moves the code from arch_init() to init_ram() (confirmed by moving the code and comparing).
+One thing to note is that this changes the order of initialisation slightly: the GIC is now created before the RAM (since we call arch_init() before init_ram()).
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14830572600000
-start commit:   234b69e3 ocfs2: fix ocfs2 read block panic
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5fa12be50bca08d8
-dashboard link: https://syzkaller.appspot.com/bug?extid=ceded3495a1d59f2d244
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1634bbae400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1728324e400000
+Nevertheless:
 
-If the result looks correct, please mark the bug fixed by replying with:
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-#syz fix: KVM: nVMX: Fix bad cleanup on error of get/set nested state IOCTLs
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Cheers,
+Andre.
+
+> ---
+>  arm/kvm.c | 75 +++++++++++++++++++++++++++++++--------------------------------
+>  1 file changed, 37 insertions(+), 38 deletions(-)
+> 
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index 5decc138fd3e..3e49db7704aa 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -29,44 +29,6 @@ void kvm__init_ram(struct kvm *kvm)
+>  	int err;
+>  	u64 phys_start, phys_size;
+>  	void *host_mem;
+> -
+> -	phys_start	= ARM_MEMORY_AREA;
+> -	phys_size	= kvm->ram_size;
+> -	host_mem	= kvm->ram_start;
+> -
+> -	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+> -	if (err)
+> -		die("Failed to register %lld bytes of memory at physical "
+> -		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+> -
+> -	kvm->arch.memory_guest_start = phys_start;
+> -}
+> -
+> -void kvm__arch_delete_ram(struct kvm *kvm)
+> -{
+> -	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
+> -}
+> -
+> -void kvm__arch_read_term(struct kvm *kvm)
+> -{
+> -	serial8250__update_consoles(kvm);
+> -	virtio_console__inject_interrupt(kvm);
+> -}
+> -
+> -void kvm__arch_set_cmdline(char *cmdline, bool video)
+> -{
+> -}
+> -
+> -void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
+> -{
+> -	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
+> -		cfg->ram_size = ARM_MAX_MEMORY(cfg);
+> -		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
+> -	}
+> -}
+> -
+> -void kvm__arch_init(struct kvm *kvm)
+> -{
+>  	unsigned long alignment;
+>  	/* Convenience aliases */
+>  	const char *hugetlbfs_path = kvm->cfg.hugetlbfs_path;
+> @@ -115,6 +77,43 @@ void kvm__arch_init(struct kvm *kvm)
+>  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+>  		MADV_HUGEPAGE);
+>  
+> +	phys_start	= ARM_MEMORY_AREA;
+> +	phys_size	= kvm->ram_size;
+> +	host_mem	= kvm->ram_start;
+> +
+> +	err = kvm__register_ram(kvm, phys_start, phys_size, host_mem);
+> +	if (err)
+> +		die("Failed to register %lld bytes of memory at physical "
+> +		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+> +
+> +	kvm->arch.memory_guest_start = phys_start;
+> +}
+> +
+> +void kvm__arch_delete_ram(struct kvm *kvm)
+> +{
+> +	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
+> +}
+> +
+> +void kvm__arch_read_term(struct kvm *kvm)
+> +{
+> +	serial8250__update_consoles(kvm);
+> +	virtio_console__inject_interrupt(kvm);
+> +}
+> +
+> +void kvm__arch_set_cmdline(char *cmdline, bool video)
+> +{
+> +}
+> +
+> +void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
+> +{
+> +	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
+> +		cfg->ram_size = ARM_MAX_MEMORY(cfg);
+> +		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
+> +	}
+> +}
+> +
+> +void kvm__arch_init(struct kvm *kvm)
+> +{
+>  	/* Create the virtual GIC. */
+>  	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+>  		die("Failed to create virtual GIC");
+
