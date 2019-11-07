@@ -2,151 +2,314 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DE46F3079
-	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:51:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3A71F30A7
+	for <lists+kvm@lfdr.de>; Thu,  7 Nov 2019 14:55:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389003AbfKGNvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 08:51:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56558 "EHLO mx1.redhat.com"
+        id S2388388AbfKGNy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 08:54:59 -0500
+Received: from foss.arm.com ([217.140.110.172]:56698 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731064AbfKGNvf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 08:51:35 -0500
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3BFC94627A
-        for <kvm@vger.kernel.org>; Thu,  7 Nov 2019 13:51:35 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id 2so2654743qtg.8
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 05:51:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Vuj0sOrz0obsaQW6VB4nuyg1B3f92+UjONHlMugAHRU=;
-        b=Mq9OT2mmINrbBflFXIuoEfCxN+MpCIHrTm0+IJOneAWIZgSQV/ISAhO7+Z/lYnflHD
-         tTq6J3bGhj6ys5q3kgGrk31YGA1Ww3NJIp4lyxVnP/i+1UWrH4Od6pBRwSvcpJlHZzLl
-         J2w1chPDmir3g0GRCLjnW7ni2iNf2k52A1qWxOBvvuMoBIVDdk/X8NjlkTYC74mvDT1K
-         NxNMFzN2LpirRFz4AWBFFDtGVYO+4YNGzDIO2qNlItr50FA+ikhXg5JI9Dd/1RtTwhBp
-         CfDTsn7zv7eLib2FdR4qFUyNsk+Um79I1/TI1BEb71dDOWrKRJOM8v7viXBnuB50awGU
-         kEsw==
-X-Gm-Message-State: APjAAAXJ9kfooVev8lVb8AO9jwLbzWRHFZ4VNA5Bn1NcizzGm1nPxJdP
-        Sf6Sq5ovy8D3yDBQ515wzMzDFyiCZAQuuHF58Sy87YtNs9VyZ+3zW6BBxgVNJl4wzFX3bfJ/ByQ
-        t+oBsF1SjTxVL
-X-Received: by 2002:a05:620a:9c4:: with SMTP id y4mr1685922qky.113.1573134694386;
-        Thu, 07 Nov 2019 05:51:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyX+KBUhWqpKhTfmZTPkTDc7Eh32z5L3hFi76AldzGn/MNvSqKAS8VxujSm8oFj0PnbSG1J/A==
-X-Received: by 2002:a05:620a:9c4:: with SMTP id y4mr1685880qky.113.1573134694094;
-        Thu, 07 Nov 2019 05:51:34 -0800 (PST)
-Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
-        by smtp.gmail.com with ESMTPSA id o201sm1088010qka.17.2019.11.07.05.51.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 05:51:33 -0800 (PST)
-Date:   Thu, 7 Nov 2019 08:51:21 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
-        alex.williamson@redhat.com, tiwei.bie@intel.com,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        cohuck@redhat.com, maxime.coquelin@redhat.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com,
-        rob.miller@broadcom.com, xiao.w.wang@intel.com,
-        haotian.wang@sifive.com, zhenyuw@linux.intel.com,
-        zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch, farman@linux.ibm.com,
-        pasic@linux.ibm.com, sebott@linux.ibm.com, oberpar@linux.ibm.com,
-        heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
-        freude@linux.ibm.com, lingshan.zhu@intel.com, eperezma@redhat.com,
-        lulu@redhat.com, parav@mellanox.com,
-        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V10 6/6] docs: sample driver to demonstrate how to
- implement virtio-mdev framework
-Message-ID: <20191107085108-mutt-send-email-mst@kernel.org>
-References: <20191106133531.693-1-jasowang@redhat.com>
- <20191106133531.693-7-jasowang@redhat.com>
- <20191107040700-mutt-send-email-mst@kernel.org>
- <bd2f7796-8d88-0eb3-b55b-3ec062b186b7@redhat.com>
- <20191107061942-mutt-send-email-mst@kernel.org>
- <d09229bc-c3e4-8d4b-c28f-565fe150ced2@redhat.com>
- <c588c724-04da-2991-9f88-f36c0d04364a@redhat.com>
- <20191107080721-mutt-send-email-mst@kernel.org>
- <29d92758-18f7-15c7-fd04-0556b1f9033c@redhat.com>
+        id S1726810AbfKGNy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 08:54:59 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1CE231B;
+        Thu,  7 Nov 2019 05:54:57 -0800 (PST)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EC7813F71A;
+        Thu,  7 Nov 2019 05:54:56 -0800 (PST)
+Date:   Thu, 7 Nov 2019 13:54:52 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Suzuki Poulose <suzuki.poulose@arm.com>,
+        Julien Grall <julien.grall.oss@gmail.com>
+Subject: Re: [PATCH kvmtool 09/16] arm: Allow the user to specify RAM base
+ address
+Message-ID: <20191107135452.09c2ff38@donnerap.cambridge.arm.com>
+In-Reply-To: <1569245722-23375-10-git-send-email-alexandru.elisei@arm.com>
+References: <1569245722-23375-1-git-send-email-alexandru.elisei@arm.com>
+        <1569245722-23375-10-git-send-email-alexandru.elisei@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <29d92758-18f7-15c7-fd04-0556b1f9033c@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 07, 2019 at 09:40:09PM +0800, Jason Wang wrote:
-> 
-> On 2019/11/7 下午9:08, Michael S. Tsirkin wrote:
-> > On Thu, Nov 07, 2019 at 08:47:06PM +0800, Jason Wang wrote:
-> > > On 2019/11/7 下午8:43, Jason Wang wrote:
-> > > > On 2019/11/7 下午7:21, Michael S. Tsirkin wrote:
-> > > > > On Thu, Nov 07, 2019 at 06:18:45PM +0800, Jason Wang wrote:
-> > > > > > On 2019/11/7 下午5:08, Michael S. Tsirkin wrote:
-> > > > > > > On Wed, Nov 06, 2019 at 09:35:31PM +0800, Jason Wang wrote:
-> > > > > > > > This sample driver creates mdev device that simulate
-> > > > > > > > virtio net device
-> > > > > > > > over virtio mdev transport. The device is implemented through vringh
-> > > > > > > > and workqueue. A device specific dma ops is to make sure HVA is used
-> > > > > > > > directly as the IOVA. This should be sufficient for kernel virtio
-> > > > > > > > driver to work.
-> > > > > > > > 
-> > > > > > > > Only 'virtio' type is supported right now. I plan to add 'vhost' type
-> > > > > > > > on top which requires some virtual IOMMU implemented in this sample
-> > > > > > > > driver.
-> > > > > > > > 
-> > > > > > > > Acked-by: Cornelia Huck<cohuck@redhat.com>
-> > > > > > > > Signed-off-by: Jason Wang<jasowang@redhat.com>
-> > > > > > > I'd prefer it that we call this something else, e.g.
-> > > > > > > mvnet-loopback. Just so people don't expect a fully
-> > > > > > > functional device somehow. Can be renamed when applying?
-> > > > > > Actually, I plan to extend it as another standard network interface for
-> > > > > > kernel. It could be either a standalone pseudo device or a stack
-> > > > > > device.
-> > > > > > Does this sounds good to you?
-> > > > > > 
-> > > > > > Thanks
-> > > > > That's a big change in an interface so it's a good reason
-> > > > > to rename the driver at that point right?
-> > > > > Oherwise users of an old kernel would expect a stacked driver
-> > > > > and get a loopback instead.
-> > > > > 
-> > > > > Or did I miss something?
-> > > > 
-> > > > My understanding is that it was a sample driver in /doc. It should not
-> > > > be used in production environment. Otherwise we need to move it to
-> > > > driver/virtio.
-> > > > 
-> > > > But if you insist, I can post a V11.
-> > > > 
-> > > > Thanks
-> > > 
-> > > Or maybe it's better to rename the type of current mdev from 'virtio' to
-> > > 'virtio-loopback'. Then we can add more types in the future.
-> > > 
-> > > Thanks
-> > > 
-> > Maybe but is virtio actually a loopback somehow? I thought we
-> > can bind a regular virtio device there, no?
-> 
-> 
-> It has a prefix, so user will see "mvnet-virtio-loopback".
-> 
-> Thanks
-> 
+On Mon, 23 Sep 2019 14:35:15 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
+Hi,
 
-yes but it's mvnet that is doing the loopback, not virtio
+> At the moment, the user can specify the amount of RAM a virtual machine
+> has, which starts at the fixed address ARM_MEMORY_AREA. The memory below
+> this address is used by MMIO and PCI devices.
+> 
+> However, it might be interesting to specify a different starting address
+> for the guest RAM. With this patch, the user can specify the address and
+> the amount of RAM a virtual machine has from the command line by using the
+> syntax -m/--mem size[@addr]. The address is optional, and must be higher or
+> equal to ARM_MEMORY_AREA. If it's not specified, the old behavior is
+> preserved.
+> 
+> This option is guarded by the define ARCH_SUPPORT_CFG_RAM_BASE, and at
+> the moment only the arm architecture has support for it. If an
+> architecture doesn't implement this feature, then the old behavior is
+> preserved and specifying the RAM base address is considered an user
+> error.
+> 
+> This patch is based upon previous work by Julien Grall.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+
+Same thing here with "S-o-b: Julien" vs. authorship.
+
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/aarch32/include/kvm/kvm-arch.h |  2 +-
+>  arm/aarch64/include/kvm/kvm-arch.h |  6 ++---
+>  arm/include/arm-common/kvm-arch.h  |  6 +++--
+>  arm/kvm.c                          | 17 ++++++++++----
+>  builtin-run.c                      | 48 ++++++++++++++++++++++++++++++++++----
+>  include/kvm/kvm-config.h           |  3 +++
+>  kvm.c                              |  6 +++++
+>  7 files changed, 73 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+> index cd31e72971bd..0aa5db40502d 100644
+> --- a/arm/aarch32/include/kvm/kvm-arch.h
+> +++ b/arm/aarch32/include/kvm/kvm-arch.h
+> @@ -3,7 +3,7 @@
+>  
+>  #define ARM_KERN_OFFSET(...)	0x8000
+>  
+> -#define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+> +#define ARM_MAX_ADDR(...)	ARM_LOMAP_MAX_ADDR
+>  
+>  #include "arm-common/kvm-arch.h"
+>  
+> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+> index 1b3d0a5fb1b4..0c58675654c5 100644
+> --- a/arm/aarch64/include/kvm/kvm-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> @@ -5,9 +5,9 @@
+>  				0x8000				:	\
+>  				0x80000)
+>  
+> -#define ARM_MAX_MEMORY(cfg)	((cfg)->arch.aarch32_guest	?	\
+> -				ARM_LOMAP_MAX_MEMORY		:	\
+> -				ARM_HIMAP_MAX_MEMORY)
+> +#define ARM_MAX_ADDR(cfg)	((cfg)->arch.aarch32_guest	?	\
+> +				ARM_LOMAP_MAX_ADDR		:	\
+> +				ARM_HIMAP_MAX_ADDR)
+>  
+>  #include "arm-common/kvm-arch.h"
+>  
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index f8f6b8f98c96..ad1a0e6872dc 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -14,8 +14,8 @@
+>  #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
+>  #define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
+>  
+> -#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
+> -#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
+> +#define ARM_LOMAP_MAX_ADDR	(1ULL << 32)
+> +#define ARM_HIMAP_MAX_ADDR	(1ULL << 40)
+>  
+>  #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
+>  #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
+> @@ -35,6 +35,8 @@
+>  
+>  #define KVM_IOEVENTFD_HAS_PIO	0
+>  
+> +#define ARCH_SUPPORT_CFG_RAM_BASE	1
+> +
+>  /*
+>   * On a GICv3 there must be one redistributor per vCPU.
+>   * The value here is the size for one, we multiply this at runtime with
+> diff --git a/arm/kvm.c b/arm/kvm.c
+> index 3e49db7704aa..355c118b098a 100644
+> --- a/arm/kvm.c
+> +++ b/arm/kvm.c
+> @@ -77,7 +77,7 @@ void kvm__init_ram(struct kvm *kvm)
+>  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+>  		MADV_HUGEPAGE);
+>  
+> -	phys_start	= ARM_MEMORY_AREA;
+> +	phys_start 	= kvm->cfg.ram_base;
+>  	phys_size	= kvm->ram_size;
+>  	host_mem	= kvm->ram_start;
+>  
+> @@ -106,8 +106,17 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
+>  
+>  void kvm__arch_sanitize_cfg(struct kvm_config *cfg)
+>  {
+> -	if (cfg->ram_size > ARM_MAX_MEMORY(cfg)) {
+> -		cfg->ram_size = ARM_MAX_MEMORY(cfg);
+> +	if (cfg->ram_base == INVALID_MEM_ADDR)
+> +		cfg->ram_base = ARM_MEMORY_AREA;
+> +
+> +	if (cfg->ram_base < ARM_MEMORY_AREA ||
+> +	    cfg->ram_base >= ARM_MAX_ADDR(cfg)) {
+> +		cfg->ram_base = ARM_MEMORY_AREA;
+> +		pr_warning("Changing RAM base to 0x%llx", cfg->ram_base);
+> +	}
+> +
+> +	if (cfg->ram_base + cfg->ram_size > ARM_MAX_ADDR(cfg)) {
+> +		cfg->ram_size = ARM_MAX_ADDR(cfg) - cfg->ram_base;
+>  		pr_warning("Capping memory to %lluMB", cfg->ram_size >> 20);
+>  	}
+
+Should we check for alignment of the base address here as well? It definitely needs to be at least page aligned.
+But even then: -m 512@0x87654000 doesn't really go anywhere, I needed 1MB alignment for Linux to boot.
+But that's probably a Linux restriction. Maybe a warning if the lower 20 bits are not zero?
+
+>  }
+> @@ -229,7 +238,7 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+>  
+>  	/* For default firmware address, lets load it at the begining of RAM */
+>  	if (fw_addr == 0)
+> -		fw_addr = ARM_MEMORY_AREA;
+> +		fw_addr = kvm->cfg.ram_base;
+>  
+>  	if (!validate_fw_addr(kvm, fw_addr))
+>  		die("Bad firmware destination: 0x%016llx", fw_addr);
+> diff --git a/builtin-run.c b/builtin-run.c
+> index 4e0c52b3e027..df255cc44078 100644
+> --- a/builtin-run.c
+> +++ b/builtin-run.c
+> @@ -87,6 +87,44 @@ void kvm_run_set_wrapper_sandbox(void)
+>  	kvm_run_wrapper = KVM_RUN_SANDBOX;
+>  }
+>  
+> +static int mem_parser(const struct option *opt, const char *arg, int unset)
+> +{
+> +	struct kvm_config *cfg = opt->value;
+> +	const char *p = arg;
+> +	char *next;
+> +	u64 size, addr = INVALID_MEM_ADDR;
+> +
+> +	/* Parse memory size. */
+> +	size = strtoll(p, &next, 0);
+> +	if (next == p)
+> +		die("Invalid memory size");
+> +
+> +	/* The user specifies the memory in MB, we use bytes. */
+> +	size <<= MB_SHIFT;
+> +
+> +	if (*next == '\0')
+> +		goto out;
+> +	else if (*next == '@')
+
+I think coding style dictates no "else" if the "if" statement always terminates (return or goto).
+
+> +		p = next + 1;
+> +	else
+> +		die("Unexpected character after memory size: %c", *next);
+
+And you could move this up, so that you check for bail outs first:
+	if (*next == '\0')
+		goto out;
+
+	if (*next != '@')
+		die();
+
+	p = next + 1;
+	...
+
+> +
+> +	addr = strtoll(p, &next, 0);
+> +	if (next == p)
+> +		die("Invalid memory address");
+> +
+> +#ifndef ARCH_SUPPORT_CFG_RAM_BASE
+> +	if (addr != INVALID_MEM_ADDR)
+
+Should this #ifndef cover more of the parsing routine? It looks a bit weird to first do all the work and then throw it away.
+And can we somehow avoid the #ifdef at all? Maybe replacing it with a proper "if" statement? To integrate into the conditions above:
+	if (!IS_ENABLED(ARCH_SUPPORT_CFG_RAM_BASE) || *next != '@')
+		die();
+
+Cheers,
+Andre.
+
+> +		die("Specifying the memory address not supported by the architecture");
+> +#endif
+> +
+> +out:
+> +	cfg->ram_base = addr;
+> +	cfg->ram_size = size;
+> +
+> +	return 0;
+> +}
+> +
+>  #ifndef OPT_ARCH_RUN
+>  #define OPT_ARCH_RUN(...)
+>  #endif
+> @@ -97,8 +135,11 @@ void kvm_run_set_wrapper_sandbox(void)
+>  	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
+>  			"A name for the guest"),			\
+>  	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
+> -	OPT_U64('m', "mem", &(cfg)->ram_size, "Virtual machine memory"	\
+> -		" size in MB."),					\
+> +	OPT_CALLBACK('m', "mem", cfg,					\
+> +		     "size[@addr]",					\
+> +		     "Virtual machine memory size in MB,"		\
+> +		     " optionally starting at <addr>.",			\
+> +		     mem_parser, NULL),					\
+>  	OPT_CALLBACK('\0', "shmem", NULL,				\
+>  		     "[pci:]<addr>:<size>[:handle=<handle>][:create]",	\
+>  		     "Share host shmem with guest via pci device",	\
+> @@ -531,9 +572,6 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>  
+>  	if (!kvm->cfg.ram_size)
+>  		kvm->cfg.ram_size = get_ram_size(kvm->cfg.nrcpus);
+> -	else
+> -		/* The user specifies the memory in MB. */
+> -		kvm->cfg.ram_size <<= MB_SHIFT;
+>  
+>  	if (kvm->cfg.ram_size > host_ram_size())
+>  		pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index e0c9ee14e103..76edb54e8bae 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -18,10 +18,13 @@
+>  #define MIN_RAM_SIZE_MB		(64ULL)
+>  #define MIN_RAM_SIZE_BYTE	(MIN_RAM_SIZE_MB << MB_SHIFT)
+>  
+> +#define INVALID_MEM_ADDR	(~0ULL)
+> +
+>  struct kvm_config {
+>  	struct kvm_config_arch arch;
+>  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
+>  	struct vfio_device_params *vfio_devices;
+> +	u64 ram_base;
+>  	u64 ram_size;		/* Guest memory size, in bytes */
+>  	u8  image_count;
+>  	u8 num_net_devices;
+> diff --git a/kvm.c b/kvm.c
+> index 36b238791fc1..55a7465960b0 100644
+> --- a/kvm.c
+> +++ b/kvm.c
+> @@ -160,6 +160,12 @@ struct kvm *kvm__new(void)
+>  	kvm->sys_fd = -1;
+>  	kvm->vm_fd = -1;
+>  
+> +	/*
+> +	 * Make sure we don't mistake the initialization value 0 for ram_base
+> +	 * with an user specifying address 0.
+> +	 */
+> +	kvm->cfg.ram_base = INVALID_MEM_ADDR;
+> +
+>  #ifdef KVM_BRLOCK_DEBUG
+>  	kvm->brlock_sem = (pthread_rwlock_t) PTHREAD_RWLOCK_INITIALIZER;
+>  #endif
 
