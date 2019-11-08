@@ -2,59 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 86B35F5887
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 21:42:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3089FF588F
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 21:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbfKHUcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 15:32:12 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:38874 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726843AbfKHUcM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 15:32:12 -0500
-Received: by mail-qk1-f195.google.com with SMTP id e2so6465924qkn.5
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 12:32:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=qCQEt9epCNTEc/0w5fj01+GJUvFREV2TMWhrgChcDEk=;
-        b=HglAdyWqFINPdsTYKBaBKNrM1Lo2oOUUZEZsQT4ith3qfqO9mHggwB9HDaL51NCpoE
-         D9qjgL5iF11nm7WKrvVPqMvLUAWjyFd7UWHj1fFq5kj+6mV7toHZqpQYc7nVWNGTETX+
-         0IBlM8CadMnysfWyKiBnH5vVNBufx/gVK/x+9DfeZQz7V4JkIkbGxSKBzUhvNCq2js/v
-         rI+RdRzOShrJ7V/hWOMIADX83Tl3hFJf8tvZ1SDnglS+eQKCqFlSoAZpYYZLR9U0GnTr
-         T63hIC8mxYHgnc2AzR8swA8RbJvQn8bKTQUC+uXGxpYHtO/zdKJrUJ++SQ7n5UPTNhxj
-         BLtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=qCQEt9epCNTEc/0w5fj01+GJUvFREV2TMWhrgChcDEk=;
-        b=Q0Yn/QY9j90g8davClkDbvaX4cOOgnXSWAjQBUXwsQGEmOtJA6qeOLBTwYlXybBTU2
-         RtH2k1TRhyBIi+dvo8XckHDPCo+RZvqyWqvYbsOy92lCdwJssECpkCp7yrTv8HGuuH88
-         LajgmRhO7Zo8icyeWcRz1aruz399mjr+gy+787AsGPZ/7+cRD0pz8OdzUmjbtVA0WgC2
-         vioUaDLHLsyfasv12S/twke860LTLULfXKi7XlnvraojE4W/JzI2+6H1F4F+NQZp2jyx
-         4ahKsvv7yIVq05EbOJ1drVPR98LQSbsFl4MRfBB5Azgpu5ibz4wKZzwkjrmo6Xoc1TOi
-         eyLw==
-X-Gm-Message-State: APjAAAVrmacDQB1UDNoJo0bTxmP1rpu1adN9fZIn2bT4ZPvvwPox4aZB
-        zMDqCqci0XXBniythBAT1di/uw==
-X-Google-Smtp-Source: APXvYqwHTPix2niu2CuvJVyCMGoWIo3sKB6z6GV1zr6xcOIZU/wV+JWwNj+eSLcNq3a7DxZJpHkBZw==
-X-Received: by 2002:a05:620a:13dc:: with SMTP id g28mr10145366qkl.180.1573245130793;
-        Fri, 08 Nov 2019 12:32:10 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id x25sm2889935qki.63.2019.11.08.12.32.10
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 08 Nov 2019 12:32:10 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iTAvR-0005LJ-SE; Fri, 08 Nov 2019 16:32:09 -0400
-Date:   Fri, 8 Nov 2019 16:32:09 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Parav Pandit <parav@mellanox.com>
+        id S1726121AbfKHUeo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 15:34:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51344 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727477AbfKHUen (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 15:34:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573245281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KMSEjXsq99hiNjoujWoEIIjY1ii1GajRovSx/9CzKSI=;
+        b=EP/IWnQbFT35K9LL7V04GhTiL6DgsSZFbx4PoTreHJyMM4GTXUNCi5nHSOKfzVfAOedQfJ
+        4uzBdknw6eoNWCuzZqnuLzLTGtjtjx2nbT3GkeRN3yXtKoVdush2BINZOGtsszhlTo6N2J
+        cnPKPhmsebLt3mDBIIzmXEFusKlckN4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-rqU7v7gZOdGJik4OXqMK6g-1; Fri, 08 Nov 2019 15:34:40 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2915800C72;
+        Fri,  8 Nov 2019 20:34:37 +0000 (UTC)
+Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 37DAA60BE1;
+        Fri,  8 Nov 2019 20:34:36 +0000 (UTC)
+Date:   Fri, 8 Nov 2019 13:34:35 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Parav Pandit <parav@mellanox.com>,
         Jiri Pirko <jiri@resnulli.us>,
         David M <david.m.ertman@intel.com>,
         "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -66,76 +51,125 @@ Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         Or Gerlitz <gerlitz.or@gmail.com>
 Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191108203209.GF10956@ziepe.ca>
+Message-ID: <20191108133435.6dcc80bd@x1.home>
+In-Reply-To: <20191108201253.GE10956@ziepe.ca>
 References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107153234.0d735c1f@cakuba.netronome.com>
- <20191108121233.GJ6990@nanopsycho>
- <20191108144054.GC10956@ziepe.ca>
- <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <AM0PR05MB4866299C3AE2448C8226DC00D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191107153234.0d735c1f@cakuba.netronome.com>
+        <20191108121233.GJ6990@nanopsycho>
+        <20191108144054.GC10956@ziepe.ca>
+        <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191108111238.578f44f1@cakuba>
+        <20191108201253.GE10956@ziepe.ca>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB4866299C3AE2448C8226DC00D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: rqU7v7gZOdGJik4OXqMK6g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 08, 2019 at 08:20:43PM +0000, Parav Pandit wrote:
-> 
-> 
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > On Fri, Nov 08, 2019 at 11:12:38AM -0800, Jakub Kicinski wrote:
-> > > On Fri, 8 Nov 2019 15:40:22 +0000, Parav Pandit wrote:
-> > > > > The new intel driver has been having a very similar discussion
-> > > > > about how to model their 'multi function device' ie to bind RDMA
-> > > > > and other drivers to a shared PCI function, and I think that discussion
-> > settled on adding a new bus?
-> > > > >
-> > > > > Really these things are all very similar, it would be nice to have
-> > > > > a clear methodology on how to use the device core if a single PCI
-> > > > > device is split by software into multiple different functional
-> > > > > units and attached to different driver instances.
-> > > > >
-> > > > > Currently there is alot of hacking in this area.. And a consistent
-> > > > > scheme might resolve the ugliness with the dma_ops wrappers.
-> > > > >
-> > > > > We already have the 'mfd' stuff to support splitting platform
-> > > > > devices, maybe we need to create a 'pci-mfd' to support splitting PCI
-> > devices?
-> > > > >
-> > > > > I'm not really clear how mfd and mdev relate, I always thought
-> > > > > mdev was strongly linked to vfio.
-> > > > >
-> > > >
-> > > > Mdev at beginning was strongly linked to vfio, but as I mentioned
-> > > > above it is addressing more use case.
-> > > >
-> > > > I observed that discussion, but was not sure of extending mdev further.
-> > > >
-> > > > One way to do for Intel drivers to do is after series [9].
-> > > > Where PCI driver says, MDEV_CLASS_ID_I40_FOO RDMA driver
-> > > > mdev_register_driver(), matches on it and does the probe().
+On Fri, 8 Nov 2019 16:12:53 -0400
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+
+> On Fri, Nov 08, 2019 at 11:12:38AM -0800, Jakub Kicinski wrote:
+> > On Fri, 8 Nov 2019 15:40:22 +0000, Parav Pandit wrote: =20
+> > > > The new intel driver has been having a very similar discussion abou=
+t how to
+> > > > model their 'multi function device' ie to bind RDMA and other drive=
+rs to a
+> > > > shared PCI function, and I think that discussion settled on adding =
+a new bus?
+> > > >=20
+> > > > Really these things are all very similar, it would be nice to have =
+a clear
+> > > > methodology on how to use the device core if a single PCI device is=
+ split by
+> > > > software into multiple different functional units and attached to d=
+ifferent
+> > > > driver instances.
+> > > >=20
+> > > > Currently there is alot of hacking in this area.. And a consistent =
+scheme
+> > > > might resolve the ugliness with the dma_ops wrappers.
+> > > >=20
+> > > > We already have the 'mfd' stuff to support splitting platform devic=
+es, maybe
+> > > > we need to create a 'pci-mfd' to support splitting PCI devices?
+> > > >=20
+> > > > I'm not really clear how mfd and mdev relate, I always thought mdev=
+ was
+> > > > strongly linked to vfio.
+> > > > =20
 > > >
-> > > Yup, FWIW to me the benefit of reusing mdevs for the Intel case vs
-> > > muddying the purpose of mdevs is not a clear trade off.
-> > 
-> > IMHO, mdev has amdev_parent_ops structure clearly intended to link it to vfio,
-> > so using a mdev for something not related to vfio seems like a poor choice.
-> > 
-> Splitting mdev_parent_ops{} is already in works for larger use case in series [1] for virtio.
-> 
-> [1] https://patchwork.kernel.org/patch/11233127/
+> > > Mdev at beginning was strongly linked to vfio, but as I mentioned
+> > > above it is addressing more use case.
+> > >=20
+> > > I observed that discussion, but was not sure of extending mdev furthe=
+r.
+> > >=20
+> > > One way to do for Intel drivers to do is after series [9].
+> > > Where PCI driver says, MDEV_CLASS_ID_I40_FOO
+> > > RDMA driver mdev_register_driver(), matches on it and does the probe(=
+). =20
+> >=20
+> > Yup, FWIW to me the benefit of reusing mdevs for the Intel case vs
+> > muddying the purpose of mdevs is not a clear trade off. =20
+>=20
+> IMHO, mdev has amdev_parent_ops structure clearly intended to link it
+> to vfio, so using a mdev for something not related to vfio seems like
+> a poor choice.
 
-Weird. So what is mdev actually providing and what does it represent
-if the entire driver facing API surface is under a union?
+Unless there's some opposition, I'm intended to queue this for v5.5:
 
-This smells a lot like it is re-implementing a bus.. AFAIK bus is
-supposed to represent the in-kernel API the struct device presents to
-drivers.
+https://www.spinics.net/lists/kvm/msg199613.html
 
-Jason
+mdev has started out as tied to vfio, but at it's core, it's just a
+device life cycle infrastructure with callbacks between bus drivers
+and vendor devices.  If virtio is on the wrong path with the above
+series, please speak up.  Thanks,
+
+Alex
+
+=20
+> I suppose this series is the start and we will eventually see the
+> mlx5's mdev_parent_ops filled in to support vfio - but *right now*
+> this looks identical to the problem most of the RDMA capable net
+> drivers have splitting into a 'core' and a 'function'
+>=20
+> > IMHO MFD should be of more natural use for Intel, since it's about
+> > providing different functionality rather than virtual slices of the
+> > same device. =20
+>=20
+> I don't think the 'different functionality' should matter much.=20
+>=20
+> Generally these multi-function drivers are build some some common
+> 'core' language like queues interrupts, BAR space, etc and then these
+> common things can be specialized into netdev, rdma, scsi, etc. So we
+> see a general rough design with a core layer managing the raw HW then
+> drivers on top of that (including netdev) using that API.
+>=20
+> The actual layering doesn't come through in the driver model,
+> generally people put all the core stuff in with the netdev and then
+> try and shuffle the netdev around as the 'handle' for that core API.
+>=20
+> These SFs are pretty similar in that the core physical driver
+> continues to provide some software API support to the SF children (at
+> least for mlx it is a small API)
+>=20
+> For instance mdev has no generic way to learn the BAR struct
+> resources, so there is some extra API around the side that does this -
+> in this series it is done by hackily co-opting the drvdata to
+> something owned by the struct device instead of the device_driver and
+> using that to access the API surface on 'struct mlx5_sf *', which
+> includes the BAR info and so forth.
+>=20
+> This is probably the main difference from MFD. At least the few
+> drivers I looked at, did not try and expose an SW API from the 'core'
+> to the 'part', everything was usual generic driver resource stuff.
+>=20
+> Jason
+
