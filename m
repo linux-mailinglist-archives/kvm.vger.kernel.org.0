@@ -2,170 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DFF82F41FF
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 09:19:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45D0CF421F
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 09:31:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730151AbfKHITt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 03:19:49 -0500
-Received: from mga01.intel.com ([192.55.52.88]:56314 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727016AbfKHITt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 03:19:49 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 00:19:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,280,1569308400"; 
-   d="asc'?scan'208";a="193098351"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
-  by orsmga007.jf.intel.com with ESMTP; 08 Nov 2019 00:19:46 -0800
-Date:   Fri, 8 Nov 2019 16:19:25 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>
-Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
-Message-ID: <20191108081925.GH4196@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        id S1730687AbfKHIbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 03:31:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49555 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726072AbfKHIbe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 03:31:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573201893;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gmSUwSztyzqN4Y3AzKbu13byGYY0jeEel4aBDRl3LTA=;
+        b=J14gkw8BnAQEqfaVnb2YMLYvEejs5wtcIcgtoo881fvqYeqKtCL+T72z3wKyafnqLzdUyY
+        5sNi6/ctCV1SaAMK082nXhZmBYrQhrpb7C/kMoSwOfgpKEn2cYgzkxSiLbLbYAgtU3XGII
+        WrMgjyzkoBeR9bLrcJbZFStSUNePuPc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-tkvvRkyePXebSJxK1panFw-1; Fri, 08 Nov 2019 03:31:32 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 006BB107ACC3;
+        Fri,  8 Nov 2019 08:31:31 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-167.ams2.redhat.com [10.36.116.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 923A4271B8;
+        Fri,  8 Nov 2019 08:31:29 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 5/6] x86: use a non-negative number in
+ shift
+To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     jmattson@google.com, sean.j.christopherson@intel.com
+References: <20191015000411.59740-1-morbo@google.com>
+ <20191030210419.213407-1-morbo@google.com>
+ <20191030210419.213407-6-morbo@google.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b8c2d502-c215-e96d-a919-66cc339d3719@redhat.com>
+Date:   Fri, 8 Nov 2019 09:31:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="OFj+1YLvsEfSXdCH"
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.10.0 (2018-05-17)
+In-Reply-To: <20191030210419.213407-6-morbo@google.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: tkvvRkyePXebSJxK1panFw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---OFj+1YLvsEfSXdCH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
-> Hi,
+On 30/10/2019 22.04, Bill Wendling wrote:
+> Shifting a negative number is undefined. Clang complains about it:
 >=20
-> > -----Original Message-----
-> > From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On Behalf
-> > Of Zhenyu Wang
-> > Sent: Thursday, October 24, 2019 12:08 AM
-> > To: kvm@vger.kernel.org
-> > Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
-> > kevin.tian@intel.com; cohuck@redhat.com
-> > Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
-> >=20
-> > Hi,
-> >=20
-> > This is a refresh for previous send of this series. I got impression th=
-at some
-> > SIOV drivers would still deploy their own create and config method so s=
-topped
-> > effort on this. But seems this would still be useful for some other SIO=
-V driver
-> > which may simply want capability to aggregate resources. So here's refr=
-eshed
-> > series.
-> >=20
-> > Current mdev device create interface depends on fixed mdev type, which =
-get
-> > uuid from user to create instance of mdev device. If user wants to use
-> > customized number of resource for mdev device, then only can create new
-> Can you please give an example of 'resource'?
-> When I grep [1], [2] and [3], I couldn't find anything related to ' aggre=
-gate'.
-
-The resource is vendor device specific, in SIOV spec there's ADI
-(Assignable Device Interface) definition which could be e.g queue for
-net device, context for gpu, etc. I just named this interface as 'aggregate'
-for aggregation purpose, it's not used in spec doc.
-
-Thanks
-
+> x86/svm.c:1131:38: error: shifting a negative signed value is undefined [=
+-Werror,-Wshift-negative-value]
+>      test->vmcb->control.tsc_offset =3D TSC_OFFSET_VALUE;
 >=20
-> > mdev type for that which may not be flexible. This requirement comes no=
-t only
-> > from to be able to allocate flexible resources for KVMGT, but also from=
- Intel
-> > scalable IO virtualization which would use vfio/mdev to be able to allo=
-cate
-> > arbitrary resources on mdev instance. More info on [1] [2] [3].
-> >=20
-> > To allow to create user defined resources for mdev, it trys to extend m=
-dev
-> > create interface by adding new "aggregate=3Dxxx" parameter following UU=
-ID, for
-> > target mdev type if aggregation is supported, it can create new mdev de=
-vice
-> > which contains resources combined by number of instances, e.g
-> >=20
-> >     echo "<uuid>,aggregate=3D10" > create
-> >=20
-> > VM manager e.g libvirt can check mdev type with "aggregation" attribute
-> > which can support this setting. If no "aggregation" attribute found for=
- mdev
-> > type, previous behavior is still kept for one instance allocation. And =
-new sysfs
-> > attribute "aggregated_instances" is created for each mdev device to show
-> > allocated number.
-> >=20
-> > References:
-> > [1] https://software.intel.com/en-us/download/intel-virtualization-tech=
-nology-
-> > for-directed-io-architecture-specification
-> > [2] https://software.intel.com/en-us/download/intel-scalable-io-virtual=
-ization-
-> > technical-specification
-> > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
-> >=20
-> > Zhenyu Wang (6):
-> >   vfio/mdev: Add new "aggregate" parameter for mdev create
-> >   vfio/mdev: Add "aggregation" attribute for supported mdev type
-> >   vfio/mdev: Add "aggregated_instances" attribute for supported mdev
-> >     device
-> >   Documentation/driver-api/vfio-mediated-device.rst: Update for
-> >     vfio/mdev aggregation support
-> >   Documentation/ABI/testing/sysfs-bus-vfio-mdev: Update for vfio/mdev
-> >     aggregation support
-> >   drm/i915/gvt: Add new type with aggregation support
-> >=20
-> >  Documentation/ABI/testing/sysfs-bus-vfio-mdev | 24 ++++++
-> >  .../driver-api/vfio-mediated-device.rst       | 23 ++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.c                |  4 +-
-> >  drivers/gpu/drm/i915/gvt/gvt.h                | 11 ++-
-> >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 53 ++++++++++++-
-> >  drivers/gpu/drm/i915/gvt/vgpu.c               | 56 ++++++++++++-
-> >  drivers/vfio/mdev/mdev_core.c                 | 36 ++++++++-
-> >  drivers/vfio/mdev/mdev_private.h              |  6 +-
-> >  drivers/vfio/mdev/mdev_sysfs.c                | 79 ++++++++++++++++++-
-> >  include/linux/mdev.h                          | 19 +++++
-> >  10 files changed, 294 insertions(+), 17 deletions(-)
-> >=20
-> > --
-> > 2.24.0.rc0
+> Using "~0ull" results in identical asm code:
+>=20
+> =09before: movabsq $-281474976710656, %rsi
+> =09after:  movabsq $-281474976710656, %rsi
+>=20
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>   x86/svm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/x86/svm.c b/x86/svm.c
+> index 4ddfaa4..cef43d5 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -1122,7 +1122,7 @@ static bool npt_rw_l1mmio_check(struct test *test)
+>   }
+>  =20
+>   #define TSC_ADJUST_VALUE    (1ll << 32)
+> -#define TSC_OFFSET_VALUE    (-1ll << 48)
+> +#define TSC_OFFSET_VALUE    (~0ull << 48)
+>   static bool ok;
+>  =20
+>   static void tsc_adjust_prepare(struct test *test)
 >=20
 
---=20
-Open Source Technology Center, Intel ltd.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---OFj+1YLvsEfSXdCH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXcUlDQAKCRCxBBozTXgY
-J2/3AJ96SN5mF29Mbj64YZWU7riR85ejhwCeP7kiYKFgJU1ElCDJeerwFrKlGsI=
-=3UoA
------END PGP SIGNATURE-----
-
---OFj+1YLvsEfSXdCH--
