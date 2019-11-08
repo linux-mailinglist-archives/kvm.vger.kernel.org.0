@@ -2,78 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67519F4D82
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 14:46:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9EA6F4D9D
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 14:56:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727485AbfKHNq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 08:46:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46993 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726457AbfKHNq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 08:46:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573220787;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=abFJLQvhwwMDqvaF1flYGUAxUh2Wuo8PpGQBX/mlRlI=;
-        b=hHdWqQFHLwKXW5fRIhYV0zVLXjgMgtVxE5jMpdXcFdcaQdnQ2VD4PneZxPmciq0QKKSzLy
-        zwdqnt6y9CnHvK0H/3EmMOR0Ww6h48hb58uVrrl0VrhTrB9uvyuoEPboE6fuxFPMtK5wnY
-        rLwucNFzCp43B9Yc/LJ6fdc/b7QYcf8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-iIZk8fUgO9iSyGwXaeeOog-1; Fri, 08 Nov 2019 08:46:24 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1728646AbfKHN4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 08:56:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43708 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726307AbfKHN4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 08:56:40 -0500
+Received: from linux-8ccs (x2f7fce5.dyn.telefonica.de [2.247.252.229])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E28E1800D7B;
-        Fri,  8 Nov 2019 13:46:22 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 76C5161F36;
-        Fri,  8 Nov 2019 13:46:17 +0000 (UTC)
-Date:   Fri, 8 Nov 2019 14:46:15 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     alex.williamson@redhat.com, davem@davemloft.net,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
-        kwankhede@nvidia.com, leon@kernel.org, jiri@mellanox.com,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
-Message-ID: <20191108144615.3646e9bb.cohuck@redhat.com>
-In-Reply-To: <20191107160834.21087-19-parav@mellanox.com>
-References: <20191107160448.20962-1-parav@mellanox.com>
-        <20191107160834.21087-1-parav@mellanox.com>
-        <20191107160834.21087-19-parav@mellanox.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id A56B7214DB;
+        Fri,  8 Nov 2019 13:56:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573221399;
+        bh=n9ystWPITpLlZG9fAxteJieqtPVAxlo0c6o7Uuvsikw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FojtLrtALDOI9gVhEgdOdfgo9H8nnaaqZlSjepLU7bnBYMXgCFTVqA/8RxEPPkQ4C
+         gxzMDjTKKqrGgLB9785qbuuxp7Np3WO575y5i610Bq46Xxmy6C/XGY+WouXnhoVm/4
+         2jqdx3/gokNhHxPe1+TdeK7g1iOEw7NnqRCBx5bE=
+Date:   Fri, 8 Nov 2019 14:56:31 +0100
+From:   Jessica Yu <jeyu@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Matthias Maennich <maennich@google.com>
+Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
+Message-ID: <20191108135631.GA22507@linux-8ccs>
+References: <20191104230001.27774-1-aarcange@redhat.com>
+ <20191104230001.27774-4-aarcange@redhat.com>
+ <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
+ <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
+ <20191105135414.GA30717@redhat.com>
+ <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
+ <20191105145651.GD30717@redhat.com>
+ <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: iIZk8fUgO9iSyGwXaeeOog-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
+X-OS:   Linux linux-8ccs 4.12.14-lp150.12.61-default x86_64
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  7 Nov 2019 10:08:34 -0600
-Parav Pandit <parav@mellanox.com> wrote:
++++ Paolo Bonzini [05/11/19 16:10 +0100]:
+>On 05/11/19 15:56, Andrea Arcangeli wrote:
+>>>> I think we should:
+>>>>
+>>>> 1) whitelist to shut off the warnings on demand
+>>>
+>>> Do you mean adding a whitelist to modpost?  That would work, though I am
+>>> not sure if the module maintainer (Jessica Yu) would accept that.
+>>
+>> Yes that's exactly what I meant.
+>
+>Ok, thanks.  Jessica, the issue here is that we have two (mutually
+>exclusive) modules providing the same interface to a third module.
 
-> Provide a module parameter to set alias length to optionally generate
-> mdev alias.
->=20
-> Example to request mdev alias.
-> $ modprobe mtty alias_length=3D12
->=20
-> Make use of mtty_alias() API when alias_length module parameter is set.
->=20
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
-> ---
->  samples/vfio-mdev/mtty.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>Andrea will check that, when the same symbol is exported by two modules,
+>the second-loaded module correctly fails insmod.
 
-If you already have code using the alias interface, you probably don't
-need to add it to the sample driver here. Especially as the alias looks
-kind of pointless here.
+Hi Paolo, thanks for getting me up to speed.
 
+The module loader already rejects loading a module with
+duplicate exported symbols.
+
+> If that is okay, we will also need modpost not to warn for these
+> symbols in sym_add_exported.
+
+I think it's certainly doable in modpost, for example we could pass a
+list of whitelisted symbols and have modpost read them in and not warn
+if it encounters the whitelisted symbols more than once.  Modpost will
+also have to be modified to accomodate duplicate symbols.  I'm not
+sure how ugly this would be without seeing the actual patch.  And I am
+not sure what Masahiro (who takes care of all things kbuild-related)
+thinks of this idea. But before implementing all this, is there
+absolutely no way around having the duplicated exported symbols? (e.g.,
+could the modules be configured/built in a mutally exclusive way? I'm
+lacking the context from the rest of the thread, so not sure which are
+the problematic modules.)
+
+Thanks,
+
+Jessica
