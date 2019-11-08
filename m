@@ -2,99 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D654F44CE
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 11:42:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B957AF44E1
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 11:45:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731521AbfKHKma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 05:42:30 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56482 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726149AbfKHKma (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 05:42:30 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8ATKrU049892;
-        Fri, 8 Nov 2019 10:41:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=fp3pnErYbvbxA+Mx+2qhY6ge/lXDQYRira7mNwHpzmY=;
- b=TOihndvvZRuOmCdD9v4KxQOWEt2Z8DYzIjPRDOqkEtapR9zij/fHVdHSg95EfVQK0igQ
- NMqYRU2ZlfYXGuADVsrpPZZILSoibA+sFJF6XXo8jS1NL/P5CxWOp6jFtm+9o4DWapx0
- /1EY3X5OiLmVBCd+xQ5a3tvM5ikXNC+aDqOQrfFuZd2rLTQ+wVrIo0KuKGx5yynRZ75M
- dei9poudgYeaJYFCB+ujpi3eaEoKUBN51IbIos2JADFV9DqRMR54sXT3ygcZHo0vsZl/
- FBuH/Sg6O59q0KEsTanbTQ65h+ES73B1AHyrtNIeAfX1MfVaMKb3LY6UEjbsOlUBZb8L Nw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2w41w1cjaf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 08 Nov 2019 10:41:54 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8ARxuB078391;
-        Fri, 8 Nov 2019 10:41:53 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2w41whf22f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 08 Nov 2019 10:41:53 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA8AfngC006265;
-        Fri, 8 Nov 2019 10:41:52 GMT
-Received: from [192.168.8.47] (/213.41.92.70)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 08 Nov 2019 02:41:48 -0800
-Subject: Re: [patch V2 06/17] x86/entry/32: Remove redundant interrupt disable
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>
-References: <20191023122705.198339581@linutronix.de>
- <20191023123118.191230255@linutronix.de>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <f8ba6ab8-c42d-f90f-f296-de270d1a7e21@oracle.com>
-Date:   Fri, 8 Nov 2019 11:41:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1731465AbfKHKpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 05:45:08 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45967 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730224AbfKHKpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 05:45:08 -0500
+Received: by mail-wr1-f65.google.com with SMTP id z10so1158235wrs.12
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 02:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=vqaw6doOfQTHZm9xSr3ZBQ9b3NLLo/sImivEHBUzvhI=;
+        b=t/7/yJMqRKZFKVnuHPbcCnjkQGS/FwsJfGdKbXBP63aYLmmPnXX5ILFYxx1qKCnidb
+         X1XDndfI78ekdXB/TuRyurylpwIBylPvulelVZMB4o1gOmzouIIr1TEYZSwdWCIcxVav
+         wBPVrB32jIuRr82db1Eiwwbaxj05+y+YoZNInt9jhzW05L78DSMB0Pzjg32vk8Tyoa2h
+         YwUH3qkFFIFgXP7lrGoT1AGhkIE4KHQE6Mwokaf4tpv+m9og4wZPIWiuMpwPGRgOrWrN
+         +kHd0sgTW/XCGYyGR+L5C6FKUgPcqGPUKOT3IkKyFsfb4MJNGFg/2glZnZ/CXVSW2YNK
+         LRnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vqaw6doOfQTHZm9xSr3ZBQ9b3NLLo/sImivEHBUzvhI=;
+        b=ZUuWx07c1cRXuEG7NgBWHKX6nu09BGPA9+m+jgvgnj/NRPGBZA1FZfZKQINGM0Nwws
+         IQG+Bs/bxCfFXZMxgC+QNXwYIBnWwUy8y5GRIkqLBFpj4J6AbaFNEEqWIfALzlAXPPY6
+         Dg2K91tPwkeQ8QDBq+peuesmIc6KYGswtz59jIInG+qG+edxKe06ELtLKnTzlZodR4pG
+         5mc0qKeGj21ir71W+71unLUqZC/MHjUfpZ2i7Ii0P8VSMUfIpLl6AIC9d4k1STLqENaD
+         wcZ9eG2gWd274vl17VcClESS/e4Lp3NSuWMMugyWCW+IfemYqTehC3xa234fq/isWj0V
+         9GEg==
+X-Gm-Message-State: APjAAAVoICwGdYAu3CU5Om2fJUBD/y4zRoEvPGbqWw+0L2pXkpSVmqYg
+        TIJoZa+gzTMWHwVIUARQqs72CQ==
+X-Google-Smtp-Source: APXvYqzWaIAfkts/duy5+ZmqOguvJpjqirZgng0zXJv0i3tpRS4htQhA5lk3+nTkMD8u8K2Cf/Kn1A==
+X-Received: by 2002:adf:8527:: with SMTP id 36mr7403692wrh.144.1573209906379;
+        Fri, 08 Nov 2019 02:45:06 -0800 (PST)
+Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
+        by smtp.gmail.com with ESMTPSA id 65sm9585091wrs.9.2019.11.08.02.45.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2019 02:45:06 -0800 (PST)
+Date:   Fri, 8 Nov 2019 11:45:05 +0100
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     alex.williamson@redhat.com, davem@davemloft.net,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
+        kwankhede@nvidia.com, leon@kernel.org, cohuck@redhat.com,
+        jiri@mellanox.com, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
+Message-ID: <20191108104505.GF6990@nanopsycho>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107160834.21087-1-parav@mellanox.com>
+ <20191107160834.21087-19-parav@mellanox.com>
 MIME-Version: 1.0
-In-Reply-To: <20191023123118.191230255@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911080103
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911080103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191107160834.21087-19-parav@mellanox.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Thu, Nov 07, 2019 at 05:08:34PM CET, parav@mellanox.com wrote:
+>Provide a module parameter to set alias length to optionally generate
+>mdev alias.
+>
+>Example to request mdev alias.
+>$ modprobe mtty alias_length=12
+>
+>Make use of mtty_alias() API when alias_length module parameter is set.
+>
+>Signed-off-by: Parav Pandit <parav@mellanox.com>
 
-On 10/23/19 2:27 PM, Thomas Gleixner wrote:
-> Now that the trap handlers return with interrupts disabled, the
-> unconditional disabling of interrupts in the low level entry code can be
-> removed along with the trace calls and the misnomed preempt_stop macro.
-> As a consequence ret_from_exception and ret_from_intr collapse.
-> 
-> Add a debug check to verify that interrupts are disabled depending on
-> CONFIG_DEBUG_ENTRY.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
->   arch/x86/entry/entry_32.S |   21 ++++++---------------
->   1 file changed, 6 insertions(+), 15 deletions(-)
-> 
-
-Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
-
-alex.
+This patch looks kind of unrelated to the rest of the set.
+I think that you can either:
+1) send this patch as a separate follow-up to this patchset
+2) use this patch as a user and push out the mdev alias patches out of
+this patchset to a separate one (I fear that this was discussed and
+declined before).
