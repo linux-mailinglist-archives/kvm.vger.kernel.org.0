@@ -2,129 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79AC7F4487
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 11:32:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D654F44CE
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 11:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731600AbfKHKcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 05:32:53 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35251 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730622AbfKHKcx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 05:32:53 -0500
-Received: by mail-wm1-f67.google.com with SMTP id 8so5676555wmo.0
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 02:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=/1599gDqgQT4+/ACcw8+n9g4WwihJtSkWdJ83xtYrrs=;
-        b=tb4sJLDi3Exe9JAsUa23Y+q1nk0BHHKEf85IQjE8dNvtPaxihDfBjebMrPHoN/i/nR
-         re4YFq0qshzrfoskQMQ6QXs9iloB9UOmtKTi4RyZTaX1HZZYNynxRU5WmeROLB5HNUhT
-         REcqzGm6BBj0Lh7ByTWCfz3V3pSZQh7tDnSEipHlxYO+e6+jWLPN78gtUqUlXlNOfH7o
-         Q4pHpeAewlMluV03h3vVb2Nk+rVOf8Wfd7+FnAxvEoLKsbAyftjMv2Zpeb9F9/Q+wqvn
-         8dgi9Lz7CnUVVshn17/hHQgRMiNIGdcoLjpURMVK6oT0AHZt2hVJrLj7i/S3khN7AfsW
-         m5GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/1599gDqgQT4+/ACcw8+n9g4WwihJtSkWdJ83xtYrrs=;
-        b=ZVhZcOj6aS6CbAx4qvcspjnjtd7JD9F25JBZgUjQyU/T5EVODFHgWL3+odITdGdjZZ
-         UslVpCR/f35YG8qzXIW6sYmDqk0qqcdvx5olEeJBDf3iBDrSqDD0BLSctwqa44bgsIiJ
-         bylRuXkiKlnGXCkSJdE8bMRpzoeG7V0w/3l5qA/QCLpyWtKAyC0YXlrMOmcw+ltBRAAJ
-         YRo1NNmbRUE9Fu0jolpukbel/YR5UCoCwCuJdrBSwFtjYL3wuEb87bxDYXTW5QV03map
-         FadUuIA0iK4u5u1zZXfu98XQ1kxUD8dd+/PxuoGf6OUI44O9fwG4DdXIlaPavV/DrJGD
-         /B4A==
-X-Gm-Message-State: APjAAAUSIJgmzNK932re6u111UfkftLGbatKaqQRGCYSY8+v4KhMiVIH
-        fxxre6EEnSHzHTXrOvLr9AJwPg==
-X-Google-Smtp-Source: APXvYqxP9nvHJSdV76uw+81FjfoIdq73P2BH1K7A+UszgAXvHwfbJNXN8UNx4RKJgQCCFfnklok1PQ==
-X-Received: by 2002:a1c:6885:: with SMTP id d127mr7243732wmc.64.1573209170449;
-        Fri, 08 Nov 2019 02:32:50 -0800 (PST)
-Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id a5sm5462412wrv.56.2019.11.08.02.32.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 02:32:50 -0800 (PST)
-Date:   Fri, 8 Nov 2019 11:32:49 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     alex.williamson@redhat.com, davem@davemloft.net,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
-        kwankhede@nvidia.com, leon@kernel.org, cohuck@redhat.com,
-        jiri@mellanox.com, linux-rdma@vger.kernel.org,
-        Vu Pham <vuhuong@mellanox.com>
-Subject: Re: [PATCH net-next 06/19] net/mlx5: Add support for mediated
- devices in switchdev mode
-Message-ID: <20191108103249.GE6990@nanopsycho>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-6-parav@mellanox.com>
+        id S1731521AbfKHKma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 05:42:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:56482 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726149AbfKHKma (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 05:42:30 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8ATKrU049892;
+        Fri, 8 Nov 2019 10:41:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=fp3pnErYbvbxA+Mx+2qhY6ge/lXDQYRira7mNwHpzmY=;
+ b=TOihndvvZRuOmCdD9v4KxQOWEt2Z8DYzIjPRDOqkEtapR9zij/fHVdHSg95EfVQK0igQ
+ NMqYRU2ZlfYXGuADVsrpPZZILSoibA+sFJF6XXo8jS1NL/P5CxWOp6jFtm+9o4DWapx0
+ /1EY3X5OiLmVBCd+xQ5a3tvM5ikXNC+aDqOQrfFuZd2rLTQ+wVrIo0KuKGx5yynRZ75M
+ dei9poudgYeaJYFCB+ujpi3eaEoKUBN51IbIos2JADFV9DqRMR54sXT3ygcZHo0vsZl/
+ FBuH/Sg6O59q0KEsTanbTQ65h+ES73B1AHyrtNIeAfX1MfVaMKb3LY6UEjbsOlUBZb8L Nw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2w41w1cjaf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Nov 2019 10:41:54 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8ARxuB078391;
+        Fri, 8 Nov 2019 10:41:53 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2w41whf22f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Nov 2019 10:41:53 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA8AfngC006265;
+        Fri, 8 Nov 2019 10:41:52 GMT
+Received: from [192.168.8.47] (/213.41.92.70)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 08 Nov 2019 02:41:48 -0800
+Subject: Re: [patch V2 06/17] x86/entry/32: Remove redundant interrupt disable
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Miroslav Benes <mbenes@suse.cz>
+References: <20191023122705.198339581@linutronix.de>
+ <20191023123118.191230255@linutronix.de>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <f8ba6ab8-c42d-f90f-f296-de270d1a7e21@oracle.com>
+Date:   Fri, 8 Nov 2019 11:41:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191107160834.21087-6-parav@mellanox.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191023123118.191230255@linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911080103
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911080103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thu, Nov 07, 2019 at 05:08:21PM CET, parav@mellanox.com wrote:
->From: Vu Pham <vuhuong@mellanox.com>
 
-[...]
+On 10/23/19 2:27 PM, Thomas Gleixner wrote:
+> Now that the trap handlers return with interrupts disabled, the
+> unconditional disabling of interrupts in the low level entry code can be
+> removed along with the trace calls and the misnomed preempt_stop macro.
+> As a consequence ret_from_exception and ret_from_intr collapse.
+> 
+> Add a debug check to verify that interrupts are disabled depending on
+> CONFIG_DEBUG_ENTRY.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>   arch/x86/entry/entry_32.S |   21 ++++++---------------
+>   1 file changed, 6 insertions(+), 15 deletions(-)
+> 
 
-	
->+static ssize_t
->+max_mdevs_show(struct kobject *kobj, struct device *dev, char *buf)
->+{
->+	struct pci_dev *pdev = to_pci_dev(dev);
->+	struct mlx5_core_dev *coredev;
->+	struct mlx5_mdev_table *table;
->+	u16 max_sfs;
->+
->+	coredev = pci_get_drvdata(pdev);
->+	table = coredev->priv.eswitch->mdev_table;
->+	max_sfs = mlx5_core_max_sfs(coredev, &table->sf_table);
->+
->+	return sprintf(buf, "%d\n", max_sfs);
->+}
->+static MDEV_TYPE_ATTR_RO(max_mdevs);
->+
->+static ssize_t
->+available_instances_show(struct kobject *kobj, struct device *dev, char *buf)
->+{
->+	struct pci_dev *pdev = to_pci_dev(dev);
->+	struct mlx5_core_dev *coredev;
->+	struct mlx5_mdev_table *table;
->+	u16 free_sfs;
->+
->+	coredev = pci_get_drvdata(pdev);
->+	table = coredev->priv.eswitch->mdev_table;
->+	free_sfs = mlx5_get_free_sfs(coredev, &table->sf_table);
->+	return sprintf(buf, "%d\n", free_sfs);
->+}
->+static MDEV_TYPE_ATTR_RO(available_instances);
+Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 
-These 2 arbitrary sysfs files are showing resource size/usage for
-the whole eswitch/asic. That is a job for "devlink resource". Please
-implement that.
-
-
->+
->+static struct attribute *mdev_dev_attrs[] = {
->+	&mdev_type_attr_max_mdevs.attr,
->+	&mdev_type_attr_available_instances.attr,
->+	NULL,
->+};
->+
->+static struct attribute_group mdev_mgmt_group = {
->+	.name  = "local",
->+	.attrs = mdev_dev_attrs,
->+};
->+
->+static struct attribute_group *mlx5_meddev_groups[] = {
->+	&mdev_mgmt_group,
->+	NULL,
->+};
-
-[...]
+alex.
