@@ -2,49 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B9DBF3D47
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 02:16:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A07BEF3D58
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 02:17:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728302AbfKHBQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 20:16:58 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:39762 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728256AbfKHBQ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 20:16:57 -0500
-Received: by mail-qk1-f194.google.com with SMTP id 15so3844531qkh.6
-        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 17:16:57 -0800 (PST)
+        id S1728249AbfKHBRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 20:17:55 -0500
+Received: from mail-qv1-f67.google.com ([209.85.219.67]:44800 "EHLO
+        mail-qv1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728569AbfKHBRy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 20:17:54 -0500
+Received: by mail-qv1-f67.google.com with SMTP id d3so28748qvs.11
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 17:17:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=netronome-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:in-reply-to:references
          :organization:mime-version:content-transfer-encoding;
-        bh=dyxeSBJVMYqSSgHrMoCBX1xHiPyaBtHHDx9vh0MyLbg=;
-        b=h1h5lsiTzQmb05+dMRootsjogeunEVA0ty19WeFHKl9612U7UhX9X9zXNdFtny0hqQ
-         Xqwnwc/MOy6f/0IsssM+UaqLFVSvo+SoauHQwoqERiAPQyhRSwTo+LaqXpJ2IyHn+QVD
-         j3ox7wthRD+ghEUdMcDMAasfX+J/8FtSRE66I2N1m88bW8TLdhk5J8/I4dRZyDUGDNnj
-         NcW9JRQkaafLVWRRw9pni54fhdg221ogcm3W4kmcrV/hfle4c7agV8zXuYO35bns+Wd2
-         FM2of8IAkzVZqc3kBYbzrmbXjHX179DAIDuc6wMDiOutAzeUzaLjyCtxvblfELxvXvgO
-         M8Vw==
+        bh=q6xlZKp1FmiyBYDuRvWEgcHuXDfy0uBqqo0d2wzNJjk=;
+        b=SgszKXp+Bh6X72c6ZgrD244PjjG0EOo12EZqDs1K7snEUFA4fgWAOdHBJeMug4frdY
+         oAIRyS0Dzl77gWfwbvVpKa/nrsRoTseE+09SHBQyc56PfbOI0aJXj4nUVRggclgHa45s
+         Eo3745ePjRlt0wTcYILx7tAX2qTM28UQJN1WXdtKtyM3k25tnOC3Dr5BPxRLB8y/78iV
+         NxuGe38SK5Q5q2Li4e+5aW4RY0ryWeXcK2f9X6XlG086cQDq7rWZPYyb+OY7/yPgegHy
+         Gjb7o2usFlvfgF36K542uG3NpOu3W89HPTzqJo6nmH6KOiMquVtTAdVE/dx+few/+QR5
+         WlCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=dyxeSBJVMYqSSgHrMoCBX1xHiPyaBtHHDx9vh0MyLbg=;
-        b=rIE8wcM85imvysdJCNRUFtx9VxIdvLRg7OMo3ZD515nB9Qps1mafwjGSqYC/M/LKZH
-         Ef0t2iJyv/oManTtNY+ckJr11jiyso1TLmelpdSuHmnfOkp7CswRxEaEcgk4ACIE70ti
-         eR5A7kpsoKzH+afVvd+CYlHmB6vSEs0+wp77DE7E7XHCxAtaem3dbfCW/chB9cPa8AaP
-         aH/dQ7NVPs8YMMHz3dKkVoQKvJ1EXHcF55jlkcU0RxPbjz0nMqB37fXKZsMqanLz0Lfs
-         V1EY6YxZbIp14CouYaNsAjbv7AgSLeHjcBa+afxNGEK4FiCsmzNQYi9mYD8fhrLvW8dp
-         vHtA==
-X-Gm-Message-State: APjAAAXycIVTS2bjMg+OoBOiMKvx+c/JKZ+AxxnReOGkVb1n/CFyQRIY
-        YDxhijBiGXOlYXYp3RFS/RjG0g==
-X-Google-Smtp-Source: APXvYqx4DFWX5SNNZl7pjgak86Wa5yCfVWQdSXhfRgO4TjXogQeQyxfBpCD/iqC0hyFp+0USDCQ+EA==
-X-Received: by 2002:a05:620a:6ce:: with SMTP id 14mr6624068qky.202.1573175816907;
-        Thu, 07 Nov 2019 17:16:56 -0800 (PST)
+        bh=q6xlZKp1FmiyBYDuRvWEgcHuXDfy0uBqqo0d2wzNJjk=;
+        b=Uk4YDTd62wJoPRYmfaPqdqgreVmMUqXZRATBRxipL3joRjBNVvV61zhFotL6PYcyVO
+         YyH5sKwwEZWSZP2Y9uyrB/5pt7rX0SB1zkQI2we1i+4pwlKftVbrMwZWwvYfuVjChEJh
+         Qy2zHoLoLixzabxYqiVykrCICFU6LzGcUq33+ETpZeL8+mIdTxaUWTCd+J2TFmG2c/V3
+         ik3YS9k72aMCb4OJ9Gnnnbrz7BputMpEAi92A1IaFeerSsBqKEypvFa1XIK3oomkiC7m
+         1tSFC3QdxDYxa0PIjnSXusj6/FVrgOGn/Sl4kFZRRhMprTtLK0RfsT4J+suhsBI+QlyO
+         Ad3A==
+X-Gm-Message-State: APjAAAXVIeXK5GK89o3+AqGYHnm1xprnaFfUohbNc1aRTh995iwLfvdZ
+        xr7wIepii7G7/smY/0FaVtL3Gg==
+X-Google-Smtp-Source: APXvYqxuEoLlUtuNZj5stZuH8R1e/xB4LZQ/XFGr9Nb4gHb8ESeDGljNTqJTvH71Xej2ZW7vwHiFzA==
+X-Received: by 2002:a0c:d09b:: with SMTP id z27mr6806500qvg.168.1573175873819;
+        Thu, 07 Nov 2019 17:17:53 -0800 (PST)
 Received: from cakuba ([65.196.126.174])
-        by smtp.gmail.com with ESMTPSA id z7sm3448762qth.85.2019.11.07.17.16.56
+        by smtp.gmail.com with ESMTPSA id u4sm2117942qkd.105.2019.11.07.17.17.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2019 17:16:56 -0800 (PST)
-Date:   Thu, 7 Nov 2019 20:16:53 -0500
+        Thu, 07 Nov 2019 17:17:53 -0800 (PST)
+Date:   Thu, 7 Nov 2019 20:17:50 -0500
 From:   Jakub Kicinski <jakub.kicinski@netronome.com>
 To:     Parav Pandit <parav@mellanox.com>
 Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
@@ -57,15 +57,14 @@ Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params
- for mediated device
-Message-ID: <20191107201653.0afb51fb@cakuba>
-In-Reply-To: <AM0PR05MB486634DCB2778C2DFDBF752FD1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
+Message-ID: <20191107201750.6ac54aed@cakuba>
+In-Reply-To: <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
 References: <20191107160448.20962-1-parav@mellanox.com>
         <20191107160834.21087-1-parav@mellanox.com>
-        <20191107160834.21087-16-parav@mellanox.com>
-        <20191107154256.21629e5a@cakuba.netronome.com>
-        <AM0PR05MB486634DCB2778C2DFDBF752FD1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191107160834.21087-12-parav@mellanox.com>
+        <20191107153836.29c09400@cakuba.netronome.com>
+        <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
 Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -75,38 +74,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 Nov 2019 21:30:41 +0000, Parav Pandit wrote:
-> > -----Original Message-----
-> > From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On Behalf
-> > Of Jakub Kicinski
-> > Sent: Thursday, November 7, 2019 2:43 PM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: alex.williamson@redhat.com; davem@davemloft.net;
-> > kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
-> > <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
-> > cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
-> > rdma@vger.kernel.org
-> > Subject: Re: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params
-> > for mediated device
-
-Please try to avoid generating those headers, you're not an occasional
-contributor. They're annoying and a waste of space :(
-
-> > On Thu,  7 Nov 2019 10:08:31 -0600, Parav Pandit wrote:  
-> > > Implement dma ops wrapper to divert dma ops to its parent PCI device
-> > > because Intel IOMMU (and may be other IOMMU) is limited to PCI devices.
-> > >
-> > > Reviewed-by: Saeed Mahameed <saeedm@mellanox.com>
-> > > Signed-off-by: Parav Pandit <parav@mellanox.com>  
+On Thu, 7 Nov 2019 21:03:09 +0000, Parav Pandit wrote:
+> > Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
 > > 
-> > Isn't this supposed to use PASSID or whatnot? Could you explain a little? This
-> > mdev stuff is pretty new to networking folks..  
-> 
-> Currently series doesn't support PCI PASID.
-> While doing dma mapping, Intel IOMMU expects dma device to be PCI device in few function traces like, find_or_alloc_domain(), 
-> Since mdev bus is not a PCI bus, DMA mapping needs to go through its parent PCI device.
-> Otherwise dma ops on mdev devices fails, as I think it fails to identify how to perform the translations.
-> (It doesn't seem to consult its parent device).
+> > On Thu,  7 Nov 2019 10:08:27 -0600, Parav Pandit wrote:  
+> > > Introduce a new mdev port flavour for mdev devices.
+> > > PF.
+> > > Prepare such port's phys_port_name using unique mdev alias.
+> > >
+> > > An example output for eswitch ports with one physical port and one
+> > > mdev port:
+> > >
+> > > $ devlink port show
+> > > pci/0000:06:00.0/65535: type eth netdev p0 flavour physical port 0
+> > > pci/0000:06:00.0/32768: type eth netdev p1b0348cf880a flavour mdev
+> > > alias 1b0348cf880a  
+> > 
+> > Surely those devices are anchored in on of the PF (or possibly VFs) that should
+> > be exposed here from the start.
+> >   
+> They are anchored to PCI device in this implementation and all mdev device has their parent device too.
+> However mdev devices establishes their unique identity at system level using unique UUID.
+> So prefixing it with pf0, will shorten the remaining phys_port_name letter we get to use.
+> Since we get unique 12 letters alias in a system for each mdev, prefixing it with pf/vf is redundant.
+> In case of VFs, given the VF numbers can repeat among multiple PFs, and representor can be over just one eswitch instance, it was necessary to prefix.
+> Mdev's devices parent PCI device is clearly seen in the PCI sysfs hierarchy, so don't prefer to duplicate it.
 
-What's missing for PASSID to work? HW support? FW support? IOMMU
-plumbing? mdev plumbing? mlx5 plumbing?
+I'm talking about netlink attributes. I'm not suggesting to sprintf it
+all into the phys_port_name.
+
+> > > Signed-off-by: Parav Pandit <parav@mellanox.com>  
+> >   
+> > > @@ -6649,6 +6678,9 @@ static int  
+> > __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,  
+> > >  		n = snprintf(name, len, "pf%uvf%u",
+> > >  			     attrs->pci_vf.pf, attrs->pci_vf.vf);
+> > >  		break;
+> > > +	case DEVLINK_PORT_FLAVOUR_MDEV:
+> > > +		n = snprintf(name, len, "p%s", attrs->mdev.mdev_alias);  
+> > 
+> > Didn't you say m$alias in the cover letter? Not p$alias?
+> >   
+> In cover letter I described the naming scheme for the netdevice of
+> the mdev device (not the representor). Representor follows current
+> unique phys_port_name method.
+
+So we're reusing the letter that normal ports use?
+
+Why does it matter to name the virtualized device? In case of other
+reprs its the repr that has the canonical name, in case of containers
+and VMs they will not care at all what hypervisor identifier the device
+has.
+
+> > > +		break;
+> > >  	}
+> > >
+> > >  	if (n >= len)  
