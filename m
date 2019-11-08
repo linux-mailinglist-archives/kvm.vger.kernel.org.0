@@ -2,94 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A5D50F5908
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 22:03:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 870FFF5924
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 22:08:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727633AbfKHVCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 16:02:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48412 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726819AbfKHVCz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 16:02:55 -0500
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1F9C5821D9
-        for <kvm@vger.kernel.org>; Fri,  8 Nov 2019 21:02:55 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f21so145729wmh.5
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 13:02:55 -0800 (PST)
+        id S1731933AbfKHVFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 16:05:48 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:45741 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731186AbfKHVFs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 16:05:48 -0500
+Received: by mail-qk1-f194.google.com with SMTP id q70so6511707qke.12
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 13:05:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=MT/LY/XgFSJdf41oOOrhevuJKKJ8QyaowUuyyauvEB4=;
+        b=S3W0WVKg61O3wdCan3sBSH25msasI778xeQivDFRYbUn37LKqhN0hULZcApsbDa45g
+         JbHEoEGLFWc3hNPNr61qqCa89hxSA+wo1ImqI93HkX3gq/CXIKz/xd0/qeMLnTqQzFNp
+         KtyRNtOvPCKRIP0VDBd4uHha5U1fV53w1I4FqOysZfFlsCk4EChQMIh7ThHnC7i9zqGt
+         J3WFoua7ssvszaCyaKuDgx4pwoKbORWQgeeonhqq1KQVAzxbieaaTPMCUUd9lTIAZXpB
+         jiDs79EZye1oc/lW+p2h20fu6gKr0IovwB3u6MDtq+XbTHziKAmjesknB392DnzXENO8
+         1XAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Nmq1GRytWblh4euOCRxuEbZgIoXZxuuSJXUDKh29oIk=;
-        b=PJheMDpahxt/YPnScVC/CK++Qq3RCXuzKSekC8i+brOB/EDZeug1g1XSy0VjJXf/34
-         9yxJcsHjvyU7dDcieSCcfTxUuxgoFFVUEzgjYch8IXhh80lV5DqRgPYRhVpIXGNngKJz
-         1fZi9NXGPpxSyP0v42laDDbhHzbCWelo+LrrqI3FnJHvKbGscIPk/FEi8zBRMMS+K3B3
-         86C7Jmg2C8I4aoeJpbwUvz48p99CC5ywgoToDSKGQUZcjfHHnLma+zuFh45/DCv0DO5f
-         HYwAR1EYXRI7xQjqhz8C0AdAWF2SJPw8PX0G+jtyJfUuYB5/ptRP7Vx42UDSTzCAx9fI
-         PUOg==
-X-Gm-Message-State: APjAAAV2DX+j9nQ8SwvGRwzoNpdanzcJYJD6JukMmXdZJlB9daY19y46
-        0MWVKHP+btE/3rJkhDTz4JUdypbTIE0Z56BapdcjjbU09qgJO1Ik797UNxcgsmvMjNBihbprbIJ
-        C21tth4/ullSX
-X-Received: by 2002:a1c:dd45:: with SMTP id u66mr9706143wmg.12.1573246973743;
-        Fri, 08 Nov 2019 13:02:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy/r6N66RU82TBDTILIQyY7RHqJh4iD/jrgGSamtcwPgbTwlkWB5WWPfNwcD7uzL3Q1oJWlbw==
-X-Received: by 2002:a1c:dd45:: with SMTP id u66mr9706123wmg.12.1573246973469;
-        Fri, 08 Nov 2019 13:02:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e8cd:9f0f:a5dc:7ad5? ([2001:b07:6468:f312:e8cd:9f0f:a5dc:7ad5])
-        by smtp.gmail.com with ESMTPSA id y8sm5515162wmi.9.2019.11.08.13.02.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2019 13:02:52 -0800 (PST)
-Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     Jessica Yu <jeyu@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Matthias Maennich <maennich@google.com>
-References: <20191104230001.27774-1-aarcange@redhat.com>
- <20191104230001.27774-4-aarcange@redhat.com>
- <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
- <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
- <20191105135414.GA30717@redhat.com>
- <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
- <20191105145651.GD30717@redhat.com>
- <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
- <20191108135631.GA22507@linux-8ccs>
- <b77283e5-a4bc-1849-fbfa-27741ab2dbd5@redhat.com>
- <20191108200103.GA532@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9a3d2936-bd26-430f-a962-9b0f6fe0c2a0@redhat.com>
-Date:   Fri, 8 Nov 2019 22:02:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=MT/LY/XgFSJdf41oOOrhevuJKKJ8QyaowUuyyauvEB4=;
+        b=YbSRDJl/sb+Waaol7bsf91csLt0GmK3FrCHRLIkOwDeYRN2ci9a61MXS6tF81lQ7Wh
+         m4pT0Z+XA6yeHmt32dLMjClv+TN34o5uAULcxP30MnG4Yqh8dMyjdEXXfqCkQ0NpHQZp
+         qNKY0Juycs3QX6mTM7lXYXYeJonroE15wbB4zMWSgxyLMBmJMIvQn3n3LAe8qmFWHuKa
+         6wm4M9YNm4pxlgNtNt5vIpNc0WCfgWk5ddyw8qCQBjpXmeZbWtPhSmrb6HqKCVA4gAU7
+         U5t1kncvB7CrzXZesLUvLSQNcURKb+j9kbGTlIQwX+XpVO179XgEwhBtc9TOEPT8d7md
+         8/pQ==
+X-Gm-Message-State: APjAAAWlNSVDnyka38YH0/0M9O29flB9zIWaKxx0eHwPLjhMhe+IOuzv
+        y7X94iXkERYRpvanbMa5PJrV0w==
+X-Google-Smtp-Source: APXvYqzQCDP5uvAgzIXZTDyoCjjQ5STGt5nb+qLD8/SkU7C35PUxocQ3qBcHamvrNh90Yo5LLJJBNQ==
+X-Received: by 2002:a37:4752:: with SMTP id u79mr7777126qka.456.1573247146585;
+        Fri, 08 Nov 2019 13:05:46 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
+        by smtp.gmail.com with ESMTPSA id n185sm3368873qkd.32.2019.11.08.13.05.46
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 08 Nov 2019 13:05:46 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iTBRx-0007ha-JA; Fri, 08 Nov 2019 17:05:45 -0400
+Date:   Fri, 8 Nov 2019 17:05:45 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Jiri Pirko <jiri@resnulli.us>,
+        David M <david.m.ertman@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191108210545.GG10956@ziepe.ca>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107153234.0d735c1f@cakuba.netronome.com>
+ <20191108121233.GJ6990@nanopsycho>
+ <20191108144054.GC10956@ziepe.ca>
+ <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108111238.578f44f1@cakuba>
+ <20191108201253.GE10956@ziepe.ca>
+ <20191108133435.6dcc80bd@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20191108200103.GA532@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191108133435.6dcc80bd@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/11/19 21:01, Andrea Arcangeli wrote:
-> On Fri, Nov 08, 2019 at 08:51:04PM +0100, Paolo Bonzini wrote:
->> I suppose we could use code patching mechanism to avoid the retpolines.
->>  Andrea, what do you think about that?  That would have the advantage
->> that we won't have to remove kvm_x86_ops. :)
+On Fri, Nov 08, 2019 at 01:34:35PM -0700, Alex Williamson wrote:
+> On Fri, 8 Nov 2019 16:12:53 -0400
+> Jason Gunthorpe <jgg@ziepe.ca> wrote:
 > 
-> page 17 covers pvops:
+> > On Fri, Nov 08, 2019 at 11:12:38AM -0800, Jakub Kicinski wrote:
+> > > On Fri, 8 Nov 2019 15:40:22 +0000, Parav Pandit wrote:  
+> > > > > The new intel driver has been having a very similar discussion about how to
+> > > > > model their 'multi function device' ie to bind RDMA and other drivers to a
+> > > > > shared PCI function, and I think that discussion settled on adding a new bus?
+> > > > > 
+> > > > > Really these things are all very similar, it would be nice to have a clear
+> > > > > methodology on how to use the device core if a single PCI device is split by
+> > > > > software into multiple different functional units and attached to different
+> > > > > driver instances.
+> > > > > 
+> > > > > Currently there is alot of hacking in this area.. And a consistent scheme
+> > > > > might resolve the ugliness with the dma_ops wrappers.
+> > > > > 
+> > > > > We already have the 'mfd' stuff to support splitting platform devices, maybe
+> > > > > we need to create a 'pci-mfd' to support splitting PCI devices?
+> > > > > 
+> > > > > I'm not really clear how mfd and mdev relate, I always thought mdev was
+> > > > > strongly linked to vfio.
+> > > > >  
+> > > >
+> > > > Mdev at beginning was strongly linked to vfio, but as I mentioned
+> > > > above it is addressing more use case.
+> > > > 
+> > > > I observed that discussion, but was not sure of extending mdev further.
+> > > > 
+> > > > One way to do for Intel drivers to do is after series [9].
+> > > > Where PCI driver says, MDEV_CLASS_ID_I40_FOO
+> > > > RDMA driver mdev_register_driver(), matches on it and does the probe().  
+> > > 
+> > > Yup, FWIW to me the benefit of reusing mdevs for the Intel case vs
+> > > muddying the purpose of mdevs is not a clear trade off.  
+> > 
+> > IMHO, mdev has amdev_parent_ops structure clearly intended to link it
+> > to vfio, so using a mdev for something not related to vfio seems like
+> > a poor choice.
 > 
-> https://people.redhat.com/~aarcange/slides/2019-KVM-monolithic.pdf
+> Unless there's some opposition, I'm intended to queue this for v5.5:
+> 
+> https://www.spinics.net/lists/kvm/msg199613.html
+> 
+> mdev has started out as tied to vfio, but at it's core, it's just a
+> device life cycle infrastructure with callbacks between bus drivers
+> and vendor devices.  If virtio is on the wrong path with the above
+> series, please speak up.  Thanks,
 
-You can patch call instructions directly using text_poke when
-kvm_intel.ko or kvm_amd.ko, I'm not sure why that would be worse for TLB
-or RAM usage.  The hard part is recording the location of the call sites
-using some pushsection/popsection magic.
+Well, I think Greg just objected pretty strongly.
 
-Paolo
+IMHO it is wrong to turn mdev into some API multiplexor. That is what
+the driver core already does and AFAIK your bus type is supposed to
+represent your API contract to your drivers.
+
+Since the bus type is ABI, 'mdev' is really all about vfio I guess?
+
+Maybe mdev should grow by factoring the special GUID life cycle stuff
+into a helper library that can make it simpler to build proper API
+specific bus's using that lifecycle model? ie the virtio I saw
+proposed should probably be a mdev-virtio bus type providing this new
+virtio API contract using a 'struct mdev_virtio'?
+
+I only looked briefly but mdev seems like an unusual way to use the
+driver core. *generally* I would expect that if a driver wants to
+provide a foo_device (on a foo bus, providing the foo API contract) it
+looks very broadly like:
+
+  struct foo_device {
+       struct device dev;
+       const struct foo_ops *ops;
+  };
+  struct my_foo_device {
+      struct foo_device fdev;
+  };
+
+  foo_device_register(&mydev->fdev);
+
+Which means we can use normal container_of() patterns, while mdev
+seems to want to allocate all the structs internally.. I guess this is
+because of how the lifecycle stuff works? From a device core view it
+looks quite unnatural.
+
+Jason
