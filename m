@@ -2,43 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6075BF58C2
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 21:43:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03C41F58EA
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 21:58:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731283AbfKHUky (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 15:40:54 -0500
-Received: from mail-eopbgr140089.outbound.protection.outlook.com ([40.107.14.89]:57314
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728371AbfKHUkx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 15:40:53 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lFPZfOpDBhxi96B8TvaABixBNR10zATb7ZfICBq1EPTXDzantcy1NaFKeYzHI5ODfspbYPeLtP0a63IpmBQgYjpX0jLpvyeKQMTcTT9JySC3MY3csRI5r9w4CrEhwRxf1SsoNhkqT8IGPpPyROVmtV9NWhsxeHFBiFjTNP5gljDTNYoVZkYZx74JIszZNJP/3aamInM/h+SovBsZSPNx2zp/T4/4JrOyhEjDDOB+4sf5lFGYSHdQC7WRJ96lbDngP4mB1gfsVkvbNJaUaXejdXC7p/Se2sBqwvmjfZm3cKeG00thpr0UJdLVVY5yJvobFs+CGzaLyNfwYiUqbb6tDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rqMkVco1mioqpQUzo/SqdWaL1ban0D2VCEXu/RdRlu0=;
- b=TSPFu37MO50bC3diwtN/e0f/PJ4D0IZdAPLIxJ+iInrZ4sVVQE8aJa4STPFY8Zk1rDZy9AAZCJ9J0jxI7tn95aXov8q9VBaJtKDZsHbgvFtz3s4ySU6EMQjANR1YI14b3lI6lvnHQI7hglj80vSTyciTZyYN/jIDjGq6FiroM9zmzAeZe5dQs4aVYiEwzVvXaAyVETg5E+mnACtJCWViBIrAj1PX2NHnmd2wekB+taYa4sqE+klqUOK9NILXADybaeiZJ6RUpgr/tUKyfsgXYNRdAUB/NeGO0g9RayZTupjOyoo3IdkzM/Y8aEGtsZuD23uorslLdBgqsF6knQ+klA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rqMkVco1mioqpQUzo/SqdWaL1ban0D2VCEXu/RdRlu0=;
- b=SCoTcvs2ub9V/MhPMGA7FQ9ePjjBOBVjT/9UfjQ/0wOYEtmVTzieVbm84LhsDGvLZluWf6saYsuGgrDCSejZOoM4/j3gtqtz5G6pXDOvAKfRKUOsFoMgzJgy0YHmkOzfMtgWPejB4B82gtypWHwSKGx3xr7hc1A181Ly3rYSLco=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6273.eurprd05.prod.outlook.com (20.179.35.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.22; Fri, 8 Nov 2019 20:40:46 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Fri, 8 Nov 2019
- 20:40:46 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jiri Pirko <jiri@resnulli.us>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        id S1730722AbfKHUwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 15:52:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51382 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727903AbfKHUwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 15:52:09 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8172D215EA;
+        Fri,  8 Nov 2019 20:52:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573246327;
+        bh=rZ2fzRBjTIttDv3ZKd9CF9dBPvTjqYQBSYwZ0sNc1TU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=1SdgK2KQQ8K5KhLdq9xeml+m1kO8wwQl6pj6zXQi3GutHANkGEeHPsMAHoiDHbQqm
+         Z2RHe10OEOfrBHyS3s+Z2UYWDjC8Fxo5MKqbFnnsJdto3XrsiHKtov7+ZcMMN+br2G
+         hIyywKk3i7RmpkxFtDhBcJRJkQcW2jxQuBTE3Ccw=
+Date:   Fri, 8 Nov 2019 21:52:04 +0100
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Parav Pandit <parav@mellanox.com>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@resnulli.us>,
+        David M <david.m.ertman@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -49,135 +41,84 @@ CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         Or Gerlitz <gerlitz.or@gmail.com>
-Subject: RE: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Thread-Topic: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Thread-Index: AQHVlYUoVUzzBv4k4UmQHUerp08scaeAKe4AgAEGoYCAAHO0AIAACa0AgAADgBA=
-Date:   Fri, 8 Nov 2019 20:40:46 +0000
-Message-ID: <AM0PR05MB48666B8475EF12809FE31059D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191108205204.GB1277001@kroah.com>
 References: <20191107160448.20962-1-parav@mellanox.com>
  <20191107153234.0d735c1f@cakuba.netronome.com>
- <20191108121233.GJ6990@nanopsycho> <20191108110640.225b2724@cakuba>
- <20191108194118.GY6990@nanopsycho>
-In-Reply-To: <20191108194118.GY6990@nanopsycho>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 42f2b5e1-7b0d-4943-c2ec-08d7648bee9c
-x-ms-traffictypediagnostic: AM0PR05MB6273:|AM0PR05MB6273:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB627344F51F0FEC3F286D04D3D17B0@AM0PR05MB6273.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(376002)(136003)(366004)(396003)(346002)(189003)(199004)(13464003)(102836004)(11346002)(7696005)(71200400001)(486006)(71190400001)(6246003)(14454004)(110136005)(4326008)(478600001)(52536014)(256004)(66946007)(76116006)(66476007)(66556008)(64756008)(66446008)(86362001)(5660300002)(316002)(25786009)(55016002)(33656002)(6116002)(6506007)(229853002)(3846002)(8936002)(186003)(6436002)(81156014)(26005)(8676002)(446003)(7416002)(14444005)(74316002)(2906002)(76176011)(305945005)(99286004)(7736002)(9686003)(66066001)(81166006)(476003)(54906003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6273;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DgNL+uryIDjbii/XBxQCZV2SJI7+KT3ZPKhHpkKe3AY4mP4SVfdQCFTO0SbDkLVaZvbH2ts53UN8hgFX3BQr+PjhKAP+AR2g0AZHztGw2BOTyF4odWwFhNsgPYkN/pK3yJ2Xuag/u4GC6ey3YrWhwYlyy1MVju0Ztq25As63FC4b2iP6AnDNsUrZveTpRiBxOVxUP2e04KEKvTpHpVdTcwNUB2LSpuxFuHOlIX7cnGXdl1zqJYQsOe4bjpo3p5awgymHepEUCCvwGTTE0WQbxnBVHbVmeZnxKKQjayy8m1mQPNBRQD+Wdn0JrBqLcHSPOmNRT5uZGwuDoa6N2FEd0WbWjMVahPMCWx5LdA1SG2BcRt5HuLoMhptd7ZHDRpZZAECg6bZ9/qxRGLYwGwDQzzK8GSTM5DIVnkltnMevAsw22tGzyR2Um2XIG/k76dn7
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <20191108121233.GJ6990@nanopsycho>
+ <20191108144054.GC10956@ziepe.ca>
+ <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108111238.578f44f1@cakuba>
+ <20191108201253.GE10956@ziepe.ca>
+ <AM0PR05MB4866299C3AE2448C8226DC00D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108203209.GF10956@ziepe.ca>
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42f2b5e1-7b0d-4943-c2ec-08d7648bee9c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 20:40:46.1068
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nam1WP/EN9YIw9x9GjFHt4NTWuIUJhgi2UMKN5aRpMTdiyNvkIPx6urxxa9KCQv9DwU8SDejbmKmBO+oe7enFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6273
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191108203209.GF10956@ziepe.ca>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Nov 08, 2019 at 04:32:09PM -0400, Jason Gunthorpe wrote:
+> On Fri, Nov 08, 2019 at 08:20:43PM +0000, Parav Pandit wrote:
+> > 
+> > 
+> > > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > > On Fri, Nov 08, 2019 at 11:12:38AM -0800, Jakub Kicinski wrote:
+> > > > On Fri, 8 Nov 2019 15:40:22 +0000, Parav Pandit wrote:
+> > > > > > The new intel driver has been having a very similar discussion
+> > > > > > about how to model their 'multi function device' ie to bind RDMA
+> > > > > > and other drivers to a shared PCI function, and I think that discussion
+> > > settled on adding a new bus?
+> > > > > >
+> > > > > > Really these things are all very similar, it would be nice to have
+> > > > > > a clear methodology on how to use the device core if a single PCI
+> > > > > > device is split by software into multiple different functional
+> > > > > > units and attached to different driver instances.
+> > > > > >
+> > > > > > Currently there is alot of hacking in this area.. And a consistent
+> > > > > > scheme might resolve the ugliness with the dma_ops wrappers.
+> > > > > >
+> > > > > > We already have the 'mfd' stuff to support splitting platform
+> > > > > > devices, maybe we need to create a 'pci-mfd' to support splitting PCI
+> > > devices?
+> > > > > >
+> > > > > > I'm not really clear how mfd and mdev relate, I always thought
+> > > > > > mdev was strongly linked to vfio.
+> > > > > >
+> > > > >
+> > > > > Mdev at beginning was strongly linked to vfio, but as I mentioned
+> > > > > above it is addressing more use case.
+> > > > >
+> > > > > I observed that discussion, but was not sure of extending mdev further.
+> > > > >
+> > > > > One way to do for Intel drivers to do is after series [9].
+> > > > > Where PCI driver says, MDEV_CLASS_ID_I40_FOO RDMA driver
+> > > > > mdev_register_driver(), matches on it and does the probe().
+> > > >
+> > > > Yup, FWIW to me the benefit of reusing mdevs for the Intel case vs
+> > > > muddying the purpose of mdevs is not a clear trade off.
+> > > 
+> > > IMHO, mdev has amdev_parent_ops structure clearly intended to link it to vfio,
+> > > so using a mdev for something not related to vfio seems like a poor choice.
+> > > 
+> > Splitting mdev_parent_ops{} is already in works for larger use case in series [1] for virtio.
+> > 
+> > [1] https://patchwork.kernel.org/patch/11233127/
+> 
+> Weird. So what is mdev actually providing and what does it represent
+> if the entire driver facing API surface is under a union?
+> 
+> This smells a lot like it is re-implementing a bus.. AFAIK bus is
+> supposed to represent the in-kernel API the struct device presents to
+> drivers.
 
+Yes, yes yes yes...
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
->=20
-> Fri, Nov 08, 2019 at 08:06:40PM CET, jakub.kicinski@netronome.com wrote:
-> >On Fri, 8 Nov 2019 13:12:33 +0100, Jiri Pirko wrote:
-> >> Thu, Nov 07, 2019 at 09:32:34PM CET, jakub.kicinski@netronome.com
-> wrote:
-> >> >On Thu,  7 Nov 2019 10:04:48 -0600, Parav Pandit wrote:
-> >> >> Mellanox sub function capability allows users to create several
-> >> >> hundreds of networking and/or rdma devices without depending on PCI
-> SR-IOV support.
-> >> >
-> >> >You call the new port type "sub function" but the devlink port
-> >> >flavour is mdev.
-> >> >
-> >> >As I'm sure you remember you nacked my patches exposing NFP's PCI
-> >> >sub functions which are just regions of the BAR without any mdev
-> >> >capability. Am I in the clear to repost those now? Jiri?
-> >>
-> >> Well question is, if it makes sense to have SFs without having them
-> >> as mdev? I mean, we discussed the modelling thoroughtly and
-> >> eventually we realized that in order to model this correctly, we need =
-SFs on
-> "a bus".
-> >> Originally we were thinking about custom bus, but mdev is already
-> >> there to handle this.
-> >
-> >But the "main/real" port is not a mdev in your case. NFP is like mlx4.
-> >It has one PCI PF for multiple ports.
->=20
-> I don't see how relevant the number of PFs-vs-uplink_ports is.
->=20
->=20
-> >
-> >> Our SFs are also just regions of the BAR, same thing as you have.
-> >>
-> >> Can't you do the same for nfp SFs?
-> >> Then the "mdev" flavour is enough for all.
-> >
-> >Absolutely not.
-> >
-> >Why not make the main device of mlx5 a mdev, too, if that's acceptable.
-> >There's (a) long precedence for multiple ports on one PCI PF in
-> >networking devices, (b) plenty deployed software which depend on the
-> >main devices hanging off the PCI PF directly.
-> >
-> >The point of mdevs is being able to sign them to VFs or run DPDK on
-> >them (map to user space).
-> >
-> >For normal devices existing sysfs hierarchy were one device has
-> >multiple children of a certain class, without a bus and a separate
-> >driver is perfectly fine. Do you think we should also slice all serial
-> >chips into mdevs if they have multiple lines.
-> >
-> >Exactly as I predicted much confusion about what's being achieved here,
-> >heh :)
->=20
-> Please let me understand how your device is different.
-> Originally Parav didn't want to have mlx5 subfunctions as mdev. He wanted=
- to
-> have them tight to the same pci device as the pf. No difference from what=
- you
-> describe you want.
-> However while we thought about how to fit things in, how to
-> handle na phys_port_name, how to see things in sysfs we came up with an i=
-dea
-> of a dedicated bus. We took it upstream and people suggested to use mdev =
-bus
-> for this.
->=20
-You are right. We considered multiple ports approach, followed by subdevice=
-s and mfd.
-Around that time mdev was being proposed that can address current and futur=
-e VM/userspace usecases using one way to lifecycle the devices.
+I'm getting tired of saying the same thing here, just use a bus, that's
+what it is there for.
 
-> Parav, please correct me if I'm wrong but I don't think where is a plan t=
-o push
-> SFs into VM or to userspace as Jakub expects, right?
-With this series - certainly not.
-In future, if mdev to be used by via vfio/VM framework, why should we preve=
-nt it (ofcourse after implementing necessary isolation method)?
-
+greg k-h
