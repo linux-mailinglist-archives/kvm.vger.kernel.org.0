@@ -2,97 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB3EBF4567
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 12:09:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3D6F4572
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 12:10:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731312AbfKHLJC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 06:09:02 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49576 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726180AbfKHLJC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 06:09:02 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8B509c050132;
-        Fri, 8 Nov 2019 11:07:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=05GqX2q0ywPMyzyL60tZrM3bsF30oO3GM+yVJb7hsAM=;
- b=fEgEVf0mYnLW2QGKB5BZV2RimLE5KuUDdegqs4601sC8b2mP2+kthj/9LlDMnBElhOGe
- IQXTGGvYeykjZ5Ex0sUedxXgS78BhhlkjotTNX5xkB2ic7xkf04KYAvjwpUHhEO2sOzP
- U8fZ3BLbzJizpakGwlIpRud9qQ3Lg/5IPzjwBHrfshSaEAOXQtctSw1+RGOt4sBeJQ0N
- 9k3yS89Wmk4lCAkHrrpjdXD+8uY2UDxJ4pqaP8yGHvyMgsCpcq2Vd0DgpMQqmMU1wwF8
- QHXCc5qTTJClvLPybCXqdKEwN9t/WE7RdPDbxK2Gvb0RHKrhmtkehotcougtNg8ULXu1 Nw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2w41w14mxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 08 Nov 2019 11:07:35 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8B4LA8052138;
-        Fri, 8 Nov 2019 11:07:35 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2w4k31mh0m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 08 Nov 2019 11:07:34 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA8B7Vvl006484;
-        Fri, 8 Nov 2019 11:07:34 GMT
-Received: from [192.168.8.47] (/213.41.92.70)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 08 Nov 2019 03:07:31 -0800
-Subject: Re: [patch V2 07/17] x86/entry/64: Remove redundant interrupt disable
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, Mike Rapoport <rppt@linux.ibm.com>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Miroslav Benes <mbenes@suse.cz>
-References: <20191023122705.198339581@linutronix.de>
- <20191023123118.296135499@linutronix.de>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <86bf1670-dd35-f310-dab9-106897cc3921@oracle.com>
-Date:   Fri, 8 Nov 2019 12:07:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1731870AbfKHLKn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 06:10:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28875 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730614AbfKHLKm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 06:10:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573211441;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3nYT87qwUirFN/Bs+GrE3cX/9b5VoxR9UXPdSVM6IKE=;
+        b=IJUSe34bM28JDjf/zmmMJXIT/HXU/fmVQi+n071sq0CaGNWTkVUDbkXM6AqAOu9UAH5UCr
+        OpYkhIaXj4mabV1X1RyGPE9Ls8F3CSOLO8F6xwdJzG141o1KoRNqZa7AmSRr9taqhCif0R
+        m0zQiy7e8Udru1aUp2CJQBIxuPkciIA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-eir2viv0OcmvHDnBioCDyQ-1; Fri, 08 Nov 2019 06:10:37 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CED11800D7B;
+        Fri,  8 Nov 2019 11:10:35 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EEF625DA7F;
+        Fri,  8 Nov 2019 11:10:32 +0000 (UTC)
+Date:   Fri, 8 Nov 2019 12:10:30 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     alex.williamson@redhat.com, davem@davemloft.net,
+        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
+        kwankhede@nvidia.com, leon@kernel.org, jiri@mellanox.com,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 07/19] vfio/mdev: Introduce sha1 based mdev
+ alias
+Message-ID: <20191108121030.5466dd3e.cohuck@redhat.com>
+In-Reply-To: <20191107160834.21087-7-parav@mellanox.com>
+References: <20191107160448.20962-1-parav@mellanox.com>
+        <20191107160834.21087-1-parav@mellanox.com>
+        <20191107160834.21087-7-parav@mellanox.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191023123118.296135499@linutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911080109
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911080109
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: eir2viv0OcmvHDnBioCDyQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  7 Nov 2019 10:08:22 -0600
+Parav Pandit <parav@mellanox.com> wrote:
 
-On 10/23/19 2:27 PM, Thomas Gleixner wrote:
-> Now that the trap handlers return with interrupts disabled, the
-> unconditional disabling of interrupts in the low level entry code can be
-> removed along with the trace calls.
-> 
-> Add debug checks where appropriate.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Some vendor drivers want an identifier for an mdev device that is
+> shorter than the UUID, due to length restrictions in the consumers of
+> that identifier.
+>=20
+> Add a callback that allows a vendor driver to request an alias of a
+> specified length to be generated for an mdev device. If generated,
+> that alias is checked for collisions.
+>=20
+> It is an optional attribute.
+> mdev alias is generated using sha1 from the mdev name.
+>=20
+> Reviewed-by: Saeed Mahameed <saeedm@mellanox.com>
+> Signed-off-by: Parav Pandit <parav@mellanox.com>
 > ---
->   arch/x86/entry/entry_64.S |    9 +++------
->   1 file changed, 3 insertions(+), 6 deletions(-)
-> 
+>  drivers/vfio/mdev/mdev_core.c    | 123 ++++++++++++++++++++++++++++++-
+>  drivers/vfio/mdev/mdev_private.h |   5 +-
+>  drivers/vfio/mdev/mdev_sysfs.c   |  13 ++--
+>  include/linux/mdev.h             |   4 +
+>  4 files changed, 135 insertions(+), 10 deletions(-)
 
-Reviewed-by: Alexandre Chartre <alexandre.chartre@oracle.com>
+Is this (or any of the other mdev alias patches) different from what I
+reviewed in the past?
 
-alex.
