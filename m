@@ -2,137 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C89CDF43CE
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 10:46:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 033B0F43D1
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 10:46:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731387AbfKHJqu convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 8 Nov 2019 04:46:50 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40714 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730645AbfKHJqt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Nov 2019 04:46:49 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xA89gZ5I127541
-        for <kvm@vger.kernel.org>; Fri, 8 Nov 2019 04:46:48 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w541c49qa-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 04:46:47 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Fri, 8 Nov 2019 09:46:46 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 8 Nov 2019 09:46:43 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xA89kfXW9830592
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 8 Nov 2019 09:46:41 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 775AAA405B;
-        Fri,  8 Nov 2019 09:46:41 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3EAF5A404D;
-        Fri,  8 Nov 2019 09:46:41 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  8 Nov 2019 09:46:41 +0000 (GMT)
-Date:   Fri, 8 Nov 2019 10:46:40 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: SCLP unit test
-In-Reply-To: <b4344967-54d2-5b57-8d36-dd1361654c8e@redhat.com>
-References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
-        <1572023194-14370-6-git-send-email-imbrenda@linux.ibm.com>
-        <191dbc7f-74b2-6f78-a721-aaac49895948@linux.ibm.com>
-        <20191104121901.3b3ab68b@p-imbrenda.boeblingen.de.ibm.com>
-        <b4344967-54d2-5b57-8d36-dd1361654c8e@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1731436AbfKHJqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 04:46:50 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37182 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730221AbfKHJqu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 04:46:50 -0500
+Received: by mail-wm1-f68.google.com with SMTP id q130so5510434wme.2
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 01:46:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=qBRUcqrHuAkFcWrhiG6W90kEr3iLZdNuck5vTxZOE2I=;
+        b=UbF+OC5/QhYL6bxs2u7StcX3ebTL9g9YHKrEP2nwnfBGwg4Fq5bQTYRTJEKFb4XOK+
+         UxDBJ6e/zTjvZtYIdn2o87NPPiNE/ZI+rL6T+2rsNY87r0FT1vAjA/pZzFG8U9W1T2+P
+         wCgjO3FNoXmgI7d+JVNNvL9kBXgNBvU1q0Hssq55C94jglwM9O8u526fL6qEsOo9lJL0
+         ROmCeVJbjOyUg/HBR5AarDeIq5ZgXrkY6uoPieI0K3W5tmAZOpqVreRSXHjP/dVhWNe3
+         /3/tyryBAXb8YOpuP2HYYZTlVQZYmNrDc1J7zYdC4mJwctQwwLBT/k1AFAqwbhWqxiiu
+         nQeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=qBRUcqrHuAkFcWrhiG6W90kEr3iLZdNuck5vTxZOE2I=;
+        b=D1RcjEr6cEs1TEc1WXYS2mWkr95YeFv+QHlvcufnD4z9Ff+8kKwaynl7/Jpohs3Edr
+         eNZN28miQN/C9hmeKDb0arptPtENO/kUFEDoyJYpUWrhEyYrp2iChtvKTucH7qb1KcH8
+         80Jk33QxRyOkXD4L7TOis79k6MVPFaniSg00jH0+aiLig4qQiBU7/6NGtQZwhXnu80/l
+         VYw0Vu4NXybP8q9vkDvBcl/5bj/z0mDdtvqhErllHcqUXMpi/U+VO21Qp8a0lbT64ALz
+         S4ByCyVSE5qX9xcx5vbzR0XkHUrIiOBDzkBB+96fU3QNImDLD/5lODUN08hIkTQ7NYZb
+         BXaA==
+X-Gm-Message-State: APjAAAUzGBBXIFqBWvIReLcDMfuuyMGCCdujmzN1dGdUarIH9ofrtVNH
+        o7P6i9Ih8Z7iuOecbagT2ntEHA==
+X-Google-Smtp-Source: APXvYqxwQwEMMzdKCCodb94kb+6Ua49RiWNSBUkEAh1vhuZWOkYle1LRVhIrgMYj3SGmQ3ZyiKHs8g==
+X-Received: by 2002:a1c:9e58:: with SMTP id h85mr7618811wme.77.1573206407491;
+        Fri, 08 Nov 2019 01:46:47 -0800 (PST)
+Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
+        by smtp.gmail.com with ESMTPSA id r15sm4761749wrc.5.2019.11.08.01.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2019 01:46:47 -0800 (PST)
+Date:   Fri, 8 Nov 2019 10:46:46 +0100
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
+Message-ID: <20191108094646.GB6990@nanopsycho>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107160834.21087-1-parav@mellanox.com>
+ <20191107160834.21087-12-parav@mellanox.com>
+ <20191107153836.29c09400@cakuba.netronome.com>
+ <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191107201750.6ac54aed@cakuba>
+ <AM0PR05MB4866BEC2A2B586AA72BAA9ABD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191107212024.61926e11@cakuba>
+ <AM0PR05MB4866C0798EA5746EE23F2D2BD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-TM-AS-GCONF: 00
-x-cbid: 19110809-4275-0000-0000-0000037BEBA3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19110809-4276-0000-0000-0000388F3F9C
-Message-Id: <20191108104640.246412bd@p-imbrenda.boeblingen.de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-08_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911080095
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM0PR05MB4866C0798EA5746EE23F2D2BD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 8 Nov 2019 10:35:32 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Fri, Nov 08, 2019 at 03:31:02AM CET, parav@mellanox.com wrote:
+>
+>
+>> -----Original Message-----
+>> From: Jakub Kicinski <jakub.kicinski@netronome.com>
+>> Sent: Thursday, November 7, 2019 8:20 PM
+>> To: Parav Pandit <parav@mellanox.com>
+>> Cc: alex.williamson@redhat.com; davem@davemloft.net;
+>> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
+>> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
+>> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
+>> rdma@vger.kernel.org
+>> Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
+>> 
+>> On Fri, 8 Nov 2019 01:44:53 +0000, Parav Pandit wrote:
+>> > > I'm talking about netlink attributes. I'm not suggesting to sprintf
+>> > > it all into the phys_port_name.
+>> > >
+>> > I didn't follow your comment. For devlink port show command output you
+>> > said,
+>> >
+>> > "Surely those devices are anchored in on of the PF (or possibly VFs)
+>> > that should be exposed here from the start."
+>> > So I was trying to explain why we don't expose PF/VF detail in the
+>> > port attributes which contains
+>> > (a) flavour
+>> > (b) netdev representor (name derived from phys_port_name)
+>> > (c) mdev alias
+>> >
+>> > Can you please describe which netlink attribute I missed?
+>> 
+>> Identification of the PCI device. The PCI devices are not linked to devlink
+>> ports, so the sysfs hierarchy (a) is irrelevant, (b) may not be visible in multi-
+>> host (or SmartNIC).
+>>
+>
+>It's the unique mdev device alias. It is not right to attach to the PCI device.
+>Mdev is bus in itself where devices are identified uniquely. So an alias suffice that identity.
 
-> On 04/11/2019 12.19, Claudio Imbrenda wrote:
-> > On Mon, 4 Nov 2019 10:45:07 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:  
-> [...]
-> >>> +static void test_toolong(void)
-> >>> +{
-> >>> +	uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-> >>> +	uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;  
-> >>
-> >> Why use variables for constants that are never touched?  
-> > 
-> > readability mostly. the names of the constants are rather long.
-> > the compiler will notice it and do the Right Thing™  
-> 
-> I'd like to suggest to add the "const" keyword to both variables in
-> that case, then it's clear that they are not used to be modified.
+Wait a sec. For mdev, what you say is correct. But here we talk about
+devlink_port which is representing this mdev. And this devlink_port is
+very similar to VF devlink_port. It is bound to specific PF (in case of
+mdev it could be PF-VF).
 
-good point
 
-> >>> +		h->length = 4096;
-> >>> +
-> >>> +		valid_code = commands[i];
-> >>> +		cc = sclp_service_call(commands[i], h);
-> >>> +		if (cc)
-> >>> +			break;
-> >>> +		if (h->response_code ==
-> >>> SCLP_RC_NORMAL_READ_COMPLETION)
-> >>> +			return;
-> >>> +		if (h->response_code !=
-> >>> SCLP_RC_INVALID_SCLP_COMMAND)
-> >>> +			break;  
-> >>
-> >> Depending on line length you could add that to the cc check.
-> >> Maybe you could also group the error conditions before the success
-> >> conditions or the other way around.  
-> > 
-> > yeah it woud fit, but I'm not sure it would be more readable:
-> > 
-> > if (cc || (h->response_code != SCLP_RC_INVALID_SCLP_COMMAND))
-> >                          break;  
-> 
-> In case you go with that solution, please drop the innermost
-> parentheses.
+>
+>> > > > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+>> > > > >
+>> > > > > > @@ -6649,6 +6678,9 @@ static int
+>> > > > > __devlink_port_phys_port_name_get(struct devlink_port
+>> > > > > *devlink_port,
+>> > > > > >  		n = snprintf(name, len, "pf%uvf%u",
+>> > > > > >  			     attrs->pci_vf.pf, attrs->pci_vf.vf);
+>> > > > > >  		break;
+>> > > > > > +	case DEVLINK_PORT_FLAVOUR_MDEV:
+>> > > > > > +		n = snprintf(name, len, "p%s", attrs-
+>> >mdev.mdev_alias);
+>> > > > >
+>> > > > > Didn't you say m$alias in the cover letter? Not p$alias?
+>> > > > >
+>> > > > In cover letter I described the naming scheme for the netdevice of
+>> > > > the mdev device (not the representor). Representor follows current
+>> > > > unique phys_port_name method.
+>> > >
+>> > > So we're reusing the letter that normal ports use?
+>> > >
+>> > I initially had 'm' as prefix to make it easy to recognize as mdev's port,
+>> instead of 'p', but during internal review Jiri's input was to just use 'p'.
+>> 
+>> Let's way for Jiri to weigh in then.
+>
+>Yeah.
+>I remember his point was to not confuse the <en><m> prefix in the persistent device name with 'm' prefix in phys_port_name.
+>Hence, his input was just 'p'.
 
-why so much hatred for parentheses? :D
+Not sure what are you referring to. Udev places "n" in front of whatever
+string we construct here, so the namespace is entirely in our hands.
 
-but no, I'm not going to do it, it's not just less readable, it's
-actually wrong!
 
-SCLP_RC_NORMAL_READ_COMPLETION != SCLP_RC_INVALID_SCLP_COMMAND
-
-the correct version would be:
-
-if (cc ||
-	h->response_code != SCLP_RC_INVALID_SCLP_COMMAND &&
-	h->response_code != SCLP_RC_NORMAL_READ_COMPLETION)
-
-which is more lines, and significantly less readable.
-
+>
+>> 
+>> > > Why does it matter to name the virtualized device? In case of other
+>> > > reprs its the repr that has the canonical name, in case of
+>> > > containers and VMs they will not care at all what hypervisor identifier
+>> the device has.
+>> > >
+>> > Well, many orchestration framework probably won't care of what name is
+>> picked up.
+>> > And such name will likely get renamed to eth0 in VM or container.
+>> > Unlike vxlan, macvlan interfaces, user explicitly specify the netdevice name,
+>> and when newlink() netlink command completes with success, user know the
+>> device to use.
+>> > If we don't have persistent name for mdev, if a random name ethX is
+>> picked up, user needs refer to sysfs device hierarchy to know its netdev.
+>> > Its super easy to do refer that, but having persistent name based out of
+>> alias makes things aligned like naming device on PCI bus.
+>> > This way devices can be used without VM/container use cases too, for
+>> example user is interested in only 4 or 8 mdev devices in system and its
+>> setup is done through systemd.service.
