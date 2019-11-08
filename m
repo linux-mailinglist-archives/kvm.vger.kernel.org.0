@@ -2,95 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B992F5031
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:50:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF5E1F503E
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:53:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726768AbfKHPuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 10:50:46 -0500
-Received: from mail-eopbgr130074.outbound.protection.outlook.com ([40.107.13.74]:51470
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725941AbfKHPuo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 10:50:44 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B4etbo3y+hbJQKIcGpXffxwxnAp3U22sq/1ggdvtrAKQavapNyPHmt7NVYrRJTsWXjxl1/ZsUa80M1E8aZVIg12Z0hZ/WN2yYpHGnVEoMuXZ0S0zXlg1HF2W2l9TmMkCo25T6ZSCn82sSIS82lrL0mHjFpB/30UrRL6TEjfNVRs1tiePS4C0wnVYztqbYVEuC/Mn5YNmIOrXGW+9dgBt+8Ev1C/gmUUEB765LnOmLiScGBsQPzB11Q36wCrrsFfRpqW6Ra+BAAC+gp3oBzW30FscacGrkU72a1YYMER4S9QClA/qYHPx9vH12FSNi/YeGMb2Yofob6NWXw9cfwFbPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QO79Q9aIdklXy0Vy4ycPU0R/oKSd1rG5fljBXHpr6tY=;
- b=oEjkbFFXEtL9sH/cDuPveouQNzx14o6Z/8EN/SJUPPkexD9QDcKIdQ9sa2YCuYzVpWFO9J5hfZfoaPOD6k0GEW2USbEEel1vn//RgnR2KF6QAnMXIDBG/Un6qrgi9QQgnefVf8rzPT9tF9Pf6kpisvD0/hv8E7B8JdS+m7TZS9J7r0kDKmNHXKw2T6RMNnhc2eZcbkIrGU5AwvsJbwAZ6eei/pCh0uIQbLe+aWZm2dTfAbg3qDmv3Afc8XtqzogiQpNZQwEEwb+buLLIgSsI4P6i3nqGkqpb+idRpX+q/wD1IRXIAkvB+2/u6M+l08pLkKW1UUKlDLKZ0xlG7NjcqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QO79Q9aIdklXy0Vy4ycPU0R/oKSd1rG5fljBXHpr6tY=;
- b=WuKxI4bBT8BpGB0cWUYp6/hPQmS/TfGOJOARDdUzTmrYImtEwHA7uVDqZg0ajjVW9Gp7z/rOOgmhCfgEigzVPDu0aN1rfXhhA1uIkdqcwfCucvcpKcjGiUFaDfjtB8ExtS4dIy5UdquNrKtarAGdnM6Vzdx3za3Wk90rA4n49eg=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB4609.eurprd05.prod.outlook.com (52.133.57.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2408.24; Fri, 8 Nov 2019 15:50:41 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Fri, 8 Nov 2019
- 15:50:41 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jiri Pirko <jiri@resnulli.us>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: RE: [PATCH net-next 01/19] net/mlx5: E-switch, Move devlink port
- close to eswitch port
-Thread-Topic: [PATCH net-next 01/19] net/mlx5: E-switch, Move devlink port
- close to eswitch port
-Thread-Index: AQHVlYWm7joB7S0cVEKHHNmNbXCxV6eBCQ0AgABjACA=
-Date:   Fri, 8 Nov 2019 15:50:41 +0000
-Message-ID: <AM0PR05MB4866A725E486A79B02261009D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191108095110.GD6990@nanopsycho>
-In-Reply-To: <20191108095110.GD6990@nanopsycho>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [2605:6000:ec82:1c00:9dfd:71f9:eb37:f669]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e7a51a3e-76b6-4b59-9e6d-08d76463686a
-x-ms-traffictypediagnostic: AM0PR05MB4609:|AM0PR05MB4609:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB4609E0864078879F993AE528D17B0@AM0PR05MB4609.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(366004)(346002)(39860400002)(136003)(189003)(199004)(13464003)(25786009)(316002)(229853002)(14444005)(478600001)(71190400001)(6246003)(102836004)(81166006)(2906002)(11346002)(256004)(71200400001)(66556008)(64756008)(76116006)(66476007)(55016002)(66946007)(66446008)(9686003)(99286004)(33656002)(486006)(86362001)(7696005)(76176011)(446003)(46003)(6916009)(8676002)(8936002)(4326008)(5660300002)(6116002)(6436002)(52536014)(6506007)(53546011)(476003)(14454004)(7736002)(186003)(305945005)(74316002)(81156014)(54906003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4609;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xy/E13YnrZTLfroA6ZJqndm+f4XprOPJtbyNx2KdyUSmtcC8/2E2nun8JS9jLXKVVWq7efXVBVYUy26qwehp4CVcdRHbixjELO5O3saCeJzSQJ8+ZST4mwrKs+/6/K1haEwHsyweQVx0dQmvTeZC0NDk4V2UaerCHiscfGT6Omz2vh+LLpxDu8u9BsAeSvo8xZXC6JOP6nkUcSLmE8UbmRMAgn0/SV/Tel1YyaPAo+UbxP1Ql4sRwK9jV25mfKFPNXT5AZhZd09raTc7BhAysFhGuF1TtyYUNwc+mjczcz2x/3YXedY64/ZGV8ppoLv1n45J7cMNYz+U9WamfGlWYcdTofXYH1NHMs8ujAmk5VBz6tJ9+hS9wZRJbJuufxyl1IENV4UmW4xkZHE1CC9LBfw2A9xws4fdEuYiGHlbmJyCl31dmF4gXgRGzm+L1bHu
-Content-Type: text/plain; charset="us-ascii"
+        id S1727148AbfKHPx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 10:53:27 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:50042 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbfKHPx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 10:53:26 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8FmvHs092969;
+        Fri, 8 Nov 2019 15:52:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=78vl3npWJFMLe7zo3j14Ef2EAdUrVRh4A4J/0eq0k48=;
+ b=CFSNTtfGlW/FJHQPQF4mMj76ADbG/xhRrnXCY6qjJhh4c/P4rx52friy823++LC9r0zn
+ c5SxWOj/OlM2NAZ+C0ovvMcS/p9ML/LSNP0GGoGLdrUBK8s5VAYjCfIcJULwpjMNujDc
+ KsdGYYLlF3Pr/7hTXW1iWz5h1YrYThROyeaqC2aIrPJT/SdIvAwL4664klMw2exJiq1b
+ 2qoeGfEa6gNxgzpH1thfuQw7UdsEXTxtABb+/OoyBtqcx5sUaKnPni9v4CjX7B2XwosF
+ vZNfjbdo2KGZOLMGxMiMzBfSZBdT3Cfx0JzR+4UmpW2PxrVb40ldgPxgA+5VPW3Ri/ru jw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2w41w164sn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Nov 2019 15:52:29 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA8FmeF7142337;
+        Fri, 8 Nov 2019 15:52:29 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2w4k32x5bk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Nov 2019 15:52:28 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA8FqPmA025299;
+        Fri, 8 Nov 2019 15:52:26 GMT
+Received: from [10.74.127.144] (/10.74.127.144)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 08 Nov 2019 07:52:25 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
+ trustworthy
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <E392C60C-A596-49DD-B604-8B3C473ACAA2@dinechin.org>
+Date:   Fri, 8 Nov 2019 17:52:19 +0200
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        KVM list <kvm@vger.kernel.org>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7a51a3e-76b6-4b59-9e6d-08d76463686a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 15:50:41.1712
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4wvwoM/EQn2+K8Hx4JYQPlrdPSNxoKMYTzHfq7+c1tQ3bTMN6mmopnZmVNd8Of9usxH1ABUXIVw0xJo7qkGPCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4609
+Message-Id: <5B82FF2C-0309-4D67-85E2-646AFB77B2FD@oracle.com>
+References: <20191105161737.21395-1-vkuznets@redhat.com>
+ <20191105193749.GA20225@linux.intel.com>
+ <20191105232500.GA25887@linux.intel.com>
+ <943488A8-2DD7-4471-B3C7-9F21A0B0BCF9@dinechin.org>
+ <713ECF67-6A6C-4956-8AC6-7F4C05961328@oracle.com>
+ <E392C60C-A596-49DD-B604-8B3C473ACAA2@dinechin.org>
+To:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911080157
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9434 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911080157
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -98,39 +86,63 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: Friday, November 8, 2019 3:51 AM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: alex.williamson@redhat.com; davem@davemloft.net;
-> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
-> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
-> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
-> rdma@vger.kernel.org
-> Subject: Re: [PATCH net-next 01/19] net/mlx5: E-switch, Move devlink port
-> close to eswitch port
+> On 8 Nov 2019, at 17:35, Christophe de Dinechin =
+<christophe.de.dinechin@gmail.com> wrote:
 >=20
-> Thu, Nov 07, 2019 at 05:08:16PM CET, parav@mellanox.com wrote:
-> >Currently devlink ports are tied to netdev representor.
-> >
-> >mlx5_vport structure is better container of e-switch vport compare to
-> >mlx5e_rep_priv.
-> >This enables to extend mlx5_vport easily for mdev flavour.
-> >
-> >Hence, move devlink_port from netdev representor to mlx5_vport.
-> >
-> >Reviewed-by: Saeed Mahameed <saeedm@mellanox.com>
-> >Signed-off-by: Parav Pandit <parav@mellanox.com>
 >=20
-> Since this patchset has 19 patches, which is quite a lot, I suggest to pu=
-sh out
-> some preparation patches (like this one) to a separate patchset that woul=
-d
-> be sent in prior to this one.
-Some of us have been doing that for a while now, that made it to 19. :-)
-We can also take out 5-6 patches of mdev as pre-series, if Alex and others =
-are fine.
+>=20
+>> On 7 Nov 2019, at 16:02, Liran Alon <liran.alon@oracle.com> wrote:
+>>=20
+>>=20
+>>=20
+>>> On 7 Nov 2019, at 16:00, Christophe de Dinechin =
+<christophe.de.dinechin@gmail.com> wrote:
+>>>=20
+>>=20
+>>>=20
+>>> I share that concern about the naming, although I do see some
+>>> value in exposing the cpu_smt_possible() result. I think it=E2=80=99s =
+easier
+>>> to state that something does not work than to state something does
+>>> work.
+>>>=20
+>>> Also, with respect to mitigation, we may want to split the two cases
+>>> that Paolo outlined, i.e. have KVM_HINTS_REALTIME,
+>>> KVM_HINTS_CORES_CROSSTALK and
+>>> KVM_HINTS_CORES_LEAKING,
+>>> where CORES_CROSSTALKS indicates there may be some
+>>> cross-talk between what the guest thinks are isolated cores,
+>>> and CORES_LEAKING indicates that cores may leak data
+>>> to some other guest.
+>>>=20
+>>> The problem with my approach is that it is shouting =E2=80=9Cdon=E2=80=
+=99t trust me=E2=80=9D
+>>> a bit too loudly.
+>>=20
+>> I don=E2=80=99t see a value in exposing CORES_LEAKING to guest. As =
+guest have nothing to do with it.
+>=20
+> The guest could display / expose the information to guest sysadmins
+> and admin tools (e.g. through /proc).
+>=20
+> While the kernel cannot mitigate, a higher-level product could for =
+example
+> have a policy about which workloads can be deployed on a system which
+> may leak data to other VMs.
+>=20
+> Christophe
 
-Please review/ack this patch, so that I can queue via usual Saeed net-next =
-tree which are already reviewed, and this series depends on that esw intern=
-al refactor.
+Honestly, I don=E2=80=99t think any sane cloud provider will schedule =
+vCPUs of different guests on same physical CPU core and report this to =
+guest.
+Therefore, I think this is only relevant for use-cases where the guest =
+owner is also the host/hypervisor owner. And therefore, doesn=E2=80=99t =
+need this
+information exposed in a CPUID bit.
+I see your point regarding how in theory it could be used, but I think =
+we should wait and see if such use-case exists before defining this =
+interface.
+
+-Liran
+
+
