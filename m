@@ -2,123 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03C41F58EA
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 21:58:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5D50F5908
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 22:03:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730722AbfKHUwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 15:52:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51382 "EHLO mail.kernel.org"
+        id S1727633AbfKHVCz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 16:02:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48412 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727903AbfKHUwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 15:52:09 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726819AbfKHVCz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 16:02:55 -0500
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8172D215EA;
-        Fri,  8 Nov 2019 20:52:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573246327;
-        bh=rZ2fzRBjTIttDv3ZKd9CF9dBPvTjqYQBSYwZ0sNc1TU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1SdgK2KQQ8K5KhLdq9xeml+m1kO8wwQl6pj6zXQi3GutHANkGEeHPsMAHoiDHbQqm
-         Z2RHe10OEOfrBHyS3s+Z2UYWDjC8Fxo5MKqbFnnsJdto3XrsiHKtov7+ZcMMN+br2G
-         hIyywKk3i7RmpkxFtDhBcJRJkQcW2jxQuBTE3Ccw=
-Date:   Fri, 8 Nov 2019 21:52:04 +0100
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Parav Pandit <parav@mellanox.com>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jiri Pirko <jiri@resnulli.us>,
-        David M <david.m.ertman@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191108205204.GB1277001@kroah.com>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107153234.0d735c1f@cakuba.netronome.com>
- <20191108121233.GJ6990@nanopsycho>
- <20191108144054.GC10956@ziepe.ca>
- <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <AM0PR05MB4866299C3AE2448C8226DC00D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108203209.GF10956@ziepe.ca>
+        by mx1.redhat.com (Postfix) with ESMTPS id 1F9C5821D9
+        for <kvm@vger.kernel.org>; Fri,  8 Nov 2019 21:02:55 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id f21so145729wmh.5
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 13:02:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Nmq1GRytWblh4euOCRxuEbZgIoXZxuuSJXUDKh29oIk=;
+        b=PJheMDpahxt/YPnScVC/CK++Qq3RCXuzKSekC8i+brOB/EDZeug1g1XSy0VjJXf/34
+         9yxJcsHjvyU7dDcieSCcfTxUuxgoFFVUEzgjYch8IXhh80lV5DqRgPYRhVpIXGNngKJz
+         1fZi9NXGPpxSyP0v42laDDbhHzbCWelo+LrrqI3FnJHvKbGscIPk/FEi8zBRMMS+K3B3
+         86C7Jmg2C8I4aoeJpbwUvz48p99CC5ywgoToDSKGQUZcjfHHnLma+zuFh45/DCv0DO5f
+         HYwAR1EYXRI7xQjqhz8C0AdAWF2SJPw8PX0G+jtyJfUuYB5/ptRP7Vx42UDSTzCAx9fI
+         PUOg==
+X-Gm-Message-State: APjAAAV2DX+j9nQ8SwvGRwzoNpdanzcJYJD6JukMmXdZJlB9daY19y46
+        0MWVKHP+btE/3rJkhDTz4JUdypbTIE0Z56BapdcjjbU09qgJO1Ik797UNxcgsmvMjNBihbprbIJ
+        C21tth4/ullSX
+X-Received: by 2002:a1c:dd45:: with SMTP id u66mr9706143wmg.12.1573246973743;
+        Fri, 08 Nov 2019 13:02:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy/r6N66RU82TBDTILIQyY7RHqJh4iD/jrgGSamtcwPgbTwlkWB5WWPfNwcD7uzL3Q1oJWlbw==
+X-Received: by 2002:a1c:dd45:: with SMTP id u66mr9706123wmg.12.1573246973469;
+        Fri, 08 Nov 2019 13:02:53 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e8cd:9f0f:a5dc:7ad5? ([2001:b07:6468:f312:e8cd:9f0f:a5dc:7ad5])
+        by smtp.gmail.com with ESMTPSA id y8sm5515162wmi.9.2019.11.08.13.02.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2019 13:02:52 -0800 (PST)
+Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     Jessica Yu <jeyu@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Matthias Maennich <maennich@google.com>
+References: <20191104230001.27774-1-aarcange@redhat.com>
+ <20191104230001.27774-4-aarcange@redhat.com>
+ <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
+ <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
+ <20191105135414.GA30717@redhat.com>
+ <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
+ <20191105145651.GD30717@redhat.com>
+ <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
+ <20191108135631.GA22507@linux-8ccs>
+ <b77283e5-a4bc-1849-fbfa-27741ab2dbd5@redhat.com>
+ <20191108200103.GA532@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9a3d2936-bd26-430f-a962-9b0f6fe0c2a0@redhat.com>
+Date:   Fri, 8 Nov 2019 22:02:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191108203209.GF10956@ziepe.ca>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <20191108200103.GA532@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 08, 2019 at 04:32:09PM -0400, Jason Gunthorpe wrote:
-> On Fri, Nov 08, 2019 at 08:20:43PM +0000, Parav Pandit wrote:
-> > 
-> > 
-> > > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > > On Fri, Nov 08, 2019 at 11:12:38AM -0800, Jakub Kicinski wrote:
-> > > > On Fri, 8 Nov 2019 15:40:22 +0000, Parav Pandit wrote:
-> > > > > > The new intel driver has been having a very similar discussion
-> > > > > > about how to model their 'multi function device' ie to bind RDMA
-> > > > > > and other drivers to a shared PCI function, and I think that discussion
-> > > settled on adding a new bus?
-> > > > > >
-> > > > > > Really these things are all very similar, it would be nice to have
-> > > > > > a clear methodology on how to use the device core if a single PCI
-> > > > > > device is split by software into multiple different functional
-> > > > > > units and attached to different driver instances.
-> > > > > >
-> > > > > > Currently there is alot of hacking in this area.. And a consistent
-> > > > > > scheme might resolve the ugliness with the dma_ops wrappers.
-> > > > > >
-> > > > > > We already have the 'mfd' stuff to support splitting platform
-> > > > > > devices, maybe we need to create a 'pci-mfd' to support splitting PCI
-> > > devices?
-> > > > > >
-> > > > > > I'm not really clear how mfd and mdev relate, I always thought
-> > > > > > mdev was strongly linked to vfio.
-> > > > > >
-> > > > >
-> > > > > Mdev at beginning was strongly linked to vfio, but as I mentioned
-> > > > > above it is addressing more use case.
-> > > > >
-> > > > > I observed that discussion, but was not sure of extending mdev further.
-> > > > >
-> > > > > One way to do for Intel drivers to do is after series [9].
-> > > > > Where PCI driver says, MDEV_CLASS_ID_I40_FOO RDMA driver
-> > > > > mdev_register_driver(), matches on it and does the probe().
-> > > >
-> > > > Yup, FWIW to me the benefit of reusing mdevs for the Intel case vs
-> > > > muddying the purpose of mdevs is not a clear trade off.
-> > > 
-> > > IMHO, mdev has amdev_parent_ops structure clearly intended to link it to vfio,
-> > > so using a mdev for something not related to vfio seems like a poor choice.
-> > > 
-> > Splitting mdev_parent_ops{} is already in works for larger use case in series [1] for virtio.
-> > 
-> > [1] https://patchwork.kernel.org/patch/11233127/
+On 08/11/19 21:01, Andrea Arcangeli wrote:
+> On Fri, Nov 08, 2019 at 08:51:04PM +0100, Paolo Bonzini wrote:
+>> I suppose we could use code patching mechanism to avoid the retpolines.
+>>  Andrea, what do you think about that?  That would have the advantage
+>> that we won't have to remove kvm_x86_ops. :)
 > 
-> Weird. So what is mdev actually providing and what does it represent
-> if the entire driver facing API surface is under a union?
+> page 17 covers pvops:
 > 
-> This smells a lot like it is re-implementing a bus.. AFAIK bus is
-> supposed to represent the in-kernel API the struct device presents to
-> drivers.
+> https://people.redhat.com/~aarcange/slides/2019-KVM-monolithic.pdf
 
-Yes, yes yes yes...
+You can patch call instructions directly using text_poke when
+kvm_intel.ko or kvm_amd.ko, I'm not sure why that would be worse for TLB
+or RAM usage.  The hard part is recording the location of the call sites
+using some pushsection/popsection magic.
 
-I'm getting tired of saying the same thing here, just use a bus, that's
-what it is there for.
-
-greg k-h
+Paolo
