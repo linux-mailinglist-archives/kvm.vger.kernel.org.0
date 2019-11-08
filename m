@@ -2,225 +2,558 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A1639F4C43
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 14:01:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DA18F4CA4
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 14:07:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727480AbfKHNBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 08:01:21 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21413 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727260AbfKHNBV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Nov 2019 08:01:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573218079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bpI/ahUOZhhlk3+f5KkOU8l+IXeGkvFmZKFU1Kcz+SU=;
-        b=BzmjK4j08efztCA8u/8m8JzlzTcdlhJNIefy70Axm14qrDTZLXVIttKN1ocDRIPgSzwcfC
-        MtFpSwS/vPEl1FKfK31OOCTxbl0SbzIYS/gnN6vM6mxjTNqMFIH3x2VdT73RhwxEmH269x
-        UoTk/SCGDcc1dGyEdkfeMEhHGRGDdSk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-vsxWXVKxMWel8GNfGNrNXw-1; Fri, 08 Nov 2019 08:01:16 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 946F8477;
-        Fri,  8 Nov 2019 13:01:14 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B1E865D6AE;
-        Fri,  8 Nov 2019 13:01:12 +0000 (UTC)
-Date:   Fri, 8 Nov 2019 14:01:10 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     alex.williamson@redhat.com, davem@davemloft.net,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
-        kwankhede@nvidia.com, leon@kernel.org, jiri@mellanox.com,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 11/19] vfio/mdev: Improvise mdev life cycle and
- parent removal scheme
-Message-ID: <20191108140110.6f24916b.cohuck@redhat.com>
-In-Reply-To: <20191107160834.21087-11-parav@mellanox.com>
-References: <20191107160448.20962-1-parav@mellanox.com>
-        <20191107160834.21087-1-parav@mellanox.com>
-        <20191107160834.21087-11-parav@mellanox.com>
-Organization: Red Hat GmbH
+        id S1727615AbfKHNHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 08:07:18 -0500
+Received: from mga01.intel.com ([192.55.52.88]:14220 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727279AbfKHNHS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 08:07:18 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Nov 2019 05:07:17 -0800
+X-IronPort-AV: E=Sophos;i="5.68,281,1569308400"; 
+   d="scan'208";a="196896540"
+Received: from lingshan-mobl5.ccr.corp.intel.com (HELO [10.238.129.48]) ([10.238.129.48])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 08 Nov 2019 05:07:14 -0800
+Subject: Re: [PATCH 1/2] IFC hardware operation layer
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     jasowang@redhat.com, alex.williamson@redhat.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com
+References: <1572946660-26265-1-git-send-email-lingshan.zhu@intel.com>
+ <1572946660-26265-2-git-send-email-lingshan.zhu@intel.com>
+ <20191108075143-mutt-send-email-mst@kernel.org>
+From:   Zhu Lingshan <lingshan.zhu@linux.intel.com>
+Message-ID: <f1e470ae-f9a3-0955-81f6-c72e5ee44d43@linux.intel.com>
+Date:   Fri, 8 Nov 2019 21:07:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: vsxWXVKxMWel8GNfGNrNXw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191108075143-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  7 Nov 2019 10:08:26 -0600
-Parav Pandit <parav@mellanox.com> wrote:
 
-I guess that should be s/Improvise/improve/ in $SUBJECT, no?
+On 11/8/2019 8:57 PM, Michael S. Tsirkin wrote:
+> On Tue, Nov 05, 2019 at 05:37:39PM +0800, Zhu Lingshan wrote:
+>> This commit introduced ifcvf_base layer, which handles hardware
+>> operations and configurations.
+>>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>> ---
+>>   drivers/vhost/ifcvf/ifcvf_base.c | 344 +++++++++++++++++++++++++++++++++++++++
+>>   drivers/vhost/ifcvf/ifcvf_base.h | 132 +++++++++++++++
+>>   2 files changed, 476 insertions(+)
+>>   create mode 100644 drivers/vhost/ifcvf/ifcvf_base.c
+>>   create mode 100644 drivers/vhost/ifcvf/ifcvf_base.h
+>>
+>> diff --git a/drivers/vhost/ifcvf/ifcvf_base.c b/drivers/vhost/ifcvf/ifcvf_base.c
+>> new file mode 100644
+>> index 0000000..0659f41
+>> --- /dev/null
+>> +++ b/drivers/vhost/ifcvf/ifcvf_base.c
+>> @@ -0,0 +1,344 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (C) 2019 Intel Corporation.
+>> + */
+>> +
+>> +#include "ifcvf_base.h"
+>> +
+>> +static void *get_cap_addr(struct ifcvf_hw *hw, struct virtio_pci_cap *cap)
+>> +{
+>> +	struct ifcvf_adapter *ifcvf;
+>> +	u32 length, offset;
+>> +	u8 bar;
+>> +
+>> +	length = le32_to_cpu(cap->length);
+>> +	offset = le32_to_cpu(cap->offset);
+>> +	bar = le32_to_cpu(cap->bar);
+>> +
+>> +	ifcvf = container_of(hw, struct ifcvf_adapter, vf);
+>> +
+>> +	if (bar >= IFCVF_PCI_MAX_RESOURCE) {
+>> +		IFC_DBG(ifcvf->dev,
+>> +			"Invalid bar number %u to get capabilities.\n", bar);
+>> +		return NULL;
+>> +	}
+>> +
+>> +	if (offset + length < offset) {
+>> +		IFC_DBG(ifcvf->dev, "offset(%u) + length(%u) overflows\n",
+>> +			offset, length);
+>> +		return NULL;
+>> +	}
+>> +
+>> +	if (offset + length > hw->mem_resource[cap->bar].len) {
+>> +		IFC_DBG(ifcvf->dev,
+>> +			"offset(%u) + len(%u) overflows bar%u to get capabilities.\n",
+>> +			offset, length, bar);
+>> +		return NULL;
+>> +	}
+>> +
+>> +	return hw->mem_resource[bar].addr + offset;
+>> +}
+>> +
+>> +int ifcvf_read_config_range(struct pci_dev *dev,
+>> +			uint32_t *val, int size, int where)
+>> +{
+>> +	int ret, i;
+>> +
+>> +	for (i = 0; i < size; i += 4) {
+>> +		ret = pci_read_config_dword(dev, where + i, val + i / 4);
+>> +		if (ret < 0)
+>> +			return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev)
+>> +{
+>> +	struct virtio_pci_cap cap;
+>> +	u16 notify_off;
+>> +	int ret;
+>> +	u8 pos;
+>> +	u32 i;
+>> +
+>> +	ret = pci_read_config_byte(dev, PCI_CAPABILITY_LIST, &pos);
+>> +
+>> +	if (ret < 0) {
+>> +		IFC_ERR(&dev->dev, "Failed to read PCI capability list.\n");
+>> +		return -EIO;
+>> +	}
+>> +
+>> +	while (pos) {
+>> +		ret = ifcvf_read_config_range(dev, (u32 *)&cap,
+>> +					      sizeof(cap), pos);
+>> +
+>> +		if (ret < 0) {
+>> +			IFC_ERR(&dev->dev, "Failed to get PCI capability at %x",
+>> +				pos);
+>> +			break;
+>> +		}
+>> +
+>> +		if (cap.cap_vndr != PCI_CAP_ID_VNDR)
+>> +			goto next;
+>> +
+>> +		IFC_DBG(&dev->dev, "read PCI config: config type: %u, PCI bar: %u,\
+>> +			 PCI bar offset: %u, PCI config len: %u.\n",
+>> +			cap.cfg_type, cap.bar, cap.offset, cap.length);
+>> +
+>> +		switch (cap.cfg_type) {
+>> +		case VIRTIO_PCI_CAP_COMMON_CFG:
+>> +			hw->common_cfg = get_cap_addr(hw, &cap);
+>> +			IFC_INFO(&dev->dev, "hw->common_cfg = %p.\n",
+>> +				 hw->common_cfg);
+>> +			break;
+>> +		case VIRTIO_PCI_CAP_NOTIFY_CFG:
+>> +			pci_read_config_dword(dev, pos + sizeof(cap),
+>> +					      &hw->notify_off_multiplier);
+>> +			hw->notify_bar = cap.bar;
+>> +			hw->notify_base = get_cap_addr(hw, &cap);
+>> +			IFC_INFO(&dev->dev, "hw->notify_base = %p.\n",
+>> +				 hw->notify_base);
+>> +			break;
+>> +		case VIRTIO_PCI_CAP_ISR_CFG:
+>> +			hw->isr = get_cap_addr(hw, &cap);
+>> +			IFC_INFO(&dev->dev, "hw->isr = %p.\n", hw->isr);
+>> +			break;
+>> +		case VIRTIO_PCI_CAP_DEVICE_CFG:
+>> +			hw->net_cfg = get_cap_addr(hw, &cap);
+>> +			IFC_INFO(&dev->dev, "hw->net_cfg = %p.\n", hw->net_cfg);
+>> +			break;
+>> +		}
+>> +next:
+>> +		pos = cap.cap_next;
+>> +	}
+>> +
+>> +	if (hw->common_cfg == NULL || hw->notify_base == NULL ||
+>> +	    hw->isr == NULL || hw->net_cfg == NULL) {
+>> +		IFC_DBG(&dev->dev, "Incomplete PCI capabilities.\n");
+>> +		return -1;
+>> +	}
+>> +
+>> +	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+>> +		iowrite16(i, &hw->common_cfg->queue_select);
+>> +		notify_off = ioread16(&hw->common_cfg->queue_notify_off);
+>> +		hw->notify_addr[i] = (void *)((u8 *)hw->notify_base +
+>> +				     notify_off * hw->notify_off_multiplier);
+>> +	}
+>> +
+>> +	hw->lm_cfg = hw->mem_resource[IFCVF_LM_BAR].addr;
+>> +
+>> +	IFC_DBG(&dev->dev, "PCI capability mapping: common cfg: %p,\
+>> +		notify base: %p\n, isr cfg: %p, device cfg: %p,\
+>> +		multiplier: %u\n",
+>> +		hw->common_cfg, hw->notify_base, hw->isr,
+>> +		hw->net_cfg, hw->notify_off_multiplier);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +u8 ifcvf_get_status(struct ifcvf_hw *hw)
+>> +{
+>> +	u8 old_gen, new_gen, status;
+>> +
+>> +	do {
+>> +		old_gen = ioread8(&hw->common_cfg->config_generation);
+>> +		status = ioread8(&hw->common_cfg->device_status);
+>> +		new_gen = ioread8(&hw->common_cfg->config_generation);
+>> +	} while (old_gen != new_gen);
+>> +
+>> +	return status;
+>> +}
+>> +
+>> +void ifcvf_set_status(struct ifcvf_hw *hw, u8 status)
+>> +{
+>> +	iowrite8(status, &hw->common_cfg->device_status);
+>> +}
+>> +
+>> +void ifcvf_reset(struct ifcvf_hw *hw)
+>> +{
+>> +	ifcvf_set_status(hw, 0);
+>> +	ifcvf_get_status(hw);
+>> +}
+>> +
+>> +static void ifcvf_add_status(struct ifcvf_hw *hw, u8 status)
+>> +{
+>> +	if (status != 0)
+>> +		status |= ifcvf_get_status(hw);
+>> +
+>> +	ifcvf_set_status(hw, status);
+>> +	ifcvf_get_status(hw);
+>> +}
+>> +
+>> +u64 ifcvf_get_features(struct ifcvf_hw *hw)
+>> +{
+>> +	struct virtio_pci_common_cfg *cfg = hw->common_cfg;
+>> +	u32 features_lo, features_hi;
+>> +
+>> +	iowrite32(0, &cfg->device_feature_select);
+>> +	features_lo = ioread32(&cfg->device_feature);
+>> +
+>> +	iowrite32(1, &cfg->device_feature_select);
+>> +	features_hi = ioread32(&cfg->device_feature);
+>> +
+>> +	return ((u64)features_hi << 32) | features_lo;
+>> +}
+>> +
+>> +void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>> +		       void *dst, int length)
+>> +{
+>> +	u8 old_gen, new_gen, *p;
+>> +	int i;
+>> +
+>> +	WARN_ON(offset + length > sizeof (struct ifcvf_net_config));
+>> +
+>> +	do {
+>> +		old_gen = ioread8(&hw->common_cfg->config_generation);
+>> +		p = dst;
+>> +
+>> +		for (i = 0; i < length; i++)
+>> +			*p++ = ioread8((u8 *)hw->net_cfg + offset + i);
+>> +
+>> +		new_gen = ioread8(&hw->common_cfg->config_generation);
+>> +	} while (old_gen != new_gen);
+>> +}
+>> +
+>> +void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
+>> +			    const void *src, int length)
+>> +{
+>> +	const u8 *p;
+>> +	int i;
+>> +
+>> +	p = src;
+>> +	WARN_ON(offset + length > sizeof (struct ifcvf_net_config));
+>> +
+>> +	for (i = 0; i < length; i++)
+>> +		iowrite8(*p++, (u8 *)hw->net_cfg + offset + i);
+>> +}
+>> +
+>> +static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
+>> +{
+>> +	struct virtio_pci_common_cfg *cfg = hw->common_cfg;
+>> +
+>> +	iowrite32(0, &cfg->guest_feature_select);
+>> +	iowrite32(features & ((1ULL << 32) - 1), &cfg->guest_feature);
+>> +
+>> +	iowrite32(1, &cfg->guest_feature_select);
+>> +	iowrite32(features >> 32, &cfg->guest_feature);
+>> +}
+>> +
+>> +static int ifcvf_config_features(struct ifcvf_hw *hw)
+>> +{
+>> +	struct ifcvf_adapter *ifcvf;
+>> +
+>> +	ifcvf =	container_of(hw, struct ifcvf_adapter, vf);
+>> +	ifcvf_set_features(hw, hw->req_features);
+>> +	ifcvf_add_status(hw, VIRTIO_CONFIG_S_FEATURES_OK);
+>> +
+>> +	if (!(ifcvf_get_status(hw) & VIRTIO_CONFIG_S_FEATURES_OK)) {
+>> +		IFC_ERR(ifcvf->dev, "Failed to set FEATURES_OK status\n");
+>> +		return -EIO;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +void io_write64_twopart(u64 val, u32 *lo, u32 *hi)
+>> +{
+>> +	iowrite32(val & ((1ULL << 32) - 1), lo);
+>> +	iowrite32(val >> 32, hi);
+>> +}
+>> +
+>> +static int ifcvf_hw_enable(struct ifcvf_hw *hw)
+>> +{
+>> +	struct virtio_pci_common_cfg *cfg;
+>> +	struct ifcvf_adapter *ifcvf;
+>> +	u8 *lm_cfg;
+>> +	u32 i;
+>> +
+>> +	ifcvf = container_of(hw, struct ifcvf_adapter, vf);
+>> +	cfg = hw->common_cfg;
+>> +	lm_cfg = hw->lm_cfg;
+>> +	iowrite16(IFCVF_MSI_CONFIG_OFF, &cfg->msix_config);
+>> +
+>> +	if (ioread16(&cfg->msix_config) == VIRTIO_MSI_NO_VECTOR) {
+>> +		IFC_ERR(ifcvf->dev, "No msix vector for device config.\n");
+>> +		return -1;
+>> +	}
+>> +
+>> +	for (i = 0; i < hw->nr_vring; i++) {
+>> +		iowrite16(i, &cfg->queue_select);
+>> +		io_write64_twopart(hw->vring[i].desc, &cfg->queue_desc_lo,
+>> +				&cfg->queue_desc_hi);
+>> +		io_write64_twopart(hw->vring[i].avail, &cfg->queue_avail_lo,
+>> +				&cfg->queue_avail_hi);
+>> +		io_write64_twopart(hw->vring[i].used, &cfg->queue_used_lo,
+>> +				&cfg->queue_used_hi);
+>> +		iowrite16(hw->vring[i].size, &cfg->queue_size);
+>> +
+>> +		*(u32 *)(lm_cfg + IFCVF_LM_RING_STATE_OFFSET +
+>> +				(i / 2) * IFCVF_LM_CFG_SIZE + (i % 2) * 4) =
+>> +			(u32)hw->vring[i].last_avail_idx |
+>> +			((u32)hw->vring[i].last_used_idx << 16);
+>> +
+>> +		iowrite16(i + IFCVF_MSI_QUEUE_OFF, &cfg->queue_msix_vector);
+>> +		if (ioread16(&cfg->queue_msix_vector) ==
+>> +		    VIRTIO_MSI_NO_VECTOR) {
+>> +			IFC_ERR(ifcvf->dev,
+>> +				"No msix vector for queue %u.\n", i);
+>> +			return -1;
+>> +		}
+>> +
+>> +		iowrite16(1, &cfg->queue_enable);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void ifcvf_hw_disable(struct ifcvf_hw *hw)
+>> +{
+>> +	struct virtio_pci_common_cfg *cfg;
+>> +	u32 i;
+>> +
+>> +	cfg = hw->common_cfg;
+>> +	iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->msix_config);
+>> +
+>> +	for (i = 0; i < hw->nr_vring; i++) {
+>> +		iowrite16(i, &cfg->queue_select);
+>> +		iowrite16(0, &cfg->queue_enable);
+>> +		iowrite16(VIRTIO_MSI_NO_VECTOR, &cfg->queue_msix_vector);
+>> +	}
+>> +}
+>> +
+>> +int ifcvf_start_hw(struct ifcvf_hw *hw)
+>> +{
+>> +	ifcvf_reset(hw);
+>> +	ifcvf_add_status(hw, VIRTIO_CONFIG_S_ACKNOWLEDGE);
+>> +	ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER);
+>> +
+>> +	if (ifcvf_config_features(hw) < 0)
+>> +		return -1;
+>> +
+>> +	if (ifcvf_hw_enable(hw) < 0)
+>> +		return -1;
+>> +
+>> +	ifcvf_add_status(hw, VIRTIO_CONFIG_S_DRIVER_OK);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +void ifcvf_stop_hw(struct ifcvf_hw *hw)
+>> +{
+>> +	ifcvf_hw_disable(hw);
+>> +	ifcvf_reset(hw);
+>> +}
+>> +
+>> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid)
+>> +{
+>> +	iowrite16(qid, hw->notify_addr[qid]);
+>> +}
+>> +
+>> +u64 ifcvf_get_queue_notify_off(struct ifcvf_hw *hw, int qid)
+>> +{
+>> +	return (u8 *)hw->notify_addr[qid] -
+>> +		(u8 *)hw->mem_resource[hw->notify_bar].addr;
+>> +}
+>> diff --git a/drivers/vhost/ifcvf/ifcvf_base.h b/drivers/vhost/ifcvf/ifcvf_base.h
+>> new file mode 100644
+>> index 0000000..c97f0eb
+>> --- /dev/null
+>> +++ b/drivers/vhost/ifcvf/ifcvf_base.h
+>> @@ -0,0 +1,132 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * Copyright (C) 2019 Intel Corporation.
+> Given this borrowed BSD licensed code from virtio, can you make this
+> licensed similarly?
+> See e.g. include/uapi/linux/virtio_config.h for the license to use.
+>
+We can discuss this issue, will send RFC V3 next Monday
 
-> mdev creation and removal sequence synchronization with parent device
-> removal is improved in [1].
->=20
-> However such improvement using semaphore either limiting or leads to
-> complex locking scheme when used across multiple subsystem such as mdev
-> and devlink.
->=20
-> When mdev devices are used with devlink eswitch device, following
-> deadlock sequence can be witnessed.
->=20
-> mlx5_core 0000:06:00.0: E-Switch: Disable: mode(OFFLOADS), nvfs(4), activ=
-e vports(5)
-> mlx5_core 0000:06:00.0: MDEV: Unregistering
->=20
-> WARNING: possible circular locking dependency detected
-> ------------------------------------------------------
-> devlink/42094 is trying to acquire lock:
-> 00000000eb6fb4c7 (&parent->unreg_sem){++++}, at: mdev_unregister_device+0=
-xf1/0x160 [mdev]
-> 012but task is already holding lock:
-> 00000000efcd208e (devlink_mutex){+.+.}, at: devlink_nl_pre_doit+0x1d/0x17=
-0
-> 012which lock already depends on the new lock.
-> 012the existing dependency chain (in reverse order) is:
-> 012-> #1 (devlink_mutex){+.+.}:
->       lock_acquire+0xbd/0x1a0
->       __mutex_lock+0x84/0x8b0
->       devlink_unregister+0x17/0x60
->       mlx5_sf_unload+0x21/0x60 [mlx5_core]
->       mdev_remove+0x1e/0x40 [mdev]
->       device_release_driver_internal+0xdc/0x1a0
->       bus_remove_device+0xef/0x160
->       device_del+0x163/0x360
->       mdev_device_remove_common+0x1e/0xa0 [mdev]
->       mdev_device_remove+0x8d/0xd0 [mdev]
->       remove_store+0x71/0x90 [mdev]
->       kernfs_fop_write+0x113/0x1a0
->       vfs_write+0xad/0x1b0
->       ksys_write+0x5c/0xd0
->       do_syscall_64+0x5a/0x270
->       entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 012-> #0 (&parent->unreg_sem){++++}:
->       check_prev_add+0xb0/0x810
->       __lock_acquire+0xd4b/0x1090
->       lock_acquire+0xbd/0x1a0
->       down_write+0x33/0x70
->       mdev_unregister_device+0xf1/0x160 [mdev]
->       esw_offloads_disable+0xe/0x70 [mlx5_core]
->       mlx5_eswitch_disable+0x149/0x190 [mlx5_core]
->       mlx5_devlink_eswitch_mode_set+0xd0/0x180 [mlx5_core]
->       devlink_nl_cmd_eswitch_set_doit+0x3e/0xb0
->       genl_family_rcv_msg+0x3a2/0x420
->       genl_rcv_msg+0x47/0x90
->       netlink_rcv_skb+0xc9/0x100
->       genl_rcv+0x24/0x40
->       netlink_unicast+0x179/0x220
->       netlink_sendmsg+0x2f6/0x3f0
->       sock_sendmsg+0x30/0x40
->       __sys_sendto+0xdc/0x160
->       __x64_sys_sendto+0x24/0x30
->       do_syscall_64+0x5a/0x270
->       entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> Possible unsafe locking scenario:
->       CPU0                    CPU1
->       ----                    ----
->  lock(devlink_mutex);
->                               lock(&parent->unreg_sem);
->                               lock(devlink_mutex);
->  lock(&parent->unreg_sem);
-> 012 *** DEADLOCK ***
-> 3 locks held by devlink/42094:
-> 0: 0000000097a0c4aa (cb_lock){++++}, at: genl_rcv+0x15/0x40
-> 1: 00000000baf61ad2 (genl_mutex){+.+.}, at: genl_rcv_msg+0x66/0x90
-> 2: 00000000efcd208e (devlink_mutex){+.+.}, at: devlink_nl_pre_doit+0x1d/0=
-x170
->=20
-> To summarize,
-> mdev_remove()
->   read locks -> unreg_sem [ lock-A ]
->   [..]
->   devlink_unregister();
->     mutex lock devlink_mutex [ lock-B ]
->=20
-> devlink eswitch->switchdev-legacy mode change.
->  devlink_nl_cmd_eswitch_set_doit()
->    mutex lock devlink_mutex [ lock-B ]
->    mdev_unregister_device()
->    write locks -> unreg_sem [ lock-A]
+THanks!
 
-So, this problem starts to pop up once you hook up that devlink stuff
-with the mdev stuff, and previous users of mdev just did not have a
-locking scheme similar to devlink?
-
->=20
-> Hence, instead of using semaphore, such synchronization is achieved
-> using srcu which is more flexible that eliminates nested locking.
->=20
-> SRCU based solution is already proposed before at [2].
->=20
-> [1] commit 5715c4dd66a3 ("vfio/mdev: Synchronize device create/remove wit=
-h parent removal")
-> [2] https://lore.kernel.org/patchwork/patch/1055254/
-
-I don't quite recall the discussion there... is this a rework of a
-patch you proposed before? Confused.
-
->=20
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
-> ---
->  drivers/vfio/mdev/mdev_core.c    | 56 +++++++++++++++++++++++---------
->  drivers/vfio/mdev/mdev_private.h |  3 +-
->  2 files changed, 43 insertions(+), 16 deletions(-)
-
-(...)
-
-> @@ -207,6 +207,7 @@ int mdev_register_device(struct device *dev, const st=
-ruct mdev_parent_ops *ops)
->  =09=09dev_warn(dev, "Failed to create compatibility class link\n");
-> =20
->  =09list_add(&parent->next, &parent_list);
-> +=09rcu_assign_pointer(parent->self, parent);
->  =09mutex_unlock(&parent_list_lock);
-> =20
->  =09dev_info(dev, "MDEV: Registered\n");
-> @@ -250,14 +251,29 @@ void mdev_unregister_device(struct device *dev)
->  =09list_del(&parent->next);
->  =09mutex_unlock(&parent_list_lock);
-> =20
-> -=09down_write(&parent->unreg_sem);
-> +=09/*
-> +=09 * Publish that this mdev parent is unregistering. So any new
-> +=09 * create/remove cannot start on this parent anymore by user.
-> +=09 */
-> +=09rcu_assign_pointer(parent->self, NULL);
-> +
-> +=09/*
-> +=09 * Wait for any active create() or remove() mdev ops on the parent
-> +=09 * to complete.
-> +=09 */
-> +=09synchronize_srcu(&parent->unreg_srcu);
-> +
-> +=09/*
-> +=09 * At this point it is confirmed that any pending user initiated
-> +=09 * create or remove callbacks accessing the parent are completed.
-> +=09 * It is safe to remove the parent now.
-> +=09 */
-
-So, you're putting an srcu-handled self reference there and use that as
-an indication whether the parent is unregistering?
-
-> =20
->  =09class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
-> =20
->  =09device_for_each_child(dev, NULL, mdev_device_remove_cb);
-> =20
->  =09parent_remove_sysfs_files(parent);
-> -=09up_write(&parent->unreg_sem);
-> =20
->  =09mdev_put_parent(parent);
-> =20
-
+>> + */
+>> +
+>> +#ifndef _IFCVF_H_
+>> +#define _IFCVF_H_
+>> +
+>> +#include <linux/virtio_mdev_ops.h>
+>> +#include <linux/mdev.h>
+>> +#include <linux/pci.h>
+>> +#include <linux/pci_regs.h>
+>> +#include <uapi/linux/virtio_net.h>
+>> +#include <uapi/linux/virtio_config.h>
+>> +#include <uapi/linux/virtio_pci.h>
+>> +
+>> +#define IFCVF_VENDOR_ID         0x1AF4
+>> +#define IFCVF_DEVICE_ID         0x1041
+>> +#define IFCVF_SUBSYS_VENDOR_ID  0x8086
+>> +#define IFCVF_SUBSYS_DEVICE_ID  0x001A
+>> +
+>> +#define IFCVF_MDEV_LIMIT	1
+>> +
+>> +/*
+>> + * Some ifcvf feature bits (currently bits 28 through 31) are
+>> + * reserved for the transport being used (eg. ifcvf_ring), the
+>> + * rest are per-device feature bits.
+>> + */
+>> +#define IFCVF_TRANSPORT_F_START 28
+>> +#define IFCVF_TRANSPORT_F_END   34
+>> +
+>> +#define IFC_SUPPORTED_FEATURES \
+>> +		((1ULL << VIRTIO_NET_F_MAC)			| \
+>> +		 (1ULL << VIRTIO_F_ANY_LAYOUT)			| \
+>> +		 (1ULL << VIRTIO_F_VERSION_1)			| \
+>> +		 (1ULL << VIRTIO_F_ORDER_PLATFORM)			| \
+>> +		 (1ULL << VIRTIO_NET_F_GUEST_ANNOUNCE)		| \
+>> +		 (1ULL << VIRTIO_NET_F_CTRL_VQ)			| \
+>> +		 (1ULL << VIRTIO_NET_F_STATUS)			| \
+>> +		 (1ULL << VIRTIO_NET_F_MRG_RXBUF)) /* not fully supported */
+>> +
+>> +//Not support MQ, only one queue pair for now.
+>> +#define IFCVF_MAX_QUEUE_PAIRS		1
+>> +#define IFCVF_MAX_QUEUES		2
+>> +
+>> +#define IFCVF_QUEUE_ALIGNMENT		PAGE_SIZE
+>> +
+>> +#define IFCVF_MSI_CONFIG_OFF	0
+>> +#define IFCVF_MSI_QUEUE_OFF	1
+>> +#define IFCVF_PCI_MAX_RESOURCE	6
+>> +
+>> +#define IFCVF_LM_CFG_SIZE		0x40
+>> +#define IFCVF_LM_RING_STATE_OFFSET	0x20
+>> +#define IFCVF_LM_BAR	4
+>> +
+>> +#define IFCVF_32_BIT_MASK		0xffffffff
+>> +
+>> +#define IFC_ERR(dev, fmt, ...)	dev_err(dev, fmt, ##__VA_ARGS__)
+>> +#define IFC_DBG(dev, fmt, ...)	dev_dbg(dev, fmt, ##__VA_ARGS__)
+>> +#define IFC_INFO(dev, fmt, ...)	dev_info(dev, fmt, ##__VA_ARGS__)
+>> +
+>> +#define IFC_PRIVATE_TO_VF(adapter) \
+>> +	(&((struct ifcvf_adapter *)adapter)->vf)
+>> +
+>> +#define IFCVF_MAX_INTR (IFCVF_MAX_QUEUE_PAIRS * 2 + 1)
+>> +
+>> +struct ifcvf_net_config {
+>> +	u8    mac[6];
+>> +	u16   status;
+>> +	u16   max_virtqueue_pairs;
+>> +} __packed;
+>> +
+>> +struct ifcvf_pci_mem_resource {
+>> +	/* Physical address, 0 if not resource. */
+>> +	u64      phys_addr;
+>> +	/* Length of the resource. */
+>> +	u64      len;
+>> +	/* Virtual address, NULL when not mapped. */
+>> +	u8       *addr;
+>> +};
+>> +
+>> +struct vring_info {
+>> +	u64 desc;
+>> +	u64 avail;
+>> +	u64 used;
+>> +	u16 size;
+>> +	u16 last_avail_idx;
+>> +	u16 last_used_idx;
+>> +	bool ready;
+>> +	char msix_name[256];
+>> +	struct virtio_mdev_callback cb;
+>> +};
+>> +
+>> +struct ifcvf_hw {
+>> +	u8	*isr;
+>> +	u8	notify_bar;
+>> +	u8	*lm_cfg;
+>> +	u8	nr_vring;
+>> +	u16	*notify_base;
+>> +	u16	*notify_addr[IFCVF_MAX_QUEUE_PAIRS * 2];
+>> +	u32	notify_off_multiplier;
+>> +	u64	req_features;
+>> +	struct	virtio_pci_common_cfg *common_cfg;
+>> +	struct	ifcvf_net_config *net_cfg;
+>> +	struct	vring_info vring[IFCVF_MAX_QUEUE_PAIRS * 2];
+>> +	struct	ifcvf_pci_mem_resource mem_resource[IFCVF_PCI_MAX_RESOURCE];
+>> +};
+>> +
+>> +struct ifcvf_adapter {
+>> +	struct	device *dev;
+>> +	struct	mutex mdev_lock;
+>> +	int	mdev_count;
+>> +	int	vectors;
+>> +	struct	ifcvf_hw vf;
+>> +};
+>> +
+>> +int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
+>> +int ifcvf_start_hw(struct ifcvf_hw *hw);
+>> +void ifcvf_stop_hw(struct ifcvf_hw *hw);
+>> +void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
+>> +u8 ifcvf_get_linkstatus(struct ifcvf_hw *hw);
+>> +void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
+>> +			   void *dst, int length);
+>> +void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
+>> +			    const void *src, int length);
+>> +u8 ifcvf_get_status(struct ifcvf_hw *hw);
+>> +void ifcvf_set_status(struct ifcvf_hw *hw, u8 status);
+>> +void io_write64_twopart(u64 val, u32 *lo, u32 *hi);
+>> +void ifcvf_reset(struct ifcvf_hw *hw);
+>> +u64 ifcvf_get_features(struct ifcvf_hw *hw);
+>> +
+>> +#endif /* _IFCVF_H_ */
+>> -- 
+>> 1.8.3.1
