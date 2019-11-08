@@ -2,49 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF637F3C5A
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 00:57:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8697EF3D44
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 02:16:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727544AbfKGX5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Nov 2019 18:57:11 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:50292 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725906AbfKGX5L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Nov 2019 18:57:11 -0500
-Received: from localhost (unknown [IPv6:2601:601:9f00:1e2::d71])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 274571537E8FB;
-        Thu,  7 Nov 2019 15:57:10 -0800 (PST)
-Date:   Thu, 07 Nov 2019 15:57:09 -0800 (PST)
-Message-Id: <20191107.155709.1716879557397915384.davem@davemloft.net>
-To:     parav@mellanox.com
-Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, saeedm@mellanox.com, kwankhede@nvidia.com,
-        leon@kernel.org, cohuck@redhat.com, jiri@mellanox.com,
-        linux-rdma@vger.kernel.org
+        id S1728096AbfKHBQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Nov 2019 20:16:32 -0500
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:40499 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725928AbfKHBQc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Nov 2019 20:16:32 -0500
+Received: by mail-qk1-f193.google.com with SMTP id z16so3845540qkg.7
+        for <kvm@vger.kernel.org>; Thu, 07 Nov 2019 17:16:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=vdt2C+geesv9gxBDPFxWmGRqSYPbEeSey1ykEQ5i0MQ=;
+        b=rvIkRJwXLTY6gD+G753640J0M69Gk/N7ZbG12ZwUG16/+FqGTcZQ9iosuqAWp35ZjJ
+         TD4LMJs5zmWuIkLQpJ06wiPyeKHVSs15AggUo+3xmsnijfhIAv6eUEPZZOZ9yNX8wRma
+         YmI7reXLlB1fX/fjOUZIGUaa3UH4Io9mYii8NHcOB6dCd1Vz7EbLGtlHVkUpEwLh8wbe
+         GlDbXAp9YUy3dhp3MQpUkjXCA2z8mMig+gkMtqVhY47NYavOfyVOduocvtLxv35RyXph
+         n0p+aUIhz8qS4YCz8eeVGOOy4/+8sj2HWiucjVHwn0t2m38CoIoujs4Fdm+3vHaTqb2O
+         VUFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=vdt2C+geesv9gxBDPFxWmGRqSYPbEeSey1ykEQ5i0MQ=;
+        b=MnAIHIoOGJTzlBYca2bGRp3Hiim5e784OluXOVaHEVTldUAQMQQaEH2n1UiurG4r7Y
+         Ogta87uDD+pTGpSm2rX6MmKRfCRjUYjlnBqcLa1nijwgG9H1AuMrQORbMehRa5paFUqV
+         Y7g5i0IzpYN069AkMr8O/+G9WCT7ixTPrIBFhw7Me2sPnz0USHMvXGviR9LCQtD8Ecf9
+         CrAdV+FSU5D+PNXU0SvwqMt9eZUojErEM1W924Wud6r70kYg3zFKtk9qtzjc7d4R28ml
+         yt8uA6qqljnUNRsLPwgcXV3zNkG7VzvE16whkurw4VrhcpLis9lhhyeRobNvqWIJGj2L
+         IfAg==
+X-Gm-Message-State: APjAAAVgHsC3VG5B1dKEYH1DqM9BbA6daUDOOmG/KN5HGUVkVsbnwNg2
+        ENuMOZMvphYC0W2/Vc7VqoQ5mQ==
+X-Google-Smtp-Source: APXvYqwgB8RB+85IE+ef9Th25yVeX8Z70RbHTez0Vh44iPGNCrj28Vv5ofUawCeZSCn27OyxpMxn9g==
+X-Received: by 2002:a05:620a:208a:: with SMTP id e10mr5847205qka.221.1573175791133;
+        Thu, 07 Nov 2019 17:16:31 -0800 (PST)
+Received: from cakuba ([65.196.126.174])
+        by smtp.gmail.com with ESMTPSA id o2sm1998400qkf.68.2019.11.07.17.16.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 17:16:31 -0800 (PST)
+Date:   Thu, 7 Nov 2019 20:16:27 -0500
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>
 Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191107160448.20962-1-parav@mellanox.com>
+Message-ID: <20191107201627.68728686@cakuba>
+In-Reply-To: <AM0PR05MB4866A2B92A64DDF345DB14F5D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
 References: <20191107160448.20962-1-parav@mellanox.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 07 Nov 2019 15:57:10 -0800 (PST)
+        <20191107153234.0d735c1f@cakuba.netronome.com>
+        <AM0PR05MB4866A2B92A64DDF345DB14F5D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Netronome Systems, Ltd.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Parav Pandit <parav@mellanox.com>
-Date: Thu,  7 Nov 2019 10:04:48 -0600
+On Thu, 7 Nov 2019 20:52:29 +0000, Parav Pandit wrote:
+> > On Thu,  7 Nov 2019 10:04:48 -0600, Parav Pandit wrote: =20
+> > > Mellanox sub function capability allows users to create several
+> > > hundreds of networking and/or rdma devices without depending on PCI S=
+R- =20
+> > IOV support.
+> >=20
+> > You call the new port type "sub function" but the devlink port flavour =
+is mdev.
+> >  =20
+> Sub function is the internal driver structure. The abstract entity at use=
+r and stack level is mdev.
+> Hence the port flavour is mdev.
 
-> This series adds the support for mlx5 sub function devices using
-> mediated device with eswitch switchdev mode.
+FWIW I agree mdev as flavour seems like the right choice.
 
-I think at a minimum there needs to be deeper explanations in the commit log
-messages and thus I expect a respin of this series.
+> > As I'm sure you remember you nacked my patches exposing NFP's PCI sub
+> > functions which are just regions of the BAR without any mdev capability=
+. Am I
+> > in the clear to repost those now? Jiri?
+> >  =20
+> For sure I didn't nack it. :-)
+
+Well, maybe the word "nack" wasn't exactly used :)
+
+> What I remember discussing offline/mailing list is=20
+> (a) exposing mdev/sub fuctions as devlink sub ports is not so good abstra=
+ction
+> (b) user creating/deleting eswitch sub ports would be hard to fit in the =
+whole usage model
+
+Okay, so I can repost the "basic" sub functions?
+
+> > > Overview:
+> > > ---------
+> > > Mellanox ConnectX sub functions are exposed to user as a mediated
+> > > device (mdev) [2] as discussed in RFC [3] and further during
+> > > netdevconf0x13 at [4].
+> > >
+> > > mlx5 mediated device (mdev) enables users to create multiple
+> > > netdevices and/or RDMA devices from single PCI function.
+> > >
+> > > Each mdev maps to a mlx5 sub function.
+> > > mlx5 sub function is similar to PCI VF. However it doesn't have its
+> > > own PCI function and MSI-X vectors.
+> > >
+> > > mlx5 mdevs share common PCI resources such as PCI BAR region, MSI-X
+> > > interrupts.
+> > >
+> > > Each mdev has its own window in the PCI BAR region, which is
+> > > accessible only to that mdev and applications using it.
+> > >
+> > > Each mlx5 sub function has its own resource namespace for RDMA resour=
+ces.
+> > >
+> > > mdevs are supported when eswitch mode of the devlink instance is in
+> > > switchdev mode described in devlink documentation [5]. =20
+> >=20
+> > So presumably the mdevs don't spawn their own devlink instance today, b=
+ut
+> > once mapped via VIRTIO to a VM they will create one?
+> >  =20
+> mdev doesn't spawn the devlink instance today when mdev is created by use=
+r, like PCI.
+> When PCI bus driver enumerates and creates PCI device, there isn't a devl=
+ink instance for it.
+>=20
+> But, mdev's devlink instance is created when mlx5_core driver binds to th=
+e mdev device.
+> (again similar to PCI, when mlx5_core driver binds to PCI, its devlink in=
+stance is created ).
+>=20
+> I should have put the example in patch-15 which creates/deletes devlink i=
+nstance of mdev.
+> I will revise the commit log of patch-15 to include that.
+> Good point.
 
 Thanks.
+
+> > It could be useful to specify.
+> >  =20
+> Yes, its certainly useful. I missed to put the example in commit log of p=
+atch-15.
+>=20
+> > > Network side:
+> > > - By default the netdevice and the rdma device of mlx5 mdev cannot
+> > > send or receive any packets over the network or to any other mlx5 mde=
+v. =20
+> >=20
+> > Does this mean the frames don't fall back to the repr by default? =20
+> Probably I wasn't clear.
+> What I wanted to say is, that frames transmitted by mdev's netdevice and =
+rdma devices don't go to network.
+> These frames goes to representor device.
+> User must configure representor to send/receive/steer traffic to mdev.
+
+=F0=9F=91=8D
