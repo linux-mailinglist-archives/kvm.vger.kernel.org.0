@@ -2,116 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABAFFF59D3
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 22:28:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25CA9F5A42
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 22:47:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730159AbfKHV0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 16:26:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49927 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726819AbfKHV0a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 16:26:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573248389;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kOlt9+gXfWdePLvgUtAlW7sjmc7CI8AXBtdIXNN9dd4=;
-        b=FfVeZ5JOvx9jfXQMcp7ZRmKFpfX5sBSci4OLmopLjPRlJFNWSeieDZCPFY0aO/F2rajdTT
-        haSoFntRp7NnzMs85FYCFmAr/mRbwydR6U+n4/UBwtYACxC/wXPqin2B3reFcH4KC3hMb1
-        agSfGsl3Dr+BL0SlfL3ntlQQf4njNdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-fEBVoNgAPgaqpLBVIXrIsw-1; Fri, 08 Nov 2019 16:26:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 659531800D7B;
-        Fri,  8 Nov 2019 21:26:26 +0000 (UTC)
-Received: from mail (ovpn-125-151.rdu2.redhat.com [10.10.125.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EC9C5D6AE;
-        Fri,  8 Nov 2019 21:26:26 +0000 (UTC)
-Date:   Fri, 8 Nov 2019 16:26:25 -0500
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jessica Yu <jeyu@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Matthias Maennich <maennich@google.com>
-Subject: Re: [PATCH 03/13] kvm: monolithic: fixup x86-32 build
-Message-ID: <20191108212625.GB532@redhat.com>
-References: <6ed4a5cd-38b1-04f8-e3d5-3327a1bd5d87@redhat.com>
- <678358c1-0621-3d2a-186e-b60742b2a286@redhat.com>
- <20191105135414.GA30717@redhat.com>
- <330acce5-a527-543b-84c0-f3d8d277a0e2@redhat.com>
- <20191105145651.GD30717@redhat.com>
- <ab18744b-afc7-75d4-b5f3-e77e9aae41a6@redhat.com>
- <20191108135631.GA22507@linux-8ccs>
- <b77283e5-a4bc-1849-fbfa-27741ab2dbd5@redhat.com>
- <20191108200103.GA532@redhat.com>
- <9a3d2936-bd26-430f-a962-9b0f6fe0c2a0@redhat.com>
+        id S1732624AbfKHVj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 16:39:56 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40217 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731256AbfKHVj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 16:39:56 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f3so7637040wmc.5
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 13:39:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=tze57b2bsR/GwYQoTzplFmam8+QXL62VeoNRfOZV8yY=;
+        b=Q/WAHYGD+DBuN7thKm8RS7Ein9f+4V87oGeQN/HOn9okMHHz64ciF2qgw/Oj03eu7D
+         NremqJ+36eDt4ZOHhtguXLs2WXYHSxd7wy3+e1QX6j9QLvh8u5qD1EVUF/MwL7lBCuJD
+         S7RFUPmZCr712D0cFsS3CKSFq/ufjmFntSylQw8wRlRptVrtrUi6showrm5AiqMZ5Eg3
+         9nzX+46AqvFiz8XiQhs0eHdP3OLwqrPnnyNfqKk83KvP/sg73iT8GDE6/3x/hXcSYVCb
+         6+MxC6/NhztMfvVjNIMzLq61+B5T3ZQIMoqKlK+xW8uWIczih20tAjHyT3zb9dR86ccH
+         wkIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=tze57b2bsR/GwYQoTzplFmam8+QXL62VeoNRfOZV8yY=;
+        b=lDUtOArShNquAvVnYQdpK+KfmeaGPMkJWPD6lLTvO0ORIhjiQRTIM7JIc9keLiAkY8
+         SC+JaAjxlhzC/WqhuKRZgwMb6/WemS7XCnnzWoMa0X48nbapB/NdTVh80J2RtXi+3uA2
+         IY3OZ+KvUqqRwEzfxxbIvtvqxHSMD4KqP/dBFvEXflCoKgMBlIfWZoc7teiChCSXTtAU
+         J4hVzIY2BoXQfNAq6biLeahuPN0h6pBJkXCEXqIsPLxgRKdGyB2a8WP2Eaa+XGI0WZM7
+         ixi54fcgvh2l+VHqUAukoHo5ypUGv6lpOwyykIqS35EUUhkjoQzEupbOjslzobiDug7f
+         bp/g==
+X-Gm-Message-State: APjAAAUmijPI0WyJCyqnzR4sBsLL861UYqroPR3qMzTuNG2W0xPAWTED
+        BoRj02RFyhy2YhlzYDAfmqqrvw==
+X-Google-Smtp-Source: APXvYqz2ULh0wC+3gaPbsNu6divAq6scvendvnNAXeY517/H3G/vlQZUzHHQgrMTj6oeXNKdcEqL2g==
+X-Received: by 2002:a1c:1f03:: with SMTP id f3mr10042764wmf.131.1573249193950;
+        Fri, 08 Nov 2019 13:39:53 -0800 (PST)
+Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
+        by smtp.gmail.com with ESMTPSA id x205sm11132284wmb.5.2019.11.08.13.39.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2019 13:39:53 -0800 (PST)
+Date:   Fri, 8 Nov 2019 22:39:52 +0100
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>
+Cc:     Parav Pandit <parav@mellanox.com>, alex.williamson@redhat.com,
+        davem@davemloft.net, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        saeedm@mellanox.com, kwankhede@nvidia.com, leon@kernel.org,
+        cohuck@redhat.com, jiri@mellanox.com, linux-rdma@vger.kernel.org,
+        Or Gerlitz <gerlitz.or@gmail.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191108213952.GZ6990@nanopsycho>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107153234.0d735c1f@cakuba.netronome.com>
+ <20191108121233.GJ6990@nanopsycho>
+ <20191108110640.225b2724@cakuba>
+ <20191108194118.GY6990@nanopsycho>
+ <20191108132120.510d8b87@cakuba>
 MIME-Version: 1.0
-In-Reply-To: <9a3d2936-bd26-430f-a962-9b0f6fe0c2a0@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: fEBVoNgAPgaqpLBVIXrIsw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191108132120.510d8b87@cakuba>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 08, 2019 at 10:02:52PM +0100, Paolo Bonzini wrote:
-> kvm_intel.ko or kvm_amd.ko, I'm not sure why that would be worse for TLB
-> or RAM usage.  The hard part is recording the location of the call sites
+Fri, Nov 08, 2019 at 10:21:20PM CET, jakub.kicinski@netronome.com wrote:
+>On Fri, 8 Nov 2019 20:41:18 +0100, Jiri Pirko wrote:
+>> Fri, Nov 08, 2019 at 08:06:40PM CET, jakub.kicinski@netronome.com wrote:
+>> >On Fri, 8 Nov 2019 13:12:33 +0100, Jiri Pirko wrote:  
+>> >> Thu, Nov 07, 2019 at 09:32:34PM CET, jakub.kicinski@netronome.com wrote:  
+>> >> >On Thu,  7 Nov 2019 10:04:48 -0600, Parav Pandit wrote:    
+>> >> >> Mellanox sub function capability allows users to create several hundreds
+>> >> >> of networking and/or rdma devices without depending on PCI SR-IOV support.    
+>> >> >
+>> >> >You call the new port type "sub function" but the devlink port flavour
+>> >> >is mdev.
+>> >> >
+>> >> >As I'm sure you remember you nacked my patches exposing NFP's PCI 
+>> >> >sub functions which are just regions of the BAR without any mdev
+>> >> >capability. Am I in the clear to repost those now? Jiri?    
+>> >> 
+>> >> Well question is, if it makes sense to have SFs without having them as
+>> >> mdev? I mean, we discussed the modelling thoroughtly and eventually we
+>> >> realized that in order to model this correctly, we need SFs on "a bus".
+>> >> Originally we were thinking about custom bus, but mdev is already there
+>> >> to handle this.  
+>> >
+>> >But the "main/real" port is not a mdev in your case. NFP is like mlx4. 
+>> >It has one PCI PF for multiple ports.  
+>> 
+>> I don't see how relevant the number of PFs-vs-uplink_ports is.
+>
+>Well. We have a slice per external port, the association between the
+>port and the slice becomes irrelevant once switchdev mode is enabled,
+>but the queues are assigned statically so it'd be a waste of resources
+>to not show all slices as netdevs.
+>
+>> >> Our SFs are also just regions of the BAR, same thing as you have.
+>> >> 
+>> >> Can't you do the same for nfp SFs?
+>> >> Then the "mdev" flavour is enough for all.  
+>> >
+>> >Absolutely not. 
+>> >
+>> >Why not make the main device of mlx5 a mdev, too, if that's acceptable.
+>> >There's (a) long precedence for multiple ports on one PCI PF in
+>> >networking devices, (b) plenty deployed software 
+>> >which depend on the main devices hanging off the PCI PF directly.
+>> >
+>> >The point of mdevs is being able to sign them to VFs or run DPDK on
+>> >them (map to user space).
+>> >
+>> >For normal devices existing sysfs hierarchy were one device has
+>> >multiple children of a certain class, without a bus and a separate
+>> >driver is perfectly fine. Do you think we should also slice all serial
+>> >chips into mdevs if they have multiple lines.
+>> >
+>> >Exactly as I predicted much confusion about what's being achieved here,
+>> >heh :)  
+>> 
+>> Please let me understand how your device is different.
+>> Originally Parav didn't want to have mlx5 subfunctions as mdev. He
+>> wanted to have them tight to the same pci device as the pf. No
+>> difference from what you describe you want. However while we thought
+>> about how to fit things in, how to handle na phys_port_name, how to see
+>> things in sysfs we came up with an idea of a dedicated bus.
+>
+>The difference is that there is naturally a main device and subslices
+>with this new mlx5 code. In mlx4 or nfp all ports are equal and
+>statically allocated when FW initializes based on port breakout.
 
-Let's ignore the different code complexity of supporting self
-modifying code: kvm.ko and kvm-*.ko will be located in different
-pages, hence it'll waste 1 iTLB for every vmexit and 2k of RAM in
-average. The L1 icache also will be wasted. It'll simply run slower.
+Ah, I see. I was missing the static part in nfp. Now I understand. It is
+just an another "pf", but not real pf in the pci terminology, right?
 
-Now about the code complexity, it is even higher than pvops:
 
-   KVM=09=09=09=09pvops
-   =3D=3D=3D=3D=3D=3D=3D=3D=3D                    =3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-1) Changes daily=09=09Never change
-
-2) Patched at runtime=09=09Patched only at boot time early on
-   during module load
-   and multiple times
-   at every load of kvm-*.ko
-
-3) The patching points to=09All patch destinations are linked into
-   code in kernel modules       the kernel
-
-Why exactly should we go through such a complication when it runs
-slower in the end and it's much more complex to implement and maintain
-and in fact even more complex than pvops already is?
-
-Runtime patching the indirect call like pvops do is strictly required
-when you are forced to resolve the linking at runtime. The alternative
-would be to ship two different Linux kernels for PV and bare
-metal. Maintaining a whole new kernel rpm and having to install a
-different rpm depending on the hypervisor/bare metal is troublesome so
-pvops is worth it.
-
-With kvm-amd and kvm-intel we can avoid the whole runtime patching of
-the call sites as already proven by KVM monolithic patchset, and it'll
-run faster in the CPU and it'll save RAM, so I'm not exactly sure how
-anybody could prefer runtime patching here when the only benefit is a
-few mbytes of disk space saved on disk.
-
-Furthermore by linking the thing statically we'll also enable LTO and
-other gcc features which would never be possible with those indirect
-calls.
-
-Thanks,
-Andrea
-
+>
+>Maybe it's the fact I spent last night at an airport but I'm feeling
+>like I'm arguing about this stronger than I actually care :)
+>
+>> We took it upstream and people suggested to use mdev bus for this.
+>> 
+>> Parav, please correct me if I'm wrong but I don't think where is a plan
+>> to push SFs into VM or to userspace as Jakub expects, right?
+>
+>There's definitely a plan to push them to VFs, I believe that was part
+>of the original requirements, otherwise there'd be absolutely no need
+>for a bus to begin with.
