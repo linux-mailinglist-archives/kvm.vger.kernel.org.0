@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08893F4FAF
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:30:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1510F4FB9
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:31:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbfKHPaI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 10:30:08 -0500
-Received: from mail-eopbgr150044.outbound.protection.outlook.com ([40.107.15.44]:28415
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        id S1726446AbfKHPbn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 10:31:43 -0500
+Received: from mail-eopbgr80083.outbound.protection.outlook.com ([40.107.8.83]:40097
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726101AbfKHPaH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 10:30:07 -0500
+        id S1726152AbfKHPbm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 10:31:42 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N6wuJioAtcSbg5Teoz2AjIrnIvCY6sbPoqsa9UHHJeL18O3uNpVmomq1FX/bZ7GMDVwJLfg5KI3eIL5GG1qp0SPN9TeAd/CIT0X1mlSe5PnN/TLTGj5xr5d41HDZVllczLCTkAMAg/osXtabObqXLnqzJ9CcOGP9S+z1XNMqhfHsu+LbJZH59vEKVTUjQe3QhWbfuHLASqj+3GqllYAp90bMtiiJdaVOKtCF2/wZu/IsLgehYa5GC41Gk/3LS9yDEIlUnmoEt4zKyGs2ShcUAQpsOM+f2HzvPOvUogpohC+lI6f22QFp3wbcKFkxg67+9sKsNwNAKY7T/GYU48R4yQ==
+ b=BmM5BK/Xpl9AMXgo+hTs/LEKtzEDBkgiaExYoDV8Esyk6nDerXKyx76UHPq0EGYBSebYraCSDqokeevllr5G/ljl16nXt+MCjsJYCXQKVKHVqauEZA2HZozzsmSIK57CRw5mmYYAmoC6Jya7fPGUhJ5IcGf8cawPUkMrWax+vHEldUlhpnsU2M49TQFe+BRJ42+c9YsDVbjHrSfAaykLKGX9aI7QcY+54zE4+cRvF5BoN5svBW8zieIRJU244Xxw7nbJ+j6+gOgZzAsyxYNeDxPojQW2gsWtCeVYiyzTMLx7e3pLqLO8pI6EQUy/SwoB70HsjslEd6dIUli7t+CMWQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yoL3U2ihPj91G5dqSG3kG/QaeMskBDCAMQ5S2ULm8hw=;
- b=L6BHI6Qdzpt7X87d7yQ8p3vkee2soMsWnDpkvoF03d16cXs46SDaiFxkHsUROB9dMfh13L6WUdObLDFhyX0W0sBUSJLjmYeBGS6TsNENoj6S5eikN+ReotacnpYYVt0AhAqNuORL4uXqlxfkPqU2Itw/5E3k5RPyC4/kCQTvY/fDNfaCl6sRAh4VOwdWPliH8Pe6cQj9pTo6SLb2qhZPW1dlIQ/+lrRy/V10zMHJmw34PSTcXdqFf9f8XyAwj6nszsK7Pvl4VTf5R9ZSJ0YIEzv00ZKM0bZ8gWHSbEY+bh9JLoVcCsjB3RTrjxjsHA0w5LGiYThSqfraoj1UD3gqrw==
+ bh=f4gHjSEYN0fSojbVCn1+gHxIN3v189gnNflTrSMdzXw=;
+ b=TnVqaT3UjQ/CP5CqyqjGo3G/3BbE3JRn29Lny1Oe9DFOB76KKGV66LsLFCke6i28ydx8iQIT7GbNqpYbLedZkgqpWopPIrXOboIXsVLiWSyJBYXHBHkM6MXmYPse3bTkH0sED+taJfeo83woINROYd0+TlDD4Vjj3Kh4HIJSzpReaFz7Hxv+mCqmgBtFzSAIgM1Wm45wzQVWOG0ryPhUQGERNVynRAZr7DZLi0LIotz1ic5sEpb0F5Egx2htu8bQoDd5dFbhClPGe33ABatCGhH5TCN6U1bVHy0tAAXMjy/woMfZMdqlKMZAOcLMIrUWUm5+/rrp5qlSVqgUoTKtbQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
  dkim=pass header.d=mellanox.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yoL3U2ihPj91G5dqSG3kG/QaeMskBDCAMQ5S2ULm8hw=;
- b=HBpwINVZw8FIJIC5RXrRMwn+kdP2VUA1HZugt2pt7B6uJh6qwQHNUheqz2tYaqyDAjrbCy3jE2HXaDFkS0AbAA+pL7uQJdu+zS3ee0K3SXWthSlSnmeR2eFcnnLKRq6Q2+9gC5PoezJMO4ZPjmml/u/9OxoP8NvtAjZ7DTwzAN0=
+ bh=f4gHjSEYN0fSojbVCn1+gHxIN3v189gnNflTrSMdzXw=;
+ b=q6AfhxY2feRJG6m3i7GG3YZsmYm9u2HkNzHtANCaRCh4NGttVq3Ohd4u8rR2Fq4IujetRIZeFfFfYggEOz5wPMA0F9incUU0ajZFP/nlhYTVRI98Jj6yQ+Q5QuXsldCJ/hLV0UL3h0raMeamZK9I9zdNfiJOwjLqEAu98MqhVcQ=
 Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6452.eurprd05.prod.outlook.com (20.179.34.142) with Microsoft SMTP
+ AM0PR05MB6132.eurprd05.prod.outlook.com (20.178.203.32) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Fri, 8 Nov 2019 15:29:24 +0000
+ 15.20.2430.24; Fri, 8 Nov 2019 15:30:59 +0000
 Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
  ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
  ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Fri, 8 Nov 2019
- 15:29:24 +0000
+ 15:30:59 +0000
 From:   Parav Pandit <parav@mellanox.com>
-To:     Christoph Hellwig <hch@infradead.org>
+To:     Cornelia Huck <cohuck@redhat.com>
 CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -44,21 +44,20 @@ CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Saeed Mahameed <saeedm@mellanox.com>,
         "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
         "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: RE: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params for
- mediated device
-Thread-Topic: [PATCH net-next 16/19] net/mlx5: Implement dma ops and params
- for mediated device
-Thread-Index: AQHVlYXHkdSYLcgDMEK1TOINymJcnaeA0vKAgACQ6rA=
-Date:   Fri, 8 Nov 2019 15:29:24 +0000
-Message-ID: <AM0PR05MB48665E3E5F74EEF847E2F1E8D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Subject: RE: [PATCH net-next 19/19] mtty: Optionally support mtty alias
+Thread-Topic: [PATCH net-next 19/19] mtty: Optionally support mtty alias
+Thread-Index: AQHVlYXKCkwgRpy5N0GblxIWUl4Rt6eBSruAgAAXETCAAAV+AIAAAGtw
+Date:   Fri, 8 Nov 2019 15:30:59 +0000
+Message-ID: <AM0PR05MB486622134AD1F1A83714629CD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-16-parav@mellanox.com>
- <20191108063731.GA24679@infradead.org>
-In-Reply-To: <20191108063731.GA24679@infradead.org>
+        <20191107160834.21087-1-parav@mellanox.com>
+        <20191107160834.21087-19-parav@mellanox.com>
+        <20191108144615.3646e9bb.cohuck@redhat.com>
+        <AM0PR05MB48667622386BBC6D52BE8BE8D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108162828.6e12fc05.cohuck@redhat.com>
+In-Reply-To: <20191108162828.6e12fc05.cohuck@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -68,81 +67,95 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [2605:6000:ec82:1c00:9dfd:71f9:eb37:f669]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 14d85c3a-6776-4c67-1ecd-08d764606f3f
-x-ms-traffictypediagnostic: AM0PR05MB6452:|AM0PR05MB6452:
+x-ms-office365-filtering-correlation-id: 1a11a60b-da46-453d-8657-08d76460a7d0
+x-ms-traffictypediagnostic: AM0PR05MB6132:|AM0PR05MB6132:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB64520141C01AC4BABFDFB9A4D17B0@AM0PR05MB6452.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam-prvs: <AM0PR05MB6132903FA98F442CC4D127EDD17B0@AM0PR05MB6132.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(376002)(366004)(346002)(396003)(199004)(189003)(13464003)(14444005)(316002)(52536014)(33656002)(8676002)(54906003)(6506007)(53546011)(476003)(486006)(7736002)(7696005)(81166006)(305945005)(5660300002)(9686003)(76176011)(8936002)(66446008)(66946007)(64756008)(76116006)(66556008)(74316002)(55016002)(4326008)(6246003)(6436002)(6916009)(71200400001)(81156014)(71190400001)(99286004)(86362001)(66476007)(25786009)(229853002)(256004)(14454004)(2906002)(186003)(46003)(478600001)(11346002)(102836004)(446003)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6452;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(366004)(346002)(39860400002)(396003)(199004)(189003)(13464003)(46003)(102836004)(99286004)(6506007)(53546011)(76176011)(55016002)(186003)(9686003)(7696005)(476003)(6246003)(229853002)(52536014)(6916009)(6436002)(81166006)(81156014)(8676002)(4326008)(6116002)(8936002)(446003)(11346002)(256004)(71190400001)(71200400001)(25786009)(66556008)(5660300002)(64756008)(66446008)(66476007)(86362001)(486006)(76116006)(316002)(33656002)(54906003)(2906002)(14454004)(7736002)(305945005)(74316002)(478600001)(66946007)(14444005);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6132;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: mellanox.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: u4T+JqPqlPbq/XvUCsIIYCKSJpNZ9UGxfrzK6cBDMiBtnLE8JHIV/DXugRBfmrzzTnOehPmMm8qsLZgJghd0UGtCQiMmeQO1kiOt4YpSXImuWyBDkbvr6SYXOEXcpTvQjyLlpO8EKl3HjvITU9zxti16bAdpn8e/7hvt6t9P2cO1eS+9Imymmv3Or9VjcDg6WNoyLdwmcOBJ7c8AIUNZ6QS1WYg0rRjx2xEqDBh5KoO3EcCiEVN34C6ksH4LB1jboMJ9L2VXz9JtWtkDRlSzQ27M0WHo6xgeeeRdhV+ZXv2xNJvwpbpD1z2u3PYScZSpOyTjJd+fcbuhusccugjjYbQSIC9XOfc3rg3hOD3h6CUEkZzNoUywD0r1fve9KgIBEkg3Bhqth/SE0zhIg5Cw1WsG8cr0we/ycl//jX61ojoIhKaJGy6G280qpzeEax6s
+x-microsoft-antispam-message-info: PGqITpKKhmFQmiQIGGwxvL4+WH31ZgqPnq85G+UpQaBoQJiIfXBnuDCcFhz0cqJP5XeMoaybn9n3ND4aGwSWV84Ju1wDjJmxJy1p2musdTX1/a1jHyTDeGXRuxIa6K4fBMUDi1VUgdoXqggTg92nuET4R5lv4MRo1hgiz3znxXBDQDv7I5CFFnIXteX8w9bGliuZp6Q8qoXo8UxhC/CW3H9vSlWm+/yM64KhSMsuPMUVAAPAMSDbqO9fbhFPXESbE8TWKGzhgMRBVmM7f8s22/L7Ht7vYUWZElDWyATbdoR7ALjzwbikX6JAyddTPJaPF+Kknq9tEbRSCvi057OawRPztgG7a1G54erTYr50eAV6aSHlHX4MDLgxWrfNTKaP7GddZ39598mrwe5JAGSVHBVuunQK/UZ1O5mit1FiCuvr0s0mQCPszBafbha9GNAP
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14d85c3a-6776-4c67-1ecd-08d764606f3f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 15:29:24.0821
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a11a60b-da46-453d-8657-08d76460a7d0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 15:30:59.0573
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Xe21SpBiP1JORTfUvqapIZLhvInPMoK/0j6T4skoGYxqNLHteVhezZN0xpR/y2cmBhxNymrP4L+OzZ8YCpbqmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6452
+X-MS-Exchange-CrossTenant-userprincipalname: jm8ZJZdad+lbyTThkF2eUd8mIbPHL9WmHYyI9BTDkqc1ooly6HgWbuZWYKQZEWcKsxadkdppie/Cvd//wtlKCQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6132
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christoph,
+
 
 > -----Original Message-----
-> From: Christoph Hellwig <hch@infradead.org>
-> Sent: Friday, November 8, 2019 12:38 AM
+> From: Cornelia Huck <cohuck@redhat.com>
+> Sent: Friday, November 8, 2019 9:28 AM
 > To: Parav Pandit <parav@mellanox.com>
 > Cc: alex.williamson@redhat.com; davem@davemloft.net;
 > kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
-> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
-> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
-> rdma@vger.kernel.or=20
-> Subject: Re: [PATCH net-next 16/19] net/mlx5: Implement dma ops and
-> params for mediated device
+> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org; Jiri
+> Pirko <jiri@mellanox.com>; linux-rdma@vger.kernel.org
+> Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
 >=20
-> On Thu, Nov 07, 2019 at 10:08:31AM -0600, Parav Pandit wrote:
-> > Implement dma ops wrapper to divert dma ops to its parent PCI device
-> > because Intel IOMMU (and may be other IOMMU) is limited to PCI devices.
+> On Fri, 8 Nov 2019 15:10:42 +0000
+> Parav Pandit <parav@mellanox.com> wrote:
 >=20
-> Yikes.  I've been trying hard to get rid of pointless dma_map_ops instanc=
-e.
-> What upper layers use these child devices, and why can't they just use th=
-e
-> parent device for dma mapping directly?
+> > > -----Original Message-----
+> > > From: Cornelia Huck <cohuck@redhat.com>
+> > > Sent: Friday, November 8, 2019 7:46 AM
+> > > To: Parav Pandit <parav@mellanox.com>
+> > > Cc: alex.williamson@redhat.com; davem@davemloft.net;
+> > > kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
+> > > <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org; Jiri
+> > > Pirko <jiri@mellanox.com>; linux-rdma@vger.kernel.org
+> > > Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty
+> > > alias
+> > >
+> > > On Thu,  7 Nov 2019 10:08:34 -0600
+> > > Parav Pandit <parav@mellanox.com> wrote:
+> > >
+> > > > Provide a module parameter to set alias length to optionally
+> > > > generate mdev alias.
+> > > >
+> > > > Example to request mdev alias.
+> > > > $ modprobe mtty alias_length=3D12
+> > > >
+> > > > Make use of mtty_alias() API when alias_length module parameter is
+> set.
+> > > >
+> > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > > > ---
+> > > >  samples/vfio-mdev/mtty.c | 13 +++++++++++++
+> > > >  1 file changed, 13 insertions(+)
+> > >
+> > > If you already have code using the alias interface, you probably
+> > > don't need to add it to the sample driver here. Especially as the
+> > > alias looks kind of pointless here.
+> >
+> > It is pointless.
+> > Alex point when we ran through the series in August, was, QA should be
+> able to do cover coverage of mdev_core where there is mdev collision and
+> mdev_create() can fail.
+> > And QA should be able to set alias length to be short to 1 or 2 letters=
+ to
+> trigger it.
+> > Hence this patch was added.
+>=20
+> If we want this for testing purposes, that should be spelled out explicit=
+ly (the
+> above had already dropped from my cache). Even better if we had
+> something in actual test infrastructure.
 
-I certainly like to get rid of the dma_ops. Please let me know, if there is=
- better way. More details below.
-
-Few upper layers that I know of are (a) NVME because this child devices are=
- rdma and (b) TCP as child device s netdevice.
-Without dma ops setup, ULPs on top of RDMA device will be able to make use =
-of it.
-
-Modifying any non RDMA ULPs to refer to the parent because this child devic=
-e is mdev will be obviously non-starter.
-On netdev side, mlx5_core driver can always do dma mapping to the parent PC=
-I device.
-
-However, I wanted to avoid such implementation in mlx5_core driver.
-Specially when it is taken care when iommu is disabled.
-When IOMMU is enabled, find_domain() fails during dma_alloc_coherent() thro=
-ugh intel_alloc_coherent() for the child devices.
-Couldn't figure out what did I miss in device setup that leads to this fail=
-ure.
-dev.archdata.iommu is null for device on mdev device.
-Further code reading hints IOMMU branches on dev_pci().
-Until that is fixed,=20
-1. we can get rid of dma ops, let mlx5_core refer to parent pci,
-2. rdma will anyway refer to parent and ulps are ok
-Or you have any inputs on how to debug this futher?
+What else purpose sample driver has other than getting reference on how to =
+use API? :-)
