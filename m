@@ -2,89 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71E1AF4578
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 12:13:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CD7FF4589
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 12:19:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730623AbfKHLNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 06:13:24 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41923 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727459AbfKHLNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 06:13:24 -0500
-Received: by mail-wr1-f65.google.com with SMTP id p4so6563272wrm.8
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 03:13:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=K+Eo0glUzjalQHt6xvHUxzQrB7u3vMyGwdCkPxcCzJY=;
-        b=u7QLJGpnAhW16VTXD/Gmf8wGHRwCNuydIXbhIRkLruxGqEccaxt4cGg+fjCalmVcOH
-         36Vd0JvzO7da+wUXNT3V7+HSK1Ak9QtB8AuiV3bPkf3ku/uVPT+oloU5+jUGD2S2+/P4
-         d45RFmwEibq89tq5v02AUDRgfiUy6X0543v0SOq7NsDMKInckdUU+l0VJ7nBrLE8Z0vI
-         sNOBy5SfOQ1d6nS9qVKJu5WyGhqxC0uNvi5MMfN1SfJAYUg3rdUO+dLzD/O2DhtpCIzB
-         o6Xq6h3x0FdW3fKMLJxO4io6+EZL4HhQkBOOWSHmxWC9IjclTTL88meL/fwkc95abNHq
-         QkZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=K+Eo0glUzjalQHt6xvHUxzQrB7u3vMyGwdCkPxcCzJY=;
-        b=dk4ewDD1IYDGD6VN1c336uRzNAwwGfEANITon+VnatCVP4HuRIdarJyNmRegvlAjT/
-         hDoqZShgKj25AG5xLJW2zTqpGJvgAsiRq0MlK+aYHi4POWElnDQokGiQmc8x/AzR3xpq
-         R6qHyAJofaktR6uq2yDKL8Ivmfp98hK8RCtz43jUdqlfMe06ZKV4W8ae86KTL3HYQiCK
-         qx2AgAL9jVz5E+2IatcS9WcanPlxu5VF4HkF5g/Kr/4nAPqgyD7hrjIvpi/SR9PviUbP
-         t0FU/uklu00xC2cLoZBvUFHW/jp4VwaxgY3kTmouefw5TGWXNF+Wu5xb5ynX/ci26Zc0
-         +/3Q==
-X-Gm-Message-State: APjAAAXJFztHS1cF/N717ETiBLDRnj9ymRKBKWu2EKvnIB/NdlDH5qJL
-        XKDnkTBvzyY1hZiycleUuUDhrQ==
-X-Google-Smtp-Source: APXvYqwnP2QDmQBcfmJLh3FRIv+V4z/O+BIfKcf6B34Ft5wA/wQ3rdOItRHB5FmTkCO/S9Z5vQlKng==
-X-Received: by 2002:adf:e346:: with SMTP id n6mr7240613wrj.234.1573211601794;
-        Fri, 08 Nov 2019 03:13:21 -0800 (PST)
-Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id 11sm4575378wmi.8.2019.11.08.03.13.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 03:13:21 -0800 (PST)
-Date:   Fri, 8 Nov 2019 12:13:20 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     alex.williamson@redhat.com, davem@davemloft.net,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, saeedm@mellanox.com,
-        kwankhede@nvidia.com, leon@kernel.org, cohuck@redhat.com,
-        jiri@mellanox.com, linux-rdma@vger.kernel.org,
-        Vu Pham <vuhuong@mellanox.com>
-Subject: Re: [PATCH net-next 15/19] net/mlx5: Add load/unload routines for SF
- driver binding
-Message-ID: <20191108111320.GI6990@nanopsycho>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-15-parav@mellanox.com>
- <20191108094854.GC6990@nanopsycho>
+        id S1729896AbfKHLTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 06:19:23 -0500
+Received: from foss.arm.com ([217.140.110.172]:40838 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725730AbfKHLTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 06:19:23 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8ADA631B;
+        Fri,  8 Nov 2019 03:19:22 -0800 (PST)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DEB53F719;
+        Fri,  8 Nov 2019 03:19:21 -0800 (PST)
+Date:   Fri, 8 Nov 2019 12:19:20 +0100
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@arm.com>,
+        sean.j.christopherson@intel.com, borntraeger@de.ibm.com,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Memory regions and VMAs across architectures
+Message-ID: <20191108111920.GD17608@e113682-lin.lund.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191108094854.GC6990@nanopsycho>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fri, Nov 08, 2019 at 10:48:54AM CET, jiri@resnulli.us wrote:
->Thu, Nov 07, 2019 at 05:08:30PM CET, parav@mellanox.com wrote:
->>Add SF load/unload helper routines which will be used during
->>binding/unbinding a SF to mlx5_core driver as mediated device.
->>
->>Reviewed-by: Saeed Mahameed <saeedm@mellanox.com>
->>Signed-off-by: Vu Pham <vuhuong@mellanox.com>
->>Signed-off-by: Parav Pandit <parav@mellanox.com>
->>---
->> .../net/ethernet/mellanox/mlx5/core/main.c    | 11 ++-
->> .../ethernet/mellanox/mlx5/core/meddev/sf.c   | 67 +++++++++++++++++++
->
->Nit: Why not s/meddev/mdev/ ? I think that "mdev" is widely recognized term.
+Hi,
 
-I take it back after grepping drivers/net/ethernet/mellanox/mlx5/core/
-for mdev :)
+I had a look at our relatively complicated logic in
+kvm_arch_prepare_memory_region(), and was wondering if there was room to
+unify some of this handling between architectures.
 
->
->[...]
+(If you haven't seen our implementation, you can find it in
+virt/kvm/arm/mmu.c, and it has lovely ASCII art!)
+
+I then had a look at the x86 code, but that doesn't actually do anything
+when creating memory regions, which makes me wonder why the arhitectures
+differ in this aspect.
+
+The reason we added the logic that we have for arm/arm64 is that we
+don't really want to take faults for I/O accesses.  I'm not actually
+sure if this is a corretness thing, or an optimization effort, and the
+original commit message doesn't really explain.  Ard, you wrote that
+code, do you recall the details?
+
+In any case, what we do is to check for each VMA backing a memslot, we
+check if the memslot flags and vma flags are a reasonable match, and we
+try to detect I/O mappings by looking for the VM_PFNMAP flag on the VMA
+and pre-populate stage 2 page tables (our equivalent of EPT/NPT/...).
+However, there are some things which are not clear to me:
+
+First, what prevents user space from messing around with the VMAs after
+kvm_arch_prepare_memory_region() completes?  If nothing, then what is
+the value of the cheks we perform wrt. to VMAs?
+
+Second, why would arm/arm64 need special handling for I/O mappings
+compared to other architectures, and how is this dealt with for
+x86/s390/power/... ?
+
+
+Thanks,
+
+    Christoffer
