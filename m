@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D8A61F532F
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 19:05:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DE82F5345
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 19:11:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbfKHSEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 13:04:33 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34601 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728235AbfKHSEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 13:04:33 -0500
-Received: by mail-wr1-f68.google.com with SMTP id e6so8135861wrw.1
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 10:04:30 -0800 (PST)
+        id S1726121AbfKHSLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 13:11:23 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39263 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726349AbfKHSLX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 13:11:23 -0500
+Received: by mail-wr1-f65.google.com with SMTP id a11so8099534wra.6
+        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 10:11:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=resnulli-us.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=rhP9GYj9sB3quxMJEvN07RZn9DFfM5rZt8DENJt4Ftk=;
-        b=eqeVu4gMo1gD/Rt1yILhcv9vdSwKMb572vK2LnFpeh7lMtfIUAd5ExMeA9fb9eAHvm
-         sJtmfSXRrZzPWAbTEzaSc6XUSQr1Rqlr1gp8salxfqltjb3QJF3v7RuyDXI9lCFwveAx
-         y5UQTScZbnCkSWpFYqoVPTYr6SkleyrIcBldQ6caE9E8953td8aqfX2dxo65cLTEo5VX
-         KMx7d2jbX7/LzQh5bDw3yO/5iXS2F3kkJObQ+zueJk7rT51XFXBfHeJRQggLk2uMHRkc
-         wXYW0n/lsTz2eAmEB+TOqZP8PYEIsp0JYiXUHx7Cdwrx1sVL8d5dE/ImCSKrUfNINThR
-         vBvA==
+        bh=1FM8QFGTLjjSibNr8z3FzFAXtJs+Q+MMqCNcWLcfyKM=;
+        b=rP9g6knGkFLJa1uyXIxNYNHfvIeC9g1irjsUWgyttp8Gf7uB+JKNeSPz/ff/6IyOv2
+         m92L2zBk31Exhu+S102+6+fYZTRJPkQuFaOvJIOwGwzn6J7p4x0s7r9g+UpoZXluUvIU
+         siYH+wfmJI7OYsxpv1edzIBIof/B0xWsgi/AmHG2QKcgzG5wgiAe1LzdvknSsWyhCFL5
+         pE32zetBOJ08KjGbLKqxEVzIWQSJYjbORCsu52KyXbbrkANX3W6X0v4Itv2xuiWNz/bV
+         2Cx6EesjGfIRv4SbQ61H/XzzBzxYRkNvNm0BHF15IoMq9BoILXXRcp0naIPbC29ty0nV
+         M3Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rhP9GYj9sB3quxMJEvN07RZn9DFfM5rZt8DENJt4Ftk=;
-        b=fpJYJDUjfvpazgMNbSPFPlRsGbXBCFpnf+oNo1qGzvRdyBV9/HAMiEfFx42l/+rICx
-         TwHC3PcvJp2CUcFPKmUUEoCQj7vwG7T6rX/EdUR3vgHzVJOJgaF2L+9gBSzPveYPzTPE
-         lPMCn+JJ6HWcKIvix+JO9IhJu6h7X/+mp2SS2nz/didCKO7+zXWXGdkGTi1UfGvtmHFE
-         kV2pN9m7WK8h/Bt0Mdbo2hhOS8BhOxN1Smw3eUQb2vqSLSqSpJLaymwJN1/FqwT0nXxh
-         3+E6M7gUTokCHk0dLQZwFFHDoidxNLnEQIPGRdgK8+VndzKMYjAaHtesLHH0yvN6L5qU
-         l8cg==
-X-Gm-Message-State: APjAAAVjrlfPs/5miQoWT8HcVWw+frtjRVBM+q8cjvivdWoptPR+PFsN
-        tQxjf9WIoKcqXM60m/9MWX46mA==
-X-Google-Smtp-Source: APXvYqxS4WjU3UUomb8GvXXH1CA49N5Xq4JpPgXgHozULL2oh1BPDAugAaMnFNdN3RFM3UX44Q3j0A==
-X-Received: by 2002:adf:ebd2:: with SMTP id v18mr9200033wrn.71.1573236270073;
-        Fri, 08 Nov 2019 10:04:30 -0800 (PST)
+        bh=1FM8QFGTLjjSibNr8z3FzFAXtJs+Q+MMqCNcWLcfyKM=;
+        b=R8D8fnfaX/FPhxCM7U4u44vZngf3v3To6aQGs4r26646hd0RULrOuZvH4ZTYVFA7dv
+         ejRXpa8jz/Td+YVb1L+bO5dSYy4Za04tB193Whz4OVoty4VX4eSjjqkXumP14YCLIVuy
+         bkKvm2uW3QSNGS9lRCoqs8AabPsm3ULOfjZkzQ2lqQst7Iq1VluZPfdJkhOQMwskNmJ0
+         vUXx3/t1xt103XeyNy4gUb1r370BzRTRMEr7W+RBi9e/b+wC6XqOnqGsT98CQJPflkvd
+         Huf+yCrxlrqvCvAJTyENbMAwNc3CJJg6wKYpsVdiGZLW2+0vi5Hm6GcqiYiqYHedxG0u
+         TRWw==
+X-Gm-Message-State: APjAAAX4yODHAAtXKvEzYhKSNVu1KBkwuzVO6t8S13uNSEfKg/oif/F8
+        I4pl/OLmoSf3xymnKN4mWhMI1Q==
+X-Google-Smtp-Source: APXvYqwD1AWXYjVLbesng+NxQG+U5rLVvJR/bhhbMwNiGe/rg6alOWTyuPFT58vLUBnXWmXvlSBoUg==
+X-Received: by 2002:a5d:4684:: with SMTP id u4mr5749770wrq.352.1573236680049;
+        Fri, 08 Nov 2019 10:11:20 -0800 (PST)
 Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id g184sm10503077wma.8.2019.11.08.10.04.29
+        by smtp.gmail.com with ESMTPSA id y8sm5193758wmi.9.2019.11.08.10.11.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 10:04:29 -0800 (PST)
-Date:   Fri, 8 Nov 2019 19:04:29 +0100
+        Fri, 08 Nov 2019 10:11:19 -0800 (PST)
+Date:   Fri, 8 Nov 2019 19:11:19 +0100
 From:   Jiri Pirko <jiri@resnulli.us>
 To:     Parav Pandit <parav@mellanox.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -56,143 +57,99 @@ Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "leon@kernel.org" <leon@kernel.org>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Vu Pham <vuhuong@mellanox.com>
-Subject: Re: [PATCH net-next 06/19] net/mlx5: Add support for mediated
- devices in switchdev mode
-Message-ID: <20191108180429.GS6990@nanopsycho>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-6-parav@mellanox.com>
- <20191108103249.GE6990@nanopsycho>
- <AM0PR05MB486609CBD40E1E26BB18C6B3D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108162246.GN6990@nanopsycho>
- <AM0PR05MB48665096F40059F63B0895C6D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
+Message-ID: <20191108181119.GT6990@nanopsycho>
+References: <20191107153836.29c09400@cakuba.netronome.com>
+ <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191107201750.6ac54aed@cakuba>
+ <AM0PR05MB4866BEC2A2B586AA72BAA9ABD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191107212024.61926e11@cakuba>
+ <AM0PR05MB4866C0798EA5746EE23F2D2BD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108094646.GB6990@nanopsycho>
+ <AM0PR05MB4866969D18877C7AAD19D236D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108163139.GQ6990@nanopsycho>
+ <AM0PR05MB48669A9AE494CCCE8E07C367D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AM0PR05MB48665096F40059F63B0895C6D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+In-Reply-To: <AM0PR05MB48669A9AE494CCCE8E07C367D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fri, Nov 08, 2019 at 05:29:56PM CET, parav@mellanox.com wrote:
+Fri, Nov 08, 2019 at 05:43:43PM CET, parav@mellanox.com wrote:
 >
 >
 >> -----Original Message-----
 >> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Friday, November 8, 2019 10:23 AM
->> To: Parav Pandit <parav@mellanox.com>
->> Cc: alex.williamson@redhat.com; davem@davemloft.net;
->> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
->> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
->> rdma@vger.kernel.org; Vu Pham <vuhuong@mellanox.com>
->> Subject: Re: [PATCH net-next 06/19] net/mlx5: Add support for mediated
->> devices in switchdev mode
+>> >> >> On Fri, 8 Nov 2019 01:44:53 +0000, Parav Pandit wrote:
+>> >> >> > > I'm talking about netlink attributes. I'm not suggesting to
+>> >> >> > > sprintf it all into the phys_port_name.
+>> >> >> > >
+>> >> >> > I didn't follow your comment. For devlink port show command
+>> >> >> > output you said,
+>> >> >> >
+>> >> >> > "Surely those devices are anchored in on of the PF (or possibly
+>> >> >> > VFs) that should be exposed here from the start."
+>> >> >> > So I was trying to explain why we don't expose PF/VF detail in
+>> >> >> > the port attributes which contains
+>> >> >> > (a) flavour
+>> >> >> > (b) netdev representor (name derived from phys_port_name)
+>> >> >> > (c) mdev alias
+>> >> >> >
+>> >> >> > Can you please describe which netlink attribute I missed?
+>> >> >>
+>> >> >> Identification of the PCI device. The PCI devices are not linked
+>> >> >> to devlink ports, so the sysfs hierarchy (a) is irrelevant, (b)
+>> >> >> may not be visible in multi- host (or SmartNIC).
+>> >> >>
+>> >> >
+>> >> >It's the unique mdev device alias. It is not right to attach to the PCI
+>> device.
+>> >> >Mdev is bus in itself where devices are identified uniquely. So an
+>> >> >alias
+>> >> suffice that identity.
+>> >>
+>> >> Wait a sec. For mdev, what you say is correct. But here we talk about
+>> >> devlink_port which is representing this mdev. And this devlink_port
+>> >> is very similar to VF devlink_port. It is bound to specific PF (in
+>> >> case of mdev it could be PF-VF).
+>> >>
+>> >But mdev port has unique phys_port_name in system, it incorrect to use
+>> PF/VF prefix.
 >> 
->> Fri, Nov 08, 2019 at 05:03:13PM CET, parav@mellanox.com wrote:
->> >
->> >
->> >> -----Original Message-----
->> >> From: Jiri Pirko <jiri@resnulli.us>
->> >> Sent: Friday, November 8, 2019 4:33 AM
->> >> To: Parav Pandit <parav@mellanox.com>
->> >> Cc: alex.williamson@redhat.com; davem@davemloft.net;
->> >> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->> >> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
->> >> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
->> >> rdma@vger.kernel.org; Vu Pham <vuhuong@mellanox.com>
->> >> Subject: Re: [PATCH net-next 06/19] net/mlx5: Add support for
->> >> mediated devices in switchdev mode
->> >>
->> >> Thu, Nov 07, 2019 at 05:08:21PM CET, parav@mellanox.com wrote:
->> >> >From: Vu Pham <vuhuong@mellanox.com>
->> >>
->> >> [...]
->> >>
->> >>
->> >> >+static ssize_t
->> >> >+max_mdevs_show(struct kobject *kobj, struct device *dev, char *buf) {
->> >> >+	struct pci_dev *pdev = to_pci_dev(dev);
->> >> >+	struct mlx5_core_dev *coredev;
->> >> >+	struct mlx5_mdev_table *table;
->> >> >+	u16 max_sfs;
->> >> >+
->> >> >+	coredev = pci_get_drvdata(pdev);
->> >> >+	table = coredev->priv.eswitch->mdev_table;
->> >> >+	max_sfs = mlx5_core_max_sfs(coredev, &table->sf_table);
->> >> >+
->> >> >+	return sprintf(buf, "%d\n", max_sfs); } static
->> >> >+MDEV_TYPE_ATTR_RO(max_mdevs);
->> >> >+
->> >> >+static ssize_t
->> >> >+available_instances_show(struct kobject *kobj, struct device *dev,
->> >> >+char *buf) {
->> >> >+	struct pci_dev *pdev = to_pci_dev(dev);
->> >> >+	struct mlx5_core_dev *coredev;
->> >> >+	struct mlx5_mdev_table *table;
->> >> >+	u16 free_sfs;
->> >> >+
->> >> >+	coredev = pci_get_drvdata(pdev);
->> >> >+	table = coredev->priv.eswitch->mdev_table;
->> >> >+	free_sfs = mlx5_get_free_sfs(coredev, &table->sf_table);
->> >> >+	return sprintf(buf, "%d\n", free_sfs); } static
->> >> >+MDEV_TYPE_ATTR_RO(available_instances);
->> >>
->> >> These 2 arbitrary sysfs files are showing resource size/usage for the
->> >> whole eswitch/asic. That is a job for "devlink resource". Please implement
->> that.
->> >>
->> >Jiri,
->> >This series is already too long. I will implement it as follow on. It is already
->> in plan.
->> >However, available_instances file is needed regardless of devlink resource,
->> as its read by the userspace for all mdev drivers.
+>> Why incorrect? It is always bound to pf/vf?
 >> 
->> If that is the case, why isn't that implemented in mdev code rather than
->> individual drivers? I don't understand.
->>
->It should be. It isn't yet.
->It is similar to how phys_port_name preparation was done in legacy way in individual drivers and later on moved to devlink.c
->So some other time, can move this to mdev core.
+>Because mdev device already identified using its unique alias. Why does it need prefix?
+>Mdev core generating the alias is not aware of the prefixes applied devlink. it shouldn't be.
+>We want more letters towards uniqueness of the alias and filling it up with such prefixes doesn't make sense.
 
-Btw, Documentation/driver-api/vfio-mediated-device.rst says:
-  "[<type-id>], device_api, and available_instances are mandatory attributes
-   that should be provided by vendor driver."
+mdev belongs undev pf/vf, no matter how uniqueue the name/alias is.
 
-Why don't you implement "device_api" as well?
+Well, I don't really need those in the phys_port_name, mainly simply
+because they would not fit. However, I believe that you should fillup
+the PF/VF devlink netlink attrs.
+
+Note that we are not talking here about the actual mdev, but rather
+devlink_port associated with this mdev. And devlink port should have
+this info.
 
 
 >
-> 
+>> >What in hypothetical case, mdev is not on top of PCI...
 >> 
->> >
->> >>
->> >> >+
->> >> >+static struct attribute *mdev_dev_attrs[] = {
->> >> >+	&mdev_type_attr_max_mdevs.attr,
->> >> >+	&mdev_type_attr_available_instances.attr,
->> >> >+	NULL,
->> >> >+};
->> >> >+
->> >> >+static struct attribute_group mdev_mgmt_group = {
->> >> >+	.name  = "local",
+>> Okay, let's go hypothetical. In that case, it is going to be on top of something
+>> else, wouldn't it?
+>Yes, it will be. But just because it is on top of something, doesn't mean we include the whole parent dev, its bridge, its rc hierarchy here.
+>There should be a need.
+>It was needed in PF/VF case due to overlapping numbers of VFs via single devlink instance. You probably missed my reply to Jakub.
 
-This local name is "type-id"? Why "local?
+Sure. Again, I don't really care about having that in phys_port_name.
+But please fillup the attrs.
 
 
-
-
-
->> >> >+	.attrs = mdev_dev_attrs,
->> >> >+};
->> >> >+
->> >> >+static struct attribute_group *mlx5_meddev_groups[] = {
->> >> >+	&mdev_mgmt_group,
->> >> >+	NULL,
->> >> >+};
->> >>
->> >> [...]
+>Here it is no overlap.
+>
