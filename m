@@ -2,166 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A3532F5166
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 17:44:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A649DF528C
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 18:28:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727010AbfKHQo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 11:44:27 -0500
-Received: from mail-eopbgr40051.outbound.protection.outlook.com ([40.107.4.51]:23463
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726095AbfKHQo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 11:44:27 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a84yxZBxzPtxNX9Vo2kDKM143JEW4C6pXXa7VkdwfE91rYV3dfDmC353t5iGsr5ByorCgJD+wrGXttDJSRwhELGWb3sJMUDpv3C5XJ9P0lqIUMFxpTCh1Oue85JEInP4XVUBo0blhhosYsHBO+GHJK5wQX1uP3TKQs6xU7IehRut0z5+5xAil8afljvzDVIdVefgM89Fs4PY6Fqn2fM2d3zEBMF23SBFD/ZFshEiCZw9EyjBNJTPXuTHBpo1OUrYRPhv5QEbhF5wYhsg1ATR71eEZ41NPT97XGGNE+rlFFuERMwh9u1ZNAEgWE0Yd6SMSSLBtS8u6n0MRLkhFAOaiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jSjMRTdqrq+6u2kNutGNTtHjdyHl9eHejNHj8hH/NyU=;
- b=AnX7oQ+acDZcpCzLCcyRdYAdJqRYmEXb5gRhi3tPtCvFTkRTdVjURsINi/VRogKusXdXXuobfQcpeOsO5X5lkrk9UXUvhMJKK65dN+K9GFDL0dPFkHY1PqheV3HnE8Wwtn7XjSG0a9beCfc9QCDxNiCUHNDOD5Ph2SEmEI++L4DNY2qDV+N0hMHhrPz1JjvXEXwmNlVRihhUq760Ii5q9vW2+51Joe4CRK8khc5aXJ1uk+MS4fLvCIIG0DJI3o5mIV5QfTTXdEZTWe3Dp9fEyOjh1PCzTzCLrKV8duKOcboYSo1X9xmr6ih9wILdikuP/D+E/7hIagOz4CO33zr0Gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jSjMRTdqrq+6u2kNutGNTtHjdyHl9eHejNHj8hH/NyU=;
- b=YIFyGoOJDKkKfBhVdpvbv57rfhuQmczot087Wl+WvkQDejTItvgFv166PATxTovHVai93+1J7+3CXUL4oQfQlHEuhZXpEfIlEe8N207DKDt6SZ0Ih+2giWZ7VbSVugMrD4Sv9mJDw0dTxRCIz4aFo5E9K08Hyo+OM2nzJYGKqh4=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6049.eurprd05.prod.outlook.com (20.178.202.145) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Fri, 8 Nov 2019 16:43:43 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.020; Fri, 8 Nov 2019
- 16:43:43 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jiri Pirko <jiri@resnulli.us>
-CC:     Jakub Kicinski <jakub.kicinski@netronome.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: RE: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
-Thread-Topic: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
-Thread-Index: AQHVlYW+5ckj7/tyDUu1ocZ3bBFvo6eAK5wAgAAEe2CAAEmKAIAAA1+ggAAOHACAAAFAIIAAe3YAgABjcxCAAA2tgIAAAeXA
-Date:   Fri, 8 Nov 2019 16:43:43 +0000
-Message-ID: <AM0PR05MB48669A9AE494CCCE8E07C367D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-12-parav@mellanox.com>
- <20191107153836.29c09400@cakuba.netronome.com>
- <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191107201750.6ac54aed@cakuba>
- <AM0PR05MB4866BEC2A2B586AA72BAA9ABD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191107212024.61926e11@cakuba>
- <AM0PR05MB4866C0798EA5746EE23F2D2BD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108094646.GB6990@nanopsycho>
- <AM0PR05MB4866969D18877C7AAD19D236D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108163139.GQ6990@nanopsycho>
-In-Reply-To: <20191108163139.GQ6990@nanopsycho>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [2605:6000:ec82:1c00:9dfd:71f9:eb37:f669]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 39c6e869-a1e5-4204-2f94-08d7646ad110
-x-ms-traffictypediagnostic: AM0PR05MB6049:|AM0PR05MB6049:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB6049B082AAF0D98460DAEB80D17B0@AM0PR05MB6049.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(13464003)(189003)(199004)(9686003)(229853002)(74316002)(102836004)(6916009)(305945005)(46003)(99286004)(446003)(476003)(33656002)(316002)(14454004)(7736002)(486006)(11346002)(76176011)(86362001)(186003)(8936002)(25786009)(256004)(7696005)(7416002)(6246003)(6116002)(478600001)(54906003)(6506007)(81156014)(81166006)(52536014)(5024004)(71200400001)(71190400001)(76116006)(4326008)(6436002)(66556008)(64756008)(66446008)(66946007)(55016002)(5660300002)(8676002)(66476007)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6049;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 83ipESw0173vCNBR4DsrbQ3YODHqjirECLTbbGkMUUrtRFuADKOq4p16kiNIgkNSbsBrC2LWSSrHJpR1aMU45ls0WcU2EJDlCOIJKF8G/jmIbPQx7++yyb609lGZV7tzvIN1qmKjOuuPX6lpvAA5b/YvEXSeKRD/Neko9eXHfaURqWl4JKNntFnwsdjOMozTHAA07bMZFXTjaONUxx/YdZkiQKj8nk5iSXJrklVs9iIV2A8wv23FNAJID1DjgRqCGSJoHofia+Hvd3EPB30UBO5ESKzN56c4EZjJSBqYJnfivyShJEe+yvUhf+NmU5Fqi1KTBV3qFQxj0HdNuLwlV2I7P5fWkzHYnyv+9pOhLOPd90hm2M72BZoYn3OReAszSsTKbcLQWvI2VP57F2JanI4F9lk1Cb1G/r0g01lnwENphMoRQ1gp8AeWBfZ4Nyub
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726294AbfKHR2m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 12:28:42 -0500
+Received: from foss.arm.com ([217.140.110.172]:47402 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726199AbfKHR2m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 12:28:42 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D278A31B;
+        Fri,  8 Nov 2019 09:28:41 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A0F63F6C4;
+        Fri,  8 Nov 2019 09:28:40 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 01/17] arm: gic: Enable GIC MMIO tests for
+ GICv3 as well
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
+References: <20191108144240.204202-1-andre.przywara@arm.com>
+ <20191108144240.204202-2-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <cc2a6815-89f7-4a3a-1d7f-9b834c064486@arm.com>
+Date:   Fri, 8 Nov 2019 17:28:38 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39c6e869-a1e5-4204-2f94-08d7646ad110
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 16:43:43.1475
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JFnBOJZdceitpZaH9Q2Xld4EOAdvDrkOD8WZG6XkoYGy4zqvDeu7xGJwwY3ql2FYOPK/Lr12EQtMkTpAIq31wg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6049
+In-Reply-To: <20191108144240.204202-2-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Andre,
 
+On 11/8/19 2:42 PM, Andre Przywara wrote:
+> So far the GIC MMIO tests were only enabled for a GICv2 guest. Modern
+> machines tend to have a GICv3-only GIC, so can't run those tests.
+> It turns out that most GIC distributor registers we test in the unit
+> tests are actually the same in GICv3, so we can just enable those tests
+> for GICv3 guests as well.
+> The only exception is the CPU number in the TYPER register, which is
+> only valid in the GICv2 compat mode (ARE=0), which KVM does not support.
+> So we protect this test against running on a GICv3 guest.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm/gic.c            | 13 +++++++++++--
+>  arm/unittests.cfg    | 26 ++++++++++++++++++++++----
+>  lib/arm/asm/gic-v3.h |  2 ++
+>  3 files changed, 35 insertions(+), 6 deletions(-)
+>
+> diff --git a/arm/gic.c b/arm/gic.c
+> index adb6aa4..04b3337 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -6,6 +6,7 @@
+>   *   + MMIO access tests
+>   * GICv3
+>   *   + test sending/receiving IPIs
+> + *   + MMIO access tests
+>   *
+>   * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+>   *
+> @@ -496,7 +497,14 @@ static void gic_test_mmio(void)
+>  		idreg = gic_dist_base + GICD_ICPIDR2;
+>  		break;
+>  	case 0x3:
+> -		report_abort("GICv3 MMIO tests NYI");
+> +		/*
+> +		 * We only test generic registers or those affecting
+> +		 * SPIs, so don't need to consider the SGI base in
+> +		 * the redistributor here.
+> +		 */
+> +		gic_dist_base = gicv3_dist_base();
+> +		idreg = gic_dist_base + GICD_PIDR2;
+> +		break;
+>  	default:
+>  		report_abort("GIC version %d not supported", gic_version());
+>  	}
+> @@ -505,7 +513,8 @@ static void gic_test_mmio(void)
+>  	nr_irqs = GICD_TYPER_IRQS(reg);
+>  	report_info("number of implemented SPIs: %d", nr_irqs - GIC_FIRST_SPI);
+>  
+> -	test_typer_v2(reg);
+> +	if (gic_version() == 0x2)
+> +		test_typer_v2(reg);
+>  
+>  	report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> >> >> On Fri, 8 Nov 2019 01:44:53 +0000, Parav Pandit wrote:
-> >> >> > > I'm talking about netlink attributes. I'm not suggesting to
-> >> >> > > sprintf it all into the phys_port_name.
-> >> >> > >
-> >> >> > I didn't follow your comment. For devlink port show command
-> >> >> > output you said,
-> >> >> >
-> >> >> > "Surely those devices are anchored in on of the PF (or possibly
-> >> >> > VFs) that should be exposed here from the start."
-> >> >> > So I was trying to explain why we don't expose PF/VF detail in
-> >> >> > the port attributes which contains
-> >> >> > (a) flavour
-> >> >> > (b) netdev representor (name derived from phys_port_name)
-> >> >> > (c) mdev alias
-> >> >> >
-> >> >> > Can you please describe which netlink attribute I missed?
-> >> >>
-> >> >> Identification of the PCI device. The PCI devices are not linked
-> >> >> to devlink ports, so the sysfs hierarchy (a) is irrelevant, (b)
-> >> >> may not be visible in multi- host (or SmartNIC).
-> >> >>
-> >> >
-> >> >It's the unique mdev device alias. It is not right to attach to the P=
-CI
-> device.
-> >> >Mdev is bus in itself where devices are identified uniquely. So an
-> >> >alias
-> >> suffice that identity.
-> >>
-> >> Wait a sec. For mdev, what you say is correct. But here we talk about
-> >> devlink_port which is representing this mdev. And this devlink_port
-> >> is very similar to VF devlink_port. It is bound to specific PF (in
-> >> case of mdev it could be PF-VF).
-> >>
-> >But mdev port has unique phys_port_name in system, it incorrect to use
-> PF/VF prefix.
->=20
-> Why incorrect? It is always bound to pf/vf?
->=20
-Because mdev device already identified using its unique alias. Why does it =
-need prefix?
-Mdev core generating the alias is not aware of the prefixes applied devlink=
-. it shouldn't be.
-We want more letters towards uniqueness of the alias and filling it up with=
- such prefixes doesn't make sense.
+More context:
 
-> >What in hypothetical case, mdev is not on top of PCI...
->=20
-> Okay, let's go hypothetical. In that case, it is going to be on top of so=
-mething
-> else, wouldn't it?
-Yes, it will be. But just because it is on top of something, doesn't mean w=
-e include the whole parent dev, its bridge, its rc hierarchy here.
-There should be a need.
-It was needed in PF/VF case due to overlapping numbers of VFs via single de=
-vlink instance. You probably missed my reply to Jakub.
-Here it is no overlap.
+@@ -489,30 +490,38 @@ static void gic_test_mmio(void)
+        u32 reg;
+        int nr_irqs;
+        void *gic_dist_base, *idreg;
+ 
+        switch(gic_version()) {
+        case 0x2:
+                gic_dist_base = gicv2_dist_base();
+                idreg = gic_dist_base + GICD_ICPIDR2;
+                break;
+        case 0x3:
+-               report_abort("GICv3 MMIO tests NYI");
++               /*
++                * We only test generic registers or those affecting
++                * SPIs, so don't need to consider the SGI base in
++                * the redistributor here.
++                */
++               gic_dist_base = gicv3_dist_base();
++               idreg = gic_dist_base + GICD_PIDR2;
++               break;
+        default:
+                report_abort("GIC version %d not supported", gic_version());
+        }
+ 
+        reg = readl(gic_dist_base + GICD_TYPER);
+        nr_irqs = GICD_TYPER_IRQS(reg);
+        report_info("number of implemented SPIs: %d", nr_irqs - GIC_FIRST_SPI);
+ 
+-       test_typer_v2(reg);
++       if (gic_version() == 0x2)
++               test_typer_v2(reg);
+ 
+        report_info("IIDR: 0x%08x", readl(gic_dist_base + GICD_IIDR));
+ 
+        report("GICD_TYPER is read-only",
+               test_readonly_32(gic_dist_base + GICD_TYPER, false));
+        report("GICD_IIDR is read-only",
+               test_readonly_32(gic_dist_base + GICD_IIDR, false));
+ 
+        reg = readl(idreg);
+        report("ICPIDR2 is read-only", test_readonly_32(idreg, false));
 
+In the case of GICv3, the register is GICD_PIDR2, not ICPIDR2. You can probably
+use a different variable to store the identification register name.
+
+>  
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index daeb5a0..12ac142 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -86,28 +86,46 @@ smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  extra_params = -machine gic-version=2 -append 'ipi'
+>  groups = gic
+>  
+> -[gicv2-mmio]
+> +[gicv3-ipi]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'ipi'
+> +groups = gic
+> +
+> +[gicv2-max-mmio]
+
+The renaming is not mentioned in the commit message. If you want to rename these
+tests, can you rename them to gic{v2,v3}-mmio-max so they're consistent with the
+other test names?
+
+Thanks,
+Alex
+>  file = gic.flat
+>  smp = $((($MAX_SMP < 8)?$MAX_SMP:8))
+>  extra_params = -machine gic-version=2 -append 'mmio'
+>  groups = gic
+>  
+> +[gicv3-max-mmio]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'mmio'
+> +groups = gic
+> +
+>  [gicv2-mmio-up]
+>  file = gic.flat
+>  smp = 1
+>  extra_params = -machine gic-version=2 -append 'mmio'
+>  groups = gic
+>  
+> +[gicv3-mmio-up]
+> +file = gic.flat
+> +smp = 1
+> +extra_params = -machine gic-version=3 -append 'mmio'
+> +groups = gic
+> +
+>  [gicv2-mmio-3p]
+>  file = gic.flat
+>  smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+>  extra_params = -machine gic-version=2 -append 'mmio'
+>  groups = gic
+>  
+> -[gicv3-ipi]
+> +[gicv3-mmio-3p]
+>  file = gic.flat
+> -smp = $MAX_SMP
+> -extra_params = -machine gic-version=3 -append 'ipi'
+> +smp = $((($MAX_SMP < 3)?$MAX_SMP:3))
+> +extra_params = -machine gic-version=2 -append 'mmio'
+>  groups = gic
+>  
+>  [gicv2-active]
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index 347be2f..ed6a5ad 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -23,6 +23,8 @@
+>  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+>  #define GICD_CTLR_ENABLE_G1		(1U << 0)
+>  
+> +#define GICD_PIDR2			0xffe8
+> +
+>  /* Re-Distributor registers, offsets from RD_base */
+>  #define GICR_TYPER			0x0008
+>  
