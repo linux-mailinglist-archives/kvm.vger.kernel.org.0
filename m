@@ -2,115 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C9E1F434B
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 10:30:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0ED0F4363
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 10:35:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731680AbfKHJaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 04:30:05 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55525 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730308AbfKHJaE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 04:30:04 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b11so5388461wmb.5
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 01:30:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=eRd0zmMB4Oip3e8n6DWloWHkrMJLlIZOg5WL86fDovg=;
-        b=0NSpx/IDuQdnoIZy19Y0yM2QJt58YDICwJ4a7AMmOg48/omhFz00Y3Q7fjfm/u43pS
-         qJoPv2TxzTidCqU4Yk+KCzg8RliD/nMvHjLYCL9c0cX0jN2V4noSCASC26saLAeIkPqY
-         B0I+MLE22D+vDwKXA0hKALOrmVcEu1pRQ3Cv24z6vZhCi8eIhlJEEQvsQoPv5syyEA3+
-         KHHBcFYYgqqe9H7QLxc9f4OtSkxXu1KaZJBSfRVoce1L7aKqElEruVQJRS6ejpTcibWr
-         FSD5MV3h+aYhvB97vgIWI2eXYP9O93ZIcdrpsz9ulyaPcr83FZrftkrKcCREv4DCmhgo
-         v63w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=eRd0zmMB4Oip3e8n6DWloWHkrMJLlIZOg5WL86fDovg=;
-        b=c5JKHlrRTAS1N7akQynDcv92sv9wea3sos9NplF25ENnwfS1hWSINUZXIa0G7Unoq5
-         L3o2373kcQ98Z4WbVc6c6ckN9AaaEUzaj99aN00GDtQ5zKyJBv1Ri59VS6+CLJfq6uE3
-         RqVZgmUcwpqrf0prYAZ1EKCb/04snqS5FCh7UuR/XtMetvm4NW3GW7StIXGhI9uqKpFg
-         Dclqmvy5i046eUhwIa6ql1eM7R8ik/VuLPrhj+Ji56g+DdT67HIO/Oprumb/MATHQ5fj
-         0QnpUZRai6ixaSp+xAqKmxUyJmTg8f69ny0/4tB0ptBmRMQshb8KRh/ESuRwtJ1XcwrE
-         L3mQ==
-X-Gm-Message-State: APjAAAUb+dxzzjlUffbif4frO8krBWbhTNnqkE3qGqfExoQSKYgefngw
-        J3LhELkJX9YjLMUShKiQjTOJyg==
-X-Google-Smtp-Source: APXvYqxFxGq6zoV4dqGUNzRMeIm6xAvEtpyaWMtpTKpSJPx4AuHUcLsFpiL3EB2rj/hFxjSgv7WKcg==
-X-Received: by 2002:a7b:c408:: with SMTP id k8mr7630339wmi.67.1573205402525;
-        Fri, 08 Nov 2019 01:30:02 -0800 (PST)
-Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id z13sm5907160wrm.64.2019.11.08.01.30.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 01:30:02 -0800 (PST)
-Date:   Fri, 8 Nov 2019 10:30:01 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     Parav Pandit <parav@mellanox.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next 12/19] devlink: Introduce mdev port flavour
-Message-ID: <20191108093001.GA6990@nanopsycho>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-12-parav@mellanox.com>
- <20191107153836.29c09400@cakuba.netronome.com>
- <AM0PR05MB4866963BE7BA1EE0831C9624D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191107201750.6ac54aed@cakuba>
- <AM0PR05MB4866BEC2A2B586AA72BAA9ABD17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191107212024.61926e11@cakuba>
+        id S1730144AbfKHJfm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 04:35:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55793 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728513AbfKHJfl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 04:35:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573205741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K9rdZ713uN02L/TUP3kmVf9uZmsoSvxQ0XKmnFq1Lrc=;
+        b=P3aI0jTGXiYfrBNPcx4wPuMfPxLCSugTi4YVZhinnKWHLjaW5Wgg/XxGly6ue4vRdm9iNY
+        snB6iWWcLtg+DCmk5Jl0UNZVzYwiQ5rgMKPvem9kB5OLd5HuwtEiPwCyb0KQS8eKKcyyfa
+        jZjJb5XeJxJA5VZqPWZrMn0lsIlT1rA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-Z5O40O75MruFaEXFb2k-Zw-1; Fri, 08 Nov 2019 04:35:39 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4802D800A1A;
+        Fri,  8 Nov 2019 09:35:38 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-167.ams2.redhat.com [10.36.116.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8952F100194E;
+        Fri,  8 Nov 2019 09:35:34 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: SCLP unit test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com
+References: <1572023194-14370-1-git-send-email-imbrenda@linux.ibm.com>
+ <1572023194-14370-6-git-send-email-imbrenda@linux.ibm.com>
+ <191dbc7f-74b2-6f78-a721-aaac49895948@linux.ibm.com>
+ <20191104121901.3b3ab68b@p-imbrenda.boeblingen.de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b4344967-54d2-5b57-8d36-dd1361654c8e@redhat.com>
+Date:   Fri, 8 Nov 2019 10:35:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191107212024.61926e11@cakuba>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191104121901.3b3ab68b@p-imbrenda.boeblingen.de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: Z5O40O75MruFaEXFb2k-Zw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fri, Nov 08, 2019 at 03:20:24AM CET, jakub.kicinski@netronome.com wrote:
->On Fri, 8 Nov 2019 01:44:53 +0000, Parav Pandit wrote:
-
+On 04/11/2019 12.19, Claudio Imbrenda wrote:
+> On Mon, 4 Nov 2019 10:45:07 +0100
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 [...]
+>>> +static void test_toolong(void)
+>>> +{
+>>> +=09uint32_t cmd =3D SCLP_CMD_WRITE_EVENT_DATA;
+>>> +=09uint16_t res =3D SCLP_RC_SCCB_BOUNDARY_VIOLATION;
+>>
+>> Why use variables for constants that are never touched?
+>=20
+> readability mostly. the names of the constants are rather long.
+> the compiler will notice it and do the Right Thing=E2=84=A2
 
->> > > > > @@ -6649,6 +6678,9 @@ static int  
->> > > > __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,  
->> > > > >  		n = snprintf(name, len, "pf%uvf%u",
->> > > > >  			     attrs->pci_vf.pf, attrs->pci_vf.vf);
->> > > > >  		break;
->> > > > > +	case DEVLINK_PORT_FLAVOUR_MDEV:
->> > > > > +		n = snprintf(name, len, "p%s", attrs->mdev.mdev_alias);  
->> > > >
->> > > > Didn't you say m$alias in the cover letter? Not p$alias?
->> > > >  
->> > > In cover letter I described the naming scheme for the netdevice of the
->> > > mdev device (not the representor). Representor follows current unique
->> > > phys_port_name method.  
->> > 
->> > So we're reusing the letter that normal ports use?
->> >  
->> I initially had 'm' as prefix to make it easy to recognize as mdev's port, instead of 'p', but during internal review Jiri's input was to just use 'p'.
->
->Let's way for Jiri to weigh in then.
+I'd like to suggest to add the "const" keyword to both variables in that=20
+case, then it's clear that they are not used to be modified.
 
-Hmm, it's been so far I can't really recall. But looking at what we have
-now:
-DEVLINK_PORT_FLAVOUR_PHYSICAL "p%u"/"p%us%u"
-DEVLINK_PORT_FLAVOUR_PCI_PF   "pf%u"
-DEVLINK_PORT_FLAVOUR_PCI_VF   "pf%uvf%u"
-For mdev, the ideal format would be:
-"pf%um%s" or "pf%uvf%um%s", but that would be too long.
-I guess that "m%s" is fine.
-"p" is probably not a good idea as phys ports already have that.
+>>> +=09=09h->length =3D 4096;
+>>> +
+>>> +=09=09valid_code =3D commands[i];
+>>> +=09=09cc =3D sclp_service_call(commands[i], h);
+>>> +=09=09if (cc)
+>>> +=09=09=09break;
+>>> +=09=09if (h->response_code =3D=3D
+>>> SCLP_RC_NORMAL_READ_COMPLETION)
+>>> +=09=09=09return;
+>>> +=09=09if (h->response_code !=3D
+>>> SCLP_RC_INVALID_SCLP_COMMAND)
+>>> +=09=09=09break;
+>>
+>> Depending on line length you could add that to the cc check.
+>> Maybe you could also group the error conditions before the success
+>> conditions or the other way around.
+>=20
+> yeah it woud fit, but I'm not sure it would be more readable:
+>=20
+> if (cc || (h->response_code !=3D SCLP_RC_INVALID_SCLP_COMMAND))
+>                          break;
 
-[...]
+In case you go with that solution, please drop the innermost parentheses.
+
+  Thomas
+
