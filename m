@@ -2,135 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2BBF4AF1
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 13:13:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E051F4B44
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 13:15:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732830AbfKHMMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 07:12:37 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35983 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732993AbfKHMMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 07:12:36 -0500
-Received: by mail-wm1-f66.google.com with SMTP id c22so6013601wmd.1
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 04:12:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=vi0FXEb1SaKZF+1W08jxMvHKOZ5OFQySHO0NRC440W8=;
-        b=k63tbg3ComKTwLI7+A1lutM9sDSJqb95sZk2Bbq4O05Sg5yWeq5zkkNHdIw6xvDmrC
-         euJGRWxMCSlcwjvNTfZ82ueGzCQiYa/6POan1a/f9HsxbcNhsse+bqBFXUzBDt8Xnibi
-         qGce4fdYovXckgOKtMI9rFnE4e1ZP6pR9xvGLIIcsHGQvaXCpYSz1tq4MSGpnsJo2XFu
-         B5PAbUZ/RW2h0cwPeCDqssLxNgKzGiFEv8CikCvCb+NBCLtjIghXvVI7ZSI2Ux13+XH9
-         iygblYqwJLz0u3VZyjVQI8qDa7ftROqQ/SROAdW6SHeXdGYvixBnp4LQC7k5hfdEBohT
-         RqKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vi0FXEb1SaKZF+1W08jxMvHKOZ5OFQySHO0NRC440W8=;
-        b=TVLdJpqHTOjCHR+mDbO6x7H5wO0ie/zp69Mg0WsdbMzQHglmJqScvu6xj1L4Nf175U
-         b0wTzOFckkE5nBB3cbP4BAtZjmpd9cbhe6OYFrldWjrzQko4jXm72BrcrCJ6l4qard7Q
-         0m2R2F1MUS4G4DrENH9ek7VSpUmYUuFtrld6WzwKKXIzB7NsQkFeQPCmysqbtk+cWCID
-         8IH3aUtRgYmwVQKlOftsn2XHHOv6/SHofiUwByRbt74w6EprPuAD7iGL+BoU/b3MNCL+
-         zHQMawiECqSXywqmCOmAmH/4MiZI2Nb9aXV/b1Eqj94y7GBvMFmXGC1uDNUKunwKxiab
-         xqpQ==
-X-Gm-Message-State: APjAAAV1+00Ud18xDvbsFIjU0/bcIHIdaA2hXq+EqEqfY8twT6ncjQET
-        FOiM2pGsn9CLMwINVRDh0EX02A==
-X-Google-Smtp-Source: APXvYqyaVvcyf53tsacNRyq5/ftg7f45Rs1oRCuUUTHNz0pnl3bHqejbD4wPXM08nTvMBhQQvwJoOw==
-X-Received: by 2002:a05:600c:2945:: with SMTP id n5mr8532196wmd.80.1573215154142;
-        Fri, 08 Nov 2019 04:12:34 -0800 (PST)
-Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id p10sm6917186wmi.44.2019.11.08.04.12.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 04:12:33 -0800 (PST)
-Date:   Fri, 8 Nov 2019 13:12:33 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     Parav Pandit <parav@mellanox.com>, alex.williamson@redhat.com,
-        davem@davemloft.net, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        saeedm@mellanox.com, kwankhede@nvidia.com, leon@kernel.org,
-        cohuck@redhat.com, jiri@mellanox.com, linux-rdma@vger.kernel.org,
-        Or Gerlitz <gerlitz.or@gmail.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191108121233.GJ6990@nanopsycho>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107153234.0d735c1f@cakuba.netronome.com>
+        id S2389837AbfKHMO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 07:14:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47631 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1733035AbfKHMO6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Nov 2019 07:14:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573215297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H7WeKdbRoP0tf6imHAoI5OYJTFpoEhjRxxfTT3g7nMc=;
+        b=E6p1EtckGZbuxVUl9OAvils/N07E3DauM+C7qNFaJDcus2T0unW+z3/y5KRA29utvHBTyJ
+        rmEUOcvXkJtgKk40sW3XXDrAmrT/eYlP1Y1WhL+mjgRu/miZKeXNhHCKyQVR3L1faur/Io
+        4PYr4dgkJas5yGwESQfpypJHHFRH5AE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-8Dd2l3zKP5SMbEJhjg0Hjw-1; Fri, 08 Nov 2019 07:14:54 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2DD1477;
+        Fri,  8 Nov 2019 12:14:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-167.ams2.redhat.com [10.36.116.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EDDA6084E;
+        Fri,  8 Nov 2019 12:14:47 +0000 (UTC)
+Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, david@redhat.com,
+        imbrenda@linux.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-3-frankja@linux.ibm.com>
+ <20191104165427.0e5e6da4.cohuck@redhat.com>
+ <5a34febd-8abc-84f5-195e-43decbb366a5@de.ibm.com>
+ <20191105102654.223e7b42.cohuck@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <9bbd0930-c55c-084b-6ae1-6a5df6a33778@redhat.com>
+Date:   Fri, 8 Nov 2019 13:14:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191107153234.0d735c1f@cakuba.netronome.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191105102654.223e7b42.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 8Dd2l3zKP5SMbEJhjg0Hjw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thu, Nov 07, 2019 at 09:32:34PM CET, jakub.kicinski@netronome.com wrote:
->On Thu,  7 Nov 2019 10:04:48 -0600, Parav Pandit wrote:
->> Mellanox sub function capability allows users to create several hundreds
->> of networking and/or rdma devices without depending on PCI SR-IOV support.
->
->You call the new port type "sub function" but the devlink port flavour
->is mdev.
->
->As I'm sure you remember you nacked my patches exposing NFP's PCI 
->sub functions which are just regions of the BAR without any mdev
->capability. Am I in the clear to repost those now? Jiri?
+On 05/11/2019 10.26, Cornelia Huck wrote:
+> On Mon, 4 Nov 2019 18:50:12 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>=20
+>> On 04.11.19 16:54, Cornelia Huck wrote:
+>>> On Thu, 24 Oct 2019 07:40:24 -0400
+>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>=20
+>>>> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
+>>>> index ed007f4a6444..88cf8825d169 100644
+>>>> --- a/arch/s390/boot/uv.c
+>>>> +++ b/arch/s390/boot/uv.c
+>>>> @@ -3,7 +3,12 @@
+>>>>   #include <asm/facility.h>
+>>>>   #include <asm/sections.h>
+>>>>  =20
+>>>> +#ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+>>>>   int __bootdata_preserved(prot_virt_guest);
+>>>> +#endif
+>>>> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
+>>>> +struct uv_info __bootdata_preserved(uv_info);
+>>>> +#endif
+>>>
+>>> Two functions with the same name, but different signatures look really
+>>> ugly.
+>>>
+>>> Also, what happens if I want to build just a single kernel image for
+>>> both guest and host?
+>>
+>> This is not two functions with the same name. It is 2 variable declarati=
+ons with
+>> the __bootdata_preserved helper. We expect to have all distro kernels to=
+ enable
+>> both.
+>=20
+> Ah ok, I misread that. (I'm blaming lack of sleep :/)
 
-Well question is, if it makes sense to have SFs without having them as
-mdev? I mean, we discussed the modelling thoroughtly and eventually we
-realized that in order to model this correctly, we need SFs on "a bus".
-Originally we were thinking about custom bus, but mdev is already there
-to handle this.
+Honestly, I have to admit that I mis-read this in the same way as=20
+Cornelia at the first glance. Why is that macro not using capital=20
+letters? ... then it would be way more obvious that it's not about a=20
+function prototype...
 
-Our SFs are also just regions of the BAR, same thing as you have.
+  Thomas
 
-Can't you do the same for nfp SFs?
-Then the "mdev" flavour is enough for all.
-
-
->
->> Overview:
->> ---------
->> Mellanox ConnectX sub functions are exposed to user as a mediated
->> device (mdev) [2] as discussed in RFC [3] and further during
->> netdevconf0x13 at [4].
->> 
->> mlx5 mediated device (mdev) enables users to create multiple netdevices
->> and/or RDMA devices from single PCI function.
->> 
->> Each mdev maps to a mlx5 sub function.
->> mlx5 sub function is similar to PCI VF. However it doesn't have its own
->> PCI function and MSI-X vectors.
->> 
->> mlx5 mdevs share common PCI resources such as PCI BAR region,
->> MSI-X interrupts.
->> 
->> Each mdev has its own window in the PCI BAR region, which is
->> accessible only to that mdev and applications using it.
->> 
->> Each mlx5 sub function has its own resource namespace for RDMA resources.
->> 
->> mdevs are supported when eswitch mode of the devlink instance
->> is in switchdev mode described in devlink documentation [5].
->
->So presumably the mdevs don't spawn their own devlink instance today,
->but once mapped via VIRTIO to a VM they will create one?
-
-I don't think it is needed for anything. Maybe one day if there is a
-need to create devlink instance for VF or SF, we can add it. But
-currently, I don't see the need.
-
-
->
->It could be useful to specify.
->
->> Network side:
->> - By default the netdevice and the rdma device of mlx5 mdev cannot send or
->> receive any packets over the network or to any other mlx5 mdev.
->
->Does this mean the frames don't fall back to the repr by default?
-
-That would be the sane default. If I up the representor, I should see
-packets coming in from SF/VF and I should be able to send packets back.
