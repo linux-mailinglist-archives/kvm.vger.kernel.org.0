@@ -2,50 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1BCEF4F17
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:15:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EF65F4FA6
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 16:28:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbfKHPPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 10:15:40 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:33492 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbfKHPPj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Nov 2019 10:15:39 -0500
-Received: by mail-wm1-f65.google.com with SMTP id a17so6835485wmb.0
-        for <kvm@vger.kernel.org>; Fri, 08 Nov 2019 07:15:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=VADyXkmyEZwfz7UJm4aPW0AfoCAr6udjM9RfkA0/AnM=;
-        b=NndXX4Geris7hE8V/Ztnx+9bbxzvSDFEhdn26kChY8owv7CATc2cz9mhRKtGY4nwSL
-         Oyb43cBXpw93oZfh+ia9K8r3NlRuke95gm4KhOQMSuA3WUiKNaIUunHFUzmG7dCLmzUY
-         ccYtg9tPwXvJew37XZ9GriStnVOfCN9yoA+KaQFXB5xT2sVc3xn6tsAaK8WvV0lnxCwJ
-         4fo+I6EwSiImHP4gyJjvq0ZTmEfJG3HlksfGCE3u5tmPctQXeGCPWWi4JItZQ8rbu3MP
-         nP0m2i2YjP42HW6R3f3xJvJFYaxu4OuZjEU3ueIPhd6B5ZpDl0JZe434fpEfDpFF7VxU
-         ypOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=VADyXkmyEZwfz7UJm4aPW0AfoCAr6udjM9RfkA0/AnM=;
-        b=LVp0Uabwj2kukpZirqArvQpwlp4PFHN22uC6blzEPKsgp5D96MH+QwnKaE6UjwI1lc
-         VRZ+AoTrehQj7LTgYUNiU+Fa6I1uIQ3622nbJojmpkenRPqgKbCjTJv2wMG4VUQEKyKF
-         jnKsY5B+SSbrCWKj5GLDke3OSS8hScgK0yUDWxPglFjlBWb8oC10pPe9vIujL8QzuZq/
-         Hj22ut80brScztuaZJQSvd0sNyuhr9Bg46gXf5I3iNzRS8Z9c4guUSdAi3t4lGeuPq1c
-         ZhHQ7SUAXUKPSyRnxSxsmyM5+dcTvyBZQmTKQXBoeWUjJfhZ0/YCM1sRWBf/X/q1WYMV
-         Vaig==
-X-Gm-Message-State: APjAAAUPlve1DaKSGMqiUcPCXQOoWxdCN/pdberrU2wU77sknTDJRVFZ
-        +hkp7v3W1LV12ubPGcTKGae4TQ==
-X-Google-Smtp-Source: APXvYqzINYRoUuFX5NaF77jpHF+D0eryv4W23kT3xH8z73wcQ98F4Yz0rU59bhdkqSPWnxEUfSRslQ==
-X-Received: by 2002:a1c:39c1:: with SMTP id g184mr8682539wma.75.1573226136346;
-        Fri, 08 Nov 2019 07:15:36 -0800 (PST)
-Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
-        by smtp.gmail.com with ESMTPSA id d202sm5462271wmd.47.2019.11.08.07.15.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2019 07:15:36 -0800 (PST)
-Date:   Fri, 8 Nov 2019 16:15:35 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
+        id S1726670AbfKHP2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 10:28:41 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55602 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726039AbfKHP2l (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 Nov 2019 10:28:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573226920;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1QBNaeRqVhOTuFGhH+r1/YHHaqfBgjb8zMTl6JtH3Jw=;
+        b=SOCxnQ4nbu04HJc+YyrULLNJsNG068lzDViJQN+ahrW1rZf6z7vrBgnyV1NFhaMb5hGyIx
+        Lhhp5vZCichQj4oxavrio1N+vOwVhCee5Joj5QewYBNFsQEmdvbQT52mfPhym+9wkg78Ks
+        dQqy9zRkCv5w/pV56qIgKyha1Mrpi7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-BlfJgfpqPlCRIFNN-hdLvQ-1; Fri, 08 Nov 2019 10:28:36 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 607CF180496F;
+        Fri,  8 Nov 2019 15:28:35 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 053EE50;
+        Fri,  8 Nov 2019 15:28:30 +0000 (UTC)
+Date:   Fri, 8 Nov 2019 16:28:28 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
 To:     Parav Pandit <parav@mellanox.com>
 Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
@@ -54,66 +42,73 @@ Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         Saeed Mahameed <saeedm@mellanox.com>,
         "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
         "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
 Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
-Message-ID: <20191108151535.GL6990@nanopsycho>
+Message-ID: <20191108162828.6e12fc05.cohuck@redhat.com>
+In-Reply-To: <AM0PR05MB48667622386BBC6D52BE8BE8D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
 References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107160834.21087-1-parav@mellanox.com>
- <20191107160834.21087-19-parav@mellanox.com>
- <20191108104505.GF6990@nanopsycho>
- <AM0PR05MB486674869FD72D1FCE3C7B53D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191107160834.21087-1-parav@mellanox.com>
+        <20191107160834.21087-19-parav@mellanox.com>
+        <20191108144615.3646e9bb.cohuck@redhat.com>
+        <AM0PR05MB48667622386BBC6D52BE8BE8D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB486674869FD72D1FCE3C7B53D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: BlfJgfpqPlCRIFNN-hdLvQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fri, Nov 08, 2019 at 04:08:22PM CET, parav@mellanox.com wrote:
->
->
->> -----Original Message-----
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Friday, November 8, 2019 4:45 AM
->> To: Parav Pandit <parav@mellanox.com>
->> Cc: alex.williamson@redhat.com; davem@davemloft.net;
->> kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
->> <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org;
->> cohuck@redhat.com; Jiri Pirko <jiri@mellanox.com>; linux-
->> rdma@vger.kernel.org
->> Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
->> 
->> Thu, Nov 07, 2019 at 05:08:34PM CET, parav@mellanox.com wrote:
->> >Provide a module parameter to set alias length to optionally generate
->> >mdev alias.
->> >
->> >Example to request mdev alias.
->> >$ modprobe mtty alias_length=12
->> >
->> >Make use of mtty_alias() API when alias_length module parameter is set.
->> >
->> >Signed-off-by: Parav Pandit <parav@mellanox.com>
->> 
->> This patch looks kind of unrelated to the rest of the set.
->> I think that you can either:
->> 1) send this patch as a separate follow-up to this patchset
->> 2) use this patch as a user and push out the mdev alias patches out of this
->> patchset to a separate one (I fear that this was discussed and declined
->> before).
->Yes, we already discussed to run mdev 5-6 patches as pre-patch before this series when reviewed on kvm mailing list.
->Alex was suggesting to package with this series as mlx5_core being the first user.
->Series will have conflict (not this patch) if Jason Wang's series [9] is merged first.
->So please let me know how shall we do it.
+On Fri, 8 Nov 2019 15:10:42 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
-Just remove this patch from the set and push it later on individually
-(if ever).
+> > -----Original Message-----
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Sent: Friday, November 8, 2019 7:46 AM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: alex.williamson@redhat.com; davem@davemloft.net;
+> > kvm@vger.kernel.org; netdev@vger.kernel.org; Saeed Mahameed
+> > <saeedm@mellanox.com>; kwankhede@nvidia.com; leon@kernel.org; Jiri
+> > Pirko <jiri@mellanox.com>; linux-rdma@vger.kernel.org
+> > Subject: Re: [PATCH net-next 19/19] mtty: Optionally support mtty alias
+> >=20
+> > On Thu,  7 Nov 2019 10:08:34 -0600
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >  =20
+> > > Provide a module parameter to set alias length to optionally generate
+> > > mdev alias.
+> > >
+> > > Example to request mdev alias.
+> > > $ modprobe mtty alias_length=3D12
+> > >
+> > > Make use of mtty_alias() API when alias_length module parameter is se=
+t.
+> > >
+> > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > > ---
+> > >  samples/vfio-mdev/mtty.c | 13 +++++++++++++
+> > >  1 file changed, 13 insertions(+) =20
+> >=20
+> > If you already have code using the alias interface, you probably don't =
+need
+> > to add it to the sample driver here. Especially as the alias looks kind=
+ of
+> > pointless here. =20
+>=20
+> It is pointless.
+> Alex point when we ran through the series in August, was, QA should be ab=
+le to do cover coverage of mdev_core where there is mdev collision and mdev=
+_create() can fail.
+> And QA should be able to set alias length to be short to 1 or 2 letters t=
+o trigger it.
+> Hence this patch was added.
 
->
->[9] https://patchwork.ozlabs.org/patch/1190425
->
->
+If we want this for testing purposes, that should be spelled out
+explicitly (the above had already dropped from my cache). Even better
+if we had something in actual test infrastructure.
+
