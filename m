@@ -2,54 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72DAFF4285
-	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 09:49:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4549FF42EA
+	for <lists+kvm@lfdr.de>; Fri,  8 Nov 2019 10:15:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728513AbfKHItF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Nov 2019 03:49:05 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54732 "EHLO
+        id S1730221AbfKHJPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Nov 2019 04:15:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32680 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725975AbfKHItE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Nov 2019 03:49:04 -0500
+        by vger.kernel.org with ESMTP id S1730005AbfKHJPS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 8 Nov 2019 04:15:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573202943;
+        s=mimecast20190719; t=1573204516;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=opGy4doVYidYacou9lawqqOlVyY89OwzZVPLlNR9M5g=;
-        b=YbnOYTqNU+0ot54c2inrpw7bvN048/mNPYhcOka5b4vHWq44zQmrr5TUI8sR+r8Z7sk46f
-        XeF719lIwE97cE2SUXfgrCrPlgPw7j07QjJADvC+crooAyWjmZ5xlVWuw2qXb4YeoGxk71
-        uXe3YCcW/IPB7I1PQVIRFrnA0QldPxU=
+        bh=lg6bhAYAhOfeB0yDp6BWf3FiCrFGttRnQeXN92whASM=;
+        b=MCKszXjHU4xOCg4Pfd7IEFW66YjcwiAzC9liqAxeHMivaeXjO/OfXjq/Ux7upJMFn/EqXd
+        4Bs65tBEZJmmDT7rm9cMZZLTVFiO5g1yj3Cvpq9V3HCH6M0TruyOuwwvVPZwWvsasyclxt
+        4KqjDePLDHMmkU4r/3ItU64aKjugS3o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-6C9tTRZ6PhW0d5SSTAfDRg-1; Fri, 08 Nov 2019 03:49:00 -0500
+ us-mta-112-KFptTM_7MjKoCvmSN_658g-1; Fri, 08 Nov 2019 04:15:09 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01D09477;
-        Fri,  8 Nov 2019 08:48:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE3F1180496F;
+        Fri,  8 Nov 2019 09:15:08 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-167.ams2.redhat.com [10.36.116.167])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F1C5DA70;
-        Fri,  8 Nov 2019 08:48:57 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 4/6] Makefile: add "cxx-option" for C++
- builds
-To:     Bill Wendling <morbo@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     jmattson@google.com, sean.j.christopherson@intel.com
-References: <20191015000411.59740-1-morbo@google.com>
- <20191030210419.213407-1-morbo@google.com>
- <20191030210419.213407-5-morbo@google.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 97B055DA70;
+        Fri,  8 Nov 2019 09:15:03 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] s390x: Use loop to save and restore fprs
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, pmorel@linux.ibm.com
+References: <20191104085533.2892-1-frankja@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <3f1b2a69-aada-6375-4443-e2132369a4b2@redhat.com>
-Date:   Fri, 8 Nov 2019 09:48:56 +0100
+Message-ID: <5dfe4c62-5178-3e9c-b1bb-6814e020078e@redhat.com>
+Date:   Fri, 8 Nov 2019 10:15:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191030210419.213407-5-morbo@google.com>
+In-Reply-To: <20191104085533.2892-1-frankja@linux.ibm.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 6C9tTRZ6PhW0d5SSTAfDRg-1
+X-MC-Unique: KFptTM_7MjKoCvmSN_658g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -58,59 +54,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/10/2019 22.04, Bill Wendling wrote:
-> The C++ compiler may not support all of the same flags as the C
-> compiler. Add a separate test for these flags.
+On 04/11/2019 09.55, Janosch Frank wrote:
+> Let's save some lines in the assembly by using a loop to save and
+> restore the fprs.
 >=20
-> Signed-off-by: Bill Wendling <morbo@google.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   Makefile | 14 +++++++++++++-
->   1 file changed, 13 insertions(+), 1 deletion(-)
+>   s390x/cstart64.S | 38 ++++++--------------------------------
+>   1 file changed, 6 insertions(+), 32 deletions(-)
 >=20
-> diff --git a/Makefile b/Makefile
-> index 6201c45..9cb47e6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -48,6 +48,8 @@ include $(SRCDIR)/$(TEST_DIR)/Makefile
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 5dc1577..8e2b21e 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -99,44 +99,18 @@ memsetxc:
+>   =09lctlg=09%c0, %c0, 0(%r1)
+>   =09/* save fprs 0-15 + fpc */
+>   =09la=09%r1, GEN_LC_SW_INT_FPRS
+> -=09std=09%f0, 0(%r1)
+> -=09std=09%f1, 8(%r1)
+> -=09std=09%f2, 16(%r1)
+> -=09std=09%f3, 24(%r1)
+> -=09std=09%f4, 32(%r1)
+> -=09std=09%f5, 40(%r1)
+> -=09std=09%f6, 48(%r1)
+> -=09std=09%f7, 56(%r1)
+> -=09std=09%f8, 64(%r1)
+> -=09std=09%f9, 72(%r1)
+> -=09std=09%f10, 80(%r1)
+> -=09std=09%f11, 88(%r1)
+> -=09std=09%f12, 96(%r1)
+> -=09std=09%f13, 104(%r1)
+> -=09std=09%f14, 112(%r1)
+> -=09std=09%f15, 120(%r1)
+> +=09.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+> +=09std=09\i, \i * 8(%r1)
+> +=09.endr
+>   =09stfpc=09GEN_LC_SW_INT_FPC
+>   =09.endm
 >  =20
->   cc-option =3D $(shell if $(CC) -Werror $(1) -S -o /dev/null -xc /dev/nu=
-ll \
->                 > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi =
-;)
-> +cxx-option =3D $(shell if $(CXX) -Werror $(1) -S -o /dev/null -xc++ /dev=
-/null \
-> +              > /dev/null 2>&1; then echo "$(1)"; else echo "$(2)"; fi ;=
-)
->  =20
->   COMMON_CFLAGS +=3D -g $(autodepend-flags)
->   COMMON_CFLAGS +=3D -Wall -Wwrite-strings -Wempty-body -Wuninitialized
-> @@ -73,9 +75,19 @@ COMMON_CFLAGS +=3D $(wclobbered)
->   COMMON_CFLAGS +=3D $(wunused_but_set_parameter)
->  =20
->   CFLAGS +=3D $(COMMON_CFLAGS)
-> +CXXFLAGS +=3D $(COMMON_CFLAGS)
-> +
-> +wmissing_parameter_type :=3D $(call cc-option, -Wmissing-parameter-type,=
- "")
-> +wold_style_declaration :=3D $(call cc-option, -Wold-style-declaration, "=
-")
-> +CFLAGS +=3D $(wmissing_parameter_type)
-> +CFLAGS +=3D $(wold_style_declaration)
->   CFLAGS +=3D -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
->  =20
-> -CXXFLAGS +=3D $(COMMON_CFLAGS)
-> +# Clang's C++ compiler doesn't support some of the flags its C compiler =
-does.
-> +wmissing_parameter_type :=3D $(call cxx-option, -Wmissing-parameter-type=
-, "")
-> +wold_style_declaration :=3D $(call cxx-option, -Wold-style-declaration, =
-"")
-> +CXXFLAGS +=3D $(wmissing_parameter_type)
-> +CXXFLAGS +=3D $(wold_style_declaration)
+>   =09.macro RESTORE_REGS
+>   =09/* restore fprs 0-15 + fpc */
+>   =09la=09%r1, GEN_LC_SW_INT_FPRS
+> -=09ld=09%f0, 0(%r1)
+> -=09ld=09%f1, 8(%r1)
+> -=09ld=09%f2, 16(%r1)
+> -=09ld=09%f3, 24(%r1)
+> -=09ld=09%f4, 32(%r1)
+> -=09ld=09%f5, 40(%r1)
+> -=09ld=09%f6, 48(%r1)
+> -=09ld=09%f7, 56(%r1)
+> -=09ld=09%f8, 64(%r1)
+> -=09ld=09%f9, 72(%r1)
+> -=09ld=09%f10, 80(%r1)
+> -=09ld=09%f11, 88(%r1)
+> -=09ld=09%f12, 96(%r1)
+> -=09ld=09%f13, 104(%r1)
+> -=09ld=09%f14, 112(%r1)
+> -=09ld=09%f15, 120(%r1)
+> +=09.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+> +=09ld=09\i, \i * 8(%r1)
+> +=09.endr
+>   =09lfpc=09GEN_LC_SW_INT_FPC
+>   =09/* restore cr0 */
+>   =09lctlg=09%c0, %c0, GEN_LC_SW_INT_CR0
+>=20
 
-According to the man page of gcc-9, both options are for "C and=20
-Objective-C only". I think you can simply always remove them from the=20
-CXXFLAGS.
+Produces exactly the same code as before.
 
-  Thomas
+Tested-by: Thomas Huth <thuth@redhat.com>
 
