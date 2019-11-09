@@ -2,220 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9302F601F
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 16:50:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9229CF60AE
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 18:28:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726467AbfKIPt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 10:49:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50552 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726026AbfKIPt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 10:49:56 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A25C121848;
-        Sat,  9 Nov 2019 15:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573314595;
-        bh=sbzOTfC1vnyLazJ/1JUjHBfVrxtQ75rkBZ4xG9tQRIg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=R5AE/DXlBIjdMB4iZQrGtBv2p1VP2HICSbqgWuxzMUszxN2cj7h78KwVUSsMsxM07
-         9275R9jxjM4+3RNFYoVbZnMNdd9ZOrbCqUy8qv9BU5ffvf3ZpR8VXPByJSJf1hG3D1
-         6RTL8u9ZBhyOihuk9eiiw3X3mMtRwTBGfgEd6yvg=
-Date:   Sat, 9 Nov 2019 16:49:52 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM list <kvm@vger.kernel.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: "statsfs" API design
-Message-ID: <20191109154952.GA1365674@kroah.com>
-References: <5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com>
+        id S1726462AbfKIR1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 12:27:54 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43165 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbfKIR1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 12:27:54 -0500
+Received: by mail-pg1-f193.google.com with SMTP id l24so6216506pgh.10
+        for <kvm@vger.kernel.org>; Sat, 09 Nov 2019 09:27:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=LNQy0C8TcfPweZgVjRqECLUUZS65m+iNRLaqpO28cpc=;
+        b=T9i//IAbBC0AuabiLwtwWc7GE+oaapJVgv4mWfiAvm0tpKnuFX/p9p3+p75rgAkSCW
+         vpOG8Qzzsszbth7hG21E7J8LpS2L9ObGM1WfWGlbQUSUc7352dyS8kfQb1pM83mrZygG
+         Dk/C5Wht+yYMeqKw24JOr99J9W2Of3g3bwZ5vNaFVeLz9CYB0e3lPshdMTgtwaRNOu+C
+         0A1ZiQLKDsOumhuPldMxmrrRmlWULplc2cP0SgsU+BDidu7DgRvzbVl4PI4b3t7yslSH
+         aQDCflTyNxx9w6Jq4ZWzgUbSFetKEKa2Hae8760EUUZgrV340uyq8HPnQaQRxnUL3ypl
+         pL1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=LNQy0C8TcfPweZgVjRqECLUUZS65m+iNRLaqpO28cpc=;
+        b=a8wSQcwJapjaJMJL84U7z5G2oHlD37LF+xJ06tNez8nFWP3SkTvtqnNTvhPxOjmOgz
+         3Aj1VVLYEAYO1NrB3EPqZcM6DPZgpl8cNIxfpmGtlpTfXOypjKk/tZ7wCnLvIs5CFGm9
+         LzVmMFUmoyC6WneCDDug5CRhMX45G0HgBM3gHBciqr3GxwgFJeHX6qtNgQglmU0+2soh
+         0zD0HmlRS8sRY7tec5hZwUrQCuX/naJgAz5jyguS+EcArdm4BOKf6bG8i5S0L2zWR81m
+         nD/haR31AUHR53fFRib2+j4gVFzNjk/vpKRZgi3/+JtIs6hpIAK2LXHbduBk5tSKIyXn
+         r4IA==
+X-Gm-Message-State: APjAAAW/6aGWfW0NVazdzgIZ/uY0yvSn5sJ24XetF8NWgm5ajEzI7RhE
+        P98qVGeOlYTaW9dWp6zBWxkABw==
+X-Google-Smtp-Source: APXvYqyN0v9xi3O8NCMrCgGvJFhuxJlRvphL7ukGcg37cddjg2OFxXn/V8x/utaCJW36E2hLJrshfw==
+X-Received: by 2002:a17:90a:9f8a:: with SMTP id o10mr22359546pjp.91.1573320471840;
+        Sat, 09 Nov 2019 09:27:51 -0800 (PST)
+Received: from cakuba (c-73-202-202-92.hsd1.ca.comcast.net. [73.202.202.92])
+        by smtp.gmail.com with ESMTPSA id j14sm9273772pfi.168.2019.11.09.09.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2019 09:27:51 -0800 (PST)
+Date:   Sat, 9 Nov 2019 09:27:47 -0800
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Parav Pandit <parav@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
+        David M <david.m.ertman@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191109092747.26a1a37e@cakuba>
+In-Reply-To: <20191109004426.GB31761@ziepe.ca>
+References: <20191107160448.20962-1-parav@mellanox.com>
+        <20191107153234.0d735c1f@cakuba.netronome.com>
+        <20191108121233.GJ6990@nanopsycho>
+        <20191108144054.GC10956@ziepe.ca>
+        <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191108111238.578f44f1@cakuba>
+        <20191108201253.GE10956@ziepe.ca>
+        <20191108134559.42fbceff@cakuba>
+        <20191109004426.GB31761@ziepe.ca>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 04:56:25PM +0100, Paolo Bonzini wrote:
-> Hi all,
+On Fri, 8 Nov 2019 20:44:26 -0400, Jason Gunthorpe wrote:
+> On Fri, Nov 08, 2019 at 01:45:59PM -0800, Jakub Kicinski wrote:
+> > Yes, my suggestion to use mdev was entirely based on the premise that
+> > the purpose of this work is to get vfio working.. otherwise I'm unclear
+> > as to why we'd need a bus in the first place. If this is just for
+> > containers - we have macvlan offload for years now, with no need for a
+> > separate device.  
 > 
-> statsfs is a proposal for a new Linux kernel synthetic filesystem, to be
-> mounted in /sys/kernel/stats, which exposes subsystem-level statistics
-> in sysfs.  Reading need not be particularly lightweight, but writing
-> must be fast.  Therefore, statistics are gathered at a fine-grain level
-> in order to avoid locking or atomic operations, and then aggregated by
-> statsfs until the desired granularity.
+> This SF thing is a full fledged VF function, it is not at all like
+> macvlan. This is perhaps less important for the netdev part of the
+> world, but the difference is very big for the RDMA side, and should
+> enable VFIO too..
 
-Wait, reading a statistic from userspace can be slow, but writing to it
-from userspace has to be fast?  Or do you mean the speed is all for
-reading/writing the value within the kernel?
+Well, macvlan used VMDq so it was pretty much a "legacy SR-IOV" VF.
+I'd perhaps need to learn more about RDMA to appreciate the difference.
 
-> The first user of statsfs would be KVM, which is currently exposing its
-> stats in debugfs.  However, debugfs access is now limited by the
-> security lock down patches, and in addition statsfs aims to be a
-> more-or-less stable API, hence the idea of making it a separate
-> filesystem and mount point.
+> > On the RDMA/Intel front, would you mind explaining what the main
+> > motivation for the special buses is? I'm a little confurious.  
+> 
+> Well, the issue is driver binding. For years we have had these
+> multi-function netdev drivers that have a single PCI device which must
+> bind into multiple subsystems, ie mlx5 does netdev and RDMA, the cxgb
+> drivers do netdev, RDMA, SCSI initiator, SCSI target, etc. [And I
+> expect when NVMe over TCP rolls out we will have drivers like cxgb4
+> binding to 6 subsytems in total!]
 
-Nice, I've had people ask about something like this for a while now.
-For the most part they just dump stuff in sysfs instead (see the DRM
-patches recently for people attempting to do that for debugfs values as
-well.)
+What I'm missing is why is it so bad to have a driver register to
+multiple subsystems.
 
-> A few people have already expressed interest in this.  Christian
-> Borntraeger presented on the kvm_stat tool recently at KVM Forum and was
-> also thinking about using some high-level API in debugfs.  Google has
-> KVM patches to gather statistics in a binary format; it may be useful to
-> add this kind of functionality (and some kind of introspection similar
-> to what tracing does) to statsfs too in the future, but this is
-> independent from the kernel API.  I'm also CCing Alex Williamson, in
-> case VFIO is interested in something similar, and Steven Rostedt because
-> apparently he has enough free time to write poetry in addition to code.
-> 
-> There are just two concepts in statsfs, namely "values" (aka files) and
-> "sources" (directories).
-> 
-> A value represents a single quantity that is gathered by the statsfs
-> client.  It could be the number of vmexits of a given kind, the amount
-> of memory used by some data structure, the length of the longest hash
-> table chain, or anything like that.
-> 
-> Values are described by a struct like this one:
-> 
-> 	struct statsfs_value {
-> 		const char *name;
-> 		enum stat_type type;	/* STAT_TYPE_{BOOL,U64,...} */
-> 		u16 aggr_kind;		/* Bitmask with zero or more of
-> 					 * STAT_AGGR_{MIN,MAX,SUM,...}
-> 					 */
-> 		u16 mode;		/* File mode */
-> 		int offset;		/* Offset from base address
-> 					 * to field containing the value
-> 					 */
-> 	};
-> 
-> As you can see, values are basically integers stored somewhere in a
-> struct.   The statsfs_value struct also includes information on which
-> operations (for example sum, min, max, average, count nonzero) it makes
-> sense to expose when the values are aggregated.
+I've seen no end of hacks caused people trying to split their driver
+too deeply by functionality. Separate sub-drivers, buses and modules.
 
-What can userspace do with that info?
+The nfp driver was split up before I upstreamed it, I merged it into
+one monolithic driver/module. Code is still split up cleanly internally,
+the architecture doesn't change in any major way. Sure 5% of developers
+were upset they can't do some partial reloads they were used to, but
+they got used to the new ways, and 100% of users were happy about the
+simplicity.
 
-> Sources form the bulk of the statsfs API.  They can include two kinds of
-> elements:
-> 
-> - values as described above.  The common case is to have many values
-> with the same base address, which are represented by an array of struct
-> statsfs_value
-> 
-> - subordinate sources
-> 
-> Adding a subordinate source has two effects:
-> 
-> - it creates a subdirectory for each subordinate source
-> 
-> - for each value in the subordinate sources which has aggr_kind != 0,
-> corresponding values will be created in the parent directory too.  If
-> multiple subordinate sources are backed by the same array of struct
-> statsfs_value, values from all those sources will be aggregated.  That
-> is, statsfs will compute these from the values of all items in the list
-> and show them in the parent directory.
-> 
-> Writable values can only be written with a value of zero. Writing zero
-> to an aggregate zeroes all the corresponding values in the subordinate
-> sources.
-> 
-> Sources are manipulated with these four functions:
-> 
-> 	struct statsfs_source *statsfs_source_create(const char *fmt,
-> 						     ...);
-> 	void statsfs_source_add_values(struct statsfs_source *source,
-> 				       struct statsfs_value *stat,
-> 				       int n, void *ptr);
-> 	void statsfs_source_add_subordinate(
-> 					struct statsfs_source *source,
-> 					struct statsfs_source *sub);
-> 	void statsfs_source_remove_subordinate(
-> 					struct statsfs_source *source,
-> 					struct statsfs_source *sub);
-> 
-> Sources are reference counted, and for this reason there is also a pair
-> of functions in the usual style:
-> 
-> 	void statsfs_source_get(struct statsfs_source *);
-> 	void statsfs_source_put(struct statsfs_source *);
-> 
-> Finally,
-> 
-> 	void statsfs_source_register(struct statsfs_source *source);
-> 
-> lets you create a toplevel statsfs directory.
-> 
-> As a practical example, KVM's usage of debugfs could be replaced by
-> something like this:
-> 
-> /* Globals */
-> 	struct statsfs_value vcpu_stats[] = ...;
-> 	struct statsfs_value vm_stats[] = ...;
-> 	static struct statsfs_source *kvm_source;
-> 
-> /* On module creation */
-> 	kvm_source = statsfs_source_create("kvm");
-> 	statsfs_source_register(kvm_source);
-> 
-> /* On VM creation */
-> 	kvm->src = statsfs_source_create("%d-%d\n",
-> 				         task_pid_nr(current), fd);
-> 	statsfs_source_add_values(kvm->src, vm_stats,
-> 				  ARRAY_SIZE(vm_stats),
-> 				  &kvm->stats);
-> 	statsfs_source_add_subordinate(kvm_source, kvm->src);
-> 
-> /* On vCPU creation */
-> 	vcpu_src = statsfs_source_create("vcpu%d\n", vcpu->vcpu_id);
-> 	statsfs_source_add_values(vcpu_src, vcpu_stats,
-> 				  ARRAY_SIZE(vcpu_stats),
-> 				  &vcpu->stats);
-> 	statsfs_source_add_subordinate(kvm->src, vcpu_src);
-> 	/*
-> 	 * No need to keep the vcpu_src around since there's no
-> 	 * separate vCPU deletion event; rely on refcount
-> 	 * exclusively.
-> 	 */
-> 	statsfs_source_put(vcpu_src);
-> 
-> /* On VM deletion */
-> 	statsfs_source_remove_subordinate(kvm_source, kvm->src);
-> 	statsfs_source_put(kvm->src);
-> 
-> /* On KVM exit */
-> 	statsfs_source_put(kvm_source);
-> 
-> How does this look?
+For the nfp I think the _real_ reason to have a bus was that it
+was expected to have some out-of-tree modules bind to it. Something 
+I would not encourage :)
 
-Where does the actual values get changed that get reflected in the
-filesystem?
+Maybe RDMA and storage have some requirements where the reload of the
+part of the driver is important, IDK..
 
-I have some old notes somewhere about what people really want when it
-comes to a good "statistics" datatype, that I was thinking of building
-off of, but that seems independant of what you are doing here, right?
-This is just exporting existing values to userspace in a semi-sane way?
+> > My understanding is MFD was created to help with cases where single
+> > device has multiple pieces of common IP in it.   
+> 
+> MFD really seems to be good at splitting a device when the HW is
+> orthogonal at the register level. Ie you might have regs 100-200 for
+> ethernet and 200-300 for RDMA.
+> 
+> But this is not how modern HW works, the functional division is more
+> subtle and more software based. ie on most devices a netdev and rdma
+> queue are nearly the same, just a few settings make them function
+> differently.
+> 
+> So what is needed isn't a split of register set like MFD specializes
+> in, but a unique per-driver API between the 'core' and 'subsystem'
+> parts of the multi-subsystem device.
 
-Anyway, I like the idea, but what about how this is exposed to
-userspace?  The criticism of sysfs for statistics is that it is too slow
-to open/read/close lots of files and tough to get "at this moment in
-time these are all the different values" snapshots easily.  How will
-this be addressed here?
+Exactly, because the device is one. For my simplistic brain one device
+means one driver, which can register to as many subsystems as it wants.
 
-thanks,
+> > Do modern RDMA cards really share IP across generations?   
+> 
+> What is a generation? Mellanox has had a stable RDMA driver across
+> many sillicon generations. Intel looks like their new driver will
+> support at least the last two or more sillicon generations..
+> 
+> RDMA drivers are monstrous complex things, there is a big incentive to
+> not respin them every time a new chip comes out.
 
-greg k-h
+Ack, but then again none of the drivers gets rewritten from scratch,
+right? It's not that some "sub-drivers" get reused and some not, no?
+
+> > Is there a need to reload the drivers for the separate pieces (I
+> > wonder if the devlink reload doesn't belong to the device model :().  
+> 
+> Yes, it is already done, but without driver model support the only way
+> to reload the rdma driver is to unload the entire module as there is
+> no 'unbind'
+
+The reload is the only thing that I can think of (other than
+out-of-tree code), but with devlink no I believe it can be solved
+differently.
+
+Thanks a lot for the explanation Jason, much appreciated!
+
+The practicality of this is still a little elusive to me, but since 
+Greg seems on board I guess it's just me :)
