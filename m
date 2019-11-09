@@ -2,107 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CA07AF60C1
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 18:43:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 968F7F6145
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 20:57:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726583AbfKIRlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 12:41:08 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43230 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726496AbfKIRlI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 12:41:08 -0500
-Received: by mail-pf1-f195.google.com with SMTP id 3so7278362pfb.10
-        for <kvm@vger.kernel.org>; Sat, 09 Nov 2019 09:41:08 -0800 (PST)
+        id S1726457AbfKIT4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 14:56:52 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:32880 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726349AbfKIT4w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 14:56:52 -0500
+Received: by mail-pg1-f193.google.com with SMTP id h27so6387081pgn.0;
+        Sat, 09 Nov 2019 11:56:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=2B7miXvo12sd3AwR/N24hvrji1TnW/1jP59Zv1D2zxA=;
-        b=Ux66y2/Kev7fAowQYcNDFqBF2oMucxESjkkRfo8IKup+pQkx6c41HWBsZj9GcF/XH7
-         9q5bddJ0Ib4aWwuzqXvZ/f6ExZS0BhSgfZfP25ahtYi6cRFgd6bNKGUNcmMNHudNagcC
-         gCsZz3t6Mq+E1k40G+tbKVjUsRtLsUqFwOo01ugae2GCJvy2GLhJrtoc20el2oh7SbBf
-         ROYWJC/rPRLGrqeXE6yeGN7xdj1TF4KXEbxh+FAYZYVgj9tCuD0GO2qMFAKfYbcAHD09
-         n6ptYL86QvSyY/z14h/xrMQJ/T5NEtw6+1My7DBq0+zYNnCHlHm/tL1osxRC9TA7a9Sc
-         ltcA==
+        d=gmail.com; s=20161025;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=sLWE3rS63Cpkf+p4HwP4LC/KJ6xTAmv/RqA0nojUWoM=;
+        b=fAdAhYgwJKwty7+hqYCuAAzC/oBBAUd7GqZD3SHIuzj+eqZNIYlDs/fxpiOa0T4JZc
+         Z9+pJrjI1gxGklPWKQOYpBG76ru/KUvxodo43RasDGmLjzAsHsYmjHjrxIG2ll1IqfA4
+         eZa1FieBQEzxYwTNawDzwTc3EoJEW1a4qxgDAfKIcmqGNpwdCuNr7IxZJz9y6Lv1hEYZ
+         2qxBPO9Jc+126IrckZ4aXX0guMp1DDBTU9iczzUzONCL6OeTBPf9YcYrk5jcxxJ4gW92
+         sBP2yuHaaL6LRJ4GtcyCJAYhcFMTBYcZT2CGMybJ2XsWjme64ZoIMCiGPpl1tOXH9xKC
+         cNNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=2B7miXvo12sd3AwR/N24hvrji1TnW/1jP59Zv1D2zxA=;
-        b=PECECh9ViWVlO3mL3/NBhtVXhdZQbjVyeYzAhsOgOMEf1a++Dm8wr706H1gnOckIyy
-         /s++y2OQYQtkfqdALbj94lkeMczgNzLCRz0iMMAwNEI+lomvBxzxJ/GnnFDgTYR6MS8t
-         8/GH9lCD2fgrIzKWm301KzCRAfXN+7WlX7mquqapxN0U008Q+1GQibGBhQt2UdXGCkDq
-         MNEG4AgtEXeTNVjTt7/hytvhhXQAx6yhu/zEHVaovG1XxpAkc5As1LdhHbE1klNdoCZD
-         CUlRYAk5uAVuJTin1krJkQLbmbIh2SmADbKoJFdkk8EFau/HLXY+sgoUhOopVp749196
-         mKMg==
-X-Gm-Message-State: APjAAAWF4J/dsbUBJQeDKP2KcCUsTar9j4u78Igj7AR7qkqN8hpMhCgV
-        2f52CSJa+er18YcOynvHhkCHkg==
-X-Google-Smtp-Source: APXvYqzxYgwMmVIq1JfKtIHriDl97HY1zcdcpAYzr8weQ2+HF6xR/h1VetUuPsLmf6vJjuss1CYESw==
-X-Received: by 2002:a63:3205:: with SMTP id y5mr19364349pgy.42.1573321267604;
-        Sat, 09 Nov 2019 09:41:07 -0800 (PST)
-Received: from cakuba (c-73-202-202-92.hsd1.ca.comcast.net. [73.202.202.92])
-        by smtp.gmail.com with ESMTPSA id a23sm5103400pjv.26.2019.11.09.09.41.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Nov 2019 09:41:07 -0800 (PST)
-Date:   Sat, 9 Nov 2019 09:41:03 -0800
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Parav Pandit <parav@mellanox.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jiri Pirko <jiri@resnulli.us>,
-        David M <david.m.ertman@intel.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>,
-        "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191109094103.739033a3@cakuba>
-In-Reply-To: <20191109005708.GC31761@ziepe.ca>
-References: <20191107153234.0d735c1f@cakuba.netronome.com>
-        <20191108121233.GJ6990@nanopsycho>
-        <20191108144054.GC10956@ziepe.ca>
-        <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20191108111238.578f44f1@cakuba>
-        <20191108201253.GE10956@ziepe.ca>
-        <20191108133435.6dcc80bd@x1.home>
-        <20191108210545.GG10956@ziepe.ca>
-        <20191108145210.7ad6351c@x1.home>
-        <AM0PR05MB4866444210721BC4EE775D27D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20191109005708.GC31761@ziepe.ca>
-Organization: Netronome Systems, Ltd.
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=sLWE3rS63Cpkf+p4HwP4LC/KJ6xTAmv/RqA0nojUWoM=;
+        b=R6l2v62rID7Zepgp9b2x+VgUdHmx8rcOl2RVeMPq2caCbA5cCtSuoZ0IJ3wiKhRTO0
+         cUJ9w2RbbJj/ZHUoSaU19iqGZ4AzggUUaqv8TRoBVeMG45YhKSRLUX4WIhp00VkBAKL1
+         lTYOFBv3cHnlXuFdRFbJNEvXiyYviLGsiLtVhBYMOYK2q7L3OivuqNTyBnuBSm75oxh5
+         OxsAh8fc0UFECcSiKY2SLI5XR2fFQ4KfoxQWegNVp2qv6fV3NHnnCo7zxwLLktj19wwP
+         bLCviGGeEY88hS0bz2wntZIJ9Otvo0OhvJT4/T7U1e3azvyRY0x88+4Lx37/RJQQlhh1
+         dijA==
+X-Gm-Message-State: APjAAAXR4jlN++ufQ7TT8K/fGJTwvEEQOA00O1cSkFHUkNAuVrlHOdAk
+        dMPPMcYX/sVPSW2PiTBWmtLe4HKbC+M7JQ==
+X-Google-Smtp-Source: APXvYqwkpMtHuF6e0ZHz0Id4WN1/wzmYxymX9kUI/DmbK7uNv7OIWFpdllt3rhd3YEpuFVVABKIUAA==
+X-Received: by 2002:a62:b616:: with SMTP id j22mr19597192pff.201.1573329409964;
+        Sat, 09 Nov 2019 11:56:49 -0800 (PST)
+Received: from [192.168.1.104] (c-76-21-111-180.hsd1.ca.comcast.net. [76.21.111.180])
+        by smtp.gmail.com with ESMTPSA id f12sm9690619pfn.152.2019.11.09.11.56.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 09 Nov 2019 11:56:49 -0800 (PST)
+From:   Mark D Rustad <mrustad@gmail.com>
+Message-Id: <A48EFA5D-56C6-404B-96FF-75736FCFD11E@gmail.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_5BF3661D-48DD-4761-9FE1-54AFC65DF771";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 2/2] IFC VDPA layer
+Date:   Sat, 9 Nov 2019 11:56:46 -0800
+In-Reply-To: <1572946660-26265-3-git-send-email-lingshan.zhu@intel.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+References: <1572946660-26265-1-git-send-email-lingshan.zhu@intel.com>
+ <1572946660-26265-3-git-send-email-lingshan.zhu@intel.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 8 Nov 2019 20:57:08 -0400, Jason Gunthorpe wrote:
-> On Fri, Nov 08, 2019 at 10:48:31PM +0000, Parav Pandit wrote:
-> > We should be creating 3 different buses, instead of mdev bus being de-multiplexer of that?
-> > 
-> > Hence, depending the device flavour specified, create such device on right bus?
-> > 
-> > For example,
-> > $ devlink create subdev pci/0000:05:00.0 flavour virtio name foo subdev_id 1
-> > $ devlink create subdev pci/0000:05:00.0 flavour mdev <uuid> subdev_id 2
-> > $ devlink create subdev pci/0000:05:00.0 flavour mlx5 id 1 subdev_id 3  
-> 
-> I like the idea of specifying what kind of interface you want at sub
-> device creation time. It fits the driver model pretty well and doesn't
-> require abusing the vfio mdev for binding to a netdev driver.
 
-Aren't the HW resources spun out in all three cases exactly identical?
+--Apple-Mail=_5BF3661D-48DD-4761-9FE1-54AFC65DF771
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii;
+	delsp=yes;
+	format=flowed
 
-IMHO creation of sub device should only define which HW resources are
-provisioned/relegated. Specifying a driver when recreating a device
-seems a little backwards.
+On Nov 5, 2019, at 1:37 AM, Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+
+> This commit introduced IFC operations for vdpa, which complys to
+> virtio_mdev and vhost_mdev interfaces, handles IFC VF
+> initialization, configuration and removal.
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>  drivers/vhost/ifcvf/ifcvf_main.c | 605 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 605 insertions(+)
+>  create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
+>
+> diff --git a/drivers/vhost/ifcvf/ifcvf_main.c  
+> b/drivers/vhost/ifcvf/ifcvf_main.c
+> new file mode 100644
+> index 0000000..7165457
+> --- /dev/null
+> +++ b/drivers/vhost/ifcvf/ifcvf_main.c
+> @@ -0,0 +1,605 @@
+
+<snip>
+
+> +	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
+> +		if (!vf->vring[i].ready) {
+> +			IFC_ERR(ifcvf->dev,
+> +				"Failed to start datapath, vring %d not ready.\n", i);
+> +			return -EINVAL;
+> +		}
+> +
+> +		if (!vf->vring[i].size) {
+> +			IFC_ERR(ifcvf->dev,
+> +				"Failed to start datapath, vring %d size is zero.\n", i);
+> +			return -EINVAL;
+> +		}
+> +
+> +		if (!vf->vring[i].desc || !vf->vring[i].avail ||
+> +			!vf->vring[i].used) {
+> +			IFC_ERR(ifcvf->dev,
+> +				"Failed to start datapath, "
+> +				"invaild value for vring %d desc,"
+> +				"avail_idx or usex_idx.\n", i);
+
+Please don't break up the format string. Start it on the second line and  
+let it run as long as it needs to. Also you will find that it is improperly  
+spaced as it is. It makes it easier to grep the source to find the source  
+of a message. The coding style has an explicit exception for such long  
+lines for this reason.
+
+Also, please don't put .'s on the end of log messages. It serves no purpose  
+and just adds to the log, the binary size and the source size. There are  
+quite a few of these.
+
+<snip>
+
+--
+Mark Rustad, MRustad@gmail.com
+
+--Apple-Mail=_5BF3661D-48DD-4761-9FE1-54AFC65DF771
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIzBAEBCAAdFiEE6ug8b0Wg+ULmnksNPA7/547j7m4FAl3HGf4ACgkQPA7/547j
+7m5i5hAAp5HzGpa+FtAAiSu0nbqUTR1JdW8w3XQwR+PqLGPPDZm8o5j/NMowthPA
+YwP3oJvINev2V6ibYRePdFg9mvgqjAII61RSaXeNuFxX8feBZU5k5+UzaOx9/zZp
+rSafgIqKyEGiR5zSdoeK6GS852O18MAwKNmoc80vyARppI959f0D64rLjYi7ApOv
+9PcQ5J0JQqlMmj7EeYM1cHnnCtxANbGu011291JjjpcsYlB173Ma0CVSPzcmnBjw
+ZpRhiKhMaV8o0Pznc1b6NQIZMx7y+dGRYkaw7aeuJr9vCergpsJu4OVrp6nk8/1x
+asxfx5qbmoZvpA7/WK+PDCORDZNwCxFjHIwmg8P8/PjqNgMHiZ98QsYS25YU8nm9
+1ArgG5Op5ngmaYZ4npZu/5blWasJWIciWfWLdHTjv1ZLGUsafWlNDh7YzEVVPPtR
+b+aT6s4MC+ttn0zJRYsuj7U+B0jr8PhfQQ8ng6EzbdQ5Aa1sBeR0nKxBpf/2KNsF
+kCvJYQqBvrtOshq2SY/bryGqW1XNwE0W7ARhE9+UEjriQG3Qu2et6K3MNmDG31cS
+cI41oSy41i6zsfwZwJKJl4Orgtr3Hz2G0aozyyqmKTrHlTUTQ/1Er4ol6oZlzrL+
+gZhXDyihHwXikwjZTWqfRw9jFVV2WHpJQt59mjmLuXbAk8bR0FI=
+=CTNy
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_5BF3661D-48DD-4761-9FE1-54AFC65DF771--
