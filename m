@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8A2CF5E22
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 09:59:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BDF2F5E46
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 10:47:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbfKII7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 03:59:00 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5753 "EHLO huawei.com"
+        id S1726252AbfKIJqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 04:46:42 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5755 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726136AbfKII67 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 03:58:59 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id BC4DF26A8A0C9978897D;
-        Sat,  9 Nov 2019 16:58:56 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Sat, 9 Nov 2019
- 16:58:49 +0800
+        id S1726143AbfKIJqm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 04:46:42 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 39E474CDAB06F0AC8E99;
+        Sat,  9 Nov 2019 17:46:39 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Sat, 9 Nov 2019
+ 17:46:28 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
 To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
@@ -25,9 +25,9 @@ To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <hpa@zytor.com>
 CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH] KVM: X86: avoid unused setup_syscalls_segments call when SYSCALL check failed
-Date:   Sat, 9 Nov 2019 16:58:54 +0800
-Message-ID: <1573289934-14430-1-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH] KVM: APIC: add helper func to remove duplicate code in kvm_pv_send_ipi
+Date:   Sat, 9 Nov 2019 17:46:49 +0800
+Message-ID: <1573292809-18181-1-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -40,46 +40,109 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-When SYSCALL/SYSENTER ability check failed, cs and ss is inited but
-remain not used. Delay initializing cs and ss until SYSCALL/SYSENTER
-ability check passed.
+There are some duplicate code in kvm_pv_send_ipi when deal with ipi
+bitmap. Add helper func to remove it, and eliminate odd out label,
+get rid of unnecessary kvm_lapic_irq field init and so on.
 
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- arch/x86/kvm/emulate.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/kvm/lapic.c | 65 ++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index 698efb8c3897..952d1a4f4d7e 100644
---- a/arch/x86/kvm/emulate.c
-+++ b/arch/x86/kvm/emulate.c
-@@ -2770,11 +2770,10 @@ static int em_syscall(struct x86_emulate_ctxt *ctxt)
- 		return emulate_ud(ctxt);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index b29d00b661ff..2f8f10103f5f 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -557,60 +557,53 @@ int kvm_apic_set_irq(struct kvm_vcpu *vcpu, struct kvm_lapic_irq *irq,
+ 			irq->level, irq->trig_mode, dest_map);
+ }
  
- 	ops->get_msr(ctxt, MSR_EFER, &efer);
--	setup_syscalls_segments(ctxt, &cs, &ss);
++static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map *map,
++			 struct kvm_lapic_irq *irq, u32 min)
++{
++	int i, count = 0;
++	struct kvm_vcpu *vcpu;
++
++	if (min > map->max_apic_id)
++		return 0;
++
++	for_each_set_bit(i, ipi_bitmap,
++		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
++		if (map->phys_map[min + i]) {
++			vcpu = map->phys_map[min + i]->vcpu;
++			count += kvm_apic_set_irq(vcpu, irq, NULL);
++		}
++	}
++
++	return count;
++}
++
+ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ 		    unsigned long ipi_bitmap_high, u32 min,
+ 		    unsigned long icr, int op_64_bit)
+ {
+-	int i;
+ 	struct kvm_apic_map *map;
+-	struct kvm_vcpu *vcpu;
+ 	struct kvm_lapic_irq irq = {0};
+ 	int cluster_size = op_64_bit ? 64 : 32;
+-	int count = 0;
++	int count;
++
++	if (icr & (APIC_DEST_MASK | APIC_SHORT_MASK))
++		return -KVM_EINVAL;
+ 
+ 	irq.vector = icr & APIC_VECTOR_MASK;
+ 	irq.delivery_mode = icr & APIC_MODE_MASK;
+ 	irq.level = (icr & APIC_INT_ASSERT) != 0;
+ 	irq.trig_mode = icr & APIC_INT_LEVELTRIG;
+ 
+-	if (icr & APIC_DEST_MASK)
+-		return -KVM_EINVAL;
+-	if (icr & APIC_SHORT_MASK)
+-		return -KVM_EINVAL;
 -
- 	if (!(efer & EFER_SCE))
- 		return emulate_ud(ctxt);
+ 	rcu_read_lock();
+ 	map = rcu_dereference(kvm->arch.apic_map);
  
-+	setup_syscalls_segments(ctxt, &cs, &ss);
- 	ops->get_msr(ctxt, MSR_STAR, &msr_data);
- 	msr_data >>= 32;
- 	cs_sel = (u16)(msr_data & 0xfffc);
-@@ -2838,12 +2837,11 @@ static int em_sysenter(struct x86_emulate_ctxt *ctxt)
- 	if (ctxt->mode == X86EMUL_MODE_PROT64)
- 		return X86EMUL_UNHANDLEABLE;
+-	if (unlikely(!map)) {
+-		count = -EOPNOTSUPP;
+-		goto out;
++	count = -EOPNOTSUPP;
++	if (likely(map)) {
++		count = __pv_send_ipi(&ipi_bitmap_low, map, &irq, min);
++		min += cluster_size;
++		count += __pv_send_ipi(&ipi_bitmap_high, map, &irq, min);
+ 	}
  
--	setup_syscalls_segments(ctxt, &cs, &ss);
+-	if (min > map->max_apic_id)
+-		goto out;
+-	/* Bits above cluster_size are masked in the caller.  */
+-	for_each_set_bit(i, &ipi_bitmap_low,
+-		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+-		if (map->phys_map[min + i]) {
+-			vcpu = map->phys_map[min + i]->vcpu;
+-			count += kvm_apic_set_irq(vcpu, &irq, NULL);
+-		}
+-	}
 -
- 	ops->get_msr(ctxt, MSR_IA32_SYSENTER_CS, &msr_data);
- 	if ((msr_data & 0xfffc) == 0x0)
- 		return emulate_gp(ctxt, 0);
- 
-+	setup_syscalls_segments(ctxt, &cs, &ss);
- 	ctxt->eflags &= ~(X86_EFLAGS_VM | X86_EFLAGS_IF);
- 	cs_sel = (u16)msr_data & ~SEGMENT_RPL_MASK;
- 	ss_sel = cs_sel + 8;
+-	min += cluster_size;
+-
+-	if (min > map->max_apic_id)
+-		goto out;
+-
+-	for_each_set_bit(i, &ipi_bitmap_high,
+-		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+-		if (map->phys_map[min + i]) {
+-			vcpu = map->phys_map[min + i]->vcpu;
+-			count += kvm_apic_set_irq(vcpu, &irq, NULL);
+-		}
+-	}
+-
+-out:
+ 	rcu_read_unlock();
+ 	return count;
+ }
 -- 
 2.19.1
 
