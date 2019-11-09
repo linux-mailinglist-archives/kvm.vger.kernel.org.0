@@ -2,147 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BDF2F5E46
-	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 10:47:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 639BBF5EAB
+	for <lists+kvm@lfdr.de>; Sat,  9 Nov 2019 12:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726252AbfKIJqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 04:46:42 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5755 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726143AbfKIJqm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 04:46:42 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 39E474CDAB06F0AC8E99;
-        Sat,  9 Nov 2019 17:46:39 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Sat, 9 Nov 2019
- 17:46:28 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>
-CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH] KVM: APIC: add helper func to remove duplicate code in kvm_pv_send_ipi
-Date:   Sat, 9 Nov 2019 17:46:49 +0800
-Message-ID: <1573292809-18181-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726530AbfKILSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 06:18:16 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37097 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726462AbfKILSP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 06:18:15 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t1so9787412wrv.4
+        for <kvm@vger.kernel.org>; Sat, 09 Nov 2019 03:18:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=lV8hsrpV1/CMqW5H35jpAhibR2n/EfxU4U4hpbJbzmA=;
+        b=lefa59EPd0gxstPKf3O9h6NkqIxDk7oRkQwnqI1H4BQt2PsIKG3RCECBKO92Z/sZU5
+         vv+bRD5U0ECT/rqoyGJt6wNABR5da/ke0ZpldJjobVbcfcBeDNZXOOyP+13aqIuC16eT
+         dZrUyfJdDOUHV7W6qIU6HASKg3txt1bfbYiaXgBeSMfVkESmbSP3iJmBeeBVc8aooBMh
+         TCWE1l468lvYG0N32PPoXqB/G9f14ytM3Nhhv/zPZzz4GFo0Nkh7cFc/xZUpp+oAmfGq
+         EfwdO5o7qdZVP4fzKDLBm7j50S2WxXxVz7ztX3AjgEbCgKd23S3WeFiUvrHrk7p47ubd
+         xJCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=lV8hsrpV1/CMqW5H35jpAhibR2n/EfxU4U4hpbJbzmA=;
+        b=kgO0ELr9I4zAN4HcLN2ZwvqUGk42yCiuZ1dR8y4psjUNNiNmgxnlTQ2tquKCI+sS0I
+         3u2/b9+OdWQ74oBxWH32HoKHqQlM4wRZ1kVuKlQA5Kxj661s+tgfhkrAJW+fZh1l6q4n
+         fJdgrbVXI0Iykoh0R4B2TriLsvqrr+QTn5udkVVmWMDXzlEHLAepa3uddaLHaTEdo1zx
+         YnONNGMGOdPKu0O3ykQWnH/CFegTVsFaF4G1y2Mk0dJZp9NYpRCfvWEEAXnpXv2CHsCi
+         SI/pGHtfsBAN0f2ytgTB7MWqwOTLgimuPI65tYavcRF9KM/IT39PVEGEQv4KvODYnLbt
+         xBXQ==
+X-Gm-Message-State: APjAAAUzRtCo6IFdUy6k7NYsk8hD20scTia7JjArehKEcodSxVMmqw4k
+        nSgrCMaSTEEY3+oBB9oViqcvHcH3/YY=
+X-Google-Smtp-Source: APXvYqxEEl878jIf6IfioC+KhBx68+cuPbduRA51yoF2RJH6ODhB0oWi8jy8ob4tQie1H4BhbuTlHg==
+X-Received: by 2002:adf:eb41:: with SMTP id u1mr12329876wrn.89.1573298291131;
+        Sat, 09 Nov 2019 03:18:11 -0800 (PST)
+Received: from localhost (ip-94-113-220-175.net.upcbroadband.cz. [94.113.220.175])
+        by smtp.gmail.com with ESMTPSA id 62sm9593721wre.38.2019.11.09.03.18.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Nov 2019 03:18:10 -0800 (PST)
+Date:   Sat, 9 Nov 2019 12:18:09 +0100
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Parav Pandit <parav@mellanox.com>,
+        David M <david.m.ertman@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191109111809.GA9565@nanopsycho>
+References: <20191107160448.20962-1-parav@mellanox.com>
+ <20191107153234.0d735c1f@cakuba.netronome.com>
+ <20191108121233.GJ6990@nanopsycho>
+ <20191108144054.GC10956@ziepe.ca>
+ <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108111238.578f44f1@cakuba>
+ <20191108201253.GE10956@ziepe.ca>
+ <20191108134559.42fbceff@cakuba>
+ <20191109004426.GB31761@ziepe.ca>
+ <20191109084659.GB1289838@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191109084659.GB1289838@kroah.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+Sat, Nov 09, 2019 at 09:46:59AM CET, gregkh@linuxfoundation.org wrote:
+>On Fri, Nov 08, 2019 at 08:44:26PM -0400, Jason Gunthorpe wrote:
+>> There has been some lack of clarity on what the ?? should be. People
+>> have proposed platform and MFD, and those seem to be no-goes. So, it
+>> looks like ?? will be a mlx5_driver on a mlx5_bus, and Intel will use
+>> an ice_driver on a ice_bus, ditto for cxgb4, if I understand Greg's
+>> guidance.
+>
+>Yes, that is the only way it can work because you really are just
+>sharing a single PCI device in a vendor-specific way, and they all need
+>to get along with each one properly for that vendor-specific way.  So
+>each vendor needs its own "bus" to be able to work out things properly,
+>I doubt you can make this more generic than that easily.
+>
+>> Though I'm wondering if we should have a 'multi_subsystem_device' that
+>> was really just about passing a 'void *core_handle' from the 'core'
+>> (ie the bus) to the driver (ie RDMA, netdev, etc). 
+>
+>Ick, no.
+>
+>> It seems weakly defined, but also exactly what every driver doing this
+>> needs.. It is basically what this series is abusing mdev to accomplish.
+>
+>What is so hard about writing a bus?  Last I tried it was just a few
+>hundred lines of code, if that.  I know it's not the easiest in places,
+>but we have loads of examples to crib from.  If you have
+>problems/questions, just ask!
+>
+>Or, worst case, you just do what I asked in this thread somewhere, and
+>write a "virtual bus" where you just create devices and bind them to the
+>driver before registering and away you go.  No auto-loading needed (or
+>possible), but then you have a generic layer that everyone can use if
+>they want to (but you loose some functionality at the expense of
+>generic code.)
 
-There are some duplicate code in kvm_pv_send_ipi when deal with ipi
-bitmap. Add helper func to remove it, and eliminate odd out label,
-get rid of unnecessary kvm_lapic_irq field init and so on.
+Pardon my ignorance, just to be clear: You suggest to have
+one-virtual-bus-per-driver or rather some common "xbus" to serve this
+purpose for all of them, right?
+If so, isn't that a bit ugly to have a bus in every driver? I wonder if
+there can be some abstraction found.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- arch/x86/kvm/lapic.c | 65 ++++++++++++++++++++------------------------
- 1 file changed, 29 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index b29d00b661ff..2f8f10103f5f 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -557,60 +557,53 @@ int kvm_apic_set_irq(struct kvm_vcpu *vcpu, struct kvm_lapic_irq *irq,
- 			irq->level, irq->trig_mode, dest_map);
- }
- 
-+static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map *map,
-+			 struct kvm_lapic_irq *irq, u32 min)
-+{
-+	int i, count = 0;
-+	struct kvm_vcpu *vcpu;
-+
-+	if (min > map->max_apic_id)
-+		return 0;
-+
-+	for_each_set_bit(i, ipi_bitmap,
-+		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-+		if (map->phys_map[min + i]) {
-+			vcpu = map->phys_map[min + i]->vcpu;
-+			count += kvm_apic_set_irq(vcpu, irq, NULL);
-+		}
-+	}
-+
-+	return count;
-+}
-+
- int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
- 		    unsigned long ipi_bitmap_high, u32 min,
- 		    unsigned long icr, int op_64_bit)
- {
--	int i;
- 	struct kvm_apic_map *map;
--	struct kvm_vcpu *vcpu;
- 	struct kvm_lapic_irq irq = {0};
- 	int cluster_size = op_64_bit ? 64 : 32;
--	int count = 0;
-+	int count;
-+
-+	if (icr & (APIC_DEST_MASK | APIC_SHORT_MASK))
-+		return -KVM_EINVAL;
- 
- 	irq.vector = icr & APIC_VECTOR_MASK;
- 	irq.delivery_mode = icr & APIC_MODE_MASK;
- 	irq.level = (icr & APIC_INT_ASSERT) != 0;
- 	irq.trig_mode = icr & APIC_INT_LEVELTRIG;
- 
--	if (icr & APIC_DEST_MASK)
--		return -KVM_EINVAL;
--	if (icr & APIC_SHORT_MASK)
--		return -KVM_EINVAL;
--
- 	rcu_read_lock();
- 	map = rcu_dereference(kvm->arch.apic_map);
- 
--	if (unlikely(!map)) {
--		count = -EOPNOTSUPP;
--		goto out;
-+	count = -EOPNOTSUPP;
-+	if (likely(map)) {
-+		count = __pv_send_ipi(&ipi_bitmap_low, map, &irq, min);
-+		min += cluster_size;
-+		count += __pv_send_ipi(&ipi_bitmap_high, map, &irq, min);
- 	}
- 
--	if (min > map->max_apic_id)
--		goto out;
--	/* Bits above cluster_size are masked in the caller.  */
--	for_each_set_bit(i, &ipi_bitmap_low,
--		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
--		if (map->phys_map[min + i]) {
--			vcpu = map->phys_map[min + i]->vcpu;
--			count += kvm_apic_set_irq(vcpu, &irq, NULL);
--		}
--	}
--
--	min += cluster_size;
--
--	if (min > map->max_apic_id)
--		goto out;
--
--	for_each_set_bit(i, &ipi_bitmap_high,
--		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
--		if (map->phys_map[min + i]) {
--			vcpu = map->phys_map[min + i]->vcpu;
--			count += kvm_apic_set_irq(vcpu, &irq, NULL);
--		}
--	}
--
--out:
- 	rcu_read_unlock();
- 	return count;
- }
--- 
-2.19.1
+>
+>Are these constant long email threads a way that people are just trying
+>to get me to do this work for them?  Because if it is, it's working...
 
+Maybe they are just confused, like I am :)
+
+
+>
+>thanks,
+>
+>greg k-h
