@@ -2,135 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 578D8F685D
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 11:12:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8171F68EC
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 13:23:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfKJKLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Nov 2019 05:11:53 -0500
-Received: from lb2-smtp-cloud9.xs4all.net ([194.109.24.26]:36361 "EHLO
-        lb2-smtp-cloud9.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726653AbfKJKLx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 10 Nov 2019 05:11:53 -0500
-Received: from [192.168.2.10] ([46.9.232.237])
-        by smtp-cloud9.xs4all.net with ESMTPA
-        id TkCAiNAD3QBsYTkCDi1SAO; Sun, 10 Nov 2019 11:11:50 +0100
-Subject: Re: [PATCH v2 13/18] media/v4l2-core: pin_longterm_pages (FOLL_PIN)
- and put_user_page() conversion
-To:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20191103211813.213227-1-jhubbard@nvidia.com>
- <20191103211813.213227-14-jhubbard@nvidia.com>
-From:   Hans Verkuil <hverkuil@xs4all.nl>
-Message-ID: <6d21391e-01c4-0605-0d0d-15f574cc3ed4@xs4all.nl>
-Date:   Sun, 10 Nov 2019 11:11:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191103211813.213227-14-jhubbard@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4wfFSTukyJqfxV4HrGGQ0j5/iKKr13OkEzy05WqAOfOSWrg/qEYKz7zmsSLuZTQBp28yCz+dvkf6VRv+kw027uNzPdnpP1TG1MNl/DxEey7uZK5/xalM5y
- 5mek2ggN11NHCI9OB51pAxH9HazB5AMpcNYWMTjkyDZlvUJtbfWW4ZUZq85nxiyCH9Wkwv75NaxcyvTMitOA+o4+U5rJjg8sA8gvfV9NbRRVFg3M6alu0IKv
- kyfdjDFwuG4F6JKpbt9v3E049Xx0YF8ppWdgVnIjGfusfyNaLb+90K4NGhzfPU11L+2UeV4HzuHSmBSjFWbsZNO99HRrZoUYxfZil98flfM0I4Tl92e2ZZ6T
- oLNGV585kbb26i0UwqgRbX0qClJpOQIX8JPemeIZHsAISH4A6EIzai79YkaAZrrdJDqsHcU/g5pBk7M+m8f1h0UhG93G+VP07un/zdrM5krNUgUcOHqWl6c8
- yg5UitZLkuZJeoj3AZIHtptGajhOljPiqFe3qrME7yIGvxpfurp6646fJOQdrdhgQ99ZW5ZVLjxCYcB39QCEQQpm6CL4XMXAsAilPNdyDqQvU26KgyC+BY4C
- EfgFzK7XJbQ28t/ACJ7DTyyH14NWDMPJXEZyBEirCE+SenjaNpo1ArEbqixnm5RCT+dULYmvp/soWFNQsgosWPukS+PH1BUonrmmMVLsT7pZ55bv6EkNWDl4
- 9ypHPyVuYZBeyd/QB3263NKtG9W94IRv7gkIMIXqe+gaZqosCCZGLoQ/R3NrX+UELfTllPBXIEjGQ6GcqW4vDLnC6e5LObzBu95S05AVd/j5Z489creqnOqz
- al1X+EBLb7SCFjH5bT0l7XPwxsPFls2nYnNC2VvjaojW5EGzj+P9FMGrDMXQYA5CwZYMR9jVieofsVzZROWuyWgzGX0IWmVMrVJ+O9Cd6w+r38l2u6VzMDO3
- vrKP72jlsDujiCNkz8SZOuEiycTOpqK7FnQXWC0vHy8ZQ5kE+5U3ZOrlf3bE5a7YMuwWWgEf1wyekRKSE5FPwRln1aFBkEu6RfHldiY5r6mScJHM0Hmz3L1G
- jmpevDng1F0dM0khzD8Rn/xNHOQmjygIoT2XjmtiT+xp1E4E+mkPp1qzmYUhF73no8Ws5q3/bDKWOdGuUrZQjRZdQtb3gNeBRaDBFMdPnfgT4QkU99ovX9La
- 0JO93Bw0hzkTQPZYGAQEEyZ5mT+kT8y0hQD80773+KE9/qHPFnhe80tvkU1RdNM3L33ptC7eREOqMAmdRO6tk0ZlucAIUVw5MRfKAm2acO9sl5to+l22CFB1
- ACY3IoeSiNIkXxalh1O2DqvLWJh0AapBIq9krEjBZouKIfbQ+FRgwsFcvPJZJS2eW70SQX+omUmZZ5xpSWDV1lpAjnprcaVW+xX7OhGfCCj2gQOCd9Q=
+        id S1726758AbfKJMXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Nov 2019 07:23:32 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:43240 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726617AbfKJMXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Nov 2019 07:23:32 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAACG6G9024960;
+        Sun, 10 Nov 2019 12:23:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=xfGHYhQGPZcQSLT5vio2mDM8lYi4JVvBs2OEBmJ4CoM=;
+ b=GOJUfKhrJjnU7itXIEcOU58AHNv1pss/nek6yOmVpbCkkt5XmvYE+cfk2d01pFWNHLYt
+ PejLiD+JYyNsNmXUdqt1EbPC7ZMAbhUrQfMXeJqXoGjoqiYIzbSyhPuMtMliJEayh1GZ
+ NSjMylQo7RyoxymwnXZT6uYk9HxQbeA0quS9XtMdItG0CrV9/P2nykeqoP0IwbifXhlM
+ ogDl66VwLZBLZOUwMoiv0c0751cotT8Wa/ITYae/jA07z0WantDzUmlnKAKfeqZMY+bn
+ gXPNGh/NrqkAWPU1CMXvDO9qsSsgLrtiVjVMsn8tda667HDU0oYRYNrpcikjmbSLLK1o fg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2w5p3qb341-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 10 Nov 2019 12:23:24 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAACNMpc162810;
+        Sun, 10 Nov 2019 12:23:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2w66ypwk9x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 10 Nov 2019 12:23:23 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAACNMsv014829;
+        Sun, 10 Nov 2019 12:23:22 GMT
+Received: from [192.168.14.112] (/79.182.207.213)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 10 Nov 2019 04:23:22 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 2/2] KVM: x86: Fix INIT signal handling in various CPU
+ states
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <199dac11-d79b-356f-ae52-91653087cc49@redhat.com>
+Date:   Sun, 10 Nov 2019 14:23:17 +0200
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <1ACF3DBE-DD34-4BE9-B25E-10805EB8C720@oracle.com>
+References: <20190826102449.142687-1-liran.alon@oracle.com>
+ <20190826102449.142687-3-liran.alon@oracle.com>
+ <20190826160301.GC19381@linux.intel.com>
+ <221B019B-D38D-401E-9C6B-17D512B61345@oracle.com>
+ <199dac11-d79b-356f-ae52-91653087cc49@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9436 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911100128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9436 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911100127
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/3/19 10:18 PM, John Hubbard wrote:
-> 1. Change v4l2 from get_user_pages(FOLL_LONGTERM), to
-> pin_longterm_pages(), which sets both FOLL_LONGTERM and FOLL_PIN.
-> 
-> 2. Because all FOLL_PIN-acquired pages must be released via
-> put_user_page(), also convert the put_page() call over to
-> put_user_pages_dirty_lock().
-> 
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Sorry in the delay of handling this.
+Now preparing a bunch of KVM commits to submit. :)
 
-Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+> On 11 Sep 2019, at 19:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 26/08/19 20:26, Liran Alon wrote:
+>> An alternative could be to just add a flag to events->flags that =
+modifies
+>> behaviour to treat events->smi.latched_init as just =
+events->latched_init.
+>> But I prefer the previous option.
+>=20
+> Why would you even need the flag?  I think you only need to move the =
+"if
+> (lapic_in_kernel(vcpu)) outside, under "if (events->flags &
+> KVM_VCPUEVENT_VALID_SMM)=E2=80=9D.
 
-Looks good, thanks!
+Without an additional flag, the events->smi.latched_init field will be =
+evaluated
+by kvm_vcpu_ioctl_x86_set_vcpu_events() even when userspace haven=E2=80=99=
+t
+specified KVM_VCPUEVENT_VALID_SMM. Which in theory should break
+compatibility to userspace that don=E2=80=99t specify this flag.
 
-	Hans
+If you are ok with breaking this compatibility, I will avoid adding an =
+opt-in flag
+that specifies this field should be evaluated even when =
+KVM_VCPUEVENT_VALID_SMM
+is not specified.
 
+Because we are lucky and =E2=80=9Clatched_init" was last field in =
+=E2=80=9Cstruct smi=E2=80=9D inside =E2=80=9Cstruct kvm_vcpu_events=E2=80=9D=
+,
+I will just move =E2=80=9Clatched_init=E2=80=9D field outside of =
+=E2=80=9Cstruct smi=E2=80=9D just before the =E2=80=9Creserved=E2=80=9D =
+field.
+Which would keep binary format compatibility while allowing making KVM =
+code more clear.
 
-> ---
->  drivers/media/v4l2-core/videobuf-dma-sg.c | 13 +++++--------
->  1 file changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> index 28262190c3ab..9b9c5b37bf59 100644
-> --- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-> +++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> @@ -183,12 +183,12 @@ static int videobuf_dma_init_user_locked(struct videobuf_dmabuf *dma,
->  	dprintk(1, "init user [0x%lx+0x%lx => %d pages]\n",
->  		data, size, dma->nr_pages);
->  
-> -	err = get_user_pages(data & PAGE_MASK, dma->nr_pages,
-> -			     flags | FOLL_LONGTERM, dma->pages, NULL);
-> +	err = pin_longterm_pages(data & PAGE_MASK, dma->nr_pages,
-> +				 flags, dma->pages, NULL);
->  
->  	if (err != dma->nr_pages) {
->  		dma->nr_pages = (err >= 0) ? err : 0;
-> -		dprintk(1, "get_user_pages: err=%d [%d]\n", err,
-> +		dprintk(1, "pin_longterm_pages: err=%d [%d]\n", err,
->  			dma->nr_pages);
->  		return err < 0 ? err : -EINVAL;
->  	}
-> @@ -349,11 +349,8 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
->  	BUG_ON(dma->sglen);
->  
->  	if (dma->pages) {
-> -		for (i = 0; i < dma->nr_pages; i++) {
-> -			if (dma->direction == DMA_FROM_DEVICE)
-> -				set_page_dirty_lock(dma->pages[i]);
-> -			put_page(dma->pages[i]);
-> -		}
-> +		put_user_pages_dirty_lock(dma->pages, dma->nr_pages,
-> +					  dma->direction == DMA_FROM_DEVICE);
->  		kfree(dma->pages);
->  		dma->pages = NULL;
->  	}
-> 
+>=20
+> In fact, I think it would make sense anyway to clear KVM_APIC_SIPI in
+> kvm_vcpu_ioctl_x86_set_vcpu_events (i.e. clear apic->pending_events =
+and
+> then possibly set KVM_APIC_INIT if events->smi.latched_init is true).
+
+Agree. Will do this as-well.
+
+-Liran
+
+>=20
+> Paolo
 
