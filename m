@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE418F6329
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 03:50:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1668CF6374
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 03:52:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727579AbfKJCuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 21:50:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60714 "EHLO mail.kernel.org"
+        id S1728374AbfKJCwl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 21:52:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36262 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729598AbfKJCuA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 21:50:00 -0500
+        id S1730012AbfKJCvc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 21:51:32 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 225F422581;
-        Sun, 10 Nov 2019 02:49:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 368D022583;
+        Sun, 10 Nov 2019 02:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573354199;
-        bh=h18vsG2/dOzyz5ekVxrrjJAtpSd/yKL1s/yBtgCB0t8=;
+        s=default; t=1573354292;
+        bh=avT296kkH6vYPf/CZXBH0ZritG7eBuOV/le7rkHC914=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XetK2v631T899r1KLDoJgZpjF8fEEJjDCD6Wycr1vBNDvS/ipbsVHSYeM070+T0OY
-         Cw0Kg0Z2b5t8QpJxdHAl1luZM8UR4oC5GAovBDQkZQe47r+h1OIHOx95b6RvdqMvm5
-         kiw9KrOW6YrGcoDzIBa+HNPu34ZT2dXQCWt6Kr/Y=
+        b=I+enOqX5bDt6VqLO1KTIzMf5hy+GkKlqVz8XuHrkL/nEaqSQvcVfSaI+drcnuZjmG
+         x9Gi3FeEUcvRlD/kp0lhCcwuMsSZdS3V4kDVbA4Y1sCLGzwlZgmdo+3pdDC1prgfSr
+         pydu241RZXf6Bvoy21r+y47o9f2/PMesbq6KF2Gg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Gage Eads <gage.eads@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
+Cc:     Li Qiang <liq3ea@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 44/66] vfio/pci: Mask buggy SR-IOV VF INTx support
-Date:   Sat,  9 Nov 2019 21:48:23 -0500
-Message-Id: <20191110024846.32598-44-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 32/40] vfio/pci: Fix potential memory leak in vfio_msi_cap_len
+Date:   Sat,  9 Nov 2019 21:50:24 -0500
+Message-Id: <20191110025032.827-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191110024846.32598-1-sashal@kernel.org>
-References: <20191110024846.32598-1-sashal@kernel.org>
+In-Reply-To: <20191110025032.827-1-sashal@kernel.org>
+References: <20191110025032.827-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -44,100 +43,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alex Williamson <alex.williamson@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
 
-[ Upstream commit db04264fe9bc0f2b62e036629f9afb530324b693 ]
+[ Upstream commit 30ea32ab1951c80c6113f300fce2c70cd12659e4 ]
 
-The SR-IOV spec requires that VFs must report zero for the INTx pin
-register as VFs are precluded from INTx support.  It's much easier for
-the host kernel to understand whether a device is a VF and therefore
-whether a non-zero pin register value is bogus than it is to do the
-same in userspace.  Override the INTx count for such devices and
-virtualize the pin register to provide a consistent view of the device
-to the user.
+Free allocated vdev->msi_perm in error path.
 
-As this is clearly a spec violation, warn about it to support hardware
-validation, but also provide a known whitelist as it doesn't do much
-good to continue complaining if the hardware vendor doesn't plan to
-fix it.
-
-Known devices with this issue: 8086:270c
-
-Tested-by: Gage Eads <gage.eads@intel.com>
-Reviewed-by: Ashok Raj <ashok.raj@intel.com>
+Signed-off-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vfio/pci/vfio_pci.c        |  8 ++++++--
- drivers/vfio/pci/vfio_pci_config.c | 27 +++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/vfio_pci_config.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index a1a712d18e028..da3f0ed18c769 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -426,10 +426,14 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
- {
- 	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
- 		u8 pin;
-+
-+		if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) ||
-+		    vdev->nointx || vdev->pdev->is_virtfn)
-+			return 0;
-+
- 		pci_read_config_byte(vdev->pdev, PCI_INTERRUPT_PIN, &pin);
--		if (IS_ENABLED(CONFIG_VFIO_PCI_INTX) && !vdev->nointx && pin)
--			return 1;
- 
-+		return pin ? 1 : 0;
- 	} else if (irq_type == VFIO_PCI_MSI_IRQ_INDEX) {
- 		u8 pos;
- 		u16 flags;
 diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
-index 06a20ea183dd6..84905d074c4ff 100644
+index c55c632a3b249..ad5929fbceb16 100644
 --- a/drivers/vfio/pci/vfio_pci_config.c
 +++ b/drivers/vfio/pci/vfio_pci_config.c
-@@ -1608,6 +1608,15 @@ static int vfio_ecap_init(struct vfio_pci_device *vdev)
- 	return 0;
+@@ -1130,8 +1130,10 @@ static int vfio_msi_cap_len(struct vfio_pci_device *vdev, u8 pos)
+ 		return -ENOMEM;
+ 
+ 	ret = init_pci_cap_msi_perm(vdev->msi_perm, len, flags);
+-	if (ret)
++	if (ret) {
++		kfree(vdev->msi_perm);
+ 		return ret;
++	}
+ 
+ 	return len;
  }
- 
-+/*
-+ * Nag about hardware bugs, hopefully to have vendors fix them, but at least
-+ * to collect a list of dependencies for the VF INTx pin quirk below.
-+ */
-+static const struct pci_device_id known_bogus_vf_intx_pin[] = {
-+	{ PCI_DEVICE(PCI_VENDOR_ID_INTEL, 0x270c) },
-+	{}
-+};
-+
- /*
-  * For each device we allocate a pci_config_map that indicates the
-  * capability occupying each dword and thus the struct perm_bits we
-@@ -1673,6 +1682,24 @@ int vfio_config_init(struct vfio_pci_device *vdev)
- 	if (pdev->is_virtfn) {
- 		*(__le16 *)&vconfig[PCI_VENDOR_ID] = cpu_to_le16(pdev->vendor);
- 		*(__le16 *)&vconfig[PCI_DEVICE_ID] = cpu_to_le16(pdev->device);
-+
-+		/*
-+		 * Per SR-IOV spec rev 1.1, 3.4.1.18 the interrupt pin register
-+		 * does not apply to VFs and VFs must implement this register
-+		 * as read-only with value zero.  Userspace is not readily able
-+		 * to identify whether a device is a VF and thus that the pin
-+		 * definition on the device is bogus should it violate this
-+		 * requirement.  We already virtualize the pin register for
-+		 * other purposes, so we simply need to replace the bogus value
-+		 * and consider VFs when we determine INTx IRQ count.
-+		 */
-+		if (vconfig[PCI_INTERRUPT_PIN] &&
-+		    !pci_match_id(known_bogus_vf_intx_pin, pdev))
-+			pci_warn(pdev,
-+				 "Hardware bug: VF reports bogus INTx pin %d\n",
-+				 vconfig[PCI_INTERRUPT_PIN]);
-+
-+		vconfig[PCI_INTERRUPT_PIN] = 0; /* Gratuitous for good VFs */
- 	}
- 
- 	if (!IS_ENABLED(CONFIG_VFIO_PCI_INTX) || vdev->nointx)
 -- 
 2.20.1
 
