@@ -2,58 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A44AF6B1F
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 20:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A7DF6B2A
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 20:48:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726976AbfKJTiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Nov 2019 14:38:03 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:36629 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726778AbfKJTiD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Nov 2019 14:38:03 -0500
-Received: by mail-qk1-f196.google.com with SMTP id d13so9506585qko.3
-        for <kvm@vger.kernel.org>; Sun, 10 Nov 2019 11:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=0vZwFYOuDdSX+7LqpPDPzgdJy0sWXL92EwHEmSxoTbk=;
-        b=ilk0ThIpMHJ2/wyFwEppEi+xbC659+fRET4PBQYY3RV4LEEyhC/3rEtDrGtvK6zZ+6
-         Q0xkcdu/NecJcrkyfRok20OQlTWoPXdj1zmHkPwOWf4tECFfPE1Bi18HegedyAg7YPMN
-         zgpqcegLO4AQNWDqpTUyqexFpdBNYHJXHehs+beL2E9NToCqoW/WZ5E3Cc7mLeIKzhV5
-         uD2YEsunwEMaNxQTxhdG3Fu78UqAqPq+q4jTieUvxL6gNKM4Y23ps7vUcAEXoQqO3djG
-         RUH5Hek0RKbOhMHTgAl7K5fup0nraKbMxTUGcqmuU6x82YFbZJg7xGgrecs44eMfdLsQ
-         T/uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0vZwFYOuDdSX+7LqpPDPzgdJy0sWXL92EwHEmSxoTbk=;
-        b=YchPF5OGHc3AsXhOdERFw99NYw7+adxEQZbpUwVBQexT1pFldlumS7WXYSlf78SjQD
-         9lwBg+95STTXaBWCxC6RTBohYyTVLUdLzIH4O/TODwPeNrXXwcRS730zOCFTg7q8eOYV
-         PM/PpZc8kmBWxUCnWBiyjRd7Zn/DeVtzLw7kISQFwevRTSvRP+6FHjCNv5s/n80uXdEy
-         DGfys+VDUZNucOgd9JItqgJNVqcVmH/DcFURTy+DVNyu1ZdGZBes2SbMpLqBcoMM2ekb
-         R3mEpfhwSxJlacoZPrWDm4o+D38zZelmBsniT/3uN4oN8N5FYj5o/MPyAEC+aJ3UTwOO
-         de1A==
-X-Gm-Message-State: APjAAAWGN2VLLW5dx19tWLMr8a4VI/8L2CrRjPcAdGJkxS1CNqv0QJgq
-        I35zVoNeuy4CauxySTkkBSC42w==
-X-Google-Smtp-Source: APXvYqwKmNJyGpWeMlAXSChz0a9yOQh5O0eCYSigMHS7jzPwZyfdvLoYTZdk5uoPdhtJBWKmhgyKaQ==
-X-Received: by 2002:a05:620a:16bb:: with SMTP id s27mr2516614qkj.501.1573414681721;
-        Sun, 10 Nov 2019 11:38:01 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id i10sm5712127qtj.19.2019.11.10.11.38.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 10 Nov 2019 11:38:00 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iTt27-0004PL-NN; Sun, 10 Nov 2019 15:37:59 -0400
-Date:   Sun, 10 Nov 2019 15:37:59 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     Parav Pandit <parav@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
+        id S1727043AbfKJTsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Nov 2019 14:48:37 -0500
+Received: from mail-eopbgr10046.outbound.protection.outlook.com ([40.107.1.46]:8377
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726778AbfKJTsh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Nov 2019 14:48:37 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wl7bzarWbxTI8ZKFU9NfdsVDFUTEUTDHk34DsiWI/WRbszhN8Mksnl7H4AusSMIyHwfX82x1SSOB2yTuGyH5Cf/4PHiT+KlK6Eo7bo/tdOYG161Akjyr7q4T9PNTPGX0EQN0HklZhoKd6TxiuIjhtjS88U3FoWritIWtmoGw6dWgOws9j/sAqU1RftVGopDNRuDO+vzAL4jkhTTtoXXIq4gkhnGb1fzFsFofF+cONcACfk6/bPkNOvvQ38npXD0N9FCYruT20myPb3b6Mon9VJ8sUrnceMvYqOj6lNoK83O7nxtlqd1jLsF6kFJczf07oWsMODoNUan07nzZZyJAgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+T/jzAyymCsrGD907TUMLizJrpqxm9bz9GMYFaXki8g=;
+ b=XbJytrLOgd9dyo9vk+x48iivIY4UpPyUYSY/17fQXVzxoB4VZgw+oGgMti4smdXrzT4VaIUZsY8MBUQv/wh24TALXcT8oSaD10Y1C8IOk3r4kgT2gUqpD+WSk8GPrb7Q3nYcn693rAOe9bEoVzG5S75H+xbL6a/2RaUa6aUlnSIilCwTt1wiaEm6ijLxQ8WAgi/TuI3fbFfeBvs58npglbRbJaU3B2XUVWqVwQN9aSc4hd1ANZIWnVLpBSn6GKi9rgBNWYcTrN/AFBfPIOkvyV/SeDvgyZwdE6EuIYzJKHsEbdrS9ZCL2xM8l1hJDX+zkdZ1h6vwEQWvJtCbgLLpaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+T/jzAyymCsrGD907TUMLizJrpqxm9bz9GMYFaXki8g=;
+ b=ctW2ADr5/6zfMwc04AhlAPuTEpbwh83K+Iu7WiQshO/mxYbBYqcUugtH3M6rTFDJoWKOdAabaLY9WsvTdF94OGMdkge799CYJpAENKZkWs1fJdijz7wfNlOUzitpXtLksgh5RPS/HbJyNBGAshDIDEwHOmw+lU1Tpyr2Qkz5BK4=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB6676.eurprd05.prod.outlook.com (10.186.174.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.20; Sun, 10 Nov 2019 19:48:32 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.023; Sun, 10 Nov 2019
+ 19:48:31 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jiri Pirko <jiri@resnulli.us>,
         David M <david.m.ertman@intel.com>,
         "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
@@ -63,106 +51,130 @@ Cc:     Parav Pandit <parav@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
         "cohuck@redhat.com" <cohuck@redhat.com>,
         Jiri Pirko <jiri@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191110193759.GE31761@ziepe.ca>
-References: <20191107160448.20962-1-parav@mellanox.com>
- <20191107153234.0d735c1f@cakuba.netronome.com>
- <20191108121233.GJ6990@nanopsycho>
- <20191108144054.GC10956@ziepe.ca>
+        Or Gerlitz <gerlitz.or@gmail.com>,
+        "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
+Subject: RE: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Thread-Topic: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Thread-Index: AQHVlYUoVUzzBv4k4UmQHUerp08scaeAKe4AgAEGoYCAAClyAIAADgnAgAA94wCAABDWgIAABhCAgAAItYCAAAz4AIAABs2QgAAs4QCAAsNGMA==
+Date:   Sun, 10 Nov 2019 19:48:31 +0000
+Message-ID: <AM0PR05MB48660E49342EC2CD6AB825F8D1750@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20191107153234.0d735c1f@cakuba.netronome.com>
+ <20191108121233.GJ6990@nanopsycho> <20191108144054.GC10956@ziepe.ca>
  <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <20191108134559.42fbceff@cakuba>
- <20191109004426.GB31761@ziepe.ca>
- <20191109092747.26a1a37e@cakuba>
+ <20191108111238.578f44f1@cakuba> <20191108201253.GE10956@ziepe.ca>
+ <20191108133435.6dcc80bd@x1.home> <20191108210545.GG10956@ziepe.ca>
+ <20191108145210.7ad6351c@x1.home>
+ <AM0PR05MB4866444210721BC4EE775D27D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191109005708.GC31761@ziepe.ca>
+In-Reply-To: <20191109005708.GC31761@ziepe.ca>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [68.203.16.89]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 953c336c-8c0a-4fc3-9ad9-08d76616f738
+x-ms-traffictypediagnostic: AM0PR05MB6676:|AM0PR05MB6676:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB66767A1D1E0951B4CCA217B8D1750@AM0PR05MB6676.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 02176E2458
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(4636009)(366004)(346002)(376002)(39860400002)(136003)(396003)(189003)(199004)(5660300002)(54906003)(8936002)(305945005)(256004)(2906002)(86362001)(7736002)(81156014)(81166006)(76116006)(66066001)(8676002)(7416002)(4326008)(52536014)(6246003)(55016002)(71200400001)(71190400001)(6916009)(99286004)(9686003)(33656002)(478600001)(6116002)(3846002)(476003)(229853002)(11346002)(446003)(26005)(74316002)(486006)(186003)(102836004)(6436002)(76176011)(6506007)(25786009)(14454004)(316002)(66946007)(66476007)(7696005)(66446008)(64756008)(66556008)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6676;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ktojAUy3QBU4dIllHOrmLkB0aQU/DjQkyshM7unAUxO2rbZPrz4cRjgrkyNLqxezlM/CfWZme8WWs3bZx0dSjMC6CVcVHpOssewQJrzSlyrxX49KnbwV7fwwZauhQVHRs6i+9WCjf5XzLWGdpcLEJT+4jpSohJERVaqfkVnKMbyZlJ3wSwqXWYM1PebL/Y8ry0pTbda3ATiiFkAwFt7rtS8YBJizEKDwxJO2dnja08+yhkVIS57Ct6OMX0QpPK1AP7SI+flXFu5vsQi8kKfAtbO3hA7W3BG16hsoWgXM7ZvZv5ttrEUC940DIVIwXPyThhEMKD5mQXTM/7BCsTsdZc0a8KpqnttZIMg5wqqIbuZU1NFSL2NUpuIQskM8R/LlQAHSPoT649pd9CxCnv5LAmFJ9ydB7EUCyoQlxGyn172NLk2df4IK4DTzR+8d87K0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191109092747.26a1a37e@cakuba>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 953c336c-8c0a-4fc3-9ad9-08d76616f738
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2019 19:48:31.7890
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: q0bMP9kKjLWBFoQYQ7cPmQbii5GI1T1RhiqEINkmsTrhkJrIZ8Kyw4ywYZOw4bn4Y2k61yw30Fs/PbOv5bLlZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6676
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 09, 2019 at 09:27:47AM -0800, Jakub Kicinski wrote:
-> On Fri, 8 Nov 2019 20:44:26 -0400, Jason Gunthorpe wrote:
-> > On Fri, Nov 08, 2019 at 01:45:59PM -0800, Jakub Kicinski wrote:
-> > > Yes, my suggestion to use mdev was entirely based on the premise that
-> > > the purpose of this work is to get vfio working.. otherwise I'm unclear
-> > > as to why we'd need a bus in the first place. If this is just for
-> > > containers - we have macvlan offload for years now, with no need for a
-> > > separate device.  
-> > 
-> > This SF thing is a full fledged VF function, it is not at all like
-> > macvlan. This is perhaps less important for the netdev part of the
-> > world, but the difference is very big for the RDMA side, and should
-> > enable VFIO too..
-> 
-> Well, macvlan used VMDq so it was pretty much a "legacy SR-IOV" VF.
-> I'd perhaps need to learn more about RDMA to appreciate the difference.
 
-It has a lot to do with the how the RDMA functionality works in the
-HW.. At least for mlx the RDMA is 'below' all the netdev stuff, so
-even though netdev has some offloaded vlan RDMA sees, essentially, the
-union of all the vlan's on the system.
+> From: Jason Gunthorpe <jgg@ziepe.ca>
+> Sent: Friday, November 8, 2019 6:57 PM
+> > We should be creating 3 different buses, instead of mdev bus being de-
+> multiplexer of that?
+> >
+> > Hence, depending the device flavour specified, create such device on ri=
+ght
+> bus?
+> >
+> > For example,
+> > $ devlink create subdev pci/0000:05:00.0 flavour virtio name foo
+> > subdev_id 1 $ devlink create subdev pci/0000:05:00.0 flavour mdev
+> > <uuid> subdev_id 2 $ devlink create subdev pci/0000:05:00.0 flavour
+> > mlx5 id 1 subdev_id 3
+>=20
+> I like the idea of specifying what kind of interface you want at sub devi=
+ce
+> creation time. It fits the driver model pretty well and doesn't require a=
+busing
+> the vfio mdev for binding to a netdev driver.
+>=20
+> > $ devlink subdev pci/0000:05:00.0/<subdev_id> config <params> $ echo
+> > <respective_device_id> <sysfs_path>/bind
+>=20
+> Is explicit binding really needed?
+No.
 
-Which at least breaks the security model of a macvlan device for
-net-namespaces.
+> If you specify a vfio flavour why shouldn't
+> the vfio driver autoload and bind to it right away? That is kind of the p=
+oint
+> of the driver model...
+>=20
+It some configuration is needed that cannot be passed at device creation ti=
+me, explicit bind later can be used.
 
-Maybe with new HW something could be done, but today, the HW is
-limited.
+> (kind of related, but I don't get while all that GUID and lifecycle stuff=
+ in mdev
+> should apply for something like a SF)
+>=20
+GUID is just the name of the device.
+But lets park this aside for a moment.
 
-> > > On the RDMA/Intel front, would you mind explaining what the main
-> > > motivation for the special buses is? I'm a little confurious.  
-> > 
-> > Well, the issue is driver binding. For years we have had these
-> > multi-function netdev drivers that have a single PCI device which must
-> > bind into multiple subsystems, ie mlx5 does netdev and RDMA, the cxgb
-> > drivers do netdev, RDMA, SCSI initiator, SCSI target, etc. [And I
-> > expect when NVMe over TCP rolls out we will have drivers like cxgb4
-> > binding to 6 subsytems in total!]
-> 
-> What I'm missing is why is it so bad to have a driver register to
-> multiple subsystems.
+> > Implement power management callbacks also on all above 3 buses?
+> > Abstract out mlx5_bus into more generic virtual bus (vdev bus?) so
+> > that multiple vendors can reuse?
+>=20
+> In this specific case, why does the SF in mlx5 mode even need a bus?
+> Is it only because of devlink? That would be unfortunate
+>
+Devlink is one part due to identifying using bus/dev.
+How do we refer to its devlink instance of SF without bus/device?
+Can we extend devlink_register() to accept optionally have sf_id?
 
-Well, for example, if you proposed to have a RDMA driver in
-drivers/net/ethernet/foo/, I would NAK it, and I hope Dave would
-too. Same for SCSI and nvme.
+If we don't have a bus, creating sub function (a device), without a 'struct=
+ device' which will have BAR, resources, etc is odd.
 
-This Linux process is that driver code for a subsystem lives in the
-subsystem and should be in a subsystem specific module. While it is
-technically possible to have a giant driver, it distorts our process
-in a way I don't think is good.
+Now if we cannot see 'struct device' in sysfs, how do we persistently name =
+them?
+Are we ok to add /sys/class/net/sf_netdev/subdev_id
+And
+/sys/class/infiniband/<rdma_dev>/subdev_id
 
-So, we have software layers between the large Linux subsystems just to
-make the development side manageable and practical.
+So that systemd/udev can rename them as en<X?><subdev_id> and roce<X><subde=
+v_id>
+If so, what will be X without a bus type?
 
-.. once the code lives in another subsystem, it is in a new module. A
-new module requires some way to connect them all together, the driver
-core is the logical way to do this connection.
-
-I don't think a driver should be split beyond that. Even my suggestion
-of a 'core' may in practice just be the netdev driver as most of the
-other modules can't function without netdev. ie you can't do iSCSI
-without an IP stack.
-
-> > What is a generation? Mellanox has had a stable RDMA driver across
-> > many sillicon generations. Intel looks like their new driver will
-> > support at least the last two or more sillicon generations..
-> > 
-> > RDMA drivers are monstrous complex things, there is a big incentive to
-> > not respin them every time a new chip comes out.
-> 
-> Ack, but then again none of the drivers gets rewritten from scratch,
-> right? It's not that some "sub-drivers" get reused and some not, no?
-
-Remarkably Intel is saying their new RDMA 'sub-driver' will be compatible
-with their ICE and pre-ICE (sorry, forget the names) netdev core
-drivers. 
-
-netdev will get a different driver for each, but RDMA will use the
-same driver.
-
-Jason
+This route without a bus is certainly helpful to overcome the IOMMU limitat=
+ion where IOMMU only listens to pci bus type for DMAR setup,=20
+dmar_register_bus_notifier(), and in=20
+intel_iommu_init()-> bus_set_iommu(&pci_bus_type, &intel_iommu_ops);
+and other IOMMU doing similar PCI/AMBA binding.
+This is currently overcome using WA dma_ops.
