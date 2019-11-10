@@ -2,69 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C335CF6ABE
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 19:22:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4873EF6B0D
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 20:08:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726835AbfKJSWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Nov 2019 13:22:01 -0500
-Received: from mail-io1-f71.google.com ([209.85.166.71]:39053 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726684AbfKJSWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Nov 2019 13:22:01 -0500
-Received: by mail-io1-f71.google.com with SMTP id e17so10306586ioc.6
-        for <kvm@vger.kernel.org>; Sun, 10 Nov 2019 10:22:01 -0800 (PST)
+        id S1726913AbfKJTEW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Nov 2019 14:04:22 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:40867 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbfKJTEV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Nov 2019 14:04:21 -0500
+Received: by mail-qt1-f193.google.com with SMTP id o49so13252612qta.7
+        for <kvm@vger.kernel.org>; Sun, 10 Nov 2019 11:04:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=4X+lJuxXpXDbRkVB7/MvwoAb9ZOQMHWI6c7L1sTBKq4=;
+        b=e2epuT3DbyEliM62E016Oc2uFJQCWmIfHYgklM7m6mhAa/R1tVadAQYMNRUxbM5yvV
+         PivYook4+PtSMJXOjE/grGeSKGRRp7Y6HoJWLNnDusXHtMI3QoWSkKEUpynggrfzLInH
+         GeGMN3JRfPIff3gE1HY1hMoaYR2rC6gOdnDbs3TDfFXV22OGMFQ3KuccegsCKGWjUUrL
+         MRCWyYoXjn9FTOgqQHsmw9ea6aUzZs9dz8Rbqoi6erWLWyT10C7wghRa8BjWjjbtSyQE
+         CvUrDsvKnnaf0G30ydtTGDL7pUuX7MAb4E7i8TENiSbS0pzp/jLXAh2wB/5NvD+gM9ad
+         GFxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=6IYsbyGOlas2TYkBAA+OX3C+c+c7PZmkmS2Lj4e2olM=;
-        b=ZFc8uqjF2eNC7aWttBCKhNB3c1FFfGwGDUjl/p8znqwN09SrF7i1GuSocL23DuyA9t
-         eyDzpeRpf5uUvAOFlhia3wHnJGaZi5q29uX2OIr2JhyPbuCfJlYcDA9h4j9NMoh0Ub72
-         f2jW2NLsUC03oOAbKiPnlpQfZT0yRcPsTO8DO8gswO9MOjtt7qKLs/s4DfBKDjb+BoKi
-         ANqPtyS4qTq0PyiBBZXg7byKCpgZGGBLEPjH73e1n8ntxFAEqg2dYlM07x7CGf4UxilD
-         VgiQXcqq9cpoxZ3P1rurSrE97LRso9NGPUNK/LRIQOzY5O6W58cZCaaq27qlCA7qKwP3
-         wWEQ==
-X-Gm-Message-State: APjAAAUnnYdKpwM9TLvj7q/wdCMlMn/Vr4rtB5Jp8HYziSp4nPHBTLVQ
-        pdSvZFlZ6Qocw5QdamcwVhgVoGhPUuZQa4GDqX/2qUgRBLxD
-X-Google-Smtp-Source: APXvYqwMQzZ1opUlIK8pdiq3H2xsR+xRhM/WZ5LyKgYFGDDzAwpnulN1V5k5E71tn+RB6nDtjNGlfXgoCchmQxi7xESS5hCBRlUI
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=4X+lJuxXpXDbRkVB7/MvwoAb9ZOQMHWI6c7L1sTBKq4=;
+        b=LyYauIhimZCfU9c2UAM3SXpVUEKZYpCePOKFNsR599IkSlF5Y1eqCkqhAtVaytFQnb
+         HxKPyxkYw7ipxmZgRNXqpIFw9GACFPq13Ge6SPdrXVp9GbMiTZwUjNSrCBC8JxuKbyne
+         +wAQZTEsUCx30u6RtoLkXz6bYvuz6YvmszKqFhGvfD9p6yksEotAlWEytqJdBgUu6MXu
+         pogCWdhJEfwhAyVm+vN0Z3OfCWi5CYGlA4ohrxHwa3AY0TmIer6/D+GmoqMJRJ58wTDt
+         Uh0BbTe5pUfKBPws3iu6M8VArFJ/SwPldYybtlBfgS9ZVdc7KZ3VOF/lQ9ocvDH+4Mmy
+         WWjQ==
+X-Gm-Message-State: APjAAAWtjMdXdCBLn9bPHlvVpmMTSGeSR8vLSGK43oFHSMulGP4wZIf5
+        vThZYHf8smXD2N1jX9ZWo51lvw==
+X-Google-Smtp-Source: APXvYqxLWlOngvz8JEYlq7KhAImGgPmaYLGP5ikKveosJheOQf3aQ/BeD8Yv/uQkBcuupt+Jx6Z8Ww==
+X-Received: by 2002:aed:2ac2:: with SMTP id t60mr22796872qtd.376.1573412659023;
+        Sun, 10 Nov 2019 11:04:19 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
+        by smtp.gmail.com with ESMTPSA id x65sm6410210qkd.15.2019.11.10.11.04.18
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 10 Nov 2019 11:04:18 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iTsVV-00048v-JX; Sun, 10 Nov 2019 15:04:17 -0400
+Date:   Sun, 10 Nov 2019 15:04:17 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>
+Cc:     Parav Pandit <parav@mellanox.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jiri Pirko <jiri@resnulli.us>,
+        David M <david.m.ertman@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>,
+        "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191110190417.GD31761@ziepe.ca>
+References: <20191108144054.GC10956@ziepe.ca>
+ <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108111238.578f44f1@cakuba>
+ <20191108201253.GE10956@ziepe.ca>
+ <20191108133435.6dcc80bd@x1.home>
+ <20191108210545.GG10956@ziepe.ca>
+ <20191108145210.7ad6351c@x1.home>
+ <AM0PR05MB4866444210721BC4EE775D27D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191109005708.GC31761@ziepe.ca>
+ <20191109094103.739033a3@cakuba>
 MIME-Version: 1.0
-X-Received: by 2002:a92:48cf:: with SMTP id j76mr25098653ilg.189.1573410120472;
- Sun, 10 Nov 2019 10:22:00 -0800 (PST)
-Date:   Sun, 10 Nov 2019 10:22:00 -0800
-In-Reply-To: <000000000000be219705967f9963@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000051218f059702171a@google.com>
-Subject: Re: general protection fault in kvm_coalesced_mmio_init
-From:   syzbot <syzbot+e27e7027eb2b80e44225@syzkaller.appspotmail.com>
-To:     jmattson@google.com, junaids@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        rkrcmar@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191109094103.739033a3@cakuba>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-syzbot has bisected this bug to:
+On Sat, Nov 09, 2019 at 09:41:03AM -0800, Jakub Kicinski wrote:
+> On Fri, 8 Nov 2019 20:57:08 -0400, Jason Gunthorpe wrote:
+> > On Fri, Nov 08, 2019 at 10:48:31PM +0000, Parav Pandit wrote:
+> > > We should be creating 3 different buses, instead of mdev bus being de-multiplexer of that?
+> > > 
+> > > Hence, depending the device flavour specified, create such device on right bus?
+> > > 
+> > > For example,
+> > > $ devlink create subdev pci/0000:05:00.0 flavour virtio name foo subdev_id 1
+> > > $ devlink create subdev pci/0000:05:00.0 flavour mdev <uuid> subdev_id 2
+> > > $ devlink create subdev pci/0000:05:00.0 flavour mlx5 id 1 subdev_id 3  
+> > 
+> > I like the idea of specifying what kind of interface you want at sub
+> > device creation time. It fits the driver model pretty well and doesn't
+> > require abusing the vfio mdev for binding to a netdev driver.
+> 
+> Aren't the HW resources spun out in all three cases exactly identical?
 
-commit 9121923c457d1d8667a6e3a67302c29e5c5add6b
-Author: Jim Mattson <jmattson@google.com>
-Date:   Thu Oct 24 23:03:26 2019 +0000
+Exactly? No, not really. The only constant is that some chunk of the
+BAR is dedicated to this subedv. The BAR is flexible, so a BAR chunk
+configured for virtio is not going to support mlx5 mode.
 
-     kvm: Allocate memslots and buses before calling kvm_arch_init_vm
+Aside from that, there are other differences ie - mlx5 does not need a
+dedicated set of MSI-X's while other modes do. There are fewer MSI-X's
+than SF's, so managing this is important for the admin.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13eaf7ece00000
-start commit:   00aff683 Merge tag 'for-5.4-rc6-tag' of git://git.kernel.o..
-git tree:       upstream
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=101af7ece00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17eaf7ece00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=896c87b73c6fcda6
-dashboard link: https://syzkaller.appspot.com/bug?extid=e27e7027eb2b80e44225
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ed65aae00000
+Even in modes which are very similar, like mlx5 vs mdev-vfio, the HW
+still has to be configured to provide global DMA isolation on the NIC
+for vfio as the IOMMU cannot be involved. This is extra overhead and
+should not be activated unless vfio is being used.
 
-Reported-by: syzbot+e27e7027eb2b80e44225@syzkaller.appspotmail.com
-Fixes: 9121923c457d ("kvm: Allocate memslots and buses before calling  
-kvm_arch_init_vm")
+.. and finally the driver core does not support a
+'multiple-inheritance' like idea, so we can't have a 'foo_device' that
+is three different things.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+So somehow the 'flavour' of the 'struct device' has to be exposed to
+userspace, and it is best if this is done at device creation time so
+the BAR region and HW can be setup once and we don't have to have
+complex reconfiguration flows.
+
+Jason
