@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 64E2AF628E
-	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 03:44:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBAD6F6419
+	for <lists+kvm@lfdr.de>; Sun, 10 Nov 2019 03:57:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728447AbfKJCnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 9 Nov 2019 21:43:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42620 "EHLO mail.kernel.org"
+        id S1728132AbfKJC5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 9 Nov 2019 21:57:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47236 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727290AbfKJCny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 9 Nov 2019 21:43:54 -0500
+        id S1729327AbfKJC4s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 9 Nov 2019 21:56:48 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 41CE2215EA;
-        Sun, 10 Nov 2019 02:43:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C8FAD222C5;
+        Sun, 10 Nov 2019 02:47:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573353834;
-        bh=mGjPsR67NsH8i4TW2u6yaW2jdVFRvrQWuhjdjIqqxIk=;
+        s=default; t=1573354064;
+        bh=UwLXFne5zF+yoIN2n+oORAiSDjx98eG7FobzA3nIJFA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZTO9vBME27ucsKQ5qovG6cH4YJcgcoqId2QdDfKhMhghZW+qp7x4ckNAaKxo52mwk
-         iHyNEZfR00c63adv2F0+DFfh9vlyH0wxMY/cdUnKr8EDoCLqkD7wazrWgwqjXEGjUP
-         O2TUscUajaN7gwGIYMZnK4F3qVxTALq0E8Go/UHE=
+        b=TxW7dy1KvnMbpzcffg3Bl/Bdf+RfbOiooTki9J17u6JlTJDIpLR8mYCz9DsTKJ9+O
+         hgiVTjA4mY02Of6hwWT4hIgMM/2vElqX9HddWY81p6wvltvpSgUbLgQFWMP4mt7bm4
+         05W2HCdoW5Lok6qzX5qTjjEIUPEmPBcBonNvBo+U=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Gage Eads <gage.eads@intel.com>,
         Ashok Raj <ashok.raj@intel.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 125/191] vfio/pci: Mask buggy SR-IOV VF INTx support
-Date:   Sat,  9 Nov 2019 21:39:07 -0500
-Message-Id: <20191110024013.29782-125-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 070/109] vfio/pci: Mask buggy SR-IOV VF INTx support
+Date:   Sat,  9 Nov 2019 21:45:02 -0500
+Message-Id: <20191110024541.31567-70-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191110024013.29782-1-sashal@kernel.org>
-References: <20191110024013.29782-1-sashal@kernel.org>
+In-Reply-To: <20191110024541.31567-1-sashal@kernel.org>
+References: <20191110024541.31567-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -73,10 +73,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 33 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index a92c2868d9021..0a6eb53e79fbf 100644
+index 15b1cd4ef5a77..9bd3e7911af2b 100644
 --- a/drivers/vfio/pci/vfio_pci.c
 +++ b/drivers/vfio/pci/vfio_pci.c
-@@ -443,10 +443,14 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
+@@ -433,10 +433,14 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
  {
  	if (irq_type == VFIO_PCI_INTX_IRQ_INDEX) {
  		u8 pin;
