@@ -2,140 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5357EF755A
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 14:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E1DF755D
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 14:49:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726949AbfKKNst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 08:48:49 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44812 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726908AbfKKNss (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 08:48:48 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABDiO3f060026;
-        Mon, 11 Nov 2019 13:48:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=EpFABDWBhO8fvvUmXkAs/bCMitZ52ZZK+AWvMZhikN0=;
- b=V9EFCMqGoPrZZwTVYZjerRnqHSIiLLisgiPjMbE4MQadc5uALrBBKO820tfr0v61W7Qp
- 5kckp7qDeVHk/iaf6Rk5CbEzSYSnTNpQXMjDfofcms9jf7ko2MZ0M/Yg/FjeJe98QUpw
- Bapy3P26NnA5OCWRQVdJtses3hSG16c1D03kyXV4PeI+MO9qTdmGvZz2kEVehhQ94Gos
- 4DD/hjgPlY9XlWkbda9cQXjoUyiPz13Te1zQcNfCMWF1lQyWplDP1EXpq1mHmAEGtbpD
- JigD3CtMrMuwh9VkSyrUjPSfGZdtbHRstbMNiDjcTXDViHBCWK8agIi2qcWNYEBymr8B Kw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2w5p3qf0fa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 13:48:41 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABDcfuS166514;
-        Mon, 11 Nov 2019 13:46:40 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2w66yxkya5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 13:46:40 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABDkdqH002780;
-        Mon, 11 Nov 2019 13:46:39 GMT
-Received: from [10.74.126.113] (/10.74.126.113)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 Nov 2019 05:46:38 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/2] KVM: x86: Prevent set vCPU into INIT/SIPI_RECEIVED
- state when INIT are latched
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <cff559e6-7cc4-64f3-bebf-e72dd2a5a3ea@redhat.com>
-Date:   Mon, 11 Nov 2019 15:46:34 +0200
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Mihai Carabas <mihai.carabas@oracle.com>
+        id S1727036AbfKKNtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 08:49:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50546 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726879AbfKKNtn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 08:49:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573480182;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=EY5+4NqtD637Jq/iOkgRi0CcCRIMuNTpq8KDCNXJJLA=;
+        b=NKUMVB+8n8RzeJtYPblppCnQ1AcTTttwLNCIS0OUXbi+vvfiBEwFghLVOqCOlmi4lPYKZO
+        1gQNbjSndP/Z04j2hdiI7zjqP0rFpPJJEVM5AanvA+BYJMBBw56+gTlpNPKy85km07XnHk
+        ODaqbDWxUNu6LRKwAdPGPVOBGy+vLr4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-y7uWyjZ9M6WyL0nf4keCAA-1; Mon, 11 Nov 2019 08:49:39 -0500
+Received: by mail-wr1-f71.google.com with SMTP id 4so9978616wrf.19
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 05:49:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=EtDO20YQ4gCjEjWttnh7Y94CePcbnhFksyEQrtJO8cs=;
+        b=b0MVmXZQQ9HnEnG06HiRdSYMed3KYxUetNBrH5tzJ3tGHauLHeFvo8ZSPkDg3t+5nN
+         lSutPTo/VXBapxzypMElwWEhL7EXSH+/2WWPLDUfOYmtQ+wWyFUJ9/C5eGFxiAYjV1tU
+         rRCuQL9niV95KngbqilQGz3U05ZOBYXL4/cCOZBhNwjSIGfV8HutkOVTRYL2jBdkLRC5
+         +sUmU1nneFGoI1orEtckZSnBnKdejIdJwnac1PoQFBqHxmd4DQ8bYrPX7Ll6x/JnO0ch
+         J6r/h6JMi9/IYG1VUu5utQPUD/HpWHunEilpx/4RSKevT5BkQAqgM6MrZRE5ev5ESuAX
+         bOGw==
+X-Gm-Message-State: APjAAAWcIsrtCk0uf5Fr4q28nQjmHIieioxQ1sQ7F96M+UvV0q0B2IOA
+        GbLl0hPnGgrV4qMa+5RqDFMU0x/hMGORS6r2SfZ8eDxx32XfAZEPqw1xgRs9YKroPp7DvUxYPg0
+        YxIMxpdlBWhBS
+X-Received: by 2002:adf:c00a:: with SMTP id z10mr10055406wre.81.1573480178213;
+        Mon, 11 Nov 2019 05:49:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwHJZ7aG6D3DbvVErNHEtfXPfD9Yik6GMDJjGqtT+LDE8STop0GLyX9fdTYVK2/+Xc2br2hTg==
+X-Received: by 2002:adf:c00a:: with SMTP id z10mr10055388wre.81.1573480177951;
+        Mon, 11 Nov 2019 05:49:37 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
+        by smtp.gmail.com with ESMTPSA id a15sm14665669wrw.10.2019.11.11.05.49.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2019 05:49:37 -0800 (PST)
+Subject: Re: [PATCH 2/5] KVM: add a check to ensure grow start value is
+ nonzero
+To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>,
+        linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, mtosatti@redhat.com,
+        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
+        rkrcmar@redhat.com
+References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1572060239-17401-3-git-send-email-zhenzhong.duan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <391dd11b-ebbb-28ff-5e57-4a795cd16a1b@redhat.com>
+Date:   Mon, 11 Nov 2019 14:49:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1572060239-17401-3-git-send-email-zhenzhong.duan@oracle.com>
+Content-Language: en-US
+X-MC-Unique: y7uWyjZ9M6WyL0nf4keCAA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <BB5CCF97-38DE-4037-83E3-22E921D25651@oracle.com>
-References: <20191111091640.92660-1-liran.alon@oracle.com>
- <20191111091640.92660-3-liran.alon@oracle.com>
- <cff559e6-7cc4-64f3-bebf-e72dd2a5a3ea@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911110129
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911110130
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 26/10/19 05:23, Zhenzhong Duan wrote:
+> vcpu->halt_poll_ns could be zeroed in certain cases (e.g. by
+> halt_poll_ns_shrink). If halt_poll_ns_grow_start is zero,
+> vcpu->halt_poll_ns will never be larger than zero.
+>=20
+> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
+> ---
+>  virt/kvm/kvm_main.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>=20
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2ca2979..1b6fe3b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2266,6 +2266,13 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcp=
+u)
+>  =09=09goto out;
+> =20
+>  =09val *=3D grow;
+> +
+> +=09/*
+> +=09 * vcpu->halt_poll_ns needs a nonzero start point to grow if it's zer=
+o.
+> +=09 */
+> +=09if (!grow_start)
+> +=09=09grow_start =3D 1;
+> +
+>  =09if (val < grow_start)
+>  =09=09val =3D grow_start;
+> =20
+>=20
 
+Zeroing grow_start will simply disable halt polling.  Is that a problem?
 
-> On 11 Nov 2019, at 15:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 11/11/19 10:16, Liran Alon wrote:
->> -	/* INITs are latched while in SMM */
->> -	if ((is_smm(vcpu) || vcpu->arch.smi_pending) &&
->> +	/* INITs are latched while CPU is in specific states */
->> +	if ((kvm_vcpu_latch_init(vcpu) || vcpu->arch.smi_pending) &&
->> 	    (mp_state->mp_state =3D=3D KVM_MP_STATE_SIPI_RECEIVED ||
->> 	     mp_state->mp_state =3D=3D KVM_MP_STATE_INIT_RECEIVED))
->> 		goto out;
->=20
-> Just a small doc clarification:
->=20
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 318046647fda..cacfe14717d6 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2707,7 +2707,8 @@ void kvm_apic_accept_events(struct kvm_vcpu =
-*vcpu)
-> 		return;
->=20
-> 	/*
-> -	 * INITs are latched while CPU is in specific states.
-> +	 * INITs are latched while CPU is in specific states
-> +	 * (SMM, VMX non-root mode, SVM with GIF=3D0).
-
-I didn=E2=80=99t want this line of comment as it may diverge from the =
-implementation of kvm_vcpu_latch_init().
-That=E2=80=99s why I removed it.
-
-> 	 * Because a CPU cannot be in these states immediately
-> 	 * after it has processed an INIT signal (and thus in
-> 	 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 681544f8db31..11746534e209 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8706,7 +8706,11 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct =
-kvm_vcpu *vcpu,
-> 	    mp_state->mp_state !=3D KVM_MP_STATE_RUNNABLE)
-> 		goto out;
->=20
-> -	/* INITs are latched while CPU is in specific states */
-> +	/*
-> +	 * KVM_MP_STATE_INIT_RECEIVED means the processor is in
-> +	 * INIT state; latched init should be reported using
-> +	 * KVM_SET_VCPU_EVENTS, so reject it here.
-> +	 */
-
-Yes this is a good comment. Thanks for adding it.
-
-> 	if ((kvm_vcpu_latch_init(vcpu) || vcpu->arch.smi_pending) &&
-> 	    (mp_state->mp_state =3D=3D KVM_MP_STATE_SIPI_RECEIVED ||
-> 	     mp_state->mp_state =3D=3D KVM_MP_STATE_INIT_RECEIVED))
->=20
->=20
-> I'm not sure why you're removing the first hunk, it's just meant to
-> explain why it needs to be a kvm_x86_ops in case the reader is not
-> thinking about nested virtualization.
->=20
-> Paolo
->=20
+Paolo
 
