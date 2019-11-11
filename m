@@ -2,102 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B72AF75B8
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 14:56:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACCE6F75DB
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:02:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbfKKNyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 08:54:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60131 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726950AbfKKNyu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 08:54:50 -0500
+        id S1726982AbfKKOCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 09:02:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48129 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726811AbfKKOCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 09:02:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573480488;
+        s=mimecast20190719; t=1573480951;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=Kdxnyo+p6t0JdZhsLc2EdVrHnYFkAr4aia07OARRAyk=;
-        b=ZZs1HUK2Mn8lDBCAE8iSdkLx1yAUG/FibdjEP6QCxLB8OcUWKhWqeQwE3JvOuAdGR3Q/xL
-        inbuCTYlLXcuxRVMiCKgTwzS8glOVeWo7TX7YKOfO89Khn7JhERCs/XYvjo3vf4/trYFmt
-        HZX50Fjo5fYdMWsLj2H6LVJI0aElk48=
+        bh=2HTa1ngHuirBrMsL3KLUBSKYu0dq4sOVUTDgb0CAUdc=;
+        b=VuMQaY2lewP7huu89A6u6z+RBSREeJCyJ0wrspypBRivUbC65KYLzux2EuNTlH6+ZrXS3O
+        BLZXvbw41Nf7l3Z/lobbqa9vkHsBCi+4zjFDKi5Ig6Re0518FAKRR/47R/UPLwqZgSA6AY
+        PzcPjEDZW4Vi/9I1Iy6o/cIKl+vMs+I=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-Wrq4e7CsN92LVxn_Nkz79A-1; Mon, 11 Nov 2019 08:54:47 -0500
-Received: by mail-wm1-f69.google.com with SMTP id h191so8181189wme.5
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 05:54:47 -0800 (PST)
+ us-mta-424-u_n6ZR_iPbah5NwStoe42A-1; Mon, 11 Nov 2019 09:02:30 -0500
+Received: by mail-wm1-f69.google.com with SMTP id b10so6906826wmh.6
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:02:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BxHVyZ+cnRCYzkQSXGK/lCaiu55fYily773XUj4dT5s=;
-        b=Vv3PKoihBmZ33n7fJTbaMfEF1yM+fhap/40wNb1yC37epv9ZYbALPXoq86gMFpykZQ
-         xgKq7EL3UHX94Dteef+5gY2i0CPGuj5HWmfFRDMejeBtwPG2juVb9h76+7FPnK4aDKAk
-         SZUnJtqHx+GV3Av5oFsrYV2+D36jz3KCdeBUtScGwh0VssI0f04OrWmJIEUj1fzkPXS1
-         xn3Q7RLkmtKcUBxWE6121Ev3RA3tFXsSQ466iu16gjG/M1CjPcBRRQo95pGvcjpS4LL0
-         Xv9gHQunNvbD7k+WejFpomNVtXnolpk9pia24p9RIFHjayWNj6u1vWX9UVyRIvZrMyDB
-         5Ung==
-X-Gm-Message-State: APjAAAW25eUrd/tuZ+dzaYIxCLdpAnpzgMnrtepfq3ELLd+uNI2lTlRl
-        O1MhwZFfsMyQ004Uc1YcXCQt2aeabJXNKsDtQ8RGrkUJ08JSxpmdn/VajqnFQgvpEQyHMb0KOSA
-        uR5Vz7CmJUCwI
-X-Received: by 2002:a1c:f20c:: with SMTP id s12mr9404568wmc.37.1573480486541;
-        Mon, 11 Nov 2019 05:54:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxPKbfaui1XILL/LXgyrl/T67qcN/cQ/bVUBjzaNiprDnW/V8fSSn81rsVJlkmK1d+EG5JIBg==
-X-Received: by 2002:a1c:f20c:: with SMTP id s12mr9404546wmc.37.1573480486289;
-        Mon, 11 Nov 2019 05:54:46 -0800 (PST)
+        bh=XB0qHGYLVcVA1erpwz2Rl7+/5K+EptCTKRytU8bU7Ns=;
+        b=oJ9W+Uv4jC+8opC9ECnSZNpn2OhfgWQWwAsAvt2mrSVV8oaJqsjA+QRksShFED89Xs
+         0wVKH1t6BrgqUQtqOxVrgcm1WC7FV54ueRtASfSUZ98xMXQ5KkMrgABx+7rnOLg259Ih
+         JyTDvuaEot/iwoINQrK7Fm0p68CSMGPSNi9toI/ESzrqRAWYbdydohCC453VnhegM7HE
+         reqFUf/M8yNlPHbDvDPQgc/Jq35/brcg61dPVTON7bbw9G063t5YjbWvLVPQHnKtC1BG
+         f4dr+cvH4qB7Nj3l0rAWASrDpM5yW9i3GibhMey/sSHmaTfS+onx7pB9hRCsyIErp5nu
+         v7fw==
+X-Gm-Message-State: APjAAAUZuZ4RzymDcWdo+UDCL/esJg3Ev80rDfkYpj328SSfTq/HAzv4
+        RRYgbmG+azpHCNVUK0udcAb5R+TM68GQIOirloKtyMY9B9mzRawtfdJQSFRQPufM14GspScyKWi
+        G359wioX4PtoP
+X-Received: by 2002:adf:e40e:: with SMTP id g14mr1045407wrm.264.1573480948779;
+        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx4PBRNbIZaeQQFF5KjjrlYnulrE2VpmEQt1a5cEfualJp8M6F7cOxnDKI/3IlL3BClfkFc5g==
+X-Received: by 2002:adf:e40e:: with SMTP id g14mr1045388wrm.264.1573480948535;
+        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
-        by smtp.gmail.com with ESMTPSA id 200sm27687037wme.32.2019.11.11.05.54.45
+        by smtp.gmail.com with ESMTPSA id 5sm13533793wmk.48.2019.11.11.06.02.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2019 05:54:45 -0800 (PST)
-Subject: Re: [PATCH 4/5] cpuidle-haltpoll: add a check to ensure grow start
- value is nonzero
-To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
-        rkrcmar@redhat.com
-References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
- <1572060239-17401-5-git-send-email-zhenzhong.duan@oracle.com>
- <20191101211908.GA20672@amt.cnet>
- <7245089f-788e-03d6-9833-6ce4d313f4ce@oracle.com>
+        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
+Subject: Re: [PATCH 2/2] KVM: x86: Prevent set vCPU into INIT/SIPI_RECEIVED
+ state when INIT are latched
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Mihai Carabas <mihai.carabas@oracle.com>
+References: <20191111091640.92660-1-liran.alon@oracle.com>
+ <20191111091640.92660-3-liran.alon@oracle.com>
+ <cff559e6-7cc4-64f3-bebf-e72dd2a5a3ea@redhat.com>
+ <BB5CCF97-38DE-4037-83E3-22E921D25651@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <57679389-6e4a-b7ad-559f-3128a608c28a@redhat.com>
-Date:   Mon, 11 Nov 2019 14:54:47 +0100
+Message-ID: <ea6e861f-a293-e0da-6364-547fe23cbab1@redhat.com>
+Date:   Mon, 11 Nov 2019 15:02:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <7245089f-788e-03d6-9833-6ce4d313f4ce@oracle.com>
+In-Reply-To: <BB5CCF97-38DE-4037-83E3-22E921D25651@oracle.com>
 Content-Language: en-US
-X-MC-Unique: Wrq4e7CsN92LVxn_Nkz79A-1
+X-MC-Unique: u_n6ZR_iPbah5NwStoe42A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/11/19 03:56, Zhenzhong Duan wrote:
+On 11/11/19 14:46, Liran Alon wrote:
+>> +=09 * INITs are latched while CPU is in specific states
+>> +=09 * (SMM, VMX non-root mode, SVM with GIF=3D0).
+> I didn=E2=80=99t want this line of comment as it may diverge from the imp=
+lementation of kvm_vcpu_latch_init().
+> That=E2=80=99s why I removed it.
 >=20
-> On 2019/11/2 5:19, Marcelo Tosatti wrote:
->> On Sat, Oct 26, 2019 at 11:23:58AM +0800, Zhenzhong Duan wrote:
->>> dev->poll_limit_ns could be zeroed in certain cases (e.g. by
->>> guest_halt_poll_shrink). If guest_halt_poll_grow_start is zero,
->>> dev->poll_limit_ns will never be larger than zero.
->>>
->>> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
->>> ---
->>> =A0 drivers/cpuidle/governors/haltpoll.c | 15 ++++++++++++---
->>> =A0 1 file changed, 12 insertions(+), 3 deletions(-)
->> I would rather disallow setting grow_start to zero rather
->> than silently setting it to one on the back of the user.
->=20
-> Ok, will do.
+>> =09 * Because a CPU cannot be in these states immediately
+>> =09 * after it has processed an INIT signal (and thus in
+>> =09 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
 
-Similar to patch 2, I think disabling halt polling is a good behavior if
-grow_start =3D 0.
+Got it... on the other hand knowing the specific states clarifies why
+they cannot be in that state immediately after processing INIT.  It's a
+bit of a catch-22 indeed.
 
 Paolo
 
