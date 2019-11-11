@@ -2,191 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 720C1F7604
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:10:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83911F7625
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbfKKOKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 09:10:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42478 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726877AbfKKOKW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 09:10:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573481421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=7ZBq9QSoT6FgXPfyPjV1GwdjDqGwpRv6nD2/9NQqjcE=;
-        b=cq6C+ag+Iegk4OuXM9OwrJKLCVzr65q+fTP+b2/OlCSZv9y3H1AdE8AuO1OGn9C77iwd2U
-        Roff18Y5Qcs81sUNMf82D/85/IOTAQREmghivjE8epIGeS5XLroojS1eK3bU+6kp1FNXIb
-        TukL85YI+iKZ5oYKqyVh7NgRHa3NFTY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-TLsge69OMb2cJFSGrv9Tgw-1; Mon, 11 Nov 2019 09:10:20 -0500
-Received: by mail-wr1-f72.google.com with SMTP id e3so9961148wrs.17
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:10:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tgoqYA+8hwe2zTcbHs/UJukx3h3GolwfCf5nsCXxKIE=;
-        b=Z6z6wXB2Qlz5iHCzKJT5Y32EFxoE50XpgPyMRW+75E1VuqamPVtGspp/LXKFMeNjI2
-         3Korp3Xis+iSdUwj3hWY5f2NhkVFZmOH5AjAdQFhooqN4nMDT2J/fRV4eyo4OQ3WXx3u
-         2n5dr7s17tAPMhitb2hopG8z6VzLeLBO8mVb/c1jQKeaKp3bL4BuOqCwdtFxlArYTKHw
-         9UrlM2mHri9Ausy4nO+77LHm+2RejDt8FqmAKR4ZoLSW160YSPBgEQcgqykRa5R68iXW
-         epEN/aBnYz+13jF/c/hdipOppTB0pedqXt/KdIWU/pHI49+rNdPOjnHroyAPuhtLnH6W
-         E9Hg==
-X-Gm-Message-State: APjAAAXe9FG7hGT5pPzvgHbMhUO09oOEB1fUiKu7G4miWwjtbhsuPhQL
-        yZQ/oRJfQ/ZpItdv/zTRfC2GpLLUkRJ+cgW3Bd96fWJkRPQQUs4QIgtLeZwjZqhy6a2+IloZzTi
-        CiGIsz3OyUGsQ
-X-Received: by 2002:a7b:c4c8:: with SMTP id g8mr19087753wmk.36.1573481418631;
-        Mon, 11 Nov 2019 06:10:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz32fok14gHNpnDfuiKRmJvdPzPxLe4MT2ZPhzOi5DUpChQhCSbqVGGAxAdbGlR8erjPXlPug==
-X-Received: by 2002:a7b:c4c8:: with SMTP id g8mr19087734wmk.36.1573481418327;
-        Mon, 11 Nov 2019 06:10:18 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
-        by smtp.gmail.com with ESMTPSA id q15sm7201581wrs.91.2019.11.11.06.10.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2019 06:10:17 -0800 (PST)
-Subject: Re: [PATCH] KVM: APIC: add helper func to remove duplicate code in
- kvm_pv_send_ipi
-To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-References: <1573292809-18181-1-git-send-email-linmiaohe@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <afcc4015-13f1-61d3-7ab8-e24f2b9c0ea8@redhat.com>
-Date:   Mon, 11 Nov 2019 15:10:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726958AbfKKOOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 09:14:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60918 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726843AbfKKOOd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 09:14:33 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA40C21925;
+        Mon, 11 Nov 2019 14:14:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573481672;
+        bh=0IDDU6b5/Y6auVkjsPzFNFLTUrYbv58q9hkKdzQUSNI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XdzM8eMhYSmS19YTBemsLCBU/GHzm2gOp6gPrWol5hs9QTFY6JVhAlBUh7YD3I1l1
+         Z+TnpWQLpX2z5dMlOECaQKZyQa14MpK0euWtP0BiZWBNc9iuT3Z+y2/luEZmm88FWV
+         3ZIkZYj0SuRNAmGlF9cD6Gtm6QsRKPqhLH5GPJ0M=
+Date:   Mon, 11 Nov 2019 15:14:30 +0100
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     Jiri Pirko <jiri@resnulli.us>
+Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Parav Pandit <parav@mellanox.com>,
+        David M <david.m.ertman@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Or Gerlitz <gerlitz.or@gmail.com>
+Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
+Message-ID: <20191111141430.GB585609@kroah.com>
+References: <20191108144054.GC10956@ziepe.ca>
+ <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108111238.578f44f1@cakuba>
+ <20191108201253.GE10956@ziepe.ca>
+ <20191108134559.42fbceff@cakuba>
+ <20191109004426.GB31761@ziepe.ca>
+ <20191109092747.26a1a37e@cakuba>
+ <20191110091855.GE1435668@kroah.com>
+ <20191110194601.0d6ed1a0@cakuba>
+ <20191111133026.GA2202@nanopsycho>
 MIME-Version: 1.0
-In-Reply-To: <1573292809-18181-1-git-send-email-linmiaohe@huawei.com>
-Content-Language: en-US
-X-MC-Unique: TLsge69OMb2cJFSGrv9Tgw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191111133026.GA2202@nanopsycho>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/11/19 10:46, linmiaohe wrote:
-> From: Miaohe Lin <linmiaohe@huawei.com>
->=20
-> There are some duplicate code in kvm_pv_send_ipi when deal with ipi
-> bitmap. Add helper func to remove it, and eliminate odd out label,
-> get rid of unnecessary kvm_lapic_irq field init and so on.
->=20
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  arch/x86/kvm/lapic.c | 65 ++++++++++++++++++++------------------------
->  1 file changed, 29 insertions(+), 36 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index b29d00b661ff..2f8f10103f5f 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -557,60 +557,53 @@ int kvm_apic_set_irq(struct kvm_vcpu *vcpu, struct =
-kvm_lapic_irq *irq,
->  =09=09=09irq->level, irq->trig_mode, dest_map);
->  }
-> =20
-> +static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map =
-*map,
-> +=09=09=09 struct kvm_lapic_irq *irq, u32 min)
-> +{
-> +=09int i, count =3D 0;
-> +=09struct kvm_vcpu *vcpu;
-> +
-> +=09if (min > map->max_apic_id)
-> +=09=09return 0;
-> +
-> +=09for_each_set_bit(i, ipi_bitmap,
-> +=09=09min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-> +=09=09if (map->phys_map[min + i]) {
-> +=09=09=09vcpu =3D map->phys_map[min + i]->vcpu;
-> +=09=09=09count +=3D kvm_apic_set_irq(vcpu, irq, NULL);
-> +=09=09}
-> +=09}
-> +
-> +=09return count;
-> +}
-> +
->  int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
->  =09=09    unsigned long ipi_bitmap_high, u32 min,
->  =09=09    unsigned long icr, int op_64_bit)
->  {
-> -=09int i;
->  =09struct kvm_apic_map *map;
-> -=09struct kvm_vcpu *vcpu;
->  =09struct kvm_lapic_irq irq =3D {0};
->  =09int cluster_size =3D op_64_bit ? 64 : 32;
-> -=09int count =3D 0;
-> +=09int count;
-> +
-> +=09if (icr & (APIC_DEST_MASK | APIC_SHORT_MASK))
-> +=09=09return -KVM_EINVAL;
-> =20
->  =09irq.vector =3D icr & APIC_VECTOR_MASK;
->  =09irq.delivery_mode =3D icr & APIC_MODE_MASK;
->  =09irq.level =3D (icr & APIC_INT_ASSERT) !=3D 0;
->  =09irq.trig_mode =3D icr & APIC_INT_LEVELTRIG;
-> =20
-> -=09if (icr & APIC_DEST_MASK)
-> -=09=09return -KVM_EINVAL;
-> -=09if (icr & APIC_SHORT_MASK)
-> -=09=09return -KVM_EINVAL;
-> -
->  =09rcu_read_lock();
->  =09map =3D rcu_dereference(kvm->arch.apic_map);
-> =20
-> -=09if (unlikely(!map)) {
-> -=09=09count =3D -EOPNOTSUPP;
-> -=09=09goto out;
-> +=09count =3D -EOPNOTSUPP;
-> +=09if (likely(map)) {
-> +=09=09count =3D __pv_send_ipi(&ipi_bitmap_low, map, &irq, min);
-> +=09=09min +=3D cluster_size;
-> +=09=09count +=3D __pv_send_ipi(&ipi_bitmap_high, map, &irq, min);
->  =09}
-> =20
-> -=09if (min > map->max_apic_id)
-> -=09=09goto out;
-> -=09/* Bits above cluster_size are masked in the caller.  */
-> -=09for_each_set_bit(i, &ipi_bitmap_low,
-> -=09=09min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-> -=09=09if (map->phys_map[min + i]) {
-> -=09=09=09vcpu =3D map->phys_map[min + i]->vcpu;
-> -=09=09=09count +=3D kvm_apic_set_irq(vcpu, &irq, NULL);
-> -=09=09}
-> -=09}
-> -
-> -=09min +=3D cluster_size;
-> -
-> -=09if (min > map->max_apic_id)
-> -=09=09goto out;
-> -
-> -=09for_each_set_bit(i, &ipi_bitmap_high,
-> -=09=09min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-> -=09=09if (map->phys_map[min + i]) {
-> -=09=09=09vcpu =3D map->phys_map[min + i]->vcpu;
-> -=09=09=09count +=3D kvm_apic_set_irq(vcpu, &irq, NULL);
-> -=09=09}
-> -=09}
-> -
-> -out:
->  =09rcu_read_unlock();
->  =09return count;
->  }
->=20
+On Mon, Nov 11, 2019 at 02:30:26PM +0100, Jiri Pirko wrote:
+> Mon, Nov 11, 2019 at 04:46:01AM CET, jakub.kicinski@netronome.com wrote:
+> >On Sun, 10 Nov 2019 10:18:55 +0100, gregkh@linuxfoundation.org wrote:
+> >> > What I'm missing is why is it so bad to have a driver register to
+> >> > multiple subsystems.  
+> >> 
+> >> Because these PCI devices seem to do "different" things all in one PCI
+> >> resource set.  Blame the hardware designers :)
+> >
+> >See below, I don't think you can blame the HW designers in this
+> >particular case :)
+> >
+> >> > For the nfp I think the _real_ reason to have a bus was that it
+> >> > was expected to have some out-of-tree modules bind to it. Something 
+> >> > I would not encourage :)  
+> >> 
+> >> That's not ok, and I agree with you.
+> >> 
+> >> But there seems to be some more complex PCI devices that do lots of
+> >> different things all at once.  Kind of like a PCI device that wants to
+> >> be both a keyboard and a storage device at the same time (i.e. a button
+> >> on a disk drive...)
+> >
+> >The keyboard which is also a storage device may be a clear cut case
+> >where multiple devices were integrated into one bus endpoint.
+> 
+> Also, I think that very important differentiator between keyboard/button
+> and NIC is that keyboard/button is fixed. You have driver bus with 2
+> devices on constant addresses.
+> 
+> However in case of NIC subfunctions. You have 0 at he beginning and user
+> instructs to create more (maybe hundreds). Now important questions
+> appear:
+> 
+> 1) How to create devices (what API) - mdev has this figured out
+> 2) How to to do the addressing of the devices. Needs to be
+>    predictable/defined by the user - mdev has this figured out
+> 3) Udev names of netdevices - udev names that according to the
+>    bus/address. That is straightforeward with mdev.
+>    I can't really see how to figure this one in particular with
+>    per-driver busses :/
 
-Queued, thanks.
+Are network devices somehow only allowed to be on mdev busses?
 
-Paolo
+No, don't be silly, userspace handles this just fine today on any type
+of bus, it's not an issue.
 
+You don't have to like individual "driver busses", but you had better
+not be using a fake platform device to use mdev.  That's my main
+objection...
+
+thanks,
+
+greg k-h
