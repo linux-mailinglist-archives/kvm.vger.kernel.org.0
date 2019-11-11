@@ -2,159 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 45C61F7758
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:06:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D599F7798
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:24:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726915AbfKKPGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 10:06:18 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:32901 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726906AbfKKPGS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 10:06:18 -0500
-Received: by mail-wr1-f65.google.com with SMTP id w9so8212662wrr.0
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 07:06:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=D7+Mln7zioZD6z9hmTpNuqpl/vZ6+iDnL/aNBB0t0B8=;
-        b=vOTeLvaI3JoAPhQ1gZGRFtG1QJiZHvozDFYKeaIURUMNdAQkib65m+tjGMLojX0gFw
-         xI3wyAbQ8xPD+CY60961ksYgQwTefeS3WQFVOTX+ecOWJzFgZBSQBbz6U3LKHaav8J9f
-         1pInlZiU3nF0RywrzTKDmPNJFJxstLEIzjeY+MJ2Ij4QwJOiHCxYNmwzGdn3BTjnTE96
-         OuHxbtM2LsGB2SSK1+cziKIJidUqrZ4kuE3CutB/1mSouPJAw5xEgN3+Wkkfpcsrkhn4
-         4f5KV9us43gWKuRJ1l87rtq5fGDyYga3gSp81xQaoDjW2HtTdfSYRtA/DbNrCPLNLfCT
-         30ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=D7+Mln7zioZD6z9hmTpNuqpl/vZ6+iDnL/aNBB0t0B8=;
-        b=Nl11IugunQhTZpkjl9JggwrLZTb6ZuzG+CgKC+c0ICCxCA+FlMiSyk1LnsSIxOVfdB
-         5iM4fK0LU3hXoi7n1F908F6WPuVl8yBIQW4Y3bFIjios/rpko4TgiQuSJXhZuPRZi2a8
-         FEw0soRmmjcahuPKNuXqErjMlklUPWeNP7xW22xD+3yqpnwwNig8V9qF+Z+Xz30smkJw
-         LB1XYd4nlcsvN+VRj+/6L55aDBcOLmmmIbTQhJUMDuLYKtSoCMsmuII0XiIRzE7mydGf
-         Km7kVnR8z9gdUEDfGArE8RPfclVgOI+k4083r1tUwa1UKiXrIGd+v2YIXghjMV8PhnlH
-         rv5A==
-X-Gm-Message-State: APjAAAWTB/8ZsQUjNYg3bW0G2BWm6+KdQEOEWUpyTgU96TErkn3+4nDQ
-        qE2TuLHcFVczvTdyxRBAYc1rNQ==
-X-Google-Smtp-Source: APXvYqz6okKQgXRrOy85hnlIawdK9gpnUJjod9cWU6khuWt2+pYd1K708rZyCf8daoD0He67rMrrDA==
-X-Received: by 2002:adf:f60a:: with SMTP id t10mr17950637wrp.29.1573484774756;
-        Mon, 11 Nov 2019 07:06:14 -0800 (PST)
-Received: from localhost (jirka.pirko.cz. [84.16.102.26])
-        by smtp.gmail.com with ESMTPSA id f14sm14853190wrv.17.2019.11.11.07.06.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2019 07:06:14 -0800 (PST)
-Date:   Mon, 11 Nov 2019 16:06:13 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        David M <david.m.ertman@intel.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>,
-        "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191111150613.GD2202@nanopsycho>
-References: <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <20191108133435.6dcc80bd@x1.home>
- <20191108210545.GG10956@ziepe.ca>
- <20191108145210.7ad6351c@x1.home>
- <AM0PR05MB4866444210721BC4EE775D27D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191109005708.GC31761@ziepe.ca>
- <AM0PR05MB48660E49342EC2CD6AB825F8D1750@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191111141732.GB2202@nanopsycho>
- <AM0PR05MB4866A5F11AED9ABA70FAE7EED1740@AM0PR05MB4866.eurprd05.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR05MB4866A5F11AED9ABA70FAE7EED1740@AM0PR05MB4866.eurprd05.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S1726877AbfKKPYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 10:24:52 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:57430 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbfKKPYw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 10:24:52 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABFO9Te162231;
+        Mon, 11 Nov 2019 15:24:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=4UNzLwOnEqJcRGz0ghDq+P2TdYkxizAVlL6hYF77Ums=;
+ b=HtbPAq4V9R55oMOcF6GeA691lUtwWZMkhCkcYlp5dSO5IJKu8Y2VnIns78JtKic3yyuh
+ gwI6H2X0GXOR9/Wd7JJBASVcjlpKm2fxVQIIoNgKfbEPpMYpfbJhGBU6b/G6TA1MxePm
+ O3N36tcTAFKzmYaad36K3N2YztuFYohOQNPKQRzYZ28N0DBv2T5R8bQLQ9R170h1ZcXS
+ j9rrZXp3hrLwVRnrJ1MJ8p/HXueGn6ll90JFG0kj4TGX28ZOSmolSWSZOtLO93v/ueis
+ HQdygZ2DmtIlPlkJw/f4tRKe3E4TxZ+SxKTuD5hv1T8QP86HMSQoRQYxmMp35eKAJDeC cg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2w5ndpykc6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Nov 2019 15:24:44 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABFNNOx012077;
+        Mon, 11 Nov 2019 15:24:44 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2w66yy1ugy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Nov 2019 15:24:44 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABFOh9v022192;
+        Mon, 11 Nov 2019 15:24:43 GMT
+Received: from [192.168.14.112] (/79.182.207.213)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 11 Nov 2019 07:24:43 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH 2/2] KVM: nVMX: Update vmcs01 TPR_THRESHOLD if L2 changed
+ L1 TPR
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <a26a9a8c-df8d-c49a-3943-35424897b6b3@redhat.com>
+Date:   Mon, 11 Nov 2019 17:24:39 +0200
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <6CAEE592-02B0-4E25-B2D2-20E5B55A5D19@oracle.com>
+References: <20191111123055.93270-1-liran.alon@oracle.com>
+ <20191111123055.93270-3-liran.alon@oracle.com>
+ <a26a9a8c-df8d-c49a-3943-35424897b6b3@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=802
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911110141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=874 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911110141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mon, Nov 11, 2019 at 03:58:18PM CET, parav@mellanox.com wrote:
->
->
->> -----Original Message-----
->> From: Jiri Pirko <jiri@resnulli.us>
->> Sent: Monday, November 11, 2019 8:18 AM
->> Sun, Nov 10, 2019 at 08:48:31PM CET, parav@mellanox.com wrote:
->> >
->> >> From: Jason Gunthorpe <jgg@ziepe.ca>
->> >> Sent: Friday, November 8, 2019 6:57 PM
->> >> > We should be creating 3 different buses, instead of mdev bus being
->> >> > de-
->> >> multiplexer of that?
->> >> >
->> >> > Hence, depending the device flavour specified, create such device
->> >> > on right
->> >> bus?
->> >> >
->> >> > For example,
->> >> > $ devlink create subdev pci/0000:05:00.0 flavour virtio name foo
->> >> > subdev_id 1 $ devlink create subdev pci/0000:05:00.0 flavour mdev
->> >> > <uuid> subdev_id 2 $ devlink create subdev pci/0000:05:00.0 flavour
->> >> > mlx5 id 1 subdev_id 3
->> >>
->> >> I like the idea of specifying what kind of interface you want at sub
->> >> device creation time. It fits the driver model pretty well and
->> >> doesn't require abusing the vfio mdev for binding to a netdev driver.
->> >>
->> >> > $ devlink subdev pci/0000:05:00.0/<subdev_id> config <params> $
->> >> > echo <respective_device_id> <sysfs_path>/bind
->> >>
->> >> Is explicit binding really needed?
->> >No.
->> >
->> >> If you specify a vfio flavour why shouldn't the vfio driver autoload
->> >> and bind to it right away? That is kind of the point of the driver
->> >> model...
->> >>
->> >It some configuration is needed that cannot be passed at device creation
->> time, explicit bind later can be used.
->> >
->> >> (kind of related, but I don't get while all that GUID and lifecycle
->> >> stuff in mdev should apply for something like a SF)
->> >>
->> >GUID is just the name of the device.
->> >But lets park this aside for a moment.
->> >
->> >> > Implement power management callbacks also on all above 3 buses?
->> >> > Abstract out mlx5_bus into more generic virtual bus (vdev bus?) so
->> >> > that multiple vendors can reuse?
->> >>
->> >> In this specific case, why does the SF in mlx5 mode even need a bus?
->> >> Is it only because of devlink? That would be unfortunate
->> >>
->> >Devlink is one part due to identifying using bus/dev.
->> >How do we refer to its devlink instance of SF without bus/device?
->> 
->> Question is, why to have devlink instance for SF itself. Same as VF, you don't
->mlx5_core has devlink instance for PF and VF for long time now.
->Health report, txq/rxq dumps etc all anchored to this devlink instance even for VF. (similar to PF).
->And so, SF same framework should work for SF.
 
-Right, for health it makes sense.
 
->
->> need devlink instance. You only need devlink_port (or
->> devlink_subdev) instance on the PF devlink parent for it.
->> 
->Devlink_port or devlink_subdev are still on eswitch or mgmt side.
->They are not present on the side where devlink instance exist on side where txq/rxq/eq etc exist.
->
+> On 11 Nov 2019, at 17:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 11/11/19 13:30, Liran Alon wrote:
+>> When L1 don't use TPR-Shadow to run L2, L0 configures vmcs02 without
+>> TPR-Shadow and install intercepts on CR8 access (load and store).
+>>=20
+>> If L1 do not intercept L2 CR8 access, L0 intercepts on those accesses
+>> will emulate load/store on L1's LAPIC TPR. If in this case L2 lowers
+>> TPR such that there is now an injectable interrupt to L1,
+>> apic_update_ppr() will request a KVM_REQ_EVENT which will trigger a =
+call
+>> to update_cr8_intercept() to update TPR-Threshold to highest pending =
+IRR
+>> priority.
+>>=20
+>> However, this update to TPR-Threshold is done while active vmcs is
+>> vmcs02 instead of vmcs01. Thus, when later at some point L0 will
+>> emulate an exit from L2 to L1, L1 will still run with high
+>> TPR-Threshold. This will result in every VMEntry to L1 to immediately
+>> exit on TPR_BELOW_THRESHOLD and continue to do so infinitely until
+>> some condition will cause KVM_REQ_EVENT to be set.
+>> (Note that TPR_BELOW_THRESHOLD exit handler do not set KVM_REQ_EVENT
+>> until apic_update_ppr() will notice a new injectable interrupt for =
+PPR)
+>>=20
+>> To fix this issue, change update_cr8_intercept() such that if L2 =
+lowers
+>> L1's TPR in a way that requires to lower L1's TPR-Threshold, save =
+update
+>> to TPR-Threshold and apply it to vmcs01 when L0 emulates an exit from
+>> L2 to L1.
+>=20
+> Can you explain why the write shouldn't be done to vmcs02 as well?
+>=20
+> Paolo
 
-Got it.
+Because when L1 don=E2=80=99t use TPR-Shadow, L0 configures vmcs02 =
+without TPR-Shadow.
+Thus, writing to vmcs02->tpr_threshold doesn=E2=80=99t have any effect.
+
+If l1 do use TPR-Shadow, then VMX=E2=80=99s update_cr8_intercept() =
+doesn=E2=80=99t write to vmcs at all,
+because it means L1 defines a vTPR for L2 and thus doesn=E2=80=99t =
+provide it direct access to L1 TPR.
+
+-Liran
+
+>=20
+>> -	vmcs_write32(TPR_THRESHOLD, tpr_threshold);
+>> +
+>> +	if (is_guest_mode(vcpu))
+>> +		to_vmx(vcpu)->nested.l1_tpr_threshold =3D tpr_threshold;
+>> +	else
+>> +		vmcs_write32(TPR_THRESHOLD, tpr_threshold);
+>> }
+>>=20
+>> void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index bee16687dc0b..43331dfafffe 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -167,6 +167,9 @@ struct nested_vmx {
+>> 	u64 vmcs01_debugctl;
+>> 	u64 vmcs01_guest_bndcfgs;
+>>=20
+>> +	/* to migrate it to L1 if L2 writes to L1's CR8 directly */
+>> +	int l1_tpr_threshold;
+>> +
+>> 	u16 vpid02;
+>> 	u16 last_vpid;
+>>=20
+>>=20
+>=20
+
