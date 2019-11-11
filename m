@@ -2,137 +2,355 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82398F7895
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:17:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0E37F78BA
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:26:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbfKKQRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 11:17:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:53928 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbfKKQRq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 11:17:46 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABGGxC6023582;
-        Mon, 11 Nov 2019 16:17:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=+XlnBIGr0f6DHQOAeAIB/PAXvooJeHW2AKZcgW65K7M=;
- b=rgS1ExlgiFgAK5a1gd5ka+cc9uihXJG+JOffbGdm1H6b5xgdwBc/bSE1Gni5sYGwBdzI
- LJK9n4x1Gb76NUTF9RVcuYyWavYjoXDFsC7Xyv1/QaDAfH47s1ioCweg61mW126r11x9
- W8XjwF4UyZ7IH/qYGt4tvVZgW3tld+sf48iZ1LQlZxDOnh2K81A2tbclHpjU7YpDb71v
- 5M9rKOVmwglhDzGJk3PFxQcQJ62tvFRMf84eTQ863UyL8L7oXoJdp9spGS5FksfLo/7o
- dIMXoqauixO0MgE8Xnf1bYXgBUdlsO5fZPqALGdW+WxoVb9DqMsVeS8/6ylwpJwd603b Hw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w5mvtfwy7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 16:17:31 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABGHL8G139543;
-        Mon, 11 Nov 2019 16:17:31 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2w66wmd11u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 16:17:30 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABGH5AZ020818;
-        Mon, 11 Nov 2019 16:17:05 GMT
-Received: from [192.168.14.112] (/79.182.207.213)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 Nov 2019 08:17:05 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH 2/2] KVM: nVMX: Update vmcs01 TPR_THRESHOLD if L2 changed
- L1 TPR
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <72c26523-702a-df0c-5573-982da25cba19@redhat.com>
-Date:   Mon, 11 Nov 2019 18:17:01 +0200
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <BD8FF780-C38E-493C-9BDE-FAFC1B3D25D6@oracle.com>
-References: <20191111123055.93270-1-liran.alon@oracle.com>
- <20191111123055.93270-3-liran.alon@oracle.com>
- <a26a9a8c-df8d-c49a-3943-35424897b6b3@redhat.com>
- <6CAEE592-02B0-4E25-B2D2-20E5B55A5D19@oracle.com>
- <72c26523-702a-df0c-5573-982da25cba19@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911110147
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911110147
+        id S1726952AbfKKQ0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 11:26:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24876 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726845AbfKKQ0X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 11:26:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573489581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zCTkYzqymPCcXrOHdRh7cCtF0cBwrt5l2QNg+d+KuAA=;
+        b=DS/RyjX5Viv8Jbmv3AWQisCdFFjdww5Ht/RR1PiDwFZhtGP5Qq9pA400pGmufb+rxDntaw
+        7tt3zpdvKLKR6hWTi3UgNBXu0T9Yk2DOFHIrW+nVw0iokmVyXk3AWwfpFLzq6ecPa/TcKT
+        lCVcjN0N85SPxtxj7fbyYJf3+SHzUDA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-o1UoMp8XMXCWzqDaRlK2VA-1; Mon, 11 Nov 2019 11:26:18 -0500
+X-MC-Unique: o1UoMp8XMXCWzqDaRlK2VA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5CB4DBFF;
+        Mon, 11 Nov 2019 16:26:16 +0000 (UTC)
+Received: from gondolin (ovpn-117-4.ams2.redhat.com [10.36.117.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0DA6610027A5;
+        Mon, 11 Nov 2019 16:26:11 +0000 (UTC)
+Date:   Mon, 11 Nov 2019 17:25:58 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 04/37] KVM: s390: protvirt: Add initial lifecycle handling
+Message-ID: <20191111172558.731a0d8b.cohuck@redhat.com>
+In-Reply-To: <8989f705-ce14-7b85-e5b6-6d87803db491@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-5-frankja@linux.ibm.com>
+        <20191107172956.4f4d8a90.cohuck@redhat.com>
+        <8989f705-ce14-7b85-e5b6-6d87803db491@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/=Bz.swff5m_75zBIaFx83X5";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+--Sig_/=Bz.swff5m_75zBIaFx83X5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 8 Nov 2019 08:36:35 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> On 11 Nov 2019, at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 11/7/19 5:29 PM, Cornelia Huck wrote:
+> > On Thu, 24 Oct 2019 07:40:26 -0400
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> >> @@ -2157,6 +2164,96 @@ static int kvm_s390_set_cmma_bits(struct kvm *k=
+vm,
+> >>  =09return r;
+> >>  }
+> >> =20
+> >> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
+> >> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd=
+)
+> >> +{
+> >> +=09int r =3D 0;
+> >> +=09void __user *argp =3D (void __user *)cmd->data;
+> >> +
+> >> +=09switch (cmd->cmd) {
+> >> +=09case KVM_PV_VM_CREATE: {
+> >> +=09=09r =3D kvm_s390_pv_alloc_vm(kvm);
+> >> +=09=09if (r)
+> >> +=09=09=09break;
+> >> +
+> >> +=09=09mutex_lock(&kvm->lock);
+> >> +=09=09kvm_s390_vcpu_block_all(kvm);
+> >> +=09=09/* FMT 4 SIE needs esca */
+> >> +=09=09r =3D sca_switch_to_extended(kvm);
+
+Looking at this again: this function calls kvm_s390_vcpu_block_all()
+(which probably does not hurt), but then kvm_s390_vcpu_unblock_all()...
+don't we want to keep the block across pv_create_vm() as well?
+
+Also, can you maybe skip calling this function if we use the esca
+already?
+
+> >> +=09=09if (!r)
+> >> +=09=09=09r =3D kvm_s390_pv_create_vm(kvm);
+> >> +=09=09kvm_s390_vcpu_unblock_all(kvm);
+> >> +=09=09mutex_unlock(&kvm->lock);
+> >> +=09=09break;
+> >> +=09}
+> >> +=09case KVM_PV_VM_DESTROY: {
+> >> +=09=09/* All VCPUs have to be destroyed before this call. */
+> >> +=09=09mutex_lock(&kvm->lock);
+> >> +=09=09kvm_s390_vcpu_block_all(kvm);
+> >> +=09=09r =3D kvm_s390_pv_destroy_vm(kvm);
+> >> +=09=09if (!r)
+> >> +=09=09=09kvm_s390_pv_dealloc_vm(kvm);
+> >> +=09=09kvm_s390_vcpu_unblock_all(kvm);
+> >> +=09=09mutex_unlock(&kvm->lock);
+> >> +=09=09break;
+> >> +=09} =20
+> >=20
+> > Would be helpful to have some code that shows when/how these are called
+> > - do you have any plans to post something soon? =20
 >=20
-> On 11/11/19 16:24, Liran Alon wrote:
->>> Can you explain why the write shouldn't be done to vmcs02 as well?
->>=20
->> Because when L1 don=E2=80=99t use TPR-Shadow, L0 configures vmcs02 =
-without TPR-Shadow.
->> Thus, writing to vmcs02->tpr_threshold doesn=E2=80=99t have any =
-effect.
->>=20
->> If l1 do use TPR-Shadow, then VMX=E2=80=99s update_cr8_intercept() =
-doesn=E2=80=99t write to vmcs at all,
->> because it means L1 defines a vTPR for L2 and thus doesn=E2=80=99t =
-provide it direct access to L1 TPR.
->=20
-> But I'm still not sure about another aspect of the patch.  The write =
-to
-> vmcs01 can be done even if TPR_SHADOW was set in vmcs12, because no =
-one
-> takes care of clearing vmx->nested.l1_tpr_threshold.  Should
-> "vmx->nested.l1_tpr_threshold =3D -1;" be outside the if?
+> Qemu patches will be in internal review soonish and afterwards I'll post
+> them upstream
 
-If I understand you correctly, you refer to the case where L1 first =
-enters L2 without TPR-Shadow,
-then L2 lowers L1 TPR directly (which load vmx->nested.l1_tpr_threshold =
-with value), then an
-emualted exit happen from L2 to L1 which writes to vmcs01->tpr_threshold =
-the value of
-vmx->nested.l1_tpr_threshold. Then L1 enters again L2 but this time with =
-TPR-Shadow and
-prepare_vmcs02_early() doesn=E2=80=99t clear =
-vmx->nested.l1_tpr_threshold which will cause next
-exit from L2 to L1 to wrongly write the value of =
-vmx->nested.l1_tpr_threshold to vmcs01->tpr_threshold.
-
-So yes I think you are right. Good catch.
-We should move vmx->nested.l1_tpr_threshold =3D -1; outside of the if.
-Should I send v2 or will you change on apply?
+Great, looking forward to this :)
 
 >=20
-> Also, what happens to_vmx(vcpu)->nested.l1_tpr_threshold if the guest =
-is
-> migrated while L2 is running without TPR shadow?  Perhaps it would be
-> easier to just rerun update_cr8_intercept on nested_vmx_vmexit.
+> >=20
+> > (...)
+> >  =20
+> >> @@ -2529,6 +2642,9 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu=
+)
+> >> =20
+> >>  =09if (vcpu->kvm->arch.use_cmma)
+> >>  =09=09kvm_s390_vcpu_unsetup_cmma(vcpu);
+> >> +=09if (IS_ENABLED(CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST) &&
+> >> +=09    kvm_s390_pv_handle_cpu(vcpu)) =20
+> >=20
+> > I was a bit confused by that function name... maybe
+> > kvm_s390_pv_cpu_get_handle()? =20
+>=20
+> Sure
+>=20
+> >=20
+> > Also, if this always returns 0 if the config option is off, you
+> > probably don't need to check for that option? =20
+>=20
+> Hmm, if we decide to remove the config option altogether then it's not
+> needed anyway and I think that's what Christian wants.
+
+That would be fine with me as well (I have not yet thought about all
+implications there, though.)
+
+>=20
+> >  =20
+> >> +=09=09kvm_s390_pv_destroy_cpu(vcpu);
+> >>  =09free_page((unsigned long)(vcpu->arch.sie_block));
+> >> =20
+> >>  =09kvm_vcpu_uninit(vcpu);
+> >> @@ -2555,8 +2671,13 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+> >>  {
+> >>  =09kvm_free_vcpus(kvm);
+> >>  =09sca_dispose(kvm);
+> >> -=09debug_unregister(kvm->arch.dbf);
+> >>  =09kvm_s390_gisa_destroy(kvm);
+> >> +=09if (IS_ENABLED(CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST) &&
+> >> +=09    kvm_s390_pv_is_protected(kvm)) {
+> >> +=09=09kvm_s390_pv_destroy_vm(kvm);
+> >> +=09=09kvm_s390_pv_dealloc_vm(kvm); =20
+> >=20
+> > It seems the pv vm can be either destroyed via the ioctl above or in
+> > the course of normal vm destruction. When is which way supposed to be
+> > used? Also, it seems kvm_s390_pv_destroy_vm() can fail -- can that be a
+> > problem in this code path? =20
+>=20
+> On a reboot we need to tear down the protected VM and boot from
+> unprotected mode again. If the VM shuts down we go through this cleanup
+> path. If it fails the kernel will loose the memory that was allocated to
+> start the VM.
+
+Shouldn't you at least log a moan in that case? Hopefully, this happens
+very rarely, but the dbf will be gone...
+
+>=20
+> >  =20
+> >> +=09}
+> >> +=09debug_unregister(kvm->arch.dbf);
+> >>  =09free_page((unsigned long)kvm->arch.sie_page2);
+> >>  =09if (!kvm_is_ucontrol(kvm))
+> >>  =09=09gmap_remove(kvm->arch.gmap); =20
+> >=20
+> > (...)
+> >  =20
+> >> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> >> index 6d9448dbd052..0d61dcc51f0e 100644
+> >> --- a/arch/s390/kvm/kvm-s390.h
+> >> +++ b/arch/s390/kvm/kvm-s390.h
+> >> @@ -196,6 +196,53 @@ static inline int kvm_s390_user_cpu_state_ctrl(st=
+ruct kvm *kvm)
+> >>  =09return kvm->arch.user_cpu_state_ctrl !=3D 0;
+> >>  }
+> >> =20
+> >> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
+> >> +/* implemented in pv.c */
+> >> +void kvm_s390_pv_unpin(struct kvm *kvm);
+> >> +void kvm_s390_pv_dealloc_vm(struct kvm *kvm);
+> >> +int kvm_s390_pv_alloc_vm(struct kvm *kvm);
+> >> +int kvm_s390_pv_create_vm(struct kvm *kvm);
+> >> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu);
+> >> +int kvm_s390_pv_destroy_vm(struct kvm *kvm);
+> >> +int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu);
+> >> +int kvm_s390_pv_set_sec_parms(struct kvm *kvm, void *hdr, u64 length)=
+;
+> >> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned =
+long size,
+> >> +=09=09       unsigned long tweak);
+> >> +int kvm_s390_pv_verify(struct kvm *kvm);
+> >> +
+> >> +static inline bool kvm_s390_pv_is_protected(struct kvm *kvm)
+> >> +{
+> >> +=09return !!kvm->arch.pv.handle;
+> >> +}
+> >> +
+> >> +static inline u64 kvm_s390_pv_handle(struct kvm *kvm) =20
+> >=20
+> > This function name is less confusing than the one below, but maybe also
+> > rename this to kvm_s390_pv_get_handle() for consistency? =20
+>=20
+> kvm_s390_pv_kvm_handle?
+
+kvm_s390_pv_kvm_get_handle() would mirror the cpu function :) </bikeshed>
+
+>=20
+> >  =20
+> >> +{
+> >> +=09return kvm->arch.pv.handle;
+> >> +}
+> >> +
+> >> +static inline u64 kvm_s390_pv_handle_cpu(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +=09return vcpu->arch.pv.handle;
+> >> +}
+> >> +#else
+> >> +static inline void kvm_s390_pv_unpin(struct kvm *kvm) {}
+> >> +static inline void kvm_s390_pv_dealloc_vm(struct kvm *kvm) {}
+> >> +static inline int kvm_s390_pv_alloc_vm(struct kvm *kvm) { return 0; }
+> >> +static inline int kvm_s390_pv_create_vm(struct kvm *kvm) { return 0; =
+}
+> >> +static inline int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu) { ret=
+urn 0; }
+> >> +static inline int kvm_s390_pv_destroy_vm(struct kvm *kvm) { return 0;=
+ }
+> >> +static inline int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu) { re=
+turn 0; }
+> >> +static inline int kvm_s390_pv_set_sec_parms(struct kvm *kvm,
+> >> +=09=09=09=09=09    u64 origin, u64 length) { return 0; }
+> >> +static inline int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long a=
+ddr,
+> >> +=09=09=09=09     unsigned long size,  unsigned long tweak)
+> >> +{ return 0; }
+> >> +static inline int kvm_s390_pv_verify(struct kvm *kvm) { return 0; }
+> >> +static inline bool kvm_s390_pv_is_protected(struct kvm *kvm) { return=
+ 0; }
+> >> +static inline u64 kvm_s390_pv_handle(struct kvm *kvm) { return 0; }
+> >> +static inline u64 kvm_s390_pv_handle_cpu(struct kvm_vcpu *vcpu) { ret=
+urn 0; }
+> >> +#endif
+> >> +
+> >>  /* implemented in interrupt.c */
+> >>  int kvm_s390_handle_wait(struct kvm_vcpu *vcpu);
+> >>  void kvm_s390_vcpu_wakeup(struct kvm_vcpu *vcpu); =20
+> >=20
+> > (...)
+> >  =20
+> >> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +=09int rc;
+> >> +=09struct uv_cb_csc uvcb =3D {
+> >> +=09=09.header.cmd =3D UVC_CMD_CREATE_SEC_CPU,
+> >> +=09=09.header.len =3D sizeof(uvcb),
+> >> +=09};
+> >> +
+> >> +=09/* EEXIST and ENOENT? */ =20
+> >=20
+> > ? =20
+>=20
+> I was asking myself if EEXIST or ENOENT would be better error values
+> than EINVAL.
+
+EEXIST might be better, but I don't really like ENOENT.
+
+>=20
+> >  =20
+> >> +=09if (kvm_s390_pv_handle_cpu(vcpu))
+> >> +=09=09return -EINVAL;
+> >> +
+> >> +=09vcpu->arch.pv.stor_base =3D __get_free_pages(GFP_KERNEL,
+> >> +=09=09=09=09=09=09   get_order(uv_info.guest_cpu_stor_len));
+> >> +=09if (!vcpu->arch.pv.stor_base)
+> >> +=09=09return -ENOMEM;
+> >> +
+> >> +=09/* Input */
+> >> +=09uvcb.guest_handle =3D kvm_s390_pv_handle(vcpu->kvm);
+> >> +=09uvcb.num =3D vcpu->arch.sie_block->icpua;
+> >> +=09uvcb.state_origin =3D (u64)vcpu->arch.sie_block;
+> >> +=09uvcb.stor_origin =3D (u64)vcpu->arch.pv.stor_base;
+> >> +
+> >> +=09rc =3D uv_call(0, (u64)&uvcb);
+> >> +=09VCPU_EVENT(vcpu, 3, "PROTVIRT CREATE VCPU: cpu %d handle %llx rc %=
+x rrc %x",
+> >> +=09=09   vcpu->vcpu_id, uvcb.cpu_handle, uvcb.header.rc,
+> >> +=09=09   uvcb.header.rrc);
+> >> +
+> >> +=09/* Output */
+> >> +=09vcpu->arch.pv.handle =3D uvcb.cpu_handle;
+> >> +=09vcpu->arch.sie_block->pv_handle_cpu =3D uvcb.cpu_handle;
+> >> +=09vcpu->arch.sie_block->pv_handle_config =3D kvm_s390_pv_handle(vcpu=
+->kvm);
+> >> +=09vcpu->arch.sie_block->sdf =3D 2;
+> >> +=09if (!rc)
+> >> +=09=09return 0;
+> >> +
+> >> +=09kvm_s390_pv_destroy_cpu(vcpu);
+> >> +=09return -EINVAL;
+> >> +} =20
+> >=20
+> > (...)
+> >=20
+> > Only a quick readthrough, as this patch is longish.
+> >  =20
+>=20
 >=20
 
-On restore of state during migration, kvm_apic_set_state() must be =
-called which
-will also request a KVM_REQ_EVENT which will make sure to call =
-update_cr8_intercept().
-If vCPU is currently in guest-mode, this should update =
-vmx->nested.l1_tpr_threshold.
 
--Liran
+--Sig_/=Bz.swff5m_75zBIaFx83X5
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> Paolo
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3Ji5YACgkQ3s9rk8bw
+L6+nqhAAtSAC5DCFbZk3dTBYI0AGeyB9WVc1XuCfXTxbF7k+USm1dRQhfX6bzL60
+InG0Hf2XMiM6fV/GHvUUb9UHmkUBCkndYp61yioaDaoLqu9DEQR3YBdRUAr6W1EB
+OYIVRzorIBSUG/X7gelcNQVayDUuh64/eEoRioK9mscpig8FxnEE1ekgDT5GiZBE
+UGqqm0BCBp8e+1dAj8gXIjpoPSMuXEilnktW68WrO03jM4JBGP8L1CNSnj8X4m+Q
+9x4DTNH1eNgEAVEyjc/KNjvlyoAuqaPSVck7hAQZKYjnHRJHOJO3jTJOF1kgmAre
+CS0LlJj0PrkdZD9EwQn7TONqbFbxdrKEAoBFwCDSeMgsHokd49Wbc1oGgnLLv1AF
+DccWst6jSt/djdgt8TCzeS5Lra8IBJDBKbu18tTqmTmicYvvb7fo+BmmaHNjY/GG
+B5HHksEJyk+pKFPStXh8CUng3RCupgZuR4u7mZnx59qedYiTzN/khBpc9zg/SaU0
+csdvAfMr+WpoVC5fKqZhJ+3ZAwCbS88hpTQ6R9paYaJCm/RibdnBFHdn5/ReqDLS
+4+CA71FKsoiWrRB/UNsl8wnHczH8jq9gTOP9c09Jzw3e/JJeGDNWSKmgI0PCep16
+77NWPrDXBOo0GEZhqYPDYogRzdNNHjX6f9qSd/5ASBQ+OrWR8Es=
+=N6o7
+-----END PGP SIGNATURE-----
+
+--Sig_/=Bz.swff5m_75zBIaFx83X5--
 
