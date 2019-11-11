@@ -2,117 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E05DF791E
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:50:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5137F7935
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:54:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbfKKQuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 11:50:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46451 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726889AbfKKQuJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 11:50:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573491009;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=OkZ+Vzh7EQWxCTLrI0mNws5Gnmovyu+336FSuRsBdro=;
-        b=cRUdCS2rfgTfzP3YaWj7YtORsfm4HnN+7IkmdrLzapnJW05v7OMZKi/FLp/dYpTdG0H/eV
-        ALZm/Evr1um+6UT54mIDQRSBerEr/6xSGvCxcSdn2FqqXTsbELhm8Z681jGbY0FwwZ7YzY
-        kAEoSXVO2WnXbtRC8p5toD0cHzaSLbc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-raEFigrtO4u3zEryxzc-Jg-1; Mon, 11 Nov 2019 11:50:06 -0500
-Received: by mail-wr1-f71.google.com with SMTP id b4so10273966wrn.8
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 08:50:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+3Ejp316XM3FRrty9ooCy9P9UOvlWptqrl2O+qkSCWo=;
-        b=q46H2PGxstp+olo74hmveQdQvXJZIeK9P/u2zO0pKle8MhOKoRa1iOBVwyvwILFVma
-         naLY80dKRFBAFuzXoH9B/ieXNeNXfAteEYPPA2AAGmj52GKAM87HHVpV0o4/V03NptzF
-         8XuqMJKH46IXbKtTIEHlAXE5w5mWkRNeT+DcyEBBCh1vwPYRcOaEKzI7eXHixKE1tb/v
-         b9EtlgNLjq275R6IWaAvUUvUhvVulrgC537Xa2NI+tqHGk3w+TPkYB0pPYpwlIvfYa72
-         1ftqaIpfQehLRvsmHAvPPqrK9hsFK6TUVIDssG9EE+WZP5uoF6PgzA6rLXrwJoqOi5Aj
-         PpPg==
-X-Gm-Message-State: APjAAAUQ3MK/ZidFcPxq9TVCvQTKTfy61xYWAJHIJssHUhrXHE58qQRC
-        QDCNResP1JMCyVZ2v/VUOqi18YJnCiFlrGJVET7CGEmR+FFz5mciHzEVsP4hSTiv0OxRS6RUy3t
-        EpgpPe1bAqCgB
-X-Received: by 2002:a1c:4b18:: with SMTP id y24mr20775351wma.71.1573491004964;
-        Mon, 11 Nov 2019 08:50:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx6RiMwSD37FdteASna5cqtLqVEzH/DXp9dI7zTSeL1HvDn3e3T6Ib9o6HtW4N4afn/DR31UQ==
-X-Received: by 2002:a1c:4b18:: with SMTP id y24mr20775323wma.71.1573491004672;
-        Mon, 11 Nov 2019 08:50:04 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
-        by smtp.gmail.com with ESMTPSA id o10sm17725835wrq.92.2019.11.11.08.50.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2019 08:50:04 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: nVMX: Update vmcs01 TPR_THRESHOLD if L2 changed
- L1 TPR
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
-References: <20191111123055.93270-1-liran.alon@oracle.com>
- <20191111123055.93270-3-liran.alon@oracle.com>
- <a26a9a8c-df8d-c49a-3943-35424897b6b3@redhat.com>
- <6CAEE592-02B0-4E25-B2D2-20E5B55A5D19@oracle.com>
- <72c26523-702a-df0c-5573-982da25cba19@redhat.com>
- <BD8FF780-C38E-493C-9BDE-FAFC1B3D25D6@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ad72854d-3b3f-ccdd-b213-2c3dbbca3b2c@redhat.com>
-Date:   Mon, 11 Nov 2019 17:50:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <BD8FF780-C38E-493C-9BDE-FAFC1B3D25D6@oracle.com>
+        id S1726988AbfKKQyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 11:54:00 -0500
+Received: from mail-eopbgr790045.outbound.protection.outlook.com ([40.107.79.45]:12594
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726845AbfKKQyA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 11:54:00 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZMHaihd5swPTo8NM4iJvoDHaYFhG22GbuwU1rxP6flebx/5NwfxDpeaDgD5Hm4M1UcXnSnSfFO5YFOv+TFpTu4XPi7gJYvxVT1NfRrprYyfIb29R/iqI56nYktyRupt6yS/J3JQ80fUB9nH7UIs5347/Xk8hr7y3GN0Liqwae1qfFkh4cIPKGyHgzwO+iJrnJo8CqMFffdcptmjNDDnxXGPVDc3QibgdE5cnpRwRz+PMAsELAmlHydH9g/e/yDihFWWfgrUdcTC11EJWgu3R8gBSeKEa1Bv8+UJveCyq7f9bXS5seM7DyhCgKhC9jXcD445YbGvYfPcwLvI5xVq98w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eXxpGMwcY8AIlKUPc+HRRXrp/xU6aEhztN1pZ4ZGk0Q=;
+ b=Bxdun3Kwt1L5N3vQVzqbOKB29EQPnOsA8bNYH5D4UTcx+BaVkc6PvT3KeYyKfWrX64SOFkSeQ4bHlZJuFxUxTBuzbZHaK73ZWWA3FohPJsQ6wtp9mT94RXMiN6zIAYrbHqhTRnWBauvj5/tX4Jy/9+nbvUdjBUCYLRzWiVoE636DbF1FcRomuPJB72CTN8dHh1bwJ+hHVMFXcKIlGeHfJiD+AeirmPlRqgRcXZxHHZUWMvnPoBJ8G9ktWdd0XSVc+wQp3os0S+yDK/XPhwRziaRH+mVFMSn71P1UK0poqYJTK6i4LJbXivWHpI4A2XjY+GLeDuE42JyaHCEYdSGDhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eXxpGMwcY8AIlKUPc+HRRXrp/xU6aEhztN1pZ4ZGk0Q=;
+ b=o6/7BoHPgqhPv4cR/CGNcZ+Ti32aUES47NMPTTtIxXrMmm20Y9r3Qtl/gwuutReG/SbY5kGSrQU4liIHl8FIEO7pgVuzG3PoYFS/eBtElBSSv/aFX3AzhT27UfZpxwXi43LdElDh7zl0WxW3ZceRzJ/udT2pVFf3dUWnioJst4I=
+Received: from MWHPR05MB3376.namprd05.prod.outlook.com (10.174.175.149) by
+ MWHPR05MB3214.namprd05.prod.outlook.com (10.173.230.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.16; Mon, 11 Nov 2019 16:53:56 +0000
+Received: from MWHPR05MB3376.namprd05.prod.outlook.com
+ ([fe80::4098:2c39:d8d3:a209]) by MWHPR05MB3376.namprd05.prod.outlook.com
+ ([fe80::4098:2c39:d8d3:a209%7]) with mapi id 15.20.2451.018; Mon, 11 Nov 2019
+ 16:53:56 +0000
+From:   Jorgen Hansen <jhansen@vmware.com>
+To:     'Stefano Garzarella' <sgarzare@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dexuan Cui <decui@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: RE: [PATCH net-next 14/14] vsock: fix bind() behaviour taking care of
+ CID
+Thread-Topic: [PATCH net-next 14/14] vsock: fix bind() behaviour taking care
+ of CID
+Thread-Index: AQHViYhvgtICjaQ2wUamZLOokx2SmaeGTQhw
+Date:   Mon, 11 Nov 2019 16:53:56 +0000
+Message-ID: <MWHPR05MB3376C7CE32B8FD98DE4EF45FDA740@MWHPR05MB3376.namprd05.prod.outlook.com>
+References: <20191023095554.11340-1-sgarzare@redhat.com>
+ <20191023095554.11340-15-sgarzare@redhat.com>
+In-Reply-To: <20191023095554.11340-15-sgarzare@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-MC-Unique: raEFigrtO4u3zEryxzc-Jg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jhansen@vmware.com; 
+x-originating-ip: [208.91.2.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 586862f1-092d-41fc-a29a-08d766c7bdb8
+x-ms-traffictypediagnostic: MWHPR05MB3214:
+x-microsoft-antispam-prvs: <MWHPR05MB32147DCDB81F19C830A822CDDA740@MWHPR05MB3214.namprd05.prod.outlook.com>
+x-vmwhitelist: True
+x-ms-oob-tlc-oobclassifiers: OLM:3513;
+x-forefront-prvs: 0218A015FA
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(39860400002)(366004)(396003)(346002)(189003)(199004)(8676002)(9686003)(256004)(8936002)(4326008)(14444005)(446003)(81156014)(81166006)(2906002)(11346002)(26005)(2501003)(186003)(6246003)(55016002)(476003)(486006)(66946007)(6116002)(3846002)(6436002)(74316002)(66066001)(305945005)(76116006)(54906003)(76176011)(33656002)(478600001)(66446008)(64756008)(66556008)(66476007)(102836004)(110136005)(99286004)(4744005)(86362001)(71200400001)(316002)(71190400001)(7696005)(7736002)(229853002)(5660300002)(52536014)(7416002)(14454004)(6506007)(25786009);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR05MB3214;H:MWHPR05MB3376.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0gonDZt8gbrfqqulTmmSYlQceZvrHcvVDoCXJfczH8BhRpKryXFvP0EVRB2lurxjZy4f7vPPmezXL28N+HdM8ICLQVfAUVgIo8/4YttqfxtdgfscHLe5w22bgqsxPaxyOhRhr4SjLj99NjT7fQP4flR02D3iVoHGW5XLja7DlX+5a0L0I0Opx9oJFtesTRNua/vrdHSgDlG+Db12+NAjKKJRkWwLPCb30U9vyUgwXQq32nIGjwqglm1XQtEqTo7sj08ltDIKTF9+SJKekwEIKh4zWzkHGsFh3UqJCScHFxWErE49cHCDAjVdr1JgwSwPMIcx2+9GuiQA56c8dGR1pjDJQD7YiROetxGEBte85uXKWX3SjR9IIE8l9DMeTRkR0NGKFGckHbuuswWclNmhwBsAcQLmAh1tjCo5IzJHn1XsmYejpJM/Avd2neEBWeHp
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 586862f1-092d-41fc-a29a-08d766c7bdb8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2019 16:53:56.1814
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +iiRXE6SDCUoPODDvrOpHq2NEj7NcnaL7jbnL7rWeDois7ccpL+lgCg+qMCEKwd1M2Anqxq5UCUWc6RKIjNBuA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR05MB3214
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/19 17:17, Liran Alon wrote:
-> If I understand you correctly, you refer to the case where L1 first enter=
-s L2 without TPR-Shadow,
-> then L2 lowers L1 TPR directly (which load vmx->nested.l1_tpr_threshold w=
-ith value), then an
-> emualted exit happen from L2 to L1 which writes to vmcs01->tpr_threshold =
-the value of
-> vmx->nested.l1_tpr_threshold. Then L1 enters again L2 but this time with =
-TPR-Shadow and
-> prepare_vmcs02_early() doesn=E2=80=99t clear vmx->nested.l1_tpr_threshold=
- which will cause next
-> exit from L2 to L1 to wrongly write the value of vmx->nested.l1_tpr_thres=
-hold to vmcs01->tpr_threshold.
+> From: Stefano Garzarella [mailto:sgarzare@redhat.com]
+> Sent: Wednesday, October 23, 2019 11:56 AM
+> When we are looking for a socket bound to a specific address,
+> we also have to take into account the CID.
 >=20
-> So yes I think you are right. Good catch.
-> We should move vmx->nested.l1_tpr_threshold =3D -1; outside of the if.
-> Should I send v2 or will you change on apply?
+> This patch is useful with multi-transports support because it
+> allows the binding of the same port with different CID, and
+> it prevents a connection to a wrong socket bound to the same
+> port, but with different CID.
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  net/vmw_vsock/af_vsock.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
-I can do that too.
-
->> Also, what happens to_vmx(vcpu)->nested.l1_tpr_threshold if the guest is
->> migrated while L2 is running without TPR shadow?  Perhaps it would be
->> easier to just rerun update_cr8_intercept on nested_vmx_vmexit.
->>
-> On restore of state during migration, kvm_apic_set_state() must be called=
- which
-> will also request a KVM_REQ_EVENT which will make sure to call update_cr8=
-_intercept().
-> If vCPU is currently in guest-mode, this should update vmx->nested.l1_tpr=
-_threshold.
-
-Okay, that makes sense.  I was half-sure that update_cr8_intercept()
-would be called, but I couldn't think of the exact path.
-
-Paolo
+Reviewed-by: Jorgen Hansen <jhansen@vmware.com>
 
