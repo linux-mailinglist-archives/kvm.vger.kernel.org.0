@@ -2,74 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACCE6F75DB
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:02:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CB97F75FA
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:07:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbfKKOCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 09:02:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48129 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726811AbfKKOCc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 09:02:32 -0500
+        id S1726906AbfKKOH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 09:07:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20235 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726811AbfKKOH1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 09:07:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573480951;
+        s=mimecast20190719; t=1573481246;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=2HTa1ngHuirBrMsL3KLUBSKYu0dq4sOVUTDgb0CAUdc=;
-        b=VuMQaY2lewP7huu89A6u6z+RBSREeJCyJ0wrspypBRivUbC65KYLzux2EuNTlH6+ZrXS3O
-        BLZXvbw41Nf7l3Z/lobbqa9vkHsBCi+4zjFDKi5Ig6Re0518FAKRR/47R/UPLwqZgSA6AY
-        PzcPjEDZW4Vi/9I1Iy6o/cIKl+vMs+I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-u_n6ZR_iPbah5NwStoe42A-1; Mon, 11 Nov 2019 09:02:30 -0500
-Received: by mail-wm1-f69.google.com with SMTP id b10so6906826wmh.6
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:02:29 -0800 (PST)
+        bh=ZGs0M6vNOlR72l+3qKrXi768QPAALJbpnXDDJqiP0K0=;
+        b=ANwsGQxPB9LPAIWYyd7f04BMg0ZKth9TSyE47uZ6u6M40/haBQGTH5TsfLRXPA1R8CFib2
+        C4zh85iiayjpoPwfVULgD5VTZOW6j9OTWsgTPK4en4oy93qh+cNozU6bT1P0YPV5huseZd
+        Gek2gtBsW33c3kNKkD0c6G5Rf2rifZo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-0by6CQwYMBawjAdK-tT_qQ-1; Mon, 11 Nov 2019 09:07:25 -0500
+Received: by mail-wr1-f72.google.com with SMTP id m17so9939582wrb.20
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:07:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XB0qHGYLVcVA1erpwz2Rl7+/5K+EptCTKRytU8bU7Ns=;
-        b=oJ9W+Uv4jC+8opC9ECnSZNpn2OhfgWQWwAsAvt2mrSVV8oaJqsjA+QRksShFED89Xs
-         0wVKH1t6BrgqUQtqOxVrgcm1WC7FV54ueRtASfSUZ98xMXQ5KkMrgABx+7rnOLg259Ih
-         JyTDvuaEot/iwoINQrK7Fm0p68CSMGPSNi9toI/ESzrqRAWYbdydohCC453VnhegM7HE
-         reqFUf/M8yNlPHbDvDPQgc/Jq35/brcg61dPVTON7bbw9G063t5YjbWvLVPQHnKtC1BG
-         f4dr+cvH4qB7Nj3l0rAWASrDpM5yW9i3GibhMey/sSHmaTfS+onx7pB9hRCsyIErp5nu
-         v7fw==
-X-Gm-Message-State: APjAAAUZuZ4RzymDcWdo+UDCL/esJg3Ev80rDfkYpj328SSfTq/HAzv4
-        RRYgbmG+azpHCNVUK0udcAb5R+TM68GQIOirloKtyMY9B9mzRawtfdJQSFRQPufM14GspScyKWi
-        G359wioX4PtoP
-X-Received: by 2002:adf:e40e:: with SMTP id g14mr1045407wrm.264.1573480948779;
-        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx4PBRNbIZaeQQFF5KjjrlYnulrE2VpmEQt1a5cEfualJp8M6F7cOxnDKI/3IlL3BClfkFc5g==
-X-Received: by 2002:adf:e40e:: with SMTP id g14mr1045388wrm.264.1573480948535;
-        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
+        bh=HHT8z9ApKJ84GVmGisp2JZyy+3t2iYfQwx7HQlS2FAw=;
+        b=sOOLg7yxA1wiAyaZCXZbIDNxEcZENLWQ9JjC35klbVDGTSBa3M1fZpUW4aqy9AJJUU
+         kmfX5TPPstXbLX8ZsAlxlCX0fRcK/xGHPhbzqBLKIrU7WPk2FweIeiq+qwjdsUM9ZMCb
+         iuIB/OnqTZMMPGFmj3iohQjlIwqFRw5Bu8G3YmACAWZjD8QMRxPXRJHdhyrqII43WI63
+         SdRRBVmyvF5tbEiTaoWPuMeOGhXjgwSCNAsW13opINldwoSJo0b4YNMO51fiSrlR8Ghu
+         zL5vzpM8Kaudwq6lxitrJuaHdNotmRJ6II/42GRzwPM9sfPLU1fekjLVR04N9yqEz/J8
+         hKAg==
+X-Gm-Message-State: APjAAAUGQxllyIay/Gm4IzZWPQSSbD65qHb4SUC4U/gvxsHb/p5q/73l
+        i1EK6LGtqwRY/FS+0bD2QvK3XjgGzTlrxZhmlGGHiXERSznhriZ0ZdUxBFnnYlseRKToywCrNe1
+        3aYvV9cOWKlh2
+X-Received: by 2002:adf:f60a:: with SMTP id t10mr17727030wrp.29.1573481243880;
+        Mon, 11 Nov 2019 06:07:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqymX6a+Us/pFWg+HkVt+RJVFYpS4w6sHQvgwVRhK7Od4V2R+giqMbAZhKM06rQzj9qXOOvIcw==
+X-Received: by 2002:adf:f60a:: with SMTP id t10mr17727007wrp.29.1573481243620;
+        Mon, 11 Nov 2019 06:07:23 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
-        by smtp.gmail.com with ESMTPSA id 5sm13533793wmk.48.2019.11.11.06.02.27
+        by smtp.gmail.com with ESMTPSA id f14sm14645823wrv.17.2019.11.11.06.07.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2019 06:02:28 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: x86: Prevent set vCPU into INIT/SIPI_RECEIVED
- state when INIT are latched
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Mihai Carabas <mihai.carabas@oracle.com>
-References: <20191111091640.92660-1-liran.alon@oracle.com>
- <20191111091640.92660-3-liran.alon@oracle.com>
- <cff559e6-7cc4-64f3-bebf-e72dd2a5a3ea@redhat.com>
- <BB5CCF97-38DE-4037-83E3-22E921D25651@oracle.com>
+        Mon, 11 Nov 2019 06:07:23 -0800 (PST)
+Subject: Re: [PATCH] KVM: MMIO: get rid of odd out_err label in
+ kvm_coalesced_mmio_init
+To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1573286900-19041-1-git-send-email-linmiaohe@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <ea6e861f-a293-e0da-6364-547fe23cbab1@redhat.com>
-Date:   Mon, 11 Nov 2019 15:02:29 +0100
+Message-ID: <e6780f84-e5e5-09ec-3cef-535a2d33ef92@redhat.com>
+Date:   Mon, 11 Nov 2019 15:07:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <BB5CCF97-38DE-4037-83E3-22E921D25651@oracle.com>
+In-Reply-To: <1573286900-19041-1-git-send-email-linmiaohe@huawei.com>
 Content-Language: en-US
-X-MC-Unique: u_n6ZR_iPbah5NwStoe42A-1
+X-MC-Unique: 0by6CQwYMBawjAdK-tT_qQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -78,20 +73,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/19 14:46, Liran Alon wrote:
->> +=09 * INITs are latched while CPU is in specific states
->> +=09 * (SMM, VMX non-root mode, SVM with GIF=3D0).
-> I didn=E2=80=99t want this line of comment as it may diverge from the imp=
-lementation of kvm_vcpu_latch_init().
-> That=E2=80=99s why I removed it.
+On 09/11/19 09:08, linmiaohe wrote:
+> From: Miaohe Lin <linmiaohe@huawei.com>
 >=20
->> =09 * Because a CPU cannot be in these states immediately
->> =09 * after it has processed an INIT signal (and thus in
->> =09 * KVM_MP_STATE_INIT_RECEIVED state), just eat SIPIs
+> The out_err label and var ret is unnecessary, clean them up.
+>=20
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  virt/kvm/coalesced_mmio.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> index 8ffd07e2a160..00c747dbc82e 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -110,14 +110,11 @@ static const struct kvm_io_device_ops coalesced_mmi=
+o_ops =3D {
+>  int kvm_coalesced_mmio_init(struct kvm *kvm)
+>  {
+>  =09struct page *page;
+> -=09int ret;
+> =20
+> -=09ret =3D -ENOMEM;
+>  =09page =3D alloc_page(GFP_KERNEL | __GFP_ZERO);
+>  =09if (!page)
+> -=09=09goto out_err;
+> +=09=09return -ENOMEM;
+> =20
+> -=09ret =3D 0;
+>  =09kvm->coalesced_mmio_ring =3D page_address(page);
+> =20
+>  =09/*
+> @@ -128,8 +125,7 @@ int kvm_coalesced_mmio_init(struct kvm *kvm)
+>  =09spin_lock_init(&kvm->ring_lock);
+>  =09INIT_LIST_HEAD(&kvm->coalesced_zones);
+> =20
+> -out_err:
+> -=09return ret;
+> +=09return 0;
+>  }
+> =20
+>  void kvm_coalesced_mmio_free(struct kvm *kvm)
+>=20
 
-Got it... on the other hand knowing the specific states clarifies why
-they cannot be in that state immediately after processing INIT.  It's a
-bit of a catch-22 indeed.
+Queued, thanks.
 
 Paolo
 
