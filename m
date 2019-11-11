@@ -2,121 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5137F7935
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:54:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E10F793B
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 17:54:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbfKKQyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 11:54:00 -0500
-Received: from mail-eopbgr790045.outbound.protection.outlook.com ([40.107.79.45]:12594
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726845AbfKKQyA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 11:54:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZMHaihd5swPTo8NM4iJvoDHaYFhG22GbuwU1rxP6flebx/5NwfxDpeaDgD5Hm4M1UcXnSnSfFO5YFOv+TFpTu4XPi7gJYvxVT1NfRrprYyfIb29R/iqI56nYktyRupt6yS/J3JQ80fUB9nH7UIs5347/Xk8hr7y3GN0Liqwae1qfFkh4cIPKGyHgzwO+iJrnJo8CqMFffdcptmjNDDnxXGPVDc3QibgdE5cnpRwRz+PMAsELAmlHydH9g/e/yDihFWWfgrUdcTC11EJWgu3R8gBSeKEa1Bv8+UJveCyq7f9bXS5seM7DyhCgKhC9jXcD445YbGvYfPcwLvI5xVq98w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXxpGMwcY8AIlKUPc+HRRXrp/xU6aEhztN1pZ4ZGk0Q=;
- b=Bxdun3Kwt1L5N3vQVzqbOKB29EQPnOsA8bNYH5D4UTcx+BaVkc6PvT3KeYyKfWrX64SOFkSeQ4bHlZJuFxUxTBuzbZHaK73ZWWA3FohPJsQ6wtp9mT94RXMiN6zIAYrbHqhTRnWBauvj5/tX4Jy/9+nbvUdjBUCYLRzWiVoE636DbF1FcRomuPJB72CTN8dHh1bwJ+hHVMFXcKIlGeHfJiD+AeirmPlRqgRcXZxHHZUWMvnPoBJ8G9ktWdd0XSVc+wQp3os0S+yDK/XPhwRziaRH+mVFMSn71P1UK0poqYJTK6i4LJbXivWHpI4A2XjY+GLeDuE42JyaHCEYdSGDhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eXxpGMwcY8AIlKUPc+HRRXrp/xU6aEhztN1pZ4ZGk0Q=;
- b=o6/7BoHPgqhPv4cR/CGNcZ+Ti32aUES47NMPTTtIxXrMmm20Y9r3Qtl/gwuutReG/SbY5kGSrQU4liIHl8FIEO7pgVuzG3PoYFS/eBtElBSSv/aFX3AzhT27UfZpxwXi43LdElDh7zl0WxW3ZceRzJ/udT2pVFf3dUWnioJst4I=
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com (10.174.175.149) by
- MWHPR05MB3214.namprd05.prod.outlook.com (10.173.230.13) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.16; Mon, 11 Nov 2019 16:53:56 +0000
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209]) by MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209%7]) with mapi id 15.20.2451.018; Mon, 11 Nov 2019
- 16:53:56 +0000
-From:   Jorgen Hansen <jhansen@vmware.com>
-To:     'Stefano Garzarella' <sgarzare@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dexuan Cui <decui@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: RE: [PATCH net-next 14/14] vsock: fix bind() behaviour taking care of
- CID
-Thread-Topic: [PATCH net-next 14/14] vsock: fix bind() behaviour taking care
- of CID
-Thread-Index: AQHViYhvgtICjaQ2wUamZLOokx2SmaeGTQhw
-Date:   Mon, 11 Nov 2019 16:53:56 +0000
-Message-ID: <MWHPR05MB3376C7CE32B8FD98DE4EF45FDA740@MWHPR05MB3376.namprd05.prod.outlook.com>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-15-sgarzare@redhat.com>
-In-Reply-To: <20191023095554.11340-15-sgarzare@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jhansen@vmware.com; 
-x-originating-ip: [208.91.2.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 586862f1-092d-41fc-a29a-08d766c7bdb8
-x-ms-traffictypediagnostic: MWHPR05MB3214:
-x-microsoft-antispam-prvs: <MWHPR05MB32147DCDB81F19C830A822CDDA740@MWHPR05MB3214.namprd05.prod.outlook.com>
-x-vmwhitelist: True
-x-ms-oob-tlc-oobclassifiers: OLM:3513;
-x-forefront-prvs: 0218A015FA
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(39860400002)(366004)(396003)(346002)(189003)(199004)(8676002)(9686003)(256004)(8936002)(4326008)(14444005)(446003)(81156014)(81166006)(2906002)(11346002)(26005)(2501003)(186003)(6246003)(55016002)(476003)(486006)(66946007)(6116002)(3846002)(6436002)(74316002)(66066001)(305945005)(76116006)(54906003)(76176011)(33656002)(478600001)(66446008)(64756008)(66556008)(66476007)(102836004)(110136005)(99286004)(4744005)(86362001)(71200400001)(316002)(71190400001)(7696005)(7736002)(229853002)(5660300002)(52536014)(7416002)(14454004)(6506007)(25786009);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR05MB3214;H:MWHPR05MB3376.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: vmware.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0gonDZt8gbrfqqulTmmSYlQceZvrHcvVDoCXJfczH8BhRpKryXFvP0EVRB2lurxjZy4f7vPPmezXL28N+HdM8ICLQVfAUVgIo8/4YttqfxtdgfscHLe5w22bgqsxPaxyOhRhr4SjLj99NjT7fQP4flR02D3iVoHGW5XLja7DlX+5a0L0I0Opx9oJFtesTRNua/vrdHSgDlG+Db12+NAjKKJRkWwLPCb30U9vyUgwXQq32nIGjwqglm1XQtEqTo7sj08ltDIKTF9+SJKekwEIKh4zWzkHGsFh3UqJCScHFxWErE49cHCDAjVdr1JgwSwPMIcx2+9GuiQA56c8dGR1pjDJQD7YiROetxGEBte85uXKWX3SjR9IIE8l9DMeTRkR0NGKFGckHbuuswWclNmhwBsAcQLmAh1tjCo5IzJHn1XsmYejpJM/Avd2neEBWeHp
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726957AbfKKQyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 11:54:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32642 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726924AbfKKQyp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 11:54:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573491283;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FW0ghkTNRFakkJKOxKKtNLRjEwoYfRw/+6ARHgx/6so=;
+        b=SFzYhyK6K2oaBMrJBLJIaKVKmPlMq221+us48Am7ByEeh7VSI5lYfAl+qKaC7HKm/m1Rl+
+        EoJPGH0pn16tneEjmPHj2ZUho2ZrXCbRtn1zXeRRr4aVxXqvjZO29bxeoDrGMyZjeO3bDo
+        8nZPuO7oxMG26iKfzRfE94RIqKmhyLk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240--bSLdSWhMTGee7aJD0jtMQ-1; Mon, 11 Nov 2019 11:54:40 -0500
+X-MC-Unique: -bSLdSWhMTGee7aJD0jtMQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF51E107ACC4;
+        Mon, 11 Nov 2019 16:54:38 +0000 (UTC)
+Received: from gondolin (ovpn-117-4.ams2.redhat.com [10.36.117.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 23D2D10027A5;
+        Mon, 11 Nov 2019 16:54:33 +0000 (UTC)
+Date:   Mon, 11 Nov 2019 17:54:21 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 04/37] KVM: s390: protvirt: Add initial lifecycle handling
+Message-ID: <20191111175421.11424cb0.cohuck@redhat.com>
+In-Reply-To: <a99a9155-64cb-a083-07ee-a3fb543b40b5@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-5-frankja@linux.ibm.com>
+        <20191107172956.4f4d8a90.cohuck@redhat.com>
+        <8989f705-ce14-7b85-e5b6-6d87803db491@linux.ibm.com>
+        <20191111172558.731a0d8b.cohuck@redhat.com>
+        <a99a9155-64cb-a083-07ee-a3fb543b40b5@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 586862f1-092d-41fc-a29a-08d766c7bdb8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2019 16:53:56.1814
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +iiRXE6SDCUoPODDvrOpHq2NEj7NcnaL7jbnL7rWeDois7ccpL+lgCg+qMCEKwd1M2Anqxq5UCUWc6RKIjNBuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR05MB3214
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/MC6yGPU+m8kG.Km8/6Gka7/";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> Sent: Wednesday, October 23, 2019 11:56 AM
-> When we are looking for a socket bound to a specific address,
-> we also have to take into account the CID.
->=20
-> This patch is useful with multi-transports support because it
-> allows the binding of the same port with different CID, and
-> it prevents a connection to a wrong socket bound to the same
-> port, but with different CID.
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/af_vsock.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+--Sig_/MC6yGPU+m8kG.Km8/6Gka7/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Jorgen Hansen <jhansen@vmware.com>
+On Mon, 11 Nov 2019 17:39:15 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> On 11/11/19 5:25 PM, Cornelia Huck wrote:
+> > On Fri, 8 Nov 2019 08:36:35 +0100
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >  =20
+> >> On 11/7/19 5:29 PM, Cornelia Huck wrote: =20
+> >>> On Thu, 24 Oct 2019 07:40:26 -0400
+> >>> Janosch Frank <frankja@linux.ibm.com> wrote: =20
+> >  =20
+> >>>> @@ -2157,6 +2164,96 @@ static int kvm_s390_set_cmma_bits(struct kvm =
+*kvm,
+> >>>>  =09return r;
+> >>>>  }
+> >>>> =20
+> >>>> +#ifdef CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST
+> >>>> +static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *c=
+md)
+> >>>> +{
+> >>>> +=09int r =3D 0;
+> >>>> +=09void __user *argp =3D (void __user *)cmd->data;
+> >>>> +
+> >>>> +=09switch (cmd->cmd) {
+> >>>> +=09case KVM_PV_VM_CREATE: {
+> >>>> +=09=09r =3D kvm_s390_pv_alloc_vm(kvm);
+> >>>> +=09=09if (r)
+> >>>> +=09=09=09break;
+> >>>> +
+> >>>> +=09=09mutex_lock(&kvm->lock);
+> >>>> +=09=09kvm_s390_vcpu_block_all(kvm);
+> >>>> +=09=09/* FMT 4 SIE needs esca */
+> >>>> +=09=09r =3D sca_switch_to_extended(kvm); =20
+> >=20
+> > Looking at this again: this function calls kvm_s390_vcpu_block_all()
+> > (which probably does not hurt), but then kvm_s390_vcpu_unblock_all()...
+> > don't we want to keep the block across pv_create_vm() as well? =20
+>=20
+> Yeah
+>=20
+> >=20
+> > Also, can you maybe skip calling this function if we use the esca
+> > already? =20
+>=20
+> Did I forget to include that in the patchset?
+> I extended sca_switch_to_extended() to just return in that case.
+
+If you did, I likely missed it; way too much stuff to review :)
+
+>=20
+> >  =20
+> >>>> +=09=09if (!r)
+> >>>> +=09=09=09r =3D kvm_s390_pv_create_vm(kvm);
+> >>>> +=09=09kvm_s390_vcpu_unblock_all(kvm);
+> >>>> +=09=09mutex_unlock(&kvm->lock);
+> >>>> +=09=09break;
+> >>>> +=09}
+
+(...)
+
+> >>>> @@ -2555,8 +2671,13 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+> >>>>  {
+> >>>>  =09kvm_free_vcpus(kvm);
+> >>>>  =09sca_dispose(kvm);
+> >>>> -=09debug_unregister(kvm->arch.dbf);
+> >>>>  =09kvm_s390_gisa_destroy(kvm);
+> >>>> +=09if (IS_ENABLED(CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST) &&
+> >>>> +=09    kvm_s390_pv_is_protected(kvm)) {
+> >>>> +=09=09kvm_s390_pv_destroy_vm(kvm);
+> >>>> +=09=09kvm_s390_pv_dealloc_vm(kvm);   =20
+> >>>
+> >>> It seems the pv vm can be either destroyed via the ioctl above or in
+> >>> the course of normal vm destruction. When is which way supposed to be
+> >>> used? Also, it seems kvm_s390_pv_destroy_vm() can fail -- can that be=
+ a
+> >>> problem in this code path?   =20
+> >>
+> >> On a reboot we need to tear down the protected VM and boot from
+> >> unprotected mode again. If the VM shuts down we go through this cleanu=
+p
+> >> path. If it fails the kernel will loose the memory that was allocated =
+to
+> >> start the VM. =20
+> >=20
+> > Shouldn't you at least log a moan in that case? Hopefully, this happens
+> > very rarely, but the dbf will be gone... =20
+>=20
+> That's why I created the uv dbf :-)
+
+Again, way too easy to get lost in these changes :)
+
+> Well, it shouldn't happen at all so maybe a WARN will be a good option
+
+Yeah, if it this is one of these "should not happen" things, a WARN
+sounds good.
+
+>=20
+> >  =20
+> >> =20
+> >>>    =20
+> >>>> +=09}
+> >>>> +=09debug_unregister(kvm->arch.dbf);
+> >>>>  =09free_page((unsigned long)kvm->arch.sie_page2);
+> >>>>  =09if (!kvm_is_ucontrol(kvm))
+> >>>>  =09=09gmap_remove(kvm->arch.gmap);   =20
+
+--Sig_/MC6yGPU+m8kG.Km8/6Gka7/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3Jkj0ACgkQ3s9rk8bw
+L6+82A/+LHWboMq9UZVl7tJU6hYxG6blsNyA6gGqRavPCwvyrDfV+9NOnUExV3be
+WHSvkks+kPPsdBF8QPQRzrhEftaAa5Sti2rPincSVf37/FJOYZZrl44nW5RTmflw
+ENZLeU94+v4E7Z0n89xXhetlucpW+HPZx4sj0ulEZWkCmEXYPCDHbyK074ayM6dw
+f9LHzKwFu0gnJD8T5hs8VsdpOkeZpVVrlq8QjcNReNV3jc0ZYujVRbiU0tr58iFg
+oTtkTlUJ3ustxXfQ05LTTDMwhKLs1mgdBQ5H8KiDnR46tqbGHCqfjTdc0Utvv/El
+U6nZFfuZV+q3X4yp0Ri2mAagm7h1BUXhA6sa5Ej3xjKlDXPVHzmO9uKGdPg2uLaM
+TTIkApJsi4iqGnOzx66/2ADSMCTkHcvxBsaipKEeASpp51ns4pcVQx4W/2AgQSZI
+GgVAe3mgdh4657n34sO36WVAlMMl9GOrgIcsZeDgPpZwzMggEVLI7nsiHOSeIqJw
+ehCBMcV1OxDoqsift6tK+Vw8Hf5kV2Jtt233eqKFraZL1F/pnnJkoo2/q0ZgFvlv
+Hvyc+Jvld/2/EpJc7R6wpBBobZaA8pldOT/+LC6XtSf9t3fy9Qn0rR3UQpmelbLM
+IObX5ep3zswpBu8ms8A2tVy916Y5m8axnyYW15g4LR6aybib/jM=
+=yq0B
+-----END PGP SIGNATURE-----
+
+--Sig_/MC6yGPU+m8kG.Km8/6Gka7/--
 
