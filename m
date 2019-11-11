@@ -2,80 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BA92F7837
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:58:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CE3BF783D
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:59:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726983AbfKKP6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 10:58:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37772 "EHLO
+        id S1726902AbfKKP7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 10:59:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27770 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726902AbfKKP6g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 10:58:36 -0500
+        with ESMTP id S1726845AbfKKP7l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 10:59:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573487914;
+        s=mimecast20190719; t=1573487979;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=/zG3yoOFQ60fgDUu8iKgwOvLofe+T2ZT+OEjsdj3fPg=;
-        b=O2EKXZ6u1/DY7o3DsNRk4yZY0zXVtoqxeX0NQJOyb1N+/PsTCcvHQNyw+MKuQb9USPtDQ3
-        lD0oUbMOjmz5X/GvAeR1mRmmaEg+LiHHcNGsyn2KGrkbG7pBGlWmveDbVP3RuGzT6vfN3k
-        kJ1ER5boN2fWiffRdQaNmD8wU7mbVK0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-XkxVwxuFPNyTCVhildMu6g-1; Mon, 11 Nov 2019 10:58:33 -0500
-Received: by mail-wr1-f70.google.com with SMTP id j17so10211240wru.13
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 07:58:33 -0800 (PST)
+        bh=21rYRK1WikbExV5oVruw+sgbHAkBfvXAQMuMqjWgAl8=;
+        b=jU0e2WYFiXBqrZum497Z3KACbIU2iLUH7wge5oyUelZlZnjG69WiPutNaa8AZiYUgWDjpZ
+        Im4IKIWAdZ26KhbCkvVAz/+3YIkkFYwwOVCXktq5dZnju2F2W5PAR58YPsCDBXbAQ+kxAH
+        57NZemNeiHGQaxPXQlzYSLkUxwljJ34=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-WHTdh2ZrPver_fMuMEojyg-1; Mon, 11 Nov 2019 10:59:36 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f191so8598160wme.1
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 07:59:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=F+pHRgddGzkdWCbCt4gYbg2WEhYZkSyJrPGHwvy6a9c=;
-        b=bd0WJUwwyHQ2Wymrcwza09Cr8pSQdJiKq1G6zLUi7vxU4a0FG8+pzHBsohNwEvziy4
-         qvCBvm2HPp+ZQO8kAnkCyrV5zorbeUWv+3GvS98NvVZjxJTg4r83Nn3MQhfjPcO1Z1Fs
-         mNNaKA7m66l2yZzhywic5eBgstat5TEVlZ2Yem6jCrjEjE/XhLy8UEvZWXAvmE1ZoXUm
-         +Kl2iXeU1B9aIWfm8sYYt3ec4++QYUMjnYQV3yrF2S3mwbaw0ntmgdee+Z12iPLkMH5J
-         tXgB8OXpdtHr1unAVN4YqiSqC2qz8GCf6QCIdAN8usA3OLAH6SQYStUNI7Bo9cshgXFz
-         nCdw==
-X-Gm-Message-State: APjAAAXH1Y6g8v2GqJAsBbu2O0UmZDKoiavHlOlZOlv0KeQuQx7ovVxe
-        GD3nZloUr2fzp8Rl1GHGM43w8w8OlsbL0D1UxHrt3jUbAorUSE9kR6lTEGdtf7IndH+sQmRHf2k
-        hRrQnCRTd3078
-X-Received: by 2002:a5d:4684:: with SMTP id u4mr16878020wrq.352.1573487912239;
-        Mon, 11 Nov 2019 07:58:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxw608qPouIK70cqcZgnAxYAHqrbWvSLLa0LOs7sqcaAEh0bFhnzAfOp3FrLOC4KyShX/8xbw==
-X-Received: by 2002:a5d:4684:: with SMTP id u4mr16877997wrq.352.1573487911940;
-        Mon, 11 Nov 2019 07:58:31 -0800 (PST)
+        bh=xE0euolwXuo2nxO5BDJoVVnzsqQOi/h+lidN1W4OF1g=;
+        b=hnCr0ihDHYqmZ1iG1J2GR2lhHindmRW/j6PhLQ2GGLkBoivsUjO8x7jzEVDtS99boG
+         6iRq2QUofGqS3KtvidlGQa10VtMc2DNsP4xbk476yp+pK/5RLheGMTeuCc7qXxDLUh/f
+         9UFIhym3nLksgSsqA4edH8U1TgDMwdUzEeKt/a7CfjMGT5y2Ij8lpBmJYPtYWQ5WBNmO
+         a/9vQoNl1J1kccGwsB9Jkdn4SWTuUicm0pF5al+MKZGbi5ODIRonkfT5ak6WUMVPOZEo
+         nnEBC5JPqDEdmo2MXbKdvM3MlEWjIFXS0gl7pGI4U3x0p5elKTg4gyCJWPdcuXnP7xc+
+         ngYw==
+X-Gm-Message-State: APjAAAUnCCuUlSY18GJncvTO1YUc/KwwnVoja+8wGkQGyyKCVh+yVT4I
+        8sn/Xjip19m+QzIKICkvK2H55hbPq3yOKmgmCIPlCVlGqiAgizEdd+SyK4HAf1hapcY4J6oMpXr
+        8LQLiAjrSOj++
+X-Received: by 2002:adf:f445:: with SMTP id f5mr10163642wrp.193.1573487975383;
+        Mon, 11 Nov 2019 07:59:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqymVEK/xUGaMUciWwTfHY2hjKfJP8CoPSLKDLmdhIlUX8j7E7jjbJbgUDJP7wN27YHTq5IMTA==
+X-Received: by 2002:adf:f445:: with SMTP id f5mr10163629wrp.193.1573487975118;
+        Mon, 11 Nov 2019 07:59:35 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
-        by smtp.gmail.com with ESMTPSA id w17sm8727264wrt.45.2019.11.11.07.58.30
+        by smtp.gmail.com with ESMTPSA id z9sm7440847wrv.35.2019.11.11.07.59.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Nov 2019 07:58:31 -0800 (PST)
-Subject: Re: [PATCH v1 1/3] KVM: VMX: Consider PID.PIR to determine if vCPU
- has pending interrupts
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Jag Raman <jag.raman@oracle.com>
-References: <20191106175602.4515-1-joao.m.martins@oracle.com>
- <20191106175602.4515-2-joao.m.martins@oracle.com>
- <67bca655-fea3-4b57-be3c-7dc58026b5d9@redhat.com>
- <030dd147-8c4f-d6e3-85a8-ee743ce4d5b0@oracle.com>
+        Mon, 11 Nov 2019 07:59:34 -0800 (PST)
+Subject: Re: [PATCH 2/2] KVM: nVMX: Update vmcs01 TPR_THRESHOLD if L2 changed
+ L1 TPR
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
+References: <20191111123055.93270-1-liran.alon@oracle.com>
+ <20191111123055.93270-3-liran.alon@oracle.com>
+ <a26a9a8c-df8d-c49a-3943-35424897b6b3@redhat.com>
+ <6CAEE592-02B0-4E25-B2D2-20E5B55A5D19@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <5ee4c4ae-9d22-d560-bb61-e5f40b56da2e@redhat.com>
-Date:   Mon, 11 Nov 2019 16:58:33 +0100
+Message-ID: <58163b3f-d4ac-6091-a0f8-7e987c224118@redhat.com>
+Date:   Mon, 11 Nov 2019 16:59:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <030dd147-8c4f-d6e3-85a8-ee743ce4d5b0@oracle.com>
+In-Reply-To: <6CAEE592-02B0-4E25-B2D2-20E5B55A5D19@oracle.com>
 Content-Language: en-US
-X-MC-Unique: XkxVwxuFPNyTCVhildMu6g-1
+X-MC-Unique: WHTdh2ZrPver_fMuMEojyg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -84,25 +78,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/19 15:59, Joao Martins wrote:
->> Should we check the bitmap only if SN is false?
-                                            ^^^^^
+On 11/11/19 16:24, Liran Alon wrote:
+> Because when L1 don=E2=80=99t use TPR-Shadow, L0 configures vmcs02 withou=
+t TPR-Shadow.
+> Thus, writing to vmcs02->tpr_threshold doesn=E2=80=99t have any effect.
 
-Of course it should be skipped if SN is false, as you correctly say below.
+Uh, sorry that was obvious:
 
->> We have a precondition
->> that if SN is clear then non-empty PIR implies ON=3D1 (modulo the small
->> window in vmx_vcpu_pi_load of course), so that'd be a bit faster.
-> Makes sense;
->=20
-> The bitmap check was really meant for SN=3D1.
->=20
-> Should SN=3D0 we would be saving ~22-27 cycles as far as I micro-benchmar=
-ked a few
-> weeks ago. Now that you suggest it, it would be also good for older platf=
-orms too.
-
-Or even newer platforms if they don't use VT-d.
+ =09if (exec_control & CPU_BASED_TPR_SHADOW)
+ =09=09vmcs_write32(TPR_THRESHOLD, vmcs12->tpr_threshold);
 
 Paolo
+
+> If l1 do use TPR-Shadow, then VMX=E2=80=99s update_cr8_intercept() doesn=
+=E2=80=99t write to vmcs at all,
+> because it means L1 defines a vTPR for L2 and thus doesn=E2=80=99t provid=
+e it direct access to L1 TPR.
 
