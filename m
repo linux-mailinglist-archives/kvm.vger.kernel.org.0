@@ -2,75 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2ED5F7746
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:00:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2EC6F774D
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:00:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfKKPAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 10:00:09 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43910 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726811AbfKKPAI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 10:00:08 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmWUU112017;
-        Mon, 11 Nov 2019 14:59:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=Aw3n/NGCKepXhXPI8k6tnOfYauE1E+r2KFX4bsTX2pk=;
- b=gh9pPPufBbS4gmhrOSpdetJA7eLe3ZSZ4T7VDdkipRccus7XehJ1dS2XrDcNL+UwPhHH
- xnOgBiW9EfhDhyEmWtILPxFAs/PxNoJuF7MuJvO0FnmubhXHgzP/xu5UmvB+YFmOjU8e
- kyQ47toh5LK/Itr6sbz9E4W1SrIaz3wpDuD84tJs8IBYwmxs+raVYyt32ee6gHhT1waJ
- pm1z+UCLoVeKNgGfvzbqSsE1cZBMOGBgF26S1BHwy8RuVB54RIV1DSLaspl3FRn2usdF
- FsCsmCIXJQkwlmqPZvBDMJxt0T/4GawLmM7amn2J0yl2kiJy/Zu79XXMKNbH0kz//rvk Fg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2w5p3qfbf2-1
+        id S1727149AbfKKPAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 10:00:31 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45704 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727136AbfKKPAb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 10:00:31 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmXYx144677;
+        Mon, 11 Nov 2019 14:59:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=lOs4Q755rWn2yin72lVv51mq0OtKjhD3FBFGWHRvPig=;
+ b=dIrSy8/AGjkkTWZ+Nfz4Uu6MBenA7ggIrP9bI8bSzjpdxYV3z6HFxFDyABTYjP2eUa6T
+ PcRB1HA2TmYOcCDu+0h+1cYk8+DIy0pvFPW5S9Az9ml2V1JzfTZZ4EsyZo+yYPjD76sC
+ PM0BvAzttOOD6KdgMHHIgv/NYCloDsoLWhkp094+yVAQS/PKdeslE4a1Q4EA4H0Dk++Q
+ x38ga1YUVMuSn0wcX8ivHgJ/X6BUV7htmFdkVyUoTo7GOMFOu+UC5DKHann4LFA62dzY
+ TfUY90p/E1Y9iNnQZ/QYFYyre30BBBdHZCs6AHXo+4RQg0kmc4+T/W9rn7odTTYtps/P TA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2w5mvtfg5p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 14:59:09 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmeuk181513;
-        Mon, 11 Nov 2019 14:59:09 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2w67km691t-1
+        Mon, 11 Nov 2019 14:59:27 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmNYt175996;
+        Mon, 11 Nov 2019 14:59:27 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2w6r8jrstx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 14:59:09 +0000
-Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABEx8JU028858;
-        Mon, 11 Nov 2019 14:59:08 GMT
-Received: from [10.175.169.52] (/10.175.169.52)
+        Mon, 11 Nov 2019 14:59:27 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xABExPxL011909;
+        Mon, 11 Nov 2019 14:59:26 GMT
+Received: from [192.168.14.112] (/79.182.207.213)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 Nov 2019 14:59:08 +0000
-Subject: Re: [PATCH v1 1/3] KVM: VMX: Consider PID.PIR to determine if vCPU
- has pending interrupts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        with ESMTP ; Mon, 11 Nov 2019 06:59:25 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v1 2/3] KVM: VMX: Do not change PID.NDST when loading a
+ blocked vCPU
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <b61dc2b2-14be-4d4f-f512-5280010d930a@oracle.com>
+Date:   Mon, 11 Nov 2019 16:59:20 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Liran Alon <liran.alon@oracle.com>,
         Jag Raman <jag.raman@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4E05E5FC-0064-47DE-B4B2-B3BDAF23C072@oracle.com>
 References: <20191106175602.4515-1-joao.m.martins@oracle.com>
- <20191106175602.4515-2-joao.m.martins@oracle.com>
- <67bca655-fea3-4b57-be3c-7dc58026b5d9@redhat.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <030dd147-8c4f-d6e3-85a8-ee743ce4d5b0@oracle.com>
-Date:   Mon, 11 Nov 2019 14:59:03 +0000
-MIME-Version: 1.0
-In-Reply-To: <67bca655-fea3-4b57-be3c-7dc58026b5d9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ <20191106175602.4515-3-joao.m.martins@oracle.com>
+ <15c8c821-25ff-eb62-abd3-8d7d69650744@redhat.com>
+ <314a4120-036c-e954-bc9f-e57dee3bbb7c@oracle.com>
+ <49912d14-1f79-2658-9471-4193807ad667@redhat.com>
+ <b61dc2b2-14be-4d4f-f512-5280010d930a@oracle.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+X-Mailer: Apple Mail (2.3445.4.7)
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=980
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1910280000 definitions=main-1911110137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
  definitions=main-1911110137
@@ -79,59 +83,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/19 2:46 PM, Paolo Bonzini wrote:
-> On 06/11/19 18:56, Joao Martins wrote:
->> Commit 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
->> introduced vmx_dy_apicv_has_pending_interrupt() in order to determine
->> if a vCPU have a pending posted interrupt. This routine is used by
->> kvm_vcpu_on_spin() when searching for a a new runnable vCPU to schedule
->> on pCPU instead of a vCPU doing busy loop.
->>
->> vmx_dy_apicv_has_pending_interrupt() determines if a
->> vCPU has a pending posted interrupt solely based on PID.ON. However,
->> when a vCPU is preempted, vmx_vcpu_pi_put() sets PID.SN which cause
->> raised posted interrupts to only set bit in PID.PIR without setting
->> PID.ON (and without sending notification vector), as depicted in VT-d
->> manual section 5.2.3 "Interrupt-Posting Hardware Operation".
->>
->> Therefore, checking PID.ON is insufficient to determine if a vCPU has
->> pending posted interrupts and instead we should also check if there is
->> some bit set on PID.PIR.
->>
->> Fixes: 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
->> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->> ---
->>  arch/x86/kvm/vmx/vmx.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 31ce6bc2c371..18b0bee662a5 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -6141,7 +6141,10 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
->>  
->>  static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
->>  {
->> -	return pi_test_on(vcpu_to_pi_desc(vcpu));
->> +	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
->> +
->> +	return pi_test_on(pi_desc) ||
->> +		!bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
->>  }
->>  
->>  static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
-> 
-> Should we check the bitmap only if SN is false?  We have a precondition
-> that if SN is clear then non-empty PIR implies ON=1 (modulo the small
-> window in vmx_vcpu_pi_load of course), so that'd be a bit faster.
 
-Makes sense;
 
-The bitmap check was really meant for SN=1.
+> On 11 Nov 2019, at 16:56, Joao Martins <joao.m.martins@oracle.com> =
+wrote:
+>=20
+> On 11/11/19 2:50 PM, Paolo Bonzini wrote:
+>> On 11/11/19 15:48, Joao Martins wrote:
+>>>>>=20
+>>>>> Fixes: c112b5f50232 ("KVM: x86: Recompute PID.ON when clearing =
+PID.SN")
+>>>>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+>>>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>>>> Something wrong in the SoB line?
+>>>>=20
+>>> I can't spot any mistake; at least it looks chained correctly for =
+me. What's the
+>>> issue you see with the Sob line?
+>>=20
+>> Liran's line after yours is confusing.  Did he help with the analysis =
+or
+>> anything like that?
+>>=20
+> He was initially reviewing my patches, but then helped improving the =
+problem
+> description in the commit messages so felt correct to give credit.
+>=20
+> 	Joao
 
-Should SN=0 we would be saving ~22-27 cycles as far as I micro-benchmarked a few
-weeks ago. Now that you suggest it, it would be also good for older platforms too.
+I think proper action is to just remove me from the SoB line.
 
-Cheers,
-	Joao
+-Liran=
