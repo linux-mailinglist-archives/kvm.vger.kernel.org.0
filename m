@@ -2,140 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F209F74E3
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 14:30:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EE42F74E8
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 14:31:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727058AbfKKNaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 08:30:30 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:56089 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbfKKNa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 08:30:29 -0500
-Received: by mail-wm1-f66.google.com with SMTP id b11so13302713wmb.5
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 05:30:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=mkwenBuk+yOAxdES4LJS2kpTu2gXDKAkkdekG5IpFbI=;
-        b=s328wBZB9kmOFPu4tqfyJMK+7A3waE1Qg75T6g83rUmKO/zjxLvxrHVvPNXJXpOeH/
-         GCzJ3BeVkRa+0fRmeqCMvHYDRtabAIkSO0KudD+4MoildGDktJiNurEd4Bx21E6OTAZ9
-         aYVXy7VSZXvm5EPSjShNaklxzwzydP4jKIu7REnJq3uxQwFHZqCeqtnpfXJm/QU95wIt
-         uGZKN+tGdH1/uclUdMnOBG1Ax5e2u/121WZVo6BkUpFVC/JPqDJoaaRO0wR7Jxd0lYqF
-         H0LR03kV+Y8BEZH76EZqZsUT1s0JV9D3yejviqk66P8pM+m6DWg7vpTJmaWyaw8TpwGz
-         a2eA==
+        id S1727199AbfKKNak (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 08:30:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42557 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727220AbfKKNaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 08:30:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573479037;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=rcIPx/5ogsYeXG7OzIvC6+U0YsBC2zFglCGdLOXfT5M=;
+        b=dcs045wzc/+XsBgMH7DxUi8/fvuRp4KASdkepL2ixaqvXKZyEX6dMrL21IgDhSNtd/4i+5
+        LFdQTDkTtwn91HN5Z3pu0FjiPtvLgY28tYNYXKVj3r4iiQ6AlMvxbzewsQN/hldutfdO7u
+        y3ck5Z/FeSjwQLO6z6+ugeMpGbAJhOw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-qU0TZ5u6Ms6mRnu6ciR2hg-1; Mon, 11 Nov 2019 08:30:34 -0500
+Received: by mail-wm1-f71.google.com with SMTP id f21so4001895wmh.5
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 05:30:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=mkwenBuk+yOAxdES4LJS2kpTu2gXDKAkkdekG5IpFbI=;
-        b=OZQrWiAMpE1Ehi49M13hj0uEjetzvJq+c3TKJfvZ8zGvMrftUUtnPTmwkw/bsA8r1q
-         pGqSEmJ4QILp5oiUs2e06Lf457S/7Mo6CMFxz66ptu2ncDCXs1BT91Vetoj/7f3fyR/f
-         05qgVna/mDKIt3R1CcivJ5K0bhGW7nWgDTN046R0MVa89J2+sO45C/E3cGvDouHCL3n6
-         X1ulfWZ2k6QtYXbyg4Vo0m8Luz95N/QCqDc9n+13YzL3Ss2FGdNObEgkQk6AI82YUEIZ
-         dlbibk6nnzB2FjJPeObtaP1nIf7moA4upjBmOj7NvC6jT0VRACC7FasEwvdqrqYInxcA
-         t0Rw==
-X-Gm-Message-State: APjAAAX5aLx8OMnEi+GqDw3ssBKWdQazAWOQIvqs0oR/jcxcAp+4v0Pi
-        3oMlt+OuNW9Ju8C8QICKGPu4xg==
-X-Google-Smtp-Source: APXvYqzwooUbxzm69efOp0rljYcE0gAn6F/FddFwTjRmADcvS5J3lQevJ5I6HflzU4YKaBn7XXxoTw==
-X-Received: by 2002:a1c:1d48:: with SMTP id d69mr19104416wmd.160.1573479028082;
-        Mon, 11 Nov 2019 05:30:28 -0800 (PST)
-Received: from localhost (jirka.pirko.cz. [84.16.102.26])
-        by smtp.gmail.com with ESMTPSA id y6sm9905517wrn.21.2019.11.11.05.30.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2019 05:30:27 -0800 (PST)
-Date:   Mon, 11 Nov 2019 14:30:26 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Parav Pandit <parav@mellanox.com>,
-        David M <david.m.ertman@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191111133026.GA2202@nanopsycho>
-References: <20191108121233.GJ6990@nanopsycho>
- <20191108144054.GC10956@ziepe.ca>
- <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <20191108134559.42fbceff@cakuba>
- <20191109004426.GB31761@ziepe.ca>
- <20191109092747.26a1a37e@cakuba>
- <20191110091855.GE1435668@kroah.com>
- <20191110194601.0d6ed1a0@cakuba>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=e+cTauSYxvUARdKLAc5A7RMT6Ok2c2ubkvwx/ni9mok=;
+        b=CzPQpLbqxHjSdpvKFGZ9AXjQeQyKgbWNGN8khClbUALqX33pXO+Up3FczUmQwRn+5W
+         1n/FrwCwVBOUcblSEqXj/2ZM9GzdrRcs3NlKv1BkLDKmhIhInsd7Kbcn2u0dtuUccJy0
+         C7acG27iPwb4E8j+aNxmibBvojhYbvB49/GJv/zzP9QoU1TZL2T6zHSOt1D5ObU7tsNM
+         IhsYfIbD9Jya7CJCIixMz5ORK5GlGIKwAPX0dH17F8ka9i2vgXAmA/e0/CbdO/qzdiO+
+         eCnKC/YYB9Mkf0+DuHA7L5RIBKPWXl0rJmpf4z2bVm0/y0h3T+6EbX8XtufaUoOvLSVc
+         x86w==
+X-Gm-Message-State: APjAAAWCVhSYFGei5HezfouDTc8TXMod5tsFr16ITeDi8SEz1EbCB5KP
+        vf406FXIqftWvc8nFM1wPBgSFdc0b+qNsS6Js+l67Le0sl3cvgxkAZXc7Pj56ynxqwxDC32dfSQ
+        E6mYR5QPopAEm
+X-Received: by 2002:a1c:814b:: with SMTP id c72mr21525078wmd.167.1573479033172;
+        Mon, 11 Nov 2019 05:30:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwp88fUA9D9DG2jgjImcScFjHKuZOp3iwIpo8VnWaraYdMBrBUgxC9lbkl1AvxOj6Xvb+BXbg==
+X-Received: by 2002:a1c:814b:: with SMTP id c72mr21525041wmd.167.1573479032767;
+        Mon, 11 Nov 2019 05:30:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
+        by smtp.gmail.com with ESMTPSA id m15sm17278510wrq.97.2019.11.11.05.30.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2019 05:30:32 -0800 (PST)
+Subject: Re: [PATCH v2] KVM: X86: Fix initialization of MSR
+ lists(msrs_to_save[], emulated_msrs[] and msr_based_features[])
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20191106063520.1915-1-chenyi.qiang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <72f9e7f2-d57f-7c63-3bb1-34f0353d5aa6@redhat.com>
+Date:   Mon, 11 Nov 2019 14:30:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191110194601.0d6ed1a0@cakuba>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191106063520.1915-1-chenyi.qiang@intel.com>
+Content-Language: en-US
+X-MC-Unique: qU0TZ5u6Ms6mRnu6ciR2hg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mon, Nov 11, 2019 at 04:46:01AM CET, jakub.kicinski@netronome.com wrote:
->On Sun, 10 Nov 2019 10:18:55 +0100, gregkh@linuxfoundation.org wrote:
->> > What I'm missing is why is it so bad to have a driver register to
->> > multiple subsystems.  
->> 
->> Because these PCI devices seem to do "different" things all in one PCI
->> resource set.  Blame the hardware designers :)
->
->See below, I don't think you can blame the HW designers in this
->particular case :)
->
->> > For the nfp I think the _real_ reason to have a bus was that it
->> > was expected to have some out-of-tree modules bind to it. Something 
->> > I would not encourage :)  
->> 
->> That's not ok, and I agree with you.
->> 
->> But there seems to be some more complex PCI devices that do lots of
->> different things all at once.  Kind of like a PCI device that wants to
->> be both a keyboard and a storage device at the same time (i.e. a button
->> on a disk drive...)
->
->The keyboard which is also a storage device may be a clear cut case
->where multiple devices were integrated into one bus endpoint.
+On 06/11/19 07:35, Chenyi Qiang wrote:
+> The three MSR lists(msrs_to_save[], emulated_msrs[] and
+> msr_based_features[]) are global arrays of kvm.ko, which are
+> adjusted (copy supported MSRs forward to override the unsupported MSRs)
+> when insmod kvm-{intel,amd}.ko, but it doesn't reset these three arrays
+> to their initial value when rmmod kvm-{intel,amd}.ko. Thus, at the next
+> installation, kvm-{intel,amd}.ko will do operations on the modified
+> arrays with some MSRs lost and some MSRs duplicated.
+>=20
+> So define three constant arrays to hold the initial MSR lists and
+> initialize msrs_to_save[], emulated_msrs[] and msr_based_features[]
+> based on the constant arrays.
+>=20
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> ---
+> Changes in v2:
+>  - define initial MSR lists with static const.
+>  - change the dynamic allocation of supported MSR lists to static allocat=
+ion.
+>=20
+>  arch/x86/kvm/x86.c | 51 +++++++++++++++++++++++++---------------------
+>  1 file changed, 28 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 89621025577a..0b4b6db5b13f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1138,13 +1138,15 @@ EXPORT_SYMBOL_GPL(kvm_rdpmc);
+>   * List of msr numbers which we expose to userspace through KVM_GET_MSRS
+>   * and KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.
+>   *
+> - * This list is modified at module load time to reflect the
+> + * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features)
+> + * extract the supported MSRs from the related const lists.
+> + * msrs_to_save is selected from the msrs_to_save_all to reflect the
+>   * capabilities of the host cpu. This capabilities test skips MSRs that =
+are
+> - * kvm-specific. Those are put in emulated_msrs; filtering of emulated_m=
+srs
+> + * kvm-specific. Those are put in emulated_msrs_all; filtering of emulat=
+ed_msrs
+>   * may depend on host virtualization features rather than host cpu featu=
+res.
+>   */
+> =20
+> -static u32 msrs_to_save[] =3D {
+> +static const u32 msrs_to_save_all[] =3D {
+>  =09MSR_IA32_SYSENTER_CS, MSR_IA32_SYSENTER_ESP, MSR_IA32_SYSENTER_EIP,
+>  =09MSR_STAR,
+>  #ifdef CONFIG_X86_64
+> @@ -1185,9 +1187,10 @@ static u32 msrs_to_save[] =3D {
+>  =09MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+>  };
+> =20
+> +static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+>  static unsigned num_msrs_to_save;
+> =20
+> -static u32 emulated_msrs[] =3D {
+> +static const u32 emulated_msrs_all[] =3D {
+>  =09MSR_KVM_SYSTEM_TIME, MSR_KVM_WALL_CLOCK,
+>  =09MSR_KVM_SYSTEM_TIME_NEW, MSR_KVM_WALL_CLOCK_NEW,
+>  =09HV_X64_MSR_GUEST_OS_ID, HV_X64_MSR_HYPERCALL,
+> @@ -1226,7 +1229,7 @@ static u32 emulated_msrs[] =3D {
+>  =09 * by arch/x86/kvm/vmx/nested.c based on CPUID or other MSRs.
+>  =09 * We always support the "true" VMX control MSRs, even if the host
+>  =09 * processor does not, so I am putting these registers here rather
+> -=09 * than in msrs_to_save.
+> +=09 * than in msrs_to_save_all.
+>  =09 */
+>  =09MSR_IA32_VMX_BASIC,
+>  =09MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+> @@ -1245,13 +1248,14 @@ static u32 emulated_msrs[] =3D {
+>  =09MSR_KVM_POLL_CONTROL,
+>  };
+> =20
+> +static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
+>  static unsigned num_emulated_msrs;
+> =20
+>  /*
+>   * List of msr numbers which are used to expose MSR-based features that
+>   * can be used by a hypervisor to validate requested CPU features.
+>   */
+> -static u32 msr_based_features[] =3D {
+> +static const u32 msr_based_features_all[] =3D {
+>  =09MSR_IA32_VMX_BASIC,
+>  =09MSR_IA32_VMX_TRUE_PINBASED_CTLS,
+>  =09MSR_IA32_VMX_PINBASED_CTLS,
+> @@ -1276,6 +1280,7 @@ static u32 msr_based_features[] =3D {
+>  =09MSR_IA32_ARCH_CAPABILITIES,
+>  };
+> =20
+> +static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
+>  static unsigned int num_msr_based_features;
+> =20
+>  static u64 kvm_get_arch_capabilities(void)
+> @@ -5131,19 +5136,19 @@ static void kvm_init_msr_list(void)
+>  =09unsigned i, j;
+> =20
+>  =09BUILD_BUG_ON_MSG(INTEL_PMC_MAX_FIXED !=3D 4,
+> -=09=09=09 "Please update the fixed PMCs in msrs_to_save[]");
+> +=09=09=09 "Please update the fixed PMCs in msrs_to_saved_all[]");
+> =20
+>  =09perf_get_x86_pmu_capability(&x86_pmu);
+> =20
+> -=09for (i =3D j =3D 0; i < ARRAY_SIZE(msrs_to_save); i++) {
+> -=09=09if (rdmsr_safe(msrs_to_save[i], &dummy[0], &dummy[1]) < 0)
+> +=09for (i =3D j =3D 0; i < ARRAY_SIZE(msrs_to_save_all); i++) {
+> +=09=09if (rdmsr_safe(msrs_to_save_all[i], &dummy[0], &dummy[1]) < 0)
+>  =09=09=09continue;
+> =20
+>  =09=09/*
+>  =09=09 * Even MSRs that are valid in the host may not be exposed
+>  =09=09 * to the guests in some cases.
+>  =09=09 */
+> -=09=09switch (msrs_to_save[i]) {
+> +=09=09switch (msrs_to_save_all[i]) {
+>  =09=09case MSR_IA32_BNDCFGS:
+>  =09=09=09if (!kvm_mpx_supported())
+>  =09=09=09=09continue;
+> @@ -5171,17 +5176,17 @@ static void kvm_init_msr_list(void)
+>  =09=09=09break;
+>  =09=09case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B: {
+>  =09=09=09if (!kvm_x86_ops->pt_supported() ||
+> -=09=09=09=09msrs_to_save[i] - MSR_IA32_RTIT_ADDR0_A >=3D
+> +=09=09=09=09msrs_to_save_all[i] - MSR_IA32_RTIT_ADDR0_A >=3D
+>  =09=09=09=09intel_pt_validate_hw_cap(PT_CAP_num_address_ranges) * 2)
+>  =09=09=09=09continue;
+>  =09=09=09break;
+>  =09=09case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR0 + 17:
+> -=09=09=09if (msrs_to_save[i] - MSR_ARCH_PERFMON_PERFCTR0 >=3D
+> +=09=09=09if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_PERFCTR0 >=3D
+>  =09=09=09    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+>  =09=09=09=09continue;
+>  =09=09=09break;
+>  =09=09case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL0 + 1=
+7:
+> -=09=09=09if (msrs_to_save[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=3D
+> +=09=09=09if (msrs_to_save_all[i] - MSR_ARCH_PERFMON_EVENTSEL0 >=3D
+>  =09=09=09    min(INTEL_PMC_MAX_GENERIC, x86_pmu.num_counters_gp))
+>  =09=09=09=09continue;
+>  =09=09}
+> @@ -5189,31 +5194,31 @@ static void kvm_init_msr_list(void)
+>  =09=09=09break;
+>  =09=09}
+> =20
+> -=09=09if (j < i)
+> -=09=09=09msrs_to_save[j] =3D msrs_to_save[i];
+> +=09=09if (j <=3D i)
+> +=09=09=09msrs_to_save[j] =3D msrs_to_save_all[i];
 
-Also, I think that very important differentiator between keyboard/button
-and NIC is that keyboard/button is fixed. You have driver bus with 2
-devices on constant addresses.
+J is always <=3D i, so we can remove the ifs.
 
-However in case of NIC subfunctions. You have 0 at he beginning and user
-instructs to create more (maybe hundreds). Now important questions
-appear:
+>  =09=09j++;
+>  =09}
+>  =09num_msrs_to_save =3D j;
+> =20
+> -=09for (i =3D j =3D 0; i < ARRAY_SIZE(emulated_msrs); i++) {
+> -=09=09if (!kvm_x86_ops->has_emulated_msr(emulated_msrs[i]))
+> +=09for (i =3D j =3D 0; i < ARRAY_SIZE(emulated_msrs_all); i++) {
+> +=09=09if (!kvm_x86_ops->has_emulated_msr(emulated_msrs_all[i]))
+>  =09=09=09continue;
+> =20
+> -=09=09if (j < i)
+> -=09=09=09emulated_msrs[j] =3D emulated_msrs[i];
+> +=09=09if (j <=3D i)
+> +=09=09=09emulated_msrs[j] =3D emulated_msrs_all[i];
+>  =09=09j++;
+>  =09}
+>  =09num_emulated_msrs =3D j;
+> =20
+> -=09for (i =3D j =3D 0; i < ARRAY_SIZE(msr_based_features); i++) {
+> +=09for (i =3D j =3D 0; i < ARRAY_SIZE(msr_based_features_all); i++) {
+>  =09=09struct kvm_msr_entry msr;
+> =20
+> -=09=09msr.index =3D msr_based_features[i];
+> +=09=09msr.index =3D msr_based_features_all[i];
+>  =09=09if (kvm_get_msr_feature(&msr))
+>  =09=09=09continue;
+> =20
+> -=09=09if (j < i)
+> -=09=09=09msr_based_features[j] =3D msr_based_features[i];
+> +=09=09if (j <=3D i)
+> +=09=09=09msr_based_features[j] =3D msr_based_features_all[i];
+>  =09=09j++;
+>  =09}
+>  =09num_msr_based_features =3D j;
+>=20
 
-1) How to create devices (what API) - mdev has this figured out
-2) How to to do the addressing of the devices. Needs to be
-   predictable/defined by the user - mdev has this figured out
-3) Udev names of netdevices - udev names that according to the
-   bus/address. That is straightforeward with mdev.
-   I can't really see how to figure this one in particular with
-   per-driver busses :/
+Queued, thanks.
 
+Paolo
 
->
->The case with these advanced networking adapters is a little different
->in that they are one HW device which has oodles of FW implementing
->clients or acceleration for various networking protocols.
->
->The nice thing about having a fake bus is you can load out-of-tree
->drivers to operate extra protocols quite cleanly.
->
->I'm not saying that's what the code in question is doing, I'm saying 
->I'd personally like to understand the motivation more clearly before
->every networking driver out there starts spawning buses. The only
->argument I've heard so far for the separate devices is reloading subset
->of the drivers, which I'd rate as moderately convincing.
