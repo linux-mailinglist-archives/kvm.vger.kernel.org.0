@@ -2,177 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F912F7731
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:58:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2ED5F7746
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 16:00:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726978AbfKKO6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 09:58:23 -0500
-Received: from mail-eopbgr50048.outbound.protection.outlook.com ([40.107.5.48]:16846
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726950AbfKKO6X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 09:58:23 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZKMQ0XdUgai5izGlL418g2pGG9pZ1IgZYc7N1N0pqsNJw8OUCLJCt3BEaqRFrr+iCzfgLyHm+MCjdlEIqsqChxekTmmdCjLe8ldJixsMfaxUxOLnzIk7gS+X0lObx/QXNMR+71JxMJ1QImTZJmfpZIqarAoats9ppB/ybU56asXr0tcHyoH1iOep9QHtMNZjIHIeZdqzcpdyYBz8l2yOQTdxS8b1MZJkjPz393cvOBx+JEiedMGOTe8VhL4CQVXsCC6WJrRHaCqVzYhoPYEs3UNqLUFihqFabCOVofYNDDbOmQ8rEIEYYBYrsJpnllBuEtTzBhkdg4P2+H7yKOItew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=35aFREQgVr4UNbqHF2MhcsyC8OUCCgltZ+ZbmIyutw4=;
- b=Krk0nKhJTWotF0kf/bwNWVOZ5Oogf1tUTsUkpx2u234/5t+IdLulRKPasShhW9djrKi7sFfOBSzvpWUsbQRGNyxaqkpvGNgiRZaYIXOorRS5vmF05hRzvRFVRloerWOpy/voNR3nyASqLaGM9ihTNFpDZE99K/SueX1q+Bf1msdKZ+Vtkx9ynojz6Xl8uxNgp/8Kti3i18d+V+kQ8eamWYjbLNKLltwPvtneLJLODFpiKMxdH9Rp4g7gJTkvMY4qXrsTbX2KhLm9gEaMxHcyr1CMarcsMO8+X8impNrq1wNTnxQuNaE6fsrecBgJnrJk/dYhlludb/nQawr0UjAGYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=35aFREQgVr4UNbqHF2MhcsyC8OUCCgltZ+ZbmIyutw4=;
- b=Y2r0beFg2Tvil5pA3a0B+f5UIeMA674KCNT7ucndO3Bm6PEO+yKFXmDU+/oMXSEVFMg5GGW8rYI5BOFgzCNYgMOuyEVe+PF0XP204LCGaDEp11t0RLLK0sw+WkzSJO67w1LeWAWoge7UMy1t+xb5r1hQbaumHQ6vLcd70QQYork=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB5938.eurprd05.prod.outlook.com (20.178.203.88) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Mon, 11 Nov 2019 14:58:18 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::e5c2:b650:f89:12d4%7]) with mapi id 15.20.2430.027; Mon, 11 Nov 2019
- 14:58:18 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jiri Pirko <jiri@resnulli.us>
-CC:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        David M <david.m.ertman@intel.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>,
-        "Jason Wang (jasowang@redhat.com)" <jasowang@redhat.com>
-Subject: RE: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Thread-Topic: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Thread-Index: AQHVlYUoVUzzBv4k4UmQHUerp08scaeAKe4AgAEGoYCAAClyAIAADgnAgAA94wCAABDWgIAABhCAgAAItYCAAAz4AIAABs2QgAAs4QCAAsNGMIABQQUAgAAKJkA=
-Date:   Mon, 11 Nov 2019 14:58:18 +0000
-Message-ID: <AM0PR05MB4866A5F11AED9ABA70FAE7EED1740@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191108144054.GC10956@ziepe.ca>
- <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba> <20191108201253.GE10956@ziepe.ca>
- <20191108133435.6dcc80bd@x1.home> <20191108210545.GG10956@ziepe.ca>
- <20191108145210.7ad6351c@x1.home>
- <AM0PR05MB4866444210721BC4EE775D27D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191109005708.GC31761@ziepe.ca>
- <AM0PR05MB48660E49342EC2CD6AB825F8D1750@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191111141732.GB2202@nanopsycho>
-In-Reply-To: <20191111141732.GB2202@nanopsycho>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [2605:6000:ec82:1c00:dc64:8393:8e52:3370]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 1a717c32-1ab0-44dc-54cc-08d766b79651
-x-ms-traffictypediagnostic: AM0PR05MB5938:|AM0PR05MB5938:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB5938466A84A8071D1891AE69D1740@AM0PR05MB5938.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0218A015FA
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(366004)(346002)(39860400002)(396003)(136003)(199004)(189003)(13464003)(25786009)(7416002)(476003)(11346002)(81156014)(81166006)(66446008)(66476007)(66946007)(76116006)(64756008)(2906002)(66556008)(446003)(8676002)(33656002)(478600001)(6506007)(7696005)(6916009)(256004)(52536014)(14454004)(8936002)(76176011)(486006)(102836004)(5660300002)(55016002)(186003)(74316002)(46003)(7736002)(99286004)(316002)(9686003)(54906003)(305945005)(6436002)(229853002)(71190400001)(71200400001)(4326008)(6246003)(86362001)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB5938;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: u5NFPrOYm1zAjSLJ251t6dQbIacP3kX2tJSorXeNaJ3BHrsqMet/JsRMSdq06iVrYZGC9SweoMf+2CioGhgPx4pmcT+YxTN50ZlQNcM5rArX854tAE+bvLSHZVaKsMwyedr7QcxzBx6izopUlq67wD6jdjTAo2LeIJrbRFk2dHQOKdQeb9+BucU48Zhjoonm3RXTa6m+axIG1YgoHOGxn/80Z+6zH7keCnoT/wbDwLR1woze/BnQ8zPZZj4DRz6Ts9bUt2E37HtVzRVyvlI+ffUkjzOyR+lcQhY85IXoM74RjvI5hyZFxEVsfllz1U9S163HRuFAjpwq2PO3Gk/qzJOiy3XUq+5e4GNK+0yHLGGiRACO97SZvHpTatYBwCICd9Q9moiLXqGxs38SD1Qig3RDrrIaXg0e9A3RWkPrfxVt3/DJsWAk1O18nKtgmxJ2
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727089AbfKKPAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 10:00:09 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:43910 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726811AbfKKPAI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 10:00:08 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmWUU112017;
+        Mon, 11 Nov 2019 14:59:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=Aw3n/NGCKepXhXPI8k6tnOfYauE1E+r2KFX4bsTX2pk=;
+ b=gh9pPPufBbS4gmhrOSpdetJA7eLe3ZSZ4T7VDdkipRccus7XehJ1dS2XrDcNL+UwPhHH
+ xnOgBiW9EfhDhyEmWtILPxFAs/PxNoJuF7MuJvO0FnmubhXHgzP/xu5UmvB+YFmOjU8e
+ kyQ47toh5LK/Itr6sbz9E4W1SrIaz3wpDuD84tJs8IBYwmxs+raVYyt32ee6gHhT1waJ
+ pm1z+UCLoVeKNgGfvzbqSsE1cZBMOGBgF26S1BHwy8RuVB54RIV1DSLaspl3FRn2usdF
+ FsCsmCIXJQkwlmqPZvBDMJxt0T/4GawLmM7amn2J0yl2kiJy/Zu79XXMKNbH0kz//rvk Fg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2w5p3qfbf2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Nov 2019 14:59:09 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABEmeuk181513;
+        Mon, 11 Nov 2019 14:59:09 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2w67km691t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Nov 2019 14:59:09 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABEx8JU028858;
+        Mon, 11 Nov 2019 14:59:08 GMT
+Received: from [10.175.169.52] (/10.175.169.52)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 11 Nov 2019 14:59:08 +0000
+Subject: Re: [PATCH v1 1/3] KVM: VMX: Consider PID.PIR to determine if vCPU
+ has pending interrupts
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+References: <20191106175602.4515-1-joao.m.martins@oracle.com>
+ <20191106175602.4515-2-joao.m.martins@oracle.com>
+ <67bca655-fea3-4b57-be3c-7dc58026b5d9@redhat.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <030dd147-8c4f-d6e3-85a8-ee743ce4d5b0@oracle.com>
+Date:   Mon, 11 Nov 2019 14:59:03 +0000
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a717c32-1ab0-44dc-54cc-08d766b79651
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2019 14:58:18.2305
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PjJben4datm2ZvkCusgnsWjUhZ4cWYRKk6kVyWVJPZRttQAb1mh8aJR5mUFc3hzk06Eo19qE5Y/Pu3+HJ8GXWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB5938
+In-Reply-To: <67bca655-fea3-4b57-be3c-7dc58026b5d9@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911110137
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9437 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911110137
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/11/19 2:46 PM, Paolo Bonzini wrote:
+> On 06/11/19 18:56, Joao Martins wrote:
+>> Commit 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
+>> introduced vmx_dy_apicv_has_pending_interrupt() in order to determine
+>> if a vCPU have a pending posted interrupt. This routine is used by
+>> kvm_vcpu_on_spin() when searching for a a new runnable vCPU to schedule
+>> on pCPU instead of a vCPU doing busy loop.
+>>
+>> vmx_dy_apicv_has_pending_interrupt() determines if a
+>> vCPU has a pending posted interrupt solely based on PID.ON. However,
+>> when a vCPU is preempted, vmx_vcpu_pi_put() sets PID.SN which cause
+>> raised posted interrupts to only set bit in PID.PIR without setting
+>> PID.ON (and without sending notification vector), as depicted in VT-d
+>> manual section 5.2.3 "Interrupt-Posting Hardware Operation".
+>>
+>> Therefore, checking PID.ON is insufficient to determine if a vCPU has
+>> pending posted interrupts and instead we should also check if there is
+>> some bit set on PID.PIR.
+>>
+>> Fixes: 17e433b54393 ("KVM: Fix leak vCPU's VMCS value into other pCPU")
+>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>>  arch/x86/kvm/vmx/vmx.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 31ce6bc2c371..18b0bee662a5 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -6141,7 +6141,10 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>>  
+>>  static bool vmx_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu)
+>>  {
+>> -	return pi_test_on(vcpu_to_pi_desc(vcpu));
+>> +	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
+>> +
+>> +	return pi_test_on(pi_desc) ||
+>> +		!bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
+>>  }
+>>  
+>>  static void vmx_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
+> 
+> Should we check the bitmap only if SN is false?  We have a precondition
+> that if SN is clear then non-empty PIR implies ON=1 (modulo the small
+> window in vmx_vcpu_pi_load of course), so that'd be a bit faster.
 
+Makes sense;
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: Monday, November 11, 2019 8:18 AM
-> Sun, Nov 10, 2019 at 08:48:31PM CET, parav@mellanox.com wrote:
-> >
-> >> From: Jason Gunthorpe <jgg@ziepe.ca>
-> >> Sent: Friday, November 8, 2019 6:57 PM
-> >> > We should be creating 3 different buses, instead of mdev bus being
-> >> > de-
-> >> multiplexer of that?
-> >> >
-> >> > Hence, depending the device flavour specified, create such device
-> >> > on right
-> >> bus?
-> >> >
-> >> > For example,
-> >> > $ devlink create subdev pci/0000:05:00.0 flavour virtio name foo
-> >> > subdev_id 1 $ devlink create subdev pci/0000:05:00.0 flavour mdev
-> >> > <uuid> subdev_id 2 $ devlink create subdev pci/0000:05:00.0 flavour
-> >> > mlx5 id 1 subdev_id 3
-> >>
-> >> I like the idea of specifying what kind of interface you want at sub
-> >> device creation time. It fits the driver model pretty well and
-> >> doesn't require abusing the vfio mdev for binding to a netdev driver.
-> >>
-> >> > $ devlink subdev pci/0000:05:00.0/<subdev_id> config <params> $
-> >> > echo <respective_device_id> <sysfs_path>/bind
-> >>
-> >> Is explicit binding really needed?
-> >No.
-> >
-> >> If you specify a vfio flavour why shouldn't the vfio driver autoload
-> >> and bind to it right away? That is kind of the point of the driver
-> >> model...
-> >>
-> >It some configuration is needed that cannot be passed at device creation
-> time, explicit bind later can be used.
-> >
-> >> (kind of related, but I don't get while all that GUID and lifecycle
-> >> stuff in mdev should apply for something like a SF)
-> >>
-> >GUID is just the name of the device.
-> >But lets park this aside for a moment.
-> >
-> >> > Implement power management callbacks also on all above 3 buses?
-> >> > Abstract out mlx5_bus into more generic virtual bus (vdev bus?) so
-> >> > that multiple vendors can reuse?
-> >>
-> >> In this specific case, why does the SF in mlx5 mode even need a bus?
-> >> Is it only because of devlink? That would be unfortunate
-> >>
-> >Devlink is one part due to identifying using bus/dev.
-> >How do we refer to its devlink instance of SF without bus/device?
->=20
-> Question is, why to have devlink instance for SF itself. Same as VF, you =
-don't
-mlx5_core has devlink instance for PF and VF for long time now.
-Health report, txq/rxq dumps etc all anchored to this devlink instance even=
- for VF. (similar to PF).
-And so, SF same framework should work for SF.
+The bitmap check was really meant for SN=1.
 
-> need devlink instance. You only need devlink_port (or
-> devlink_subdev) instance on the PF devlink parent for it.
->=20
-Devlink_port or devlink_subdev are still on eswitch or mgmt side.
-They are not present on the side where devlink instance exist on side where=
- txq/rxq/eq etc exist.
+Should SN=0 we would be saving ~22-27 cycles as far as I micro-benchmarked a few
+weeks ago. Now that you suggest it, it would be also good for older platforms too.
 
+Cheers,
+	Joao
