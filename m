@@ -2,124 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A06DFF79EF
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 18:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C198F79F9
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 18:30:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbfKKR3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 12:29:01 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:48548 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbfKKR3A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 12:29:00 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABHPVFe077366;
-        Mon, 11 Nov 2019 17:28:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=WlxVxKiBr49y4SsqPlWfm5cHZY1cE9jd8M0a28PEqNk=;
- b=Mz5fSnaVVh/Jxse98mVsZB+d77X0IfUciewQJcCvtqcMCnsXDWDz+7BAkafki3Ob/LSF
- cIc0Lq+XWBuB4GiPn+PsiTPxwaAQyhe2P0wjz5xdFSf/+d+J7DRASqceeS/tj8wL3fk/
- YWUkvZ1WbU3BgLPuGaRGe6oqDPpDHnBbgmayHxxT7oE9avpM65sRgigvWVRtBUyxb2Zx
- +sVCqPFxqZ7NPU1+f5pIAQuBGOvSr6fBEUyNLfY28uxN9B1b4Bz+3U9+WTASm0yfuqLr
- +AW0pl/vHFA1440Py+jSOTSy9lj2aG2F40Cchd380ZMZCa3ra/2G+lV6WvJ+JPI3dKIw qg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2w5mvtg7vs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 17:28:09 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xABHEp6p067937;
-        Mon, 11 Nov 2019 17:28:08 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2w66wmfwbg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 17:28:08 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xABHS51e023060;
-        Mon, 11 Nov 2019 17:28:05 GMT
-Received: from [10.175.169.52] (/10.175.169.52)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 Nov 2019 09:28:05 -0800
-Subject: Re: [PATCH v1 2/3] KVM: VMX: Do not change PID.NDST when loading a
- blocked vCPU
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Liran Alon <liran.alon@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jag Raman <jag.raman@oracle.com>
-References: <20191106175602.4515-1-joao.m.martins@oracle.com>
- <20191106175602.4515-3-joao.m.martins@oracle.com>
- <15c8c821-25ff-eb62-abd3-8d7d69650744@redhat.com>
- <314a4120-036c-e954-bc9f-e57dee3bbb7c@oracle.com>
- <49912d14-1f79-2658-9471-4193807ad667@redhat.com>
- <b61dc2b2-14be-4d4f-f512-5280010d930a@oracle.com>
- <4E05E5FC-0064-47DE-B4B2-B3BDAF23C072@oracle.com>
- <20191111155349.GA11725@linux.intel.com>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <946be6b4-3b8b-e89d-c3e5-18fd7b714a7f@oracle.com>
-Date:   Mon, 11 Nov 2019 17:27:57 +0000
+        id S1727103AbfKKRaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 12:30:01 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38489 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726878AbfKKR37 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 12:29:59 -0500
+Received: by mail-pg1-f193.google.com with SMTP id 15so9861991pgh.5
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 09:29:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=fA7Fsg1gpMy56Uu36LA4owNDl1Jh20vv8x7SlaV4qs8=;
+        b=iacXhPkc9FGy32VeGcUizlaxp9TQyTa3YCq/Mk6DC1chJi3XqsDkHLsbxG5ogjF7mL
+         cHrCAE9nMRbY1ne2C3sr4IhOPaWJ2BRnmockFOBbL70I54EDazU88zBM3JO+CpK73UQ3
+         PodZNDoDnD8qH1DoJ1oiFoNgNkaTTyEFmoesB2/PI8l9OtBr5MTXGwh0+SkMxIIiKwBD
+         oKc631VrVtl2JSu7Nt5yTatGHrE46KsgfPCuwoSyITvpyvrCJXb6MU68VvMyD0GnQNeq
+         2XLnaTQkBqfugUlXoMFeoT1nyAYH8VQDHPUEw3yCqSvvMO9cPzry4w02tpH4rmIb0xCh
+         76HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fA7Fsg1gpMy56Uu36LA4owNDl1Jh20vv8x7SlaV4qs8=;
+        b=eYsgsHbANqtXdvPS5zj9fb79Tsehr1iXrETraEUljixUVsY25VjdwBxOeUVAzJgYmg
+         tDSeziv+uBqNsR9+Nh73ji5v5u0lL5Kq1cMSxN54hY/8RWqAoqGvBDsuIDtfMDuySuSy
+         QURHbBOM/v/aUzZ2bvBghuQoxPOM2MCmOuQ8I3f5Ie+JnPI3eslAiZ4B0naXeOtpPCE1
+         Kb3uWPDlpB64U6nag+L3opg0PlIwNCKqgQOwL3PCS3ezJkrUN72kKH0eJu+YRUzGxFVC
+         4Brud7YTF53xy9e/9mj7TQKbjAo5S6itNmTnde2KklLqdpDPbve6Of5O3PZxbJSU470e
+         4tXQ==
+X-Gm-Message-State: APjAAAUalenCSLVwl7q4PQeQ5vfT42TRRgYIan4whB8NrKoMcUiLA4kZ
+        uDww/GldA+23Zk3CFC3xTd7tLQ==
+X-Google-Smtp-Source: APXvYqz/ZDi0j4sGOiniVLuzA+Rs8BpMrp5miPmhe+9uGIOTxXjJNz7l6UCNqvoKgWBmZet2LW3hWA==
+X-Received: by 2002:a63:7015:: with SMTP id l21mr27824906pgc.200.1573493397028;
+        Mon, 11 Nov 2019 09:29:57 -0800 (PST)
+Received: from hermes.lan (204-195-22-127.wavecable.com. [204.195.22.127])
+        by smtp.gmail.com with ESMTPSA id r184sm17589538pfc.106.2019.11.11.09.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2019 09:29:56 -0800 (PST)
+Date:   Mon, 11 Nov 2019 09:29:48 -0800
+From:   Stephen Hemminger <stephen@networkplumber.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     lantianyu1986@gmail.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>, sashal@kernel.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net, robh@kernel.org,
+        Jonathan.Cameron@huawei.com, paulmck@linux.ibm.com,
+        Michael Kelley <mikelley@microsoft.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, vkuznets <vkuznets@redhat.com>
+Subject: Re: [PATCH] VFIO/VMBUS: Add VFIO VMBUS driver support
+Message-ID: <20191111092948.047f1708@hermes.lan>
+In-Reply-To: <20191111172322.GB1077444@kroah.com>
+References: <20191111084507.9286-1-Tianyu.Lan@microsoft.com>
+        <20191111094920.GA135867@kroah.com>
+        <20191111084712.37ba7d5a@hermes.lan>
+        <20191111172322.GB1077444@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <20191111155349.GA11725@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=904
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911110155
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=971 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911110155
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/19 3:53 PM, Sean Christopherson wrote:
-> On Mon, Nov 11, 2019 at 04:59:20PM +0200, Liran Alon wrote:
->>
->>
->>> On 11 Nov 2019, at 16:56, Joao Martins <joao.m.martins@oracle.com> wrote:
->>>
->>> On 11/11/19 2:50 PM, Paolo Bonzini wrote:
->>>> On 11/11/19 15:48, Joao Martins wrote:
->>>>>>>
->>>>>>> Fixes: c112b5f50232 ("KVM: x86: Recompute PID.ON when clearing PID.SN")
->>>>>>> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
->>>>>>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->>>>>> Something wrong in the SoB line?
->>>>>>
->>>>> I can't spot any mistake; at least it looks chained correctly for me. What's the
->>>>> issue you see with the Sob line?
->>>>
->>>> Liran's line after yours is confusing.  Did he help with the analysis or
->>>> anything like that?
->>>>
->>> He was initially reviewing my patches, but then helped improving the problem
->>> description in the commit messages so felt correct to give credit.
->>>
->>> 	Joao
->>
->> I think proper action is to just remove me from the SoB line.
-> 
-> Use Co-developed-by to attribute multiple authors.  Note, the SoB ordering
-> should show the chronological history of the patch when possible, e.g. the
-> person sending the patch should always have their SoB last.
-> 
-> Documentation/process/submitting-patches.rst and 
-> Documentation/process/5.Posting.rst have more details.
-> 
-The Sob chain on the first two patches were broken (regardless of any use of
-Co-developed-by). Fixed it up on v2, alongside the rest of the comments.
+On Mon, 11 Nov 2019 18:23:22 +0100
+Greg KH <gregkh@linuxfoundation.org> wrote:
 
-Cheers,
-	Joao
+> On Mon, Nov 11, 2019 at 08:47:12AM -0800, Stephen Hemminger wrote:
+> > On Mon, 11 Nov 2019 01:49:20 -0800
+> > "Greg KH" <gregkh@linuxfoundation.org> wrote:
+> >   
+> > > > +	ret = sysfs_create_bin_file(&channel->kobj,    
+> > > &ring_buffer_bin_attr);  
+> > > > +	if (ret)
+> > > > +		dev_notice(&dev->device,
+> > > > +			   "sysfs create ring bin file failed; %d\n",    
+> > > ret);  
+> > > > +    
+> > > 
+> > > Again, don't create sysfs files on your own, the bus code should be
+> > > doing this for you automatically and in a way that is race-free.
+> > > 
+> > > thanks,
+> > > 
+> > > greg k-h  
+> > 
+> > The sysfs file is only created if the VFIO/UIO driveris used.  
+> 
+> That's even worse.  Again, sysfs files should be automatically created
+> by the driver core when the device is created.  To randomly add/remove
+> random files after that happens means userspace is never notified of
+> that and that's not good.
+> 
+> We've been working for a while to fix up these types of races, don't
+> purposfully add new ones for no good reason please :)
+> 
+> thanks,
+> 
+> greg k-h
+
+The handler for this sysfs file is in the vfio (and uio) driver.
+How would this work if bus handled it?
