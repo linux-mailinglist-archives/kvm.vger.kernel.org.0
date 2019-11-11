@@ -2,535 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF2F9F79B6
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 18:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7558F79C7
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 18:23:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbfKKRUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 12:20:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61944 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726950AbfKKRUg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 12:20:36 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xABHDeI1007861
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 12:20:34 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w7bmjrxm9-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 12:20:33 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
-        Mon, 11 Nov 2019 17:20:31 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 11 Nov 2019 17:20:29 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xABHKSEu61276246
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Nov 2019 17:20:28 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2820F52063;
-        Mon, 11 Nov 2019 17:20:28 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id D320952051;
-        Mon, 11 Nov 2019 17:20:27 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v3 2/2] s390x: SCLP unit test
-Date:   Mon, 11 Nov 2019 18:20:26 +0100
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1573492826-24589-1-git-send-email-imbrenda@linux.ibm.com>
-References: <1573492826-24589-1-git-send-email-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19111117-4275-0000-0000-0000037CCF26
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111117-4276-0000-0000-00003890291E
-Message-Id: <1573492826-24589-3-git-send-email-imbrenda@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-11_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911110155
+        id S1726951AbfKKRXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 12:23:02 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40758 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726877AbfKKRXC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Nov 2019 12:23:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573492981;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OEhtdn0ducEBktqMJPHx+gxE4ZPzNIL4ZrcEG/r2e04=;
+        b=DssIW8dtmjmZJb4UQ0+5K/8wDEm2YxMB+yKgqyKcE49rMe/bG9II+RzB/aynEAoJ4gHSC9
+        suhPH3vhpj/0x9tKF4Neoa9OZmOO7vKvbfFv4QGCYOUbAibG3rb6kco2rWaQXkbHlBeoKF
+        1z7uacmPBJO+e2TqMdciiExM4qFZEdc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-swZPPgxEPwmoQA3zUT6awA-1; Mon, 11 Nov 2019 12:23:00 -0500
+Received: by mail-wr1-f70.google.com with SMTP id q6so6873480wrv.11
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 09:23:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=nEOIBNMxOOtSZX6/l/nKquHk+EOlBFfmyVDwDPZC6jE=;
+        b=oZNF78Kd2ZO6zNnVWGxCpKkuv5GFNhG8vuT8ubKsy8LtSVO4OhldqRY2HMSxwhalgc
+         rus/DnpnmIFEYwPXCnTyVghHf5WZm6IHGyq3XbjVgSqOCmW1yg/vlznzpUmt9e97IHKi
+         LG01nbpaWO648NZbYsY6YP/TVUym6JrtIh8tjAIKzgLa6KJwKOfbo6o0XNn6PJrevEBz
+         /uO34R6m0SCVKroevnKHNVG1IdxEoa2pPgHWnO+03zIDaq7Yz1Iwv7+Unbe0DAJRSYlz
+         fSwvohyoeWAkQ5xudjfMqhjfEnhL28mx7VzrM0V1E2Cjyc8TCR7kr2xRzIIhcudrV5H8
+         pcXg==
+X-Gm-Message-State: APjAAAWHRieqSihCaVm4j8NFPXwMNXVBQZ+CZl+kv6RRTWUyqsGEh6k3
+        k/WC5W4ajNwzxDiK/AxHupGNdL2dJiUYbuMEG508hm6jizyhJrb3GmbV/GqDwlvBVqbtx+P3imC
+        qpKqWj89XI0cn
+X-Received: by 2002:adf:8b01:: with SMTP id n1mr10873895wra.227.1573492979068;
+        Mon, 11 Nov 2019 09:22:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyQoV8+pBRF8GAdIW9Yuq23ZqdPgT0Q1VEbPFcK9HYRpLTRWv+nP5hCRciUDpTYuZpwuu8wWw==
+X-Received: by 2002:adf:8b01:: with SMTP id n1mr10873884wra.227.1573492978858;
+        Mon, 11 Nov 2019 09:22:58 -0800 (PST)
+Received: from [192.168.3.122] (p5B0C62A5.dip0.t-ipconnect.de. [91.12.98.165])
+        by smtp.gmail.com with ESMTPSA id c144sm120002wmd.1.2019.11.11.09.22.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2019 09:22:58 -0800 (PST)
+From:   David Hildenbrand <david@redhat.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [kvm-unit-tests PATCH v2 2/3] s390x: Add CR save area
+Date:   Mon, 11 Nov 2019 18:22:57 +0100
+Message-Id: <C799E856-1F4B-4052-8D33-3FD1EE2EA570@redhat.com>
+References: <20191111153345.22505-3-frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        thuth@redhat.com
+In-Reply-To: <20191111153345.22505-3-frankja@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+X-Mailer: iPhone Mail (17A878)
+X-MC-Unique: swZPPgxEPwmoQA3zUT6awA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SCLP unit test. Testing the following:
 
-* Correctly ignoring instruction bits that should be ignored
-* Privileged instruction check
-* Check for addressing exceptions
-* Specification exceptions:
-  - SCCB size less than 8
-  - SCCB unaligned
-  - SCCB overlaps prefix or lowcore
-  - SCCB address higher than 2GB
-* Return codes for
-  - Invalid command
-  - SCCB too short (but at least 8)
-  - SCCB page boundary violation
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/sclp.c        | 417 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   3 +
- 3 files changed, 421 insertions(+)
- create mode 100644 s390x/sclp.c
+> Am 11.11.2019 um 16:34 schrieb Janosch Frank <frankja@linux.ibm.com>:
+>=20
+> =EF=BB=BFIf we run with DAT enabled and do a reset, we need to save the C=
+Rs to
+> backup our ASCEs on a diag308 for example.
+>=20
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 3744372..ddb4b48 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -16,6 +16,7 @@ tests += $(TEST_DIR)/diag288.elf
- tests += $(TEST_DIR)/stsi.elf
- tests += $(TEST_DIR)/skrf.elf
- tests += $(TEST_DIR)/smp.elf
-+tests += $(TEST_DIR)/sclp.elf
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- 
- all: directories test_cases test_cases_binary
-diff --git a/s390x/sclp.c b/s390x/sclp.c
-new file mode 100644
-index 0000000..3267a92
---- /dev/null
-+++ b/s390x/sclp.c
-@@ -0,0 +1,417 @@
-+/*
-+ * Service Call tests
-+ *
-+ * Copyright (c) 2019 IBM Corp
-+ *
-+ * Authors:
-+ *  Claudio Imbrenda <imbrenda@linux.ibm.com>
-+ *
-+ * This code is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2.
-+ */
-+
-+#include <libcflat.h>
-+#include <asm/page.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <sclp.h>
-+
-+#define PGM_NONE	1
-+#define PGM_BIT_SPEC	(1ULL << PGM_INT_CODE_SPECIFICATION)
-+#define PGM_BIT_ADDR	(1ULL << PGM_INT_CODE_ADDRESSING)
-+#define PGM_BIT_PRIV	(1ULL << PGM_INT_CODE_PRIVILEGED_OPERATION)
-+#define MKPTR(x) ((void *)(uint64_t)(x))
-+
-+static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+static uint8_t prefix_buf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+static uint8_t sccb_template[PAGE_SIZE];
-+static uint32_t valid_code;
-+static struct lowcore *lc;
-+
-+/**
-+ * Enable SCLP interrupt.
-+ */
-+static void sclp_setup_int_test(void)
-+{
-+	uint64_t mask;
-+
-+	ctl_set_bit(0, 9);
-+	mask = extract_psw_mask();
-+	mask |= PSW_MASK_EXT;
-+	load_psw_mask(mask);
-+}
-+
-+/**
-+ * Perform one service call, handling exceptions and interrupts.
-+ */
-+static int sclp_service_call_test(unsigned int command, void *sccb)
-+{
-+	int cc;
-+
-+	sclp_mark_busy();
-+	sclp_setup_int_test();
-+	cc = servc(command, __pa(sccb));
-+	if (lc->pgm_int_code) {
-+		sclp_handle_ext();
-+		return 0;
-+	}
-+	if (!cc)
-+		sclp_wait_busy();
-+	return cc;
-+}
-+
-+/**
-+ * Perform one test at the given address, optionally using the SCCB template,
-+ * checking for the expected program interrupts and return codes.
-+ * Returns 1 in case of success or 0 in case of failure
-+ */
-+static int test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	SCCBHeader *h = (SCCBHeader *)addr;
-+	int res, pgm;
-+
-+	/* Copy the template to the test address if needed */
-+	if (len)
-+		memcpy(addr, sccb_template, len);
-+	expect_pgm_int();
-+	res = sclp_service_call_test(cmd, h);
-+	if (res) {
-+		report_info("SCLP not ready (command %#x, address %p, cc %d)", cmd, addr, res);
-+		return 0;
-+	}
-+	pgm = clear_pgm_int();
-+	/* Check if the program exception was one of the expected ones */
-+	if (!((1ULL << pgm) & exp_pgm)) {
-+		report_info("First failure at addr %p, size %d, cmd %#x, pgm code %d", addr, len, cmd, pgm);
-+		return 0;
-+	}
-+	/* Check if the response code is the one expected */
-+	if (exp_rc && (exp_rc != h->response_code)) {
-+		report_info("First failure at addr %p, size %d, cmd %#x, resp code %#x",
-+				addr, len, cmd, h->response_code);
-+		return 0;
-+	}
-+	return 1;
-+}
-+
-+/**
-+ * Wrapper for test_one_sccb to set up a simple SCCB template.
-+ * Returns 1 in case of success or 0 in case of failure
-+ */
-+static int test_one_simple(uint32_t cmd, uint8_t *addr, uint16_t sccb_len,
-+			uint16_t buf_len, uint64_t exp_pgm, uint16_t exp_rc)
-+{
-+	if (buf_len)
-+		memset(sccb_template, 0, sizeof(sccb_template));
-+	((SCCBHeader *)sccb_template)->length = sccb_len;
-+	return test_one_sccb(cmd, addr, buf_len, exp_pgm, exp_rc);
-+}
-+
-+/**
-+ * Test SCCB lengths < 8.
-+ */
-+static void test_sccb_too_short(void)
-+{
-+	int len;
-+
-+	for (len = 0; len < 8; len++)
-+		if (!test_one_simple(valid_code, pagebuf, len, 8, PGM_BIT_SPEC, 0))
-+			break;
-+
-+	report("SCCB too short", len == 8);
-+}
-+
-+/**
-+ * Test SCCBs that are not 64-bit aligned.
-+ */
-+static void test_sccb_unaligned(void)
-+{
-+	int offset;
-+
-+	for (offset = 1; offset < 8; offset++)
-+		if (!test_one_simple(valid_code, offset + pagebuf, 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report("SCCB unaligned", offset == 8);
-+}
-+
-+/**
-+ * Test SCCBs whose address is in the lowcore or prefix area.
-+ */
-+static void test_sccb_prefix(void)
-+{
-+	uint32_t prefix, new_prefix;
-+	int offset;
-+
-+	/* can't actually trash the lowcore, unsurprisingly things break if we do */
-+	for (offset = 0; offset < 8192; offset += 8)
-+		if (!test_one_sccb(valid_code, MKPTR(offset), 0, PGM_BIT_SPEC, 0))
-+			break;
-+	report("SCCB low pages", offset == 8192);
-+
-+	memcpy(prefix_buf, 0, 8192);
-+	new_prefix = (uint32_t)(intptr_t)prefix_buf;
-+	asm volatile("stpx %0" : "=Q" (prefix));
-+	asm volatile("spx %0" : : "Q" (new_prefix) : "memory");
-+
-+	for (offset = 0; offset < 8192; offset += 8)
-+		if (!test_one_simple(valid_code, MKPTR(new_prefix + offset), 8, 8, PGM_BIT_SPEC, 0))
-+			break;
-+	report("SCCB prefix pages", offset == 8192);
-+
-+	memcpy(prefix_buf, 0, 8192);
-+	asm volatile("spx %0" : : "Q" (prefix) : "memory");
-+}
-+
-+/**
-+ * Test SCCBs that are above 2GB. If outside of memory, an addressing
-+ * exception is also allowed.
-+ */
-+static void test_sccb_high(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	uintptr_t a[33 * 4 * 2 + 2];
-+	uint64_t maxram;
-+	int i, pgm, len = 0;
-+
-+	h->length = 8;
-+
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 1UL << (i + 31);
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 3UL << (i + 31);
-+	for (i = 0; i < 33; i++)
-+		a[len++] = 0xffffffff80000000UL << i;
-+	a[len++] = 0x80000000;
-+	for (i = 1; i < 33; i++, len++)
-+		a[len] = a[len - 1] | (1UL << (i + 31));
-+	for (i = 0; i < len; i++)
-+		a[len + i] = a[i] + (intptr_t)h;
-+	len += i;
-+	a[len++] = 0xdeadbeef00000000;
-+	a[len++] = 0xdeaddeadbeef0000;
-+
-+	maxram = get_ram_size();
-+	for (i = 0; i < len; i++) {
-+		pgm = PGM_BIT_SPEC | (a[i] >= maxram ? PGM_BIT_ADDR : 0);
-+		if (!test_one_sccb(valid_code, (void *)a[i], 0, pgm, 0))
-+			break;
-+	}
-+	report("SCCB high addresses", i == len);
-+}
-+
-+/**
-+ * Test invalid commands, both invalid command detail codes and valid
-+ * ones with invalid command class code.
-+ */
-+static void test_inval(void)
-+{
-+	const uint16_t res = SCLP_RC_INVALID_SCLP_COMMAND;
-+	uint32_t cmd;
-+	int i;
-+
-+	report_prefix_push("Invalid command");
-+	for (i = 0; i < 65536; i++) {
-+		cmd = (0xdead0000) | i;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report("Command detail code", i == 65536);
-+
-+	for (i = 0; i < 256; i++) {
-+		cmd = (valid_code & ~0xff) | i;
-+		if (cmd == valid_code)
-+			continue;
-+		if (!test_one_simple(cmd, pagebuf, PAGE_SIZE, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report("Command class code", i == 256);
-+	report_prefix_pop();
-+}
-+
-+
-+/**
-+ * Test short SCCBs (but larger than 8).
-+ */
-+static void test_short(void)
-+{
-+	const uint16_t res = SCLP_RC_INSUFFICIENT_SCCB_LENGTH;
-+	int i;
-+
-+	for (i = 8; i < 144; i++)
-+		if (!test_one_simple(valid_code, pagebuf, i, i, PGM_NONE, res))
-+			break;
-+	report("Insufficient SCCB length (Read SCP info)", i == 144);
-+
-+	for (i = 8; i < 40; i++)
-+		if (!test_one_simple(SCLP_READ_CPU_INFO, pagebuf, i, i, PGM_NONE, res))
-+			break;
-+	report("Insufficient SCCB length (Read CPU info)", i == 40);
-+}
-+
-+/**
-+ * Test SCCB page boundary violations.
-+ */
-+static void test_boundary(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int len, i;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (len = 32; len <= 4096; len++) {
-+		i = len & 7 ? len & ~7 : len - 8;
-+		for (i = 4096 - i; i < 4096; i += 8) {
-+			sccb->h.length = len;
-+			if (!test_one_sccb(cmd, i + pagebuf, len, PGM_NONE, res))
-+				goto out;
-+		}
-+	}
-+out:
-+	report("SCCB page boundary violation", len > 4096 && i == 4096);
-+}
-+
-+/**
-+ * Test excessively long SCCBs.
-+ */
-+static void test_toolong(void)
-+{
-+	const uint32_t cmd = SCLP_CMD_WRITE_EVENT_DATA;
-+	const uint16_t res = SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-+	WriteEventData *sccb = (WriteEventData *)sccb_template;
-+	int i;
-+
-+	memset(sccb_template, 0, sizeof(sccb_template));
-+	sccb->h.function_code = SCLP_FC_NORMAL_WRITE;
-+	for (i = 4097; i < 8192; i++) {
-+		sccb->h.length = i;
-+		if (!test_one_sccb(cmd, pagebuf, PAGE_SIZE, PGM_NONE, res))
-+			break;
-+	}
-+	report("SCCB bigger than 4k", i == 8192);
-+}
-+
-+/**
-+ * Test privileged operation.
-+ */
-+static void test_priv(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+
-+	report_prefix_push("Privileged operation");
-+	h->length = 8;
-+	expect_pgm_int();
-+	enter_pstate();
-+	servc(valid_code, __pa(h));
-+	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
-+	report_prefix_pop();
-+}
-+
-+/**
-+ * Test addressing exceptions. We need to test SCCB addresses between the
-+ * end of available memory and 2GB, because after 2GB a specification
-+ * exception is also allowed.
-+ * Only applicable if the VM has less than 2GB of memory
-+ */
-+static void test_addressing(void)
-+{
-+	unsigned long i, maxram = get_ram_size();
-+
-+	if (maxram >= 0x80000000) {
-+		report_skip("Invalid SCCB address");
-+		return;
-+	}
-+	for (i = maxram; i < MIN(maxram + 65536, 0x80000000); i += 8)
-+		if (!test_one_sccb(valid_code, (void *)i, 0, PGM_BIT_ADDR, 0))
-+			goto out;
-+	for (; i < MIN((maxram + 0x7fffff) & ~0xfffff, 0x80000000); i += 4096)
-+		if (!test_one_sccb(valid_code, (void *)i, 0, PGM_BIT_ADDR, 0))
-+			goto out;
-+	for (; i < 0x80000000; i += 1048576)
-+		if (!test_one_sccb(valid_code, (void *)i, 0, PGM_BIT_ADDR, 0))
-+			goto out;
-+out:
-+	report("Invalid SCCB address", i == 0x80000000);
-+}
-+
-+/**
-+ * Test some bits in the instruction format that are specified to be ignored.
-+ */
-+static void test_instbits(void)
-+{
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int cc;
-+
-+	expect_pgm_int();
-+	sclp_mark_busy();
-+	h->length = 8;
-+	sclp_setup_int_test();
-+
-+	asm volatile(
-+		"       .insn   rre,0xb2204200,%1,%2\n"  /* servc %1,%2 */
-+		"       ipm     %0\n"
-+		"       srl     %0,28"
-+		: "=&d" (cc) : "d" (valid_code), "a" (__pa(pagebuf))
-+		: "cc", "memory");
-+	if (lc->pgm_int_code) {
-+		sclp_handle_ext();
-+		cc = 1;
-+	} else if (!cc)
-+		sclp_wait_busy();
-+	report("Instruction format ignored bits", cc == 0);
-+}
-+
-+/**
-+ * Find a valid SCLP command code; not all codes are always allowed, and
-+ * probing should be performed in the right order.
-+ */
-+static void find_valid_sclp_code(void)
-+{
-+	const unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
-+					  SCLP_CMDW_READ_SCP_INFO };
-+	SCCBHeader *h = (SCCBHeader *)pagebuf;
-+	int i, cc;
-+
-+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-+		sclp_mark_busy();
-+		memset(h, 0, sizeof(*h));
-+		h->length = 4096;
-+
-+		valid_code = commands[i];
-+		cc = sclp_service_call(commands[i], h);
-+		if (cc)
-+			break;
-+		if (h->response_code == SCLP_RC_NORMAL_READ_COMPLETION)
-+			return;
-+		if (h->response_code != SCLP_RC_INVALID_SCLP_COMMAND)
-+			break;
-+	}
-+	valid_code = 0;
-+	report_abort("READ_SCP_INFO failed");
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("sclp");
-+	find_valid_sclp_code();
-+
-+	/* Test some basic things */
-+	test_instbits();
-+	test_priv();
-+	test_addressing();
-+
-+	/* Test the specification exceptions */
-+	test_sccb_too_short();
-+	test_sccb_unaligned();
-+	test_sccb_prefix();
-+	test_sccb_high();
-+
-+	/* Test the expected response codes */
-+	test_inval();
-+	test_short();
-+	test_boundary();
-+	test_toolong();
-+
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f1b07cd..75e3d37 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -75,3 +75,6 @@ file = stsi.elf
- [smp]
- file = smp.elf
- extra_params =-smp 2
-+
-+[sclp]
-+file = sclp.elf
--- 
-2.7.4
+Looks good
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+> lib/s390x/asm-offsets.c  |  2 +-
+> lib/s390x/asm/arch_def.h |  4 ++--
+> lib/s390x/interrupt.c    |  4 ++--
+> lib/s390x/smp.c          |  2 +-
+> s390x/cstart64.S         | 10 +++++-----
+> 5 files changed, 11 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
+> index 6e2d259..4b213f8 100644
+> --- a/lib/s390x/asm-offsets.c
+> +++ b/lib/s390x/asm-offsets.c
+> @@ -57,7 +57,7 @@ int main(void)
+>    OFFSET(GEN_LC_SW_INT_GRS, lowcore, sw_int_grs);
+>    OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
+>    OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
+> -    OFFSET(GEN_LC_SW_INT_CR0, lowcore, sw_int_cr0);
+> +    OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
+>    OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
+>    OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
+>    OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 96cca2e..07d4e5e 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -78,8 +78,8 @@ struct lowcore {
+>    uint64_t    sw_int_fprs[16];        /* 0x0280 */
+>    uint32_t    sw_int_fpc;            /* 0x0300 */
+>    uint8_t        pad_0x0304[0x0308 - 0x0304];    /* 0x0304 */
+> -    uint64_t    sw_int_cr0;            /* 0x0308 */
+> -    uint8_t        pad_0x0310[0x11b0 - 0x0310];    /* 0x0310 */
+> +    uint64_t    sw_int_crs[16];            /* 0x0308 */
+> +    uint8_t        pad_0x0310[0x11b0 - 0x0388];    /* 0x0388 */
+>    uint64_t    mcck_ext_sa_addr;        /* 0x11b0 */
+>    uint8_t        pad_0x11b8[0x1200 - 0x11b8];    /* 0x11b8 */
+>    uint64_t    fprs_sa[16];            /* 0x1200 */
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 5cade23..c9e2dc6 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -124,13 +124,13 @@ void handle_ext_int(void)
+>    }
+>=20
+>    if (lc->ext_int_code =3D=3D EXT_IRQ_SERVICE_SIG) {
+> -        lc->sw_int_cr0 &=3D ~(1UL << 9);
+> +        lc->sw_int_crs[0] &=3D ~(1UL << 9);
+>        sclp_handle_ext();
+>    } else {
+>        ext_int_expected =3D false;
+>    }
+>=20
+> -    if (!(lc->sw_int_cr0 & CR0_EXTM_MASK))
+> +    if (!(lc->sw_int_crs[0] & CR0_EXTM_MASK))
+>        lc->ext_old_psw.mask &=3D ~PSW_MASK_EXT;
+> }
+>=20
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index 7602886..f57f420 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -189,7 +189,7 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>    cpu->lowcore->sw_int_grs[15] =3D (uint64_t)cpu->stack + (PAGE_SIZE * 4=
+);
+>    lc->restart_new_psw.mask =3D 0x0000000180000000UL;
+>    lc->restart_new_psw.addr =3D (uint64_t)smp_cpu_setup_state;
+> -    lc->sw_int_cr0 =3D 0x0000000000040000UL;
+> +    lc->sw_int_crs[0] =3D 0x0000000000040000UL;
+>=20
+>    /* Start processing */
+>    rc =3D sigp_retry(cpu->addr, SIGP_RESTART, 0, NULL);
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 043e34a..4be20fc 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -92,8 +92,8 @@ memsetxc:
+>    .macro SAVE_REGS
+>    /* save grs 0-15 */
+>    stmg    %r0, %r15, GEN_LC_SW_INT_GRS
+> -    /* save cr0 */
+> -    stctg    %c0, %c0, GEN_LC_SW_INT_CR0
+> +    /* save crs 0-15 */
+> +    stctg    %c0, %c15, GEN_LC_SW_INT_CRS
+>    /* load a cr0 that has the AFP control bit which enables all FPRs */
+>    larl    %r1, initial_cr0
+>    lctlg    %c0, %c0, 0(%r1)
+> @@ -112,8 +112,8 @@ memsetxc:
+>    ld    \i, \i * 8(%r1)
+>    .endr
+>    lfpc    GEN_LC_SW_INT_FPC
+> -    /* restore cr0 */
+> -    lctlg    %c0, %c0, GEN_LC_SW_INT_CR0
+> +    /* restore crs 0-15 */
+> +    lctlg    %c0, %c15, GEN_LC_SW_INT_CRS
+>    /* restore grs 0-15 */
+>    lmg    %r0, %r15, GEN_LC_SW_INT_GRS
+>    .endm
+> @@ -150,7 +150,7 @@ diag308_load_reset:
+> smp_cpu_setup_state:
+>    xgr    %r1, %r1
+>    lmg     %r0, %r15, GEN_LC_SW_INT_GRS
+> -    lctlg   %c0, %c0, GEN_LC_SW_INT_CR0
+> +    lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
+>    br    %r14
+>=20
+> pgm_int:
+> --=20
+> 2.20.1
+>=20
 
