@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E9F2F6D64
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 04:46:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7EFFF6D6D
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 04:57:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726912AbfKKDqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Nov 2019 22:46:07 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44609 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726749AbfKKDqG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Nov 2019 22:46:06 -0500
-Received: by mail-pf1-f196.google.com with SMTP id q26so9697475pfn.11
-        for <kvm@vger.kernel.org>; Sun, 10 Nov 2019 19:46:06 -0800 (PST)
+        id S1726910AbfKKD5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Nov 2019 22:57:19 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:45630 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726749AbfKKD5T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Nov 2019 22:57:19 -0500
+Received: by mail-pg1-f194.google.com with SMTP id w11so8548470pga.12
+        for <kvm@vger.kernel.org>; Sun, 10 Nov 2019 19:57:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=netronome-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:in-reply-to:references
          :organization:mime-version:content-transfer-encoding;
-        bh=AqhM9u1bzCnw7qhUa4mHnqgFKW6TzFtxLFQ8BM/epMs=;
-        b=SOIlwK5mjoyFW/tXHeVmYa4IK11qYjcalG4RreXwkjwE6o05256yuTEZ4tqlNqlfGD
-         shDyAVTcAHfRAPjk0HgUUKt78RLGstgu/5t3Xt/YTXXdCjfzs9mSIpOwHV2fBRUr4arr
-         AimZYIbgl6d67DxMbwVkHuQhEjqCZvV6SfPQ8uDxtE9RoCr+xi1KecnA+sD5oHcnju5t
-         dFGKlm2zNCLvQWMxLDvuJZZCdRP6iqrhDPSdCZijkrYJ/JogxXmCgPyhTq2g5iRb3//X
-         4ZXSpxzZA92++uyYySNgIfmELbtXgsdpqUoyYO5dKpkYYGsBdF1TrYchrVlxN9pAY8EW
-         +iRA==
+        bh=YfVuYLgFsEpOGQu1iZTYuor2PUz6WFlFBUTHRR4RFJc=;
+        b=tY6Ijl+10E8NFBSUq4NC/e+tVpwHxHp2wAIO1EaR1ll/30Q7sQWqPL8Kq/YaNvRQWI
+         te7LKUAkkoXlPSkKUaUUj+FUj309hiozjm4ozWAIHBrLQm0RApwb7377lycP/xEcgyRV
+         O7qXArYDpns/P1zo16U36ifxA1rlTf/jw6F/NG/xAPlri1c0xpNGVmEfWBH4TqIEYPfG
+         3auQKxYiWmr9VKheTpUGuNqFNJuAkhSUpXwiG42sauUCSmnJ0pEcXSgXzcvcgN9x7IGg
+         sjv8IUrtdU0Eo92qu6Q3ODm/+J1yAYor+673i/pbPDNTEQJtq0j5fITVm/rCIWIJKpdW
+         2Ntg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=AqhM9u1bzCnw7qhUa4mHnqgFKW6TzFtxLFQ8BM/epMs=;
-        b=rRrlec3pqTg8H5aKg+gmIEkCPc/bE76tkhuXkr2OuKqEXcK2ipEdquWEBfTkUIfYtF
-         wQzhRLu6KEycwP5816ryfD6KUK90QoiIWUquFLRyYEb25tHVyArIp1YxgezNac0y91HT
-         X01OulWbKMkLYHE9NLt7Uh+5gOmSfh4vHlU9vJ5OG/xuOH5qdHkngHnYraWGlPGdoGY8
-         /rfvXVa5eA9HrDduNrd/Dd1kMD9feqMbinHlRsYrpDZ2UTgkbuU1veAVR9jTahmsdpKD
-         4SwhA1FxI4On97ufIAKuLT8YSiHNfW44noTFZMGARbJ+13Vr+atTp30661iDVE+/b/yR
-         35xg==
-X-Gm-Message-State: APjAAAU9uaEiVFVqTgS+4U77Qv/wjObK5Xcnc5QyP3thDWqcsi1m3G+M
-        fuYhtk6QBb4YkFba7qnvqIWEMg==
-X-Google-Smtp-Source: APXvYqyvsmmGRubdY0eCp6Hd53IA2QHIUdVnV/J9ottQSlb0FTBMpy9oBY7rLSA0rhkW3bsD3dRtVQ==
-X-Received: by 2002:a63:86c6:: with SMTP id x189mr25278222pgd.341.1573443966052;
-        Sun, 10 Nov 2019 19:46:06 -0800 (PST)
+        bh=YfVuYLgFsEpOGQu1iZTYuor2PUz6WFlFBUTHRR4RFJc=;
+        b=RuKkWbY/8qBxqCzU5gDjxhG5lNjlCcE9KLmuRV/D1H0DwBibzEkRXCpyLlk6yjH/d4
+         eH44azDgQi/ADnlnRZLNdeEWyCxU+DG5Y5saMjXzKvjFLytGCYJeYBvqo3iacEPHHBEF
+         3/WmFX/NAu88kKn3YSU/Apt0FszgvP3m0cF4S8yAUFCGRULspQaxLmhGksyWRwGIMwfQ
+         jV5t+3U/e1LHPamWQcAUiC/+miJafyJUQXD4eoUiROCtxS+7aZqhQMtSAUNtarLBfrPl
+         gddLkL5EFFTm6LTHY+i5o+SAtRVadyW8shOSb86dwVkvNFd9T5CGThC8Da9wzbcl+mSs
+         EIUA==
+X-Gm-Message-State: APjAAAXrLGGZKEtOQuwxj7nlUjVwfus49AZL1oQKXnNPjG7Qa5/ShJ3q
+        9PT0sddElm/Dq6SLWzVd/FcRQg==
+X-Google-Smtp-Source: APXvYqymJTQdz+0DhInHQ6YlXFk7bO6AC+TYf7u51PP59HFRwi4q8qAsu6FIpFAQzXxrgx7gj5IfLg==
+X-Received: by 2002:a17:90a:2064:: with SMTP id n91mr31812895pjc.41.1573444638273;
+        Sun, 10 Nov 2019 19:57:18 -0800 (PST)
 Received: from cakuba (c-73-202-202-92.hsd1.ca.comcast.net. [73.202.202.92])
-        by smtp.gmail.com with ESMTPSA id w8sm12009631pfi.60.2019.11.10.19.46.04
+        by smtp.gmail.com with ESMTPSA id w7sm14911956pfb.101.2019.11.10.19.57.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Nov 2019 19:46:05 -0800 (PST)
-Date:   Sun, 10 Nov 2019 19:46:01 -0800
+        Sun, 10 Nov 2019 19:57:18 -0800 (PST)
+Date:   Sun, 10 Nov 2019 19:57:14 -0800
 From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Parav Pandit <parav@mellanox.com>,
-        Jiri Pirko <jiri@resnulli.us>,
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Parav Pandit <parav@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
         David M <david.m.ertman@intel.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -62,8 +62,8 @@ Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Parav Pandit <parav@mellanox.com>,
         "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
         Or Gerlitz <gerlitz.or@gmail.com>
 Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191110194601.0d6ed1a0@cakuba>
-In-Reply-To: <20191110091855.GE1435668@kroah.com>
+Message-ID: <20191110195714.6c42ad77@cakuba>
+In-Reply-To: <20191110193759.GE31761@ziepe.ca>
 References: <20191107160448.20962-1-parav@mellanox.com>
         <20191107153234.0d735c1f@cakuba.netronome.com>
         <20191108121233.GJ6990@nanopsycho>
@@ -74,7 +74,7 @@ References: <20191107160448.20962-1-parav@mellanox.com>
         <20191108134559.42fbceff@cakuba>
         <20191109004426.GB31761@ziepe.ca>
         <20191109092747.26a1a37e@cakuba>
-        <20191110091855.GE1435668@kroah.com>
+        <20191110193759.GE31761@ziepe.ca>
 Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -84,39 +84,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 10 Nov 2019 10:18:55 +0100, gregkh@linuxfoundation.org wrote:
+On Sun, 10 Nov 2019 15:37:59 -0400, Jason Gunthorpe wrote:
+> On Sat, Nov 09, 2019 at 09:27:47AM -0800, Jakub Kicinski wrote:
+> > On Fri, 8 Nov 2019 20:44:26 -0400, Jason Gunthorpe wrote:  
+> > > On Fri, Nov 08, 2019 at 01:45:59PM -0800, Jakub Kicinski wrote:  
+> > > > Yes, my suggestion to use mdev was entirely based on the premise that
+> > > > the purpose of this work is to get vfio working.. otherwise I'm unclear
+> > > > as to why we'd need a bus in the first place. If this is just for
+> > > > containers - we have macvlan offload for years now, with no need for a
+> > > > separate device.    
+> > > 
+> > > This SF thing is a full fledged VF function, it is not at all like
+> > > macvlan. This is perhaps less important for the netdev part of the
+> > > world, but the difference is very big for the RDMA side, and should
+> > > enable VFIO too..  
+> > 
+> > Well, macvlan used VMDq so it was pretty much a "legacy SR-IOV" VF.
+> > I'd perhaps need to learn more about RDMA to appreciate the difference.  
+> 
+> It has a lot to do with the how the RDMA functionality works in the
+> HW.. At least for mlx the RDMA is 'below' all the netdev stuff, so
+> even though netdev has some offloaded vlan RDMA sees, essentially, the
+> union of all the vlan's on the system.
+> 
+> Which at least breaks the security model of a macvlan device for
+> net-namespaces.
+> 
+> Maybe with new HW something could be done, but today, the HW is
+> limited.
+
+Oh, I think we sort of talked past each other there.
+
+I was just pointing to the fact that Intel's macvlan offload did well
+without any fake bus or devices. I'm not saying anything about the
+particulars of the virtualization from the networking perspective.
+
+> > > > On the RDMA/Intel front, would you mind explaining what the main
+> > > > motivation for the special buses is? I'm a little confurious.    
+> > > 
+> > > Well, the issue is driver binding. For years we have had these
+> > > multi-function netdev drivers that have a single PCI device which must
+> > > bind into multiple subsystems, ie mlx5 does netdev and RDMA, the cxgb
+> > > drivers do netdev, RDMA, SCSI initiator, SCSI target, etc. [And I
+> > > expect when NVMe over TCP rolls out we will have drivers like cxgb4
+> > > binding to 6 subsytems in total!]  
+> > 
 > > What I'm missing is why is it so bad to have a driver register to
 > > multiple subsystems.  
 > 
-> Because these PCI devices seem to do "different" things all in one PCI
-> resource set.  Blame the hardware designers :)
-
-See below, I don't think you can blame the HW designers in this
-particular case :)
-
-> > For the nfp I think the _real_ reason to have a bus was that it
-> > was expected to have some out-of-tree modules bind to it. Something 
-> > I would not encourage :)  
+> Well, for example, if you proposed to have a RDMA driver in
+> drivers/net/ethernet/foo/, I would NAK it, and I hope Dave would
+> too. Same for SCSI and nvme.
 > 
-> That's not ok, and I agree with you.
+> This Linux process is that driver code for a subsystem lives in the
+> subsystem and should be in a subsystem specific module. While it is
+> technically possible to have a giant driver, it distorts our process
+> in a way I don't think is good.
 > 
-> But there seems to be some more complex PCI devices that do lots of
-> different things all at once.  Kind of like a PCI device that wants to
-> be both a keyboard and a storage device at the same time (i.e. a button
-> on a disk drive...)
+> So, we have software layers between the large Linux subsystems just to
+> make the development side manageable and practical.
+> 
+> .. once the code lives in another subsystem, it is in a new module. A
+> new module requires some way to connect them all together, the driver
+> core is the logical way to do this connection.
+> 
+> I don't think a driver should be split beyond that. Even my suggestion
+> of a 'core' may in practice just be the netdev driver as most of the
+> other modules can't function without netdev. ie you can't do iSCSI
+> without an IP stack.
 
-The keyboard which is also a storage device may be a clear cut case
-where multiple devices were integrated into one bus endpoint.
+Okay, yes, that's what I was expecting you'd say. I'm not 100%
+convinced a bus is necessary, we lived long enough with drivers 
+split across the tree...
 
-The case with these advanced networking adapters is a little different
-in that they are one HW device which has oodles of FW implementing
-clients or acceleration for various networking protocols.
+> > > What is a generation? Mellanox has had a stable RDMA driver across
+> > > many sillicon generations. Intel looks like their new driver will
+> > > support at least the last two or more sillicon generations..
+> > > 
+> > > RDMA drivers are monstrous complex things, there is a big incentive to
+> > > not respin them every time a new chip comes out.  
+> > 
+> > Ack, but then again none of the drivers gets rewritten from scratch,
+> > right? It's not that some "sub-drivers" get reused and some not, no?  
+> 
+> Remarkably Intel is saying their new RDMA 'sub-driver' will be compatible
+> with their ICE and pre-ICE (sorry, forget the names) netdev core
+> drivers. 
+> 
+> netdev will get a different driver for each, but RDMA will use the
+> same driver.
 
-The nice thing about having a fake bus is you can load out-of-tree
-drivers to operate extra protocols quite cleanly.
-
-I'm not saying that's what the code in question is doing, I'm saying 
-I'd personally like to understand the motivation more clearly before
-every networking driver out there starts spawning buses. The only
-argument I've heard so far for the separate devices is reloading subset
-of the drivers, which I'd rate as moderately convincing.
+I see :)
