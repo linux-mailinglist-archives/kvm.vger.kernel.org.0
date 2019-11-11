@@ -2,157 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36E9AF7682
-	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCE9DF7697
+	for <lists+kvm@lfdr.de>; Mon, 11 Nov 2019 15:39:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726811AbfKKOhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 09:37:19 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43028 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726845AbfKKOhT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 09:37:19 -0500
-Received: by mail-wr1-f66.google.com with SMTP id n1so14857674wra.10
-        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:37:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=vWmsvXOxLILOeMxH5L7QAWLc3/R25fgjknw/j9uIX0A=;
-        b=YmVQjaG9yNNiUeYFoYLzLvy8mhdFOEAhi88nkdZRHSViKfUQXC69VHPP/R4M9sTDES
-         FBZVb56mqMQQo3wxdusd/ckD4yqsurYYD/RxuVL5Yg4eYviajjgLWhWh4m4lCxWWx3zP
-         2+VwRsIYPWnfgCeEwHOu70hGr/E/KB6+iliSSOiDd4CMAH9z0AvjYSH4n/kj4gThAPQ5
-         3vknbqnJBybiu8sNS0nBsqdNeOqzwcLoYttNwPwTrG72LPBzpIXhFKYPbhYNmOBAIadO
-         pLTqBOvTglY5SWA6ERFWEFxOgxJ/0MeIQStcFNUUlFbRXqLA5lESw1FafaiQUxZUQ4kI
-         uz9Q==
+        id S1727054AbfKKOjL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 09:39:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31480 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726903AbfKKOjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 09:39:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573483149;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=wirKbU/8Cv2mgoDz4OmhWHmf28SB8MLFquOJWJpWCPc=;
+        b=W1w7A/yaDRk0smVz/geLWDktHpsmXPQ8zyLftOaZvE2mFzgbQmOd0n4Wy9X6MP4YxMzAdK
+        QW/61SJApHe4Ia7MmBG55Oi5vKZRz+yVcVBoGV9HyQvzxMvd39FDR6CeWK6defqcsA70cD
+        VmE9QeYaXtIUK3QIzO6wkN7FebbswX0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-Tw7iJsx_PImG84O0j5AIkA-1; Mon, 11 Nov 2019 09:39:07 -0500
+Received: by mail-wr1-f70.google.com with SMTP id m17so9999754wrb.20
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 06:39:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vWmsvXOxLILOeMxH5L7QAWLc3/R25fgjknw/j9uIX0A=;
-        b=BC0GRW1hbna7fPPsmidm53g42ahrRIFlrikq9ooui5q5Y6lJEV8mHcAuA7rU50MQDd
-         AAA9HoYupDYOAfjTLs/1sozkhbC09YdHnEh+poGm9KWIoW5aLoUlvcOc6KE0MsQGPUuB
-         6pjYl2ijRh6l85xTjRaBXI0srwmjbXXc9uP6cq95mwW86/MpZO+r36yode6hltluu2Np
-         zju9U729QN53ve5eZ/4ISPnm4xyC/fyXHy2j9e7qoICwfeANZsQahX7oI8lKA16ZD7rI
-         Xhgg7eqWlkx9mUvvH78BVrx7G0ey3iJl4gZ1trEbg20wmt8X7fit9pyU+jQRpWwz97VO
-         EIOw==
-X-Gm-Message-State: APjAAAVG6kCuogjiEpAYoxggh2HUOZUHK5XkRJGiJVPW30hwMGxLX/T9
-        Lxh5QX2ckkb1kmg/OovhRORDUQ==
-X-Google-Smtp-Source: APXvYqzOaLjQQaYGN5JkRRxujp+prfgCYrtUbv69efERk6stRxI4fRDhwend3GXBqSpfYglDZN1y9Q==
-X-Received: by 2002:a5d:522e:: with SMTP id i14mr8748558wra.27.1573483036582;
-        Mon, 11 Nov 2019 06:37:16 -0800 (PST)
-Received: from localhost (jirka.pirko.cz. [84.16.102.26])
-        by smtp.gmail.com with ESMTPSA id b8sm14931767wrt.39.2019.11.11.06.37.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2019 06:37:15 -0800 (PST)
-Date:   Mon, 11 Nov 2019 15:37:14 +0100
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-Cc:     Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Parav Pandit <parav@mellanox.com>,
-        David M <david.m.ertman@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Or Gerlitz <gerlitz.or@gmail.com>
-Subject: Re: [PATCH net-next 00/19] Mellanox, mlx5 sub function support
-Message-ID: <20191111143714.GC2202@nanopsycho>
-References: <AM0PR05MB486658D1D2A4F3999ED95D45D17B0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108111238.578f44f1@cakuba>
- <20191108201253.GE10956@ziepe.ca>
- <20191108134559.42fbceff@cakuba>
- <20191109004426.GB31761@ziepe.ca>
- <20191109092747.26a1a37e@cakuba>
- <20191110091855.GE1435668@kroah.com>
- <20191110194601.0d6ed1a0@cakuba>
- <20191111133026.GA2202@nanopsycho>
- <20191111141430.GB585609@kroah.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2vUuMLzRqkGHHf2+2jVwfNEqVzFHxRKuojcVRTT5wvM=;
+        b=hxS2m+T/Bn/vJluGFM3vrqDb5MXkQPtIYBowWuEFEYubkfZeXGstzv7g4t5YZrbeNG
+         thKTY3x3D6EpTj79tklEj957yAWvvJcdwn5xGtOQubPC6eXdthXcmj39IGa2gSdpXMCp
+         FhZbWnLNUvW0hy+Km5VL+3EFCD9tqfSY8KvwgQoWP8ETnBxjtBPyDhj+HqNFf+RzB57F
+         AgrQQALj6XzKZQHUJZQmRERMdGY5ob2n0+hx5sIV5j0yEiQbDgHqmPUEH4h5zCSJh950
+         M8sh06c046Uiq7mAaoB+3Hr/1bV3jrj0gzvYphSfDHV8aM2707D+utHNIEx1W8GET5Bg
+         yXvw==
+X-Gm-Message-State: APjAAAUAdfmsbzGqutstLjIVYSGBxE2nSm6TX4h6zbhA5AEFK19/2o6V
+        A/6VmSl0EM50udc8M2YKvsI92JS8FkkbKyNFA6w0jn3FJG5Zgzrhv+x0875UfXvmSym5ZOs5Ilm
+        RkOfWn5tl9T0b
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr22013152wmj.127.1573483146362;
+        Mon, 11 Nov 2019 06:39:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxJ8FeEElSu3YUeqierkfd/csj/UTEuloo6RjxvUSLwq82HJNOJS+SokLC3HuL5PAhxFuoEYw==
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr22013123wmj.127.1573483146026;
+        Mon, 11 Nov 2019 06:39:06 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a0f7:472a:1e7:7ef? ([2001:b07:6468:f312:a0f7:472a:1e7:7ef])
+        by smtp.gmail.com with ESMTPSA id j63sm22130103wmj.46.2019.11.11.06.39.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Nov 2019 06:39:05 -0800 (PST)
+Subject: Re: [PATCH v1 2/3] KVM: VMX: Do not change PID.NDST when loading a
+ blocked vCPU
+To:     Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+References: <20191106175602.4515-1-joao.m.martins@oracle.com>
+ <20191106175602.4515-3-joao.m.martins@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <15c8c821-25ff-eb62-abd3-8d7d69650744@redhat.com>
+Date:   Mon, 11 Nov 2019 15:39:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191111141430.GB585609@kroah.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191106175602.4515-3-joao.m.martins@oracle.com>
+Content-Language: en-US
+X-MC-Unique: Tw7iJsx_PImG84O0j5AIkA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Mon, Nov 11, 2019 at 03:14:30PM CET, gregkh@linuxfoundation.org wrote:
->On Mon, Nov 11, 2019 at 02:30:26PM +0100, Jiri Pirko wrote:
->> Mon, Nov 11, 2019 at 04:46:01AM CET, jakub.kicinski@netronome.com wrote:
->> >On Sun, 10 Nov 2019 10:18:55 +0100, gregkh@linuxfoundation.org wrote:
->> >> > What I'm missing is why is it so bad to have a driver register to
->> >> > multiple subsystems.  
->> >> 
->> >> Because these PCI devices seem to do "different" things all in one PCI
->> >> resource set.  Blame the hardware designers :)
->> >
->> >See below, I don't think you can blame the HW designers in this
->> >particular case :)
->> >
->> >> > For the nfp I think the _real_ reason to have a bus was that it
->> >> > was expected to have some out-of-tree modules bind to it. Something 
->> >> > I would not encourage :)  
->> >> 
->> >> That's not ok, and I agree with you.
->> >> 
->> >> But there seems to be some more complex PCI devices that do lots of
->> >> different things all at once.  Kind of like a PCI device that wants to
->> >> be both a keyboard and a storage device at the same time (i.e. a button
->> >> on a disk drive...)
->> >
->> >The keyboard which is also a storage device may be a clear cut case
->> >where multiple devices were integrated into one bus endpoint.
->> 
->> Also, I think that very important differentiator between keyboard/button
->> and NIC is that keyboard/button is fixed. You have driver bus with 2
->> devices on constant addresses.
->> 
->> However in case of NIC subfunctions. You have 0 at he beginning and user
->> instructs to create more (maybe hundreds). Now important questions
->> appear:
->> 
->> 1) How to create devices (what API) - mdev has this figured out
->> 2) How to to do the addressing of the devices. Needs to be
->>    predictable/defined by the user - mdev has this figured out
->> 3) Udev names of netdevices - udev names that according to the
->>    bus/address. That is straightforeward with mdev.
->>    I can't really see how to figure this one in particular with
->>    per-driver busses :/
->
->Are network devices somehow only allowed to be on mdev busses?
+On 06/11/19 18:56, Joao Martins wrote:
+> When vCPU enters block phase, pi_pre_block() inserts vCPU to a per pCPU
+> linked list of all vCPUs that are blocked on this pCPU. Afterwards, it
+> changes PID.NV to POSTED_INTR_WAKEUP_VECTOR which its handler
+> (wakeup_handler()) is responsible to kick (unblock) any vCPU on that
+> linked list that now has pending posted interrupts.
+>=20
+> While vCPU is blocked (in kvm_vcpu_block()), it may be preempted which
+> will cause vmx_vcpu_pi_put() to set PID.SN.  If later the vCPU will be
+> scheduled to run on a different pCPU, vmx_vcpu_pi_load() will clear
+> PID.SN but will also *overwrite PID.NDST to this different pCPU*.
+> Instead of keeping it with original pCPU which vCPU had entered block
+> phase on.
+>=20
+> This results in an issue because when a posted interrupt is delivered,
+> the wakeup_handler() will be executed and fail to find blocked vCPU on
+> its per pCPU linked list of all vCPUs that are blocked on this pCPU.
+> Which is due to the vCPU being placed on a *different* per pCPU
+> linked list than the original pCPU that it had entered block phase.
+>=20
+> The regression is introduced by commit c112b5f50232 ("KVM: x86:
+> Recompute PID.ON when clearing PID.SN"). Therefore, partially revert
+> it and reintroduce the condition in vmx_vcpu_pi_load() responsible for
+> avoiding changing PID.NDST when loading a blocked vCPU.
+>=20
+> Fixes: c112b5f50232 ("KVM: x86: Recompute PID.ON when clearing PID.SN")
+> Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 
-Of course not. But there is a difference if we are talking about:
-a) "the usual" network devices, like PF, VF. - They are well defined and
-   they have well defined lifecycle (pci probe, sriov sysfs for number
-   of VFs, etc). I this world all works fine. Even if a device has 100
-   static subdevices (bus or no bus).
-b) dynamically created sub-bar-devices or subfunctions. Could be created
-   by user. This is not handled now in kernel, we have to find correct iface.
-   I don't really care it it is fakebus, driverbus, etc. I'm just concerned
-   about how to handle 1), 2), 3) above.
+Something wrong in the SoB line?
 
->
->No, don't be silly, userspace handles this just fine today on any type
->of bus, it's not an issue.
->
->You don't have to like individual "driver busses", but you had better
->not be using a fake platform device to use mdev.  That's my main
->objection...
+Otherwise looks good.
 
-Okay, I understand your objection. Do you have suggestion how to handle
-1) 2) 3) from above?
+Paolo
 
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 14 ++++++++++++++
+>  arch/x86/kvm/vmx/vmx.h |  6 ++++++
+>  2 files changed, 20 insertions(+)
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 18b0bee662a5..75d903455e1c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1274,6 +1274,18 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu=
+, int cpu)
+>  =09if (!pi_test_sn(pi_desc) && vcpu->cpu =3D=3D cpu)
+>  =09=09return;
+> =20
+> +=09/*
+> +=09 * If the 'nv' field is POSTED_INTR_WAKEUP_VECTOR, do not change
+> +=09 * PI.NDST: pi_post_block is the one expected to change PID.NDST and =
+the
+> +=09 * wakeup handler expects the vCPU to be on the blocked_vcpu_list tha=
+t
+> +=09 * matches PI.NDST. Otherwise, a vcpu may not be able to be woken up
+> +=09 * correctly.
+> +=09 */
+> +=09if (pi_desc->nv =3D=3D POSTED_INTR_WAKEUP_VECTOR || vcpu->cpu =3D=3D =
+cpu) {
+> +=09=09pi_clear_sn(pi_desc);
+> +=09=09goto after_clear_sn;
+> +=09}
+> +
+>  =09/* The full case.  */
+>  =09do {
+>  =09=09old.control =3D new.control =3D pi_desc->control;
+> @@ -1289,6 +1301,8 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu,=
+ int cpu)
+>  =09} while (cmpxchg64(&pi_desc->control, old.control,
+>  =09=09=09   new.control) !=3D old.control);
+> =20
+> +after_clear_sn:
+> +
+>  =09/*
+>  =09 * Clear SN before reading the bitmap.  The VT-d firmware
+>  =09 * writes the bitmap and reads SN atomically (5.2.3 in the
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index bee16687dc0b..1e32ab54fc2d 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -373,6 +373,12 @@ static inline void pi_clear_on(struct pi_desc *pi_de=
+sc)
+>  =09=09(unsigned long *)&pi_desc->control);
+>  }
+> =20
+> +static inline void pi_clear_sn(struct pi_desc *pi_desc)
+> +{
+> +=09clear_bit(POSTED_INTR_SN,
+> +=09=09(unsigned long *)&pi_desc->control);
+> +}
+> +
+>  static inline int pi_test_on(struct pi_desc *pi_desc)
+>  {
+>  =09return test_bit(POSTED_INTR_ON,
+>=20
 
-
->
->thanks,
->
->greg k-h
