@@ -2,118 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D753F9567
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 17:18:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 742E1F95A4
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 17:27:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbfKLQSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 11:18:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53805 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726388AbfKLQSC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 11:18:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573575481;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XX5t35I7sbj+CcgcVDbYVEUjVF3D5OrIan777i+SG4o=;
-        b=ZkuiHSqQsv3xBWAc3ou6oqjSRZSnqB/H8iTwdn60uEkBFBMRprreIZj4+OGCSQ13AXJvU9
-        RBxGKoXge7S/k2BLXXlJbpXgkF2fYMgILmzDhbFZUOeVwz0AWMs1sGVDf3456Zr9udbeuU
-        RC0rDi1pAD6oRpf8EcSa7c3cE3dlfPw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-zVbD4R8FNaeDYxnhq53V0Q-1; Tue, 12 Nov 2019 11:17:58 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4961D107ACC8;
-        Tue, 12 Nov 2019 16:17:57 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B0A786016E;
-        Tue, 12 Nov 2019 16:17:52 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] s390x: Load reset psw on diag308
- reset
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org
-References: <20191111153345.22505-1-frankja@linux.ibm.com>
- <20191111153345.22505-4-frankja@linux.ibm.com>
- <7683adc7-2cd0-1103-d231-8a1577f1e673@redhat.com>
- <a22f8407-efb1-ab0e-eaf6-77d0b853c6de@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <f3be87c4-135e-dd42-b9b4-aadc0d0c90ca@redhat.com>
-Date:   Tue, 12 Nov 2019 17:17:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727171AbfKLQ1Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 11:27:24 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:42225 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727140AbfKLQ1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 11:27:24 -0500
+Received: by mail-ed1-f65.google.com with SMTP id m13so15386816edv.9
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 08:27:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=qNdulMghwGPBvmgJ8scwCvXDFRwh4jWCkPxL6qrSIjQ=;
+        b=WsNhISOt+hJkwbT7YN0D/1CAbxYs1x64PK9hVpM/9Lp0tdTDzA1sdtCfQ9ORQHddmu
+         SWw8MeBIFdqKCnfB+CTPjClScqjYAUa7xGNsH0xea1alpD0KKDb/71jlBRziY7Qd9qdx
+         KV0CvxkV5t6cSBUmoO5okM/7FYAgHCCesvlZyrCbTxeCe4tdDMsW85Doqmswx63GE7wZ
+         uYnLA+nQOsZqzuDT/yn8FPnBx5G04jDhrvGNcWr/+fINHW+iqGAPut6Np2TO1MBBWLIQ
+         mP8HdO9X3/9rvAsSXiTtY7np2QYRsalD3mhKoXcvIAmObokb1mwSJwDNBpAtw/Rzq2tr
+         tPFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=qNdulMghwGPBvmgJ8scwCvXDFRwh4jWCkPxL6qrSIjQ=;
+        b=Z/pCjS7QTa7L5pA4QX9X2UlUUWrNXAOHl3TjTwvkZTOclZq15Gw8bmoz2RtjOqTulO
+         eHGYWJc7rqDN37KIGDQf6f7JkL1eK3xMEQgZQh390eDeN87v1V/OfNCE/9OHzlcuU+et
+         T0mWtA0az4yKcNmrKGuqaDEcso6hZe/RdSVgaJx4SJkVkvyc9DAeceZ4yOnLsWgg5URe
+         E3SfSzt5SzZQyYg+c3P6+fus+aw3V+E/Q0DaqSsoUhwLDihCt0kgoyQRgZW+dKp31cz0
+         w+/Xs3pi33RlDhwdp259rmM+Ir4ZEcRasJpC5AKNDcjsl+nnEUV+w3Bcmd2xfY//Z5RR
+         5c1Q==
+X-Gm-Message-State: APjAAAXAkNdaDtmoPJgWpzRbGIobWpN38MDTYhRKDm5fXgy77FWR6Z3i
+        837GdNiWI30i2Cc96j+UY+sIANmM3tnX1Yw1hN0=
+X-Google-Smtp-Source: APXvYqyx6ZSP9pia1ghp0mGM0db9pMWKu3Ilw5isnMyYCLiKlWaoj5hSNiGZLYdu7/xruRv858z6c1CJ/zVYY273ryQ=
+X-Received: by 2002:a05:6402:142c:: with SMTP id c12mr33378742edx.96.1573576041909;
+ Tue, 12 Nov 2019 08:27:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <a22f8407-efb1-ab0e-eaf6-77d0b853c6de@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: zVbD4R8FNaeDYxnhq53V0Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:a05:6402:1118:0:0:0:0 with HTTP; Tue, 12 Nov 2019 08:27:21
+ -0800 (PST)
+Reply-To: walmart.b100263@gmail.com
+From:   "MS. MARYANNA B. THOMASON" <eco.bank1204@gmail.com>
+Date:   Tue, 12 Nov 2019 17:27:21 +0100
+Message-ID: <CAOE+jAB_cP8q9vvBDV62=BwoQhn_GcPJhAZsCyhMAnjxyg9-YA@mail.gmail.com>
+Subject: CONTACT WALMART TRANSFER To pick up $5000 sent to you this morning
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/11/2019 14.42, Janosch Frank wrote:
-> On 11/12/19 1:09 PM, David Hildenbrand wrote:
->> On 11.11.19 16:33, Janosch Frank wrote:
->>> On a diag308 subcode 0 CRs will be reset, so we need a PSW mask
->>> without DAT. Also we need to set the short psw indication to be
->>> compliant with the architecture.
->>>
->>> Let's therefore define a reset PSW mask with 64 bit addressing and
->>> short PSW indication that is compliant with architecture and use it.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>  lib/s390x/asm-offsets.c  |  1 +
->>>  lib/s390x/asm/arch_def.h |  3 ++-
->>>  s390x/cstart64.S         | 24 +++++++++++++++++-------
->>>  3 files changed, 20 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
->>> index 4b213f8..61d2658 100644
->>> --- a/lib/s390x/asm-offsets.c
->>> +++ b/lib/s390x/asm-offsets.c
->>> @@ -58,6 +58,7 @@ int main(void)
->>>  =09OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
->>>  =09OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
->>>  =09OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
->>> +=09OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
->>>  =09OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
->>>  =09OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
->>>  =09OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
->>> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->>> index 07d4e5e..7d25e4f 100644
->>> --- a/lib/s390x/asm/arch_def.h
->>> +++ b/lib/s390x/asm/arch_def.h
->>> @@ -79,7 +79,8 @@ struct lowcore {
->>>  =09uint32_t=09sw_int_fpc;=09=09=09/* 0x0300 */
->>>  =09uint8_t=09=09pad_0x0304[0x0308 - 0x0304];=09/* 0x0304 */
->>>  =09uint64_t=09sw_int_crs[16];=09=09=09/* 0x0308 */
->>> -=09uint8_t=09=09pad_0x0310[0x11b0 - 0x0388];=09/* 0x0388 */
->>> +=09struct psw=09sw_int_psw;=09=09=09/* 0x0388 */
->>> +=09uint8_t=09=09pad_0x0310[0x11b0 - 0x0390];=09/* 0x0390 */
->>>  =09uint64_t=09mcck_ext_sa_addr;=09=09/* 0x11b0 */
->>>  =09uint8_t=09=09pad_0x11b8[0x1200 - 0x11b8];=09/* 0x11b8 */
->>>  =09uint64_t=09fprs_sa[16];=09=09=09/* 0x1200 */
-[...]
->> This patch breaks the smp test under TCG (no clue and no time to look
->> into the details :) ):
->=20
-> I forgot to fixup the offset calculation at the top of the patch once
-> again...
+ CONTACT WALMART TRANSFER To pick up $5000 sent to you this morning
 
-Maybe add a
-
-_Static_assert(sizeof(struct lowcore) =3D=3D xyz)
-
-after the struct definitions, to avoid that this happens again?
-
- Thomas
-
+Attn Dear Beneficiary.
+Happy to inform you,I have deposited your payment funds
+$10.500,000MillionUS DollarsWith Walmart international money
+transfers.
+Receive the Money with Walmart | MoneyGram service.
+Walmart partners with MoneyGram to allow customers
+easily receive money transfers abroad,
+Contact Walmart international money transfers office -Benin
+Receive your approval payment funds $10.500,000MillionUS Dollars
+HERE IS WALMART CONTACT INFORMATIONS.
+Contact person. Mrs. Mary Anderson,Dir. Walmart transfers-Benin
+Email: walmart.b100263@gmail.com
+Telephone. +229 68823234
+Text Her on this international phone line. (256) 284-4886
+Ask Mrs. Mary Anderson,Dir. Walmart transfers-Benin to send the transfer
+as i instructed.
+we agreed to keep sending the transfer to you $5000.00 daily.
+Until you received your total payment $10.500,000 from the office
+Once again,
+make sure you contact Mrs. Mary Anderson,Dir. Walmart transfers-Benin
+today including your infos.
+(1) Your  Full Name==============
+(2) house address=============
+(3) Your Phone Numbers=============
+Urgent to receive your transfer now without any further delay.
+Thanks
+MS. MARYANNA B. THOMASON
