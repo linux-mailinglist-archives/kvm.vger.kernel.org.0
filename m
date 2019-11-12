@@ -2,135 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BED7FF9B84
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:10:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AE48F9B8C
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:11:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727211AbfKLVKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 16:10:44 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37006 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726645AbfKLVKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 16:10:40 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b17so4502182wmj.2;
-        Tue, 12 Nov 2019 13:10:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=ggJ1wueVMuwowaHeTZ0GC3WO2tlvDZKJl8chKJQFPkc=;
-        b=PsrKIWwEywODV7XLDEwnDWYX0V4T9w2Mftx/GcjVlZAbot4zg+JZ5aENMi4bHATIWc
-         K+4tnaZQ8IzUR5NJPcTKw8a7KyfsUckNE3cch77SeAEKeeUYN8lQwVoVNB2oDgtr88Ns
-         kj/Oql8dFfClk1nJfV48ylRaj0VxCDPMhU1DUCCSyPW/8E8IHfgc7sN04kwkoGh412GV
-         r4iJ6bT3p4SEXlnOPqlWigVDQifpMc0FZazQ10KGqcOcz1FbowtAZHtQzK93GsHE7/Ew
-         3I2vF3dEDVDDb1VR7d1Dql87uwiAM7FMwZxJ1tbl5W6NeDBhmZaF6WkRpUp9x64SDujm
-         kxSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=ggJ1wueVMuwowaHeTZ0GC3WO2tlvDZKJl8chKJQFPkc=;
-        b=aT++p+N1IpURCVQoeHI9EvM8J78MAfOPyzOZc0TZ0cCpN78T+1A8fSftlpm9cgSjyA
-         4a41P6FqBgXVd+J2Sl2LhztbH8UQVcFpDWgEZhYVkub9pr5D+O2t3X7sqYMYWoTVuQnJ
-         pufrds2pGaj4gPRFjI05TVUz2OZXWmeR8ssy62cqnXgYiEoqT/R/X0zglmHhySd8lmBL
-         LkwnEw2KZ/TX6jbZM+hmuvvjFgxukb68GDGOgqj/oL7MR5xMusadELbtQgoNek9/X34Q
-         RVjoWRfjHTzhg2Y+J8shoCwhjPOninapvP8beoPRvXg5CJgaYOIj2qVr+5ca4UQoEr94
-         mCqw==
-X-Gm-Message-State: APjAAAW/n6/YlLi1E86rWjksYnCMA5KW0gCozZp6sRhA/Im2kvbAZUit
-        pBPgTitXSCsUhUW+MPHaMY7Bf7eL
-X-Google-Smtp-Source: APXvYqy2aLhqqT/TL0rcyK1Ryn/w/sr+i15tLkfOG5tJp6IP8/oSH50xCw/il6DnUuQ16rUQ5Urj8Q==
-X-Received: by 2002:a1c:9601:: with SMTP id y1mr5613615wmd.157.1573593037942;
-        Tue, 12 Nov 2019 13:10:37 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id p25sm4132624wma.20.2019.11.12.13.10.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Nov 2019 13:10:37 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] KVM patches for Linux 5.4-rc8
-Date:   Tue, 12 Nov 2019 22:10:36 +0100
-Message-Id: <1573593036-23271-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727264AbfKLVKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 16:10:52 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:1270 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727239AbfKLVKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 16:10:52 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb1fa00000>; Tue, 12 Nov 2019 13:09:52 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 12 Nov 2019 13:10:48 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 13:10:48 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
+ 2019 21:10:47 +0000
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
+ FOLL_LONGTERM
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112203802.GD5584@ziepe.ca>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+Date:   Tue, 12 Nov 2019 13:10:47 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191112203802.GD5584@ziepe.ca>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573592992; bh=FYNiQqIIwAjaPTLdgZDFjzpc3PZA+IOd8Qzq/L3NYFI=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=XDTPGbX/pfLSLEPMZj0U4ST8nWeqLQb9L0gJo2fojuRXhn2sbJZCbDvwG00vq+XIQ
+         colylZtLpZg40dx1ABr6UMyL7nDz+Ko0zZq5udmfA2v8o8KV6jbQ8nMJaMjSxXz3jT
+         /IQas6U39IMXowKsu+Lp15YvwNvsj9I4GEW1qSNrdbdQur8MbFNPpL74slNbnNTKiw
+         2tvXn1JIXwNPZ2+bJmHJ2nQzCpfl0RwWLH4Y7hj0SisnidmxgFdWv36tY7VU9S2345
+         uRxyqWTOY6lQqCfoY1uSgUmsGBjI6laWSw8oWM5BJSMXcH/MubF7tkJ0NoA3AfLsvB
+         eNrIf7Db8lhiQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
-
-The following changes since commit 31f4f5b495a62c9a8b15b1c3581acd5efeb9af8c:
-
-  Linux 5.4-rc7 (2019-11-10 16:17:15 -0800)
-
-are available in the git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to a78986aae9b2988f8493f9f65a587ee433e83bc3:
-
-  KVM: MMU: Do not treat ZONE_DEVICE pages as being reserved (2019-11-12 10:17:42 +0100)
-
-----------------------------------------------------------------
-Bugfixes: unwinding of KVM_CREATE_VM failure,
-VT-d posted interrupts, DAX/ZONE_DEVICE,
-module unload/reload.
-
-----------------------------------------------------------------
-
-I delayed sending this until today, because there is a conflict between
-today's processor vulnerability mitigations and commit 8a44119a98be from
-this pull request ("KVM: Fix NULL-ptr deref after kvm_create_vm fails"),
-and I didn't want to mess up your processing of Thomas's pull request.
-It's not a particularly hard conflict, but I'm including anyway a
-resolution at the end of this email.
-
-Paolo
-
-Chenyi Qiang (1):
-      KVM: X86: Fix initialization of MSR lists
-
-Joao Martins (3):
-      KVM: VMX: Consider PID.PIR to determine if vCPU has pending interrupts
-      KVM: VMX: Do not change PID.NDST when loading a blocked vCPU
-      KVM: VMX: Introduce pi_is_pir_empty() helper
-
-Liran Alon (1):
-      KVM: VMX: Fix comment to specify PID.ON instead of PIR.ON
-
-Paolo Bonzini (2):
-      KVM: Fix NULL-ptr deref after kvm_create_vm fails
-      KVM: fix placement of refcount initialization
-
-Sean Christopherson (1):
-      KVM: MMU: Do not treat ZONE_DEVICE pages as being reserved
-
- arch/x86/kvm/mmu.c       |  8 +++----
- arch/x86/kvm/vmx/vmx.c   | 23 +++++++++++++++++---
- arch/x86/kvm/vmx/vmx.h   | 11 ++++++++++
- arch/x86/kvm/x86.c       | 56 ++++++++++++++++++++++--------------------------
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 48 +++++++++++++++++++++++++++++------------
- 6 files changed, 96 insertions(+), 51 deletions(-)
+On 11/12/19 12:38 PM, Jason Gunthorpe wrote:
+> On Mon, Nov 11, 2019 at 04:06:37PM -0800, John Hubbard wrote:
+>> Hi,
+>>
+>> The cover letter is long, so the more important stuff is first:
+>>
+>> * Jason, if you or someone could look at the the VFIO cleanup (patch 8)
+>>   and conversion to FOLL_PIN (patch 18), to make sure it's use of
+>>   remote and longterm gup matches what we discussed during the review
+>>   of v2, I'd appreciate it.
+>>
+>> * Also for Jason and IB: as noted below, in patch 11, I am (too?) boldly
+>>   converting from put_user_pages() to release_pages().
+> 
+> Why are we doing this? I think things got confused here someplace, as
 
 
+Because:
 
-diff --cc virt/kvm/kvm_main.c
-index 4aab3547a165,0dac149ead16..000000000000
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@@ -715,15 -713,6 +735,11 @@@
-  	return kvm;
-  
-  out_err:
- +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
- +	if (kvm->mmu_notifier.ops)
- +		mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
- +#endif
- +out_err_no_mmu_notifier:
-- 	cleanup_srcu_struct(&kvm->irq_srcu);
-- out_err_no_irq_srcu:
-- 	cleanup_srcu_struct(&kvm->srcu);
-- out_err_no_srcu:
-  	hardware_disable_all();
-  out_err_no_disable:
-  	kvm_arch_destroy_vm(kvm);
+a) These need put_page() calls,  and
 
+b) there is no put_pages() call, but there is a release_pages() call that
+is, arguably, what put_pages() would be.
+
+
+> the comment still says:
+> 
+> /**
+>  * put_user_page() - release a gup-pinned page
+>  * @page:            pointer to page to be released
+>  *
+>  * Pages that were pinned via get_user_pages*() must be released via
+>  * either put_user_page(), or one of the put_user_pages*() routines
+>  * below.
+
+
+Ohhh, I missed those comments. They need to all be changed over to
+say "pages that were pinned via pin_user_pages*() or 
+pin_longterm_pages*() must be released via put_user_page*()."
+
+The get_user_pages*() pages must still be released via put_page.
+
+The churn is due to a fairly significant change in strategy, whis
+is: instead of changing all get_user_pages*() sites to call 
+put_user_page(), change selected sites to call pin_user_pages*() or 
+pin_longterm_pages*(), plus put_user_page().
+
+That allows incrementally converting the kernel over to using the
+new pin APIs, without taking on the huge risk of a big one-shot
+conversion. 
+
+So, I've ended up with one place that actually needs to get reverted
+back to get_user_pages(), and that's the IB ODP code.
+
+> 
+> I feel like if put_user_pages() is not the correct way to undo
+> get_user_pages() then it needs to be deleted.
+> 
+
+Yes, you're right. I'll fix the put_user_page comments() as described.
+
+
+thanks,
+
+John Hubbard
+NVIDIA
