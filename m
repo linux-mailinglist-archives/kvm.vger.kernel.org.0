@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1A72F8666
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 02:34:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0752F866A
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 02:34:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbfKLBeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 20:34:02 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:46410 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726928AbfKLBeC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 20:34:02 -0500
-Received: by mail-ot1-f68.google.com with SMTP id n23so12915891otr.13;
-        Mon, 11 Nov 2019 17:34:00 -0800 (PST)
+        id S1727065AbfKLBep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 20:34:45 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:34893 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726928AbfKLBep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 20:34:45 -0500
+Received: by mail-oi1-f193.google.com with SMTP id n16so13352613oig.2;
+        Mon, 11 Nov 2019 17:34:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nCXnq6KfTcW48HdT/UVgMIRXRm8X+Lrr6IQKnNcG3B8=;
-        b=Ario+ujY8q3eOROTO8GLVkJJ9yLO2y/AkEe4/OrjczRsfMg0o6vljnEDoZiBp6QwWa
-         YR5IZ5uW48wzJ/GrXjaw+fdVR0GpefkE8QpIcXNUw6N1Ry4yF6NkgCneKBRpuWf35szD
-         xvbRESTqqUXBMBBTCYYEX8SQncXTOjpLPFaFRatHB38sfSK8MNULTNYYoy3K533Erm9H
-         ZUGWdo95SMoWIJidYue9zO0CWzpL9AipHzsXrJ7yPz0VPC79LsGeAHyjPiSn9NC9DSgT
-         txut7L+czczUhDe4Eh2LA1ljqU5AfnFZ1HS29MQc2wvkJ9EI7+XqYCHuIYe69RssAlac
-         KHVQ==
+        bh=Mez+pVB2aSRl3joTyHwJYr7P2LRTYTKys9tINZyr2/o=;
+        b=nLHGcfjlNdBxuy9OP6XPSYsFhgZMGPmqolg/5EycwX81Ugcx11fDqho6CztizdBIqS
+         MMezND70FGWWDPdNUCRC6L6GZR7lXjBBsQF2KCAVzOErToHOUK/dvFYk625crMVRRei9
+         o9+SSSZJG2IKWoECw9Z7nP/e3ObaU06fq0hCq+Lws+uJJ4qaVDbtAdsKKp1dozrJY8k1
+         7MszZZwapqMNlbPPKJ/56Axu3MaYHHIffKMpjTN8fgycuzCk/TuEpWiUHlm7OwljNLra
+         GhNBtIU/aDlPVq9NLm2NCAg8ssiuQLOKX1opP58suaU37+yrRKwyl5IIzboSVt0J+pZP
+         HT+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nCXnq6KfTcW48HdT/UVgMIRXRm8X+Lrr6IQKnNcG3B8=;
-        b=B9gvA/MGzw5gYuQcoJ7WB72yZOkAZKI8+1HuFzupfkxLC73WdKuiYoO4+ARjd7dU+G
-         jSvMrLZJ4ZGX/ZjHlR0eK62hBosRFA/hEALSEV/PlZ8km0E3JiyQlFc7PaGczWEhTL5i
-         UnirqFPtUxjKcXhhNiAADn7J5bnQG0pYGEIWrYBukWOdbgorl8ikIHCSk0EIkIjPpLNJ
-         jfKIkDskJTsrYicqVrPCgK98N1KtvcAzWU3/h7kpUcTtgmCyp/wjndInpEE4usK6OqwM
-         SmODu2PMaIwfJxxxGX43LUTBe/UsOEDaZSt7/ikw7gzkVYZZjzVM9T0XlRVmuhyZ9Rnq
-         lgSw==
-X-Gm-Message-State: APjAAAXCTRL0gw/1ob6ZGEfbZBFZb4Q/OiDQEg8dqmn0zzNE6+mlea3e
-        N2XXz+5ZUFw7FijEDp0olrRAjAS4sOUR+FVqNmGvTg4w
-X-Google-Smtp-Source: APXvYqzkVdUE6QtSEFwy+i0dXIH0hPJL/YC3OsSpujqIYP7Ot8Bw7/ZFVzGAwtzFYU6mhje2mluc5BIIGwaELV5pKtg=
-X-Received: by 2002:a9d:b83:: with SMTP id 3mr22827187oth.56.1573522439777;
- Mon, 11 Nov 2019 17:33:59 -0800 (PST)
+        bh=Mez+pVB2aSRl3joTyHwJYr7P2LRTYTKys9tINZyr2/o=;
+        b=Kv3Lgl+txiRkiolHhZ362RME+AGLHRjxiuoh8TBpvFqLY6nG9DgvtZA89NhqYQt7q8
+         65V3bsB4U0pLeGdEur6AJ9D/x8LTMQybeWtqoGjcR9XSNssZAVL8fTJEwxOaPlLkLvLa
+         ktdwbOoIq+VAPtkWlgebCMVnHL4Zn+BasSjUFB9SuFqUEwrJWvxryaygB4YDdXYZZ1wI
+         /7y92kqE/Z60g/8cZwjeYS63+Gm8eOW8qgnLCaqtUhol0zxUhpL2gsJIN6ROjxHU1yg7
+         og1vPbt2YCmykP9c2bq6S1qIh3m/ACHLXuTJ/MaIVbRjw1tMzxEd9fJ1/g7pUDZ29Sx5
+         G+7w==
+X-Gm-Message-State: APjAAAXJWGM/dtb5xU5JR5vm2j2TBo4LIiGg/sDeinIXd9GVs8T0oTuz
+        cC4Iv81pYuZf8G0eGiHCR1cSzG4YRObN3Mf0bKBWzg==
+X-Google-Smtp-Source: APXvYqwJ3B/cGGQ6QoFrMaYL6Rg2bBM5c8aoJ9Ym8QZ5I3Y/0F6FYh3ltg2Nnu9FWl0BwsBMtMJamH/b5tRnnsQZi6U=
+X-Received: by 2002:aca:5015:: with SMTP id e21mr1803688oib.174.1573522483255;
+ Mon, 11 Nov 2019 17:34:43 -0800 (PST)
 MIME-Version: 1.0
-References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com> <4418c734-68e1-edaf-c939-f24d041acf2e@redhat.com>
-In-Reply-To: <4418c734-68e1-edaf-c939-f24d041acf2e@redhat.com>
+References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com>
+ <1573283135-5502-2-git-send-email-wanpengli@tencent.com> <7a526814-c44e-c188-fba4-c6fb97b88b71@redhat.com>
+In-Reply-To: <7a526814-c44e-c188-fba4-c6fb97b88b71@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 12 Nov 2019 09:33:49 +0800
-Message-ID: <CANRm+CzK_h2E9XWFipkNpAALLCBcM2vrUkdBpumwmT9AP09hfA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: X86: Single target IPI fastpath
+Date:   Tue, 12 Nov 2019 09:34:34 +0800
+Message-ID: <CANRm+CyeH_qNs2oJPVT4Lnw9VB-+86QkLiLVy25OtK=k44CBsg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: LAPIC: micro-optimize fixed mode ipi delivery
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
@@ -66,52 +67,20 @@ On Tue, 12 Nov 2019 at 05:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > On 09/11/19 08:05, Wanpeng Li wrote:
 > > From: Wanpeng Li <wanpengli@tencent.com>
 > >
-> > This patch tries to optimize x2apic physical destination mode, fixed delivery
-> > mode single target IPI by delivering IPI to receiver immediately after sender
-> > writes ICR vmexit to avoid various checks when possible.
+> > After disabling mwait/halt/pause vmexits, RESCHEDULE_VECTOR and
+> > CALL_FUNCTION_SINGLE_VECTOR etc IPI is one of the main remaining
+> > cause of vmexits observed in product environment which can't be
+> > optimized by PV IPIs. This patch is the follow-up on commit
+> > 0e6d242eccdb (KVM: LAPIC: Micro optimize IPI latency), to optimize
+> > redundancy logic before fixed mode ipi is delivered in the fast
+> > path.
 > >
-> > Testing on Xeon Skylake server:
-> >
-> > The virtual IPI latency from sender send to receiver receive reduces more than
-> > 330+ cpu cycles.
-> >
-> > Running hackbench(reschedule ipi) in the guest, the avg handle time of MSR_WRITE
-> > caused vmexit reduces more than 1000+ cpu cycles:
-> >
-> > Before patch:
-> >
-> >   VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
-> > MSR_WRITE    5417390    90.01%    16.31%      0.69us    159.60us    1.08us
-> >
-> > After patch:
-> >
-> >   VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
-> > MSR_WRITE    6726109    90.73%    62.18%      0.48us    191.27us    0.58us
+> > - broadcast handling needs to go slow path, so the delivery mode repair
+> >   can be delayed to before slow path.
 >
-> Do you have retpolines enabled?  The bulk of the speedup might come just
-> from the indirect jump.
+> I agree with this part, but is the cost of the irq->shorthand check
+> really measurable?
 
-Adding 'mitigations=off' to the host grub parameter:
-
-Before patch:
-
-    VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
-MSR_WRITE    2681713    92.98%    77.52%      0.38us     18.54us
-0.73us ( +-   0.02% )
-
-After patch:
-
-    VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
-MSR_WRITE    2953447    92.48%    62.47%      0.30us     59.09us
-0.40us ( +-   0.02% )
-
-Actually, this is not the first attempt to add shortcut for MSR writes
-which performance sensitive, the other effort is tscdeadline timer
-from Isaku Yamahata, https://patchwork.kernel.org/cover/10541035/ ,
-ICR and TSCDEADLINE MSR writes cause the main MSR write vmexits in our
-product observation, multicast IPIs are not as common as unicast IPI
-like RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc. As far as
-I know, something similar to this patch has already been deployed in
-some cloud companies private kvm fork.
+I can drop the second part for v2.
 
     Wanpeng
