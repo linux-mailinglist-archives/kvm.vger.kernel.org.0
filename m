@@ -2,112 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A035F85F0
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 02:18:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1A72F8666
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 02:34:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbfKLBSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 20:18:21 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:39005 "EHLO
+        id S1727021AbfKLBeC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 20:34:02 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:46410 "EHLO
         mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726908AbfKLBSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 20:18:21 -0500
-Received: by mail-ot1-f68.google.com with SMTP id e17so12931848otk.6;
-        Mon, 11 Nov 2019 17:18:20 -0800 (PST)
+        with ESMTP id S1726928AbfKLBeC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 20:34:02 -0500
+Received: by mail-ot1-f68.google.com with SMTP id n23so12915891otr.13;
+        Mon, 11 Nov 2019 17:34:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3lBuSLniBfxOtbZPc5uBPKwf2C9wf9/68vgFfge/XIw=;
-        b=WhQBWrx94wCGYhMrvqnfuqQ37he3o2NG/qpAkS0ZBzKwFCtEdURmWzVXyJVyTJLnXB
-         kUbIPnwa67FsXTobd6wvczudo2cOpa+ukmWMeslnh9Eo/QwnalaF3SjYqnnoe5UFoMbQ
-         sErB1GxroWw4ZcM8HzQ8dugQdtBKpD61mdo7rAYDhD0okeC0dQxOn2w6nLBkD8C46SMK
-         9SjanOPjxmLvivuJh83AjC9RzrwLl8+RngtUYZXS6PSnCb4DY7ePOLv4aAsVlTsC+siQ
-         4lBYnBQAj1zyV0PMldgVM4D8ab+YEHQCKHdvB+ZvBV7MZ+9+4ORUciFU9EdSuVQGASHR
-         Y63w==
+        bh=nCXnq6KfTcW48HdT/UVgMIRXRm8X+Lrr6IQKnNcG3B8=;
+        b=Ario+ujY8q3eOROTO8GLVkJJ9yLO2y/AkEe4/OrjczRsfMg0o6vljnEDoZiBp6QwWa
+         YR5IZ5uW48wzJ/GrXjaw+fdVR0GpefkE8QpIcXNUw6N1Ry4yF6NkgCneKBRpuWf35szD
+         xvbRESTqqUXBMBBTCYYEX8SQncXTOjpLPFaFRatHB38sfSK8MNULTNYYoy3K533Erm9H
+         ZUGWdo95SMoWIJidYue9zO0CWzpL9AipHzsXrJ7yPz0VPC79LsGeAHyjPiSn9NC9DSgT
+         txut7L+czczUhDe4Eh2LA1ljqU5AfnFZ1HS29MQc2wvkJ9EI7+XqYCHuIYe69RssAlac
+         KHVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3lBuSLniBfxOtbZPc5uBPKwf2C9wf9/68vgFfge/XIw=;
-        b=UV6SednGSkY32eaPd1bwz28YzRUkJ2L//wZPL7im+Bm7SE+qWiX2zlXQyedoEPnX8P
-         cymmjavmY2CF5VQ1pLGHtg684qp+CmqWohBVdnM6L2AU8FLirCNJJBfofZSeXy6wr5QR
-         9Is7zETUbJTVmiXgGVstglubTpHtoN4lqDNdxEY1HXAlxtMN6qTH824RWCWL5P13gIT1
-         nkVwAfqJKgh4rL6DS97GwNa4nc6O9d7RD2fMBlTgnHe8H9TI5oLCWH1IuPWTdH8dRwaS
-         tGCxsNKc7kWdF0J9JVC9EUf17w9SfR99kSQ0AGcihrNPT630Y8teuVzzb7xKjOxGWOvk
-         IlwA==
-X-Gm-Message-State: APjAAAVFbA3ILWAgIXHdlvXMWZYYP+6+aOaxre5+Ry7UJm/h00lfrC//
-        wey6Eg1s31hb+88yXTPiJEkRI89wdCgoO5+YB/k=
-X-Google-Smtp-Source: APXvYqzs9jLymC/LGhXlFA2x2mI3e+pqq6h3FIftSS7u8rOxKwRI4UGUYb3QWmAyqw1Ka0WTgzXQm87m6FkzHlom0Zk=
-X-Received: by 2002:a9d:b83:: with SMTP id 3mr22791896oth.56.1573521500347;
- Mon, 11 Nov 2019 17:18:20 -0800 (PST)
+        bh=nCXnq6KfTcW48HdT/UVgMIRXRm8X+Lrr6IQKnNcG3B8=;
+        b=B9gvA/MGzw5gYuQcoJ7WB72yZOkAZKI8+1HuFzupfkxLC73WdKuiYoO4+ARjd7dU+G
+         jSvMrLZJ4ZGX/ZjHlR0eK62hBosRFA/hEALSEV/PlZ8km0E3JiyQlFc7PaGczWEhTL5i
+         UnirqFPtUxjKcXhhNiAADn7J5bnQG0pYGEIWrYBukWOdbgorl8ikIHCSk0EIkIjPpLNJ
+         jfKIkDskJTsrYicqVrPCgK98N1KtvcAzWU3/h7kpUcTtgmCyp/wjndInpEE4usK6OqwM
+         SmODu2PMaIwfJxxxGX43LUTBe/UsOEDaZSt7/ikw7gzkVYZZjzVM9T0XlRVmuhyZ9Rnq
+         lgSw==
+X-Gm-Message-State: APjAAAXCTRL0gw/1ob6ZGEfbZBFZb4Q/OiDQEg8dqmn0zzNE6+mlea3e
+        N2XXz+5ZUFw7FijEDp0olrRAjAS4sOUR+FVqNmGvTg4w
+X-Google-Smtp-Source: APXvYqzkVdUE6QtSEFwy+i0dXIH0hPJL/YC3OsSpujqIYP7Ot8Bw7/ZFVzGAwtzFYU6mhje2mluc5BIIGwaELV5pKtg=
+X-Received: by 2002:a9d:b83:: with SMTP id 3mr22827187oth.56.1573522439777;
+ Mon, 11 Nov 2019 17:33:59 -0800 (PST)
 MIME-Version: 1.0
-References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com> <87mud2sgsz.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87mud2sgsz.fsf@vitty.brq.redhat.com>
+References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com> <4418c734-68e1-edaf-c939-f24d041acf2e@redhat.com>
+In-Reply-To: <4418c734-68e1-edaf-c939-f24d041acf2e@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 12 Nov 2019 09:18:11 +0800
-Message-ID: <CANRm+CyzwArrMokQHBOr1FDYmXS=8z1+hnbKnXAjoFvpBe67HA@mail.gmail.com>
+Date:   Tue, 12 Nov 2019 09:33:49 +0800
+Message-ID: <CANRm+CzK_h2E9XWFipkNpAALLCBcM2vrUkdBpumwmT9AP09hfA@mail.gmail.com>
 Subject: Re: [PATCH 1/2] KVM: X86: Single target IPI fastpath
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+        Joerg Roedel <joro@8bytes.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 11 Nov 2019 at 21:06, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+On Tue, 12 Nov 2019 at 05:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Wanpeng Li <kernellwp@gmail.com> writes:
->
-> > +
-> >  static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > @@ -6615,6 +6645,12 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >                                 | (1 << VCPU_EXREG_CR3));
-> >       vcpu->arch.regs_dirty = 0;
+> On 09/11/19 08:05, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
 > >
-> > +     vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
-> > +     vcpu->fast_vmexit = false;
-> > +     if (!is_guest_mode(vcpu) &&
-> > +             vmx->exit_reason == EXIT_REASON_MSR_WRITE)
-> > +             vcpu->fast_vmexit = handle_ipi_fastpath(vcpu);
+> > This patch tries to optimize x2apic physical destination mode, fixed delivery
+> > mode single target IPI by delivering IPI to receiver immediately after sender
+> > writes ICR vmexit to avoid various checks when possible.
+> >
+> > Testing on Xeon Skylake server:
+> >
+> > The virtual IPI latency from sender send to receiver receive reduces more than
+> > 330+ cpu cycles.
+> >
+> > Running hackbench(reschedule ipi) in the guest, the avg handle time of MSR_WRITE
+> > caused vmexit reduces more than 1000+ cpu cycles:
+> >
+> > Before patch:
+> >
+> >   VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
+> > MSR_WRITE    5417390    90.01%    16.31%      0.69us    159.60us    1.08us
+> >
+> > After patch:
+> >
+> >   VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
+> > MSR_WRITE    6726109    90.73%    62.18%      0.48us    191.27us    0.58us
 >
-> I have to admit this looks too much to me :-( Yes, I see the benefits of
-> taking a shortcut (by actualy penalizing all other MSR writes) but the
-> question I have is: where do we stop?
+> Do you have retpolines enabled?  The bulk of the speedup might come just
+> from the indirect jump.
 
-In our iaas environment observation, ICR and TSCDEADLINE are the main
-MSR write vmexits.
+Adding 'mitigations=off' to the host grub parameter:
 
 Before patch:
-tscdeadline_immed 3900
-tscdeadline 5413
+
+    VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
+MSR_WRITE    2681713    92.98%    77.52%      0.38us     18.54us
+0.73us ( +-   0.02% )
 
 After patch:
-tscdeadline_immed 3912
-tscdeadline 5427
 
-So the penalize can be tolerated.
+    VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time   Avg time
+MSR_WRITE    2953447    92.48%    62.47%      0.30us     59.09us
+0.40us ( +-   0.02% )
 
->
-> Also, this 'shortcut' creates an imbalance in tracing: you don't go down
-> to kvm_emulate_wrmsr() so handle_ipi_fastpath() should probably gain a
-> tracepoint.
-
-Agreed.
-
->
-> Looking at 'fast_vmexit' name makes me think this is something
-> generic. Is this so? Maybe we can create some sort of an infrastructure
-> for fast vmexit handling and make it easy to hook things up to it?
-
-Maybe an indirect jump? But I can have a try.
+Actually, this is not the first attempt to add shortcut for MSR writes
+which performance sensitive, the other effort is tscdeadline timer
+from Isaku Yamahata, https://patchwork.kernel.org/cover/10541035/ ,
+ICR and TSCDEADLINE MSR writes cause the main MSR write vmexits in our
+product observation, multicast IPIs are not as common as unicast IPI
+like RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc. As far as
+I know, something similar to this patch has already been deployed in
+some cloud companies private kvm fork.
 
     Wanpeng
