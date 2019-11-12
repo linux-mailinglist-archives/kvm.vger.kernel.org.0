@@ -2,117 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FBE7F9D69
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:46:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 87EC2F9DC4
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 00:08:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726910AbfKLWqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 17:46:03 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:39088 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726969AbfKLWqC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:46:02 -0500
-Received: by mail-oi1-f193.google.com with SMTP id v138so16430782oif.6
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 14:46:02 -0800 (PST)
+        id S1727216AbfKLXIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 18:08:32 -0500
+Received: from mail-il1-f196.google.com ([209.85.166.196]:35769 "EHLO
+        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726973AbfKLXIc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 18:08:32 -0500
+Received: by mail-il1-f196.google.com with SMTP id z12so17227127ilp.2
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 15:08:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=7VZux41I9l8WsaFw4dnSKoQ+DL1POYbdTwXxPgsqOD8=;
-        b=g+shynx9wA4O7/ZPSOmOhvhdFUBcChFyBb7EYzal20VNZRr14tSC8CEEu8RhYVOSKP
-         ujUV0PqIhIH36zKviPook+HnkIHuRG88nmkcJhEvO3dJXo36vkvTp3d/Rv5+wpQSmOnU
-         bQU0r/Fslk/8pH+0JUylPowC6D4ZnT5PrmHiZ30JXUbKpZ1rMZQ7kmT50jl8KfJoHp7m
-         VvEK+ooBIm3vYED6+FUL9oFvr5SRhfXOEafMoAbLZrqHGNUi1aW7WiDjR5Rr2M+YKo5Q
-         1bTGao6fq7ZjCHqOdYHjYnxFv2rb5XbPoQBWE0A1WALsbQq7HL4C3F5HipXsfgbDt8Vf
-         nWjw==
+        bh=DMF1zQ7G+/eyZ3P/+ZJfog2eNz9Ge+2rznL4SFkPZvA=;
+        b=AFmcL0c7qsu91xh0H/CBmaOyCgNAPYC0ZO2WFRfDQym/phuTH+UiT0E6rOsfXdHhXF
+         B/1lMFnyvUO2R4uThWwr4eAHCXJUPtcL9HhIUHpOSB8McYoGVHC1XUH48E1u7yrczlqP
+         hTM+1JgLMoyPkhEA45iu2bU/5woD4zG3wMlzdry2YO4qRJbHnDTViF6l7z1G20YaZ8PU
+         Ek3LO8am+hPnizsyxGSZ5tIHMlIvuqYyhV5wboh6nqOYw2pDOtG2FDR1jFpOTr1JYz0J
+         glprxKn7SgXzCilk9hExkJnhj100lHrWa/mEGO0Vs6z7CZyNFwfgt+TnRWg2v1Zp3hm7
+         9xmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=7VZux41I9l8WsaFw4dnSKoQ+DL1POYbdTwXxPgsqOD8=;
-        b=TAC+kb3ME8Zf4OxgeGcYc3MR9lzUubi0vDP2oL8tTKXlzAdI2w1WYtkTckCAqA58cQ
-         N9HmLcXQ5fYUILqT3m4fMJ0h2huQncbKSE1xCMCcuKfbrmvvDEbg7js3M73pngIE7/6K
-         HYn2eFoiIKdnduCB7w9RXb8HYlUklq5poc5UXNWFBXb3C8w72qJ4+ST/AsXxmh5pelTc
-         uLeMtatmZS1kZE+FBSeTAuDoU9zEUCq8CchoYMfxiGCstzbLVJa+S0QfeEh0EVqGTNKL
-         G1BRUM/1EJ6ennD74xpnwuJcli/XQc/8jjC/okv3xWwixcWe135mDwC+5FDrzPs0NNmK
-         D8Zw==
-X-Gm-Message-State: APjAAAXSEyJvZTlPDUZdOA9jlssUGtxD2viVlr2o3mewGFgBjgdLooh/
-        a1LwtlZYxQPo4evhizK2vh2xyoTtkUV5ZwBsrgSwIA==
-X-Google-Smtp-Source: APXvYqwYMdEjXlo/ZXkQ25Q7OqLij5wE38qfmFx+c4Kh6ETnZQ80hOGe2SgdovvfY1Nwmo4LDa9vLeLDcR91Ofxlyck=
-X-Received: by 2002:aca:ea57:: with SMTP id i84mr83905oih.73.1573598761920;
- Tue, 12 Nov 2019 14:46:01 -0800 (PST)
+        bh=DMF1zQ7G+/eyZ3P/+ZJfog2eNz9Ge+2rznL4SFkPZvA=;
+        b=VufGP+ffSCt/2qG4C23S2JGSRmAMqSMgiw6TaVcDoWUGNVpageaxc+v4Dy59dG1KzY
+         lQBTy6/WqiPTAlTCJevsUEdM5hniyzk7tsKHp3kIqW2feIRX0Ah3RZDw0WPFdtdLDQit
+         QdiDYXbzydaPCiJVwu1mcrCGVTERSTQabMBfsZrHn6kbxWwn7Q1FXnN5MQ1g5/J8Bg6E
+         Y9kSORdoy2EciuHWY+glmeIXMxjHmBI8kf4E/kstGUOsWPhWcsJhRLk2AEPkLYYiJmr0
+         VepNvcGTpqY1VW9WufNsa5F9Tu7GAtnNjaYPrR3kpHZIeyBNSqnNqdKHvgjaUgKBmw5C
+         nVLg==
+X-Gm-Message-State: APjAAAVpdFGR5iGj4St2dXITtmNf667nU8cdmrYEk00MojSbikv9loiV
+        JW+f6mg2XgUwWp6Xu9anpDWniZGKMQlr9jSamI+YmQ==
+X-Google-Smtp-Source: APXvYqz0eSGNNx9Ol+LYS74i6rbFx+T+ze8QaHQN/6T0LF4RoCYl3jjyW34LVpQvPczMGTF6bNETQH2b/ajBlkcn3RM=
+X-Received: by 2002:a92:c10f:: with SMTP id p15mr403067ile.119.1573600110805;
+ Tue, 12 Nov 2019 15:08:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20191112000700.3455038-1-jhubbard@nvidia.com> <20191112000700.3455038-9-jhubbard@nvidia.com>
- <20191112204338.GE5584@ziepe.ca> <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
-In-Reply-To: <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 12 Nov 2019 14:45:51 -0800
-Message-ID: <CAPcyv4hAEgw6ySNS+EFRS4yNRVGz9A3Fu1vOk=XtpjYC64kQJw@mail.gmail.com>
-Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and FOLL_LONGTERM
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <20191111122621.93151-1-liran.alon@oracle.com>
+In-Reply-To: <20191111122621.93151-1-liran.alon@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 12 Nov 2019 15:08:19 -0800
+Message-ID: <CALMp9eTEyYzA-LDrRZzaLtqCJHgQr7WOFDa6xxZ+g8p3QeB-Kw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SVM: Remove check if APICv enabled in SVM
+ update_cr8_intercept() handler
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 2:43 PM John Hubbard <jhubbard@nvidia.com> wrote:
+On Mon, Nov 11, 2019 at 4:26 AM Liran Alon <liran.alon@oracle.com> wrote:
 >
-> On 11/12/19 12:43 PM, Jason Gunthorpe wrote:
-> ...
-> >> -            }
-> >> +    ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> >> +                                page, vmas, NULL);
-> >> +    /*
-> >> +     * The lifetime of a vaddr_get_pfn() page pin is
-> >> +     * userspace-controlled. In the fs-dax case this could
-> >> +     * lead to indefinite stalls in filesystem operations.
-> >> +     * Disallow attempts to pin fs-dax pages via this
-> >> +     * interface.
-> >> +     */
-> >> +    if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> >> +            ret = -EOPNOTSUPP;
-> >> +            put_page(page[0]);
-> >>      }
-> >
-> > AFAIK this chunk is redundant now as it is some hack to emulate
-> > FOLL_LONGTERM? So vmas can be deleted too.
+> This check is unnecessary as x86 update_cr8_intercept() which calls
+> this VMX/SVM specific callback already performs this check.
 >
-> Let me first make sure I understand what Dan has in mind for the vma
-> checking, in the other thread...
-
-It's not redundant relative to upstream which does not do anything the
-FOLL_LONGTERM in the gup-slow path... but I have not looked at patches
-1-7 to see if something there made it redundant.
+> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
