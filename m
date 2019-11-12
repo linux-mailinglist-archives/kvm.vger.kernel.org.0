@@ -2,120 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0FA1F9CE9
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:23:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29B5FF9CF5
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:24:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726962AbfKLWXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 17:23:19 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44746 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726896AbfKLWXT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:23:19 -0500
-Received: by mail-io1-f67.google.com with SMTP id j20so131142ioo.11
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 14:23:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kbZ0FLEIJqgDx32ZuWy0vmHvCIKwfGbPT6f4crP6il4=;
-        b=CeWVqyPzHeOhROoKK0J3Fdo/f76ed5+fmpKwaBgWiZqVDAbXxMQAHBc3Lfxh1AIiyM
-         lFLjI4oOwsKRwzX8bvRIYMTnj8UYpVCVYjvPJynCVVewHryQND+dBS3jEvMe1RjlsY0/
-         yPMQH9sjPQUBRYEdl24nXBlrj4Q5Q5SujTGHbgOQD8mhO5GJ+j/N9zffO7A1z/+25RJl
-         9OX4jcRNIuNaWo5wrV9aWpuLDKUGRZnRAqNfpv0/x23e4cwxKJ1ogN1wpi6RbyriQCop
-         a9HuGZZG7JzYy67xTdUTIVmhOtCoNvaQUd+Sv+zmTUGfTz/M1NYwcCdYWshj+QF489ON
-         TBsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kbZ0FLEIJqgDx32ZuWy0vmHvCIKwfGbPT6f4crP6il4=;
-        b=gL+aDjGRR/RkzNucj+WVnFY8J8hIFuIqkGFWqs8KiDk6SnlGwJJw1hTMOb1BlcgHqn
-         iQQ6DRf+vrih2EakGtIYrc1xN221OCbHRSihepIJvr0D+s4dXWgx7H4+NgS0tA/aImf3
-         Ivtc2spc0b74Et5bRXH4c7t+3QxrhTCSFOJ3sIWl2/TWcxKJpX17hnhY72jmVEr+4llm
-         18W72qr3qgCu5u1KJcdHtKU2aRNCA8/M7O0+y/4hPQARWx5jp0TyH63+nchXf8j1rFmU
-         qVABR/YVU0UvIiZMiYg2bp2toIe8+wvWzmqZb/O9Weg8tBngCJN80lDj3gI+2SHMPW2B
-         3rgQ==
-X-Gm-Message-State: APjAAAXbYV71DK700886eQvWGd+ZH3/NGJw0Uvto5CKpf5Q030mONhPE
-        pxaEOGWzjolj1fw2Halu9XALXZmHQ10T5oWsUAmqwQ==
-X-Google-Smtp-Source: APXvYqypWtcoEAVe1rmRQXFP0GxfFoIz/oTB3CdmlIdpAOChTwJSW+V8HVU26HCt6ORtpz9NYpp10toDfp0GJDhpUzI=
-X-Received: by 2002:a6b:c9ce:: with SMTP id z197mr315197iof.14.1573597398002;
- Tue, 12 Nov 2019 14:23:18 -0800 (PST)
+        id S1727100AbfKLWYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 17:24:35 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:14583 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726896AbfKLWYe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 17:24:34 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb31200000>; Tue, 12 Nov 2019 14:24:32 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 12 Nov 2019 14:24:33 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 14:24:33 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
+ 2019 22:24:32 +0000
+Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+To:     Dan Williams <dan.j.williams@intel.com>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112000700.3455038-9-jhubbard@nvidia.com>
+ <CAPcyv4hgKEqoxeQJH9R=YiZosvazj308Kk7jJA1NLxJkNenDcQ@mail.gmail.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <471e513c-833f-2f8b-60db-5d9c56a8f766@nvidia.com>
+Date:   Tue, 12 Nov 2019 14:24:32 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-3-brijesh.singh@amd.com>
-In-Reply-To: <20190710201244.25195-3-brijesh.singh@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 12 Nov 2019 14:23:06 -0800
-Message-ID: <CAMkAt6rrwWteTaA4zJO1D3qd12P+8Qa68hjwsSEb+0AVcsjk7A@mail.gmail.com>
-Subject: Re: [PATCH v3 02/11] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAPcyv4hgKEqoxeQJH9R=YiZosvazj308Kk7jJA1NLxJkNenDcQ@mail.gmail.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573597472; bh=UAR1d5GKJU/1KahVmHwOR6A9jK9nwoB3wSa2dPf7qQ0=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=SCx0hF/22GHwsQWIhebJkJWfDE6W1v3w54kBd61ULtK+gIirCeDvEe+mYnEHJgwF3
+         N309YgZ8A546WwB5IQMwcVMEM6bPuxfgNODHVHbvBgEiVWtLyxj0B398vc3JKHqHLW
+         fYVbOfGFayiJTsvTBYUVssA0KXLzsSF47AIiXijFRvt1VZIYNmWsBao0fUMlxfVb9y
+         FK/kGRlw4DPqDT/iEi5HrOqFBttHVHyJMVpOjnpKQsoAEutvLb0R76IcvAhSMz3Te2
+         8LwQjMHLUXqcwuSETUK6U7GZZJxoHzli9rQ73NjcXdAxPWo6WYwRsOMHLimlMGza1W
+         kJHm8uWG9iU5g==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 1:14 PM Singh, Brijesh <brijesh.singh@amd.com> wrote:
+On 11/12/19 1:57 PM, Dan Williams wrote:
+...
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index d864277ea16f..017689b7c32b 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -348,24 +348,20 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>>                 flags |= FOLL_WRITE;
+>>
+>>         down_read(&mm->mmap_sem);
+>> -       if (mm == current->mm) {
+>> -               ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
+>> -                                    vmas);
+>> -       } else {
+>> -               ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
+>> -                                           vmas, NULL);
+>> -               /*
+>> -                * The lifetime of a vaddr_get_pfn() page pin is
+>> -                * userspace-controlled. In the fs-dax case this could
+>> -                * lead to indefinite stalls in filesystem operations.
+>> -                * Disallow attempts to pin fs-dax pages via this
+>> -                * interface.
+>> -                */
+>> -               if (ret > 0 && vma_is_fsdax(vmas[0])) {
+>> -                       ret = -EOPNOTSUPP;
+>> -                       put_page(page[0]);
+>> -               }
+>> +       ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
+>> +                                   page, vmas, NULL);
+> 
+> Hmm, what's the point of passing FOLL_LONGTERM to
+> get_user_pages_remote() if get_user_pages_remote() is not going to
+> check the vma? I think we got to this code state because the
 
-> +static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +       struct sev_data_send_update_data *data;
-> +       struct kvm_sev_send_update_data params;
-> +       void *hdr = NULL, *trans_data = NULL;
-> +       struct page **guest_page = NULL;
-> +       unsigned long n;
-> +       int ret, offset;
-> +
-> +       if (!sev_guest(kvm))
-> +               return -ENOTTY;
-> +
-> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +                       sizeof(struct kvm_sev_send_update_data)))
-> +               return -EFAULT;
-> +
-> +       data = kzalloc(sizeof(*data), GFP_KERNEL);
-> +       if (!data)
-> +               return -ENOMEM;
-> +
-> +       /* userspace wants to query either header or trans length */
-> +       if (!params.trans_len || !params.hdr_len)
-> +               goto cmd;
-> +
-> +       ret = -EINVAL;
-> +       if (!params.trans_uaddr || !params.guest_uaddr ||
-> +           !params.guest_len || !params.hdr_uaddr)
-> +               goto e_free;
-> +
-> +       /* Check if we are crossing the page boundry */
-> +       ret = -EINVAL;
-> +       offset = params.guest_uaddr & (PAGE_SIZE - 1);
-> +       if ((params.guest_len + offset > PAGE_SIZE))
-> +               goto e_free;
-> +
-> +       ret = -ENOMEM;
-> +       hdr = kmalloc(params.hdr_len, GFP_KERNEL);
-> +       if (!hdr)
-> +               goto e_free;
+FOLL_LONGTERM is short-lived in this location, because patch 23 
+("mm/gup: remove support for gup(FOLL_LONGTERM)") removes it, after
+callers are changed over to pin_longterm_pages*().
 
-Should we be checking params.hdr_len against SEV_FW_BLOB_MAX_SIZE?
+So FOLL_LONGTERM is not doing much now, but it is basically a marker for
+"change gup(FOLL_LONGTERM) to pin_longterm_pages()", and patch 18
+actually makes that change.
 
-> +
-> +       data->hdr_address = __psp_pa(hdr);
-> +       data->hdr_len = params.hdr_len;
-> +
-> +       ret = -ENOMEM;
-> +       trans_data = kmalloc(params.trans_len, GFP_KERNEL);
-> +       if (!trans_data)
-> +               goto e_free;
+And then pin_longterm_pages*() is, in turn, a way to mark all the 
+places that need file system and/or user space interactions (layout
+leases, etc), as per "Case 2: RDMA" in the new 
+Documentation/vm/pin_user_pages.rst.
 
-Ditto, should we be checking params.hdr_len against SEV_FW_BLOB_MAX_SIZE?
+> get_user_pages() vs get_user_pages_remote() split predated the
+> introduction of FOLL_LONGTERM.
+
+Yes. And I do want clean this up as I go, so we don't end up with
+stale concepts lingering in gup.c...
+
+> 
+> I think check_vma_flags() should do the ((FOLL_LONGTERM | FOLL_GET) &&
+> vma_is_fsdax()) check and that would also remove the need for
+> __gup_longterm_locked.
+> 
+
+Good idea, but there is still the call to check_and_migrate_cma_pages(), 
+inside __gup_longterm_locked().  So it's a little more involved and
+we can't trivially delete __gup_longterm_locked() yet, right?
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
