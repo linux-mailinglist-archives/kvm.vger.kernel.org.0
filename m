@@ -2,85 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0752F866A
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 02:34:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09E78F8719
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 04:34:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727065AbfKLBep (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Nov 2019 20:34:45 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:34893 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726928AbfKLBep (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Nov 2019 20:34:45 -0500
-Received: by mail-oi1-f193.google.com with SMTP id n16so13352613oig.2;
-        Mon, 11 Nov 2019 17:34:43 -0800 (PST)
+        id S1726932AbfKLDez (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Nov 2019 22:34:55 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36192 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726910AbfKLDez (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Nov 2019 22:34:55 -0500
+Received: by mail-pf1-f193.google.com with SMTP id b19so32067pfd.3
+        for <kvm@vger.kernel.org>; Mon, 11 Nov 2019 19:34:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mez+pVB2aSRl3joTyHwJYr7P2LRTYTKys9tINZyr2/o=;
-        b=nLHGcfjlNdBxuy9OP6XPSYsFhgZMGPmqolg/5EycwX81Ugcx11fDqho6CztizdBIqS
-         MMezND70FGWWDPdNUCRC6L6GZR7lXjBBsQF2KCAVzOErToHOUK/dvFYk625crMVRRei9
-         o9+SSSZJG2IKWoECw9Z7nP/e3ObaU06fq0hCq+Lws+uJJ4qaVDbtAdsKKp1dozrJY8k1
-         7MszZZwapqMNlbPPKJ/56Axu3MaYHHIffKMpjTN8fgycuzCk/TuEpWiUHlm7OwljNLra
-         GhNBtIU/aDlPVq9NLm2NCAg8ssiuQLOKX1opP58suaU37+yrRKwyl5IIzboSVt0J+pZP
-         HT+w==
+        h=from:to:cc:subject:date:message-id;
+        bh=RjB3o0NjWZXINNESvPz4COiSojg7wROs/y6CgxKZ/Pw=;
+        b=Ar5AXk2psvjukJXi6gdH+xtvXmPp9uIXKwTYX28+pv4edMenYVt2Q9cSx6Sir1B8To
+         U/Mp7UNwz4u9P6dJcQtjMhdBxKtaekycaC+pbD1ure7q3xluNVB4AY694Wdw5hhbXVnj
+         LCOw7QFIpSTm4GC9WPrTKXscJfsQ5h8EPGAgNsqrxdBSfO9qYez338FgkBWHcDsFytET
+         4/fJcb2Qp8DPFg75MLd5Ed36cVo8VjZ3GhwtHY9VWQHzYNHgzp95trzk4oApjEOf1+Sv
+         GdWYuiYl0LWZalpZUzwibW2heGA4Ks6Bn4tUENTyBrSlyKKZ4H+7oZX0er/id3Ug2alL
+         KMqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mez+pVB2aSRl3joTyHwJYr7P2LRTYTKys9tINZyr2/o=;
-        b=Kv3Lgl+txiRkiolHhZ362RME+AGLHRjxiuoh8TBpvFqLY6nG9DgvtZA89NhqYQt7q8
-         65V3bsB4U0pLeGdEur6AJ9D/x8LTMQybeWtqoGjcR9XSNssZAVL8fTJEwxOaPlLkLvLa
-         ktdwbOoIq+VAPtkWlgebCMVnHL4Zn+BasSjUFB9SuFqUEwrJWvxryaygB4YDdXYZZ1wI
-         /7y92kqE/Z60g/8cZwjeYS63+Gm8eOW8qgnLCaqtUhol0zxUhpL2gsJIN6ROjxHU1yg7
-         og1vPbt2YCmykP9c2bq6S1qIh3m/ACHLXuTJ/MaIVbRjw1tMzxEd9fJ1/g7pUDZ29Sx5
-         G+7w==
-X-Gm-Message-State: APjAAAXJWGM/dtb5xU5JR5vm2j2TBo4LIiGg/sDeinIXd9GVs8T0oTuz
-        cC4Iv81pYuZf8G0eGiHCR1cSzG4YRObN3Mf0bKBWzg==
-X-Google-Smtp-Source: APXvYqwJ3B/cGGQ6QoFrMaYL6Rg2bBM5c8aoJ9Ym8QZ5I3Y/0F6FYh3ltg2Nnu9FWl0BwsBMtMJamH/b5tRnnsQZi6U=
-X-Received: by 2002:aca:5015:: with SMTP id e21mr1803688oib.174.1573522483255;
- Mon, 11 Nov 2019 17:34:43 -0800 (PST)
-MIME-Version: 1.0
-References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com>
- <1573283135-5502-2-git-send-email-wanpengli@tencent.com> <7a526814-c44e-c188-fba4-c6fb97b88b71@redhat.com>
-In-Reply-To: <7a526814-c44e-c188-fba4-c6fb97b88b71@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 12 Nov 2019 09:34:34 +0800
-Message-ID: <CANRm+CyeH_qNs2oJPVT4Lnw9VB-+86QkLiLVy25OtK=k44CBsg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: LAPIC: micro-optimize fixed mode ipi delivery
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=RjB3o0NjWZXINNESvPz4COiSojg7wROs/y6CgxKZ/Pw=;
+        b=h4EHiGUUYiOyOK+E+krC5IS4F/Tb3fWcRiBvlz09zFAWeCGjov5PggVDoBYla0FtRv
+         cWzGgRReXQDNt69Ahhr1HBIn7CsXGQkJeiu1Y6wXN3biFfYQqBEGgo/BjPsDyvhCAGXn
+         quYLbseMm3x0ebxr35GHZCL2+VEUArvBg9IUJt+lLcDkx0+gNWAgrF9pqPUMcu/MfbaC
+         8RX6ymjOcwvoNtv17JeLxzZa7pHYnCcbmqtT3MJP8yx1bPeCMGGB0Ku03I8/0Q1BGlx9
+         EY2EkJ4/GEDCZGfw7c4csHib9KRIjiXBROqqLXydoLy4bBBcMGedDkK39ZBquZXRaEma
+         tEqg==
+X-Gm-Message-State: APjAAAXaJtXL7EyYE5ju/mdPqUd1khwcGW2M6jLR0w6k88N0H6KobVoF
+        lsUgN4b9FSWaLRl81b/bdqk=
+X-Google-Smtp-Source: APXvYqxm3G75qyaUjRQQIkPwyZGO7sh/u2z8W5LqAbtVsVJkIsjXh8sN7kIATp92EqxAESEhDElMYQ==
+X-Received: by 2002:a65:46c1:: with SMTP id n1mr11037437pgr.257.1573529693925;
+        Mon, 11 Nov 2019 19:34:53 -0800 (PST)
+Received: from localhost.corp.microsoft.com ([167.220.255.5])
+        by smtp.googlemail.com with ESMTPSA id f5sm114018pjp.1.2019.11.11.19.34.50
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 11 Nov 2019 19:34:53 -0800 (PST)
+From:   lantianyu1986@gmail.com
+X-Google-Original-From: Tianyu.Lan@microsoft.com
+To:     pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+        mtosatti@redhat.com, rkagan@virtuozzo.com, vkuznets@redhat.com
+Cc:     Tianyu Lan <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+Date:   Tue, 12 Nov 2019 11:34:27 +0800
+Message-Id: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
+X-Mailer: git-send-email 2.14.5
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Nov 2019 at 05:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 09/11/19 08:05, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > After disabling mwait/halt/pause vmexits, RESCHEDULE_VECTOR and
-> > CALL_FUNCTION_SINGLE_VECTOR etc IPI is one of the main remaining
-> > cause of vmexits observed in product environment which can't be
-> > optimized by PV IPIs. This patch is the follow-up on commit
-> > 0e6d242eccdb (KVM: LAPIC: Micro optimize IPI latency), to optimize
-> > redundancy logic before fixed mode ipi is delivered in the fast
-> > path.
-> >
-> > - broadcast handling needs to go slow path, so the delivery mode repair
-> >   can be delayed to before slow path.
->
-> I agree with this part, but is the cost of the irq->shorthand check
-> really measurable?
+From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 
-I can drop the second part for v2.
+Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+Enable direct TLB flush for its guests meaning that TLB
+flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+bypassing KVM in Level 1. Due to the different ABI for hypercall
+parameters between Hyper-V and KVM, KVM capabilities should be
+hidden when enable Hyper-V direct tlb flush otherwise KVM
+hypercalls may be intercepted by Hyper-V. Add new parameter
+"hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+capability status before enabling the feature.
 
-    Wanpeng
+Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+---
+Change since v3:
+       - Fix logic of Hyper-V passthrough mode with direct
+       tlb flush.
+
+Change sicne v2:
+       - Update new feature description and name.
+       - Change failure print log.
+
+Change since v1:
+       - Add direct tlb flush's Hyper-V property and use
+       hv_cpuid_check_and_set() to check the dependency of tlbflush
+       feature.
+       - Make new feature work with Hyper-V passthrough mode.
+---
+ docs/hyperv.txt   | 10 ++++++++++
+ target/i386/cpu.c |  2 ++
+ target/i386/cpu.h |  1 +
+ target/i386/kvm.c | 24 ++++++++++++++++++++++++
+ 4 files changed, 37 insertions(+)
+
+diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+index 8fdf25c829..140a5c7e44 100644
+--- a/docs/hyperv.txt
++++ b/docs/hyperv.txt
+@@ -184,6 +184,16 @@ enabled.
+ 
+ Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+ 
++3.18. hv-direct-tlbflush
++=======================
++Enable direct TLB flush for KVM when it is running as a nested
++hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
++guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
++differences between Hyper-V and KVM hypercalls, L2 guests will not be
++able to issue KVM hypercalls (as those could be mishanled by L0
++Hyper-V), this requires KVM hypervisor signature to be hidden.
++
++Requires: hv-tlbflush, -kvm
+ 
+ 4. Development features
+ ========================
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 44f1bbdcac..7bc7fee512 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
+                       HYPERV_FEAT_IPI, 0),
+     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+                       HYPERV_FEAT_STIMER_DIRECT, 0),
++    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
++                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
+     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+ 
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index eaa5395aa5..3cb105f7d6 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define HYPERV_FEAT_EVMCS               12
+ #define HYPERV_FEAT_IPI                 13
+ #define HYPERV_FEAT_STIMER_DIRECT       14
++#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
+ 
+ #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+ #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 11b9c854b5..43f5cbc3f6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -900,6 +900,10 @@ static struct {
+         },
+         .dependencies = BIT(HYPERV_FEAT_STIMER)
+     },
++    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
++        .desc = "direct paravirtualized TLB flush (hv-direct-tlbflush)",
++        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
++    },
+ };
+ 
+ static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+@@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
+     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
++    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
+ 
+     /* Additional dependencies not covered by kvm_hyperv_properties[] */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+@@ -1243,6 +1248,25 @@ static int hyperv_handle_properties(CPUState *cs,
+         goto free;
+     }
+ 
++    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH)) {
++        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0)) {
++            if (!cpu->hyperv_passthrough) {
++                fprintf(stderr,
++                    "Hyper-V %s is not supported by kernel\n",
++                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
++                return -ENOSYS;
++            }
++
++            cpu->hyperv_features &= ~BIT(HYPERV_FEAT_DIRECT_TLBFLUSH);
++        } else if (cpu->expose_kvm) {
++            fprintf(stderr,
++                "Hyper-V %s requires KVM hypervisor signature "
++                "to be hidden (-kvm).\n",
++                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
++            return -ENOSYS;
++        }
++    }
++
+     if (cpu->hyperv_passthrough) {
+         /* We already copied all feature words from KVM as is */
+         r = cpuid->nent;
+-- 
+2.14.5
+
