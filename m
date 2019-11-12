@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED90CF9C04
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:22:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D284F9BF2
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:21:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727291AbfKLVWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 16:22:19 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38562 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727073AbfKLVVo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 16:21:44 -0500
-Received: by mail-wr1-f65.google.com with SMTP id i12so13256415wro.5;
-        Tue, 12 Nov 2019 13:21:43 -0800 (PST)
+        id S1727142AbfKLVVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 16:21:47 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36214 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727074AbfKLVVq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 16:21:46 -0500
+Received: by mail-wm1-f67.google.com with SMTP id c22so4530546wmd.1;
+        Tue, 12 Nov 2019 13:21:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:subject:date:message-id:in-reply-to:references;
-        bh=sxfWnb04loE+ufYyv1Wnndt+fSb262tNn1S8lwredBU=;
-        b=MSXUxw78HBDlq1p7PiHOSntg0KyQhFOFyMAHC97OUWdgSAlhrN22EXMTgYNKlBZLs5
-         R/pd54nxXTk6mJJ+p5lFmhqDh85P9ATLxUB7PlIkyp7UVccU2XL3DsWw0eeOzcohSsKi
-         z6G4OZjnNF+HHy4Doj1yODDREsUiooUXxTtsepjz3QqAVXJLc96vxVd0f7Uk8Svl/F0e
-         AwoI+B7oxMQl2NWE22xme1V8hMP/2J7Al8kHoIp004/gbLQR6525FHGlbj6GQ4m446Rd
-         KGjFFHOkjQ0TkfwH+yOifNoakVSs6H0+XEAWDxUd9XRFMqVFQrPCTlzrPw3bnnJlBXqX
-         jQvg==
+        bh=a/fp3yIiecFEwiSwSQjkImzwKxVhK2zo5Gvj/r09nJY=;
+        b=mQTnayFh5C7BmNlcfJPLtYQDp3w+P2VcxeG6rb5QcE537EA1FcvaqDb+iQtqFQuJhx
+         QKf/CUefWfdIu1eYQXcXoz808eKigw0k37yDv4UHW0ViCOCGvuq3UzJQAaBEgRDhnuF2
+         RnmEovp2ajcwXrn0G9MFzX/Ot38ZEUuvL5dfXqEFqLCb0xW5rJKfnwVLPUXyzyeyoeqQ
+         /uNBXxY55mvRMfOvlHOTbLiarcO3HDDEMM2AKd1znwoa2xhb/+fH8oXzmUMY5yHX4Jdl
+         AgtEvKM18hxFECJjUfOoyrDanAS3kkmTZPXAB/MRDJW0WKji7xaaNnkPF170n2cRrxgm
+         OPjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:subject:date:message-id
          :in-reply-to:references;
-        bh=sxfWnb04loE+ufYyv1Wnndt+fSb262tNn1S8lwredBU=;
-        b=MP6POC35utP+4YznWm9RIzBXrJyrFtEOrkyJ1vTzokSWZ1FiQThnPfY9NqGeJOMkKX
-         hu5gmcgx6AqpYZ24/Sd82+0M1MMTEFBwTKI2zDvtiTZY22K52PWUBo4PetZLrw0wjDaZ
-         OwpaK4HdAjEAjqtHmg7FmQWVvEpx/X8FEbZw4Kegb/wv5wrecvAZkk/MACl4ZXFi5N+h
-         ilY567LQxTUTPqIkfeobdaGy0lbH3wzD/PSYdjkNcWIOz3q4gtrrJtLV2gh8vcth+1tb
-         5k3suqI+4jroXBgj03uSzrMdve9x3Ul2ULaYJlqG2FcpYdRemei75dWCXy1jEBfLq0hW
-         Vq9g==
-X-Gm-Message-State: APjAAAWW5W/oBv5O6F7JM/rIwaI/AWRyn8xJNfdOrc3eI4t3fBvJSSs+
-        QnUEaMr5Py/A8FP2NWrcixAvX1am
-X-Google-Smtp-Source: APXvYqxaPiuoHfSVC02lyEPNcWNd+rR6mublWqggRhF+2xWQ5wNDaEnyVR7kvUMiM043ibmf6aHU4Q==
-X-Received: by 2002:adf:d18b:: with SMTP id v11mr29233145wrc.308.1573593701550;
-        Tue, 12 Nov 2019 13:21:41 -0800 (PST)
+        bh=a/fp3yIiecFEwiSwSQjkImzwKxVhK2zo5Gvj/r09nJY=;
+        b=eGMmK3wQjMAJerPFhbUXa4Apvl7CjWtBd8XzQZ1ARHdUM7DUqaIs4mwrI/gFRAKFeE
+         mKJoLa+sEOjyn0XkeBJB/HRHm8wKnP+Kx1iJOe9GS2X+SpNVhcyBuyGAIwKfeQWND3Jv
+         jqB220CS3Dk9D4tGNy1CadWgS6kvVcYGXl2u4QnovzLb7jDaZG+G/p8JuWe7DIbhcmPd
+         dkmp+VR3CyQpdxI/6eK6KdKSTgMQ9r1eLS42NfgTCQ0SePEY697fs9DXIVyWTsFORc2D
+         aKsOHGpNwlyKVBq5d9QT5k3IJS32ixeHXydwCDkZJUaupsln7N+yYhlwR2gfb/pv7fpV
+         zYBQ==
+X-Gm-Message-State: APjAAAXJ2+yZSrUk+xtCVR08QxMZbtkM1nIpveb+3cRBfdWaaqV1d2KP
+        g3mcVQWQzx7WsnQJUGrOV2nXi9+F
+X-Google-Smtp-Source: APXvYqwR5ZPlPj7BLFraOslBnxRHvlHpsxa6AGcIqKyGLJq6nLiKSy2dUl63xhCMALgT2t/z9XnmVg==
+X-Received: by 2002:a1c:b404:: with SMTP id d4mr6284702wmf.9.1573593702780;
+        Tue, 12 Nov 2019 13:21:42 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id q25sm198664wra.3.2019.11.12.13.21.40
+        by smtp.gmail.com with ESMTPSA id q25sm198664wra.3.2019.11.12.13.21.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Nov 2019 13:21:40 -0800 (PST)
+        Tue, 12 Nov 2019 13:21:41 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 3/7] cpu/speculation: Uninline and export CPU mitigations helpers
-Date:   Tue, 12 Nov 2019 22:21:33 +0100
-Message-Id: <1573593697-25061-4-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 4/7] kvm: mmu: ITLB_MULTIHIT mitigation
+Date:   Tue, 12 Nov 2019 22:21:34 +0100
+Message-Id: <1573593697-25061-5-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
 References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
@@ -56,103 +56,502 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tyler Hicks <tyhicks@canonical.com>
+With some Intel processors, putting the same virtual address in the TLB
+as both a 4 KiB and 2 MiB page can confuse the instruction fetch unit
+and cause the processor to issue a machine check resulting in a CPU lockup.
 
-A kernel module may need to check the value of the "mitigations=" kernel
-command line parameter as part of its setup when the module needs
-to perform software mitigations for a CPU flaw.
+Unfortunately when EPT page tables use huge pages, it is possible for a
+malicious guest to cause this situation.
 
-Uninline and export the helper functions surrounding the cpu_mitigations
-enum to allow for their usage from a module.
+Add a knob to mark huge pages as non-executable. When the nx_huge_pages
+parameter is enabled (and we are using EPT), all huge pages are marked as
+NX. If the guest attempts to execute in one of those pages, the page is
+broken down into 4K pages, which are then marked executable.
 
-Lastly, privatize the enum and cpu_mitigations variable since the value of
-cpu_mitigations can be checked with the exported helper functions.
+This is not an issue for shadow paging (except nested EPT), because then
+the host is in control of TLB flushes and the problematic situation cannot
+happen.  With nested EPT, again the nested guest can cause problems shadow
+and direct EPT is treated in the same way.
 
-Signed-off-by: Tyler Hicks <tyhicks@canonical.com>
+[ tglx: Fixup default to auto and massage wording a bit ]
+
+Originally-by: Junaid Shahid <junaids@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- include/linux/cpu.h | 25 ++-----------------------
- kernel/cpu.c        | 27 ++++++++++++++++++++++++++-
- 2 files changed, 28 insertions(+), 24 deletions(-)
+ Documentation/admin-guide/kernel-parameters.txt |  19 ++++
+ arch/x86/include/asm/kvm_host.h                 |   2 +
+ arch/x86/kernel/cpu/bugs.c                      |  13 ++-
+ arch/x86/kvm/mmu.c                              | 141 +++++++++++++++++++++++-
+ arch/x86/kvm/paging_tmpl.h                      |  29 ++++-
+ arch/x86/kvm/x86.c                              |   9 ++
+ 6 files changed, 200 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/cpu.h b/include/linux/cpu.h
-index 2a093434e975..bc6c879bd110 100644
---- a/include/linux/cpu.h
-+++ b/include/linux/cpu.h
-@@ -218,28 +218,7 @@ static inline void cpu_smt_check_topology(void) { }
- static inline int cpuhp_smt_disable(enum cpuhp_smt_control ctrlval) { return 0; }
- #endif
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index fa8f03ddff24..9d5f123cc218 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2055,6 +2055,19 @@
+ 			KVM MMU at runtime.
+ 			Default is 0 (off)
  
--/*
-- * These are used for a global "mitigations=" cmdline option for toggling
-- * optional CPU mitigations.
-- */
--enum cpu_mitigations {
--	CPU_MITIGATIONS_OFF,
--	CPU_MITIGATIONS_AUTO,
--	CPU_MITIGATIONS_AUTO_NOSMT,
--};
--
--extern enum cpu_mitigations cpu_mitigations;
--
--/* mitigations=off */
--static inline bool cpu_mitigations_off(void)
--{
--	return cpu_mitigations == CPU_MITIGATIONS_OFF;
--}
--
--/* mitigations=auto,nosmt */
--static inline bool cpu_mitigations_auto_nosmt(void)
--{
--	return cpu_mitigations == CPU_MITIGATIONS_AUTO_NOSMT;
--}
-+extern bool cpu_mitigations_off(void);
-+extern bool cpu_mitigations_auto_nosmt(void);
++	kvm.nx_huge_pages=
++			[KVM] Controls the software workaround for the
++			X86_BUG_ITLB_MULTIHIT bug.
++			force	: Always deploy workaround.
++			off	: Never deploy workaround.
++			auto    : Deploy workaround based on the presence of
++				  X86_BUG_ITLB_MULTIHIT.
++
++			Default is 'auto'.
++
++			If the software workaround is enabled for the host,
++			guests do need not to enable it for nested guests.
++
+ 	kvm-amd.nested=	[KVM,AMD] Allow nested virtualization in KVM/SVM.
+ 			Default is 1 (enabled)
  
- #endif /* _LINUX_CPU_H_ */
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index fc28e17940e0..e2cad3ee2ead 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -2373,7 +2373,18 @@ void __init boot_cpu_hotplug_init(void)
- 	this_cpu_write(cpuhp_state.state, CPUHP_ONLINE);
+@@ -2637,6 +2650,12 @@
+ 					       l1tf=off [X86]
+ 					       mds=off [X86]
+ 					       tsx_async_abort=off [X86]
++					       kvm.nx_huge_pages=off [X86]
++
++				Exceptions:
++					       This does not have any effect on
++					       kvm.nx_huge_pages when
++					       kvm.nx_huge_pages=force.
+ 
+ 			auto (default)
+ 				Mitigate all CPU vulnerabilities, but leave SMT
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 24d6598dea29..a37b03483b66 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -315,6 +315,7 @@ struct kvm_mmu_page {
+ 	bool unsync;
+ 	u8 mmu_valid_gen;
+ 	bool mmio_cached;
++	bool lpage_disallowed; /* Can't be replaced by an equiv large page */
+ 
+ 	/*
+ 	 * The following two entries are used to key the shadow page in the
+@@ -946,6 +947,7 @@ struct kvm_vm_stat {
+ 	ulong mmu_unsync;
+ 	ulong remote_tlb_flush;
+ 	ulong lpages;
++	ulong nx_lpage_splits;
+ 	ulong max_mmu_page_hash_collisions;
+ };
+ 
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 5364beda8c61..850005590167 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -1257,6 +1257,9 @@ void x86_spec_ctrl_setup_ap(void)
+ 		x86_amd_ssb_disable();
  }
  
--enum cpu_mitigations cpu_mitigations __ro_after_init = CPU_MITIGATIONS_AUTO;
-+/*
-+ * These are used for a global "mitigations=" cmdline option for toggling
-+ * optional CPU mitigations.
-+ */
-+enum cpu_mitigations {
-+	CPU_MITIGATIONS_OFF,
-+	CPU_MITIGATIONS_AUTO,
-+	CPU_MITIGATIONS_AUTO_NOSMT,
++bool itlb_multihit_kvm_mitigation;
++EXPORT_SYMBOL_GPL(itlb_multihit_kvm_mitigation);
++
+ #undef pr_fmt
+ #define pr_fmt(fmt)	"L1TF: " fmt
+ 
+@@ -1412,17 +1415,25 @@ static ssize_t l1tf_show_state(char *buf)
+ 		       l1tf_vmx_states[l1tf_vmx_mitigation],
+ 		       sched_smt_active() ? "vulnerable" : "disabled");
+ }
++
++static ssize_t itlb_multihit_show_state(char *buf)
++{
++	if (itlb_multihit_kvm_mitigation)
++		return sprintf(buf, "KVM: Mitigation: Split huge pages\n");
++	else
++		return sprintf(buf, "KVM: Vulnerable\n");
++}
+ #else
+ static ssize_t l1tf_show_state(char *buf)
+ {
+ 	return sprintf(buf, "%s\n", L1TF_DEFAULT_MSG);
+ }
+-#endif
+ 
+ static ssize_t itlb_multihit_show_state(char *buf)
+ {
+ 	return sprintf(buf, "Processor vulnerable\n");
+ }
++#endif
+ 
+ static ssize_t mds_show_state(char *buf)
+ {
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 24c23c66b226..bedf6864b092 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -47,6 +47,20 @@
+ #include <asm/kvm_page_track.h>
+ #include "trace.h"
+ 
++extern bool itlb_multihit_kvm_mitigation;
++
++static int __read_mostly nx_huge_pages = -1;
++
++static int set_nx_huge_pages(const char *val, const struct kernel_param *kp);
++
++static struct kernel_param_ops nx_huge_pages_ops = {
++	.set = set_nx_huge_pages,
++	.get = param_get_bool,
 +};
 +
-+static enum cpu_mitigations cpu_mitigations __ro_after_init =
-+	CPU_MITIGATIONS_AUTO;
- 
- static int __init mitigations_parse_cmdline(char *arg)
- {
-@@ -2390,3 +2401,17 @@ static int __init mitigations_parse_cmdline(char *arg)
- 	return 0;
++module_param_cb(nx_huge_pages, &nx_huge_pages_ops, &nx_huge_pages, 0644);
++__MODULE_PARM_TYPE(nx_huge_pages, "bool");
++
+ /*
+  * When setting this variable to true it enables Two-Dimensional-Paging
+  * where the hardware walks 2 page tables:
+@@ -352,6 +366,11 @@ static inline bool spte_ad_need_write_protect(u64 spte)
+ 	return (spte & SPTE_SPECIAL_MASK) != SPTE_AD_ENABLED_MASK;
  }
- early_param("mitigations", mitigations_parse_cmdline);
-+
-+/* mitigations=off */
-+bool cpu_mitigations_off(void)
+ 
++static bool is_nx_huge_page_enabled(void)
 +{
-+	return cpu_mitigations == CPU_MITIGATIONS_OFF;
++	return READ_ONCE(nx_huge_pages);
 +}
-+EXPORT_SYMBOL_GPL(cpu_mitigations_off);
 +
-+/* mitigations=auto,nosmt */
-+bool cpu_mitigations_auto_nosmt(void)
+ static inline u64 spte_shadow_accessed_mask(u64 spte)
+ {
+ 	MMU_WARN_ON(is_mmio_spte(spte));
+@@ -1190,6 +1209,15 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	kvm_mmu_gfn_disallow_lpage(slot, gfn);
+ }
+ 
++static void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
 +{
-+	return cpu_mitigations == CPU_MITIGATIONS_AUTO_NOSMT;
++	if (sp->lpage_disallowed)
++		return;
++
++	++kvm->stat.nx_lpage_splits;
++	sp->lpage_disallowed = true;
 +}
-+EXPORT_SYMBOL_GPL(cpu_mitigations_auto_nosmt);
++
+ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	struct kvm_memslots *slots;
+@@ -1207,6 +1235,12 @@ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	kvm_mmu_gfn_allow_lpage(slot, gfn);
+ }
+ 
++static void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
++{
++	--kvm->stat.nx_lpage_splits;
++	sp->lpage_disallowed = false;
++}
++
+ static bool __mmu_gfn_lpage_is_disallowed(gfn_t gfn, int level,
+ 					  struct kvm_memory_slot *slot)
+ {
+@@ -2792,6 +2826,9 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
+ 			kvm_reload_remote_mmus(kvm);
+ 	}
+ 
++	if (sp->lpage_disallowed)
++		unaccount_huge_nx_page(kvm, sp);
++
+ 	sp->role.invalid = 1;
+ 	return list_unstable;
+ }
+@@ -3013,6 +3050,11 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 	if (!speculative)
+ 		spte |= spte_shadow_accessed_mask(spte);
+ 
++	if (level > PT_PAGE_TABLE_LEVEL && (pte_access & ACC_EXEC_MASK) &&
++	    is_nx_huge_page_enabled()) {
++		pte_access &= ~ACC_EXEC_MASK;
++	}
++
+ 	if (pte_access & ACC_EXEC_MASK)
+ 		spte |= shadow_x_mask;
+ 	else
+@@ -3233,9 +3275,32 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+ 	__direct_pte_prefetch(vcpu, sp, sptep);
+ }
+ 
++static void disallowed_hugepage_adjust(struct kvm_shadow_walk_iterator it,
++				       gfn_t gfn, kvm_pfn_t *pfnp, int *levelp)
++{
++	int level = *levelp;
++	u64 spte = *it.sptep;
++
++	if (it.level == level && level > PT_PAGE_TABLE_LEVEL &&
++	    is_nx_huge_page_enabled() &&
++	    is_shadow_present_pte(spte) &&
++	    !is_large_pte(spte)) {
++		/*
++		 * A small SPTE exists for this pfn, but FNAME(fetch)
++		 * and __direct_map would like to create a large PTE
++		 * instead: just force them to go down another level,
++		 * patching back for them into pfn the next 9 bits of
++		 * the address.
++		 */
++		u64 page_mask = KVM_PAGES_PER_HPAGE(level) - KVM_PAGES_PER_HPAGE(level - 1);
++		*pfnp |= gfn & page_mask;
++		(*levelp)--;
++	}
++}
++
+ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 			int map_writable, int level, kvm_pfn_t pfn,
+-			bool prefault)
++			bool prefault, bool lpage_disallowed)
+ {
+ 	struct kvm_shadow_walk_iterator it;
+ 	struct kvm_mmu_page *sp;
+@@ -3248,6 +3313,12 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 
+ 	trace_kvm_mmu_spte_requested(gpa, level, pfn);
+ 	for_each_shadow_entry(vcpu, gpa, it) {
++		/*
++		 * We cannot overwrite existing page tables with an NX
++		 * large page, as the leaf could be executable.
++		 */
++		disallowed_hugepage_adjust(it, gfn, &pfn, &level);
++
+ 		base_gfn = gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
+ 		if (it.level == level)
+ 			break;
+@@ -3258,6 +3329,8 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 					      it.level - 1, true, ACC_ALL);
+ 
+ 			link_shadow_page(vcpu, it.sptep, sp);
++			if (lpage_disallowed)
++				account_huge_nx_page(vcpu->kvm, sp);
+ 		}
+ 	}
+ 
+@@ -3550,11 +3623,14 @@ static int nonpaging_map(struct kvm_vcpu *vcpu, gva_t v, u32 error_code,
+ {
+ 	int r;
+ 	int level;
+-	bool force_pt_level = false;
++	bool force_pt_level;
+ 	kvm_pfn_t pfn;
+ 	unsigned long mmu_seq;
+ 	bool map_writable, write = error_code & PFERR_WRITE_MASK;
++	bool lpage_disallowed = (error_code & PFERR_FETCH_MASK) &&
++				is_nx_huge_page_enabled();
+ 
++	force_pt_level = lpage_disallowed;
+ 	level = mapping_level(vcpu, gfn, &force_pt_level);
+ 	if (likely(!force_pt_level)) {
+ 		/*
+@@ -3588,7 +3664,8 @@ static int nonpaging_map(struct kvm_vcpu *vcpu, gva_t v, u32 error_code,
+ 		goto out_unlock;
+ 	if (likely(!force_pt_level))
+ 		transparent_hugepage_adjust(vcpu, gfn, &pfn, &level);
+-	r = __direct_map(vcpu, v, write, map_writable, level, pfn, prefault);
++	r = __direct_map(vcpu, v, write, map_writable, level, pfn,
++			 prefault, false);
+ out_unlock:
+ 	spin_unlock(&vcpu->kvm->mmu_lock);
+ 	kvm_release_pfn_clean(pfn);
+@@ -4174,6 +4251,8 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
+ 	unsigned long mmu_seq;
+ 	int write = error_code & PFERR_WRITE_MASK;
+ 	bool map_writable;
++	bool lpage_disallowed = (error_code & PFERR_FETCH_MASK) &&
++				is_nx_huge_page_enabled();
+ 
+ 	MMU_WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa));
+ 
+@@ -4184,8 +4263,9 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
+ 	if (r)
+ 		return r;
+ 
+-	force_pt_level = !check_hugepage_cache_consistency(vcpu, gfn,
+-							   PT_DIRECTORY_LEVEL);
++	force_pt_level =
++		lpage_disallowed ||
++		!check_hugepage_cache_consistency(vcpu, gfn, PT_DIRECTORY_LEVEL);
+ 	level = mapping_level(vcpu, gfn, &force_pt_level);
+ 	if (likely(!force_pt_level)) {
+ 		if (level > PT_DIRECTORY_LEVEL &&
+@@ -4214,7 +4294,8 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
+ 		goto out_unlock;
+ 	if (likely(!force_pt_level))
+ 		transparent_hugepage_adjust(vcpu, gfn, &pfn, &level);
+-	r = __direct_map(vcpu, gpa, write, map_writable, level, pfn, prefault);
++	r = __direct_map(vcpu, gpa, write, map_writable, level, pfn,
++			 prefault, lpage_disallowed);
+ out_unlock:
+ 	spin_unlock(&vcpu->kvm->mmu_lock);
+ 	kvm_release_pfn_clean(pfn);
+@@ -6155,10 +6236,58 @@ static void kvm_set_mmio_spte_mask(void)
+ 	kvm_mmu_set_mmio_spte_mask(mask, mask, ACC_WRITE_MASK | ACC_USER_MASK);
+ }
+ 
++static bool get_nx_auto_mode(void)
++{
++	/* Return true when CPU has the bug, and mitigations are ON */
++	return boot_cpu_has_bug(X86_BUG_ITLB_MULTIHIT) && !cpu_mitigations_off();
++}
++
++static void __set_nx_huge_pages(bool val)
++{
++	nx_huge_pages = itlb_multihit_kvm_mitigation = val;
++}
++
++static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
++{
++	bool old_val = nx_huge_pages;
++	bool new_val;
++
++	/* In "auto" mode deploy workaround only if CPU has the bug. */
++	if (sysfs_streq(val, "off"))
++		new_val = 0;
++	else if (sysfs_streq(val, "force"))
++		new_val = 1;
++	else if (sysfs_streq(val, "auto"))
++		new_val = get_nx_auto_mode();
++	else if (strtobool(val, &new_val) < 0)
++		return -EINVAL;
++
++	__set_nx_huge_pages(new_val);
++
++	if (new_val != old_val) {
++		struct kvm *kvm;
++		int idx;
++
++		mutex_lock(&kvm_lock);
++
++		list_for_each_entry(kvm, &vm_list, vm_list) {
++			idx = srcu_read_lock(&kvm->srcu);
++			kvm_mmu_zap_all_fast(kvm);
++			srcu_read_unlock(&kvm->srcu, idx);
++		}
++		mutex_unlock(&kvm_lock);
++	}
++
++	return 0;
++}
++
+ int kvm_mmu_module_init(void)
+ {
+ 	int ret = -ENOMEM;
+ 
++	if (nx_huge_pages == -1)
++		__set_nx_huge_pages(get_nx_auto_mode());
++
+ 	/*
+ 	 * MMU roles use union aliasing which is, generally speaking, an
+ 	 * undefined behavior. However, we supposedly know how compilers behave
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
+index 7d5cdb3af594..97b21e7fd013 100644
+--- a/arch/x86/kvm/paging_tmpl.h
++++ b/arch/x86/kvm/paging_tmpl.h
+@@ -614,13 +614,14 @@ static void FNAME(pte_prefetch)(struct kvm_vcpu *vcpu, struct guest_walker *gw,
+ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
+ 			 struct guest_walker *gw,
+ 			 int write_fault, int hlevel,
+-			 kvm_pfn_t pfn, bool map_writable, bool prefault)
++			 kvm_pfn_t pfn, bool map_writable, bool prefault,
++			 bool lpage_disallowed)
+ {
+ 	struct kvm_mmu_page *sp = NULL;
+ 	struct kvm_shadow_walk_iterator it;
+ 	unsigned direct_access, access = gw->pt_access;
+ 	int top_level, ret;
+-	gfn_t base_gfn;
++	gfn_t gfn, base_gfn;
+ 
+ 	direct_access = gw->pte_access;
+ 
+@@ -665,13 +666,25 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
+ 			link_shadow_page(vcpu, it.sptep, sp);
+ 	}
+ 
+-	base_gfn = gw->gfn;
++	/*
++	 * FNAME(page_fault) might have clobbered the bottom bits of
++	 * gw->gfn, restore them from the virtual address.
++	 */
++	gfn = gw->gfn | ((addr & PT_LVL_OFFSET_MASK(gw->level)) >> PAGE_SHIFT);
++	base_gfn = gfn;
+ 
+ 	trace_kvm_mmu_spte_requested(addr, gw->level, pfn);
+ 
+ 	for (; shadow_walk_okay(&it); shadow_walk_next(&it)) {
+ 		clear_sp_write_flooding_count(it.sptep);
+-		base_gfn = gw->gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
++
++		/*
++		 * We cannot overwrite existing page tables with an NX
++		 * large page, as the leaf could be executable.
++		 */
++		disallowed_hugepage_adjust(it, gfn, &pfn, &hlevel);
++
++		base_gfn = gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
+ 		if (it.level == hlevel)
+ 			break;
+ 
+@@ -683,6 +696,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
+ 			sp = kvm_mmu_get_page(vcpu, base_gfn, addr,
+ 					      it.level - 1, true, direct_access);
+ 			link_shadow_page(vcpu, it.sptep, sp);
++			if (lpage_disallowed)
++				account_huge_nx_page(vcpu->kvm, sp);
+ 		}
+ 	}
+ 
+@@ -759,9 +774,11 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gva_t addr, u32 error_code,
+ 	int r;
+ 	kvm_pfn_t pfn;
+ 	int level = PT_PAGE_TABLE_LEVEL;
+-	bool force_pt_level = false;
+ 	unsigned long mmu_seq;
+ 	bool map_writable, is_self_change_mapping;
++	bool lpage_disallowed = (error_code & PFERR_FETCH_MASK) &&
++				is_nx_huge_page_enabled();
++	bool force_pt_level = lpage_disallowed;
+ 
+ 	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
+ 
+@@ -851,7 +868,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gva_t addr, u32 error_code,
+ 	if (!force_pt_level)
+ 		transparent_hugepage_adjust(vcpu, walker.gfn, &pfn, &level);
+ 	r = FNAME(fetch)(vcpu, addr, &walker, write_fault,
+-			 level, pfn, map_writable, prefault);
++			 level, pfn, map_writable, prefault, lpage_disallowed);
+ 	kvm_mmu_audit(vcpu, AUDIT_POST_PAGE_FAULT);
+ 
+ out_unlock:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 32d70ca2a7fd..b087d178a774 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -213,6 +213,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	{ "mmu_unsync", VM_STAT(mmu_unsync) },
+ 	{ "remote_tlb_flush", VM_STAT(remote_tlb_flush) },
+ 	{ "largepages", VM_STAT(lpages, .mode = 0444) },
++	{ "nx_largepages_splitted", VM_STAT(nx_lpage_splits, .mode = 0444) },
+ 	{ "max_mmu_page_hash_collisions",
+ 		VM_STAT(max_mmu_page_hash_collisions) },
+ 	{ NULL }
+@@ -1280,6 +1281,14 @@ static u64 kvm_get_arch_capabilities(void)
+ 		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, data);
+ 
+ 	/*
++	 * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
++	 * the nested hypervisor runs with NX huge pages.  If it is not,
++	 * L1 is anyway vulnerable to ITLB_MULTIHIT explots from other
++	 * L1 guests, so it need not worry about its own (L2) guests.
++	 */
++	data |= ARCH_CAP_PSCHANGE_MC_NO;
++
++	/*
+ 	 * If we're doing cache flushes (either "always" or "cond")
+ 	 * we will do one whenever the guest does a vmlaunch/vmresume.
+ 	 * If an outer hypervisor is doing the cache flush for us
 -- 
 1.8.3.1
 
