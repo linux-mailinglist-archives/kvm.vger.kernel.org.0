@@ -2,160 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 452A9F90EC
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 14:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7019BF9100
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 14:49:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727312AbfKLNpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 08:45:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34092 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725919AbfKLNpi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 08:45:38 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xACDcKkM032457
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 08:45:37 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w7w2jjd8h-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 08:45:37 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 12 Nov 2019 13:45:33 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 12 Nov 2019 13:45:30 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xACDirZn38666688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Nov 2019 13:44:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AE66AE063;
-        Tue, 12 Nov 2019 13:45:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3076AE04D;
-        Tue, 12 Nov 2019 13:45:28 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.131])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 12 Nov 2019 13:45:28 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3] s390x: Load reset psw on diag308 reset
-Date:   Tue, 12 Nov 2019 08:45:26 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <7683adc7-2cd0-1103-d231-8a1577f1e673@redhat.com>
-References: <7683adc7-2cd0-1103-d231-8a1577f1e673@redhat.com>
+        id S1727431AbfKLNtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 08:49:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48752 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726946AbfKLNtY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 08:49:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573566563;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pE+UPzYK/83Xgn5Oal6kD+8qNIvBjohPXIrqziRsjnc=;
+        b=X05+12TrCphJYyq/KdYgZ5CShtMq/BhUgvOQALwSHyJ5hBGzeaQRJEKnhXb8E38b7bjQVZ
+        f5zLRukz5had4NvRtvlAcGindMvPlNUtqtuz9grg0uUGi+AWemyKmSj/Sl/chmRZ2LGskw
+        WzGuqv7/0CydSfG09jyYYsu+FCNIr8Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-s-rOSYUdMzOJ8X686Yd9OQ-1; Tue, 12 Nov 2019 08:49:20 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 121E180B732;
+        Tue, 12 Nov 2019 13:49:19 +0000 (UTC)
+Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E55A28D1E;
+        Tue, 12 Nov 2019 13:49:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 03/17] arm: gic: Provide per-IRQ helper
+ functions
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+References: <20191108144240.204202-1-andre.przywara@arm.com>
+ <20191108144240.204202-4-andre.przywara@arm.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <9ce6a73d-8e37-8144-b65e-b1ba7140dae5@redhat.com>
+Date:   Tue, 12 Nov 2019 14:49:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19111213-0008-0000-0000-0000032E5D21
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111213-0009-0000-0000-00004A4D624F
-Message-Id: <20191112134526.2106-1-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-12_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911120123
+In-Reply-To: <20191108144240.204202-4-andre.przywara@arm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: s-rOSYUdMzOJ8X686Yd9OQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a diag308 subcode 0 CRs will be reset, so we need a PSW mask
-without DAT. Also we need to set the short psw indication to be
-compliant with the architecture.
+Hi Andre
 
-Let's therefore define a reset PSW mask with 64 bit addressing and
-short PSW indication that is compliant with architecture and use it.
+On 11/8/19 3:42 PM, Andre Przywara wrote:
+> A common theme when accessing per-IRQ parameters in the GIC distributor
+> is to set fields of a certain bit width in a range of MMIO registers.
+> Examples are the enabled status (one bit per IRQ), the level/edge
+> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
+>=20
+> Add a generic helper function which is able to mask and set the
+> respective number of bits, given the IRQ number and the MMIO offset.
+> Provide wrappers using this function to easily allow configuring an IRQ.
+>=20
+> For now assume that private IRQ numbers always refer to the current CPU.
+> In a GICv2 accessing the "other" private IRQs is not easily doable (the
+> registers are banked per CPU on the same MMIO address), so we impose the
+> same limitation on GICv3, even though those registers are not banked
+> there anymore.
+>=20
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  lib/arm/asm/gic-v3.h |  1 +
+>  lib/arm/asm/gic.h    |  9 +++++
+>  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 100 insertions(+)
+>=20
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index ed6a5ad..8cfaed1 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -23,6 +23,7 @@
+>  #define GICD_CTLR_ENABLE_G1A=09=09(1U << 1)
+>  #define GICD_CTLR_ENABLE_G1=09=09(1U << 0)
+> =20
+> +#define GICD_IROUTER=09=09=090x6000
+>  #define GICD_PIDR2=09=09=090xffe8
+> =20
+>  /* Re-Distributor registers, offsets from RD_base */
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index 1fc10a0..21cdb58 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -15,6 +15,7 @@
+>  #define GICD_IIDR=09=09=090x0008
+>  #define GICD_IGROUPR=09=09=090x0080
+>  #define GICD_ISENABLER=09=09=090x0100
+> +#define GICD_ICENABLER=09=09=090x0180
+>  #define GICD_ISPENDR=09=09=090x0200
+>  #define GICD_ICPENDR=09=09=090x0280
+>  #define GICD_ISACTIVER=09=09=090x0300
+> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+>  extern void gic_ipi_send_single(int irq, int cpu);
+>  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+> =20
+> +void gic_set_irq_bit(int irq, int offset);
+> +void gic_enable_irq(int irq);
+> +void gic_disable_irq(int irq);
+> +void gic_set_irq_priority(int irq, u8 prio);
+> +void gic_set_irq_target(int irq, int cpu);
+> +void gic_set_irq_group(int irq, int group);
+> +int gic_get_irq_group(int irq);
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_H_ */
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 9430116..cf4e811 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
+t)
+>  =09assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+>  =09gic_common_ops->ipi_send_mask(irq, dest);
+>  }
+> +
+> +enum gic_bit_access {
+> +=09ACCESS_READ,
+> +=09ACCESS_SET,
+> +=09ACCESS_RMW
+> +};
+> +
+> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
+> +=09=09=09      enum gic_bit_access access)
+> +{
+> +=09void *base;
+> +=09int split =3D 32 / bits;
+> +=09int shift =3D (irq % split) * bits;
+> +=09u32 reg, mask =3D ((1U << bits) - 1) << shift;
+> +
+> +=09switch (gic_version()) {
+> +=09case 2:
+> +=09=09base =3D gicv2_dist_base();
+> +=09=09break;
+> +=09case 3:
+> +=09=09if (irq < 32)
+> +=09=09=09base =3D gicv3_sgi_base();
+> +=09=09else
+> +=09=09=09base =3D gicv3_dist_base();
+> +=09=09break;
+> +=09default:
+> +=09=09return 0;
+> +=09}
+> +=09base +=3D offset + (irq / split) * 4;
+> +
+> +=09switch (access) {
+> +=09case ACCESS_READ:
+> +=09=09return (readl(base) & mask) >> shift;
+> +=09case ACCESS_SET:
+> +=09=09reg =3D 0;
+> +=09=09break;
+> +=09case ACCESS_RMW:
+> +=09=09reg =3D readl(base) & ~mask;
+> +=09=09break;
+> +=09}
+> +
+> +=09writel(reg | ((u32)value << shift), base);
+value & mask may be safer
+> +
+> +=09return 0;
+> +}
+> +
+> +void gic_set_irq_bit(int irq, int offset)
+> +{
+> +=09gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
+Why don't we use ACCESS_RMW?
+> +}
+> +
+> +void gic_enable_irq(int irq)
+> +{
+> +=09gic_set_irq_bit(irq, GICD_ISENABLER);
+here we just want to touch one bit and not erase other bits in the word?
+> +}
+> +
+> +void gic_disable_irq(int irq)
+> +{
+> +=09gic_set_irq_bit(irq, GICD_ICENABLER);
+> +}
+> +
+> +void gic_set_irq_priority(int irq, u8 prio)
+> +{
+> +=09gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
+> +}
+> +
+> +void gic_set_irq_target(int irq, int cpu)
+> +{
+> +=09if (irq < 32)
+> +=09=09return;
+> +
+> +=09if (gic_version() =3D=3D 2) {
+> +=09=09gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
+> +=09=09=09=09    ACCESS_RMW);
+> +
+> +=09=09return;
+> +=09}
+> +
+> +=09writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
+> +}
+> +
+> +void gic_set_irq_group(int irq, int group)
+> +{
+> +=09gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
+> +}
+> +
+> +int gic_get_irq_group(int irq)
+> +{
+> +=09return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
+> +}
+>=20
+Thanks
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/asm-offsets.c  |  1 +
- lib/s390x/asm/arch_def.h |  3 ++-
- s390x/cstart64.S         | 24 +++++++++++++++++-------
- 3 files changed, 20 insertions(+), 8 deletions(-)
-
-diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
-index 4b213f8..61d2658 100644
---- a/lib/s390x/asm-offsets.c
-+++ b/lib/s390x/asm-offsets.c
-@@ -58,6 +58,7 @@ int main(void)
- 	OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
- 	OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
- 	OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
-+	OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
- 	OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
- 	OFFSET(GEN_LC_FPRS_SA, lowcore, fprs_sa);
- 	OFFSET(GEN_LC_GRS_SA, lowcore, grs_sa);
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index 07d4e5e..5f034a7 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -79,7 +79,8 @@ struct lowcore {
- 	uint32_t	sw_int_fpc;			/* 0x0300 */
- 	uint8_t		pad_0x0304[0x0308 - 0x0304];	/* 0x0304 */
- 	uint64_t	sw_int_crs[16];			/* 0x0308 */
--	uint8_t		pad_0x0310[0x11b0 - 0x0388];	/* 0x0388 */
-+	struct psw	sw_int_psw;			/* 0x0388 */
-+	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
- 	uint64_t	mcck_ext_sa_addr;		/* 0x11b0 */
- 	uint8_t		pad_0x11b8[0x1200 - 0x11b8];	/* 0x11b8 */
- 	uint64_t	fprs_sa[16];			/* 0x1200 */
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index 4be20fc..86dd4c4 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -126,13 +126,18 @@ memsetxc:
- .globl diag308_load_reset
- diag308_load_reset:
- 	SAVE_REGS
--	/* Save the first PSW word to the IPL PSW */
-+	/* Backup current PSW mask, as we have to restore it on success */
- 	epsw	%r0, %r1
--	st	%r0, 0
--	/* Store the address and the bit for 31 bit addressing */
--	larl    %r0, 0f
--	oilh    %r0, 0x8000
--	st      %r0, 0x4
-+	st	%r0, GEN_LC_SW_INT_PSW
-+	st	%r1, GEN_LC_SW_INT_PSW + 4
-+	/* Load reset psw mask (short psw, 64 bit) */
-+	lg	%r0, reset_psw
-+	/* Load the success label address */
-+	larl    %r1, 0f
-+	/* Or it to the mask */
-+	ogr	%r0, %r1
-+	/* Store it at the reset PSW location (real 0x0) */
-+	stg	%r0, 0
- 	/* Do the reset */
- 	diag    %r0,%r2,0x308
- 	/* Failure path */
-@@ -144,7 +149,10 @@ diag308_load_reset:
- 	lctlg	%c0, %c0, 0(%r1)
- 	RESTORE_REGS
- 	lhi	%r2, 1
--	br	%r14
-+	larl	%r0, 1f
-+	stg	%r0, GEN_LC_SW_INT_PSW + 8
-+	lpswe	GEN_LC_SW_INT_PSW
-+1:	br	%r14
- 
- .globl smp_cpu_setup_state
- smp_cpu_setup_state:
-@@ -184,6 +192,8 @@ svc_int:
- 	lpswe	GEN_LC_SVC_OLD_PSW
- 
- 	.align	8
-+reset_psw:
-+	.quad	0x0008000180000000
- initial_psw:
- 	.quad	0x0000000180000000, clear_bss_start
- pgm_int_psw:
--- 
-2.20.1
+Eric
 
