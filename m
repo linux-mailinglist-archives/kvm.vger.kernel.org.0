@@ -2,105 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3DA8F9B63
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:00:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BED7FF9B84
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:10:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727069AbfKLVAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 16:00:44 -0500
-Received: from ozlabs.org ([203.11.71.1]:38799 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726697AbfKLVAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 16:00:43 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47CKs43JPvz9sNH;
-        Wed, 13 Nov 2019 08:00:40 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1573592440;
-        bh=Fl+cnxImbUdxKiW7FdnzmPITLo/GSGUVAFEIaaL5eo0=;
-        h=Date:From:To:Cc:Subject:From;
-        b=MVzlhpxs4rSOX1QJUEOnQslPQrXJ1R279YUQO/nyPodUDCZYiQgnotS9Te1U5QlvE
-         rkBkppTlI2//CHrmsMnZyhuchJkETC9pz1EtBF6vCJr09TOSpzKB3h9UCdb8rlAnZX
-         8sGd9jeNw4qYY/99JoP4dz31tKgFJ6Rq5rfEJ1WVBLDVEpRnOHpQM4ZYBm4k8z1ezh
-         Z6aMmYQEsScFndpTBk7mkS+sFoKFNQ99f+lWPkdPZnPj95A//O1LNW8MxMLH3eSAGZ
-         h84WtvE3mGGKRePiV6gjsk5pDU+EN7qXwPbrn+q9ivxs5lBy89n14pEjVb86NM6/9U
-         8q7daU8fIDbFQ==
-Date:   Wed, 13 Nov 2019 08:00:27 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Junaid Shahid <junaids@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: linux-next: manual merge of the kvm-fixes tree with Linus' tree
-Message-ID: <20191113080027.7f97187e@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8Xt/mjuISnu+fFn1EoKnuQe";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S1727211AbfKLVKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 16:10:44 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:37006 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726645AbfKLVKk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 16:10:40 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b17so4502182wmj.2;
+        Tue, 12 Nov 2019 13:10:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=ggJ1wueVMuwowaHeTZ0GC3WO2tlvDZKJl8chKJQFPkc=;
+        b=PsrKIWwEywODV7XLDEwnDWYX0V4T9w2Mftx/GcjVlZAbot4zg+JZ5aENMi4bHATIWc
+         K+4tnaZQ8IzUR5NJPcTKw8a7KyfsUckNE3cch77SeAEKeeUYN8lQwVoVNB2oDgtr88Ns
+         kj/Oql8dFfClk1nJfV48ylRaj0VxCDPMhU1DUCCSyPW/8E8IHfgc7sN04kwkoGh412GV
+         r4iJ6bT3p4SEXlnOPqlWigVDQifpMc0FZazQ10KGqcOcz1FbowtAZHtQzK93GsHE7/Ew
+         3I2vF3dEDVDDb1VR7d1Dql87uwiAM7FMwZxJ1tbl5W6NeDBhmZaF6WkRpUp9x64SDujm
+         kxSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=ggJ1wueVMuwowaHeTZ0GC3WO2tlvDZKJl8chKJQFPkc=;
+        b=aT++p+N1IpURCVQoeHI9EvM8J78MAfOPyzOZc0TZ0cCpN78T+1A8fSftlpm9cgSjyA
+         4a41P6FqBgXVd+J2Sl2LhztbH8UQVcFpDWgEZhYVkub9pr5D+O2t3X7sqYMYWoTVuQnJ
+         pufrds2pGaj4gPRFjI05TVUz2OZXWmeR8ssy62cqnXgYiEoqT/R/X0zglmHhySd8lmBL
+         LkwnEw2KZ/TX6jbZM+hmuvvjFgxukb68GDGOgqj/oL7MR5xMusadELbtQgoNek9/X34Q
+         RVjoWRfjHTzhg2Y+J8shoCwhjPOninapvP8beoPRvXg5CJgaYOIj2qVr+5ca4UQoEr94
+         mCqw==
+X-Gm-Message-State: APjAAAW/n6/YlLi1E86rWjksYnCMA5KW0gCozZp6sRhA/Im2kvbAZUit
+        pBPgTitXSCsUhUW+MPHaMY7Bf7eL
+X-Google-Smtp-Source: APXvYqy2aLhqqT/TL0rcyK1Ryn/w/sr+i15tLkfOG5tJp6IP8/oSH50xCw/il6DnUuQ16rUQ5Urj8Q==
+X-Received: by 2002:a1c:9601:: with SMTP id y1mr5613615wmd.157.1573593037942;
+        Tue, 12 Nov 2019 13:10:37 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id p25sm4132624wma.20.2019.11.12.13.10.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 Nov 2019 13:10:37 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] KVM patches for Linux 5.4-rc8
+Date:   Tue, 12 Nov 2019 22:10:36 +0100
+Message-Id: <1573593036-23271-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/8Xt/mjuISnu+fFn1EoKnuQe
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Linus,
 
-Hi all,
+The following changes since commit 31f4f5b495a62c9a8b15b1c3581acd5efeb9af8c:
 
-Today's linux-next merge of the kvm-fixes tree got a conflict in:
+  Linux 5.4-rc7 (2019-11-10 16:17:15 -0800)
 
-  virt/kvm/kvm_main.c
+are available in the git repository at:
 
-between commit:
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-  1aa9b9572b10 ("kvm: x86: mmu: Recovery of shattered NX large pages")
+for you to fetch changes up to a78986aae9b2988f8493f9f65a587ee433e83bc3:
 
-from Linus' tree and commit:
+  KVM: MMU: Do not treat ZONE_DEVICE pages as being reserved (2019-11-12 10:17:42 +0100)
 
-  8a44119a98be ("KVM: Fix NULL-ptr deref after kvm_create_vm fails")
+----------------------------------------------------------------
+Bugfixes: unwinding of KVM_CREATE_VM failure,
+VT-d posted interrupts, DAX/ZONE_DEVICE,
+module unload/reload.
 
-from the kvm-fixes tree.
+----------------------------------------------------------------
 
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
+I delayed sending this until today, because there is a conflict between
+today's processor vulnerability mitigations and commit 8a44119a98be from
+this pull request ("KVM: Fix NULL-ptr deref after kvm_create_vm fails"),
+and I didn't want to mess up your processing of Thomas's pull request.
+It's not a particularly hard conflict, but I'm including anyway a
+resolution at the end of this email.
 
---=20
-Cheers,
-Stephen Rothwell
+Paolo
+
+Chenyi Qiang (1):
+      KVM: X86: Fix initialization of MSR lists
+
+Joao Martins (3):
+      KVM: VMX: Consider PID.PIR to determine if vCPU has pending interrupts
+      KVM: VMX: Do not change PID.NDST when loading a blocked vCPU
+      KVM: VMX: Introduce pi_is_pir_empty() helper
+
+Liran Alon (1):
+      KVM: VMX: Fix comment to specify PID.ON instead of PIR.ON
+
+Paolo Bonzini (2):
+      KVM: Fix NULL-ptr deref after kvm_create_vm fails
+      KVM: fix placement of refcount initialization
+
+Sean Christopherson (1):
+      KVM: MMU: Do not treat ZONE_DEVICE pages as being reserved
+
+ arch/x86/kvm/mmu.c       |  8 +++----
+ arch/x86/kvm/vmx/vmx.c   | 23 +++++++++++++++++---
+ arch/x86/kvm/vmx/vmx.h   | 11 ++++++++++
+ arch/x86/kvm/x86.c       | 56 ++++++++++++++++++++++--------------------------
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 48 +++++++++++++++++++++++++++++------------
+ 6 files changed, 96 insertions(+), 51 deletions(-)
+
+
 
 diff --cc virt/kvm/kvm_main.c
 index 4aab3547a165,0dac149ead16..000000000000
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@@ -693,16 -700,7 +718,11 @@@ static struct kvm *kvm_create_vm(unsign
-  	INIT_HLIST_HEAD(&kvm->irq_ack_notifier_list);
-  #endif
- =20
-- 	if (init_srcu_struct(&kvm->srcu))
-- 		goto out_err_no_srcu;
-- 	if (init_srcu_struct(&kvm->irq_srcu))
-- 		goto out_err_no_irq_srcu;
--=20
-  	r =3D kvm_init_mmu_notifier(kvm);
- +	if (r)
- +		goto out_err_no_mmu_notifier;
- +
- +	r =3D kvm_arch_post_init_vm(kvm);
-  	if (r)
-  		goto out_err;
- =20
 @@@ -715,15 -713,6 +735,11 @@@
   	return kvm;
- =20
+  
   out_err:
  +#if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
  +	if (kvm->mmu_notifier.ops)
@@ -115,20 +134,3 @@ index 4aab3547a165,0dac149ead16..000000000000
   out_err_no_disable:
   	kvm_arch_destroy_vm(kvm);
 
---Sig_/8Xt/mjuISnu+fFn1EoKnuQe
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3LHWsACgkQAVBC80lX
-0GzCPAf/b29ToiuxSPwg8rdX45EO9o3HaaUOIr75goZaHxQ+AikHF38WUH9G7nQf
-gvEOHY35Im8wFMmLXpy+HB/AHAFaUqLegATYyYFnnrYGsZmjC1LtHo/1Ll1RNtpd
-JDjtfTINyD++G2SR1iujUQaVgtth4ysWva3qbMJ9/ytZ26maxRK55Q2lFRJHVKmJ
-jGa5Hqkw44xKGMIfWrqmPpxCGhwS5Q60xwcafuz4Bx9k2dlFG787gHWjolg0ZO/r
-e4T/y5u15jXqtCGNRYIgJgbhgwgLFJl3AXFGkljtste7FFNtynAk6BKyA822IoSp
-CNP0Tei0yRD4G1is1DpDstEqYgIxTQ==
-=jQY5
------END PGP SIGNATURE-----
-
---Sig_/8Xt/mjuISnu+fFn1EoKnuQe--
