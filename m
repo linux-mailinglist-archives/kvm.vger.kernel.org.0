@@ -2,160 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 29B5FF9CF5
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:24:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F9BF9CFE
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:27:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727100AbfKLWYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 17:24:35 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:14583 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726896AbfKLWYe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:24:34 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb31200000>; Tue, 12 Nov 2019 14:24:32 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 14:24:33 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 14:24:33 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
- 2019 22:24:32 +0000
-Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-To:     Dan Williams <dan.j.williams@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
- <20191112000700.3455038-9-jhubbard@nvidia.com>
- <CAPcyv4hgKEqoxeQJH9R=YiZosvazj308Kk7jJA1NLxJkNenDcQ@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <471e513c-833f-2f8b-60db-5d9c56a8f766@nvidia.com>
-Date:   Tue, 12 Nov 2019 14:24:32 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hgKEqoxeQJH9R=YiZosvazj308Kk7jJA1NLxJkNenDcQ@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+        id S1726982AbfKLW1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 17:27:30 -0500
+Received: from mail-eopbgr730044.outbound.protection.outlook.com ([40.107.73.44]:8685
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726906AbfKLW13 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 17:27:29 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=auC0xmbrwqAGUb17N8V440BIqtScRE6FuyX2wucoIAIWs9GAE9zlu0zeb+NG1UlauczT9PApVIO8gAtFvTO9JR4mFji/hLwXkONvHsenXNXGNR1rFzXfnbHD2rGNaDtgufp4jPerevYhsSX+xvyPTQ/wAFIpNqVkI/MqtuRnIrgvuIGflxx5XvAevahuEOTIpzdcPkHqGx26sFbZQy28FGfurinpNPG4hCAQWqZ+ej6MGjX/LPWRqoWexjk/EEWQ0iyQzojrQWm1PmGuEO12tn0JpsLnlsXPBHZ7i7N436TRR2XoE/SI8nIkExv9n0xREex8obxvd7V8YJSZtIgIsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x3en8LjhA7rRRjAvUzhgrqWTqfeLLcFCLAThEK8A6pE=;
+ b=YPbH5T5eHMjWvbPhIfU2LIbK/wnzaiyqJ21bhvPtdy++MlARuOaudIdADfbdQAMJcw66GAlG+bHDXDTaqlaTS9JILIQsnnFG/7zWzL+nmdiN+4Xuh8M6LV8hAdBfw1K0/L0CDzuf9j23yDNPJtBF61igNvVS2vijgxxr82gzp7AX03TlkrNzeL1bfHWauzWiR7ShZIg5Iz1gzTq0659pmHBLegMyorYysmicJiDi1GaBDQXqxyPqopcu2mngWCH8Jsv6qU8QBb9O/xGgFOlAEJWjQO6DpbJK5hOnFh+/YIKWSHlJVB4/LioQm40uWzLNyKrZDrgX69mpl8FPmx5oYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x3en8LjhA7rRRjAvUzhgrqWTqfeLLcFCLAThEK8A6pE=;
+ b=UMFY4LiVeSi1ZDh28e8lzH0dn9VwlJNwJ9FTPXMzxC1R0V8kpAJIsVvLL1od40lQg3Mu547+2AKL0I4SaYjMFdEwkcvDEdRCBL2Arx6Y6j+84iadWMdUn/tnU7RaXYp+xtWVVYym+J1xN57F6+6Limvp36GDjkBHN2wzsG+ivpU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3273.namprd12.prod.outlook.com (20.179.106.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23; Tue, 12 Nov 2019 22:27:25 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::edfa:96b9:b6fd:fbf9]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::edfa:96b9:b6fd:fbf9%7]) with mapi id 15.20.2430.023; Tue, 12 Nov 2019
+ 22:27:25 +0000
+Cc:     brijesh.singh@amd.com, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 01/11] KVM: SVM: Add KVM_SEV SEND_START command
+To:     Peter Gonda <pgonda@google.com>
+References: <20190710201244.25195-1-brijesh.singh@amd.com>
+ <20190710201244.25195-2-brijesh.singh@amd.com>
+ <CAMkAt6pzXrZw1TZgcX-G0wDNZBjf=1bQdErAJTxfzYQ2MJDZvw@mail.gmail.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <4f509f43-a576-144d-efd4-ab0362f1d667@amd.com>
+Date:   Tue, 12 Nov 2019 16:27:25 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.0
+In-Reply-To: <CAMkAt6pzXrZw1TZgcX-G0wDNZBjf=1bQdErAJTxfzYQ2MJDZvw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573597472; bh=UAR1d5GKJU/1KahVmHwOR6A9jK9nwoB3wSa2dPf7qQ0=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=SCx0hF/22GHwsQWIhebJkJWfDE6W1v3w54kBd61ULtK+gIirCeDvEe+mYnEHJgwF3
-         N309YgZ8A546WwB5IQMwcVMEM6bPuxfgNODHVHbvBgEiVWtLyxj0B398vc3JKHqHLW
-         fYVbOfGFayiJTsvTBYUVssA0KXLzsSF47AIiXijFRvt1VZIYNmWsBao0fUMlxfVb9y
-         FK/kGRlw4DPqDT/iEi5HrOqFBttHVHyJMVpOjnpKQsoAEutvLb0R76IcvAhSMz3Te2
-         8LwQjMHLUXqcwuSETUK6U7GZZJxoHzli9rQ73NjcXdAxPWo6WYwRsOMHLimlMGza1W
-         kJHm8uWG9iU5g==
+Content-Language: en-US
+X-ClientProxiedBy: SN6PR15CA0024.namprd15.prod.outlook.com
+ (2603:10b6:805:16::37) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+MIME-Version: 1.0
+X-Originating-IP: [165.204.77.11]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 2da931ce-3147-46f6-a841-08d767bf7e42
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3273:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3273C34557CC02C8CC920E71E5770@DM6PR12MB3273.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 021975AE46
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(376002)(396003)(366004)(346002)(136003)(51914003)(189003)(199004)(4326008)(14454004)(6512007)(6436002)(26005)(99286004)(6246003)(54906003)(11346002)(65806001)(66066001)(25786009)(186003)(36756003)(229853002)(6486002)(14444005)(316002)(65956001)(47776003)(478600001)(58126008)(446003)(3846002)(6116002)(7736002)(305945005)(6916009)(81166006)(81156014)(486006)(31696002)(23676004)(50466002)(86362001)(386003)(2616005)(5660300002)(44832011)(6506007)(7416002)(66556008)(52116002)(53546011)(76176011)(31686004)(2906002)(230700001)(2486003)(8676002)(66476007)(66946007)(476003)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3273;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aYhJABbFZtn5BP84SP3iy1N4Yb+AQwWJsu6A9ZVrwWRNhCBWSHBrm392yvFLb5eGkK8hU5R5D19PATpcOnZCOF9PVPxJXC9ACfR5v7XnmnzIQXfBtst193D3FUmWVo+SQbw7/r1+FIVrmHwJ28TkXr8S7NXunEw5mY3yOF450SbA7Ghy1ByKpWT22FUtcjX7FeyqRz8QDech80JZrHcUhE7B3TRydG/n2+XzhjfgWJebtLYc0WXyvlzdRWEvpnfMuFPkOQuXmQHw2fMsWAOzmKXVs2gNgb6/3xabbjO9Lquf7jcDJjWNTRPtL5ag+d/SrL/Wm44w3VVsJTNl7r/YY2yKmpMOSYuaPUrKDQ72lxMyMXUjZoF7Z/O3czUOZKaGBG1LW6KHrSNUa8X49fqlOQ4tJZrjKZEteJq+9eN0hHFsI0T5F/hyOOyhHIEfokDO
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2da931ce-3147-46f6-a841-08d767bf7e42
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2019 22:27:25.3595
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: A5rkrzIVuXopcD/TZfasG6D4EudKth3BvZEgLFBEfbPnd7fFFYKTjh+nSw/v5cE4manbo5dpIqE6sjdsNkPEnw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3273
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/19 1:57 PM, Dan Williams wrote:
-...
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index d864277ea16f..017689b7c32b 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -348,24 +348,20 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->>                 flags |= FOLL_WRITE;
->>
->>         down_read(&mm->mmap_sem);
->> -       if (mm == current->mm) {
->> -               ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
->> -                                    vmas);
->> -       } else {
->> -               ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
->> -                                           vmas, NULL);
->> -               /*
->> -                * The lifetime of a vaddr_get_pfn() page pin is
->> -                * userspace-controlled. In the fs-dax case this could
->> -                * lead to indefinite stalls in filesystem operations.
->> -                * Disallow attempts to pin fs-dax pages via this
->> -                * interface.
->> -                */
->> -               if (ret > 0 && vma_is_fsdax(vmas[0])) {
->> -                       ret = -EOPNOTSUPP;
->> -                       put_page(page[0]);
->> -               }
->> +       ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
->> +                                   page, vmas, NULL);
-> 
-> Hmm, what's the point of passing FOLL_LONGTERM to
-> get_user_pages_remote() if get_user_pages_remote() is not going to
-> check the vma? I think we got to this code state because the
 
-FOLL_LONGTERM is short-lived in this location, because patch 23 
-("mm/gup: remove support for gup(FOLL_LONGTERM)") removes it, after
-callers are changed over to pin_longterm_pages*().
-
-So FOLL_LONGTERM is not doing much now, but it is basically a marker for
-"change gup(FOLL_LONGTERM) to pin_longterm_pages()", and patch 18
-actually makes that change.
-
-And then pin_longterm_pages*() is, in turn, a way to mark all the 
-places that need file system and/or user space interactions (layout
-leases, etc), as per "Case 2: RDMA" in the new 
-Documentation/vm/pin_user_pages.rst.
-
-> get_user_pages() vs get_user_pages_remote() split predated the
-> introduction of FOLL_LONGTERM.
-
-Yes. And I do want clean this up as I go, so we don't end up with
-stale concepts lingering in gup.c...
-
-> 
-> I think check_vma_flags() should do the ((FOLL_LONGTERM | FOLL_GET) &&
-> vma_is_fsdax()) check and that would also remove the need for
-> __gup_longterm_locked.
-> 
-
-Good idea, but there is still the call to check_and_migrate_cma_pages(), 
-inside __gup_longterm_locked().  So it's a little more involved and
-we can't trivially delete __gup_longterm_locked() yet, right?
+On 11/12/19 12:35 PM, Peter Gonda wrote:
+> On Wed, Jul 10, 2019 at 1:13 PM Singh, Brijesh <brijesh.singh@amd.com> wrote:
+>> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>> +{
+>> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>> +       void *amd_cert = NULL, *session_data = NULL;
+>> +       void *pdh_cert = NULL, *plat_cert = NULL;
+>> +       struct sev_data_send_start *data = NULL;
+>> +       struct kvm_sev_send_start params;
+>> +       int ret;
+>> +
+>> +       if (!sev_guest(kvm))
+>> +               return -ENOTTY;
+>> +
+>> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+>> +                               sizeof(struct kvm_sev_send_start)))
+>> +               return -EFAULT;
+>> +
+>> +       data = kzalloc(sizeof(*data), GFP_KERNEL);
+>> +       if (!data)
+>> +               return -ENOMEM;
+>> +
+>> +       /* userspace wants to query the session length */
+>> +       if (!params.session_len)
+>> +               goto cmd;
+>> +
+>> +       if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
+>> +           !params.session_uaddr)
+>> +               return -EINVAL;
+> I think pdh_cert is only required if the guest policy SEV bit is set.
+> Can pdh_cert be optional?
 
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+We don't cache the policy information in kernel, having said so we can
+try caching it during the LAUNCH_START to optimize this case. I have to
+check with FW folks but I believe all those fields are required. IIRC,
+When I passed NULL then SEND_START failed for me. But I double check it
+and update you on this.
+
+
+>
+>> +
+>> +       /* copy the certificate blobs from userspace */
+>> +       pdh_cert = psp_copy_user_blob(params.pdh_cert_uaddr, params.pdh_cert_len);
+>> +       if (IS_ERR(pdh_cert)) {
+>> +               ret = PTR_ERR(pdh_cert);
+>> +               goto e_free;
+>> +       }
+>> +
+>> +       data->pdh_cert_address = __psp_pa(pdh_cert);
+>> +       data->pdh_cert_len = params.pdh_cert_len;
+>> +
+>> +       plat_cert = psp_copy_user_blob(params.plat_cert_uaddr, params.plat_cert_len);
+>> +       if (IS_ERR(plat_cert)) {
+>> +               ret = PTR_ERR(plat_cert);
+>> +               goto e_free_pdh;
+>> +       }
+> I think plat_cert is also only required if the guest policy SEV bit is
+> set. Can plat_cert also be optional?
+
+
+Same as above, I believe its required.
+
+
+>
+>> +
+>> +       data->plat_cert_address = __psp_pa(plat_cert);
+>> +       data->plat_cert_len = params.plat_cert_len;
+>> +
+>> +       amd_cert = psp_copy_user_blob(params.amd_cert_uaddr, params.amd_cert_len);
+>> +       if (IS_ERR(amd_cert)) {
+>> +               ret = PTR_ERR(amd_cert);
+>> +               goto e_free_plat_cert;
+>> +       }
+> I think amd_cert is also only required if the guest policy SEV bit is
+> set. Can amd_cert also be optional?
+
+
+Same as above, I believe its required. I will double check it.
+
+
+>> +
+>> +       data->amd_cert_address = __psp_pa(amd_cert);
+>> +       data->amd_cert_len = params.amd_cert_len;
+>> +
+>> +       ret = -EINVAL;
+>> +       if (params.session_len > SEV_FW_BLOB_MAX_SIZE)
+>> +               goto e_free_amd_cert;
+>> +
+>> +       ret = -ENOMEM;
+>> +       session_data = kmalloc(params.session_len, GFP_KERNEL);
+>> +       if (!session_data)
+>> +               goto e_free_amd_cert;
+> This pattern of returning -EINVAL if a length is greater than
+> SEV_FW_BLOB_MAX_SIZE and -ENOMEM if kmalloc fails is used at
+> sev_launch_measure. And I think in your later patches you do similar,
+> did you consider factoring this out into a helper function similar to
+> psp_copy_user_blob?
+
+
+Yes, we could factor out this check into a separate function. Let me see
+what I can do in next iteration. thanks for the feedbacks.
+
+-Brijesh
+
