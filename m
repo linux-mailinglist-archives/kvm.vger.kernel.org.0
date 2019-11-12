@@ -2,93 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D58CF8BA9
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 10:26:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C43E8F8BD4
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 10:32:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727308AbfKLJ0M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 04:26:12 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40299 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727058AbfKLJ0M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 04:26:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573550771;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nyz0R0JFcm91sDUPNxPXHhLmYMpB12ASJ5cBmfOUd6o=;
-        b=LduT4gRlFjzWQ/AYQSZxnVdT7cKLP8PgKZghMvJ/Xa2QgCsJoILJJzMc6yG/PtLg0yZihd
-        8CvlRDkLIkhtBzY6Si94taxp72STqjk7qDhBA3MJt8aLgzvvMuWGAEze1+8XSmovbXA60U
-        TVJMYK0+k2xze0c/1GlQpCZEatSRPac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-jlcQUFOLO-Ot6r267mUkDA-1; Tue, 12 Nov 2019 04:26:07 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53DEE91267;
-        Tue, 12 Nov 2019 09:26:06 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B03162671;
-        Tue, 12 Nov 2019 09:26:01 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 1/3] s390x: Fix initial cr0 load
- comments
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com
-References: <20191111153345.22505-1-frankja@linux.ibm.com>
- <20191111153345.22505-2-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <55d20cae-aa91-beec-a7b2-b1145b9983b0@redhat.com>
-Date:   Tue, 12 Nov 2019 10:25:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20191111153345.22505-2-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: jlcQUFOLO-Ot6r267mUkDA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+        id S1727113AbfKLJcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 04:32:04 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56112 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725834AbfKLJcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 04:32:04 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 01:32:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,295,1569308400"; 
+   d="scan'208";a="198017529"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.79])
+  by orsmga008.jf.intel.com with ESMTP; 12 Nov 2019 01:31:59 -0800
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
+        zhiyuan.lv@intel.com, Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [RFC V3 0/2] Intel IFC VF driver for VDPA
+Date:   Tue, 12 Nov 2019 17:29:47 +0800
+Message-Id: <1573550989-40860-1-git-send-email-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/2019 16.33, Janosch Frank wrote:
-> We need to load cr0 to have access to all fprs during save and restore
-> of fprs. Saving conditionally on basis of the CR0 AFP bit would be a
-> pain.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/cstart64.S | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 8e2b21e..043e34a 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -94,7 +94,7 @@ memsetxc:
->  =09stmg=09%r0, %r15, GEN_LC_SW_INT_GRS
->  =09/* save cr0 */
->  =09stctg=09%c0, %c0, GEN_LC_SW_INT_CR0
-> -=09/* load initial cr0 again */
-> +=09/* load a cr0 that has the AFP control bit which enables all FPRs */
->  =09larl=09%r1, initial_cr0
->  =09lctlg=09%c0, %c0, 0(%r1)
->  =09/* save fprs 0-15 + fpc */
-> @@ -139,7 +139,7 @@ diag308_load_reset:
->  =09xgr=09%r2, %r2
->  =09br=09%r14
->  =09/* Success path */
-> -=09/* We lost cr0 due to the reset */
-> +=09/* load a cr0 that has the AFP control bit which enables all FPRs */
->  0:=09larl=09%r1, initial_cr0
->  =09lctlg=09%c0, %c0, 0(%r1)
->  =09RESTORE_REGS
->=20
+Hi all:
+  This series intends to introduce Intel IFC VF NIC driver for Vhost
+Data Plane Acceleration(VDPA).
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Here comes two main parts, one is ifcvf_base layer, which handles
+hardware operations. The other is ifcvf_main layer handles VF
+initialization, configuration and removal, which depends on
+and complys to:
+virtio_mdev https://lkml.org/lkml/2019/11/7/650
+vhost_mdev https://lkml.org/lkml/2019/11/7/62
+
+This patchset passed netperf tests.
+
+This is RFC V3, plese help review.
+
+Changes from V2:
+removed some unnecessary code.
+using a struct ifcvf_lm_cfg to address hw->lm_cfg and operations on it.
+set CONFIG_S_FAILED  when ifcvf_start_hw() fail.
+removed VIRTIO_NET_F_CTRL_VQ and VIRTIO_NET_F_STATUS
+replace ifcvf_net_config with virtio_net_config.
+minor changes
+
+Changes from V1:
+using le32_to_cpu() to convert PCI capabilities.
+some set /get  operations will sync with the hardware, eg get_status
+and get_generation.
+remove feature bit VHOST_F_LOG_ALL, add VIRTIO_F_ORDERED_PLATFORM
+add get/set_config functions.
+split mdev type group into mdev_type_group_virtio and mdev_type_group_vhost
+add ifcvf_mdev_get_mdev_features()
+coding stype changes.
+
+Zhu Lingshan (2):
+  This commit introduced ifcvf_base layer, which handles hardware    
+    operations and configurations.
+  This commit introduced IFC operations for vdpa, which complys to    
+    virtio_mdev and vhost_mdev interfaces, handles IFC VF    
+    initialization, configuration and removal.
+
+ drivers/vhost/ifcvf/ifcvf_base.c | 326 ++++++++++++++++++++++
+ drivers/vhost/ifcvf/ifcvf_base.h | 129 +++++++++
+ drivers/vhost/ifcvf/ifcvf_main.c | 579 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 1034 insertions(+)
+ create mode 100644 drivers/vhost/ifcvf/ifcvf_base.c
+ create mode 100644 drivers/vhost/ifcvf/ifcvf_base.h
+ create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
+
+-- 
+1.8.3.1
 
