@@ -2,152 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AE48F9B8C
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:11:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5448DF9BCC
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:14:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727264AbfKLVKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 16:10:52 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:1270 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727239AbfKLVKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 16:10:52 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb1fa00000>; Tue, 12 Nov 2019 13:09:52 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 13:10:48 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 13:10:48 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
- 2019 21:10:47 +0000
-Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
- FOLL_LONGTERM
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
- <20191112203802.GD5584@ziepe.ca>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
-Date:   Tue, 12 Nov 2019 13:10:47 -0800
+        id S1727312AbfKLVO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 16:14:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58838 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726952AbfKLVOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 16:14:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573593264;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0bsLDLGgwqWjvPt7yk6eXjGQ2Ee83dUoAWlp33AQHXo=;
+        b=hSQ0Twzvd66PNVbf3X1AgRSy4P3LjStNICs4m1YCpoucPT7bI4ZfedWtwXDU6prmh95t8X
+        JRNY43/HtVzUybymq3zm5TCsKWLE79tfR0syU5QrtLE7f3kqjES/We2meEdDMyqoOLsNBI
+        fr0kiCVjryj/szcYeUwf9Fw2OkEXAQY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-HqlNN2b1Nw-sGxj_LfAFhQ-1; Tue, 12 Nov 2019 16:14:21 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 785019266C;
+        Tue, 12 Nov 2019 21:14:19 +0000 (UTC)
+Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2278B6018B;
+        Tue, 12 Nov 2019 21:14:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 04/17] arm: gic: Support no IRQs test case
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+References: <20191108144240.204202-1-andre.przywara@arm.com>
+ <20191108144240.204202-5-andre.przywara@arm.com>
+ <db89b983-425c-8b45-3f26-1a33b9817836@arm.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <a8546125-1d41-559b-1085-9289868ad009@redhat.com>
+Date:   Tue, 12 Nov 2019 22:14:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20191112203802.GD5584@ziepe.ca>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <db89b983-425c-8b45-3f26-1a33b9817836@arm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573592992; bh=FYNiQqIIwAjaPTLdgZDFjzpc3PZA+IOd8Qzq/L3NYFI=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=XDTPGbX/pfLSLEPMZj0U4ST8nWeqLQb9L0gJo2fojuRXhn2sbJZCbDvwG00vq+XIQ
-         colylZtLpZg40dx1ABr6UMyL7nDz+Ko0zZq5udmfA2v8o8KV6jbQ8nMJaMjSxXz3jT
-         /IQas6U39IMXowKsu+Lp15YvwNvsj9I4GEW1qSNrdbdQur8MbFNPpL74slNbnNTKiw
-         2tvXn1JIXwNPZ2+bJmHJ2nQzCpfl0RwWLH4Y7hj0SisnidmxgFdWv36tY7VU9S2345
-         uRxyqWTOY6lQqCfoY1uSgUmsGBjI6laWSw8oWM5BJSMXcH/MubF7tkJ0NoA3AfLsvB
-         eNrIf7Db8lhiQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: HqlNN2b1Nw-sGxj_LfAFhQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/19 12:38 PM, Jason Gunthorpe wrote:
-> On Mon, Nov 11, 2019 at 04:06:37PM -0800, John Hubbard wrote:
->> Hi,
+Hi,
+
+On 11/12/19 2:26 PM, Alexandru Elisei wrote:
+> Hi,
+>=20
+> On 11/8/19 2:42 PM, Andre Przywara wrote:
+>> For some tests it would be important to check that an IRQ was *not*
+>> triggered, for instance to test certain masking operations.
 >>
->> The cover letter is long, so the more important stuff is first:
+>> Extend the check_added() function to recognise an empty cpumask to
+>> detect this situation. The timeout duration is reduced, and the "no IRQs
+>=20
+> Why is the timeout duration reduced?
+>=20
+>> triggered" case is actually reported as a success in this case.
 >>
->> * Jason, if you or someone could look at the the VFIO cleanup (patch 8)
->>   and conversion to FOLL_PIN (patch 18), to make sure it's use of
->>   remote and longterm gup matches what we discussed during the review
->>   of v2, I'd appreciate it.
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  arm/gic.c | 10 ++++++++--
+>>  1 file changed, 8 insertions(+), 2 deletions(-)
 >>
->> * Also for Jason and IB: as noted below, in patch 11, I am (too?) boldly
->>   converting from put_user_pages() to release_pages().
-> 
-> Why are we doing this? I think things got confused here someplace, as
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index a114009..eca9188 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -66,9 +66,10 @@ static void check_acked(const char *testname, cpumask=
+_t *mask)
+>>  =09int missing =3D 0, extra =3D 0, unexpected =3D 0;
+>>  =09int nr_pass, cpu, i;
+>>  =09bool bad =3D false;
+>> +=09bool noirqs =3D cpumask_empty(mask);
+>> =20
+>>  =09/* Wait up to 5s for all interrupts to be delivered */
+>=20
+> This comment needs updating.
+>=20
+>> -=09for (i =3D 0; i < 50; ++i) {
+>> +=09for (i =3D 0; i < (noirqs ? 15 : 50); ++i) {
+>>  =09=09mdelay(100);
+>>  =09=09nr_pass =3D 0;
+>>  =09=09for_each_present_cpu(cpu) {
+>> @@ -88,7 +89,7 @@ static void check_acked(const char *testname, cpumask_=
+t *mask)
+>>  =09=09=09=09bad =3D true;
+>>  =09=09=09}
+>>  =09=09}
+>> -=09=09if (nr_pass =3D=3D nr_cpus) {
+>> +=09=09if (!noirqs && nr_pass =3D=3D nr_cpus) {
+>=20
+> This condition is pretty hard to read - what you are doing here is making=
+ sure
+> that when check_acked tests that no irqs have been received, you do the e=
+ntire for
+> loop and wait the entire timeout duration. Did I get that right?
+>=20
+> How about this (compile tested only):
+>=20
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 if (noirqs)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Wait for th=
+e entire timeout duration. */
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue;
+> +
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 if (nr_pass =3D=3D nr_cpus) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 report("=
+%s", !bad, testname);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (i)
+>=20
+>>  =09=09=09report("%s", !bad, testname);
+>>  =09=09=09if (i>>  =09=09=09=09report_info("took more than %d ms", i * 1=
+00);
+>> @@ -96,6 +97,11 @@ static void check_acked(const char *testname, cpumask=
+_t *mask)
+>>  =09=09}
+>>  =09}
+>> =20
+>> +=09if (noirqs && nr_pass =3D=3D nr_cpus) {
+>> +=09=09report("%s", !bad, testname);
 
+This one looks at the result of the last iteration (on timeout).
 
-Because:
+In case of noirqs I think we should be able to return a failure as soon
+as an irq is detected where we do not expect it, without waiting for the
+full delay?
 
-a) These need put_page() calls,  and
+Thanks
 
-b) there is no put_pages() call, but there is a release_pages() call that
-is, arguably, what put_pages() would be.
+Eric
+>=20
+> bad is true only when bad_sender[cpu] !=3D -1 or bad_irq[cpu] !=3D -1, wh=
+ich only get
+> set in the irq or ipi handlesr, meaning when you do get an interrupt. If =
+nr_pass
+> =3D=3D nr_cpus and noirqs, then you shouldn't have gotten an interrupt. I=
+ think it's
+> safe to write it as report("%s", true, testname). I think a short comment=
+ above
+> explaining why we do this check (timeout expired and we haven't gotten an=
+y
+> interrupts) would also improve readability of the code, but that's up to =
+you.
+>=20
+> Thanks,
+> Alex
+>> +=09=09return;
+>> +=09}
+>> +
+>>  =09for_each_present_cpu(cpu) {
+>>  =09=09if (cpumask_test_cpu(cpu, mask)) {
+>>  =09=09=09if (!acked[cpu])
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>=20
 
-
-> the comment still says:
-> 
-> /**
->  * put_user_page() - release a gup-pinned page
->  * @page:            pointer to page to be released
->  *
->  * Pages that were pinned via get_user_pages*() must be released via
->  * either put_user_page(), or one of the put_user_pages*() routines
->  * below.
-
-
-Ohhh, I missed those comments. They need to all be changed over to
-say "pages that were pinned via pin_user_pages*() or 
-pin_longterm_pages*() must be released via put_user_page*()."
-
-The get_user_pages*() pages must still be released via put_page.
-
-The churn is due to a fairly significant change in strategy, whis
-is: instead of changing all get_user_pages*() sites to call 
-put_user_page(), change selected sites to call pin_user_pages*() or 
-pin_longterm_pages*(), plus put_user_page().
-
-That allows incrementally converting the kernel over to using the
-new pin APIs, without taking on the huge risk of a big one-shot
-conversion. 
-
-So, I've ended up with one place that actually needs to get reverted
-back to get_user_pages(), and that's the IB ODP code.
-
-> 
-> I feel like if put_user_pages() is not the correct way to undo
-> get_user_pages() then it needs to be deleted.
-> 
-
-Yes, you're right. I'll fix the put_user_page comments() as described.
-
-
-thanks,
-
-John Hubbard
-NVIDIA
