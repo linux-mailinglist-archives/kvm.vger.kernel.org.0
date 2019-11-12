@@ -2,141 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4087CF9D05
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDFECF9D44
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 23:43:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbfKLWaa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 17:30:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22198 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726988AbfKLWa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:30:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573597827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IFjoCXM3aDjIq+KpZvKaiyfBSifVnRLohoE7M9/BvmA=;
-        b=fRNegOORrhoDJXUoHqWE0uxEHEdRzPj6Iw3Gv93FKLDPVDEYnh6MwMIdpMZsDVZa74xUhX
-        yBcyia92SWLaES8BPLr/5GmJvs7vmtHI0DIZ6qgggFg6yuS8/SOBKPd85Z4Jrhj+abmrFi
-        m4gTyHgwDFakWV9yev6o9QULFx1sKDg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-mYuiBlk2OPOXKtpPfD_7tQ-1; Tue, 12 Nov 2019 17:30:24 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7332464A7D;
-        Tue, 12 Nov 2019 22:30:22 +0000 (UTC)
-Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 22F1328D3C;
-        Tue, 12 Nov 2019 22:30:21 +0000 (UTC)
-Date:   Tue, 12 Nov 2019 15:30:20 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>, <cohuck@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Message-ID: <20191112153020.71406c44@x1.home>
-In-Reply-To: <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
-        <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+        id S1726979AbfKLWnE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 17:43:04 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:6590 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726906AbfKLWnD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 17:43:03 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb353a0000>; Tue, 12 Nov 2019 14:42:02 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Tue, 12 Nov 2019 14:42:58 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Tue, 12 Nov 2019 14:42:58 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 Nov
+ 2019 22:42:57 +0000
+Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and
+ FOLL_LONGTERM
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112000700.3455038-9-jhubbard@nvidia.com>
+ <20191112204338.GE5584@ziepe.ca>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
+Date:   Tue, 12 Nov 2019 14:42:57 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: mYuiBlk2OPOXKtpPfD_7tQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191112204338.GE5584@ziepe.ca>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573598522; bh=Y5yk8f3O0SqpmKkLqVvRBWCkW319hAOZ+63Twi/leN0=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=k73DbqVF1ro4BGXqtoOXY8+RqyGGe2g09YDUx2SX8XytMdTG+dmOpX+jHtYX3sy0m
+         jqRakpKDfOE8+KOF078kMgEWeRTrM64RVzrIc5oOooDxqIVboTzwD8VSvvTsbdqRvZ
+         VUfhjLhHIl5v6iMhsEkxxPV8LaL6dE8RS69ywE4DWS3/QelSGNxpH0rJ4kmEm//y+p
+         XXB4Gdx5hRr2SYYAicrcdd+BO7VysNir33yZ/MmfzzivcmZz0JpK+nUr9PhYe4icqS
+         koYHksTWwDMw0phfipFOQbYisXKLuZUJMy7LSz/++6j9kUwwcPzjslXYFXKOkRwY0a
+         JDLTwENrLW26A==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Nov 2019 22:33:37 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On 11/12/19 12:43 PM, Jason Gunthorpe wrote:
+...
+>> -		}
+>> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
+>> +				    page, vmas, NULL);
+>> +	/*
+>> +	 * The lifetime of a vaddr_get_pfn() page pin is
+>> +	 * userspace-controlled. In the fs-dax case this could
+>> +	 * lead to indefinite stalls in filesystem operations.
+>> +	 * Disallow attempts to pin fs-dax pages via this
+>> +	 * interface.
+>> +	 */
+>> +	if (ret > 0 && vma_is_fsdax(vmas[0])) {
+>> +		ret = -EOPNOTSUPP;
+>> +		put_page(page[0]);
+>>  	}
+> 
+> AFAIK this chunk is redundant now as it is some hack to emulate
+> FOLL_LONGTERM? So vmas can be deleted too.
 
-> All pages pinned by vendor driver through vfio_pin_pages API should be
-> considered as dirty during migration. IOMMU container maintains a list of
-> all such pinned pages. Added an ioctl defination to get bitmap of such
+Let me first make sure I understand what Dan has in mind for the vma
+checking, in the other thread...
 
-definition
+> 
+> Also unclear why this function has this:
+> 
+>         up_read(&mm->mmap_sem);
+> 
+>         if (ret == 1) {
+>                 *pfn = page_to_pfn(page[0]);
+>                 return 0;
+>         }
+> 
+>         down_read(&mm->mmap_sem);
+> 
 
-> pinned pages for requested IO virtual address range.
+Yes, that's really odd. It's not good to release and retake the lock
+anyway in general (without re-checking things), and  certainly it is
+not required to release mmap_sem in order to call page_to_pfn().
 
-Additionally, all mapped pages are considered dirty when physically
-mapped through to an IOMMU, modulo we discussed devices opting in to
-per page pinning to indicate finer granularity with a TBD mechanism to
-figure out if any non-opt-in devices remain.
+I've removed that up_read()/down_read() pair, for v4.
 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  include/uapi/linux/vfio.h | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
->=20
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 35b09427ad9f..6fd3822aa610 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -902,6 +902,29 @@ struct vfio_iommu_type1_dma_unmap {
->  #define VFIO_IOMMU_ENABLE=09_IO(VFIO_TYPE, VFIO_BASE + 15)
->  #define VFIO_IOMMU_DISABLE=09_IO(VFIO_TYPE, VFIO_BASE + 16)
-> =20
-> +/**
-> + * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-> + *                                     struct vfio_iommu_type1_dirty_bit=
-map)
-> + *
-> + * IOCTL to get dirty pages bitmap for IOMMU container during migration.
-> + * Get dirty pages bitmap of given IO virtual addresses range using
-> + * struct vfio_iommu_type1_dirty_bitmap. Caller sets argsz, which is siz=
-e of
-> + * struct vfio_iommu_type1_dirty_bitmap. User should allocate memory to =
-get
-> + * bitmap and should set size of allocated memory in bitmap_size field.
-> + * One bit is used to represent per page consecutively starting from iov=
-a
-> + * offset. Bit set indicates page at that offset from iova is dirty.
-> + */
-> +struct vfio_iommu_type1_dirty_bitmap {
-> +=09__u32        argsz;
-> +=09__u32        flags;
-> +=09__u64        iova;                      /* IO virtual address */
-> +=09__u64        size;                      /* Size of iova range */
-> +=09__u64        bitmap_size;               /* in bytes */
 
-This seems redundant.  We can calculate the size of the bitmap based on
-the iova size.
-
-> +=09void __user *bitmap;                    /* one bit per page */
-
-Should we define that as a __u64* to (a) help with the size
-calculation, and (b) assure that we can use 8-byte ops on it?
-
-However, who defines page size?  Is it necessarily the processor page
-size?  A physical IOMMU may support page sizes other than the CPU page
-size.  It might be more important to indicate the expected page size
-than the bitmap size.  Thanks,
-
-Alex
-
-> +};
-> +
-> +#define VFIO_IOMMU_GET_DIRTY_BITMAP             _IO(VFIO_TYPE, VFIO_BASE=
- + 17)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU --------=
- */
-> =20
->  /*
-
+thanks,
+-- 
+John Hubbard
+NVIDIA
