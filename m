@@ -2,98 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83149F991B
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 19:50:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC5FFF9945
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 20:02:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbfKLSui (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 13:50:38 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43335 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726952AbfKLSui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 13:50:38 -0500
-Received: by mail-io1-f66.google.com with SMTP id c11so19888310iom.10
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 10:50:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FKknxADsj8dAaCVRA/6UvI9FWyRNiphwf96YoePWw/c=;
-        b=somUeRuEeUFVZZN5aEaXUral3mjnED+uZDYiwCN0BEpTBb5QW4odLtCgcbppWMflo5
-         sJhUnYId0QyA/r+NrYi3DU8AEEaM4r84OGyTxJCmOuWuEGZ1kb8buAAtr/nDv/PQC+ij
-         mUO4s2E+TmQeVsKxMmYSRmPNh85E9Y1x7TbSViD+fV8nk8ajQMLqkjyg6MGaiEdkTB2g
-         e6l34SOnkreeGcZDiM9LnGNgYduKiZ13xjPS5pi0FuxaIupmG/ZLImYHspyIJX31Nokc
-         AtwJ8e4qRb8zTETyYAK2VxnbKHBXWw1T9jYvAv67HxwQgxoIo16IvdkxrIvfoofpUKZk
-         cSog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FKknxADsj8dAaCVRA/6UvI9FWyRNiphwf96YoePWw/c=;
-        b=chmRQWWkvDwpk+gnBGnmHjzaUJtLqgPEycJ9Xn6L/R3te4emv+jmk7UBvcEvP6MokA
-         znSZGrVVQ0A9qhuxLPSW9fTGqLI8Aal3jKiS2Sha0hZwepwgc5ToLlARbp9dFBeDnZoE
-         vlAX/06xsJmvH2eszYRSWPNHW528J+fp938A+uHvH2Hw7egjh40gDr9GczRbyurvYrWN
-         zSRAmeSx4e5lqXPr55P3H8mq9GbVv1iCWVlt1faXx1cYo4lVnvVXz7GzwvuInCCQmnu2
-         FNMc+63bXEf5VHdFa2GELTI9cJcP+ZGrQq1aN2mQyeBbNIOWOmp7DRDyJCK25dtYfv7b
-         Iz/A==
-X-Gm-Message-State: APjAAAWEKr1ZKmO6Q9j6BTd0D41WTEQN2IRbqIUiHPGqMuHEK4Th93+F
-        mS/u9JGkVFO9O3RgKZbwDbFIXfjhE9UeS+6yiH7uYw==
-X-Google-Smtp-Source: APXvYqzXIf8CzGG4ldQeR4jazTgDKaDOdXZ3kHD4cq94yW+2SJmtwJwP99KXFSHPfhUMXDH7gNKo1Zcsv6DjirlarlM=
-X-Received: by 2002:a6b:908a:: with SMTP id s132mr32071112iod.118.1573584636856;
- Tue, 12 Nov 2019 10:50:36 -0800 (PST)
+        id S1726982AbfKLTCk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 14:02:40 -0500
+Received: from mga04.intel.com ([192.55.52.120]:7548 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726958AbfKLTCk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 14:02:40 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 11:02:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,297,1569308400"; 
+   d="scan'208";a="202788210"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga007.fm.intel.com with ESMTP; 12 Nov 2019 11:02:38 -0800
+Date:   Tue, 12 Nov 2019 11:02:38 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org,
+        jmattson@google.com, vkuznets@redhat.com,
+        Bhavesh Davda <bhavesh.davda@oracle.com>
+Subject: Re: [PATCH] KVM: x86: Optimization: Requst TLB flush in
+ fast_cr3_switch() instead of do it directly
+Message-ID: <20191112190238.GC18089@linux.intel.com>
+References: <20191112183300.6959-1-liran.alon@oracle.com>
 MIME-Version: 1.0
-References: <1573478741-30959-1-git-send-email-pbonzini@redhat.com> <1573478741-30959-3-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1573478741-30959-3-git-send-email-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 12 Nov 2019 10:50:25 -0800
-Message-ID: <CALMp9eRXgMe2hSfDCCPCvYrLenQX_k-J=QTV8a9AtCuZVDByDg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: fix placement of refcount initialization
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Junaid Shahid <junaids@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112183300.6959-1-liran.alon@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 5:25 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Reported by syzkaller:
->
->    =============================
->    WARNING: suspicious RCU usage
->    -----------------------------
->    ./include/linux/kvm_host.h:536 suspicious rcu_dereference_check() usage!
->
->    other info that might help us debug this:
->
->    rcu_scheduler_active = 2, debug_locks = 1
->    no locks held by repro_11/12688.
->
->    stack backtrace:
->    Call Trace:
->     dump_stack+0x7d/0xc5
->     lockdep_rcu_suspicious+0x123/0x170
->     kvm_dev_ioctl+0x9a9/0x1260 [kvm]
->     do_vfs_ioctl+0x1a1/0xfb0
->     ksys_ioctl+0x6d/0x80
->     __x64_sys_ioctl+0x73/0xb0
->     do_syscall_64+0x108/0xaa0
->     entry_SYSCALL_64_after_hwframe+0x49/0xbe
->
-> Commit a97b0e773e4 (kvm: call kvm_arch_destroy_vm if vm creation fails)
-> sets users_count to 1 before kvm_arch_init_vm(), however, if kvm_arch_init_vm()
-> fails, we need to decrease this count.  By moving it earlier, we can push
-> the decrease to out_err_no_arch_destroy_vm without introducing yet another
-> error label.
->
-> syzkaller source: https://syzkaller.appspot.com/x/repro.c?x=15209b84e00000
->
-> Reported-by: syzbot+75475908cd0910f141ee@syzkaller.appspotmail.com
-> Fixes: a97b0e773e49 ("kvm: call kvm_arch_destroy_vm if vm creation fails")
-> Cc: Jim Mattson <jmattson@google.com>
-> Analyzed-by: Wanpeng Li <wanpengli@tencent.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+On Tue, Nov 12, 2019 at 08:33:00PM +0200, Liran Alon wrote:
+> When KVM emulates a nested VMEntry (L1->L2 VMEntry), it switches mmu root
+> page. If nEPT is used, this will happen from
+> kvm_init_shadow_ept_mmu()->__kvm_mmu_new_cr3() and otherwise it will
+> happpen from nested_vmx_load_cr3()->kvm_mmu_new_cr3(). Either case,
+> __kvm_mmu_new_cr3() will use fast_cr3_switch() in attempt to switch to a
+> previously cached root page.
+> 
+> In case fast_cr3_switch() finds a matching cached root page, it will
+> set it in mmu->root_hpa and request KVM_REQ_LOAD_CR3 such that on
+> next entry to guest, KVM will set root HPA in appropriate hardware
+> fields (e.g. vmcs->eptp). In addition, fast_cr3_switch() calls
+> kvm_x86_ops->tlb_flush() in order to flush TLB as MMU root page
+> was replaced.
+> 
+> This works as mmu->root_hpa, which vmx_flush_tlb() use, was
+> already replaced in cached_root_available(). However, this may
+> result in unnecessary INVEPT execution because a KVM_REQ_TLB_FLUSH
+> may have already been requested. For example, by prepare_vmcs02()
+> in case L1 don't use VPID.
+> 
+> Therefore, change fast_cr3_switch() to just request TLB flush on
+> next entry to guest.
+> 
+> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 24c23c66b226..150d982ec1d2 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -4295,7 +4295,7 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, gpa_t new_cr3,
+>  			kvm_make_request(KVM_REQ_LOAD_CR3, vcpu);
+>  			if (!skip_tlb_flush) {
+>  				kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+> -				kvm_x86_ops->tlb_flush(vcpu, true);
+> +				kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+
+Ha, I brought this up in the original review[*].  Junaid was concerned with
+maintaining the existing behavior for vcpu->stat.tlb_flush, so we kept the
+direct call to ->tlb_flush().  Incrementing tlb_flush seems a-ok, so:
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+[*] https://patchwork.kernel.org/patch/10461319/#21985483
+
+>  			}
+>  
+>  			/*
+> -- 
+> 2.20.1
+> 
