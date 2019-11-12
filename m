@@ -2,346 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41BA7F961C
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 17:54:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80258F9661
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 17:57:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727720AbfKLQyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 11:54:00 -0500
-Received: from foss.arm.com ([217.140.110.172]:37470 "EHLO foss.arm.com"
+        id S1727516AbfKLQ5S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 11:57:18 -0500
+Received: from mga05.intel.com ([192.55.52.43]:28377 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727688AbfKLQx6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 11:53:58 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A4EC30E;
-        Tue, 12 Nov 2019 08:53:57 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 28E473F534;
-        Tue, 12 Nov 2019 08:53:56 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 03/17] arm: gic: Provide per-IRQ helper
- functions
-To:     Auger Eric <eric.auger@redhat.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-4-andre.przywara@arm.com>
- <9cc460d1-c01f-6b0a-c6be-292a63174d68@arm.com>
- <bcdc76b2-3549-94fe-1070-8a8198e22a63@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <21d30cc3-8e97-f5fe-4de1-5672e8707887@arm.com>
-Date:   Tue, 12 Nov 2019 16:53:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726896AbfKLQ5S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 11:57:18 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 08:57:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,297,1569308400"; 
+   d="scan'208";a="229453522"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga004.fm.intel.com with ESMTP; 12 Nov 2019 08:57:17 -0800
+Date:   Tue, 12 Nov 2019 08:57:17 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Adam Borowski <kilobyte@angband.pl>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: MMU: Do not treat ZONE_DEVICE pages as being
+ reserved
+Message-ID: <20191112165717.GA18089@linux.intel.com>
+References: <CAPcyv4jysxEu54XK2kUYnvTqUL7zf2fJvv7jWRR=P4Shy+3bOQ@mail.gmail.com>
+ <CAPcyv4i3M18V9Gmx3x7Ad12VjXbq94NsaUG9o71j59mG9-6H9Q@mail.gmail.com>
+ <0db7c328-1543-55db-bc02-c589deb3db22@redhat.com>
+ <CAPcyv4gMu547patcROaqBqbwxut5au-WyE_M=XsKxyCLbLXHTg@mail.gmail.com>
+ <20191107155846.GA7760@linux.intel.com>
+ <20191109014323.GB8254@linux.intel.com>
+ <CAPcyv4hAY_OfExNP+_067Syh9kZAapppNwKZemVROfxgbDLLYQ@mail.gmail.com>
+ <20191111182750.GE11805@linux.intel.com>
+ <CAPcyv4hErx-Hd5q+3+W6VUSWDpEuOfipMsWAL+nnQtZvYAf3bg@mail.gmail.com>
+ <e6637be8-7890-579b-8131-6fdbbd791fa0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bcdc76b2-3549-94fe-1070-8a8198e22a63@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e6637be8-7890-579b-8131-6fdbbd791fa0@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Nov 12, 2019 at 11:19:44AM +0100, Paolo Bonzini wrote:
+> On 12/11/19 01:51, Dan Williams wrote:
+> > An elevated page reference count for file mapped pages causes the
+> > filesystem (for a dax mode file) to wait for that reference count to
+> > drop to 1 before allowing the truncate to proceed. For a page cache
+> > backed file mapping (non-dax) the reference count is not considered in
+> > the truncate path. It does prevent the page from getting freed in the
+> > page cache case, but the association to the file is lost for truncate.
+> 
+> KVM support for file-backed guest memory is limited.  It is not
+> completely broken, in fact cases such as hugetlbfs are in use routinely,
+> but corner cases such as truncate aren't covered well indeed.
 
-On 11/12/19 3:53 PM, Auger Eric wrote:
-> Hi Alex,
->
-> On 11/12/19 1:51 PM, Alexandru Elisei wrote:
->> Hi,
->>
->> On 11/8/19 2:42 PM, Andre Przywara wrote:
->>> A common theme when accessing per-IRQ parameters in the GIC distributor
->>> is to set fields of a certain bit width in a range of MMIO registers.
->>> Examples are the enabled status (one bit per IRQ), the level/edge
->>> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
->>>
->>> Add a generic helper function which is able to mask and set the
->>> respective number of bits, given the IRQ number and the MMIO offset.
->>> Provide wrappers using this function to easily allow configuring an IRQ.
->>>
->>> For now assume that private IRQ numbers always refer to the current CPU.
->>> In a GICv2 accessing the "other" private IRQs is not easily doable (the
->>> registers are banked per CPU on the same MMIO address), so we impose the
->>> same limitation on GICv3, even though those registers are not banked
->>> there anymore.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  lib/arm/asm/gic-v3.h |  1 +
->>>  lib/arm/asm/gic.h    |  9 +++++
->>>  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
->>>  3 files changed, 100 insertions(+)
->>>
->>> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
->>> index ed6a5ad..8cfaed1 100644
->>> --- a/lib/arm/asm/gic-v3.h
->>> +++ b/lib/arm/asm/gic-v3.h
->>> @@ -23,6 +23,7 @@
->>>  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
->>>  #define GICD_CTLR_ENABLE_G1		(1U << 0)
->>>  
->>> +#define GICD_IROUTER			0x6000
->>>  #define GICD_PIDR2			0xffe8
->>>  
->>>  /* Re-Distributor registers, offsets from RD_base */
->>> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
->>> index 1fc10a0..21cdb58 100644
->>> --- a/lib/arm/asm/gic.h
->>> +++ b/lib/arm/asm/gic.h
->>> @@ -15,6 +15,7 @@
->>>  #define GICD_IIDR			0x0008
->>>  #define GICD_IGROUPR			0x0080
->>>  #define GICD_ISENABLER			0x0100
->>> +#define GICD_ICENABLER			0x0180
->>>  #define GICD_ISPENDR			0x0200
->>>  #define GICD_ICPENDR			0x0280
->>>  #define GICD_ISACTIVER			0x0300
->>> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
->>>  extern void gic_ipi_send_single(int irq, int cpu);
->>>  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
->>>  
->>> +void gic_set_irq_bit(int irq, int offset);
->>> +void gic_enable_irq(int irq);
->>> +void gic_disable_irq(int irq);
->>> +void gic_set_irq_priority(int irq, u8 prio);
->>> +void gic_set_irq_target(int irq, int cpu);
->>> +void gic_set_irq_group(int irq, int group);
->>> +int gic_get_irq_group(int irq);
->>> +
->>>  #endif /* !__ASSEMBLY__ */
->>>  #endif /* _ASMARM_GIC_H_ */
->>> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
->>> index 9430116..cf4e811 100644
->>> --- a/lib/arm/gic.c
->>> +++ b/lib/arm/gic.c
->>> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->>>  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
->>>  	gic_common_ops->ipi_send_mask(irq, dest);
->>>  }
->>> +
->>> +enum gic_bit_access {
->>> +	ACCESS_READ,
->>> +	ACCESS_SET,
->>> +	ACCESS_RMW
->>> +};
->>> +
->>> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
->>> +			      enum gic_bit_access access)
->>> +{
->>> +	void *base;
->>> +	int split = 32 / bits;
->>> +	int shift = (irq % split) * bits;
->>> +	u32 reg, mask = ((1U << bits) - 1) << shift;
->>> +
->>> +	switch (gic_version()) {
->>> +	case 2:
->>> +		base = gicv2_dist_base();
->>> +		break;
->>> +	case 3:
->>> +		if (irq < 32)
->>> +			base = gicv3_sgi_base();
->>> +		else
->>> +			base = gicv3_dist_base();
->>> +		break;
->>> +	default:
->>> +		return 0;
->>> +	}
->>> +	base += offset + (irq / split) * 4;
->> This is probably not what you intended, if irq = 4 and split = 8, (irq / split) *
->> 4 = 0. On the other hand, irq * 4 / split = 2.
-> I think that's correct. if bits = 4 this means there are 8 of such
-> fields in a word and the field corresponding to irq=4 is indeed located
-> in word 0.
+KVM's actual MMU should be ok since it coordinates with the mmu_notifier.
 
-You're right, I got confused about the 4. Now I realize that the 4 represents the
-size of a register.
+kvm_vcpu_map() is where KVM could run afoul of page cache truncation.
+This is the other main use of hva_to_pfn*(), where KVM directly accesses
+guest memory (which could be file-backed) without coordinating with the
+mmu_notifier.  IIUC, an ill-timed page cache truncation could result in a
+write from KVM effectively being dropped due to writeback racing with
+KVM's write to the page.  If that's true, then I think KVM would need to
+to move to the proposed pin_user_pages() to ensure its "DMA" isn't lost.
 
-Thanks,
-Alex
-> Thanks
->
-> Eric
->>> +
->>> +	switch (access) {
->>> +	case ACCESS_READ:
->>> +		return (readl(base) & mask) >> shift;
->>> +	case ACCESS_SET:
->>> +		reg = 0;
->>> +		break;
->>> +	case ACCESS_RMW:
->>> +		reg = readl(base) & ~mask;
->>> +		break;
->>> +	}
->>> +
->>> +	writel(reg | ((u32)value << shift), base);
->>> +
->>> +	return 0;
->>> +}
->> This function looks a bit out of place:
->> - the function name has a verb in the past tense ('masked'), which makes me think
->> it should return a bool, but the function actually performs an access to a GIC
->> register.
->> - the return value is an u8, but it returns an u32 on a read, because readl
->> returns an u32.
->> - the semantics of the function and the return value change based on the access
->> parameter; worse yet, the return value on a write is completely ignored by the
->> callers and the value parameter is ignored on reads.
->>
->> You could split it into separate functions - see below.
->>
->>> +
->>> +void gic_set_irq_bit(int irq, int offset)
->>> +{
->>> +	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
->>> +}
->>> +
->>> +void gic_enable_irq(int irq)
->>> +{
->>> +	gic_set_irq_bit(irq, GICD_ISENABLER);
->>> +}
->>> +
->>> +void gic_disable_irq(int irq)
->>> +{
->>> +	gic_set_irq_bit(irq, GICD_ICENABLER);
->>> +}
->>> +
->>> +void gic_set_irq_priority(int irq, u8 prio)
->>> +{
->>> +	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
->>> +}
->>> +
->>> +void gic_set_irq_target(int irq, int cpu)
->>> +{
->>> +	if (irq < 32)
->>> +		return;
->>> +
->>> +	if (gic_version() == 2) {
->>> +		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
->>> +				    ACCESS_RMW);
->>> +
->>> +		return;
->>> +	}
->>> +
->>> +	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
->>> +}
->>> +
->>> +void gic_set_irq_group(int irq, int group)
->>> +{
->>> +	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
->>> +}
->>> +
->>> +int gic_get_irq_group(int irq)
->>> +{
->>> +	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
->>> +}
->> The pattern for the public functions in this file is to check that the GIC has
->> been initialized (assert(gic_common_ops)).
->>
->> I propose we rewrite the functions like this (compile tested only):
->>
->> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
->> index 94301169215c..1f5aa7b48828 100644
->> --- a/lib/arm/gic.c
->> +++ b/lib/arm/gic.c
->> @@ -146,3 +146,89 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->>         assert(gic_common_ops && gic_common_ops->ipi_send_mask);
->>         gic_common_ops->ipi_send_mask(irq, dest);
->>  }
->> +
->> +static void *gic_get_irq_reg(int irq, int offset, int width)
->> +{
->> +       void *base;
->> +
->> +       switch (gic_version()) {
->> +       case 2:
->> +               base = gicv2_dist_base();
->> +               break;
->> +       case 3:
->> +               if (irq < 32)
->> +                       base = gicv3_sgi_base();
->> +               else
->> +                       base = gicv3_dist_base();
->> +               break;
->> +       default:
->> +               return 0;
->> +       }
->> +
->> +       return base + offset + (irq * width / 32);
->> +}
->> +
->> +static void gic_set_irq_field(int irq, int offset, int width, u32 value)
->> +{
->> +       void *reg;
->> +       u32 val;
->> +       int shift = (irq * width) % 32;
->> +       u32 mask = ((1U << width) - 1) << shift;
->> +
->> +       reg = gic_get_irq_reg(irq, offset, width);
->> +       val = readl(reg);
->> +       val = (val & ~mask) | (value << shift);
->> +       writel(val, reg);
->> +}
->> +
->> +void gic_enable_irq(int irq)
->> +{
->> +       assert(gic_common_ops);
->> +       gic_set_irq_field(irq, GICD_ISENABLER, 1, 1);
->> +}
->> +
->> +void gic_disable_irq(int irq)
->> +{
->> +       assert(gic_common_ops);
->> +       gic_set_irq_field(irq, GICD_ICENABLER, 1, 1);
->> +}
->> +
->> +void gic_set_irq_priority(int irq, u8 prio)
->> +{
->> +       assert(gic_common_ops);
->> +       gic_set_irq_field(irq, GICD_IPRIORITYR, 8, prio);
->> +}
->> +
->> +void gic_set_irq_target(int irq, int cpu)
->> +{
->> +       assert(gic_common_ops);
->> +
->> +       if (irq < 32)
->> +               return;
->> +
->> +       if (gic_version() == 2) {
->> +               gic_set_irq_field(irq, GICD_ITARGETSR, 8, 1U << cpu);
->> +               return;
->> +       }
->> +
->> +       writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
->> +}
->> +
->> +void gic_set_irq_group(int irq, int group)
->> +{
->> +       assert(gic_common_ops);
->> +       gic_set_irq_field(irq, GICD_IGROUPR, 1, 1);
->> +}
->> +
->> +int gic_get_irq_group(int irq)
->> +{
->> +       void *reg;
->> +       u32 val;
->> +       int shift = irq % 32;
->> +
->> +       assert(gic_common_ops);
->> +       reg = gic_get_irq_reg(irq, GICD_IGROUPR, 1);
->> +       val = readl(reg);
->> +
->> +       return (val >> shift) & 0x1;
->> +}
->>
->> A bit more lines of code, but to me more readable. What do you think?
->>
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>
+> > As long as any memory the guest expects to be persistent is backed by
+> > mmu-notifier coordination we're all good, otherwise an elevated
+> > reference count does not coordinate with truncate in a reliable way.
+
+KVM itself is (mostly) blissfully unaware of any such expectations.  The
+userspace VMM, e.g. Qemu, is ultimately responsible for ensuring the guest
+sees a valid model, e.g. that persistent memory (as presented to the guest)
+is actually persistent (from the guest's perspective).
+
+The big caveat is the truncation issue above.
