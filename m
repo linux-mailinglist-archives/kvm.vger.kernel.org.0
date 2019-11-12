@@ -2,255 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE5A9F9317
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 15:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DB9AF9302
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 15:49:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727504AbfKLOvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 09:51:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3238 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727498AbfKLOvT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 09:51:19 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xACEkk0C121571
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 09:51:17 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w7xmrgd8p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 09:51:16 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Tue, 12 Nov 2019 14:47:24 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 12 Nov 2019 14:47:22 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xACElKAC59703300
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Nov 2019 14:47:20 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AF6DAA4053;
-        Tue, 12 Nov 2019 14:47:20 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51BB6A4040;
-        Tue, 12 Nov 2019 14:47:20 +0000 (GMT)
-Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 12 Nov 2019 14:47:20 +0000 (GMT)
-Subject: Re: [RFC 02/37] s390/protvirt: introduce host side setup
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, imbrenda@linux.ibm.com, mihajlov@linux.ibm.com,
-        mimu@linux.ibm.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-3-frankja@linux.ibm.com>
- <41fb411d-68b5-96be-fc0e-c88570df9d19@de.ibm.com>
- <20191104152603.76f50c60.cohuck@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Tue, 12 Nov 2019 15:47:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727032AbfKLOty (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 09:49:54 -0500
+Received: from mail-bgr052101135077.outbound.protection.outlook.com ([52.101.135.77]:47872
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725997AbfKLOtx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 09:49:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IZ0yWjZIirY3IXnZRQLVKriFTVk9HdgsP//T2qYD9UCs68sWevRVhyF3EQW6PobL92aA7VQUFvFwphC0cqg9J8nBFNnKBm0x3Yq5YsIQlIfMT9Cx6/6yOcvTKhpjAmVfx9BuiuT+Yp0743YEToxSZaxF6DtnGxkFdS64Z+dLCyAyW21B/TGnvjI7YbgfPZ97yr5tGQDCQgl4pyVG1dr5RSJq8o7lTxUDRDqGZ0Z0gubiTlrqZPzz8C5oZN/VB+DdSsJTqhR+dszrm9QJqncvIbewtm2utkdvBl//w5JDmfWJ96IKP+XhkMBVnaRtuYmGD9qSfLcp+weLptdpd5WpHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQXpvlGi5daoBtmV2MLrMW0+kGLqOLnhiVf09Ppd3Dw=;
+ b=ftJpvcPjCvRxUelia99f0pNK1vreMCxqxoTO3O0FuMyswY5d27ZcxtW8BLkHr4YDrQSoQVRvXqHilIEutDLTTva/sA7ZxDyAsTT8HcuT58BBTAFNU9N6+c2USWztYTUiR1GEqU6xHogrEMRubDFOpm/1+ILJVBWkYf4+ikeiPxjOOvssMwE7920cy0ng7ZWnVtf1UuTl5iSQTWMe3X3RGunLhl4wIQUysw6SkLnjGUvOc53PIQGOPoZWDIe80dSdRZ2QbVnHrkuogRYJH7ioz2bGM/+bTNkG9rkXOlnr+yjBW7yIrMjzMb0NBYjAbTHWUCbcgpnsnyaSUuerRBOT3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQXpvlGi5daoBtmV2MLrMW0+kGLqOLnhiVf09Ppd3Dw=;
+ b=JfqpNI2TzK40tjhGzH8DzGLuSH/YpobGOTcG5B5xOsiRH3asFP+G6SnwvsEpx7Yq1XVeg75N4FhK2Qbv7CYEpTujxbFLxhhKAo3TWCcw3IqTTcIQUt5oEJr7oNpYsnv3II5rKmJ6Jwag3cViXgR2vMMuTx4plBkZ5+9rKidme40=
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
+ VI1PR08MB3471.eurprd08.prod.outlook.com (20.177.59.86) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.25; Tue, 12 Nov 2019 14:49:47 +0000
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::9465:ec66:befb:e8b5]) by VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::9465:ec66:befb:e8b5%3]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
+ 14:49:47 +0000
+From:   Roman Kagan <rkagan@virtuozzo.com>
+To:     "lantianyu1986@gmail.com" <lantianyu1986@gmail.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rth@twiddle.net" <rth@twiddle.net>,
+        "ehabkost@redhat.com" <ehabkost@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+Thread-Topic: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+Thread-Index: AQHVmQooMjAMF4hMsk+z5W7t6cZOKaeHnsGA
+Date:   Tue, 12 Nov 2019 14:49:47 +0000
+Message-ID: <20191112144943.GD2397@rkaganb.sw.ru>
+References: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
+In-Reply-To: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.12.1 (2019-06-15)
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,   lantianyu1986@gmail.com,
+ pbonzini@redhat.com, rth@twiddle.net,  ehabkost@redhat.com,
+ mtosatti@redhat.com, vkuznets@redhat.com,      Tianyu Lan
+ <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,     kvm@vger.kernel.org
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1P191CA0004.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::14)
+ To VI1PR08MB4608.eurprd08.prod.outlook.com (2603:10a6:803:c0::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e13e0db8-9943-4e42-33b3-08d7677f9000
+x-ms-traffictypediagnostic: VI1PR08MB3471:
+x-microsoft-antispam-prvs: <VI1PR08MB347147F8A0F3067B83A1A8C0C9770@VI1PR08MB3471.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1850;
+x-forefront-prvs: 021975AE46
+x-forefront-antispam-report: SFV:SPM;SFS:(10019020)(376002)(396003)(346002)(39850400004)(366004)(136003)(54094003)(199004)(189003)(6246003)(5660300002)(5640700003)(478600001)(14454004)(6436002)(4326008)(25786009)(6116002)(229853002)(36756003)(66476007)(3846002)(9686003)(6512007)(66556008)(66946007)(2501003)(6486002)(64756008)(66446008)(1076003)(446003)(14444005)(99286004)(486006)(256004)(81166006)(71190400001)(71200400001)(1411001)(11346002)(54906003)(102836004)(26005)(66066001)(52116002)(8676002)(476003)(8936002)(186003)(2351001)(76176011)(386003)(6506007)(33656002)(86362001)(2906002)(7736002)(1361003)(81156014)(6916009)(305945005)(316002)(58126008)(30126002);DIR:OUT;SFP:1501;SCL:5;SRVR:VI1PR08MB3471;H:VI1PR08MB4608.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-transport-forked: True
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ELCLHyOfVzOvDwbmLRdcmpPKnhZxNrOf9t+ZaitBLXaNd3iO6iYZ7tbw1upCdON3a58qPdlxXXj10+JIOQ3K7VTM1CWcoZZWn114sOK3KFjRK8u8rLRtgIzk2fGLRPQRtMYkAlJoRY/mrqGkcOhZKPUJwsW5cQPfC7jdJVXjqi7n/E9LpV3WKe7qRdFl/M/x5ZRI7UtplsEd0DP0+pNuNEG9KLv9hl5xdDbhmvHxY8jY4/RHQz7HGKPoZv6+q3Vc2TGKGNHo2GJ+ppjvr0A6JCDpR8JrH31rmk1Uwi6mQ+HJmktG6TrARJ9iBrS+PAwxDxr62vLduRBbLO2l9Cj9dUboPdC8YwfLSdOzLr9C9koIRiR7nYfdN4ncsFt6LD01
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AB96B3B89FB7624FA45598987B45EF63@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20191104152603.76f50c60.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="oZUDBCwfom9G0Dcpf96XYJ4Jpkc2BjkKx"
-X-TM-AS-GCONF: 00
-x-cbid: 19111214-4275-0000-0000-0000037D1897
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111214-4276-0000-0000-0000389076C7
-Message-Id: <fb5837ee-0868-85df-fe61-381484162f47@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-12_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911120132
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e13e0db8-9943-4e42-33b3-08d7677f9000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 14:49:47.4052
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4e3DEayglwleibheiFvthRQEoIgBbAIfvrWY9/YW7XHiwDrUoolABIh6P7TEKmv6Rsj27yc6Aa6zTNh5TWdTaw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3471
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oZUDBCwfom9G0Dcpf96XYJ4Jpkc2BjkKx
-Content-Type: multipart/mixed; boundary="En3MMsjz1gQRzn0mEizSQkXYAY1vUmNKZ"
+On Tue, Nov 12, 2019 at 11:34:27AM +0800, lantianyu1986@gmail.com wrote:
+> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> 
+> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+> Enable direct TLB flush for its guests meaning that TLB
+> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+> bypassing KVM in Level 1. Due to the different ABI for hypercall
+> parameters between Hyper-V and KVM, KVM capabilities should be
+> hidden when enable Hyper-V direct tlb flush otherwise KVM
+> hypercalls may be intercepted by Hyper-V. Add new parameter
+> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+> capability status before enabling the feature.
+> 
+> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> ---
+> Change since v3:
+>        - Fix logic of Hyper-V passthrough mode with direct
+>        tlb flush.
+> 
+> Change sicne v2:
+>        - Update new feature description and name.
+>        - Change failure print log.
+> 
+> Change since v1:
+>        - Add direct tlb flush's Hyper-V property and use
+>        hv_cpuid_check_and_set() to check the dependency of tlbflush
+>        feature.
+>        - Make new feature work with Hyper-V passthrough mode.
+> ---
+>  docs/hyperv.txt   | 10 ++++++++++
+>  target/i386/cpu.c |  2 ++
+>  target/i386/cpu.h |  1 +
+>  target/i386/kvm.c | 24 ++++++++++++++++++++++++
+>  4 files changed, 37 insertions(+)
+> 
+> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+> index 8fdf25c829..140a5c7e44 100644
+> --- a/docs/hyperv.txt
+> +++ b/docs/hyperv.txt
+> @@ -184,6 +184,16 @@ enabled.
+>  
+>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+>  
+> +3.18. hv-direct-tlbflush
+> +=======================
+> +Enable direct TLB flush for KVM when it is running as a nested
+> +hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
+> +guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
+> +differences between Hyper-V and KVM hypercalls, L2 guests will not be
+> +able to issue KVM hypercalls (as those could be mishanled by L0
+> +Hyper-V), this requires KVM hypervisor signature to be hidden.
 
---En3MMsjz1gQRzn0mEizSQkXYAY1vUmNKZ
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On a second thought, I wonder if this is the only conflict we have.
 
-On 11/4/19 3:26 PM, Cornelia Huck wrote:
-> On Fri, 1 Nov 2019 09:53:12 +0100
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->=20
->> On 24.10.19 13:40, Janosch Frank wrote:
->>> From: Vasily Gorbik <gor@linux.ibm.com>
->>>
->>> Introduce KVM_S390_PROTECTED_VIRTUALIZATION_HOST kbuild option for
->>> protected virtual machines hosting support code.
->>>
->>> Add "prot_virt" command line option which controls if the kernel
->>> protected VMs support is enabled at runtime.
->>>
->>> Extend ultravisor info definitions and expose it via uv_info struct
->>> filled in during startup.
->>>
->>> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
->>> ---
->>>  .../admin-guide/kernel-parameters.txt         |  5 ++
->>>  arch/s390/boot/Makefile                       |  2 +-
->>>  arch/s390/boot/uv.c                           | 20 +++++++-
->>>  arch/s390/include/asm/uv.h                    | 46 ++++++++++++++++-=
--
->>>  arch/s390/kernel/Makefile                     |  1 +
->>>  arch/s390/kernel/setup.c                      |  4 --
->>>  arch/s390/kernel/uv.c                         | 48 +++++++++++++++++=
-++
->>>  arch/s390/kvm/Kconfig                         |  9 ++++
->>>  8 files changed, 126 insertions(+), 9 deletions(-)
->>>  create mode 100644 arch/s390/kernel/uv.c
->=20
-> (...)
->=20
->>> diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
->>> index d3db3d7ed077..652b36f0efca 100644
->>> --- a/arch/s390/kvm/Kconfig
->>> +++ b/arch/s390/kvm/Kconfig
->>> @@ -55,6 +55,15 @@ config KVM_S390_UCONTROL
->>>
->>>  	  If unsure, say N.
->>>
->>> +config KVM_S390_PROTECTED_VIRTUALIZATION_HOST
->>> +	bool "Protected guests execution support"
->>> +	depends on KVM
->>> +	---help---
->>> +	  Support hosting protected virtual machines isolated from the
->>> +	  hypervisor.
->>> +
->>> +	  If unsure, say Y.
->>> +
->>>  # OK, it's a little counter-intuitive to do this, but it puts it nea=
-tly under
->>>  # the virtualization menu.
->>>  source "drivers/vhost/Kconfig"
->>>  =20
->>
->> As we have the prot_virt kernel paramter there is a way to fence this =
-during runtime
->> Not sure if we really need a build time fence. We could get rid of
->> CONFIG_KVM_S390_PROTECTED_VIRTUALIZATION_HOST and just use CONFIG_KVM =
-instead,
->> assuming that in the long run all distros will enable that anyway.=20
->=20
-> I still need to read through the rest of this patch set to have an
-> informed opinion on that, which will probably take some more time.
->=20
->> If other reviewers prefer to keep that extra option what about the fol=
-lowing to the
->> help section:
->>
->> ----
->> Support hosting protected virtual machines in KVM. The state of these =
-machines like
->> memory content or register content is protected from the host or host =
-administrators.
->>
->> Enabling this option will enable extra code that talks to a new firmwa=
-re instance
->=20
-> "...that allows the host kernel to talk..." ?
+In KVM, kvm_emulate_hypercall, when sees Hyper-V hypercalls enabled,
+just calls kvm_hv_hypercall and returns.  I.e. once the userspace
+enables Hyper-V hypercalls (which QEMU does when any of hv_* flags is
+given), KVM treats *all* hypercalls as Hyper-V ones and handles *no* KVM
+hypercalls.
 
-"allows a Linux hypervisor to talk..." ?
-
->=20
->> called ultravisor that will take care of protecting the guest while al=
-so enabling
->> KVM to run this guest.
->>
->> This feature must be enable by the kernel command line option prot_vir=
-t.
->=20
-> s/enable by/enabled via/
->=20
->>
->> 	  If unsure, say Y.
->=20
-> Looks better. I'm continuing to read the rest of this series before I
-> say more, though :)
->=20
+So, if hiding the KVM hypervisor signature is the only way to prevent the
+guest from issuing KVM hypercalls (need to double-check), then, I'm
+afraid, we just need to require it as soon as any Hyper-V feature is
+enabled.
 
 
+> +Requires: hv-tlbflush, -kvm
+>  
+>  4. Development features
+>  ========================
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 44f1bbdcac..7bc7fee512 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
+>                        HYPERV_FEAT_IPI, 0),
+>      DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+>                        HYPERV_FEAT_STIMER_DIRECT, 0),
+> +    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
+> +                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
+>      DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+>  
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index eaa5395aa5..3cb105f7d6 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+>  #define HYPERV_FEAT_EVMCS               12
+>  #define HYPERV_FEAT_IPI                 13
+>  #define HYPERV_FEAT_STIMER_DIRECT       14
+> +#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
+>  
+>  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+>  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 11b9c854b5..43f5cbc3f6 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -900,6 +900,10 @@ static struct {
+>          },
+>          .dependencies = BIT(HYPERV_FEAT_STIMER)
+>      },
+> +    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
+> +        .desc = "direct paravirtualized TLB flush (hv-direct-tlbflush)",
+> +        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
+> +    },
+>  };
+>  
+>  static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+> @@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
+> +    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
+>  
+>      /* Additional dependencies not covered by kvm_hyperv_properties[] */
+>      if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+> @@ -1243,6 +1248,25 @@ static int hyperv_handle_properties(CPUState *cs,
+>          goto free;
+>      }
+>  
+> +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH)) {
+> +        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0)) {
+> +            if (!cpu->hyperv_passthrough) {
+> +                fprintf(stderr,
+> +                    "Hyper-V %s is not supported by kernel\n",
+> +                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +                return -ENOSYS;
+> +            }
+> +
+> +            cpu->hyperv_features &= ~BIT(HYPERV_FEAT_DIRECT_TLBFLUSH);
+> +        } else if (cpu->expose_kvm) {
+> +            fprintf(stderr,
+> +                "Hyper-V %s requires KVM hypervisor signature "
+> +                "to be hidden (-kvm).\n",
+> +                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +            return -ENOSYS;
+> +        }
 
---En3MMsjz1gQRzn0mEizSQkXYAY1vUmNKZ--
+In view of my comment above, this "else if" clause may become
+unnecessary.
 
---oZUDBCwfom9G0Dcpf96XYJ4Jpkc2BjkKx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+However, it doesn't hurt either, and doesn't make things worse, so, if
+this is seen as 4.2 material and the general KVM vs Hyper-V hypercall
+conflict resolution is postponed till after 4.2, the patch looks ok as
+it is.
 
------BEGIN PGP SIGNATURE-----
+Under this provision
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3KxfgACgkQ41TmuOI4
-ufjyehAAtfdPYkB8+mybPu49oVshXYq+8dlOAuHNARIspPtWIP9ZCpz2Wh9bFCh4
-K2I3r0/U2gmXrvtZ3LqYRZ2GXPvkW9U1nnwDtb8W0XYhkJrXRmc/zD4qLVzyWRJ/
-RCmqb389GUDClKFGnjzo3/JnP9A8EwTFkqBWkUTrSruDqoUXoVU7kHrjZxcyG9Vk
-/NI7i5pn1XhwV6Q3wCYLeSFUesUI+BuXhxji/7gTCQpQWiQi14DWeq3tDRtuSrLZ
-IxThyMyJUUOP1Uji3Arz972WSg4OtKgPnbeMgbT5RwfvFGYrH0z5A5lTSps6rRrH
-Frqc9g/o7FgWM2ASGcyv++44pDQBm26hHkcTm4LrSy7/S3g0Bn+pD6+VugpVRXuW
-ltVE9sUIJptTCHj7llnz7Uqj/pw688KOsZLRwuF1ul0UMQ8MhidyfiMKwkNEeilv
-HT+G9ygMfJ3JiXdbFrS0POVl9hT5zkCdQLvGRJPbxPKchoozVmbKdcNdThBOtJjJ
-Niuem8xN+yI1hPgzepCHg5tQV18DlvVXYm6mbc8hKHLBmOlIhXc6mKqOTZmzZg8R
-k4rlo5+Zk4H97queOu8zeF5trJehENWf+X24IboqPdf2MsVfaqPa+1r20snXMVmo
-faG00pPoZ3i0AojPx2ziZgnQi5KynEIIn9sPWQqdbOo4YNZZBr4=
-=9Ltf
------END PGP SIGNATURE-----
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
 
---oZUDBCwfom9G0Dcpf96XYJ4Jpkc2BjkKx--
-
+> +    }
+> +
+>      if (cpu->hyperv_passthrough) {
+>          /* We already copied all feature words from KVM as is */
+>          r = cpuid->nent;
+> -- 
+> 2.14.5
+> 
