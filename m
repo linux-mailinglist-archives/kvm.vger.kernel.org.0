@@ -2,137 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33849F8F5A
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 13:10:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDFA1F8F7A
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 13:14:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725954AbfKLMKm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 07:10:42 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30985 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725865AbfKLMKl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 07:10:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573560641;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=8EIIxlNOkdNmOByaxRdxBssf9zveCCEaUGkD3bWZsCI=;
-        b=ErLqmKhcoTokLxT37DUkkaN2dpg4uUqkh3jAbbMtgLCN55soHoioq8Exa5CwYOkBKljAhd
-        iFwMyDlZu5IdNPs7jIH6L1ClGIZZ6ONc3PlhARvXgIWxyBf7ywLAT+WxYWFdmxpBGgEmZT
-        4qIszXLEXu5uiTS9pHBcXKYznb/UHcI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-kNMeCVLINF-w-na6fZWMDw-1; Tue, 12 Nov 2019 07:10:39 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BC8D8CDF25;
-        Tue, 12 Nov 2019 12:10:39 +0000 (UTC)
-Received: from [10.36.117.126] (ovpn-117-126.ams2.redhat.com [10.36.117.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BAE3060171;
-        Tue, 12 Nov 2019 12:10:37 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] s390x: Improve architectural
- compliance for diag308
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, thuth@redhat.com
-References: <20191111153345.22505-1-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <1dacfdb6-26bd-3575-cf92-09f81c8dc2f2@redhat.com>
-Date:   Tue, 12 Nov 2019 13:10:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727290AbfKLMOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 07:14:14 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:36242 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725954AbfKLMON (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 07:14:13 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xACC93f8089973;
+        Tue, 12 Nov 2019 12:14:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=cwbFHdOtQE8djdjL/sCVjGdnyrOIqq0d6NAU+DO6W2o=;
+ b=pGJUYjRErF5MSYnvt99xZ/GzFKSytJJJighqp1OzWLITlOukYTRfgE+o5GUYIHF9ND4i
+ c7ltWLXPWv/5PA4sB10piz72J7Fe9wSE3ADeeMR+nl50c7m6dadMePOD3pfenVuZvfdt
+ keZnyY9CQTNMUMwAklaB9Pvlxu5MTL0eEqx7tBlKUHbkhSQrnleBggaXX8g95GO0aWpA
+ Z79GBcJIytxJECfZzjspitb9zSUkevvzG9p9EKtBHRct5f2m4g1Ko0g3JRWvnEkwzy2C
+ xUg21vlMCsmIRZ+6Hcmt1xrQaLoNmsx6v63TVYqmrPVY33cyzkIk0Km3lc98cha+Vdo8 Aw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2w5p3qm99j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Nov 2019 12:14:09 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xACC8MBm006620;
+        Tue, 12 Nov 2019 12:14:08 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2w6r8m3pb5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Nov 2019 12:14:08 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xACCE7eb016328;
+        Tue, 12 Nov 2019 12:14:07 GMT
+Received: from [10.191.24.133] (/10.191.24.133)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 12 Nov 2019 04:14:07 -0800
+Subject: Re: [PATCH 3/5] KVM: ensure pool time is longer than block_ns
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        joao.m.martins@oracle.com, rafael.j.wysocki@intel.com,
+        rkrcmar@redhat.com
+References: <1572060239-17401-1-git-send-email-zhenzhong.duan@oracle.com>
+ <1572060239-17401-4-git-send-email-zhenzhong.duan@oracle.com>
+ <20191101211623.GB20061@amt.cnet>
+ <76044f07-0b76-cd91-dc87-82ed3fca061e@redhat.com>
+From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <fc9eab27-5251-feb7-29f4-1e2923d5d013@oracle.com>
+Date:   Tue, 12 Nov 2019 20:14:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <20191111153345.22505-1-frankja@linux.ibm.com>
+In-Reply-To: <76044f07-0b76-cd91-dc87-82ed3fca061e@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: kNMeCVLINF-w-na6fZWMDw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911120110
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9438 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911120110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.11.19 16:33, Janosch Frank wrote:
-> When testing diag308 subcodes 0/1 on lpar with virtual mem set up, I
-> experienced spec PGMs and addressing PGMs due to the tests not setting
-> short psw bit 12 and leaving the DAT bit on. The problem was not found
-> under KVM/QEMU, because Qemu just ignores all cpu mask bits.
->=20
-> v1 -> v2:
->    * Fixed comment in extra patch
->    * Now using pre-defined reset psw
->    * Fixed some comments
->=20
-> Janosch Frank (3):
->   s390x: Fix initial cr0 load comments
->   s390x: Add CR save area
->   s390x: Load reset psw on diag308 reset
->=20
->  lib/s390x/asm-offsets.c  |  3 ++-
->  lib/s390x/asm/arch_def.h |  5 +++--
->  lib/s390x/interrupt.c    |  4 ++--
->  lib/s390x/smp.c          |  2 +-
->  s390x/cstart64.S         | 38 ++++++++++++++++++++++++--------------
->  5 files changed, 32 insertions(+), 20 deletions(-)
->=20
 
-I'll queue the first two patches for now to
+On 2019/11/11 21:53, Paolo Bonzini wrote:
+> On 01/11/19 22:16, Marcelo Tosatti wrote:
+>>   		if (!vcpu_valid_wakeup(vcpu)) {
+>>   			shrink_halt_poll_ns(vcpu);
+>>   		} else if (halt_poll_ns) {
+>> -			if (block_ns <= vcpu->halt_poll_ns)
+>> +			if (block_ns < vcpu->halt_poll_ns)
+>>   				;
+>>   			/* we had a short halt and our poll time is too small */
+>>   			else if (block_ns < halt_poll_ns)
+> What about making this "if (!waited)"?  The result would be very readable:
+>
+>                          if (!waited)
+>                                  ;
+>                          /* we had a long block, shrink polling */
+>                          else if (block_ns > halt_poll_ns && vcpu->halt_poll_ns)
+>                                  shrink_halt_poll_ns(vcpu);
+>                          /* we had a short halt and our poll time is too small */
+>                          else if (block_ns < halt_poll_ns && vcpu->halt_poll_ns < halt_poll_ns)
+>                                  grow_halt_poll_ns(vcpu);
 
-https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
+This patch is dropped in v2 as it rarely happen in real scenario.
 
-And wait with the first until we know if it's a TCG or a kvm-unit-tests
-bug that makes the SMP test fail.
+Appreciate you reviewing v2 in https://lkml.org/lkml/2019/11/6/447
 
---=20
+Thanks
 
-Thanks,
-
-David / dhildenb
+Zhenzhong
 
