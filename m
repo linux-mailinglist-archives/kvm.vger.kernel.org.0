@@ -2,134 +2,405 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17BB7F8DB9
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 12:12:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F09BF8E62
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 12:21:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbfKLLMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 06:12:24 -0500
-Received: from mail-bgr052101134082.outbound.protection.outlook.com ([52.101.134.82]:50599
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725947AbfKLLMY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 06:12:24 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jfMIoTzxY+OfMNbwomeym2xQBcL/5pxn53Pok/fkiVw1MNZvc3bqQo/PD4GjOczrLcNqGpIaxFtwe0IfeRi9CZ6+1+HNqxgVt9DDAWS2lkL3TV82c13RJ9bEQMetBPJtNyy1JiujXbRpxFzff4HNhAIpcgrj3RP4/EIeinLxnHW49Mrv3NenerlifjVQgtG5D1sVIwjR4/CJb280lxL+XhjkghlK1M+fi5EMrTRrZ5yNh0e+pA+EkwcI4+V32YP0VsgWYEJaiLfp2X0/7Ks84qyC1Bxd9inKluQui8J4yK4nr8sslGN/3eb8+eQsxTeFRpI12A30FdyYS8Eunrh6aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IX0fztmSrBTXBX5FoAEfdqbYuHF5fLkGN1+k/XWE0Zc=;
- b=AYGcdKN68BcLEB8iFz+zubhZ1UrZTOjsShKpXuTpiKA8Y9A6gbfXrj6evO69tiOm6e5aJchQYag1kn3oKSdu1Y/4Vo5izr+VmbGfK/RVqe+PKnEXaGmJmAAp8SXs7jP3tyonAvK3Zz1lVzctB3VxWipH4RT5NJSAXK/877HCGqNqWWrKuOyR0iXR3agk85XrrwQib8RYMLng00621NfeVbz/TS9XvarFJterBt4pTo5/KnLcmdtvw2GuTQpf/lSSc6GKhFSpDCFKmOF42fMR/Qw9hzCtb1BomX8wO9MFHZfQhaiXdT7DnXMdcYL1ln8jLc6jihY7RYTdzkPUOXey7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IX0fztmSrBTXBX5FoAEfdqbYuHF5fLkGN1+k/XWE0Zc=;
- b=K233sLULIxOEKuOYW/840PBKBbQcdBw9+peT5dvzbeZ2CehJe7rCfK3zexq9wp7ZuJT4uXqnySl/MHE0vTjsNBM0F5P1+NpWcTi7I55hLZ2ne3rcpk1j6GOZc8UR2+z2fN7FMwHMAeHe2bFqODouisQfgyrzJnybZ2rcHFHrYr8=
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
- VI1PR08MB3981.eurprd08.prod.outlook.com (20.178.205.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Tue, 12 Nov 2019 11:12:19 +0000
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5]) by VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5%3]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
- 11:12:19 +0000
-From:   Roman Kagan <rkagan@virtuozzo.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        id S1727264AbfKLLVt convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 12 Nov 2019 06:21:49 -0500
+Received: from mga02.intel.com ([134.134.136.20]:26653 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725865AbfKLLVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 06:21:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 03:21:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,296,1569308400"; 
+   d="scan'208";a="207080391"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+  by orsmga003.jf.intel.com with ESMTP; 12 Nov 2019 03:21:42 -0800
+Received: from fmsmsx125.amr.corp.intel.com (10.18.125.40) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 12 Nov 2019 03:21:42 -0800
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ FMSMSX125.amr.corp.intel.com (10.18.125.40) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 12 Nov 2019 03:21:42 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.60]) with mapi id 14.03.0439.000;
+ Tue, 12 Nov 2019 19:21:40 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
         "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,
-        "rimasluk@amazon.com" <rimasluk@amazon.com>,
-        "Grimm, Jon" <Jon.Grimm@amd.com>
-Subject: Re: [PATCH v4 08/17] kvm: x86: Introduce APICv pre-update hook
-Thread-Topic: [PATCH v4 08/17] kvm: x86: Introduce APICv pre-update hook
-Thread-Index: AQHVkQWF3SaRgLSvd0GUYdThH7zHx6d7lb6AgAsiuYCAALmRgA==
-Date:   Tue, 12 Nov 2019 11:12:19 +0000
-Message-ID: <20191112111215.GB2397@rkaganb.sw.ru>
-References: <1572648072-84536-1-git-send-email-suravee.suthikulpanit@amd.com>
- <1572648072-84536-9-git-send-email-suravee.suthikulpanit@amd.com>
- <20191104220457.GB23545@rkaganb.lan>
- <a087061a-1217-962f-43ae-1d791c9d38f6@amd.com>
-In-Reply-To: <a087061a-1217-962f-43ae-1d791c9d38f6@amd.com>
-Accept-Language: en-US, ru-RU
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Lu, Baolu" <baolu.lu@intel.com>, "Wu, Hao" <hao.wu@intel.com>
+Subject: RE: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
+ to host
+Thread-Topic: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
+ to host
+Thread-Index: AQHVimn49qwPncOwpUK3oA3gYR4tBqd/6QGAgAdz7JA=
+Date:   Tue, 12 Nov 2019 11:21:40 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0F6894@SHSMSX104.ccr.corp.intel.com>
+References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
+        <1571919983-3231-4-git-send-email-yi.l.liu@intel.com>
+ <20191107162041.31e620a4@x1.home>
+In-Reply-To: <20191107162041.31e620a4@x1.home>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.12.1 (2019-06-15)
-mail-followup-to: "rkagan@virtuozzo.com" <rkagan@virtuozzo.com>,        Suravee
- Suthikulpanit <suravee.suthikulpanit@amd.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,    "rkrcmar@redhat.com"
- <rkrcmar@redhat.com>,  "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,    "graf@amazon.com"
- <graf@amazon.com>,     "jschoenh@amazon.de" <jschoenh@amazon.de>,
-        "karahmed@amazon.de" <karahmed@amazon.de>,      "rimasluk@amazon.com"
- <rimasluk@amazon.com>, "Grimm, Jon" <Jon.Grimm@amd.com>
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR05CA0232.eurprd05.prod.outlook.com
- (2603:10a6:3:fa::32) To VI1PR08MB4608.eurprd08.prod.outlook.com
- (2603:10a6:803:c0::22)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0ea6ae82-446f-4481-793b-08d767612eb3
-x-ms-traffictypediagnostic: VI1PR08MB3981:
-x-microsoft-antispam-prvs: <VI1PR08MB398156FE43DE72885B0E1FA2C9770@VI1PR08MB3981.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 021975AE46
-x-forefront-antispam-report: SFV:SPM;SFS:(10019020)(396003)(366004)(136003)(39850400004)(376002)(346002)(189003)(199004)(478600001)(81166006)(53546011)(6506007)(26005)(8936002)(8676002)(81156014)(25786009)(4326008)(66556008)(66476007)(66946007)(64756008)(66446008)(15650500001)(6916009)(386003)(3846002)(71190400001)(71200400001)(2906002)(6116002)(102836004)(52116002)(76176011)(186003)(6246003)(14454004)(99286004)(33656002)(54906003)(1076003)(6436002)(36756003)(446003)(14444005)(66066001)(86362001)(11346002)(486006)(476003)(305945005)(229853002)(6486002)(6512007)(7416002)(9686003)(7736002)(58126008)(316002)(256004)(5660300002)(30126002);DIR:OUT;SFP:1501;SCL:5;SRVR:VI1PR08MB3981;H:VI1PR08MB4608.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-transport-forked: True
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: a+xvzLEoBHS7i0s022ez5bc5ydVMsxmSlq7LgxoGzLaQ1j4HWsA1RmZ9/9SozkWLiLW/wxb/EyNszIOwSWP4UdsYAjKomqp60bwE4gICCyuhJC3sXbfW3oXvKaDXjj/XHxcIUKW4k0dYAJBFXBStBNQCQkQnfrF4cc7ZGkQH6Hp9gf7xh5eSZhwYoY235A3SjapTZgY4Yupwia/KAaYn/sjjnz3VD9LFVeKD4+ppSdIUSMbBWGKodEWF4nVVv7bUq1q3b6rlUUgLDlXI3a8gol1AJ+CGtVIKJxiJlKuOpgZzu1ROyK1WAvG0cRM5KkP6XrlHOA6C2OCNMhYRVbdJSEkJqS+t7TaYFkw3h0m9cw7laNqwqjYgKNrh8Uu2EF0y
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmFjZDM1ODEtZjhlNi00ZTQzLThkOWItYzg4ODAxZGI4MDdkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNkJPRFhkQjBRYWpiakxjUVZJTUgwNklVOXgzY0pGeEdqaHNSXC84WVRlYW5aR2FoWk1FKzRMcjBnWDY0NDlWQ0wifQ==
+x-originating-ip: [10.239.127.40]
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D142AD6D28BC3B48B343FED6CB4B8F5B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ea6ae82-446f-4481-793b-08d767612eb3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 11:12:19.0936
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nK8AZ65O001WblCCj+Az7NCevKwg41E+LPY29HKiJwskISFySh1/lonbx5A8EP4z26NHOEbZK7QEW+McVLZPNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3981
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 06:08:05PM -0600, Suravee Suthikulpanit wrote:
-> On 11/4/19 4:05 PM, Roman Kagan wrote:
-> > On Fri, Nov 01, 2019 at 10:41:31PM +0000, Suthikulpanit, Suravee wrote:
-> > > AMD SVM AVIC needs to update APIC backing page mapping before changing
-> > > APICv mode. Introduce struct kvm_x86_ops.pre_update_apicv_exec_ctrl
-> > > function hook to be called prior KVM APICv update request to each vcpu.
-> > This again seems to mix up APIC backing page and APIC access page.
-> > 
-> > And I must be missing something obvious, but why is it necessary to
-> > unmap the APIC access page while AVIC is disabled?  Does keeping it
-> > around stand in the way when working with AVIC disabled?
+> From: Alex Williamson < alex.williamson@redhat.com >
+> Sent: Friday, November 8, 2019 7:21 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables) to host
 > 
-> I have replied to patch 07/17 with explanation.
+> On Thu, 24 Oct 2019 08:26:23 -0400
+> Liu Yi L <yi.l.liu@intel.com> wrote:
 > 
-> Yes, keeping the APIC access page while disabling AVIC would cause
-> the SVM to not function properly.
+> > This patch adds vfio support to bind guest translation structure
+> > to host iommu. VFIO exposes iommu programming capability to user-
+> > space. Guest is a user-space application in host under KVM solution.
+> > For SVA usage in Virtual Machine, guest owns GVA->GPA translation
+> > structure. And this part should be passdown to host to enable nested
+> > translation (or say two stage translation). This patch reuses the
+> > VFIO_IOMMU_BIND proposal from Jean-Philippe Brucker, and adds new
+> > bind type for binding guest owned translation structure to host.
+> >
+> > *) Add two new ioctls for VFIO containers.
+> >
+> >   - VFIO_IOMMU_BIND: for bind request from userspace, it could be
+> >                    bind a process to a pasid or bind a guest pasid
+> >                    to a device, this is indicated by type
+> >   - VFIO_IOMMU_UNBIND: for unbind request from userspace, it could be
+> >                    unbind a process to a pasid or unbind a guest pasid
+> >                    to a device, also indicated by type
+> >   - Bind type:
+> > 	VFIO_IOMMU_BIND_PROCESS: user-space request to bind a process
+> >                    to a device
+> > 	VFIO_IOMMU_BIND_GUEST_PASID: bind guest owned translation
+> >                    structure to host iommu. e.g. guest page table
+> >
+> > *) Code logic in vfio_iommu_type1_ioctl() to handle VFIO_IOMMU_BIND/UNBIND
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c | 136
+> ++++++++++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/vfio.h       |  44 +++++++++++++
+> >  2 files changed, 180 insertions(+)
+> >
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index 3d73a7d..1a27e25 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -2325,6 +2325,104 @@ static int vfio_iommu_type1_pasid_free(struct
+> vfio_iommu *iommu,
+> >  	return ret;
+> >  }
+> >
+> > +static int vfio_bind_gpasid_fn(struct device *dev, void *data)
+> > +{
+> > +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> > +	struct iommu_gpasid_bind_data *ustruct =
+> > +		(struct iommu_gpasid_bind_data *) dc->data;
+> > +
+> > +	return iommu_sva_bind_gpasid(dc->domain, dev, ustruct);
+> > +}
+> > +
+> > +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
+> > +{
+> > +	struct domain_capsule *dc = (struct domain_capsule *)data;
+> > +	struct iommu_gpasid_bind_data *ustruct =
+> > +		(struct iommu_gpasid_bind_data *) dc->data;
+> > +
+> > +	return iommu_sva_unbind_gpasid(dc->domain, dev,
+> > +						ustruct->hpasid);
+> > +}
+> > +
+> > +/*
+> > + * unbind specific gpasid, caller of this function requires hold
+> > + * vfio_iommu->lock
+> > + */
+> > +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
+> > +		  struct iommu_gpasid_bind_data *gbind_data)
+> > +{
+> > +	return vfio_iommu_lookup_dev(iommu, vfio_unbind_gpasid_fn, gbind_data);
+> > +}
+> > +
+> > +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
+> > +					    void __user *arg,
+> > +					    struct vfio_iommu_type1_bind *bind)
+> > +{
+> > +	struct iommu_gpasid_bind_data gbind_data;
+> > +	unsigned long minsz;
+> > +	int ret = 0;
+> > +
+> > +	minsz = sizeof(*bind) + sizeof(gbind_data);
+> > +	if (bind->argsz < minsz)
+> > +		return -EINVAL;
+> > +
+> > +	if (copy_from_user(&gbind_data, arg, sizeof(gbind_data)))
+> > +		return -EFAULT;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > +		ret = -EINVAL;
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	ret = vfio_iommu_lookup_dev(iommu, vfio_bind_gpasid_fn, &gbind_data);
+> > +	/*
+> > +	 * If bind failed, it may not be a total failure. Some devices within
+> > +	 * the iommu group may have bind successfully. Although we don't enable
+> > +	 * pasid capability for non-singletion iommu groups, a unbind operation
+> > +	 * would be helpful to ensure no partial binding for an iommu group.
+> > +	 */
+> > +	if (ret)
+> > +		/*
+> > +		 * Undo all binds that already succeeded, no need to check the
+> > +		 * return value here since some device within the group has no
+> > +		 * successful bind when coming to this place switch.
+> > +		 */
+> > +		vfio_iommu_type1_do_guest_unbind(iommu, &gbind_data);
+> > +
+> > +out_unlock:
+> > +	mutex_unlock(&iommu->lock);
+> > +	return ret;
+> > +}
+> > +
+> > +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
+> > +					    void __user *arg,
+> > +					    struct vfio_iommu_type1_bind *bind)
+> > +{
+> > +	struct iommu_gpasid_bind_data gbind_data;
+> > +	unsigned long minsz;
+> > +	int ret = 0;
+> > +
+> > +	minsz = sizeof(*bind) + sizeof(gbind_data);
+> > +	if (bind->argsz < minsz)
+> > +		return -EINVAL;
+> 
+> But gbind_data can change size if new vendor specific data is added to
+> the union, so kernel updates break existing userspace.  Fail.
 
-I wonder why?  Once AVIC is disabled guest access to this page would
-trigger a regular NPT fault vmexit, just as it would with the NPT entry
-for this page destroyed, wouldn't it?  So there would be no difference
-from the host's POV.  Am I missing something?
+yes, we have a version field in struct iommu_gpasid_bind_data. How
+about doing sanity check per versions? kernel knows the gbind_data
+size of specific versions. Does it make sense? If yes, I'll also apply it
+to the other sanity check in this series to avoid userspace fail after
+kernel update.
+
+> > +
+> > +	if (copy_from_user(&gbind_data, arg, sizeof(gbind_data)))
+> > +		return -EFAULT;
+> > +
+> > +	mutex_lock(&iommu->lock);
+> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
+> > +		ret = -EINVAL;
+> > +		goto out_unlock;
+> > +	}
+> > +
+> > +	ret = vfio_iommu_type1_do_guest_unbind(iommu, &gbind_data);
+> > +
+> > +out_unlock:
+> > +	mutex_unlock(&iommu->lock);
+> > +	return ret;
+> > +}
+> > +
+> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  				   unsigned int cmd, unsigned long arg)
+> >  {
+> > @@ -2484,6 +2582,44 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >  		default:
+> >  			return -EINVAL;
+> >  		}
+> > +
+> > +	} else if (cmd == VFIO_IOMMU_BIND) {
+> > +		struct vfio_iommu_type1_bind bind;
+> > +
+> > +		minsz = offsetofend(struct vfio_iommu_type1_bind, bind_type);
+> > +
+> > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
+> > +			return -EFAULT;
+> > +
+> > +		if (bind.argsz < minsz)
+> > +			return -EINVAL;
+> > +
+> > +		switch (bind.bind_type) {
+> > +		case VFIO_IOMMU_BIND_GUEST_PASID:
+> > +			return vfio_iommu_type1_bind_gpasid(iommu,
+> > +					(void __user *)(arg + minsz), &bind);
+> 
+> Why are we defining BIND_PROCESS if it's not supported?  How does the
+> user learn it's not supported?
+
+I think I should drop it so far since I only add BIND_GUEST_PASID. I think
+Jean Philippe may need it in his native SVA enabling patchset. For the way
+to let user learn it, may be using VFIO_IOMMU_GET_INFO as you mentioned
+below?
+
+> 
+> > +		default:
+> > +			return -EINVAL;
+> > +		}
+> > +
+> > +	} else if (cmd == VFIO_IOMMU_UNBIND) {
+> > +		struct vfio_iommu_type1_bind bind;
+> > +
+> > +		minsz = offsetofend(struct vfio_iommu_type1_bind, bind_type);
+> > +
+> > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
+> > +			return -EFAULT;
+> > +
+> > +		if (bind.argsz < minsz)
+> > +			return -EINVAL;
+> > +
+> > +		switch (bind.bind_type) {
+> > +		case VFIO_IOMMU_BIND_GUEST_PASID:
+> > +			return vfio_iommu_type1_unbind_gpasid(iommu,
+> > +					(void __user *)(arg + minsz), &bind);
+> > +		default:
+> > +			return -EINVAL;
+> > +		}
+> >  	}
+> >
+> >  	return -ENOTTY;
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 04de290..78e8c64 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -832,6 +832,50 @@ struct vfio_iommu_type1_pasid_request {
+> >   */
+> >  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 27)
+> >
+> > +enum vfio_iommu_bind_type {
+> > +	VFIO_IOMMU_BIND_PROCESS,
+> > +	VFIO_IOMMU_BIND_GUEST_PASID,
+> > +};
+> > +
+> > +/*
+> > + * Supported types:
+> > + *	- VFIO_IOMMU_BIND_GUEST_PASID: bind guest pasid, which invoked
+> > + *			by guest, it takes iommu_gpasid_bind_data in data.
+> > + */
+> > +struct vfio_iommu_type1_bind {
+> > +	__u32				argsz;
+> > +	enum vfio_iommu_bind_type	bind_type;
+> > +	__u8				data[];
+> > +};
+> 
+> I don't think enum defines a compiler invariant data size.  We can't
+> use it for a kernel/user interface.  Also why no flags field as is
+> essentially standard for every vfio ioctl?  Couldn't we specify
+> process/guest-pasid with flags?
+
+I remember there is an early comment in community which pointed out
+that using flags potentially allows to config multiples types in one IOCTL.
+Regards to it, defining explicit emums avoids it. But I agree with you,
+it makes variant size. I'll fix it if this matter more.
+
+> For that matter couldn't we specify
+> bind/unbind using a single ioctl?  I think that would be more
+> consistent with the pasid alloc/free ioctl in the previous patch.
+
+yes, let me make it in next version.
+
+> Why are we appending opaque data to the end of the structure when
+> clearly we expect a struct iommu_gpasid_bind_data?
+
+This is due to the intention to support BIND_GUEST_PASID and
+BIND_PROCESS with a single IOCTL. Maybe we can use a separate
+IOCTL for BIND_PROCESS. what's your opinion here?
+
+> That bind data
+> structure expects a format (ex. IOMMU_PASID_FORMAT_INTEL_VTD).  How does
+> a user determine what formats are accepted from within the vfio API (or
+> even outside of the vfio API)?
+
+The info is provided by vIOMMU emulator (e.g. virtual VT-d). The vSVA patch
+from Jacob has a sanity check on it.
+https://lkml.org/lkml/2019/10/28/873
+
+> > +
+> > +/*
+> > + * VFIO_IOMMU_BIND - _IOWR(VFIO_TYPE, VFIO_BASE + 28, struct
+> vfio_iommu_bind)
+>                             ^
+> The semantics appear to just be _IOW, nothing is written back to the
+> userspace buffer on return.
+
+will fix it. thanks.
+
+> > + *
+> > + * Manage address spaces of devices in this container. Initially a TYPE1
+> > + * container can only have one address space, managed with
+> > + * VFIO_IOMMU_MAP/UNMAP_DMA.
+> > + *
+> > + * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by both
+> MAP/UNMAP
+> > + * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host) page
+> > + * tables, and BIND manages the stage-1 (guest) page tables. Other types of
+> > + * IOMMU may allow MAP/UNMAP and BIND to coexist, where MAP/UNMAP
+> controls
+> > + * non-PASID traffic and BIND controls PASID traffic. But this depends on the
+> > + * underlying IOMMU architecture and isn't guaranteed.
+> > + *
+> > + * Availability of this feature depends on the device, its bus, the underlying
+> > + * IOMMU and the CPU architecture.
+> 
+> And the user discovers this is available by...?  There's no probe here,
+> are they left only to setup a VM to the point of trying to use this
+> before they fail the ioctl?  Could VFIO_IOMMU_GET_INFO fill this gap?
+> Thanks,
+
+I think VFIO_IOMMU_GET_INFO could help. let me extend it to fill this gap
+if you agree.
+
+> Alex
 
 Thanks,
-Roman.
+Yi Liu
+
+> 
+> > + *
+> > + * returns: 0 on success, -errno on failure.
+> > + */
+> > +#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 28)
+> > +
+> > +/*
+> > + * VFIO_IOMMU_UNBIND - _IOWR(VFIO_TYPE, VFIO_BASE + 29, struct
+> vfio_iommu_bind)
+> > + *
+> > + * Undo what was done by the corresponding VFIO_IOMMU_BIND ioctl.
+> > + */
+> > +#define VFIO_IOMMU_UNBIND	_IO(VFIO_TYPE, VFIO_BASE + 29)
+> > +
+> >  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+> >
+> >  /*
+
