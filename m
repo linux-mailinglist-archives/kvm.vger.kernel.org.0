@@ -2,405 +2,330 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F09BF8E62
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 12:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E0C5F8E93
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 12:29:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727264AbfKLLVt convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 12 Nov 2019 06:21:49 -0500
-Received: from mga02.intel.com ([134.134.136.20]:26653 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfKLLVn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 06:21:43 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 03:21:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,296,1569308400"; 
-   d="scan'208";a="207080391"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by orsmga003.jf.intel.com with ESMTP; 12 Nov 2019 03:21:42 -0800
-Received: from fmsmsx125.amr.corp.intel.com (10.18.125.40) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 12 Nov 2019 03:21:42 -0800
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- FMSMSX125.amr.corp.intel.com (10.18.125.40) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 12 Nov 2019 03:21:42 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.60]) with mapi id 14.03.0439.000;
- Tue, 12 Nov 2019 19:21:40 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
+        id S1726978AbfKLL2y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 06:28:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28030 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726957AbfKLL2x (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 06:28:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573558132;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FJp+cdkR/KUfWO88XvWnViJGJgatKXO8jQkKYpu6WJk=;
+        b=LL6KrsfIudUG5gaq3YGOpEwte5bl8w7dH/+yoJvK5fZ8fvzF+C6Str4mhNqxqNV98nZN0Q
+        5hVCRe1uW0PpxlKk6R6+q3PjTgghReCgsWywK5js0U5ESBJAgvxIo+oH/f97oABpbrqJP0
+        1SGAzgMUS33Ihu880bA/ecf9B5xmvhs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-ceMHyAO1Mn2K2ymVmGHufg-1; Tue, 12 Nov 2019 06:28:48 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E66107ACC4;
+        Tue, 12 Nov 2019 11:28:46 +0000 (UTC)
+Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA6BE59;
+        Tue, 12 Nov 2019 11:28:38 +0000 (UTC)
+Subject: Re: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
         "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Lu, Baolu" <baolu.lu@intel.com>, "Wu, Hao" <hao.wu@intel.com>
-Subject: RE: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
- to host
-Thread-Topic: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
- to host
-Thread-Index: AQHVimn49qwPncOwpUK3oA3gYR4tBqd/6QGAgAdz7JA=
-Date:   Tue, 12 Nov 2019 11:21:40 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0F6894@SHSMSX104.ccr.corp.intel.com>
-References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
-        <1571919983-3231-4-git-send-email-yi.l.liu@intel.com>
- <20191107162041.31e620a4@x1.home>
-In-Reply-To: <20191107162041.31e620a4@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNmFjZDM1ODEtZjhlNi00ZTQzLThkOWItYzg4ODAxZGI4MDdkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNkJPRFhkQjBRYWpiakxjUVZJTUgwNklVOXgzY0pGeEdqaHNSXC84WVRlYW5aR2FoWk1FKzRMcjBnWDY0NDlWQ0wifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "will.deacon@arm.com" <will.deacon@arm.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Cc:     "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "vincent.stehle@arm.com" <vincent.stehle@arm.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
+        "tina.zhang@intel.com" <tina.zhang@intel.com>,
+        Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
+References: <20190711135625.20684-1-eric.auger@redhat.com>
+ <f5b4b97b197d4bab8f3703eba2e966c4@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <ebaded3e-8a5c-73dd-b3f7-7533a6e80146@redhat.com>
+Date:   Tue, 12 Nov 2019 12:28:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <f5b4b97b197d4bab8f3703eba2e966c4@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: ceMHyAO1Mn2K2ymVmGHufg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson < alex.williamson@redhat.com >
-> Sent: Friday, November 8, 2019 7:21 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables) to host
-> 
-> On Thu, 24 Oct 2019 08:26:23 -0400
-> Liu Yi L <yi.l.liu@intel.com> wrote:
-> 
-> > This patch adds vfio support to bind guest translation structure
-> > to host iommu. VFIO exposes iommu programming capability to user-
-> > space. Guest is a user-space application in host under KVM solution.
-> > For SVA usage in Virtual Machine, guest owns GVA->GPA translation
-> > structure. And this part should be passdown to host to enable nested
-> > translation (or say two stage translation). This patch reuses the
-> > VFIO_IOMMU_BIND proposal from Jean-Philippe Brucker, and adds new
-> > bind type for binding guest owned translation structure to host.
-> >
-> > *) Add two new ioctls for VFIO containers.
-> >
-> >   - VFIO_IOMMU_BIND: for bind request from userspace, it could be
-> >                    bind a process to a pasid or bind a guest pasid
-> >                    to a device, this is indicated by type
-> >   - VFIO_IOMMU_UNBIND: for unbind request from userspace, it could be
-> >                    unbind a process to a pasid or unbind a guest pasid
-> >                    to a device, also indicated by type
-> >   - Bind type:
-> > 	VFIO_IOMMU_BIND_PROCESS: user-space request to bind a process
-> >                    to a device
-> > 	VFIO_IOMMU_BIND_GUEST_PASID: bind guest owned translation
-> >                    structure to host iommu. e.g. guest page table
-> >
-> > *) Code logic in vfio_iommu_type1_ioctl() to handle VFIO_IOMMU_BIND/UNBIND
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 136
-> ++++++++++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/vfio.h       |  44 +++++++++++++
-> >  2 files changed, 180 insertions(+)
-> >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index 3d73a7d..1a27e25 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -2325,6 +2325,104 @@ static int vfio_iommu_type1_pasid_free(struct
-> vfio_iommu *iommu,
-> >  	return ret;
-> >  }
-> >
-> > +static int vfio_bind_gpasid_fn(struct device *dev, void *data)
-> > +{
-> > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > +	struct iommu_gpasid_bind_data *ustruct =
-> > +		(struct iommu_gpasid_bind_data *) dc->data;
-> > +
-> > +	return iommu_sva_bind_gpasid(dc->domain, dev, ustruct);
-> > +}
-> > +
-> > +static int vfio_unbind_gpasid_fn(struct device *dev, void *data)
-> > +{
-> > +	struct domain_capsule *dc = (struct domain_capsule *)data;
-> > +	struct iommu_gpasid_bind_data *ustruct =
-> > +		(struct iommu_gpasid_bind_data *) dc->data;
-> > +
-> > +	return iommu_sva_unbind_gpasid(dc->domain, dev,
-> > +						ustruct->hpasid);
-> > +}
-> > +
-> > +/*
-> > + * unbind specific gpasid, caller of this function requires hold
-> > + * vfio_iommu->lock
-> > + */
-> > +static long vfio_iommu_type1_do_guest_unbind(struct vfio_iommu *iommu,
-> > +		  struct iommu_gpasid_bind_data *gbind_data)
-> > +{
-> > +	return vfio_iommu_lookup_dev(iommu, vfio_unbind_gpasid_fn, gbind_data);
-> > +}
-> > +
-> > +static long vfio_iommu_type1_bind_gpasid(struct vfio_iommu *iommu,
-> > +					    void __user *arg,
-> > +					    struct vfio_iommu_type1_bind *bind)
-> > +{
-> > +	struct iommu_gpasid_bind_data gbind_data;
-> > +	unsigned long minsz;
-> > +	int ret = 0;
-> > +
-> > +	minsz = sizeof(*bind) + sizeof(gbind_data);
-> > +	if (bind->argsz < minsz)
-> > +		return -EINVAL;
-> > +
-> > +	if (copy_from_user(&gbind_data, arg, sizeof(gbind_data)))
-> > +		return -EFAULT;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	ret = vfio_iommu_lookup_dev(iommu, vfio_bind_gpasid_fn, &gbind_data);
-> > +	/*
-> > +	 * If bind failed, it may not be a total failure. Some devices within
-> > +	 * the iommu group may have bind successfully. Although we don't enable
-> > +	 * pasid capability for non-singletion iommu groups, a unbind operation
-> > +	 * would be helpful to ensure no partial binding for an iommu group.
-> > +	 */
-> > +	if (ret)
-> > +		/*
-> > +		 * Undo all binds that already succeeded, no need to check the
-> > +		 * return value here since some device within the group has no
-> > +		 * successful bind when coming to this place switch.
-> > +		 */
-> > +		vfio_iommu_type1_do_guest_unbind(iommu, &gbind_data);
-> > +
-> > +out_unlock:
-> > +	mutex_unlock(&iommu->lock);
-> > +	return ret;
-> > +}
-> > +
-> > +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
-> > +					    void __user *arg,
-> > +					    struct vfio_iommu_type1_bind *bind)
-> > +{
-> > +	struct iommu_gpasid_bind_data gbind_data;
-> > +	unsigned long minsz;
-> > +	int ret = 0;
-> > +
-> > +	minsz = sizeof(*bind) + sizeof(gbind_data);
-> > +	if (bind->argsz < minsz)
-> > +		return -EINVAL;
-> 
-> But gbind_data can change size if new vendor specific data is added to
-> the union, so kernel updates break existing userspace.  Fail.
+Hi Shameer,
+On 11/12/19 12:08 PM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
+>=20
+>> -----Original Message-----
+>> From: kvmarm-bounces@lists.cs.columbia.edu
+>> [mailto:kvmarm-bounces@lists.cs.columbia.edu] On Behalf Of Eric Auger
+>> Sent: 11 July 2019 14:56
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
+>> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+>> yi.l.liu@intel.com; jean-philippe.brucker@arm.com; will.deacon@arm.com;
+>> robin.murphy@arm.com
+>> Cc: kevin.tian@intel.com; vincent.stehle@arm.com; ashok.raj@intel.com;
+>> marc.zyngier@arm.com; tina.zhang@intel.com
+>> Subject: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+>>
+>> This series brings the VFIO part of HW nested paging support
+>> in the SMMUv3.
+>>
+>> The series depends on:
+>> [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+>> (https://www.spinics.net/lists/kernel/msg3187714.html)
+>>
+>> 3 new IOCTLs are introduced that allow the userspace to
+>> 1) pass the guest stage 1 configuration
+>> 2) pass stage 1 MSI bindings
+>> 3) invalidate stage 1 related caches
+>>
+>> They map onto the related new IOMMU API functions.
+>>
+>> We introduce the capability to register specific interrupt
+>> indexes (see [1]). A new DMA_FAULT interrupt index allows to register
+>> an eventfd to be signaled whenever a stage 1 related fault
+>> is detected at physical level. Also a specific region allows
+>> to expose the fault records to the user space.
+>=20
+> I am trying to get this running on one of our platform that has smmuv3 du=
+al
+> stage support. I am seeing some issues with this when an ixgbe vf dev is=
+=20
+> made pass-through and is behind a vSMMUv3 in Guest.
+>=20
+> Kernel used : https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> Qemu: https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
+>=20
+> And this is my Qemu cmd line,
+>=20
+> ./qemu-system-aarch64
+> -machine virt,kernel_irqchip=3Don,gic-version=3D3,iommu=3Dsmmuv3 -cpu hos=
+t \
+> -kernel Image \
+> -drive if=3Dnone,file=3Dubuntu,id=3Dfs \
+> -device virtio-blk-device,drive=3Dfs \
+> -device vfio-pci,host=3D0000:01:10.1 \
+> -bios QEMU_EFI.fd \
+> -net none \
+> -m 4G \
+> -nographic -D -d -enable-kvm \
+> -append "console=3DttyAMA0 root=3D/dev/vda rw acpi=3Dforce"
+>=20
+> The basic ping from Guest works fine,
+> root@ubuntu:~# ping 10.202.225.185
+> PING 10.202.225.185 (10.202.225.185) 56(84) bytes of data.
+> 64 bytes from 10.202.225.185: icmp_seq=3D2 ttl=3D64 time=3D0.207 ms
+> 64 bytes from 10.202.225.185: icmp_seq=3D3 ttl=3D64 time=3D0.203 ms
+> ...
+>=20
+> But if I increase ping packet size,=20
+>=20
+> root@ubuntu:~# ping -s 1024 10.202.225.185
+> PING 10.202.225.185 (10.202.225.185) 1024(1052) bytes of data.
+> 1032 bytes from 10.202.225.185: icmp_seq=3D22 ttl=3D64 time=3D0.292 ms
+> 1032 bytes from 10.202.225.185: icmp_seq=3D23 ttl=3D64 time=3D0.207 ms
+> From 10.202.225.169 icmp_seq=3D66 Destination Host Unreachable
+> From 10.202.225.169 icmp_seq=3D67 Destination Host Unreachable
+> From 10.202.225.169 icmp_seq=3D68 Destination Host Unreachable
+> From 10.202.225.169 icmp_seq=3D69 Destination Host Unreachable
+>=20
+> And from Host kernel I get,
+> [  819.970742] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets detected
+> [  824.002707] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> [  828.034683] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> [  830.050673] ixgbe 0000:01:00.1 enp1s0f1: 4 Spoofed packets detected
+> [  832.066659] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> [  834.082640] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets detected
+>=20
+> Also noted that iperf cannot work as it fails to establish the connection=
+ with iperf
+> server.=20
+>=20
+> Please find attached the trace logs(vfio*, smmuv3*) from Qemu for your re=
+ference.
+> I haven't debugged this further yet and thought of checking with you if t=
+his is
+> something you have seen already or not. Or maybe I am missing something h=
+ere?
 
-yes, we have a version field in struct iommu_gpasid_bind_data. How
-about doing sanity check per versions? kernel knows the gbind_data
-size of specific versions. Does it make sense? If yes, I'll also apply it
-to the other sanity check in this series to avoid userspace fail after
-kernel update.
+Please can you try to edit and modify hw/vfio/common.c, function
+vfio_iommu_unmap_notify
 
-> > +
-> > +	if (copy_from_user(&gbind_data, arg, sizeof(gbind_data)))
-> > +		return -EFAULT;
-> > +
-> > +	mutex_lock(&iommu->lock);
-> > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > +		ret = -EINVAL;
-> > +		goto out_unlock;
-> > +	}
-> > +
-> > +	ret = vfio_iommu_type1_do_guest_unbind(iommu, &gbind_data);
-> > +
-> > +out_unlock:
-> > +	mutex_unlock(&iommu->lock);
-> > +	return ret;
-> > +}
-> > +
-> >  static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  				   unsigned int cmd, unsigned long arg)
-> >  {
-> > @@ -2484,6 +2582,44 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
-> >  		default:
-> >  			return -EINVAL;
-> >  		}
-> > +
-> > +	} else if (cmd == VFIO_IOMMU_BIND) {
-> > +		struct vfio_iommu_type1_bind bind;
-> > +
-> > +		minsz = offsetofend(struct vfio_iommu_type1_bind, bind_type);
-> > +
-> > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
-> > +			return -EFAULT;
-> > +
-> > +		if (bind.argsz < minsz)
-> > +			return -EINVAL;
-> > +
-> > +		switch (bind.bind_type) {
-> > +		case VFIO_IOMMU_BIND_GUEST_PASID:
-> > +			return vfio_iommu_type1_bind_gpasid(iommu,
-> > +					(void __user *)(arg + minsz), &bind);
-> 
-> Why are we defining BIND_PROCESS if it's not supported?  How does the
-> user learn it's not supported?
 
-I think I should drop it so far since I only add BIND_GUEST_PASID. I think
-Jean Philippe may need it in his native SVA enabling patchset. For the way
-to let user learn it, may be using VFIO_IOMMU_GET_INFO as you mentioned
-below?
+/*
+    if (size <=3D 0x10000) {
+        ustruct.info.cache =3D IOMMU_CACHE_INV_TYPE_IOTLB;
+        ustruct.info.granularity =3D IOMMU_INV_GRANU_ADDR;
+        ustruct.info.addr_info.flags =3D IOMMU_INV_ADDR_FLAGS_ARCHID;
+        if (iotlb->leaf) {
+            ustruct.info.addr_info.flags |=3D IOMMU_INV_ADDR_FLAGS_LEAF;
+        }
+        ustruct.info.addr_info.archid =3D iotlb->arch_id;
+        ustruct.info.addr_info.addr =3D start;
+        ustruct.info.addr_info.granule_size =3D size;
+        ustruct.info.addr_info.nb_granules =3D 1;
+        trace_vfio_iommu_addr_inv_iotlb(iotlb->arch_id, start, size, 1,
+                                        iotlb->leaf);
+    } else {
+*/
+        ustruct.info.cache =3D IOMMU_CACHE_INV_TYPE_IOTLB;
+        ustruct.info.granularity =3D IOMMU_INV_GRANU_PASID;
+        ustruct.info.pasid_info.archid =3D iotlb->arch_id;
+        ustruct.info.pasid_info.flags =3D IOMMU_INV_PASID_FLAGS_ARCHID;
+        trace_vfio_iommu_asid_inv_iotlb(iotlb->arch_id);
+//    }
 
-> 
-> > +		default:
-> > +			return -EINVAL;
-> > +		}
-> > +
-> > +	} else if (cmd == VFIO_IOMMU_UNBIND) {
-> > +		struct vfio_iommu_type1_bind bind;
-> > +
-> > +		minsz = offsetofend(struct vfio_iommu_type1_bind, bind_type);
-> > +
-> > +		if (copy_from_user(&bind, (void __user *)arg, minsz))
-> > +			return -EFAULT;
-> > +
-> > +		if (bind.argsz < minsz)
-> > +			return -EINVAL;
-> > +
-> > +		switch (bind.bind_type) {
-> > +		case VFIO_IOMMU_BIND_GUEST_PASID:
-> > +			return vfio_iommu_type1_unbind_gpasid(iommu,
-> > +					(void __user *)(arg + minsz), &bind);
-> > +		default:
-> > +			return -EINVAL;
-> > +		}
-> >  	}
-> >
-> >  	return -ENOTTY;
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 04de290..78e8c64 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -832,6 +832,50 @@ struct vfio_iommu_type1_pasid_request {
-> >   */
-> >  #define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 27)
-> >
-> > +enum vfio_iommu_bind_type {
-> > +	VFIO_IOMMU_BIND_PROCESS,
-> > +	VFIO_IOMMU_BIND_GUEST_PASID,
-> > +};
-> > +
-> > +/*
-> > + * Supported types:
-> > + *	- VFIO_IOMMU_BIND_GUEST_PASID: bind guest pasid, which invoked
-> > + *			by guest, it takes iommu_gpasid_bind_data in data.
-> > + */
-> > +struct vfio_iommu_type1_bind {
-> > +	__u32				argsz;
-> > +	enum vfio_iommu_bind_type	bind_type;
-> > +	__u8				data[];
-> > +};
-> 
-> I don't think enum defines a compiler invariant data size.  We can't
-> use it for a kernel/user interface.  Also why no flags field as is
-> essentially standard for every vfio ioctl?  Couldn't we specify
-> process/guest-pasid with flags?
+This modification leads to invalidate the whole asid each time we get a
+guest TLBI instead of invalidating the single IOVA (TLBI). On my end, I
+saw this was the cause of such kind of issues. Please let me know if it
+fixes your perf issues and then we may discuss further about the test
+configuration.
 
-I remember there is an early comment in community which pointed out
-that using flags potentially allows to config multiples types in one IOCTL.
-Regards to it, defining explicit emums avoids it. But I agree with you,
-it makes variant size. I'll fix it if this matter more.
+Thanks
 
-> For that matter couldn't we specify
-> bind/unbind using a single ioctl?  I think that would be more
-> consistent with the pasid alloc/free ioctl in the previous patch.
+Eric
 
-yes, let me make it in next version.
 
-> Why are we appending opaque data to the end of the structure when
-> clearly we expect a struct iommu_gpasid_bind_data?
 
-This is due to the intention to support BIND_GUEST_PASID and
-BIND_PROCESS with a single IOCTL. Maybe we can use a separate
-IOCTL for BIND_PROCESS. what's your opinion here?
-
-> That bind data
-> structure expects a format (ex. IOMMU_PASID_FORMAT_INTEL_VTD).  How does
-> a user determine what formats are accepted from within the vfio API (or
-> even outside of the vfio API)?
-
-The info is provided by vIOMMU emulator (e.g. virtual VT-d). The vSVA patch
-from Jacob has a sanity check on it.
-https://lkml.org/lkml/2019/10/28/873
-
-> > +
-> > +/*
-> > + * VFIO_IOMMU_BIND - _IOWR(VFIO_TYPE, VFIO_BASE + 28, struct
-> vfio_iommu_bind)
->                             ^
-> The semantics appear to just be _IOW, nothing is written back to the
-> userspace buffer on return.
-
-will fix it. thanks.
-
-> > + *
-> > + * Manage address spaces of devices in this container. Initially a TYPE1
-> > + * container can only have one address space, managed with
-> > + * VFIO_IOMMU_MAP/UNMAP_DMA.
-> > + *
-> > + * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by both
-> MAP/UNMAP
-> > + * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host) page
-> > + * tables, and BIND manages the stage-1 (guest) page tables. Other types of
-> > + * IOMMU may allow MAP/UNMAP and BIND to coexist, where MAP/UNMAP
-> controls
-> > + * non-PASID traffic and BIND controls PASID traffic. But this depends on the
-> > + * underlying IOMMU architecture and isn't guaranteed.
-> > + *
-> > + * Availability of this feature depends on the device, its bus, the underlying
-> > + * IOMMU and the CPU architecture.
-> 
-> And the user discovers this is available by...?  There's no probe here,
-> are they left only to setup a VM to the point of trying to use this
-> before they fail the ioctl?  Could VFIO_IOMMU_GET_INFO fill this gap?
+>=20
+> Please let me know.
+>=20
 > Thanks,
-
-I think VFIO_IOMMU_GET_INFO could help. let me extend it to fill this gap
-if you agree.
-
-> Alex
-
-Thanks,
-Yi Liu
-
-> 
-> > + *
-> > + * returns: 0 on success, -errno on failure.
-> > + */
-> > +#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 28)
-> > +
-> > +/*
-> > + * VFIO_IOMMU_UNBIND - _IOWR(VFIO_TYPE, VFIO_BASE + 29, struct
-> vfio_iommu_bind)
-> > + *
-> > + * Undo what was done by the corresponding VFIO_IOMMU_BIND ioctl.
-> > + */
-> > +#define VFIO_IOMMU_UNBIND	_IO(VFIO_TYPE, VFIO_BASE + 29)
-> > +
-> >  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
-> >
-> >  /*
+> Shameer
+>=20
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+>>
+>> It series includes Tina's patch steming from
+>> [1] "[RFC PATCH v2 1/3] vfio: Use capability chains to handle device
+>> specific irq" plus patches originally contributed by Yi.
+>>
+>> History:
+>>
+>> v8 -> v9:
+>> - introduce specific irq framework
+>> - single fault region
+>> - iommu_unregister_device_fault_handler failure case not handled
+>>   yet.
+>>
+>> v7 -> v8:
+>> - rebase on top of v5.2-rc1 and especially
+>>   8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+>> - dynamic alloc of s1_cfg/s2_cfg
+>> - __arm_smmu_tlb_inv_asid/s1_range_nosync
+>> - check there is no HW MSI regions
+>> - asid invalidation using pasid extended struct (change in the uapi)
+>> - add s1_live/s2_live checks
+>> - move check about support of nested stages in domain finalise
+>> - fixes in error reporting according to the discussion with Robin
+>> - reordered the patches to have first iommu/smmuv3 patches and then
+>>   VFIO patches
+>>
+>> v6 -> v7:
+>> - removed device handle from bind/unbind_guest_msi
+>> - added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+>>   enforcement"
+>> - added few uapi comments as suggested by Jean, Jacop and Alex
+>>
+>> v5 -> v6:
+>> - Fix compilation issue when CONFIG_IOMMU_API is unset
+>>
+>> v4 -> v5:
+>> - fix bug reported by Vincent: fault handler unregistration now happens =
+in
+>>   vfio_pci_release
+>> - IOMMU_FAULT_PERM_* moved outside of struct definition + small
+>>   uapi changes suggested by Kean-Philippe (except fetch_addr)
+>> - iommu: introduce device fault report API: removed the PRI part.
+>> - see individual logs for more details
+>> - reset the ste abort flag on detach
+>>
+>> v3 -> v4:
+>> - took into account Alex, jean-Philippe and Robin's comments on v3
+>> - rework of the smmuv3 driver integration
+>> - add tear down ops for msi binding and PASID table binding
+>> - fix S1 fault propagation
+>> - put fault reporting patches at the beginning of the series following
+>>   Jean-Philippe's request
+>> - update of the cache invalidate and fault API uapis
+>> - VFIO fault reporting rework with 2 separate regions and one mmappable
+>>   segment for the fault queue
+>> - moved to PATCH
+>>
+>> v2 -> v3:
+>> - When registering the S1 MSI binding we now store the device handle. Th=
+is
+>>   addresses Robin's comment about discimination of devices beonging to
+>>   different S1 groups and using different physical MSI doorbells.
+>> - Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+>>   set the eventfd and expose the faults through an mmappable fault regio=
+n
+>>
+>> v1 -> v2:
+>> - Added the fault reporting capability
+>> - asid properly passed on invalidation (fix assignment of multiple
+>>   devices)
+>> - see individual change logs for more info
+>>
+>>
+>> Eric Auger (8):
+>>   vfio: VFIO_IOMMU_SET_MSI_BINDING
+>>   vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
+>>   vfio/pci: Register an iommu fault handler
+>>   vfio/pci: Allow to mmap the fault queue
+>>   vfio: Add new IRQ for DMA fault reporting
+>>   vfio/pci: Add framework for custom interrupt indices
+>>   vfio/pci: Register and allow DMA FAULT IRQ signaling
+>>   vfio: Document nested stage control
+>>
+>> Liu, Yi L (2):
+>>   vfio: VFIO_IOMMU_SET_PASID_TABLE
+>>   vfio: VFIO_IOMMU_CACHE_INVALIDATE
+>>
+>> Tina Zhang (1):
+>>   vfio: Use capability chains to handle device specific irq
+>>
+>>  Documentation/vfio.txt              |  77 ++++++++
+>>  drivers/vfio/pci/vfio_pci.c         | 283 ++++++++++++++++++++++++++--
+>>  drivers/vfio/pci/vfio_pci_intrs.c   |  62 ++++++
+>>  drivers/vfio/pci/vfio_pci_private.h |  24 +++
+>>  drivers/vfio/pci/vfio_pci_rdwr.c    |  45 +++++
+>>  drivers/vfio/vfio_iommu_type1.c     | 166 ++++++++++++++++
+>>  include/uapi/linux/vfio.h           | 109 ++++++++++-
+>>  7 files changed, 747 insertions(+), 19 deletions(-)
+>>
+>> --
+>> 2.20.1
+>>
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
