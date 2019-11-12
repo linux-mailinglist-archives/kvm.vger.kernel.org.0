@@ -2,182 +2,323 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AF1CF8FEE
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 13:49:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB1F0F8FF9
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 13:52:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727167AbfKLMt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 07:49:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28280 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727166AbfKLMt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 07:49:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573562996;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g9s0JIN2xt+eywacAxoWziOVtnj6SE0YzxR2eAkIxak=;
-        b=HwNjv8wkyHAUN6apxz5bJYk78NPTG4nKTgrtdI5uQo2E6leo5PTxeqPW6ds0eH+x1RJSi3
-        ylaG4/a699iVP5f0j/krUiLWSskNWpy7I5v9ZqW+8kY7df2rsb5wqjwJNY7KzHaFvFEnvh
-        DJeJL7GXmjXLQhIyPX2XMAT2sitjWe8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-qfzcBp8jPdia9I30u2CuOg-1; Tue, 12 Nov 2019 07:49:55 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 696978017E0;
-        Tue, 12 Nov 2019 12:49:54 +0000 (UTC)
-Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2A4A10001BD;
-        Tue, 12 Nov 2019 12:49:52 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 02/17] arm: gic: Generalise function names
+        id S1727168AbfKLMv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 07:51:59 -0500
+Received: from foss.arm.com ([217.140.110.172]:33364 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725944AbfKLMv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 07:51:59 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3375C30E;
+        Tue, 12 Nov 2019 04:51:58 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 433503F6C4;
+        Tue, 12 Nov 2019 04:51:57 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 03/17] arm: gic: Provide per-IRQ helper
+ functions
 To:     Andre Przywara <andre.przywara@arm.com>,
         Andrew Jones <drjones@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
 References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-3-andre.przywara@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <b2657cf3-202a-3fc5-3268-1f2fcc1b68f2@redhat.com>
-Date:   Tue, 12 Nov 2019 13:49:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ <20191108144240.204202-4-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <9cc460d1-c01f-6b0a-c6be-292a63174d68@arm.com>
+Date:   Tue, 12 Nov 2019 12:51:55 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191108144240.204202-3-andre.przywara@arm.com>
+In-Reply-To: <20191108144240.204202-4-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: qfzcBp8jPdia9I30u2CuOg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Hi,
 
-On 11/8/19 3:42 PM, Andre Przywara wrote:
-> In preparation for adding functions to test SPI interrupts, generalise
-> some existing functions dealing with IPIs so far, since most of them
-> are actually generic for all kind of interrupts.
-> This also reformats the irq_handler() function, to later expand it
-> more easily.
->=20
+On 11/8/19 2:42 PM, Andre Przywara wrote:
+> A common theme when accessing per-IRQ parameters in the GIC distributor
+> is to set fields of a certain bit width in a range of MMIO registers.
+> Examples are the enabled status (one bit per IRQ), the level/edge
+> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
+>
+> Add a generic helper function which is able to mask and set the
+> respective number of bits, given the IRQ number and the MMIO offset.
+> Provide wrappers using this function to easily allow configuring an IRQ.
+>
+> For now assume that private IRQ numbers always refer to the current CPU.
+> In a GICv2 accessing the "other" private IRQs is not easily doable (the
+> registers are banked per CPU on the same MMIO address), so we impose the
+> same limitation on GICv3, even though those registers are not banked
+> there anymore.
+>
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  arm/gic.c | 40 +++++++++++++++++++++-------------------
->  1 file changed, 21 insertions(+), 19 deletions(-)
->=20
-> diff --git a/arm/gic.c b/arm/gic.c
-> index 04b3337..a114009 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -135,28 +135,30 @@ static void check_ipi_sender(u32 irqstat)
->  =09}
->  }
-> =20
-> -static void check_irqnr(u32 irqnr)
-> +static void check_irqnr(u32 irqnr, int expected)
->  {
-> -=09if (irqnr !=3D IPI_IRQ)
-> +=09if (irqnr !=3D expected)
->  =09=09bad_irq[smp_processor_id()] =3D irqnr;
->  }
-> =20
-> -static void ipi_handler(struct pt_regs *regs __unused)
-> +static void irq_handler(struct pt_regs *regs __unused)
->  {
->  =09u32 irqstat =3D gic_read_iar();
->  =09u32 irqnr =3D gic_iar_irqnr(irqstat);
-> =20
-> -=09if (irqnr !=3D GICC_INT_SPURIOUS) {
-> -=09=09gic_write_eoir(irqstat);
-> -=09=09smp_rmb(); /* pairs with wmb in stats_reset */
-> -=09=09++acked[smp_processor_id()];
-> -=09=09check_ipi_sender(irqstat);
-> -=09=09check_irqnr(irqnr);
-> -=09=09smp_wmb(); /* pairs with rmb in check_acked */
-> -=09} else {
-> +=09if (irqnr =3D=3D GICC_INT_SPURIOUS) {
->  =09=09++spurious[smp_processor_id()];
->  =09=09smp_wmb();
-> +=09=09return;
->  =09}
+>  lib/arm/asm/gic-v3.h |  1 +
+>  lib/arm/asm/gic.h    |  9 +++++
+>  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 100 insertions(+)
+>
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index ed6a5ad..8cfaed1 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -23,6 +23,7 @@
+>  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+>  #define GICD_CTLR_ENABLE_G1		(1U << 0)
+>  
+> +#define GICD_IROUTER			0x6000
+>  #define GICD_PIDR2			0xffe8
+>  
+>  /* Re-Distributor registers, offsets from RD_base */
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index 1fc10a0..21cdb58 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -15,6 +15,7 @@
+>  #define GICD_IIDR			0x0008
+>  #define GICD_IGROUPR			0x0080
+>  #define GICD_ISENABLER			0x0100
+> +#define GICD_ICENABLER			0x0180
+>  #define GICD_ISPENDR			0x0200
+>  #define GICD_ICPENDR			0x0280
+>  #define GICD_ISACTIVER			0x0300
+> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+>  extern void gic_ipi_send_single(int irq, int cpu);
+>  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+>  
+> +void gic_set_irq_bit(int irq, int offset);
+> +void gic_enable_irq(int irq);
+> +void gic_disable_irq(int irq);
+> +void gic_set_irq_priority(int irq, u8 prio);
+> +void gic_set_irq_target(int irq, int cpu);
+> +void gic_set_irq_group(int irq, int group);
+> +int gic_get_irq_group(int irq);
 > +
-> +=09gic_write_eoir(irqstat);
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_H_ */
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 9430116..cf4e811 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+>  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+>  	gic_common_ops->ipi_send_mask(irq, dest);
+>  }
 > +
-> +=09smp_rmb(); /* pairs with wmb in stats_reset */
-> +=09++acked[smp_processor_id()];
-> +=09check_ipi_sender(irqstat);
-> +=09check_irqnr(irqnr, IPI_IRQ);
-> +=09smp_wmb(); /* pairs with rmb in check_acked */
->  }
-> =20
->  static void gicv2_ipi_send_self(void)
-> @@ -216,20 +218,20 @@ static void ipi_test_smp(void)
->  =09report_prefix_pop();
->  }
-> =20
-> -static void ipi_enable(void)
-> +static void irqs_enable(void)
->  {
->  =09gic_enable_defaults();
->  #ifdef __arm__
-> -=09install_exception_handler(EXCPTN_IRQ, ipi_handler);
-> +=09install_exception_handler(EXCPTN_IRQ, irq_handler);
->  #else
-> -=09install_irq_handler(EL1H_IRQ, ipi_handler);
-> +=09install_irq_handler(EL1H_IRQ, irq_handler);
->  #endif
->  =09local_irq_enable();
->  }
-> =20
->  static void ipi_send(void)
->  {
-> -=09ipi_enable();
-> +=09irqs_enable();
->  =09wait_on_ready();
->  =09ipi_test_self();
->  =09ipi_test_smp();
-> @@ -237,9 +239,9 @@ static void ipi_send(void)
->  =09exit(report_summary());
->  }
-> =20
-> -static void ipi_recv(void)
-> +static void irq_recv(void)
->  {
-> -=09ipi_enable();
-> +=09irqs_enable();
->  =09cpumask_set_cpu(smp_processor_id(), &ready);
->  =09while (1)
->  =09=09wfi();
-> @@ -250,7 +252,7 @@ static void ipi_test(void *data __unused)
->  =09if (smp_processor_id() =3D=3D IPI_SENDER)
->  =09=09ipi_send();
->  =09else
-> -=09=09ipi_recv();
-> +=09=09irq_recv();
->  }
-> =20
->  static struct gic gicv2 =3D {
-> @@ -285,7 +287,7 @@ static void ipi_clear_active_handler(struct pt_regs *=
-regs __unused)
-> =20
->  =09=09smp_rmb(); /* pairs with wmb in stats_reset */
->  =09=09++acked[smp_processor_id()];
-> -=09=09check_irqnr(irqnr);
-> +=09=09check_irqnr(irqnr, IPI_IRQ);
->  =09=09smp_wmb(); /* pairs with rmb in check_acked */
->  =09} else {
->  =09=09++spurious[smp_processor_id()];
->=20
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> +enum gic_bit_access {
+> +	ACCESS_READ,
+> +	ACCESS_SET,
+> +	ACCESS_RMW
+> +};
+> +
+> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
+> +			      enum gic_bit_access access)
+> +{
+> +	void *base;
+> +	int split = 32 / bits;
+> +	int shift = (irq % split) * bits;
+> +	u32 reg, mask = ((1U << bits) - 1) << shift;
+> +
+> +	switch (gic_version()) {
+> +	case 2:
+> +		base = gicv2_dist_base();
+> +		break;
+> +	case 3:
+> +		if (irq < 32)
+> +			base = gicv3_sgi_base();
+> +		else
+> +			base = gicv3_dist_base();
+> +		break;
+> +	default:
+> +		return 0;
+> +	}
+> +	base += offset + (irq / split) * 4;
 
-Thanks
+This is probably not what you intended, if irq = 4 and split = 8, (irq / split) *
+4 = 0. On the other hand, irq * 4 / split = 2.
 
-Eric
+> +
+> +	switch (access) {
+> +	case ACCESS_READ:
+> +		return (readl(base) & mask) >> shift;
+> +	case ACCESS_SET:
+> +		reg = 0;
+> +		break;
+> +	case ACCESS_RMW:
+> +		reg = readl(base) & ~mask;
+> +		break;
+> +	}
+> +
+> +	writel(reg | ((u32)value << shift), base);
+> +
+> +	return 0;
+> +}
+This function looks a bit out of place:
+- the function name has a verb in the past tense ('masked'), which makes me think
+it should return a bool, but the function actually performs an access to a GIC
+register.
+- the return value is an u8, but it returns an u32 on a read, because readl
+returns an u32.
+- the semantics of the function and the return value change based on the access
+parameter; worse yet, the return value on a write is completely ignored by the
+callers and the value parameter is ignored on reads.
+
+You could split it into separate functions - see below.
+
+> +
+> +void gic_set_irq_bit(int irq, int offset)
+> +{
+> +	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
+> +}
+> +
+> +void gic_enable_irq(int irq)
+> +{
+> +	gic_set_irq_bit(irq, GICD_ISENABLER);
+> +}
+> +
+> +void gic_disable_irq(int irq)
+> +{
+> +	gic_set_irq_bit(irq, GICD_ICENABLER);
+> +}
+> +
+> +void gic_set_irq_priority(int irq, u8 prio)
+> +{
+> +	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
+> +}
+> +
+> +void gic_set_irq_target(int irq, int cpu)
+> +{
+> +	if (irq < 32)
+> +		return;
+> +
+> +	if (gic_version() == 2) {
+> +		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
+> +				    ACCESS_RMW);
+> +
+> +		return;
+> +	}
+> +
+> +	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
+> +}
+> +
+> +void gic_set_irq_group(int irq, int group)
+> +{
+> +	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
+> +}
+> +
+> +int gic_get_irq_group(int irq)
+> +{
+> +	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
+> +}
+
+The pattern for the public functions in this file is to check that the GIC has
+been initialized (assert(gic_common_ops)).
+
+I propose we rewrite the functions like this (compile tested only):
+
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 94301169215c..1f5aa7b48828 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,89 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+        assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+        gic_common_ops->ipi_send_mask(irq, dest);
+ }
++
++static void *gic_get_irq_reg(int irq, int offset, int width)
++{
++       void *base;
++
++       switch (gic_version()) {
++       case 2:
++               base = gicv2_dist_base();
++               break;
++       case 3:
++               if (irq < 32)
++                       base = gicv3_sgi_base();
++               else
++                       base = gicv3_dist_base();
++               break;
++       default:
++               return 0;
++       }
++
++       return base + offset + (irq * width / 32);
++}
++
++static void gic_set_irq_field(int irq, int offset, int width, u32 value)
++{
++       void *reg;
++       u32 val;
++       int shift = (irq * width) % 32;
++       u32 mask = ((1U << width) - 1) << shift;
++
++       reg = gic_get_irq_reg(irq, offset, width);
++       val = readl(reg);
++       val = (val & ~mask) | (value << shift);
++       writel(val, reg);
++}
++
++void gic_enable_irq(int irq)
++{
++       assert(gic_common_ops);
++       gic_set_irq_field(irq, GICD_ISENABLER, 1, 1);
++}
++
++void gic_disable_irq(int irq)
++{
++       assert(gic_common_ops);
++       gic_set_irq_field(irq, GICD_ICENABLER, 1, 1);
++}
++
++void gic_set_irq_priority(int irq, u8 prio)
++{
++       assert(gic_common_ops);
++       gic_set_irq_field(irq, GICD_IPRIORITYR, 8, prio);
++}
++
++void gic_set_irq_target(int irq, int cpu)
++{
++       assert(gic_common_ops);
++
++       if (irq < 32)
++               return;
++
++       if (gic_version() == 2) {
++               gic_set_irq_field(irq, GICD_ITARGETSR, 8, 1U << cpu);
++               return;
++       }
++
++       writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++       assert(gic_common_ops);
++       gic_set_irq_field(irq, GICD_IGROUPR, 1, 1);
++}
++
++int gic_get_irq_group(int irq)
++{
++       void *reg;
++       u32 val;
++       int shift = irq % 32;
++
++       assert(gic_common_ops);
++       reg = gic_get_irq_reg(irq, GICD_IGROUPR, 1);
++       val = readl(reg);
++
++       return (val >> shift) & 0x1;
++}
+
+A bit more lines of code, but to me more readable. What do you think?
+
 
