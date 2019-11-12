@@ -2,323 +2,360 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB1F0F8FF9
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 13:52:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F95F902D
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 14:06:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727168AbfKLMv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 07:51:59 -0500
-Received: from foss.arm.com ([217.140.110.172]:33364 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725944AbfKLMv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 07:51:59 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3375C30E;
-        Tue, 12 Nov 2019 04:51:58 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 433503F6C4;
-        Tue, 12 Nov 2019 04:51:57 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 03/17] arm: gic: Provide per-IRQ helper
- functions
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-4-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9cc460d1-c01f-6b0a-c6be-292a63174d68@arm.com>
-Date:   Tue, 12 Nov 2019 12:51:55 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191108144240.204202-4-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        id S1727324AbfKLNGR convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 12 Nov 2019 08:06:17 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2086 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725985AbfKLNGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 08:06:16 -0500
+Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 8D190D1853C511971F3C;
+        Tue, 12 Nov 2019 13:06:14 +0000 (GMT)
+Received: from lhreml706-chm.china.huawei.com (10.201.108.55) by
+ lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Tue, 12 Nov 2019 13:06:13 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml706-chm.china.huawei.com (10.201.108.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 12 Nov 2019 13:06:13 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Tue, 12 Nov 2019 13:06:14 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "will.deacon@arm.com" <will.deacon@arm.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+CC:     "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "vincent.stehle@arm.com" <vincent.stehle@arm.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
+        "tina.zhang@intel.com" <tina.zhang@intel.com>,
+        Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
+Subject: RE: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+Thread-Topic: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+Thread-Index: AQHVN/CfwyE8ogH9wk6QxsmMIq08eqeIHQ3QgAALuICAABiYUA==
+Date:   Tue, 12 Nov 2019 13:06:13 +0000
+Message-ID: <76d9dc0274414887b04e11b9b6bda257@huawei.com>
+References: <20190711135625.20684-1-eric.auger@redhat.com>
+ <f5b4b97b197d4bab8f3703eba2e966c4@huawei.com>
+ <ebaded3e-8a5c-73dd-b3f7-7533a6e80146@redhat.com>
+In-Reply-To: <ebaded3e-8a5c-73dd-b3f7-7533a6e80146@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Hi Eric,
 
-On 11/8/19 2:42 PM, Andre Przywara wrote:
-> A common theme when accessing per-IRQ parameters in the GIC distributor
-> is to set fields of a certain bit width in a range of MMIO registers.
-> Examples are the enabled status (one bit per IRQ), the level/edge
-> configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
->
-> Add a generic helper function which is able to mask and set the
-> respective number of bits, given the IRQ number and the MMIO offset.
-> Provide wrappers using this function to easily allow configuring an IRQ.
->
-> For now assume that private IRQ numbers always refer to the current CPU.
-> In a GICv2 accessing the "other" private IRQs is not easily doable (the
-> registers are banked per CPU on the same MMIO address), so we impose the
-> same limitation on GICv3, even though those registers are not banked
-> there anymore.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  lib/arm/asm/gic-v3.h |  1 +
->  lib/arm/asm/gic.h    |  9 +++++
->  lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 100 insertions(+)
->
-> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-> index ed6a5ad..8cfaed1 100644
-> --- a/lib/arm/asm/gic-v3.h
-> +++ b/lib/arm/asm/gic-v3.h
-> @@ -23,6 +23,7 @@
->  #define GICD_CTLR_ENABLE_G1A		(1U << 1)
->  #define GICD_CTLR_ENABLE_G1		(1U << 0)
->  
-> +#define GICD_IROUTER			0x6000
->  #define GICD_PIDR2			0xffe8
->  
->  /* Re-Distributor registers, offsets from RD_base */
-> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> index 1fc10a0..21cdb58 100644
-> --- a/lib/arm/asm/gic.h
-> +++ b/lib/arm/asm/gic.h
-> @@ -15,6 +15,7 @@
->  #define GICD_IIDR			0x0008
->  #define GICD_IGROUPR			0x0080
->  #define GICD_ISENABLER			0x0100
-> +#define GICD_ICENABLER			0x0180
->  #define GICD_ISPENDR			0x0200
->  #define GICD_ICPENDR			0x0280
->  #define GICD_ISACTIVER			0x0300
-> @@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
->  extern void gic_ipi_send_single(int irq, int cpu);
->  extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
->  
-> +void gic_set_irq_bit(int irq, int offset);
-> +void gic_enable_irq(int irq);
-> +void gic_disable_irq(int irq);
-> +void gic_set_irq_priority(int irq, u8 prio);
-> +void gic_set_irq_target(int irq, int cpu);
-> +void gic_set_irq_group(int irq, int group);
-> +int gic_get_irq_group(int irq);
-> +
->  #endif /* !__ASSEMBLY__ */
->  #endif /* _ASMARM_GIC_H_ */
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 9430116..cf4e811 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
->  	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
->  	gic_common_ops->ipi_send_mask(irq, dest);
->  }
-> +
-> +enum gic_bit_access {
-> +	ACCESS_READ,
-> +	ACCESS_SET,
-> +	ACCESS_RMW
-> +};
-> +
-> +static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
-> +			      enum gic_bit_access access)
-> +{
-> +	void *base;
-> +	int split = 32 / bits;
-> +	int shift = (irq % split) * bits;
-> +	u32 reg, mask = ((1U << bits) - 1) << shift;
-> +
-> +	switch (gic_version()) {
-> +	case 2:
-> +		base = gicv2_dist_base();
-> +		break;
-> +	case 3:
-> +		if (irq < 32)
-> +			base = gicv3_sgi_base();
-> +		else
-> +			base = gicv3_dist_base();
-> +		break;
-> +	default:
-> +		return 0;
-> +	}
-> +	base += offset + (irq / split) * 4;
+> -----Original Message-----
+> From: Auger Eric [mailto:eric.auger@redhat.com]
+> Sent: 12 November 2019 11:29
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> eric.auger.pro@gmail.com; iommu@lists.linux-foundation.org;
+> linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
+> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+> yi.l.liu@intel.com; jean-philippe.brucker@arm.com; will.deacon@arm.com;
+> robin.murphy@arm.com
+> Cc: kevin.tian@intel.com; vincent.stehle@arm.com; ashok.raj@intel.com;
+> marc.zyngier@arm.com; tina.zhang@intel.com; Linuxarm
+> <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
+> Subject: Re: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+> 
+> Hi Shameer,
+> On 11/12/19 12:08 PM, Shameerali Kolothum Thodi wrote:
+> > Hi Eric,
+> >
+> >> -----Original Message-----
+> >> From: kvmarm-bounces@lists.cs.columbia.edu
+> >> [mailto:kvmarm-bounces@lists.cs.columbia.edu] On Behalf Of Eric Auger
+> >> Sent: 11 July 2019 14:56
+> >> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> >> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> >> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
+> >> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
+> >> yi.l.liu@intel.com; jean-philippe.brucker@arm.com; will.deacon@arm.com;
+> >> robin.murphy@arm.com
+> >> Cc: kevin.tian@intel.com; vincent.stehle@arm.com; ashok.raj@intel.com;
+> >> marc.zyngier@arm.com; tina.zhang@intel.com
+> >> Subject: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+> >>
+> >> This series brings the VFIO part of HW nested paging support
+> >> in the SMMUv3.
+> >>
+> >> The series depends on:
+> >> [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+> >> (https://www.spinics.net/lists/kernel/msg3187714.html)
+> >>
+> >> 3 new IOCTLs are introduced that allow the userspace to
+> >> 1) pass the guest stage 1 configuration
+> >> 2) pass stage 1 MSI bindings
+> >> 3) invalidate stage 1 related caches
+> >>
+> >> They map onto the related new IOMMU API functions.
+> >>
+> >> We introduce the capability to register specific interrupt
+> >> indexes (see [1]). A new DMA_FAULT interrupt index allows to register
+> >> an eventfd to be signaled whenever a stage 1 related fault
+> >> is detected at physical level. Also a specific region allows
+> >> to expose the fault records to the user space.
+> >
+> > I am trying to get this running on one of our platform that has smmuv3 dual
+> > stage support. I am seeing some issues with this when an ixgbe vf dev is
+> > made pass-through and is behind a vSMMUv3 in Guest.
+> >
+> > Kernel used : https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> > Qemu: https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
+> >
+> > And this is my Qemu cmd line,
+> >
+> > ./qemu-system-aarch64
+> > -machine virt,kernel_irqchip=on,gic-version=3,iommu=smmuv3 -cpu host \
+> > -kernel Image \
+> > -drive if=none,file=ubuntu,id=fs \
+> > -device virtio-blk-device,drive=fs \
+> > -device vfio-pci,host=0000:01:10.1 \
+> > -bios QEMU_EFI.fd \
+> > -net none \
+> > -m 4G \
+> > -nographic -D -d -enable-kvm \
+> > -append "console=ttyAMA0 root=/dev/vda rw acpi=force"
+> >
+> > The basic ping from Guest works fine,
+> > root@ubuntu:~# ping 10.202.225.185
+> > PING 10.202.225.185 (10.202.225.185) 56(84) bytes of data.
+> > 64 bytes from 10.202.225.185: icmp_seq=2 ttl=64 time=0.207 ms
+> > 64 bytes from 10.202.225.185: icmp_seq=3 ttl=64 time=0.203 ms
+> > ...
+> >
+> > But if I increase ping packet size,
+> >
+> > root@ubuntu:~# ping -s 1024 10.202.225.185
+> > PING 10.202.225.185 (10.202.225.185) 1024(1052) bytes of data.
+> > 1032 bytes from 10.202.225.185: icmp_seq=22 ttl=64 time=0.292 ms
+> > 1032 bytes from 10.202.225.185: icmp_seq=23 ttl=64 time=0.207 ms
+> > From 10.202.225.169 icmp_seq=66 Destination Host Unreachable
+> > From 10.202.225.169 icmp_seq=67 Destination Host Unreachable
+> > From 10.202.225.169 icmp_seq=68 Destination Host Unreachable
+> > From 10.202.225.169 icmp_seq=69 Destination Host Unreachable
+> >
+> > And from Host kernel I get,
+> > [  819.970742] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets detected
+> > [  824.002707] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> > [  828.034683] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> > [  830.050673] ixgbe 0000:01:00.1 enp1s0f1: 4 Spoofed packets detected
+> > [  832.066659] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets detected
+> > [  834.082640] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets detected
+> >
+> > Also noted that iperf cannot work as it fails to establish the connection with
+> iperf
+> > server.
+> >
+> > Please find attached the trace logs(vfio*, smmuv3*) from Qemu for your
+> reference.
+> > I haven't debugged this further yet and thought of checking with you if this is
+> > something you have seen already or not. Or maybe I am missing something
+> here?
+> 
+> Please can you try to edit and modify hw/vfio/common.c, function
+> vfio_iommu_unmap_notify
+> 
+> 
+> /*
+>     if (size <= 0x10000) {
+>         ustruct.info.cache = IOMMU_CACHE_INV_TYPE_IOTLB;
+>         ustruct.info.granularity = IOMMU_INV_GRANU_ADDR;
+>         ustruct.info.addr_info.flags = IOMMU_INV_ADDR_FLAGS_ARCHID;
+>         if (iotlb->leaf) {
+>             ustruct.info.addr_info.flags |=
+> IOMMU_INV_ADDR_FLAGS_LEAF;
+>         }
+>         ustruct.info.addr_info.archid = iotlb->arch_id;
+>         ustruct.info.addr_info.addr = start;
+>         ustruct.info.addr_info.granule_size = size;
+>         ustruct.info.addr_info.nb_granules = 1;
+>         trace_vfio_iommu_addr_inv_iotlb(iotlb->arch_id, start, size, 1,
+>                                         iotlb->leaf);
+>     } else {
+> */
+>         ustruct.info.cache = IOMMU_CACHE_INV_TYPE_IOTLB;
+>         ustruct.info.granularity = IOMMU_INV_GRANU_PASID;
+>         ustruct.info.pasid_info.archid = iotlb->arch_id;
+>         ustruct.info.pasid_info.flags = IOMMU_INV_PASID_FLAGS_ARCHID;
+>         trace_vfio_iommu_asid_inv_iotlb(iotlb->arch_id);
+> //    }
+> 
+> This modification leads to invalidate the whole asid each time we get a
+> guest TLBI instead of invalidating the single IOVA (TLBI). On my end, I
+> saw this was the cause of such kind of issues. Please let me know if it
+> fixes your perf issues
 
-This is probably not what you intended, if irq = 4 and split = 8, (irq / split) *
-4 = 0. On the other hand, irq * 4 / split = 2.
+Yes, this seems to fix the issue.
 
-> +
-> +	switch (access) {
-> +	case ACCESS_READ:
-> +		return (readl(base) & mask) >> shift;
-> +	case ACCESS_SET:
-> +		reg = 0;
-> +		break;
-> +	case ACCESS_RMW:
-> +		reg = readl(base) & ~mask;
-> +		break;
-> +	}
-> +
-> +	writel(reg | ((u32)value << shift), base);
-> +
-> +	return 0;
-> +}
-This function looks a bit out of place:
-- the function name has a verb in the past tense ('masked'), which makes me think
-it should return a bool, but the function actually performs an access to a GIC
-register.
-- the return value is an u8, but it returns an u32 on a read, because readl
-returns an u32.
-- the semantics of the function and the return value change based on the access
-parameter; worse yet, the return value on a write is completely ignored by the
-callers and the value parameter is ignored on reads.
+root@ubuntu:~# iperf -c 10.202.225.185
+------------------------------------------------------------
+Client connecting to 10.202.225.185, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 10.202.225.169 port 47996 connected with 10.202.225.185 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  2.27 GBytes  1.95 Gbits/sec
+root@ubuntu:~#
 
-You could split it into separate functions - see below.
+But the performance seems to be very poor as this is a 10Gbps interface(Of course
+invalidating the whole asid may not be very helpful). It is interesting that why the
+single iova invalidation is not working.
 
-> +
-> +void gic_set_irq_bit(int irq, int offset)
-> +{
-> +	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
-> +}
-> +
-> +void gic_enable_irq(int irq)
-> +{
-> +	gic_set_irq_bit(irq, GICD_ISENABLER);
-> +}
-> +
-> +void gic_disable_irq(int irq)
-> +{
-> +	gic_set_irq_bit(irq, GICD_ICENABLER);
-> +}
-> +
-> +void gic_set_irq_priority(int irq, u8 prio)
-> +{
-> +	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
-> +}
-> +
-> +void gic_set_irq_target(int irq, int cpu)
-> +{
-> +	if (irq < 32)
-> +		return;
-> +
-> +	if (gic_version() == 2) {
-> +		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
-> +				    ACCESS_RMW);
-> +
-> +		return;
-> +	}
-> +
-> +	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
-> +}
-> +
-> +void gic_set_irq_group(int irq, int group)
-> +{
-> +	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
-> +}
-> +
-> +int gic_get_irq_group(int irq)
-> +{
-> +	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
-> +}
+ and then we may discuss further about the test
+> configuration.
 
-The pattern for the public functions in this file is to check that the GIC has
-been initialized (assert(gic_common_ops)).
+Sure. Please let me know.
 
-I propose we rewrite the functions like this (compile tested only):
+Cheers,
+Shameer 
 
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 94301169215c..1f5aa7b48828 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -146,3 +146,89 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
-        assert(gic_common_ops && gic_common_ops->ipi_send_mask);
-        gic_common_ops->ipi_send_mask(irq, dest);
- }
-+
-+static void *gic_get_irq_reg(int irq, int offset, int width)
-+{
-+       void *base;
-+
-+       switch (gic_version()) {
-+       case 2:
-+               base = gicv2_dist_base();
-+               break;
-+       case 3:
-+               if (irq < 32)
-+                       base = gicv3_sgi_base();
-+               else
-+                       base = gicv3_dist_base();
-+               break;
-+       default:
-+               return 0;
-+       }
-+
-+       return base + offset + (irq * width / 32);
-+}
-+
-+static void gic_set_irq_field(int irq, int offset, int width, u32 value)
-+{
-+       void *reg;
-+       u32 val;
-+       int shift = (irq * width) % 32;
-+       u32 mask = ((1U << width) - 1) << shift;
-+
-+       reg = gic_get_irq_reg(irq, offset, width);
-+       val = readl(reg);
-+       val = (val & ~mask) | (value << shift);
-+       writel(val, reg);
-+}
-+
-+void gic_enable_irq(int irq)
-+{
-+       assert(gic_common_ops);
-+       gic_set_irq_field(irq, GICD_ISENABLER, 1, 1);
-+}
-+
-+void gic_disable_irq(int irq)
-+{
-+       assert(gic_common_ops);
-+       gic_set_irq_field(irq, GICD_ICENABLER, 1, 1);
-+}
-+
-+void gic_set_irq_priority(int irq, u8 prio)
-+{
-+       assert(gic_common_ops);
-+       gic_set_irq_field(irq, GICD_IPRIORITYR, 8, prio);
-+}
-+
-+void gic_set_irq_target(int irq, int cpu)
-+{
-+       assert(gic_common_ops);
-+
-+       if (irq < 32)
-+               return;
-+
-+       if (gic_version() == 2) {
-+               gic_set_irq_field(irq, GICD_ITARGETSR, 8, 1U << cpu);
-+               return;
-+       }
-+
-+       writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
-+}
-+
-+void gic_set_irq_group(int irq, int group)
-+{
-+       assert(gic_common_ops);
-+       gic_set_irq_field(irq, GICD_IGROUPR, 1, 1);
-+}
-+
-+int gic_get_irq_group(int irq)
-+{
-+       void *reg;
-+       u32 val;
-+       int shift = irq % 32;
-+
-+       assert(gic_common_ops);
-+       reg = gic_get_irq_reg(irq, GICD_IGROUPR, 1);
-+       val = readl(reg);
-+
-+       return (val >> shift) & 0x1;
-+}
-
-A bit more lines of code, but to me more readable. What do you think?
-
+> Thanks
+> 
+> Eric
+> 
+> 
+> 
+> >
+> > Please let me know.
+> >
+> > Thanks,
+> > Shameer
+> >
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> This series can be found at:
+> >> https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> >>
+> >> It series includes Tina's patch steming from
+> >> [1] "[RFC PATCH v2 1/3] vfio: Use capability chains to handle device
+> >> specific irq" plus patches originally contributed by Yi.
+> >>
+> >> History:
+> >>
+> >> v8 -> v9:
+> >> - introduce specific irq framework
+> >> - single fault region
+> >> - iommu_unregister_device_fault_handler failure case not handled
+> >>   yet.
+> >>
+> >> v7 -> v8:
+> >> - rebase on top of v5.2-rc1 and especially
+> >>   8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain pointer
+> >> - dynamic alloc of s1_cfg/s2_cfg
+> >> - __arm_smmu_tlb_inv_asid/s1_range_nosync
+> >> - check there is no HW MSI regions
+> >> - asid invalidation using pasid extended struct (change in the uapi)
+> >> - add s1_live/s2_live checks
+> >> - move check about support of nested stages in domain finalise
+> >> - fixes in error reporting according to the discussion with Robin
+> >> - reordered the patches to have first iommu/smmuv3 patches and then
+> >>   VFIO patches
+> >>
+> >> v6 -> v7:
+> >> - removed device handle from bind/unbind_guest_msi
+> >> - added "iommu/smmuv3: Nested mode single MSI doorbell per domain
+> >>   enforcement"
+> >> - added few uapi comments as suggested by Jean, Jacop and Alex
+> >>
+> >> v5 -> v6:
+> >> - Fix compilation issue when CONFIG_IOMMU_API is unset
+> >>
+> >> v4 -> v5:
+> >> - fix bug reported by Vincent: fault handler unregistration now happens in
+> >>   vfio_pci_release
+> >> - IOMMU_FAULT_PERM_* moved outside of struct definition + small
+> >>   uapi changes suggested by Kean-Philippe (except fetch_addr)
+> >> - iommu: introduce device fault report API: removed the PRI part.
+> >> - see individual logs for more details
+> >> - reset the ste abort flag on detach
+> >>
+> >> v3 -> v4:
+> >> - took into account Alex, jean-Philippe and Robin's comments on v3
+> >> - rework of the smmuv3 driver integration
+> >> - add tear down ops for msi binding and PASID table binding
+> >> - fix S1 fault propagation
+> >> - put fault reporting patches at the beginning of the series following
+> >>   Jean-Philippe's request
+> >> - update of the cache invalidate and fault API uapis
+> >> - VFIO fault reporting rework with 2 separate regions and one mmappable
+> >>   segment for the fault queue
+> >> - moved to PATCH
+> >>
+> >> v2 -> v3:
+> >> - When registering the S1 MSI binding we now store the device handle. This
+> >>   addresses Robin's comment about discimination of devices beonging to
+> >>   different S1 groups and using different physical MSI doorbells.
+> >> - Change the fault reporting API: use VFIO_PCI_DMA_FAULT_IRQ_INDEX to
+> >>   set the eventfd and expose the faults through an mmappable fault region
+> >>
+> >> v1 -> v2:
+> >> - Added the fault reporting capability
+> >> - asid properly passed on invalidation (fix assignment of multiple
+> >>   devices)
+> >> - see individual change logs for more info
+> >>
+> >>
+> >> Eric Auger (8):
+> >>   vfio: VFIO_IOMMU_SET_MSI_BINDING
+> >>   vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
+> >>   vfio/pci: Register an iommu fault handler
+> >>   vfio/pci: Allow to mmap the fault queue
+> >>   vfio: Add new IRQ for DMA fault reporting
+> >>   vfio/pci: Add framework for custom interrupt indices
+> >>   vfio/pci: Register and allow DMA FAULT IRQ signaling
+> >>   vfio: Document nested stage control
+> >>
+> >> Liu, Yi L (2):
+> >>   vfio: VFIO_IOMMU_SET_PASID_TABLE
+> >>   vfio: VFIO_IOMMU_CACHE_INVALIDATE
+> >>
+> >> Tina Zhang (1):
+> >>   vfio: Use capability chains to handle device specific irq
+> >>
+> >>  Documentation/vfio.txt              |  77 ++++++++
+> >>  drivers/vfio/pci/vfio_pci.c         | 283
+> ++++++++++++++++++++++++++--
+> >>  drivers/vfio/pci/vfio_pci_intrs.c   |  62 ++++++
+> >>  drivers/vfio/pci/vfio_pci_private.h |  24 +++
+> >>  drivers/vfio/pci/vfio_pci_rdwr.c    |  45 +++++
+> >>  drivers/vfio/vfio_iommu_type1.c     | 166 ++++++++++++++++
+> >>  include/uapi/linux/vfio.h           | 109 ++++++++++-
+> >>  7 files changed, 747 insertions(+), 19 deletions(-)
+> >>
+> >> --
+> >> 2.20.1
+> >>
+> >> _______________________________________________
+> >> kvmarm mailing list
+> >> kvmarm@lists.cs.columbia.edu
+> >> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
