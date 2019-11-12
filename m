@@ -2,473 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A3F5F9ACD
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 21:35:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F89AF9ADF
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 21:38:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbfKLUfZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 15:35:25 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52588 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726645AbfKLUfZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Nov 2019 15:35:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573590923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=01VtwgnfzekOLxQX7b1QKuF231uztQhhyybbh9Ibtwk=;
-        b=B/Z8wwAQWWe4HQWhexgcT9yI+ZaFNoaJYxbuuLqTDnrIecJ1u0Fet8lGceTPsrOocw8Fnj
-        VqPB2ZF1xHFUf1Ql9+nmg3jA0/uRyLjMPaSQI3yBs9u+ZCp0FVtlwtLAEjeMsvISVWRmDo
-        vVNLh5nOlhu8HAQjw4umFHsR8qwBiPU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-79kKpTsxO9GnYMVpttv9nQ-1; Tue, 12 Nov 2019 15:34:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85351477;
-        Tue, 12 Nov 2019 20:34:43 +0000 (UTC)
-Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A93B69F6A;
-        Tue, 12 Nov 2019 20:34:34 +0000 (UTC)
-Subject: Re: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "will.deacon@arm.com" <will.deacon@arm.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc:     "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "vincent.stehle@arm.com" <vincent.stehle@arm.com>,
-        "ashok.raj@intel.com" <ashok.raj@intel.com>,
-        "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
-        "tina.zhang@intel.com" <tina.zhang@intel.com>,
-        Linuxarm <linuxarm@huawei.com>, "xuwei (O)" <xuwei5@huawei.com>
-References: <20190711135625.20684-1-eric.auger@redhat.com>
- <f5b4b97b197d4bab8f3703eba2e966c4@huawei.com>
- <ebaded3e-8a5c-73dd-b3f7-7533a6e80146@redhat.com>
- <76d9dc0274414887b04e11b9b6bda257@huawei.com>
- <b0a9f107-2e89-1418-d6f4-3e6f5ac0b330@redhat.com>
- <9f0a9d341b01419eb566731339b3fbd2@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <6e0faec9-5840-653e-cb43-86545a48e65d@redhat.com>
-Date:   Tue, 12 Nov 2019 21:34:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726718AbfKLUiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 15:38:04 -0500
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:37144 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726973AbfKLUiE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 15:38:04 -0500
+Received: by mail-qk1-f193.google.com with SMTP id e187so15748110qkf.4
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 12:38:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=GMi4xT2UOd2CFR3VJjVGTgOG1WxBYR/HDNQyyBU/zGM=;
+        b=j3NNIjPO3cADqvZd/hJQbIxM+DDhVRAEGcC+3T6+Q3fhxmcfREpCirlLaEIJBZkEdd
+         e3aBqytbSt/O1y6azCg5mzciQb9aXN7nl404GgQzXcRXFb+31Gp+DUUM20vq+CBmnlhO
+         OI6Itn853T6kP0jxgCe/92EYcvYqEI5wpO6FG/uJe2R9DweqI3FnTjwOvYkLmRQ3s4Xc
+         zG96fPghzfwVyKWk9G5BMiBAMZoSIJhIZiNOrjmRw2PjfIwZlx+LuvDRDWa51OzyNGdk
+         7PnZkzKlvewWQFyt2QF7slB5Swx6CEiwuOCbZxYFCsytkVXhCWtpdK2fshpP/jsmV8fx
+         ZjTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GMi4xT2UOd2CFR3VJjVGTgOG1WxBYR/HDNQyyBU/zGM=;
+        b=hyhIGCBMQUENu/FKTECyDTF5uYu+tJlWf4ZS8E++bfddQzkDinsTb3parYwHEr1+P/
+         BldqdHfMUEm4HLoYLX/QfpgOIuU7RwgXDRd2VXjUkWpAnHMDFS/qkBQ7TX5UTxKxCnAl
+         MaXfTF3wFwKoyjASePh+B7eFYSTKt/25nvi5k0l7Wr17RZ5Wobo/VDGGlPbC7i/M2YrH
+         /Y/noUjnoGVpdqNg90mrgMIrpqVEf3lWdNZ6AbIqxEgYdmmKM39s7bNJr6C/2VXg1JfS
+         owTqJX45zETL0KboCmkmLWiiTh25SkejWwV8jeIgq1Pof8Vvd5wBeXrzZRCZZTvbJVAq
+         N/Nw==
+X-Gm-Message-State: APjAAAVN7AZ18UbY8dEvdauKoBqjCl15K/bgKEWFiorPkXcve05qLUmc
+        oozO4H//w0IZRAHviJoGOFef/A==
+X-Google-Smtp-Source: APXvYqwLkTug1hfsKRZbiUckKPR5+bmE3pOvHeIup8u/vHZbKyWy6tiIbngDLXx22jZap3IUKn0tSg==
+X-Received: by 2002:a37:dc44:: with SMTP id v65mr7289252qki.72.1573591083419;
+        Tue, 12 Nov 2019 12:38:03 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
+        by smtp.gmail.com with ESMTPSA id k40sm11983680qta.76.2019.11.12.12.38.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 12 Nov 2019 12:38:02 -0800 (PST)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1iUcvK-00043t-G4; Tue, 12 Nov 2019 16:38:02 -0400
+Date:   Tue, 12 Nov 2019 16:38:02 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
+ FOLL_LONGTERM
+Message-ID: <20191112203802.GD5584@ziepe.ca>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <9f0a9d341b01419eb566731339b3fbd2@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 79kKpTsxO9GnYMVpttv9nQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112000700.3455038-1-jhubbard@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameer,
+On Mon, Nov 11, 2019 at 04:06:37PM -0800, John Hubbard wrote:
+> Hi,
+> 
+> The cover letter is long, so the more important stuff is first:
+> 
+> * Jason, if you or someone could look at the the VFIO cleanup (patch 8)
+>   and conversion to FOLL_PIN (patch 18), to make sure it's use of
+>   remote and longterm gup matches what we discussed during the review
+>   of v2, I'd appreciate it.
+> 
+> * Also for Jason and IB: as noted below, in patch 11, I am (too?) boldly
+>   converting from put_user_pages() to release_pages().
 
-On 11/12/19 6:56 PM, Shameerali Kolothum Thodi wrote:
-> Hi Eric,
->=20
->> -----Original Message-----
->> From: Shameerali Kolothum Thodi
->> Sent: 12 November 2019 14:21
->> To: 'Auger Eric' <eric.auger@redhat.com>; eric.auger.pro@gmail.com;
->> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; joro@8bytes.org;
->> alex.williamson@redhat.com; jacob.jun.pan@linux.intel.com;
->> yi.l.liu@intel.com; jean-philippe.brucker@arm.com; will.deacon@arm.com;
->> robin.murphy@arm.com
->> Cc: kevin.tian@intel.com; vincent.stehle@arm.com; ashok.raj@intel.com;
->> marc.zyngier@arm.com; tina.zhang@intel.com; Linuxarm
->> <linuxarm@huawei.com>; xuwei (O) <xuwei5@huawei.com>
->> Subject: RE: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
->>
-> [...]
->>>>>> I am trying to get this running on one of our platform that has smmu=
-v3
->> dual
->>>>>> stage support. I am seeing some issues with this when an ixgbe vf de=
-v is
->>>>>> made pass-through and is behind a vSMMUv3 in Guest.
->>>>>>
->>>>>> Kernel used : https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage=
--v9
->>>>>> Qemu: https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
->>>>>>
->>>>>> And this is my Qemu cmd line,
->>>>>>
->>>>>> ./qemu-system-aarch64
->>>>>> -machine virt,kernel_irqchip=3Don,gic-version=3D3,iommu=3Dsmmuv3 -cp=
-u host
->> \
->>>>>> -kernel Image \
->>>>>> -drive if=3Dnone,file=3Dubuntu,id=3Dfs \
->>>>>> -device virtio-blk-device,drive=3Dfs \
->>>>>> -device vfio-pci,host=3D0000:01:10.1 \
->>>>>> -bios QEMU_EFI.fd \
->>>>>> -net none \
->>>>>> -m 4G \
->>>>>> -nographic -D -d -enable-kvm \
->>>>>> -append "console=3DttyAMA0 root=3D/dev/vda rw acpi=3Dforce"
->>>>>>
->>>>>> The basic ping from Guest works fine,
->>>>>> root@ubuntu:~# ping 10.202.225.185
->>>>>> PING 10.202.225.185 (10.202.225.185) 56(84) bytes of data.
->>>>>> 64 bytes from 10.202.225.185: icmp_seq=3D2 ttl=3D64 time=3D0.207 ms
->>>>>> 64 bytes from 10.202.225.185: icmp_seq=3D3 ttl=3D64 time=3D0.203 ms
->>>>>> ...
->>>>>>
->>>>>> But if I increase ping packet size,
->>>>>>
->>>>>> root@ubuntu:~# ping -s 1024 10.202.225.185
->>>>>> PING 10.202.225.185 (10.202.225.185) 1024(1052) bytes of data.
->>>>>> 1032 bytes from 10.202.225.185: icmp_seq=3D22 ttl=3D64 time=3D0.292 =
-ms
->>>>>> 1032 bytes from 10.202.225.185: icmp_seq=3D23 ttl=3D64 time=3D0.207 =
-ms
->>>>>> From 10.202.225.169 icmp_seq=3D66 Destination Host Unreachable
->>>>>> From 10.202.225.169 icmp_seq=3D67 Destination Host Unreachable
->>>>>> From 10.202.225.169 icmp_seq=3D68 Destination Host Unreachable
->>>>>> From 10.202.225.169 icmp_seq=3D69 Destination Host Unreachable
->>>>>>
->>>>>> And from Host kernel I get,
->>>>>> [  819.970742] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets
->> detected
->>>>>> [  824.002707] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
->> detected
->>>>>> [  828.034683] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
->> detected
->>>>>> [  830.050673] ixgbe 0000:01:00.1 enp1s0f1: 4 Spoofed packets
->> detected
->>>>>> [  832.066659] ixgbe 0000:01:00.1 enp1s0f1: 1 Spoofed packets
->> detected
->>>>>> [  834.082640] ixgbe 0000:01:00.1 enp1s0f1: 3 Spoofed packets
->> detected
->>>>>>
->>>>>> Also noted that iperf cannot work as it fails to establish the conne=
-ction
->>> with
->>>>> iperf
->>>>>> server.
->>>>>>
->>>>>> Please find attached the trace logs(vfio*, smmuv3*) from Qemu for yo=
-ur
->>>>> reference.
->>>>>> I haven't debugged this further yet and thought of checking with you=
- if
->> this
->>> is
->>>>>> something you have seen already or not. Or maybe I am missing
->> something
->>>>> here?
->>>>>
->>>>> Please can you try to edit and modify hw/vfio/common.c, function
->>>>> vfio_iommu_unmap_notify
->>>>>
->>>>>
->>>>> /*
->>>>>     if (size <=3D 0x10000) {
->>>>>         ustruct.info.cache =3D IOMMU_CACHE_INV_TYPE_IOTLB;
->>>>>         ustruct.info.granularity =3D IOMMU_INV_GRANU_ADDR;
->>>>>         ustruct.info.addr_info.flags =3D
->>> IOMMU_INV_ADDR_FLAGS_ARCHID;
->>>>>         if (iotlb->leaf) {
->>>>>             ustruct.info.addr_info.flags |=3D
->>>>> IOMMU_INV_ADDR_FLAGS_LEAF;
->>>>>         }
->>>>>         ustruct.info.addr_info.archid =3D iotlb->arch_id;
->>>>>         ustruct.info.addr_info.addr =3D start;
->>>>>         ustruct.info.addr_info.granule_size =3D size;
->>>>>         ustruct.info.addr_info.nb_granules =3D 1;
->>>>>         trace_vfio_iommu_addr_inv_iotlb(iotlb->arch_id, start, size, =
-1,
->>>>>                                         iotlb->leaf);
->>>>>     } else {
->>>>> */
->>>>>         ustruct.info.cache =3D IOMMU_CACHE_INV_TYPE_IOTLB;
->>>>>         ustruct.info.granularity =3D IOMMU_INV_GRANU_PASID;
->>>>>         ustruct.info.pasid_info.archid =3D iotlb->arch_id;
->>>>>         ustruct.info.pasid_info.flags =3D
->>> IOMMU_INV_PASID_FLAGS_ARCHID;
->>>>>         trace_vfio_iommu_asid_inv_iotlb(iotlb->arch_id);
->>>>> //    }
->>>>>
->>>>> This modification leads to invalidate the whole asid each time we get=
- a
->>>>> guest TLBI instead of invalidating the single IOVA (TLBI). On my end,=
- I
->>>>> saw this was the cause of such kind of issues. Please let me know if =
-it
->>>>> fixes your perf issues
->>>>
->>>> Yes, this seems to fix the issue.
->>>>
->>>> root@ubuntu:~# iperf -c 10.202.225.185
->>>> ------------------------------------------------------------
->>>> Client connecting to 10.202.225.185, TCP port 5001
->>>> TCP window size: 85.0 KByte (default)
->>>> ------------------------------------------------------------
->>>> [  3] local 10.202.225.169 port 47996 connected with 10.202.225.185 po=
-rt
->>> 5001
->>>> [ ID] Interval       Transfer     Bandwidth
->>>> [  3]  0.0-10.0 sec  2.27 GBytes  1.95 Gbits/sec
->>>> root@ubuntu:~#
->>>>
->>>> But the performance seems to be very poor as this is a 10Gbps interfac=
-e(Of
->>> course
->>>> invalidating the whole asid may not be very helpful). It is interestin=
-g that
->> why
->>> the
->>>> single iova invalidation is not working.
->>>>
->>>>  and then we may discuss further about the test
->>>>> configuration.
->>>>
->>>> Sure. Please let me know.
->>>
->>> I reported that issue earlier on the ML. I have not been able to find
->>> any integration issue in the kernel/qemu code but maybe I am too blind
->>> now as I wrote it ;-) When I get a guest stage1 TLBI I cascade it down
->>> to the physical IOMMU. I also pass the LEAF flag.
->>
->> Ok.
->>
->>> As you are an expert of the SMMUv3 PMU, if your implementation has any
->>> and you have cycles to look at this, it would be helpful to run it and
->>> see if something weird gets highlighted.
->>
->> :). Sure. I will give it a try and report back if anything suspicious.
->=20
-> I just noted that CMDQ_OP_TLBI_NH_VA is missing the vmid filed which seem=
-s
-> to be the cause for single IOVA TLBI not working properly.
->=20
-> I had this fix in arm-smmuv3.c,
->=20
-> @@ -947,6 +947,7 @@ static int arm_smmu_cmdq_build_cmd(u64 *cmd, struct a=
-rm_smmu_cmdq_ent *ent)
-> =09=09cmd[1] |=3D FIELD_PREP(CMDQ_CFGI_1_RANGE, 31);
-> =09=09break;
-> =09case CMDQ_OP_TLBI_NH_VA:
-> +=09=09cmd[0] |=3D FIELD_PREP(CMDQ_TLBI_0_VMID, ent->tlbi.vmid);
-Damn, I did not see that! That's it. ASID invalidation fills this field
-indeed. You may post an independent patch for that.> =09=09cmd[0] |=3D
-FIELD_PREP(CMDQ_TLBI_0_ASID, ent->tlbi.asid);
-> =09=09cmd[1] |=3D FIELD_PREP(CMDQ_TLBI_1_LEAF, ent->tlbi.leaf);
-> =09=09cmd[1] |=3D ent->tlbi.addr & CMDQ_TLBI_1_VA_MASK;
->=20
->=20
-> With this, your original qemu branch is working.=20
->=20
-> root@ubuntu:~# iperf -c 10.202.225.185
-> ------------------------------------------------------------
-> Client connecting to 10.202.225.185, TCP port 5001 TCP window size: 85.0 =
-KByte (default)
-> ------------------------------------------------------------
-> [  3] local 10.202.225.169 port 44894 connected with 10.202.225.185 port =
-5001
-> [ ID] Interval       Transfer     Bandwidth
-> [  3]  0.0-10.0 sec  3.21 GBytes  2.76 Gbits/sec
->=20
-> Could you please check this...
->=20
-> I also have a rebase of your patches on top of 5.4-rc5. This has some opt=
-imizations
-> From Will such as batched TLBI inv. Please find it here,
->=20
-> https://github.com/hisilicon/kernel-dev/tree/private-vSMMUv3-v9-v5.4-rc5
->=20
-> This gives me a better performance with iperf,
->=20
-> root@ubuntu:~# iperf -c 10.202.225.185
-> ------------------------------------------------------------
-> Client connecting to 10.202.225.185, TCP port 5001 TCP window size: 85.0 =
-KByte (default)
-> ------------------------------------------------------------
-> [  3] local 10.202.225.169 port 55450 connected with 10.202.225.185 port =
-5001
-> [ ID] Interval       Transfer     Bandwidth
-> [  3]  0.0-10.0 sec  4.91 GBytes  4.22 Gbits/sec root@ubuntu:~#
->=20
-> If possible please check this branch as well.
+Why are we doing this? I think things got confused here someplace, as
+the comment still says:
 
-To be honest I don't really know what to do with this work. Despite the
-efforts, this has suffered from a lack of traction in the community. My
-last attempt to explain the use cases, upon Will's request at Plumber,
-has not received any comment (https://lkml.org/lkml/2019/9/20/104).
+/**
+ * put_user_page() - release a gup-pinned page
+ * @page:            pointer to page to be released
+ *
+ * Pages that were pinned via get_user_pages*() must be released via
+ * either put_user_page(), or one of the put_user_pages*() routines
+ * below.
 
-I think I will post a rebased version with your fix, as a matter to get
-a clean snapshot. If you think this work is useful for your projects,
-please let it know on the ML.
+I feel like if put_user_pages() is not the correct way to undo
+get_user_pages() then it needs to be deleted.
 
-Thank you again!
-
-Eric
->=20
-> Thanks,
-> Shameer
->=20
->> Thanks,
->> Shameer
->>
->>
->>> Thanks
->>>
->>> Eric
->>>>
->>>> Cheers,
->>>> Shameer
->>>>
->>>>> Thanks
->>>>>
->>>>> Eric
->>>>>
->>>>>
->>>>>
->>>>>>
->>>>>> Please let me know.
->>>>>>
->>>>>> Thanks,
->>>>>> Shameer
->>>>>>
->>>>>>> Best Regards
->>>>>>>
->>>>>>> Eric
->>>>>>>
->>>>>>> This series can be found at:
->>>>>>> https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
->>>>>>>
->>>>>>> It series includes Tina's patch steming from
->>>>>>> [1] "[RFC PATCH v2 1/3] vfio: Use capability chains to handle devic=
-e
->>>>>>> specific irq" plus patches originally contributed by Yi.
->>>>>>>
->>>>>>> History:
->>>>>>>
->>>>>>> v8 -> v9:
->>>>>>> - introduce specific irq framework
->>>>>>> - single fault region
->>>>>>> - iommu_unregister_device_fault_handler failure case not handled
->>>>>>>   yet.
->>>>>>>
->>>>>>> v7 -> v8:
->>>>>>> - rebase on top of v5.2-rc1 and especially
->>>>>>>   8be39a1a04c1  iommu/arm-smmu-v3: Add a master->domain
->> pointer
->>>>>>> - dynamic alloc of s1_cfg/s2_cfg
->>>>>>> - __arm_smmu_tlb_inv_asid/s1_range_nosync
->>>>>>> - check there is no HW MSI regions
->>>>>>> - asid invalidation using pasid extended struct (change in the uapi=
-)
->>>>>>> - add s1_live/s2_live checks
->>>>>>> - move check about support of nested stages in domain finalise
->>>>>>> - fixes in error reporting according to the discussion with Robin
->>>>>>> - reordered the patches to have first iommu/smmuv3 patches and then
->>>>>>>   VFIO patches
->>>>>>>
->>>>>>> v6 -> v7:
->>>>>>> - removed device handle from bind/unbind_guest_msi
->>>>>>> - added "iommu/smmuv3: Nested mode single MSI doorbell per domain
->>>>>>>   enforcement"
->>>>>>> - added few uapi comments as suggested by Jean, Jacop and Alex
->>>>>>>
->>>>>>> v5 -> v6:
->>>>>>> - Fix compilation issue when CONFIG_IOMMU_API is unset
->>>>>>>
->>>>>>> v4 -> v5:
->>>>>>> - fix bug reported by Vincent: fault handler unregistration now hap=
-pens
->> in
->>>>>>>   vfio_pci_release
->>>>>>> - IOMMU_FAULT_PERM_* moved outside of struct definition + small
->>>>>>>   uapi changes suggested by Kean-Philippe (except fetch_addr)
->>>>>>> - iommu: introduce device fault report API: removed the PRI part.
->>>>>>> - see individual logs for more details
->>>>>>> - reset the ste abort flag on detach
->>>>>>>
->>>>>>> v3 -> v4:
->>>>>>> - took into account Alex, jean-Philippe and Robin's comments on v3
->>>>>>> - rework of the smmuv3 driver integration
->>>>>>> - add tear down ops for msi binding and PASID table binding
->>>>>>> - fix S1 fault propagation
->>>>>>> - put fault reporting patches at the beginning of the series follow=
-ing
->>>>>>>   Jean-Philippe's request
->>>>>>> - update of the cache invalidate and fault API uapis
->>>>>>> - VFIO fault reporting rework with 2 separate regions and one
->> mmappable
->>>>>>>   segment for the fault queue
->>>>>>> - moved to PATCH
->>>>>>>
->>>>>>> v2 -> v3:
->>>>>>> - When registering the S1 MSI binding we now store the device handl=
-e.
->>> This
->>>>>>>   addresses Robin's comment about discimination of devices beonging
->>> to
->>>>>>>   different S1 groups and using different physical MSI doorbells.
->>>>>>> - Change the fault reporting API: use
->> VFIO_PCI_DMA_FAULT_IRQ_INDEX
->>> to
->>>>>>>   set the eventfd and expose the faults through an mmappable fault
->>> region
->>>>>>>
->>>>>>> v1 -> v2:
->>>>>>> - Added the fault reporting capability
->>>>>>> - asid properly passed on invalidation (fix assignment of multiple
->>>>>>>   devices)
->>>>>>> - see individual change logs for more info
->>>>>>>
->>>>>>>
->>>>>>> Eric Auger (8):
->>>>>>>   vfio: VFIO_IOMMU_SET_MSI_BINDING
->>>>>>>   vfio/pci: Add VFIO_REGION_TYPE_NESTED region type
->>>>>>>   vfio/pci: Register an iommu fault handler
->>>>>>>   vfio/pci: Allow to mmap the fault queue
->>>>>>>   vfio: Add new IRQ for DMA fault reporting
->>>>>>>   vfio/pci: Add framework for custom interrupt indices
->>>>>>>   vfio/pci: Register and allow DMA FAULT IRQ signaling
->>>>>>>   vfio: Document nested stage control
->>>>>>>
->>>>>>> Liu, Yi L (2):
->>>>>>>   vfio: VFIO_IOMMU_SET_PASID_TABLE
->>>>>>>   vfio: VFIO_IOMMU_CACHE_INVALIDATE
->>>>>>>
->>>>>>> Tina Zhang (1):
->>>>>>>   vfio: Use capability chains to handle device specific irq
->>>>>>>
->>>>>>>  Documentation/vfio.txt              |  77 ++++++++
->>>>>>>  drivers/vfio/pci/vfio_pci.c         | 283
->>>>> ++++++++++++++++++++++++++--
->>>>>>>  drivers/vfio/pci/vfio_pci_intrs.c   |  62 ++++++
->>>>>>>  drivers/vfio/pci/vfio_pci_private.h |  24 +++
->>>>>>>  drivers/vfio/pci/vfio_pci_rdwr.c    |  45 +++++
->>>>>>>  drivers/vfio/vfio_iommu_type1.c     | 166 ++++++++++++++++
->>>>>>>  include/uapi/linux/vfio.h           | 109 ++++++++++-
->>>>>>>  7 files changed, 747 insertions(+), 19 deletions(-)
->>>>>>>
->>>>>>> --
->>>>>>> 2.20.1
->>>>>>>
->>>>>>> _______________________________________________
->>>>>>> kvmarm mailing list
->>>>>>> kvmarm@lists.cs.columbia.edu
->>>>>>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>>>
->=20
-
+Jason
