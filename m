@@ -2,254 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 273DFF9BFE
-	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:22:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D218DF9C3E
+	for <lists+kvm@lfdr.de>; Tue, 12 Nov 2019 22:26:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727199AbfKLVVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 16:21:49 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54527 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727065AbfKLVVt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 16:21:49 -0500
-Received: by mail-wm1-f67.google.com with SMTP id z26so4811249wmi.4;
-        Tue, 12 Nov 2019 13:21:48 -0800 (PST)
+        id S1727140AbfKLV0w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 16:26:52 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:41605 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726923AbfKLV0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 16:26:51 -0500
+Received: by mail-lj1-f196.google.com with SMTP id d22so69743lji.8
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 13:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id:in-reply-to:references;
-        bh=k7yjor2EMmJZynb3fnq6oXvNP7d6yGjg6jAPuIWUBQA=;
-        b=m+oOa8iY9vkUipOOVBW8a/KkGz0+sl7M7RCLKx9YRks1w99Pg+PhC66jBRgHSYhZMU
-         /54GEGSuQ2s49sujJZnXK6svyTjfyHbXmzi8lAyPgbhnWQNNo7l+U7miBRs+vlpZBGBJ
-         Xcsgly3Hm9V0Ih8Lamu1rQuh5xBti/7I8UEyLUMLHXVXCBrP936oCaL1xze22mSjoZvh
-         nL+qao1mlSjESUK6KUcA28A6gfsLqTTnPA2bhHmIi6YHUHvL62ib7im/OLzFEe5DFKcE
-         MZnHcjb9qZV4k9QI5Z1zRMhb/A5c9s3kHzg42CQLf8hNz0IwR+i36qhhVqVP4nSb646M
-         2BpA==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c2kd7wElWMgzfhzil86lKOxClkhSX76vUlbnZXhNRBU=;
+        b=GM8FaRiPEkdHS56FwdTLO7a5FOcLD2iJt2i7xIxdVDSTlqk5b3yhck5CRqTDoa7b4S
+         mV9X20uS0gEUhdpGbx6MmjERR/XvnvHOT3oxhuDv5WC1p6fYAn9dWLCm/Uf2PH2onKq8
+         uarbTWRJRqNL0DHM7NiJvYKUEDyyKfd1Fd1dM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id
-         :in-reply-to:references;
-        bh=k7yjor2EMmJZynb3fnq6oXvNP7d6yGjg6jAPuIWUBQA=;
-        b=tvbxNkpafoZQ8CjuIjfqDvlMGtf6H/2IO3h/HEm4nMn5E1dQp9h3bA6CSqG5mzRvOa
-         kCu1PS7IpKUzTLkNLI8ESy/13e39knWLZ3LSyB7AeSxQAaKuxh2xoWNuY4Htd4jrtyp1
-         mAHuytUTuCQBntHHrGdDX1QMrPmoirjqwYlMS4DB374zsjLXCRBZ2NHvyhCyhTbb433Z
-         7ZV42abl2KUTPmjrzFwtxxm35eLnFYgXkNOXJQz4ulahvmf71Oovrh3p+7zkK+YvM4cO
-         qPQpgTkdeYEmNUO4I2x+CsJQF728iMRmxgZhQq3qHWFvgXQnLYQSta7vgoYGBJo5fHMw
-         7Wbg==
-X-Gm-Message-State: APjAAAWCllmP6mNDa3jmB/jLhDEHBiBD+ZDaty25PIZednLSQqf37Lc3
-        Wm/JJwr3Dpnezm7T/VieDiFFOOoo
-X-Google-Smtp-Source: APXvYqxg078+SAqmn/bGZVCAlerv1pjs2W8Dcb4Aj17XpkQvcrVJdgM5hOo37Pyn7JQ7lTkUUMC6Xw==
-X-Received: by 2002:a1c:4d11:: with SMTP id o17mr5851918wmh.170.1573593706792;
-        Tue, 12 Nov 2019 13:21:46 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id q25sm198664wra.3.2019.11.12.13.21.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Nov 2019 13:21:46 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH 7/7] Documentation: Add ITLB_MULTIHIT documentation
-Date:   Tue, 12 Nov 2019 22:21:37 +0100
-Message-Id: <1573593697-25061-8-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
-References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c2kd7wElWMgzfhzil86lKOxClkhSX76vUlbnZXhNRBU=;
+        b=q3xMHuEdt2ANRht1jIgsgKl0jlowlT4D7ECmWaymM+y7C7AK8CV4X2/MZUmX5pG81z
+         9iJ/QK3dbTq943EP+AkxDFeXhp+gnWSVr9xQkFtHFBwDFgnhikzyu7d33etxuBBPwxLv
+         5tCy2eBLrAoVHCSPZjri2vtiukS+lWWIEBmlX4gKv0kve25u4vhqi/4VhL8/oYuUJ4NL
+         66wBPcbZEnZRdmY1/sC6teNOnlW6TKDufKxPFiMV2XmZVplm4F+6sd05fPYPrHNH1Cxn
+         yx6lgw69cddP+YKfP5bUuZTvUz95rhPdG2Mr0xzK3fg3UEN2j6tLVZbhJ+37JZt2sxpj
+         gS6A==
+X-Gm-Message-State: APjAAAWXKxDgZwi0EsSonZ6P/A4rcUAO8w81KN92GX/G/pAFii2rrPma
+        q8o6G+6jc/JUXCrGCx5AgsImMEeFpiU=
+X-Google-Smtp-Source: APXvYqxrg5mVqpnfqPuyA++YAfyisEQo4QD/eZbl+H69sp6OTmqlxgFfrf8RRwNZ6RHH/XBcJkkiLQ==
+X-Received: by 2002:a2e:8544:: with SMTP id u4mr5763750ljj.25.1573594007825;
+        Tue, 12 Nov 2019 13:26:47 -0800 (PST)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com. [209.85.208.169])
+        by smtp.gmail.com with ESMTPSA id z17sm10685025ljz.30.2019.11.12.13.26.46
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Nov 2019 13:26:47 -0800 (PST)
+Received: by mail-lj1-f169.google.com with SMTP id g3so53991ljl.11
+        for <kvm@vger.kernel.org>; Tue, 12 Nov 2019 13:26:46 -0800 (PST)
+X-Received: by 2002:a2e:22c1:: with SMTP id i184mr21939869lji.1.1573594006740;
+ Tue, 12 Nov 2019 13:26:46 -0800 (PST)
+MIME-Version: 1.0
+References: <1573593036-23271-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1573593036-23271-1-git-send-email-pbonzini@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 12 Nov 2019 13:26:30 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wibywR7ySaBD=H9Q0cc1d86+Z1Sg3OWUsDjUvj21dZAKQ@mail.gmail.com>
+Message-ID: <CAHk-=wibywR7ySaBD=H9Q0cc1d86+Z1Sg3OWUsDjUvj21dZAKQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM patches for Linux 5.4-rc8
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Gomez Iglesias, Antonio" <antonio.gomez.iglesias@intel.com>
+On Tue, Nov 12, 2019 at 1:10 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> It's not a particularly hard conflict, but I'm including anyway a
+> resolution at the end of this email.
 
-Add the initial ITLB_MULTIHIT documentation.
+Hmm. My resolution has a slightly different conflict diff, that shows
+another earlier part (that git ended up sorting out itself - maybe you
+edited it out for that reason).
 
-[ tglx: Add it to the index so it gets actually built. ]
+I think I did the right conflict resolution, but the difference in
+diffs makes me just slightly nervous. Mind checking it?
 
-Signed-off-by: Antonio Gomez Iglesias <antonio.gomez.iglesias@intel.com>
-Signed-off-by: Nelson D'Souza <nelson.dsouza@linux.intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- Documentation/admin-guide/hw-vuln/index.rst    |   1 +
- Documentation/admin-guide/hw-vuln/multihit.rst | 163 +++++++++++++++++++++++++
- 2 files changed, 164 insertions(+)
- create mode 100644 Documentation/admin-guide/hw-vuln/multihit.rst
-
-diff --git a/Documentation/admin-guide/hw-vuln/index.rst b/Documentation/admin-guide/hw-vuln/index.rst
-index 0802b1c67452..0795e3c2643f 100644
---- a/Documentation/admin-guide/hw-vuln/index.rst
-+++ b/Documentation/admin-guide/hw-vuln/index.rst
-@@ -13,3 +13,4 @@ are configurable at compile, boot or run time.
-    l1tf
-    mds
-    tsx_async_abort
-+   multihit.rst
-diff --git a/Documentation/admin-guide/hw-vuln/multihit.rst b/Documentation/admin-guide/hw-vuln/multihit.rst
-new file mode 100644
-index 000000000000..ba9988d8bce5
---- /dev/null
-+++ b/Documentation/admin-guide/hw-vuln/multihit.rst
-@@ -0,0 +1,163 @@
-+iTLB multihit
-+=============
-+
-+iTLB multihit is an erratum where some processors may incur a machine check
-+error, possibly resulting in an unrecoverable CPU lockup, when an
-+instruction fetch hits multiple entries in the instruction TLB. This can
-+occur when the page size is changed along with either the physical address
-+or cache type. A malicious guest running on a virtualized system can
-+exploit this erratum to perform a denial of service attack.
-+
-+
-+Affected processors
-+-------------------
-+
-+Variations of this erratum are present on most Intel Core and Xeon processor
-+models. The erratum is not present on:
-+
-+   - non-Intel processors
-+
-+   - Some Atoms (Airmont, Bonnell, Goldmont, GoldmontPlus, Saltwell, Silvermont)
-+
-+   - Intel processors that have the PSCHANGE_MC_NO bit set in the
-+     IA32_ARCH_CAPABILITIES MSR.
-+
-+
-+Related CVEs
-+------------
-+
-+The following CVE entry is related to this issue:
-+
-+   ==============  =================================================
-+   CVE-2018-12207  Machine Check Error Avoidance on Page Size Change
-+   ==============  =================================================
-+
-+
-+Problem
-+-------
-+
-+Privileged software, including OS and virtual machine managers (VMM), are in
-+charge of memory management. A key component in memory management is the control
-+of the page tables. Modern processors use virtual memory, a technique that creates
-+the illusion of a very large memory for processors. This virtual space is split
-+into pages of a given size. Page tables translate virtual addresses to physical
-+addresses.
-+
-+To reduce latency when performing a virtual to physical address translation,
-+processors include a structure, called TLB, that caches recent translations.
-+There are separate TLBs for instruction (iTLB) and data (dTLB).
-+
-+Under this errata, instructions are fetched from a linear address translated
-+using a 4 KB translation cached in the iTLB. Privileged software modifies the
-+paging structure so that the same linear address using large page size (2 MB, 4
-+MB, 1 GB) with a different physical address or memory type.  After the page
-+structure modification but before the software invalidates any iTLB entries for
-+the linear address, a code fetch that happens on the same linear address may
-+cause a machine-check error which can result in a system hang or shutdown.
-+
-+
-+Attack scenarios
-+----------------
-+
-+Attacks against the iTLB multihit erratum can be mounted from malicious
-+guests in a virtualized system.
-+
-+
-+iTLB multihit system information
-+--------------------------------
-+
-+The Linux kernel provides a sysfs interface to enumerate the current iTLB
-+multihit status of the system:whether the system is vulnerable and which
-+mitigations are active. The relevant sysfs file is:
-+
-+/sys/devices/system/cpu/vulnerabilities/itlb_multihit
-+
-+The possible values in this file are:
-+
-+.. list-table::
-+
-+     * - Not affected
-+       - The processor is not vulnerable.
-+     * - KVM: Mitigation: Split huge pages
-+       - Software changes mitigate this issue.
-+     * - KVM: Vulnerable
-+       - The processor is vulnerable, but no mitigation enabled
-+
-+
-+Enumeration of the erratum
-+--------------------------------
-+
-+A new bit has been allocated in the IA32_ARCH_CAPABILITIES (PSCHANGE_MC_NO) msr
-+and will be set on CPU's which are mitigated against this issue.
-+
-+   =======================================   ===========   ===============================
-+   IA32_ARCH_CAPABILITIES MSR                Not present   Possibly vulnerable,check model
-+   IA32_ARCH_CAPABILITIES[PSCHANGE_MC_NO]    '0'           Likely vulnerable,check model
-+   IA32_ARCH_CAPABILITIES[PSCHANGE_MC_NO]    '1'           Not vulnerable
-+   =======================================   ===========   ===============================
-+
-+
-+Mitigation mechanism
-+-------------------------
-+
-+This erratum can be mitigated by restricting the use of large page sizes to
-+non-executable pages.  This forces all iTLB entries to be 4K, and removes
-+the possibility of multiple hits.
-+
-+In order to mitigate the vulnerability, KVM initially marks all huge pages
-+as non-executable. If the guest attempts to execute in one of those pages,
-+the page is broken down into 4K pages, which are then marked executable.
-+
-+If EPT is disabled or not available on the host, KVM is in control of TLB
-+flushes and the problematic situation cannot happen.  However, the shadow
-+EPT paging mechanism used by nested virtualization is vulnerable, because
-+the nested guest can trigger multiple iTLB hits by modifying its own
-+(non-nested) page tables.  For simplicity, KVM will make large pages
-+non-executable in all shadow paging modes.
-+
-+Mitigation control on the kernel command line and KVM - module parameter
-+------------------------------------------------------------------------
-+
-+The KVM hypervisor mitigation mechanism for marking huge pages as
-+non-executable can be controlled with a module parameter "nx_huge_pages=".
-+The kernel command line allows to control the iTLB multihit mitigations at
-+boot time with the option "kvm.nx_huge_pages=".
-+
-+The valid arguments for these options are:
-+
-+  ==========  ================================================================
-+  force       Mitigation is enabled. In this case, the mitigation implements
-+              non-executable huge pages in Linux kernel KVM module. All huge
-+              pages in the EPT are marked as non-executable.
-+              If a guest attempts to execute in one of those pages, the page is
-+              broken down into 4K pages, which are then marked executable.
-+
-+  off	      Mitigation is disabled.
-+
-+  auto        Enable mitigation only if the platform is affected and the kernel
-+              was not booted with the "mitigations=off" command line parameter.
-+	      This is the default option.
-+  ==========  ================================================================
-+
-+
-+Mitigation selection guide
-+--------------------------
-+
-+1. No virtualization in use
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+   The system is protected by the kernel unconditionally and no further
-+   action is required.
-+
-+2. Virtualization with trusted guests
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+   If the guest comes from a trusted source, you may assume that the guest will
-+   not attempt to maliciously exploit these errata and no further action is
-+   required.
-+
-+3. Virtualization with untrusted guests
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+   If the guest comes from an untrusted source, the guest host kernel will need
-+   to apply iTLB multihit mitigation via the kernel command line or kvm
-+   module parameter.
--- 
-1.8.3.1
-
+               Linus
