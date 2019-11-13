@@ -2,119 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BBB7FB463
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:55:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7E07FB469
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:57:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727113AbfKMPz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 10:55:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55190 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726074AbfKMPz6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 10:55:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573660556;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mlGkyHaMp7bMHeXoyPDgBJEztNxGeiS89bc92OgwQ08=;
-        b=S5sIIat7xjtpBvdBWdeOQ0Xh60rqC+B+u/ckLQT8Nk0XUsHwU/KK2ji1t6XuWbNy02v0jT
-        mvBnCLEtbxce6SxFgokmHYV3WHcRKrrMunoCiB6ah2vU/2mzPiaVRFcKPQ6srTtycGn+Yr
-        cbihl9Rj2V+QP9CfyGCdNoQvRe52j7c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-PPemGn2jMVSNIn0TflawJw-1; Wed, 13 Nov 2019 10:55:55 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 196BC107ACC5
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 15:55:54 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-122-119.rdu2.redhat.com [10.10.122.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD8366293B;
-        Wed, 13 Nov 2019 15:55:53 +0000 (UTC)
-Subject: Re: [PATCH kvm-unit-tests] svm: run tests with host IF=1
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <1573660209-26331-1-git-send-email-pbonzini@redhat.com>
-From:   Cathy Avery <cavery@redhat.com>
-Message-ID: <afcc073a-15cc-7ac5-4b26-48667e546cf4@redhat.com>
-Date:   Wed, 13 Nov 2019 10:55:52 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726074AbfKMP5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 10:57:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44394 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727001AbfKMP5Z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 10:57:25 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xADFeGUH098220
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 10:57:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w8mnegvet-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 10:57:23 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Wed, 13 Nov 2019 15:57:21 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 13 Nov 2019 15:57:18 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xADFvGBv43188410
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Nov 2019 15:57:16 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65BEAAE051;
+        Wed, 13 Nov 2019 15:57:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A1C3AE04D;
+        Wed, 13 Nov 2019 15:57:16 +0000 (GMT)
+Received: from [9.152.224.49] (unknown [9.152.224.49])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Nov 2019 15:57:15 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [RFC 15/37] KVM: s390: protvirt: Add machine-check interruption
+ injection controls
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, cohuck@redhat.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-16-frankja@linux.ibm.com>
+ <6b0bef57-cbe3-99df-354e-061a12d4cc31@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Wed, 13 Nov 2019 16:57:15 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <1573660209-26331-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <6b0bef57-cbe3-99df-354e-061a12d4cc31@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: PPemGn2jMVSNIn0TflawJw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111315-0028-0000-0000-000003B695B8
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111315-0029-0000-0000-000024799E9C
+Message-Id: <7ff507ad-a725-b7b4-6a6e-9ae283a0ffd2@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-13_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911130143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/13/19 10:50 AM, Paolo Bonzini wrote:
-> Tests should in general call VMRUN with EFLAGS.IF=3D1 (if there are
-> exceptions in the future we can add a cmp/jz in test_run).  This is
-> because currently interrupts are masked during all of VMRUN, while
-> we usually want interrupts during a test to cause a vmexit.
-> This is similar to how PIN_EXTINT and PIN_NMI are included by
-> default in the VMCS used by vmx.flat.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   x86/svm.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/x86/svm.c b/x86/svm.c
-> index 4ddfaa4..097a296 100644
-> --- a/x86/svm.c
-> +++ b/x86/svm.c
-> @@ -254,6 +254,7 @@ static void test_run(struct test *test, struct vmcb *=
-vmcb)
->       u64 vmcb_phys =3D virt_to_phys(vmcb);
->       u64 guest_stack[10000];
->  =20
-> +    irq_disable();
->       test->vmcb =3D vmcb;
->       test->prepare(test);
->       vmcb->save.rip =3D (ulong)test_thunk;
-> @@ -269,7 +270,9 @@ static void test_run(struct test *test, struct vmcb *=
-vmcb)
->               "mov regs, %%r15\n\t"       // rax
->               "mov %%r15, 0x1f8(%0)\n\t"
->               LOAD_GPR_C
-> +            "sti \n\t"=09=09// only used if V_INTR_MASKING=3D1
 
-I thought sti was going to be conditional
 
-// entered with IF=3D0
- =A0=A0=A0 clgi
- =A0=A0=A0 cmp=A0=A0=A0 $0, test_host_if
- =A0=A0=A0 jz=A0=A0=A0 1f
- =A0=A0=A0 sti
+On 13.11.19 15:49, Thomas Huth wrote:
+> On 24/10/2019 13.40, Janosch Frank wrote:
+>> From: Michael Mueller <mimu@linux.ibm.com>
+>>
+>> The following fields are added to the sie control block type 4:
+>>       - Machine Check Interruption Code (mcic)
+>>       - External Damage Code (edc)
+>>       - Failing Storage Address (faddr)
+>>
+>> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/kvm_host.h | 33 +++++++++++++++++++++++---------
+>>   1 file changed, 24 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index 63fc32d38aa9..0ab309b7bf4c 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -261,16 +261,31 @@ struct kvm_s390_sie_block {
+>>   #define HPID_VSIE	0x5
+>>   	__u8	hpid;			/* 0x00b8 */
+>>   	__u8	reservedb9[7];		/* 0x00b9 */
+>> -	__u32	eiparams;		/* 0x00c0 */
+>> -	__u16	extcpuaddr;		/* 0x00c4 */
+>> -	__u16	eic;			/* 0x00c6 */
+>> +	union {
+>> +		struct {
+>> +			__u32	eiparams;	/* 0x00c0 */
+>> +			__u16	extcpuaddr;	/* 0x00c4 */
+>> +			__u16	eic;		/* 0x00c6 */
+>> +		};
+>> +		__u64	mcic;			/* 0x00c0 */
+>> +	} __packed;
+>>   	__u32	reservedc8;		/* 0x00c8 */
+>> -	__u16	pgmilc;			/* 0x00cc */
+>> -	__u16	iprcc;			/* 0x00ce */
+>> -	__u32	dxc;			/* 0x00d0 */
+>> -	__u16	mcn;			/* 0x00d4 */
+>> -	__u8	perc;			/* 0x00d6 */
+>> -	__u8	peratmid;		/* 0x00d7 */
+>> +	union {
+>> +		struct {
+>> +			__u16	pgmilc;		/* 0x00cc */
+>> +			__u16	iprcc;		/* 0x00ce */
+>> +		};
+>> +		__u32	edc;			/* 0x00cc */
+>> +	} __packed;
+>> +	union {
+>> +		struct {
+>> +			__u32	dxc;		/* 0x00d0 */
+>> +			__u16	mcn;		/* 0x00d4 */
+>> +			__u8	perc;		/* 0x00d6 */
+>> +			__u8	peratmid;	/* 0x00d7 */
+>> +		};
+>> +		__u64	faddr;			/* 0x00d0 */
+>> +	} __packed;
+> 
+> Maybe drop the __packed keywords since the struct members are naturally
+> aligned anyway?
+> 
+>   Thomas
+> 
 
->               "vmrun \n\t"
-> +            "cli \n\t"
->               SAVE_GPR_C
->               "mov 0x170(%0), %%r15\n\t"  // rflags
->               "mov %%r15, regs+0x80\n\t"
-> @@ -284,6 +287,7 @@ static void test_run(struct test *test, struct vmcb *=
-vmcb)
->   =09tsc_end =3D rdtsc();
->           ++test->exits;
->       } while (!test->finished(test));
-> +    irq_enable();
->  =20
->       report("%s", test->succeeded(test), test->name);
->   }
-> @@ -301,7 +305,6 @@ static bool default_supported(void)
->   static void default_prepare(struct test *test)
->   {
->       vmcb_ident(test->vmcb);
-> -    cli();
->   }
->  =20
->   static bool default_finished(struct test *test)
+Thanks, I will give it a try.
 
+Michael
 
