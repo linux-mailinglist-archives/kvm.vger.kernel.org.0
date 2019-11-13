@@ -2,84 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E17E9FB2CE
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 15:47:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18643FB2D5
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 15:48:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727792AbfKMOrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 09:47:23 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42519 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727427AbfKMOrX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 09:47:23 -0500
-Received: by mail-wr1-f66.google.com with SMTP id a15so2664378wrf.9;
-        Wed, 13 Nov 2019 06:47:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=qTf6OInkFeP/tR4a5XNbnzc1z5smkpFf/IpOmURtbuc=;
-        b=vZuLGk/nVtijHr9Kilg6ZBK895kTu/XM7cKyHKf9COBFgxzrbQr1CjqtyKhRJtF4P+
-         IRa7btP+Z+0cR6dgHFYgwYKm87q7pzXKpJTJ2h0GzWm9nzD6CYCg5fp1mg0Z6j7k6Atx
-         rQjBOee1tpDjsW7R2gBEypGysSfCruxIJIFWY0+Gtg0hPTk9g4wzlR7XdYGKYdj7JEpm
-         3HHN/tl+sYVcmkbPzVbfr7XpobEjGuY3ox4pcFAU69DglvdfDEO/IJTURFpCKS2qW2On
-         am9TgSJ7bb/PItdJ93PZ8sS57wU+Qcub/xeOeQF4d+Q0OZ8qrP/BMxabGbYD240odgEb
-         olVg==
+        id S1727915AbfKMOsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 09:48:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36090 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727831AbfKMOsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 09:48:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573656495;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=l1Qv7aCu0tMW7OtYm3xxr/Z3wqpzcl/ymo6pe6jRGuQ=;
+        b=Xq7bEsVe0r2zCkkOp6aOyVZq4W7+/Qyt72+ESCiTYs3islIXgiWN7hPRzpUiysxfkKgjcH
+        pif5/XAQl1Vb5HNPLBy4h9OYK8O4yE2DVe4twLblyrfiXukYQOy5wmADKQNQldD4K8OM6M
+        h5f/7mKvnoxnVru2/fOImVAhd2xqCPI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-7hbwHKFWN-Or4F6Bpkzs0Q-1; Wed, 13 Nov 2019 09:48:12 -0500
+Received: by mail-wr1-f71.google.com with SMTP id w4so1713890wro.10
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 06:48:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=qTf6OInkFeP/tR4a5XNbnzc1z5smkpFf/IpOmURtbuc=;
-        b=Rp6Djwi2h0zPrITPtrLVNDhjAgDrV/wiT2gM2iIG/x+tAidXcHWnkk/6nRtp3cAbLY
-         IIwrRyLLPfbn8vTpXPgQfVZGhR+uwH9RQQVeZul1MpU/kskiVWo43RJJIJKRbLjUJinn
-         t/RzFc3k7xnpjXqCnk3Lq8j+mYUJF4cveVIjVRpx25nn2Xq8YxYVS1X9ioe3q/IunUuY
-         J3SKKC4XLXN8bXAijnwZnvUDpL22lREH2WGEHeF1o3v6Eo8NhO/ZlxYhIX3o7o0g6jaP
-         GdnR0/eHYZWZ0Nknlc37w9bcSTVyB5K0R2xCPP6dJ0OrdJVJ7u3EwVVlS33zyU4WQRIK
-         K1Jw==
-X-Gm-Message-State: APjAAAXgruR1uaHKk9VSWKdRrAcc206RKNb28+74rz88elCDmo9aET+8
-        r9ufjYfw2hidX2uu20GkdgfbB9zG
-X-Google-Smtp-Source: APXvYqzo/tFGlzvRU9JFceav+G+zHg9Teitj9o8fi17xEh3Hfl1qOfNKyMDpGEHPNxCZPr4ImVLvEA==
-X-Received: by 2002:adf:c449:: with SMTP id a9mr3097160wrg.240.1573656440997;
-        Wed, 13 Nov 2019 06:47:20 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 189sm2807631wme.28.2019.11.13.06.47.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Nov 2019 06:47:20 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yT7ZKZSSm+kX84++2Q1R93ukDGNcfckJnyzL498YrpU=;
+        b=e9FWuXp0aRGqIXIUKQ+m4XYTtR2sZo3RqVQGsKKgVFBJ1Q3dk0GO4jT2mxLHmiIKTI
+         FxqdlLs8lf/Ee9YZqsQzNt3i81zdwFAw3scSwoObZbOb9Bh53nmcOkXNkOMX5jskC6zB
+         8SodnxmleyUiy0retiV0ScXN3m1l8Rdokv+GwmV+ViO9zsIrk9CAckiSfB9rgrmsKPkB
+         CGmFstr/i/lbFPOj+gzB3JQGRTw3+C0/0QtPrfEtEOXx0wHxnwqXO444lXkcz8mtpDGG
+         8xgIUnV9B8QPCKUk7KtA3suU2a0vUyjpRZIzQGrPvcOwVa3S5QST50Z6c2vq4f7ZkRMJ
+         Bh2A==
+X-Gm-Message-State: APjAAAUtmW9cfZn+bN3I6g2qq/4f/hku3uMiJ56qQO3GdRs77sQB8qnS
+        4im62TH2HuJ2ZdB+8BW5H4BLaH05UihJn7mab3dN6UkrTFVnEVEetaawUaTggwqEkwWZ1SRZBw7
+        f0ss2GrEwm1St
+X-Received: by 2002:a7b:cbd9:: with SMTP id n25mr3341871wmi.64.1573656490870;
+        Wed, 13 Nov 2019 06:48:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxr+4rLIvhy+ld6W8KwaCBq7eLefRn6XMnMwnAj+lSMGeaJWA8x4Re3qzAwTQpTUb02Kwolxw==
+X-Received: by 2002:a7b:cbd9:: with SMTP id n25mr3341841wmi.64.1573656490560;
+        Wed, 13 Nov 2019 06:48:10 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:64a1:540d:6391:74a9? ([2001:b07:6468:f312:64a1:540d:6391:74a9])
+        by smtp.gmail.com with ESMTPSA id j67sm2748757wmb.43.2019.11.13.06.48.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Nov 2019 06:48:09 -0800 (PST)
+Subject: Re: [PATCH] selftests: kvm: fix build with glibc >= 2.30
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <20191113125115.23100-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] kvm: x86: disable shattered huge page recovery for PREEMPT_RT.
-Date:   Wed, 13 Nov 2019 15:47:19 +0100
-Message-Id: <1573656439-16252-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Openpgp: preference=signencrypt
+Message-ID: <f439dee6-012a-d9aa-5f16-cbd911d6d55d@redhat.com>
+Date:   Wed, 13 Nov 2019 15:48:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191113125115.23100-1-vkuznets@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 7hbwHKFWN-Or4F6Bpkzs0Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a huge page is recovered (and becomes no executable) while another
-thread is executing it, the resulting contention on mmu_lock can cause
-latency spikes.  Disabling recovery for PREEMPT_RT kernels fixes this
-issue.
+On 13/11/19 13:51, Vitaly Kuznetsov wrote:
+> Glibc-2.30 gained gettid() wrapper, selftests fail to compile:
+>=20
+> lib/assert.c:58:14: error: static declaration of =E2=80=98gettid=E2=80=99=
+ follows non-static declaration
+>    58 | static pid_t gettid(void)
+>       |              ^~~~~~
+> In file included from /usr/include/unistd.h:1170,
+>                  from include/test_util.h:18,
+>                  from lib/assert.c:10:
+> /usr/include/bits/unistd_ext.h:34:16: note: previous declaration of =E2=
+=80=98gettid=E2=80=99 was here
+>    34 | extern __pid_t gettid (void) __THROW;
+>       |                ^~~~~~
+>=20
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/lib/assert.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/sel=
+ftests/kvm/lib/assert.c
+> index 4911fc77d0f6..d1cf9f6e0e6b 100644
+> --- a/tools/testing/selftests/kvm/lib/assert.c
+> +++ b/tools/testing/selftests/kvm/lib/assert.c
+> @@ -55,7 +55,7 @@ static void test_dump_stack(void)
+>  #pragma GCC diagnostic pop
+>  }
+> =20
+> -static pid_t gettid(void)
+> +static pid_t _gettid(void)
+>  {
+>  =09return syscall(SYS_gettid);
+>  }
+> @@ -72,7 +72,7 @@ test_assert(bool exp, const char *exp_str,
+>  =09=09fprintf(stderr, "=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D\=
+n"
+>  =09=09=09"  %s:%u: %s\n"
+>  =09=09=09"  pid=3D%d tid=3D%d - %s\n",
+> -=09=09=09file, line, exp_str, getpid(), gettid(),
+> +=09=09=09file, line, exp_str, getpid(), _gettid(),
+>  =09=09=09strerror(errno));
+>  =09=09test_dump_stack();
+>  =09=09if (fmt) {
+>=20
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Queued, thanks.
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index fd6012eef9c9..cf718fa23dff 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -51,7 +51,12 @@
- extern bool itlb_multihit_kvm_mitigation;
- 
- static int __read_mostly nx_huge_pages = -1;
-+#ifdef CONFIG_PREEMPT_RT
-+/* Recovery can cause latency spikes, disable it for PREEMPT_RT.  */
-+static uint __read_mostly nx_huge_pages_recovery_ratio = 0;
-+#else
- static uint __read_mostly nx_huge_pages_recovery_ratio = 60;
-+#endif
- 
- static int set_nx_huge_pages(const char *val, const struct kernel_param *kp);
- static int set_nx_huge_pages_recovery_ratio(const char *val, const struct kernel_param *kp);
--- 
-1.8.3.1
+Paolo
 
