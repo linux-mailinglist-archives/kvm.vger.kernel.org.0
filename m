@@ -2,129 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02604FAE01
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:06:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D62FCFAE37
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:12:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726613AbfKMKGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 05:06:11 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33137 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726338AbfKMKGL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 05:06:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573639570;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GFSvVQCKw1HgKt4R6QChcLLxkjz2AqLqUeAkHxH4HsA=;
-        b=hB2/aKLw2Lj0gQhnj4D3G69kt2nGf8XK0wFZ86ufNUeaLjxT/E2ePrWJwcJI7uJGPb+Kkf
-        nn3qBKelmR85ZHoXPZ7yppjjVGBVkIVukpFe3SmXUhSgAMYFQ0qx27HIISogF/+ZWugKmP
-        u+Id6INTFPuBfxeNzzDNz9OLoJCca2U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-zfzRvCu0Pzi953-aHJ95EQ-1; Wed, 13 Nov 2019 05:06:06 -0500
-X-MC-Unique: zfzRvCu0Pzi953-aHJ95EQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EE44927B23;
-        Wed, 13 Nov 2019 10:06:05 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com [10.36.116.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4318717F20;
-        Wed, 13 Nov 2019 10:06:00 +0000 (UTC)
-Subject: Re: [RFC 04/37] KVM: s390: protvirt: Add initial lifecycle handling
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-5-frankja@linux.ibm.com>
- <20191107172956.4f4d8a90.cohuck@redhat.com>
- <8989f705-ce14-7b85-e5b6-6d87803db491@linux.ibm.com>
- <20191111172558.731a0d8b.cohuck@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <b28ae9ba-e085-08ef-9b1b-eede5e0457af@redhat.com>
-Date:   Wed, 13 Nov 2019 11:05:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727482AbfKMKMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 05:12:21 -0500
+Received: from mx2.suse.de ([195.135.220.15]:39804 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726389AbfKMKMU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 05:12:20 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 826B9B3ED;
+        Wed, 13 Nov 2019 10:12:15 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id CA3AA1E1498; Wed, 13 Nov 2019 11:12:10 +0100 (CET)
+Date:   Wed, 13 Nov 2019 11:12:10 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Daniel Vetter <daniel@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, linux-rdma@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
+ FOLL_LONGTERM
+Message-ID: <20191113101210.GD6367@quack2.suse.cz>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112203802.GD5584@ziepe.ca>
+ <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+ <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
+ <7b671bf9-4d94-f2cc-8453-863acd5a1115@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191111172558.731a0d8b.cohuck@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="hljtreHj6wc9C4jdFxZK1WbE8eRgFJtB0"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7b671bf9-4d94-f2cc-8453-863acd5a1115@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hljtreHj6wc9C4jdFxZK1WbE8eRgFJtB0
-Content-Type: multipart/mixed; boundary="9IIrUE8asiG4qWC2ZZ8GVxERneEBnU0YK"
+On Wed 13-11-19 01:02:02, John Hubbard wrote:
+> On 11/13/19 12:22 AM, Daniel Vetter wrote:
+> ...
+> > > > Why are we doing this? I think things got confused here someplace, as
+> > > 
+> > > 
+> > > Because:
+> > > 
+> > > a) These need put_page() calls,  and
+> > > 
+> > > b) there is no put_pages() call, but there is a release_pages() call that
+> > > is, arguably, what put_pages() would be.
+> > > 
+> > > 
+> > > > the comment still says:
+> > > > 
+> > > > /**
+> > > >   * put_user_page() - release a gup-pinned page
+> > > >   * @page:            pointer to page to be released
+> > > >   *
+> > > >   * Pages that were pinned via get_user_pages*() must be released via
+> > > >   * either put_user_page(), or one of the put_user_pages*() routines
+> > > >   * below.
+> > > 
+> > > 
+> > > Ohhh, I missed those comments. They need to all be changed over to
+> > > say "pages that were pinned via pin_user_pages*() or
+> > > pin_longterm_pages*() must be released via put_user_page*()."
+> > > 
+> > > The get_user_pages*() pages must still be released via put_page.
+> > > 
+> > > The churn is due to a fairly significant change in strategy, whis
+> > > is: instead of changing all get_user_pages*() sites to call
+> > > put_user_page(), change selected sites to call pin_user_pages*() or
+> > > pin_longterm_pages*(), plus put_user_page().
+> > 
+> > Can't we call this unpin_user_page then, for some symmetry? Or is that
+> > even more churn?
+> > 
+> > Looking from afar the naming here seems really confusing.
+> 
+> 
+> That look from afar is valuable, because I'm too close to the problem to see
+> how the naming looks. :)
+> 
+> unpin_user_page() sounds symmetrical. It's true that it would cause more
+> churn (which is why I started off with a proposal that avoids changing the
+> names of put_user_page*() APIs). But OTOH, the amount of churn is proportional
+> to the change in direction here, and it's really only 10 or 20 lines changed,
+> in the end.
+> 
+> So I'm open to changing to that naming. It would be nice to hear what others
+> prefer, too...
 
---9IIrUE8asiG4qWC2ZZ8GVxERneEBnU0YK
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+FWIW I'd find unpin_user_page() also better than put_user_page() as a
+counterpart to pin_user_pages().
 
-On 11/11/2019 17.25, Cornelia Huck wrote:
-> On Fri, 8 Nov 2019 08:36:35 +0100
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> On 11/7/19 5:29 PM, Cornelia Huck wrote:
-[...]
->>>  =20
->>>> +int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +=09int rc;
->>>> +=09struct uv_cb_csc uvcb =3D {
->>>> +=09=09.header.cmd =3D UVC_CMD_CREATE_SEC_CPU,
->>>> +=09=09.header.len =3D sizeof(uvcb),
->>>> +=09};
->>>> +
->>>> +=09/* EEXIST and ENOENT? */ =20
->>>
->>> ? =20
->>
->> I was asking myself if EEXIST or ENOENT would be better error values
->> than EINVAL.
->=20
-> EEXIST might be better, but I don't really like ENOENT.
->=20
->>>  =20
->>>> +=09if (kvm_s390_pv_handle_cpu(vcpu))
->>>> +=09=09return -EINVAL;
-
-FWIW, I'd also vote for EEXIST here.
-
- Thomas
-
-
---9IIrUE8asiG4qWC2ZZ8GVxERneEBnU0YK--
-
---hljtreHj6wc9C4jdFxZK1WbE8eRgFJtB0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl3L1YUACgkQLtnXdP5w
-LbW7SQ//RExUXZOruu0BZ0+TgRSjROGyJ3AfBJvDYZDOcA1w0bp2k9tTDhq39a0o
-/qP05FxW0zmBRUn/yMRX6njAk0aFn/ArHyH5z1B5fum9m53ldjq3mir09CqECfaG
-8mfSt+YLm3aY9p3lDxygRCoT7eBu1owxarOfetTet1Fe8QutsftHFoW52so7yYvG
-amCG3YPxqxqTZ315Ef5jzGl6RllF2UHbi4Apn3u9XJ9tPzxFWKUX/U7Ug+E8aw1e
-QBHq84b+MFbZxz+0TVKWuKhNdLArRPxzpRc7dUUxJCSb+cG/3MKgSLdwrvLqOPGm
-vfvtNb0iaDyoSJa0tMQfo1zFur0YTrneflBzzMvJ8CstLVeCH0N2NjwwpGBoDICO
-CdYBbPoXU7cBnaTAVbCpY9WjAmsHaLYbfNNYzu80VPBVJ26Zz8JucrfnJRUjzBGP
-b2V6JnpPCMiTf1nNfW27LE2ViDxguwfqnnYhF3yY89Po3uYt6YWz5JI6mrBpP4d4
-WRQ58RhSHirbA7kAej047hkQDi+hn8gDzaZh388S8S3pGarWPXAa2k7/5GhNjZx9
-qLXDq8rcjr10A6vwTf1az4FIgUmECpAccIzjmHl8rkYpZGyIY60nelQ7MDjQvTK2
-6n/kU89j6RpMppC0RC1ZyrYusfS2JTxhUDuQfmcjgWrn4Ta2O0g=
-=cYoY
------END PGP SIGNATURE-----
-
---hljtreHj6wc9C4jdFxZK1WbE8eRgFJtB0--
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
