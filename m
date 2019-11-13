@@ -2,89 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36E38FAC04
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 09:23:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4CA52FAC8A
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 10:05:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727440AbfKMIXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 03:23:35 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54696 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726923AbfKMIXd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 03:23:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573633412;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=vqVZDFat0PMM6C+YZWmr17Dxnrkmoud9CsYgAO3Sp2M=;
-        b=W9QXUVLg/+VsZaW56s95tNzkHqWrCaPKCd4n7hMAjP70e7KjMRBAq1DMIHErzpJzYCTztn
-        jdmaJD+jo8uD3nVFFqvGvoOrnAvzgvpzvrQfssp3s4G5C2sVwUxrE7Sc9WJDpSqSV4noPf
-        12U5Qhyco3hQft+fzNhQ1ZNWnSjott0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-8yob1Rd_MJiPTTitN4MFHg-1; Wed, 13 Nov 2019 03:23:30 -0500
-Received: by mail-wr1-f72.google.com with SMTP id j17so1161387wru.13
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 00:23:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5Mx/AGAaP+j6yF2jjolqE4bxLZFV7ALbdD3tA1UDj6I=;
-        b=phaiG0B94SgHNJbqvY+4R8ZKgB4uiSlzH8xK1VSgFeYoR3mft3/DJHt9tCLslKngjc
-         y2RxnmKiWQImF5jLdZtMs13TRVvQNySk5+dXRRctTPrnVrdAarcfMtVOsRXpKHA0N4BV
-         UAa59HeQQ1Qv5+FaTYWlToKJRl+4bxHhKJwfT1r5QeF+6tF7N0zoln0w3PK8/v73YsiY
-         wY0qzW1uhkYJyuIBP/oQ2lcHanktijHrcLBeWbHuqYIngsEenZLCyvwpmlxFArKLC74B
-         nm2mogmTHTle9MJWpUVNrh5vTcGpridA534Ei18mosWvdz3RE1DWktBovGea3XFh+ivH
-         DA5Q==
-X-Gm-Message-State: APjAAAVJ5Fprq+H/slOeL4CydkWVTI22RAC7cPBfSMYZ1x/ZUIq0dr5B
-        IxOJ8aV29q2cDyo66rZpUxzKS5l3DJFqiuvSOowycdXs48DUmQctxjJIq/+yTczmrerVRDl6B/b
-        H6oPssJqxelib
-X-Received: by 2002:a5d:4f06:: with SMTP id c6mr1555708wru.211.1573633409451;
-        Wed, 13 Nov 2019 00:23:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwiYyk8fUvAknJQ+JRzrcddJ66kvKLs3AvbR+PScIPgNAa903yr90BKUugKeMCMJGwa+X50Yg==
-X-Received: by 2002:a5d:4f06:: with SMTP id c6mr1555683wru.211.1573633409147;
-        Wed, 13 Nov 2019 00:23:29 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8c9d:1a6f:4730:367c? ([2001:b07:6468:f312:8c9d:1a6f:4730:367c])
-        by smtp.gmail.com with ESMTPSA id 91sm1952882wrm.42.2019.11.13.00.23.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2019 00:23:28 -0800 (PST)
-Subject: Re: [FYI PATCH 0/7] Mitigation for CVE-2018-12207
-To:     Jan Kiszka <jan.kiszka@siemens.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>,
-        "Gupta, Pawan Kumar" <pawan.kumar.gupta@intel.com>
-References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
- <23353382-53ea-8b20-7e30-763ef6df374c@siemens.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ea5a084b-e047-6677-b8fe-d7bb6f8c0ef8@redhat.com>
-Date:   Wed, 13 Nov 2019 09:23:30 +0100
+        id S1727132AbfKMJEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 04:04:51 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:2292 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726086AbfKMJEv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 04:04:51 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcbc7300000>; Wed, 13 Nov 2019 01:04:48 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 13 Nov 2019 01:04:48 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 01:04:48 -0800
+Received: from [10.2.160.173] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
+ 2019 09:04:48 +0000
+Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
+ FOLL_LONGTERM
+To:     Daniel Vetter <daniel@ffwll.ch>
+CC:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20191112000700.3455038-1-jhubbard@nvidia.com>
+ <20191112203802.GD5584@ziepe.ca>
+ <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
+ <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <7b671bf9-4d94-f2cc-8453-863acd5a1115@nvidia.com>
+Date:   Wed, 13 Nov 2019 01:02:02 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <23353382-53ea-8b20-7e30-763ef6df374c@siemens.com>
+In-Reply-To: <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-MC-Unique: 8yob1Rd_MJiPTTitN4MFHg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573635888; bh=WuCLw1mNhRSSrQbzE2XtsJC46JZuOt82gJ5Z6A5sU6M=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=qgoX2qy8q+Pz4xwaUpJCPUDYqLc7AOyeowDXx94iSygezEmzpCR7ZZxo0cljsfswu
+         ukE0Cm+f0R483iPntRfn/ABXBRqJdTjYQOd5BMk3/+ahH8sNYpooo8xojMC+j2QKMp
+         YnZN0Muwss41C3UGdYFy5MS6hRmL0789DFptbHHfPd5vitO0CxsRYBJyPt01+pG4cX
+         6cPdl9NwtrthmFzBA5/mOnD1+FGwYZl+/Gsvcsk8njJ9ZjDk+S/T82e3qWgu+CaLxi
+         GAWOKJgmoqYLWXc9CemtInbG0/tG5R+23jPdDf2TY9FLXzVWhi+Ia12J1oxABZoP9Y
+         i24f/CxZw1J0Q==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/11/19 07:38, Jan Kiszka wrote:
-> When reading MCE, error code 0150h, ie. SRAR, I was wondering if that
-> couldn't simply be handled by the host. But I suppose the symptom of
-> that erratum is not "just" regular recoverable MCE, rather
-> sometimes/always an unrecoverable CPU state, despite the error code, righ=
-t?
+On 11/13/19 12:22 AM, Daniel Vetter wrote:
+...
+>>> Why are we doing this? I think things got confused here someplace, as
+>>
+>>
+>> Because:
+>>
+>> a) These need put_page() calls,  and
+>>
+>> b) there is no put_pages() call, but there is a release_pages() call that
+>> is, arguably, what put_pages() would be.
+>>
+>>
+>>> the comment still says:
+>>>
+>>> /**
+>>>   * put_user_page() - release a gup-pinned page
+>>>   * @page:            pointer to page to be released
+>>>   *
+>>>   * Pages that were pinned via get_user_pages*() must be released via
+>>>   * either put_user_page(), or one of the put_user_pages*() routines
+>>>   * below.
+>>
+>>
+>> Ohhh, I missed those comments. They need to all be changed over to
+>> say "pages that were pinned via pin_user_pages*() or
+>> pin_longterm_pages*() must be released via put_user_page*()."
+>>
+>> The get_user_pages*() pages must still be released via put_page.
+>>
+>> The churn is due to a fairly significant change in strategy, whis
+>> is: instead of changing all get_user_pages*() sites to call
+>> put_user_page(), change selected sites to call pin_user_pages*() or
+>> pin_longterm_pages*(), plus put_user_page().
+> 
+> Can't we call this unpin_user_page then, for some symmetry? Or is that
+> even more churn?
+> 
+> Looking from afar the naming here seems really confusing.
 
-The erratum documentation talks explicitly about hanging the system, but
-it's not clear if it's just a result of the OS mishandling the MCE, or
-something worse.  So I don't know. :(  Pawan, do you?
 
-Paolo
+That look from afar is valuable, because I'm too close to the problem to see
+how the naming looks. :)
 
+unpin_user_page() sounds symmetrical. It's true that it would cause more
+churn (which is why I started off with a proposal that avoids changing the
+names of put_user_page*() APIs). But OTOH, the amount of churn is proportional
+to the change in direction here, and it's really only 10 or 20 lines changed,
+in the end.
+
+So I'm open to changing to that naming. It would be nice to hear what others
+prefer, too...
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
