@@ -2,151 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CA52FAC8A
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 10:05:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDB10FACBE
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 10:20:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727132AbfKMJEv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 04:04:51 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:2292 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726086AbfKMJEv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 04:04:51 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcbc7300000>; Wed, 13 Nov 2019 01:04:48 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 13 Nov 2019 01:04:48 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 01:04:48 -0800
-Received: from [10.2.160.173] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 09:04:48 +0000
-Subject: Re: [PATCH v3 00/23] mm/gup: track dma-pinned pages: FOLL_PIN,
- FOLL_LONGTERM
-To:     Daniel Vetter <daniel@ffwll.ch>
-CC:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf <bpf@vger.kernel.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DMA BUFFER SHARING FRAMEWORK" 
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
- <20191112203802.GD5584@ziepe.ca>
- <02fa935c-3469-b766-b691-5660084b60b9@nvidia.com>
- <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <7b671bf9-4d94-f2cc-8453-863acd5a1115@nvidia.com>
-Date:   Wed, 13 Nov 2019 01:02:02 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726389AbfKMJUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 04:20:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49438 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726138AbfKMJUX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 04:20:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573636822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XGXER1UjhVXuSY8VWobSaIItzt+ADu1QjsvqwOrHP1s=;
+        b=XcNU8wmdfwQUSO0pWUyrTiBy6q/Dw9zMoIACDO2rIDU+CY1CxKkx/9FLfGOS2MxstYPwtG
+        qQvloz1eRrR29Om0iva0HPYqXo4+t/Hz8eFCKyL9EQyrrHnCeapkntb5afUPodFERE2AjE
+        2YlMBdUR44m3tZ8FrnIVpSJUra0QSZc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-UMacf3GDODCkCuq7_QBQ1A-1; Wed, 13 Nov 2019 04:20:21 -0500
+Received: by mail-wr1-f70.google.com with SMTP id q12so1240001wrr.3
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 01:20:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=mnNNwnBUcnS7UmMioOjfLEOpDsEJoW+9XpFJb4a+vHQ=;
+        b=qGTuQ9JAWEDKSVajNh6JGJA+FreIudVBEj/x3CkjNpmAEVNHNl1h9BJxMjKa0tC3f+
+         PCN9rhqvFD9nU91OJFpBiEKv2zawnsmDIIWVW804T2TBu2PwuyemdXdkckuGbvDM7Zkf
+         dc8G4bomI91fN3dAq0/Ao9+YzrccqUo1fCSG8yktsMhFrMwOImiTM7dyAYYowBdRYkpV
+         dI0g9QEONGw5PuZPS6pPNb0VwJTgkik2qvZyZgBlJw0mRzcUswYl6CdsyMv/UmzJLYgH
+         suiIoqSpttC2IXi1hSb+31+5WVtn9ptAdSPquZMkCUB10dRR+wP4BZLNkz6alkIgjFmK
+         C7KQ==
+X-Gm-Message-State: APjAAAWASJYidsDLgPOybp4MQnPosZ8HoqX7GZzpWZO1udGVEBhVgECe
+        rNMFvgFOR00G2heKkdcXJn62u/jsWrMlZn6VtHESX39P9vPs5qU1ogQtiQ4naoBFlW4jzoG1x2/
+        RnBWK+TDe1OX+
+X-Received: by 2002:adf:fe0c:: with SMTP id n12mr1761419wrr.174.1573636819671;
+        Wed, 13 Nov 2019 01:20:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwj7US7VRQmfzJkEkr/eu9Tt8DqOjk1+3sUzd0i/qYYb7JPmVKy0mBHCQ29WrDqWQEP8mJADg==
+X-Received: by 2002:adf:fe0c:: with SMTP id n12mr1761396wrr.174.1573636819317;
+        Wed, 13 Nov 2019 01:20:19 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id j10sm2133105wrx.30.2019.11.13.01.20.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2019 01:20:18 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        Liran Alon <liran.alon@oracle.com>,
+        Bhavesh Davda <bhavesh.davda@oracle.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Optimization: Requst TLB flush in fast_cr3_switch() instead of do it directly
+In-Reply-To: <20191112183300.6959-1-liran.alon@oracle.com>
+References: <20191112183300.6959-1-liran.alon@oracle.com>
+Date:   Wed, 13 Nov 2019 10:20:18 +0100
+Message-ID: <87h838ku99.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKMK7uHvk+ti00mCCF2006U003w1dofFg9nSfmZ4bS2Z2pEDNQ@mail.gmail.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573635888; bh=WuCLw1mNhRSSrQbzE2XtsJC46JZuOt82gJ5Z6A5sU6M=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=qgoX2qy8q+Pz4xwaUpJCPUDYqLc7AOyeowDXx94iSygezEmzpCR7ZZxo0cljsfswu
-         ukE0Cm+f0R483iPntRfn/ABXBRqJdTjYQOd5BMk3/+ahH8sNYpooo8xojMC+j2QKMp
-         YnZN0Muwss41C3UGdYFy5MS6hRmL0789DFptbHHfPd5vitO0CxsRYBJyPt01+pG4cX
-         6cPdl9NwtrthmFzBA5/mOnD1+FGwYZl+/Gsvcsk8njJ9ZjDk+S/T82e3qWgu+CaLxi
-         GAWOKJgmoqYLWXc9CemtInbG0/tG5R+23jPdDf2TY9FLXzVWhi+Ia12J1oxABZoP9Y
-         i24f/CxZw1J0Q==
+X-MC-Unique: UMacf3GDODCkCuq7_QBQ1A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/13/19 12:22 AM, Daniel Vetter wrote:
-...
->>> Why are we doing this? I think things got confused here someplace, as
->>
->>
->> Because:
->>
->> a) These need put_page() calls,  and
->>
->> b) there is no put_pages() call, but there is a release_pages() call that
->> is, arguably, what put_pages() would be.
->>
->>
->>> the comment still says:
->>>
->>> /**
->>>   * put_user_page() - release a gup-pinned page
->>>   * @page:            pointer to page to be released
->>>   *
->>>   * Pages that were pinned via get_user_pages*() must be released via
->>>   * either put_user_page(), or one of the put_user_pages*() routines
->>>   * below.
->>
->>
->> Ohhh, I missed those comments. They need to all be changed over to
->> say "pages that were pinned via pin_user_pages*() or
->> pin_longterm_pages*() must be released via put_user_page*()."
->>
->> The get_user_pages*() pages must still be released via put_page.
->>
->> The churn is due to a fairly significant change in strategy, whis
->> is: instead of changing all get_user_pages*() sites to call
->> put_user_page(), change selected sites to call pin_user_pages*() or
->> pin_longterm_pages*(), plus put_user_page().
-> 
-> Can't we call this unpin_user_page then, for some symmetry? Or is that
-> even more churn?
-> 
-> Looking from afar the naming here seems really confusing.
+Liran Alon <liran.alon@oracle.com> writes:
 
+> When KVM emulates a nested VMEntry (L1->L2 VMEntry), it switches mmu root
+> page. If nEPT is used, this will happen from
+> kvm_init_shadow_ept_mmu()->__kvm_mmu_new_cr3() and otherwise it will
+> happpen from nested_vmx_load_cr3()->kvm_mmu_new_cr3(). Either case,
+> __kvm_mmu_new_cr3() will use fast_cr3_switch() in attempt to switch to a
+> previously cached root page.
+>
+> In case fast_cr3_switch() finds a matching cached root page, it will
+> set it in mmu->root_hpa and request KVM_REQ_LOAD_CR3 such that on
+> next entry to guest, KVM will set root HPA in appropriate hardware
+> fields (e.g. vmcs->eptp). In addition, fast_cr3_switch() calls
+> kvm_x86_ops->tlb_flush() in order to flush TLB as MMU root page
+> was replaced.
+>
+> This works as mmu->root_hpa, which vmx_flush_tlb() use, was
+> already replaced in cached_root_available(). However, this may
+> result in unnecessary INVEPT execution because a KVM_REQ_TLB_FLUSH
+> may have already been requested. For example, by prepare_vmcs02()
+> in case L1 don't use VPID.
+>
+> Therefore, change fast_cr3_switch() to just request TLB flush on
+> next entry to guest.
+>
+> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 24c23c66b226..150d982ec1d2 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -4295,7 +4295,7 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, =
+gpa_t new_cr3,
+>  =09=09=09kvm_make_request(KVM_REQ_LOAD_CR3, vcpu);
+>  =09=09=09if (!skip_tlb_flush) {
+>  =09=09=09=09kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
+> -=09=09=09=09kvm_x86_ops->tlb_flush(vcpu, true);
+> +=09=09=09=09kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+>  =09=09=09}
+> =20
+>  =09=09=09/*
 
-That look from afar is valuable, because I'm too close to the problem to see
-how the naming looks. :)
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-unpin_user_page() sounds symmetrical. It's true that it would cause more
-churn (which is why I started off with a proposal that avoids changing the
-names of put_user_page*() APIs). But OTOH, the amount of churn is proportional
-to the change in direction here, and it's really only 10 or 20 lines changed,
-in the end.
+--=20
+Vitaly
 
-So I'm open to changing to that naming. It would be nice to hear what others
-prefer, too...
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
