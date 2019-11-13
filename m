@@ -2,66 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BDB10FACBE
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 10:20:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0BA2FACF0
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 10:29:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726389AbfKMJUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 04:20:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49438 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726138AbfKMJUX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 04:20:23 -0500
+        id S1727316AbfKMJ3H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 04:29:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60977 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727166AbfKMJ3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 04:29:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573636822;
+        s=mimecast20190719; t=1573637344;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XGXER1UjhVXuSY8VWobSaIItzt+ADu1QjsvqwOrHP1s=;
-        b=XcNU8wmdfwQUSO0pWUyrTiBy6q/Dw9zMoIACDO2rIDU+CY1CxKkx/9FLfGOS2MxstYPwtG
-        qQvloz1eRrR29Om0iva0HPYqXo4+t/Hz8eFCKyL9EQyrrHnCeapkntb5afUPodFERE2AjE
-        2YlMBdUR44m3tZ8FrnIVpSJUra0QSZc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-UMacf3GDODCkCuq7_QBQ1A-1; Wed, 13 Nov 2019 04:20:21 -0500
-Received: by mail-wr1-f70.google.com with SMTP id q12so1240001wrr.3
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 01:20:20 -0800 (PST)
+        bh=2DVCP2/08CFgN2W7uLnMfcZ1lja7Zvdm5cWOXP2OiuY=;
+        b=DQsh2N4nK+Cd4TZPbAOMXnpiM7MgBGqXePA55g2Y6dXrlamjG63KQ1OZgf41umg9zO9THX
+        MK/G97Pl0dv72f1lX1mMju8HHpW/bcvnz1odFdBZda4QsxEhHs5Gm5mpRqkqa7b3MBu19y
+        yMqxAt4ljGKidiVL8dFNWZHBIND3MPM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-Ad4U1jiNNvqLHlnca5ugqQ-1; Wed, 13 Nov 2019 04:29:03 -0500
+Received: by mail-wm1-f71.google.com with SMTP id g14so1014526wmk.9
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 01:29:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=mnNNwnBUcnS7UmMioOjfLEOpDsEJoW+9XpFJb4a+vHQ=;
-        b=qGTuQ9JAWEDKSVajNh6JGJA+FreIudVBEj/x3CkjNpmAEVNHNl1h9BJxMjKa0tC3f+
-         PCN9rhqvFD9nU91OJFpBiEKv2zawnsmDIIWVW804T2TBu2PwuyemdXdkckuGbvDM7Zkf
-         dc8G4bomI91fN3dAq0/Ao9+YzrccqUo1fCSG8yktsMhFrMwOImiTM7dyAYYowBdRYkpV
-         dI0g9QEONGw5PuZPS6pPNb0VwJTgkik2qvZyZgBlJw0mRzcUswYl6CdsyMv/UmzJLYgH
-         suiIoqSpttC2IXi1hSb+31+5WVtn9ptAdSPquZMkCUB10dRR+wP4BZLNkz6alkIgjFmK
-         C7KQ==
-X-Gm-Message-State: APjAAAWASJYidsDLgPOybp4MQnPosZ8HoqX7GZzpWZO1udGVEBhVgECe
-        rNMFvgFOR00G2heKkdcXJn62u/jsWrMlZn6VtHESX39P9vPs5qU1ogQtiQ4naoBFlW4jzoG1x2/
-        RnBWK+TDe1OX+
-X-Received: by 2002:adf:fe0c:: with SMTP id n12mr1761419wrr.174.1573636819671;
-        Wed, 13 Nov 2019 01:20:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwj7US7VRQmfzJkEkr/eu9Tt8DqOjk1+3sUzd0i/qYYb7JPmVKy0mBHCQ29WrDqWQEP8mJADg==
-X-Received: by 2002:adf:fe0c:: with SMTP id n12mr1761396wrr.174.1573636819317;
-        Wed, 13 Nov 2019 01:20:19 -0800 (PST)
+        bh=q2dbQnHC18PohRp9CEMTpQ5WoArG6QRXmOe76T9Og9w=;
+        b=LfqeZRHSHhlsySqs13vfqx+otdDDrn8mNEiuSjP/bo0afHrNDQMMaKai4+Wmkxhs3U
+         U8rsyhf5oUaThMH4mBljaZCAQTFPVfDCyus/owqsPqPGbdV5Qup4qIM0k4znjUgd7QUV
+         4KvdcWiD+ZY70W1NeIXQFCRUHmaNpyApMOofezb6XrZMbifr4i98HYMxEFjWEJwLH6li
+         mNBTTWE5XtkDqpy/U1Wco+SRG0dV7gIyugBS1E1Q3sA6pe9sVf//L+XuVsPpDLyVOijZ
+         tqPF9UbuZ0VmX0PuuEa43Yip6SDs82PQMKWdUABh7ZdGYaoA8ufHYkOGUcX/6j0Fd9v6
+         J39A==
+X-Gm-Message-State: APjAAAXDOEWXqfa+MAuD5Mk4g4ptmHTvfSBmLYGiG2t/EvEQ7DnGfOt1
+        HpM4O/oWn/6+RpjGq0jkhsPBv41BobO6VMIPrKMMJMBZNos8zT92tEJNRh/iTJ4eAlgOycmvHzJ
+        uXtOD7v+ydMKy
+X-Received: by 2002:a05:600c:2944:: with SMTP id n4mr1815548wmd.57.1573637342342;
+        Wed, 13 Nov 2019 01:29:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx6/0hwS2Qik9hidsciA/TR+XW47vLE5hlxH1gDrr6kcqUzz1spT90WZp2P2T6BqXjkDS5uag==
+X-Received: by 2002:a05:600c:2944:: with SMTP id n4mr1815524wmd.57.1573637342047;
+        Wed, 13 Nov 2019 01:29:02 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id j10sm2133105wrx.30.2019.11.13.01.20.18
+        by smtp.gmail.com with ESMTPSA id b196sm1748684wmd.24.2019.11.13.01.29.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2019 01:20:18 -0800 (PST)
+        Wed, 13 Nov 2019 01:29:01 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
-        Liran Alon <liran.alon@oracle.com>,
-        Bhavesh Davda <bhavesh.davda@oracle.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: Optimization: Requst TLB flush in fast_cr3_switch() instead of do it directly
-In-Reply-To: <20191112183300.6959-1-liran.alon@oracle.com>
-References: <20191112183300.6959-1-liran.alon@oracle.com>
-Date:   Wed, 13 Nov 2019 10:20:18 +0100
-Message-ID: <87h838ku99.fsf@vitty.brq.redhat.com>
+To:     Roman Kagan <rkagan@virtuozzo.com>,
+        "lantianyu1986\@gmail.com" <lantianyu1986@gmail.com>
+Cc:     "pbonzini\@redhat.com" <pbonzini@redhat.com>,
+        "rth\@twiddle.net" <rth@twiddle.net>,
+        "ehabkost\@redhat.com" <ehabkost@redhat.com>,
+        "mtosatti\@redhat.com" <mtosatti@redhat.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "qemu-devel\@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm\@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+In-Reply-To: <20191112144943.GD2397@rkaganb.sw.ru>
+References: <20191112033427.7204-1-Tianyu.Lan@microsoft.com> <20191112144943.GD2397@rkaganb.sw.ru>
+Date:   Wed, 13 Nov 2019 10:29:00 +0100
+Message-ID: <87eeycktur.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: UMacf3GDODCkCuq7_QBQ1A-1
+X-MC-Unique: Ad4U1jiNNvqLHlnca5ugqQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -70,53 +74,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Liran Alon <liran.alon@oracle.com> writes:
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-> When KVM emulates a nested VMEntry (L1->L2 VMEntry), it switches mmu root
-> page. If nEPT is used, this will happen from
-> kvm_init_shadow_ept_mmu()->__kvm_mmu_new_cr3() and otherwise it will
-> happpen from nested_vmx_load_cr3()->kvm_mmu_new_cr3(). Either case,
-> __kvm_mmu_new_cr3() will use fast_cr3_switch() in attempt to switch to a
-> previously cached root page.
+> On Tue, Nov 12, 2019 at 11:34:27AM +0800, lantianyu1986@gmail.com wrote:
+>> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+>>=20
+>> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+>> Enable direct TLB flush for its guests meaning that TLB
+>> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+>> bypassing KVM in Level 1. Due to the different ABI for hypercall
+>> parameters between Hyper-V and KVM, KVM capabilities should be
+>> hidden when enable Hyper-V direct tlb flush otherwise KVM
+>> hypercalls may be intercepted by Hyper-V. Add new parameter
+>> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+>> capability status before enabling the feature.
+>>=20
+>> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+>> ---
+>> Change since v3:
+>>        - Fix logic of Hyper-V passthrough mode with direct
+>>        tlb flush.
+>>=20
+>> Change sicne v2:
+>>        - Update new feature description and name.
+>>        - Change failure print log.
+>>=20
+>> Change since v1:
+>>        - Add direct tlb flush's Hyper-V property and use
+>>        hv_cpuid_check_and_set() to check the dependency of tlbflush
+>>        feature.
+>>        - Make new feature work with Hyper-V passthrough mode.
+>> ---
+>>  docs/hyperv.txt   | 10 ++++++++++
+>>  target/i386/cpu.c |  2 ++
+>>  target/i386/cpu.h |  1 +
+>>  target/i386/kvm.c | 24 ++++++++++++++++++++++++
+>>  4 files changed, 37 insertions(+)
+>>=20
+>> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+>> index 8fdf25c829..140a5c7e44 100644
+>> --- a/docs/hyperv.txt
+>> +++ b/docs/hyperv.txt
+>> @@ -184,6 +184,16 @@ enabled.
+>> =20
+>>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+>> =20
+>> +3.18. hv-direct-tlbflush
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +Enable direct TLB flush for KVM when it is running as a nested
+>> +hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
+>> +guests are being passed through to L0 (Hyper-V) for handling. Due to AB=
+I
+>> +differences between Hyper-V and KVM hypercalls, L2 guests will not be
+>> +able to issue KVM hypercalls (as those could be mishanled by L0
+>> +Hyper-V), this requires KVM hypervisor signature to be hidden.
 >
-> In case fast_cr3_switch() finds a matching cached root page, it will
-> set it in mmu->root_hpa and request KVM_REQ_LOAD_CR3 such that on
-> next entry to guest, KVM will set root HPA in appropriate hardware
-> fields (e.g. vmcs->eptp). In addition, fast_cr3_switch() calls
-> kvm_x86_ops->tlb_flush() in order to flush TLB as MMU root page
-> was replaced.
+> On a second thought, I wonder if this is the only conflict we have.
 >
-> This works as mmu->root_hpa, which vmx_flush_tlb() use, was
-> already replaced in cached_root_available(). However, this may
-> result in unnecessary INVEPT execution because a KVM_REQ_TLB_FLUSH
-> may have already been requested. For example, by prepare_vmcs02()
-> in case L1 don't use VPID.
->
-> Therefore, change fast_cr3_switch() to just request TLB flush on
-> next entry to guest.
->
-> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  arch/x86/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 24c23c66b226..150d982ec1d2 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -4295,7 +4295,7 @@ static bool fast_cr3_switch(struct kvm_vcpu *vcpu, =
-gpa_t new_cr3,
->  =09=09=09kvm_make_request(KVM_REQ_LOAD_CR3, vcpu);
->  =09=09=09if (!skip_tlb_flush) {
->  =09=09=09=09kvm_make_request(KVM_REQ_MMU_SYNC, vcpu);
-> -=09=09=09=09kvm_x86_ops->tlb_flush(vcpu, true);
-> +=09=09=09=09kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->  =09=09=09}
-> =20
->  =09=09=09/*
+> In KVM, kvm_emulate_hypercall, when sees Hyper-V hypercalls enabled,
+> just calls kvm_hv_hypercall and returns.  I.e. once the userspace
+> enables Hyper-V hypercalls (which QEMU does when any of hv_* flags is
+> given), KVM treats *all* hypercalls as Hyper-V ones and handles *no* KVM
+> hypercalls.
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Yes, but only after guest enables Hyper-V hypercalls by writing to
+HV_X64_MSR_HYPERCALL. E.g. if you run a Linux guest and add a couple
+hv_* flags on the QEMU command line the guest will still be able to use
+KVM hypercalls normally becase Linux won't enable Hyper-V hypercall
+page.
+
+>
+> So, if hiding the KVM hypervisor signature is the only way to prevent the
+> guest from issuing KVM hypercalls (need to double-check), then, I'm
+> afraid, we just need to require it as soon as any Hyper-V feature is
+> enabled.
+>
+
+If we do that we're going to break a lot of setups in the wild which run
+Linux guests with hv_* flags (e.g. just to keep configuration the same
+for Windows/Linux or by mistake/misunderstanding).
+
+When Hyper-V enlightenments are enabled, KVM signature moves to
+0x40000100 so if a guest is still able to find it -- then it knows
+what's going on. I'd suggest we maintain the status quo.
 
 --=20
 Vitaly
