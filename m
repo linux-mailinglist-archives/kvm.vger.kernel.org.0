@@ -2,400 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FFCDFB905
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 20:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C1FFFB923
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 20:48:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726449AbfKMTk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 14:40:56 -0500
-Received: from mga07.intel.com ([134.134.136.100]:9158 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726155AbfKMTkz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 14:40:55 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Nov 2019 11:40:54 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,301,1569308400"; 
-   d="scan'208";a="194780908"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
-  by orsmga007.jf.intel.com with ESMTP; 13 Nov 2019 11:40:54 -0800
-Date:   Wed, 13 Nov 2019 11:45:27 -0800
-From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        jacob.jun.pan@linux.intel.com
-Subject: Re: [RFC v2 2/3] vfio/type1: VFIO_IOMMU_PASID_REQUEST(alloc/free)
-Message-ID: <20191113114527.2c933e67@jacob-builder>
-In-Reply-To: <20191113082940.1b415d00@x1.home>
-References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
-        <1571919983-3231-3-git-send-email-yi.l.liu@intel.com>
-        <20191105163537.1935291c@x1.home>
-        <A2975661238FB949B60364EF0F2C25743A0EF41B@SHSMSX104.ccr.corp.intel.com>
-        <20191107150659.05fa7548@x1.home>
-        <A2975661238FB949B60364EF0F2C25743A0F305A@SHSMSX104.ccr.corp.intel.com>
-        <20191108081503.29a7a800@x1.home>
-        <A2975661238FB949B60364EF0F2C25743A0F8CB4@SHSMSX104.ccr.corp.intel.com>
-        <20191113082940.1b415d00@x1.home>
-Organization: OTC
-X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+        id S1727104AbfKMTsa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 14:48:30 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47173 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726120AbfKMTs3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 14:48:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573674507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5jAC1zaaqf0m+/Pbfu75vtwtFHfb9H9Fk6sFkl/m//Q=;
+        b=gIcD4KnBde7/XYinrI39a1VbBI/RBsEiBDGROsYgGn5lVbalZJjUDPVs2eU5V6TVNLG3wZ
+        BIo+xJqUGSaFuRORyv1868Y6VnYyhmHGxzuvdvESNWLyGyv0T7zoEUGVuVTxPocB1Emq3S
+        hAA/5xDLmzr1bLsEbw3CvgJl34d5idU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-PpC07pgCNB6_0HfqP_P41Q-1; Wed, 13 Nov 2019 14:48:24 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF8658C8BBB;
+        Wed, 13 Nov 2019 19:48:21 +0000 (UTC)
+Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 595F76B8EE;
+        Wed, 13 Nov 2019 19:48:19 +0000 (UTC)
+Date:   Wed, 13 Nov 2019 12:48:18 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, <cjia@nvidia.com>,
+        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
+        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
+        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
+        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
+        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
+        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
+        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
+        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20191113124818.2b5be89d@x1.home>
+In-Reply-To: <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
+References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
+        <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
+        <20191112153005.53bf324c@x1.home>
+        <20191113112417.6e40ce96.cohuck@redhat.com>
+        <20191113112733.49542ebc@x1.home>
+        <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: PpC07pgCNB6_0HfqP_P41Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Nov 2019 08:29:40 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Thu, 14 Nov 2019 00:59:52 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On Wed, 13 Nov 2019 11:03:17 +0000
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> 
-> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > Sent: Friday, November 8, 2019 11:15 PM
-> > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > Subject: Re: [RFC v2 2/3] vfio/type1:
-> > > VFIO_IOMMU_PASID_REQUEST(alloc/free)
-> > > 
-> > > On Fri, 8 Nov 2019 12:23:41 +0000
-> > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > >     
-> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > Sent: Friday, November 8, 2019 6:07 AM
-> > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > Subject: Re: [RFC v2 2/3] vfio/type1:
-> > > > > VFIO_IOMMU_PASID_REQUEST(alloc/free)
-> > > > >
-> > > > > On Wed, 6 Nov 2019 13:27:26 +0000
-> > > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > > > >    
-> > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > Sent: Wednesday, November 6, 2019 7:36 AM
-> > > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > > > Subject: Re: [RFC v2 2/3] vfio/type1:    
-> > > VFIO_IOMMU_PASID_REQUEST(alloc/free)    
-> > > > > > >
-> > > > > > > On Thu, 24 Oct 2019 08:26:22 -0400
-> > > > > > > Liu Yi L <yi.l.liu@intel.com> wrote:
-> > > > > > >    
-> > > > > > > > This patch adds VFIO_IOMMU_PASID_REQUEST ioctl which
-> > > > > > > > aims to passdown PASID allocation/free request from the
-> > > > > > > > virtual iommu. This is required to get PASID managed in
-> > > > > > > > system-wide.
-> > > > > > > >
-> > > > > > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > > > > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > > > > > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > > > > > > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > > > > > > ---
-> > > > > > > >  drivers/vfio/vfio_iommu_type1.c | 114    
-> > > > > > > ++++++++++++++++++++++++++++++++++++++++    
-> > > > > > > >  include/uapi/linux/vfio.h       |  25 +++++++++
-> > > > > > > >  2 files changed, 139 insertions(+)
-> > > > > > > >
-> > > > > > > > diff --git a/drivers/vfio/vfio_iommu_type1.c    
-> > > > > b/drivers/vfio/vfio_iommu_type1.c    
-> > > > > > > > index cd8d3a5..3d73a7d 100644
-> > > > > > > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > > > > > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > > > > > > @@ -2248,6 +2248,83 @@ static int
-> > > > > > > > vfio_cache_inv_fn(struct device *dev,    
-> > > > > void    
-> > > > > > > *data)    
-> > > > > > > >  	return iommu_cache_invalidate(dc->domain, dev,
-> > > > > > > > &ustruct->info); }
-> > > > > > > >
-> > > > > > > > +static int vfio_iommu_type1_pasid_alloc(struct
-> > > > > > > > vfio_iommu *iommu,
-> > > > > > > > +					 int min_pasid,
-> > > > > > > > +					 int max_pasid)
-> > > > > > > > +{
-> > > > > > > > +	int ret;
-> > > > > > > > +	ioasid_t pasid;
-> > > > > > > > +	struct mm_struct *mm = NULL;
-> > > > > > > > +
-> > > > > > > > +	mutex_lock(&iommu->lock);
-> > > > > > > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > > > > > > > +		ret = -EINVAL;
-> > > > > > > > +		goto out_unlock;
-> > > > > > > > +	}
-> > > > > > > > +	mm = get_task_mm(current);
-> > > > > > > > +	/* Track ioasid allocation owner by mm */
-> > > > > > > > +	pasid = ioasid_alloc((struct ioasid_set *)mm,
-> > > > > > > > min_pasid,
-> > > > > > > > +				max_pasid, NULL);    
-> > > > > > >
-> > > > > > > Are we sure we want to tie this to the task mm vs perhaps
-> > > > > > > the vfio_iommu pointer?    
-> > > > > >
-> > > > > > Here we want to have a kind of per-VM mark, which can be
-> > > > > > used to do ownership check on whether a pasid is held by a
-> > > > > > specific VM. This is very important to prevent across VM
-> > > > > > affect. vfio_iommu pointer is competent for vfio as vfio is
-> > > > > > both pasid alloc requester and pasid consumer. e.g. vfio
-> > > > > > requests pasid alloc from ioasid and also it will invoke
-> > > > > > bind_gpasid(). vfio can either check ownership before
-> > > > > > invoking bind_gpasid() or pass vfio_iommu pointer to iommu
-> > > > > > driver. But in future, there may be other modules which are
-> > > > > > just consumers of pasid. And they also want to do ownership
-> > > > > > check for a pasid. Then, it would be hard for them as they
-> > > > > > are not the pasid alloc requester. So here better to have a
-> > > > > > system wide structure to perform as the per-VM mark. task
-> > > > > > mm looks to be much competent.    
-> > > > >
-> > > > > Ok, so it's intentional to have a VM-wide token.  Elsewhere
-> > > > > in the type1 code (vfio_dma_do_map) we record the task_struct
-> > > > > per dma mapping so that we can get the task mm as needed.
-> > > > > Would the task_struct pointer provide any advantage?    
-> > > >
-> > > > I think we may use task_struct pointer to make type1 code
-> > > > consistent. How do you think?    
-> > > 
-> > > If it has the same utility, sure.    
-> > 
-> > thanks, I'll make this change.
-> >   
-> > > > > Also, an overall question, this provides userspace with pasid
-> > > > > alloc and free ioctls, (1) what prevents a userspace process
-> > > > > from consuming every available pasid, and (2) if the process
-> > > > > exits or crashes without freeing pasids, how are they
-> > > > > recovered aside from a reboot?    
-> > > >
-> > > > For question (1), I think we only need to take care about
-> > > > malicious userspace process. As vfio usage is under privilege
-> > > > mode, so we may be safe on it so far.    
-> > > 
-> > > No, where else do we ever make this assumption?  vfio requires a
-> > > privileged entity to configure the system for vfio, bind devices
-> > > for user use, and grant those devices to the user, but the usage
-> > > of the device is always assumed to be by an unprivileged user.
-> > > It is absolutely not acceptable require a privileged user.  It's
-> > > vfio's responsibility to protect the system from the user.    
-> > 
-> > My assumption is not precise here. sorry for it... Maybe to further
-> > check with you to better understand your point. I think the user
-> > (QEMU) of vfio needs to have a root permission. Thus it can open
-> > the vfio fds. At this point, the user is a privileged one. Also I
-> > guess that's why vfio can grant the user with the usage of
-> > VFIO_MAP/UNMAP to config mappings into iommu page tables. But I'm
-> > not quite sure when will the user be an unprivileged one.  
-> 
-> QEMU does NOT need to be run as root to use vfio.  This is NOT the
-> model libvirt follows.  libvirt grants a user access to a device, or
-> rather a set of one or more devices (ie. the group) via standard file
-> permission access to the group file (/dev/vfio/$GROUP).  Ownership of
-> a device allows the user permission to make use of the IOMMU.  The
-> user's ability to create DMA mappings is restricted by their process
-> locked memory limits, where libvirt elevates the user limit
-> sufficient for the size of the VM.  QEMU should never need to be run
-> as root and doing so is entirely unacceptable from a security
-> perspective.  The only mode of vfio that requires elevated privilege
-> for use is when making use of no-iommu, where we have no IOMMU
-> protection or translation.
-> 
-> > > > However, we may need to introduce a kind of credit
-> > > > mechanism to protect it. I've thought it, but no good idea yet.
-> > > > Would be happy to hear from you.    
-> > > 
-> > > It's a limited system resource and it's unclear how many might
-> > > reasonably used by a user.  I don't have an easy answer.    
-> > 
-> > How about the below method? based on some offline chat with Jacob.
-> > a. some reasonable defaults for the initial per VM quota, e.g. 1000
-> > per process
-> > b. IOASID should be able to enforce per ioasid_set (it is kind of
-> > per VM mark) limit  
-> 
-> We support large numbers of assigned devices, how many IOASIDs might
-> be reasonably used per device?  Is the mm or the task still the
-> correct "set" in this scenario?  I don't have any better ideas than
-> setting a limit, but it probably needs a kernel or module tunable,
-> and it needs to match the scaling we expect to see when multiple
-> devices are involved.
-> 
-I think mm/task is still the correct set in that we try to prevent
-abuse based on mm not device. Or we need to have some notion of super
-container (Ashok proposed a while ago) that maps to a VM.
+> On 11/13/2019 11:57 PM, Alex Williamson wrote:
+> > On Wed, 13 Nov 2019 11:24:17 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >  =20
+> >> On Tue, 12 Nov 2019 15:30:05 -0700
+> >> Alex Williamson <alex.williamson@redhat.com> wrote:
+> >> =20
+> >>> On Tue, 12 Nov 2019 22:33:36 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>     =20
+> >>>> - Defined MIGRATION region type and sub-type.
+> >>>> - Used 3 bits to define VFIO device states.
+> >>>>      Bit 0 =3D> _RUNNING
+> >>>>      Bit 1 =3D> _SAVING
+> >>>>      Bit 2 =3D> _RESUMING
+> >>>>      Combination of these bits defines VFIO device's state during mi=
+gration
+> >>>>      _RUNNING =3D> Normal VFIO device running state. When its reset,=
+ it
+> >>>> =09=09indicates _STOPPED state. when device is changed to
+> >>>> =09=09_STOPPED, driver should stop device before write()
+> >>>> =09=09returns.
+> >>>>      _SAVING | _RUNNING =3D> vCPUs are running, VFIO device is runni=
+ng but
+> >>>>                            start saving state of device i.e. pre-cop=
+y state
+> >>>>      _SAVING  =3D> vCPUs are stopped, VFIO device should be stopped,=
+ and =20
+> >>>
+> >>> s/should/must/
+> >>>     =20
+> >>>>                  save device state,i.e. stop-n-copy state
+> >>>>      _RESUMING =3D> VFIO device resuming state.
+> >>>>      _SAVING | _RESUMING and _RUNNING | _RESUMING =3D> Invalid state=
+s =20
+> >>>
+> >>> A table might be useful here and in the uapi header to indicate valid
+> >>> states: =20
+> >>
+> >> I like that.
+> >> =20
+> >>>
+> >>> | _RESUMING | _SAVING | _RUNNING | Description
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    0    |     0    | Stopped, not saving or resuming (a=
+)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    0    |     1    | Running, default state
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    1    |     0    | Stopped, migration interface in sa=
+ve mode
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    1    |     1    | Running, save mode interface, iter=
+ative
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    0    |     0    | Stopped, migration resume interfac=
+e active
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    0    |     1    | Invalid (b)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    1    |     0    | Invalid (c)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    1    |     1    | Invalid (d)
+> >>>
+> >>> I think we need to consider whether we define (a) as generally
+> >>> available, for instance we might want to use it for diagnostics or a
+> >>> fatal error condition outside of migration.
+> >>>
+> >>> Are there hidden assumptions between state transitions here or are
+> >>> there specific next possible state diagrams that we need to include a=
+s
+> >>> well? =20
+> >>
+> >> Some kind of state-change diagram might be useful in addition to the
+> >> textual description anyway. Let me try, just to make sure I understand
+> >> this correctly:
+> >> =20
+>=20
+> During User application initialization, there is one more state change:
+>=20
+> 0) 0/0/0 ---- stop to running -----> 0/0/1
 
-I am guessing you are suggesting the per mm quota should also be
-scaled against number of devices assigned. I think that is very
-reasonable. Perhaps we can do:
+0/0/0 cannot be the initial state of the device, that would imply that
+a device supporting this migration interface breaks backwards
+compatibility with all existing vfio userspace code and that code needs
+to learn to set the device running as part of its initialization.
+That's absolutely unacceptable.  The initial device state must be 0/0/1.
 
-1. A tunable per iommu group PASID quota with a default of 1000, e.g.
-nr_pasid_per_group. Since we are dealing with nested translation and
-each device has its own second level so we pretty much have one device
-per group. Call it nr_pasid_per_group?
+> >> 1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1 =
+=20
+>=20
+> not just gathering state info, but also copy device state to be=20
+> transferred during pre-copy phase.
+>=20
+> Below 2 state are not just to tell driver to stop, those 2 differ.
+> 2) is device state changed from running to stop, this is when VM=20
+> shutdowns cleanly, no need to save device state
 
-2. Limit number of PASIDs per VM with nr_pasid_per_group * nr_groups.
-Probably update the limit when group is added to a container with the
-same mm.
+Userspace is under no obligation to perform this state change though,
+backwards compatibility dictates this.
+=20
+> >> 2) 0/0/1 ---(tell driver to stop)---> 0/0/0  =20
+>=20
+> >> 3) 0/1/1 ---(tell driver to stop)---> 0/1/0 =20
+>=20
+> above is transition from pre-copy phase to stop-and-copy phase, where=20
+> device data should be made available to user to transfer to destination=
+=20
+> or to save it to file in case of save VM or suspend.
+>=20
+>=20
+> >> 4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0 =20
+> >=20
+> > I think this is to switch into resuming mode, the data will follow > =
+=20
+> >> 5) 1/0/0 ---(driver is ready)---> 0/0/1
+> >> 6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1 =20
+> > =20
+>=20
+> above can occur on migration cancelled or failed.
+>=20
+>=20
+> > I think also:
+> >=20
+> > 0/0/1 --> 0/1/0 If user chooses to go directly to stop and copy =20
+>=20
+> that's right, this happens in case of save VM or suspend VM.
+>=20
+> >=20
+> > 0/0/0 and 0/0/1 should be reachable from any state, though I could see
+> > that a vendor driver could fail transition from 1/0/0 -> 0/0/1 if the
+> > received state is incomplete.  Somehow though a user always needs to
+> > return the device to the initial state, so how does device_state
+> > interact with the reset ioctl?  Would this automatically manipulate
+> > device_state back to 0/0/1? =20
+>=20
+> why would reset occur on 1/0/0 -> 0/0/1 failure?
 
-I guess we could also use a cgroup controller for PASIDs.
+The question is whether the reset ioctl automatically puts the device
+back into the initial state, 0/0/1.  A reset from 1/0/0 -> 0/0/1
+presumably discards much of the device state we just restored, so
+clearly that would be undesirable.
+=20
+> 1/0/0 -> 0/0/1 fails, then user should convey that to source that=20
+> migration has failed, then resume at source.
 
-> > > > For question (2), I think we need to reclaim the allocated
-> > > > pasids when the vfio container fd is released just like what
-> > > > vfio does to the domain mappings. I didn't add it yet. But I
-> > > > can add it in next version if you think it would make the pasid
-> > > > alloc/free be much sound.    
-> > > 
-> > > Consider it required, the interface is susceptible to abuse
-> > > without it.    
-> > 
-> > sure, let me add it in next version.
-> >   
-> > > > > > > > +	if (pasid == INVALID_IOASID) {
-> > > > > > > > +		ret = -ENOSPC;
-> > > > > > > > +		goto out_unlock;
-> > > > > > > > +	}
-> > > > > > > > +	ret = pasid;
-> > > > > > > > +out_unlock:
-> > > > > > > > +	mutex_unlock(&iommu->lock);    
-> > > > >
-> > > > > What does holding this lock protect?  That the vfio_iommu
-> > > > > remains backed by an iommu during this operation, even though
-> > > > > we don't do anything to release allocated pasids when that
-> > > > > iommu backing is removed?    
-> > > >
-> > > > yes, it is unnecessary to hold the lock here. At least for the
-> > > > operations in this patch. will remove it. :-)
-> > > >    
-> > > > > > > > +	if (mm)
-> > > > > > > > +		mmput(mm);
-> > > > > > > > +	return ret;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > > +static int vfio_iommu_type1_pasid_free(struct
-> > > > > > > > vfio_iommu *iommu,
-> > > > > > > > +				       unsigned int
-> > > > > > > > pasid) +{
-> > > > > > > > +	struct mm_struct *mm = NULL;
-> > > > > > > > +	void *pdata;
-> > > > > > > > +	int ret = 0;
-> > > > > > > > +
-> > > > > > > > +	mutex_lock(&iommu->lock);
-> > > > > > > > +	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-> > > > > > > > +		ret = -EINVAL;
-> > > > > > > > +		goto out_unlock;
-> > > > > > > > +	}
-> > > > > > > > +
-> > > > > > > > +	/**
-> > > > > > > > +	 * REVISIT:
-> > > > > > > > +	 * There are two cases free could fail:
-> > > > > > > > +	 * 1. free pasid by non-owner, we use
-> > > > > > > > ioasid_set to track mm, if
-> > > > > > > > +	 * the set does not match, caller is not
-> > > > > > > > permitted to free.
-> > > > > > > > +	 * 2. free before unbind all devices, we can
-> > > > > > > > check if ioasid private
-> > > > > > > > +	 * data, if data != NULL, then fail to free.
-> > > > > > > > +	 */
-> > > > > > > > +	mm = get_task_mm(current);
-> > > > > > > > +	pdata = ioasid_find((struct ioasid_set *)mm,
-> > > > > > > > pasid, NULL);
-> > > > > > > > +	if (IS_ERR(pdata)) {
-> > > > > > > > +		if (pdata == ERR_PTR(-ENOENT))
-> > > > > > > > +			pr_err("PASID %u is not
-> > > > > > > > allocated\n", pasid);
-> > > > > > > > +		else if (pdata == ERR_PTR(-EACCES))
-> > > > > > > > +			pr_err("Free PASID %u by
-> > > > > > > > non-owner, denied",    
-> > > pasid);    
-> > > > > > > > +		else
-> > > > > > > > +			pr_err("Error searching PASID
-> > > > > > > > %u\n", pasid);    
-> > > > > > >
-> > > > > > > This should be removed, errno is sufficient for the user,
-> > > > > > > this just provides the user with a trivial DoS vector
-> > > > > > > filling logs.    
-> > > > > >
-> > > > > > sure, will fix it. thanks.
-> > > > > >    
-> > > > > > > > +		ret = -EPERM;    
-> > > > > > >
-> > > > > > > But why not return PTR_ERR(pdata)?    
-> > > > > >
-> > > > > > aha, would do it.
-> > > > > >    
-> > > > > > > > +		goto out_unlock;
-> > > > > > > > +	}
-> > > > > > > > +	if (pdata) {
-> > > > > > > > +		pr_debug("Cannot free pasid %d with
-> > > > > > > > private data\n", pasid);
-> > > > > > > > +		/* Expect PASID has no private data if
-> > > > > > > > not bond */
-> > > > > > > > +		ret = -EBUSY;
-> > > > > > > > +		goto out_unlock;
-> > > > > > > > +	}
-> > > > > > > > +	ioasid_free(pasid);    
-> > > > > > >
-> > > > > > > We only ever get here with pasid == NULL?!    
-> > > > > >
-> > > > > > I guess you meant only when pdata==NULL.
-> > > > > >    
-> > > > > > > Something is wrong.  Should
-> > > > > > > that be 'if (!pdata)'?  (which also makes that pr_debug
-> > > > > > > another DoS vector)    
-> > > > > >
-> > > > > > Oh, yes, just do it as below:
-> > > > > >
-> > > > > > if (!pdata) {
-> > > > > > 	ioasid_free(pasid);
-> > > > > > 	ret = SUCCESS;
-> > > > > > } else
-> > > > > > 	ret = -EBUSY;
-> > > > > >
-> > > > > > Is it what you mean?    
-> > > > >
-> > > > > No, I think I was just confusing pdata and pasid, but I am
-> > > > > still confused about testing pdata.  We call ioasid_alloc()
-> > > > > with private = NULL, and I don't see any of your patches
-> > > > > calling ioasid_set_data() to change the private data after
-> > > > > allocation, so how could this ever be set?  Should this just
-> > > > > be a BUG_ON(pdata) as the integrity of the system is in
-> > > > > question should this state ever occur?  Thanks,    
-> > > >
-> > > > ioasid_set_data() was called  in one patch from Jacob's vSVA
-> > > > patchset. [PATCH v6 08/10] iommu/vt-d: Add bind guest PASID
-> > > > support https://lkml.org/lkml/2019/10/22/946
-> > > >
-> > > > The basic idea is to allocate pasid with private=NULL, and set
-> > > > it when the pasid is actually bind to a device (bind_gpasid()).
-> > > > Each bind_gpasid() will increase the ref_cnt in the private
-> > > > data, and each unbind_gpasid() will decrease the ref_cnt. So if
-> > > > bind/unbind_gpasid() is called in mirror, the private data
-> > > > should be null when comes to free operation. If not, vfio can
-> > > > believe that the pasid is still in use.    
-> > > 
-> > > So this is another opportunity to leak pasids.  What's a user
-> > > supposed to do when their attempt to free a pasid fails?  It
-> > > invites leaks to allow this path to fail.  Thanks,    
-> > 
-> > Agreed, may no need to fail pasid free as it may leak pasid. How
-> > about always let free successful? If the ref_cnt is non-zero,
-> > notify the remaining users to release their reference.  
-> 
-> If a user frees an PASID, they've done their due diligence in
-> indicating it's no longer used.  The kernel should handle reclaiming
-> it from that point.  Thanks,
+In the scheme of the migration yet, but as far as the vfio interface is
+concerned the user should have a path to make use of a device after
+this point without closing it and starting over.  Thus, if a 1/0/0 ->
+0/0/1 transition fails, would we define the device reset ioctl as a
+mechanism to flush the bogus state and place the device into the 0/0/1
+initial state?
+=20
+> >    =20
+> >> Not sure about the usefulness of 2). =20
+>=20
+> I explained this above.
+>=20
+> >> Also, is 4) the only way to
+> >> trigger resuming?  =20
+> Yes.
+>=20
+> >> And is the change in 5) performed by the driver, or
+> >> by userspace?
+> >> =20
+> By userspace.
+>=20
+> >> Are any other state transitions valid?
+> >>
+> >> (...)
+> >> =20
+> >>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre=
+-copy phase
+> >>>> + * and for _SAVING device state or stop-and-copy phase:
+> >>>> + * a. read pending_bytes. If pending_bytes > 0, go through below st=
+eps.
+> >>>> + * b. read data_offset, indicates kernel driver to write data to st=
+aging buffer.
+> >>>> + *    Kernel driver should return this read operation only after wr=
+iting data to
+> >>>> + *    staging buffer is done. =20
+> >>>
+> >>> "staging buffer" implies a vendor driver implementation, perhaps we
+> >>> could just state that data is available from (region + data_offset) t=
+o
+> >>> (region + data_offset + data_size) upon return of this read operation=
+.
+> >>>     =20
+> >>>> + * c. read data_size, amount of data in bytes written by vendor dri=
+ver in
+> >>>> + *    migration region.
+> >>>> + * d. read data_size bytes of data from data_offset in the migratio=
+n region.
+> >>>> + * e. process data.
+> >>>> + * f. Loop through a to e. Next read on pending_bytes indicates tha=
+t read data
+> >>>> + *    operation from migration region for previous iteration is don=
+e. =20
+> >>>
+> >>> I think this indicate that step (f) should be to read pending_bytes, =
+the
+> >>> read sequence is not complete until this step.  Optionally the user c=
+an
+> >>> then proceed to step (b).  There are no read side-effects of (a) afai=
+ct.
+> >>>
+> >>> Is the use required to reach pending_bytes =3D=3D 0 before changing
+> >>> device_state, particularly transitioning to !_RUNNING?  Presumably th=
+e
+> >>> user can exit this sequence at any time by clearing _SAVING. =20
+> >>
+> >> That would be transition 6) above (abort saving and continue). I think
+> >> it makes sense not to forbid this.
+> >> =20
+> >>>     =20
+> >>>> + *
+> >>>> + * Sequence to be followed while _RESUMING device state:
+> >>>> + * While data for this device is available, repeat below steps:
+> >>>> + * a. read data_offset from where user application should write dat=
+a.
+> >>>> + * b. write data of data_size to migration region from data_offset.
+> >>>> + * c. write data_size which indicates vendor driver that data is wr=
+itten in
+> >>>> + *    staging buffer. Vendor driver should read this data from migr=
+ation
+> >>>> + *    region and resume device's state. =20
+> >>>
+> >>> The device defaults to _RUNNING state, so a prerequisite is to set
+> >>> _RESUMING and clear _RUNNING, right? =20
+> >> =20
+>=20
+> Sorry, I replied yes in my previous reply, but no. Default device state=
+=20
+> is _STOPPED. During resume _STOPPED -> _RESUMING
 
-Yeah, I think we can add a atomic notifier for each PASID.
-Consumers such as IOMMU driver and KVM gets notified when IOASID is
-freed by VFIO. IOMMU driver can do the unbind and tear down.
+Nope, it can't be, it must be _RUNNING.
 
-In case of all the users already did unbind() before ioasid_free(), the
-free will proceed as usual.
+> >> Transition 4) above. Do we need =20
+>=20
+> I think, its not required.
 
-> Alex
->
+But above we say it's the only way to trigger resuming (4 was 0/0/1 ->
+1/0/0).
+
+> >> 7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
+> >> as well? (Probably depends on how sensible the 0/0/0 state is.) =20
+> >=20
+> > I think we must unless we require the user to transition from 0/0/1 to
+> > 1/0/0 in a single operation, but I'd prefer to make 0/0/0 generally
+> > available.  Thanks,
+> >  =20
+>=20
+> its 0/0/0 -> 1/0/0 while resuming.
+
+I think we're starting with different initial states, IMO there is
+absolutely no way around 0/0/1 being the initial device state.
+Anything otherwise means that we cannot add migration support to an
+existing device and maintain compatibility with existing userspace.
+Thanks,
+
+Alex
+
