@@ -2,150 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 614D9FB392
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:21:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26B39FB3A3
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:24:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727698AbfKMPVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 10:21:05 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:34780 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbfKMPVE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 10:21:04 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADFEXgq130715;
-        Wed, 13 Nov 2019 15:20:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=pkFy/Zp/PcpVu9YbRXp2CC66m0hSTM6eWqI4zwR7HUM=;
- b=N/f85k+pZp18+XULFbjvo9vR6mFUAKV+aStOaSjVWxD8X2AmITGoXp0gyWfbkw+UmUnw
- fxJ4yViRMKJ6MA+grfwqh48GuDrRsk0JNsbA72aIh8EfQ8q1ZJNcwa8K6zYo6Eqk/5MY
- AYI8VjYgtHnfaK/56JKu0SrnQyFUkrU9K4c5cP5ai71C7Mfvg8mjyUihZj5wcTagc8G1
- DaMI/50k2U/X1jr/2Hamho/lxl8R7oMH3MODPWebs9t08+U7p98lxok1dGrQWZEjLrvR
- vErcoFId0U73LWyB2arppzReCXlw1A1VIHnE2AMtMDd+u25JHL4mrEDYFszg4UlcgYem +Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2w5ndqd4vv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Nov 2019 15:20:56 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADFEGii154079;
-        Wed, 13 Nov 2019 15:20:56 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2w7vppehcy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Nov 2019 15:20:55 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xADFKtfx005464;
-        Wed, 13 Nov 2019 15:20:55 GMT
-Received: from [192.168.14.112] (/79.181.225.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 13 Nov 2019 07:20:54 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] KVM: x86: Optimization: Requst TLB flush in
- fast_cr3_switch() instead of do it directly
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <6292b4ef-64df-5e37-dcf7-a359f3268a6f@redhat.com>
-Date:   Wed, 13 Nov 2019 17:20:50 +0200
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Bhavesh Davda <bhavesh.davda@oracle.com>
+        id S1728004AbfKMPYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 10:24:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54311 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727614AbfKMPYx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 10:24:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573658692;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WvkrPFG/BkQlkJSU9ZGd13o6ArqEw2sKNaKwY2NRc/E=;
+        b=BNGREXVA2EuxC0yoNTgf2SaQVbOPTdvI+danJoV7wd/8q4FhgjWg3hZ04xwMabwmVPTq34
+        fTS7YGnVB7FoIVbx2mkMzHExSOg2i4QbrExY8n36tsanVNPeQKyAiF0oPy1zBOaGlWeLQ8
+        nnozo+A7OaIjZ4IAQD36WIhdUBPb1ms=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-0qD74EOKPNK16mAbIUtong-1; Wed, 13 Nov 2019 10:24:50 -0500
+Received: by mail-wr1-f70.google.com with SMTP id p4so1769985wrw.15
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 07:24:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0HlomJoHlrjM784oArr+x3B0iN591rhHcF/QFBYxsdY=;
+        b=hINN3OOE7G1dzAlqGWoqPLNTGVemlWlA+Xgme6sZLu63Rh1dxuCW6PuqoQ4NnlyAt5
+         IB87n1qyH+KKzzcwj1zyBEmAJmwbSnSFDvsWlxuhminyh02aArHUfPaLF6WptD2i0p2K
+         QiMN2SQpTW/5q82DinWJhr0yZr4xwKfXl3irHIl+Yel8VBLUyQS9MCrqNTl0IANcpB+l
+         pJsQnB9E1bC4GtU5LSplJVYbrNOa3R6hSDmvK4tV94JWaI5fcTQTcCo8JHtmkSW5VSl2
+         gpteAmpuMV589P251iBZHjHsRu/U3OcCNtJc17NoIEu2Uudp1ZJm//0YYyipB/K+AeGn
+         eivA==
+X-Gm-Message-State: APjAAAUIa503CaUEfXF8JPAPk+ISQIiMRmzSwTW4V5A4U5jelV9Z2njp
+        1Ho2ASupXgQMMdBPx+W40QWXNWwtVhn3FiJETNTY7IcqMTM3TveKF9Pf+Y2akBmtsq9FDaZYm9e
+        yDIu5PD0sjOoM
+X-Received: by 2002:a7b:c211:: with SMTP id x17mr3130711wmi.71.1573658689300;
+        Wed, 13 Nov 2019 07:24:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxJaPVpwliGa4xcU/3Z9Wis8+Tj6Cj3IK8ZUApiTdlvlAEiPQztRwbe7l6MVispSdtrtXnTjg==
+X-Received: by 2002:a7b:c211:: with SMTP id x17mr3130688wmi.71.1573658688971;
+        Wed, 13 Nov 2019 07:24:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:64a1:540d:6391:74a9? ([2001:b07:6468:f312:64a1:540d:6391:74a9])
+        by smtp.gmail.com with ESMTPSA id t29sm3597982wrb.53.2019.11.13.07.24.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Nov 2019 07:24:48 -0800 (PST)
+Subject: Re: [PATCH] KVM: VMX: Consume pending LAPIC INIT event when exit on
+ INIT_SIGNAL
+To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, nadav.amit@gmail.com,
+        Mihai Carabas <mihai.carabas@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+References: <20191111121605.92972-1-liran.alon@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <31ed4dc6-edf0-f489-726c-c57c9790b861@redhat.com>
+Date:   Wed, 13 Nov 2019 16:24:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191111121605.92972-1-liran.alon@oracle.com>
+Content-Language: en-US
+X-MC-Unique: 0qD74EOKPNK16mAbIUtong-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <9802964F-4629-46D8-A528-67B0AB5E372B@oracle.com>
-References: <20191112183300.6959-1-liran.alon@oracle.com>
- <6292b4ef-64df-5e37-dcf7-a359f3268a6f@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911130142
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911130142
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> On 13 Nov 2019, at 17:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 11/11/19 13:16, Liran Alon wrote:
+> Intel SDM section 25.2 OTHER CAUSES OF VM EXITS specifies the following
+> on INIT signals: "Such exits do not modify register state or clear pendin=
+g
+> events as they would outside of VMX operation."
 >=20
-> On 12/11/19 19:33, Liran Alon wrote:
->> When KVM emulates a nested VMEntry (L1->L2 VMEntry), it switches mmu =
-root
->> page. If nEPT is used, this will happen from
->> kvm_init_shadow_ept_mmu()->__kvm_mmu_new_cr3() and otherwise it will
->> happpen from nested_vmx_load_cr3()->kvm_mmu_new_cr3(). Either case,
->> __kvm_mmu_new_cr3() will use fast_cr3_switch() in attempt to switch =
-to a
->> previously cached root page.
->>=20
->> In case fast_cr3_switch() finds a matching cached root page, it will
->> set it in mmu->root_hpa and request KVM_REQ_LOAD_CR3 such that on
->> next entry to guest, KVM will set root HPA in appropriate hardware
->> fields (e.g. vmcs->eptp). In addition, fast_cr3_switch() calls
->> kvm_x86_ops->tlb_flush() in order to flush TLB as MMU root page
->> was replaced.
->>=20
->> This works as mmu->root_hpa, which vmx_flush_tlb() use, was
->> already replaced in cached_root_available(). However, this may
->> result in unnecessary INVEPT execution because a KVM_REQ_TLB_FLUSH
->> may have already been requested. For example, by prepare_vmcs02()
->> in case L1 don't use VPID.
->>=20
->> Therefore, change fast_cr3_switch() to just request TLB flush on
->> next entry to guest.
->>=20
->> Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
->> Signed-off-by: Liran Alon <liran.alon@oracle.com>
->> ---
->> arch/x86/kvm/mmu.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
->> index 24c23c66b226..150d982ec1d2 100644
->> --- a/arch/x86/kvm/mmu.c
->> +++ b/arch/x86/kvm/mmu.c
->> @@ -4295,7 +4295,7 @@ static bool fast_cr3_switch(struct kvm_vcpu =
-*vcpu, gpa_t new_cr3,
->> 			kvm_make_request(KVM_REQ_LOAD_CR3, vcpu);
->> 			if (!skip_tlb_flush) {
->> 				kvm_make_request(KVM_REQ_MMU_SYNC, =
-vcpu);
->> -				kvm_x86_ops->tlb_flush(vcpu, true);
->> +				kvm_make_request(KVM_REQ_TLB_FLUSH, =
-vcpu);
->> 			}
->>=20
->> 			/*
->>=20
+> When commit 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various =
+CPU states")
+> was applied, I interepted above Intel SDM statement such that
+> INIT_SIGNAL exit don=E2=80=99t consume the LAPIC INIT pending event.
 >=20
-> Queued, thanks.
+> However, when Nadav Amit run matching kvm-unit-test on a bare-metal
+> machine, it turned out my interpetation was wrong. i.e. INIT_SIGNAL
+> exit does consume the LAPIC INIT pending event.
+> (See: https://www.spinics.net/lists/kvm/msg196757.html)
 >=20
-> (I should get kvm/queue properly tested and pushed by the end of this =
-week).
+> Therefore, fix KVM code to behave as observed on bare-metal.
 >=20
-> Paolo
+> Fixes: 4b9852f4f389 ("KVM: x86: Fix INIT signal handling in various CPU s=
+tates")
+> Reported-by: Nadav Amit <nadav.amit@gmail.com>
+> Reviewed-by: Mihai Carabas <mihai.carabas@oracle.com>
+> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 0e7c9301fe86..2c4336ac7576 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3461,6 +3461,7 @@ static int vmx_check_nested_events(struct kvm_vcpu =
+*vcpu, bool external_intr)
+>  =09=09test_bit(KVM_APIC_INIT, &apic->pending_events)) {
+>  =09=09if (block_nested_events)
+>  =09=09=09return -EBUSY;
+> +=09=09clear_bit(KVM_APIC_INIT, &apic->pending_events);
+>  =09=09nested_vmx_vmexit(vcpu, EXIT_REASON_INIT_SIGNAL, 0, 0);
+>  =09=09return 0;
+>  =09}
 >=20
 
-Thanks.
+Queued, thanks.
 
-Also note that I have sent another trivial patch that didn=E2=80=99t got =
-any response ("KVM: VMX: Consume pending LAPIC INIT event when exit on =
-INIT_SIGNAL=E2=80=9D).
-See: https://patchwork.kernel.org/patch/11236869/
-
-I have also sent kvm-unit-tests for my recent patches (The INIT_SIGNAL =
-fix and nVMX TPR-Threshold issue).
-See: https://patchwork.kernel.org/patch/11236951/ and =
-https://patchwork.kernel.org/patch/11236961/
-
--Liran
+Paolo
 
