@@ -2,362 +2,337 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83276FA74C
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 04:31:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCCFCFA892
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 05:31:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727262AbfKMDbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 22:31:39 -0500
-Received: from mga04.intel.com ([192.55.52.120]:43310 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727100AbfKMDbi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 22:31:38 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 19:31:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,299,1569308400"; 
-   d="scan'208";a="235118128"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by fmsmga002.fm.intel.com with ESMTP; 12 Nov 2019 19:31:34 -0800
-Date:   Tue, 12 Nov 2019 22:23:32 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20191113032332.GB18001@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
- <20191112153005.53bf324c@x1.home>
+        id S1728144AbfKME3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 23:29:08 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:4024 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727646AbfKME1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 23:27:22 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dcb85e80000>; Tue, 12 Nov 2019 20:26:16 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 12 Nov 2019 20:27:12 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 20:27:12 -0800
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
+ 2019 04:27:11 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Wed, 13 Nov 2019 04:27:11 +0000
+Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5dcb861f0001>; Tue, 12 Nov 2019 20:27:11 -0800
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v4 00/23] mm/gup: track dma-pinned pages: FOLL_PIN, FOLL_LONGTERM
+Date:   Tue, 12 Nov 2019 20:26:47 -0800
+Message-ID: <20191113042710.3997854-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191112153005.53bf324c@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-NVConfidentiality: public
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573619176; bh=2AN+O1jk8w8prcr1jjcrPUWCsdLNYMikvfboI2tzboo=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Type:
+         Content-Transfer-Encoding;
+        b=sI3X+qv/RC5jGSfAds5syx78pPtcScH4Nxad5TO0TMpK+2FRarC2LJ88uwmi4bM2O
+         aoHH8aTYEycMk3LxKRt+YmKI3x3o75ADjD6t4eWF7dIKtBH1lgyIx9tviBUBGKPpWd
+         rgKWNomJpZFgo6+tG5rNFhvV6CLvYAxNz7ZaVBZNkfyvWiZ8/z7wPO6Y+Lh70++uTi
+         IskxU/W+trfj/FTqk+Ld+LdSh9XY6FBQ6c36/dU/NrPq7aTbYoOmocG2VgDIuqEsr/
+         i+cfKWU165IgrP0maeoMTYghc0Sp4a3Xg3JjE75N4RNcIkSCwNBcRSxlxWj2gsmu1h
+         bEPJFQN7CrQmg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 06:30:05AM +0800, Alex Williamson wrote:
-> On Tue, 12 Nov 2019 22:33:36 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > - Defined MIGRATION region type and sub-type.
-> > - Used 3 bits to define VFIO device states.
-> >     Bit 0 => _RUNNING
-> >     Bit 1 => _SAVING
-> >     Bit 2 => _RESUMING
-> >     Combination of these bits defines VFIO device's state during migration
-> >     _RUNNING => Normal VFIO device running state. When its reset, it
-> > 		indicates _STOPPED state. when device is changed to
-> > 		_STOPPED, driver should stop device before write()
-> > 		returns.
-> >     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
-> >                           start saving state of device i.e. pre-copy state
-> >     _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
-> 
-> s/should/must/
-> 
-> >                 save device state,i.e. stop-n-copy state
-> >     _RESUMING => VFIO device resuming state.
-> >     _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
-> 
-> A table might be useful here and in the uapi header to indicate valid
-> states:
-> 
-> | _RESUMING | _SAVING | _RUNNING | Description
-> +-----------+---------+----------+------------------------------------------
-> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
-> +-----------+---------+----------+------------------------------------------
-> |     0     |    0    |     1    | Running, default state
-> +-----------+---------+----------+------------------------------------------
-> |     0     |    1    |     0    | Stopped, migration interface in save mode
-> +-----------+---------+----------+------------------------------------------
-> |     0     |    1    |     1    | Running, save mode interface, iterative
-> +-----------+---------+----------+------------------------------------------
-> |     1     |    0    |     0    | Stopped, migration resume interface active
-> +-----------+---------+----------+------------------------------------------
-> |     1     |    0    |     1    | Invalid (b)
-> +-----------+---------+----------+------------------------------------------
-> |     1     |    1    |     0    | Invalid (c)
-> +-----------+---------+----------+------------------------------------------
-> |     1     |    1    |     1    | Invalid (d)
-> 
-> I think we need to consider whether we define (a) as generally
-> available, for instance we might want to use it for diagnostics or a
-> fatal error condition outside of migration.
-> 
-> Are there hidden assumptions between state transitions here or are
-> there specific next possible state diagrams that we need to include as
-> well?
-> 
-> I'm curious if Intel agrees with the states marked invalid with their
-> push for post-copy support.
-> 
-hi Alex and Kirti,
-Actually, for postcopy, I think we anyway need an extra POSTCOPY state
-introduced. Reasons as below:
-- in the target side, _RSESUMING state is set in the beginning of
-  migration. It cannot be used as a state to inform device of that
-  currently it's in postcopy state and device DMAs are to be trapped and
-  pre-faulted.
-  we also cannot use state (_RESUMING + _RUNNING) as an indicator of
-  postcopy, because before device & vm running in target side, some device
-  state are already loaded (e.g. page tables, pending workloads),
-  target side can do pre-pagefault at that period before target vm up.
-- in the source side, after device is stopped, postcopy needs saving
-  device state only (as compared to device state + remaining dirty
-  pages in precopy). state (!_RUNNING + _SAVING) here again cannot
-  differentiate precopy and postcopy here.
+OK, here we go. Any VFIO and Infiniband runtime testing from anyone, is
+especially welcome here.
 
-> >     Bits 3 - 31 are reserved for future use. User should perform
-> >     read-modify-write operation on this field.
-> > - Defined vfio_device_migration_info structure which will be placed at 0th
-> >   offset of migration region to get/set VFIO device related information.
-> >   Defined members of structure and usage on read/write access:
-> >     * device_state: (read/write)
-> >         To convey VFIO device state to be transitioned to. Only 3 bits are
-> > 	used as of now, Bits 3 - 31 are reserved for future use.
-> >     * pending bytes: (read only)
-> >         To get pending bytes yet to be migrated for VFIO device.
-> >     * data_offset: (read only)
-> >         To get data offset in migration region from where data exist
-> > 	during _SAVING and from where data should be written by user space
-> > 	application during _RESUMING state.
-> >     * data_size: (read/write)
-> >         To get and set size in bytes of data copied in migration region
-> > 	during _SAVING and _RESUMING state.
-> > 
-> > Migration region looks like:
-> >  ------------------------------------------------------------------
-> > |vfio_device_migration_info|    data section                      |
-> > |                          |     ///////////////////////////////  |
-> >  ------------------------------------------------------------------
-> >  ^                              ^
-> >  offset 0-trapped part        data_offset
-> > 
-> > Structure vfio_device_migration_info is always followed by data section
-> > in the region, so data_offset will always be non-0. Offset from where data
-> > to be copied is decided by kernel driver, data section can be trapped or
-> > mapped depending on how kernel driver defines data section.
-> > Data section partition can be defined as mapped by sparse mmap capability.
-> > If mmapped, then data_offset should be page aligned, where as initial
-> > section which contain vfio_device_migration_info structure might not end
-> > at offset which is page aligned.
-> > Vendor driver should decide whether to partition data section and how to
-> > partition the data section. Vendor driver should return data_offset
-> > accordingly.
-> > 
-> > For user application, data is opaque. User should write data in the same
-> > order as received.
-> > 
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 108 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 108 insertions(+)
-> > 
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 9e843a147ead..35b09427ad9f 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
-> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
-> >  #define VFIO_REGION_TYPE_GFX                    (1)
-> >  #define VFIO_REGION_TYPE_CCW			(2)
-> > +#define VFIO_REGION_TYPE_MIGRATION              (3)
-> >  
-> >  /* sub-types for VFIO_REGION_TYPE_PCI_* */
-> >  
-> > @@ -379,6 +380,113 @@ struct vfio_region_gfx_edid {
-> >  /* sub-types for VFIO_REGION_TYPE_CCW */
-> >  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
-> >  
-> > +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
-> > +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
-> > +
-> > +/*
-> > + * Structure vfio_device_migration_info is placed at 0th offset of
-> > + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-> > + * information. Field accesses from this structure are only supported at their
-> > + * native width and alignment, otherwise the result is undefined and vendor
-> > + * drivers should return an error.
-> > + *
-> > + * device_state: (read/write)
-> > + *      To indicate vendor driver the state VFIO device should be transitioned
-> > + *      to. If device state transition fails, write on this field return error.
-> > + *      It consists of 3 bits:
-> > + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
-> 
-> Let's use set/cleared or 1/0 to indicate bit values, 'reset' is somewhat
-> ambiguous.
-> 
-> > + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
-> > + *        device before write() returns.
-> > + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
-> > + *        should start gathering device state information which will be provided
-> > + *        to VFIO user space application to save device's state.
-> > + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
-> > + *        prepare to resume device, data provided through migration region
-> > + *        should be used to resume device.
-> > + *      Bits 3 - 31 are reserved for future use. User should perform
-> > + *      read-modify-write operation on this field.
-> > + *      _SAVING and _RESUMING bits set at the same time is invalid state.
-> > + *	Similarly _RUNNING and _RESUMING bits set is invalid state.
-> > + *
-> > + * pending bytes: (read only)
-> > + *      Number of pending bytes yet to be migrated from vendor driver
-> > + *
-> > + * data_offset: (read only)
-> > + *      User application should read data_offset in migration region from where
-> > + *      user application should read device data during _SAVING state or write
-> > + *      device data during _RESUMING state. See below for detail of sequence to
-> > + *      be followed.
-> > + *
-> > + * data_size: (read/write)
-> > + *      User application should read data_size to get size of data copied in
-> > + *      bytes in migration region during _SAVING state and write size of data
-> > + *      copied in bytes in migration region during _RESUMING state.
-> > + *
-> > + * Migration region looks like:
-> > + *  ------------------------------------------------------------------
-> > + * |vfio_device_migration_info|    data section                      |
-> > + * |                          |     ///////////////////////////////  |
-> > + * ------------------------------------------------------------------
-> > + *   ^                              ^
-> > + *  offset 0-trapped part        data_offset
-> > + *
-> > + * Structure vfio_device_migration_info is always followed by data section in
-> > + * the region, so data_offset will always be non-0. Offset from where data is
-> > + * copied is decided by kernel driver, data section can be trapped or mapped
-> > + * or partitioned, depending on how kernel driver defines data section.
-> > + * Data section partition can be defined as mapped by sparse mmap capability.
-> > + * If mmapped, then data_offset should be page aligned, where as initial section
-> > + * which contain vfio_device_migration_info structure might not end at offset
-> > + * which is page aligned.
-> 
-> "The user is not required to to access via mmap regardless of the
-> region mmap capabilities."
->
-But once the user decides to access via mmap, it has to read data of
-data_size each time, otherwise the vendor driver has no idea of how many
-data are already read from user. Agree?
+Changes since v3:
 
-> > + * Vendor driver should decide whether to partition data section and how to
-> > + * partition the data section. Vendor driver should return data_offset
-> > + * accordingly.
-> > + *
-> > + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
-> > + * and for _SAVING device state or stop-and-copy phase:
-> > + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
-> > + * b. read data_offset, indicates kernel driver to write data to staging buffer.
-> > + *    Kernel driver should return this read operation only after writing data to
-> > + *    staging buffer is done.
-May I know under what condition this data_offset will be changed per
-each iteration from a-f ?
+* VFIO fix (patch 8): applied further cleanup: removed a pre-existing,
+  unnecessary release and reacquire of mmap_sem. Moved the DAX vma
+  checks from the vfio call site, to gup internals, and added comments
+  (and commit log) to clarify.
 
-> 
-> "staging buffer" implies a vendor driver implementation, perhaps we
-> could just state that data is available from (region + data_offset) to
-> (region + data_offset + data_size) upon return of this read operation.
-> 
-> > + * c. read data_size, amount of data in bytes written by vendor driver in
-> > + *    migration region.
-> > + * d. read data_size bytes of data from data_offset in the migration region.
-> > + * e. process data.
-> > + * f. Loop through a to e. Next read on pending_bytes indicates that read data
-> > + *    operation from migration region for previous iteration is done.
-> 
-> I think this indicate that step (f) should be to read pending_bytes, the
-> read sequence is not complete until this step.  Optionally the user can
-> then proceed to step (b).  There are no read side-effects of (a) afaict.
-> 
-> Is the use required to reach pending_bytes == 0 before changing
-> device_state, particularly transitioning to !_RUNNING?  Presumably the
-> user can exit this sequence at any time by clearing _SAVING.
-> 
-> > + *
-> > + * Sequence to be followed while _RESUMING device state:
-> > + * While data for this device is available, repeat below steps:
-> > + * a. read data_offset from where user application should write data.
-before proceed to step b, need to read data_size from vendor driver to determine
-the max len of data to write. I think it's necessary in such a condition
-that source vendor driver and target vendor driver do not offer data sections of
-the same size. e.g. in source side, the data section is of size 100M,
-but in target side, the data section is only of 50M size.
-rather than simply fail, loop and write seems better.
+* Due to the above, made a corresponding fix to the
+  pin_longterm_pages_remote(), which was actually calling the wrong
+  gup internal function.
 
-Thanks
-Yan
-> > + * b. write data of data_size to migration region from data_offset.
-> > + * c. write data_size which indicates vendor driver that data is written in
-> > + *    staging buffer. Vendor driver should read this data from migration
-> > + *    region and resume device's state.
-> 
-> The device defaults to _RUNNING state, so a prerequisite is to set
-> _RESUMING and clear _RUNNING, right?
-> 
-> > + *
-> > + * For user application, data is opaque. User should write data in the same
-> > + * order as received.
-> > + */
-> > +
-> > +struct vfio_device_migration_info {
-> > +	__u32 device_state;         /* VFIO device state */
-> > +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-> > +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-> > +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-> > +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
-> > +				     VFIO_DEVICE_STATE_SAVING |  \
-> > +				     VFIO_DEVICE_STATE_RESUMING)
-> > +
-> > +#define VFIO_DEVICE_STATE_INVALID_CASE1    (VFIO_DEVICE_STATE_SAVING | \
-> > +					    VFIO_DEVICE_STATE_RESUMING)
-> > +
-> > +#define VFIO_DEVICE_STATE_INVALID_CASE2    (VFIO_DEVICE_STATE_RUNNING | \
-> > +					    VFIO_DEVICE_STATE_RESUMING)
-> 
-> These seem difficult to use, maybe we just need a
-> VFIO_DEVICE_STATE_VALID macro?
-> 
-> #define VFIO_DEVICE_STATE_VALID(state) \
->   (state & VFIO_DEVICE_STATE_RESUMING ? \
->   (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
-> 
-> Thanks,
-> Alex
-> 
-> > +	__u32 reserved;
-> > +	__u64 pending_bytes;
-> > +	__u64 data_offset;
-> > +	__u64 data_size;
-> > +} __attribute__((packed));
-> > +
-> >  /*
-> >   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
-> >   * which allows direct access to non-MSIX registers which happened to be within
-> 
+* Changed put_user_page() comments, to refer to pin*() APIs, rather than
+  get_user_pages*() APIs.
+
+* Reverted an accidental whitespace-only change in the IB ODP code.
+
+* Added a few more reviewed-by tags.
+
+
+Changes since v2:
+
+* Added a patch to convert IB/umem from normal gup, to gup_fast(). This
+  is also posted separately, in order to hopefully get some runtime
+  testing.
+
+* Changed the page devmap code to be a little clearer,
+  thanks to Jerome for that.
+
+* Split out the page devmap changes into a separate patch (and moved
+  Ira's Signed-off-by to that patch).
+
+* Fixed my bug in IB: ODP code does not require pin_user_pages()
+  semantics. Therefore, revert the put_user_page() calls to put_page(),
+  and leave the get_user_pages() call as-is.
+
+      * As part of the revert, I am proposing here a change directly
+        from put_user_pages(), to release_pages(). I'd feel better if
+        someone agrees that this is the best way. It uses the more
+        efficient release_pages(), instead of put_page() in a loop,
+        and keep the change to just a few character on one line,
+        but OTOH it is not a pure revert.
+
+* Loosened the FOLL_LONGTERM restrictions in the
+  __get_user_pages_locked() implementation, and used that in order
+  to fix up a VFIO bug. Thanks to Jason for that idea.
+
+    * Note the use of release_pages() in IB: is that OK?
+
+* Added a few more WARN's and clarifying comments nearby.
+
+* Many documentation improvements in various comments.
+
+* Moved the new pin_user_pages.rst from Documentation/vm/ to
+  Documentation/core-api/ .
+
+* Commit descriptions: added clarifying notes to the three patches
+  (drm/via, fs/io_uring, net/xdp) that already had put_user_page()
+  calls in place.
+
+* Collected all pending Reviewed-by and Acked-by tags, from v1 and v2
+  email threads.
+
+* Lot of churn from v2 --> v3, so it's possible that new bugs
+  sneaked in.
+
+NOT DONE: separate patchset is required:
+
+* __get_user_pages_locked(): stop compensating for
+  buggy callers who failed to set FOLL_GET. Instead, assert
+  that FOLL_GET is set (and fail if it's not).
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Original cover letter (edited to fix up the patch description numbers)
+
+This applies cleanly to linux-next and mmotm, and also to linux.git if
+linux-next's commit 20cac10710c9 ("mm/gup_benchmark: fix MAP_HUGETLB
+case") is first applied there.
+
+This provides tracking of dma-pinned pages. This is a prerequisite to
+solving the larger problem of proper interactions between file-backed
+pages, and [R]DMA activities, as discussed in [1], [2], [3], and in
+a remarkable number of email threads since about 2017. :)
+
+A new internal gup flag, FOLL_PIN is introduced, and thoroughly
+documented in the last patch's Documentation/vm/pin_user_pages.rst.
+
+I believe that this will provide a good starting point for doing the
+layout lease work that Ira Weiny has been working on. That's because
+these new wrapper functions provide a clean, constrained, systematically
+named set of functionality that, again, is required in order to even
+know if a page is "dma-pinned".
+
+In contrast to earlier approaches, the page tracking can be
+incrementally applied to the kernel call sites that, until now, have
+been simply calling get_user_pages() ("gup"). In other words, opt-in by
+changing from this:
+
+    get_user_pages() (sets FOLL_GET)
+    put_page()
+
+to this:
+    pin_user_pages() (sets FOLL_PIN)
+    put_user_page()
+
+Because there are interdependencies with FOLL_LONGTERM, a similar
+conversion as for FOLL_PIN, was applied. The change was from this:
+
+    get_user_pages(FOLL_LONGTERM) (also sets FOLL_GET)
+    put_page()
+
+to this:
+    pin_longterm_pages() (sets FOLL_PIN | FOLL_LONGTERM)
+    put_user_page()
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Patch summary:
+
+* Patches 1-8: refactoring and preparatory cleanup, independent fixes
+
+* Patch 9: introduce pin_user_pages(), FOLL_PIN, but no functional
+           changes yet
+* Patches 10-15: Convert existing put_user_page() callers, to use the
+                new pin*()
+* Patch 16: Activate tracking of FOLL_PIN pages.
+* Patches 17-19: convert FOLL_LONGTERM callers
+* Patches: 20-22: gup_benchmark and run_vmtests support
+* Patch 23: enforce FOLL_LONGTERM as a gup-internal (only) flag
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Testing:
+
+* I've done some overall kernel testing (LTP, and a few other goodies),
+  and some directed testing to exercise some of the changes. And as you
+  can see, gup_benchmark is enhanced to exercise this. Basically, I've been
+  able to runtime test the core get_user_pages() and pin_user_pages() and
+  related routines, but not so much on several of the call sites--but those
+  are generally just a couple of lines changed, each.
+
+  Not much of the kernel is actually using this, which on one hand
+  reduces risk quite a lot. But on the other hand, testing coverage
+  is low. So I'd love it if, in particular, the Infiniband and PowerPC
+  folks could do a smoke test of this series for me.
+
+  Also, my runtime testing for the call sites so far is very weak:
+
+    * io_uring: Some directed tests from liburing exercise this, and they p=
+ass.
+    * process_vm_access.c: A small directed test passes.
+    * gup_benchmark: the enhanced version hits the new gup.c code, and pass=
+es.
+    * infiniband (still only have crude "IB pingpong" working, on a
+                  good day: it's not exercising my conversions at runtime..=
+.)
+    * VFIO: compiles (I'm vowing to set up a run time test soon, but it's
+                      not ready just yet)
+    * powerpc: it compiles...
+    * drm/via: compiles...
+    * goldfish: compiles...
+    * net/xdp: compiles...
+    * media/v4l2: compiles...
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Next:
+
+* Get the block/bio_vec sites converted to use pin_user_pages().
+
+* Work with Ira and Dave Chinner to weave this together with the
+  layout lease stuff.
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+[1] Some slow progress on get_user_pages() (Apr 2, 2019): https://lwn.net/A=
+rticles/784574/
+[2] DMA and get_user_pages() (LPC: Dec 12, 2018): https://lwn.net/Articles/=
+774411/
+[3] The trouble with get_user_pages() (Apr 30, 2018): https://lwn.net/Artic=
+les/753027/
+
+John Hubbard (23):
+  mm/gup: pass flags arg to __gup_device_* functions
+  mm/gup: factor out duplicate code from four routines
+  mm/gup: move try_get_compound_head() to top, fix minor issues
+  mm: devmap: refactor 1-based refcounting for ZONE_DEVICE pages
+  goldish_pipe: rename local pin_user_pages() routine
+  IB/umem: use get_user_pages_fast() to pin DMA pages
+  media/v4l2-core: set pages dirty upon releasing DMA buffers
+  vfio, mm: fix get_user_pages_remote() and FOLL_LONGTERM
+  mm/gup: introduce pin_user_pages*() and FOLL_PIN
+  goldish_pipe: convert to pin_user_pages() and put_user_page()
+  IB/{core,hw,umem}: set FOLL_PIN, FOLL_LONGTERM via
+    pin_longterm_pages*()
+  mm/process_vm_access: set FOLL_PIN via pin_user_pages_remote()
+  drm/via: set FOLL_PIN via pin_user_pages_fast()
+  fs/io_uring: set FOLL_PIN via pin_user_pages()
+  net/xdp: set FOLL_PIN via pin_user_pages()
+  mm/gup: track FOLL_PIN pages
+  media/v4l2-core: pin_longterm_pages (FOLL_PIN) and put_user_page()
+    conversion
+  vfio, mm: pin_longterm_pages (FOLL_PIN) and put_user_page() conversion
+  powerpc: book3s64: convert to pin_longterm_pages() and put_user_page()
+  mm/gup_benchmark: use proper FOLL_WRITE flags instead of hard-coding
+    "1"
+  mm/gup_benchmark: support pin_user_pages() and related calls
+  selftests/vm: run_vmtests: invoke gup_benchmark with basic FOLL_PIN
+    coverage
+  mm/gup: remove support for gup(FOLL_LONGTERM)
+
+ Documentation/core-api/index.rst            |   1 +
+ Documentation/core-api/pin_user_pages.rst   | 218 +++++++
+ arch/powerpc/mm/book3s64/iommu_api.c        |  15 +-
+ drivers/gpu/drm/via/via_dmablit.c           |   2 +-
+ drivers/infiniband/core/umem.c              |  17 +-
+ drivers/infiniband/core/umem_odp.c          |  13 +-
+ drivers/infiniband/hw/hfi1/user_pages.c     |   4 +-
+ drivers/infiniband/hw/mthca/mthca_memfree.c |   3 +-
+ drivers/infiniband/hw/qib/qib_user_pages.c  |   8 +-
+ drivers/infiniband/hw/qib/qib_user_sdma.c   |   2 +-
+ drivers/infiniband/hw/usnic/usnic_uiom.c    |   9 +-
+ drivers/infiniband/sw/siw/siw_mem.c         |   5 +-
+ drivers/media/v4l2-core/videobuf-dma-sg.c   |  10 +-
+ drivers/platform/goldfish/goldfish_pipe.c   |  35 +-
+ drivers/vfio/vfio_iommu_type1.c             |  30 +-
+ fs/io_uring.c                               |   5 +-
+ include/linux/mm.h                          | 164 ++++-
+ include/linux/mmzone.h                      |   2 +
+ include/linux/page_ref.h                    |  10 +
+ mm/gup.c                                    | 636 ++++++++++++++++----
+ mm/gup_benchmark.c                          |  87 ++-
+ mm/huge_memory.c                            |  54 +-
+ mm/hugetlb.c                                |  39 +-
+ mm/memremap.c                               |  67 +--
+ mm/process_vm_access.c                      |  28 +-
+ mm/vmstat.c                                 |   2 +
+ net/xdp/xdp_umem.c                          |   4 +-
+ tools/testing/selftests/vm/gup_benchmark.c  |  34 +-
+ tools/testing/selftests/vm/run_vmtests      |  22 +
+ 29 files changed, 1191 insertions(+), 335 deletions(-)
+ create mode 100644 Documentation/core-api/pin_user_pages.rst
+
+--=20
+2.24.0
+
