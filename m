@@ -2,108 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CAE0FB422
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:50:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DF96FB45C
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:54:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727986AbfKMPuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 10:50:15 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39493 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbfKMPuP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 10:50:15 -0500
-Received: by mail-wr1-f68.google.com with SMTP id l7so2937352wrp.6
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 07:50:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=krjU2hd3ztP4woKuJblHI3QSV2BYpHLjvcUu9d/lsaQ=;
-        b=U62KbEfDIt3WvEiheY2lcYb/enkEtZlPwnKf0Mq+wdLpaXfRIMM0nHpTsFlR3J1YDl
-         8nrL8GLPfjRVb80/RIUYbuWzOaVHC6P7G3qJALuRJbjSuWzjniv1R/+Yas38N5uYOBJF
-         Mh2d6q4zyumHh0qdn/2meStlvd/EVO4N5kaoweGSOdCVGycD4WVyAN1lIBMd8S9EEO5H
-         Cq1gQwAucima49HsKI3IZ92ppjlOXe3RX+ZvainSh1pYUHch0YQlv1S8OUcnuqFH2RP8
-         xMtYjPVrlUhsLIlqog94BrTtvulR6c+cBxz3bxsCBEyMVlOsE9h8H9v6tmYAb6bHc+Tr
-         1xSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=krjU2hd3ztP4woKuJblHI3QSV2BYpHLjvcUu9d/lsaQ=;
-        b=cC+UfG3XTiq7Vhg74ka8uKbeFEgtClTDs3Mg/q5B01bDeUWsWJpffOZa+fOvZesZ7Z
-         4LTod4rXxtvJTJu8CEJfktPE5O+iDaoQBQUYKwDPJ1XkCPzZgHDE+vNSpZRvQ2WwIadd
-         k8LKpDOtx0sbK9dNkE3dtZ/mau/kWi5cKikP90a7RNgIKvObUIzxO6OSny+6Q7iB9UiF
-         3Fy+vENyA1Go0sAoIy5BB+9Ao6hwIIgQtl0kF2XKyN+F4mFUfG8Pxfa85d83O8yhECOh
-         3JF9mYXby4kj024N3nU6bvmdQOBKq3lUj927IBjHibwIRK8wFyKoGt0X24L2/LJeS6N/
-         Iq4w==
-X-Gm-Message-State: APjAAAW2/Dqc89IVwh+74KeHNbP+SXDyo+uBIdzZ5XXVdGrGCx4G+CtZ
-        tlP0k+RVrloYtNKTYTNgpzmJukPp
-X-Google-Smtp-Source: APXvYqxiQMJNxDNZkEFnRUM1RCnttAfg3vmIqygChNm2My+pAYzU2l3qB4hSOA9t/jneqeaMH/x0GA==
-X-Received: by 2002:adf:8543:: with SMTP id 61mr3693887wrh.171.1573660212458;
-        Wed, 13 Nov 2019 07:50:12 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id t134sm2992999wmt.24.2019.11.13.07.50.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Nov 2019 07:50:11 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     cavery@redhat.com
-Subject: [PATCH kvm-unit-tests] svm: run tests with host IF=1
-Date:   Wed, 13 Nov 2019 16:50:09 +0100
-Message-Id: <1573660209-26331-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727141AbfKMPyi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 10:54:38 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41974 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726285AbfKMPyh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 10:54:37 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xADFfmQq115916
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 10:54:36 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w8kbgd3sk-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 10:54:36 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 13 Nov 2019 15:54:34 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 13 Nov 2019 15:54:32 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xADFsUuo37487036
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Nov 2019 15:54:30 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 884CB4204B;
+        Wed, 13 Nov 2019 15:54:30 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3797942042;
+        Wed, 13 Nov 2019 15:54:30 +0000 (GMT)
+Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Nov 2019 15:54:30 +0000 (GMT)
+Subject: Re: [RFC v2] KVM: s390: protvirt: Secure memory is not mergeable
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-8-frankja@linux.ibm.com>
+ <20191025082446.754-1-frankja@linux.ibm.com>
+ <621d0191-1490-d8d3-c7be-11466243f63f@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Wed, 13 Nov 2019 16:54:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <621d0191-1490-d8d3-c7be-11466243f63f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="C67lVgB9KcMhHeTJn6Zy1ej9JfO0gnp6B"
+X-TM-AS-GCONF: 00
+x-cbid: 19111315-0016-0000-0000-000002C35732
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111315-0017-0000-0000-00003324F424
+Message-Id: <9c89ff61-bc62-9ff6-0c1c-f1a6ba69a2fc@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-13_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=935 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911130143
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tests should in general call VMRUN with EFLAGS.IF=1 (if there are
-exceptions in the future we can add a cmp/jz in test_run).  This is
-because currently interrupts are masked during all of VMRUN, while
-we usually want interrupts during a test to cause a vmexit.
-This is similar to how PIN_EXTINT and PIN_NMI are included by
-default in the VMCS used by vmx.flat.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C67lVgB9KcMhHeTJn6Zy1ej9JfO0gnp6B
+Content-Type: multipart/mixed; boundary="GvEdhkrLa1VnXk1hv1ISpLYeXgbJzk1sq"
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- x86/svm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+--GvEdhkrLa1VnXk1hv1ISpLYeXgbJzk1sq
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/x86/svm.c b/x86/svm.c
-index 4ddfaa4..097a296 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -254,6 +254,7 @@ static void test_run(struct test *test, struct vmcb *vmcb)
-     u64 vmcb_phys = virt_to_phys(vmcb);
-     u64 guest_stack[10000];
- 
-+    irq_disable();
-     test->vmcb = vmcb;
-     test->prepare(test);
-     vmcb->save.rip = (ulong)test_thunk;
-@@ -269,7 +270,9 @@ static void test_run(struct test *test, struct vmcb *vmcb)
-             "mov regs, %%r15\n\t"       // rax
-             "mov %%r15, 0x1f8(%0)\n\t"
-             LOAD_GPR_C
-+            "sti \n\t"		// only used if V_INTR_MASKING=1
-             "vmrun \n\t"
-+            "cli \n\t"
-             SAVE_GPR_C
-             "mov 0x170(%0), %%r15\n\t"  // rflags
-             "mov %%r15, regs+0x80\n\t"
-@@ -284,6 +287,7 @@ static void test_run(struct test *test, struct vmcb *vmcb)
- 	tsc_end = rdtsc();
-         ++test->exits;
-     } while (!test->finished(test));
-+    irq_enable();
- 
-     report("%s", test->succeeded(test), test->name);
- }
-@@ -301,7 +305,6 @@ static bool default_supported(void)
- static void default_prepare(struct test *test)
- {
-     vmcb_ident(test->vmcb);
--    cli();
- }
- 
- static bool default_finished(struct test *test)
--- 
-1.8.3.1
+On 11/13/19 1:23 PM, Thomas Huth wrote:
+> On 25/10/2019 10.24, Janosch Frank wrote:
+>> KSM will not work on secure pages, because when the kernel reads a
+>> secure page, it will be encrypted and hence no two pages will look the=
+
+>> same.
+>>
+>> Let's mark the guest pages as unmergeable when we transition to secure=
+
+>> mode.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+> [...]
+>> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+>> index edcdca97e85e..faecdf81abdb 100644
+>> --- a/arch/s390/mm/gmap.c
+>> +++ b/arch/s390/mm/gmap.c
+>> @@ -2548,6 +2548,23 @@ int s390_enable_sie(void)
+>>  }
+>>  EXPORT_SYMBOL_GPL(s390_enable_sie);
+>> =20
+>> +int gmap_mark_unmergeable(void)
+>> +{
+>> +	struct mm_struct *mm =3D current->mm;
+>> +	struct vm_area_struct *vma;
+>> +
+>> +
+>=20
+> Please remove one of the two empty lines.
+
+Already gone
+
+>=20
+>> +	for (vma =3D mm->mmap; vma; vma =3D vma->vm_next) {
+>> +		if (ksm_madvise(vma, vma->vm_start, vma->vm_end,
+>> +				MADV_UNMERGEABLE, &vma->vm_flags))
+>> +			return -ENOMEM;
+>> +	}
+>> +	mm->def_flags &=3D ~VM_MERGEABLE;
+>> +
+
+Also this one was removed
+
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(gmap_mark_unmergeable);
+>> +
+> [...]
+>=20
+> Apart from the cosmetic nit, the patch looks fine to me.
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>=20
+Thanks!
+
+
+
+--GvEdhkrLa1VnXk1hv1ISpLYeXgbJzk1sq--
+
+--C67lVgB9KcMhHeTJn6Zy1ej9JfO0gnp6B
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3MJzUACgkQ41TmuOI4
+ufhdpA//fJwk03H4vKIEyUPdoKf8E3Oz2wv+Ejh/aMs7+5tNTd1K/Oic/7onvKNm
+j+MyhUyC/BkjYC5fyVwB+Daac+YoR8KRZ8Mb86lsICQqbClRxRN3+yiKnk5/OTCw
+zkEr/4wdvEnl/LbX9r7p/D1zmF7e5fYPX6uJF110hIBXc7VzujMZ4U0htXbSjt1a
+XKVm6icP9KmtZ6o1Natf9cr4hEo9Ni5wprZLLTlqXhK/1xlUzGv6fY6/ugmIyQaC
+4NQcUjA2mixW0nsZ5ddfEYoGgYxBs38nyfWBwf6Ckaml8lfI/+9cdU1dzdW4LKMX
+p1xtvfgR/acjxNZlIjsC8P7Zn94jcI6FturPvC1HZWraD1FSpf1CcfUYF4zF1uQD
+e4K34H6thUSrtItq5GEt2SITq+JMSbVs7C6KPP3vAn5Vk8dAIwgPur7A3pbU0cGB
+hO3LE84QW4ruYsg/pGShbzq/lfB6wmIi64vnrnsRu3XK3VKtoz4X9pFkRiT/lBZv
+RvDROg/CYzqlO8LxJkhLjThana8h3fHvET2wZ7pZjwwOQv40Y3CMFGL3y9E1lUgU
+dlvTZ8VcHEtM+5AjeZe/05L5g13aNp4VkIBBlpUDsvZqUTA7d4XgnXQqzxgeKS2E
+AmXcZLmJ4vzsDHafN2eOyHI5Q06W/JEtSU5H4Bsrfz4xabJa3vs=
+=CT0p
+-----END PGP SIGNATURE-----
+
+--C67lVgB9KcMhHeTJn6Zy1ej9JfO0gnp6B--
 
