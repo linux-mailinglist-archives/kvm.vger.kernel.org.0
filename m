@@ -2,191 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA72FB551
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 17:39:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04408FB691
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 18:48:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728525AbfKMQix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 11:38:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33806 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727835AbfKMQix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 11:38:53 -0500
+        id S1727112AbfKMRsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 12:48:50 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32392 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726105AbfKMRst (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 12:48:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573663131;
+        s=mimecast20190719; t=1573667328;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QqzCZrrw+N1LqLUBngxMhEYqWKp5yMdHfOeTcezaP3c=;
-        b=ck6WKRP6pR+OweE3bLxOUrX+Ur1dWghtQZXNyE28NHEZ2kFGVMlhOyfjEnPPT9xKjseW+N
-        U0qU9KPtUgVwh80VBtIefOVvSo/nEHVM1DWzr/y9vpdghrDBVs0sRgtAp0ZGO+cNzp8Tbn
-        LWFRgfwbnoChSWsXdPPOmTxU2ah3HfI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-4nd2eGCdOB-zsucfOt1fRA-1; Wed, 13 Nov 2019 11:38:48 -0500
-Received: by mail-wr1-f70.google.com with SMTP id w9so1898770wrn.9
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 08:38:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9rmRmGxbCej/NSmLlrw5qBptbx4sAiez+aV0DPKoxmk=;
-        b=MEbXt2EZsl2lbyEYdjdp8K1uet5ATeletApTLkFnqcZdodAJ5pxbjO89YrAeuCTFUT
-         Vu/e8wL/ilyFgF/qsq4OCxxhRUA14Jwcj9D1QI5sU1QO5dViLoj29UaEv02XUEICfYG6
-         vvBya89kv3VheT9iPu5aRTAoBREpdFueoS1UyrBl/0oEznKoVEX8V6+k9tAcAjtlnHAm
-         mJ/iTyMGCe6bUlbdMJ2vfegBZSIQ7/F8RQbZ5QhgCx8LX71JX687qi3QwKLx06O0KYT2
-         njhP3/sPYLuD5LGZgV+VxborpT3ZB83nCktWwKzf51FOnpDemoRUpN/yqRSOirSA4NGF
-         v2zw==
-X-Gm-Message-State: APjAAAXvJY9kYQjL7R2PkM11JPiAtFPcD14Y8rEEO6oooKSZcg9PGHgz
-        fCvg0A7xjGOClWmBA/QTNVqFnaBmVt8o0NaRS4Gt0stZp4cvGp16z8OikF9CPXOEe72U517MmzU
-        qs5vuywy3nVPN
-X-Received: by 2002:adf:f0c4:: with SMTP id x4mr2417500wro.217.1573663126801;
-        Wed, 13 Nov 2019 08:38:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxXrDaHddzqNUvTPvMV4jXm5tNoMjrSJ3IvH3rKSatkd4o3Pvp2hT95nFuBwmA+H3+NDewgsg==
-X-Received: by 2002:adf:f0c4:: with SMTP id x4mr2417472wro.217.1573663126527;
-        Wed, 13 Nov 2019 08:38:46 -0800 (PST)
-Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
-        by smtp.gmail.com with ESMTPSA id q17sm2813058wmj.12.2019.11.13.08.38.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2019 08:38:45 -0800 (PST)
-Date:   Wed, 13 Nov 2019 17:38:42 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jorgen Hansen <jhansen@vmware.com>
-Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dexuan Cui <decui@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH net-next 11/14] vsock: add multi-transports support
-Message-ID: <20191113163842.6byl2qul4nbjf5no@steredhat>
-References: <20191023095554.11340-1-sgarzare@redhat.com>
- <20191023095554.11340-12-sgarzare@redhat.com>
- <MWHPR05MB33761FE4DA27130C72FC5048DA740@MWHPR05MB3376.namprd05.prod.outlook.com>
- <20191111171740.xwo7isdmtt7ywibo@steredhat>
- <MWHPR05MB33764F82AFA882B921A11E56DA770@MWHPR05MB3376.namprd05.prod.outlook.com>
- <20191112103630.vd3kbk7xnplv6rey@steredhat>
- <MWHPR05MB3376560CFD2A710723843828DA760@MWHPR05MB3376.namprd05.prod.outlook.com>
+        bh=DqDxQKf1L8BXZYWjyfeQ7+2ppmpxNqc2YxrLPzA1JJ4=;
+        b=F2s3c7oLQHlkR8HYojmrDTcspNhouauwUJ6dbfZBb4CPSvYCNk51YT3UpR68kOGaQZ3Oah
+        aRB8AKMyDfTGK4OidMxlt36Oy8arfVK76xilEXwLneGGNoSHyRhRvyW5f1nebAYPgGCWpG
+        fCCgzb1odqYB+o1mG27whxhUjjr6yzQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-pnp35ybBPzO5UVgfncamIg-1; Wed, 13 Nov 2019 12:48:47 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D2268048EC;
+        Wed, 13 Nov 2019 17:48:46 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-183.ams2.redhat.com [10.36.116.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5754B10374B9;
+        Wed, 13 Nov 2019 17:48:45 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v2] travis.yml: Test with KVM instead of TCG (on x86)
+Date:   Wed, 13 Nov 2019 18:48:42 +0100
+Message-Id: <20191113174842.20759-1-thuth@redhat.com>
+In-Reply-To: <e7246b2d-e76a-1302-513b-30cbfacdd4c6@redhat.com>
+References: <e7246b2d-e76a-1302-513b-30cbfacdd4c6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <MWHPR05MB3376560CFD2A710723843828DA760@MWHPR05MB3376.namprd05.prod.outlook.com>
-X-MC-Unique: 4nd2eGCdOB-zsucfOt1fRA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: pnp35ybBPzO5UVgfncamIg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 02:30:24PM +0000, Jorgen Hansen wrote:
-> > From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> > Sent: Tuesday, November 12, 2019 11:37 AM
->=20
-> > > > > You already mentioned that you are working on a fix for loopback
-> > > > > here for the guest, but presumably a host could also do loopback.
-> > > >
-> > > > IIUC we don't support loopback in the host, because in this case th=
-e
-> > > > application will use the CID_HOST as address, but if we are in a ne=
-sted
-> > > > VM environment we are in trouble.
-> > >
-> > > If both src and dst CID are CID_HOST, we should be fairly sure that t=
-his
-> > > Is host loopback, no? If src is anything else, we would do G2H.
-> > >
-> >=20
-> > The problem is that we don't know the src until we assign a transport
-> > looking at the dst. (or if the user bound the socket to CID_HOST before
-> > the connect(), but it is not very common)
-> >=20
-> > So if we are in a L1 and the user uses the local guest CID, it works, b=
-ut if
-> > it uses the HOST_CID, the packet will go to the L0.
-> >=20
-> > If we are in L0, it could be simple, because we can simply check if G2H
-> > is not loaded, so any packet to CID_HOST, is host loopback.
-> >=20
-> > I think that if the user uses the IOCTL_VM_SOCKETS_GET_LOCAL_CID, to se=
-t
-> > the dest CID for the loopback, it works in both cases because we return=
- the
-> > HOST_CID in L0, and always the guest CID in L1, also if a H2G is loaded=
- to
-> > handle the L2.
-> >=20
-> > Maybe we should document this in the man page.
->=20
-> Yeah, it seems like a good idea to flesh out the routing behavior for nes=
-ted
-> VMs in the man page.
+Travis nowadays supports KVM in their CI pipelines, so we can finally
+run the kvm-unit-tests with KVM instead of TCG here. Unfortunately, there
+are some quirks:
 
-I'll do it.
+First, /dev/kvm is not accessible on Ubuntu by default. You have to be
+"root" or in the "kvm" group to access it. But changing the group of the
+current user is not taking into account for the current shell process, so
+that would need some indirections in the yml file. Thus the yml script now
+rather changes the group and "g+s" permission of the qemu binary instead.
 
->=20
-> >=20
-> > But I have a question: Does vmci support the host loopback?
-> > I've tried, and it seems not.
->=20
-> Only for datagrams - not for stream sockets.
-> =20
+Second, not all x86 tests are working in this environment, so we still
+have to manually select the test set here (but the amount of tests is
+definitely higher now than what we were able to run with TCG before).
 
-Ok, I'll leave the datagram loopback as before.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Use chgrp + "chmod g+s" instead "chmod u+s" to get it running
 
-> > Also vhost-vsock doesn't support it, but virtio-vsock does.
-> >=20
-> > > >
-> > > > Since several people asked about this feature at the KVM Forum, I w=
-ould
-> > like
-> > > > to add a new VMADDR_CID_LOCAL (i.e. using the reserved 1) and
-> > implement
-> > > > loopback in the core.
-> > > >
-> > > > What do you think?
-> > >
-> > > What kind of use cases are mentioned in the KVM forum for loopback?
-> > One concern
-> > > is that we have to maintain yet another interprocess communication
-> > mechanism,
-> > > even though other choices exist already  (and those are likely to be =
-more
-> > efficient
-> > > given the development time and specific focus that went into those). =
-To
-> > me, the
-> > > local connections are mainly useful as a way to sanity test the proto=
-col and
-> > transports.
-> > > However, if loopback is compelling, it would make sense have it in th=
-e core,
-> > since it
-> > > shouldn't need a specific transport.
-> >=20
-> > The common use cases is for developer point of view, and to test the
-> > protocol and transports as you said.
-> >=20
-> > People that are introducing VSOCK support in their projects, would like=
- to
-> > test them on their own PC without starting a VM.
-> >=20
-> > The idea is to move the code to handle loopback from the virtio-vsock,
-> > in the core, but in another series :-)
->=20
-> OK, that makes sense.
+ .travis.yml | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-Thanks,
-Stefano
+diff --git a/.travis.yml b/.travis.yml
+index 3f5b5ee..89c50fe 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -1,4 +1,4 @@
+-sudo: false
++sudo: true
+ dist: bionic
+ language: c
+ cache: ccache
+@@ -13,16 +13,21 @@ matrix:
+       env:
+       - CONFIG=3D""
+       - BUILD_DIR=3D"."
+-      - TESTS=3D"vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit=
+_ipi
+-             vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_=
+immed"
++      - TESTS=3D"access asyncpf debug emulator ept hypercall hyperv_stimer
++               hyperv_synic idt_test intel_iommu ioapic ioapic-split
++               kvmclock_test msr pcid rdpru realmode rmap_chain s3 umip"
++      - ACCEL=3D"kvm"
+=20
+     - addons:
+         apt_packages: gcc qemu-system-x86
+       env:
+       - CONFIG=3D""
+       - BUILD_DIR=3D"x86-builddir"
+-      - TESTS=3D"ioapic-split ioapic smptest smptest3 eventinj msr port80 =
+syscall
+-             tsc rmap_chain umip intel_iommu vmexit_inl_pmtimer vmexit_ipi=
+_halt"
++      - TESTS=3D"smptest smptest3 tsc tsc_adjust xsave vmexit_cpuid vmexit=
+_vmcall
++               sieve vmexit_inl_pmtimer vmexit_ipi_halt vmexit_mov_from_cr=
+8
++               vmexit_mov_to_cr8 vmexit_ple_round_robin vmexit_tscdeadline
++               vmexit_tscdeadline_immed  vmx_apic_passthrough_thread sysca=
+ll"
++      - ACCEL=3D"kvm"
+=20
+     - addons:
+         apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+@@ -85,6 +90,10 @@ matrix:
+       - ACCEL=3D"tcg,firmware=3Ds390x/run"
+=20
+ before_script:
++  - if [ "$ACCEL" =3D "kvm" ]; then
++      sudo chgrp kvm /usr/bin/qemu-system-* ;
++      sudo chmod g+s /usr/bin/qemu-system-* ;
++    fi
+   - mkdir -p $BUILD_DIR && cd $BUILD_DIR
+   - if [ -e ./configure ]; then ./configure $CONFIG ; fi
+   - if [ -e ../configure ]; then ../configure $CONFIG ; fi
+--=20
+2.23.0
 
