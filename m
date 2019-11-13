@@ -2,62 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3875EFB327
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:05:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA6D9FB333
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:06:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727800AbfKMPFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 10:05:09 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36795 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727772AbfKMPFJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 10:05:09 -0500
-Received: by mail-wr1-f66.google.com with SMTP id r10so2769838wrx.3
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 07:05:07 -0800 (PST)
+        id S1727910AbfKMPGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 10:06:52 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45315 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726812AbfKMPGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 10:06:52 -0500
+Received: by mail-wr1-f67.google.com with SMTP id z10so2731622wrs.12
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 07:06:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=references:user-agent:from:to:cc:subject:in-reply-to:date
          :message-id:mime-version:content-transfer-encoding;
-        bh=NO3PNf3g/VPZKnpNUzJ2AMM3C/6+AK3GwKL2m/b6hEE=;
-        b=jhnVGq3AK/T/xNYoLRdAfB6+wrZ0tZXF03guXoGYJTT5WeT0bkcxt1TD5DMF7qKVvR
-         dvtpPBMwCYTYZ0fQMQ1oa5NgnJ1aeuM8hR7wvVuTnQ8YUgV93sNpdqtpraZJyGWHjdTz
-         BEuGsFSq7BuswZJutOoi15Xd31r4XqoyWxIHs/jQihUzzap+9+25ZBLj1OmBOsaVg4Or
-         y03FbHnVo/jAtDOpBf1Sg22kOpwktdUvVrHPjwL3hF/Tm4TxL5l1SI/7ZLGIacIGh7ZL
-         Xq6v/PhcXlqKIXVtZ8vyhK/+JICuzcOMAfPa83AzDSZwb447IQhBpGhXfA7Mf5Kn7JkJ
-         RFGA==
+        bh=Ma5s1m+zjBkjGGrP/Kt27aEjBmanveR5yh6rwsj31Og=;
+        b=HxkvHT9Y6TxlCUwxt8h1uCETkkYtG1Hi2vz5E0sqzAXazUq5jWNMEPk282UNvU9hIO
+         Ckf1YN/ZEcweVohBG9N8EvLK2vlJFJEzqVu6ptxyzgUibVX/Gl38NhD4epTESQEvfqKe
+         jDCd0BIPe+kG1WAQbIPH3s5k/griiZ4eiQ3aoWP8u36zyFn03Oj0ixHjOpBKs6YbJziK
+         rkiiXKwhblB6Y0kVaSNTzM2uwfXAUswXrJvVd8+0fd3QQ5AQty72Lmqe9lvRfFGLCRne
+         nTKEUGfAbSGJoiAYYRI3pwj7oAL0OzvUDNCfZ2baLlwrS/oITKzBleP7+/0U4daUaLN3
+         tRTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:references:user-agent:from:to:cc:subject
          :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-        bh=NO3PNf3g/VPZKnpNUzJ2AMM3C/6+AK3GwKL2m/b6hEE=;
-        b=mn2awbNGv4Ps51prh9qwWaUiDGkNWdjwopfudXUpR7bzmdGT+8k8rId/sQtuISN/f1
-         ydsoYOx4MY30bL8MP5SvDhwW2O/hJZ/TRRDznVjwVax9ck2XD4gsYoelc57nTA1ektEU
-         q4wf4uFduzPPmFmD7b0GYx04wm3c+eWrb+dRZOLWuMXpjWsi+RxRG8KaoGGu0TseLAFX
-         dU5YNy3Q4b+l7ERguIKTaR8CCeAr/g6X4MwFYkH8Xc0LJeFXnLGXj0mFlGlqYUMqBBe+
-         27gxs+8trCZ+T2JuQDKk3NRL/DUL9iKbWFn5XRwpCy9kYPQ0k1OlAfA7n+jf2FiuAMcQ
-         ZirQ==
-X-Gm-Message-State: APjAAAXUA6+H5FmgD0sSyzlroqNL7SoqdeiQJcwyLwEQSw/zsO+Tj4G6
-        JinrlTUJ2qCTM0jjpYMJjdWezg==
-X-Google-Smtp-Source: APXvYqyK40K1rCdWnZoaPtWCPpDDydEJPaeRa1MReXK3lpia4oW3TqAT3DNDqnWwNWWoLeSfth8UtA==
-X-Received: by 2002:adf:db41:: with SMTP id f1mr3112843wrj.351.1573657507017;
-        Wed, 13 Nov 2019 07:05:07 -0800 (PST)
+        bh=Ma5s1m+zjBkjGGrP/Kt27aEjBmanveR5yh6rwsj31Og=;
+        b=d0dIlmnBfRmy2ZfxBisKAUE7JPszZmHkT+30A02In0wDIfQBITau60fEY6eu7u+NBk
+         kvIgcpIZzIQ/JmaHsc/2+8B89ni5r4AFo3G6SdwYifuNHtzPiWTYxMXHZCgX16YmBV67
+         hhDtfYpv/0WqmKcdtZSq6Tnn03SND5aF0Z/WWDcBycFrQXxyyvcbh5HUyGirXyGyLXtC
+         tmCsP6GVAwlwxKxAFAtOTUAU3DEi1kQfRJqrIEGhcC4EGmZyipsx1bNKuUuidF2QVzsM
+         5I4IEThKUae+Eak1gu7vPVV6ZpTrbIgDMfNNFLcKRiH68ovGRVJ4Uv6V4tlM9KQA3Gps
+         /0Vg==
+X-Gm-Message-State: APjAAAUjMbYf2FzGOeHMhzge576X87L+Gd7EVytPiAiLrXExpk1X5ulu
+        AWqbEp9dKnEDCtlS0ntKpWwOfA==
+X-Google-Smtp-Source: APXvYqxce2CBtihPakdjKEWeAOxp+odUfE46hEQGMlYMOvwm+3S5B1ueO3MN1/mGk5eq+xCt9TXdgw==
+X-Received: by 2002:a5d:694d:: with SMTP id r13mr3083435wrw.395.1573657609212;
+        Wed, 13 Nov 2019 07:06:49 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id w10sm2503483wmd.26.2019.11.13.07.05.05
+        by smtp.gmail.com with ESMTPSA id a186sm2090035wmc.48.2019.11.13.07.06.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2019 07:05:05 -0800 (PST)
+        Wed, 13 Nov 2019 07:06:48 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id B533D1FF87;
-        Wed, 13 Nov 2019 15:05:04 +0000 (GMT)
+        by zen.linaroharston (Postfix) with ESMTP id 259491FF87;
+        Wed, 13 Nov 2019 15:06:47 +0000 (GMT)
 References: <20191113112649.14322-1-thuth@redhat.com>
- <20191113112649.14322-5-thuth@redhat.com>
+ <20191113112649.14322-6-thuth@redhat.com>
 User-agent: mu4e 1.3.5; emacs 27.0.50
 From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     Thomas Huth <thuth@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         David Hildenbrand <david@redhat.com>
-Subject: Re: [kvm-unit-test PATCH 4/5] travis.yml: Test the i386 build, too
-In-reply-to: <20191113112649.14322-5-thuth@redhat.com>
-Date:   Wed, 13 Nov 2019 15:05:04 +0000
-Message-ID: <87pnhv7r6n.fsf@linaro.org>
+Subject: Re: [kvm-unit-test PATCH 5/5] travis.yml: Expect that at least one
+ test succeeds
+In-reply-to: <20191113112649.14322-6-thuth@redhat.com>
+Date:   Wed, 13 Nov 2019 15:06:47 +0000
+Message-ID: <87mucz7r3s.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -69,46 +70,30 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Thomas Huth <thuth@redhat.com> writes:
 
-> After installing gcc-multilib, we can also test the 32-bit builds
-> on Travis.
+> While working on the travis.yml file, I've run into cases where
+> all tests are reported as "SKIP" by the run_test.sh script (e.g.
+> when QEMU could not be started). This should not result in a
+> successful test run, so mark it as failed if not at least one
+> test passed.
+
+But doesn't this mean you could have everything fail except one pass and
+still report success?
+
 >
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
 > ---
->  .travis.yml | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  .travis.yml | 1 +
+>  1 file changed, 1 insertion(+)
 >
 > diff --git a/.travis.yml b/.travis.yml
-> index f91118c..9ceb04d 100644
+> index 9ceb04d..aacf7d2 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -29,6 +29,21 @@ matrix:
->                 vmexit_tscdeadline_immed  vmx_apic_passthrough_thread sys=
-call"
->        - ACCEL=3D"kvm"
->
-> +    - addons:
-> +        apt_packages: gcc gcc-multilib qemu-system-x86
-> +      env:
-> +      - CONFIG=3D"--arch=3Di386"
-> +      - BUILD_DIR=3D"."
-> +      - TESTS=3D"eventinj port80 sieve tsc taskswitch umip vmexit_ple_ro=
-und_robin"
-> +
-> +    - addons:
-> +        apt_packages: gcc gcc-multilib qemu-system-x86
-> +      env:
-> +      - CONFIG=3D"--arch=3Di386"
-> +      - BUILD_DIR=3D"i386-builddir"
-> +      - TESTS=3D"vmexit_mov_from_cr8 vmexit_ipi vmexit_ipi_halt vmexit_m=
-ov_to_cr8
-> +               vmexit_cpuid vmexit_tscdeadline vmexit_tscdeadline_immed"
-> +
->      - addons:
->          apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
->        env:
+> @@ -115,3 +115,4 @@ script:
+>    - make -j3
+>    - ACCEL=3D"${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
+>    - if grep -q FAIL results.txt ; then exit 1 ; fi
+> +  - if ! grep -q PASS results.txt ; then exit 1 ; fi
 
 
 --
