@@ -2,101 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5159CFB2DC
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 15:50:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3875EFB327
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 16:05:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727684AbfKMOu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 09:50:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33951 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727112AbfKMOu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 09:50:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573656624;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/snImS3RCKQAYFTgaKwplx20AQSBVTMtKOickQ1zjek=;
-        b=L6oy0R1HaanRo2xP0TiNNfnm8z7IYyNwIZFEOuPD+CJGQyjcn/kpDQLYVkaKbrRt+2/93c
-        fQJoVScQ3ztHjOZNzHtx7rlkA5aHx6T3XyY4WKjLQxsuF65X0kj2vDENitPuXy1W9cxBd/
-        Jmb6WR4S+gRkuBbgb4/FmC7+u825OEk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-8OtSwPD3OaSkju3kXE773Q-1; Wed, 13 Nov 2019 09:50:23 -0500
-Received: by mail-wr1-f70.google.com with SMTP id q12so1735415wrr.3
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 06:50:23 -0800 (PST)
+        id S1727800AbfKMPFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 10:05:09 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36795 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727772AbfKMPFJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 10:05:09 -0500
+Received: by mail-wr1-f66.google.com with SMTP id r10so2769838wrx.3
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 07:05:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=NO3PNf3g/VPZKnpNUzJ2AMM3C/6+AK3GwKL2m/b6hEE=;
+        b=jhnVGq3AK/T/xNYoLRdAfB6+wrZ0tZXF03guXoGYJTT5WeT0bkcxt1TD5DMF7qKVvR
+         dvtpPBMwCYTYZ0fQMQ1oa5NgnJ1aeuM8hR7wvVuTnQ8YUgV93sNpdqtpraZJyGWHjdTz
+         BEuGsFSq7BuswZJutOoi15Xd31r4XqoyWxIHs/jQihUzzap+9+25ZBLj1OmBOsaVg4Or
+         y03FbHnVo/jAtDOpBf1Sg22kOpwktdUvVrHPjwL3hF/Tm4TxL5l1SI/7ZLGIacIGh7ZL
+         Xq6v/PhcXlqKIXVtZ8vyhK/+JICuzcOMAfPa83AzDSZwb447IQhBpGhXfA7Mf5Kn7JkJ
+         RFGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uViOOaW7gnxtknMFLeEqHtocS46dbL1si5U9obMvnSQ=;
-        b=F6LhLxgLxd+bqGbQLIOmP6GQ3bTn+FpKlrY+cIARypRtiSzsxNE225IG9J/v++rTiy
-         AEb58KP7fWR1E9oMXVRPfnUoY8AKzAtv0nQaP9S/sowfgMcL+JpIag3rv7zahXy2Hp6e
-         4xF6JigYBacNiXPSigKPMZkqOSt21K0hMFYGtvkl0YMJoOyq8UFvFia6Qv7BLnV3pMNb
-         mcSXvKxPf6rYhErjARK++ziIxjOb0Wis+2a4nshcg657mIMKn1bVTjp4t2Y8QKPy5NeG
-         dDRv66Iopsvo9cMZwg6ER6UKWvd2BsPRWsRieTSDkGWG6WkRTW1dePZQmP+iAkZpNkAK
-         4qPw==
-X-Gm-Message-State: APjAAAVLXTvWcco4vARWWgONMws8DUIT3H/lw3CZN2Hx27tKnTQYCaMn
-        ITjUy8a6Q+0C1VAoqJY+Pe314OFCY4Qdbo9jDOHx7xLD5aQq6VSyibjOSCxkQ4N6+xjKHlL3b9k
-        39drHlcX+IJ48
-X-Received: by 2002:a1c:e08a:: with SMTP id x132mr3243581wmg.146.1573656622264;
-        Wed, 13 Nov 2019 06:50:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw8zZDrTrbAsSBcam9XAe1XyTZ49/fsICTdL15pb5rY1nR6f3+ALNUTDuNholRDP5e0NqxU+g==
-X-Received: by 2002:a1c:e08a:: with SMTP id x132mr3243550wmg.146.1573656621979;
-        Wed, 13 Nov 2019 06:50:21 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:64a1:540d:6391:74a9? ([2001:b07:6468:f312:64a1:540d:6391:74a9])
-        by smtp.gmail.com with ESMTPSA id l1sm3116596wrw.33.2019.11.13.06.50.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Nov 2019 06:50:21 -0800 (PST)
-Subject: Re: [kvm-unit-test PATCH 0/5] Improvements for the Travis CI
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=NO3PNf3g/VPZKnpNUzJ2AMM3C/6+AK3GwKL2m/b6hEE=;
+        b=mn2awbNGv4Ps51prh9qwWaUiDGkNWdjwopfudXUpR7bzmdGT+8k8rId/sQtuISN/f1
+         ydsoYOx4MY30bL8MP5SvDhwW2O/hJZ/TRRDznVjwVax9ck2XD4gsYoelc57nTA1ektEU
+         q4wf4uFduzPPmFmD7b0GYx04wm3c+eWrb+dRZOLWuMXpjWsi+RxRG8KaoGGu0TseLAFX
+         dU5YNy3Q4b+l7ERguIKTaR8CCeAr/g6X4MwFYkH8Xc0LJeFXnLGXj0mFlGlqYUMqBBe+
+         27gxs+8trCZ+T2JuQDKk3NRL/DUL9iKbWFn5XRwpCy9kYPQ0k1OlAfA7n+jf2FiuAMcQ
+         ZirQ==
+X-Gm-Message-State: APjAAAXUA6+H5FmgD0sSyzlroqNL7SoqdeiQJcwyLwEQSw/zsO+Tj4G6
+        JinrlTUJ2qCTM0jjpYMJjdWezg==
+X-Google-Smtp-Source: APXvYqyK40K1rCdWnZoaPtWCPpDDydEJPaeRa1MReXK3lpia4oW3TqAT3DNDqnWwNWWoLeSfth8UtA==
+X-Received: by 2002:adf:db41:: with SMTP id f1mr3112843wrj.351.1573657507017;
+        Wed, 13 Nov 2019 07:05:07 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id w10sm2503483wmd.26.2019.11.13.07.05.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2019 07:05:05 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id B533D1FF87;
+        Wed, 13 Nov 2019 15:05:04 +0000 (GMT)
 References: <20191113112649.14322-1-thuth@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <81f71e72-eb74-07c2-6f35-d17634c9c7a7@redhat.com>
-Date:   Wed, 13 Nov 2019 15:50:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <20191113112649.14322-5-thuth@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [kvm-unit-test PATCH 4/5] travis.yml: Test the i386 build, too
+In-reply-to: <20191113112649.14322-5-thuth@redhat.com>
+Date:   Wed, 13 Nov 2019 15:05:04 +0000
+Message-ID: <87pnhv7r6n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191113112649.14322-1-thuth@redhat.com>
-Content-Language: en-US
-X-MC-Unique: 8OtSwPD3OaSkju3kXE773Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/11/19 12:26, Thomas Huth wrote:
-> The first two patches make the test matrix a little bit more flexible,
-> and the fourth patch enables the 32-bit builds on x86.
->=20
-> But the most important patch is likely the third one: It is possible to
-> test with KVM on Travis now, so we can run the tests within a real KVM
-> environment, without TCG! The only caveat is that qemu-system-x86_64
-> has to run as root ... fixing only the permissions of /dev/kvm did
-> not help here, I still got a "Permission denied" in that case.
 
-Ah, that's Debian.  You need to be in group kvm or root to run KVM.
+Thomas Huth <thuth@redhat.com> writes:
 
-Looks good, can you include it in the next pull request?
+> After installing gcc-multilib, we can also test the 32-bit builds
+> on Travis.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Paolo
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> Thomas Huth (5):
->   travis.yml: Re-arrange the test matrix
->   travis.yml: Install only the required packages for each entry in the
->     matrix
->   travis.yml: Test with KVM instead of TCG (on x86)
->   travis.yml: Test the i386 build, too
->   travis.yml: Expect that at least one test succeeds
->=20
->  .travis.yml | 155 +++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 104 insertions(+), 51 deletions(-)
->=20
+> ---
+>  .travis.yml | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index f91118c..9ceb04d 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -29,6 +29,21 @@ matrix:
+>                 vmexit_tscdeadline_immed  vmx_apic_passthrough_thread sys=
+call"
+>        - ACCEL=3D"kvm"
+>
+> +    - addons:
+> +        apt_packages: gcc gcc-multilib qemu-system-x86
+> +      env:
+> +      - CONFIG=3D"--arch=3Di386"
+> +      - BUILD_DIR=3D"."
+> +      - TESTS=3D"eventinj port80 sieve tsc taskswitch umip vmexit_ple_ro=
+und_robin"
+> +
+> +    - addons:
+> +        apt_packages: gcc gcc-multilib qemu-system-x86
+> +      env:
+> +      - CONFIG=3D"--arch=3Di386"
+> +      - BUILD_DIR=3D"i386-builddir"
+> +      - TESTS=3D"vmexit_mov_from_cr8 vmexit_ipi vmexit_ipi_halt vmexit_m=
+ov_to_cr8
+> +               vmexit_cpuid vmexit_tscdeadline vmexit_tscdeadline_immed"
+> +
+>      - addons:
+>          apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+>        env:
 
+
+--
+Alex Benn=C3=A9e
