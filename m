@@ -2,132 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 110E8F9FDC
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 02:08:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68F23FA029
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 02:31:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbfKMBIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Nov 2019 20:08:14 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:9626 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726979AbfKMBIN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:08:13 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcb577a0001>; Tue, 12 Nov 2019 17:08:11 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 12 Nov 2019 17:08:08 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 12 Nov 2019 17:08:08 -0800
-Received: from MacBook-Pro-10.local (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 01:08:07 +0000
-Subject: Re: [PATCH v3 08/23] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-To:     Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        Maling list - DRI developers 
-        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>,
-        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20191112000700.3455038-1-jhubbard@nvidia.com>
- <20191112000700.3455038-9-jhubbard@nvidia.com>
- <20191112204338.GE5584@ziepe.ca>
- <0db36e86-b779-01af-77e7-469af2a2e19c@nvidia.com>
- <CAPcyv4hAEgw6ySNS+EFRS4yNRVGz9A3Fu1vOk=XtpjYC64kQJw@mail.gmail.com>
- <20191112234250.GA19615@ziepe.ca>
- <CAPcyv4hwFKmsQpp04rS6diCmZwGtbnriCjfY2ofWV485qT9kzg@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <28355eb0-4ee5-3418-b430-59302d15b478@nvidia.com>
-Date:   Tue, 12 Nov 2019 17:08:07 -0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.1
+        id S1727063AbfKMBb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Nov 2019 20:31:29 -0500
+Received: from mga11.intel.com ([192.55.52.93]:55392 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726936AbfKMBb2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Nov 2019 20:31:28 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2019 17:31:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,298,1569308400"; 
+   d="scan'208";a="235090663"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.43.57])
+  by fmsmga002.fm.intel.com with ESMTP; 12 Nov 2019 17:31:25 -0800
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>
+Subject: [PATCH] KVM: X86: Reset the three MSR list number variables to 0 in kvm_init_msr_list()
+Date:   Wed, 13 Nov 2019 09:15:21 +0800
+Message-Id: <20191113011521.32255-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hwFKmsQpp04rS6diCmZwGtbnriCjfY2ofWV485qT9kzg@mail.gmail.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573607291; bh=wl9HqaOmiz62D7VoXo7FjyMU54D3XRSGYP3F6kh9mOM=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=BVU7rtLSKH40gEcG6jSN5CiYgtuH0Fsti8jOVN/t2cAsa7Lm+CfaOZ/cPBpKb/4pw
-         t2vrd447reb2cZaNtW1CrBBDCDSmRKvz10axjxdYouKdjIwayolxMRUvbWVZvRVnkG
-         svn8sgOn4uKeOQZMstm5QEuB1y1OABbj5Qg0iRg3RASWgUP54Ma2UJ/YLgr8iKpjqC
-         Mji+oXkSdbgJiidbxXQS/C9y8AEU32Ewa2NYrZGcfO6vFwup2ff4CZ6OIxWxJdqYtM
-         ZNX94L/R/d+iS0MKljVZcNT6wxULepfnHo9F4Q3KqGJu8/w+Vf+0hpqV8JvGKGhjvb
-         RkKNrnEIsYK7Q==
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/19 4:58 PM, Dan Williams wrote:
-...
->>> It's not redundant relative to upstream which does not do anything the
->>> FOLL_LONGTERM in the gup-slow path... but I have not looked at patches
->>> 1-7 to see if something there made it redundant.
->>
->> Oh, the hunk John had below for get_user_pages_remote() also needs to
->> call __gup_longterm_locked() when FOLL_LONGTERM is specified, then
->> that calls check_dax_vmas() which duplicates the vma_is_fsdax() check
->> above.
-> 
-> Oh true, good eye. It is redundant if it does additionally call
-> __gup_longterm_locked(), and it needs to do that otherwises it undoes
-> the CMA migration magic that Aneesh added.
-> 
+When applying commit 7a5ee6edb42e ("KVM: X86: Fix initialization of MSR
+lists"), it forgot to reset the three MSR lists number varialbes to 0
+while removing the useless conditionals.
 
-OK. So just to be clear, I'll be removing this from the patch:
+Fixes: 7a5ee6edb42e (KVM: X86: Fix initialization of MSR lists)
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-	/*
-	 * The lifetime of a vaddr_get_pfn() page pin is
-	 * userspace-controlled. In the fs-dax case this could
-	 * lead to indefinite stalls in filesystem operations.
-	 * Disallow attempts to pin fs-dax pages via this
-	 * interface.
-	 */
-	if (ret > 0 && vma_is_fsdax(vmas[0])) {
-		ret = -EOPNOTSUPP;
-		put_page(page[0]);
-  	}
-
-(and the declaration of "vmas", as well).
-
-thanks,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8c8a5e20ea06..9368b0e6bf21 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5102,6 +5102,10 @@ static void kvm_init_msr_list(void)
+ 
+ 	perf_get_x86_pmu_capability(&x86_pmu);
+ 
++	num_msrs_to_save = 0;
++	num_emulated_msrs = 0;
++	num_msr_based_features = 0;
++
+ 	for (i = 0; i < ARRAY_SIZE(msrs_to_save_all); i++) {
+ 		if (rdmsr_safe(msrs_to_save_all[i], &dummy[0], &dummy[1]) < 0)
+ 			continue;
 -- 
-John Hubbard
-NVIDIA
+2.19.1
+
