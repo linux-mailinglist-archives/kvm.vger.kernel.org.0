@@ -2,174 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D9BBFB0FD
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 14:02:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F027EFB109
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 14:05:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727265AbfKMNCG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 08:02:06 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:35011 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727022AbfKMNCF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 08:02:05 -0500
-Received: by mail-qt1-f193.google.com with SMTP id n4so2479441qte.2
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 05:02:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=oMayMeIif+74vqoR9Hg244XFAjXhPl1nedXCyPx66Cc=;
-        b=nx3682LY4M40wGJ/sVGEu1B6oRowx3yCQZUXaDyQPZ8wp2PPM1JbbnvXpnwJ+1w7kN
-         lveYAqZtu6ZiCNE2GeOgCzqCbaPveYJh+bEnyDI89VRNGCHDXS9A7L5ZDDa96GF+3bm0
-         VmapuAT4FqF5vTUEuSGlcRA+NIY79GOrBmWnh2u551hGbiYfLURBD9nS87LvoXBLbrK0
-         o1TB/3BSIGkHlZVczCO3ubOoj5u0dVQwEYLzu7svoxCzx/+RmvcCH+ACjaNBf3sl94Zf
-         NRZR8twQGuvzHtghZ4nzQu/TUj0hyyqfJ3dXa+O6cdFNGC6w6BZNjOabe9aQdvwtecNu
-         AUCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oMayMeIif+74vqoR9Hg244XFAjXhPl1nedXCyPx66Cc=;
-        b=sbfSGNt6Itjgg2Mp0vsZS8wv2DV4rqxl+vi0XQd2SYSa99xgOmQfM3OTjNnA/3SRXh
-         YSz0pK3oqGh16wP6zz41tggdBnVO3Boj3U1VZOCXkzZTVH5vT4bSODbDdOruinlmWDne
-         GNHkE8Gi3T+c0BttQ2YoCUxpkUtLwlkRTo02iz+lNudYh6iy3yICnLdQmeVa47Mcuhoh
-         ErsUP1PwCPDj+llF69fYxJdyEGDKr9HUtqPS+mg4mIeNB6HDMuOdzaLlzrOKr79n5uBg
-         o9FqlXFGpAeQ82eXHCeACri4/hPzzwGUHzVdcmaZuTCZ+XYgesVdr18VPljp+hZ4PrC1
-         FvEw==
-X-Gm-Message-State: APjAAAVXlMnDmhpUpCglHdmN1x4xHIMchnq6RhQdwK1zwWJlLUZTxDOR
-        VTGpjzFaq+25LbS8rkvIVoW0jw==
-X-Google-Smtp-Source: APXvYqwGbusmGQAfGHn3CXk2dU2JO4knhTY4prDGLzmyu8apMpc1WOd3WOgt9K6JkDyAWe/3c1LxDA==
-X-Received: by 2002:ac8:724f:: with SMTP id l15mr2476006qtp.234.1573650124104;
-        Wed, 13 Nov 2019 05:02:04 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id 187sm918223qkk.103.2019.11.13.05.02.03
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 13 Nov 2019 05:02:03 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iUsHa-000767-Jc; Wed, 13 Nov 2019 09:02:02 -0400
-Date:   Wed, 13 Nov 2019 09:02:02 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 08/23] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-Message-ID: <20191113130202.GA26068@ziepe.ca>
-References: <20191113042710.3997854-1-jhubbard@nvidia.com>
- <20191113042710.3997854-9-jhubbard@nvidia.com>
+        id S1727064AbfKMNFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 08:05:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53281 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726250AbfKMNFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 08:05:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573650334;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tsCN0+YE6TRsN+UdVI6kg8PGJLrxHDnSCZdX6aGWXzQ=;
+        b=AiNz7ue6m/CSEVqWzDYknaoTluIJ55SF5SKmmsa+fhkWp28DqUMnW4jZrf46DypWISsvL0
+        WidtDD6X/OFyMgPWVHwzLRGQVPo+U4mtBZgYQy8DbqzXKSwyu0VZ3CvSysGytHKuTEVKoJ
+        /MwqNNX8lCf04LGcoYb+2CvTEB0FBbY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-mIeRWuWfOuy3hOgTwe7XRA-1; Wed, 13 Nov 2019 08:05:31 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54165803CE0;
+        Wed, 13 Nov 2019 13:05:30 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com [10.36.116.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ED5C21B5B5;
+        Wed, 13 Nov 2019 13:05:25 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: SCLP unit test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+References: <1573492826-24589-1-git-send-email-imbrenda@linux.ibm.com>
+ <1573492826-24589-3-git-send-email-imbrenda@linux.ibm.com>
+ <fe853e54-ef79-ed94-eaf8-18b2acfd95f5@redhat.com>
+ <20191113134024.75beb67d@p-imbrenda.boeblingen.de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <87d5c8cb-f6d6-4034-629a-4bf26b349b5f@redhat.com>
+Date:   Wed, 13 Nov 2019 14:05:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191113042710.3997854-9-jhubbard@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20191113134024.75beb67d@p-imbrenda.boeblingen.de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: mIeRWuWfOuy3hOgTwe7XRA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 08:26:55PM -0800, John Hubbard wrote:
-> As it says in the updated comment in gup.c: current FOLL_LONGTERM
-> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
-> FS DAX check requirement on vmas.
-> 
-> However, the corresponding restriction in get_user_pages_remote() was
-> slightly stricter than is actually required: it forbade all
-> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
-> that do not set the "locked" arg.
-> 
-> Update the code and comments accordingly, and update the VFIO caller
-> to take advantage of this, fixing a bug as a result: the VFIO caller
-> is logically a FOLL_LONGTERM user.
-> 
-> Also, remove an unnessary pair of calls that were releasing and
-> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
-> just in order to call page_to_pfn().
-> 
-> Also, move the DAX check ("if a VMA is DAX, don't allow long term
-> pinning") from the VFIO call site, all the way into the internals
-> of get_user_pages_remote() and __gup_longterm_locked(). That is:
-> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
-> calls check_dax_vmas(). It's lightly explained in the comments as well.
-> 
-> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
-> and to Dan Williams for helping clarify the DAX refactoring.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Jerome Glisse <jglisse@redhat.com>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
->  drivers/vfio/vfio_iommu_type1.c | 25 ++-----------------------
->  mm/gup.c                        | 27 ++++++++++++++++++++++-----
->  2 files changed, 24 insertions(+), 28 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..7301b710c9a4 100644
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  {
->  	struct page *page[1];
->  	struct vm_area_struct *vma;
-> -	struct vm_area_struct *vmas[1];
->  	unsigned int flags = 0;
->  	int ret;
->  
-> @@ -348,33 +347,13 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		flags |= FOLL_WRITE;
->  
->  	down_read(&mm->mmap_sem);
-> -	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> -	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> -		/*
-> -		 * The lifetime of a vaddr_get_pfn() page pin is
-> -		 * userspace-controlled. In the fs-dax case this could
-> -		 * lead to indefinite stalls in filesystem operations.
-> -		 * Disallow attempts to pin fs-dax pages via this
-> -		 * interface.
-> -		 */
-> -		if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> -			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> -		}
-> -	}
-> -	up_read(&mm->mmap_sem);
-> -
-> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> +				    page, NULL, NULL);
->  	if (ret == 1) {
->  		*pfn = page_to_pfn(page[0]);
->  		return 0;
+On 13/11/2019 13.40, Claudio Imbrenda wrote:
+> On Wed, 13 Nov 2019 10:34:02 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+[...]
+>>> +/**
+>>> + * Perform one test at the given address, optionally using the
+>>> SCCB template, =20
+>>
+>> I think you should at least mention the meaning of the "len" parameter
+>> here, otherwise this is rather confusing (see below, my comment to
+>> sccb_template).
+>=20
+> I'll rename it and add comments
+>=20
+>>> + * checking for the expected program interrupts and return codes.
+>>> + * Returns 1 in case of success or 0 in case of failure =20
+>>
+>> Could use bool with true + false instead.
+>>
+>>> + */
+>>> +static int test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t
+>>> len, uint64_t exp_pgm, uint16_t exp_rc) +{
+>>> +=09SCCBHeader *h =3D (SCCBHeader *)addr;
+>>> +=09int res, pgm;
+>>> +
+>>> +=09/* Copy the template to the test address if needed */
+>>> +=09if (len)
+>>> +=09=09memcpy(addr, sccb_template, len); =20
+>>
+>> Honestly, that sccb_template is rather confusing. Why does the caller
+>> has to provide both, the data in the sccb_template and the "addr"
+>> variable for yet another buffer? Wouldn't it be simpler if the caller
+>> simply sets up everything in a place of choice and then only passes
+>> the "addr" to the buffer?
+>=20
+> because you will test the same buffer at different addresses. this
+> mechanism abstracts this. instead of having to clear the buffer and set
+> the values for each address, you can simply set the template once and
+> then call the same function, changing only the target address.
+>=20
+> also, the target address is not always a buffer, in many cases it is in
+> fact an invalid address, which should generate exceptions.=20
 
-Mind the return with the lock held this needs some goto unwind
+Hmm, ok, I guess some additional comments like this in the source code
+would be helpful.
 
-Jason
+>>> +=09expect_pgm_int();
+>>> +=09res =3D sclp_service_call_test(cmd, h);
+>>> +=09if (res) {
+>>> +=09=09report_info("SCLP not ready (command %#x, address
+>>> %p, cc %d)", cmd, addr, res);
+>>> +=09=09return 0;
+>>> +=09}
+>>> +=09pgm =3D clear_pgm_int();
+>>> +=09/* Check if the program exception was one of the expected
+>>> ones */
+>>> +=09if (!((1ULL << pgm) & exp_pgm)) {
+>>> +=09=09report_info("First failure at addr %p, size %d,
+>>> cmd %#x, pgm code %d", addr, len, cmd, pgm);
+>>> +=09=09return 0;
+>>> +=09}
+>>> +=09/* Check if the response code is the one expected */
+>>> +=09if (exp_rc && (exp_rc !=3D h->response_code)) { =20
+>>
+>> You can drop the parentheses around "exp_rc !=3D h->response_code".
+>=20
+> fine, although I don't understand you hatred toward parentheses :)
+
+I took a LISP class at university once ... never quite recovered from
+that...
+
+No, honestly, the problem is rather that these additional parentheses
+slow me down when I read the source code. If I see such if-statements,
+my brain starts to think something like "There are parentheses here, so
+there must be some additional non-trivial logic in this if-statement...
+let's try to understand that..." and it takes a second to realize that
+it's not the case and the parentheses are just superfluous.
+
+>>> +/**
+>>> + * Test SCCBs whose address is in the lowcore or prefix area.
+>>> + */
+>>> +static void test_sccb_prefix(void)
+>>> +{
+>>> +=09uint32_t prefix, new_prefix;
+>>> +=09int offset;
+>>> +
+>>> +=09/* can't actually trash the lowcore, unsurprisingly things
+>>> break if we do */
+>>> +=09for (offset =3D 0; offset < 8192; offset +=3D 8)
+>>> +=09=09if (!test_one_sccb(valid_code, MKPTR(offset), 0,
+>>> PGM_BIT_SPEC, 0))
+>>> +=09=09=09break;
+>>> +=09report("SCCB low pages", offset =3D=3D 8192);
+>>> +
+>>> +=09memcpy(prefix_buf, 0, 8192);
+>>> +=09new_prefix =3D (uint32_t)(intptr_t)prefix_buf;
+>>> +=09asm volatile("stpx %0" : "=3DQ" (prefix));
+>>> +=09asm volatile("spx %0" : : "Q" (new_prefix) : "memory");
+>>> +
+>>> +=09for (offset =3D 0; offset < 8192; offset +=3D 8)
+>>> +=09=09if (!test_one_simple(valid_code, MKPTR(new_prefix
+>>> + offset), 8, 8, PGM_BIT_SPEC, 0))
+>>> +=09=09=09break;
+>>> +=09report("SCCB prefix pages", offset =3D=3D 8192);
+>>> +
+>>> +=09memcpy(prefix_buf, 0, 8192); =20
+>>
+>> What's that memcpy() good for? A comment would be helpful.
+>=20
+> we just moved the prefix to a temporary one, and thrashed the old one.
+> we can't simply set the old prefix and call it a day, things will break.
+
+Did the test really trash the old one? ... hmm, I guess I got the code
+wrong, that prefix addressing is always so confusing. Is SCLP working
+with absolute or real addresses?
+
+ Thomas
+
