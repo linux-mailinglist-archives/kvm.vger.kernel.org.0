@@ -2,172 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D981FB7D3
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 19:44:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C62DFB7E0
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 19:46:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727538AbfKMSoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 13:44:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38400 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727329AbfKMSoI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 13:44:08 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xADIVr7j177256
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 13:44:06 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w7qdbnw7m-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 13:44:06 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 13 Nov 2019 18:44:03 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 13 Nov 2019 18:43:58 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xADIhvlN27000904
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Nov 2019 18:43:57 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4354BAE055;
-        Wed, 13 Nov 2019 18:43:57 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3A694AE051;
-        Wed, 13 Nov 2019 18:43:56 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.34.102])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Nov 2019 18:43:56 +0000 (GMT)
-Subject: Re: [PATCH] KVM: Forbid /dev/kvm being opened by a compat task when
- CONFIG_KVM_COMPAT=n
-To:     Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Peter Maydell <peter.maydell@linaro.org>
-References: <20191113160523.16130-1-maz@kernel.org>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 13 Nov 2019 19:43:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1728425AbfKMSqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 13:46:04 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:39889 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726960AbfKMSqC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 13:46:02 -0500
+Received: by mail-ot1-f65.google.com with SMTP id w24so2065963otk.6
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 10:46:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=cT4Ynp7AABnbetkKbYtY9L84HJMiir4x9aUvgO3qIkA=;
+        b=a7A+dcs4qLyRwykFz5P8aF/5gHL9KK36xtIfXVr/kBk3uPlOEckoeys38y+nnoealE
+         xzZU97hBkbVqSDW3gJxcm8meBZzrkQaKb0fOpplJk89VtBOEN/d/rvjF/p1FfJJqTTXv
+         4RFlHCPjmONBQGpTT3WPud0MHuI1arLibsaS9qkCPzQA4NQZsJVxDT/hq2PSgxZUbK6j
+         hmavUnr3qxAC5dpB11ue+Kc8RjftT0go7LTB3CRWT06X6W6/Vr35u8YiRNHJv46YGe1d
+         7YKSAbhOh/ee5b8uqRA8DDWS3/IOwVUmAGMREeaTodHgoCOvb7Na9VVd6Z5oKT3OMDr8
+         TTJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=cT4Ynp7AABnbetkKbYtY9L84HJMiir4x9aUvgO3qIkA=;
+        b=EaJWv/sfXZVdnFbeF8xqrtUHf6zF0bWIut15R9hhZmag1LtxWbb373qlDE1OupfiUH
+         LoHiSmgwUSt8U72y4YRCrv92YJ0XxeU0lHNeyUanxyW6Vl3Q72B5ZZmtEELGdsnMhzlQ
+         jpRdDPdsPOSyOIRLwRGhtIAWxXAedY++bT//Kknoaf2qCSvk02vJFk7c5R7v5NlTeQfe
+         vdoHZIaP29Iaj7B6b2ICgPz986CxDTdmoxCOGFnAFXqT7oQvuFbGubOKUC7mDXd83g5D
+         q/YmlxqISLcJdORFyJaHR2tlwNuAnIsQzigp6kVzYzkRq4cWkR52l0VtSWlkImxLaZaP
+         ukJg==
+X-Gm-Message-State: APjAAAUchM0tKxqmWYTp0nM93+bqhofZ/zzaYr7/Io981ZaeZ9n9zrPf
+        +IlRHbq1ZqM+W0vbb4SANbOVgF95d8wC7AdSr9Dw0A==
+X-Google-Smtp-Source: APXvYqyPn+rDZrNle0VfTIMlvvY+/KynBCjFHBDHqyFwY/x5q0B2O33H3JfKZdicH8PxUo9GG3nCazg6kogrLq1IvZ4=
+X-Received: by 2002:a05:6830:1af7:: with SMTP id c23mr4066831otd.247.1573670761142;
+ Wed, 13 Nov 2019 10:46:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191113160523.16130-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19111318-0016-0000-0000-000002C3619B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111318-0017-0000-0000-00003324FF3D
-Message-Id: <2b846839-ea81-e40c-5106-90776d964e33@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-13_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911130158
+References: <20191113042710.3997854-1-jhubbard@nvidia.com> <20191113042710.3997854-10-jhubbard@nvidia.com>
+ <20191113104308.GE6367@quack2.suse.cz>
+In-Reply-To: <20191113104308.GE6367@quack2.suse.cz>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 13 Nov 2019 10:45:49 -0800
+Message-ID: <CAPcyv4gJbmf9aRU_5_umiE7GvTWG1D+zkCMNxrU=LYn-n0arNA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/23] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     Jan Kara <jack@suse.cz>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>, KVM list <kvm@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Netdev <netdev@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mike Rapoport <rppt@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 13, 2019 at 2:43 AM Jan Kara <jack@suse.cz> wrote:
+>
+> On Tue 12-11-19 20:26:56, John Hubbard wrote:
+> > Introduce pin_user_pages*() variations of get_user_pages*() calls,
+> > and also pin_longterm_pages*() variations.
+> >
+> > These variants all set FOLL_PIN, which is also introduced, and
+> > thoroughly documented.
+> >
+> > The pin_longterm*() variants also set FOLL_LONGTERM, in addition
+> > to FOLL_PIN:
+> >
+> >     pin_user_pages()
+> >     pin_user_pages_remote()
+> >     pin_user_pages_fast()
+> >
+> >     pin_longterm_pages()
+> >     pin_longterm_pages_remote()
+> >     pin_longterm_pages_fast()
+> >
+> > All pages that are pinned via the above calls, must be unpinned via
+> > put_user_page().
+> >
+> > The underlying rules are:
+> >
+> > * These are gup-internal flags, so the call sites should not directly
+> > set FOLL_PIN nor FOLL_LONGTERM. That behavior is enforced with
+> > assertions, for the new FOLL_PIN flag. However, for the pre-existing
+> > FOLL_LONGTERM flag, which has some call sites that still directly
+> > set FOLL_LONGTERM, there is no assertion yet.
+> >
+> > * Call sites that want to indicate that they are going to do DirectIO
+> >   ("DIO") or something with similar characteristics, should call a
+> >   get_user_pages()-like wrapper call that sets FOLL_PIN. These wrappers
+> >   will:
+> >         * Start with "pin_user_pages" instead of "get_user_pages". That
+> >           makes it easy to find and audit the call sites.
+> >         * Set FOLL_PIN
+> >
+> > * For pages that are received via FOLL_PIN, those pages must be returne=
+d
+> >   via put_user_page().
+> >
+> > Thanks to Jan Kara and Vlastimil Babka for explaining the 4 cases
+> > in this documentation. (I've reworded it and expanded upon it.)
+> >
+> > Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>  # Documentation
+> > Reviewed-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > Cc: Jonathan Corbet <corbet@lwn.net>
+> > Cc: Ira Weiny <ira.weiny@intel.com>
+> > Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+>
+> Thanks for the documentation. It looks great!
+>
+> > diff --git a/mm/gup.c b/mm/gup.c
+> > index 83702b2e86c8..4409e84dff51 100644
+> > --- a/mm/gup.c
+> > +++ b/mm/gup.c
+> > @@ -201,6 +201,10 @@ static struct page *follow_page_pte(struct vm_area=
+_struct *vma,
+> >       spinlock_t *ptl;
+> >       pte_t *ptep, pte;
+> >
+> > +     /* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> > +     if (WARN_ON_ONCE((flags & (FOLL_PIN | FOLL_GET)) =3D=3D
+> > +                      (FOLL_PIN | FOLL_GET)))
+> > +             return ERR_PTR(-EINVAL);
+> >  retry:
+> >       if (unlikely(pmd_bad(*pmd)))
+> >               return no_page_table(vma, flags);
+>
+> How does FOLL_PIN result in grabbing (at least normal, for now) page refe=
+rence?
+> I didn't find that anywhere in this patch but it is a prerequisite to
+> converting any user to pin_user_pages() interface, right?
+>
+> > +/**
+> > + * pin_user_pages_fast() - pin user pages in memory without taking loc=
+ks
+> > + *
+> > + * Nearly the same as get_user_pages_fast(), except that FOLL_PIN is s=
+et. See
+> > + * get_user_pages_fast() for documentation on the function arguments, =
+because
+> > + * the arguments here are identical.
+> > + *
+> > + * FOLL_PIN means that the pages must be released via put_user_page().=
+ Please
+> > + * see Documentation/vm/pin_user_pages.rst for further details.
+> > + *
+> > + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_page=
+s.rst. It
+> > + * is NOT intended for Case 2 (RDMA: long-term pins).
+> > + */
+> > +int pin_user_pages_fast(unsigned long start, int nr_pages,
+> > +                     unsigned int gup_flags, struct page **pages)
+> > +{
+> > +     /* FOLL_GET and FOLL_PIN are mutually exclusive. */
+> > +     if (WARN_ON_ONCE(gup_flags & FOLL_GET))
+> > +             return -EINVAL;
+> > +
+> > +     gup_flags |=3D FOLL_PIN;
+> > +     return internal_get_user_pages_fast(start, nr_pages, gup_flags, p=
+ages);
+> > +}
+> > +EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+>
+> I was somewhat wondering about the number of functions you add here. So w=
+e
+> have:
+>
+> pin_user_pages()
+> pin_user_pages_fast()
+> pin_user_pages_remote()
+>
+> and then longterm variants:
+>
+> pin_longterm_pages()
+> pin_longterm_pages_fast()
+> pin_longterm_pages_remote()
+>
+> and obviously we have gup like:
+> get_user_pages()
+> get_user_pages_fast()
+> get_user_pages_remote()
+> ... and some other gup variants ...
+>
+> I think we really should have pin_* vs get_* variants as they are very
+> different in terms of guarantees and after conversion, any use of get_*
+> variant in non-mm code should be closely scrutinized. OTOH pin_longterm_*
+> don't look *that* useful to me and just using pin_* instead with
+> FOLL_LONGTERM flag would look OK to me and somewhat reduce the number of
+> functions which is already large enough? What do people think? I don't fe=
+el
+> too strongly about this but wanted to bring this up.
 
-
-On 13.11.19 17:05, Marc Zyngier wrote:
-> On a system without KVM_COMPAT, we prevent IOCTLs from being issued
-> by a compat task. Although this prevents most silly things from
-> happening, it can still confuse a 32bit userspace that is able
-> to open the kvm device (the qemu test suite seems to be pretty
-> mad with this behaviour).
-> 
-> Take a more radical approach and return a -ENODEV to the compat
-> task.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/kvm_main.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 543024c7a87f..1243e48dc717 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -122,7 +122,13 @@ static long kvm_vcpu_compat_ioctl(struct file *file, unsigned int ioctl,
->  #else
->  static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
->  				unsigned long arg) { return -EINVAL; }
-> -#define KVM_COMPAT(c)	.compat_ioctl	= kvm_no_compat_ioctl
-> +
-> +static int kvm_no_compat_open(struct inode *inode, struct file *file)
-> +{
-> +	return is_compat_task() ? -ENODEV : 0;
-> +}
-> +#define KVM_COMPAT(c)	.compat_ioctl	= kvm_no_compat_ioctl,	\
-
-Do we still need compat_ioctl if open never succeeds?
-
-
-> +			.open		= kvm_no_compat_open
->  #endif
->  static int hardware_enable_all(void);
->  static void hardware_disable_all(void);
-> 
-
+I'd vote for FOLL_LONGTERM should obviate the need for
+{get,pin}_user_pages_longterm(). It's a property that is passed by the
+call site, not an internal flag.
