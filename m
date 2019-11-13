@@ -2,220 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C7E4FAB40
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 08:50:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92EA1FABDC
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 09:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbfKMHum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 02:50:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37697 "EHLO
+        id S1726120AbfKMIUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 03:20:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43302 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725908AbfKMHum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 02:50:42 -0500
+        with ESMTP id S1725966AbfKMIUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 03:20:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573631440;
+        s=mimecast20190719; t=1573633244;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rnpa5U4sj3xZkQya2G1T7YqUyI/VJOSBWTsouefmHoI=;
-        b=cWsqhCSmLBrG9shAulHOIza1N77STYNvX/Gb36ESW2spKvgzar2JQGqFQ+Wx3+6ueg77x9
-        v1I+lLv8mKKIeBjIRqnSGK/9jTlJazX+g0uvjUGsGY7c+GAVQAMehvwh81Uq0obHWhrAz8
-        jlW5CB5BhPQI4hsz/Qb22xDMOQefMaM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-Jyvm9L0NP2iCu0hdi7tQUA-1; Wed, 13 Nov 2019 02:50:37 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 701A718C6305;
-        Wed, 13 Nov 2019 07:50:35 +0000 (UTC)
-Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C12C6019C;
-        Wed, 13 Nov 2019 07:50:05 +0000 (UTC)
-Subject: Re: [RFC v2 1/3] vfio: VFIO_IOMMU_CACHE_INVALIDATE
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
- <1571919983-3231-2-git-send-email-yi.l.liu@intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5D04AD@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A0D7C23@SHSMSX104.ccr.corp.intel.com>
- <20191105154224.3b894a9c@x1.home>
- <A2975661238FB949B60364EF0F2C25743A0EED2E@SHSMSX104.ccr.corp.intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <e3bc03ba-8537-dd1f-135a-520a695dc2b9@redhat.com>
-Date:   Wed, 13 Nov 2019 08:50:03 +0100
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=whJvieYSPZF3C0Ev7gvfZK1XEQG2EzzzHM80XB6g75A=;
+        b=Bw70PeBZgNnnFEiAg4WDTsvZhpIoN4+p2i0WVtiArVYx2v8nBe2iMB4068sdE+jP/U8VKb
+        56Wp8lNYsn+mwjR9fgqSkia92wCgMOcy0KH2KUi3/66AJqh3PokHhvn8+y42qM2p2kxWWz
+        XKxY1JnOcpiv8vDBmQM6DsVoG7qeO0M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-139-v9mm87aGMoyokkCTiljjZw-1; Wed, 13 Nov 2019 03:20:43 -0500
+Received: by mail-wm1-f71.google.com with SMTP id f14so807277wmc.0
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 00:20:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gRJtnCq+CKt1kPsmHkXPWnEtQz9JufgD24IWcr8duAg=;
+        b=NkGPpPSicaWtHRqm0pll3B+GRylDTZ/lC2eujJuvSvAgJslqPlN9J8ZT2p/3G3l8Ko
+         KsFObxPbPxgEXhBYm6KOp764URchnfogKUgKZy8OSrocOccalH+TBXwcTYmJ3glVFzSg
+         P2XKLDbsKox/MUMf9KHGvmU0c6RgJbTSz5abAQPubVhQZk340Qqcx5aPAN3CJ0hDvsRG
+         Jcjf1KidPZHjWJFWlr/+3VPLNFh2dJ+fBxgYK58w99pZG0tVv+rvlaeg3h4WV+r5P1+e
+         oSSAwnVQCmp6j3t0HR7fUSPhmBh6taYpOF3r0LnyXVQNNMghfn+b4ksSoGgnR5pJEzUV
+         M+nQ==
+X-Gm-Message-State: APjAAAU5asP8b/FBlADwYCxa9hVkswl2uWiWxoCZzlVyZHvUAcO9muNf
+        UBzK4DOvi6m71q+W092gFBdMUlB4k6xSVpIYvcEVwlXf7U4SsOEWqjog9yryC2qDjun/ghg+pFQ
+        qnxin45So/y8A
+X-Received: by 2002:a5d:4986:: with SMTP id r6mr1507902wrq.307.1573633241982;
+        Wed, 13 Nov 2019 00:20:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyvuhfthJLiZbIf7ASFW0EJey9TeYZbP3dIAq7chny/myshfoEZhQsu6Zyv9TB2AwA4sR/anA==
+X-Received: by 2002:a5d:4986:: with SMTP id r6mr1507868wrq.307.1573633241635;
+        Wed, 13 Nov 2019 00:20:41 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8c9d:1a6f:4730:367c? ([2001:b07:6468:f312:8c9d:1a6f:4730:367c])
+        by smtp.gmail.com with ESMTPSA id 19sm2670309wrc.47.2019.11.13.00.20.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Nov 2019 00:20:41 -0800 (PST)
+Subject: Re: [PATCH] KVM: X86: Reset the three MSR list number variables to 0
+ in kvm_init_msr_list()
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20191113011521.32255-1-xiaoyao.li@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <02a71740-a98d-622e-ee3e-705fe707c772@redhat.com>
+Date:   Wed, 13 Nov 2019 09:20:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EED2E@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <20191113011521.32255-1-xiaoyao.li@intel.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Jyvm9L0NP2iCu0hdi7tQUA-1
+X-MC-Unique: v9mm87aGMoyokkCTiljjZw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+On 13/11/19 02:15, Xiaoyao Li wrote:
+> When applying commit 7a5ee6edb42e ("KVM: X86: Fix initialization of MSR
+> lists"), it forgot to reset the three MSR lists number varialbes to 0
+> while removing the useless conditionals.
+>=20
+> Fixes: 7a5ee6edb42e (KVM: X86: Fix initialization of MSR lists)
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8c8a5e20ea06..9368b0e6bf21 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5102,6 +5102,10 @@ static void kvm_init_msr_list(void)
+> =20
+>  =09perf_get_x86_pmu_capability(&x86_pmu);
+> =20
+> +=09num_msrs_to_save =3D 0;
+> +=09num_emulated_msrs =3D 0;
+> +=09num_msr_based_features =3D 0;
+> +
+>  =09for (i =3D 0; i < ARRAY_SIZE(msrs_to_save_all); i++) {
+>  =09=09if (rdmsr_safe(msrs_to_save_all[i], &dummy[0], &dummy[1]) < 0)
+>  =09=09=09continue;
+>=20
 
-On 11/6/19 2:31 AM, Liu, Yi L wrote:
->> From: Alex Williamson [mailto:alex.williamson@redhat.com]
->> Sent: Wednesday, November 6, 2019 6:42 AM
->> To: Liu, Yi L <yi.l.liu@intel.com>
->> Subject: Re: [RFC v2 1/3] vfio: VFIO_IOMMU_CACHE_INVALIDATE
->>
->> On Fri, 25 Oct 2019 11:20:40 +0000
->> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
->>
->>> Hi Kevin,
->>>
->>>> From: Tian, Kevin
->>>> Sent: Friday, October 25, 2019 5:14 PM
->>>> To: Liu, Yi L <yi.l.liu@intel.com>; alex.williamson@redhat.com;
->>>> Subject: RE: [RFC v2 1/3] vfio: VFIO_IOMMU_CACHE_INVALIDATE
->>>>
->>>>> From: Liu, Yi L
->>>>> Sent: Thursday, October 24, 2019 8:26 PM
->>>>>
->>>>> From: Liu Yi L <yi.l.liu@linux.intel.com>
->>>>>
->>>>> When the guest "owns" the stage 1 translation structures,  the
->>>>> host IOMMU driver has no knowledge of caching structure updates
->>>>> unless the guest invalidation requests are trapped and passed down to=
- the host.
->>>>>
->>>>> This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims at
->>>>> propagating guest stage1 IOMMU cache invalidations to the host.
->>>>>
->>>>> Cc: Kevin Tian <kevin.tian@intel.com>
->>>>> Signed-off-by: Liu Yi L <yi.l.liu@linux.intel.com>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->>>>> ---
->>>>>  drivers/vfio/vfio_iommu_type1.c | 55
->>>>> +++++++++++++++++++++++++++++++++++++++++
->>>>>  include/uapi/linux/vfio.h       | 13 ++++++++++
->>>>>  2 files changed, 68 insertions(+)
->>>>>
->>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c
->>>>> b/drivers/vfio/vfio_iommu_type1.c index 96fddc1d..cd8d3a5 100644
->>>>> --- a/drivers/vfio/vfio_iommu_type1.c
->>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>>>> @@ -124,6 +124,34 @@ struct vfio_regions {
->>>>>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)=09\
->>>>>  =09=09=09=09=09(!list_empty(&iommu->domain_list))
->>>>>
->>>>> +struct domain_capsule {
->>>>> +=09struct iommu_domain *domain;
->>>>> +=09void *data;
->>>>> +};
->>>>> +
->>>>> +/* iommu->lock must be held */
->>>>> +static int
->>>>> +vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
->>>>> +=09=09      int (*fn)(struct device *dev, void *data),
->>>>> +=09=09      void *data)
->>>>
->>>> 'lookup' usually means find a device and then return. But the real
->>>> purpose here is to loop all the devices within this container and
->>>> then do something. Does it make more sense to be vfio_iommu_for_each_d=
-ev?
->>
->> +1
->>
->>> yep, I can replace it.
->>>
->>>>
->>>>> +{
->>>>> +=09struct domain_capsule dc =3D {.data =3D data};
->>>>> +=09struct vfio_domain *d;
->>> [...]
->>>> 2315,6 +2352,24 @@
->>>>> static long vfio_iommu_type1_ioctl(void *iommu_data,
->>>>>
->>>>>  =09=09return copy_to_user((void __user *)arg, &unmap, minsz) ?
->>>>>  =09=09=09-EFAULT : 0;
->>>>> +=09} else if (cmd =3D=3D VFIO_IOMMU_CACHE_INVALIDATE) {
->>>>> +=09=09struct vfio_iommu_type1_cache_invalidate ustruct;
->>>>
->>>> it's weird to call a variable as struct.
->>>
->>> Will fix it.
->>>
->>>>> +=09=09int ret;
->>>>> +
->>>>> +=09=09minsz =3D offsetofend(struct
->>>>> vfio_iommu_type1_cache_invalidate,
->>>>> +=09=09=09=09    info);
->>>>> +
->>>>> +=09=09if (copy_from_user(&ustruct, (void __user *)arg, minsz))
->>>>> +=09=09=09return -EFAULT;
->>>>> +
->>>>> +=09=09if (ustruct.argsz < minsz || ustruct.flags)
->>>>> +=09=09=09return -EINVAL;
->>>>> +
->>>>> +=09=09mutex_lock(&iommu->lock);
->>>>> +=09=09ret =3D vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
->>>>> +=09=09=09=09=09    &ustruct);
->>>>> +=09=09mutex_unlock(&iommu->lock);
->>>>> +=09=09return ret;
->>>>>  =09}
->>>>>
->>>>>  =09return -ENOTTY;
->>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>>>> index 9e843a1..ccf60a2 100644
->>>>> --- a/include/uapi/linux/vfio.h
->>>>> +++ b/include/uapi/linux/vfio.h
->>>>> @@ -794,6 +794,19 @@ struct vfio_iommu_type1_dma_unmap {
->>>>>  #define VFIO_IOMMU_ENABLE=09_IO(VFIO_TYPE, VFIO_BASE + 15)
->>>>>  #define VFIO_IOMMU_DISABLE=09_IO(VFIO_TYPE, VFIO_BASE + 16)
->>>>>
->>>>> +/**
->>>>> + * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE +
->>>>> 24,
->>
->> What's going on with these ioctl numbers?  AFAICT[1] we've used up throu=
-gh
->> VFIO_BASE + 21, this jumps to 24, the next patch skips to 27, then the l=
-ast patch fills
->> in 28 & 29.  Thanks,
->=20
-> Hi Alex,
->=20
-> I rebase my patch to Eric's nested stage translation patches. His base al=
-so introduced
-> IOCTLs. I should have made it better. I'll try to sync with Eric to seria=
-lize the IOCTLs.
->=20
-> [PATCH v6 00/22] SMMUv3 Nested Stage Setup by Eric Auger
-> https://lkml.org/lkml/2019/3/17/124
+Ouch.  Sorry.
 
-Feel free to choose your IOCTL numbers without taking care of my series.
-I will adapt to yours if my work gets unblocked at some point.
-
-Thanks
-
-Eric
->=20
-> Thanks,
-> Yi Liu
->=20
->> Alex
->>
->> [1] git grep -h VFIO_BASE | grep "VFIO_BASE +" | grep -e ^#define | \
->>     awk '{print $NF}' | tr -d ')' | sort -u -n
->=20
+Paolo
 
