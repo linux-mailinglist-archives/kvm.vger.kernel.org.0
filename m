@@ -2,196 +2,287 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F3DAFAEB8
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:43:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 139F7FAEBC
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:44:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727516AbfKMKnQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 05:43:16 -0500
-Received: from mx2.suse.de ([195.135.220.15]:58618 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727113AbfKMKnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 05:43:16 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8E4ECB2D5;
-        Wed, 13 Nov 2019 10:43:11 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 7E7151E1498; Wed, 13 Nov 2019 11:43:08 +0100 (CET)
-Date:   Wed, 13 Nov 2019 11:43:08 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Mike Rapoport <rppt@linux.ibm.com>
-Subject: Re: [PATCH v4 09/23] mm/gup: introduce pin_user_pages*() and FOLL_PIN
-Message-ID: <20191113104308.GE6367@quack2.suse.cz>
-References: <20191113042710.3997854-1-jhubbard@nvidia.com>
- <20191113042710.3997854-10-jhubbard@nvidia.com>
+        id S1727610AbfKMKoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 05:44:03 -0500
+Received: from foss.arm.com ([217.140.110.172]:50332 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727113AbfKMKoD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 05:44:03 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B97957A7;
+        Wed, 13 Nov 2019 02:44:02 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8B193F534;
+        Wed, 13 Nov 2019 02:44:01 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 16/17] arm: gic: Prepare interrupt
+ statistics for both groups
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
+References: <20191108144240.204202-1-andre.przywara@arm.com>
+ <20191108144240.204202-17-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <90acc4bd-22e6-38f5-c52f-c789e0996690@arm.com>
+Date:   Wed, 13 Nov 2019 10:44:00 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191113042710.3997854-10-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191108144240.204202-17-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 12-11-19 20:26:56, John Hubbard wrote:
-> Introduce pin_user_pages*() variations of get_user_pages*() calls,
-> and also pin_longterm_pages*() variations.
-> 
-> These variants all set FOLL_PIN, which is also introduced, and
-> thoroughly documented.
-> 
-> The pin_longterm*() variants also set FOLL_LONGTERM, in addition
-> to FOLL_PIN:
-> 
->     pin_user_pages()
->     pin_user_pages_remote()
->     pin_user_pages_fast()
-> 
->     pin_longterm_pages()
->     pin_longterm_pages_remote()
->     pin_longterm_pages_fast()
-> 
-> All pages that are pinned via the above calls, must be unpinned via
-> put_user_page().
-> 
-> The underlying rules are:
-> 
-> * These are gup-internal flags, so the call sites should not directly
-> set FOLL_PIN nor FOLL_LONGTERM. That behavior is enforced with
-> assertions, for the new FOLL_PIN flag. However, for the pre-existing
-> FOLL_LONGTERM flag, which has some call sites that still directly
-> set FOLL_LONGTERM, there is no assertion yet.
-> 
-> * Call sites that want to indicate that they are going to do DirectIO
->   ("DIO") or something with similar characteristics, should call a
->   get_user_pages()-like wrapper call that sets FOLL_PIN. These wrappers
->   will:
->         * Start with "pin_user_pages" instead of "get_user_pages". That
->           makes it easy to find and audit the call sites.
->         * Set FOLL_PIN
-> 
-> * For pages that are received via FOLL_PIN, those pages must be returned
->   via put_user_page().
-> 
-> Thanks to Jan Kara and Vlastimil Babka for explaining the 4 cases
-> in this documentation. (I've reworded it and expanded upon it.)
-> 
-> Reviewed-by: Mike Rapoport <rppt@linux.ibm.com>  # Documentation
-> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Hi,
 
-Thanks for the documentation. It looks great!
-
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 83702b2e86c8..4409e84dff51 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -201,6 +201,10 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
->  	spinlock_t *ptl;
->  	pte_t *ptep, pte;
+On 11/8/19 2:42 PM, Andre Przywara wrote:
+> The arrays storing information about received interrupts need to
+> differentiate between IRQs and FIQs, to detect interrupts firing in the
+> wrong group.
+>
+> Extend the acked, spurious, bad_sender and bad_irq arrays to get another
+> dimension, so that we can check the kind of interrupt easily.
+> The fiq_handler marks its result using index 0, the irq_handler uses
+> index 1.
+> Also we add a group parameter to check_acked() and friends, to let them
+> use the right group.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm/gic.c | 78 ++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 42 insertions(+), 36 deletions(-)
+>
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 6756850..43a272b 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -33,8 +33,8 @@ struct gic {
+>  };
 >  
-> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
-> +	if (WARN_ON_ONCE((flags & (FOLL_PIN | FOLL_GET)) ==
-> +			 (FOLL_PIN | FOLL_GET)))
-> +		return ERR_PTR(-EINVAL);
->  retry:
->  	if (unlikely(pmd_bad(*pmd)))
->  		return no_page_table(vma, flags);
+>  static struct gic *gic;
+> -static int acked[NR_CPUS], spurious[NR_CPUS];
+> -static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
+> +static int acked[2][NR_CPUS], spurious[2][NR_CPUS];
+> +static int bad_sender[2][NR_CPUS], bad_irq[2][NR_CPUS];
+>  static cpumask_t ready;
+>  
+>  static void nr_cpu_check(int nr)
+> @@ -55,14 +55,17 @@ static void stats_reset(void)
+>  	int i;
+>  
+>  	for (i = 0; i < nr_cpus; ++i) {
+> -		acked[i] = 0;
+> -		bad_sender[i] = -1;
+> -		bad_irq[i] = -1;
+> +		acked[0][i] = 0;
+> +		acked[1][i] = 0;
+> +		bad_sender[0][i] = -1;
+> +		bad_sender[1][i] = -1;
+> +		bad_irq[0][i] = -1;
+> +		bad_irq[1][i] = -1;
 
-How does FOLL_PIN result in grabbing (at least normal, for now) page reference?
-I didn't find that anywhere in this patch but it is a prerequisite to
-converting any user to pin_user_pages() interface, right?
+How about we use defines for the groups instead of 0/1? bad_irq[GIC_GROUP0][i] (or
+whatever name you choose) looks more readable to me than bad_irq[0][i].
 
-> +/**
-> + * pin_user_pages_fast() - pin user pages in memory without taking locks
-> + *
-> + * Nearly the same as get_user_pages_fast(), except that FOLL_PIN is set. See
-> + * get_user_pages_fast() for documentation on the function arguments, because
-> + * the arguments here are identical.
-> + *
-> + * FOLL_PIN means that the pages must be released via put_user_page(). Please
-> + * see Documentation/vm/pin_user_pages.rst for further details.
-> + *
-> + * This is intended for Case 1 (DIO) in Documentation/vm/pin_user_pages.rst. It
-> + * is NOT intended for Case 2 (RDMA: long-term pins).
-> + */
-> +int pin_user_pages_fast(unsigned long start, int nr_pages,
-> +			unsigned int gup_flags, struct page **pages)
-> +{
-> +	/* FOLL_GET and FOLL_PIN are mutually exclusive. */
-> +	if (WARN_ON_ONCE(gup_flags & FOLL_GET))
-> +		return -EINVAL;
-> +
-> +	gup_flags |= FOLL_PIN;
-> +	return internal_get_user_pages_fast(start, nr_pages, gup_flags, pages);
-> +}
-> +EXPORT_SYMBOL_GPL(pin_user_pages_fast);
-
-I was somewhat wondering about the number of functions you add here. So we
-have:
-
-pin_user_pages()
-pin_user_pages_fast()
-pin_user_pages_remote()
-
-and then longterm variants:
-
-pin_longterm_pages()
-pin_longterm_pages_fast()
-pin_longterm_pages_remote()
-
-and obviously we have gup like:
-get_user_pages()
-get_user_pages_fast()
-get_user_pages_remote()
-... and some other gup variants ...
-
-I think we really should have pin_* vs get_* variants as they are very
-different in terms of guarantees and after conversion, any use of get_*
-variant in non-mm code should be closely scrutinized. OTOH pin_longterm_*
-don't look *that* useful to me and just using pin_* instead with
-FOLL_LONGTERM flag would look OK to me and somewhat reduce the number of
-functions which is already large enough? What do people think? I don't feel
-too strongly about this but wanted to bring this up.
-
-								Honza
-
-
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks,
+Alex
+>  	}
+>  	smp_wmb();
+>  }
+>  
+> -static int check_acked(const char *testname, cpumask_t *mask)
+> +static int check_acked(const char *testname, cpumask_t *mask, int group)
+>  {
+>  	int missing = 0, extra = 0, unexpected = 0;
+>  	int nr_pass, cpu, i;
+> @@ -76,17 +79,17 @@ static int check_acked(const char *testname, cpumask_t *mask)
+>  		for_each_present_cpu(cpu) {
+>  			smp_rmb();
+>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+> -				acked[cpu] == 1 : acked[cpu] == 0;
+> +				acked[group][cpu] == 1 : acked[group][cpu] == 0;
+>  
+> -			if (bad_sender[cpu] != -1) {
+> +			if (bad_sender[group][cpu] != -1) {
+>  				printf("cpu%d received IPI from wrong sender %d\n",
+> -					cpu, bad_sender[cpu]);
+> +					cpu, bad_sender[group][cpu]);
+>  				bad = true;
+>  			}
+>  
+> -			if (bad_irq[cpu] != -1) {
+> +			if (bad_irq[group][cpu] != -1) {
+>  				printf("cpu%d received wrong irq %d\n",
+> -					cpu, bad_irq[cpu]);
+> +					cpu, bad_irq[group][cpu]);
+>  				bad = true;
+>  			}
+>  		}
+> @@ -109,12 +112,12 @@ static int check_acked(const char *testname, cpumask_t *mask)
+>  
+>  	for_each_present_cpu(cpu) {
+>  		if (cpumask_test_cpu(cpu, mask)) {
+> -			if (!acked[cpu])
+> +			if (!acked[group][cpu])
+>  				++missing;
+> -			else if (acked[cpu] > 1)
+> +			else if (acked[group][cpu] > 1)
+>  				++extra;
+>  		} else {
+> -			if (acked[cpu])
+> +			if (acked[group][cpu])
+>  				++unexpected;
+>  		}
+>  	}
+> @@ -132,9 +135,12 @@ static void check_spurious(void)
+>  
+>  	smp_rmb();
+>  	for_each_present_cpu(cpu) {
+> -		if (spurious[cpu])
+> -			report_info("WARN: cpu%d got %d spurious interrupts",
+> -				cpu, spurious[cpu]);
+> +		if (spurious[0][cpu])
+> +			report_info("WARN: cpu%d got %d spurious FIQs",
+> +				    cpu, spurious[0][cpu]);
+> +		if (spurious[1][cpu])
+> +			report_info("WARN: cpu%d got %d spurious IRQs",
+> +				    cpu, spurious[1][cpu]);
+>  	}
+>  }
+>  
+> @@ -144,14 +150,14 @@ static void check_ipi_sender(u32 irqstat)
+>  		int src = (irqstat >> 10) & 7;
+>  
+>  		if (src != IPI_SENDER)
+> -			bad_sender[smp_processor_id()] = src;
+> +			bad_sender[1][smp_processor_id()] = src;
+>  	}
+>  }
+>  
+> -static void check_irqnr(u32 irqnr, int expected)
+> +static void check_irqnr(u32 irqnr, int expected, int group)
+>  {
+>  	if (irqnr != expected)
+> -		bad_irq[smp_processor_id()] = irqnr;
+> +		bad_irq[group][smp_processor_id()] = irqnr;
+>  }
+>  
+>  static void irq_handler(struct pt_regs *regs __unused)
+> @@ -160,7 +166,7 @@ static void irq_handler(struct pt_regs *regs __unused)
+>  	u32 irqnr = gic_iar_irqnr(irqstat);
+>  
+>  	if (irqnr == GICC_INT_SPURIOUS) {
+> -		++spurious[smp_processor_id()];
+> +		++spurious[1][smp_processor_id()];
+>  		smp_wmb();
+>  		return;
+>  	}
+> @@ -168,12 +174,12 @@ static void irq_handler(struct pt_regs *regs __unused)
+>  	gic_write_eoir(irqstat, 1);
+>  
+>  	smp_rmb(); /* pairs with wmb in stats_reset */
+> -	++acked[smp_processor_id()];
+> +	++acked[1][smp_processor_id()];
+>  	if (irqnr < GIC_NR_PRIVATE_IRQS) {
+>  		check_ipi_sender(irqstat);
+> -		check_irqnr(irqnr, IPI_IRQ);
+> +		check_irqnr(irqnr, IPI_IRQ, 1);
+>  	} else {
+> -		check_irqnr(irqnr, SPI_IRQ);
+> +		check_irqnr(irqnr, SPI_IRQ, 1);
+>  	}
+>  	smp_wmb(); /* pairs with rmb in check_acked */
+>  }
+> @@ -184,7 +190,7 @@ static inline void fiq_handler(struct pt_regs *regs __unused)
+>  	u32 irqnr = gic_iar_irqnr(irqstat);
+>  
+>  	if (irqnr == GICC_INT_SPURIOUS) {
+> -		++spurious[smp_processor_id()];
+> +		++spurious[0][smp_processor_id()];
+>  		smp_wmb();
+>  		return;
+>  	}
+> @@ -192,12 +198,12 @@ static inline void fiq_handler(struct pt_regs *regs __unused)
+>  	gic_write_eoir(irqstat, 0);
+>  
+>  	smp_rmb(); /* pairs with wmb in stats_reset */
+> -	++acked[smp_processor_id()];
+> +	++acked[0][smp_processor_id()];
+>  	if (irqnr < GIC_NR_PRIVATE_IRQS) {
+>  		check_ipi_sender(irqstat);
+> -		check_irqnr(irqnr, IPI_IRQ);
+> +		check_irqnr(irqnr, IPI_IRQ, 0);
+>  	} else {
+> -		check_irqnr(irqnr, SPI_IRQ);
+> +		check_irqnr(irqnr, SPI_IRQ, 0);
+>  	}
+>  	smp_wmb(); /* pairs with rmb in check_acked */
+>  }
+> @@ -232,7 +238,7 @@ static void ipi_test_self(void)
+>  	cpumask_clear(&mask);
+>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_self();
+> -	check_acked("IPI: self", &mask);
+> +	check_acked("IPI: self", &mask, 1);
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -247,7 +253,7 @@ static void ipi_test_smp(void)
+>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>  		cpumask_clear_cpu(i, &mask);
+>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+> -	check_acked("IPI: directed", &mask);
+> +	check_acked("IPI: directed", &mask, 1);
+>  	report_prefix_pop();
+>  
+>  	report_prefix_push("broadcast");
+> @@ -255,7 +261,7 @@ static void ipi_test_smp(void)
+>  	cpumask_copy(&mask, &cpu_present_mask);
+>  	cpumask_clear_cpu(smp_processor_id(), &mask);
+>  	gic->ipi.send_broadcast();
+> -	check_acked("IPI: broadcast", &mask);
+> +	check_acked("IPI: broadcast", &mask, 1);
+>  	report_prefix_pop();
+>  }
+>  
+> @@ -327,11 +333,11 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
+>  		writel(val, base + GICD_ICACTIVER);
+>  
+>  		smp_rmb(); /* pairs with wmb in stats_reset */
+> -		++acked[smp_processor_id()];
+> -		check_irqnr(irqnr, IPI_IRQ);
+> +		++acked[1][smp_processor_id()];
+> +		check_irqnr(irqnr, IPI_IRQ, 1);
+>  		smp_wmb(); /* pairs with rmb in check_acked */
+>  	} else {
+> -		++spurious[smp_processor_id()];
+> +		++spurious[1][smp_processor_id()];
+>  		smp_wmb();
+>  	}
+>  }
+> @@ -617,7 +623,7 @@ static bool trigger_and_check_spi(const char *test_name,
+>  		break;
+>  	}
+>  
+> -	ret = (check_acked(test_name, &cpumask) >= 0);
+> +	ret = (check_acked(test_name, &cpumask, 1) >= 0);
+>  
+>  	/* Clean up pending bit in case this IRQ wasn't taken. */
+>  	if (!(irq_stat & IRQ_STAT_NO_CLEAR))
+> @@ -643,7 +649,7 @@ static void spi_test_single(void)
+>  	cpumask_clear(&cpumask);
+>  	cpumask_set_cpu(cpu, &cpumask);
+>  	gic_enable_irq(SPI_IRQ);
+> -	check_acked("now enabled SPI fires", &cpumask);
+> +	check_acked("now enabled SPI fires", &cpumask, 1);
+>  }
+>  
+>  static void spi_test_smp(void)
