@@ -2,54 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F027EFB109
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 14:05:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01ABCFB10C
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 14:05:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbfKMNFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 08:05:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53281 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726250AbfKMNFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 08:05:36 -0500
+        id S1727339AbfKMNFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 08:05:50 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30248 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727122AbfKMNFu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Nov 2019 08:05:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573650334;
+        s=mimecast20190719; t=1573650348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tsCN0+YE6TRsN+UdVI6kg8PGJLrxHDnSCZdX6aGWXzQ=;
-        b=AiNz7ue6m/CSEVqWzDYknaoTluIJ55SF5SKmmsa+fhkWp28DqUMnW4jZrf46DypWISsvL0
-        WidtDD6X/OFyMgPWVHwzLRGQVPo+U4mtBZgYQy8DbqzXKSwyu0VZ3CvSysGytHKuTEVKoJ
-        /MwqNNX8lCf04LGcoYb+2CvTEB0FBbY=
+        bh=hzuB70X2L591fX6uCZ1N72IlLgOXbE5oNWHyCti9s+o=;
+        b=Uhff75ZohX/YHm9j37BB50PnK0ZW2l1Fcwc/evsn+WqUDdzmc9JX/qlCE6zSoZSR+7JxSv
+        xvvAq2UK3poo+KIQ/STd/6w1J09Esr5yoMvplRynl/NI6duX6/5R31Ablhvbjgn1HZrbhr
+        wAJeQDzkMO0zQKZ4wh9PjzukQSHPInU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-mIeRWuWfOuy3hOgTwe7XRA-1; Wed, 13 Nov 2019 08:05:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-204-6DzfgOYePmKWKokthGSOdQ-1; Wed, 13 Nov 2019 08:05:47 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54165803CE0;
-        Wed, 13 Nov 2019 13:05:30 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com [10.36.116.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ED5C21B5B5;
-        Wed, 13 Nov 2019 13:05:25 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: SCLP unit test
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-References: <1573492826-24589-1-git-send-email-imbrenda@linux.ibm.com>
- <1573492826-24589-3-git-send-email-imbrenda@linux.ibm.com>
- <fe853e54-ef79-ed94-eaf8-18b2acfd95f5@redhat.com>
- <20191113134024.75beb67d@p-imbrenda.boeblingen.de.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <87d5c8cb-f6d6-4034-629a-4bf26b349b5f@redhat.com>
-Date:   Wed, 13 Nov 2019 14:05:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53F2C477;
+        Wed, 13 Nov 2019 13:05:46 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A221BEA66;
+        Wed, 13 Nov 2019 13:05:42 +0000 (UTC)
+Date:   Wed, 13 Nov 2019 14:05:39 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
+Message-ID: <20191113140539.4d153d5f.cohuck@redhat.com>
+In-Reply-To: <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+        <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191113134024.75beb67d@p-imbrenda.boeblingen.de.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: mIeRWuWfOuy3hOgTwe7XRA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 6DzfgOYePmKWKokthGSOdQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -58,121 +54,233 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/11/2019 13.40, Claudio Imbrenda wrote:
-> On Wed, 13 Nov 2019 10:34:02 +0100
-> Thomas Huth <thuth@redhat.com> wrote:
-[...]
->>> +/**
->>> + * Perform one test at the given address, optionally using the
->>> SCCB template, =20
->>
->> I think you should at least mention the meaning of the "len" parameter
->> here, otherwise this is rather confusing (see below, my comment to
->> sccb_template).
+On Wed, 13 Nov 2019 13:23:19 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> This simple test test the I/O reading by the SUB Channel by:
+> - initializing the Channel SubSystem with predefined CSSID:
+>   0xfe000000 CSSID for a Virtual CCW
+
+0 should be fine with recent QEMU versions as well, I guess?
+
+>   0x00090000 SSID for CCW-PONG
+
+subchannel id, or subchannel set id?
+
+> - initializing the ORB pointing to a single READ CCW
+
+Out of curiosity: Would using a NOP also be an option?
+
+> - starts the STSH command with the ORB
+
+s/STSH/SSCH/ ?
+
+> - Expect an interrupt
+> - writes the read data to output
 >=20
-> I'll rename it and add comments
+> The test implements lots of traces when DEBUG is on and
+> tests if memory above the stack is corrupted.
 >=20
->>> + * checking for the expected program interrupts and return codes.
->>> + * Returns 1 in case of success or 0 in case of failure =20
->>
->> Could use bool with true + false instead.
->>
->>> + */
->>> +static int test_one_sccb(uint32_t cmd, uint8_t *addr, uint16_t
->>> len, uint64_t exp_pgm, uint16_t exp_rc) +{
->>> +=09SCCBHeader *h =3D (SCCBHeader *)addr;
->>> +=09int res, pgm;
->>> +
->>> +=09/* Copy the template to the test address if needed */
->>> +=09if (len)
->>> +=09=09memcpy(addr, sccb_template, len); =20
->>
->> Honestly, that sccb_template is rather confusing. Why does the caller
->> has to provide both, the data in the sccb_template and the "addr"
->> variable for yet another buffer? Wouldn't it be simpler if the caller
->> simply sets up everything in a place of choice and then only passes
->> the "addr" to the buffer?
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h      | 244 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  lib/s390x/css_dump.c | 141 +++++++++++++++++++++++++++++
+>  s390x/Makefile       |   2 +
+>  s390x/css.c          | 222 +++++++++++++++++++++++++++++++++++++++++++++=
++
+>  s390x/unittests.cfg  |   4 +
+>  5 files changed, 613 insertions(+)
+>  create mode 100644 lib/s390x/css.h
+>  create mode 100644 lib/s390x/css_dump.c
+>  create mode 100644 s390x/css.c
 >=20
-> because you will test the same buffer at different addresses. this
-> mechanism abstracts this. instead of having to clear the buffer and set
-> the values for each address, you can simply set the template once and
-> then call the same function, changing only the target address.
->=20
-> also, the target address is not always a buffer, in many cases it is in
-> fact an invalid address, which should generate exceptions.=20
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> new file mode 100644
+> index 0000000..a7c42fd
+> --- /dev/null
+> +++ b/lib/s390x/css.h
 
-Hmm, ok, I guess some additional comments like this in the source code
-would be helpful.
+(...)
 
->>> +=09expect_pgm_int();
->>> +=09res =3D sclp_service_call_test(cmd, h);
->>> +=09if (res) {
->>> +=09=09report_info("SCLP not ready (command %#x, address
->>> %p, cc %d)", cmd, addr, res);
->>> +=09=09return 0;
->>> +=09}
->>> +=09pgm =3D clear_pgm_int();
->>> +=09/* Check if the program exception was one of the expected
->>> ones */
->>> +=09if (!((1ULL << pgm) & exp_pgm)) {
->>> +=09=09report_info("First failure at addr %p, size %d,
->>> cmd %#x, pgm code %d", addr, len, cmd, pgm);
->>> +=09=09return 0;
->>> +=09}
->>> +=09/* Check if the response code is the one expected */
->>> +=09if (exp_rc && (exp_rc !=3D h->response_code)) { =20
->>
->> You can drop the parentheses around "exp_rc !=3D h->response_code".
->=20
-> fine, although I don't understand you hatred toward parentheses :)
+> +static inline int rsch(unsigned long schid)
 
-I took a LISP class at university once ... never quite recovered from
-that...
+I don't think anyone has tried rsch with QEMU before; sounds like a
+good idea to test this :)
 
-No, honestly, the problem is rather that these additional parentheses
-slow me down when I read the source code. If I see such if-statements,
-my brain starts to think something like "There are parentheses here, so
-there must be some additional non-trivial logic in this if-statement...
-let's try to understand that..." and it takes a second to realize that
-it's not the case and the parentheses are just superfluous.
+> +{
+> +=09register unsigned long reg1 asm("1") =3D schid;
+> +=09int ccode;
+> +
+> +=09asm volatile(
+> +=09=09"=09rsch\n"
+> +=09=09"=09ipm=09%0\n"
+> +=09=09"=09srl=09%0,28"
+> +=09=09: "=3Dd" (ccode)
+> +=09=09: "d" (reg1)
+> +=09=09: "cc");
+> +=09return ccode;
+> +}
+> +
+> +static inline int rchp(unsigned long chpid)
 
->>> +/**
->>> + * Test SCCBs whose address is in the lowcore or prefix area.
->>> + */
->>> +static void test_sccb_prefix(void)
->>> +{
->>> +=09uint32_t prefix, new_prefix;
->>> +=09int offset;
->>> +
->>> +=09/* can't actually trash the lowcore, unsurprisingly things
->>> break if we do */
->>> +=09for (offset =3D 0; offset < 8192; offset +=3D 8)
->>> +=09=09if (!test_one_sccb(valid_code, MKPTR(offset), 0,
->>> PGM_BIT_SPEC, 0))
->>> +=09=09=09break;
->>> +=09report("SCCB low pages", offset =3D=3D 8192);
->>> +
->>> +=09memcpy(prefix_buf, 0, 8192);
->>> +=09new_prefix =3D (uint32_t)(intptr_t)prefix_buf;
->>> +=09asm volatile("stpx %0" : "=3DQ" (prefix));
->>> +=09asm volatile("spx %0" : : "Q" (new_prefix) : "memory");
->>> +
->>> +=09for (offset =3D 0; offset < 8192; offset +=3D 8)
->>> +=09=09if (!test_one_simple(valid_code, MKPTR(new_prefix
->>> + offset), 8, 8, PGM_BIT_SPEC, 0))
->>> +=09=09=09break;
->>> +=09report("SCCB prefix pages", offset =3D=3D 8192);
->>> +
->>> +=09memcpy(prefix_buf, 0, 8192); =20
->>
->> What's that memcpy() good for? A comment would be helpful.
->=20
-> we just moved the prefix to a temporary one, and thrashed the old one.
-> we can't simply set the old prefix and call it a day, things will break.
+Anything useful we can test here?
 
-Did the test really trash the old one? ... hmm, I guess I got the code
-wrong, that prefix addressing is always so confusing. Is SCLP working
-with absolute or real addresses?
+> +{
+> +=09register unsigned long reg1 asm("1") =3D chpid;
+> +=09int ccode;
+> +
+> +=09asm volatile(
+> +=09=09"=09rchp\n"
+> +=09=09"=09ipm=09%0\n"
+> +=09=09"=09srl=09%0,28"
+> +=09=09: "=3Dd" (ccode)
+> +=09=09: "d" (reg1)
+> +=09=09: "cc");
+> +=09return ccode;
+> +}
 
- Thomas
+(...)
+
+> diff --git a/s390x/css.c b/s390x/css.c
+> new file mode 100644
+> index 0000000..6cdaf61
+> --- /dev/null
+> +++ b/s390x/css.c
+
+(...)
+
+> +static void set_io_irq_subclass_mask(uint64_t const new_mask)
+> +{
+> +=09asm volatile (
+> +=09=09"lctlg %%c6, %%c6, %[source]\n"
+> +=09=09: /* No outputs */
+> +=09=09: [source] "R" (new_mask));
+> +}
+> +
+> +static void set_system_mask(uint8_t new_mask)
+> +{
+> +=09asm volatile (
+> +=09=09"ssm %[source]\n"
+> +=09=09: /* No outputs */
+> +=09=09: [source] "R" (new_mask));
+> +}
+> +
+> +static void enable_io_irq(void)
+> +{
+> +=09set_io_irq_subclass_mask(0x00000000ff000000);
+
+So, you always enable all iscs? Maybe add a comment?
+
+> +=09set_system_mask(PSW_PRG_MASK >> 56);
+> +}
+> +
+> +void handle_io_int(sregs_t *regs)
+> +{
+> +=09int ret =3D 0;
+> +
+> +=09DBG("IO IRQ: subsys_id_word=3D%08x", lowcore->subsys_id_word);
+> +=09DBG("......: io_int_parm   =3D%08x", lowcore->io_int_param);
+> +=09DBG("......: io_int_word   =3D%08x", lowcore->io_int_word);
+> +=09ret =3D tsch(lowcore->subsys_id_word, &irb);
+> +=09dump_irb(&irb);
+> +=09if (ret)
+> +=09=09DBG("......: tsch retval %d", ret);
+> +=09DBG("IO IRQ: END");
+> +}
+> +
+> +static void set_schib(struct schib *sch)
+> +{
+> +=09struct pmcw *p =3D &sch->pmcw;
+> +
+> +=09p->intparm =3D 0xdeadbeef;
+> +=09p->devnum =3D 0xc0ca;
+> +=09p->lpm =3D 0x80;
+> +=09p->flags =3D 0x3081;
+
+Use #defines instead of magic numbers?
+
+> +=09p->chpid[7] =3D 0x22;
+> +=09p->pim =3D 0x0f;
+> +=09p->pam =3D 0x0f;
+> +=09p->pom =3D 0x0f;
+> +=09p->lpm =3D 0x0f;
+> +=09p->lpum =3D 0xaa;
+> +=09p->pnom =3D 0xf0;
+> +=09p->mbi =3D 0xaa;
+> +=09p->mbi =3D 0xaaaa;
+
+Many of these fields are not supposed to be modifiable by the program
+-- do you want to check what you get back after msch?
+
+Also, you set mbi twice ;) (And for it to actually have any effect,
+you'd have to execute SET CHANNEL MONITOR, no?)
+
+
+> +}
+> +
+> +static void css_enable(void)
+> +{
+> +=09int ret;
+> +
+> +=09ret =3D stsch(CSSID_PONG, &schib);
+> +=09if (ret)
+> +=09=09DBG("stsch: %x\n", ret);
+> +=09dump_schib(&schib);
+> +=09set_schib(&schib);
+> +=09dump_schib(&schib);
+> +=09ret =3D msch(CSSID_PONG, &schib);
+> +=09if (ret)
+> +=09=09DBG("msch : %x\n", ret);
+> +}
+> +
+> +/* These two definitions are part of the QEMU PONG interface */
+> +#define PONG_WRITE 0x21
+> +#define PONG_READ  0x22
+
+Ah, so it's not a plain read/write, but a specialized one? Mention that
+in the patch description?
+
+> +
+> +static int css_run(int fake)
+> +{
+> +=09struct orb *p =3D orb;
+
+I'd maybe call that variable 'orb' instead; at a glance, I was confused
+what you did with the pmcw below, until I realized that it's the orb :)
+
+> +=09int cc;
+> +
+> +=09if (fake)
+> +=09=09return 0;
+> +=09css_enable();
+> +
+> +=09enable_io_irq();
+> +
+> +=09ccw[0].code =3D PONG_READ;
+> +=09ccw[0].flags =3D CCW_F_PCI;
+> +=09ccw[0].count =3D 80;
+> +=09ccw[0].data =3D (unsigned int)(unsigned long) &buffer;
+> +
+> +=09p->intparm =3D 0xcafec0ca;
+> +=09p->ctrl =3D ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
+> +=09p->cpa =3D (unsigned int) (unsigned long)&ccw[0];
+> +
+> +=09printf("ORB AT %p\n", orb);
+> +=09dump_orb(p);
+> +=09cc =3D ssch(CSSID_PONG, p);
+> +=09if (cc) {
+> +=09=09DBG("cc: %x\n", cc);
+> +=09=09return cc;
+> +=09}
+> +
+> +=09delay(1);
+> +
+> +=09stsch(CSSID_PONG, &schib);
+> +=09dump_schib(&schib);
+> +=09DBG("got: %s\n", buffer);
+> +
+> +=09return 0;
+> +}
+(...)
 
