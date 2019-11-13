@@ -2,221 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B621FAE66
-	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A46F6FAE7C
+	for <lists+kvm@lfdr.de>; Wed, 13 Nov 2019 11:28:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727319AbfKMKYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 05:24:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38417 "EHLO
+        id S1727145AbfKMK2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 05:28:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28873 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726165AbfKMKYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 05:24:33 -0500
+        with ESMTP id S1726991AbfKMK2t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 05:28:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573640671;
+        s=mimecast20190719; t=1573640928;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DfRTTjOwZPCdy0eEDyt9cHkoZ8bwtRHW6suwdKFA4Dc=;
-        b=dkvWjO+CyhPrhsGMJedOE6QGvCWnagR4dDcsrVpSHJ5M894T+lW6hiGRxAbpCBDH+kqPH0
-        dBm++OSC1P2/wbsr6xovA6jlepg2XgfX2xWCBozLeADEp9+KGkDmBkHNbcUmNXMb9LbTAG
-        0SNcai+dizEBX/+5kmAqhwDQ/WA9xDA=
+        bh=w3autvsTwXRgzZBTKOSol7i8PLRsHWJaglOb54UD7HU=;
+        b=SHOXGRX3rcR4z4H1YHY6lZrNEq10OmV2K4ipquB+Pzo1G1mMEtjIjC/qC4o/jnZW0c4qb4
+        8ofes+PJ4FXwFSMMdUy8cgwctqBqqCe/AofVkZjxfYfn8w9Qpzic9tH+IK0+YsyToz6gHe
+        DWvqCh9qWTyWCVDTs9/3LqMNPY47n18=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-VyTwAihWO7SvD2yIDWlVOQ-1; Wed, 13 Nov 2019 05:24:28 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-202-O4B3qXHWOICjFPSgG9e9iw-1; Wed, 13 Nov 2019 05:28:45 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C33A8045E2;
-        Wed, 13 Nov 2019 10:24:26 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3142F28D36;
-        Wed, 13 Nov 2019 10:24:19 +0000 (UTC)
-Date:   Wed, 13 Nov 2019 11:24:17 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>, <cjia@nvidia.com>,
-        <kevin.tian@intel.com>, <ziye.yang@intel.com>,
-        <changpeng.liu@intel.com>, <yi.l.liu@intel.com>,
-        <mlevitsk@redhat.com>, <eskultet@redhat.com>,
-        <dgilbert@redhat.com>, <jonathan.davies@nutanix.com>,
-        <eauger@redhat.com>, <aik@ozlabs.ru>, <pasic@linux.ibm.com>,
-        <felipe@nutanix.com>, <Zhengxiao.zx@Alibaba-inc.com>,
-        <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
-        <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20191113112417.6e40ce96.cohuck@redhat.com>
-In-Reply-To: <20191112153005.53bf324c@x1.home>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
-        <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
-        <20191112153005.53bf324c@x1.home>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE0398E8E06;
+        Wed, 13 Nov 2019 10:28:43 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-183.ams2.redhat.com [10.36.116.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F9DB5C1D8;
+        Wed, 13 Nov 2019 10:28:36 +0000 (UTC)
+Subject: Re: [RFC 04/37] KVM: s390: protvirt: Add initial lifecycle handling
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-5-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <07705597-8e8f-28d4-f9a1-d3d5dc9a4555@redhat.com>
+Date:   Wed, 13 Nov 2019 11:28:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: VyTwAihWO7SvD2yIDWlVOQ-1
+In-Reply-To: <20191024114059.102802-5-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: O4B3qXHWOICjFPSgG9e9iw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Nov 2019 15:30:05 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On 24/10/2019 13.40, Janosch Frank wrote:
+> Let's add a KVM interface to create and destroy protected VMs.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+[...]
+> +int kvm_s390_pv_unpack(struct kvm *kvm, unsigned long addr, unsigned lon=
+g size,
+> +=09=09       unsigned long tweak)
+> +{
+> +=09int i, rc =3D 0;
+> +=09struct uv_cb_unp uvcb =3D {
+> +=09=09.header.cmd =3D UVC_CMD_UNPACK_IMG,
+> +=09=09.header.len =3D sizeof(uvcb),
+> +=09=09.guest_handle =3D kvm_s390_pv_handle(kvm),
+> +=09=09.tweak[0] =3D tweak
+> +=09};
+> +
+> +=09if (addr & ~PAGE_MASK || size & ~PAGE_MASK)
+> +=09=09return -EINVAL;
 
-> On Tue, 12 Nov 2019 22:33:36 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->=20
-> > - Defined MIGRATION region type and sub-type.
-> > - Used 3 bits to define VFIO device states.
-> >     Bit 0 =3D> _RUNNING
-> >     Bit 1 =3D> _SAVING
-> >     Bit 2 =3D> _RESUMING
-> >     Combination of these bits defines VFIO device's state during migrat=
-ion
-> >     _RUNNING =3D> Normal VFIO device running state. When its reset, it
-> > =09=09indicates _STOPPED state. when device is changed to
-> > =09=09_STOPPED, driver should stop device before write()
-> > =09=09returns.
-> >     _SAVING | _RUNNING =3D> vCPUs are running, VFIO device is running b=
-ut
-> >                           start saving state of device i.e. pre-copy st=
-ate
-> >     _SAVING  =3D> vCPUs are stopped, VFIO device should be stopped, and=
- =20
->=20
-> s/should/must/
->=20
-> >                 save device state,i.e. stop-n-copy state
-> >     _RESUMING =3D> VFIO device resuming state.
-> >     _SAVING | _RESUMING and _RUNNING | _RESUMING =3D> Invalid states =
-=20
->=20
-> A table might be useful here and in the uapi header to indicate valid
-> states:
+Also check for size =3D=3D 0 ?
 
-I like that.
+> +
+> +
 
->=20
-> | _RESUMING | _SAVING | _RUNNING | Description
-> +-----------+---------+----------+---------------------------------------=
----
-> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
-> +-----------+---------+----------+---------------------------------------=
----
-> |     0     |    0    |     1    | Running, default state
-> +-----------+---------+----------+---------------------------------------=
----
-> |     0     |    1    |     0    | Stopped, migration interface in save m=
-ode
-> +-----------+---------+----------+---------------------------------------=
----
-> |     0     |    1    |     1    | Running, save mode interface, iterativ=
-e
-> +-----------+---------+----------+---------------------------------------=
----
-> |     1     |    0    |     0    | Stopped, migration resume interface ac=
-tive
-> +-----------+---------+----------+---------------------------------------=
----
-> |     1     |    0    |     1    | Invalid (b)
-> +-----------+---------+----------+---------------------------------------=
----
-> |     1     |    1    |     0    | Invalid (c)
-> +-----------+---------+----------+---------------------------------------=
----
-> |     1     |    1    |     1    | Invalid (d)
->=20
-> I think we need to consider whether we define (a) as generally
-> available, for instance we might want to use it for diagnostics or a
-> fatal error condition outside of migration.
->=20
-> Are there hidden assumptions between state transitions here or are
-> there specific next possible state diagrams that we need to include as
-> well?
+Remove one of the two empty lines, please.
 
-Some kind of state-change diagram might be useful in addition to the
-textual description anyway. Let me try, just to make sure I understand
-this correctly:
+> +=09VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: start addr %lx size %lx",
+> +=09=09 addr, size);
+> +=09for (i =3D 0; i < size / PAGE_SIZE; i++) {
+> +=09=09uvcb.gaddr =3D addr + i * PAGE_SIZE;
+> +=09=09uvcb.tweak[1] =3D i * PAGE_SIZE;
+> +retry:
+> +=09=09rc =3D uv_call(0, (u64)&uvcb);
+> +=09=09if (!rc)
+> +=09=09=09continue;
+> +=09=09/* If not yet mapped fault and retry */
+> +=09=09if (uvcb.header.rc =3D=3D 0x10a) {
+> +=09=09=09rc =3D gmap_fault(kvm->arch.gmap, uvcb.gaddr,
+> +=09=09=09=09=09FAULT_FLAG_WRITE);
+> +=09=09=09if (rc)
+> +=09=09=09=09return rc;
+> +=09=09=09goto retry;
+> +=09=09}
+> +=09=09VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: failed addr %llx rc %x rrc %=
+x",
+> +=09=09=09 uvcb.gaddr, uvcb.header.rc, uvcb.header.rrc);
+> +=09=09break;
 
-1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1
-2) 0/0/1 ---(tell driver to stop)---> 0/0/0
-3) 0/1/1 ---(tell driver to stop)---> 0/1/0
-4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0
-5) 1/0/0 ---(driver is ready)---> 0/0/1
-6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1
+A break at the end of the for-loop ... that's really not what I'd expect.
 
-Not sure about the usefulness of 2). Also, is 4) the only way to
-trigger resuming? And is the change in 5) performed by the driver, or
-by userspace?
+Could you please invert the logic here, i.e.:
 
-Are any other state transitions valid?
+    if (uvcb.header.rc !=3D 0x10a) {
+        VM_EVENT(...)
+        break;
+    }
+    rc =3D gmap_fault(...)
+    ...
 
-(...)
+I think you might even get rid of that ugly "goto", too, that way?
 
-> > + * Sequence to be followed for _SAVING|_RUNNING device state or pre-co=
-py phase
-> > + * and for _SAVING device state or stop-and-copy phase:
-> > + * a. read pending_bytes. If pending_bytes > 0, go through below steps=
-.
-> > + * b. read data_offset, indicates kernel driver to write data to stagi=
-ng buffer.
-> > + *    Kernel driver should return this read operation only after writi=
-ng data to
-> > + *    staging buffer is done. =20
->=20
-> "staging buffer" implies a vendor driver implementation, perhaps we
-> could just state that data is available from (region + data_offset) to
-> (region + data_offset + data_size) upon return of this read operation.
->=20
-> > + * c. read data_size, amount of data in bytes written by vendor driver=
- in
-> > + *    migration region.
-> > + * d. read data_size bytes of data from data_offset in the migration r=
-egion.
-> > + * e. process data.
-> > + * f. Loop through a to e. Next read on pending_bytes indicates that r=
-ead data
-> > + *    operation from migration region for previous iteration is done. =
-=20
->=20
-> I think this indicate that step (f) should be to read pending_bytes, the
-> read sequence is not complete until this step.  Optionally the user can
-> then proceed to step (b).  There are no read side-effects of (a) afaict.
->=20
-> Is the use required to reach pending_bytes =3D=3D 0 before changing
-> device_state, particularly transitioning to !_RUNNING?  Presumably the
-> user can exit this sequence at any time by clearing _SAVING.
+> +=09}
+> +=09VM_EVENT(kvm, 3, "PROTVIRT VM UNPACK: finished with rc %x rrc %x",
+> +=09=09 uvcb.header.rc, uvcb.header.rrc);
+> +=09return rc;
+> +}
 
-That would be transition 6) above (abort saving and continue). I think
-it makes sense not to forbid this.
-
->=20
-> > + *
-> > + * Sequence to be followed while _RESUMING device state:
-> > + * While data for this device is available, repeat below steps:
-> > + * a. read data_offset from where user application should write data.
-> > + * b. write data of data_size to migration region from data_offset.
-> > + * c. write data_size which indicates vendor driver that data is writt=
-en in
-> > + *    staging buffer. Vendor driver should read this data from migrati=
-on
-> > + *    region and resume device's state. =20
->=20
-> The device defaults to _RUNNING state, so a prerequisite is to set
-> _RESUMING and clear _RUNNING, right?
-
-Transition 4) above. Do we need
-7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
-as well? (Probably depends on how sensible the 0/0/0 state is.)
-
->=20
-> > + *
-> > + * For user application, data is opaque. User should write data in the=
- same
-> > + * order as received.
-> > + */
+ Thomas
 
