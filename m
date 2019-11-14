@@ -2,118 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 695FEFBC97
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 00:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B83F0FBCE9
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 01:17:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726516AbfKMX3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Nov 2019 18:29:47 -0500
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:14354 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726363AbfKMX3r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Nov 2019 18:29:47 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dcc91e90000>; Wed, 13 Nov 2019 15:29:45 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 13 Nov 2019 15:29:46 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 15:29:46 -0800
-Received: from [10.2.160.107] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 23:29:45 +0000
-Subject: Re: [PATCH v4 23/23] mm/gup: remove support for gup(FOLL_LONGTERM)
-To:     Ira Weiny <ira.weiny@intel.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191113042710.3997854-1-jhubbard@nvidia.com>
- <20191113042710.3997854-24-jhubbard@nvidia.com>
- <20191113190935.GD12947@iweiny-DESK2.sc.intel.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <4e24c5af-bd96-e7c7-179b-0ca0f6abb852@nvidia.com>
-Date:   Wed, 13 Nov 2019 15:27:00 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191113190935.GD12947@iweiny-DESK2.sc.intel.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573687785; bh=9B/DbxbXL2Cu8EFiCYVZNw+MxNudIvhgmb1GMnaTmQ0=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=rJKFgq0qWlNQhEr6LwQRM7xJTWCfLcG6jdSS31KElayO6wHx7IiwFsaXOvGhplyH1
-         tCC68KrsRIXSAjoot89gKwHpedHmflDisAxv/IoMKZRuMzvzxHIp82VaySctaPBYkQ
-         hZemWLx10v7w1crWSE8+tecZBKihDudRrciOwHkYvfyXR52KB/0+nCkX8xcEjYzOgD
-         BdrgEwqj12gUt+52wZddvynAEOXEEJldAzotyUKT84BAusYTd8IMJOcdCe+okl1UqL
-         yIUM4FRTzo2XVuGeXsCxvfWydTvgqiLWMulv4eIra/tutHomq+DAZbILc3dKig7Hd1
-         UTGu99x3VirIw==
+        id S1726473AbfKNARe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Nov 2019 19:17:34 -0500
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:56414 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726195AbfKNARe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Nov 2019 19:17:34 -0500
+Received: by mail-pg1-f201.google.com with SMTP id 11so3112637pgm.23
+        for <kvm@vger.kernel.org>; Wed, 13 Nov 2019 16:17:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=GTIC95OO8wyHkXq89RvQsalRu9vquP6LSLQDB4RTONs=;
+        b=Txi9mR2pTU0pZCkosjcm1DVX9yWJYOo+4X64OW5Gm+J6WOPI1Or+0giA7VVJQ3ERUK
+         7wM2OoHOR+d4B1/r+DLzWAXy9/veatXdlJXVJ0El8qSGCNxGQZTmwKl6948XUrnZGla8
+         MQpOMbT0M7a8GI48LmfCA2qm4HZjhE2eYkRwWXye9Qoor413Vw6O7wZKXB7YYlTWbKtz
+         IkRmy+R9mJAAPjlEEzDO9MiFD6YHmDcQ/f3RWZnCGtlc5G5jv/bv6b0hmlzo9X2j/lW1
+         +gJIQYRgui7iiszSbCJtZ1GgWjnr0mBhEgwyNUMG8UHnBcg8KEjwOzYHyiN0WPhOYAc3
+         lt4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=GTIC95OO8wyHkXq89RvQsalRu9vquP6LSLQDB4RTONs=;
+        b=lPzUzex6ZXN5mo1KqnALHnfdNQYE+4pV23DXJMhnafIBle/ephiOv7HVtytJUSns4O
+         Z492s/FvyKreyDmzB6kgQbUMkG75/v4MsUg7DzYmRKCUWdx2G6RnqSj+y8pG4OTzRxDl
+         j+PAS/iyIj3YhsTXehz0USP14LyS+6gqR8LwmZALD1OntH69W1aUREPxsxxi3rDIY2Bk
+         MxbL6NY4goZ/D6mi48IEBzkz5q81pDgfhys6n56Wf3L/vcif/mt3lkJtARDopkj+j9j+
+         hFJl0T8YPjtXdWCE5+ORRVEjDz5DYWGkpPC7EOlqn4hXbyr7hPb7NC2e+M6vNWO3/NhY
+         jyxQ==
+X-Gm-Message-State: APjAAAVQRLi1SgiHGceDpBpLWhFEhuIv/ttlkRsLUD1n8GkfkUEckb2K
+        jNbk8uUuxsE4CHu8HbNqsYuo6VJZxEFB64XjCyTzkffV7eEDVDGcuHIsg+V3D1lZBlWkYUEOOer
+        onPlQ66foAQ1M4V3hx5WD5sIwsox6H6otqa2CnxTsmB4ozy7bYZy1RLcXLA==
+X-Google-Smtp-Source: APXvYqyYaQFXSRef/kiz4OUzE0JH+kQxyotZdTTl1c8PG92NUXU/fM8iRZ1aADSA3xufuFYRWe5GxV4eMLk=
+X-Received: by 2002:a63:b20f:: with SMTP id x15mr6707598pge.65.1573690651517;
+ Wed, 13 Nov 2019 16:17:31 -0800 (PST)
+Date:   Wed, 13 Nov 2019 16:17:14 -0800
+Message-Id: <20191114001722.173836-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.rc1.363.gb1bccd3e3d-goog
+Subject: [PATCH v5 0/8] KVM: nVMX: Add full nested support for "load
+ IA32_PERF_GLOBAL_CTRL" VM-{Entry,Exit} control
+From:   Oliver Upton <oupton@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/13/19 11:09 AM, Ira Weiny wrote:
-...
->> diff --git a/mm/gup.c b/mm/gup.c
->> index 82e7e4ce5027..90f5f95ee7ac 100644
->> --- a/mm/gup.c
->> +++ b/mm/gup.c
->> @@ -1756,11 +1756,11 @@ long get_user_pages(unsigned long start, unsigned long nr_pages,
->>   		struct vm_area_struct **vmas)
->>   {
->>   	/*
->> -	 * FOLL_PIN must only be set internally by the pin_user_page*() and
->> -	 * pin_longterm_*() APIs, never directly by the caller, so enforce that
->> -	 * with an assertion:
->> +	 * FOLL_PIN and FOLL_LONGTERM must only be set internally by the
->> +	 * pin_user_page*() and pin_longterm_*() APIs, never directly by the
->> +	 * caller, so enforce that with an assertion:
->>   	 */
->> -	if (WARN_ON_ONCE(gup_flags & FOLL_PIN))
->> +	if (WARN_ON_ONCE(gup_flags & (FOLL_PIN | FOLL_LONGTERM)))
-> 
-> Don't we want to block FOLL_LONGTERM in get_user_pages_fast() as well after all
-> this?
-> 
+[v1] https://lore.kernel.org/r/20190828234134.132704-1-oupton@google.com
+[v2] https://lore.kernel.org/r/20190903213044.168494-1-oupton@google.com
+[v3] https://lore.kernel.org/r/20190903215801.183193-1-oupton@google.com
+[v4] https://lore.kernel.org/r/20190906210313.128316-1-oupton@google.com
 
-Yes. But with the latest idea to restore FOLL_LONGTERM to its original glory,
-that won't be an issue in the next version. heh.
+v1 => v2:
+ - Add Krish's Co-developed-by and Signed-off-by tags.
+ - Fix minor nit to kvm-unit-tests to use 'host' local variable
+   throughout test_load_pgc()
+ - Teach guest_state_test_main() to check guest state from within nested
+   VM
+ - Update proposed tests to use guest/host state checks, wherein the
+   value is checked from MSR_CORE_PERF_GLOBAL_CTRL.
+ - Changelog line wrapping
 
+v2 => v3:
+ - Remove the value unchanged condition from
+   kvm_is_valid_perf_global_ctrl
+ - Add line to changelog for patch 3/8
 
-thanks,
+v3 => v4:
+ - Allow tests to set the guest func multiple times
+ - Style fixes throughout kvm-unit-tests patches, per Krish's review
+
+v4 => v5:
+ - Rebased kernel and kvm-unit-tests patches
+ - Reordered and reworked patches to now WARN on a failed
+   kvm_set_msr()
+ - Dropped patch to alow resetting guest in kvm-unit-tests, as the
+   functionality is no longer needed.
+
+This patchset exposes the "load IA32_PERF_GLOBAL_CTRL" to guests for nested
+VM-entry and VM-exit. There already was some existing code that supported
+the VM-exit ctrl, though it had an issue and was not exposed to the guest
+anyway. These patches are based on the original set that Krish Sadhukhan
+sent out earlier this year.
+
+Oliver Upton (6):
+  KVM: nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit} control
+  KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR on VM-Entry
+  KVM: nVMX: Use kvm_set_msr to load IA32_PERF_GLOBAL_CTRL on VM-Exit
+  KVM: nVMX: Check HOST_IA32_PERF_GLOBAL_CTRL on VM-Entry
+  KVM: nVMX: Check GUEST_IA32_PERF_GLOBAL_CTRL on VM-Entry
+  KVM: VMX: Add helper to check reserved bits in IA32_PERF_GLOBAL_CTRL
+
+ arch/x86/kvm/pmu.h           |  6 ++++++
+ arch/x86/kvm/vmx/nested.c    | 51 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/nested.h    |  1 +
+ arch/x86/kvm/vmx/pmu_intel.c |  5 ++++-
+
 -- 
-John Hubbard
-NVIDIA
+2.23.0.187.g17f5b7556c-goog
+
