@@ -2,82 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DFAAAFC14D
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 09:13:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E838BFC156
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 09:15:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726024AbfKNINg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 03:13:36 -0500
-Received: from thoth.sbs.de ([192.35.17.2]:39146 "EHLO thoth.sbs.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725965AbfKNINg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 03:13:36 -0500
-Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
-        by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id xAE8DNNI008618
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Nov 2019 09:13:23 +0100
-Received: from [167.87.46.11] ([167.87.46.11])
-        by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xAE8DM5G023544;
-        Thu, 14 Nov 2019 09:13:22 +0100
-Subject: Re: [FYI PATCH 0/7] Mitigation for CVE-2018-12207
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>,
-        "Gupta, Pawan Kumar" <pawan.kumar.gupta@intel.com>
-References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
- <23353382-53ea-8b20-7e30-763ef6df374c@siemens.com>
- <ea5a084b-e047-6677-b8fe-d7bb6f8c0ef8@redhat.com>
- <20191113232510.GB891@guptapadev.amr>
-From:   Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <671b49ab-f65d-8b44-4da6-137d05cd1b9c@siemens.com>
-Date:   Thu, 14 Nov 2019 09:13:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1726369AbfKNIP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 03:15:58 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:36562 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725976AbfKNIP6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 03:15:58 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iVAIC-0007GE-Cl; Thu, 14 Nov 2019 09:15:52 +0100
+Date:   Thu, 14 Nov 2019 08:15:50 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: Forbid /dev/kvm being opened by a compat task when
+ CONFIG_KVM_COMPAT=n
+Message-ID: <20191114081550.3c6a7a47@why>
+In-Reply-To: <CAFEAcA8c3ePLXRa_-G0jPgMVVrFHaN1Qn3qRf-WShPXmNXX6Ug@mail.gmail.com>
+References: <20191113160523.16130-1-maz@kernel.org>
+        <2b846839-ea81-e40c-5106-90776d964e33@de.ibm.com>
+        <CAFEAcA8c3ePLXRa_-G0jPgMVVrFHaN1Qn3qRf-WShPXmNXX6Ug@mail.gmail.com>
+Organization: Approximate
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20191113232510.GB891@guptapadev.amr>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, borntraeger@de.ibm.com, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14.11.19 00:25, Pawan Gupta wrote:
-> On Wed, Nov 13, 2019 at 09:23:30AM +0100, Paolo Bonzini wrote:
->> On 13/11/19 07:38, Jan Kiszka wrote:
->>> When reading MCE, error code 0150h, ie. SRAR, I was wondering if that
->>> couldn't simply be handled by the host. But I suppose the symptom of
->>> that erratum is not "just" regular recoverable MCE, rather
->>> sometimes/always an unrecoverable CPU state, despite the error code, right?
->>
->> The erratum documentation talks explicitly about hanging the system, but
->> it's not clear if it's just a result of the OS mishandling the MCE, or
->> something worse.  So I don't know. :(  Pawan, do you?
-> 
-> As Dave mentioned in the other email its "something worse".
-> 
-> Although this erratum results in a machine check with the same MCACOD
-> signature as an SRAR error (0x150) the MCi_STATUS.PCC bit will be set to
-> one. The Intel Software Developers manual says that PCC=1 errors are
-> fatal and cannot be recovered.
-> 
-> 	15.10.4.1 Machine-Check Exception Handler for Error Recovery [1]
-> 
-> 	[...]
-> 	The PCC flag in each IA32_MCi_STATUS register indicates whether recovery
-> 	from the error is possible for uncorrected errors (UC=1). If the PCC
-> 	flag is set for enabled uncorrected errors (UC=1 and EN=1), recovery is
-> 	not possible.
-> 
+On Wed, 13 Nov 2019 21:23:07 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-And, as Dave observed, even that event is not delivered to software 
-(maybe just logged by firmware for post-reset analysis) but can or does 
-cause a machine lock-up, right?
+> On Wed, 13 Nov 2019 at 18:44, Christian Borntraeger
+> <borntraeger@de.ibm.com> wrote:
+> > On 13.11.19 17:05, Marc Zyngier wrote:  
+> > > On a system without KVM_COMPAT, we prevent IOCTLs from being issued
+> > > by a compat task. Although this prevents most silly things from
+> > > happening, it can still confuse a 32bit userspace that is able
+> > > to open the kvm device (the qemu test suite seems to be pretty
+> > > mad with this behaviour).
+> > >
+> > > Take a more radical approach and return a -ENODEV to the compat
+> > > task.  
+> 
+> > Do we still need compat_ioctl if open never succeeds?  
+> 
+> I wondered about that, but presumably you could use
+> fd-passing, or just inheriting open fds across exec(),
+> to open the fd in a 64-bit process and then hand it off
+> to a 32-bit process to call the ioctl with. (That's
+> probably only something you'd do if you were
+> deliberately playing silly games, of course, but
+> preventing silly games is useful as it makes it
+> easier to reason about kernel behaviour.)
 
-Thanks,
-Jan
+This was exactly my train of thoughts, which I should have made clear
+in the commit log. Thanks Peter for reading my mind! ;-)
 
+	M.
 -- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+Jazz is not dead. It just smells funny...
