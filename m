@@ -2,106 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11A38FC3BE
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 11:12:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 859C6FC425
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 11:28:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726717AbfKNKMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 05:12:06 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53222 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726613AbfKNKMG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 05:12:06 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEAARP1085378
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 05:12:05 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w92uk4xm6-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 05:12:00 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 14 Nov 2019 10:11:50 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 14 Nov 2019 10:11:46 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEABkPJ51904612
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Nov 2019 10:11:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0A20152050;
-        Thu, 14 Nov 2019 10:11:46 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.27])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C569852063;
-        Thu, 14 Nov 2019 10:11:45 +0000 (GMT)
+        id S1726598AbfKNK2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 05:28:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22076 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726505AbfKNK2d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 05:28:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573727311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EFQvYPYJg4J0nEUN1I/pxNWunrwAO/84en8PpJ4myG8=;
+        b=MtnQ/e1WBhfSPdtbo2rXkGREFnSEZY5zqwoWk35U+NOl57mr2qb75giRZLzxFPpGsz62nR
+        Tt4+ErcBDY0T77oqes66rbUdnTaw8ho0OmytSHnxSRdxt5rJSMSKyeCQvIrsesOTFJ7Y0E
+        pT6JH5vZvwmGFaXBkyOXvOXVutako2k=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-oWQm8zjDMJuKuiIE9GMdAw-1; Thu, 14 Nov 2019 05:28:30 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c16so4139450wro.1
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 02:28:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=OLEZB8bUOZy709XKSr13fqe/JQ22WaDdec1GWexzC2k=;
+        b=aHgXUrmBhDHKtDbf/IddWc9tcVcLL3o/L9Gr/UX4qLHWOThAIYiCLfu0bf10MbsEAT
+         yHIFSDp1tByCXa7QAMH/MekDDC1w2SnEDadhjMMe5k0SEcd7tP32eb8A9PtXCp3u3tGF
+         kfCRef/jf4wWQga9WOvMjbBr1GnuLn6VOMAWGmocE5hhMkyYJS/sRwJgMBeCjDPF6zXg
+         WWTi2k25bNtQGUEOLBwvGGTd5ROJkn4ttonKg53jHm76Z/RJrUyM1ziEkWNb5kWq/fdQ
+         OeHREc6RSjvqTFv/cYvrZeHAfSnvZ1+4VR7e1ihhK28xSwGwhQKhd9WWmwNnSUse4hVV
+         +lIg==
+X-Gm-Message-State: APjAAAWD4UUE1BHOA5cfrlzvfjd3Q1HwBQ8nOvpyeGQbJOEMPO0zGt0u
+        SASy+6ZiFEqXdHf1BgeCiyetvPJjUrcugFr8g/WCcH1M9BAW5/krpfV6USKoS5MtjFzoUsRdLRU
+        dLbWevR6gADYQ
+X-Received: by 2002:adf:e5c5:: with SMTP id a5mr7734044wrn.103.1573727309729;
+        Thu, 14 Nov 2019 02:28:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwsYLtMghPxHaocCw/sQZ+g4HIzu9O9MkZCpblaOH+6ZixnUTO0kiIbHOFV+18oHvCbcS0aeA==
+X-Received: by 2002:adf:e5c5:: with SMTP id a5mr7734015wrn.103.1573727309428;
+        Thu, 14 Nov 2019 02:28:29 -0800 (PST)
+Received: from [192.168.3.122] (p4FF23EA2.dip0.t-ipconnect.de. [79.242.62.162])
+        by smtp.gmail.com with ESMTPSA id 17sm4878867wmg.19.2019.11.14.02.28.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2019 02:28:28 -0800 (PST)
+From:   David Hildenbrand <david@redhat.com>
+Mime-Version: 1.0 (1.0)
 Subject: Re: [PATCH v1 1/4] s390x: saving regs for interrupts
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
- <1573647799-30584-2-git-send-email-pmorel@linux.ibm.com>
- <7f40bf69-6e34-7613-1ab5-83e09464c0b0@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Thu, 14 Nov 2019 11:11:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <7f40bf69-6e34-7613-1ab5-83e09464c0b0@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19111410-0028-0000-0000-000003B6CC6F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111410-0029-0000-0000-00002479D8B8
-Message-Id: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_01:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=698 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911140094
+Date:   Thu, 14 Nov 2019 11:28:28 +0100
+Message-Id: <CD5636A0-3C33-4DC4-9217-68A00137E3F4@redhat.com>
+References: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
+In-Reply-To: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+X-Mailer: iPhone Mail (17A878)
+X-MC-Unique: oWQm8zjDMJuKuiIE9GMdAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019-11-13 17:12, Janosch Frank wrote:
-> On 11/13/19 1:23 PM, Pierre Morel wrote:
->> If we use multiple source of interrupts, for exemple, using SCLP console
->> to print information while using I/O interrupts or during exceptions, we
->> need to have a re-entrant register saving interruption handling.
->>
->> Instead of saving at a static place, let's save the base registers on
->> the stack.
->>
->> Note that we keep the static register saving that we need for the RESET
->> tests.
->>
->> We also care to give the handlers a pointer to the save registers in
->> case the handler needs it (fixup_pgm_int needs the old psw address).
-> So you're still ignoring the FPRs...
-> I disassembled a test and looked at all stds and it looks like printf
-> and related functions use them. Wouldn't we overwrite test FPRs if
-> printing in a handler?
 
-If printf uses the FPRs in my opinion we should modify the compilation 
-options for the library.
+> Am 14.11.2019 um 11:11 schrieb Pierre Morel <pmorel@linux.ibm.com>:
+>=20
+> =EF=BB=BF
+>> On 2019-11-13 17:12, Janosch Frank wrote:
+>>> On 11/13/19 1:23 PM, Pierre Morel wrote:
+>>> If we use multiple source of interrupts, for exemple, using SCLP consol=
+e
+>>> to print information while using I/O interrupts or during exceptions, w=
+e
+>>> need to have a re-entrant register saving interruption handling.
+>>>=20
+>>> Instead of saving at a static place, let's save the base registers on
+>>> the stack.
+>>>=20
+>>> Note that we keep the static register saving that we need for the RESET
+>>> tests.
+>>>=20
+>>> We also care to give the handlers a pointer to the save registers in
+>>> case the handler needs it (fixup_pgm_int needs the old psw address).
+>> So you're still ignoring the FPRs...
+>> I disassembled a test and looked at all stds and it looks like printf
+>> and related functions use them. Wouldn't we overwrite test FPRs if
+>> printing in a handler?
+>=20
+> If printf uses the FPRs in my opinion we should modify the compilation op=
+tions for the library.
+>=20
+> What is the reason for printf and related functions to use floating point=
+?
+>=20
 
-What is the reason for printf and related functions to use floating point?
+Register spilling. This can and will be done.
 
-I will have a deeper look at this.
+Cheers.
 
-
-Regards,
-
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+> I will have a deeper look at this.
+>=20
+>=20
+> Regards,
+>=20
+> Pierre
+>=20
+>=20
+> --=20
+> Pierre Morel
+> IBM Lab Boeblingen
+>=20
 
