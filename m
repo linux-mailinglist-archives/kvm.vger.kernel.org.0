@@ -2,113 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A289FCEBF
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 20:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C07A2FCF28
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 21:09:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726767AbfKNT1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 14:27:51 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:40621 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726597AbfKNT1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 14:27:50 -0500
-Received: by mail-io1-f66.google.com with SMTP id p6so8109576iod.7
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 11:27:50 -0800 (PST)
+        id S1726567AbfKNUJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 15:09:16 -0500
+Received: from mail-io1-f50.google.com ([209.85.166.50]:41174 "EHLO
+        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726474AbfKNUJQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 15:09:16 -0500
+Received: by mail-io1-f50.google.com with SMTP id r144so8230629iod.8
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 12:09:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=REvJGBqtN17t/Kpi8Drm01nVRUzEJ8Px9ug31PYdiig=;
-        b=bkTP4tD0KoFK5EgiU/VRa4wtv5URuKzQYq/mSCkaNkwZRGNrlBTY4nexeB3QjYsjC+
-         +DrqwgaRpf2MRrIb7uYqqkBS/uNsISF5wamKF3c/JLjW60AYHfZBMJgvfKTNbPwU9RlI
-         7i35g0V9NQwaK0uKoaxzkEKWpxXhjhSoe/0C0QQv7VqiDsRJKzYn4GzgV3Wd9ufDAim9
-         8rEeU0Ew93wfJ32ZkgoUuXAhA3X/Db41Ag3gp58sM0xEPizKgv6Q9i7BwhjUPwr0fWHv
-         UpSnBhXjQnmLsO06mTSI3zF9GRbclW8AWNWjV2EHNh8Xf0TaqL7UpgGbwH+OK0PetAi0
-         jyhw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=59gbO9ngFb6JvwATZjaBOelFU6+24q0SZznXt/ht4Kg=;
+        b=gQKm07Ewcw27MfDJL4zk3eMDGWn9oRP3nHDsBGN6u1EBbkfxxGSrGk9GWQ+VDrZfRY
+         sAE1kMOQhDIbSWqZ3dQCf63Z935b1CFB/CtWgLdhrEBu3EldSdIjqxF0aIAdgdQK0eUl
+         iCgGKR9NOw3VFy++eHq/sRS+3JNYuD3QkAJXvIv//XA5AAKj4YvDPpGomRP4N8jaRUG+
+         yX/ssA9Bdz8lVZKa5rdT14q/ZnqsVyNx99trHPBfHMJbXLUatnPJA4cmV39+2HybdoXS
+         6lTWbkXbrCYnxiPrj8s1FyGpmSFglZYSZ6zPZAY+73T+bTgcGwRngl1sEuZrnZEeJtda
+         VDkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=REvJGBqtN17t/Kpi8Drm01nVRUzEJ8Px9ug31PYdiig=;
-        b=kzVdPe2SVYh+zptNFVO3hys39XEfgqCypOlEaZPJB196tDB8uiDYNrHlYRjFO2B1Fw
-         dATnTVI7ijili9+N8furOkYY8QEr6R7KMGo7Pb37prPrG/zbeTC+ZVc5PAegwNpEjmXJ
-         DK0vsQt7E9VSxxLLL9glPx0JBOVj7NltOu5PKtJm7ZEtcEfaeKyZfEz5uDbxVuLpQZET
-         Mil26xmlu3FDwWrNDCk+gD1T8pqfoWTz7YLazhOzPm7D26Y+2wkkKSy7iYbcf0W23cW2
-         fDxBfli9f4AX5ihb6lb+tpETu2wbOtW5a4OdAFuMA+5FM8ZItqFu9LwYDniZ9+48gIwb
-         qFRg==
-X-Gm-Message-State: APjAAAVhUNoM9btpkH60v+Q7fXxcUjlb9XwfpxF/KKJ3kvCk7rZzpiTe
-        C4P6vSwLyjNr44mmOf91hVpjcagjxP0kigtl8LQvdUDGsC8=
-X-Google-Smtp-Source: APXvYqyRnFZszxqERekTTfb9VacIRa+G5RpC59jH+JXd4EJy8Rt6mj6evr+Y29HBgmxCSNBJDvoLO8uq125KAQD14h4=
-X-Received: by 2002:a6b:6a17:: with SMTP id x23mr9873142iog.193.1573759669802;
- Thu, 14 Nov 2019 11:27:49 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=59gbO9ngFb6JvwATZjaBOelFU6+24q0SZznXt/ht4Kg=;
+        b=iNDeeWyFOB3kHi+16IbvwfpxCfkLFKIigV9gHVGg+coRO3E+LSQfi0A6uxeptYyb1r
+         UIPt00jtw2RIEixg+sNiOarI/5I33TE3LbSE6V+nttbMvxLPCiGfYOU7dXIV2I+EG7RY
+         Qjc9XFTIsJ1svhLYdWZzSlT1j4XSBA3fQ5CjWpASBJR7NI32GUCrZPnoF9ZGF6WQgeIO
+         LUcuvl4Dedx8XRXt8C/jSJh4h/SwezqAgMtOIZlZ39J/YgycPCP3ieZLQbuRFHvDmsxZ
+         k+GlbbUMBsteyo7qpyIcl7MxiSY+0Aiw1WsJ2mF2a8Geopb/oj3k0t2Izl3rjqa39iyO
+         YwjQ==
+X-Gm-Message-State: APjAAAVuriqTc+R8JUo3CsSgfylK4W3FiF7o9viqqsvPJlYO89wecWW5
+        8tHWOUDCoPyVDGXV6LWrZRhCuJjSEzOwFgs5C2tYaEfy/Zk=
+X-Google-Smtp-Source: APXvYqxr5fhqs8s4GTovb525ntP8fk3MSd+Q3UVXTO7hbZL8w+5BuBZ89aE+XT1bM51WFPdi+PJ6GjglnZpdBJ+abac=
+X-Received: by 2002:a02:40c6:: with SMTP id n189mr9517269jaa.18.1573762154821;
+ Thu, 14 Nov 2019 12:09:14 -0800 (PST)
 MIME-Version: 1.0
-References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-2-brijesh.singh@amd.com>
- <CAMkAt6pzXrZw1TZgcX-G0wDNZBjf=1bQdErAJTxfzYQ2MJDZvw@mail.gmail.com> <4f509f43-a576-144d-efd4-ab0362f1d667@amd.com>
-In-Reply-To: <4f509f43-a576-144d-efd4-ab0362f1d667@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 14 Nov 2019 11:27:38 -0800
-Message-ID: <CAMkAt6qfPyqGuNv9gKirote=zj6Vha=9Vu1HSFkxx334s-GV1g@mail.gmail.com>
-Subject: Re: [PATCH v3 01/11] KVM: SVM: Add KVM_SEV SEND_START command
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 14 Nov 2019 12:09:03 -0800
+Message-ID: <CALMp9eQ3NcXOJ9MDMBhm2Fi2cvMW7X5GxVgDw97zS=H5vOMvgw@mail.gmail.com>
+Subject: KVM_GET_SUPPORTED_CPUID
+To:     kvm list <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 2:27 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
->
->
-> On 11/12/19 12:35 PM, Peter Gonda wrote:
-> > On Wed, Jul 10, 2019 at 1:13 PM Singh, Brijesh <brijesh.singh@amd.com> wrote:
-> >> +static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> >> +{
-> >> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> >> +       void *amd_cert = NULL, *session_data = NULL;
-> >> +       void *pdh_cert = NULL, *plat_cert = NULL;
-> >> +       struct sev_data_send_start *data = NULL;
-> >> +       struct kvm_sev_send_start params;
-> >> +       int ret;
-> >> +
-> >> +       if (!sev_guest(kvm))
-> >> +               return -ENOTTY;
-> >> +
-> >> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> >> +                               sizeof(struct kvm_sev_send_start)))
-> >> +               return -EFAULT;
-> >> +
-> >> +       data = kzalloc(sizeof(*data), GFP_KERNEL);
-> >> +       if (!data)
-> >> +               return -ENOMEM;
-> >> +
-> >> +       /* userspace wants to query the session length */
-> >> +       if (!params.session_len)
-> >> +               goto cmd;
-> >> +
-> >> +       if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
-> >> +           !params.session_uaddr)
-> >> +               return -EINVAL;
-> > I think pdh_cert is only required if the guest policy SEV bit is set.
-> > Can pdh_cert be optional?
->
->
-> We don't cache the policy information in kernel, having said so we can
-> try caching it during the LAUNCH_START to optimize this case. I have to
-> check with FW folks but I believe all those fields are required. IIRC,
-> When I passed NULL then SEND_START failed for me. But I double check it
-> and update you on this.
+Can someone explain this ioctl to me? The more I look at it, the less
+sense it makes to me.
 
+Let's start with leaf 0. If I see 0xd in EAX, does that indicate the
+*maximum* supported value in EAX? Or does that mean that only a value
+of 0xd is supported for EAX? If I see "AuthenticAMD" in EBX/EDX/ECX,
+does that mean that "GenuineIntel" is *not* supported? I thought
+people were having reasonable success with cross-vendor migration.
 
-I must have misinterpreted the this line of the spec:
-"If GCTX.POLICY.SEV is 1, the PDH, PEK, CEK, ASK, and ARK certificates
-are validated."
-I thought that since they were not validated they were not needed.
+What about leaf 7 EBX? If a bit is clear, does that mean setting the
+bit is unsupported? If a bit is set, does that mean clearing the bit
+is unsupported? Do those answers still apply for bits 6 and 13, where
+a '1' indicates the absence of a feature?
+
+What about leaf 0xa? Kvm's api.txt says, "Note that certain
+capabilities, such as KVM_CAP_X86_DISABLE_EXITS, may expose cpuid
+features (e.g. MONITOR) which are not supported by kvm in its default
+configuration. If userspace enables such capabilities, it is
+responsible for modifying the results of this ioctl appropriately."
+However, it appears that the vPMU is enabled not by such a capability,
+but by filling in leaf 0xa. How does userspace know what leaf 0xa
+values are supported by both the hardware and kvm?
+
+And as for KVM_CAP_X86_DISABLE_EXITS, in particular, how is userspace
+supposed to know what the appropriate modification to
+KVM_GET_SUPPORTED_CPUID is? Is this documented somewhere else?
+
+And as for the "certain capabilities" clause above, should I assume
+that any capability enabled by userspace may require modifications to
+KVM_GET_SUPPORTED_CPUID?  What might those required modifications be?
+Has anyone thought to document them, or better yet, provide an API to
+get them?
+
+What about the processor brand string in leaves 0x80000000-0x80000004?
+Is a string of NULs really the only supported value?
+
+And just a nit, but why does this ioctl bother returning explicitly
+zeroed leaves for unsupported leaves in range?
+
+It would really be nice if I could use this ioctl to write a
+"HostSupportsGuest" function based in part on an existing guest's
+CPUID information, but that doesn't seem all that feasible, without
+intimate knowledge of how the host's implementation of kvm works.
