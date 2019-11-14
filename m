@@ -2,137 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73815FCAC8
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 17:34:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 671C0FCADD
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 17:39:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbfKNQeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 11:34:46 -0500
-Received: from mga03.intel.com ([134.134.136.65]:27987 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726214AbfKNQeq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 11:34:46 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 08:34:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,304,1569308400"; 
-   d="scan'208";a="216798796"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga002.jf.intel.com with ESMTP; 14 Nov 2019 08:34:45 -0800
-Date:   Thu, 14 Nov 2019 08:34:45 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 1/2] KVM: X86: Single target IPI fastpath
-Message-ID: <20191114163444.GD24045@linux.intel.com>
-References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com>
- <6c2c7bbb-39f4-2a77-632e-7730e9887fc5@redhat.com>
- <20191114152235.GC24045@linux.intel.com>
- <857e6494-4ed8-be4a-c21a-577ab99a5711@redhat.com>
+        id S1726985AbfKNQjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 11:39:06 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44840 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726214AbfKNQjG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 11:39:06 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEGTSp0037845
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 11:39:04 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w998dm906-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 11:39:04 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 14 Nov 2019 16:39:02 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 14 Nov 2019 16:39:00 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEGcxeY53346384
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Nov 2019 16:38:59 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0FFD65204E;
+        Thu, 14 Nov 2019 16:38:59 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.27])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CF7F65204F;
+        Thu, 14 Nov 2019 16:38:58 +0000 (GMT)
+Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+ <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
+ <db451544-fcb1-9d81-7042-ef91c8324204@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 14 Nov 2019 17:38:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <857e6494-4ed8-be4a-c21a-577ab99a5711@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <db451544-fcb1-9d81-7042-ef91c8324204@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19111416-0020-0000-0000-000003863374
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111416-0021-0000-0000-000021DC4B96
+Message-Id: <81ef68d4-5ec5-b14e-6c3d-6935e9a6a1c1@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140149
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 04:44:33PM +0100, Paolo Bonzini wrote:
-> On 14/11/19 16:22, Sean Christopherson wrote:
-> >> Instead of a separate vcpu->fast_vmexit, perhaps you can set exit_reason
-> >> to vmx->exit_reason to -1 if the fast path succeeds.
-> > 
-> > Actually, rather than make this super special case, what about moving the
-> > handling into vmx_handle_exit_irqoff()?  Practically speaking that would
-> > only add ~50 cycles (two VMREADs) relative to the code being run right
-> > after kvm_put_guest_xcr0().  It has the advantage of restoring the host's
-> > hardware breakpoints, preserving a semi-accurate last_guest_tsc, and
-> > running with vcpu->mode set back to OUTSIDE_GUEST_MODE.  Hopefully it'd
-> > also be more intuitive for people unfamiliar with the code.
-> 
-> Yes, that's a good idea.  The expensive bit between handle_exit_irqoff
-> and handle_exit is srcu_read_lock, which has two memory barriers in it.
 
-Preaching to the choir at this point, but it'd also eliminate latency
-spikes due to interrupts.
+On 2019-11-14 10:15, Janosch Frank wrote:
+> On 11/13/19 1:23 PM, Pierre Morel wrote:
+>> This simple test test the I/O reading by the SUB Channel by:
+>> - initializing the Channel SubSystem with predefined CSSID:
+>>    0xfe000000 CSSID for a Virtual CCW
+>>    0x00090000 SSID for CCW-PONG
+>> - initializing the ORB pointing to a single READ CCW
+>> - starts the STSH command with the ORB
+>> - Expect an interrupt
+>> - writes the read data to output
+>>
+>> The test implements lots of traces when DEBUG is on and
+>> tests if memory above the stack is corrupted.
+> What happens if we do not habe the pong device?
 
-> >>> +			if (ret == 0)
-> >>> +				ret = kvm_skip_emulated_instruction(vcpu);
-> >> Please move the "kvm_skip_emulated_instruction(vcpu)" to
-> >> vmx_handle_exit, so that this basically is
-> >>
-> >> #define EXIT_REASON_NEED_SKIP_EMULATED_INSN -1
-> >>
-> >> 	if (ret == 0)
-> >> 		vcpu->exit_reason = EXIT_REASON_NEED_SKIP_EMULATED_INSN;
-> >>
-> >> and handle_ipi_fastpath can return void.
-> >
-> > I'd rather we add a dedicated variable to say the exit has already been
-> > handled.  Overloading exit_reason is bound to cause confusion, and that's
-> > probably a best case scenario.
-> 
-> I proposed the fake exit reason to avoid a ternary return code from
-> handle_ipi_fastpath (return to guest, return to userspace, call
-> kvm_x86_ops->handle_exit), which Wanpeng's patch was mishandling.
+CC error on stsch() which is currently not cached (but will in the next 
+version)
 
-For this case, I think we can get away with a WARN if kvm_lapic_reg_write()
-fails since it (currently) can't fail for ICR.  That would allow us to keep
-a void return for ->handle_exit_irqoff() and avoid an overloaded return
-value.
+CC error on msch() and on ssch() which is cached and makes the test to fail.
 
-And, if the fastpath is used for all ICR writes, not just FIXED+PHYSICAL,
-and is implemented for SVM, then we don't even need a a flag, e.g.
-kvm_x2apic_msr_write() can simply ignore ICR writes, similar to how
-handle_exception() ignores #MC and NMIs.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 87b0fcc23ef8..d7b79f7faac1 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2615,12 +2615,11 @@ int kvm_x2apic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data)
-        if (!lapic_in_kernel(vcpu) || !apic_x2apic_mode(apic))
-                return 1;
+>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h      | 244 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   lib/s390x/css_dump.c | 141 +++++++++++++++++++++++++++++
+> Hmm, what about splitting the patch into css.h/css_dump.c and the actual
+> test in s390x/css.c?
 
--       if (reg == APIC_ICR2)
-+
-+       /* ICR2 writes are ignored and ICR writes are handled early. */
-+       if (reg == APIC_ICR2 || reg == APIC_ICR)
-                return 1;
+OK
 
--       /* if this is ICR write vector before command */
--       if (reg == APIC_ICR)
--               kvm_lapic_reg_write(apic, APIC_ICR2, (u32)(data >> 32));
-        return kvm_lapic_reg_write(apic, reg, (u32)data);
- }
 
-Another bonus to this approach is that the refactoring for the
-exit_reason can be done in a separate series.
+>
+>>   s390x/Makefile       |   2 +
+>>   s390x/css.c          | 222 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg  |   4 +
+>>   5 files changed, 613 insertions(+)
+>>   create mode 100644 lib/s390x/css.h
+>>   create mode 100644 lib/s390x/css_dump.c
+>>   create mode 100644 s390x/css.c
+>>
+>> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+>> new file mode 100644
 
-> To ensure confusion does not become the best case scenario, perhaps it
-> is worth trying to push exit_reason into vcpu_enter_guest's stack.
-> vcpu_enter_guest can pass a pointer to it, and then it can be passed
-> back into kvm_x86_ops->handle_exit{,_irqoff}.  It could be a struct too,
-> instead of just a bare u32.
+OK to all comments...  (I sniped out for clarity)
 
-On the other hand, if it's a bare u32 then kvm_x86_ops->run can simply
-return the value instead of doing out parameter shenanigans.
+...snip...
 
-> This would ensure at compile-time that exit_reason is not accessed
-> outside the short path from vmexit to kvm_x86_ops->handle_exit.
 
-That would be nice.  Surprisingly, the code actually appears to be fairly
-clean, I thought for sure the nested stuff would be using exit_reason all
-over the place.  The only one that needs to be fixed is handle_vmfunc(),
-which passes vmx->exit_reason when forwarding the VM-Exit instead of simply
-hardcoding EXIT_REASON_VMFUNC.
+>> +static char buffer[4096];
+>> +
+>> +static void delay(int d)
+>> +{
+>> +	int i, j;
+>> +
+>> +	while (d--)
+>> +		for (i = 1000000; i; i--)
+>> +			for (j = 1000000; j; j--)
+>> +				;
+>> +}
+> You could set a timer.
+
+
+Hum, do we really want to do this?
+
+
+>
+>> +
+>> +static void set_io_irq_subclass_mask(uint64_t const new_mask)
+>> +{
+>> +	asm volatile (
+>> +		"lctlg %%c6, %%c6, %[source]\n"
+>> +		: /* No outputs */
+>> +		: [source] "R" (new_mask));
+> arch_def.h has lctlg() and ctl_set/clear_bit
+
+
+OK, thanks
+
+
+>
+>> +}
+>> +
+>> +static void set_system_mask(uint8_t new_mask)
+>> +{
+>> +	asm volatile (
+>> +		"ssm %[source]\n"
+>> +		: /* No outputs */
+>> +		: [source] "R" (new_mask));
+>> +}
+>> +
+>> +static void enable_io_irq(void)
+>> +{
+>> +	set_io_irq_subclass_mask(0x00000000ff000000);
+>> +	set_system_mask(PSW_PRG_MASK >> 56);
+> load_psw_mask(extract_psw_mask() | PSW_PRG_MASK); no need for another
+> inline asm function :)
+>
+> Or add a psw_set/clear_bit function and fixup enter_pstate()
+
+I look at this.
+
+
+>
+>> +}
+>> +
+>> +void handle_io_int(sregs_t *regs)
+>> +{
+,,,snip...
+>> +
+>> +	delay(1);
+>> +
+>> +	stsch(CSSID_PONG, &schib);
+>> +	dump_schib(&schib);
+> Is all that dumping necessary or just a dev remainder?
+
+
+it goes in the logs, so I thought it could be interresting to keep it.
+
+
+>
+>> +	DBG("got: %s\n", buffer);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +#define MAX_ERRORS 10
+>> +static int checkmem(phys_addr_t start, phys_addr_t end)
+>> +{
+>> +	phys_addr_t curr;
+>> +	int err = 0;
+>> +
+>> +	for (curr = start; curr != end; curr += PAGE_SIZE)
+>> +		if (memcmp((void *)start, (void *)curr, PAGE_SIZE)) {
+>> +			report("memcmp failed %lx", true, curr);
+> How many errors do you normally run into (hopefully 0)?
+
+
+hopefully.
+
+However I thought it could be interesting to know how many pages have 
+been dirtied.
+
+
+>
+>> +			if (err++ > MAX_ERRORS)
+>> +				break;
+>> +		}
+>> +	return err;
+>> +}
+>> +
+>> +extern unsigned long bss_end;
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +	phys_addr_t base, top;
+>> +	int check_mem = 0;
+>> +	int err = 0;
+>> +
+>> +	if (argc == 2 && !strcmp(argv[1], "-i"))
+>> +		check_mem = 1;
+>> +
+>> +	report_prefix_push("css");
+>> +	phys_alloc_get_unused(&base, &top);
+>> +
+>> +	top = 0x08000000; /* 128MB Need to be updated */
+>> +	base = (phys_addr_t)&stacktop;
+>> +
+>> +	if (check_mem)
+>> +		memset((void *)base, 0x00, top - base);
+>> +
+>> +	if (check_mem)
+>> +		err = checkmem(base, top);
+>> +	if (err)
+>> +		goto out;
+>> +
+>> +	err = css_run(0);
+>> +	if (err)
+>> +		goto out;
+>> +
+>> +	if (check_mem)
+>> +		err = checkmem(base, top);
+>> +
+>> +out:
+>> +	if (err)
+>> +		report("Tested", 0);
+>> +	else
+>> +		report("Tested", 1);
+> Normally we report the sucsess or failure of single actions and a
+> summary will tell us if the whole test ran into errors.
+
+Right, will be enhanced.
+
+Thanks for the comments.
+
+Regards,
+
+Pierre
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
+
