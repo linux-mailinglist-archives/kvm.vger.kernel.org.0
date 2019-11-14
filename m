@@ -2,63 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52275FC995
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AD42FC9A3
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:15:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727041AbfKNPKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 10:10:52 -0500
-Received: from mga09.intel.com ([134.134.136.24]:50143 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726214AbfKNPKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 10:10:52 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 07:10:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,304,1569308400"; 
-   d="scan'208";a="379601037"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga005.jf.intel.com with ESMTP; 14 Nov 2019 07:10:51 -0800
-Date:   Thu, 14 Nov 2019 07:10:51 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: Take slots_lock when using
- kvm_mmu_zap_all_fast()
-Message-ID: <20191114151051.GB24045@linux.intel.com>
-References: <20191113193032.12912-1-sean.j.christopherson@intel.com>
- <1b46d531-6423-3ccc-fc5f-df6fbaa02557@redhat.com>
+        id S1726482AbfKNPPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:15:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32747 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726179AbfKNPPy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:15:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573744553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9nm7qa9QDVub7198Yoayd+jd7gSzFXSMeqbfa75+yNE=;
+        b=SwtKux8UNX7z16wwgFfhFJS/4E32LKcJrm0wykSKsRu3swGvm/bpCA8wzKn3o5BwupyhH8
+        WYtLzyHXttqRKnbsFG2mM4VmQnVGQ/92uJ5utNp+YGPYl4HtIvLpGUQCfl0vldx2zjfY+b
+        m6JirT3ZzyYGpGPqXzLiZFPOz8aleVQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-ZiS27w5VPQysJLVQ7ZBBuw-1; Thu, 14 Nov 2019 10:15:50 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A923CDBCC;
+        Thu, 14 Nov 2019 15:15:48 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C54C96364A;
+        Thu, 14 Nov 2019 15:15:28 +0000 (UTC)
+Date:   Thu, 14 Nov 2019 16:15:26 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 17/37] DOCUMENTATION: protvirt: Instruction emulation
+Message-ID: <20191114161526.1100f4fe.cohuck@redhat.com>
+In-Reply-To: <20191024114059.102802-18-frankja@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-18-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b46d531-6423-3ccc-fc5f-df6fbaa02557@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ZiS27w5VPQysJLVQ7ZBBuw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 01:16:21PM +0100, Paolo Bonzini wrote:
-> On 13/11/19 20:30, Sean Christopherson wrote:
-> > Failing to take slots_lock when toggling nx_huge_pages allows multiple
-> > instances of kvm_mmu_zap_all_fast() to run concurrently, as the other
-> > user, KVM_SET_USER_MEMORY_REGION, does not take the global kvm_lock.
-> > Concurrent fast zap instances causes obsolete shadow pages to be
-> > incorrectly identified as valid due to the single bit generation number
-> > wrapping, which results in stale shadow pages being left in KVM's MMU
-> > and leads to all sorts of undesirable behavior.
-> 
-> Indeed the current code fails lockdep miserably, but isn't the whole
-> body of kvm_mmu_zap_all_fast() covered by kvm->mmu_lock?  What kind of
-> badness can happen if kvm->slots_lock isn't taken?
+On Thu, 24 Oct 2019 07:40:39 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-kvm_zap_obsolete_pages() temporarily drops mmu_lock and reschedules so
-that it doesn't block other vCPUS from inserting shadow pages into the new
-generation of the mmu.
+> As guest memory is inaccessible and information about the guest's
+> state is very limited, new ways for instruction emulation have been
+> introduced.
+>=20
+> With a bounce area for guest GRs and instruction data, guest state
+> leaks can be limited by the Ultravisor. KVM now has to move
+> instruction input and output through these areas.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  Documentation/virtual/kvm/s390-pv.txt | 47 +++++++++++++++++++++++++++
+>  1 file changed, 47 insertions(+)
+>=20
+> diff --git a/Documentation/virtual/kvm/s390-pv.txt b/Documentation/virtua=
+l/kvm/s390-pv.txt
+> index e09f2dc5f164..cb08d78a7922 100644
+> --- a/Documentation/virtual/kvm/s390-pv.txt
+> +++ b/Documentation/virtual/kvm/s390-pv.txt
+> @@ -48,3 +48,50 @@ interception codes have been introduced. One which tel=
+ls us that CRs
+>  have changed. And one for PSW bit 13 changes. The CRs and the PSW in
+>  the state description only contain the mask bits and no further info
+>  like the current instruction address.
+> +
+> +
+> +Instruction emulation:
+> +With the format 4 state description the SIE instruction already
+
+s/description/description,/
+
+> +interprets more instructions than it does with format 2. As it is not
+> +able to interpret all instruction, the SIE and the UV safeguard KVM's
+
+s/instruction/instructions/
+
+> +emulation inputs and outputs.
+> +
+> +Guest GRs and most of the instruction data, like IO data structures
+
+Hm, what 'IO data structures'?
+
+> +are filtered. Instruction data is copied to and from the Secure
+> +Instruction Data Area. Guest GRs are put into / retrieved from the
+> +Interception-Data block.
+> +
+> +The Interception-Data block from the state description's offset 0x380
+> +contains GRs 0 - 16. Only GR values needed to emulate an instruction
+> +will be copied into this area.
+> +
+> +The Interception Parameters state description field still contains the
+> +the bytes of the instruction text but with pre-set register
+> +values. I.e. each instruction always uses the same instruction text,
+> +to not leak guest instruction text.
+> +
+> +The Secure Instruction Data Area contains instruction storage
+> +data. Data for diag 500 is exempt from that and has to be moved
+> +through shared buffers to KVM.
+
+I find this paragraph a bit confusing. What does that imply for diag
+500 interception? Data is still present in gprs 1-4?
+
+(Also, why only diag 500? Because it is the 'reserved for kvm' diagnose
+call?)
+
+> +
+> +When SIE intercepts an instruction, it will only allow data and
+> +program interrupts for this instruction to be moved to the guest via
+> +the two data areas discussed before. Other data is ignored or results
+> +in validity interceptions.
+> +
+> +
+> +Instruction emulation interceptions:
+> +There are two types of SIE secure instruction intercepts. The normal
+> +and the notification type. Normal secure instruction intercepts will
+> +make the guest pending for instruction completion of the intercepted
+> +instruction type, i.e. on SIE entry it is attempted to complete
+> +emulation of the instruction with the data provided by KVM. That might
+> +be a program exception or instruction completion.
+> +
+> +The notification type intercepts inform KVM about guest environment
+> +changes due to guest instruction interpretation. Such an interception
+
+'interpretation by SIE' ?
+
+> +is recognized for the store prefix instruction and provides the new
+> +lowcore location for mapping change notification arming. Any KVM data
+> +in the data areas is ignored, program exceptions are not injected and
+> +execution continues on next SIE entry, as if no intercept had
+> +happened.
+
