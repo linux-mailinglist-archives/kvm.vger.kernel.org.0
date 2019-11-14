@@ -2,114 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FF9DFC9DF
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:25:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2472FC9E1
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:25:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726949AbfKNPZ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 10:25:28 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34001 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726251AbfKNPZ2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:25:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573745127;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MKYCmTxFGEQzkrZiaOpvhYM9V1nG/QF6MJIc5vMkLeI=;
-        b=LLUf7tbAaaaioFBZh6VF6Wof4YmVD6TjUqOGyAqojNYNQ/JN42Xgnoysvro4gRuu50si8H
-        EOYouIzxdVBtCSnUNVi4vDQ2xHSL0mhbR7fxtCDtqHLUjNidXCQhYS9dNTztBEQuZKtePI
-        PyAbVhH/vbMkzOMr6wlT613sZar+O8Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-vNWIDD47P8GHiiRCelpfhQ-1; Thu, 14 Nov 2019 10:25:23 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4998107ACC6;
-        Thu, 14 Nov 2019 15:25:22 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 991B85D9E2;
-        Thu, 14 Nov 2019 15:25:22 +0000 (UTC)
-Received: from zmail19.collab.prod.int.phx2.redhat.com (zmail19.collab.prod.int.phx2.redhat.com [10.5.83.22])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 6CD6A182B00E;
-        Thu, 14 Nov 2019 15:25:22 +0000 (UTC)
-From:   David Hildenbrand <dhildenb@redhat.com>
+        id S1727054AbfKNPZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:25:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10872 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726997AbfKNPZm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:25:42 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEFOh4Z086326
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:25:40 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2w9985s3hp-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:25:40 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 14 Nov 2019 15:25:34 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 14 Nov 2019 15:25:30 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEFPTYx48300172
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Nov 2019 15:25:29 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A295E5204F;
+        Thu, 14 Nov 2019 15:25:29 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.27])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6AEC15204E;
+        Thu, 14 Nov 2019 15:25:29 +0000 (GMT)
+Subject: Re: [PATCH v1 2/4] s390x: Define the PSW bits
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+ <1573647799-30584-3-git-send-email-pmorel@linux.ibm.com>
+ <5796f620-7ee6-6333-e4f4-5e904284a331@linux.ibm.com>
+ <189f8129-86c5-8761-fdfe-d08c34fb1f18@linux.ibm.com>
+ <e27023c2-5f9c-884d-e194-4420ec6e3023@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 14 Nov 2019 16:25:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 1/4] s390x: saving regs for interrupts
-Date:   Thu, 14 Nov 2019 10:25:22 -0500 (EST)
-Message-Id: <7C13E9AB-F26B-439B-A170-F187BC1E1136@redhat.com>
-References: <6c84ade5-8a42-9c73-abff-47e019fc11bd@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, thuth@redhat.com
-In-Reply-To: <6c84ade5-8a42-9c73-abff-47e019fc11bd@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Thread-Topic: s390x: saving regs for interrupts
-Thread-Index: 2ipOXvAHQqaDJRwVmNe/3QfngCvL3Q==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: vNWIDD47P8GHiiRCelpfhQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+In-Reply-To: <e27023c2-5f9c-884d-e194-4420ec6e3023@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19111415-0016-0000-0000-000002C3A4BD
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111415-0017-0000-0000-00003325476C
+Message-Id: <33163b34-247d-71b2-54a3-8a6b476b7157@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=763 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140142
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gQW0gMTQuMTEuMjAxOSB1bSAxNjoyMSBzY2hyaWViIFBpZXJyZSBNb3JlbCA8cG1vcmVs
-QGxpbnV4LmlibS5jb20+Og0KPiANCj4g77u/DQo+PiBPbiAyMDE5LTExLTE0IDEzOjExLCBEYXZp
-ZCBIaWxkZW5icmFuZCB3cm90ZToNCj4+PiBPbiAxNC4xMS4xOSAxMjo1NywgUGllcnJlIE1vcmVs
-IHdyb3RlOg0KPj4+IA0KPj4+IE9uIDIwMTktMTEtMTQgMTE6MjgsIERhdmlkIEhpbGRlbmJyYW5k
-IHdyb3RlOg0KPj4+PiANCj4+Pj4+IEFtIDE0LjExLjIwMTkgdW0gMTE6MTEgc2NocmllYiBQaWVy
-cmUgTW9yZWwgPHBtb3JlbEBsaW51eC5pYm0uY29tPjoNCj4+Pj4+IA0KPj4+Pj4g77u/DQo+Pj4+
-Pj4gT24gMjAxOS0xMS0xMyAxNzoxMiwgSmFub3NjaCBGcmFuayB3cm90ZToNCj4+Pj4+Pj4gT24g
-MTEvMTMvMTkgMToyMyBQTSwgUGllcnJlIE1vcmVsIHdyb3RlOg0KPj4+Pj4+PiBJZiB3ZSB1c2Ug
-bXVsdGlwbGUgc291cmNlIG9mIGludGVycnVwdHMsIGZvciBleGVtcGxlLCB1c2luZyBTQ0xQIGNv
-bnNvbGUNCj4+Pj4+Pj4gdG8gcHJpbnQgaW5mb3JtYXRpb24gd2hpbGUgdXNpbmcgSS9PIGludGVy
-cnVwdHMgb3IgZHVyaW5nIGV4Y2VwdGlvbnMsIHdlDQo+Pj4+Pj4+IG5lZWQgdG8gaGF2ZSBhIHJl
-LWVudHJhbnQgcmVnaXN0ZXIgc2F2aW5nIGludGVycnVwdGlvbiBoYW5kbGluZy4NCj4+Pj4+Pj4g
-DQo+Pj4+Pj4+IEluc3RlYWQgb2Ygc2F2aW5nIGF0IGEgc3RhdGljIHBsYWNlLCBsZXQncyBzYXZl
-IHRoZSBiYXNlIHJlZ2lzdGVycyBvbg0KPj4+Pj4+PiB0aGUgc3RhY2suDQo+Pj4+Pj4+IA0KPj4+
-Pj4+PiBOb3RlIHRoYXQgd2Uga2VlcCB0aGUgc3RhdGljIHJlZ2lzdGVyIHNhdmluZyB0aGF0IHdl
-IG5lZWQgZm9yIHRoZSBSRVNFVA0KPj4+Pj4+PiB0ZXN0cy4NCj4+Pj4+Pj4gDQo+Pj4+Pj4+IFdl
-IGFsc28gY2FyZSB0byBnaXZlIHRoZSBoYW5kbGVycyBhIHBvaW50ZXIgdG8gdGhlIHNhdmUgcmVn
-aXN0ZXJzIGluDQo+Pj4+Pj4+IGNhc2UgdGhlIGhhbmRsZXIgbmVlZHMgaXQgKGZpeHVwX3BnbV9p
-bnQgbmVlZHMgdGhlIG9sZCBwc3cgYWRkcmVzcykuDQo+Pj4+Pj4gU28geW91J3JlIHN0aWxsIGln
-bm9yaW5nIHRoZSBGUFJzLi4uDQo+Pj4+Pj4gSSBkaXNhc3NlbWJsZWQgYSB0ZXN0IGFuZCBsb29r
-ZWQgYXQgYWxsIHN0ZHMgYW5kIGl0IGxvb2tzIGxpa2UgcHJpbnRmDQo+Pj4+Pj4gYW5kIHJlbGF0
-ZWQgZnVuY3Rpb25zIHVzZSB0aGVtLiBXb3VsZG4ndCB3ZSBvdmVyd3JpdGUgdGVzdCBGUFJzIGlm
-DQo+Pj4+Pj4gcHJpbnRpbmcgaW4gYSBoYW5kbGVyPw0KPj4+Pj4gSWYgcHJpbnRmIHVzZXMgdGhl
-IEZQUnMgaW4gbXkgb3BpbmlvbiB3ZSBzaG91bGQgbW9kaWZ5IHRoZSBjb21waWxhdGlvbiBvcHRp
-b25zIGZvciB0aGUgbGlicmFyeS4NCj4+Pj4+IA0KPj4+Pj4gV2hhdCBpcyB0aGUgcmVhc29uIGZv
-ciBwcmludGYgYW5kIHJlbGF0ZWQgZnVuY3Rpb25zIHRvIHVzZSBmbG9hdGluZyBwb2ludD8NCj4+
-Pj4+IA0KPj4+PiBSZWdpc3RlciBzcGlsbGluZy4gVGhpcyBjYW4gYW5kIHdpbGwgYmUgZG9uZS4N
-Cj4+PiANCj4+PiANCj4+PiBIdW0sIGNhbiB5b3UgcGxlYXNlIGNsYXJpZnk/DQo+Pj4gDQo+Pj4g
-QUZBSUsgcmVnaXN0ZXIgc3BpbGxpbmcgaXMgZm9yIGEgY29tcGlsZXIsIHRvIHVzZSBtZW1vcnkg
-aWYgaXQgaGFzIG5vdA0KPj4+IGVub3VnaCByZWdpc3RlcnMuDQo+PiANCj4+IE5vdCBzdHJpY3Rs
-eSBtZW1vcnkuIElmIHRoZSBjb21waWxlciBuZWVkcyBtb3JlIEdQUlMsIGl0IGNhbiBzYXZlL3Jl
-c3RvcmUgR1BSUyB0byBGUFJTLg0KPj4gDQo+PiBBbnkgZnVuY3Rpb24gdGhlIGNvbXBpbGVyIGdl
-bmVyYXRlcyBpcyBmcmVlIHRvIHVzZSB0aGUgRlBSUy4uDQo+PiANCj4+PiANCj4+PiBTbyB5b3Vy
-IGFuc3dlciBpcyBmb3IgdGhlIG15IGZpcnN0IHNlbnRlbmNlLCBtZWFuaW5nIHllcyByZWdpc3Rl
-cg0KPj4+IHNwaWxsaW5nIHdpbGwgYmUgZG9uZQ0KPj4+IG9yDQo+Pj4gZG8geW91IG1lYW4gcmVn
-aXN0ZXIgc3BpbGxpbmcgaXMgdGhlIHJlYXNvbiB3aHkgdGhlIGNvbXBpbGVyIHVzZSBGUFJzDQo+
-Pj4gYW5kIGl0IG11c3QgYmUgZG9uZSBzbz8NCj4+IA0KPj4gQ29uZnVzZWQgYnkgYm90aCBvcHRp
-b25zIDpEIFRoZSBjb21waWxlciBtaWdodCBnZW5lcmF0ZSBjb2RlIHRoYXQgdXNlcyB0aGUgRlBS
-UyBhbHRob3VnaCBubyBmbG9hdGluZyBwb2ludCBpbnN0cnVjdGlvbnMgYXJlIGluIHVzZS4gVGhh
-dCdzIHdoeSB3ZSBoYXZlIHRvIGVuYWJsZSB0aGUgQUZQIGNvbnRyb2wgYW5kIHByb3Blcmx5IHRh
-a2UgY2FyZSBvZiBGUFJTIGJlaW5nIHVzZWQuDQo+PiANCj4+IA0KPiBUaGUgY29tcGlsZXIgaGFz
-IHRoZSAtbXNvZnQtZmxvYXQgc3dpdGNoIHRvIGF2b2lkIHVzaW5nIHRoZSBmbG9hdGluZyBwb2lu
-dCBpbnN0cnVjdGlvbnMgYW5kIHJlZ2lzdGVycywgc28gaXQgaXMgb3VyIGRlY2lzaW9uLg0KDQpO
-bywgbm90IHJlZ2lzdGVycyBBRkFJSy4NCg0KPiANCj4gU2F2aW5nIHRoZSBGUCByZWdpc3RlcnMg
-b24gZXhjZXB0aW9ucyBpcyBub3QgdmVyeSBlZmZpY2llbnQsIHdlIGxvb3NlIHRpbWUgb24gZWFj
-aCBpbnRlcnJ1cHQsIG5vdCBzdXJlIHRoYXQgd2Ugd2luIGl0IGJhY2sgYnkgdXNpbmcgRlByZWdz
-IHRvIGFzIFJlZ3MgYmFja3VwLg0KDQpXaG8gb24gZWFydGggY2FyZXMgYWJvdXQgcGVyZm9ybWFu
-Y2UgaGVyZT8NCg0KPiANCj4gVXN1YWxseSBhIHN5c3RlbSBhdCBsb3cgbGV2ZWwgdXNlcyBzb21l
-IGVudGVyX2ZwdSwgbGVhdmVfZnB1IHJvdXRpbmUgdG8gZW50ZXIgY3JpdGljYWwgc2VjdGlvbnMg
-dXNpbmcgRlBVIGluc3RlYWQgb2YgbG9zaW5nIHRpbWUgb24gZWFjaCBpbnRlcnJ1cHRpb25zLg0K
-PiANCj4gV2UgY2FuIHRoaW5rIGFib3V0IHRoaXMsIGluIGJldHdlZW4gSSBkbyBhcyB5b3UgcmVj
-b21hbmQgYW5kIHNhdmUgdGhlIEZQcmVncyB0b28uDQo+IA0KPiBCZXN0IHJlZ2FyZHMsDQo+IA0K
-PiBQaWVycmUNCj4gDQo+IA0KPiAtLSANCj4gUGllcnJlIE1vcmVsDQo+IElCTSBMYWIgQm9lYmxp
-bmdlbg0KPiANCg==
+
+On 2019-11-14 09:53, Janosch Frank wrote:
+> On 11/14/19 9:40 AM, Pierre Morel wrote:
+>> On 2019-11-13 17:05, Janosch Frank wrote:
+>>> On 11/13/19 1:23 PM, Pierre Morel wrote:
+>>>> Instead of assigning obfuscated masks to the PSW dedicated to the
+>>>> exceptions, let's define the masks explicitely, it will clarify the
+>>> s/explicitely/explicitly/
+>>> Try to break that up into sentences.
+>> OK thx
+...snip...
+>>>> +
+>>>> +#define PSW_EXCEPTION_MASK (PSW_MASK_EA|PSW_MASK_BA)
+>>> That's not a bit anymore, shouldn't that be in arch_def.h?
+>>> Also please add a comment, that this is 64 bit addressing.
+>>
+>> Don't we use the 64bit architecture only?
+> architecture != addressing
+> We can do 24 bit addressing on zArch...
+> We mostly use ESAME (zArch), but old machines start up in the old mode
+> and then we transition to zArch via a SIGP.
+
+
+Yes, this is done during the first instructions of cstart.S:
+
+- Setting the architecture to 64bit / ESAME using SIGP
+
+- Set addressing mode to 64bit
+
+After that AFAIK we never change the addressing mode.
+
+The definitions in the file are intended for PSW flags which AFAIK are 
+always 64bits.
+
+I created arch_bits.h to avoid using arch_def.h which contains C 
+structures and functions, so preventing to include it in assembler files.
+
+
+Regards,
+
+Pierre
+
+
+>
+>> Regards,
+>>
+>> Pierre
+>>
+>>
+>
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
