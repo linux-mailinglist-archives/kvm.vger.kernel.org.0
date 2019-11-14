@@ -2,72 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FE7CFC941
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 15:50:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52275FC995
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:10:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbfKNOu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 09:50:26 -0500
-Received: from foss.arm.com ([217.140.110.172]:44494 "EHLO foss.arm.com"
+        id S1727041AbfKNPKw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:10:52 -0500
+Received: from mga09.intel.com ([134.134.136.24]:50143 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726452AbfKNOu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 09:50:26 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFFED328;
-        Thu, 14 Nov 2019 06:50:25 -0800 (PST)
-Received: from [10.1.32.172] (e121487-lin.cambridge.arm.com [10.1.32.172])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A1423F52E;
-        Thu, 14 Nov 2019 06:50:24 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 09/17] arm: gic: Add test for flipping
- GICD_CTLR.DS
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-10-andre.przywara@arm.com>
- <2e14ccd4-89f4-aa90-cc58-bebf0e2eeede@arm.com>
- <7ca57a0c-3934-1778-e3f9-a3eee0658002@arm.com>
- <20191114141745.32d3b89c@donnerap.cambridge.arm.com>
-From:   Vladimir Murzin <vladimir.murzin@arm.com>
-Message-ID: <90cdc695-f761-26bd-d2a7-f8655ce04463@arm.com>
-Date:   Thu, 14 Nov 2019 14:50:22 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726214AbfKNPKw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 10:10:52 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 07:10:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,304,1569308400"; 
+   d="scan'208";a="379601037"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga005.jf.intel.com with ESMTP; 14 Nov 2019 07:10:51 -0800
+Date:   Thu, 14 Nov 2019 07:10:51 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/mmu: Take slots_lock when using
+ kvm_mmu_zap_all_fast()
+Message-ID: <20191114151051.GB24045@linux.intel.com>
+References: <20191113193032.12912-1-sean.j.christopherson@intel.com>
+ <1b46d531-6423-3ccc-fc5f-df6fbaa02557@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191114141745.32d3b89c@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b46d531-6423-3ccc-fc5f-df6fbaa02557@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/14/19 2:17 PM, Andre Przywara wrote:
-> On Thu, 14 Nov 2019 13:39:33 +0000
-> Vladimir Murzin <vladimir.murzin@arm.com> wrote:
+On Thu, Nov 14, 2019 at 01:16:21PM +0100, Paolo Bonzini wrote:
+> On 13/11/19 20:30, Sean Christopherson wrote:
+> > Failing to take slots_lock when toggling nx_huge_pages allows multiple
+> > instances of kvm_mmu_zap_all_fast() to run concurrently, as the other
+> > user, KVM_SET_USER_MEMORY_REGION, does not take the global kvm_lock.
+> > Concurrent fast zap instances causes obsolete shadow pages to be
+> > incorrectly identified as valid due to the single bit generation number
+> > wrapping, which results in stale shadow pages being left in KVM's MMU
+> > and leads to all sorts of undesirable behavior.
 > 
->> Hi,
->>
->> On 11/12/19 4:42 PM, Alexandru Elisei wrote:
->>> Are we not testing KVM? Why are we not treating a behaviour different than what
->>> KVM should emulate as a fail?
->>
->> Can kvm-unit-tests be run with qemu TCG?
-> 
-> Yes, it does that actually by default if you cross compile. I also tested this explicitly on TCG: unlike KVM that actually passes all those tests.
-> If you set the environment variable ACCEL to either tcg or kvm, you can select this at runtime:
-> $ ACCEL=tcg arm/run arm/gic.flat -smp 3 -append irq
+> Indeed the current code fails lockdep miserably, but isn't the whole
+> body of kvm_mmu_zap_all_fast() covered by kvm->mmu_lock?  What kind of
+> badness can happen if kvm->slots_lock isn't taken?
 
-Great! Then, IMO, it is absolutely valid to test this functionality!
-
-Thanks
-Vladimir
-
-> 
-> Cheers,
-> Andre
-> 
-
+kvm_zap_obsolete_pages() temporarily drops mmu_lock and reschedules so
+that it doesn't block other vCPUS from inserting shadow pages into the new
+generation of the mmu.
