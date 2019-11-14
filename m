@@ -2,54 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40A17FCA54
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:55:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C458DFCA5B
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:56:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbfKNPzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 10:55:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58372 "EHLO
+        id S1726717AbfKNP4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:56:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28930 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726339AbfKNPzz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:55:55 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEFt66p050143
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:55:53 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w99e2sa12-1
+        by vger.kernel.org with ESMTP id S1726516AbfKNP4t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:56:49 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEFtWcD141274
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:56:48 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w91m7qyg0-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:55:53 -0500
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:56:46 -0500
 Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Thu, 14 Nov 2019 15:55:51 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 14 Nov 2019 15:56:16 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 14 Nov 2019 15:55:49 -0000
+        Thu, 14 Nov 2019 15:56:14 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEFtlVl51052666
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEFuCYl32636988
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Nov 2019 15:55:48 GMT
+        Thu, 14 Nov 2019 15:56:12 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9AB8A4054;
-        Thu, 14 Nov 2019 15:55:47 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BEBD6A4066;
+        Thu, 14 Nov 2019 15:56:12 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6F444A405C;
-        Thu, 14 Nov 2019 15:55:47 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 65672A405B;
+        Thu, 14 Nov 2019 15:56:12 +0000 (GMT)
 Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Nov 2019 15:55:47 +0000 (GMT)
-Subject: Re: [RFC 17/37] DOCUMENTATION: protvirt: Instruction emulation
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
-        mimu@linux.ibm.com, gor@linux.ibm.com
+        Thu, 14 Nov 2019 15:56:12 +0000 (GMT)
+Subject: Re: [RFC 19/37] KVM: s390: protvirt: Add new gprs location handling
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-18-frankja@linux.ibm.com>
- <20191114161526.1100f4fe.cohuck@redhat.com>
- <20191114162024.13f17aa9@p-imbrenda.boeblingen.de.ibm.com>
- <20191114164136.0be3f058.cohuck@redhat.com>
+ <20191024114059.102802-20-frankja@linux.ibm.com>
+ <049b8634-c195-4b3f-4d9c-83a1df7f03f7@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -93,19 +91,19 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Thu, 14 Nov 2019 16:55:46 +0100
+Date:   Thu, 14 Nov 2019 16:56:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191114164136.0be3f058.cohuck@redhat.com>
+In-Reply-To: <049b8634-c195-4b3f-4d9c-83a1df7f03f7@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7oTW1KzE7oZpXbnhSASZuIPVL0KnmW5c6"
+ boundary="qp2B3f9A6X4xMio4GmyZAWUKMhSuyCZMH"
 X-TM-AS-GCONF: 00
-x-cbid: 19111415-0012-0000-0000-00000363A2F8
+x-cbid: 19111415-0016-0000-0000-000002C3A681
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111415-0013-0000-0000-0000219F1D0B
-Message-Id: <b94125ec-256c-7d7b-929e-fdbabcacb142@linux.ibm.com>
+x-cbparentid: 19111415-0017-0000-0000-00003325495C
+Message-Id: <80d53c48-25a3-8ec8-ee94-1f7854522df6@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_04:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -119,167 +117,76 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7oTW1KzE7oZpXbnhSASZuIPVL0KnmW5c6
-Content-Type: multipart/mixed; boundary="SFGLotJ7JEKaTdK83l8JHuGv6NCstqEFP"
+--qp2B3f9A6X4xMio4GmyZAWUKMhSuyCZMH
+Content-Type: multipart/mixed; boundary="MbsG7KSxNzr6i7hWAKRffv5hJS8klzuE6"
 
---SFGLotJ7JEKaTdK83l8JHuGv6NCstqEFP
-Content-Type: text/plain; charset=windows-1252
+--MbsG7KSxNzr6i7hWAKRffv5hJS8klzuE6
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/14/19 4:41 PM, Cornelia Huck wrote:
-> On Thu, 14 Nov 2019 16:20:24 +0100
-> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
->=20
->> On Thu, 14 Nov 2019 16:15:26 +0100
->> Cornelia Huck <cohuck@redhat.com> wrote:
+On 11/14/19 3:44 PM, Thomas Huth wrote:
+> On 24/10/2019 13.40, Janosch Frank wrote:
+>> Guest registers for protected guests are stored at offset 0x380.
 >>
->>> On Thu, 24 Oct 2019 07:40:39 -0400
->>> Janosch Frank <frankja@linux.ibm.com> wrote:
->>>  =20
->>>> As guest memory is inaccessible and information about the guest's
->>>> state is very limited, new ways for instruction emulation have been
->>>> introduced.
->>>>
->>>> With a bounce area for guest GRs and instruction data, guest state
->>>> leaks can be limited by the Ultravisor. KVM now has to move
->>>> instruction input and output through these areas.
->>>>
->>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>> ---
->>>>  Documentation/virtual/kvm/s390-pv.txt | 47
->>>> +++++++++++++++++++++++++++ 1 file changed, 47 insertions(+)
->>>>
->>>> diff --git a/Documentation/virtual/kvm/s390-pv.txt
->>>> b/Documentation/virtual/kvm/s390-pv.txt index
->>>> e09f2dc5f164..cb08d78a7922 100644 ---
->>>> a/Documentation/virtual/kvm/s390-pv.txt +++
->>>> b/Documentation/virtual/kvm/s390-pv.txt @@ -48,3 +48,50 @@
->>>> interception codes have been introduced. One which tells us that
->>>> CRs have changed. And one for PSW bit 13 changes. The CRs and the
->>>> PSW in the state description only contain the mask bits and no
->>>> further info like the current instruction address. +
->>>> +
->>>> +Instruction emulation:
->>>> +With the format 4 state description the SIE instruction already    =
-
->>>
->>> s/description/description,/
->>>  =20
->>>> +interprets more instructions than it does with format 2. As it is
->>>> not +able to interpret all instruction, the SIE and the UV
->>>> safeguard KVM's   =20
->>>
->>> s/instruction/instructions/
->>>  =20
->>>> +emulation inputs and outputs.
->>>> +
->>>> +Guest GRs and most of the instruction data, like IO data
->>>> structures   =20
->>>
->>> Hm, what 'IO data structures'? =20
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h |  4 +++-
+>>  arch/s390/kvm/kvm-s390.c         | 11 +++++++++++
+>>  2 files changed, 14 insertions(+), 1 deletion(-)
 >>
->> the various IRB and ORB of I/O instructions
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/=
+kvm_host.h
+>> index 0ab309b7bf4c..5deabf9734d9 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -336,7 +336,9 @@ struct kvm_s390_itdb {
+>>  struct sie_page {
+>>  	struct kvm_s390_sie_block sie_block;
+>>  	struct mcck_volatile_info mcck_info;	/* 0x0200 */
+>> -	__u8 reserved218[1000];		/* 0x0218 */
+>> +	__u8 reserved218[360];		/* 0x0218 */
+>> +	__u64 pv_grregs[16];		/* 0x380 */
+>> +	__u8 reserved400[512];
 >=20
-> Would be good to mention them as examples :)
->=20
->>
->>>> +are filtered. Instruction data is copied to and from the Secure
->>>> +Instruction Data Area. Guest GRs are put into / retrieved from the
->>>> +Interception-Data block.
->>>> +
->>>> +The Interception-Data block from the state description's offset
->>>> 0x380 +contains GRs 0 - 16. Only GR values needed to emulate an
->>>> instruction +will be copied into this area.
->>>> +
->>>> +The Interception Parameters state description field still contains
->>>> the +the bytes of the instruction text but with pre-set register
->>>> +values. I.e. each instruction always uses the same instruction
->>>> text, +to not leak guest instruction text.
->>>> +
->>>> +The Secure Instruction Data Area contains instruction storage
->>>> +data. Data for diag 500 is exempt from that and has to be moved
->>>> +through shared buffers to KVM.   =20
->>>
->>> I find this paragraph a bit confusing. What does that imply for diag
->>> 500 interception? Data is still present in gprs 1-4? =20
->>
->> no registers are leaked in the registers. registers are always only
->> exposed through the state description.
->=20
-> So, what is so special about diag 500, then?
+> Maybe add a "/* 0x400 */" comment to be consisten with the other lines?=
 
-That's mostly a confusion on my side.
-The SIDAD is 4k max, so we can only move IO "management" data over it
-like ORBs and stuff. My intention was to point out, that the data which
-is to be transferred (disk contents, etc.) can't go over the SIDAD but
-needs to be in a shared page.
 
-diag500 was mostly a notification mechanism without a lot of data, right?=
-
+Sure
 
 >=20
->>
->>> (Also, why only diag 500? Because it is the 'reserved for kvm'
->>> diagnose call?)
->>>  =20
->>>> +
->>>> +When SIE intercepts an instruction, it will only allow data and
->>>> +program interrupts for this instruction to be moved to the guest
->>>> via +the two data areas discussed before. Other data is ignored or
->>>> results +in validity interceptions.
->>>> +
->>>> +
->>>> +Instruction emulation interceptions:
->>>> +There are two types of SIE secure instruction intercepts. The
->>>> normal +and the notification type. Normal secure instruction
->>>> intercepts will +make the guest pending for instruction completion
->>>> of the intercepted +instruction type, i.e. on SIE entry it is
->>>> attempted to complete +emulation of the instruction with the data
->>>> provided by KVM. That might +be a program exception or instruction
->>>> completion. +
->>>> +The notification type intercepts inform KVM about guest environment=
-
->>>> +changes due to guest instruction interpretation. Such an
->>>> interception   =20
->>>
->>> 'interpretation by SIE' ?
->>>  =20
->>>> +is recognized for the store prefix instruction and provides the new=
-
->>>> +lowcore location for mapping change notification arming. Any KVM
->>>> data +in the data areas is ignored, program exceptions are not
->>>> injected and +execution continues on next SIE entry, as if no
->>>> intercept had +happened.   =20
->>>  =20
->>
+>>  	struct kvm_s390_itdb itdb;	/* 0x0600 */
+>>  	__u8 reserved700[2304];		/* 0x0700 */
+>>  };
+>=20
+>  Thomas
 >=20
 
 
 
---SFGLotJ7JEKaTdK83l8JHuGv6NCstqEFP--
+--MbsG7KSxNzr6i7hWAKRffv5hJS8klzuE6--
 
---7oTW1KzE7oZpXbnhSASZuIPVL0KnmW5c6
+--qp2B3f9A6X4xMio4GmyZAWUKMhSuyCZMH
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3NeQMACgkQ41TmuOI4
-ufjymxAAkKvX6s0mMCFk64FWdTfj9/62C/uTkTBXN7gGMnyYjYcBsyaIMbXA2OZ5
-Ca7vMI4oIXHAPn08v4VNXtqgZu2vrsFCnrdnuws9mHNDdoPn9p4vl3Q8ECvVzG1m
-WxtjtXKbtzUFDGvSfET3vLBJJjw1F3vtBWBLvbwyvLY24GhG8x4Zcagz9AoJhEzr
-fKL4rwWyUD9RF7f525UYFUsPnoajW5korofNteYnyUxCQzuASZzC9cGTNjRw2h+a
-3INbuX6nzq9hgrth9YQqhU/X0kGTQVC1A3qwc41EHtcMLXsUhm2anxBqNltsZsgy
-FPe3ccMnqcecCM03IT7G3gbFlHT3ZOPs3EqS9wugFrhaRNgeEQbHbqbtOqUFjFAi
-G58EpRQaJgaCVIzX44x68MapzQ0683AZZw9UEbHuegnG8w+crVqYQwIWIwZiAlFu
-nIg9SWkNDmc+9wqbZvXpUAUVurBA3my3CxodL0YEvosyOF159YTVGufMUHqMefSI
-dA6wjhYjZdZngg/dMzvJz9tV8L9D9RVYqttI8kZJgRUuuVPsqBUTach0RKDD43Ta
-CMbzXndtoiVkuBitrUCvl7ujpj9dSlunMwJnjKb/Zfn0b6BeaEeVfTgWjXu48U2L
-S4Bv6BkGyq8xbHxZuW569MSQrJvuuiUAPJ2t4u9ZPvCgGZTLDFA=
-=R0AQ
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3NeRwACgkQ41TmuOI4
+ufhN3A//Z7KUusoa2kmB1Ah4VrUOR08qe60cqj/uHwLXeP6Yuga6YIgFHUt2OT8U
+FM8QndSwGxWLUBLRwZikpOPNCRgysCoXk5gnBg0/u6GCslwBlQfeHZtIB/l4mG7X
+0VOmgwed2BoGELFPAnELvIzXTcLhaoYPaqES/h9JQVHS5EqfuwKiYyXnhLFaw6vo
+CTJ5NAKMmTKheyABdiZKver66s9u+IMfPGHnABWEDYDTyny7wMPEiCGCU6sKMcSI
+x/t78IPpEum6nBPyU/IYCMB/YS/uH27lGla8a90qz/7ZLf8x4yFz3QBdntasJ0ns
++4gk+PTohBnLBQ2o+bO2mcdLq8l71xQBUQoaAv0g3/7v6IIzhnPMS6Dx9kfuUDpR
+zhth73dJCS9bTHidOYwlWZ2V98328m0JN344K33d4jLLcbBlgulmlCT3CokQJAmJ
+KPNt1nWh24Z/EWkR50v6couIP3RRI1zvtfJmqBoiqg+m3KLUPy+xvPgP7+KQ79b3
+GQVfgeVDoqLKQyVhxTocty6nd5U5gvkfwb5ywSzYxHsNRS913G490wpokbOzyfRx
+lkfe5aN0fAMBFUuqYUusyxjYrJdXsfDYEs7NPVbKPc83kmxIvDHdB42R2NE+MwwR
+XsWusIRfkE7tXQMzDKKsIR+JYSLey+Jae4XQf+H6sx2LWh4Rwj0=
+=1R2Y
 -----END PGP SIGNATURE-----
 
---7oTW1KzE7oZpXbnhSASZuIPVL0KnmW5c6--
+--qp2B3f9A6X4xMio4GmyZAWUKMhSuyCZMH--
 
