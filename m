@@ -2,141 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 37BBCFC5A5
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 12:49:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE186FC5C4
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 12:57:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbfKNLtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 06:49:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60382 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726087AbfKNLtL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 06:49:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573732150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h1+q8062is0VvTGh9F8Kusrk8AH8c0bcaDCJzBzKUMg=;
-        b=WgqHOGuTu2sstOdIJ8B3Iv5ViFVZKKDGytX+qnK2kNwunaB2PAheSKVws+m3Tf4Y6G5gSN
-        3HmyAwVf2ZnfrBNnH8MAo8yJTh2I9wmuGbjBCbeRAkpvl5smA+3/ZeyExtkl1oYIZZrHpq
-        CQt6dBAP9/rONHd//LvYJSH5EO4zyfI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-49eiB2ciNRm-7G2n0von_w-1; Thu, 14 Nov 2019 06:49:05 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8ED11938FDC;
-        Thu, 14 Nov 2019 11:49:03 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-89.ams2.redhat.com [10.36.116.89])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A71B63F63;
-        Thu, 14 Nov 2019 11:48:54 +0000 (UTC)
-Subject: Re: [RFC 13/37] KVM: s390: protvirt: Add interruption injection
- controls
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-14-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <a81da821-5dad-8564-4b91-a1753d8e4bd0@redhat.com>
-Date:   Thu, 14 Nov 2019 12:48:52 +0100
+        id S1726115AbfKNL5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 06:57:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55812 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726002AbfKNL5r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 06:57:47 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEBv426046150
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 06:57:46 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w94yk46vf-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 06:57:45 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 14 Nov 2019 11:57:43 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 14 Nov 2019 11:57:41 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEBvein58196134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Nov 2019 11:57:41 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4F4F5204F;
+        Thu, 14 Nov 2019 11:57:40 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.27])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A2D915204E;
+        Thu, 14 Nov 2019 11:57:40 +0000 (GMT)
+Subject: Re: [PATCH v1 1/4] s390x: saving regs for interrupts
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, thuth@redhat.com
+References: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
+ <CD5636A0-3C33-4DC4-9217-68A00137E3F4@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 14 Nov 2019 12:57:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191024114059.102802-14-frankja@linux.ibm.com>
+In-Reply-To: <CD5636A0-3C33-4DC4-9217-68A00137E3F4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 49eiB2ciNRm-7G2n0von_w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+x-cbid: 19111411-0008-0000-0000-0000032EF672
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111411-0009-0000-0000-00004A4E04E4
+Message-Id: <ef5cc0aa-d1fe-874f-8f61-863c793a23d4@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=787 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/10/2019 13.40, Janosch Frank wrote:
-> From: Michael Mueller <mimu@linux.ibm.com>
->=20
-> Define the interruption injection codes and the related fields in the
-> sie control block for PVM interruption injection.
->=20
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
->=20
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm=
-_host.h
-> index 6cc3b73ca904..82443236d4cc 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -215,7 +215,15 @@ struct kvm_s390_sie_block {
->  =09__u8=09icptcode;=09=09/* 0x0050 */
->  =09__u8=09icptstatus;=09=09/* 0x0051 */
->  =09__u16=09ihcpu;=09=09=09/* 0x0052 */
-> -=09__u8=09reserved54[2];=09=09/* 0x0054 */
-> +=09__u8=09reserved54;=09=09/* 0x0054 */
-> +#define IICTL_CODE_NONE=09=09 0x00
-> +#define IICTL_CODE_MCHK=09=09 0x01
-> +#define IICTL_CODE_EXT=09=09 0x02
-> +#define IICTL_CODE_IO=09=09 0x03
-> +#define IICTL_CODE_RESTART=09 0x04
-> +#define IICTL_CODE_SPECIFICATION 0x10
-> +#define IICTL_CODE_OPERAND=09 0x11
-> +=09__u8=09iictl;=09=09=09/* 0x0055 */
->  =09__u16=09ipa;=09=09=09/* 0x0056 */
->  =09__u32=09ipb;=09=09=09/* 0x0058 */
->  =09__u32=09scaoh;=09=09=09/* 0x005c */
-> @@ -252,7 +260,8 @@ struct kvm_s390_sie_block {
->  #define HPID_KVM=090x4
->  #define HPID_VSIE=090x5
->  =09__u8=09hpid;=09=09=09/* 0x00b8 */
-> -=09__u8=09reservedb9[11];=09=09/* 0x00b9 */
-> +=09__u8=09reservedb9[7];=09=09/* 0x00b9 */
-> +=09__u32=09eiparams;=09=09/* 0x00c0 */
->  =09__u16=09extcpuaddr;=09=09/* 0x00c4 */
->  =09__u16=09eic;=09=09=09/* 0x00c6 */
->  =09__u32=09reservedc8;=09=09/* 0x00c8 */
-> @@ -268,8 +277,16 @@ struct kvm_s390_sie_block {
->  =09__u8=09oai;=09=09=09/* 0x00e2 */
->  =09__u8=09armid;=09=09=09/* 0x00e3 */
->  =09__u8=09reservede4[4];=09=09/* 0x00e4 */
-> -=09__u64=09tecmc;=09=09=09/* 0x00e8 */
-> -=09__u8=09reservedf0[12];=09=09/* 0x00f0 */
-> +=09union {
-> +=09=09__u64=09tecmc;=09=09/* 0x00e8 */
 
-I have to admit that I always have to think twice where the compiler
-might put the padding in this case. Maybe you could do that manually to
-make it obvious and wrap it in a struct, too:
-
-                struct {
-=09=09=09__u64=09tecmc;=09=09/* 0x00e8 */
-=09=09=09__u8=09reservedf0[4];=09/* 0x00f0 */
- =09=09};
-
-?
-
-Just my 0.02 =E2=82=AC, though.
-
- Thomas
+On 2019-11-14 11:28, David Hildenbrand wrote:
+>
+>> Am 14.11.2019 um 11:11 schrieb Pierre Morel <pmorel@linux.ibm.com>:
+>>
+>> ﻿
+>>> On 2019-11-13 17:12, Janosch Frank wrote:
+>>>> On 11/13/19 1:23 PM, Pierre Morel wrote:
+>>>> If we use multiple source of interrupts, for exemple, using SCLP console
+>>>> to print information while using I/O interrupts or during exceptions, we
+>>>> need to have a re-entrant register saving interruption handling.
+>>>>
+>>>> Instead of saving at a static place, let's save the base registers on
+>>>> the stack.
+>>>>
+>>>> Note that we keep the static register saving that we need for the RESET
+>>>> tests.
+>>>>
+>>>> We also care to give the handlers a pointer to the save registers in
+>>>> case the handler needs it (fixup_pgm_int needs the old psw address).
+>>> So you're still ignoring the FPRs...
+>>> I disassembled a test and looked at all stds and it looks like printf
+>>> and related functions use them. Wouldn't we overwrite test FPRs if
+>>> printing in a handler?
+>> If printf uses the FPRs in my opinion we should modify the compilation options for the library.
+>>
+>> What is the reason for printf and related functions to use floating point?
+>>
+> Register spilling. This can and will be done.
 
 
-> +=09=09struct {
-> +=09=09=09__u16=09subchannel_id;=09/* 0x00e8 */
-> +=09=09=09__u16=09subchannel_nr;=09/* 0x00ea */
-> +=09=09=09__u32=09io_int_parm;=09/* 0x00ec */
-> +=09=09=09__u32=09io_int_word;=09/* 0x00f0 */
-> +=09=09};
-> +=09} __packed;
-> +=09__u8=09reservedf4[8];=09=09/* 0x00f4 */
->  #define CRYCB_FORMAT_MASK 0x00000003
->  #define CRYCB_FORMAT0 0x00000000
->  #define CRYCB_FORMAT1 0x00000001
->=20
+Hum, can you please clarify?
+
+AFAIK register spilling is for a compiler, to use memory if it has not 
+enough registers.
+
+So your answer is for the my first sentence, meaning yes register 
+spilling will be done
+or
+do you mean register spilling is the reason why the compiler use FPRs 
+and it must be done so?
+
+Thanks,
+
+Pierre
+
+
+>
+> Cheers.
+>
+>> I will have a deeper look at this.
+>>
+>>
+>> Regards,
+>>
+>> Pierre
+>>
+>>
+>> -- 
+>> Pierre Morel
+>> IBM Lab Boeblingen
+>>
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
