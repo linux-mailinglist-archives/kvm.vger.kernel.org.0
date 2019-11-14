@@ -2,120 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 859C6FC425
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 11:28:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A71ADFC52B
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 12:17:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbfKNK2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 05:28:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22076 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726505AbfKNK2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 05:28:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573727311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EFQvYPYJg4J0nEUN1I/pxNWunrwAO/84en8PpJ4myG8=;
-        b=MtnQ/e1WBhfSPdtbo2rXkGREFnSEZY5zqwoWk35U+NOl57mr2qb75giRZLzxFPpGsz62nR
-        Tt4+ErcBDY0T77oqes66rbUdnTaw8ho0OmytSHnxSRdxt5rJSMSKyeCQvIrsesOTFJ7Y0E
-        pT6JH5vZvwmGFaXBkyOXvOXVutako2k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-oWQm8zjDMJuKuiIE9GMdAw-1; Thu, 14 Nov 2019 05:28:30 -0500
-Received: by mail-wr1-f69.google.com with SMTP id c16so4139450wro.1
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 02:28:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=OLEZB8bUOZy709XKSr13fqe/JQ22WaDdec1GWexzC2k=;
-        b=aHgXUrmBhDHKtDbf/IddWc9tcVcLL3o/L9Gr/UX4qLHWOThAIYiCLfu0bf10MbsEAT
-         yHIFSDp1tByCXa7QAMH/MekDDC1w2SnEDadhjMMe5k0SEcd7tP32eb8A9PtXCp3u3tGF
-         kfCRef/jf4wWQga9WOvMjbBr1GnuLn6VOMAWGmocE5hhMkyYJS/sRwJgMBeCjDPF6zXg
-         WWTi2k25bNtQGUEOLBwvGGTd5ROJkn4ttonKg53jHm76Z/RJrUyM1ziEkWNb5kWq/fdQ
-         OeHREc6RSjvqTFv/cYvrZeHAfSnvZ1+4VR7e1ihhK28xSwGwhQKhd9WWmwNnSUse4hVV
-         +lIg==
-X-Gm-Message-State: APjAAAWD4UUE1BHOA5cfrlzvfjd3Q1HwBQ8nOvpyeGQbJOEMPO0zGt0u
-        SASy+6ZiFEqXdHf1BgeCiyetvPJjUrcugFr8g/WCcH1M9BAW5/krpfV6USKoS5MtjFzoUsRdLRU
-        dLbWevR6gADYQ
-X-Received: by 2002:adf:e5c5:: with SMTP id a5mr7734044wrn.103.1573727309729;
-        Thu, 14 Nov 2019 02:28:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwsYLtMghPxHaocCw/sQZ+g4HIzu9O9MkZCpblaOH+6ZixnUTO0kiIbHOFV+18oHvCbcS0aeA==
-X-Received: by 2002:adf:e5c5:: with SMTP id a5mr7734015wrn.103.1573727309428;
-        Thu, 14 Nov 2019 02:28:29 -0800 (PST)
-Received: from [192.168.3.122] (p4FF23EA2.dip0.t-ipconnect.de. [79.242.62.162])
-        by smtp.gmail.com with ESMTPSA id 17sm4878867wmg.19.2019.11.14.02.28.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Nov 2019 02:28:28 -0800 (PST)
-From:   David Hildenbrand <david@redhat.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v1 1/4] s390x: saving regs for interrupts
-Date:   Thu, 14 Nov 2019 11:28:28 +0100
-Message-Id: <CD5636A0-3C33-4DC4-9217-68A00137E3F4@redhat.com>
-References: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com
-In-Reply-To: <c7d6c21e-3746-b31a-aff9-d19549feb24c@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-X-Mailer: iPhone Mail (17A878)
-X-MC-Unique: oWQm8zjDMJuKuiIE9GMdAw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        id S1726270AbfKNLQ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 06:16:59 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:36015 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726139AbfKNLQ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 06:16:59 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iVD7P-0001vT-EV; Thu, 14 Nov 2019 12:16:55 +0100
+To:     Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 2/3] kvm: arm: VGIC: Scan all IRQs when interrupt group  gets enabled
+X-PHP-Originating-Script: 0:main.inc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 14 Nov 2019 11:16:55 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
+In-Reply-To: <20191112093658.08f248c5@donnerap.cambridge.arm.com>
+References: <20191108174952.740-1-andre.przywara@arm.com>
+ <20191108174952.740-3-andre.przywara@arm.com> <20191110142914.6ffdfdfa@why>
+ <20191112093658.08f248c5@donnerap.cambridge.arm.com>
+Message-ID: <9ddab86ca3959acbb8b7aad24be5f1ad@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2019-11-12 09:36, Andre Przywara wrote:
+> On Sun, 10 Nov 2019 14:29:14 +0000
+> Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Marc,
+>
+>> On Fri,  8 Nov 2019 17:49:51 +0000
+>> Andre Przywara <andre.przywara@arm.com> wrote:
+>>
+>> > Our current VGIC emulation code treats the "EnableGrpX" bits in 
+>> GICD_CTLR
+>> > as a single global interrupt delivery switch, where in fact the 
+>> GIC
+>> > architecture asks for this being separate for the two interrupt 
+>> groups.
+>> >
+>> > To implement this properly, we have to slightly adjust our design, 
+>> to
+>> > *not* let IRQs from a disabled interrupt group be added to the 
+>> ap_list.
+>> >
+>> > As a consequence, enabling one group requires us to re-evaluate 
+>> every
+>> > pending IRQ and potentially add it to its respective ap_list. 
+>> Similarly
+>> > disabling an interrupt group requires pending IRQs to be removed 
+>> from
+>> > the ap_list (as long as they have not been activated yet).
+>> >
+>> > Implement a rather simple, yet not terribly efficient algorithm to
+>> > achieve this: For each VCPU we iterate over all IRQs, checking for
+>> > pending ones and adding them to the list. We hold the ap_list_lock
+>> > for this, to make this atomic from a VCPU's point of view.
+>> >
+>> > When an interrupt group gets disabled, we can't directly remove 
+>> affected
+>> > IRQs from the ap_list, as a running VCPU might have already 
+>> activated
+>> > them, which wouldn't be immediately visible to the host.
+>> > Instead simply kick all VCPUs, so that they clean their ap_list's
+>> > automatically when running vgic_prune_ap_list().
+>> >
+>> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> > ---
+>> >  virt/kvm/arm/vgic/vgic.c | 88 
+>> ++++++++++++++++++++++++++++++++++++----
+>> >  1 file changed, 80 insertions(+), 8 deletions(-)
+>> >
+>> > diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>> > index 3b88e14d239f..28d9ff282017 100644
+>> > --- a/virt/kvm/arm/vgic/vgic.c
+>> > +++ b/virt/kvm/arm/vgic/vgic.c
+>> > @@ -339,6 +339,38 @@ int vgic_dist_enable_group(struct kvm *kvm, 
+>> int group, bool status)
+>> >  	return 0;
+>> >  }
+>> >
+>> > +/*
+>> > + * Check whether a given IRQs need to be queued to this ap_list, 
+>> and do
+>> > + * so if that's the case.
+>> > + * Requires the ap_list_lock to be held (but not the irq lock).
+>> > + *
+>> > + * Returns 1 if that IRQ has been added to the ap_list, and 0 if 
+>> not.
+>> > + */
+>> > +static int queue_enabled_irq(struct kvm *kvm, struct kvm_vcpu 
+>> *vcpu,
+>> > +			     int intid)
+>>
+>> true/false seems better than 1/0.
+>
+> Mmh, indeed. I think I had more in there in an earlier version.
+>
+>> > +{
+>> > +	struct vgic_irq *irq = vgic_get_irq(kvm, vcpu, intid);
+>> > +	int ret = 0;
+>> > +
+>> > +	raw_spin_lock(&irq->irq_lock);
+>> > +	if (!irq->vcpu && vcpu == vgic_target_oracle(irq)) {
+>> > +		/*
+>> > +		 * Grab a reference to the irq to reflect the
+>> > +		 * fact that it is now in the ap_list.
+>> > +		 */
+>> > +		vgic_get_irq_kref(irq);
+>> > +		list_add_tail(&irq->ap_list,
+>> > +			      &vcpu->arch.vgic_cpu.ap_list_head);
+>>
+>> Two things:
+>> - This should be the job of vgic_queue_irq_unlock. Why are you
+>>   open-coding it?
+>
+> I was *really* keen on reusing that, but couldn't  for two reasons:
+> a) the locking code inside vgic_queue_irq_unlock spoils that: It
+> requires the irq_lock to be held, but not the ap_list_lock. Then it
+> takes both locks, but returns with both of them dropped. We need to
+> hold the ap_list_lock all of the time, to prevent any VCPU returning
+> to the HV to interfere with this routine.
+> b) vgic_queue_irq_unlock() kicks the VCPU already, where I want to
+> just add all of them first, then kick the VCPU at the end.
 
+Indeed, and that is why you need to change the way you queue these
+pending, enabled, group-disabled interrupts (see the LPI issue below).
 
-> Am 14.11.2019 um 11:11 schrieb Pierre Morel <pmorel@linux.ibm.com>:
->=20
-> =EF=BB=BF
->> On 2019-11-13 17:12, Janosch Frank wrote:
->>> On 11/13/19 1:23 PM, Pierre Morel wrote:
->>> If we use multiple source of interrupts, for exemple, using SCLP consol=
-e
->>> to print information while using I/O interrupts or during exceptions, w=
-e
->>> need to have a re-entrant register saving interruption handling.
->>>=20
->>> Instead of saving at a static place, let's save the base registers on
->>> the stack.
->>>=20
->>> Note that we keep the static register saving that we need for the RESET
->>> tests.
->>>=20
->>> We also care to give the handlers a pointer to the save registers in
->>> case the handler needs it (fixup_pgm_int needs the old psw address).
->> So you're still ignoring the FPRs...
->> I disassembled a test and looked at all stds and it looks like printf
->> and related functions use them. Wouldn't we overwrite test FPRs if
->> printing in a handler?
->=20
-> If printf uses the FPRs in my opinion we should modify the compilation op=
-tions for the library.
->=20
-> What is the reason for printf and related functions to use floating point=
-?
->=20
+>
+> So I decided to go with the stripped-down version of it, because I
+> didn't dare to touch the original function. I could refactor this
+> "actually add to the list" part of vgic_queue_irq_unlock() into this
+> new function, then call it from both vgic_queue_irq_unlock() and from
+> the new users.
+>
+>> - What if the interrupt isn't pending? Non-pending, non-active
+>>   interrupts should not be on the AP list!
+>
+> That should be covered by vgic_target_oracle() already, shouldn't it?
 
-Register spilling. This can and will be done.
+Ah, yes, you're right.
 
-Cheers.
+>
+>> > +		irq->vcpu = vcpu;
+>> > +
+>> > +		ret = 1;
+>> > +	}
+>> > +	raw_spin_unlock(&irq->irq_lock);
+>> > +	vgic_put_irq(kvm, irq);
+>> > +
+>> > +	return ret;
+>> > +}
+>> > +
+>> >  /*
+>> >   * The group enable status of at least one of the groups has 
+>> changed.
+>> >   * If enabled is true, at least one of the groups got enabled.
+>> > @@ -346,17 +378,57 @@ int vgic_dist_enable_group(struct kvm *kvm, 
+>> int group, bool status)
+>> >   */
+>> >  void vgic_rescan_pending_irqs(struct kvm *kvm, bool enabled)
+>> >  {
+>> > +	int cpuid;
+>> > +	struct kvm_vcpu *vcpu;
+>> > +
+>> >  	/*
+>> > -	 * TODO: actually scan *all* IRQs of the VM for pending IRQs.
+>> > -	 * If a pending IRQ's group is now enabled, add it to its 
+>> ap_list.
+>> > -	 * If a pending IRQ's group is now disabled, kick the VCPU to
+>> > -	 * let it remove this IRQ from its ap_list. We have to let the
+>> > -	 * VCPU do it itself, because we can't know the exact state of 
+>> an
+>> > -	 * IRQ pending on a running VCPU.
+>> > +	 * If no group got enabled, we only have to potentially remove
+>> > +	 * interrupts from ap_lists. We can't do this here, because a 
+>> running
+>> > +	 * VCPU might have ACKed an IRQ already, which wouldn't 
+>> immediately
+>> > +	 * be reflected in the ap_list.
+>> > +	 * So kick all VCPUs, which will let them re-evaluate their 
+>> ap_lists
+>> > +	 * by running vgic_prune_ap_list(), removing no longer enabled
+>> > +	 * IRQs.
+>> > +	 */
+>> > +	if (!enabled) {
+>> > +		vgic_kick_vcpus(kvm);
+>> > +
+>> > +		return;
+>> > +	}
+>> > +
+>> > +	/*
+>> > +	 * At least one group went from disabled to enabled. Now we need
+>> > +	 * to scan *all* IRQs of the VM for newly group-enabled IRQs.
+>> > +	 * If a pending IRQ's group is now enabled, add it to the 
+>> ap_list.
+>> > +	 *
+>> > +	 * For each VCPU this needs to be atomic, as we need *all* newly
+>> > +	 * enabled IRQs in be in the ap_list to determine the highest
+>> > +	 * priority one.
+>> > +	 * So grab the ap_list_lock, then iterate over all private IRQs 
+>> and
+>> > +	 * all SPIs. Once the ap_list is updated, kick that VCPU to
+>> > +	 * forward any new IRQs to the guest.
+>> >  	 */
+>> > +	kvm_for_each_vcpu(cpuid, vcpu, kvm) {
+>> > +		unsigned long flags;
+>> > +		int i;
+>> >
+>> > -	 /* For now just kick all VCPUs, as the old code did. */
+>> > -	vgic_kick_vcpus(kvm);
+>> > +		raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock, 
+>> flags);
+>> > +
+>> > +		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++)
+>> > +			queue_enabled_irq(kvm, vcpu, i);
+>> > +
+>> > +		for (i = VGIC_NR_PRIVATE_IRQS;
+>> > +		     i < kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS; i++)
+>> > +			queue_enabled_irq(kvm, vcpu, i);
+>>
+>> On top of my questions above, what happens to LPIs?
+>
+> Oh dear. Looks like wishful thinking on my side ;-) Iterating over
+> all interrupts is probably not a good idea anymore.
+> Do you think this idea of having a list with group-disabled IRQs is a
+> better approach: In vgic_queue_irq_unlock, if a pending IRQ's group 
+> is
+> enabled, it goes into the ap_list, if not, it goes into another list
+> instead. Then we would only need to consult this other list when a
+> group gets enabled. Both lists protected by the same ap_list_lock.
+> Does that make sense?
 
-> I will have a deeper look at this.
->=20
->=20
-> Regards,
->=20
-> Pierre
->=20
->=20
-> --=20
-> Pierre Morel
-> IBM Lab Boeblingen
->=20
+I think that could work. One queue for each group, holding pending,
+enabled, group-disabled interrupts. Pending, disabled interrupts are
+not queued anywhere, just like today.
 
+The only snag is per-cpu interrupts. On which queue do they live?
+Do you have per-CPU queues? or a global one?
+
+>> And if a group has
+>> been disabled, how do you retire these interrupts from the AP list?
+>
+> This is done above: we kick the respective VCPU and rely on
+> vgic_prune_ap_list() to remove them (that uses vgic_target_oracle(),
+> which in turn checks vgic_irq_is_grp_enabled()).
+
+But what if the CPU isn't running? Kicking it isn't going to do much,
+is it?
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
