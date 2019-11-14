@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7661CFD01A
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 22:06:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3283FD01D
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 22:08:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbfKNVGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 16:06:36 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37104 "EHLO
+        id S1726796AbfKNVIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 16:08:32 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39235 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726592AbfKNVGg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 16:06:36 -0500
+        by vger.kernel.org with ESMTP id S1726597AbfKNVIc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 16:08:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573765594;
+        s=mimecast20190719; t=1573765711;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JZkO9qOZOKio9PSHH2vHArRjWlcp1FYEZqfvTiYAcIU=;
-        b=c/k4zrOxAFclqWLhMimumBtSH39v0wvSpkbguhvI8FetsBG0vBZ7zlmozIWxs2HMyYfjx5
-        J7SmgptdT7zVg+pP8MA8G4WvPa9VJz2cG1tqLhAiE2G8AttyNjZaVdB5rYaGuiSXCTbC8T
-        ZVyRzvWripIEpIXCTy3bmurqqLbY8EE=
+        bh=5pDDzLjSI9qqUSPbYB+psol3zH7V2uqbHtghDpsPPfw=;
+        b=Ma7N64UAjPXSZb0I1kK/hH14vp419Y/4hVl6LL6fMutlXZrxE6rJ3QRrUZzQwPOapcAWbO
+        St/AasopnWSDxZwQDrgXd8yAJpwiP+u0zvZLx1UcPrZwdY8ac8ojFk+iPV7nHj6i4AM0sz
+        T5EjbH7NTqmbG9qaIYz0bCnfHzuYlfE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-xuMjMyTTM-6WwMWHcUmykw-1; Thu, 14 Nov 2019 16:06:31 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-25-vveDkcKHPMmtyIMiyhPKmg-1; Thu, 14 Nov 2019 16:08:29 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D38A5800C73;
-        Thu, 14 Nov 2019 21:06:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D071800C77;
+        Thu, 14 Nov 2019 21:08:27 +0000 (UTC)
 Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 241885D6AE;
-        Thu, 14 Nov 2019 21:06:26 +0000 (UTC)
-Date:   Thu, 14 Nov 2019 14:06:25 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E88355C1D4;
+        Thu, 14 Nov 2019 21:08:25 +0000 (UTC)
+Date:   Thu, 14 Nov 2019 14:08:25 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Kirti Wankhede <kwankhede@nvidia.com>
 Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
@@ -44,20 +44,20 @@ Cc:     <cjia@nvidia.com>, <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <shuangtai.tst@alibaba-inc.com>, <Ken.Xue@amd.com>,
         <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Message-ID: <20191114140625.213e8a99@x1.home>
-In-Reply-To: <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
+Subject: Re: [PATCH v9 Kernel 3/5] vfio iommu: Add ioctl defination to unmap
+ IOVA and return dirty bitmap
+Message-ID: <20191114140825.7472970d@x1.home>
+In-Reply-To: <1f8fc51f-8bdc-7c0c-43ce-1b252f429260@nvidia.com>
 References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
-        <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
-        <20191112153020.71406c44@x1.home>
-        <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
-        <20191113130705.32c6b663@x1.home>
-        <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
+        <1573578220-7530-4-git-send-email-kwankhede@nvidia.com>
+        <20191112153017.3c792673@x1.home>
+        <a148c5e2-ad34-6973-de50-eab472ed38fb@nvidia.com>
+        <20191113132219.5075b32e@x1.home>
+        <1f8fc51f-8bdc-7c0c-43ce-1b252f429260@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: xuMjMyTTM-6WwMWHcUmykw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: vveDkcKHPMmtyIMiyhPKmg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -66,172 +66,167 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 15 Nov 2019 00:26:07 +0530
+On Fri, 15 Nov 2019 00:26:26 +0530
 Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On 11/14/2019 1:37 AM, Alex Williamson wrote:
-> > On Thu, 14 Nov 2019 01:07:21 +0530
+> On 11/14/2019 1:52 AM, Alex Williamson wrote:
+> > On Thu, 14 Nov 2019 01:22:39 +0530
 > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > >  =20
 > >> On 11/13/2019 4:00 AM, Alex Williamson wrote: =20
-> >>> On Tue, 12 Nov 2019 22:33:37 +0530
+> >>> On Tue, 12 Nov 2019 22:33:38 +0530
 > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > >>>     =20
-> >>>> All pages pinned by vendor driver through vfio_pin_pages API should =
-be
-> >>>> considered as dirty during migration. IOMMU container maintains a li=
-st of
-> >>>> all such pinned pages. Added an ioctl defination to get bitmap of su=
-ch =20
+> >>>> With vIOMMU, during pre-copy phase of migration, while CPUs are stil=
+l
+> >>>> running, IO virtual address unmap can happen while device still keep=
+ing
+> >>>> reference of guest pfns. Those pages should be reported as dirty bef=
+ore
+> >>>> unmap, so that VFIO user space application can copy content of those=
+ pages
+> >>>> from source to destination.
+> >>>>
+> >>>> IOCTL defination added here add bitmap pointer, size and flag. If fl=
+ag =20
 > >>>
-> >>> definition
+> >>> definition, adds
 > >>>     =20
-> >>>> pinned pages for requested IO virtual address range. =20
+> >>>> VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP is set and bitmap memory is all=
+ocated
+> >>>> and bitmap_size of set, then ioctl will create bitmap of pinned page=
+s and =20
 > >>>
-> >>> Additionally, all mapped pages are considered dirty when physically
-> >>> mapped through to an IOMMU, modulo we discussed devices opting in to
-> >>> per page pinning to indicate finer granularity with a TBD mechanism t=
-o
-> >>> figure out if any non-opt-in devices remain.
+> >>> s/of/is/
 > >>>     =20
-> >>
-> >> You mean, in case of device direct assignment (device pass through)? =
-=20
-> >=20
-> > Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
-> > pinned and mapped, then the correct dirty page set is all mapped pages.
-> > We discussed using the vpfn list as a mechanism for vendor drivers to
-> > reduce their migration footprint, but we also discussed that we would
-> > need a way to determine that all participants in the container have
-> > explicitly pinned their working pages or else we must consider the
-> > entire potential working set as dirty.
-> >  =20
->=20
-> How can vendor driver tell this capability to iommu module? Any suggestio=
-ns?
-
-I think it does so by pinning pages.  Is it acceptable that if the
-vendor driver pins any pages, then from that point forward we consider
-the IOMMU group dirty page scope to be limited to pinned pages?  There
-are complications around non-singleton IOMMU groups, but I think we're
-already leaning towards that being a non-worthwhile problem to solve.
-So if we require that only singleton IOMMU groups can pin pages and we
-pass the IOMMU group as a parameter to
-vfio_iommu_driver_ops.pin_pages(), then the type1 backend can set a
-flag on its local vfio_group struct to indicate dirty page scope is
-limited to pinned pages.  We might want to keep a flag on the
-vfio_iommu struct to indicate if all of the vfio_groups for each
-vfio_domain in the vfio_iommu.domain_list dirty page scope limited to
-pinned pages as an optimization to avoid walking lists too often.  Then
-we could test if vfio_iommu.domain_list is not empty and this new flag
-does not limit the dirty page scope, then everything within each
-vfio_dma is considered dirty.
-=20
+> >>>> then unmap those.
+> >>>>
 > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > >>>> ---
-> >>>>    include/uapi/linux/vfio.h | 23 +++++++++++++++++++++++
-> >>>>    1 file changed, 23 insertions(+)
+> >>>>    include/uapi/linux/vfio.h | 33 +++++++++++++++++++++++++++++++++
+> >>>>    1 file changed, 33 insertions(+)
 > >>>>
 > >>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >>>> index 35b09427ad9f..6fd3822aa610 100644
+> >>>> index 6fd3822aa610..72fd297baf52 100644
 > >>>> --- a/include/uapi/linux/vfio.h
 > >>>> +++ b/include/uapi/linux/vfio.h
-> >>>> @@ -902,6 +902,29 @@ struct vfio_iommu_type1_dma_unmap {
-> >>>>    #define VFIO_IOMMU_ENABLE=09_IO(VFIO_TYPE, VFIO_BASE + 15)
-> >>>>    #define VFIO_IOMMU_DISABLE=09_IO(VFIO_TYPE, VFIO_BASE + 16)
+> >>>> @@ -925,6 +925,39 @@ struct vfio_iommu_type1_dirty_bitmap {
+> >>>>   =20
+> >>>>    #define VFIO_IOMMU_GET_DIRTY_BITMAP             _IO(VFIO_TYPE, VF=
+IO_BASE + 17)
 > >>>>   =20
 > >>>> +/**
-> >>>> + * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-> >>>> + *                                     struct vfio_iommu_type1_dirt=
-y_bitmap)
+> >>>> + * VFIO_IOMMU_UNMAP_DMA_GET_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 1=
+8,
+> >>>> + *=09=09=09=09      struct vfio_iommu_type1_dma_unmap_bitmap)
 > >>>> + *
-> >>>> + * IOCTL to get dirty pages bitmap for IOMMU container during migra=
-tion.
-> >>>> + * Get dirty pages bitmap of given IO virtual addresses range using
-> >>>> + * struct vfio_iommu_type1_dirty_bitmap. Caller sets argsz, which i=
-s size of
-> >>>> + * struct vfio_iommu_type1_dirty_bitmap. User should allocate memor=
-y to get
-> >>>> + * bitmap and should set size of allocated memory in bitmap_size fi=
-eld.
-> >>>> + * One bit is used to represent per page consecutively starting fro=
-m iova
-> >>>> + * offset. Bit set indicates page at that offset from iova is dirty=
-.
+> >>>> + * Unmap IO virtual addresses using the provided struct
+> >>>> + * vfio_iommu_type1_dma_unmap_bitmap.  Caller sets argsz.
+> >>>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty =
+bitmap
+> >>>> + * before unmapping IO virtual addresses. If this flag is not set, =
+only IO
+> >>>> + * virtual address are unmapped without creating pinned pages bitma=
+p, that
+> >>>> + * is, behave same as VFIO_IOMMU_UNMAP_DMA ioctl.
+> >>>> + * User should allocate memory to get bitmap and should set size of=
+ allocated
+> >>>> + * memory in bitmap_size field. One bit in bitmap is used to repres=
+ent per page
+> >>>> + * consecutively starting from iova offset. Bit set indicates page =
+at that
+> >>>> + * offset from iova is dirty.
+> >>>> + * The actual unmapped size is returned in the size field and bitma=
+p of pages
+> >>>> + * in the range of unmapped size is returned in bitmap if flag
+> >>>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP is set.
+> >>>> + *
+> >>>> + * No guarantee is made to the user that arbitrary unmaps of iova o=
+r size
+> >>>> + * different from those used in the original mapping call will succ=
+eed.
 > >>>> + */
-> >>>> +struct vfio_iommu_type1_dirty_bitmap {
+> >>>> +struct vfio_iommu_type1_dma_unmap_bitmap {
 > >>>> +=09__u32        argsz;
 > >>>> +=09__u32        flags;
-> >>>> +=09__u64        iova;                      /* IO virtual address */
-> >>>> +=09__u64        size;                      /* Size of iova range */
-> >>>> +=09__u64        bitmap_size;               /* in bytes */ =20
+> >>>> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >>>> +=09__u64        iova;                        /* IO virtual address =
+*/
+> >>>> +=09__u64        size;                        /* Size of mapping (by=
+tes) */
+> >>>> +=09__u64        bitmap_size;                 /* in bytes */
+> >>>> +=09void __user *bitmap;                      /* one bit per page */
+> >>>> +};
+> >>>> +
+> >>>> +#define VFIO_IOMMU_UNMAP_DMA_GET_BITMAP _IO(VFIO_TYPE, VFIO_BASE + =
+18)
+> >>>> + =20
 > >>>
-> >>> This seems redundant.  We can calculate the size of the bitmap based =
-on
-> >>> the iova size.
-> >>>    =20
+> >>> Why not extend VFIO_IOMMU_UNMAP_DMA to support this rather than add a=
+n
+> >>> ioctl that duplicates the functionality and extends it?? =20
 > >>
-> >> But in kernel space, we need to validate the size of memory allocated =
-by
-> >> user instead of assuming user is always correct, right? =20
-> >=20
-> > What does it buy us for the user to tell us the size?  They could be
-> > wrong, they could be malicious.  The argsz field on the ioctl is mostly
-> > for the handshake that the user is competent, we should get faults from
-> > the copy-user operation if it's incorrect.
-> > =20
->=20
-> It is to mainly fail safe.
->=20
-> >>>> +=09void __user *bitmap;                    /* one bit per page */ =
-=20
-> >>>
-> >>> Should we define that as a __u64* to (a) help with the size
-> >>> calculation, and (b) assure that we can use 8-byte ops on it?
-> >>>
-> >>> However, who defines page size?  Is it necessarily the processor page
-> >>> size?  A physical IOMMU may support page sizes other than the CPU pag=
-e
-> >>> size.  It might be more important to indicate the expected page size
-> >>> than the bitmap size.  Thanks,
-> >>>    =20
+> >> We do want old userspace applications to work with new kernel and
+> >> vice-versa, right?
 > >>
-> >> I see in QEMU and in vfio_iommu_type1 module, page sizes considered fo=
-r
-> >> mapping are CPU page size, 4K. Do we still need to have such argument?=
- =20
+> >> If I try to change existing VFIO_IOMMU_UNMAP_DMA ioctl structure, say =
+if
+> >> add 'bitmap_size' and 'bitmap' after 'size', with below code in old
+> >> kernel, old kernel & new userspace will work.
+> >>
+> >>           minsz =3D offsetofend(struct vfio_iommu_type1_dma_unmap, siz=
+e);
+> >>
+> >>           if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> >>                   return -EFAULT;
+> >>
+> >>           if (unmap.argsz < minsz || unmap.flags)
+> >>                   return -EINVAL;
+> >>
+> >>
+> >> With new kernel it would change to:
+> >>           minsz =3D offsetofend(struct vfio_iommu_type1_dma_unmap, bit=
+map); =20
 > >=20
-> > That assumption exists for backwards compatibility prior to supporting
-> > the iova_pgsizes field in vfio_iommu_type1_info.  AFAIK the current
-> > interface has no page size assumptions and we should not add any. =20
+> > No, the minimum structure size still ends at size, we interpret flags
+> > and argsz to learn if the user understands those fields and optionally
+> > include them.  Therefore old userspace on new kernel continues to work.
+> >  =20
+> >>           if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> >>                   return -EFAULT;
+> >>
+> >>           if (unmap.argsz < minsz || unmap.flags)
+> >>                   return -EINVAL;
+> >>
+> >> Then old userspace app will fail because unmap.argsz < minsz and might
+> >> be copy_from_user would cause seg fault because userspace sdk doesn't
+> >> contain new member variables.
+> >> We can't change the sequence to keep 'size' as last member, because th=
+en
+> >> new userspace app on old kernel will interpret it wrong. =20
+> >=20
+> > If we have new userspace on old kernel, that userspace needs to be able
+> > to learn that this feature exists (new flag in the
+> > vfio_iommu_type1_info struct as suggested below) and only make use of i=
+t
+> > when available.  This is why the old kernel checks argsz against minsz.
+> > So long as the user passes something at least minsz in size, we have
+> > compatibility.  The old kernel doesn't understand the GET_DIRTY_BITMAP
+> > flag and will return an error if the user attempts to use it.  Thanks,
+> >  =20
 >=20
-> So userspace has iova_pgsizes information, which can be input to this=20
-> ioctl. Bitmap should be considering smallest page size. Does that makes=
+> Ok. So then VFIO_IOMMU_UNMAP_DMA_GET_BITMAP ioctl is not needed. I'll do=
 =20
-> sense?
+> the change. Again bitmap will be created considering smallest page size=
+=20
+> of iova_pgsizes
+>=20
+> But VFIO_IOMMU_GET_DIRTY_BITMAP ioctl will still required, right?
 
-I'm not sure.  I thought I had an argument that the iova_pgsize could
-indicate support for sizes smaller than the processor page size, which
-would make the user responsible for using a different base for their
-page size, but vfio_pgsize_bitmap() already masks out sub-page sizes.
-Clearly the vendor driver is pinning based on processor sized pages,
-but that's independent of an IOMMU and not part of a user ABI.
-
-I'm tempted to say your bitmap_size field has a use here, but it seems
-to fail in validating the user page size at the low extremes.  For
-example if we have a single page mapping, the user can specify the iova
-size as 4K (for example), but the minimum bitmap_size they can indicate
-is 1 byte, would we therefore assume the user's bitmap page size is 512
-bytes (ie. they provided us with 8 bits to describe a 4K range)?  We'd
-need to be careful to specify that the minimum iova_pgsize indicated
-page size is our lower bound as well.  But then what do we do if the
-user provides us with a smaller buffer than we expect?  For example, a
-128MB iova range and only an 8-byte buffer.  Do we go ahead and assume
-a 2MB page size and fill the bitmap accordingly or do we generate an
-error?  If the latter, might we support that at some point in time and
-is it sufficient to let the user perform trial and error to test if that
-exists?  Thanks,
+Yes, I'm not willing to suggest a flag on an unmap ioctl that
+eliminates the unmap just so we can re-use it for retrieving a dirty
+page bitmap.  That'd be ugly.  Thanks,
 
 Alex
 
