@@ -2,88 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EC753FC9CE
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:21:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10AD7FC9D4
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:22:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726750AbfKNPVx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 10:21:53 -0500
-Received: from foss.arm.com ([217.140.110.172]:44992 "EHLO foss.arm.com"
+        id S1727078AbfKNPWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:22:37 -0500
+Received: from mga12.intel.com ([192.55.52.136]:34667 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726318AbfKNPVx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 10:21:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D614F328;
-        Thu, 14 Nov 2019 07:21:52 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BE3D13F52E;
-        Thu, 14 Nov 2019 07:21:51 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 09/17] arm: gic: Add test for flipping
- GICD_CTLR.DS
-To:     Vladimir Murzin <vladimir.murzin@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20191108144240.204202-1-andre.przywara@arm.com>
- <20191108144240.204202-10-andre.przywara@arm.com>
- <2e14ccd4-89f4-aa90-cc58-bebf0e2eeede@arm.com>
- <7ca57a0c-3934-1778-e3f9-a3eee0658002@arm.com>
- <20191114141745.32d3b89c@donnerap.cambridge.arm.com>
- <90cdc695-f761-26bd-d2a7-f8655ce04463@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <187393bb-a32d-092d-d0ea-44c58a54d1de@arm.com>
-Date:   Thu, 14 Nov 2019 15:21:46 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726980AbfKNPWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 10:22:36 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 07:22:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,304,1569308400"; 
+   d="scan'208";a="214560663"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Nov 2019 07:22:35 -0800
+Date:   Thu, 14 Nov 2019 07:22:35 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 1/2] KVM: X86: Single target IPI fastpath
+Message-ID: <20191114152235.GC24045@linux.intel.com>
+References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com>
+ <6c2c7bbb-39f4-2a77-632e-7730e9887fc5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <90cdc695-f761-26bd-d2a7-f8655ce04463@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c2c7bbb-39f4-2a77-632e-7730e9887fc5@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Thu, Nov 14, 2019 at 12:58:56PM +0100, Paolo Bonzini wrote:
+> Ok, it's not _so_ ugly after all.
+> 
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c   | 39 +++++++++++++++++++++++++++++++++++++--
+> >  include/linux/kvm_host.h |  1 +
+> >  2 files changed, 38 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 5d21a4a..5c67061 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -5924,7 +5924,9 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
+> >  		}
+> >  	}
+> >  
+> > -	if (exit_reason < kvm_vmx_max_exit_handlers
+> > +	if (vcpu->fast_vmexit)
+> > +		return 1;
+> > +	else if (exit_reason < kvm_vmx_max_exit_handlers
+> 
+> Instead of a separate vcpu->fast_vmexit, perhaps you can set exit_reason
+> to vmx->exit_reason to -1 if the fast path succeeds.
 
-On 11/14/19 2:50 PM, Vladimir Murzin wrote:
-> On 11/14/19 2:17 PM, Andre Przywara wrote:
->> On Thu, 14 Nov 2019 13:39:33 +0000
->> Vladimir Murzin <vladimir.murzin@arm.com> wrote:
->>
->>> Hi,
->>>
->>> On 11/12/19 4:42 PM, Alexandru Elisei wrote:
->>>> Are we not testing KVM? Why are we not treating a behaviour different than what
->>>> KVM should emulate as a fail?
->>> Can kvm-unit-tests be run with qemu TCG?
->> Yes, it does that actually by default if you cross compile. I also tested this explicitly on TCG: unlike KVM that actually passes all those tests.
->> If you set the environment variable ACCEL to either tcg or kvm, you can select this at runtime:
->> $ ACCEL=tcg arm/run arm/gic.flat -smp 3 -append irq
-> Great! Then, IMO, it is absolutely valid to test this functionality!
+Actually, rather than make this super special case, what about moving the
+handling into vmx_handle_exit_irqoff()?  Practically speaking that would
+only add ~50 cycles (two VMREADs) relative to the code being run right
+after kvm_put_guest_xcr0().  It has the advantage of restoring the host's
+hardware breakpoints, preserving a semi-accurate last_guest_tsc, and
+running with vcpu->mode set back to OUTSIDE_GUEST_MODE.  Hopefully it'd
+also be more intuitive for people unfamiliar with the code.
 
-TCG emulates a GIC with a single security state for me:
+> 
 
-/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=3,accel=tcg
--cpu cortex-a57 -device virtio-serial-device -device virtconsole,chardev=ctd
--chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel
-arm/gic.flat -append irq
-PASS: gicv3: irq: SPI triggered by CPU write
-PASS: gicv3: irq: disabled SPI does not fire
-PASS: gicv3: irq: now enabled SPI fires
-INFO: gicv3: irq: GROUP: GIC is one security state only
-[..]
+> > +			if (ret == 0)
+> > +				ret = kvm_skip_emulated_instruction(vcpu);
+> 
+> Please move the "kvm_skip_emulated_instruction(vcpu)" to
+> vmx_handle_exit, so that this basically is
+> 
+> #define EXIT_REASON_NEED_SKIP_EMULATED_INSN -1
+> 
+> 	if (ret == 0)
+> 		vcpu->exit_reason = EXIT_REASON_NEED_SKIP_EMULATED_INSN;
+> 
+> and handle_ipi_fastpath can return void.
 
-But that could change someday, so I'm fine with failing only if we are not allowed
-to have GICD_CTLR.DS=1, because that will prevent us from testing group 0 interrupts.
+I'd rather we add a dedicated variable to say the exit has already been
+handled.  Overloading exit_reason is bound to cause confusion, and that's
+probably a best case scenario.
 
-Thanks,
-Alex
-> Thanks
-> Vladimir
->
->> Cheers,
->> Andre
->>
+> > +		};
+> > +	};
+> > +
+> > +	return ret;
+> > +}
+> > +
+> >  static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > @@ -6615,6 +6645,12 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  				  | (1 << VCPU_EXREG_CR3));
+> >  	vcpu->arch.regs_dirty = 0;
+> >  
+> > +	vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
+> > +	vcpu->fast_vmexit = false;
+> > +	if (!is_guest_mode(vcpu) &&
+> > +		vmx->exit_reason == EXIT_REASON_MSR_WRITE)
+> > +		vcpu->fast_vmexit = handle_ipi_fastpath(vcpu);
+> 
+> This should be done later, at least after kvm_put_guest_xcr0, because
+> running with partially-loaded guest state is harder to audit.  The best
+> place to put it actually is right after the existing vmx->exit_reason
+> assignment, where we already handle EXIT_REASON_MCE_DURING_VMENTRY.
+> 
+> >  	pt_guest_exit(vmx);
+> >  
+> >  	/*
+> > @@ -6634,7 +6670,6 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  	vmx->nested.nested_run_pending = 0;
+> >  	vmx->idt_vectoring_info = 0;
+> >  
+> > -	vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
+> >  	if ((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
+> >  		kvm_machine_check();
+> >  
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 719fc3e..7a7358b 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -319,6 +319,7 @@ struct kvm_vcpu {
+> >  #endif
+> >  	bool preempted;
+> >  	bool ready;
+> > +	bool fast_vmexit;
+> >  	struct kvm_vcpu_arch arch;
+> >  	struct dentry *debugfs_dentry;
+> >  };
+> > 
+> 
