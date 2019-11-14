@@ -2,136 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F095FC6F6
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 14:10:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C4F7FC744
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 14:23:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbfKNNKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 08:10:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60023 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726202AbfKNNKA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 08:10:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573736999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6yyZbS56I4tAONF7KcICPVxNVSf4T1PDtqDFeQbrNXM=;
-        b=bqepkPiZI7D7bkRnJGRZ7mjwZH/QlkpxoQZvJTekYFs/BEVTvpWaHyh6HJO20wRU8hXKh/
-        2Px3UUzMTCNG+rmzAP8yQ/6Eo3xGm1ksH9kUrWuFaLYpWPzkTfDcQTBTUiLq1XOcaJuJMp
-        DQG1SXkzBGsc/2JLhEL5oa5fkMibMes=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-gDdAxXV3MQGUwrIzoj9RUA-1; Thu, 14 Nov 2019 08:09:55 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0120B1006805;
-        Thu, 14 Nov 2019 13:09:54 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D3A9575E51;
-        Thu, 14 Nov 2019 13:09:48 +0000 (UTC)
-Date:   Thu, 14 Nov 2019 14:09:46 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 11/37] DOCUMENTATION: protvirt: Interrupt injection
-Message-ID: <20191114140946.7bca2350.cohuck@redhat.com>
-In-Reply-To: <20191024114059.102802-12-frankja@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-12-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726983AbfKNNXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 08:23:01 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:34949 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726613AbfKNNXB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 08:23:01 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iVF5L-0003Wl-Qy; Thu, 14 Nov 2019 14:22:55 +0100
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: Forbid /dev/kvm being opened by a compat task when  =?UTF-8?Q?CONFIG=5FKVM=5FCOMPAT=3Dn?=
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: gDdAxXV3MQGUwrIzoj9RUA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 14 Nov 2019 13:22:55 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        =?UTF-8?Q?Radim_Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+In-Reply-To: <e781ec19-1a93-c061-9236-46c8a8f698db@redhat.com>
+References: <20191113160523.16130-1-maz@kernel.org>
+ <2b846839-ea81-e40c-5106-90776d964e33@de.ibm.com>
+ <CAFEAcA8c3ePLXRa_-G0jPgMVVrFHaN1Qn3qRf-WShPXmNXX6Ug@mail.gmail.com>
+ <20191114081550.3c6a7a47@why>
+ <5576baca-458e-3206-bdc5-5fb8da00cf6d@de.ibm.com>
+ <e781ec19-1a93-c061-9236-46c8a8f698db@redhat.com>
+Message-ID: <4a9380afe118031c77be53112d73d5d4@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, borntraeger@de.ibm.com, peter.maydell@linaro.org, kvm@vger.kernel.org, rkrcmar@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, jhogan@kernel.org, paulus@ozlabs.org, frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com, sean.j.christopherson@intel.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 07:40:33 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On 2019-11-14 12:12, Paolo Bonzini wrote:
+> On 14/11/19 09:20, Christian Borntraeger wrote:
+>>
+>>
+>> On 14.11.19 09:15, Marc Zyngier wrote:
+>>> On Wed, 13 Nov 2019 21:23:07 +0000
+>>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>
+>>>> On Wed, 13 Nov 2019 at 18:44, Christian Borntraeger
+>>>> <borntraeger@de.ibm.com> wrote:
+>>>>> On 13.11.19 17:05, Marc Zyngier wrote:
+>>>>>> On a system without KVM_COMPAT, we prevent IOCTLs from being 
+>>>>>> issued
+>>>>>> by a compat task. Although this prevents most silly things from
+>>>>>> happening, it can still confuse a 32bit userspace that is able
+>>>>>> to open the kvm device (the qemu test suite seems to be pretty
+>>>>>> mad with this behaviour).
+>>>>>>
+>>>>>> Take a more radical approach and return a -ENODEV to the compat
+>>>>>> task.
+>>>>
+>>>>> Do we still need compat_ioctl if open never succeeds?
+>>>>
+>>>> I wondered about that, but presumably you could use
+>>>> fd-passing, or just inheriting open fds across exec(),
+>>>> to open the fd in a 64-bit process and then hand it off
+>>>> to a 32-bit process to call the ioctl with. (That's
+>>>> probably only something you'd do if you were
+>>>> deliberately playing silly games, of course, but
+>>>> preventing silly games is useful as it makes it
+>>>> easier to reason about kernel behaviour.)
+>>>
+>>> This was exactly my train of thoughts, which I should have made 
+>>> clear
+>>> in the commit log. Thanks Peter for reading my mind! ;-)
+>>
+>> Makes sense. Looks like this is already in kvm/master so we cannot 
+>> improve
+>> the commit message easily any more. Hopefully we will not forget :-)
+>
+> A comment in the code would probably be better than the commit 
+> message,
+> to not forget stuff like this.  (Hint! :))
 
-> Interrupt injection has changed a lot for protected guests, as KVM
-> can't access the cpus' lowcores. New fields in the state description,
-> like the interrupt injection control, and masked values safeguard the
-> guest from KVM.
->=20
-> Let's add some documentation to the interrupt injection basics for
-> protected guests.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  Documentation/virtual/kvm/s390-pv.txt | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->=20
-> diff --git a/Documentation/virtual/kvm/s390-pv.txt b/Documentation/virtua=
-l/kvm/s390-pv.txt
-> index 86ed95f36759..e09f2dc5f164 100644
-> --- a/Documentation/virtual/kvm/s390-pv.txt
-> +++ b/Documentation/virtual/kvm/s390-pv.txt
-> @@ -21,3 +21,30 @@ normally needed to be able to run a VM, some changes h=
-ave been made in
->  SIE behavior and fields have different meaning for a PVM. SIE exits
->  are minimized as much as possible to improve speed and reduce exposed
->  guest state.
-> +
-> +
-> +Interrupt injection:
-> +
-> +Interrupt injection is safeguarded by the Ultravisor and, as KVM lost
-> +access to the VCPUs' lowcores, is handled via the format 4 state
-> +description.
-> +
-> +Machine check, external, IO and restart interruptions each can be
-> +injected on SIE entry via a bit in the interrupt injection control
-> +field (offset 0x54). If the guest cpu is not enabled for the interrupt
-> +at the time of injection, a validity interception is recognized. The
-> +interrupt's data is transported via parts of the interception data
-> +block.
+Hint received. How about this?
 
-"Data associated with the interrupt needs to be placed into the
-respective fields in the interception data block to be injected into
-the guest."
+         M.
 
-?
+ From 34bfc68752253c3da3e59072b137d1a4a85bc005 Mon Sep 17 00:00:00 2001
+ From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 14 Nov 2019 13:17:39 +0000
+Subject: [PATCH] KVM: Add a comment describing the /dev/kvm no_compat 
+handling
 
-> +
-> +Program and Service Call exceptions have another layer of
-> +safeguarding, they are only injectable, when instructions have
-> +intercepted into KVM and such an exception can be an emulation result.
+Add a comment explaining the rational behind having both
+no_compat open and ioctl callbacks to fend off compat tasks.
 
-I find this sentence hard to parse... not sure if I understand it
-correctly.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+  virt/kvm/kvm_main.c | 7 +++++++
+  1 file changed, 7 insertions(+)
 
-"They can only be injected if the exception can be encountered during
-emulation of instructions that had been intercepted into KVM."
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 1243e48dc717..722f2b1d4672 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -120,6 +120,13 @@ static long kvm_vcpu_compat_ioctl(struct file 
+*file, unsigned int ioctl,
+  				  unsigned long arg);
+  #define KVM_COMPAT(c)	.compat_ioctl	= (c)
+  #else
++/*
++ * For architectures that don't implement a compat infrastructure,
++ * adopt a double line of defense:
++ * - Prevent a compat task from opening /dev/kvm
++ * - If the open has been done by a 64bit task, and the KVM fd
++ *   passed to a compat task, let the ioctls fail.
++ */
+  static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
+  				unsigned long arg) { return -EINVAL; }
 
-?
+-- 
+2.20.1
 
-> +
-> +
-> +Mask notification interceptions:
-> +As a replacement for the lctl(g) and lpsw(e) interception, two new
-> +interception codes have been introduced. One which tells us that CRs
-> +0, 6 or 14 have been changed and therefore interrupt masking might
-> +have changed. And one for PSW bit 13 changes. The CRs and the PSW in
 
-Might be helpful to mention that this bit covers machine checks, which
-do not get a separate bit in the control block :)
-
-> +the state description only contain the mask bits and no further info
-> +like the current instruction address.
-
-"The CRs and the PSW in the state description only contain the bits
-referring to interrupt masking; other fields like e.g. the current
-instruction address are zero."
-
-?
-
+-- 
+Jazz is not dead. It just smells funny...
