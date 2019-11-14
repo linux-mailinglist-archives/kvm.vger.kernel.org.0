@@ -2,149 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AD42FC9A3
-	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:15:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 595CEFC9CA
+	for <lists+kvm@lfdr.de>; Thu, 14 Nov 2019 16:21:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbfKNPPz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 10:15:55 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32747 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726179AbfKNPPy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:15:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573744553;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9nm7qa9QDVub7198Yoayd+jd7gSzFXSMeqbfa75+yNE=;
-        b=SwtKux8UNX7z16wwgFfhFJS/4E32LKcJrm0wykSKsRu3swGvm/bpCA8wzKn3o5BwupyhH8
-        WYtLzyHXttqRKnbsFG2mM4VmQnVGQ/92uJ5utNp+YGPYl4HtIvLpGUQCfl0vldx2zjfY+b
-        m6JirT3ZzyYGpGPqXzLiZFPOz8aleVQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-ZiS27w5VPQysJLVQ7ZBBuw-1; Thu, 14 Nov 2019 10:15:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A923CDBCC;
-        Thu, 14 Nov 2019 15:15:48 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C54C96364A;
-        Thu, 14 Nov 2019 15:15:28 +0000 (UTC)
-Date:   Thu, 14 Nov 2019 16:15:26 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+        id S1726505AbfKNPVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 10:21:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12238 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726318AbfKNPVf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Nov 2019 10:21:35 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xAEFEoaX021995
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:21:34 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w91m7q2ws-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 10:21:33 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Thu, 14 Nov 2019 15:20:29 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 14 Nov 2019 15:20:27 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAEFJnvX34406780
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Nov 2019 15:19:49 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 56C7A11C04A;
+        Thu, 14 Nov 2019 15:20:26 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0206B11C04C;
+        Thu, 14 Nov 2019 15:20:26 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Nov 2019 15:20:25 +0000 (GMT)
+Date:   Thu, 14 Nov 2019 16:20:24 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, mihajlov@linux.ibm.com, mimu@linux.ibm.com,
+        gor@linux.ibm.com
 Subject: Re: [RFC 17/37] DOCUMENTATION: protvirt: Instruction emulation
-Message-ID: <20191114161526.1100f4fe.cohuck@redhat.com>
-In-Reply-To: <20191024114059.102802-18-frankja@linux.ibm.com>
+In-Reply-To: <20191114161526.1100f4fe.cohuck@redhat.com>
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
         <20191024114059.102802-18-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        <20191114161526.1100f4fe.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: ZiS27w5VPQysJLVQ7ZBBuw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111415-0008-0000-0000-0000032F049B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111415-0009-0000-0000-00004A4E13ED
+Message-Id: <20191114162024.13f17aa9@p-imbrenda.boeblingen.de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-14_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=880 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 07:40:39 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Thu, 14 Nov 2019 16:15:26 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> As guest memory is inaccessible and information about the guest's
-> state is very limited, new ways for instruction emulation have been
-> introduced.
->=20
-> With a bounce area for guest GRs and instruction data, guest state
-> leaks can be limited by the Ultravisor. KVM now has to move
-> instruction input and output through these areas.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  Documentation/virtual/kvm/s390-pv.txt | 47 +++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
->=20
-> diff --git a/Documentation/virtual/kvm/s390-pv.txt b/Documentation/virtua=
-l/kvm/s390-pv.txt
-> index e09f2dc5f164..cb08d78a7922 100644
-> --- a/Documentation/virtual/kvm/s390-pv.txt
-> +++ b/Documentation/virtual/kvm/s390-pv.txt
-> @@ -48,3 +48,50 @@ interception codes have been introduced. One which tel=
-ls us that CRs
->  have changed. And one for PSW bit 13 changes. The CRs and the PSW in
->  the state description only contain the mask bits and no further info
->  like the current instruction address.
-> +
-> +
-> +Instruction emulation:
-> +With the format 4 state description the SIE instruction already
+> On Thu, 24 Oct 2019 07:40:39 -0400
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+> 
+> > As guest memory is inaccessible and information about the guest's
+> > state is very limited, new ways for instruction emulation have been
+> > introduced.
+> > 
+> > With a bounce area for guest GRs and instruction data, guest state
+> > leaks can be limited by the Ultravisor. KVM now has to move
+> > instruction input and output through these areas.
+> > 
+> > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> > ---
+> >  Documentation/virtual/kvm/s390-pv.txt | 47
+> > +++++++++++++++++++++++++++ 1 file changed, 47 insertions(+)
+> > 
+> > diff --git a/Documentation/virtual/kvm/s390-pv.txt
+> > b/Documentation/virtual/kvm/s390-pv.txt index
+> > e09f2dc5f164..cb08d78a7922 100644 ---
+> > a/Documentation/virtual/kvm/s390-pv.txt +++
+> > b/Documentation/virtual/kvm/s390-pv.txt @@ -48,3 +48,50 @@
+> > interception codes have been introduced. One which tells us that
+> > CRs have changed. And one for PSW bit 13 changes. The CRs and the
+> > PSW in the state description only contain the mask bits and no
+> > further info like the current instruction address. +
+> > +
+> > +Instruction emulation:
+> > +With the format 4 state description the SIE instruction already  
+> 
+> s/description/description,/
+> 
+> > +interprets more instructions than it does with format 2. As it is
+> > not +able to interpret all instruction, the SIE and the UV
+> > safeguard KVM's  
+> 
+> s/instruction/instructions/
+> 
+> > +emulation inputs and outputs.
+> > +
+> > +Guest GRs and most of the instruction data, like IO data
+> > structures  
+> 
+> Hm, what 'IO data structures'?
 
-s/description/description,/
+the various IRB and ORB of I/O instructions
 
-> +interprets more instructions than it does with format 2. As it is not
-> +able to interpret all instruction, the SIE and the UV safeguard KVM's
+> > +are filtered. Instruction data is copied to and from the Secure
+> > +Instruction Data Area. Guest GRs are put into / retrieved from the
+> > +Interception-Data block.
+> > +
+> > +The Interception-Data block from the state description's offset
+> > 0x380 +contains GRs 0 - 16. Only GR values needed to emulate an
+> > instruction +will be copied into this area.
+> > +
+> > +The Interception Parameters state description field still contains
+> > the +the bytes of the instruction text but with pre-set register
+> > +values. I.e. each instruction always uses the same instruction
+> > text, +to not leak guest instruction text.
+> > +
+> > +The Secure Instruction Data Area contains instruction storage
+> > +data. Data for diag 500 is exempt from that and has to be moved
+> > +through shared buffers to KVM.  
+> 
+> I find this paragraph a bit confusing. What does that imply for diag
+> 500 interception? Data is still present in gprs 1-4?
 
-s/instruction/instructions/
+no registers are leaked in the registers. registers are always only
+exposed through the state description.
 
-> +emulation inputs and outputs.
-> +
-> +Guest GRs and most of the instruction data, like IO data structures
-
-Hm, what 'IO data structures'?
-
-> +are filtered. Instruction data is copied to and from the Secure
-> +Instruction Data Area. Guest GRs are put into / retrieved from the
-> +Interception-Data block.
-> +
-> +The Interception-Data block from the state description's offset 0x380
-> +contains GRs 0 - 16. Only GR values needed to emulate an instruction
-> +will be copied into this area.
-> +
-> +The Interception Parameters state description field still contains the
-> +the bytes of the instruction text but with pre-set register
-> +values. I.e. each instruction always uses the same instruction text,
-> +to not leak guest instruction text.
-> +
-> +The Secure Instruction Data Area contains instruction storage
-> +data. Data for diag 500 is exempt from that and has to be moved
-> +through shared buffers to KVM.
-
-I find this paragraph a bit confusing. What does that imply for diag
-500 interception? Data is still present in gprs 1-4?
-
-(Also, why only diag 500? Because it is the 'reserved for kvm' diagnose
-call?)
-
-> +
-> +When SIE intercepts an instruction, it will only allow data and
-> +program interrupts for this instruction to be moved to the guest via
-> +the two data areas discussed before. Other data is ignored or results
-> +in validity interceptions.
-> +
-> +
-> +Instruction emulation interceptions:
-> +There are two types of SIE secure instruction intercepts. The normal
-> +and the notification type. Normal secure instruction intercepts will
-> +make the guest pending for instruction completion of the intercepted
-> +instruction type, i.e. on SIE entry it is attempted to complete
-> +emulation of the instruction with the data provided by KVM. That might
-> +be a program exception or instruction completion.
-> +
-> +The notification type intercepts inform KVM about guest environment
-> +changes due to guest instruction interpretation. Such an interception
-
-'interpretation by SIE' ?
-
-> +is recognized for the store prefix instruction and provides the new
-> +lowcore location for mapping change notification arming. Any KVM data
-> +in the data areas is ignored, program exceptions are not injected and
-> +execution continues on next SIE entry, as if no intercept had
-> +happened.
+> (Also, why only diag 500? Because it is the 'reserved for kvm'
+> diagnose call?)
+> 
+> > +
+> > +When SIE intercepts an instruction, it will only allow data and
+> > +program interrupts for this instruction to be moved to the guest
+> > via +the two data areas discussed before. Other data is ignored or
+> > results +in validity interceptions.
+> > +
+> > +
+> > +Instruction emulation interceptions:
+> > +There are two types of SIE secure instruction intercepts. The
+> > normal +and the notification type. Normal secure instruction
+> > intercepts will +make the guest pending for instruction completion
+> > of the intercepted +instruction type, i.e. on SIE entry it is
+> > attempted to complete +emulation of the instruction with the data
+> > provided by KVM. That might +be a program exception or instruction
+> > completion. +
+> > +The notification type intercepts inform KVM about guest environment
+> > +changes due to guest instruction interpretation. Such an
+> > interception  
+> 
+> 'interpretation by SIE' ?
+> 
+> > +is recognized for the store prefix instruction and provides the new
+> > +lowcore location for mapping change notification arming. Any KVM
+> > data +in the data areas is ignored, program exceptions are not
+> > injected and +execution continues on next SIE entry, as if no
+> > intercept had +happened.  
+> 
 
