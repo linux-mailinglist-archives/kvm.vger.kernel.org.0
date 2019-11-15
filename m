@@ -2,88 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E16C3FE007
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:26:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9F81FE00E
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:27:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727537AbfKOO04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 09:26:56 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49845 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727411AbfKOO04 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 09:26:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573828015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=YAABbHe3sNY+Egrkqr4me6x1W0FPkMdgZ+GIVxxRgO4=;
-        b=KTXaCBBNQo0zC50dM60ag3g7zeyvBMH2F/FWLhu/v9gPhxWY4tOYAoW4X+J7sgmzuZ85la
-        1d8kTaYciIQsB1fvM3TYlmjDIlujFU5DCqSmCw2EE7F+dDpCnpEqALh0YIZUbGYEbqYEJr
-        COrzCg10W8NqIhVVAj3QCWV4Hbp8nAo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-1wRRZ56WOVmo7JyOoHkOdw-1; Fri, 15 Nov 2019 09:26:51 -0500
-Received: by mail-wr1-f70.google.com with SMTP id q12so7780399wrr.3
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:26:51 -0800 (PST)
+        id S1727496AbfKOO1s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 09:27:48 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:38584 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727443AbfKOO1s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 09:27:48 -0500
+Received: by mail-lf1-f67.google.com with SMTP id q28so8171578lfa.5
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:27:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=J1z043+yawG1LzHxNBrYBrUNUJ78K6NFWaeacWnh1zU=;
+        b=SMW9FbN7RnsHSYe0SlcG5Ry9aF3WH+GCkTB8whiPCkPC0QdiexUJRKjTw4mJi1EJh7
+         CAW3piMolLIShTG6LLclPfQokNNE6lYK5hU8dwVtHgXgl2sD/dvDK5KV99JbT42gXfd0
+         NvbDGYoiq7r2JnhKhl1Cn14Jk576xgKL2915nUBYbhpWhNnLymB6Dx+BK639RebEYzwa
+         suDPAvIyKzMYc5uJfb21ASEYu1vikZ00vDy53LMyWx5q/65zryVyjv0vITKvtbE8vWt4
+         PXH5stUYQUNCVtDi1FbyvkuzffETM7hI5aL2aFjmOHyQHH6YDL4fQW2XXb+O0+UvdXdw
+         OqZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=B6aD7MeLkiqpuKWWnu1AaCWgAg1Wn1iy4yCeUluVRb0=;
-        b=oetNr6V+LDEFDYjSXyH7/i9sn3lce1AvuBxnFx5kiCS4V1wKFH6bD2DRCUGNYc2K6k
-         Zn1LdgkiSAF6Ay1bFzjBkoXmsclZCsUGEfxJDmvkkuq7DIxWdanmKmjXDqc9Fu2yXqMf
-         ovQsV6qgDwXeSE2gWLd/bM3AdTtN/9pDSS3CgLLLR1sHQxApBtSB9dHYmjAMlGZ6vvba
-         IMihYWz8hXoLEM8m5rFe0/EY8aRJXEBe7aN9ZJhxJGGr0douwNlNDOSNELQvfVi6Z769
-         cSRf8GANXTotoMU1CFOeQwRH6MIIc4evq1rFUSujlQ8z9kAlg7K16GQTu4l7kVQnSkGw
-         9RUg==
-X-Gm-Message-State: APjAAAX2R0RypdEvfx74ue/yyXsEoZr5fyQoitpAv4v5COc9/j9cEwKR
-        1aeAF2G4H6Y6ZNqNzQaHRD8VppJgl5unwOqpILNLvOBEZbIWV21psesGx7WrDpeXQwVB6DqYf35
-        6tT8kd/uyfs8k
-X-Received: by 2002:a1c:4456:: with SMTP id r83mr14194173wma.2.1573828010439;
-        Fri, 15 Nov 2019 06:26:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy0HVdAECPM563WhDKZT2ASqBtrO4RHcyxdiJtbCydoHrnVyPFZcoZ7liXHHMWmmEvibZ1KlA==
-X-Received: by 2002:a1c:4456:: with SMTP id r83mr14194143wma.2.1573828010122;
-        Fri, 15 Nov 2019 06:26:50 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:857e:73f6:39a8:6f94? ([2001:b07:6468:f312:857e:73f6:39a8:6f94])
-        by smtp.gmail.com with ESMTPSA id f140sm10806039wme.21.2019.11.15.06.26.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2019 06:26:49 -0800 (PST)
-Subject: Re: [PATCH v4 0/4] Add support for capturing the highest observable
- L2 TSC
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
-References: <20191108051439.185635-1-aaronlewis@google.com>
- <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
- <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fe087e58-252a-f489-abbb-37cd68e2e437@redhat.com>
-Date:   Fri, 15 Nov 2019 15:26:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J1z043+yawG1LzHxNBrYBrUNUJ78K6NFWaeacWnh1zU=;
+        b=mGCbFfwaNTbEZ01q5W0IlyeKrvXNNlEDmTR16Hb0Fs45k1gYD9MegxqBeFRzzLo1hG
+         1fTDSWPz6jc6PK8ZB/UBbuJ6mo6WtScp2yY+FU7XBiBU6laqYkcQqZnUFiR2JJltT22r
+         l+hV0v5+o17lANPjRYhUR3qmTmRYxjlcsGQ0T1VWJXQQuJ2YLbAxvfzL7SpjEBc1kS9W
+         PX9wKCneElsOKPiZAIiZUEYh/0wWCLHMKqy0X8nf8kCTjtaZ3itLdKFzHfOr6wCu+yRe
+         YfRkGwafZBXSS/V68ysS2FXURLbEHpsphEisnv9lR5c4BHxWtIohiojQCIqAlp0KuZIT
+         a1/Q==
+X-Gm-Message-State: APjAAAW6i4dT6EhaZiAQ0kHFXeMxSrWmzZLBm3/BQMUx4VWS0Zno2omd
+        IqvrHz5XX65/zeV3Ztzuliopggo1SQKZVBnH4WrjvBR+
+X-Google-Smtp-Source: APXvYqyrl8aZQJaxpEhtocBfKqeg6VtJwq4ABDL/Mt3KWlzoFUS4xL9wwGj62yFi2vQDFnx28KGx9HTi6SssOcKy//4=
+X-Received: by 2002:a19:848a:: with SMTP id g132mr11805229lfd.62.1573828065804;
+ Fri, 15 Nov 2019 06:27:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: 1wRRZ56WOVmo7JyOoHkOdw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191025170056.109755-1-aaronlewis@google.com>
+In-Reply-To: <20191025170056.109755-1-aaronlewis@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Fri, 15 Nov 2019 06:27:34 -0800
+Message-ID: <CAAAPnDFcS+SCrLK1wGGEiBBc+yy1bGOKsw4oKnXgXFwUb9p0CQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix the register order to match
+ struct regs
+To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/11/19 15:25, Aaron Lewis wrote:
-> Agreed.  I have some test cases in kvm-unit-tests for this code that
-> I've been using to test these changes locally, however, they would
-> fail upstream without "[kvm-unit-tests PATCH] x86: Fix the register
-> order to match struct regs" being taken first.  I'll ping that patch
-> again.
->=20
+On Fri, Oct 25, 2019 at 10:01 AM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> Fix the order the registers show up in SAVE_GPR and SAVE_GPR_C to ensure
+> the correct registers get the correct values.  Previously, the registers
+> were being written to (and read from) the wrong fields.
+>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  x86/vmx.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/x86/vmx.h b/x86/vmx.h
+> index 8496be7..8527997 100644
+> --- a/x86/vmx.h
+> +++ b/x86/vmx.h
+> @@ -492,9 +492,9 @@ enum vm_instruction_error_number {
+>
+>  #define SAVE_GPR                               \
+>         "xchg %rax, regs\n\t"                   \
+> -       "xchg %rbx, regs+0x8\n\t"               \
+> -       "xchg %rcx, regs+0x10\n\t"              \
+> -       "xchg %rdx, regs+0x18\n\t"              \
+> +       "xchg %rcx, regs+0x8\n\t"               \
+> +       "xchg %rdx, regs+0x10\n\t"              \
+> +       "xchg %rbx, regs+0x18\n\t"              \
+>         "xchg %rbp, regs+0x28\n\t"              \
+>         "xchg %rsi, regs+0x30\n\t"              \
+>         "xchg %rdi, regs+0x38\n\t"              \
+> @@ -511,9 +511,9 @@ enum vm_instruction_error_number {
+>
+>  #define SAVE_GPR_C                             \
+>         "xchg %%rax, regs\n\t"                  \
+> -       "xchg %%rbx, regs+0x8\n\t"              \
+> -       "xchg %%rcx, regs+0x10\n\t"             \
+> -       "xchg %%rdx, regs+0x18\n\t"             \
+> +       "xchg %%rcx, regs+0x8\n\t"              \
+> +       "xchg %%rdx, regs+0x10\n\t"             \
+> +       "xchg %%rbx, regs+0x18\n\t"             \
+>         "xchg %%rbp, regs+0x28\n\t"             \
+>         "xchg %%rsi, regs+0x30\n\t"             \
+>         "xchg %%rdi, regs+0x38\n\t"             \
+> --
+> 2.24.0.rc0.303.g954a862665-goog
+>
 
-You've just done that... :)
-
-Paolo
-
+Ping.
