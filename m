@@ -2,106 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B235CFD283
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 02:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAAA2FD2E1
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 03:18:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727323AbfKOBkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 20:40:15 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:45182 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727022AbfKOBkO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 20:40:14 -0500
-Received: by mail-lf1-f68.google.com with SMTP id v8so6655046lfa.12
-        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 17:40:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rFskqtLP2N2VaZi1tFqSAtlpsDvGGv7YPwSPEpuMZEo=;
-        b=bNsKgL/vFHp5Dmh3egwCsmkq3RAyW9y/VBXFH8UbShDrDwtrKHLz34Pn4zFWo7NY3z
-         5PTmOWxwXywEvoxu/SVKs/6hilrCcEjC1tkbXU0MpRa0Kjf7gd9thLWv7a4NNgMTEhjy
-         R+PXiaXD6Fumb4JQVKY6gBby+WxozAtLDvBfgUxDFoXKVSVk/i0026CQAfFbbcVENqUv
-         nXeDS56UsnuKqn3R+tKNQBxYvYuZ5LuP2VlicTTUdzTi6YuDc/FFH2zGkx6Wyd5uRiC9
-         rZ15dZyUHKKwXmGVMqaYnwBITAFeEPy2k0xgOebCWOX4T2HsIZT7P1/Hr8okT67PFkqB
-         09qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rFskqtLP2N2VaZi1tFqSAtlpsDvGGv7YPwSPEpuMZEo=;
-        b=Y25Zy8PbbK06duXyOwf6rEa09p22bYoQJEhq0v+FfjOurs78NYLF6VsHxbJsA6xxo6
-         SZGFLUgJ4jN0GUMA4pvrgQpzPbmWOAECybpTPa/FNAwUSHGPOMxyeax5YZhxBJAQRV63
-         UVK5pgcFc9vUKmXsEQlO7h8hE29q+bGGjuAIIH/ztG+SaaX4kSf28sjrKWAO08YvZ7qH
-         Mu/2Cq9nB49VMVThszn66or0a2Mwc29svcYT7ptQiZvc0xjaN2pr07sYN6NmCojBLRKv
-         ZRQkAs8j+lF0h+eoeAo9EXblEHiGCyEHYgzpgkoq1L28ERJ5IcSHv2PLaK621RveH2g4
-         PyGw==
-X-Gm-Message-State: APjAAAUo0iSZAwu/GNOM+hDRzzT3ek8Deh5aYQMruLwapWCjiJgH3t/5
-        H/mk4LkdgAy7M+kZVcZS6RrgZ889NjudqQort7+q1w==
-X-Google-Smtp-Source: APXvYqz60nURqcP+ihfir96vZTjjr0ZAN8WS3qlm2R92Tk9C+zIRN/Bzmh5fMkWjRsuUPdRJxDb2bptiDaojJBCZVYY=
-X-Received: by 2002:a19:c790:: with SMTP id x138mr9439033lff.61.1573782011720;
- Thu, 14 Nov 2019 17:40:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-12-brijesh.singh@amd.com>
- <CABayD+ctvNszs6gVdjP+geJTk1RN3Ko-RWaRTdeU6-7G1=F=Mw@mail.gmail.com>
-In-Reply-To: <CABayD+ctvNszs6gVdjP+geJTk1RN3Ko-RWaRTdeU6-7G1=F=Mw@mail.gmail.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Thu, 14 Nov 2019 17:39:35 -0800
-Message-ID: <CABayD+fnnyLxh1Nak9vskKQpLBOXROvaaj5Q64Ksx_qHB0DE5g@mail.gmail.com>
-Subject: Re: [PATCH v3 11/11] KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
+        id S1726986AbfKOCSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 21:18:09 -0500
+Received: from mga09.intel.com ([134.134.136.24]:50611 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726533AbfKOCSI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 21:18:08 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 18:18:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,306,1569308400"; 
+   d="scan'208";a="199047942"
+Received: from guptapadev.jf.intel.com (HELO guptapadev.amr) ([10.7.198.56])
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2019 18:18:07 -0800
+Date:   Thu, 14 Nov 2019 18:11:19 -0800
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Nadav Amit <nadav.amit@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>,
+        "Gupta, Pawan Kumar" <pawan.kumar.gupta@intel.com>,
+        kirill.shutemov@linux.intel.com
+Subject: Re: [FYI PATCH 0/7] Mitigation for CVE-2018-12207
+Message-ID: <20191115021119.GB18745@guptapadev.amr>
+References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
+ <23353382-53ea-8b20-7e30-763ef6df374c@siemens.com>
+ <ea5a084b-e047-6677-b8fe-d7bb6f8c0ef8@redhat.com>
+ <dffb19ab-daa2-a513-531e-c43279d8a4bf@intel.com>
+ <6C0513A5-6C73-4F17-B73B-6F19E7D9EAF0@gmail.com>
+ <6a317558-44c0-5a21-0310-4ae49048134f@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a317558-44c0-5a21-0310-4ae49048134f@intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 5:22 PM Steve Rutherford <srutherford@google.com> wrote:
->
-> On Wed, Jul 10, 2019 at 1:13 PM Singh, Brijesh <brijesh.singh@amd.com> wrote:
-> >
-> >  struct kvm_arch_async_pf {
-> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> > index e675fd89bb9a..31653e8d5927 100644
-> > --- a/arch/x86/kvm/svm.c
-> > +++ b/arch/x86/kvm/svm.c
-> > @@ -7466,6 +7466,47 @@ static int svm_get_page_enc_bitmap(struct kvm *kvm,
-> >         return ret;
-> >  }
-> >
-> > +static int svm_set_page_enc_bitmap(struct kvm *kvm,
-> > +                                  struct kvm_page_enc_bitmap *bmap)
-> > +{
-> > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > +       unsigned long gfn_start, gfn_end;
-> > +       unsigned long *bitmap;
-> > +       unsigned long sz, i;
-> > +       int ret;
-> > +
-> > +       if (!sev_guest(kvm))
-> > +               return -ENOTTY;
-> > +
-> > +       gfn_start = bmap->start_gfn;
-> > +       gfn_end = gfn_start + bmap->num_pages;
-> > +
-> > +       sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
-> > +       bitmap = kmalloc(sz, GFP_KERNEL);
->
-> This kmalloc should probably be either a vmalloc or kvmalloc. The max
-> size, if I'm reading kmalloc correctly, is 2^10 pages. That's 4MB,
-> which should correspond to a bitmap for a 128GB VM, which is a
-> plausible VM size.
->
-> --Steve
+On Wed, Nov 13, 2019 at 09:26:24PM -0800, Dave Hansen wrote:
+> On 11/13/19 5:17 PM, Nadav Amit wrote:
+> > But is it always the case? Looking at __split_large_page(), it seems that the
+> > TLB invalidation is only done after the PMD is changed. Can't this leave a
+> > small time window in which a malicious actor triggers a machine-check on 
+> > another core than the one that runs __split_large_page()?
+> 
+> It's not just a split.  It has to be a change that results in
+> inconsistencies between two entries in the TLB.  A normal split doesn't
+> change the resulting final translations and is never inconsistent
+> between the two translations.
+> 
+> To have an inconsistency, you need to change the backing physical
+> address (or cache attributes?).  I'd need to go double-check the erratum
+> to be sure about the cache attributes.
+> 
+> In any case, that's why we decided that normal kernel mapping
+> split/merges don't need to be mitigated.  But, we should probably
+> document this somewhere if it's not clear.
+> 
+> Pawan, did we document the results of the audit you did anywhere?
 
-Ignore this, you are clearly never going to copy that much in one
-call, and the backing bitmap correctly uses kvmalloc.
+Kirill Shutemov did the heavy lifting, thank you Kirill. Below were the
+major areas probed: 
+
+1. Can a non-privileged user application induce this erratum?
+
+	Userspace can trigger switching between 4k and 2M (in both
+	directions), but kernel already follows the protocol to avoid
+	this issue due to similar errata in AMD CPUs. [1][2]
+
+2. If kernel can accidentally induce this?
+
+	__split_large_page() in arch/x86/mm/pageattr.c was the suspect [3]. 
+
+	The locking scheme described in the comment only guarantees that
+	TLB entries for 4k and 2M/1G will have the same page attributes
+	until TLB flush. There is nothing that would protect from having
+	multiple TLB entries of different sizes with the same attributes.
+
+	But the erratum can be triggered only when:
+
+		Software modifies the paging structures so that the same
+		linear address is translated using a large page (2 MB, 4
+		MB, or 1 GB) with a different physical address or memory
+		type.
+
+	And in this case the physical address and memory type is
+	preserved until TLB is flushed, so it should be safe.
+
+Thanks,
+Pawan
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/mm/huge_memory.c#n2190
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/mm/khugepaged.c#n1038
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/mm/pageattr.c#n1020
