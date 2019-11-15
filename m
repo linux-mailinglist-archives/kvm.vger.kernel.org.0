@@ -2,217 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D181FE487
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 19:06:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAFD1FE4F6
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 19:33:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726822AbfKOSGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 13:06:35 -0500
-Received: from mga05.intel.com ([192.55.52.43]:12098 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726131AbfKOSGe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 13:06:34 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2019 10:06:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,309,1569308400"; 
-   d="scan'208";a="203454343"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2019 10:06:32 -0800
-Date:   Fri, 15 Nov 2019 10:06:32 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 09/24] vfio, mm: fix get_user_pages_remote() and
- FOLL_LONGTERM
-Message-ID: <20191115180631.GA23832@iweiny-DESK2.sc.intel.com>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-10-jhubbard@nvidia.com>
+        id S1726984AbfKOSdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 13:33:54 -0500
+Received: from mail-wr1-f46.google.com ([209.85.221.46]:34267 "EHLO
+        mail-wr1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726075AbfKOSdy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 13:33:54 -0500
+Received: by mail-wr1-f46.google.com with SMTP id e6so12056718wrw.1
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 10:33:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Nt76VJq+AvRdmgTmCwjkMhdJekqZR/On+yFU5X38d+g=;
+        b=fwUy1Z5gpBOK/bEoLUPvETy3MtxsG6ETR6mMYA4n4AX75FJkAgtm3/XHEEPQ9LAyzG
+         CVvVmLbNbHtBt21R++5TbVu4TFQph0XkTzzdhGxeo6MO0qA/I5bba1DEu2YTEAk0vj4F
+         enYXtOzxYT7Fs5Q5zJKvVrY/O9zMS103EJVP6tSF7eCzA7AKFNpSlcZ7rNiQNeJscq7i
+         ovwkhGSwybxr/RN/p/7nY4eZbTxUml5R8NgUdo8hWvVWs5Je/npJUACVAj87abexBWNa
+         kwg9x/WwOzATURMFu/YGAfTae56p+dr8CMYDY3v9jsiAJvEd9+v7r7p43i4sPw0oyhaS
+         ymiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Nt76VJq+AvRdmgTmCwjkMhdJekqZR/On+yFU5X38d+g=;
+        b=qsVp0MaPrqCSD87KXZLqxRzV2J4evHpRC03zD8vGw9nvsXCtkY80C24tvCRHvF3gy/
+         tEABwhZHhSxLXyA2jS4VQiepF400stL9Q3cX5IpTT7mx1nvR++GEn1MSzXjDhMiLv4u9
+         oMqoz18A5VeD1kR8/lrsZsuTXAU8M9LFYNuhPsHjne0xWQnts644otrDFkk2W64mB5CE
+         ERJe+8NL1hsKEcEiLCMvjBckzY4ElYJlfw/OuV5g4gPE4FvBiyOYZkO3w2OvFOOaAmd9
+         3SQcq0778BLXq5phZLxqxlmVr8/Cf+fs27J8nU0xQ1DTRdKRQqS0UdUp65/F1nad3BOr
+         3X6g==
+X-Gm-Message-State: APjAAAWZ0OSoDfStH0Prgn/5c1+2KfZ1K8JL27bF015AwOrXzKm+kfwb
+        WK2xX9e1QQ0BcsbL8SIK/744fqpqDg3W3/6cUkyL5LyV
+X-Google-Smtp-Source: APXvYqzoOQteX/gW1P0FfoNlQQlSeZ75l/+9letcXdSTmieCv5BkByiyI4FBymc6LOoVzcF76KPLNVGb7IBmXTSlpEM=
+X-Received: by 2002:adf:e389:: with SMTP id e9mr7356278wrm.285.1573842831013;
+ Fri, 15 Nov 2019 10:33:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-10-jhubbard@nvidia.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+References: <CALMp9eQ3NcXOJ9MDMBhm2Fi2cvMW7X5GxVgDw97zS=H5vOMvgw@mail.gmail.com>
+ <a5845d60-fe38-afc6-e433-4c5a12813026@redhat.com>
+In-Reply-To: <a5845d60-fe38-afc6-e433-4c5a12813026@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 15 Nov 2019 10:33:39 -0800
+Message-ID: <CALMp9eRdWCbN689WrB2WKG3N3_vqpYa6G+1CB+kUbO_sig026w@mail.gmail.com>
+Subject: Re: KVM_GET_SUPPORTED_CPUID
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 09:53:25PM -0800, John Hubbard wrote:
-> As it says in the updated comment in gup.c: current FOLL_LONGTERM
-> behavior is incompatible with FAULT_FLAG_ALLOW_RETRY because of the
-> FS DAX check requirement on vmas.
-> 
-> However, the corresponding restriction in get_user_pages_remote() was
-> slightly stricter than is actually required: it forbade all
-> FOLL_LONGTERM callers, but we can actually allow FOLL_LONGTERM callers
-> that do not set the "locked" arg.
-> 
-> Update the code and comments accordingly, and update the VFIO caller
-> to take advantage of this, fixing a bug as a result: the VFIO caller
-> is logically a FOLL_LONGTERM user.
-> 
-> Also, remove an unnessary pair of calls that were releasing and
-> reacquiring the mmap_sem. There is no need to avoid holding mmap_sem
-> just in order to call page_to_pfn().
-> 
-> Also, move the DAX check ("if a VMA is DAX, don't allow long term
-> pinning") from the VFIO call site, all the way into the internals
-> of get_user_pages_remote() and __gup_longterm_locked(). That is:
-> get_user_pages_remote() calls __gup_longterm_locked(), which in turn
-> calls check_dax_vmas(). It's lightly explained in the comments as well.
-> 
-> Thanks to Jason Gunthorpe for pointing out a clean way to fix this,
-> and to Dan Williams for helping clarify the DAX refactoring.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Jerome Glisse <jglisse@redhat.com>
-> Cc: Ira Weiny <ira.weiny@intel.com>
+On Fri, Nov 15, 2019 at 3:42 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 14/11/19 21:09, Jim Mattson wrote:
+> > Can someone explain this ioctl to me? The more I look at it, the less
+> > sense it makes to me.
+>
+> It certainly has some historical baggage in it, much like
+> KVM_GET_MSR_INDEX_LIST.  But (unlike KVM_GET_MSR_INDEX_LIST) it's mostly
+> okay; the issues you report boil down to one of:
+>
+> 1) KVM_GET_SUPPORTED_CPUID being a system ioctl
+>
+> 2) supporting the simple case of taking the output of
+> KVM_GET_SUPPORTED_CPUID and passing it to KVM_SET_CPUID2
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+For this purpose, wouldn't 'DEFAULT' make a lot more sense than
+'SUPPORTED' in the name of this ioctl?
 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 30 +++++-------------------------
->  mm/gup.c                        | 27 ++++++++++++++++++++++-----
->  2 files changed, 27 insertions(+), 30 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index d864277ea16f..c7a111ad9975 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -340,7 +340,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  {
->  	struct page *page[1];
->  	struct vm_area_struct *vma;
-> -	struct vm_area_struct *vmas[1];
->  	unsigned int flags = 0;
->  	int ret;
->  
-> @@ -348,33 +347,14 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		flags |= FOLL_WRITE;
->  
->  	down_read(&mm->mmap_sem);
-> -	if (mm == current->mm) {
-> -		ret = get_user_pages(vaddr, 1, flags | FOLL_LONGTERM, page,
-> -				     vmas);
-> -	} else {
-> -		ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags, page,
-> -					    vmas, NULL);
-> -		/*
-> -		 * The lifetime of a vaddr_get_pfn() page pin is
-> -		 * userspace-controlled. In the fs-dax case this could
-> -		 * lead to indefinite stalls in filesystem operations.
-> -		 * Disallow attempts to pin fs-dax pages via this
-> -		 * interface.
-> -		 */
-> -		if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> -			ret = -EOPNOTSUPP;
-> -			put_page(page[0]);
-> -		}
-> -	}
-> -	up_read(&mm->mmap_sem);
-> -
-> +	ret = get_user_pages_remote(NULL, mm, vaddr, 1, flags | FOLL_LONGTERM,
-> +				    page, NULL, NULL);
->  	if (ret == 1) {
->  		*pfn = page_to_pfn(page[0]);
-> -		return 0;
-> +		ret = 0;
-> +		goto done;
->  	}
->  
-> -	down_read(&mm->mmap_sem);
-> -
->  	vaddr = untagged_addr(vaddr);
->  
->  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
-> @@ -384,7 +364,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  		if (is_invalid_reserved_pfn(*pfn))
->  			ret = 0;
->  	}
-> -
-> +done:
->  	up_read(&mm->mmap_sem);
->  	return ret;
->  }
-> diff --git a/mm/gup.c b/mm/gup.c
-> index b859bd4da4d7..6cf613bfe7dc 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -29,6 +29,13 @@ struct follow_page_context {
->  	unsigned int page_mask;
->  };
->  
-> +static __always_inline long __gup_longterm_locked(struct task_struct *tsk,
-> +						  struct mm_struct *mm,
-> +						  unsigned long start,
-> +						  unsigned long nr_pages,
-> +						  struct page **pages,
-> +						  struct vm_area_struct **vmas,
-> +						  unsigned int flags);
->  /*
->   * Return the compound head page with ref appropriately incremented,
->   * or NULL if that failed.
-> @@ -1167,13 +1174,23 @@ long get_user_pages_remote(struct task_struct *tsk, struct mm_struct *mm,
->  		struct vm_area_struct **vmas, int *locked)
->  {
->  	/*
-> -	 * FIXME: Current FOLL_LONGTERM behavior is incompatible with
-> +	 * Parts of FOLL_LONGTERM behavior are incompatible with
->  	 * FAULT_FLAG_ALLOW_RETRY because of the FS DAX check requirement on
-> -	 * vmas.  As there are no users of this flag in this call we simply
-> -	 * disallow this option for now.
-> +	 * vmas. However, this only comes up if locked is set, and there are
-> +	 * callers that do request FOLL_LONGTERM, but do not set locked. So,
-> +	 * allow what we can.
->  	 */
-> -	if (WARN_ON_ONCE(gup_flags & FOLL_LONGTERM))
-> -		return -EINVAL;
-> +	if (gup_flags & FOLL_LONGTERM) {
-> +		if (WARN_ON_ONCE(locked))
-> +			return -EINVAL;
-> +		/*
-> +		 * This will check the vmas (even if our vmas arg is NULL)
-> +		 * and return -ENOTSUPP if DAX isn't allowed in this case:
-> +		 */
-> +		return __gup_longterm_locked(tsk, mm, start, nr_pages, pages,
-> +					     vmas, gup_flags | FOLL_TOUCH |
-> +					     FOLL_REMOTE);
-> +	}
->  
->  	return __get_user_pages_locked(tsk, mm, start, nr_pages, pages, vmas,
->  				       locked,
-> -- 
-> 2.24.0
-> 
+> 3) CPUID information being poorly designed, or just Intel doing
+> undesirable things
+>
+> > Let's start with leaf 0. If I see 0xd in EAX, does that indicate the
+> > *maximum* supported value in EAX?
+>
+> This is easy, you can always supply a subset of the values to the guest,
+> and this includes reducing the value of integer values (such as the
+> number of leaves) or clearing bits.  It should be documented better,
+> possibly including with a list of leaves that can be filled by the VMM
+> as it likes (e.g. cache topology).
+
+Maybe you can reduce CPUID.0H:EAX, but there are some integer values
+that you can't reduce (e.g. CPUID.(EAX=0Dh,ECX=0):ECX). So, I'd argue
+that this isn't "easy."
+
+> > Or does that mean that only a value
+> > of 0xd is supported for EAX? If I see "AuthenticAMD" in EBX/EDX/ECX,
+> > does that mean that "GenuineIntel" is *not* supported? I thought
+> > people were having reasonable success with cross-vendor migration.
+>
+> This is (2).  But in general passing the host value is the safe choice,
+> everything else has reasonable success but it's not something I would
+> recommend in production (and it's something I wouldn't mind removing,
+> really).
+>
+> > What about leaf 7 EBX? If a bit is clear, does that mean setting the
+> > bit is unsupported? If a bit is set, does that mean clearing the bit
+> > is unsupported? Do those answers still apply for bits 6 and 13, where
+> > a '1' indicates the absence of a feature?
+>
+> Again, clearing bits is always supported in theory, but I say "in
+> theory" because of course bits 6 and 13 are indeed problematic. And
+> unfortunately the only solutions for those is to stick your head in the
+> sand and pretend they don't exist.  If bits 6 and 13 were handled
+> strictly, people would not be able to migrate VMs between e.g. Haswell
+> and Ivy Bridge machines within the same fleet, which is something people
+> want to do.  So, this is (3).
+
+For these two bits, one could argue that *setting* them is always
+supported, at least insofar as *clearing* the normal polarity bits is
+supported. If you say that FCS and FDS are "deprecated [sic]" on your
+Ivy Bridge platform, but software relies on it, then that software is
+just as ill-behaved as software that depends on any other feature that
+has been masked off. (Of course, none of the software that actually
+depends on this feature actually checks the CPUID bit, since the CPUID
+bit was defined after-the-fact.) So, even if you're strict about it,
+you can migrate between Haswell and Ivy Bridge.
+
+
+> A similar case is CPUID[0Ah].EBX (unavailable architectural events).
+>
+> > What about leaf 0xa? Kvm's api.txt says, "Note that certain
+> > capabilities, such as KVM_CAP_X86_DISABLE_EXITS, may expose cpuid
+> > features (e.g. MONITOR) which are not supported by kvm in its default
+> > configuration. If userspace enables such capabilities, it is
+> > responsible for modifying the results of this ioctl appropriately."
+> > However, it appears that the vPMU is enabled not by such a capability,
+> > but by filling in leaf 0xa.
+>
+> Right, the supported values are provided by KVM_GET_SUPPORTED_CPUID.  So
+> as long as you don't zero the PMU version id to 0, PMU is enabled.
+>
+> > How does userspace know what leaf 0xa
+> > values are supported by both the hardware and kvm?
+>
+> Reducing functionality is supported---fewer GP or fixed counters, or
+> disabling events by *setting* bits in EBX or reducing EAX[31:24].
+>
+> > And as for KVM_CAP_X86_DISABLE_EXITS, in particular, how is userspace
+> > supposed to know what the appropriate modification to
+> > KVM_GET_SUPPORTED_CPUID is? Is this documented somewhere else?
+> >
+> > And as for the "certain capabilities" clause above, should I assume
+> > that any capability enabled by userspace may require modifications to
+> > KVM_GET_SUPPORTED_CPUID?  What might those required modifications be?
+> > Has anyone thought to document them, or better yet, provide an API to
+> > get them?
+>
+> And finally this is (1).  It should be documented by the individual
+> capabilities or ioctls.
+>
+> With KVM_ENABLE_CAP, the only one that is _absent_ from
+> KVM_GET_SUPPORTED_CPUID the MONITOR bit.
+
+And leaf 5?
+
+> The opposite case is X2APIC, which is reported as supported in
+> KVM_GET_SUPPORTED_CPUID even though requires KVM_CREATE_IRQCHIP (or
+> KVM_ENABLE_CAP + KVM_CAP_SPLIT_IRQCHIP).  Of course any serious VMM uses
+> in-kernel irqchip, but still it's ugly.
+>
+> Providing an API to get a known-good value of CPUID for the current VM
+> (a KVM_GET_SUPPORTED_CPUID vm-ioctl, basically) would be a fine idea.
+> If anybody is interested, I can think of other cases where this applies.
+>  It would provide a better way to do (2), essentially.
+>
+> > What about the processor brand string in leaves 0x80000000-0x80000004?
+> > Is a string of NULs really the only supported value?
+>
+> Indeed this should probably return the host values, at least for
+> consistency with the vendor.
+>
+> > And just a nit, but why does this ioctl bother returning explicitly
+> > zeroed leaves for unsupported leaves in range?
+>
+> No particular reason, it just keeps the code simpler.
+>
+> > It would really be nice if I could use this ioctl to write a
+> > "HostSupportsGuest" function based in part on an existing guest's
+> > CPUID information, but that doesn't seem all that feasible, without
+> > intimate knowledge of how the host's implementation of kvm works.
+>
+> It does not depend that much on knowledge of the host's implementation
+> of KVM.  However, it does depend on tiny details of the CPUID bits.
+>
+> Thanks,
+>
+> Paolo
+>
