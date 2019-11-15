@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDF8BFE420
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 18:35:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CA64FE47B
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 19:01:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727830AbfKORfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 12:35:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45814 "EHLO mail.kernel.org"
+        id S1727077AbfKOSBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 13:01:23 -0500
+Received: from mga02.intel.com ([134.134.136.20]:37139 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727718AbfKORfH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 12:35:07 -0500
-Subject: Re: [GIT PULL] More KVM fixes for 5.4-rc8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573839307;
-        bh=6uhqrn3Os1/XNjxcZCalQTem+EZ16y4aWUfR5yeVMGc=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=CiVN4sUOvwxz/qHaVnig89D6TLmCpvrI59TEecFHopwRn+9Gf/LWdecW9Cn4NqOcb
-         lNpNFxNGVQvzQmBsXn1grfcI+IeEeVIdVA3XLsC/88cSIkzDy4jdJn44UwbAaD2QKE
-         HAeaJkuoEZEmg5VCFmMmELd7E+ATKVt4WmFIHyrg=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1573811092-12834-1-git-send-email-pbonzini@redhat.com>
-References: <1573811092-12834-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1573811092-12834-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: 9cb09e7c1c9af2968d5186ef9085f05641ab65d9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 74bc8acd6cb4f5cee25fcfe4e9afb06f75949081
-Message-Id: <157383930726.31249.8445509197480847010.pr-tracker-bot@kernel.org>
-Date:   Fri, 15 Nov 2019 17:35:07 +0000
+        id S1727069AbfKOSBX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 13:01:23 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2019 10:01:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,309,1569308400"; 
+   d="scan'208";a="406744746"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 15 Nov 2019 10:01:22 -0800
+Date:   Fri, 15 Nov 2019 10:01:22 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+Subject: Re: KVM_GET_SUPPORTED_CPUID
+Message-ID: <20191115180122.GB6055@linux.intel.com>
+References: <CALMp9eQ3NcXOJ9MDMBhm2Fi2cvMW7X5GxVgDw97zS=H5vOMvgw@mail.gmail.com>
+ <a5845d60-fe38-afc6-e433-4c5a12813026@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5845d60-fe38-afc6-e433-4c5a12813026@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri, 15 Nov 2019 10:44:52 +0100:
+On Fri, Nov 15, 2019 at 12:42:17PM +0100, Paolo Bonzini wrote:
+> On 14/11/19 21:09, Jim Mattson wrote:
+> > If I see "AuthenticAMD" in EBX/EDX/ECX,
+> > does that mean that "GenuineIntel" is *not* supported? I thought
+> > people were having reasonable success with cross-vendor migration.
+> 
+> This is (2).  But in general passing the host value is the safe choice,
+> everything else has reasonable success but it's not something I would
+> recommend in production (and it's something I wouldn't mind removing,
+> really).
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/74bc8acd6cb4f5cee25fcfe4e9afb06f75949081
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Maybe keep it but add a pr_warn_once() to inform the user that exposions
+are likely?  Or make it opt-in via a module param?  I've found this useful
+for smoke testing patches that touch AMD/Hygon/Zhaoxin/Centaur code.
