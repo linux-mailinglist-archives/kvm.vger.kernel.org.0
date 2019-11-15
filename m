@@ -2,184 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E10A3FDC63
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 12:39:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFF62FDC6F
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 12:42:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727256AbfKOLjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 06:39:39 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63468 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727122AbfKOLjj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 06:39:39 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAFBXl8u071922
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:39:38 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w9nuxbav5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:39:38 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Fri, 15 Nov 2019 11:39:35 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 15 Nov 2019 11:39:32 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAFBdUQG53346400
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Nov 2019 11:39:30 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F1A8AE056;
-        Fri, 15 Nov 2019 11:39:30 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52F5FAE051;
-        Fri, 15 Nov 2019 11:39:30 +0000 (GMT)
-Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 Nov 2019 11:39:30 +0000 (GMT)
-Subject: Re: [RFC 32/37] KVM: s390: protvirt: UV calls diag308 0, 1
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
-        gor@linux.ibm.com
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-33-frankja@linux.ibm.com>
- <6fb6b03f-5a33-34ec-53e6-d960ac7bbae6@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date:   Fri, 15 Nov 2019 12:39:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727208AbfKOLmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 06:42:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35525 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726983AbfKOLmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 06:42:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573818141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F+ah94JjIHAJkEXOkzgz1b2OLU4RdWluX9thdv65FgM=;
+        b=Lqze+I56wH6RrnquJuLnhMbOwo5mHINOwEwZPONyJap3E0S6PBLn7nzwnmwyzR1FwCV79o
+        kN5aCYZifY6xSHEktL9xLEprRBRlAFG/Qb0qopzQmaP17pKX5kP7z6oGhT0Pq7wTXv2x9W
+        lj7NuRTFceBiV7J8b72LsN9ugEZ6NpY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-woJtPsJbMH-1UPoZq1lkvw-1; Fri, 15 Nov 2019 06:42:20 -0500
+Received: by mail-wm1-f71.google.com with SMTP id g14so6748676wmk.9
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 03:42:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hxb2jgKJMs2gsGu5l56FuM8E4NRRgeTB5uJFr0x4TRs=;
+        b=JwEStaBGQZR4r+ILqaDy0G60QNdi7bGcUYal8w3Os5Hg8rleONtomhA87t85Fx5MSb
+         fFFAlbn10UbA81OYSkn7dCl+UX6uIfI7zTU8Wy2/NLMxcNAtkNzvb4tx+u8Wo8Q85/TG
+         psMlVatqwenODUqc5c1Y76S+v0iZyfmq2t4mGOXbb5u6sBGaGMqya6YMB2sZFZfG/ES6
+         3JTU9fYafXMZjPCnpVxC/uAwGScLTCd8tDoSmSk49KMsZ1XEIAQHWC6KgTp7jTVf3H7d
+         Wfb9QsTlnHWYbJgqCvA37s9h56vrp5YdBV55g1IkvFOrwJ/SamFptH8k3lpNM64zDUxO
+         LK9Q==
+X-Gm-Message-State: APjAAAVQsxvsbuv5psJ3xPJ1+0CeAsvDwnyojQ6Ocuc/Tla/4PgsQUKz
+        h4+8RLE7iaHRh00ddud7sR6JIkVXfeKr63O1YbfKB7YjClMoKiv0wpCztOa4sHAVY6qKNSg6GOH
+        7mIIPRg3CTDA4
+X-Received: by 2002:a1c:810d:: with SMTP id c13mr15188434wmd.154.1573818139121;
+        Fri, 15 Nov 2019 03:42:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyGasUjgqXCBd9dvIblf/+C+DTV5gb8s6utybkKwRh0ywQvj8FbpSaozDHM9eCd/LWtAp2jOQ==
+X-Received: by 2002:a1c:810d:: with SMTP id c13mr15188391wmd.154.1573818138714;
+        Fri, 15 Nov 2019 03:42:18 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+        by smtp.gmail.com with ESMTPSA id 76sm10292047wma.0.2019.11.15.03.42.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2019 03:42:18 -0800 (PST)
+Subject: Re: KVM_GET_SUPPORTED_CPUID
+To:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>
+References: <CALMp9eQ3NcXOJ9MDMBhm2Fi2cvMW7X5GxVgDw97zS=H5vOMvgw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a5845d60-fe38-afc6-e433-4c5a12813026@redhat.com>
+Date:   Fri, 15 Nov 2019 12:42:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6fb6b03f-5a33-34ec-53e6-d960ac7bbae6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3bQ82cVqhvsl99zb1c8ikaBauLUWIlF3H"
-X-TM-AS-GCONF: 00
-x-cbid: 19111511-0016-0000-0000-000002C3E3EB
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111511-0017-0000-0000-000033258ADC
-Message-Id: <302337a3-5a1f-4ee9-2ee8-a10b7fe17479@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-15_03:2019-11-15,2019-11-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
- phishscore=0 mlxscore=0 malwarescore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 impostorscore=0 suspectscore=3
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911150108
+In-Reply-To: <CALMp9eQ3NcXOJ9MDMBhm2Fi2cvMW7X5GxVgDw97zS=H5vOMvgw@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: woJtPsJbMH-1UPoZq1lkvw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3bQ82cVqhvsl99zb1c8ikaBauLUWIlF3H
-Content-Type: multipart/mixed; boundary="uDCDXCOpyalrvDHubmqFlnTYSk3CvC9sq"
+On 14/11/19 21:09, Jim Mattson wrote:
+> Can someone explain this ioctl to me? The more I look at it, the less
+> sense it makes to me.
 
---uDCDXCOpyalrvDHubmqFlnTYSk3CvC9sq
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+It certainly has some historical baggage in it, much like
+KVM_GET_MSR_INDEX_LIST.  But (unlike KVM_GET_MSR_INDEX_LIST) it's mostly
+okay; the issues you report boil down to one of:
 
-On 11/15/19 11:07 AM, Thomas Huth wrote:
-> On 24/10/2019 13.40, Janosch Frank wrote:
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  arch/s390/include/asm/uv.h | 25 +++++++++++++++++++++++++
->>  arch/s390/kvm/diag.c       |  1 +
->>  arch/s390/kvm/kvm-s390.c   | 20 ++++++++++++++++++++
->>  arch/s390/kvm/kvm-s390.h   |  2 ++
->>  arch/s390/kvm/pv.c         | 19 +++++++++++++++++++
->>  include/uapi/linux/kvm.h   |  2 ++
->>  6 files changed, 69 insertions(+)
+1) KVM_GET_SUPPORTED_CPUID being a system ioctl
+
+2) supporting the simple case of taking the output of
+KVM_GET_SUPPORTED_CPUID and passing it to KVM_SET_CPUID2
+
+3) CPUID information being poorly designed, or just Intel doing
+undesirable things
+
+> Let's start with leaf 0. If I see 0xd in EAX, does that indicate the
+> *maximum* supported value in EAX?
+
+This is easy, you can always supply a subset of the values to the guest,
+and this includes reducing the value of integer values (such as the
+number of leaves) or clearing bits.  It should be documented better,
+possibly including with a list of leaves that can be filled by the VMM
+as it likes (e.g. cache topology).
+
+> Or does that mean that only a value
+> of 0xd is supported for EAX? If I see "AuthenticAMD" in EBX/EDX/ECX,
+> does that mean that "GenuineIntel" is *not* supported? I thought
+> people were having reasonable success with cross-vendor migration.
+
+This is (2).  But in general passing the host value is the safe choice,
+everything else has reasonable success but it's not something I would
+recommend in production (and it's something I wouldn't mind removing,
+really).
+
+> What about leaf 7 EBX? If a bit is clear, does that mean setting the
+> bit is unsupported? If a bit is set, does that mean clearing the bit
+> is unsupported? Do those answers still apply for bits 6 and 13, where
+> a '1' indicates the absence of a feature?
+
+Again, clearing bits is always supported in theory, but I say "in
+theory" because of course bits 6 and 13 are indeed problematic. And
+unfortunately the only solutions for those is to stick your head in the
+sand and pretend they don't exist.  If bits 6 and 13 were handled
+strictly, people would not be able to migrate VMs between e.g. Haswell
+and Ivy Bridge machines within the same fleet, which is something people
+want to do.  So, this is (3).
+
+A similar case is CPUID[0Ah].EBX (unavailable architectural events).
+
+> What about leaf 0xa? Kvm's api.txt says, "Note that certain
+> capabilities, such as KVM_CAP_X86_DISABLE_EXITS, may expose cpuid
+> features (e.g. MONITOR) which are not supported by kvm in its default
+> configuration. If userspace enables such capabilities, it is
+> responsible for modifying the results of this ioctl appropriately."
+> However, it appears that the vPMU is enabled not by such a capability,
+> but by filling in leaf 0xa.
+
+Right, the supported values are provided by KVM_GET_SUPPORTED_CPUID.  So
+as long as you don't zero the PMU version id to 0, PMU is enabled.
+
+> How does userspace know what leaf 0xa
+> values are supported by both the hardware and kvm?
+
+Reducing functionality is supported---fewer GP or fixed counters, or
+disabling events by *setting* bits in EBX or reducing EAX[31:24].
+
+> And as for KVM_CAP_X86_DISABLE_EXITS, in particular, how is userspace
+> supposed to know what the appropriate modification to
+> KVM_GET_SUPPORTED_CPUID is? Is this documented somewhere else?
 >=20
-> Add at least a short patch description what this patch is all about?
->=20
->  Thomas
->=20
+> And as for the "certain capabilities" clause above, should I assume
+> that any capability enabled by userspace may require modifications to
+> KVM_GET_SUPPORTED_CPUID?  What might those required modifications be?
+> Has anyone thought to document them, or better yet, provide an API to
+> get them?
 
-I'm thinking about taking out the set cpu state changes and move it into
-a later patch.
+And finally this is (1).  It should be documented by the individual
+capabilities or ioctls.
 
+With KVM_ENABLE_CAP, the only one that is _absent_ from
+KVM_GET_SUPPORTED_CPUID the MONITOR bit.
 
-How about:
-diag 308 subcode 0 and 1 require KVM and Ultravisor interaction, since
-the cpus have to be set into multiple reset states.
+The opposite case is X2APIC, which is reported as supported in
+KVM_GET_SUPPORTED_CPUID even though requires KVM_CREATE_IRQCHIP (or
+KVM_ENABLE_CAP + KVM_CAP_SPLIT_IRQCHIP).  Of course any serious VMM uses
+in-kernel irqchip, but still it's ugly.
 
-* All cpus need to be stopped
-* The unshare all UVC needs to be executed
-* The perform reset UVC needs to be executed
-* The cpus need to be reset via the set cpu state UVC
-* The issuing cpu needs to set state 5 via set cpu state
+Providing an API to get a known-good value of CPUID for the current VM
+(a KVM_GET_SUPPORTED_CPUID vm-ioctl, basically) would be a fine idea.
+If anybody is interested, I can think of other cases where this applies.
+ It would provide a better way to do (2), essentially.
 
+> What about the processor brand string in leaves 0x80000000-0x80000004?
+> Is a string of NULs really the only supported value?
 
---uDCDXCOpyalrvDHubmqFlnTYSk3CvC9sq--
+Indeed this should probably return the host values, at least for
+consistency with the vendor.
 
---3bQ82cVqhvsl99zb1c8ikaBauLUWIlF3H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> And just a nit, but why does this ioctl bother returning explicitly
+> zeroed leaves for unsupported leaves in range?
 
------BEGIN PGP SIGNATURE-----
+No particular reason, it just keeps the code simpler.
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3OjnIACgkQ41TmuOI4
-ufglfQ//XXyHr6b1BC6mRlVGms5WFZZJjTXYbGCisgRv8uefNE/brwSGkrhxAFZR
-PNIzVY72RNGeuRqR26UlWojNzD8mmFSiHjnrkoZ5yBn0QZ+18odbiQUG7oZDKL66
-qHkqnVfRmh+BDXblmnL+DHDNKPEFN5a8JLaLbU4Iay7TwJHTnfIgwAmqyMsCZOeG
-8grufuG1YlBM2OfOzSfTiZkwdTaLYNiRQf9fk68ngY1vTqQTTJUd4LE3Te5vxAYi
-50+KlU5s55FmduEQPySG0vQysqc2+z5ImiVBXOTKuM2s9blgbHqGfUcXsfJfpPzJ
-ODv4LqPKPc2LmQFvSOzRwFnChZdqpy8izFg9NNf4ue+anQQmZmfArrrT9hPt3+gi
-x8guIJksq29Gaq/QA4H+ESsSifQFWzWpcqCPwieorkLNTl1BeYfl2gJW8P4KQOOc
-M8Xpmo5B43jc/ByI8OQ4n4dugYtMIhE0VLDhOEUdJJPyiwQ63f5fsDc5h+9hSq4y
-Nc3U7e/ZFQuOPxzwW+DWZ1YvAAp4PzxkyUDYUaNaeM9+EmgB879gxK/GmtLBVfeX
-TQFxDnFuQB2aD3+eUU3zytR+rhBDuoFwyqxJ3tCCONcmmN+A8PP8kX6BgfsCOq7B
-miBukRDBeB42l95GBuXM9IqruN/EGuKlB6fRNnkI5V15EkKVk3k=
-=NI/M
------END PGP SIGNATURE-----
+> It would really be nice if I could use this ioctl to write a
+> "HostSupportsGuest" function based in part on an existing guest's
+> CPUID information, but that doesn't seem all that feasible, without
+> intimate knowledge of how the host's implementation of kvm works.
 
---3bQ82cVqhvsl99zb1c8ikaBauLUWIlF3H--
+It does not depend that much on knowledge of the host's implementation
+of KVM.  However, it does depend on tiny details of the CPUID bits.
+
+Thanks,
+
+Paolo
 
