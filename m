@@ -2,255 +2,390 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF9D3FD3F5
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 06:10:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5411FD541
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 06:56:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbfKOFK6 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 15 Nov 2019 00:10:58 -0500
-Received: from mga07.intel.com ([134.134.136.100]:12095 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725773AbfKOFK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 00:10:58 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 21:10:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,307,1569308400"; 
-   d="scan'208";a="203291865"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Nov 2019 21:10:57 -0800
-Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 14 Nov 2019 21:10:57 -0800
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 14 Nov 2019 21:10:56 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.200]) with mapi id 14.03.0439.000;
- Fri, 15 Nov 2019 13:10:54 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        "Zhao, Yan Y" <yan.y.zhao@intel.com>
-CC:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Thread-Topic: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Thread-Index: AQHVmX9T7ifKT6t+r02nKr4nCxrVM6eHmG0AgAFiAICAAAhOgIABfoGAgAAkaICAAF1egIAAC3KAgACYZPA=
-Date:   Fri, 15 Nov 2019 05:10:53 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5F6A83@SHSMSX104.ccr.corp.intel.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
-        <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
-        <20191112153020.71406c44@x1.home>
-        <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
-        <20191113130705.32c6b663@x1.home>
-        <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
-        <20191114140625.213e8a99@x1.home>
-        <20191115024035.GA24163@joy-OptiPlex-7040>
- <20191114202133.4b046cb9@x1.home>
-In-Reply-To: <20191114202133.4b046cb9@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzdlNzhhY2ItZmQ5ZC00NGY5LWFhYjAtYTY1ZDUwNjY3NmRmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZWxmVGQzTEMzQ1JCNDZaWE14OExFVkVqcUQ0WE9lMmpZeUh6TkhCQVI0VkxaUVRZSHAxNWY2N2g2TjErb1NFdyJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727881AbfKOF4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 00:56:38 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:10678 "EHLO
+        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727239AbfKOFx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 00:53:56 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dce3d680000>; Thu, 14 Nov 2019 21:53:44 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Thu, 14 Nov 2019 21:53:44 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Thu, 14 Nov 2019 21:53:44 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 Nov
+ 2019 05:53:43 +0000
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 Nov
+ 2019 05:53:43 +0000
+Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Fri, 15 Nov 2019 05:53:43 +0000
+Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
+        id <B5dce3d670000>; Thu, 14 Nov 2019 21:53:43 -0800
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+CC:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v5 00/24] mm/gup: track dma-pinned pages: FOLL_PIN
+Date:   Thu, 14 Nov 2019 21:53:16 -0800
+Message-ID: <20191115055340.1825745-1-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
+X-NVConfidentiality: public
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1573797224; bh=EIIdjw6QQ9kSONnEf59U1mlHiT9Q6HqodmatoE1cjqA=;
+        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+         MIME-Version:X-NVConfidentiality:Content-Type:
+         Content-Transfer-Encoding;
+        b=rgXmOvqJLUo/ZNL6R7UkGzxvqCKE5WKHqMmP0+iUXVkRb9nVOvZtuUaXsxx+g0hvw
+         USCml0g4Xj9gnMThzuGP0XooWuUgL3BZi8rN9HnLsSF/ZfKGE9JK9ODF+1j4xKGKKx
+         Kjd8uP62IYmf+IaKtfXpbNOVkq4BJ50LTRBKNV1Ev1yyj4mYvamUtFK4O/EC89p79d
+         kWkvXX5AzRiTRcobYhC67nR/ylU+VkX5dx/i83HqhrWpLHm+6AY5RXPlgFGHo27Z9Y
+         kPbE6a2d0M0lCnv7dwu2CqvWyQ4S7nTXoE+6eNPxeKnYzuEwgwKV+QllT6GsMJ4wGz
+         VafELb6SBcMhg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Alex Williamson
-> Sent: Friday, November 15, 2019 11:22 AM
-> 
-> On Thu, 14 Nov 2019 21:40:35 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:
-> > > On Fri, 15 Nov 2019 00:26:07 +0530
-> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >
-> > > > On 11/14/2019 1:37 AM, Alex Williamson wrote:
-> > > > > On Thu, 14 Nov 2019 01:07:21 +0530
-> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > >
-> > > > >> On 11/13/2019 4:00 AM, Alex Williamson wrote:
-> > > > >>> On Tue, 12 Nov 2019 22:33:37 +0530
-> > > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > >>>
-> > > > >>>> All pages pinned by vendor driver through vfio_pin_pages API
-> should be
-> > > > >>>> considered as dirty during migration. IOMMU container
-> maintains a list of
-> > > > >>>> all such pinned pages. Added an ioctl defination to get bitmap of
-> such
-> > > > >>>
-> > > > >>> definition
-> > > > >>>
-> > > > >>>> pinned pages for requested IO virtual address range.
-> > > > >>>
-> > > > >>> Additionally, all mapped pages are considered dirty when
-> physically
-> > > > >>> mapped through to an IOMMU, modulo we discussed devices
-> opting in to
-> > > > >>> per page pinning to indicate finer granularity with a TBD
-> mechanism to
-> > > > >>> figure out if any non-opt-in devices remain.
-> > > > >>>
-> > > > >>
-> > > > >> You mean, in case of device direct assignment (device pass
-> through)?
-> > > > >
-> > > > > Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are
-> fully
-> > > > > pinned and mapped, then the correct dirty page set is all mapped
-> pages.
-> > > > > We discussed using the vpfn list as a mechanism for vendor drivers
-> to
-> > > > > reduce their migration footprint, but we also discussed that we
-> would
-> > > > > need a way to determine that all participants in the container have
-> > > > > explicitly pinned their working pages or else we must consider the
-> > > > > entire potential working set as dirty.
-> > > > >
-> > > >
-> > > > How can vendor driver tell this capability to iommu module? Any
-> suggestions?
-> > >
-> > > I think it does so by pinning pages.  Is it acceptable that if the
-> > > vendor driver pins any pages, then from that point forward we consider
-> > > the IOMMU group dirty page scope to be limited to pinned pages?
-> There
-> > > are complications around non-singleton IOMMU groups, but I think
-> we're
-> > > already leaning towards that being a non-worthwhile problem to solve.
-> > > So if we require that only singleton IOMMU groups can pin pages and
-> we
-> > > pass the IOMMU group as a parameter to
-> > > vfio_iommu_driver_ops.pin_pages(), then the type1 backend can set a
-> > > flag on its local vfio_group struct to indicate dirty page scope is
-> > > limited to pinned pages.  We might want to keep a flag on the
-> > > vfio_iommu struct to indicate if all of the vfio_groups for each
-> > > vfio_domain in the vfio_iommu.domain_list dirty page scope limited to
-> > > pinned pages as an optimization to avoid walking lists too often.  Then
-> > > we could test if vfio_iommu.domain_list is not empty and this new flag
-> > > does not limit the dirty page scope, then everything within each
-> > > vfio_dma is considered dirty.
-> > >
-> >
-> > hi Alex
-> > could you help clarify whether my understandings below are right?
-> > In future,
-> > 1. for mdev and for passthrough device withoug hardware ability to track
-> > dirty pages, the vendor driver has to explicitly call
-> > vfio_pin_pages()/vfio_unpin_pages() + a flag to tell vfio its dirty page set.
-> 
-> For non-IOMMU backed mdevs without hardware dirty page tracking,
-> there's no change to the vendor driver currently.  Pages pinned by the
-> vendor driver are marked as dirty.
+Hi,
 
-What about the vendor driver can figure out, in software means, which
-pinned pages are actually dirty? In that case, would a separate mark_dirty
-interface make more sense? Or introduce read/write flag to the pin_pages
-interface similar to DMA API? Existing drivers always set both r/w flags but
-just in case then a specific driver may set read-only or write-only...
+Please note that two of these patches are also out for review
+separately, and may go in earlier than this series. This series
+requires those, so to ease review and testing, they are also
+included here: patches 4 and 5, the devmap cleanups.
 
-> 
-> For any IOMMU backed device, mdev or direct assignment, all mapped
-> memory would be considered dirty unless there are explicit calls to pin
-> pages on top of the IOMMU page pinning and mapping.  These would likely
-> be enabled only when the device is in the _SAVING device_state.
-> 
-> > 2. for those devices with hardware ability to track dirty pages, will still
-> > provide a callback to vendor driver to get dirty pages. (as for those
-> devices,
-> > it is hard to explicitly call vfio_pin_pages()/vfio_unpin_pages())
-> >
-> > 3. for devices relying on dirty bit info in physical IOMMU, there
-> > will be a callback to physical IOMMU driver to get dirty page set from
-> > vfio.
-> 
-> The proposal here does not cover exactly how these would be
-> implemented, it only establishes the container as the point of user
-> interaction with the dirty bitmap and hopefully allows us to maintain
-> that interface regardless of whether we have dirty tracking at the
-> device or the system IOMMU.  Ideally devices with dirty tracking would
-> make use of page pinning and we'd extend the interface to allow vendor
-> drivers the ability to indicate the clean/dirty state of those pinned
+There is a git repo and branch, for convenience:
 
-I don't think "dirty tracking" == "page pinning". It's possible that a device
-support tracking/logging dirty page info into a driver-registered buffer, 
-then the host vendor driver doesn't need to mediate fast-path operations. 
-In such case, the entire guest memory is always pinned and we just need 
-a log-sync like interface for vendor driver to fill dirty bitmap.
+    git@github.com:johnhubbard/linux.git pin_user_pages_tracking_v5
 
-> pages.  For system IOMMU dirty page tracking, that potentially might
-> mean that we support IOMMU page faults and the container manages
-> those
-> faults such that the container is the central record of dirty pages.
+Despite the large number of changes, it does feel like the review
+comments are converging, btw.
 
-IOMMU dirty-bit is not equivalent to IOMMU page fault. The latter
-is much more complex which requires support both in IOMMU and in
-device. Here similar to above device-dirty-tracking case, we just need a
-log-sync interface calling into iommu driver to get dirty info filled for
-requested address range.
+Changes since v4:
 
-> Until these interfaces are designed, we can only speculate, but the
-> goal is to design a user interface compatible with how those features
-> might evolve.  If you identify something that can't work, please raise
-> the issue.  Thanks,
-> 
-> Alex
+* Renamed put_user_page*() --> unpin_user_page().
 
-Here is the desired scheme in my mind. Feel free to correct me. :-)
+* Removed all pin_longterm_pages*() calls. We will use FOLL_LONGTERM
+  at the call sites. (FOLL_PIN, however, remains an internal gup flag).
 
-1. iommu log-buf callback is preferred if underlying IOMMU reports
-such capability. The iommu driver walks IOMMU page table to find
-dirty pages for requested address range;
-2. otherwise vendor driver log-buf callback is preferred if the vendor
-driver reports such capability when registering mdev types. The
-vendor driver calls device-specific interface to fill dirty info;
-3. otherwise pages pined by vfio_pin_pages (with WRITE flag) are
-considered dirty. This covers normal mediated devices or using
-fast-path mediation for migrating passthrough device;
-4. otherwise all mapped pages are considered dirty;
+  This is very nice: many patches just change three characters now:
+  get_user_pages --> pin_user_pages. I think we've found the right
+  balance of wrapper calls and gup flags, for the call sites.
 
-Currently we're working on 1) based on VT-d rev3.0. I know some
-vendors implement 2) in their own code base. 3) has real usages 
-already. 4) is the fall-back.
+* Updated a lot of documentation and commit logs to match the above
+  two large changes.
 
-Alex, are you willing to have all the interfaces ready in one batch,
-or support them based on available usages? I'm fine with either
-way, but even just doing 3/4 in this series, I'd prefer to having
-above scheme included in the code comment, to give the whole 
-picture of all possible situations. :-)
+* Changed gup_benchmark tests and run_vmtests, to adapt to one less
+  use case: there is no pin_longterm_pages() call anymore.
 
-Thanks
-Kevin
+* This includes a new devmap cleanup patch from Dan Williams, along
+  with a rebased follow-up: patches 4 and 5, already mentioned above.
+
+* Fixed patch 10 ("mm/gup: introduce pin_user_pages*() and FOLL_PIN"),
+  so as to make pin_user_pages*() calls act as placeholders for the
+  corresponding get_user_pages*() calls, until a later patch fully
+  implements the DMA-pinning functionality.
+
+  Thanks to Jan Kara for noticing that.
+
+* Fixed the implementation of pin_user_pages_remote().
+
+* Further tweaked patch 2 ("mm/gup: factor out duplicate code from four
+  routines"), in response to Jan Kara's feedback.
+
+* Dropped a few reviewed-by tags  due to changes that invalidated
+  them.
+
+
+Changes since v3:
+
+* VFIO fix (patch 8): applied further cleanup: removed a pre-existing,
+  unnecessary release and reacquire of mmap_sem. Moved the DAX vma
+  checks from the vfio call site, to gup internals, and added comments
+  (and commit log) to clarify.
+
+* Due to the above, made a corresponding fix to the
+  pin_longterm_pages_remote(), which was actually calling the wrong
+  gup internal function.
+
+* Changed put_user_page() comments, to refer to pin*() APIs, rather than
+  get_user_pages*() APIs.
+
+* Reverted an accidental whitespace-only change in the IB ODP code.
+
+* Added a few more reviewed-by tags.
+
+
+Changes since v2:
+
+* Added a patch to convert IB/umem from normal gup, to gup_fast(). This
+  is also posted separately, in order to hopefully get some runtime
+  testing.
+
+* Changed the page devmap code to be a little clearer,
+  thanks to Jerome for that.
+
+* Split out the page devmap changes into a separate patch (and moved
+  Ira's Signed-off-by to that patch).
+
+* Fixed my bug in IB: ODP code does not require pin_user_pages()
+  semantics. Therefore, revert the put_user_page() calls to put_page(),
+  and leave the get_user_pages() call as-is.
+
+      * As part of the revert, I am proposing here a change directly
+        from put_user_pages(), to release_pages(). I'd feel better if
+        someone agrees that this is the best way. It uses the more
+        efficient release_pages(), instead of put_page() in a loop,
+        and keep the change to just a few character on one line,
+        but OTOH it is not a pure revert.
+
+* Loosened the FOLL_LONGTERM restrictions in the
+  __get_user_pages_locked() implementation, and used that in order
+  to fix up a VFIO bug. Thanks to Jason for that idea.
+
+    * Note the use of release_pages() in IB: is that OK?
+
+* Added a few more WARN's and clarifying comments nearby.
+
+* Many documentation improvements in various comments.
+
+* Moved the new pin_user_pages.rst from Documentation/vm/ to
+  Documentation/core-api/ .
+
+* Commit descriptions: added clarifying notes to the three patches
+  (drm/via, fs/io_uring, net/xdp) that already had put_user_page()
+  calls in place.
+
+* Collected all pending Reviewed-by and Acked-by tags, from v1 and v2
+  email threads.
+
+* Lot of churn from v2 --> v3, so it's possible that new bugs
+  sneaked in.
+
+NOT DONE: separate patchset is required:
+
+* __get_user_pages_locked(): stop compensating for
+  buggy callers who failed to set FOLL_GET. Instead, assert
+  that FOLL_GET is set (and fail if it's not).
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Original cover letter (edited to fix up the patch description numbers)
+
+This applies cleanly to linux-next and mmotm, and also to linux.git if
+linux-next's commit 20cac10710c9 ("mm/gup_benchmark: fix MAP_HUGETLB
+case") is first applied there.
+
+This provides tracking of dma-pinned pages. This is a prerequisite to
+solving the larger problem of proper interactions between file-backed
+pages, and [R]DMA activities, as discussed in [1], [2], [3], and in
+a remarkable number of email threads since about 2017. :)
+
+A new internal gup flag, FOLL_PIN is introduced, and thoroughly
+documented in the last patch's Documentation/vm/pin_user_pages.rst.
+
+I believe that this will provide a good starting point for doing the
+layout lease work that Ira Weiny has been working on. That's because
+these new wrapper functions provide a clean, constrained, systematically
+named set of functionality that, again, is required in order to even
+know if a page is "dma-pinned".
+
+In contrast to earlier approaches, the page tracking can be
+incrementally applied to the kernel call sites that, until now, have
+been simply calling get_user_pages() ("gup"). In other words, opt-in by
+changing from this:
+
+    get_user_pages() (sets FOLL_GET)
+    put_page()
+
+to this:
+    pin_user_pages() (sets FOLL_PIN)
+    put_user_page()
+
+Because there are interdependencies with FOLL_LONGTERM, a similar
+conversion as for FOLL_PIN, was applied. The change was from this:
+
+    get_user_pages(FOLL_LONGTERM) (also sets FOLL_GET)
+    put_page()
+
+to this:
+    pin_longterm_pages() (sets FOLL_PIN | FOLL_LONGTERM)
+    put_user_page()
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Patch summary:
+
+* Patches 1-9: refactoring and preparatory cleanup, independent fixes
+
+* Patch 10: introduce pin_user_pages(), FOLL_PIN, but no functional
+           changes yet
+* Patches 11-16: Convert existing put_user_page() callers, to use the
+                 new pin*()
+* Patch 17: Activate tracking of FOLL_PIN pages.
+* Patches 18-20: convert various callers
+* Patches: 21-23: gup_benchmark and run_vmtests support
+* Patch 24: rename put_user_page*() --> unpin_user_page*()
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Testing:
+
+* I've done some overall kernel testing (LTP, and a few other goodies),
+  and some directed testing to exercise some of the changes. And as you
+  can see, gup_benchmark is enhanced to exercise this. Basically, I've been
+  able to runtime test the core get_user_pages() and pin_user_pages() and
+  related routines, but not so much on several of the call sites--but those
+  are generally just a couple of lines changed, each.
+
+  Not much of the kernel is actually using this, which on one hand
+  reduces risk quite a lot. But on the other hand, testing coverage
+  is low. So I'd love it if, in particular, the Infiniband and PowerPC
+  folks could do a smoke test of this series for me.
+
+  Also, my runtime testing for the call sites so far is very weak:
+
+    * io_uring: Some directed tests from liburing exercise this, and they p=
+ass.
+    * process_vm_access.c: A small directed test passes.
+    * gup_benchmark: the enhanced version hits the new gup.c code, and pass=
+es.
+    * infiniband (still only have crude "IB pingpong" working, on a
+                  good day: it's not exercising my conversions at runtime..=
+.)
+    * VFIO: compiles (I'm vowing to set up a run time test soon, but it's
+                      not ready just yet)
+    * powerpc: it compiles...
+    * drm/via: compiles...
+    * goldfish: compiles...
+    * net/xdp: compiles...
+    * media/v4l2: compiles...
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Next:
+
+* Get the block/bio_vec sites converted to use pin_user_pages().
+
+* Work with Ira and Dave Chinner to weave this together with the
+  layout lease stuff.
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+[1] Some slow progress on get_user_pages() (Apr 2, 2019): https://lwn.net/A=
+rticles/784574/
+[2] DMA and get_user_pages() (LPC: Dec 12, 2018): https://lwn.net/Articles/=
+774411/
+[3] The trouble with get_user_pages() (Apr 30, 2018): https://lwn.net/Artic=
+les/753027/
+
+
+Dan Williams (1):
+  mm: Cleanup __put_devmap_managed_page() vs ->page_free()
+
+John Hubbard (23):
+  mm/gup: pass flags arg to __gup_device_* functions
+  mm/gup: factor out duplicate code from four routines
+  mm/gup: move try_get_compound_head() to top, fix minor issues
+  mm: devmap: refactor 1-based refcounting for ZONE_DEVICE pages
+  goldish_pipe: rename local pin_user_pages() routine
+  IB/umem: use get_user_pages_fast() to pin DMA pages
+  media/v4l2-core: set pages dirty upon releasing DMA buffers
+  vfio, mm: fix get_user_pages_remote() and FOLL_LONGTERM
+  mm/gup: introduce pin_user_pages*() and FOLL_PIN
+  goldish_pipe: convert to pin_user_pages() and put_user_page()
+  IB/{core,hw,umem}: set FOLL_PIN via pin_user_pages*(), fix up ODP
+  mm/process_vm_access: set FOLL_PIN via pin_user_pages_remote()
+  drm/via: set FOLL_PIN via pin_user_pages_fast()
+  fs/io_uring: set FOLL_PIN via pin_user_pages()
+  net/xdp: set FOLL_PIN via pin_user_pages()
+  mm/gup: track FOLL_PIN pages
+  media/v4l2-core: pin_user_pages (FOLL_PIN) and put_user_page()
+    conversion
+  vfio, mm: pin_user_pages (FOLL_PIN) and put_user_page() conversion
+  powerpc: book3s64: convert to pin_user_pages() and put_user_page()
+  mm/gup_benchmark: use proper FOLL_WRITE flags instead of hard-coding
+    "1"
+  mm/gup_benchmark: support pin_user_pages() and related calls
+  selftests/vm: run_vmtests: invoke gup_benchmark with basic FOLL_PIN
+    coverage
+  mm, tree-wide: rename put_user_page*() to unpin_user_page*()
+
+ Documentation/core-api/index.rst            |   1 +
+ Documentation/core-api/pin_user_pages.rst   | 233 ++++++++
+ arch/powerpc/mm/book3s64/iommu_api.c        |  12 +-
+ drivers/gpu/drm/via/via_dmablit.c           |   6 +-
+ drivers/infiniband/core/umem.c              |  19 +-
+ drivers/infiniband/core/umem_odp.c          |  13 +-
+ drivers/infiniband/hw/hfi1/user_pages.c     |   4 +-
+ drivers/infiniband/hw/mthca/mthca_memfree.c |   8 +-
+ drivers/infiniband/hw/qib/qib_user_pages.c  |   4 +-
+ drivers/infiniband/hw/qib/qib_user_sdma.c   |   8 +-
+ drivers/infiniband/hw/usnic/usnic_uiom.c    |   4 +-
+ drivers/infiniband/sw/siw/siw_mem.c         |   4 +-
+ drivers/media/v4l2-core/videobuf-dma-sg.c   |   8 +-
+ drivers/nvdimm/pmem.c                       |   6 -
+ drivers/platform/goldfish/goldfish_pipe.c   |  35 +-
+ drivers/vfio/vfio_iommu_type1.c             |  35 +-
+ fs/io_uring.c                               |   6 +-
+ include/linux/mm.h                          | 155 +++++-
+ include/linux/mmzone.h                      |   2 +
+ include/linux/page_ref.h                    |  10 +
+ mm/gup.c                                    | 561 +++++++++++++++-----
+ mm/gup_benchmark.c                          |  74 ++-
+ mm/huge_memory.c                            |  54 +-
+ mm/hugetlb.c                                |  39 +-
+ mm/memremap.c                               |  76 ++-
+ mm/process_vm_access.c                      |  28 +-
+ mm/vmstat.c                                 |   2 +
+ net/xdp/xdp_umem.c                          |   4 +-
+ tools/testing/selftests/vm/gup_benchmark.c  |  21 +-
+ tools/testing/selftests/vm/run_vmtests      |  22 +
+ 30 files changed, 1104 insertions(+), 350 deletions(-)
+ create mode 100644 Documentation/core-api/pin_user_pages.rst
+
+--=20
+2.24.0
+
