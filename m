@@ -2,59 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B78F0FD2D2
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 03:13:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3144EFD2EF
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 03:30:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbfKOCMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 21:12:55 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:57650 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726549AbfKOCMy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 21:12:54 -0500
-Received: from localhost (unknown [IPv6:2601:601:9f00:1e2::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 042ED14B79F67;
-        Thu, 14 Nov 2019 18:12:51 -0800 (PST)
-Date:   Thu, 14 Nov 2019 18:12:51 -0800 (PST)
-Message-Id: <20191114.181251.451070581625618487.davem@davemloft.net>
-To:     sgarzare@redhat.com
-Cc:     netdev@vger.kernel.org, sthemmin@microsoft.com, arnd@arndb.de,
-        jhansen@vmware.com, jasowang@redhat.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        mst@redhat.com, haiyangz@microsoft.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        sashal@kernel.org, kys@microsoft.com, decui@microsoft.com,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH net-next v2 00/15] vsock: add multi-transports support
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191114095750.59106-1-sgarzare@redhat.com>
-References: <20191114095750.59106-1-sgarzare@redhat.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 14 Nov 2019 18:12:52 -0800 (PST)
+        id S1727089AbfKOCaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 21:30:18 -0500
+Received: from mga09.intel.com ([134.134.136.24]:52067 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727075AbfKOCaS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 21:30:18 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2019 18:30:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,306,1569308400"; 
+   d="scan'208";a="199050528"
+Received: from guptapadev.jf.intel.com (HELO guptapadev.amr) ([10.7.198.56])
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2019 18:30:17 -0800
+Date:   Thu, 14 Nov 2019 18:23:28 -0800
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Jan Kiszka <jan.kiszka@siemens.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>,
+        "Gupta, Pawan Kumar" <pawan.kumar.gupta@intel.com>
+Subject: Re: [FYI PATCH 0/7] Mitigation for CVE-2018-12207
+Message-ID: <20191115022328.GC18745@guptapadev.amr>
+References: <1573593697-25061-1-git-send-email-pbonzini@redhat.com>
+ <23353382-53ea-8b20-7e30-763ef6df374c@siemens.com>
+ <ea5a084b-e047-6677-b8fe-d7bb6f8c0ef8@redhat.com>
+ <20191113232510.GB891@guptapadev.amr>
+ <671b49ab-f65d-8b44-4da6-137d05cd1b9c@siemens.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <671b49ab-f65d-8b44-4da6-137d05cd1b9c@siemens.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 14 Nov 2019 10:57:35 +0100
-
-> Most of the patches are reviewed by Dexuan, Stefan, and Jorgen.
-> The following patches need reviews:
-> - [11/15] vsock: add multi-transports support
-> - [12/15] vsock/vmci: register vmci_transport only when VMCI guest/host
->           are active
-> - [15/15] vhost/vsock: refuse CID assigned to the guest->host transport
+On Thu, Nov 14, 2019 at 09:13:22AM +0100, Jan Kiszka wrote:
+> On 14.11.19 00:25, Pawan Gupta wrote:
+> > On Wed, Nov 13, 2019 at 09:23:30AM +0100, Paolo Bonzini wrote:
+> > > On 13/11/19 07:38, Jan Kiszka wrote:
+> > > > When reading MCE, error code 0150h, ie. SRAR, I was wondering if that
+> > > > couldn't simply be handled by the host. But I suppose the symptom of
+> > > > that erratum is not "just" regular recoverable MCE, rather
+> > > > sometimes/always an unrecoverable CPU state, despite the error code, right?
+> > > 
+> > > The erratum documentation talks explicitly about hanging the system, but
+> > > it's not clear if it's just a result of the OS mishandling the MCE, or
+> > > something worse.  So I don't know. :(  Pawan, do you?
+> > 
+> > As Dave mentioned in the other email its "something worse".
+> > 
+> > Although this erratum results in a machine check with the same MCACOD
+> > signature as an SRAR error (0x150) the MCi_STATUS.PCC bit will be set to
+> > one. The Intel Software Developers manual says that PCC=1 errors are
+> > fatal and cannot be recovered.
+> > 
+> > 	15.10.4.1 Machine-Check Exception Handler for Error Recovery [1]
+> > 
+> > 	[...]
+> > 	The PCC flag in each IA32_MCi_STATUS register indicates whether recovery
+> > 	from the error is possible for uncorrected errors (UC=1). If the PCC
+> > 	flag is set for enabled uncorrected errors (UC=1 and EN=1), recovery is
+> > 	not possible.
+> > 
 > 
-> RFC: https://patchwork.ozlabs.org/cover/1168442/
-> v1: https://patchwork.ozlabs.org/cover/1181986/
+> And, as Dave observed, even that event is not delivered to software (maybe
+> just logged by firmware for post-reset analysis) but can or does cause a
+> machine lock-up, right?
 
-I'm applying this as-is, if there is feedback changes required on 11,
-12, and 15 please deal with this using follow-up patches.
+It can either cause a machine lock-up or a reset and the event delivery
+to the software is not guaranteed.
 
-Thanks.
+Thanks,
+Pawan
