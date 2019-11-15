@@ -2,96 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 78355FD7E1
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 09:26:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95278FD7E5
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 09:27:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725829AbfKOI0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 03:26:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26265 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727004AbfKOI0X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 03:26:23 -0500
+        id S1726983AbfKOI1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 03:27:41 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47641 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726890AbfKOI1l (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 03:27:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573806381;
+        s=mimecast20190719; t=1573806460;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xt7ctRiywIG1tpU0cT26zCBUdn9q3E2Aseumqp8v+zU=;
-        b=e9lHlgRWsugelA1gTvRfjNDi97koBCuKCS7h6udcuchMc2hT3n4TRgmeXI6p2JKgWUp1Y1
-        k2lPeQzuOUfYTE9eFF+d0iflnZOljJKjQ6ninjUugw8o4Bi7lyGUnOb6Rzj4Ecme8uRCBI
-        Gp4KmKKkqQ1sBV7wCuy4nNye4hvAxaQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-DL5e_iosOAGvFig7ijke7Q-1; Fri, 15 Nov 2019 03:26:20 -0500
-Received: by mail-wr1-f72.google.com with SMTP id m17so7164185wrn.23
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 00:26:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RoXy81G7M/BfnHRZ4y2U2/JU3z4ekC5J7eZ1fYMw4CI=;
-        b=f9DwotJJvGsUfBad1eULFhWkUXJ9MluPJHsEEEJYo055sS+eHdgWpAXnd+LUUsE+Qg
-         3E7VZbfz0/bT/EqoG74tsr+N0kA8EuvJw+SE9nWn4Gg6IPDrF3th11o0SwhXIGyX1wFQ
-         nEvwZX9Fv1OSzsFeoAX2MxaTn7WiUWOryBT+VqqKCDnUTmO9Eh/qnZqmS40qQUhhzAVU
-         GWpv4cu6uD5yGWer84go3osmKM2To83yWJr5BWcDZXH5lKjMpmYvcQGyK2Hn+aFuXb92
-         E4g1dnaizok9zK5su2d6pK734MhSYtm9NT1qHAM3i8UpKb6hTr6IZ2dXtNBGDdZ3tFn2
-         HoUA==
-X-Gm-Message-State: APjAAAVKPd++9rsCjlG67LKCR19aBlwoOKnK6NwI0qRB9xR1GVcYOX4J
-        eqhv9zefBHxJL872D5pa7gFvDmDDKuxeF231X/HIlQv7Lri8DpuuxBISJqFEAGsb08wNg1GHZ1s
-        KFP3hHVsiL93p
-X-Received: by 2002:adf:f78c:: with SMTP id q12mr13056404wrp.71.1573806379269;
-        Fri, 15 Nov 2019 00:26:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyvFtcZcCmdybEhREmfVJhjMJWYu5vgKjT2yNfXmAdZcdboUyo4lpokec2THBO5n/9IFhwgFw==
-X-Received: by 2002:adf:f78c:: with SMTP id q12mr13056369wrp.71.1573806378928;
-        Fri, 15 Nov 2019 00:26:18 -0800 (PST)
-Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
-        by smtp.gmail.com with ESMTPSA id 19sm12549850wrc.47.2019.11.15.00.26.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2019 00:26:18 -0800 (PST)
-Date:   Fri, 15 Nov 2019 09:26:15 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     David Miller <davem@davemloft.net>
-Cc:     netdev@vger.kernel.org, sthemmin@microsoft.com, arnd@arndb.de,
-        jhansen@vmware.com, jasowang@redhat.com,
-        gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        mst@redhat.com, haiyangz@microsoft.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        sashal@kernel.org, kys@microsoft.com, decui@microsoft.com,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH net-next v2 00/15] vsock: add multi-transports support
-Message-ID: <20191115082615.uouzvisaz27xny4e@steredhat>
-References: <20191114095750.59106-1-sgarzare@redhat.com>
- <20191114.181251.451070581625618487.davem@davemloft.net>
+        bh=vdu6eMBJD2SgB0lzVDKbnJJ+cTOlwYyQGiOP5FLcOsc=;
+        b=VEr9LPVbXzl+m6nezwpHjlqc8feM1cygOc6BNp/sCAaei7M8orHocJEWxxZU57lT65Y5Jt
+        yA0nQu8lFXNJL6hLy+Xgwo9ZktK9f/fWy8+VuW6dvm+dv8IX6YF2eVw5QKe1Xvz1dYzlC8
+        0HVRHrCzUvLJvnPjQY0AZwqHcrWoKuA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-YZJ4-4IsMiWiuujpCcP-Ag-1; Fri, 15 Nov 2019 03:27:36 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27D2D802682;
+        Fri, 15 Nov 2019 08:27:35 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-14.ams2.redhat.com [10.36.117.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC6376293B;
+        Fri, 15 Nov 2019 08:27:30 +0000 (UTC)
+Subject: Re: [RFC 25/37] KVM: s390: protvirt: STSI handling
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-26-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <4891580a-422a-3d85-f20e-c4c194487d34@redhat.com>
+Date:   Fri, 15 Nov 2019 09:27:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191114.181251.451070581625618487.davem@davemloft.net>
-X-MC-Unique: DL5e_iosOAGvFig7ijke7Q-1
+In-Reply-To: <20191024114059.102802-26-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: YZJ4-4IsMiWiuujpCcP-Ag-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 06:12:51PM -0800, David Miller wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> Date: Thu, 14 Nov 2019 10:57:35 +0100
+On 24/10/2019 13.40, Janosch Frank wrote:
+> Save response to sidad and disable address checking for protected
+> guests.
 >=20
-> > Most of the patches are reviewed by Dexuan, Stefan, and Jorgen.
-> > The following patches need reviews:
-> > - [11/15] vsock: add multi-transports support
-> > - [12/15] vsock/vmci: register vmci_transport only when VMCI guest/host
-> >           are active
-> > - [15/15] vhost/vsock: refuse CID assigned to the guest->host transport
-> >=20
-> > RFC: https://patchwork.ozlabs.org/cover/1168442/
-> > v1: https://patchwork.ozlabs.org/cover/1181986/
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/kvm/priv.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 >=20
-> I'm applying this as-is, if there is feedback changes required on 11,
-> 12, and 15 please deal with this using follow-up patches.
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index ed52ffa8d5d4..06c7e7a10825 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -872,7 +872,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+> =20
+>  =09operand2 =3D kvm_s390_get_base_disp_s(vcpu, &ar);
+> =20
+> -=09if (operand2 & 0xfff)
+> +=09if (!kvm_s390_pv_is_protected(vcpu->kvm) && (operand2 & 0xfff))
+>  =09=09return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
 
-Thank you very much,
-Stefano
+I'd prefer if you could put the calculation of operand2 also under the
+!pv if-statement:
+
+=09if (!kvm_s390_pv_is_protected(vcpu->kvm)) {
+=09=09operand2 =3D kvm_s390_get_base_disp_s(vcpu, &ar);
+=09=09if (operand2 & 0xfff)
+=09=09=09return kvm_s390_inject_program_int(vcpu,
+=09=09=09=09=09=09    PGM_SPECIFICATION);
+=09}
+
+... that makes it more obvious that operand2 is only valid in the !pv
+case and you should get automatic compiler warnings if you use it otherwise=
+.
+
+>  =09switch (fc) {
+> @@ -893,8 +893,13 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+>  =09=09handle_stsi_3_2_2(vcpu, (void *) mem);
+>  =09=09break;
+>  =09}
+> +=09if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+> +=09=09memcpy((void *)vcpu->arch.sie_block->sidad, (void *)mem,
+> +=09=09       PAGE_SIZE);
+> +=09=09rc =3D 0;
+> +=09} else
+> +=09=09rc =3D write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
+
+Please also use braces for the else-branch (according to
+Documentation/process/coding-style.rst).
+
+ Thomas
 
