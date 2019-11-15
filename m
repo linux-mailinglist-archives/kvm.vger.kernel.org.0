@@ -2,65 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9267FDAEF
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 11:17:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A03FDB20
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 11:19:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727314AbfKOKQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 05:16:58 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:36460 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727036AbfKOKQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:16:58 -0500
-Received: by mail-ot1-f66.google.com with SMTP id f10so7594560oto.3;
-        Fri, 15 Nov 2019 02:16:57 -0800 (PST)
+        id S1727208AbfKOKTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 05:19:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30933 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725829AbfKOKTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 05:19:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573813162;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=xIma6LGd2FNlo2mXwYtHoBseXP1/PYmrCLV26HJFQW4=;
+        b=HkuSM5SxHOuf5uk0af69NPVOxNAloYeAgVIMwIPJDfewSVW0tUXLRJZ6Nkty31TC75WoIU
+        to71IxbngzEm4nwtg8BKMU2nRGm8ZnNbEbVecop5NS3ULC22vInk6kM2yW5jbB+5sBuF2e
+        6OPE9cL1niMgQhiHFpYF7bX3NprZ2Y4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273--UEwBf5yNWyxPe2FgF_RFw-1; Fri, 15 Nov 2019 05:19:20 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f21so5759976wmh.5
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 02:19:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=L31Kfs1iCtI5iVDCuelWcjeMJ55bO+AtIuo4wI7qu9U=;
-        b=B3sScFr8xItN+PCAKQAeRtJPGIG/pfOvxOmeRw2G6qAdfPkZj8qMwOJpELvgThUmt4
-         2aSkHajUnXFEAqLNao9XP/fVdop+7zeBwAJI8ZC9cPsEcG1XqO5j6ppGIP6XcK/L5RsS
-         hxdYR6nGSdtTUw+9HzQZItpH682WZn78HDdnRAmIE6St8Z0PbfyT6gtJgpxTuOB6+MjD
-         qT2gVoHP+BjEv/CSFGO5Yhwz9cGOVInHzLVuPXwLDaBqgu6HtJ9+Q7YtunJQwv/xAV79
-         wrQOVqj2xGvt9mvF4DSs+Qxtg4qfULjfH6wfzs2msdd/pvbG5OZ6kODKCi/lN9hHxsIv
-         rY6w==
-X-Gm-Message-State: APjAAAX3Vh4Xq/5l8/47MG55cxH8ZTiueF0Btt4y/sjgAFwAF6X7A7/d
-        F2GKQ+hKzVRqJpVUFSn78h6Id/NuNEVOsUwuMWc=
-X-Google-Smtp-Source: APXvYqxZ/bAtMq18l9mpuCAsg44KJyrcgmnqVoIIx4Mk+o7r4aPh25WzgicKYS/aWkTqw5pQAng03Fta3Cmam/OYkEQ=
-X-Received: by 2002:a9d:590f:: with SMTP id t15mr10089371oth.118.1573813017367;
- Fri, 15 Nov 2019 02:16:57 -0800 (PST)
+        h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ex691wxP+WudC1AeVAYuZvWpMt4elP21+Johc5/FhrM=;
+        b=GL57MLb9+qrASfvg0NGys/9vr44zlO3UDBerBYj9hoSjQk56hWuntobpr8bt0IdahI
+         PQrWoqkMvsrfF4BF1HM3CQ3u2OM2FZF3lrslHkJBh17+HyyYYOVuov5obkB2QRegI6RY
+         /dno4JUDc56mCBYk7OL6OZT4GsTo/+qDnD6Jcghz1zR2UR9w5fAIJ31iQWCI3oOppRqj
+         OCM/wtUfHTifOhICJvkCN2AsUWl//+UZoaqubz+eMLzjwjjg/+jiu2eMIY2JWSyTWajA
+         0yPDoq2HYcmp1w+g68sd7srPjsoalKIk8BgKqOQGVy8CipBKzAJI1Zdy3X4bzOzfSm1J
+         wV4g==
+X-Gm-Message-State: APjAAAXQz/HSw3wpihKW+t3pQKulwhVaMxd5SJNr/x7Dy1HXFYAiW1P9
+        UDPgIlfORXQ87kfdwgw4ZHBAeEHKp3GZB5i4q5kFHmDK4SzdM13UjwmiHxBY+e2BEL+QYGh2Ed2
+        hSvT2CWeTS7PV
+X-Received: by 2002:adf:f20f:: with SMTP id p15mr10274369wro.370.1573813159564;
+        Fri, 15 Nov 2019 02:19:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxTkuvxJhIBI0e2w2s+2Ww8sse+GeEdXk9Qz1xvwO6PARwz+GsNulE2kBO1u1UMw/nhWxZgCA==
+X-Received: by 2002:adf:f20f:: with SMTP id p15mr10274336wro.370.1573813159231;
+        Fri, 15 Nov 2019 02:19:19 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+        by smtp.gmail.com with ESMTPSA id t14sm10641509wrw.87.2019.11.15.02.19.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2019 02:19:18 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 1/2] Makefile: use "-Werror" in cc-option
+To:     Thomas Huth <thuth@redhat.com>, KVM list <kvm@vger.kernel.org>,
+        Bill Wendling <morbo@google.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20191107010844.101059-1-morbo@google.com>
+ <20191107010844.101059-2-morbo@google.com>
+ <60caf083-5778-0ccd-a11f-613d28514a25@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f0f8a02d-43fa-107d-3eca-f589d1c5b0e1@redhat.com>
+Date:   Fri, 15 Nov 2019 11:19:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1573041302-4904-1-git-send-email-zhenzhong.duan@oracle.com>
- <1573041302-4904-2-git-send-email-zhenzhong.duan@oracle.com> <2090510.mhlLnX9yIq@kreacher>
-In-Reply-To: <2090510.mhlLnX9yIq@kreacher>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Fri, 15 Nov 2019 11:16:46 +0100
-Message-ID: <CAJZ5v0i4b0hvGjSjSpBnZ-huJZGi3FmN1z5NVc_4V6CForaLfA@mail.gmail.com>
-Subject: Re: [PATCH RESEND v2 1/4] cpuidle-haltpoll: ensure grow start value
- is nonzero
-To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <60caf083-5778-0ccd-a11f-613d28514a25@redhat.com>
+Content-Language: en-US
+X-MC-Unique: -UEwBf5yNWyxPe2FgF_RFw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 11:06 AM Rafael J. Wysocki <rjw@rjwysocki.net> wrote:
->
-> On Wednesday, November 6, 2019 12:54:59 PM CET Zhenzhong Duan wrote:
-> > dev->poll_limit_ns could be zeroed in certain cases (e.g. by
-> > guest_halt_poll_ns = 0). If guest_halt_poll_grow_start is zero,
-> > dev->poll_limit_ns will never be bigger than zero.
->
-> Given that haltpoll_enable_device() sets dev->poll_limit_ns = 0 to start with,
-> I don't think that the statement above is correct.
+On 12/11/19 18:47, Thomas Huth wrote:
+> On 07/11/2019 02.08, Bill Wendling wrote:
+>> The "cc-option" macro should use "-Werror" to determine if a flag is
+>> supported. Otherwise the test may not return a nonzero result. Also
+>> conditionalize some of the warning flags which aren't supported by
+>> clang.
+>>
+>> Signed-off-by: Bill Wendling <morbo@google.com>
+>> ---
+>>  Makefile | 20 ++++++++++++++------
+>>  1 file changed, 14 insertions(+), 6 deletions(-)
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>=20
 
-Scratch this, I misread it.
+Queued, thanks.
+
+(As for C++, the right thing to do would be to rewrite the tests for
+tools/testing/selftests/kvm/ and get rid of it...).
+
+Paolo
+
