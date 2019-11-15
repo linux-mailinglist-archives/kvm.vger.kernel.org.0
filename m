@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 523BBFDA3B
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 10:59:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B673FDA45
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 11:01:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727575AbfKOJ7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 04:59:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19934 "EHLO
+        id S1727089AbfKOKB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 05:01:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21942 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727135AbfKOJ7h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 04:59:37 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAF9w2Id066171
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 04:59:36 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2w9nsjgk0f-1
+        by vger.kernel.org with ESMTP id S1727004AbfKOKBZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 05:01:25 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAF9w6YG087567
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 05:01:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w9nuh0evt-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 04:59:36 -0500
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 05:01:24 -0500
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Fri, 15 Nov 2019 09:59:34 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Fri, 15 Nov 2019 10:01:22 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 15 Nov 2019 09:59:31 -0000
+        Fri, 15 Nov 2019 10:01:19 -0000
 Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAF9xUtQ46596454
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAFA1HRR57671878
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Nov 2019 09:59:30 GMT
+        Fri, 15 Nov 2019 10:01:17 GMT
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 49B7A11C04C;
-        Fri, 15 Nov 2019 09:59:30 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 92BAA11C05B;
+        Fri, 15 Nov 2019 10:01:17 +0000 (GMT)
 Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E28E011C04A;
-        Fri, 15 Nov 2019 09:59:29 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3ABC511C05E;
+        Fri, 15 Nov 2019 10:01:17 +0000 (GMT)
 Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
         by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 Nov 2019 09:59:29 +0000 (GMT)
-Subject: Re: [RFC 29/37] KVM: s390: protvirt: Sync pv state
+        Fri, 15 Nov 2019 10:01:17 +0000 (GMT)
+Subject: Re: [RFC 26/37] KVM: s390: protvirt: Only sync fmt4 registers
 To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com,
         borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
         mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
         gor@linux.ibm.com
 References: <20191024114059.102802-1-frankja@linux.ibm.com>
- <20191024114059.102802-30-frankja@linux.ibm.com>
- <e60f6e74-2d0f-36a8-cde7-1b6054370ba8@redhat.com>
+ <20191024114059.102802-27-frankja@linux.ibm.com>
+ <197c1218-3171-3e22-caf8-47cdab58caf8@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -91,165 +91,129 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Fri, 15 Nov 2019 10:59:29 +0100
+Date:   Fri, 15 Nov 2019 11:01:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <e60f6e74-2d0f-36a8-cde7-1b6054370ba8@redhat.com>
+In-Reply-To: <197c1218-3171-3e22-caf8-47cdab58caf8@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="GGVcwaYrLGzDsEyLZevegTNu5tPncZo8f"
+ boundary="PdhOTjLoZjYXjs1szoQtZlknVfAmDU2P3"
 X-TM-AS-GCONF: 00
-x-cbid: 19111509-0008-0000-0000-0000032F3C49
+x-cbid: 19111510-0028-0000-0000-000003B71B35
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111509-0009-0000-0000-00004A4E4E45
-Message-Id: <b016cee2-18b5-a621-62b0-f230adfc89ce@linux.ibm.com>
+x-cbparentid: 19111510-0029-0000-0000-0000247A2BEF
+Message-Id: <c89c28a9-15f9-0a40-4815-4f50883c93d3@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-15_02:2019-11-15,2019-11-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 impostorscore=0
- mlxlogscore=885 phishscore=0 suspectscore=3 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911150093
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ spamscore=0 clxscore=1015 malwarescore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 adultscore=0 mlxscore=0
+ mlxlogscore=999 suspectscore=3 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911150093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GGVcwaYrLGzDsEyLZevegTNu5tPncZo8f
-Content-Type: multipart/mixed; boundary="xlz7sHVn2vb8PVMz5aVKx2wSIRfkJDGvy"
+--PdhOTjLoZjYXjs1szoQtZlknVfAmDU2P3
+Content-Type: multipart/mixed; boundary="1guMIYcNAznUAlPhQ2sQsZhbgu0Qy4zZn"
 
---xlz7sHVn2vb8PVMz5aVKx2wSIRfkJDGvy
+--1guMIYcNAznUAlPhQ2sQsZhbgu0Qy4zZn
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/15/19 10:36 AM, Thomas Huth wrote:
+On 11/15/19 10:02 AM, Thomas Huth wrote:
 > On 24/10/2019 13.40, Janosch Frank wrote:
->> Indicate via register sync if the VM is in secure mode.
+>> A lot of the registers are controlled by the Ultravisor and never
+>> visible to KVM. Also some registers are overlayed, like gbea is with
+>> sidad, which might leak data to userspace.
+>>
+>> Hence we sync a minimal set of registers for both SIE formats and then=
+
+>> check and sync format 2 registers if necessary.
+>>
+>> Also we disable set/get one reg for the same reason. It's an old
+>> interface anyway.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  arch/s390/include/uapi/asm/kvm.h | 5 ++++-
->>  arch/s390/kvm/kvm-s390.c         | 7 ++++++-
->>  2 files changed, 10 insertions(+), 2 deletions(-)
+>>  arch/s390/kvm/kvm-s390.c | 138 +++++++++++++++++++++++---------------=
+-
+>>  1 file changed, 82 insertions(+), 56 deletions(-)
 >>
->> diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi=
-/asm/kvm.h
->> index 436ec7636927..b44c02426c2e 100644
->> --- a/arch/s390/include/uapi/asm/kvm.h
->> +++ b/arch/s390/include/uapi/asm/kvm.h
->> @@ -231,11 +231,13 @@ struct kvm_guest_debug_arch {
->>  #define KVM_SYNC_GSCB   (1UL << 9)
->>  #define KVM_SYNC_BPBC   (1UL << 10)
->>  #define KVM_SYNC_ETOKEN (1UL << 11)
->> +#define KVM_SYNC_PV	(1UL << 12)
->> =20
->>  #define KVM_SYNC_S390_VALID_FIELDS \
->>  	(KVM_SYNC_PREFIX | KVM_SYNC_GPRS | KVM_SYNC_ACRS | KVM_SYNC_CRS | \
->>  	 KVM_SYNC_ARCH0 | KVM_SYNC_PFAULT | KVM_SYNC_VRS | KVM_SYNC_RICCB | =
-\
->> -	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN)
->> +	 KVM_SYNC_FPRS | KVM_SYNC_GSCB | KVM_SYNC_BPBC | KVM_SYNC_ETOKEN | \=
-
->> +	 KVM_SYNC_PV)
->> =20
->>  /* length and alignment of the sdnx as a power of two */
->>  #define SDNXC 8
->> @@ -261,6 +263,7 @@ struct kvm_sync_regs {
->>  	__u8  reserved[512];	/* for future vector expansion */
->>  	__u32 fpc;		/* valid on KVM_SYNC_VRS or KVM_SYNC_FPRS */
->>  	__u8 bpbc : 1;		/* bp mode */
->> +	__u8 pv : 1;		/* pv mode */
->>  	__u8 reserved2 : 7;
->=20
-> Don't you want to decrease the reserved2 bits to 6 ? ...
-
-Ups
-
->=20
->>  	__u8 padding1[51];	/* riccb needs to be 64byte aligned */
->=20
-> ... otherwise you might mess up the alignment here!
->=20
->>  	__u8 riccb[64];		/* runtime instrumentation controls block */
 >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index f623c64aeade..500972a1f742 100644
+>> index 17a78774c617..f623c64aeade 100644
 >> --- a/arch/s390/kvm/kvm-s390.c
 >> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -2856,6 +2856,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->>  		vcpu->run->kvm_valid_regs |=3D KVM_SYNC_GSCB;
->>  	if (test_kvm_facility(vcpu->kvm, 156))
->>  		vcpu->run->kvm_valid_regs |=3D KVM_SYNC_ETOKEN;
->> +	if (test_kvm_facility(vcpu->kvm, 161))
->> +		vcpu->run->kvm_valid_regs |=3D KVM_SYNC_PV;
->>  	/* fprs can be synchronized via vrs, even if the guest has no vx. Wi=
-th
->>  	 * MACHINE_HAS_VX, (load|store)_fpu_regs() will work with vrs format=
-=2E
->>  	 */
->> @@ -4136,6 +4138,7 @@ static void store_regs_fmt2(struct kvm_vcpu *vcp=
-u, struct kvm_run *kvm_run)
->>  {
->>  	kvm_run->s.regs.gbea =3D vcpu->arch.sie_block->gbea;
->>  	kvm_run->s.regs.bpbc =3D (vcpu->arch.sie_block->fpf & FPF_BPBC) =3D=3D=
- FPF_BPBC;
->> +	kvm_run->s.regs.pv =3D 0;
->>  	if (MACHINE_HAS_GS) {
->>  		__ctl_set_bit(2, 4);
->>  		if (vcpu->arch.gs_enabled)
->> @@ -4172,8 +4175,10 @@ static void store_regs(struct kvm_vcpu *vcpu, s=
-truct kvm_run *kvm_run)
->>  	/* Restore will be done lazily at return */
->>  	current->thread.fpu.fpc =3D vcpu->arch.host_fpregs.fpc;
->>  	current->thread.fpu.regs =3D vcpu->arch.host_fpregs.regs;
->> -	if (likely(!kvm_s390_pv_is_protected(vcpu->kvm)))
->> +	if (likely(!kvm_s390_pv_handle_cpu(vcpu)))
+>> @@ -2997,7 +2997,8 @@ static void kvm_s390_vcpu_initial_reset(struct k=
+vm_vcpu *vcpu)
+>>  	/* make sure the new fpc will be lazily loaded */
+>>  	save_fpu_regs();
+>>  	current->thread.fpu.fpc =3D 0;
+>> -	vcpu->arch.sie_block->gbea =3D 1;
+>> +	if (!kvm_s390_pv_is_protected(vcpu->kvm))
+>> +		vcpu->arch.sie_block->gbea =3D 1;
+>>  	vcpu->arch.sie_block->pp =3D 0;
+>>  	vcpu->arch.sie_block->fpf &=3D ~FPF_BPBC;
+>>  	vcpu->arch.pfault_token =3D KVM_S390_PFAULT_TOKEN_INVALID;
+>> @@ -3367,6 +3368,10 @@ static int kvm_arch_vcpu_ioctl_get_one_reg(stru=
+ct kvm_vcpu *vcpu,
+>>  			     (u64 __user *)reg->addr);
+>>  		break;
+>>  	case KVM_REG_S390_GBEA:
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			r =3D 0;
+>> +			break;
+>> +		}
+>>  		r =3D put_user(vcpu->arch.sie_block->gbea,
+>>  			     (u64 __user *)reg->addr);
+>>  		break;
+>> @@ -3420,6 +3425,10 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(stru=
+ct kvm_vcpu *vcpu,
+>>  			     (u64 __user *)reg->addr);
+>>  		break;
+>>  	case KVM_REG_S390_GBEA:
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			r =3D 0;
+>> +			break;
+>> +		}
 >=20
-> Why change the if-statement now? Should this maybe rather be squashed
-> into the patch that introduced the if-statement?
-
-That was part of a cleanup that should have been done in other patches.
-
->=20
->>  		store_regs_fmt2(vcpu, kvm_run);
->> +	else
->> +		kvm_run->s.regs.pv =3D 1;
->>  }
->> =20
->>  int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *kv=
-m_run)
->>
+> Wouldn't it be better to return EINVAL in this case? ... the callers
+> definitely do not get what they expected here...
 >=20
 >  Thomas
 >=20
 
+Hrm, new QEMUs will use cpu run anyway and hence I guess it would make
+sense as old QEMUs hopefully won't have pv support.
 
 
---xlz7sHVn2vb8PVMz5aVKx2wSIRfkJDGvy--
+--1guMIYcNAznUAlPhQ2sQsZhbgu0Qy4zZn--
 
---GGVcwaYrLGzDsEyLZevegTNu5tPncZo8f
+--PdhOTjLoZjYXjs1szoQtZlknVfAmDU2P3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3OdwEACgkQ41TmuOI4
-ufgPCw//UnI4w96rOGqgcuFfQxLd071cr8WxXwEFqz+qUVYuuKgSTCs+7h2D6ycR
-TDUe3VTVz84hvVZU8UojACJruivA37DLLSjPuLq/64kddKFqe17LSc8SPzeQHSt3
-iionnE9IPZRRV2CDZm0upaLemmfQ9jeQ3vUvsPI2zyGADAk0lGjTxdJtdZ883HOj
-wPrc6A7EJKyELCOdN1luhq1ckJF9/DG0sWnd0u8ngxTVCUy4UsxVJyajJ8KISbQq
-SZL+GdUBERKW4R1Aya/7GUTRZicm4lsE0P+6mNL2ZCrsBUcwgesNpUsclaQXJ+nK
-dQYfm7RdmzyDDLEzXvTFcPnLYh8BJa7aQbUoLHGsPFlYwZjR1mZsvkjkU7anPPvQ
-tVw21quOIwS4rlM7hVpE0zujFg/Lf/bz47fIqH0qc0EIqk0MVn6pWB5+bKf2aZTr
-Gbq7NWnAqA/1kt+zSVlXTEhY8QH5fSVmWf0RClI4lErzsaxjB98QbyMbUCfKjEPh
-VDSgU+jIgIhigXknNpzTuxG5BBn3kUtflBU2v6IdeGhD+Bt+888Q0XNPvMu2e+NB
-dGd8YIjSHcV6GkHQ06I3VkvQlyqpcZCXlzcMatjCzDdvNcBNGClFIZxwEe14zu48
-h8GH4bju10+k+72j0RGPscrsYpiy71NkBxC4SR9CSYLzFcVprw0=
-=qOXn
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3Od2wACgkQ41TmuOI4
+ufhyng//U7oBygOGsq1WSOMtR5WkCWlExYl0QexBSk80lP1Q41AjlFBEd/agzo8F
+e3CORr53g+xNdle1TX4cAr+jpu5cJ/hFv/pAFyU4GqT5/H97DOotV7FXYEZHqXKj
+tih9O5b1CMw2+s5ZAtAda3Z0LbhP0B+nAitXQ8Jeoj7Kb/cDAJftcZbKZ7MbD1Jw
+l0JoGDDeo1Xp5MuqcL06j1yMrDRGGVUZPsh6UFJjarC44oolJLA5Mi6FIgYP9PKr
+uw+Sl9NGk+y9u5kPH1SlxQKFsGryLsrs1ooJuT/JndDJMw/nO+34ZjeXS/CoNnSG
+fQwBbE2M3zYvfLWR9UmjSHRYi+za/0YNwwgcBrgHPifdpuhK5EOAnlinmT0NmMyE
+B2t93rAa2mskyRN/YGVU66XZ3TUSGxZiZ5tn4BeR+/HNVX44+U9T0Ct/xAVvArLV
+JrGwOgGbuPu/hsRnLrUeSa6dmldHR3zGExKuAHyFNwwcBhQbQpPBzD69Bqs0QKer
+/k+v0WsaWULWP8o8/WG0CghWmJqJGioWpXFEB+sYQGz10vkHax9W0fgvPUKbPW+3
+0NDXks99lWClSOzloAchvuOqxJwwkinUoc/uM8WfT2DiFV1Fh8Qu9oIiIDeEfQEO
+Dim9UaRRremdSFG7XAamqmVyzlGuWeBxsPKn3hDGUSLkDUYZE4E=
+=k+mg
 -----END PGP SIGNATURE-----
 
---GGVcwaYrLGzDsEyLZevegTNu5tPncZo8f--
+--PdhOTjLoZjYXjs1szoQtZlknVfAmDU2P3--
 
