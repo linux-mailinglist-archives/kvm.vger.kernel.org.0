@@ -2,143 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 99C8DFDAD4
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 11:10:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7F61FDAEA
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 11:16:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbfKOKKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 05:10:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22725 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726930AbfKOKKT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:10:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573812618;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=t1851B8N941Rz7PPSqrzu1Q1EGtwq1CeS2EBtMeagjk=;
-        b=PaCd/owgCiMcq4Rh/S3z8Y9AdcOPm+wY9a1scCZY3TY0urgqtfRELyfInnaa9eBc7/G3UW
-        WNPyDNBIOUP+5auwcRTXOa632Gt/pHNQpLiHc5jjyZxYUPx6Oya0UFbLDRtBDBjRLOx0Vb
-        v6iPPb51kV26gnno5unAHMZDlhHrd3E=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-qnaw7-WBM4uKysHpqn-_Og-1; Fri, 15 Nov 2019 05:10:17 -0500
-Received: by mail-wr1-f70.google.com with SMTP id 4so7404166wrf.19
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 02:10:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4U1nnbDS2kVHJEcmz7eSjL6TcFduQzcJVf/OFeeGAfc=;
-        b=o5wkM38bhTz8lA7zk1XqfqKW8f3Kit4mS6ecpzZSeFr41Yps9uEGpP8Ahm9+W7mlEw
-         CBw5X0cs21mfDUlbWhTJBUw663Rmb0QOhXT+wE7IxlKVx5oGbTwIVA+LCV6ewdxJE4PT
-         zaszg/rJvGFsesrsLSJ2Bv+nxo8/thw5eZk77uivQ3PNqdhCnG8uhGP7GrTI9rCeJjYP
-         3aby9SSfK7NRBZRMfd+H7UDmtaQ1a7VSJDSOFqBwarEGYKSBg5/XugyBdzsa1CpjitvQ
-         1iwiFfzDFTCOaKd2ptqLTkMQAg9taIXQQihBhdrLhDzmYkIa5FmbQ/sDDJ22dAp5xgHY
-         5E3w==
-X-Gm-Message-State: APjAAAVwe1n5Cyyn81w6NI+k2pga6SnADTg3UKdh/q8GdLWX0t317dFq
-        YHgjBXa+UdzJo2BcQ8h0muwwvc3MrwzuEeOTV3CYRNTpRDrraKTH0nnXwzdhmWh1gnD73a47J1G
-        vXWqoEOlyDULF
-X-Received: by 2002:a7b:c743:: with SMTP id w3mr14127384wmk.165.1573812615826;
-        Fri, 15 Nov 2019 02:10:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy4+YFJJa1zYa8p4uLPA490Q+SVHWwfndQ8NVq+KvtXr8ExWMuCpRO+Fq2h1O6L/ggdjTt0CA==
-X-Received: by 2002:a7b:c743:: with SMTP id w3mr14127261wmk.165.1573812614644;
-        Fri, 15 Nov 2019 02:10:14 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
-        by smtp.gmail.com with ESMTPSA id a11sm9640787wmh.40.2019.11.15.02.10.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2019 02:10:14 -0800 (PST)
-Subject: Re: [PATCH v2 05/16] KVM: VMX: Drop initialization of
- IA32_FEATURE_CONTROL MSR
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-References: <20191021234632.32363-1-sean.j.christopherson@intel.com>
- <20191022000820.1854-1-sean.j.christopherson@intel.com>
- <59cbc79a-fb06-f689-aa24-0ba923783345@redhat.com>
- <20191022151622.GA2343@linux.intel.com>
- <20191114183453.GI24045@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b0148465-37ae-15c0-9520-8061c7983002@redhat.com>
-Date:   Fri, 15 Nov 2019 11:10:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727223AbfKOKQb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 05:16:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48070 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727065AbfKOKQa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 05:16:30 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAFACCXM003432
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 05:16:29 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2w9ntnyxcv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 05:16:29 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Fri, 15 Nov 2019 10:16:27 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 15 Nov 2019 10:16:24 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAFAGNRV50528332
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Nov 2019 10:16:23 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 456C411C05E;
+        Fri, 15 Nov 2019 10:16:23 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E054411C050;
+        Fri, 15 Nov 2019 10:16:22 +0000 (GMT)
+Received: from dyn-9-152-224-131.boeblingen.de.ibm.com (unknown [9.152.224.131])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Nov 2019 10:16:22 +0000 (GMT)
+Subject: Re: [RFC 24/37] KVM: s390: protvirt: Write sthyi data to instruction
+ data area
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, cohuck@redhat.com,
+        gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-25-frankja@linux.ibm.com>
+ <cf52261e-9281-b11c-fee4-b97013a77ff2@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Fri, 15 Nov 2019 11:16:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191114183453.GI24045@linux.intel.com>
-Content-Language: en-US
-X-MC-Unique: qnaw7-WBM4uKysHpqn-_Og-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <cf52261e-9281-b11c-fee4-b97013a77ff2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="R1X0BeEmDhtvdjsMkiqystVIQlo8ovDk1"
+X-TM-AS-GCONF: 00
+x-cbid: 19111510-0028-0000-0000-000003B71C27
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111510-0029-0000-0000-0000247A2CF1
+Message-Id: <25dcf105-9a25-2e88-287c-c7dfdff429c4@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-15_02:2019-11-15,2019-11-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 suspectscore=11 malwarescore=0 impostorscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 mlxlogscore=999 spamscore=0
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911150096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/11/19 19:34, Sean Christopherson wrote:
-> On Tue, Oct 22, 2019 at 08:16:22AM -0700, Sean Christopherson wrote:
->> On Tue, Oct 22, 2019 at 12:51:01PM +0200, Paolo Bonzini wrote:
->>> On 22/10/19 02:08, Sean Christopherson wrote:
->>>> Remove the code to initialize IA32_FEATURE_CONTROL MSR when KVM is
->>>> loaded now that the MSR is initialized during boot on all CPUs that
->>>> support VMX, i.e. can possibly load kvm_intel.
->>>>
->>>> Reviewed-by: Jim Mattson <jmattson@google.com>
->>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->>>> ---
->>>>  arch/x86/kvm/vmx/vmx.c | 48 +++++++++++++++++------------------------=
--
->>>>  1 file changed, 19 insertions(+), 29 deletions(-)
->>>
->>> I am still not sure about this...  Enabling VMX is adding a possible
->>> attack vector for the kernel, we should not do it unless we plan to do =
-a
->>> VMXON.
->>
->> An attacker would need arbitrary cpl0 access to toggle CR4.VMXE and do
->> VMXON (and VMLAUNCH), would an extra WRMSR really slow them down?
->>
->> And practically speaking, how often do you encounter systems whose
->> firmware leaves IA32_FEATURE_CONTROL unlocked?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--R1X0BeEmDhtvdjsMkiqystVIQlo8ovDk1
+Content-Type: multipart/mixed; boundary="rIo2895KEPxUfb8EOgMhWe372hf1bFWUe"
 
-I honestly don't know... always on nested virtualization probably
-doesn't count as an answer. :)
+--rIo2895KEPxUfb8EOgMhWe372hf1bFWUe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-From a totally abstract point of view I like the idea of KVM being an
-independent driver and thus the only place that touches VMX stuff
-(including the relevant bit in IA32_FEATURE_CONTROL).  But I understand
-that this doesn't really make any concrete difference, so I guess you
-can go ahead with this.
-
->>> Why is it so important to operate with locked
->>> IA32_FEATURE_CONTROL (so that KVM can enable VMX and the kernel can
->>> still enable SGX if desired).
+On 11/15/19 9:04 AM, Thomas Huth wrote:
+> On 24/10/2019 13.40, Janosch Frank wrote:
+>> STHYI data has to go through the bounce buffer.
 >>
->> For simplicity.  The alternative that comes to mind is to compute the
->> desired MSR value and write/lock the MSR on demand, e.g. add a sequence
->> similar to KVM's hardware_enable_all() for SGX, but that's a fair amount
->> of complexity for marginal benefit (IMO).
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/kvm/intercept.c | 15 ++++++++++-----
+>>  1 file changed, 10 insertions(+), 5 deletions(-)
 >>
->> If a user really doesn't want VMX enabled, they can clear the feature bi=
-t
->> via the clearcpuid kernel param.=20
->>
->> That being said, enabling VMX in IA32_FEATURE_CONTROL if and only if
->> IS_ENABLED(CONFIG_KVM) is true would be an easy enhancement.
+>> diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
+>> index 510b1dee3320..37cb62bc261b 100644
+>> --- a/arch/s390/kvm/intercept.c
+>> +++ b/arch/s390/kvm/intercept.c
+>> @@ -391,7 +391,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+>>  		goto out;
+>>  	}
+>> =20
+>> -	if (addr & ~PAGE_MASK)
+>> +	if (!kvm_s390_pv_is_protected(vcpu->kvm) && (addr & ~PAGE_MASK))
+>>  		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+>> =20
+>>  	sctns =3D (void *)get_zeroed_page(GFP_KERNEL);
+>> @@ -402,10 +402,15 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+>> =20
+>>  out:
+>>  	if (!cc) {
+>> -		r =3D write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+>> -		if (r) {
+>> -			free_page((unsigned long)sctns);
+>> -			return kvm_s390_inject_prog_cond(vcpu, r);
+>> +		if (kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			memcpy((void *)vcpu->arch.sie_block->sidad, sctns,
 >=20
-> Paolo, any follow up thoughts on this approach?
+> sidad & PAGE_MASK, just to be sure?
 
-Yes, that would be a simple enhancement, useful at least for
-documentation purpose.
+How about a macro or just saving the pointer in an arch struct?
 
-Paolo
+>=20
+>> +			       PAGE_SIZE);
+>> +		} else {
+>> +			r =3D write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+>> +			if (r) {
+>> +				free_page((unsigned long)sctns);
+>> +				return kvm_s390_inject_prog_cond(vcpu, r);
+>> +			}
+>>  		}
+>>  	}
+>> =20
+>>
+>=20
+> With "& PAGE_MASK":
+>=20
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>=20
+
+
+
+--rIo2895KEPxUfb8EOgMhWe372hf1bFWUe--
+
+--R1X0BeEmDhtvdjsMkiqystVIQlo8ovDk1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3OevYACgkQ41TmuOI4
+ufhI8w//Um54bh3fscX0u4pd2SuoEv94BXoNziNR7iSPz2HsE2KE1ufvXTUhxTJY
+erXWPv8K2occVrTJNCG9doSJbAiZuRNwqq/PbcdHR9IuhVGyzlG+0EnCxxILtPeN
+fA67kH3A0afkZvRRZc1n8v2mfbF8sJya8N1FyMD2Fg8X960lUouzvaTxYrStX3Xl
+Y3sCPnn4yT/UmvLWoCq5mt674nzu6F7paYCKpk0OLXqRcjBXHVgGFnlC5LvBt529
+2F4WiEYawtt51jnnsbPUIQs/p9z0YC7NQ3YeXKG/Du3MS9KSQRDDLH+V52JN+AaM
+OC+i8nBzkXNpMVF72D1s/ipVERudlnAjVF/3nQDn1JSDxp0TdM08j/TJGVtE0B1y
+rOhGODhCRGilh+4ge7oVTFJTpKYCqe3eYZp3HDy79kT9Lpgb+HWcuD8irYYZsXUk
+dlpsRjhjrJ591mE78LxWPfFLv01xAXV2xpiBOed7S6FpCX6eYBiO+F4qmA464TlT
+AExkO/WaERfKMsIzMQOxHyxt7OcUfgocIKUyU+AmjxEO/apk4Vc/g1m9aOd9Ej4Q
+keZSFzede8/H1A46pkTCk1ITVCjG3ZGRP2MMbiDgFfbZ26W3mnT8clyCfVRB9il3
+UabkFOi42FUB2IlWS6d679dw/XJ60YvUP4qv/IWf3AhPTGMyKsI=
+=mcs8
+-----END PGP SIGNATURE-----
+
+--R1X0BeEmDhtvdjsMkiqystVIQlo8ovDk1--
 
