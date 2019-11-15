@@ -2,111 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2AF5FE004
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:26:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E16C3FE007
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:26:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727589AbfKOO0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 09:26:10 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:37992 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727406AbfKOO0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 09:26:09 -0500
-Received: by mail-lj1-f196.google.com with SMTP id v8so10902130ljh.5
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:26:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e2s4PTa8DL16YJ33v+TIOuBj4ZPP4D1YasYLzCNI294=;
-        b=vcgq70ScYIQ4fAj7N+yf/SeviKuTfD3VdVHSpojWlpfhgOtDWSKSEKJExBYB4zq1Ui
-         2woEkl2MXVI8uYkPP6gr9/KJjSSoTMwtm4ShQphBSIfQGoU+yQfyEGg6ahz/O+XsHimR
-         MeGgKdLsEmukn9/R2pK3hut+sSm9sjGp87oZgz2RGS+iX8pn2cloEXM36vR1bxxvVWR3
-         7zmw5whrNLqls2Laz610kUjf5dWtjnv7GUZtrMyeXUtEVcdl4DUCpcJREKdQvUo/4x/V
-         cxXqMqcjP4byISLLg05l81UtFsmB2mOHt51P7foskWGol/vMcJNfPMOiqiX456kRb6cE
-         p9/Q==
+        id S1727537AbfKOO04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 09:26:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49845 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727411AbfKOO04 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Nov 2019 09:26:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573828015;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=YAABbHe3sNY+Egrkqr4me6x1W0FPkMdgZ+GIVxxRgO4=;
+        b=KTXaCBBNQo0zC50dM60ag3g7zeyvBMH2F/FWLhu/v9gPhxWY4tOYAoW4X+J7sgmzuZ85la
+        1d8kTaYciIQsB1fvM3TYlmjDIlujFU5DCqSmCw2EE7F+dDpCnpEqALh0YIZUbGYEbqYEJr
+        COrzCg10W8NqIhVVAj3QCWV4Hbp8nAo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-1wRRZ56WOVmo7JyOoHkOdw-1; Fri, 15 Nov 2019 09:26:51 -0500
+Received: by mail-wr1-f70.google.com with SMTP id q12so7780399wrr.3
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:26:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e2s4PTa8DL16YJ33v+TIOuBj4ZPP4D1YasYLzCNI294=;
-        b=jzuMAXcS2iOw81+h8wvlDH7tWZq6UjnpiQVjmX09y2wJ5X0kmHk0U/05rj0PbnxlPT
-         t9zPvLc/bOfqw+jmMeha3y0gcoGAps2UwINYWn0WvbPVjFx6k+y4GC5QIUX9zdd398LU
-         ssNwZ8X72Nnquql0KdFj90NIaf6tVIqhPUEM+DdJBQ2U6MYl1Pfonm1dNwmTQQdDI4i0
-         dmng5sEIUmSxd4ufHz33q1CgCtFdAZihEI49f2w6hbrC5R9mk6XqduVDdAnFGcu8WkIj
-         ipvwXUrH8adgMVRT2iL6etwy+87Q4KiAaJTVJrFQYuomRHyIxlzMYhMMerfv/tFOOlCR
-         y3sQ==
-X-Gm-Message-State: APjAAAUVJUrO/V+vSn93nluuO5YktWY1PqluqCvCE5xj9oExUAsXzZrz
-        XKAvr6waJfmJ/G6r8Q4/WWQHRMU0SGzZVU6o9RPjDA==
-X-Google-Smtp-Source: APXvYqz5BbCZfgz8OLL95cZUzz5y0HzOvWWrdaCgtKlobYh43CLfzhBdTXq6RY1HV4Rpv+JlHSluUQIZqo3XKLiUk/s=
-X-Received: by 2002:a2e:b0d3:: with SMTP id g19mr11026236ljl.135.1573827967158;
- Fri, 15 Nov 2019 06:26:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20191108051439.185635-1-aaronlewis@google.com> <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
-In-Reply-To: <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Fri, 15 Nov 2019 06:25:56 -0800
-Message-ID: <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=B6aD7MeLkiqpuKWWnu1AaCWgAg1Wn1iy4yCeUluVRb0=;
+        b=oetNr6V+LDEFDYjSXyH7/i9sn3lce1AvuBxnFx5kiCS4V1wKFH6bD2DRCUGNYc2K6k
+         Zn1LdgkiSAF6Ay1bFzjBkoXmsclZCsUGEfxJDmvkkuq7DIxWdanmKmjXDqc9Fu2yXqMf
+         ovQsV6qgDwXeSE2gWLd/bM3AdTtN/9pDSS3CgLLLR1sHQxApBtSB9dHYmjAMlGZ6vvba
+         IMihYWz8hXoLEM8m5rFe0/EY8aRJXEBe7aN9ZJhxJGGr0douwNlNDOSNELQvfVi6Z769
+         cSRf8GANXTotoMU1CFOeQwRH6MIIc4evq1rFUSujlQ8z9kAlg7K16GQTu4l7kVQnSkGw
+         9RUg==
+X-Gm-Message-State: APjAAAX2R0RypdEvfx74ue/yyXsEoZr5fyQoitpAv4v5COc9/j9cEwKR
+        1aeAF2G4H6Y6ZNqNzQaHRD8VppJgl5unwOqpILNLvOBEZbIWV21psesGx7WrDpeXQwVB6DqYf35
+        6tT8kd/uyfs8k
+X-Received: by 2002:a1c:4456:: with SMTP id r83mr14194173wma.2.1573828010439;
+        Fri, 15 Nov 2019 06:26:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy0HVdAECPM563WhDKZT2ASqBtrO4RHcyxdiJtbCydoHrnVyPFZcoZ7liXHHMWmmEvibZ1KlA==
+X-Received: by 2002:a1c:4456:: with SMTP id r83mr14194143wma.2.1573828010122;
+        Fri, 15 Nov 2019 06:26:50 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:857e:73f6:39a8:6f94? ([2001:b07:6468:f312:857e:73f6:39a8:6f94])
+        by smtp.gmail.com with ESMTPSA id f140sm10806039wme.21.2019.11.15.06.26.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Nov 2019 06:26:49 -0800 (PST)
 Subject: Re: [PATCH v4 0/4] Add support for capturing the highest observable
  L2 TSC
-To:     Paolo Bonzini <pbonzini@redhat.com>
+To:     Aaron Lewis <aaronlewis@google.com>
 Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20191108051439.185635-1-aaronlewis@google.com>
+ <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
+ <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <fe087e58-252a-f489-abbb-37cd68e2e437@redhat.com>
+Date:   Fri, 15 Nov 2019 15:26:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: 1wRRZ56WOVmo7JyOoHkOdw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 2:23 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 08/11/19 06:14, Aaron Lewis wrote:
-> > The L1 hypervisor may include the IA32_TIME_STAMP_COUNTER MSR in the
-> > vmcs12 MSR VM-exit MSR-store area as a way of determining the highest
-> > TSC value that might have been observed by L2 prior to VM-exit. The
-> > current implementation does not capture a very tight bound on this
-> > value.  To tighten the bound, add the IA32_TIME_STAMP_COUNTER MSR to the
-> > vmcs02 VM-exit MSR-store area whenever it appears in the vmcs12 VM-exit
-> > MSR-store area.  When L0 processes the vmcs12 VM-exit MSR-store area
-> > during the emulation of an L2->L1 VM-exit, special-case the
-> > IA32_TIME_STAMP_COUNTER MSR, using the value stored in the vmcs02
-> > VM-exit MSR-store area to derive the value to be stored in the vmcs12
-> > VM-exit MSR-store area.
-> >
-> > v3 -> v4:
-> >  - Squash the final commit with the previous one used to prepare the MSR-store
-> >    area.  There is no need for this split after all.
-> >
-> > v2 -> v3:
-> >  - Rename NR_MSR_ENTRIES to NR_LOADSAVE_MSRS
-> >  - Pull setup code for preparing the MSR-store area out of the final commit and
-> >    put it in it's own commit (4/5).
-> >  - Export vmx_find_msr_index() in the final commit instead of in commit 3/5 as
-> >    it isn't until the final commit that we actually use it.
-> >
-> > v1 -> v2:
-> >  - Rename function nested_vmx_get_msr_value() to
-> >    nested_vmx_get_vmexit_msr_value().
-> >  - Remove unneeded tag 'Change-Id' from commit messages.
-> >
-> > Aaron Lewis (4):
-> >   kvm: nested: Introduce read_and_check_msr_entry()
-> >   kvm: vmx: Rename NR_AUTOLOAD_MSRS to NR_LOADSTORE_MSRS
-> >   kvm: vmx: Rename function find_msr() to vmx_find_msr_index()
-> >   KVM: nVMX: Add support for capturing highest observable L2 TSC
-> >
-> >  arch/x86/kvm/vmx/nested.c | 136 ++++++++++++++++++++++++++++++++------
-> >  arch/x86/kvm/vmx/vmx.c    |  14 ++--
-> >  arch/x86/kvm/vmx/vmx.h    |   9 ++-
-> >  3 files changed, 131 insertions(+), 28 deletions(-)
-> >
->
-> Queued, but it would be good to have a testcase for this, either for
-> kvm-unit-tests or for tools/testing/selftests/kvm.
->
-> Paolo
->
+On 15/11/19 15:25, Aaron Lewis wrote:
+> Agreed.  I have some test cases in kvm-unit-tests for this code that
+> I've been using to test these changes locally, however, they would
+> fail upstream without "[kvm-unit-tests PATCH] x86: Fix the register
+> order to match struct regs" being taken first.  I'll ping that patch
+> again.
+>=20
 
-Agreed.  I have some test cases in kvm-unit-tests for this code that
-I've been using to test these changes locally, however, they would
-fail upstream without "[kvm-unit-tests PATCH] x86: Fix the register
-order to match struct regs" being taken first.  I'll ping that patch
-again.
+You've just done that... :)
+
+Paolo
+
