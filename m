@@ -2,99 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6A29FD9A6
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 10:45:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18029FD9A9
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 10:45:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbfKOJo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 04:44:57 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54287 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726920AbfKOJo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 04:44:56 -0500
-Received: by mail-wm1-f66.google.com with SMTP id z26so8957775wmi.4;
-        Fri, 15 Nov 2019 01:44:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=s61crLo7rMvO8Wf80iBrPDgDwSffbeyNgj2v4Ncj5Ag=;
-        b=DyoReDyyhRBmrZaTauJCDmNm+/tlTd3FWW/ZoNYN05xqz6RvoflkhN+J91NI8ye6E4
-         5/VSJXf/6UpCZPNIno3j6M4oUR2TN3R+xG9uV6Fc3RwJcqyasO/Lqw71+d4uNVMle4Vz
-         61PGIXq+qSJkhUU3SK7GYZbuYMT0KFN7lrqURh4wg1vR0F7fedMlJ0l/3wDbguRCJI1u
-         xRYQd3W09q1P5EH2j6QOz/rYwK6YBNOTwC83douYCfnHnJNypcE64rDt8sZuHrCS+hXp
-         f8YZ1WVWZfn1vc1IoCQCk+9DvU+dANWjX92j41uXBeJfn4HWvfOSeikJG/402s4DNYv9
-         Q03w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=s61crLo7rMvO8Wf80iBrPDgDwSffbeyNgj2v4Ncj5Ag=;
-        b=M2B36gHIJUp18WQ/tOtESlB8QMI9pP7JmCDxGOQ5e0+dzIJVI+GsA1/GiI+czh0Ufs
-         NfREdOSBIQqT4FpzweWn/Y802YoP+RuSqGTKPLkDqKwWSN1uLZCep7tP8rMX7EB4t/+H
-         XcCnGw9bjtp8ZkdQleMEO5CiaWd8itbFxDgFoSmpSjKK2263lJC4IbrWQOeCkyn4p4WU
-         dPWMAEG9PFeqLiBXTr1feRCn8qIiIK/irRzOj1BOflYKEoMvWlrhr9UNFJZihD48VBbj
-         APJbYB7SMvI4O5vTRE3djQuDupyaM7q8wUirrYDBd5ndzd2XmD9Rf2NuKVIRODeMrNp7
-         uwqA==
-X-Gm-Message-State: APjAAAXs6q29fyDURtwK1hWK0ysQXLP29iC/TOn09fWAKWGP6lv+WNJi
-        NE8Ea7tblI2+VkkgRqyfJdbJuLTx
-X-Google-Smtp-Source: APXvYqyU+TVj8L3P31QRcrvtWrtvI3pOCkxyInBkWrRnjj5g3p+UdchNp9kkKhraOwu7Mnb6ySx4KQ==
-X-Received: by 2002:a7b:cc8b:: with SMTP id p11mr13682877wma.38.1573811094469;
-        Fri, 15 Nov 2019 01:44:54 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id d13sm10097783wrq.51.2019.11.15.01.44.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Nov 2019 01:44:53 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] More KVM fixes for 5.4-rc8
-Date:   Fri, 15 Nov 2019 10:44:52 +0100
-Message-Id: <1573811092-12834-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727643AbfKOJpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 04:45:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41880 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727183AbfKOJpN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 04:45:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573811111;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rDa6afp9hueO2vBvDtK/Ls/QJ8tHZ/QehiNQvbDMUPw=;
+        b=bCI5Ty86psHuPqpjr+ZIU9WNlBLEsmMfAdRkOOhF9QTLvVhbMSIJRIagkwlAQRql6kNFrt
+        8rgu7GKS/TRPsnrizgtPlG+AIecwnlTBgd7bHjFEM/EeQPTCoRqHJqeNrInYaHukVvXIyD
+        8Zta+sDauGgLoXtmMl/XEZmz/KxVTYU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-bYq3-kLhNziTdAeIcPm87w-1; Fri, 15 Nov 2019 04:45:08 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1D61DBAD;
+        Fri, 15 Nov 2019 09:45:06 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82D431001DE1;
+        Fri, 15 Nov 2019 09:45:00 +0000 (UTC)
+Date:   Fri, 15 Nov 2019 10:44:58 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Xiang Zheng <zhengxiang9@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>,
+        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
+        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <linuxarm@huawei.com>, <wanghaibin.wang@huawei.com>
+Subject: Re: [RESEND PATCH v21 2/6] docs: APEI GHES generation and CPER
+ record description
+Message-ID: <20191115104458.200a6231@redhat.com>
+In-Reply-To: <20191111014048.21296-3-zhengxiang9@huawei.com>
+References: <20191111014048.21296-1-zhengxiang9@huawei.com>
+        <20191111014048.21296-3-zhengxiang9@huawei.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: bYq3-kLhNziTdAeIcPm87w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Mon, 11 Nov 2019 09:40:44 +0800
+Xiang Zheng <zhengxiang9@huawei.com> wrote:
 
-The following changes since commit 8c5bd25bf42effd194d4b0b43895c42b374e620b:
+> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>=20
+> Add APEI/GHES detailed design document
+>=20
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  docs/specs/acpi_hest_ghes.rst | 95 +++++++++++++++++++++++++++++++++++
+>  docs/specs/index.rst          |  1 +
+>  2 files changed, 96 insertions(+)
+>  create mode 100644 docs/specs/acpi_hest_ghes.rst
+>=20
+> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rs=
+t
+> new file mode 100644
+> index 0000000000..348825f9d3
+> --- /dev/null
+> +++ b/docs/specs/acpi_hest_ghes.rst
+> @@ -0,0 +1,95 @@
+> +APEI tables generating and CPER record
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +..
+> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+> +
+> +   This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> +   See the COPYING file in the top-level directory.
+> +
+> +Design Details
+> +--------------
+> +
+> +::
+> +
+> +         etc/acpi/tables                                 etc/hardware_er=
+rors
+> +      =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D      =
+                =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +  + +--------------------------+            +-----------------------+
+> +  | | HEST                     |            |    address            |   =
+         +--------------+
+> +  | +--------------------------+            |    registers          |   =
+         | Error Status |
+> +  | | GHES1                    |            | +---------------------+   =
+         | Data Block 1 |
+> +  | +--------------------------+ +--------->| |error_block_address1 |---=
+-------->| +------------+
+> +  | | .................        | |          | +---------------------+   =
+         | |  CPER      |
+> +  | | error_status_address-----+-+ +------->| |error_block_address2 |---=
+-----+   | |  CPER      |
+> +  | | .................        |   |        | +---------------------+   =
+     |   | |  ....      |
+> +  | | read_ack_register--------+-+ |        | |    ..............   |   =
+     |   | |  CPER      |
+> +  | | read_ack_preserve        | | |        +-----------------------+   =
+     |   | +------------+
+> +  | | read_ack_write           | | | +----->| |error_block_addressN |---=
+---+ |   | Error Status |
+> +  + +--------------------------+ | | |      | +---------------------+   =
+   | |   | Data Block 2 |
+> +  | | GHES2                    | +-+-+----->| |read_ack_register1   |   =
+   | +-->| +------------+
+> +  + +--------------------------+   | |      | +---------------------+   =
+   |     | |  CPER      |
+> +  | | .................        |   | | +--->| |read_ack_register2   |   =
+   |     | |  CPER      |
+> +  | | error_status_address-----+---+ | |    | +---------------------+   =
+   |     | |  ....      |
+> +  | | .................        |     | |    | |  .............      |   =
+   |     | |  CPER      |
+> +  | | read_ack_register--------+-----+-+    | +---------------------+   =
+   |     +-+------------+
+> +  | | read_ack_preserve        |     |   +->| |read_ack_registerN   |   =
+   |     | |..........  |
+> +  | | read_ack_write           |     |   |  | +---------------------+   =
+   |     | +------------+
+> +  + +--------------------------|     |   |                              =
+   |     | Error Status |
+> +  | | ...............          |     |   |                              =
+   |     | Data Block N |
+> +  + +--------------------------+     |   |                              =
+   +---->| +------------+
+> +  | | GHESN                    |     |   |                              =
+         | |  CPER      |
+> +  + +--------------------------+     |   |                              =
+         | |  CPER      |
+> +  | | .................        |     |   |                              =
+         | |  ....      |
+> +  | | error_status_address-----+-----+   |                              =
+         | |  CPER      |
+> +  | | .................        |         |                              =
+         +-+------------+
+> +  | | read_ack_register--------+---------+
+> +  | | read_ack_preserve        |
+> +  | | read_ack_write           |
+> +  + +--------------------------+
 
-  Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2019-11-12 13:19:15 -0800)
+I'd merge "Error Status Data Block" with "address registers", so it would b=
+e
+clear that "Error Status Data Block" is located after "read_ack_registerN"
 
-are available in the git repository at:
+> +
+> +(1) QEMU generates the ACPI HEST table. This table goes in the current
+> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
+> +    notification types.
+> +
+> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
+> +    also needs to populate this blob. The "etc/hardware_errors" fw_cfg b=
+lob
+> +    contains an address registers table and an Error Status Data Block t=
+able.
+> +
+> +(3) The address registers table contains N Error Block Address entries
+> +    and N Read Ack Register entries. The size for each entry is 8-byte.
+> +    The Error Status Data Block table contains N Error Status Data Block
+> +    entries. The size for each entry is 4096(0x1000) bytes. The total si=
+ze
+> +    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) =
+bytes.
+> +    N is the number of the kinds of hardware error sources.
+> +
+> +(4) QEMU generates the ACPI linker/loader script for the firmware. The
+> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_e=
+rrors"
+> +    and copies blob contents there.
+> +
+> +(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
+> +    "error_status_address" fields of the HEST table with a pointer to th=
+e
+> +    corresponding "address registers" in the "etc/hardware_errors" blob.
+> +
+> +(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
+> +    "read_ack_register" fields of the HEST table with a pointer to the
+> +    corresponding "address registers" in the "etc/hardware_errors" blob.
+
+s/"address registers" in/"read_ack_register" within/
+
+> +
+> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
+> +    addresses in the "error_block_address" fields with a pointer to the
+> +    respective "Error Status Data Block" in the "etc/hardware_errors" bl=
+ob.
+> +
+> +(8) QEMU defines a third and write-only fw_cfg blob which is called
+> +    "etc/hardware_errors_addr". Through that blob, the firmware can send=
+ back
+> +    the guest-side allocation addresses to QEMU. The "etc/hardware_error=
+s_addr"
+> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER =
+command
+> +    for the firmware. The firmware will write back the start address of
+> +    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_a=
+ddr".
+> +
+
+> +(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right=
+ into
+> +    guest memory,=20
+
+s/
+QEMU formats the CPER right into guest memory
+/
+QEMU writes CPER into corresponding "Error Status Data Block"
+/
+
+> and then injects platform specific interrupt (in case of
+> +    arm/virt machine it's Synchronous External Abort) as a notification =
+which
+> +    is necessary for notifying the guest.
 
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> +
+> +(10) This notification (in virtual hardware) will be handled by the gues=
+t
+> +     kernel, guest APEI driver will read the CPER which is recorded by Q=
+EMU and
+> +     do the recovery.
+Maybe better would be to say:
+"
+On receiving notification, guest APEI driver cold read the CPER error
+and take appropriate action
+"
 
-for you to fetch changes up to 9cb09e7c1c9af2968d5186ef9085f05641ab65d9:
 
-  KVM: Add a comment describing the /dev/kvm no_compat handling (2019-11-15 10:14:04 +0100)
+also in HEST patches there is implicit ABI, which probably should be docume=
+nted here.
+More specifically kvm_arch_on_sigbus_vcpu() error injection
+uses source_id as index in "etc/hardware_errors" to find out "Error Status =
+Data Block"
+entry corresponding to error source. So supported source_id values should b=
+e assigned
+here and not be changed afterwards to make sure that guest will write error=
+ into
+expected "Error Status Data Block" even if guest was migrated to a newer QE=
+MU.
 
-----------------------------------------------------------------
-* Fixes for CONFIG_KVM_COMPAT=n
-* Two updates to the IFU erratum
-* selftests build fix
-* Brown paper bag fix
 
-----------------------------------------------------------------
-Marc Zyngier (2):
-      KVM: Forbid /dev/kvm being opened by a compat task when CONFIG_KVM_COMPAT=n
-      KVM: Add a comment describing the /dev/kvm no_compat handling
+> diff --git a/docs/specs/index.rst b/docs/specs/index.rst
+> index 984ba44029..3019b9c976 100644
+> --- a/docs/specs/index.rst
+> +++ b/docs/specs/index.rst
+> @@ -13,3 +13,4 @@ Contents:
+>     ppc-xive
+>     ppc-spapr-xive
+>     acpi_hw_reduced_hotplug
+> +   acpi_hest_ghes
 
-Paolo Bonzini (1):
-      kvm: x86: disable shattered huge page recovery for PREEMPT_RT.
-
-Sean Christopherson (1):
-      KVM: x86/mmu: Take slots_lock when using kvm_mmu_zap_all_fast()
-
-Vitaly Kuznetsov (1):
-      selftests: kvm: fix build with glibc >= 2.30
-
-Xiaoyao Li (1):
-      KVM: X86: Reset the three MSR list number variables to 0 in kvm_init_msr_list()
-
- arch/x86/kvm/mmu.c                       | 10 +++++++---
- arch/x86/kvm/x86.c                       |  4 ++++
- tools/testing/selftests/kvm/lib/assert.c |  4 ++--
- virt/kvm/kvm_main.c                      | 15 ++++++++++++++-
- 4 files changed, 27 insertions(+), 6 deletions(-)
