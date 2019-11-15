@@ -2,124 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 879B2FDFC0
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:09:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2AF5FE004
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 15:26:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727677AbfKOOJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 09:09:30 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:34088 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727534AbfKOOJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 09:09:29 -0500
-Received: by mail-qk1-f194.google.com with SMTP id 205so8184075qkk.1
-        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:09:29 -0800 (PST)
+        id S1727589AbfKOO0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 09:26:10 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:37992 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727406AbfKOO0J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 09:26:09 -0500
+Received: by mail-lj1-f196.google.com with SMTP id v8so10902130ljh.5
+        for <kvm@vger.kernel.org>; Fri, 15 Nov 2019 06:26:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=01834Iuy8wrTkyETdgSEfcddUW82cA+Rc6Zt+MvTCwg=;
-        b=BFBIgmkk8QkntrHNjJLsvCL1a0ZURlA5X/gmLb4n3VPRP5m3aB6scRcD2DMxTLAV9P
-         UaMtjJH/lJaxRT3MaYZLNwy8cw9D1M5/6iAxnqhClJH46gGawBEotmmVwz9bc8u3IFV9
-         a3v4lMSNKHekmvWmxSCO3xS9GuPfrTZZ9gfrHLPlSSz+de3k9e1mbvTuAMlgMSg1inD0
-         htevxD4Ti62AfDMDE+osEpAwbIBY+1VPeWYkc7W/CwzYOFcM3WvoA9tt0pcZZGXm+LdO
-         O8XKMS5WarP50UJ1uTIL/tvlJnyEoGG2Ukx7eqBCtFPfW9ti43J0cbZRwFC28FPxF58w
-         Wt7Q==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=e2s4PTa8DL16YJ33v+TIOuBj4ZPP4D1YasYLzCNI294=;
+        b=vcgq70ScYIQ4fAj7N+yf/SeviKuTfD3VdVHSpojWlpfhgOtDWSKSEKJExBYB4zq1Ui
+         2woEkl2MXVI8uYkPP6gr9/KJjSSoTMwtm4ShQphBSIfQGoU+yQfyEGg6ahz/O+XsHimR
+         MeGgKdLsEmukn9/R2pK3hut+sSm9sjGp87oZgz2RGS+iX8pn2cloEXM36vR1bxxvVWR3
+         7zmw5whrNLqls2Laz610kUjf5dWtjnv7GUZtrMyeXUtEVcdl4DUCpcJREKdQvUo/4x/V
+         cxXqMqcjP4byISLLg05l81UtFsmB2mOHt51P7foskWGol/vMcJNfPMOiqiX456kRb6cE
+         p9/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=01834Iuy8wrTkyETdgSEfcddUW82cA+Rc6Zt+MvTCwg=;
-        b=Z4xQGbd7um65ey2DappP8I6EL0HhK1hG6FSScTSPuidGQU7cv5nR/csFvaIloZjnoV
-         rpw/429j6OI83kmggG2GxiWPUjf9JJ+B4nSiFikB/cy/+xrN2f3doKyV2L9GVL3EIDYO
-         U29Svx9dh+ld2BTEykCZIMBl83bHAWH4nZbl/wEUBWVPW8Thpok2CPWW+ixG34589Bux
-         Etz3EXSu0JL6Y5EJF5ZEWtnKUZoEjrc83nZFF9s34d2bzAOcoOqTm+2g8Y1ykjBmggOL
-         sD9g34MwBPNLcbFfzBzVM7bS+wy67jpElmiQVgxd2Qm3iSASxF/C055mk1WBF0tPVbOw
-         PjQQ==
-X-Gm-Message-State: APjAAAXuuJaMxqSDBwgHNwRT9KEJeou+trYQUMttlWUNirF3+oDEgZPA
-        bE2iR3CKfBr9qRRKX52nn+URsw==
-X-Google-Smtp-Source: APXvYqySuuQ0WzAKMm3kXEkiDMguUlgyvE6K/2D67jOtzEpRUEwGr7GFZW94ehFUiDC6Dq2Nm3hHug==
-X-Received: by 2002:a37:76c6:: with SMTP id r189mr11712734qkc.303.1573826968699;
-        Fri, 15 Nov 2019 06:09:28 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-180.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.180])
-        by smtp.gmail.com with ESMTPSA id m65sm4836053qte.54.2019.11.15.06.09.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 15 Nov 2019 06:09:28 -0800 (PST)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1iVcHv-0002xw-Lj; Fri, 15 Nov 2019 10:09:27 -0400
-Date:   Fri, 15 Nov 2019 10:09:27 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 12/24] IB/{core,hw,umem}: set FOLL_PIN via
- pin_user_pages*(), fix up ODP
-Message-ID: <20191115140927.GB4055@ziepe.ca>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-13-jhubbard@nvidia.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e2s4PTa8DL16YJ33v+TIOuBj4ZPP4D1YasYLzCNI294=;
+        b=jzuMAXcS2iOw81+h8wvlDH7tWZq6UjnpiQVjmX09y2wJ5X0kmHk0U/05rj0PbnxlPT
+         t9zPvLc/bOfqw+jmMeha3y0gcoGAps2UwINYWn0WvbPVjFx6k+y4GC5QIUX9zdd398LU
+         ssNwZ8X72Nnquql0KdFj90NIaf6tVIqhPUEM+DdJBQ2U6MYl1Pfonm1dNwmTQQdDI4i0
+         dmng5sEIUmSxd4ufHz33q1CgCtFdAZihEI49f2w6hbrC5R9mk6XqduVDdAnFGcu8WkIj
+         ipvwXUrH8adgMVRT2iL6etwy+87Q4KiAaJTVJrFQYuomRHyIxlzMYhMMerfv/tFOOlCR
+         y3sQ==
+X-Gm-Message-State: APjAAAUVJUrO/V+vSn93nluuO5YktWY1PqluqCvCE5xj9oExUAsXzZrz
+        XKAvr6waJfmJ/G6r8Q4/WWQHRMU0SGzZVU6o9RPjDA==
+X-Google-Smtp-Source: APXvYqz5BbCZfgz8OLL95cZUzz5y0HzOvWWrdaCgtKlobYh43CLfzhBdTXq6RY1HV4Rpv+JlHSluUQIZqo3XKLiUk/s=
+X-Received: by 2002:a2e:b0d3:: with SMTP id g19mr11026236ljl.135.1573827967158;
+ Fri, 15 Nov 2019 06:26:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-13-jhubbard@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20191108051439.185635-1-aaronlewis@google.com> <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
+In-Reply-To: <52b9e145-9cc6-a1b5-fee6-c3afe79e9480@redhat.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Fri, 15 Nov 2019 06:25:56 -0800
+Message-ID: <CAAAPnDHQSCGjLX252Zj7UDWjQQ9uKYC9UTmCWx2HJ4Q+u-aObw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Add support for capturing the highest observable
+ L2 TSC
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 14, 2019 at 09:53:28PM -0800, John Hubbard wrote:
-> Convert infiniband to use the new pin_user_pages*() calls.
-> 
-> Also, revert earlier changes to Infiniband ODP that had it using
-> put_user_page(). ODP is "Case 3" in
-> Documentation/core-api/pin_user_pages.rst, which is to say, normal
-> get_user_pages() and put_page() is the API to use there.
-> 
-> The new pin_user_pages*() calls replace corresponding get_user_pages*()
-> calls, and set the FOLL_PIN flag. The FOLL_PIN flag requires that the
-> caller must return the pages via put_user_page*() calls, but infiniband
-> was already doing that as part of an earlier commit.
-> 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/infiniband/core/umem.c              |  2 +-
->  drivers/infiniband/core/umem_odp.c          | 13 ++++++-------
->  drivers/infiniband/hw/hfi1/user_pages.c     |  2 +-
->  drivers/infiniband/hw/mthca/mthca_memfree.c |  2 +-
->  drivers/infiniband/hw/qib/qib_user_pages.c  |  2 +-
->  drivers/infiniband/hw/qib/qib_user_sdma.c   |  2 +-
->  drivers/infiniband/hw/usnic/usnic_uiom.c    |  2 +-
->  drivers/infiniband/sw/siw/siw_mem.c         |  2 +-
->  8 files changed, 13 insertions(+), 14 deletions(-)
+On Fri, Nov 15, 2019 at 2:23 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 08/11/19 06:14, Aaron Lewis wrote:
+> > The L1 hypervisor may include the IA32_TIME_STAMP_COUNTER MSR in the
+> > vmcs12 MSR VM-exit MSR-store area as a way of determining the highest
+> > TSC value that might have been observed by L2 prior to VM-exit. The
+> > current implementation does not capture a very tight bound on this
+> > value.  To tighten the bound, add the IA32_TIME_STAMP_COUNTER MSR to the
+> > vmcs02 VM-exit MSR-store area whenever it appears in the vmcs12 VM-exit
+> > MSR-store area.  When L0 processes the vmcs12 VM-exit MSR-store area
+> > during the emulation of an L2->L1 VM-exit, special-case the
+> > IA32_TIME_STAMP_COUNTER MSR, using the value stored in the vmcs02
+> > VM-exit MSR-store area to derive the value to be stored in the vmcs12
+> > VM-exit MSR-store area.
+> >
+> > v3 -> v4:
+> >  - Squash the final commit with the previous one used to prepare the MSR-store
+> >    area.  There is no need for this split after all.
+> >
+> > v2 -> v3:
+> >  - Rename NR_MSR_ENTRIES to NR_LOADSAVE_MSRS
+> >  - Pull setup code for preparing the MSR-store area out of the final commit and
+> >    put it in it's own commit (4/5).
+> >  - Export vmx_find_msr_index() in the final commit instead of in commit 3/5 as
+> >    it isn't until the final commit that we actually use it.
+> >
+> > v1 -> v2:
+> >  - Rename function nested_vmx_get_msr_value() to
+> >    nested_vmx_get_vmexit_msr_value().
+> >  - Remove unneeded tag 'Change-Id' from commit messages.
+> >
+> > Aaron Lewis (4):
+> >   kvm: nested: Introduce read_and_check_msr_entry()
+> >   kvm: vmx: Rename NR_AUTOLOAD_MSRS to NR_LOADSTORE_MSRS
+> >   kvm: vmx: Rename function find_msr() to vmx_find_msr_index()
+> >   KVM: nVMX: Add support for capturing highest observable L2 TSC
+> >
+> >  arch/x86/kvm/vmx/nested.c | 136 ++++++++++++++++++++++++++++++++------
+> >  arch/x86/kvm/vmx/vmx.c    |  14 ++--
+> >  arch/x86/kvm/vmx/vmx.h    |   9 ++-
+> >  3 files changed, 131 insertions(+), 28 deletions(-)
+> >
+>
+> Queued, but it would be good to have a testcase for this, either for
+> kvm-unit-tests or for tools/testing/selftests/kvm.
+>
+> Paolo
+>
 
-Ok
-
-Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
-
-Jason
+Agreed.  I have some test cases in kvm-unit-tests for this code that
+I've been using to test these changes locally, however, they would
+fail upstream without "[kvm-unit-tests PATCH] x86: Fix the register
+order to match struct regs" being taken first.  I'll ping that patch
+again.
