@@ -2,162 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AFC8FD24C
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 02:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A14F1FD25B
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 02:22:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727254AbfKOBOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Nov 2019 20:14:38 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:55048 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727121AbfKOBOi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Nov 2019 20:14:38 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAF1EIHw026219;
-        Fri, 15 Nov 2019 01:14:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=pLkdbLaYg0ehMHf4cyPIMwwXvUJSpeS5SIkig0z7b7o=;
- b=crX4Tfjp1U2ChcNCogXGmBpSrWhKB3mjxJQIuC9CgjcUO0LWONNzPqHk7eb/pxEbupFq
- eSv3tAqFPkRguqe/9f0qr0YAFVQrLBzh4dWTsW8nr0ED00ZZSk2UeHU6UTGrc+oUyy7J
- RPqfqmZ8nPTfsAiV2OaDeNc/dfRt5XHc8WOUIs7BZ2eIRZSG1pPllKNdpO2tVJm0KpFE
- XGtUkjjPksR28eRoHkICyCpZIzzJWiEqlhusTZpE5bRYqSJvM9A7slqiDtAbV9rePPgN
- okxVCeAhYvaVhleaUeWNzufY/MYUDctByunm6vYU9XlFK0Q9yl9LhXb/Di7XWnLs4Av/ Tg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2w9gxpg77m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Nov 2019 01:14:35 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAF1DPt8180505;
-        Fri, 15 Nov 2019 01:14:34 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2w9h0gmm72-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Nov 2019 01:14:34 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAF1EWH1021081;
-        Fri, 15 Nov 2019 01:14:32 GMT
-Received: from [192.168.14.112] (/109.64.206.233)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 14 Nov 2019 17:14:32 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: KVM_GET_MSR_INDEX_LIST vs KVM_GET_MSR_FEATURE_INDEX_LIST
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <CALMp9eSdm9cQamj3mMiyQHL1W+FXZ497AH_hZecmeHowjJoUxg@mail.gmail.com>
-Date:   Fri, 15 Nov 2019 03:14:29 +0200
-Cc:     kvm list <kvm@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F2E6BF05-7C82-4F07-9AF4-0A722102D87A@oracle.com>
-References: <CALMp9eTT6oJMibHh0OTXgj83LXmjGt7CQ22Tr6NM4NRB_bfA8Q@mail.gmail.com>
- <CB679B0C-00FF-400E-B760-4AC8641252AC@oracle.com>
- <CALMp9eRbSL+y6-LV8YSRpOBa+t0dnEG5=tc91EZy1_CZRvMYiw@mail.gmail.com>
- <C9723F4E-01AA-4739-B93B-7F49477A15AF@oracle.com>
- <CALMp9eSdm9cQamj3mMiyQHL1W+FXZ497AH_hZecmeHowjJoUxg@mail.gmail.com>
-To:     Jim Mattson <jmattson@google.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9441 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911150006
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9441 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911150006
+        id S1727376AbfKOBWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Nov 2019 20:22:47 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35252 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727176AbfKOBWq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Nov 2019 20:22:46 -0500
+Received: by mail-lf1-f66.google.com with SMTP id i26so6691216lfl.2
+        for <kvm@vger.kernel.org>; Thu, 14 Nov 2019 17:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rbE1Wcsirza2JaW+3utZn4hbrXpX5xNM8bL08eDqpyw=;
+        b=qjvFTPBgFXYbB5WdseQRUdly8Y8CbuMcAAcDxORIfmdVQS99H/oqvGy8WoF96Tg7A+
+         n2YmgRm6wt8AA9LrPXu2b/aspr0DYORzzcudOogpl9P9ditcW6nnwA/1v9B+MLV077dM
+         MSod2kWwlGFXQQrBokWh0PhHbF6L7khF7M67SFJ6gb/MFXEocLfBhboQbz4/yF1sC9rK
+         8f1/RXUBhcSFNSFfdPpc8baOHrvdGEdH5Lo8aoKcGlDBeeHB7Sr6aJF+uFvp9iPYTbuv
+         5+a8xXS01xAajSZj5AiRN53uswZtj1Hltsb6Wln1LzhHdYiiXudnLqLVeBFJENJWr3g9
+         ZnUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rbE1Wcsirza2JaW+3utZn4hbrXpX5xNM8bL08eDqpyw=;
+        b=gSRVS//ZuMNbr5uR1udqGXAlgh9835Dx/PFry/z6V3sT0jzQVIMaXXJgOJo0sPw7u6
+         6kqrRlVu7ATOifTBNM+C8XMuBYVxVI7w2HF078qQ6YNaWikZ087YtyICdF8cDOgNZQLu
+         Ay0+fgoJOqLsfGHx7FctgIAr99qp6/8IZUQR9xrifQGouJaLPzv94M9xsD27xceBkjDO
+         J4M8oe6IjER3M+jisItsUf9zKBzRJt2i1G0g1z1yflkFt0Rc7rf+MiuABbN1yVfMYCzo
+         NACWn7YFUe6Bj+VVSB9wh4ToOXBt7GshRfFMMKfhivrbjPx9kYN6jxFl8IWUS2Fu6OHh
+         KIkQ==
+X-Gm-Message-State: APjAAAWxoIM1Iw00oLA4p+ODkY+z7a11qOufrl/6BlZpiBQVW7T4j2r0
+        qB5w9RoiRVGDOK2zqCEKSaoIg6glkjanD1GZn+l78QVi5ag=
+X-Google-Smtp-Source: APXvYqwQwGEi9KMXiJwWP1bFww1hrCBel+m7oLxDqeOryH+SK2KL+bPmaHUTPWh+0JAj/TgIbmhHhZMIwkji3C1u9sU=
+X-Received: by 2002:a19:22d3:: with SMTP id i202mr8959655lfi.69.1573780962459;
+ Thu, 14 Nov 2019 17:22:42 -0800 (PST)
+MIME-Version: 1.0
+References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-12-brijesh.singh@amd.com>
+In-Reply-To: <20190710201244.25195-12-brijesh.singh@amd.com>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Thu, 14 Nov 2019 17:22:06 -0800
+Message-ID: <CABayD+ctvNszs6gVdjP+geJTk1RN3Ko-RWaRTdeU6-7G1=F=Mw@mail.gmail.com>
+Subject: Re: [PATCH v3 11/11] KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
+To:     "Singh, Brijesh" <brijesh.singh@amd.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jul 10, 2019 at 1:13 PM Singh, Brijesh <brijesh.singh@amd.com> wrote:
+>
+>  struct kvm_arch_async_pf {
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index e675fd89bb9a..31653e8d5927 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -7466,6 +7466,47 @@ static int svm_get_page_enc_bitmap(struct kvm *kvm,
+>         return ret;
+>  }
+>
+> +static int svm_set_page_enc_bitmap(struct kvm *kvm,
+> +                                  struct kvm_page_enc_bitmap *bmap)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       unsigned long gfn_start, gfn_end;
+> +       unsigned long *bitmap;
+> +       unsigned long sz, i;
+> +       int ret;
+> +
+> +       if (!sev_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       gfn_start = bmap->start_gfn;
+> +       gfn_end = gfn_start + bmap->num_pages;
+> +
+> +       sz = ALIGN(bmap->num_pages, BITS_PER_LONG) / 8;
+> +       bitmap = kmalloc(sz, GFP_KERNEL);
 
+This kmalloc should probably be either a vmalloc or kvmalloc. The max
+size, if I'm reading kmalloc correctly, is 2^10 pages. That's 4MB,
+which should correspond to a bitmap for a 128GB VM, which is a
+plausible VM size.
 
-> On 15 Nov 2019, at 3:05, Jim Mattson <jmattson@google.com> wrote:
->=20
-> On Thu, Nov 14, 2019 at 4:35 PM Liran Alon <liran.alon@oracle.com> =
-wrote:
->>=20
->>=20
->>=20
->>> On 15 Nov 2019, at 0:07, Jim Mattson <jmattson@google.com> wrote:
->>>=20
->>> On Sat, Sep 8, 2018 at 5:58 PM Liran Alon <liran.alon@oracle.com> =
-wrote:
->>>>=20
->>>>=20
->>>>> On 7 Sep 2018, at 21:37, Jim Mattson <jmattson@google.com> wrote:
->>>>>=20
->>>>> Are these two lists intended to be disjoint? Is it a bug that
->>>>> IA32_ARCH_CAPABILITIES appears in both?
->>>=20
->>> Here's a more basic question: Should any MSR that can be read and
->>> written by a guest appear in KVM_GET_MSR_INDEX_LIST? If not, what's
->>> the point of this ioctl?
->>=20
->> I think the point of KVM_GET_MSR_INDEX_LIST ioctl is for userspace to =
-know what are all the MSR values it needs to save/restore on migration.
->> Therefore, any MSR that is exposed to guest read/write and isn=E2=80=99=
-t determined on VM provisioning time, should be returned from this =
-ioctl.
->>=20
->> In contrast, KVM_GET_MSR_FEATURE_INDEX_LIST ioctl is meant to be used =
-by userspace to query KVM capabilities based on host MSRs and KVM =
-support and use that information to validate the CPU features that the =
-user have requested to expose to guest.
->>=20
->> For example, MSR_IA32_UCODE_REV is specified only in =
-KVM_GET_MSR_FEATURE_INDEX_LIST. This is because it is determined by =
-userspace on provisioning time (No need to save/restore on migration) =
-and userspace may require to know it=E2=80=99s host value to define =
-guest value appropriately. MSR_IA32_PERF_STATUS is not specified in =
-neither ioctls because KVM returns constant value for it (not required =
-to be saved/restored).
->>=20
->> However, I=E2=80=99m also not sure about above mentioned =
-definitions=E2=80=A6 As they are some bizarre things that seems to =
-contradict it:
->> 1) MSR_IA32_ARCH_CAPABILITIES is specified in =
-KVM_GET_MSR_FEATURE_INDEX_LIST to allow userspace to know which =
-vulnerabilities apply to CPU. By default, vCPU =
-MSR_IA32_ARCH_CAPABILITIES value will be set by host value (See =
-kvm_arch_vcpu_setup()) but it=E2=80=99s possible for host userspace to =
-override value exposed to guest (See kvm_set_msr_common()). *However*, =
-it seems to me to be wrong that this MSR is specified in =
-KVM_GET_MSR_INDEX_LIST as it should be determined in VM provisioning =
-time and thus not need to be saved/restore on migration. i.e. How is it =
-different from MSR_IA32_UCODE_REV?
->> 2) MSR_EFER should be saved/restored and thus returned by =
-KVM_GET_MSR_INDEX_LIST. But it=E2=80=99s not. Probably because it can be =
-saved/restored via KVM_{GET,SET}_SREGS but this is inconsistent with =
-semantic definitions of KVM_GET_MSR_INDEX_LIST ioctl...
->> 3) MSR_AMD64_OSVW_ID_LENGTH & MSR_AMD64_OSVW_STATUS can be set by =
-guest but it doesn=E2=80=99t seem to be specified in emulated_msrs[] and =
-therefore not returned by KVM_GET_MSR_INDEX_LIST ioctl. I think this is =
-a migration bug...
->>=20
->> Unless someone disagrees, I think I will submit a patch for (1) and =
-(3).
->=20
-> I assume that we're also skipping the x2APIC MSRs because they can be
-> read/modified with KVM_{GET,SET}_LAPIC. At least until you start
-> thinking about userspace instruction emulation.
-
-Probably...
-
->=20
-> What about MSR_F15H_PERF_*, MSR_K7_EVNTSEL*, MSR_K7_PERFCTR*,
-> MSR_MTRR*, HV_X64_MSR_STIMER[12]_CONFIG,
-> HV_X64_MSR_STIMER[0123]_COUNT, MSR_VM_CR, and possibly others I'm
-> missing on the first pass?
-
-LOL, yes all of the above seem to be right...
-This is indeed extremely error-prone. :\
-
--Liran
-
-
-
-
+--Steve
