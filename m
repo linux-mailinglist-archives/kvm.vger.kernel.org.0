@@ -2,700 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A913FD508
-	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 06:55:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A165AFD53A
+	for <lists+kvm@lfdr.de>; Fri, 15 Nov 2019 06:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbfKOFzS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 00:55:18 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10740 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727476AbfKOFyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 00:54:02 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dce3d6a0001>; Thu, 14 Nov 2019 21:53:46 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 14 Nov 2019 21:53:46 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 14 Nov 2019 21:53:46 -0800
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 15 Nov
- 2019 05:53:45 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Fri, 15 Nov 2019 05:53:45 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5dce3d690007>; Thu, 14 Nov 2019 21:53:45 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v5 24/24] mm, tree-wide: rename put_user_page*() to unpin_user_page*()
-Date:   Thu, 14 Nov 2019 21:53:40 -0800
-Message-ID: <20191115055340.1825745-25-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191115055340.1825745-1-jhubbard@nvidia.com>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+        id S1727500AbfKOF40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Nov 2019 00:56:26 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:42088 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727348AbfKOF4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Nov 2019 00:56:25 -0500
+Received: by mail-ot1-f68.google.com with SMTP id b16so7068887otk.9;
+        Thu, 14 Nov 2019 21:56:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LVpr5hsgmURnDoh3tA1zn4tm7Jg5t52+Xjbnuuac3hM=;
+        b=kMNK/inTqoOb1WDG90MmZ+dA0fPZny/1BWMreJMUhfYKsuRgj0ApSZ5nJuourZQvR6
+         E7Ibkhqdz4tvovzjcPLtJCkfHZLW4/UWVbqO+aG9cRk1pXOl8Sr/481klIcLtixxS8xH
+         MZShKsacEq6OiVuYZ5tNWb0I42tcz7/MLGUtl+amXz5Vb+KXs4DL7QxTA8pwrVg0RWOc
+         paIe/52dwy2fOTBe5ziecS/OkJSFaEjL3f+8J2KusIfwZzUujaSrrIcXMCDhV1Rt+deC
+         eDmQYAIrwocNo42Rnpse+SK70GRnuNTCNapfKver6Z0Bj7EyWNPAU4lrciGIJ3GvOkB4
+         fU9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LVpr5hsgmURnDoh3tA1zn4tm7Jg5t52+Xjbnuuac3hM=;
+        b=XdJJIDwxmBXvtZgdCgEtIxrpx/UZrsp/uQ3eYxvgiYCBM3bIcMkuMCg62joG0gY8Xo
+         RM4Is7Xbcof6NjN+HUUxRztbQnMOPaBZWlCWHNtVt0ocRtKcw0fq1Cc6XBhxyHRE7n/d
+         TdW384vJuuRT4DpL+t+HV6chnAoFCkRehY8jlSg7MV8OGEqwYuUJkPPOG7Xik13elUVP
+         0f4gUd4zruxy/TgIiLcOmiKFkKwiuas7ProEGJrFdt7bIdQ2ELFgRoL7cXMiqTgr3oBO
+         dflrXJFKe7esqRYyQVxhZMTAWDOgCyHEtSyY4Wt+vc9iY1zMG52ymE+B7VvASvWRKZ7T
+         uz1A==
+X-Gm-Message-State: APjAAAWbkeAbsYbLiYQjcxI/rB/vA5jH3ODi09y7WcidF/v52pZjAOUE
+        d1ucy70Eba8+AdQRXpxPNFoXxQcIgJ44v42vcLQHnPY8
+X-Google-Smtp-Source: APXvYqyD0OkeS3fxNolVx3MFMXYulT4wGkElX3ryk2nxpiYc2al8foZ8o4uNXDtuHmIeARF+GxFON0E0uotzsAofO2o=
+X-Received: by 2002:a05:6830:1d8b:: with SMTP id y11mr9273902oti.45.1573797384621;
+ Thu, 14 Nov 2019 21:56:24 -0800 (PST)
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1573797226; bh=STzExVj+9tzBfJU2bAe+2a5wKbBXpDTeZdAEjVWwxYo=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=fgq2HbUmLwZt8sMtmHStunjU2h2x48zs6ALgNOdkOca3A7EluDhjmi1kxykMiJZ2R
-         uawnlW9ZH9+FFbXpSIzXECa/HYO9D1OZrD7eq6opLINmSnPE+FSHcSRLyeyD50bBOi
-         DcF0GajCOlwRupOCe9dPxmZFS7Lemsm28diMyt+iI5iFiG8AMa09417uvpCBnGjslY
-         SP4jinLKAYRud8zS7dF58YuAdmTJhhjPsbSYiqANVedXTEhDXDT7hgL6dqDKiGJJuY
-         eaieXiOdzg1ikcvcOaoc5LbfMxrHc7dtbE1j8cRwSopUFEB2MMoNnVodPGol5t98sX
-         U/uSBI6N6hITw==
+References: <1573283135-5502-1-git-send-email-wanpengli@tencent.com>
+ <6c2c7bbb-39f4-2a77-632e-7730e9887fc5@redhat.com> <20191114152235.GC24045@linux.intel.com>
+ <857e6494-4ed8-be4a-c21a-577ab99a5711@redhat.com> <20191114163444.GD24045@linux.intel.com>
+In-Reply-To: <20191114163444.GD24045@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 15 Nov 2019 13:56:14 +0800
+Message-ID: <CANRm+CwdXz9HO-U47kO4j9-6+CaaTU6R7ZP_swtGF7RMF7uVEA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: X86: Single target IPI fastpath
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to provide a clearer, more symmetric API for pinning
-and unpinning DMA pages. This way, pin_user_pages*() calls
-match up with unpin_user_pages*() calls, and the API is a lot
-closer to being self-explanatory.
+On Fri, 15 Nov 2019 at 00:34, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Thu, Nov 14, 2019 at 04:44:33PM +0100, Paolo Bonzini wrote:
+> > On 14/11/19 16:22, Sean Christopherson wrote:
+> > >> Instead of a separate vcpu->fast_vmexit, perhaps you can set exit_reason
+> > >> to vmx->exit_reason to -1 if the fast path succeeds.
+> > >
+> > > Actually, rather than make this super special case, what about moving the
+> > > handling into vmx_handle_exit_irqoff()?  Practically speaking that would
+> > > only add ~50 cycles (two VMREADs) relative to the code being run right
+> > > after kvm_put_guest_xcr0().  It has the advantage of restoring the host's
+> > > hardware breakpoints, preserving a semi-accurate last_guest_tsc, and
+> > > running with vcpu->mode set back to OUTSIDE_GUEST_MODE.  Hopefully it'd
+> > > also be more intuitive for people unfamiliar with the code.
+> >
+> > Yes, that's a good idea.  The expensive bit between handle_exit_irqoff
+> > and handle_exit is srcu_read_lock, which has two memory barriers in it.
 
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Moving the handling into vmx_handle_exit_irqoff() can worse ~100
+cycles than right after kvm_put_guest_xcr0() in my testing. So, which
+one do you prefer?
+
+For moving the handling into vmx_handle_exit_irqoff(), how about the
+patch below:
+
+---8<---
+
+From 1b20b0a80c6da18b721f125cc40f8be5ad31f4b1 Mon Sep 17 00:00:00 2001
+From: Wanpeng Li <wanpengli@tencent.com>
+Date: Fri, 15 Nov 2019 10:18:09 +0800
+Subject: [PATCH v2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
+
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- Documentation/core-api/pin_user_pages.rst   |  2 +-
- arch/powerpc/mm/book3s64/iommu_api.c        |  6 +--
- drivers/gpu/drm/via/via_dmablit.c           |  4 +-
- drivers/infiniband/core/umem.c              |  2 +-
- drivers/infiniband/hw/hfi1/user_pages.c     |  2 +-
- drivers/infiniband/hw/mthca/mthca_memfree.c |  6 +--
- drivers/infiniband/hw/qib/qib_user_pages.c  |  2 +-
- drivers/infiniband/hw/qib/qib_user_sdma.c   |  6 +--
- drivers/infiniband/hw/usnic/usnic_uiom.c    |  2 +-
- drivers/infiniband/sw/siw/siw_mem.c         |  2 +-
- drivers/media/v4l2-core/videobuf-dma-sg.c   |  4 +-
- drivers/platform/goldfish/goldfish_pipe.c   |  4 +-
- drivers/vfio/vfio_iommu_type1.c             |  2 +-
- fs/io_uring.c                               |  4 +-
- include/linux/mm.h                          | 30 +++++++-------
- include/linux/mmzone.h                      |  2 +-
- mm/gup.c                                    | 46 ++++++++++-----------
- mm/gup_benchmark.c                          |  2 +-
- mm/process_vm_access.c                      |  4 +-
- net/xdp/xdp_umem.c                          |  2 +-
- 20 files changed, 67 insertions(+), 67 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  4 ++--
+ arch/x86/include/uapi/asm/vmx.h |  1 +
+ arch/x86/kvm/svm.c              |  4 ++--
+ arch/x86/kvm/vmx/vmx.c          | 40 +++++++++++++++++++++++++++++++++++++---
+ arch/x86/kvm/x86.c              |  5 +++--
+ 5 files changed, 45 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core=
--api/pin_user_pages.rst
-index baa288a44a77..6d93ef203561 100644
---- a/Documentation/core-api/pin_user_pages.rst
-+++ b/Documentation/core-api/pin_user_pages.rst
-@@ -220,7 +220,7 @@ since the system was booted, via two new /proc/vmstat e=
-ntries: ::
-     /proc/vmstat/nr_foll_pin_requested
-=20
- Those are both going to show zero, unless CONFIG_DEBUG_VM is set. This is
--because there is a noticeable performance drop in put_user_page(), when th=
-ey
-+because there is a noticeable performance drop in unpin_user_page(), when =
-they
- are activated.
-=20
- References
-diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s6=
-4/iommu_api.c
-index 196383e8e5a9..dd7aa5a4f33c 100644
---- a/arch/powerpc/mm/book3s64/iommu_api.c
-+++ b/arch/powerpc/mm/book3s64/iommu_api.c
-@@ -168,7 +168,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, uns=
-igned long ua,
-=20
- free_exit:
- 	/* free the references taken */
--	put_user_pages(mem->hpages, pinned);
-+	unpin_user_pages(mem->hpages, pinned);
-=20
- 	vfree(mem->hpas);
- 	kfree(mem);
-@@ -211,8 +211,8 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_=
-mem_t *mem)
- 		if (!page)
- 			continue;
-=20
--		put_user_pages_dirty_lock(&mem->hpages[i], 1,
--					  MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-+		unpin_user_pages_dirty_lock(&mem->hpages[i], 1,
-+					    MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-=20
- 		mem->hpas[i] =3D 0;
- 	}
-diff --git a/drivers/gpu/drm/via/via_dmablit.c b/drivers/gpu/drm/via/via_dm=
-ablit.c
-index 37c5e572993a..719d036c9384 100644
---- a/drivers/gpu/drm/via/via_dmablit.c
-+++ b/drivers/gpu/drm/via/via_dmablit.c
-@@ -188,8 +188,8 @@ via_free_sg_info(struct pci_dev *pdev, drm_via_sg_info_=
-t *vsg)
- 		kfree(vsg->desc_pages);
- 		/* fall through */
- 	case dr_via_pages_locked:
--		put_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
--					  (vsg->direction =3D=3D DMA_FROM_DEVICE));
-+		unpin_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
-+					   (vsg->direction =3D=3D DMA_FROM_DEVICE));
- 		/* fall through */
- 	case dr_via_pages_alloc:
- 		vfree(vsg->pages);
-diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
-c
-index 2c287ced3439..119a147da904 100644
---- a/drivers/infiniband/core/umem.c
-+++ b/drivers/infiniband/core/umem.c
-@@ -54,7 +54,7 @@ static void __ib_umem_release(struct ib_device *dev, stru=
-ct ib_umem *umem, int d
-=20
- 	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
- 		page =3D sg_page_iter_page(&sg_iter);
--		put_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
-+		unpin_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
- 	}
-=20
- 	sg_free_table(&umem->sg_head);
-diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/h=
-w/hfi1/user_pages.c
-index 9a94761765c0..3b505006c0a6 100644
---- a/drivers/infiniband/hw/hfi1/user_pages.c
-+++ b/drivers/infiniband/hw/hfi1/user_pages.c
-@@ -118,7 +118,7 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsig=
-ned long vaddr, size_t np
- void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
- 			     size_t npages, bool dirty)
- {
--	put_user_pages_dirty_lock(p, npages, dirty);
-+	unpin_user_pages_dirty_lock(p, npages, dirty);
-=20
- 	if (mm) { /* during close after signal, mm can be NULL */
- 		atomic64_sub(npages, &mm->pinned_vm);
-diff --git a/drivers/infiniband/hw/mthca/mthca_memfree.c b/drivers/infiniba=
-nd/hw/mthca/mthca_memfree.c
-index 8269ab040c21..78a48aea3faf 100644
---- a/drivers/infiniband/hw/mthca/mthca_memfree.c
-+++ b/drivers/infiniband/hw/mthca/mthca_memfree.c
-@@ -482,7 +482,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
-=20
- 	ret =3D pci_map_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
- 	if (ret < 0) {
--		put_user_page(pages[0]);
-+		unpin_user_page(pages[0]);
- 		goto out;
- 	}
-=20
-@@ -490,7 +490,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
- 				 mthca_uarc_virt(dev, uar, i));
- 	if (ret) {
- 		pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--		put_user_page(sg_page(&db_tab->page[i].mem));
-+		unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		goto out;
- 	}
-=20
-@@ -556,7 +556,7 @@ void mthca_cleanup_user_db_tab(struct mthca_dev *dev, s=
-truct mthca_uar *uar,
- 		if (db_tab->page[i].uvirt) {
- 			mthca_UNMAP_ICM(dev, mthca_uarc_virt(dev, uar, i), 1);
- 			pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--			put_user_page(sg_page(&db_tab->page[i].mem));
-+			unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		}
- 	}
-=20
-diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniban=
-d/hw/qib/qib_user_pages.c
-index 7fc4b5f81fcd..342e3172ca40 100644
---- a/drivers/infiniband/hw/qib/qib_user_pages.c
-+++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-@@ -40,7 +40,7 @@
- static void __qib_release_user_pages(struct page **p, size_t num_pages,
- 				     int dirty)
- {
--	put_user_pages_dirty_lock(p, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(p, num_pages, dirty);
- }
-=20
- /**
-diff --git a/drivers/infiniband/hw/qib/qib_user_sdma.c b/drivers/infiniband=
-/hw/qib/qib_user_sdma.c
-index 1a3cc2957e3a..a67599b5a550 100644
---- a/drivers/infiniband/hw/qib/qib_user_sdma.c
-+++ b/drivers/infiniband/hw/qib/qib_user_sdma.c
-@@ -317,7 +317,7 @@ static int qib_user_sdma_page_to_frags(const struct qib=
-_devdata *dd,
- 		 * the caller can ignore this page.
- 		 */
- 		if (put) {
--			put_user_page(page);
-+			unpin_user_page(page);
- 		} else {
- 			/* coalesce case */
- 			kunmap(page);
-@@ -631,7 +631,7 @@ static void qib_user_sdma_free_pkt_frag(struct device *=
-dev,
- 			kunmap(pkt->addr[i].page);
-=20
- 		if (pkt->addr[i].put_page)
--			put_user_page(pkt->addr[i].page);
-+			unpin_user_page(pkt->addr[i].page);
- 		else
- 			__free_page(pkt->addr[i].page);
- 	} else if (pkt->addr[i].kvaddr) {
-@@ -706,7 +706,7 @@ static int qib_user_sdma_pin_pages(const struct qib_dev=
-data *dd,
- 	/* if error, return all pages not managed by pkt */
- free_pages:
- 	while (i < j)
--		put_user_page(pages[i++]);
-+		unpin_user_page(pages[i++]);
-=20
- done:
- 	return ret;
-diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/=
-hw/usnic/usnic_uiom.c
-index 600896727d34..bd9f944b68fc 100644
---- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-+++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-@@ -75,7 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_=
-list, int dirty)
- 		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
- 			page =3D sg_page(sg);
- 			pa =3D sg_phys(sg);
--			put_user_pages_dirty_lock(&page, 1, dirty);
-+			unpin_user_pages_dirty_lock(&page, 1, dirty);
- 			usnic_dbg("pa: %pa\n", &pa);
- 		}
- 		kfree(chunk);
-diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/si=
-w/siw_mem.c
-index e53b07dcfed5..e2061dc0b043 100644
---- a/drivers/infiniband/sw/siw/siw_mem.c
-+++ b/drivers/infiniband/sw/siw/siw_mem.c
-@@ -63,7 +63,7 @@ struct siw_mem *siw_mem_id2obj(struct siw_device *sdev, i=
-nt stag_index)
- static void siw_free_plist(struct siw_page_chunk *chunk, int num_pages,
- 			   bool dirty)
- {
--	put_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
- }
-=20
- void siw_umem_release(struct siw_umem *umem, bool dirty)
-diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2=
--core/videobuf-dma-sg.c
-index 162a2633b1e3..13b65ed9e74c 100644
---- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-+++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-@@ -349,8 +349,8 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
- 	BUG_ON(dma->sglen);
-=20
- 	if (dma->pages) {
--		put_user_pages_dirty_lock(dma->pages, dma->nr_pages,
--					  dma->direction =3D=3D DMA_FROM_DEVICE);
-+		unpin_user_pages_dirty_lock(dma->pages, dma->nr_pages,
-+					    dma->direction =3D=3D DMA_FROM_DEVICE);
- 		kfree(dma->pages);
- 		dma->pages =3D NULL;
- 	}
-diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/g=
-oldfish/goldfish_pipe.c
-index 635a8bc1b480..bf523df2a90d 100644
---- a/drivers/platform/goldfish/goldfish_pipe.c
-+++ b/drivers/platform/goldfish/goldfish_pipe.c
-@@ -360,8 +360,8 @@ static int transfer_max_buffers(struct goldfish_pipe *p=
-ipe,
-=20
- 	*consumed_size =3D pipe->command_buffer->rw_params.consumed_size;
-=20
--	put_user_pages_dirty_lock(pipe->pages, pages_count,
--				  !is_write && *consumed_size > 0);
-+	unpin_user_pages_dirty_lock(pipe->pages, pages_count,
-+				    !is_write && *consumed_size > 0);
-=20
- 	mutex_unlock(&pipe->lock);
- 	return 0;
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type=
-1.c
-index 18aa36b56896..c48ac1567f14 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -328,7 +328,7 @@ static int put_pfn(unsigned long pfn, int prot)
- 	if (!is_invalid_reserved_pfn(pfn)) {
- 		struct page *page =3D pfn_to_page(pfn);
-=20
--		put_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
-+		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
- 		return 1;
- 	}
- 	return 0;
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index cff64bd00db9..75ce5b386ffd 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -3312,7 +3312,7 @@ static int io_sqe_buffer_unregister(struct io_ring_ct=
-x *ctx)
- 		struct io_mapped_ubuf *imu =3D &ctx->user_bufs[i];
-=20
- 		for (j =3D 0; j < imu->nr_bvecs; j++)
--			put_user_page(imu->bvec[j].bv_page);
-+			unpin_user_page(imu->bvec[j].bv_page);
-=20
- 		if (ctx->account_mem)
- 			io_unaccount_mem(ctx->user, imu->nr_bvecs);
-@@ -3457,7 +3457,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx =
-*ctx, void __user *arg,
- 			 * release any pages we did get
- 			 */
- 			if (pret > 0)
--				put_user_pages(pages, pret);
-+				unpin_user_pages(pages, pret);
- 			if (ctx->account_mem)
- 				io_unaccount_mem(ctx->user, nr_pages);
- 			kvfree(imu->bvec);
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index db872766480f..dc5fa3df826f 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1080,18 +1080,18 @@ static inline void put_page(struct page *page)
-  * made against the page. ("gup-pinned" is another term for the latter).
-  *
-  * With this scheme, get_user_pages() becomes special: such pages are mark=
-ed
-- * as distinct from normal pages. As such, the put_user_page() call (and i=
-ts
-+ * as distinct from normal pages. As such, the unpin_user_page() call (and=
- its
-  * variants) must be used in order to release gup-pinned pages.
-  *
-  * Choice of value:
-  *
-  * By making GUP_PIN_COUNTING_BIAS a power of two, debugging of page refer=
-ence
-- * counts with respect to get_user_pages() and put_user_page() becomes sim=
-pler,
-- * due to the fact that adding an even power of two to the page refcount h=
-as
-- * the effect of using only the upper N bits, for the code that counts up =
-using
-- * the bias value. This means that the lower bits are left for the exclusi=
-ve
-- * use of the original code that increments and decrements by one (or at l=
-east,
-- * by much smaller values than the bias value).
-+ * counts with respect to get_user_pages() and unpin_user_page() becomes
-+ * simpler, due to the fact that adding an even power of two to the page
-+ * refcount has the effect of using only the upper N bits, for the code th=
-at
-+ * counts up using the bias value. This means that the lower bits are left=
- for
-+ * the exclusive use of the original code that increments and decrements b=
-y one
-+ * (or at least, by much smaller values than the bias value).
-  *
-  * Of course, once the lower bits overflow into the upper bits (and this i=
-s
-  * OK, because subtraction recovers the original values), then visual insp=
-ection
-@@ -1106,10 +1106,10 @@ static inline void put_page(struct page *page)
-  */
- #define GUP_PIN_COUNTING_BIAS (1UL << 10)
-=20
--void put_user_page(struct page *page);
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty);
--void put_user_pages(struct page **pages, unsigned long npages);
-+void unpin_user_page(struct page *page);
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty);
-+void unpin_user_pages(struct page **pages, unsigned long npages);
-=20
- /**
-  * page_dma_pinned() - report if a page is pinned for DMA.
-@@ -2660,7 +2660,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
- #define FOLL_ANON	0x8000	/* don't do file mappings */
- #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below=
- */
- #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
--#define FOLL_PIN	0x40000	/* pages must be released via put_user_page() */
-+#define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
-=20
- /*
-  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with eac=
-h
-@@ -2695,7 +2695,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * Direct IO). This lets the filesystem know that some non-file-system ent=
-ity is
-  * potentially changing the pages' data. In contrast to FOLL_GET (whose pa=
-ges
-  * are released via put_page()), FOLL_PIN pages must be released, ultimate=
-ly, by
-- * a call to put_user_page().
-+ * a call to unpin_user_page().
-  *
-  * FOLL_PIN is similar to FOLL_GET: both of these pin pages. They use diff=
-erent
-  * and separate refcounting mechanisms, however, and that means that each =
-has
-@@ -2703,7 +2703,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  *
-  *     FOLL_GET: get_user_pages*() to acquire, and put_page() to release.
-  *
-- *     FOLL_PIN: pin_user_pages*() to acquire, and put_user_pages to relea=
-se.
-+ *     FOLL_PIN: pin_user_pages*() to acquire, and unpin_user_pages to rel=
-ease.
-  *
-  * FOLL_PIN and FOLL_GET are mutually exclusive for a given function call.
-  * (The underlying pages may experience both FOLL_GET-based and FOLL_PIN-b=
-ased
-@@ -2713,7 +2713,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * FOLL_PIN should be set internally by the pin_user_pages*() APIs, never
-  * directly by the caller. That's in order to help avoid mismatches when
-  * releasing pages: get_user_pages*() pages must be released via put_page(=
-),
-- * while pin_user_pages*() pages must be released via put_user_page().
-+ * while pin_user_pages*() pages must be released via unpin_user_page().
-  *
-  * Please see Documentation/vm/pin_user_pages.rst for more information.
-  */
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index 0485cba38d23..d66c1fb9d45e 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -245,7 +245,7 @@ enum node_stat_item {
- 	NR_WRITTEN,		/* page writings since bootup */
- 	NR_KERNEL_MISC_RECLAIMABLE,	/* reclaimable non-slab kernel pages */
- 	NR_FOLL_PIN_REQUESTED,	/* via: pin_user_page(), gup flag: FOLL_PIN */
--	NR_FOLL_PIN_RETURNED,	/* pages returned via put_user_page() */
-+	NR_FOLL_PIN_RETURNED,	/* pages returned via unpin_user_page() */
- 	NR_VM_NODE_STAT_ITEMS
- };
-=20
-diff --git a/mm/gup.c b/mm/gup.c
-index 783cc5f23c79..9cbb72399182 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -110,15 +110,15 @@ static bool __put_devmap_managed_user_page(struct pag=
-e *page)
- #endif /* CONFIG_DEV_PAGEMAP_OPS */
-=20
- /**
-- * put_user_page() - release a dma-pinned page
-+ * unpin_user_page() - release a dma-pinned page
-  * @page:            pointer to page to be released
-  *
-  * Pages that were pinned via pin_user_pages*() must be released via eithe=
-r
-- * put_user_page(), or one of the put_user_pages*() routines. This is so t=
-hat
-- * such pages can be separately tracked and uniquely handled. In particula=
-r,
-- * interactions with RDMA and filesystems need special handling.
-+ * unpin_user_page(), or one of the unpin_user_pages*() routines. This is =
-so
-+ * that such pages can be separately tracked and uniquely handled. In
-+ * particular, interactions with RDMA and filesystems need special handlin=
-g.
-  */
--void put_user_page(struct page *page)
-+void unpin_user_page(struct page *page)
- {
- 	page =3D compound_head(page);
-=20
-@@ -136,10 +136,10 @@ void put_user_page(struct page *page)
-=20
- 	__update_proc_vmstat(page, NR_FOLL_PIN_RETURNED, 1);
- }
--EXPORT_SYMBOL(put_user_page);
-+EXPORT_SYMBOL(unpin_user_page);
-=20
- /**
-- * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned p=
-ages
-+ * unpin_user_pages_dirty_lock() - release and optionally dirty gup-pinned=
- pages
-  * @pages:  array of pages to be maybe marked dirty, and definitely releas=
-ed.
-  * @npages: number of pages in the @pages array.
-  * @make_dirty: whether to mark the pages dirty
-@@ -149,19 +149,19 @@ EXPORT_SYMBOL(put_user_page);
-  *
-  * For each page in the @pages array, make that page (or its head page, if=
- a
-  * compound page) dirty, if @make_dirty is true, and if the page was previ=
-ously
-- * listed as clean. In any case, releases all pages using put_user_page(),
-- * possibly via put_user_pages(), for the non-dirty case.
-+ * listed as clean. In any case, releases all pages using unpin_user_page(=
-),
-+ * possibly via unpin_user_pages(), for the non-dirty case.
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  *
-  * set_page_dirty_lock() is used internally. If instead, set_page_dirty() =
-is
-  * required, then the caller should a) verify that this is really correct,
-  * because _lock() is usually required, and b) hand code it:
-- * set_page_dirty_lock(), put_user_page().
-+ * set_page_dirty_lock(), unpin_user_page().
-  *
-  */
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty)
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty)
- {
- 	unsigned long index;
-=20
-@@ -172,7 +172,7 @@ void put_user_pages_dirty_lock(struct page **pages, uns=
-igned long npages,
- 	 */
-=20
- 	if (!make_dirty) {
--		put_user_pages(pages, npages);
-+		unpin_user_pages(pages, npages);
- 		return;
- 	}
-=20
-@@ -200,21 +200,21 @@ void put_user_pages_dirty_lock(struct page **pages, u=
-nsigned long npages,
- 		 */
- 		if (!PageDirty(page))
- 			set_page_dirty_lock(page);
--		put_user_page(page);
-+		unpin_user_page(page);
- 	}
- }
--EXPORT_SYMBOL(put_user_pages_dirty_lock);
-+EXPORT_SYMBOL(unpin_user_pages_dirty_lock);
-=20
- /**
-- * put_user_pages() - release an array of gup-pinned pages.
-+ * unpin_user_pages() - release an array of gup-pinned pages.
-  * @pages:  array of pages to be marked dirty and released.
-  * @npages: number of pages in the @pages array.
-  *
-- * For each page in the @pages array, release the page using put_user_page=
-().
-+ * For each page in the @pages array, release the page using unpin_user_pa=
-ge().
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  */
--void put_user_pages(struct page **pages, unsigned long npages)
-+void unpin_user_pages(struct page **pages, unsigned long npages)
- {
- 	unsigned long index;
-=20
-@@ -224,9 +224,9 @@ void put_user_pages(struct page **pages, unsigned long =
-npages)
- 	 * single operation to the head page should suffice.
- 	 */
- 	for (index =3D 0; index < npages; index++)
--		put_user_page(pages[index]);
-+		unpin_user_page(pages[index]);
- }
--EXPORT_SYMBOL(put_user_pages);
-+EXPORT_SYMBOL(unpin_user_pages);
-=20
- #ifdef CONFIG_MMU
- static struct page *no_page_table(struct vm_area_struct *vma,
-@@ -1953,7 +1953,7 @@ static void __maybe_unused undo_dev_pagemap(int *nr, =
-int nr_start,
-=20
- 		ClearPageReferenced(page);
- 		if (flags & FOLL_PIN)
--			put_user_page(page);
-+			unpin_user_page(page);
- 		else
- 			put_page(page);
- 	}
-diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
-index 1ac089ad815f..76d32db48af8 100644
---- a/mm/gup_benchmark.c
-+++ b/mm/gup_benchmark.c
-@@ -35,7 +35,7 @@ static void put_back_pages(int cmd, struct page **pages, =
-unsigned long nr_pages)
-=20
- 	case PIN_FAST_BENCHMARK:
- 	case PIN_BENCHMARK:
--		put_user_pages(pages, nr_pages);
-+		unpin_user_pages(pages, nr_pages);
- 		break;
- 	}
- }
-diff --git a/mm/process_vm_access.c b/mm/process_vm_access.c
-index fd20ab675b85..de41e830cdac 100644
---- a/mm/process_vm_access.c
-+++ b/mm/process_vm_access.c
-@@ -126,8 +126,8 @@ static int process_vm_rw_single_vec(unsigned long addr,
- 		pa +=3D pinned_pages * PAGE_SIZE;
-=20
- 		/* If vm_write is set, the pages need to be made dirty: */
--		put_user_pages_dirty_lock(process_pages, pinned_pages,
--					  vm_write);
-+		unpin_user_pages_dirty_lock(process_pages, pinned_pages,
-+					    vm_write);
- 	}
-=20
- 	return rc;
-diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-index d071003b5e76..ac182c38f7b0 100644
---- a/net/xdp/xdp_umem.c
-+++ b/net/xdp/xdp_umem.c
-@@ -212,7 +212,7 @@ static int xdp_umem_map_pages(struct xdp_umem *umem)
-=20
- static void xdp_umem_unpin_pages(struct xdp_umem *umem)
- {
--	put_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-+	unpin_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-=20
- 	kfree(umem->pgs);
- 	umem->pgs =3D NULL;
---=20
-2.24.0
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 24d6598..3604f3a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1067,7 +1067,7 @@ struct kvm_x86_ops {
+     void (*tlb_flush_gva)(struct kvm_vcpu *vcpu, gva_t addr);
 
+     void (*run)(struct kvm_vcpu *vcpu);
+-    int (*handle_exit)(struct kvm_vcpu *vcpu);
++    int (*handle_exit)(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason);
+     int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
+     void (*set_interrupt_shadow)(struct kvm_vcpu *vcpu, int mask);
+     u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
+@@ -1117,7 +1117,7 @@ struct kvm_x86_ops {
+     int (*check_intercept)(struct kvm_vcpu *vcpu,
+                    struct x86_instruction_info *info,
+                    enum x86_intercept_stage stage);
+-    void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
++    void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason);
+     bool (*mpx_supported)(void);
+     bool (*xsaves_supported)(void);
+     bool (*umip_emulated)(void);
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index 3eb8411..b33c6e1 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -88,6 +88,7 @@
+ #define EXIT_REASON_XRSTORS             64
+ #define EXIT_REASON_UMWAIT              67
+ #define EXIT_REASON_TPAUSE              68
++#define EXIT_REASON_NEED_SKIP_EMULATED_INSN -1
+
+ #define VMX_EXIT_REASONS \
+     { EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index c5673bd..3bb0661 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -4927,7 +4927,7 @@ static void svm_get_exit_info(struct kvm_vcpu
+*vcpu, u64 *info1, u64 *info2)
+     *info2 = control->exit_info_2;
+ }
+
+-static int handle_exit(struct kvm_vcpu *vcpu)
++static int handle_exit(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason)
+ {
+     struct vcpu_svm *svm = to_svm(vcpu);
+     struct kvm_run *kvm_run = vcpu->run;
+@@ -6171,7 +6171,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+     return ret;
+ }
+
+-static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
++static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu, u32
+*vcpu_exit_reason)
+ {
+
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5d21a4a..073fe1f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5838,7 +5838,7 @@ void dump_vmcs(void)
+  * The guest has exited.  See if we can fix it or if we need userspace
+  * assistance.
+  */
+-static int vmx_handle_exit(struct kvm_vcpu *vcpu)
++static int vmx_handle_exit(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason)
+ {
+     struct vcpu_vmx *vmx = to_vmx(vcpu);
+     u32 exit_reason = vmx->exit_reason;
+@@ -5924,7 +5924,10 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu)
+         }
+     }
+
+-    if (exit_reason < kvm_vmx_max_exit_handlers
++    if (*vcpu_exit_reason == EXIT_REASON_NEED_SKIP_EMULATED_INSN) {
++        kvm_skip_emulated_instruction(vcpu);
++        return 1;
++    } else if (exit_reason < kvm_vmx_max_exit_handlers
+         && kvm_vmx_exit_handlers[exit_reason])
+         return kvm_vmx_exit_handlers[exit_reason](vcpu);
+     else {
+@@ -6255,7 +6258,36 @@ static void
+handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
+ }
+ STACK_FRAME_NON_STANDARD(handle_external_interrupt_irqoff);
+
+-static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
++static u32 handle_ipi_fastpath(struct kvm_vcpu *vcpu)
++{
++    u32 index;
++    u64 data;
++    int ret = 0;
++
++    if (lapic_in_kernel(vcpu) && apic_x2apic_mode(vcpu->arch.apic)) {
++        /*
++         * fastpath to IPI target, FIXED+PHYSICAL which is popular
++         */
++        index = kvm_rcx_read(vcpu);
++        data = kvm_read_edx_eax(vcpu);
++
++        if (((index - APIC_BASE_MSR) << 4 == APIC_ICR) &&
++            ((data & KVM_APIC_DEST_MASK) == APIC_DEST_PHYSICAL) &&
++            ((data & APIC_MODE_MASK) == APIC_DM_FIXED)) {
++
++            trace_kvm_msr_write(index, data);
++            kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u32)(data >> 32));
++            ret = kvm_lapic_reg_write(vcpu->arch.apic, APIC_ICR, (u32)data);
++
++            if (ret == 0)
++                return EXIT_REASON_NEED_SKIP_EMULATED_INSN;
++        }
++    }
++
++    return ret;
++}
++
++static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu, u32 *exit_reason)
+ {
+     struct vcpu_vmx *vmx = to_vmx(vcpu);
+
+@@ -6263,6 +6295,8 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+         handle_external_interrupt_irqoff(vcpu);
+     else if (vmx->exit_reason == EXIT_REASON_EXCEPTION_NMI)
+         handle_exception_nmi_irqoff(vmx);
++    else if (vmx->exit_reason == EXIT_REASON_MSR_WRITE)
++        *exit_reason = handle_ipi_fastpath(vcpu);
+ }
+
+ static bool vmx_has_emulated_msr(int index)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff395f8..130576b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7931,6 +7931,7 @@ EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ {
+     int r;
++    u32 exit_reason = 0;
+     bool req_int_win =
+         dm_request_for_irq_injection(vcpu) &&
+         kvm_cpu_accept_dm_intr(vcpu);
+@@ -8180,7 +8181,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+     vcpu->mode = OUTSIDE_GUEST_MODE;
+     smp_wmb();
+
+-    kvm_x86_ops->handle_exit_irqoff(vcpu);
++    kvm_x86_ops->handle_exit_irqoff(vcpu, &exit_reason);
+
+     /*
+      * Consume any pending interrupts, including the possible source of
+@@ -8224,7 +8225,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+         kvm_lapic_sync_from_vapic(vcpu);
+
+     vcpu->arch.gpa_available = false;
+-    r = kvm_x86_ops->handle_exit(vcpu);
++    r = kvm_x86_ops->handle_exit(vcpu, &exit_reason);
+     return r;
+
+ cancel_injection:
+--
+2.7.4
