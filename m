@@ -2,90 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B20FEA3C
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 03:21:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 959B5FED1B
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 16:42:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbfKPCUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Nov 2019 21:20:54 -0500
-Received: from sender4-pp-o94.zoho.com ([136.143.188.94]:25481 "EHLO
-        sender4-pp-o94.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727275AbfKPCUx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Nov 2019 21:20:53 -0500
-X-Greylist: delayed 904 seconds by postgrey-1.27 at vger.kernel.org; Fri, 15 Nov 2019 21:20:53 EST
-ARC-Seal: i=1; a=rsa-sha256; t=1573869948; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=JBUmxxgjzN8WOocQWVm3N5+ERmqzaf0yI/IA49U6ReSrHSPxCQM0KCXO3PkPUCx56sqACUi21iEJCoFQXuoj2g5Foc9qb1kkFYKEtWIr/tx37+EYd3qxVsX3pUW0x511T1PymIzDX9JgDzF/2zwBHuNJXq0wlbwThx3fjrFm2Q0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1573869948; h=Content-Type:Content-Transfer-Encoding:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=/j/gkwINdDxxHTEkE2ogbZzlN5zsVwOINIvX0fpiNyc=; 
-        b=dDnC5yUyQc9Qi1zztviQxsRDYuJ1VAcJ1wqAxF4McusE3ikY+zxCWEHoviQ80/sWniB1qyHumQaFtrjpksTYB1Y0QWj5EFScbIMCsi6FEqjJzL0a2z+5JPKeBkhslRUBBmF0xzQD7LZIVPrLoFDRurH5KlA3ju2+W5QuNErrZe8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=zoho.com;
-        spf=pass  smtp.mailfrom=ToddAndMargo@zoho.com;
-        dmarc=pass header.from=<ToddAndMargo@zoho.com> header.from=<ToddAndMargo@zoho.com>
-DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; 
-  s=zapps768; d=zoho.com; 
-  h=to:from:subject:message-id:date:user-agent:mime-version:content-type; 
-  b=bTF16uCrQFx2RXb9KFth711QLpIlxCc5TepKVN4u9zwgzH43Oa8FcjCkXtcqZgIpQx0EiCV7Irn2
-    yVTRZnGFn1Ir+PT2jhNmL+6LlHoNHJSWxVFvzn0EKWLw2qUBE53R  
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1573869948;
-        s=zm2019; d=zoho.com; i=ToddAndMargo@zoho.com;
-        h=To:From:Subject:Message-ID:Date:MIME-Version:Content-Type:Content-Transfer-Encoding;
-        l=699; bh=/j/gkwINdDxxHTEkE2ogbZzlN5zsVwOINIvX0fpiNyc=;
-        b=Z8dhgLJmexYoTASzLnoP7eKlLchjoecU8rOovvVk/sJYnRUGjp+sDCzMl1T6hUKc
-        y8HC3uP1ejV3WVn8W6wxx5gQdh/c5E46eWSKWEVG38kmfZKfGUJulbznbc0AZ9eMezk
-        S25ts+A0Qxpt3K9JT6upsGtN6xVxWP67+4zxXk1I=
-Received: from rn6.rent-a-nerd.local (50-37-21-182.grdv.nv.frontiernet.net [50.37.21.182]) by mx.zohomail.com
-        with SMTPS id 1573869947638789.4777551508874; Fri, 15 Nov 2019 18:05:47 -0800 (PST)
-To:     kvm@vger.kernel.org
-From:   ToddAndMargo <ToddAndMargo@zoho.com>
-Subject: Missing usb driver
-Message-ID: <3dc8048f-1243-cfc2-bac1-773ffb70042a@zoho.com>
-Date:   Fri, 15 Nov 2019 18:05:46 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1728143AbfKPPmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Nov 2019 10:42:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45500 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728128AbfKPPmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:42:04 -0500
+Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 76B0C2083E;
+        Sat, 16 Nov 2019 15:42:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573918923;
+        bh=KvCMDfyhwMbRfCQUWrKMvkjLsDmpI1JPmcNaflZv0ho=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ufQ2hOpzJgJDZIaIpDlwREO2IkyX81IUgboLbKW22FpUR+Qn69PhBn414unfMwUSf
+         eg5UyPa7LQIijWgKBuX7SW0Q1H4vtqtUp5PpSi0m14xwbkLPyqa1H2srfUWqNpBAcs
+         M3YzqIC8pyJ6fNNjGMLvG0uUMeSmoe/FVgV0FdRg=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 049/237] KVM/x86: Fix invvpid and invept register operand size in 64-bit mode
+Date:   Sat, 16 Nov 2019 10:38:04 -0500
+Message-Id: <20191116154113.7417-49-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
+References: <20191116154113.7417-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi All,
+From: Uros Bizjak <ubizjak@gmail.com>
 
-Host:
-    Fedora 31, x64
-    qemu-kvm-4.1.0-5.fc31.x86_64
-    USB Controller (USB3):
+[ Upstream commit 5ebb272b2ea7e02911a03a893f8d922d49f9bb4a ]
 
-<controller type="usb" index="0" model="qemu-xhci" ports="15">
-   <alias name="usb"/>
-   <address type="pci" domain="0x0000" bus="0x00" slot="0x05" 
-function="0x0"/>
-</controller>
+Register operand size of invvpid and invept instruction in 64-bit mode
+has always 64 bits. Adjust inline function argument type to reflect
+correct size.
 
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/kvm/vmx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-VM:
-    Windows 7 Pro, SP1, x64
-
-
-In my VM's device manager, it has a bang mark on
-     Universal Serial Bus (USB) Controller
-
-And Windows can not find the appropriate driver in:
-     virtio-win-0.1.173.2.iso/virtio-win-gt-x64.msi
-or the search the web find it.
-
-And Windows can not find a USB device I redirect to it.
-
-I don't have the problem with my Windows Ten -  1909 VM.
-
-Any word of wisdom?
-
-Many thanks,
--T
-
+diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
+index 3f40edf6fdeb3..80b0942fb84db 100644
+--- a/arch/x86/kvm/vmx.c
++++ b/arch/x86/kvm/vmx.c
+@@ -2079,7 +2079,7 @@ static int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
+ 	return -1;
+ }
+ 
+-static inline void __invvpid(int ext, u16 vpid, gva_t gva)
++static inline void __invvpid(unsigned long ext, u16 vpid, gva_t gva)
+ {
+     struct {
+ 	u64 vpid : 16;
+@@ -2094,7 +2094,7 @@ static inline void __invvpid(int ext, u16 vpid, gva_t gva)
+     BUG_ON(error);
+ }
+ 
+-static inline void __invept(int ext, u64 eptp, gpa_t gpa)
++static inline void __invept(unsigned long ext, u64 eptp, gpa_t gpa)
+ {
+ 	struct {
+ 		u64 eptp, gpa;
+-- 
+2.20.1
 
