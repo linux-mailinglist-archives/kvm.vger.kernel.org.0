@@ -2,39 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 959B5FED1B
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 16:42:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E65A3FED5B
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 16:45:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728143AbfKPPmE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Nov 2019 10:42:04 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45500 "EHLO mail.kernel.org"
+        id S1728814AbfKPPno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Nov 2019 10:43:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47766 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728128AbfKPPmE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Nov 2019 10:42:04 -0500
+        id S1727833AbfKPPnj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:43:39 -0500
 Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 76B0C2083E;
-        Sat, 16 Nov 2019 15:42:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1955820833;
+        Sat, 16 Nov 2019 15:43:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573918923;
-        bh=KvCMDfyhwMbRfCQUWrKMvkjLsDmpI1JPmcNaflZv0ho=;
+        s=default; t=1573919018;
+        bh=T1fjXJ8Jm32Cke60Jcid/VJwyP6KUMtt2vqjFjO8xeY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ufQ2hOpzJgJDZIaIpDlwREO2IkyX81IUgboLbKW22FpUR+Qn69PhBn414unfMwUSf
-         eg5UyPa7LQIijWgKBuX7SW0Q1H4vtqtUp5PpSi0m14xwbkLPyqa1H2srfUWqNpBAcs
-         M3YzqIC8pyJ6fNNjGMLvG0uUMeSmoe/FVgV0FdRg=
+        b=JCyt8RD6YK86xeR85nOUBAEhInc8zUHli0GBR3x25KDXgQ94HLvBlLgsouSGvPl5X
+         2dgqtEAXtLftPhucdsNpybc+s579zJP+Kb5i3PAE+sH4ZFPC17N14sU3kEzZz26oeN
+         Ql3Du7q4/QPEuJK6XqaLftqF58n/QBISrv0gQRnQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 049/237] KVM/x86: Fix invvpid and invept register operand size in 64-bit mode
-Date:   Sat, 16 Nov 2019 10:38:04 -0500
-Message-Id: <20191116154113.7417-49-sashal@kernel.org>
+Cc:     Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Shuah Khan <shuah@kernel.org>, Sasha Levin <sashal@kernel.org>,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 119/237] selftests: kvm: Fix -Wformat warnings
+Date:   Sat, 16 Nov 2019 10:39:14 -0500
+Message-Id: <20191116154113.7417-119-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
 References: <20191116154113.7417-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -43,43 +44,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Uros Bizjak <ubizjak@gmail.com>
+From: Andrea Parri <andrea.parri@amarulasolutions.com>
 
-[ Upstream commit 5ebb272b2ea7e02911a03a893f8d922d49f9bb4a ]
+[ Upstream commit fb363e2d20351e1d16629df19e7bce1a31b3227a ]
 
-Register operand size of invvpid and invept instruction in 64-bit mode
-has always 64 bits. Adjust inline function argument type to reflect
-correct size.
+Fixes the following warnings:
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+dirty_log_test.c: In function ‘help’:
+dirty_log_test.c:216:9: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘int’ [-Wformat=]
+  printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/test_util.h:18:0,
+                 from dirty_log_test.c:16:
+/usr/include/inttypes.h:105:34: note: format string is defined here
+ # define PRIu64  __PRI64_PREFIX "u"
+dirty_log_test.c:218:9: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘int’ [-Wformat=]
+  printf(" -I: specify interval in ms (default: %"PRIu64" ms)\n",
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from include/test_util.h:18:0,
+                 from dirty_log_test.c:16:
+/usr/include/inttypes.h:105:34: note: format string is defined here
+ # define PRIu64  __PRI64_PREFIX "u"
+
+Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
+Signed-off-by: Shuah Khan (Samsung OSG) <shuah@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/vmx.c | 4 ++--
+ tools/testing/selftests/kvm/dirty_log_test.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index 3f40edf6fdeb3..80b0942fb84db 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -2079,7 +2079,7 @@ static int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
- 	return -1;
- }
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 0c2cdc105f968..a9c4b5e21d7e7 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -31,9 +31,9 @@
+ /* How many pages to dirty for each guest loop */
+ #define  TEST_PAGES_PER_LOOP            1024
+ /* How many host loops to run (one KVM_GET_DIRTY_LOG for each loop) */
+-#define  TEST_HOST_LOOP_N               32
++#define  TEST_HOST_LOOP_N               32UL
+ /* Interval for each host loop (ms) */
+-#define  TEST_HOST_LOOP_INTERVAL        10
++#define  TEST_HOST_LOOP_INTERVAL        10UL
  
--static inline void __invvpid(int ext, u16 vpid, gva_t gva)
-+static inline void __invvpid(unsigned long ext, u16 vpid, gva_t gva)
- {
-     struct {
- 	u64 vpid : 16;
-@@ -2094,7 +2094,7 @@ static inline void __invvpid(int ext, u16 vpid, gva_t gva)
-     BUG_ON(error);
- }
- 
--static inline void __invept(int ext, u64 eptp, gpa_t gpa)
-+static inline void __invept(unsigned long ext, u64 eptp, gpa_t gpa)
- {
- 	struct {
- 		u64 eptp, gpa;
+ /*
+  * Guest variables.  We use these variables to share data between host
 -- 
 2.20.1
 
