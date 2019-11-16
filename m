@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E56FF197
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 17:13:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 457B9FF05C
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 17:05:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729898AbfKPPsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Nov 2019 10:48:01 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54902 "EHLO mail.kernel.org"
+        id S1730758AbfKPPv2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Nov 2019 10:51:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60058 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729888AbfKPPsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Nov 2019 10:48:00 -0500
+        id S1729874AbfKPPv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:51:26 -0500
 Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D04A208E3;
-        Sat, 16 Nov 2019 15:47:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BAEF4214E0;
+        Sat, 16 Nov 2019 15:51:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573919279;
-        bh=8YhL0ze8eWMLOFfOXvqE7tZ92Hf36MAGwjzaFKJo2Rs=;
+        s=default; t=1573919486;
+        bh=wUt4D1DEg1f6rjOKaBENefHuGSbzJpjSw8JuUHmPraw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aMX5LBvsi+PVK++ytpnfqRB9AaW/0xts/2ZZNh3D8ISyQiDMEi9pq1UvwBCvhZ41X
-         5wgpY4ljKABsKA7UizDge+hzia0bKGk297ncc5JBZStTANCkdn6WNvwRvXWXFCKS82
-         wM7kBzuDLnuV7IVN0bGuqvBYja7XQHKWVX8APH04=
+        b=VabG4pgXcXmPcyVrvueFo2zYAUz6BSTUsywyAEhnZKB7TndJg65/iE1zQZ0zwdz4Y
+         Vg3MEQ1Vcu6rJNlU4ZACAhqIRLpsRpLHWwamYQC2Nn4qcbc29jL4wWwvEOEPCA4hJy
+         JzS7jH5HijzyVBMttkWBSI5+4CZcXHzT0V25gIps=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Uros Bizjak <ubizjak@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 030/150] KVM/x86: Fix invvpid and invept register operand size in 64-bit mode
-Date:   Sat, 16 Nov 2019 10:45:28 -0500
-Message-Id: <20191116154729.9573-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 17/99] KVM/x86: Fix invvpid and invept register operand size in 64-bit mode
+Date:   Sat, 16 Nov 2019 10:49:40 -0500
+Message-Id: <20191116155103.10971-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191116154729.9573-1-sashal@kernel.org>
-References: <20191116154729.9573-1-sashal@kernel.org>
+In-Reply-To: <20191116155103.10971-1-sashal@kernel.org>
+References: <20191116155103.10971-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -59,10 +59,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index ae34b482e9109..0bd5f8f4d6ebd 100644
+index 6b66d1f0d1859..b33d6f27399c8 100644
 --- a/arch/x86/kvm/vmx.c
 +++ b/arch/x86/kvm/vmx.c
-@@ -1602,7 +1602,7 @@ static int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
+@@ -1547,7 +1547,7 @@ static int __find_msr_index(struct vcpu_vmx *vmx, u32 msr)
  	return -1;
  }
  
@@ -71,7 +71,7 @@ index ae34b482e9109..0bd5f8f4d6ebd 100644
  {
      struct {
  	u64 vpid : 16;
-@@ -1616,7 +1616,7 @@ static inline void __invvpid(int ext, u16 vpid, gva_t gva)
+@@ -1561,7 +1561,7 @@ static inline void __invvpid(int ext, u16 vpid, gva_t gva)
  		  : : "a"(&operand), "c"(ext) : "cc", "memory");
  }
  
