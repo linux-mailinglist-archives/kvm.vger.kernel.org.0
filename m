@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 551D7FF371
-	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 17:25:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF715FF1A8
+	for <lists+kvm@lfdr.de>; Sat, 16 Nov 2019 17:13:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731555AbfKPQZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Nov 2019 11:25:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45488 "EHLO mail.kernel.org"
+        id S1731899AbfKPQNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Nov 2019 11:13:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54840 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728122AbfKPPmD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Nov 2019 10:42:03 -0500
+        id S1729879AbfKPPr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:47:58 -0500
 Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A3630207FA;
-        Sat, 16 Nov 2019 15:42:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id DA4E820815;
+        Sat, 16 Nov 2019 15:47:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573918923;
-        bh=kEMp6ly1yRA3JcS6DLA3xZ0dHQobM/V8sXKYwAWzRTc=;
+        s=default; t=1573919278;
+        bh=rDrhUhQSd49dcyLGwOTAa85ul3nGNRunIHroIySg1t0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iWg4TDRcDtjE4KNygbHxFQLpYTw+cZ340MUDm5+w/pnFBWC9Jxo8N3k0Is/IhQoOa
-         B5xM923cN1sbXNG4VhKAUovffVJCf89OP3UZ4T97JAnz9dBZT5BHqZf31mKJGKmLCO
-         O9MyOu9FgMabLh1rkIJ7FooTt83Hl5rbB4lWfDkA=
+        b=qt4MDKNjDaXt65NSDjaBSGAwNcvD3qp31CNs3pE137Roc4ljfzmPjwa8dPP0D2nya
+         c61Y/uWDa1EX1Xd/TpvBaOva0O59VaU+yifz7y8+/1QuQjQLyPKVVLYH+vrKlCcwkQ
+         e11oCQmXq4Zwu+E3GWAK2Q22W1lkhD/mQ84LnfwY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 048/237] KVM: nVMX: move check_vmentry_postreqs() call to nested_vmx_enter_non_root_mode()
-Date:   Sat, 16 Nov 2019 10:38:03 -0500
-Message-Id: <20191116154113.7417-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 028/150] KVM: nVMX: reset cache/shadows when switching loaded VMCS
+Date:   Sat, 16 Nov 2019 10:45:26 -0500
+Message-Id: <20191116154729.9573-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
-References: <20191116154113.7417-1-sashal@kernel.org>
+In-Reply-To: <20191116154729.9573-1-sashal@kernel.org>
+References: <20191116154729.9573-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -46,62 +46,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-[ Upstream commit 7671ce21b13b9596163a29f4712cb2451a9b97dc ]
+[ Upstream commit b7031fd40fcc741b0f9b0c04c8d844e445858b84 ]
 
-In preparation of supporting checkpoint/restore for nested state,
-commit ca0bde28f2ed ("kvm: nVMX: Split VMCS checks from nested_vmx_run()")
-modified check_vmentry_postreqs() to only perform the guest EFER
-consistency checks when nested_run_pending is true.  But, in the
-normal nested VMEntry flow, nested_run_pending is only set after
-check_vmentry_postreqs(), i.e. the consistency check is being skipped.
+Reset the vm_{entry,exit}_controls_shadow variables as well as the
+segment cache after loading a new VMCS in vmx_switch_vmcs().  The
+shadows/cache track VMCS data, i.e. they're stale every time we
+switch to a new VMCS regardless of reason.
 
-Alternatively, nested_run_pending could be set prior to calling
-check_vmentry_postreqs() in nested_vmx_run(), but placing the
-consistency checks in nested_vmx_enter_non_root_mode() allows us
-to split prepare_vmcs02() and interleave the preparation with
-the consistency checks without having to change the call sites
-of nested_vmx_enter_non_root_mode().  In other words, the rest
-of the consistency check code in nested_vmx_run() will be joining
-the postreqs checks in future patches.
+This fixes a bug where stale control shadows would be consumed after
+a nested VMExit due to a failed consistency check.
 
-Fixes: ca0bde28f2ed ("kvm: nVMX: Split VMCS checks from nested_vmx_run()")
+Suggested-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Jim Mattson <jmattson@google.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/vmx.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index 8c7554d7f0a80..3f40edf6fdeb3 100644
+index cd5a8e888eb6b..bba42eb3cc124 100644
 --- a/arch/x86/kvm/vmx.c
 +++ b/arch/x86/kvm/vmx.c
-@@ -12695,6 +12695,9 @@ static int enter_vmx_non_root_mode(struct kvm_vcpu *vcpu, u32 *exit_qual)
- 	if (likely(!evaluate_pending_interrupts) && kvm_vcpu_apicv_active(vcpu))
- 		evaluate_pending_interrupts |= vmx_has_apicv_interrupt(vcpu);
- 
-+	if (from_vmentry && check_vmentry_postreqs(vcpu, vmcs12, exit_qual))
-+		return EXIT_REASON_INVALID_STATE;
+@@ -10000,6 +10000,10 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
+ 	vmx_vcpu_load(vcpu, cpu);
+ 	vcpu->cpu = cpu;
+ 	put_cpu();
 +
- 	enter_guest_mode(vcpu);
++	vm_entry_controls_reset_shadow(vmx);
++	vm_exit_controls_reset_shadow(vmx);
++	vmx_segment_cache_clear(vmx);
+ }
  
- 	if (!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))
-@@ -12837,13 +12840,6 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	 */
- 	skip_emulated_instruction(vcpu);
+ /*
+@@ -11429,7 +11433,6 @@ static int enter_vmx_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
+ 		vmx->nested.vmcs01_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
  
--	ret = check_vmentry_postreqs(vcpu, vmcs12, &exit_qual);
--	if (ret) {
--		nested_vmx_entry_failure(vcpu, vmcs12,
--					 EXIT_REASON_INVALID_STATE, exit_qual);
--		return 1;
--	}
--
- 	/*
- 	 * We're finally done with prerequisite checking, and can start with
- 	 * the nested entry.
+ 	vmx_switch_vmcs(vcpu, &vmx->nested.vmcs02);
+-	vmx_segment_cache_clear(vmx);
+ 
+ 	if (prepare_vmcs02(vcpu, vmcs12, from_vmentry, &exit_qual)) {
+ 		leave_guest_mode(vcpu);
+@@ -12173,9 +12176,6 @@ static void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+ 	}
+ 
+ 	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+-	vm_entry_controls_reset_shadow(vmx);
+-	vm_exit_controls_reset_shadow(vmx);
+-	vmx_segment_cache_clear(vmx);
+ 
+ 	/* Update any VMCS fields that might have changed while L2 ran */
+ 	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
 -- 
 2.20.1
 
