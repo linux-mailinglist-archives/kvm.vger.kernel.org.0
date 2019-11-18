@@ -2,101 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A93E7100069
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 09:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 440B51000ED
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 10:04:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbfKRIgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 03:36:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6328 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726664AbfKRIgM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Nov 2019 03:36:12 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAI8WlXn093064
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 03:36:11 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2way69bt8w-1
+        id S1726638AbfKRJEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 04:04:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7494 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726403AbfKRJEO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Nov 2019 04:04:14 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAI92Ytd107982
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 04:04:13 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2waeh83cmm-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 03:36:10 -0500
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 04:04:13 -0500
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 18 Nov 2019 08:36:09 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Mon, 18 Nov 2019 09:04:11 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 18 Nov 2019 08:36:06 -0000
+        Mon, 18 Nov 2019 09:04:08 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAI8a5Lb57081968
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAI9479132834034
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Nov 2019 08:36:05 GMT
+        Mon, 18 Nov 2019 09:04:08 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22EE3A4064;
-        Mon, 18 Nov 2019 08:36:05 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D713DA4066;
+        Mon, 18 Nov 2019 09:04:07 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D897A4060;
-        Mon, 18 Nov 2019 08:36:05 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 18 Nov 2019 08:36:05 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id B9F2AE02C4; Mon, 18 Nov 2019 09:36:04 +0100 (CET)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: [GIT PULL 5/5] KVM: s390: Do not yield when target is already running
-Date:   Mon, 18 Nov 2019 09:36:02 +0100
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191118083602.15835-1-borntraeger@de.ibm.com>
-References: <20191118083602.15835-1-borntraeger@de.ibm.com>
+        by IMSVA (Postfix) with ESMTP id A0500A405C;
+        Mon, 18 Nov 2019 09:04:07 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.77])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 18 Nov 2019 09:04:07 +0000 (GMT)
+Subject: Re: [PATCH v1 3/4] s390x:irq: make IRQ handler weak
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+ <1573647799-30584-4-git-send-email-pmorel@linux.ibm.com>
+ <5fc6450e-ec88-d500-7fc9-9e17e41f2dd0@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Mon, 18 Nov 2019 10:04:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <5fc6450e-ec88-d500-7fc9-9e17e41f2dd0@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-TM-AS-GCONF: 00
-x-cbid: 19111808-0020-0000-0000-000003891DE3
+x-cbid: 19111809-0028-0000-0000-000003B9D455
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111808-0021-0000-0000-000021DF426E
-Message-Id: <20191118083602.15835-6-borntraeger@de.ibm.com>
+x-cbparentid: 19111809-0029-0000-0000-0000247CEBCD
+Message-Id: <bb6d784e-cceb-98e0-b565-8ec3fc47f2e3@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-18_01:2019-11-15,2019-11-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- impostorscore=0 priorityscore=1501 clxscore=1015 spamscore=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=895 mlxscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1911180077
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ phishscore=0 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=549
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911180082
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the target is already running we do not need to yield.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- arch/s390/kvm/diag.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On 2019-11-15 08:12, Thomas Huth wrote:
+> On 13/11/2019 13.23, Pierre Morel wrote:
+>> Having a weak function allows the tests programm to declare its own IRQ
+>> handler.
+>> This is helpfull when developping I/O tests.
+>> ---
+>>   lib/s390x/interrupt.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+>> index 7aecfc5..0049194 100644
+>> --- a/lib/s390x/interrupt.c
+>> +++ b/lib/s390x/interrupt.c
+>> @@ -140,7 +140,7 @@ void handle_mcck_int(sregs_t *regs)
+>>   		     lc->mcck_old_psw.addr);
+>>   }
+>>   
+>> -void handle_io_int(sregs_t *regs)
+>> +__attribute__((weak)) void handle_io_int(sregs_t *regs)
+>>   {
+>>   	report_abort("Unexpected io interrupt: at %#lx",
+>>   		     lc->io_old_psw.addr);
+>>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>
+Thanks for the review,
 
-diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-index 609c55df3ce8..3fb54ec2cf3e 100644
---- a/arch/s390/kvm/diag.c
-+++ b/arch/s390/kvm/diag.c
-@@ -168,6 +168,10 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
- 	if (!tcpu)
- 		goto no_yield;
- 
-+	/* target already running */
-+	if (READ_ONCE(tcpu->cpu) >= 0)
-+		goto no_yield;
-+
- 	if (kvm_vcpu_yield_to(tcpu) <= 0)
- 		goto no_yield;
- 
+Pierre
+
 -- 
-2.21.0
+Pierre Morel
+IBM Lab Boeblingen
 
