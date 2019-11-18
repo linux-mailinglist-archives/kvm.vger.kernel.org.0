@@ -2,123 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 73AAF100007
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 09:06:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DD7410006E
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 09:36:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbfKRIGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 03:06:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30206 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726316AbfKRIGV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 03:06:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574064380;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KNJ55WbT7VycZ8uCkUtv4AEa8qD8C2oOjxRZZ8HXkAA=;
-        b=BuabHVxKAAheBX2cnQIm+QkMhFh9r34HD0SrmJ7W+SsQXN8tXUHmpLQy3hFK0hjbmQu/jn
-        423swWWCW8FB8qsAACPL/zH8+I+jXp2qonrS3XJct6nsWwNpUSqViGb7Cum8iXzIIOR1Lg
-        GF0963Zwz3PTLIDLWyK8iuuIgSe10nw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-ab65OHwEMvKV-SjST_EDqw-1; Mon, 18 Nov 2019 03:06:18 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01E1D801FD2;
-        Mon, 18 Nov 2019 08:06:17 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D32B10002D0;
-        Mon, 18 Nov 2019 08:06:15 +0000 (UTC)
-Date:   Mon, 18 Nov 2019 09:06:12 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     kuhn.chenqun@huawei.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        kenny.zhangjun@huawei.com, pannengyuan@huawei.com,
-        zhang.zhanghailiang@huawei.com
-Subject: Re: [kvm-unit-tests PATCH] arm: Add missing test name prefix for
- pl031 and spinlock
-Message-ID: <20191118080612.cudiybi3xlkruc55@kamzik.brq.redhat.com>
-References: <20191118022720.17488-1-kuhn.chenqun@huawei.com>
+        id S1726666AbfKRIgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 03:36:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32212 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726552AbfKRIgK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Nov 2019 03:36:10 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAI8WCIa033122
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 03:36:09 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2way66v1sd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 03:36:09 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 18 Nov 2019 08:36:07 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 18 Nov 2019 08:36:04 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAI8a3rG53018826
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Nov 2019 08:36:03 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 46F6511C05B;
+        Mon, 18 Nov 2019 08:36:03 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33B0611C04A;
+        Mon, 18 Nov 2019 08:36:03 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 18 Nov 2019 08:36:03 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id E4780E02C4; Mon, 18 Nov 2019 09:36:02 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: [GIT PULL 0/5] KVM: s390: fixes and enhancements for 5.5
+Date:   Mon, 18 Nov 2019 09:35:57 +0100
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191118022720.17488-1-kuhn.chenqun@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ab65OHwEMvKV-SjST_EDqw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111808-0016-0000-0000-000002C6954A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111808-0017-0000-0000-000033284445
+Message-Id: <20191118083602.15835-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-18_01:2019-11-15,2019-11-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=826
+ bulkscore=0 mlxscore=0 priorityscore=1501 suspectscore=0
+ lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911180077
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 10:27:20AM +0800, kuhn.chenqun@huawei.com wrote:
-> From: Chen Qun <kuhn.chenqun@huawei.com>
->=20
-> pl031 and spinlock testcase without prefix, when running
-> the unit tests in TAP mode (./run_tests.sh -t), it is
-> difficult to the test results.
->=20
-> The test results=EF=BC=9A
-> ok 13 - Periph/PCell IDs match
-> ok 14 - R/O fields are R/O
-> ok 15 - RTC ticks at 1HZ
-> ok 16 - RTC IRQ not pending yet
-> ...
-> ok 24 -   RTC IRQ not pending anymore
-> ok 25 - CPU1: Done - Errors: 0
-> ok 26 - CPU0: Done - Errors: 0
->=20
-> It should be like this=EF=BC=9A
-> ok 13 - pl031: Periph/PCell IDs match
-> ok 14 - pl031: R/O fields are R/O
-> ok 15 - pl031: RTC ticks at 1HZ
-> ok 16 - pl031: RTC IRQ not pending yet
-> ...
-> ok 24 - pl031:   RTC IRQ not pending anymore
-> ok 25 - spinlock: CPU0: Done - Errors: 0
-> ok 26 - spinlock: CPU1: Done - Errors: 0
->=20
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
->  arm/pl031.c         | 1 +
->  arm/spinlock-test.c | 1 +
->  2 files changed, 2 insertions(+)
->=20
-> diff --git a/arm/pl031.c b/arm/pl031.c
-> index 5672f36..d0c9c10 100644
-> --- a/arm/pl031.c
-> +++ b/arm/pl031.c
-> @@ -252,6 +252,7 @@ int main(int argc, char **argv)
->  =09=09return 0;
->  =09}
-> =20
-> +=09report_prefix_push("pl031");
->  =09report("Periph/PCell IDs match", !check_id());
->  =09report("R/O fields are R/O", !check_ro());
->  =09report("RTC ticks at 1HZ", !check_rtc_freq());
-> diff --git a/arm/spinlock-test.c b/arm/spinlock-test.c
-> index d55471b..ff16fb0 100644
-> --- a/arm/spinlock-test.c
-> +++ b/arm/spinlock-test.c
-> @@ -72,6 +72,7 @@ static void test_spinlock(void *data __unused)
-> =20
->  int main(int argc, char **argv)
->  {
-> +=09report_prefix_push("spinlock");
->  =09if (argc > 1 && strcmp(argv[1], "bad") !=3D 0) {
->  =09=09lock_ops.lock =3D gcc_builtin_lock;
->  =09=09lock_ops.unlock =3D gcc_builtin_unlock;
-> --=20
-> 2.14.1.windows.1
->=20
->
+Paolo, Radim,
 
-Queued to https://github.com/rhdrjones/kvm-unit-tests/tree/arm/queue
+everybody is busy on the ultravisor related things, so only a small
+number of changes for s390 for 5.5.
 
-Thanks,
-drew=20
+The following changes since commit 54ecb8f7028c5eb3d740bb82b0f1d90f2df63c5c:
+
+  Linux 5.4-rc1 (2019-09-30 10:35:40 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.5-1
+
+for you to fetch changes up to c7b7de63124645089ccf9900b9e5ea08059ccae0:
+
+  KVM: s390: Do not yield when target is already running (2019-10-10 13:18:40 +0200)
+
+----------------------------------------------------------------
+KVM: s390: small fixes and enhancements
+
+- selftest improvements
+- yield improvements
+- cleanups
+
+----------------------------------------------------------------
+Christian Borntraeger (3):
+      selftests: kvm: make syncregs more reliable on s390
+      KVM: s390: count invalid yields
+      KVM: s390: Do not yield when target is already running
+
+Janosch Frank (1):
+      KVM: s390: Cleanup kvm_arch_init error path
+
+Thomas Huth (1):
+      KVM: s390: Remove unused parameter from __inject_sigp_restart()
+
+ arch/s390/include/asm/kvm_host.h                   |  1 +
+ arch/s390/kvm/diag.c                               | 22 ++++++++++++++++++----
+ arch/s390/kvm/interrupt.c                          |  5 ++---
+ arch/s390/kvm/kvm-s390.c                           | 19 ++++++++-----------
+ tools/testing/selftests/kvm/s390x/sync_regs_test.c | 15 +++++++++------
+ 5 files changed, 38 insertions(+), 24 deletions(-)
 
