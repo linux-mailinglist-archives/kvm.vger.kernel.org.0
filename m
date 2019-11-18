@@ -2,117 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABF03100A6B
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 18:38:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42959100B4A
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 19:17:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbfKRRiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 12:38:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30105 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726427AbfKRRiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 12:38:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574098734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=09lIY/1ykj3CyQxty1x4pFpPbAXHiHFrMXZ+SvtjMrQ=;
-        b=aAPpS2naALmSBZXjDPFGVx0v73bDEXpMI0zwQSGdzTZ71mePfFsXg0ooau4QfvRH7PQW/3
-        ZelqUwCvixVmzKiwNTZwduYIw8XstLGepvH7px10C9Tb04BGgQUEDaubDBaE1awUOtDteI
-        qGNfyobgo+R2mnG+ll24mGKX/WpOPQM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-LoJBqhw6OpO8y22Aj-3D3A-1; Mon, 18 Nov 2019 12:38:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55EB7800EBA;
-        Mon, 18 Nov 2019 17:38:49 +0000 (UTC)
-Received: from gondolin (ovpn-117-194.ams2.redhat.com [10.36.117.194])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C24876106D;
-        Mon, 18 Nov 2019 17:38:44 +0000 (UTC)
-Date:   Mon, 18 Nov 2019 18:38:42 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 36/37] KVM: s390: protvirt: Support cmd 5 operation state
-Message-ID: <20191118183842.36688a81.cohuck@redhat.com>
-In-Reply-To: <20191024114059.102802-37-frankja@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-37-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: LoJBqhw6OpO8y22Aj-3D3A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+        id S1726647AbfKRSRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 13:17:53 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37675 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726216AbfKRSRx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 13:17:53 -0500
+Received: by mail-wm1-f67.google.com with SMTP id b17so346984wmj.2;
+        Mon, 18 Nov 2019 10:17:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=UHVmj17X5I97BtGdOpQHVSrZpwkyodA+Uw+toEe9ceM=;
+        b=cPW6MV8KJLW7M2YTVyqiYmE2Nl606qjFWgljH4qSErWNWVHim8rZby2mSQpjvc3ST9
+         mYGXQ4AKQat8J0GqsiVdm3CJ4SxKB3fBsYMZ1lyX9T9CdckDFD2NV9sDFuHYUjVXilW6
+         o08r5tHgtDMdyhQPGJDC5+HJEJWxitIBD4G8RfpS8Cph4v+zScQDfnmJMJJB6uroOwdW
+         1Cxc29en4+/8DeLkIMFgFosVz5Ku4E++4Ddr2KE4z7yZrZtV4fCmuqask3S6N1LYVZuY
+         d76TWYsDBN5gOsbma+2EZjItqK2aoqdGL4qv7dkmbV8J1RyK0qfK7ezfg+MTMchHYDLU
+         OGig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=UHVmj17X5I97BtGdOpQHVSrZpwkyodA+Uw+toEe9ceM=;
+        b=YmMhJPEcxIL/L8ArBOmiIDrKPfh5UKU81t4cYxELLeHtqeHXW6WEnxWTwWAl9h2MoX
+         Bs8kesOyP/dV9e+hnL6jqvdWdlEROemXluNLa7fTxT6Ufdb1S4fyKRSObMbFhL9IewdT
+         wS7h21N28KPeoU8tvToEXKeXD0C5L3K/LVQgtLjGQmHI2JRbGnbAL6Rxobwx2ZxTxLFJ
+         W4yT1YCPBmE+ms/8Xfux8RttZ+ymhnao7+e6ZYuaQ+KJjrrG6hvNwPXfgxI00fW+WJ1e
+         2/cfc/JUHpKmD5yLjAUacHNygEMYO1Z7JTEh5ntvXxyPz4+Q9Sw4GN5bgCCr0Rwx9Dwh
+         q6cw==
+X-Gm-Message-State: APjAAAUfXNuHjJ6fwJBKhG3dfo1yzI9rVSZj5hcfTobRwUJNrp5NUlcR
+        esBlZd7cHP/iz8M1hwtWK8FpDfuu
+X-Google-Smtp-Source: APXvYqzqAAHTKIDQfKYRhTR26Z/txO0yzIIJfqBYR3tKEzIR+8n7zqljh0TP349Ri4tzP/Cy80vtlQ==
+X-Received: by 2002:a1c:f317:: with SMTP id q23mr426754wmq.97.1574101071329;
+        Mon, 18 Nov 2019 10:17:51 -0800 (PST)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id v81sm233794wmg.4.2019.11.18.10.17.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Nov 2019 10:17:50 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jmattson@google.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH 0/5] KVM: vmx: implement MSR_IA32_TSX_CTRL for guests
+Date:   Mon, 18 Nov 2019 19:17:42 +0100
+Message-Id: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Oct 2019 07:40:58 -0400
-Janosch Frank <frankja@linux.ibm.com> wrote:
+The current guest mitigation of TAA is both too heavy and not really
+sufficient.  It is too heavy because it will cause some affected CPUs
+(those that have MDS_NO but lack TAA_NO) to fall back to VERW and
+get the corresponding slowdown.  It is not really sufficient because
+it will cause the MDS_NO bit to disappear upon microcode update, so
+that VMs started before the microcode update will not be runnable
+anymore afterwards, even with tsx=on.
 
-> Code 5 for the set cpu state UV call tells the UV to load a PSW from
-> the SE header (first IPL) or from guest location 0x0 (diag 308 subcode
-> 0/1). Also it sets the cpu into operating state afterwards, so we can
-> start it.
+Instead, if tsx=on on the host, we can emulate MSR_IA32_TSX_CTRL for
+the guest and let it run without the VERW mitigation.  Even though
+MSR_IA32_TSX_CTRL is quite heavyweight, and we do not want to write
+it on every vmentry, we can use the shared MSR functionality because
+the host kernel need not protect itself from TSX-based side-channels.
 
-I'm a bit confused by the patch description: Does this mean that the UV
-does the transition to operating state? Does the hypervisor get a
-notification for that?
+Patch 1 is a minimal fix for MSR_IA32_ARCH_CAPABILITIES for stable
+kernels.  The other four patches implement the feature.
 
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  arch/s390/include/asm/uv.h | 1 +
->  arch/s390/kvm/kvm-s390.c   | 4 ++++
->  include/uapi/linux/kvm.h   | 1 +
->  3 files changed, 6 insertions(+)
->=20
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 33b52ba306af..8d10ae731458 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -163,6 +163,7 @@ struct uv_cb_unp {
->  #define PV_CPU_STATE_OPR=091
->  #define PV_CPU_STATE_STP=092
->  #define PV_CPU_STATE_CHKSTP=093
-> +#define PV_CPU_STATE_OPR_LOAD=095
-> =20
->  struct uv_cb_cpu_set_state {
->  =09struct uv_cb_header header;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index cc5feb67f145..5cc9108c94e4 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4652,6 +4652,10 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu=
- *vcpu,
->  =09=09r =3D kvm_s390_pv_destroy_cpu(vcpu);
->  =09=09break;
->  =09}
-> +=09case KVM_PV_VCPU_SET_IPL_PSW: {
-> +=09=09r =3D kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD);
-> +=09=09break;
-> +=09}
->  =09default:
->  =09=09r =3D -ENOTTY;
->  =09}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 2846ed5e5dd9..973007d27d55 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1483,6 +1483,7 @@ enum pv_cmd_id {
->  =09KVM_PV_VM_UNSHARE,
->  =09KVM_PV_VCPU_CREATE,
->  =09KVM_PV_VCPU_DESTROY,
-> +=09KVM_PV_VCPU_SET_IPL_PSW,
->  };
-> =20
->  struct kvm_pv_cmd {
+Getting some help testing this series with the kvm-unit-tests patch I
+have just sent would be great; I could only test this on a machine that
+I couldn't reboot, and therefore I could only work on an older kernel.
+
+Paolo Bonzini (5):
+  KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES
+  KVM: x86: do not modify masked bits of shared MSRs
+  KVM: x86: implement MSR_IA32_TSX_CTRL effect on CPUID
+  KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM functionality
+  KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable TSX on guest that lack
+    it
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  8 +++--
+ arch/x86/kvm/vmx/vmx.c          | 78 ++++++++++++++++++++++++++++++++---------
+ arch/x86/kvm/x86.c              | 34 ++++++++----------
+ 4 files changed, 82 insertions(+), 39 deletions(-)
+
+-- 
+1.8.3.1
 
