@@ -2,152 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C0DFF89E
-	for <lists+kvm@lfdr.de>; Sun, 17 Nov 2019 10:02:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 402D8FFD14
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 03:27:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726062AbfKQJCx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Nov 2019 04:02:53 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:33510 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726020AbfKQJCx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Nov 2019 04:02:53 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAH906lB165791;
-        Sun, 17 Nov 2019 09:02:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=K87XTMst2Lu5yJxW3+2amjx0WBo4HNyMY4Pw854xdSA=;
- b=SIT+2rAYq/jVinl4RRW0shGpfFf6VQjuow/0AebFa1OV6C4TorMtPRl2//OojIMYsmlT
- ExozFyv/S1f4XmflwBwk52jVy4RG8eKgC5mLdToyl4hf1iqfyUWbJSMbLjebXwIt/447
- ++Sj4bT1S6r3/IDhoMpNlJ4UX/ck1QSu/efnM4/Bba3Y7hWBUjoMWxxD24gpJmZJWbnz
- A1yPiWypjFfyuA2fr1ic98nss/82TCo4ttHMuF+AXa958ts18GtLUyvofJFsnVmVcHue
- qqgGcZh0ZamzrEhEb/uzDZ3ORaopjTCJTXtIrCjbk1mWbNtL/rd22Vs0ZByVZTwkgv8u Qw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2wa8htbba0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 17 Nov 2019 09:02:46 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAH8s88C105714;
-        Sun, 17 Nov 2019 09:02:46 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2wau92rput-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 17 Nov 2019 09:02:45 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAH92iur029140;
-        Sun, 17 Nov 2019 09:02:44 GMT
-Received: from [10.191.18.30] (/10.191.18.30)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 17 Nov 2019 01:02:35 -0800
-Subject: Re: [PATCH RESEND v2 1/4] cpuidle-haltpoll: ensure grow start value
- is nonzero
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rafael Wysocki <rafael.j.wysocki@intel.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Linux PM <linux-pm@vger.kernel.org>
-References: <1573041302-4904-1-git-send-email-zhenzhong.duan@oracle.com>
- <1573041302-4904-2-git-send-email-zhenzhong.duan@oracle.com>
- <CAJZ5v0gyszPOvUxd8WX8gxc1OvX_nLUGh3vKn=aXWRj52L76yw@mail.gmail.com>
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <4219f339-556d-e2f8-c54a-99c6bc83eafd@oracle.com>
-Date:   Sun, 17 Nov 2019 17:02:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+        id S1726442AbfKRC1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Nov 2019 21:27:32 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:41164 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726325AbfKRC1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Nov 2019 21:27:32 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id D71B4E117DC0D4651E24;
+        Mon, 18 Nov 2019 10:27:30 +0800 (CST)
+Received: from HGHY4C002233111.china.huawei.com (10.133.205.93) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 18 Nov 2019 10:27:23 +0800
+From:   <kuhn.chenqun@huawei.com>
+To:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <drjones@redhat.com>
+CC:     <kenny.zhangjun@huawei.com>, <kuhn.chenqun@huawei.com>,
+        <pannengyuan@huawei.com>, <zhang.zhanghailiang@huawei.com>
+Subject: [kvm-unit-tests PATCH] arm: Add missing test name prefix for pl031 and spinlock
+Date:   Mon, 18 Nov 2019 10:27:20 +0800
+Message-ID: <20191118022720.17488-1-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-In-Reply-To: <CAJZ5v0gyszPOvUxd8WX8gxc1OvX_nLUGh3vKn=aXWRj52L76yw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9443 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911170086
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9443 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911170087
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.133.205.93]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
-On 2019/11/15 18:26, Rafael J. Wysocki wrote:
-> On Wed, Nov 6, 2019 at 12:56 PM Zhenzhong Duan
-> <zhenzhong.duan@oracle.com> wrote:
->> dev->poll_limit_ns could be zeroed in certain cases (e.g. by
->> guest_halt_poll_ns = 0). If guest_halt_poll_grow_start is zero,
->> dev->poll_limit_ns will never be bigger than zero.
-> I would rephrase this in the following way:
->
-> "If guest_halt_poll_grow_start is zero and dev->poll_limit_ns becomes
-> zero for any reason, it will never be greater than zero again, so use
-> ..."
+pl031 and spinlock testcase without prefix, when running
+the unit tests in TAP mode (./run_tests.sh -t), it is
+difficult to the test results.
 
-OK, will do, thanks for your suggestion.
+The test results：
+ok 13 - Periph/PCell IDs match
+ok 14 - R/O fields are R/O
+ok 15 - RTC ticks at 1HZ
+ok 16 - RTC IRQ not pending yet
+...
+ok 24 -   RTC IRQ not pending anymore
+ok 25 - CPU1: Done - Errors: 0
+ok 26 - CPU0: Done - Errors: 0
 
-Zhenzhong
+It should be like this：
+ok 13 - pl031: Periph/PCell IDs match
+ok 14 - pl031: R/O fields are R/O
+ok 15 - pl031: RTC ticks at 1HZ
+ok 16 - pl031: RTC IRQ not pending yet
+...
+ok 24 - pl031:   RTC IRQ not pending anymore
+ok 25 - spinlock: CPU0: Done - Errors: 0
+ok 26 - spinlock: CPU1: Done - Errors: 0
 
->
-> The patch itself looks OK to me.
->
->> Use param callback to avoid writing zero to guest_halt_poll_grow_start.
->>
->> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
->> ---
->>   drivers/cpuidle/governors/haltpoll.c | 22 +++++++++++++++++++++-
->>   1 file changed, 21 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/cpuidle/governors/haltpoll.c b/drivers/cpuidle/governors/haltpoll.c
->> index 7a703d2..660859d 100644
->> --- a/drivers/cpuidle/governors/haltpoll.c
->> +++ b/drivers/cpuidle/governors/haltpoll.c
->> @@ -20,6 +20,26 @@
->>   #include <linux/module.h>
->>   #include <linux/kvm_para.h>
->>
->> +static int grow_start_set(const char *val, const struct kernel_param *kp)
->> +{
->> +       int ret;
->> +       unsigned int n;
->> +
->> +       if (!val)
->> +               return -EINVAL;
->> +
->> +       ret = kstrtouint(val, 0, &n);
->> +       if (ret || !n)
->> +               return -EINVAL;
->> +
->> +       return param_set_uint(val, kp);
->> +}
->> +
->> +static const struct kernel_param_ops grow_start_ops = {
->> +       .set = grow_start_set,
->> +       .get = param_get_uint,
->> +};
->> +
->>   static unsigned int guest_halt_poll_ns __read_mostly = 200000;
->>   module_param(guest_halt_poll_ns, uint, 0644);
->>
->> @@ -33,7 +53,7 @@
->>
->>   /* value in us to start growing per-cpu halt_poll_ns */
->>   static unsigned int guest_halt_poll_grow_start __read_mostly = 50000;
->> -module_param(guest_halt_poll_grow_start, uint, 0644);
->> +module_param_cb(guest_halt_poll_grow_start, &grow_start_ops, &guest_halt_poll_grow_start, 0644);
->>
->>   /* allow shrinking guest halt poll */
->>   static bool guest_halt_poll_allow_shrink __read_mostly = true;
->> --
->> 1.8.3.1
->>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+ arm/pl031.c         | 1 +
+ arm/spinlock-test.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/arm/pl031.c b/arm/pl031.c
+index 5672f36..d0c9c10 100644
+--- a/arm/pl031.c
++++ b/arm/pl031.c
+@@ -252,6 +252,7 @@ int main(int argc, char **argv)
+ 		return 0;
+ 	}
+ 
++	report_prefix_push("pl031");
+ 	report("Periph/PCell IDs match", !check_id());
+ 	report("R/O fields are R/O", !check_ro());
+ 	report("RTC ticks at 1HZ", !check_rtc_freq());
+diff --git a/arm/spinlock-test.c b/arm/spinlock-test.c
+index d55471b..ff16fb0 100644
+--- a/arm/spinlock-test.c
++++ b/arm/spinlock-test.c
+@@ -72,6 +72,7 @@ static void test_spinlock(void *data __unused)
+ 
+ int main(int argc, char **argv)
+ {
++	report_prefix_push("spinlock");
+ 	if (argc > 1 && strcmp(argv[1], "bad") != 0) {
+ 		lock_ops.lock = gcc_builtin_lock;
+ 		lock_ops.unlock = gcc_builtin_unlock;
+-- 
+2.14.1.windows.1
+
+
