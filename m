@@ -2,222 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39BDA100A38
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 18:29:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABF03100A6B
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 18:38:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbfKRR3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 12:29:03 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46230 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726317AbfKRR3D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 12:29:03 -0500
-Received: by mail-wr1-f68.google.com with SMTP id b3so20498286wrs.13
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 09:29:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=YND6Zs40Ln4MrQ8TnFNfSflQxBifvkVl4mTVEIrw30s=;
-        b=iNWZXzyIqChjfu1CKskiQERSMg1DM8i/ElBUDIbUch/frdAEaU+w9bsFPvo+cKqust
-         SCSByoxOFKEQ+GJFRL2ckuqDXOu/2idaq5+tcmQunsQe8NjfuXT0yyu98wuwzdHqA5DU
-         vl3gInqz0Y0Os7Ekq5zplKmOy0oYEDwlXdZ05qKLruVE/RX0+selsw4H7ZTdixPQIaqJ
-         RHnCuDsxNmSiSmh8OljdCXuFoTvrWBcLiIeWrJiET9pCkEi2kh+HWveNE2SKby2F9VmI
-         /DRrDJHuW6m78JklShiwjFW9p7h/7BJ2tvu0dFoy5knOl1JZGPFKq2BJRfXCqCnKQGy9
-         t5RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=YND6Zs40Ln4MrQ8TnFNfSflQxBifvkVl4mTVEIrw30s=;
-        b=luGaqjs3mi8LkoU+NrUaJoAtfI9jj76+evRHXBHYMTRtCQwUeHIMxoVkY+DBBU1LlW
-         9epNOU3zYWssOxQkq4UbHDfcYvPce4iWxIymeGcfVMSkiw0kMmgzCv5LsBzxWx+ZIw7+
-         4urs69dCi+XbxhYeg6Q/zzw5eG2u6MdIzSAyFaO4a2vCfVugvLonUOtEPsVCEiRj0jDu
-         lsW71SZ3pfuPICc/g31HkLmm/jRgQ/5CPipMj4OnMhApwMW/J9smctonc9dUHt/FQdH+
-         WXA4gucqjRpz8nIqNFhXGcUNhX3wrfjlX5x5lCPyvaggwHtO+L71qskp/P5fNhnirRi2
-         9qAA==
-X-Gm-Message-State: APjAAAWVrmFU8CrEvcuYj0x1+Kyff5kV243hbJBqHXhDwmQ1QYhoN4vD
-        P0pcloJ2IvuWyTbcaahh2oBY6a/L
-X-Google-Smtp-Source: APXvYqxjTTXs5htt1a65KzbwzRu0fdwhMYscANOlfzQ8yMquP/GqV5fV2VapRuW8JrHMKNL3KJA5lA==
-X-Received: by 2002:adf:edc5:: with SMTP id v5mr16374652wro.322.1574098139378;
-        Mon, 18 Nov 2019 09:28:59 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id b3sm21837wmj.44.2019.11.18.09.28.58
-        for <kvm@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 09:28:58 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Subject: [PATCH kvm-unit-tests] x86: add tests for MSR_IA32_TSX_CTRL
-Date:   Mon, 18 Nov 2019 18:28:56 +0100
-Message-Id: <1574098136-48779-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726435AbfKRRiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 12:38:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30105 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726427AbfKRRiz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 12:38:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574098734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=09lIY/1ykj3CyQxty1x4pFpPbAXHiHFrMXZ+SvtjMrQ=;
+        b=aAPpS2naALmSBZXjDPFGVx0v73bDEXpMI0zwQSGdzTZ71mePfFsXg0ooau4QfvRH7PQW/3
+        ZelqUwCvixVmzKiwNTZwduYIw8XstLGepvH7px10C9Tb04BGgQUEDaubDBaE1awUOtDteI
+        qGNfyobgo+R2mnG+ll24mGKX/WpOPQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-LoJBqhw6OpO8y22Aj-3D3A-1; Mon, 18 Nov 2019 12:38:51 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55EB7800EBA;
+        Mon, 18 Nov 2019 17:38:49 +0000 (UTC)
+Received: from gondolin (ovpn-117-194.ams2.redhat.com [10.36.117.194])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C24876106D;
+        Mon, 18 Nov 2019 17:38:44 +0000 (UTC)
+Date:   Mon, 18 Nov 2019 18:38:42 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 36/37] KVM: s390: protvirt: Support cmd 5 operation state
+Message-ID: <20191118183842.36688a81.cohuck@redhat.com>
+In-Reply-To: <20191024114059.102802-37-frankja@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-37-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: LoJBqhw6OpO8y22Aj-3D3A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- lib/x86/msr.h       | 14 +++++++++++++
- lib/x86/processor.h |  2 ++
- x86/Makefile.common |  2 +-
- x86/tsx-ctrl.c      | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- x86/vmexit.c        | 12 +++++++++++
- 5 files changed, 89 insertions(+), 1 deletion(-)
- create mode 100644 x86/tsx-ctrl.c
+On Thu, 24 Oct 2019 07:40:58 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index abf0d93..8dca964 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -221,6 +221,20 @@
- #define MSR_IA32_UCODE_WRITE		0x00000079
- #define MSR_IA32_UCODE_REV		0x0000008b
- 
-+#define MSR_IA32_ARCH_CAPABILITIES	0x0000010a
-+#define ARCH_CAP_RDCL_NO		(1ULL << 0)
-+#define ARCH_CAP_IBRS_ALL		(1ULL << 1)
-+#define ARCH_CAP_SKIP_VMENTRY_L1DFLUSH	(1ULL << 3)
-+#define ARCH_CAP_SSB_NO			(1ULL << 4)
-+#define ARCH_CAP_MDS_NO			(1ULL << 5)
-+#define ARCH_CAP_PSCHANGE_MC_NO		(1ULL << 6)
-+#define ARCH_CAP_TSX_CTRL_MSR		(1ULL << 7)
-+#define ARCH_CAP_TAA_NO			(1ULL << 8)
-+
-+#define MSR_IA32_TSX_CTRL		0x00000122
-+#define TSX_CTRL_RTM_DISABLE		(1ULL << 0)
-+#define TSX_CTRL_CPUID_CLEAR		(1ULL << 1)
-+
- #define MSR_IA32_PERF_STATUS		0x00000198
- #define MSR_IA32_PERF_CTL		0x00000199
- 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 3f461dc..7057180 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -137,6 +137,7 @@ static inline u8 cpuid_maxphyaddr(void)
- #define	X86_FEATURE_XMM			(CPUID(0x1, 0, EDX, 25))
- #define	X86_FEATURE_XMM2		(CPUID(0x1, 0, EDX, 26))
- #define	X86_FEATURE_TSC_ADJUST		(CPUID(0x7, 0, EBX, 1))
-+#define	X86_FEATURE_HLE			(CPUID(0x7, 0, EBX, 4))
- #define	X86_FEATURE_INVPCID_SINGLE	(CPUID(0x7, 0, EBX, 7))
- #define	X86_FEATURE_INVPCID		(CPUID(0x7, 0, EBX, 10))
- #define	X86_FEATURE_RTM			(CPUID(0x7, 0, EBX, 11))
-@@ -149,6 +150,7 @@ static inline u8 cpuid_maxphyaddr(void)
- #define	X86_FEATURE_LA57		(CPUID(0x7, 0, ECX, 16))
- #define	X86_FEATURE_RDPID		(CPUID(0x7, 0, ECX, 22))
- #define	X86_FEATURE_SPEC_CTRL		(CPUID(0x7, 0, EDX, 26))
-+#define	X86_FEATURE_ARCH_CAPABILITIES	(CPUID(0x7, 0, EDX, 29))
- #define	X86_FEATURE_NX			(CPUID(0x80000001, 0, EDX, 20))
- #define	X86_FEATURE_RDPRU		(CPUID(0x80000008, 0, EBX, 4))
- 
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index e612dbe..b157154 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -58,7 +58,7 @@ tests-common = $(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
-                $(TEST_DIR)/init.flat $(TEST_DIR)/smap.flat \
-                $(TEST_DIR)/hyperv_synic.flat $(TEST_DIR)/hyperv_stimer.flat \
-                $(TEST_DIR)/hyperv_connections.flat \
--               $(TEST_DIR)/umip.flat
-+               $(TEST_DIR)/umip.flat $(TEST_DIR)/tsx-ctrl.flat
- 
- ifdef API
- tests-api = api/api-sample api/dirty-log api/dirty-log-perf
-diff --git a/x86/tsx-ctrl.c b/x86/tsx-ctrl.c
-new file mode 100644
-index 0000000..f482cb5
---- /dev/null
-+++ b/x86/tsx-ctrl.c
-@@ -0,0 +1,60 @@
-+/* TSX tests */
-+
-+#include "libcflat.h"
-+#include "processor.h"
-+#include "msr.h"
-+
-+static bool try_transaction(void)
-+{
-+    unsigned x;
-+    int i;
-+
-+    for (i = 0; i < 100; i++) {
-+        x = 0;
-+        /*
-+         * The value before the transaction is important, so make the
-+         * operand input/output.
-+         */
-+        asm volatile("xbegin 2f; movb $1, %0; xend; 2:" : "+m" (x) : : "eax");
-+        if (x) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+int main(int ac, char **av)
-+{
-+    if (!this_cpu_has(X86_FEATURE_RTM)) {
-+        report_skip("TSX not available");
-+	return 0;
-+    }
-+    if (!this_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
-+        report_skip("ARCH_CAPABILITIES not available");
-+	return 0;
-+    }
-+    if (!(rdmsr(MSR_IA32_ARCH_CAPABILITIES) & ARCH_CAP_TSX_CTRL_MSR)) {
-+        report_skip("TSX_CTRL not available");
-+	return 0;
-+    }
-+
-+    report("TSX_CTRL should be 0", rdmsr(MSR_IA32_TSX_CTRL) == 0);
-+    report("Transactions do not abort", try_transaction());
-+
-+    wrmsr(MSR_IA32_TSX_CTRL, TSX_CTRL_CPUID_CLEAR);
-+    report("TSX_CTRL hides RTM", !this_cpu_has(X86_FEATURE_RTM));
-+    report("TSX_CTRL hides HLE", !this_cpu_has(X86_FEATURE_HLE));
-+
-+    /* Microcode might hide HLE unconditionally */
-+    wrmsr(MSR_IA32_TSX_CTRL, 0);
-+    report("TSX_CTRL=0 unhides RTM", this_cpu_has(X86_FEATURE_RTM));
-+
-+    wrmsr(MSR_IA32_TSX_CTRL, TSX_CTRL_RTM_DISABLE);
-+    report("TSX_CTRL causes transactions to abort", !try_transaction());
-+
-+    wrmsr(MSR_IA32_TSX_CTRL, 0);
-+    report("TSX_CTRL=0 causes transactions to succeed", try_transaction());
-+
-+    return report_summary();
-+}
-+
-diff --git a/x86/vmexit.c b/x86/vmexit.c
-index 81b743b..acdcbdc 100644
---- a/x86/vmexit.c
-+++ b/x86/vmexit.c
-@@ -434,6 +434,17 @@ static void tscdeadline(void)
- 	while (x == 0) barrier();
- }
- 
-+static void wr_tsx_ctrl_msr(void)
-+{
-+	wrmsr(MSR_IA32_TSX_CTRL, 0);
-+}
-+
-+static int has_tsx_ctrl(void)
-+{
-+    return this_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)
-+	    && (rdmsr(MSR_IA32_ARCH_CAPABILITIES) & ARCH_CAP_TSX_CTRL_MSR);
-+}
-+
- static void wr_ibrs_msr(void)
- {
- 	wrmsr(MSR_IA32_SPEC_CTRL, 1);
-@@ -478,6 +489,7 @@ static struct test tests[] = {
- 	{ ipi_halt, "ipi_halt", is_smp, .parallel = 0, },
- 	{ ple_round_robin, "ple_round_robin", .parallel = 1 },
- 	{ wr_kernel_gs_base, "wr_kernel_gs_base", .parallel = 1 },
-+	{ wr_tsx_ctrl_msr, "wr_tsx_ctrl_msr", has_tsx_ctrl, .parallel = 1, },
- 	{ wr_ibrs_msr, "wr_ibrs_msr", has_spec_ctrl, .parallel = 1 },
- 	{ wr_ibpb_msr, "wr_ibpb_msr", has_ibpb, .parallel = 1 },
- 	{ wr_tsc_adjust_msr, "wr_tsc_adjust_msr", .parallel = 1 },
--- 
-1.8.3.1
+> Code 5 for the set cpu state UV call tells the UV to load a PSW from
+> the SE header (first IPL) or from guest location 0x0 (diag 308 subcode
+> 0/1). Also it sets the cpu into operating state afterwards, so we can
+> start it.
+
+I'm a bit confused by the patch description: Does this mean that the UV
+does the transition to operating state? Does the hypervisor get a
+notification for that?
+
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/uv.h | 1 +
+>  arch/s390/kvm/kvm-s390.c   | 4 ++++
+>  include/uapi/linux/kvm.h   | 1 +
+>  3 files changed, 6 insertions(+)
+>=20
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 33b52ba306af..8d10ae731458 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -163,6 +163,7 @@ struct uv_cb_unp {
+>  #define PV_CPU_STATE_OPR=091
+>  #define PV_CPU_STATE_STP=092
+>  #define PV_CPU_STATE_CHKSTP=093
+> +#define PV_CPU_STATE_OPR_LOAD=095
+> =20
+>  struct uv_cb_cpu_set_state {
+>  =09struct uv_cb_header header;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index cc5feb67f145..5cc9108c94e4 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4652,6 +4652,10 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_vcpu=
+ *vcpu,
+>  =09=09r =3D kvm_s390_pv_destroy_cpu(vcpu);
+>  =09=09break;
+>  =09}
+> +=09case KVM_PV_VCPU_SET_IPL_PSW: {
+> +=09=09r =3D kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD);
+> +=09=09break;
+> +=09}
+>  =09default:
+>  =09=09r =3D -ENOTTY;
+>  =09}
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 2846ed5e5dd9..973007d27d55 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1483,6 +1483,7 @@ enum pv_cmd_id {
+>  =09KVM_PV_VM_UNSHARE,
+>  =09KVM_PV_VCPU_CREATE,
+>  =09KVM_PV_VCPU_DESTROY,
+> +=09KVM_PV_VCPU_SET_IPL_PSW,
+>  };
+> =20
+>  struct kvm_pv_cmd {
 
