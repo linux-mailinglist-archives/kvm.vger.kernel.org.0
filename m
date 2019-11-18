@@ -2,140 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17012100B4C
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 19:18:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDE0C100C02
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 20:08:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfKRSSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 13:18:01 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33552 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfKRSR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 13:17:59 -0500
-Received: by mail-wr1-f66.google.com with SMTP id w9so20714454wrr.0;
-        Mon, 18 Nov 2019 10:17:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=jpG2kEyEJHc8/CbQPiWfOD/+xRzsS5WNXU8AFKfy8Cg=;
-        b=EMsOtal5IxuXRR6Ovh9l1jsckcRu6ANKKAO4xosjmjDrrOT5p1sN4prnJYcTztqv20
-         6jdjXPjqdT1deIscnpJeu5rIgUQ7ARgpvbI0jUwKDRw0xFaQoGA52n6lHGu0wN4DHJqS
-         uCQFu/du47+++EaynzJ/qMUpl0+kK0FSW1PqwTDu9MgtU/54v8HyCp94AHUqSaNcYz8T
-         z4d4vaascf+LHRW2vVrQR6cGRDCeI7dIomeSDy1B5x1dkstq1Qq6J2PTQSMEm1J+Hp7A
-         ZhB/UgBM2/VqrB2ygn7T8qWnZmpFweWAmy6bVkmWq4vqO8ByG/f/vbgdii3tHTVgrwao
-         JyWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=jpG2kEyEJHc8/CbQPiWfOD/+xRzsS5WNXU8AFKfy8Cg=;
-        b=QwKOGHYbETGJCXRmXKLEHWr/mx/gHh7s6Sy05cSwkRNu4IpxoTXaG+5umcVYTevgsF
-         h6awhhvklewSoiNtojo0I5UnEsYjzcVrvM6aYSVlS4vSuFqwX6RNQh3U1J/saMePZ9Wh
-         yb1gxapFkJlpdWGKlUOW0rqgTRCC/vUjpN68ZDllPFv3/maauWjfpiwsn6vVKPF1GPyk
-         7iEvs4JxWql7UeQLt0dj0ISuR19TdTjBsuRJVNkuGuTBy1hCqVMVrmis1WqrijjmVXid
-         r9sT5hgpznBNT8xWGRC94MYXn2Kd1ScyLN0m1po4t0kGcI1uEa8gsMamh5pKscfyYiRN
-         Ayfg==
-X-Gm-Message-State: APjAAAXnBXE0hNaAxDsglQzFvBPXTEtwKEr7e7GiS+Tu+X2N/bBcmjp4
-        BbhNsA6mteiRREQK1CPg0wWtAmrc
-X-Google-Smtp-Source: APXvYqxRMPUdmTzKr9fbr/6UsyRvQMFo7cWSZV09SuiPptY2AUJ+tlECky1XRY2ahQqroDirkyHvQA==
-X-Received: by 2002:a5d:5686:: with SMTP id f6mr32984073wrv.231.1574101076166;
-        Mon, 18 Nov 2019 10:17:56 -0800 (PST)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id v81sm233794wmg.4.2019.11.18.10.17.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 10:17:55 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jmattson@google.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH 5/5] KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable TSX on guest that lack it
-Date:   Mon, 18 Nov 2019 19:17:47 +0100
-Message-Id: <1574101067-5638-6-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
-References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
+        id S1726472AbfKRTIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 14:08:41 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:44642 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726423AbfKRTIk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 14:08:40 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIJ4PBt057973;
+        Mon, 18 Nov 2019 19:08:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=ooVljAxnOFvpDxTHab72/L9Lnr5egAf8LSHHqQBWv3c=;
+ b=UiLWf2QnjjJIR3WLjxPIu0R1GNG6Jva3jAMHDxHUM1Kf+gpf2wKtb5VtAEfB59NKINmY
+ B1zVzVQR4BYDEN3MFCG5bKHk1nMACc6f5UuC4vc3TvMtoCl71gETmnNqajwPNqpjctxA
+ 1rHXRyGb65wgCbDuiB3a68c22eihheceXuU6rG6p8h+T/QW/i2E+ek5KSG9OyLV8iGDi
+ S86WNuY6xhqMKLHRmuk03ytWC7XhYOAfRGk08c2oRr2yi0ze2MgaS6X+iDNWbgI3i/Dl
+ 3wvYvZA2dV7hSO/dZ1gD38ZFs+wl6bmQWGuIlpeh+2KPwvcqdzioZlIXlSArCM3+3uG5 BQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2wa92pj8xj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Nov 2019 19:08:35 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIJ8VQB149337;
+        Mon, 18 Nov 2019 19:08:35 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2wbxm303pw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Nov 2019 19:08:35 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAIJ8Xmd019639;
+        Mon, 18 Nov 2019 19:08:33 GMT
+Received: from [10.159.244.44] (/10.159.244.44)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 18 Nov 2019 11:08:33 -0800
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix the register order to match
+ struct regs
+To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20191025170056.109755-1-aaronlewis@google.com>
+ <CAAAPnDFcS+SCrLK1wGGEiBBc+yy1bGOKsw4oKnXgXFwUb9p0CQ@mail.gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <03a2c4c5-d966-5a5b-dec5-c7eb9507f5ae@oracle.com>
+Date:   Mon, 18 Nov 2019 11:08:31 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <CAAAPnDFcS+SCrLK1wGGEiBBc+yy1bGOKsw4oKnXgXFwUb9p0CQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911180162
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911180162
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If X86_FEATURE_RTM is disabled, the guest should not be able to access
-MSR_IA32_TSX_CTRL.  We can therefore use it in KVM to force all
-transactions from the guest to abort.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 44 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 30 insertions(+), 14 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ed25fe7d5234..8cba65eec0d3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -639,6 +639,23 @@ struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr)
- 	return NULL;
- }
- 
-+static int vmx_set_guest_msr(struct vcpu_vmx *vmx, struct shared_msr_entry *msr, u64 data)
-+{
-+	int ret = 0;
-+
-+	u64 old_msr_data = msr->data;
-+	msr->data = data;
-+	if (msr - vmx->guest_msrs < vmx->save_nmsrs) {
-+		preempt_disable();
-+		ret = kvm_set_shared_msr(msr->index, msr->data,
-+					 msr->mask);
-+		preempt_enable();
-+		if (ret)
-+			msr->data = old_msr_data;
-+	}
-+	return ret;
-+}
-+
- void loaded_vmcs_init(struct loaded_vmcs *loaded_vmcs)
- {
- 	vmcs_clear(loaded_vmcs->vmcs);
-@@ -2174,20 +2191,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	default:
- 	find_shared_msr:
- 		msr = find_msr_entry(vmx, msr_index);
--		if (msr) {
--			u64 old_msr_data = msr->data;
--			msr->data = data;
--			if (msr - vmx->guest_msrs < vmx->save_nmsrs) {
--				preempt_disable();
--				ret = kvm_set_shared_msr(msr->index, msr->data,
--							 msr->mask);
--				preempt_enable();
--				if (ret)
--					msr->data = old_msr_data;
--			}
--			break;
--		}
--		ret = kvm_set_msr_common(vcpu, msr_info);
-+		if (msr)
-+			ret = vmx_set_guest_msr(vmx, msr, data);
-+		else
-+			ret = kvm_set_msr_common(vcpu, msr_info);
- 	}
- 
- 	return ret;
-@@ -7138,6 +7145,15 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
- 	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
- 			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
- 		update_intel_pt_cfg(vcpu);
-+
-+	if (boot_cpu_has(X86_FEATURE_RTM)) {
-+		struct shared_msr_entry *msr;
-+		msr = find_msr_entry(vmx, MSR_IA32_TSX_CTRL);
-+		if (msr) {
-+			bool enabled = guest_cpuid_has(vcpu, X86_FEATURE_RTM);
-+			vmx_set_guest_msr(vmx, msr, enabled ? 0 : TSX_CTRL_RTM_DISABLE);
-+		}
-+	}
- }
- 
- static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2 *entry)
--- 
-1.8.3.1
-
+On 11/15/19 6:27 AM, Aaron Lewis wrote:
+> On Fri, Oct 25, 2019 at 10:01 AM Aaron Lewis <aaronlewis@google.com> wrote:
+>> Fix the order the registers show up in SAVE_GPR and SAVE_GPR_C to ensure
+>> the correct registers get the correct values.  Previously, the registers
+>> were being written to (and read from) the wrong fields.
+>>
+>> Reviewed-by: Jim Mattson <jmattson@google.com>
+>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+>> ---
+>>   x86/vmx.h | 12 ++++++------
+>>   1 file changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/x86/vmx.h b/x86/vmx.h
+>> index 8496be7..8527997 100644
+>> --- a/x86/vmx.h
+>> +++ b/x86/vmx.h
+>> @@ -492,9 +492,9 @@ enum vm_instruction_error_number {
+>>
+>>   #define SAVE_GPR                               \
+>>          "xchg %rax, regs\n\t"                   \
+>> -       "xchg %rbx, regs+0x8\n\t"               \
+>> -       "xchg %rcx, regs+0x10\n\t"              \
+>> -       "xchg %rdx, regs+0x18\n\t"              \
+>> +       "xchg %rcx, regs+0x8\n\t"               \
+>> +       "xchg %rdx, regs+0x10\n\t"              \
+>> +       "xchg %rbx, regs+0x18\n\t"              \
+>>          "xchg %rbp, regs+0x28\n\t"              \
+>>          "xchg %rsi, regs+0x30\n\t"              \
+>>          "xchg %rdi, regs+0x38\n\t"              \
+>> @@ -511,9 +511,9 @@ enum vm_instruction_error_number {
+>>
+>>   #define SAVE_GPR_C                             \
+>>          "xchg %%rax, regs\n\t"                  \
+>> -       "xchg %%rbx, regs+0x8\n\t"              \
+>> -       "xchg %%rcx, regs+0x10\n\t"             \
+>> -       "xchg %%rdx, regs+0x18\n\t"             \
+>> +       "xchg %%rcx, regs+0x8\n\t"              \
+>> +       "xchg %%rdx, regs+0x10\n\t"             \
+>> +       "xchg %%rbx, regs+0x18\n\t"             \
+>>          "xchg %%rbp, regs+0x28\n\t"             \
+>>          "xchg %%rsi, regs+0x30\n\t"             \
+>>          "xchg %%rdi, regs+0x38\n\t"             \
+>> --
+>> 2.24.0.rc0.303.g954a862665-goog
+>>
+> Ping.
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
