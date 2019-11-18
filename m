@@ -2,107 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C7F310050E
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 13:01:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE2CD100569
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 13:15:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727190AbfKRMB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 07:01:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37606 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727073AbfKRMB1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 07:01:27 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E73AFB071;
-        Mon, 18 Nov 2019 12:01:20 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 8AEB01E4B0D; Mon, 18 Nov 2019 11:34:09 +0100 (CET)
-Date:   Mon, 18 Nov 2019 11:34:09 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 15/24] fs/io_uring: set FOLL_PIN via pin_user_pages()
-Message-ID: <20191118103409.GI17319@quack2.suse.cz>
-References: <20191115055340.1825745-1-jhubbard@nvidia.com>
- <20191115055340.1825745-16-jhubbard@nvidia.com>
+        id S1726691AbfKRMPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 07:15:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45682 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726490AbfKRMPW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Nov 2019 07:15:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574079321;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=Tvff9PjqKA3FC9Q4ynPdaw5FsHpxecBMvggOiUz4ut8=;
+        b=Bzi8ij9ZqTNquYNW28gZPURfUb5M9Xfgn/6eccg88eFCBgFFbcX+P4JbzgJQV/vG07suiX
+        chLW4a5Nlq0x+zOPS7/Ik56iQJL+/zJCtf7h6VGGVUw+OXekSARgxHUUc9dlaX+OaJ6Q6w
+        zPEatDa8Jnu3ZtnaJ+YjVJjnYpWiI8M=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-PUcGl2WvMXqIbBdMxSI9EQ-1; Mon, 18 Nov 2019 07:15:18 -0500
+Received: by mail-wr1-f71.google.com with SMTP id n11so2894801wrq.5
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 04:15:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xs0m8LNfKnUXtv8PJqCMeNUP3E1GcGcsQ1R88aG03k8=;
+        b=ODgnYtRHlngKHSHovPR5sqEr0dGt2yCGdg+nKO2nG4yrxmL+WJ8ovm0B5gAiHJ4khH
+         9pbsMNZribkL2o3vx7bff3p48OgNHc57M0P6J7TGbD6jg89yiNhXdPuEtDOaVwGx434Y
+         k0KsPRRJtqmKa9pTfsrlRXdhHrjmAFnUg92DPyDUmtv9JutCqaR89g/zwEXCBXdgRLKC
+         82qbgiNM+SxGAsfFbijHPjEQ1n2OhkU0xwoFJMRaVGgTWjtyq53QGlPrrWlKqJ9iOq5g
+         VBNADwIptGnC3jgdnqfITsduhOeffMzWjSjzvhqAVbHWY/zjvoha7gZCg6e8aRxtPFTb
+         zK9Q==
+X-Gm-Message-State: APjAAAX2KPHcx1UjjqLPEORHzb2JNPW+lA3NfYQrLfFniyskJeV10wDC
+        YffsH0a+r4XKu3CeNsOD4ekbVI9joxQXH5wptuHH2BvQLiwbSLRBho6jF0ItukErW6PGgLT3zxQ
+        hleZKtScw9nxZ
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr14143040wrs.288.1574079317025;
+        Mon, 18 Nov 2019 04:15:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx7HhhvDpKdnMV3luY7p/3OqKwDpVpkL0j68I32euep6688sfJZoDUoYCS30LQeY+ysUrl6xQ==
+X-Received: by 2002:a5d:4a45:: with SMTP id v5mr14143005wrs.288.1574079316717;
+        Mon, 18 Nov 2019 04:15:16 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+        by smtp.gmail.com with ESMTPSA id j67sm21255526wmb.43.2019.11.18.04.15.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2019 04:15:16 -0800 (PST)
+Subject: Re: [GIT PULL 0/5] KVM: s390: fixes and enhancements for 5.5
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20191118083602.15835-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <47e79931-f6e0-ad92-e705-0d6c07cdf515@redhat.com>
+Date:   Mon, 18 Nov 2019 13:15:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115055340.1825745-16-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191118083602.15835-1-borntraeger@de.ibm.com>
+Content-Language: en-US
+X-MC-Unique: PUcGl2WvMXqIbBdMxSI9EQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 14-11-19 21:53:31, John Hubbard wrote:
-> Convert fs/io_uring to use the new pin_user_pages() call, which sets
-> FOLL_PIN. Setting FOLL_PIN is now required for code that requires
-> tracking of pinned pages, and therefore for any code that calls
-> put_user_page().
-> 
-> In partial anticipation of this work, the io_uring code was already
-> calling put_user_page() instead of put_page(). Therefore, in order to
-> convert from the get_user_pages()/put_page() model, to the
-> pin_user_pages()/put_user_page() model, the only change required
-> here is to change get_user_pages() to pin_user_pages().
-> 
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+On 18/11/19 09:35, Christian Borntraeger wrote:
+> Paolo, Radim,
+>=20
+> everybody is busy on the ultravisor related things, so only a small
+> number of changes for s390 for 5.5.
+>=20
+> The following changes since commit 54ecb8f7028c5eb3d740bb82b0f1d90f2df63c=
+5c:
+>=20
+>   Linux 5.4-rc1 (2019-09-30 10:35:40 -0700)
+>=20
+> are available in the Git repository at:
+>=20
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/k=
+vm-s390-next-5.5-1
+>=20
+> for you to fetch changes up to c7b7de63124645089ccf9900b9e5ea08059ccae0:
+>=20
+>   KVM: s390: Do not yield when target is already running (2019-10-10 13:1=
+8:40 +0200)
+>=20
 
-Looks good to me. You can add:
+Pulled, thanks.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Paolo
 
-								Honza
+> ----------------------------------------------------------------
+> KVM: s390: small fixes and enhancements
+>=20
+> - selftest improvements
+> - yield improvements
+> - cleanups
+>=20
+> ----------------------------------------------------------------
+> Christian Borntraeger (3):
+>       selftests: kvm: make syncregs more reliable on s390
+>       KVM: s390: count invalid yields
+>       KVM: s390: Do not yield when target is already running
+>=20
+> Janosch Frank (1):
+>       KVM: s390: Cleanup kvm_arch_init error path
+>=20
+> Thomas Huth (1):
+>       KVM: s390: Remove unused parameter from __inject_sigp_restart()
+>=20
+>  arch/s390/include/asm/kvm_host.h                   |  1 +
+>  arch/s390/kvm/diag.c                               | 22 ++++++++++++++++=
+++----
+>  arch/s390/kvm/interrupt.c                          |  5 ++---
+>  arch/s390/kvm/kvm-s390.c                           | 19 ++++++++--------=
+---
+>  tools/testing/selftests/kvm/s390x/sync_regs_test.c | 15 +++++++++------
+>  5 files changed, 38 insertions(+), 24 deletions(-)
+>=20
 
-> ---
->  fs/io_uring.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index f9a38998f2fc..cff64bd00db9 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -3433,7 +3433,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
->  
->  		ret = 0;
->  		down_read(&current->mm->mmap_sem);
-> -		pret = get_user_pages(ubuf, nr_pages,
-> +		pret = pin_user_pages(ubuf, nr_pages,
->  				      FOLL_WRITE | FOLL_LONGTERM,
->  				      pages, vmas);
->  		if (pret == nr_pages) {
-> -- 
-> 2.24.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
