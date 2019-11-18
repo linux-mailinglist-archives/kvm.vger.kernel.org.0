@@ -2,67 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46BFA100C2C
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 20:23:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90E2E100C4E
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 20:40:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbfKRTXm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 14:23:42 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:40476 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726453AbfKRTXl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 14:23:41 -0500
-Received: by mail-il1-f195.google.com with SMTP id d83so17066855ilk.7
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 11:23:41 -0800 (PST)
+        id S1726475AbfKRTkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 14:40:10 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:37577 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726435AbfKRTkJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 14:40:09 -0500
+Received: by mail-io1-f67.google.com with SMTP id 1so20179744iou.4
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 11:40:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=dT/xhzAc+qcTREFMJziHxhql11mxjnVJlIwa2Z0qOxM=;
-        b=ogZ4ljgC5F8BBJpBToHoChJXsNVI449UVG/m+xW4d7H5RlfitDbLfCYGsCD3Su+l4D
-         VL9e92laOxdgGn1wbaf6kOg8wrQ0ppEYavlkfb72f/a5/WNNetG1xnyfBng3zeyXN/uB
-         fQG1Rc9c6+qKDow0phC5Z80TOuAlfI4+VUyxg4wWleicZdTkdKA7tyXkJu2Yqi0xM102
-         rODnVAwaqnN9QGUxMo5YtjneYGumXatBgYZz1L1r00iJ2Njt4VuKZ4rCRCHRrJsbE2Yb
-         p+jvWiv9LWu6NIdMxAYWEx3LPiNzzN3fG+nzkv/VnMM29DAodEi1slGukKh1De9fo5tk
-         S48w==
+        bh=ga2QOfLsmfhUnk6OwFJIP/FQLzU959KChsQqy2SkK0Y=;
+        b=PU7Vz9tJaqQojCfLRboG837OeLoOtQZpwQCf8MXYQXSQ0yEub51VGxshLMUi7epDOd
+         xs+ageFwVejd8Guw1fRAXgEkqH5NWGUoacZvQfZWOkGi80u8rFvFiXygRzqdO93LGI9O
+         /MW3unwEs6/Z15UUIOpA7rZOHQ4/OQN65nOlUo7xT2tBFkRhqtgqGAOaiaWZ8tV6kExX
+         ntZIlMGXS6u7FIBlN3BkxP/gLBPtlaR5VxLFMN6yC0qEx5Igeop/GgHvvuIt9/yuJYp0
+         mN3Wtbhb2oT1mZTHHc5opIaQaFnOs2AbGTP7nWs5zvpHRMt2yHHC01KX+EMXVYsiVqHT
+         ndWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=dT/xhzAc+qcTREFMJziHxhql11mxjnVJlIwa2Z0qOxM=;
-        b=HbFEwrZlpH97GutlDrZ8giYNO8/eIZoIlgcBOCuVBJT1LsMSBlGZ7IMqUbXDicyVxR
-         7lw3lFQMIGnaAcB8fnVn2Igu7ELNy7ov16mcJ4wD0flMHR327+S9yg87fWfiwLbz0dtG
-         5ThdMmqDzCY6R0Prh6/c+2MkN4Lw3rdlx9lq2qpZfL1XkNHf5EStuPvZLKv5KSVwKn63
-         0ARdBeirgNz0USLZSkjcS/CXUXqgwdlgBlQL002gXipbnZjYpCpDhbCVrGdy2xl+cLs9
-         aX0/xe7x9Ghr2YU1T5A8rDtO9+tNVgi8iRIjmHAuqLcbcwJJfe2ATnpP1ph9l4p15RHE
-         hb2w==
-X-Gm-Message-State: APjAAAXpWvjimfUhNy6+ySIcGiZkj7zTd4Yc+c05Hnrjf6Fh4pEBFyVS
-        fuTpM/vQra6CtAVFK3qhU1llc7H47RSRd55/Of3Kyw==
-X-Google-Smtp-Source: APXvYqyTLTOzWL8xtA5ioL5fETU5hBSfnqr9qyzpOJx7wDcfjl65qgfdzf44sTUY6wUJHGN1BIV/HY6P/mBwKt1+rKQ=
-X-Received: by 2002:a92:ce0d:: with SMTP id b13mr17843073ilo.26.1574105020622;
- Mon, 18 Nov 2019 11:23:40 -0800 (PST)
+        bh=ga2QOfLsmfhUnk6OwFJIP/FQLzU959KChsQqy2SkK0Y=;
+        b=gUX37be8jILHv5u7rTUu3GMIj6B5siw9XapbcFOSeUdtTA/i8p3/Zp9doSahqkqWsL
+         +eHqbUKqLz8K3MMrkGd1CKYyE0YxjBCu0w04u8yGabja4o5DYBHB6JfNixH/vdCPw7RJ
+         lOsfXo63BqdkpmD1IUiIyit0bGaPQ9quUcqfVFGvXWAQ9iIPF1V6fDFs0r05CoD2KqrQ
+         WIl/VJSiuW5AHIMFH2NbUMs6BqF6mzRue0tMfSUgIj6La5y72UINFzpf0o7QjcIf9DyH
+         /poxxVLC8UMPyK4djsPJ0fq18++mNA5eIlDhb8VlpXSYOCu67EVQ7f52WniaZPuP9mto
+         b1Mg==
+X-Gm-Message-State: APjAAAUBT1uyT4fhsYSHwomWvV+qFqwUKX8aXy/AXNxs3qJm7jvHHxOE
+        61AZ9cYiqn+gvVPhK/JcAiz9U05IU5GX9ktFV3eSLQ==
+X-Google-Smtp-Source: APXvYqw+d2zHth6qS/TxDmab4ggByifB0NaAT7RS/+ysk4DVgF/PlEVHyn1tIEWtnKHuSz1obEsITYvKNRASyR77Icc=
+X-Received: by 2002:a5d:9b08:: with SMTP id y8mr7466853ion.108.1574106008870;
+ Mon, 18 Nov 2019 11:40:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20191118191121.43440-1-liran.alon@oracle.com>
-In-Reply-To: <20191118191121.43440-1-liran.alon@oracle.com>
+References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com> <1574101067-5638-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1574101067-5638-2-git-send-email-pbonzini@redhat.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 18 Nov 2019 11:23:29 -0800
-Message-ID: <CALMp9eQMfMfhdteg4N6u5dM3DRw9E7WXON77jnjkxN1QgQXHZQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Use semi-colon instead of comma for
- exit-handlers initialization
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+Date:   Mon, 18 Nov 2019 11:39:57 -0800
+Message-ID: <CALMp9eQjkp7H5oj_XrmqbTsQjrjq1LrbYfxqeNUzWfT4a_Tg8Q@mail.gmail.com>
+Subject: Re: [PATCH 1/5] KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Mark Kanda <mark.kanda@oracle.com>
+        stable@vger.kernel.org, Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 11:11 AM Liran Alon <liran.alon@oracle.com> wrote:
+On Mon, Nov 18, 2019 at 10:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> KVM does not implement MSR_IA32_TSX_CTRL, so it must not be presented
+> to the guests.  It is also confusing to have !ARCH_CAP_TSX_CTRL_MSR &&
+> !RTM && ARCH_CAP_TAA_NO: lack of MSR_IA32_TSX_CTRL suggests TSX was not
+> hidden (it actually was), yet the value says that TSX is not vulnerable
+> to microarchitectural data sampling.  Fix both.
+
+I actually think kvm should virtualize IA32_TSX_CTRL for VMs that have
+exclusive use of their cores (i.e. the same VMs for which we disable
+MWAIT and HLT exiting).
