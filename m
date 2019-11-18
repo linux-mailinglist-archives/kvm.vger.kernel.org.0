@@ -2,94 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42959100B4A
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 19:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97A10100B54
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 19:18:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbfKRSRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 13:17:53 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37675 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfKRSRx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 13:17:53 -0500
-Received: by mail-wm1-f67.google.com with SMTP id b17so346984wmj.2;
-        Mon, 18 Nov 2019 10:17:52 -0800 (PST)
+        id S1726760AbfKRSR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 13:17:58 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42038 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726541AbfKRSRy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 13:17:54 -0500
+Received: by mail-wr1-f68.google.com with SMTP id a15so20684366wrf.9;
+        Mon, 18 Nov 2019 10:17:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=UHVmj17X5I97BtGdOpQHVSrZpwkyodA+Uw+toEe9ceM=;
-        b=cPW6MV8KJLW7M2YTVyqiYmE2Nl606qjFWgljH4qSErWNWVHim8rZby2mSQpjvc3ST9
-         mYGXQ4AKQat8J0GqsiVdm3CJ4SxKB3fBsYMZ1lyX9T9CdckDFD2NV9sDFuHYUjVXilW6
-         o08r5tHgtDMdyhQPGJDC5+HJEJWxitIBD4G8RfpS8Cph4v+zScQDfnmJMJJB6uroOwdW
-         1Cxc29en4+/8DeLkIMFgFosVz5Ku4E++4Ddr2KE4z7yZrZtV4fCmuqask3S6N1LYVZuY
-         d76TWYsDBN5gOsbma+2EZjItqK2aoqdGL4qv7dkmbV8J1RyK0qfK7ezfg+MTMchHYDLU
-         OGig==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=xuKE2SmFgctrg1WssQn4ZdOCP9av/DCBktsiIBAJY9w=;
+        b=F9NFiZtCXptg/YQCw2GdCexki51nGWmL9R85iUJUQlm25ZJZ0EF27N1UBN8Tpg1mUr
+         aJ9eH6X3u4U7SmVKsgajMNGmLGI9m2Gu1vgjObhH1splv5g3BLgVYpAmnk59RxQUb2Vd
+         e7wG+rYJs1VEC7XIRMt7ZIlZ1S/x8qI5uBmgvjFTiMoEL7srgfquLW+t3ou+wJGN/Us2
+         zKL/A/IgIbNgVRRrJjyWifAP7eSLJ2A9K0nW/g8Gq+29IyHa0FXLGgSqWHVwnWUWps+A
+         nK8DlqgcvFFJcx8i/cK+zTEZoMk5NYdtXN1X1YKkUmiUFmxnOJ1UXPvsjUrkLPFDeDnn
+         c5Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=UHVmj17X5I97BtGdOpQHVSrZpwkyodA+Uw+toEe9ceM=;
-        b=YmMhJPEcxIL/L8ArBOmiIDrKPfh5UKU81t4cYxELLeHtqeHXW6WEnxWTwWAl9h2MoX
-         Bs8kesOyP/dV9e+hnL6jqvdWdlEROemXluNLa7fTxT6Ufdb1S4fyKRSObMbFhL9IewdT
-         wS7h21N28KPeoU8tvToEXKeXD0C5L3K/LVQgtLjGQmHI2JRbGnbAL6Rxobwx2ZxTxLFJ
-         W4yT1YCPBmE+ms/8Xfux8RttZ+ymhnao7+e6ZYuaQ+KJjrrG6hvNwPXfgxI00fW+WJ1e
-         2/cfc/JUHpKmD5yLjAUacHNygEMYO1Z7JTEh5ntvXxyPz4+Q9Sw4GN5bgCCr0Rwx9Dwh
-         q6cw==
-X-Gm-Message-State: APjAAAUfXNuHjJ6fwJBKhG3dfo1yzI9rVSZj5hcfTobRwUJNrp5NUlcR
-        esBlZd7cHP/iz8M1hwtWK8FpDfuu
-X-Google-Smtp-Source: APXvYqzqAAHTKIDQfKYRhTR26Z/txO0yzIIJfqBYR3tKEzIR+8n7zqljh0TP349Ri4tzP/Cy80vtlQ==
-X-Received: by 2002:a1c:f317:: with SMTP id q23mr426754wmq.97.1574101071329;
-        Mon, 18 Nov 2019 10:17:51 -0800 (PST)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=xuKE2SmFgctrg1WssQn4ZdOCP9av/DCBktsiIBAJY9w=;
+        b=HijLB4nVT0NgIfiBiwaUYzmEMJrjmld/ZAxi6p9Jdbh3V8oMTHmy/+ELkunxy2eck5
+         pgWPFCxxsx6JgVD1CbLF4jkEnQwnjFpndLa238h2Q80ch89Epn/FC0p5t4Pc9yU7Xkam
+         OW5HIXe2SAx/Q70Ze+kA8bUBzSJ0JDvBCRm4apV4SkUmZIxqLZWvwRa+2nDwM5rfVqLy
+         z2/CrhJY5JzS4cv7ME+LvAblzDjrRxp5HrglZyLOojYxIHciZ+Hr7IKGvTQTO4mNA+Nd
+         nb7DbS+0+wK7y0FIvQv8txGveJ5P77pxGs2j4VOuwFOxjQNpmL9ixk2mFqDVvWE09vpN
+         TqRQ==
+X-Gm-Message-State: APjAAAXDGApqXAz5ReObmJJmQAVNAwk3mvxaKPH1CuVTVcITjAtaUIgh
+        3VZZMej+p5Cfa/yPz4Q0htdxx0Yx
+X-Google-Smtp-Source: APXvYqzhyJ4Kh/a6galI0gjAkld4KLQic+pfcqsfZ4JLq3E9hN5NJdv2AysoklmRZ65fyziweX6Jqw==
+X-Received: by 2002:adf:f445:: with SMTP id f5mr33093504wrp.193.1574101072269;
+        Mon, 18 Nov 2019 10:17:52 -0800 (PST)
 Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id v81sm233794wmg.4.2019.11.18.10.17.50
+        by smtp.gmail.com with ESMTPSA id v81sm233794wmg.4.2019.11.18.10.17.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2019 10:17:50 -0800 (PST)
+        Mon, 18 Nov 2019 10:17:51 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     jmattson@google.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH 0/5] KVM: vmx: implement MSR_IA32_TSX_CTRL for guests
-Date:   Mon, 18 Nov 2019 19:17:42 +0100
-Message-Id: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        stable@vger.kernel.org
+Subject: [PATCH 1/5] KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES
+Date:   Mon, 18 Nov 2019 19:17:43 +0100
+Message-Id: <1574101067-5638-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
+References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current guest mitigation of TAA is both too heavy and not really
-sufficient.  It is too heavy because it will cause some affected CPUs
-(those that have MDS_NO but lack TAA_NO) to fall back to VERW and
-get the corresponding slowdown.  It is not really sufficient because
-it will cause the MDS_NO bit to disappear upon microcode update, so
-that VMs started before the microcode update will not be runnable
-anymore afterwards, even with tsx=on.
+KVM does not implement MSR_IA32_TSX_CTRL, so it must not be presented
+to the guests.  It is also confusing to have !ARCH_CAP_TSX_CTRL_MSR &&
+!RTM && ARCH_CAP_TAA_NO: lack of MSR_IA32_TSX_CTRL suggests TSX was not
+hidden (it actually was), yet the value says that TSX is not vulnerable
+to microarchitectural data sampling.  Fix both.
 
-Instead, if tsx=on on the host, we can emulate MSR_IA32_TSX_CTRL for
-the guest and let it run without the VERW mitigation.  Even though
-MSR_IA32_TSX_CTRL is quite heavyweight, and we do not want to write
-it on every vmentry, we can use the shared MSR functionality because
-the host kernel need not protect itself from TSX-based side-channels.
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/x86.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Patch 1 is a minimal fix for MSR_IA32_ARCH_CAPABILITIES for stable
-kernels.  The other four patches implement the feature.
-
-Getting some help testing this series with the kvm-unit-tests patch I
-have just sent would be great; I could only test this on a machine that
-I couldn't reboot, and therefore I could only work on an older kernel.
-
-Paolo Bonzini (5):
-  KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES
-  KVM: x86: do not modify masked bits of shared MSRs
-  KVM: x86: implement MSR_IA32_TSX_CTRL effect on CPUID
-  KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM functionality
-  KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable TSX on guest that lack
-    it
-
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            |  8 +++--
- arch/x86/kvm/vmx/vmx.c          | 78 ++++++++++++++++++++++++++++++++---------
- arch/x86/kvm/x86.c              | 34 ++++++++----------
- 4 files changed, 82 insertions(+), 39 deletions(-)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5d530521f11d..6ea735d632e9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1327,12 +1327,18 @@ static u64 kvm_get_arch_capabilities(void)
+ 	 * If TSX is disabled on the system, guests are also mitigated against
+ 	 * TAA and clear CPU buffer mitigation is not required for guests.
+ 	 */
+-	if (boot_cpu_has_bug(X86_BUG_TAA) && boot_cpu_has(X86_FEATURE_RTM) &&
+-	    (data & ARCH_CAP_TSX_CTRL_MSR))
++	if (!boot_cpu_has(X86_FEATURE_RTM))
++		data &= ~ARCH_CAP_TAA_NO;
++	else if (!boot_cpu_has_bug(X86_BUG_TAA))
++		data |= ARCH_CAP_TAA_NO;
++	else if (data & ARCH_CAP_TSX_CTRL_MSR)
+ 		data &= ~ARCH_CAP_MDS_NO;
+ 
++	/* KVM does not emulate MSR_IA32_TSX_CTRL.  */
++	data &= ~ARCH_CAP_TSX_CTRL_MSR;
+ 	return data;
+ }
++EXPORT_SYMBOL_GPL(kvm_get_arch_capabilities);
+ 
+ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+ {
 -- 
 1.8.3.1
+
 
