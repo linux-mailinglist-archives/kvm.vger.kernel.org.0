@@ -2,85 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84383100235
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 11:18:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F734100281
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 11:36:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbfKRKSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 05:18:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52678 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726460AbfKRKSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 05:18:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574072296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=2E3zGvcBzTUcLhpxKfOcu9Ms2VjdQXXDxg4LgjxU4cY=;
-        b=WUuPqVvE3pe5UhVUaiEVzClhAClFjuYPHQlCrkXVHrGVY8Fa7zUmNeKnLCxlz0GF5c5wwe
-        7P13vjU25kPukRFarCm9hEPhehceOqPKCgc8Oshdn5KmTkBMQ+zt1CR4oNR7DvoynVSq2E
-        qCZAloVo0yQ3Vcg/xBVfDTkFFJ+cz4A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-bsPBLE6KOS2ORBOrPw_sNw-1; Mon, 18 Nov 2019 05:18:13 -0500
-Received: by mail-wr1-f71.google.com with SMTP id e3so15059165wrs.17
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 02:18:13 -0800 (PST)
+        id S1726600AbfKRKgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 05:36:02 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:47030 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726490AbfKRKgB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 05:36:01 -0500
+Received: by mail-wr1-f68.google.com with SMTP id b3so18783667wrs.13
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 02:36:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=O6snPj4zRF7PnmdnvOs9XQoZqp3Knhprhwo6jIsI7pk=;
+        b=EDk8Fod4KYVy3Ku3JKZWOBfrr3rK7aA/YCCASUklWuJkEwjDeojA2EuQOaogcy1Ce4
+         91VzGpCS11mVTlMh97BzYznrWt0ZB0pWImcJc1CMhWmZWbJJK7kBQS/ukmqK7LhSRM+k
+         FuxXis9+tN4+RJ/2LWZVcQL+JLlu725EEPJ/k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NUX8CeNVsMpg2rxsEpL/fpGBcxg3BWxo3mZefOvTINk=;
-        b=A3VuiyNTI4BpfXbhuGMI8nzBk8aoBY0rw0nEV6faughhu+w+iv5IDBxyXSUz94w0JO
-         8MyOu+XjVo2jRAoSzhjzDX9CfwFAR0/6bxSRDOrwWlc41h0JmVF5doFUXbM+pz8ZJES4
-         0QLxqXjP2U3dqA2rfviMaj/qsl8iLuwhwR2w7vZ7cTycZYHO1jYHJWAxqaDoNajtYpCK
-         UKkJ+uY4x4m2RxI41e2odEJQeuoFSDDtGYoOi90FUfXU7d7+GAAginQIZGZLGUd6XBJd
-         87Ru/PF9oRA73InDLFHC3IFIxVcfa8JpIOnAQ95So5G0jpp/7t1bC0YPhOqQRDsWCfj8
-         TXLA==
-X-Gm-Message-State: APjAAAX28vifaUJEjDBCrSCUHOISlrBtKPvntY8ulin1JfUQakT2Z8lu
-        kZea+P4NrcD+EtQjzpXmeKwezrSeifhzSuJBjgTSaBjYVIyVbp8RUmMwAYn7NNn9qAJurSD9BCb
-        FYdcrU3iyMkAR
-X-Received: by 2002:a05:600c:489:: with SMTP id d9mr16089208wme.20.1574072292021;
-        Mon, 18 Nov 2019 02:18:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxiD+WufhFIR18R5qHmYm4WnrDMHd+vwAEjPuAJUZQ2UUYnNrw1gUpBslV0U1a4V+Vj4OhcmA==
-X-Received: by 2002:a05:600c:489:: with SMTP id d9mr16089166wme.20.1574072291742;
-        Mon, 18 Nov 2019 02:18:11 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
-        by smtp.gmail.com with ESMTPSA id j2sm22693993wrt.61.2019.11.18.02.18.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Nov 2019 02:18:11 -0800 (PST)
-Subject: Re: [kvm-unit-tests PULL 00/12] s390x and Travis CI updates
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-References: <20191118100719.7968-1-david@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <390f8a03-fdb1-b67b-1342-e6714ba24ba1@redhat.com>
-Date:   Mon, 18 Nov 2019 11:18:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=O6snPj4zRF7PnmdnvOs9XQoZqp3Knhprhwo6jIsI7pk=;
+        b=mDswTYucywRuOlZ7PiexvQp8FZzF1oRpeIh7EMmhpRG7HxnI10foX487uRTrFD+rxy
+         GpTCqmk1OxLOx5mBYrRaZZbb4d9W3TSWvtcO/SO5D2yfTTLvLkF0mnm+Z1Id07GaXhx6
+         KFj1/571QVWKEdc9Gg8RImn39uwOeC61zCfdla1BOUHyWKsA1R3qYeRZ213D5pYyoPHy
+         zFLJ6OLN3cxVwBBh3gfNUmxjAEraoch1ao8+BOTlV7y4aFfO6+ytgxNL35GZmouoLw7l
+         kdnXIog6Aut6rex5giR751scvTB/nk4AxP69d2CaqQ8HnWDTc+yiEOD24+zb9zxkJD04
+         Jd9Q==
+X-Gm-Message-State: APjAAAU7ZvaBy1lHLCEeXP9EuDDx8LJlHu95pVd6GBBD29e19shuZkgQ
+        N5O35Cr6LGkRFUImIil3lHBYtg==
+X-Google-Smtp-Source: APXvYqxwliWhIEUAO9jqkKlsD9SR6F/Gar8dxbJUUc2j0kGt2YK8h8lt3xuihOzMEA3CN5LZFOMWFw==
+X-Received: by 2002:adf:ec42:: with SMTP id w2mr15988758wrn.32.1574073359659;
+        Mon, 18 Nov 2019 02:35:59 -0800 (PST)
+Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
+        by smtp.gmail.com with ESMTPSA id j2sm22749200wrt.61.2019.11.18.02.35.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2019 02:35:58 -0800 (PST)
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+To:     DRI Development <dri-devel@lists.freedesktop.org>
+Cc:     Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: [PATCH 14/15] sample/vfio-mdev/mbocs: Remove dma_buf_k(un)map support
+Date:   Mon, 18 Nov 2019 11:35:35 +0100
+Message-Id: <20191118103536.17675-15-daniel.vetter@ffwll.ch>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191118103536.17675-1-daniel.vetter@ffwll.ch>
+References: <20191118103536.17675-1-daniel.vetter@ffwll.ch>
 MIME-Version: 1.0
-In-Reply-To: <20191118100719.7968-1-david@redhat.com>
-Content-Language: en-US
-X-MC-Unique: bsPBLE6KOS2ORBOrPw_sNw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/11/19 11:07, David Hildenbrand wrote:
->   https://github.com/davidhildenbrand/kvm-unit-tests.git tags/s390x-2019-=
-11-18
+No in-tree users left.
 
-Pulled, thanks.
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: kvm@vger.kernel.org
+--
+Ack for merging this through drm trees very much appreciated.
+-Daniel
+---
+ samples/vfio-mdev/mbochs.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-Paolo
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index ac5c8c17b1ff..3cc5e5921682 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -891,26 +891,10 @@ static void mbochs_release_dmabuf(struct dma_buf *buf)
+ 	mutex_unlock(&mdev_state->ops_lock);
+ }
+ 
+-static void *mbochs_kmap_dmabuf(struct dma_buf *buf, unsigned long page_num)
+-{
+-	struct mbochs_dmabuf *dmabuf = buf->priv;
+-	struct page *page = dmabuf->pages[page_num];
+-
+-	return kmap(page);
+-}
+-
+-static void mbochs_kunmap_dmabuf(struct dma_buf *buf, unsigned long page_num,
+-				 void *vaddr)
+-{
+-	kunmap(vaddr);
+-}
+-
+ static struct dma_buf_ops mbochs_dmabuf_ops = {
+ 	.map_dma_buf	  = mbochs_map_dmabuf,
+ 	.unmap_dma_buf	  = mbochs_unmap_dmabuf,
+ 	.release	  = mbochs_release_dmabuf,
+-	.map		  = mbochs_kmap_dmabuf,
+-	.unmap		  = mbochs_kunmap_dmabuf,
+ 	.mmap		  = mbochs_mmap_dmabuf,
+ };
+ 
+-- 
+2.24.0
 
