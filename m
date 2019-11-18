@@ -2,54 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C09A100220
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 11:08:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84383100235
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 11:18:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726939AbfKRKIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 05:08:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20580 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726956AbfKRKIl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Nov 2019 05:08:41 -0500
+        id S1726506AbfKRKSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 05:18:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52678 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726460AbfKRKSR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 05:18:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574071720;
+        s=mimecast20190719; t=1574072296;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JCxaUCZLLy3tTwT9N1l1ulIsEarmu4H/s/AHqsHjk00=;
-        b=Niih3T+UUzvP3apTeiquGpnGVNc+oUjOMQLUU2JEhlwVXAgivoxvRJhpfP1c3F+py5lim4
-        Vire7PoTg9h/j3iNiEjoMhj/Ewr3cqKnr6gN4uAKkaMinPK89RzncWkxqaRDpaPKYKit1r
-        ygxw+IBi7VtWUxxnhg+xf6eahiEcNMs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-ZvmXdU10Mu6TpM86W3qAcw-1; Mon, 18 Nov 2019 05:08:39 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25E15802691;
-        Mon, 18 Nov 2019 10:08:38 +0000 (UTC)
-Received: from t460s.redhat.com (unknown [10.36.118.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32CC866856;
-        Mon, 18 Nov 2019 10:08:34 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=2E3zGvcBzTUcLhpxKfOcu9Ms2VjdQXXDxg4LgjxU4cY=;
+        b=WUuPqVvE3pe5UhVUaiEVzClhAClFjuYPHQlCrkXVHrGVY8Fa7zUmNeKnLCxlz0GF5c5wwe
+        7P13vjU25kPukRFarCm9hEPhehceOqPKCgc8Oshdn5KmTkBMQ+zt1CR4oNR7DvoynVSq2E
+        qCZAloVo0yQ3Vcg/xBVfDTkFFJ+cz4A=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-bsPBLE6KOS2ORBOrPw_sNw-1; Mon, 18 Nov 2019 05:18:13 -0500
+Received: by mail-wr1-f71.google.com with SMTP id e3so15059165wrs.17
+        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 02:18:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NUX8CeNVsMpg2rxsEpL/fpGBcxg3BWxo3mZefOvTINk=;
+        b=A3VuiyNTI4BpfXbhuGMI8nzBk8aoBY0rw0nEV6faughhu+w+iv5IDBxyXSUz94w0JO
+         8MyOu+XjVo2jRAoSzhjzDX9CfwFAR0/6bxSRDOrwWlc41h0JmVF5doFUXbM+pz8ZJES4
+         0QLxqXjP2U3dqA2rfviMaj/qsl8iLuwhwR2w7vZ7cTycZYHO1jYHJWAxqaDoNajtYpCK
+         UKkJ+uY4x4m2RxI41e2odEJQeuoFSDDtGYoOi90FUfXU7d7+GAAginQIZGZLGUd6XBJd
+         87Ru/PF9oRA73InDLFHC3IFIxVcfa8JpIOnAQ95So5G0jpp/7t1bC0YPhOqQRDsWCfj8
+         TXLA==
+X-Gm-Message-State: APjAAAX28vifaUJEjDBCrSCUHOISlrBtKPvntY8ulin1JfUQakT2Z8lu
+        kZea+P4NrcD+EtQjzpXmeKwezrSeifhzSuJBjgTSaBjYVIyVbp8RUmMwAYn7NNn9qAJurSD9BCb
+        FYdcrU3iyMkAR
+X-Received: by 2002:a05:600c:489:: with SMTP id d9mr16089208wme.20.1574072292021;
+        Mon, 18 Nov 2019 02:18:12 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxiD+WufhFIR18R5qHmYm4WnrDMHd+vwAEjPuAJUZQ2UUYnNrw1gUpBslV0U1a4V+Vj4OhcmA==
+X-Received: by 2002:a05:600c:489:: with SMTP id d9mr16089166wme.20.1574072291742;
+        Mon, 18 Nov 2019 02:18:11 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+        by smtp.gmail.com with ESMTPSA id j2sm22693993wrt.61.2019.11.18.02.18.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Nov 2019 02:18:11 -0800 (PST)
+Subject: Re: [kvm-unit-tests PULL 00/12] s390x and Travis CI updates
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests PULL 12/12] travis.yml: Expect that at least one test succeeds
-Date:   Mon, 18 Nov 2019 11:07:19 +0100
-Message-Id: <20191118100719.7968-13-david@redhat.com>
-In-Reply-To: <20191118100719.7968-1-david@redhat.com>
+        Janosch Frank <frankja@linux.ibm.com>
 References: <20191118100719.7968-1-david@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <390f8a03-fdb1-b67b-1342-e6714ba24ba1@redhat.com>
+Date:   Mon, 18 Nov 2019 11:18:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: ZvmXdU10Mu6TpM86W3qAcw-1
+In-Reply-To: <20191118100719.7968-1-david@redhat.com>
+Content-Language: en-US
+X-MC-Unique: bsPBLE6KOS2ORBOrPw_sNw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -58,31 +76,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Huth <thuth@redhat.com>
+On 18/11/19 11:07, David Hildenbrand wrote:
+>   https://github.com/davidhildenbrand/kvm-unit-tests.git tags/s390x-2019-=
+11-18
 
-While working on the travis.yml file, I've run into cases where
-all tests are reported as "SKIP" by the run_test.sh script (e.g.
-when QEMU could not be started). This should not result in a
-successful test run, so mark it as failed if not at least one
-test passed.
+Pulled, thanks.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <20191113112649.14322-6-thuth@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- .travis.yml | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/.travis.yml b/.travis.yml
-index 6858c3a..4162366 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -116,3 +116,4 @@ script:
-   - make -j3
-   - ACCEL=3D"${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
-   - if grep -q FAIL results.txt ; then exit 1 ; fi
-+  - if ! grep -q PASS results.txt ; then exit 1 ; fi
---=20
-2.21.0
+Paolo
 
