@@ -2,262 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0C611004B8
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 12:50:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE91E1004DF
+	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 12:58:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727050AbfKRLue (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 06:50:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27359 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726704AbfKRLud (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 06:50:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574077831;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P4gdRaiq5NJXwEpEtK5L6jmsMQ23dZMrC6/urd2TGn4=;
-        b=INgxVAVCZuf/ZjFFFIlohCzcCkjCfHAYVfxqtOIv20wGnSkhkISDz+vQTDI9whcc9xQmhu
-        QDYY8wtfi4cPL8CntLXm6OXO5t6zoXilqjCJKU3Xy3lc43wkIjqDUr+TcNtGw3k19d7/o8
-        XR8B5bZc9gEtLxEi42zp0oWsM5WX8Ig=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-NOpYb9ICO-atLqfJVTFOOg-1; Mon, 18 Nov 2019 06:50:29 -0500
-Received: by mail-wr1-f72.google.com with SMTP id p4so15125664wrw.15
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 03:50:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uwsSsleVAQSgmtTsdOA+w72Xmy5s18Cc0V6ZitNVUH8=;
-        b=izm73qbu/jv7jaVUizogjQ4gQf62qmEIBsOePb6udvictLmF/2lgXN2x+3gX4l+orh
-         5yPEqz2euDrBXZjB+O5XZNnv6FwJoUg3PSRiH2yEbBN/dtNdk78/JlwOgWN95mb0TeOy
-         vBku2DdNRbqkxcyMJMazPKPZ2cqKeEtIRTWmiXXafSp7ZCWVaEpZlXD+SC8xx5pubelW
-         aOAdYBhUid+1VgCH6YpisG1H8P1lYo/CT0q3vCwUkd/B4q4NjPFzP9d0tpA9BLCEt+Y+
-         yVLVR+3tST8MFaAYxTPruhzf+K1P7WcK0yjnXF7YgqKYojB4S1EhJlR9iZ42Q0Y8nfUd
-         dePA==
-X-Gm-Message-State: APjAAAXGL8TE9u2CkHCFSQCjloDAATzINhE/MBWJegtWywRJm2XoJE2G
-        YkOEy+uUqKyYoLZ/dhYam7Bcy7vY6FdO6jLOEC1FuEgBPmy3MVSbCIa9TxJP7/H5oFN8xGtiwq6
-        42K2Z8BIs3aQi
-X-Received: by 2002:a7b:c211:: with SMTP id x17mr27094711wmi.71.1574077827598;
-        Mon, 18 Nov 2019 03:50:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwT1ytJLFJcV1U/5tskHFw15cnFJ3HXvueU1Qa+VEy0QDuO/KsHYfLOkMUfMdSgfmWk9WAswg==
-X-Received: by 2002:a7b:c211:: with SMTP id x17mr27094676wmi.71.1574077827292;
-        Mon, 18 Nov 2019 03:50:27 -0800 (PST)
-Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
-        by smtp.gmail.com with ESMTPSA id z14sm22287121wrl.60.2019.11.18.03.50.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2019 03:50:26 -0800 (PST)
-Date:   Mon, 18 Nov 2019 12:50:24 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "David S. Miller" <davem@davemloft.net>
-Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        kvm <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH net-next v5 4/5] vhost/vsock: split packets to send using
- multiple buffers
-Message-ID: <CAGxU2F7wbR-4Y310LJfkJkYFLtaJssmFVR6d=OJd4skYvw6n-A@mail.gmail.com>
-References: <20190730154334.237789-1-sgarzare@redhat.com>
- <20190730154334.237789-5-sgarzare@redhat.com>
+        id S1726952AbfKRL6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 06:58:44 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36158 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726506AbfKRL6m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 06:58:42 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 67C34AE68;
+        Mon, 18 Nov 2019 11:58:37 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 912131E4B0C; Mon, 18 Nov 2019 12:58:29 +0100 (CET)
+Date:   Mon, 18 Nov 2019 12:58:29 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v5 17/24] mm/gup: track FOLL_PIN pages
+Message-ID: <20191118115829.GJ17319@quack2.suse.cz>
+References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+ <20191115055340.1825745-18-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190730154334.237789-5-sgarzare@redhat.com>
-X-MC-Unique: NOpYb9ICO-atLqfJVTFOOg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191115055340.1825745-18-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dave,
-talking to Michael, we realized that this patch merged upstream (commit
-6dbd3e66e7785a2f055bf84d98de9b8fd31ff3f5) solves an issue in the
-device emulation in the vhost-vsock module, because the emulation
-did not meet the specification, assuming that the buffer in the RX
-virtqueue was always 4 KB, without checking the actual size.
+On Thu 14-11-19 21:53:33, John Hubbard wrote:
+> Add tracking of pages that were pinned via FOLL_PIN.
+> 
+> As mentioned in the FOLL_PIN documentation, callers who effectively set
+> FOLL_PIN are required to ultimately free such pages via put_user_page().
+> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
+> for DIO and/or RDMA use".
+> 
+> Pages that have been pinned via FOLL_PIN are identifiable via a
+> new function call:
+> 
+>    bool page_dma_pinned(struct page *page);
+> 
+> What to do in response to encountering such a page, is left to later
+> patchsets. There is discussion about this in [1].
+						^^ missing this reference
+in the changelog...
 
-We think it's better to apply this patch in -stable.
-
-What do you think?
-
-Thanks,
-Stefano
-
-On Tue, Jul 30, 2019 at 5:44 PM Stefano Garzarella <sgarzare@redhat.com> wr=
-ote:
->
-> If the packets to sent to the guest are bigger than the buffer
-> available, we can split them, using multiple buffers and fixing
-> the length in the packet header.
-> This is safe since virtio-vsock supports only stream sockets.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
+> 
+> Suggested-by: Jan Kara <jack@suse.cz>
+> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 > ---
->  drivers/vhost/vsock.c                   | 66 ++++++++++++++++++-------
->  net/vmw_vsock/virtio_transport_common.c | 15 ++++--
->  2 files changed, 60 insertions(+), 21 deletions(-)
->
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 6c8390a2af52..9f57736fe15e 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -102,7 +102,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock=
-,
->                 struct iov_iter iov_iter;
->                 unsigned out, in;
->                 size_t nbytes;
-> -               size_t len;
-> +               size_t iov_len, payload_len;
->                 int head;
->
->                 spin_lock_bh(&vsock->send_pkt_list_lock);
-> @@ -147,8 +147,24 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsoc=
-k,
->                         break;
->                 }
->
-> -               len =3D iov_length(&vq->iov[out], in);
-> -               iov_iter_init(&iov_iter, READ, &vq->iov[out], in, len);
-> +               iov_len =3D iov_length(&vq->iov[out], in);
-> +               if (iov_len < sizeof(pkt->hdr)) {
-> +                       virtio_transport_free_pkt(pkt);
-> +                       vq_err(vq, "Buffer len [%zu] too small\n", iov_le=
-n);
-> +                       break;
-> +               }
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index 6588d2e02628..db872766480f 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -1054,6 +1054,8 @@ static inline __must_check bool try_get_page(struct page *page)
+>  	return true;
+>  }
+>  
+> +__must_check bool user_page_ref_inc(struct page *page);
 > +
-> +               iov_iter_init(&iov_iter, READ, &vq->iov[out], in, iov_len=
-);
-> +               payload_len =3D pkt->len - pkt->off;
-> +
-> +               /* If the packet is greater than the space available in t=
-he
-> +                * buffer, we split it using multiple buffers.
-> +                */
-> +               if (payload_len > iov_len - sizeof(pkt->hdr))
-> +                       payload_len =3D iov_len - sizeof(pkt->hdr);
-> +
-> +               /* Set the correct length in the header */
-> +               pkt->hdr.len =3D cpu_to_le32(payload_len);
->
->                 nbytes =3D copy_to_iter(&pkt->hdr, sizeof(pkt->hdr), &iov=
-_iter);
->                 if (nbytes !=3D sizeof(pkt->hdr)) {
-> @@ -157,33 +173,47 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vso=
-ck,
->                         break;
->                 }
->
-> -               nbytes =3D copy_to_iter(pkt->buf, pkt->len, &iov_iter);
-> -               if (nbytes !=3D pkt->len) {
-> +               nbytes =3D copy_to_iter(pkt->buf + pkt->off, payload_len,
-> +                                     &iov_iter);
-> +               if (nbytes !=3D payload_len) {
->                         virtio_transport_free_pkt(pkt);
->                         vq_err(vq, "Faulted on copying pkt buf\n");
->                         break;
->                 }
->
-> -               vhost_add_used(vq, head, sizeof(pkt->hdr) + pkt->len);
-> +               vhost_add_used(vq, head, sizeof(pkt->hdr) + payload_len);
->                 added =3D true;
->
-> -               if (pkt->reply) {
-> -                       int val;
-> -
-> -                       val =3D atomic_dec_return(&vsock->queued_replies)=
-;
-> -
-> -                       /* Do we have resources to resume tx processing? =
-*/
-> -                       if (val + 1 =3D=3D tx_vq->num)
-> -                               restart_tx =3D true;
-> -               }
-> -
->                 /* Deliver to monitoring devices all correctly transmitte=
-d
->                  * packets.
->                  */
->                 virtio_transport_deliver_tap_pkt(pkt);
->
-> -               total_len +=3D pkt->len;
-> -               virtio_transport_free_pkt(pkt);
-> +               pkt->off +=3D payload_len;
-> +               total_len +=3D payload_len;
-> +
-> +               /* If we didn't send all the payload we can requeue the p=
-acket
-> +                * to send it with the next available buffer.
-> +                */
-> +               if (pkt->off < pkt->len) {
-> +                       spin_lock_bh(&vsock->send_pkt_list_lock);
-> +                       list_add(&pkt->list, &vsock->send_pkt_list);
-> +                       spin_unlock_bh(&vsock->send_pkt_list_lock);
-> +               } else {
-> +                       if (pkt->reply) {
-> +                               int val;
-> +
-> +                               val =3D atomic_dec_return(&vsock->queued_=
-replies);
-> +
-> +                               /* Do we have resources to resume tx
-> +                                * processing?
-> +                                */
-> +                               if (val + 1 =3D=3D tx_vq->num)
-> +                                       restart_tx =3D true;
-> +                       }
-> +
-> +                       virtio_transport_free_pkt(pkt);
-> +               }
->         } while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
->         if (added)
->                 vhost_signal(&vsock->dev, vq);
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virt=
-io_transport_common.c
-> index 34a2b42313b7..56fab3f03d0e 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -97,8 +97,17 @@ static struct sk_buff *virtio_transport_build_skb(void=
- *opaque)
->         struct virtio_vsock_pkt *pkt =3D opaque;
->         struct af_vsockmon_hdr *hdr;
->         struct sk_buff *skb;
-> +       size_t payload_len;
-> +       void *payload_buf;
->
-> -       skb =3D alloc_skb(sizeof(*hdr) + sizeof(pkt->hdr) + pkt->len,
-> +       /* A packet could be split to fit the RX buffer, so we can retrie=
-ve
-> +        * the payload length from the header and the buffer pointer taki=
-ng
-> +        * care of the offset in the original packet.
-> +        */
-> +       payload_len =3D le32_to_cpu(pkt->hdr.len);
-> +       payload_buf =3D pkt->buf + pkt->off;
-> +
-> +       skb =3D alloc_skb(sizeof(*hdr) + sizeof(pkt->hdr) + payload_len,
->                         GFP_ATOMIC);
->         if (!skb)
->                 return NULL;
-> @@ -138,8 +147,8 @@ static struct sk_buff *virtio_transport_build_skb(voi=
-d *opaque)
->
->         skb_put_data(skb, &pkt->hdr, sizeof(pkt->hdr));
->
-> -       if (pkt->len) {
-> -               skb_put_data(skb, pkt->buf, pkt->len);
-> +       if (payload_len) {
-> +               skb_put_data(skb, payload_buf, payload_len);
->         }
->
->         return skb;
-> --
-> 2.20.1
->
+>  static inline void put_page(struct page *page)
+>  {
+>  	page = compound_head(page);
+> @@ -1071,29 +1073,70 @@ static inline void put_page(struct page *page)
+>  		__put_page(page);
+>  }
+>  
+> -/**
+> - * put_user_page() - release a gup-pinned page
+> - * @page:            pointer to page to be released
+> +/*
+> + * GUP_PIN_COUNTING_BIAS, and the associated functions that use it, overload
+> + * the page's refcount so that two separate items are tracked: the original page
+> + * reference count, and also a new count of how many get_user_pages() calls were
+							^^ pin_user_pages()
 
+> + * made against the page. ("gup-pinned" is another term for the latter).
+> + *
+> + * With this scheme, get_user_pages() becomes special: such pages are marked
+			^^^ pin_user_pages()
+
+> + * as distinct from normal pages. As such, the put_user_page() call (and its
+> + * variants) must be used in order to release gup-pinned pages.
+> + *
+> + * Choice of value:
+>   *
+> - * Pages that were pinned via pin_user_pages*() must be released via either
+> - * put_user_page(), or one of the put_user_pages*() routines. This is so that
+> - * eventually such pages can be separately tracked and uniquely handled. In
+> - * particular, interactions with RDMA and filesystems need special handling.
+> + * By making GUP_PIN_COUNTING_BIAS a power of two, debugging of page reference
+> + * counts with respect to get_user_pages() and put_user_page() becomes simpler,
+				^^^ pin_user_pages()
+
+> + * due to the fact that adding an even power of two to the page refcount has
+> + * the effect of using only the upper N bits, for the code that counts up using
+> + * the bias value. This means that the lower bits are left for the exclusive
+> + * use of the original code that increments and decrements by one (or at least,
+> + * by much smaller values than the bias value).
+>   *
+> - * put_user_page() and put_page() are not interchangeable, despite this early
+> - * implementation that makes them look the same. put_user_page() calls must
+> - * be perfectly matched up with pin*() calls.
+> + * Of course, once the lower bits overflow into the upper bits (and this is
+> + * OK, because subtraction recovers the original values), then visual inspection
+> + * no longer suffices to directly view the separate counts. However, for normal
+> + * applications that don't have huge page reference counts, this won't be an
+> + * issue.
+> + *
+> + * Locking: the lockless algorithm described in page_cache_get_speculative()
+> + * and page_cache_gup_pin_speculative() provides safe operation for
+> + * get_user_pages and page_mkclean and other calls that race to set up page
+> + * table entries.
+>   */
+...
+> @@ -2070,9 +2191,16 @@ static int gup_hugepte(pte_t *ptep, unsigned long sz, unsigned long addr,
+>  	page = head + ((addr & (sz-1)) >> PAGE_SHIFT);
+>  	refs = __record_subpages(page, addr, end, pages + *nr);
+>  
+> -	head = try_get_compound_head(head, refs);
+> -	if (!head)
+> -		return 0;
+> +	if (flags & FOLL_PIN) {
+> +		head = page;
+> +		if (unlikely(!user_page_ref_inc(head)))
+> +			return 0;
+> +		head = page;
+
+Why do you assign 'head' twice? Also the refcounting logic is repeated
+several times so perhaps you can factor it out in to a helper function or
+even move it to __record_subpages()?
+
+> +	} else {
+> +		head = try_get_compound_head(head, refs);
+> +		if (!head)
+> +			return 0;
+> +	}
+>  
+>  	if (unlikely(pte_val(pte) != pte_val(*ptep))) {
+>  		put_compound_head(head, refs);
+
+So this will do the wrong thing for FOLL_PIN. We took just one "pin"
+reference there but here we'll release 'refs' normal references AFAICT.
+Also the fact that you take just one pin reference for each huge page
+substantially changes how GUP refcounting works in the huge page case.
+Currently, FOLL_GET users can be completely agnostic of huge pages. So you
+can e.g. GUP whole 2 MB page, submit it as 2 different bios and then
+drop page references from each bio completion function. With your new
+FOLL_PIN behavior you cannot do that and I believe it will be a problem for
+some users. So I think you have to maintain the behavior that you increase
+the head->_refcount by (refs * GUP_PIN_COUNTING_BIAS) here.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
