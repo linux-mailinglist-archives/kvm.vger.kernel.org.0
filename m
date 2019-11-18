@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 634E0100218
+	by mail.lfdr.de (Postfix) with ESMTP id AACA3100219
 	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 11:08:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726740AbfKRKIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 05:08:16 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32485 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726490AbfKRKIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 05:08:16 -0500
+        id S1726855AbfKRKIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 05:08:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22811 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726761AbfKRKIS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 05:08:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574071695;
+        s=mimecast20190719; t=1574071697;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q9/21UM7sPX+fr8RxiF1Rp1FbeR5FKDFOLwbAWbjJXQ=;
-        b=H7GPZgpt7zIeq3fgZikXJhCKOR7n1jQMJzI9qACLe3yW1Fp4INDEaN6SJzvp6k1xK0Vmiw
-        BumsF5NwZookO7tTK0e32EBoqgvPXc4R2o7fa09VP0uykkR4/5pnltwhwFojNdeS0bfoTj
-        Z8eMFIYl0fECA7v7ZXBzk1gqUDcEkes=
+        bh=AsF9OHSdlsKS6rwHyhm8uC61MVisTsEjO24dF2lfbXE=;
+        b=IwS/Dulg8jqgvMqrMJhc7jQWDiKBM6zcFDITRSElC5YyYbqd0PjFvysCDkI2tglEURRlC7
+        IHOtlxO+TItOPpCndUH6+DT2V561WnHqpNqhzwRC1TQZtjGX3AZgwYgnV/OAhh57oKa+S3
+        NQEJwPjMFL+AXkG40KQ15I5hGx/JGWY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-gT_z_zUdPuSVxMhRuB_pUQ-1; Mon, 18 Nov 2019 05:08:11 -0500
+ us-mta-370-RVkvkPo_MOqD3kr72BuCWA-1; Mon, 18 Nov 2019 05:08:15 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9ECF1034B3A;
-        Mon, 18 Nov 2019 10:08:09 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58095477;
+        Mon, 18 Nov 2019 10:08:14 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.118.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CE5CA75E30;
-        Mon, 18 Nov 2019 10:08:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 42F8E66856;
+        Mon, 18 Nov 2019 10:08:10 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -40,16 +40,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests PULL 04/12] s390x: sclp: expose ram_size and max_ram_size
-Date:   Mon, 18 Nov 2019 11:07:11 +0100
-Message-Id: <20191118100719.7968-5-david@redhat.com>
+Subject: [kvm-unit-tests PULL 05/12] s390x: Fix initial cr0 load comments
+Date:   Mon, 18 Nov 2019 11:07:12 +0100
+Message-Id: <20191118100719.7968-6-david@redhat.com>
 In-Reply-To: <20191118100719.7968-1-david@redhat.com>
 References: <20191118100719.7968-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: gT_z_zUdPuSVxMhRuB_pUQ-1
+X-MC-Unique: RVkvkPo_MOqD3kr72BuCWA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -58,55 +57,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
 
-Expose ram_size and max_ram_size through accessor functions.
+We need to load cr0 to have access to all fprs during save and restore
+of fprs. Saving conditionally on basis of the CR0 AFP bit would be a
+pain.
 
-We only use get_ram_size in an upcoming patch, but having an accessor
-for the other one does not hurt.
-
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <1572023194-14370-4-git-send-email-imbrenda@linux.ibm.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Message-Id: <20191111153345.22505-2-frankja@linux.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- lib/s390x/sclp.c | 10 ++++++++++
- lib/s390x/sclp.h |  2 ++
- 2 files changed, 12 insertions(+)
+ s390x/cstart64.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-index 56fca0c..7798f04 100644
---- a/lib/s390x/sclp.c
-+++ b/lib/s390x/sclp.c
-@@ -167,3 +167,13 @@ void sclp_memory_setup(void)
-=20
- =09mem_init(ram_size);
- }
-+
-+uint64_t get_ram_size(void)
-+{
-+=09return ram_size;
-+}
-+
-+uint64_t get_max_ram_size(void)
-+{
-+=09return max_ram_size;
-+}
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index f00c3df..6d40fb7 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -272,5 +272,7 @@ void sclp_console_setup(void);
- void sclp_print(const char *str);
- int sclp_service_call(unsigned int command, void *sccb);
- void sclp_memory_setup(void);
-+uint64_t get_ram_size(void);
-+uint64_t get_max_ram_size(void);
-=20
- #endif /* SCLP_H */
+diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+index 8e2b21e..043e34a 100644
+--- a/s390x/cstart64.S
++++ b/s390x/cstart64.S
+@@ -94,7 +94,7 @@ memsetxc:
+ =09stmg=09%r0, %r15, GEN_LC_SW_INT_GRS
+ =09/* save cr0 */
+ =09stctg=09%c0, %c0, GEN_LC_SW_INT_CR0
+-=09/* load initial cr0 again */
++=09/* load a cr0 that has the AFP control bit which enables all FPRs */
+ =09larl=09%r1, initial_cr0
+ =09lctlg=09%c0, %c0, 0(%r1)
+ =09/* save fprs 0-15 + fpc */
+@@ -139,7 +139,7 @@ diag308_load_reset:
+ =09xgr=09%r2, %r2
+ =09br=09%r14
+ =09/* Success path */
+-=09/* We lost cr0 due to the reset */
++=09/* load a cr0 that has the AFP control bit which enables all FPRs */
+ 0:=09larl=09%r1, initial_cr0
+ =09lctlg=09%c0, %c0, 0(%r1)
+ =09RESTORE_REGS
 --=20
 2.21.0
 
