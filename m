@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE4A102453
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 13:26:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E0E10245C
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 13:28:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbfKSM04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 07:26:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30296 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726555AbfKSM0z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 07:26:55 -0500
+        id S1728010AbfKSM2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 07:28:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54553 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726351AbfKSM2i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 07:28:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574166414;
+        s=mimecast20190719; t=1574166517;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J3mOxYKpBUtrD3Eqhq7wj1DaBWOdzGNG7B02AqP8/hk=;
-        b=bN2FxnB10vB131p8Xkt55M12mxH5qcXTH0IBtZhpxw1sLXHlCIAXen2J7TnxKcQLEa286n
-        zSffA3OJer/8O5aZBM5UkHWIlro3B1pXGhrurB5sGED8HlANh79mE9jkwk+bYcdBvk7sUb
-        RExAEKNi3GljIWJTxUTQ+r1icB8tJm8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84--MEvi0MTNgyR8BABDs7p2A-1; Tue, 19 Nov 2019 07:26:53 -0500
-Received: by mail-wm1-f72.google.com with SMTP id f14so2177400wmc.0
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 04:26:53 -0800 (PST)
+        bh=5/Tpur5Jg0w8dOS4DWpqDeh25xiVTStCvikKzJwd37M=;
+        b=bYkKWHKvdQaIgFH/Uq56HDtPtBSUKPzUrpAz5Z4/7Y3MC0oZsJsfGeGC0AeI8hvi2ImnGP
+        mpwu9//EwulMLc2ftyGv6/WUa4ryv1nvSZlmBTLEmwI8WpgJ2BD++eEGVh6DTWZ0ZDFqtl
+        BXvPev84KEiZed/E7almc3n/4VAP6GU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-pMITtFo2P2yXppWluh01OA-1; Tue, 19 Nov 2019 07:28:36 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f21so2165323wmh.5
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 04:28:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=awmu6I9Y99dmJSWRPIQLmc8tQlVRK2cI0mOpA3pzvDw=;
-        b=nUwhTu16El0K+pzbCwXu4rx43EyemDw1RCz3KRWkQOSNSWx+e7kiGliKnEDT7/AEcq
-         DjaCdeXJU7qYoHgOadeHss0zy1Z7lR7lfcn41c4ej9rdIilK0bN576X6ExF8oHXcJli8
-         JKBkXCcMsWFJ4EQX9and0SeNSqn2zfPMl23XJn4ZtBuQlOhL1Np66dij/dbG5YyF1Px5
-         t1Naly32ITbRlr58bFhD5h7kj7qzcjYa89PJw0dIUMBRi/gOM53gK8HWE7hsgbidNSut
-         E5eUXQrRwcwuWEmq+/GX0W5KTDy10QSY1leJp226ddv/GIq3udC8MY7dJsDP2P0aQG87
-         B2cA==
-X-Gm-Message-State: APjAAAUPFYGo0Fl8i/yrkYsXNm7AHlatCh8VoEUY2PRBBhO6UpjI8KGb
-        ykO8KYJH/WAgox52tzgrIYu81bsIyFZ9a0bTsOhd34kyxVhTyiXsFhUWCApvDU1FV3Rx2x9ht6j
-        8VszUbmGWpX3e
-X-Received: by 2002:a5d:4ecd:: with SMTP id s13mr24376671wrv.216.1574166412578;
-        Tue, 19 Nov 2019 04:26:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzB7t6Kre2ZE9oFyNHnTMEuPPAI1X0nkDnc5BMRHHjljrglZNrSttKN8ypZKLm/cv+A52kMjQ==
-X-Received: by 2002:a5d:4ecd:: with SMTP id s13mr24376651wrv.216.1574166412383;
-        Tue, 19 Nov 2019 04:26:52 -0800 (PST)
+        bh=tbeowhQzRKjB6uF0t4WazsD0mnFA+By287e2iOh8qGc=;
+        b=eoKkrdLiQadEDK98TmFX+EfRL9w+CKVPjulsZIHEVBwGxf+Mi5QQmn96UOnHrDmu7N
+         BwTbEETxi/QXw7KmmqU/JZdJO4Kr6t6jOSRmLDKgYXMsiuumFrFMOq1zyhTnyPsQd1Wk
+         i28BF+lb3TkAIfPjhZVFjF1UkFJcozCyalkhytvOBZmYXkexpYAf41OqJFiN64thzEyy
+         4yEF/qvLBhgNCnWCg2RWxEneMlQr7MbSQtDXTqUz+vaQa7Jcxk0KNmUgPbnzuhnFvLAd
+         syRW++bYWavVaRJcthEK8X3C6NDm/3i9kusVKWhpx1GhaanGqosK0sIxhlSRjHN1nhiV
+         VQiQ==
+X-Gm-Message-State: APjAAAW5inDtBUZxOMJsSOd6/ya2RZH0xIzLIfTIdtYh7dA3XwbH0mpY
+        0JV+1ydxF4FwRHCasdW12BzfSC5bToRUrDyLBtbFmqe7QaQLiDhRJmQY04YGdarDj+1ByBm9eUI
+        UhWxFNkyH8+S6
+X-Received: by 2002:adf:f10d:: with SMTP id r13mr34941152wro.173.1574166514822;
+        Tue, 19 Nov 2019 04:28:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyNbb0ckuHE7IWjv7bqXQZrlL7jwUoHv2U/gZjQfxbd5CUks+dI0LHAyXvstzObqiu1EB+nTQ==
+X-Received: by 2002:adf:f10d:: with SMTP id r13mr34941123wro.173.1574166514611;
+        Tue, 19 Nov 2019 04:28:34 -0800 (PST)
 Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id n13sm2816854wmi.25.2019.11.19.04.26.51
+        by smtp.gmail.com with ESMTPSA id i71sm29755065wri.68.2019.11.19.04.28.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2019 04:26:51 -0800 (PST)
+        Tue, 19 Nov 2019 04:28:33 -0800 (PST)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH v2 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
-In-Reply-To: <CANRm+CzcWDvRA0+iaQZ6hd2HGRKyZpRnurghQXdagDCffKaSPg@mail.gmail.com>
-References: <1574145389-12149-1-git-send-email-wanpengli@tencent.com> <87r224gjyt.fsf@vitty.brq.redhat.com> <CANRm+CzcWDvRA0+iaQZ6hd2HGRKyZpRnurghQXdagDCffKaSPg@mail.gmail.com>
-Date:   Tue, 19 Nov 2019 13:26:51 +0100
-Message-ID: <87lfscgigk.fsf@vitty.brq.redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Mao Wenan <maowenan@huawei.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH -next] KVM: x86: remove set but not used variable 'called'
+In-Reply-To: <20191119121423.GB5604@kadam>
+References: <20191119030640.25097-1-maowenan@huawei.com> <87o8x8gjr5.fsf@vitty.brq.redhat.com> <20191119121423.GB5604@kadam>
+Date:   Tue, 19 Nov 2019 13:28:32 +0100
+Message-ID: <87imnggidr.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: -MEvi0MTNgyR8BABDs7p2A-1
+X-MC-Unique: pMITtFo2P2yXppWluh01OA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -73,39 +72,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+Dan Carpenter <dan.carpenter@oracle.com> writes:
 
-> On Tue, 19 Nov 2019 at 19:54, Vitaly Kuznetsov <vkuznets@redhat.com> wrot=
-e:
->>
->> Wanpeng Li <kernellwp@gmail.com> writes:
->>
->> > From: Wanpeng Li <wanpengli@tencent.com>
+> On Tue, Nov 19, 2019 at 12:58:54PM +0100, Vitaly Kuznetsov wrote:
+>> Mao Wenan <maowenan@huawei.com> writes:
+>>=20
+>> > Fixes gcc '-Wunused-but-set-variable' warning:
 >> >
->> > +     if (lapic_in_kernel(vcpu) && apic_x2apic_mode(vcpu->arch.apic)) =
-{
->> > +             /*
->> > +              * fastpath to IPI target, FIXED+PHYSICAL which is popul=
-ar
->> > +              */
->> > +             index =3D kvm_rcx_read(vcpu);
->> > +             data =3D kvm_read_edx_eax(vcpu);
->> > +
->> > +             if (((index - APIC_BASE_MSR) << 4 =3D=3D APIC_ICR) &&
->>
->> What if index (RCX) is < APIC_BASE_MSR?
+>> > arch/x86/kvm/x86.c: In function kvm_make_scan_ioapic_request_mask:
+>> > arch/x86/kvm/x86.c:7911:7: warning: variable called set but not
+>> > used [-Wunused-but-set-variable]
+>> >
+>> > It is not used since commit 7ee30bc132c6 ("KVM: x86: deliver KVM
+>> > IOAPIC scan request to target vCPUs")
+>>=20
+>> Better expressed as=20
+>>=20
+>> Fixes: 7ee30bc132c6 ("KVM: x86: deliver KVM IOAPIC scan request to targe=
+t vCPUs")
+>>=20
 >
-> How about if (index =3D=3D (APIC_BASE_MSR + 0x300) &&
+> There is sort of a debate about this whether the Fixes tag should be
+> used if it's only a cleanup.
 >
 
-What about ' << 4', don't we still need it? :-) And better APIC_ICR
-instead of 0x300...
-
-Personally, I'd write something like
-
-if (index > APIC_BASE_MSR && (index - APIC_BASE_MSR) =3D=3D APIC_ICR >> 4)
-
-and let compiler optimize this, I bet it's going to be equally good.
+I have to admit I'm involved in doing backporting sometimes and I really
+appreciate Fixes: tags. Just so you know on which side of the debate I
+am :-)
 
 --=20
 Vitaly
