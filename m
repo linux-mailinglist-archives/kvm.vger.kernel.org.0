@@ -2,183 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ED3910111B
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 03:05:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CD61101182
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 04:04:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbfKSCFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 21:05:00 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:42584 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfKSCE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 21:04:59 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJ20JOq174419;
-        Tue, 19 Nov 2019 02:02:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=LwULDTBc+rigjf0sejI3ferVE3V7uWPReTZ8S+pp39s=;
- b=nhWJqFQPkRIoMDNFK7WxEUVy8QzdSc+fs2Wc6Y3w+YAb9AqfvqN5wDV5ElCfPoHEUkjX
- lLuO9+DwoNmXSapMrkqBvjaG+Ksppzaai/gCAXn9gVXxhR2lJKMIELISSIOwLqESBcFr
- NdO2JxTm/oeAvwpE6EgHNNFpw0PGBK8hIT8V1XTtlxGBGQfQp557AdzPVeCZEmp3At0S
- pWnvuN5AhiaKiUSo7nxeMS+/o1rkagV7qyJ7RiMKWW1Wn9Kcju1YHmllNaKHRzGlhXdi
- a46VvEb73TrvmbFYIPEBuvtN/RlPGcCx2GvCtGdUTGjNJ8gpQ0KwCkRNuDqLKb2LtRML 5g== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2wa92pkvs7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 02:02:09 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJ1xPOD118317;
-        Tue, 19 Nov 2019 02:02:08 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2wc09wja66-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 02:02:08 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAJ225L5024440;
-        Tue, 19 Nov 2019 02:02:05 GMT
-Received: from [10.191.19.228] (/10.191.19.228)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 18 Nov 2019 18:02:04 -0800
-Subject: Re: [PATCH v8 0/5] Add a unified parameter "nopvspin"
-From:   Zhenzhong Duan <zhenzhong.duan@oracle.com>
-To:     linux-kernel@vger.kernel.org, tglx@linutronix.de,
-        pbonzini@redhat.com
-Cc:     mingo@redhat.com, bp@alien8.de, x86@kernel.org, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        boris.ostrovsky@oracle.com, jgross@suse.com, peterz@infradead.org,
-        will@kernel.org, linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        mikelley@microsoft.com, kys@microsoft.com, haiyangz@microsoft.com,
-        sthemmin@microsoft.com, sashal@kernel.org
-References: <1571829384-5309-1-git-send-email-zhenzhong.duan@oracle.com>
- <86263ee3-f94f-8a6b-3842-f15fb0316798@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <1ef9b26d-3b21-f285-bb93-063ee30e546f@oracle.com>
-Date:   Tue, 19 Nov 2019 10:01:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+        id S1727445AbfKSDER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 22:04:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53094 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727242AbfKSDEQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 22:04:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574132655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tw7bahIrBk8OAceM0I9m2c95R3hrLEe1uz2ktfeXfwY=;
+        b=Cbaw02DWHNQqXwRceHRFNI+ssBZfcSPRELXaij/a5VSsN9y1bXu4CPCIZiWVs1cR7XO0yD
+        mqr8AYBGN0ks3I79ubKj8IYDUY8MLvD7sToGTMlsWH4xlS8eVUWGcza0gZbufwWFbKmxny
+        2DlYyUrsVwgC0aDbVibzyhQ6DJ5AxGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-245-LlTJOq6nOt2ciNwHvotXvw-1; Mon, 18 Nov 2019 22:04:13 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EF1C593A2;
+        Tue, 19 Nov 2019 03:04:08 +0000 (UTC)
+Received: from [10.72.12.132] (ovpn-12-132.pek2.redhat.com [10.72.12.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51BFBA7F0;
+        Tue, 19 Nov 2019 03:03:40 +0000 (UTC)
+Subject: Re: [PATCH V13 6/6] docs: sample driver to demonstrate how to
+ implement virtio-mdev framework
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, kwankhede@nvidia.com,
+        alex.williamson@redhat.com, mst@redhat.com, tiwei.bie@intel.com,
+        jgg@mellanox.com, netdev@vger.kernel.org, cohuck@redhat.com,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, haotian.wang@sifive.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        jani.nikula@linux.intel.com, joonas.lahtinen@linux.intel.com,
+        rodrigo.vivi@intel.com, airlied@linux.ie, daniel@ffwll.ch,
+        farman@linux.ibm.com, pasic@linux.ibm.com, sebott@linux.ibm.com,
+        oberpar@linux.ibm.com, heiko.carstens@de.ibm.com,
+        gor@linux.ibm.com, borntraeger@de.ibm.com, akrowiak@linux.ibm.com,
+        freude@linux.ibm.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com,
+        christophe.de.dinechin@gmail.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jakub.kicinski@netronome.com, jiri@mellanox.com,
+        jeffrey.t.kirsher@intel.com
+References: <20191118105923.7991-1-jasowang@redhat.com>
+ <20191118105923.7991-7-jasowang@redhat.com>
+ <20191118151706.GA371978@kroah.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4fed1e7e-9d27-d441-f0a1-0eb6f15e90b1@redhat.com>
+Date:   Tue, 19 Nov 2019 11:03:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <86263ee3-f94f-8a6b-3842-f15fb0316798@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191118151706.GA371978@kroah.com>
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911190016
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911190016
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: LlTJOq6nOt2ciNwHvotXvw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Maintainers,
 
-May I get a final update on this patchset?
+On 2019/11/18 =E4=B8=8B=E5=8D=8811:17, Greg KH wrote:
+> On Mon, Nov 18, 2019 at 06:59:23PM +0800, Jason Wang wrote:
+>> +static void mvnet_device_release(struct device *dev)
+>> +{
+>> +=09dev_dbg(dev, "mvnet: released\n");
+>> +}
+> We used to have documentation in the kernel source tree that said that
+> whenever anyone did this, I got to make fun of them.  Unfortunately that
+> has been removed.
+>
+> Think about what you did right here.  You silenced a kernel runtime
+> warning that said something like "ERROR! NO RELEASE FUNCTION FOUND!" by
+> doing the above because "I am smarter than the kernel, I will silence it
+> by putting an empty release function in there."
+>
+> {sigh}
+>
+> Did you ever think _why_ we took the time and effort to add that warning
+> there?  It wasn't just so that people can circumvent it, it is to
+> PREVENT A MAJOR BUG IN YOUR DESIGN!  We are trying to be nice here and
+> give people a _chance_ to get things right instead of having you just
+> live with a silent memory leak.
+>
+> After 13 versions of this series, basic things like this are still here?
+> Who is reviewing this thing?
 
-There is only a few days remaining before my layoff at Oracle. I can't 
-login the mail address after that.
 
-No matter if you prefer to reject it, please let me know. I'd like to 
-get an end to this patchset.
+Apologize that static structure is used here, will fix them with dynamic=20
+one. I just borrow the codes from other vfio-mdev samples without too=20
+much thought here ...
+
+
+>
+> {ugh}
+>
+> Also, see the other conversations we are having about a "virtual" bus
+> and devices.  I do not want to have two different ways of doing the same
+> thing in the kernel at the same time please.  Please work together with
+> the Intel developers to solve this in a unified way, as you both
+> need/want the same thing here.
+
+
+Sure, some functions looks similar, but the "virtual" bus does not=20
+contain a management interface and it's not clear that how it can be=20
+used by userspace driver. For this series, sysfs/GUID based management=20
+interface is reused and we had a concrete example of how it would be=20
+used by userspace driver[1] and a real hardware driver implementation[2].
+
+[1] https://lkml.org/lkml/2019/11/7/62
+[2] https://lkml.org/lkml/2019/11/12/215
+
+
+>
+> Neither this, nor the other proposal can be accepted until you all agree
+> on the design and implementation.
+
+
+Yes.
 
 Thanks
 
-Zhenzhong
 
+>
+> /me goes off to find a nice fruity drink with an umbrella.
+>
+> greg k-h
+>
 
-On 2019/10/29 9:33, Zhenzhong Duan wrote:
-> Hi Baolo, Thomas
->
-> This patchset is reviewed pass and keep silent for a while, will 
-> anyone of you
->
-> consider to pick it up? Thanks
->
-> Zhenzhong
->
-> On 2019/10/23 19:16, Zhenzhong Duan wrote:
->> There are cases folks want to disable spinlock optimization for
->> debug/test purpose. Xen and hyperv already have parameters 
->> "xen_nopvspin"
->> and "hv_nopvspin" to support that, but kvm doesn't.
->>
->> The first patch adds that feature to KVM guest with "nopvspin".
->>
->> For compatibility reason original parameters "xen_nopvspin" and
->> "hv_nopvspin" are retained and marked obsolete.
->>
->> v8:
->> PATCH2: use 'kvm-guest' instead of 'kvm_guest'        [Sean 
->> Christopherson]
->> PATCH3: add a comment to explain missed 'return'      [Sean 
->> Christopherson]
->>
->> v7:
->> PATCH3: update comment and use goto, add RB              [Vitaly 
->> Kuznetsov]
->>
->> v6:
->> PATCH1: add Reviewed-by                                  [Vitaly 
->> Kuznetsov]
->> PATCH2: change 'pv' to 'PV', add Reviewed-by             [Vitaly 
->> Kuznetsov]
->> PATCH3: refactor 'if' branch in kvm_spinlock_init()      [Vitaly 
->> Kuznetsov]
->>
->> v5:
->> PATCH1: new patch to revert a currently unnecessory commit,
->>          code is simpler a bit after that change.         [Boris 
->> Ostrovsky]
->> PATCH3: fold 'if' statement,add comments on virt_spin_lock_key,
->>          reorder with PATCH2 to better reflect dependency
->> PATCH4: fold 'if' statement, add Reviewed-by             [Boris 
->> Ostrovsky]
->> PATCH5: add Reviewed-by [Michael Kelley]
->>
->> v4:
->> PATCH1: use variable name nopvspin instead of pvspin and
->>          defined it as __initdata, changed print message,
->>          updated patch description                     [Sean 
->> Christopherson]
->> PATCH2: remove Suggested-by, use "kvm-guest:" prefix  [Sean 
->> Christopherson]
->> PATCH3: make variable nopvsin and xen_pvspin coexist
->>          remove Reviewed-by due to code change         [Sean 
->> Christopherson]
->> PATCH4: make variable nopvsin and hv_pvspin coexist   [Sean 
->> Christopherson]
->>
->> v3:
->> PATCH2: Fix indentation
->>
->> v2:
->> PATCH1: pick the print code change into separate PATCH2,
->>          updated patch description             [Vitaly Kuznetsov]
->> PATCH2: new patch with print code change      [Vitaly Kuznetsov]
->> PATCH3: add Reviewed-by                       [Juergen Gross]
->>
->> Zhenzhong Duan (5):
->>    Revert "KVM: X86: Fix setup the virt_spin_lock_key before static key
->>      get initialized"
->>    x86/kvm: Change print code to use pr_*() format
->>    x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
->>    xen: Mark "xen_nopvspin" parameter obsolete
->>    x86/hyperv: Mark "hv_nopvspin" parameter obsolete
->>
->>   Documentation/admin-guide/kernel-parameters.txt | 14 ++++-
->>   arch/x86/hyperv/hv_spinlock.c                   |  4 ++
->>   arch/x86/include/asm/qspinlock.h                |  1 +
->>   arch/x86/kernel/kvm.c                           | 79 
->> ++++++++++++++++---------
->>   arch/x86/xen/spinlock.c                         |  4 +-
->>   kernel/locking/qspinlock.c                      |  7 +++
->>   6 files changed, 76 insertions(+), 33 deletions(-)
->>
