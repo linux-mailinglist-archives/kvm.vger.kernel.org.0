@@ -2,131 +2,261 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B712100E9A
-	for <lists+kvm@lfdr.de>; Mon, 18 Nov 2019 23:09:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00F3410102D
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 01:22:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726748AbfKRWJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Nov 2019 17:09:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53796 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726272AbfKRWJO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Nov 2019 17:09:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574114952;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=l+1PGj+H4rKQuFV+YphzHIiRLQRDixGf9l5dALjfLIw=;
-        b=DSb2qxuk0tUTrmhFOFf0NtJ21UFvOI1YgeBCmm7GnrhmAr3lXpwuvcnzKuYAguV9sC3l8P
-        uYkg0srkWyrEfg73GRf8fLM/4m0nf4Kv6JU8aiYH0oQjluLBuxDmgK9u+tS606FGQmVFDj
-        qAyvK2MFjfgWkTl7mLsuVkDWdRdWcS8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-KSBxqVvGM--k8SgGDuZt-w-1; Mon, 18 Nov 2019 17:09:09 -0500
-Received: by mail-wr1-f71.google.com with SMTP id w4so16833217wro.10
-        for <kvm@vger.kernel.org>; Mon, 18 Nov 2019 14:09:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DeR7oGmeiXKQ7yA5ehhnmdSVxed2wOzO6TKfrdCxJIU=;
-        b=CNYUdpNrFz9+ZBUEf9xnpCrKgjXf5JzWunISAcKEHifqhrBSDmRgKt1DgG1N+tJibY
-         5N5sxNiACZ7LG6u4twUDt9E0Hy0+nfsu7R7u7Ig36BkB1ZTn9qZ6xV6gKFlu+DJL7GSB
-         uj3GFbR8B8D7aLZVFPI4c6yzhsxid2iwiuvkor0KVfmPPi9+w7z/wgngOXugDSppC+xd
-         HUVOG3CudDiyOoiktLKcal640oCNIPkdnstsS/4KwYxIdukRLccySAkiPhTAeyHSdLwU
-         KfEYFcQWagqJqwvo7O+4uBJGXnoWBVkZsQkXy3UWJPErm+lwFYe2eTx/nY6c1a1gt66c
-         0Vvw==
-X-Gm-Message-State: APjAAAWOHJu+hb5ZpHFMIY69Yk8tYIROEKST5x3lA8OJZQV3osMy2ws1
-        fptV4rO+t8gjaVmyKIjLWCQV6GIdnlPkCC8WYn4pxULsxbSDS8IZQyiF4w7YVBbLmC37J5W3vcC
-        u6bwwnULIfZq6
-X-Received: by 2002:a1c:9c54:: with SMTP id f81mr1742159wme.89.1574114948061;
-        Mon, 18 Nov 2019 14:09:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwjngXelaqGBSrfPaz5aV5ersb7VpL5X/OEb2Kf5523fDbdhDJrVYMUhkF8ACasf71Smk+Lfg==
-X-Received: by 2002:a1c:9c54:: with SMTP id f81mr1742130wme.89.1574114947778;
-        Mon, 18 Nov 2019 14:09:07 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc? ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
-        by smtp.gmail.com with ESMTPSA id v9sm24085812wrs.95.2019.11.18.14.09.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Nov 2019 14:09:07 -0800 (PST)
-Subject: Re: [PATCH] KVM: nVMX: Use semi-colon instead of comma for
- exit-handlers initialization
-To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Mark Kanda <mark.kanda@oracle.com>
-References: <20191118191121.43440-1-liran.alon@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <83268078-036f-5cc7-9033-b3ad1f05123c@redhat.com>
-Date:   Mon, 18 Nov 2019 23:09:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727604AbfKSAWq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Nov 2019 19:22:46 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:6982 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726952AbfKSAWp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Nov 2019 19:22:45 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dd335d60001>; Mon, 18 Nov 2019 16:22:46 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 18 Nov 2019 16:22:44 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 18 Nov 2019 16:22:44 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 19 Nov
+ 2019 00:22:43 +0000
+Subject: Re: [PATCH v5 17/24] mm/gup: track FOLL_PIN pages
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+ <20191115055340.1825745-18-jhubbard@nvidia.com>
+ <20191118115829.GJ17319@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <8424f891-271d-5c34-8f7c-ebf3e3aa6664@nvidia.com>
+Date:   Mon, 18 Nov 2019 16:22:43 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191118191121.43440-1-liran.alon@oracle.com>
+In-Reply-To: <20191118115829.GJ17319@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-MC-Unique: KSBxqVvGM--k8SgGDuZt-w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1574122967; bh=ip2xVJC+jxbL/7d2eWhZjqdIi4kB0uoxgzyWnYDs5q4=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=kZWTJaB6BUYpdW+z0HXxRztjdsBPgYMtIagp6++GXQ1xMYEqmDvkuTu5SJexcfc3Z
+         aqvcG/+YbvfnrntTmKpTzXcCcJ1vacUs8Vt+kkZFmecCKGt5ESA8XOWs62Cbve3dr3
+         XsCtQVKM4yFI8r3EtkYIToV94nBwkk0bzSnRfhI6IY4EfMEr9iYp9o7iElBN+PNDoe
+         GYMLDs4YJjT+MkCB6avfM8/DST4lwWHJbTQrh01mIBzcPCF4cBGDQd1OqtdqCqvly5
+         URQ6TTy1wBAC/IlVtHZs8b+E7d7tANvL2AVJcuHSx7ushKjPgli8Izd92XqBpLulsV
+         NLxmWdrhMpwGw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/11/19 20:11, Liran Alon wrote:
-> Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+On 11/18/19 3:58 AM, Jan Kara wrote:
+> On Thu 14-11-19 21:53:33, John Hubbard wrote:
+>> Add tracking of pages that were pinned via FOLL_PIN.
+>>
+>> As mentioned in the FOLL_PIN documentation, callers who effectively set
+>> FOLL_PIN are required to ultimately free such pages via put_user_page().
+>> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
+>> for DIO and/or RDMA use".
+>>
+>> Pages that have been pinned via FOLL_PIN are identifiable via a
+>> new function call:
+>>
+>>    bool page_dma_pinned(struct page *page);
+>>
+>> What to do in response to encountering such a page, is left to later
+>> patchsets. There is discussion about this in [1].
+> 						^^ missing this reference
+> in the changelog...
+
+I'll add that.=20
+
 >=20
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index bc11fcbbe12b..229ca7164318 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6051,23 +6051,23 @@ __init int nested_vmx_hardware_setup(int (*exit_h=
-andlers[])(struct kvm_vcpu *))
->  =09=09init_vmcs_shadow_fields();
->  =09}
-> =20
-> -=09exit_handlers[EXIT_REASON_VMCLEAR]=09=3D handle_vmclear,
-> -=09exit_handlers[EXIT_REASON_VMLAUNCH]=09=3D handle_vmlaunch,
-> -=09exit_handlers[EXIT_REASON_VMPTRLD]=09=3D handle_vmptrld,
-> -=09exit_handlers[EXIT_REASON_VMPTRST]=09=3D handle_vmptrst,
-> -=09exit_handlers[EXIT_REASON_VMREAD]=09=3D handle_vmread,
-> -=09exit_handlers[EXIT_REASON_VMRESUME]=09=3D handle_vmresume,
-> -=09exit_handlers[EXIT_REASON_VMWRITE]=09=3D handle_vmwrite,
-> -=09exit_handlers[EXIT_REASON_VMOFF]=09=3D handle_vmoff,
-> -=09exit_handlers[EXIT_REASON_VMON]=09=09=3D handle_vmon,
-> -=09exit_handlers[EXIT_REASON_INVEPT]=09=3D handle_invept,
-> -=09exit_handlers[EXIT_REASON_INVVPID]=09=3D handle_invvpid,
-> -=09exit_handlers[EXIT_REASON_VMFUNC]=09=3D handle_vmfunc,
-> +=09exit_handlers[EXIT_REASON_VMCLEAR]=09=3D handle_vmclear;
-> +=09exit_handlers[EXIT_REASON_VMLAUNCH]=09=3D handle_vmlaunch;
-> +=09exit_handlers[EXIT_REASON_VMPTRLD]=09=3D handle_vmptrld;
-> +=09exit_handlers[EXIT_REASON_VMPTRST]=09=3D handle_vmptrst;
-> +=09exit_handlers[EXIT_REASON_VMREAD]=09=3D handle_vmread;
-> +=09exit_handlers[EXIT_REASON_VMRESUME]=09=3D handle_vmresume;
-> +=09exit_handlers[EXIT_REASON_VMWRITE]=09=3D handle_vmwrite;
-> +=09exit_handlers[EXIT_REASON_VMOFF]=09=3D handle_vmoff;
-> +=09exit_handlers[EXIT_REASON_VMON]=09=09=3D handle_vmon;
-> +=09exit_handlers[EXIT_REASON_INVEPT]=09=3D handle_invept;
-> +=09exit_handlers[EXIT_REASON_INVVPID]=09=3D handle_invvpid;
-> +=09exit_handlers[EXIT_REASON_VMFUNC]=09=3D handle_vmfunc;
-> =20
->  =09kvm_x86_ops->check_nested_events =3D vmx_check_nested_events;
->  =09kvm_x86_ops->get_nested_state =3D vmx_get_nested_state;
->  =09kvm_x86_ops->set_nested_state =3D vmx_set_nested_state;
-> -=09kvm_x86_ops->get_vmcs12_pages =3D nested_get_vmcs12_pages,
-> +=09kvm_x86_ops->get_vmcs12_pages =3D nested_get_vmcs12_pages;
->  =09kvm_x86_ops->nested_enable_evmcs =3D nested_enable_evmcs;
->  =09kvm_x86_ops->nested_get_evmcs_version =3D nested_get_evmcs_version;
-> =20
+>> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
+>>
+>> Suggested-by: Jan Kara <jack@suse.cz>
+>> Suggested-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+>> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+>> ---
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index 6588d2e02628..db872766480f 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -1054,6 +1054,8 @@ static inline __must_check bool try_get_page(struc=
+t page *page)
+>>  	return true;
+>>  }
+>> =20
+>> +__must_check bool user_page_ref_inc(struct page *page);
+>> +
+>>  static inline void put_page(struct page *page)
+>>  {
+>>  	page =3D compound_head(page);
+>> @@ -1071,29 +1073,70 @@ static inline void put_page(struct page *page)
+>>  		__put_page(page);
+>>  }
+>> =20
+>> -/**
+>> - * put_user_page() - release a gup-pinned page
+>> - * @page:            pointer to page to be released
+>> +/*
+>> + * GUP_PIN_COUNTING_BIAS, and the associated functions that use it, ove=
+rload
+>> + * the page's refcount so that two separate items are tracked: the orig=
+inal page
+>> + * reference count, and also a new count of how many get_user_pages() c=
+alls were
+> 							^^ pin_user_pages()
+>=20
+>> + * made against the page. ("gup-pinned" is another term for the latter)=
+.
+>> + *
+>> + * With this scheme, get_user_pages() becomes special: such pages are m=
+arked
+> 			^^^ pin_user_pages()
+>=20
+>> + * as distinct from normal pages. As such, the put_user_page() call (an=
+d its
+>> + * variants) must be used in order to release gup-pinned pages.
+>> + *
+>> + * Choice of value:
+>>   *
+>> - * Pages that were pinned via pin_user_pages*() must be released via ei=
+ther
+>> - * put_user_page(), or one of the put_user_pages*() routines. This is s=
+o that
+>> - * eventually such pages can be separately tracked and uniquely handled=
+. In
+>> - * particular, interactions with RDMA and filesystems need special hand=
+ling.
+>> + * By making GUP_PIN_COUNTING_BIAS a power of two, debugging of page re=
+ference
+>> + * counts with respect to get_user_pages() and put_user_page() becomes =
+simpler,
+> 				^^^ pin_user_pages()
 >=20
 
-Queued, thanks.
+Yes.
 
-Paolo
+>> + * due to the fact that adding an even power of two to the page refcoun=
+t has
+>> + * the effect of using only the upper N bits, for the code that counts =
+up using
+>> + * the bias value. This means that the lower bits are left for the excl=
+usive
+>> + * use of the original code that increments and decrements by one (or a=
+t least,
+>> + * by much smaller values than the bias value).
+>>   *
+>> - * put_user_page() and put_page() are not interchangeable, despite this=
+ early
+>> - * implementation that makes them look the same. put_user_page() calls =
+must
+>> - * be perfectly matched up with pin*() calls.
+>> + * Of course, once the lower bits overflow into the upper bits (and thi=
+s is
+>> + * OK, because subtraction recovers the original values), then visual i=
+nspection
+>> + * no longer suffices to directly view the separate counts. However, fo=
+r normal
+>> + * applications that don't have huge page reference counts, this won't =
+be an
+>> + * issue.
+>> + *
+>> + * Locking: the lockless algorithm described in page_cache_get_speculat=
+ive()
+>> + * and page_cache_gup_pin_speculative() provides safe operation for
+>> + * get_user_pages and page_mkclean and other calls that race to set up =
+page
+>> + * table entries.
+>>   */
+> ...
+>> @@ -2070,9 +2191,16 @@ static int gup_hugepte(pte_t *ptep, unsigned long=
+ sz, unsigned long addr,
+>>  	page =3D head + ((addr & (sz-1)) >> PAGE_SHIFT);
+>>  	refs =3D __record_subpages(page, addr, end, pages + *nr);
+>> =20
+>> -	head =3D try_get_compound_head(head, refs);
+>> -	if (!head)
+>> -		return 0;
+>> +	if (flags & FOLL_PIN) {
+>> +		head =3D page;
+>> +		if (unlikely(!user_page_ref_inc(head)))
+>> +			return 0;
+>> +		head =3D page;
+>=20
+> Why do you assign 'head' twice? Also the refcounting logic is repeated
+> several times so perhaps you can factor it out in to a helper function or
+> even move it to __record_subpages()?
 
+OK.
+
+>=20
+>> +	} else {
+>> +		head =3D try_get_compound_head(head, refs);
+>> +		if (!head)
+>> +			return 0;
+>> +	}
+>> =20
+>>  	if (unlikely(pte_val(pte) !=3D pte_val(*ptep))) {
+>>  		put_compound_head(head, refs);
+>=20
+> So this will do the wrong thing for FOLL_PIN. We took just one "pin"
+> reference there but here we'll release 'refs' normal references AFAICT.
+> Also the fact that you take just one pin reference for each huge page
+> substantially changes how GUP refcounting works in the huge page case.
+> Currently, FOLL_GET users can be completely agnostic of huge pages. So yo=
+u
+> can e.g. GUP whole 2 MB page, submit it as 2 different bios and then
+> drop page references from each bio completion function. With your new
+> FOLL_PIN behavior you cannot do that and I believe it will be a problem f=
+or
+> some users. So I think you have to maintain the behavior that you increas=
+e
+> the head->_refcount by (refs * GUP_PIN_COUNTING_BIAS) here.
+>=20
+
+Yes, completely agreed, this was a (big) oversight. I went through the same
+reasoning and reached your conclusions, in __gup_device_huge(), but then
+did it wrong in these functions. Will fix.
+
+thanks,
+--=20
+John Hubbard
+NVIDIA
