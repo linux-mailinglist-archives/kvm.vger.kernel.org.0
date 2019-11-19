@@ -2,136 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D969610283D
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 16:39:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1055B10285C
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 16:45:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728325AbfKSPjB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 10:39:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59984 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728176AbfKSPjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 10:39:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574177939;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Of43/XJ4GtSQZWIo1MKN49nhTW+b6dRQ9sbJkJzdi80=;
-        b=XnTvwiEKHzYlnSZeZivPt2mkv3Y5x0dvjr8y2lvYnJux9kBNukCGcPDeHPoZ9HlA6XJZxV
-        RjpX3xjzSP7RcROAr2+xR3oTWCKV3kfPq29m8FwYogk53655UdAfJbHmiYdirthIWK6FKB
-        fMf2GcR7hsgYCNfDyNUK4q06/XYuQHE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-xBP-DQ62NOaYO5W7zASpAg-1; Tue, 19 Nov 2019 10:38:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34954800EBE;
-        Tue, 19 Nov 2019 15:38:55 +0000 (UTC)
-Received: from gondolin (ovpn-117-102.ams2.redhat.com [10.36.117.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F07BA1B42F;
-        Tue, 19 Nov 2019 15:38:53 +0000 (UTC)
-Date:   Tue, 19 Nov 2019 16:38:46 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
+        id S1728060AbfKSPpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 10:45:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11146 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727509AbfKSPpV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 10:45:21 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAJFgQHP070856;
+        Tue, 19 Nov 2019 10:45:19 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf564nq8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Nov 2019 10:45:19 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xAJFh22H074364;
+        Tue, 19 Nov 2019 10:45:19 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf564npj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Nov 2019 10:45:19 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAJFgMWS008154;
+        Tue, 19 Nov 2019 15:45:22 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
+        by ppma01wdc.us.ibm.com with ESMTP id 2wa8r64c86-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Nov 2019 15:45:22 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAJFjHl845941044
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 15:45:17 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5BD9B205F;
+        Tue, 19 Nov 2019 15:45:17 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B9EBB2066;
+        Tue, 19 Nov 2019 15:45:17 +0000 (GMT)
+Received: from [9.80.210.113] (unknown [9.80.210.113])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Nov 2019 15:45:17 +0000 (GMT)
+Subject: Re: [RFC PATCH v1 02/10] vfio-ccw: Register a chp_event callback for
+ vfio-ccw
+To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         Jason Herne <jjherne@linux.ibm.com>,
         Jared Rossi <jrossi@linux.ibm.com>
-Subject: Re: [RFC PATCH v1 03/10] vfio-ccw: Use subchannel lpm in the orb
-Message-ID: <20191119163846.18df1f69.cohuck@redhat.com>
-In-Reply-To: <fa7f22e1-df44-4ad2-871a-23cd4feebc5e@linux.ibm.com>
 References: <20191115025620.19593-1-farman@linux.ibm.com>
-        <20191115025620.19593-4-farman@linux.ibm.com>
-        <20191119140046.4b81edd8.cohuck@redhat.com>
-        <fa7f22e1-df44-4ad2-871a-23cd4feebc5e@linux.ibm.com>
-Organization: Red Hat GmbH
+ <20191115025620.19593-3-farman@linux.ibm.com>
+ <20191119134809.75ba276b.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <077147ec-39c3-7d00-5ee1-fc290ab7fd1a@linux.ibm.com>
+Date:   Tue, 19 Nov 2019 10:45:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: xBP-DQ62NOaYO5W7zASpAg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191119134809.75ba276b.cohuck@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-19_05:2019-11-15,2019-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 mlxlogscore=999
+ priorityscore=1501 suspectscore=0 spamscore=0 impostorscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911190142
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Nov 2019 10:16:30 -0500
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> On 11/19/19 8:00 AM, Cornelia Huck wrote:
-> > On Fri, 15 Nov 2019 03:56:13 +0100
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >  =20
-> >> From: Farhan Ali <alifm@linux.ibm.com>
-> >>
-> >> The subchannel logical path mask (lpm) would have the most
-> >> up to date information of channel paths that are logically
-> >> available for the subchannel.
-> >>
-> >> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-> >> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> >> ---
-> >>
-> >> Notes:
-> >>     v0->v1: [EF]
-> >>      - None; however I am greatly confused by this one.  Thoughts? =20
-> >=20
-> > I think it's actually wrong.
-> >  =20
-> >>
-> >>  drivers/s390/cio/vfio_ccw_cp.c | 4 +---
-> >>  1 file changed, 1 insertion(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_cc=
-w_cp.c
-> >> index 3645d1720c4b..d4a86fb9d162 100644
-> >> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> >> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> >> @@ -779,9 +779,7 @@ union orb *cp_get_orb(struct channel_program *cp, =
-u32 intparm, u8 lpm)
-> >>  =09orb->cmd.intparm =3D intparm;
-> >>  =09orb->cmd.fmt =3D 1;
-> >>  =09orb->cmd.key =3D PAGE_DEFAULT_KEY >> 4;
-> >> -
-> >> -=09if (orb->cmd.lpm =3D=3D 0)
-> >> -=09=09orb->cmd.lpm =3D lpm; =20
-> >=20
-> > In the end, the old code will use the lpm from the subchannel
-> > structure, if userspace did not supply anything to be used.
-> >  =20
-> >> +=09orb->cmd.lpm =3D lpm; =20
-> >=20
-> > The new code will always discard any lpm userspace has supplied and
-> > replace it with the lpm from the subchannel structure. This feels
-> > wrong; what if the I/O is supposed to be restricted to a subset of the
-> > paths? =20
->=20
-> I had the same opinion, but didn't want to flat-out discard it from his
-> series without a second look.  :)
 
-:)
+On 11/19/19 7:48 AM, Cornelia Huck wrote:
+> On Fri, 15 Nov 2019 03:56:12 +0100
+> Eric Farman <farman@linux.ibm.com> wrote:
+> 
+>> From: Farhan Ali <alifm@linux.ibm.com>
+>>
+>> Register the chp_event callback to receive channel path related
+>> events for the subchannels managed by vfio-ccw.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>> ---
+>>
+>> Notes:
+>>     v0->v1: [EF]
+>>      - Add s390dbf trace
+>>
+>>  drivers/s390/cio/vfio_ccw_drv.c | 44 +++++++++++++++++++++++++++++++++
+>>  1 file changed, 44 insertions(+)
+>>
+>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+>> index 91989269faf1..05da1facee60 100644
+>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+>> @@ -19,6 +19,7 @@
+>>  
+>>  #include <asm/isc.h>
+>>  
+>> +#include "chp.h"
+>>  #include "ioasm.h"
+>>  #include "css.h"
+>>  #include "vfio_ccw_private.h"
+>> @@ -257,6 +258,48 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
+>>  	return rc;
+>>  }
+>>  
+>> +static int vfio_ccw_chp_event(struct subchannel *sch,
+>> +			      struct chp_link *link, int event)
+>> +{
+>> +	struct vfio_ccw_private *private = dev_get_drvdata(&sch->dev);
+>> +	int mask = chp_ssd_get_mask(&sch->ssd_info, link);
+>> +	int retry = 255;
+>> +
+>> +	if (!private || !mask)
+>> +		return 0;
+>> +
+>> +	if (cio_update_schib(sch))
+>> +		return -ENODEV;
+> 
+> It seems this return code is only checked by the common I/O layer for
+> the _OFFLINE case; still, it's probably not a bad idea, even though it
+> is different from what the vanilla I/O subchannel driver does.
 
->=20
-> >=20
-> > If we want to include the current value of the subchannel lpm in the
-> > requests, we probably want to AND the masks instead. =20
->=20
-> Then we'd be on the hook to return some sort of error if the result is
-> zero.  Is it better to just send it to hw as-is, and let the response
-> come back naturally?  (Which is what we do today.)
+cio_update_schib() itself can only return -ENODEV so it seemed sane.
 
-But if a chpid is logically varied off, it is removed from the lpm,
-right? Therefore, the caller really should get a 'no path' indication
-back, shouldn't it?
+> 
+>> +
+>> +	VFIO_CCW_MSG_EVENT(2, "%pUl (%x.%x.%04x): mask=0x%x event=%d\n",
+>> +			   mdev_uuid(private->mdev), sch->schid.cssid,
+>> +			   sch->schid.ssid, sch->schid.sch_no,
+>> +			   mask, event);
+> 
+> If you log only here, you're missing the case above.
 
->=20
-> >  =20
-> >> =20
-> >>  =09chain =3D list_first_entry(&cp->ccwchain_list, struct ccwchain, ne=
-xt);
-> >>  =09cpa =3D chain->ch_ccw; =20
-> >  =20
->=20
+Ah, yes.  I'll move that up.
 
+> 
+>> +
+>> +	switch (event) {
+>> +	case CHP_VARY_OFF:
+>> +		/* Path logically turned off */
+>> +		sch->opm &= ~mask;
+>> +		sch->lpm &= ~mask;
+>> +		break;
+>> +	case CHP_OFFLINE:
+>> +		/* Path is gone */
+>> +		cio_cancel_halt_clear(sch, &retry);
+>> +		break;
+>> +	case CHP_VARY_ON:
+>> +		/* Path logically turned on */
+>> +		sch->opm |= mask;
+>> +		sch->lpm |= mask;
+>> +		break;
+>> +	case CHP_ONLINE:
+>> +		/* Path became available */
+>> +		sch->lpm |= mask & sch->opm;
+>> +		break;
+>> +	}
+> 
+> Looks sane as the first round.
+> 
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static struct css_device_id vfio_ccw_sch_ids[] = {
+>>  	{ .match_flags = 0x1, .type = SUBCHANNEL_TYPE_IO, },
+>>  	{ /* end of list */ },
+>> @@ -274,6 +317,7 @@ static struct css_driver vfio_ccw_sch_driver = {
+>>  	.remove = vfio_ccw_sch_remove,
+>>  	.shutdown = vfio_ccw_sch_shutdown,
+>>  	.sch_event = vfio_ccw_sch_event,
+>> +	.chp_event = vfio_ccw_chp_event,
+>>  };
+>>  
+>>  static int __init vfio_ccw_debug_init(void)
+> 
