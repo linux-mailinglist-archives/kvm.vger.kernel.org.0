@@ -2,134 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BFAA1026D2
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 15:32:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37BE6102735
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 15:45:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727316AbfKSOct (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 09:32:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:53514 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726409AbfKSOcs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 09:32:48 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E00930E;
-        Tue, 19 Nov 2019 06:32:48 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A036D3F6C4;
-        Tue, 19 Nov 2019 06:32:47 -0800 (PST)
-Date:   Tue, 19 Nov 2019 14:32:43 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH 2/3] kvm: arm: VGIC: Scan all IRQs when interrupt group
-  gets enabled
-Message-ID: <20191119143243.28378f8d@donnerap.cambridge.arm.com>
-In-Reply-To: <4245ee82a03c9403f8e4ff815f032709@www.loen.fr>
-References: <20191108174952.740-1-andre.przywara@arm.com>
-        <20191108174952.740-3-andre.przywara@arm.com>
-        <20191110142914.6ffdfdfa@why>
-        <20191112093658.08f248c5@donnerap.cambridge.arm.com>
-        <9ddab86ca3959acbb8b7aad24be5f1ad@www.loen.fr>
-        <20191118141216.352a3a0a@donnerap.cambridge.arm.com>
-        <4245ee82a03c9403f8e4ff815f032709@www.loen.fr>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1728218AbfKSOpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 09:45:42 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:40734 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727124AbfKSOpm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 09:45:42 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJEdWqK177168;
+        Tue, 19 Nov 2019 14:44:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=KyULXMqBuw+BBUz3KfOuulONWiy+9k5YMKxdr3Y2jng=;
+ b=D50jOauubj4oZP7fPhc5xjTiqd5rjhiK8fcjZFX7JtrtHR997ILtuMgkrvmdyMfxeAnl
+ bl2kbnnyDRVPZJo39wPWkqTsuL5qQsnfqabquloo2EG6s+Zkumdhu3cQwVRqs6rbG7RR
+ 74sgKNiZMjO657E+ltSzO8+mB8M+5d3wXGwyIXT6rZ1tbfkc37leZXG4qmfNNhk6J7bw
+ YmN1UHwrLYWdSZmmscNkVbXLa2Mej/5PCQ7A16yuK0JKjfRFVZagXXLIEbree+WszRNE
+ VdsFa1DXwFxgceJT4G4ymR5yKbfjMCdC/NXT+fwLGdk7cGn0ek3DWNtAc8uLBuBABrHF lg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2wa9rqf8aw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 14:44:34 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJEdWGT055757;
+        Tue, 19 Nov 2019 14:44:34 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2wc09xga8g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 14:44:34 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAJEiWFh031935;
+        Tue, 19 Nov 2019 14:44:32 GMT
+Received: from [192.168.1.67] (/94.61.1.144)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 Nov 2019 06:44:31 -0800
+Subject: Re: [PATCH v2 2/3] KVM: VMX: Do not change PID.NDST when loading a
+ blocked vCPU
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+References: <20191111172012.28356-1-joao.m.martins@oracle.com>
+ <20191111172012.28356-3-joao.m.martins@oracle.com>
+ <CANRm+CyrbiJ068zLRH8ZMttqjnEG38qb1W1SMND+H-D=8N8tVw@mail.gmail.com>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <6b6acdee-f080-241f-8a6e-89708f746944@oracle.com>
+Date:   Tue, 19 Nov 2019 14:44:27 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CANRm+CyrbiJ068zLRH8ZMttqjnEG38qb1W1SMND+H-D=8N8tVw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911190134
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911190134
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Nov 2019 09:40:40 +0000
-Marc Zyngier <maz@kernel.org> wrote:
-
-Hi Marc,
-
-[ ... ]
-
-> >>
-> >> I think that could work. One queue for each group, holding pending,
-> >> enabled, group-disabled interrupts. Pending, disabled interrupts are
-> >> not queued anywhere, just like today.
-> >>
-> >> The only snag is per-cpu interrupts. On which queue do they live?
-> >> Do you have per-CPU queues? or a global one?  
-> >
-> > Yes, the idea was to have a per-VCPU "grp_dis_list" in addition to
-> > the ap_list, reusing the ap_list list_head in struct vgic_irq.
-> > vgic_queue_irq_unlock() would put them into *one* of those two lists,
-> > depending on their group-enabled status. When a group gets enabled, 
-> > we
-> > just have to transfer the IRQs from grp_dis_list to ap_list.
-> >
-> > But fleshing this out I was wondering if it couldn't be much simpler:
-> > We ignore the group-enabled status most of the time, except in
-> > vgic_flush_lr_state(). So group-disabled IRQs *would go* to the
-> > ap_list (when they are otherwise pending|active and enabled), but
-> > would be skipped when eventually populating the LRs.
-> > vgic_prune_ap_list would also not touch them, so they would stay in
-> > the ap_list (unless removed for other reasons).
-> >
-> > That might raise some eyebrows (because we keep IRQs in the ap_list
-> > which are not ready), but would require only minimal changes and 
-> > avoid
-> > all kind of nasty/racy code to be added. The only downside I see is
-> > that the ap_list could potentially be much longer, but we could 
-> > change
-> > the sorting algorithm if needed to keep group-disabled IRQs at the
-> > end, at which point it wouldn't really matter.
-> >
-> > Do you see any problem with that approach? Alex seemed to remember
-> > that you had an objection against a very similar (if not identical)
-> > idea before.  
+On 11/19/19 11:36 AM, Wanpeng Li wrote:
+> On Tue, 12 Nov 2019 at 01:23, Joao Martins <joao.m.martins@oracle.com> wrote:
+>>
+>> While vCPU is blocked (in kvm_vcpu_block()), it may be preempted which
+>> will cause vmx_vcpu_pi_put() to set PID.SN.  If later the vCPU will be
 > 
-> My main worry with this is that it causes overhead on the fast path.
-> Disabled interrupts (for whichever reason they are disabled) shouldn't
-> have to be evaluated on the fast path.
-> 
-> Take for example kvm_vgic_vcpu_pending_irq(), which we evaluate pretty
-> often (each time a vcpu wakes up). Do we want to scan a bunch of
-> group-disabled interrupts there? No.
-> 
-> At the end of the day, what we're looking at is a list of disabled,
-> pending interrupts. They can be disabled for multiple reasons
-> (group is disabled, or interrupt itself is disabled). But they should
-> *not* end-up on the AP list, because that list has a precise semantic.
-> 
-> Your suggestion to add the group-disabled interrupts to the AP list
-> may be a cool hack, but it is mostly a hack that opens the whole thing
-> to a bunch of corner cases. Let's not do that.
+> How can this happen? See the prepare_to_swait_exlusive() in
+> kvm_vcpu_block(), the task will be set in TASK_INTERRUPTIBLE state,
+> kvm_sched_out will set vcpu->preempted to true iff current->state ==
+> TASK_RUNNING.
 
-I understand what you are saying, and I had similar gripes. It was just too tempting to not give it a try ;-)
- 
-> >> >> And if a group has
-> >> >> been disabled, how do you retire these interrupts from the AP   
-> >> list?  
-> >> >
-> >> > This is done above: we kick the respective VCPU and rely on
-> >> > vgic_prune_ap_list() to remove them (that uses   
-> >> vgic_target_oracle(),  
-> >> > which in turn checks vgic_irq_is_grp_enabled()).  
-> >>
-> >> But what if the CPU isn't running? Kicking it isn't going to do 
-> >> much,
-> >> is it?  
-> >
-> > Not directly, but in either approach that would be handled similar to
-> > disabled interrupts: once the VCPU runs, they would *not* end up in
-> > LRs (because we check the oracle before), and would be cleaned up in
-> > prune() once the guest exits (at least for the original approach).  
-> 
-> I lost track of the original approach already :-/
-> 
-> Try and build the above suggestion. It should follow the same flow as
-> the enabled, group-enabled interrupts, just with a different list.
+You're right.
 
-OK, will do.
+But preemption (thus setting PID.SN) can still happen before vcpu_block(), or
+otherwise scheduled out if we are already in vcpu_block() (with task in
+TASK_INTERRUPTIBLE). The right term we should have written in that sentence
+above would have been 'scheduled out' and drop the vcpu_block mention and it
+would encompass both cases. A better sentence would perhaps be:
 
-Thanks!
+"While vCPU is blocked (or about to block) it may be scheduled out which will
+cause vmx_vcpu_pi_put() to be called."
 
-Andre.
+But setting or not preempted/PID.SN doesn't change the rest and was mentioned
+for completeness.
+
+	Joao
