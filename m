@@ -2,98 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1873D1022B6
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 12:15:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F584102341
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 12:37:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727631AbfKSLPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 06:15:15 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:50036 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725904AbfKSLPO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 06:15:14 -0500
-Received: from zn.tnic (p200300EC2F0EDC00DDCC46785D6B318A.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:dc00:ddcc:4678:5d6b:318a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED7521EC0CAF;
-        Tue, 19 Nov 2019 12:15:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1574162113;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=G8bIPI7eMqwT4OGw64KYwiD4+/Nz3AJ6bpqyvoHxzGE=;
-        b=TCAKKh4JmkRfTPQI9eYekH1jkcNRfLWs2H7MPLEUB7wha5+Lq494+gA97L1SeLaGW53dkj
-        7lYAoRjzC4VBvHeUtDK5doEfPxgW2MvVKPiGQpKSb83sxjMbFd2mMgulnY9OmgO7vGuqPs
-        5EISsFBde5P8qseJj7C9XA9+xybjNJw=
-Date:   Tue, 19 Nov 2019 12:15:08 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
+        id S1727800AbfKSLg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 06:36:28 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45561 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726351AbfKSLg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 06:36:28 -0500
+Received: by mail-ot1-f67.google.com with SMTP id r24so17534271otk.12;
+        Tue, 19 Nov 2019 03:36:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=O4bgGlnr9YGraqcGqRTVWqBe6uwtLwxkzJh4SzEwyFo=;
+        b=n3BQGwCJfycuAMFvnZDcr3Hu3ukTzjDamexrrbqiaODw+rVgtGLjTiBrkTLbLXr0KV
+         02hdg8VUZMlaPMJrBouxnpN0dVeRNlEHMPrZ/OHqurwG5weCsFK5b5m9e4c9YzOZ7qxL
+         bN8OK6UnhNljuWzW7COd3E0FoGk0V0e71CiTVtJxUFRuKcPuCbT7RRdeq9fp1Ib4/B3o
+         ESZzMIQS7diJdAp2RfpLOSD1sZHZ7u9LXOVjZNTZIejYhrTu+n+aLBBoyqw5ITuJrG2n
+         cF+1wL7tzqwg5jkwagS/VTIA100j2yEGKE4zFlVWCQKUoZfQpcg36LFoG/Tp0CPe2M52
+         xqig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O4bgGlnr9YGraqcGqRTVWqBe6uwtLwxkzJh4SzEwyFo=;
+        b=WXD/n8gmwfRdgK4xN05UmOLtcYRAn38VX1VFibb74RzA1yVVmEuhN72jFBcLC80eBH
+         OLKHwrvI2rUkrz6MDKgdwxss7uQEDupPRJimBDeaIZwv7Mm5F4BuqhwwlCBJ/4IjWQTa
+         Oa+n/W+LJYGLp9+Ef6SK3vRx1eErW/+I3gAfi0Lzke79/vGIVkUQ75Nl0owZ0m+wu6ah
+         n86FpVESy8YMv3oHd71L69i2i7INMXiB6hY8N9EVShint0pUSmAXi2osbVE3Gk6P0u0u
+         /t9bkiZ3WYFTP2dIQM+JOnQwpl065EmLnPKSGEBAbpRjYl8erZ+bEXtz66wkx0FxSxZk
+         Ma6g==
+X-Gm-Message-State: APjAAAWB8KuctPycfzGuaLo7OFof+5a/MtjRDjF1TGzfVksrDTyhOKu8
+        GBdEQcE4gzHHhyUY+LXLYnHyqQyrAGMT4KbNU4I=
+X-Google-Smtp-Source: APXvYqyDpAorsfYdBpBR7EzrIYuwOiOE/+kKmQo8NuX1/d/ejR8FXEbCO3p7ECFkoT2VHLhSYf+JnIGOFaAWsURHIeA=
+X-Received: by 2002:a05:6830:4ae:: with SMTP id l14mr3403148otd.185.1574163387705;
+ Tue, 19 Nov 2019 03:36:27 -0800 (PST)
+MIME-Version: 1.0
+References: <20191111172012.28356-1-joao.m.martins@oracle.com> <20191111172012.28356-3-joao.m.martins@oracle.com>
+In-Reply-To: <20191111172012.28356-3-joao.m.martins@oracle.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 19 Nov 2019 19:36:19 +0800
+Message-ID: <CANRm+CyrbiJ068zLRH8ZMttqjnEG38qb1W1SMND+H-D=8N8tVw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: VMX: Do not change PID.NDST when loading a
+ blocked vCPU
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v3 01/19] x86/msr-index: Clean up bit defines for
- IA32_FEATURE_CONTROL MSR
-Message-ID: <20191119111445.GB27787@zn.tnic>
-References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
- <20191119031240.7779-2-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191119031240.7779-2-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Liran Alon <liran.alon@oracle.com>,
+        Jag Raman <jag.raman@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 07:12:22PM -0800, Sean Christopherson wrote:
-> As pointed out by Boris, the defines for bits in IA32_FEATURE_CONTROL
-> are quite a mouthful, especially the VMX bits which must differentiate
-> between enabling VMX inside and outside SMX (TXT) operation.  Rename the
-> bit defines to abbreviate FEATURE_CONTROL as FEAT_CTL so that they're a
-> little friendlier on the eyes.  Keep the full name for the MSR itself to
-> help even the most obtuse reader decipher the abbreviation, and to match
-> the name used by the Intel SDM.
-> 
-> Opportunistically fix a few other annoyances with the defines:
-> 
->   - Relocate the bit defines so that they immediately follow the MSR
->     define, e.g. aren't mistaken as belonging to MISC_FEATURE_CONTROL.
->   - Add whitespace around the block of feature control defines to make
->     it clear that FEAT_CTL is indeed short for FEATURE_CONTROL.
->   - Use BIT() instead of manually encoding the bit shift.
->   - Use "VMX" instead of "VMXON" to match the SDM.
->   - Append "_ENABLED" to the LMCE bit to be consistent with the verbiage
->     used for all other feature control bits.  (LCME is an acronym for
->     Local Machine Check Exception, i.e. LMCE_ENABLED is not redundant).
+On Tue, 12 Nov 2019 at 01:23, Joao Martins <joao.m.martins@oracle.com> wrote:
+>
+> While vCPU is blocked (in kvm_vcpu_block()), it may be preempted which
+> will cause vmx_vcpu_pi_put() to set PID.SN.  If later the vCPU will be
 
-Sure but SDM calls it LMCE_ON. What is our current decision on sticking
-to SDM bit names? I guess we don't...
+How can this happen? See the prepare_to_swait_exlusive() in
+kvm_vcpu_block(), the task will be set in TASK_INTERRUPTIBLE state,
+kvm_sched_out will set vcpu->preempted to true iff current->state ==
+TASK_RUNNING.
 
-But above you say "to match the SDM"...
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+    Wanpeng
