@@ -2,215 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C9AF102DF0
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 22:06:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 763AD102E79
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 22:46:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727468AbfKSVGn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 16:06:43 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:36872 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727403AbfKSVGm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 16:06:42 -0500
-Received: by mail-il1-f195.google.com with SMTP id s5so1033909iln.4
-        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 13:06:40 -0800 (PST)
+        id S1727224AbfKSVqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 16:46:16 -0500
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:44950 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727140AbfKSVqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 16:46:16 -0500
+Received: by mail-yw1-f67.google.com with SMTP id p128so7888270ywc.11;
+        Tue, 19 Nov 2019 13:46:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mGwHKktdHWfe1wudNntoyFI8byqQVxr7vbzvHkvedAo=;
-        b=rMxIfQJnnWLaY9kXb4aYVfV+q/5OV1uxc/T+Xk0Djbnesr+k9pFXkrrnXtmzoY4l7J
-         0n9UZ2EXzCEBM478DLvp2ZKyrgfEGvF3FQ9xCR2eNd/SBHe9B9nBgF7VYtg0/GUlkyAx
-         dANimp8QfAuXJtwlbE88NQSRgWAvHQFX1tkxG8pKJD0qux065mOr9BIzA+mcygzJnZPK
-         9WxR0TRUQ3/zF5E0I/FSYkxacmI1x5fllRPv3HUzSN+tC7fJ7k8j7sZE1VUkfm18gWu7
-         b3hn7M6T0Y516mbkPuyuFbsAE0QqQbAXGjvyGMtfcIm4TsXeBsC+pFoCRcRCWQCzNrXD
-         HKHg==
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=pUpWlzhNnUNrlheiRsxAz8OGFtPbKHfioHTNH0/oEpE=;
+        b=JBrWf6e4IA8PUaXiQepHokT5R8iFYw1TRXjXUUVZtSdMQJk3bpaJpVUOCeSN/bZNho
+         LH0WyDQF+fGSZkRfy1bZbEdm+I8eWWNdgTuatgbsZlzcc+CnSJejSfW/coRMo4175zoX
+         EdAGXmly+HemG48vd1MF5bdMyd1F2TKrOl6xi92ZdzdDJxe8Y6eN/WcbYQWMKl5oJAcP
+         tD1jZYtswA16KrtRooMm2io5iF+s+XM5urtJmYfvuAimFo4dbgiEbBdy7pLqWCq6KRDu
+         KUAN1/0XjEEU59V89QXvHF0tpa5UNqbI9gXbyfBGSXB6buIICiFJJTl6e+QYxL0oE5fB
+         +K4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mGwHKktdHWfe1wudNntoyFI8byqQVxr7vbzvHkvedAo=;
-        b=qwUuTgpGiLQnEZgm4SJeAsvbYGr4m9r1OHHeEwD00tQMS4P07F6nGyLmdTFL7Osgo+
-         FZFkCJlo21gXrqgl1Nz1zNWyDDPvMmig1QkSv+EW4pEdEEMwc/hRZx7YYc94CzfoFdVv
-         htH7kEp0FclIt/JT6Vli3035QXoe9LThKy0xSd9G+CyBOlB/HgodF6HKwbYIf/1BjNfS
-         AWZ6VbvnyEgEeLdmgqFtiT+f4Sjc7IvL+dZU37SUXSFb58IKkCvJcpmnghzaXVrk5CZm
-         MG6shuNlE6KHXXCtiXea36qWY4LOb1szi/oDQFP6wixyluhGcxeSIHKvbtCcT5Glq+92
-         kC/A==
-X-Gm-Message-State: APjAAAVBEvew/osBpcBs6kR7G9kOe65drx8oF3Iy/BJOFPdW6S9OFL8O
-        mKO/OxOy0LVCCU4ak+noNRpIsfOdJjp0tTkIaX3KdA==
-X-Google-Smtp-Source: APXvYqzeMnsNbcW39YM71C6lXnjfG2cyRu9l9m8Nv+Dxku4yXqeHbPqemUzbbrb8tx99n/J0VLeno+7xSccST/M4c3s=
-X-Received: by 2002:a92:85:: with SMTP id 127mr25151196ila.118.1574197599779;
- Tue, 19 Nov 2019 13:06:39 -0800 (PST)
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=pUpWlzhNnUNrlheiRsxAz8OGFtPbKHfioHTNH0/oEpE=;
+        b=G43Q1qM7GizyM7+3yeA0x7hvCEVuUUvc/Hy0kjg6gn0mV3huBPMcZ4EGifhgCRtw8j
+         QsdsdUmi5tWHrwuVBH+3EyG56Br7fW9NaaOTU3TbZ+Y1rZQofHRSMCcs/rRRPvKKzL79
+         ibjAd6/XL/ZMj95375k7WoOX2s5aBEYZeE2SD+B9XWPrJ3lrIYR93VnBwpYVb/HLj7oK
+         SWvaykWh254cWvm1J23NTfBNSeUOZgYfLX/JnEFByU+7keQsqiR4xINZZ8sj+QPYMWDc
+         j+HiCRBe7hF70q97ahWoL54eikWZzVXXKEWeYmFYgeSaROlOFClyKzd2+cwEOwhW30P5
+         KQDw==
+X-Gm-Message-State: APjAAAUApg+QfdU3jaLTCCK7yybz4FferSMvvHL07D2Tr9XuQzr9/Lm1
+        0Kih5timy5Buz2nl8l6I3Qk=
+X-Google-Smtp-Source: APXvYqyqnM7Mm250334POn8xmkE9jk/uGBRqiWKn9Tf1/k5diRgcKFSXylHiVM4SVIF7IsEWqpz/vw==
+X-Received: by 2002:a81:168c:: with SMTP id 134mr4308yww.436.1574199973120;
+        Tue, 19 Nov 2019 13:46:13 -0800 (PST)
+Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id s18sm10437781ywk.33.2019.11.19.13.46.10
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Nov 2019 13:46:12 -0800 (PST)
+Subject: [PATCH v14 0/6] mm / virtio: Provide support for unused page
+ reporting
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
+        osalvador@suse.de
+Date:   Tue, 19 Nov 2019 13:46:09 -0800
+Message-ID: <20191119214454.24996.66289.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com> <1574101067-5638-5-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1574101067-5638-5-git-send-email-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 19 Nov 2019 13:06:28 -0800
-Message-ID: <CALMp9eQ=QXD5sFCADtFY0Bc9wWcn2nhq7XdahD-g4DBSgARYJw@mail.gmail.com>
-Subject: Re: [PATCH 4/5] KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM functionality
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 10:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The current guest mitigation of TAA is both too heavy and not really
-> sufficient.  It is too heavy because it will cause some affected CPUs
-> (those that have MDS_NO but lack TAA_NO) to fall back to VERW and
-> get the corresponding slowdown.  It is not really sufficient because
-> it will cause the MDS_NO bit to disappear upon microcode update, so
-> that VMs started before the microcode update will not be runnable
-> anymore afterwards, even with tsx=on.
->
-> Instead, if tsx=on on the host, we can emulate MSR_IA32_TSX_CTRL for
-> the guest and let it run without the VERW mitigation.  Even though
-> MSR_IA32_TSX_CTRL is quite heavyweight, and we do not want to write
-> it on every vmentry, we can use the shared MSR functionality because
-> the host kernel need not protect itself from TSX-based side-channels.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 34 +++++++++++++++++++++++++++++++---
->  arch/x86/kvm/x86.c     | 23 +++++------------------
->  2 files changed, 36 insertions(+), 21 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 04a8212704c1..ed25fe7d5234 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -450,6 +450,7 @@ noinline void invept_error(unsigned long ext, u64 eptp, gpa_t gpa)
->         MSR_SYSCALL_MASK, MSR_LSTAR, MSR_CSTAR,
->  #endif
->         MSR_EFER, MSR_TSC_AUX, MSR_STAR,
-> +       MSR_IA32_TSX_CTRL,
->  };
->
->  #if IS_ENABLED(CONFIG_HYPERV)
-> @@ -1683,6 +1684,9 @@ static void setup_msrs(struct vcpu_vmx *vmx)
->         index = __find_msr_index(vmx, MSR_TSC_AUX);
->         if (index >= 0 && guest_cpuid_has(&vmx->vcpu, X86_FEATURE_RDTSCP))
->                 move_msr_up(vmx, index, save_nmsrs++);
-> +       index = __find_msr_index(vmx, MSR_IA32_TSX_CTRL);
-> +       if (index >= 0)
-> +               move_msr_up(vmx, index, save_nmsrs++);
->
->         vmx->save_nmsrs = save_nmsrs;
->         vmx->guest_msrs_ready = false;
-> @@ -1782,6 +1786,11 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  #endif
->         case MSR_EFER:
->                 return kvm_get_msr_common(vcpu, msr_info);
-> +       case MSR_IA32_TSX_CTRL:
-> +               if (!msr_info->host_initiated &&
-> +                   !(vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR))
-> +                       return 1;
-> +               goto find_shared_msr;
->         case MSR_IA32_UMWAIT_CONTROL:
->                 if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
->                         return 1;
-> @@ -1884,8 +1893,9 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 if (!msr_info->host_initiated &&
->                     !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->                         return 1;
-> -               /* Else, falls through */
-> +               goto find_shared_msr;
->         default:
-> +       find_shared_msr:
->                 msr = find_msr_entry(vmx, msr_info->index);
->                 if (msr) {
->                         msr_info->data = msr->data;
-> @@ -2001,6 +2011,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                                               MSR_IA32_SPEC_CTRL,
->                                               MSR_TYPE_RW);
->                 break;
-> +       case MSR_IA32_TSX_CTRL:
-> +               if (!msr_info->host_initiated &&
-> +                   !(vcpu->arch.arch_capabilities & ARCH_CAP_TSX_CTRL_MSR))
-> +                       return 1;
-> +               if (data & ~(TSX_CTRL_RTM_DISABLE | TSX_CTRL_CPUID_CLEAR))
-> +                       return 1;
-> +               goto find_shared_msr;
->         case MSR_IA32_PRED_CMD:
->                 if (!msr_info->host_initiated &&
->                     !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-> @@ -2152,8 +2169,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 /* Check reserved bit, higher 32 bits should be zero */
->                 if ((data >> 32) != 0)
->                         return 1;
-> -               /* Else, falls through */
-> +               goto find_shared_msr;
-> +
->         default:
-> +       find_shared_msr:
->                 msr = find_msr_entry(vmx, msr_index);
->                 if (msr) {
->                         u64 old_msr_data = msr->data;
-> @@ -4234,7 +4253,16 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
->                         continue;
->                 vmx->guest_msrs[j].index = i;
->                 vmx->guest_msrs[j].data = 0;
-> -               vmx->guest_msrs[j].mask = -1ull;
-> +
-> +               switch (index) {
-> +               case MSR_IA32_TSX_CTRL:
-> +                       /* No need to pass TSX_CTRL_CPUID_CLEAR through.  */
-> +                       vmx->guest_msrs[j].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
-> +                       break;
+This series provides an asynchronous means of reporting unused guest
+pages to a hypervisor so that the memory associated with those pages can
+be dropped and reused by other processes and/or guests on the host. Using
+this it is possible to avoid unnecessary I/O to disk and greatly improve
+performance in the case of memory overcommit on the host.
 
-Why even bother with the special case here? Does this make the wrmsr faster?
+When enabled it will allocate a set of statistics to track the number of
+reported pages. When the nr_free for a given free area is greater than
+this by the high water mark we will schedule a worker to begin pulling the
+non-reported memory and to provide it to the reporting interface via a
+scatterlist.
 
-> +               default:
-> +                       vmx->guest_msrs[j].mask = -1ull;
-> +                       break;
-> +               }
->                 ++vmx->nmsrs;
->         }
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 648e84e728fc..fc54e3905fe3 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1314,29 +1314,16 @@ static u64 kvm_get_arch_capabilities(void)
->                 data |= ARCH_CAP_MDS_NO;
->
->         /*
-> -        * On TAA affected systems, export MDS_NO=0 when:
-> -        *      - TSX is enabled on the host, i.e. X86_FEATURE_RTM=1.
-> -        *      - Updated microcode is present. This is detected by
-> -        *        the presence of ARCH_CAP_TSX_CTRL_MSR and ensures
-> -        *        that VERW clears CPU buffers.
-> -        *
-> -        * When MDS_NO=0 is exported, guests deploy clear CPU buffer
-> -        * mitigation and don't complain:
-> -        *
-> -        *      "Vulnerable: Clear CPU buffers attempted, no microcode"
-> -        *
-> -        * If TSX is disabled on the system, guests are also mitigated against
-> -        * TAA and clear CPU buffer mitigation is not required for guests.
-> +        * On TAA affected systems:
-> +        *      - nothing to do if TSX is disabled on the host.
-> +        *      - we emulate TSX_CTRL if present on the host.
-> +        *        This lets the guest use VERW to clear CPU buffers.
->          */
->         if (!boot_cpu_has(X86_FEATURE_RTM))
-> -               data &= ~ARCH_CAP_TAA_NO;
-> +               data &= ~(ARCH_CAP_TAA_NO | ARCH_CAP_TSX_CTRL_MSR);
->         else if (!boot_cpu_has_bug(X86_BUG_TAA))
->                 data |= ARCH_CAP_TAA_NO;
-> -       else if (data & ARCH_CAP_TSX_CTRL_MSR)
-> -               data &= ~ARCH_CAP_MDS_NO;
->
-> -       /* KVM does not emulate MSR_IA32_TSX_CTRL.  */
-> -       data &= ~ARCH_CAP_TSX_CTRL_MSR;
->         return data;
->  }
->  EXPORT_SYMBOL_GPL(kvm_get_arch_capabilities);
-> --
-> 1.8.3.1
->
->
+Currently this is only in use by virtio-balloon however there is the hope
+that at some point in the future other hypervisors might be able to make
+use of it. In the virtio-balloon/QEMU implementation the hypervisor is
+currently using MADV_DONTNEED to indicate to the host kernel that the page
+is currently unused. It will be zeroed and faulted back into the guest the
+next time the page is accessed.
+
+To track if a page is reported or not the Uptodate flag was repurposed and
+used as a Reported flag for Buddy pages. We walk though the free list
+isolating pages and adding them to the scatterlist until we either
+encounter the end of the list or have filled the scatterlist with pages to
+be reported. If we fill the scatterlist before we reach the end of the
+list we rotate the list so that the first unreported page we encounter is
+moved to the head of the list as that is where we will resume after we
+have freed the reported pages back into the tail of the list.
+
+Below are the results from various benchmarks. I primarily focused on two
+tests. The first is the will-it-scale/page_fault2 test, and the other is
+a modified version of will-it-scale/page_fault1 that was enabled to use
+THP. I did this as it allows for better visibility into different parts
+of the memory subsystem. The guest is running with 32G for RAM on one
+node of a E5-2630 v3. The host has had some power saving features disabled
+by setting the /dev/cpu_dma_latency value to 10ms.
+
+Test                page_fault1 (THP)     page_fault2
+Name         tasks  Process Iter  STDEV  Process Iter  STDEV
+Baseline         1    1203934.75  0.04%     379940.75  0.11%
+                16    8828217.00  0.85%    3178653.00  1.28%
+
+Patches applied  1    1207961.25  0.10%     380852.25  0.25%
+                16    8862373.00  0.98%    3246397.25  0.68%
+
+Patches enabled  1    1207758.75  0.17%     373079.25  0.60%
+ MADV disabled  16    8870373.75  0.29%	   3204989.75  1.08%
+
+Patches enabled  1    1261183.75  0.39%     373201.50  0.50%
+                16    8371359.75  0.65%    3233665.50  0.84%
+
+Patches enabled  1    1090201.50  0.25%     376967.25  0.29%
+ page shuffle   16    8108719.75  0.58%    3218450.25  1.07%
+
+The results above are for a baseline with a linux-next-20191115 kernel,
+that kernel with this patch set applied but page reporting disabled in
+virtio-balloon, patches applied but the madvise disabled by direct
+assigning a device, the patches applied and page reporting fully
+enabled, and the patches enabled with page shuffling enabled.  These
+results include the deviation seen between the average value reported here
+versus the high and/or low value. I observed that during the test memory
+usage for the first three tests never dropped whereas with the patches
+fully enabled the VM would drop to using only a few GB of the host's
+memory when switching from memhog to page fault tests.
+
+Most of the overhead seen with this patch set enabled seems due to page
+faults caused by accessing the reported pages and the host zeroing the page
+before giving it back to the guest. This overhead is much more visible when
+using THP than with standard 4K pages. In addition page shuffling seemed to
+increase the amount of faults generated due to an increase in memory churn.
+
+The overall guest size is kept fairly small to only a few GB while the test
+is running. If the host memory were oversubscribed this patch set should
+result in a performance improvement as swapping memory in the host can be
+avoided.
+
+A brief history on the background of unused page reporting can be found at:
+https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com/
+
+Changes from v12:
+https://lore.kernel.org/lkml/20191022221223.17338.5860.stgit@localhost.localdomain/
+Rebased on linux-next 20191031
+Renamed page_is_reported to page_reported
+Renamed add_page_to_reported_list to mark_page_reported
+Dropped unused definition of add_page_to_reported_list for non-reporting case
+Split free_area_reporting out from get_unreported_tail
+Minor updates to cover page
+
+Changes from v13:
+https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost.localdomain/
+Rewrote core reporting functionality
+  Merged patches 3 & 4
+  Dropped boundary list and related code
+  Folded get_reported_page into page_reporting_fill
+  Folded page_reporting_fill into page_reporting_cycle
+Pulled reporting functionality out of free_reported_page
+  Renamed it to __free_isolated_page
+  Moved page reporting specific bits to page_reporting_drain
+Renamed phdev to prdev since we aren't "hinting" we are "reporting"
+Added documentation to describe the usage of unused page reporting
+Updated cover page and patch descriptions to avoid mention of boundary
+
+
+---
+
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce Reported pages
+      mm: Add unused page reporting documentation
+      virtio-balloon: Pull page poisoning config out of free page hinting
+      virtio-balloon: Add support for providing unused page reports to host
+
+
+ Documentation/vm/unused_page_reporting.rst |   44 ++++
+ drivers/virtio/Kconfig                     |    1 
+ drivers/virtio/virtio_balloon.c            |   88 +++++++
+ include/linux/mmzone.h                     |   56 +----
+ include/linux/page-flags.h                 |   11 +
+ include/linux/page_reporting.h             |   31 +++
+ include/uapi/linux/virtio_balloon.h        |    1 
+ mm/Kconfig                                 |   11 +
+ mm/Makefile                                |    1 
+ mm/memory_hotplug.c                        |    2 
+ mm/page_alloc.c                            |  181 +++++++++++----
+ mm/page_reporting.c                        |  337 ++++++++++++++++++++++++++++
+ mm/page_reporting.h                        |  125 ++++++++++
+ mm/shuffle.c                               |   12 -
+ mm/shuffle.h                               |    6 
+ 15 files changed, 805 insertions(+), 102 deletions(-)
+ create mode 100644 Documentation/vm/unused_page_reporting.rst
+ create mode 100644 include/linux/page_reporting.h
+ create mode 100644 mm/page_reporting.c
+ create mode 100644 mm/page_reporting.h
+
+--
