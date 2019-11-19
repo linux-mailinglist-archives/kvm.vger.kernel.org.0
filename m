@@ -2,147 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77C93102114
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 10:45:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32C4010213E
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 10:53:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725904AbfKSJpt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 04:45:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60486 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725280AbfKSJps (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 04:45:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574156748;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9AUb92RYFJFMPUckMcMKSsMU74llM5H5sHH7q4HkSEU=;
-        b=B2l+u0/WC4cEcuhrJGHM35AbO6xbMw77jf9S8MY4g23nBcPDiOVQD9P2jYl3uheKw34HKG
-        OjynOZD/JCsotVOXRGVhFRIvWp56xstmZk1zNM3YIr7hT6oKzHs+c+P0EPlDGdTXBDztgE
-        J+xIJnyJcLDfGSlCz43mQz7HXrdfc3k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-vHhsPlpiO1GWTroyzCkHnw-1; Tue, 19 Nov 2019 04:45:46 -0500
-X-MC-Unique: vHhsPlpiO1GWTroyzCkHnw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B6821852E20;
-        Tue, 19 Nov 2019 09:45:45 +0000 (UTC)
-Received: from gondolin (ovpn-117-102.ams2.redhat.com [10.36.117.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A299627DE;
-        Tue, 19 Nov 2019 09:45:40 +0000 (UTC)
-Date:   Tue, 19 Nov 2019 10:45:28 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 23/37] KVM: s390: protvirt: Make sure prefix is always
- protected
-Message-ID: <20191119104528.3f3c2620.cohuck@redhat.com>
-In-Reply-To: <db54630b-8959-feba-168e-0afecc30d4b9@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-24-frankja@linux.ibm.com>
-        <20191118173942.0252b731.cohuck@redhat.com>
-        <db54630b-8959-feba-168e-0afecc30d4b9@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="Sig_/zhv7PoOZ1lQTw1Ax=3I64YS";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+        id S1727324AbfKSJxw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 04:53:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9334 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727255AbfKSJxw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 04:53:52 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAJ9qq1O031231
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 04:53:47 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wact6pw16-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 04:53:47 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <imbrenda@linux.ibm.com>;
+        Tue, 19 Nov 2019 09:53:43 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 19 Nov 2019 09:53:41 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAJ9reTh57934034
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 09:53:40 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 414C152051;
+        Tue, 19 Nov 2019 09:53:40 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.108])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 007235204F;
+        Tue, 19 Nov 2019 09:53:39 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, frankja@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v4 0/3] s390x: SCLP Unit test
+Date:   Tue, 19 Nov 2019 10:53:36 +0100
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19111909-0020-0000-0000-0000038A6D47
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111909-0021-0000-0000-000021E09863
+Message-Id: <1574157219-22052-1-git-send-email-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-19_02:2019-11-15,2019-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 mlxlogscore=696 suspectscore=1
+ adultscore=0 mlxscore=0 bulkscore=0 clxscore=1015 spamscore=0
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911190094
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/zhv7PoOZ1lQTw1Ax=3I64YS
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This patchset contains some minor cleanup, some preparatory work and
+then the SCLP unit test itself.
 
-On Tue, 19 Nov 2019 09:11:11 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+The unit test checks the following:
+    
+    * Correctly ignoring instruction bits that should be ignored
+    * Privileged instruction check
+    * Check for addressing exceptions
+    * Specification exceptions:
+      - SCCB size less than 8
+      - SCCB unaligned
+      - SCCB overlaps prefix or lowcore
+      - SCCB address higher than 2GB
+    * Return codes for
+      - Invalid command
+      - SCCB too short (but at least 8)
+      - SCCB page boundary violation
 
-> On 11/18/19 5:39 PM, Cornelia Huck wrote:
-> > On Thu, 24 Oct 2019 07:40:45 -0400
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >=20
-> > Add at least a short sentence here? =20
->=20
-> For protected VMs the lowcore does not only need to be mapped, but also
-> needs to be protected memory, if not we'll get a validity interception
-> when trying to run it.
+v3 -> v4
+* export sclp_setup_int instead of copying it
+* add more comments
+* rename some more variables to improve readability
+* improve the prefix test
+* improved the invalid address test
+* addressed further comments received during review
+v2 -> v3
+* generally improved the naming of variables
+* added and fixed comments
+* renamed test_one_run to test_one_simple
+* added some const where needed
+* addresed many more small comments received during review
+v1 -> v2
+* fix many small issues that came up during the first round of reviews
+* add comments to each function
+* use a static buffer for the SCCP template when used
 
-Much better, thanks!
+Claudio Imbrenda (3):
+  s390x: export sclp_setup_int
+  s390x: sclp: add service call instruction wrapper
+  s390x: SCLP unit test
 
->=20
-> >  =20
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>  arch/s390/kvm/kvm-s390.c | 9 +++++++++
-> >>  1 file changed, 9 insertions(+)
-> >>
-> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> >> index eddc9508c1b1..17a78774c617 100644
-> >> --- a/arch/s390/kvm/kvm-s390.c
-> >> +++ b/arch/s390/kvm/kvm-s390.c
-> >> @@ -3646,6 +3646,15 @@ static int kvm_s390_handle_requests(struct kvm_=
-vcpu *vcpu)
-> >>  =09=09rc =3D gmap_mprotect_notify(vcpu->arch.gmap,
-> >>  =09=09=09=09=09  kvm_s390_get_prefix(vcpu),
-> >>  =09=09=09=09=09  PAGE_SIZE * 2, PROT_WRITE);
-> >> +=09=09if (!rc && kvm_s390_pv_is_protected(vcpu->kvm)) {
-> >> +=09=09=09rc =3D uv_convert_to_secure(vcpu->arch.gmap,
-> >> +=09=09=09=09=09=09  kvm_s390_get_prefix(vcpu));
-> >> +=09=09=09WARN_ON_ONCE(rc && rc !=3D -EEXIST);
-> >> +=09=09=09rc =3D uv_convert_to_secure(vcpu->arch.gmap,
-> >> +=09=09=09=09=09=09  kvm_s390_get_prefix(vcpu) + PAGE_SIZE);
-> >> +=09=09=09WARN_ON_ONCE(rc && rc !=3D -EEXIST);
-> >> +=09=09=09rc =3D 0; =20
-> >=20
-> > So, what happens if we have an error other than -EEXIST (which
-> > presumably means that we already protected it) here? The page is not
-> > protected, and further accesses will get an error? (Another question:
-> > what can actually go wrong here?) =20
->=20
-> If KVM or QEMU write into a lowcore, we will fail the integrity check on
-> import and this cpu will never run again.
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |  13 ++
+ lib/s390x/sclp.h         |   1 +
+ lib/s390x/sclp.c         |   9 +-
+ s390x/sclp.c             | 465 +++++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 6 files changed, 485 insertions(+), 7 deletions(-)
+ create mode 100644 s390x/sclp.c
 
-From the guest's POV, is that similar to a cpu going into xstop?
-=20
-> In retrospect a warn_on_once might be the wrong error handling here.
->=20
-> >  =20
-> >> +=09=09}
-> >>  =09=09if (rc) {
-> >>  =09=09=09kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
-> >>  =09=09=09return rc; =20
-> >  =20
->=20
->=20
-
-
---Sig_/zhv7PoOZ1lQTw1Ax=3I64YS
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3TubgACgkQ3s9rk8bw
-L68TyxAAj7WCu4pHHzMaOOfcByYdpzzcqt4Z1xEWoh20i9FK+b7uRAQRBA0WdIBA
-RcxwMzsjNwJAspxH4/g/1agXJvDb5GK5ryaqvqBvOIm8cHLUOewT/jC0L+1qIC6J
-6w9yXU4Ml813k7hEj/qLwcjRqYIwxQe5r18IHGoI6tXnfBn2WYkokBzI4TzlADLr
-tpRIc6WvSQSorTqTm0xckBPJ+X3hL2/HWfq54SWl6XFdKbvmP0kQRvvZq6+UEaPs
-bbJ4AV6qGiWPzNt/yuv/9wKlS9zVTdnip5Tv1SZ/I2r8HQCyCZcG5yNUszCjKhp7
-P6pSIIvesjVXRVdPlWILoBZKxEcHLHD8yXhpjOcv9gn5ES3BcRrnT+wIuZbfTk8b
-3s1mgjAukFFOB/dvAFt1+bx5a2J7d3i1YlXSyTVRIbvdS1UK5hpwFFRP05GpAZpv
-cRdZ392oN5siqAOOgHuvwOGMOpMQYK4Zl55X1lCuV4uqdUe7s4EOVH1/qu8M8zoU
-ifeS0LTc3RAp0rbKEbqMffWw+8MiZ42SFSo3BXeQvn97tK52budt2nphwdA8PGsE
-CsmFM0P4Rgbal5i7MAx5vHvJVFEgcsEiBdlZ1XUo2aaGyGJ2bmfvTilJW1jRbJgd
-WyTWhPnpZnN+QLuZmSM2ESZmxg64QS3hCsZwllJJ3kB8JK6fkBw=
-=vkoq
------END PGP SIGNATURE-----
-
---Sig_/zhv7PoOZ1lQTw1Ax=3I64YS--
+-- 
+2.7.4
 
