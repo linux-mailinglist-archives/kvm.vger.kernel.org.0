@@ -2,115 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6100D103053
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 00:37:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC5CC103070
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 00:56:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727415AbfKSXht (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 18:37:49 -0500
-Received: from mail-eopbgr740092.outbound.protection.outlook.com ([40.107.74.92]:25275
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726874AbfKSXhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 18:37:48 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dFkEtmmzbXeO2qYv6m+VBNxP4X/jZNoR74dK6bieXznIjsLLPq1eZSl70Gu/cf6ME/rcimGFZgrB4Gz92Jq/0xmSexSmYeMrDJO5OYub7AGn8tISFch5CVamx4Tt4YNod9IgoV5GTw4B6420uA2n5Q8HEatBji5zDbGDiwhGxq8IVNBUFTudJWfLFt01bpiK46Z0XTEDoL6W9jOBs/ISimxw41dYGiMjh6shjeAi0hBmqPz+M0l7JujYgd/NBIt2II/kAXPLG8dGDtFiX8p50SLF+7cY/HZiBzn7PZaewPwku1O1GKc6iObmkYHcbJb/6dR+WQcwtZWwaTm3czTxMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z1sgkeW8s8KJPbYNIHYWFJPaZCkrEJcmzUoZZ49ge+I=;
- b=ksDVTi7pKcJJTOyv4SmvbaukSGen0M1BJ+BgHs7ttC0rTfOZmQplG2VTf3c8UxFD4Mwq09qGS3T5iDJ1UeONXFdRrrzJni/us6aYlh5ykW+gs1SXtPvq5t0EbAWcdJm2Dvt0A4Knz8CRZC3WYbzcTOYIcUEdkTvmx5u00rr7FKhGjpbQ3/AeOz8sPSyruGhIdI68/D4vc1ZkHCpBDWPBl7jZkfx33+NNMIOeNRU95/S2Fsm5BqYDgHlt+1XuBg6Kt4QsiCPD/yeybQcs1V5upY/wCypQZ8Z76s7Qt5cg+okyV4DI/HMsGh7JK203EM/67HyylGVMugrt4+y+u5AS0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z1sgkeW8s8KJPbYNIHYWFJPaZCkrEJcmzUoZZ49ge+I=;
- b=f297DyjUmI1u9eQaA2p9ZEL0pSVZWOk0yUmS6fL4zQ0dYHkqMVR8Kov/Q+f8Ot0W6bSXR66PJFTBvUUHA6Et97DEDQffZtRcjEKwB/P8ao3EtwWOTpC44p2DXPRoXdJpj7hod7tlM+N0/Gdy8E9iGbxONyxWbLruZhLKu0MDgBE=
-Received: from CY4PR21MB0629.namprd21.prod.outlook.com (10.175.115.19) by
- CY4PR21MB0789.namprd21.prod.outlook.com (10.175.121.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.3; Tue, 19 Nov 2019 23:37:44 +0000
-Received: from CY4PR21MB0629.namprd21.prod.outlook.com
- ([fe80::ed94:4b6d:5371:285c]) by CY4PR21MB0629.namprd21.prod.outlook.com
- ([fe80::ed94:4b6d:5371:285c%5]) with mapi id 15.20.2495.006; Tue, 19 Nov 2019
- 23:37:44 +0000
-From:   Michael Kelley <mikelley@microsoft.com>
-To:     "lantianyu1986@gmail.com" <lantianyu1986@gmail.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "sashal@kernel.org" <sashal@kernel.org>,
-        "mchehab+samsung@kernel.org" <mchehab+samsung@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "robh@kernel.org" <robh@kernel.org>,
-        "Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
-        "paulmck@linux.ibm.com" <paulmck@linux.ibm.com>
-CC:     Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        vkuznets <vkuznets@redhat.com>
-Subject: RE: [PATCH] VFIO/VMBUS: Add VFIO VMBUS driver support
-Thread-Topic: [PATCH] VFIO/VMBUS: Add VFIO VMBUS driver support
-Thread-Index: AQHVmGxauB7OPo498EatkuQ0bgSaPqeTEvjg
-Date:   Tue, 19 Nov 2019 23:37:43 +0000
-Message-ID: <CY4PR21MB06295B84DDA48DD414B21071D74C0@CY4PR21MB0629.namprd21.prod.outlook.com>
-References: <20191111084507.9286-1-Tianyu.Lan@microsoft.com>
+        id S1727468AbfKSX43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 18:56:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36593 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727329AbfKSX43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 18:56:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574207786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QSUMhah2Sl05f2BtPYajl6y1IgKm0HFkuzBJb2Obo/s=;
+        b=a3+/9t4olh7MdFITiJINat6UpYWKUpywuy5vOWnxQB3vSbMbigtWKnMqUE1AKuWrAX6rte
+        gFcMflCzFsNcg4dIreLlV6mMxtJi87awH7sIR4lDDDt5BGab/p4ExHES44BMcpJT1LIxeo
+        sfZ6PO0HUw8rNBqGMOYYy/Jod6rDjKQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-qAgxEFI9M9Kzx9JRr_P37g-1; Tue, 19 Nov 2019 18:56:25 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F316D801E5D;
+        Tue, 19 Nov 2019 23:56:22 +0000 (UTC)
+Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 564866CE40;
+        Tue, 19 Nov 2019 23:56:21 +0000 (UTC)
+Date:   Tue, 19 Nov 2019 16:56:20 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     lantianyu1986@gmail.com
+Cc:     cohuck@redhat.com, kys@microsoft.com, haiyangz@microsoft.com,
+        sthemmin@microsoft.com, sashal@kernel.org,
+        mchehab+samsung@kernel.org, davem@davemloft.net,
+        gregkh@linuxfoundation.org, robh@kernel.org,
+        Jonathan.Cameron@huawei.com, paulmck@linux.ibm.com,
+        michael.h.kelley@microsoft.com,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, vkuznets@redhat.com
+Subject: Re: [PATCH] VFIO/VMBUS: Add VFIO VMBUS driver support
+Message-ID: <20191119165620.0f42e5ba@x1.home>
 In-Reply-To: <20191111084507.9286-1-Tianyu.Lan@microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=mikelley@ntdev.microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-11-19T23:37:41.8135810Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=4baa8fe5-2a13-4574-b2ca-7f98aceea2f4;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=mikelley@microsoft.com; 
-x-originating-ip: [24.22.167.197]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: add63804-abfe-4afb-0e81-08d76d4979d5
-x-ms-traffictypediagnostic: CY4PR21MB0789:|CY4PR21MB0789:|CY4PR21MB0789:
-x-ms-exchange-transport-forked: True
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <CY4PR21MB0789F6573A220C6D75E16538D74C0@CY4PR21MB0789.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 022649CC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(376002)(366004)(39860400002)(396003)(189003)(199004)(6246003)(8936002)(110136005)(66446008)(66476007)(7416002)(54906003)(66556008)(66946007)(25786009)(64756008)(10090500001)(76116006)(22452003)(316002)(14454004)(5660300002)(10290500003)(1511001)(52536014)(478600001)(66066001)(2201001)(476003)(486006)(11346002)(446003)(86362001)(81166006)(81156014)(33656002)(8676002)(76176011)(2906002)(6116002)(3846002)(4326008)(71190400001)(71200400001)(2501003)(99286004)(30864003)(8990500004)(102836004)(6506007)(305945005)(9686003)(6436002)(55016002)(186003)(256004)(74316002)(26005)(229853002)(14444005)(7736002)(7696005)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR21MB0789;H:CY4PR21MB0629.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: g9ygW9c6xe8ns2IOS9jGOGYQhCholMo9x31rz9qpZX9IPahFkEntWp8M9TipUBCOkSG7c1dnOd3oaX9Dbu35hVfgYGOsDXJskmcczPIuAPCFYBSQS/+XXggPRMDGafKt4Rri1xExSP9D1Tjyieqbeu63uxg0vwrruTEU5jvuqYdHU6cJy63euhJ0AUR6N9AsJZGvTWivFTkRlhgnE0YsqCnrVMhJHO5PD+aM3QmCa+w/tyE9T/T3BatY4QSFgs+rkYy0MDTj2g87da949OaRwRN1WDPMztqkCfkX7om1kLic4zyWcGlPxqyae+M52LVOkQQSEWIEa1LW2dnOqU2YqJgremM9tbXTj7KCORRIEtZCXoYzBac5P+rH1AvxDj3Yts/xq5XVD6KA3s9Rezpz2Wy7hcqAE3LtlHMrZc63flqqZvu+eoOdtV0tLavNaBVM
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+References: <20191111084507.9286-1-Tianyu.Lan@microsoft.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: add63804-abfe-4afb-0e81-08d76d4979d5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 23:37:43.8841
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: esl+gqcDOjBtxecLKNG0145zczzKYaC4NKWx/oczkLi7Dgnd0x9gSrnjwdfDZTpClra+2PuZaq5Nz91NkXI4+vQALPZ0+8VrUZdXirTxbrw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR21MB0789
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: qAgxEFI9M9Kzx9JRr_P37g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: lantianyu1986@gmail.com <lantianyu1986@gmail.com> Sent: Monday, Novem=
-ber 11, 2019 12:45 AM
+On Mon, 11 Nov 2019 16:45:07 +0800
+lantianyu1986@gmail.com wrote:
+
+> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
 >=20
 > This patch is to add VFIO VMBUS driver support in order to expose
 > VMBUS devices to user space drivers(Reference Hyper-V UIO driver).
@@ -119,25 +72,21 @@ ber 11, 2019 12:45 AM
 >=20
 > So far, Hyper-V doesn't provide virtual IOMMU support and so this
 > driver needs to be used with VFIO noiommu mode.
->=20
+
+Let's be clear here, vfio no-iommu mode taints the kernel and was a
+compromise that we can re-use vfio-pci in its entirety, so it had a
+high code reuse value for minimal code and maintenance investment.  It
+was certainly not intended to provoke new drivers that rely on this mode
+of operation.  In fact, no-iommu should be discouraged as it provides
+absolutely no isolation.  I'd therefore ask, why should this be in the
+kernel versus any other unsupportable out of tree driver?  It appears
+almost entirely self contained.  Thanks,
+
+Alex
+=20
 > Current netvsc PMD driver in DPDK doesn't have IRQ mode support.
 > This driver version skips IRQ control part and adds later when
 > there is a real request.
-
-Let me suggest some cleaned up wording for the commit message:
-
-Add a VFIO VMBus driver to expose VMBus devices to user-space
-drivers in a manner similar to the Hyper-V UIO driver.  For example,
-DPDK has a netvsc Poll-Mode Driver (PMD) and it can get VMBus
-resources via the VFIO interface with this new driver.
-
-Hyper-V doesn't provide a virtual IOMMU in guest VMs, so this=20
-driver must be used in VFIO noiommu mode.
-
-The current netvsc PMD driver in DPDK doesn't use IRQ mode so this
-driver does not implement IRQ control.  IRQ control can be added
-later when there is a PMD driver that needs it.
-
 >=20
 > Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
 > ---
@@ -145,8 +94,8 @@ later when there is a PMD driver that needs it.
 >  drivers/vfio/Kconfig            |   1 +
 >  drivers/vfio/Makefile           |   1 +
 >  drivers/vfio/vmbus/Kconfig      |   9 +
->  drivers/vfio/vmbus/vfio_vmbus.c | 407
-> ++++++++++++++++++++++++++++++++++++++++
+>  drivers/vfio/vmbus/vfio_vmbus.c | 407 ++++++++++++++++++++++++++++++++++=
+++++++
 >  include/uapi/linux/vfio.h       |  12 ++
 >  6 files changed, 431 insertions(+)
 >  create mode 100644 drivers/vfio/vmbus/Kconfig
@@ -156,14 +105,14 @@ later when there is a PMD driver that needs it.
 > index 55199ef7fa74..6f61fb351a5d 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -7574,6 +7574,7 @@ F:	drivers/scsi/storvsc_drv.c
->  F:	drivers/uio/uio_hv_generic.c
->  F:	drivers/video/fbdev/hyperv_fb.c
->  F:	drivers/iommu/hyperv-iommu.c
-> +F:	drivers/vfio/vmbus/
->  F:	net/vmw_vsock/hyperv_transport.c
->  F:	include/clocksource/hyperv_timer.h
->  F:	include/linux/hyperv.h
+> @@ -7574,6 +7574,7 @@ F:=09drivers/scsi/storvsc_drv.c
+>  F:=09drivers/uio/uio_hv_generic.c
+>  F:=09drivers/video/fbdev/hyperv_fb.c
+>  F:=09drivers/iommu/hyperv-iommu.c
+> +F:=09drivers/vfio/vmbus/
+>  F:=09net/vmw_vsock/hyperv_transport.c
+>  F:=09include/clocksource/hyperv_timer.h
+>  F:=09include/linux/hyperv.h
 > diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
 > index fd17db9b432f..f4e075fcedbe 100644
 > --- a/drivers/vfio/Kconfig
@@ -190,27 +139,14 @@ later when there is a PMD driver that needs it.
 > +++ b/drivers/vfio/vmbus/Kconfig
 > @@ -0,0 +1,9 @@
 > +config VFIO_VMBUS
-> +	tristate "VFIO support for vmbus devices"
-> +	depends on VFIO && HYPERV
-> +	help
-> +	  Support for the VMBUS VFIO bus driver. Expose VMBUS
-> +	  resources to user space drivers(e.g, DPDK and SPDK).
+> +=09tristate "VFIO support for vmbus devices"
+> +=09depends on VFIO && HYPERV
+> +=09help
+> +=09  Support for the VMBUS VFIO bus driver. Expose VMBUS
+> +=09  resources to user space drivers(e.g, DPDK and SPDK).
 > +
-> +	  If you don't know what to do here, say N.
+> +=09  If you don't know what to do here, say N.
 > +
-
-Let's use consistent capitalization of "VMBus".   So:
-
-config VFIO_VMBUS
-	tristate "VFIO support for Hyper-V VMBus devices"
-	depends on VFIO && HYPERV
-	help
-	 Support for the VMBus VFIO driver, which exposes VMBus
-	 resources to user space drivers (e.g., DPDK and SPDK).
-
-	 If you don't know what to do here, say N.
-
-
 > diff --git a/drivers/vfio/vmbus/vfio_vmbus.c b/drivers/vfio/vmbus/vfio_vm=
 bus.c
 > new file mode 100644
@@ -238,225 +174,422 @@ bus.c
 > +#include "../../hv/hyperv_vmbus.h"
 > +
 > +
-> +#define DRIVER_VERSION	"0.0.1"
-> +#define DRIVER_AUTHOR	"Tianyu Lan <Tianyu.Lan@microsoft.com>"
-> +#define DRIVER_DESC	"VFIO driver for VMBus devices"
+> +#define DRIVER_VERSION=09"0.0.1"
+> +#define DRIVER_AUTHOR=09"Tianyu Lan <Tianyu.Lan@microsoft.com>"
+> +#define DRIVER_DESC=09"VFIO driver for VMBus devices"
 > +
-> +#define HV_RING_SIZE	 (512 * HV_HYP_PAGE_SIZE) /* 2M Ring size */
+> +#define HV_RING_SIZE=09 (512 * HV_HYP_PAGE_SIZE) /* 2M Ring size */
 > +#define SEND_BUFFER_SIZE (16 * 1024 * 1024)
 > +#define RECV_BUFFER_SIZE (31 * 1024 * 1024)
 > +
 > +struct vmbus_mem {
-> +	phys_addr_t		addr;
-> +	resource_size_t		size;
+> +=09phys_addr_t=09=09addr;
+> +=09resource_size_t=09=09size;
 > +};
 > +
 > +struct vfio_vmbus_device {
-> +	struct hv_device *hdev;
-> +	atomic_t refcnt;
-> +	struct  vmbus_mem mem[VFIO_VMBUS_MAX_MAP_NUM];
+> +=09struct hv_device *hdev;
+> +=09atomic_t refcnt;
+> +=09struct  vmbus_mem mem[VFIO_VMBUS_MAX_MAP_NUM];
 > +
-> +	void	*recv_buf;
-> +	void	*send_buf;
+> +=09void=09*recv_buf;
+> +=09void=09*send_buf;
 > +};
 > +
 > +static void vfio_vmbus_channel_cb(void *context)
 > +{
-> +	struct vmbus_channel *chan =3D context;
+> +=09struct vmbus_channel *chan =3D context;
 > +
-> +	/* Disable interrupts on channel */
-> +	chan->inbound.ring_buffer->interrupt_mask =3D 1;
+> +=09/* Disable interrupts on channel */
+> +=09chan->inbound.ring_buffer->interrupt_mask =3D 1;
 > +
-> +	/* Issue a full memory barrier after masking interrupt */
-> +	virt_mb();
+> +=09/* Issue a full memory barrier after masking interrupt */
+> +=09virt_mb();
 > +}
 > +
 > +static int vfio_vmbus_ring_mmap(struct file *filp, struct kobject *kobj,
-> +			    struct bin_attribute *attr,
-> +			    struct vm_area_struct *vma)
+> +=09=09=09    struct bin_attribute *attr,
+> +=09=09=09    struct vm_area_struct *vma)
 > +{
-> +	struct vmbus_channel *channel
-> +		=3D container_of(kobj, struct vmbus_channel, kobj);
-> +	void *ring_buffer =3D page_address(channel->ringbuffer_page);
+> +=09struct vmbus_channel *channel
+> +=09=09=3D container_of(kobj, struct vmbus_channel, kobj);
+> +=09void *ring_buffer =3D page_address(channel->ringbuffer_page);
 > +
-> +	if (channel->state !=3D CHANNEL_OPENED_STATE)
-> +		return -ENODEV;
+> +=09if (channel->state !=3D CHANNEL_OPENED_STATE)
+> +=09=09return -ENODEV;
 > +
-> +	return vm_iomap_memory(vma, virt_to_phys(ring_buffer),
-> +			       channel->ringbuffer_pagecount << PAGE_SHIFT);
-
-Use HV_HYP_PAGE_SHIFT since ringbuffer_pagecount is in units of the
-Hyper-V page size, which may be different from the guest PAGE_SIZE.
-
+> +=09return vm_iomap_memory(vma, virt_to_phys(ring_buffer),
+> +=09=09=09       channel->ringbuffer_pagecount << PAGE_SHIFT);
 > +}
 > +
 > +static const struct bin_attribute ring_buffer_bin_attr =3D {
-> +	.attr =3D {
-> +		.name =3D "ring",
-> +		.mode =3D 0600,
-> +	},
-> +	.size =3D 2 * HV_RING_SIZE,
-> +	.mmap =3D vfio_vmbus_ring_mmap,
+> +=09.attr =3D {
+> +=09=09.name =3D "ring",
+> +=09=09.mode =3D 0600,
+> +=09},
+> +=09.size =3D 2 * HV_RING_SIZE,
+> +=09.mmap =3D vfio_vmbus_ring_mmap,
 > +};
 > +
-
-[snip]
-
-> +static int vfio_vmbus_probe(struct hv_device *dev,
-> +			 const struct hv_vmbus_device_id *dev_id)
+> +static void
+> +vfio_vmbus_new_channel(struct vmbus_channel *new_sc)
 > +{
-> +	struct vmbus_channel *channel =3D dev->channel;
-> +	struct vfio_vmbus_device *vdev;
-> +	struct iommu_group *group;
-> +	u32 gpadl;
-> +	void *ring_buffer;
-> +	int ret;
+> +=09struct hv_device *hv_dev =3D new_sc->primary_channel->device_obj;
+> +=09struct device *device =3D &hv_dev->device;
+> +=09int ret;
 > +
-> +	group =3D vfio_iommu_group_get(&dev->device);
-> +	if (!group)
-> +		return -EINVAL;
+> +=09/* Create host communication ring */
+> +=09ret =3D vmbus_open(new_sc, HV_RING_SIZE, HV_RING_SIZE, NULL, 0,
+> +=09=09=09 vfio_vmbus_channel_cb, new_sc);
+> +=09if (ret) {
+> +=09=09dev_err(device, "vmbus_open subchannel failed: %d\n", ret);
+> +=09=09return;
+> +=09}
 > +
-> +	vdev =3D kzalloc(sizeof(*vdev), GFP_KERNEL);
-> +	if (!vdev) {
-> +		vfio_iommu_group_put(group, &dev->device);
-> +		return -ENOMEM;
-> +	}
+> +=09/* Disable interrupts on sub channel */
+> +=09new_sc->inbound.ring_buffer->interrupt_mask =3D 1;
+> +=09set_channel_read_mode(new_sc, HV_CALL_ISR);
 > +
-> +	ret =3D vfio_add_group_dev(&dev->device, &vfio_vmbus_ops, vdev);
-> +	if (ret)
-> +		goto free_vdev;
-> +
-> +	vdev->hdev =3D dev;
-> +	ret =3D vmbus_alloc_ring(channel, HV_RING_SIZE, HV_RING_SIZE);
-> +	if (ret)
-> +		goto del_group_dev;
-> +
-> +	set_channel_read_mode(channel, HV_CALL_ISR);
-> +
-> +	ring_buffer =3D page_address(channel->ringbuffer_page);
-> +	vdev->mem[VFIO_VMBUS_TXRX_RING_MAP].addr
-> +		=3D virt_to_phys(ring_buffer);
-> +	vdev->mem[VFIO_VMBUS_TXRX_RING_MAP].size
-> +		=3D channel->ringbuffer_pagecount << PAGE_SHIFT;
-
-Use HV_HYP_PAGE_SHIFT per my earlier comment.
-
-> +
-> +	vdev->mem[VFIO_VMBUS_INT_PAGE_MAP].addr
-> +		=3D (phys_addr_t)vmbus_connection.int_page;
-> +	vdev->mem[VFIO_VMBUS_INT_PAGE_MAP].size =3D PAGE_SIZE;
-
-Use HV_HYP_PAGE_SIZE since the interrupt page is sized to the
-Hyper-V page size, not the guest page size.
-
-> +
-> +	vdev->mem[VFIO_VMBUS_MON_PAGE_MAP].addr
-> +		=3D (phys_addr_t)vmbus_connection.monitor_pages[1];
-> +	vdev->mem[VFIO_VMBUS_MON_PAGE_MAP].size =3D PAGE_SIZE;
-
-Same here for the monitor page.
-
-> +
-> +	vdev->recv_buf =3D vzalloc(RECV_BUFFER_SIZE);
-> +	if (vdev->recv_buf =3D=3D NULL) {
-> +		ret =3D -ENOMEM;
-> +		goto free_ring;
-> +	}
-> +
-> +	ret =3D vmbus_establish_gpadl(channel, vdev->recv_buf,
-> +				    RECV_BUFFER_SIZE, &gpadl);
-> +	if (ret)
-> +		goto free_recv_buf;
-> +
-> +	vdev->mem[VFIO_VMBUS_RECV_BUF_MAP].addr
-> +		=3D (phys_addr_t)vdev->recv_buf;
-> +	vdev->mem[VFIO_VMBUS_RECV_BUF_MAP].size =3D RECV_BUFFER_SIZE;
-> +
-> +	/* Expose Recv GPADL via region info. */
-> +	vdev->mem[VFIO_VMBUS_RECV_GPADL].addr =3D gpadl;
-> +
-> +	vdev->send_buf =3D vzalloc(SEND_BUFFER_SIZE);
-> +	if (vdev->send_buf =3D=3D NULL) {
-> +		ret =3D -ENOMEM;
-> +		goto free_recv_gpadl;
-> +	}
-> +
-> +	ret =3D vmbus_establish_gpadl(channel, vdev->send_buf,
-> +				    SEND_BUFFER_SIZE, &gpadl);
-> +	if (ret)
-> +		goto free_send_buf;
-> +
-> +	vdev->mem[VFIO_VMBUS_SEND_BUF_MAP].addr
-> +		=3D (phys_addr_t)vdev->send_buf;
-> +	vdev->mem[VFIO_VMBUS_SEND_BUF_MAP].size =3D SEND_BUFFER_SIZE;
-> +
-> +	/* Expose Send GPADL via region info. */
-> +	vdev->mem[VFIO_VMBUS_SEND_GPADL].addr =3D gpadl;
-> +
-> +	ret =3D sysfs_create_bin_file(&channel->kobj, &ring_buffer_bin_attr);
-> +	if (ret)
-> +		dev_notice(&dev->device,
-> +			   "sysfs create ring bin file failed; %d\n", ret);
-> +
-> +	return 0;
-> +
-> + free_send_buf:
-> +	vfree(vdev->send_buf);
-> + free_recv_gpadl:
-> +	vmbus_teardown_gpadl(channel, vdev->mem[VFIO_VMBUS_RECV_GPADL].addr);
-> + free_recv_buf:
-> +	vfree(vdev->recv_buf);
-> + free_ring:
-> +	vmbus_free_ring(channel);
-> + del_group_dev:
-> +	vfio_del_group_dev(&dev->device);
-> + free_vdev:
-> +	vfio_iommu_group_put(group, &dev->device);
-> +	kfree(vdev);
-> +	return -EINVAL;
+> +=09ret =3D sysfs_create_bin_file(&new_sc->kobj, &ring_buffer_bin_attr);
+> +=09if (ret)
+> +=09=09dev_notice(&hv_dev->device,
+> +=09=09=09   "sysfs create ring bin file failed; %d\n", ret);
 > +}
 > +
-
-[snip]
-
+> +static int vfio_vmbus_open(void *device_data)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D device_data;
+> +=09struct hv_device *dev =3D vdev->hdev;
+> +=09int ret;
+> +
+> +=09vmbus_set_sc_create_callback(dev->channel, vfio_vmbus_new_channel);
+> +
+> +=09ret =3D vmbus_connect_ring(dev->channel,
+> +=09=09=09vfio_vmbus_channel_cb, dev->channel);
+> +=09if (ret =3D=3D 0)
+> +=09=09dev->channel->inbound.ring_buffer->interrupt_mask =3D 1;
+> +
+> +=09return 0;
+> +}
+> +
+> +static long vfio_vmbus_ioctl(void *device_data, unsigned int cmd,
+> +=09=09=09 unsigned long arg)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D device_data;
+> +=09unsigned long minsz;
+> +
+> +=09if (cmd =3D=3D VFIO_DEVICE_GET_INFO) {
+> +=09=09struct vfio_device_info info;
+> +
+> +=09=09minsz =3D offsetofend(struct vfio_device_info, num_irqs);
+> +
+> +=09=09if (copy_from_user(&info, (void __user *)arg, minsz))
+> +=09=09=09return -EFAULT;
+> +
+> +=09=09if (info.argsz < minsz)
+> +=09=09=09return -EINVAL;
+> +
+> +=09=09info.flags =3D VFIO_DEVICE_FLAGS_VMBUS;
+> +=09=09info.num_regions =3D VFIO_VMBUS_MAX_MAP_NUM;
+> +
+> +=09=09return copy_to_user((void __user *)arg, &info, minsz) ?
+> +=09=09=09-EFAULT : 0;
+> +=09} else if (cmd =3D=3D VFIO_DEVICE_GET_REGION_INFO) {
+> +=09=09struct vfio_region_info info;
+> +
+> +=09=09minsz =3D offsetofend(struct vfio_region_info, offset);
+> +
+> +=09=09if (copy_from_user(&info, (void __user *)arg, minsz))
+> +=09=09=09return -EFAULT;
+> +
+> +=09=09if (info.argsz < minsz)
+> +=09=09=09return -EINVAL;
+> +
+> +=09=09if (info.index >=3D VFIO_VMBUS_MAX_MAP_NUM)
+> +=09=09=09return -EINVAL;
+> +
+> +=09=09info.offset =3D vdev->mem[info.index].addr;
+> +=09=09info.size =3D vdev->mem[info.index].size;
+> +=09=09info.flags =3D VFIO_REGION_INFO_FLAG_READ
+> +=09=09=09| VFIO_REGION_INFO_FLAG_WRITE
+> +=09=09=09| VFIO_REGION_INFO_FLAG_MMAP;
+> +
+> +=09=09return copy_to_user((void __user *)arg, &info, minsz) ?
+> +=09=09=09-EFAULT : 0;
+> +=09}
+> +
+> +=09return -ENOTTY;
+> +}
+> +
+> +static void vfio_vmbus_release(void *device_data)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D device_data;
+> +
+> +=09vmbus_disconnect_ring(vdev->hdev->channel);
+> +}
+> +
+> +static vm_fault_t vfio_vma_fault(struct vm_fault *vmf)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D vmf->vma->vm_private_data;
+> +=09struct vm_area_struct *vma =3D vmf->vma;
+> +=09struct page *page;
+> +=09unsigned long offset;
+> +=09void *addr;
+> +=09int index;
+> +
+> +=09index =3D vma->vm_pgoff;
+> +
+> +=09/*
+> +=09 * Page fault should only happen on mmap regiones
+> +=09 * and bypass GPADL indexes here.
+> +=09 */
+> +=09if (index >=3D VFIO_VMBUS_MAX_MAP_NUM - 2)
+> +=09=09return VM_FAULT_SIGBUS;
+> +
+> +=09offset =3D (vmf->pgoff - index) << PAGE_SHIFT;
+> +=09addr =3D (void *)(vdev->mem[index].addr + offset);
+> +
+> +=09if (index =3D=3D VFIO_VMBUS_SEND_BUF_MAP ||
+> +=09    index =3D=3D VFIO_VMBUS_RECV_BUF_MAP)
+> +=09=09page =3D vmalloc_to_page(addr);
+> +=09else
+> +=09=09page =3D virt_to_page(addr);
+> +
+> +=09get_page(page);
+> +=09vmf->page =3D page;
+> +
+> +=09return 0;
+> +}
+> +
+> +static const struct vm_operations_struct vfio_logical_vm_ops =3D {
+> +=09.fault =3D vfio_vma_fault,
+> +};
+> +
+> +static const struct vm_operations_struct vfio_physical_vm_ops =3D {
+> +#ifdef CONFIG_HAVE_IOREMAP_PROT
+> +=09.access =3D generic_access_phys,
+> +#endif
+> +};
+> +
+> +static int vfio_vmbus_mmap(void *device_data, struct vm_area_struct *vma=
+)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D device_data;
+> +=09int index;
+> +
+> +=09if (vma->vm_end < vma->vm_start)
+> +=09=09return -EINVAL;
+> +
+> +=09/*
+> +=09 * Mmap should only happen on map regions
+> +=09 * and bypass GPADL index here.
+> +=09 */
+> +=09if (vma->vm_pgoff >=3D VFIO_VMBUS_MAX_MAP_NUM - 2)
+> +=09=09return -EINVAL;
+> +
+> +=09index =3D vma->vm_pgoff;
+> +=09vma->vm_private_data =3D vdev;
+> +
+> +=09if (index =3D=3D VFIO_VMBUS_TXRX_RING_MAP) {
+> +=09=09u64 addr;
+> +
+> +=09=09addr =3D vdev->mem[VFIO_VMBUS_TXRX_RING_MAP].addr;
+> +=09=09vma->vm_ops =3D &vfio_physical_vm_ops;
+> +=09=09return remap_pfn_range(vma,
+> +=09=09=09       vma->vm_start,
+> +=09=09=09       addr >> PAGE_SHIFT,
+> +=09=09=09       vma->vm_end - vma->vm_start,
+> +=09=09=09       vma->vm_page_prot);
+> +=09} else {
+> +=09=09vma->vm_flags |=3D VM_DONTEXPAND | VM_DONTDUMP;
+> +=09=09vma->vm_ops =3D &vfio_logical_vm_ops;
+> +=09=09return 0;
+> +=09}
+> +}
+> +
+> +static const struct vfio_device_ops vfio_vmbus_ops =3D {
+> +=09.name=09=09=3D "vfio-vmbus",
+> +=09.open=09=09=3D vfio_vmbus_open,
+> +=09.release=09=3D vfio_vmbus_release,
+> +=09.mmap=09=09=3D vfio_vmbus_mmap,
+> +=09.ioctl=09=09=3D vfio_vmbus_ioctl,
+> +};
+> +
+> +static int vfio_vmbus_probe(struct hv_device *dev,
+> +=09=09=09 const struct hv_vmbus_device_id *dev_id)
+> +{
+> +=09struct vmbus_channel *channel =3D dev->channel;
+> +=09struct vfio_vmbus_device *vdev;
+> +=09struct iommu_group *group;
+> +=09u32 gpadl;
+> +=09void *ring_buffer;
+> +=09int ret;
+> +
+> +=09group =3D vfio_iommu_group_get(&dev->device);
+> +=09if (!group)
+> +=09=09return -EINVAL;
+> +
+> +=09vdev =3D kzalloc(sizeof(*vdev), GFP_KERNEL);
+> +=09if (!vdev) {
+> +=09=09vfio_iommu_group_put(group, &dev->device);
+> +=09=09return -ENOMEM;
+> +=09}
+> +
+> +=09ret =3D vfio_add_group_dev(&dev->device, &vfio_vmbus_ops, vdev);
+> +=09if (ret)
+> +=09=09goto free_vdev;
+> +
+> +=09vdev->hdev =3D dev;
+> +=09ret =3D vmbus_alloc_ring(channel, HV_RING_SIZE, HV_RING_SIZE);
+> +=09if (ret)
+> +=09=09goto del_group_dev;
+> +
+> +=09set_channel_read_mode(channel, HV_CALL_ISR);
+> +
+> +=09ring_buffer =3D page_address(channel->ringbuffer_page);
+> +=09vdev->mem[VFIO_VMBUS_TXRX_RING_MAP].addr
+> +=09=09=3D virt_to_phys(ring_buffer);
+> +=09vdev->mem[VFIO_VMBUS_TXRX_RING_MAP].size
+> +=09=09=3D channel->ringbuffer_pagecount << PAGE_SHIFT;
+> +
+> +=09vdev->mem[VFIO_VMBUS_INT_PAGE_MAP].addr
+> +=09=09=3D (phys_addr_t)vmbus_connection.int_page;
+> +=09vdev->mem[VFIO_VMBUS_INT_PAGE_MAP].size =3D PAGE_SIZE;
+> +
+> +=09vdev->mem[VFIO_VMBUS_MON_PAGE_MAP].addr
+> +=09=09=3D (phys_addr_t)vmbus_connection.monitor_pages[1];
+> +=09vdev->mem[VFIO_VMBUS_MON_PAGE_MAP].size =3D PAGE_SIZE;
+> +
+> +=09vdev->recv_buf =3D vzalloc(RECV_BUFFER_SIZE);
+> +=09if (vdev->recv_buf =3D=3D NULL) {
+> +=09=09ret =3D -ENOMEM;
+> +=09=09goto free_ring;
+> +=09}
+> +
+> +=09ret =3D vmbus_establish_gpadl(channel, vdev->recv_buf,
+> +=09=09=09=09    RECV_BUFFER_SIZE, &gpadl);
+> +=09if (ret)
+> +=09=09goto free_recv_buf;
+> +
+> +=09vdev->mem[VFIO_VMBUS_RECV_BUF_MAP].addr
+> +=09=09=3D (phys_addr_t)vdev->recv_buf;
+> +=09vdev->mem[VFIO_VMBUS_RECV_BUF_MAP].size =3D RECV_BUFFER_SIZE;
+> +
+> +=09/* Expose Recv GPADL via region info. */
+> +=09vdev->mem[VFIO_VMBUS_RECV_GPADL].addr =3D gpadl;
+> +
+> +=09vdev->send_buf =3D vzalloc(SEND_BUFFER_SIZE);
+> +=09if (vdev->send_buf =3D=3D NULL) {
+> +=09=09ret =3D -ENOMEM;
+> +=09=09goto free_recv_gpadl;
+> +=09}
+> +
+> +=09ret =3D vmbus_establish_gpadl(channel, vdev->send_buf,
+> +=09=09=09=09    SEND_BUFFER_SIZE, &gpadl);
+> +=09if (ret)
+> +=09=09goto free_send_buf;
+> +
+> +=09vdev->mem[VFIO_VMBUS_SEND_BUF_MAP].addr
+> +=09=09=3D (phys_addr_t)vdev->send_buf;
+> +=09vdev->mem[VFIO_VMBUS_SEND_BUF_MAP].size =3D SEND_BUFFER_SIZE;
+> +
+> +=09/* Expose Send GPADL via region info. */
+> +=09vdev->mem[VFIO_VMBUS_SEND_GPADL].addr =3D gpadl;
+> +
+> +=09ret =3D sysfs_create_bin_file(&channel->kobj, &ring_buffer_bin_attr);
+> +=09if (ret)
+> +=09=09dev_notice(&dev->device,
+> +=09=09=09   "sysfs create ring bin file failed; %d\n", ret);
+> +
+> +=09return 0;
+> +
+> + free_send_buf:
+> +=09vfree(vdev->send_buf);
+> + free_recv_gpadl:
+> +=09vmbus_teardown_gpadl(channel, vdev->mem[VFIO_VMBUS_RECV_GPADL].addr);
+> + free_recv_buf:
+> +=09vfree(vdev->recv_buf);
+> + free_ring:
+> +=09vmbus_free_ring(channel);
+> + del_group_dev:
+> +=09vfio_del_group_dev(&dev->device);
+> + free_vdev:
+> +=09vfio_iommu_group_put(group, &dev->device);
+> +=09kfree(vdev);
+> +=09return -EINVAL;
+> +}
+> +
+> +static int vfio_vmbus_remove(struct hv_device *hdev)
+> +{
+> +=09struct vfio_vmbus_device *vdev =3D vfio_del_group_dev(&hdev->device);
+> +=09struct vmbus_channel *channel =3D hdev->channel;
+> +
+> +=09if (!vdev)
+> +=09=09return 0;
+> +
+> +=09sysfs_remove_bin_file(&channel->kobj, &ring_buffer_bin_attr);
+> +
+> +=09vmbus_teardown_gpadl(channel, vdev->mem[VFIO_VMBUS_SEND_GPADL].addr);
+> +=09vmbus_teardown_gpadl(channel, vdev->mem[VFIO_VMBUS_RECV_GPADL].addr);
+> +=09vfree(vdev->recv_buf);
+> +=09vfree(vdev->send_buf);
+> +=09vmbus_free_ring(channel);
+> +=09vfio_iommu_group_put(hdev->device.iommu_group, &hdev->device);
+> +=09kfree(vdev);
+> +
+> +=09return 0;
+> +}
+> +
+> +static struct hv_driver hv_vfio_drv =3D {
+> +=09.name =3D "hv_vfio",
+> +=09.id_table =3D NULL,
+> +=09.probe =3D vfio_vmbus_probe,
+> +=09.remove =3D vfio_vmbus_remove,
+> +};
+> +
+> +static int __init vfio_vmbus_init(void)
+> +{
+> +=09return vmbus_driver_register(&hv_vfio_drv);
+> +}
+> +
+> +static void __exit vfio_vmbus_exit(void)
+> +{
+> +=09vmbus_driver_unregister(&hv_vfio_drv);
+> +}
+> +
+> +module_init(vfio_vmbus_init);
+> +module_exit(vfio_vmbus_exit);
+> +
+> +MODULE_VERSION(DRIVER_VERSION);
+> +MODULE_LICENSE("GPL v2");
 > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
 > index 9e843a147ead..611baf7a30e4 100644
 > --- a/include/uapi/linux/vfio.h
 > +++ b/include/uapi/linux/vfio.h
 > @@ -201,6 +201,7 @@ struct vfio_device_info {
->  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
->  #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
->  #define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
-> +#define VFIO_DEVICE_FLAGS_VMBUS  (1 << 6)	/* vfio-vmbus device */
->  	__u32	num_regions;	/* Max region index + 1 */
->  	__u32	num_irqs;	/* Max IRQ index + 1 */
+>  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)=09/* vfio-amba device */
+>  #define VFIO_DEVICE_FLAGS_CCW=09(1 << 4)=09/* vfio-ccw device */
+>  #define VFIO_DEVICE_FLAGS_AP=09(1 << 5)=09/* vfio-ap device */
+> +#define VFIO_DEVICE_FLAGS_VMBUS  (1 << 6)=09/* vfio-vmbus device */
+>  =09__u32=09num_regions;=09/* Max region index + 1 */
+>  =09__u32=09num_irqs;=09/* Max IRQ index + 1 */
 >  };
 > @@ -564,6 +565,17 @@ enum {
->  	VFIO_PCI_NUM_IRQS
+>  =09VFIO_PCI_NUM_IRQS
 >  };
->=20
+> =20
 > +enum {
-> +	VFIO_VMBUS_TXRX_RING_MAP =3D 0,
-> +	VFIO_VMBUS_INT_PAGE_MAP,
-> +	VFIO_VMBUS_MON_PAGE_MAP,
-> +	VFIO_VMBUS_RECV_BUF_MAP,
-> +	VFIO_VMBUS_SEND_BUF_MAP,
-> +	VFIO_VMBUS_RECV_GPADL,
-> +	VFIO_VMBUS_SEND_GPADL,
-> +	VFIO_VMBUS_MAX_MAP_NUM,
-
-While the code that uses VFIO_VMBUS_MAX_MAP_NUM appears
-correct, the "MAX_MAP_NUM" in the symbol name tends to
-imply that this is an index value.  But it's not the max index
-value -- it's actually a "count" or "size".  I think it would be
-clearer as VFIO_VMBUS_MAP_COUNT or
-VFIO_VMBUS_MAP_SIZE.
-
+> +=09VFIO_VMBUS_TXRX_RING_MAP =3D 0,
+> +=09VFIO_VMBUS_INT_PAGE_MAP,
+> +=09VFIO_VMBUS_MON_PAGE_MAP,
+> +=09VFIO_VMBUS_RECV_BUF_MAP,
+> +=09VFIO_VMBUS_SEND_BUF_MAP,
+> +=09VFIO_VMBUS_RECV_GPADL,
+> +=09VFIO_VMBUS_SEND_GPADL,
+> +=09VFIO_VMBUS_MAX_MAP_NUM,
 > +};
 > +
 >  /*
 >   * The vfio-ccw bus driver makes use of the following fixed region and
 >   * IRQ index mapping. Unimplemented regions return a size of zero.
-> --
-> 2.14.5
 
