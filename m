@@ -2,189 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4166102288
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 12:03:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E089210229F
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 12:09:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbfKSLBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 06:01:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42436 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727831AbfKSLBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 06:01:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574161306;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1z/VI7W0prfUjvWwdOR/7dH6MJy5e5zlxrpQ4kuKOZ4=;
-        b=C6V0fCd4IPTIH/j2mqTe/vo/VLDUmjDeCjslaZ15JkyV1tq36lghtiPvt1sRZayR8rpPY3
-        1be90xh5owkxoElp4rCNc3zqd0NeX9NLnClFhAseQSrUVbsBuHJSy2bTnT6JzXEmVnF6cG
-        pjXalowEdLRJWd1L0F9jofBW5oRf1Wg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-YTbcsSu5NMKMvmANpeg8BQ-1; Tue, 19 Nov 2019 06:01:42 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 289308018A3;
-        Tue, 19 Nov 2019 11:01:41 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-41.ams2.redhat.com [10.36.117.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3A4F760BE0;
-        Tue, 19 Nov 2019 11:01:39 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     virtualization@lists.linux-foundation.org,
-        Dexuan Cui <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: [PATCH net-next 6/6] vsock/virtio: remove loopback handling
-Date:   Tue, 19 Nov 2019 12:01:21 +0100
-Message-Id: <20191119110121.14480-7-sgarzare@redhat.com>
-In-Reply-To: <20191119110121.14480-1-sgarzare@redhat.com>
-References: <20191119110121.14480-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: YTbcsSu5NMKMvmANpeg8BQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+        id S1727582AbfKSLJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 06:09:37 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:37688 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726000AbfKSLJh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 06:09:37 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJB91xe006850;
+        Tue, 19 Nov 2019 11:09:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=+LudNtyX4Erl79mhNu0hhJPpKxMnYeH2eWFQ1JlktzU=;
+ b=fSmYs4hW/5MztNVxGTRQPMiBmB/51N8yChcgsYCOk6sEURBJnfrlt3sfu4qisDDr5MK2
+ t/VTFb+6R7aAvjC0lZ4zXE0rPyELsaBVGhAlHBSY8kdUcV9tRWcePoXV/8ox2cZg+zQ1
+ Db2B6oFA+gR8x56JkM3z6msbdlq82gMDT7O4tQFdGgCSA9B1RcYrPnfNXD9qFVJKAKNB
+ WUergQHpnbErJtRdSJ74UC840znf4H6vawWf61mGbEzmtTCArnj7X0j8+MVSvpn0XMK+
+ TYrzltYoC460e6cJGzNmPwX/t6C4oEpWOFi1gglAqwTtFjMq5eCCUlzN3VvGIQTL1cvw 7g== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2wa92pp49c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 11:09:29 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJB94vF130106;
+        Tue, 19 Nov 2019 11:09:28 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2wc09x753n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 11:09:28 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAJB9Qh9002160;
+        Tue, 19 Nov 2019 11:09:26 GMT
+Received: from [192.168.14.112] (/79.181.226.113)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 Nov 2019 03:09:25 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] KVM: nVMX: add CR4_LA57 bit to nested CR4_FIXED1
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20191119083359.15319-1-chenyi.qiang@intel.com>
+Date:   Tue, 19 Nov 2019 13:09:21 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <348B5C47-7AA0-4DAC-91A7-8FB0D0205EF6@oracle.com>
+References: <20191119083359.15319-1-chenyi.qiang@intel.com>
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911190105
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911190105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We can remove the loopback handling from virtio_transport,
-because now the vsock core is able to handle local communication
-using the new vsock_loopback device.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport.c | 61 ++------------------------------
- 1 file changed, 2 insertions(+), 59 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transp=
-ort.c
-index 1458c5c8b64d..dfbaf6bd8b1c 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -44,10 +44,6 @@ struct virtio_vsock {
- =09spinlock_t send_pkt_list_lock;
- =09struct list_head send_pkt_list;
-=20
--=09struct work_struct loopback_work;
--=09spinlock_t loopback_list_lock; /* protects loopback_list */
--=09struct list_head loopback_list;
--
- =09atomic_t queued_replies;
-=20
- =09/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
-@@ -86,20 +82,6 @@ static u32 virtio_transport_get_local_cid(void)
- =09return ret;
- }
-=20
--static int virtio_transport_send_pkt_loopback(struct virtio_vsock *vsock,
--=09=09=09=09=09      struct virtio_vsock_pkt *pkt)
--{
--=09int len =3D pkt->len;
--
--=09spin_lock_bh(&vsock->loopback_list_lock);
--=09list_add_tail(&pkt->list, &vsock->loopback_list);
--=09spin_unlock_bh(&vsock->loopback_list_lock);
--
--=09queue_work(virtio_vsock_workqueue, &vsock->loopback_work);
--
--=09return len;
--}
--
- static void
- virtio_transport_send_pkt_work(struct work_struct *work)
- {
-@@ -194,7 +176,8 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
- =09}
-=20
- =09if (le64_to_cpu(pkt->hdr.dst_cid) =3D=3D vsock->guest_cid) {
--=09=09len =3D virtio_transport_send_pkt_loopback(vsock, pkt);
-+=09=09virtio_transport_free_pkt(pkt);
-+=09=09len =3D -ENODEV;
- =09=09goto out_rcu;
- =09}
-=20
-@@ -502,33 +485,6 @@ static struct virtio_transport virtio_transport =3D {
- =09.send_pkt =3D virtio_transport_send_pkt,
- };
-=20
--static void virtio_transport_loopback_work(struct work_struct *work)
--{
--=09struct virtio_vsock *vsock =3D
--=09=09container_of(work, struct virtio_vsock, loopback_work);
--=09LIST_HEAD(pkts);
--
--=09spin_lock_bh(&vsock->loopback_list_lock);
--=09list_splice_init(&vsock->loopback_list, &pkts);
--=09spin_unlock_bh(&vsock->loopback_list_lock);
--
--=09mutex_lock(&vsock->rx_lock);
--
--=09if (!vsock->rx_run)
--=09=09goto out;
--
--=09while (!list_empty(&pkts)) {
--=09=09struct virtio_vsock_pkt *pkt;
--
--=09=09pkt =3D list_first_entry(&pkts, struct virtio_vsock_pkt, list);
--=09=09list_del_init(&pkt->list);
--
--=09=09virtio_transport_recv_pkt(&virtio_transport, pkt);
--=09}
--out:
--=09mutex_unlock(&vsock->rx_lock);
--}
--
- static void virtio_transport_rx_work(struct work_struct *work)
- {
- =09struct virtio_vsock *vsock =3D
-@@ -633,13 +589,10 @@ static int virtio_vsock_probe(struct virtio_device *v=
-dev)
- =09mutex_init(&vsock->event_lock);
- =09spin_lock_init(&vsock->send_pkt_list_lock);
- =09INIT_LIST_HEAD(&vsock->send_pkt_list);
--=09spin_lock_init(&vsock->loopback_list_lock);
--=09INIT_LIST_HEAD(&vsock->loopback_list);
- =09INIT_WORK(&vsock->rx_work, virtio_transport_rx_work);
- =09INIT_WORK(&vsock->tx_work, virtio_transport_tx_work);
- =09INIT_WORK(&vsock->event_work, virtio_transport_event_work);
- =09INIT_WORK(&vsock->send_pkt_work, virtio_transport_send_pkt_work);
--=09INIT_WORK(&vsock->loopback_work, virtio_transport_loopback_work);
-=20
- =09mutex_lock(&vsock->tx_lock);
- =09vsock->tx_run =3D true;
-@@ -720,22 +673,12 @@ static void virtio_vsock_remove(struct virtio_device =
-*vdev)
- =09}
- =09spin_unlock_bh(&vsock->send_pkt_list_lock);
-=20
--=09spin_lock_bh(&vsock->loopback_list_lock);
--=09while (!list_empty(&vsock->loopback_list)) {
--=09=09pkt =3D list_first_entry(&vsock->loopback_list,
--=09=09=09=09       struct virtio_vsock_pkt, list);
--=09=09list_del(&pkt->list);
--=09=09virtio_transport_free_pkt(pkt);
--=09}
--=09spin_unlock_bh(&vsock->loopback_list_lock);
--
- =09/* Delete virtqueues and flush outstanding callbacks if any */
- =09vdev->config->del_vqs(vdev);
-=20
- =09/* Other works can be queued before 'config->del_vqs()', so we flush
- =09 * all works before to free the vsock object to avoid use after free.
- =09 */
--=09flush_work(&vsock->loopback_work);
- =09flush_work(&vsock->rx_work);
- =09flush_work(&vsock->tx_work);
- =09flush_work(&vsock->event_work);
---=20
-2.21.0
+> On 19 Nov 2019, at 10:33, Chenyi Qiang <chenyi.qiang@intel.com> wrote:
+>=20
+> When L1 guest uses 5-level paging, it fails vm-entry to L2 due to
+> invalid host-state. It needs to add CR4_LA57 bit to nested CR4_FIXED1
+> MSR.
+>=20
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+
+> ---
+> arch/x86/kvm/vmx/vmx.c | 1 +
+> 1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 621142e55e28..89253d60e23a 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6962,6 +6962,7 @@ static void =
+nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
+> 	cr4_fixed1_update(X86_CR4_SMAP,       ebx, =
+bit(X86_FEATURE_SMAP));
+> 	cr4_fixed1_update(X86_CR4_PKE,        ecx, =
+bit(X86_FEATURE_PKU));
+> 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, =
+bit(X86_FEATURE_UMIP));
+> +	cr4_fixed1_update(X86_CR4_LA57,       ecx, =
+bit(X86_FEATURE_LA57));
+>=20
+> #undef cr4_fixed1_update
+> }
+> --=20
+> 2.17.1
+>=20
 
