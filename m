@@ -2,98 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8939102416
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 13:16:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE4A102453
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 13:26:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727992AbfKSMQ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 07:16:29 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:52390 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727511AbfKSMQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 07:16:29 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJCDipR046976;
-        Tue, 19 Nov 2019 12:14:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=AQk/7h5Ym3BmVg5rKLn1o6XSiLk0PA1eheI7FYE0AlQ=;
- b=lIwcWgxcanEFOhZnrPX3xQIzaeHK/r0O6DmcEzxFg2pJ2CJfTazxqxqFjCzwfpG0w0GW
- BfjQho3yNSAI22nKxSmxUEb/9qXzpqZGSnaRi6IJtYpaDIskKPkCt3e2ah8u4BanjTzc
- 8kLOJH2oP4NiYoxDhjrrgxsGm177jcSBr9fT6mVmIjER4wwh0vdolna7rHUZ2S0ms2jx
- 3xGfUt9f8XYwhvdOjzAygkGrHw6WJEnZEp8LxaCNkFeTLxaD/PYsQxppeT5U3UIF5HLL
- 4coQQN1fNTntJnD2Uy5sqiiZ2QZCKw3miA1olQu+k7hke7yJFGThvfwPDchyeKbPEJr5 Sg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2wa9rqecux-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 12:14:50 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJCDw1w180011;
-        Tue, 19 Nov 2019 12:14:49 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2wbxm46ft1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 12:14:49 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAJCEiJ4014217;
-        Tue, 19 Nov 2019 12:14:44 GMT
-Received: from kadam (/41.210.141.188)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 19 Nov 2019 04:14:43 -0800
-Date:   Tue, 19 Nov 2019 15:14:26 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Mao Wenan <maowenan@huawei.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH -next] KVM: x86: remove set but not used variable 'called'
-Message-ID: <20191119121423.GB5604@kadam>
-References: <20191119030640.25097-1-maowenan@huawei.com>
- <87o8x8gjr5.fsf@vitty.brq.redhat.com>
+        id S1727890AbfKSM04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 07:26:56 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30296 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726555AbfKSM0z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 07:26:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574166414;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J3mOxYKpBUtrD3Eqhq7wj1DaBWOdzGNG7B02AqP8/hk=;
+        b=bN2FxnB10vB131p8Xkt55M12mxH5qcXTH0IBtZhpxw1sLXHlCIAXen2J7TnxKcQLEa286n
+        zSffA3OJer/8O5aZBM5UkHWIlro3B1pXGhrurB5sGED8HlANh79mE9jkwk+bYcdBvk7sUb
+        RExAEKNi3GljIWJTxUTQ+r1icB8tJm8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84--MEvi0MTNgyR8BABDs7p2A-1; Tue, 19 Nov 2019 07:26:53 -0500
+Received: by mail-wm1-f72.google.com with SMTP id f14so2177400wmc.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 04:26:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=awmu6I9Y99dmJSWRPIQLmc8tQlVRK2cI0mOpA3pzvDw=;
+        b=nUwhTu16El0K+pzbCwXu4rx43EyemDw1RCz3KRWkQOSNSWx+e7kiGliKnEDT7/AEcq
+         DjaCdeXJU7qYoHgOadeHss0zy1Z7lR7lfcn41c4ej9rdIilK0bN576X6ExF8oHXcJli8
+         JKBkXCcMsWFJ4EQX9and0SeNSqn2zfPMl23XJn4ZtBuQlOhL1Np66dij/dbG5YyF1Px5
+         t1Naly32ITbRlr58bFhD5h7kj7qzcjYa89PJw0dIUMBRi/gOM53gK8HWE7hsgbidNSut
+         E5eUXQrRwcwuWEmq+/GX0W5KTDy10QSY1leJp226ddv/GIq3udC8MY7dJsDP2P0aQG87
+         B2cA==
+X-Gm-Message-State: APjAAAUPFYGo0Fl8i/yrkYsXNm7AHlatCh8VoEUY2PRBBhO6UpjI8KGb
+        ykO8KYJH/WAgox52tzgrIYu81bsIyFZ9a0bTsOhd34kyxVhTyiXsFhUWCApvDU1FV3Rx2x9ht6j
+        8VszUbmGWpX3e
+X-Received: by 2002:a5d:4ecd:: with SMTP id s13mr24376671wrv.216.1574166412578;
+        Tue, 19 Nov 2019 04:26:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzB7t6Kre2ZE9oFyNHnTMEuPPAI1X0nkDnc5BMRHHjljrglZNrSttKN8ypZKLm/cv+A52kMjQ==
+X-Received: by 2002:a5d:4ecd:: with SMTP id s13mr24376651wrv.216.1574166412383;
+        Tue, 19 Nov 2019 04:26:52 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id n13sm2816854wmi.25.2019.11.19.04.26.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2019 04:26:51 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v2 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
+In-Reply-To: <CANRm+CzcWDvRA0+iaQZ6hd2HGRKyZpRnurghQXdagDCffKaSPg@mail.gmail.com>
+References: <1574145389-12149-1-git-send-email-wanpengli@tencent.com> <87r224gjyt.fsf@vitty.brq.redhat.com> <CANRm+CzcWDvRA0+iaQZ6hd2HGRKyZpRnurghQXdagDCffKaSPg@mail.gmail.com>
+Date:   Tue, 19 Nov 2019 13:26:51 +0100
+Message-ID: <87lfscgigk.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87o8x8gjr5.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=957
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911190114
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911190114
+X-MC-Unique: -MEvi0MTNgyR8BABDs7p2A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 12:58:54PM +0100, Vitaly Kuznetsov wrote:
-> Mao Wenan <maowenan@huawei.com> writes:
-> 
-> > Fixes gcc '-Wunused-but-set-variable' warning:
-> >
-> > arch/x86/kvm/x86.c: In function kvm_make_scan_ioapic_request_mask:
-> > arch/x86/kvm/x86.c:7911:7: warning: variable called set but not
-> > used [-Wunused-but-set-variable]
-> >
-> > It is not used since commit 7ee30bc132c6 ("KVM: x86: deliver KVM
-> > IOAPIC scan request to target vCPUs")
-> 
-> Better expressed as 
-> 
-> Fixes: 7ee30bc132c6 ("KVM: x86: deliver KVM IOAPIC scan request to target vCPUs")
-> 
+Wanpeng Li <kernellwp@gmail.com> writes:
 
-There is sort of a debate about this whether the Fixes tag should be
-used if it's only a cleanup.
+> On Tue, 19 Nov 2019 at 19:54, Vitaly Kuznetsov <vkuznets@redhat.com> wrot=
+e:
+>>
+>> Wanpeng Li <kernellwp@gmail.com> writes:
+>>
+>> > From: Wanpeng Li <wanpengli@tencent.com>
+>> >
+>> > +     if (lapic_in_kernel(vcpu) && apic_x2apic_mode(vcpu->arch.apic)) =
+{
+>> > +             /*
+>> > +              * fastpath to IPI target, FIXED+PHYSICAL which is popul=
+ar
+>> > +              */
+>> > +             index =3D kvm_rcx_read(vcpu);
+>> > +             data =3D kvm_read_edx_eax(vcpu);
+>> > +
+>> > +             if (((index - APIC_BASE_MSR) << 4 =3D=3D APIC_ICR) &&
+>>
+>> What if index (RCX) is < APIC_BASE_MSR?
+>
+> How about if (index =3D=3D (APIC_BASE_MSR + 0x300) &&
+>
 
-regards,
-dan carpenter
+What about ' << 4', don't we still need it? :-) And better APIC_ICR
+instead of 0x300...
+
+Personally, I'd write something like
+
+if (index > APIC_BASE_MSR && (index - APIC_BASE_MSR) =3D=3D APIC_ICR >> 4)
+
+and let compiler optimize this, I bet it's going to be equally good.
+
+--=20
+Vitaly
 
