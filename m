@@ -2,180 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 96648102208
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 11:23:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AC5510227A
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 12:01:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727450AbfKSKXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 05:23:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25541 "EHLO
+        id S1727704AbfKSLBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 06:01:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48749 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725798AbfKSKXn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 05:23:43 -0500
+        with ESMTP id S1727535AbfKSLBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 06:01:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574159022;
+        s=mimecast20190719; t=1574161293;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6gLPt/JvxqVhsN2FUc2s1UUTeSB3OZ8a9bEL1y+5hKE=;
-        b=KQBSqc2l3XoI3SfIzX87DNAbKurOy2OEwlyEdGyfEwHdESSKYQ8ss8+MaK48VA9gnojxCh
-        nAzUwBBB+QVDYruKHsbYlbumJS++I4mzGz3EI1q7QXtpmmEisV4+KAVN3qDdi2PLRIhwY8
-        aYOZRBD3eOfAzapeUDfK+qI0iBmloxo=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wSp/F3aaHP5Q45hBptTm2n+6Yz9U6VCZsc0e0XK22/M=;
+        b=C16vhxLJcrPk6DxN8Ri8HSmdhJVjjC7A5oxg6XmzxhwQt8S+tUE7NJ/fygd5uhfeJyLMEt
+        q+7IvRT932zVeTH1xDOZ12Y6OxKO5x8wrIAuH+V8Tj0QufNW0Q+3zIkgp4H+H4sFFneDHz
+        6W2l8g9y5ZdFdbWmDwxiH/uQImH/SMo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-3TDrG765O4yFekYnMqNZpg-1; Tue, 19 Nov 2019 05:23:37 -0500
-X-MC-Unique: 3TDrG765O4yFekYnMqNZpg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-218-jBesbjVsPNuTu7nPnemEHA-1; Tue, 19 Nov 2019 06:01:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10A1D477;
-        Tue, 19 Nov 2019 10:23:36 +0000 (UTC)
-Received: from gondolin (ovpn-117-102.ams2.redhat.com [10.36.117.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6D9421B425;
-        Tue, 19 Nov 2019 10:23:28 +0000 (UTC)
-Date:   Tue, 19 Nov 2019 11:23:16 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
-        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [RFC 36/37] KVM: s390: protvirt: Support cmd 5 operation state
-Message-ID: <20191119112316.0a421a01.cohuck@redhat.com>
-In-Reply-To: <44b320d8-604d-8497-59a3-defc41472ba5@linux.ibm.com>
-References: <20191024114059.102802-1-frankja@linux.ibm.com>
-        <20191024114059.102802-37-frankja@linux.ibm.com>
-        <20191118183842.36688a81.cohuck@redhat.com>
-        <44b320d8-604d-8497-59a3-defc41472ba5@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DDD6800EBE;
+        Tue, 19 Nov 2019 11:01:27 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-41.ams2.redhat.com [10.36.117.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 469A960BE0;
+        Tue, 19 Nov 2019 11:01:22 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     virtualization@lists.linux-foundation.org,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: [PATCH net-next 0/6] vsock: add local transport support
+Date:   Tue, 19 Nov 2019 12:01:15 +0100
+Message-Id: <20191119110121.14480-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: jBesbjVsPNuTu7nPnemEHA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="Sig_/426suMwb8hy2eZjpANtTcZe";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/426suMwb8hy2eZjpANtTcZe
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This series introduces a new transport (vsock_loopback) to handle
+local communication.
+This could be useful to test vsock core itself and to allow developers
+to test their applications without launching a VM.
 
-On Tue, 19 Nov 2019 09:13:11 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Before this series, vmci and virtio transports allowed this behavior,
+but only in the guest.
+We are moving the loopback handling in a new transport, because it
+might be useful to provide this feature also in the host or when
+no H2G/G2H transports (hyperv, virtio, vmci) are loaded.
 
-> On 11/18/19 6:38 PM, Cornelia Huck wrote:
-> > On Thu, 24 Oct 2019 07:40:58 -0400
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> Code 5 for the set cpu state UV call tells the UV to load a PSW from
-> >> the SE header (first IPL) or from guest location 0x0 (diag 308 subcode
-> >> 0/1). Also it sets the cpu into operating state afterwards, so we can
-> >> start it. =20
-> >=20
-> > I'm a bit confused by the patch description: Does this mean that the UV
-> > does the transition to operating state? Does the hypervisor get a
-> > notification for that? =20
->=20
-> CMD 5 is defined as "load psw and set to operating".
-> Currently QEMU will still go out and do a "set to operating" after the
-> cmd 5 because our current infrastructure does it and it's basically a
-> nop, so I didn't want to put in the effort to remove it.
+The user can use the loopback with the new VMADDR_CID_LOCAL (that
+replaces VMADDR_CID_RESERVED) in any condition.
+Otherwise, if the G2H transport is loaded, it can also use the guest
+local CID as previously supported by vmci and virtio transports.
+If G2H transport is not loaded, the user can also use VMADDR_CID_HOST
+for local communication.
 
-So, the "it" setting the cpu into operating state is QEMU, via the
-mpstate interface, which triggers that call? Or is that implicit, but
-it does not hurt to do it again (which would make more sense to me)?
+Patch 1 is a cleanup to build virtio_transport_common without virtio
+Patch 2 adds the new VMADDR_CID_LOCAL, replacing VMADDR_CID_RESERVED
+Patch 3 adds a new feature flag to register a loopback transport
+Patch 4 adds the new vsock_loopback transport based on the loopback
+        implementation of virtio_transport
+Patch 5 implements the logic to use the local transport for loopback
+        communication
+Patch 6 removes the loopback from virtio_transport
 
-Assuming the latter, what about the following description:
+@Jorgen: Do you think it might be a problem to replace
+VMADDR_CID_RESERVED with VMADDR_CID_LOCAL?
 
-"KVM: s390: protvirt: support setting cpu state 5
+Thanks,
+Stefano
 
-Setting code 5 ("load psw and set to operating") in the set cpu state
-UV call tells the UV to load a PSW either from the SE header (first
-IPL) or from guest location 0x0 (diag 308 subcode 0/1). Subsequently,
-the cpu is set into operating state by the UV.
+Stefano Garzarella (6):
+  vsock/virtio_transport_common: remove unused virtio header includes
+  vsock: add VMADDR_CID_LOCAL definition
+  vsock: add local transport support in the vsock core
+  vsock: add vsock_loopback transport
+  vsock: use local transport when it is loaded
+  vsock/virtio: remove loopback handling
 
-Note that we can still instruct the UV to set the cpu into operating
-state explicitly afterwards."
+ MAINTAINERS                             |   1 +
+ include/net/af_vsock.h                  |   2 +
+ include/uapi/linux/vm_sockets.h         |   8 +-
+ net/vmw_vsock/Kconfig                   |  12 ++
+ net/vmw_vsock/Makefile                  |   1 +
+ net/vmw_vsock/af_vsock.c                |  49 +++++-
+ net/vmw_vsock/virtio_transport.c        |  61 +------
+ net/vmw_vsock/virtio_transport_common.c |   3 -
+ net/vmw_vsock/vmci_transport.c          |   2 +-
+ net/vmw_vsock/vsock_loopback.c          | 217 ++++++++++++++++++++++++
+ 10 files changed, 283 insertions(+), 73 deletions(-)
+ create mode 100644 net/vmw_vsock/vsock_loopback.c
 
->=20
-> >  =20
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>  arch/s390/include/asm/uv.h | 1 +
-> >>  arch/s390/kvm/kvm-s390.c   | 4 ++++
-> >>  include/uapi/linux/kvm.h   | 1 +
-> >>  3 files changed, 6 insertions(+)
-> >>
-> >> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> >> index 33b52ba306af..8d10ae731458 100644
-> >> --- a/arch/s390/include/asm/uv.h
-> >> +++ b/arch/s390/include/asm/uv.h
-> >> @@ -163,6 +163,7 @@ struct uv_cb_unp {
-> >>  #define PV_CPU_STATE_OPR=091
-> >>  #define PV_CPU_STATE_STP=092
-> >>  #define PV_CPU_STATE_CHKSTP=093
-> >> +#define PV_CPU_STATE_OPR_LOAD=095
-> >> =20
-> >>  struct uv_cb_cpu_set_state {
-> >>  =09struct uv_cb_header header;
-> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> >> index cc5feb67f145..5cc9108c94e4 100644
-> >> --- a/arch/s390/kvm/kvm-s390.c
-> >> +++ b/arch/s390/kvm/kvm-s390.c
-> >> @@ -4652,6 +4652,10 @@ static int kvm_s390_handle_pv_vcpu(struct kvm_v=
-cpu *vcpu,
-> >>  =09=09r =3D kvm_s390_pv_destroy_cpu(vcpu);
-> >>  =09=09break;
-> >>  =09}
-> >> +=09case KVM_PV_VCPU_SET_IPL_PSW: {
-> >> +=09=09r =3D kvm_s390_pv_set_cpu_state(vcpu, PV_CPU_STATE_OPR_LOAD);
-
-Also maybe add a comment here that setting into oper state (again) can
-be done separately?
-
-> >> +=09=09break;
-> >> +=09}
-> >>  =09default:
-> >>  =09=09r =3D -ENOTTY;
-> >>  =09}
-> >> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> >> index 2846ed5e5dd9..973007d27d55 100644
-> >> --- a/include/uapi/linux/kvm.h
-> >> +++ b/include/uapi/linux/kvm.h
-> >> @@ -1483,6 +1483,7 @@ enum pv_cmd_id {
-> >>  =09KVM_PV_VM_UNSHARE,
-> >>  =09KVM_PV_VCPU_CREATE,
-> >>  =09KVM_PV_VCPU_DESTROY,
-> >> +=09KVM_PV_VCPU_SET_IPL_PSW,
-> >>  };
-> >> =20
-> >>  struct kvm_pv_cmd { =20
-> >  =20
->=20
->=20
-
-
---Sig_/426suMwb8hy2eZjpANtTcZe
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3TwpQACgkQ3s9rk8bw
-L69hRQ/+IkXC55f5pKzsG5NQp7SL8hfIM4pfshIIq3fwfCO00Z/pB6YQJeckXXwr
-rpCbP7jJvAj3Mc7ZkTj4k41ekeol3Tvga9Oo8JBGWnxFFrlBEYs8P5Ee1qQNGhnE
-gb8+52B9CNwm0m2W5M61+8p/65I66EwiK5sksNnmsSYMSbCb6Za5/+q2xF8CdW6a
-2rTNXFvLxJ462N6BgLBC81euXEuJRdoK70YRK8ZUcXnpl/wDk3p9UhTnUUI21KxS
-ebwOGrpGfYaGXbQmMATIQiPDkQbnJl0SUpDrCPnod9hEHVt4gkCypjHIdMb8eX5a
-nlrbXKF8IAn1jKhhUdfbaJz3FEIRYs1Q4pY+Zt/pkPuzP3/GoA8FYetALc1oF2e+
-6Gi25JkqH4cvLfIc5x2ReJB657UzQsxO5mx4+KRmcA5LmqE/e7nBpjcObLrSdhf3
-XRtNCW1bMDrByN+FnE1Um36/dN5w44YlHF50b4MLbGMUmyePnkKCpCzCU/AV6TGO
-leVSB8txfwD+fVJH9s/dn9dqziFHXqtcLRx9ZlK8pUcKcErVgX3PHQ5iZTtpxWr1
-fKQNk5rD+d0PXE6qaSm9DvFvbFIPk7fiPlvj+fCQJsqbhtMGJOMY2cvtDUY0lWdR
-GcPu1x4xdbNNKKWb9RFWoYTioIHhMM6nx2xTp7w+fZc9XLeaRKs=
-=e9K4
------END PGP SIGNATURE-----
-
---Sig_/426suMwb8hy2eZjpANtTcZe--
+--=20
+2.21.0
 
