@@ -2,150 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 54FC91019E5
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 08:00:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CEB71019EE
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 08:00:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727431AbfKSHAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 02:00:24 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:46651 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbfKSHAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 02:00:24 -0500
-Received: by mail-ot1-f66.google.com with SMTP id n23so16919677otr.13;
-        Mon, 18 Nov 2019 23:00:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aHD4Xn5/sth3UNvyKlhGzuryCM9IkAIPjPJGPFbypFk=;
-        b=FtDquBCUI4NWxzSBTO8cxkAQxGRaKjbUfY/2IeLsFtnw2h6Dn/qMmmUP9OaWmje0Na
-         NVfmcpApjRmy0sGlkJZV32n3iGn1uKa4kucVCyGPPwszFs5O0sHiAuqmV7QJwKecyK0u
-         +eFBAsDZpdM8FO4sT4qC30G++jTZQ3QJWsJ44sZZWBBxfzxCMe6OrZzwiYLWtERr5ldD
-         bzetfc2Fqt2kUJpMw/5S5NyNOkfnRT/9o57i0swoSSt1AqLLzFdehXuLskzYZHm2yQqt
-         0i79kLgbdocAj9aXxPrPpSAYFVM5ET3QYevpry7LoV0CvvlRvuJ8W2FscUAJBiTD27PF
-         VKmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aHD4Xn5/sth3UNvyKlhGzuryCM9IkAIPjPJGPFbypFk=;
-        b=QNL2vtbbanhO0qsTHyS/ayNGV7RmwgzKKKy5ikanpNDAZmQp5PCYP9Oy+s5PrNGfFB
-         QOc3m5O4Z7Z3E213eYIHGa1BX1f9Vu7NBhViKXCNOChGZoVcABI3VrhARG+bRNvg+d4i
-         8ghBunCmAw7tUfTg5aqf35J+jnQB0+C2rSmVNKsaLeszjALOAEq1+6Ql5pXZXkRF9t34
-         tc02L89WnTgDGzYfFhvxYwBepQhTtq5YAhcKd79i+8xdE5UwiASq1JdDTl+yg77HjGhQ
-         Qj2Iz5NxH2XBs8uXmAeB+7S+myp4fJcnlanAu9x00Ie5/3xc4jhFd7eKbGDQnbs+/w8F
-         XH+g==
-X-Gm-Message-State: APjAAAWXDWMGpiPs64ZlUkBaH9y29tLz5ZiI7xECy9lOsV8MTPUeh2dl
-        jra/CDX9cSoUs7sGaHisztxpNxVvzKtLiO/M6GQ=
-X-Google-Smtp-Source: APXvYqwYCbILBHUmk9MyTGvu1q4QNhZ8cNqLJGxRpG5F1yFtAZ6MtPf5e1phTdRmMT13KmdjtJ5SYGgKC6TwuRx1Wnk=
-X-Received: by 2002:a9d:b83:: with SMTP id 3mr2468919oth.56.1574146821897;
- Mon, 18 Nov 2019 23:00:21 -0800 (PST)
+        id S1727535AbfKSHAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 02:00:36 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:14990 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726792AbfKSHAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 02:00:36 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5dd3930f0000>; Mon, 18 Nov 2019 23:00:32 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate102.nvidia.com (PGP Universal service);
+  Mon, 18 Nov 2019 23:00:34 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate102.nvidia.com on Mon, 18 Nov 2019 23:00:34 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 19 Nov
+ 2019 07:00:34 +0000
+Subject: Re: [PATCH v5 02/24] mm/gup: factor out duplicate code from four
+ routines
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+References: <20191115055340.1825745-1-jhubbard@nvidia.com>
+ <20191115055340.1825745-3-jhubbard@nvidia.com>
+ <20191118094604.GC17319@quack2.suse.cz>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <152e2ea9-edd9-f868-7731-ff467d692f5f@nvidia.com>
+Date:   Mon, 18 Nov 2019 23:00:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <1571829384-5309-1-git-send-email-zhenzhong.duan@oracle.com> <1571829384-5309-2-git-send-email-zhenzhong.duan@oracle.com>
-In-Reply-To: <1571829384-5309-2-git-send-email-zhenzhong.duan@oracle.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 19 Nov 2019 15:00:13 +0800
-Message-ID: <CANRm+Cyr+Gg06MiE1+6g9eKTcrN=nn9mPf6=b+5xUN5_9T0v4A@mail.gmail.com>
-Subject: Re: [PATCH v8 1/5] Revert "KVM: X86: Fix setup the virt_spin_lock_key
- before static key get initialized"
-To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>, will@kernel.org,
-        linux-hyperv@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        mikelley@microsoft.com, "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191118094604.GC17319@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1574146832; bh=u3YCRE77HsuXbqK9BxFmzDLl8JhQHMG9gXXaYRfagTQ=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=OHB+eUp2jQQmHLrGYBTtAkydhQax1jgPbRIdqXv/zT7mJheOoxm2jC/o00J+31bDd
+         psR1uWZTYTlZpkmYbJIlMzoHbpxnwxoe7ZrZ8UMQNDddfR1HU1k+hUj3JCOx3ZRd5b
+         XT8Ag7PAkGX6G4pIQ7geJmQblkDOtgu1RTN+An2f8z0fTBevVuF5GINewI0N+iPfcv
+         YgagSYh5LQVW6KL8izWZSAMBRDSFlAEl3uHonusWk1CkuRAUgvh73saFcEMPgIKbUo
+         7msrJOumHG3EP3Mzt2Z3Dov3XH2Wq2MWpaj0JPNxYk4UIQaUft9LMOT0FAc0/WGi6i
+         OtciRBna4adWA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 at 19:20, Zhenzhong Duan <zhenzhong.duan@oracle.com> wrote:
->
-> This reverts commit 34226b6b70980a8f81fff3c09a2c889f77edeeff.
->
-> Commit 8990cac6e5ea ("x86/jump_label: Initialize static branching
-> early") adds jump_label_init() call in setup_arch() to make static
-> keys initialized early, so we could use the original simpler code
-> again.
->
-> The similar change for XEN is in commit 090d54bcbc54 ("Revert
-> "x86/paravirt: Set up the virt_spin_lock_key after static keys get
-> initialized"")
->
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krcmar <rkrcmar@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
+On 11/18/19 1:46 AM, Jan Kara wrote:
+> On Thu 14-11-19 21:53:18, John Hubbard wrote:
+>> There are four locations in gup.c that have a fair amount of code
+>> duplication. This means that changing one requires making the same
+>> changes in four places, not to mention reading the same code four
+>> times, and wondering if there are subtle differences.
+>>
+>> Factor out the common code into static functions, thus reducing the
+>> overall line count and the code's complexity.
+>>
+>> Also, take the opportunity to slightly improve the efficiency of the
+>> error cases, by doing a mass subtraction of the refcount, surrounded
+>> by get_page()/put_page().
+>>
+>> Also, further simplify (slightly), by waiting until the the successful
+>> end of each routine, to increment *nr.
+>>
+>> Reviewed-by: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+>> Cc: Jan Kara <jack@suse.cz>
+>> Cc: Ira Weiny <ira.weiny@intel.com>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
+>> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+>> ---
+>>  mm/gup.c | 95 ++++++++++++++++++++++++--------------------------------
+>>  1 file changed, 40 insertions(+), 55 deletions(-)
+>>
+>> diff --git a/mm/gup.c b/mm/gup.c
+>> index 85caf76b3012..858541ea30ce 100644
+>> --- a/mm/gup.c
+>> +++ b/mm/gup.c
+>> @@ -1969,6 +1969,29 @@ static int __gup_device_huge_pud(pud_t pud, pud_t=
+ *pudp, unsigned long addr,
+>>  }
+>>  #endif
+>> =20
+>> +static int __record_subpages(struct page *page, unsigned long addr,
+>> +			     unsigned long end, struct page **pages)
+>> +{
+>> +	int nr =3D 0;
+>> +	int nr_recorded_pages =3D 0;
+>> +
+>> +	do {
+>> +		pages[nr] =3D page;
+>> +		nr++;
+>> +		page++;
+>> +		nr_recorded_pages++;
+>> +	} while (addr +=3D PAGE_SIZE, addr !=3D end);
+>> +	return nr_recorded_pages;
+>=20
+> nr =3D=3D nr_recorded_pages so no need for both... BTW, structuring this =
+as a
+> for loop would be probably more logical and shorter now:
+>=20
+> 	for (nr =3D 0; addr !=3D end; addr +=3D PAGE_SIZE)
+> 		pages[nr++] =3D page++;
+> 	return nr;
+>=20
 
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
+Nice touch, I've applied it.
 
-> ---
->  arch/x86/kernel/kvm.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index e820568..3bc6a266 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -527,13 +527,6 @@ static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
->         }
->  }
->
-> -static void __init kvm_smp_prepare_cpus(unsigned int max_cpus)
-> -{
-> -       native_smp_prepare_cpus(max_cpus);
-> -       if (kvm_para_has_hint(KVM_HINTS_REALTIME))
-> -               static_branch_disable(&virt_spin_lock_key);
-> -}
-> -
->  static void __init kvm_smp_prepare_boot_cpu(void)
->  {
->         /*
-> @@ -633,7 +626,6 @@ static void __init kvm_guest_init(void)
->                 apic_set_eoi_write(kvm_guest_apic_eoi_write);
->
->  #ifdef CONFIG_SMP
-> -       smp_ops.smp_prepare_cpus = kvm_smp_prepare_cpus;
->         smp_ops.smp_prepare_boot_cpu = kvm_smp_prepare_boot_cpu;
->         if (kvm_para_has_feature(KVM_FEATURE_PV_SCHED_YIELD) &&
->             !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
-> @@ -835,8 +827,10 @@ void __init kvm_spinlock_init(void)
->         if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
->                 return;
->
-> -       if (kvm_para_has_hint(KVM_HINTS_REALTIME))
-> +       if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
-> +               static_branch_disable(&virt_spin_lock_key);
->                 return;
-> +       }
->
->         /* Don't use the pvqspinlock code if there is only 1 vCPU. */
->         if (num_possible_cpus() == 1)
-> --
-> 1.8.3.1
->
+thanks,
+--=20
+John Hubbard
+NVIDIA
+
+
+
+> The rest of the patch looks good to me.
+>=20
+> 								Honza
+>=20
