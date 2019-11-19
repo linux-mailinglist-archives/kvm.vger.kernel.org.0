@@ -2,226 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B40001019F5
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 08:01:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CE01101B68
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 09:11:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727092AbfKSHBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 02:01:55 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:43680 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbfKSHBy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 02:01:54 -0500
-Received: by mail-oi1-f195.google.com with SMTP id l20so17900402oie.10;
-        Mon, 18 Nov 2019 23:01:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qz77BFNx7Mzy/MD1o3YVo9rJMBCL9I3q5BZGdkzee6E=;
-        b=ft+p6PvxpkSpqyVCfKBkwoJ9cWG+lIgZDlW4rBbYsNdr/my6ZIlaxRNhEawqAOx24E
-         JU2bg5u8gnVxdGZmJlE0h2iYcEccL1YM5MAdvz1/30irCnM5CnWS/XvMC+igIQPIf9zD
-         3IG4Wy6Wrss1w+MARmW437uRb8gDXPKxtO9NQvDpEeuy1AGu/MhZvtrWq1tGb6d51+Ts
-         KWOzkPl3VYVC7GPcfnYbxEP6036+OIugWfRvP1AmqUvppEGo20h+7rwiTCPgLC2jJ77I
-         D0EmrbS9yKHXawP+2gtee8WPxFYiRZpDaIWu2E+EXu1Kjgahx/euS/f1iXMxf89iHBZE
-         1qmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qz77BFNx7Mzy/MD1o3YVo9rJMBCL9I3q5BZGdkzee6E=;
-        b=SlAAS7N1bzc9Gb/7ewXsSk3Xmn0FVy5piY82nbsIY6yjZ/+c0VDFu5S1bhFvXaY37h
-         v7L3SnscZUumlxAYJ845S/DoeauwkGVACTbNm6o8azCwES4UNSEPZYsGe306TUQdsrlJ
-         BSp4BNPjB2iFpFYlDpeF+HNVVGbEXsJQ7Q4avEcNwwj+yYGu+JIu/c5L/E4tTOSZQUtO
-         qG83KlLkfDvx96N73afELmUfaudxTlPmDLYBeqTxnrmU6I5tWZTkFUFZzyolFZhvj2/V
-         +QzSegIDsq2M9AVZLKHWO4vtRs94fDXOIpEHu7uETTlvxPwFpRnwcCk+D2MBJxAyMxqj
-         BvRA==
-X-Gm-Message-State: APjAAAUPn3hgtkP/GB0FlPWKdTLI6SHe10xNgNOqDxXKd8+arqugNEna
-        gNFzKL9pPiQgB+avdn5zJspzrdfTtXRDMdMOkCo=
-X-Google-Smtp-Source: APXvYqwmGoKh3uUy1mY1+Rk/+b0NiC55jQDs6tDgUT9OAyqEAabRDmNRZTUwg+81GMFFRf9NBZUqS3aOPzRCkh04aqQ=
-X-Received: by 2002:aca:5015:: with SMTP id e21mr2814500oib.174.1574146913825;
- Mon, 18 Nov 2019 23:01:53 -0800 (PST)
+        id S1727190AbfKSILV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 03:11:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54954 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725306AbfKSILU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 03:11:20 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAJ87fGr115556
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 03:11:19 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2way21cy6d-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 03:11:18 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Tue, 19 Nov 2019 08:11:17 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 19 Nov 2019 08:11:14 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAJ8BCT836504060
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Nov 2019 08:11:12 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA72252067;
+        Tue, 19 Nov 2019 08:11:12 +0000 (GMT)
+Received: from dyn-9-152-224-153.boeblingen.de.ibm.com (unknown [9.152.224.153])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6C78852050;
+        Tue, 19 Nov 2019 08:11:12 +0000 (GMT)
+Subject: Re: [RFC 23/37] KVM: s390: protvirt: Make sure prefix is always
+ protected
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+ <20191024114059.102802-24-frankja@linux.ibm.com>
+ <20191118173942.0252b731.cohuck@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date:   Tue, 19 Nov 2019 09:11:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <1571829384-5309-1-git-send-email-zhenzhong.duan@oracle.com> <1571829384-5309-4-git-send-email-zhenzhong.duan@oracle.com>
-In-Reply-To: <1571829384-5309-4-git-send-email-zhenzhong.duan@oracle.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 19 Nov 2019 15:01:45 +0800
-Message-ID: <CANRm+CzW=M37QwkVPhkhJHimUG6MtCMZnhcLL+24ujtpv9cPyA@mail.gmail.com>
-Subject: Re: [PATCH v8 3/5] x86/kvm: Add "nopvspin" parameter to disable PV spinlocks
-To:     Zhenzhong Duan <zhenzhong.duan@oracle.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>, will@kernel.org,
-        linux-hyperv@vger.kernel.org, kvm <kvm@vger.kernel.org>,
-        mikelley@microsoft.com, "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191118173942.0252b731.cohuck@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="dTiQux0JQ55Djpg2Rsgq8qTwZonfqEr3C"
+X-TM-AS-GCONF: 00
+x-cbid: 19111908-0028-0000-0000-000003BB040F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111908-0029-0000-0000-0000247E2036
+Message-Id: <db54630b-8959-feba-168e-0afecc30d4b9@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-19_01:2019-11-15,2019-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=525
+ malwarescore=0 bulkscore=0 suspectscore=3 spamscore=0 adultscore=0
+ clxscore=1015 mlxscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911190076
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 23 Oct 2019 at 19:21, Zhenzhong Duan <zhenzhong.duan@oracle.com> wrote:
->
-> There are cases where a guest tries to switch spinlocks to bare metal
-> behavior (e.g. by setting "xen_nopvspin" on XEN platform and
-> "hv_nopvspin" on HYPER_V).
->
-> That feature is missed on KVM, add a new parameter "nopvspin" to disable
-> PV spinlocks for KVM guest.
->
-> The new 'nopvspin' parameter will also replace Xen and Hyper-V specific
-> parameters in future patches.
->
-> Define variable nopvsin as global because it will be used in future
-> patches as above.
->
-> Signed-off-by: Zhenzhong Duan <zhenzhong.duan@oracle.com>
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krcmar <rkrcmar@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Will Deacon <will@kernel.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dTiQux0JQ55Djpg2Rsgq8qTwZonfqEr3C
+Content-Type: multipart/mixed; boundary="WXgCMtOkbkxdPBessyThRwbnTNXHfBbyq"
 
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
+--WXgCMtOkbkxdPBessyThRwbnTNXHfBbyq
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  Documentation/admin-guide/kernel-parameters.txt |  5 ++++
->  arch/x86/include/asm/qspinlock.h                |  1 +
->  arch/x86/kernel/kvm.c                           | 39 ++++++++++++++++++++-----
->  kernel/locking/qspinlock.c                      |  7 +++++
->  4 files changed, 45 insertions(+), 7 deletions(-)
->
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index a84a83f..bd49ed2 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -5334,6 +5334,11 @@
->                         as generic guest with no PV drivers. Currently support
->                         XEN HVM, KVM, HYPER_V and VMWARE guest.
->
-> +       nopvspin        [X86,KVM]
-> +                       Disables the qspinlock slow path using PV optimizations
-> +                       which allow the hypervisor to 'idle' the guest on lock
-> +                       contention.
-> +
->         xirc2ps_cs=     [NET,PCMCIA]
->                         Format:
->                         <irq>,<irq_mask>,<io>,<full_duplex>,<do_sound>,<lockup_hack>[,<irq2>[,<irq3>[,<irq4>]]]
-> diff --git a/arch/x86/include/asm/qspinlock.h b/arch/x86/include/asm/qspinlock.h
-> index 444d6fd..d86ab94 100644
-> --- a/arch/x86/include/asm/qspinlock.h
-> +++ b/arch/x86/include/asm/qspinlock.h
-> @@ -32,6 +32,7 @@ static __always_inline u32 queued_fetch_set_pending_acquire(struct qspinlock *lo
->  extern void __pv_init_lock_hash(void);
->  extern void __pv_queued_spin_lock_slowpath(struct qspinlock *lock, u32 val);
->  extern void __raw_callee_save___pv_queued_spin_unlock(struct qspinlock *lock);
-> +extern bool nopvspin;
->
->  #define        queued_spin_unlock queued_spin_unlock
->  /**
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 6562886..9834737 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -825,18 +825,36 @@ __visible bool __kvm_vcpu_is_preempted(long cpu)
->   */
->  void __init kvm_spinlock_init(void)
->  {
-> -       /* Does host kernel support KVM_FEATURE_PV_UNHALT? */
-> -       if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT))
-> +       /*
-> +        * In case host doesn't support KVM_FEATURE_PV_UNHALT there is still an
-> +        * advantage of keeping virt_spin_lock_key enabled: virt_spin_lock() is
-> +        * preferred over native qspinlock when vCPU is preempted.
-> +        */
-> +       if (!kvm_para_has_feature(KVM_FEATURE_PV_UNHALT)) {
-> +               pr_info("PV spinlocks disabled, no host support\n");
->                 return;
-> +       }
->
-> +       /*
-> +        * Disable PV spinlocks and use native qspinlock when dedicated pCPUs
-> +        * are available.
-> +        */
->         if (kvm_para_has_hint(KVM_HINTS_REALTIME)) {
-> -               static_branch_disable(&virt_spin_lock_key);
-> -               return;
-> +               pr_info("PV spinlocks disabled with KVM_HINTS_REALTIME hints\n");
-> +               goto out;
->         }
->
-> -       /* Don't use the pvqspinlock code if there is only 1 vCPU. */
-> -       if (num_possible_cpus() == 1)
-> -               return;
-> +       if (num_possible_cpus() == 1) {
-> +               pr_info("PV spinlocks disabled, single CPU\n");
-> +               goto out;
-> +       }
-> +
-> +       if (nopvspin) {
-> +               pr_info("PV spinlocks disabled, forced by \"nopvspin\" parameter\n");
-> +               goto out;
-> +       }
-> +
-> +       pr_info("PV spinlocks enabled\n");
->
->         __pv_init_lock_hash();
->         pv_ops.lock.queued_spin_lock_slowpath = __pv_queued_spin_lock_slowpath;
-> @@ -849,6 +867,13 @@ void __init kvm_spinlock_init(void)
->                 pv_ops.lock.vcpu_is_preempted =
->                         PV_CALLEE_SAVE(__kvm_vcpu_is_preempted);
->         }
-> +       /*
-> +        * When PV spinlock is enabled which is preferred over
-> +        * virt_spin_lock(), virt_spin_lock_key's value is meaningless.
-> +        * Just disable it anyway.
-> +        */
-> +out:
-> +       static_branch_disable(&virt_spin_lock_key);
->  }
->
->  #endif /* CONFIG_PARAVIRT_SPINLOCKS */
-> diff --git a/kernel/locking/qspinlock.c b/kernel/locking/qspinlock.c
-> index 2473f10..75193d6 100644
-> --- a/kernel/locking/qspinlock.c
-> +++ b/kernel/locking/qspinlock.c
-> @@ -580,4 +580,11 @@ void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
->  #include "qspinlock_paravirt.h"
->  #include "qspinlock.c"
->
-> +bool nopvspin __initdata;
-> +static __init int parse_nopvspin(char *arg)
-> +{
-> +       nopvspin = true;
-> +       return 0;
-> +}
-> +early_param("nopvspin", parse_nopvspin);
->  #endif
-> --
-> 1.8.3.1
->
+On 11/18/19 5:39 PM, Cornelia Huck wrote:
+> On Thu, 24 Oct 2019 07:40:45 -0400
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+>=20
+> Add at least a short sentence here?
+
+For protected VMs the lowcore does not only need to be mapped, but also
+needs to be protected memory, if not we'll get a validity interception
+when trying to run it.
+
+>=20
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/kvm/kvm-s390.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index eddc9508c1b1..17a78774c617 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -3646,6 +3646,15 @@ static int kvm_s390_handle_requests(struct kvm_=
+vcpu *vcpu)
+>>  		rc =3D gmap_mprotect_notify(vcpu->arch.gmap,
+>>  					  kvm_s390_get_prefix(vcpu),
+>>  					  PAGE_SIZE * 2, PROT_WRITE);
+>> +		if (!rc && kvm_s390_pv_is_protected(vcpu->kvm)) {
+>> +			rc =3D uv_convert_to_secure(vcpu->arch.gmap,
+>> +						  kvm_s390_get_prefix(vcpu));
+>> +			WARN_ON_ONCE(rc && rc !=3D -EEXIST);
+>> +			rc =3D uv_convert_to_secure(vcpu->arch.gmap,
+>> +						  kvm_s390_get_prefix(vcpu) + PAGE_SIZE);
+>> +			WARN_ON_ONCE(rc && rc !=3D -EEXIST);
+>> +			rc =3D 0;
+>=20
+> So, what happens if we have an error other than -EEXIST (which
+> presumably means that we already protected it) here? The page is not
+> protected, and further accesses will get an error? (Another question:
+> what can actually go wrong here?)
+
+If KVM or QEMU write into a lowcore, we will fail the integrity check on
+import and this cpu will never run again.
+
+In retrospect a warn_on_once might be the wrong error handling here.
+
+>=20
+>> +		}
+>>  		if (rc) {
+>>  			kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+>>  			return rc;
+>=20
+
+
+
+--WXgCMtOkbkxdPBessyThRwbnTNXHfBbyq--
+
+--dTiQux0JQ55Djpg2Rsgq8qTwZonfqEr3C
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3To6AACgkQ41TmuOI4
+ufjICBAArn8chPtOBdwPrGdyUqynbSUeN2sCnMJ71dvs+8V2AKXr1lM/uiGtz4v0
+6WEbkZ3k0ZAMbrE+sBAlK/ghma9Vcn6FkFFTJPoBmUTlQXlMN3HTJntqIl279AcR
+gyRSk2qJgF+VLxO4YexVw4nBz8Az6ez0tDyVYtftDAf+Q0Ha/1Aivq0F68C23MKZ
+rzSCHsxjTmCBFZmr1fJxeK1ad6Pw6ra0HBWUocKiLnJxcUax3oBAFs9uPoDM/I/y
+5ZV8o90TSVFIDBbQR0V2Ee32s0bOj409Il3hH7hyK4PKqEtvIxZDOBXYMjSJcuPZ
+M7JP7wvImzUfwEJoZ8H27fTf4V0voHZJGDAgjI9xAioOTEBL3a7enHhHEwcFoCJY
+pnc81zrKeOcrL3wn4eNgsqPl5FsZ654wpqq4oVugxgogpmFn3QLiH4DGYXMm6829
+vPb1utkCOvKPHITj33yh0q8HYNAEfzFMvGcz/kriHrEuBEhJPIFxr9IqiTrE2efp
+LDnXDsR81CKScNsE4iPMzfUVYkYV1worMJtQQqWoZCGcngsNKjMC63hnb+HPguh7
+7KvnaPOpLkly/dS2IIC8vqFpweVIUQHM+ipQucBv/32QbOVcRu38IQGeExyWhAx3
+St7cDHMEZ9+RyliVxTmxfuoJbrHBNiSecZXylob3RaraLBUIRqY=
+=Gtoe
+-----END PGP SIGNATURE-----
+
+--dTiQux0JQ55Djpg2Rsgq8qTwZonfqEr3C--
+
