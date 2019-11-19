@@ -2,371 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5FB1020F4
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 10:41:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77C93102114
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 10:45:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727728AbfKSJkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 04:40:52 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:48096 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727640AbfKSJkq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Nov 2019 04:40:46 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1iX000-0001Fd-RT; Tue, 19 Nov 2019 10:40:40 +0100
-To:     Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 2/3] kvm: arm: VGIC: Scan all IRQs when interrupt group  gets enabled
-X-PHP-Originating-Script: 0:main.inc
+        id S1725904AbfKSJpt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 04:45:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60486 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725280AbfKSJps (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 04:45:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574156748;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9AUb92RYFJFMPUckMcMKSsMU74llM5H5sHH7q4HkSEU=;
+        b=B2l+u0/WC4cEcuhrJGHM35AbO6xbMw77jf9S8MY4g23nBcPDiOVQD9P2jYl3uheKw34HKG
+        OjynOZD/JCsotVOXRGVhFRIvWp56xstmZk1zNM3YIr7hT6oKzHs+c+P0EPlDGdTXBDztgE
+        J+xIJnyJcLDfGSlCz43mQz7HXrdfc3k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285-vHhsPlpiO1GWTroyzCkHnw-1; Tue, 19 Nov 2019 04:45:46 -0500
+X-MC-Unique: vHhsPlpiO1GWTroyzCkHnw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B6821852E20;
+        Tue, 19 Nov 2019 09:45:45 +0000 (UTC)
+Received: from gondolin (ovpn-117-102.ams2.redhat.com [10.36.117.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A299627DE;
+        Tue, 19 Nov 2019 09:45:40 +0000 (UTC)
+Date:   Tue, 19 Nov 2019 10:45:28 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, thuth@redhat.com,
+        david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        mihajlov@linux.ibm.com, mimu@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [RFC 23/37] KVM: s390: protvirt: Make sure prefix is always
+ protected
+Message-ID: <20191119104528.3f3c2620.cohuck@redhat.com>
+In-Reply-To: <db54630b-8959-feba-168e-0afecc30d4b9@linux.ibm.com>
+References: <20191024114059.102802-1-frankja@linux.ibm.com>
+        <20191024114059.102802-24-frankja@linux.ibm.com>
+        <20191118173942.0252b731.cohuck@redhat.com>
+        <db54630b-8959-feba-168e-0afecc30d4b9@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 19 Nov 2019 09:40:40 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
-In-Reply-To: <20191118141216.352a3a0a@donnerap.cambridge.arm.com>
-References: <20191108174952.740-1-andre.przywara@arm.com>
- <20191108174952.740-3-andre.przywara@arm.com> <20191110142914.6ffdfdfa@why>
- <20191112093658.08f248c5@donnerap.cambridge.arm.com>
- <9ddab86ca3959acbb8b7aad24be5f1ad@www.loen.fr>
- <20191118141216.352a3a0a@donnerap.cambridge.arm.com>
-Message-ID: <4245ee82a03c9403f8e4ff815f032709@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/zhv7PoOZ1lQTw1Ax=3I64YS";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+--Sig_/zhv7PoOZ1lQTw1Ax=3I64YS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 2019-11-18 14:12, Andre Przywara wrote:
-> On Thu, 14 Nov 2019 11:16:55 +0000
-> Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Marc,
->
->> On 2019-11-12 09:36, Andre Przywara wrote:
->> > On Sun, 10 Nov 2019 14:29:14 +0000
->> > Marc Zyngier <maz@kernel.org> wrote:
->> >
->> > Hi Marc,
->> >
->> >> On Fri,  8 Nov 2019 17:49:51 +0000
->> >> Andre Przywara <andre.przywara@arm.com> wrote:
->> >>
->> >> > Our current VGIC emulation code treats the "EnableGrpX" bits in
->> >> GICD_CTLR
->> >> > as a single global interrupt delivery switch, where in fact the
->> >> GIC
->> >> > architecture asks for this being separate for the two interrupt
->> >> groups.
->> >> >
->> >> > To implement this properly, we have to slightly adjust our 
->> design,
->> >> to
->> >> > *not* let IRQs from a disabled interrupt group be added to the
->> >> ap_list.
->> >> >
->> >> > As a consequence, enabling one group requires us to re-evaluate
->> >> every
->> >> > pending IRQ and potentially add it to its respective ap_list.
->> >> Similarly
->> >> > disabling an interrupt group requires pending IRQs to be 
->> removed
->> >> from
->> >> > the ap_list (as long as they have not been activated yet).
->> >> >
->> >> > Implement a rather simple, yet not terribly efficient algorithm 
->> to
->> >> > achieve this: For each VCPU we iterate over all IRQs, checking 
->> for
->> >> > pending ones and adding them to the list. We hold the 
->> ap_list_lock
->> >> > for this, to make this atomic from a VCPU's point of view.
->> >> >
->> >> > When an interrupt group gets disabled, we can't directly remove
->> >> affected
->> >> > IRQs from the ap_list, as a running VCPU might have already
->> >> activated
->> >> > them, which wouldn't be immediately visible to the host.
->> >> > Instead simply kick all VCPUs, so that they clean their 
->> ap_list's
->> >> > automatically when running vgic_prune_ap_list().
->> >> >
->> >> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> >> > ---
->> >> >  virt/kvm/arm/vgic/vgic.c | 88
->> >> ++++++++++++++++++++++++++++++++++++----
->> >> >  1 file changed, 80 insertions(+), 8 deletions(-)
->> >> >
->> >> > diff --git a/virt/kvm/arm/vgic/vgic.c 
->> b/virt/kvm/arm/vgic/vgic.c
->> >> > index 3b88e14d239f..28d9ff282017 100644
->> >> > --- a/virt/kvm/arm/vgic/vgic.c
->> >> > +++ b/virt/kvm/arm/vgic/vgic.c
->> >> > @@ -339,6 +339,38 @@ int vgic_dist_enable_group(struct kvm 
->> *kvm,
->> >> int group, bool status)
->> >> >  	return 0;
->> >> >  }
->> >> >
->> >> > +/*
->> >> > + * Check whether a given IRQs need to be queued to this 
->> ap_list,
->> >> and do
->> >> > + * so if that's the case.
->> >> > + * Requires the ap_list_lock to be held (but not the irq 
->> lock).
->> >> > + *
->> >> > + * Returns 1 if that IRQ has been added to the ap_list, and 0 
->> if
->> >> not.
->> >> > + */
->> >> > +static int queue_enabled_irq(struct kvm *kvm, struct kvm_vcpu
->> >> *vcpu,
->> >> > +			     int intid)
->> >>
->> >> true/false seems better than 1/0.
->> >
->> > Mmh, indeed. I think I had more in there in an earlier version.
->> >
->> >> > +{
->> >> > +	struct vgic_irq *irq = vgic_get_irq(kvm, vcpu, intid);
->> >> > +	int ret = 0;
->> >> > +
->> >> > +	raw_spin_lock(&irq->irq_lock);
->> >> > +	if (!irq->vcpu && vcpu == vgic_target_oracle(irq)) {
->> >> > +		/*
->> >> > +		 * Grab a reference to the irq to reflect the
->> >> > +		 * fact that it is now in the ap_list.
->> >> > +		 */
->> >> > +		vgic_get_irq_kref(irq);
->> >> > +		list_add_tail(&irq->ap_list,
->> >> > +			      &vcpu->arch.vgic_cpu.ap_list_head);
->> >>
->> >> Two things:
->> >> - This should be the job of vgic_queue_irq_unlock. Why are you
->> >>   open-coding it?
->> >
->> > I was *really* keen on reusing that, but couldn't  for two 
->> reasons:
->> > a) the locking code inside vgic_queue_irq_unlock spoils that: It
->> > requires the irq_lock to be held, but not the ap_list_lock. Then 
->> it
->> > takes both locks, but returns with both of them dropped. We need 
->> to
->> > hold the ap_list_lock all of the time, to prevent any VCPU 
->> returning
->> > to the HV to interfere with this routine.
->> > b) vgic_queue_irq_unlock() kicks the VCPU already, where I want to
->> > just add all of them first, then kick the VCPU at the end.
->>
->> Indeed, and that is why you need to change the way you queue these
->> pending, enabled, group-disabled interrupts (see the LPI issue 
->> below).
->>
->> >
->> > So I decided to go with the stripped-down version of it, because I
->> > didn't dare to touch the original function. I could refactor this
->> > "actually add to the list" part of vgic_queue_irq_unlock() into 
->> this
->> > new function, then call it from both vgic_queue_irq_unlock() and 
->> from
->> > the new users.
->> >
->> >> - What if the interrupt isn't pending? Non-pending, non-active
->> >>   interrupts should not be on the AP list!
->> >
->> > That should be covered by vgic_target_oracle() already, shouldn't 
->> it?
->>
->> Ah, yes, you're right.
->>
->> >
->> >> > +		irq->vcpu = vcpu;
->> >> > +
->> >> > +		ret = 1;
->> >> > +	}
->> >> > +	raw_spin_unlock(&irq->irq_lock);
->> >> > +	vgic_put_irq(kvm, irq);
->> >> > +
->> >> > +	return ret;
->> >> > +}
->> >> > +
->> >> >  /*
->> >> >   * The group enable status of at least one of the groups has
->> >> changed.
->> >> >   * If enabled is true, at least one of the groups got enabled.
->> >> > @@ -346,17 +378,57 @@ int vgic_dist_enable_group(struct kvm 
->> *kvm,
->> >> int group, bool status)
->> >> >   */
->> >> >  void vgic_rescan_pending_irqs(struct kvm *kvm, bool enabled)
->> >> >  {
->> >> > +	int cpuid;
->> >> > +	struct kvm_vcpu *vcpu;
->> >> > +
->> >> >  	/*
->> >> > -	 * TODO: actually scan *all* IRQs of the VM for pending IRQs.
->> >> > -	 * If a pending IRQ's group is now enabled, add it to its
->> >> ap_list.
->> >> > -	 * If a pending IRQ's group is now disabled, kick the VCPU to
->> >> > -	 * let it remove this IRQ from its ap_list. We have to let 
->> the
->> >> > -	 * VCPU do it itself, because we can't know the exact state 
->> of
->> >> an
->> >> > -	 * IRQ pending on a running VCPU.
->> >> > +	 * If no group got enabled, we only have to potentially 
->> remove
->> >> > +	 * interrupts from ap_lists. We can't do this here, because a
->> >> running
->> >> > +	 * VCPU might have ACKed an IRQ already, which wouldn't
->> >> immediately
->> >> > +	 * be reflected in the ap_list.
->> >> > +	 * So kick all VCPUs, which will let them re-evaluate their
->> >> ap_lists
->> >> > +	 * by running vgic_prune_ap_list(), removing no longer 
->> enabled
->> >> > +	 * IRQs.
->> >> > +	 */
->> >> > +	if (!enabled) {
->> >> > +		vgic_kick_vcpus(kvm);
->> >> > +
->> >> > +		return;
->> >> > +	}
->> >> > +
->> >> > +	/*
->> >> > +	 * At least one group went from disabled to enabled. Now we 
->> need
->> >> > +	 * to scan *all* IRQs of the VM for newly group-enabled IRQs.
->> >> > +	 * If a pending IRQ's group is now enabled, add it to the
->> >> ap_list.
->> >> > +	 *
->> >> > +	 * For each VCPU this needs to be atomic, as we need *all* 
->> newly
->> >> > +	 * enabled IRQs in be in the ap_list to determine the highest
->> >> > +	 * priority one.
->> >> > +	 * So grab the ap_list_lock, then iterate over all private 
->> IRQs
->> >> and
->> >> > +	 * all SPIs. Once the ap_list is updated, kick that VCPU to
->> >> > +	 * forward any new IRQs to the guest.
->> >> >  	 */
->> >> > +	kvm_for_each_vcpu(cpuid, vcpu, kvm) {
->> >> > +		unsigned long flags;
->> >> > +		int i;
->> >> >
->> >> > -	 /* For now just kick all VCPUs, as the old code did. */
->> >> > -	vgic_kick_vcpus(kvm);
->> >> > +		raw_spin_lock_irqsave(&vcpu->arch.vgic_cpu.ap_list_lock,
->> >> flags);
->> >> > +
->> >> > +		for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++)
->> >> > +			queue_enabled_irq(kvm, vcpu, i);
->> >> > +
->> >> > +		for (i = VGIC_NR_PRIVATE_IRQS;
->> >> > +		     i < kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS; i++)
->> >> > +			queue_enabled_irq(kvm, vcpu, i);
->> >>
->> >> On top of my questions above, what happens to LPIs?
->> >
->> > Oh dear. Looks like wishful thinking on my side ;-) Iterating over
->> > all interrupts is probably not a good idea anymore.
->> > Do you think this idea of having a list with group-disabled IRQs 
->> is a
->> > better approach: In vgic_queue_irq_unlock, if a pending IRQ's 
->> group
->> > is
->> > enabled, it goes into the ap_list, if not, it goes into another 
->> list
->> > instead. Then we would only need to consult this other list when a
->> > group gets enabled. Both lists protected by the same ap_list_lock.
->> > Does that make sense?
->>
->> I think that could work. One queue for each group, holding pending,
->> enabled, group-disabled interrupts. Pending, disabled interrupts are
->> not queued anywhere, just like today.
->>
->> The only snag is per-cpu interrupts. On which queue do they live?
->> Do you have per-CPU queues? or a global one?
->
-> Yes, the idea was to have a per-VCPU "grp_dis_list" in addition to
-> the ap_list, reusing the ap_list list_head in struct vgic_irq.
-> vgic_queue_irq_unlock() would put them into *one* of those two lists,
-> depending on their group-enabled status. When a group gets enabled, 
-> we
-> just have to transfer the IRQs from grp_dis_list to ap_list.
->
-> But fleshing this out I was wondering if it couldn't be much simpler:
-> We ignore the group-enabled status most of the time, except in
-> vgic_flush_lr_state(). So group-disabled IRQs *would go* to the
-> ap_list (when they are otherwise pending|active and enabled), but
-> would be skipped when eventually populating the LRs.
-> vgic_prune_ap_list would also not touch them, so they would stay in
-> the ap_list (unless removed for other reasons).
->
-> That might raise some eyebrows (because we keep IRQs in the ap_list
-> which are not ready), but would require only minimal changes and 
-> avoid
-> all kind of nasty/racy code to be added. The only downside I see is
-> that the ap_list could potentially be much longer, but we could 
-> change
-> the sorting algorithm if needed to keep group-disabled IRQs at the
-> end, at which point it wouldn't really matter.
->
-> Do you see any problem with that approach? Alex seemed to remember
-> that you had an objection against a very similar (if not identical)
-> idea before.
+On Tue, 19 Nov 2019 09:11:11 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-My main worry with this is that it causes overhead on the fast path.
-Disabled interrupts (for whichever reason they are disabled) shouldn't
-have to be evaluated on the fast path.
+> On 11/18/19 5:39 PM, Cornelia Huck wrote:
+> > On Thu, 24 Oct 2019 07:40:45 -0400
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >=20
+> > Add at least a short sentence here? =20
+>=20
+> For protected VMs the lowcore does not only need to be mapped, but also
+> needs to be protected memory, if not we'll get a validity interception
+> when trying to run it.
 
-Take for example kvm_vgic_vcpu_pending_irq(), which we evaluate pretty
-often (each time a vcpu wakes up). Do we want to scan a bunch of
-group-disabled interrupts there? No.
+Much better, thanks!
 
-At the end of the day, what we're looking at is a list of disabled,
-pending interrupts. They can be disabled for multiple reasons
-(group is disabled, or interrupt itself is disabled). But they should
-*not* end-up on the AP list, because that list has a precise semantic.
+>=20
+> >  =20
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >> ---
+> >>  arch/s390/kvm/kvm-s390.c | 9 +++++++++
+> >>  1 file changed, 9 insertions(+)
+> >>
+> >> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> >> index eddc9508c1b1..17a78774c617 100644
+> >> --- a/arch/s390/kvm/kvm-s390.c
+> >> +++ b/arch/s390/kvm/kvm-s390.c
+> >> @@ -3646,6 +3646,15 @@ static int kvm_s390_handle_requests(struct kvm_=
+vcpu *vcpu)
+> >>  =09=09rc =3D gmap_mprotect_notify(vcpu->arch.gmap,
+> >>  =09=09=09=09=09  kvm_s390_get_prefix(vcpu),
+> >>  =09=09=09=09=09  PAGE_SIZE * 2, PROT_WRITE);
+> >> +=09=09if (!rc && kvm_s390_pv_is_protected(vcpu->kvm)) {
+> >> +=09=09=09rc =3D uv_convert_to_secure(vcpu->arch.gmap,
+> >> +=09=09=09=09=09=09  kvm_s390_get_prefix(vcpu));
+> >> +=09=09=09WARN_ON_ONCE(rc && rc !=3D -EEXIST);
+> >> +=09=09=09rc =3D uv_convert_to_secure(vcpu->arch.gmap,
+> >> +=09=09=09=09=09=09  kvm_s390_get_prefix(vcpu) + PAGE_SIZE);
+> >> +=09=09=09WARN_ON_ONCE(rc && rc !=3D -EEXIST);
+> >> +=09=09=09rc =3D 0; =20
+> >=20
+> > So, what happens if we have an error other than -EEXIST (which
+> > presumably means that we already protected it) here? The page is not
+> > protected, and further accesses will get an error? (Another question:
+> > what can actually go wrong here?) =20
+>=20
+> If KVM or QEMU write into a lowcore, we will fail the integrity check on
+> import and this cpu will never run again.
 
-Your suggestion to add the group-disabled interrupts to the AP list
-may be a cool hack, but it is mostly a hack that opens the whole thing
-to a bunch of corner cases. Let's not do that.
+From the guest's POV, is that similar to a cpu going into xstop?
+=20
+> In retrospect a warn_on_once might be the wrong error handling here.
+>=20
+> >  =20
+> >> +=09=09}
+> >>  =09=09if (rc) {
+> >>  =09=09=09kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> >>  =09=09=09return rc; =20
+> >  =20
+>=20
+>=20
 
->> >> And if a group has
->> >> been disabled, how do you retire these interrupts from the AP 
->> list?
->> >
->> > This is done above: we kick the respective VCPU and rely on
->> > vgic_prune_ap_list() to remove them (that uses 
->> vgic_target_oracle(),
->> > which in turn checks vgic_irq_is_grp_enabled()).
->>
->> But what if the CPU isn't running? Kicking it isn't going to do 
->> much,
->> is it?
->
-> Not directly, but in either approach that would be handled similar to
-> disabled interrupts: once the VCPU runs, they would *not* end up in
-> LRs (because we check the oracle before), and would be cleaned up in
-> prune() once the guest exits (at least for the original approach).
 
-I lost track of the original approach already :-/
+--Sig_/zhv7PoOZ1lQTw1Ax=3I64YS
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Try and build the above suggestion. It should follow the same flow as
-the enabled, group-enabled interrupts, just with a different list.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3TubgACgkQ3s9rk8bw
+L68TyxAAj7WCu4pHHzMaOOfcByYdpzzcqt4Z1xEWoh20i9FK+b7uRAQRBA0WdIBA
+RcxwMzsjNwJAspxH4/g/1agXJvDb5GK5ryaqvqBvOIm8cHLUOewT/jC0L+1qIC6J
+6w9yXU4Ml813k7hEj/qLwcjRqYIwxQe5r18IHGoI6tXnfBn2WYkokBzI4TzlADLr
+tpRIc6WvSQSorTqTm0xckBPJ+X3hL2/HWfq54SWl6XFdKbvmP0kQRvvZq6+UEaPs
+bbJ4AV6qGiWPzNt/yuv/9wKlS9zVTdnip5Tv1SZ/I2r8HQCyCZcG5yNUszCjKhp7
+P6pSIIvesjVXRVdPlWILoBZKxEcHLHD8yXhpjOcv9gn5ES3BcRrnT+wIuZbfTk8b
+3s1mgjAukFFOB/dvAFt1+bx5a2J7d3i1YlXSyTVRIbvdS1UK5hpwFFRP05GpAZpv
+cRdZ392oN5siqAOOgHuvwOGMOpMQYK4Zl55X1lCuV4uqdUe7s4EOVH1/qu8M8zoU
+ifeS0LTc3RAp0rbKEbqMffWw+8MiZ42SFSo3BXeQvn97tK52budt2nphwdA8PGsE
+CsmFM0P4Rgbal5i7MAx5vHvJVFEgcsEiBdlZ1XUo2aaGyGJ2bmfvTilJW1jRbJgd
+WyTWhPnpZnN+QLuZmSM2ESZmxg64QS3hCsZwllJJ3kB8JK6fkBw=
+=vkoq
+-----END PGP SIGNATURE-----
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+--Sig_/zhv7PoOZ1lQTw1Ax=3I64YS--
+
