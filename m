@@ -2,52 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 024D0102537
-	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 14:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6124F102554
+	for <lists+kvm@lfdr.de>; Tue, 19 Nov 2019 14:25:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726555AbfKSNOd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 08:14:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26344 "EHLO
+        id S1726736AbfKSNZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 08:25:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30605 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725280AbfKSNOd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 08:14:33 -0500
+        with ESMTP id S1725280AbfKSNZq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 08:25:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574169272;
+        s=mimecast20190719; t=1574169945;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YB6gU8ikEiFDx2DKIh68eFdrenBuxJ2OWegwg4khmKQ=;
-        b=dVrIXknB3zoe5aEpm8YkSzYgsdcPvDf2NNuCWAsQN1Zm6OfxBFSXw6QL8ZFrv2vA+JtVNZ
-        J8RQ+5dG9UJhL11AtBJoAVP44DEXQdrbCpnUu0hAOJ6HmjVjaAs3yGzuYk4PcKiAAWcZhd
-        480s/fsJ2SclzAprl2yzu57R+ZTDPf4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-5k06wjbOPZi9HSHULPInFg-1; Tue, 19 Nov 2019 08:14:27 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6E20800686;
-        Tue, 19 Nov 2019 13:14:26 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-181.ams2.redhat.com [10.36.117.181])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C563E2935B;
-        Tue, 19 Nov 2019 13:14:22 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v4 1/3] s390x: export sclp_setup_int
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-References: <1574157219-22052-1-git-send-email-imbrenda@linux.ibm.com>
- <1574157219-22052-2-git-send-email-imbrenda@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <5ddea0bc-df5a-6af6-a7b4-494565ea0005@redhat.com>
-Date:   Tue, 19 Nov 2019 14:14:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        bh=zuIFrepTI5XGjnmu7SZRBXm2ypngTSYro2lLoyi+D9U=;
+        b=JLQtEiSI+NwnDBeKKHxGV7Dn6VNrdnoyJjvOcG08/jhiAad552Dw2oWGSfk9jyK1rZ09MD
+        in5WpOznWffBqUBfz+Q6RFJClDxegOI4sIIcoDZRSUh/Sf+jIFJvUleQZkMjTHTJXqnyNK
+        EL24j8nv+9mM1AY4CYwA00kiMTnj+Lg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-FzSI37vnP_6E5yp397RuFQ-1; Tue, 19 Nov 2019 08:25:43 -0500
+Received: by mail-wm1-f71.google.com with SMTP id g13so1431399wme.0
+        for <kvm@vger.kernel.org>; Tue, 19 Nov 2019 05:25:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=UWribs4bV+tz4KZQ/7HRXELXyhGEq0/rpuN5CPg+cLU=;
+        b=n293lOW01t0G3gYoB4FPsH3xGaHD7e9HyqXjosZKPA6gyJY/Gz3thEI8ArqfAV+leN
+         1wQU7ySa66S3y73yIDDR3GyM5USAj6VsG7r7PDsphK8ACLlKBFuogEDjMXFPWAN9us7F
+         ZoPESL97DWdwIfDCafOBEuD1lnqO0VHTWKRZqFZ7EFFRBInZvjz43oyVOl7SrlG89NaM
+         bNmcBg7vsHfzk8wJIzlK8GOQAcqWxHOXS7LDDWeUT5A9VtMY0uM6u2+QcbmX/3c2eZIS
+         EQjj+d/DW3smH3+W4xC8IfTdMywCDWjGx+EPSTM9Or+Ke3kGbzC1AFU6UL20kbgYx+jI
+         g1cw==
+X-Gm-Message-State: APjAAAU2T2Crb58rvsztd5XTMFe9OzxSqFJ/d7S9CLMHZRkQEO8lc271
+        /qrvGMsc3H1lKtAeLn/XiHd9YzA5OOKqGidTnm9msJA0s44NTf8nY9KiOOHQ9uQhjBQwL54mOSb
+        Ttli0fV8b40NL
+X-Received: by 2002:a05:6000:14a:: with SMTP id r10mr26061340wrx.310.1574169942737;
+        Tue, 19 Nov 2019 05:25:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyt0XLcdpHWEe/n4GPIDIIm1F1+q8ZirrEBw+e15nvX+SUzCfY2GLvuKgW2pCfMt5pAjJsTA==
+X-Received: by 2002:a05:6000:14a:: with SMTP id r10mr26061309wrx.310.1574169942433;
+        Tue, 19 Nov 2019 05:25:42 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id u13sm2968880wmm.45.2019.11.19.05.25.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Nov 2019 05:25:41 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Mao Wenan <maowenan@huawei.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, sean.j.christopherson@intel.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH -next] KVM: x86: remove set but not used variable 'called'
+In-Reply-To: <20191119123956.GC5604@kadam>
+References: <20191119030640.25097-1-maowenan@huawei.com> <87o8x8gjr5.fsf@vitty.brq.redhat.com> <20191119121423.GB5604@kadam> <87imnggidr.fsf@vitty.brq.redhat.com> <20191119123956.GC5604@kadam>
+Date:   Tue, 19 Nov 2019 14:25:40 +0100
+Message-ID: <87a78sgfqj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1574157219-22052-2-git-send-email-imbrenda@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 5k06wjbOPZi9HSHULPInFg-1
+X-MC-Unique: FzSI37vnP_6E5yp397RuFQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -56,41 +72,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/11/2019 10.53, Claudio Imbrenda wrote:
-> Export sclp_setup_int() so that it can be used from outside.
->=20
-> Needed for an upocoming unit test.
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  lib/s390x/sclp.h | 1 +
->  lib/s390x/sclp.c | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 6d40fb7..675f07e 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -265,6 +265,7 @@ typedef struct ReadEventData {
->  } __attribute__((packed)) ReadEventData;
-> =20
->  extern char _sccb[];
-> +void sclp_setup_int(void);
->  void sclp_handle_ext(void);
->  void sclp_wait_busy(void);
->  void sclp_mark_busy(void);
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 7798f04..123b639 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -45,7 +45,7 @@ static void mem_init(phys_addr_t mem_end)
->  =09page_alloc_ops_enable();
->  }
-> =20
-> -static void sclp_setup_int(void)
-> +void sclp_setup_int(void)
->  {
->  =09uint64_t mask;
+Dan Carpenter <dan.carpenter@oracle.com> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Tue, Nov 19, 2019 at 01:28:32PM +0100, Vitaly Kuznetsov wrote:
+>> Dan Carpenter <dan.carpenter@oracle.com> writes:
+>>=20
+>> > On Tue, Nov 19, 2019 at 12:58:54PM +0100, Vitaly Kuznetsov wrote:
+>> >> Mao Wenan <maowenan@huawei.com> writes:
+>> >>=20
+>> >> > Fixes gcc '-Wunused-but-set-variable' warning:
+>> >> >
+>> >> > arch/x86/kvm/x86.c: In function kvm_make_scan_ioapic_request_mask:
+>> >> > arch/x86/kvm/x86.c:7911:7: warning: variable called set but not
+>> >> > used [-Wunused-but-set-variable]
+>> >> >
+>> >> > It is not used since commit 7ee30bc132c6 ("KVM: x86: deliver KVM
+>> >> > IOAPIC scan request to target vCPUs")
+>> >>=20
+>> >> Better expressed as=20
+>> >>=20
+>> >> Fixes: 7ee30bc132c6 ("KVM: x86: deliver KVM IOAPIC scan request to ta=
+rget vCPUs")
+>> >>=20
+>> >
+>> > There is sort of a debate about this whether the Fixes tag should be
+>> > used if it's only a cleanup.
+>> >
+>>=20
+>> I have to admit I'm involved in doing backporting sometimes and I really
+>> appreciate Fixes: tags. Just so you know on which side of the debate I
+>> am :-)
+>
+> But we're not going to backport this hopefully?
+>
+
+In case we're speaking about stable@ kernels, 7ee30bc132c6 doesn't look
+like a good candidate (to me) but who knows, it may get pulled in
+because of some code dependency or some other 'autosel magic'. And
+that's when 'Fixes:' tags become handy.
+
+--=20
+Vitaly
 
