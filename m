@@ -2,87 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1943210426B
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 18:48:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A69A510427C
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 18:49:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727826AbfKTRsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 12:48:20 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:35402 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727671AbfKTRsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 12:48:19 -0500
-Received: from zn.tnic (p200300EC2F0D8C00F553B94F3FB99B80.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:8c00:f553:b94f:3fb9:9b80])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4B7D41EC0C0A;
-        Wed, 20 Nov 2019 18:48:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1574272097;
+        id S1728362AbfKTRtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 12:49:40 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52132 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728342AbfKTRtk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 12:49:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574272178;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=sRGk1TFOicxI4LhR8Ex8diUi+6oCm1GfPkLIX+2fv3k=;
-        b=ddWR/VPtrKLvTOJFzaHVDWgpMgbnK9t9PGNQfhYFWQXJDrF/b/wgn4TGqzrtqDphOUfvY9
-        S9/TKirB/KIQWRegfs5f8xqqEspKeinJ7gj3veo+LbHfNO/22QCW/xAe4av/1pQJKREgFD
-        tSdQHBcSqiKfr3ZQdsucmfmj3+xUGag=
-Date:   Wed, 20 Nov 2019 18:48:10 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v3 01/19] x86/msr-index: Clean up bit defines for
- IA32_FEATURE_CONTROL MSR
-Message-ID: <20191120174810.GI2634@zn.tnic>
-References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
- <20191119031240.7779-2-sean.j.christopherson@intel.com>
- <20191119111445.GB27787@zn.tnic>
- <20191119231822.GA6855@linux.intel.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=AwplhFvZn7ue8kuvSWisJ2pQUAairzqRsfTIC3ok1HE=;
+        b=ILCfn4A56pe5FlIqDpivqqaGlxbZAox/2UZpc+UiH+XNC0hw2RRlvIf+Jx5GllwkRyKDiR
+        8VZyq7e2GFs2omKeKeM/JA+B+mvcgjcf0LkegRfPEWzm5zRAoeNZ1ILuBrfbEMey3f5QMS
+        eYeTGHt3xo27D/SQIaDs8HQqkahGubM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-DmtL5hSsPtm1c_0e4SdTBQ-1; Wed, 20 Nov 2019 12:49:34 -0500
+Received: by mail-wm1-f69.google.com with SMTP id q186so85696wma.0
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 09:49:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=akAVd8K6cQxkBf+QkTljJ+ZWGqQSUCB1thlOsQO/Xic=;
+        b=QKj9CrJdNxSTagZzUVWX9ZMY9AvBuSvc01H/IFYsn4If2OZmHmcE5SHl5OfYWFoFM1
+         i8RkFuiw5zSTGgs5XoEJqO/4QZpJPt1ZaWeMZUDDTnr9agZySaYXFdWTGvzCaWlQIk/k
+         psGku6jZivR6aygGL/X2Mmu1LuW0KQRwVG+TLSlL5IsWAk2ip8/N/ySPf3NL0PalgbAi
+         h0fClt2iTP8x/30Qczj0KiaLc4fBnbVsWGTX+CU9TGU9ZVETD/Z0vQDD9bt0XJKX67U2
+         cQSEZFzGcYhcAl6+QWYnY0vBw+kNMR+uvZXnDZO73zcSiEXaOEQafIkO28NHKlpU1wkh
+         6jlQ==
+X-Gm-Message-State: APjAAAVwz5AZAY6gx0qUOmqWBDzfTwUl3INN1MW1YH3ZUygPUAeh/J+L
+        lla1Tm1kaJ5LyY5I8wLFXn2DeJS78UERNBJI9e0szyc8+JxAPirKP1vXg4T5duSa+c7I8BCjDNM
+        POcaBlHM3J0cw
+X-Received: by 2002:adf:dd10:: with SMTP id a16mr5201010wrm.213.1574272172835;
+        Wed, 20 Nov 2019 09:49:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzQiaNhRCqA3U7hrirHolgRGh8UguIsTmZtRpD8Pnntcu9SeilEx815TpiMjKR5npbWyAaaMQ==
+X-Received: by 2002:adf:dd10:: with SMTP id a16mr5200964wrm.213.1574272172477;
+        Wed, 20 Nov 2019 09:49:32 -0800 (PST)
+Received: from [192.168.178.40] ([151.48.115.61])
+        by smtp.gmail.com with ESMTPSA id z6sm30941wro.18.2019.11.20.09.49.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Nov 2019 09:49:32 -0800 (PST)
+Subject: Re: [PATCH] KVM: nVMX: Remove unnecessary TLB flushes on L1<->L2
+ switches when L1 use apic-access-page
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
+References: <20191120143307.59906-1-liran.alon@oracle.com>
+ <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
+ <4D796E12-758F-44D6-93B9-0BEFE0E7F712@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <92baadfa-b458-7a12-25c4-da198b64e8c7@redhat.com>
+Date:   Wed, 20 Nov 2019 18:49:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191119231822.GA6855@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <4D796E12-758F-44D6-93B9-0BEFE0E7F712@oracle.com>
+Content-Language: en-US
+X-MC-Unique: DmtL5hSsPtm1c_0e4SdTBQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 03:18:22PM -0800, Sean Christopherson wrote:
-> Ugh.  Match the SDM unless it's obviously "wrong"?  :-)  It might literally
-> be the only instance of the SDM using "on" instead of "enable(d)" for an
-> MSR or CR bit.  The SDM even refers to it as an enable bit, e.g. "platform
-> software has not enabled LMCE by setting IA32_FEATURE_CONTROL.LMCE_ON (bit 20)".
-> 
-> Whining aside, I'm ok going with LMCE_ON, I have a feeling "on" was
-> deliberately chosen differentiate it from IA32_MCG_EXT_CTL.LMCE_EN.
+On 20/11/19 16:25, Liran Alon wrote:
+>>> If L0 use EPT, L0 use different EPTP when running L2 than L1
+>>> (Because guest_mode is part of mmu-role) and therefore SDM section
+>>> 28.3.3.4 doesn't apply. Otherwise, L0 use different VPID when
+>>> running L2 than L1 and therefore SDM section 28.3.3.3 doesn't
+>>> apply.
+>> I don't understand this.  You could still have a stale EPTP entry from a
+>> previous L2 vmenter.   If L1 uses neither EPT nor VPID, it expects a TLB
+>> flush to occur on every vmentry, but this won't happen if L0 uses EPT.
+> I don=E2=80=99t seem to get your concern.
+> In case L1 don=E2=80=99t use VPID, prepare_vmcs02() will request KVM_REQ_=
+TLB_FLUSH.
+> (As it needs to emulate to L1 that on every L1<->L2 switch, the entire ph=
+ysical TLB is flushed)
+> As explained in commit message.
+>=20
 
-Nah, ok, let's leave this as a one-off case where the SDM is simply
-wrong but otherwise the bit names are correct and we keep them the same
-as in the SDM to avoid obvious confusion.
+You're right.  I'll rewrite some parts of the commit message, but the
+patch is correct.
 
-Thx.
+Paolo
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
