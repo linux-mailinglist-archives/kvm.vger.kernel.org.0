@@ -2,640 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B7F103682
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 10:19:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB005103683
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 10:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728190AbfKTJTi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 04:19:38 -0500
-Received: from mga06.intel.com ([134.134.136.31]:61597 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728176AbfKTJTf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 04:19:35 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Nov 2019 01:19:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,221,1571727600"; 
-   d="scan'208";a="237660962"
-Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.79])
-  by fmsmga002.fm.intel.com with ESMTP; 20 Nov 2019 01:19:32 -0800
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com
-Cc:     linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, tiwei.bie@intel.com, jason.zeng@intel.com,
-        zhiyuan.lv@intel.com, Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: [RFC V4 2/2] This commit introduced IFC operations for vdpa
-Date:   Wed, 20 Nov 2019 17:17:11 +0800
-Message-Id: <1574241431-24792-3-git-send-email-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574241431-24792-1-git-send-email-lingshan.zhu@intel.com>
-References: <1574241431-24792-1-git-send-email-lingshan.zhu@intel.com>
+        id S1728209AbfKTJTy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 04:19:54 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:44386 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728204AbfKTJTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 04:19:53 -0500
+Received: by mail-oi1-f194.google.com with SMTP id s71so21844212oih.11
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 01:19:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/s9d0eBsNWs0S7Z9/kGU3/sKlBy60Nmwo0VOQi3Qb+Q=;
+        b=fwFJNysxLxM2AKjob5AiJs/ELSpJ11PRSrh51RQPPhmCCuK3A4na/FO7Njmao1p7wQ
+         tTv8qEj9qMeLRIFiE5eT1zrGAnHkGqSgQPJIWGvZOI+po9xrDrl21wjPigjyzMepqYuG
+         nz9iThvffKTtjsMLk3OeXawHQa3oV+5st/L5K9y82DpJq/D2ZmrRJOFHScKHXWv1pQWA
+         qvDFO0AVF5ED62wvuPTo+C9LPejE1Y5NFIyJR2vaGejXq5JsZyJe7ZDwNsbaZjnpYMH+
+         MOR5GmVZH9aJ4kWCuK2QfJ1kP3i4shpadIkNVJoiwKqwFeyYv+/48T/jahCqquAKgOGE
+         xaPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/s9d0eBsNWs0S7Z9/kGU3/sKlBy60Nmwo0VOQi3Qb+Q=;
+        b=ZiPuDhH36+5+AWuc/2eX0vnSU2Uc1uF9wWffZ6h/5SXSVTG/dWhGLxC7vv0JyXqAUr
+         dVHuddtfCLh56esNg8dqLtLalRvFd5Kn+q2pz0jsYfbgDxsFdKHdH+WzQVbotZXHxEHy
+         r6msucugBypy0rBhOfsc5Xom7msrZkPtfqix4tis+XmGassMkJNF/+3L1zisUcvYOQxA
+         nPJ4i8sJa+ZCBWUsYWxYxYffgEVMvrarp0wWd9wW9Da15ONMwtxPPa2mYBrn5nm4wAia
+         DoatCkw/lGqAA/K857Yja5tBIscagZSIp4oIch+gkXpm4A0b8it5UsKMbEUzcbNPnQoh
+         bboQ==
+X-Gm-Message-State: APjAAAWzk/uQbRLamyeoyMdhO1afJCTFFRBRMrXIAq8Mcpf4kpi3p9nE
+        8sBgd7PsPRSqY2JQN5t6j6LjJddx6aoT8SSDghk=
+X-Google-Smtp-Source: APXvYqzQdC4lHcM7mhXa2zkZqPmHjIOt/84guLgyrBZu9PczPhhMRqkd+jQeue2BhZrSPGkum5P4ca+yKtveBJVRdZg=
+X-Received: by 2002:a54:4783:: with SMTP id o3mr1848694oic.33.1574241592857;
+ Wed, 20 Nov 2019 01:19:52 -0800 (PST)
+MIME-Version: 1.0
+References: <1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc> <20191016112857.293a197d@x1.home>
+ <20191016174943.GG5866@linux.intel.com> <53f506b3-e864-b3ca-f18f-f8e9a1612072@djy.llc>
+ <20191022202847.GO2343@linux.intel.com> <4af8cbac-39b1-1a20-8e26-54a37189fe32@djy.llc>
+ <20191024173212.GC20633@linux.intel.com> <36be1503-f6f1-0ed0-b1fe-9c05d827f624@djy.llc>
+ <20191119200133.GD25672@linux.intel.com>
+In-Reply-To: <20191119200133.GD25672@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 20 Nov 2019 17:19:45 +0800
+Message-ID: <CANRm+CzuYvZ-97EtYaCTT2GgCACKMvGGHbY_bWMZ90Z3-4TVrg@mail.gmail.com>
+Subject: Re: PROBLEM: Regression of MMU causing guest VM application errors
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Derek Yerger <derek@djy.llc>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm <kvm@vger.kernel.org>, "Bonzini, Paolo" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit intends to implement ops which complying to
-virtio_mdev and vhost_mdev interfaces, handles IFC VF initialization,
-configuration and removal.
+On Wed, 20 Nov 2019 at 04:03, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Wed, Oct 30, 2019 at 11:44:09PM -0400, Derek Yerger wrote:
+> >
+> > On 10/24/19 1:32 PM, Sean Christopherson wrote:
+> > >On Thu, Oct 24, 2019 at 11:18:59AM -0400, Derek Yerger wrote:
+> > >>On 10/22/19 4:28 PM, Sean Christopherson wrote:
+> > >>>On Thu, Oct 17, 2019 at 07:57:35PM -0400, Derek Yerger wrote:
+> > >>>Heh, should've checked from the get go...  It's definitely not the memslot
+> > >>>issue, because the memslot bug is in 5.1.16 as well.  :-)
+> > >>I didn't pick up on that, nice catch. The memslot thread was the closest
+> > >>thing I could find to an educated guess.
+> > >>>>I'm stuck on 5.1.x for now, maybe I'll give up and get a dedicated windows
+> > >>>>machine /s
+> > >>>What hardware are you running on?  I was thinking this was AMD specific,
+> > >>>but then realized you said "AMD Radeon 540 GPU" and not "AMD CPU".
+> > >>Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
+> > >>
+> > >>07:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI]
+> > >>Lexa PRO [Radeon 540/540X/550/550X / RX 540X/550/550X] (rev c7)
+> > >>         Subsystem: Gigabyte Technology Co., Ltd Device 22fe
+> > >>         Kernel driver in use: vfio-pci
+> > >>         Kernel modules: amdgpu
+> > >>(plus related audio device)
+> > >>
+> > >>I can't think of any other data points that would be helpful to solving
+> > >>system instability in a guest OS.
+> > >Can you bisect starting from v5.2?  Identifying which commit in the kernel
+> > >introduced the regression would help immensely.
+> > On the host, I have to install NVIDIA GPU drivers with each new kernel
+> > build. During the process I discovered that I can't reproduce the issue on
+> > any kernel if I skip the *host* GPU drivers and start libvirtd in single
+> > mode.
+> >
+> > I noticed the following in the host kernel log around the time the guest
+> > encountered BSOD on 5.2.7:
+> >
+> > [  337.841491] WARNING: CPU: 6 PID: 7548 at arch/x86/kvm/x86.c:7963
+> > kvm_arch_vcpu_ioctl_run+0x19b1/0x1b00 [kvm]
+>
+> Rats, I overlooked this first time round.  In the future, if you get a
+> WARN splat, try to make it very obvious in the bug report, they're almost
+> always a smoking gun.
+>
+> That WARN that fired is:
+>
+>         /* The preempt notifier should have taken care of the FPU already.  */
+>         WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD));
+>
+> which was added part of a bug fix by commit:
+>
+>         240c35a3783a ("kvm: x86: Use task structs fpu field for user")
+>
+> the buggy commit that was fixed is
+>
+>         5f409e20b794 ("x86/fpu: Defer FPU state load until return to userspace")
+>
+> which was part of a FPU rewrite that went into 5.2[*].  So yep, big
+> smoking gun :-)
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
----
- drivers/vhost/ifcvf/ifcvf_main.c | 582 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 582 insertions(+)
- create mode 100644 drivers/vhost/ifcvf/ifcvf_main.c
+Since 5.3-rc2, we have three commits fix it.
 
-diff --git a/drivers/vhost/ifcvf/ifcvf_main.c b/drivers/vhost/ifcvf/ifcvf_main.c
-new file mode 100644
-index 0000000..cdc804f
---- /dev/null
-+++ b/drivers/vhost/ifcvf/ifcvf_main.c
-@@ -0,0 +1,582 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2019 Intel Corporation.
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/module.h>
-+#include <linux/mdev.h>
-+#include <linux/pci.h>
-+#include <linux/sysfs.h>
-+#include "ifcvf_base.h"
-+
-+#define VERSION_STRING	"0.1"
-+#define DRIVER_AUTHOR	"Intel Corporation"
-+#define IFCVF_DRIVER_NAME	"ifcvf"
-+
-+static struct ifcvf_hw *mdev_to_vf(struct mdev_device *mdev)
-+{
-+	struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
-+
-+	return vf;
-+}
-+
-+static irqreturn_t ifcvf_intr_handler(int irq, void *arg)
-+{
-+	struct vring_info *vring = arg;
-+
-+	if (vring->cb.callback)
-+		return vring->cb.callback(vring->cb.private);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static u64 ifcvf_mdev_get_features(struct mdev_device *mdev)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	return ifcvf_get_features(vf);
-+}
-+
-+static int ifcvf_mdev_set_features(struct mdev_device *mdev, u64 features)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->req_features = features;
-+
-+	return 0;
-+}
-+
-+static u64 ifcvf_mdev_get_vq_state(struct mdev_device *mdev, u16 qid)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+	u16 last_avail_idx;
-+	u16 __iomem *idx_addr;
-+
-+	idx_addr = (u16 __iomem*)(vf->lm_cfg + IFCVF_LM_RING_STATE_OFFSET +
-+			(qid / 2) * IFCVF_LM_CFG_SIZE + (qid % 2) * 4);
-+
-+	last_avail_idx = ioread16(idx_addr);
-+
-+	return last_avail_idx;
-+}
-+
-+static int ifcvf_mdev_set_vq_state(struct mdev_device *mdev, u16 qid, u64 num)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->vring[qid].last_avail_idx = num;
-+
-+	return 0;
-+}
-+
-+static int ifcvf_mdev_set_vq_address(struct mdev_device *mdev, u16 idx,
-+				     u64 desc_area, u64 driver_area,
-+				     u64 device_area)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->vring[idx].desc = desc_area;
-+	vf->vring[idx].avail = driver_area;
-+	vf->vring[idx].used = device_area;
-+
-+	return 0;
-+}
-+
-+static void ifcvf_mdev_set_vq_num(struct mdev_device *mdev, u16 qid, u32 num)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->vring[qid].size = num;
-+}
-+
-+static void ifcvf_mdev_set_vq_ready(struct mdev_device *mdev,
-+				    u16 qid, bool ready)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->vring[qid].ready = ready;
-+}
-+
-+static bool ifcvf_mdev_get_vq_ready(struct mdev_device *mdev, u16 qid)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	return vf->vring[qid].ready;
-+}
-+
-+static void ifcvf_mdev_set_vq_cb(struct mdev_device *mdev, u16 idx,
-+				 struct virtio_mdev_callback *cb)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	vf->vring[idx].cb = *cb;
-+}
-+
-+static void ifcvf_mdev_kick_vq(struct mdev_device *mdev, u16 idx)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	ifcvf_notify_queue(vf, idx);
-+}
-+
-+static u8 ifcvf_mdev_get_status(struct mdev_device *mdev)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	return ifcvf_get_status(vf);
-+}
-+
-+static u32 ifcvf_mdev_get_generation(struct mdev_device *mdev)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	return ioread8(&vf->common_cfg->config_generation);
-+}
-+
-+static u32 ifcvf_mdev_get_device_id(struct mdev_device *mdev)
-+{
-+	return VIRTIO_ID_NET;
-+}
-+
-+static u32 ifcvf_mdev_get_vendor_id(struct mdev_device *mdev)
-+{
-+	return IFCVF_VENDOR_ID;
-+}
-+
-+static u16 ifcvf_mdev_get_vq_align(struct mdev_device *mdev)
-+{
-+	return IFCVF_QUEUE_ALIGNMENT;
-+}
-+
-+static int ifcvf_start_datapath(void *private)
-+{
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(private);
-+	struct ifcvf_adapter *ifcvf;
-+	int ret = 0;
-+	u8 status;
-+
-+	ifcvf = container_of(vf, struct ifcvf_adapter, vf);
-+	vf->nr_vring = IFCVF_MAX_QUEUE_PAIRS * 2;
-+	ret = ifcvf_start_hw(vf);
-+
-+	if (ret) {
-+		status = ifcvf_get_status(vf);
-+		status |= VIRTIO_CONFIG_S_FAILED;
-+		ifcvf_set_status(vf, status);
-+	}
-+
-+	return ret;
-+}
-+
-+static int ifcvf_stop_datapath(void *private)
-+{
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(private);
-+	int i;
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUES; i++)
-+		vf->vring[i].cb.callback = NULL;
-+
-+	ifcvf_stop_hw(vf);
-+
-+	return 0;
-+}
-+
-+static void ifcvf_reset_vring(struct ifcvf_adapter *adapter)
-+{
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
-+	int i;
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		vf->vring[i].last_used_idx = 0;
-+		vf->vring[i].last_avail_idx = 0;
-+		vf->vring[i].desc = 0;
-+		vf->vring[i].avail = 0;
-+		vf->vring[i].used = 0;
-+		vf->vring[i].ready = 0;
-+		vf->vring->cb.callback = NULL;
-+		vf->vring->cb.private = NULL;
-+
-+	}
-+
-+	ifcvf_reset(vf);
-+}
-+
-+static void ifcvf_mdev_set_status(struct mdev_device *mdev, u8 status)
-+{
-+	struct ifcvf_adapter *adapter = mdev_get_drvdata(mdev);
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
-+	int ret = 0;
-+
-+	if (status == 0) {
-+		ifcvf_stop_datapath(adapter);
-+		ifcvf_reset_vring(adapter);
-+		return;
-+	}
-+
-+	if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-+		ret = ifcvf_start_datapath(adapter);
-+
-+		if (ret)
-+			IFC_ERR(adapter->dev, "Failed to set mdev status %u\n",
-+				status);
-+	}
-+
-+	ifcvf_set_status(vf, status);
-+}
-+
-+static u16 ifcvf_mdev_get_vq_num_max(struct mdev_device *mdev)
-+{
-+
-+	return (u16)IFCVF_QUEUE_MAX;
-+}
-+static void ifcvf_mdev_get_config(struct mdev_device *mdev, unsigned int offset,
-+			     void *buf, unsigned int len)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	WARN_ON(offset + len > sizeof(struct virtio_net_config));
-+	ifcvf_read_net_config(vf, offset, buf, len);
-+}
-+
-+static void ifcvf_mdev_set_config(struct mdev_device *mdev, unsigned int offset,
-+			     const void *buf, unsigned int len)
-+{
-+	struct ifcvf_hw *vf = mdev_to_vf(mdev);
-+
-+	WARN_ON(offset + len > sizeof(struct virtio_net_config));
-+	ifcvf_write_net_config(vf, offset, buf, len);
-+}
-+
-+static struct mdev_virtio_ops ifc_mdev_ops = {
-+	.get_features  = ifcvf_mdev_get_features,
-+	.set_features  = ifcvf_mdev_set_features,
-+	.get_status    = ifcvf_mdev_get_status,
-+	.set_status    = ifcvf_mdev_set_status,
-+	.get_vq_num_max = ifcvf_mdev_get_vq_num_max,
-+	.get_vq_state   = ifcvf_mdev_get_vq_state,
-+	.set_vq_state   = ifcvf_mdev_set_vq_state,
-+	.set_vq_cb      = ifcvf_mdev_set_vq_cb,
-+	.set_vq_ready   = ifcvf_mdev_set_vq_ready,
-+	.get_vq_ready	= ifcvf_mdev_get_vq_ready,
-+	.set_vq_num     = ifcvf_mdev_set_vq_num,
-+	.set_vq_address = ifcvf_mdev_set_vq_address,
-+	.kick_vq        = ifcvf_mdev_kick_vq,
-+	.get_generation	= ifcvf_mdev_get_generation,
-+	.get_device_id	= ifcvf_mdev_get_device_id,
-+	.get_vendor_id	= ifcvf_mdev_get_vendor_id,
-+	.get_vq_align	= ifcvf_mdev_get_vq_align,
-+	.get_config	= ifcvf_mdev_get_config,
-+	.set_config	= ifcvf_mdev_set_config,
-+};
-+
-+static int ifcvf_init_msix(struct ifcvf_adapter *adapter)
-+{
-+	struct pci_dev *pdev = to_pci_dev(adapter->dev);
-+	struct ifcvf_hw *vf = &adapter->vf;
-+	int vector, i, ret, irq;
-+
-+	ret = pci_alloc_irq_vectors(pdev, IFCVF_MAX_INTR,
-+				    IFCVF_MAX_INTR, PCI_IRQ_MSIX);
-+	if (ret < 0) {
-+		IFC_ERR(adapter->dev, "Failed to alloc irq vectors\n");
-+		return ret;
-+	}
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		vector = i + IFCVF_MSI_QUEUE_OFF;
-+		irq = pci_irq_vector(pdev, vector);
-+		ret = request_irq(irq, ifcvf_intr_handler, 0,
-+				pci_name(pdev), &vf->vring[i]);
-+		if (ret) {
-+			IFC_ERR(adapter->dev,
-+				"Failed to request irq for vq %d\n", i);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void ifcvf_destroy_adapter(struct ifcvf_adapter *adapter)
-+{
-+	struct ifcvf_hw *vf = IFC_PRIVATE_TO_VF(adapter);
-+	struct pci_dev *pdev = to_pci_dev(adapter->dev);
-+	int i, vector, irq;
-+
-+	for (i = 0; i < IFCVF_MAX_QUEUE_PAIRS * 2; i++) {
-+		vector = i + IFCVF_MSI_QUEUE_OFF;
-+		irq = pci_irq_vector(pdev, vector);
-+		free_irq(irq, &vf->vring[i]);
-+	}
-+}
-+
-+static ssize_t name_show(struct kobject *kobj, struct device *dev, char *buf)
-+{
-+	const char *name = "IFC VF virtio/vhost accelerator (virtio ring compatible)";
-+
-+	return sprintf(buf, "%s\n", name);
-+}
-+MDEV_TYPE_ATTR_RO(name);
-+
-+static ssize_t device_api_show(struct kobject *kobj, struct device *dev,
-+			       char *buf)
-+{
-+	//return sprintf(buf, "%s\n", VIRTIO_MDEV_DEVICE_API_STRING);
-+	return sprintf(buf, "%s\n", "virtio_mdev");
-+}
-+MDEV_TYPE_ATTR_RO(device_api);
-+
-+static ssize_t available_instances_show(struct kobject *kobj,
-+					struct device *dev, char *buf)
-+{
-+	struct pci_dev *pdev;
-+	struct ifcvf_adapter *adapter;
-+
-+	pdev = to_pci_dev(dev);
-+	adapter = pci_get_drvdata(pdev);
-+
-+	return sprintf(buf, "%d\n", adapter->mdev_count);
-+}
-+
-+MDEV_TYPE_ATTR_RO(available_instances);
-+
-+static ssize_t type_show(struct kobject *kobj,
-+			struct device *dev, char *buf)
-+{
-+	return sprintf(buf, "%s\n", "net");
-+}
-+
-+MDEV_TYPE_ATTR_RO(type);
-+
-+
-+static struct attribute *mdev_types_attrs[] = {
-+	&mdev_type_attr_name.attr,
-+	&mdev_type_attr_device_api.attr,
-+	&mdev_type_attr_available_instances.attr,
-+	&mdev_type_attr_type.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group mdev_type_group_virtio = {
-+	.name  = "virtio_mdev",
-+	.attrs = mdev_types_attrs,
-+};
-+
-+static struct attribute_group mdev_type_group_vhost = {
-+	.name  = "vhost_mdev",
-+	.attrs = mdev_types_attrs,
-+};
-+
-+static struct attribute_group *mdev_type_groups[] = {
-+	&mdev_type_group_virtio,
-+	&mdev_type_group_vhost,
-+	NULL,
-+};
-+
-+const struct attribute_group *mdev_dev_groups[] = {
-+	NULL,
-+};
-+
-+static int ifcvf_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
-+{
-+	struct device *dev = mdev_parent_dev(mdev);
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-+	int ret = 0;
-+
-+	mutex_lock(&adapter->mdev_lock);
-+
-+	if (adapter->mdev_count < IFCVF_MDEV_LIMIT) {
-+		IFC_ERR(&pdev->dev,
-+			"Can not create mdev, reached limitation %d\n",
-+			IFCVF_MDEV_LIMIT);
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	mdev_virtio_set_ops(mdev, &ifc_mdev_ops);
-+
-+	if (!strcmp(kobj->name, "ifcvf-virtio_mdev"))
-+		mdev_virtio_set_class_id(mdev,MDEV_VIRTIO_CLASS_ID_VIRTIO);
-+
-+	if (!strcmp(kobj->name, "ifcvf-vhost_mdev"))
-+		mdev_virtio_set_class_id(mdev,MDEV_VIRTIO_CLASS_ID_VHOST);
-+
-+	mdev_set_drvdata(mdev, adapter);
-+	mdev_set_iommu_device(mdev_dev(mdev), dev);
-+	adapter->mdev_count--;
-+
-+out:
-+	mutex_unlock(&adapter->mdev_lock);
-+	return ret;
-+}
-+
-+static int ifcvf_mdev_remove(struct mdev_device *mdev)
-+{
-+	struct device *dev = mdev_parent_dev(mdev);
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	mutex_lock(&adapter->mdev_lock);
-+	adapter->mdev_count++;
-+	mutex_unlock(&adapter->mdev_lock);
-+
-+	return 0;
-+}
-+
-+static struct mdev_parent_ops ifcvf_mdev_fops = {
-+	.owner			= THIS_MODULE,
-+	.supported_type_groups	= mdev_type_groups,
-+	.mdev_attr_groups	= mdev_dev_groups,
-+	.create			= ifcvf_mdev_create,
-+	.remove			= ifcvf_mdev_remove,
-+};
-+
-+static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct ifcvf_adapter *adapter;
-+	struct ifcvf_hw *vf;
-+	int ret, i;
-+
-+	adapter = kzalloc(sizeof(struct ifcvf_adapter), GFP_KERNEL);
-+
-+	if (adapter == NULL) {
-+		ret = -ENOMEM;
-+		goto fail;
-+	}
-+
-+	mutex_init(&adapter->mdev_lock);
-+	adapter->mdev_count = IFCVF_MDEV_LIMIT;
-+	adapter->dev = dev;
-+	pci_set_drvdata(pdev, adapter);
-+	ret = pci_enable_device(pdev);
-+
-+	if (ret) {
-+		IFC_ERR(adapter->dev, "Failed to enable device\n");
-+		goto free_adapter;
-+	}
-+
-+	ret = pci_request_regions(pdev, IFCVF_DRIVER_NAME);
-+
-+	if (ret) {
-+		IFC_ERR(adapter->dev, "Failed to request MMIO region\n");
-+		goto disable_device;
-+	}
-+
-+	pci_set_master(pdev);
-+	ret = ifcvf_init_msix(adapter);
-+
-+	if (ret) {
-+		IFC_ERR(adapter->dev, "Failed to initialize MSI-X\n");
-+		goto free_msix;
-+	}
-+
-+	vf = &adapter->vf;
-+	
-+	for (i = 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
-+		vf->mem_resource[i].phys_addr = pci_resource_start(pdev, i);
-+		vf->mem_resource[i].len = pci_resource_len(pdev, i);
-+		if (!vf->mem_resource[i].len) {
-+			vf->mem_resource[i].addr = NULL;
-+			continue;
-+		}
-+
-+		vf->mem_resource[i].addr = pci_iomap_range(pdev, i, 0,
-+				vf->mem_resource[i].len);
-+		if (!vf->mem_resource[i].addr) {
-+			IFC_ERR(adapter->dev, "Failed to map IO resource %d\n",
-+				i);
-+			ret = -1;
-+			goto free_msix;
-+		}
-+	}
-+
-+	if (ifcvf_init_hw(vf, pdev) < 0) {
-+		ret = -1;
-+		goto destroy_adapter;
-+	}
-+
-+	ret = mdev_virtio_register_device(dev, &ifcvf_mdev_fops);
-+
-+	if (ret) {
-+		IFC_ERR(adapter->dev,  "Failed to register mdev device\n");
-+		goto destroy_adapter;
-+	}
-+
-+	return 0;
-+
-+destroy_adapter:
-+	ifcvf_destroy_adapter(adapter);
-+free_msix:
-+	pci_free_irq_vectors(pdev);
-+	pci_release_regions(pdev);
-+disable_device:
-+	pci_disable_device(pdev);
-+free_adapter:
-+	kfree(adapter);
-+fail:
-+	return ret;
-+}
-+
-+static void ifcvf_remove(struct pci_dev *pdev)
-+{
-+	struct ifcvf_adapter *adapter = pci_get_drvdata(pdev);
-+	struct device *dev = &pdev->dev;
-+	struct ifcvf_hw *vf;
-+	int i;
-+
-+	mdev_virtio_unregister_device(dev);
-+
-+	vf = &adapter->vf;
-+	for (i = 0; i < IFCVF_PCI_MAX_RESOURCE; i++) {
-+		if (vf->mem_resource[i].addr) {
-+			pci_iounmap(pdev, vf->mem_resource[i].addr);
-+			vf->mem_resource[i].addr = NULL;
-+		}
-+	}
-+
-+	ifcvf_destroy_adapter(adapter);
-+	pci_free_irq_vectors(pdev);
-+	pci_release_regions(pdev);
-+	pci_disable_device(pdev);
-+	kfree(adapter);
-+}
-+
-+static struct pci_device_id ifcvf_pci_ids[] = {
-+	{ PCI_DEVICE_SUB(IFCVF_VENDOR_ID,
-+			IFCVF_DEVICE_ID,
-+			IFCVF_SUBSYS_VENDOR_ID,
-+			IFCVF_SUBSYS_DEVICE_ID) },
-+	{ 0 },
-+};
-+MODULE_DEVICE_TABLE(pci, ifcvf_pci_ids);
-+
-+static struct pci_driver ifcvf_driver = {
-+	.name     = IFCVF_DRIVER_NAME,
-+	.id_table = ifcvf_pci_ids,
-+	.probe    = ifcvf_probe,
-+	.remove   = ifcvf_remove,
-+};
-+
-+static int __init ifcvf_init_module(void)
-+{
-+	int ret;
-+
-+	ret = pci_register_driver(&ifcvf_driver);
-+	return ret;
-+}
-+
-+static void __exit ifcvf_exit_module(void)
-+{
-+	pci_unregister_driver(&ifcvf_driver);
-+}
-+
-+module_init(ifcvf_init_module);
-+module_exit(ifcvf_exit_module);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_VERSION(VERSION_STRING);
-+MODULE_AUTHOR(DRIVER_AUTHOR);
--- 
-1.8.3.1
+commitec269475cba7bc (Revert "kvm: x86: Use task structs fpu field for user")
+commite751732486eb3 (KVM: X86: Fix fpu state crash in kvm guest)
+commitd9a710e5fc4941 (KVM: X86: Dynamically allocate user_fpu)
 
+    Wanpeng
