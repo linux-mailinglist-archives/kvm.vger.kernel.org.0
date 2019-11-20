@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 79D3E10416F
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 17:51:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F3C9104156
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 17:50:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729751AbfKTQv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 11:51:58 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:56821 "EHLO
+        id S1729622AbfKTQuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 11:50:10 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:41629 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728314AbfKTQv6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 11:51:58 -0500
+        by vger.kernel.org with ESMTP id S1729526AbfKTQuK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 11:50:10 -0500
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1iXT4R-0007RI-KA; Wed, 20 Nov 2019 17:43:11 +0100
+        id 1iXT4S-0007RI-Ee; Wed, 20 Nov 2019 17:43:12 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -37,9 +37,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 21/22] KVM: vgic-v4: Track the number of VLPIs per vcpu
-Date:   Wed, 20 Nov 2019 16:42:35 +0000
-Message-Id: <20191120164236.29359-22-maz@kernel.org>
+Subject: [PATCH 22/22] KVM: arm64: Opportunistically turn off WFI trapping when using direct LPI injection
+Date:   Wed, 20 Nov 2019 16:42:36 +0000
+Message-Id: <20191120164236.29359-23-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -54,84 +54,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to find out whether a vcpu is likely to be the target of
-VLPIs (and to further optimize the way we deal with those), let's
-track the number of VLPIs a vcpu can receive.
+Just like we do for WFE trapping, it can be useful to turn off
+WFI trapping when the physical CPU is not oversubscribed (that
+is, the vcpu is the only runnable process on this CPU) *and*
+that we're using direct injection of interrupts.
 
-This gets implemented with an atomic variable that gets incremented
-or decremented on map, unmap and move of a VLPI.
+The conditions are reevaluated on each vcpu_load(), ensuring that
+we don't switch to this mode on a busy system.
+
+On a GICv4 system, this has the effect of reducing the generation
+of doorbell interrupts to zero when the right conditions are
+met, which is a huge improvement over the current situation
+(where the doorbells are screaming if the CPU ever hits a
+blocking WFI).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
-Link: https://lore.kernel.org/r/20191107160412.30301-2-maz@kernel.org
+Link: https://lore.kernel.org/r/20191107160412.30301-3-maz@kernel.org
 ---
- include/linux/irqchip/arm-gic-v4.h | 2 ++
- virt/kvm/arm/vgic/vgic-init.c      | 1 +
- virt/kvm/arm/vgic/vgic-its.c       | 3 +++
- virt/kvm/arm/vgic/vgic-v4.c        | 2 ++
- 4 files changed, 8 insertions(+)
+ arch/arm/include/asm/kvm_emulate.h   | 4 ++--
+ arch/arm64/include/asm/kvm_emulate.h | 9 +++++++--
+ virt/kvm/arm/arm.c                   | 4 ++--
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
-index ab1396afe08a..5dbcfc65f21e 100644
---- a/include/linux/irqchip/arm-gic-v4.h
-+++ b/include/linux/irqchip/arm-gic-v4.h
-@@ -32,6 +32,8 @@ struct its_vm {
- struct its_vpe {
- 	struct page 		*vpt_page;
- 	struct its_vm		*its_vm;
-+	/* per-vPE VLPI tracking */
-+	atomic_t		vlpi_count;
- 	/* Doorbell interrupt */
- 	int			irq;
- 	irq_hw_number_t		vpe_db_lpi;
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 6f50c429196d..b3c5de48064c 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -203,6 +203,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+index 40002416efec..023c01cad2b1 100644
+--- a/arch/arm/include/asm/kvm_emulate.h
++++ b/arch/arm/include/asm/kvm_emulate.h
+@@ -95,12 +95,12 @@ static inline unsigned long *vcpu_hcr(const struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr;
+ }
  
- 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
- 	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
-+	atomic_set(&vgic_cpu->vgic_v3.its_vpe.vlpi_count, 0);
+-static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr &= ~HCR_TWE;
+ }
  
- 	/*
- 	 * Enable and configure all SGIs to be edge-triggered and
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 2be6b66b3856..98c7360d9fb7 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -360,7 +360,10 @@ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
- 		if (ret)
- 			return ret;
+-static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr |= HCR_TWE;
+ }
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 6e92f6c7b1e4..5a542d801f07 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -87,14 +87,19 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
  
-+		if (map.vpe)
-+			atomic_dec(&map.vpe->vlpi_count);
- 		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+		atomic_inc(&map.vpe->vlpi_count);
+-static inline void vcpu_clear_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
++	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count))
++		vcpu->arch.hcr_el2 &= ~HCR_TWI;
++	else
++		vcpu->arch.hcr_el2 |= HCR_TWI;
+ }
  
- 		ret = its_map_vlpi(irq->host_irq, &map);
- 	}
-diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
-index 0965fb0c427a..46f875589c47 100644
---- a/virt/kvm/arm/vgic/vgic-v4.c
-+++ b/virt/kvm/arm/vgic/vgic-v4.c
-@@ -309,6 +309,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+-static inline void vcpu_set_wfe_traps(struct kvm_vcpu *vcpu)
++static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 |= HCR_TWE;
++	vcpu->arch.hcr_el2 |= HCR_TWI;
+ }
  
- 	irq->hw		= true;
- 	irq->host_irq	= virq;
-+	atomic_inc(&map.vpe->vlpi_count);
+ static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index bd2afcf9a13f..dac96e355f69 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -386,9 +386,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_vcpu_pmu_restore_guest(vcpu);
  
- out:
- 	mutex_unlock(&its->its_lock);
-@@ -342,6 +343,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 	if (single_task_running())
+-		vcpu_clear_wfe_traps(vcpu);
++		vcpu_clear_wfx_traps(vcpu);
+ 	else
+-		vcpu_set_wfe_traps(vcpu);
++		vcpu_set_wfx_traps(vcpu);
  
- 	WARN_ON(!(irq->hw && irq->host_irq == virq));
- 	if (irq->hw) {
-+		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
- 		irq->hw = false;
- 		ret = its_unmap_vlpi(virq);
- 	}
+ 	vcpu_ptrauth_setup_lazy(vcpu);
+ }
 -- 
 2.20.1
 
