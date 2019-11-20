@@ -2,140 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3557B104319
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 19:16:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64A8C104322
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 19:19:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbfKTSQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 13:16:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40761 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727468AbfKTSQO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 13:16:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574273773;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gYyBv5Rxp1Uje+USM1WcyGRNB3Xlzuqtk5xGVkD8gpY=;
-        b=Lyc+Q3eBZcxLVwIS8pM0SNHznJLZoOQAnyC7KIJjhWiRW/HPg6qynvMWjm9e77w0uJBP+Q
-        be2gdFMsc6TgdqBieadAlgZDax0WGH8SpU1RyOVKApGnjyfXyvFmXV8Prg2V+xNLiOP47k
-        kkedRO6oHjYyBvN7w1nTgQEzwFyH0Bk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-l6OFv6dKMxC7NNiu3rpBmw-1; Wed, 20 Nov 2019 13:16:10 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35B37107ACE6;
-        Wed, 20 Nov 2019 18:16:09 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-122.ams2.redhat.com [10.36.116.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E46DD5195F;
-        Wed, 20 Nov 2019 18:16:04 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v4 3/3] s390x: SCLP unit test
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com
-References: <1574157219-22052-1-git-send-email-imbrenda@linux.ibm.com>
- <1574157219-22052-4-git-send-email-imbrenda@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <3ed24d20-9c77-7f18-203b-b28a38b5e07f@redhat.com>
-Date:   Wed, 20 Nov 2019 19:16:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727847AbfKTSTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 13:19:24 -0500
+Received: from mga09.intel.com ([134.134.136.24]:41417 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727656AbfKTSTX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 13:19:23 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Nov 2019 10:19:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,222,1571727600"; 
+   d="scan'208,223";a="237838281"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 20 Nov 2019 10:19:14 -0800
+Date:   Wed, 20 Nov 2019 10:19:14 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Derek Yerger <derek@djy.llc>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Bonzini, Paolo" <pbonzini@redhat.com>
+Subject: Re: PROBLEM: Regression of MMU causing guest VM application errors
+Message-ID: <20191120181913.GA11521@linux.intel.com>
+References: <1e525b08-6204-3238-5d56-513f82f1d7fb@djy.llc>
+ <20191016112857.293a197d@x1.home>
+ <20191016174943.GG5866@linux.intel.com>
+ <53f506b3-e864-b3ca-f18f-f8e9a1612072@djy.llc>
+ <20191022202847.GO2343@linux.intel.com>
+ <4af8cbac-39b1-1a20-8e26-54a37189fe32@djy.llc>
+ <20191024173212.GC20633@linux.intel.com>
+ <36be1503-f6f1-0ed0-b1fe-9c05d827f624@djy.llc>
+ <20191119200133.GD25672@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1574157219-22052-4-git-send-email-imbrenda@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: l6OFv6dKMxC7NNiu3rpBmw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="xHFwDpU9dbj6ez1V"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191119200133.GD25672@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/11/2019 10.53, Claudio Imbrenda wrote:
-> SCLP unit test. Testing the following:
->=20
-> * Correctly ignoring instruction bits that should be ignored
-> * Privileged instruction check
-> * Check for addressing exceptions
-> * Specification exceptions:
->   - SCCB size less than 8
->   - SCCB unaligned
->   - SCCB overlaps prefix or lowcore
->   - SCCB address higher than 2GB
-> * Return codes for
->   - Invalid command
->   - SCCB too short (but at least 8)
->   - SCCB page boundary violation
->=20
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  s390x/Makefile      |   1 +
->  s390x/sclp.c        | 465 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  s390x/unittests.cfg |   3 +
->  3 files changed, 469 insertions(+)
->  create mode 100644 s390x/sclp.c
-[...]
-> +/**
-> + * Test SCCB page boundary violations.
-> + */
-> +static void test_boundary(void)
-> +{
-> +=09const uint32_t cmd =3D SCLP_CMD_WRITE_EVENT_DATA;
-> +=09const uint16_t res =3D SCLP_RC_SCCB_BOUNDARY_VIOLATION;
-> +=09WriteEventData *sccb =3D (WriteEventData *)sccb_template;
-> +=09int len, offset;
-> +
-> +=09memset(sccb_template, 0, sizeof(sccb_template));
-> +=09sccb->h.function_code =3D SCLP_FC_NORMAL_WRITE;
-> +=09for (len =3D 32; len <=3D 4096; len++) {
-> +=09=09offset =3D len & 7 ? len & ~7 : len - 8;
 
-I needed some time to understand that line. I think it would be easier
-that way:
+--xHFwDpU9dbj6ez1V
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-=09=09offset =3D (len - 1) & ~7;
+On Tue, Nov 19, 2019 at 12:01:33PM -0800, Sean Christopherson wrote:
+> On Wed, Oct 30, 2019 at 11:44:09PM -0400, Derek Yerger wrote:
+> > I noticed the following in the host kernel log around the time the guest
+> > encountered BSOD on 5.2.7:
+> > 
+> > [  337.841491] WARNING: CPU: 6 PID: 7548 at arch/x86/kvm/x86.c:7963
+> > kvm_arch_vcpu_ioctl_run+0x19b1/0x1b00 [kvm]
+> 
+> Rats, I overlooked this first time round.  In the future, if you get a
+> WARN splat, try to make it very obvious in the bug report, they're almost
+> always a smoking gun.
+> 
+> That WARN that fired is:
+> 
+>         /* The preempt notifier should have taken care of the FPU already.  */
+>         WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD));
+> 
+> which was added part of a bug fix by commit:
+> 
+> 	240c35a3783a ("kvm: x86: Use task structs fpu field for user")
+> 
+> the buggy commit that was fixed is
+> 
+> 	5f409e20b794 ("x86/fpu: Defer FPU state load until return to userspace")
+> 
+> which was part of a FPU rewrite that went into 5.2[*].  So yep, big
+> smoking gun :-)
+> 
+> My understanding of the WARN is that it means the kernel's FPU state is
+> unexpectedly loaded when entry to the KVM guest is imminent.  As for *how*
+> the kernel's FPU state is getting loaded, no clue.  But, I think it'd be
+> pretty easy to find the the culprit by adding a debug flag into struct
+> thread_info that gets set in vcpu_load() and clearing it in vcpu_put(),
+> and then WARN in set_ti_thread_flag() if the debug flag is true when
+> TIF_NEED_FPU_LOAD is being set.  I'll put together a debugging patch later
+> today and send it your way.
 
-?
+Debug patch attached.  Hopefully it finds something, it took me an
+embarassing number of attempts to get correct, I kept screwing up checking
+a bit number versus checking a bit mask...
 
-Anyway, no need to respin just because of that line ... the rest of the
-patch looks ok to me.
+--xHFwDpU9dbj6ez1V
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-thread_info-Add-a-debug-hook-to-detect-FPU-changes-w.patch"
 
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index f1b07cd..75e3d37 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -75,3 +75,6 @@ file =3D stsi.elf
->  [smp]
->  file =3D smp.elf
->  extra_params =3D-smp 2
-> +
-> +[sclp]
-> +file =3D sclp.elf
+From 6288031dacbe753b84515d330f62c1f8ed31d932 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+Date: Wed, 20 Nov 2019 10:12:56 -0800
+Subject: [PATCH] thread_info: Add a debug hook to detect FPU changes while a
+ vCPU is loaded
 
-It's a little bit sad that some of the tests require < 2G of RAM while
-other tests should (also) be done with > 2G if I understood that
-correctly. So currently not all tests can be run automatically but just
-starting the "run_tests.sh" script, right?
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/include/asm/thread_info.h | 2 ++
+ arch/x86/kvm/x86.c                 | 4 ++++
+ include/linux/thread_info.h        | 1 +
+ 3 files changed, 7 insertions(+)
 
-It does not have to be right now (i.e. could also be a follow-up patch
-later), but what about adding two sections to the unittests.cfg file,
-one with less and one with more than 2G of RAM? E.g.:
+diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
+index f9453536f9bb..7b697005cc51 100644
+--- a/arch/x86/include/asm/thread_info.h
++++ b/arch/x86/include/asm/thread_info.h
+@@ -56,6 +56,8 @@ struct task_struct;
+ struct thread_info {
+ 	unsigned long		flags;		/* low level flags */
+ 	u32			status;		/* thread synchronous flags */
++	bool			vcpu_loaded;
++
+ };
+ 
+ #define INIT_THREAD_INFO(tsk)			\
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a8ad3a4d86b1..3d9c049e749e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3303,6 +3303,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	}
+ 
+ 	kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
++
++	current_thread_info()->vcpu_loaded = 1;
+ }
+ 
+ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+@@ -3322,6 +3324,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
+ 	int idx;
+ 
++	current_thread_info()->vcpu_loaded = 0;
++
+ 	if (vcpu->preempted)
+ 		vcpu->arch.preempted_in_kernel = !kvm_x86_ops->get_cpl(vcpu);
+ 
+diff --git a/include/linux/thread_info.h b/include/linux/thread_info.h
+index 8d8821b3689a..016c2c887354 100644
+--- a/include/linux/thread_info.h
++++ b/include/linux/thread_info.h
+@@ -52,6 +52,7 @@ enum {
+ 
+ static inline void set_ti_thread_flag(struct thread_info *ti, int flag)
+ {
++	WARN_ON_ONCE(ti->vcpu_loaded && flag == TIF_NEED_FPU_LOAD);
+ 	set_bit(flag, (unsigned long *)&ti->flags);
+ }
+ 
+-- 
+2.24.0
 
-[sclp-1g]
-file =3D sclp.elf
-extra_params =3D -m 1G
 
-[sclp-3g]
-file =3D sclp.elf
-extra_params =3D -m 3G -append "somemagicparametertoonlyrunthebigmemtest"
-
-?
-
- Thomas
-
+--xHFwDpU9dbj6ez1V--
