@@ -2,107 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6298103740
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 11:13:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6E0710374F
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 11:18:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728425AbfKTKNt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 05:13:49 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:38746 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728406AbfKTKNt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 05:13:49 -0500
-Received: by mail-oi1-f195.google.com with SMTP id a14so21993015oid.5;
-        Wed, 20 Nov 2019 02:13:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lde2KhjY7wfAoIiWkWWnbWFwuvtD6AW2ng2O9SrZAQI=;
-        b=tum3HFhYbfwE2ky4iNe0IhOcN4+nZNb/DMn8iw2S81C99M+x5e2EpQ8Kac8CGk22dR
-         SgZdMXeUc7J3ZIhOyA5CkcJtybYPj7wt4WMrvym3C5fkFUU6DtSkbg9gpizwYk7xNNTm
-         pyFyJsPwCpU+rSp2zDiF49sl68Fl0syhG0ar6BTMKk+n0C7Xdp/Ba6qJ62Ldu+e/Vq4S
-         IUWuV5f55JU4oe0yXJObBkBRBhvEHzpfhvr3gOvVP6Ji4F48VB90D0ljh8mW/5BGPYvD
-         j9J76EzK4ABxmgE7DW3/pCIxDs0qJX/Wa9k+JCjFJOQd7Qsyy8xlwKh7Paz66kocFjg9
-         seRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lde2KhjY7wfAoIiWkWWnbWFwuvtD6AW2ng2O9SrZAQI=;
-        b=dp2Asg+LT2tjCaHgCNShZ0aqsQkE+kxWcfc+Hw30zjZc8E18O5c9Ja7XSv2qgXKLUl
-         WGfjhHJg0R5bU/y4zMJcTFZyE1nZu39ea6meH1nKHkp6FLSJdBrW57mq8adK0nPQlNGn
-         4wM+LqA1Mvw2Z1p6YIMrtDbmueuSDOuD/0LzlHRjRVQZBjyLUgcfO8Ix5Jha9+tPg4F5
-         uNpwEcemHjbtTCV6iTHih3ZMZace2SV0aqHp/u7W0ELpz3RCAikZmCFxv3Uj7ZkZi0px
-         +yQXLlYpFUzJDEFX97jNgj2PXQqZhpJZZ0TnJC1BN6wePCrlSTLBw1aZ2Dlaz80PfF1U
-         eUWg==
-X-Gm-Message-State: APjAAAUEFKoluQjdy5gPM2cQyofsUydNXEzRuTMO2jLrjSBAr7T2oPII
-        LsP8SA2AOYg9ogIZsMw4HRjte/xtN11J4SNaMCU=
-X-Google-Smtp-Source: APXvYqxZSfWMxyflhcnT9tM5lOwDlMuKYqjC59kb27nMC0uIT+CCiDvQijJ51b9M9rmiGv4h+QUrJ21pTECzguY3nOA=
-X-Received: by 2002:aca:4a84:: with SMTP id x126mr1978871oia.47.1574244828632;
- Wed, 20 Nov 2019 02:13:48 -0800 (PST)
+        id S1728599AbfKTKS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 05:18:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58333 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727856AbfKTKS3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 05:18:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574245108;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xWcoDmmt3hOnbNOgoE5dQlhwSeBPgNfYdupdAnlBkc8=;
+        b=IZR6PatPkFleYIgXw9JCWzyGL3dpl3FVKNScKIxV80feWYoY8PH2Z4KDt6VF88JBQ8rGGz
+        V2+/b5zZbhpBlHtF2UlBjUYUT6bvAjzG2yr/dCrixwiLugev29SzisH+lHEo/M1TJWi6xq
+        Cbs1I4H6MqdKAQYH3jybe4v0W2BdySU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-5HWBhLnLMeGUl4cuPBFxxQ-1; Wed, 20 Nov 2019 05:18:25 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BA40801E6A;
+        Wed, 20 Nov 2019 10:18:21 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 694F71968D;
+        Wed, 20 Nov 2019 10:18:14 +0000 (UTC)
+Subject: Re: [PATCH v9 00/11] SMMUv3 Nested Stage Setup (VFIO part)
+To:     Tomasz Nowicki <tnowicki@marvell.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
+        "will.deacon@arm.com" <will.deacon@arm.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>
+Cc:     "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
+        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "vincent.stehle@arm.com" <vincent.stehle@arm.com>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "tina.zhang@intel.com" <tina.zhang@intel.com>
+References: <20190711135625.20684-1-eric.auger@redhat.com>
+ <a35234a6-e386-fc8e-fcc4-5db4601b00d2@marvell.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <3741c034-08f1-9dbb-ab06-434f3a8bd782@redhat.com>
+Date:   Wed, 20 Nov 2019 11:18:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20191105161737.21395-1-vkuznets@redhat.com> <20191105200218.GF3079@worktop.programming.kicks-ass.net>
- <20191105232528.GF23297@linux.intel.com> <20191106083235.GP4131@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191106083235.GP4131@hirez.programming.kicks-ass.net>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 20 Nov 2019 18:13:41 +0800
-Message-ID: <CANRm+CxtE-jMCGbhfL5QSU9JDCFcytsF=KQD6QGzT22-5_ZS8A@mail.gmail.com>
-Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is trustworthy
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvm <kvm@vger.kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <a35234a6-e386-fc8e-fcc4-5db4601b00d2@marvell.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 5HWBhLnLMeGUl4cuPBFxxQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-On Wed, 6 Nov 2019 at 16:34, Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Tue, Nov 05, 2019 at 03:25:28PM -0800, Sean Christopherson wrote:
-> > On Tue, Nov 05, 2019 at 09:02:18PM +0100, Peter Zijlstra wrote:
-> > > On Tue, Nov 05, 2019 at 05:17:37PM +0100, Vitaly Kuznetsov wrote:
-> > > > Virtualized guests may pick a different strategy to mitigate hardware
-> > > > vulnerabilities when it comes to hyper-threading: disable SMT completely,
-> > > > use core scheduling, or, for example, opt in for STIBP. Making the
-> > > > decision, however, requires an extra bit of information which is currently
-> > > > missing: does the topology the guest see match hardware or if it is 'fake'
-> > > > and two vCPUs which look like different cores from guest's perspective can
-> > > > actually be scheduled on the same physical core. Disabling SMT or doing
-> > > > core scheduling only makes sense when the topology is trustworthy.
-> > > >
-> > > > Add two feature bits to KVM: KVM_FEATURE_TRUSTWORTHY_SMT with the meaning
-> > > > that KVM_HINTS_TRUSTWORTHY_SMT bit answers the question if the exposed SMT
-> > > > topology is actually trustworthy. It would, of course, be possible to get
-> > > > away with a single bit (e.g. 'KVM_FEATURE_FAKE_SMT') and not lose backwards
-> > > > compatibility but the current approach looks more straightforward.
-> > >
-> > > The only way virt topology can make any sense what so ever is if the
-> > > vcpus are pinned to physical CPUs.
-> > >
-> > > And I was under the impression we already had a bit for that (isn't it
-> > > used to disable paravirt spinlocks and the like?). But I cannot seem to
-> > > find it in a hurry.
-> >
-> > Yep, KVM_HINTS_REALTIME does what you describe.
->
-> *sigh*, that's a pretty shit name for it :/
+Hi Tomasz,
 
-My original commit name this to KVM_HINTS_DEDICATED, commit a4429e53c
-(KVM: Introduce paravirtualization hints and KVM_HINTS_DEDICATED),
-could we revert the KVM_HINTS_REALTIME renaming? A lot of guys
-confused by this renaming now, Peterz, Marcelo ("The previous
-definition was much better IMO: HINTS_DEDICATED".
-https://lkml.org/lkml/2019/8/26/855).
+On 11/20/19 9:15 AM, Tomasz Nowicki wrote:
+> Hi Eric,
+>=20
+> On 11.07.2019 15:56, Eric Auger wrote:
+>> This series brings the VFIO part of HW nested paging support
+>> in the SMMUv3.
+>>
+>> The series depends on:
+>> [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+>> (https://www.spinics.net/lists/kernel/msg3187714.html)
+>>
+>> 3 new IOCTLs are introduced that allow the userspace to
+>> 1) pass the guest stage 1 configuration
+>> 2) pass stage 1 MSI bindings
+>> 3) invalidate stage 1 related caches
+>>
+>> They map onto the related new IOMMU API functions.
+>>
+>> We introduce the capability to register specific interrupt
+>> indexes (see [1]). A new DMA_FAULT interrupt index allows to register
+>> an eventfd to be signaled whenever a stage 1 related fault
+>> is detected at physical level. Also a specific region allows
+>> to expose the fault records to the user space.
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+>=20
+> I think you have already tested on ThunderX2, but as a formality, for=20
+> the whole series:
+>=20
+> Tested-by: Tomasz Nowicki <tnowicki@marvell.com>
+> qemu: https://github.com/eauger/qemu/tree/v4.1.0-rc0-2stage-rfcv5
+> kernel: https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9 +=20
+> Shameer's fix patch
+>=20
+> In my test I assigned Intel 82574L NIC and perform iperf tests.
 
-    Wanpeng
+Thank you for your testing efforts.
+>=20
+> Other folks from Marvell claimed this to be important feature so I asked=
+=20
+> them to review and speak up on mailing list.
+
+That's nice to read that!  So it is time for me to rebase both the iommu
+and vfio parts. I will submit something quickly. Then I would encourage
+the review efforts to focus first on the iommu part.
+
+Thanks
+
+Eric
+>=20
+> Thanks,
+> Tomasz
+>=20
+
