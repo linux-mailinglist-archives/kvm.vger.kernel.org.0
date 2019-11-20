@@ -2,109 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7AAF104659
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 23:21:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BE3F1046A4
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 23:32:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726346AbfKTWVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 17:21:40 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38713 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725819AbfKTWVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 17:21:40 -0500
-Received: by mail-io1-f66.google.com with SMTP id i13so1056345ioj.5
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 14:21:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PPZb5uc06E6ckJZfyVBVoO/p/GImtxauQ595lSsSogI=;
-        b=EydN6cMM95cljwnqnIrfQMpMgLuKIQIlYA+RvzDmmRnuSKJ8XCZq8FvtODUOFJxt9u
-         n1VkucUkFCdERiLEMM+afXx1VoslOMy9RYZ/qQgIOd/KOf2vHcIrH2uaii9og0pY81Bi
-         jMwHvTirPdl7RdqWYSlOF9viYookF1itbrv7S19DHm+h8MQVku/A6rYQrGK2fb5XyNaC
-         2922Y5DK44tvz+w046Llq+HQgkQXp5/E9LuJ+0/5m7ptRzJzwZGEo1yQAQsfshTAHFV8
-         OFw13Hius1unNMGOQ04cJbZEROGvzGH1sVqRUIekeEvFVOpPa9Gxy+ePNfqTpI6PMGxs
-         Sf8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PPZb5uc06E6ckJZfyVBVoO/p/GImtxauQ595lSsSogI=;
-        b=XEOwBTXft3MVz6N8cT6Wdbatv2rZQ4uhuZS8iWcWeyTFxGHUelP9hZvCzGjGXwd2ng
-         vnVO1gp49lOP7G1H7LygQhRzMocaeOEyYj4wlZn3YLpSi/MCQojlVTRdsTKP8DHiTAGX
-         EIzbz3rg3ftwxJIUewtNXtU1pb/oTmCjeP767HvsV9FLRkdIA2lwbP9k+1en2IfAl7R/
-         RMytNJ1YrR3nLtb8I7F7B7tcaXVtx1nIDqFYrp+7tpTicZ+JWA3u7VQrsdlY1XYHGy6G
-         dYH1iS3GCbbebFDYvN6zCk7fWld7dESGfZopxqGK+FW7pWQZI4PMqEwhan3fPOsfuUul
-         EBWg==
-X-Gm-Message-State: APjAAAV3z82yg0daUNh4RlKKB3Jc+hoJq4Q1ZVueKSFwwngrh0t7cZXe
-        mxwlCeMvA/+2bZs6Yjc8aV4HKsje43z85NKcp6Are7DA
-X-Google-Smtp-Source: APXvYqwt3qG289AzlGvwsetVHVi1g9ZzP4+/ocXJ2Kbls3RPm3hYUpmMqf4w0GUgUGrH7NtEZedY3i7l0lGBUfnDkq4=
-X-Received: by 2002:a02:846:: with SMTP id 67mr5618162jac.54.1574288498720;
- Wed, 20 Nov 2019 14:21:38 -0800 (PST)
+        id S1726014AbfKTWcI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 17:32:08 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45172 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbfKTWcH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 17:32:07 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKMIxbi194931;
+        Wed, 20 Nov 2019 22:32:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=jPiCHswE/8lrEBCyDTuCovZmy8rsk6cyZIiTyARLZAY=;
+ b=ZXWpFhrbyDHS55dfYXxqlfGI9rZwlJYoyYBwWXL7f6tCAnsE/pjjJCarw2BrZVsMCRMF
+ 0Lvd2/YD3OuveucUkR1prrCKMmIXQSxk34AP4TVsu0v5GHMaR3bqWqJJlwgXE1tB1LOi
+ AqtGtECfvyeb1VGL+3/eKwTE+b/QmmG017g4LWOydQwm9idRRquyh9Lta3sbvgNau7PN
+ MSXLwXbbGgReGCKsM9ds23OmW1/ykfFQnwnxcNwap/RTEAL7fcyy3RnOobNVsD1fuNah
+ stBjbfU8QkdHemVKTQt9PqfpRadIuSRBCtL2BYiTM++VnxCs74mJejn5HTCerXfO6/V3 qQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2wa8hu0k20-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 22:32:01 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKMJ8Ug006090;
+        Wed, 20 Nov 2019 22:32:00 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2wcemja4ax-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 22:32:00 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAKMVwhr009525;
+        Wed, 20 Nov 2019 22:31:59 GMT
+Received: from Lirans-MBP.Home (/79.176.218.68)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 20 Nov 2019 14:31:58 -0800
+From:   Liran Alon <liran.alon@oracle.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Liran Alon <liran.alon@oracle.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Subject: [PATCH] KVM: nVMX: Do not mark vmcs02->apic_access_page as dirty when unpinning
+Date:   Thu, 21 Nov 2019 00:31:47 +0200
+Message-Id: <20191120223147.63358-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <1574098136-48779-1-git-send-email-pbonzini@redhat.com>
- <CALMp9eQERkb76LvGDRQbJafK75fo=7X6xyBb+PfwfzGaY5_qeA@mail.gmail.com>
- <710cd64e-b74e-0651-2045-156ba47ce04b@redhat.com> <CALMp9eTnTOsch_fjSc92Jo+DoWE1AHwx04Vij7KKb4-Fy6nWEA@mail.gmail.com>
- <f5fcab3a-21f3-8025-5773-1bed4ef75f13@redhat.com>
-In-Reply-To: <f5fcab3a-21f3-8025-5773-1bed4ef75f13@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 20 Nov 2019 14:21:27 -0800
-Message-ID: <CALMp9eRz_G0rTMO4Omd_s78-=-zbRLGGxHzJsZBFpsfr0ysCgw@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] x86: add tests for MSR_IA32_TSX_CTRL
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=501
+ adultscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911200189
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=561 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911200189
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 2:17 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 20/11/19 23:16, Jim Mattson wrote:
-> > On Wed, Nov 20, 2019 at 10:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 20/11/19 19:13, Jim Mattson wrote:
-> >>> On Mon, Nov 18, 2019 at 9:29 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>>>
-> >>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >>>
-> >>> I had to add tsx-ctrl to x86/unittests.cfg:
-> >>>
-> >>> +[tsx-ctrl]
-> >>> +file = tsx-ctrl.flat
-> >>> +extra_params = -cpu host
-> >>> +groups = tsx-ctrl
-> >>> +
-> >>>
-> >>> With qemu 4.1, I get:
-> >>>
-> >>> timeout -k 1s --foreground 90s /root/kvm-unit-tests/deps/qemu.sh
-> >>> -nodefaults -device pc-testdev -device
-> >>> isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device
-> >>> pci-testdev -machine accel=kvm -kernel x86/tsx-ctrl.flat -smp 1 -cpu
-> >>> host # -initrd /tmp/tmp.7wOLppNO4W
-> >>> enabling apic
-> >>> SKIP: TSX_CTRL not available
-> >>>
-> >>> Maybe qemu is masking off ARCH_CAP_TSX_CTRL_MSR? I haven't investigated.
-> >>
-> >> Yes, you need "-cpu host,migratable=off" if you don't have the
-> >> corresponding QEMU patches (which I've only sent today, but just
-> >> allowing unmigratable features in extra_params will be okay for you to
-> >> test).
-> >
-> > Okay, that works!
-> >
-> > enabling apic
-> > PASS: TSX_CTRL should be 0
-> > PASS: Transactions do not abort
-> > PASS: TSX_CTRL hides RTM
-> > PASS: TSX_CTRL hides HLE
-> > PASS: TSX_CTRL=0 unhides RTM
-> > PASS: TSX_CTRL causes transactions to abort
-> > PASS: TSX_CTRL=0 causes transactions to succeed
-> > SUMMARY: 7 tests
->
-> Great, should I merge the patches in 5.5 with your Tested-by annotation?
+vmcs->apic_access_page is simply a token that the hypervisor puts into
+the PFN of a 4KB EPTE (or PTE if using shadow-paging) that triggers
+APIC-access VMExit or APIC virtualization logic whenever a CPU running
+in VMX non-root mode read/write from/to this PFN.
 
-Please do.
+As every write either triggers an APIC-access VMExit or write is
+performed on vmcs->virtual_apic_page, the PFN pointed to by
+vmcs->apic_access_page should never actually be touched by CPU.
+
+Therefore, there is no need to mark vmcs02->apic_access_page as dirty
+after unpin it on L2->L1 emulated VMExit or when L1 exit VMX operation.
+
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ arch/x86/kvm/vmx/nested.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 20692e442d13..2506f431d51e 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -257,7 +257,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 	vmx->nested.cached_shadow_vmcs12 = NULL;
+ 	/* Unpin physical memory we referred to in the vmcs02 */
+ 	if (vmx->nested.apic_access_page) {
+-		kvm_release_page_dirty(vmx->nested.apic_access_page);
++		kvm_release_page_clean(vmx->nested.apic_access_page);
+ 		vmx->nested.apic_access_page = NULL;
+ 	}
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+@@ -2933,7 +2933,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 		 * to it so we can release it later.
+ 		 */
+ 		if (vmx->nested.apic_access_page) { /* shouldn't happen */
+-			kvm_release_page_dirty(vmx->nested.apic_access_page);
++			kvm_release_page_clean(vmx->nested.apic_access_page);
+ 			vmx->nested.apic_access_page = NULL;
+ 		}
+ 		page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->apic_access_addr);
+@@ -4126,7 +4126,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
+ 
+ 	/* Unpin physical memory we referred to in vmcs02 */
+ 	if (vmx->nested.apic_access_page) {
+-		kvm_release_page_dirty(vmx->nested.apic_access_page);
++		kvm_release_page_clean(vmx->nested.apic_access_page);
+ 		vmx->nested.apic_access_page = NULL;
+ 	}
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
+-- 
+2.20.1
+
