@@ -2,319 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B8B85103255
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 04:49:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ED15103284
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 05:28:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727578AbfKTDtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 22:49:45 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:40304 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727378AbfKTDto (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 22:49:44 -0500
-Received: by mail-ot1-f68.google.com with SMTP id m15so19995207otq.7;
-        Tue, 19 Nov 2019 19:49:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=AL7UwpZpDtrAGO1EXavPbI6HiHuHJD7YVcQ5aKTdQSg=;
-        b=KgW+LNrma27erCDp4ciIxJVOnGkpFA33g/TmcXtqOzr1T5FDcPPv2i4gmoQJox1ej1
-         PRU7014/ltoCn6wuy+O8sLwY0czxMd2hE9s7frbvCr6bbdIHS748oXlBBEssBFkuc24a
-         oarvhLj94m+Xn54KwnPEDmADVa5JaQzFBvHgACL8apctznDsvX/SKPZCJ6xwbn80ioOF
-         ADuhboJVLeqXjK2smvwMv2PAFSSBjmGuc5ePnt3saBSGkivSaUCzeoKLFkiVbL+7CbV9
-         gDrjhTvpx6LPYbnjIBpiL/GHstpDst0Nwx/8iicQcLQ2FSK7p8hoMzN0dYvC4sHWUSx1
-         jPhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=AL7UwpZpDtrAGO1EXavPbI6HiHuHJD7YVcQ5aKTdQSg=;
-        b=Y0bnADVRYmLUgpmr28L61ebBgQkvg6dyoCZDDmmjklIRgcxmw2PFLJ30gjMDnxPWw+
-         uHTNeVps0DJ5pFyaWlwJ2HmGZlsI02itmLRW/roqYj76ecapR3hzVL/qCaap9U4oROjK
-         SHFymmimWkGPCXbf6CDltP/uSmogA8ttOSy+n3sz0c1fxe5dZQQauLWwb43pO7t9X/8W
-         hKTE2Kc7+wMZyk21UaGqPut/bZ6YuaEGSnUJtVuJGaptv8+EToGS43Y/PM4wOvn8gWza
-         igrHyW4H7xM7q0JxTf8P3GxjrbfZXXIIWuhCWxh8rtlTaDOTEWTOg/fEUXzDDP5KAmlB
-         KLFg==
-X-Gm-Message-State: APjAAAXr/YWNMIgBHPguc13/q9vq3YVRb+DFJiJlggKYU7ehCSHa7lM5
-        R/y4Ck4jfdfEYzD5U/sg92vdoWdO8gagnzWAUtE=
-X-Google-Smtp-Source: APXvYqxpOUla8jdXFA9vNA64qE23aq6wGSr/g5HKdgZibrMRGtlZee2Dn0S/kPy81kpjdDcskJX1Yxc8lI3gBFOOMeE=
-X-Received: by 2002:a9d:b83:: with SMTP id 3mr321505oth.56.1574221783615; Tue,
- 19 Nov 2019 19:49:43 -0800 (PST)
+        id S1727629AbfKTE2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 23:28:06 -0500
+Received: from ozlabs.org ([203.11.71.1]:51247 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727264AbfKTE2G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 23:28:06 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 47HqS21Nf8z9sPc; Wed, 20 Nov 2019 15:28:02 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1574224082;
+        bh=LaH01KzXUG8osJf+FKzF3QRxkjm9zL46s4Srl7HjQoc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BYGmKxs4qkqt04SO11Mw73RB3d6ihXaPKcpXsZPh/faswGUo+hmDImBaC88Xj+YYa
+         f444AvqgTlEAzl5xy19ZvJcf1FmSyqhaZt1P38yLL5htzuzKYfodPHRBN+0f4bzdkf
+         8Dgo0Vk7dN/01FZy3uJ0KFIOqJbICyDSwSSF7Mxo=
+Date:   Wed, 20 Nov 2019 15:27:52 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Message-ID: <20191120042752.GF5582@umbus.fritz.box>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
+ <20191029121544.GS3552@umbus.metropole.lan>
+ <A2975661238FB949B60364EF0F2C25743A0EF2CE@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-References: <1574145389-12149-1-git-send-email-wanpengli@tencent.com> <09CD3BD3-1F5E-48DA-82ED-58E3196DBD83@oracle.com>
-In-Reply-To: <09CD3BD3-1F5E-48DA-82ED-58E3196DBD83@oracle.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 20 Nov 2019 11:49:36 +0800
-Message-ID: <CANRm+CxZ5Opj44Aj+LL18nVSuU63hXpt9U9E3jJEQP67Hx6WMg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="hNrJFWHEm0TKGkuH"
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EF2CE@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Nov 2019 at 20:11, Liran Alon <liran.alon@oracle.com> wrote:
->
->
->
-> > On 19 Nov 2019, at 8:36, Wanpeng Li <kernellwp@gmail.com> wrote:
-> >
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > ICR and TSCDEADLINE MSRs write cause the main MSRs write vmexits in
-> > our product observation, multicast IPIs are not as common as unicast
-> > IPI like RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc.
-> >
-> > This patch tries to optimize x2apic physical destination mode, fixed
-> > delivery mode single target IPI by delivering IPI to receiver as soon
-> > as possible after sender writes ICR vmexit to avoid various checks
-> > when possible, especially when running guest w/ --overcommit cpu-pm=3Do=
-n
-> > or guest can keep running, IPI can be injected to target vCPU by
-> > posted-interrupt immediately.
-> >
-> > Testing on Xeon Skylake server:
-> >
-> > The virtual IPI latency from sender send to receiver receive reduces
-> > more than 200+ cpu cycles.
-> >
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> > v1 -> v2:
-> > * add tracepoint
-> > * Instead of a separate vcpu->fast_vmexit, set exit_reason
-> >   to vmx->exit_reason to -1 if the fast path succeeds.
-> > * move the "kvm_skip_emulated_instruction(vcpu)" to vmx_handle_exit
-> > * moving the handling into vmx_handle_exit_irqoff()
-> >
-> > arch/x86/include/asm/kvm_host.h |  4 ++--
-> > arch/x86/include/uapi/asm/vmx.h |  1 +
-> > arch/x86/kvm/svm.c              |  4 ++--
-> > arch/x86/kvm/vmx/vmx.c          | 40 ++++++++++++++++++++++++++++++++++=
-+++---
-> > arch/x86/kvm/x86.c              |  5 +++--
-> > 5 files changed, 45 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index 898ab9e..0daafa9 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1084,7 +1084,7 @@ struct kvm_x86_ops {
-> >       void (*tlb_flush_gva)(struct kvm_vcpu *vcpu, gva_t addr);
-> >
-> >       void (*run)(struct kvm_vcpu *vcpu);
-> > -     int (*handle_exit)(struct kvm_vcpu *vcpu);
-> > +     int (*handle_exit)(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason);
-> >       int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
-> >       void (*set_interrupt_shadow)(struct kvm_vcpu *vcpu, int mask);
-> >       u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
-> > @@ -1134,7 +1134,7 @@ struct kvm_x86_ops {
-> >       int (*check_intercept)(struct kvm_vcpu *vcpu,
-> >                              struct x86_instruction_info *info,
-> >                              enum x86_intercept_stage stage);
-> > -     void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
-> > +     void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu, u32 *vcpu_exit_=
-reason);
-> >       bool (*mpx_supported)(void);
-> >       bool (*xsaves_supported)(void);
-> >       bool (*umip_emulated)(void);
-> > diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/as=
-m/vmx.h
-> > index 3eb8411..b33c6e1 100644
-> > --- a/arch/x86/include/uapi/asm/vmx.h
-> > +++ b/arch/x86/include/uapi/asm/vmx.h
-> > @@ -88,6 +88,7 @@
-> > #define EXIT_REASON_XRSTORS             64
-> > #define EXIT_REASON_UMWAIT              67
-> > #define EXIT_REASON_TPAUSE              68
-> > +#define EXIT_REASON_NEED_SKIP_EMULATED_INSN -1
-> >
-> > #define VMX_EXIT_REASONS \
-> >       { EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> > index d02a73a..c8e063a 100644
-> > --- a/arch/x86/kvm/svm.c
-> > +++ b/arch/x86/kvm/svm.c
-> > @@ -4929,7 +4929,7 @@ static void svm_get_exit_info(struct kvm_vcpu *vc=
-pu, u64 *info1, u64 *info2)
-> >       *info2 =3D control->exit_info_2;
-> > }
-> >
-> > -static int handle_exit(struct kvm_vcpu *vcpu)
-> > +static int handle_exit(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reason)
-> > {
-> >       struct vcpu_svm *svm =3D to_svm(vcpu);
-> >       struct kvm_run *kvm_run =3D vcpu->run;
-> > @@ -6187,7 +6187,7 @@ static int svm_check_intercept(struct kvm_vcpu *v=
-cpu,
-> >       return ret;
-> > }
-> >
-> > -static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-> > +static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu, u32 *vcpu_ex=
-it_reason)
-> > {
-> >
-> > }
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 621142e5..b98198d 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -5792,7 +5792,7 @@ void dump_vmcs(void)
-> >  * The guest has exited.  See if we can fix it or if we need userspace
-> >  * assistance.
-> >  */
-> > -static int vmx_handle_exit(struct kvm_vcpu *vcpu)
-> > +static int vmx_handle_exit(struct kvm_vcpu *vcpu, u32 *vcpu_exit_reaso=
-n)
->
-> vmx_handle_exit() should get second parameter by value and not by pointer=
-. As it doesn=E2=80=99t need to modify it.
->
-> I would also rename parameter to =E2=80=9Caccel_exit_completion=E2=80=9D =
-to indicate this is additional work that needs to happen to complete accele=
-rated-exit handling.
-> This parameter should be an enum that currently only have 2 values: ACCEL=
-_EXIT_NONE and ACCEL_EXIT_SKIP_EMUL_INS.
->
-> > {
-> >       struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> >       u32 exit_reason =3D vmx->exit_reason;
-> > @@ -5878,7 +5878,10 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu=
-)
-> >               }
-> >       }
-> >
-> > -     if (exit_reason < kvm_vmx_max_exit_handlers
-> > +     if (*vcpu_exit_reason =3D=3D EXIT_REASON_NEED_SKIP_EMULATED_INSN)=
- {
-> > +             kvm_skip_emulated_instruction(vcpu);
-> > +             return 1;
-> > +     } else if (exit_reason < kvm_vmx_max_exit_handlers
-> >           && kvm_vmx_exit_handlers[exit_reason]) {
-> > #ifdef CONFIG_RETPOLINE
-> >               if (exit_reason =3D=3D EXIT_REASON_MSR_WRITE)
-> > @@ -6223,7 +6226,36 @@ static void handle_external_interrupt_irqoff(str=
-uct kvm_vcpu *vcpu)
-> > }
-> > STACK_FRAME_NON_STANDARD(handle_external_interrupt_irqoff);
-> >
-> > -static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
-> > +static u32 handle_ipi_fastpath(struct kvm_vcpu *vcpu)
-> > +{
-> > +     u32 index;
-> > +     u64 data;
-> > +     int ret =3D 0;
-> > +
-> > +     if (lapic_in_kernel(vcpu) && apic_x2apic_mode(vcpu->arch.apic)) {
-> > +             /*
-> > +              * fastpath to IPI target, FIXED+PHYSICAL which is popula=
-r
-> > +              */
-> > +             index =3D kvm_rcx_read(vcpu);
-> > +             data =3D kvm_read_edx_eax(vcpu);
-> > +
-> > +             if (((index - APIC_BASE_MSR) << 4 =3D=3D APIC_ICR) &&
-> > +                     ((data & KVM_APIC_DEST_MASK) =3D=3D APIC_DEST_PHY=
-SICAL) &&
-> > +                     ((data & APIC_MODE_MASK) =3D=3D APIC_DM_FIXED)) {
-> > +
-> > +                     trace_kvm_msr_write(index, data);
->
-> On a standard EXIT_REASON_MSR_WRITE VMExit, this trace will be printed on=
-ly after LAPIC emulation logic happens.
-> You should preserve same ordering.
->
-> > +                     kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u3=
-2)(data >> 32));
-> > +                     ret =3D kvm_lapic_reg_write(vcpu->arch.apic, APIC=
-_ICR, (u32)data);
-> > +
-> > +                     if (ret =3D=3D 0)
-> > +                             return EXIT_REASON_NEED_SKIP_EMULATED_INS=
-N;
-> > +             }
-> > +     }
-> > +
-> > +     return ret;
-> > +}
->
-> Maybe it would be more elegant to modify this function as follows?
->
-> static int handle_accel_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u32 =
-msr, u64 data)
-> {
->     if (lapic_in_kernel(vcpu) && apic_x2apic_mode(vcpu->arch.apic) &&
->         ((data & KVM_APIC_DEST_MASK) =3D=3D APIC_DEST_PHYSICAL) &&
->         ((data & APIC_MODE_MASK) =3D=3D APIC_DM_FIXED)) {
->
->         kvm_lapic_set_reg(vcpu->arch.apic, APIC_ICR2, (u32)(data >> 32));
->         return kvm_lapic_reg_write(vcpu->arch.apic, APIC_ICR, (u32)data);
->     }
->
->     return 1;
-> }
->
-> static enum accel_exit_completion handle_accel_set_msr_irqoff(struct kvm_=
-vcpu *vcpu)
-> {
->     u32 msr =3D kvm_rcx_read(vcpu);
->     u64 data =3D kvm_read_edx_eax(vcpu);
->     int ret =3D 0;
->
->     switch (msr) {
->     case APIC_BASE_MSR + (APIC_ICR >> 4):
->         ret =3D handle_accel_set_x2apic_icr_irqoff(vcpu, msr, data);
->         break;
->     default:
->         return ACCEL_EXIT_NONE;
->     }
->
->     if (!ret) {
->         trace_kvm_msr_write(msr, data);
->         return ACCEL_EXIT_SKIP_EMUL_INS;
->     }
->
->     return ACCEL_EXIT_NONE;
-> }
->
-> > +
-> > +static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu, u32 *exit_re=
-ason)
-> > {
-> >       struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-> >
-> > @@ -6231,6 +6263,8 @@ static void vmx_handle_exit_irqoff(struct kvm_vcp=
-u *vcpu)
-> >               handle_external_interrupt_irqoff(vcpu);
-> >       else if (vmx->exit_reason =3D=3D EXIT_REASON_EXCEPTION_NMI)
-> >               handle_exception_nmi_irqoff(vmx);
-> > +     else if (vmx->exit_reason =3D=3D EXIT_REASON_MSR_WRITE)
-> > +             *exit_reason =3D handle_ipi_fastpath(vcpu);
->
-> 1) This case requires a comment as the only reason it is called here is a=
-n optimisation.
-> In contrast to the other cases which must be called before interrupts are=
- enabled on the host.
->
-> 2) I would rename handler to handle_accel_set_msr_irqoff().
-> To signal this handler runs with host interrupts disabled and to make it =
-a general place for accelerating WRMSRs in case we would require more in th=
-e future.
 
-Yes, TSCDEADLINE/VMX PREEMPTION TIMER is in my todo list after this
-merged upstream, handle all the comments in v3, thanks for making this
-nicer further. :)
+--hNrJFWHEm0TKGkuH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    Wanpeng
+On Wed, Nov 06, 2019 at 12:14:50PM +0000, Liu, Yi L wrote:
+> > From: David Gibson [mailto:david@gibson.dropbear.id.au]
+> > Sent: Tuesday, October 29, 2019 8:16 PM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pa=
+sid alloc/free
+> >=20
+> > On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
+> > > This patch adds pasid alloc/free notifiers for vfio-pci. It is
+> > > supposed to be fired by vIOMMU. VFIO then sends PASID allocation
+> > > or free request to host.
+> > >
+> > > Cc: Kevin Tian <kevin.tian@intel.com>
+> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > Cc: Peter Xu <peterx@redhat.com>
+> > > Cc: Eric Auger <eric.auger@redhat.com>
+> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > ---
+> > >  hw/vfio/common.c         |  9 ++++++
+> > >  hw/vfio/pci.c            | 81
+> > ++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  include/hw/iommu/iommu.h | 15 +++++++++
+> > >  3 files changed, 105 insertions(+)
+> > >
+> > > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > > index d418527..e6ad21c 100644
+> > > --- a/hw/vfio/common.c
+> > > +++ b/hw/vfio/common.c
+> > > @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup
+> > *group)
+> > >      if (QLIST_EMPTY(&container->group_list)) {
+> > >          VFIOAddressSpace *space =3D container->space;
+> > >          VFIOGuestIOMMU *giommu, *tmp;
+> > > +        VFIOIOMMUContext *giommu_ctx, *ctx;
+> > >
+> > >          QLIST_REMOVE(container, next);
+> > >
+> > > @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup
+> > *group)
+> > >              g_free(giommu);
+> > >          }
+> > >
+> > > +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
+> > > +                                                   iommu_ctx_next, c=
+tx) {
+> > > +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
+> > > +                                                      &giommu_ctx->n=
+);
+> > > +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
+> > > +            g_free(giommu_ctx);
+> > > +        }
+> > > +
+> > >          trace_vfio_disconnect_container(container->fd);
+> > >          close(container->fd);
+> > >          g_free(container);
+> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > index 12fac39..8721ff6 100644
+> > > --- a/hw/vfio/pci.c
+> > > +++ b/hw/vfio/pci.c
+> > > @@ -2699,11 +2699,80 @@ static void
+> > vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> > >      vdev->req_enabled =3D false;
+> > >  }
+> > >
+> > > +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
+> > > +                                             IOMMUContext *iommu_ctx,
+> > > +                                             IOMMUCTXNotifyFn fn,
+> > > +                                             IOMMUCTXEvent event)
+> > > +{
+> > > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > > +    VFIOIOMMUContext *giommu_ctx;
+> > > +
+> > > +    giommu_ctx =3D g_malloc0(sizeof(*giommu_ctx));
+> > > +    giommu_ctx->container =3D container;
+> > > +    giommu_ctx->iommu_ctx =3D iommu_ctx;
+> > > +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
+> > > +                      giommu_ctx,
+> > > +                      iommu_ctx_next);
+> > > +    iommu_ctx_notifier_register(iommu_ctx,
+> > > +                                &giommu_ctx->n,
+> > > +                                fn,
+> > > +                                event);
+> > > +}
+> > > +
+> > > +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
+> > > +                                          IOMMUCTXEventData *event_d=
+ata)
+> > > +{
+> > > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContex=
+t, n);
+> > > +    VFIOContainer *container =3D giommu_ctx->container;
+> > > +    IOMMUCTXPASIDReqDesc *pasid_req =3D
+> > > +                              (IOMMUCTXPASIDReqDesc *) event_data->d=
+ata;
+> > > +    struct vfio_iommu_type1_pasid_request req;
+> > > +    unsigned long argsz;
+> > > +    int pasid;
+> > > +
+> > > +    argsz =3D sizeof(req);
+> > > +    req.argsz =3D argsz;
+> > > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> > > +    req.min_pasid =3D pasid_req->min_pasid;
+> > > +    req.max_pasid =3D pasid_req->max_pasid;
+> > > +
+> > > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > > +    if (pasid < 0) {
+> > > +        error_report("%s: %d, alloc failed", __func__, -errno);
+> > > +    }
+> > > +    pasid_req->alloc_result =3D pasid;
+> >=20
+> > Altering the event data from the notifier doesn't make sense.  By
+> > definition there can be multiple notifiers on the chain, so in that
+> > case which one is responsible for updating the writable field?
+>=20
+> I guess you mean multiple pasid_alloc nofitiers. right?
+>=20
+> It works for VT-d now, as Intel vIOMMU maintains the IOMMUContext
+> per-bdf. And there will be only 1 pasid_alloc notifier in the chain. But,=
+ I
+> agree it is not good if other module just share an IOMMUConext across
+> devices. Definitely, it would have multiple pasid_alloc notifiers.
+
+Right.
+
+> How about enforcing IOMMUContext layer to only invoke one successful
+> pasid_alloc/free notifier if PASID_ALLOC/FREE event comes? pasid
+> alloc/free are really special as it requires feedback. And a potential
+> benefit is that the pasid_alloc/free will not be affected by hot plug
+> scenario. There will be always a notifier to work for pasid_alloc/free
+> work unless all passthru devices are hot plugged. How do you think? Or
+> if any other idea?
+
+Hrm, that still doesn't seem right to me.  I don't think a notifier is
+really the right mechanism for something that needs to return values.
+This seems like something where you need to find a _single_
+responsible object and call a method / callback on that specifically.
+
+But it seems to me there's a more fundamental problem here.  AIUI the
+idea is that a single IOMMUContext could hold multiple devices.  But
+if the devices are responsible for assigning their own pasid values
+(by passing that decisionon to the host through vfio) then that really
+can't work.
+
+I'm assuming it's impossible from the hardware side to virtualize the
+pasids (so that we could assign them from qemu without host
+intervention).
+
+If so, then the pasid allocation really has to be a Context level, not
+device level operation.  We'd have to wire the VFIO backend up to the
+context itself, not a device... I'm not immediately sure how to do
+that, though.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--hNrJFWHEm0TKGkuH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UwMEACgkQbDjKyiDZ
+s5KZsA//XoelIlgONN7f19PheYAfU+DR8erhYyZtmWqzjeD9DmyWMXY+R2IRUWFd
+Pm8XaGqVAgL030DECHdv8LubB/qXT9+6Vj1mgMYE5jsAds/+UpVmtTZyKyKBKJkx
+pU6TwW9nzdOrHoz1tWF5RNbrLV850F+qVIHEuuEeB8DHunxf4iNos9hSGQ3eisZ1
+cNxWzmB64CknY0TuVBTvUm9oe0/UXIFCdx+Tvy/hHfKFXV+M6b6YisYfR4yIKmyo
+UUV9jJePXgSv1j4/94KnUxGgvu7XVr+bFccb2jsA4qaHDV3QK+QB6SymdrUJIF7Y
+9u/R8Ju6tE4joENQZh4/XhiZs2rR9DtboBdBFryeASy7UN3Exw1lHQiaC0bGgGCY
+q4nmM3Oj2kpjEXO1SHVG/pQv4G5U3uq8XPfMHSdTObLwwnehQlLWgk3ZQlpG0H44
+NI3xhQnCsHoiUmXbI7IKxEqdJ4wjT/KN0axZIz+Gz8tZXTF6y1vtNg47ow75+ZNF
+6KzwGB4EVkqKTp5kTNFPg27bXSXPbv9Pyc8+J0sQnhUL/0PfsHxaUvf1dPD3c8Iu
+4sBh4siqZ1wlBtOdjyynehUUTIBw3/snScdKZ2YTR8YrSfLJWcJaoX0Tm32yuy75
+XPfPvQyoRs8U+gYRbkqqns+YTprs6Uk89e/us17fbdV+AR7Oew8=
+=5vxW
+-----END PGP SIGNATURE-----
+
+--hNrJFWHEm0TKGkuH--
