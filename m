@@ -2,126 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0D1F103E54
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 16:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB4B510410E
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 17:43:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730944AbfKTP2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 10:28:09 -0500
-Received: from mga06.intel.com ([134.134.136.31]:24075 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730911AbfKTP2I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 10:28:08 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Nov 2019 07:28:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,222,1571727600"; 
-   d="scan'208";a="237773796"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga002.fm.intel.com with ESMTP; 20 Nov 2019 07:28:07 -0800
-Date:   Wed, 20 Nov 2019 07:28:07 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Christoffer Dall <christoffer.dall@arm.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@arm.com>,
-        borntraeger@de.ibm.com, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: Memory regions and VMAs across architectures
-Message-ID: <20191120152807.GA32572@linux.intel.com>
-References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
- <20191120034448.GC25890@linux.intel.com>
- <20191120115216.GL8317@e113682-lin.lund.arm.com>
+        id S1732870AbfKTQnI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 11:43:08 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:36603 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732847AbfKTQnH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 11:43:07 -0500
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iXT49-0007RI-KJ; Wed, 20 Nov 2019 17:42:53 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        Julien Grall <julien.grall@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Subject: [GIT PULL] KVM/arm updates for 5.5
+Date:   Wed, 20 Nov 2019 16:42:14 +0000
+Message-Id: <20191120164236.29359-1-maz@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191120115216.GL8317@e113682-lin.lund.arm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, rkrcmar@redhat.com, graf@amazon.com, drjones@redhat.com, borntraeger@de.ibm.com, christoffer.dall@arm.com, eric.auger@redhat.com, xypron.glpk@gmx.de, julien.grall@arm.com, mark.rutland@arm.com, bigeasy@linutronix.de, steven.price@arm.com, tglx@linutronix.de, will@kernel.org, yuzenghui@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 12:52:16PM +0100, Christoffer Dall wrote:
-> On Tue, Nov 19, 2019 at 07:44:48PM -0800, Sean Christopherson wrote:
-> > On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
-> > > First, what prevents user space from messing around with the VMAs after
-> > > kvm_arch_prepare_memory_region() completes?  If nothing, then what is
-> > > the value of the cheks we perform wrt. to VMAs?
-> > 
-> > Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
-> > the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
-> > the VMAs from being invalidated while the stage 2 tables are populated,
-> > e.g. prevents racing with the mmu notifier.  The VMAs could be modified
-> > after prepare_memory_region(), but the mmu notifier will ensure they are
-> > unmapped from stage2 prior the the host change taking effect.  So I think
-> > you're safe (famous last words).
-> > 
-> 
-> So we for example check:
-> 
-> 	writeable = !(memslot->falgs & KVM_MEM_READONLY);
-> 	if (writeable && !(vma->vm_flags & VM_WRITE))
-> 		return -EPERM;
-> 
-> And yes, user space can then unmap the VMAs and MMU notifiers will
-> unmap the stage 2 entries, but user space can then create a new
-> read-only VMA covering the area of the memslot and the fault-handling
-> path will have to deal with this same check later.Only, the fault
-> handling path, via gfn_to_pfn_prot(), returns an address based on an
-> entirely different set of mechanics, than our prepare_memory_region,
-> which I think indicates we are doing something wrong somewhere, and we
-> should have a common path for faulting things in, for I/O, both if we do
-> this up-front or if we do this at fault time.
+Paolo, Radim,
 
-Unconditionally interpreting vm_pgoff as a physical address does not seem
-correct.  There are cases where that might be correct, e.g. if the backing
-(virtual) file is a flat representation of the address space, which appears
-to be the case on some architectures, e.g. for PCI handling.  But even then
-there should be some confirmation that the VMA is actually associated with
-such a file, otherwise KVM is at the mercy of userspace to do the right
-thing (unless there are other guarantees on arm I am unaware of).
+Here's the bulk of KVM/arm updates for 5.5. On the menu, two new features:
+- Stolen time is finally exposed to guests. Yay!
+- We can report (and potentially emulate) instructions that KVM cannot
+  handle in kernel space to userspace. Yay again!
 
-> > > Second, why would arm/arm64 need special handling for I/O mappings
-> > > compared to other architectures, and how is this dealt with for
-> > > x86/s390/power/... ?
-> > 
-> > As Ard mentioned, it looks like an optimization.  The "passthrough"
-> > part from the changelog implies that VM_PFNMAP memory regions are exclusive
-> > to the guest.  Mapping the entire thing would be a nice boot optimization
-> > as it would save taking page faults on every page of the MMIO region.
-> > 
-> > As for how this is different from other archs... at least on x86, VM_PFNMAP
-> > isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
-> > pages may actually trigger allocation, and remapping the addresses could be
-> > flat out wrong.
-> 
-> What does VM_PFNMAP mean on x86?  I didn't think we were relying on
-> anything architecture specific in their meaning in the arm code, and I
-> thought the VM_PFNMAP was a generic mm flag with generic mm meaning,
-> but I could be wrong here?
+Apart from that, a fairly mundane bag of perf optimization, cleanup and
+bug fixes.
 
-No, you're correct, VM_PFNMAP is a generic flag that state the VMA doesn't
-have an associated struct page and is being managed directly by something
-other than the core mmu.
+Note that this series is based on a shared branch with the arm64 tree,
+avoiding a potential delicate merge.
 
-But not having a struct page doesn't guarantee that the PFN is backed by
-MMIO, or that it is exclusive to the guest (although in practice this is
-probably the case 99.9999% of the time).  E.g. x86 supports having guest
-memory backed by regular ram that is hidden from the host kernel via
-'mem=', which will show up as VM_PFNMAP.
+Please pull,
 
-> Is there any valid semantics for creating a memslot backed by a
-> VM_PFNMAP on x86, and if so, what are those?
-> 
-> Similarly, if you do map a device region straight to the guest on x86,
-> how is that handled?  (A pointer to the right place in the myriad of EPT
-> and shadow code in x86 would be much appreciated.)
+	M.
 
-There is no special handling in x86 for VM_PFNMAP memory, we rely on KVM's
-generic __gfn_to_pfn_memslot() to retrieve the PFN on demand, and use
-mmu_notifier_seq to ensure the stale PFNs (invalidated in the host) aren't
-inserted into the guest page tables.  Effectively the same thing arm does,
-sans the prepare_memory_region() shenanigans.
+The following changes since commit e6ea46511b1ae8c4491904c79411fcd29139af14:
+
+  firmware: arm_sdei: use common SMCCC_CONDUIT_* (2019-10-14 10:55:14 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.5
+
+for you to fetch changes up to cd7056ae34af0e9424da97bbc7d2b38246ba8a2c:
+
+  Merge remote-tracking branch 'kvmarm/misc-5.5' into kvmarm/next (2019-11-08 11:27:29 +0000)
+
+----------------------------------------------------------------
+KVM/arm updates for Linux 5.5:
+
+- Allow non-ISV data aborts to be reported to userspace
+- Allow injection of data aborts from userspace
+- Expose stolen time to guests
+- GICv4 performance improvements
+- vgic ITS emulation fixes
+- Simplify FWB handling
+- Enable halt pool counters
+- Make the emulated timer PREEMPT_RT compliant
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      KVM: arm/arm64: Show halt poll counters in debugfs
+
+Christoffer Dall (4):
+      KVM: arm/arm64: Allow reporting non-ISV data aborts to userspace
+      KVM: arm/arm64: Allow user injection of external data aborts
+      KVM: arm/arm64: Factor out hypercall handling from PSCI code
+      KVM: arm64: Don't set HCR_EL2.TVM when S2FWB is supported
+
+Marc Zyngier (6):
+      Merge remote-tracking branch 'arm64/for-next/smccc-conduit-cleanup' into kvm-arm64/stolen-time
+      Merge remote-tracking branch 'kvmarm/kvm-arm64/stolen-time' into kvmarm-master/next
+      KVM: arm64: vgic-v4: Move the GICv4 residency flow to be driven by vcpu_load/put
+      KVM: vgic-v4: Track the number of VLPIs per vcpu
+      KVM: arm64: Opportunistically turn off WFI trapping when using direct LPI injection
+      Merge remote-tracking branch 'kvmarm/misc-5.5' into kvmarm/next
+
+Steven Price (10):
+      KVM: arm64: Document PV-time interface
+      KVM: arm64: Implement PV_TIME_FEATURES call
+      KVM: Implement kvm_put_guest()
+      KVM: arm64: Support stolen time reporting via shared structure
+      KVM: Allow kvm_device_ops to be const
+      KVM: arm64: Provide VCPU attributes for stolen time
+      arm/arm64: Provide a wrapper for SMCCC 1.1 calls
+      arm/arm64: Make use of the SMCCC 1.1 wrapper
+      arm64: Retrieve stolen time as paravirtualized guest
+      KVM: arm64: Select TASK_DELAY_ACCT+TASKSTATS rather than SCHEDSTATS
+
+Thomas Gleixner (1):
+      KVM: arm/arm64: Let the timer expire in hardirq context on RT
+
+Zenghui Yu (3):
+      KVM: arm/arm64: vgic: Remove the declaration of kvm_send_userspace_msi()
+      KVM: arm/arm64: vgic: Fix some comments typo
+      KVM: arm/arm64: vgic: Don't rely on the wrong pending table
+
+ Documentation/admin-guide/kernel-parameters.txt |   6 +-
+ Documentation/virt/kvm/api.txt                  |  55 +++++++++-
+ Documentation/virt/kvm/arm/pvtime.rst           |  80 ++++++++++++++
+ Documentation/virt/kvm/devices/vcpu.txt         |  14 +++
+ arch/arm/include/asm/kvm_arm.h                  |   1 +
+ arch/arm/include/asm/kvm_emulate.h              |   9 +-
+ arch/arm/include/asm/kvm_host.h                 |  33 ++++++
+ arch/arm/include/uapi/asm/kvm.h                 |   3 +-
+ arch/arm/kvm/Makefile                           |   2 +-
+ arch/arm/kvm/guest.c                            |  14 +++
+ arch/arm/kvm/handle_exit.c                      |   2 +-
+ arch/arm/mm/proc-v7-bugs.c                      |  13 +--
+ arch/arm64/include/asm/kvm_arm.h                |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h            |  26 ++++-
+ arch/arm64/include/asm/kvm_host.h               |  37 +++++++
+ arch/arm64/include/asm/paravirt.h               |   9 +-
+ arch/arm64/include/asm/pvclock-abi.h            |  17 +++
+ arch/arm64/include/uapi/asm/kvm.h               |   5 +-
+ arch/arm64/kernel/cpu_errata.c                  |  81 +++++---------
+ arch/arm64/kernel/paravirt.c                    | 140 ++++++++++++++++++++++++
+ arch/arm64/kernel/time.c                        |   3 +
+ arch/arm64/kvm/Kconfig                          |   4 +
+ arch/arm64/kvm/Makefile                         |   2 +
+ arch/arm64/kvm/guest.c                          |  23 ++++
+ arch/arm64/kvm/handle_exit.c                    |   4 +-
+ arch/arm64/kvm/inject_fault.c                   |   4 +-
+ drivers/irqchip/irq-gic-v4.c                    |   7 +-
+ include/Kbuild                                  |   2 +
+ include/kvm/arm_hypercalls.h                    |  43 ++++++++
+ include/kvm/arm_psci.h                          |   2 +-
+ include/kvm/arm_vgic.h                          |   8 +-
+ include/linux/arm-smccc.h                       |  59 ++++++++++
+ include/linux/cpuhotplug.h                      |   1 +
+ include/linux/irqchip/arm-gic-v4.h              |   4 +
+ include/linux/kvm_host.h                        |  26 ++++-
+ include/linux/kvm_types.h                       |   2 +
+ include/uapi/linux/kvm.h                        |  10 ++
+ virt/kvm/arm/arch_timer.c                       |   8 +-
+ virt/kvm/arm/arm.c                              |  49 ++++++++-
+ virt/kvm/arm/hypercalls.c                       |  71 ++++++++++++
+ virt/kvm/arm/mmio.c                             |   9 +-
+ virt/kvm/arm/psci.c                             |  84 +-------------
+ virt/kvm/arm/pvtime.c                           | 131 ++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-init.c                   |   1 +
+ virt/kvm/arm/vgic/vgic-its.c                    |   3 +
+ virt/kvm/arm/vgic/vgic-v3.c                     |  12 +-
+ virt/kvm/arm/vgic/vgic-v4.c                     |  59 +++++-----
+ virt/kvm/arm/vgic/vgic.c                        |   4 -
+ virt/kvm/arm/vgic/vgic.h                        |   2 -
+ virt/kvm/kvm_main.c                             |   6 +-
+ 50 files changed, 968 insertions(+), 225 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pvtime.rst
+ create mode 100644 arch/arm64/include/asm/pvclock-abi.h
+ create mode 100644 include/kvm/arm_hypercalls.h
+ create mode 100644 virt/kvm/arm/hypercalls.c
+ create mode 100644 virt/kvm/arm/pvtime.c
