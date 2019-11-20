@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BEB010415B
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 17:50:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79D3E10416F
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 17:51:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730255AbfKTQuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 11:50:32 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:55867 "EHLO
+        id S1729751AbfKTQv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 11:51:58 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:56821 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729526AbfKTQuc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 11:50:32 -0500
+        by vger.kernel.org with ESMTP id S1728314AbfKTQv6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 11:51:58 -0500
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1iXT4Q-0007RI-Pi; Wed, 20 Nov 2019 17:43:10 +0100
+        id 1iXT4R-0007RI-KA; Wed, 20 Nov 2019 17:43:11 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -37,9 +37,9 @@ Cc:     Alexander Graf <graf@amazon.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 20/22] KVM: arm/arm64: Let the timer expire in hardirq context on RT
-Date:   Wed, 20 Nov 2019 16:42:34 +0000
-Message-Id: <20191120164236.29359-21-maz@kernel.org>
+Subject: [PATCH 21/22] KVM: vgic-v4: Track the number of VLPIs per vcpu
+Date:   Wed, 20 Nov 2019 16:42:35 +0000
+Message-Id: <20191120164236.29359-22-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120164236.29359-1-maz@kernel.org>
 References: <20191120164236.29359-1-maz@kernel.org>
@@ -54,53 +54,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
+In order to find out whether a vcpu is likely to be the target of
+VLPIs (and to further optimize the way we deal with those), let's
+track the number of VLPIs a vcpu can receive.
 
-The timers are canceled from an preempt-notifier which is invoked with
-disabled preemption which is not allowed on PREEMPT_RT.
-The timer callback is short so in could be invoked in hard-IRQ context
-on -RT.
+This gets implemented with an atomic variable that gets incremented
+or decremented on map, unmap and move of a VLPI.
 
-Let the timer expire on hard-IRQ context even on -RT.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Tested-by: Julien Grall <julien.grall@arm.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20191107095424.16647-1-bigeasy@linutronix.de
+Reviewed-by: Zenghui Yu <yuzenghui@huawei.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@arm.com>
+Link: https://lore.kernel.org/r/20191107160412.30301-2-maz@kernel.org
 ---
- virt/kvm/arm/arch_timer.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/linux/irqchip/arm-gic-v4.h | 2 ++
+ virt/kvm/arm/vgic/vgic-init.c      | 1 +
+ virt/kvm/arm/vgic/vgic-its.c       | 3 +++
+ virt/kvm/arm/vgic/vgic-v4.c        | 2 ++
+ 4 files changed, 8 insertions(+)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index e2bb5bd60227..f182b2380345 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -80,7 +80,7 @@ static inline bool userspace_irqchip(struct kvm *kvm)
- static void soft_timer_start(struct hrtimer *hrt, u64 ns)
- {
- 	hrtimer_start(hrt, ktime_add_ns(ktime_get(), ns),
--		      HRTIMER_MODE_ABS);
-+		      HRTIMER_MODE_ABS_HARD);
- }
+diff --git a/include/linux/irqchip/arm-gic-v4.h b/include/linux/irqchip/arm-gic-v4.h
+index ab1396afe08a..5dbcfc65f21e 100644
+--- a/include/linux/irqchip/arm-gic-v4.h
++++ b/include/linux/irqchip/arm-gic-v4.h
+@@ -32,6 +32,8 @@ struct its_vm {
+ struct its_vpe {
+ 	struct page 		*vpt_page;
+ 	struct its_vm		*its_vm;
++	/* per-vPE VLPI tracking */
++	atomic_t		vlpi_count;
+ 	/* Doorbell interrupt */
+ 	int			irq;
+ 	irq_hw_number_t		vpe_db_lpi;
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 6f50c429196d..b3c5de48064c 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -203,6 +203,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
  
- static void soft_timer_cancel(struct hrtimer *hrt)
-@@ -697,11 +697,11 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
- 	ptimer->cntvoff = 0;
+ 	INIT_LIST_HEAD(&vgic_cpu->ap_list_head);
+ 	raw_spin_lock_init(&vgic_cpu->ap_list_lock);
++	atomic_set(&vgic_cpu->vgic_v3.its_vpe.vlpi_count, 0);
  
--	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
+ 	/*
+ 	 * Enable and configure all SGIs to be edge-triggered and
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 2be6b66b3856..98c7360d9fb7 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -360,7 +360,10 @@ static int update_affinity(struct vgic_irq *irq, struct kvm_vcpu *vcpu)
+ 		if (ret)
+ 			return ret;
  
--	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
--	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-+	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	vtimer->hrtimer.function = kvm_hrtimer_expire;
- 	ptimer->hrtimer.function = kvm_hrtimer_expire;
++		if (map.vpe)
++			atomic_dec(&map.vpe->vlpi_count);
+ 		map.vpe = &vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
++		atomic_inc(&map.vpe->vlpi_count);
  
+ 		ret = its_map_vlpi(irq->host_irq, &map);
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-v4.c b/virt/kvm/arm/vgic/vgic-v4.c
+index 0965fb0c427a..46f875589c47 100644
+--- a/virt/kvm/arm/vgic/vgic-v4.c
++++ b/virt/kvm/arm/vgic/vgic-v4.c
+@@ -309,6 +309,7 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, int virq,
+ 
+ 	irq->hw		= true;
+ 	irq->host_irq	= virq;
++	atomic_inc(&map.vpe->vlpi_count);
+ 
+ out:
+ 	mutex_unlock(&its->its_lock);
+@@ -342,6 +343,7 @@ int kvm_vgic_v4_unset_forwarding(struct kvm *kvm, int virq,
+ 
+ 	WARN_ON(!(irq->hw && irq->host_irq == virq));
+ 	if (irq->hw) {
++		atomic_dec(&irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count);
+ 		irq->hw = false;
+ 		ret = its_unmap_vlpi(virq);
+ 	}
 -- 
 2.20.1
 
