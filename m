@@ -2,99 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65A481039FA
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 13:21:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1690D103A09
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 13:28:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729707AbfKTMVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 07:21:42 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57342 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729133AbfKTMVm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Nov 2019 07:21:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574252501;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0y+Va4NBLdVxptKCFSjrSqw/jstEexITDbBbQwJO4B4=;
-        b=Xyug8OkG/mvCkH7/dqLfjvdMuxYCAf4RpIh+rb8GIqf4VTzri0mwWQxREJRynSPqnp8f45
-        yptG3PaQdYIv0JQ5fp+QBNBNl4VUFVbhzi2+bLIcDp4et9MXGeFYsRsEOmAKq38Ghm2ovd
-        vPN8XZxwg0qZf5q/7N9BXXfFEZ1C8Qo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-tQlcq4eYM4Wq2hkVsEIusQ-1; Wed, 20 Nov 2019 07:21:39 -0500
-Received: by mail-wr1-f70.google.com with SMTP id l3so21037530wrx.21
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 04:21:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3CRYoC+FXuRRRB1nkQ2UTEB7lD0/kwekRSpLwkYD6lI=;
-        b=KfPjjCmClVWZMXhj7iGu4MnHM9WO/x1A9O14ZVIwGvc6f4wyM6eVnaY24JTQ8UbLYI
-         uIl0xzecIDTW2nm5lDZp5hsf6bATFKg4Tpsh8AcncbJI//VcPkVLXP79NwHLIvpMqC1O
-         1Q+cMNhMOO8PFXyz1+FCOYC0TXUAyiMYbOu41nNxya4MzFQER7HiyD8isCPMSWlSORk6
-         NXOA+8vf4Kwq6tuhKjjraD255dj2WG14VNwZjRy5eyZcGdTP+CODI/69lqia8CWHsle9
-         TWows00/mI780j6VIB0K/R4uwkNPuoDIOvweAWItMqKvOlANy4W/oQ5pXAtdKos9swBf
-         QUVA==
-X-Gm-Message-State: APjAAAWcamQMmhHmuWBYj6z+/9SZ/AbK5WwLJKZ14ey4ftu1R1FfG+3f
-        +wWv8/RJAyuf1NTxY11yO/Z8CtLCAFsCX40EVgAQ61CPZ/FBiqMeNl2apN4QT7fgYSVSENOHcPv
-        XvoHwDbIRoKUW
-X-Received: by 2002:adf:dc81:: with SMTP id r1mr3153628wrj.84.1574252497877;
-        Wed, 20 Nov 2019 04:21:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyKPOrrwukpzYwVmy5KkrfH43kXkleuhypNH0euma/SjTaLdY4e1rCrLeWxMJWnK4K36Jyv+Q==
-X-Received: by 2002:adf:dc81:: with SMTP id r1mr3153590wrj.84.1574252497590;
-        Wed, 20 Nov 2019 04:21:37 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:dc24:9a59:da87:5724? ([2001:b07:6468:f312:dc24:9a59:da87:5724])
-        by smtp.gmail.com with ESMTPSA id u16sm31686955wrr.65.2019.11.20.04.21.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Nov 2019 04:21:36 -0800 (PST)
-Subject: Re: [PATCH 4/5] KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM
- functionality
-To:     Jim Mattson <jmattson@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
- <1574101067-5638-5-git-send-email-pbonzini@redhat.com>
- <CALMp9eQ=QXD5sFCADtFY0Bc9wWcn2nhq7XdahD-g4DBSgARYJw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <656c0af1-6c56-8a08-ff86-745409f6968c@redhat.com>
-Date:   Wed, 20 Nov 2019 13:21:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1729473AbfKTM2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 07:28:13 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:34900 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728611AbfKTM2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 07:28:13 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKC93bm048834;
+        Wed, 20 Nov 2019 12:28:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=HcfXjW7i3DttquHo0+qv6rMXzKPvIwZKw2tsvZKypvw=;
+ b=fQ0H+N8qOxUE+WEuHFgNolPD+G5hXK1pKjxW7Da8+3rczxU6fEo60DiNkN3RWzhUDkvX
+ Qle8VZP/kur7C/zNuGMRrqmX1qVNK9PdDwXd88AlMNmnl1cJVpAg3SilEATddkmCsiut
+ hRVAZdnJjurzxUqgbprbazUcXgFZknCRVGEBaltTVcM8Zbh/IagyGfHVUOQo0sv1N3H9
+ ijjcWfRqVXRIUdfgMHWPjs1WB8kZOKaY59z7xv+HB7a1lv3UT/ReFP6kFMmueEq3WOjl
+ B27hrw4fan08QSQthoneQz4tS0ok5uDOKFYbOP3jVX68jEpzRAiefCSgfAdoXioREKu+ +w== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2wa92pw7f6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 12:28:06 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKCCuwx026291;
+        Wed, 20 Nov 2019 12:26:06 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2wd47v37wf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 12:26:06 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAKCQ5d8005586;
+        Wed, 20 Nov 2019 12:26:05 GMT
+Received: from localhost.localdomain (/10.74.127.98)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 20 Nov 2019 04:26:05 -0800
+From:   Liran Alon <liran.alon@oracle.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+        vkuznets@redhat.com, Liran Alon <liran.alon@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: [PATCH] KVM: nVMX: Assume TLB entries of L1 and L2 are tagged differently if L0 use EPT
+Date:   Wed, 20 Nov 2019 14:24:52 +0200
+Message-Id: <20191120122452.57462-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eQ=QXD5sFCADtFY0Bc9wWcn2nhq7XdahD-g4DBSgARYJw@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: tQlcq4eYM4Wq2hkVsEIusQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=655
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911200112
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=733 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911200112
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/11/19 22:06, Jim Mattson wrote:
->> +               switch (index) {
->> +               case MSR_IA32_TSX_CTRL:
->> +                       /* No need to pass TSX_CTRL_CPUID_CLEAR through.=
-  */
->> +                       vmx->guest_msrs[j].mask =3D ~(u64)TSX_CTRL_CPUID=
-_CLEAR;
->> +                       break;
-> Why even bother with the special case here? Does this make the wrmsr fast=
-er?
->=20
+Since commit 1313cc2bd8f6 ("kvm: mmu: Add guest_mode to kvm_mmu_page_role"),
+guest_mode was added to mmu-role and therefore if L0 use EPT, it will
+always run L1 and L2 with different EPTP. i.e. EPTP01!=EPTP02.
 
-No, but it can avoid the wrmsr altogether if the guest uses the same
-DISABLE_RTM setting but a different value for CPUID_CLEAR.
+Because TLB entries are tagged with EP4TA, KVM can assume
+TLB entries populated while running L2 are tagged differently
+than TLB entries populated while running L1.
 
-More important, while I am confident re-enabling TSX while in the kernel
-and only restoring MSR_IA32_TSX_CTRL on return to userspace, I'm more
-wary of changing CPUID bits while the kernel is running.  I will update
-the comment.
+Therefore, update nested_has_guest_tlb_tag() to consider if
+L0 use EPT instead of if L1 use EPT.
 
-Paolo
+Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ arch/x86/kvm/vmx/nested.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 229ca7164318..fdcead2d4dd6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1024,7 +1024,9 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3, bool ne
+  * populated by L2 differently than TLB entries populated
+  * by L1.
+  *
+- * If L1 uses EPT, then TLB entries are tagged with different EPTP.
++ * If L0 uses EPT, L1 and L2 run with different EPTP because
++ * guest_mode is part of kvm_mmu_page_role. Thus, TLB entries
++ * are tagged with different EPTP.
+  *
+  * If L1 uses VPID and we allocated a vpid02, TLB entries are tagged
+  * with different VPID (L1 entries are tagged with vmx->vpid
+@@ -1034,7 +1036,7 @@ static bool nested_has_guest_tlb_tag(struct kvm_vcpu *vcpu)
+ {
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 
+-	return nested_cpu_has_ept(vmcs12) ||
++	return enable_ept ||
+ 	       (nested_cpu_has_vpid(vmcs12) && to_vmx(vcpu)->nested.vpid02);
+ }
+ 
+-- 
+2.20.1
 
