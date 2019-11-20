@@ -2,100 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36102103DF6
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 16:05:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E09D103E44
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 16:25:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729262AbfKTPFq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 10:05:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56727 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728030AbfKTPFq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 10:05:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574262345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=XIYnrCUEYGZooNbi5Qcyd8gI3d85pVdDs8CghR6VpAY=;
-        b=Ku3EN/Tp4S+KL8ZJY9fPS80WJHCSMPwQ8PkEddtbPY6TxyuzYmy7C9TbCRngghLiFUiLeK
-        9nAN7cRPbI4lPMOI8lWDtIgbYxVEioDHbc6L6kxAPz1Ptf8lmFjiI6vuEMqnhSaOSbZbRL
-        tZ1QplQbM3iP6Q6V1adoWcpZy+GyQxc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-fb4ljzP3P7-tMvmd7rpefQ-1; Wed, 20 Nov 2019 10:05:43 -0500
-Received: by mail-wm1-f69.google.com with SMTP id y14so4655442wmj.9
-        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 07:05:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cP6Y0Y2FTtRbIYgs6ZXasrAcdMcWh8XhX6tTnulznEU=;
-        b=Wm0axql7vRPned4fCWwZXZbVsg5sAjgJox72upMYqAl/9WEbykVDa0N9BsN77cevzy
-         xxM4dkdsFQb40PAa/B4ZGrbj1zmwGkDnedYqMNhDILpMIjp3529Zzj+jCcTyK4r/D5s5
-         CdOvj/UyQWgYf5UEdADqAiGStDJ6lb1UuE6uxtV1CqwUZSAGK96EEiDHbqMV+Gvsmqy/
-         JqSA69bTzYQaDwGyT6P82cdp3TJE9TYmcukEpRlXnFR8F+ZUy2MWtp6LCNq6HddK95SG
-         VPIMMWEgGuISOb6Q2KO7h1W+tgxFQlsX8gYUhWweBw5pPM1eBKqc84yP/cyRxlQFHom1
-         RYfA==
-X-Gm-Message-State: APjAAAXI5642SPCyN36rwgSxIKJCLY8Njw5fkaAbOC/ZblxMZNJOGng0
-        phNr5UsGTPGayvDW2+bvfLdHV8fpxcneGfQBATtKetZxtOfOwtawlcGBRXUkaBoG93V32Zk8Nnb
-        2aU+bHbh/vJNR
-X-Received: by 2002:adf:f282:: with SMTP id k2mr4052879wro.387.1574262342537;
-        Wed, 20 Nov 2019 07:05:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzPHF5rOoBbmqXRSeWc3ngbFY4fnPjS5tXIpFuBAd/S+LUKUN5kYp77zEFvnEDxXOE47twiyQ==
-X-Received: by 2002:adf:f282:: with SMTP id k2mr4052833wro.387.1574262342249;
-        Wed, 20 Nov 2019 07:05:42 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:dc24:9a59:da87:5724? ([2001:b07:6468:f312:dc24:9a59:da87:5724])
-        by smtp.gmail.com with ESMTPSA id p9sm21622545wrs.55.2019.11.20.07.05.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Nov 2019 07:05:41 -0800 (PST)
+        id S1729023AbfKTPZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 10:25:57 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:42532 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727067AbfKTPZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 10:25:57 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKFNZE5031481;
+        Wed, 20 Nov 2019 15:25:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=67PKDs+GYPSm513wCO3qMf6C3JDDK7O6a+efBPIjKeY=;
+ b=qcWzhV47hfbv1RUrXurKpBT6rWG8Mj8aaRH5PAbg4YW0r0PKR9DhQil6l3LX6sSEOygt
+ ns8s0cf6LGNffjtt3lObho2kKUwyRS2y0m2PwdrUZCdXW7p6nKnap5VAysNLOj+kg3i7
+ yht8XBzAcx+/HTGbCCKhfGoeLY8pYTZwGX9lJ/ZEwMCXTZgEX818da+IaTcrti4bJEg3
+ H4KPEy2rbikNYufiS6piyeQ4bhhvOGLydfSH5M6Tf6YBun2oyhjE39+YGItFf4C1bFIY
+ ZwNWffITuh8D5N6y/uM7aBXpCIHHMumez9mEErFgmby/gjPkMxjIVrvkS8tza+nZtmO7 OQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2wa8htx8w6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 15:25:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKFO0jn094795;
+        Wed, 20 Nov 2019 15:25:51 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2wcemgb6md-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Nov 2019 15:25:51 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAKFPo90019305;
+        Wed, 20 Nov 2019 15:25:50 GMT
+Received: from [192.168.14.112] (/79.176.218.68)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 20 Nov 2019 07:25:50 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
 Subject: Re: [PATCH] KVM: nVMX: Remove unnecessary TLB flushes on L1<->L2
  switches when L1 use apic-access-page
-To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, jmattson@google.com,
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
+Date:   Wed, 20 Nov 2019 17:25:46 +0200
+Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
+        sean.j.christopherson@intel.com, jmattson@google.com,
         vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
-References: <20191120143307.59906-1-liran.alon@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
-Date:   Wed, 20 Nov 2019 16:05:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191120143307.59906-1-liran.alon@oracle.com>
-Content-Language: en-US
-X-MC-Unique: fb4ljzP3P7-tMvmd7rpefQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <4D796E12-758F-44D6-93B9-0BEFE0E7F712@oracle.com>
+References: <20191120143307.59906-1-liran.alon@oracle.com>
+ <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911200136
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911200136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/11/19 15:33, Liran Alon wrote:
-> "Virtualize APIC accesses" VM-execution control was changed
-> from 0 to 1, OR the value of apic_access_page was changed.
->=20
-> Examining prepare_vmcs02(), one could note that L0 won't flush
-> physical TLB only in case: L0 use VPID, L1 use VPID and L0
-> can guarantee TLB entries populated while running L1 are tagged
-> differently than TLB entries populated while running L2.
-> The last condition can only occur if either L0 use EPT or
-> L0 use different VPID for L1 and L2
-> (i.e. vmx->vpid !=3D vmx->nested.vpid02).
->=20
-> If L0 use EPT, L0 use different EPTP when running L2 than L1
-> (Because guest_mode is part of mmu-role) and therefore SDM section
-> 28.3.3.4 doesn't apply. Otherwise, L0 use different VPID when
-> running L2 than L1 and therefore SDM section 28.3.3.3 doesn't
-> apply.
 
-I don't understand this.  You could still have a stale EPTP entry from a
-previous L2 vmenter.   If L1 uses neither EPT nor VPID, it expects a TLB
-flush to occur on every vmentry, but this won't happen if L0 uses EPT.
 
-Paolo
+> On 20 Nov 2019, at 17:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 20/11/19 15:33, Liran Alon wrote:
+>> "Virtualize APIC accesses" VM-execution control was changed
+>> from 0 to 1, OR the value of apic_access_page was changed.
+>>=20
+>> Examining prepare_vmcs02(), one could note that L0 won't flush
+>> physical TLB only in case: L0 use VPID, L1 use VPID and L0
+>> can guarantee TLB entries populated while running L1 are tagged
+>> differently than TLB entries populated while running L2.
+>> The last condition can only occur if either L0 use EPT or
+>> L0 use different VPID for L1 and L2
+>> (i.e. vmx->vpid !=3D vmx->nested.vpid02).
+>>=20
+>> If L0 use EPT, L0 use different EPTP when running L2 than L1
+>> (Because guest_mode is part of mmu-role) and therefore SDM section
+>> 28.3.3.4 doesn't apply. Otherwise, L0 use different VPID when
+>> running L2 than L1 and therefore SDM section 28.3.3.3 doesn't
+>> apply.
+>=20
+> I don't understand this.  You could still have a stale EPTP entry from =
+a
+> previous L2 vmenter.   If L1 uses neither EPT nor VPID, it expects a =
+TLB
+> flush to occur on every vmentry, but this won't happen if L0 uses EPT.
+
+I don=E2=80=99t seem to get your concern.
+In case L1 don=E2=80=99t use VPID, prepare_vmcs02() will request =
+KVM_REQ_TLB_FLUSH.
+(As it needs to emulate to L1 that on every L1<->L2 switch, the entire =
+physical TLB is flushed)
+As explained in commit message.
+
+>=20
+> Paolo
+
+
+
 
