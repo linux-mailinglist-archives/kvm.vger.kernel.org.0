@@ -2,115 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E09D103E44
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 16:25:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D1F103E54
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 16:28:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729023AbfKTPZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 10:25:57 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:42532 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727067AbfKTPZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 10:25:57 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKFNZE5031481;
-        Wed, 20 Nov 2019 15:25:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=67PKDs+GYPSm513wCO3qMf6C3JDDK7O6a+efBPIjKeY=;
- b=qcWzhV47hfbv1RUrXurKpBT6rWG8Mj8aaRH5PAbg4YW0r0PKR9DhQil6l3LX6sSEOygt
- ns8s0cf6LGNffjtt3lObho2kKUwyRS2y0m2PwdrUZCdXW7p6nKnap5VAysNLOj+kg3i7
- yht8XBzAcx+/HTGbCCKhfGoeLY8pYTZwGX9lJ/ZEwMCXTZgEX818da+IaTcrti4bJEg3
- H4KPEy2rbikNYufiS6piyeQ4bhhvOGLydfSH5M6Tf6YBun2oyhjE39+YGItFf4C1bFIY
- ZwNWffITuh8D5N6y/uM7aBXpCIHHMumez9mEErFgmby/gjPkMxjIVrvkS8tza+nZtmO7 OQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2wa8htx8w6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 15:25:51 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKFO0jn094795;
-        Wed, 20 Nov 2019 15:25:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2wcemgb6md-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 15:25:51 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAKFPo90019305;
-        Wed, 20 Nov 2019 15:25:50 GMT
-Received: from [192.168.14.112] (/79.176.218.68)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Nov 2019 07:25:50 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] KVM: nVMX: Remove unnecessary TLB flushes on L1<->L2
- switches when L1 use apic-access-page
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
-Date:   Wed, 20 Nov 2019 17:25:46 +0200
-Cc:     rkrcmar@redhat.com, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        vkuznets@redhat.com, Joao Martins <joao.m.martins@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4D796E12-758F-44D6-93B9-0BEFE0E7F712@oracle.com>
-References: <20191120143307.59906-1-liran.alon@oracle.com>
- <d7d4629a-c605-72bc-9d71-dd97cb6c0ab4@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911200136
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911200136
+        id S1730944AbfKTP2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 10:28:09 -0500
+Received: from mga06.intel.com ([134.134.136.31]:24075 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730911AbfKTP2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 10:28:08 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Nov 2019 07:28:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,222,1571727600"; 
+   d="scan'208";a="237773796"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 20 Nov 2019 07:28:07 -0800
+Date:   Wed, 20 Nov 2019 07:28:07 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christoffer Dall <christoffer.dall@arm.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@arm.com>,
+        borntraeger@de.ibm.com, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: Memory regions and VMAs across architectures
+Message-ID: <20191120152807.GA32572@linux.intel.com>
+References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
+ <20191120034448.GC25890@linux.intel.com>
+ <20191120115216.GL8317@e113682-lin.lund.arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191120115216.GL8317@e113682-lin.lund.arm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 20, 2019 at 12:52:16PM +0100, Christoffer Dall wrote:
+> On Tue, Nov 19, 2019 at 07:44:48PM -0800, Sean Christopherson wrote:
+> > On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
+> > > First, what prevents user space from messing around with the VMAs after
+> > > kvm_arch_prepare_memory_region() completes?  If nothing, then what is
+> > > the value of the cheks we perform wrt. to VMAs?
+> > 
+> > Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
+> > the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
+> > the VMAs from being invalidated while the stage 2 tables are populated,
+> > e.g. prevents racing with the mmu notifier.  The VMAs could be modified
+> > after prepare_memory_region(), but the mmu notifier will ensure they are
+> > unmapped from stage2 prior the the host change taking effect.  So I think
+> > you're safe (famous last words).
+> > 
+> 
+> So we for example check:
+> 
+> 	writeable = !(memslot->falgs & KVM_MEM_READONLY);
+> 	if (writeable && !(vma->vm_flags & VM_WRITE))
+> 		return -EPERM;
+> 
+> And yes, user space can then unmap the VMAs and MMU notifiers will
+> unmap the stage 2 entries, but user space can then create a new
+> read-only VMA covering the area of the memslot and the fault-handling
+> path will have to deal with this same check later.Only, the fault
+> handling path, via gfn_to_pfn_prot(), returns an address based on an
+> entirely different set of mechanics, than our prepare_memory_region,
+> which I think indicates we are doing something wrong somewhere, and we
+> should have a common path for faulting things in, for I/O, both if we do
+> this up-front or if we do this at fault time.
 
+Unconditionally interpreting vm_pgoff as a physical address does not seem
+correct.  There are cases where that might be correct, e.g. if the backing
+(virtual) file is a flat representation of the address space, which appears
+to be the case on some architectures, e.g. for PCI handling.  But even then
+there should be some confirmation that the VMA is actually associated with
+such a file, otherwise KVM is at the mercy of userspace to do the right
+thing (unless there are other guarantees on arm I am unaware of).
 
-> On 20 Nov 2019, at 17:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 20/11/19 15:33, Liran Alon wrote:
->> "Virtualize APIC accesses" VM-execution control was changed
->> from 0 to 1, OR the value of apic_access_page was changed.
->>=20
->> Examining prepare_vmcs02(), one could note that L0 won't flush
->> physical TLB only in case: L0 use VPID, L1 use VPID and L0
->> can guarantee TLB entries populated while running L1 are tagged
->> differently than TLB entries populated while running L2.
->> The last condition can only occur if either L0 use EPT or
->> L0 use different VPID for L1 and L2
->> (i.e. vmx->vpid !=3D vmx->nested.vpid02).
->>=20
->> If L0 use EPT, L0 use different EPTP when running L2 than L1
->> (Because guest_mode is part of mmu-role) and therefore SDM section
->> 28.3.3.4 doesn't apply. Otherwise, L0 use different VPID when
->> running L2 than L1 and therefore SDM section 28.3.3.3 doesn't
->> apply.
->=20
-> I don't understand this.  You could still have a stale EPTP entry from =
-a
-> previous L2 vmenter.   If L1 uses neither EPT nor VPID, it expects a =
-TLB
-> flush to occur on every vmentry, but this won't happen if L0 uses EPT.
+> > > Second, why would arm/arm64 need special handling for I/O mappings
+> > > compared to other architectures, and how is this dealt with for
+> > > x86/s390/power/... ?
+> > 
+> > As Ard mentioned, it looks like an optimization.  The "passthrough"
+> > part from the changelog implies that VM_PFNMAP memory regions are exclusive
+> > to the guest.  Mapping the entire thing would be a nice boot optimization
+> > as it would save taking page faults on every page of the MMIO region.
+> > 
+> > As for how this is different from other archs... at least on x86, VM_PFNMAP
+> > isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
+> > pages may actually trigger allocation, and remapping the addresses could be
+> > flat out wrong.
+> 
+> What does VM_PFNMAP mean on x86?  I didn't think we were relying on
+> anything architecture specific in their meaning in the arm code, and I
+> thought the VM_PFNMAP was a generic mm flag with generic mm meaning,
+> but I could be wrong here?
 
-I don=E2=80=99t seem to get your concern.
-In case L1 don=E2=80=99t use VPID, prepare_vmcs02() will request =
-KVM_REQ_TLB_FLUSH.
-(As it needs to emulate to L1 that on every L1<->L2 switch, the entire =
-physical TLB is flushed)
-As explained in commit message.
+No, you're correct, VM_PFNMAP is a generic flag that state the VMA doesn't
+have an associated struct page and is being managed directly by something
+other than the core mmu.
 
->=20
-> Paolo
+But not having a struct page doesn't guarantee that the PFN is backed by
+MMIO, or that it is exclusive to the guest (although in practice this is
+probably the case 99.9999% of the time).  E.g. x86 supports having guest
+memory backed by regular ram that is hidden from the host kernel via
+'mem=', which will show up as VM_PFNMAP.
 
+> Is there any valid semantics for creating a memslot backed by a
+> VM_PFNMAP on x86, and if so, what are those?
+> 
+> Similarly, if you do map a device region straight to the guest on x86,
+> how is that handled?  (A pointer to the right place in the myriad of EPT
+> and shadow code in x86 would be much appreciated.)
 
-
-
+There is no special handling in x86 for VM_PFNMAP memory, we rely on KVM's
+generic __gfn_to_pfn_memslot() to retrieve the PFN on demand, and use
+mmu_notifier_seq to ensure the stale PFNs (invalidated in the host) aren't
+inserted into the guest page tables.  Effectively the same thing arm does,
+sans the prepare_memory_region() shenanigans.
