@@ -2,102 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1209D103214
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 04:42:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3668C10321A
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 04:44:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727549AbfKTDm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Nov 2019 22:42:29 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:33725 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727264AbfKTDm2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Nov 2019 22:42:28 -0500
-Received: by mail-pj1-f65.google.com with SMTP id o14so3547217pjr.0;
-        Tue, 19 Nov 2019 19:42:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=QoisCnfLv/ffzmjOdQd+UsoR7NAQmnSFonw4OyGwCJE=;
-        b=VyHcXq+3Xbl+VQAneuUwXtlR/XjQed7nkhvdfFHHI+xxxvFJQDGnGhI0MD70+gW0Eu
-         WJXIvlAYYgn5FiPy7bkYfjOsCEHLMDboqAm3Jn4b1czHHUJNC1LWAioSuvunvEBYRVsu
-         QBbcRCJ3FEFlsEiapKyyavEtfXUkITiri+jptnq0LlDExW17fwY2ptkRVAt1FA3zNgm1
-         HrqcaqS7rCKSFoGK1oaUMzxg2fYYraAcMxcDnBwDFnjeIuqt/ZsoEZUrMranIH4N8WhK
-         NrPyMLpA2rhVLsiKHFGm7M32V47fSbFV9Nr3TT3pl5uHcT2GGMOnEQzlGncho8Vn8UdR
-         rV2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=QoisCnfLv/ffzmjOdQd+UsoR7NAQmnSFonw4OyGwCJE=;
-        b=cR3c7jfch22znRC7HExImHag1UHPVE+hHePNGmVlzqdrY5QOG6nV/sEAJqQ2DNkljB
-         WHmml8q/CLVhJIQjLV9aUDZZ5VJJLnbfqeRlpSeJGLOy2lCmjZi7LlmIpv3P5GTjUjmS
-         VIRpjj/3zjjMFSdqs6YyrtN3Rt4jf8ebMUjfqC0jBeKNFKl6dnJZWzDlSObRwtztM1SZ
-         QFB9In4hKL37lMN7svoBVGsLtMBKBzEYPWu/4W/6HXMqFE7t077QcM6fHGYtZgJaXQKm
-         qJIVi+/uBSHMygp9Ty/ss3Etq8qnypR3qOX7988gzrru/J2uY3+GBsDdsvXW33QbWLX8
-         iA+w==
-X-Gm-Message-State: APjAAAV8KcsyAkavxxM4wrUlCtqIOHd6+s928zXd4/WmU8Kv2bEmSaK4
-        lS5y7dTNhsCtKfO71Pu5yhAirl16
-X-Google-Smtp-Source: APXvYqweNjNrrD4StHAvcjhP5p1I7NOnMWrAdfN9rPgJbgZBOxs/g14ocpCeEPRf1Rvme0Gc8qnX+Q==
-X-Received: by 2002:a17:90a:fc85:: with SMTP id ci5mr1278738pjb.17.1574221347686;
-        Tue, 19 Nov 2019 19:42:27 -0800 (PST)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id w27sm25916842pgc.20.2019.11.19.19.42.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 19 Nov 2019 19:42:27 -0800 (PST)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: [PATCH v3 2/2] KVM: LAPIC: micro-optimize fixed mode ipi delivery
-Date:   Wed, 20 Nov 2019 11:42:09 +0800
-Message-Id: <1574221329-12370-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1574221329-12370-1-git-send-email-wanpengli@tencent.com>
-References: <1574221329-12370-1-git-send-email-wanpengli@tencent.com>
+        id S1727594AbfKTDou (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Nov 2019 22:44:50 -0500
+Received: from mga03.intel.com ([134.134.136.65]:49028 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727357AbfKTDou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Nov 2019 22:44:50 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Nov 2019 19:44:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,220,1571727600"; 
+   d="scan'208";a="204597622"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga008.fm.intel.com with ESMTP; 19 Nov 2019 19:44:48 -0800
+Date:   Tue, 19 Nov 2019 19:44:48 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Christoffer Dall <christoffer.dall@arm.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@arm.com>,
+        borntraeger@de.ibm.com, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: Memory regions and VMAs across architectures
+Message-ID: <20191120034448.GC25890@linux.intel.com>
+References: <20191108111920.GD17608@e113682-lin.lund.arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191108111920.GD17608@e113682-lin.lund.arm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Fri, Nov 08, 2019 at 12:19:20PM +0100, Christoffer Dall wrote:
+> Hi,
+> 
+> I had a look at our relatively complicated logic in
+> kvm_arch_prepare_memory_region(), and was wondering if there was room to
+> unify some of this handling between architectures.
+> 
+> (If you haven't seen our implementation, you can find it in
+> virt/kvm/arm/mmu.c, and it has lovely ASCII art!)
+> 
+> I then had a look at the x86 code, but that doesn't actually do anything
+> when creating memory regions, which makes me wonder why the arhitectures
+> differ in this aspect.
+> 
+> The reason we added the logic that we have for arm/arm64 is that we
+> don't really want to take faults for I/O accesses.  I'm not actually
+> sure if this is a corretness thing, or an optimization effort, and the
+> original commit message doesn't really explain.  Ard, you wrote that
+> code, do you recall the details?
+> 
+> In any case, what we do is to check for each VMA backing a memslot, we
+> check if the memslot flags and vma flags are a reasonable match, and we
+> try to detect I/O mappings by looking for the VM_PFNMAP flag on the VMA
+> and pre-populate stage 2 page tables (our equivalent of EPT/NPT/...).
+> However, there are some things which are not clear to me:
+> 
+> First, what prevents user space from messing around with the VMAs after
+> kvm_arch_prepare_memory_region() completes?  If nothing, then what is
+> the value of the cheks we perform wrt. to VMAs?
 
-This patch optimizes redundancy logic before fixed mode ipi is delivered
-in the fast path, broadcast handling needs to go slow path, so the delivery
-mode repair can be delayed to before slow path.
+Arm's prepare_memory_region() holds mmap_sem and mmu_lock while processing
+the VMAs and populating the stage 2 page tables.  Holding mmap_sem prevents
+the VMAs from being invalidated while the stage 2 tables are populated,
+e.g. prevents racing with the mmu notifier.  The VMAs could be modified
+after prepare_memory_region(), but the mmu notifier will ensure they are
+unmapped from stage2 prior the the host change taking effect.  So I think
+you're safe (famous last words).
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/irq_comm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> Second, why would arm/arm64 need special handling for I/O mappings
+> compared to other architectures, and how is this dealt with for
+> x86/s390/power/... ?
 
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 8ecd48d..aa88156 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -52,15 +52,15 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
- 	unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
- 	unsigned int dest_vcpus = 0;
- 
-+	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
-+		return r;
-+
- 	if (irq->dest_mode == 0 && irq->dest_id == 0xff &&
- 			kvm_lowest_prio_delivery(irq)) {
- 		printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
- 		irq->delivery_mode = APIC_DM_FIXED;
- 	}
- 
--	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
--		return r;
--
- 	memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
--- 
-2.7.4
+As Ard mentioned, it looks like an optimization.  The "passthrough"
+part from the changelog implies that VM_PFNMAP memory regions are exclusive
+to the guest.  Mapping the entire thing would be a nice boot optimization
+as it would save taking page faults on every page of the MMIO region.
+
+As for how this is different from other archs... at least on x86, VM_PFNMAP
+isn't guaranteed to be passthrough or even MMIO, e.g. prefaulting the
+pages may actually trigger allocation, and remapping the addresses could be
+flat out wrong.
+
+
+  commit 8eef91239e57d2e932e7470879c9a504d5494ebb
+  Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+  Date:   Fri Oct 10 17:00:32 2014 +0200
+
+    arm/arm64: KVM: map MMIO regions at creation time
+
+    There is really no point in faulting in memory regions page by page
+    if they are not backed by demand paged system RAM but by a linear
+    passthrough mapping of a host MMIO region. So instead, detect such
+    regions at setup time and install the mappings for the backing all
+    at once.
+
 
