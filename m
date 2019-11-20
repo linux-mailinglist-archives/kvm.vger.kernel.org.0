@@ -2,177 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F29CE103506
-	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 08:17:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 142C61035C7
+	for <lists+kvm@lfdr.de>; Wed, 20 Nov 2019 09:04:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727940AbfKTHRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 02:17:35 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:19872 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727888AbfKTHRX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 02:17:23 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dd4e87e0000>; Tue, 19 Nov 2019 23:17:18 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Tue, 19 Nov 2019 23:17:17 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Tue, 19 Nov 2019 23:17:17 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 20 Nov
- 2019 07:17:16 +0000
-Subject: Re: [PATCH v6 17/24] mm/gup: track FOLL_PIN pages
-To:     Jan Kara <jack@suse.cz>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        id S1727677AbfKTIEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 03:04:16 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34127 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727227AbfKTIEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 03:04:15 -0500
+Received: by mail-io1-f67.google.com with SMTP id q83so26667542iod.1
+        for <kvm@vger.kernel.org>; Wed, 20 Nov 2019 00:04:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=BacJ7EBR9ytS2/6OwHcGzjIg710Zu5B5M5aCR72bJWA=;
+        b=VO8JDuiYDFx9cSL5SqJK3STzGgAjyrHydkFR2rL2wLLXNbBFnDHTepn7fMtUJpbe4E
+         obnzLYzJIX2DCUk7C9YHLXU+G/1wcpLygGrJzo4jNx1u9lQjIztdjytuGSy8eYhTw7xO
+         FJAdNaw27IoeGn1j3JYhZNcTVl1HUxjR62WpPXz9x2KYxe+Wh7ujofcnk4UlKbm9EThJ
+         4ltquqg9ml2N8qlVXt26KMAokZAyaFR0pjwaQmFfZC5vVWS5bnQ/9I+2WYKOL5KpV6vj
+         L44Q1Om9Kbq0JPnB6E0RsIhuJOl9iQ+syl0zVUoU/MXq4vVI6t+72g1afJuZlmB060iZ
+         a+1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=BacJ7EBR9ytS2/6OwHcGzjIg710Zu5B5M5aCR72bJWA=;
+        b=d2Xnc/RxQ6OtdFmHnHGgZb0cflPibbrmHyNrnxTB2Co1HeB08yPwDXV3hgZD8yHQ80
+         QAUOJBuc4ZH8j7hXE7Flekz8Nm/e1RYd82FCmI08hb4BaQDZRvdP2431r32JIzZfh4jH
+         Okb5jfgjCWDtbLHyqMOCRl9Z69lLS4cuEY2O5v6rXthtL4VuQo23qFLTKlrI8dXodVf8
+         nZdEq3QkJRu8LB6mQc2c+wZtd4Sx6IXu93aUCUn+MLKYDG3uk/yFJ3Wk7y+NPIdAU4EY
+         0A9yxU0xemfP5VFXZ8LBAzvBdJlCsF+kRj13K6BlQcsxUmrw0gs39u1LSN0xTUJoXI27
+         bfPg==
+X-Gm-Message-State: APjAAAWWr8YHcLJzsj0kdbMAIaiKp4ldVUvAaTJYQ8l0ajatJByHcye4
+        HDlKIMcesJIiRsxSacQpWmWcPg==
+X-Google-Smtp-Source: APXvYqy+717NLJlVd20jJMYLKR/1De7mJqNFF+/oYOiwoN3AGBAq1ytMXqic/gdugH11qYE0ztUcQg==
+X-Received: by 2002:a5e:a70e:: with SMTP id b14mr1088130iod.166.1574237054759;
+        Wed, 20 Nov 2019 00:04:14 -0800 (PST)
+Received: from localhost (67-0-26-4.albq.qwest.net. [67.0.26.4])
+        by smtp.gmail.com with ESMTPSA id a11sm6274182ilb.72.2019.11.20.00.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2019 00:04:14 -0800 (PST)
+Date:   Wed, 20 Nov 2019 00:04:13 -0800 (PST)
+From:   Paul Walmsley <paul.walmsley@sifive.com>
+X-X-Sender: paulw@viisi.sifive.com
+To:     Anup Patel <Anup.Patel@wdc.com>
+cc:     Palmer Dabbelt <palmer@sifive.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim K <rkrcmar@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Graf <graf@amazon.com>,
+        Atish Patra <Atish.Patra@wdc.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191119081643.1866232-1-jhubbard@nvidia.com>
- <20191119081643.1866232-18-jhubbard@nvidia.com>
- <20191119113746.GD25605@quack2.suse.cz>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <92d0385a-90be-e900-e5ec-1eeafd24ff81@nvidia.com>
-Date:   Tue, 19 Nov 2019 23:17:16 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+        Anup Patel <anup@brainfault.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v9 03/22] RISC-V: Add initial skeletal KVM support
+In-Reply-To: <20191016160649.24622-4-anup.patel@wdc.com>
+Message-ID: <alpine.DEB.2.21.9999.1911200002310.490@viisi.sifive.com>
+References: <20191016160649.24622-1-anup.patel@wdc.com> <20191016160649.24622-4-anup.patel@wdc.com>
+User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
 MIME-Version: 1.0
-In-Reply-To: <20191119113746.GD25605@quack2.suse.cz>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1574234238; bh=XS1elsnwWY0rNKRca94CapnxJDsibdDqnD818d/G+io=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=cgfFkxVckFKph83JpaLozX1BPV67pcDvc4zYdLq9ggt/6dUFhjSjEUfkPlJ6YS85y
-         Tzbfkd2Ssh+1cnbHZVu22ZxAYWyCv1b8X10VXVS5hS2byaCvY0Vg9ipA7x3Fo3odW9
-         mJ8QOlZhdrlbORb/tooq8lEuT6AxTt5cVxDPZE9pOLHClbe3whACaJnf15veA5FbxQ
-         N7Z3c9PH3VSrAZwjy0whi7ko1Q5RU1C8PJUljAOR0JzSWQ7k8UX3NdOtoVh+QLcZ15
-         DmGFCQcpIJbV8FkJKisaDhzEEJcucwABlIhBeXVZln5jK7XEYXo5n/Z8Yardu3zdea
-         jFCxWfbFbwpdA==
+Content-Type: text/plain; charset=US-ASCII
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/19/19 3:37 AM, Jan Kara wrote:
-> On Tue 19-11-19 00:16:36, John Hubbard wrote:
->> @@ -2025,6 +2149,20 @@ static int __record_subpages(struct page *page, unsigned long addr,
->>  	return nr;
->>  }
->>  
->> +static bool __pin_compound_head(struct page *head, int refs, unsigned int flags)
->> +{
+Hi,
+
+On Wed, 16 Oct 2019, Anup Patel wrote:
+
+> This patch adds initial skeletal KVM RISC-V support which has:
+> 1. A simple implementation of arch specific VM functions
+>    except kvm_vm_ioctl_get_dirty_log() which will implemeted
+>    in-future as part of stage2 page loging.
+> 2. Stubs of required arch specific VCPU functions except
+>    kvm_arch_vcpu_ioctl_run() which is semi-complete and
+>    extended by subsequent patches.
+> 3. Stubs for required arch specific stage2 MMU functions.
 > 
-> I don't quite like the proliferation of names starting with __. I don't
-> think there's a good reason for that, particularly in this case. Also 'pin'
-> here is somewhat misleading as we already use term "pin" for the particular
-> way of pinning the page. We could have grab_compound_head() or maybe
-> nail_compound_head() :), but you're native speaker so you may come up with
-> better word.
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Alexander Graf <graf@amazon.com>
+
+Olof's autobuilder found an issue with this patch (below)
+
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> new file mode 100644
+> index 000000000000..9459709656be
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -0,0 +1,81 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+
+This should be
+
+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+
+to match the license used in the kvm.h files in other architectures.
 
 
-Yes, it is ugly naming, I'll change these as follows:
-
-    __pin_compound_head() --> grab_compound_head()    
-    __record_subpages()   --> record_subpages()
-
-I loved the "nail_compound_head()" suggestion, it just seems very vivid, but
-in the end, I figured I'd better keep it relatively drab and colorless. :)
-
-> 
->> +	if (flags & FOLL_PIN) {
->> +		if (unlikely(!try_pin_compound_head(head, refs)))
->> +			return false;
->> +	} else {
->> +		head = try_get_compound_head(head, refs);
->> +		if (!head)
->> +			return false;
->> +	}
->> +
->> +	return true;
->> +}
->> +
->>  static void put_compound_head(struct page *page, int refs)
->>  {
->>  	/* Do a get_page() first, in case refs == page->_refcount */
-> 
-> put_compound_head() needs similar treatment as undo_dev_pagemap(), doesn't
-> it?
-> 
-
-Yes, will fix that up.
-
-
->> @@ -968,7 +973,18 @@ struct page *follow_devmap_pmd(struct vm_area_struct *vma, unsigned long addr,
->>  	if (!*pgmap)
->>  		return ERR_PTR(-EFAULT);
->>  	page = pfn_to_page(pfn);
->> -	get_page(page);
->> +
->> +	if (flags & FOLL_GET)
->> +		get_page(page);
->> +	else if (flags & FOLL_PIN) {
->> +		/*
->> +		 * try_pin_page() is not actually expected to fail here because
->> +		 * we hold the pmd lock so no one can unmap the pmd and free the
->> +		 * page that it points to.
->> +		 */
->> +		if (unlikely(!try_pin_page(page)))
->> +			page = ERR_PTR(-EFAULT);
->> +	}
-> 
-> This pattern is rather common. So maybe I'd add a helper grab_page(page,
-> flags) doing
-> 
-> 	if (flags & FOLL_GET)
-> 		get_page(page);
-> 	else if (flags & FOLL_PIN)
-> 		return try_pin_page(page);
-> 	return true;
-> 
-
-OK.
-
-> Otherwise the patch looks good to me now.
-> 
-> 								Honza
-
-Great! I thought I'd have a v7 out today, but fate decided to have me repair
-my test machine instead. So, soon. ha. :)
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+- Paul
