@@ -2,73 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B5B0104BB4
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 08:16:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C08F5104D28
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 09:04:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbfKUHQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 02:16:05 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53750 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726358AbfKUHQE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 02:16:04 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id AAC8DC4C53B3229B3B3C;
-        Thu, 21 Nov 2019 15:16:01 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Thu, 21 Nov 2019
- 15:15:52 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     <maz@kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
-        <suzuki.poulose@arm.com>
-CC:     <linmiaohe@huawei.com>, <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: [PATCH] KVM: arm: get rid of unused arg in cpu_init_hyp_mode()
-Date:   Thu, 21 Nov 2019 15:15:59 +0800
-Message-ID: <1574320559-5662-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726529AbfKUIEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 03:04:04 -0500
+Received: from verein.lst.de ([213.95.11.211]:44639 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725842AbfKUIEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 03:04:04 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C80DF68BFE; Thu, 21 Nov 2019 09:03:56 +0100 (CET)
+Date:   Thu, 21 Nov 2019 09:03:56 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v7 02/24] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191121080356.GA24784@lst.de>
+References: <20191121071354.456618-1-jhubbard@nvidia.com> <20191121071354.456618-3-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191121071354.456618-3-jhubbard@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+On Wed, Nov 20, 2019 at 11:13:32PM -0800, John Hubbard wrote:
+> There are four locations in gup.c that have a fair amount of code
+> duplication. This means that changing one requires making the same
+> changes in four places, not to mention reading the same code four
+> times, and wondering if there are subtle differences.
+> 
+> Factor out the common code into static functions, thus reducing the
+> overall line count and the code's complexity.
+> 
+> Also, take the opportunity to slightly improve the efficiency of the
+> error cases, by doing a mass subtraction of the refcount, surrounded
+> by get_page()/put_page().
+> 
+> Also, further simplify (slightly), by waiting until the the successful
+> end of each routine, to increment *nr.
 
-As arg dummy is not really needed, there's no need to pass
-NULL when calling cpu_init_hyp_mode(). So clean it up.
+Any reason for the spurious underscore in the function name?
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
- virt/kvm/arm/arm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Otherwise this looks fine and might be a worthwhile cleanup to feed
+Andrew for 5.5 independent of the gut of the changes.
 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 86c6aa1cb58e..a5470f1b1a19 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1315,7 +1315,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 	}
- }
- 
--static void cpu_init_hyp_mode(void *dummy)
-+static void cpu_init_hyp_mode(void)
- {
- 	phys_addr_t pgd_ptr;
- 	unsigned long hyp_stack_ptr;
-@@ -1349,7 +1349,7 @@ static void cpu_hyp_reinit(void)
- 	if (is_kernel_in_hyp_mode())
- 		kvm_timer_init_vhe();
- 	else
--		cpu_init_hyp_mode(NULL);
-+		cpu_init_hyp_mode();
- 
- 	kvm_arm_init_debug();
- 
--- 
-2.19.1
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
