@@ -2,152 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AAE931047AF
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 01:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D60131047CA
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 01:58:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbfKUAn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 19:43:58 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:42194 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726202AbfKUAn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 19:43:58 -0500
-Received: by mail-oi1-f195.google.com with SMTP id o12so1582749oic.9;
-        Wed, 20 Nov 2019 16:43:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=5duga5hStByFIxQLF43Hvhp6L3zIT7bydBtcmTR/tNg=;
-        b=Z2jQgMmagOSywgBB1g5iBKgaB62SxXVn9HvxA4TtxuZrKXbOMqZUqr3DtxauiYDSlN
-         BYkT35Hc+jUN9XLFQn6JWhbNUelrm62kG2i9tIE4VXXY5kXS5B+TFmxplGVgOg5WZGxL
-         hrhs32e18U6DV8jaGp+0X2katGRzjXEB2RWmeCW3y1ihWRGaavq4um+cydwKTDxfSTDC
-         nrS79UORkjT9JA9140folZWP1QAh3sH9nR4t+jaOPo3QK/mRMh8/AagzcCiExuSddsS4
-         IxtLM8X4ZR6KJnCbn422LRGaOLR/BQ+r27/kTPnFjP3K3Pd2itpCq67taR3Qk0/QG23I
-         BRpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=5duga5hStByFIxQLF43Hvhp6L3zIT7bydBtcmTR/tNg=;
-        b=KPGV3prKDTWIP295tLh7FQhb76Qwf0PKxfOb2sIXuzROyK7JXgJW8DSXrDA7KdgVik
-         ePpweVIAMz5fNzFN+WTpi6vrnrZDUwDVn+7RAGFMOOkwEejIOlpDGhbEhITstxq/Yzke
-         313AOp+pTkMWJ7bMSE1ySNHtIdIGgOuq663KpgEaqJlc9+/NsFj0I2PmWvhDOCjBrNw1
-         VNC8gVRUEJGlpdDS0rPODc3mfmgGi/Qyr32MYOliRekXmsDn07Y4Sk7xUAmxCdYCr9mf
-         XbibNe1SiEjxum65DHWYh7sUEuTrR5LcBPtenMAlB80rIQAdrMJS7WAJhEzF0+Iomemv
-         X79w==
-X-Gm-Message-State: APjAAAU4zyDbWyFw69R3JG51w83P1pZhBS/Edq/dgiMYaX2sZbGv6Qza
-        Nx7IXg2t74FGDjKOSK8CR08j/xA48rDIvniR1jI=
-X-Google-Smtp-Source: APXvYqyIgj3f6exokWOiCedzvm8QAgFFlxitYlAX6t3TqpDAeoum3Jhy9OJKkCMSSCSK5Pl1VJ8UKJI5Jx1z5wjzZhI=
-X-Received: by 2002:aca:c50f:: with SMTP id v15mr5503455oif.5.1574297037472;
- Wed, 20 Nov 2019 16:43:57 -0800 (PST)
-MIME-Version: 1.0
-References: <1574221329-12370-1-git-send-email-wanpengli@tencent.com>
- <61E34902-0743-4DAF-A7DF-94C0E51CDA08@oracle.com> <CA11DF59-9969-4E1C-AF8A-8102D2D9D8A9@oracle.com>
-In-Reply-To: <CA11DF59-9969-4E1C-AF8A-8102D2D9D8A9@oracle.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 21 Nov 2019 08:43:49 +0800
-Message-ID: <CANRm+CzCyauiJ9TGYxkLw61--WVT2L2ARj8JhedJN+ZhD64uKg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        id S1726573AbfKUA6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 19:58:47 -0500
+Received: from ozlabs.org ([203.11.71.1]:60897 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726202AbfKUA6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 19:58:46 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 47JLm40WNcz9sPL; Thu, 21 Nov 2019 11:58:43 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1574297924;
+        bh=tCEjjjB7GWqDoKkmTHHtPfHvbR0elnZvywA0y/9MLo0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=EyVBCYXMbgL/PZAgLOTtz0gX0pXijPuX9pUZJRgcHWhLB/w4oLX2BSi4I/VPlBnOC
+         q0FYGB73r6i3IDHdz26veT6iTYIPVJLENM+xVShNbLHYT6ymE19SLFyXyQA/XjtblG
+         dqtn6WBoa1baAQuibNkZrG2Ez5v4xLF3w4mfR4fA=
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Alex Williamson <alex.williamson@redhat.com>, clg@kaod.org
+Cc:     groug@kaod.org, philmd@redhat.com, qemu-ppc@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Jason Wang <jasowang@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        Riku Voipio <riku.voipio@iki.fi>,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Subject: [PATCH 0/5] vfio/spapr: Handle changes of master irq chip for VFIO devices
+Date:   Thu, 21 Nov 2019 11:56:02 +1100
+Message-Id: <20191121005607.274347-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Nov 2019 at 07:55, Liran Alon <liran.alon@oracle.com> wrote:
->
->
->
-> > On 21 Nov 2019, at 1:36, Liran Alon <liran.alon@oracle.com> wrote:
-> >
-> >
-> >
-> >> On 20 Nov 2019, at 5:42, Wanpeng Li <kernellwp@gmail.com> wrote:
-> >>
-> >> From: Wanpeng Li <wanpengli@tencent.com>
-> >>
-> >> ICR and TSCDEADLINE MSRs write cause the main MSRs write vmexits in
-> >> our product observation, multicast IPIs are not as common as unicast
-> >> IPI like RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc.
-> >
-> > Have you also had the chance to measure non-Linux workloads. Such as Wi=
-ndows?
-> >
-> >>
-> >> This patch tries to optimize x2apic physical destination mode, fixed
-> >> delivery mode single target IPI. The fast path is invoked at
-> >> ->handle_exit_irqoff() to emulate only the effect of the ICR write
-> >> itself, i.e. the sending of IPIs.  Sending IPIs early in the VM-Exit
-> >> flow reduces the latency of virtual IPIs by avoiding the expensive bit=
-s
-> >> of transitioning from guest to host, e.g. reacquiring KVM's SRCU lock.
-> >> Especially when running guest w/ KVM_CAP_X86_DISABLE_EXITS capability
-> >> enabled or guest can keep running, IPI can be injected to target vCPU
-> >> by posted-interrupt immediately.
-> >
-> > May I suggest an alternative phrasing? Something such as:
-> >
-> > =E2=80=9C=E2=80=9D=E2=80=9D
-> > This patch introduce a mechanism to handle certain performance-critical=
- WRMSRs
-> > in a very early stage of KVM VMExit handler.
-> >
-> > This mechanism is specifically used for accelerating writes to x2APIC I=
-CR that
-> > attempt to send a virtual IPI with physical destination-mode, fixed del=
-ivery-mode
-> > and single target. Which was found as one of the main causes of VMExits=
- for
-> > Linux workloads.
-> >
-> > The reason this mechanism significantly reduce the latency of such virt=
-ual IPIs
-> > is by sending the physical IPI to the target vCPU in a very early stage=
- of KVM
-> > VMExit handler, before host interrupts are enabled and before expensive
-> > operations such as reacquiring KVM=E2=80=99s SRCU lock.
-> > Latency is reduced even more when KVM is able to use APICv posted-inter=
-rupt
-> > mechanism (which allows to deliver the virtual IPI directly to target v=
-CPU without
-> > the need to kick it to host).
-> > =E2=80=9C=E2=80=9D=E2=80=9D
-> >
-> >>
-> >> Testing on Xeon Skylake server:
-> >>
-> >> The virtual IPI latency from sender send to receiver receive reduces
-> >> more than 200+ cpu cycles.
-> >>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> >> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> >> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> Cc: Liran Alon <liran.alon@oracle.com>
-> >> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > I see you used the code I provided my reply to v2. :)
-> > I had only some very minor comments inline below. Therefore:
-> > Reviewed-by: Liran Alon <liran.alon@oracle.com>
->
-> Oh there is a small thing pointed by Sean I agree with (and missed in my =
-review) before this Reviewed-by can be given.
-> You should avoid performing accelerated WRMSR handling in case vCPU is in=
- guest-mode.
-> (From obvious reasons as L1 for example could intercept this WRMSR=E2=80=
-=A6)
+Due to the way feature negotiation works in PAPR (which is a
+paravirtualized platform), we can end up changing the global irq chip
+at runtime, including it's KVM accelerate model.  That causes
+complications for VFIO devices with INTx, which wire themselves up
+directly to the KVM irqchip for performance.
 
-Yes, I add !is_guest_mode(vcpu) checking in v1, but careless lose it
-in further versions.
+This series introduces a new notifier to let VFIO devices (and
+anything else that needs to in the future) know about changes to the
+master irqchip.  It modifies VFIO to respond to the notifier,
+reconnecting itself to the new KVM irqchip as necessary.
 
-    Wanpeng
+In particular this removes a misleading (though not wholly inaccurate)
+warning that occurs when using VFIO devices on a pseries machine type
+guest.
+
+Open question: should this go into qemu-4.2 or wait until 5.0?  It's
+has medium complexity / intrusiveness, but it *is* a bugfix that I
+can't see a simpler way to fix.  It's effectively a regression from
+qemu-4.0 to qemu-4.1 (because that introduced XIVE support by
+default), although not from 4.1 to 4.2.
+
+Changes since RFC:
+ * Fixed some incorrect error paths pointed by aw in 3/5
+ * 5/5 had some problems previously, but they have been obsoleted by
+   other changes merged in the meantime
+
+David Gibson (5):
+  kvm: Introduce KVM irqchip change notifier
+  vfio/pci: Split vfio_intx_update()
+  vfio/pci: Respond to KVM irqchip change notifier
+  spapr: Handle irq backend changes with VFIO PCI devices
+  spapr: Work around spurious warnings from vfio INTx initialization
+
+ accel/kvm/kvm-all.c    | 18 ++++++++++++
+ accel/stubs/kvm-stub.c | 12 ++++++++
+ hw/ppc/spapr_irq.c     | 17 +++++++++++-
+ hw/vfio/pci.c          | 62 +++++++++++++++++++++++++++---------------
+ hw/vfio/pci.h          |  1 +
+ include/sysemu/kvm.h   |  5 ++++
+ 6 files changed, 92 insertions(+), 23 deletions(-)
+
+-- 
+2.23.0
+
