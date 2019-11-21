@@ -2,69 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00FD61050C4
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 126FB1050CD
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:43:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726658AbfKUKlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 05:41:53 -0500
-Received: from mga12.intel.com ([192.55.52.136]:17388 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726165AbfKUKlw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:41:52 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Nov 2019 02:41:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,224,1571727600"; 
-   d="scan'208";a="408472759"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.162])
-  by fmsmga006.fm.intel.com with ESMTP; 21 Nov 2019 02:41:46 -0800
-Date:   Thu, 21 Nov 2019 12:41:45 +0200
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH v3 04/19] x86/intel: Initialize IA32_FEATURE_CONTROL MSR
- at boot
-Message-ID: <20191121104145.GC20907@linux.intel.com>
-References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
- <20191119031240.7779-5-sean.j.christopherson@intel.com>
- <20191121103925.GB20907@linux.intel.com>
+        id S1726922AbfKUKnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 05:43:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20521 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726957AbfKUKnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 05:43:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574332996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J3W8i0iOJEXyO2QTbJjCdfj028+OhlnLk7ZsSbSMbcA=;
+        b=BIC61RulbmAXJgpVPcHhJxsIQzyCs2XW7hligC96rNMetDBo5Wx59tIsAGDLMLRrlVGhPn
+        dXGG+qSqvpAi4SsKlRBEycfdVNgUfC0rl5r+a2HzwF13q5ZLMEF5uEQHePDX4axpihDUkw
+        J+CbGBnXCvjEroNzLZWimcNvQO0+iVo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-t_jTQtnuNj-QTbxQsI5m9A-1; Thu, 21 Nov 2019 05:43:12 -0500
+Received: by mail-wr1-f69.google.com with SMTP id h7so1889224wrb.2
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 02:43:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZIjxSWOpncWMeofwzEZL33olSoz/0WCOZe4bbP5QEmM=;
+        b=VHug+oc6PYDCz/hkR/iR7GkBb2LjutesmhlmNUdpMQJuuTEmF7Kf+40wTxHtkT6Q8R
+         yuMnbzSTeFY8HSRvBQJEL0WmHhs1xPIxpCjEEcxZTaM8v0JftnyYlKRI779XytzURbsP
+         A9fhbVQZxFjKSnXfjcI4yutAuXQlj9pRCsyqeDbXYMyy0JJOqv0UQ6IZdUsNrlzYWaFl
+         Y+2tiGwaAcxg9BGD0jfgB8JCL3KcL9Ti6lE1zkmmMzrsKU9EncyfWc7SKvxychlbORjR
+         uJjOJshrZF/OolhOiOPRrctGxNl+FYmYT6BOybopRdBXu4PU9w2qsdv88YyJjRej5WID
+         rScg==
+X-Gm-Message-State: APjAAAXKGqc3mJAkhc+zpOg1+E8tCC8KfXADQOKcWcyzHMUkuhhgP0zS
+        wgIOSoh+Rx9oSxhSKqVnwoNDz1WtUhGlbG4GuiWQB9gbblSq3RsK9KiLGKgG7SChvAmr+TTIcI7
+        qYNqNdBAOhtRX
+X-Received: by 2002:a1c:480a:: with SMTP id v10mr9232143wma.138.1574332991576;
+        Thu, 21 Nov 2019 02:43:11 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyCImg2J7Xc1OsIo0tikTSaBXY2RTIhLUoGtIR2rrRBxjuL0bnlR4mMAMX8ZoqqCoEEP3vZYg==
+X-Received: by 2002:a1c:480a:: with SMTP id v10mr9232107wma.138.1574332991282;
+        Thu, 21 Nov 2019 02:43:11 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744? ([2001:b07:6468:f312:71a5:6e:f854:d744])
+        by smtp.gmail.com with ESMTPSA id u16sm2763530wrr.65.2019.11.21.02.43.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2019 02:43:10 -0800 (PST)
+Subject: Re: [PATCH v7 4/9] mmu: spp: Add functions to create/destroy SPP
+ bitmap block
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com
+References: <20191119084949.15471-1-weijiang.yang@intel.com>
+ <20191119084949.15471-5-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8ad27209-cc28-0503-da0e-bead63b28a83@redhat.com>
+Date:   Thu, 21 Nov 2019 11:43:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191121103925.GB20907@linux.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191119084949.15471-5-weijiang.yang@intel.com>
+Content-Language: en-US
+X-MC-Unique: t_jTQtnuNj-QTbxQsI5m9A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 12:39:25PM +0200, Jarkko Sakkinen wrote:
-> > +void init_feature_control_msr(struct cpuinfo_x86 *c)
+On 19/11/19 09:49, Yang Weijiang wrote:
+> =20
+> +/*
+> + * all vcpus share the same SPPT, vcpu->arch.mmu->sppt_root points to sa=
+me
+> + * SPPT root page, so any vcpu will do.
+> + */
+> +static struct kvm_vcpu *kvm_spp_get_vcpu(struct kvm *kvm)
+> +{
+> +=09struct kvm_vcpu *vcpu =3D NULL;
+> +=09int idx;
 
-I'd also use here shorter init_feat_ctl_msr(). It has one call site
-but shorter name is more convenient when playing with tracing tools.
+Is this true?  Perhaps you need one with
+VALID_PAGE(vcpu->arch.mmu->sppt_root) for kvm_spp_set_permission?
 
-/Jarkko
+Also, since vcpu->arch.mmu->sppt_root is the same for all vCPUs, perhaps
+it should be kvm->arch.sppt_root instead?
+
+If you can get rid of this function, it would be much better (but if you
+cannot, kvm_get_vcpu(kvm, 0) should give the same result).
+
+>=20
+> +=09if (npages > SUBPAGE_MAX_BITMAP)
+> +=09=09return -EFAULT;
+
+This is not needed here, the restriction only applies to the ioctl.
+
+Paolo
+
