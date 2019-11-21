@@ -2,77 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CA43F10487C
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 03:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D21F1048DD
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 04:16:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbfKUC3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Nov 2019 21:29:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56936 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726454AbfKUC3C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Nov 2019 21:29:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574303341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=by/zQ+3yLUz+ix0dbdVmiFHSoojhC/RF88zhiK7/yXo=;
-        b=hCpDNV+rk6pJAVht5CARvxS8xQIiB0sCIdEREQaBgiqzoB9MVGRdb0tScGZLc8xf2MSTji
-        UVWkVtOJ3WRjWFaxRyE1EkVY56k8X7v5XRUBveLymxlKoTDSesSiBat0eGRKEKu269iaTH
-        6zx814V+8jEgFoSG272JJ9cI5qJLBRA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-GfRTqIQkMFKGzDPUqseiFQ-1; Wed, 20 Nov 2019 21:22:55 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1555E107ACC4;
-        Thu, 21 Nov 2019 02:22:54 +0000 (UTC)
-Received: from localhost (ovpn-116-6.gru2.redhat.com [10.97.116.6])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 905A95E268;
-        Thu, 21 Nov 2019 02:22:53 +0000 (UTC)
-Date:   Wed, 20 Nov 2019 23:22:52 -0300
-From:   Eduardo Habkost <ehabkost@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jmattson@google.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH 5/5] KVM: vmx: use MSR_IA32_TSX_CTRL to hard-disable TSX
- on guest that lack it
-Message-ID: <20191121022252.GX3812@habkost.net>
-References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
- <1574101067-5638-6-git-send-email-pbonzini@redhat.com>
+        id S1726548AbfKUDQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Nov 2019 22:16:45 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:43318 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725842AbfKUDQp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Nov 2019 22:16:45 -0500
+Received: by mail-ot1-f67.google.com with SMTP id l14so1617095oti.10;
+        Wed, 20 Nov 2019 19:16:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=W8NJFXMq1hP4Qw4qrsGTgJ6LydZYVSf7XvUILF35TkI=;
+        b=e42q5Dt7gHmj9sk3HkUelEJSbwzQa5GeZLVk7+svkiu0ehkrRBfykcQ7JH7/X6HYA4
+         I46io4ICsit03LC1b71x8Wt4azLEocRlomjDC7ZBqnF/2uHf8hjdFDUXD1GjPJ4C6Pk5
+         KrsXjEKiTB+reJQkXh+sxGCfu1iGhnDnozGVrq0nLC15xL3XqvGQLwuC0aFConcDXfWs
+         /WE7bWtY+LdFihCVHTT4zg2eEGo1cAcsnyyzAwbG+PU++U9ZRFGOlhziGvL0nUEE3NC/
+         dbnmlEJnWthi9pC7mJLqwYNrlzriPq7xtlaXUjHtUzqwtmEhdcY5wH0ArmZFz7Zts+Be
+         Cnhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=W8NJFXMq1hP4Qw4qrsGTgJ6LydZYVSf7XvUILF35TkI=;
+        b=Lf5kAgzpfOXG12qeMYiSPeeQHEsBVZtg67YO863L7A16TIvFUdXMqzvO7zK7gpXEMk
+         sFDEW+YmPpsvSuBzMKFUTAE2gE31QLxhUfhl3ZA/lCrEdH6Pyz2GQJe9ESw20LwrJJv9
+         7cSMBK91nmGT/1S8MrqF3kiQWhtLpqwuugzmJHff+JKfd9puuAbxaTLg8Snl7tuZemx6
+         2hzBYhwHzd3rdwN55CZLr/DGhabGtDIWz2Zg/xjXdZp+rS0W22PFq7blTvMfJ7Ca9e+G
+         0hpz+Xk0Tgvhpu4d8Bvkz+Z3A+Ia7jHauCcLrXC9cTdCHmZJmCui5J8BV4AoGX+znGCY
+         wlLQ==
+X-Gm-Message-State: APjAAAXPmolPXkdKzZjnXisB9uJkLdA4/3vYvH8/1/Or2JSJ6W8JV5WC
+        L/PI1rQ9wgN/7kLgvp2ixT5MD/gbhUVrfW1WFad5Lg==
+X-Google-Smtp-Source: APXvYqzhuStBie25VFTE/1Gzpl/ag0wWxervXgFlKbr2I1x3phPpgtQIXbEF2Zfjzsh+WUETR40DR4fRj9afDw+lmrU=
+X-Received: by 2002:a9d:b83:: with SMTP id 3mr4524380oth.56.1574306204696;
+ Wed, 20 Nov 2019 19:16:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1574101067-5638-6-git-send-email-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: GfRTqIQkMFKGzDPUqseiFQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <1574221329-12370-1-git-send-email-wanpengli@tencent.com> <61E34902-0743-4DAF-A7DF-94C0E51CDA08@oracle.com>
+In-Reply-To: <61E34902-0743-4DAF-A7DF-94C0E51CDA08@oracle.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 21 Nov 2019 11:16:36 +0800
+Message-ID: <CANRm+CyyEda_X=+Nzo0QV-75eeVSi0c3E69piG0TrhK-+7sZWg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI fastpath
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 07:17:47PM +0100, Paolo Bonzini wrote:
-> If X86_FEATURE_RTM is disabled, the guest should not be able to access
-> MSR_IA32_TSX_CTRL.  We can therefore use it in KVM to force all
-> transactions from the guest to abort.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, 21 Nov 2019 at 07:37, Liran Alon <liran.alon@oracle.com> wrote:
+>
+>
+>
+> > On 20 Nov 2019, at 5:42, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > ICR and TSCDEADLINE MSRs write cause the main MSRs write vmexits in
+> > our product observation, multicast IPIs are not as common as unicast
+> > IPI like RESCHEDULE_VECTOR and CALL_FUNCTION_SINGLE_VECTOR etc.
+>
+> Have you also had the chance to measure non-Linux workloads. Such as Wind=
+ows?
 
-So, without this patch guest OSes will incorrectly report "Not
-affected" at /sys/devices/system/cpu/vulnerabilities/tsx_async_abort
-if RTM is disabled in the VM configuration.
+I ask around, guys not pay attention to IPIs under windows guests before.
 
-Is there anything host userspace can do to detect this situation
-and issue a warning on that case?
+>
+> >
+> > This patch tries to optimize x2apic physical destination mode, fixed
+> > delivery mode single target IPI. The fast path is invoked at
+> > ->handle_exit_irqoff() to emulate only the effect of the ICR write
+> > itself, i.e. the sending of IPIs.  Sending IPIs early in the VM-Exit
+> > flow reduces the latency of virtual IPIs by avoiding the expensive bits
+> > of transitioning from guest to host, e.g. reacquiring KVM's SRCU lock.
+> > Especially when running guest w/ KVM_CAP_X86_DISABLE_EXITS capability
+> > enabled or guest can keep running, IPI can be injected to target vCPU
+> > by posted-interrupt immediately.
+>
+> May I suggest an alternative phrasing? Something such as:
 
-Is there anything the guest kernel can do to detect this and not
-report a false negative at /sys/.../tsx_async_abort?
+Great, thanks for better English.
 
---=20
-Eduardo
+>
+> =E2=80=9C=E2=80=9D=E2=80=9D
+> This patch introduce a mechanism to handle certain performance-critical W=
+RMSRs
+> in a very early stage of KVM VMExit handler.
+>
+> This mechanism is specifically used for accelerating writes to x2APIC ICR=
+ that
+> attempt to send a virtual IPI with physical destination-mode, fixed deliv=
+ery-mode
+> and single target. Which was found as one of the main causes of VMExits f=
+or
+> Linux workloads.
+>
+> The reason this mechanism significantly reduce the latency of such virtua=
+l IPIs
+> is by sending the physical IPI to the target vCPU in a very early stage o=
+f KVM
+> VMExit handler, before host interrupts are enabled and before expensive
+> operations such as reacquiring KVM=E2=80=99s SRCU lock.
+> Latency is reduced even more when KVM is able to use APICv posted-interru=
+pt
+> mechanism (which allows to deliver the virtual IPI directly to target vCP=
+U without
+> the need to kick it to host).
+> =E2=80=9C=E2=80=9D=E2=80=9D
+>
+> >
+> > Testing on Xeon Skylake server:
+> >
+> > The virtual IPI latency from sender send to receiver receive reduces
+> > more than 200+ cpu cycles.
+> >
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Cc: Liran Alon <liran.alon@oracle.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+>
+> I see you used the code I provided my reply to v2. :)
+> I had only some very minor comments inline below. Therefore:
+> Reviewed-by: Liran Alon <liran.alon@oracle.com>
 
+Thanks, handle them in v4.
+
+>
+> Thanks for doing this optimisation.
+
+Thanks everybody who help make this work nice. :)
+
+    Wanpeng
