@@ -2,96 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A878105B7B
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 21:59:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A57105B96
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 22:07:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727116AbfKUU7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 15:59:47 -0500
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:38252 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727104AbfKUU7r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 15:59:47 -0500
-Received: by mail-vs1-f68.google.com with SMTP id u18so3276056vsg.5
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 12:59:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=crcTCAPPsxVgnOjlVDKJTngHtaLiQZ8SHlj9KdBgksI=;
-        b=u8WstEmp1wtqOI/XSaGODDxzMojOXJA7WwL4itzn7W6lYfz/JtWGgX0fjfGHrERzsC
-         O2qrUvkKmmZYL7cV2O0t5YYlJJDuXpQGqzWD86U1maZtMXATOYSifUVvjjA7y6tAQeLn
-         KoDoCzO/f5wrxXsxokLTqNFvioMnSNpmPN9kTBn2hhNg+v1pRr8oK35m/O6cKRCI80rA
-         OQsM+lJAsAi4KuMBY49FBqUdXmqmm2KH2grH3uLoIFZ1NkNn67pmo9lDGz2+JzLaKPCP
-         SKsoyEpaZWLO9FDinUSheZI+w3fYXifWNHCWxzEc0VWX2kH/SuGeNjWjB/gUJTy+z35G
-         IxxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=crcTCAPPsxVgnOjlVDKJTngHtaLiQZ8SHlj9KdBgksI=;
-        b=g2Q/nJfH3OhlZpedASeXBXlou53BbA5jQchACTbHlXBeaCfklYoQ9Tn1oul6ViK70Y
-         i4O6sUv1UXHhwXrT6u/yTkwBz9O9D3aZb7/cubWZvOUnEhZ/n3ZSnqcJKaVO+g7TdtBl
-         GdcoPmrkh8zIc6pJKMwLut8skfZGdUnSP4yrCypKfUXDYgJc2DJZb0X09gZFt0yUb2A9
-         cPKtA7oNfUrjuz8uwFZC1XxsvnXnM9ZgJ/kPHpiPz52L98SsSEb8icvgC5SEtRzEoLvB
-         NZWq/Rbx691yc4iUXQUl4b9ZscKV+GLDdnDcjHdehvla0WuvCdENh8C5BVqtbV6lsQBn
-         j2lQ==
-X-Gm-Message-State: APjAAAVC36BEvZFAYDT6pUb9BehQq1EbOQPlIwvn30RA70GmtfFXpGbC
-        pE1vdxN5NbLozvtkqVz9BGXPjKI/xVzxhwfbtm0=
-X-Google-Smtp-Source: APXvYqyPZU5WStHnkYQ7SEBONwSPEImuzAxOBa8IRoA3ID4ekXI40Mrvxbqxo3b5kOqn32dZOjjiw0e6SeT/NZIHEds=
-X-Received: by 2002:a67:f116:: with SMTP id n22mr7714176vsk.149.1574369985983;
- Thu, 21 Nov 2019 12:59:45 -0800 (PST)
+        id S1726802AbfKUVHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 16:07:16 -0500
+Received: from mga01.intel.com ([192.55.52.88]:28328 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726293AbfKUVHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 16:07:16 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Nov 2019 13:07:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,227,1571727600"; 
+   d="scan'208";a="238343412"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 21 Nov 2019 13:07:14 -0800
+Date:   Thu, 21 Nov 2019 13:07:14 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
+        "linux-kselftest@vger.kernel.org, Jarkko Sakkinen" 
+        <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v3 09/19] x86/cpu: Clear VMX feature flag if VMX is not
+ fully enabled
+Message-ID: <20191121210714.GB16617@linux.intel.com>
+References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
+ <20191119031240.7779-10-sean.j.christopherson@intel.com>
+ <20191121162452.GJ6540@zn.tnic>
 MIME-Version: 1.0
-Received: by 2002:ab0:71d5:0:0:0:0:0 with HTTP; Thu, 21 Nov 2019 12:59:45
- -0800 (PST)
-Reply-To: lchrist88@aol.com
-From:   Campwell Roland <ngnvnsonia@gmail.com>
-Date:   Thu, 21 Nov 2019 21:59:45 +0100
-Message-ID: <CAPu6YQFOOj7X+4QxuA9oD-gbZ+vWeoTgPnPkcUEKUz3eGd87Zg@mail.gmail.com>
-Subject: =?UTF-8?Q?Mon_bien_aim=C3=A9_en_christ?=
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191121162452.GJ6540@zn.tnic>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bonjour Bien Aim=C3=A9
-Je m'excuse pour cette intrusion, je me nomme veuf  Campwell Roland
-n=C3=A9 le 23 Octobre 1957 originaire Fran=C3=A7ais. Assistant au cabinet d=
-u
-minist=C3=A8re de l=E2=80=99int=C3=A9rieur du B=C3=A9nin pr=C3=A9s de mon p=
-ays d=E2=80=99o=C3=B9 j'ai servis
-pendant 9 ans .J'ai du vous contact=C3=A9 de cette sorte parce que je
-souhaite faire une chose tr=C3=A8s important. Cela vous semblera un peu
-suspect bien vrais que vous ne me connaissez pas et que je ne vous
-connais pas. Je souffre d'un cancer du cerveau qui est en phase
-terminal, mon m=C3=A9decin traitant vient de m'informer que mes jours sont
-comptes du fait de mon =C3=A9tat de sant=C3=A9 d=C3=A9grade. Selon ce que l=
-e Docteur
-m'a justifie une Boule s'installe pr=C3=A9sentement dans ma cage c=C3=A9r=
-=C3=A9brale
-, j'ai cette maladie depuis plus de 4 ans. Je suis veuf et je n'ai pas
-d'enfant. J'envisage de faire une donation de tous mes biens. J'ai
-presque vendu mes affaires dont une compagnie d'exportation de bois au
-Canada ou je vis depuis pr=C3=A9s de 30 ans, une partie de tout cet argent
-sera verse a diff=C3=A9rentes associations, et des centres d'aide au
-orphelins et aux sans abri. Je ne sais pas dans quel domaine
-d=E2=80=99activit=C3=A9 vous exercez mais je souhaiterais vous aider. J'ai =
-en ce
-moment dans mon compte personnel compte bloque, la somme de 1500000
-Euro  (Un million cinq cents mille Euros) que j'avais garder pour un
-projet de construction. Je serai gr=C3=A9e de vous donner cet argent qui
-pourra vous aider dans votre entreprise, je vous prie d'accepter cela
-car c'est un don que je vous fait et cela sans rien demander en
-retour. Je souffre =C3=A9norm=C3=A9ment et j'ai tr=C3=A8s peur, je n'arrive=
- presque
-pas a dormir la nuit comme la journ=C3=A9e car je ne veux pas mourir sansa
-avoir fait don de tout cet argent sinon je pense que cela serait un
-g=C3=A2chis. Veuillez me contactez des que possible si vous =C3=AAtes d'acc=
-ord
-pour mon offre.
-Que la paix du seigneur sois avec vous . Je vous laisse mon e mail
-afin que vous puissiez m'envoyer de vos nouvelles concernant ce sujet.
-Bonne Compr=C3=A9hension
-Veuf Campwell Roland
+On Thu, Nov 21, 2019 at 05:24:52PM +0100, Borislav Petkov wrote:
+> On Mon, Nov 18, 2019 at 07:12:30PM -0800, Sean Christopherson wrote:
+> > Now that the IA32_FEATURE_CONTROL MSR is guaranteed to be configured and
+> > locked, clear the VMX capability flag if the IA32_FEATURE_CONTROL MSR is
+> > not supported or if BIOS disabled VMX, i.e. locked IA32_FEATURE_CONTROL
+> > and did not set the appropriate VMX enable bit.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > ---
+> >  arch/x86/kernel/cpu/feature_control.c | 28 ++++++++++++++++++++++++---
+> >  1 file changed, 25 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kernel/cpu/feature_control.c b/arch/x86/kernel/cpu/feature_control.c
+> > index 33c9444dda52..2bd1a9e6021a 100644
+> > --- a/arch/x86/kernel/cpu/feature_control.c
+> > +++ b/arch/x86/kernel/cpu/feature_control.c
+> > @@ -5,15 +5,26 @@
+> >  #include <asm/msr-index.h>
+> >  #include <asm/processor.h>
+> >  
+> > +#undef pr_fmt
+> > +#define pr_fmt(fmt)	"x86/cpu: " fmt
+> > +
+> > +#define FEAT_CTL_UNSUPPORTED_MSG "IA32_FEATURE_CONTROL MSR unsupported on VMX capable CPU, suspected hardware or hypervisor issue.\n"
+> > +
+> >  void init_feature_control_msr(struct cpuinfo_x86 *c)
+> >  {
+> > +	bool tboot = tboot_enabled();
+> >  	u64 msr;
+> >  
+> > -	if (rdmsrl_safe(MSR_IA32_FEATURE_CONTROL, &msr))
+> > +	if (rdmsrl_safe(MSR_IA32_FEATURE_CONTROL, &msr)) {
+> > +		if (cpu_has(c, X86_FEATURE_VMX)) {
+> > +			pr_err_once(FEAT_CTL_UNSUPPORTED_MSG);
+> > +			clear_cpu_cap(c, X86_FEATURE_VMX);
+> > +		}
+> >  		return;
+> > +	}
+> 
+> Right, so this test: is this something that could happen on some
+> configurations - i.e., the MSR is not there but VMX bit is set - or are
+> you being too cautious here?
+
+Probably being overly cautious.
+
+> IOW, do you have any concrete use cases in mind (cloud provider can f*ck
+> it up this way) or?
+
+Yes, VMM somehow managing to break things.  Admittedly extremely unlikely
+given how long IA32_FEATURE_CONTROL has been around.
+
+> My angle is that if this is never going to happen, why even bother to
+> print anything...
+
+My thought was to add an equivalent of the WARN that fires when an MSR
+access unexpectedly faults.  That's effectively what'd be happening, except
+I used the safe variant to reduce the maintenance cost, e.g. so that the
+RDMSR doesn't have to be conditioned on every possible feature.
+
+What about a WARN_ON cpu_has?  That'd be more aligned with the unexpected
+#GP on RDMSR behavior.
+
+	if (rdmsrl_safe(...)) {
+		if (WARN_ON_ONCE(cpu_has(c, X86_FEATURE_VMX)))
+			clear_cpu_cap(c, X86_FEATURE_VMX);
+		return;
+	}
+
+I'm also ok dropping it altogether, though from a KVM developer
+perspective I wouldn't mind the extra sanity check :-)
