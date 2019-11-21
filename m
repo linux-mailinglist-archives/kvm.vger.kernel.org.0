@@ -2,97 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B04310553C
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 16:20:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A1E2105569
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 16:25:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbfKUPUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 10:20:18 -0500
-Received: from mga04.intel.com ([192.55.52.120]:35756 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726774AbfKUPUS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 10:20:18 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Nov 2019 07:20:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,226,1571727600"; 
-   d="scan'208";a="201151528"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga008.jf.intel.com with ESMTP; 21 Nov 2019 07:20:15 -0800
-Date:   Thu, 21 Nov 2019 23:22:12 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jmattson@google.com,
-        sean.j.christopherson@intel.com, yu.c.zhang@linux.intel.com,
-        alazar@bitdefender.com, edwin.zhai@intel.com
-Subject: Re: [PATCH v7 6/9] vmx: spp: Set up SPP paging table at
- vmentry/vmexit
-Message-ID: <20191121152212.GG17169@local-michael-cet-test>
-References: <20191119084949.15471-1-weijiang.yang@intel.com>
- <20191119084949.15471-7-weijiang.yang@intel.com>
- <a7ce232b-0a54-0039-7009-8e92e8078791@redhat.com>
+        id S1727130AbfKUPZ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 10:25:26 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54924 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726976AbfKUPZ0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Nov 2019 10:25:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574349924;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kBm3B1uW0ATy8DLnD/N50So/7howYiU9bWi3eGPQ8KQ=;
+        b=BZyUrSto5o2CWfb2u7Au4/2bJfT9L7J+OoaA3WWxf0XbhkePDBeJq6b4l0XD3z4mBoW/eM
+        wHbGEWik78dbrFTdjTsO+3MR2dsXszCjFxy5IjyPMPp0ka+yufqtQcy5zoWq47rG5qIUjO
+        NQJqbkatmPhXdV3+dtl4TYJ1j9CNAxQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-2fnWxyBDPxGjvWawx5qh3Q-1; Thu, 21 Nov 2019 10:25:21 -0500
+Received: by mail-wr1-f69.google.com with SMTP id y1so2300469wrl.0
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 07:25:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Luh/FRsdrygdtryuzjcgAMyRo3l6t+Zhjzz9aLHJ0EU=;
+        b=ow/8url8vMwFoXBxSusxO7A4xl5BoNLvvkNawlYG7qe8RxJF3di/PfL8k863f/KPC4
+         fGxjULyfWNoRH8kK2jo+AOFPPUroBk0hcujK8s2YTMzMIFggZx2TV5Y3aEowSiMCDcvN
+         D0jQ64nF3vNPwWy22LY/mp6ZfykyUeou7VNoKClep67dSBmtKEzmLirJ3kAkpMO7f+6P
+         mB5bTEGvPU2R80sxQVT72oWV6hueBlJ760N+kmwgB8RmZwy0UEaXdg53ruJrPH+JqxKy
+         1bahnzSeOKbE+UYyUBvQ2LKapWrd9UisiCPZCnO2sRit2sez9SA0EBrYWWNtSyXZr4/M
+         HPJQ==
+X-Gm-Message-State: APjAAAUknxs8YyH8sA5Uuns4DPU78wjRLofw+EUPfiRczUsqMIDgkOLo
+        QQXO7W9A6UQ+1PpOAcIa6Wp4TC4NKBIO94PEYfckSv1/BSSglylEi5htojPcg/sAFizMAZM2XJ/
+        doPO79H7Limw7
+X-Received: by 2002:a05:600c:2410:: with SMTP id 16mr10111952wmp.36.1574349920264;
+        Thu, 21 Nov 2019 07:25:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw6kCXHNhqyKfZOnNRC+6rkdzH+5TteBCvmm65ewNpd7LRKY0hfW8ym9t1TkIRcJ7FqzYeccA==
+X-Received: by 2002:a05:600c:2410:: with SMTP id 16mr10111918wmp.36.1574349919938;
+        Thu, 21 Nov 2019 07:25:19 -0800 (PST)
+Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
+        by smtp.gmail.com with ESMTPSA id w17sm3864052wrt.45.2019.11.21.07.25.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2019 07:25:19 -0800 (PST)
+Date:   Thu, 21 Nov 2019 16:25:17 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jorgen Hansen <jhansen@vmware.com>
+Subject: Re: [PATCH net-next 4/6] vsock: add vsock_loopback transport
+Message-ID: <20191121152517.zfedz6hg6ftcb2ks@steredhat>
+References: <20191119110121.14480-1-sgarzare@redhat.com>
+ <20191119110121.14480-5-sgarzare@redhat.com>
+ <20191121093458.GB439743@stefanha-x1.localdomain>
+ <20191121095948.bc7lc3ptsh6jxizw@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20191121095948.bc7lc3ptsh6jxizw@steredhat>
+X-MC-Unique: 2fnWxyBDPxGjvWawx5qh3Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <a7ce232b-0a54-0039-7009-8e92e8078791@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 11:18:48AM +0100, Paolo Bonzini wrote:
-> On 19/11/19 09:49, Yang Weijiang wrote:
-> > +			if (spte & PT_SPP_MASK) {
-> > +				fault_handled = true;
-> > +				vcpu->run->exit_reason = KVM_EXIT_SPP;
-> > +				vcpu->run->spp.addr = gva;
-> > +				kvm_skip_emulated_instruction(vcpu);
-> 
-> Do you really want to skip the current instruction?  Who will do the write?
->
-If the destination memory is SPP protected, the target memory is
-expected unchanged on a "write op" in guest, so would like to skip current 
-instruction.
+On Thu, Nov 21, 2019 at 10:59:48AM +0100, Stefano Garzarella wrote:
+> On Thu, Nov 21, 2019 at 09:34:58AM +0000, Stefan Hajnoczi wrote:
+> > On Tue, Nov 19, 2019 at 12:01:19PM +0100, Stefano Garzarella wrote:
+> >=20
+> > Ideas for long-term changes below.
+> >=20
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >=20
+>=20
+> Thanks for reviewing!
+>=20
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 760049454a23..c2a3dc3113ba 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -17239,6 +17239,7 @@ F:=09net/vmw_vsock/diag.c
+> > >  F:=09net/vmw_vsock/af_vsock_tap.c
+> > >  F:=09net/vmw_vsock/virtio_transport_common.c
+> > >  F:=09net/vmw_vsock/virtio_transport.c
+> > > +F:=09net/vmw_vsock/vsock_loopback.c
+> > >  F:=09drivers/net/vsockmon.c
+> > >  F:=09drivers/vhost/vsock.c
+> > >  F:=09tools/testing/vsock/
+> >=20
+> > At this point you are most active in virtio-vsock and I am reviewing
+> > patches on a best-effort basis.  Feel free to add yourself as
+> > maintainer.
+> >=20
+>=20
+> Sure, I'd be happy to maintain it.
+>=20
+> > > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loo=
+pback.c
+> > > new file mode 100644
+> > > index 000000000000..3d1c1a88305f
+> > > --- /dev/null
+> > > +++ b/net/vmw_vsock/vsock_loopback.c
+> > > @@ -0,0 +1,217 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * loopback transport for vsock using virtio_transport_common APIs
+> > > + *
+> > > + * Copyright (C) 2013-2019 Red Hat, Inc.
+> > > + * Author: Asias He <asias@redhat.com>
+> > > + *         Stefan Hajnoczi <stefanha@redhat.com>
+> > > + *         Stefano Garzarella <sgarzare@redhat.com>
+> > > + *
+> > > + */
+> > > +#include <linux/spinlock.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/list.h>
+> > > +#include <linux/virtio_vsock.h>
+> >=20
+> > Is it time to rename the generic functionality in
+> > virtio_transport_common.c?  This doesn't have anything to do with virti=
+o
+> > :).
+> >=20
+>=20
+> Completely agree, new transports could use it to handle the protocol with=
+out
+> reimplementing things already done.
+>=20
+> > > +
+> > > +static struct workqueue_struct *vsock_loopback_workqueue;
+> > > +static struct vsock_loopback *the_vsock_loopback;
+> >=20
+> > the_vsock_loopback could be a static global variable (not a pointer) an=
+d
+> > vsock_loopback_workqueue could also be included in the struct.
+> >=20
+> > The RCU pointer is really a way to synchronize vsock_loopback_send_pkt(=
+)
+> > and vsock_loopback_cancel_pkt() with module exit.  There is no other
+> > reason for using a pointer.
+> >=20
+> > It's cleaner to implement the synchronization once in af_vsock.c (or
+> > virtio_transport_common.c) instead of making each transport do it.
+> > Maybe try_module_get() and related APIs provide the necessary semantics
+> > so that core vsock code can hold the transport module while it's being
+> > used to send/cancel a packet.
+>=20
+> Right, the module cannot be unloaded until open sockets, so here the
+> synchronization is not needed.
+>=20
+> The synchronization come from virtio-vsock device that can be
+> hot-unplugged while sockets are still open, but that can't happen here.
+>=20
+> I will remove the pointers and RCU in the v2.
+>=20
+> Can I keep your R-b or do you prefer to watch v2 first?
+>=20
+> >=20
+> > > +MODULE_ALIAS_NETPROTO(PF_VSOCK);
+> >=20
+> > Why does this module define the alias for PF_VSOCK?  Doesn't another
+> > module already define this alias?
+>=20
+> It is a way to load this module when PF_VSOCK is starting to be used.
+> MODULE_ALIAS_NETPROTO(PF_VSOCK) is already defined in vmci_transport
+> and hyperv_transport. IIUC it is used for the same reason.
+>=20
+> In virtio_transport we don't need it because it will be loaded when
+> the PCI device is discovered.
+>=20
+> Do you think there's a better way?
+> Should I include the vsock_loopback transport directly in af_vsock
+> without creating a new module?
+>=20
 
-> > +		pr_info("SPP - SPPT entry missing! gfn = 0x%llx\n", gfn);
-> 
-> Please replace pr_info with a tracepoint.
-> 
-OK.
+That last thing I said may not be possible:
+I remembered that I tried, but DEPMOD found a cyclic dependency because
+vsock_transport use virtio_transport_common that use vsock, so if I
+include vsock_transport in the vsock module, DEPMOD is not happy.
 
-> > +		slot = gfn_to_memslot(vcpu->kvm, gfn);
-> > +		if (!slot)
-> > +			return -EFAULT;
-> 
-> You want either a goto to the misconfig case, so that there is a warn
->
-OK.
-> > +		spp_info.base_gfn = gfn;
-> > +		spp_info.npages = 1;
-> > +
-> > +		spin_lock(&vcpu->kvm->mmu_lock);
-> > +		ret = kvm_spp_get_permission(vcpu->kvm, &spp_info);
-> > +		if (ret == 1) {
-> 
-> Can you clarify when ret will not be 1?  In this case you already have a
-> slot, so it seems to me that you do not need to go through
-> kvm_spp_get_permission and you can just test "if
-> (kvm->arch.spp_active)".  But then, spp_active should be 1 if you get
-> here, I think?
-> 
-Hmm, getting permission bits from gfn directly should work here. 
-Thank you!
+Do you think it's okay in this case to keep MODULE_ALIAS_NETPROTO(PF_VSOCK)
+or is there a better way?
 
-> > +	pr_alert("SPP - SPPT Misconfiguration!\n");
-> > +	return 0;
-> 
-> 
-> pr_alert not needed since you've just warned.
->
-OK, will remove it.
+Thanks,
+Stefano
 
-> Paolo
