@@ -2,106 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E973A104FE4
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:02:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA264104FE8
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:03:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbfKUKCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 05:02:09 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40946 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726014AbfKUKCH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Nov 2019 05:02:07 -0500
+        id S1726802AbfKUKDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 05:03:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37546 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726343AbfKUKDD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 05:03:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574330527;
+        s=mimecast20190719; t=1574330581;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XEzzNkobngto7A7JkTiA2JRstWm/Qwf1aRo6Iv3/3m8=;
-        b=DjtqsVgDWZElpzdQHy/MF1cr4cw03uuCw/oOas6+kz2b6DPxDHTAqXZY8e6wbtfncBuKum
-        FV9F/rWvlir0TBDs6hKbXe5JDiwPTf98JodP3tykJSMsB7wgOOtJDYpeJNMIjiYp8ZXoTp
-        JzECwipF+Z1ZxLVK3c/AXwjxWkKBrco=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-wZ5vgTX1NBKS3p8el6Efrg-1; Thu, 21 Nov 2019 05:02:00 -0500
-Received: by mail-wr1-f72.google.com with SMTP id m17so1751297wrb.20
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 02:02:00 -0800 (PST)
+        bh=M4v8h369ZsUMVA15kRJzaETn7xYxMuYIewbT6nQP1ZA=;
+        b=M+OUQTEUmiRl1rHcBw00ViWPSOOQRNLdOhnq/l3Eo7b6U7Zhw9qUcr4pKXxMN6XMj/6zIT
+        dazSmmpexmQQ8iyG+ShFeM5/FPI28uI0agWaKRRUblxEXyx0q5RTgpYprYpLlVKUJsYEf2
+        55lVlYz8fIH5EoPRFC2I9cMkjHgFFhE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-h2tvIf5HOC-OzMT76IKtPg-1; Thu, 21 Nov 2019 05:02:58 -0500
+Received: by mail-wr1-f69.google.com with SMTP id q6so1798445wrv.11
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 02:02:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tFqAKgUAsSLJXhwvvIOsI4T22gRsWSmbmVmEZ/F0Ht4=;
-        b=tVCiQaQzMLy4FjfIer/t6WjPYR2/w6Q/v/pMK/YrZBXOsHw930G1QLMDOYDnne1kjj
-         iVdANbDmo6dlP+pLydL63hoOI/Y2njgswkxB/5gXiuSqZScsLes4AMo5hXO32Maj7GhG
-         04na2Rphc2xhY87JhK4G0QMtgrwm1mqBaXsy7r6WzbNE8D1tq4BVyF5e3csBhn+UaFWX
-         byIPttQ+Ymoj+nQCr0p56tmm8PfptPJ6Ft73gKfbEvKv779En4wWmiBdsUXipFtAHLgJ
-         3zjOGPEeVLmrmMC8EhcAH+jnFfSMvpg0rbGpZ5JmuPvKckD5NtxKz4vKZtmjj5KVWF+P
-         7XWQ==
-X-Gm-Message-State: APjAAAWoMBkM6cuZhoT941Wlq+G0BI2M60KsryBGA4e3oYZQh9SVG6nR
-        YtcQySMlLVTavH+/X3Es3UZFRwqI4pB/11rvaVXTOJhTz7d/DIZfy6xFYX26YgW1KwvZoXO+1EM
-        /z+LnSzC+CIc+
-X-Received: by 2002:adf:db8e:: with SMTP id u14mr274458wri.274.1574330519204;
-        Thu, 21 Nov 2019 02:01:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxy6brRF1ev/m1DKBfFjA6HTGnTBIhroRW1ilhIuPxww1/cdIQc+e2rt6PwX9NqSCpO1cJSPg==
-X-Received: by 2002:adf:db8e:: with SMTP id u14mr274435wri.274.1574330519006;
-        Thu, 21 Nov 2019 02:01:59 -0800 (PST)
-Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
-        by smtp.gmail.com with ESMTPSA id f188sm2272358wmf.3.2019.11.21.02.01.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2019 02:01:58 -0800 (PST)
-Date:   Thu, 21 Nov 2019 11:01:56 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Dexuan Cui <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [PATCH net-next 5/6] vsock: use local transport when it is loaded
-Message-ID: <20191121100156.v4ehwmstlhujrviv@steredhat>
-References: <20191119110121.14480-1-sgarzare@redhat.com>
- <20191119110121.14480-6-sgarzare@redhat.com>
- <20191121094614.GC439743@stefanha-x1.localdomain>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QqX7sWs9fb5wtXIbtNAyNHpwoHRqIRPUhMneTaa0Ggk=;
+        b=YvPRWEEHW5i6HExQ4nubGpkp9btVBjok4GX+1KNXBNLz/Fffp/y7tAG9grUmSwWBnx
+         AaD4BkxGalAO6R6PxJqsA5HpVqFuOv3MFHbm+SCct67AUDdhl2Yd07j3h21WO8FTVy1s
+         pJOsXl9kIbwxTdm23Cgpbme9LXvNRrKBxlFUM2DaINr1ynqj9+bYTgvUmfSt9KWQpti+
+         3D6tmXOOPb131fFGCVInzuw5L1/UmB+qAS7hdou3HjOHRlnqDJuHIRhrUVQj2TXRCET7
+         iYcdrZAEuhiUegyASjxeetRwCnLXEBU9pbAUHmPG91va6mWn2cJEqMjN0WtLUfZmsn5M
+         Q2gw==
+X-Gm-Message-State: APjAAAWC01oM3AjhpMyGr04a+GQG84ycx2fTtvvjW+w2uMUsNIlWdBlp
+        7c0VhtkfTg+CS2r4JWLhJYy5CTME3yGqAa8ADMXaWARr6S4MRelXV8oMLGQm5km0PMSiHGFMmlx
+        5FUW6xOkkr6bL
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr1491300wrp.200.1574330577306;
+        Thu, 21 Nov 2019 02:02:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyvsbGcaZuHudOd5MhASUTtyRm6oppNmcc6Q5zF+P+kMjkzlLT0M6CCnZ93IbdRlyDNmRcAIw==
+X-Received: by 2002:adf:ef45:: with SMTP id c5mr1491280wrp.200.1574330577012;
+        Thu, 21 Nov 2019 02:02:57 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744? ([2001:b07:6468:f312:71a5:6e:f854:d744])
+        by smtp.gmail.com with ESMTPSA id y6sm2561699wrr.19.2019.11.21.02.02.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2019 02:02:56 -0800 (PST)
+Subject: Re: [PATCH v7 1/9] Documentation: Introduce EPT based Subpage
+ Protection and related ioctls
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com
+References: <20191119084949.15471-1-weijiang.yang@intel.com>
+ <20191119084949.15471-2-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dbf1f124-7864-b1e8-fae3-49448372d502@redhat.com>
+Date:   Thu, 21 Nov 2019 11:02:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191121094614.GC439743@stefanha-x1.localdomain>
-X-MC-Unique: wZ5vgTX1NBKS3p8el6Efrg-1
+In-Reply-To: <20191119084949.15471-2-weijiang.yang@intel.com>
+Content-Language: en-US
+X-MC-Unique: h2tvIf5HOC-OzMT76IKtPg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 09:46:14AM +0000, Stefan Hajnoczi wrote:
-> On Tue, Nov 19, 2019 at 12:01:20PM +0100, Stefano Garzarella wrote:
-> > @@ -420,9 +436,10 @@ int vsock_assign_transport(struct vsock_sock *vsk,=
- struct vsock_sock *psk)
-> >  =09=09new_transport =3D transport_dgram;
-> >  =09=09break;
-> >  =09case SOCK_STREAM:
-> > -=09=09if (remote_cid <=3D VMADDR_CID_HOST ||
-> > -=09=09    (transport_g2h &&
-> > -=09=09     remote_cid =3D=3D transport_g2h->get_local_cid()))
-> > +=09=09if (vsock_use_local_transport(remote_cid))
-> > +=09=09=09new_transport =3D transport_local;
-> > +=09=09else if (remote_cid =3D=3D VMADDR_CID_HOST ||
-> > +=09=09=09 remote_cid =3D=3D VMADDR_CID_HYPERVISOR)
-> >  =09=09=09new_transport =3D transport_g2h;
-> >  =09=09else
-> >  =09=09=09new_transport =3D transport_h2g;
->=20
-> We used to send VMADDR_CID_RESERVED to the host.  Now we send
-> VMADDR_CID_RESERVED (LOCAL) to the guest when there is no
-> transport_local loaded?
->=20
-> If this is correct, is there a justification for this change?  It seems
-> safest to retain existing behavior.
+On 19/11/19 09:49, Yang Weijiang wrote:
+> +
+> +#define SUBPAGE_MAX_BITMAP   64
 
-You're right, I'll revert this change in v2.
+Please rename this to KVM_SUBPAGE_MAX_PAGES
+
+> +struct kvm_subpage_info {
+> +=09__u64 gfn;    /* the first page gfn of the contiguous pages */
+> +=09__u64 npages; /* number of 4K pages */
+
+This can be
+
+=09u32 npages;
+=09u32 flags;
+
+Check that the flags are 0, and fail the ioctl if they aren't.  This
+will make it easy to extend the API in the future.
+
+> +=09__u32 access_map[SUBPAGE_MAX_BITMAP]; /* sub-page write-access bitmap=
+ array */
+> +};
+
+Please make this access_map[0], since the number of entries actually
+depends on npages.
+
+Likewise, kvm_arch_vm_ioctl should read the header first, then allocate
+memory for the access_map and read into it.  It's probably simpler if
+you make kvm_vm_ioctl_get_subpages/kvm_vm_ioctl_set_subpages take
+parameters like
+
+int kvm_vm_ioctl_get_subpages(struct kvm *kvm, u64 gfn, u32 npages,
+=09=09=09      u32 *access_map);
+int kvm_vm_ioctl_set_subpages(struct kvm *kvm, u64 gfn, u32 npages,
+=09=09=09      u32 *access_map);
 
 Thanks,
-Stefano
+
+Paolo
 
