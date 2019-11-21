@@ -2,110 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DBE2D10568A
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 17:08:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B41371056AC
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 17:13:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726722AbfKUQIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 11:08:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23421 "EHLO
+        id S1726980AbfKUQNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 11:13:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44323 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726379AbfKUQIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 11:08:12 -0500
+        with ESMTP id S1726977AbfKUQMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 11:12:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574352492;
+        s=mimecast20190719; t=1574352774;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=MeeOedOyzrBDgLHnAaEdYtdPw/Bnh3YjiRhbRgcresI=;
-        b=jRVCyxHoWKFGiftrW97OuKr6Hq9Gfmwxu2/bijtaexDMzt3Kug6SxSOoFXNC23U/E2PprF
-        /HL2tNl9Rj9EbrbsybPzcbKaLiQZwBX5pKkHdRILSlFlXbt+mDHuzSUWKX7CkpobrufzYx
-        0XrjV9Q0sdLxOmUso5LIFO88suFac8E=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-CrP3dveoOFOYxOGH8BK8dQ-1; Thu, 21 Nov 2019 11:08:10 -0500
-Received: by mail-wr1-f71.google.com with SMTP id c12so1041294wrq.7
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 08:08:10 -0800 (PST)
+         in-reply-to:in-reply-to:references:references;
+        bh=s4jDlqvRauMO48OH1rfHe5D1vr1CStUdJKWdRifHUHE=;
+        b=beR9xVl3TlBNOd7oLX7HZrOyLjQuXf1oRL26fh+GCi6CKoRPh3Sxwz28SnvZm4Dp3a2zdR
+        dnayGCS4f2oKKQnU9rOqM8pDPh2t5TWdKJM9GKgWVLSVms/TiGmjwL1nT2XRiMKtueDHLn
+        N6SwsrHp3GRaNDkYlsAQY7DRk+kQilQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-zAHNttq2PfaORQFubJ_oJw-1; Thu, 21 Nov 2019 11:12:52 -0500
+Received: by mail-wr1-f70.google.com with SMTP id k15so2285800wrp.22
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 08:12:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KMDjZkzrlqiVQ/Y8A6t0DAiUQ9UpMG4ktLorbVn8v3Q=;
-        b=qey+iytvKSR6rQ+/0WmREeITYAhDd7TxnGUUNf4vTjXAB6gluzPjbrSEMXLkZE0xo2
-         22BzWtx7sBAYa9QcUyuyC+Q8w1bd33V/Wb+/GrNgoiaoI1I/jkY24Nl9AdDXK/x1ys+G
-         LwtKPFeFmpE8k1BH0H3TkiCYAItOpP4fpiVqLRLDgxAgEP0+wE5CPQ/ZWQwU35kgZ+D4
-         b3W5P9+v4ULaqMAhVPWjEqeGEDzsNOn/axwAhAhu48NbzZnUgBn1C5foWQiRUQTA97Ky
-         NhghkanV3Khai/Dxf0EsNJ5MdkNJ7WkQN9AnH+fkGmPtTVdiBj9cgeJfUtAA/fBu2fAf
-         A7Nw==
-X-Gm-Message-State: APjAAAVE88aSpylUi566GSDSQz8YWQholNwVxiEPSskUk5ec+vHRdJcV
-        1cSmhaJxhZtCSjwevY3QGH7ul0chujMQ15Dl5eTLvv2a8Tq5Wb412BshxrgGLDtQnzdKQAwTPdy
-        SfnLjegBH6u44
-X-Received: by 2002:a1c:7f94:: with SMTP id a142mr10568871wmd.33.1574352489475;
-        Thu, 21 Nov 2019 08:08:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDnhT3JBlp/jXfwl4CJh7SlIP82w3enQZE3lpWjhvdGmtTQ7g4eELgQdIiSIVuH65LYDfs1w==
-X-Received: by 2002:a1c:7f94:: with SMTP id a142mr10568840wmd.33.1574352489181;
-        Thu, 21 Nov 2019 08:08:09 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744? ([2001:b07:6468:f312:71a5:6e:f854:d744])
-        by smtp.gmail.com with ESMTPSA id f19sm4087872wrf.23.2019.11.21.08.08.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Nov 2019 08:08:08 -0800 (PST)
-Subject: Re: [PATCH v7 6/9] vmx: spp: Set up SPP paging table at
- vmentry/vmexit
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jmattson@google.com, sean.j.christopherson@intel.com,
-        yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
-        edwin.zhai@intel.com
-References: <20191119084949.15471-1-weijiang.yang@intel.com>
- <20191119084949.15471-7-weijiang.yang@intel.com>
- <a7ce232b-0a54-0039-7009-8e92e8078791@redhat.com>
- <20191121152212.GG17169@local-michael-cet-test>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7cdcd2b2-ced8-4c08-82c7-b3a25ed8bb15@redhat.com>
-Date:   Thu, 21 Nov 2019 17:08:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bzunz7vaTZgIeoprS+AqEx2vIVmIoRBhLk3Y9Zo1tTc=;
+        b=Pxwj3G6HNaKwIvv6h+iFupwDUtUmv0Mw6j7YJ8Nd+cVcZzEAJbQZTQmIzNXIKAQgIO
+         7Gcw7CuEmRIAXnwEMrdkz8V6tXB6Cfct23O6+hGR/Slig++XtVY7kmj6RzeEa6/yKAtT
+         GfSarD1QJEVWTgMucP2k20wgN2QCLVPjyyNjuhi+uJ1+KtHX3JwvtF19yDd3QL4m6vr4
+         7vn1AmPxdTg5l3Oagr2MNFN7EC1cb6w8wnE743IANnDiSwb7faJDQjO56Pqm2PDbMJAa
+         Hz+tUpiG65gCojDH6cJaiekEocyCs6FKKrRDg9d++u1yVROhn8t8XpZD5WjPvpGk4B6t
+         TDxg==
+X-Gm-Message-State: APjAAAWwqXuecy8inV8LUzHNoBF7pcV9XxWvKTE5+gJTpMMkesk3+Wjm
+        /4RhSQ5NE2E3Dqz2jT2UGt40djtwWsMOVAKPwN9WstET/PMlNjblW9WRBfhLt7RjLI4hjUxhfVV
+        leviraNmmIvxm
+X-Received: by 2002:a7b:c10c:: with SMTP id w12mr11307553wmi.114.1574352771191;
+        Thu, 21 Nov 2019 08:12:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx/ihIoiUrBSYY5RXkVJWL/zIYFDoQRjxNOwfDXmQBBbNZUvYEUurSUy8wy3xec3AaM6xyemQ==
+X-Received: by 2002:a7b:c10c:: with SMTP id w12mr11307522wmi.114.1574352770936;
+        Thu, 21 Nov 2019 08:12:50 -0800 (PST)
+Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
+        by smtp.gmail.com with ESMTPSA id g133sm75244wme.42.2019.11.21.08.12.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2019 08:12:50 -0800 (PST)
+Date:   Thu, 21 Nov 2019 17:12:47 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jorgen Hansen <jhansen@vmware.com>
+Cc:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Dexuan Cui <decui@microsoft.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next 3/6] vsock: add local transport support in the
+ vsock core
+Message-ID: <20191121161247.u6xvrso272q4ujag@steredhat>
+References: <20191119110121.14480-1-sgarzare@redhat.com>
+ <20191119110121.14480-4-sgarzare@redhat.com>
+ <MWHPR05MB3376F4452F0CF38C1AFABA2EDA4E0@MWHPR05MB3376.namprd05.prod.outlook.com>
+ <20191121152148.slv26oesn25dpjb6@steredhat>
+ <MWHPR05MB3376D95B5E50DF7CAF675EEDDA4E0@MWHPR05MB3376.namprd05.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20191121152212.GG17169@local-michael-cet-test>
-Content-Language: en-US
-X-MC-Unique: CrP3dveoOFOYxOGH8BK8dQ-1
+In-Reply-To: <MWHPR05MB3376D95B5E50DF7CAF675EEDDA4E0@MWHPR05MB3376.namprd05.prod.outlook.com>
+X-MC-Unique: zAHNttq2PfaORQFubJ_oJw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/11/19 16:22, Yang Weijiang wrote:
-> On Thu, Nov 21, 2019 at 11:18:48AM +0100, Paolo Bonzini wrote:
->> On 19/11/19 09:49, Yang Weijiang wrote:
->>> +=09=09=09if (spte & PT_SPP_MASK) {
->>> +=09=09=09=09fault_handled =3D true;
->>> +=09=09=09=09vcpu->run->exit_reason =3D KVM_EXIT_SPP;
->>> +=09=09=09=09vcpu->run->spp.addr =3D gva;
->>> +=09=09=09=09kvm_skip_emulated_instruction(vcpu);
->>
->> Do you really want to skip the current instruction?  Who will do the wri=
-te?
->>
-> If the destination memory is SPP protected, the target memory is
-> expected unchanged on a "write op" in guest, so would like to skip curren=
-t=20
-> instruction.
+On Thu, Nov 21, 2019 at 03:53:47PM +0000, Jorgen Hansen wrote:
+> > From: Stefano Garzarella [mailto:sgarzare@redhat.com]
+> > Sent: Thursday, November 21, 2019 4:22 PM
+> >=20
+> > On Thu, Nov 21, 2019 at 03:04:18PM +0000, Jorgen Hansen wrote:
+> > > > From: Stefano Garzarella [mailto:sgarzare@redhat.com]
+> > > > Sent: Tuesday, November 19, 2019 12:01 PM
+> > > > To: netdev@vger.kernel.org
+> > > >
+> > > > This patch allows to register a transport able to handle
+> > > > local communication (loopback).
+> > > >
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >  include/net/af_vsock.h   |  2 ++
+> > > >  net/vmw_vsock/af_vsock.c | 17 ++++++++++++++++-
+> > > >  2 files changed, 18 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > > > index 4206dc6d813f..b1c717286993 100644
+> > > > --- a/include/net/af_vsock.h
+> > > > +++ b/include/net/af_vsock.h
+> > > > @@ -98,6 +98,8 @@ struct vsock_transport_send_notify_data {
+> > > >  #define VSOCK_TRANSPORT_F_G2H=09=090x00000002
+> > > >  /* Transport provides DGRAM communication */
+> > > >  #define VSOCK_TRANSPORT_F_DGRAM=09=090x00000004
+> > > > +/* Transport provides local (loopback) communication */
+> > > > +#define VSOCK_TRANSPORT_F_LOCAL=09=090x00000008
+> > > >
+> > > >  struct vsock_transport {
+> > > >  =09struct module *module;
+> > > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > > > index cc8659838bf2..c9e5bad59dc1 100644
+> > > > --- a/net/vmw_vsock/af_vsock.c
+> > > > +++ b/net/vmw_vsock/af_vsock.c
+> > > > @@ -136,6 +136,8 @@ static const struct vsock_transport
+> > *transport_h2g;
+> > > >  static const struct vsock_transport *transport_g2h;
+> > > >  /* Transport used for DGRAM communication */
+> > > >  static const struct vsock_transport *transport_dgram;
+> > > > +/* Transport used for local communication */
+> > > > +static const struct vsock_transport *transport_local;
+> > > >  static DEFINE_MUTEX(vsock_register_mutex);
+> > > >
+> > > >  /**** UTILS ****/
+> > > > @@ -2130,7 +2132,7 @@
+> > EXPORT_SYMBOL_GPL(vsock_core_get_transport);
+> > > >
+> > > >  int vsock_core_register(const struct vsock_transport *t, int featu=
+res)
+> > > >  {
+> > > > -=09const struct vsock_transport *t_h2g, *t_g2h, *t_dgram;
+> > > > +=09const struct vsock_transport *t_h2g, *t_g2h, *t_dgram, *t_local=
+;
+> > > >  =09int err =3D mutex_lock_interruptible(&vsock_register_mutex);
+> > > >
+> > > >  =09if (err)
+> > > > @@ -2139,6 +2141,7 @@ int vsock_core_register(const struct
+> > > > vsock_transport *t, int features)
+> > > >  =09t_h2g =3D transport_h2g;
+> > > >  =09t_g2h =3D transport_g2h;
+> > > >  =09t_dgram =3D transport_dgram;
+> > > > +=09t_local =3D transport_local;
+> > > >
+> > > >  =09if (features & VSOCK_TRANSPORT_F_H2G) {
+> > > >  =09=09if (t_h2g) {
+> > > > @@ -2164,9 +2167,18 @@ int vsock_core_register(const struct
+> > > > vsock_transport *t, int features)
+> > > >  =09=09t_dgram =3D t;
+> > > >  =09}
+> > > >
+> > > > +=09if (features & VSOCK_TRANSPORT_F_LOCAL) {
+> > > > +=09=09if (t_local) {
+> > > > +=09=09=09err =3D -EBUSY;
+> > > > +=09=09=09goto err_busy;
+> > > > +=09=09}
+> > > > +=09=09t_local =3D t;
+> > > > +=09}
+> > > > +
+> > > >  =09transport_h2g =3D t_h2g;
+> > > >  =09transport_g2h =3D t_g2h;
+> > > >  =09transport_dgram =3D t_dgram;
+> > > > +=09transport_local =3D t_local;
+> > > >
+> > > >  err_busy:
+> > > >  =09mutex_unlock(&vsock_register_mutex);
+> > > > @@ -2187,6 +2199,9 @@ void vsock_core_unregister(const struct
+> > > > vsock_transport *t)
+> > > >  =09if (transport_dgram =3D=3D t)
+> > > >  =09=09transport_dgram =3D NULL;
+> > > >
+> > > > +=09if (transport_local =3D=3D t)
+> > > > +=09=09transport_local =3D NULL;
+> > > > +
+> > > >  =09mutex_unlock(&vsock_register_mutex);
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(vsock_core_unregister);
+> > > > --
+> > > > 2.21.0
+> > >
+> > > Having loopback support as a separate transport fits nicely, but do w=
+e need
+> > to support
+> > > different variants of loopback? It could just be built in.
+> >=20
+> > I agree with you, indeed initially I developed it as built in, but
+> > DEPMOD found a cyclic dependency because vsock_transport use
+> > virtio_transport_common that use vsock, so if I include vsock_transport
+> > in the vsock module, DEPMOD is not happy.
+> >=20
+> > I don't know how to break this cyclic dependency, do you have any ideas=
+?
+>=20
+> One way to view this would be that the loopback transport and the support
+> it uses from virtio_transport_common are independent of virtio as such,
+> and could be part of  the af_vsock module if loopback is configured. So
+> in a way, the virtio g2h and h2g transports would be extensions of the
+> built in loopback transport. But that brings in quite a bit of code so
+> it could be better to just keep it as is.
 
-This is how you are expecting SPP to be used, but another possibility is
-to unprotect and reenter the guest.  In this case
-kvm_skip_emulated_instruction would be wrong (and once this decision is
-made, it would be very, very hard to change it).
+Great idea!
 
-However, you clearly need a way to skip the instruction, and for that
-you could store the current instruction length in vcpu->run->spp.  Then
-userspace can adjust RIP manually if desired.
+Stefan already suggested (as a long-term goal) to rename the generic
+functionality in virtio_transport_common.c
+
+Maybe I can do both in another series later on, since it requires enough
+changes.
 
 Thanks,
-
-Paolo
+Stefano
 
