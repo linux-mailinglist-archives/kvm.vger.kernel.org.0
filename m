@@ -2,215 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DBCC810560A
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 16:54:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5140710565F
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 17:02:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726676AbfKUPx4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 10:53:56 -0500
-Received: from mail-eopbgr730087.outbound.protection.outlook.com ([40.107.73.87]:12512
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726279AbfKUPx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 10:53:56 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YLy2Z1rObqHKh7BrkIOgCOFunWItBTaVzzUnrtQQsGy/PJTMJYc8iKr0+T7GDb4Fuswy3pBFF78EMp0get9JmEtHR/UQdlck1AXTzreHGRaMdqGMf6BUg6pgFoKEgiN37uyLZ61PJ41lFRwAe+cJ/NJsnI8eGb7ykum0NYFshGHNN/AHN8PsAUbqATcKoZVHQk+niqXw1YqqoQlXPtPdDZKqdHFGf2JYA3C+glD60es6s4ttPCSMC9dGI5mIYIa15SR6mxmyH1JLkMHS0/tdVNn98vz1Es3lYiG2bFU8ue1f3PQSdFwgnU5tuv5o5qIAALDf2iqK5lT9VvZp0oHppw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ax36A33+/7b7muHsk6F44iGcyRMic1uTUlDCkdwx5fo=;
- b=FbSab7gn56CSAWIWfvEIeoww1ytypXZVx6QooKgyIheLf0nL9nTH+W8rMVYF+bg3E8TdzgeWsqsHM1cVJCyA1faDU9KbhwdcAfZeCtlZORHDA/fbWEKzUDxa4vmZRAdMgh139CY1AtwH01O/aGynedXkxIhmnQiXB+Uh0SgARzyeZ+h9zSRxN1fxeisH2LESuXc93KpaDrWhGXUEyomYCZu8YkzpBZ6nZ0JjZu7MxPpfqo0uN/J4oxEAEp6FOWgkOv50pd7QWAWjgvEfHFljBTWUabCDPpGBMih2M07KUmrRfc+7U4Iad8t/LUj4Hf8bDahO42OL6H24PSk4zdWKhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ax36A33+/7b7muHsk6F44iGcyRMic1uTUlDCkdwx5fo=;
- b=nIUnnFA6TPyGEppLSEeyisjLvSrQvKnk1Qp531tT7q+O4xSS+9YT+NgmwVtOioki1jQGnQPSxmmf4A3CCoNuT7Bz3oqPMIj9SM1Mf0pU6oSpeUnBilJVKf/VZVyM5uUMFYJqPsCLJVfeR4GD35kH9h4NL+/ZRJzjBLOM/irg8H8=
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com (10.174.175.149) by
- MWHPR05MB3631.namprd05.prod.outlook.com (10.174.251.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.9; Thu, 21 Nov 2019 15:53:47 +0000
-Received: from MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209]) by MWHPR05MB3376.namprd05.prod.outlook.com
- ([fe80::4098:2c39:d8d3:a209%7]) with mapi id 15.20.2474.015; Thu, 21 Nov 2019
- 15:53:47 +0000
-From:   Jorgen Hansen <jhansen@vmware.com>
-To:     'Stefano Garzarella' <sgarzare@redhat.com>
-CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: RE: [PATCH net-next 3/6] vsock: add local transport support in the
- vsock core
-Thread-Topic: [PATCH net-next 3/6] vsock: add local transport support in the
- vsock core
-Thread-Index: AQHVnsi6A5C79S6UD0KKiVDL3k1B8qeVuhZQgAAHIACAAAGVwA==
-Date:   Thu, 21 Nov 2019 15:53:47 +0000
-Message-ID: <MWHPR05MB3376D95B5E50DF7CAF675EEDDA4E0@MWHPR05MB3376.namprd05.prod.outlook.com>
-References: <20191119110121.14480-1-sgarzare@redhat.com>
- <20191119110121.14480-4-sgarzare@redhat.com>
- <MWHPR05MB3376F4452F0CF38C1AFABA2EDA4E0@MWHPR05MB3376.namprd05.prod.outlook.com>
- <20191121152148.slv26oesn25dpjb6@steredhat>
-In-Reply-To: <20191121152148.slv26oesn25dpjb6@steredhat>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jhansen@vmware.com; 
-x-originating-ip: [208.91.2.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2e5c9b05-5229-47b4-ccf0-08d76e9afed2
-x-ms-traffictypediagnostic: MWHPR05MB3631:
-x-microsoft-antispam-prvs: <MWHPR05MB36318B83B106F7C7BC15AE85DA4E0@MWHPR05MB3631.namprd05.prod.outlook.com>
-x-vmwhitelist: True
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0228DDDDD7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(346002)(396003)(366004)(39860400002)(199004)(189003)(26005)(316002)(7736002)(76116006)(7696005)(71190400001)(71200400001)(81166006)(81156014)(446003)(186003)(86362001)(6116002)(9686003)(11346002)(2906002)(55016002)(229853002)(53546011)(6506007)(6246003)(3846002)(54906003)(305945005)(5660300002)(66066001)(6916009)(14444005)(256004)(99286004)(102836004)(478600001)(76176011)(52536014)(4326008)(66446008)(25786009)(74316002)(64756008)(66556008)(66476007)(66946007)(14454004)(33656002)(6436002)(8676002)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR05MB3631;H:MWHPR05MB3376.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: vmware.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +vH6rivpM+K+oUMpPEMVav7Sl2MrxAoPXzcRQ8N+uWElk5NMAk0udjqWIEDwSSfwNHx201zBGkj5SoJ8VyNQ/BA9OU5BqGX9Uay0lo5Jy7lhg98D35SH6Rpqf1j0ImFzMzOaZXKnxMtBboOy5mxlIwR2SSeI9P2OWVUPLPTM8OThsR73HKBUjFd8XZRiClvA/JR2e+i8gnnR8NEx69o/ppjJlLvw9q31/sn2Tj1HLM+TIXH8b+/L6KVN+0lE+rrjOkiHaXxxofsAdOfOrQDaG7scl9rSohtquieEDIghd6OzO+/y0XuCaW2JZ0OVL5C3vn/dQHBYQap/MrDHz7rN7lQqk+SMBikDd0N+gBZLQklol8eShtvx9N0Kam6qf3GaeMdfWmaZuXrtdzA0cQHQhKP6jocm365oSOiKvGVR2lcNi5stCr+FJ59GwgDi4qkR
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1727097AbfKUQCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 11:02:50 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45368 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727022AbfKUQCt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Nov 2019 11:02:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574352168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a11re/ehZiEz1brS/g1soEqMUI57pKvAoVTakb9DkPc=;
+        b=TUQ0ZzT9NbZXSLhA9t6La2/t9xTxkwMHRAaq1zb+7dwi8JyzrgyK1uDK6UilJ51Reoyv3O
+        PKt5lSzzSCrC5aF7+Bcaj1lYrMvavx8h4Qp2LYY5bNpNV2naY8MI3Vsg1NMhjGmmjUg0it
+        H78K17cu9zUKydNJ4q3SMYRG9wkcDuI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-EoePcsGNNki38VNRGn8M6w-1; Thu, 21 Nov 2019 11:02:44 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DE0410509DF;
+        Thu, 21 Nov 2019 16:02:43 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ED48860148;
+        Thu, 21 Nov 2019 16:02:39 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 17:02:37 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
+Message-ID: <20191121170237.72e0bd45.cohuck@redhat.com>
+In-Reply-To: <802c298d-d2da-83c4-c222-67bb78131988@linux.ibm.com>
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+        <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
+        <20191113140539.4d153d5f.cohuck@redhat.com>
+        <802c298d-d2da-83c4-c222-67bb78131988@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e5c9b05-5229-47b4-ccf0-08d76e9afed2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2019 15:53:47.5041
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: givXglQbZQq/2XbesKUQxk8Opz91jIATMfbuuqBBpyG7EJ1IpGBoo7zlKby34bsHddIWJch2qHy6mYfoEUkouA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR05MB3631
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: EoePcsGNNki38VNRGn8M6w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> Sent: Thursday, November 21, 2019 4:22 PM
->=20
-> On Thu, Nov 21, 2019 at 03:04:18PM +0000, Jorgen Hansen wrote:
-> > > From: Stefano Garzarella [mailto:sgarzare@redhat.com]
-> > > Sent: Tuesday, November 19, 2019 12:01 PM
-> > > To: netdev@vger.kernel.org
-> > >
-> > > This patch allows to register a transport able to handle
-> > > local communication (loopback).
-> > >
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > ---
-> > >  include/net/af_vsock.h   |  2 ++
-> > >  net/vmw_vsock/af_vsock.c | 17 ++++++++++++++++-
-> > >  2 files changed, 18 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> > > index 4206dc6d813f..b1c717286993 100644
-> > > --- a/include/net/af_vsock.h
-> > > +++ b/include/net/af_vsock.h
-> > > @@ -98,6 +98,8 @@ struct vsock_transport_send_notify_data {
-> > >  #define VSOCK_TRANSPORT_F_G2H		0x00000002
-> > >  /* Transport provides DGRAM communication */
-> > >  #define VSOCK_TRANSPORT_F_DGRAM		0x00000004
-> > > +/* Transport provides local (loopback) communication */
-> > > +#define VSOCK_TRANSPORT_F_LOCAL		0x00000008
-> > >
-> > >  struct vsock_transport {
-> > >  	struct module *module;
-> > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > > index cc8659838bf2..c9e5bad59dc1 100644
-> > > --- a/net/vmw_vsock/af_vsock.c
-> > > +++ b/net/vmw_vsock/af_vsock.c
-> > > @@ -136,6 +136,8 @@ static const struct vsock_transport
-> *transport_h2g;
-> > >  static const struct vsock_transport *transport_g2h;
-> > >  /* Transport used for DGRAM communication */
-> > >  static const struct vsock_transport *transport_dgram;
-> > > +/* Transport used for local communication */
-> > > +static const struct vsock_transport *transport_local;
-> > >  static DEFINE_MUTEX(vsock_register_mutex);
-> > >
-> > >  /**** UTILS ****/
-> > > @@ -2130,7 +2132,7 @@
-> EXPORT_SYMBOL_GPL(vsock_core_get_transport);
-> > >
-> > >  int vsock_core_register(const struct vsock_transport *t, int feature=
-s)
-> > >  {
-> > > -	const struct vsock_transport *t_h2g, *t_g2h, *t_dgram;
-> > > +	const struct vsock_transport *t_h2g, *t_g2h, *t_dgram, *t_local;
-> > >  	int err =3D mutex_lock_interruptible(&vsock_register_mutex);
-> > >
-> > >  	if (err)
-> > > @@ -2139,6 +2141,7 @@ int vsock_core_register(const struct
-> > > vsock_transport *t, int features)
-> > >  	t_h2g =3D transport_h2g;
-> > >  	t_g2h =3D transport_g2h;
-> > >  	t_dgram =3D transport_dgram;
-> > > +	t_local =3D transport_local;
-> > >
-> > >  	if (features & VSOCK_TRANSPORT_F_H2G) {
-> > >  		if (t_h2g) {
-> > > @@ -2164,9 +2167,18 @@ int vsock_core_register(const struct
-> > > vsock_transport *t, int features)
-> > >  		t_dgram =3D t;
-> > >  	}
-> > >
-> > > +	if (features & VSOCK_TRANSPORT_F_LOCAL) {
-> > > +		if (t_local) {
-> > > +			err =3D -EBUSY;
-> > > +			goto err_busy;
-> > > +		}
-> > > +		t_local =3D t;
-> > > +	}
-> > > +
-> > >  	transport_h2g =3D t_h2g;
-> > >  	transport_g2h =3D t_g2h;
-> > >  	transport_dgram =3D t_dgram;
-> > > +	transport_local =3D t_local;
-> > >
-> > >  err_busy:
-> > >  	mutex_unlock(&vsock_register_mutex);
-> > > @@ -2187,6 +2199,9 @@ void vsock_core_unregister(const struct
-> > > vsock_transport *t)
-> > >  	if (transport_dgram =3D=3D t)
-> > >  		transport_dgram =3D NULL;
-> > >
-> > > +	if (transport_local =3D=3D t)
-> > > +		transport_local =3D NULL;
-> > > +
-> > >  	mutex_unlock(&vsock_register_mutex);
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(vsock_core_unregister);
-> > > --
-> > > 2.21.0
-> >
-> > Having loopback support as a separate transport fits nicely, but do we =
-need
-> to support
-> > different variants of loopback? It could just be built in.
->=20
-> I agree with you, indeed initially I developed it as built in, but
-> DEPMOD found a cyclic dependency because vsock_transport use
-> virtio_transport_common that use vsock, so if I include vsock_transport
-> in the vsock module, DEPMOD is not happy.
->=20
-> I don't know how to break this cyclic dependency, do you have any ideas?
+On Thu, 14 Nov 2019 11:11:18 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-One way to view this would be that the loopback transport and the support
-it uses from virtio_transport_common are independent of virtio as such,
-and could be part of  the af_vsock module if loopback is configured. So
-in a way, the virtio g2h and h2g transports would be extensions of the
-built in loopback transport. But that brings in quite a bit of code so
-it could be better to just keep it as is.
+> On 2019-11-13 14:05, Cornelia Huck wrote:
+> > On Wed, 13 Nov 2019 13:23:19 +0100
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > =20
+> >> This simple test test the I/O reading by the SUB Channel by:
+> >> - initializing the Channel SubSystem with predefined CSSID:
+> >>    0xfe000000 CSSID for a Virtual CCW =20
+> > 0 should be fine with recent QEMU versions as well, I guess? =20
+> Right
+>=20
+>=20
+> > =20
+> >>    0x00090000 SSID for CCW-PONG =20
+> > subchannel id, or subchannel set id? =20
+>=20
+> hum, only part of, I had SSID (Subchannel Set ID) 4 (a.k.a m bit) + Bit=
+=20
+> 47=C2=A0 =3D1
+>=20
+> But as you said, I can use CSSID 0 and m =3D 0 which makes:
+>=20
+> Subsystem Identification word =3D 0x00010000
 
-Thanks,
-Jorgen
+Yeah, I was mainly confused by the name 'SSID'.
+
+> >> - initializing the ORB pointing to a single READ CCW =20
+> > Out of curiosity: Would using a NOP also be an option? =20
+>=20
+> It will work but will not be handled by this device, css.c intercept it=
+=20
+> in sch_handle_start_func_virtual.
+>=20
+> AFAIU If we want to have a really good testing environment, for driver=20
+> testing for exemple, then it would be interesting to add a new=20
+> do_subchannel_work callback like do_subchannel_work_emulation along with=
+=20
+> the _virtual and _paththrough variantes.
+>=20
+> Having a dedicated callback for emulation, we can answer to any CSS=20
+> instructions and SSCH commands, including NOP and TIC.
+
+I guess that depends on what you want to test; if you actually want to
+test device emulation as used by virtio etc., you obviously want to go
+through the existing _virtual callback :)
+
+The actual motivation behind my question was:
+Is it possible to e.g. throw NOP (or TIC, or something else not
+device-specific) at a normal, existing virtio device for test purposes?
+You'd end up testing the common emulation code without needing any
+extra support in QEMU. No idea how useful that would be.
+
+>=20
+> My goal here was to quickly develop a device answering to some basic=20
+> READ/WRITE command to start memory transfers from inside a guest without=
+=20
+> Linux and without implementing VIRTIO in KVM tests.
+
+Yes, if you want to do some simple memory transfers, virtio is probably
+not the first choice. Would e.g. doing a SenseID or so actually be
+useful in some way already? After all, it does transfer memory (but
+only in one direction).
+
+> >> +static inline int rsch(unsigned long schid) =20
+> > I don't think anyone has tried rsch with QEMU before; sounds like a
+> > good idea to test this :) =20
+>=20
+> With an do_subchannel_work_emulation() callback?
+
+You probably need to build a simple channel program that suspends
+itself and can be resumed later.
+
