@@ -2,103 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D5DE51050D4
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBED91050D6
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:45:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbfKUKpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 05:45:45 -0500
-Received: from mga14.intel.com ([192.55.52.115]:47098 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726014AbfKUKpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:45:44 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Nov 2019 02:45:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,224,1571727600"; 
-   d="scan'208";a="408473585"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.162])
-  by fmsmga006.fm.intel.com with ESMTP; 21 Nov 2019 02:45:38 -0800
-Date:   Thu, 21 Nov 2019 12:45:38 +0200
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH v3 05/19] x86/mce: WARN once if IA32_FEATURE_CONTROL MSR
- is left unlocked
-Message-ID: <20191121104538.GD20907@linux.intel.com>
-References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
- <20191119031240.7779-6-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191119031240.7779-6-sean.j.christopherson@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726690AbfKUKps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 05:45:48 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39350 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726014AbfKUKps (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Nov 2019 05:45:48 -0500
+Received: by mail-wm1-f68.google.com with SMTP id t26so3104350wmi.4;
+        Thu, 21 Nov 2019 02:45:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=cxS5SnfMHCr10pDxeGM/7sjAasmtfI9lheTpz/ICL50=;
+        b=NMLOmZbG1QR7h4UQQ4HZf1hVPYrxEm1ZJNehrqPfkOdCdfWlHrkopiy3UcAmeWWXPu
+         46EUdDIIlNcH92rVn/4LIabijIkjTfKTwTBuFQIsx0UZj2M/998qHZEhVFjyCV0grzQs
+         V9KHSnlF3ookG3Vb7mK3stgJbIQgH9sUPko33b+e0raVFDd+rU9jlRePXW0qC7J8SGal
+         u8BPmeIdrwAaeT9KW8IfMnz0nFh7C1N7MHKPQ+ykh3k0X5090qbFW865LYHXlHXSH+jy
+         M48ZZR0NzvTjY4m4z8mg5o8iTic2mlCtNlWqH5xKttE01xzDgrZaYFJJ9qK/HfhfcGxl
+         rbyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=cxS5SnfMHCr10pDxeGM/7sjAasmtfI9lheTpz/ICL50=;
+        b=NWAo5RDhqKJeMp/yPIM6YrWwGIZNh750NJw498Y0xXuX6R/68XSKI6c5iP8SYnaPrg
+         lIKqW0Ou7qDhONEugk17Un3aXmWDr4L9dtnCIVgEgLy9ZNZgbd+gZJ04Altzi2o3OnC3
+         +/U92zARydFNkVRML09/3eJhn63Va86pJzR2Td43k2W9TxSG8HZSG/nSXRiDGLOsFEo0
+         JkPzIJcVpLxXun2oZUW/4s11Clob8nEtqUXXAuOU73tUiIHAWXtaPvOV+HH5LEGQBz9X
+         XoG3zWTe/QlyJDsfP5NqAGNiE9s6AvmcXc7AejG0eCqjPaT5v7WIOwL3vB8MVU2Zsein
+         PVHQ==
+X-Gm-Message-State: APjAAAXLNb8GQYT9DPwkOct0bbdxUIVG+HuTlcQNWseazFR9n2vjyolL
+        tjyET1H7DO/B6IA7MqpPmLTPsVje
+X-Google-Smtp-Source: APXvYqxILiCiMhr9y5tsRaYve/TJEB3kVlTw+lE1x7awLVKtBnT5EdHOOOgqYiCiqzHchAY+PNQ0LA==
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr9552009wmi.124.1574333145541;
+        Thu, 21 Nov 2019 02:45:45 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id k1sm2871745wrp.29.2019.11.21.02.45.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Nov 2019 02:45:45 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Peter Feiner <pfeiner@google.com>
+Subject: [PATCH] KVM: x86: create mmu/ subdirectory
+Date:   Thu, 21 Nov 2019 11:45:43 +0100
+Message-Id: <1574333143-27723-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 18, 2019 at 07:12:26PM -0800, Sean Christopherson wrote:
-> WARN if the IA32_FEATURE_CONTROL MSR is somehow left unlocked now that
-> CPU initialization unconditionally locks the MSR.
-> 
-> Reviewed-by: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->  arch/x86/kernel/cpu/mce/intel.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/cpu/mce/intel.c b/arch/x86/kernel/cpu/mce/intel.c
-> index 3e5b29acd301..5abc55a67fce 100644
-> --- a/arch/x86/kernel/cpu/mce/intel.c
-> +++ b/arch/x86/kernel/cpu/mce/intel.c
-> @@ -119,11 +119,10 @@ static bool lmce_supported(void)
->  	 * generate a #GP fault.
->  	 */
->  	rdmsrl(MSR_IA32_FEATURE_CONTROL, tmp);
-> -	if ((tmp & (FEAT_CTL_LOCKED | FEAT_CTL_LMCE_ENABLED)) ==
-> -		   (FEAT_CTL_LOCKED | FEAT_CTL_LMCE_ENABLED))
-> -		return true;
+Preparatory work for shattering mmu.c into multiple files.  Besides making it easier
+to follow, this will also make it possible to write unit tests for various parts.
 
-I'd add a prepending comment:
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/Makefile                | 4 ++--
+ arch/x86/kvm/{ => mmu}/mmu.c         | 0
+ arch/x86/kvm/{ => mmu}/page_track.c  | 0
+ arch/x86/kvm/{ => mmu}/paging_tmpl.h | 0
+ 4 files changed, 2 insertions(+), 2 deletions(-)
+ rename arch/x86/kvm/{ => mmu}/mmu.c (100%)
+ rename arch/x86/kvm/{ => mmu}/page_track.c (100%)
+ rename arch/x86/kvm/{ => mmu}/paging_tmpl.h (100%)
 
-/*
- * FEAT_CTL_LOCKED should have been always set either by
- * BIOS before handover to the kernel or init_feature_control_msr().
- */
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 31ecf7a76d5a..b19ef421084d 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -8,9 +8,9 @@ kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
+ 				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
+ 
+-kvm-y			+= x86.o mmu.o emulate.o i8259.o irq.o lapic.o \
++kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+ 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+-			   hyperv.o page_track.o debugfs.o
++			   hyperv.o debugfs.o mmu/mmu.o mmu/page_track.o
+ 
+ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o vmx/evmcs.o vmx/nested.o
+ kvm-amd-y		+= svm.o pmu_amd.o
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu/mmu.c
+similarity index 100%
+rename from arch/x86/kvm/mmu.c
+rename to arch/x86/kvm/mmu/mmu.c
+diff --git a/arch/x86/kvm/page_track.c b/arch/x86/kvm/mmu/page_track.c
+similarity index 100%
+rename from arch/x86/kvm/page_track.c
+rename to arch/x86/kvm/mmu/page_track.c
+diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+similarity index 100%
+rename from arch/x86/kvm/paging_tmpl.h
+rename to arch/x86/kvm/mmu/paging_tmpl.h
+-- 
+1.8.3.1
 
-> +	if (WARN_ON_ONCE(!(tmp & FEAT_CTL_LOCKED)))
-> +		return false;
->  
-> -	return false;
-> +	return tmp & FEAT_CTL_LMCE_ENABLED;
->  }
->  
->  bool mce_intel_cmci_poll(void)
-> -- 
-> 2.24.0
-> 
-
-/Jarkko
