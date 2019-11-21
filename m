@@ -2,140 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 30F35105001
-	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:05:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EC1110505A
+	for <lists+kvm@lfdr.de>; Thu, 21 Nov 2019 11:19:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726690AbfKUKFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Nov 2019 05:05:16 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56016 "EHLO
+        id S1727090AbfKUKS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Nov 2019 05:18:57 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31609 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726342AbfKUKFQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Nov 2019 05:05:16 -0500
+        by vger.kernel.org with ESMTP id S1726343AbfKUKS4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Nov 2019 05:18:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574330716;
+        s=mimecast20190719; t=1574331535;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mTbZEMwYfOT6jDofWQMm684EqH0d5BOVG5EfNCsfnNw=;
-        b=Q4JfqNQ26ceaZUOLRk1+HNDwT9CCXyQgcDevUplomn2HAaCofHu7vnh8Y9XWujjZ0RMm9Y
-        hXbplEXz82CdfEwbKoRcUSALmSpYJOhjZV7OgvMkJ3fghANovYdxpR2wkJ+AEwk7dDPkE3
-        3L6lXYvUIbjU8Rzkp+q4cIYDEY6OonA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-8iyy8Nv2NUuHDyKyfYDP5g-1; Thu, 21 Nov 2019 05:05:14 -0500
-Received: by mail-wr1-f70.google.com with SMTP id e3so1773894wrs.17
-        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 02:05:14 -0800 (PST)
+        bh=5gek0hQ8ZLdLms7wGQFlBpywg0Dh4Rzi7CF4EhMq+qI=;
+        b=hFzV9mhHRxO/DZs4lCxQlSxVOOuYrX1ZeeJL9gqobRgVUojk2EKXban9y/bgKGqQcLpSql
+        Nn8mqsF1KCKnjvCRfYmZJRJ4HJK5O7uSYI4m7wm0i/67ChfSKAqhoRrwGYkEE2HnmZ2U1k
+        IgPMKoFUWnsLolr+GwG9xpWGTjEOxEg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-poTt-IUCO6CQqvMzofZl2Q-1; Thu, 21 Nov 2019 05:18:52 -0500
+Received: by mail-wm1-f69.google.com with SMTP id i23so1347996wmb.3
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 02:18:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WjBe/bpFfR8YjJaRZQ403Que5OIq9zts89mo41qWm30=;
-        b=rPcnREbJodNPOA7U/OBY+XVd3EBS1oMjfYxwOu+jJSNHoUDkAXiydUTvmQa6GfYGqg
-         DQ9PuAonqE9oEZaRb79xlc106pUR3AYp8jr4OMGDmfVbY1JqFfwHohZK6+zMPV2gZZ1x
-         1wDUkDzkybZ/PIoqfwdk4n2zSCVWty8hOubqNL238iXItQhGKaRETvS6gKUuWoCdQnkJ
-         c6yTW2rlQ+ukUBehH8MlGHC0h8iIeFCJZ/fdUY8wUxGXdxX2JG5jAEaUBTcKgeXHSVLG
-         OracTiRfcseu1jQJraRVWTJV9KFlYU2jdTEsaxLQSEqECHaN23tCyAHzz840LuFVrtim
-         KQnA==
-X-Gm-Message-State: APjAAAXsr+UaoRu6wzgAmixGU9OpnCdfejnV73pRWjny8oH34GR5H3lQ
-        8TJr7EgbNj7xK8v7/Wo0P2KYgTgGxzjQf6xsB0FRQoUHQzCoZNTTy+ZrHmB8sYEYprZYVMySDXR
-        JlrTlue0uJZ6k
-X-Received: by 2002:a1c:7d16:: with SMTP id y22mr8565201wmc.106.1574330713247;
-        Thu, 21 Nov 2019 02:05:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyOlfVU/bWpGIHnKv57s8kK3m5vYZ/Pt8KTmBF8V0SJrqfD//MnSWSTdrBYEv5kqItZozpMBg==
-X-Received: by 2002:a1c:7d16:: with SMTP id y22mr8565167wmc.106.1574330712947;
-        Thu, 21 Nov 2019 02:05:12 -0800 (PST)
-Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
-        by smtp.gmail.com with ESMTPSA id 17sm2273656wmg.19.2019.11.21.02.05.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2019 02:05:12 -0800 (PST)
-Date:   Thu, 21 Nov 2019 11:05:10 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Dexuan Cui <decui@microsoft.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [PATCH net-next 0/6] vsock: add local transport support
-Message-ID: <20191121100510.7gdcx7c3qom2f3wo@steredhat>
-References: <20191119110121.14480-1-sgarzare@redhat.com>
- <20191121094643.GD439743@stefanha-x1.localdomain>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YLr6hs+2kbTqnRRA4/wKkKRGchRZdYPhFr9/x9KHzBY=;
+        b=YHXCiWIpqsX/YIA20lpAXZUvNBWi+THhjeXyCXKdQcQqQyb74oNwF/cmjXo2qY/dVp
+         eVRqj+vZuvAsZ9y79cple+a0ItKO6NNrbO34dElxdDn/rKKHuQX+rSldHqfddAM79Zgn
+         BM0UogqHeYzEz7jZgyl57FTSEYRBOKIbimSrwVCZ01KBM1wXaJrcomQOlQDO6gBTqITp
+         7PZNvx1T0hzNvEpk9Nm2tRhehNT5vNdzRUBg/fvxZuLjHp+rqhP5Piy5ambNG3thE01p
+         s86QgXTUiM0vMJxtJIGPkmVaupRvePbI/OudiKYqiRT9xSKdmtYihpIEc15IKIzfYIBd
+         debA==
+X-Gm-Message-State: APjAAAVA1aLwmXTQRljF92NZwn3kk+9OV/6NR4k7bkZtIeaJ7bpCVLG0
+        luxtpeP/aIlBkj4BHCKdoN7YBhsdD/Sv0CsdJva/dbOk41c5VHqb4zeb/xIBvGoV9BRVQXzKH6v
+        k5/3Uq1NFKYRh
+X-Received: by 2002:a1c:3d08:: with SMTP id k8mr8486652wma.119.1574331530232;
+        Thu, 21 Nov 2019 02:18:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx1iABHZAx/K/IiCjLw7xRZnkNUg1zfGJVjoWHiAW0VkGqID4bxFvDIq/LBBkZR+P28g3p1Lg==
+X-Received: by 2002:a1c:3d08:: with SMTP id k8mr8486628wma.119.1574331529928;
+        Thu, 21 Nov 2019 02:18:49 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744? ([2001:b07:6468:f312:71a5:6e:f854:d744])
+        by smtp.gmail.com with ESMTPSA id t134sm2468758wmt.24.2019.11.21.02.18.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Nov 2019 02:18:49 -0800 (PST)
+Subject: Re: [PATCH v7 6/9] vmx: spp: Set up SPP paging table at
+ vmentry/vmexit
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com
+References: <20191119084949.15471-1-weijiang.yang@intel.com>
+ <20191119084949.15471-7-weijiang.yang@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a7ce232b-0a54-0039-7009-8e92e8078791@redhat.com>
+Date:   Thu, 21 Nov 2019 11:18:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191121094643.GD439743@stefanha-x1.localdomain>
-X-MC-Unique: 8iyy8Nv2NUuHDyKyfYDP5g-1
+In-Reply-To: <20191119084949.15471-7-weijiang.yang@intel.com>
+Content-Language: en-US
+X-MC-Unique: poTt-IUCO6CQqvMzofZl2Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 09:46:43AM +0000, Stefan Hajnoczi wrote:
-> On Tue, Nov 19, 2019 at 12:01:15PM +0100, Stefano Garzarella wrote:
-> > This series introduces a new transport (vsock_loopback) to handle
-> > local communication.
-> > This could be useful to test vsock core itself and to allow developers
-> > to test their applications without launching a VM.
-> >=20
-> > Before this series, vmci and virtio transports allowed this behavior,
-> > but only in the guest.
-> > We are moving the loopback handling in a new transport, because it
-> > might be useful to provide this feature also in the host or when
-> > no H2G/G2H transports (hyperv, virtio, vmci) are loaded.
-> >=20
-> > The user can use the loopback with the new VMADDR_CID_LOCAL (that
-> > replaces VMADDR_CID_RESERVED) in any condition.
-> > Otherwise, if the G2H transport is loaded, it can also use the guest
-> > local CID as previously supported by vmci and virtio transports.
-> > If G2H transport is not loaded, the user can also use VMADDR_CID_HOST
-> > for local communication.
-> >=20
-> > Patch 1 is a cleanup to build virtio_transport_common without virtio
-> > Patch 2 adds the new VMADDR_CID_LOCAL, replacing VMADDR_CID_RESERVED
-> > Patch 3 adds a new feature flag to register a loopback transport
-> > Patch 4 adds the new vsock_loopback transport based on the loopback
-> >         implementation of virtio_transport
-> > Patch 5 implements the logic to use the local transport for loopback
-> >         communication
-> > Patch 6 removes the loopback from virtio_transport
-> >=20
-> > @Jorgen: Do you think it might be a problem to replace
-> > VMADDR_CID_RESERVED with VMADDR_CID_LOCAL?
-> >=20
-> > Thanks,
-> > Stefano
-> >=20
-> > Stefano Garzarella (6):
-> >   vsock/virtio_transport_common: remove unused virtio header includes
-> >   vsock: add VMADDR_CID_LOCAL definition
-> >   vsock: add local transport support in the vsock core
-> >   vsock: add vsock_loopback transport
-> >   vsock: use local transport when it is loaded
-> >   vsock/virtio: remove loopback handling
-> >=20
-> >  MAINTAINERS                             |   1 +
-> >  include/net/af_vsock.h                  |   2 +
-> >  include/uapi/linux/vm_sockets.h         |   8 +-
-> >  net/vmw_vsock/Kconfig                   |  12 ++
-> >  net/vmw_vsock/Makefile                  |   1 +
-> >  net/vmw_vsock/af_vsock.c                |  49 +++++-
-> >  net/vmw_vsock/virtio_transport.c        |  61 +------
-> >  net/vmw_vsock/virtio_transport_common.c |   3 -
-> >  net/vmw_vsock/vmci_transport.c          |   2 +-
-> >  net/vmw_vsock/vsock_loopback.c          | 217 ++++++++++++++++++++++++
-> >  10 files changed, 283 insertions(+), 73 deletions(-)
-> >  create mode 100644 net/vmw_vsock/vsock_loopback.c
->=20
-> Please see my comments.  Otherwise:
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 19/11/19 09:49, Yang Weijiang wrote:
+> +=09=09=09if (spte & PT_SPP_MASK) {
+> +=09=09=09=09fault_handled =3D true;
+> +=09=09=09=09vcpu->run->exit_reason =3D KVM_EXIT_SPP;
+> +=09=09=09=09vcpu->run->spp.addr =3D gva;
+> +=09=09=09=09kvm_skip_emulated_instruction(vcpu);
 
-Thanks!
-I'll send a v2 following your comments.
+Do you really want to skip the current instruction?  Who will do the write?
 
-Stefano
+> +=09=09pr_info("SPP - SPPT entry missing! gfn =3D 0x%llx\n", gfn);
+
+Please replace pr_info with a tracepoint.
+
+> +=09=09slot =3D gfn_to_memslot(vcpu->kvm, gfn);
+> +=09=09if (!slot)
+> +=09=09=09return -EFAULT;
+
+You want either a goto to the misconfig case, so that there is a warn
+
+> +=09=09spp_info.base_gfn =3D gfn;
+> +=09=09spp_info.npages =3D 1;
+> +
+> +=09=09spin_lock(&vcpu->kvm->mmu_lock);
+> +=09=09ret =3D kvm_spp_get_permission(vcpu->kvm, &spp_info);
+> +=09=09if (ret =3D=3D 1) {
+
+Can you clarify when ret will not be 1?  In this case you already have a
+slot, so it seems to me that you do not need to go through
+kvm_spp_get_permission and you can just test "if
+(kvm->arch.spp_active)".  But then, spp_active should be 1 if you get
+here, I think?
+
+> +=09pr_alert("SPP - SPPT Misconfiguration!\n");
+> +=09return 0;
+
+
+pr_alert not needed since you've just warned.
+
+Paolo
 
