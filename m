@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18689107AB7
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3056F107AB5
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727166AbfKVWkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 17:40:32 -0500
+        id S1727152AbfKVWkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 17:40:31 -0500
 Received: from mga01.intel.com ([192.55.52.88]:61229 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726920AbfKVWkE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726931AbfKVWkE (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 22 Nov 2019 17:40:04 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:40:04 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,231,1571727600"; 
-   d="scan'208";a="409029685"
+   d="scan'208";a="409029691"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by fmsmga006.fm.intel.com with ESMTP; 22 Nov 2019 14:40:04 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -29,9 +29,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 08/13] KVM: x86: Dynamically allocate per-vCPU emulation context
-Date:   Fri, 22 Nov 2019 14:39:54 -0800
-Message-Id: <20191122223959.13545-9-sean.j.christopherson@intel.com>
+Subject: [PATCH 09/13] KVM: x86: Move kvm_emulate.h into KVM's private directory
+Date:   Fri, 22 Nov 2019 14:39:55 -0800
+Message-Id: <20191122223959.13545-10-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191122223959.13545-1-sean.j.christopherson@intel.com>
 References: <20191122223959.13545-1-sean.j.christopherson@intel.com>
@@ -42,216 +42,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allocate the emulation context instead of embedding it in struct
-kvm_vcpu_arch.
-
-Dynamic allocation provides several benefits:
-
-  - Shrinks the size x86 vcpus by ~2.5k bytes, dropping them back below
-    the PAGE_ALLOC_COSTLY_ORDER threshold.
-  - Allows for dropping the include of kvm_emulate.h from asm/kvm_host.h
-    and moving kvm_emulate.h into KVM's private directory.
-  - Allows a reducing KVM's attack surface by shrinking the amount of
-    vCPU data that is exposed to usercopy.
-  - Allows a future patch to disable the emulator entirely, which may or
-    may not be a realistic endeavor.
-
-Mark the entire struct as valid for usercopy to maintain existing
-behavior with respect to hardened usercopy.  Future patches can shrink
-the usercopy range to cover only what is necessary.
+Now that the emulation context is dynamically allocated and not embedded
+in struct kvm_vcpu, move its header, kvm_emulate.h, out of the public
+asm directory and into KVM's private x86 directory.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_emulate.h |  1 +
- arch/x86/include/asm/kvm_host.h    |  2 +-
- arch/x86/kvm/x86.c                 | 62 ++++++++++++++++++++++++++----
- 3 files changed, 57 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/kvm_host.h             | 5 ++++-
+ arch/x86/kvm/emulate.c                      | 2 +-
+ arch/x86/{include/asm => kvm}/kvm_emulate.h | 0
+ arch/x86/kvm/mmu/mmu.c                      | 1 +
+ arch/x86/kvm/x86.c                          | 1 +
+ arch/x86/kvm/x86.h                          | 1 +
+ 6 files changed, 8 insertions(+), 2 deletions(-)
+ rename arch/x86/{include/asm => kvm}/kvm_emulate.h (100%)
 
-diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index 77cf6c11f66b..844e833609db 100644
---- a/arch/x86/include/asm/kvm_emulate.h
-+++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -289,6 +289,7 @@ enum x86emul_mode {
- #define X86EMUL_SMM_INSIDE_NMI_MASK  (1 << 7)
- 
- struct x86_emulate_ctxt {
-+	void *vcpu;
- 	const struct x86_emulate_ops *ops;
- 
- 	/* Register state before/after emulation. */
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index dec643f4ac78..eab45340eb2f 100644
+index eab45340eb2f..9ed14b11063c 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -671,7 +671,7 @@ struct kvm_vcpu_arch {
+@@ -175,7 +175,10 @@ enum {
+ 	VCPU_SREG_LDTR,
+ };
  
- 	/* emulate context */
+-#include <asm/kvm_emulate.h>
++struct x86_emulate_ctxt;
++struct x86_exception;
++enum x86_intercept;
++enum x86_intercept_stage;
  
--	struct x86_emulate_ctxt emulate_ctxt;
-+	struct x86_emulate_ctxt *emulate_ctxt;
- 	bool emulate_regs_need_sync_to_vcpu;
- 	bool emulate_regs_need_sync_from_vcpu;
- 	int (*complete_userspace_io)(struct kvm_vcpu *vcpu);
+ #define KVM_NR_MEM_OBJS 40
+ 
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 596fa52e5ecb..95b07b92f884 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -20,7 +20,7 @@
+ 
+ #include <linux/kvm_host.h>
+ #include "kvm_cache_regs.h"
+-#include <asm/kvm_emulate.h>
++#include "kvm_emulate.h"
+ #include <linux/stringify.h>
+ #include <asm/debugreg.h>
+ #include <asm/nospec-branch.h>
+diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+similarity index 100%
+rename from arch/x86/include/asm/kvm_emulate.h
+rename to arch/x86/kvm/kvm_emulate.h
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6f92b40d798c..9ab2f9c07f35 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -19,6 +19,7 @@
+ #include "mmu.h"
+ #include "x86.h"
+ #include "kvm_cache_regs.h"
++#include "kvm_emulate.h"
+ #include "cpuid.h"
+ 
+ #include <linux/kvm_host.h>
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index dd6f010345d1..9092990d57ad 100644
+index 9092990d57ad..548cf3b659f5 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -79,7 +79,7 @@ u64 __read_mostly kvm_mce_cap_supported = MCG_CTL_P | MCG_SER_P;
- EXPORT_SYMBOL_GPL(kvm_mce_cap_supported);
+@@ -22,6 +22,7 @@
+ #include "i8254.h"
+ #include "tss.h"
+ #include "kvm_cache_regs.h"
++#include "kvm_emulate.h"
+ #include "x86.h"
+ #include "cpuid.h"
+ #include "pmu.h"
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 84649ec1b7f5..3f425b601257 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -5,6 +5,7 @@
+ #include <linux/kvm_host.h>
+ #include <asm/pvclock.h>
+ #include "kvm_cache_regs.h"
++#include "kvm_emulate.h"
  
- #define emul_to_vcpu(ctxt) \
--	container_of(ctxt, struct kvm_vcpu, arch.emulate_ctxt)
-+	((struct kvm_vcpu *)(ctxt)->vcpu)
- 
- /* EFER defaults:
-  * - enable syscall per default because its emulated by KVM
-@@ -226,6 +226,19 @@ u64 __read_mostly host_xcr0;
- struct kmem_cache *x86_fpu_cache;
- EXPORT_SYMBOL_GPL(x86_fpu_cache);
- 
-+static struct kmem_cache *x86_emulator_cache;
-+
-+static struct kmem_cache *kvm_alloc_emulator_cache(void)
-+{
-+	return kmem_cache_create_usercopy("x86_emulator",
-+					  sizeof(struct x86_emulate_ctxt),
-+					  __alignof__(struct x86_emulate_ctxt),
-+					  SLAB_ACCOUNT,
-+					  0,
-+					  sizeof(struct x86_emulate_ctxt),
-+					  NULL);
-+}
-+
- static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
- 
- static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
-@@ -6324,6 +6337,23 @@ static bool inject_emulated_exception(struct x86_emulate_ctxt *ctxt)
- 	return false;
- }
- 
-+static struct x86_emulate_ctxt *alloc_emulate_ctxt(struct kvm_vcpu *vcpu)
-+{
-+	struct x86_emulate_ctxt *ctxt;
-+
-+	ctxt = kmem_cache_zalloc(x86_emulator_cache, GFP_KERNEL_ACCOUNT);
-+	if (!ctxt) {
-+		pr_err("kvm: failed to allocate vcpu's emulator\n");
-+		return NULL;
-+	}
-+
-+	ctxt->vcpu = vcpu;
-+	ctxt->ops = &emulate_ops;
-+	vcpu->arch.emulate_ctxt = ctxt;
-+
-+	return ctxt;
-+}
-+
- static void init_emulate_ctxt(struct x86_emulate_ctxt *ctxt)
- {
- 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
-@@ -6350,7 +6380,7 @@ static void init_emulate_ctxt(struct x86_emulate_ctxt *ctxt)
- 
- void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip)
- {
--	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
-+	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
- 	int ret;
- 
- 	init_emulate_ctxt(ctxt);
-@@ -6669,7 +6699,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
- 			    int insn_len)
- {
- 	int r;
--	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
-+	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
- 	bool writeback = true;
- 	bool write_fault_to_spt = vcpu->arch.write_fault_to_shadow_pgtable;
- 
-@@ -7251,10 +7281,16 @@ int kvm_arch_init(void *opaque)
- 		goto out;
- 	}
- 
-+	x86_emulator_cache = kvm_alloc_emulator_cache();
-+	if (!x86_emulator_cache) {
-+		pr_err("kvm: failed to allocate cache for x86 emulator\n");
-+		goto out_free_x86_fpu_cache;
-+	}
-+
- 	shared_msrs = alloc_percpu(struct kvm_shared_msrs);
- 	if (!shared_msrs) {
- 		printk(KERN_ERR "kvm: failed to allocate percpu kvm_shared_msrs\n");
--		goto out_free_x86_fpu_cache;
-+		goto out_free_x86_emulator_cache;
- 	}
- 
- 	r = kvm_mmu_module_init();
-@@ -7287,6 +7323,8 @@ int kvm_arch_init(void *opaque)
- 
- out_free_percpu:
- 	free_percpu(shared_msrs);
-+out_free_x86_emulator_cache:
-+	kmem_cache_destroy(x86_emulator_cache);
- out_free_x86_fpu_cache:
- 	kmem_cache_destroy(x86_fpu_cache);
- out:
-@@ -8602,7 +8640,7 @@ static void __get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
- 		 * that usually, but some bad designed PV devices (vmware
- 		 * backdoor interface) need this to work
- 		 */
--		emulator_writeback_register_cache(&vcpu->arch.emulate_ctxt);
-+		emulator_writeback_register_cache(vcpu->arch.emulate_ctxt);
- 		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
- 	}
- 	regs->rax = kvm_rax_read(vcpu);
-@@ -8784,7 +8822,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
- 		    int reason, bool has_error_code, u32 error_code)
- {
--	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
-+	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
- 	int ret;
- 
- 	init_emulate_ctxt(ctxt);
-@@ -9109,6 +9147,8 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 
- 	kvmclock_reset(vcpu);
- 
-+	if (vcpu->arch.emulate_ctxt)
-+		kmem_cache_free(x86_emulator_cache, vcpu->arch.emulate_ctxt);
- 	kvm_x86_ops->vcpu_free(vcpu);
- 	free_cpumask_var(wbinvd_dirty_mask);
- }
-@@ -9124,6 +9164,13 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
- 		"guest TSC will not be reliable\n");
- 
- 	vcpu = kvm_x86_ops->vcpu_create(kvm, id);
-+	if (IS_ERR(vcpu))
-+		return vcpu;
-+
-+	if (!alloc_emulate_ctxt(vcpu)) {
-+		kvm_arch_vcpu_destroy(vcpu);
-+		return ERR_PTR(-ENOMEM);
-+	}
- 
- 	return vcpu;
- }
-@@ -9176,6 +9223,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_mmu_unload(vcpu);
- 	vcpu_put(vcpu);
- 
-+	if (vcpu->arch.emulate_ctxt)
-+		kmem_cache_free(x86_emulator_cache, vcpu->arch.emulate_ctxt);
- 	kvm_x86_ops->vcpu_free(vcpu);
- }
- 
-@@ -9418,7 +9467,6 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- 	struct page *page;
- 	int r;
- 
--	vcpu->arch.emulate_ctxt.ops = &emulate_ops;
- 	if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
- 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 	else
+ #define KVM_DEFAULT_PLE_GAP		128
+ #define KVM_VMX_DEFAULT_PLE_WINDOW	4096
 -- 
 2.24.0
 
