@@ -2,108 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A376910646B
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 07:17:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E908E1066F1
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 08:19:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729347AbfKVGN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 01:13:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50686 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729316AbfKVGN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 01:13:28 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D01B620708;
-        Fri, 22 Nov 2019 06:13:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574403207;
-        bh=u/ht6PC8dTaXSeedqZtbu1SzlGDMXer7QYkbRsHtsc0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eMxybB1Eq+E9auJUqUF8i/9SEBn61IF6rqiKGG71rpwlBbMfCXPsfrxUOEAibhGFN
-         hqYokCuYVbHra9FHkUN/B3jnCanQE9Jv+nPBZVR3v8ldPfK3a5m3fffZxmyxL88n8/
-         UeougtOFK3piCzphZS8GOE36dtz3jzbI11EFXwJM=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Michael Mueller <mimu@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 23/68] KVM: s390: unregister debug feature on failing arch init
-Date:   Fri, 22 Nov 2019 01:12:16 -0500
-Message-Id: <20191122061301.4947-22-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122061301.4947-1-sashal@kernel.org>
-References: <20191122061301.4947-1-sashal@kernel.org>
+        id S1726910AbfKVHTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 02:19:02 -0500
+Received: from mail-io1-f71.google.com ([209.85.166.71]:42891 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726861AbfKVHTB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 02:19:01 -0500
+Received: by mail-io1-f71.google.com with SMTP id p1so4257299ioo.9
+        for <kvm@vger.kernel.org>; Thu, 21 Nov 2019 23:19:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=1cUcF3hJKE1N4P4WyddDQmYqcNZvFWfBMCxod9a8Ztg=;
+        b=JPm+GhI76Xrrb4t/xJpZUjPPGqivGM0ocK7wKIeBBIq3uFHQ6xlUMgU4bE3KR1gMcr
+         cA8Lln8nmFY0O+zog+HLi0aESlJaMayURpAv4KMY/K7EiZALCjg57yqjgV+q3lwpvG2v
+         S2aeO7WMC8mN+wTEZrzb8cbU39ValV01YXJ1fMPhB8ZqE9vzqGlNSkiOlz279vksqKog
+         wE9LtSIScBqN4V7xiDI1L1kFhfMzIjX7XQE2z39OTxsX6UU/jtpP+OTsbxWdSg2465cY
+         B12Z3mwjh1IoiEQMpnaerMafcNjrFyLHwgR89zWH2PGEfwHju9PThGoJ1P1g4YJm7SKF
+         DisQ==
+X-Gm-Message-State: APjAAAWLg0e/oTtr5jd1za8xEVsr79cwQ4DLW7QnbhzLcBDqMGC1FuGV
+        MmxNvnQd3scDxH+kI5XWm3ZECxq4hz6xEfhCJyS2IiUUAgWb
+X-Google-Smtp-Source: APXvYqz7YQR3Ph2vR2o/JQ6Y+lyCMjwoGf4NoUXt8LcJXs8VhmLZT2rHE8UUekeFjpMnBlonHBj9FzFznQfgOmicwRtoMmh+YsCi
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:3602:: with SMTP id d2mr14510424ila.7.1574407140976;
+ Thu, 21 Nov 2019 23:19:00 -0800 (PST)
+Date:   Thu, 21 Nov 2019 23:19:00 -0800
+In-Reply-To: <000000000000e67a05057314ddf6@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005eb1070597ea3a1f@google.com>
+Subject: Re: general protection fault in __schedule (2)
+From:   syzbot <syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com>
+To:     casey@schaufler-ca.com, frederic@kernel.org,
+        gregkh@linuxfoundation.org, hpa@zytor.com, jmattson@google.com,
+        jmorris@namei.org, karahmed@amazon.de,
+        kstewart@linuxfoundation.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, mingo@kernel.org,
+        mingo@redhat.com, pasha.tatashin@oracle.com, pbonzini@redhat.com,
+        pombredanne@nexb.com, rkrcmar@redhat.com, serge@hallyn.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Michael Mueller <mimu@linux.ibm.com>
+syzbot has bisected this bug to:
 
-[ Upstream commit 308c3e6673b012beecb96ef04cc65f4a0e7cdd99 ]
+commit 8fcc4b5923af5de58b80b53a069453b135693304
+Author: Jim Mattson <jmattson@google.com>
+Date:   Tue Jul 10 09:27:20 2018 +0000
 
-Make sure the debug feature and its allocated resources get
-released upon unsuccessful architecture initialization.
+     kvm: nVMX: Introduce KVM_CAP_NESTED_STATE
 
-A related indication of the issue will be reported as kernel
-message.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124cdbace00000
+start commit:   234b69e3 ocfs2: fix ocfs2 read block panic
+git tree:       upstream
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=114cdbace00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=164cdbace00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5fa12be50bca08d8
+dashboard link: https://syzkaller.appspot.com/bug?extid=7e2ab84953e4084a638d
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=150f0a4e400000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f67111400000
 
-Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20181130143215.69496-2-mimu@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/kvm/kvm-s390.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+Reported-by: syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com
+Fixes: 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 3e46f62d32adf..b4032d625d225 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -185,17 +185,28 @@ void kvm_arch_hardware_unsetup(void)
- 
- int kvm_arch_init(void *opaque)
- {
-+	int rc;
-+
- 	kvm_s390_dbf = debug_register("kvm-trace", 32, 1, 7 * sizeof(long));
- 	if (!kvm_s390_dbf)
- 		return -ENOMEM;
- 
- 	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view)) {
--		debug_unregister(kvm_s390_dbf);
--		return -ENOMEM;
-+		rc = -ENOMEM;
-+		goto out_debug_unreg;
- 	}
- 
- 	/* Register floating interrupt controller interface. */
--	return kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
-+	rc = kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
-+	if (rc) {
-+		pr_err("Failed to register FLIC rc=%d\n", rc);
-+		goto out_debug_unreg;
-+	}
-+	return 0;
-+
-+out_debug_unreg:
-+	debug_unregister(kvm_s390_dbf);
-+	return rc;
- }
- 
- void kvm_arch_exit(void)
--- 
-2.20.1
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
