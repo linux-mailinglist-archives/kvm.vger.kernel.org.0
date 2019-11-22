@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B127C107ABF
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C97CA107AC2
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbfKVWkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 17:40:01 -0500
+        id S1727304AbfKVWlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 17:41:08 -0500
 Received: from mga01.intel.com ([192.55.52.88]:61220 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726089AbfKVWkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726526AbfKVWkB (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 22 Nov 2019 17:40:01 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,9 +17,9 @@ Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:40:01 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,231,1571727600"; 
-   d="scan'208";a="409029625"
+   d="scan'208";a="409029632"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Nov 2019 14:40:00 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 22 Nov 2019 14:40:01 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -29,10 +29,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 00/13] KVM: x86: Allow userspace to disable the emulator
-Date:   Fri, 22 Nov 2019 14:39:46 -0800
-Message-Id: <20191122223959.13545-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 01/13] KVM: x86: Refactor I/O emulation helpers to provide vcpu-only variant
+Date:   Fri, 22 Nov 2019 14:39:47 -0800
+Message-Id: <20191122223959.13545-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191122223959.13545-1-sean.j.christopherson@intel.com>
+References: <20191122223959.13545-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -40,58 +42,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The primary intent of this series is to dynamically allocate the emulator
-and get KVM to a state where the emulator *could* be disabled at some
-point in the future.  Actually allowing userspace to disable the emulator
-was a minor change at that point, so I threw it in.
+Add new helpers for I/O helpers to provide a variant that takes a vCPU
+instead of the emulation context.  This will eventually allow KVM to
+constrain use of the emulation context to the full emulation path.
 
-Dynamically allocating the emulator shrinks the size of x86 vcpus by
-~2.5k bytes, which is important because 'struct vcpu_vmx' has once again
-fattened up and squeaked past the PAGE_ALLOC_COSTLY_ORDER threshold.
-Moving the emulator to its own allocation gives us some breathing room
-for the near future, and has some other nice side effects.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.c | 39 ++++++++++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 15 deletions(-)
 
-As for disabling the emulator... in the not-too-distant future, I expect
-there will be use cases that can truly disable KVM's emulator, e.g. for
-security (KVM's and/or the guests).  I don't have a strong opinion on
-whether or not KVM should actually allow userspace to disable the emulator
-without a concrete use case, which is why that part is done in its own
-tiny patch.  I also expect that any real use case would want "no emulator"
-to be a per-VM toggle, but since this is basically an experimental feature
-I added it as a module param.
-
-Running without an emulator has been "tested" in the sense that the
-selftests that don't require emulation continue to pass, and everything
-else fails with the expected "emulation error".
-
-Sean Christopherson (13):
-  KVM: x86: Refactor I/O emulation helpers to provide vcpu-only variant
-  KVM: x86: Explicitly pass an exception struct to check_intercept
-  KVM: x86: Move emulation-only helpers to emulate.c
-  KVM: x86: Refactor R/W page helper to take the emulation context
-  KVM: x86: Refactor emulated exception injection to take the emul
-    context
-  KVM: x86: Refactor emulate tracepoint to explicitly take context
-  KVM: x86: Refactor init_emulate_ctxt() to explicitly take context
-  KVM: x86: Dynamically allocate per-vCPU emulation context
-  KVM: x86: Move kvm_emulate.h into KVM's private directory
-  KVM: x86: Shrink the usercopy region of the emulation context
-  KVM: x86: Add helper to "handle" internal emulation error
-  KVM: x86: Add variable to control existence of emulator
-  KVM: x86: Allow userspace to disable the kernel's emulator
-
- arch/x86/include/asm/kvm_host.h             |  12 +-
- arch/x86/kvm/emulate.c                      |  17 +-
- arch/x86/{include/asm => kvm}/kvm_emulate.h |   9 +-
- arch/x86/kvm/mmu/mmu.c                      |   1 +
- arch/x86/kvm/svm.c                          |   5 +-
- arch/x86/kvm/trace.h                        |  22 +--
- arch/x86/kvm/vmx/vmx.c                      |  15 +-
- arch/x86/kvm/x86.c                          | 194 ++++++++++++++------
- arch/x86/kvm/x86.h                          |  16 +-
- 9 files changed, 189 insertions(+), 102 deletions(-)
- rename arch/x86/{include/asm => kvm}/kvm_emulate.h (99%)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a256e09f321a..2b4af6be255c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5887,11 +5887,9 @@ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
+ 	return 0;
+ }
+ 
+-static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+-				    int size, unsigned short port, void *val,
+-				    unsigned int count)
++static int emulator_pio_in(struct kvm_vcpu *vcpu, int size,
++			   unsigned short port, void *val, unsigned int count)
+ {
+-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ 	int ret;
+ 
+ 	if (vcpu->arch.pio.count)
+@@ -5911,17 +5909,30 @@ static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
+ 	return 0;
+ }
+ 
+-static int emulator_pio_out_emulated(struct x86_emulate_ctxt *ctxt,
+-				     int size, unsigned short port,
+-				     const void *val, unsigned int count)
++static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
++				    int size, unsigned short port, void *val,
++				    unsigned int count)
+ {
+-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
++	return emulator_pio_in(emul_to_vcpu(ctxt), size, port, val, count);
+ 
++}
++
++static int emulator_pio_out(struct kvm_vcpu *vcpu, int size,
++			    unsigned short port, const void *val,
++			    unsigned int count)
++{
+ 	memcpy(vcpu->arch.pio_data, val, size * count);
+ 	trace_kvm_pio(KVM_PIO_OUT, port, size, count, vcpu->arch.pio_data);
+ 	return emulator_pio_in_out(vcpu, size, port, (void *)val, count, false);
+ }
+ 
++static int emulator_pio_out_emulated(struct x86_emulate_ctxt *ctxt,
++				     int size, unsigned short port,
++				     const void *val, unsigned int count)
++{
++	return emulator_pio_out(emul_to_vcpu(ctxt), size, port, val, count);
++}
++
+ static unsigned long get_segment_base(struct kvm_vcpu *vcpu, int seg)
+ {
+ 	return kvm_x86_ops->get_segment_base(vcpu, seg);
+@@ -6842,8 +6853,8 @@ static int kvm_fast_pio_out(struct kvm_vcpu *vcpu, int size,
+ 			    unsigned short port)
+ {
+ 	unsigned long val = kvm_rax_read(vcpu);
+-	int ret = emulator_pio_out_emulated(&vcpu->arch.emulate_ctxt,
+-					    size, port, &val, 1);
++	int ret = emulator_pio_out(vcpu, size, port, &val, 1);
++
+ 	if (ret)
+ 		return ret;
+ 
+@@ -6879,11 +6890,10 @@ static int complete_fast_pio_in(struct kvm_vcpu *vcpu)
+ 	val = (vcpu->arch.pio.size < 4) ? kvm_rax_read(vcpu) : 0;
+ 
+ 	/*
+-	 * Since vcpu->arch.pio.count == 1 let emulator_pio_in_emulated perform
++	 * Since vcpu->arch.pio.count == 1 let emulator_pio_in perform
+ 	 * the copy and tracing
+ 	 */
+-	emulator_pio_in_emulated(&vcpu->arch.emulate_ctxt, vcpu->arch.pio.size,
+-				 vcpu->arch.pio.port, &val, 1);
++	emulator_pio_in(vcpu, vcpu->arch.pio.size, vcpu->arch.pio.port, &val, 1);
+ 	kvm_rax_write(vcpu, val);
+ 
+ 	return kvm_skip_emulated_instruction(vcpu);
+@@ -6898,8 +6908,7 @@ static int kvm_fast_pio_in(struct kvm_vcpu *vcpu, int size,
+ 	/* For size less than 4 we merge, else we zero extend */
+ 	val = (size < 4) ? kvm_rax_read(vcpu) : 0;
+ 
+-	ret = emulator_pio_in_emulated(&vcpu->arch.emulate_ctxt, size, port,
+-				       &val, 1);
++	ret = emulator_pio_in(vcpu, size, port, &val, 1);
+ 	if (ret) {
+ 		kvm_rax_write(vcpu, val);
+ 		return ret;
 -- 
 2.24.0
 
