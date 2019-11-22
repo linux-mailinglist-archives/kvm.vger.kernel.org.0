@@ -2,114 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC87B106F5B
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:15:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BBBC106FFB
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:19:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730634AbfKVLPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 06:15:09 -0500
-Received: from mx2.suse.de ([195.135.220.15]:34110 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729023AbfKVLPI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 06:15:08 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 21586B2F6;
-        Fri, 22 Nov 2019 11:15:04 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4FA541E484C; Fri, 22 Nov 2019 12:15:02 +0100 (CET)
-Date:   Fri, 22 Nov 2019 12:15:02 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-Subject: Re: [PATCH v7 02/24] mm/gup: factor out duplicate code from four
- routines
-Message-ID: <20191122111502.GC26721@quack2.suse.cz>
-References: <20191121071354.456618-1-jhubbard@nvidia.com>
- <20191121071354.456618-3-jhubbard@nvidia.com>
- <20191121080356.GA24784@lst.de>
- <852f6c27-8b65-547b-89e0-e8f32a4d17b9@nvidia.com>
- <20191121095411.GC18190@quack2.suse.cz>
- <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
+        id S1727795AbfKVLT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 06:19:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31391 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726990AbfKVLT0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 06:19:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574421565;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yWN8xrHtD+VM+QZ/aEMLoMs5z3nBkdpI58n1H+EvsIo=;
+        b=QYXKKfRgF/HjUeXLQi8pC4oY+Xc9yvtpsAzHcHiH7BpQppryH8yILfssZT6tN++sCIdx8M
+        RflXbUDRsViqrwjcK8x92FuNroegVy5WiXAm0YXRgbSPIQC7W0h/ykStDe+0Ox3IHsfo2J
+        esmjrT307Dj6MBKmukxY4hlcq5+jFsM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-dr6Q_-ZANSKJj1SIAfbOQA-1; Fri, 22 Nov 2019 06:19:21 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC8B39B5FA;
+        Fri, 22 Nov 2019 11:19:20 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA8576E718;
+        Fri, 22 Nov 2019 11:19:19 +0000 (UTC)
+Date:   Fri, 22 Nov 2019 12:19:17 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH kvm-unit-tests] runtime: set MAX_SMP to number of online
+ cpus
+Message-ID: <20191122111917.fzdrdjkbm2w3reph@kamzik.brq.redhat.com>
+References: <20191120141928.6849-1-drjones@redhat.com>
+ <86280ced-214f-eb0f-0662-0854e5c57991@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <86280ced-214f-eb0f-0662-0854e5c57991@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: dr6Q_-ZANSKJj1SIAfbOQA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 21-11-19 18:54:02, John Hubbard wrote:
-> On 11/21/19 1:54 AM, Jan Kara wrote:
-> > On Thu 21-11-19 00:29:59, John Hubbard wrote:
-> > > > 
-> > > > Otherwise this looks fine and might be a worthwhile cleanup to feed
-> > > > Andrew for 5.5 independent of the gut of the changes.
-> > > > 
-> > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > > 
-> > > 
-> > > Thanks for the reviews! Say, it sounds like your view here is that this
-> > > series should be targeted at 5.6 (not 5.5), is that what you have in mind?
-> > > And get the preparatory patches (1-9, and maybe even 10-16) into 5.5?
-> > 
-> > One more note :) If you are going to push pin_user_pages() interfaces
-> > (which I'm fine with), it would probably make sense to push also the
-> > put_user_pages() -> unpin_user_pages() renaming so that that inconsistency
-> > in naming does not exist in the released upstream kernel.
-> > 
-> > 								Honza
-> 
-> Yes, that's what this patch series does. But I'm not sure if "push" here
-> means, "push out: defer to 5.6", "push (now) into 5.5", or "advocate for"?
+On Fri, Nov 22, 2019 at 10:45:08AM +0000, Alexandru Elisei wrote:
+> Hi,
+>=20
+> On 11/20/19 2:19 PM, Andrew Jones wrote:
+> > We can only use online cpus, so make sure we check specifically for
+> > those.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  scripts/runtime.bash | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> > index 200d5b67290c..fbad0bd05fc5 100644
+> > --- a/scripts/runtime.bash
+> > +++ b/scripts/runtime.bash
+> > @@ -1,5 +1,5 @@
+> >  : "${RUNTIME_arch_run?}"
+> > -: ${MAX_SMP:=3D$(getconf _NPROCESSORS_CONF)}
+> > +: ${MAX_SMP:=3D$(getconf _NPROCESSORS_ONLN)}
+>=20
+> I tested it on my machine by offlining a CPU and calling getconf _NPROCES=
+SORS_CONF
+> (returned 32) and getconf _NPROCESSORS_ONLN (returned 31). man 3 sysconf =
+also
+> agrees with your patch.
+>=20
+> I am wondering though, if _NPROCESSORS_CONF is 8 and _NPROCESSORS_ONLN is=
+ 1
+> (meaning that 7 CPUs were offlined), that means that qemu will create 8 V=
+CPUs
+> which will share the same physical CPU. Is that undesirable?
 
-I meant to include the patch in the "for 5.5" batch.
+With KVM enabled that's not recommended. KVM_CAP_NR_VCPUS returns the
+number of online VCPUs (at least for arm). Since the guest code may not
+run as expected with overcommitted VCPUs we don't usually want to test
+that way. OTOH, maybe we should write a test or two that does run with
+overcommitted VCPUs in order to look for bugs in KVM.
 
-> I will note that it's not going to be easy to rename in one step, now
-> that this is being split up. Because various put_user_pages()-based items
-> are going into 5.5 via different maintainer trees now. Probably I'd need
-> to introduce unpin_user_page() alongside put_user_page()...thoughts?
+Thanks,
+drew
 
-Yes, I understand that moving that patch from the end of the series would
-cause fair amount of conflicts. I was hoping that you could generate the
-patch with sed/Coccinelle and then rebasing what remains for 5.6 on top of
-that patch should not be that painful so overall it should not be that much
-work. But I may be wrong so if it proves to be too tedious, let's just
-postpone the renaming to 5.6. I don't find having both unpin_user_page()
-and put_user_page() a better alternative to current state. Thanks!
+>=20
+> Thanks,
+> Alex
+> >  : ${TIMEOUT:=3D90s}
+> > =20
+> >  PASS() { echo -ne "\e[32mPASS\e[0m"; }
+>=20
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
