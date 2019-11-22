@@ -2,94 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3415E1078F9
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 20:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB2DC1078BC
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 20:54:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727182AbfKVTyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 14:54:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48614 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727275AbfKVTtR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 14:49:17 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3C24F20658;
-        Fri, 22 Nov 2019 19:49:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574452157;
-        bh=sujIkRHrGw4eY/KTasIs6iMCrU8CKRJ35rDad+eWp1U=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mZGzY/Y2a6hiZ2nnL8Ydl5/ZtWt7xGN3WyK3TTpB6zZF3/xs359SRS/uClkw7s5aG
-         hMTz+jaD2xUW4aBI/EY2LctiBstb68pzjkT4SFLN8eGvo0rElr2bh5s1OjrMZnIuMD
-         dIGxfpNS4DSTdkNgX5hSryANXAUjMTyXjcdsL8pM=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 14/25] selftests: kvm: fix build with glibc >= 2.30
-Date:   Fri, 22 Nov 2019 14:48:47 -0500
-Message-Id: <20191122194859.24508-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122194859.24508-1-sashal@kernel.org>
-References: <20191122194859.24508-1-sashal@kernel.org>
+        id S1728063AbfKVTw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 14:52:56 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:45693 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727555AbfKVTwy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 14:52:54 -0500
+Received: by mail-io1-f68.google.com with SMTP id v17so9344110iol.12
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 11:52:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9YR3TdCRnULySeY1ifV5J5Y0S/GAMiJz+y2t57j2q2M=;
+        b=tKu4RlXP8/mkTuRGysYaQgHAWElZaPURVUix7oCpmswuhh2GO6/9BJ2b5+CgW4MXWd
+         0BQ0tt3k+PG3KeS53AEoVLC+KnlyIM/+hri/igF2Zm96Wqv4bQ14rXHgdfF1lNS7BIy2
+         RUVa39qLqimBmekJeyEltiaqmep35acyMlag/W0m9SUorQa/sZgHrayKSiZLH7cnnncK
+         RrMP2c8ZSZnO5LdqTE89MhLGGRIekZSadeX0Btv8mP+LbWlbot2Cbj1Pehl/30o3CBUX
+         SQnLM4rLbgxjA2DVR9oG6hcJPxKMDHSTEVDtSdvdQ19abCjDJKt8F8uvchWdGCwshqUK
+         mNGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9YR3TdCRnULySeY1ifV5J5Y0S/GAMiJz+y2t57j2q2M=;
+        b=IM1EEK5WuIlj/axKr+XzxE9uY0oe8DVn6e62EjrF5j4rV6A+bagLg2kA74TR2UMcGS
+         WIrzGhcVsdrNuxqLS7w4MPmem2V8NMtiduM9elgwSOFhAYZMCe8Khm256KKk+BP0+m2k
+         oGzbhlR8I1oCDjLO4xmqMlDCgUGRu7kFxfGh4p30OX/Nl0M4w/UuX/hV6Tq5FQGs8Epy
+         YbSQQoKlZFOiAbKmT6BspUPMrvGeDIrpXaPEBs/pAxR5cJMGfywejiu04Mz29Fse8Isq
+         AdGPmY1ThfAEXYdgZvzHVq/rCYrUTclZspKMrL6E7ijkunUMOTLk472msdgT0MqXkggV
+         erLw==
+X-Gm-Message-State: APjAAAXNX7haQ4XPyUbyMToj+4NKkdEHzsIh3XgcB/+NbNGMIo7tBcwM
+        +rPJx0GamwHvbQtv7Q6i52KTpMbk+3IpxbYcPciFZQ==
+X-Google-Smtp-Source: APXvYqwfY1aspQ/GZmGnSDh3eoyXdFTdb/sVKFYE7JuHBjVYasE3sS5ku0UsD5DIsnKRVH/ySwQR+OEhslnWwA0xwDY=
+X-Received: by 2002:a5d:8985:: with SMTP id m5mr8972775iol.193.1574452373508;
+ Fri, 22 Nov 2019 11:52:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <20191121203344.156835-1-pgonda@google.com> <20191121203344.156835-3-pgonda@google.com>
+ <d876b27b-9519-a0a0-55c2-62e57a783a7f@amd.com> <CALMp9eRVNDvy65AFDz=KjUT0M0rCtgCECuMS0nUZqAhy2S=MsA@mail.gmail.com>
+In-Reply-To: <CALMp9eRVNDvy65AFDz=KjUT0M0rCtgCECuMS0nUZqAhy2S=MsA@mail.gmail.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 22 Nov 2019 11:52:42 -0800
+Message-ID: <CAMkAt6paein2dHHD-wZ8Eke4tUb_8GNuiH_3-RHkiBHx=jjwUg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM x86: Mask memory encryption guest cpuid
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+I am not sure that the SevEs CPUID bit has the same problem as the Sev
+bit. It seems the reason the Sev bit was to be passed to the guest was
+to prevent the guest from reading the SEV MSR if it did not exist. If
+the guest is running with SevEs it must be also running with Sev. So
+the guest  can safely read the SevStatus MSR to check the SevEsEnabled
+bit because the Sev CPUID bit will be set.
 
-[ Upstream commit e37f9f139f62deddff90c7298ae3a85026a71067 ]
+If I look at the AMD patches for ES. I see just that,
+https://github.com/AMDESE/linux/commit/c19d84b803caf8e3130b1498868d0fcafc755da7,
+it doesn't look for the SevEs CPUID bit.
 
-Glibc-2.30 gained gettid() wrapper, selftests fail to compile:
+} else {
+  /* For SEV, check the SEV MSR */
+  msr = __rdmsr(MSR_AMD64_SEV);
+  if (!(msr & MSR_AMD64_SEV_ENABLED))
+    return;
+  /* SEV state cannot be controlled by a command line option */
+  sme_me_mask = me_mask;
+  sme_me_status |= SEV_ACTIVE;
+  physical_mask &= ~sme_me_mask;
++
++  if (!(msr & MSR_AMD64_SEV_ES_ENABLED))
++    return;
++
++  sme_me_status |= SEV_ES_ACTIVE;
+  return;
+}
 
-lib/assert.c:58:14: error: static declaration of ‘gettid’ follows non-static declaration
-   58 | static pid_t gettid(void)
-      |              ^~~~~~
-In file included from /usr/include/unistd.h:1170,
-                 from include/test_util.h:18,
-                 from lib/assert.c:10:
-/usr/include/bits/unistd_ext.h:34:16: note: previous declaration of ‘gettid’ was here
-   34 | extern __pid_t gettid (void) __THROW;
-      |                ^~~~~~
+}
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- tools/testing/selftests/kvm/lib/assert.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/selftests/kvm/lib/assert.c
-index cd01144d27c8d..d306677065699 100644
---- a/tools/testing/selftests/kvm/lib/assert.c
-+++ b/tools/testing/selftests/kvm/lib/assert.c
-@@ -56,7 +56,7 @@ static void test_dump_stack(void)
- #pragma GCC diagnostic pop
- }
- 
--static pid_t gettid(void)
-+static pid_t _gettid(void)
- {
- 	return syscall(SYS_gettid);
- }
-@@ -73,7 +73,7 @@ test_assert(bool exp, const char *exp_str,
- 		fprintf(stderr, "==== Test Assertion Failure ====\n"
- 			"  %s:%u: %s\n"
- 			"  pid=%d tid=%d - %s\n",
--			file, line, exp_str, getpid(), gettid(),
-+			file, line, exp_str, getpid(), _gettid(),
- 			strerror(errno));
- 		test_dump_stack();
- 		if (fmt) {
--- 
-2.20.1
-
+On Fri, Nov 22, 2019 at 9:18 AM Jim Mattson <jmattson@google.com> wrote:
+>
+> Does SEV-ES indicate that SEV-ES guests are supported, or that the
+> current (v)CPU is running with SEV-ES enabled, or both?
+>
+> On Fri, Nov 22, 2019 at 5:01 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+> >
+> >
+> > On 11/21/19 2:33 PM, Peter Gonda wrote:
+> > > Only pass through guest relevant CPUID information: Cbit location and
+> > > SEV bit. The kernel does not support nested SEV guests so the other data
+> > > in this CPUID leaf is unneeded by the guest.
+> > >
+> > > Suggested-by: Jim Mattson <jmattson@google.com>
+> > > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > > ---
+> > >  arch/x86/kvm/cpuid.c | 8 +++++++-
+> > >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index 946fa9cb9dd6..6439fb1dbe76 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -780,8 +780,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> > >               break;
+> > >       /* Support memory encryption cpuid if host supports it */
+> > >       case 0x8000001F:
+> > > -             if (!boot_cpu_has(X86_FEATURE_SEV))
+> > > +             if (boot_cpu_has(X86_FEATURE_SEV)) {
+> > > +                     /* Expose only SEV bit and CBit location */
+> > > +                     entry->eax &= F(SEV);
+> >
+> >
+> > I know SEV-ES patches are not accepted yet, but can I ask to pass the
+> > SEV-ES bit in eax?
+> >
+> >
+> > > +                     entry->ebx &= GENMASK(5, 0);
+> > > +                     entry->edx = entry->ecx = 0;
+> > > +             } else {
+> > >                       entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> > > +             }
+> > >               break;
+> > >       /*Add support for Centaur's CPUID instruction*/
+> > >       case 0xC0000000:
