@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F429107AAD
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8595107ABD
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:41:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726774AbfKVWkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 17:40:02 -0500
+        id S1727250AbfKVWk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 17:40:59 -0500
 Received: from mga01.intel.com ([192.55.52.88]:61220 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726729AbfKVWkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726089AbfKVWkC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 22 Nov 2019 17:40:02 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:40:01 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:40:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,231,1571727600"; 
-   d="scan'208";a="409029637"
+   d="scan'208";a="409029646"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by fmsmga006.fm.intel.com with ESMTP; 22 Nov 2019 14:40:01 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -29,9 +29,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 02/13] KVM: x86: Explicitly pass an exception struct to check_intercept
-Date:   Fri, 22 Nov 2019 14:39:48 -0800
-Message-Id: <20191122223959.13545-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 03/13] KVM: x86: Move emulation-only helpers to emulate.c
+Date:   Fri, 22 Nov 2019 14:39:49 -0800
+Message-Id: <20191122223959.13545-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191122223959.13545-1-sean.j.christopherson@intel.com>
 References: <20191122223959.13545-1-sean.j.christopherson@intel.com>
@@ -42,88 +42,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly pass an exception struct when checking for intercept from
-the emulator, which elimates the last reference to arch.emulate_ctxt
-in vendor specific code.
+Move ctxt_virt_addr_bits() and emul_is_noncanonical_address() from x86.h
+to emulate.c.  This eliminates all references to struct x86_emulate_ctxt
+from x86.h, and sets the stage for a future patch to stop including
+kvm_emulate.h in asm/kvm_host.h.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 3 ++-
- arch/x86/kvm/svm.c              | 3 ++-
- arch/x86/kvm/vmx/vmx.c          | 8 ++++----
- arch/x86/kvm/x86.c              | 3 ++-
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ arch/x86/kvm/emulate.c | 15 +++++++++++++++
+ arch/x86/kvm/x86.h     | 15 ---------------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b79cd6aa4075..dec643f4ac78 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1139,7 +1139,8 @@ struct kvm_x86_ops {
- 
- 	int (*check_intercept)(struct kvm_vcpu *vcpu,
- 			       struct x86_instruction_info *info,
--			       enum x86_intercept_stage stage);
-+			       enum x86_intercept_stage stage,
-+			       struct x86_exception *exception);
- 	void (*handle_exit_irqoff)(struct kvm_vcpu *vcpu);
- 	bool (*mpx_supported)(void);
- 	bool (*xsaves_supported)(void);
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 362e874297e4..bc57bd01c7b3 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -6074,7 +6074,8 @@ static const struct __x86_intercept {
- 
- static int svm_check_intercept(struct kvm_vcpu *vcpu,
- 			       struct x86_instruction_info *info,
--			       enum x86_intercept_stage stage)
-+			       enum x86_intercept_stage stage,
-+			       struct x86_exception *exception)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	int vmexit, ret = X86EMUL_CONTINUE;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d39475e2d44e..a192a3da5fc2 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7152,10 +7152,10 @@ static void vmx_request_immediate_exit(struct kvm_vcpu *vcpu)
- 
- static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 			       struct x86_instruction_info *info,
--			       enum x86_intercept_stage stage)
-+			       enum x86_intercept_stage stage,
-+			       struct x86_exception *exception)
- {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
--	struct x86_emulate_ctxt *ctxt = &vcpu->arch.emulate_ctxt;
- 
- 	/*
- 	 * RDPID causes #UD if disabled through secondary execution controls.
-@@ -7163,8 +7163,8 @@ static int vmx_check_intercept(struct kvm_vcpu *vcpu,
- 	 */
- 	if (info->intercept == x86_intercept_rdtscp &&
- 	    !nested_cpu_has2(vmcs12, SECONDARY_EXEC_RDTSCP)) {
--		ctxt->exception.vector = UD_VECTOR;
--		ctxt->exception.error_code_valid = false;
-+		exception->vector = UD_VECTOR;
-+		exception->error_code_valid = false;
- 		return X86EMUL_PROPAGATE_FAULT;
- 	}
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2b4af6be255c..c3992ed1568a 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6195,7 +6195,8 @@ static int emulator_intercept(struct x86_emulate_ctxt *ctxt,
- 			      struct x86_instruction_info *info,
- 			      enum x86_intercept_stage stage)
- {
--	return kvm_x86_ops->check_intercept(emul_to_vcpu(ctxt), info, stage);
-+	return kvm_x86_ops->check_intercept(emul_to_vcpu(ctxt), info, stage,
-+					    &ctxt->exception);
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 952d1a4f4d7e..596fa52e5ecb 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -670,6 +670,21 @@ static void set_segment_selector(struct x86_emulate_ctxt *ctxt, u16 selector,
+ 	ctxt->ops->set_segment(ctxt, selector, &desc, base3, seg);
  }
  
- static bool emulator_get_cpuid(struct x86_emulate_ctxt *ctxt,
++static inline u8 ctxt_virt_addr_bits(struct x86_emulate_ctxt *ctxt)
++{
++	return (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_LA57) ? 57 : 48;
++}
++
++static inline bool emul_is_noncanonical_address(u64 la,
++						struct x86_emulate_ctxt *ctxt)
++{
++#ifdef CONFIG_X86_64
++	return get_canonical(la, ctxt_virt_addr_bits(ctxt)) != la;
++#else
++	return false;
++#endif
++}
++
+ /*
+  * x86 defines three classes of vector instructions: explicitly
+  * aligned, explicitly unaligned, and the rest, which change behaviour
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 29391af8871d..84649ec1b7f5 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -154,11 +154,6 @@ static inline u8 vcpu_virt_addr_bits(struct kvm_vcpu *vcpu)
+ 	return kvm_read_cr4_bits(vcpu, X86_CR4_LA57) ? 57 : 48;
+ }
+ 
+-static inline u8 ctxt_virt_addr_bits(struct x86_emulate_ctxt *ctxt)
+-{
+-	return (ctxt->ops->get_cr(ctxt, 4) & X86_CR4_LA57) ? 57 : 48;
+-}
+-
+ static inline u64 get_canonical(u64 la, u8 vaddr_bits)
+ {
+ 	return ((int64_t)la << (64 - vaddr_bits)) >> (64 - vaddr_bits);
+@@ -173,16 +168,6 @@ static inline bool is_noncanonical_address(u64 la, struct kvm_vcpu *vcpu)
+ #endif
+ }
+ 
+-static inline bool emul_is_noncanonical_address(u64 la,
+-						struct x86_emulate_ctxt *ctxt)
+-{
+-#ifdef CONFIG_X86_64
+-	return get_canonical(la, ctxt_virt_addr_bits(ctxt)) != la;
+-#else
+-	return false;
+-#endif
+-}
+-
+ static inline void vcpu_cache_mmio_info(struct kvm_vcpu *vcpu,
+ 					gva_t gva, gfn_t gfn, unsigned access)
+ {
 -- 
 2.24.0
 
