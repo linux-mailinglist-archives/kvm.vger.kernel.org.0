@@ -2,184 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F047410726C
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 13:49:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 672821072A9
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 14:01:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727571AbfKVMtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 07:49:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44874 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726526AbfKVMtA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Nov 2019 07:49:00 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAMClBY8112355
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 07:48:58 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wdhwsu6fv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 07:48:58 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 22 Nov 2019 12:48:56 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 22 Nov 2019 12:48:54 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAMCmrB549807576
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Nov 2019 12:48:53 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8AA685204F;
-        Fri, 22 Nov 2019 12:48:53 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.30.219])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 332B652050;
-        Fri, 22 Nov 2019 12:48:53 +0000 (GMT)
-Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
- <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
- <20191113140539.4d153d5f.cohuck@redhat.com>
- <802c298d-d2da-83c4-c222-67bb78131988@linux.ibm.com>
- <20191121170237.72e0bd45.cohuck@redhat.com>
- <0c9d19ef-8ef7-0dab-b283-3db243b95476@linux.ibm.com>
- <20191122115422.56019f03.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Fri, 22 Nov 2019 13:48:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20191122115422.56019f03.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+        id S1727219AbfKVNBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 08:01:32 -0500
+Received: from mail-eopbgr820047.outbound.protection.outlook.com ([40.107.82.47]:10688
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726548AbfKVNBb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 08:01:31 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nWyeVyw8KoEP74JzKEiB7lMGNMmArflY79ryPZHQN5vPX3IEcU0pNQcp7snSAEJ2XBmThluefVB+aA1imKqwbLr8upqqgsBS/WHmN0ysTSo+Tj2FlEUNlc3go4T6eaZ97baRnN0e2uiMCgLqmVRnF7JJh9bgKDG95nD0JIHp+fFJM1b+KRGTXLLP44xvk0bucud70hKOgFjvAW34DJf0gvRG+oIIaluZs+86nJFHBMfxlA6f6ERAQZR7zyNAZi6/5giosGNOpm4IE5KgckHn/g8ACeFaSUqPZRAUnx9gAGCn+5LgNC6s81YZYXl5gtIDM3JNjeOHiflnI3L6V43Eww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1LoIC86SkLkv1Zzs3WxdzydAUFFn7w8beBLCFC+skhg=;
+ b=WAZbK6NU57/02pQ1f0QgjkwWsdliYTKWVAolPvjEUcIaq8MdQ3/Eu2QWLjeLUAWsd9st9ZJErpEwTX8Ah4rkByvE+k7yOWprgm2Pxsk88iF/3r3i4OtDH2GX3YUn8FjtFkJsiad+m8KUxD1cEscdylO04xO0cVGrrheYhMwEDsO6ydbURoN0KqAx4IDAk/5vxEZ2FdE/7aQOt1zzo6BdC8BgRr1K2fbkRN26LKLVcf0yA7lLWIexzJiD7JVAnyw+zMtIoeaOwq4n30Asz4iLi7mjniz/qhw+V51oYK4kbFlMXJimYNqx1MqzIhXo5pb1PiyMACuAVNSL4NV/LufZvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1LoIC86SkLkv1Zzs3WxdzydAUFFn7w8beBLCFC+skhg=;
+ b=h7DF397/StbdvwMCcZgWVYIcoYzPMdBL2Sd2JLxtVD4klb+YAd/l7cKDndRFmPrxQ1ZOM0pujCnRBAm6vC1ezoVvrElb5ka4S31UuLfj4M9H4+b94eL6HhVZBkqFLAEZIc0KI8lmEyKbVIDEMV0Wh+XwBtw5wi33uaO6AER86Vo=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3497.namprd12.prod.outlook.com (20.178.199.20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.16; Fri, 22 Nov 2019 13:01:28 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::edfa:96b9:b6fd:fbf9]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::edfa:96b9:b6fd:fbf9%7]) with mapi id 15.20.2474.019; Fri, 22 Nov 2019
+ 13:01:28 +0000
+Cc:     brijesh.singh@amd.com, Jim Mattson <jmattson@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH 2/2] KVM x86: Mask memory encryption guest cpuid
+To:     Peter Gonda <pgonda@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20191121203344.156835-1-pgonda@google.com>
+ <20191121203344.156835-3-pgonda@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <d876b27b-9519-a0a0-55c2-62e57a783a7f@amd.com>
+Date:   Fri, 22 Nov 2019 07:01:58 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.1
+In-Reply-To: <20191121203344.156835-3-pgonda@google.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19112212-0012-0000-0000-0000036AC524
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112212-0013-0000-0000-000021A65D74
-Message-Id: <bcdd966d-b60d-471c-0c48-a7d0cd006e42@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-22_02:2019-11-21,2019-11-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- suspectscore=0 impostorscore=0 mlxlogscore=999 spamscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 clxscore=1015 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911220113
+X-ClientProxiedBy: SN4PR0201CA0004.namprd02.prod.outlook.com
+ (2603:10b6:803:2b::14) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+MIME-Version: 1.0
+X-Originating-IP: [70.112.153.56]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 8dd8cd0f-f9db-4e37-beb2-08d76f4c1425
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3497:|DM6PR12MB3497:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3497E81A9108B5AD9CD3889BE5490@DM6PR12MB3497.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 02296943FF
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(199004)(189003)(6246003)(66066001)(316002)(229853002)(186003)(8676002)(65956001)(54906003)(11346002)(47776003)(4326008)(66476007)(305945005)(58126008)(14454004)(110136005)(6486002)(2616005)(478600001)(26005)(66556008)(230700001)(6436002)(65806001)(50466002)(66946007)(25786009)(52116002)(6512007)(44832011)(7736002)(86362001)(81156014)(2486003)(5660300002)(2906002)(99286004)(446003)(14444005)(23676004)(8936002)(76176011)(36756003)(31696002)(53546011)(31686004)(6506007)(386003)(81166006)(6666004)(6116002)(3846002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3497;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hc6f670DI0HGWcc2ijMJ3PiUrgMzuYqJf5cl82wDlTb+RHj8r52XKW2cHX6o1UQ8hoDqtpirSLtJDcoj9yyvagwCeWHqSFUQLP4xrCgEnwDw27oG0t8xhwvowxnH+aiUUm5dUaE1+3qf2VI76WY1XK25aBhky4Pj0teVXygSWPKe9GFn0ovu7lxDUj2/vXUUU2FYhCbWxo/IRG+Z+pPk4oXQjiBKSi87w5riOJAJ/9wF1M9F1A8sb8a0q7VulKEie/FcCUtfmjymVnd7fdag3OcDkvrBWUZjvmgXfmzFUVygTSF+h8daCoieg6PKyoTGVJR86n7dZkl35J3j4aACacRRkfR+0ispL352HfqUTQPIB234uproGQrJJbHylvaWDk4XhKYCq2DN1P6imyF9gzOw93BjwBwURGOjsF63opPVBZFX/aC9IW0juL/by3dT
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dd8cd0f-f9db-4e37-beb2-08d76f4c1425
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2019 13:01:28.1326
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PVG2IyU2Kp6wjbWeoAcQTMrF5vVVgMKYW3vyjHtSxMc98Y53EKLJTIVRS+zHvcsvPutloz1EwOqapw2F/pDfew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3497
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019-11-22 11:54, Cornelia Huck wrote:
-> On Fri, 22 Nov 2019 10:03:21 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 11/21/19 2:33 PM, Peter Gonda wrote:
+> Only pass through guest relevant CPUID information: Cbit location and
+> SEV bit. The kernel does not support nested SEV guests so the other data
+> in this CPUID leaf is unneeded by the guest.
 >
->> On 2019-11-21 17:02, Cornelia Huck wrote:
->>> On Thu, 14 Nov 2019 11:11:18 +0100
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>   
->>>> On 2019-11-13 14:05, Cornelia Huck wrote:
->>>>> On Wed, 13 Nov 2019 13:23:19 +0100
->>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>>> - initializing the ORB pointing to a single READ CCW
->>>>> Out of curiosity: Would using a NOP also be an option?
->>>> It will work but will not be handled by this device, css.c intercept it
->>>> in sch_handle_start_func_virtual.
->>>>
->>>> AFAIU If we want to have a really good testing environment, for driver
->>>> testing for exemple, then it would be interesting to add a new
->>>> do_subchannel_work callback like do_subchannel_work_emulation along with
->>>> the _virtual and _paththrough variantes.
->>>>
->>>> Having a dedicated callback for emulation, we can answer to any CSS
->>>> instructions and SSCH commands, including NOP and TIC.
->>> I guess that depends on what you want to test; if you actually want to
->>> test device emulation as used by virtio etc., you obviously want to go
->>> through the existing _virtual callback :)
->> The first goal is to test basic I/O from inside the kvm-unit-test,
->> producing errors and see how the system respond to errors.
->>
->> In a standard system errors will be generated by QEMU analysing the I/O
->> instruction after interception.
->>
->> In a secured guest, we expect the same errors, however we want to check
->> this.
-> But we still get the intercepts for all I/O instructions, right? We
-> just get/inject the parameters in a slightly different way, IIUC.
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 >
-> Not that I disagree with wanting to check this :)
-
-AFAIU the SE firmware, the SIE and KVM first handle the instruction 
-interception before it comes to the QEMU code.
-
-There are two major changes with secure execution that we want to test, 
-SE firmware and SIE modifications.
-If the instruction is treated by QEMU, then hopefully we get the same 
-answer as without SE.
-
-
->
->> This PONG device is intended to be low level, no VIRTIO, and to allow
->> basic I/O.
-> Ok, so this is designed to test basic channel I/O handling, not
-> necessarily if the guest has set up all its control structures
-> correctly?
-
-More than this it is intended, in the next version, to test answers to 
-bad configurations and wrong instruction's arguments.
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 946fa9cb9dd6..6439fb1dbe76 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -780,8 +780,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+>  		break;
+>  	/* Support memory encryption cpuid if host supports it */
+>  	case 0x8000001F:
+> -		if (!boot_cpu_has(X86_FEATURE_SEV))
+> +		if (boot_cpu_has(X86_FEATURE_SEV)) {
+> +			/* Expose only SEV bit and CBit location */
+> +			entry->eax &= F(SEV);
 
 
->
->>> The actual motivation behind my question was:
->>> Is it possible to e.g. throw NOP (or TIC, or something else not
->>> device-specific) at a normal, existing virtio device for test purposes?
->>> You'd end up testing the common emulation code without needing any
->>> extra support in QEMU. No idea how useful that would be.
->> Writing a VIRTIO driver inside the kvm-unit-test is something we can do
->> in the future.
->>
->> As you said, the common code already handle NOP and TIC, the
->> interpretation of the
->> CCW chain, once the SSCH has been intercepted is done by QEMU.
->> I do not think it would be different with SE.
-> Yes. You don't really need to get the virtio device up on the virtio
-> side; if recognizing the device correctly via senseID works and you
-> maybe can do some NOP/TIC commands, you might have a very basic test
-> without introducing a new device.
-
-Right, but the test is incomplete, as you said before, no write 
-operation with this procedure.
+I know SEV-ES patches are not accepted yet, but can I ask to pass the
+SEV-ES bit in eax?
 
 
->
-> Testing virtio-ccw via kvm-unit-tests is probably a good idea for the
-> future.
->
->> To sum-up:
->>
->> in kvm-unit-test: implement all I/O instructions and force instructions
->> errors, like memory error, operand etc. and expect the right reaction of
->> the system.
->>
->> in QEMU, add the necessary infrastructure to test this.
-> Sounds good to me.
-
-Thanks,
-
-I think the next version will make the purpose of all of it even more 
-obvious,
-and hopefully answers all your questions better.
-
-Best regards,
-
-Pierre
-
->
--- 
-Pierre Morel
-IBM Lab Boeblingen
-
+> +			entry->ebx &= GENMASK(5, 0);
+> +			entry->edx = entry->ecx = 0;
+> +		} else {
+>  			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> +		}
+>  		break;
+>  	/*Add support for Centaur's CPUID instruction*/
+>  	case 0xC0000000:
