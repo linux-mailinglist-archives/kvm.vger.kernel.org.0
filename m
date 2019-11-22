@@ -2,36 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 661651063AE
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 07:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B509106392
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 07:11:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729339AbfKVGLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 01:11:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34244 "EHLO mail.kernel.org"
+        id S1728888AbfKVGL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 01:11:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34370 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729146AbfKVF40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:56:26 -0500
+        id S1728788AbfKVF4d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:56:33 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E655420659;
-        Fri, 22 Nov 2019 05:56:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9501D2071B;
+        Fri, 22 Nov 2019 05:56:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402185;
-        bh=VAQuNsQmSre+s2/0iXEv1rQrYfM5/lf41sEGigsfDzA=;
+        s=default; t=1574402192;
+        bh=3ZD4z5tSMConpDLT4YiQqF+w3h8Md2Wr1i9YsvQlzeo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZgXefGPLPImCVd9N70pWHFpurTAIrrmTihT7FaXrDBb6IEIGVSDbFWXZEsB1D6Cjt
-         y0CNmeRWeMCgjYqPUl+96eqhu20wQX5IGOwytaSZ4HGW0GmsOcXSFv0lB7wGpzhq3A
-         4F7QsGKpBZFGJpSBDMI93pbcKX8M5IH30RGOLYYo=
+        b=em6dyl/DPDAbzmrPyL3bUWvgp3z/FSsGJ2sUk9cPTOc//XeDk01URV9lkHLni4H/3
+         irqdz8xYe94DWQnhD4o1nR9LxDwTZ3jimHFQU3pg/A31MTzQuufJncCMBZRv8yPMqZ
+         kK1C6qK+IfV4IkaaTNZ+i4Wa5X4ELAMl12jzuHG0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.14 036/127] vfio-mdev/samples: Use u8 instead of char for handle functions
-Date:   Fri, 22 Nov 2019 00:54:14 -0500
-Message-Id: <20191122055544.3299-35-sashal@kernel.org>
+        linux-s390@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 042/127] KVM: s390: unregister debug feature on failing arch init
+Date:   Fri, 22 Nov 2019 00:54:20 -0500
+Message-Id: <20191122055544.3299-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
 References: <20191122055544.3299-1-sashal@kernel.org>
@@ -44,150 +47,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nathan Chancellor <natechancellor@gmail.com>
+From: Michael Mueller <mimu@linux.ibm.com>
 
-[ Upstream commit 8ba35b3a0046d6573c98f00461d9bd1b86250d35 ]
+[ Upstream commit 308c3e6673b012beecb96ef04cc65f4a0e7cdd99 ]
 
-Clang warns:
+Make sure the debug feature and its allocated resources get
+released upon unsuccessful architecture initialization.
 
-samples/vfio-mdev/mtty.c:592:39: warning: implicit conversion from 'int'
-to 'char' changes value from 162 to -94 [-Wconstant-conversion]
-                *buf = UART_MSR_DSR | UART_MSR_DDSR | UART_MSR_DCD;
-                     ~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~
-1 warning generated.
+A related indication of the issue will be reported as kernel
+message.
 
-Turns out that all uses of buf in this function ultimately end up stored
-or cast to an unsigned type. Just use u8, which has the same number of
-bits but can store this larger number so Clang no longer warns.
-
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20181130143215.69496-2-mimu@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- samples/vfio-mdev/mtty.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-index ca495686b9c31..f8c7249fa705d 100644
---- a/samples/vfio-mdev/mtty.c
-+++ b/samples/vfio-mdev/mtty.c
-@@ -171,7 +171,7 @@ static struct mdev_state *find_mdev_state_by_uuid(uuid_le uuid)
- 	return NULL;
- }
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index ff62a4fe2159a..91c24e87fe10a 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -361,19 +361,30 @@ static void kvm_s390_cpu_feat_init(void)
  
--void dump_buffer(char *buf, uint32_t count)
-+void dump_buffer(u8 *buf, uint32_t count)
+ int kvm_arch_init(void *opaque)
  {
- #if defined(DEBUG)
- 	int i;
-@@ -250,7 +250,7 @@ static void mtty_create_config_space(struct mdev_state *mdev_state)
- }
++	int rc;
++
+ 	kvm_s390_dbf = debug_register("kvm-trace", 32, 1, 7 * sizeof(long));
+ 	if (!kvm_s390_dbf)
+ 		return -ENOMEM;
  
- static void handle_pci_cfg_write(struct mdev_state *mdev_state, u16 offset,
--				 char *buf, u32 count)
-+				 u8 *buf, u32 count)
- {
- 	u32 cfg_addr, bar_mask, bar_index = 0;
- 
-@@ -304,7 +304,7 @@ static void handle_pci_cfg_write(struct mdev_state *mdev_state, u16 offset,
- }
- 
- static void handle_bar_write(unsigned int index, struct mdev_state *mdev_state,
--				u16 offset, char *buf, u32 count)
-+				u16 offset, u8 *buf, u32 count)
- {
- 	u8 data = *buf;
- 
-@@ -475,7 +475,7 @@ static void handle_bar_write(unsigned int index, struct mdev_state *mdev_state,
- }
- 
- static void handle_bar_read(unsigned int index, struct mdev_state *mdev_state,
--			    u16 offset, char *buf, u32 count)
-+			    u16 offset, u8 *buf, u32 count)
- {
- 	/* Handle read requests by guest */
- 	switch (offset) {
-@@ -650,7 +650,7 @@ static void mdev_read_base(struct mdev_state *mdev_state)
+ 	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view)) {
+-		debug_unregister(kvm_s390_dbf);
+-		return -ENOMEM;
++		rc = -ENOMEM;
++		goto out_debug_unreg;
  	}
+ 
+ 	kvm_s390_cpu_feat_init();
+ 
+ 	/* Register floating interrupt controller interface. */
+-	return kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
++	rc = kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
++	if (rc) {
++		pr_err("Failed to register FLIC rc=%d\n", rc);
++		goto out_debug_unreg;
++	}
++	return 0;
++
++out_debug_unreg:
++	debug_unregister(kvm_s390_dbf);
++	return rc;
  }
  
--static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
-+static ssize_t mdev_access(struct mdev_device *mdev, u8 *buf, size_t count,
- 			   loff_t pos, bool is_write)
- {
- 	struct mdev_state *mdev_state;
-@@ -698,7 +698,7 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
- #if defined(DEBUG_REGS)
- 			pr_info("%s: BAR%d  WR @0x%llx %s val:0x%02x dlab:%d\n",
- 				__func__, index, offset, wr_reg[offset],
--				(u8)*buf, mdev_state->s[index].dlab);
-+				*buf, mdev_state->s[index].dlab);
- #endif
- 			handle_bar_write(index, mdev_state, offset, buf, count);
- 		} else {
-@@ -708,7 +708,7 @@ static ssize_t mdev_access(struct mdev_device *mdev, char *buf, size_t count,
- #if defined(DEBUG_REGS)
- 			pr_info("%s: BAR%d  RD @0x%llx %s val:0x%02x dlab:%d\n",
- 				__func__, index, offset, rd_reg[offset],
--				(u8)*buf, mdev_state->s[index].dlab);
-+				*buf, mdev_state->s[index].dlab);
- #endif
- 		}
- 		break;
-@@ -827,7 +827,7 @@ ssize_t mtty_read(struct mdev_device *mdev, char __user *buf, size_t count,
- 		if (count >= 4 && !(*ppos % 4)) {
- 			u32 val;
- 
--			ret =  mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret =  mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					   *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -839,7 +839,7 @@ ssize_t mtty_read(struct mdev_device *mdev, char __user *buf, size_t count,
- 		} else if (count >= 2 && !(*ppos % 2)) {
- 			u16 val;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					  *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -851,7 +851,7 @@ ssize_t mtty_read(struct mdev_device *mdev, char __user *buf, size_t count,
- 		} else {
- 			u8 val;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					  *ppos, false);
- 			if (ret <= 0)
- 				goto read_err;
-@@ -889,7 +889,7 @@ ssize_t mtty_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
-@@ -901,7 +901,7 @@ ssize_t mtty_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
-@@ -913,7 +913,7 @@ ssize_t mtty_write(struct mdev_device *mdev, const char __user *buf,
- 			if (copy_from_user(&val, buf, sizeof(val)))
- 				goto write_err;
- 
--			ret = mdev_access(mdev, (char *)&val, sizeof(val),
-+			ret = mdev_access(mdev, (u8 *)&val, sizeof(val),
- 					  *ppos, true);
- 			if (ret <= 0)
- 				goto write_err;
+ void kvm_arch_exit(void)
 -- 
 2.20.1
 
