@@ -2,128 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1679B107AF7
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:58:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19B84107B8E
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 00:44:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbfKVW6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 17:58:34 -0500
-Received: from mga06.intel.com ([134.134.136.31]:15520 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726937AbfKVW6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 17:58:34 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:58:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,231,1571727600"; 
-   d="scan'208";a="382219004"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga005.jf.intel.com with ESMTP; 22 Nov 2019 14:58:33 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] KVM: x86: Move #PF retry tracking variables into emulation context
-Date:   Fri, 22 Nov 2019 14:58:32 -0800
-Message-Id: <20191122225832.26684-4-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191122225832.26684-1-sean.j.christopherson@intel.com>
-References: <20191122225832.26684-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726686AbfKVXoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 18:44:16 -0500
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:51660 "EHLO
+        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbfKVXoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 18:44:16 -0500
+Received: by mail-qt1-f202.google.com with SMTP id v92so5742797qtd.18
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 15:44:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=v33LWS5njd3HA3a4rOiy/PMZk8toCPL1wn8/Vj/DWlI=;
+        b=XjCpfaOufG+9NCDsSCPsYmeBSe0jBAeqDDsJJ0vefBAwFcVfI2d4O7l9sZt/P9AEl2
+         cakp/EESkTHVu4ygP330qNJF+EOA1x/n+mdGGiUNeqgYEDQ7S02mtHAZRC/Wa4lmOlZZ
+         K9L/rxus47O+27XSgpY2tDrypSJaeVnVUBgeMqxgXD9NGHuYn/KM6y/FKV7Y8gamSDYE
+         OXor7nGzndTi8LDR+6deywWardA/3hOtfxETEgSYo860sjxxSmKx7FrACAhqjrbXEpWp
+         kMisWLQC5Gf5NJ7jY5FUIp0dcT74GfzosO1zE9lsawy0crxsxMcSJMVHgG4j1XDTIgFP
+         gT7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=v33LWS5njd3HA3a4rOiy/PMZk8toCPL1wn8/Vj/DWlI=;
+        b=oZX+Bc4Ya0qKmwbChZlYnk9DqtiopU51N+qUvrX1wMZEjW9VG8as1e4i6UsactQ1sH
+         YKZ2nu3Ok5Fa7PW6j6/g5fdhMEz0a4ezHW0WHyBo7R0DKgotgFMoxCp+vPe05UQEX3fc
+         kdu6D8lyjj8+mBxFtIMUmrevipTyp2QV8/bKeAgC2XLANus4gBlWc0g2lKtfoGOGw6Pu
+         6dYZEVAi7UZlO/+6OlC9DelM1sXMAGROqewCQignM0jyayP4aGgy+imNlkR1unr4Ctev
+         bFFxiDVLZGjTEx30IL1CafDhMNPKvVWx2ZU2x/A/xBNyUPWnJg6L9tFF1rvaQcLSarUt
+         23pw==
+X-Gm-Message-State: APjAAAVEl8KI83aARMXZ0B451XZuo7b9OOAP3gqoBYTfmO8W+1FWPdA9
+        YO5asC+c+KleuSE9Mu1EP8jpMAUB9HVxUQigHhYy5Q/7U+VpJ4rE9QWPMyDCDnuN84LiCDPilkW
+        ob+q8umGv3r9Vv1+SPUFlm2xMyLQa7LqqasKb3JORewaDBiZyGaMBdmtEfgTo9Xs=
+X-Google-Smtp-Source: APXvYqzysauZncRk/96+SceJlXO2q4nqV47mDXB7CgstiPDGWvTRAU4dvArbYbSfvczaU/bDKpm3fcqh70Cs0A==
+X-Received: by 2002:a05:6214:6e3:: with SMTP id bk3mr2370192qvb.20.1574466254558;
+ Fri, 22 Nov 2019 15:44:14 -0800 (PST)
+Date:   Fri, 22 Nov 2019 15:43:55 -0800
+Message-Id: <20191122234355.174998-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
+Subject: [PATCH] kvm: nVMX: Relax guest IA32_FEATURE_CONTROL constraints
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Haozhong Zhang <haozhong.zhang@intel.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move last_retry_eip and last_retry_addr into the emulation context as
-they are specific to retrying an instruction after emulation failure.
+Commit 37e4c997dadf ("KVM: VMX: validate individual bits of guest
+MSR_IA32_FEATURE_CONTROL") broke the KVM_SET_MSRS ABI by instituting
+new constraints on the data values that kvm would accept for the guest
+MSR, IA32_FEATURE_CONTROL. Perhaps these constraints should have been
+opt-in via a new KVM capability, but they were applied
+indiscriminately, breaking at least one existing hypervisor.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Relax the constraints to allow either or both of
+FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX and
+FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX to be set when nVMX is
+enabled. This change is sufficient to fix the aforementioned breakage.
+
+Fixes: 37e4c997dadf ("KVM: VMX: validate individual bits of guest MSR_IA32_FEATURE_CONTROL")
+Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/include/asm/kvm_emulate.h |  4 ++++
- arch/x86/include/asm/kvm_host.h    |  3 ---
- arch/x86/kvm/x86.c                 | 11 ++++++-----
- 3 files changed, 10 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index e81658a4ab9d..9c5db3b4120e 100644
---- a/arch/x86/include/asm/kvm_emulate.h
-+++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -311,6 +311,10 @@ struct x86_emulate_ctxt {
- 	bool gpa_available;
- 	gpa_t gpa_val;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 04a8212704c17..9f46023451810 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7097,10 +7097,12 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
  
-+	/* Track EIP and CR2/GPA when retrying faulting instruction on #PF. */
-+	unsigned long last_retry_eip;
-+	unsigned long last_retry_addr;
-+
- 	/*
- 	 * decode cache
- 	 */
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e434f4cfecd1..6c8bfebabc31 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -745,9 +745,6 @@ struct kvm_vcpu_arch {
+ 	if (nested_vmx_allowed(vcpu))
+ 		to_vmx(vcpu)->msr_ia32_feature_control_valid_bits |=
++			FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX |
+ 			FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
+ 	else
+ 		to_vmx(vcpu)->msr_ia32_feature_control_valid_bits &=
+-			~FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
++			~(FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX |
++			  FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX);
  
- 	cpumask_var_t wbinvd_dirty_mask;
- 
--	unsigned long last_retry_eip;
--	unsigned long last_retry_addr;
--
- 	struct {
- 		bool halted;
- 		gfn_t gfns[roundup_pow_of_two(ASYNC_PF_PER_VCPU)];
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9a8adfdf1e0a..3aa2d7d98779 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6317,6 +6317,7 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
- 
- 	kvm_x86_ops->get_cs_db_l_bits(vcpu, &cs_db, &cs_l);
- 
-+	/* last_retry_{eip,addr} are persistent and must not be init'd here. */
- 	ctxt->gpa_available = false;
- 	ctxt->eflags = kvm_get_rflags(vcpu);
- 	ctxt->tf = (ctxt->eflags & X86_EFLAGS_TF) != 0;
-@@ -6467,8 +6468,8 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
- 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
- 	unsigned long last_retry_eip, last_retry_addr, gpa = cr2;
- 
--	last_retry_eip = vcpu->arch.last_retry_eip;
--	last_retry_addr = vcpu->arch.last_retry_addr;
-+	last_retry_eip = ctxt->last_retry_eip;
-+	last_retry_addr = ctxt->last_retry_addr;
- 
- 	/*
- 	 * If the emulation is caused by #PF and it is non-page_table
-@@ -6483,7 +6484,7 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
- 	 * and the address again, we can break out of the potential infinite
- 	 * loop.
- 	 */
--	vcpu->arch.last_retry_eip = vcpu->arch.last_retry_addr = 0;
-+	ctxt->last_retry_eip = ctxt->last_retry_addr = 0;
- 
- 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
- 		return false;
-@@ -6498,8 +6499,8 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
- 	if (ctxt->eip == last_retry_eip && last_retry_addr == cr2)
- 		return false;
- 
--	vcpu->arch.last_retry_eip = ctxt->eip;
--	vcpu->arch.last_retry_addr = cr2;
-+	ctxt->last_retry_eip = ctxt->eip;
-+	ctxt->last_retry_addr = cr2;
- 
- 	if (!vcpu->arch.mmu->direct_map)
- 		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2, NULL);
+ 	if (nested_vmx_allowed(vcpu)) {
+ 		nested_vmx_cr_fixed1_bits_update(vcpu);
 -- 
-2.24.0
+2.24.0.432.g9d3f5f5b63-goog
 
