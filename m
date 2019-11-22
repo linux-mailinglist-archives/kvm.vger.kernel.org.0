@@ -2,122 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1546107612
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 17:58:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC10E10764D
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 18:18:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726784AbfKVQ6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 11:58:20 -0500
-Received: from mga07.intel.com ([134.134.136.100]:51805 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726620AbfKVQ6U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 11:58:20 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 08:58:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,230,1571727600"; 
-   d="scan'208";a="201580258"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga008.jf.intel.com with ESMTP; 22 Nov 2019 08:58:19 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: Grab KVM's srcu lock when setting nested state
-Date:   Fri, 22 Nov 2019 08:58:18 -0800
-Message-Id: <20191122165818.32558-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.0
+        id S1726705AbfKVRSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 12:18:30 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:42782 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfKVRSa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 12:18:30 -0500
+Received: by mail-io1-f68.google.com with SMTP id k13so8852523ioa.9
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 09:18:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h8FwEq5/p32a1eY3isWRrwz0NOl7g5eBH/DEgCOZNq0=;
+        b=TsdtXkPhnVRqTlZ0bTiedQHTxqBTrFiBuPfGICaLLceRbaJi/U0hhDX5++62v/pj0w
+         PSJbqeZNLGvdwEX2I7/93IkZP1tWVrnS52R/TPzRh3/llJ3Oqm0P5Bdj4Bn7V3zcQepr
+         +q1vSjCYzw8nTLaKFMgX0Odjm4lUSddPfcz0ugr54QWTev86Y33l1kMgdDxR7nHgNqCS
+         Q3rRbllrfXKf+zb4FPYwlk8SA6X2maB/DLqhmWqodG+xWPG23smszkzby8Tv/q77Y9Rw
+         v+eJ4u7DMKFnVxon/4QHSkDEmBZraPTpxDELkNSPJi9PF4++kioVWj4hOL4Lk42jFixq
+         dN0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h8FwEq5/p32a1eY3isWRrwz0NOl7g5eBH/DEgCOZNq0=;
+        b=IitSdXdagg+eHAJDgtJzqY6fUdqTzaOtxPzZcz74b0IWE7BBn9f70OUnBkaYVPg+PC
+         FJP2SjVJcvGp+xgKXe5z/er9XRN87ztClfms6iA6f9R+isq9lwanLw+xGxXX1pEIsi74
+         fxM7ZMetvrgFvAqt6ejFKddNYCn0MPsVSVfQsLDJosjRVeN2aYPkCheuSUtQdjB/LXQ7
+         F7xKCYB8beV3lZTSQt7ZK9pberRccPP1eGegiJ/THAsR9irWXQJctrsPA01tkqoK4DTJ
+         M1CKoDQp0YvCRmd1jLQxrSo7dMf8HP9kBiPbTCKLuXMXzmi3C95gIlkbk2zHrcTSZXPE
+         U9ug==
+X-Gm-Message-State: APjAAAUC7QNl76jX9AqHNz17noi+0tBqdScJVexqXolPQ8BaDDWIwVfo
+        PMgw8mkwXDCfiQHrfJzXomADL5vmAm6U3ljiXro2Zw==
+X-Google-Smtp-Source: APXvYqyROlENwv1nj2jwYjvNqrdmbHrOhBkcZHVpPhDK5Gq6jk2IF9hA68o6068LM2aVj5tqSU/mAnYosFlWEZpNkvM=
+X-Received: by 2002:a5d:9b08:: with SMTP id y8mr14653675ion.108.1574443108920;
+ Fri, 22 Nov 2019 09:18:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20191121203344.156835-1-pgonda@google.com> <20191121203344.156835-3-pgonda@google.com>
+ <d876b27b-9519-a0a0-55c2-62e57a783a7f@amd.com>
+In-Reply-To: <d876b27b-9519-a0a0-55c2-62e57a783a7f@amd.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 22 Nov 2019 09:18:17 -0800
+Message-ID: <CALMp9eRVNDvy65AFDz=KjUT0M0rCtgCECuMS0nUZqAhy2S=MsA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM x86: Mask memory encryption guest cpuid
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     Peter Gonda <pgonda@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Acquire kvm->srcu for the duration of ->set_nested_state() to fix a bug
-where nVMX derefences ->memslots without holding ->srcu or ->slots_lock.
+Does SEV-ES indicate that SEV-ES guests are supported, or that the
+current (v)CPU is running with SEV-ES enabled, or both?
 
-The other half of nested migration, ->get_nested_state(), does not need
-to acquire ->srcu as it is a purely a dump of internal KVM (and CPU)
-state to userspace.
-
-Detected as an RCU lockdep splat that is 100% reproducible by running
-KVM's state_test selftest with CONFIG_PROVE_LOCKING=y.  Note that the
-failing function, kvm_is_visible_gfn(), is only checking the validity of
-a gfn, it's not actually accessing guest memory (which is more or less
-unsupported during vmx_set_nested_state() due to incorrect MMU state),
-i.e. vmx_set_nested_state() itself isn't fundamentally broken.  In any
-case, setting nested state isn't a fast path so there's no reason to go
-out of our way to avoid taking ->srcu.
-
-  =============================
-  WARNING: suspicious RCU usage
-  5.4.0-rc7+ #94 Not tainted
-  -----------------------------
-  include/linux/kvm_host.h:626 suspicious rcu_dereference_check() usage!
-
-               other info that might help us debug this:
-
-  rcu_scheduler_active = 2, debug_locks = 1
-  1 lock held by evmcs_test/10939:
-   #0: ffff88826ffcb800 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x85/0x630 [kvm]
-
-  stack backtrace:
-  CPU: 1 PID: 10939 Comm: evmcs_test Not tainted 5.4.0-rc7+ #94
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  Call Trace:
-   dump_stack+0x68/0x9b
-   kvm_is_visible_gfn+0x179/0x180 [kvm]
-   mmu_check_root+0x11/0x30 [kvm]
-   fast_cr3_switch+0x40/0x120 [kvm]
-   kvm_mmu_new_cr3+0x34/0x60 [kvm]
-   nested_vmx_load_cr3+0xbd/0x1f0 [kvm_intel]
-   nested_vmx_enter_non_root_mode+0xab8/0x1d60 [kvm_intel]
-   vmx_set_nested_state+0x256/0x340 [kvm_intel]
-   kvm_arch_vcpu_ioctl+0x491/0x11a0 [kvm]
-   kvm_vcpu_ioctl+0xde/0x630 [kvm]
-   do_vfs_ioctl+0xa2/0x6c0
-   ksys_ioctl+0x66/0x70
-   __x64_sys_ioctl+0x16/0x20
-   do_syscall_64+0x54/0x200
-   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-  RIP: 0033:0x7f59a2b95f47
-
-Fixes: 8fcc4b5923af5 ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/x86.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5d530521f11d..656878a9802e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4421,6 +4421,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	case KVM_SET_NESTED_STATE: {
- 		struct kvm_nested_state __user *user_kvm_nested_state = argp;
- 		struct kvm_nested_state kvm_state;
-+		int idx;
- 
- 		r = -EINVAL;
- 		if (!kvm_x86_ops->set_nested_state)
-@@ -4444,7 +4445,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		    && !(kvm_state.flags & KVM_STATE_NESTED_GUEST_MODE))
- 			break;
- 
-+		idx = srcu_read_lock(&vcpu->kvm->srcu);
- 		r = kvm_x86_ops->set_nested_state(vcpu, user_kvm_nested_state, &kvm_state);
-+		srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 		break;
- 	}
- 	case KVM_GET_SUPPORTED_HV_CPUID: {
--- 
-2.24.0
-
+On Fri, Nov 22, 2019 at 5:01 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+> On 11/21/19 2:33 PM, Peter Gonda wrote:
+> > Only pass through guest relevant CPUID information: Cbit location and
+> > SEV bit. The kernel does not support nested SEV guests so the other data
+> > in this CPUID leaf is unneeded by the guest.
+> >
+> > Suggested-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> > ---
+> >  arch/x86/kvm/cpuid.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 946fa9cb9dd6..6439fb1dbe76 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -780,8 +780,14 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+> >               break;
+> >       /* Support memory encryption cpuid if host supports it */
+> >       case 0x8000001F:
+> > -             if (!boot_cpu_has(X86_FEATURE_SEV))
+> > +             if (boot_cpu_has(X86_FEATURE_SEV)) {
+> > +                     /* Expose only SEV bit and CBit location */
+> > +                     entry->eax &= F(SEV);
+>
+>
+> I know SEV-ES patches are not accepted yet, but can I ask to pass the
+> SEV-ES bit in eax?
+>
+>
+> > +                     entry->ebx &= GENMASK(5, 0);
+> > +                     entry->edx = entry->ecx = 0;
+> > +             } else {
+> >                       entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> > +             }
+> >               break;
+> >       /*Add support for Centaur's CPUID instruction*/
+> >       case 0xC0000000:
