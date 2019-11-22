@@ -2,71 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C9310704A
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:21:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 564DC106F2A
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:14:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729816AbfKVLVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 06:21:33 -0500
-Received: from foss.arm.com ([217.140.110.172]:43866 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727903AbfKVKpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 05:45:10 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0C75328;
-        Fri, 22 Nov 2019 02:45:09 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C9EC3F6C4;
-        Fri, 22 Nov 2019 02:45:09 -0800 (PST)
-Subject: Re: [PATCH kvm-unit-tests] runtime: set MAX_SMP to number of online
- cpus
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com
-References: <20191120141928.6849-1-drjones@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <86280ced-214f-eb0f-0662-0854e5c57991@arm.com>
-Date:   Fri, 22 Nov 2019 10:45:08 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1728091AbfKVLN7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 06:13:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55911 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727567AbfKVKyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 05:54:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574420073;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2e50LNZlNp4nrLqKzGHubkeP3g5mGFC99jlbb5R6lfg=;
+        b=hhyYjlxIVnTuvuBIajEWnpxNnmeH8t1gEKXm9LloDOYwiGv0C58FdPAZUeEgaZFyJgBrwN
+        0POE8MIIKcSpXm6nJHfA1y6p4d3rceVWBZZ0YU4PwDRaicQAhThdUTIkzjkQi10AXdDg9W
+        VHqtuGQsDfR7lnuSGkrjuhDATWKagXY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-U4uacRPQO-G9glMmLVTrhw-1; Fri, 22 Nov 2019 05:54:30 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB2C218557C0;
+        Fri, 22 Nov 2019 10:54:28 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 041971C957;
+        Fri, 22 Nov 2019 10:54:24 +0000 (UTC)
+Date:   Fri, 22 Nov 2019 11:54:22 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
+Message-ID: <20191122115422.56019f03.cohuck@redhat.com>
+In-Reply-To: <0c9d19ef-8ef7-0dab-b283-3db243b95476@linux.ibm.com>
+References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
+        <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
+        <20191113140539.4d153d5f.cohuck@redhat.com>
+        <802c298d-d2da-83c4-c222-67bb78131988@linux.ibm.com>
+        <20191121170237.72e0bd45.cohuck@redhat.com>
+        <0c9d19ef-8ef7-0dab-b283-3db243b95476@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191120141928.6849-1-drjones@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: U4uacRPQO-G9glMmLVTrhw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, 22 Nov 2019 10:03:21 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 11/20/19 2:19 PM, Andrew Jones wrote:
-> We can only use online cpus, so make sure we check specifically for
-> those.
->
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  scripts/runtime.bash | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 200d5b67290c..fbad0bd05fc5 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -1,5 +1,5 @@
->  : "${RUNTIME_arch_run?}"
-> -: ${MAX_SMP:=$(getconf _NPROCESSORS_CONF)}
-> +: ${MAX_SMP:=$(getconf _NPROCESSORS_ONLN)}
+> On 2019-11-21 17:02, Cornelia Huck wrote:
+> > On Thu, 14 Nov 2019 11:11:18 +0100
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > =20
+> >> On 2019-11-13 14:05, Cornelia Huck wrote: =20
+> >>> On Wed, 13 Nov 2019 13:23:19 +0100
+> >>> Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-I tested it on my machine by offlining a CPU and calling getconf _NPROCESSORS_CONF
-(returned 32) and getconf _NPROCESSORS_ONLN (returned 31). man 3 sysconf also
-agrees with your patch.
+> >>>> - initializing the ORB pointing to a single READ CCW =20
+> >>> Out of curiosity: Would using a NOP also be an option? =20
+> >> It will work but will not be handled by this device, css.c intercept i=
+t
+> >> in sch_handle_start_func_virtual.
+> >>
+> >> AFAIU If we want to have a really good testing environment, for driver
+> >> testing for exemple, then it would be interesting to add a new
+> >> do_subchannel_work callback like do_subchannel_work_emulation along wi=
+th
+> >> the _virtual and _paththrough variantes.
+> >>
+> >> Having a dedicated callback for emulation, we can answer to any CSS
+> >> instructions and SSCH commands, including NOP and TIC. =20
+> > I guess that depends on what you want to test; if you actually want to
+> > test device emulation as used by virtio etc., you obviously want to go
+> > through the existing _virtual callback :) =20
+>=20
+> The first goal is to test basic I/O from inside the kvm-unit-test,=20
+> producing errors and see how the system respond to errors.
+>=20
+> In a standard system errors will be generated by QEMU analysing the I/O=
+=20
+> instruction after interception.
+>=20
+> In a secured guest, we expect the same errors, however we want to check=
+=20
+> this.
 
-I am wondering though, if _NPROCESSORS_CONF is 8 and _NPROCESSORS_ONLN is 1
-(meaning that 7 CPUs were offlined), that means that qemu will create 8 VCPUs
-which will share the same physical CPU. Is that undesirable?
+But we still get the intercepts for all I/O instructions, right? We
+just get/inject the parameters in a slightly different way, IIUC.
 
-Thanks,
-Alex
->  : ${TIMEOUT:=90s}
->  
->  PASS() { echo -ne "\e[32mPASS\e[0m"; }
+Not that I disagree with wanting to check this :)
+
+> This PONG device is intended to be low level, no VIRTIO, and to allow=20
+> basic I/O.
+
+Ok, so this is designed to test basic channel I/O handling, not
+necessarily if the guest has set up all its control structures
+correctly?
+
+> > The actual motivation behind my question was:
+> > Is it possible to e.g. throw NOP (or TIC, or something else not
+> > device-specific) at a normal, existing virtio device for test purposes?
+> > You'd end up testing the common emulation code without needing any
+> > extra support in QEMU. No idea how useful that would be. =20
+>=20
+> Writing a VIRTIO driver inside the kvm-unit-test is something we can do=
+=20
+> in the future.
+>=20
+> As you said, the common code already handle NOP and TIC, the=20
+> interpretation of the
+> CCW chain, once the SSCH has been intercepted is done by QEMU.
+> I do not think it would be different with SE.
+
+Yes. You don't really need to get the virtio device up on the virtio
+side; if recognizing the device correctly via senseID works and you
+maybe can do some NOP/TIC commands, you might have a very basic test
+without introducing a new device.
+
+Testing virtio-ccw via kvm-unit-tests is probably a good idea for the
+future.
+
+> To sum-up:
+>=20
+> in kvm-unit-test: implement all I/O instructions and force instructions=
+=20
+> errors, like memory error, operand etc. and expect the right reaction of=
+=20
+> the system.
+>=20
+> in QEMU, add the necessary infrastructure to test this.
+
+Sounds good to me.
+
