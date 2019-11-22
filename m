@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03FB21069CD
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 11:20:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14C9310704A
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:21:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbfKVKUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 05:20:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45009 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726563AbfKVKUW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Nov 2019 05:20:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574418021;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZWq3HtktWgJiFGS3sKMs6SJfF4IhV0hkiIXQfhIWWkw=;
-        b=KhutcInaH7dmI/lV2e0z7N/2yNtL5/z+xeTaFWToJp5oRO4zuY14BaY20VaejQq8XVZnUO
-        dR5yBQD2QeefkWWszxI+sMtt20epUNdtJUqqAsSOsQ4nYn1r5PMofWwW9anbtGp3di45d/
-        PET5aQ2hC3Phj8TCLgkJ035AxVeWCUM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-t6X-cLIQOaisNykJdAq6Fw-1; Fri, 22 Nov 2019 05:20:19 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93475107ACC4;
-        Fri, 22 Nov 2019 10:20:18 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-116.ams2.redhat.com [10.36.117.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A10014145;
-        Fri, 22 Nov 2019 10:20:11 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH] MAINTAINERS: Add myself as maintainer of virtio-vsock
-Date:   Fri, 22 Nov 2019 11:20:10 +0100
-Message-Id: <20191122102010.14346-1-sgarzare@redhat.com>
+        id S1729816AbfKVLVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 06:21:33 -0500
+Received: from foss.arm.com ([217.140.110.172]:43866 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727903AbfKVKpK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 05:45:10 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0C75328;
+        Fri, 22 Nov 2019 02:45:09 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C9EC3F6C4;
+        Fri, 22 Nov 2019 02:45:09 -0800 (PST)
+Subject: Re: [PATCH kvm-unit-tests] runtime: set MAX_SMP to number of online
+ cpus
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+References: <20191120141928.6849-1-drjones@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <86280ced-214f-eb0f-0662-0854e5c57991@arm.com>
+Date:   Fri, 22 Nov 2019 10:45:08 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: t6X-cLIQOaisNykJdAq6Fw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191120141928.6849-1-drjones@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since I'm actively working on vsock and virtio/vhost transports,
-Stefan suggested to help him to maintain it.
+Hi,
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+On 11/20/19 2:19 PM, Andrew Jones wrote:
+> We can only use online cpus, so make sure we check specifically for
+> those.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  scripts/runtime.bash | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index 200d5b67290c..fbad0bd05fc5 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -1,5 +1,5 @@
+>  : "${RUNTIME_arch_run?}"
+> -: ${MAX_SMP:=$(getconf _NPROCESSORS_CONF)}
+> +: ${MAX_SMP:=$(getconf _NPROCESSORS_ONLN)}
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 993d4e1d4974..077c4ba438cb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17212,6 +17212,7 @@ F:=09virt/lib/
-=20
- VIRTIO AND VHOST VSOCK DRIVER
- M:=09Stefan Hajnoczi <stefanha@redhat.com>
-+M:=09Stefano Garzarella <sgarzare@redhat.com>
- L:=09kvm@vger.kernel.org
- L:=09virtualization@lists.linux-foundation.org
- L:=09netdev@vger.kernel.org
---=20
-2.21.0
+I tested it on my machine by offlining a CPU and calling getconf _NPROCESSORS_CONF
+(returned 32) and getconf _NPROCESSORS_ONLN (returned 31). man 3 sysconf also
+agrees with your patch.
 
+I am wondering though, if _NPROCESSORS_CONF is 8 and _NPROCESSORS_ONLN is 1
+(meaning that 7 CPUs were offlined), that means that qemu will create 8 VCPUs
+which will share the same physical CPU. Is that undesirable?
+
+Thanks,
+Alex
+>  : ${TIMEOUT:=90s}
+>  
+>  PASS() { echo -ne "\e[32mPASS\e[0m"; }
