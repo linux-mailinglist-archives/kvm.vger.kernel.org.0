@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8434F107AF8
+	by mail.lfdr.de (Postfix) with ESMTP id 1679B107AF7
 	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 23:58:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726880AbfKVW6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726967AbfKVW6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 22 Nov 2019 17:58:34 -0500
 Received: from mga06.intel.com ([134.134.136.31]:15520 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726089AbfKVW6d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 17:58:33 -0500
+        id S1726937AbfKVW6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 17:58:34 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 14:58:33 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,231,1571727600"; 
-   d="scan'208";a="382219002"
+   d="scan'208";a="382219004"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
   by orsmga005.jf.intel.com with ESMTP; 22 Nov 2019 14:58:33 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -29,9 +29,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] KVM: x86: Move gpa_val and gpa_available into the emulator context
-Date:   Fri, 22 Nov 2019 14:58:31 -0800
-Message-Id: <20191122225832.26684-3-sean.j.christopherson@intel.com>
+Subject: [PATCH 3/3] KVM: x86: Move #PF retry tracking variables into emulation context
+Date:   Fri, 22 Nov 2019 14:58:32 -0800
+Message-Id: <20191122225832.26684-4-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191122225832.26684-1-sean.j.christopherson@intel.com>
 References: <20191122225832.26684-1-sean.j.christopherson@intel.com>
@@ -42,95 +42,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the GPA tracking into the emulator context to prevent it from being
-abused in the standard page fault flow.  All paths into the emulator go
-through init_emulate_ctxt(), so there's no need to clear gpa_available
-after every VM-Exit.  The only partial exception is EMULTYPE_NO_DECODE,
-but in that case the emulator is simply being re-entered, i.e. retaining
-gpa_available is correct and consistent with current behavior.
+Move last_retry_eip and last_retry_addr into the emulation context as
+they are specific to retrying an instruction after emulation failure.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
  arch/x86/include/asm/kvm_emulate.h |  4 ++++
- arch/x86/include/asm/kvm_host.h    |  4 ----
- arch/x86/kvm/x86.c                 | 13 ++++++-------
- 3 files changed, 10 insertions(+), 11 deletions(-)
+ arch/x86/include/asm/kvm_host.h    |  3 ---
+ arch/x86/kvm/x86.c                 | 11 ++++++-----
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
-index 77cf6c11f66b..e81658a4ab9d 100644
+index e81658a4ab9d..9c5db3b4120e 100644
 --- a/arch/x86/include/asm/kvm_emulate.h
 +++ b/arch/x86/include/asm/kvm_emulate.h
-@@ -307,6 +307,10 @@ struct x86_emulate_ctxt {
- 	bool have_exception;
- 	struct x86_exception exception;
+@@ -311,6 +311,10 @@ struct x86_emulate_ctxt {
+ 	bool gpa_available;
+ 	gpa_t gpa_val;
  
-+	/* GPA available */
-+	bool gpa_available;
-+	gpa_t gpa_val;
++	/* Track EIP and CR2/GPA when retrying faulting instruction on #PF. */
++	unsigned long last_retry_eip;
++	unsigned long last_retry_addr;
 +
  	/*
  	 * decode cache
  	 */
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6311fffbc2f0..e434f4cfecd1 100644
+index e434f4cfecd1..6c8bfebabc31 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -791,10 +791,6 @@ struct kvm_vcpu_arch {
- 	int pending_ioapic_eoi;
- 	int pending_external_vector;
+@@ -745,9 +745,6 @@ struct kvm_vcpu_arch {
  
--	/* GPA available */
--	bool gpa_available;
--	gpa_t gpa_val;
+ 	cpumask_var_t wbinvd_dirty_mask;
+ 
+-	unsigned long last_retry_eip;
+-	unsigned long last_retry_addr;
 -
- 	/* be preempted when it's in kernel-mode(cpl=0) */
- 	bool preempted_in_kernel;
- 
+ 	struct {
+ 		bool halted;
+ 		gfn_t gfns[roundup_pow_of_two(ASYNC_PF_PER_VCPU)];
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 848e4ec21c5e..9a8adfdf1e0a 100644
+index 9a8adfdf1e0a..3aa2d7d98779 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5664,10 +5664,9 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
- 	 * operation using rep will only have the initial GPA from the NPF
- 	 * occurred.
- 	 */
--	if (vcpu->arch.gpa_available &&
--	    emulator_can_use_gpa(ctxt) &&
--	    (addr & ~PAGE_MASK) == (vcpu->arch.gpa_val & ~PAGE_MASK)) {
--		gpa = vcpu->arch.gpa_val;
-+	if (ctxt->gpa_available && emulator_can_use_gpa(ctxt) &&
-+	    (addr & ~PAGE_MASK) == (ctxt->gpa_val & ~PAGE_MASK)) {
-+		gpa = ctxt->gpa_val;
- 		ret = vcpu_is_mmio_gpa(vcpu, addr, gpa, write);
- 	} else {
- 		ret = vcpu_mmio_gva_to_gpa(vcpu, addr, &gpa, exception, write);
-@@ -6318,6 +6317,7 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
+@@ -6317,6 +6317,7 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
  
  	kvm_x86_ops->get_cs_db_l_bits(vcpu, &cs_db, &cs_l);
  
-+	ctxt->gpa_available = false;
++	/* last_retry_{eip,addr} are persistent and must not be init'd here. */
+ 	ctxt->gpa_available = false;
  	ctxt->eflags = kvm_get_rflags(vcpu);
  	ctxt->tf = (ctxt->eflags & X86_EFLAGS_TF) != 0;
+@@ -6467,8 +6468,8 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
+ 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+ 	unsigned long last_retry_eip, last_retry_addr, gpa = cr2;
  
-@@ -6750,8 +6750,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
+-	last_retry_eip = vcpu->arch.last_retry_eip;
+-	last_retry_addr = vcpu->arch.last_retry_addr;
++	last_retry_eip = ctxt->last_retry_eip;
++	last_retry_addr = ctxt->last_retry_addr;
  
- 		/* With shadow page tables, cr2 contains a GVA or nGPA. */
- 		if (vcpu->arch.mmu->direct_map) {
--			vcpu->arch.gpa_available = true;
--			vcpu->arch.gpa_val = cr2;
-+			ctxt->gpa_available = true;
-+			ctxt->gpa_val = cr2;
- 		}
- 	} else {
- 		/* Sanitize the address out of an abundance of paranoia. */
-@@ -8306,7 +8306,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.apic_attention)
- 		kvm_lapic_sync_from_vapic(vcpu);
+ 	/*
+ 	 * If the emulation is caused by #PF and it is non-page_table
+@@ -6483,7 +6484,7 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
+ 	 * and the address again, we can break out of the potential infinite
+ 	 * loop.
+ 	 */
+-	vcpu->arch.last_retry_eip = vcpu->arch.last_retry_addr = 0;
++	ctxt->last_retry_eip = ctxt->last_retry_addr = 0;
  
--	vcpu->arch.gpa_available = false;
- 	r = kvm_x86_ops->handle_exit(vcpu);
- 	return r;
+ 	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
+ 		return false;
+@@ -6498,8 +6499,8 @@ static bool retry_instruction(struct x86_emulate_ctxt *ctxt,
+ 	if (ctxt->eip == last_retry_eip && last_retry_addr == cr2)
+ 		return false;
  
+-	vcpu->arch.last_retry_eip = ctxt->eip;
+-	vcpu->arch.last_retry_addr = cr2;
++	ctxt->last_retry_eip = ctxt->eip;
++	ctxt->last_retry_addr = cr2;
+ 
+ 	if (!vcpu->arch.mmu->direct_map)
+ 		gpa = kvm_mmu_gva_to_gpa_write(vcpu, cr2, NULL);
 -- 
 2.24.0
 
