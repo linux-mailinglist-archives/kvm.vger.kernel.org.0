@@ -2,146 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 564DC106F2A
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:14:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC87B106F5B
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 12:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbfKVLN7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 06:13:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55911 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727567AbfKVKyd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 05:54:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574420073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2e50LNZlNp4nrLqKzGHubkeP3g5mGFC99jlbb5R6lfg=;
-        b=hhyYjlxIVnTuvuBIajEWnpxNnmeH8t1gEKXm9LloDOYwiGv0C58FdPAZUeEgaZFyJgBrwN
-        0POE8MIIKcSpXm6nJHfA1y6p4d3rceVWBZZ0YU4PwDRaicQAhThdUTIkzjkQi10AXdDg9W
-        VHqtuGQsDfR7lnuSGkrjuhDATWKagXY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-U4uacRPQO-G9glMmLVTrhw-1; Fri, 22 Nov 2019 05:54:30 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB2C218557C0;
-        Fri, 22 Nov 2019 10:54:28 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 041971C957;
-        Fri, 22 Nov 2019 10:54:24 +0000 (UTC)
-Date:   Fri, 22 Nov 2019 11:54:22 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [PATCH v1 4/4] s390x: Testing the Subchannel I/O read
-Message-ID: <20191122115422.56019f03.cohuck@redhat.com>
-In-Reply-To: <0c9d19ef-8ef7-0dab-b283-3db243b95476@linux.ibm.com>
-References: <1573647799-30584-1-git-send-email-pmorel@linux.ibm.com>
-        <1573647799-30584-5-git-send-email-pmorel@linux.ibm.com>
-        <20191113140539.4d153d5f.cohuck@redhat.com>
-        <802c298d-d2da-83c4-c222-67bb78131988@linux.ibm.com>
-        <20191121170237.72e0bd45.cohuck@redhat.com>
-        <0c9d19ef-8ef7-0dab-b283-3db243b95476@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1730634AbfKVLPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 06:15:09 -0500
+Received: from mx2.suse.de ([195.135.220.15]:34110 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729023AbfKVLPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 06:15:08 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 21586B2F6;
+        Fri, 22 Nov 2019 11:15:04 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 4FA541E484C; Fri, 22 Nov 2019 12:15:02 +0100 (CET)
+Date:   Fri, 22 Nov 2019 12:15:02 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v7 02/24] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191122111502.GC26721@quack2.suse.cz>
+References: <20191121071354.456618-1-jhubbard@nvidia.com>
+ <20191121071354.456618-3-jhubbard@nvidia.com>
+ <20191121080356.GA24784@lst.de>
+ <852f6c27-8b65-547b-89e0-e8f32a4d17b9@nvidia.com>
+ <20191121095411.GC18190@quack2.suse.cz>
+ <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: U4uacRPQO-G9glMmLVTrhw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9d0846af-2c4f-7cda-dfcb-1f642943afea@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Nov 2019 10:03:21 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Thu 21-11-19 18:54:02, John Hubbard wrote:
+> On 11/21/19 1:54 AM, Jan Kara wrote:
+> > On Thu 21-11-19 00:29:59, John Hubbard wrote:
+> > > > 
+> > > > Otherwise this looks fine and might be a worthwhile cleanup to feed
+> > > > Andrew for 5.5 independent of the gut of the changes.
+> > > > 
+> > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > > > 
+> > > 
+> > > Thanks for the reviews! Say, it sounds like your view here is that this
+> > > series should be targeted at 5.6 (not 5.5), is that what you have in mind?
+> > > And get the preparatory patches (1-9, and maybe even 10-16) into 5.5?
+> > 
+> > One more note :) If you are going to push pin_user_pages() interfaces
+> > (which I'm fine with), it would probably make sense to push also the
+> > put_user_pages() -> unpin_user_pages() renaming so that that inconsistency
+> > in naming does not exist in the released upstream kernel.
+> > 
+> > 								Honza
+> 
+> Yes, that's what this patch series does. But I'm not sure if "push" here
+> means, "push out: defer to 5.6", "push (now) into 5.5", or "advocate for"?
 
-> On 2019-11-21 17:02, Cornelia Huck wrote:
-> > On Thu, 14 Nov 2019 11:11:18 +0100
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-> > =20
-> >> On 2019-11-13 14:05, Cornelia Huck wrote: =20
-> >>> On Wed, 13 Nov 2019 13:23:19 +0100
-> >>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+I meant to include the patch in the "for 5.5" batch.
 
-> >>>> - initializing the ORB pointing to a single READ CCW =20
-> >>> Out of curiosity: Would using a NOP also be an option? =20
-> >> It will work but will not be handled by this device, css.c intercept i=
-t
-> >> in sch_handle_start_func_virtual.
-> >>
-> >> AFAIU If we want to have a really good testing environment, for driver
-> >> testing for exemple, then it would be interesting to add a new
-> >> do_subchannel_work callback like do_subchannel_work_emulation along wi=
-th
-> >> the _virtual and _paththrough variantes.
-> >>
-> >> Having a dedicated callback for emulation, we can answer to any CSS
-> >> instructions and SSCH commands, including NOP and TIC. =20
-> > I guess that depends on what you want to test; if you actually want to
-> > test device emulation as used by virtio etc., you obviously want to go
-> > through the existing _virtual callback :) =20
->=20
-> The first goal is to test basic I/O from inside the kvm-unit-test,=20
-> producing errors and see how the system respond to errors.
->=20
-> In a standard system errors will be generated by QEMU analysing the I/O=
-=20
-> instruction after interception.
->=20
-> In a secured guest, we expect the same errors, however we want to check=
-=20
-> this.
+> I will note that it's not going to be easy to rename in one step, now
+> that this is being split up. Because various put_user_pages()-based items
+> are going into 5.5 via different maintainer trees now. Probably I'd need
+> to introduce unpin_user_page() alongside put_user_page()...thoughts?
 
-But we still get the intercepts for all I/O instructions, right? We
-just get/inject the parameters in a slightly different way, IIUC.
+Yes, I understand that moving that patch from the end of the series would
+cause fair amount of conflicts. I was hoping that you could generate the
+patch with sed/Coccinelle and then rebasing what remains for 5.6 on top of
+that patch should not be that painful so overall it should not be that much
+work. But I may be wrong so if it proves to be too tedious, let's just
+postpone the renaming to 5.6. I don't find having both unpin_user_page()
+and put_user_page() a better alternative to current state. Thanks!
 
-Not that I disagree with wanting to check this :)
-
-> This PONG device is intended to be low level, no VIRTIO, and to allow=20
-> basic I/O.
-
-Ok, so this is designed to test basic channel I/O handling, not
-necessarily if the guest has set up all its control structures
-correctly?
-
-> > The actual motivation behind my question was:
-> > Is it possible to e.g. throw NOP (or TIC, or something else not
-> > device-specific) at a normal, existing virtio device for test purposes?
-> > You'd end up testing the common emulation code without needing any
-> > extra support in QEMU. No idea how useful that would be. =20
->=20
-> Writing a VIRTIO driver inside the kvm-unit-test is something we can do=
-=20
-> in the future.
->=20
-> As you said, the common code already handle NOP and TIC, the=20
-> interpretation of the
-> CCW chain, once the SSCH has been intercepted is done by QEMU.
-> I do not think it would be different with SE.
-
-Yes. You don't really need to get the virtio device up on the virtio
-side; if recognizing the device correctly via senseID works and you
-maybe can do some NOP/TIC commands, you might have a very basic test
-without introducing a new device.
-
-Testing virtio-ccw via kvm-unit-tests is probably a good idea for the
-future.
-
-> To sum-up:
->=20
-> in kvm-unit-test: implement all I/O instructions and force instructions=
-=20
-> errors, like memory error, operand etc. and expect the right reaction of=
-=20
-> the system.
->=20
-> in QEMU, add the necessary infrastructure to test this.
-
-Sounds good to me.
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
