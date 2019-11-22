@@ -2,97 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50078106176
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 06:57:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3241D106619
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 07:29:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729344AbfKVF5C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 00:57:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35126 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729336AbfKVF5B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 00:57:01 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6CFE42072E;
-        Fri, 22 Nov 2019 05:57:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402221;
-        bh=Qfbrh3CAl/9De393ORqQNDprdkPEaFRcGApPRM3ToAc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B2iL5TCbIvczugImu03GnGBPlgTEtpIHPdTXXwa0wwG6m/p8xZircwsVFqlsoyeYU
-         BzfE9VgIGAbv2epzg3v6UQizY/hXWCiSTqRFTw9R/A6mMsnCqowIfFyj528oefOKlV
-         ldJuHP+Kqiq2UfXpkoenr+dK4iyJFuVLIyMg+HR4=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 068/127] vfio/spapr_tce: Get rid of possible infinite loop
-Date:   Fri, 22 Nov 2019 00:54:46 -0500
-Message-Id: <20191122055544.3299-67-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
-References: <20191122055544.3299-1-sashal@kernel.org>
+        id S1727742AbfKVG2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 01:28:41 -0500
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:47692 "EHLO
+        1.mo69.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727522AbfKVG2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 01:28:39 -0500
+X-Greylist: delayed 4200 seconds by postgrey-1.27 at vger.kernel.org; Fri, 22 Nov 2019 01:28:38 EST
+Received: from player159.ha.ovh.net (unknown [10.109.146.5])
+        by mo69.mail-out.ovh.net (Postfix) with ESMTP id 7462573352
+        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 06:13:12 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player159.ha.ovh.net (Postfix) with ESMTPSA id 24E06C4FF72D;
+        Fri, 22 Nov 2019 05:12:58 +0000 (UTC)
+Date:   Fri, 22 Nov 2019 06:12:57 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, clg@kaod.org,
+        philmd@redhat.com, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+        =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH 3/5] vfio/pci: Respond to KVM irqchip change notifier
+Message-ID: <20191122061257.7633bcdd@bahia.lan>
+In-Reply-To: <20191121005607.274347-4-david@gibson.dropbear.id.au>
+References: <20191121005607.274347-1-david@gibson.dropbear.id.au>
+        <20191121005607.274347-4-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7955608745321273830
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehfedgjeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrudehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+On Thu, 21 Nov 2019 11:56:05 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-[ Upstream commit 517ad4ae8aa93dccdb9a88c27257ecb421c9e848 ]
+> VFIO PCI devices already respond to the pci intx routing notifier, in order
+> to update kernel irqchip mappings when routing is updated.  However this
+> won't handle the case where the irqchip itself is replaced by a different
+> model while retaining the same routing.  This case can happen on
+> the pseries machine type due to PAPR feature negotiation.
+> 
+> To handle that case, add a handler for the irqchip change notifier, which
+> does much the same thing as the routing notifier, but is unconditional,
+> rather than being a no-op when the routing hasn't changed.
+> 
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/vfio/pci.c | 23 ++++++++++++++++++-----
+>  hw/vfio/pci.h |  1 +
+>  2 files changed, 19 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 521289aa7d..95478c2c55 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -256,6 +256,14 @@ static void vfio_intx_routing_notifier(PCIDevice *pdev)
+>      }
+>  }
+>  
+> +static void vfio_irqchip_change(Notifier *notify, void *data)
+> +{
+> +    VFIOPCIDevice *vdev = container_of(notify, VFIOPCIDevice,
+> +                                       irqchip_change_notifier);
+> +
+> +    vfio_intx_update(vdev, &vdev->intx.route);
+> +}
+> +
+>  static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>  {
+>      uint8_t pin = vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN, 1);
+> @@ -2973,16 +2981,18 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>                                                    vfio_intx_mmap_enable, vdev);
+>          pci_device_set_intx_routing_notifier(&vdev->pdev,
+>                                               vfio_intx_routing_notifier);
+> +        vdev->irqchip_change_notifier.notify = vfio_irqchip_change;
+> +        kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier);
+>          ret = vfio_intx_enable(vdev, errp);
+>          if (ret) {
+> -            goto out_teardown;
+> +            goto out_deregister;
+>          }
+>      }
+>  
+>      if (vdev->display != ON_OFF_AUTO_OFF) {
+>          ret = vfio_display_probe(vdev, errp);
+>          if (ret) {
+> -            goto out_teardown;
+> +            goto out_deregister;
+>          }
+>      }
+>      if (vdev->enable_ramfb && vdev->dpy == NULL) {
+> @@ -2992,11 +3002,11 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>      if (vdev->display_xres || vdev->display_yres) {
+>          if (vdev->dpy == NULL) {
+>              error_setg(errp, "xres and yres properties require display=on");
+> -            goto out_teardown;
+> +            goto out_deregister;
+>          }
+>          if (vdev->dpy->edid_regs == NULL) {
+>              error_setg(errp, "xres and yres properties need edid support");
+> -            goto out_teardown;
+> +            goto out_deregister;
+>          }
+>      }
+>  
 
-As a part of cleanup, the SPAPR TCE IOMMU subdriver releases preregistered
-memory. If there is a bug in memory release, the loop in
-tce_iommu_release() becomes infinite; this actually happened to me.
+After this change, we end up with:
 
-This makes the loop finite and prints a warning on every failure to make
-the code more bug prone.
+    if (vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN, 1)) {
+        vdev->intx.mmap_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+                                                  vfio_intx_mmap_enable, vdev);
+        pci_device_set_intx_routing_notifier(&vdev->pdev,
+                                             vfio_intx_routing_notifier);
+        vdev->irqchip_change_notifier.notify = vfio_irqchip_change;
+        kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier);
+        ret = vfio_intx_enable(vdev, errp);
+        if (ret) {
+            goto out_deregister;
+        }
+    }
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vfio/vfio_iommu_spapr_tce.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+    if (vdev->display != ON_OFF_AUTO_OFF) {
+        ret = vfio_display_probe(vdev, errp);
+        if (ret) {
+            goto out_deregister;
+        }
+    }
+    if (vdev->enable_ramfb && vdev->dpy == NULL) {
+        error_setg(errp, "ramfb=on requires display=on");
+        goto out_teardown;
+             ^^^^^^^^^^^^
 
-diff --git a/drivers/vfio/vfio_iommu_spapr_tce.c b/drivers/vfio/vfio_iommu_spapr_tce.c
-index b4c68f3b82be9..eba9aaf3cc17c 100644
---- a/drivers/vfio/vfio_iommu_spapr_tce.c
-+++ b/drivers/vfio/vfio_iommu_spapr_tce.c
-@@ -409,6 +409,7 @@ static void tce_iommu_release(void *iommu_data)
- {
- 	struct tce_container *container = iommu_data;
- 	struct tce_iommu_group *tcegrp;
-+	struct tce_iommu_prereg *tcemem, *tmtmp;
- 	long i;
- 
- 	while (tce_groups_attached(container)) {
-@@ -431,13 +432,8 @@ static void tce_iommu_release(void *iommu_data)
- 		tce_iommu_free_table(container, tbl);
- 	}
- 
--	while (!list_empty(&container->prereg_list)) {
--		struct tce_iommu_prereg *tcemem;
--
--		tcemem = list_first_entry(&container->prereg_list,
--				struct tce_iommu_prereg, next);
--		WARN_ON_ONCE(tce_iommu_prereg_free(container, tcemem));
--	}
-+	list_for_each_entry_safe(tcemem, tmtmp, &container->prereg_list, next)
-+		WARN_ON(tce_iommu_prereg_free(container, tcemem));
- 
- 	tce_iommu_disable(container);
- 	if (container->mm)
--- 
-2.20.1
+This should be out_deregister.
+
+The enable_ramfb property belongs to the nohotplug variant. It
+means QEMU is going to terminate and we probably don't really
+care to leak notifiers, but this still looks weird and fragile,
+if enable_ramfb ever becomes usable by hotpluggable devices
+one day.
+
+    }
+    if (vdev->display_xres || vdev->display_yres) {
+        if (vdev->dpy == NULL) {
+            error_setg(errp, "xres and yres properties require display=on");
+            goto out_deregister;
+        }
+        if (vdev->dpy->edid_regs == NULL) {
+            error_setg(errp, "xres and yres properties need edid support");
+            goto out_deregister;
+        }
+    }
+
+
+> @@ -3020,8 +3030,10 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>  
+>      return;
+>  
+> -out_teardown:
+> +out_deregister:
+>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+> +out_teardown:
+>      vfio_teardown_msi(vdev);
+>      vfio_bars_exit(vdev);
+>  error:
+> @@ -3064,6 +3076,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+>      vfio_unregister_req_notifier(vdev);
+>      vfio_unregister_err_notifier(vdev);
+>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+>      vfio_disable_interrupts(vdev);
+>      if (vdev->intx.mmap_timer) {
+>          timer_free(vdev->intx.mmap_timer);
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index b329d50338..35626cd63e 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -169,6 +169,7 @@ typedef struct VFIOPCIDevice {
+>      bool enable_ramfb;
+>      VFIODisplay *dpy;
+>      Error *migration_blocker;
+> +    Notifier irqchip_change_notifier;
+>  } VFIOPCIDevice;
+>  
+>  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
 
