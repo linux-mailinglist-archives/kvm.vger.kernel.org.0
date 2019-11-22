@@ -2,83 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33AD8107559
-	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 17:02:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B236110758E
+	for <lists+kvm@lfdr.de>; Fri, 22 Nov 2019 17:15:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727217AbfKVQCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 11:02:39 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:48650 "EHLO mail.skyhub.de"
+        id S1727379AbfKVQPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 11:15:30 -0500
+Received: from mga05.intel.com ([192.55.52.43]:24195 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726633AbfKVQCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 11:02:38 -0500
-Received: from zn.tnic (p200300EC2F0E9700617A286416B6740E.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:9700:617a:2864:16b6:740e])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4B35C1EC0D02;
-        Fri, 22 Nov 2019 17:02:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1574438557;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=h4hPZVDGhlJ/nVahWCNAYi0rixY8BxMyl5rH5OiLiT8=;
-        b=klUjxbevxiSgkfiTyTD/bZ/K+Cywo2jaMwkNJWrueBGvXxKeqgxub19AJk5N/Ihhiw0Ooi
-        hqGIquKBvf7lD2VmnVaMjbQ5HZc9itIwfYBeiHxEdNdXIX1sH9CtPA6GfNP0Rt2EF81P7w
-        X6BxRgSCuiHiOIuL63ufRfGaMzgzlxU=
-Date:   Fri, 22 Nov 2019 17:02:30 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-edac@vger.kernel.org,
-        "linux-kselftest@vger.kernel.org, Jarkko Sakkinen" 
-        <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v3 09/19] x86/cpu: Clear VMX feature flag if VMX is not
- fully enabled
-Message-ID: <20191122160229.GI6289@zn.tnic>
-References: <20191119031240.7779-1-sean.j.christopherson@intel.com>
- <20191119031240.7779-10-sean.j.christopherson@intel.com>
- <20191121162452.GJ6540@zn.tnic>
- <20191121210714.GB16617@linux.intel.com>
+        id S1726546AbfKVQPa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 11:15:30 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Nov 2019 08:15:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,230,1571727600"; 
+   d="scan'208";a="232706418"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga004.fm.intel.com with ESMTP; 22 Nov 2019 08:15:28 -0800
+Date:   Sat, 23 Nov 2019 00:17:23 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jmattson@google.com,
+        sean.j.christopherson@intel.com, yu.c.zhang@linux.intel.com,
+        alazar@bitdefender.com, edwin.zhai@intel.com
+Subject: Re: [PATCH v7 1/9] Documentation: Introduce EPT based Subpage
+ Protection and related ioctls
+Message-ID: <20191122161723.GA10458@local-michael-cet-test>
+References: <20191119084949.15471-1-weijiang.yang@intel.com>
+ <20191119084949.15471-2-weijiang.yang@intel.com>
+ <dbf1f124-7864-b1e8-fae3-49448372d502@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191121210714.GB16617@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <dbf1f124-7864-b1e8-fae3-49448372d502@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 01:07:14PM -0800, Sean Christopherson wrote:
-> I'm also ok dropping it altogether, though from a KVM developer
-> perspective I wouldn't mind the extra sanity check :-)
+On Thu, Nov 21, 2019 at 11:02:56AM +0100, Paolo Bonzini wrote:
+> On 19/11/19 09:49, Yang Weijiang wrote:
+> > +
+> > +#define SUBPAGE_MAX_BITMAP   64
+> 
+> Please rename this to KVM_SUBPAGE_MAX_PAGES
+>
+OK.
+> > +struct kvm_subpage_info {
+> > +	__u64 gfn;    /* the first page gfn of the contiguous pages */
+> > +	__u64 npages; /* number of 4K pages */
+> 
+> This can be
+> 
+> 	u32 npages;
+> 	u32 flags;
+> 
+> Check that the flags are 0, and fail the ioctl if they aren't.  This
+> will make it easy to extend the API in the future.
+> 
+Cool, thanks for the suggestion!
 
-Right, I think we should keep it in the bag and only take it out when it
-really happens. Because if we really wanna be overly cautious in every
-possible case where stuff may fail, we won't see the actual code from
-all the error handling. :-)
+> > +	__u32 access_map[SUBPAGE_MAX_BITMAP]; /* sub-page write-access bitmap array */
+> > +};
+> 
+> Please make this access_map[0], since the number of entries actually
+> depends on npages.
+> 
+> Likewise, kvm_arch_vm_ioctl should read the header first, then allocate
+> memory for the access_map and read into it.  It's probably simpler if
+> you make kvm_vm_ioctl_get_subpages/kvm_vm_ioctl_set_subpages take
+> parameters like
+> 
+> int kvm_vm_ioctl_get_subpages(struct kvm *kvm, u64 gfn, u32 npages,
+> 			      u32 *access_map);
+> int kvm_vm_ioctl_set_subpages(struct kvm *kvm, u64 gfn, u32 npages,
+> 			      u32 *access_map);
+>
+Sure, will make the change. thank you!
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> Thanks,
+> 
+> Paolo
