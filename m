@@ -2,127 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2F2107BF9
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 01:22:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBD11107BFF
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 01:24:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbfKWAW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Nov 2019 19:22:28 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:40213 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbfKWAW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Nov 2019 19:22:28 -0500
-Received: by mail-io1-f66.google.com with SMTP id b26so8259951ion.7
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 16:22:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=OJiKa/nOf3Di2MymEJ8+BVE7LhjX9sa8ESWUBAYCXdw=;
-        b=sqhCatqtmrAcqG5zu401qANQp9xOLzsqa2+vPRmTCE1uuCtLXysZNtrho9Udoep9OH
-         j8+U62DvmgRDpKGBz923+BkZm+5binXPPiNzZ3m98+T9CfRURUDa60429URRUCvOygW+
-         L6Naw5AiIsZl0DFPIE3Dp2o8zEj007Zko+YL8uVBCuQ6FglQGbAYJ/iaLY+oFsABjvjr
-         VK4XlHDIyEfj4EiGXdVd0rGkdalgUfvXaDYAKmkFeBWHET5GJttwoPOTuLxCEVkkd0Dp
-         VVSZcwmr0UdQzbKRhPLZRvmugpcJ8MTSWyUWPhImiUU7OaOdMgZS2XKrcro5JKnU92eb
-         JOXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=OJiKa/nOf3Di2MymEJ8+BVE7LhjX9sa8ESWUBAYCXdw=;
-        b=Y8YbWF9H1CTLD8pkZzSCc1Tr5myx0rLeHD7r86ioErxhLMDqN3Bg1uKm2KzT/8tgq0
-         GBrWaHMY82BrHLrZLyvGZkNIGSe97DkewIiAUsLeHuy98xMqbs0mk6bix2MHSSM5m7t/
-         rK580NIIaNm+KR7wELv0zdHtHd9K0svesuCXjhd6Co8jPzW0sgSln+eHTTKxZm5tnoTj
-         RrQ9bm1dBhBREA1gypYMLRE0XJJ1ZebJ6g/OyYg4roZnFpagABWg7OSdKV7hh3izvTzS
-         IYCZGN0SV7qZgywYUdRJKYUKKvHA26gNlgF435FK6nVHuEVsQhYb/o8yicON30BWUHaa
-         +B7g==
-X-Gm-Message-State: APjAAAUAb7ViNFqDCHuIp4Osl0IgLLCZKy6XYb1CI0Nn7V7fSqKEQXze
-        S9WwM8+HPpddnkUedeZfxdOaci7GlcMsiKChyhmtlg==
-X-Google-Smtp-Source: APXvYqyHaOzZf9M7XbPodEzuxV2qHiEBNNs+OtpFiDDL9m84rfOiqTyhjorw3tub77L1TKTHQ3RvuCl+d/GUxXW8Gm4=
-X-Received: by 2002:a5d:9153:: with SMTP id y19mr15825520ioq.26.1574468547017;
- Fri, 22 Nov 2019 16:22:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20191122234355.174998-1-jmattson@google.com> <97EE5F0F-3047-46BC-B569-D407B5800499@oracle.com>
-In-Reply-To: <97EE5F0F-3047-46BC-B569-D407B5800499@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 22 Nov 2019 16:22:15 -0800
-Message-ID: <CALMp9eTLQrFprNoYtXa2MCiAGnHuf4Rqxxh33cXD936boxMEwg@mail.gmail.com>
-Subject: Re: [PATCH] kvm: nVMX: Relax guest IA32_FEATURE_CONTROL constraints
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Haozhong Zhang <haozhong.zhang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726686AbfKWAYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Nov 2019 19:24:42 -0500
+Received: from mail-dm6nam10on2076.outbound.protection.outlook.com ([40.107.93.76]:61216
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726089AbfKWAYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Nov 2019 19:24:42 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m+D3uto2+WXc58bNmJlv9du4/fpyHjFrn25BqAB1QTJ3K54+JTsG1Mg3DQbHIIvhzhaGeZMA1xn0ByFgM5+leAG29FzOV0SLhIovGulwwLCkVULclJFMG1jK4K5up0Ojo5o8qr8aVPA3YL4Qb/1+z28xDddvH0TSWdw4qxFWRsbQpSNJ6UTZXDUqUbSbZJ30Dx3o5fE2X0NpUNslyHo/nMFO002qGH85fmou00ocdGKJJgLthBRDxf6D4Ln/oPAbT8Ox4tEf8NIeS37GGiDmJZ3KBssIKAjBp+A3fC/kWUdT7Iw/450R4uPfjgHiEdLx3HHKNLIcE26zNxkRGiC8eA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=35s7wuwgyAl55iv3xnoCAasQoYL0Dkt19gEQU1k6rOU=;
+ b=WefnkR2C4i1xfYLKxPxRicAh5G5L5upRcTegeldfPwvbT1gl/3qaTFl6ILyMrs8DF323rEB4B+KjjMRmcKjrWBWae31HoY8TVfN1O+/Ygjh/Zb20L74bSyv1NMaaIstNa6SazkWYRsGM3/hgOg3MCAGZWkg6fEo4B8m8yY59Gdi/ufATwexvrClbEbKXvdb/HelFnHVVohcVi06nqnNOD8nerIq1uk3ODwmR6qlt91rQYI7OpiK+jUdvvO1cV5XitQ3bq1NWFBYDWgP2rt6M5kRcZ0hl1flpnAtY3Etoy5xYBMMc6wyLgK+KIsclnmdEEaBpysklX64DFgj948v8gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=35s7wuwgyAl55iv3xnoCAasQoYL0Dkt19gEQU1k6rOU=;
+ b=pPmBBtif5EPVXKimBHldsfO8kWbj2Rpnk44RJ3jYPqhZilOipFWtEUNMAgy1KduZ+pnbSbFIulynNei48B6m9Ch8XjR+eSuJnxYbIcooqppwzp1eoRxdWe9lQN9IPkYnxo1zxvd0xajOelZsPcx1uVsiTik7Qt3janT+LxZv6O8=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
+ BYAPR05MB6150.namprd05.prod.outlook.com (20.178.55.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.10; Sat, 23 Nov 2019 00:24:39 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::c078:b785:f79d:482e]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::c078:b785:f79d:482e%5]) with mapi id 15.20.2474.018; Sat, 23 Nov 2019
+ 00:24:39 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+CC:     kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: Fix the check whether CMCI is
+ supported
+Thread-Topic: [kvm-unit-tests PATCH] x86: vmx: Fix the check whether CMCI is
+ supported
+Thread-Index: AQHVftJDRH9WeMDLQEaQujdh1XzILaeYKyMA
+Date:   Sat, 23 Nov 2019 00:24:39 +0000
+Message-ID: <766B4333-44BF-41B0-B3B5-5C2F7190B7EF@vmware.com>
+References: <20191009112754.36805-1-namit@vmware.com>
+In-Reply-To: <20191009112754.36805-1-namit@vmware.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=namit@vmware.com; 
+x-originating-ip: [66.170.99.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 498c9650-5b56-42ab-bb75-08d76fab8730
+x-ms-traffictypediagnostic: BYAPR05MB6150:
+x-microsoft-antispam-prvs: <BYAPR05MB61504F4F02A64694BA5A2484D0480@BYAPR05MB6150.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-forefront-prvs: 0230B09AC4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(39860400002)(396003)(346002)(136003)(376002)(189003)(199004)(6916009)(14454004)(66476007)(7736002)(8936002)(446003)(11346002)(2616005)(71200400001)(71190400001)(25786009)(478600001)(102836004)(6506007)(26005)(76176011)(81166006)(81156014)(186003)(8676002)(6512007)(256004)(229853002)(5660300002)(86362001)(6436002)(4326008)(6246003)(316002)(66066001)(6486002)(54906003)(53546011)(6116002)(99286004)(2906002)(3846002)(36756003)(33656002)(66946007)(66446008)(305945005)(76116006)(66556008)(64756008)(4744005);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB6150;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: URmg9/rMLOaxXmOt+vP3UINWPlAVXm5x/JFjyWdXz2IP2CHbINiP/Q9EcxPAYLWDkvIsJOCxr8zsOxpegAaznbVUausLhSyC21NHUuF8N19V0tasr+ounsGg3asSULqTXGogd/2P5GIm0hdKLC726bEs3oLniSMmDQt2rMdnP0KoD2dIiSehy6wAxi4lvV9yqWkWL3X0dtFU+ioPB53dlxqcT6FL4cV5sZOeEcJNDRBHwiYQWWfDIWMwKrz/q4SYvQc5ePCR8Gva11aJtSkfl+6IjE2d5dh1BbNbS1rJU8LiuQoO9hZIQJwY+unHqWGSJQ3LokdC0V7I1jYugvy1AqKc3XklJ5EzLzZLQ5BvPhUT+gW8Hlx/nItpGC/+IwS24pPuA+Z4GAtJikICcZaT7wryMnltr5mi71quOJvUx9yFQXmET913r4P2pHazb0ON
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <028850A512014A4484251E9DA567C164@namprd05.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 498c9650-5b56-42ab-bb75-08d76fab8730
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2019 00:24:39.3423
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pzdDjmbVOKSII4I+dsSC1hKRol6NKacmalIxQbKSlH2akKEweKk+Bx2H18q9DB/YOCqOIhWi/BWjyc6LAKJ7Ig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB6150
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 22, 2019 at 3:57 PM Liran Alon <liran.alon@oracle.com> wrote:
->
->
->
-> > On 23 Nov 2019, at 1:43, Jim Mattson <jmattson@google.com> wrote:
-> >
-> > Commit 37e4c997dadf ("KVM: VMX: validate individual bits of guest
-> > MSR_IA32_FEATURE_CONTROL") broke the KVM_SET_MSRS ABI by instituting
-> > new constraints on the data values that kvm would accept for the guest
-> > MSR, IA32_FEATURE_CONTROL. Perhaps these constraints should have been
-> > opt-in via a new KVM capability, but they were applied
-> > indiscriminately, breaking at least one existing hypervisor.
-> >
-> > Relax the constraints to allow either or both of
-> > FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX and
-> > FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX to be set when nVMX is
-> > enabled. This change is sufficient to fix the aforementioned breakage.
-> >
-> > Fixes: 37e4c997dadf ("KVM: VMX: validate individual bits of guest MSR_I=
-A32_FEATURE_CONTROL")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
->
-> I suggest to also add a comment in code to clarify why we allow setting
-> FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX even though we expose a vCPU tha=
-t doesn=E2=80=99t support Intel TXT.
-> (I think the compatibility to existing workloads that sets this blindly o=
-n boot is a legit reason. Just recommend documenting it.)
->
-> In addition, if the nested hypervisor which relies on this is public, ple=
-ase also mention it in commit message for reference.
 
-It's not an L1 hypervisor that's the problem. It's Google's L0
-hypervisor. We've been incorrectly reporting IA32_FEATURE_CONTROL as 7
-to nested guests for years, and now we have thousands of running VMs
-with the bogus value. I've thought about just changing it to 5 on the
-fly (on real hardware, one could almost blame it on SMM, but the MSR
-is *locked*, after all).
+> On Oct 9, 2019, at 4:27 AM, Nadav Amit <namit@vmware.com> wrote:
+>=20
+> The logic of figuring out whether CMCI is supported is broken, causing
+> the CMCI accessing tests to fail on Skylake bare-metal.
+>=20
+> Determine whether CMCI is supported according to the maximum entries in
+> the LVT as encoded in the APIC version register.
+>=20
+> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Nadav Amit <namit@vmware.com>
 
-> Reviewed-by: Liran Alon <liran.alon@oracle.com>
->
-> > ---
-> > arch/x86/kvm/vmx/vmx.c | 4 +++-
-> > 1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 04a8212704c17..9f46023451810 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7097,10 +7097,12 @@ static void vmx_cpuid_update(struct kvm_vcpu *v=
-cpu)
-> >
-> >       if (nested_vmx_allowed(vcpu))
-> >               to_vmx(vcpu)->msr_ia32_feature_control_valid_bits |=3D
-> > +                     FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX |
-> >                       FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
-> >       else
-> >               to_vmx(vcpu)->msr_ia32_feature_control_valid_bits &=3D
-> > -                     ~FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
-> > +                     ~(FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX |
-> > +                       FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX);
-> >
-> >       if (nested_vmx_allowed(vcpu)) {
-> >               nested_vmx_cr_fixed1_bits_update(vcpu);
-> > --
-> > 2.24.0.432.g9d3f5f5b63-goog
-> >
->
+Ping?
+
