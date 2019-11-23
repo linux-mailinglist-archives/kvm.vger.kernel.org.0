@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 769BA107E0C
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 11:29:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61137107E0F
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 11:30:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726855AbfKWK34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Nov 2019 05:29:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35293 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726368AbfKWK34 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 23 Nov 2019 05:29:56 -0500
+        id S1726861AbfKWKac (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Nov 2019 05:30:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31107 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726751AbfKWKab (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 23 Nov 2019 05:30:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574504994;
+        s=mimecast20190719; t=1574505030;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=b0nGYW2Evu1Vo0GnMnluFE/WqpJeDuxhq9+fUV8fdR0=;
-        b=htTa4oh8axnOkHyttxspYC7QfJA2SVFTlhmiVjII9/S24pDfaLoW4ap9PiHaDXTr0K7Bes
-        iPbX/4vcRQkla1wBJJNY+idq5bD1d6p0+YDqk8TVrxx0AlCmQllpNDBxGL+WFDWnM3Euyj
-        phbeVtFhixJbaCbV6dRzCV9ONG1ba9I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-g_2lP2DFPC62l85ZrOFxSg-1; Sat, 23 Nov 2019 05:29:53 -0500
-Received: by mail-wr1-f70.google.com with SMTP id j12so5265197wrw.15
-        for <kvm@vger.kernel.org>; Sat, 23 Nov 2019 02:29:53 -0800 (PST)
+        bh=tHyeSpJ7sLWR615t3plMuZ1Vpdg4QSPNuIYfcXROw50=;
+        b=Sd1Q4x5s6ciudludsjDCAyOyLq2I1s8r1hNe7oFnt5GYU5sCwze9D6mTb7D+JGw/sSiOn6
+        DdugcRlBtvWWCHTsYKQPVXsBSXREWsi5B5NFgxw5YOdaRC8yYSpYKVf9w8QgJRJ/vBLI68
+        C7cTWxaxmkd/KZa/lSQucTZcnwgn308=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-hDYAf3jNNzWAY5B4037gzA-1; Sat, 23 Nov 2019 05:30:29 -0500
+Received: by mail-wm1-f69.google.com with SMTP id 2so4617110wmd.3
+        for <kvm@vger.kernel.org>; Sat, 23 Nov 2019 02:30:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=uatzGgKPx8lrJYeybqBiyYHtN3+XnYuv6IHQKW9rOoU=;
-        b=bBEACPwtImDRKb5uoGxtVzzYbnJZt4aUjqjh7qtH7x6qGWz2C96nfPDH21AY2dF/Jd
-         ajN/cvH94UX4ai61JK+Pn53JDD9kNFnP+2zZDES0TCl05WxaKFDWgO7Z8+798tC6x9hl
-         KPWGw+4c6iY09PduETuQQGPBWQCnmCvs8Nd1s/5T/arJqgXvGqw2100NG8yw3saC96Zt
-         OwRp2CuOylX2ZUrwm0RDDNy8yE3CS+A8oFJPNI96C5P0J6F743Y+nF6XRWf6m0JBTg7Z
-         Zsun1ii6d49CP9wzGmBKIlvDBOCPBAhjuVu7rnK4z6bYYHoBWOOzImUHzywigW97I/wp
-         wtjA==
-X-Gm-Message-State: APjAAAV1/NRxyNfmwOc3WwfaQl9bGkEO+lGT/zS1mk5nw/gypZmD9aOW
-        smgj2eWY5VYMuy557PzfP4UaBnnsn5LGtvIMZ9hOgvy4K4dS0TbqYnHL4+dCRRb5h3fyejWq6ji
-        IsGMMKR8U1XJz
-X-Received: by 2002:adf:9e92:: with SMTP id a18mr21907548wrf.34.1574504992002;
-        Sat, 23 Nov 2019 02:29:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx+4o6q2BbPnhDhJn1tGwzLvr3ecTKLY+jm2sk7KVnT27GBJ6mTTIvSgxETvX2M0dih9qBbcg==
-X-Received: by 2002:adf:9e92:: with SMTP id a18mr21907527wrf.34.1574504991741;
-        Sat, 23 Nov 2019 02:29:51 -0800 (PST)
+        bh=BRL5/jsrsyTQSajOcuwfnNoj7FhSqXMj7k6xT9W7NjM=;
+        b=dNH3avZ0ghw1/IrBu29nk3JOCKj4ZlWz8aZlEK39f2wJpZDC3aX5WUr2tF3o7c3DRr
+         EpxkK5CgVeUuwKWbV4Zcs7K+bcDuknf5/fuxGHltBmSrG6/MOJFq13iNyNVVG6npNgE3
+         ZhkuepwA5Xa+wGyd0oCi29QxLutLIA1WDd8IoJVx282ntzuOYo/UhKRgjJYGJIRfzmrw
+         gdSSsU0yViWGHPB+SBNRb9R/4821en6Ei5UpCuZk8D3aVhu2Kw6hs1Mi2augDBuq7RXI
+         FN4AfwrRKgqbsScW6iJRhePT7G/60/KR2kNRLK9XcDW0Pf4laMeQMrM+q+2hQa1kO8/T
+         /H8w==
+X-Gm-Message-State: APjAAAXrzssMy2p2pcd7cpJtxE24fKcildW6tR/i9Hv/Z4pBVZqiVy8T
+        YoMTJ2RNvbolA8yhTW+lATStzpxW3YBC2KJvnezWO6pj/fZ5HZ8EW4rHybzbZiJkcVa/qTjjjn8
+        qsGBlvGI7c7+p
+X-Received: by 2002:adf:e70d:: with SMTP id c13mr22019393wrm.248.1574505027789;
+        Sat, 23 Nov 2019 02:30:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyX7pfwLVRrAs6l9HErfSL8jhQ+C723kbyi9INcb8d3bySq/LiKuZ3Ia7YM04sulC0Eoma4Zg==
+X-Received: by 2002:adf:e70d:: with SMTP id c13mr22019367wrm.248.1574505027378;
+        Sat, 23 Nov 2019 02:30:27 -0800 (PST)
 Received: from [192.168.42.104] (mob-109-112-4-118.net.vodafone.it. [109.112.4.118])
-        by smtp.gmail.com with ESMTPSA id f140sm1460892wme.21.2019.11.23.02.29.50
+        by smtp.gmail.com with ESMTPSA id w4sm1433126wmk.29.2019.11.23.02.30.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 23 Nov 2019 02:29:51 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Open code shared_msr_update() in its only
- caller
+        Sat, 23 Nov 2019 02:30:26 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: Grab KVM's srcu lock when setting nested state
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -59,17 +58,17 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20191122200450.26239-1-sean.j.christopherson@intel.com>
+References: <20191122165818.32558-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <9e0038a3-dd57-353f-f176-edea48491174@redhat.com>
-Date:   Sat, 23 Nov 2019 11:29:49 +0100
+Message-ID: <6b07bcb9-a640-7ffe-36cf-370702f20d4b@redhat.com>
+Date:   Sat, 23 Nov 2019 11:30:25 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191122200450.26239-1-sean.j.christopherson@intel.com>
+In-Reply-To: <20191122165818.32558-1-sean.j.christopherson@intel.com>
 Content-Language: en-US
-X-MC-Unique: g_2lP2DFPC62l85ZrOFxSg-1
+X-MC-Unique: hDYAf3jNNzWAY5B4037gzA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -78,65 +77,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/11/19 21:04, Sean Christopherson wrote:
-> Fold shared_msr_update() into its sole user to eliminate its pointless
-> bounds check, its godawful printk, its misleading comment (it's called
-> under a global lock), and its woefully inaccurate name.
+On 22/11/19 17:58, Sean Christopherson wrote:
+> Acquire kvm->srcu for the duration of ->set_nested_state() to fix a bug
+> where nVMX derefences ->memslots without holding ->srcu or ->slots_lock.
 >=20
+> The other half of nested migration, ->get_nested_state(), does not need
+> to acquire ->srcu as it is a purely a dump of internal KVM (and CPU)
+> state to userspace.
+>=20
+> Detected as an RCU lockdep splat that is 100% reproducible by running
+> KVM's state_test selftest with CONFIG_PROVE_LOCKING=3Dy.  Note that the
+> failing function, kvm_is_visible_gfn(), is only checking the validity of
+> a gfn, it's not actually accessing guest memory (which is more or less
+> unsupported during vmx_set_nested_state() due to incorrect MMU state),
+> i.e. vmx_set_nested_state() itself isn't fundamentally broken.  In any
+> case, setting nested state isn't a fast path so there's no reason to go
+> out of our way to avoid taking ->srcu.
+>=20
+>   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+>   WARNING: suspicious RCU usage
+>   5.4.0-rc7+ #94 Not tainted
+>   -----------------------------
+>   include/linux/kvm_host.h:626 suspicious rcu_dereference_check() usage!
+>=20
+>                other info that might help us debug this:
+>=20
+>   rcu_scheduler_active =3D 2, debug_locks =3D 1
+>   1 lock held by evmcs_test/10939:
+>    #0: ffff88826ffcb800 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x85/0x6=
+30 [kvm]
+>=20
+>   stack backtrace:
+>   CPU: 1 PID: 10939 Comm: evmcs_test Not tainted 5.4.0-rc7+ #94
+>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/20=
+15
+>   Call Trace:
+>    dump_stack+0x68/0x9b
+>    kvm_is_visible_gfn+0x179/0x180 [kvm]
+>    mmu_check_root+0x11/0x30 [kvm]
+>    fast_cr3_switch+0x40/0x120 [kvm]
+>    kvm_mmu_new_cr3+0x34/0x60 [kvm]
+>    nested_vmx_load_cr3+0xbd/0x1f0 [kvm_intel]
+>    nested_vmx_enter_non_root_mode+0xab8/0x1d60 [kvm_intel]
+>    vmx_set_nested_state+0x256/0x340 [kvm_intel]
+>    kvm_arch_vcpu_ioctl+0x491/0x11a0 [kvm]
+>    kvm_vcpu_ioctl+0xde/0x630 [kvm]
+>    do_vfs_ioctl+0xa2/0x6c0
+>    ksys_ioctl+0x66/0x70
+>    __x64_sys_ioctl+0x16/0x20
+>    do_syscall_64+0x54/0x200
+>    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>   RIP: 0033:0x7f59a2b95f47
+>=20
+> Fixes: 8fcc4b5923af5 ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  arch/x86/kvm/x86.c | 29 +++++++++--------------------
->  1 file changed, 9 insertions(+), 20 deletions(-)
+>  arch/x86/kvm/x86.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >=20
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a256e09f321a..35b571c769bd 100644
+> index 5d530521f11d..656878a9802e 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -262,23 +262,6 @@ static void kvm_on_user_return(struct user_return_no=
-tifier *urn)
+> @@ -4421,6 +4421,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  =09case KVM_SET_NESTED_STATE: {
+>  =09=09struct kvm_nested_state __user *user_kvm_nested_state =3D argp;
+>  =09=09struct kvm_nested_state kvm_state;
+> +=09=09int idx;
+> =20
+>  =09=09r =3D -EINVAL;
+>  =09=09if (!kvm_x86_ops->set_nested_state)
+> @@ -4444,7 +4445,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  =09=09    && !(kvm_state.flags & KVM_STATE_NESTED_GUEST_MODE))
+>  =09=09=09break;
+> =20
+> +=09=09idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+>  =09=09r =3D kvm_x86_ops->set_nested_state(vcpu, user_kvm_nested_state, &=
+kvm_state);
+> +=09=09srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  =09=09break;
 >  =09}
->  }
-> =20
-> -static void shared_msr_update(unsigned slot, u32 msr)
-> -{
-> -=09u64 value;
-> -=09unsigned int cpu =3D smp_processor_id();
-> -=09struct kvm_shared_msrs *smsr =3D per_cpu_ptr(shared_msrs, cpu);
-> -
-> -=09/* only read, and nobody should modify it at this time,
-> -=09 * so don't need lock */
-> -=09if (slot >=3D shared_msrs_global.nr) {
-> -=09=09printk(KERN_ERR "kvm: invalid MSR slot!");
-> -=09=09return;
-> -=09}
-> -=09rdmsrl_safe(msr, &value);
-> -=09smsr->values[slot].host =3D value;
-> -=09smsr->values[slot].curr =3D value;
-> -}
-> -
->  void kvm_define_shared_msr(unsigned slot, u32 msr)
->  {
->  =09BUG_ON(slot >=3D KVM_NR_SHARED_MSRS);
-> @@ -290,10 +273,16 @@ EXPORT_SYMBOL_GPL(kvm_define_shared_msr);
-> =20
->  static void kvm_shared_msr_cpu_online(void)
->  {
-> -=09unsigned i;
-> +=09unsigned int cpu =3D smp_processor_id();
-> +=09struct kvm_shared_msrs *smsr =3D per_cpu_ptr(shared_msrs, cpu);
-> +=09u64 value;
-> +=09int i;
-> =20
-> -=09for (i =3D 0; i < shared_msrs_global.nr; ++i)
-> -=09=09shared_msr_update(i, shared_msrs_global.msrs[i]);
-> +=09for (i =3D 0; i < shared_msrs_global.nr; ++i) {
-> +=09=09rdmsrl_safe(shared_msrs_global.msrs[i], &value);
-> +=09=09smsr->values[i].host =3D value;
-> +=09=09smsr->values[i].curr =3D value;
-> +=09}
->  }
-> =20
->  int kvm_set_shared_msr(unsigned slot, u64 value, u64 mask)
+>  =09case KVM_GET_SUPPORTED_HV_CPUID: {
 >=20
 
 Queued, thanks.
