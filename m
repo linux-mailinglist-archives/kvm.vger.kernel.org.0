@@ -2,144 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74FC1107CE9
-	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 06:15:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1302107E02
+	for <lists+kvm@lfdr.de>; Sat, 23 Nov 2019 11:24:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725800AbfKWFP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 23 Nov 2019 00:15:29 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:41198 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725768AbfKWFP2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 23 Nov 2019 00:15:28 -0500
-Received: by mail-qk1-f195.google.com with SMTP id m125so8214419qkd.8
-        for <kvm@vger.kernel.org>; Fri, 22 Nov 2019 21:15:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=td3lSd+1Hj7wjzQBUneLylwj0bvqJWNQn19AnBKU34U=;
-        b=DEkirAPa3hKaEvR/UKdspuRqYFHBT1jF37FtLNsKCmchp7VypiLHeHqDW+5adpCK/V
-         RNoZfLT1IXHjkVfFVLyEyDXDnrPGtZCoillGOZMwsRgwpw31hEJH3J9ZDMzzdWwKdg8d
-         QQBWlVz9Y4uxwPXw6bsyDA44CEeDDpdPO8+XemZLhlaWEJZmTVZ4rm1UqxwNP6wTL8wg
-         pmQhemgcuxd2P5NxDzsvWZvHPFnrLPT6LLmPw6jsUo2XscunaJCWKrmsBdrBt9BlXaRK
-         9+6k7cwBq/8vblXnw3rPNMh2oVnLBh7hdKqv36Cw/LSRhX2CM9CrBXPXCxjz38IVWEjj
-         h/tA==
+        id S1726463AbfKWKWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 23 Nov 2019 05:22:21 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53208 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726141AbfKWKWU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 23 Nov 2019 05:22:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574504538;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=TtLTEtBWf4y9L2z3NCrE6T7Sn8p33MruSXRSTugIgt8=;
+        b=ihOEIAqalepbEMoVZB1uOg4gyKrBAJUyQQS9yZOI7jH4PTz5OtmdQehqv5eEvPDWcoj9vQ
+        RIyaYDyX2BT1FiZ3UVQoS8U5nmPt5C5y4UVoV69YqfUB1c9fMeOYWJW/mdqO7T+kdnzjIh
+        w7ntj//fn1Iz7en94RDcivyIVKZX5t0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-fe5huQzDOaWmvLgWCZ13AA-1; Sat, 23 Nov 2019 05:22:17 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c6so5232529wrm.18
+        for <kvm@vger.kernel.org>; Sat, 23 Nov 2019 02:22:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=td3lSd+1Hj7wjzQBUneLylwj0bvqJWNQn19AnBKU34U=;
-        b=J4mcznkjrq5cdCOgM72UY4iOzWzmUFo9xPAApWypizi0j+JAFOSgC4atQAJbWRRLIf
-         /Sn7pmt+b1KfkXx/VD3gxH/fkagnNjeiSchX6dzzUVBywjkkTk8T6A/9Mqca48tvDp0n
-         Fx8NS3bYC/Z83lzYG8Oxc6PiNNLJOzo3SSK8PWK7ORdXaNo0TeSMvM2e27ucUsoIgRlc
-         qilSmZ4EpZ8fjPby0HmmCDvVFnVEgHMnx7UNKkMR8iLgtaJXZQqvQ5Bb17J8Z4iV0RLk
-         Ml7zFCjDqbhwidjqRN8/SM0HI6MpsvUrYhPvXohO/PsSkxo4FQ/Ht9Q4t/3A/mwZbkWn
-         ZpiA==
-X-Gm-Message-State: APjAAAWSRolEmVjEbciY4daXUZxTDWF/a5xUqG6E7GkFdkowf8g5GL6F
-        siWVe5Z9VRE/X1nqMsJtqudSSvwWzERmhUbV0syBJg==
-X-Google-Smtp-Source: APXvYqyHJN3R+Gedk5zmMZL4Ag9vnAn1KF1/f1a5+Ok3FkQLi1DBlZ5Ga+QgOWLFLf9l9N5He2B15Hoqj/eF4OH73jg=
-X-Received: by 2002:a37:de12:: with SMTP id h18mr1108022qkj.256.1574486127183;
- Fri, 22 Nov 2019 21:15:27 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9bDBmXdZA69WLyzAiMBLBK7Z2+jpZZgwiaZErKcUFII=;
+        b=j3Lq62nRKgnFZmk1LOHzmjRgN1qV/bYaxJ3DEmkhjHPaHP5Z5GTg28eck2FrQ/vFpa
+         yXdBZMFqkON91VNEZp9b7XkiOjRbScOLCQ9IMxNq92UZw4MJH4ko0xwLSQR58oY83bIV
+         09f6DvCDReaNv5n+WYxDVJ0GtY3BRuVLMPjiTe+u1u0RVKx+he+qBWJRDhcjgPBig9hr
+         RA56fig8G3zTAqPwGz1QR9tF7DOF70owW3wF0PFTLd3qUL7JTHMDjMtUcLFHBct7Mebw
+         BOoBAuSAbBm3Qk5IU05osgFnx6EKNWe/I9IiPR5rP2IMY+Y0KJi2gSUN2jbJgVj598Wd
+         AKpQ==
+X-Gm-Message-State: APjAAAVh7x1UUWcDMWj0HSKUT0T24AjMNr7QYzVGFY08fHJAqu8cbEUt
+        aaDmMe7SxdGmuWL6G+rAv/97bV7X1Boui5NFEICtRsYHEdq0VDKalmOhZk+9mBql84RfDfSTtJH
+        /4zn6Qzp3XZnM
+X-Received: by 2002:a7b:cd86:: with SMTP id y6mr20232536wmj.163.1574504535925;
+        Sat, 23 Nov 2019 02:22:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzd/+DDyjpLmCGeMts5WYWRDcxayFxn/ldBPMt2CdqZtkrDZqA4SYqLQxpXy5TdvofK8VcFqQ==
+X-Received: by 2002:a7b:cd86:: with SMTP id y6mr20232512wmj.163.1574504535630;
+        Sat, 23 Nov 2019 02:22:15 -0800 (PST)
+Received: from [192.168.42.104] (mob-109-112-4-118.net.vodafone.it. [109.112.4.118])
+        by smtp.gmail.com with ESMTPSA id v14sm1614955wrm.28.2019.11.23.02.22.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 23 Nov 2019 02:22:15 -0800 (PST)
+Subject: Re: [PATCH kvm-unit-tests 2/4] x86: vmx_tests: extend HOST_EFER tests
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <1569428066-27894-1-git-send-email-pbonzini@redhat.com>
+ <1569428066-27894-3-git-send-email-pbonzini@redhat.com>
+ <1EE752DF-F00B-4504-8E9B-56BC31127FA4@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ddf7ba88-baf3-8727-586d-66dfa6ed7455@redhat.com>
+Date:   Sat, 23 Nov 2019 11:22:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <000000000000e67a05057314ddf6@google.com> <0000000000005eb1070597ea3a1f@google.com>
- <20191122205453.GE31235@linux.intel.com>
-In-Reply-To: <20191122205453.GE31235@linux.intel.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Sat, 23 Nov 2019 06:15:15 +0100
-Message-ID: <CACT4Y+b9FD8GTHc0baY-kUkuNFo-gdXCJ-uk5JtJSyjsyt8jTg@mail.gmail.com>
-Subject: Re: general protection fault in __schedule (2)
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     syzbot <syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morris <jmorris@namei.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Pavel Tatashin <pasha.tatashin@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1EE752DF-F00B-4504-8E9B-56BC31127FA4@gmail.com>
+Content-Language: en-US
+X-MC-Unique: fe5huQzDOaWmvLgWCZ13AA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 22, 2019 at 9:54 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Thu, Nov 21, 2019 at 11:19:00PM -0800, syzbot wrote:
-> > syzbot has bisected this bug to:
-> >
-> > commit 8fcc4b5923af5de58b80b53a069453b135693304
-> > Author: Jim Mattson <jmattson@google.com>
-> > Date:   Tue Jul 10 09:27:20 2018 +0000
-> >
-> >     kvm: nVMX: Introduce KVM_CAP_NESTED_STATE
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124cdbace00000
-> > start commit:   234b69e3 ocfs2: fix ocfs2 read block panic
-> > git tree:       upstream
-> > final crash:    https://syzkaller.appspot.com/x/report.txt?x=114cdbace00000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=164cdbace00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=5fa12be50bca08d8
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=7e2ab84953e4084a638d
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=150f0a4e400000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f67111400000
-> >
-> > Reported-by: syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com
-> > Fixes: 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
-> >
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->
-> Is there a way to have syzbot stop processing/bisecting these things
-> after a reasonable amount of time?  The original crash is from August of
-> last year...
->
-> Note, the original crash is actually due to KVM's put_kvm() fd race, but
-> whatever we want to blame, it's a duplicate.
->
-> #syz dup: general protection fault in kvm_lapic_hv_timer_in_use
+On 23/11/19 02:40, Nadav Amit wrote:
+>=20
+>=20
+>> On Sep 25, 2019, at 9:14 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> Extend the tests to cover the host address size bit.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>> x86/vmx_tests.c | 126 +++++++++++++++++++++++++++++++++-----------------=
+------
+>> 1 file changed, 74 insertions(+), 52 deletions(-)
+>=20
+> I get the following results with this test on Skylake bare-metal:
+>=20
+> PASS: HOST_EFER EFER_LMA bit turned off, controls off: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LMA bit turned on, controls off: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LMA bit turned off, controls on: vmlaunch fails
+> PASS: HOST_EFER EFER_LMA bit turned off, controls on: VMX inst error is 8=
+ (actual 8)
+> PASS: HOST_EFER EFER_LMA bit turned on, controls on: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LME bit turned off, controls off: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LME bit turned on, controls off: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LME bit turned off, controls on: vmlaunch fails
+> PASS: HOST_EFER EFER_LME bit turned off, controls on: VMX inst error is 8=
+ (actual 8)
+> PASS: HOST_EFER EFER_LME bit turned on, controls on: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LMA bit turned off, controls off: vmlaunch fails
+> FAIL: HOST_EFER EFER_LMA bit turned off, controls off: VMX inst error is =
+8 (actual 7)
+> PASS: HOST_EFER EFER_LMA bit turned on, controls off: vmlaunch fails
+> FAIL: HOST_EFER EFER_LMA bit turned on, controls off: VMX inst error is 8=
+ (actual 7)
+> PASS: HOST_EFER EFER_LMA bit turned off, controls on: vmlaunch fails
+> PASS: HOST_EFER EFER_LMA bit turned off, controls on: VMX inst error is 8=
+ (actual 8)
+> PASS: HOST_EFER EFER_LMA bit turned on, controls on: vmlaunch succeeds
+> PASS: HOST_EFER EFER_LME bit turned off, controls off: vmlaunch fails
+> FAIL: HOST_EFER EFER_LME bit turned off, controls off: VMX inst error is =
+8 (actual 7)
+> PASS: HOST_EFER EFER_LME bit turned on, controls off: vmlaunch fails
+> FAIL: HOST_EFER EFER_LME bit turned on, controls off: VMX inst error is 8=
+ (actual 7)
+> PASS: HOST_EFER EFER_LME bit turned off, controls on: vmlaunch fails
+> PASS: HOST_EFER EFER_LME bit turned off, controls on: VMX inst error is 8=
+ (actual 8)
+> PASS: HOST_EFER EFER_LME bit turned on, controls on: vmlaunch succeeds
+>=20
+> Apparently, turning the controls off, causes some =E2=80=9CVM entry with =
+invalid
+> control field=E2=80=9D (7) instead of =E2=80=9CVM-entry with invalid host=
+-state field=E2=80=9D.
+>=20
+> According to the SDM, checks of control fields and host field are not ord=
+ered.
+> But I do not know what exactly causes the failure.
 
-Hi Sean,
+The failure happens when checking the VM-exit host address size bit
+against EFER.LMA.  26.2.2 puts that check under "Checks on Host Control
+Registers and MSRs", so technically it would be wrong to return error 7
+instead of 8.  However we can relax the test, it's not a big deal.
 
-syzbot only sends bisection results to open bugs with no known fixes.
-So what you did (marking the bug as invalid/dup, or attaching a fix)
-would stop it from doing/sending bisection.
+Paolo
 
-"Original crash happened a long time ago" is not necessary a good
-signal. On the syzbot dashboard
-(https://syzkaller.appspot.com/upstream), you can see bugs with the
-original crash 2+ years ago, but they are still pretty much relevant.
-The default kernel development process strategy for invalidating bug
-reports by burying them in oblivion has advantages, but also
-downsides. FWIW syzbot prefers explicit status tracking.
-
-Besides implications on the mainline development, consider the
-following. We regularly discover the same bugs (missed backports) on
-LTS kernels:
-https://syzkaller.appspot.com/linux-4.14
-https://syzkaller.appspot.com/linux-4.19
-The dashboard also shows similar crash signatures in other tested
-kernels. So say you see a crash in your product kernel, and you notice
-that a similar crash happened on mainline some time ago, but
-presumably it was fixed, but then you look at the bug report thread
-and there is no info whatsoever as to what happened.
-Now this bug report:
-https://syzkaller.appspot.com/bug?extid=7e2ab84953e4084a638d
-is linked to "general protection fault in kvm_lapic_hv_timer_in_use":
-https://syzkaller.appspot.com/bug?id=0c330c4e475223a40d95f1d94c761357dd0f011f
-which has a recorded fix "KVM: nVMX: Fix bad cleanup on error of
-get/set nested state IOCTLs":
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=26b471c7e2f7befd0f59c35b257749ca57e0ed70
