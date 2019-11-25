@@ -2,159 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CB8D91094C9
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 21:47:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 613441095B8
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 23:45:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726873AbfKYUrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 15:47:05 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:3447 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbfKYUrF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 15:47:05 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ddc3dc40000>; Mon, 25 Nov 2019 12:47:00 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 25 Nov 2019 12:46:58 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 25 Nov 2019 12:46:58 -0800
-Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 Nov
- 2019 20:46:57 +0000
-Subject: Re: [PATCH 17/19] powerpc: book3s64: convert to pin_user_pages() and
- put_user_page()
-To:     Jan Kara <jack@suse.cz>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-References: <20191125042011.3002372-1-jhubbard@nvidia.com>
- <20191125042011.3002372-18-jhubbard@nvidia.com>
- <20191125085915.GB1797@quack2.suse.cz>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <9abfd0bf-ffb9-9fad-848c-caff4a490773@nvidia.com>
-Date:   Mon, 25 Nov 2019 12:46:56 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20191125085915.GB1797@quack2.suse.cz>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1574714820; bh=7Gmrre2tneNEWRU9G5+DIn5rrxtRLBtJ55Uj7bfaWRw=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Vc2WP6DAAbNZStXBl+ln2+kB/EuUuvRZHzMpZNW80Fm3ZctGnvM4O+tZRCgS3669B
-         /qldmeczkVi9pQJMXYF/4i2XGVt4Gm+gOJ/tFv/RnDb4dopV+tz5b0cyQc9YOTVtBS
-         P/yYNUzd4pjDhuvvDyZmybC/J7abTjT/ntYJJMbyGr8NCKnGXhEtDqS5T7TKRE2hwU
-         dbPgyN9eu9VXPtG/lD5Uk37zf69kjzXTl/JkUlunTht14kOdHqRRRORI90fFcZ/kGC
-         NFhCuK40TfQ4yRLkmLaKp7qlIx6xeGOy5CzKXKx/3W33foWMDjA/xuDpoO/15JsFQy
-         0FiT0Aycu6K+g==
+        id S1727877AbfKYWpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 17:45:54 -0500
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:44279 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbfKYWpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 17:45:53 -0500
+Received: by mail-pf1-f201.google.com with SMTP id 2so10644490pfx.11
+        for <kvm@vger.kernel.org>; Mon, 25 Nov 2019 14:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=swz/sjYKb6g3M40/hztc/tyAihR4u+28ellm/nQF/QM=;
+        b=vhMiTCmQBcovEk45MSKnaR63E74jfHw/feAR7qBaPHmmJ0P4nu0KJClcbZ7wD0BQVa
+         oBsdSgyld41ekvGr+x3M5HyMBCI2Cl9JZs+ZO7zNfGgFZffxZMCjdG3ehuWoY28GeQHD
+         KH+2hFPVGPSdA2r5xfVHYaz8yGvMeGwB0gdrk4k7Y/bQYR20qcZ6UqvnVDFKMjJ9w8SJ
+         IJ/QxDIVMMTQ7ThrRLA6yTrFSqEoSAvL45kaHlB0JlhPlOiewyM3m1mC5ymBPDHacddi
+         V37HDrsCxGIqets9+f9Z2DCav3qDIVv8DJXduglAYMWbkW6vKb6WsXuYJX/kXOIBVp34
+         SJqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=swz/sjYKb6g3M40/hztc/tyAihR4u+28ellm/nQF/QM=;
+        b=VHlHfMvRzvs00t+MyXoy0ckf05jRejv93SVFQv4HdlEJSFYa8ZkjLRduf3yWOwJwPs
+         0GP8Yh1Rnjszm6Sja9G+zZrfR6TynGgXOEhDNPrhI//EieD+zzvjlWRX4McoHMG59fNs
+         XwiHBuR+zjjpurQggfkzQwLsYxOciehFl29VlmvuaREacV3IK/PiLLhIogYs57yBWGL3
+         7xtU4XDH4XTCaqWPeiMzanzSqZUnDrAZxJnXIHEkDRHMxMkca4YYRjKHzPSSvVgl/Ggb
+         diQmpvPuAAjSdR2mypivuNIDVQ9+CZEU2vV8xzN3cJ7hsvH28LSVc6rOqEqCjDSQjqsv
+         WKgg==
+X-Gm-Message-State: APjAAAWT0RrKzAQmM/2JhUymeFswiAL+K2C+pbPp58+qPIw7C/aQ158J
+        qXJUVLH8XrseM7weeWuVJeBogKV22UcVEBV/
+X-Google-Smtp-Source: APXvYqxM2JCnCwfekVNgzOEeFllNWJCuRATX0bZ5W1OhrqHWMmoi/HLhuhS7ZWsPK80pbfnPMQ0eGB5XuOFf2JX7
+X-Received: by 2002:a63:750f:: with SMTP id q15mr35303993pgc.422.1574721951113;
+ Mon, 25 Nov 2019 14:45:51 -0800 (PST)
+Date:   Mon, 25 Nov 2019 14:44:29 -0800
+Message-Id: <20191125224428.77547-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
+Subject: [kvm-unit-tests PATCH] x86: Add RDTSC test
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/25/19 12:59 AM, Jan Kara wrote:
-> On Sun 24-11-19 20:20:09, John Hubbard wrote:
->> 1. Convert from get_user_pages() to pin_user_pages().
->>
->> 2. As required by pin_user_pages(), release these pages via
->> put_user_page(). In this case, do so via put_user_pages_dirty_lock().
->>
->> That has the side effect of calling set_page_dirty_lock(), instead
->> of set_page_dirty(). This is probably more accurate.
->>
->> As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
->> dealing with a file backed page where we have reference on the inode it
->> hangs off." [1]
->>
->> 3. Release each page in mem->hpages[] (instead of mem->hpas[]), because
->> that is the array that pin_longterm_pages() filled in. This is more
->> accurate and should be a little safer from a maintenance point of
->> view.
-> 
-> Except that this breaks the code. hpages is unioned with hpas...
-> 
+Verify that the difference between an L2 RDTSC instruction and the
+IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12's VM-exit
+MSR-store list is less than 750 cycles, 99.9% of the time.
 
-OK. 
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+---
+ x86/unittests.cfg |  6 ++++
+ x86/vmx_tests.c   | 89 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 95 insertions(+)
 
->> @@ -212,10 +211,9 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
->>  		if (!page)
->>  			continue;
->>  
->> -		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
->> -			SetPageDirty(page);
->> +		put_user_pages_dirty_lock(&mem->hpages[i], 1,
->> +					  MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-> 
-> And the dirtying condition is wrong here as well. Currently it is always
-> true.
-> 
-> 								Honza
-> 
-
-Yes. Fixed up locally. The function now looks like this (for this patch, not for
-the entire series, which renames "put" to "unpin"):
-
-
-static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
-{
-	long i;
-	struct page *page = NULL;
-
-	if (!mem->hpas)
-		return;
-
-	for (i = 0; i < mem->entries; ++i) {
-		if (!mem->hpas[i])
-			continue;
-
-		page = pfn_to_page(mem->hpas[i] >> PAGE_SHIFT);
-		if (!page)
-			continue;
-
-		put_user_pages_dirty_lock(&page, 1,
-				mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-
-		mem->hpas[i] = 0;
-	}
-}
-
-thanks,
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index b4865ac..5291d96 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -284,6 +284,12 @@ extra_params = -cpu host,+vmx -append vmx_vmcs_shadow_test
+ arch = x86_64
+ groups = vmx
+ 
++[vmx_rdtsc_vmexit_diff_test]
++file = vmx.flat
++extra_params = -cpu host,+vmx -append rdtsc_vmexit_diff_test
++arch = x86_64
++groups = vmx
++
+ [debug]
+ file = debug.flat
+ arch = x86_64
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 1d8932f..f42ae2c 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -8790,7 +8790,94 @@ static void vmx_vmcs_shadow_test(void)
+ 	enter_guest();
+ }
+ 
++/*
++ * This test monitors the difference between an L2 RDTSC instruction
++ * and the IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12
++ * VM-exit MSR-store list when taking a VM-exit on the instruction
++ * following RDTSC.
++ */
++#define RDTSC_DIFF_ITERS 100000
++#define RDTSC_DIFF_FAILS 100
++#define L1_RDTSC_LIMIT 750
++
++/*
++ * Set 'use TSC offsetting' and set the L2 offset to the
++ * inverse of L1's current TSC value, so that L2 starts running
++ * with an effective TSC value of 0.
++ */
++static void reset_l2_tsc_to_zero(void)
++{
++	TEST_ASSERT_MSG(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET,
++			"Expected support for 'use TSC offsetting'");
++
++	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
++	vmcs_write(TSC_OFFSET, -rdtsc());
++}
++
++static void rdtsc_vmexit_diff_test_guest(void)
++{
++	int i;
++
++	for (i = 0; i < RDTSC_DIFF_ITERS; i++)
++		asm volatile("rdtsc; vmcall" : : : "eax", "edx");
++}
++
++/*
++ * This function only considers the "use TSC offsetting" VM-execution
++ * control.  It does not handle "use TSC scaling" (because the latter
++ * isn't available to L1 today.)
++ */
++static unsigned long long l1_time_to_l2_time(unsigned long long t)
++{
++	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_USE_TSC_OFFSET)
++		t += vmcs_read(TSC_OFFSET);
++
++	return t;
++}
++
++static unsigned long long get_tsc_diff(void)
++{
++	unsigned long long l2_tsc, l1_to_l2_tsc;
++
++	enter_guest();
++	skip_exit_vmcall();
++	l2_tsc = (u32) regs.rax + (regs.rdx << 32);
++	l1_to_l2_tsc = l1_time_to_l2_time(exit_msr_store[0].value);
++
++	return l1_to_l2_tsc - l2_tsc;
++}
++
++static void rdtsc_vmexit_diff_test(void)
++{
++	int fail = 0;
++	int i;
++
++	test_set_guest(rdtsc_vmexit_diff_test_guest);
++
++	reset_l2_tsc_to_zero();
+ 
++	/*
++	 * Set up the VMCS12 VM-exit MSR-store list to store just one
++	 * MSR: IA32_TIME_STAMP_COUNTER. Note that the value stored is
++	 * in the L1 time domain (i.e., it is not adjusted according
++	 * to the TSC multiplier and TSC offset fields in the VMCS12,
++	 * as an L2 RDTSC would be.)
++	 */
++	exit_msr_store = alloc_page();
++	exit_msr_store[0].index = MSR_IA32_TSC;
++	vmcs_write(EXI_MSR_ST_CNT, 1);
++	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
++
++	for (i = 0; i < RDTSC_DIFF_ITERS; i++) {
++		if (get_tsc_diff() < L1_RDTSC_LIMIT)
++			fail++;
++	}
++
++	enter_guest();
++
++	report("RDTSC to VM-exit delta too high in %d of %d iterations",
++	       fail < RDTSC_DIFF_FAILS, fail, RDTSC_DIFF_ITERS);
++}
+ 
+ static int invalid_msr_init(struct vmcs *vmcs)
+ {
+@@ -9056,5 +9143,7 @@ struct vmx_test vmx_tests[] = {
+ 	/* Atomic MSR switch tests. */
+ 	TEST(atomic_switch_max_msrs_test),
+ 	TEST(atomic_switch_overflow_msrs_test),
++	/* Miscellaneous tests */
++	TEST(rdtsc_vmexit_diff_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, {0} },
+ };
 -- 
-John Hubbard
-NVIDIA
+2.24.0.432.g9d3f5f5b63-goog
 
