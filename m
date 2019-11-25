@@ -2,99 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E5AB108E13
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 13:37:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21DB010913C
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 16:47:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727299AbfKYMho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 07:37:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41578 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727194AbfKYMhn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 07:37:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574685462;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=lpzbkQ3i1d0GuVy4yh5saM/LJxonFfXBJE0iTKqBGXg=;
-        b=IG933hyIfdQdnX/f5PdQo248fMS7H82y5VUr3pDTh3esU7uaXPuKzYZLbs7/DmGPmBYcK2
-        yzrlQ1lU4DM/HAf4dElnT1RbDlwQFrvnHZmXAzUHBGVGCOb+am7Q/CwDBRA6h/SFbDCWOm
-        lk6J+Il8KgBiqI2RK/rnmpagj78SzJM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-6_gZ2yjIMBC_8k0Vcmg4EA-1; Mon, 25 Nov 2019 07:37:41 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z10so8771869wrr.5
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2019 04:37:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K4GPngNhpXwxQp8IbDin9g/AOQ0Xg3tlEruKrqGu/Ho=;
-        b=T9i+W362bvIn6JhHMyyrZfuFSe/R+hqpD38yYQFoRzVbivGuhlvvaF89NTm2cHDR+Y
-         bXhk+eBB4/09sAn74YuVI59t+wf7B+H4O19iWphVk57+s0Ny9ppqlrpYT+yjE0s2D2NN
-         b3VIKjd1skqW+WM8FwMbLEmDnb+WMMhUTu3sOMP04/Fkc3/eYNKhUYhfu6sMqCbsMK99
-         oamqqGwDTdtcd2vCudTV3YKT+1kGyIzuCEt//VOrRlcSB0LVxy4DVobM9HLWxNaPk1Y1
-         AdokoWv1Gq0P8L0xgRE7MRTJsdPvYRJexA4UkiYcNGhlZ4HwVHKm3l0YEJ8GyHjO4Vbt
-         bzcA==
-X-Gm-Message-State: APjAAAUDRQWep9YVNQ29Nms8amASDnYr3gOL9CHU4a+LLlLuHz0FnKOb
-        4KMWil/qkcCzF74j96A2VgQSXDDS/cCJerA9s6rlEH3Ds3el4CSfltJ7ofJqdld1kGZZsC3RA+H
-        CCxmAQNdBskIF
-X-Received: by 2002:a05:6000:103:: with SMTP id o3mr33411605wrx.80.1574685459824;
-        Mon, 25 Nov 2019 04:37:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyLgqh/0zfq+akrX99Er2Qdl9YBHqD7kFPiGY0DtDEGWff0/FakB+oikEsHfqh07QGQlYhkCQ==
-X-Received: by 2002:a05:6000:103:: with SMTP id o3mr33411582wrx.80.1574685459537;
-        Mon, 25 Nov 2019 04:37:39 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5454:a592:5a0a:75c? ([2001:b07:6468:f312:5454:a592:5a0a:75c])
-        by smtp.gmail.com with ESMTPSA id z11sm11604272wrg.0.2019.11.25.04.37.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Nov 2019 04:37:38 -0800 (PST)
-Subject: Re: [PATCH] kvm: nVMX: Relax guest IA32_FEATURE_CONTROL constraints
-To:     Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Haozhong Zhang <haozhong.zhang@intel.com>
-References: <20191122234355.174998-1-jmattson@google.com>
- <97EE5F0F-3047-46BC-B569-D407B5800499@oracle.com>
- <CALMp9eTLQrFprNoYtXa2MCiAGnHuf4Rqxxh33cXD936boxMEwg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fd0033a2-6fd8-ff02-64b8-9c6e30a99e65@redhat.com>
-Date:   Mon, 25 Nov 2019 13:37:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1728649AbfKYPrv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 10:47:51 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:50298 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728454AbfKYPru (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Nov 2019 10:47:50 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iZGaS-00029Q-Ac; Mon, 25 Nov 2019 16:47:40 +0100
+To:     Jianyong Wu <jianyong.wu@arm.com>
+Subject: Re: [RFC PATCH v8 3/8] ptp: Reorganize =?UTF-8?Q?ptp=5Fkvm=20modu?=  =?UTF-8?Q?les=20to=20make=20it=20arch-independent=2E?=
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eTLQrFprNoYtXa2MCiAGnHuf4Rqxxh33cXD936boxMEwg@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: 6_gZ2yjIMBC_8k0Vcmg4EA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 25 Nov 2019 15:47:40 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     <netdev@vger.kernel.org>, <yangbo.lu@nxp.com>,
+        <john.stultz@linaro.org>, <tglx@linutronix.de>,
+        <pbonzini@redhat.com>, <sean.j.christopherson@intel.com>,
+        <richardcochran@gmail.com>, <mark.rutland@arm.com>,
+        <will@kernel.org>, <suzuki.poulose@arm.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <steve.capper@arm.com>, <kaly.xin@arm.com>, <justin.he@arm.com>,
+        <nd@arm.com>
+In-Reply-To: <20191125104506.36850-4-jianyong.wu@arm.com>
+References: <20191125104506.36850-1-jianyong.wu@arm.com>
+ <20191125104506.36850-4-jianyong.wu@arm.com>
+Message-ID: <a13a4f9554f36a46781308358fc63519@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com, mark.rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, steve.capper@arm.com, kaly.xin@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/11/19 01:22, Jim Mattson wrote:
->> I suggest to also add a comment in code to clarify why we allow setting
->> FEATURE_CONTROL_VMXON_ENABLED_INSIDE_SMX even though we expose a
->> vCPU that doesn=E2=80=99t support Intel TXT.
->> (I think the compatibility to existing workloads that sets this
->> blindly on boot is a legit reason. Just recommend documenting it.)
->>
->> In addition, if the nested hypervisor which relies on this is
->> public, please also mention it in commit message for reference.
+On 2019-11-25 10:45, Jianyong Wu wrote:
+> Currently, ptp_kvm modules implementation is only for x86 which 
+> includs
+> large part of arch-specific code.  This patch move all of those code
+> into new arch related file in the same directory.
 >
-> It's not an L1 hypervisor that's the problem. It's Google's L0
-> hypervisor. We've been incorrectly reporting IA32_FEATURE_CONTROL as 7
-> to nested guests for years, and now we have thousands of running VMs
-> with the bogus value. I've thought about just changing it to 5 on the
-> fly (on real hardware, one could almost blame it on SMM, but the MSR
-> is *locked*, after all).
+> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
+> ---
+>  drivers/ptp/Makefile                        |  1 +
+>  drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 77 +++++-------------
+>  drivers/ptp/ptp_kvm_x86.c                   | 87 
+> +++++++++++++++++++++
+>  include/asm-generic/ptp_kvm.h               | 12 +++
+>  4 files changed, 118 insertions(+), 59 deletions(-)
+>  rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (63%)
+>  create mode 100644 drivers/ptp/ptp_kvm_x86.c
+>  create mode 100644 include/asm-generic/ptp_kvm.h
 
-Queued, thanks.
+[...]
 
-Paolo
+> diff --git a/include/asm-generic/ptp_kvm.h 
+> b/include/asm-generic/ptp_kvm.h
+> new file mode 100644
+> index 000000000000..e5dd386f6664
+> --- /dev/null
+> +++ b/include/asm-generic/ptp_kvm.h
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + *  Virtual PTP 1588 clock for use with KVM guests
+> + *
+> + *  Copyright (C) 2019 ARM Ltd.
 
+I think you should live the original copyright assignment here.
+This really isn't anything new.
+
+> + *  All Rights Reserved
+> + */
+> +
+> +int kvm_arch_ptp_init(void);
+> +int kvm_arch_ptp_get_clock(struct timespec64 *ts);
+> +int kvm_arch_ptp_get_crosststamp(unsigned long *cycle,
+> +		struct timespec64 *tspec, void *cs);
+
+Why is this include file in asm-generic? This isn't a kernel-wide API.
+
+I think it should be sitting in drivers/ptp, as it is only shared 
+between
+the generic and arch-specific stuff.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
