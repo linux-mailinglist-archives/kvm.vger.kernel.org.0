@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E038108BC9
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B3F1108BC6
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbfKYKcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727609AbfKYKcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 25 Nov 2019 05:32:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:47772 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.110.172]:47778 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727588AbfKYKcm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727599AbfKYKcm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 25 Nov 2019 05:32:42 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7752D328;
-        Mon, 25 Nov 2019 02:32:41 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D33555D;
+        Mon, 25 Nov 2019 02:32:42 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 902C23F52E;
-        Mon, 25 Nov 2019 02:32:40 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B329F3F52E;
+        Mon, 25 Nov 2019 02:32:41 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com
-Subject: [PATCH kvmtool 10/16] virtio/pci: Make memory and IO BARs independent
-Date:   Mon, 25 Nov 2019 10:30:27 +0000
-Message-Id: <20191125103033.22694-11-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 11/16] virtio/pci: Ignore MMIO and I/O accesses when they are disabled
+Date:   Mon, 25 Nov 2019 10:30:28 +0000
+Message-Id: <20191125103033.22694-12-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191125103033.22694-1-alexandru.elisei@arm.com>
 References: <20191125103033.22694-1-alexandru.elisei@arm.com>
@@ -35,195 +35,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Julien Thierry <julien.thierry@arm.com>
+A device's response to memory or I/O accesses is disabled when Memory
+Space, respectively I/O Space, is set to 0 in the Command register.
+According to the PCI Local Bus Specification Revision 3.0, those two
+bits reset to 0.
 
-Currently, callbacks for memory BAR 1 call the IO port emulation.  This
-means that the memory BAR needs I/O Space to be enabled whenever Memory
-Space is enabled.
+Let's respect the specifiction, so set Command and I/O Space to 0 on
+reset, and ignore accesses to a device's respective regions when they
+are disabled.
 
-Refactor the code so the two type of  BARs are independent. Also, unify
-ioport/mmio callback arguments so that they all receive a virtio_device.
-
-Cc: julien.thierry.kdev@gmail.com
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- virtio/pci.c | 71 +++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 48 insertions(+), 23 deletions(-)
+ virtio/pci.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/virtio/pci.c b/virtio/pci.c
-index eeb5b5efa6e1..6723a1f3a84d 100644
+index 6723a1f3a84d..9f86bb7b6f93 100644
 --- a/virtio/pci.c
 +++ b/virtio/pci.c
-@@ -87,8 +87,8 @@ static inline bool virtio_pci__msix_enabled(struct virtio_pci *vpci)
- 	return vpci->pci_hdr.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE);
- }
- 
--static bool virtio_pci__specific_io_in(struct kvm *kvm, struct virtio_device *vdev, u16 port,
--					void *data, int size, int offset)
-+static bool virtio_pci__specific_data_in(struct kvm *kvm, struct virtio_device *vdev,
-+					 void *data, int size, unsigned long offset)
- {
- 	u32 config_offset;
- 	struct virtio_pci *vpci = vdev->virtio;
-@@ -117,20 +117,17 @@ static bool virtio_pci__specific_io_in(struct kvm *kvm, struct virtio_device *vd
- 	return false;
- }
- 
--static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-+static bool virtio_pci__data_in(struct kvm_cpu *vcpu, struct virtio_device *vdev,
-+				unsigned long offset, void *data, int size)
- {
--	unsigned long offset;
- 	bool ret = true;
--	struct virtio_device *vdev;
- 	struct virtio_pci *vpci;
- 	struct virt_queue *vq;
- 	struct kvm *kvm;
- 	u32 val;
- 
- 	kvm = vcpu->kvm;
--	vdev = ioport->priv;
+@@ -168,6 +168,9 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
  	vpci = vdev->virtio;
--	offset = port - vpci->port_addr;
+ 	offset = port - vpci->port_addr;
  
- 	switch (offset) {
- 	case VIRTIO_PCI_HOST_FEATURES:
-@@ -154,13 +151,26 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
- 		vpci->isr = VIRTIO_IRQ_LOW;
- 		break;
- 	default:
--		ret = virtio_pci__specific_io_in(kvm, vdev, port, data, size, offset);
-+		ret = virtio_pci__specific_data_in(kvm, vdev, data, size, offset);
- 		break;
- 	};
- 
- 	return ret;
++	if (!(vpci->pci_hdr.command & PCI_COMMAND_IO))
++		return true;
++
+ 	return virtio_pci__data_in(vcpu, vdev, offset, data, size);
  }
  
-+static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-+{
-+	unsigned long offset;
-+	struct virtio_device *vdev;
-+	struct virtio_pci *vpci;
-+
-+	vdev = ioport->priv;
-+	vpci = vdev->virtio;
-+	offset = port - vpci->port_addr;
-+
-+	return virtio_pci__data_in(vcpu, vdev, offset, data, size);
-+}
-+
- static void update_msix_map(struct virtio_pci *vpci,
- 			    struct msix_table *msix_entry, u32 vecnum)
- {
-@@ -185,8 +195,8 @@ static void update_msix_map(struct virtio_pci *vpci,
- 	irq__update_msix_route(vpci->kvm, gsi, &msix_entry->msg);
- }
- 
--static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *vdev, u16 port,
--					void *data, int size, int offset)
-+static bool virtio_pci__specific_data_out(struct kvm *kvm, struct virtio_device *vdev,
-+					  void *data, int size, unsigned long offset)
- {
- 	struct virtio_pci *vpci = vdev->virtio;
- 	u32 config_offset, vec;
-@@ -259,19 +269,16 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 	return false;
- }
- 
--static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-+static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vdev,
-+				 unsigned long offset, void *data, int size)
- {
--	unsigned long offset;
- 	bool ret = true;
--	struct virtio_device *vdev;
- 	struct virtio_pci *vpci;
- 	struct kvm *kvm;
- 	u32 val;
- 
- 	kvm = vcpu->kvm;
--	vdev = ioport->priv;
+@@ -328,6 +331,9 @@ static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
  	vpci = vdev->virtio;
--	offset = port - vpci->port_addr;
+ 	offset = port - vpci->port_addr;
  
- 	switch (offset) {
- 	case VIRTIO_PCI_GUEST_FEATURES:
-@@ -304,13 +311,26 @@ static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16
- 		virtio_notify_status(kvm, vdev, vpci->dev, vpci->status);
- 		break;
- 	default:
--		ret = virtio_pci__specific_io_out(kvm, vdev, port, data, size, offset);
-+		ret = virtio_pci__specific_data_out(kvm, vdev, data, size, offset);
- 		break;
- 	};
- 
- 	return ret;
++	if (!(vpci->pci_hdr.command & PCI_COMMAND_IO))
++		return true;
++
+ 	return virtio_pci__data_out(vcpu, vdev, offset, data, size);
  }
  
-+static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-+{
-+	unsigned long offset;
-+	struct virtio_device *vdev;
-+	struct virtio_pci *vpci;
-+
-+	vdev = ioport->priv;
-+	vpci = vdev->virtio;
-+	offset = port - vpci->port_addr;
-+
-+	return virtio_pci__data_out(vcpu, vdev, offset, data, size);
-+}
-+
- static struct ioport_operations virtio_pci__io_ops = {
- 	.io_in	= virtio_pci__io_in,
- 	.io_out	= virtio_pci__io_out,
-@@ -320,7 +340,8 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
- 					   u64 addr, u8 *data, u32 len,
- 					   u8 is_write, void *ptr)
- {
--	struct virtio_pci *vpci = ptr;
-+	struct virtio_device *vdev = ptr;
-+	struct virtio_pci *vpci = vdev->virtio;
- 	struct msix_table *table;
+@@ -346,6 +352,9 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
  	int vecnum;
  	size_t offset;
-@@ -419,11 +440,15 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
- 					 u64 addr, u8 *data, u32 len,
- 					 u8 is_write, void *ptr)
- {
--	struct virtio_pci *vpci = ptr;
--	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
--	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
-+	struct virtio_device *vdev = ptr;
-+	struct virtio_pci *vpci = vdev->virtio;
  
--	kvm__emulate_io(vcpu, port, data, direction, len, 1);
-+	if (!is_write)
-+		virtio_pci__data_in(vcpu, vdev, addr - vpci->mmio_addr,
-+				    data, len);
-+	else
-+		virtio_pci__data_out(vcpu, vdev, addr - vpci->mmio_addr,
-+				     data, len);
- }
++	if (!(vpci->pci_hdr.command & PCI_COMMAND_MEMORY))
++		return;
++
+ 	if (addr > vpci->msix_io_block + PCI_IO_SIZE) {
+ 		if (is_write)
+ 			return;
+@@ -443,6 +452,9 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+ 	struct virtio_device *vdev = ptr;
+ 	struct virtio_pci *vpci = vdev->virtio;
  
- int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
-@@ -445,13 +470,13 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 
- 	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
- 	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
--			       virtio_pci__io_mmio_callback, vpci);
-+			       virtio_pci__io_mmio_callback, vdev);
- 	if (r < 0)
- 		goto free_ioport;
- 
- 	vpci->msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
- 	r = kvm__register_mmio(kvm, vpci->msix_io_block, PCI_IO_SIZE * 2, false,
--			       virtio_pci__msix_mmio_callback, vpci);
-+			       virtio_pci__msix_mmio_callback, vdev);
- 	if (r < 0)
- 		goto free_mmio;
- 
++	if (!(vpci->pci_hdr.command & PCI_COMMAND_MEMORY))
++		return;
++
+ 	if (!is_write)
+ 		virtio_pci__data_in(vcpu, vdev, addr - vpci->mmio_addr,
+ 				    data, len);
+@@ -483,7 +495,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 	vpci->pci_hdr = (struct pci_device_header) {
+ 		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+ 		.device_id		= cpu_to_le16(device_id),
+-		.command		= PCI_COMMAND_IO | PCI_COMMAND_MEMORY,
++		/* The Command register is 0 on RST. */
++		.command		= 0,
+ 		.header_type		= PCI_HEADER_TYPE_NORMAL,
+ 		.revision_id		= 0,
+ 		.class[0]		= class & 0xff,
 -- 
 2.20.1
 
