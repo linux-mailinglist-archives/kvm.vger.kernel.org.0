@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B480108BC8
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B756108BCA
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727603AbfKYKcs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 05:32:48 -0500
-Received: from foss.arm.com ([217.140.110.172]:47796 "EHLO foss.arm.com"
+        id S1727585AbfKYKcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 05:32:47 -0500
+Received: from foss.arm.com ([217.140.110.172]:47806 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727553AbfKYKcp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 05:32:45 -0500
+        id S1727604AbfKYKcq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 05:32:46 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8950328;
-        Mon, 25 Nov 2019 02:32:44 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0330D1045;
+        Mon, 25 Nov 2019 02:32:46 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F25543F52E;
-        Mon, 25 Nov 2019 02:32:43 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1C9623F52E;
+        Mon, 25 Nov 2019 02:32:45 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com
-Subject: [PATCH kvmtool 13/16] vfio: Add support for BAR configuration
-Date:   Mon, 25 Nov 2019 10:30:30 +0000
-Message-Id: <20191125103033.22694-14-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 14/16] virtio/pci: Add support for BAR configuration
+Date:   Mon, 25 Nov 2019 10:30:31 +0000
+Message-Id: <20191125103033.22694-15-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191125103033.22694-1-alexandru.elisei@arm.com>
 References: <20191125103033.22694-1-alexandru.elisei@arm.com>
@@ -35,194 +35,284 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Julien Thierry <julien.thierry@arm.com>
+A device's Memory or I/O space address can be written by software in a
+Base Address Register (BAR). Allow the BARs to be programable by
+registering the mmio or ioport emulation when access is enabled for that
+region, not when the virtual machine is created.
 
-When a guest can reassign BARs, kvmtool needs to maintain the vfio_region
-consistent with their corresponding BARs. Take the new updated addresses
-from the PCI header read back from the vfio driver.
-
-Also, to modify the BARs, it is expected that guests will disable
-IO/Memory response in the PCI command. Support this by mapping/unmapping
-regions when the corresponding response gets enabled/disabled.
-
-Cc: julien.thierry.kdev@gmail.com
-Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-[Fixed BAR selection]
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- vfio/core.c |  8 ++---
- vfio/pci.c  | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 87 insertions(+), 9 deletions(-)
+ include/kvm/virtio-pci.h |   1 +
+ virtio/pci.c             | 208 +++++++++++++++++++++++++++++++++------
+ 2 files changed, 179 insertions(+), 30 deletions(-)
 
-diff --git a/vfio/core.c b/vfio/core.c
-index 0ed1e6fee6bf..b554897fc8c1 100644
---- a/vfio/core.c
-+++ b/vfio/core.c
-@@ -202,14 +202,13 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
- 				  struct vfio_region *region)
- {
- 	if (region->is_ioport) {
--		int port = pci_get_io_port_block(region->info.size);
-+		int port = ioport__register(kvm, region->port_base,
-+					    &vfio_ioport_ops,
-+					    region->info.size, region);
+diff --git a/include/kvm/virtio-pci.h b/include/kvm/virtio-pci.h
+index 278a25950d8b..9b3ad3d04d41 100644
+--- a/include/kvm/virtio-pci.h
++++ b/include/kvm/virtio-pci.h
+@@ -22,6 +22,7 @@ struct virtio_pci {
+ 	struct pci_device_header pci_hdr;
+ 	struct device_header	dev_hdr;
+ 	void			*dev;
++	struct virtio_device	*vdev;
+ 	struct kvm		*kvm;
  
--		port = ioport__register(kvm, port, &vfio_ioport_ops,
--					region->info.size, region);
- 		if (port < 0)
- 			return port;
- 
--		region->port_base = port;
- 		return 0;
- 	}
- 
-@@ -258,6 +257,7 @@ void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
- {
- 	if (region->host_addr) {
- 		munmap(region->host_addr, region->info.size);
-+		region->host_addr = NULL;
- 	} else if (region->is_ioport) {
- 		ioport__unregister(kvm, region->port_base);
- 	} else {
-diff --git a/vfio/pci.c b/vfio/pci.c
-index bc5a6d452f7a..28f895c06b27 100644
---- a/vfio/pci.c
-+++ b/vfio/pci.c
-@@ -1,3 +1,4 @@
-+#include "kvm/ioport.h"
- #include "kvm/irq.h"
- #include "kvm/kvm.h"
- #include "kvm/kvm-cpu.h"
-@@ -464,6 +465,67 @@ static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr
- 			      sz, offset);
+ 	u16			port_addr;
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 9f86bb7b6f93..dadb796e6d62 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -463,6 +463,170 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+ 				     data, len);
  }
  
-+static void vfio_pci_cfg_handle_command(struct kvm *kvm, struct vfio_device *vdev,
-+					void *data, int sz)
++static void virtio_pci__update_command(struct kvm *kvm,
++				       struct pci_device_header *pci_hdr,
++				       void *data, int sz)
 +{
-+	struct pci_device_header *hdr = &vdev->pci.hdr;
-+	bool toggle_io;
-+	bool toggle_mem;
++	struct virtio_pci *vpci = container_of(pci_hdr, struct virtio_pci, pci_hdr);
++	u32 addr, mem_size;
 +	u16 cmd;
-+	int i;
++	int r;
++	bool toggle_io, toggle_mem;
 +
 +	cmd = ioport__read16(data);
-+	toggle_io = !!((cmd ^ hdr->command) & PCI_COMMAND_IO);
-+	toggle_mem = !!((cmd ^ hdr->command) & PCI_COMMAND_MEMORY);
 +
-+	for (i = VFIO_PCI_BAR0_REGION_INDEX; i <= VFIO_PCI_BAR5_REGION_INDEX; ++i) {
-+		struct vfio_region *region = &vdev->regions[i];
++	toggle_io = !!((cmd ^ pci_hdr->command) & PCI_COMMAND_IO);
++	toggle_mem = !!((cmd ^ pci_hdr->command) & PCI_COMMAND_MEMORY);
 +
-+		if (region->is_ioport && toggle_io) {
-+			if (cmd & PCI_COMMAND_IO)
-+				vfio_map_region(kvm, vdev, region);
-+			else
-+				vfio_unmap_region(kvm, region);
++	if (toggle_io && (cmd & PCI_COMMAND_IO)) {
++		addr = pci_hdr->bar[0] & PCI_BASE_ADDRESS_IO_MASK;
++		mem_size = pci_hdr->bar_size[0];
++
++		r = ioport__register(kvm, addr, &virtio_pci__io_ops, mem_size,
++				     vpci->vdev);
++		if (r < 0) {
++			pr_err("ioport__register failed for memory region 0x%x@0x%x\n",
++			       mem_size, addr);
++			/* Drop writes. */
++			memcpy(data, (void *)&pci_hdr->command, sz);
++			goto mem_setup;
 +		}
++		vpci->port_addr = (u16)r;
++	}
 +
-+		if (!region->is_ioport && toggle_mem) {
-+			if (cmd & PCI_COMMAND_MEMORY)
-+				vfio_map_region(kvm, vdev, region);
-+			else
-+				vfio_unmap_region(kvm, region);
++	if (toggle_io && !(cmd & PCI_COMMAND_IO)) {
++		/* Same as for the memory BARs. */
++		memcpy((void *)&pci_hdr->command, data, sz);
++		ioport__unregister(kvm, vpci->port_addr);
++	}
++
++mem_setup:
++	if (toggle_mem && (cmd & PCI_COMMAND_MEMORY)) {
++		addr = pci_hdr->bar[1] & PCI_BASE_ADDRESS_MEM_MASK;
++		mem_size = pci_hdr->bar_size[1];
++		r = kvm__register_mmio(kvm, addr, mem_size, false,
++				       virtio_pci__io_mmio_callback, vpci->vdev);
++		if (r < 0) {
++			pr_err("kvm__register_mmio failed for memory region 0x%x@0x%x\n",
++			       mem_size, addr);
++			/* Treat it like a Master Abort and drop writes. */
++			memcpy(data, (void *)&pci_hdr->command, sz);
++			return;
 +		}
++		vpci->mmio_addr = addr;
++
++		addr = pci_hdr->bar[2] & PCI_BASE_ADDRESS_MEM_MASK;
++		mem_size = pci_hdr->bar_size[2];
++		r = kvm__register_mmio(kvm, addr, mem_size, false,
++				       virtio_pci__msix_mmio_callback, vpci->vdev);
++		if (r < 0) {
++			pr_err("kvm__register_mmio failed for memory region 0x%x@0x%x\n",
++			       mem_size, addr);
++			kvm__deregister_mmio(kvm, pci_hdr->bar[1] & PCI_BASE_ADDRESS_MEM_MASK);
++			/* Drop writes. */
++			memcpy(data, (void *)&pci_hdr->command, sz);
++			return;
++		}
++		vpci->msix_io_block = addr;
++	}
++
++	if (toggle_mem && !(cmd & PCI_COMMAND_MEMORY)) {
++		/*
++		 * This is to prevent races - an access by another thread
++		 * initiated before the region is unregistered, but performed
++		 * after that, will see that memory access is disabled and won't
++		 * do any emulation.
++		 */
++		memcpy((void *)&pci_hdr->command, data, sz);
++		kvm__deregister_mmio(kvm, vpci->mmio_addr);
++		kvm__deregister_mmio(kvm, vpci->msix_io_block);
 +	}
 +}
 +
-+static void vfio_pci_cfg_update_bar(struct kvm *kvm, struct vfio_device *vdev,
-+				    int bar_num, void *data, int sz)
++static void virtio_pci__update_bar(struct kvm *kvm,
++				   struct pci_device_header *pci_hdr,
++				   int bar_num, void *data, int sz)
 +{
-+	struct pci_device_header *hdr = &vdev->pci.hdr;
-+	struct vfio_region *region;
-+	uint32_t bar;
++	struct virtio_pci *vpci = container_of(pci_hdr, struct virtio_pci, pci_hdr);
++	u32 new_bar, old_bar;
++	u32 new_addr, mem_size;
++	int r;
 +
-+	region = &vdev->regions[bar_num + VFIO_PCI_BAR0_REGION_INDEX];
-+	bar = ioport__read32(data);
++	if (bar_num > 2) {
++		/* BARs not implemented, ignore writes. */
++		bzero(data, sz);
++		return;
++	}
 +
-+	if (region->is_ioport) {
-+		if (hdr->command & PCI_COMMAND_IO)
-+			vfio_unmap_region(kvm, region);
++	/*
++	 * The BARs are being configured when device access is disabled, the
++	 * memory will be registered for mmio/ioport emulation when the device
++	 * is actually enabled.
++	 */
++	if (bar_num == 0 && !(pci_hdr->command & PCI_COMMAND_IO))
++		return;
++	if (bar_num >= 1 && !(pci_hdr->command & PCI_COMMAND_MEMORY))
++		return;
 +
-+		region->port_base = bar & PCI_BASE_ADDRESS_IO_MASK;
++	new_bar = ioport__read32(data);
++	if (bar_num == 0)
++		new_addr = new_bar & PCI_BASE_ADDRESS_IO_MASK;
++	else
++		new_addr = new_bar & PCI_BASE_ADDRESS_MEM_MASK;
++	old_bar = pci_hdr->bar[bar_num];
++	mem_size = pci_hdr->bar_size[bar_num];
 +
-+		if (hdr->command & PCI_COMMAND_IO)
-+			vfio_map_region(kvm, vdev, region);
++	if (bar_num == 0) {
++		ioport__unregister(kvm, old_bar & PCI_BASE_ADDRESS_IO_MASK);
++		r = ioport__register(kvm, new_addr, &virtio_pci__io_ops,
++				     mem_size, vpci->vdev);
++		if (r < 0) {
++			pr_err("ioport__register failed for memory region 0x%x@0x%x\n",
++			       mem_size, new_addr);
++			/* Treat it like a Master Abort and drop writes. */
++			memcpy(data, (void *)&old_bar, sz);
++			return;
++		}
++		vpci->port_addr = (u16)r;
 +	} else {
-+		if (hdr->command & PCI_COMMAND_MEMORY)
-+			vfio_unmap_region(kvm, region);
-+
-+		region->guest_phys_addr = bar & PCI_BASE_ADDRESS_MEM_MASK;
-+
-+		if (hdr->command & PCI_COMMAND_MEMORY)
-+			vfio_map_region(kvm, vdev, region);
++		kvm__deregister_mmio(kvm, old_bar & PCI_BASE_ADDRESS_MEM_MASK);
++		if (bar_num == 1)
++			r = kvm__register_mmio(kvm, new_addr, mem_size, false,
++					       virtio_pci__io_mmio_callback,
++					       vpci->vdev);
++		else
++			r = kvm__register_mmio(kvm, new_addr, mem_size, false,
++					       virtio_pci__msix_mmio_callback,
++					       vpci->vdev);
++		if (r < 0) {
++			pr_err("kvm__register_mmio failed for memory region 0x%x@0x%x\n",
++			       mem_size, new_addr);
++			/* Drop writes. */
++			memcpy(data, (void *)&old_bar, sz);
++			return;
++		}
++		if (bar_num == 1)
++			vpci->mmio_addr = new_addr;
++		else
++			vpci->msix_io_block = new_addr;
 +	}
 +}
 +
- static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
- 			       u8 offset, void *data, int sz)
- {
-@@ -471,6 +533,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
- 	struct vfio_pci_device *pdev;
- 	struct vfio_device *vdev;
- 	void *base = pci_hdr;
++static void virtio_pci__config_wr(struct kvm *kvm,
++                                 struct pci_device_header *pci_hdr,
++                                 u8 offset, void *data, int sz)
++{
 +	int bar_num;
- 
- 	pdev = container_of(pci_hdr, struct vfio_pci_device, hdr);
- 	vdev = container_of(pdev, struct vfio_device, pci);
-@@ -487,9 +550,17 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
- 	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
- 		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
- 
-+	if (offset == PCI_COMMAND)
-+		vfio_pci_cfg_handle_command(kvm, vdev, data, sz);
 +
- 	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
- 		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
- 			      sz, offset);
++	if (offset == PCI_COMMAND)
++		virtio_pci__update_command(kvm, pci_hdr, data, sz);
 +
 +	if (offset >= PCI_BASE_ADDRESS_0 && offset <= PCI_BASE_ADDRESS_5) {
 +		bar_num = (offset - PCI_BASE_ADDRESS_0) / sizeof(u32);
-+		vfio_pci_cfg_update_bar(kvm, vdev, bar_num, data, sz);
++		virtio_pci__update_bar(kvm, pci_hdr, bar_num, data, sz);
 +	}
- }
++}
++
+ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		     int device_id, int subsys_id, int class)
+ {
+@@ -471,26 +635,14 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
  
- static ssize_t vfio_pci_msi_cap_size(struct msi_cap_64 *cap_hdr)
-@@ -808,6 +879,7 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
- 	size_t map_size;
- 	struct vfio_pci_device *pdev = &vdev->pci;
- 	struct vfio_region *region = &vdev->regions[nr];
-+	bool map_now;
+ 	vpci->kvm = kvm;
+ 	vpci->dev = dev;
++	vpci->vdev = vdev;
  
- 	if (nr >= vdev->info.num_regions)
- 		return 0;
-@@ -848,16 +920,22 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
- 		}
- 	}
+ 	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
  
--	if (!region->is_ioport) {
-+	if (region->is_ioport) {
-+		region->port_base = pci_get_io_port_block(region->info.size);
-+		map_now = !!(pdev->hdr.command & PCI_COMMAND_IO);
-+	} else {
- 		/* Grab some MMIO space in the guest */
- 		map_size = ALIGN(region->info.size, PAGE_SIZE);
- 		region->guest_phys_addr = pci_get_mmio_block(map_size);
-+		map_now = !!(pdev->hdr.command & PCI_COMMAND_MEMORY);
- 	}
+-	r = pci_get_io_port_block(PCI_IO_SIZE);
+-	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
+-	if (r < 0)
+-		return r;
+-	vpci->port_addr = (u16)r;
+-
++	/* Let's have some sensible initial values for the BARs. */
++	vpci->port_addr = (u16)pci_get_io_port_block(PCI_IO_SIZE);
+ 	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+-	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
+-			       virtio_pci__io_mmio_callback, vdev);
+-	if (r < 0)
+-		goto free_ioport;
+-
+ 	vpci->msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
+-	r = kvm__register_mmio(kvm, vpci->msix_io_block, PCI_IO_SIZE * 2, false,
+-			       virtio_pci__msix_mmio_callback, vdev);
+-	if (r < 0)
+-		goto free_mmio;
  
--	/* Map the BARs into the guest or setup a trap region. */
--	ret = vfio_map_region(kvm, vdev, region);
--	if (ret)
--		return ret;
-+	if (map_now) {
-+		/* Map the BARs into the guest or setup a trap region. */
-+		ret = vfio_map_region(kvm, vdev, region);
-+		if (ret)
-+			return ret;
-+	}
+ 	vpci->pci_hdr = (struct pci_device_header) {
+ 		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+@@ -504,17 +656,21 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		.class[2]		= (class >> 16) & 0xff,
+ 		.subsys_vendor_id	= cpu_to_le16(PCI_SUBSYSTEM_VENDOR_ID_REDHAT_QUMRANET),
+ 		.subsys_id		= cpu_to_le16(subsys_id),
+-		.bar[0]			= cpu_to_le32(vpci->port_addr
+-							| PCI_BASE_ADDRESS_SPACE_IO),
+-		.bar[1]			= cpu_to_le32(vpci->mmio_addr
+-							| PCI_BASE_ADDRESS_SPACE_MEMORY),
+-		.bar[2]			= cpu_to_le32(vpci->msix_io_block
+-							| PCI_BASE_ADDRESS_SPACE_MEMORY),
++		/*
++		 * According to PCI Local Bus 3.0, read accesses to reserved or
++		 * unimplemented registers must be completed normally and a data
++		 * value of 0 returned. Set the bars to sensible addresses so
++		 * the guest does not think that they are not implemented.
++		 */
++		.bar[0]                 = vpci->port_addr | PCI_BASE_ADDRESS_SPACE_IO,
++		.bar[1]                 = vpci->mmio_addr | PCI_BASE_ADDRESS_SPACE_MEMORY,
++		.bar[2]                 = vpci->msix_io_block | PCI_BASE_ADDRESS_SPACE_MEMORY,
+ 		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
+ 		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+ 		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+ 		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+ 		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
++		.cfg_ops.write		= virtio_pci__config_wr,
+ 	};
+ 
+ 	vpci->dev_hdr = (struct device_header) {
+@@ -547,20 +703,12 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 
+ 	r = device__register(&vpci->dev_hdr);
+ 	if (r < 0)
+-		goto free_msix_mmio;
++		return r;
+ 
+ 	/* save the IRQ that device__register() has allocated */
+ 	vpci->legacy_irq_line = vpci->pci_hdr.irq_line;
  
  	return 0;
+-
+-free_msix_mmio:
+-	kvm__deregister_mmio(kvm, vpci->msix_io_block);
+-free_mmio:
+-	kvm__deregister_mmio(kvm, vpci->mmio_addr);
+-free_ioport:
+-	ioport__unregister(kvm, vpci->port_addr);
+-	return r;
  }
+ 
+ int virtio_pci__reset(struct kvm *kvm, struct virtio_device *vdev)
 -- 
 2.20.1
 
