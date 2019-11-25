@@ -2,84 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E6EEA1093F3
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 20:07:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10EB310948B
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 21:13:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727138AbfKYTHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 14:07:36 -0500
-Received: from mail-il1-f193.google.com ([209.85.166.193]:37734 "EHLO
-        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725799AbfKYTHg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 14:07:36 -0500
-Received: by mail-il1-f193.google.com with SMTP id s5so15237271iln.4
-        for <kvm@vger.kernel.org>; Mon, 25 Nov 2019 11:07:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uxg5HUbuTNPv9TZS2m101TfjoAcQvznXZTZhO4Sew/M=;
-        b=YcVMb1LRVpwa6yTgLQyEh5/k5v9KJIQqzG+ilyfQm7G+taD6dWwghScTobFhZqm6oy
-         eoZWyL79itbjaPV8niFxl3xN2KSZdY6VGbCS0sLvtLA5GfpJMXeTFotFYv7mklb7d34/
-         K+IhdHe94oIErw5pVUpoLK4gdqANMJCyExr8Qx0V9DhTH8CIFh8iX4SrBbryW96nMYHU
-         MCOepLPfTvzgQdx+eZIgcl1S5zgJynSyLANVX15Rm400zIGGMBNgdVuIswbU5JrLC3m6
-         gpYLV2UByG9ArDO9d3sahz0j49ahMLIJ2Kxi7bqsNsUzmwgSP21ckqIvF23zTG0wmlYV
-         0K8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uxg5HUbuTNPv9TZS2m101TfjoAcQvznXZTZhO4Sew/M=;
-        b=cwo2+MhDbdfWoGJEf6Zvmr+DISFPXmsj/FR6UtgSaZ68r2A+ODyAtkz6fwgJE5Uizx
-         qWPrep/1hbdGfFaxbdmscx7NrQG5Z/kYXbzz1qSOU4PdGtgkBTpXaiM5g59okXscTH7q
-         lXFvSLHQsOw94pBA61sUraExyGLttoxrh5s7ac3mtA5JuUPioa/UdGyuwds0SB9ow78s
-         MxVNXZ2WqRbJvzc+xubayMty5W7iumJMVZPL9A4zrBlyPuAF+2RRMF16DaC1nnZiU9A8
-         WBbv5jqg4Hzoe4JhKTVwF+KZwElhODAuWDlNQ8rtZIf9+lK0IT8BESJhKnzK3qYB6iJt
-         ig/Q==
-X-Gm-Message-State: APjAAAXbe3IRFEfHrj/MOlD+sKw0Z57klYFdcucUgMtRZUm7uIkeHHUe
-        RY62vAYPMUQmyw4SS3YhkmN8SOQb/TBGvZ8vAmP6jA==
-X-Google-Smtp-Source: APXvYqwMpr1hW/rwgUerZPkyrHN4UTM1+E1/N6RPpLYJoWfa0agGgCpfc5HP0OGYjfDrtGgK4Pw6KcNy6Lq/IT0Ug84=
-X-Received: by 2002:a92:c981:: with SMTP id y1mr33566633iln.53.1574708854881;
- Mon, 25 Nov 2019 11:07:34 -0800 (PST)
+        id S1726984AbfKYUN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 15:13:58 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:10773 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725882AbfKYUN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 15:13:57 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5ddc36070000>; Mon, 25 Nov 2019 12:14:00 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 25 Nov 2019 12:13:56 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 25 Nov 2019 12:13:56 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 Nov
+ 2019 20:13:55 +0000
+Subject: Re: [PATCH 07/19] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     kbuild test robot <lkp@intel.com>
+CC:     <kbuild-all@lists.01.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>, Jan Kara <jack@suse.cz>,
+        <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        Dave Chinner <david@fromorbit.com>,
+        <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        Paul Mackerras <paulus@samba.org>,
+        <linux-kselftest@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>,
+        Jonathan Corbet <corbet@lwn.net>, <linux-rdma@vger.kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Rapoport <rppt@linux.ibm.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        <linux-media@vger.kernel.org>, Shuah Khan <shuah@kernel.org>,
+        <linux-block@vger.kernel.org>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Jens Axboe <axboe@kernel.dk>, <netdev@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <linux-fsdevel@vger.kernel.org>, <bpf@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Mike Kravetz <mike.kravetz@oracle.com>
+References: <20191125042011.3002372-8-jhubbard@nvidia.com>
+ <201911251639.UWS3hE3Y%lkp@intel.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <3989f406-c333-59f8-027a-e3506af59028@nvidia.com>
+Date:   Mon, 25 Nov 2019 12:13:55 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20190710201244.25195-1-brijesh.singh@amd.com> <20190710201244.25195-9-brijesh.singh@amd.com>
-In-Reply-To: <20190710201244.25195-9-brijesh.singh@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 25 Nov 2019 11:07:23 -0800
-Message-ID: <CAMkAt6ouYHH6tg=SrGLoh1kEua2BY+WksaM0oRhVTW-i64rTaA@mail.gmail.com>
-Subject: Re: [PATCH v3 08/11] KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <201911251639.UWS3hE3Y%lkp@intel.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="windows-1252"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1574712840; bh=xIrvhzi9FQlGBM90SU8S2M4hsd9JLL89vrPzYePQebc=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=nLQ5e77gFGxdvd47gRiRGHQbc1wVG8bwNbuGbyST1Q+jBowT4WflUsZ9otzD54lLB
+         J2wcW1AWxZ1vtAVadAvnnzHYEB9/RMQVx2Q02xRhkx6jKeVYJqp1Vzd24M3MZT/KvC
+         2r/IXfhmoHhQNFs1s+Ijlm3sbCcfcCTqQLXfh/u6EJodBjYv13WjZ+5uA/qpRqF5KJ
+         cgfhkSAYwIIVs+guU8WDjo4g7p8fk0VqKWKusesTvojs5xnlpb4TJcK/V2onbK8LWW
+         ksqnqfXGTA8sAX8XklRUC+OhMkFBYvdHQY7BxmxtkVVkFbYIpBRqVJEp1i5QjV+FwU
+         IkbF7UmcnHQ6g==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->  struct kvm_arch_async_pf {
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 3089942f6630..431718309359 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -135,6 +135,8 @@ struct kvm_sev_info {
->         int fd;                 /* SEV device fd */
->         unsigned long pages_locked; /* Number of pages locked */
->         struct list_head regions_list;  /* List of registered regions */
-> +       unsigned long *page_enc_bmap;
-> +       unsigned long page_enc_bmap_size;
->  };
->
+On 11/25/19 12:44 AM, kbuild test robot wrote:
+> Hi John,
+> 
+> Thank you for the patch! Yet something to improve:
+> 
+> [auto build test ERROR on rdma/for-next]
+> [cannot apply to v5.4 next-20191122]
+> [if your patch is applied to the wrong git tree, please drop us a note to help
+> improve the system. BTW, we also suggest to use '--base' option to specify the
+> base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
+> 
+> url:    https://github.com/0day-ci/linux/commits/John-Hubbard/pin_user_pages-reduced-risk-series-for-Linux-5-5/20191125-125637
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git for-next
+> config: arm-randconfig-a001-20191125 (attached as .config)
+> compiler: arm-linux-gnueabi-gcc (GCC) 7.4.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.4.0 make.cross ARCH=arm 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    mm/gup.o: In function `pin_user_pages_remote':
+>>> mm/gup.c:2528: undefined reference to `get_user_pages_remote'
+> 
+> vim +2528 mm/gup.c
 
-Just a high level question. Would it be better for these bitmaps to
-live in kvm_memory_slot and the ioctl to be take a memslot instead of
-a GPA + length? The c-bit status bitmap will probably need to be
-checked at when checking the dirty log and KVM_GET_DIRTY_LOG
-operations on memslots.
+
+This, and the other (sh) report, is due to !CONFIG_MMU lacking a get_user_pages_remote(), 
+but pin_user_pages_remote() needs it for a (temporary) implementation. I'll post the fix, 
+in v2.
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
