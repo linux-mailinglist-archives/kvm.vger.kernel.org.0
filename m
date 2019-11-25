@@ -2,58 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7042F108B06
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 10:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D1C7108B2F
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 10:49:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727193AbfKYJhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 04:37:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25421 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727052AbfKYJhT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Nov 2019 04:37:19 -0500
+        id S1727332AbfKYJtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 04:49:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44101 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727052AbfKYJtL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 04:49:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574674638;
+        s=mimecast20190719; t=1574675350;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PiqjedxAFN+dSi/udCuMYwMO1iGMtAE7u2HqW+1iDsw=;
-        b=MxtuzZw5NL03FbM1TZmzrCMsI9B+zKBv7AMa7WQyFnKHK2+IGNEEm67AJnfti1um6rERMJ
-        BzGcmNRuKI3g4VPw+mVUKyfnvNvHyL/XqGCBO8lMNfF736rPGlCvtYa1eQ/MUm6flRAanU
-        LhbM7CjykuSwiennrERXZzNrucaThPI=
+        bh=LI90vjXh2HXUGcnDPIxy5xrhkGpcg6ttLKuY2YJfARU=;
+        b=aIJofAWWfB45O1ifaaxgp7F/Mjy1pA1nLVDUAcyWtMsyiRe3ITdUx6z74ODSBP6PynCYGg
+        eM1z+ZGaFwr3N4hMhV50tdhiULR7DbGujZAbjcREIuq90IJNcRakCl2cop7aIl7OPRYzM6
+        ZrxQdxOGrQZuhqC8koLF60rIleQGw6o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-LZIhOXWON6yAqii7gehcAg-1; Mon, 25 Nov 2019 04:37:16 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-20-8zfc_lBjPRynSK0RUXnuaA-1; Mon, 25 Nov 2019 04:49:09 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93B7B801E5E;
-        Mon, 25 Nov 2019 09:37:14 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1D0E107ACE5;
+        Mon, 25 Nov 2019 09:49:07 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5DA585C1D4;
-        Mon, 25 Nov 2019 09:37:08 +0000 (UTC)
-Date:   Mon, 25 Nov 2019 10:37:06 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8DDD510016DA;
+        Mon, 25 Nov 2019 09:49:00 +0000 (UTC)
+Date:   Mon, 25 Nov 2019 10:48:59 +0100
 From:   Igor Mammedov <imammedo@redhat.com>
-To:     Beata Michalska <beata.michalska@linaro.org>
-Cc:     Xiang Zheng <zhengxiang9@huawei.com>,
-        Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
-        kvm@vger.kernel.org, mst@redhat.com, wanghaibin.wang@huawei.com,
-        mtosatti@redhat.com, linuxarm@huawei.com, qemu-devel@nongnu.org,
-        gengdongjiu@huawei.com, shannon.zhaosl@gmail.com,
-        qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     gengdongjiu <gengdongjiu@huawei.com>, peter.maydell@linaro.org,
+        ehabkost@redhat.com, kvm@vger.kernel.org,
+        wanghaibin.wang@huawei.com, mtosatti@redhat.com,
+        qemu-devel@nongnu.org, linuxarm@huawei.com,
+        shannon.zhaosl@gmail.com, Xiang Zheng <zhengxiang9@huawei.com>,
+        qemu-arm@nongnu.org, james.morse@arm.com,
         jonathan.cameron@huawei.com, pbonzini@redhat.com,
-        Laszlo Ersek <lersek@redhat.com>, rth@twiddle.net
-Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
- from kernel or KVM
-Message-ID: <20191125103706.46300ff1@redhat.com>
-In-Reply-To: <CADSWDzsg9aMCbbLadmc+twmJw3dZvRYgqKKWsDQRiJSRS7=GDQ@mail.gmail.com>
+        xuwei5@huawei.com, lersek@redhat.com, rth@twiddle.net
+Subject: Re: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
+ support
+Message-ID: <20191125104859.70047602@redhat.com>
+In-Reply-To: <20191118082036-mutt-send-email-mst@kernel.org>
 References: <20191111014048.21296-1-zhengxiang9@huawei.com>
-        <20191111014048.21296-6-zhengxiang9@huawei.com>
-        <20191115173713.795e5f63@redhat.com>
-        <CADSWDzsg9aMCbbLadmc+twmJw3dZvRYgqKKWsDQRiJSRS7=GDQ@mail.gmail.com>
+        <20191111014048.21296-4-zhengxiang9@huawei.com>
+        <20191115103801.547fc84d@redhat.com>
+        <cf5e5aa4-2283-6cf9-70d0-278d167e3a13@huawei.com>
+        <87758ec2-c242-71c3-51f8-a5d348f8e7fd@huawei.com>
+        <20191118082036-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: LZIhOXWON6yAqii7gehcAg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 8zfc_lBjPRynSK0RUXnuaA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -62,72 +64,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Nov 2019 15:47:24 +0000
-Beata Michalska <beata.michalska@linaro.org> wrote:
+On Mon, 18 Nov 2019 08:21:18 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> Hi,
+> On Mon, Nov 18, 2019 at 09:18:01PM +0800, gengdongjiu wrote:
+> > On 2019/11/18 20:49, gengdongjiu wrote:  
+> > >>> +     */
+> > >>> +    build_append_int_noprefix(table_data, source_id, 2);
+> > >>> +    /* Related Source Id */
+> > >>> +    build_append_int_noprefix(table_data, 0xffff, 2);
+> > >>> +    /* Flags */
+> > >>> +    build_append_int_noprefix(table_data, 0, 1);
+> > >>> +    /* Enabled */
+> > >>> +    build_append_int_noprefix(table_data, 1, 1);
+> > >>> +
+> > >>> +    /* Number of Records To Pre-allocate */
+> > >>> +    build_append_int_noprefix(table_data, 1, 4);
+> > >>> +    /* Max Sections Per Record */
+> > >>> +    build_append_int_noprefix(table_data, 1, 4);
+> > >>> +    /* Max Raw Data Length */
+> > >>> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
+> > >>> +
+> > >>> +    /* Error Status Address */
+> > >>> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
+> > >>> +                     4 /* QWord access */, 0);
+> > >>> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> > >>> +        ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),  
+> > >> it's fine only if GHESv2 is the only entries in HEST, but once
+> > >> other types are added this macro will silently fall apart and
+> > >> cause table corruption.  
+> >    why  silently fall?
+> >    I think the acpi_ghes.c only support GHESv2 type, not support other type.
+> >   
+> > >>
+> > >> Instead of offset from hest_start, I suggest to use offset relative
+> > >> to GAS structure, here is an idea>>
+> > >> #define GAS_ADDR_OFFSET 4
+> > >>
+> > >>     off = table->len
+> > >>     build_append_gas()
+> > >>     bios_linker_loader_add_pointer(...,
+> > >>         off + GAS_ADDR_OFFSET, ...  
+> > 
+> > If use offset relative to GAS structure, the code does not easily extend to support more Generic Hardware Error Source.
+> > if use offset relative to hest_start, just use a loop, the code can support  more error source, for example:
+> > for (source_id = 0; i<n; source_id++)
+> > {
+> >    ......
+> >     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> >         ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),
+> >         sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
+> >         source_id * sizeof(uint64_t));
+> >   .......
+> > }
+> > 
+> > My previous series patch support 2 error sources, but now only enable 'SEA' type Error Source  
 > 
-> On Fri, 15 Nov 2019 at 16:54, Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > On Mon, 11 Nov 2019 09:40:47 +0800
-> > Xiang Zheng <zhengxiang9@huawei.com> wrote:
-> >  
-> > > From: Dongjiu Geng <gengdongjiu@huawei.com>
-> > >
-> > > Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> > > translates the host VA delivered by host to guest PA, then fills this PA
-> > > to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> > > type.
-> > >
-> > > When guest accesses the poisoned memory, it will generate a Synchronous
-> > > External Abort(SEA). Then host kernel gets an APEI notification and calls
-> > > memory_failure() to unmapped the affected page in stage 2, finally
-> > > returns to guest.
-> > >
-> > > Guest continues to access the PG_hwpoison page, it will trap to KVM as
-> > > stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> > > Qemu, Qemu records this error address into guest APEI GHES memory and
-> > > notifes guest using Synchronous-External-Abort(SEA).
-> > >
-> > > In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
-> > > in which we can setup the type of exception and the syndrome information.
-> > > When switching to guest, the target vcpu will jump to the synchronous
-> > > external abort vector table entry.
-> > >
-> > > The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
-> > > ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> > > not valid and hold an UNKNOWN value. These values will be set to KVM
-> > > register structures through KVM_SET_ONE_REG IOCTL.
-> > >
-> > > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> > > Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  hw/acpi/acpi_ghes.c         | 297 ++++++++++++++++++++++++++++++++++++
-[...]
-> > > +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
-> > > +                                      uint64_t error_physical_addr,
-> > > +                                      uint32_t data_length)
-> > > +{
-> > > +    GArray *block;
-> > > +    uint64_t current_block_length;
-> > > +    /* Memory Error Section Type */
-> > > +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;  
-> >                                ^^
-> > UEFI_CPER_SEC_PLATFORM_MEM is defined as BE, so _le here is wrong
-> > and then later you use qemu_uuid_bswap() to make it LE.
-> >
-> > Why not define it as LE to begin with, like it's been done for NVDIMM_UUID_LE?
-> >  
-> Is there a chance to make it common for both ?
+> I'd try to merge this, worry about extending things later.
+> This is at v21 and the simpler you can keep things,
+> the faster it'll go in.
+I don't think the series is ready for merging yet.
+It has a number of issues (not stylistic ones) that need to be fixed first.
 
-sure, it just should be a separate patch.
+As for extending, I think I've suggested to simplify series
+to account for single error source only in some places so it
+would be easier on author and reviewers and worry about extending
+it later.
 
-Maybe put it in include/qemu/uuid.h
-or maybe make qemu_uuid_parse() return QemuUUID
-so we could initialize like this:
-  QemuUUID mem_section_id_le = qemu_uuid_parse("00000000-0000-0000-0000-000000000000", &error_abort);
-where used UUID value is easy to read and compare with spec.
-
-[...]
 
