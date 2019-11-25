@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C55F9108BCD
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EBA9108BC4
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:32:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbfKYKcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 05:32:39 -0500
-Received: from foss.arm.com ([217.140.110.172]:47744 "EHLO foss.arm.com"
+        id S1727570AbfKYKck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 05:32:40 -0500
+Received: from foss.arm.com ([217.140.110.172]:47752 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727569AbfKYKci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 05:32:38 -0500
+        id S1727553AbfKYKcj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 05:32:39 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 15340328;
-        Mon, 25 Nov 2019 02:32:38 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 31C051045;
+        Mon, 25 Nov 2019 02:32:39 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 283113F52E;
-        Mon, 25 Nov 2019 02:32:37 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 492553F52E;
+        Mon, 25 Nov 2019 02:32:38 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
         andre.przywara@arm.com, sami.mujawar@arm.com,
         lorenzo.pieralisi@arm.com
-Subject: [PATCH kvmtool 07/16] pci: Fix ioport allocation size
-Date:   Mon, 25 Nov 2019 10:30:24 +0000
-Message-Id: <20191125103033.22694-8-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 08/16] arm/pci: Fix PCI IO region
+Date:   Mon, 25 Nov 2019 10:30:25 +0000
+Message-Id: <20191125103033.22694-9-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191125103033.22694-1-alexandru.elisei@arm.com>
 References: <20191125103033.22694-1-alexandru.elisei@arm.com>
@@ -37,120 +37,105 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Julien Thierry <julien.thierry@arm.com>
 
-The PCI Local Bus Specification, Rev. 3.0, Section 6.2.5.1. "Address Maps"
-states: "Devices that map control functions into I/O Space must not consume
-more than 256 bytes per I/O Base Address register."
+Current PCI IO region that is exposed through the DT contains ports that
+are reserved by non-PCI devices.
 
-Yet all the PCI devices allocate IO ports of IOPORT_SIZE (= 1024 bytes).
-
-Fix this by having PCI devices use 256 bytes ports for IO BARs.
-
-There is no hard requirement on the size of the memory region described
-by memory BARs. However, the region must be big enough to hold the
-virtio common interface described in [1], which is 20 bytes, and other
-MSI-X and/or device specific configuration. To be consistent, let's also
-limit the memory region described by BAR1 to 256. This is the same size
-used by BAR2 for each of the two MSI-X vectors.
-
-[1] VIRTIO Version 1.0 Committee Specification 04, section 4.4.8.
+Use the proper PCI IO start so that the region exposed through DT can
+actually be used to reassign device BARs.
 
 Cc: julien.thierry.kdev@gmail.com
 Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-[Added rationale for changing BAR1 size to PCI_IO_SIZE]
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- hw/vesa.c            |  4 ++--
- include/kvm/ioport.h |  1 -
- pci.c                |  2 +-
- virtio/pci.c         | 15 +++++++--------
- 4 files changed, 10 insertions(+), 12 deletions(-)
+ arm/include/arm-common/pci.h |  1 +
+ arm/kvm.c                    |  3 +++
+ arm/pci.c                    | 21 ++++++++++++++++++---
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/hw/vesa.c b/hw/vesa.c
-index 70ab59974f76..0191e9264666 100644
---- a/hw/vesa.c
-+++ b/hw/vesa.c
-@@ -62,8 +62,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
+diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+index 9008a0ed072e..aea42b8895e9 100644
+--- a/arm/include/arm-common/pci.h
++++ b/arm/include/arm-common/pci.h
+@@ -1,6 +1,7 @@
+ #ifndef ARM_COMMON__PCI_H
+ #define ARM_COMMON__PCI_H
  
- 	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
- 		return NULL;
--	r = pci_get_io_port_block(IOPORT_SIZE);
--	r = ioport__register(kvm, r, &vesa_io_ops, IOPORT_SIZE, NULL);
-+	r = pci_get_io_port_block(PCI_IO_SIZE);
-+	r = ioport__register(kvm, r, &vesa_io_ops, PCI_IO_SIZE, NULL);
- 	if (r < 0)
- 		return ERR_PTR(r);
++void pci__arm_init(struct kvm *kvm);
+ void pci__generate_fdt_nodes(void *fdt);
  
-diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-index b10fcd5b4412..8c86b7151f25 100644
---- a/include/kvm/ioport.h
-+++ b/include/kvm/ioport.h
-@@ -14,7 +14,6 @@
+ #endif /* ARM_COMMON__PCI_H */
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 1f85fc60588f..5c30ec1e0515 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -6,6 +6,7 @@
+ #include "kvm/fdt.h"
  
- /* some ports we reserve for own use */
- #define IOPORT_DBG			0xe0
--#define IOPORT_SIZE			0x400
+ #include "arm-common/gic.h"
++#include "arm-common/pci.h"
  
- struct kvm;
- 
-diff --git a/pci.c b/pci.c
-index 32a07335a765..b4677434c50c 100644
---- a/pci.c
-+++ b/pci.c
-@@ -20,7 +20,7 @@ static u16 io_port_blocks		= PCI_IOPORT_START;
- 
- u16 pci_get_io_port_block(u32 size)
- {
--	u16 port = ALIGN(io_port_blocks, IOPORT_SIZE);
-+	u16 port = ALIGN(io_port_blocks, PCI_IO_SIZE);
- 
- 	io_port_blocks = port + size;
- 	return port;
-diff --git a/virtio/pci.c b/virtio/pci.c
-index d73414abde05..eeb5b5efa6e1 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -421,7 +421,7 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
- {
- 	struct virtio_pci *vpci = ptr;
- 	int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
--	u16 port = vpci->port_addr + (addr & (IOPORT_SIZE - 1));
-+	u16 port = vpci->port_addr + (addr & (PCI_IO_SIZE - 1));
- 
- 	kvm__emulate_io(vcpu, port, data, direction, len, 1);
+ #include <linux/kernel.h>
+ #include <linux/kvm.h>
+@@ -86,6 +87,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+ 	/* Create the virtual GIC. */
+ 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+ 		die("Failed to create virtual GIC");
++
++	pci__arm_init(kvm);
  }
-@@ -435,17 +435,16 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	vpci->kvm = kvm;
- 	vpci->dev = dev;
  
--	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
- 	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
+ #define FDT_ALIGN	SZ_2M
+diff --git a/arm/pci.c b/arm/pci.c
+index ed325fa4a811..1c0949a22408 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -1,3 +1,5 @@
++#include "linux/sizes.h"
++
+ #include "kvm/devices.h"
+ #include "kvm/fdt.h"
+ #include "kvm/kvm.h"
+@@ -7,6 +9,11 @@
  
--	r = pci_get_io_port_block(IOPORT_SIZE);
--	r = ioport__register(kvm, r, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
-+	r = pci_get_io_port_block(PCI_IO_SIZE);
-+	r = ioport__register(kvm, r, &virtio_pci__io_ops, PCI_IO_SIZE, vdev);
- 	if (r < 0)
- 		return r;
- 	vpci->port_addr = (u16)r;
+ #include "arm-common/pci.h"
  
--	vpci->mmio_addr = pci_get_mmio_block(IOPORT_SIZE);
--	r = kvm__register_mmio(kvm, vpci->mmio_addr, IOPORT_SIZE, false,
-+	vpci->mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
-+	r = kvm__register_mmio(kvm, vpci->mmio_addr, PCI_IO_SIZE, false,
- 			       virtio_pci__io_mmio_callback, vpci);
- 	if (r < 0)
- 		goto free_ioport;
-@@ -475,8 +474,8 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 							| PCI_BASE_ADDRESS_SPACE_MEMORY),
- 		.status			= cpu_to_le16(PCI_STATUS_CAP_LIST),
- 		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
--		.bar_size[0]		= cpu_to_le32(IOPORT_SIZE),
--		.bar_size[1]		= cpu_to_le32(IOPORT_SIZE),
-+		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
-+		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
- 		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
- 	};
++#define ARM_PCI_IO_START ALIGN(PCI_IOPORT_START, SZ_4K)
++
++/* Must be a multiple of 4k */
++#define ARM_PCI_IO_SIZE ((ARM_MMIO_AREA - ARM_PCI_IO_START) & ~(SZ_4K - 1))
++
+ /*
+  * An entry in the interrupt-map table looks like:
+  * <pci unit address> <pci interrupt pin> <gic phandle> <gic interrupt>
+@@ -24,6 +31,14 @@ struct of_interrupt_map_entry {
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
  
++void pci__arm_init(struct kvm *kvm)
++{
++	u32 align_pad = ARM_PCI_IO_START - PCI_IOPORT_START;
++
++	/* Make PCI port allocation start at a properly aligned address */
++	pci_get_io_port_block(align_pad);
++}
++
+ void pci__generate_fdt_nodes(void *fdt)
+ {
+ 	struct device_header *dev_hdr;
+@@ -40,10 +55,10 @@ void pci__generate_fdt_nodes(void *fdt)
+ 			.pci_addr = {
+ 				.hi	= cpu_to_fdt32(of_pci_b_ss(OF_PCI_SS_IO)),
+ 				.mid	= 0,
+-				.lo	= 0,
++				.lo	= cpu_to_fdt32(ARM_PCI_IO_START),
+ 			},
+-			.cpu_addr	= cpu_to_fdt64(KVM_IOPORT_AREA),
+-			.length		= cpu_to_fdt64(ARM_IOPORT_SIZE),
++			.cpu_addr	= cpu_to_fdt64(ARM_PCI_IO_START),
++			.length		= cpu_to_fdt64(ARM_PCI_IO_SIZE),
+ 		},
+ 		{
+ 			.pci_addr = {
 -- 
 2.20.1
 
