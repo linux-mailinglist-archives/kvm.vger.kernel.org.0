@@ -2,126 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ABA4109326
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 18:54:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FCEB109346
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 19:08:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729228AbfKYRyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 12:54:19 -0500
-Received: from mga12.intel.com ([192.55.52.136]:14985 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729220AbfKYRyT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 12:54:19 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Nov 2019 09:54:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,242,1571727600"; 
-   d="scan'208";a="216979269"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Nov 2019 09:54:17 -0800
-Date:   Mon, 25 Nov 2019 09:54:17 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        James Morris <jmorris@namei.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Ingo Molnar <mingo@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Pavel Tatashin <pasha.tatashin@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Philippe Ombredanne <pombredanne@nexb.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: general protection fault in __schedule (2)
-Message-ID: <20191125175417.GD12178@linux.intel.com>
-References: <000000000000e67a05057314ddf6@google.com>
- <0000000000005eb1070597ea3a1f@google.com>
- <20191122205453.GE31235@linux.intel.com>
- <CACT4Y+b9FD8GTHc0baY-kUkuNFo-gdXCJ-uk5JtJSyjsyt8jTg@mail.gmail.com>
+        id S1729284AbfKYSIm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 13:08:42 -0500
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:1622 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727722AbfKYSIl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Nov 2019 13:08:41 -0500
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAPI7ENg031551;
+        Mon, 25 Nov 2019 10:08:05 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=facebook;
+ bh=rW9alH6/9vNgEUeMGHz5SORSEbxri1Rb35XfLT6ieng=;
+ b=bsu1D6Txg3/l8tRR6NEx2IpE45XgK5IPqEAKIvXmrcT961VI2sOTe4e3YH6nl7K0h0Vl
+ biopHT5mjylj2fFvWuanvOUsdVgVrAv9NZt7srg5TUX8ezebB3j/cjjwrpLWCZ1glH+Q
+ mqmatsBReZ9m8n7KvURkwm3Fhqqf8ICfQMI= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com with ESMTP id 2wfnbfy517-18
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Mon, 25 Nov 2019 10:08:03 -0800
+Received: from ash-exhub104.TheFacebook.com (2620:10d:c0a8:82::d) by
+ ash-exhub101.TheFacebook.com (2620:10d:c0a8:82::e) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 25 Nov 2019 10:07:52 -0800
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (100.104.31.183)
+ by o365-in.thefacebook.com (100.104.35.175) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 25 Nov 2019 10:07:52 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HqTSkFdy1Hv6g0wRrO8dFw4mefUEuFwCLpAIpl16DzJF/fc3L6zjv5kvl/lQIexPyeDrDocMV+REffwHRm8KMep/23K3NcS0fXevLoevPmuge4t8yMZCfGK15MtWwF8j6q6ukg16hUc69aJZJNiDaPISDR7ZPbiuAY48cSZx8MXbudGADz5EtdOTeqVp6zlhabiLx+CVM/CFNmSotqS1hAGDyDPLOrNKhzpI9KAeygRR79P5x8IPSYomAKHizdR/BnRGmvBz+9BqnJH18EzKjxpal8b8pi8jOcTCddlAWeVQaFT6TLCKdOSH2fLRRB3TzZFj+YzdZEg/PYrKCw2/3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rW9alH6/9vNgEUeMGHz5SORSEbxri1Rb35XfLT6ieng=;
+ b=k8+cAH78PhqKg0T8yrPN2avAWzRWovhWmgmlpEr9aMJo7oW1MHqZefz33jdslCd+lC8Hkl+sCHQfBzFXEyY7t78SdIb06awePCV629E8121OHKxFY8aorhNOZ48/lofofcdv7nIug6956gRJZQjII+x+iQ6J0TxGDHptLnAPrYZkTf91o4STAZbAMAAHI1YUxB+gTmsYqTSVVt3dBlAPNOPnQPTx9ErXyODAzDqWutbuEP1KTODRuyNUYO60+TpkVop9p+WViFIZi6nqOxhpPSgn/Uf6ZwR6OJKwQaFqPNGZ+HOXEG3G45qlul0LDBLjgdOgvQebwXsvM79zpoRSeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fb.com; dmarc=pass action=none header.from=fb.com; dkim=pass
+ header.d=fb.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector2-fb-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rW9alH6/9vNgEUeMGHz5SORSEbxri1Rb35XfLT6ieng=;
+ b=C3wDHeZJzexC3OasJ3oD9RsCxdS1bUkYcoz0Zv6XoVuBglW3gZiCOYs1GhZUMIQurJLB+mnnHRMnJHKnYVcp3TEUHAfp3urWC7n/iOkrmAUbmsZdTlSSschhDSUXN3BoaPyW8HK13xSql9A8YPqKF5X3Z+vAa09a2d0b2u1I0Yo=
+Received: from BN8PR15MB2626.namprd15.prod.outlook.com (20.179.137.220) by
+ BN8PR15MB3426.namprd15.prod.outlook.com (20.179.76.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.21; Mon, 25 Nov 2019 18:07:51 +0000
+Received: from BN8PR15MB2626.namprd15.prod.outlook.com
+ ([fe80::50eb:bc03:b3de:375c]) by BN8PR15MB2626.namprd15.prod.outlook.com
+ ([fe80::50eb:bc03:b3de:375c%7]) with mapi id 15.20.2474.023; Mon, 25 Nov 2019
+ 18:07:51 +0000
+From:   Roman Gushchin <guro@fb.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+        Kernel Team <Kernel-team@fb.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "longman@redhat.com" <longman@redhat.com>,
+        "shakeelb@google.com" <shakeelb@google.com>,
+        "vdavydov.dev@gmail.com" <vdavydov.dev@gmail.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: WARNING bisected (was Re: [PATCH v7 08/10] mm: rework non-root
+ kmem_cache lifecycle management)
+Thread-Topic: WARNING bisected (was Re: [PATCH v7 08/10] mm: rework non-root
+ kmem_cache lifecycle management)
+Thread-Index: AQHVoF1eUJGIXl/jo02oA2+fhmBRU6eV2PaAgAAAgACAAB16AIABbCgAgAIbagCAAg2xAIAAqYoA
+Date:   Mon, 25 Nov 2019 18:07:50 +0000
+Message-ID: <20191125180744.GA9800@localhost.localdomain>
+References: <20190611231813.3148843-9-guro@fb.com>
+ <20191121111739.3054-1-borntraeger@de.ibm.com>
+ <20191121165807.GA201621@localhost.localdomain>
+ <c6a2696b-6e35-de7c-8387-b21285b6776f@de.ibm.com>
+ <20191121184524.GA4758@localhost.localdomain>
+ <903c101d-45bc-1e52-3c01-1e65cd4ef43e@de.ibm.com>
+ <20191124003924.GA7816@localhost.localdomain>
+ <e2923bb7-19bf-b303-9457-49040acffe92@de.ibm.com>
+In-Reply-To: <e2923bb7-19bf-b303-9457-49040acffe92@de.ibm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: MWHPR13CA0017.namprd13.prod.outlook.com
+ (2603:10b6:300:16::27) To BN8PR15MB2626.namprd15.prod.outlook.com
+ (2603:10b6:408:c7::28)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [2620:10d:c090:180::a91]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 24ad1d79-e9bb-4fa9-2efd-08d771d26278
+x-ms-traffictypediagnostic: BN8PR15MB3426:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN8PR15MB3426F17E533487467B240458BE4A0@BN8PR15MB3426.namprd15.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:206;
+x-forefront-prvs: 0232B30BBC
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(39860400002)(366004)(376002)(346002)(136003)(189003)(199004)(76176011)(25786009)(9686003)(1076003)(71200400001)(102836004)(46003)(53546011)(6512007)(6486002)(6506007)(386003)(6436002)(14454004)(316002)(99286004)(54906003)(71190400001)(6916009)(86362001)(14444005)(256004)(52116002)(8676002)(81156014)(81166006)(8936002)(305945005)(5660300002)(229853002)(6246003)(186003)(4326008)(446003)(11346002)(66556008)(66446008)(66476007)(478600001)(2906002)(66946007)(64756008)(6116002)(33656002)(7736002)(7416002);DIR:OUT;SFP:1102;SCL:1;SRVR:BN8PR15MB3426;H:BN8PR15MB2626.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: fb.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uXNZvMbcq0j82wuDuZ6in0Y8v7jjeuZTxMSCI7WEjt3rdNWBqBK3sxZwuKfS2aUnfBCaXCi9HCZAhsUHBbgXY9koMwZxq8EdW5qOwjwlrU3rcmlLx4ITJb5/lyOQ1HOgYk9uJgcg7+uv4G3t3usWAT77iYVLgJssh9ei2NbX8mQYImcZ2wyIfgTll+dsTPRi3GGFxzI5L6Z/W2ePWqxnND0v5vKNm8iE5usfk13o6tEOxL2ijEiJPoLQJdc+g5qKWFglIkWEHqHpUD2WkC7ZgDXswbKrLBOCkxKxZPtlBocCFxOihYp6VGI3+tcqxuOMNGl1O+/QxRaeVQsxGHKoJbQcfcnyj55KcmRkXKFsWXc79OFOOlutrj8GrzHJbCJOuTt+aMupTnmuZYz2Fep3bRZnUA+wrprYhSqPHR1hxKEsvr0AqoAupAMw8rScC5E5
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A2A2E360053E3F418DD07C62E45FC4F7@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+b9FD8GTHc0baY-kUkuNFo-gdXCJ-uk5JtJSyjsyt8jTg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24ad1d79-e9bb-4fa9-2efd-08d771d26278
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 18:07:50.9126
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qdDKOXCxz9OdjcBxzx5Ns1GcgFEFdsK4ZsxOhqFrTzMpaYqzV0+QQ8v9dqYtgU/5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR15MB3426
+X-OriginatorOrg: fb.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-25_04:2019-11-21,2019-11-25 signatures=0
+X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 spamscore=0 adultscore=0
+ suspectscore=0 bulkscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911250148
+X-FB-Internal: deliver
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 23, 2019 at 06:15:15AM +0100, Dmitry Vyukov wrote:
-> On Fri, Nov 22, 2019 at 9:54 PM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Thu, Nov 21, 2019 at 11:19:00PM -0800, syzbot wrote:
-> > > syzbot has bisected this bug to:
-> > >
-> > > commit 8fcc4b5923af5de58b80b53a069453b135693304
-> > > Author: Jim Mattson <jmattson@google.com>
-> > > Date:   Tue Jul 10 09:27:20 2018 +0000
-> > >
-> > >     kvm: nVMX: Introduce KVM_CAP_NESTED_STATE
-> > >
-> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124cdbace00000
-> > > start commit:   234b69e3 ocfs2: fix ocfs2 read block panic
-> > > git tree:       upstream
-> > > final crash:    https://syzkaller.appspot.com/x/report.txt?x=114cdbace00000
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=164cdbace00000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=5fa12be50bca08d8
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=7e2ab84953e4084a638d
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=150f0a4e400000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f67111400000
-> > >
-> > > Reported-by: syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com
-> > > Fixes: 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
-> > >
-> > > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> >
-> > Is there a way to have syzbot stop processing/bisecting these things
-> > after a reasonable amount of time?  The original crash is from August of
-> > last year...
-> >
-> > Note, the original crash is actually due to KVM's put_kvm() fd race, but
-> > whatever we want to blame, it's a duplicate.
-> >
-> > #syz dup: general protection fault in kvm_lapic_hv_timer_in_use
-> 
-> Hi Sean,
-> 
-> syzbot only sends bisection results to open bugs with no known fixes.
-> So what you did (marking the bug as invalid/dup, or attaching a fix)
-> would stop it from doing/sending bisection.
-> 
-> "Original crash happened a long time ago" is not necessary a good
-> signal. On the syzbot dashboard
-> (https://syzkaller.appspot.com/upstream), you can see bugs with the
-> original crash 2+ years ago, but they are still pretty much relevant.
-> The default kernel development process strategy for invalidating bug
-> reports by burying them in oblivion has advantages, but also
-> downsides. FWIW syzbot prefers explicit status tracking.
+On Mon, Nov 25, 2019 at 09:00:56AM +0100, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.11.19 01:39, Roman Gushchin wrote:
+> > On Fri, Nov 22, 2019 at 05:28:46PM +0100, Christian Borntraeger wrote:
+> >> On 21.11.19 19:45, Roman Gushchin wrote:
+> >>> I see. Do you know, which kmem_cache it is? If not, can you, please,
+> >>> figure it out?
+> >>
+> >> The release function for that ref is kmemcg_cache_shutdown.=20
+> >>
+> >=20
+> > Hi Christian!
+> >=20
+> > Can you, please, test if the following patch resolves the problem?
+>=20
+> Yes, it does.
 
-I have no objection to explicit status tracking or getting pinged on old
-open bugs.  I suppose I don't even mind the belated bisection, I'd probably
-whine if syzbot didn't do the bisection :-).
+Thanks for testing it!
+I'll send the patch shortly.
 
-What's annoying is the report doesn't provide any information about when it
-originally occured or on what kernel it originally failed.  It didn't occur
-to me that the original bug might be a year old and I only realized it was
-from an old kernel when I saw "4.19.0-rc4+" in the dashboard's sample crash
-log.  Knowing that the original crash was a year old would have saved me
-5-10 minutes of getting myself oriented.
+>=20
+>=20
+> >=20
+> > diff --git a/mm/slab_common.c b/mm/slab_common.c
+> > index 8afa188f6e20..628e5f0ee19e 100644
+> > --- a/mm/slab_common.c
+> > +++ b/mm/slab_common.c
+> > @@ -888,6 +888,8 @@ static int shutdown_memcg_caches(struct kmem_cache =
+*s)
+> > =20
+> >  static void flush_memcg_workqueue(struct kmem_cache *s)
+> >  {
+> > +	bool wait_for_children;
+> > +
+> >  	spin_lock_irq(&memcg_kmem_wq_lock);
+> >  	s->memcg_params.dying =3D true;
+> >  	spin_unlock_irq(&memcg_kmem_wq_lock);
+> > @@ -904,6 +906,13 @@ static void flush_memcg_workqueue(struct kmem_cach=
+e *s)
+> >  	 * previous workitems on workqueue are processed.
+> >  	 */
+> >  	flush_workqueue(memcg_kmem_cache_wq);
+> > +
+> > +	mutex_lock(&slab_mutex);
+> > +	wait_for_children =3D !list_empty(&s->memcg_params.children);
+> > +	mutex_unlock(&slab_mutex);
+>=20
+> Not sure if (for reading) we really need the mutex.
 
-Could syzbot provide the date and reported kernel version (assuming the
-kernel version won't be misleading) of the original failure in its reports?
+Good point!
+At this moment the list of children caches can't grow, only shrink.
+So if we're reading it without the slab mutex, the worst thing can
+happen is that we'll make an excessive rcu_barrier() call.
+Which is fine given that resulting code looks much simpler.
+
+Thanks!
