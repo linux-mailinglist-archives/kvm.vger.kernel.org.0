@@ -2,77 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5470D108C24
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:46:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF07B108C56
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 11:55:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727777AbfKYKqT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Nov 2019 05:46:19 -0500
-Received: from foss.arm.com ([217.140.110.172]:48228 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727767AbfKYKqR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Nov 2019 05:46:17 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13B8B328;
-        Mon, 25 Nov 2019 02:46:17 -0800 (PST)
-Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id DCB133F52E;
-        Mon, 25 Nov 2019 02:46:11 -0800 (PST)
-From:   Jianyong Wu <jianyong.wu@arm.com>
-To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, maz@kernel.org,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
-        jianyong.wu@arm.com, nd@arm.com
-Subject: [RFC PATCH v8 8/8] kvm: arm64: Add capability check extension for ptp_kvm
-Date:   Mon, 25 Nov 2019 18:45:06 +0800
-Message-Id: <20191125104506.36850-9-jianyong.wu@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191125104506.36850-1-jianyong.wu@arm.com>
-References: <20191125104506.36850-1-jianyong.wu@arm.com>
+        id S1727572AbfKYKzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Nov 2019 05:55:06 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:40554 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727278AbfKYKzF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Nov 2019 05:55:05 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1iZC1G-0007GU-5V; Mon, 25 Nov 2019 11:55:02 +0100
+To:     Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2] kvm: arm: VGIC: Fix interrupt group enablement
+X-PHP-Originating-Script: 0:main.inc
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 25 Nov 2019 10:55:01 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>
+In-Reply-To: <20191122185142.65477-1-andre.przywara@arm.com>
+References: <20191122185142.65477-1-andre.przywara@arm.com>
+Message-ID: <e2426986ebc9be4e14eb99028b28a43e@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let userspace check if there is kvm ptp service in host.
-before VMs migrate to a another host, VMM may check if this
-cap is available to determine the migration behaviour.
+On 2019-11-22 18:51, Andre Przywara wrote:
+> Hi Marc,
+>
+> this is still a bit rough, and only briefly tested, but I wanted to
+> hear your opinion on the general approach (using a second list in
+> addition to the ap_list). Some ugly bits come from the fact that the
+> two lists are not that different, so we have to consider both of them
+> at times. This is what I wanted to avoid with just one list that gets
+> filtered on the fly.
+> Or I am just stupid and don't see how it can be done properly ;-)
 
-Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
----
- include/uapi/linux/kvm.h | 1 +
- virt/kvm/arm/arm.c       | 1 +
- 2 files changed, 2 insertions(+)
+I don't know about that, but I think there is a better way.
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2fe12b40d503..a0bff6002bd9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_KVM_PTP 173
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..80999985160b 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -201,6 +201,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_VCPU_EVENTS:
-+	case KVM_CAP_ARM_KVM_PTP:
- 		r = 1;
- 		break;
- 	case KVM_CAP_ARM_SET_DEVICE_ADDR:
+You have essentially two sets of pending interrupts:
+
+1) those that are enabled and group-enabled, that end up in the AP list
+2) those that are either disabled and/or group-disabled
+
+Today, (2) are not on any list. What I'm suggesting is that we create
+a list for these interrupts that cannot be forwarded.
+
+Then enabling an interrupt or a group is a matter of moving pending
+interrupts from one list to another. And I think most of the logic
+can be hidden in vgic_queue_irq_unlock().
+
+         M.
 -- 
-2.17.1
-
+Jazz is not dead. It just smells funny...
