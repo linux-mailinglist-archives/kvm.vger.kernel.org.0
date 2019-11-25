@@ -2,625 +2,311 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B30F5108762
-	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 05:21:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D09108965
+	for <lists+kvm@lfdr.de>; Mon, 25 Nov 2019 08:45:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727286AbfKYEUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Nov 2019 23:20:21 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:9430 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727239AbfKYEUU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Nov 2019 23:20:20 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5ddb56810000>; Sun, 24 Nov 2019 20:20:17 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Sun, 24 Nov 2019 20:20:15 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Sun, 24 Nov 2019 20:20:15 -0800
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 25 Nov
- 2019 04:20:15 +0000
-Received: from hqnvemgw03.nvidia.com (10.124.88.68) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 25 Nov 2019 04:20:15 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by hqnvemgw03.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5ddb567e000b>; Sun, 24 Nov 2019 20:20:14 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 19/19] mm, tree-wide: rename put_user_page*() to unpin_user_page*()
-Date:   Sun, 24 Nov 2019 20:20:11 -0800
-Message-ID: <20191125042011.3002372-20-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191125042011.3002372-1-jhubbard@nvidia.com>
-References: <20191125042011.3002372-1-jhubbard@nvidia.com>
+        id S1725912AbfKYHpX convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 25 Nov 2019 02:45:23 -0500
+Received: from mga17.intel.com ([192.55.52.151]:32531 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725535AbfKYHpX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Nov 2019 02:45:23 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Nov 2019 23:45:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,240,1571727600"; 
+   d="scan'208";a="382728426"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+  by orsmga005.jf.intel.com with ESMTP; 24 Nov 2019 23:45:21 -0800
+Received: from fmsmsx124.amr.corp.intel.com (10.18.125.39) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 24 Nov 2019 23:45:21 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ fmsmsx124.amr.corp.intel.com (10.18.125.39) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sun, 24 Nov 2019 23:45:21 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.215]) with mapi id 14.03.0439.000;
+ Mon, 25 Nov 2019 15:45:19 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+Subject: RE: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
+ to host
+Thread-Topic: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables)
+ to host
+Thread-Index: AQHVimn49qwPncOwpUK3oA3gYR4tBqd/6QGAgAdz7JCAAASEAIABX3gg//++iYCAEx7LIA==
+Date:   Mon, 25 Nov 2019 07:45:18 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A10D40B@SHSMSX104.ccr.corp.intel.com>
+References: <1571919983-3231-1-git-send-email-yi.l.liu@intel.com>
+ <1571919983-3231-4-git-send-email-yi.l.liu@intel.com>
+ <20191107162041.31e620a4@x1.home>
+ <A2975661238FB949B60364EF0F2C25743A0F6894@SHSMSX104.ccr.corp.intel.com>
+ <20191112102534.75968ccd@x1.home>
+ <A2975661238FB949B60364EF0F2C25743A0F8A70@SHSMSX104.ccr.corp.intel.com>
+ <20191113102913.GA40832@lophozonia>
+In-Reply-To: <20191113102913.GA40832@lophozonia>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzU5MzZlYjgtNzg1Zi00OGE3LTlhNWEtOWQ5MGJjYzk0NjU0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSFpSTXFqN1BObFJNa1VobjZBZHhwb2pZS1ZuWjN1R01LVXV0bHIxTnhmT0hoOWdBUVR4VmtHeEhcL2psYTFcL00xIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1574655617; bh=L30X02STdzs46l0dDtsMk0uHzlhbmBQK6c5RMaBXpAk=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=h7X+z4BQUWt8vjhxC6a2Th4W2q2oCPUpb5eZB9cTAIE9Nz3/Qn/62P68hLTu1DnSE
-         moJwC2aCCkfpknpzWdfPIGdbPIDlAUmL4vZmmLDH/J9I4rlI2wLPjgzSjnHiVr1lY0
-         lylHVRSzfe5jHve47AcXHTUDWA7pE9mgYjiyvWpBDdH1kTs2Ufu3dm+TUtWjUKNZxA
-         of3rDzzPkPUnpCaPCNLyjI4S01l2NbY5MJ4syusBnP7wsMZw+oA+3LzBJ+sr8KeeMp
-         4Hi/06pSUb++n+H8BjNU+OU/0cWVjQJyhO15HgSB3zS0jZAprZP4spZ08UjWuW6uai
-         kBZ11wA9O3qYg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to provide a clearer, more symmetric API for pinning
-and unpinning DMA pages. This way, pin_user_pages*() calls
-match up with unpin_user_pages*() calls, and the API is a lot
-closer to being self-explanatory.
+Hi Alex,
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- Documentation/core-api/pin_user_pages.rst   |  2 +-
- arch/powerpc/mm/book3s64/iommu_api.c        |  6 ++--
- drivers/gpu/drm/via/via_dmablit.c           |  4 +--
- drivers/infiniband/core/umem.c              |  2 +-
- drivers/infiniband/hw/hfi1/user_pages.c     |  2 +-
- drivers/infiniband/hw/mthca/mthca_memfree.c |  6 ++--
- drivers/infiniband/hw/qib/qib_user_pages.c  |  2 +-
- drivers/infiniband/hw/qib/qib_user_sdma.c   |  6 ++--
- drivers/infiniband/hw/usnic/usnic_uiom.c    |  2 +-
- drivers/infiniband/sw/siw/siw_mem.c         |  2 +-
- drivers/media/v4l2-core/videobuf-dma-sg.c   |  4 +--
- drivers/platform/goldfish/goldfish_pipe.c   |  4 +--
- drivers/vfio/vfio_iommu_type1.c             |  2 +-
- fs/io_uring.c                               |  4 +--
- include/linux/mm.h                          | 26 ++++++++---------
- mm/gup.c                                    | 32 ++++++++++-----------
- mm/process_vm_access.c                      |  4 +--
- net/xdp/xdp_umem.c                          |  2 +-
- 18 files changed, 56 insertions(+), 56 deletions(-)
+Thanks for the review. Here I'd like to conclude the major opens in this
+thread and see if we can get some agreements to prepare a new version.
 
-diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core=
--api/pin_user_pages.rst
-index 4f26637a5005..bba96428ade7 100644
---- a/Documentation/core-api/pin_user_pages.rst
-+++ b/Documentation/core-api/pin_user_pages.rst
-@@ -220,7 +220,7 @@ since the system was booted, via two new /proc/vmstat e=
-ntries: ::
-     /proc/vmstat/nr_foll_pin_requested
-=20
- Those are both going to show zero, unless CONFIG_DEBUG_VM is set. This is
--because there is a noticeable performance drop in put_user_page(), when th=
-ey
-+because there is a noticeable performance drop in unpin_user_page(), when =
-they
- are activated.
-=20
- References
-diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s6=
-4/iommu_api.c
-index 196383e8e5a9..dd7aa5a4f33c 100644
---- a/arch/powerpc/mm/book3s64/iommu_api.c
-+++ b/arch/powerpc/mm/book3s64/iommu_api.c
-@@ -168,7 +168,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, uns=
-igned long ua,
-=20
- free_exit:
- 	/* free the references taken */
--	put_user_pages(mem->hpages, pinned);
-+	unpin_user_pages(mem->hpages, pinned);
-=20
- 	vfree(mem->hpas);
- 	kfree(mem);
-@@ -211,8 +211,8 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_=
-mem_t *mem)
- 		if (!page)
- 			continue;
-=20
--		put_user_pages_dirty_lock(&mem->hpages[i], 1,
--					  MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-+		unpin_user_pages_dirty_lock(&mem->hpages[i], 1,
-+					    MM_IOMMU_TABLE_GROUP_PAGE_DIRTY);
-=20
- 		mem->hpas[i] =3D 0;
- 	}
-diff --git a/drivers/gpu/drm/via/via_dmablit.c b/drivers/gpu/drm/via/via_dm=
-ablit.c
-index 37c5e572993a..719d036c9384 100644
---- a/drivers/gpu/drm/via/via_dmablit.c
-+++ b/drivers/gpu/drm/via/via_dmablit.c
-@@ -188,8 +188,8 @@ via_free_sg_info(struct pci_dev *pdev, drm_via_sg_info_=
-t *vsg)
- 		kfree(vsg->desc_pages);
- 		/* fall through */
- 	case dr_via_pages_locked:
--		put_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
--					  (vsg->direction =3D=3D DMA_FROM_DEVICE));
-+		unpin_user_pages_dirty_lock(vsg->pages, vsg->num_pages,
-+					   (vsg->direction =3D=3D DMA_FROM_DEVICE));
- 		/* fall through */
- 	case dr_via_pages_alloc:
- 		vfree(vsg->pages);
-diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.=
-c
-index 39a1542e6707..663b5c785716 100644
---- a/drivers/infiniband/core/umem.c
-+++ b/drivers/infiniband/core/umem.c
-@@ -54,7 +54,7 @@ static void __ib_umem_release(struct ib_device *dev, stru=
-ct ib_umem *umem, int d
-=20
- 	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
- 		page =3D sg_page_iter_page(&sg_iter);
--		put_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
-+		unpin_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
- 	}
-=20
- 	sg_free_table(&umem->sg_head);
-diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/h=
-w/hfi1/user_pages.c
-index 9a94761765c0..3b505006c0a6 100644
---- a/drivers/infiniband/hw/hfi1/user_pages.c
-+++ b/drivers/infiniband/hw/hfi1/user_pages.c
-@@ -118,7 +118,7 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsig=
-ned long vaddr, size_t np
- void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
- 			     size_t npages, bool dirty)
- {
--	put_user_pages_dirty_lock(p, npages, dirty);
-+	unpin_user_pages_dirty_lock(p, npages, dirty);
-=20
- 	if (mm) { /* during close after signal, mm can be NULL */
- 		atomic64_sub(npages, &mm->pinned_vm);
-diff --git a/drivers/infiniband/hw/mthca/mthca_memfree.c b/drivers/infiniba=
-nd/hw/mthca/mthca_memfree.c
-index 8269ab040c21..78a48aea3faf 100644
---- a/drivers/infiniband/hw/mthca/mthca_memfree.c
-+++ b/drivers/infiniband/hw/mthca/mthca_memfree.c
-@@ -482,7 +482,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
-=20
- 	ret =3D pci_map_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
- 	if (ret < 0) {
--		put_user_page(pages[0]);
-+		unpin_user_page(pages[0]);
- 		goto out;
- 	}
-=20
-@@ -490,7 +490,7 @@ int mthca_map_user_db(struct mthca_dev *dev, struct mth=
-ca_uar *uar,
- 				 mthca_uarc_virt(dev, uar, i));
- 	if (ret) {
- 		pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--		put_user_page(sg_page(&db_tab->page[i].mem));
-+		unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		goto out;
- 	}
-=20
-@@ -556,7 +556,7 @@ void mthca_cleanup_user_db_tab(struct mthca_dev *dev, s=
-truct mthca_uar *uar,
- 		if (db_tab->page[i].uvirt) {
- 			mthca_UNMAP_ICM(dev, mthca_uarc_virt(dev, uar, i), 1);
- 			pci_unmap_sg(dev->pdev, &db_tab->page[i].mem, 1, PCI_DMA_TODEVICE);
--			put_user_page(sg_page(&db_tab->page[i].mem));
-+			unpin_user_page(sg_page(&db_tab->page[i].mem));
- 		}
- 	}
-=20
-diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniban=
-d/hw/qib/qib_user_pages.c
-index 7fc4b5f81fcd..342e3172ca40 100644
---- a/drivers/infiniband/hw/qib/qib_user_pages.c
-+++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-@@ -40,7 +40,7 @@
- static void __qib_release_user_pages(struct page **p, size_t num_pages,
- 				     int dirty)
- {
--	put_user_pages_dirty_lock(p, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(p, num_pages, dirty);
- }
-=20
- /**
-diff --git a/drivers/infiniband/hw/qib/qib_user_sdma.c b/drivers/infiniband=
-/hw/qib/qib_user_sdma.c
-index 1a3cc2957e3a..a67599b5a550 100644
---- a/drivers/infiniband/hw/qib/qib_user_sdma.c
-+++ b/drivers/infiniband/hw/qib/qib_user_sdma.c
-@@ -317,7 +317,7 @@ static int qib_user_sdma_page_to_frags(const struct qib=
-_devdata *dd,
- 		 * the caller can ignore this page.
- 		 */
- 		if (put) {
--			put_user_page(page);
-+			unpin_user_page(page);
- 		} else {
- 			/* coalesce case */
- 			kunmap(page);
-@@ -631,7 +631,7 @@ static void qib_user_sdma_free_pkt_frag(struct device *=
-dev,
- 			kunmap(pkt->addr[i].page);
-=20
- 		if (pkt->addr[i].put_page)
--			put_user_page(pkt->addr[i].page);
-+			unpin_user_page(pkt->addr[i].page);
- 		else
- 			__free_page(pkt->addr[i].page);
- 	} else if (pkt->addr[i].kvaddr) {
-@@ -706,7 +706,7 @@ static int qib_user_sdma_pin_pages(const struct qib_dev=
-data *dd,
- 	/* if error, return all pages not managed by pkt */
- free_pages:
- 	while (i < j)
--		put_user_page(pages[i++]);
-+		unpin_user_page(pages[i++]);
-=20
- done:
- 	return ret;
-diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/=
-hw/usnic/usnic_uiom.c
-index 600896727d34..bd9f944b68fc 100644
---- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-+++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-@@ -75,7 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_=
-list, int dirty)
- 		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
- 			page =3D sg_page(sg);
- 			pa =3D sg_phys(sg);
--			put_user_pages_dirty_lock(&page, 1, dirty);
-+			unpin_user_pages_dirty_lock(&page, 1, dirty);
- 			usnic_dbg("pa: %pa\n", &pa);
- 		}
- 		kfree(chunk);
-diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/si=
-w/siw_mem.c
-index e53b07dcfed5..e2061dc0b043 100644
---- a/drivers/infiniband/sw/siw/siw_mem.c
-+++ b/drivers/infiniband/sw/siw/siw_mem.c
-@@ -63,7 +63,7 @@ struct siw_mem *siw_mem_id2obj(struct siw_device *sdev, i=
-nt stag_index)
- static void siw_free_plist(struct siw_page_chunk *chunk, int num_pages,
- 			   bool dirty)
- {
--	put_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
-+	unpin_user_pages_dirty_lock(chunk->plist, num_pages, dirty);
- }
-=20
- void siw_umem_release(struct siw_umem *umem, bool dirty)
-diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2=
--core/videobuf-dma-sg.c
-index 162a2633b1e3..13b65ed9e74c 100644
---- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-+++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-@@ -349,8 +349,8 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
- 	BUG_ON(dma->sglen);
-=20
- 	if (dma->pages) {
--		put_user_pages_dirty_lock(dma->pages, dma->nr_pages,
--					  dma->direction =3D=3D DMA_FROM_DEVICE);
-+		unpin_user_pages_dirty_lock(dma->pages, dma->nr_pages,
-+					    dma->direction =3D=3D DMA_FROM_DEVICE);
- 		kfree(dma->pages);
- 		dma->pages =3D NULL;
- 	}
-diff --git a/drivers/platform/goldfish/goldfish_pipe.c b/drivers/platform/g=
-oldfish/goldfish_pipe.c
-index 2a5901efecde..1ab207ec9c94 100644
---- a/drivers/platform/goldfish/goldfish_pipe.c
-+++ b/drivers/platform/goldfish/goldfish_pipe.c
-@@ -360,8 +360,8 @@ static int transfer_max_buffers(struct goldfish_pipe *p=
-ipe,
-=20
- 	*consumed_size =3D pipe->command_buffer->rw_params.consumed_size;
-=20
--	put_user_pages_dirty_lock(pipe->pages, pages_count,
--				  !is_write && *consumed_size > 0);
-+	unpin_user_pages_dirty_lock(pipe->pages, pages_count,
-+				    !is_write && *consumed_size > 0);
-=20
- 	mutex_unlock(&pipe->lock);
- 	return 0;
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type=
-1.c
-index 18bfc2fc8e6d..a177bf2c6683 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -310,7 +310,7 @@ static int put_pfn(unsigned long pfn, int prot)
- 	if (!is_invalid_reserved_pfn(pfn)) {
- 		struct page *page =3D pfn_to_page(pfn);
-=20
--		put_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
-+		unpin_user_pages_dirty_lock(&page, 1, prot & IOMMU_WRITE);
- 		return 1;
- 	}
- 	return 0;
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0f7898b1c4b0..c5eaaa04e4d6 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -4064,7 +4064,7 @@ static int io_sqe_buffer_unregister(struct io_ring_ct=
-x *ctx)
- 		struct io_mapped_ubuf *imu =3D &ctx->user_bufs[i];
-=20
- 		for (j =3D 0; j < imu->nr_bvecs; j++)
--			put_user_page(imu->bvec[j].bv_page);
-+			unpin_user_page(imu->bvec[j].bv_page);
-=20
- 		if (ctx->account_mem)
- 			io_unaccount_mem(ctx->user, imu->nr_bvecs);
-@@ -4209,7 +4209,7 @@ static int io_sqe_buffer_register(struct io_ring_ctx =
-*ctx, void __user *arg,
- 			 * release any pages we did get
- 			 */
- 			if (pret > 0)
--				put_user_pages(pages, pret);
-+				unpin_user_pages(pages, pret);
- 			if (ctx->account_mem)
- 				io_unaccount_mem(ctx->user, nr_pages);
- 			kvfree(imu->bvec);
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 5fabbc5d10f3..96dd865e3fc9 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1036,27 +1036,27 @@ static inline void put_page(struct page *page)
- }
-=20
- /**
-- * put_user_page() - release a gup-pinned page
-+ * unpin_user_page() - release a gup-pinned page
-  * @page:            pointer to page to be released
-  *
-  * Pages that were pinned via pin_user_pages*() must be released via eithe=
-r
-- * put_user_page(), or one of the put_user_pages*() routines. This is so t=
-hat
-- * eventually such pages can be separately tracked and uniquely handled. I=
-n
-+ * unpin_user_page(), or one of the unpin_user_pages*() routines. This is =
-so
-+ * that eventually such pages can be separately tracked and uniquely handl=
-ed. In
-  * particular, interactions with RDMA and filesystems need special handlin=
-g.
-  *
-- * put_user_page() and put_page() are not interchangeable, despite this ea=
-rly
-- * implementation that makes them look the same. put_user_page() calls mus=
-t
-+ * unpin_user_page() and put_page() are not interchangeable, despite this =
-early
-+ * implementation that makes them look the same. unpin_user_page() calls m=
-ust
-  * be perfectly matched up with pin*() calls.
-  */
--static inline void put_user_page(struct page *page)
-+static inline void unpin_user_page(struct page *page)
- {
- 	put_page(page);
- }
-=20
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty);
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty);
-=20
--void put_user_pages(struct page **pages, unsigned long npages);
-+void unpin_user_pages(struct page **pages, unsigned long npages);
-=20
- #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
- #define SECTION_IN_PAGE_FLAGS
-@@ -2586,7 +2586,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
- #define FOLL_ANON	0x8000	/* don't do file mappings */
- #define FOLL_LONGTERM	0x10000	/* mapping lifetime is indefinite: see below=
- */
- #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
--#define FOLL_PIN	0x40000	/* pages must be released via put_user_page() */
-+#define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
-=20
- /*
-  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with eac=
-h
-@@ -2621,7 +2621,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * Direct IO). This lets the filesystem know that some non-file-system ent=
-ity is
-  * potentially changing the pages' data. In contrast to FOLL_GET (whose pa=
-ges
-  * are released via put_page()), FOLL_PIN pages must be released, ultimate=
-ly, by
-- * a call to put_user_page().
-+ * a call to unpin_user_page().
-  *
-  * FOLL_PIN is similar to FOLL_GET: both of these pin pages. They use diff=
-erent
-  * and separate refcounting mechanisms, however, and that means that each =
-has
-@@ -2629,7 +2629,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  *
-  *     FOLL_GET: get_user_pages*() to acquire, and put_page() to release.
-  *
-- *     FOLL_PIN: pin_user_pages*() to acquire, and put_user_pages to relea=
-se.
-+ *     FOLL_PIN: pin_user_pages*() to acquire, and unpin_user_pages to rel=
-ease.
-  *
-  * FOLL_PIN and FOLL_GET are mutually exclusive for a given function call.
-  * (The underlying pages may experience both FOLL_GET-based and FOLL_PIN-b=
-ased
-@@ -2639,7 +2639,7 @@ struct page *follow_page(struct vm_area_struct *vma, =
-unsigned long address,
-  * FOLL_PIN should be set internally by the pin_user_pages*() APIs, never
-  * directly by the caller. That's in order to help avoid mismatches when
-  * releasing pages: get_user_pages*() pages must be released via put_page(=
-),
-- * while pin_user_pages*() pages must be released via put_user_page().
-+ * while pin_user_pages*() pages must be released via unpin_user_page().
-  *
-  * Please see Documentation/vm/pin_user_pages.rst for more information.
-  */
-diff --git a/mm/gup.c b/mm/gup.c
-index ef1bfd374a11..1229a09e129b 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -52,7 +52,7 @@ static inline struct page *try_get_compound_head(struct p=
-age *page, int refs)
- }
-=20
- /**
-- * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned p=
-ages
-+ * unpin_user_pages_dirty_lock() - release and optionally dirty gup-pinned=
- pages
-  * @pages:  array of pages to be maybe marked dirty, and definitely releas=
-ed.
-  * @npages: number of pages in the @pages array.
-  * @make_dirty: whether to mark the pages dirty
-@@ -62,19 +62,19 @@ static inline struct page *try_get_compound_head(struct=
- page *page, int refs)
-  *
-  * For each page in the @pages array, make that page (or its head page, if=
- a
-  * compound page) dirty, if @make_dirty is true, and if the page was previ=
-ously
-- * listed as clean. In any case, releases all pages using put_user_page(),
-- * possibly via put_user_pages(), for the non-dirty case.
-+ * listed as clean. In any case, releases all pages using unpin_user_page(=
-),
-+ * possibly via unpin_user_pages(), for the non-dirty case.
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  *
-  * set_page_dirty_lock() is used internally. If instead, set_page_dirty() =
-is
-  * required, then the caller should a) verify that this is really correct,
-  * because _lock() is usually required, and b) hand code it:
-- * set_page_dirty_lock(), put_user_page().
-+ * set_page_dirty_lock(), unpin_user_page().
-  *
-  */
--void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
--			       bool make_dirty)
-+void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages=
-,
-+				 bool make_dirty)
- {
- 	unsigned long index;
-=20
-@@ -85,7 +85,7 @@ void put_user_pages_dirty_lock(struct page **pages, unsig=
-ned long npages,
- 	 */
-=20
- 	if (!make_dirty) {
--		put_user_pages(pages, npages);
-+		unpin_user_pages(pages, npages);
- 		return;
- 	}
-=20
-@@ -113,21 +113,21 @@ void put_user_pages_dirty_lock(struct page **pages, u=
-nsigned long npages,
- 		 */
- 		if (!PageDirty(page))
- 			set_page_dirty_lock(page);
--		put_user_page(page);
-+		unpin_user_page(page);
- 	}
- }
--EXPORT_SYMBOL(put_user_pages_dirty_lock);
-+EXPORT_SYMBOL(unpin_user_pages_dirty_lock);
-=20
- /**
-- * put_user_pages() - release an array of gup-pinned pages.
-+ * unpin_user_pages() - release an array of gup-pinned pages.
-  * @pages:  array of pages to be marked dirty and released.
-  * @npages: number of pages in the @pages array.
-  *
-- * For each page in the @pages array, release the page using put_user_page=
-().
-+ * For each page in the @pages array, release the page using unpin_user_pa=
-ge().
-  *
-- * Please see the put_user_page() documentation for details.
-+ * Please see the unpin_user_page() documentation for details.
-  */
--void put_user_pages(struct page **pages, unsigned long npages)
-+void unpin_user_pages(struct page **pages, unsigned long npages)
- {
- 	unsigned long index;
-=20
-@@ -137,9 +137,9 @@ void put_user_pages(struct page **pages, unsigned long =
-npages)
- 	 * single operation to the head page should suffice.
- 	 */
- 	for (index =3D 0; index < npages; index++)
--		put_user_page(pages[index]);
-+		unpin_user_page(pages[index]);
- }
--EXPORT_SYMBOL(put_user_pages);
-+EXPORT_SYMBOL(unpin_user_pages);
-=20
- #ifdef CONFIG_MMU
- static struct page *no_page_table(struct vm_area_struct *vma,
-diff --git a/mm/process_vm_access.c b/mm/process_vm_access.c
-index fd20ab675b85..de41e830cdac 100644
---- a/mm/process_vm_access.c
-+++ b/mm/process_vm_access.c
-@@ -126,8 +126,8 @@ static int process_vm_rw_single_vec(unsigned long addr,
- 		pa +=3D pinned_pages * PAGE_SIZE;
-=20
- 		/* If vm_write is set, the pages need to be made dirty: */
--		put_user_pages_dirty_lock(process_pages, pinned_pages,
--					  vm_write);
-+		unpin_user_pages_dirty_lock(process_pages, pinned_pages,
-+					    vm_write);
- 	}
-=20
- 	return rc;
-diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-index d071003b5e76..ac182c38f7b0 100644
---- a/net/xdp/xdp_umem.c
-+++ b/net/xdp/xdp_umem.c
-@@ -212,7 +212,7 @@ static int xdp_umem_map_pages(struct xdp_umem *umem)
-=20
- static void xdp_umem_unpin_pages(struct xdp_umem *umem)
- {
--	put_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-+	unpin_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
-=20
- 	kfree(umem->pgs);
- 	umem->pgs =3D NULL;
---=20
-2.24.0
+a) IOCTLs for BIND_GPASID and BIND_PROCESS, share a single IOCTL or two
+   separate IOCTLs?
+   Yi: It may be helpful to have separate IOCTLs. The bind data conveyed
+   for BIND_GPASID and BIND_PROCESS are totally different, and the struct
+   iommu_gpasid_bind_data has vendor specific data and may even have more
+   versions in future. To better maintain it, I guess separate IOCTLs for
+   the two bind types would be better. The structure for BIND_GPASID is
+   as below:
 
+        struct vfio_iommu_type1_bind {
+                __u32                           argsz;
+                struct iommu_gpasid_bind_data   bind_data;
+        };
+
+b) how kernel-space learns the number of bytes to be copied (a.k.a. the
+   usage of @version field and @format field of struct
+   iommu_gpasid_bind_data)
+   Yi: Jean has an excellent recap in prior reply on the plan of future
+   extensions regards to @version field and @format field. Based on the
+   plan, kernel space needs to parse the @version field and @format field
+   to get the length of the current BIND_GPASID request. Also kernel needs
+   to maintain the new and old structure versions. Follow specific
+   deprecation policy in future.
+
+c) how can vIOMMU emulator know that the vfio interface supports to config
+   dual stage translation for vIOMMU?
+   Yi: may do it via VFIO_IOMMU_GET_INFO.
+
+d) how can vIOMMU emulator know what @version and @format should be set
+   in struct iommu_gpasid_bind_data?
+   Yi: currently, we have two ways. First one, may do it via
+   VFIO_IOMMU_GET_INFO. This is a natural idea as here @version and @format
+   are used in vfio apis. It makes sense to let vfio to provide related info
+   to vIOMMU emulator after checking with vendor specific iommu driver. Also,
+   there is idea to do it via sysfs (/sys/class/iommu/dmar#) as we have plan
+   to do IOMMU capability sync between vIOMMU and pIOMMU via sysfs. I have
+   two concern on this option. Current iommu sysfs only provides vendor
+   specific hardware infos. I'm not sure if it is good to expose infos
+   defined in IOMMU generic layer via iommu sysfs. If this concern is not
+   a big thing, I'm fine with both options.
+
+Thoughts? Would also be happy to know more from you guys.
+
+Regards,
+Yi Liu
+
+> From: Jean-Philippe Brucker [mailto:jean-philippe@linaro.org]
+> Sent: Wednesday, November 13, 2019 6:29 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables) to host
+> 
+> On Wed, Nov 13, 2019 at 07:43:43AM +0000, Liu, Yi L wrote:
+> > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > Sent: Wednesday, November 13, 2019 1:26 AM
+> > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > Subject: Re: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables) to host
+> > >
+> > > On Tue, 12 Nov 2019 11:21:40 +0000
+> > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> > >
+> > > > > From: Alex Williamson < alex.williamson@redhat.com >
+> > > > > Sent: Friday, November 8, 2019 7:21 AM
+> > > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > Subject: Re: [RFC v2 3/3] vfio/type1: bind guest pasid (guest page tables) to
+> host
+> > > > >
+> > > > > On Thu, 24 Oct 2019 08:26:23 -0400
+> > > > > Liu Yi L <yi.l.liu@intel.com> wrote:
+> > > > >
+> > > > > > This patch adds vfio support to bind guest translation structure
+> > > > > > to host iommu. VFIO exposes iommu programming capability to user-
+> > > > > > space. Guest is a user-space application in host under KVM solution.
+> > > > > > For SVA usage in Virtual Machine, guest owns GVA->GPA translation
+> > > > > > structure. And this part should be passdown to host to enable nested
+> > > > > > translation (or say two stage translation). This patch reuses the
+> > > > > > VFIO_IOMMU_BIND proposal from Jean-Philippe Brucker, and adds new
+> > > > > > bind type for binding guest owned translation structure to host.
+> > > > > >
+> > > > > > *) Add two new ioctls for VFIO containers.
+> > > > > >
+> > > > > >   - VFIO_IOMMU_BIND: for bind request from userspace, it could be
+> > > > > >                    bind a process to a pasid or bind a guest pasid
+> > > > > >                    to a device, this is indicated by type
+> > > > > >   - VFIO_IOMMU_UNBIND: for unbind request from userspace, it could be
+> > > > > >                    unbind a process to a pasid or unbind a guest pasid
+> > > > > >                    to a device, also indicated by type
+> > > > > >   - Bind type:
+> > > > > > 	VFIO_IOMMU_BIND_PROCESS: user-space request to bind a
+> process
+> > > > > >                    to a device
+> > > > > > 	VFIO_IOMMU_BIND_GUEST_PASID: bind guest owned translation
+> > > > > >                    structure to host iommu. e.g. guest page table
+> > > > > >
+> > > > > > *) Code logic in vfio_iommu_type1_ioctl() to handle
+> > > VFIO_IOMMU_BIND/UNBIND
+> > > > > >
+> > [...]
+> > > > > > +static long vfio_iommu_type1_unbind_gpasid(struct vfio_iommu *iommu,
+> > > > > > +					    void __user *arg,
+> > > > > > +					    struct vfio_iommu_type1_bind
+> *bind)
+> > > > > > +{
+> > > > > > +	struct iommu_gpasid_bind_data gbind_data;
+> > > > > > +	unsigned long minsz;
+> > > > > > +	int ret = 0;
+> > > > > > +
+> > > > > > +	minsz = sizeof(*bind) + sizeof(gbind_data);
+> > > > > > +	if (bind->argsz < minsz)
+> > > > > > +		return -EINVAL;
+> > > > >
+> > > > > But gbind_data can change size if new vendor specific data is added to
+> > > > > the union, so kernel updates break existing userspace.  Fail.
+> 
+> I guess we could take minsz up to the vendor-specific data, copy @format,
+> and then check the size of vendor-specific data?
+> 
+> > > >
+> > > > yes, we have a version field in struct iommu_gpasid_bind_data. How
+> > > > about doing sanity check per versions? kernel knows the gbind_data
+> > > > size of specific versions. Does it make sense? If yes, I'll also apply it
+> > > > to the other sanity check in this series to avoid userspace fail after
+> > > > kernel update.
+> > >
+> > > Has it already been decided that the version field will be updated for
+> > > every addition to the union?
+> >
+> > No, just my proposal. Jacob may help to explain the purpose of version
+> > field. But if we may be too  "frequent" for an uapi version number updating
+> > if we inc version for each change in the union part. I may vote for the
+> > second option from you below.
+> >
+> > > It seems there are two options, either
+> > > the version definition includes the possible contents of the union,
+> > > which means we need to support multiple versions concurrently in the
+> > > kernel to maintain compatibility with userspace and follow deprecation
+> > > protocols for removing that support, or we need to consider version to
+> > > be the general form of the structure and interpret the format field to
+> > > determine necessary length to copy from the user.
+> >
+> > As I mentioned above, may be better to let @version field only over the
+> > general fields and let format to cover the possible changes in union. e.g.
+> > IOMMU_PASID_FORMAT_INTEL_VTD2 may means version 2 of Intel
+> > VT-d bind. But either way, I think we need to let kernel maintain multiple
+> > versions to support compatible userspace. e.g. may have multiple versions
+> > iommu_gpasid_bind_data_vtd struct in the union part.
+> 
+> I couldn't find where the @version field originated in our old
+> discussions, but I believe our plan for allowing future extensions was:
+> 
+> * Add new vendor-specific data by introducing a new format
+>   (IOMMU_PASID_FORMAT_INTEL_VTD2,
+> IOMMU_PASID_FORMAT_ARM_SMMUV2...), and
+>   extend the union.
+> 
+> * Add a new common field, if it fits in the existing padding bytes, by
+>   adding a flag (IOMMU_SVA_GPASID_*).
+> 
+> * Add a new common field, if it doesn't fit in the current padding bytes,
+>   or completely change the structure layout, by introducing a new version
+>   (IOMMU_GPASID_BIND_VERSION_2). In that case the kernel has to handle
+>   both new and old structure versions. It would have both
+>   iommu_gpasid_bind_data and iommu_gpasid_bind_data_v2 structs.
+> 
+> I think iommu_cache_invalidate_info and iommu_page_response use the same
+> scheme. iommu_fault is a bit more complicated because it's
+> kernel->userspace and requires some negotiation:
+> https://lore.kernel.org/linux-iommu/77405d39-81a4-d9a8-5d35-
+> 27602199867a@arm.com/
+> 
+> [...]
+> > > If the ioctls have similar purpose and form, then re-using a single
+> > > ioctl might make sense, but BIND_PROCESS is only a place-holder in this
+> > > series, which is not acceptable.  A dual purpose ioctl does not
+> > > preclude that we could also use a union for the data field to make the
+> > > structure well specified.
+> >
+> > yes, BIND_PROCESS is only a place-holder here. From kernel p.o.v., both
+> > BIND_GUEST_PASID and BIND_PROCESS are bind requests from userspace.
+> > So the purposes are aligned. Below is the content the @data[] field
+> > supposed to convey for BIND_PROCESS. If we use union, it would leave
+> > space for extending it to support BIND_PROCESS. If only data[], it is a little
+> > bit confusing why we define it in such manner if BIND_PROCESS is included
+> > in this series. Please feel free let me know which one suits better.
+> >
+> > +struct vfio_iommu_type1_bind_process {
+> > +	__u32	flags;
+> > +#define VFIO_IOMMU_BIND_PID		(1 << 0)
+> > +	__u32	pasid;
+> > +	__s32	pid;
+> > +};
+> > https://patchwork.kernel.org/patch/10394927/
+> 
+> Note that I don't plan to upstream BIND_PROCESS at the moment. It was
+> useful for testing but I don't know of anyone actually needing it.
+> 
+> > > > > That bind data
+> > > > > structure expects a format (ex. IOMMU_PASID_FORMAT_INTEL_VTD).  How
+> > > does
+> > > > > a user determine what formats are accepted from within the vfio API (or
+> > > > > even outside of the vfio API)?
+> > > >
+> > > > The info is provided by vIOMMU emulator (e.g. virtual VT-d). The vSVA patch
+> > > > from Jacob has a sanity check on it.
+> > > > https://lkml.org/lkml/2019/10/28/873
+> > >
+> > > The vIOMMU emulator runs at a layer above vfio.  How does the vIOMMU
+> > > emulator know that the vfio interface supports virtual VT-d?  IMO, it's
+> > > not acceptable that the user simply assume that an Intel host platform
+> > > supports VT-d.  For example, consider what happens when we need to
+> > > define IOMMU_PASID_FORMAT_INTEL_VTDv2.  How would the user learn that
+> > > VTDv2 is supported and the original VTD format is not supported?
+> >
+> > I guess this may be another info VFIO_IOMMU_GET_INFO should provide.
+> > It makes sense that vfio be aware of what platform it is running on. right?
+> > After vfio gets the info, may let vfio fill in the format info. Is it the correct
+> > direction?
+> 
+> I thought you were planning to put that information in sysfs?  We last
+> discussed this over a year ago so I don't remember where we left it. I
+> know Alex isn't keen on putting in sysfs what can be communicated through
+> VFIO, but it is a convenient way to describe IOMMU features:
+> http://www.linux-arm.org/git?p=linux-
+> jpb.git;a=commitdiff;h=665370d5b5e0022c24b2d2b57975ef6fe7b40870;hp=7ce780
+> d838889b53f5e04ba5d444520621261eda
+> 
+> My problem with GET_INFO was that it could be difficult to extend, and
+> to describe things like variable-size list of supported page table
+> formats, but I guess the new info capabilities make this easier.
+> 
+> Thanks,
+> Jean
