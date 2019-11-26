@@ -2,138 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E687B10A3FD
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 19:14:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBE6A10A576
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 21:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727071AbfKZSOH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 13:14:07 -0500
-Received: from mga01.intel.com ([192.55.52.88]:35839 "EHLO mga01.intel.com"
+        id S1726593AbfKZUaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 15:30:25 -0500
+Received: from ozlabs.org ([203.11.71.1]:41871 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725870AbfKZSOH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 13:14:07 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Nov 2019 10:14:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,246,1571727600"; 
-   d="scan'208";a="211493575"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga006.jf.intel.com with ESMTP; 26 Nov 2019 10:14:06 -0800
-Date:   Tue, 26 Nov 2019 10:14:06 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+        id S1726033AbfKZUaY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 15:30:24 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47MwWc65Ggz9sRH;
+        Wed, 27 Nov 2019 07:30:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1574800222;
+        bh=afsoIn2XZqK4fz9PBhl5G8eJamsDD10MBu3yEOVkQg8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=TKzABNkdBIRhUZFn4xtDqf6vrgHyPebdBu5IUD+MvfkmYZMgZg7Cco0hnih0elLP9
+         VW+VreZXiZHRRREL+NGCLQFEcMgBViOXdzHFxLqr1ENpZ00Q/nBDo1L3dq3cMKInyY
+         OdSqThyXGmBSancMCwEAXGasHUSPUTg3I5cSh8KTf69L9Eqp76yTiKCpT6JFdpFJQK
+         klitAcJed/p9q59cu4SGI7Erf1Z1uA9Qc50F8r7TvYfblKspO8lMNh3NJQc0emggyA
+         cTMB4yhkdu+Ix7wVStamc5y37tcji7+OhLJuz+aYJSxnNhITQoiOGCKDQnvBnqXvhv
+         nyN6CY9NPTU/Q==
+Date:   Wed, 27 Nov 2019 07:30:19 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Masahiro Yamada <yamada.masahiro@socionext.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-Message-ID: <20191126181406.GC22233@linux.intel.com>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Christoffer Dall <cdall@cs.columbia.edu>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM <kvm@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the kvm-arm tree with the kbuild
+ tree
+Message-ID: <20191127073019.41c44ae7@canb.auug.org.au>
+In-Reply-To: <20191125135811.4a3d71da@canb.auug.org.au>
+References: <20191118143842.2e7ad24d@canb.auug.org.au>
+        <20191125135811.4a3d71da@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126175212.377171-1-leonardo@linux.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: multipart/signed; boundary="Sig_/mO/2s2aVXGsrv_8fZYouSu1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 02:52:12PM -0300, Leonardo Bras wrote:
-> Fixes a possible 'use after free' of kvm variable.
-> It does use mutex_unlock(&kvm->lock) after possible freeing a variable
-> with kvm_put_kvm(kvm).
+--Sig_/mO/2s2aVXGsrv_8fZYouSu1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Moving the calls to kvm_put_kvm() to the end of the functions doesn't
-actually fix a use-after-free.  In these flows, the reference being
-released is a borrowed reference that KVM takes on behalf of the entity it
-is creating, e.g. device, vcpu, or spapr tce.  The caller of these create
-helpers must also hold its own reference to @kvm on top of the borrowed
-reference, i.e. these kvm_put_kvm() calls will never free @kvm (assuming
-there are no refcounting bugs elsewhere in KVM).
+Hi all,
 
-If one these kvm_put_kvm() calls did unexpectedly free @kvm (due to a bug
-somewhere else), KVM would still hit a use-after-free scenario as the
-caller still thinks @kvm is valid.  Currently, this would only happen on a
-subsequent ioctl() on the caller's file descriptor (which holds a pointer
-to @kvm), as the callers of these functions don't directly dereference
-@kvm after the functions return.  But, not deferencing @kvm isn't deliberate
-or functionally required, it's just how the code happens to be written.
+On Mon, 25 Nov 2019 13:58:11 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> On Mon, 18 Nov 2019 14:38:42 +1100 Stephen Rothwell <sfr@canb.auug.org.au=
+> wrote:
+> >
+> > Today's linux-next merge of the kvm-arm tree got a conflict in:
+> >=20
+> >   include/Kbuild
+> >=20
+> > between commit:
+> >=20
+> >   fcbb8461fd23 ("kbuild: remove header compile test")
+> >=20
+> > from the kbuild tree and commit:
+> >=20
+> >   55009c6ed2d2 ("KVM: arm/arm64: Factor out hypercall handling from PSC=
+I code")
+> >=20
+> > from the kvm-arm tree.
+> >=20
+> > I fixed it up (I just removed the file) and can carry the fix as necess=
+ary. This
+> > is now fixed as far as linux-next is concerned, but any non trivial
+> > conflicts should be mentioned to your upstream maintainer when your tree
+> > is submitted for merging.  You may also want to consider cooperating
+> > with the maintainer of the conflicting tree to minimise any particularly
+> > complex conflicts. =20
+>=20
+> This is now a conflict between the kvm tree and the kbuild tree.
 
-The intent of adding kvm_put_kvm_no_destroy() was primarily to document
-that under no circumstance should the to-be-put reference be the *last*
-reference to @kvm.  Moving the call to kvm_put_kvm{_no_destroy}() doesn't
-change that
+And now between the kbuild tree and Linus' tree.
+--=20
+Cheers,
+Stephen Rothwell
 
-> Signed-off-by: Leonardo Bras <leonardo@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_64_vio.c | 3 +--
->  virt/kvm/kvm_main.c              | 8 ++++----
->  2 files changed, 5 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-> index 5834db0a54c6..a402ead833b6 100644
-> --- a/arch/powerpc/kvm/book3s_64_vio.c
-> +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
->  
->  	if (ret >= 0)
->  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> -	else
-> -		kvm_put_kvm(kvm);
->  
->  	mutex_unlock(&kvm->lock);
->  
->  	if (ret >= 0)
->  		return ret;
->  
-> +	kvm_put_kvm(kvm);
->  	kfree(stt);
->   fail_acct:
->  	account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 13efc291b1c7..f37089b60d09 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2744,10 +2744,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	/* Now it's all set up, let userspace reach it */
->  	kvm_get_kvm(kvm);
->  	r = create_vcpu_fd(vcpu);
-> -	if (r < 0) {
-> -		kvm_put_kvm(kvm);
-> +	if (r < 0)
->  		goto unlock_vcpu_destroy;
-> -	}
->  
->  	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
->  
-> @@ -2771,6 +2769,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	mutex_lock(&kvm->lock);
->  	kvm->created_vcpus--;
->  	mutex_unlock(&kvm->lock);
-> +	if (r < 0)
-> +		kvm_put_kvm(kvm);
->  	return r;
->  }
->  
-> @@ -3183,10 +3183,10 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
->  	kvm_get_kvm(kvm);
->  	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
->  	if (ret < 0) {
-> -		kvm_put_kvm(kvm);
->  		mutex_lock(&kvm->lock);
->  		list_del(&dev->vm_node);
->  		mutex_unlock(&kvm->lock);
-> +		kvm_put_kvm(kvm);
->  		ops->destroy(dev);
->  		return ret;
->  	}
-> -- 
-> 2.23.0
-> 
+--Sig_/mO/2s2aVXGsrv_8fZYouSu1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3di1sACgkQAVBC80lX
+0GxKWgf/XqDJya979/i/Ee6kkS9stH/cuZLB0qgcdM0OJksaN6vsHD1mj6sv2qdx
+h0qVO1ycAOLoM1Z3JGcbwvbJloYHG/lwejHc1yazpwdq+59pxBfqM1wCW100x+pH
+BFUXLlChcdcwzLRe0aXSQeNMH2BMM/UMjGlZ0QtIg/7pGtJyKbpj8/JsvB2CD6a7
+ptVB0dyrIVeC3kGo4O0F7M+P1hd0CoA+6X/syMRhdFAOKGYcBsdkVdbE+EIDMdeZ
+3jrnJToTlIJVA6i0sGW3Px9mZfdHGfvK3M8ZPvTkixzp2YhliRa9JP7c4Cn7pywI
+5oYRSi/GfCtGEsN1HD/VX9i80F0muw==
+=MaQE
+-----END PGP SIGNATURE-----
+
+--Sig_/mO/2s2aVXGsrv_8fZYouSu1--
