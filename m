@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 227F410A39B
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 18:54:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B07310A3B8
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 18:57:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbfKZRyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 12:54:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21988 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727091AbfKZRyL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Nov 2019 12:54:11 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAQHruoL164556;
-        Tue, 26 Nov 2019 12:54:06 -0500
+        id S1727097AbfKZR5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 12:57:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5656 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725895AbfKZR5W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Nov 2019 12:57:22 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAQHv1iF103453;
+        Tue, 26 Nov 2019 12:57:18 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wf0f89tu6-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wh3y3e0qu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Nov 2019 12:54:06 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xAQHs34J165159;
-        Tue, 26 Nov 2019 12:54:03 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wf0f89tsv-1
+        Tue, 26 Nov 2019 12:57:17 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xAQHvHiS105083;
+        Tue, 26 Nov 2019 12:57:17 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wh3y3e0q9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Nov 2019 12:54:03 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAQHoStJ006855;
-        Tue, 26 Nov 2019 17:54:02 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma04dal.us.ibm.com with ESMTP id 2wevd6mkbm-1
+        Tue, 26 Nov 2019 12:57:17 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAQHt2ne014217;
+        Tue, 26 Nov 2019 17:57:16 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01dal.us.ibm.com with ESMTP id 2wevd6mp9a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Nov 2019 17:54:02 +0000
+        Tue, 26 Nov 2019 17:57:16 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAQHs1Rb44761562
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xAQHvF7I40632664
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 17:54:01 GMT
+        Tue, 26 Nov 2019 17:57:15 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B8273112064;
-        Tue, 26 Nov 2019 17:54:01 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 4FBE2112062;
+        Tue, 26 Nov 2019 17:57:15 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C537112061;
-        Tue, 26 Nov 2019 17:54:00 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 34879112063;
+        Tue, 26 Nov 2019 17:57:14 +0000 (GMT)
 Received: from leobras.br.ibm.com (unknown [9.18.235.137])
         by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Nov 2019 17:54:00 +0000 (GMT)
-Message-ID: <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
+        Tue, 26 Nov 2019 17:57:14 +0000 (GMT)
+Message-ID: <18ced61addce73270a03029235f230176512ce6e.camel@linux.ibm.com>
 Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
  to kvm
 From:   Leonardo Bras <leonardo@linux.ibm.com>
@@ -55,30 +55,30 @@ Cc:     Paul Mackerras <paulus@ozlabs.org>,
         Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Tue, 26 Nov 2019 14:53:59 -0300
+Date:   Tue, 26 Nov 2019 14:57:13 -0300
 In-Reply-To: <20191126171416.GA22233@linux.intel.com>
 References: <20191021225842.23941-1-sean.j.christopherson@intel.com>
          <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
          <20191126171416.GA22233@linux.intel.com>
 Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-idWXaYDfYe+W0o1IqKu9"
+        protocol="application/pgp-signature"; boundary="=-gcwdRq1NdV0pFgUSVhSJ"
 User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-26_05:2019-11-26,2019-11-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- bulkscore=0 spamscore=0 clxscore=1015 mlxlogscore=999 adultscore=0
- phishscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911260150
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ suspectscore=0 phishscore=0 spamscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911260151
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-idWXaYDfYe+W0o1IqKu9
+--=-gcwdRq1NdV0pFgUSVhSJ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -187,7 +187,6 @@ On Tue, 2019-11-26 at 09:14 -0800, Sean Christopherson wrote:
 > to be used when users_count is guaranteed to be valid after it is
 > decremented.
 
-
 I agree an use-after-free more problem than a memory leak, but I think
 that there is a way to solve this without leaking the memory also.
 
@@ -199,7 +198,7 @@ the counter is less than zero:
 
 atomic_dec_and_test_negative(atomic_t *v)
 {
-	return atomic_dec_return(v) <=3D 0;
+        return atomic_dec_return(v) <=3D 0;
 }=20
 
 And apply it to generic refcount.
@@ -210,27 +209,27 @@ Best regards,
 
 Leonardo Bras
 
---=-idWXaYDfYe+W0o1IqKu9
+--=-gcwdRq1NdV0pFgUSVhSJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3dZrcACgkQlQYWtz9S
-ttQzNg/+NwFWS0Z2zks2F8xdJJ0gpjjxdtntNMare2JzrS1nYbtjNcbVphDlczKl
-IdWKkjdZqS7AwqkcXcCVFWnSdMdHs+B3AAQz4FncjZQag5NLy+pmUJ9mlTf+LB7V
-IFmyqTrqGCCxA3VXfVP3qJzOxHRZWu2L/1v8dtzbi95+oqqpHd8GKByctTujoRS+
-vcS3nMRaXW71/acTNWQa0bEjtMFTrBNO3o9qlOejor3nQUaS1xb3HiiPSc1pZcYr
-LInWHiiKsMzu/yZYg3s48Q8zNel6CkJ/MNrxwohR3A7SjYyvkxxP5SR6uc4Tb03V
-dnXcV0z1dzWG6GSy9K9Pg5Q1SdY+gELKngZrVC9zXGw6rXkVimX0LLDFeDznISz5
-ljedofj2m7YExs4zo9K267YbNiTz5ZzHsom0OiKZzNrXNEBJTCcjwCpdcdA8I+Lt
-qHnl7CcHYqfnOY3bRSG1iBcX1kmpOHWRfBHw7GHqCDAyw/Hxls6KVqid/C5nzx+j
-ipQZddMtqC7cpwKpngQ/XErx7yvAlq390AjjMuZnxTK8vOWmrtjTU1V+zqt4TUwK
-O0equPiTbfImxBgk2HzxdplmKszkhV85ECCt67s3mnODCqbq2EBuTYpBl5AG5f5C
-3BzZ6i/9Vspyz4mPQ6TNY9cIQ1NJIzMCZW7vzoiF9gH10UepuZg=
-=FgOf
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3dZ3kACgkQlQYWtz9S
+ttQLvRAAlQj1ol8PpqqAQj1gZ7TlCqP/AO37VPrgKqbSwhwLe9X1a6JT6OLpn/qV
+YM6U5FPl6IDr3goqz2kUq8hK5CSmYeYoBZpQTbF8jXWE8JpgLNSeC4tqbfRKahjW
+adLaqmBPjPOJk76Twk2Fo8Siu9ARMr4D5Z7Qg1FDcCzOdQ6iXXJMxLL+AEqikLWN
+vt0LMRgqbP+QRuEs4aK09k3fE+doRyhEbCZp7x5ZKtl3uXH6Ivitywf8yCGkNMuG
+22tuOxY1JPHwtKrGfVrr3mEzTcM5AX6AkakGPlqEh/ViNIpqP0DEpmJ9XQP3Gz+z
+9OEO+kVM4GmFcbRw6HBaY779a8zpdzB/btn2TgwR4Fqw/44qroc86W1FvNpB5Dk9
+LaQi73hinmhU0UFDfBWxiKMmzM+dkwHx9CHwLcY6mzju2x6RHiUeSWvaLIjhTY2o
+i8P+6V9jBTZUEjTbRJBicohGUFX/8EbNt9BC0qHTwX9PB+oPskAqg7e7JmHIKWl9
+WnCbmIzAFRbGdJbNws9MLVVK7yD0jcrE5KP6jJlapxmttSXYRQ0fLqXdg2WDpTv3
+wr3be37jRJPnTN4MUIv6B+CAHlJu0FqQB8QEkA4ud9Ped7uYktTRGp7VMm7HbK0u
+RvXJmOns/F5YB1kMkSfVWB87Gvi35j/1M5fndCIapzVai9lg1HY=
+=4lT6
 -----END PGP SIGNATURE-----
 
---=-idWXaYDfYe+W0o1IqKu9--
+--=-gcwdRq1NdV0pFgUSVhSJ--
 
