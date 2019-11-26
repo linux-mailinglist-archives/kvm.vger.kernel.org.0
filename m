@@ -2,103 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2F33109C63
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 11:36:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2CC7109C8D
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 11:50:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbfKZKg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 05:36:29 -0500
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21861 "EHLO
-        sender4-of-o58.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727752AbfKZKg3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 05:36:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574764565; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=KSgbP/SaLhDXQJUQjdEUcPeGhxe0CYtNcs4Bq0Y9ODob+Je/UrLu98rxvpfYIWXsZtPCVR3E+zfsijfAM2DwvCGVxZLJQPP6aBpYLuTasHSq1wXTtzYqtpYstqIFXX05/hxEFEZWd3IE/EwzvtAR+rLUWr+tXzeEYfM5g0ob0O4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1574764565; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=c/3dqYrZaGnc4tGwwSDhNLs/aSCK3LS7JS9Z5nKVpVQ=; 
-        b=cqGrFulyhlNmpspgekpi8My0kjBFvNpBm58ST6wK/w4QISPFLOzeq4ohsUAlN3wb1h0ofM+Qq/3Hea0l05x4w5gmES3qhZIIQ6utNA58cpj462vST8nx3Rk83JilkPIkxPCmlI3e6zYXON7fW5+x6xBz8vtHnZGw6X5HUVj1VPk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=patchew.org;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1574764563537255.54649937131023; Tue, 26 Nov 2019 02:36:03 -0800 (PST)
-In-Reply-To: <20191126100914.5150-1-prashantbhole.linux@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [RFC 0/3] Qemu: virtio-net XDP offload
-Message-ID: <157476456132.31055.15214499348148879084@37313f22b938>
+        id S1727873AbfKZKuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 05:50:39 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49679 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727867AbfKZKug (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 05:50:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574765435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=R0suUB0h2cJm9IG+wl8vuFejSumo0ekP4tj9lnnUJew=;
+        b=cHadvh1uPUOOU+zeOH82wn0Tuos97FBanLAfYLyNe4a0yUUl8SGU8QjJVZWrxQZMIBEQNG
+        oH9LabWICJ/k2DM9d79ZtwNV/udBMU+3Sb16gXVw9DkbQmXD36fy76Qed2QfQ+SP6qdQTl
+        B/tJizKBcJb0tBwVkFod7tcQBc/I/lY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-22-z0pIswJGOdyJVa5QfLwLLg-1; Tue, 26 Nov 2019 05:50:32 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f21so963424wmh.5
+        for <kvm@vger.kernel.org>; Tue, 26 Nov 2019 02:50:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=R0suUB0h2cJm9IG+wl8vuFejSumo0ekP4tj9lnnUJew=;
+        b=SH86tq8TP4lDiPcX8X3iyhY5SUiU/sdonBRze1VFWpVDu9w+w/j3oKnqxA4cdnqJiN
+         aldwWkr3Qg3PNzwK5iL2ZvRi/HCzGsacaRohgqlboKYis1L+uluRn7gCVeRghpMYWJH0
+         34kYHIMmqtP/JXyxh9urU80aDrjljugb1K3Uk3zJH0Ya2i2bLwNA46Z1gTZ3DkzltYEV
+         QEGhYVYVxx/H0ED6/LhzkhwL8ydOFUUv189EzT9P9g3DaD/IokSpOGjpSosiIR4Q4298
+         YWLfs1n7hkjUdHibfqxxudRU5IFYalztbYgMXiptXyPQN5IYH6bS/id5CGWX0TEyhhTr
+         YHiQ==
+X-Gm-Message-State: APjAAAVN183/0I52AcrLSDj1f4F++bclvIKKTQ8ZYJX+a9LctWgyaZ6c
+        Fx0VpEUVfmcS25V1rykrsE+5dL4gCijVLKygTtopRWDIcPYRIlu36DWyyojbXjDUO51GUKkmd34
+        hlsR2S7kKtpko
+X-Received: by 2002:adf:d091:: with SMTP id y17mr38095422wrh.182.1574765431444;
+        Tue, 26 Nov 2019 02:50:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxYWtiHjTbs2+gq5fix9nXS12FIn2I1K/paROsrcbJEox1XXKa4zTvdRRqUsp5+Wm4plu4R0A==
+X-Received: by 2002:adf:d091:: with SMTP id y17mr38095394wrh.182.1574765431153;
+        Tue, 26 Nov 2019 02:50:31 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5454:a592:5a0a:75c? ([2001:b07:6468:f312:5454:a592:5a0a:75c])
+        by smtp.gmail.com with ESMTPSA id w11sm15560411wra.83.2019.11.26.02.50.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2019 02:50:30 -0800 (PST)
+Subject: Re: "statsfs" API design
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     KVM list <kvm@vger.kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <5d6cdcb1-d8ad-7ae6-7351-3544e2fa366d@redhat.com>
+ <20191109154952.GA1365674@kroah.com>
+ <cb52053e-eac0-cbb9-1633-646c7f71b8b3@redhat.com>
+ <20191126100948.GB1416107@kroah.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <75dc4403-cc07-0f99-00ec-86f61092fff9@redhat.com>
+Date:   Tue, 26 Nov 2019 11:50:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     prashantbhole.linux@gmail.com
-Cc:     mst@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org,
-        songliubraving@fb.com, jakub.kicinski@netronome.com,
-        hawk@kernel.org, daniel@iogearbox.net, netdev@vger.kernel.org,
-        john.fastabend@gmail.com, ast@kernel.org, kafai@fb.com,
-        prashantbhole.linux@gmail.com, kvm@vger.kernel.org, yhs@fb.com,
-        andriin@fb.com, davem@davemloft.net
-Date:   Tue, 26 Nov 2019 02:36:03 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191126100948.GB1416107@kroah.com>
+Content-Language: en-US
+X-MC-Unique: z0pIswJGOdyJVa5QfLwLLg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNjEwMDkxNC41MTUw
-LTEtcHJhc2hhbnRiaG9sZS5saW51eEBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
-ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbXVzaWNwYWwubwogIENDICAgICAgYWFyY2g2
-NC1zb2Z0bW11L2h3L2FybS9uZXRkdWlubzIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
-L2FybS9uc2VyaWVzLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L25ldC92aXJ0aW8tbmV0LmM6NjM2
-OjEyOiBlcnJvcjogJ3BlZXJfYXR0YWNoX2VicGYnIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vy
-cm9yPXVudXNlZC1mdW5jdGlvbl0KIHN0YXRpYyBpbnQgcGVlcl9hdHRhY2hfZWJwZihWaXJ0SU9O
-ZXQgKm4sIGludCBsZW4sIHZvaWQgKmluc25zLCB1aW50OF90IGdwbCkKICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwpt
-YWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L25ldC92aXJ0
-aW8tbmV0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
-cy4uLi4KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcF9zeDEubwogIENDICAg
-ICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9wYWxtLm8KbWFrZTogKioqIFtNYWtlZmlsZTo0OTE6
-IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5p
-c2hlZCBqb2JzLi4uLgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9ndW1zdGl4Lm8K
-ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc3BpdHoubwotLS0KICBDQyAgICAgIGFh
-cmNoNjQtc29mdG1tdS9nZGJzdHViLXhtbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdHJh
-Y2UvZ2VuZXJhdGVkLWhlbHBlcnMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9h
-cm0vdHJhbnNsYXRlLXN2ZS5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5ldC5j
-OjYzNjoxMjogZXJyb3I6ICdwZWVyX2F0dGFjaF9lYnBmJyBkZWZpbmVkIGJ1dCBub3QgdXNlZCBb
-LVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dCiBzdGF0aWMgaW50IHBlZXJfYXR0YWNoX2VicGYoVmly
-dElPTmV0ICpuLCBpbnQgbGVuLCB2b2lkICppbnNucywgdWludDhfdCBncGwpCiAgICAgICAgICAg
-IF5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJv
-cnMKbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBody9uZXQv
-dmlydGlvLW5ldC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDkxOiBhYXJjaDY0LXNv
-ZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
-aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2MiwgaW4gPG1vZHVsZT4KICAg
-IHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
-ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
-Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
-PTViNmFjYzJhYzc0OTRhZDZiNTk3MDZjOWRkMjZjM2NkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1
-cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
-U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
-PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJ
-Uj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2Nr
-ZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC00ZTJobm5kNS9zcmMvZG9ja2VyLXNyYy4yMDE5LTExLTI2LTA1LjMzLjM3LjMzMjov
-dmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
-dGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
-aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01YjZhY2MyYWM3NDk0YWQ2YjU5NzA2
-YzlkZDI2YzNjZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
-dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00ZTJobm5kNS9zcmMn
-Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAg
-ICAybTI0Ljk2N3MKdXNlciAgICAwbTguOTk5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjYxMDA5MTQuNTE1MC0xLXByYXNoYW50
-YmhvbGUubGludXhAZ21haWwuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On 26/11/19 11:09, Greg Kroah-Hartman wrote:
+> So I think there are two different things here:
+> 	- a simple data structure for in-kernel users of statistics
+> 	- a way to export statistics to userspace
+> 
+> Now if they both can be solved with the same "solution", wonderful!  But
+> don't think that you have to do both of these at the same time.
+> 
+> Which one are you trying to solve here, I can't figure it out.  Is it
+> the second one?
+
+I already have the second in KVM using debugfs, but that's not good.  So
+I want to do:
+
+- a simple data structure for in-kernel *publishers* of statistics
+
+- a sysfs-based interface to export it to userspace, which looks a lot
+like KVM's debugfs-based statistics.
+
+What we don't have to do at the same time, is a new interface to
+userspace, one that is more efficient while keeping the self-describing
+property that we agree is needed.  That is also planned, but would come
+later.
+
+Paolo
 
