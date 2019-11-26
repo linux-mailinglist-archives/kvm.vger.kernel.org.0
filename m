@@ -2,280 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74535109DC9
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 13:20:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB45D109E15
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 13:36:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728316AbfKZMUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 07:20:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21781 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727951AbfKZMUx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 07:20:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574770850;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=0QicmIFZgcSaQ9HsIRb0rZI3UQa68hu10zVrXnNnFpg=;
-        b=MyW/52A2iae4cmOmfOyrWtEfDRX6KoGCyxCEeEiX81ufy/Er+CHzt4apfblbaVi8AD+hEA
-        9afpn6EhivH9zz9v7pj15mepcN9hDTf4HfLJugO5oyg6DLJwce4D04XO2RSdabnSM1p9q8
-        o/9v0x9rWpOLWO0S69IuYpi/2bfGN4c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-355O7T9NPBSsoMY5TCwDaQ-1; Tue, 26 Nov 2019 07:20:48 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 288381007269;
-        Tue, 26 Nov 2019 12:20:46 +0000 (UTC)
-Received: from [10.36.118.20] (unknown [10.36.118.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 776561001DC0;
-        Tue, 26 Nov 2019 12:20:33 +0000 (UTC)
-Subject: Re: [PATCH v14 0/6] mm / virtio: Provide support for unused page
- reporting
-To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com,
-        alexander.h.duyck@linux.intel.com, osalvador@suse.de
-References: <20191119214454.24996.66289.stgit@localhost.localdomain>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <052f7442-4500-cd02-af2e-56d2f97a232c@redhat.com>
-Date:   Tue, 26 Nov 2019 13:20:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1728571AbfKZMgn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 07:36:43 -0500
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:59714 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728519AbfKZMgm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 07:36:42 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAQCaVuR048859;
+        Tue, 26 Nov 2019 06:36:31 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1574771791;
+        bh=vcERJ18wcMnaJA3/y4V2GMdIEZOjeBtH+vfdp4+d8nc=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=njFTf4DLIvYOGiUVw5oLYxCa6mYYx/Sb0B5g9suruF6LGsZDSI5b3zrnJffI7Y6CH
+         xFn8P7EMfPmhXJJyWhvEbpMInZZhtu0Fs1cShQc8ZNWiNtUEduD9GO0BTwz25ezm0g
+         JtpSKl3YfoQUsqKgeDmlDzD7l8zOD/s9O5a1uEaw=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xAQCaVZd061181
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 26 Nov 2019 06:36:31 -0600
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 26
+ Nov 2019 06:36:31 -0600
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Tue, 26 Nov 2019 06:36:31 -0600
+Received: from [10.24.69.157] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAQCaRsV126481;
+        Tue, 26 Nov 2019 06:36:28 -0600
+Subject: Re: [PATCH] pci: endpoint: functions: Add a virtnet EP function
+To:     Jason Wang <jasowang@redhat.com>,
+        Haotian Wang <haotian.wang@sifive.com>, <mst@redhat.com>,
+        <lorenzo.pieralisi@arm.com>, <bhelgaas@google.com>,
+        Alan Mikhak <alan.mikhak@sifive.com>
+CC:     <linux-pci@vger.kernel.org>, <haotian.wang@duke.edu>,
+        Jon Mason <jdmason@kudzu.us>, KVM list <kvm@vger.kernel.org>
+References: <7067e657-5c8e-b724-fa6a-086fece6e6c3@redhat.com>
+ <20190904215801.2971-1-haotian.wang@sifive.com>
+ <59982499-0fc1-2e39-9ff9-993fb4dd7dcc@redhat.com>
+ <2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com>
+ <d87fbe2f-b3ae-5cb1-448a-41335febc460@redhat.com>
+From:   Kishon Vijay Abraham I <kishon@ti.com>
+Message-ID: <9f8e596f-b601-7f97-a98a-111763f966d1@ti.com>
+Date:   Tue, 26 Nov 2019 18:05:46 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191119214454.24996.66289.stgit@localhost.localdomain>
+In-Reply-To: <d87fbe2f-b3ae-5cb1-448a-41335febc460@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 355O7T9NPBSsoMY5TCwDaQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.11.19 22:46, Alexander Duyck wrote:
-> This series provides an asynchronous means of reporting unused guest
-> pages to a hypervisor so that the memory associated with those pages can
-> be dropped and reused by other processes and/or guests on the host. Using
-> this it is possible to avoid unnecessary I/O to disk and greatly improve
-> performance in the case of memory overcommit on the host.
->=20
-> When enabled it will allocate a set of statistics to track the number of
-> reported pages. When the nr_free for a given free area is greater than
-> this by the high water mark we will schedule a worker to begin pulling th=
-e
-> non-reported memory and to provide it to the reporting interface via a
-> scatterlist.
->=20
-> Currently this is only in use by virtio-balloon however there is the hope
-> that at some point in the future other hypervisors might be able to make
-> use of it. In the virtio-balloon/QEMU implementation the hypervisor is
-> currently using MADV_DONTNEED to indicate to the host kernel that the pag=
-e
-> is currently unused. It will be zeroed and faulted back into the guest th=
-e
-> next time the page is accessed.
+Hi Jason,
 
-Remind me why we are using MADV_DONTNEED? Mostly for debugging purposes
-right now, right? Did you do any measurements with MADV_FREE? I guess
-there should be quite a performance increase in some scenarios.
+On 26/11/19 3:28 PM, Jason Wang wrote:
+> 
+> On 2019/11/25 下午8:49, Kishon Vijay Abraham I wrote:
+>> +Alan, Jon
+>>
+>> Hi Jason, Haotian, Alan,
+>>
+>> On 05/09/19 8:26 AM, Jason Wang wrote:
+>>> On 2019/9/5 上午5:58, Haotian Wang wrote:
+>>>> Hi Jason,
+>>>>
+>>>> I have an additional comment regarding using vring.
+>>>>
+>>>> On Tue, Sep 3, 2019 at 6:42 AM Jason Wang <jasowang@redhat.com> wrote:
+>>>>> Kind of, in order to address the above limitation, you probably want to
+>>>>> implement a vringh based netdevice and driver. It will work like,
+>>>>> instead of trying to represent a virtio-net device to endpoint,
+>>>>> represent a new type of network device, it uses two vringh ring instead
+>>>>> virtio ring. The vringh ring is usually used to implement the
+>>>>> counterpart of virtio driver. The advantages are obvious:
+>>>>>
+>>>>> - no need to deal with two sets of features, config space etc.
+>>>>> - network specific, from the point of endpoint linux, it's not a virtio
+>>>>> device, no need to care about transport stuffs or embedding internal
+>>>>> virtio-net specific data structures
+>>>>> - reuse the exist codes (vringh) to avoid duplicated bugs, implementing
+>>>>> a virtqueue is kind of challenge
+>>>> With vringh.c, there is no easy way to interface with virtio_net.c.
+>>>>
+>>>> vringh.c is linked with vhost/net.c nicely
+>>>
+>>> Let me clarify, vhost_net doesn't use vringh at all (though there's a
+>>> plan to switch to use vringh).
+>>>
+>>>
+>>>> but again it's not easy to
+>>>> interface vhost/net.c with the network stack of endpoint kernel. The
+>>>> vhost drivers are not designed with the purpose of creating another
+>>>> suite of virtual devices in the host kernel in the first place. If I try
+>>>> to manually write code for this interfacing, it seems that I will do
+>>>> duplicate work that virtio_net.c does.
+>>>
+>>> Let me explain:
+>>>
+>>> - I'm not suggesting to use vhost_net since it can only deal with
+>>> userspace virtio rings.
+>>> - I suggest to introduce netdev that has vringh vring assoticated.
+>>> Vringh was designed to deal with virtio ring located at different types
+>>> of memory. It supports userspace vring and kernel vring currently, but
+>>> it should not be too hard to add support for e.g endpoint device that
+>>> requires DMA or whatever other method to access the vring. So it was by
+>>> design to talk directly with e.g kernel virtio device.
+>>> - In your case, you can read vring address from virtio config space
+>>> through endpoint framework and then create vringh. It's as simple as:
+>>> creating a netdev, read vring address, and initialize vringh. Then you
+>>> can use vringh helper to get iov and build skb etc (similar to caif_virtio).
+>>  From the discussions above and from looking at Jason's mdev patches [1], I've
+>> created the block diagram below.
+>>
+>> While this patch (from Haotian) deals with RC<->EP connection, I'd also like
+>> this to be extended for NTB (using multiple EP instances. RC<->EP<->EP<->RC)
+>> [2][3].
+>>
+>> +-----------------------------------+   +-------------------------------------+
+>> |                                   |   |                                     |
+>> |  +------------+  +--------------+ |   | +------------+  +--------------+    |
+>> |  | vringh_net |  | vringh_rpmsg | |   | | virtio_net |  | virtio_rpmsg |    |
+>> |  +------------+  +--------------+ |   | +------------+  +--------------+    |
+>> |                                   |   |                                     |
+>> |          +---------------+        |   |          +---------------+          |
+>> |          |  vringh_mdev  |        |   |          |  virtio_mdev  |          |
+>> |          +---------------+        |   |          +---------------+          |
+>> |                                   |   |                                     |
+>> |  +------------+   +------------+  |   | +-------------------+ +------------+|
+>> |  | vringh_epf |   | vringh_ntb |  |   | | virtio_pci_common | | virtio_ntb ||
+>> |  +------------+   +------------+  |   | +-------------------+ +------------+|
+>> | (PCI EP Device)   (NTB Secondary  |   |        (PCI RC)       (NTB Primary  |
+>> |                       Device)     |   |                          Device)    |
+>> |                                   |   |                                     |
+>> |                                   |   |                                     |
+>> |             (A)                   |   |              (B)                    |
+>> +-----------------------------------+   +-------------------------------------+
+>>
+>> GUEST SIDE (B):
+>> ===============
+>> In the virtualization terminology, the side labeled (B) will be the guest side.
+>> Here it will be the place where PCIe host (RC) side SW will execute (Ignore NTB
+>> for this discussion since PCIe host side SW will execute on both ends of the
+>> link in the case of NTB. However I've included in the block diagram since the
+>> design we adopt should be able to be extended for NTB as well).
+>>
+>> Most of the pieces in (B) already exists.
+>> 1) virtio_net and virtio_rpmsg: No modifications needed and can be used as it
+>>     is.
+>> 2) virtio_mdev: Jason has sent this [1]. This could be used as it is for EP
+>>     usecases as well. Jason has created mvnet based on virtio_mdev, but for EP
+>>     usecases virtio_pci_common and virtio_ntb should use it.
+> 
+> 
+> Can we implement NTB as a transport for virtio, then there's no need for
+> virtio_mdev?
 
->=20
-> To track if a page is reported or not the Uptodate flag was repurposed an=
-d
-> used as a Reported flag for Buddy pages. We walk though the free list
-> isolating pages and adding them to the scatterlist until we either
-> encounter the end of the list or have filled the scatterlist with pages t=
-o
-> be reported. If we fill the scatterlist before we reach the end of the
-> list we rotate the list so that the first unreported page we encounter is
-> moved to the head of the list as that is where we will resume after we
-> have freed the reported pages back into the tail of the list.
+Yes, we could have NTB specific virtio_config_ops. Where exactly should
+virtio_mdev be used?
+> 
+> 
+>> 3) virtio_pci_common: This should be used when a PCIe EPF is connected. This
+>>     should be modified to create virtio_mdev instead of directly creating virtio
+>>     device.
+>> 4) virtio_ntb: This is used for NTB where one end of the link should use
+>>     virtio_ntb. This should create virtio_mdev.
+>>
+>> With this virtio_mdev can abstract virtio_pci_common and virtio_ntb and ideally
+>> any virtio drivers can be used for EP or NTB (In the block diagram above
+>> virtio_net and virtio_rpmsg can be used).
+>>
+>> HOST SIDE (A):
+>> ===============
+>> In the virtualization terminology, the side labeled (A) will be the host side.
+>> Here it will be the place where PCIe device (Endpoint) side SW will execute.
+>>
+>> Bits and pieces of (A) should exist but there should be considerable work in
+>> this.
+>> 1) vringh_net: There should be vringh drivers corresponding to
+>>     the virtio drivers on the guest side (B). vringh_net should register with
+>>     the net core. The vringh_net device should be created by vringh_mdev. This
+>>     should be new development.
+>> 2) vringh_rpmsg: vringh_rpmsg should register with the rpmsg core. The
+>>     vringh_rpmsg device should be created by vringh_mdev.
+>> 3) vringh_mdev: This layer should define ops specific to vringh (e.g
+>>     get_desc_addr() should give vring descriptor address and will depend on
+>>     either EP device or NTB device). I haven't looked further on what other ops
+>>     will be needed. IMO this layer should also decide whether _kern() or _user()
+>>     vringh helpers should be invoked.
+> 
+> 
+> Right, but probably not necessary called "mdev", it could just some abstraction
+> as a set of callbacks.
 
-So the boundary pointer didn't actually provide that big of a benefit I
-assume (IOW, worst thing is you have to re-scan the whole list)?
+Yeah, we could have something like vringh_config_ops. Once we start to
+implement, this might get more clear.
+> 
+> 
+>> 4) vringh_epf: This will be used for PCIe endpoint. This will implement ops to
+>>     get the vring descriptor address.
+>> 5) vringh_ntb: Similar to vringh_epf but will interface with NTB device instead
+>>     of EPF device.
+>>
+>> Jason,
+>>
+>> Can you give your comments on the above design? Do you see any flaws/issues
+>> with the above approach?
+> 
+> 
+> Looks good overall, see questions above.
 
->=20
-> Below are the results from various benchmarks. I primarily focused on two
-> tests. The first is the will-it-scale/page_fault2 test, and the other is
-> a modified version of will-it-scale/page_fault1 that was enabled to use
-> THP. I did this as it allows for better visibility into different parts
-> of the memory subsystem. The guest is running with 32G for RAM on one
-> node of a E5-2630 v3. The host has had some power saving features disable=
-d
-> by setting the /dev/cpu_dma_latency value to 10ms.
->=20
-> Test                page_fault1 (THP)     page_fault2
-> Name         tasks  Process Iter  STDEV  Process Iter  STDEV
-> Baseline         1    1203934.75  0.04%     379940.75  0.11%
->                 16    8828217.00  0.85%    3178653.00  1.28%
->=20
-> Patches applied  1    1207961.25  0.10%     380852.25  0.25%
->                 16    8862373.00  0.98%    3246397.25  0.68%
->=20
-> Patches enabled  1    1207758.75  0.17%     373079.25  0.60%
->  MADV disabled  16    8870373.75  0.29%=09   3204989.75  1.08%
->=20
-> Patches enabled  1    1261183.75  0.39%     373201.50  0.50%
->                 16    8371359.75  0.65%    3233665.50  0.84%
->=20
-> Patches enabled  1    1090201.50  0.25%     376967.25  0.29%
->  page shuffle   16    8108719.75  0.58%    3218450.25  1.07%
->=20
-> The results above are for a baseline with a linux-next-20191115 kernel,
-> that kernel with this patch set applied but page reporting disabled in
-> virtio-balloon, patches applied but the madvise disabled by direct
-> assigning a device, the patches applied and page reporting fully
-> enabled, and the patches enabled with page shuffling enabled.  These
-> results include the deviation seen between the average value reported her=
-e
-> versus the high and/or low value. I observed that during the test memory
-> usage for the first three tests never dropped whereas with the patches
-> fully enabled the VM would drop to using only a few GB of the host's
-> memory when switching from memhog to page fault tests.
->=20
-> Most of the overhead seen with this patch set enabled seems due to page
-> faults caused by accessing the reported pages and the host zeroing the pa=
-ge
-> before giving it back to the guest. This overhead is much more visible wh=
-en
-> using THP than with standard 4K pages. In addition page shuffling seemed =
-to
-> increase the amount of faults generated due to an increase in memory chur=
-n.
+Thanks for your comments Jason.
 
-MADV_FREE would be interesting.
+Haotian, Alan, Me or whoever gets to implement this first, should try to follow
+the above discussed approach.
 
->=20
-> The overall guest size is kept fairly small to only a few GB while the te=
-st
-> is running. If the host memory were oversubscribed this patch set should
-> result in a performance improvement as swapping memory in the host can be
-> avoided.
->=20
-> A brief history on the background of unused page reporting can be found a=
-t:
-> https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.cam=
-el@linux.intel.com/
->=20
-> Changes from v12:
-> https://lore.kernel.org/lkml/20191022221223.17338.5860.stgit@localhost.lo=
-caldomain/
-> Rebased on linux-next 20191031
-> Renamed page_is_reported to page_reported
-> Renamed add_page_to_reported_list to mark_page_reported
-> Dropped unused definition of add_page_to_reported_list for non-reporting =
-case
-> Split free_area_reporting out from get_unreported_tail
-> Minor updates to cover page
->=20
-> Changes from v13:
-> https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost.l=
-ocaldomain/
-> Rewrote core reporting functionality
->   Merged patches 3 & 4
->   Dropped boundary list and related code
->   Folded get_reported_page into page_reporting_fill
->   Folded page_reporting_fill into page_reporting_cycle
-> Pulled reporting functionality out of free_reported_page
->   Renamed it to __free_isolated_page
->   Moved page reporting specific bits to page_reporting_drain
-> Renamed phdev to prdev since we aren't "hinting" we are "reporting"
-> Added documentation to describe the usage of unused page reporting
-> Updated cover page and patch descriptions to avoid mention of boundary
->=20
->=20
-> ---
->=20
-> Alexander Duyck (6):
->       mm: Adjust shuffle code to allow for future coalescing
->       mm: Use zone and order instead of free area in free_list manipulato=
-rs
->       mm: Introduce Reported pages
->       mm: Add unused page reporting documentation
->       virtio-balloon: Pull page poisoning config out of free page hinting
->       virtio-balloon: Add support for providing unused page reports to ho=
-st
->=20
->=20
->  Documentation/vm/unused_page_reporting.rst |   44 ++++
->  drivers/virtio/Kconfig                     |    1=20
->  drivers/virtio/virtio_balloon.c            |   88 +++++++
->  include/linux/mmzone.h                     |   56 +----
->  include/linux/page-flags.h                 |   11 +
->  include/linux/page_reporting.h             |   31 +++
->  include/uapi/linux/virtio_balloon.h        |    1=20
->  mm/Kconfig                                 |   11 +
->  mm/Makefile                                |    1=20
->  mm/memory_hotplug.c                        |    2=20
->  mm/page_alloc.c                            |  181 +++++++++++----
->  mm/page_reporting.c                        |  337 ++++++++++++++++++++++=
-++++++
->  mm/page_reporting.h                        |  125 ++++++++++
->  mm/shuffle.c                               |   12 -
->  mm/shuffle.h                               |    6=20
->  15 files changed, 805 insertions(+), 102 deletions(-)
+Thanks
+Kishon
 
-So roughly 100 LOC less added, that's nice to see :)
-
-I'm planning to look into the details soon, just fairly busy lately. I
-hope Mel Et al. can also comment.
-
---=20
-Thanks,
-
-David / dhildenb
-
+> 
+> Thanks
+> 
+> 
+>>
+>> Thanks
+>> Kishon
+>>
+>> [1] -> https://lkml.org/lkml/2019/11/18/261
+>> [2] -> https://lkml.org/lkml/2019/9/26/291
+>> [3] ->
+>> https://www.linuxplumbersconf.org/event/4/contributions/395/attachments/284/481/Implementing_NTB_Controller_Using_PCIe_Endpoint_-_final.pdf
+>>
+>>>
+>>>> There will be two more main disadvantages probably.
+>>>>
+>>>> Firstly, there will be two layers of overheads. vhost/net.c uses
+>>>> vringh.c to channel data buffers into some struct sockets. This is the
+>>>> first layer of overhead. That the virtual network device will have to
+>>>> use these sockets somehow adds another layer of overhead.
+>>>
+>>> As I said, it doesn't work like vhost and no socket is needed at all.
+>>>
+>>>
+>>>> Secondly, probing, intialization and de-initialization of the virtual
+>>>> network_device are already non-trivial. I'll likely copy this part
+>>>> almost verbatim from virtio_net.c in the end. So in the end, there will
+>>>> be more duplicate code.
+>>>
+>>> It will be a new type of network device instead of virtio, you don't
+>>> need to care any virtio stuffs but vringh in your codes. So it looks to
+>>> me it would be much simpler and compact.
+>>>
+>>> But I'm not saying your method is no way to go, but you should deal with
+>>> lots of other issues like I've replied in the previous mail. What you
+>>> want to achieve is
+>>>
+>>> 1) Host (virtio-pci) <-> virtio ring <-> virtual eth device <-> virtio
+>>> ring <-> Endpoint (virtio with customized config_ops).
+>>>
+>>> But I suggest is
+>>>
+>>> 2) Host (virtio-pci) <-> virtio ring <-> virtual eth device <-> vringh
+>>> vring (virtio ring in the Host) <-> network device
+>>>
+>>> The differences is.
+>>> - Complexity: In your proposal, there will be two virtio devices and 4
+>>> virtqueues. It means you need to prepare two sets of features, config
+>>> ops etc. And dealing with inconsistent feature will be a pain. It may
+>>> work for simple case like a virtio-net device with only _F_MAC, but it
+>>> would be hard to be expanded. If we decide to go for vringh, there will
+>>> be a single virtio device and 2 virtqueues. In the endpoint part, it
+>>> will be 2 vringh vring (which is actually point the same virtqueue from
+>>> Host side) and a normal network device. There's no need for dealing with
+>>> inconsistency, since vringh basically sever as a a device
+>>> implementation, the feature negotiation is just between device (network
+>>> device with vringh) and driver (virtito-pci) from the view of Linux
+>>> running on the PCI Host.
+>>> - Maintainability: A third path for dealing virtio ring. We've already
+>>> had vhost and vringh, a third path will add a lot of overhead when
+>>> trying to maintaining them. My proposal will try to reuse vringh,
+>>> there's no need a new path.
+>>> - Layer violation: We want to hide the transport details from the device
+>>> and make virito-net device can be used without modification. But your
+>>> codes try to poke information like virtnet_info. My proposal is to just
+>>> have a new networking device that won't need to care virtio at all. It's
+>>> not that hard as you imagine to have a new type of netdev, I suggest to
+>>> take a look at how caif_virtio is done, it would be helpful.
+>>>
+>>> If you still decide to go with two two virtio device model, you need
+>>> probably:
+>>> - Proving two sets of config and features, and deal with inconsistency
+>>> - Try to reuse the vringh codes
+>>> - Do not refer internal structures from virtio-net.c
+>>>
+>>> But I recommend to take a step of trying vringh method which should be
+>>> much simpler.
+>>>
+>>> Thanks
+>>>
+>>>
+>>>> Thank you for your patience!
+>>>>
+>>>> Best,
+>>>> Haotian
+> 
