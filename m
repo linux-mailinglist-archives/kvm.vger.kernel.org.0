@@ -2,289 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4838710A67B
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 23:24:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD6A110A684
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 23:27:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbfKZWYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 17:24:22 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:47928 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726103AbfKZWYV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 17:24:21 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQMEEW7040049;
-        Tue, 26 Nov 2019 22:24:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=SJDVCpw6qPueKJtDR+L1/n7oTWYZFEcQk+lmiUm1XOQ=;
- b=C5nG9+5/j2IzWmBbcT53Mx4kZNnBym6/gKEXYKQzSIRfYl5IW+driqmOOqynLFJ0eaFk
- 2SKa6hFaYW61hQycJaLGSfqMQMDzh+lx3GQNH3Mp1/D1fos6nqzWZHYyrgfq357vjKbI
- NO9JZVMO6Hcm95AWX2PTdcdfp5w5eTGbzSAuy4+iS5wlEoVfFRgipvphNaqKv8kN32Um
- F4Rw3p1lgQK+3OiJIsM18r+8KpS8yIf9bPSYZUoRbqCiZCpnvtybAY7PT0lQ90ZHL6gP
- tRqt5KRzFOTR6n8HogCVp0CMJDDZByqBXulPwAlOGNbIsBMcltq5WC+rc0n+9qt5hJ67 Lw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2wevqq9paj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 22:24:16 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQMOBrQ051915;
-        Tue, 26 Nov 2019 22:24:15 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2wh0reb91m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 22:24:15 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAQMNm0k015074;
-        Tue, 26 Nov 2019 22:23:48 GMT
-Received: from [192.168.14.112] (/109.66.202.5)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 26 Nov 2019 14:23:48 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [kvm-unit-tests PATCH v2] x86: Add RDTSC test
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20191126214443.99189-1-aaronlewis@google.com>
-Date:   Wed, 27 Nov 2019 00:23:45 +0200
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
+        id S1726199AbfKZW13 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 17:27:29 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52315 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726077AbfKZW13 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Nov 2019 17:27:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574807247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NicO9dQ03Zmo4PQMvYh38X/weC3beZzf/9LJxgQLW2o=;
+        b=YbwsjuqnC0/R9o1ygqUR7nd4MiiX/r2C3gY5Od8cdVkFIxpof0UUaWqZ8P6ksEvcEqV9Vy
+        i/XjS+B4bq2xuSEya1e2bhYTZtxy5Jk5tcntnYokxSdCQydHLBM/gFK2Lj/GQ9p8tYlTj3
+        iaqSUsQ+z9GzRPwpBnHOO4L8cqH1iEg=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-QBqWIM9kM1CpI5NUXirAHQ-1; Tue, 26 Nov 2019 17:27:24 -0500
+Received: by mail-qt1-f197.google.com with SMTP id f31so13531482qta.0
+        for <kvm@vger.kernel.org>; Tue, 26 Nov 2019 14:27:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=RbHOMzuh71lzkXaVrHGstWzxDJlihkJE/87ycwZQB+w=;
+        b=XZltrMvcJTQQNLX/hJiTCcDHzaJm0mRafS4bL8RlfWW3uamc7It2Lj3LKXgiEZ9Zoc
+         q3vFgk/2RODmPytRfdWXa/dx15JyMYu9AIBlP0jGKmySeQbG8sW9kVMQTd2qLAHu3CBV
+         mrhJO7vPbmXenbcVxQh5R0TlKc5Zg5lJCg1BpN/TtT5BX6V3hmEcuIAiDt40WdGvFgKn
+         G7pUbudFnbtVAr0PQLaQyrlcx/hRJR0NKk1mUvmeC09ynyC6EWJuhIqMOOjnV1bntDfO
+         kTqpMM4yQ5lveko8IdlSjvI175dSbeTvOuJGk+b23OA3JUQRjMBOvlu4m/iGhXANuazO
+         5yIQ==
+X-Gm-Message-State: APjAAAXEXfOBNzg8KeGVDEDgPOgl9QsdLRXV9gE5jWfPFMQ8ua9PEnqs
+        pupHjaukjkmwFTpIYyl9tmZI/4cqBA4ZfMpAs7WLAicnDzLYUlTwQ6owZ42AtzjPMTm8LhqC6Uo
+        GwRtoSXMVTGx2
+X-Received: by 2002:a05:620a:816:: with SMTP id s22mr878667qks.48.1574807244077;
+        Tue, 26 Nov 2019 14:27:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy6UQQWiuLZ74PXNzTPA2SAstnnTg0lc7LDU8i0zr8BODQKEqgqe0zdRaJekr2JvT+wcx6iOA==
+X-Received: by 2002:a05:620a:816:: with SMTP id s22mr878636qks.48.1574807243765;
+        Tue, 26 Nov 2019 14:27:23 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id f35sm6617602qtd.35.2019.11.26.14.27.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2019 14:27:23 -0800 (PST)
+Date:   Tue, 26 Nov 2019 17:27:21 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH] KVM: Unlimit number of ioeventfd assignments for real
+Message-ID: <20191126222721.GB14153@xz-x1>
+References: <20190928014045.10721-1-peterx@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20190928014045.10721-1-peterx@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: QBqWIM9kM1CpI5NUXirAHQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <54EDFF36-0746-470B-A73E-4479D2A662DC@oracle.com>
-References: <20191126214443.99189-1-aaronlewis@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9453 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911260189
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9453 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911260188
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> On 26 Nov 2019, at 23:44, Aaron Lewis <aaronlewis@google.com> wrote:
+On Sat, Sep 28, 2019 at 09:40:45AM +0800, Peter Xu wrote:
+> Previously we've tried to unlimit ioeventfd creation (6ea34c9b78c1,
+> "kvm: exclude ioeventfd from counting kvm_io_range limit",
+> 2013-06-04), because that can be easily done by fd limitations and
+> otherwise it can easily reach the current maximum of 1000 iodevices.
+> Meanwhile, we still use the counter to limit the maximum allowed kvm
+> io devices to be created besides ioeventfd.
 >=20
-> Verify that the difference between a guest RDTSC instruction and the
-> IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12's VM-exit
-> MSR-store list is less than 750 cycles, 99.9% of the time.
-
-It will help if commit message would also reference the KVM commit which =
-fixes the issue tested by this test.
-i.e. 662f1d1d1931 ("KVM: nVMX: Add support for capturing highest =
-observable L2 TSC=E2=80=9D)
-
+> 6ea34c9b78c1 achieved that in most cases, however it'll still fali the
+> ioeventfd creation when non-ioeventfd io devices overflows to 1000.
+> Then the next ioeventfd creation will fail while logically it should
+> be the next non-ioeventfd iodevice creation to fail.
 >=20
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> ---
-> x86/unittests.cfg |  6 ++++
-> x86/vmx.h         |  1 +
-> x86/vmx_tests.c   | 91 +++++++++++++++++++++++++++++++++++++++++++++++
-> 3 files changed, 98 insertions(+)
+> That's not really a big problem at all because when it happens it
+> probably means something has leaked in userspace (or even malicious
+> program) so it's a bug to fix there.  However the error message like
+> "ioeventfd creation failed" with an -ENOSPACE is really confusing and
+> may let people think about the fact that it's the ioeventfd that is
+> leaked (while in most cases it's not!).
 >=20
-> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> index b4865ac..5291d96 100644
-> --- a/x86/unittests.cfg
-> +++ b/x86/unittests.cfg
-> @@ -284,6 +284,12 @@ extra_params =3D -cpu host,+vmx -append =
-vmx_vmcs_shadow_test
-> arch =3D x86_64
-> groups =3D vmx
+> Let's use this patch to unlimit the creation of ioeventfd for real
+> this time, assuming this is also a bugfix of 6ea34c9b78c1.  To me more
+> importantly, when with a bug in userspace this patch can probably give
+> us another more meaningful failure on what has overflowed/leaked
+> rather than "ioeventfd creation failure: -ENOSPC".
 >=20
-> +[vmx_rdtsc_vmexit_diff_test]
-> +file =3D vmx.flat
-> +extra_params =3D -cpu host,+vmx -append rdtsc_vmexit_diff_test
-> +arch =3D x86_64
-> +groups =3D vmx
-> +
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-I think we are missing some clear guidance on when a VMX unit-test =
-should have it=E2=80=99s own test-section in x86/unittests.cfg.
+Ping - just in case it fell through the cracks.
 
-I believe the guidance should be that all VMX tests are suppose to be =
-run by [vmx] except those that have special requirements
-on execution environment (e.g. vmx_smp*) or destroy execution =
-environment after they run (e.g. vmx_init_signal_test) or
-require special timeout if they fail (e.g. =
-vmx_apic_passthrough_tpr_threshold_test).
-These tests should both be removed from [vmx] by "-append -test_name=E2=80=
-=9D and have their own section which runs them.
-
-Being concrete to this patch, I think it shouldn=E2=80=99t have it=E2=80=99=
-s own section.
-For example, it will cause the test to run twice: Both as part of [vmx] =
-and as part of [vmx_rdtsc_vmexit_diff_test].
-
-And I can submit a separate patches to:
-1) Rename vmx_eoi_bitmap_ioapic_scan & vmx_apic_passthrough_thread to =
-prefix with vmx_smp*
-    (It actually seems to me that currently there are no vmx_smp* tests =
-at all=E2=80=A6)
-    and create a [vmx_smp] section for running them.
-2) Remove vmx_hlt_with_rvi_test and vmx_apicv_test sections.
-
-Does anyone think differently?
-
-> [debug]
-> file =3D debug.flat
-> arch =3D x86_64
-> diff --git a/x86/vmx.h b/x86/vmx.h
-> index 8496be7..21ba953 100644
-> --- a/x86/vmx.h
-> +++ b/x86/vmx.h
-> @@ -420,6 +420,7 @@ enum Ctrl1 {
-> 	CPU_SHADOW_VMCS		=3D 1ul << 14,
-> 	CPU_RDSEED		=3D 1ul << 16,
-> 	CPU_PML                 =3D 1ul << 17,
-> +	CPU_USE_TSC_SCALING	=3D 1ul << 25,
-> };
->=20
-> enum Intr_type {
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index 1d8932f..fcf71e7 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -8790,7 +8790,97 @@ static void vmx_vmcs_shadow_test(void)
-> 	enter_guest();
-> }
->=20
-> +/*
-> + * This test monitors the difference between a guest RDTSC =
-instruction
-> + * and the IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12
-> + * VM-exit MSR-store list when taking a VM-exit on the instruction
-> + * following RDTSC.
-> + */
-> +#define RDTSC_DIFF_ITERS 100000
-> +#define RDTSC_DIFF_FAILS 100
-> +#define HOST_RDTSC_LIMIT 750
-
-Nit: I suggest to rename HOST_RDTSC_LIMIT to =
-HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD.
-
-> +
-> +/*
-> + * Set 'use TSC offsetting' and set the guest offset to the
-> + * inverse of the host's current TSC value, so that the guest starts =
-running
-> + * with an effective TSC value of 0.
-> + */
-> +static void reset_guest_tsc_to_zero(void)
-> +{
-> +	TEST_ASSERT_MSG(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET,
-> +			"Expected support for 'use TSC offsetting'");
-> +
-> +	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
-> +	vmcs_write(TSC_OFFSET, -rdtsc());
-> +}
-> +
-> +static void rdtsc_vmexit_diff_test_guest(void)
-> +{
-> +	int i;
-> +
-> +	for (i =3D 0; i < RDTSC_DIFF_ITERS; i++)
-> +		/* Ensure rdtsc is the last instruction before the =
-vmcall. */
-> +		asm volatile("rdtsc; vmcall" : : : "eax", "edx");
-> +}
->=20
-> +/*
-> + * This function only considers the "use TSC offsetting" VM-execution
-> + * control.  It does not handle "use TSC scaling" (because the latter
-> + * isn't available to the host today.)
-> + */
-> +static unsigned long long host_time_to_guest_time(unsigned long long =
-t)
-> +{
-> +	TEST_ASSERT((vmcs_read(CPU_EXEC_CTRL1) & CPU_USE_TSC_SCALING) =3D=3D=
- 0);
-
-It=E2=80=99s problematic to vmcs_read(CPU_EXEC_CTRL1) when test runs on =
-CPU that doesn=E2=80=99t support
-secondary VM-execution control. As this will cause VMfailInvalid (i.e. =
-Clear CF,PF,AF,SF,OF and set ZF).
-
-What=E2=80=99s worse is that vmcs_read() today doesn=E2=80=99t assert =
-that RFLAGS.ZF=3D=3D0 after executing VMREAD.
-Maybe we should submit a separate patch for that as-well=E2=80=A6
-
-Anyway, you can just change your assert condition to:
-TEST_ASSERT(!(ctrl_cpu_rev[0].clr & CPU_SECONDARY) || =
-!(vmcs_read(CPU_EXEC_CTRL1) & CPU_USE_TSC_SCALING));
-
-> +
-> +	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_USE_TSC_OFFSET)
-> +		t +=3D vmcs_read(TSC_OFFSET);
-> +
-> +	return t;
-> +}
-> +
-> +static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
-> +{
-> +	unsigned long long guest_tsc, host_to_guest_tsc;
-> +
-> +	enter_guest();
-> +	skip_exit_vmcall();
-> +	guest_tsc =3D (u32) regs.rax + (regs.rdx << 32);
-> +	host_to_guest_tsc =3D =
-host_time_to_guest_time(exit_msr_store[0].value);
-> +
-> +	return host_to_guest_tsc - guest_tsc;
-> +}
-> +
-> +static void rdtsc_vmexit_diff_test(void)
-> +{
-> +	int fail =3D 0;
-> +	int i;
-> +
-> +	test_set_guest(rdtsc_vmexit_diff_test_guest);
-> +
-> +	reset_guest_tsc_to_zero();
-> +
-> +	/*
-> +	 * Set up the VMCS12 VM-exit MSR-store list to store just one
-> +	 * MSR: IA32_TIME_STAMP_COUNTER. Note that the value stored is
-> +	 * in the host time domain (i.e., it is not adjusted according
-> +	 * to the TSC multiplier and TSC offset fields in the VMCS12,
-> +	 * as a guest RDTSC would be.)
-> +	 */
-> +	exit_msr_store =3D alloc_page();
-> +	exit_msr_store[0].index =3D MSR_IA32_TSC;
-> +	vmcs_write(EXI_MSR_ST_CNT, 1);
-> +	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
-> +
-> +	for (i =3D 0; i < RDTSC_DIFF_ITERS; i++) {
-> +		if (rdtsc_vmexit_diff_test_iteration() >=3D =
-HOST_RDTSC_LIMIT)
-> +			fail++;
-> +	}
-> +
-> +	enter_guest();
-> +
-> +	report("RDTSC to VM-exit delta too high in %d of %d iterations",
-> +	       fail < RDTSC_DIFF_FAILS, fail, RDTSC_DIFF_ITERS);
-> +}
->=20
-> static int invalid_msr_init(struct vmcs *vmcs)
-> {
-> @@ -9056,5 +9146,6 @@ struct vmx_test vmx_tests[] =3D {
-> 	/* Atomic MSR switch tests. */
-> 	TEST(atomic_switch_max_msrs_test),
-> 	TEST(atomic_switch_overflow_msrs_test),
-> +	TEST(rdtsc_vmexit_diff_test),
-> 	{ NULL, NULL, NULL, NULL, NULL, {0} },
-> };
-> --=20
-> 2.24.0.432.g9d3f5f5b63-goog
->=20
+--=20
+Peter Xu
 
