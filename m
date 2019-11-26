@@ -2,111 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BBE6A10A576
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 21:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7695D10A587
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 21:35:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbfKZUaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 15:30:25 -0500
-Received: from ozlabs.org ([203.11.71.1]:41871 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726033AbfKZUaY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 15:30:24 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47MwWc65Ggz9sRH;
-        Wed, 27 Nov 2019 07:30:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1574800222;
-        bh=afsoIn2XZqK4fz9PBhl5G8eJamsDD10MBu3yEOVkQg8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=TKzABNkdBIRhUZFn4xtDqf6vrgHyPebdBu5IUD+MvfkmYZMgZg7Cco0hnih0elLP9
-         VW+VreZXiZHRRREL+NGCLQFEcMgBViOXdzHFxLqr1ENpZ00Q/nBDo1L3dq3cMKInyY
-         OdSqThyXGmBSancMCwEAXGasHUSPUTg3I5cSh8KTf69L9Eqp76yTiKCpT6JFdpFJQK
-         klitAcJed/p9q59cu4SGI7Erf1Z1uA9Qc50F8r7TvYfblKspO8lMNh3NJQc0emggyA
-         cTMB4yhkdu+Ix7wVStamc5y37tcji7+OhLJuz+aYJSxnNhITQoiOGCKDQnvBnqXvhv
-         nyN6CY9NPTU/Q==
-Date:   Wed, 27 Nov 2019 07:30:19 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Christoffer Dall <cdall@cs.columbia.edu>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM <kvm@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the kvm-arm tree with the kbuild
- tree
-Message-ID: <20191127073019.41c44ae7@canb.auug.org.au>
-In-Reply-To: <20191125135811.4a3d71da@canb.auug.org.au>
-References: <20191118143842.2e7ad24d@canb.auug.org.au>
-        <20191125135811.4a3d71da@canb.auug.org.au>
+        id S1726990AbfKZUfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 15:35:34 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40173 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726504AbfKZUfe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 15:35:34 -0500
+Received: by mail-lj1-f196.google.com with SMTP id s22so2784612ljs.7
+        for <kvm@vger.kernel.org>; Tue, 26 Nov 2019 12:35:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=K4Bc+8eHqvfcdZUohVg+/Nb9ohh1S05Ow4H5opvoqhk=;
+        b=hP8MBek+jIyGLD+HG0jW2xvdPV0teuBv/6k2y1ZOfuFlO/HjwikQPbJcxccaCkY4ca
+         gjaTQdQJuJuuDe7KXGd7CHEz647Qh6NX9XAIW3c4Z8FK6pZpjhGsPKjwmxaJVD5IlM/X
+         Z5/WxylRjt2WqI7WJW+aZcE6o+zYKjTFcMG7c0n8bOuwNbF7ICmk+Fxg7pHQ7dwDF31l
+         NmFxlfLTZZuYjXH9EvJKULzXQ8K11aH69Hhg25nRJk/+Jd3ZLFE+87+CG7Iv/YLiH0r1
+         8nEtemUANXF+RxlU+k7p/LnGQqcmKLtW90x47b0ZBqnVjm14VykY0TyefIzMoDaXqk0J
+         rZ7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=K4Bc+8eHqvfcdZUohVg+/Nb9ohh1S05Ow4H5opvoqhk=;
+        b=WRQDPAkeEe6YCChtYqbwPogkeEaGEThtwUMVawc/NSH+bozSO6SnduXv6rg0dv8sdf
+         Irt20r/OAR0Z1qtEe65fnBZaKF3w8tVvpbpcnSpO4v+vhGy8+sJlcwLHTausVgkMi1G+
+         Er/mlo1Tufz2bIqdolbDxMpAORHEQZRQAxZTapuB0h5jSCQWPBXJInCEXz6q9znnrbQW
+         52SO+KncdZmYyh6RpTpLRMVD9rCCRZ3q1fRpS2SHuw8QXyNUiUdUyrK/f3l9w/RRVery
+         qk8tj6ysyTFsqpsjERUgBrIksMrD/GA+EAeAO11872xjC6UROrjLYlUdImEWr9Zweqog
+         68aQ==
+X-Gm-Message-State: APjAAAV51UCzjZFZrruYmSkZpP+tGvIRfVi16yPqhTJ+EHZOGLk+YjiP
+        DLA3RMShnkj5nhmm2WOaIY7tVYfNl1k=
+X-Google-Smtp-Source: APXvYqx9IqBt3lkqgKwa8lRqh+EMXV4Z5INEt5vZARRFzhNGU5/ykWOAvkTYwnAGobZix7373gRwCQ==
+X-Received: by 2002:a2e:8885:: with SMTP id k5mr11915374lji.98.1574800532208;
+        Tue, 26 Nov 2019 12:35:32 -0800 (PST)
+Received: from cakuba.netronome.com ([66.60.152.14])
+        by smtp.gmail.com with ESMTPSA id z127sm5839668lfa.19.2019.11.26.12.35.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Nov 2019 12:35:31 -0800 (PST)
+Date:   Tue, 26 Nov 2019 12:35:14 -0800
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     Prashant Bhole <prashantbhole.linux@gmail.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
+Message-ID: <20191126123514.3bdf6d6f@cakuba.netronome.com>
+In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/mO/2s2aVXGsrv_8fZYouSu1";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/mO/2s2aVXGsrv_8fZYouSu1
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:
+> Note: This RFC has been sent to netdev as well as qemu-devel lists
+> 
+> This series introduces XDP offloading from virtio_net. It is based on
+> the following work by Jason Wang:
+> https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
+> 
+> Current XDP performance in virtio-net is far from what we can achieve
+> on host. Several major factors cause the difference:
+> - Cost of virtualization
+> - Cost of virtio (populating virtqueue and context switching)
+> - Cost of vhost, it needs more optimization
+> - Cost of data copy
+> Because of above reasons there is a need of offloading XDP program to
+> host. This set is an attempt to implement XDP offload from the guest.
 
-Hi all,
+This turns the guest kernel into a uAPI proxy.
 
-On Mon, 25 Nov 2019 13:58:11 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->
-> On Mon, 18 Nov 2019 14:38:42 +1100 Stephen Rothwell <sfr@canb.auug.org.au=
-> wrote:
-> >
-> > Today's linux-next merge of the kvm-arm tree got a conflict in:
-> >=20
-> >   include/Kbuild
-> >=20
-> > between commit:
-> >=20
-> >   fcbb8461fd23 ("kbuild: remove header compile test")
-> >=20
-> > from the kbuild tree and commit:
-> >=20
-> >   55009c6ed2d2 ("KVM: arm/arm64: Factor out hypercall handling from PSC=
-I code")
-> >=20
-> > from the kvm-arm tree.
-> >=20
-> > I fixed it up (I just removed the file) and can carry the fix as necess=
-ary. This
-> > is now fixed as far as linux-next is concerned, but any non trivial
-> > conflicts should be mentioned to your upstream maintainer when your tree
-> > is submitted for merging.  You may also want to consider cooperating
-> > with the maintainer of the conflicting tree to minimise any particularly
-> > complex conflicts. =20
->=20
-> This is now a conflict between the kvm tree and the kbuild tree.
+BPF uAPI calls related to the "offloaded" BPF objects are forwarded 
+to the hypervisor, they pop up in QEMU which makes the requested call
+to the hypervisor kernel. Today it's the Linux kernel tomorrow it may 
+be someone's proprietary "SmartNIC" implementation.
 
-And now between the kbuild tree and Linus' tree.
---=20
-Cheers,
-Stephen Rothwell
+Why can't those calls be forwarded at the higher layer? Why do they
+have to go through the guest kernel?
 
---Sig_/mO/2s2aVXGsrv_8fZYouSu1
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+If kernel performs no significant work (or "adds value", pardon the
+expression), and problem can easily be solved otherwise we shouldn't 
+do the work of maintaining the mechanism.
 
------BEGIN PGP SIGNATURE-----
+The approach of kernel generating actual machine code which is then
+loaded into a sandbox on the hypervisor/SmartNIC is another story.
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3di1sACgkQAVBC80lX
-0GxKWgf/XqDJya979/i/Ee6kkS9stH/cuZLB0qgcdM0OJksaN6vsHD1mj6sv2qdx
-h0qVO1ycAOLoM1Z3JGcbwvbJloYHG/lwejHc1yazpwdq+59pxBfqM1wCW100x+pH
-BFUXLlChcdcwzLRe0aXSQeNMH2BMM/UMjGlZ0QtIg/7pGtJyKbpj8/JsvB2CD6a7
-ptVB0dyrIVeC3kGo4O0F7M+P1hd0CoA+6X/syMRhdFAOKGYcBsdkVdbE+EIDMdeZ
-3jrnJToTlIJVA6i0sGW3Px9mZfdHGfvK3M8ZPvTkixzp2YhliRa9JP7c4Cn7pywI
-5oYRSi/GfCtGEsN1HD/VX9i80F0muw==
-=MaQE
------END PGP SIGNATURE-----
-
---Sig_/mO/2s2aVXGsrv_8fZYouSu1--
+I'd appreciate if others could chime in.
