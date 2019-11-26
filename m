@@ -2,440 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B31910A649
-	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 23:02:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4838710A67B
+	for <lists+kvm@lfdr.de>; Tue, 26 Nov 2019 23:24:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbfKZWCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 17:02:13 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:34187 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726072AbfKZWCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 17:02:13 -0500
-Received: by mail-lj1-f195.google.com with SMTP id m6so14663943ljc.1
-        for <kvm@vger.kernel.org>; Tue, 26 Nov 2019 14:02:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=jIlvgH7GkjMm5Fm1Bx/lY01P8MyoEe6h4HHhXWC23Qc=;
-        b=ndnCBhIj8byM5T63YMQ2tUJlUxUR5uzTBPJPU4VHBzoi4TNywKibjwtBReW8vBjU7l
-         co4kHNslBOq35J3qeVobWEQkCBWvS+rpC4zwJfcMEBmzMhe2qcCOU6Kp/G00Zc9mx1yO
-         xr/kBdRU1WzNK6cCORkhXGt5/iEWbWLWX6Lwp1lJbuCJowwHtZ9PIOFDfnb+9zKff5Le
-         3Ld5pYpGhcUk5B2i16LWyerFILURjeqMTob8HriSixnLPx3VlaRRHyyrlMktILxq/RwU
-         plfMlmM/gHbwKxCE2bkFZxYpGd7wvhcQ660rUOl29giYEHidKjPLEVSscItkCb8DFzEF
-         uGeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jIlvgH7GkjMm5Fm1Bx/lY01P8MyoEe6h4HHhXWC23Qc=;
-        b=rNxi0wGEYNPk3fET6j7BcTYMYV7QonKbgkGr78NRWPy+w4DzbWdvzcecvGN/nqZqpt
-         3Y5FTZFn+2DwH48uViuMSr2uc65NX08ZptiOpDyv/IxJbssLFpG7QrrbobaYKASRJ6T5
-         ZPx8bnVJgGJGWi3grxbOsSUY3qjm8bl+GLSe019+c4PLcdM9MZRcdGzj6Qml4i8kyQ0v
-         5+dpW9ODxcaF6R0cE1V64Em7Q0aDHyhdX71I0eWMAGQhwjLUGdcDh4D31veTLcb6axHS
-         01HKFq+l/DjKxqU8F6xsGjUYof9PE+ZsMVFphIe+oLxIMyBp29vsvwqLEpSyDcbCMf+n
-         QNLg==
-X-Gm-Message-State: APjAAAVQtBKTSiV/Qt36PNzvnGLQ+qFzNRgIs7oZ+8YC7+fYVAGAkkml
-        aUjTFEfe0ZCw+IC6Xld47r7VidIfbwAQAL2XD9Yupg==
-X-Google-Smtp-Source: APXvYqytbpMqe+yt7kf0QVOv8NSjT14vJa1WAatkadhVMZmBkFT4NJRxnOvYf6+4w54fjqeM/g6b7It26TD8BtxUt4w=
-X-Received: by 2002:a05:651c:326:: with SMTP id b6mr28119597ljp.119.1574805730784;
- Tue, 26 Nov 2019 14:02:10 -0800 (PST)
-MIME-Version: 1.0
-References: <7067e657-5c8e-b724-fa6a-086fece6e6c3@redhat.com>
- <20190904215801.2971-1-haotian.wang@sifive.com> <59982499-0fc1-2e39-9ff9-993fb4dd7dcc@redhat.com>
- <2cf00ec4-1ed6-f66e-6897-006d1a5b6390@ti.com> <d87fbe2f-b3ae-5cb1-448a-41335febc460@redhat.com>
- <9f8e596f-b601-7f97-a98a-111763f966d1@ti.com> <CABEDWGxmTvENvz-3Om0wzPb=wrx4XvPhkNYFTy1O6YAHxm+A-w@mail.gmail.com>
-In-Reply-To: <CABEDWGxmTvENvz-3Om0wzPb=wrx4XvPhkNYFTy1O6YAHxm+A-w@mail.gmail.com>
-From:   Alan Mikhak <alan.mikhak@sifive.com>
-Date:   Tue, 26 Nov 2019 14:01:59 -0800
-Message-ID: <CABEDWGzppgrGKwhr4J2RB8nG6B1Nqg9E1NVZEA6GDvzat7DNQQ@mail.gmail.com>
-Subject: Re: [PATCH] pci: endpoint: functions: Add a virtnet EP function
-To:     Kishon Vijay Abraham I <kishon@ti.com>
-Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        lorenzo.pieralisi@arm.com, Bjorn Helgaas <bhelgaas@google.com>,
-        linux-pci@vger.kernel.org,
-        "haotian.wang@duke.edu" <haotian.wang@duke.edu>,
-        Jon Mason <jdmason@kudzu.us>, KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726437AbfKZWYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 17:24:22 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:47928 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726103AbfKZWYV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 17:24:21 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQMEEW7040049;
+        Tue, 26 Nov 2019 22:24:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=SJDVCpw6qPueKJtDR+L1/n7oTWYZFEcQk+lmiUm1XOQ=;
+ b=C5nG9+5/j2IzWmBbcT53Mx4kZNnBym6/gKEXYKQzSIRfYl5IW+driqmOOqynLFJ0eaFk
+ 2SKa6hFaYW61hQycJaLGSfqMQMDzh+lx3GQNH3Mp1/D1fos6nqzWZHYyrgfq357vjKbI
+ NO9JZVMO6Hcm95AWX2PTdcdfp5w5eTGbzSAuy4+iS5wlEoVfFRgipvphNaqKv8kN32Um
+ F4Rw3p1lgQK+3OiJIsM18r+8KpS8yIf9bPSYZUoRbqCiZCpnvtybAY7PT0lQ90ZHL6gP
+ tRqt5KRzFOTR6n8HogCVp0CMJDDZByqBXulPwAlOGNbIsBMcltq5WC+rc0n+9qt5hJ67 Lw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2wevqq9paj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Nov 2019 22:24:16 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQMOBrQ051915;
+        Tue, 26 Nov 2019 22:24:15 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2wh0reb91m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Nov 2019 22:24:15 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAQMNm0k015074;
+        Tue, 26 Nov 2019 22:23:48 GMT
+Received: from [192.168.14.112] (/109.66.202.5)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 26 Nov 2019 14:23:48 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Add RDTSC test
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20191126214443.99189-1-aaronlewis@google.com>
+Date:   Wed, 27 Nov 2019 00:23:45 +0200
+Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <54EDFF36-0746-470B-A73E-4479D2A662DC@oracle.com>
+References: <20191126214443.99189-1-aaronlewis@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9453 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911260189
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9453 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911260188
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 1:55 PM Alan Mikhak <alan.mikhak@sifive.com> wrote:
->
-> On Tue, Nov 26, 2019 at 4:36 AM Kishon Vijay Abraham I <kishon@ti.com> wr=
-ote:
-> >
-> > Hi Jason,
-> >
-> > On 26/11/19 3:28 PM, Jason Wang wrote:
-> > >
-> > > On 2019/11/25 =E4=B8=8B=E5=8D=888:49, Kishon Vijay Abraham I wrote:
-> > >> +Alan, Jon
-> > >>
-> > >> Hi Jason, Haotian, Alan,
-> > >>
-> > >> On 05/09/19 8:26 AM, Jason Wang wrote:
-> > >>> On 2019/9/5 =E4=B8=8A=E5=8D=885:58, Haotian Wang wrote:
-> > >>>> Hi Jason,
-> > >>>>
-> > >>>> I have an additional comment regarding using vring.
-> > >>>>
-> > >>>> On Tue, Sep 3, 2019 at 6:42 AM Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > >>>>> Kind of, in order to address the above limitation, you probably w=
-ant to
-> > >>>>> implement a vringh based netdevice and driver. It will work like,
-> > >>>>> instead of trying to represent a virtio-net device to endpoint,
-> > >>>>> represent a new type of network device, it uses two vringh ring i=
-nstead
-> > >>>>> virtio ring. The vringh ring is usually used to implement the
-> > >>>>> counterpart of virtio driver. The advantages are obvious:
-> > >>>>>
-> > >>>>> - no need to deal with two sets of features, config space etc.
-> > >>>>> - network specific, from the point of endpoint linux, it's not a =
-virtio
-> > >>>>> device, no need to care about transport stuffs or embedding inter=
-nal
-> > >>>>> virtio-net specific data structures
-> > >>>>> - reuse the exist codes (vringh) to avoid duplicated bugs, implem=
-enting
-> > >>>>> a virtqueue is kind of challenge
-> > >>>> With vringh.c, there is no easy way to interface with virtio_net.c=
-.
-> > >>>>
-> > >>>> vringh.c is linked with vhost/net.c nicely
-> > >>>
-> > >>> Let me clarify, vhost_net doesn't use vringh at all (though there's=
- a
-> > >>> plan to switch to use vringh).
-> > >>>
-> > >>>
-> > >>>> but again it's not easy to
-> > >>>> interface vhost/net.c with the network stack of endpoint kernel. T=
-he
-> > >>>> vhost drivers are not designed with the purpose of creating anothe=
-r
-> > >>>> suite of virtual devices in the host kernel in the first place. If=
- I try
-> > >>>> to manually write code for this interfacing, it seems that I will =
-do
-> > >>>> duplicate work that virtio_net.c does.
-> > >>>
-> > >>> Let me explain:
-> > >>>
-> > >>> - I'm not suggesting to use vhost_net since it can only deal with
-> > >>> userspace virtio rings.
-> > >>> - I suggest to introduce netdev that has vringh vring assoticated.
-> > >>> Vringh was designed to deal with virtio ring located at different t=
-ypes
-> > >>> of memory. It supports userspace vring and kernel vring currently, =
-but
-> > >>> it should not be too hard to add support for e.g endpoint device th=
-at
-> > >>> requires DMA or whatever other method to access the vring. So it wa=
-s by
-> > >>> design to talk directly with e.g kernel virtio device.
-> > >>> - In your case, you can read vring address from virtio config space
-> > >>> through endpoint framework and then create vringh. It's as simple a=
-s:
-> > >>> creating a netdev, read vring address, and initialize vringh. Then =
-you
-> > >>> can use vringh helper to get iov and build skb etc (similar to caif=
-_virtio).
-> > >>  From the discussions above and from looking at Jason's mdev patches=
- [1], I've
-> > >> created the block diagram below.
-> > >>
-> > >> While this patch (from Haotian) deals with RC<->EP connection, I'd a=
-lso like
-> > >> this to be extended for NTB (using multiple EP instances. RC<->EP<->=
-EP<->RC)
-> > >> [2][3].
-> > >>
-> > >> +-----------------------------------+   +---------------------------=
-----------+
-> > >> |                                   |   |                           =
-          |
-> > >> |  +------------+  +--------------+ |   | +------------+  +---------=
------+    |
-> > >> |  | vringh_net |  | vringh_rpmsg | |   | | virtio_net |  | virtio_r=
-pmsg |    |
-> > >> |  +------------+  +--------------+ |   | +------------+  +---------=
------+    |
-> > >> |                                   |   |                           =
-          |
-> > >> |          +---------------+        |   |          +---------------+=
-          |
-> > >> |          |  vringh_mdev  |        |   |          |  virtio_mdev  |=
-          |
-> > >> |          +---------------+        |   |          +---------------+=
-          |
-> > >> |                                   |   |                           =
-          |
-> > >> |  +------------+   +------------+  |   | +-------------------+ +---=
----------+|
-> > >> |  | vringh_epf |   | vringh_ntb |  |   | | virtio_pci_common | | vi=
-rtio_ntb ||
-> > >> |  +------------+   +------------+  |   | +-------------------+ +---=
----------+|
-> > >> | (PCI EP Device)   (NTB Secondary  |   |        (PCI RC)       (NTB=
- Primary  |
-> > >> |                       Device)     |   |                          D=
-evice)    |
-> > >> |                                   |   |                           =
-          |
-> > >> |                                   |   |                           =
-          |
-> > >> |             (A)                   |   |              (B)          =
-          |
-> > >> +-----------------------------------+   +---------------------------=
-----------+
-> > >>
-> > >> GUEST SIDE (B):
-> > >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >> In the virtualization terminology, the side labeled (B) will be the =
-guest side.
-> > >> Here it will be the place where PCIe host (RC) side SW will execute =
-(Ignore NTB
-> > >> for this discussion since PCIe host side SW will execute on both end=
-s of the
-> > >> link in the case of NTB. However I've included in the block diagram =
-since the
-> > >> design we adopt should be able to be extended for NTB as well).
-> > >>
-> > >> Most of the pieces in (B) already exists.
-> > >> 1) virtio_net and virtio_rpmsg: No modifications needed and can be u=
-sed as it
-> > >>     is.
-> > >> 2) virtio_mdev: Jason has sent this [1]. This could be used as it is=
- for EP
-> > >>     usecases as well. Jason has created mvnet based on virtio_mdev, =
-but for EP
-> > >>     usecases virtio_pci_common and virtio_ntb should use it.
-> > >
-> > >
-> > > Can we implement NTB as a transport for virtio, then there's no need =
-for
-> > > virtio_mdev?
-> >
-> > Yes, we could have NTB specific virtio_config_ops. Where exactly should
-> > virtio_mdev be used?
-> > >
-> > >
-> > >> 3) virtio_pci_common: This should be used when a PCIe EPF is connect=
-ed. This
-> > >>     should be modified to create virtio_mdev instead of directly cre=
-ating virtio
-> > >>     device.
-> > >> 4) virtio_ntb: This is used for NTB where one end of the link should=
- use
-> > >>     virtio_ntb. This should create virtio_mdev.
-> > >>
-> > >> With this virtio_mdev can abstract virtio_pci_common and virtio_ntb =
-and ideally
-> > >> any virtio drivers can be used for EP or NTB (In the block diagram a=
-bove
-> > >> virtio_net and virtio_rpmsg can be used).
-> > >>
-> > >> HOST SIDE (A):
-> > >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >> In the virtualization terminology, the side labeled (A) will be the =
-host side.
-> > >> Here it will be the place where PCIe device (Endpoint) side SW will =
-execute.
-> > >>
-> > >> Bits and pieces of (A) should exist but there should be considerable=
- work in
-> > >> this.
-> > >> 1) vringh_net: There should be vringh drivers corresponding to
-> > >>     the virtio drivers on the guest side (B). vringh_net should regi=
-ster with
-> > >>     the net core. The vringh_net device should be created by vringh_=
-mdev. This
-> > >>     should be new development.
-> > >> 2) vringh_rpmsg: vringh_rpmsg should register with the rpmsg core. T=
-he
-> > >>     vringh_rpmsg device should be created by vringh_mdev.
-> > >> 3) vringh_mdev: This layer should define ops specific to vringh (e.g
-> > >>     get_desc_addr() should give vring descriptor address and will de=
-pend on
-> > >>     either EP device or NTB device). I haven't looked further on wha=
-t other ops
-> > >>     will be needed. IMO this layer should also decide whether _kern(=
-) or _user()
-> > >>     vringh helpers should be invoked.
-> > >
-> > >
-> > > Right, but probably not necessary called "mdev", it could just some a=
-bstraction
-> > > as a set of callbacks.
-> >
-> > Yeah, we could have something like vringh_config_ops. Once we start to
-> > implement, this might get more clear.
-> > >
-> > >
-> > >> 4) vringh_epf: This will be used for PCIe endpoint. This will implem=
-ent ops to
-> > >>     get the vring descriptor address.
-> > >> 5) vringh_ntb: Similar to vringh_epf but will interface with NTB dev=
-ice instead
-> > >>     of EPF device.
-> > >>
-> > >> Jason,
-> > >>
-> > >> Can you give your comments on the above design? Do you see any flaws=
-/issues
-> > >> with the above approach?
-> > >
-> > >
-> > > Looks good overall, see questions above.
-> >
-> > Thanks for your comments Jason.
-> >
-> > Haotian, Alan, Me or whoever gets to implement this first, should try t=
-o follow
-> > the above discussed approach.
->
-> Kishon,
->
-> Thank you, and Jason Wang, for comments and suggestions re: NTB.
->
-> My preference is to see Haotian continue his work on this
-> patch, if and when possible. As for expanding the scope to
-> support NTB, I personally find it very interesting. I will
-> keep an eye open for a suitable hardware platform in house
-> before figuring out if and when it would be possible to do such
-> work. From your slides, you may get there first since you
-> seem to have a suitable hardware platform already.
 
-- haotian.wang@sifive.com
 
-other: haotian.wang@duke.edu
+> On 26 Nov 2019, at 23:44, Aaron Lewis <aaronlewis@google.com> wrote:
+>=20
+> Verify that the difference between a guest RDTSC instruction and the
+> IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12's VM-exit
+> MSR-store list is less than 750 cycles, 99.9% of the time.
 
->
-> Regards,
-> Alan
->
-> >
-> > Thanks
-> > Kishon
-> >
-> > >
-> > > Thanks
-> > >
-> > >
-> > >>
-> > >> Thanks
-> > >> Kishon
-> > >>
-> > >> [1] -> https://lkml.org/lkml/2019/11/18/261
-> > >> [2] -> https://lkml.org/lkml/2019/9/26/291
-> > >> [3] ->
-> > >> https://www.linuxplumbersconf.org/event/4/contributions/395/attachme=
-nts/284/481/Implementing_NTB_Controller_Using_PCIe_Endpoint_-_final.pdf
-> > >>
-> > >>>
-> > >>>> There will be two more main disadvantages probably.
-> > >>>>
-> > >>>> Firstly, there will be two layers of overheads. vhost/net.c uses
-> > >>>> vringh.c to channel data buffers into some struct sockets. This is=
- the
-> > >>>> first layer of overhead. That the virtual network device will have=
- to
-> > >>>> use these sockets somehow adds another layer of overhead.
-> > >>>
-> > >>> As I said, it doesn't work like vhost and no socket is needed at al=
-l.
-> > >>>
-> > >>>
-> > >>>> Secondly, probing, intialization and de-initialization of the virt=
-ual
-> > >>>> network_device are already non-trivial. I'll likely copy this part
-> > >>>> almost verbatim from virtio_net.c in the end. So in the end, there=
- will
-> > >>>> be more duplicate code.
-> > >>>
-> > >>> It will be a new type of network device instead of virtio, you don'=
-t
-> > >>> need to care any virtio stuffs but vringh in your codes. So it look=
-s to
-> > >>> me it would be much simpler and compact.
-> > >>>
-> > >>> But I'm not saying your method is no way to go, but you should deal=
- with
-> > >>> lots of other issues like I've replied in the previous mail. What y=
-ou
-> > >>> want to achieve is
-> > >>>
-> > >>> 1) Host (virtio-pci) <-> virtio ring <-> virtual eth device <-> vir=
-tio
-> > >>> ring <-> Endpoint (virtio with customized config_ops).
-> > >>>
-> > >>> But I suggest is
-> > >>>
-> > >>> 2) Host (virtio-pci) <-> virtio ring <-> virtual eth device <-> vri=
-ngh
-> > >>> vring (virtio ring in the Host) <-> network device
-> > >>>
-> > >>> The differences is.
-> > >>> - Complexity: In your proposal, there will be two virtio devices an=
-d 4
-> > >>> virtqueues. It means you need to prepare two sets of features, conf=
-ig
-> > >>> ops etc. And dealing with inconsistent feature will be a pain. It m=
-ay
-> > >>> work for simple case like a virtio-net device with only _F_MAC, but=
- it
-> > >>> would be hard to be expanded. If we decide to go for vringh, there =
-will
-> > >>> be a single virtio device and 2 virtqueues. In the endpoint part, i=
-t
-> > >>> will be 2 vringh vring (which is actually point the same virtqueue =
-from
-> > >>> Host side) and a normal network device. There's no need for dealing=
- with
-> > >>> inconsistency, since vringh basically sever as a a device
-> > >>> implementation, the feature negotiation is just between device (net=
-work
-> > >>> device with vringh) and driver (virtito-pci) from the view of Linux
-> > >>> running on the PCI Host.
-> > >>> - Maintainability: A third path for dealing virtio ring. We've alre=
-ady
-> > >>> had vhost and vringh, a third path will add a lot of overhead when
-> > >>> trying to maintaining them. My proposal will try to reuse vringh,
-> > >>> there's no need a new path.
-> > >>> - Layer violation: We want to hide the transport details from the d=
-evice
-> > >>> and make virito-net device can be used without modification. But yo=
-ur
-> > >>> codes try to poke information like virtnet_info. My proposal is to =
-just
-> > >>> have a new networking device that won't need to care virtio at all.=
- It's
-> > >>> not that hard as you imagine to have a new type of netdev, I sugges=
-t to
-> > >>> take a look at how caif_virtio is done, it would be helpful.
-> > >>>
-> > >>> If you still decide to go with two two virtio device model, you nee=
-d
-> > >>> probably:
-> > >>> - Proving two sets of config and features, and deal with inconsiste=
-ncy
-> > >>> - Try to reuse the vringh codes
-> > >>> - Do not refer internal structures from virtio-net.c
-> > >>>
-> > >>> But I recommend to take a step of trying vringh method which should=
- be
-> > >>> much simpler.
-> > >>>
-> > >>> Thanks
-> > >>>
-> > >>>
-> > >>>> Thank you for your patience!
-> > >>>>
-> > >>>> Best,
-> > >>>> Haotian
-> > >
+It will help if commit message would also reference the KVM commit which =
+fixes the issue tested by this test.
+i.e. 662f1d1d1931 ("KVM: nVMX: Add support for capturing highest =
+observable L2 TSC=E2=80=9D)
+
+>=20
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> ---
+> x86/unittests.cfg |  6 ++++
+> x86/vmx.h         |  1 +
+> x86/vmx_tests.c   | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 98 insertions(+)
+>=20
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index b4865ac..5291d96 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -284,6 +284,12 @@ extra_params =3D -cpu host,+vmx -append =
+vmx_vmcs_shadow_test
+> arch =3D x86_64
+> groups =3D vmx
+>=20
+> +[vmx_rdtsc_vmexit_diff_test]
+> +file =3D vmx.flat
+> +extra_params =3D -cpu host,+vmx -append rdtsc_vmexit_diff_test
+> +arch =3D x86_64
+> +groups =3D vmx
+> +
+
+I think we are missing some clear guidance on when a VMX unit-test =
+should have it=E2=80=99s own test-section in x86/unittests.cfg.
+
+I believe the guidance should be that all VMX tests are suppose to be =
+run by [vmx] except those that have special requirements
+on execution environment (e.g. vmx_smp*) or destroy execution =
+environment after they run (e.g. vmx_init_signal_test) or
+require special timeout if they fail (e.g. =
+vmx_apic_passthrough_tpr_threshold_test).
+These tests should both be removed from [vmx] by "-append -test_name=E2=80=
+=9D and have their own section which runs them.
+
+Being concrete to this patch, I think it shouldn=E2=80=99t have it=E2=80=99=
+s own section.
+For example, it will cause the test to run twice: Both as part of [vmx] =
+and as part of [vmx_rdtsc_vmexit_diff_test].
+
+And I can submit a separate patches to:
+1) Rename vmx_eoi_bitmap_ioapic_scan & vmx_apic_passthrough_thread to =
+prefix with vmx_smp*
+    (It actually seems to me that currently there are no vmx_smp* tests =
+at all=E2=80=A6)
+    and create a [vmx_smp] section for running them.
+2) Remove vmx_hlt_with_rvi_test and vmx_apicv_test sections.
+
+Does anyone think differently?
+
+> [debug]
+> file =3D debug.flat
+> arch =3D x86_64
+> diff --git a/x86/vmx.h b/x86/vmx.h
+> index 8496be7..21ba953 100644
+> --- a/x86/vmx.h
+> +++ b/x86/vmx.h
+> @@ -420,6 +420,7 @@ enum Ctrl1 {
+> 	CPU_SHADOW_VMCS		=3D 1ul << 14,
+> 	CPU_RDSEED		=3D 1ul << 16,
+> 	CPU_PML                 =3D 1ul << 17,
+> +	CPU_USE_TSC_SCALING	=3D 1ul << 25,
+> };
+>=20
+> enum Intr_type {
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 1d8932f..fcf71e7 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -8790,7 +8790,97 @@ static void vmx_vmcs_shadow_test(void)
+> 	enter_guest();
+> }
+>=20
+> +/*
+> + * This test monitors the difference between a guest RDTSC =
+instruction
+> + * and the IA32_TIME_STAMP_COUNTER MSR value stored in the VMCS12
+> + * VM-exit MSR-store list when taking a VM-exit on the instruction
+> + * following RDTSC.
+> + */
+> +#define RDTSC_DIFF_ITERS 100000
+> +#define RDTSC_DIFF_FAILS 100
+> +#define HOST_RDTSC_LIMIT 750
+
+Nit: I suggest to rename HOST_RDTSC_LIMIT to =
+HOST_CAPTURED_GUEST_TSC_DIFF_THRESHOLD.
+
+> +
+> +/*
+> + * Set 'use TSC offsetting' and set the guest offset to the
+> + * inverse of the host's current TSC value, so that the guest starts =
+running
+> + * with an effective TSC value of 0.
+> + */
+> +static void reset_guest_tsc_to_zero(void)
+> +{
+> +	TEST_ASSERT_MSG(ctrl_cpu_rev[0].clr & CPU_USE_TSC_OFFSET,
+> +			"Expected support for 'use TSC offsetting'");
+> +
+> +	vmcs_set_bits(CPU_EXEC_CTRL0, CPU_USE_TSC_OFFSET);
+> +	vmcs_write(TSC_OFFSET, -rdtsc());
+> +}
+> +
+> +static void rdtsc_vmexit_diff_test_guest(void)
+> +{
+> +	int i;
+> +
+> +	for (i =3D 0; i < RDTSC_DIFF_ITERS; i++)
+> +		/* Ensure rdtsc is the last instruction before the =
+vmcall. */
+> +		asm volatile("rdtsc; vmcall" : : : "eax", "edx");
+> +}
+>=20
+> +/*
+> + * This function only considers the "use TSC offsetting" VM-execution
+> + * control.  It does not handle "use TSC scaling" (because the latter
+> + * isn't available to the host today.)
+> + */
+> +static unsigned long long host_time_to_guest_time(unsigned long long =
+t)
+> +{
+> +	TEST_ASSERT((vmcs_read(CPU_EXEC_CTRL1) & CPU_USE_TSC_SCALING) =3D=3D=
+ 0);
+
+It=E2=80=99s problematic to vmcs_read(CPU_EXEC_CTRL1) when test runs on =
+CPU that doesn=E2=80=99t support
+secondary VM-execution control. As this will cause VMfailInvalid (i.e. =
+Clear CF,PF,AF,SF,OF and set ZF).
+
+What=E2=80=99s worse is that vmcs_read() today doesn=E2=80=99t assert =
+that RFLAGS.ZF=3D=3D0 after executing VMREAD.
+Maybe we should submit a separate patch for that as-well=E2=80=A6
+
+Anyway, you can just change your assert condition to:
+TEST_ASSERT(!(ctrl_cpu_rev[0].clr & CPU_SECONDARY) || =
+!(vmcs_read(CPU_EXEC_CTRL1) & CPU_USE_TSC_SCALING));
+
+> +
+> +	if (vmcs_read(CPU_EXEC_CTRL0) & CPU_USE_TSC_OFFSET)
+> +		t +=3D vmcs_read(TSC_OFFSET);
+> +
+> +	return t;
+> +}
+> +
+> +static unsigned long long rdtsc_vmexit_diff_test_iteration(void)
+> +{
+> +	unsigned long long guest_tsc, host_to_guest_tsc;
+> +
+> +	enter_guest();
+> +	skip_exit_vmcall();
+> +	guest_tsc =3D (u32) regs.rax + (regs.rdx << 32);
+> +	host_to_guest_tsc =3D =
+host_time_to_guest_time(exit_msr_store[0].value);
+> +
+> +	return host_to_guest_tsc - guest_tsc;
+> +}
+> +
+> +static void rdtsc_vmexit_diff_test(void)
+> +{
+> +	int fail =3D 0;
+> +	int i;
+> +
+> +	test_set_guest(rdtsc_vmexit_diff_test_guest);
+> +
+> +	reset_guest_tsc_to_zero();
+> +
+> +	/*
+> +	 * Set up the VMCS12 VM-exit MSR-store list to store just one
+> +	 * MSR: IA32_TIME_STAMP_COUNTER. Note that the value stored is
+> +	 * in the host time domain (i.e., it is not adjusted according
+> +	 * to the TSC multiplier and TSC offset fields in the VMCS12,
+> +	 * as a guest RDTSC would be.)
+> +	 */
+> +	exit_msr_store =3D alloc_page();
+> +	exit_msr_store[0].index =3D MSR_IA32_TSC;
+> +	vmcs_write(EXI_MSR_ST_CNT, 1);
+> +	vmcs_write(EXIT_MSR_ST_ADDR, virt_to_phys(exit_msr_store));
+> +
+> +	for (i =3D 0; i < RDTSC_DIFF_ITERS; i++) {
+> +		if (rdtsc_vmexit_diff_test_iteration() >=3D =
+HOST_RDTSC_LIMIT)
+> +			fail++;
+> +	}
+> +
+> +	enter_guest();
+> +
+> +	report("RDTSC to VM-exit delta too high in %d of %d iterations",
+> +	       fail < RDTSC_DIFF_FAILS, fail, RDTSC_DIFF_ITERS);
+> +}
+>=20
+> static int invalid_msr_init(struct vmcs *vmcs)
+> {
+> @@ -9056,5 +9146,6 @@ struct vmx_test vmx_tests[] =3D {
+> 	/* Atomic MSR switch tests. */
+> 	TEST(atomic_switch_max_msrs_test),
+> 	TEST(atomic_switch_overflow_msrs_test),
+> +	TEST(rdtsc_vmexit_diff_test),
+> 	{ NULL, NULL, NULL, NULL, NULL, {0} },
+> };
+> --=20
+> 2.24.0.432.g9d3f5f5b63-goog
+>=20
+
