@@ -2,245 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 703A910B610
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:48:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D065810B650
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 20:04:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727525AbfK0SsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 13:48:10 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44042 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727423AbfK0SsK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 13:48:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574880487;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hAv+8Rp9p8BKrYrz0WR6s4F38PMsBWQjRKLYMYSaIm4=;
-        b=U9NEryXhYGxXAM0q4IeLGxfD87Hd8i1wDG3N50QWtiFpSDiciyJp7t7MUVR4xfiY2ARq9H
-        3vELcrvB5iUNZaP8wiAU2rT1NIVLNQpqbpcPsCAxJgGqIgbK1fjny381Xh3gOFq1GowmP8
-        OZFGJ8AbEDCagNvitIxKNR3HDB/cSEw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-KT0ssU7kPXC09VGJWcNnQg-1; Wed, 27 Nov 2019 13:48:04 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEA918017CC;
-        Wed, 27 Nov 2019 18:48:02 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2EC95D9D6;
-        Wed, 27 Nov 2019 18:47:58 +0000 (UTC)
-Date:   Wed, 27 Nov 2019 19:47:56 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH 10/18] arm/arm64: selftest: Add prefetch
- abort test
-Message-ID: <20191127184756.encuqdupgwcky6ys@kamzik.brq.redhat.com>
-References: <20191127142410.1994-1-alexandru.elisei@arm.com>
- <20191127142410.1994-11-alexandru.elisei@arm.com>
+        id S1727139AbfK0TEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 14:04:04 -0500
+Received: from mga17.intel.com ([192.55.52.151]:45148 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726603AbfK0TEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 14:04:04 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 11:04:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,250,1571727600"; 
+   d="scan'208";a="410447441"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga006.fm.intel.com with ESMTP; 27 Nov 2019 11:04:01 -0800
+Date:   Wed, 27 Nov 2019 11:04:01 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [RFC PATCH 07/28] kvm: mmu: Add functions for handling changed
+ PTEs
+Message-ID: <20191127190401.GG22227@linux.intel.com>
+References: <20190926231824.149014-1-bgardon@google.com>
+ <20190926231824.149014-8-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20191127142410.1994-11-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: KT0ssU7kPXC09VGJWcNnQg-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
+In-Reply-To: <20190926231824.149014-8-bgardon@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 02:24:02PM +0000, Alexandru Elisei wrote:
-> When a guest tries to execute code from MMIO memory, KVM injects an
-> external abort into that guest. We have now fixed the psci test to not
-> fetch instructions from the I/O region, and it's not that often that a
-> guest misbehaves in such a way. Let's expand our coverage by adding a
-> proper test targetting this corner case.
->=20
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Thu, Sep 26, 2019 at 04:18:03PM -0700, Ben Gardon wrote:
+> The existing bookkeeping done by KVM when a PTE is changed is
+> spread around several functions. This makes it difficult to remember all
+> the stats, bitmaps, and other subsystems that need to be updated whenever
+> a PTE is modified. When a non-leaf PTE is marked non-present or becomes
+> a leaf PTE, page table memory must also be freed. Further, most of the
+> bookkeeping is done before the PTE is actually set. This works well with
+> a monolithic MMU lock, however if changes use atomic compare/exchanges,
+> the bookkeeping cannot be done before the change is made. In either
+> case, there is a short window in which some statistics, e.g. the dirty
+> bitmap will be inconsistent, however consistency is still restored
+> before the MMU lock is released. To simplify the MMU and facilitate the
+> use of atomic operations on PTEs, create functions to handle some of the
+> bookkeeping required as a result of the change.
+
+This is one case where splitting into multiple patches is probably not the
+best option.  It's difficult to review this patch without seeing how
+disconnected PTEs are used.  And, the patch is untestable for all intents
+and purposes since there is no external caller, i.e. all of the calles are
+self-referential within the new code.
+
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->  lib/arm64/asm/esr.h |  3 ++
->  arm/selftest.c      | 97 +++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 97 insertions(+), 3 deletions(-)
->=20
-> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
-> index 8e5af4d90767..8c351631b0a0 100644
-> --- a/lib/arm64/asm/esr.h
-> +++ b/lib/arm64/asm/esr.h
-> @@ -44,4 +44,7 @@
->  #define ESR_EL1_EC_BKPT32=09(0x38)
->  #define ESR_EL1_EC_BRK64=09(0x3C)
-> =20
-> +#define ESR_EL1_FSC_MASK=09(0x3F)
-> +#define ESR_EL1_FSC_EXTABT=09(0x10)
+>  arch/x86/kvm/mmu.c | 145 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 145 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 0311d18d9a995..50413f17c7cd0 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -143,6 +143,18 @@ module_param(dbg, bool, 0644);
+>  #define SPTE_HOST_WRITEABLE	(1ULL << PT_FIRST_AVAIL_BITS_SHIFT)
+>  #define SPTE_MMU_WRITEABLE	(1ULL << (PT_FIRST_AVAIL_BITS_SHIFT + 1))
+>  
+> +/*
+> + * PTEs in a disconnected page table can be set to DISCONNECTED_PTE to indicate
+> + * to other threads that the page table in which the pte resides is no longer
+> + * connected to the root of a paging structure.
+> + *
+> + * This constant works because it is considered non-present on both AMD and
+> + * Intel CPUs and does not create a L1TF vulnerability because the pfn section
+> + * is zeroed out. PTE bit 57 is available to software, per vol 3, figure 28-1
+> + * of the Intel SDM and vol 2, figures 5-18 to 5-21 of the AMD APM.
+> + */
+> +#define DISCONNECTED_PTE (1ull << 57)
+
+Use BIT_ULL, ignore the bad examples in mmu.c :-)
+
 > +
->  #endif /* _ASMARM64_ESR_H_ */
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index e9dc5c0cab28..caad524378fc 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -16,6 +16,8 @@
->  #include <asm/psci.h>
->  #include <asm/smp.h>
->  #include <asm/barrier.h>
-> +#include <asm/mmu.h>
-> +#include <asm/pgtable.h>
-> =20
->  static cpumask_t ready, valid;
-> =20
-> @@ -68,6 +70,7 @@ static void check_setup(int argc, char **argv)
->  static struct pt_regs expected_regs;
->  static bool und_works;
->  static bool svc_works;
-> +static bool pabt_works;
->  #if defined(__arm__)
->  /*
->   * Capture the current register state and execute an instruction
-> @@ -91,7 +94,7 @@ static bool svc_works;
->  =09=09"str=09r1, [r0, #" xstr(S_PC) "]\n"=09=09\
->  =09=09excptn_insn "\n"=09=09=09=09\
->  =09=09post_insns "\n"=09=09=09=09=09\
-> -=09:: "r" (&expected_regs) : "r0", "r1")
-> +=09:: "r" (&expected_regs) : "r0", "r1", "r2")
-> =20
->  static bool check_regs(struct pt_regs *regs)
->  {
-> @@ -171,6 +174,45 @@ static void user_psci_system_off(struct pt_regs *reg=
-s)
->  {
->  =09__user_psci_system_off();
+>  #define SHADOW_PT_INDEX(addr, level) PT64_INDEX(addr, level)
+>  
+>  /* make pte_list_desc fit well in cache line */
+> @@ -555,6 +567,16 @@ static int is_shadow_present_pte(u64 pte)
+>  	return (pte != 0) && !is_mmio_spte(pte);
 >  }
-> +
-> +static void check_pabt_exit(void)
+>  
+> +static inline int is_disconnected_pte(u64 pte)
 > +{
-> +=09install_exception_handler(EXCPTN_PABT, NULL);
+> +	return pte == DISCONNECTED_PTE;
+> +}
+
+An explicit comparsion scares me a bit, but that's just my off the cuff
+reaction.  I'll come back to the meat of this series after turkey day.
+
 > +
-> +=09report("pabt", pabt_works);
-> +=09exit(report_summary());
+> +static int is_present_direct_pte(u64 pte)
+> +{
+> +	return is_shadow_present_pte(pte) && !is_disconnected_pte(pte);
 > +}
 > +
-> +static void pabt_handler(struct pt_regs *regs)
-> +{
-> +=09expected_regs.ARM_pc =3D 0;
-> +=09pabt_works =3D check_regs(regs);
-> +
-> +=09regs->ARM_pc =3D (unsigned long)&check_pabt_exit;
-> +}
-> +
-> +static void check_pabt(void)
-> +{
-> +=09unsigned long sctlr;
-> +
-> +=09/* Make sure we can actually execute from a writable region */
-> +=09asm volatile("mrc p15, 0, %0, c1, c0, 0": "=3Dr" (sctlr));
-> +=09if (sctlr & CR_ST) {
-> +=09=09sctlr &=3D ~CR_ST;
-> +=09=09asm volatile("mcr p15, 0, %0, c1, c0, 0" :: "r" (sctlr));
-> +=09=09isb();
-> +=09=09/*
-> +=09=09 * Required according to the sequence in ARM DDI 0406C.d, page
-> +=09=09 * B3-1358.
-> +=09=09 */
-> +=09=09flush_tlb_all();
-> +=09}
-> +
-> +=09install_exception_handler(EXCPTN_PABT, pabt_handler);
-> +
-> +=09test_exception("mov r2, #0x0", "bx r2", "");
-> +=09__builtin_unreachable();
-> +}
->  #elif defined(__aarch64__)
-> =20
->  /*
-> @@ -212,7 +254,7 @@ static void user_psci_system_off(struct pt_regs *regs=
-)
->  =09=09"stp=09 x0,  x1, [x1]\n"=09=09=09\
->  =09"1:"=09excptn_insn "\n"=09=09=09=09\
->  =09=09post_insns "\n"=09=09=09=09=09\
-> -=09:: "r" (&expected_regs) : "x0", "x1")
-> +=09:: "r" (&expected_regs) : "x0", "x1", "x2")
-> =20
->  static bool check_regs(struct pt_regs *regs)
+>  static int is_large_pte(u64 pte)
 >  {
-> @@ -288,6 +330,53 @@ static bool check_svc(void)
->  =09return svc_works;
+>  	return pte & PT_PAGE_SIZE_MASK;
+> @@ -1659,6 +1681,129 @@ static bool __rmap_set_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head)
+>  	return flush;
 >  }
-> =20
-> +static void check_pabt_exit(void)
-> +{
-> +=09install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
+>  
+> +static void handle_changed_pte(struct kvm *kvm, int as_id, gfn_t gfn,
+> +			       u64 old_pte, u64 new_pte, int level);
 > +
-> +=09report("pabt", pabt_works);
-> +=09exit(report_summary());
+> +/**
+> + * mark_pte_disconnected - Mark a PTE as part of a disconnected PT
+> + * @kvm: kvm instance
+> + * @as_id: the address space of the paging structure the PTE was a part of
+> + * @gfn: the base GFN that was mapped by the PTE
+> + * @ptep: a pointer to the PTE to be marked disconnected
+> + * @level: the level of the PT this PTE was a part of, when it was part of the
+> + *	paging structure
+> + */
+> +static void mark_pte_disconnected(struct kvm *kvm, int as_id, gfn_t gfn,
+> +				  u64 *ptep, int level)
+> +{
+> +	u64 old_pte;
+> +
+> +	old_pte = xchg(ptep, DISCONNECTED_PTE);
+> +	BUG_ON(old_pte == DISCONNECTED_PTE);
+> +
+> +	handle_changed_pte(kvm, as_id, gfn, old_pte, DISCONNECTED_PTE, level);
 > +}
 > +
-> +static void pabt_handler(struct pt_regs *regs, unsigned int esr)
+> +/**
+> + * handle_disconnected_pt - Mark a PT as disconnected and handle associated
+> + * bookkeeping and freeing
+> + * @kvm: kvm instance
+> + * @as_id: the address space of the paging structure the PT was a part of
+> + * @pt_base_gfn: the base GFN that was mapped by the first PTE in the PT
+> + * @pfn: The physical frame number of the disconnected PT page
+> + * @level: the level of the PT, when it was part of the paging structure
+> + *
+> + * Given a pointer to a page table that has been removed from the paging
+> + * structure and its level, recursively free child page tables and mark their
+> + * entries as disconnected.
+> + */
+> +static void handle_disconnected_pt(struct kvm *kvm, int as_id,
+> +				   gfn_t pt_base_gfn, kvm_pfn_t pfn, int level)
 > +{
-> +=09bool is_extabt;
+> +	int i;
+> +	gfn_t gfn = pt_base_gfn;
+> +	u64 *pt = pfn_to_kaddr(pfn);
 > +
-> +=09expected_regs.pc =3D 0;
-> +=09is_extabt =3D (esr & ESR_EL1_FSC_MASK) =3D=3D ESR_EL1_FSC_EXTABT;
-> +=09pabt_works =3D check_regs(regs) && is_extabt;
+> +	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+> +		/*
+> +		 * Mark the PTE as disconnected so that no other thread will
+> +		 * try to map in an entry there or try to free any child page
+> +		 * table the entry might have pointed to.
+> +		 */
+> +		mark_pte_disconnected(kvm, as_id, gfn, &pt[i], level);
 > +
-> +=09regs->pc =3D (u64)&check_pabt_exit;
+> +		gfn += KVM_PAGES_PER_HPAGE(level);
+> +	}
+> +
+> +	free_page((unsigned long)pt);
 > +}
 > +
-> +static void check_pabt(void)
+> +/**
+> + * handle_changed_pte - handle bookkeeping associated with a PTE change
+> + * @kvm: kvm instance
+> + * @as_id: the address space of the paging structure the PTE was a part of
+> + * @gfn: the base GFN that was mapped by the PTE
+> + * @old_pte: The value of the PTE before the atomic compare / exchange
+> + * @new_pte: The value of the PTE after the atomic compare / exchange
+> + * @level: the level of the PT the PTE is part of in the paging structure
+> + *
+> + * Handle bookkeeping that might result from the modification of a PTE.
+> + * This function should be called in the same RCU read critical section as the
+> + * atomic cmpxchg on the pte. This function must be called for all direct pte
+> + * modifications except those which strictly emulate hardware, for example
+> + * setting the dirty bit on a pte.
+> + */
+> +static void handle_changed_pte(struct kvm *kvm, int as_id, gfn_t gfn,
+> +			       u64 old_pte, u64 new_pte, int level)
 > +{
-> +=09enum vector v =3D check_vector_prep();
-> +=09unsigned long sctlr;
+> +	bool was_present = is_present_direct_pte(old_pte);
+> +	bool is_present = is_present_direct_pte(new_pte);
+> +	bool was_leaf = was_present && is_last_spte(old_pte, level);
+> +	bool pfn_changed = spte_to_pfn(old_pte) != spte_to_pfn(new_pte);
+> +	int child_level;
 > +
-> +=09/*
-> +=09 * According to ARM DDI 0487E.a, table D5-33, footnote c, all regions
-> +=09 * writable at EL0 are treated as PXN. Clear the user bit so we can
-> +=09 * execute code from the bottom I/O space (0G-1G) to simulate a
-> +=09 * misbehaved guest.
-> +=09 */
-> +=09mmu_clear_user(current_thread_info()->pgtable, 0);
+> +	BUG_ON(level > PT64_ROOT_MAX_LEVEL);
+> +	BUG_ON(level < PT_PAGE_TABLE_LEVEL);
+> +	BUG_ON(gfn % KVM_PAGES_PER_HPAGE(level));
 > +
-> +=09/* Make sure we can actually execute from a writable region */
-> +=09sctlr =3D read_sysreg(sctlr_el1);
-> +=09if (sctlr & SCTLR_EL1_WXN) {
-> +=09=09write_sysreg(sctlr & ~SCTLR_EL1_WXN, sctlr_el1);
-> +=09=09isb();
-> +=09=09/* SCTLR_EL1.WXN is permitted to be cached in a TLB. */
-> +=09=09flush_tlb_all();
-> +=09}
+> +	/*
+> +	 * The only times a pte should be changed from a non-present to
+> +	 * non-present state is when an entry in an unlinked page table is
+> +	 * marked as a disconnected PTE as part of freeing the page table,
+> +	 * or an MMIO entry is installed/modified. In these cases there is
+> +	 * nothing to do.
+> +	 */
+> +	if (!was_present && !is_present) {
+> +		/*
+> +		 * If this change is not on an MMIO PTE and not setting a PTE
+> +		 * as disconnected, then it is unexpected. Log the change,
+> +		 * though it should not impact the guest since both the former
+> +		 * and current PTEs are nonpresent.
+> +		 */
+> +		WARN_ON((new_pte != DISCONNECTED_PTE) &&
+> +			!is_mmio_spte(new_pte));
+> +		return;
+> +	}
 > +
-> +=09install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
+> +	if (was_present && !was_leaf && (pfn_changed || !is_present)) {
+> +		/*
+> +		 * The level of the page table being freed is one level lower
+> +		 * than the level at which it is mapped.
+> +		 */
+> +		child_level = level - 1;
 > +
-> +=09test_exception("mov x2, xzr", "br x2", "");
-> +=09__builtin_unreachable();
+> +		/*
+> +		 * If there was a present non-leaf entry before, and now the
+> +		 * entry points elsewhere, the lpage stats and dirty logging /
+> +		 * access tracking status for all the entries the old pte
+> +		 * pointed to must be updated and the page table pages it
+> +		 * pointed to must be freed.
+> +		 */
+> +		handle_disconnected_pt(kvm, as_id, gfn, spte_to_pfn(old_pte),
+> +				       child_level);
+> +	}
 > +}
 > +
->  static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
->  {
->  =09__user_psci_system_off();
-> @@ -298,7 +387,9 @@ static void check_vectors(void *arg __unused)
->  {
->  =09report("und", check_und());
->  =09report("svc", check_svc());
-> -=09if (is_user()) {
-> +=09if (!is_user()) {
-> +=09=09check_pabt();
-> +=09} else {
->  #ifdef __arm__
->  =09=09install_exception_handler(EXCPTN_UND, user_psci_system_off);
->  #else
-> --=20
-> 2.20.1
->
-
-Did you also test with QEMU? Because this new test dies on an unhandled
-unknown exception for me. Both with KVM and with TCG, and both arm64 and
-arm32 (KVM:aarch32 or TCG:arm).
-
-Thanks,
-drew
-
+>  /**
+>   * kvm_mmu_write_protect_pt_masked - write protect selected PT level pages
+>   * @kvm: kvm instance
+> -- 
+> 2.23.0.444.g18eeb5a265-goog
+> 
