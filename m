@@ -2,138 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DAFF10B757
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 21:19:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6802A10B76B
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 21:32:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbfK0UTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 15:19:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21562 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726716AbfK0UTS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 15:19:18 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xARKETAQ050538;
-        Wed, 27 Nov 2019 15:19:02 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2whhyg0s9t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 15:19:02 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xARKJ2I9060582;
-        Wed, 27 Nov 2019 15:19:02 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2whhyg0s9e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 15:19:02 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xARKFHQ9025850;
-        Wed, 27 Nov 2019 20:19:05 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01wdc.us.ibm.com with ESMTP id 2wevd6ftqw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 20:19:05 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xARKJ0aT39191020
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Nov 2019 20:19:00 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BB4F112067;
-        Wed, 27 Nov 2019 20:19:00 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0F34112063;
-        Wed, 27 Nov 2019 20:18:58 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.137])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Nov 2019 20:18:58 +0000 (GMT)
-Message-ID: <7dd89f27e886fc73e3de4d2a92e27f443978f318.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Date:   Wed, 27 Nov 2019 17:18:57 -0300
-In-Reply-To: <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
-         <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-svLp0XGwOGKrM1lqBRkB"
-User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
+        id S1727031AbfK0Uc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 15:32:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41014 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726716AbfK0Uc3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 15:32:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574886747;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zH/T5jU4tH/8Gb+1qmuFB+rSdeHGBSoJ0BA6rM2mcnc=;
+        b=QI6P18/0EFlhmIfxZ1f28+WFDxYoza2zUMV6uIAKu7T51E2q7GTghZrrmt4JC53A4zRnCV
+        rCu99afZRm+Y/FXl3lVeinV7jp3xNNiZzvUiTJg8avfEZDOJevuEmMp3VaemLXIwJ7SJUx
+        gJd2+NjonuRUbYP37aHW9Sa4UKRbaQ4=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-yEoK46rZPvauW_h7hCor1Q-1; Wed, 27 Nov 2019 15:32:25 -0500
+Received: by mail-qv1-f69.google.com with SMTP id a4so9437938qvn.14
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 12:32:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7MY+sx+Nuv189evu6jc/7Ff6+j+qSUxD3qsuDjudl3E=;
+        b=HxOqDBzuR2o1N0K8tyqEOnEXPO32LK7a/l9+jrIJp0zfd/O/Whc1JuPSSlk4H4iPmD
+         qHUQ+KvGBb2wkT/YUZTzp4ks3tQzi2s0E6Y4GubHA8pvIN1O4KJjFQQsAn6VtCQAh4q/
+         qkw+6QLz9RrcHhz72I6kihkpltGMvgZ+4wBEIAyvQWfaIeG99KjU+e4tFHs6d0rx0US6
+         mnf0qdqzO8P9amBa3TT3fj2ryJXNPFsklp2JVDhME408778grFYzZ0AJq0dLeIlA0WzE
+         SKUlTWoJ2QFrLUJjK+Ryms7IIEIsL/8ZbKWDXv1vUFxi9wmUSo9osoQ2sLEdatjF3UIl
+         Q88w==
+X-Gm-Message-State: APjAAAWeB1eXGDw6w41g+ytdawmwAJojtS+gAttL486bTqoO4adTVRnI
+        hZ7IEN2aOwDEuWa3nnAz5R0RqFWKC7UI7Cx2/U9zV4NEARVvdZDbEFyVTvN9rJQrWBiZqkykLYf
+        P1EwHYyUDC15p
+X-Received: by 2002:ad4:55e8:: with SMTP id bu8mr3198579qvb.61.1574886745491;
+        Wed, 27 Nov 2019 12:32:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzOaXOFxvrAACGTJt/FeYHy85AqcOBKnTlQND1DqS/Jm+RE0uTl1tA+4+iDEbGw4t6w2fwm7A==
+X-Received: by 2002:ad4:55e8:: with SMTP id bu8mr3198538qvb.61.1574886745141;
+        Wed, 27 Nov 2019 12:32:25 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id o70sm7418083qke.47.2019.11.27.12.32.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2019 12:32:24 -0800 (PST)
+Date:   Wed, 27 Nov 2019 15:32:17 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>
+Cc:     Prashant Bhole <prashantbhole.linux@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
+Message-ID: <20191127152653-mutt-send-email-mst@kernel.org>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ <20191126123514.3bdf6d6f@cakuba.netronome.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-27_04:2019-11-27,2019-11-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- clxscore=1015 priorityscore=1501 lowpriorityscore=0 bulkscore=0
- phishscore=0 impostorscore=0 mlxlogscore=934 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911270162
+In-Reply-To: <20191126123514.3bdf6d6f@cakuba.netronome.com>
+X-MC-Unique: yEoK46rZPvauW_h7hCor1Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---=-svLp0XGwOGKrM1lqBRkB
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2019-11-27 at 17:40 +0100, Paolo Bonzini wrote:
-> >  =20
-> >        if (ret >=3D 0)
-> >                list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> > -     else
-> > -             kvm_put_kvm(kvm);
-> >  =20
-> >        mutex_unlock(&kvm->lock);
-> >  =20
-> >        if (ret >=3D 0)
-> >                return ret;
-> >  =20
-> > +     kvm_put_kvm(kvm);
-> >        kfree(stt);
-> >    fail_acct:
-> >        account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
+On Tue, Nov 26, 2019 at 12:35:14PM -0800, Jakub Kicinski wrote:
+> On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:
+> > Note: This RFC has been sent to netdev as well as qemu-devel lists
+> >=20
+> > This series introduces XDP offloading from virtio_net. It is based on
+> > the following work by Jason Wang:
+> > https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
+> >=20
+> > Current XDP performance in virtio-net is far from what we can achieve
+> > on host. Several major factors cause the difference:
+> > - Cost of virtualization
+> > - Cost of virtio (populating virtqueue and context switching)
+> > - Cost of vhost, it needs more optimization
+> > - Cost of data copy
+> > Because of above reasons there is a need of offloading XDP program to
+> > host. This set is an attempt to implement XDP offload from the guest.
 >=20
-> This part is a good change, as it makes the code clearer.  The
-> virt/kvm/kvm_main.c bits, however, are not necessary as explained by Sean=
-.
+> This turns the guest kernel into a uAPI proxy.
 >=20
+> BPF uAPI calls related to the "offloaded" BPF objects are forwarded=20
+> to the hypervisor, they pop up in QEMU which makes the requested call
+> to the hypervisor kernel. Today it's the Linux kernel tomorrow it may=20
+> be someone's proprietary "SmartNIC" implementation.
+>=20
+> Why can't those calls be forwarded at the higher layer? Why do they
+> have to go through the guest kernel?
 
-Thanks!
-So, like this patch?
-https://lkml.org/lkml/2019/11/7/763
+Well everyone is writing these programs and attaching them to NICs.
 
-Best regards,
+For better or worse that's how userspace is written.
 
-Leonardo
+Yes, in the simple case where everything is passed through, it could
+instead be passed through some other channel just as well, but then
+userspace would need significant changes just to make it work with
+virtio.
 
---=-svLp0XGwOGKrM1lqBRkB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3e2jEACgkQlQYWtz9S
-ttTWzxAAy+Q8kuOW+58Zujf5Pl1VAPNeOj8APWTSfbtEtYh+qeriS0Fx+MlwfycO
-jKea8M8pTxuNFG88V9+rQM+qciE5UpqGYqTPkbhHEsrXYcBRPct/bS6/EmYc5wve
-MeTLOTW11fnZYR9WXghKpPhM2AOCvBYPMq3nnQUFqr0DLk7tkOB7OuHk9qASTVbH
-dZvU9rXIIMa5cxH4v0/qEZtzY+9/UStvDUM3cghd9p0DqDtGL396wIQwvRMfxT94
-KP925KeLoi1wqIAH7VUxgrP8/SkLPfgMwG1QuyIiWO2cqHE9MpozjDU9hOebXoyb
-UVJngHT/oRyG7plHLcZ6eedy75M6Z4lKv3oviezjEjIRr8pC7/xT2MZYiV3dox9c
-rd9KgDTLihHEBfKmKnocErwvEleu9Dr6vJ6zBU1bWOahROryvuPdZ00SbVGZIa0U
-MFyIinaBDLWwn6zhpGZVc1vUqy1lmJnS91116u+og30IgwXMYpb6sHFUWmr9B0Ai
-40tdEGnFKthSCeyskqBrLab4ykV49MLJxd9cK4kwnWou1M6Fl1kDY86h1P6afqEG
-RAbTtL4HCmOButVZjP5kzTnONkIZWLSmkibqSx4Gxl9Lw2u+jg523Ds9Ye2Pfqrd
-NARjPJb+1h6PU2IiDLmoC7r+axcI+Np+xacERZEOFo51lE0wI/c=
-=CM/a
------END PGP SIGNATURE-----
+> If kernel performs no significant work (or "adds value", pardon the
+> expression), and problem can easily be solved otherwise we shouldn't=20
+> do the work of maintaining the mechanism.
+>=20
+> The approach of kernel generating actual machine code which is then
+> loaded into a sandbox on the hypervisor/SmartNIC is another story.
 
---=-svLp0XGwOGKrM1lqBRkB--
+But that's transparent to guest userspace. Making userspace care whether
+it's a SmartNIC or a software device breaks part of virtualization's
+appeal, which is that it looks like a hardware box to the guest.
+
+> I'd appreciate if others could chime in.
 
