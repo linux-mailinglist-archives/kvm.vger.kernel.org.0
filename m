@@ -2,145 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B8C510B131
+	by mail.lfdr.de (Postfix) with ESMTP id 89E3510B132
 	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 15:25:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727232AbfK0OZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 09:25:10 -0500
-Received: from foss.arm.com ([217.140.110.172]:48196 "EHLO foss.arm.com"
+        id S1727237AbfK0OZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 09:25:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:48204 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727235AbfK0OZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 09:25:09 -0500
+        id S1727258AbfK0OZL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 09:25:11 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66307328;
-        Wed, 27 Nov 2019 06:25:09 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B633931B;
+        Wed, 27 Nov 2019 06:25:10 -0800 (PST)
 Received: from e123195-lin.cambridge.arm.com (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id ECB993F68E;
-        Wed, 27 Nov 2019 06:25:07 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9A79F3F68E;
+        Wed, 27 Nov 2019 06:25:09 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
         maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com, Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests PATCH 03/18] lib: Add WRITE_ONCE and READ_ONCE implementations in compiler.h
-Date:   Wed, 27 Nov 2019 14:23:55 +0000
-Message-Id: <20191127142410.1994-4-alexandru.elisei@arm.com>
+        mark.rutland@arm.com
+Subject: [kvm-unit-tests PATCH 04/18] lib: arm/arm64: Use WRITE_ONCE to update the translation tables
+Date:   Wed, 27 Nov 2019 14:23:56 +0000
+Message-Id: <20191127142410.1994-5-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191127142410.1994-1-alexandru.elisei@arm.com>
 References: <20191127142410.1994-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the WRITE_ONCE and READ_ONCE macros which are used to prevent to
-prevent the compiler from optimizing a store or a load, respectively, into
-something else.
+Use WRITE_ONCE to prevent store tearing when updating an entry in the
+translation tables. Without WRITE_ONCE, the compiler, even though it is
+unlikely, can emit several stores when changing the table, and we might
+end up with bogus TLB entries.
 
-Cc: Drew Jones <drjones@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
+It's worth noting that the existing code is mostly fine without any
+changes because the translation tables are updated in one of the
+following situations:
+
+- When the tables are being created with the MMU off, which means no TLB
+  caching is being performed.
+
+- When new page table entries are added as a result of vmalloc'ing a
+  stack for a secondary CPU, which doesn't happen very often.
+
+- When clearing the PTE_USER bit for the cache test, and store tearing
+  has no effect on the table walker because there are no intermediate
+  values between bit values 0 and 1. We still use WRITE_ONCE in this case
+  for consistency.
+
+However, the functions are global and there is nothing preventing someone
+from writing a test that uses them in a different scenario. Let's make
+sure that when that happens, there will be no breakage once in a blue
+moon.
+
+Reported-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/linux/compiler.h | 81 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 81 insertions(+)
- create mode 100644 lib/linux/compiler.h
+ lib/arm/asm/pgtable.h   | 12 ++++++++----
+ lib/arm64/asm/pgtable.h |  7 +++++--
+ lib/arm/mmu.c           | 19 +++++++++++++------
+ 3 files changed, 26 insertions(+), 12 deletions(-)
 
-diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
-new file mode 100644
-index 000000000000..aac84c1d711c
---- /dev/null
-+++ b/lib/linux/compiler.h
-@@ -0,0 +1,81 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Taken from tools/include/linux/compiler.h, with minor changes. */
-+#ifndef __LINUX_COMPILER_H
-+#define __LINUX_COMPILER_H
+diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+index 241dff69b38a..794514b8c927 100644
+--- a/lib/arm/asm/pgtable.h
++++ b/lib/arm/asm/pgtable.h
+@@ -19,6 +19,8 @@
+  * because we always allocate their pages with alloc_page(), and
+  * alloc_page() always returns identity mapped pages.
+  */
++#include <linux/compiler.h>
 +
-+#ifndef __ASSEMBLY__
+ #define pgtable_va(x)		((void *)(unsigned long)(x))
+ #define pgtable_pa(x)		((unsigned long)(x))
+ 
+@@ -58,8 +60,9 @@ static inline pmd_t *pmd_alloc_one(void)
+ static inline pmd_t *pmd_alloc(pgd_t *pgd, unsigned long addr)
+ {
+ 	if (pgd_none(*pgd)) {
+-		pmd_t *pmd = pmd_alloc_one();
+-		pgd_val(*pgd) = pgtable_pa(pmd) | PMD_TYPE_TABLE;
++		pgd_t entry;
++		pgd_val(entry) = pgtable_pa(pmd_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pgd, entry);
+ 	}
+ 	return pmd_offset(pgd, addr);
+ }
+@@ -84,8 +87,9 @@ static inline pte_t *pte_alloc_one(void)
+ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+ {
+ 	if (pmd_none(*pmd)) {
+-		pte_t *pte = pte_alloc_one();
+-		pmd_val(*pmd) = pgtable_pa(pte) | PMD_TYPE_TABLE;
++		pmd_t entry;
++		pmd_val(entry) = pgtable_pa(pte_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pmd, entry);
+ 	}
+ 	return pte_offset(pmd, addr);
+ }
+diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+index ee0a2c88cc18..dbf9e7253b71 100644
+--- a/lib/arm64/asm/pgtable.h
++++ b/lib/arm64/asm/pgtable.h
+@@ -18,6 +18,8 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+ 
++#include <linux/compiler.h>
 +
-+#include <stdint.h>
+ /*
+  * We can convert va <=> pa page table addresses with simple casts
+  * because we always allocate their pages with alloc_page(), and
+@@ -66,8 +68,9 @@ static inline pte_t *pte_alloc_one(void)
+ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+ {
+ 	if (pmd_none(*pmd)) {
+-		pte_t *pte = pte_alloc_one();
+-		pmd_val(*pmd) = pgtable_pa(pte) | PMD_TYPE_TABLE;
++		pmd_t entry;
++		pmd_val(entry) = pgtable_pa(pte_alloc_one()) | PMD_TYPE_TABLE;
++		WRITE_ONCE(*pmd, entry);
+ 	}
+ 	return pte_offset(pmd, addr);
+ }
+diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+index 72043c333b55..cc03b25aa77e 100644
+--- a/lib/arm/mmu.c
++++ b/lib/arm/mmu.c
+@@ -17,6 +17,8 @@
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/pgtable.h>
+ 
++#include <linux/compiler.h>
 +
-+#define barrier()	asm volatile("" : : : "memory")
-+
-+#define __always_inline	inline __attribute__((always_inline))
-+
-+static __always_inline void __read_once_size(const volatile void *p, void *res, int size)
-+{
-+	switch (size) {
-+	case 1: *(uint8_t *)res = *(volatile uint8_t *)p; break;
-+	case 2: *(uint16_t *)res = *(volatile uint16_t *)p; break;
-+	case 4: *(uint32_t *)res = *(volatile uint32_t *)p; break;
-+	case 8: *(uint64_t *)res = *(volatile uint64_t *)p; break;
-+	default:
-+		barrier();
-+		__builtin_memcpy((void *)res, (const void *)p, size);
-+		barrier();
-+	}
-+}
-+
-+/*
-+ * Prevent the compiler from merging or refetching reads or writes. The
-+ * compiler is also forbidden from reordering successive instances of
-+ * READ_ONCE and WRITE_ONCE, but only when the compiler is aware of some
-+ * particular ordering. One way to make the compiler aware of ordering is to
-+ * put the two invocations of READ_ONCE or WRITE_ONCE in different C
-+ * statements.
-+ *
-+ * These two macros will also work on aggregate data types like structs or
-+ * unions. If the size of the accessed data type exceeds the word size of
-+ * the machine (e.g., 32 bits or 64 bits) READ_ONCE() and WRITE_ONCE() will
-+ * fall back to memcpy(). There's at least two memcpy()s: one for the
-+ * __builtin_memcpy() and then one for the macro doing the copy of variable
-+ * - '__u' allocated on the stack.
-+ *
-+ * Their two major use cases are: (1) Mediating communication between
-+ * process-level code and irq/NMI handlers, all running on the same CPU,
-+ * and (2) Ensuring that the compiler does not fold, spindle, or otherwise
-+ * mutilate accesses that either do not require ordering or that interact
-+ * with an explicit memory barrier or atomic instruction that provides the
-+ * required ordering.
-+ */
-+#define READ_ONCE(x)					\
-+({							\
-+	union { typeof(x) __val; char __c[1]; } __u =	\
-+		{ .__c = { 0 } };			\
-+	__read_once_size(&(x), __u.__c, sizeof(x));	\
-+	__u.__val;					\
-+})
-+
-+static __always_inline void __write_once_size(volatile void *p, void *res, int size)
-+{
-+	switch (size) {
-+	case 1: *(volatile uint8_t *)p = *(uint8_t *)res; break;
-+	case 2: *(volatile uint16_t *)p = *(uint16_t *)res; break;
-+	case 4: *(volatile uint32_t *)p = *(uint32_t *)res; break;
-+	case 8: *(volatile uint64_t *)p = *(uint64_t *)res; break;
-+	default:
-+		barrier();
-+		__builtin_memcpy((void *)p, (const void *)res, size);
-+		barrier();
-+	}
-+}
-+
-+#define WRITE_ONCE(x, val) \
-+({							\
-+	union { typeof(x) __val; char __c[1]; } __u =	\
-+		{ .__val = (typeof(x)) (val) }; 	\
-+	__write_once_size(&(x), __u.__c, sizeof(x));	\
-+	__u.__val;					\
-+})
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* !__LINUX_COMPILER_H */
+ extern unsigned long etext;
+ 
+ pgd_t *mmu_idmap;
+@@ -86,7 +88,7 @@ static pteval_t *install_pte(pgd_t *pgtable, uintptr_t vaddr, pteval_t pte)
+ {
+ 	pteval_t *p_pte = get_pte(pgtable, vaddr);
+ 
+-	*p_pte = pte;
++	WRITE_ONCE(*p_pte, pte);
+ 	dsb(ishst);
+ 	flush_tlb_page(vaddr);
+ 
+@@ -133,12 +135,15 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+ 	phys_addr_t paddr = phys_start & PGDIR_MASK;
+ 	uintptr_t vaddr = virt_offset & PGDIR_MASK;
+ 	uintptr_t virt_end = phys_end - paddr + vaddr;
++	pgd_t *pgd;
++	pgd_t entry;
+ 
+ 	for (; vaddr < virt_end; vaddr += PGDIR_SIZE, paddr += PGDIR_SIZE) {
+-		pgd_t *pgd = pgd_offset(pgtable, vaddr);
+-		pgd_val(*pgd) = paddr;
+-		pgd_val(*pgd) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
+-		pgd_val(*pgd) |= pgprot_val(prot);
++		pgd_val(entry) = paddr;
++		pgd_val(entry) |= PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S;
++		pgd_val(entry) |= pgprot_val(prot);
++		pgd = pgd_offset(pgtable, vaddr);
++		WRITE_ONCE(*pgd, entry);
+ 		dsb(ishst);
+ 		flush_tlb_page(vaddr);
+ 	}
+@@ -213,6 +218,7 @@ void mmu_clear_user(unsigned long vaddr)
+ {
+ 	pgd_t *pgtable;
+ 	pteval_t *pte;
++	pteval_t entry;
+ 
+ 	if (!mmu_enabled())
+ 		return;
+@@ -220,7 +226,8 @@ void mmu_clear_user(unsigned long vaddr)
+ 	pgtable = current_thread_info()->pgtable;
+ 	pte = get_pte(pgtable, vaddr);
+ 
+-	*pte &= ~PTE_USER;
++	entry = *pte & ~PTE_USER;
++	WRITE_ONCE(*pte, entry);
+ 	dsb(ishst);
+ 	flush_tlb_page(vaddr);
+ }
 -- 
 2.20.1
 
