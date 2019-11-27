@@ -2,245 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DD9F10B5AD
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:25:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EE9E10B5BE
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:29:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbfK0SZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 13:25:54 -0500
-Received: from mga12.intel.com ([192.55.52.136]:13448 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726514AbfK0SZy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 13:25:54 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 10:25:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,250,1571727600"; 
-   d="scan'208";a="199273387"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 27 Nov 2019 10:25:53 -0800
-Date:   Wed, 27 Nov 2019 10:25:53 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [RFC PATCH 02/28] kvm: mmu: Separate pte generation from set_spte
-Message-ID: <20191127182553.GB22227@linux.intel.com>
-References: <20190926231824.149014-1-bgardon@google.com>
- <20190926231824.149014-3-bgardon@google.com>
+        id S1727031AbfK0S3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 13:29:50 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44398 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726576AbfK0S3t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 13:29:49 -0500
+Received: by mail-wr1-f68.google.com with SMTP id i12so27819642wrn.11
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 10:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=q8PU0rul7Ps0UsPr1EhmDg+IsYeeYEG3+1dENJKBMlg=;
+        b=HHEosXhsFZU4tqkKFMksMLlRSe317ArG/tQxZhX1RqfwX/e+KF1TMl5jI61vAQkDl/
+         8offhU56rjNkhhxp9/ycfqju9SbNu4oaSH9vR/HOha+3oY+pHIdESc1HJmsI3ZsGJ7d2
+         /aFmv6TQXTAHuEVAF1AWRDtAOks/esHYEA7Vo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=q8PU0rul7Ps0UsPr1EhmDg+IsYeeYEG3+1dENJKBMlg=;
+        b=DackPt71kO9IeEKd8OOpQ7tjV3e6e1Nde2cU24XK9LwtuT3GXOXs7x1Dgxwxkja5oB
+         1SiC1PIk6yyjVuECjF7Qt54EtYIAwtSuJLIHfAO3P0TrTrRSpWB5L/KXxjMA8X9171Uw
+         zG6jhfq6++6IdHCn8pZUqcpN20oVLqZB5yrek0qwPFBSXbMCja1IBKrI63UDw9NhYj8L
+         i+CG1SXN9UVqBpD+5NGPv0pdk5vdufCMF5icbg+CAEjNrdt8LezFyPAgwoJgKVx7ABWO
+         WOMSwHiIdBShCevNTcuijy0FjNMbtFf4tIt71qOd2jv+Bhn6DxzfeJI4IU+2LfmF5+4L
+         sudQ==
+X-Gm-Message-State: APjAAAVbKaOoGg0igar1Rgj6f9Bt6b95jGWj8v8q1WIojE8XX9WyYSzu
+        DyEGYTZGTJKu561hq/VaeNFTNA==
+X-Google-Smtp-Source: APXvYqzGxb027T6AjbrSIyxgbGT10Rlua3bWwnVmub45qfU7fTieDKg9Vuu7OFHe0iUJBy2r/1eQDw==
+X-Received: by 2002:adf:f108:: with SMTP id r8mr13256774wro.390.1574879387660;
+        Wed, 27 Nov 2019 10:29:47 -0800 (PST)
+Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
+        by smtp.gmail.com with ESMTPSA id h15sm20789799wrb.44.2019.11.27.10.29.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2019 10:29:43 -0800 (PST)
+Date:   Wed, 27 Nov 2019 19:29:40 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Jani Nikula <jani.nikula@intel.com>
+Cc:     linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/13] samples: vfio-mdev: constify fb ops
+Message-ID: <20191127182940.GM406127@phenom.ffwll.local>
+References: <cover.1574871797.git.jani.nikula@intel.com>
+ <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190926231824.149014-3-bgardon@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
+X-Operating-System: Linux phenom 5.3.0-2-amd64 
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 04:17:58PM -0700, Ben Gardon wrote:
-> Separate the functions for generating leaf page table entries from the
-> function that inserts them into the paging structure. This refactoring
-> will allow changes to the MMU sychronization model to use atomic
-> compare / exchanges (which are not guaranteed to succeed) instead of a
-> monolithic MMU lock.
+On Wed, Nov 27, 2019 at 06:32:09PM +0200, Jani Nikula wrote:
+> Now that the fbops member of struct fb_info is const, we can star making
+> the ops const as well.
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+
+You've missed at least drivers/staging/fbtft in your search. I guess you
+need to do a full make allyesconfig on x86/arm and arm64 (the latter
+because some stupid drivers only compile there, not on arm, don't ask).
+Still misses a pile of mips/ppc only stuff and maybe the sparcs and
+alphas, but should be good enough.
+
+With that done, on the remaining patches:
+
+Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+
 > ---
->  arch/x86/kvm/mmu.c | 93 ++++++++++++++++++++++++++++------------------
->  1 file changed, 57 insertions(+), 36 deletions(-)
+>  samples/vfio-mdev/mdpy-fb.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 781c2ca7455e3..7e5ab9c6e2b09 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -2964,21 +2964,15 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
->  #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
->  #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
->  
-> -static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> -		    unsigned pte_access, int level,
-> -		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-> -		    bool can_unsync, bool host_writable)
-> +static int generate_pte(struct kvm_vcpu *vcpu, unsigned pte_access, int level,
-
-Similar comment on "generate".  Note, I don't necessarily like the names
-get_mmio_spte_value() or get_spte_value() either as they could be
-misinterpreted as reading the value from memory.  Maybe
-calc_{mmio_}spte_value()?
-
-> +		    gfn_t gfn, kvm_pfn_t pfn, u64 old_pte, bool speculative,
-> +		    bool can_unsync, bool host_writable, bool ad_disabled,
-> +		    u64 *ptep)
->  {
-> -	u64 spte = 0;
-> +	u64 pte;
-
-Renames and unrelated refactoring (leaving the variable uninitialized and
-setting it directdly to shadow_present_mask) belong in separate patches.
-The renames especially make this patch much more difficult to review.  And,
-I disagree with the rename, I think it's important to keep the "spte"
-nomenclature, even though it's a bit of a misnomer for TDP entries, so that
-it is easy to differentiate data that is coming from the host PTEs versus
-data that is for KVM's MMU.
-
->  	int ret = 0;
-> -	struct kvm_mmu_page *sp;
-> -
-> -	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
-> -		return 0;
->  
-> -	sp = page_header(__pa(sptep));
-> -	if (sp_ad_disabled(sp))
-> -		spte |= shadow_acc_track_value;
-> +	*ptep = 0;
->  
->  	/*
->  	 * For the EPT case, shadow_present_mask is 0 if hardware
-> @@ -2986,36 +2980,39 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  	 * ACC_USER_MASK and shadow_user_mask are used to represent
->  	 * read access.  See FNAME(gpte_access) in paging_tmpl.h.
->  	 */
-> -	spte |= shadow_present_mask;
-> +	pte = shadow_present_mask;
-> +
-> +	if (ad_disabled)
-> +		pte |= shadow_acc_track_value;
-> +
->  	if (!speculative)
-> -		spte |= spte_shadow_accessed_mask(spte);
-> +		pte |= spte_shadow_accessed_mask(pte);
->  
->  	if (pte_access & ACC_EXEC_MASK)
-> -		spte |= shadow_x_mask;
-> +		pte |= shadow_x_mask;
->  	else
-> -		spte |= shadow_nx_mask;
-> +		pte |= shadow_nx_mask;
->  
->  	if (pte_access & ACC_USER_MASK)
-> -		spte |= shadow_user_mask;
-> +		pte |= shadow_user_mask;
->  
->  	if (level > PT_PAGE_TABLE_LEVEL)
-> -		spte |= PT_PAGE_SIZE_MASK;
-> +		pte |= PT_PAGE_SIZE_MASK;
->  	if (tdp_enabled)
-> -		spte |= kvm_x86_ops->get_mt_mask(vcpu, gfn,
-> +		pte |= kvm_x86_ops->get_mt_mask(vcpu, gfn,
->  			kvm_is_mmio_pfn(pfn));
->  
->  	if (host_writable)
-> -		spte |= SPTE_HOST_WRITEABLE;
-> +		pte |= SPTE_HOST_WRITEABLE;
->  	else
->  		pte_access &= ~ACC_WRITE_MASK;
->  
->  	if (!kvm_is_mmio_pfn(pfn))
-> -		spte |= shadow_me_mask;
-> +		pte |= shadow_me_mask;
->  
-> -	spte |= (u64)pfn << PAGE_SHIFT;
-> +	pte |= (u64)pfn << PAGE_SHIFT;
->  
->  	if (pte_access & ACC_WRITE_MASK) {
-> -
->  		/*
->  		 * Other vcpu creates new sp in the window between
->  		 * mapping_level() and acquiring mmu-lock. We can
-> @@ -3024,9 +3021,9 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  		 */
->  		if (level > PT_PAGE_TABLE_LEVEL &&
->  		    mmu_gfn_lpage_is_disallowed(vcpu, gfn, level))
-> -			goto done;
-> +			return 0;
->  
-> -		spte |= PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE;
-> +		pte |= PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE;
->  
->  		/*
->  		 * Optimization: for pte sync, if spte was writable the hash
-> @@ -3034,30 +3031,54 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  		 * is responsibility of mmu_get_page / kvm_sync_page.
->  		 * Same reasoning can be applied to dirty page accounting.
->  		 */
-> -		if (!can_unsync && is_writable_pte(*sptep))
-> -			goto set_pte;
-> +		if (!can_unsync && is_writable_pte(old_pte)) {
-> +			*ptep = pte;
-> +			return 0;
-> +		}
->  
->  		if (mmu_need_write_protect(vcpu, gfn, can_unsync)) {
->  			pgprintk("%s: found shadow page for %llx, marking ro\n",
->  				 __func__, gfn);
-> -			ret |= SET_SPTE_WRITE_PROTECTED_PT;
-> +			ret = SET_SPTE_WRITE_PROTECTED_PT;
-
-More unnecessary refactoring.
-
->  			pte_access &= ~ACC_WRITE_MASK;
-> -			spte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
-> +			pte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
->  		}
->  	}
->  
-> -	if (pte_access & ACC_WRITE_MASK) {
-> -		kvm_vcpu_mark_page_dirty(vcpu, gfn);
-> -		spte |= spte_shadow_dirty_mask(spte);
-> -	}
-> +	if (pte_access & ACC_WRITE_MASK)
-> +		pte |= spte_shadow_dirty_mask(pte);
->  
->  	if (speculative)
-> -		spte = mark_spte_for_access_track(spte);
-> +		pte = mark_spte_for_access_track(pte);
-> +
-> +	*ptep = pte;
-> +	return ret;
-> +}
-> +
-> +static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
-> +		    int level, gfn_t gfn, kvm_pfn_t pfn, bool speculative,
-> +		    bool can_unsync, bool host_writable)
-> +{
-> +	u64 spte;
-> +	int ret;
-> +	struct kvm_mmu_page *sp;
-> +
-> +	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
-> +		return 0;
-> +
-> +	sp = page_header(__pa(sptep));
-> +
-> +	ret = generate_pte(vcpu, pte_access, level, gfn, pfn, *sptep,
-> +			   speculative, can_unsync, host_writable,
-> +			   sp_ad_disabled(sp), &spte);
-
-Yowsers, that's a big prototype.  This is something that came up in an
-unrelated internal discussion.  I wonder if it would make sense to define
-a struct to hold all of the data needed to insert an spte and pass that
-on the stack isntead of having a bajillion parameters.  Just spitballing,
-no idea if it's feasible and/or reasonable.
-
-> +	if (!spte)
-> +		return 0;
-> +
-> +	if (spte & PT_WRITABLE_MASK)
-> +		kvm_vcpu_mark_page_dirty(vcpu, gfn);
->  
-> -set_pte:
->  	if (mmu_spte_update(sptep, spte))
->  		ret |= SET_SPTE_NEED_REMOTE_TLB_FLUSH;
-> -done:
->  	return ret;
+> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+> index 2719bb259653..21dbf63d6e41 100644
+> --- a/samples/vfio-mdev/mdpy-fb.c
+> +++ b/samples/vfio-mdev/mdpy-fb.c
+> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
+>  		iounmap(info->screen_base);
 >  }
 >  
+> -static struct fb_ops mdpy_fb_ops = {
+> +static const struct fb_ops mdpy_fb_ops = {
+>  	.owner		= THIS_MODULE,
+>  	.fb_destroy	= mdpy_fb_destroy,
+>  	.fb_setcolreg	= mdpy_fb_setcolreg,
 > -- 
-> 2.23.0.444.g18eeb5a265-goog
+> 2.20.1
 > 
+> _______________________________________________
+> dri-devel mailing list
+> dri-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/dri-devel
+
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
