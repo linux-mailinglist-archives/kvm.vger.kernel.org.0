@@ -2,130 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E2A110A7F1
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 02:28:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCAF910A809
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 02:38:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727321AbfK0B2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Nov 2019 20:28:52 -0500
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:35519 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727297AbfK0B2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Nov 2019 20:28:52 -0500
-Received: by mail-pg1-f182.google.com with SMTP id l24so1460862pgk.2;
-        Tue, 26 Nov 2019 17:28:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=rnzomsGEvWmK6DHLbwnM4g9G/cfdaPXxWaOXimkAyMw=;
-        b=ORirqgi30/+MzCdzTdz1sHRwkoZyJXrtDYEyOIwv5DoU+97RLUEWoEUtpqP/bgIT/N
-         ksN/K2fpKXwSCvoxaH6jHXjKpgNg9r9kS+m3MP0me8tFxTBTV3vpc4B49+kLN79EDH1E
-         D9v6I2f8X7U1wuJLgekiQvOr1l/dQ0XIFdVvQSZ+2YQomGlWxJbByDGpN8VqWYFWdoLZ
-         +ooT8ZA1jAtCexlwgpbZZVqHXzFVnVeVlHPj6/Ib8lixxjZFhBQaCP+uJyuqUAn1Skju
-         UwQqCDRwabmcwN7WmO08QGlHC8p5mHDouOIMvtiNlosQPzSRUYzhZWYBU2ObuA9L2Fy8
-         dJKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rnzomsGEvWmK6DHLbwnM4g9G/cfdaPXxWaOXimkAyMw=;
-        b=soZJv40rpTDMs5MBdRZly/2li03JIM2KxydLJklS+8RIxaCVPAVCBjb3Gcj0dZya3k
-         cOBwKm3zesiUHkzxcEW8WR1h1+oCOY+WtUpoCKv14w9dHBHQ9E8CMFpSknhgU3gK0H+Y
-         sSDDnlrJaQV0LJgcM+wj8VvPJEZUeBAiOYnbnVFSwOxddntm6220Gelaoq0S/ItXC60y
-         UdTd6ao0SSAOkboj4Goh+UmnOm64Kh3Ibdse72AUGUQ0eyxNXHMBapg7BFlTJFpVOcMa
-         R9G8USlslVx6kzmGlHCtXMFtqdSsmdL2JWnswvxVY3xf9/jdQ8jvVfr7IGuJzg1fHNIz
-         X3Qg==
-X-Gm-Message-State: APjAAAWxrfy1lqkCqMU9HsF95QsUgz0YtlFMoAm9rnvDUMUz3vffY90f
-        X1AoPEj66rrwgTuNOeTKeFc=
-X-Google-Smtp-Source: APXvYqzwJd/ZbQ9JW8NIf8L1H0+wP7FB7dlPfL++npvf4Hp+lJvr4lRVhQChVxesWQVbW+25dAlWYg==
-X-Received: by 2002:a63:5206:: with SMTP id g6mr1844261pgb.49.1574818131265;
-        Tue, 26 Nov 2019 17:28:51 -0800 (PST)
-Received: from [172.20.20.156] ([222.151.198.97])
-        by smtp.gmail.com with ESMTPSA id 125sm14165429pfu.136.2019.11.26.17.28.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Nov 2019 17:28:50 -0800 (PST)
-Subject: Re: [RFC 0/3] Qemu: virtio-net XDP offload
-To:     qemu-devel@nongnu.org
-Cc:     mst@redhat.com, jasowang@redhat.com, songliubraving@fb.com,
-        jakub.kicinski@netronome.com, hawk@kernel.org,
-        daniel@iogearbox.net, netdev@vger.kernel.org,
-        john.fastabend@gmail.com, ast@kernel.org, kafai@fb.com,
-        kvm@vger.kernel.org, yhs@fb.com, andriin@fb.com,
-        davem@davemloft.net
-References: <157476438124.31055.4199785471534349367@37313f22b938>
-From:   Prashant Bhole <prashantbhole.linux@gmail.com>
-Message-ID: <371adc67-33c1-0346-31d7-528057a997ce@gmail.com>
-Date:   Wed, 27 Nov 2019 10:27:57 +0900
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726576AbfK0BiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Nov 2019 20:38:14 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58782 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726094AbfK0BiO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Nov 2019 20:38:14 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 4F42ECA742D128B964E0;
+        Wed, 27 Nov 2019 09:38:09 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Wed, 27 Nov 2019
+ 09:37:59 +0800
+From:   Xiang Zheng <zhengxiang9@huawei.com>
+Subject: Re: [RESEND PATCH v21 2/6] docs: APEI GHES generation and CPER record
+ description
+To:     Igor Mammedov <imammedo@redhat.com>
+CC:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>,
+        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
+        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
+        <linuxarm@huawei.com>, <wanghaibin.wang@huawei.com>
+References: <20191111014048.21296-1-zhengxiang9@huawei.com>
+ <20191111014048.21296-3-zhengxiang9@huawei.com>
+ <20191115104458.200a6231@redhat.com>
+Message-ID: <05d2ba81-501f-bd7e-8da4-73e413169688@huawei.com>
+Date:   Wed, 27 Nov 2019 09:37:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <157476438124.31055.4199785471534349367@37313f22b938>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191115104458.200a6231@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Igor,
 
+Thanks for your review!
+Since the series of patches are going to be merged, we will address your comments by follow up patches.
 
-On 11/26/19 7:33 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20191126100914.5150-1-prashantbhole.linux@gmail.com/
+On 2019/11/15 17:44, Igor Mammedov wrote:
+> On Mon, 11 Nov 2019 09:40:44 +0800
+> Xiang Zheng <zhengxiang9@huawei.com> wrote:
 > 
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> Add APEI/GHES detailed design document
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+>> ---
+>>  docs/specs/acpi_hest_ghes.rst | 95 +++++++++++++++++++++++++++++++++++
+>>  docs/specs/index.rst          |  1 +
+>>  2 files changed, 96 insertions(+)
+>>  create mode 100644 docs/specs/acpi_hest_ghes.rst
+>>
+>> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
+>> new file mode 100644
+>> index 0000000000..348825f9d3
+>> --- /dev/null
+>> +++ b/docs/specs/acpi_hest_ghes.rst
+>> @@ -0,0 +1,95 @@
+>> +APEI tables generating and CPER record
+>> +======================================
+>> +
+>> +..
+>> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
+>> +
+>> +   This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> +   See the COPYING file in the top-level directory.
+>> +
+>> +Design Details
+>> +--------------
+>> +
+>> +::
+>> +
+>> +         etc/acpi/tables                                 etc/hardware_errors
+>> +      ====================                      ==========================================
+>> +  + +--------------------------+            +-----------------------+
+>> +  | | HEST                     |            |    address            |            +--------------+
+>> +  | +--------------------------+            |    registers          |            | Error Status |
+>> +  | | GHES1                    |            | +---------------------+            | Data Block 1 |
+>> +  | +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
+>> +  | | .................        | |          | +---------------------+            | |  CPER      |
+>> +  | | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
+>> +  | | .................        |   |        | +---------------------+        |   | |  ....      |
+>> +  | | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
+>> +  | | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
+>> +  | | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
+>> +  + +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
+>> +  | | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
+>> +  + +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
+>> +  | | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
+>> +  | | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
+>> +  | | .................        |     | |    | |  .............      |      |     | |  CPER      |
+>> +  | | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
+>> +  | | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
+>> +  | | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
+>> +  + +--------------------------|     |   |                                 |     | Error Status |
+>> +  | | ...............          |     |   |                                 |     | Data Block N |
+>> +  + +--------------------------+     |   |                                 +---->| +------------+
+>> +  | | GHESN                    |     |   |                                       | |  CPER      |
+>> +  + +--------------------------+     |   |                                       | |  CPER      |
+>> +  | | .................        |     |   |                                       | |  ....      |
+>> +  | | error_status_address-----+-----+   |                                       | |  CPER      |
+>> +  | | .................        |         |                                       +-+------------+
+>> +  | | read_ack_register--------+---------+
+>> +  | | read_ack_preserve        |
+>> +  | | read_ack_write           |
+>> +  + +--------------------------+
 > 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
->    CC      ui/input-keymap.o
->    CC      ui/input-legacy.o
->    CC      ui/kbd-state.o
-> /tmp/qemu-test/src/net/tap-linux.c:34:21: fatal error: bpf/bpf.h: No such file or directory
->   #include <bpf/bpf.h>
+> I'd merge "Error Status Data Block" with "address registers", so it would be
+> clear that "Error Status Data Block" is located after "read_ack_registerN"
 
-Sorry, I missed to enclose it in #ifdef CONFIG_LIBBPF.
-It should be fixed whenever I'll post next revision.
+Yes, this image doesn't demonstrate this point. We will make some changes on
+this image.
 
+> 
+>> +
+>> +(1) QEMU generates the ACPI HEST table. This table goes in the current
+>> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
+>> +    notification types.
+>> +
+>> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
+>> +    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
+>> +    contains an address registers table and an Error Status Data Block table.
+>> +
+>> +(3) The address registers table contains N Error Block Address entries
+>> +    and N Read Ack Register entries. The size for each entry is 8-byte.
+>> +    The Error Status Data Block table contains N Error Status Data Block
+>> +    entries. The size for each entry is 4096(0x1000) bytes. The total size
+>> +    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
+>> +    N is the number of the kinds of hardware error sources.
+>> +
+>> +(4) QEMU generates the ACPI linker/loader script for the firmware. The
+>> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
+>> +    and copies blob contents there.
+>> +
+>> +(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
+>> +    "error_status_address" fields of the HEST table with a pointer to the
+>> +    corresponding "address registers" in the "etc/hardware_errors" blob.
+>> +
+>> +(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
+>> +    "read_ack_register" fields of the HEST table with a pointer to the
+>> +    corresponding "address registers" in the "etc/hardware_errors" blob.
+> 
+> s/"address registers" in/"read_ack_register" within/
 
-Prashant
+OK.
 
+> 
+>> +
+>> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
+>> +    addresses in the "error_block_address" fields with a pointer to the
+>> +    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
+>> +
+>> +(8) QEMU defines a third and write-only fw_cfg blob which is called
+>> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
+>> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
+>> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
+>> +    for the firmware. The firmware will write back the start address of
+>> +    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
+>> +
+> 
+>> +(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right into
+>> +    guest memory, 
+> 
+> s/
+> QEMU formats the CPER right into guest memory
+> /
+> QEMU writes CPER into corresponding "Error Status Data Block"
+> /
+> 
 
->                       ^
-> compilation terminated.
-> ---
->    SIGN    pc-bios/optionrom/linuxboot.bin
->    SIGN    pc-bios/optionrom/kvmvapic.bin
->    BUILD   pc-bios/optionrom/linuxboot_dma.img
-> make: *** [net/tap-linux.o] Error 1
-> make: *** Waiting for unfinished jobs....
->    BUILD   pc-bios/optionrom/pvh.img
->    BUILD   pc-bios/optionrom/linuxboot_dma.raw
-> ---
->      raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=be849bfed02d4ea7b19f7746fe037bd5', '-u', '1001', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-3d2z3wl3/src/docker-src.2019-11-26-05.31.05.21708:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
-> filter=--filter=label=com.qemu.instance.uuid=be849bfed02d4ea7b19f7746fe037bd5
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-3d2z3wl3/src'
-> make: *** [docker-run-test-quick@centos7] Error 2
-> 
-> real    1m56.447s
-> user    0m8.519s
+OK.
+
+>> and then injects platform specific interrupt (in case of
+>> +    arm/virt machine it's Synchronous External Abort) as a notification which
+>> +    is necessary for notifying the guest.
 > 
 > 
-> The full log is available at
-> http://patchew.org/logs/20191126100914.5150-1-prashantbhole.linux@gmail.com/testing.docker-quick@centos7/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+>> +
+>> +(10) This notification (in virtual hardware) will be handled by the guest
+>> +     kernel, guest APEI driver will read the CPER which is recorded by QEMU and
+>> +     do the recovery.
+> Maybe better would be to say:
+> "
+> On receiving notification, guest APEI driver cold read the CPER error
+> and take appropriate action
+> "
+
+OK.
+
 > 
+> 
+> also in HEST patches there is implicit ABI, which probably should be documented here.
+> More specifically kvm_arch_on_sigbus_vcpu() error injection
+> uses source_id as index in "etc/hardware_errors" to find out "Error Status Data Block"
+> entry corresponding to error source. So supported source_id values should be assigned
+> here and not be changed afterwards to make sure that guest will write error into
+> expected "Error Status Data Block" even if guest was migrated to a newer QEMU.
+> 
+
+OK, I will add the descriptions of the implicit ABI.
+
+-- 
+
+Thanks,
+Xiang
+
