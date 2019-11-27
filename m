@@ -2,194 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6AC710B49B
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 18:37:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3619710B4F6
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:00:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727172AbfK0Rhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 12:37:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34482 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727033AbfK0Rhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 12:37:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574876258;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=/EutEIL466ZUqNQMlg8zDkw8HWKGT4MM8Orz5FGtAII=;
-        b=HDTfj4VyAfXflCYrVvYtaWj1YmBj4M3YXLAAmbhPWsKc9/uH+JAfkj6oMGnpQKYoXdbxNA
-        HhVxLbCdOaa7rXkkansPPl2U6bKEVkwW09hzB+sZMJTxfOaJbJX1TaGz8nMtx7gSnXiPM6
-        xYqeXIQft/wxMprPGE6vhur9qRXkNHc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-7DlmekviN0OKh7IvD6j-Uw-1; Wed, 27 Nov 2019 12:37:37 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75391107ACE3;
-        Wed, 27 Nov 2019 17:37:34 +0000 (UTC)
-Received: from [10.36.116.69] (ovpn-116-69.ams2.redhat.com [10.36.116.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F9A119C6A;
-        Wed, 27 Nov 2019 17:37:22 +0000 (UTC)
-Subject: Re: [PATCH v14 0/6] mm / virtio: Provide support for unused page
- reporting
-To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-References: <20191119214454.24996.66289.stgit@localhost.localdomain>
- <052f7442-4500-cd02-af2e-56d2f97a232c@redhat.com>
- <2cd804f781b55d5c20e970dcd67b472fba6e1387.camel@linux.intel.com>
- <905bf376-b8a5-d101-fb8e-ec8aa9ce500e@redhat.com>
- <57f4c78f298a5e3d929c0026f7b323a3bb911848.camel@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <fd866a71-1d1a-1481-ffee-aefe0313ef38@redhat.com>
-Date:   Wed, 27 Nov 2019 18:37:21 +0100
+        id S1726655AbfK0SAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 13:00:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4450 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726576AbfK0SAm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 13:00:42 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xARHq7uF154270
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 13:00:40 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2whcxpmcg1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 13:00:40 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 27 Nov 2019 18:00:38 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 27 Nov 2019 18:00:37 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xARI0Z2R36700304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Nov 2019 18:00:35 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C60D111C054;
+        Wed, 27 Nov 2019 18:00:35 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7576D11C05C;
+        Wed, 27 Nov 2019 18:00:35 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.82.185])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Nov 2019 18:00:35 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 1/3] s390x: export sclp_setup_int
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com
+References: <1574157219-22052-1-git-send-email-imbrenda@linux.ibm.com>
+ <1574157219-22052-2-git-send-email-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
+ qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
+ 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
+ zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
+ lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
+ Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
+ 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
+ cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
+ Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
+ HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
+ YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
+ CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
+ AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
+ bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
+ eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
+ CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
+ EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
+ rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
+ UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
+ RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
+ dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
+ jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
+ cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
+ JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
+ iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
+ tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
+ 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
+ v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
+ HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
+ 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
+ gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
+ BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
+ 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
+ jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
+ IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
+ katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
+ dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
+ FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
+ DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
+ Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
+ phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
+Date:   Wed, 27 Nov 2019 19:00:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <57f4c78f298a5e3d929c0026f7b323a3bb911848.camel@linux.intel.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 7DlmekviN0OKh7IvD6j-Uw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1574157219-22052-2-git-send-email-imbrenda@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PDw2QwgBndjmlxTfLSna3B8sH13zrk7CN"
+X-TM-AS-GCONF: 00
+x-cbid: 19112718-0012-0000-0000-0000036D0D3A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112718-0013-0000-0000-000021A8B77F
+Message-Id: <c7f564db-0594-141c-6531-3ba21b6d3a8d@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-27_04:2019-11-27,2019-11-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ impostorscore=0 suspectscore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911270146
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.11.19 18:36, Alexander Duyck wrote:
-> On Wed, 2019-11-27 at 11:01 +0100, David Hildenbrand wrote:
->> On 26.11.19 17:45, Alexander Duyck wrote:
->>> On Tue, 2019-11-26 at 13:20 +0100, David Hildenbrand wrote:
->>>> On 19.11.19 22:46, Alexander Duyck wrote:
-> 
-> <snip>
-> 
->>>>> Below are the results from various benchmarks. I primarily focused on two
->>>>> tests. The first is the will-it-scale/page_fault2 test, and the other is
->>>>> a modified version of will-it-scale/page_fault1 that was enabled to use
->>>>> THP. I did this as it allows for better visibility into different parts
->>>>> of the memory subsystem. The guest is running with 32G for RAM on one
->>>>> node of a E5-2630 v3. The host has had some power saving features disabled
->>>>> by setting the /dev/cpu_dma_latency value to 10ms.
->>>>>
->>>>> Test                page_fault1 (THP)     page_fault2
->>>>> Name         tasks  Process Iter  STDEV  Process Iter  STDEV
->>>>> Baseline         1    1203934.75  0.04%     379940.75  0.11%
->>>>>                 16    8828217.00  0.85%    3178653.00  1.28%
->>>>>
->>>>> Patches applied  1    1207961.25  0.10%     380852.25  0.25%
->>>>>                 16    8862373.00  0.98%    3246397.25  0.68%
->>>>>
->>>>> Patches enabled  1    1207758.75  0.17%     373079.25  0.60%
->>>>>  MADV disabled  16    8870373.75  0.29%    3204989.75  1.08%
->>>>>
->>>>> Patches enabled  1    1261183.75  0.39%     373201.50  0.50%
->>>>>                 16    8371359.75  0.65%    3233665.50  0.84%
->>>>>
->>>>> Patches enabled  1    1090201.50  0.25%     376967.25  0.29%
->>>>>  page shuffle   16    8108719.75  0.58%    3218450.25  1.07%
->>>>>
->>>>> The results above are for a baseline with a linux-next-20191115 kernel,
->>>>> that kernel with this patch set applied but page reporting disabled in
->>>>> virtio-balloon, patches applied but the madvise disabled by direct
->>>>> assigning a device, the patches applied and page reporting fully
->>>>> enabled, and the patches enabled with page shuffling enabled.  These
->>>>> results include the deviation seen between the average value reported here
->>>>> versus the high and/or low value. I observed that during the test memory
->>>>> usage for the first three tests never dropped whereas with the patches
->>>>> fully enabled the VM would drop to using only a few GB of the host's
->>>>> memory when switching from memhog to page fault tests.
->>>>>
->>>>> Most of the overhead seen with this patch set enabled seems due to page
->>>>> faults caused by accessing the reported pages and the host zeroing the page
->>>>> before giving it back to the guest. This overhead is much more visible when
->>>>> using THP than with standard 4K pages. In addition page shuffling seemed to
->>>>> increase the amount of faults generated due to an increase in memory churn.
->>>>
->>>> MADV_FREE would be interesting.
->>>
->>> I can probably code something up. However that is going to push a bunch of
->>> complexity into the QEMU code and doesn't really mean much to the kernel
->>> code. I can probably add it as another QEMU patch to the set since it is
->>> just a matter of having a function similar to ram_block_discard_range that
->>> uses MADV_FREE instead of MADV_DONTNEED.
->>
->> Yes, addon patch makes perfect sense. The nice thing about MADV_FREE is
->> that you only take back pages from a process when really under memory
->> pressure (before going to SWAP). You will still get a pagefault on the
->> next access (to identify that the page is still in use after all), but
->> don't have to fault in a fresh page.
-> 
-> So I got things running with a proof of concept using MADV_FREE.
-> Apparently another roadblock I hadn't realized is that you have to have
-> the right version of glibc for MADV_FREE to be present.
-> 
-> Anyway with MADV_FREE the numbers actually look pretty close to the
-> numbers with the madvise disabled. Apparently the page fault overhead
-> isn't all that significant. When I push the next patch set I will include
-> the actual numbers, but even with shuffling enabled the results were in
-> the 8.7 to 8.8 million iteration range.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PDw2QwgBndjmlxTfLSna3B8sH13zrk7CN
+Content-Type: multipart/mixed; boundary="sjzrViNbKoeSphFWOTOiUfp2HT2z7dv2H"
 
-Cool, thanks for evaluating!
+--sjzrViNbKoeSphFWOTOiUfp2HT2z7dv2H
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Thanks,
+On 11/19/19 10:53 AM, Claudio Imbrenda wrote:
+> Export sclp_setup_int() so that it can be used from outside.
+>=20
+> Needed for an upocoming unit test.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-David / dhildenb
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>  lib/s390x/sclp.h | 1 +
+>  lib/s390x/sclp.c | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index 6d40fb7..675f07e 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -265,6 +265,7 @@ typedef struct ReadEventData {
+>  } __attribute__((packed)) ReadEventData;
+> =20
+>  extern char _sccb[];
+> +void sclp_setup_int(void);
+>  void sclp_handle_ext(void);
+>  void sclp_wait_busy(void);
+>  void sclp_mark_busy(void);
+> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+> index 7798f04..123b639 100644
+> --- a/lib/s390x/sclp.c
+> +++ b/lib/s390x/sclp.c
+> @@ -45,7 +45,7 @@ static void mem_init(phys_addr_t mem_end)
+>  	page_alloc_ops_enable();
+>  }
+> =20
+> -static void sclp_setup_int(void)
+> +void sclp_setup_int(void)
+>  {
+>  	uint64_t mask;
+> =20
+>=20
+
+
+
+--sjzrViNbKoeSphFWOTOiUfp2HT2z7dv2H--
+
+--PDw2QwgBndjmlxTfLSna3B8sH13zrk7CN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3eucMACgkQ41TmuOI4
+ufjGEw/9Fh3deGzKlwLMhI7HbwifL9nrMCwepU1/flPu37a4BtLPURrw7jJDjUPz
+zv5Xh8h/wkn6TYO/VFYKBx2tI5p2WWYwyja6GQJRuSftyfqdP0CsOsCkQYlZQ7qm
+pHtcbh+6xkGkmEaQ+pDfV6Mf3iNWabUh4dkPeOxEL+Ribpz4DomcGWR9i8k4jcuW
+HcIz2DrwKXuZtySuYNNRGnYpwlxemDtqUgsfhpOXf707WEdB3bzTt75cYh4P0Cqt
+ikjKvwaNy/x0NT2Sd9RaWFqrMeGWq5PhTWwmVSVjcYyeqF76HRDtqZRf39tFJq5q
+h/iSMP/njpWQJXws3ne5kD2sJAPXQJf1oOQjwYwq8ztqWfawRW5Vf63EMRam3Flx
+WydLdxkC+Dq9rFKIM+Cg+PHjtQY6Fj3W51dgk+yF2tv7RYakugDIUnb+CuqIvtGK
+Pf0iDvul9QHxqK36f2jcq4NEvnIyrcvs1WZveQMK6ad2Mur3xwh66YY88E7dtxLl
+LU/zTDlq6Eo2lZaV1jV8f5VZpYntKzkXSQQxQCDPkDF0rF0DAr3m9tOmB9slTkjY
+bsuQPJvGFhUlFy2svy+LAsgC+2CGYPFbj2GP+NGJAB5SD0lwMhA/AxxTbGXQQ2qh
+qcJj/F98QjEivk6xrB1uQWV1t9Ehk89IBDDxXHq3+WvCyYeR54s=
+=UPTL
+-----END PGP SIGNATURE-----
+
+--PDw2QwgBndjmlxTfLSna3B8sH13zrk7CN--
 
