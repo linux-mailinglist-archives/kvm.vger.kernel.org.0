@@ -2,89 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D4FB10AB7D
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 09:12:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9990D10AC25
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 09:47:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726149AbfK0IMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 03:12:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43876 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726125AbfK0IMu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 03:12:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574842368;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4GO5cDJE1Bxb5yiz/pxJvWOQ/f85zWGdpqW4AA0SXEI=;
-        b=YY5cs0wgAXXuK8L2ppnnZr2pQz4c9LQXd5Zs+F/6Od+ktK9x0JfjeJB2zG0WLNe1nYdI63
-        MXfo6A/JgXfr9CF854f63oXJWzLoc9Gw8USwxqMj29tAJM7bL6wv0C6vs/DBCqjKL6x78e
-        T6ev21xqZVvJO8JfWzUQwk7XPJJGKt4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-_0e5tcQZNBa4qCcYFu_HSA-1; Wed, 27 Nov 2019 03:12:47 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 325C1800D54;
-        Wed, 27 Nov 2019 08:12:45 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F1E5119C69;
-        Wed, 27 Nov 2019 08:12:38 +0000 (UTC)
-Date:   Wed, 27 Nov 2019 09:12:37 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Xiang Zheng <zhengxiang9@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>,
-        <gengdongjiu@huawei.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
-        <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
-        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <linuxarm@huawei.com>, <wanghaibin.wang@huawei.com>
-Subject: Re: [RESEND PATCH v21 2/6] docs: APEI GHES generation and CPER
- record description
-Message-ID: <20191127091237.7bd64bbf@redhat.com>
-In-Reply-To: <05d2ba81-501f-bd7e-8da4-73e413169688@huawei.com>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
-        <20191111014048.21296-3-zhengxiang9@huawei.com>
-        <20191115104458.200a6231@redhat.com>
-        <05d2ba81-501f-bd7e-8da4-73e413169688@huawei.com>
+        id S1726526AbfK0IrJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 03:47:09 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2091 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726092AbfK0IrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 03:47:09 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 62DF1EFFDFA9A6E46914;
+        Wed, 27 Nov 2019 16:47:06 +0800 (CST)
+Received: from dggeme765-chm.china.huawei.com (10.3.19.111) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 27 Nov 2019 16:47:06 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme765-chm.china.huawei.com (10.3.19.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Wed, 27 Nov 2019 16:47:05 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Wed, 27 Nov 2019 16:47:05 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Haiwei Li <lihaiwei.kernel@gmail.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "gary.hook@amd.com" <gary.hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH v2] KVM: SVM: Fix "error" isn't initialized
+Thread-Topic: [PATCH v2] KVM: SVM: Fix "error" isn't initialized
+Thread-Index: AdWk9Gm4M611HFaZTlSzM0B9cT25RQ==
+Date:   Wed, 27 Nov 2019 08:47:05 +0000
+Message-ID: <a5d0e94ba8cc4926a1ef27e6efcee594@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.184.189.20]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: _0e5tcQZNBa4qCcYFu_HSA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Nov 2019 09:37:57 +0800
-Xiang Zheng <zhengxiang9@huawei.com> wrote:
-
-> Hi Igor,
-> 
-> Thanks for your review!
-> Since the series of patches are going to be merged, we will address your comments by follow up patches.
-
-Yes, I know it's quite frustrating to respin series multiple times,
-but on the other hand it's more frustrating later on when reader
-tries to figure out mess caused by a bunch of fixups in commit
-history.
-
-With amount of issues spotted during review, which also requires
-rewriting some patches. I don't see big vXX as a valid reason
-to merge without other compelling reason, especially at
-the beginning of merge window.
-(it might be fine right before soft-freeze if issues are minor
-but is not the case here)
-
-If I were you, I'd just respin v22 with comments addressed.
-(from my side I can promise to review it shortly after that,
-while I still remember how it works)
-
-[...]
-
+PiBGcm9tIGU3ZjljNzg2ZTQzZWY0Zjg5MGI4YTAxZjE1ZjhmMDA3ODZmNGIxNGEgTW9uIFNlcCAx
+NyAwMDowMDowMCAyMDAxDQo+IEZyb206IEhhaXdlaSBMaSA8bGloYWl3ZWlAdGVuY2VudC5jb20+
+DQo+IERhdGU6IFdlZCwgMjcgTm92IDIwMTkgMTU6MDA6NDkgKzA4MDANCj4gU3ViamVjdDogW1BB
+VENIIHYyXSBmaXg6ICdlcnJvcicgaXMgbm90IGluaXRpYWxpemVkDQo+DQo+IFRoZXJlIGFyZSBh
+IGJ1bmNoIG9mIGVycm9yIHBhdGhzIHdlcmUgImVycm9yIiBpc24ndCBpbml0aWFsaXplZC4NCj4g
+QEAgLTE1NSw2ICsxNTUsOCBAQCBzdGF0aWMgaW50IF9fc2V2X2RvX2NtZF9sb2NrZWQoaW50IGNt
+ZCwgdm9pZCAqZGF0YSwgaW50ICpwc3BfcmV0KQ0KPiAgIAl1bnNpZ25lZCBpbnQgcGh5c19sc2Is
+IHBoeXNfbXNiOw0KPiAgIAl1bnNpZ25lZCBpbnQgcmVnLCByZXQgPSAwOw0KPg0KPiArCSpwc3Bf
+cmV0ID0gLTE7DQo+ICsNCj4gICAJaWYgKCFwc3ApDQo+ICAgCQlyZXR1cm4gLUVOT0RFVjsNCj4N
+Cg0KVGhlIGFyZyBwc3BfcmV0IG1heSBiZSBOVUxMIGluIHNvbWUgcGF0aCBzdWNoIGFzIHNldl9n
+dWVzdF9kZl9mbHVzaChOVUxMKS4NClNvIHlvdSBoYXZlIHRvIGNoZWNrIGl0IGFnYWluc3QgTlVM
+TC4NClRoYW5rcy4NCg==
