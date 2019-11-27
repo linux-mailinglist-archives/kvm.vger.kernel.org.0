@@ -2,153 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 282E610B5A9
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DD9F10B5AD
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:25:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbfK0SZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 13:25:18 -0500
-Received: from foss.arm.com ([217.140.110.172]:51506 "EHLO foss.arm.com"
+        id S1727120AbfK0SZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 13:25:54 -0500
+Received: from mga12.intel.com ([192.55.52.136]:13448 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726984AbfK0SZS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 13:25:18 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D538331B;
-        Wed, 27 Nov 2019 10:25:17 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E789F3F6C4;
-        Wed, 27 Nov 2019 10:25:16 -0800 (PST)
-Date:   Wed, 27 Nov 2019 18:25:14 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-Subject: Re: [PATCH kvmtool 04/16] Check that a PCI device's memory size is
- power of two
-Message-ID: <20191127182514.23d719ff@donnerap.cambridge.arm.com>
-In-Reply-To: <20191125103033.22694-5-alexandru.elisei@arm.com>
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
-        <20191125103033.22694-5-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1726514AbfK0SZy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 13:25:54 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 10:25:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,250,1571727600"; 
+   d="scan'208";a="199273387"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by orsmga007.jf.intel.com with ESMTP; 27 Nov 2019 10:25:53 -0800
+Date:   Wed, 27 Nov 2019 10:25:53 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [RFC PATCH 02/28] kvm: mmu: Separate pte generation from set_spte
+Message-ID: <20191127182553.GB22227@linux.intel.com>
+References: <20190926231824.149014-1-bgardon@google.com>
+ <20190926231824.149014-3-bgardon@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190926231824.149014-3-bgardon@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Nov 2019 10:30:21 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-Hi,
-
-> According to the PCI local bus specification [1], a device's memory size
-> must be a power of two. This is also implicit in the mechanism that a CPU
-> uses to get the memory size requirement for a PCI device.
+On Thu, Sep 26, 2019 at 04:17:58PM -0700, Ben Gardon wrote:
+> Separate the functions for generating leaf page table entries from the
+> function that inserts them into the paging structure. This refactoring
+> will allow changes to the MMU sychronization model to use atomic
+> compare / exchanges (which are not guaranteed to succeed) instead of a
+> monolithic MMU lock.
 > 
-> The vesa device requests a memory size that isn't a power of two.
-> According to the same spec [1], a device is allowed to consume more memory
-> than it actually requires. As a result, the amount of memory that the vesa
-> device now reserves has been increased.
-> 
-> To prevent slip-ups in the future, a few BUILD_BUG_ON statements were added
-> in places where the memory size is known at compile time.
-> 
-> [1] PCI Local Bus Specification Revision 3.0, section 6.2.5.1
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->  hw/vesa.c          | 2 ++
->  include/kvm/util.h | 2 ++
->  include/kvm/vesa.h | 6 +++++-
->  vfio/pci.c         | 5 +++++
->  virtio/pci.c       | 3 +++
->  5 files changed, 17 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/mmu.c | 93 ++++++++++++++++++++++++++++------------------
+>  1 file changed, 57 insertions(+), 36 deletions(-)
 > 
-> diff --git a/hw/vesa.c b/hw/vesa.c
-> index f3c5114cf4fe..75670a51be5f 100644
-> --- a/hw/vesa.c
-> +++ b/hw/vesa.c
-> @@ -58,6 +58,8 @@ struct framebuffer *vesa__init(struct kvm *kvm)
->  	char *mem;
->  	int r;
+> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+> index 781c2ca7455e3..7e5ab9c6e2b09 100644
+> --- a/arch/x86/kvm/mmu.c
+> +++ b/arch/x86/kvm/mmu.c
+> @@ -2964,21 +2964,15 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+>  #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
+>  #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
 >  
-> +	BUILD_BUG_ON(!is_power_of_two(VESA_MEM_SIZE));
+> -static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+> -		    unsigned pte_access, int level,
+> -		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+> -		    bool can_unsync, bool host_writable)
+> +static int generate_pte(struct kvm_vcpu *vcpu, unsigned pte_access, int level,
+
+Similar comment on "generate".  Note, I don't necessarily like the names
+get_mmio_spte_value() or get_spte_value() either as they could be
+misinterpreted as reading the value from memory.  Maybe
+calc_{mmio_}spte_value()?
+
+> +		    gfn_t gfn, kvm_pfn_t pfn, u64 old_pte, bool speculative,
+> +		    bool can_unsync, bool host_writable, bool ad_disabled,
+> +		    u64 *ptep)
+>  {
+> -	u64 spte = 0;
+> +	u64 pte;
+
+Renames and unrelated refactoring (leaving the variable uninitialized and
+setting it directdly to shadow_present_mask) belong in separate patches.
+The renames especially make this patch much more difficult to review.  And,
+I disagree with the rename, I think it's important to keep the "spte"
+nomenclature, even though it's a bit of a misnomer for TDP entries, so that
+it is easy to differentiate data that is coming from the host PTEs versus
+data that is for KVM's MMU.
+
+>  	int ret = 0;
+> -	struct kvm_mmu_page *sp;
+> -
+> -	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
+> -		return 0;
+>  
+> -	sp = page_header(__pa(sptep));
+> -	if (sp_ad_disabled(sp))
+> -		spte |= shadow_acc_track_value;
+> +	*ptep = 0;
+>  
+>  	/*
+>  	 * For the EPT case, shadow_present_mask is 0 if hardware
+> @@ -2986,36 +2980,39 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+>  	 * ACC_USER_MASK and shadow_user_mask are used to represent
+>  	 * read access.  See FNAME(gpte_access) in paging_tmpl.h.
+>  	 */
+> -	spte |= shadow_present_mask;
+> +	pte = shadow_present_mask;
 > +
->  	if (!kvm->cfg.vnc && !kvm->cfg.sdl && !kvm->cfg.gtk)
->  		return NULL;
+> +	if (ad_disabled)
+> +		pte |= shadow_acc_track_value;
+> +
+>  	if (!speculative)
+> -		spte |= spte_shadow_accessed_mask(spte);
+> +		pte |= spte_shadow_accessed_mask(pte);
 >  
-> diff --git a/include/kvm/util.h b/include/kvm/util.h
-> index 4ca7aa9392b6..e90f1c2db39f 100644
-> --- a/include/kvm/util.h
-> +++ b/include/kvm/util.h
-> @@ -104,6 +104,8 @@ static inline unsigned long roundup_pow_of_two(unsigned long x)
->  	return x ? 1UL << fls_long(x - 1) : 0;
+>  	if (pte_access & ACC_EXEC_MASK)
+> -		spte |= shadow_x_mask;
+> +		pte |= shadow_x_mask;
+>  	else
+> -		spte |= shadow_nx_mask;
+> +		pte |= shadow_nx_mask;
+>  
+>  	if (pte_access & ACC_USER_MASK)
+> -		spte |= shadow_user_mask;
+> +		pte |= shadow_user_mask;
+>  
+>  	if (level > PT_PAGE_TABLE_LEVEL)
+> -		spte |= PT_PAGE_SIZE_MASK;
+> +		pte |= PT_PAGE_SIZE_MASK;
+>  	if (tdp_enabled)
+> -		spte |= kvm_x86_ops->get_mt_mask(vcpu, gfn,
+> +		pte |= kvm_x86_ops->get_mt_mask(vcpu, gfn,
+>  			kvm_is_mmio_pfn(pfn));
+>  
+>  	if (host_writable)
+> -		spte |= SPTE_HOST_WRITEABLE;
+> +		pte |= SPTE_HOST_WRITEABLE;
+>  	else
+>  		pte_access &= ~ACC_WRITE_MASK;
+>  
+>  	if (!kvm_is_mmio_pfn(pfn))
+> -		spte |= shadow_me_mask;
+> +		pte |= shadow_me_mask;
+>  
+> -	spte |= (u64)pfn << PAGE_SHIFT;
+> +	pte |= (u64)pfn << PAGE_SHIFT;
+>  
+>  	if (pte_access & ACC_WRITE_MASK) {
+> -
+>  		/*
+>  		 * Other vcpu creates new sp in the window between
+>  		 * mapping_level() and acquiring mmu-lock. We can
+> @@ -3024,9 +3021,9 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+>  		 */
+>  		if (level > PT_PAGE_TABLE_LEVEL &&
+>  		    mmu_gfn_lpage_is_disallowed(vcpu, gfn, level))
+> -			goto done;
+> +			return 0;
+>  
+> -		spte |= PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE;
+> +		pte |= PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE;
+>  
+>  		/*
+>  		 * Optimization: for pte sync, if spte was writable the hash
+> @@ -3034,30 +3031,54 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+>  		 * is responsibility of mmu_get_page / kvm_sync_page.
+>  		 * Same reasoning can be applied to dirty page accounting.
+>  		 */
+> -		if (!can_unsync && is_writable_pte(*sptep))
+> -			goto set_pte;
+> +		if (!can_unsync && is_writable_pte(old_pte)) {
+> +			*ptep = pte;
+> +			return 0;
+> +		}
+>  
+>  		if (mmu_need_write_protect(vcpu, gfn, can_unsync)) {
+>  			pgprintk("%s: found shadow page for %llx, marking ro\n",
+>  				 __func__, gfn);
+> -			ret |= SET_SPTE_WRITE_PROTECTED_PT;
+> +			ret = SET_SPTE_WRITE_PROTECTED_PT;
+
+More unnecessary refactoring.
+
+>  			pte_access &= ~ACC_WRITE_MASK;
+> -			spte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
+> +			pte &= ~(PT_WRITABLE_MASK | SPTE_MMU_WRITEABLE);
+>  		}
+>  	}
+>  
+> -	if (pte_access & ACC_WRITE_MASK) {
+> -		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+> -		spte |= spte_shadow_dirty_mask(spte);
+> -	}
+> +	if (pte_access & ACC_WRITE_MASK)
+> +		pte |= spte_shadow_dirty_mask(pte);
+>  
+>  	if (speculative)
+> -		spte = mark_spte_for_access_track(spte);
+> +		pte = mark_spte_for_access_track(pte);
+> +
+> +	*ptep = pte;
+> +	return ret;
+> +}
+> +
+> +static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
+> +		    int level, gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+> +		    bool can_unsync, bool host_writable)
+> +{
+> +	u64 spte;
+> +	int ret;
+> +	struct kvm_mmu_page *sp;
+> +
+> +	if (set_mmio_spte(vcpu, sptep, gfn, pfn, pte_access))
+> +		return 0;
+> +
+> +	sp = page_header(__pa(sptep));
+> +
+> +	ret = generate_pte(vcpu, pte_access, level, gfn, pfn, *sptep,
+> +			   speculative, can_unsync, host_writable,
+> +			   sp_ad_disabled(sp), &spte);
+
+Yowsers, that's a big prototype.  This is something that came up in an
+unrelated internal discussion.  I wonder if it would make sense to define
+a struct to hold all of the data needed to insert an spte and pass that
+on the stack isntead of having a bajillion parameters.  Just spitballing,
+no idea if it's feasible and/or reasonable.
+
+> +	if (!spte)
+> +		return 0;
+> +
+> +	if (spte & PT_WRITABLE_MASK)
+> +		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+>  
+> -set_pte:
+>  	if (mmu_spte_update(sptep, spte))
+>  		ret |= SET_SPTE_NEED_REMOTE_TLB_FLUSH;
+> -done:
+>  	return ret;
 >  }
 >  
-> +#define is_power_of_two(x)	((x) ? ((x) & ((x) - 1)) == 0 : 0)
-
-This gives weird results for negative values (which the kernel avoids by having this a static inline and using an unsigned type).
-Not sure we care, but maybe (x > 0) ? ... would fix this?
-
-> +
->  struct kvm;
->  void *mmap_hugetlbfs(struct kvm *kvm, const char *htlbfs_path, u64 size);
->  void *mmap_anon_or_hugetlbfs(struct kvm *kvm, const char *hugetlbfs_path, u64 size);
-> diff --git a/include/kvm/vesa.h b/include/kvm/vesa.h
-> index 0fac11ab5a9f..e7d971343642 100644
-> --- a/include/kvm/vesa.h
-> +++ b/include/kvm/vesa.h
-> @@ -5,8 +5,12 @@
->  #define VESA_HEIGHT	480
->  
->  #define VESA_MEM_ADDR	0xd0000000
-> -#define VESA_MEM_SIZE	(4*VESA_WIDTH*VESA_HEIGHT)
->  #define VESA_BPP	32
-> +/*
-> + * We actually only need VESA_BPP/8*VESA_WIDTH*VESA_HEIGHT bytes. But the memory
-> + * size must be a power of 2, so we round up.
-> + */
-> +#define VESA_MEM_SIZE	(1 << 21)
-
-I don't think it's worth calculating the value and rounding it up, but can we have a BUILD_BUG checking that VESA_MEM_SIZE is big enough to hold the framebuffer?
-
-Cheers,
-Andre
-
->  
->  struct kvm;
->  struct biosregs;
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index 76e24c156906..914732cc6897 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -831,6 +831,11 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
->  	/* Ignore invalid or unimplemented regions */
->  	if (!region->info.size)
->  		return 0;
-> +	if (!is_power_of_two(region->info.size)) {
-> +		vfio_dev_err(vdev, "region is not power of two: 0x%llx",
-> +			     region->info.size);
-> +		return -EINVAL;
-> +	}
->  
->  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSIX) {
->  		/* Trap and emulate MSI-X table */
-> diff --git a/virtio/pci.c b/virtio/pci.c
-> index 99653cad2c0f..04e801827df9 100644
-> --- a/virtio/pci.c
-> +++ b/virtio/pci.c
-> @@ -435,6 +435,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
->  	vpci->kvm = kvm;
->  	vpci->dev = dev;
->  
-> +	BUILD_BUG_ON(!is_power_of_two(IOPORT_SIZE));
-> +	BUILD_BUG_ON(!is_power_of_two(PCI_IO_SIZE));
-> +
->  	r = ioport__register(kvm, IOPORT_EMPTY, &virtio_pci__io_ops, IOPORT_SIZE, vdev);
->  	if (r < 0)
->  		return r;
-
+> -- 
+> 2.23.0.444.g18eeb5a265-goog
+> 
