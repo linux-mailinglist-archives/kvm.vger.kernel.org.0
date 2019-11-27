@@ -2,105 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C36510B60C
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:47:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 703A910B610
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:48:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727247AbfK0Srh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 13:47:37 -0500
-Received: from mga18.intel.com ([134.134.136.126]:15822 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727186AbfK0Srh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 13:47:37 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 10:47:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,250,1571727600"; 
-   d="scan'208";a="383586811"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga005.jf.intel.com with ESMTP; 27 Nov 2019 10:47:36 -0800
-Date:   Wed, 27 Nov 2019 10:47:36 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [RFC PATCH 06/28] kvm: mmu: Replace mmu_lock with a read/write
- lock
-Message-ID: <20191127184736.GF22227@linux.intel.com>
-References: <20190926231824.149014-1-bgardon@google.com>
- <20190926231824.149014-7-bgardon@google.com>
+        id S1727525AbfK0SsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 13:48:10 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44042 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727423AbfK0SsK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 13:48:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574880487;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hAv+8Rp9p8BKrYrz0WR6s4F38PMsBWQjRKLYMYSaIm4=;
+        b=U9NEryXhYGxXAM0q4IeLGxfD87Hd8i1wDG3N50QWtiFpSDiciyJp7t7MUVR4xfiY2ARq9H
+        3vELcrvB5iUNZaP8wiAU2rT1NIVLNQpqbpcPsCAxJgGqIgbK1fjny381Xh3gOFq1GowmP8
+        OZFGJ8AbEDCagNvitIxKNR3HDB/cSEw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-KT0ssU7kPXC09VGJWcNnQg-1; Wed, 27 Nov 2019 13:48:04 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEA918017CC;
+        Wed, 27 Nov 2019 18:48:02 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2EC95D9D6;
+        Wed, 27 Nov 2019 18:47:58 +0000 (UTC)
+Date:   Wed, 27 Nov 2019 19:47:56 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH 10/18] arm/arm64: selftest: Add prefetch
+ abort test
+Message-ID: <20191127184756.encuqdupgwcky6ys@kamzik.brq.redhat.com>
+References: <20191127142410.1994-1-alexandru.elisei@arm.com>
+ <20191127142410.1994-11-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+In-Reply-To: <20191127142410.1994-11-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: KT0ssU7kPXC09VGJWcNnQg-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20190926231824.149014-7-bgardon@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 04:18:02PM -0700, Ben Gardon wrote:
-> Replace the KVM MMU spinlock with a read/write lock so that some parts of
-> the MMU can be made more concurrent in future commits by switching some
-> write mode aquisitions to read mode. A read/write lock was chosen over
-> other synchronization options beause it has minimal initial impact: this
-> change simply changes all uses of the MMU spin lock to an MMU read/write
-> lock, in write mode. This change has no effect on the logic of the code
-> and only a small performance penalty.
-> 
-> Other, more invasive options were considered for synchronizing access to
-> the paging structures. Sharding the MMU lock to protect 2MB chunks of
-> addresses, as the main MM does, would also work, however it makes
-> acquiring locks for operations on large regions of memory expensive.
-> Further, the parallel page fault handling algorithm introduced later in
-> this series does not require exclusive access to the region of memory
-> for which it is handling a fault.
-> 
-> There are several disadvantages to the read/write lock approach:
-> 1. The reader/writer terminology does not apply well to MMU operations.
-> 2. Many operations require exclusive access to a region of memory
-> (often a memslot), but not all of memory. The read/write lock does not
-> facilitate this.
-> 3. Contention between readers and writers can still create problems in
-> the face of long running MMU operations.
-> 
-> Despite these issues,the use of a read/write lock facilitates
-> substantial improvements over the monolithic locking scheme.
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+On Wed, Nov 27, 2019 at 02:24:02PM +0000, Alexandru Elisei wrote:
+> When a guest tries to execute code from MMIO memory, KVM injects an
+> external abort into that guest. We have now fixed the psci test to not
+> fetch instructions from the I/O region, and it's not that often that a
+> guest misbehaves in such a way. Let's expand our coverage by adding a
+> proper test targetting this corner case.
+>=20
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/x86/kvm/mmu.c         | 106 +++++++++++++++++++------------------
->  arch/x86/kvm/page_track.c  |   8 +--
->  arch/x86/kvm/paging_tmpl.h |   8 +--
->  arch/x86/kvm/x86.c         |   4 +-
->  include/linux/kvm_host.h   |   3 +-
->  virt/kvm/kvm_main.c        |  34 ++++++------
->  6 files changed, 83 insertions(+), 80 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> index 56587655aecb9..0311d18d9a995 100644
-> --- a/arch/x86/kvm/mmu.c
-> +++ b/arch/x86/kvm/mmu.c
-> @@ -2446,9 +2446,9 @@ static void mmu_sync_children(struct kvm_vcpu *vcpu,
->  			flush |= kvm_sync_page(vcpu, sp, &invalid_list);
->  			mmu_pages_clear_parents(&parents);
->  		}
-> -		if (need_resched() || spin_needbreak(&vcpu->kvm->mmu_lock)) {
+>  lib/arm64/asm/esr.h |  3 ++
+>  arm/selftest.c      | 97 +++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 97 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
+> index 8e5af4d90767..8c351631b0a0 100644
+> --- a/lib/arm64/asm/esr.h
+> +++ b/lib/arm64/asm/esr.h
+> @@ -44,4 +44,7 @@
+>  #define ESR_EL1_EC_BKPT32=09(0x38)
+>  #define ESR_EL1_EC_BRK64=09(0x3C)
+> =20
+> +#define ESR_EL1_FSC_MASK=09(0x3F)
+> +#define ESR_EL1_FSC_EXTABT=09(0x10)
+> +
+>  #endif /* _ASMARM64_ESR_H_ */
+> diff --git a/arm/selftest.c b/arm/selftest.c
+> index e9dc5c0cab28..caad524378fc 100644
+> --- a/arm/selftest.c
+> +++ b/arm/selftest.c
+> @@ -16,6 +16,8 @@
+>  #include <asm/psci.h>
+>  #include <asm/smp.h>
+>  #include <asm/barrier.h>
+> +#include <asm/mmu.h>
+> +#include <asm/pgtable.h>
+> =20
+>  static cpumask_t ready, valid;
+> =20
+> @@ -68,6 +70,7 @@ static void check_setup(int argc, char **argv)
+>  static struct pt_regs expected_regs;
+>  static bool und_works;
+>  static bool svc_works;
+> +static bool pabt_works;
+>  #if defined(__arm__)
+>  /*
+>   * Capture the current register state and execute an instruction
+> @@ -91,7 +94,7 @@ static bool svc_works;
+>  =09=09"str=09r1, [r0, #" xstr(S_PC) "]\n"=09=09\
+>  =09=09excptn_insn "\n"=09=09=09=09\
+>  =09=09post_insns "\n"=09=09=09=09=09\
+> -=09:: "r" (&expected_regs) : "r0", "r1")
+> +=09:: "r" (&expected_regs) : "r0", "r1", "r2")
+> =20
+>  static bool check_regs(struct pt_regs *regs)
+>  {
+> @@ -171,6 +174,45 @@ static void user_psci_system_off(struct pt_regs *reg=
+s)
+>  {
+>  =09__user_psci_system_off();
+>  }
+> +
+> +static void check_pabt_exit(void)
+> +{
+> +=09install_exception_handler(EXCPTN_PABT, NULL);
+> +
+> +=09report("pabt", pabt_works);
+> +=09exit(report_summary());
+> +}
+> +
+> +static void pabt_handler(struct pt_regs *regs)
+> +{
+> +=09expected_regs.ARM_pc =3D 0;
+> +=09pabt_works =3D check_regs(regs);
+> +
+> +=09regs->ARM_pc =3D (unsigned long)&check_pabt_exit;
+> +}
+> +
+> +static void check_pabt(void)
+> +{
+> +=09unsigned long sctlr;
+> +
+> +=09/* Make sure we can actually execute from a writable region */
+> +=09asm volatile("mrc p15, 0, %0, c1, c0, 0": "=3Dr" (sctlr));
+> +=09if (sctlr & CR_ST) {
+> +=09=09sctlr &=3D ~CR_ST;
+> +=09=09asm volatile("mcr p15, 0, %0, c1, c0, 0" :: "r" (sctlr));
+> +=09=09isb();
+> +=09=09/*
+> +=09=09 * Required according to the sequence in ARM DDI 0406C.d, page
+> +=09=09 * B3-1358.
+> +=09=09 */
+> +=09=09flush_tlb_all();
+> +=09}
+> +
+> +=09install_exception_handler(EXCPTN_PABT, pabt_handler);
+> +
+> +=09test_exception("mov r2, #0x0", "bx r2", "");
+> +=09__builtin_unreachable();
+> +}
+>  #elif defined(__aarch64__)
+> =20
+>  /*
+> @@ -212,7 +254,7 @@ static void user_psci_system_off(struct pt_regs *regs=
+)
+>  =09=09"stp=09 x0,  x1, [x1]\n"=09=09=09\
+>  =09"1:"=09excptn_insn "\n"=09=09=09=09\
+>  =09=09post_insns "\n"=09=09=09=09=09\
+> -=09:: "r" (&expected_regs) : "x0", "x1")
+> +=09:: "r" (&expected_regs) : "x0", "x1", "x2")
+> =20
+>  static bool check_regs(struct pt_regs *regs)
+>  {
+> @@ -288,6 +330,53 @@ static bool check_svc(void)
+>  =09return svc_works;
+>  }
+> =20
+> +static void check_pabt_exit(void)
+> +{
+> +=09install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
+> +
+> +=09report("pabt", pabt_works);
+> +=09exit(report_summary());
+> +}
+> +
+> +static void pabt_handler(struct pt_regs *regs, unsigned int esr)
+> +{
+> +=09bool is_extabt;
+> +
+> +=09expected_regs.pc =3D 0;
+> +=09is_extabt =3D (esr & ESR_EL1_FSC_MASK) =3D=3D ESR_EL1_FSC_EXTABT;
+> +=09pabt_works =3D check_regs(regs) && is_extabt;
+> +
+> +=09regs->pc =3D (u64)&check_pabt_exit;
+> +}
+> +
+> +static void check_pabt(void)
+> +{
+> +=09enum vector v =3D check_vector_prep();
+> +=09unsigned long sctlr;
+> +
+> +=09/*
+> +=09 * According to ARM DDI 0487E.a, table D5-33, footnote c, all regions
+> +=09 * writable at EL0 are treated as PXN. Clear the user bit so we can
+> +=09 * execute code from the bottom I/O space (0G-1G) to simulate a
+> +=09 * misbehaved guest.
+> +=09 */
+> +=09mmu_clear_user(current_thread_info()->pgtable, 0);
+> +
+> +=09/* Make sure we can actually execute from a writable region */
+> +=09sctlr =3D read_sysreg(sctlr_el1);
+> +=09if (sctlr & SCTLR_EL1_WXN) {
+> +=09=09write_sysreg(sctlr & ~SCTLR_EL1_WXN, sctlr_el1);
+> +=09=09isb();
+> +=09=09/* SCTLR_EL1.WXN is permitted to be cached in a TLB. */
+> +=09=09flush_tlb_all();
+> +=09}
+> +
+> +=09install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
+> +
+> +=09test_exception("mov x2, xzr", "br x2", "");
+> +=09__builtin_unreachable();
+> +}
+> +
+>  static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
+>  {
+>  =09__user_psci_system_off();
+> @@ -298,7 +387,9 @@ static void check_vectors(void *arg __unused)
+>  {
+>  =09report("und", check_und());
+>  =09report("svc", check_svc());
+> -=09if (is_user()) {
+> +=09if (!is_user()) {
+> +=09=09check_pabt();
+> +=09} else {
+>  #ifdef __arm__
+>  =09=09install_exception_handler(EXCPTN_UND, user_psci_system_off);
+>  #else
+> --=20
+> 2.20.1
+>
 
-I gather there is no equivalent to spin_needbreak() for r/w locks?  Is it
-something that can be added?  Losing spinlock contention detection will
-negatively impact other flows, e.g. fast zapping all pages will no longer
-drop the lock to allow insertion of SPTEs into the new generation of MMU.
+Did you also test with QEMU? Because this new test dies on an unhandled
+unknown exception for me. Both with KVM and with TCG, and both arm64 and
+arm32 (KVM:aarch32 or TCG:arm).
 
-> +		if (need_resched()) {
->  			kvm_mmu_flush_or_zap(vcpu, &invalid_list, false, flush);
-> -			cond_resched_lock(&vcpu->kvm->mmu_lock);
-> +			cond_resched_rwlock_write(&vcpu->kvm->mmu_lock);
->  			flush = false;
->  		}
->  	}
+Thanks,
+drew
+
