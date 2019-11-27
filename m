@@ -2,180 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 94D2810B70A
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 20:49:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAACD10B747
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 21:16:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727239AbfK0Ttf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 14:49:35 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:42686 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbfK0Ttf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 14:49:35 -0500
-Received: by mail-lf1-f68.google.com with SMTP id y19so18126893lfl.9
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 11:49:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=tpa6qsgsffF6MZ2hAroMhBII3NVwR7/Y88cSdiliNf0=;
-        b=HyzdQVmo2vsOZyvKTv/HixleVW+fE/oq7v6M/t9xSKYG/a1OT34vVXcp5W3hNJy1zP
-         mB75uz9wyD1j/1SGSqhE57PHS5G23SWJpr2Uj8ojzcXEQj4dG4HZYvtr/XAQY7QYe1+M
-         9p1r2GJ8BRVNhwtH8IsnohsSkt7IdYgL+GgwzqZ15Af1HRQWQJRlbrlJ54p/MElxPUw3
-         q4jG/caVgnm2ZOko1agVFfd9raXvqkuNsBCBB1v35QlfzkZp7mVGVY+qZiCf+5XyTciZ
-         W3yfw0segLv00PbeIPWCzrQKnilNCrs28T2ucr53EdN6MBs+nzbnoUf4Gikmcpnq1f+m
-         mCmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=tpa6qsgsffF6MZ2hAroMhBII3NVwR7/Y88cSdiliNf0=;
-        b=uoED9j1AQDnCCC8ou8hmmqv0zvRTxsxUyiI432Ej1pZd1lqFArIs2jMbdXFQqAcamb
-         UIHPVkiR6puLCUyNcXWL/IepFf/ROa6DB6cF5LpRsJc48lCS129ynRGFY0CG4XrkjLYm
-         DRBg6CRzgh/IMf65nbkwgQBgfa0CzvnbKsktKsbD19G08vreqm5v530V+/HxCoFaKEwp
-         v5LIBITHBa9i6pXh1DTCVHqpmtGhtiyNZ7wT8RFXbnhRv4C6AcxWaBJRM1TpsBI9rO+3
-         kL3KmeOcFCWFS0osBZx73uJuczPoorOZIZK+QUTgdEZ58RyRdfrR/mtQK9yZ5HH2tJUP
-         VODw==
-X-Gm-Message-State: APjAAAW5V37E+g20LFtl7aLfpJkzn8LboKk++9fSUo+tan7A+c+BWBzw
-        baEMO4rMHWiDb0WH/XWwyCScMA==
-X-Google-Smtp-Source: APXvYqybDtB2Ovw/ENr4nkvummmpv5ttVbYMaxRqCU1q3wmSBePOoBmSZRFDwa9J2xUg1ekUya/ruA==
-X-Received: by 2002:a19:8104:: with SMTP id c4mr24228921lfd.191.1574884172084;
-        Wed, 27 Nov 2019 11:49:32 -0800 (PST)
-Received: from cakuba.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id o15sm7741773ljc.28.2019.11.27.11.49.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2019 11:49:31 -0800 (PST)
-Date:   Wed, 27 Nov 2019 11:49:13 -0800
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Prashant Bhole <prashantbhole.linux@gmail.com>,
-        Song Liu <songliubraving@fb.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>, kvm@vger.kernel.org,
-        Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
-Message-ID: <20191127114913.0363a0e8@cakuba.netronome.com>
-In-Reply-To: <48cec928-871f-3f50-e99f-c6a6d124cf4c@redhat.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
-        <20191126123514.3bdf6d6f@cakuba.netronome.com>
-        <48cec928-871f-3f50-e99f-c6a6d124cf4c@redhat.com>
-Organization: Netronome Systems, Ltd.
+        id S1727356AbfK0UQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 15:16:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10184 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727127AbfK0UQO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 15:16:14 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xARKETLf050565;
+        Wed, 27 Nov 2019 15:16:06 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2whhyg0pu6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Nov 2019 15:16:06 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xARKEowR051905;
+        Wed, 27 Nov 2019 15:16:06 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2whhyg0ptk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Nov 2019 15:16:06 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xARKFC8u025883;
+        Wed, 27 Nov 2019 20:16:05 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma04wdc.us.ibm.com with ESMTP id 2wevd7ftg0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Nov 2019 20:16:05 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xARKG4r848300504
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Nov 2019 20:16:04 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 92E05AE05C;
+        Wed, 27 Nov 2019 20:16:04 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 750E5AE062;
+        Wed, 27 Nov 2019 20:16:03 +0000 (GMT)
+Received: from leobras.br.ibm.com (unknown [9.18.235.137])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Nov 2019 20:16:03 +0000 (GMT)
+Message-ID: <103b290917221baa10194c27c8e35b9803f3cafa.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
+ to kvm
+From:   Leonardo Bras <leonardo@linux.ibm.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Wed, 27 Nov 2019 17:15:59 -0300
+In-Reply-To: <20191127194757.GI22227@linux.intel.com>
+References: <20191021225842.23941-1-sean.j.christopherson@intel.com>
+         <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
+         <20191126171416.GA22233@linux.intel.com>
+         <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
+         <e1a4218f-2a70-3de3-1403-dbebf8a8abdf@redhat.com>
+         <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
+         <6beeff56-7676-5dfd-a578-1732730f8963@redhat.com>
+         <adcfe1b4c5b36b3c398a5d456da9543e0390cba3.camel@linux.ibm.com>
+         <20191127194757.GI22227@linux.intel.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-xFrapZw7GF6R9331NkVz"
+User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-27_04:2019-11-27,2019-11-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=2
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911270162
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 27 Nov 2019 10:59:37 +0800, Jason Wang wrote:
-> On 2019/11/27 =E4=B8=8A=E5=8D=884:35, Jakub Kicinski wrote:
-> > On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote: =20
-> >> Note: This RFC has been sent to netdev as well as qemu-devel lists
-> >>
-> >> This series introduces XDP offloading from virtio_net. It is based on
-> >> the following work by Jason Wang:
-> >> https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
-> >>
-> >> Current XDP performance in virtio-net is far from what we can achieve
-> >> on host. Several major factors cause the difference:
-> >> - Cost of virtualization
-> >> - Cost of virtio (populating virtqueue and context switching)
-> >> - Cost of vhost, it needs more optimization
-> >> - Cost of data copy
-> >> Because of above reasons there is a need of offloading XDP program to
-> >> host. This set is an attempt to implement XDP offload from the guest. =
+
+--=-xFrapZw7GF6R9331NkVz
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 2019-11-27 at 11:47 -0800, Sean Christopherson wrote:
+> On Wed, Nov 27, 2019 at 04:25:55PM -0300, Leonardo Bras wrote:
+> > On Wed, 2019-11-27 at 19:32 +0100, Paolo Bonzini wrote:
+> > > On 27/11/19 19:24, Leonardo Bras wrote:
+> > > > By what I could undestand up to now, these functions that use borro=
+wed
+> > > > references can only be called while the reference (file descriptor)
+> > > > exists.=20
+> > > > So, suppose these threads, where:
+> > > > - T1 uses a borrowed reference, and=20
+> > > > - T2 is releasing the reference (close, release):
+> > >=20
+> > > Nit: T2 is releasing the *last* reference (as implied by your referen=
+ce
+> > > to close/release).
+> >=20
+> > Correct.
+> >=20
+> > > > T1				| T2
+> > > > kvm_get_kvm()			|
+> > > > ...				| kvm_put_kvm()
+> > > > kvm_put_kvm_no_destroy()	|
+> > > >=20
+> > > > The above would not trigger a use-after-free bug, but will cause a
+> > > > memory leak. Is my above understanding right?
+> > >=20
+> > > Yes, this is correct.
+> > >=20
+> >=20
+> > Then, what would not be a bug before (using kvm_put_kvm()) now is a
+> > memory leak (using kvm_put_kvm_no_destroy()).
+>=20
+> No, using kvm_put_kvm_no_destroy() changes how a bug would manifest, as
+> you note below.  Replacing kvm_put_kvm() with kvm_put_kvm_no_destroy()
+> when the refcount is _guaranteed_ to be >1 has no impact on correctness.
+>=20
+
+Humm, so what about the above example with T1 and T2?
+
+
+> > And it's the price to avoid use-after-free on other cases, which is a
+> > worse bug. Ok, I get it.=20
+> >=20
+> > > Paolo
+> >=20
+> > On Tue, 2019-11-26 at 10:14 -0800, Sean Christopherson wrote:
+> > > If one these kvm_put_kvm() calls did unexpectedly free @kvm (due to=
 =20
-> > This turns the guest kernel into a uAPI proxy.
-> >
-> > BPF uAPI calls related to the "offloaded" BPF objects are forwarded
-> > to the hypervisor, they pop up in QEMU which makes the requested call
-> > to the hypervisor kernel. Today it's the Linux kernel tomorrow it may
-> > be someone's proprietary "SmartNIC" implementation.
-> >
-> > Why can't those calls be forwarded at the higher layer? Why do they
-> > have to go through the guest kernel? =20
->=20
->=20
-> I think doing forwarding at higher layer have the following issues:
->=20
-> - Need a dedicated library (probably libbpf) but application may choose=20
->   to do eBPF syscall directly
-> - Depends on guest agent to work
-
-This can be said about any user space functionality.
-
-> - Can't work for virtio-net hardware, since it still requires a hardware=
+> > > a bug somewhere else), KVM would still hit a use-after-free scenario=
 =20
-> interface for carrying=C2=A0 offloading information
-
-The HW virtio-net presumably still has a PF and hopefully reprs for
-VFs, so why can't it attach the program there?
-
-> - Implement at the level of kernel may help for future extension like=20
->   BPF object pinning and eBPF helper etc.
-
-No idea what you mean by this.
-
-> Basically, this series is trying to have an implementation of=20
-> transporting eBPF through virtio, so it's not necessarily a guest to=20
-> host but driver and device. For device, it could be either a virtual one=
-=20
-> (as done in qemu) or a real hardware.
-
-SmartNIC with a multi-core 64bit ARM CPUs is as much of a host as=20
-is the x86 hypervisor side. This set turns the kernel into a uAPI
-forwarder.
-
-3 years ago my answer to this proposal would have been very different.
-Today after all the CPU bugs it seems like the SmartNICs (which are=20
-just another CPU running proprietary code) may just take off..
-
-> > If kernel performs no significant work (or "adds value", pardon the
-> > expression), and problem can easily be solved otherwise we shouldn't
-> > do the work of maintaining the mechanism. =20
+> > > as the caller still thinks @kvm is valid.  Currently, this would=20
+> > > only happen on a subsequent ioctl() on the caller's file descriptor
+> > > (which holds a pointer to @kvm), as the callers of these functions
+> > > don't directly dereference @kvm after the functions return.  But,=20
+> > > not deferencing @kvm isn't deliberate or functionally required, it's
+> > > just how the code happens to be written.
+> >=20
+> > So, testing if the kvm reference is valid before running ioctl would be
+> > enough to avoid these bugs?
 >=20
-> My understanding is that it should not be much difference compared to=20
-> other offloading technology.
-
-I presume you mean TC offloads? In virtualization there is inherently a
-hypervisor which will receive the request, be it an IO hub/SmartNIC or
-the traditional hypervisor on the same CPU.
-
-The ACL/routing offloads differ significantly, because it's either the=20
-driver that does all the HW register poking directly or the complexity
-of programming a rule into a HW table is quite low.
-
-Same is true for the NFP BPF offload, BTW, the driver does all the
-heavy lifting and compiles the final machine code image.
-
-You can't say verifying and JITing BPF code into machine code entirely
-in the hypervisor is similarly simple.
-
-So no, there is a huge difference.
-
-> > The approach of kernel generating actual machine code which is then
-> > loaded into a sandbox on the hypervisor/SmartNIC is another story. =20
+> No, the only way to avoid use-after-free bugs of this nature is to not
+> screw up the refcounting :-)  This funky "borrowed reference" pattern is
+> not very common.  It's necessary here because KVM needs to take an extra
+> reference to itself on behalf of the child device before installing the
+> child's file descriptor, because once the fd is installed it can be
+> closed by userspace and free the child's reference.  The error path,
+> which uses kvm_put_kvm_no_destroy(), is used if and only if installing
+> the fd fails, in which case the extra reference is deliberately thrown
+> away.
 >=20
-> We've considered such way, but actual machine code is not as portable as=
-=20
-> eBPF bytecode consider we may want:
+> kvm_put_kvm_no_destroy() is asserting "N > 0" as a way to detect a
+> refcounting bug that wouldn't be detected (until later) by the normal
+> refcounting behavior, which asserts "N >=3D 0".
 >=20
-> - Support migration
-> - Further offload the program to smart NIC (e.g through macvtap=20
->   passthrough mode etc).
+> > Is it possible?=20
+>=20
+> No.  Similar to above, userspace gets a fd by doing open("/dev/kvm"), and
+> the semantics of KVM are such that each fd is a reference to KVM. From
+> userspace's perspective, having a valid fd *is* how it knows that it has
+> a valid KVM reference.
+>=20
+> > Humm, but if it frees kvm before running ->release(), would it mean the
+> > VM is destroyed incorrectly, and will probably crash?
+>=20
+> More than likely the host will crash due to corrupting memory.  The guest
+> will crash too, but that's a secondary concern.
 
-You can re-JIT or JIT for SmartNIC..? Having the BPF bytecode does not
-guarantee migration either, if the environment is expected to be
-running different version of HW and SW. But yes, JITing in the guest
-kernel when you don't know what to JIT for may be hard, I was just
-saying that I don't mean to discourage people from implementing
-sandboxes which run JITed code on SmartNICs. My criticism is (as
-always?) against turning the kernel into a one-to-one uAPI forwarder
-into unknown platform code.
+Thanks for explaining, it's way more clear to me now how it works.
 
-For cloud use cases I believe the higher layer should solve this.
+Best regards,
+
+Leonardo Bras
+
+--=-xFrapZw7GF6R9331NkVz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3e2X8ACgkQlQYWtz9S
+ttSG7g//VqqPgAPZk9jWggp9bgypwMSgoU431QmrRpqZZcoUotfNp05aDaR6r7EU
+8N0ZoMsWz1fgAqQO4zWZcO9cg6UQ+KRu1p7zL3C125DAWMUVHTC1nrpZDQkrWdg+
+LeYaplyQg9je7zXLRfGJEP7Mqn4PuhTTFdZL7kgyu6fsBmiQAUB2eSqusDjTrtNv
+AUaHoVPBXzodTdqnHyM9G3Szl4mIEC3UAP6M8a3BzE1/fsY/1LCiamd5iMSFXcHy
+v0K8TS3wUKUAtARhj/xvzpwMcEnhUWbl0AlnUROpcvhWtf3iGfhab/IM8+NUZHAR
+WVRSiirKi6rjY1Mmx1DMwSCbLS/skS1wbNeP9A4FdnbaNIusGhF4lm1sCbNMSm5P
+xn+sUmLcfumxavG2yFBIcbLqK3ZS8L7MDiyx5g05RG8hCsc1olpmGMvObLctqP8E
+QxgMCL1lbGvSSgANWrf872xR4Tzl95B2FmKn6rzKtENihvguJsrMH/3TXDnc5PYo
+shFMM/w3NF2LKOgF4TTMAov05FTyebYhryQD9CUMYhjwvFiqeesMdKVsdiNJIVDH
+uR+qklXfM18bDhDiEd1fNPl0lenuR4Ws7P+4iaKDWWqnJgJW93rCBt4U77cVZ9Xg
+BTqQTs8NsUcfuDPvxDctqWbHCM2yBt9y6r0Ld8nps+jzPbxCuc0=
+=zqVw
+-----END PGP SIGNATURE-----
+
+--=-xFrapZw7GF6R9331NkVz--
+
