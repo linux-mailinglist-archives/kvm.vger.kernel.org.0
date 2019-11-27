@@ -2,131 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71BED10C075
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 23:58:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93B3B10C0B8
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 00:40:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727593AbfK0W57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 17:57:59 -0500
-Received: from ozlabs.org ([203.11.71.1]:47243 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726984AbfK0W57 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 17:57:59 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47NblR578Xz9sRs; Thu, 28 Nov 2019 09:57:55 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1574895475; bh=7lp6WdXRNwAaexgJv4y1ZsBrYzUJGxl4fS7hta9XSwY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SZGWVoQj+QSnlUnXRnCLApCigVRU6ObmCz3AiNQEqFCI79oHl0qwlEFqq3BjC7y/V
-         e4s2cQ3SEXBSjlxB7srz2osBnlDosqFASG/u0GeL2OMfYrpDYl0WZ1Awzx7VcjRfKM
-         NVEIwDdZDHE8Yah5OKAtZ1bP9tZpGMJIV7t2FcOjQHr7gAcA5B5pWV4BorsKpgUi83
-         4ENqWNp2Z+JmUrc1C9ToOTZnSw/cQ+3wXWLv3mQgBw+ih+xtgefamgkI8ytiAHPSVK
-         1n3y5ZZEv/9XwiQEF0x79BjQ8hgDvKMfgnSvb8EEsy+DJaSS+jpbKzTMFHhxacOXZe
-         7LlTq9MzCgrZQ==
-Date:   Thu, 28 Nov 2019 09:57:47 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-Message-ID: <20191127225747.GA2317@blackberry>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
+        id S1727455AbfK0Xkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 18:40:35 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:38586 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727104AbfK0Xkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 18:40:35 -0500
+Received: by mail-lf1-f68.google.com with SMTP id r14so2287436lfm.5
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 15:40:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=p7axeNoTAof088gM7pzbSHLI6Q/IQavsCGxKE7DXG/U=;
+        b=EyY2nlfReMtFjJhWIYjXR2lZFGKN4Zxf+p2xXXwuUeYE/thGc7BcZYIsa+r4Hf8mnd
+         TKBLZ15GD+6CKe2qkfeSo8KkpsN3/rUtvJtEycKFhjcs67kO0LTOGnGXVSE+jOJFLVv/
+         WS6LWthjkpLLyBqJO/TZ3sQbkxjzULIuN6tVh9rUJf31RKjLaVvoD0RaqL6pzbADkd8j
+         aakeWcKVvnSeZKIKXqRh3zjZi5ERGoFEoIRXukGrxQY+JQmiTGZ65UM3qocrIYOstl27
+         FWYyWPDSKnQE/qyeeZFSrEdRD3IxCnNqDoeoI/h0GPmcnmsjUUeWu7xpf2+CCuPQDiUc
+         7XCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=p7axeNoTAof088gM7pzbSHLI6Q/IQavsCGxKE7DXG/U=;
+        b=DoHGoOaDhzH55Aertbg8zPhzs7tjnOkiubrM3+xA+ncKj7IIz477hDwy/cvYz+VqdG
+         S9E6eQUaMLOT6vztuVAVD7zAsc/nNW+odoBsWPCs9IRDRYNUf4FFf4iEWjvHTcGtvtTy
+         xqZm+U7kHxAAgRjD7Q/SIhHkXjguvhb4/RO5giplaxaBpPIYWanVeFuL7Wf9cA5OaWv1
+         mVz6WAuvujNf5w8Ia22UnlSGwzBM2cRAoXByPzcg8nTM1+C3FSOSh+C/YD2ibj8X1Doe
+         VWhcmgAVnBA+qZHVnbyhf/2WWFT0K3XHeVFrwT7YkYdnnKrDWukiUsp1QvOS6wMfXe3w
+         Q33g==
+X-Gm-Message-State: APjAAAVIOEasAn/LF63SsBvyLeKNOV4uyUU6S59YLOyFMlN3UIYTXnf1
+        lb4V2mB4FyfLYisp/dzYJsXcxA==
+X-Google-Smtp-Source: APXvYqxHUECno26xNrBVPfFt+5AMB/6kpfKtdY093O3UHDC9X/C0eO6xU3lDRl+QXYtjPWxzJz4u4Q==
+X-Received: by 2002:a19:e343:: with SMTP id c3mr4626704lfk.192.1574898033168;
+        Wed, 27 Nov 2019 15:40:33 -0800 (PST)
+Received: from cakuba.netronome.com ([66.60.152.14])
+        by smtp.gmail.com with ESMTPSA id q13sm317527ljc.17.2019.11.27.15.40.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2019 15:40:32 -0800 (PST)
+Date:   Wed, 27 Nov 2019 15:40:14 -0800
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Prashant Bhole <prashantbhole.linux@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
+Message-ID: <20191127154014.2b91ecc2@cakuba.netronome.com>
+In-Reply-To: <20191127152653-mutt-send-email-mst@kernel.org>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+        <20191126123514.3bdf6d6f@cakuba.netronome.com>
+        <20191127152653-mutt-send-email-mst@kernel.org>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126175212.377171-1-leonardo@linux.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 02:52:12PM -0300, Leonardo Bras wrote:
-> Fixes a possible 'use after free' of kvm variable.
-> It does use mutex_unlock(&kvm->lock) after possible freeing a variable
-> with kvm_put_kvm(kvm).
+On Wed, 27 Nov 2019 15:32:17 -0500, Michael S. Tsirkin wrote:
+> On Tue, Nov 26, 2019 at 12:35:14PM -0800, Jakub Kicinski wrote:
+> > On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:  
+> > > Note: This RFC has been sent to netdev as well as qemu-devel lists
+> > > 
+> > > This series introduces XDP offloading from virtio_net. It is based on
+> > > the following work by Jason Wang:
+> > > https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
+> > > 
+> > > Current XDP performance in virtio-net is far from what we can achieve
+> > > on host. Several major factors cause the difference:
+> > > - Cost of virtualization
+> > > - Cost of virtio (populating virtqueue and context switching)
+> > > - Cost of vhost, it needs more optimization
+> > > - Cost of data copy
+> > > Because of above reasons there is a need of offloading XDP program to
+> > > host. This set is an attempt to implement XDP offload from the guest.  
+> > 
+> > This turns the guest kernel into a uAPI proxy.
+> > 
+> > BPF uAPI calls related to the "offloaded" BPF objects are forwarded 
+> > to the hypervisor, they pop up in QEMU which makes the requested call
+> > to the hypervisor kernel. Today it's the Linux kernel tomorrow it may 
+> > be someone's proprietary "SmartNIC" implementation.
+> > 
+> > Why can't those calls be forwarded at the higher layer? Why do they
+> > have to go through the guest kernel?  
+> 
+> Well everyone is writing these programs and attaching them to NICs.
 
-Comments below...
+Who's everyone?
 
-> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-> index 5834db0a54c6..a402ead833b6 100644
-> --- a/arch/powerpc/kvm/book3s_64_vio.c
-> +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
->  
->  	if (ret >= 0)
->  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> -	else
-> -		kvm_put_kvm(kvm);
->  
->  	mutex_unlock(&kvm->lock);
->  
->  	if (ret >= 0)
->  		return ret;
->  
-> +	kvm_put_kvm(kvm);
+> For better or worse that's how userspace is written.
 
-There isn't a potential use-after-free here.  We are relying on the
-property that the release function (kvm_vm_release) cannot be called
-in parallel with this function.  The reason is that this function
-(kvm_vm_ioctl_create_spapr_tce) is handling an ioctl on a kvm VM file
-descriptor.  That means that a userspace process has the file
-descriptor still open.  The code that implements the close() system
-call makes sure that no thread is still executing inside any system
-call that is using the same file descriptor before calling the file
-descriptor's release function (in this case, kvm_vm_release).  That
-means that this kvm_put_kvm() call here cannot make the reference
-count go to zero.
+HW offload requires modifying the user space, too. The offload is not
+transparent. Do you know that?
 
->  	kfree(stt);
->   fail_acct:
->  	account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 13efc291b1c7..f37089b60d09 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2744,10 +2744,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	/* Now it's all set up, let userspace reach it */
->  	kvm_get_kvm(kvm);
->  	r = create_vcpu_fd(vcpu);
-> -	if (r < 0) {
-> -		kvm_put_kvm(kvm);
-> +	if (r < 0)
->  		goto unlock_vcpu_destroy;
-> -	}
->  
->  	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
->  
-> @@ -2771,6 +2769,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->  	mutex_lock(&kvm->lock);
->  	kvm->created_vcpus--;
->  	mutex_unlock(&kvm->lock);
-> +	if (r < 0)
-> +		kvm_put_kvm(kvm);
->  	return r;
->  }
+> Yes, in the simple case where everything is passed through, it could
+> instead be passed through some other channel just as well, but then
+> userspace would need significant changes just to make it work with
+> virtio.
 
-Once again we are inside an ioctl on the kvm VM file descriptor, so
-the reference count cannot go to zero.
+There is a recently spawned effort to create an "XDP daemon" or
+otherwise a control application which would among other things link
+separate XDP apps to share a NIC attachment point.
 
-> @@ -3183,10 +3183,10 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
->  	kvm_get_kvm(kvm);
->  	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
->  	if (ret < 0) {
-> -		kvm_put_kvm(kvm);
->  		mutex_lock(&kvm->lock);
->  		list_del(&dev->vm_node);
->  		mutex_unlock(&kvm->lock);
-> +		kvm_put_kvm(kvm);
->  		ops->destroy(dev);
->  		return ret;
->  	}
+Making use of cloud APIs would make a perfect addition to that.
 
-Same again here.
+Obviously if one asks a kernel guy to solve a problem one'll get kernel
+code as an answer. And writing higher layer code requires companies to
+actually organize their teams and have "full stack" strategies.
 
-Paul.
+We've seen this story already with net_failover wart. At least that
+time we weren't risking building a proxy to someone's proprietary FW.
+
+> > If kernel performs no significant work (or "adds value", pardon the
+> > expression), and problem can easily be solved otherwise we shouldn't 
+> > do the work of maintaining the mechanism.
+> > 
+> > The approach of kernel generating actual machine code which is then
+> > loaded into a sandbox on the hypervisor/SmartNIC is another story.  
+> 
+> But that's transparent to guest userspace. Making userspace care whether
+> it's a SmartNIC or a software device breaks part of virtualization's
+> appeal, which is that it looks like a hardware box to the guest.
+
+It's not hardware unless you JITed machine code for it, it's just
+someone else's software.
+
+I'm not arguing with the appeal. I'm arguing the risk/benefit ratio
+doesn't justify opening this can of worms.
+
+> > I'd appreciate if others could chime in.  
