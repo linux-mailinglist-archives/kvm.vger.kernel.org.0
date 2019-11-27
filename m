@@ -2,178 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AC4510BFF7
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 22:57:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71BED10C075
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 23:58:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727304AbfK0V5d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 16:57:33 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727133AbfK0V5c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 16:57:32 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xARLvN6r042022;
-        Wed, 27 Nov 2019 16:57:25 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxqtdbm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 16:57:25 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xARLvOu2042219;
-        Wed, 27 Nov 2019 16:57:24 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxqtd8g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 16:57:24 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xARLt135008387;
-        Wed, 27 Nov 2019 21:57:17 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 2wevd72j5q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Nov 2019 21:57:17 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xARLvGGx43057616
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Nov 2019 21:57:16 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7EED1BE051;
-        Wed, 27 Nov 2019 21:57:16 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05454BE04F;
-        Wed, 27 Nov 2019 21:57:14 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.137])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Nov 2019 21:57:14 +0000 (GMT)
-Message-ID: <41fe3962ce1f1d5f61db5f5c28584f68ad66b2b1.camel@linux.ibm.com>
-Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
- to kvm
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 27 Nov 2019 18:57:10 -0300
-In-Reply-To: <103b290917221baa10194c27c8e35b9803f3cafa.camel@linux.ibm.com>
-References: <20191021225842.23941-1-sean.j.christopherson@intel.com>
-         <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
-         <20191126171416.GA22233@linux.intel.com>
-         <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
-         <e1a4218f-2a70-3de3-1403-dbebf8a8abdf@redhat.com>
-         <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
-         <6beeff56-7676-5dfd-a578-1732730f8963@redhat.com>
-         <adcfe1b4c5b36b3c398a5d456da9543e0390cba3.camel@linux.ibm.com>
-         <20191127194757.GI22227@linux.intel.com>
-         <103b290917221baa10194c27c8e35b9803f3cafa.camel@linux.ibm.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-YvHALfCMrZZTWTBzRIrY"
-User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
+        id S1727593AbfK0W57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 17:57:59 -0500
+Received: from ozlabs.org ([203.11.71.1]:47243 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726984AbfK0W57 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 17:57:59 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47NblR578Xz9sRs; Thu, 28 Nov 2019 09:57:55 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1574895475; bh=7lp6WdXRNwAaexgJv4y1ZsBrYzUJGxl4fS7hta9XSwY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SZGWVoQj+QSnlUnXRnCLApCigVRU6ObmCz3AiNQEqFCI79oHl0qwlEFqq3BjC7y/V
+         e4s2cQ3SEXBSjlxB7srz2osBnlDosqFASG/u0GeL2OMfYrpDYl0WZ1Awzx7VcjRfKM
+         NVEIwDdZDHE8Yah5OKAtZ1bP9tZpGMJIV7t2FcOjQHr7gAcA5B5pWV4BorsKpgUi83
+         4ENqWNp2Z+JmUrc1C9ToOTZnSw/cQ+3wXWLv3mQgBw+ih+xtgefamgkI8ytiAHPSVK
+         1n3y5ZZEv/9XwiQEF0x79BjQ8hgDvKMfgnSvb8EEsy+DJaSS+jpbKzTMFHhxacOXZe
+         7LlTq9MzCgrZQ==
+Date:   Thu, 28 Nov 2019 09:57:47 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Leonardo Bras <leonardo@linux.ibm.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
+ release' of kvm
+Message-ID: <20191127225747.GA2317@blackberry>
+References: <20191126175212.377171-1-leonardo@linux.ibm.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-27_04:2019-11-27,2019-11-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=868
- malwarescore=0 impostorscore=0 clxscore=1015 adultscore=0 suspectscore=2
- phishscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911270177
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191126175212.377171-1-leonardo@linux.ibm.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Nov 26, 2019 at 02:52:12PM -0300, Leonardo Bras wrote:
+> Fixes a possible 'use after free' of kvm variable.
+> It does use mutex_unlock(&kvm->lock) after possible freeing a variable
+> with kvm_put_kvm(kvm).
 
---=-YvHALfCMrZZTWTBzRIrY
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Comments below...
 
-On Wed, 2019-11-27 at 17:15 -0300, Leonardo Bras wrote:
-> > > > > So, suppose these threads, where:
-> > > > > - T1 uses a borrowed reference, and=20
-> > > > > - T2 is releasing the reference (close, release):
-> > > >=20
-> > > > Nit: T2 is releasing the *last* reference (as implied by your refer=
-ence
-> > > > to close/release).
-> > >=20
-> > > Correct.
-> > >=20
-> > > > > T1                              | T2
-> > > > > kvm_get_kvm()                   |
-> > > > > ...                             | kvm_put_kvm()
-> > > > > kvm_put_kvm_no_destroy()        |
-> > > > >=20
-> > > > > The above would not trigger a use-after-free bug, but will cause =
-a
-> > > > > memory leak. Is my above understanding right?
-> > > >=20
-> > > > Yes, this is correct.
-> > > >=20
-> > >=20
-> > > Then, what would not be a bug before (using kvm_put_kvm()) now is a
-> > > memory leak (using kvm_put_kvm_no_destroy()).
-> >=20
+> diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+> index 5834db0a54c6..a402ead833b6 100644
+> --- a/arch/powerpc/kvm/book3s_64_vio.c
+> +++ b/arch/powerpc/kvm/book3s_64_vio.c
+> @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+>  
+>  	if (ret >= 0)
+>  		list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
+> -	else
+> -		kvm_put_kvm(kvm);
+>  
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	if (ret >= 0)
+>  		return ret;
+>  
+> +	kvm_put_kvm(kvm);
 
-Sorry, I missed some information on above example.=20
-Suppose on that example that the reorder changes take place so that
-kvm_put_kvm{,_no_destroy}() always happens after the last usage of kvm
-(in the same syscall, let's say).
+There isn't a potential use-after-free here.  We are relying on the
+property that the release function (kvm_vm_release) cannot be called
+in parallel with this function.  The reason is that this function
+(kvm_vm_ioctl_create_spapr_tce) is handling an ioctl on a kvm VM file
+descriptor.  That means that a userspace process has the file
+descriptor still open.  The code that implements the close() system
+call makes sure that no thread is still executing inside any system
+call that is using the same file descriptor before calling the file
+descriptor's release function (in this case, kvm_vm_release).  That
+means that this kvm_put_kvm() call here cannot make the reference
+count go to zero.
 
-Before T1 and T2, refcount =3D 1;
+>  	kfree(stt);
+>   fail_acct:
+>  	account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 13efc291b1c7..f37089b60d09 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2744,10 +2744,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>  	/* Now it's all set up, let userspace reach it */
+>  	kvm_get_kvm(kvm);
+>  	r = create_vcpu_fd(vcpu);
+> -	if (r < 0) {
+> -		kvm_put_kvm(kvm);
+> +	if (r < 0)
+>  		goto unlock_vcpu_destroy;
+> -	}
+>  
+>  	kvm->vcpus[atomic_read(&kvm->online_vcpus)] = vcpu;
+>  
+> @@ -2771,6 +2769,8 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+>  	mutex_lock(&kvm->lock);
+>  	kvm->created_vcpus--;
+>  	mutex_unlock(&kvm->lock);
+> +	if (r < 0)
+> +		kvm_put_kvm(kvm);
+>  	return r;
+>  }
 
-If T1 uses kvm_put_kvm_no_destroy():
-- T1 increases refcount (=3D2)
-- T2 decreases refcount (=3D1)
-- T1 decreases refcount, (=3D0) don't free kvm (memleak)
+Once again we are inside an ioctl on the kvm VM file descriptor, so
+the reference count cannot go to zero.
 
-If T1 uses kvm_put_kvm():
-- T1 increases refcount (=3D 2)
-- T2 decreases refcount (=3D 1)
-- T1 decreases refcount, (=3D 0) frees kvm.
+> @@ -3183,10 +3183,10 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
+>  	kvm_get_kvm(kvm);
+>  	ret = anon_inode_getfd(ops->name, &kvm_device_fops, dev, O_RDWR | O_CLOEXEC);
+>  	if (ret < 0) {
+> -		kvm_put_kvm(kvm);
+>  		mutex_lock(&kvm->lock);
+>  		list_del(&dev->vm_node);
+>  		mutex_unlock(&kvm->lock);
+> +		kvm_put_kvm(kvm);
+>  		ops->destroy(dev);
+>  		return ret;
+>  	}
 
-So using kvm_put_kvm_no_destroy() would introduce a memleak where it
-would have no bug.
+Same again here.
 
-> > No, using kvm_put_kvm_no_destroy() changes how a bug would manifest, as
-> > you note below.  Replacing kvm_put_kvm() with kvm_put_kvm_no_destroy()
-> > when the refcount is _guaranteed_ to be >1 has no impact on correctness=
-.
-
-Yes, you are correct.=20
-But on the above case, kvm_put_kvm{,_no_destroy}() would be called
-with refcount =3D=3D 1, and if reorder patch is applied, it would not cause
-any use-after-free error, even on kvm_put_kvm() case.
-
-Is the above correct?
-
-Best regards,
-
-Leonardo
-
-
---=-YvHALfCMrZZTWTBzRIrY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3e8TYACgkQlQYWtz9S
-ttQTnA/+KWa1OB0s6oIQx8k0/fYKBdkrFAaM7NsmARe4iggvBxQWR+6Ii1YVVeVO
-283oQMalK4v8Q7/VkKIWqoM0ckm3s64Qsq4P1bupxpX1cbOOBAIdsuIdX2Rh6n0G
-jvjYoFddzkIgNBZvB/Pt7i9gd7E15dkL8P61v6ZFjsWAigEF/VSV4QKoOq5p81w5
-roElJVxLJuLj4uXG6G6zG/a/EPcW2ubL4YJShwt3R+WC7Z7eDt3TDord1KseTEOH
-rmxHdMEDI8VKuSdmtW1mBZyXI7AABUjIoaMWcxAURndtIal3huBfJ4qbLYebITkP
-hkFxaDorJDqr7Mwowc7V0QNN4E0bw8XHPRY/HdnOFHnjdy9QwaDxUPEwSpns3BPY
-3tY2g9usUf2XsZzJjST4TvXA5QUowM0k4kUhaS3mBj+XR+tyjv3BPJBcdJyyxWp2
-WVkLOb0iw/urbRRGR0eY6UI82oLHSkymQC0Lkz8GeiMLqxhtPGII6Rn+zje8X2UL
-mwncGjVDbk+YDeHDRdtcod6NLZy3gCPxPSPG8GJDL5+QJU70o+4IfuCskjHp8USL
-VIS9L9Ue7CCWm5FZvK0gogk2lpBWE9gynJCsT9Csf9cW2y32CnJUHiblDiHDZLDy
-9DyNLj39ajxLBIPci8baCLx22b3PI3jFfX75n/ELLQKtCHGlimA=
-=AHre
------END PGP SIGNATURE-----
-
---=-YvHALfCMrZZTWTBzRIrY--
-
+Paul.
