@@ -2,91 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 895F210B186
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 15:41:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C8B210B25B
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 16:24:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726729AbfK0Olv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 09:41:51 -0500
-Received: from foss.arm.com ([217.140.110.172]:48508 "EHLO foss.arm.com"
+        id S1727004AbfK0PYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 10:24:10 -0500
+Received: from mga01.intel.com ([192.55.52.88]:60744 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726593AbfK0Olv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 09:41:51 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A51631B;
-        Wed, 27 Nov 2019 06:41:50 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 262763F68E;
-        Wed, 27 Nov 2019 06:41:49 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH 18/18] arm: cstart64.S: Remove icache
- invalidation from asm_mmu_enable
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
-        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-References: <20191127142410.1994-1-alexandru.elisei@arm.com>
- <20191127142410.1994-19-alexandru.elisei@arm.com>
-Message-ID: <611f7833-223c-b55a-489a-0b956011c699@arm.com>
-Date:   Wed, 27 Nov 2019 14:41:47 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726514AbfK0PYK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 10:24:10 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 07:24:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,249,1571727600"; 
+   d="scan'208";a="206803778"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga008.fm.intel.com with ESMTP; 27 Nov 2019 07:24:09 -0800
+Date:   Wed, 27 Nov 2019 07:24:09 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Derek Yerger <derek@djy.llc>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Bonzini, Paolo" <pbonzini@redhat.com>
+Subject: Re: PROBLEM: Regression of MMU causing guest VM application errors
+Message-ID: <20191127152409.GC18530@linux.intel.com>
+References: <20191120181913.GA11521@linux.intel.com>
+ <7F99D4CD-272D-43FD-9CEE-E45C0F7C7910@djy.llc>
+ <20191120192843.GA2341@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191127142410.1994-19-alexandru.elisei@arm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191120192843.GA2341@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, Nov 20, 2019 at 11:28:43AM -0800, Sean Christopherson wrote:
+> On Wed, Nov 20, 2019 at 02:04:38PM -0500, Derek Yerger wrote:
+> > 
+> > > Debug patch attached.  Hopefully it finds something, it took me an
+> > > embarassing number of attempts to get correct, I kept screwing up checking
+> > > a bit number versus checking a bit mask...
+> > > <0001-thread_info-Add-a-debug-hook-to-detect-FPU-changes-w.patch>
+> > 
+> > Should this still be tested despite Wanpeng Li’s comments that the issue may
+> > have been fixed in a 5.3 release candidate?
+> 
+> Yes.
+> 
+> The actual bug fix, commit e751732486eb3 (KVM: X86: Fix fpu state crash in
+> kvm guest), is present in v5.2.7.
+> 
+> Unless there's a subtlety I'm missing, commit d9a710e5fc4941 (KVM: X86:
+> Dynamically allocate user_fpu) is purely an optimization and should not
+> have a functional impact.
 
-On 11/27/19 2:24 PM, Alexandru Elisei wrote:
-> According to the ARM ARM [1]:
->
-> "In Armv8, any permitted instruction cache implementation can be
-> described as implementing the IVIPT Extension to the Arm architecture.
->
-> The formal definition of the Arm IVIPT Extension is that it reduces the
-> instruction cache maintenance requirement to the following condition:
-> Instruction cache maintenance is required only after writing new data to
-> a PA that holds an instruction".
+---
 
-And immediately following: "Previous versions of the Arm architecture have
-permitted an instruction cache option that does not implement the Arm IVIPT
-Extension".
+Any chance the below change fixes your issue?  It's a bug fix for AVX
+corruption during signal delivery[*].  It doesn't seem like the same thing
+you are seeing, but it's worth trying.
 
-That type of cache is the ASID and VMID tagged VIVT instruction cache [1], which
-require icache maintenance when the instruction at a given virtual address
-changes. Seeing how we don't change the IPA for the same VA anywhere in
-kvm-unit-tests, I propose that it will be up to the person who will write such a
-test to use the appropriate maintenance operations.
+[*] https://lkml.kernel.org/r/20191127124243.u74osvlkhcmsskng@linutronix.de/
 
-[1] ARM DDI 0406C.d, section B3.11.2.
+ arch/x86/include/asm/fpu/internal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Alex
-> We never patch instructions in the boot path, so remove the icache
-> invalidation from asm_mmu_enable. Tests that modify instructions (like
-> the cache test) should have their own icache maintenance operations.
->
-> [1] ARM DDI 0487E.a, section D5.11.2 "Instruction caches"
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/cstart64.S | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index 87bf873795a1..7e7f8b2e8f0b 100644
-> --- a/arm/cstart64.S
-> +++ b/arm/cstart64.S
-> @@ -166,7 +166,6 @@ halt:
->  
->  .globl asm_mmu_enable
->  asm_mmu_enable:
-> -	ic	iallu			// I+BTB cache invalidate
->  	tlbi	vmalle1			// invalidate I + D TLBs
->  	dsb	nsh
->  
+diff --git a/arch/x86/include/asm/fpu/internal.h b/arch/x86/include/asm/fpu/internal.h
+index 4c95c365058aa..44c48e34d7994 100644
+--- a/arch/x86/include/asm/fpu/internal.h
++++ b/arch/x86/include/asm/fpu/internal.h
+@@ -509,7 +509,7 @@ static inline void __fpu_invalidate_fpregs_state(struct fpu *fpu)
+ 
+ static inline int fpregs_state_valid(struct fpu *fpu, unsigned int cpu)
+ {
+-	return fpu == this_cpu_read_stable(fpu_fpregs_owner_ctx) && cpu == fpu->last_cpu;
++	return fpu == this_cpu_read(fpu_fpregs_owner_ctx) && cpu == fpu->last_cpu;
+ }
