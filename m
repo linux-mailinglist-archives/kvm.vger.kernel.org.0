@@ -2,110 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EE9E10B5BE
-	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:29:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1256C10B5CA
+	for <lists+kvm@lfdr.de>; Wed, 27 Nov 2019 19:32:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbfK0S3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 13:29:50 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44398 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726576AbfK0S3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 13:29:49 -0500
-Received: by mail-wr1-f68.google.com with SMTP id i12so27819642wrn.11
-        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 10:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=q8PU0rul7Ps0UsPr1EhmDg+IsYeeYEG3+1dENJKBMlg=;
-        b=HHEosXhsFZU4tqkKFMksMLlRSe317ArG/tQxZhX1RqfwX/e+KF1TMl5jI61vAQkDl/
-         8offhU56rjNkhhxp9/ycfqju9SbNu4oaSH9vR/HOha+3oY+pHIdESc1HJmsI3ZsGJ7d2
-         /aFmv6TQXTAHuEVAF1AWRDtAOks/esHYEA7Vo=
+        id S1727149AbfK0Scm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 13:32:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37183 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726514AbfK0Sck (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 13:32:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574879559;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=29WF8SRJu7k6XWM0r8jhKtWhn/ROnuR/yAPRr+2SCjM=;
+        b=Fx3aIGgGCQbw2Y98VR/pvdHZGOsQC/5YgfATEVtwrcg3FkkHEOB+WlZLC+OlhjGt5Qgqz2
+        RZzkrT8On4WbuTNJiv8IO4hrURdx3WxgpfIMo4YqDFNo9x3wVNyrc/0JVC5RZK2tkzy1qR
+        kdCcXzQZx8W8YrpJS+pJw6XoaSF/0BE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-KhexAbHGPFOR0JFv6uoXBQ-1; Wed, 27 Nov 2019 13:32:35 -0500
+X-MC-Unique: KhexAbHGPFOR0JFv6uoXBQ-1
+Received: by mail-wr1-f71.google.com with SMTP id u14so12547650wrq.19
+        for <kvm@vger.kernel.org>; Wed, 27 Nov 2019 10:32:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=q8PU0rul7Ps0UsPr1EhmDg+IsYeeYEG3+1dENJKBMlg=;
-        b=DackPt71kO9IeEKd8OOpQ7tjV3e6e1Nde2cU24XK9LwtuT3GXOXs7x1Dgxwxkja5oB
-         1SiC1PIk6yyjVuECjF7Qt54EtYIAwtSuJLIHfAO3P0TrTrRSpWB5L/KXxjMA8X9171Uw
-         zG6jhfq6++6IdHCn8pZUqcpN20oVLqZB5yrek0qwPFBSXbMCja1IBKrI63UDw9NhYj8L
-         i+CG1SXN9UVqBpD+5NGPv0pdk5vdufCMF5icbg+CAEjNrdt8LezFyPAgwoJgKVx7ABWO
-         WOMSwHiIdBShCevNTcuijy0FjNMbtFf4tIt71qOd2jv+Bhn6DxzfeJI4IU+2LfmF5+4L
-         sudQ==
-X-Gm-Message-State: APjAAAVbKaOoGg0igar1Rgj6f9Bt6b95jGWj8v8q1WIojE8XX9WyYSzu
-        DyEGYTZGTJKu561hq/VaeNFTNA==
-X-Google-Smtp-Source: APXvYqzGxb027T6AjbrSIyxgbGT10Rlua3bWwnVmub45qfU7fTieDKg9Vuu7OFHe0iUJBy2r/1eQDw==
-X-Received: by 2002:adf:f108:: with SMTP id r8mr13256774wro.390.1574879387660;
-        Wed, 27 Nov 2019 10:29:47 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id h15sm20789799wrb.44.2019.11.27.10.29.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2019 10:29:43 -0800 (PST)
-Date:   Wed, 27 Nov 2019 19:29:40 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Jani Nikula <jani.nikula@intel.com>
-Cc:     linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 13/13] samples: vfio-mdev: constify fb ops
-Message-ID: <20191127182940.GM406127@phenom.ffwll.local>
-References: <cover.1574871797.git.jani.nikula@intel.com>
- <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to;
+        bh=YxaL1ZT1aGySKkKsMe8gcQSf/mlZomA5ztZxEiMxVxw=;
+        b=dLRqtzlgFhGW0OUokDrytOz/8q0wL8cmlXhsmgHCn6WXPgW+xg5FtIxi3wFpq9l47G
+         XP2HP+R08Fb44bBSN7HOaEjEyUG6T0hQ9QbuSfKb0LUCUX+MVewtF5D+PVA4Gl6cDJCX
+         xNCPVEP6y8lpyy9ryWR5CigP9MdsaMPa59NKb3KhyfMqIM/Ss4HPOyQ9H3TziaLlVhl3
+         y0jucmT6Qs93HidaE0kv4gU2S28RXhSWFU5K1uqlRPdu8ijfdTpJBAIJS8V43mkBwihd
+         ZKaismsOT48gI9Wr0cNoLT9e9F8owvQqkEebjQSkLYdLY6NnWx4SSX9pn4f3A9Wl9DM4
+         a9DQ==
+X-Gm-Message-State: APjAAAXgylZAkWnEUcZfHBhLVxDmAMvJ5tVwXylHi//4CxGX8mDXjKu1
+        JtdtS3/LQzzGfbhk/II9589EPs0Ox2vBXoVmES6lsy4xRS3wEyPCIxlSWf0wCD7deCpoSwxt4YW
+        SlRv/e5e9fyiP
+X-Received: by 2002:adf:ffc5:: with SMTP id x5mr3907197wrs.92.1574879554650;
+        Wed, 27 Nov 2019 10:32:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx8ika2gcHJ74dgNr0WfljAWH/C85tD9jVcLcwqgkOP5zVcGmWunqYNXZFhQ43XFqfbSu8vdA==
+X-Received: by 2002:adf:ffc5:: with SMTP id x5mr3907176wrs.92.1574879554355;
+        Wed, 27 Nov 2019 10:32:34 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:459f:99a9:39f1:65ba? ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
+        by smtp.gmail.com with ESMTPSA id o133sm8067506wmb.4.2019.11.27.10.32.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Nov 2019 10:32:33 -0800 (PST)
+Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
+ to kvm
+To:     Leonardo Bras <leonardo@linux.ibm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paul Mackerras <paulus@ozlabs.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20191021225842.23941-1-sean.j.christopherson@intel.com>
+ <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
+ <20191126171416.GA22233@linux.intel.com>
+ <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
+ <e1a4218f-2a70-3de3-1403-dbebf8a8abdf@redhat.com>
+ <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6beeff56-7676-5dfd-a578-1732730f8963@redhat.com>
+Date:   Wed, 27 Nov 2019 19:32:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
-X-Operating-System: Linux phenom 5.3.0-2-amd64 
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ffsTa9Xe2Ee0ZdRuXdoWLUmRFeQM2p1Zu"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 06:32:09PM +0200, Jani Nikula wrote:
-> Now that the fbops member of struct fb_info is const, we can star making
-> the ops const as well.
-> 
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ffsTa9Xe2Ee0ZdRuXdoWLUmRFeQM2p1Zu
+Content-Type: multipart/mixed; boundary="aqZUHOq3nlK4WoWx9AL9jxCe3XQdlu06R"
 
-You've missed at least drivers/staging/fbtft in your search. I guess you
-need to do a full make allyesconfig on x86/arm and arm64 (the latter
-because some stupid drivers only compile there, not on arm, don't ask).
-Still misses a pile of mips/ppc only stuff and maybe the sparcs and
-alphas, but should be good enough.
+--aqZUHOq3nlK4WoWx9AL9jxCe3XQdlu06R
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-With that done, on the remaining patches:
+On 27/11/19 19:24, Leonardo Bras wrote:
+> By what I could undestand up to now, these functions that use borrowed
+> references can only be called while the reference (file descriptor)
+> exists.=20
+> So, suppose these threads, where:
+> - T1 uses a borrowed reference, and=20
+> - T2 is releasing the reference (close, release):
 
-Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+Nit: T2 is releasing the *last* reference (as implied by your reference
+to close/release).
 
-> ---
->  samples/vfio-mdev/mdpy-fb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> index 2719bb259653..21dbf63d6e41 100644
-> --- a/samples/vfio-mdev/mdpy-fb.c
-> +++ b/samples/vfio-mdev/mdpy-fb.c
-> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
->  		iounmap(info->screen_base);
->  }
->  
-> -static struct fb_ops mdpy_fb_ops = {
-> +static const struct fb_ops mdpy_fb_ops = {
->  	.owner		= THIS_MODULE,
->  	.fb_destroy	= mdpy_fb_destroy,
->  	.fb_setcolreg	= mdpy_fb_setcolreg,
-> -- 
-> 2.20.1
-> 
-> _______________________________________________
-> dri-devel mailing list
-> dri-devel@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/dri-devel
+>=20
+> T1=09=09=09=09| T2
+> kvm_get_kvm()=09=09=09|
+> ...=09=09=09=09| kvm_put_kvm()
+> kvm_put_kvm_no_destroy()=09|
+>=20
+> The above would not trigger a use-after-free bug, but will cause a
+> memory leak. Is my above understanding right?
 
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+Yes, this is correct.
+
+Paolo
+
+
+--aqZUHOq3nlK4WoWx9AL9jxCe3XQdlu06R--
+
+--ffsTa9Xe2Ee0ZdRuXdoWLUmRFeQM2p1Zu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl3ewUAACgkQv/vSX3jH
+roNHAwf/V5jw3UuEAUr+qwFRt1WbZT7kDY6RcpqwfR7drS3cV9JoPkLaa/vuvUnj
+TvZG7Q2ZVR0m2JALj914WOuC5pmAYy8HVawrFbooQ4T5mtc2akQzVD0eshLankPo
+RZjfY2ijPzfY+tajHzQJ09U9Rzc33YvOZGmao/zV8/QXtFQokF1549ZJQyZPTVM0
+cgiRO5mVfl0/IbchPvczCrgXIT0P4Ca9w+BN7xn1+HFGO8rvUtwaG5ZxVhUfk58B
+LArJb8NkIGNDdoh3DF27nHNXak0C95hD1ENiPKVK6RrEkr/wJc6ffOS8eAdUu5yl
+WmgTspYVIA7RjqLbTwLXHOQwKrvG7A==
+=Shjy
+-----END PGP SIGNATURE-----
+
+--ffsTa9Xe2Ee0ZdRuXdoWLUmRFeQM2p1Zu--
+
