@@ -2,108 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7CA210CC02
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 16:45:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0883010CC37
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 16:55:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbfK1Ppi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 10:45:38 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25287 "EHLO
+        id S1727060AbfK1PzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 10:55:24 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29751 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726583AbfK1Ppi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 10:45:38 -0500
+        by vger.kernel.org with ESMTP id S1726446AbfK1PzY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 10:55:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574955937;
+        s=mimecast20190719; t=1574956523;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xGsdSO+ydrVZSxWYC3w/X6LXKszicUiIA0Toh6QzZtQ=;
-        b=UaTOd3WGUm3+MMF/KUBBER8Oy5KQHw4SHeamaO4xhuif/7PHSSnNYDgHQ4u1AmA93GTb/Y
-        /WMjCDXrOcJhthshK215PebzCctSjYqpfx21d00q0PDdsXUjL41R+AeGI/qmxDco3A9W3k
-        seby3a29WKDVCGIRHCV63HcShP2jpNo=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LNRtx2eKuvnZpDiZLFUivmjg1FNYd4r9ipgtCcuMY/A=;
+        b=c3/How7g/CWIXLrM86SQ8UwCPoQPS+zhkPeblVZWjMeICUZ1ivJprI8MQbxNSOrwq69AN2
+        scVBWcjRFTUX6cisoZ7qoqIzgsc19gNWMrzKTNKEabDVd62MKgjlFrbw1rEyE+uhdxiXe+
+        0ctUyqx0sCFvJQmcOspgNDVs+DB/uio=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-EdkpEs06Ou6r7LN4QsYqQQ-1; Thu, 28 Nov 2019 10:45:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-104-iyWJQaPYPIOma8rkjdpifw-1; Thu, 28 Nov 2019 10:55:19 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CB46106B329;
-        Thu, 28 Nov 2019 15:45:32 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06D86100A162;
+        Thu, 28 Nov 2019 15:55:18 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ABCCD608C2;
-        Thu, 28 Nov 2019 15:45:27 +0000 (UTC)
-Date:   Thu, 28 Nov 2019 16:45:25 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C85925C1B0;
+        Thu, 28 Nov 2019 15:55:16 +0000 (UTC)
 From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Bill Wendling <morbo@google.com>, kvm-ppc@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2] Switch the order of the parameters in
- report() and report_xfail()
-Message-ID: <20191128154525.xnrzzxtxacldrh7n@kamzik.brq.redhat.com>
-References: <20191128071453.15114-1-thuth@redhat.com>
+To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc:     pbonzini@redhat.com, Alexander Graf <graf@amazon.com>
+Subject: [PATCH kvm-unit-tests] arm/arm64: PL031: Fix check_rtc_irq
+Date:   Thu, 28 Nov 2019 16:55:15 +0100
+Message-Id: <20191128155515.19013-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191128071453.15114-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: EdkpEs06Ou6r7LN4QsYqQQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: iyWJQaPYPIOma8rkjdpifw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 28, 2019 at 08:14:53AM +0100, Thomas Huth wrote:
-> Commit c09c54c66b1df ("lib: use an argument which doesn't require
-> default argument promotion") fixed a warning that occurs with Clang,
-> but introduced a regression: If the "pass" parameter is a value
-> which has only set the condition bits in the upper 32 bits of a
-> 64 bit value, the condition is now false since the value is truncated
-> to "unsigned int" so that the upper bits are simply discarded.
->=20
-> We fixed it by reverting the commit, but that of course also means
-> trouble with Clang again. We can not use "bool" if it is the last
-> parameter before the variable argument list. The proper fix is to
-> swap the parameters around and make the format string the last
-> parameter.
->=20
-> This patch (except the changes in lib/libcflat.h and lib/report.c
-> and some rebase conflicts along the way) has basically been created
-> with following coccinelle script (with some additional manual tweaking
-> of long and disabled lines afterwards):
->=20
-> @@
-> expression fmt;
-> expression pass;
-> expression list args;
-> @@
->  report(
-> -fmt, pass
-> +pass, fmt
->  , args);
->=20
-> @@
-> expression fmt;
-> expression pass;
-> expression list args;
-> @@
->  report_xfail(
-> -fmt, xfail, pass
-> +xfail, pass, fmt
->  , args);
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Rebase the patch to the current master branch
->
+Since QEMU commit 83ad95957c7e ("pl031: Expose RTCICR as proper WC
+register") the PL031 test gets into an infinite loop. Now we must
+write bit zero of RTCICR to clear the IRQ status. Before, writing
+anything to RTCICR would work. As '1' is a member of 'anything'
+writing it should work for old QEMU as well.
 
-Tested on arm and arm64.
+Cc: Alexander Graf <graf@amazon.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/pl031.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
+diff --git a/arm/pl031.c b/arm/pl031.c
+index 1f63ef13994f..3b75fd653e96 100644
+--- a/arm/pl031.c
++++ b/arm/pl031.c
+@@ -143,8 +143,8 @@ static void irq_handler(struct pt_regs *regs)
+ =09=09report(readl(&pl031->ris) =3D=3D 1, "  RTC RIS =3D=3D 1");
+ =09=09report(readl(&pl031->mis) =3D=3D 1, "  RTC MIS =3D=3D 1");
+=20
+-=09=09/* Writing any value should clear IRQ status */
+-=09=09writel(0x80000000ULL, &pl031->icr);
++=09=09/* Writing one to bit zero should clear IRQ status */
++=09=09writel(1, &pl031->icr);
+=20
+ =09=09report(readl(&pl031->ris) =3D=3D 0, "  RTC RIS =3D=3D 0");
+ =09=09report(readl(&pl031->mis) =3D=3D 0, "  RTC MIS =3D=3D 0");
+--=20
+2.21.0
 
