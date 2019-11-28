@@ -2,100 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E81810C521
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 09:31:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13EF710C56F
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 09:49:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbfK1IbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 03:31:11 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43883 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727184AbfK1IbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Nov 2019 03:31:11 -0500
-Received: by mail-wr1-f67.google.com with SMTP id n1so29996191wra.10;
-        Thu, 28 Nov 2019 00:31:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:mime-version:subject:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=41iFNzsZShp3cTI5whXr8wJxyzr91hsxklxwLQF/D5A=;
-        b=TK91N00lx4mZdugbyv2Ejmsi3NeRlCtaW7zEma2yjbWiRGE7/1cDbjaXwzSE57ROBG
-         n+zhGhgmB/dw5P0ZlYepLDRTMVHYagELsLWNPyzZ+FQKY5sGSNt6EiDSG+a/TIuIkbsZ
-         ggEOtJYK86VyXwhyGF251InPCJlLeTnzcsP5Rqo4TnemjWtt02lax45HMDYJfJuJrCt3
-         +9Jxq6esNeQ6pJeggH5+YwvwsujhJLxacEQaWJxIbdx/2S7rsHkB/LnXK33adX51IjYg
-         8bTMqv3cJp8zgxggGW7GJmDTW6I9Dj6+/TXUTa5+cgZ6cqEHdsEQb0R3X22zAqGGxjkL
-         AGbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:mime-version:subject:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=41iFNzsZShp3cTI5whXr8wJxyzr91hsxklxwLQF/D5A=;
-        b=kM18Nx2cM8j7zZja4xOdJdK8tIFTHtaLYHWoWzrSlExO1wpkDmCLUcVSY3P0cIq/qq
-         IaQ0PBg4nEcwRikF05cAUMKhQB/ENnWwlF9M0We1syokI2aaKbWCM/Yfd9aOjpA0diZP
-         KHxdOo43ZyYJq+50nRo7JLEeXhHAwYHGsyhwQZmNQYm5TjhR0ME+mGlBxJbq/u6yQvOW
-         VaWw7ljiHSTsSbuvNcN6NP4mtmzKe2+QMXp6qBoCj01kuPtqC8lmVBcXhYRmu70zuP0r
-         V68zZtoMKIMJZqUfrHeFHrRoo2jItO2/C5hHl5JUq3aSGvtp0L+WW+pEs5FQArE9VtkK
-         XmAw==
-X-Gm-Message-State: APjAAAV7GQ8oRBDNLafWt/Cb4nFG7o7rf9ohNhbCEzXb5WDIcdHUOB1U
-        hqFCUCihAkQ+QdSNobaM3Uk=
-X-Google-Smtp-Source: APXvYqxXk8FwSRUAiGCAnDZ0aIrVLk/2gHjGzrhjZnH1HsSMGh7kpX1+8dGo4cWeqmbSasTT77Pl0w==
-X-Received: by 2002:a5d:5050:: with SMTP id h16mr50519725wrt.380.1574929866906;
-        Thu, 28 Nov 2019 00:31:06 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:466:71c0:d4fe:9901:8a9f:19cf? ([2a01:e0a:466:71c0:d4fe:9901:8a9f:19cf])
-        by smtp.gmail.com with ESMTPSA id 91sm23455974wrm.42.2019.11.28.00.31.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 Nov 2019 00:31:05 -0800 (PST)
-From:   Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-X-Google-Original-From: Christophe de Dinechin <christophe@dinechin.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 13/13] samples: vfio-mdev: constify fb ops
-In-Reply-To: <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
-Date:   Thu, 28 Nov 2019 09:31:03 +0100
-Cc:     linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        ville.syrjala@linux.intel.com, intel-gfx@lists.freedesktop.org,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+        id S1727518AbfK1ItP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 03:49:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54934 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727508AbfK1ItP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 03:49:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574930954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SR+KTTJ3GlEow7kpfjWw52TLP8VskmK7shD9jzjrLUk=;
+        b=dBa/zkhW7Ton+JH9ifZI2LO4hpMx5hP8fcEMRNZqPygU15vxRG7FozHVpi2/wSVMm9vlZb
+        GCl92h8vjxzhoFtaIJVVrMx8VKLfHbhmKZNTVu6U6xySU577EPfV9RfDXSzj6sXma+X5nl
+        YuG1cxHIHsXPqY2bN4b3tMNfpLxskEs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-k1I8B9FENh-njGBz-WF6VQ-1; Thu, 28 Nov 2019 03:49:13 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82A62107ACE3;
+        Thu, 28 Nov 2019 08:49:10 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB6AD60C80;
+        Thu, 28 Nov 2019 08:49:03 +0000 (UTC)
+Subject: Re: [PATCH] KVM: vgic: Fix potential double free dist->spis in
+ __kvm_vgic_destroy()
+To:     linmiaohe <linmiaohe@huawei.com>, maz@kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com, james.morse@arm.com,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        christoffer.dall@arm.com, catalin.marinas@arm.com,
+        gregkh@linuxfoundation.org, will@kernel.org,
+        andre.przywara@arm.com, tglx@linutronix.de
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <1574923128-19956-1-git-send-email-linmiaohe@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <115fbbb3-73d5-444a-0aec-61bca0dea435@redhat.com>
+Date:   Thu, 28 Nov 2019 09:49:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <1574923128-19956-1-git-send-email-linmiaohe@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: k1I8B9FENh-njGBz-WF6VQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <39B62C70-3E60-48AB-8F11-534EF5B8EFBD@dinechin.org>
-References: <cover.1574871797.git.jani.nikula@intel.com>
- <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
-To:     Jani Nikula <jani.nikula@intel.com>
-X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-
-> On 27 Nov 2019, at 17:32, Jani Nikula <jani.nikula@intel.com> wrote:
+On 11/28/19 7:38 AM, linmiaohe wrote:
+> From: Miaohe Lin <linmiaohe@huawei.com>
 > 
-> Now that the fbops member of struct fb_info is const, we can star making
-s/star/start/
-
-> the ops const as well.
+> In kvm_vgic_dist_init() called from kvm_vgic_map_resources(), if
+> dist->vgic_model is invalid, dist->spis will be freed without set
+> dist->spis = NULL. And in vgicv2 resources clean up path,
+> __kvm_vgic_destroy() will be called to free allocated resources.
+> And dist->spis will be freed again in clean up chain because we
+> forget to set dist->spis = NULL in kvm_vgic_dist_init() failed
+> path. So double free would happen.
 > 
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
 > ---
-> samples/vfio-mdev/mdpy-fb.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+>  virt/kvm/arm/vgic/vgic-init.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> index 2719bb259653..21dbf63d6e41 100644
-> --- a/samples/vfio-mdev/mdpy-fb.c
-> +++ b/samples/vfio-mdev/mdpy-fb.c
-> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
-> 		iounmap(info->screen_base);
-> }
-> 
-> -static struct fb_ops mdpy_fb_ops = {
-> +static const struct fb_ops mdpy_fb_ops = {
-> 	.owner		= THIS_MODULE,
-> 	.fb_destroy	= mdpy_fb_destroy,
-> 	.fb_setcolreg	= mdpy_fb_setcolreg,
-> -- 
-> 2.20.1
+> diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+> index 53e3969dfb52..c17c29beeb72 100644
+> --- a/virt/kvm/arm/vgic/vgic-init.c
+> +++ b/virt/kvm/arm/vgic/vgic-init.c
+> @@ -171,6 +171,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+>  			break;
+>  		default:
+>  			kfree(dist->spis);
+> +			dist->spis = NULL;
+>  			return -EINVAL;
+>  		}
+>  	}
 > 
 
