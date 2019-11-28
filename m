@@ -2,98 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 352FC10CE91
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 19:30:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E69BF10CEC7
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 20:16:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbfK1Sas (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 13:30:48 -0500
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:11723 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726401AbfK1Sas (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Nov 2019 13:30:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1574965848; x=1606501848;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=YmvDKDae6K6GLbl+oWNmnzof6XHtLau20RExutHZUN0=;
-  b=s4cQiunx54h8ja0Cub25UQNnh7q1yGnjfFX8OhPN6Hqm5wFMwN78+tlq
-   YlJLw/ES/wQ2NiNT+xUwPClxrbYTCxR2WpaszfiSLW9NWahGc9d8BAudx
-   9H/tROPgHrOWIZEBwf1hmrfMIy7q/fZ1xLZ4gVKA08MY3pQ2P/wqehwGu
-   Y=;
-IronPort-SDR: 3wzWyfK1I+PdPFfr1PuKgOFC9g15z/SeIIaxhknZaXOZ1f/8xBc3m/LAhzSVcX+GG7jScWhYSo
- cZ73fthAIMPQ==
-X-IronPort-AV: E=Sophos;i="5.69,254,1571702400"; 
-   d="scan'208";a="2054927"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2b-859fe132.us-west-2.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 28 Nov 2019 18:30:37 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
-        by email-inbound-relay-2b-859fe132.us-west-2.amazon.com (Postfix) with ESMTPS id AB2B222639F;
-        Thu, 28 Nov 2019 18:30:36 +0000 (UTC)
-Received: from EX13D20UWC002.ant.amazon.com (10.43.162.163) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 28 Nov 2019 18:30:27 +0000
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13D20UWC002.ant.amazon.com (10.43.162.163) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 28 Nov 2019 18:30:27 +0000
-Received: from EX13D20UWC001.ant.amazon.com ([10.43.162.244]) by
- EX13D20UWC001.ant.amazon.com ([10.43.162.244]) with mapi id 15.00.1367.000;
- Thu, 28 Nov 2019 18:30:27 +0000
-From:   "Graf (AWS), Alexander" <graf@amazon.de>
-To:     "drjones@redhat.com" <drjones@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests] arm/arm64: PL031: Fix check_rtc_irq
-Thread-Topic: [PATCH kvm-unit-tests] arm/arm64: PL031: Fix check_rtc_irq
-Thread-Index: AQHVpgRfU2CAtVWY9kOuYtk+vjuC16eg2hIA
-Date:   Thu, 28 Nov 2019 18:30:27 +0000
-Message-ID: <94CC1391-FCAF-4889-A234-911C66D6D334@amazon.de>
-References: <20191128155515.19013-1-drjones@redhat.com>
-In-Reply-To: <20191128155515.19013-1-drjones@redhat.com>
-Accept-Language: en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CAC2895EC2160A46972AFA411FF05A7F@amazon.com>
+        id S1726692AbfK1TQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 14:16:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21608 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726401AbfK1TQj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 14:16:39 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASJCGIi130975
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 14:16:38 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxsdsd4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 14:16:38 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 28 Nov 2019 19:16:37 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 28 Nov 2019 19:16:35 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASJGYVW47775906
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Nov 2019 19:16:34 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A42752051;
+        Thu, 28 Nov 2019 19:16:34 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.185.119])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C8E9852050;
+        Thu, 28 Nov 2019 19:16:33 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 2/9] s390x: Define the PSW bits
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        thuth@redhat.com, cohuck@redhat.com
+References: <1574945167-29677-1-git-send-email-pmorel@linux.ibm.com>
+ <1574945167-29677-3-git-send-email-pmorel@linux.ibm.com>
+ <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 28 Nov 2019 20:16:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+In-Reply-To: <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19112819-0028-0000-0000-000003C1461A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112819-0029-0000-0000-00002484521B
+Message-Id: <7abb4725-b814-8b43-8a4f-e0e2cf7a44f8@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-28_06:2019-11-28,2019-11-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ mlxscore=0 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911280165
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gQW0gMjguMTEuMjAxOSB1bSAxNzo1NiBzY2hyaWViICJkcmpvbmVzQHJlZGhhdC5jb20i
-IDxkcmpvbmVzQHJlZGhhdC5jb20+Og0KPiANCj4g77u/U2luY2UgUUVNVSBjb21taXQgODNhZDk1
-OTU3YzdlICgicGwwMzE6IEV4cG9zZSBSVENJQ1IgYXMgcHJvcGVyIFdDDQo+IHJlZ2lzdGVyIikg
-dGhlIFBMMDMxIHRlc3QgZ2V0cyBpbnRvIGFuIGluZmluaXRlIGxvb3AuIE5vdyB3ZSBtdXN0DQo+
-IHdyaXRlIGJpdCB6ZXJvIG9mIFJUQ0lDUiB0byBjbGVhciB0aGUgSVJRIHN0YXR1cy4gQmVmb3Jl
-LCB3cml0aW5nDQo+IGFueXRoaW5nIHRvIFJUQ0lDUiB3b3VsZCB3b3JrLiBBcyAnMScgaXMgYSBt
-ZW1iZXIgb2YgJ2FueXRoaW5nJw0KPiB3cml0aW5nIGl0IHNob3VsZCB3b3JrIGZvciBvbGQgUUVN
-VSBhcyB3ZWxsLg0KPiANCj4gQ2M6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFtYXpvbi5jb20+DQo+
-IFNpZ25lZC1vZmYtYnk6IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPg0KDQpSZXZp
-ZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9uLmNvbT4NCg0KU29ycnkgZm9yIGlu
-dHJvZHVjaW5nIGEgdGVzdCBjYXNlIG9uIGNvZGUgdGhhdCBJIHRoZW4gbW9kaWZ5LCB3aXRob3V0
-IHVwZGF0aW5nIHRoZSB0ZXN0IGNhc2UgYXMgd2VsbCA6KQ0KDQpBbGV4DQoNCg0KPiAtLS0NCj4g
-YXJtL3BsMDMxLmMgfCA0ICsrLS0NCj4gMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
-MiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcm0vcGwwMzEuYyBiL2FybS9wbDAz
-MS5jDQo+IGluZGV4IDFmNjNlZjEzOTk0Zi4uM2I3NWZkNjUzZTk2IDEwMDY0NA0KPiAtLS0gYS9h
-cm0vcGwwMzEuYw0KPiArKysgYi9hcm0vcGwwMzEuYw0KPiBAQCAtMTQzLDggKzE0Myw4IEBAIHN0
-YXRpYyB2b2lkIGlycV9oYW5kbGVyKHN0cnVjdCBwdF9yZWdzICpyZWdzKQ0KPiAgICAgICAgcmVw
-b3J0KHJlYWRsKCZwbDAzMS0+cmlzKSA9PSAxLCAiICBSVEMgUklTID09IDEiKTsNCj4gICAgICAg
-IHJlcG9ydChyZWFkbCgmcGwwMzEtPm1pcykgPT0gMSwgIiAgUlRDIE1JUyA9PSAxIik7DQo+IA0K
-PiAtICAgICAgICAvKiBXcml0aW5nIGFueSB2YWx1ZSBzaG91bGQgY2xlYXIgSVJRIHN0YXR1cyAq
-Lw0KPiAtICAgICAgICB3cml0ZWwoMHg4MDAwMDAwMFVMTCwgJnBsMDMxLT5pY3IpOw0KPiArICAg
-ICAgICAvKiBXcml0aW5nIG9uZSB0byBiaXQgemVybyBzaG91bGQgY2xlYXIgSVJRIHN0YXR1cyAq
-Lw0KPiArICAgICAgICB3cml0ZWwoMSwgJnBsMDMxLT5pY3IpOw0KPiANCj4gICAgICAgIHJlcG9y
-dChyZWFkbCgmcGwwMzEtPnJpcykgPT0gMCwgIiAgUlRDIFJJUyA9PSAwIik7DQo+ICAgICAgICBy
-ZXBvcnQocmVhZGwoJnBsMDMxLT5taXMpID09IDAsICIgIFJUQyBNSVMgPT0gMCIpOw0KPiAtLSAN
-Cj4gMi4yMS4wDQo+IA0KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgK
-S3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFu
-IFNjaGxhZWdlciwgUmFsZiBIZXJicmljaApFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
-bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
-IDIzNyA4NzkKCgo=
+
+On 2019-11-28 15:36, David Hildenbrand wrote:
+> On 28.11.19 13:46, Pierre Morel wrote:
+>> Let's define the PSW bits  explicitly, it will clarify their
+>> usage.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/asm/arch_bits.h | 20 ++++++++++++++++++++
+>>   lib/s390x/asm/arch_def.h  |  6 ++----
+> I'm sorry, but I don't really see a reason to move these 4/5 defines to
+> a separate header. Can you just keep them in arch_def.h and extend?
+
+no because arch_def.h contains C structures and inline.
+
+
+>
+> (none of your other patches touch arch_bits.h - and it is somewhat a
+> weird name. Where to put something new: arch_def.h or arch_bits.h? I
+> would have understood "psw.h", but even that, I don't consider necessary)
+>
+I can use a name like psw.h or let fall and keep the hexa.
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
