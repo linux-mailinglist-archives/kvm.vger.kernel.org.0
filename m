@@ -2,161 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 598E710C330
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 05:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3BB710C34C
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 05:56:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727566AbfK1ESq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 23:18:46 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58955 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727113AbfK1ESp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Nov 2019 23:18:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574914724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VZHfnpUHMVQfOJML2Ic3SHu+PaQ/ZeBlsp9ffMkTs9Y=;
-        b=AAXwqhLG/0/IFUx+xHPdH0jQK3kErsj9rL48Etk6vXa8jaLGVpzfIk0Q4ZdaQ7nDX7E5ay
-        W0siSLKLQV519yNYTO5yNe5GfdjTUPuez+zu8C1IemT1c0631wPwXILLMSCWvyv8EMBeHx
-        BRU+fOMY2zV4/9svyIS6Nt3uPVSt8Vw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-phLk_qt-Pc6H7_DN1poGOw-1; Wed, 27 Nov 2019 23:18:41 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04631184CAA1;
-        Thu, 28 Nov 2019 04:18:39 +0000 (UTC)
-Received: from [10.72.12.231] (ovpn-12-231.pek2.redhat.com [10.72.12.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 114B1100164D;
-        Thu, 28 Nov 2019 04:18:22 +0000 (UTC)
-Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
-To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     Song Liu <songliubraving@fb.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Prashant Bhole <prashantbhole.linux@gmail.com>,
-        kvm@vger.kernel.org, Yonghong Song <yhs@fb.com>,
-        Andrii Nakryiko <andriin@fb.com>,
-        "David S . Miller" <davem@davemloft.net>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126123514.3bdf6d6f@cakuba.netronome.com>
- <20191128033255.r66d4zedmhudeaa6@ast-mbp.dhcp.thefacebook.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <c6c6ca98-8793-5510-ad24-583e25403e35@redhat.com>
-Date:   Thu, 28 Nov 2019 12:18:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1727218AbfK1E4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 23:56:44 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35697 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726401AbfK1E4o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 23:56:44 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 47NljP3y4zz9sPL; Thu, 28 Nov 2019 15:56:41 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1574917001; bh=dq/B6bAPFmqaGLATrGnSHKh6kfJmN3b0JQehcdPnYtU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=n0YjGm0+WUE/mAWbwEBnHeHpoAhycAW4uSUqCMso72OfrvDMubpSw+IwhpyxQBZ//
+         v0z8HWhAUtL5hdjF58njrD2mnP/URxH29lwcAU4ELS2YwUgpeCOebQ+LdBTLaAdq2n
+         ws+r4hWglzx6/IEWg/K81C5ZJpk8UODMtJC/YZ08Wns5jCQW1sm7nhfXTu87bcqFbN
+         TmFb3Z4uN4UDTEkZvK3njR7tjnpX6EcJRV23kkSgb0mHjnT8Tfkwst7djOPLlCULVz
+         VBZxSCAFj9nqwu3/OqR+UYfPZ8FZzdh5Jxufyf4MbSqCIRKunWQFmOhL+piBwHjNe+
+         z5KxTH4tswrKw==
+Date:   Thu, 28 Nov 2019 15:56:39 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-uvmem-5.5 tag
+Message-ID: <20191128045639.GA28618@oak.ozlabs.ibm.com>
+References: <20191126052455.GA2922@oak.ozlabs.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191128033255.r66d4zedmhudeaa6@ast-mbp.dhcp.thefacebook.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: phLk_qt-Pc6H7_DN1poGOw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191126052455.GA2922@oak.ozlabs.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Nov 26, 2019 at 04:24:55PM +1100, Paul Mackerras wrote:
+> Paolo,
+> 
+> If you are intending to send a second pull request for Linus for this
+> merge window, and you are OK with taking a new feature in PPC KVM code
+> at this stage, then please do a pull from my kvm-ppc-uvmem-5.5 tag.
+> This adds code to manage the movement of pages for a secure KVM guest
+> between normal memory managed by the host kernel and secure memory
+> managed by the ultravisor on Power systems with Protected Execution
+> Facility hardware and firmware.  Secure memory is not accessible to
+> the host kernel and is represented as device memory using the
+> ZONE_DEVICE facility.
+> 
+> The patch set has been around for a while and has been reasonably well
+> reviewed -- this branch contains v11 of the patch set.  The code
+> changes are confined to PPC KVM code with the exception of a one-line
+> change to mm/ksm.c to export the ksm_madvise function, the addition of
+> a new ioctl number in include/uapi/linux/kvm.h, and the addition of a
+> Kconfig option in arch/powerpc/Kconfig (which Michael Ellerman is OK
+> with).
 
-On 2019/11/28 =E4=B8=8A=E5=8D=8811:32, Alexei Starovoitov wrote:
-> On Tue, Nov 26, 2019 at 12:35:14PM -0800, Jakub Kicinski wrote:
->> I'd appreciate if others could chime in.
-> The performance improvements are quite appealing.
-> In general offloading from higher layers into lower layers is necessary l=
-ong term.
->
-> But the approach taken by patches 15 and 17 is a dead end. I don't see ho=
-w it
-> can ever catch up with the pace of bpf development.
+Please hold off on this.  Hugh Dickins sent some review comments
+identifying a problem (ksm_madvise needs mmap_sem held for writing,
+not just reading).  I'll send an updated pull request shortly.
 
-
-This applies for any hardware offloading features, isn't it?
-
-
->   As presented this approach
-> works for the most basic programs and simple maps. No line info, no BTF, =
-no
-> debuggability. There are no tail_calls either.
-
-
-If I understand correctly, neither of above were implemented in NFP. We=20
-can collaborate to find solution for all of those.
-
-
->   I don't think I've seen a single
-> production XDP program that doesn't use tail calls.
-
-
-It looks to me we can manage to add this support.
-
-
-> Static and dynamic linking
-> is coming. Wraping one bpf feature at a time with virtio api is never goi=
-ng to
-> be complete.
-
-
-It's a common problem for hardware that want to implement eBPF=20
-offloading, not a virtio specific one.
-
-
-> How FDs are going to be passed back? OBJ_GET_INFO_BY_FD ?
-> OBJ_PIN/GET ? Where bpffs is going to live ?
-
-
-If we want pinning work in the case of virt, it should live in both host=20
-and guest probably.
-
-
->   Any realistic XDP application will
-> be using a lot more than single self contained XDP prog with hash and arr=
-ay
-> maps.
-
-
-It's possible if we want to use XDP offloading to accelerate VNF which=20
-often has simple logic.
-
-
-> It feels that the whole sys_bpf needs to be forwarded as a whole from
-> guest into host. In case of true hw offload the host is managing HW. So i=
-t
-> doesn't forward syscalls into the driver. The offload from guest into hos=
-t is
-> different. BPF can be seen as a resource that host provides and guest ker=
-nel
-> plus qemu would be forwarding requests between guest user space and host
-> kernel. Like sys_bpf(BPF_MAP_CREATE) can passthrough into the host direct=
-ly.
-> The FD that hosts sees would need a corresponding mirror FD in the guest.=
- There
-> are still questions about bpffs paths, but the main issue of
-> one-feature-at-a-time will be addressed in such approach.
-
-
-We try to follow what NFP did by starting from a fraction of the whole=20
-eBPF features. It would be very hard to have all eBPF features=20
-implemented from the start.=C2=A0 It would be helpful to clarify what's the=
-=20
-minimal set of features that you want to have from the start.
-
-
-> There could be other
-> solutions, of course.
->
->
-
-Suggestions are welcomed.
-
-Thanks
-
+Paul.
