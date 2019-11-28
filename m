@@ -2,140 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A8DF10C66E
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 11:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BBC810C69F
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 11:26:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbfK1KLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 05:11:23 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55353 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726191AbfK1KLX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Nov 2019 05:11:23 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a131so5999154wme.5
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 02:11:20 -0800 (PST)
+        id S1726383AbfK1K0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 05:26:22 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40647 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfK1K0W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 05:26:22 -0500
+Received: by mail-wr1-f66.google.com with SMTP id c14so5804119wrn.7
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 02:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=sISXPTjlwJ7V4ITzTlJun09VzrXW1uLl32xxBS1VK28=;
-        b=klzHbCkoQlkg81BbUL+EwHZ6p0WS/SQgfNh6KC2POoVTgHs2znnPxgYJm0K5b2ECIX
-         hMpCOOixeQHlahZM1wGlahTd7uwQOxI15aS7DpKxKriCVt6j6Krp4fR5eNJ+6CJ1hqZj
-         3miAgkLmwqgjTWpsx+3/GKiitbN+RJhcpIJJA=
+        d=gmail.com; s=20161025;
+        h=from:references:user-agent:to:cc:subject:message-id:in-reply-to
+         :date:mime-version;
+        bh=1lrGqkcV4iI5jLnp5kfouAF45I2tY7vDK/UTEfM693U=;
+        b=ox3QWsFuo0rZEljuaqZ8m34VBCi2AhJdU9geUBCvfRPwNscgPCnf6oIfi1y4SjzTvl
+         6/htuEaUyRkiE6PfrJpf7QI7QP9XLDiHv9dvCSJiV1y1ZDMO3AaMJ/MSEr2nxXnbV/vw
+         QfNqn/4aNm/VtpvGa1VzM9MEGZC9KXS6Q0+/ntSGlc8mhsHBUVOswCnw41cKNs3PhD+2
+         NZYoaBUvIc1gOTg1Ti0XVzVRD8/4hnn7P7bcJEwT53WAP2gLECsNrZf7+4RYo0wnB3E9
+         E8tYEXvaylO89Zemww15ead7lb5JtQGghXF++Cr5vvC6s1EEhgznrcpOjB8CJ3FzQhSS
+         WYXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=sISXPTjlwJ7V4ITzTlJun09VzrXW1uLl32xxBS1VK28=;
-        b=qzaCJPTGmAU1ARhYGf9QMAjSaowKLfMRwXhxeI4mwZcDSL0KLn55zNGYEY4WflILD2
-         dhyTtc6VKlTs1YChH3gt1KtbLsttZNO45VV1EWhplHI6EGUlbOyiYU5UAXhzQLizOfVi
-         W5AWe20CTlACvjRiriIWgDfnaUK56ZV9dGf2ST4fO7Y9PjQUTihWMgnMuXH1BBaX2SFM
-         INyHxW3GvgVZhmOT2AXu4xb13V/ZtA/oV4Z//kMHntqx1xfhagOtRG2GHkkMCQUREqoI
-         mKioz7NDnkRdGn2QBxRuqHt5O5SCI+NsNzbA+JNN0/i5YzEFBR7iXRrBdb/t/6G5OGs6
-         CwCw==
-X-Gm-Message-State: APjAAAXeebv9Zw+fc0KlHR52Ot+xbJmPSM5d9PmswJFjo3+tsYxkDfV7
-        YAZiRHo0va1e7ezzE8hg0l7axw==
-X-Google-Smtp-Source: APXvYqwnNrI49aZ2W2YOZm0w5C0k/FdmQqHJgDY8+tOWqD4ok/grJ1NwsYJD988O1lFJnK/fDsmZBg==
-X-Received: by 2002:a7b:cb02:: with SMTP id u2mr9058232wmj.142.1574935879478;
-        Thu, 28 Nov 2019 02:11:19 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id s8sm22418162wrt.57.2019.11.28.02.11.18
+        h=x-gm-message-state:from:references:user-agent:to:cc:subject
+         :message-id:in-reply-to:date:mime-version;
+        bh=1lrGqkcV4iI5jLnp5kfouAF45I2tY7vDK/UTEfM693U=;
+        b=RggmysuLECdp+2VwT0XTGM6KtmeORnIZ3GkZP6KLw5Fz+87Eoiq6yBzVLckV+2v7ZR
+         n0dKQsa2ZqMmIabKgaScn5KD9+nIUbhq0YpWKgD5ZyO9NmYN0A/WlNFYz7p2LnF8tMDI
+         iaZNmDUHcYxPW6Sp6M/wFUVaskQ06egy2jJ0Cu62Ynep94q+Dgguk2luUEIwto8e0qK2
+         lCSQ43Ie9uOFt6dHmCvYh4bkoZit/GXhepQula3cTf9e05qegVGln2YQ0RcT1YFTiq39
+         9sA0Ba4vkejm7QPEWSXXn7BVFAla2WgRezBVpY7sXSBHUJtP6i2164w6F0Pb3SWk+MZW
+         b6RA==
+X-Gm-Message-State: APjAAAXFUri++DCqQjNCys2atQqLcN+h9YWAUOlsfj1cJikQxZTUozlO
+        6Vr1MlygUAC4wrR2C1yn8kU=
+X-Google-Smtp-Source: APXvYqw5aYA+kaOf7eZUd7bWXlIyuLocoGbM/hty5IkP6V9CCoX6ojPtPfpPbvioEtaXP/Go7TPVdQ==
+X-Received: by 2002:adf:e591:: with SMTP id l17mr6587399wrm.139.1574936778136;
+        Thu, 28 Nov 2019 02:26:18 -0800 (PST)
+Received: from crazypad.dinechin.lan ([2a01:e0a:466:71c0:493:4df5:b9c4:eed5])
+        by smtp.gmail.com with ESMTPSA id q3sm890141wrn.33.2019.11.28.02.26.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Nov 2019 02:11:18 -0800 (PST)
-Date:   Thu, 28 Nov 2019 11:11:16 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Jani Nikula <jani.nikula@intel.com>
-Cc:     Daniel Vetter <daniel@ffwll.ch>, linux-fbdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 13/13] samples: vfio-mdev: constify fb ops
-Message-ID: <20191128101116.GQ406127@phenom.ffwll.local>
-References: <cover.1574871797.git.jani.nikula@intel.com>
- <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
- <20191127182940.GM406127@phenom.ffwll.local>
- <87d0dcnynk.fsf@intel.com>
+        Thu, 28 Nov 2019 02:26:16 -0800 (PST)
+From:   Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+X-Google-Original-From: Christophe de Dinechin <christophe@dinechin.org>
+References: <1573044429-7390-1-git-send-email-nitesh@redhat.com> <1573044429-7390-3-git-send-email-nitesh@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.2
+To:     Nitesh Narayan Lal <nitesh@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
+        mtosatti@redhat.com
+Subject: Re: [kvm-unit-tests Patch v1 2/2] x86: ioapic: Test physical and logical destination mode
+Message-ID: <7hblsw8fji.fsf@crazypad.dinechin.lan>
+In-reply-to: <1573044429-7390-3-git-send-email-nitesh@redhat.com>
+Date:   Thu, 28 Nov 2019 11:25:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0dcnynk.fsf@intel.com>
-X-Operating-System: Linux phenom 5.3.0-2-amd64 
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 28, 2019 at 11:22:23AM +0200, Jani Nikula wrote:
-> On Wed, 27 Nov 2019, Daniel Vetter <daniel@ffwll.ch> wrote:
-> > On Wed, Nov 27, 2019 at 06:32:09PM +0200, Jani Nikula wrote:
-> >> Now that the fbops member of struct fb_info is const, we can star making
-> >> the ops const as well.
-> >> 
-> >> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Cc: kvm@vger.kernel.org
-> >> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
-> >
-> > You've missed at least drivers/staging/fbtft in your search. I guess you
-> > need to do a full make allyesconfig on x86/arm and arm64 (the latter
-> > because some stupid drivers only compile there, not on arm, don't ask).
-> > Still misses a pile of mips/ppc only stuff and maybe the sparcs and
-> > alphas, but should be good enough.
-> 
-> fbtft dynamically allocates the fbops, for whatever reason. There were
-> others like that too. Some of the drivers modify the fbops runtime to
-> choose different hooks for different configurations. Can't change them
-> all anyway.
-> 
-> Facilitating making the fbops const is one thing (patches 1-8), but I'm
-> not really sure I want to sign up for exhaustively moving fbops to
-> rodata on anything beyond drivers/gpu/drm. It's not like I leave stuff
-> broken. Besides I am trying to cover all the low hanging fruit where I
-> can simply add the "const" and be done with it.
 
-Uh indeed, I didn't check the output of my grep with sufficient finesses.
-r-b as-is on that pile.
+Nitesh Narayan Lal writes:
 
-Since fbdev is officially in drm-misc you can just merge it all once the
-prep is done - feels silly not to when you've done the work already.
--Daniel
+> This patch tests the physical destination mode by sending an
+> interrupt to one of the vcpus and logical destination mode by
+> sending an interrupt to more than one vcpus.
+>
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> ---
+>  x86/ioapic.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 65 insertions(+)
+>
+> diff --git a/x86/ioapic.c b/x86/ioapic.c
+> index c32dabd..31aec03 100644
+> --- a/x86/ioapic.c
+> +++ b/x86/ioapic.c
+> @@ -405,12 +405,73 @@ static void test_ioapic_self_reconfigure(void)
+>  	report("Reconfigure self", g_isr_84 == 1 && e.remote_irr == 0);
+>  }
+>
+> +static volatile int g_isr_85;
+> +
+> +static void ioapic_isr_85(isr_regs_t *regs)
+> +{
+> +	++g_isr_85;
+> +	set_irq_line(0x0e, 0);
+> +	eoi();
+> +}
+> +
+> +static void test_ioapic_physical_destination_mode(void)
+> +{
+> +	ioapic_redir_entry_t e = {
+> +		.vector = 0x85,
+> +		.delivery_mode = 0,
+> +		.dest_mode = 0,
+> +		.dest_id = 0x1,
+> +		.trig_mode = TRIGGER_LEVEL,
+> +	};
+> +	handle_irq(0x85, ioapic_isr_85);
+> +	ioapic_write_redir(0xe, e);
+> +	set_irq_line(0x0e, 1);
+> +	do {
+> +		pause();
+> +	} while(g_isr_85 != 1);
 
-> 
-> BR,
-> Jani.
-> 
-> >
-> > With that done, on the remaining patches:
-> >
-> > Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> >
-> >> ---
-> >>  samples/vfio-mdev/mdpy-fb.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >> 
-> >> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> >> index 2719bb259653..21dbf63d6e41 100644
-> >> --- a/samples/vfio-mdev/mdpy-fb.c
-> >> +++ b/samples/vfio-mdev/mdpy-fb.c
-> >> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
-> >>  		iounmap(info->screen_base);
-> >>  }
-> >>  
-> >> -static struct fb_ops mdpy_fb_ops = {
-> >> +static const struct fb_ops mdpy_fb_ops = {
-> >>  	.owner		= THIS_MODULE,
-> >>  	.fb_destroy	= mdpy_fb_destroy,
-> >>  	.fb_setcolreg	= mdpy_fb_setcolreg,
-> >> -- 
-> >> 2.20.1
-> >> 
-> >> _______________________________________________
-> >> dri-devel mailing list
-> >> dri-devel@lists.freedesktop.org
-> >> https://lists.freedesktop.org/mailman/listinfo/dri-devel
-> 
-> -- 
-> Jani Nikula, Intel Open Source Graphics Center
+Does this loop (and the next one) end up running forever if the test
+fails? Would it be worth adding some timeout to detect failure?
 
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+> +	report("ioapic physical destination mode", g_isr_85 == 1);
+> +}
+> +
+> +static volatile int g_isr_86;
+> +
+> +static void ioapic_isr_86(isr_regs_t *regs)
+> +{
+> +	++g_isr_86;
+> +	set_irq_line(0x0e, 0);
+> +	eoi();
+> +}
+> +
+> +static void test_ioapic_logical_destination_mode(void)
+> +{
+> +	/* Number of vcpus which are configured/set in dest_id */
+> +	int nr_vcpus = 3;
+> +	ioapic_redir_entry_t e = {
+> +		.vector = 0x86,
+> +		.delivery_mode = 0,
+> +		.dest_mode = 1,
+> +		.dest_id = 0xd,
+> +		.trig_mode = TRIGGER_LEVEL,
+> +	};
+> +	handle_irq(0x86, ioapic_isr_86);
+> +	ioapic_write_redir(0xe, e);
+> +	set_irq_line(0x0e, 1);
+> +	do {
+> +		pause();
+> +	} while(g_isr_86 < nr_vcpus);
+> +	report("ioapic logical destination mode", g_isr_86 == nr_vcpus);
+> +}
+> +
+> +static void update_cr3(void *cr3)
+> +{
+> +	write_cr3((ulong)cr3);
+> +}
+>
+>  int main(void)
+>  {
+>  	setup_vm();
+>  	smp_init();
+>
+> +	on_cpus(update_cr3, (void *)read_cr3());
+>  	mask_pic_interrupts();
+>
+>  	if (enable_x2apic())
+> @@ -448,7 +509,11 @@ int main(void)
+>  		test_ioapic_edge_tmr_smp(true);
+>
+>  		test_ioapic_self_reconfigure();
+> +		test_ioapic_physical_destination_mode();
+>  	}
+>
+> +	if (cpu_count() > 3)
+> +		test_ioapic_logical_destination_mode();
+> +
+>  	return report_summary();
+>  }
+
+
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
