@@ -2,139 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F9D10CDA6
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 18:16:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1EAB10CE01
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 18:41:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727118AbfK1RQW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 12:16:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60758 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726587AbfK1RQW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 12:16:22 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASHCG5O189865;
-        Thu, 28 Nov 2019 12:16:08 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 12:16:08 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xASHCGQe189854;
-        Thu, 28 Nov 2019 12:16:07 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wjah6rh7u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 12:16:07 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xASHFa3l000649;
-        Thu, 28 Nov 2019 17:16:06 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 2wevd7b1j5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Nov 2019 17:16:06 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASHG5og32833932
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 17:16:05 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4ECD7BE053;
-        Thu, 28 Nov 2019 17:16:05 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 626A6BE04F;
-        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
-Received: from leobras.br.ibm.com (unknown [9.18.235.137])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Nov 2019 17:16:03 +0000 (GMT)
-Message-ID: <263e73be1047014ad3b6c0ae28d57db4b9dea970.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] powerpc/kvm/book3s: Fixes possible 'use after
- release' of kvm
-From:   Leonardo Bras <leonardo@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kvm-ppc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paul Mackerras <paulus@ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Date:   Thu, 28 Nov 2019 14:15:59 -0300
-In-Reply-To: <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-References: <20191126175212.377171-1-leonardo@linux.ibm.com>
-         <f3750cf8-88fc-cae7-1cfb-cb4b86b44704@redhat.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-l7jjVAuSfdlX1zRYI3pK"
-User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
+        id S1726641AbfK1RlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 12:41:22 -0500
+Received: from foss.arm.com ([217.140.110.172]:39034 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726608AbfK1RlW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 12:41:22 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EDC01FB;
+        Thu, 28 Nov 2019 09:41:21 -0800 (PST)
+Received: from e121166-lin.cambridge.arm.com (e121166-lin.cambridge.arm.com [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 898F33F6C4;
+        Thu, 28 Nov 2019 09:41:20 -0800 (PST)
+Date:   Thu, 28 Nov 2019 17:41:15 +0000
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com, andre.przywara@arm.com,
+        sami.mujawar@arm.com
+Subject: Re: [PATCH kvmtool 00/16] Add writable BARs and PCIE 1.1 support
+Message-ID: <20191128174115.GA14099@e121166-lin.cambridge.arm.com>
+References: <20191125103033.22694-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-28_05:2019-11-28,2019-11-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 impostorscore=0 clxscore=1015 bulkscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911280146
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191125103033.22694-1-alexandru.elisei@arm.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 25, 2019 at 10:30:17AM +0000, Alexandru Elisei wrote:
+> kvmtool uses the Linux-only dt property 'linux,pci-probe-only' to prevent
+> it from trying to reprogram the BARs. Let's make the BARs writable so we
+> can get rid of this band-aid.
 
---=-l7jjVAuSfdlX1zRYI3pK
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+For the sake of precision, PCI BARs are *always* writable and are indeed
+written in eg Linux kernel enumeration code regardless of what DT
+firmware property is present - in order to size them.
 
-On Wed, 2019-11-27 at 17:40 +0100, Paolo Bonzini wrote:
-> > diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s=
-_64_vio.c
-> > index 5834db0a54c6..a402ead833b6 100644
-> > --- a/arch/powerpc/kvm/book3s_64_vio.c
-> > +++ b/arch/powerpc/kvm/book3s_64_vio.c
-> > @@ -316,14 +316,13 @@ long kvm_vm_ioctl_create_spapr_tce(struct kvm *kv=
-m,
-> >  =20
-> >        if (ret >=3D 0)
-> >                list_add_rcu(&stt->list, &kvm->arch.spapr_tce_tables);
-> > -     else
-> > -             kvm_put_kvm(kvm);
-> >  =20
-> >        mutex_unlock(&kvm->lock);
-> >  =20
-> >        if (ret >=3D 0)
-> >                return ret;
-> >  =20
-> > +     kvm_put_kvm(kvm);
-> >        kfree(stt);
-> >    fail_acct:
-> >        account_locked_vm(current->mm, kvmppc_stt_pages(npages), false);
+This series - which is very welcome - allows something different, namely
+it allows changing the BARs value from a default address space
+configuration aka reassigning BARs in Linux kernel speak.
 
-Paul, do you think this change is still valid as it 'makes the code
-clearer', as said by Paolo before? I would write a new commit message
-to match the change.
+Thanks,
+Lorenzo
 
-Best regards,
-Leonardo
-
---=-l7jjVAuSfdlX1zRYI3pK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEMdeUgIzgjf6YmUyOlQYWtz9SttQFAl3gAM8ACgkQlQYWtz9S
-ttTDJg//eBwp87AJa/nFXJRNohYve3mIdddUz+1Er3k4cXhuW3HWbrickBI+w+GM
-5s3kXIywUHeAEPFuaqhCxDvM3YHf9cXbKUSO+vYipwnukAAx6xlrQA8squ0CuKKm
-Njbz4qBf9crM7lkH9S8vEFTvC46dUrClfPcdvQTPw0jPCknIPzpW9RdwjbJUC7q/
-Woc0XfHhmvgwMHKI3Q1e7FEDIxYKZHDbvGhI2RN/+ROIvnsLcx/kdzrNE0LyhKfj
-hCfCfQ0i5LZwmUMh7bdGVb8qxuItuEMifrWZWjq0tly/KE0/1IrvRzWLG6uW4sTF
-gLRskMN2TQ3pAKHgTzqanYYkkBqh2VUTcPh6beVQP4qnSMzuEMR+AxA08NO1m2HQ
-s7l1GSiAVI+ae72YMUA8jcjoxnrcxKB+R5S39ZEXpoxoIsfYrx3QAiaBo2CyOrZL
-vD77YCthDMQ8Js4dINh4MMRgf0m95Pn4pD2BX5nD1L0NHHtD2paEayTapmBStaPR
-pBU9oTtajHcV7Fpo4Hq29Vj1Zl+Nbj101CnJknCoLy/7xT3Z5MnVHw3lYBAoN+hK
-sDG/XCfkWQ9+YkGda3LTjW2CxaTXHvpi2Y2BO2iHyULEZUZ+t8zyutd1v0pc6BiV
-lxjBZ9fbmQTQVOqWdueea85C7HVz/p7dohqQnwVLmCuMzCwB+cQ=
-=Kgb4
------END PGP SIGNATURE-----
-
---=-l7jjVAuSfdlX1zRYI3pK--
-
+> Let's also extend the legacy PCI emulation, which came out in 1992, so we
+> can properly emulate the PCI Express version 1.1 protocol, which is
+> relatively newer, being published in 2005.
+> 
+> With these two changes, we are very close to running EDK2 as the firmware
+> for the virtual machine; the only thing that is missing is flash emulation
+> for storing firmware variables.
+> 
+> Summary of the patches:
+> * Patches 1-12 are fixes or enhancements needed to support reprogramable
+>   BARs.
+> * Patches 13-15 add support for reprogramable BARs and remove the dt
+>   property.
+> * Patch 16 adds support for PCIE 1.1.
+> 
+> Based on the series at [1].
+> 
+> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2019-March/034964.html
+> 
+> Alexandru Elisei (8):
+>   Makefile: Use correct objcopy binary when cross-compiling for x86_64
+>   Remove pci-shmem device
+>   Check that a PCI device's memory size is power of two
+>   arm: pci.c: Advertise only PCI bus 0 in the DT
+>   virtio/pci: Ignore MMIO and I/O accesses when they are disabled
+>   Use independent read/write locks for ioport and mmio
+>   virtio/pci: Add support for BAR configuration
+>   Add PCI Express 1.1 support
+> 
+> Julien Thierry (7):
+>   ioport: pci: Move port allocations to PCI devices
+>   pci: Fix ioport allocation size
+>   arm/pci: Fix PCI IO region
+>   arm/pci: Do not use first PCI IO space bytes for devices
+>   virtio/pci: Make memory and IO BARs independent
+>   vfio: Add support for BAR configuration
+>   arm/fdt: Remove 'linux,pci-probe-only' property
+> 
+> Sami Mujawar (1):
+>   pci: Fix BAR resource sizing arbitration
+> 
+>  Makefile                          |   4 +-
+>  arm/fdt.c                         |   1 -
+>  arm/include/arm-common/kvm-arch.h |   2 +-
+>  arm/include/arm-common/pci.h      |   1 +
+>  arm/kvm.c                         |   3 +
+>  arm/pci.c                         |  28 ++-
+>  builtin-run.c                     |   5 -
+>  hw/pci-shmem.c                    | 400 ------------------------------
+>  hw/vesa.c                         |  21 +-
+>  include/kvm/ioport.h              |   4 -
+>  include/kvm/pci-shmem.h           |  32 ---
+>  include/kvm/pci.h                 |  61 ++++-
+>  include/kvm/util.h                |   2 +
+>  include/kvm/vesa.h                |   6 +-
+>  include/kvm/virtio-pci.h          |   1 +
+>  ioport.c                          |  36 +--
+>  mmio.c                            |  26 +-
+>  pci.c                             |  64 ++++-
+>  powerpc/include/kvm/kvm-arch.h    |   2 +-
+>  vfio/core.c                       |   6 +-
+>  vfio/pci.c                        |  97 +++++++-
+>  virtio/pci.c                      | 355 ++++++++++++++++++++------
+>  x86/include/kvm/kvm-arch.h        |   2 +-
+>  23 files changed, 562 insertions(+), 597 deletions(-)
+>  delete mode 100644 hw/pci-shmem.c
+>  delete mode 100644 include/kvm/pci-shmem.h
+> 
+> -- 
+> 2.20.1
+> 
