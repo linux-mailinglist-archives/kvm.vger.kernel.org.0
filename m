@@ -2,118 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5614110C63A
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 10:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A00510C648
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 10:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbfK1Jy3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 04:54:29 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:39203 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbfK1Jy2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Nov 2019 04:54:28 -0500
-Received: by mail-pf1-f202.google.com with SMTP id z2so15871321pfg.6
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 01:54:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=73thCkBPX2FDaxemBtAwlsmt1YdFFahmNunbm6OlhXA=;
-        b=qS997IoyaKyuX8vAeEwryNr0YQfCT2kQsW6fDAbJSRDys/1RJ4FSh7/GuPkbWh2r5+
-         CH9giMeuYCNfTHVFsA0shUhiNtlLoIb87rX6CEJrU++U5jKFFQnIR8u+8QAVXHeeCYtH
-         ulxQB7BXNJsUfEsnA1xOriRJNMaroM5sXsUQPi4n8OMWD+AVLHbG9/rm0gAg0V5PD+7M
-         DztF0T+YOhiYwiEdAwDky9hBYxIezR/t6mq7REndeljx7WnomwEAdORBhog/yVmPErgD
-         oQLhpfIafi7ix+UNmjJcUWfZDRe3pAYxfINv8JCmnVLaIIcQROfM/CPctR2v8myf1E8Y
-         Ho1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=73thCkBPX2FDaxemBtAwlsmt1YdFFahmNunbm6OlhXA=;
-        b=QHVfnjtFO4Amxnyli+tiaTquT2DwQCFLdNM0oZY7lSfVEgAslGwcvJ7VlvU0whUAWP
-         ym9ABwy+uMI9vckEJ8W103aeEZPiR5oRSAJ17qQgb2PDo1VKhYHJkqCCULMkuHhUeYnV
-         tYIB6d7rLXMHyPbJCoQsLR7EJKUKhXHFCsJb3bjqXetgRZcpa+Pq2tZwBmfX5ULq3qYm
-         cQsETwr9wHGtUYCQmoSR3Oe9jj+WwM5lhrH/c0XMsee2e0fDa5kzlTLOx10uSs3Kj4Wu
-         ClcbVywJy62eQzYYycsVqlLxF3AW3BVgGDZe7V1HQLo3EgtV/rD5PsIpPsLJ6ClppiRQ
-         ZbMQ==
-X-Gm-Message-State: APjAAAW907Zzr61/ztBcyNdF8yHkEB/+sZrTz5NUF9ObHmCr62JplK1b
-        tg+WiUeANe9QWhHiCRyhy4TuIRw/1JbfvJ9QY3r6AJusPphhT/+9eIPhby9JK9kvrVBabvM2fWu
-        ZXB6nDWn0L0ejP/zc/wv0u7I7MMKLV+ekBN9PcHpZ3YlAqtKT8S6N58PXpQ==
-X-Google-Smtp-Source: APXvYqwxYbkRGasT2EvGWOZ4/ON7b3DquXQZsXKljp3ze2dB3SXF3hn3mg272YlBsCB4oa67PN9s29cpOOM=
-X-Received: by 2002:a63:1a22:: with SMTP id a34mr9728712pga.403.1574934866510;
- Thu, 28 Nov 2019 01:54:26 -0800 (PST)
-Date:   Thu, 28 Nov 2019 01:54:22 -0800
-Message-Id: <20191128095422.26757-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.432.g9d3f5f5b63-goog
-Subject: [kvm-unit-tests PATCH] x86: VMX: Check EPT AD bits when enabled in ept_access_paddr()
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726252AbfK1J7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 04:59:39 -0500
+Received: from foss.arm.com ([217.140.110.172]:32986 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726133AbfK1J7j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 04:59:39 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEB941FB;
+        Thu, 28 Nov 2019 01:59:38 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 951F23F6C4;
+        Thu, 28 Nov 2019 01:59:37 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 10/18] arm/arm64: selftest: Add prefetch
+ abort test
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+References: <20191127142410.1994-1-alexandru.elisei@arm.com>
+ <20191127142410.1994-11-alexandru.elisei@arm.com>
+ <20191127184756.encuqdupgwcky6ys@kamzik.brq.redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <82684f76-2157-e96a-00e2-a30451619751@arm.com>
+Date:   Thu, 28 Nov 2019 09:59:36 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20191127184756.encuqdupgwcky6ys@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Modify the test helper, ept_access_paddr(), to test the correctness
-of the L1's EPT AD bits when enabled. After a successful guest access,
-assert that the accessed bit (bit 8) has been set on all EPT entries
-which were used in the translation of the guest-physical address.
+Hi,
 
-Since ept_access_paddr() tests an EPT mapping that backs a guest paging
-structure, processor accesses are treated as writes and the dirty bit
-(bit 9) is set accordingly. Assert that the dirty bit is set on the leaf
-EPT entry.
+On 11/27/19 6:47 PM, Andrew Jones wrote:
+> On Wed, Nov 27, 2019 at 02:24:02PM +0000, Alexandru Elisei wrote:
+>> When a guest tries to execute code from MMIO memory, KVM injects an
+>> external abort into that guest. We have now fixed the psci test to not
+>> fetch instructions from the I/O region, and it's not that often that a
+>> guest misbehaves in such a way. Let's expand our coverage by adding a
+>> proper test targetting this corner case.
+>>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  lib/arm64/asm/esr.h |  3 ++
+>>  arm/selftest.c      | 97 +++++++++++++++++++++++++++++++++++++++++++--
+>>  2 files changed, 97 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
+>> index 8e5af4d90767..8c351631b0a0 100644
+>> --- a/lib/arm64/asm/esr.h
+>> +++ b/lib/arm64/asm/esr.h
+>> @@ -44,4 +44,7 @@
+>>  #define ESR_EL1_EC_BKPT32	(0x38)
+>>  #define ESR_EL1_EC_BRK64	(0x3C)
+>>  
+>> +#define ESR_EL1_FSC_MASK	(0x3F)
+>> +#define ESR_EL1_FSC_EXTABT	(0x10)
+>> +
+>>  #endif /* _ASMARM64_ESR_H_ */
+>> diff --git a/arm/selftest.c b/arm/selftest.c
+>> index e9dc5c0cab28..caad524378fc 100644
+>> --- a/arm/selftest.c
+>> +++ b/arm/selftest.c
+>> @@ -16,6 +16,8 @@
+>>  #include <asm/psci.h>
+>>  #include <asm/smp.h>
+>>  #include <asm/barrier.h>
+>> +#include <asm/mmu.h>
+>> +#include <asm/pgtable.h>
+>>  
+>>  static cpumask_t ready, valid;
+>>  
+>> @@ -68,6 +70,7 @@ static void check_setup(int argc, char **argv)
+>>  static struct pt_regs expected_regs;
+>>  static bool und_works;
+>>  static bool svc_works;
+>> +static bool pabt_works;
+>>  #if defined(__arm__)
+>>  /*
+>>   * Capture the current register state and execute an instruction
+>> @@ -91,7 +94,7 @@ static bool svc_works;
+>>  		"str	r1, [r0, #" xstr(S_PC) "]\n"		\
+>>  		excptn_insn "\n"				\
+>>  		post_insns "\n"					\
+>> -	:: "r" (&expected_regs) : "r0", "r1")
+>> +	:: "r" (&expected_regs) : "r0", "r1", "r2")
+>>  
+>>  static bool check_regs(struct pt_regs *regs)
+>>  {
+>> @@ -171,6 +174,45 @@ static void user_psci_system_off(struct pt_regs *regs)
+>>  {
+>>  	__user_psci_system_off();
+>>  }
+>> +
+>> +static void check_pabt_exit(void)
+>> +{
+>> +	install_exception_handler(EXCPTN_PABT, NULL);
+>> +
+>> +	report("pabt", pabt_works);
+>> +	exit(report_summary());
+>> +}
+>> +
+>> +static void pabt_handler(struct pt_regs *regs)
+>> +{
+>> +	expected_regs.ARM_pc = 0;
+>> +	pabt_works = check_regs(regs);
+>> +
+>> +	regs->ARM_pc = (unsigned long)&check_pabt_exit;
+>> +}
+>> +
+>> +static void check_pabt(void)
+>> +{
+>> +	unsigned long sctlr;
+>> +
+>> +	/* Make sure we can actually execute from a writable region */
+>> +	asm volatile("mrc p15, 0, %0, c1, c0, 0": "=r" (sctlr));
+>> +	if (sctlr & CR_ST) {
+>> +		sctlr &= ~CR_ST;
+>> +		asm volatile("mcr p15, 0, %0, c1, c0, 0" :: "r" (sctlr));
+>> +		isb();
+>> +		/*
+>> +		 * Required according to the sequence in ARM DDI 0406C.d, page
+>> +		 * B3-1358.
+>> +		 */
+>> +		flush_tlb_all();
+>> +	}
+>> +
+>> +	install_exception_handler(EXCPTN_PABT, pabt_handler);
+>> +
+>> +	test_exception("mov r2, #0x0", "bx r2", "");
+>> +	__builtin_unreachable();
+>> +}
+>>  #elif defined(__aarch64__)
+>>  
+>>  /*
+>> @@ -212,7 +254,7 @@ static void user_psci_system_off(struct pt_regs *regs)
+>>  		"stp	 x0,  x1, [x1]\n"			\
+>>  	"1:"	excptn_insn "\n"				\
+>>  		post_insns "\n"					\
+>> -	:: "r" (&expected_regs) : "x0", "x1")
+>> +	:: "r" (&expected_regs) : "x0", "x1", "x2")
+>>  
+>>  static bool check_regs(struct pt_regs *regs)
+>>  {
+>> @@ -288,6 +330,53 @@ static bool check_svc(void)
+>>  	return svc_works;
+>>  }
+>>  
+>> +static void check_pabt_exit(void)
+>> +{
+>> +	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
+>> +
+>> +	report("pabt", pabt_works);
+>> +	exit(report_summary());
+>> +}
+>> +
+>> +static void pabt_handler(struct pt_regs *regs, unsigned int esr)
+>> +{
+>> +	bool is_extabt;
+>> +
+>> +	expected_regs.pc = 0;
+>> +	is_extabt = (esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT;
+>> +	pabt_works = check_regs(regs) && is_extabt;
+>> +
+>> +	regs->pc = (u64)&check_pabt_exit;
+>> +}
+>> +
+>> +static void check_pabt(void)
+>> +{
+>> +	enum vector v = check_vector_prep();
+>> +	unsigned long sctlr;
+>> +
+>> +	/*
+>> +	 * According to ARM DDI 0487E.a, table D5-33, footnote c, all regions
+>> +	 * writable at EL0 are treated as PXN. Clear the user bit so we can
+>> +	 * execute code from the bottom I/O space (0G-1G) to simulate a
+>> +	 * misbehaved guest.
+>> +	 */
+>> +	mmu_clear_user(current_thread_info()->pgtable, 0);
+>> +
+>> +	/* Make sure we can actually execute from a writable region */
+>> +	sctlr = read_sysreg(sctlr_el1);
+>> +	if (sctlr & SCTLR_EL1_WXN) {
+>> +		write_sysreg(sctlr & ~SCTLR_EL1_WXN, sctlr_el1);
+>> +		isb();
+>> +		/* SCTLR_EL1.WXN is permitted to be cached in a TLB. */
+>> +		flush_tlb_all();
+>> +	}
+>> +
+>> +	install_exception_handler(v, ESR_EL1_EC_IABT_EL1, pabt_handler);
+>> +
+>> +	test_exception("mov x2, xzr", "br x2", "");
+>> +	__builtin_unreachable();
+>> +}
+>> +
+>>  static void user_psci_system_off(struct pt_regs *regs, unsigned int esr)
+>>  {
+>>  	__user_psci_system_off();
+>> @@ -298,7 +387,9 @@ static void check_vectors(void *arg __unused)
+>>  {
+>>  	report("und", check_und());
+>>  	report("svc", check_svc());
+>> -	if (is_user()) {
+>> +	if (!is_user()) {
+>> +		check_pabt();
+>> +	} else {
+>>  #ifdef __arm__
+>>  		install_exception_handler(EXCPTN_UND, user_psci_system_off);
+>>  #else
+>> -- 
+>> 2.20.1
+>>
+> Did you also test with QEMU? Because this new test dies on an unhandled
+> unknown exception for me. Both with KVM and with TCG, and both arm64 and
+> arm32 (KVM:aarch32 or TCG:arm).
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- x86/vmx_tests.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+To my chagrin, I forgot to test it on qemu. Tried it now and indeed it causes an
+unknown exception. I'll try to figure out why it breaks on qemu and not on kvmtool.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index a456bd1..325dde7 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -1135,6 +1135,11 @@ static void ept_disable_ad_bits(void)
- 	vmcs_write(EPTP, eptp);
- }
- 
-+static int ept_ad_enabled(void)
-+{
-+	return eptp & EPTP_AD_FLAG;
-+}
-+
- static void ept_enable_ad_bits_or_skip_test(void)
- {
- 	if (!ept_ad_bits_supported())
-@@ -2500,6 +2505,8 @@ static void ept_access_paddr(unsigned long ept_access, unsigned long pte_ad,
- 	unsigned long *ptep;
- 	unsigned long gpa;
- 	unsigned long orig_epte;
-+	unsigned long epte;
-+	int i;
- 
- 	/* Modify the guest PTE mapping data->gva according to @pte_ad.  */
- 	ptep = get_pte_level(current_page_table(), data->gva, /*level=*/1);
-@@ -2536,6 +2543,17 @@ static void ept_access_paddr(unsigned long ept_access, unsigned long pte_ad,
- 		do_ept_access_op(op);
- 	} else {
- 		do_ept_access_op(op);
-+		if (ept_ad_enabled()) {
-+			for (i = EPT_PAGE_LEVEL; i > 0; i--) {
-+				TEST_ASSERT(get_ept_pte(pml4, gpa, i, &epte));
-+				TEST_ASSERT(epte & EPT_ACCESS_FLAG);
-+				if (i == 1)
-+					TEST_ASSERT(epte & EPT_DIRTY_FLAG);
-+				else
-+					TEST_ASSERT_EQ(epte & EPT_DIRTY_FLAG, 0);
-+			}
-+		}
-+
- 		ept_untwiddle(gpa, /*level=*/1, orig_epte);
- 	}
- 
--- 
-2.24.0.432.g9d3f5f5b63-goog
-
+Thanks,
+Alex
+>
+> Thanks,
+> drew
+>
