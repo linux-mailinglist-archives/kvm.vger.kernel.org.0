@@ -2,148 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E779210C261
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 03:30:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28B6C10C29F
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 03:55:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730036AbfK1CaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 21:30:23 -0500
-Received: from mga18.intel.com ([134.134.136.126]:17935 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728371AbfK1CaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 21:30:18 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 18:30:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,251,1571727600"; 
-   d="scan'208";a="221176261"
-Received: from allen-box.sh.intel.com ([10.239.159.136])
-  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 18:30:15 -0800
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-To:     Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
-        jacob.jun.pan@linux.intel.com, kevin.tian@intel.com,
-        yi.l.liu@intel.com, yi.y.sun@intel.com,
-        Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: [PATCH v2 8/8] iommu/vt-d: Add set domain DOMAIN_ATTR_NESTING attr
-Date:   Thu, 28 Nov 2019 10:25:50 +0800
-Message-Id: <20191128022550.9832-9-baolu.lu@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191128022550.9832-1-baolu.lu@linux.intel.com>
-References: <20191128022550.9832-1-baolu.lu@linux.intel.com>
+        id S1727666AbfK1Cyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 21:54:36 -0500
+Received: from mail-pj1-f68.google.com ([209.85.216.68]:42220 "EHLO
+        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727192AbfK1Cyf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 21:54:35 -0500
+Received: by mail-pj1-f68.google.com with SMTP id y21so11174341pjn.9;
+        Wed, 27 Nov 2019 18:54:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=QVjDMSx5+CBlZfoasvUKpNpCEQRNUdLJKpLr0vW0iOg=;
+        b=BRH3uQm1T+yc8VQ4P+eIBX1WdUJFLuB3ohcUxgwuFqzGYKDReyi0lshQsuePqD7ZGM
+         09Wi7AhPzU9ZO8hfI62na4Plu6dO7+9B86PzDj1+3dCjEzZ3lo4uAgNTqKqMbaQ9Isvg
+         TfWZwv5zQtAbHjms3qTgkj6w/4pHIKen9v3+rxQJc9/NBzBK/gZ043UEk60sF9IDbhhH
+         Ih4CSwgX1m7oRIEjFE7c2aBQX3XgsWwvB/W7YLK0NQSBPH6wVvhy+zWKPW3P7lli1hDJ
+         QrUI0X/BPqN/JkMp+gDl34rPQsz/NEkPCoAQFyPJ3cvJmL/ILTz1WjW9qva6cRJh8mHq
+         bO+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QVjDMSx5+CBlZfoasvUKpNpCEQRNUdLJKpLr0vW0iOg=;
+        b=kX1MVTxQ15SaoZnIo3lAbZNE1SEMU6xFh28GcDP+pS903cbUYaItinKzcJphcU0Kvy
+         ObdqacJXWNpRDuJX/qgAjsBTMG1LvcvGc8DQaFgBrFy+hagrUFNd14NHQim/9JePBrQX
+         F8GasSppRlh4mGC4VMeBj5RB6M8tCOEXEmG3ck30cmBnJ6XL7VgQ6M2NA0zzVzIVdLl4
+         2KmVzVY/Sonhj50vNJQ1n+X6F7cGaCVhmdkpaRtin+iMHS0zfOF0GqYhId3tPzi+LEF4
+         fe5cJH52pCHXrOIx5nnT3bM46jnSnZIFjQ9RRZ045WeWMW6sXYHXP0EE9lqqc2S+umRv
+         n7Tw==
+X-Gm-Message-State: APjAAAUBmSyUpdO563BXMFsR1YmjOEW9B1CxqUzdR/dO/kwxbdHJ+ATA
+        gk/xeD3WluuxFoQoOyjpqiUGsUGv
+X-Google-Smtp-Source: APXvYqwM+rGj3t9fvCM8AlSg+hRLmzqTozOSfjXYhfAemzMrUo7KZkLxbiymcoSxUbgSSjErtrU+mw==
+X-Received: by 2002:a17:902:be16:: with SMTP id r22mr7508188pls.2.1574909674528;
+        Wed, 27 Nov 2019 18:54:34 -0800 (PST)
+Received: from [172.20.20.156] ([222.151.198.97])
+        by smtp.gmail.com with ESMTPSA id j23sm17761332pfe.95.2019.11.27.18.54.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Nov 2019 18:54:34 -0800 (PST)
+Subject: Re: [RFC net-next 15/18] virtio_net: implement XDP prog offload
+ functionality
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ <20191126100744.5083-16-prashantbhole.linux@gmail.com>
+ <20191127153253-mutt-send-email-mst@kernel.org>
+From:   Prashant Bhole <prashantbhole.linux@gmail.com>
+Message-ID: <73323055-3f8a-802d-87da-e8f61ef5cfb7@gmail.com>
+Date:   Thu, 28 Nov 2019 11:53:41 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20191127153253-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds the Intel VT-d specific callback of setting
-DOMAIN_ATTR_NESTING domain attribution. It is necessary
-to let the VT-d driver know that the domain represents
-a virutual machine which requires the IOMMU hardware to
-support nested translation mode. Return success if the
-IOMMU hardware suports nested mode, otherwise failure.
 
-Cc: Ashok Raj <ashok.raj@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
----
- drivers/iommu/intel-iommu.c | 56 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
 
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 68b2f98ecd65..ee717dcb9644 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -308,6 +308,12 @@ static int hw_pass_through = 1;
-  */
- #define DOMAIN_FLAG_LOSE_CHILDREN		BIT(1)
- 
-+/*
-+ * Domain represents a virtual machine which demands iommu nested
-+ * translation mode support.
-+ */
-+#define DOMAIN_FLAG_NESTING_MODE		BIT(2)
-+
- #define for_each_domain_iommu(idx, domain)			\
- 	for (idx = 0; idx < g_num_of_iommus; idx++)		\
- 		if (domain->iommu_refcnt[idx])
-@@ -5929,6 +5935,24 @@ static inline bool iommu_pasid_support(void)
- 	return ret;
- }
- 
-+static inline bool nested_mode_support(void)
-+{
-+	struct dmar_drhd_unit *drhd;
-+	struct intel_iommu *iommu;
-+	bool ret = true;
-+
-+	rcu_read_lock();
-+	for_each_active_iommu(iommu, drhd) {
-+		if (!sm_supported(iommu) || !ecap_nest(iommu->ecap)) {
-+			ret = false;
-+			break;
-+		}
-+	}
-+	rcu_read_unlock();
-+
-+	return ret;
-+}
-+
- static bool intel_iommu_capable(enum iommu_cap cap)
- {
- 	if (cap == IOMMU_CAP_CACHE_COHERENCY)
-@@ -6305,10 +6329,42 @@ static bool intel_iommu_is_attach_deferred(struct iommu_domain *domain,
- 	return dev->archdata.iommu == DEFER_DEVICE_DOMAIN_INFO;
- }
- 
-+static int
-+intel_iommu_domain_set_attr(struct iommu_domain *domain,
-+			    enum iommu_attr attr, void *data)
-+{
-+	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-+	unsigned long flags;
-+	int ret = 0;
-+
-+	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
-+		return -EINVAL;
-+
-+	switch (attr) {
-+	case DOMAIN_ATTR_NESTING:
-+		spin_lock_irqsave(&device_domain_lock, flags);
-+		if (nested_mode_support() &&
-+		    list_empty(&dmar_domain->devices)) {
-+			dmar_domain->flags |= DOMAIN_FLAG_NESTING_MODE;
-+			dmar_domain->ops = &second_lvl_pgtable_ops;
-+		} else {
-+			ret = -ENODEV;
-+		}
-+		spin_unlock_irqrestore(&device_domain_lock, flags);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
- const struct iommu_ops intel_iommu_ops = {
- 	.capable		= intel_iommu_capable,
- 	.domain_alloc		= intel_iommu_domain_alloc,
- 	.domain_free		= intel_iommu_domain_free,
-+	.domain_set_attr	= intel_iommu_domain_set_attr,
- 	.attach_dev		= intel_iommu_attach_device,
- 	.detach_dev		= intel_iommu_detach_device,
- 	.aux_attach_dev		= intel_iommu_aux_attach_device,
--- 
-2.17.1
+On 11/28/19 5:42 AM, Michael S. Tsirkin wrote:
+> On Tue, Nov 26, 2019 at 07:07:41PM +0900, Prashant Bhole wrote:
+>> From: Jason Wang <jasowang@redhat.com>
+>>
+>> This patch implements bpf_prog_offload_ops callbacks and adds handling
+>> for XDP_SETUP_PROG_HW. Handling of XDP_SETUP_PROG_HW involves setting
+>> up struct virtio_net_ctrl_ebpf_prog and appending program instructions
+>> to it. This control buffer is sent to Qemu with class
+>> VIRTIO_NET_CTRL_EBPF and command VIRTIO_NET_BPF_CMD_SET_OFFLOAD.
+>> The expected behavior from Qemu is that it should try to load the
+>> program in host os and report the status.
+> 
+> That's not great e.g. for migration: different hosts might have
+> a different idea about what's allowed.
+> Device capabilities should be preferably exported through
+> feature bits or config space such that it's easy to
+> intercept and limit these as needed.
 
+These things are mentioned in the TODO section of cover letter.
+Having offload feature enabled should be a migration blocker.
+A feature bit in virtio for offloading capability needs to be added.
+
+> 
+> Also, how are we going to handle e.g. endian-ness here?
+
+For now I feel we should block offloading in case of cross endian
+virtualization. Further to support cross endian-ness, the requests for 
+offloading a map or program should include metadata such as BTF info.
+Qemu needs to handle the conversion.
+
+> 
+>>
+>> It also adds restriction to have either driver or offloaded program
+>> at a time.
+> 
+> I'm not sure I understand what does the above say.
+> virtnet_xdp_offload_check?
+> Please add code comments so we remember what to do and when.
+> 
+>> This restriction can be removed later after proper testing.
+> 
+> What kind of testing is missing here?
+
+This restriction mentioned above is about having multiple programs
+attached to the same device. It can be possible to have a program
+attached in driver mode and other in offload mode, but in current code
+only one mode at a time is supported because I wasn't aware whether
+bpf tooling supports the case. I will add a comment or remove the
+restriction in the next revision.
+
+> 
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> Co-developed-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+>> Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+> 
+> Any UAPI changes need to be copied to virtio-dev@lists.oasis-open.org
+> (subscriber only) list please.
+
+Sure.
+
+Thanks.
