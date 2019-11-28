@@ -2,107 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B8F910C64F
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 11:02:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A8DF10C66E
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 11:11:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbfK1KCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 05:02:00 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58249 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726281AbfK1KB7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 05:01:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574935318;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/Ty42avADbFfsrksucy6eTvFgwCWCTZ2fGrRzoi90qU=;
-        b=LUR0fsNvaLihiEvg3CVjhYyP0fmIe8ZlcN0SbR/uEuSUDTUZkIRPMfd4+xBpTfY/QpxMRX
-        4pKbWU04Te7hg1sAP8HZo+S/RMr6qY8hXJQ78OsrO0zroJB6HlsDIBVx4meW1U5oJXvjQN
-        SXIg/k1SNiErBU8Tx2wyw35mUH3yGNI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-a2sGVNN_O46eQx4CcqBUVw-1; Thu, 28 Nov 2019 05:01:47 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74D1F1005510;
-        Thu, 28 Nov 2019 10:01:46 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 54D7210027B2;
-        Thu, 28 Nov 2019 10:01:37 +0000 (UTC)
-Subject: Re: [PATCH] vfio: call irq_bypass_unregister_producer() before
- freeing irq
-To:     Jiang Yi <giangyi@amazon.com>, kvm@vger.kernel.org
-Cc:     adulea@amazon.de, jschoenh@amazon.de, maz@kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com
-References: <20191127164910.15888-1-giangyi@amazon.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <26ed9041-417c-199c-cb75-383b2200e89a@redhat.com>
-Date:   Thu, 28 Nov 2019 11:01:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726296AbfK1KLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 05:11:23 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55353 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfK1KLX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 05:11:23 -0500
+Received: by mail-wm1-f67.google.com with SMTP id a131so5999154wme.5
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 02:11:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=sISXPTjlwJ7V4ITzTlJun09VzrXW1uLl32xxBS1VK28=;
+        b=klzHbCkoQlkg81BbUL+EwHZ6p0WS/SQgfNh6KC2POoVTgHs2znnPxgYJm0K5b2ECIX
+         hMpCOOixeQHlahZM1wGlahTd7uwQOxI15aS7DpKxKriCVt6j6Krp4fR5eNJ+6CJ1hqZj
+         3miAgkLmwqgjTWpsx+3/GKiitbN+RJhcpIJJA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=sISXPTjlwJ7V4ITzTlJun09VzrXW1uLl32xxBS1VK28=;
+        b=qzaCJPTGmAU1ARhYGf9QMAjSaowKLfMRwXhxeI4mwZcDSL0KLn55zNGYEY4WflILD2
+         dhyTtc6VKlTs1YChH3gt1KtbLsttZNO45VV1EWhplHI6EGUlbOyiYU5UAXhzQLizOfVi
+         W5AWe20CTlACvjRiriIWgDfnaUK56ZV9dGf2ST4fO7Y9PjQUTihWMgnMuXH1BBaX2SFM
+         INyHxW3GvgVZhmOT2AXu4xb13V/ZtA/oV4Z//kMHntqx1xfhagOtRG2GHkkMCQUREqoI
+         mKioz7NDnkRdGn2QBxRuqHt5O5SCI+NsNzbA+JNN0/i5YzEFBR7iXRrBdb/t/6G5OGs6
+         CwCw==
+X-Gm-Message-State: APjAAAXeebv9Zw+fc0KlHR52Ot+xbJmPSM5d9PmswJFjo3+tsYxkDfV7
+        YAZiRHo0va1e7ezzE8hg0l7axw==
+X-Google-Smtp-Source: APXvYqwnNrI49aZ2W2YOZm0w5C0k/FdmQqHJgDY8+tOWqD4ok/grJ1NwsYJD988O1lFJnK/fDsmZBg==
+X-Received: by 2002:a7b:cb02:: with SMTP id u2mr9058232wmj.142.1574935879478;
+        Thu, 28 Nov 2019 02:11:19 -0800 (PST)
+Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
+        by smtp.gmail.com with ESMTPSA id s8sm22418162wrt.57.2019.11.28.02.11.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2019 02:11:18 -0800 (PST)
+Date:   Thu, 28 Nov 2019 11:11:16 +0100
+From:   Daniel Vetter <daniel@ffwll.ch>
+To:     Jani Nikula <jani.nikula@intel.com>
+Cc:     Daniel Vetter <daniel@ffwll.ch>, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 13/13] samples: vfio-mdev: constify fb ops
+Message-ID: <20191128101116.GQ406127@phenom.ffwll.local>
+References: <cover.1574871797.git.jani.nikula@intel.com>
+ <fc8342eef9fcd2f55c86fcd78f7df52f7c76fa87.1574871797.git.jani.nikula@intel.com>
+ <20191127182940.GM406127@phenom.ffwll.local>
+ <87d0dcnynk.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191127164910.15888-1-giangyi@amazon.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: a2sGVNN_O46eQx4CcqBUVw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87d0dcnynk.fsf@intel.com>
+X-Operating-System: Linux phenom 5.3.0-2-amd64 
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-On 11/27/19 5:49 PM, Jiang Yi wrote:
-> Since irq_bypass_register_producer() is called after request_irq(), we
-> should do tear-down in reverse order: irq_bypass_unregister_producer()
-> then free_irq().
+On Thu, Nov 28, 2019 at 11:22:23AM +0200, Jani Nikula wrote:
+> On Wed, 27 Nov 2019, Daniel Vetter <daniel@ffwll.ch> wrote:
+> > On Wed, Nov 27, 2019 at 06:32:09PM +0200, Jani Nikula wrote:
+> >> Now that the fbops member of struct fb_info is const, we can star making
+> >> the ops const as well.
+> >> 
+> >> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Cc: kvm@vger.kernel.org
+> >> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+> >
+> > You've missed at least drivers/staging/fbtft in your search. I guess you
+> > need to do a full make allyesconfig on x86/arm and arm64 (the latter
+> > because some stupid drivers only compile there, not on arm, don't ask).
+> > Still misses a pile of mips/ppc only stuff and maybe the sparcs and
+> > alphas, but should be good enough.
 > 
-> Signed-off-by: Jiang Yi <giangyi@amazon.com>
-> ---
->  drivers/vfio/pci/vfio_pci_intrs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> fbtft dynamically allocates the fbops, for whatever reason. There were
+> others like that too. Some of the drivers modify the fbops runtime to
+> choose different hooks for different configurations. Can't change them
+> all anyway.
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 3fa3f728fb39..2056f3f85f59 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -289,18 +289,18 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
->  	int irq, ret;
->  
->  	if (vector < 0 || vector >= vdev->num_ctx)
->  		return -EINVAL;
->  
->  	irq = pci_irq_vector(pdev, vector);
->  
->  	if (vdev->ctx[vector].trigger) {
-> -		free_irq(irq, vdev->ctx[vector].trigger);
->  		irq_bypass_unregister_producer(&vdev->ctx[vector].producer);
-> +		free_irq(irq, vdev->ctx[vector].trigger);
-Looks the right way too
+> Facilitating making the fbops const is one thing (patches 1-8), but I'm
+> not really sure I want to sign up for exhaustively moving fbops to
+> rodata on anything beyond drivers/gpu/drm. It's not like I leave stuff
+> broken. Besides I am trying to cover all the low hanging fruit where I
+> can simply add the "const" and be done with it.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Uh indeed, I didn't check the output of my grep with sufficient finesses.
+r-b as-is on that pile.
 
-May be worth checking it does not alter the x86 posted interrupt setup
-though. update_pi_irte() gets called. I was concerned about the fact the
-interrupts may be enabled when doing the unregistration (TBC). The
-irq_bypass framework offers producer start/stop callbacks that would
-allow to handle this but nobody use them atm.
+Since fbdev is officially in drm-misc you can just merge it all once the
+prep is done - feels silly not to when you've done the work already.
+-Daniel
 
-Thanks
-
-Eric
->  		kfree(vdev->ctx[vector].name);
->  		eventfd_ctx_put(vdev->ctx[vector].trigger);
->  		vdev->ctx[vector].trigger = NULL;
->  	}
->  
->  	if (fd < 0)
->  		return 0;
->  
 > 
+> BR,
+> Jani.
+> 
+> >
+> > With that done, on the remaining patches:
+> >
+> > Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> >
+> >> ---
+> >>  samples/vfio-mdev/mdpy-fb.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >> 
+> >> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+> >> index 2719bb259653..21dbf63d6e41 100644
+> >> --- a/samples/vfio-mdev/mdpy-fb.c
+> >> +++ b/samples/vfio-mdev/mdpy-fb.c
+> >> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
+> >>  		iounmap(info->screen_base);
+> >>  }
+> >>  
+> >> -static struct fb_ops mdpy_fb_ops = {
+> >> +static const struct fb_ops mdpy_fb_ops = {
+> >>  	.owner		= THIS_MODULE,
+> >>  	.fb_destroy	= mdpy_fb_destroy,
+> >>  	.fb_setcolreg	= mdpy_fb_setcolreg,
+> >> -- 
+> >> 2.20.1
+> >> 
+> >> _______________________________________________
+> >> dri-devel mailing list
+> >> dri-devel@lists.freedesktop.org
+> >> https://lists.freedesktop.org/mailman/listinfo/dri-devel
+> 
+> -- 
+> Jani Nikula, Intel Open Source Graphics Center
 
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
