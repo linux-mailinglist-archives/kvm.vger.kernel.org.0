@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E4DE10C259
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 03:30:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A34D10C25B
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 03:30:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728257AbfK1CaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 21:30:07 -0500
+        id S1728350AbfK1CaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 21:30:11 -0500
 Received: from mga18.intel.com ([134.134.136.126]:17935 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728313AbfK1CaH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 21:30:07 -0500
+        id S1728313AbfK1CaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 21:30:10 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 18:30:06 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 18:30:09 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,251,1571727600"; 
-   d="scan'208";a="221176172"
+   d="scan'208";a="221176189"
 Received: from allen-box.sh.intel.com ([10.239.159.136])
-  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 18:30:04 -0800
+  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 18:30:06 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Joerg Roedel <joro@8bytes.org>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -29,10 +29,11 @@ Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
         yi.l.liu@intel.com, yi.y.sun@intel.com,
         Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v2 4/8] iommu/vt-d: Apply per domain second level page table ops
-Date:   Thu, 28 Nov 2019 10:25:46 +0800
-Message-Id: <20191128022550.9832-5-baolu.lu@linux.intel.com>
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: [PATCH v2 5/8] iommu/vt-d: Add first level page table interfaces
+Date:   Thu, 28 Nov 2019 10:25:47 +0800
+Message-Id: <20191128022550.9832-6-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191128022550.9832-1-baolu.lu@linux.intel.com>
 References: <20191128022550.9832-1-baolu.lu@linux.intel.com>
@@ -41,215 +42,594 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This applies per domain page table ops to various domain
-mapping and unmapping interfaces.
+This adds functions to manipulate first level page tables
+which could be used by a scalale mode capable IOMMU unit.
 
 Cc: Ashok Raj <ashok.raj@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Liu Yi L <yi.l.liu@intel.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/iommu/intel-iommu.c | 118 ++++++++++++++++--------------------
- 1 file changed, 52 insertions(+), 66 deletions(-)
+ drivers/iommu/Makefile             |   2 +-
+ drivers/iommu/intel-iommu.c        |  33 +++
+ drivers/iommu/intel-pgtable.c      | 376 +++++++++++++++++++++++++++++
+ include/linux/intel-iommu.h        |  33 ++-
+ include/trace/events/intel_iommu.h |  60 +++++
+ 5 files changed, 502 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/iommu/intel-pgtable.c
 
+diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
+index 35d17094fe3b..aa04f4c3ae26 100644
+--- a/drivers/iommu/Makefile
++++ b/drivers/iommu/Makefile
+@@ -18,7 +18,7 @@ obj-$(CONFIG_ARM_SMMU) += arm-smmu.o arm-smmu-impl.o
+ obj-$(CONFIG_ARM_SMMU_V3) += arm-smmu-v3.o
+ obj-$(CONFIG_DMAR_TABLE) += dmar.o
+ obj-$(CONFIG_INTEL_IOMMU) += intel-iommu.o intel-pasid.o
+-obj-$(CONFIG_INTEL_IOMMU) += intel-trace.o
++obj-$(CONFIG_INTEL_IOMMU) += intel-trace.o intel-pgtable.o
+ obj-$(CONFIG_INTEL_IOMMU_DEBUGFS) += intel-iommu-debugfs.o
+ obj-$(CONFIG_INTEL_IOMMU_SVM) += intel-svm.o
+ obj-$(CONFIG_IPMMU_VMSA) += ipmmu-vmsa.o
 diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 96ead4e3395a..66f76f6df2c2 100644
+index 66f76f6df2c2..a314892ee72b 100644
 --- a/drivers/iommu/intel-iommu.c
 +++ b/drivers/iommu/intel-iommu.c
-@@ -80,6 +80,7 @@
- #define IOVA_START_PFN		(1)
- 
- #define IOVA_PFN(addr)		((addr) >> PAGE_SHIFT)
-+#define PFN_ADDR(pfn)		((pfn) << PAGE_SHIFT)
- 
- /* page table handling */
- #define LEVEL_STRIDE		(9)
-@@ -1153,8 +1154,8 @@ static struct page *domain_unmap(struct dmar_domain *domain,
- 	BUG_ON(start_pfn > last_pfn);
- 
- 	/* we don't need lock here; nobody else touches the iova range */
--	freelist = dma_pte_clear_level(domain, agaw_to_level(domain->agaw),
--				       domain->pgd, 0, start_pfn, last_pfn, NULL);
-+	freelist = domain->ops->unmap_range(domain, PFN_ADDR(start_pfn),
-+					    PFN_ADDR(last_pfn - start_pfn + 1));
- 
- 	/* free pgd */
- 	if (start_pfn == 0 && last_pfn == DOMAIN_MAX_PFN(domain->gaw)) {
-@@ -1484,39 +1485,6 @@ static void iommu_flush_dev_iotlb(struct dmar_domain *domain,
- 	spin_unlock_irqrestore(&device_domain_lock, flags);
+@@ -1670,6 +1670,37 @@ static void free_dmar_iommu(struct intel_iommu *iommu)
+ #endif
  }
  
--static void iommu_flush_iotlb_psi(struct intel_iommu *iommu,
--				  struct dmar_domain *domain,
--				  unsigned long pfn, unsigned int pages,
--				  int ih, int map)
--{
--	unsigned int mask = ilog2(__roundup_pow_of_two(pages));
--	uint64_t addr = (uint64_t)pfn << VTD_PAGE_SHIFT;
--	u16 did = domain->iommu_did[iommu->seq_id];
--
--	BUG_ON(pages == 0);
--
--	if (ih)
--		ih = 1 << 6;
--	/*
--	 * Fallback to domain selective flush if no PSI support or the size is
--	 * too big.
--	 * PSI requires page size to be 2 ^ x, and the base address is naturally
--	 * aligned to the size
--	 */
--	if (!cap_pgsel_inv(iommu->cap) || mask > cap_max_amask_val(iommu->cap))
--		iommu->flush.iotlb_inv(iommu, did, 0, 0, DMA_TLB_DSI_FLUSH);
--	else
--		iommu->flush.iotlb_inv(iommu, did, addr | ih,
--				       mask, DMA_TLB_PSI_FLUSH);
--
--	/*
--	 * In caching mode, changes of pages from non-present to present require
--	 * flush. However, device IOTLB doesn't need to be flushed in this case.
--	 */
--	if (!cap_caching_mode(iommu->cap) || !map)
--		iommu_flush_dev_iotlb(domain, addr, mask);
--}
--
- /* Notification for newly created mappings */
- static inline void __mapping_notify_one(struct intel_iommu *iommu,
- 					struct dmar_domain *domain,
-@@ -1524,7 +1492,8 @@ static inline void __mapping_notify_one(struct intel_iommu *iommu,
- {
- 	/* It's a non-present to present mapping. Only flush if caching mode */
- 	if (cap_caching_mode(iommu->cap))
--		iommu_flush_iotlb_psi(iommu, domain, pfn, pages, 0, 1);
-+		domain->ops->flush_tlb_range(domain, iommu, PFN_ADDR(pfn),
-+					     PFN_ADDR(pages), 0);
- 	else
- 		iommu_flush_write_buffer(iommu);
- }
-@@ -1536,16 +1505,8 @@ static void iommu_flush_iova(struct iova_domain *iovad)
- 
- 	domain = container_of(iovad, struct dmar_domain, iovad);
- 
--	for_each_domain_iommu(idx, domain) {
--		struct intel_iommu *iommu = g_iommus[idx];
--		u16 did = domain->iommu_did[iommu->seq_id];
--
--		iommu->flush.iotlb_inv(iommu, did, 0, 0, DMA_TLB_DSI_FLUSH);
--
--		if (!cap_caching_mode(iommu->cap))
--			iommu_flush_dev_iotlb(get_iommu_domain(iommu, did),
--					      0, MAX_AGAW_PFN_WIDTH);
--	}
-+	for_each_domain_iommu(idx, domain)
-+		domain->ops->flush_tlb_range(domain, g_iommus[idx], 0, 0, 0);
- }
- 
- static void iommu_disable_protect_mem_regions(struct intel_iommu *iommu)
-@@ -2419,13 +2380,43 @@ static int domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 			  struct scatterlist *sg, unsigned long phys_pfn,
- 			  unsigned long nr_pages, int prot)
- {
--	int iommu_id, ret;
- 	struct intel_iommu *iommu;
-+	int iommu_id, ret;
- 
- 	/* Do the real mapping first */
--	ret = __domain_mapping(domain, iov_pfn, sg, phys_pfn, nr_pages, prot);
--	if (ret)
--		return ret;
-+	if (!sg) {
-+		ret = domain->ops->map_range(domain, PFN_ADDR(iov_pfn),
-+					     PFN_ADDR(phys_pfn),
-+					     PFN_ADDR(nr_pages),
-+					     prot);
-+		if (ret)
-+			return ret;
-+	} else {
-+		unsigned long pgoff, pgs;
-+		unsigned long start = iov_pfn, total = nr_pages;
++/* First level 5-level paging support */
++static bool first_lvl_5lp_support(void)
++{
++	struct dmar_drhd_unit *drhd;
++	struct intel_iommu *iommu;
++	static int first_level_5lp_supported = -1;
 +
-+		while (total && sg) {
-+			pgoff = sg->offset & ~PAGE_MASK;
-+			pgs = aligned_nrpages(sg->offset, sg->length);
++	if (likely(first_level_5lp_supported != -1))
++		return first_level_5lp_supported;
 +
-+			ret = domain->ops->map_range(domain, PFN_ADDR(start),
-+						     sg_phys(sg) - pgoff,
-+						     PFN_ADDR(pgs), prot);
-+			if (ret) {
-+				domain->ops->unmap_range(domain,
-+							 PFN_ADDR(iov_pfn),
-+							 PFN_ADDR(nr_pages));
-+				return ret;
-+			}
++	first_level_5lp_supported = 1;
++#ifdef CONFIG_X86
++	/* Match IOMMU first level and CPU paging mode */
++	if (!cpu_feature_enabled(X86_FEATURE_LA57)) {
++		first_level_5lp_supported = 0;
++		return first_level_5lp_supported;
++	}
++#endif /* #ifdef CONFIG_X86 */
 +
-+			sg->dma_address = ((dma_addr_t)start << VTD_PAGE_SHIFT) + pgoff;
-+			sg->dma_length = sg->length;
-+
-+			total -= pgs;
-+			start += pgs;
-+			sg = sg_next(sg);
++	rcu_read_lock();
++	for_each_active_iommu(iommu, drhd) {
++		if (!cap_5lp_support(iommu->cap)) {
++			first_level_5lp_supported = 0;
++			break;
 +		}
 +	}
- 
- 	for_each_domain_iommu(iommu_id, domain) {
- 		iommu = g_iommus[iommu_id];
-@@ -3837,8 +3828,8 @@ static void intel_unmap(struct device *dev, dma_addr_t dev_addr, size_t size)
- 	freelist = domain_unmap(domain, start_pfn, last_pfn);
- 	if (intel_iommu_strict || (pdev && pdev->untrusted) ||
- 			!has_iova_flush_queue(&domain->iovad)) {
--		iommu_flush_iotlb_psi(iommu, domain, start_pfn,
--				      nrpages, !freelist, 0);
-+		domain->ops->flush_tlb_range(domain, iommu, dev_addr,
-+					     size, !freelist);
- 		/* free iova */
- 		free_iova_fast(&domain->iovad, iova_pfn, dma_to_mm_pfn(nrpages));
- 		dma_free_pagelist(freelist);
-@@ -4927,9 +4918,9 @@ static int intel_iommu_memory_notifier(struct notifier_block *nb,
- 
- 			rcu_read_lock();
- 			for_each_active_iommu(iommu, drhd)
--				iommu_flush_iotlb_psi(iommu, si_domain,
--					iova->pfn_lo, iova_size(iova),
--					!freelist, 0);
-+				si_domain->ops->flush_tlb_range(si_domain,
-+					iommu, PFN_ADDR(iova->pfn_lo),
-+					PFN_ADDR(iova_size(iova)), !freelist);
- 			rcu_read_unlock();
- 			dma_free_pagelist(freelist);
- 
-@@ -5732,8 +5723,9 @@ static size_t intel_iommu_unmap(struct iommu_domain *domain,
- 	npages = last_pfn - start_pfn + 1;
- 
- 	for_each_domain_iommu(iommu_id, dmar_domain)
--		iommu_flush_iotlb_psi(g_iommus[iommu_id], dmar_domain,
--				      start_pfn, npages, !freelist, 0);
-+		dmar_domain->ops->flush_tlb_range(dmar_domain,
-+						  g_iommus[iommu_id],
-+						  iova, size, !freelist);
- 
- 	dma_free_pagelist(freelist);
- 
-@@ -5747,18 +5739,12 @@ static phys_addr_t intel_iommu_iova_to_phys(struct iommu_domain *domain,
- 					    dma_addr_t iova)
++	rcu_read_unlock();
++
++	return first_level_5lp_supported;
++}
++
+ static struct dmar_domain *alloc_domain(int flags)
  {
- 	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
--	struct dma_pte *pte;
--	int level = 0;
--	u64 phys = 0;
+ 	struct dmar_domain *domain;
+@@ -1683,6 +1714,8 @@ static struct dmar_domain *alloc_domain(int flags)
+ 	domain->flags = flags;
+ 	domain->has_iotlb_device = false;
+ 	domain->ops = &second_lvl_pgtable_ops;
++	domain->first_lvl_5lp = first_lvl_5lp_support();
++	spin_lock_init(&domain->page_table_lock);
+ 	INIT_LIST_HEAD(&domain->devices);
  
--	if (dmar_domain->flags & DOMAIN_FLAG_LOSE_CHILDREN)
-+	if ((dmar_domain->flags & DOMAIN_FLAG_LOSE_CHILDREN) ||
-+	    !dmar_domain->ops->iova_to_phys)
- 		return 0;
+ 	return domain;
+diff --git a/drivers/iommu/intel-pgtable.c b/drivers/iommu/intel-pgtable.c
+new file mode 100644
+index 000000000000..4a26d08a7570
+--- /dev/null
++++ b/drivers/iommu/intel-pgtable.c
+@@ -0,0 +1,376 @@
++// SPDX-License-Identifier: GPL-2.0
++/**
++ * intel-pgtable.c - Intel IOMMU page table manipulation library
++ *
++ * Copyright (C) 2019 Intel Corporation
++ *
++ * Author: Lu Baolu <baolu.lu@linux.intel.com>
++ */
++
++#define pr_fmt(fmt)     "DMAR: " fmt
++#include <linux/vmalloc.h>
++#include <linux/mm.h>
++#include <linux/sched.h>
++#include <linux/io.h>
++#include <linux/export.h>
++#include <linux/intel-iommu.h>
++#include <asm/cacheflush.h>
++#include <asm/pgtable.h>
++#include <asm/pgalloc.h>
++#include <trace/events/intel_iommu.h>
++
++/*
++ * first_lvl_map: Map a range of IO virtual address to physical addresses.
++ */
++#ifdef CONFIG_X86
++#define pgtable_populate(domain, nm)					\
++do {									\
++	void *__new = alloc_pgtable_page(domain->nid);			\
++	if (!__new)							\
++		return -ENOMEM;						\
++	smp_wmb();							\
++	spin_lock(&(domain)->page_table_lock);				\
++	if (nm ## _present(*nm)) {					\
++		free_pgtable_page(__new);				\
++	} else {							\
++		set_##nm(nm, __##nm(__pa(__new) | _PAGE_TABLE));	\
++		domain_flush_cache(domain, nm, sizeof(nm##_t));		\
++	}								\
++	spin_unlock(&(domain)->page_table_lock);			\
++} while (0)
++
++static int
++first_lvl_map_pte_range(struct dmar_domain *domain, pmd_t *pmd,
++			unsigned long addr, unsigned long end,
++			phys_addr_t phys_addr, pgprot_t prot)
++{
++	pte_t *pte, *first_pte;
++	u64 pfn;
++
++	pfn = phys_addr >> PAGE_SHIFT;
++	if (unlikely(pmd_none(*pmd)))
++		pgtable_populate(domain, pmd);
++
++	first_pte = pte = pte_offset_kernel(pmd, addr);
++
++	do {
++		if (pte_present(*pte))
++			pr_crit("ERROR: PTE for vPFN 0x%llx already set to 0x%llx\n",
++				pfn, (unsigned long long)pte_val(*pte));
++		set_pte(pte, pfn_pte(pfn, prot));
++		pfn++;
++	} while (pte++, addr += PAGE_SIZE, addr != end);
++
++	domain_flush_cache(domain, first_pte, (void *)pte - (void *)first_pte);
++
++	return 0;
++}
++
++static int
++first_lvl_map_pmd_range(struct dmar_domain *domain, pud_t *pud,
++			unsigned long addr, unsigned long end,
++			phys_addr_t phys_addr, pgprot_t prot)
++{
++	unsigned long next;
++	pmd_t *pmd;
++
++	if (unlikely(pud_none(*pud)))
++		pgtable_populate(domain, pud);
++	pmd = pmd_offset(pud, addr);
++
++	phys_addr -= addr;
++	do {
++		next = pmd_addr_end(addr, end);
++		if (first_lvl_map_pte_range(domain, pmd, addr, next,
++					    phys_addr + addr, prot))
++			return -ENOMEM;
++	} while (pmd++, addr = next, addr != end);
++
++	return 0;
++}
++
++static int
++first_lvl_map_pud_range(struct dmar_domain *domain, p4d_t *p4d,
++			unsigned long addr, unsigned long end,
++			phys_addr_t phys_addr, pgprot_t prot)
++{
++	unsigned long next;
++	pud_t *pud;
++
++	if (unlikely(p4d_none(*p4d)))
++		pgtable_populate(domain, p4d);
++
++	pud = pud_offset(p4d, addr);
++
++	phys_addr -= addr;
++	do {
++		next = pud_addr_end(addr, end);
++		if (first_lvl_map_pmd_range(domain, pud, addr, next,
++					    phys_addr + addr, prot))
++			return -ENOMEM;
++	} while (pud++, addr = next, addr != end);
++
++	return 0;
++}
++
++static int
++first_lvl_map_p4d_range(struct dmar_domain *domain, pgd_t *pgd,
++			unsigned long addr, unsigned long end,
++			phys_addr_t phys_addr, pgprot_t prot)
++{
++	unsigned long next;
++	p4d_t *p4d;
++
++	if (domain->first_lvl_5lp && unlikely(pgd_none(*pgd)))
++		pgtable_populate(domain, pgd);
++
++	p4d = p4d_offset(pgd, addr);
++
++	phys_addr -= addr;
++	do {
++		next = p4d_addr_end(addr, end);
++		if (first_lvl_map_pud_range(domain, p4d, addr, next,
++					    phys_addr + addr, prot))
++			return -ENOMEM;
++	} while (p4d++, addr = next, addr != end);
++
++	return 0;
++}
++
++int first_lvl_map_range(struct dmar_domain *domain, unsigned long addr,
++			unsigned long end, phys_addr_t phys_addr, int dma_prot)
++{
++	unsigned long next;
++	pgprot_t prot;
++	pgd_t *pgd;
++
++	trace_domain_mm_map(domain, addr, end, phys_addr);
++
++	/*
++	 * There is no PAGE_KERNEL_WO for a pte entry, so let's use RW
++	 * for a pte that requires write operation.
++	 */
++	prot = dma_prot & DMA_PTE_WRITE ? PAGE_KERNEL : PAGE_KERNEL_RO;
++	if (WARN_ON(addr >= end))
++		return -EINVAL;
++
++	phys_addr -= addr;
++	pgd = pgd_offset_pgd(domain->pgd, addr);
++	do {
++		next = pgd_addr_end(addr, end);
++		if (first_lvl_map_p4d_range(domain, pgd, addr, next,
++					    phys_addr + addr, prot))
++			return -ENOMEM;
++	} while (pgd++, addr = next, addr != end);
++
++	return 0;
++}
++
++/*
++ * first_lvl_unmap: Unmap an existing mapping between a range of IO virtual
++ *		    address and physical addresses.
++ */
++static struct page *
++first_lvl_unmap_pte_range(struct dmar_domain *domain, pmd_t *pmd,
++			  unsigned long addr, unsigned long end,
++			  struct page *freelist)
++{
++	unsigned long start;
++	pte_t *pte, *first_pte;
++
++	start = addr;
++	pte = pte_offset_kernel(pmd, addr);
++	first_pte = pte;
++	do {
++		set_pte(pte, __pte(0));
++	} while (pte++, addr += PAGE_SIZE, addr != end);
++
++	domain_flush_cache(domain, first_pte, (void *)pte - (void *)first_pte);
++
++	/*
++	 * Reclaim pmd page, lock is unnecessary here if it owns
++	 * the whole range.
++	 */
++	if (start != end && IS_ALIGNED(start | end, PMD_SIZE)) {
++		struct page *pte_page;
++
++		pte_page = pmd_page(*pmd);
++		pte_page->freelist = freelist;
++		freelist = pte_page;
++		pmd_clear(pmd);
++		domain_flush_cache(domain, pmd, sizeof(pmd_t));
++	}
++
++	return freelist;
++}
++
++static struct page *
++first_lvl_unmap_pmd_range(struct dmar_domain *domain, pud_t *pud,
++			  unsigned long addr, unsigned long end,
++			  struct page *freelist)
++{
++	pmd_t *pmd;
++	unsigned long start, next;
++
++	start = addr;
++	pmd = pmd_offset(pud, addr);
++	do {
++		next = pmd_addr_end(addr, end);
++		if (pmd_none_or_clear_bad(pmd))
++			continue;
++		freelist = first_lvl_unmap_pte_range(domain, pmd,
++						     addr, next, freelist);
++	} while (pmd++, addr = next, addr != end);
++
++	/*
++	 * Reclaim pud page, lock is unnecessary here if it owns
++	 * the whole range.
++	 */
++	if (start != end && IS_ALIGNED(start | end, PUD_SIZE)) {
++		struct page *pmd_page;
++
++		pmd_page = pud_page(*pud);
++		pmd_page->freelist = freelist;
++		freelist = pmd_page;
++		pud_clear(pud);
++		domain_flush_cache(domain, pud, sizeof(pud_t));
++	}
++
++	return freelist;
++}
++
++static struct page *
++first_lvl_unmap_pud_range(struct dmar_domain *domain, p4d_t *p4d,
++			  unsigned long addr, unsigned long end,
++			  struct page *freelist)
++{
++	pud_t *pud;
++	unsigned long start, next;
++
++	start = addr;
++	pud = pud_offset(p4d, addr);
++	do {
++		next = pud_addr_end(addr, end);
++		if (pud_none_or_clear_bad(pud))
++			continue;
++		freelist = first_lvl_unmap_pmd_range(domain, pud,
++						     addr, next, freelist);
++	} while (pud++, addr = next, addr != end);
++
++	/*
++	 * Reclaim p4d page, lock is unnecessary here if it owns
++	 * the whole range.
++	 */
++	if (start != end && IS_ALIGNED(start | end, P4D_SIZE)) {
++		struct page *pud_page;
++
++		pud_page = p4d_page(*p4d);
++		pud_page->freelist = freelist;
++		freelist = pud_page;
++		p4d_clear(p4d);
++		domain_flush_cache(domain, p4d, sizeof(p4d_t));
++	}
++
++	return freelist;
++}
++
++static struct page *
++first_lvl_unmap_p4d_range(struct dmar_domain *domain, pgd_t *pgd,
++			  unsigned long addr, unsigned long end,
++			  struct page *freelist)
++{
++	p4d_t *p4d;
++	unsigned long start, next;
++
++	start = addr;
++	p4d = p4d_offset(pgd, addr);
++	do {
++		next = p4d_addr_end(addr, end);
++		if (p4d_none_or_clear_bad(p4d))
++			continue;
++		freelist = first_lvl_unmap_pud_range(domain, p4d,
++						     addr, next, freelist);
++	} while (p4d++, addr = next, addr != end);
++
++	/*
++	 * Reclaim pgd page, lock is unnecessary here if it owns
++	 * the whole range.
++	 */
++	if (domain->first_lvl_5lp && start != end &&
++	    IS_ALIGNED(start | end, PGDIR_SIZE)) {
++		struct page *p4d_page;
++
++		p4d_page = pgd_page(*pgd);
++		p4d_page->freelist = freelist;
++		freelist = p4d_page;
++		pgd_clear(pgd);
++		domain_flush_cache(domain, pgd, sizeof(pgd_t));
++	}
++
++	return freelist;
++}
++
++struct page *first_lvl_unmap_range(struct dmar_domain *domain,
++				   unsigned long addr, unsigned long end)
++{
++	pgd_t *pgd;
++	unsigned long next;
++	struct page *freelist = NULL;
++
++	trace_domain_mm_unmap(domain, addr, end);
++
++	if (WARN_ON(addr >= end))
++		return NULL;
++
++	pgd = pgd_offset_pgd(domain->pgd, addr);
++	do {
++		next = pgd_addr_end(addr, end);
++		if (pgd_none_or_clear_bad(pgd))
++			continue;
++		freelist = first_lvl_unmap_p4d_range(domain, pgd,
++						     addr, next, freelist);
++	} while (pgd++, addr = next, addr != end);
++
++	return freelist;
++}
++
++static pte_t *iova_to_pte(struct dmar_domain *domain, unsigned long iova)
++{
++	pgd_t *pgd;
++	p4d_t *p4d;
++	pud_t *pud;
++	pmd_t *pmd;
++
++	if (WARN_ON_ONCE(!IS_ALIGNED(iova, PAGE_SIZE)))
++		return NULL;
++
++	pgd = pgd_offset_pgd(domain->pgd, iova);
++	if (pgd_none_or_clear_bad(pgd))
++		return NULL;
++
++	p4d = p4d_offset(pgd, iova);
++	if (p4d_none_or_clear_bad(p4d))
++		return NULL;
++
++	pud = pud_offset(p4d, iova);
++	if (pud_none_or_clear_bad(pud))
++		return NULL;
++
++	pmd = pmd_offset(pud, iova);
++	if (pmd_none_or_clear_bad(pmd))
++		return NULL;
++
++	return pte_offset_kernel(pmd, iova);
++}
++
++phys_addr_t
++first_lvl_iova_to_phys(struct dmar_domain *domain, unsigned long iova)
++{
++	pte_t *pte = iova_to_pte(domain, PAGE_ALIGN(iova));
++
++	if (!pte || !pte_present(*pte))
++		return 0;
++
++	return (pte_val(*pte) & PTE_PFN_MASK) | (iova & ~PAGE_MASK);
++}
++#endif /* CONFIG_X86 */
+diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+index 9b259756057b..9273e3f59078 100644
+--- a/include/linux/intel-iommu.h
++++ b/include/linux/intel-iommu.h
+@@ -540,9 +540,11 @@ struct dmar_domain {
+ 	struct iova_domain iovad;	/* iova's that belong to this domain */
  
--	pte = pfn_to_dma_pte(dmar_domain, iova >> VTD_PAGE_SHIFT, &level);
--	if (pte)
--		phys = dma_pte_addr(pte);
--
--	return phys;
-+	return dmar_domain->ops->iova_to_phys(dmar_domain, iova);
- }
+ 	/* page table used by this domain */
+-	struct dma_pte	*pgd;		/* virtual address */
++	void		*pgd;		/* virtual address */
++	spinlock_t page_table_lock;	/* Protects page tables */
+ 	int		gaw;		/* max guest address width */
+ 	const struct pgtable_ops *ops;	/* page table ops */
++	bool		first_lvl_5lp;	/* First level 5-level paging support */
  
- static inline bool scalable_mode_support(void)
+ 	/* adjusted guest address width, 0 is level 2 30-bit */
+ 	int		agaw;
+@@ -708,6 +710,35 @@ int for_each_device_domain(int (*fn)(struct device_domain_info *info,
+ void iommu_flush_write_buffer(struct intel_iommu *iommu);
+ int intel_iommu_enable_pasid(struct intel_iommu *iommu, struct device *dev);
+ 
++#ifdef CONFIG_X86
++int first_lvl_map_range(struct dmar_domain *domain, unsigned long addr,
++			unsigned long end, phys_addr_t phys_addr, int dma_prot);
++struct page *first_lvl_unmap_range(struct dmar_domain *domain,
++				   unsigned long addr, unsigned long end);
++phys_addr_t first_lvl_iova_to_phys(struct dmar_domain *domain,
++				   unsigned long iova);
++#else
++static inline int
++first_lvl_map_range(struct dmar_domain *domain, unsigned long addr,
++		    unsigned long end, phys_addr_t phys_addr, int dma_prot)
++{
++	return -ENODEV;
++}
++
++static inline struct page *
++first_lvl_unmap_range(struct dmar_domain *domain,
++		      unsigned long addr, unsigned long end)
++{
++	return NULL;
++}
++
++static inline phys_addr_t
++first_lvl_iova_to_phys(struct dmar_domain *domain, unsigned long iova)
++{
++	return 0;
++}
++#endif /* CONFIG_X86 */
++
+ #ifdef CONFIG_INTEL_IOMMU_SVM
+ extern void intel_svm_check(struct intel_iommu *iommu);
+ extern int intel_svm_enable_prq(struct intel_iommu *iommu);
+diff --git a/include/trace/events/intel_iommu.h b/include/trace/events/intel_iommu.h
+index 54e61d456cdf..e8c95290fd13 100644
+--- a/include/trace/events/intel_iommu.h
++++ b/include/trace/events/intel_iommu.h
+@@ -99,6 +99,66 @@ DEFINE_EVENT(dma_unmap, bounce_unmap_single,
+ 	TP_ARGS(dev, dev_addr, size)
+ );
+ 
++DECLARE_EVENT_CLASS(domain_map,
++	TP_PROTO(struct dmar_domain *domain, unsigned long addr,
++		 unsigned long end, phys_addr_t phys_addr),
++
++	TP_ARGS(domain, addr, end, phys_addr),
++
++	TP_STRUCT__entry(
++		__field(struct dmar_domain *, domain)
++		__field(unsigned long, addr)
++		__field(unsigned long, end)
++		__field(phys_addr_t, phys_addr)
++	),
++
++	TP_fast_assign(
++		__entry->domain = domain;
++		__entry->addr = addr;
++		__entry->end = end;
++		__entry->phys_addr = phys_addr;
++	),
++
++	TP_printk("domain=%p addr=0x%lx end=0x%lx phys_addr=0x%llx",
++		  __entry->domain, __entry->addr, __entry->end,
++		  (unsigned long long)__entry->phys_addr)
++);
++
++DEFINE_EVENT(domain_map, domain_mm_map,
++	TP_PROTO(struct dmar_domain *domain, unsigned long addr,
++		 unsigned long end, phys_addr_t phys_addr),
++
++	TP_ARGS(domain, addr, end, phys_addr)
++);
++
++DECLARE_EVENT_CLASS(domain_unmap,
++	TP_PROTO(struct dmar_domain *domain, unsigned long addr,
++		 unsigned long end),
++
++	TP_ARGS(domain, addr, end),
++
++	TP_STRUCT__entry(
++		__field(struct dmar_domain *, domain)
++		__field(unsigned long, addr)
++		__field(unsigned long, end)
++	),
++
++	TP_fast_assign(
++		__entry->domain = domain;
++		__entry->addr = addr;
++		__entry->end = end;
++	),
++
++	TP_printk("domain=%p addr=0x%lx end=0x%lx",
++		  __entry->domain, __entry->addr, __entry->end)
++);
++
++DEFINE_EVENT(domain_unmap, domain_mm_unmap,
++	TP_PROTO(struct dmar_domain *domain, unsigned long addr,
++		 unsigned long end),
++
++	TP_ARGS(domain, addr, end)
++);
+ #endif /* _TRACE_INTEL_IOMMU_H */
+ 
+ /* This part must be outside protection */
 -- 
 2.17.1
 
