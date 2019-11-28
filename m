@@ -2,66 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E3BB710C34C
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 05:56:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 710A410C40A
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 07:38:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727218AbfK1E4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 23:56:44 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35697 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726401AbfK1E4o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 23:56:44 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47NljP3y4zz9sPL; Thu, 28 Nov 2019 15:56:41 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1574917001; bh=dq/B6bAPFmqaGLATrGnSHKh6kfJmN3b0JQehcdPnYtU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=n0YjGm0+WUE/mAWbwEBnHeHpoAhycAW4uSUqCMso72OfrvDMubpSw+IwhpyxQBZ//
-         v0z8HWhAUtL5hdjF58njrD2mnP/URxH29lwcAU4ELS2YwUgpeCOebQ+LdBTLaAdq2n
-         ws+r4hWglzx6/IEWg/K81C5ZJpk8UODMtJC/YZ08Wns5jCQW1sm7nhfXTu87bcqFbN
-         TmFb3Z4uN4UDTEkZvK3njR7tjnpX6EcJRV23kkSgb0mHjnT8Tfkwst7djOPLlCULVz
-         VBZxSCAFj9nqwu3/OqR+UYfPZ8FZzdh5Jxufyf4MbSqCIRKunWQFmOhL+piBwHjNe+
-         z5KxTH4tswrKw==
-Date:   Thu, 28 Nov 2019 15:56:39 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-uvmem-5.5 tag
-Message-ID: <20191128045639.GA28618@oak.ozlabs.ibm.com>
-References: <20191126052455.GA2922@oak.ozlabs.ibm.com>
+        id S1726610AbfK1GiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 01:38:16 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36207 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726436AbfK1GiQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 01:38:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574923096;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EhFlF/ndy2ixO8rMiUeNrZqzqm2bi+mK6OkyJZAt2RM=;
+        b=T3BGWuPPQGCXBNzpQSVRedo3KoaKgTzNbF9gh5aCo4r0U40dYJAI2cFlft/gIMYlFbutyB
+        PuOd6y3abU1LcrcT8AcotPovertVh5Lw2JaZAZmj9Bz4hU1EjMHAuFIruO446u3C6Z5n86
+        aIjX24bl0JUCE1m11O3yfc/TSJBeAq8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-MffJIWr1PHCji3rchShvGQ-1; Thu, 28 Nov 2019 01:38:14 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF3601800D52
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 06:38:13 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C274C60BE1;
+        Thu, 28 Nov 2019 06:38:09 +0000 (UTC)
+Subject: Re: [kvm-unit-tests Patch v1 2/2] x86: ioapic: Test physical and
+ logical destination mode
+To:     Nitesh Narayan Lal <nitesh@redhat.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, mtosatti@redhat.com
+References: <1573044429-7390-1-git-send-email-nitesh@redhat.com>
+ <1573044429-7390-3-git-send-email-nitesh@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <821842d1-2faf-074e-8639-80405efa26e4@redhat.com>
+Date:   Thu, 28 Nov 2019 07:38:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126052455.GA2922@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1573044429-7390-3-git-send-email-nitesh@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: MffJIWr1PHCji3rchShvGQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 04:24:55PM +1100, Paul Mackerras wrote:
-> Paolo,
+On 06/11/2019 13.47, Nitesh Narayan Lal wrote:
+> This patch tests the physical destination mode by sending an
+> interrupt to one of the vcpus and logical destination mode by
+> sending an interrupt to more than one vcpus.
 > 
-> If you are intending to send a second pull request for Linus for this
-> merge window, and you are OK with taking a new feature in PPC KVM code
-> at this stage, then please do a pull from my kvm-ppc-uvmem-5.5 tag.
-> This adds code to manage the movement of pages for a secure KVM guest
-> between normal memory managed by the host kernel and secure memory
-> managed by the ultravisor on Power systems with Protected Execution
-> Facility hardware and firmware.  Secure memory is not accessible to
-> the host kernel and is represented as device memory using the
-> ZONE_DEVICE facility.
-> 
-> The patch set has been around for a while and has been reasonably well
-> reviewed -- this branch contains v11 of the patch set.  The code
-> changes are confined to PPC KVM code with the exception of a one-line
-> change to mm/ksm.c to export the ksm_madvise function, the addition of
-> a new ioctl number in include/uapi/linux/kvm.h, and the addition of a
-> Kconfig option in arch/powerpc/Kconfig (which Michael Ellerman is OK
-> with).
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> ---
+>   x86/ioapic.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 65 insertions(+)
 
-Please hold off on this.  Hugh Dickins sent some review comments
-identifying a problem (ksm_madvise needs mmap_sem held for writing,
-not just reading).  I'll send an updated pull request shortly.
+  Hi,
 
-Paul.
+I think this patch likely broke the possibility to run the ioapic test 
+under TCG (it was still working some weeks ago):
+
+  https://gitlab.com/huth/kvm-unit-tests/-/jobs/363553211#L1815
+
+Do you care about this test to be runnable under TCG, or shall I simply 
+cook a patch to disable it in the gitlab CI?
+
+  Thomas
+
