@@ -2,120 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECB5B10C135
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 02:00:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14B5110C1B6
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 02:42:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727516AbfK1BAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 20:00:02 -0500
-Received: from mga04.intel.com ([192.55.52.120]:27181 "EHLO mga04.intel.com"
+        id S1727600AbfK1BkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 20:40:21 -0500
+Received: from mga02.intel.com ([134.134.136.20]:10954 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726984AbfK1BAC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 20:00:02 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727109AbfK1BkV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 20:40:21 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 17:00:01 -0800
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 17:40:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,251,1571727600"; 
-   d="scan'208";a="199361861"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga007.jf.intel.com with ESMTP; 27 Nov 2019 17:00:01 -0800
-Date:   Wed, 27 Nov 2019 17:00:01 -0800
+   d="scan'208";a="221166461"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
+  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 17:40:18 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Leonardo Bras <leonardo@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: Add separate helper for putting borrowed reference
- to kvm
-Message-ID: <20191128010001.GJ22227@linux.intel.com>
-References: <de313d549a5ae773aad6bbf04c20b395bea7811f.camel@linux.ibm.com>
- <20191126171416.GA22233@linux.intel.com>
- <0009c6c1bb635098fa68cb6db6414634555039fe.camel@linux.ibm.com>
- <e1a4218f-2a70-3de3-1403-dbebf8a8abdf@redhat.com>
- <bfa563e6a584bd85d3abe953ca088281dc0e167b.camel@linux.ibm.com>
- <6beeff56-7676-5dfd-a578-1732730f8963@redhat.com>
- <adcfe1b4c5b36b3c398a5d456da9543e0390cba3.camel@linux.ibm.com>
- <20191127194757.GI22227@linux.intel.com>
- <103b290917221baa10194c27c8e35b9803f3cafa.camel@linux.ibm.com>
- <41fe3962ce1f1d5f61db5f5c28584f68ad66b2b1.camel@linux.ibm.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: [PATCH v4 00/19] x86/cpu: Clean up handling of VMX features
+Date:   Wed, 27 Nov 2019 17:39:57 -0800
+Message-Id: <20191128014016.4389-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <41fe3962ce1f1d5f61db5f5c28584f68ad66b2b1.camel@linux.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 06:57:10PM -0300, Leonardo Bras wrote:
-> On Wed, 2019-11-27 at 17:15 -0300, Leonardo Bras wrote:
-> > > > > > So, suppose these threads, where:
-> > > > > > - T1 uses a borrowed reference, and 
-> > > > > > - T2 is releasing the reference (close, release):
-> > > > > 
-> > > > > Nit: T2 is releasing the *last* reference (as implied by your reference
-> > > > > to close/release).
-> > > > 
-> > > > Correct.
-> > > > 
-> > > > > > T1                              | T2
-> > > > > > kvm_get_kvm()                   |
-> > > > > > ...                             | kvm_put_kvm()
-> > > > > > kvm_put_kvm_no_destroy()        |
-> > > > > > 
-> > > > > > The above would not trigger a use-after-free bug, but will cause a
-> > > > > > memory leak. Is my above understanding right?
-> > > > > 
-> > > > > Yes, this is correct.
-> > > > > 
-> > > > 
-> > > > Then, what would not be a bug before (using kvm_put_kvm()) now is a
-> > > > memory leak (using kvm_put_kvm_no_destroy()).
-> > > 
-> 
-> Sorry, I missed some information on above example. 
-> Suppose on that example that the reorder changes take place so that
-> kvm_put_kvm{,_no_destroy}() always happens after the last usage of kvm
-> (in the same syscall, let's say).
+Clean up a handful of interrelated warts in the kernel's handling of VMX:
 
-That can't happen, because the ioctl() holds a reference to KVM via its
-file descriptor for /dev/kvm, and ioctl() in turn prevents the fd from
-being closed.
+  - Enable VMX in IA32_FEATURE_CONTROL during boot instead of on-demand
+    during KVM load to avoid future contention over IA32_FEATURE_CONTROL.
 
-> Before T1 and T2, refcount = 1;
+  - Rework VMX feature reporting so that it is accurate and up-to-date,
+    now and in the future.
 
-This is what's impossible.  T1 must have an existing reference to get
-into the ioctl(), and that reference cannot be dropped until the ioctl()
-completes (and by completes I mean returns to userspace). Assuming no
-other bugs, i.e. T2 has its own reference, then refcount >= 2.
+  - Consolidate code across CPUs that support VMX.
 
-> If T1 uses kvm_put_kvm_no_destroy():
-> - T1 increases refcount (=2)
-> - T2 decreases refcount (=1)
-> - T1 decreases refcount, (=0) don't free kvm (memleak)
-> 
-> If T1 uses kvm_put_kvm():
-> - T1 increases refcount (= 2)
-> - T2 decreases refcount (= 1)
-> - T1 decreases refcount, (= 0) frees kvm.
-> 
-> So using kvm_put_kvm_no_destroy() would introduce a memleak where it
-> would have no bug.
-> 
-> > > No, using kvm_put_kvm_no_destroy() changes how a bug would manifest, as
-> > > you note below.  Replacing kvm_put_kvm() with kvm_put_kvm_no_destroy()
-> > > when the refcount is _guaranteed_ to be >1 has no impact on correctness.
-> 
-> Yes, you are correct. 
-> But on the above case, kvm_put_kvm{,_no_destroy}() would be called
-> with refcount == 1, and if reorder patch is applied, it would not cause
-> any use-after-free error, even on kvm_put_kvm() case.
-> 
-> Is the above correct?
+This series stems from two separate but related issues.  The first issue,
+pointed out by Boris in the SGX enabling series[1], is that the kernel
+currently doesn't ensure the IA32_FEATURE_CONTROL MSR is configured during
+boot.  The second issue is that the kernel's reporting of VMX features is
+stale, potentially inaccurate, and difficult to maintain.
 
-No, see above.
+v4:
+  - Rebase to tip/master, 8a1b070333f4 ("Merge branch 'WIP.x86/mm'")
+  - Rename everything feature control related to IA32_FEAT_CTL. [Boris]
+  - Minor coding style tweaks [Boris and Jarkko].
+  - Print VMX feature flags in "vmx flags" to avoid polluting "flags",
+    but keep printing the current synthetic VMX in "flags" so as not to
+    break the ABI. [Boris]
+  - Don't bother printing an error message in the extremely unlikely
+    event VMX is supported but IA32_FEAT_CTL doesn't exist. [Boris]
+  - Beef up a few changelogs and comments. [Boris]
+  - Add a comment in the LMCE code for the new WARN. [Jarkko]
+  - Check CONFIG_KVM_INTEL instead of CONFIG_KVM when deciding whether
+    or not to enable VMX.
+  - Add a patch to introduce X86_FEATURE_MSR_IA32_FEAT_CTL.
+  - Dropped Jim's Reviewed-by from a few KVM patches due to the above
+    addition.
+
+v3:
+  - Rebase to tip/master, ceceaf1f12ba ("Merge branch 'WIP.x86/cleanups'").
+  - Rename the feature control MSR bit defines [Boris].
+  - Rewrite the error message displayed when reading feature control MSR
+    faults on a VMX capable CPU to explicitly state that it's likely a
+    hardware or hypervisor issue [Boris].
+  - Collect a Reviewed-by for the LMCE change [Boris].
+  - Enable VMX in feature control (if it's unlocked) if and only if
+    KVM is enabled [Paolo].
+  - Remove a big pile of redudant MSR defines from the KVM selftests that
+    was discovered when renaming the feature control defines.
+  - Fix a changelog typoe [Boris].
+
+v2:
+  - Rebase to latest tip/x86/cpu (1edae1ae6258, "x86/Kconfig: Enforce...)
+  - Collect Jim's reviews.
+  - Fix a typo in setting of EPT capabilities [TonyWWang-oc].
+  - Remove defines for reserved VMX feature flags [Paolo].
+  - Print the VMX features under "flags" and maintain all existing names
+    to be backward compatible with the ABI [Paolo].
+  - Create aggregate APIC features to report FLEXPRIORITY and APICV, so
+    that the full feature *and* their associated individual features are
+    printed, e.g. to aid in recognizing why an APIC feature isn't being
+    used.
+  - Fix a few copy paste errors in changelogs.
+
+
+v1 cover letter:
+
+== IA32_FEATURE_CONTROL ==
+Lack of IA32_FEATURE_CONTROL configuration during boot isn't a functional
+issue in the current kernel as the majority of platforms set and lock
+IA32_FEATURE_CONTROL in firmware.  And when the MSR is left unlocked, KVM
+is the only subsystem that writes IA32_FEATURE_CONTROL.  That will change
+if/when SGX support is enabled, as SGX will also want to fully enable
+itself when IA32_FEATURE_CONTROL is unlocked.
+
+== VMX Feature Reporting ==
+VMX features are not enumerated via CPUID, but instead are enumerated
+through VMX MSRs.  As a result, new VMX features are not automatically
+reported via /proc/cpuinfo.
+
+An attempt was made long ago to report interesting and/or meaningful VMX
+features by synthesizing select features into a Linux-defined cpufeatures
+word.  Synthetic feature flags worked for the initial purpose, but the
+existence of the synthetic flags was forgotten almost immediately, e.g.
+only one new flag (EPT A/D) has been added in the the decade since the
+synthetic VMX features were introduced, while VMX and KVM have gained
+support for many new features.
+
+Placing the synthetic flags in x86_capability also allows them to be
+queried via cpu_has() and company, which is misleading as the flags exist
+purely for reporting via /proc/cpuinfo.  KVM, the only in-kernel user of
+VMX, ignores the flags.
+
+Last but not least, VMX features are reported in /proc/cpuinfo even
+when VMX is unusable due to lack of enabling in IA32_FEATURE_CONTROL.
+
+== Caveats ==
+All of the testing of non-standard flows was done in a VM, as I don't
+have a system that leaves IA32_FEATURE_CONTROL unlocked, or locks it with
+VMX disabled.
+
+The Centaur and Zhaoxin changes are somewhat speculative, as I haven't
+confirmed they actually support IA32_FEATURE_CONTROL, or that they want to
+gain "official" KVM support.  I assume they unofficially support KVM given
+that both CPUs went through the effort of enumerating VMX features.  That
+in turn would require them to support IA32_FEATURE_CONTROL since KVM will
+fault and refuse to load if the MSR doesn't exist.
+
+[1] https://lkml.kernel.org/r/20190925085156.GA3891@zn.tnic
+
+Sean Christopherson (19):
+  x86/msr-index: Clean up bit defines for IA32_FEATURE_CONTROL MSR
+  selftests: kvm: Replace manual MSR defs with common msr-index.h
+  tools arch x86: Sync msr-index.h from kernel sources
+  x86/intel: Initialize IA32_FEAT_CTL MSR at boot
+  x86/mce: WARN once if IA32_FEAT_CTL MSR is left unlocked
+  x86/centaur: Use common IA32_FEAT_CTL MSR initialization
+  x86/zhaoxin: Use common IA32_FEAT_CTL MSR initialization
+  x86/cpu: Clear VMX feature flag if VMX is not fully enabled
+  x86/vmx: Introduce VMX_FEATURES_*
+  x86/cpu: Detect VMX features on Intel, Centaur and Zhaoxin CPUs
+  x86/cpu: Print VMX flags in /proc/cpuinfo using VMX_FEATURES_*
+  x86/cpu: Set synthetic VMX cpufeatures during init_ia32_feat_ctl()
+  x86/cpufeatures: Add flag to track whether MSR IA32_FEAT_CTL is
+    configured
+  KVM: VMX: Drop initialization of IA32_FEAT_CTL MSR
+  KVM: VMX: Use VMX feature flag to query BIOS enabling
+  KVM: VMX: Check for full VMX support when verifying CPU compatibility
+  KVM: VMX: Use VMX_FEATURE_* flags to define VMCS control bits
+  perf/x86: Provide stubs of KVM helpers for non-Intel CPUs
+  KVM: VMX: Allow KVM_INTEL when building for Centaur and/or Zhaoxin
+    CPUs
+
+ MAINTAINERS                                   |   2 +-
+ arch/x86/Kconfig.cpu                          |   8 +
+ arch/x86/boot/mkcpustr.c                      |   1 +
+ arch/x86/include/asm/cpufeatures.h            |   1 +
+ arch/x86/include/asm/msr-index.h              |  14 +-
+ arch/x86/include/asm/perf_event.h             |  22 +-
+ arch/x86/include/asm/processor.h              |   4 +
+ arch/x86/include/asm/vmx.h                    | 105 +--
+ arch/x86/include/asm/vmxfeatures.h            |  86 +++
+ arch/x86/kernel/cpu/Makefile                  |   6 +-
+ arch/x86/kernel/cpu/centaur.c                 |  35 +-
+ arch/x86/kernel/cpu/common.c                  |   3 +
+ arch/x86/kernel/cpu/cpu.h                     |   4 +
+ arch/x86/kernel/cpu/feat_ctl.c                | 140 ++++
+ arch/x86/kernel/cpu/intel.c                   |  49 +-
+ arch/x86/kernel/cpu/mce/intel.c               |  15 +-
+ arch/x86/kernel/cpu/mkcapflags.sh             |  15 +-
+ arch/x86/kernel/cpu/proc.c                    |  15 +
+ arch/x86/kernel/cpu/zhaoxin.c                 |  35 +-
+ arch/x86/kvm/Kconfig                          |  10 +-
+ arch/x86/kvm/vmx/nested.c                     |   4 +-
+ arch/x86/kvm/vmx/vmx.c                        |  67 +-
+ arch/x86/kvm/vmx/vmx.h                        |   2 +-
+ arch/x86/kvm/x86.c                            |   2 +-
+ tools/arch/x86/include/asm/msr-index.h        |  30 +-
+ tools/power/x86/turbostat/turbostat.c         |   4 +-
+ tools/testing/selftests/kvm/Makefile          |   4 +-
+ .../selftests/kvm/include/x86_64/processor.h  | 726 +-----------------
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  |   8 +-
+ 29 files changed, 431 insertions(+), 986 deletions(-)
+ create mode 100644 arch/x86/include/asm/vmxfeatures.h
+ create mode 100644 arch/x86/kernel/cpu/feat_ctl.c
+
+-- 
+2.24.0
+
