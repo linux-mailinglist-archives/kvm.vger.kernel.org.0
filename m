@@ -2,98 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E69BF10CEC7
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 20:16:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A4A210CEEA
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 20:32:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726692AbfK1TQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 14:16:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21608 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726401AbfK1TQj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 14:16:39 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xASJCGIi130975
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 14:16:38 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxsdsd4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 14:16:38 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 28 Nov 2019 19:16:37 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 28 Nov 2019 19:16:35 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xASJGYVW47775906
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Nov 2019 19:16:34 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A42752051;
-        Thu, 28 Nov 2019 19:16:34 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.185.119])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C8E9852050;
-        Thu, 28 Nov 2019 19:16:33 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/9] s390x: Define the PSW bits
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        thuth@redhat.com, cohuck@redhat.com
-References: <1574945167-29677-1-git-send-email-pmorel@linux.ibm.com>
- <1574945167-29677-3-git-send-email-pmorel@linux.ibm.com>
- <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Thu, 28 Nov 2019 20:16:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1726609AbfK1TcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 14:32:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47044 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726545AbfK1TcS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 14:32:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574969536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XMgsSwZQeQUSGV+wli5DvraayuJweYcClot3naZXyqM=;
+        b=hLcSWRs/n1CdxLodM7SxyCgkHCxx1D5x0WHnUgzavxQkp+GGWu1LnUHYInTLd+0j5OjCA0
+        iM24ABE73V/DSa6E8nVzYKgu70dk33tRKzS6dONCNr/xL74n4IaYZ4sQubBWvePC+CE6HV
+        gFH61NBJofk3hl06UNxHZImPdaeZz+4=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-TJJdfkETMuCvt7jnbv7ZNQ-1; Thu, 28 Nov 2019 14:32:14 -0500
+Received: by mail-qt1-f197.google.com with SMTP id l25so745708qtu.0
+        for <kvm@vger.kernel.org>; Thu, 28 Nov 2019 11:32:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=UsdxgTYnGq5qlzCPxK2R/zyMAt8PsfASdePTB4mVfio=;
+        b=uXeLn40O4I0EyfZiaGzkoScUSX5hN5BwZsukPFUnvoDfMczEDOMmMK3Pc0dJkeTIxw
+         LJW+iWpKWc3rz/JpenJrgWUGuDkmIIcbRAchgoLa0GxZVO3HpHEPTwQ4KeecCj+AGF/f
+         Xz2mg6Pk0Xp5q1VzMKbMDEpN3CNhY+u4RGreBgcgLVUgrIJDDJavGrmrrR/pAElqGqt3
+         VxuXezhFMvqhpaJIEhoY950txoVE5dnQRqu5VTCLdU+0HRXrFFg7P/PKG/a87CEA/dQs
+         FJIKxZVPoasrCS6T6f4S2fBllJSV1BZCHnXjGD1xjKEC90xnywfJ7g1n+z+7JbJhL2us
+         gArw==
+X-Gm-Message-State: APjAAAUIem6H7oLGEfOUJAb9AQS13NFXOwsns6fVQtdnTzAQBk816CNs
+        4AZAZuvF7RIxX0MjYcjAf6IyH04NIgOK4LgWhjcAjhhP+K4UVVGMJ8oYD7blNt6+2vChDwFfvUe
+        xz2nre3tjZKae
+X-Received: by 2002:a37:5942:: with SMTP id n63mr11663947qkb.432.1574969534100;
+        Thu, 28 Nov 2019 11:32:14 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx2kY7sAyhyavXxVXch1pzKTwKJrrOIiaxnEiIEDCsPRfNWlBYZUpXZzMOMBRn088FhlV7mjA==
+X-Received: by 2002:a37:5942:: with SMTP id n63mr11663920qkb.432.1574969533797;
+        Thu, 28 Nov 2019 11:32:13 -0800 (PST)
+Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id x6sm2273178qke.127.2019.11.28.11.32.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Nov 2019 11:32:12 -0800 (PST)
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>
+Subject: [PATCH] KVM: X86: Use APIC_DEST_* macros properly
+Date:   Thu, 28 Nov 2019 14:32:11 -0500
+Message-Id: <20191128193211.32684-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19112819-0028-0000-0000-000003C1461A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112819-0029-0000-0000-00002484521B
-Message-Id: <7abb4725-b814-8b43-8a4f-e0e2cf7a44f8@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-28_06:2019-11-28,2019-11-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxlogscore=999 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- mlxscore=0 malwarescore=0 adultscore=0 phishscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911280165
+X-MC-Unique: TJJdfkETMuCvt7jnbv7ZNQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Previously we were using either APIC_DEST_PHYSICAL|APIC_DEST_LOGICAL
+or 0|1 to fill in kvm_lapic_irq.dest_mode, and it's done in an adhoc
+way.  It's fine imho only because in most cases when we check against
+dest_mode it's against APIC_DEST_PHYSICAL (which equals to 0).
+However, that's not consistent, majorly because APIC_DEST_LOGICAL does
+not equals to 1, so if one day we check irq.dest_mode against
+APIC_DEST_LOGICAL we'll probably always get a false returned.
 
-On 2019-11-28 15:36, David Hildenbrand wrote:
-> On 28.11.19 13:46, Pierre Morel wrote:
->> Let's define the PSW bits  explicitly, it will clarify their
->> usage.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/asm/arch_bits.h | 20 ++++++++++++++++++++
->>   lib/s390x/asm/arch_def.h  |  6 ++----
-> I'm sorry, but I don't really see a reason to move these 4/5 defines to
-> a separate header. Can you just keep them in arch_def.h and extend?
+This patch replaces the 0/1 settings of irq.dest_mode with the macros
+to make them consistent.
 
-no because arch_def.h contains C structures and inline.
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Sean Christopherson <sean.j.christopherson@intel.com>
+CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+CC: Nitesh Narayan Lal <nitesh@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ arch/x86/kvm/ioapic.c   | 9 ++++++---
+ arch/x86/kvm/irq_comm.c | 7 ++++---
+ arch/x86/kvm/x86.c      | 2 +-
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
-
->
-> (none of your other patches touch arch_bits.h - and it is somewhat a
-> weird name. Where to put something new: arch_def.h or arch_bits.h? I
-> would have understood "psw.h", but even that, I don't consider necessary)
->
-I can use a name like psw.h or let fall and keep the hexa.
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 9fd2dd89a1c5..1e091637d5d5 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -331,7 +331,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *io=
+apic, u32 val)
+ =09=09=09irq.vector =3D e->fields.vector;
+ =09=09=09irq.delivery_mode =3D e->fields.delivery_mode << 8;
+ =09=09=09irq.dest_id =3D e->fields.dest_id;
+-=09=09=09irq.dest_mode =3D e->fields.dest_mode;
++=09=09=09irq.dest_mode =3D e->fields.dest_mode ?
++=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+ =09=09=09bitmap_zero(&vcpu_bitmap, 16);
+ =09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+ =09=09=09=09=09=09 &vcpu_bitmap);
+@@ -343,7 +344,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *io=
+apic, u32 val)
+ =09=09=09=09 * keep ioapic_handled_vectors synchronized.
+ =09=09=09=09 */
+ =09=09=09=09irq.dest_id =3D old_dest_id;
+-=09=09=09=09irq.dest_mode =3D old_dest_mode;
++=09=09=09=09irq.dest_mode =3D old_dest_mode ?
++=09=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+ =09=09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+ =09=09=09=09=09=09=09 &vcpu_bitmap);
+ =09=09=09}
+@@ -369,7 +371,8 @@ static int ioapic_service(struct kvm_ioapic *ioapic, in=
+t irq, bool line_status)
+=20
+ =09irqe.dest_id =3D entry->fields.dest_id;
+ =09irqe.vector =3D entry->fields.vector;
+-=09irqe.dest_mode =3D entry->fields.dest_mode;
++=09irqe.dest_mode =3D entry->fields.dest_mode ?
++=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+ =09irqe.trig_mode =3D entry->fields.trig_mode;
+ =09irqe.delivery_mode =3D entry->fields.delivery_mode << 8;
+ =09irqe.level =3D 1;
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index 8ecd48d31800..673b6afd6dbf 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -52,8 +52,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_=
+lapic *src,
+ =09unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
+ =09unsigned int dest_vcpus =3D 0;
+=20
+-=09if (irq->dest_mode =3D=3D 0 && irq->dest_id =3D=3D 0xff &&
+-=09=09=09kvm_lowest_prio_delivery(irq)) {
++=09if (irq->dest_mode =3D=3D APIC_DEST_PHYSICAL &&
++=09    irq->dest_id =3D=3D 0xff && kvm_lowest_prio_delivery(irq)) {
+ =09=09printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
+ =09=09irq->delivery_mode =3D APIC_DM_FIXED;
+ =09}
+@@ -114,7 +114,8 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel=
+_irq_routing_entry *e,
+ =09=09irq->dest_id |=3D MSI_ADDR_EXT_DEST_ID(e->msi.address_hi);
+ =09irq->vector =3D (e->msi.data &
+ =09=09=09MSI_DATA_VECTOR_MASK) >> MSI_DATA_VECTOR_SHIFT;
+-=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_lo;
++=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_lo =
+?
++=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+ =09irq->trig_mode =3D (1 << MSI_DATA_TRIGGER_SHIFT) & e->msi.data;
+ =09irq->delivery_mode =3D e->msi.data & 0x700;
+ =09irq->msi_redir_hint =3D ((e->msi.address_lo
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3ed167e039e5..3b00d662dc14 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7356,7 +7356,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, unsig=
+ned long flags, int apicid)
+ =09struct kvm_lapic_irq lapic_irq;
+=20
+ =09lapic_irq.shorthand =3D 0;
+-=09lapic_irq.dest_mode =3D 0;
++=09lapic_irq.dest_mode =3D APIC_DEST_PHYSICAL;
+ =09lapic_irq.level =3D 0;
+ =09lapic_irq.dest_id =3D apicid;
+ =09lapic_irq.msi_redir_hint =3D false;
+--=20
+2.21.0
 
