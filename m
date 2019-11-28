@@ -2,93 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB5F610C17D
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 02:40:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB96B10C24B
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 03:30:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbfK1Bku (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Nov 2019 20:40:50 -0500
-Received: from mga02.intel.com ([134.134.136.20]:10961 "EHLO mga02.intel.com"
+        id S1728014AbfK1CaA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Nov 2019 21:30:00 -0500
+Received: from mga18.intel.com ([134.134.136.126]:17935 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727775AbfK1BkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Nov 2019 20:40:25 -0500
+        id S1726695AbfK1C37 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Nov 2019 21:29:59 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 17:40:20 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2019 18:29:59 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,251,1571727600"; 
-   d="scan'208";a="221166525"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
-  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 17:40:20 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: [PATCH v4 19/19] KVM: VMX: Allow KVM_INTEL when building for Centaur and/or Zhaoxin CPUs
-Date:   Wed, 27 Nov 2019 17:40:16 -0800
-Message-Id: <20191128014016.4389-20-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191128014016.4389-1-sean.j.christopherson@intel.com>
-References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+   d="scan'208";a="221176111"
+Received: from allen-box.sh.intel.com ([10.239.159.136])
+  by orsmga002.jf.intel.com with ESMTP; 27 Nov 2019 18:29:57 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     ashok.raj@intel.com, sanjay.k.kumar@intel.com,
+        jacob.jun.pan@linux.intel.com, kevin.tian@intel.com,
+        yi.l.liu@intel.com, yi.y.sun@intel.com,
+        Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v2 1/8] iommu/vt-d: Add per domain page table ops
+Date:   Thu, 28 Nov 2019 10:25:43 +0800
+Message-Id: <20191128022550.9832-2-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191128022550.9832-1-baolu.lu@linux.intel.com>
+References: <20191128022550.9832-1-baolu.lu@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change the dependency for KVM_INTEL, i.e. KVM w/ VMX, from Intel CPUs to
-any CPU that supports the IA32_FEAT_CTL MSR and thus VMX functionality.
-This effectively allows building KVM_INTEL for Centaur and Zhaoxin CPUs.
+The Intel VT-d in scalable mode supports two types of
+page talbes for DMA translation: the first level page
+table and the second level page table. The IOMMU driver
+is able to choose one of them for DMA remapping according
+to the use case. The first level page table uses the same
+format as the CPU page table, while the second level page
+table keeps compatible with previous formats.
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+This abstracts the page tables used in Intel IOMMU driver
+by defining a per domain page table ops structure which
+contains callbacks for various page table operations.
+
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- arch/x86/kvm/Kconfig | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ include/linux/intel-iommu.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 840e12583b85..991019d5eee1 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -60,13 +60,11 @@ config KVM
- 	  If unsure, say N.
+diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
+index 326146a36dbf..e8bfe7466ebb 100644
+--- a/include/linux/intel-iommu.h
++++ b/include/linux/intel-iommu.h
+@@ -499,6 +499,28 @@ struct context_entry {
+ 	u64 hi;
+ };
  
- config KVM_INTEL
--	tristate "KVM for Intel processors support"
--	depends on KVM
--	# for perf_guest_get_msrs():
--	depends on CPU_SUP_INTEL
-+	tristate "KVM for Intel (and compatible) processors support"
-+	depends on KVM && IA32_FEAT_CTL
- 	---help---
--	  Provides support for KVM on Intel processors equipped with the VT
--	  extensions.
-+	  Provides support for KVM on processors equipped with Intel's VT
-+	  extensions, a.k.a. Virtual Machine Extensions (VMX).
++struct dmar_domain;
++
++/*
++ * struct pgtable_ops - page table ops
++ * @map_range: map a physically contiguous memory region to iova
++ * @unmap_range: unmap a physically contiguous memory region
++ * @iova_to_phys: return the physical address mapped to @iova
++ * @flush_tlb_range: flush the tlb caches as the result of map or unmap
++ */
++struct pgtable_ops {
++	int (*map_range)(struct dmar_domain *domain,
++			 unsigned long iova, phys_addr_t paddr,
++			 size_t size, int prot);
++	struct page *(*unmap_range)(struct dmar_domain *domain,
++				    unsigned long iova, size_t size);
++	phys_addr_t (*iova_to_phys)(struct dmar_domain *domain,
++				    unsigned long iova);
++	void (*flush_tlb_range)(struct dmar_domain *domain,
++				struct intel_iommu *iommu,
++				unsigned long iova, size_t size, bool ih);
++};
++
+ struct dmar_domain {
+ 	int	nid;			/* node id */
  
- 	  To compile this as a module, choose M here: the module
- 	  will be called kvm-intel.
+@@ -517,8 +539,10 @@ struct dmar_domain {
+ 	struct list_head auxd;		/* link to device's auxiliary list */
+ 	struct iova_domain iovad;	/* iova's that belong to this domain */
+ 
++	/* page table used by this domain */
+ 	struct dma_pte	*pgd;		/* virtual address */
+ 	int		gaw;		/* max guest address width */
++	const struct pgtable_ops *ops;	/* page table ops */
+ 
+ 	/* adjusted guest address width, 0 is level 2 30-bit */
+ 	int		agaw;
 -- 
-2.24.0
+2.17.1
 
