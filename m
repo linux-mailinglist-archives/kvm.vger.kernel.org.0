@@ -2,138 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C2C010CBF9
-	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 16:44:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7CA210CC02
+	for <lists+kvm@lfdr.de>; Thu, 28 Nov 2019 16:45:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726558AbfK1Pn7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 10:43:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51023 "EHLO
+        id S1726731AbfK1Ppi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 10:45:38 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25287 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726401AbfK1Pn7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 10:43:59 -0500
+        by vger.kernel.org with ESMTP id S1726583AbfK1Ppi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Nov 2019 10:45:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574955837;
+        s=mimecast20190719; t=1574955937;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=vz34xy23I34V6t61KJptUN9zqdocHEiTDJU+6y5GpJM=;
-        b=ONHGFhVCx4xF9AeqmfSViXdv3hl5ot8kKhXJ/0FUEhd7+LPqR+jm7g+wlwB2ptGYyEsYqR
-        jt6ro5nCrOFINHu3z1rIqFX4+5tbK1xjm5bTu9thbujfdfiiS3fLqBOIqLJZfRefqWOCU2
-        ZIV4MdOgXZb1jBIrNIiVfQHj5idHIFI=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xGsdSO+ydrVZSxWYC3w/X6LXKszicUiIA0Toh6QzZtQ=;
+        b=UaTOd3WGUm3+MMF/KUBBER8Oy5KQHw4SHeamaO4xhuif/7PHSSnNYDgHQ4u1AmA93GTb/Y
+        /WMjCDXrOcJhthshK215PebzCctSjYqpfx21d00q0PDdsXUjL41R+AeGI/qmxDco3A9W3k
+        seby3a29WKDVCGIRHCV63HcShP2jpNo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-gZADEEkKO2aoopNos3i5XQ-1; Thu, 28 Nov 2019 10:43:54 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-214-EdkpEs06Ou6r7LN4QsYqQQ-1; Thu, 28 Nov 2019 10:45:33 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4997C107B7E8;
-        Thu, 28 Nov 2019 15:43:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CB46106B329;
+        Thu, 28 Nov 2019 15:45:32 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B18E600CD;
-        Thu, 28 Nov 2019 15:43:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ABCCD608C2;
+        Thu, 28 Nov 2019 15:45:27 +0000 (UTC)
+Date:   Thu, 28 Nov 2019 16:45:25 +0100
 From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     thuth@redhat.com, pbonzini@redhat.com
-Subject: [PATCH kvm-unit-tests v3] arm: Enable the VFP
-Date:   Thu, 28 Nov 2019 16:43:50 +0100
-Message-Id: <20191128154350.9650-1-drjones@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Bill Wendling <morbo@google.com>, kvm-ppc@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2] Switch the order of the parameters in
+ report() and report_xfail()
+Message-ID: <20191128154525.xnrzzxtxacldrh7n@kamzik.brq.redhat.com>
+References: <20191128071453.15114-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: gZADEEkKO2aoopNos3i5XQ-1
+In-Reply-To: <20191128071453.15114-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: EdkpEs06Ou6r7LN4QsYqQQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Variable argument macros frequently depend on floating point
-registers. Indeed we needed to enable the VFP for arm64 since its
-introduction in order to use printf and the like. Somehow we
-didn't need to do that for arm32 until recently when compiling
-with GCC 9.
+On Thu, Nov 28, 2019 at 08:14:53AM +0100, Thomas Huth wrote:
+> Commit c09c54c66b1df ("lib: use an argument which doesn't require
+> default argument promotion") fixed a warning that occurs with Clang,
+> but introduced a regression: If the "pass" parameter is a value
+> which has only set the condition bits in the upper 32 bits of a
+> 64 bit value, the condition is now false since the value is truncated
+> to "unsigned int" so that the upper bits are simply discarded.
+>=20
+> We fixed it by reverting the commit, but that of course also means
+> trouble with Clang again. We can not use "bool" if it is the last
+> parameter before the variable argument list. The proper fix is to
+> swap the parameters around and make the format string the last
+> parameter.
+>=20
+> This patch (except the changes in lib/libcflat.h and lib/report.c
+> and some rebase conflicts along the way) has basically been created
+> with following coccinelle script (with some additional manual tweaking
+> of long and disabled lines afterwards):
+>=20
+> @@
+> expression fmt;
+> expression pass;
+> expression list args;
+> @@
+>  report(
+> -fmt, pass
+> +pass, fmt
+>  , args);
+>=20
+> @@
+> expression fmt;
+> expression pass;
+> expression list args;
+> @@
+>  report_xfail(
+> -fmt, xfail, pass
+> +xfail, pass, fmt
+>  , args);
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2: Rebase the patch to the current master branch
+>
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
+Tested on arm and arm64.
 
-v3: Added Thomas' t-b and suggested .gitlab-ci.yml change.
-v2: Added '-mfpu=3Dvfp' cflag to deal with older compilers
+Tested-by: Andrew Jones <drjones@redhat.com>
 
- .gitlab-ci.yml   |  2 +-
- arm/Makefile.arm |  2 +-
- arm/cstart.S     | 14 +++++++++++++-
- 3 files changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index fbf3328a19ea..a9dc16a2d6fd 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -17,7 +17,7 @@ build-aarch64:
-=20
- build-arm:
-  script:
-- - dnf install -y qemu-system-arm gcc-arm-linux-gnu-8.2.1-1.fc30.2
-+ - dnf install -y qemu-system-arm gcc-arm-linux-gnu
-  - ./configure --arch=3Darm --cross-prefix=3Darm-linux-gnu-
-  - make -j2
-  - ACCEL=3Dtcg ./run_tests.sh
-diff --git a/arm/Makefile.arm b/arm/Makefile.arm
-index 43b4be1e05ee..d379a2800749 100644
---- a/arm/Makefile.arm
-+++ b/arm/Makefile.arm
-@@ -5,7 +5,7 @@
- #
- bits =3D 32
- ldarch =3D elf32-littlearm
--machine =3D -marm
-+machine =3D -marm -mfpu=3Dvfp
-=20
- # stack.o relies on frame pointers.
- KEEP_FRAME_POINTER :=3D y
-diff --git a/arm/cstart.S b/arm/cstart.S
-index 114726feab82..bc6219d8a3ee 100644
---- a/arm/cstart.S
-+++ b/arm/cstart.S
-@@ -50,10 +50,11 @@ start:
- =09mov=09r0, r2
- =09push=09{r0-r1}
-=20
--=09/* set up vector table and mode stacks */
-+=09/* set up vector table, mode stacks, and enable the VFP */
- =09mov=09r0, lr=09=09=09@ lr is stack top (see above),
- =09=09=09=09=09@ which is the exception stacks base
- =09bl=09exceptions_init
-+=09bl=09enable_vfp
-=20
- =09/* complete setup */
- =09pop=09{r0-r1}
-@@ -100,6 +101,16 @@ exceptions_init:
- =09isb
- =09mov=09pc, lr
-=20
-+enable_vfp:
-+=09/* Enable full access to CP10 and CP11: */
-+=09mov=09r0, #(3 << 22 | 3 << 20)
-+=09mcr=09p15, 0, r0, c1, c0, 2
-+=09isb
-+=09/* Set the FPEXC.EN bit to enable Advanced SIMD and VFP: */
-+=09mov=09r0, #(1 << 30)
-+=09vmsr=09fpexc, r0
-+=09mov=09pc, lr
-+
- .text
-=20
- .global get_mmu_off
-@@ -130,6 +141,7 @@ secondary_entry:
- =09ldr=09r0, [r1]
- =09mov=09sp, r0
- =09bl=09exceptions_init
-+=09bl=09enable_vfp
-=20
- =09/* finish init in C code */
- =09bl=09secondary_cinit
---=20
-2.21.0
+Thanks,
+drew
 
