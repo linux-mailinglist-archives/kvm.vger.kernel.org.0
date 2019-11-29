@@ -2,124 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D73F10D25D
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 09:20:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACA9A10D3F7
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 11:30:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726943AbfK2IUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 03:20:14 -0500
-Received: from mail-io1-f69.google.com ([209.85.166.69]:43263 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726819AbfK2IUM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Nov 2019 03:20:12 -0500
-Received: by mail-io1-f69.google.com with SMTP id b17so7309491ioh.10
-        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 00:20:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=xVR2E33E57gP3WHNwoEF1Nitw4WLWCmTkXaj4CCkoHA=;
-        b=P14mU0p9jcltJcYSYBUl5tnLhg9X63SLysvD3PuvbVMhk+MrAS/L70hdp8sNnE3Tih
-         CWgpnzc/6o8DxEdMxHY+tmjXJdcXj18ik5NAZQfjyHGpCgox5HKUiaw4n8GuAosHp4Hj
-         1WPOmpVTQcKABX8qXZeFBAdaY7073+3ysvOe9QyS8WXf7GDEvybdDLhP2cE2ZfyWa7Ws
-         dQl1LwhtM2Y6xxIVAIJaMhx2Dkyu6AUjudf/GsmkYkrGxXQgo+HYlIurapSQT4gPtfWp
-         /gMej6kTkboK4CszXNFsBrMTKE0xf3UEHu50oX+DO60dF2Rl/OFbWidJpgLra4Fs3Ffl
-         haFA==
-X-Gm-Message-State: APjAAAWI+pPatgsl1kOTRn1Z8RgKwpTGK4O774KEZZ+NvAl4LIzCKcW0
-        VwqOnhjzXpsl+tBfbDSx2MKc27j8jow1p+RYX6oNGosOAyR8
-X-Google-Smtp-Source: APXvYqwdCe1U7S/I44jBVgKxlTWKlpY4ux151fW+V79MvqSdIt1FOf5+SuwPAbBxqB63sQx9SD86rmFajVIrgr/9PlCpcwd/3QQj
+        id S1726800AbfK2KaA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 05:30:00 -0500
+Received: from mga11.intel.com ([192.55.52.93]:27927 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725892AbfK2KaA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Nov 2019 05:30:00 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Nov 2019 02:29:58 -0800
+X-IronPort-AV: E=Sophos;i="5.69,257,1571727600"; 
+   d="scan'208";a="203694628"
+Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Nov 2019 02:29:50 -0800
+From:   Jani Nikula <jani.nikula@intel.com>
+To:     dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
+Cc:     intel-gfx@lists.freedesktop.org, jani.nikula@intel.com,
+        ville.syrjala@linux.intel.com,
+        Andy Walls <awalls@md.metrocast.net>,
+        Bernie Thompson <bernie@plugable.com>,
+        =?UTF-8?q?Bruno=20Pr=C3=A9mont?= <bonbons@linux-vserver.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Hans Verkuil <hverkuil@xs4all.nl>,
+        Jaya Kumar <jayalk@intworks.biz>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>,
+        =?UTF-8?q?Noralf=20Tr=C3=B8nnes?= <noralf@tronnes.org>,
+        Robin van der Gracht <robin@protonic.nl>,
+        Steve Glendinning <steve.glendinning@shawell.net>,
+        ivtv-devel@ivtvdriver.org, kvm@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-omap@vger.kernel.org
+Subject: [PATCH v2 00/14] video, drm, etc: constify fbops in struct fb_info
+Date:   Fri, 29 Nov 2019 12:29:30 +0200
+Message-Id: <cover.1575022735.git.jani.nikula@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Received: by 2002:a5e:c20c:: with SMTP id v12mr31373543iop.35.1575015610408;
- Fri, 29 Nov 2019 00:20:10 -0800 (PST)
-Date:   Fri, 29 Nov 2019 00:20:10 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f965b8059877e5e6@google.com>
-Subject: WARNING in vcpu_enter_guest
-From:   syzbot <syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=UTF-8
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+This is v2 of https://patchwork.freedesktop.org/series/70119/
 
-syzbot found the following crash on:
+I wanted to make our struct fb_ops const because we don't modify
+it... and this is what I ended up with to fix it and a bunch of others.
 
-HEAD commit:    ad062195 Merge tag 'platform-drivers-x86-v5.4-1' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=154910ad600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f9fc16a6374d5fd0
-dashboard link: https://syzkaller.appspot.com/bug?extid=00be5da1d75f1cc95f6b
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+I would appreciate acks to merge all this via the drm-misc tree. This is
+especially important for patches 1-8 to reasonably get the job
+done. Patches 9-14 are somewhat easier to merge at leisure afterwards,
+but there really isn't much conflict potential IMO.
 
-Unfortunately, I don't have any reproducer for this crash yet.
+Daniel, please double-check me adding your Reviewed-by on the later
+patches wasn't overzealous.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+00be5da1d75f1cc95f6b@syzkaller.appspotmail.com
-
-WARNING: CPU: 1 PID: 15173 at arch/x86/kvm/x86.c:8007  
-vcpu_enter_guest+0x4b29/0x5e90 arch/x86/kvm/x86.c:8007
-Kernel panic - not syncing: panic_on_warn set ...
-CPU: 1 PID: 15173 Comm: syz-executor.5 Not tainted 5.3.0+ #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x172/0x1f0 lib/dump_stack.c:113
-  panic+0x2dc/0x755 kernel/panic.c:219
-  __warn.cold+0x20/0x4c kernel/panic.c:576
-  report_bug+0x263/0x2b0 lib/bug.c:186
-  fixup_bug arch/x86/kernel/traps.c:179 [inline]
-  fixup_bug arch/x86/kernel/traps.c:174 [inline]
-  do_error_trap+0x11b/0x200 arch/x86/kernel/traps.c:272
-  do_invalid_op+0x37/0x50 arch/x86/kernel/traps.c:291
-  invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1028
-RIP: 0010:vcpu_enter_guest+0x4b29/0x5e90 arch/x86/kvm/x86.c:8007
-Code: 00 fc ff df 48 c1 ea 03 0f b6 04 02 84 c0 74 08 3c 03 0f 8e e9 11 00  
-00 41 83 a5 20 27 00 00 fb e9 5c bf ff ff e8 97 9e 65 00 <0f> 0b e9 98 be  
-ff ff e8 8b 9e 65 00 31 ff be 07 00 00 00 e8 ef 97
-RSP: 0018:ffff8880572bfa10 EFLAGS: 00010046
-RAX: 0000000000040000 RBX: 0000000000000000 RCX: ffffc900109ce000
-RDX: 0000000000040000 RSI: ffffffff810d3599 RDI: 0000000000000007
-RBP: ffff8880572bfb20 R08: ffff8880576b62c0 R09: ffffed100aed6c59
-R10: ffffed100aed6c58 R11: ffff8880576b62c7 R12: ffff88805fa9866c
-R13: ffff88805fa98640 R14: 0000000000000001 R15: ffff88805fa98670
-  vcpu_run arch/x86/kvm/x86.c:8159 [inline]
-  kvm_arch_vcpu_ioctl_run+0x464/0x1750 arch/x86/kvm/x86.c:8367
-  kvm_vcpu_ioctl+0x4dc/0xfd0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2765
-  vfs_ioctl fs/ioctl.c:46 [inline]
-  file_ioctl fs/ioctl.c:509 [inline]
-  do_vfs_ioctl+0xdb6/0x13e0 fs/ioctl.c:696
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-  __do_sys_ioctl fs/ioctl.c:720 [inline]
-  __se_sys_ioctl fs/ioctl.c:718 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-  do_syscall_64+0xfa/0x760 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x4598e9
-Code: fd b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 cb b7 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007f84f3c93c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00000000004598e9
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f84f3c946d4
-R13: 00000000004c2c68 R14: 00000000004d6330 R15: 00000000ffffffff
-Kernel Offset: disabled
-Rebooting in 86400 seconds..
+BR,
+Jani.
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Cc: Andy Walls <awalls@md.metrocast.net>
+Cc: Bernie Thompson <bernie@plugable.com>
+Cc: Bruno Prémont <bonbons@linux-vserver.org>
+Cc: Daniel Vetter <daniel@ffwll.ch>
+Cc: Hans Verkuil <hverkuil@xs4all.nl>
+Cc: Jaya Kumar <jayalk@intworks.biz>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
+Cc: Noralf Trønnes <noralf@tronnes.org>
+Cc: Robin van der Gracht <robin@protonic.nl>
+Cc: Steve Glendinning <steve.glendinning@shawell.net>
+Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Cc: dri-devel@lists.freedesktop.org
+Cc: ivtv-devel@ivtvdriver.org
+Cc: kvm@vger.kernel.org
+Cc: linux-fbdev@vger.kernel.org
+Cc: linux-input@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: linux-omap@vger.kernel.org
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+Jani Nikula (14):
+  video: fb_defio: preserve user fb_ops
+  drm/fb-helper: don't preserve fb_ops across deferred IO use
+  video: smscufx: don't restore fb_mmap after deferred IO cleanup
+  video: udlfb: don't restore fb_mmap after deferred IO cleanup
+  video: fbdev: vesafb: modify the static fb_ops directly
+  video: fbmem: use const pointer for fb_ops
+  video: omapfb: use const pointer for fb_ops
+  video: fbdev: make fbops member of struct fb_info a const pointer
+  drm: constify fb ops across all drivers
+  video: constify fb ops across all drivers
+  HID: picoLCD: constify fb ops
+  media: constify fb ops across all drivers
+  samples: vfio-mdev: constify fb ops
+  auxdisplay: constify fb ops
+
+ drivers/auxdisplay/cfag12864bfb.c             |  2 +-
+ drivers/auxdisplay/ht16k33.c                  |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_fb.c        |  2 +-
+ drivers/gpu/drm/armada/armada_fbdev.c         |  2 +-
+ drivers/gpu/drm/drm_fb_helper.c               | 27 +++----------------
+ drivers/gpu/drm/exynos/exynos_drm_fbdev.c     |  2 +-
+ .../gpu/drm/hisilicon/hibmc/hibmc_drm_fbdev.c |  2 +-
+ drivers/gpu/drm/i915/display/intel_fbdev.c    |  2 +-
+ drivers/gpu/drm/msm/msm_fbdev.c               |  2 +-
+ drivers/gpu/drm/nouveau/nouveau_fbcon.c       |  4 +--
+ drivers/gpu/drm/omapdrm/omap_fbdev.c          |  2 +-
+ drivers/gpu/drm/radeon/radeon_fb.c            |  2 +-
+ drivers/gpu/drm/rockchip/rockchip_drm_fbdev.c |  2 +-
+ drivers/gpu/drm/tegra/fb.c                    |  2 +-
+ drivers/gpu/drm/vmwgfx/vmwgfx_fb.c            |  2 +-
+ drivers/hid/hid-picolcd_fb.c                  |  3 +--
+ drivers/media/pci/ivtv/ivtvfb.c               |  3 +--
+ drivers/media/platform/vivid/vivid-osd.c      |  3 +--
+ drivers/video/fbdev/68328fb.c                 |  2 +-
+ drivers/video/fbdev/acornfb.c                 |  2 +-
+ drivers/video/fbdev/amba-clcd.c               |  2 +-
+ drivers/video/fbdev/amifb.c                   |  2 +-
+ drivers/video/fbdev/arcfb.c                   |  2 +-
+ drivers/video/fbdev/arkfb.c                   |  2 +-
+ drivers/video/fbdev/asiliantfb.c              |  2 +-
+ drivers/video/fbdev/atmel_lcdfb.c             |  2 +-
+ drivers/video/fbdev/aty/aty128fb.c            |  2 +-
+ drivers/video/fbdev/aty/atyfb_base.c          |  2 +-
+ drivers/video/fbdev/aty/radeon_base.c         |  2 +-
+ drivers/video/fbdev/au1100fb.c                |  2 +-
+ drivers/video/fbdev/au1200fb.c                |  2 +-
+ drivers/video/fbdev/broadsheetfb.c            |  2 +-
+ drivers/video/fbdev/bw2.c                     |  2 +-
+ drivers/video/fbdev/carminefb.c               |  2 +-
+ drivers/video/fbdev/cg14.c                    |  2 +-
+ drivers/video/fbdev/cg3.c                     |  2 +-
+ drivers/video/fbdev/cg6.c                     |  2 +-
+ drivers/video/fbdev/chipsfb.c                 |  2 +-
+ drivers/video/fbdev/cirrusfb.c                |  2 +-
+ drivers/video/fbdev/clps711x-fb.c             |  2 +-
+ drivers/video/fbdev/cobalt_lcdfb.c            |  2 +-
+ drivers/video/fbdev/controlfb.c               |  2 +-
+ drivers/video/fbdev/core/fb_defio.c           |  3 ---
+ drivers/video/fbdev/core/fbmem.c              | 19 ++++++++-----
+ drivers/video/fbdev/cyber2000fb.c             |  2 +-
+ drivers/video/fbdev/da8xx-fb.c                |  2 +-
+ drivers/video/fbdev/dnfb.c                    |  2 +-
+ drivers/video/fbdev/efifb.c                   |  2 +-
+ drivers/video/fbdev/ep93xx-fb.c               |  2 +-
+ drivers/video/fbdev/fb-puv3.c                 |  2 +-
+ drivers/video/fbdev/ffb.c                     |  2 +-
+ drivers/video/fbdev/fm2fb.c                   |  2 +-
+ drivers/video/fbdev/fsl-diu-fb.c              |  2 +-
+ drivers/video/fbdev/g364fb.c                  |  2 +-
+ drivers/video/fbdev/gbefb.c                   |  2 +-
+ drivers/video/fbdev/geode/gx1fb_core.c        |  2 +-
+ drivers/video/fbdev/geode/gxfb_core.c         |  2 +-
+ drivers/video/fbdev/geode/lxfb_core.c         |  2 +-
+ drivers/video/fbdev/goldfishfb.c              |  2 +-
+ drivers/video/fbdev/grvga.c                   |  2 +-
+ drivers/video/fbdev/gxt4500.c                 |  2 +-
+ drivers/video/fbdev/hecubafb.c                |  2 +-
+ drivers/video/fbdev/hgafb.c                   |  2 +-
+ drivers/video/fbdev/hitfb.c                   |  2 +-
+ drivers/video/fbdev/hpfb.c                    |  2 +-
+ drivers/video/fbdev/hyperv_fb.c               |  2 +-
+ drivers/video/fbdev/i740fb.c                  |  2 +-
+ drivers/video/fbdev/imsttfb.c                 |  2 +-
+ drivers/video/fbdev/imxfb.c                   |  2 +-
+ drivers/video/fbdev/intelfb/intelfbdrv.c      |  2 +-
+ drivers/video/fbdev/kyro/fbdev.c              |  2 +-
+ drivers/video/fbdev/leo.c                     |  2 +-
+ drivers/video/fbdev/macfb.c                   |  2 +-
+ drivers/video/fbdev/matrox/matroxfb_crtc2.c   |  2 +-
+ drivers/video/fbdev/maxinefb.c                |  2 +-
+ drivers/video/fbdev/mb862xx/mb862xxfbdrv.c    |  2 +-
+ drivers/video/fbdev/mbx/mbxfb.c               |  2 +-
+ drivers/video/fbdev/metronomefb.c             |  2 +-
+ drivers/video/fbdev/mmp/fb/mmpfb.c            |  2 +-
+ drivers/video/fbdev/mx3fb.c                   |  5 ++--
+ drivers/video/fbdev/neofb.c                   |  2 +-
+ drivers/video/fbdev/nvidia/nvidia.c           |  2 +-
+ drivers/video/fbdev/ocfb.c                    |  2 +-
+ drivers/video/fbdev/offb.c                    |  2 +-
+ drivers/video/fbdev/omap/omapfb_main.c        |  2 +-
+ .../video/fbdev/omap2/omapfb/omapfb-main.c    |  2 +-
+ drivers/video/fbdev/p9100.c                   |  2 +-
+ drivers/video/fbdev/platinumfb.c              |  2 +-
+ drivers/video/fbdev/pm2fb.c                   |  2 +-
+ drivers/video/fbdev/pm3fb.c                   |  2 +-
+ drivers/video/fbdev/pmag-aa-fb.c              |  2 +-
+ drivers/video/fbdev/pmag-ba-fb.c              |  2 +-
+ drivers/video/fbdev/pmagb-b-fb.c              |  2 +-
+ drivers/video/fbdev/ps3fb.c                   |  2 +-
+ drivers/video/fbdev/pvr2fb.c                  |  2 +-
+ drivers/video/fbdev/pxa168fb.c                |  2 +-
+ drivers/video/fbdev/pxafb.c                   |  4 +--
+ drivers/video/fbdev/q40fb.c                   |  2 +-
+ drivers/video/fbdev/riva/fbdev.c              |  2 +-
+ drivers/video/fbdev/s3c-fb.c                  |  2 +-
+ drivers/video/fbdev/s3c2410fb.c               |  2 +-
+ drivers/video/fbdev/s3fb.c                    |  2 +-
+ drivers/video/fbdev/sa1100fb.c                |  2 +-
+ drivers/video/fbdev/savage/savagefb_driver.c  |  2 +-
+ drivers/video/fbdev/sh7760fb.c                |  2 +-
+ drivers/video/fbdev/sh_mobile_lcdcfb.c        |  4 +--
+ drivers/video/fbdev/simplefb.c                |  2 +-
+ drivers/video/fbdev/sis/sis_main.c            |  2 +-
+ drivers/video/fbdev/skeletonfb.c              |  2 +-
+ drivers/video/fbdev/sm712fb.c                 |  2 +-
+ drivers/video/fbdev/smscufx.c                 |  3 +--
+ drivers/video/fbdev/ssd1307fb.c               |  2 +-
+ drivers/video/fbdev/sstfb.c                   |  2 +-
+ drivers/video/fbdev/stifb.c                   |  2 +-
+ drivers/video/fbdev/sunxvr1000.c              |  2 +-
+ drivers/video/fbdev/sunxvr2500.c              |  2 +-
+ drivers/video/fbdev/sunxvr500.c               |  2 +-
+ drivers/video/fbdev/tcx.c                     |  2 +-
+ drivers/video/fbdev/tdfxfb.c                  |  2 +-
+ drivers/video/fbdev/tgafb.c                   |  2 +-
+ drivers/video/fbdev/tmiofb.c                  |  2 +-
+ drivers/video/fbdev/tridentfb.c               |  2 +-
+ drivers/video/fbdev/udlfb.c                   |  1 -
+ drivers/video/fbdev/uvesafb.c                 |  2 +-
+ drivers/video/fbdev/valkyriefb.c              |  2 +-
+ drivers/video/fbdev/vesafb.c                  |  6 ++---
+ drivers/video/fbdev/vfb.c                     |  2 +-
+ drivers/video/fbdev/vga16fb.c                 |  2 +-
+ drivers/video/fbdev/vt8500lcdfb.c             |  2 +-
+ drivers/video/fbdev/vt8623fb.c                |  2 +-
+ drivers/video/fbdev/w100fb.c                  |  2 +-
+ drivers/video/fbdev/wm8505fb.c                |  2 +-
+ drivers/video/fbdev/xen-fbfront.c             |  2 +-
+ drivers/video/fbdev/xilinxfb.c                |  2 +-
+ include/linux/fb.h                            |  2 +-
+ samples/vfio-mdev/mdpy-fb.c                   |  2 +-
+ 136 files changed, 156 insertions(+), 175 deletions(-)
+
+-- 
+2.20.1
+
