@@ -2,107 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5476610CFF3
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 00:25:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8B4C10D09D
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 04:20:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726664AbfK1XZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Nov 2019 18:25:35 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51507 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726653AbfK1XZe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Nov 2019 18:25:34 -0500
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 47PDJq27m4z9sR2; Fri, 29 Nov 2019 10:25:31 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1574983531; bh=K3rUI3oKvNc9LFGK8LZbyA4UxPK1ZJoyUWkTY87H/ik=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WyMBBKeJv/k/CHoDeakagEbM8YYsaz919gFs2XU5OSL0FYebH4r7KtDuVVajxaDRO
-         yUyASs6jPL4YcliuQUGTaSgK3EvHVpZVkPmS6pVcjT779Ss0cGp9ZD+Lp9tbgwLcyT
-         19+5fVSkZLHFKDPOUB2SXFEIy+JfjWCY/PolSluVbb69LK8j1tAuQU6S8wA8e6ZhSG
-         lPg8aBeEX6kPw0bJPma410yHfo6f7NP/MMIWHlqs9h5tYNdAV4oW7a44eVCmnmgdZs
-         OaBm+wmIdefUeNQAjDlctLGfvhpt7vi9nVdrH8x5vJOaUo0gEjHekYE3OODhwuyvQ6
-         gcntLNyW3149w==
-Date:   Fri, 29 Nov 2019 10:25:28 +1100
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
-Subject: [GIT PULL v2] Please pull my kvm-ppc-uvmem-5.5-2 tag
-Message-ID: <20191128232528.GA12171@oak.ozlabs.ibm.com>
-References: <20191126052455.GA2922@oak.ozlabs.ibm.com>
+        id S1726859AbfK2DT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Nov 2019 22:19:57 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6729 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726764AbfK2DT5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Nov 2019 22:19:57 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 09800991634F43F95A93;
+        Fri, 29 Nov 2019 11:19:54 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Fri, 29 Nov 2019
+ 11:19:45 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     <maz@kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
+        <suzuki.poulose@arm.com>, <christoffer.dall@arm.com>,
+        <catalin.marinas@arm.com>, <eric.auger@redhat.com>,
+        <gregkh@linuxfoundation.org>, <will@kernel.org>,
+        <andre.przywara@arm.com>, <tglx@linutronix.de>
+CC:     <linmiaohe@huawei.com>, <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: [PATCH] KVM: arm/arm64: Fix some obsolete comments
+Date:   Fri, 29 Nov 2019 11:19:47 +0800
+Message-ID: <1574997587-20842-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126052455.GA2922@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+From: Miaohe Lin <linmiaohe@huawei.com>
 
-Bharata has corrected the issue identified by Hugh Dickins, so please
-do a pull from my kvm-ppc-uvmem-5.5-2 tag.
+Fix various comments, including comment typo, and obsolete comments
+no longer make sense.
+Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+---
+ virt/kvm/arm/arch_timer.c    | 5 ++---
+ virt/kvm/arm/arm.c           | 1 -
+ virt/kvm/arm/vgic/vgic-its.c | 2 +-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
-This adds code to manage the movement of pages for a secure KVM guest
-between normal memory managed by the host kernel and secure memory
-managed by the ultravisor, on Power systems with Protected Execution
-Facility hardware and firmware.  Secure memory is not accessible to
-the host kernel and is represented as device memory using the
-ZONE_DEVICE facility.
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 73867f97040c..d8d2f4bec935 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -322,9 +322,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 	}
+ 
+ 	/*
+-	 * If the timer can fire now, we don't need to have a soft timer
+-	 * scheduled for the future.  If the timer cannot fire at all,
+-	 * then we also don't need a soft timer.
++	 * If the timer cannot fire at all, we don't need to have a
++	 * soft timer scheduled for the future.
+ 	 */
+ 	if (!kvm_timer_irq_can_fire(ctx)) {
+ 		soft_timer_cancel(&ctx->hrtimer);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 8de4daf25097..7687663ab71b 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -525,7 +525,6 @@ static bool need_new_vmid_gen(struct kvm_vmid *vmid)
+ 
+ /**
+  * update_vmid - Update the vmid with a valid VMID for the current generation
+- * @kvm: The guest that struct vmid belongs to
+  * @vmid: The stage-2 VMID information struct
+  */
+ static void update_vmid(struct kvm_vmid *vmid)
+diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+index 98c7360d9fb7..d64569b30b5c 100644
+--- a/virt/kvm/arm/vgic/vgic-its.c
++++ b/virt/kvm/arm/vgic/vgic-its.c
+@@ -2564,7 +2564,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+ }
+ 
+ /**
+- * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
++ * vgic_its_save_tables_v0 - Save the ITS tables into guest RAM
+  * according to v0 ABI
+  */
+ static int vgic_its_save_tables_v0(struct vgic_its *its)
+-- 
+2.19.1
 
-Thanks,
-Paul.
-
-The following changes since commit 96710247298df52a4b8150a62a6fe87083093ff3:
-
-  Merge tag 'kvm-ppc-next-5.5-2' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc into HEAD (2019-11-25 11:29:05 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-uvmem-5.5-2
-
-for you to fetch changes up to 013a53f2d25a9fa9b9e1f70f5baa3f56e3454052:
-
-  powerpc: Ultravisor: Add PPC_UV config option (2019-11-28 17:02:40 +1100)
-
-----------------------------------------------------------------
-KVM: Add support for secure guests under the Protected Execution
-Framework (PEF) Ultravisor on POWER.
-
-This enables secure memory to be represented as device memory,
-which provides a way for the host to keep track of which pages of a
-secure guest have been moved into secure memory managed by the
-ultravisor and are no longer accessible by the host, and manage
-movement of pages between secure and normal memory.
-
-----------------------------------------------------------------
-Anshuman Khandual (1):
-      powerpc: Ultravisor: Add PPC_UV config option
-
-Bharata B Rao (6):
-      mm: ksm: Export ksm_madvise()
-      KVM: PPC: Book3S HV: Support for running secure guests
-      KVM: PPC: Book3S HV: Shared pages support for secure guests
-      KVM: PPC: Book3S HV: Radix changes for secure guest
-      KVM: PPC: Book3S HV: Handle memory plug/unplug to secure VM
-      KVM: PPC: Book3S HV: Support reset of secure guest
-
- Documentation/virt/kvm/api.txt              |  18 +
- arch/powerpc/Kconfig                        |  17 +
- arch/powerpc/include/asm/hvcall.h           |   9 +
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |  74 +++
- arch/powerpc/include/asm/kvm_host.h         |   6 +
- arch/powerpc/include/asm/kvm_ppc.h          |   1 +
- arch/powerpc/include/asm/ultravisor-api.h   |   6 +
- arch/powerpc/include/asm/ultravisor.h       |  36 ++
- arch/powerpc/kvm/Makefile                   |   3 +
- arch/powerpc/kvm/book3s_64_mmu_radix.c      |  25 +
- arch/powerpc/kvm/book3s_hv.c                | 143 +++++
- arch/powerpc/kvm/book3s_hv_uvmem.c          | 785 ++++++++++++++++++++++++++++
- arch/powerpc/kvm/powerpc.c                  |  12 +
- include/uapi/linux/kvm.h                    |   1 +
- mm/ksm.c                                    |   1 +
- 15 files changed, 1137 insertions(+)
- create mode 100644 arch/powerpc/include/asm/kvm_book3s_uvmem.h
- create mode 100644 arch/powerpc/kvm/book3s_hv_uvmem.c
