@@ -2,240 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41C6A10D8C8
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 18:05:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6816910D8E0
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 18:25:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726963AbfK2RFi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 12:05:38 -0500
-Received: from foss.arm.com ([217.140.110.172]:50198 "EHLO foss.arm.com"
+        id S1727030AbfK2RZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 12:25:29 -0500
+Received: from mga14.intel.com ([192.55.52.115]:64167 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726608AbfK2RFi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Nov 2019 12:05:38 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA7471FB;
-        Fri, 29 Nov 2019 09:05:37 -0800 (PST)
-Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB6943F68E;
-        Fri, 29 Nov 2019 09:05:36 -0800 (PST)
-Subject: Re: [PATCH kvmtool 13/16] vfio: Add support for BAR configuration
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     kvm@vger.kernel.org
-Cc:     will@kernel.org, julien.thierry.kdev@gmail.com,
-        andre.przywara@arm.com, sami.mujawar@arm.com,
-        lorenzo.pieralisi@arm.com
-References: <20191125103033.22694-1-alexandru.elisei@arm.com>
- <20191125103033.22694-14-alexandru.elisei@arm.com>
-Message-ID: <97d8c250-6546-bdda-bd89-8980a111dc8e@arm.com>
-Date:   Fri, 29 Nov 2019 17:05:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191125103033.22694-14-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1726909AbfK2RZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Nov 2019 12:25:28 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Nov 2019 09:25:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,257,1571727600"; 
+   d="scan'208";a="241108952"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.128])
+  by fmsmga002.fm.intel.com with ESMTP; 29 Nov 2019 09:25:26 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        sean.j.christopherson@intel.com
+Cc:     yu.c.zhang@linux.intel.com, alazar@bitdefender.com,
+        edwin.zhai@intel.com, Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v8 00/10] Enable Sub-Page Write Protection Support
+Date:   Sat, 30 Nov 2019 01:26:59 +0800
+Message-Id: <20191129172709.11347-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+EPT-Based Sub-Page write Protection(SPP) allows Virtual Machine Monitor(VMM)
+specify write-permission for guest physical memory at a sub-page(128 byte)
+granularity. When SPP works, HW enforces write-access check for sub-pages
+within a protected 4KB page.
 
-On 11/25/19 10:30 AM, Alexandru Elisei wrote:
-> From: Julien Thierry <julien.thierry@arm.com>
->
-> When a guest can reassign BARs, kvmtool needs to maintain the vfio_region
-> consistent with their corresponding BARs. Take the new updated addresses
-> from the PCI header read back from the vfio driver.
->
-> Also, to modify the BARs, it is expected that guests will disable
-> IO/Memory response in the PCI command. Support this by mapping/unmapping
-> regions when the corresponding response gets enabled/disabled.
->
-> Cc: julien.thierry.kdev@gmail.com
-> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
-> [Fixed BAR selection]
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  vfio/core.c |  8 ++---
->  vfio/pci.c  | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++---
->  2 files changed, 87 insertions(+), 9 deletions(-)
+The feature targets to provide fine-grained memory protection for
+usages such as memory guard and VM introspection etc.
 
-I've finally had the chance to do more testing for PCI passthrough, and this patch
-is pretty broken, so far I've found that: kvmtool does trap-and-emulate for the
-BAR(s) dedicated to the MSI-X table and MSI-X PBA structure, and we don't take
-that into account; vfio_unmap_region doesn't destroy the memslot; when the guest
-enables memory or I/O accesses, we call vfio_map_region for all 6 BARs, even
-though some of them might be unimplemented (their value is 0).
+SPP is active when the "sub-page write protection" (bit 23) is 1 in
+Secondary VM-Execution Controls. The feature is backed with a Sub-Page
+Permission Table(SPPT), and subpage permission vector is stored in the
+leaf entry of SPPT. The root page is referenced via a Sub-Page Permission
+Table Pointer (SPPTP) in VMCS.
 
-Thanks,
-Alex
-> diff --git a/vfio/core.c b/vfio/core.c
-> index 0ed1e6fee6bf..b554897fc8c1 100644
-> --- a/vfio/core.c
-> +++ b/vfio/core.c
-> @@ -202,14 +202,13 @@ static int vfio_setup_trap_region(struct kvm *kvm, struct vfio_device *vdev,
->  				  struct vfio_region *region)
->  {
->  	if (region->is_ioport) {
-> -		int port = pci_get_io_port_block(region->info.size);
-> +		int port = ioport__register(kvm, region->port_base,
-> +					    &vfio_ioport_ops,
-> +					    region->info.size, region);
->  
-> -		port = ioport__register(kvm, port, &vfio_ioport_ops,
-> -					region->info.size, region);
->  		if (port < 0)
->  			return port;
->  
-> -		region->port_base = port;
->  		return 0;
->  	}
->  
-> @@ -258,6 +257,7 @@ void vfio_unmap_region(struct kvm *kvm, struct vfio_region *region)
->  {
->  	if (region->host_addr) {
->  		munmap(region->host_addr, region->info.size);
-> +		region->host_addr = NULL;
->  	} else if (region->is_ioport) {
->  		ioport__unregister(kvm, region->port_base);
->  	} else {
-> diff --git a/vfio/pci.c b/vfio/pci.c
-> index bc5a6d452f7a..28f895c06b27 100644
-> --- a/vfio/pci.c
-> +++ b/vfio/pci.c
-> @@ -1,3 +1,4 @@
-> +#include "kvm/ioport.h"
->  #include "kvm/irq.h"
->  #include "kvm/kvm.h"
->  #include "kvm/kvm-cpu.h"
-> @@ -464,6 +465,67 @@ static void vfio_pci_cfg_read(struct kvm *kvm, struct pci_device_header *pci_hdr
->  			      sz, offset);
->  }
->  
-> +static void vfio_pci_cfg_handle_command(struct kvm *kvm, struct vfio_device *vdev,
-> +					void *data, int sz)
-> +{
-> +	struct pci_device_header *hdr = &vdev->pci.hdr;
-> +	bool toggle_io;
-> +	bool toggle_mem;
-> +	u16 cmd;
-> +	int i;
-> +
-> +	cmd = ioport__read16(data);
-> +	toggle_io = !!((cmd ^ hdr->command) & PCI_COMMAND_IO);
-> +	toggle_mem = !!((cmd ^ hdr->command) & PCI_COMMAND_MEMORY);
-> +
-> +	for (i = VFIO_PCI_BAR0_REGION_INDEX; i <= VFIO_PCI_BAR5_REGION_INDEX; ++i) {
-> +		struct vfio_region *region = &vdev->regions[i];
-> +
-> +		if (region->is_ioport && toggle_io) {
-> +			if (cmd & PCI_COMMAND_IO)
-> +				vfio_map_region(kvm, vdev, region);
-> +			else
-> +				vfio_unmap_region(kvm, region);
-> +		}
-> +
-> +		if (!region->is_ioport && toggle_mem) {
-> +			if (cmd & PCI_COMMAND_MEMORY)
-> +				vfio_map_region(kvm, vdev, region);
-> +			else
-> +				vfio_unmap_region(kvm, region);
-> +		}
-> +	}
-> +}
-> +
-> +static void vfio_pci_cfg_update_bar(struct kvm *kvm, struct vfio_device *vdev,
-> +				    int bar_num, void *data, int sz)
-> +{
-> +	struct pci_device_header *hdr = &vdev->pci.hdr;
-> +	struct vfio_region *region;
-> +	uint32_t bar;
-> +
-> +	region = &vdev->regions[bar_num + VFIO_PCI_BAR0_REGION_INDEX];
-> +	bar = ioport__read32(data);
-> +
-> +	if (region->is_ioport) {
-> +		if (hdr->command & PCI_COMMAND_IO)
-> +			vfio_unmap_region(kvm, region);
-> +
-> +		region->port_base = bar & PCI_BASE_ADDRESS_IO_MASK;
-> +
-> +		if (hdr->command & PCI_COMMAND_IO)
-> +			vfio_map_region(kvm, vdev, region);
-> +	} else {
-> +		if (hdr->command & PCI_COMMAND_MEMORY)
-> +			vfio_unmap_region(kvm, region);
-> +
-> +		region->guest_phys_addr = bar & PCI_BASE_ADDRESS_MEM_MASK;
-> +
-> +		if (hdr->command & PCI_COMMAND_MEMORY)
-> +			vfio_map_region(kvm, vdev, region);
-> +	}
-> +}
-> +
->  static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hdr,
->  			       u8 offset, void *data, int sz)
->  {
-> @@ -471,6 +533,7 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	struct vfio_pci_device *pdev;
->  	struct vfio_device *vdev;
->  	void *base = pci_hdr;
-> +	int bar_num;
->  
->  	pdev = container_of(pci_hdr, struct vfio_pci_device, hdr);
->  	vdev = container_of(pdev, struct vfio_device, pci);
-> @@ -487,9 +550,17 @@ static void vfio_pci_cfg_write(struct kvm *kvm, struct pci_device_header *pci_hd
->  	if (pdev->irq_modes & VFIO_PCI_IRQ_MODE_MSI)
->  		vfio_pci_msi_cap_write(kvm, vdev, offset, data, sz);
->  
-> +	if (offset == PCI_COMMAND)
-> +		vfio_pci_cfg_handle_command(kvm, vdev, data, sz);
-> +
->  	if (pread(vdev->fd, base + offset, sz, info->offset + offset) != sz)
->  		vfio_dev_warn(vdev, "Failed to read %d bytes from Configuration Space at 0x%x",
->  			      sz, offset);
-> +
-> +	if (offset >= PCI_BASE_ADDRESS_0 && offset <= PCI_BASE_ADDRESS_5) {
-> +		bar_num = (offset - PCI_BASE_ADDRESS_0) / sizeof(u32);
-> +		vfio_pci_cfg_update_bar(kvm, vdev, bar_num, data, sz);
-> +	}
->  }
->  
->  static ssize_t vfio_pci_msi_cap_size(struct msi_cap_64 *cap_hdr)
-> @@ -808,6 +879,7 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
->  	size_t map_size;
->  	struct vfio_pci_device *pdev = &vdev->pci;
->  	struct vfio_region *region = &vdev->regions[nr];
-> +	bool map_now;
->  
->  	if (nr >= vdev->info.num_regions)
->  		return 0;
-> @@ -848,16 +920,22 @@ static int vfio_pci_configure_bar(struct kvm *kvm, struct vfio_device *vdev,
->  		}
->  	}
->  
-> -	if (!region->is_ioport) {
-> +	if (region->is_ioport) {
-> +		region->port_base = pci_get_io_port_block(region->info.size);
-> +		map_now = !!(pdev->hdr.command & PCI_COMMAND_IO);
-> +	} else {
->  		/* Grab some MMIO space in the guest */
->  		map_size = ALIGN(region->info.size, PAGE_SIZE);
->  		region->guest_phys_addr = pci_get_mmio_block(map_size);
-> +		map_now = !!(pdev->hdr.command & PCI_COMMAND_MEMORY);
->  	}
->  
-> -	/* Map the BARs into the guest or setup a trap region. */
-> -	ret = vfio_map_region(kvm, vdev, region);
-> -	if (ret)
-> -		return ret;
-> +	if (map_now) {
-> +		/* Map the BARs into the guest or setup a trap region. */
-> +		ret = vfio_map_region(kvm, vdev, region);
-> +		if (ret)
-> +			return ret;
-> +	}
->  
->  	return 0;
->  }
+To enable SPP for guest memory, the guest page should be first mapped
+to a 4KB EPT entry, then set SPP bit 61 of the corresponding entry. 
+While HW walks EPT, it traverses SPPT with the gpa to look up the sub-page
+permission vector within SPPT leaf entry. If the corresponding bit is set,
+write to sub-page is permitted, otherwise, SPP induced EPT violation is generated.
+
+This patch serial passed SPP function test and selftest on Ice-Lake platform.
+
+Please refer to the SPP introduction document in this patch set and
+Intel SDM for details:
+
+Intel SDM:
+https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Patch 1: Documentation for SPP and related API.
+Patch 2: Add control flags for Sub-Page Protection(SPP).
+Patch 3: Add SPP Table setup functions.
+Patch 4: Add functions to create/destroy SPP bitmap block.
+Patch 5: Introduce user-space SPP IOCTLs.
+Patch 6: Set up SPP paging table at vmentry/vmexit.
+Patch 7: Enable Lazy mode SPP protection.
+Patch 8: Handle SPP protected pages when VM memory changes.
+Patch 9: Add SPP protection check in emulation case.
+Patch 10: SPP selftest.
+
+Change logs:
+V7 -> V8:
+  1. Changed ioctl interface definition per Paolo's comments.
+  2. Replaced SPP_INIT ioctl funciton with KVM_ENABLE_CAP.
+  3. Removed SPP bit from X86 feature word.
+  4. Returned instruction length to user-space when SPP induced EPT
+     violation happens, this is to provide flexibility to use SPP,
+     revert write or track write.
+  5. Modified selftest application and added into this serial.
+  6. Simplified SPP permission vector check.
+  7. Moved spp.c and spp.h to kvm/mmu folder.
+  8. Other code fix according to Paolo's feedback and testing.
+
+V6 -> V7:
+  1. Configured all available protected pages once SPP induced vmexit
+     happens since there's no PRESENT bit in SPPT leaf entry.
+  2. Changed SPP protection check flow in tdp_page_fault().
+  3. Code refactor and minior fixes.
+
+V5 -> V6:
+  1. Added SPP protection patch for emulation cases per Jim's review.
+  2. Modified documentation and added API description per Jim's review.
+  3. Other minior changes suggested by Jim.
+
+V4 -> V5:
+  1. Enable SPP support for Hugepage(1GB/2MB) to extend application.
+  2. Make SPP miss vm-exit handler as the unified place to set up SPPT.
+  3. If SPP protected pages are access-tracked or dirty-page-tracked,
+     store SPP flag in reserved address bit, restore it in
+     fast_page_fault() handler.
+  4. Move SPP specific functions to vmx/spp.c and vmx/spp.h
+  5. Rebased code to kernel v5.3
+  6. Other change suggested by KVM community.
+  
+V3 -> V4:
+  1. Modified documentation to make it consistent with patches.
+  2. Allocated SPPT root page in init_spp() instead of vmx_set_cr3() to
+     avoid SPPT miss error.
+  3. Added back co-developers and sign-offs.
+
+V2 -> V3:                                                                
+  1. Rebased patches to kernel 5.1 release                                
+  2. Deferred SPPT setup to EPT fault handler if the page is not
+     available while set_subpage() is being called.
+  3. Added init IOCTL to reduce extra cost if SPP is not used.
+  4. Refactored patch structure, cleaned up cross referenced functions.
+  5. Added code to deal with memory swapping/migration/shrinker cases.
+
+V2 -> V1:
+  1. Rebased to 4.20-rc1
+  2. Move VMCS change to a separated patch.
+  3. Code refine and Bug fix 
+
+
+Yang Weijiang (10):
+  Documentation: Introduce EPT based Subpage Protection and related APIs
+  vmx: spp: Add control flags for Sub-Page Protection(SPP)
+  mmu: spp: Add SPP Table setup functions
+  mmu: spp: Add functions to operate SPP access bitmap
+  x86: spp: Introduce user-space SPP IOCTLs
+  vmx: spp: Set up SPP paging table at vmentry/vmexit
+  mmu: spp: Enable Lazy mode SPP protection
+  mmu: spp: Handle SPP protected pages when VM memory changes
+  x86: spp: Add SPP protection check in emulation
+  kvm: selftests: selftest for Sub-Page protection
+
+ Documentation/virt/kvm/api.txt                |  38 ++
+ Documentation/virtual/kvm/spp_kvm.txt         | 180 ++++++
+ arch/x86/include/asm/kvm_host.h               |  11 +-
+ arch/x86/include/asm/vmx.h                    |  10 +
+ arch/x86/include/uapi/asm/vmx.h               |   2 +
+ arch/x86/kvm/mmu.h                            |   2 +
+ arch/x86/kvm/mmu/mmu.c                        |  75 ++-
+ arch/x86/kvm/mmu/spp.c                        | 611 ++++++++++++++++++
+ arch/x86/kvm/mmu/spp.h                        |  35 +
+ arch/x86/kvm/vmx/capabilities.h               |   5 +
+ arch/x86/kvm/vmx/vmx.c                        | 102 +++
+ arch/x86/kvm/x86.c                            | 134 +++-
+ include/uapi/linux/kvm.h                      |  18 +
+ tools/testing/selftests/kvm/Makefile          |   2 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/x86_64/spp_test.c | 234 +++++++
+ 16 files changed, 1455 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
+ create mode 100644 arch/x86/kvm/mmu/spp.c
+ create mode 100644 arch/x86/kvm/mmu/spp.h
+ create mode 100644 tools/testing/selftests/kvm/x86_64/spp_test.c
+
+-- 
+2.17.2
+
