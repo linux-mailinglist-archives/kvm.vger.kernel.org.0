@@ -2,349 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3995210DAD5
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 22:13:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 562A410DAF4
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 22:32:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727197AbfK2VNq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 16:13:46 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:46415 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727111AbfK2VNq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Nov 2019 16:13:46 -0500
-Received: by mail-il1-f195.google.com with SMTP id t17so1097488ilm.13;
-        Fri, 29 Nov 2019 13:13:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hJ8RbTIGZZQ7VJu2rp/1bZ+IuxZXobj9TbZNQdZKBHE=;
-        b=qdN0zHl22aRYUrvLOlxp/PivnUhWnY0g+1CZq+skgMhO8eIAosj3SB3I1BuroUtr/U
-         9l5e6F9taugoWU9W47NrjUC6j34mKcQJeSn6Ge3FbryDN4iRQG8ABNNQoq+P/hFpow8I
-         qmQ4H2WRF+WsXI/XrZ/VLk8gUNLE0xbP3kgzqRjI+UxFSLGdmAQDoGA+JHCsufmZ3iPA
-         cQ1YuVYmX09K46n3hCRypvPj7Q14mqb4jX2BhrekYNSKvgsuHJhB/0Yzl8CSE2jKUigA
-         D96/y2k/t/Qr2yv7N/bv0vYOEpZ0eGJxA1MoDGOXlyQgxZl9f+AUspBhYHE8B0jeXvOB
-         hO3A==
+        id S1727187AbfK2Vcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 16:32:50 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49966 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727116AbfK2Vcu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 16:32:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575063169;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=peI3w5GhWEX1JieJHH29KyaSX4w2AsTjOin5SLB/5Gw=;
+        b=jSNTEX5OfiErFkF8aJvja4ywZY9ZK6PYxAMszHX4xtvrXwQZQKE/B0kFm/6sIQE5OH1qwJ
+        naWT5q9y9lVYVCo34HLhnJSkGu3o4bkddnLetn3jKtYbztuCw60H3mUG0T6KCN23RuXJz8
+        lUXm3wq3yMZt4AQkHa+sEOJq7CfiFas=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-5OIN4PcGNI2DbeqWSDHIXg-1; Fri, 29 Nov 2019 16:32:45 -0500
+Received: by mail-qv1-f71.google.com with SMTP id q2so19609884qvo.23
+        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 13:32:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hJ8RbTIGZZQ7VJu2rp/1bZ+IuxZXobj9TbZNQdZKBHE=;
-        b=UGp3Se3eZJdVLmmhZPTM8vDg+7D4TFStvozj7VbPPGW6LcPSFd/dStj03rjB3rQoz8
-         PfdeNjbVkZC7Q/ByiG4g6ULEW43WSLuCuYlx/yI+ns8H8DJt594BKQgLZZC8TSMZnljD
-         B/3kVwGMA1rsq8oaWLUW8NLrKChs/FuILrIvz9G69pygoGGY4HVIbUkmS8npYdwbcph0
-         txsq0QLITEjPxuIP+1OcqHt3zrMwFXX3/t0o/cqSh8i3dCL+v+cflTZRnj+0uCU4kjKT
-         RkyaYOwviS88UxHOXfVNY2pmdSBbnoO4mUcJG7pEtcIWGNdSDDW/3Py7amsLayp7AFLZ
-         mlTA==
-X-Gm-Message-State: APjAAAVmW7h2VMprQTPIUjOJlYhGfdbwQIffCOL63vMGvqeDITPbkN3m
-        aPCBPro38Y2PGW3I9ReERcMX8C4qkzGGBximzso=
-X-Google-Smtp-Source: APXvYqz8PHQebGFS+bDvYJwLP/1NZwgIQoF6ZaBfKex11pycHa/29B2aacde4OzWDehPoaR2l/+QaRQ1jCDHqFg3AuI=
-X-Received: by 2002:a92:d744:: with SMTP id e4mr16846561ilq.64.1575062023927;
- Fri, 29 Nov 2019 13:13:43 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cn7j7/8SJgeM/ER61fZ1AdZGSd2mYCJ7pUgcBKPF2KQ=;
+        b=M9Z1kNk/KCnC3ihrbHEO0DJbfi8mBlisq4QevcLOr+/2D5LqPifgw7xRLRb1RreM1H
+         +N5r9jTxU8w1DNWHZnGdcD/0+cA6ZJEhxjeSUXsx5LHoZ9ox9ly9h39lSpu8uI4c920B
+         Uj68bQQHKAkO0hj18aH+Ugweu+MCADUdXw+u6NhMqeQrasd39WLvg/SDh8iISLG3ffpp
+         5Iu+AMU9ljOewOdn/3Ke+LIxF6i6QjUvdXWaGMJkNzVOF7anG3rmZxpUkSeFWW/q92qU
+         n74FqpZZMl09Nz3UilYTWMEJjfF4kaUL/wdUVMVOxG9RtJPS5tUOqos5mDti+/w5+6K8
+         TYXg==
+X-Gm-Message-State: APjAAAWNZaFjE+Ur5aa/n/0ArLqneEvG2ggmGZ8yKEGX5KiR3qRV4ooY
+        PY/zOznrw/FlnlnhPIziWm9+GUZedrNP76+jgVEZKzHGb+8M4WS6Uwx7B/fHYQIS1AETTlCwpIv
+        +uq5/6R+ZFopc
+X-Received: by 2002:ad4:588d:: with SMTP id dz13mr19982295qvb.86.1575063164827;
+        Fri, 29 Nov 2019 13:32:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy5eIATWxerwmd03ez0vmrXtvk2z5PAQi557Z+8gFzf+IEvRetJH80wrZlItjYLRMnxc+PPpA==
+X-Received: by 2002:ad4:588d:: with SMTP id dz13mr19982258qvb.86.1575063164469;
+        Fri, 29 Nov 2019 13:32:44 -0800 (PST)
+Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id n5sm10634817qkf.48.2019.11.29.13.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Nov 2019 13:32:43 -0800 (PST)
+From:   Peter Xu <peterx@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Cao Lei <Lei.Cao@stratus.com>,
+        peterx@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH RFC 00/15] KVM: Dirty ring interface
+Date:   Fri, 29 Nov 2019 16:32:27 -0500
+Message-Id: <20191129213242.17144-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20191119214454.24996.66289.stgit@localhost.localdomain>
- <20191119214653.24996.90695.stgit@localhost.localdomain> <65de00cf-5969-ea2e-545b-2228a4c859b0@redhat.com>
-In-Reply-To: <65de00cf-5969-ea2e-545b-2228a4c859b0@redhat.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Fri, 29 Nov 2019 13:13:32 -0800
-Message-ID: <CAKgT0Uf8iebEXSovdWfXq1FvyGpqrF-X0VDrq-h8xavQkvA_9w@mail.gmail.com>
-Subject: Re: [PATCH v14 6/6] virtio-balloon: Add support for providing unused
- page reports to host
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Pankaj Gupta <pagupta@redhat.com>,
-        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Oscar Salvador <osalvador@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+X-MC-Unique: 5OIN4PcGNI2DbeqWSDHIXg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 28, 2019 at 7:26 AM David Hildenbrand <david@redhat.com> wrote:
->
-> On 19.11.19 22:46, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> >
-> > Add support for the page reporting feature provided by virtio-balloon.
-> > Reporting differs from the regular balloon functionality in that is is
-> > much less durable than a standard memory balloon. Instead of creating a
-> > list of pages that cannot be accessed the pages are only inaccessible
-> > while they are being indicated to the virtio interface. Once the
-> > interface has acknowledged them they are placed back into their respective
-> > free lists and are once again accessible by the guest system.
->
-> Maybe add something like "In contrast to ordinary balloon
-> inflation/deflation, the guest can reuse all reported pages immediately
-> after reporting has finished, without having to notify the hypervisor
-> about it (e.g., VIRTIO_BALLOON_F_MUST_TELL_HOST does not apply)."
+Branch is here: https://github.com/xzpeter/linux/tree/kvm-dirty-ring
 
-Okay. I'll make a note of it for next version.
+Overview
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-> [...]
->
-> >  /*
-> >   * Balloon device works in 4K page units.  So each page is pointed to by
-> > @@ -37,6 +38,9 @@
-> >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
-> >       (1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
-> >
-> > +/*  limit on the number of pages that can be on the reporting vq */
-> > +#define VIRTIO_BALLOON_VRING_HINTS_MAX       16
->
-> Maybe rename that from HINTS to REPORTS
+This is a continued work from Lei Cao <lei.cao@stratus.com> and Paolo
+on the KVM dirty ring interface.  To make it simple, I'll still start
+with version 1 as RFC.
 
-I'll fix it for the next version.
+The new dirty ring interface is another way to collect dirty pages for
+the virtual machine, but it is different from the existing dirty
+logging interface in a few ways, majorly:
 
-> > +
-> >  #ifdef CONFIG_BALLOON_COMPACTION
-> >  static struct vfsmount *balloon_mnt;
-> >  #endif
-> > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
-> >       VIRTIO_BALLOON_VQ_DEFLATE,
-> >       VIRTIO_BALLOON_VQ_STATS,
-> >       VIRTIO_BALLOON_VQ_FREE_PAGE,
-> > +     VIRTIO_BALLOON_VQ_REPORTING,
-> >       VIRTIO_BALLOON_VQ_MAX
-> >  };
-> >
-> > @@ -113,6 +118,10 @@ struct virtio_balloon {
-> >
-> >       /* To register a shrinker to shrink memory upon memory pressure */
-> >       struct shrinker shrinker;
-> > +
-> > +     /* Unused page reporting device */
->
-> Sounds like the device is unused :D
->
-> "Device info for reporting unused pages" ?
->
-> I am in general wondering, should we rename "unused" to "free". I.e.,
-> "free page reporting" instead of "unused page reporting"? Or what was
-> the motivation behind using "unused" ?
+  - Data format: The dirty data was in a ring format rather than a
+    bitmap format, so the size of data to sync for dirty logging does
+    not depend on the size of guest memory any more, but speed of
+    dirtying.  Also, the dirty ring is per-vcpu (currently plus
+    another per-vm ring, so total ring number is N+1), while the dirty
+    bitmap is per-vm.
 
-I honestly don't remember why I chose "unused" at this point. I can
-switch over to "free" if that is what is preferred.
+  - Data copy: The sync of dirty pages does not need data copy any more,
+    but instead the ring is shared between the userspace and kernel by
+    page sharings (mmap() on either the vm fd or vcpu fd)
 
-Looking over the code a bit more I suspect the reason for avoiding it
-is because free page hinting also mentioned reporting in a few spots.
+  - Interface: Instead of using the old KVM_GET_DIRTY_LOG,
+    KVM_CLEAR_DIRTY_LOG interfaces, the new ring uses a new interface
+    called KVM_RESET_DIRTY_RINGS when we want to reset the collected
+    dirty pages to protected mode again (works like
+    KVM_CLEAR_DIRTY_LOG, but ring based)
 
-> > +     struct virtqueue *reporting_vq;
-> > +     struct page_reporting_dev_info pr_dev_info;
-> >  };
-> >
-> >  static struct virtio_device_id id_table[] = {
-> > @@ -152,6 +161,32 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
-> >
-> >  }
-> >
-> > +void virtballoon_unused_page_report(struct page_reporting_dev_info *pr_dev_info,
-> > +                                 unsigned int nents)
-> > +{
-> > +     struct virtio_balloon *vb =
-> > +             container_of(pr_dev_info, struct virtio_balloon, pr_dev_info);
-> > +     struct virtqueue *vq = vb->reporting_vq;
-> > +     unsigned int unused, err;
-> > +
-> > +     /* We should always be able to add these buffers to an empty queue. */
->
-> This comment somewhat contradicts the error handling (and comment)
-> below. Maybe just drop it?
->
-> > +     err = virtqueue_add_inbuf(vq, pr_dev_info->sg, nents, vb,
-> > +                               GFP_NOWAIT | __GFP_NOWARN);
-> > +
-> > +     /*
-> > +      * In the extremely unlikely case that something has changed and we
-> > +      * are able to trigger an error we will simply display a warning
-> > +      * and exit without actually processing the pages.
-> > +      */
-> > +     if (WARN_ON(err))
-> > +             return;
->
-> Maybe WARN_ON_ONCE? (to not flood the log on recurring errors)
+And more.
 
-Actually I might need to tweak things here a bit. It occurs to me that
-this can fail for more than just there not being space in the ring. I
-forgot that DMA mapping needs to also occur so in the case of a DMA
-mapping failure we would also see an error.
+I would appreciate if the reviewers can start with patch "KVM:
+Implement ring-based dirty memory tracking", especially the document
+update part for the big picture.  Then I'll avoid copying into most of
+them into cover letter again.
 
-I probably will switch it to a WARN_ON_ONCE. I may also need to add a
-return value to the function so that we can indicate that an entire
-batch has failed and that we need to abort.
+I marked this series as RFC because I'm at least uncertain on this
+change of vcpu_enter_guest():
 
-> > +
-> > +     virtqueue_kick(vq);
-> > +
-> > +     /* When host has read buffer, this completes via balloon_ack */
-> > +     wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
->
-> Is it safe to rely on the same ack-ing mechanism as the inflate/deflate
-> queue? What if both mechanisms are used concurrently and race/both wait
-> for the hypervisor?
->
-> Maybe we need a separate vb->acked + callback function.
+        if (kvm_check_request(KVM_REQ_DIRTY_RING_FULL, vcpu)) {
+                vcpu->run->exit_reason =3D KVM_EXIT_DIRTY_RING_FULL;
+                /*
+                        * If this is requested, it means that we've
+                        * marked the dirty bit in the dirty ring BUT
+                        * we've not written the date.  Do it now.
+                        */
+                r =3D kvm_emulate_instruction(vcpu, 0);
+                r =3D r >=3D 0 ? 0 : r;
+                goto out;
+        }
 
-So if I understand correctly what is actually happening is that the
-wait event is simply a trigger that will wake us up, and at that point
-we check to see if the buffer we submitted is done. If not we go back
-to sleep. As such all we are really waiting on is the notification
-that the buffers we submitted have been processed. So it is using the
-same function but on a different virtual queue.
+I did a kvm_emulate_instruction() when dirty ring reaches softlimit
+and want to exit to userspace, however I'm not really sure whether
+there could have any side effect.  I'd appreciate any comment of
+above, or anything else.
 
-> > +}
-> > +
-> >  static void set_page_pfns(struct virtio_balloon *vb,
-> >                         __virtio32 pfns[], struct page *page)
-> >  {
-> > @@ -476,6 +511,7 @@ static int init_vqs(struct virtio_balloon *vb)
-> >       names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
-> >       names[VIRTIO_BALLOON_VQ_STATS] = NULL;
-> >       names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
-> > +     names[VIRTIO_BALLOON_VQ_REPORTING] = NULL;
-> >
-> >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-> >               names[VIRTIO_BALLOON_VQ_STATS] = "stats";
-> > @@ -487,11 +523,19 @@ static int init_vqs(struct virtio_balloon *vb)
-> >               callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
-> >       }
-> >
-> > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
-> > +             names[VIRTIO_BALLOON_VQ_REPORTING] = "reporting_vq";
-> > +             callbacks[VIRTIO_BALLOON_VQ_REPORTING] = balloon_ack;
-> > +     }
-> > +
-> >       err = vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_MAX,
-> >                                        vqs, callbacks, names, NULL, NULL);
-> >       if (err)
-> >               return err;
-> >
-> > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
-> > +             vb->reporting_vq = vqs[VIRTIO_BALLOON_VQ_REPORTING];
-> > +
->
-> I'd register these in the same order they are defined (IOW, move this
-> further down)
+Tests
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-done.
+I wanted to continue work on the QEMU part, but after I noticed that
+the interface might still prone to change, I posted this series first.
+However to make sure it's at least working, I've provided unit tests
+together with the series.  The unit tests should be able to test the
+series in at least three major paths:
 
-> >       vb->inflate_vq = vqs[VIRTIO_BALLOON_VQ_INFLATE];
-> >       vb->deflate_vq = vqs[VIRTIO_BALLOON_VQ_DEFLATE];
-> >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-> > @@ -932,12 +976,30 @@ static int virtballoon_probe(struct virtio_device *vdev)
-> >               if (err)
-> >                       goto out_del_balloon_wq;
-> >       }
-> > +
-> > +     vb->pr_dev_info.report = virtballoon_unused_page_report;
-> > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
-> > +             unsigned int capacity;
-> > +
-> > +             capacity = min_t(unsigned int,
-> > +                              virtqueue_get_vring_size(vb->reporting_vq),
-> > +                              VIRTIO_BALLOON_VRING_HINTS_MAX);
-> > +             vb->pr_dev_info.capacity = capacity;
-> > +
-> > +             err = page_reporting_register(&vb->pr_dev_info);
-> > +             if (err)
-> > +                     goto out_unregister_shrinker;
-> > +     }
->
-> It can happen here that we start reporting before marking the device
-> ready. Can that be problematic?
->
-> Maybe we have to ignore any reports in virtballoon_unused_page_report()
-> until ready...
+  (1) ./dirty_log_test -M dirty-ring
 
-I don't think there is an issue with us putting buffers on the ring
-before it is ready. I think it will just cause our function to sleep.
+      This tests async ring operations: this should be the major work
+      mode for the dirty ring interface, say, when the kernel is
+      queuing more data, the userspace is collecting too.  Ring can
+      hardly reaches full when working like this, because in most
+      cases the collection could be fast.
 
-I'm guessing that is the case since init_vqs will add a buffer to the
-stats vq and that happens even earlier in virtballoon_probe.
+  (2) ./dirty_log_test -M dirty-ring -c 1024
 
-> > +
-> >       virtio_device_ready(vdev);
-> >
-> >       if (towards_target(vb))
-> >               virtballoon_changed(vdev);
-> >       return 0;
-> >
-> > +out_unregister_shrinker:
-> > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> > +             virtio_balloon_unregister_shrinker(vb);
->
-> A sync is done implicitly, right? So after this call, we won't get any
-> new callbacks/are stuck in a callback.
+      This set the ring size to be very small so that ring soft-full
+      always triggers (soft-full is a soft limit of the ring state,
+      when the dirty ring reaches the soft limit it'll do a userspace
+      exit and let the userspace to collect the data).
 
-From what I can tell a read/write semaphore is used in
-unregister_shrinker when we delete it from the list so it shouldn't be
-an issue.
+  (3) ./dirty_log_test -M dirty-ring-wait-queue
 
-> >  out_del_balloon_wq:
-> >       if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
-> >               destroy_workqueue(vb->balloon_wq);
-> > @@ -966,6 +1028,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
-> >  {
-> >       struct virtio_balloon *vb = vdev->priv;
-> >
-> > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
-> > +             page_reporting_unregister(&vb->pr_dev_info);
->
-> Dito, same question regarding syncs.
+      This sololy test the extreme case where ring is full.  When the
+      ring is completely full, the thread (no matter vcpu or not) will
+      be put onto a per-vm waitqueue, and KVM_RESET_DIRTY_RINGS will
+      wake the threads up (assuming until which the ring will not be
+      full any more).
 
-Yes, although for that one I was using pointer deletion, a barrier,
-and a cancel_work_sync since I didn't support a list.
+Thanks,
 
-> >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> >               virtio_balloon_unregister_shrinker(vb);
-> >       spin_lock_irq(&vb->stop_update_lock);
-> > @@ -1038,6 +1102,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
-> >       VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
-> >       VIRTIO_BALLOON_F_FREE_PAGE_HINT,
-> >       VIRTIO_BALLOON_F_PAGE_POISON,
-> > +     VIRTIO_BALLOON_F_REPORTING,
-> >  };
-> >
-> >  static struct virtio_driver virtio_balloon_driver = {
-> > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> > index a1966cd7b677..19974392d324 100644
-> > --- a/include/uapi/linux/virtio_balloon.h
-> > +++ b/include/uapi/linux/virtio_balloon.h
-> > @@ -36,6 +36,7 @@
-> >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM      2 /* Deflate balloon on OOM */
-> >  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT      3 /* VQ to report free pages */
-> >  #define VIRTIO_BALLOON_F_PAGE_POISON 4 /* Guest is using page poisoning */
-> > +#define VIRTIO_BALLOON_F_REPORTING   5 /* Page reporting virtqueue */
-> >
-> >  /* Size of a PFN in the balloon interface. */
-> >  #define VIRTIO_BALLOON_PFN_SHIFT 12
-> >
-> >
->
-> Small and powerful patch :)
+Cao, Lei (2):
+  KVM: Add kvm/vcpu argument to mark_dirty_page_in_slot
+  KVM: X86: Implement ring-based dirty memory tracking
 
-Agreed. Although we will have to see if we can keep it that way.
-Ideally I want to leave this with the ability so specify what size
-scatterlist we receive. However if we have to flip it around then it
-will force us to add logic for chopping up the scatterlist for
-processing in chunks.
+Paolo Bonzini (1):
+  KVM: Move running VCPU from ARM to common code
 
-Thanks for the review.
+Peter Xu (12):
+  KVM: Add build-time error check on kvm_run size
+  KVM: Implement ring-based dirty memory tracking
+  KVM: Make dirty ring exclusive to dirty bitmap log
+  KVM: Introduce dirty ring wait queue
+  KVM: selftests: Always clear dirty bitmap after iteration
+  KVM: selftests: Sync uapi/linux/kvm.h to tools/
+  KVM: selftests: Use a single binary for dirty/clear log test
+  KVM: selftests: Introduce after_vcpu_run hook for dirty log test
+  KVM: selftests: Add dirty ring buffer test
+  KVM: selftests: Let dirty_log_test async for dirty ring test
+  KVM: selftests: Add "-c" parameter to dirty log test
+  KVM: selftests: Test dirty ring waitqueue
 
-- Alex
+ Documentation/virt/kvm/api.txt                | 116 +++++
+ arch/arm/include/asm/kvm_host.h               |   2 -
+ arch/arm64/include/asm/kvm_host.h             |   2 -
+ arch/x86/include/asm/kvm_host.h               |   5 +
+ arch/x86/include/uapi/asm/kvm.h               |   1 +
+ arch/x86/kvm/Makefile                         |   3 +-
+ arch/x86/kvm/mmu/mmu.c                        |   6 +
+ arch/x86/kvm/vmx/vmx.c                        |   7 +
+ arch/x86/kvm/x86.c                            |  12 +
+ include/linux/kvm_dirty_ring.h                |  67 +++
+ include/linux/kvm_host.h                      |  37 ++
+ include/linux/kvm_types.h                     |   1 +
+ include/uapi/linux/kvm.h                      |  36 ++
+ tools/include/uapi/linux/kvm.h                |  47 ++
+ tools/testing/selftests/kvm/Makefile          |   2 -
+ .../selftests/kvm/clear_dirty_log_test.c      |   2 -
+ tools/testing/selftests/kvm/dirty_log_test.c  | 452 ++++++++++++++++--
+ .../testing/selftests/kvm/include/kvm_util.h  |   6 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 103 ++++
+ .../selftests/kvm/lib/kvm_util_internal.h     |   5 +
+ virt/kvm/arm/arm.c                            |  29 --
+ virt/kvm/arm/perf.c                           |   6 +-
+ virt/kvm/arm/vgic/vgic-mmio.c                 |  15 +-
+ virt/kvm/dirty_ring.c                         | 156 ++++++
+ virt/kvm/kvm_main.c                           | 315 +++++++++++-
+ 25 files changed, 1329 insertions(+), 104 deletions(-)
+ create mode 100644 include/linux/kvm_dirty_ring.h
+ delete mode 100644 tools/testing/selftests/kvm/clear_dirty_log_test.c
+ create mode 100644 virt/kvm/dirty_ring.c
+
+--=20
+2.21.0
+
