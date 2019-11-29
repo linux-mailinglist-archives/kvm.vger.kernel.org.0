@@ -2,42 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DE6C10D558
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 13:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3A4410D55D
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 13:03:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbfK2MB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 07:01:59 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43679 "EHLO
+        id S1726876AbfK2MDx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 07:03:53 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42069 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726651AbfK2MB7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 07:01:59 -0500
+        by vger.kernel.org with ESMTP id S1726684AbfK2MDx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 07:03:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575028918;
+        s=mimecast20190719; t=1575029032;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=MJUg0GT4pSK1Ka6hSaAbPQ9wk1Y0SC3Y4NckGsBo4Dg=;
-        b=eZ446onQ2siuItM8tANJ5zmt56M+4sbVoqO6NPZmLewTBt4UjxnqWw1jqSbTjrO+RPVCw6
-        RKR1UtufBb2JJGuGjG/wgahHAiTG/1L8F9yBxP53Xl5BjKwwo+QJxhzrAJVpswA2ap0NUn
-        4r0wNYc/NWpB20IvAzVZHdXQqqN3OXA=
+        bh=vdKlUdA5/dig+d12EAkXm26UdS+sVeX6lzOMJ5IVBn4=;
+        b=h3oOipMQkoBRXzVnI6FXpzeed88G+mMbo5wDuhhyzYeVf/I2YTqLxPrWL+e1V53cuxGIxX
+        DETbiTzFJMyc/F2BByBo4PWT+Bvf2Y3vBwd30zdY3CYa8RgKb97tMvAvaq6CIKcCT8gE1l
+        LS/wgHvClUk4yYHN6L2A5hjD1XYheuU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-s2u7yvC_NMe9ZHHEu1sSXw-1; Fri, 29 Nov 2019 07:01:53 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-285-lqqR12m-Nl6wMo2u7-7kdg-1; Fri, 29 Nov 2019 07:03:48 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD83110054E3;
-        Fri, 29 Nov 2019 12:01:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A477DB60;
+        Fri, 29 Nov 2019 12:03:47 +0000 (UTC)
 Received: from [10.36.118.44] (unknown [10.36.118.44])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6156F5D9E1;
-        Fri, 29 Nov 2019 12:01:50 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 3/9] s390x: irq: make IRQ handler weak
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D415F1001902;
+        Fri, 29 Nov 2019 12:03:45 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] s390x: export the clock
+ get_clock_ms() utility
 To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         thuth@redhat.com, cohuck@redhat.com
 References: <1574945167-29677-1-git-send-email-pmorel@linux.ibm.com>
- <1574945167-29677-4-git-send-email-pmorel@linux.ibm.com>
+ <1574945167-29677-5-git-send-email-pmorel@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -83,15 +84,15 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <33be2bbd-ea3b-4a93-3ce3-9dee36a531d1@redhat.com>
-Date:   Fri, 29 Nov 2019 13:01:49 +0100
+Message-ID: <442f3d30-e61f-e884-096e-6ed47b4c6d7e@redhat.com>
+Date:   Fri, 29 Nov 2019 13:03:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1574945167-29677-4-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1574945167-29677-5-git-send-email-pmorel@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: s2u7yvC_NMe9ZHHEu1sSXw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: lqqR12m-Nl6wMo2u7-7kdg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
@@ -101,35 +102,13 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 28.11.19 13:46, Pierre Morel wrote:
-> Having a weak function allows the tests programm to declare its own
-> IRQ handler.
-> This is helpfull for I/O tests to have the I/O IRQ handler having
-> its special work to do.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  lib/s390x/interrupt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> index 3e07867..d70fde3 100644
-> --- a/lib/s390x/interrupt.c
-> +++ b/lib/s390x/interrupt.c
-> @@ -140,7 +140,7 @@ void handle_mcck_int(void)
->  		     lc->mcck_old_psw.addr);
->  }
->  
-> -void handle_io_int(void)
-> +__attribute__((weak)) void handle_io_int(void)
->  {
->  	report_abort("Unexpected io interrupt: at %#lx",
->  		     lc->io_old_psw.addr);
-> 
+> To serve multiple times, the function get_clock_ms() is moved
+> from intercept.c test to the new file asm/clock.h.
 
-The clear alternative would be a way to register a callback function.
-That way you can modify the callback during the tests. As long as not
-registered, wrong I/Os can be caught easily here. @Thomas?
+I'd probably call this "tod.h" instead. Nevermind.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
 
 -- 
 Thanks,
