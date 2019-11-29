@@ -2,287 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D392110D7F6
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 16:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D29D110D856
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 17:17:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbfK2PkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 10:40:24 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38613 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726970AbfK2PkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Nov 2019 10:40:24 -0500
-Received: by mail-wr1-f65.google.com with SMTP id i12so35796942wro.5
-        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 07:40:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=d1qlPGKEub2zxKrCwvu7wl5sgPz0ycWM4uVqvybEP3o=;
-        b=F82YmRMvls0MB5LUz2QLPFzl3BfaxgxvnOVCEJhs1lPCNqRLd1ALGX/cWTwx/odPIW
-         IemIWncQEOpg+J/XVdmZD8pa932RyfoOZV4pOcjVYPzCUl6MH1uJfvVchf6zsgyCwhxG
-         bCPE7pnQMnBdKE05ualTzpbl3MPA+ESEs8cyw=
+        id S1727043AbfK2QRj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 11:17:39 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57363 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726934AbfK2QRj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 11:17:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575044256;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nC165XAf8z00FQicFMdRB+X/C3ivNyex6DQHQvlQ96g=;
+        b=TRsn3ynkFurTxI75FrdiCIxSZjRuMi40D2oTloMXmKEyQpLbgtxrz25O+EXKnbDkEUpVzw
+        gVZubfXTFp7hKavcc9YIzAU7iiEl0lEvWYtuoj97mH/o0zkWz5oPPwFas9Pp4tX1nm9yx8
+        1wkxGeUtWhO8fBqQHH08vdw4O7EJsnY=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-kg4YgswmN2ymwtQhY-beGg-1; Fri, 29 Nov 2019 11:17:34 -0500
+Received: by mail-qt1-f199.google.com with SMTP id x8so17441962qtq.14
+        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 08:17:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=d1qlPGKEub2zxKrCwvu7wl5sgPz0ycWM4uVqvybEP3o=;
-        b=GnWV5OR9nHRUn4Tt8IMKiIP61v8qrOzokr6TuC2SKdCg1FNiDkGCTkO+K3mjeZ5x+j
-         ezKRFyZAjUbitz0corf3tK2zuf6FnI7Q7a5j4pO2lv2ZoAZKAA7qWK/2Ux7ZLtMBKPp+
-         E0GZI4gIs3ekLkKdjqIGiHjjv5OEhBDCHCy2Vo2DJg9G4Rro0VUukPAw036LDJoPQv9g
-         lvrw1Ftt8VHM97jW8c1RN5xf5w1uIGcsw3M58vQeSCRGEL25cgG1r9QiC7OFA3asq4gt
-         EiKtaZ+bN3PD4yCj7WKZXS+f14zvNXPMd3BbQxMrnNo8cnK6IFY5c8pz8Kqqbqc854dM
-         n1LA==
-X-Gm-Message-State: APjAAAVMompImQFo+2/Ahlp1E9BhJfY4ezy0NZlTSOLuDcm+8vz+MeMk
-        z3WdsFe3teVsZFRpx/4zjT7TuQ==
-X-Google-Smtp-Source: APXvYqyOcTZwJaF1yb8C5yGqGrIDeDIxvzOnil0vbT94pRF4zJdnCm1UYhNHwa7P+mD1vwCUSOZm1A==
-X-Received: by 2002:adf:fa87:: with SMTP id h7mr44553361wrr.172.1575042022285;
-        Fri, 29 Nov 2019 07:40:22 -0800 (PST)
-Received: from phenom.ffwll.local (212-51-149-96.fiber7.init7.net. [212.51.149.96])
-        by smtp.gmail.com with ESMTPSA id e16sm13723160wme.35.2019.11.29.07.40.21
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=dpdSr67eMWMTe1/gd1Elve1qWOHBB45CAiQGfKTczRs=;
+        b=iZWOLLDerV/OmPjuuDnT3xm/5N/NLNxNPjsCiHYGsfx5AixOSAW8oCCfH35U9o8dh7
+         mh5bspYi+ff48/kv+/K2RxApmO0zTmlCZl8p6dxQhD1+tlUcaNOH4V+ViT6Tw1mzS1yT
+         pXCdMLYp+Sq+KINfkF6ta6DcOUaq5UNORiCI54B4npXoXhkUOUUiGcD/WCGuXWuXiR9Y
+         S9VKyqh8KVLt7YaCwX4RjoN233r1b2UcF7FxJW3kCdC0dTwuhy3DjdJ3RGCWXsoWbNxW
+         Z9lxqNFGHwYMeI9wa4fS7iugcIY5pTx+C5h5yiGuvgZzQ9+yloqGBRYoV54X3lGbAmvD
+         Ahzg==
+X-Gm-Message-State: APjAAAVqv6I1UYLztOJw4hMXX83bgVhxU/WjNepP/G85laokPqU05fdm
+        4PA4JMNqa1mQHKsR0DIM6URP3ydnU8kvyotwTzp7ISjelsKvGUMLpOIGN0UGnSrhGTJh0w/+5VB
+        6qU8uUQ0nB4yM
+X-Received: by 2002:a37:644:: with SMTP id 65mr207927qkg.309.1575044254124;
+        Fri, 29 Nov 2019 08:17:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxDehW4hUYvXxXhA6Tkbmu/WkHPLEM1tjU0+eNrpPeUNpji9CurY+4OO6JTb02J5LdbVaJVTA==
+X-Received: by 2002:a37:644:: with SMTP id 65mr207883qkg.309.1575044253788;
+        Fri, 29 Nov 2019 08:17:33 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id l17sm10222892qkl.21.2019.11.29.08.17.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2019 07:40:21 -0800 (PST)
-Date:   Fri, 29 Nov 2019 16:40:19 +0100
-From:   Daniel Vetter <daniel@ffwll.ch>
-To:     Jani Nikula <jani.nikula@intel.com>
-Cc:     dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, ville.syrjala@linux.intel.com,
-        Andy Walls <awalls@md.metrocast.net>,
-        Bernie Thompson <bernie@plugable.com>,
-        Bruno =?iso-8859-1?Q?Pr=E9mont?= <bonbons@linux-vserver.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Hans Verkuil <hverkuil@xs4all.nl>,
-        Jaya Kumar <jayalk@intworks.biz>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>,
-        Noralf =?iso-8859-1?Q?Tr=F8nnes?= <noralf@tronnes.org>,
-        Robin van der Gracht <robin@protonic.nl>,
-        Steve Glendinning <steve.glendinning@shawell.net>,
-        ivtv-devel@ivtvdriver.org, kvm@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-omap@vger.kernel.org
-Subject: Re: [PATCH v2 00/14] video, drm, etc: constify fbops in struct
- fb_info
-Message-ID: <20191129154019.GI624164@phenom.ffwll.local>
-References: <cover.1575022735.git.jani.nikula@intel.com>
+        Fri, 29 Nov 2019 08:17:32 -0800 (PST)
+Date:   Fri, 29 Nov 2019 11:17:31 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>
+Subject: Re: [PATCH] KVM: X86: Use APIC_DEST_* macros properly
+Message-ID: <20191129161731.GB9292@xz-x1>
+References: <20191128193211.32684-1-peterx@redhat.com>
+ <87sgm6damv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <87sgm6damv.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: kg4YgswmN2ymwtQhY-beGg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cover.1575022735.git.jani.nikula@intel.com>
-X-Operating-System: Linux phenom 5.3.0-2-amd64 
-User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 29, 2019 at 12:29:30PM +0200, Jani Nikula wrote:
-> This is v2 of https://patchwork.freedesktop.org/series/70119/
-> 
-> I wanted to make our struct fb_ops const because we don't modify
-> it... and this is what I ended up with to fix it and a bunch of others.
-> 
-> I would appreciate acks to merge all this via the drm-misc tree. This is
-> especially important for patches 1-8 to reasonably get the job
-> done. Patches 9-14 are somewhat easier to merge at leisure afterwards,
-> but there really isn't much conflict potential IMO.
+On Fri, Nov 29, 2019 at 03:23:36PM +0100, Vitaly Kuznetsov wrote:
+> Peter Xu <peterx@redhat.com> writes:
+>=20
+> > Previously we were using either APIC_DEST_PHYSICAL|APIC_DEST_LOGICAL
+> > or 0|1 to fill in kvm_lapic_irq.dest_mode, and it's done in an adhoc
+> > way.  It's fine imho only because in most cases when we check against
+> > dest_mode it's against APIC_DEST_PHYSICAL (which equals to 0).
+> > However, that's not consistent, majorly because APIC_DEST_LOGICAL does
+> > not equals to 1, so if one day we check irq.dest_mode against
+> > APIC_DEST_LOGICAL we'll probably always get a false returned.
+> >
+> > This patch replaces the 0/1 settings of irq.dest_mode with the macros
+> > to make them consistent.
+> >
+> > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > CC: Sean Christopherson <sean.j.christopherson@intel.com>
+> > CC: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > CC: Nitesh Narayan Lal <nitesh@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  arch/x86/kvm/ioapic.c   | 9 ++++++---
+> >  arch/x86/kvm/irq_comm.c | 7 ++++---
+> >  arch/x86/kvm/x86.c      | 2 +-
+> >  3 files changed, 11 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> > index 9fd2dd89a1c5..1e091637d5d5 100644
+> > --- a/arch/x86/kvm/ioapic.c
+> > +++ b/arch/x86/kvm/ioapic.c
+> > @@ -331,7 +331,8 @@ static void ioapic_write_indirect(struct kvm_ioapic=
+ *ioapic, u32 val)
+> >  =09=09=09irq.vector =3D e->fields.vector;
+> >  =09=09=09irq.delivery_mode =3D e->fields.delivery_mode << 8;
+> >  =09=09=09irq.dest_id =3D e->fields.dest_id;
+> > -=09=09=09irq.dest_mode =3D e->fields.dest_mode;
+> > +=09=09=09irq.dest_mode =3D e->fields.dest_mode ?
+> > +=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+> >  =09=09=09bitmap_zero(&vcpu_bitmap, 16);
+> >  =09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+> >  =09=09=09=09=09=09 &vcpu_bitmap);
+> > @@ -343,7 +344,8 @@ static void ioapic_write_indirect(struct kvm_ioapic=
+ *ioapic, u32 val)
+> >  =09=09=09=09 * keep ioapic_handled_vectors synchronized.
+> >  =09=09=09=09 */
+> >  =09=09=09=09irq.dest_id =3D old_dest_id;
+> > -=09=09=09=09irq.dest_mode =3D old_dest_mode;
+> > +=09=09=09=09irq.dest_mode =3D old_dest_mode ?
+> > +=09=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+> >  =09=09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+> >  =09=09=09=09=09=09=09 &vcpu_bitmap);
+> >  =09=09=09}
+> > @@ -369,7 +371,8 @@ static int ioapic_service(struct kvm_ioapic *ioapic=
+, int irq, bool line_status)
+> > =20
+> >  =09irqe.dest_id =3D entry->fields.dest_id;
+> >  =09irqe.vector =3D entry->fields.vector;
+> > -=09irqe.dest_mode =3D entry->fields.dest_mode;
+> > +=09irqe.dest_mode =3D entry->fields.dest_mode ?
+> > +=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+> >  =09irqe.trig_mode =3D entry->fields.trig_mode;
+> >  =09irqe.delivery_mode =3D entry->fields.delivery_mode << 8;
+> >  =09irqe.level =3D 1;
+> > diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> > index 8ecd48d31800..673b6afd6dbf 100644
+> > --- a/arch/x86/kvm/irq_comm.c
+> > +++ b/arch/x86/kvm/irq_comm.c
+> > @@ -52,8 +52,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct =
+kvm_lapic *src,
+> >  =09unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
+> >  =09unsigned int dest_vcpus =3D 0;
+> > =20
+> > -=09if (irq->dest_mode =3D=3D 0 && irq->dest_id =3D=3D 0xff &&
+> > -=09=09=09kvm_lowest_prio_delivery(irq)) {
+> > +=09if (irq->dest_mode =3D=3D APIC_DEST_PHYSICAL &&
+> > +=09    irq->dest_id =3D=3D 0xff && kvm_lowest_prio_delivery(irq)) {
+> >  =09=09printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
+> >  =09=09irq->delivery_mode =3D APIC_DM_FIXED;
+> >  =09}
+> > @@ -114,7 +114,8 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_ke=
+rnel_irq_routing_entry *e,
+> >  =09=09irq->dest_id |=3D MSI_ADDR_EXT_DEST_ID(e->msi.address_hi);
+> >  =09irq->vector =3D (e->msi.data &
+> >  =09=09=09MSI_DATA_VECTOR_MASK) >> MSI_DATA_VECTOR_SHIFT;
+> > -=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address=
+_lo;
+> > +=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address=
+_lo ?
+> > +=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+> >  =09irq->trig_mode =3D (1 << MSI_DATA_TRIGGER_SHIFT) & e->msi.data;
+> >  =09irq->delivery_mode =3D e->msi.data & 0x700;
+> >  =09irq->msi_redir_hint =3D ((e->msi.address_lo
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 3ed167e039e5..3b00d662dc14 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -7356,7 +7356,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, u=
+nsigned long flags, int apicid)
+> >  =09struct kvm_lapic_irq lapic_irq;
+> > =20
+> >  =09lapic_irq.shorthand =3D 0;
+> > -=09lapic_irq.dest_mode =3D 0;
+> > +=09lapic_irq.dest_mode =3D APIC_DEST_PHYSICAL;
+> >  =09lapic_irq.level =3D 0;
+> >  =09lapic_irq.dest_id =3D apicid;
+> >  =09lapic_irq.msi_redir_hint =3D false;
+>=20
+> dest_mode is being passed to kvm_apic_match_dest() where we do:
+>=20
+> =09case APIC_DEST_NOSHORT:
+> =09=09if (dest_mode =3D=3D APIC_DEST_PHYSICAL)
+> =09=09=09return kvm_apic_match_physical_addr(target, mda);
+> =09=09else
+> =09=09=09return kvm_apic_match_logical_addr(target, mda);
+>=20
+> I'd suggest we fix this too then (and BUG() in case it's neither).
 
-Only patches 11-14 need acks, drivers/video is already officially
-maintained in drm-misc.
+That's true.  Let me add another patch to fix it (probably easier by
+changing the type of dest_mode param in kvm_apic_match_dest from int
+to bool).
 
-> Daniel, please double-check me adding your Reviewed-by on the later
-> patches wasn't overzealous.
+Thanks,
 
-Yeah, looks all neat&tidy.
--Daniel
+--=20
+Peter Xu
 
-> 
-> BR,
-> Jani.
-> 
-> 
-> Cc: Andy Walls <awalls@md.metrocast.net>
-> Cc: Bernie Thompson <bernie@plugable.com>
-> Cc: Bruno Prémont <bonbons@linux-vserver.org>
-> Cc: Daniel Vetter <daniel@ffwll.ch>
-> Cc: Hans Verkuil <hverkuil@xs4all.nl>
-> Cc: Jaya Kumar <jayalk@intworks.biz>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: Miguel Ojeda Sandonis <miguel.ojeda.sandonis@gmail.com>
-> Cc: Noralf Trønnes <noralf@tronnes.org>
-> Cc: Robin van der Gracht <robin@protonic.nl>
-> Cc: Steve Glendinning <steve.glendinning@shawell.net>
-> Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: ivtv-devel@ivtvdriver.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-fbdev@vger.kernel.org
-> Cc: linux-input@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: linux-omap@vger.kernel.org
-> 
-> 
-> Jani Nikula (14):
->   video: fb_defio: preserve user fb_ops
->   drm/fb-helper: don't preserve fb_ops across deferred IO use
->   video: smscufx: don't restore fb_mmap after deferred IO cleanup
->   video: udlfb: don't restore fb_mmap after deferred IO cleanup
->   video: fbdev: vesafb: modify the static fb_ops directly
->   video: fbmem: use const pointer for fb_ops
->   video: omapfb: use const pointer for fb_ops
->   video: fbdev: make fbops member of struct fb_info a const pointer
->   drm: constify fb ops across all drivers
->   video: constify fb ops across all drivers
->   HID: picoLCD: constify fb ops
->   media: constify fb ops across all drivers
->   samples: vfio-mdev: constify fb ops
->   auxdisplay: constify fb ops
-> 
->  drivers/auxdisplay/cfag12864bfb.c             |  2 +-
->  drivers/auxdisplay/ht16k33.c                  |  2 +-
->  drivers/gpu/drm/amd/amdgpu/amdgpu_fb.c        |  2 +-
->  drivers/gpu/drm/armada/armada_fbdev.c         |  2 +-
->  drivers/gpu/drm/drm_fb_helper.c               | 27 +++----------------
->  drivers/gpu/drm/exynos/exynos_drm_fbdev.c     |  2 +-
->  .../gpu/drm/hisilicon/hibmc/hibmc_drm_fbdev.c |  2 +-
->  drivers/gpu/drm/i915/display/intel_fbdev.c    |  2 +-
->  drivers/gpu/drm/msm/msm_fbdev.c               |  2 +-
->  drivers/gpu/drm/nouveau/nouveau_fbcon.c       |  4 +--
->  drivers/gpu/drm/omapdrm/omap_fbdev.c          |  2 +-
->  drivers/gpu/drm/radeon/radeon_fb.c            |  2 +-
->  drivers/gpu/drm/rockchip/rockchip_drm_fbdev.c |  2 +-
->  drivers/gpu/drm/tegra/fb.c                    |  2 +-
->  drivers/gpu/drm/vmwgfx/vmwgfx_fb.c            |  2 +-
->  drivers/hid/hid-picolcd_fb.c                  |  3 +--
->  drivers/media/pci/ivtv/ivtvfb.c               |  3 +--
->  drivers/media/platform/vivid/vivid-osd.c      |  3 +--
->  drivers/video/fbdev/68328fb.c                 |  2 +-
->  drivers/video/fbdev/acornfb.c                 |  2 +-
->  drivers/video/fbdev/amba-clcd.c               |  2 +-
->  drivers/video/fbdev/amifb.c                   |  2 +-
->  drivers/video/fbdev/arcfb.c                   |  2 +-
->  drivers/video/fbdev/arkfb.c                   |  2 +-
->  drivers/video/fbdev/asiliantfb.c              |  2 +-
->  drivers/video/fbdev/atmel_lcdfb.c             |  2 +-
->  drivers/video/fbdev/aty/aty128fb.c            |  2 +-
->  drivers/video/fbdev/aty/atyfb_base.c          |  2 +-
->  drivers/video/fbdev/aty/radeon_base.c         |  2 +-
->  drivers/video/fbdev/au1100fb.c                |  2 +-
->  drivers/video/fbdev/au1200fb.c                |  2 +-
->  drivers/video/fbdev/broadsheetfb.c            |  2 +-
->  drivers/video/fbdev/bw2.c                     |  2 +-
->  drivers/video/fbdev/carminefb.c               |  2 +-
->  drivers/video/fbdev/cg14.c                    |  2 +-
->  drivers/video/fbdev/cg3.c                     |  2 +-
->  drivers/video/fbdev/cg6.c                     |  2 +-
->  drivers/video/fbdev/chipsfb.c                 |  2 +-
->  drivers/video/fbdev/cirrusfb.c                |  2 +-
->  drivers/video/fbdev/clps711x-fb.c             |  2 +-
->  drivers/video/fbdev/cobalt_lcdfb.c            |  2 +-
->  drivers/video/fbdev/controlfb.c               |  2 +-
->  drivers/video/fbdev/core/fb_defio.c           |  3 ---
->  drivers/video/fbdev/core/fbmem.c              | 19 ++++++++-----
->  drivers/video/fbdev/cyber2000fb.c             |  2 +-
->  drivers/video/fbdev/da8xx-fb.c                |  2 +-
->  drivers/video/fbdev/dnfb.c                    |  2 +-
->  drivers/video/fbdev/efifb.c                   |  2 +-
->  drivers/video/fbdev/ep93xx-fb.c               |  2 +-
->  drivers/video/fbdev/fb-puv3.c                 |  2 +-
->  drivers/video/fbdev/ffb.c                     |  2 +-
->  drivers/video/fbdev/fm2fb.c                   |  2 +-
->  drivers/video/fbdev/fsl-diu-fb.c              |  2 +-
->  drivers/video/fbdev/g364fb.c                  |  2 +-
->  drivers/video/fbdev/gbefb.c                   |  2 +-
->  drivers/video/fbdev/geode/gx1fb_core.c        |  2 +-
->  drivers/video/fbdev/geode/gxfb_core.c         |  2 +-
->  drivers/video/fbdev/geode/lxfb_core.c         |  2 +-
->  drivers/video/fbdev/goldfishfb.c              |  2 +-
->  drivers/video/fbdev/grvga.c                   |  2 +-
->  drivers/video/fbdev/gxt4500.c                 |  2 +-
->  drivers/video/fbdev/hecubafb.c                |  2 +-
->  drivers/video/fbdev/hgafb.c                   |  2 +-
->  drivers/video/fbdev/hitfb.c                   |  2 +-
->  drivers/video/fbdev/hpfb.c                    |  2 +-
->  drivers/video/fbdev/hyperv_fb.c               |  2 +-
->  drivers/video/fbdev/i740fb.c                  |  2 +-
->  drivers/video/fbdev/imsttfb.c                 |  2 +-
->  drivers/video/fbdev/imxfb.c                   |  2 +-
->  drivers/video/fbdev/intelfb/intelfbdrv.c      |  2 +-
->  drivers/video/fbdev/kyro/fbdev.c              |  2 +-
->  drivers/video/fbdev/leo.c                     |  2 +-
->  drivers/video/fbdev/macfb.c                   |  2 +-
->  drivers/video/fbdev/matrox/matroxfb_crtc2.c   |  2 +-
->  drivers/video/fbdev/maxinefb.c                |  2 +-
->  drivers/video/fbdev/mb862xx/mb862xxfbdrv.c    |  2 +-
->  drivers/video/fbdev/mbx/mbxfb.c               |  2 +-
->  drivers/video/fbdev/metronomefb.c             |  2 +-
->  drivers/video/fbdev/mmp/fb/mmpfb.c            |  2 +-
->  drivers/video/fbdev/mx3fb.c                   |  5 ++--
->  drivers/video/fbdev/neofb.c                   |  2 +-
->  drivers/video/fbdev/nvidia/nvidia.c           |  2 +-
->  drivers/video/fbdev/ocfb.c                    |  2 +-
->  drivers/video/fbdev/offb.c                    |  2 +-
->  drivers/video/fbdev/omap/omapfb_main.c        |  2 +-
->  .../video/fbdev/omap2/omapfb/omapfb-main.c    |  2 +-
->  drivers/video/fbdev/p9100.c                   |  2 +-
->  drivers/video/fbdev/platinumfb.c              |  2 +-
->  drivers/video/fbdev/pm2fb.c                   |  2 +-
->  drivers/video/fbdev/pm3fb.c                   |  2 +-
->  drivers/video/fbdev/pmag-aa-fb.c              |  2 +-
->  drivers/video/fbdev/pmag-ba-fb.c              |  2 +-
->  drivers/video/fbdev/pmagb-b-fb.c              |  2 +-
->  drivers/video/fbdev/ps3fb.c                   |  2 +-
->  drivers/video/fbdev/pvr2fb.c                  |  2 +-
->  drivers/video/fbdev/pxa168fb.c                |  2 +-
->  drivers/video/fbdev/pxafb.c                   |  4 +--
->  drivers/video/fbdev/q40fb.c                   |  2 +-
->  drivers/video/fbdev/riva/fbdev.c              |  2 +-
->  drivers/video/fbdev/s3c-fb.c                  |  2 +-
->  drivers/video/fbdev/s3c2410fb.c               |  2 +-
->  drivers/video/fbdev/s3fb.c                    |  2 +-
->  drivers/video/fbdev/sa1100fb.c                |  2 +-
->  drivers/video/fbdev/savage/savagefb_driver.c  |  2 +-
->  drivers/video/fbdev/sh7760fb.c                |  2 +-
->  drivers/video/fbdev/sh_mobile_lcdcfb.c        |  4 +--
->  drivers/video/fbdev/simplefb.c                |  2 +-
->  drivers/video/fbdev/sis/sis_main.c            |  2 +-
->  drivers/video/fbdev/skeletonfb.c              |  2 +-
->  drivers/video/fbdev/sm712fb.c                 |  2 +-
->  drivers/video/fbdev/smscufx.c                 |  3 +--
->  drivers/video/fbdev/ssd1307fb.c               |  2 +-
->  drivers/video/fbdev/sstfb.c                   |  2 +-
->  drivers/video/fbdev/stifb.c                   |  2 +-
->  drivers/video/fbdev/sunxvr1000.c              |  2 +-
->  drivers/video/fbdev/sunxvr2500.c              |  2 +-
->  drivers/video/fbdev/sunxvr500.c               |  2 +-
->  drivers/video/fbdev/tcx.c                     |  2 +-
->  drivers/video/fbdev/tdfxfb.c                  |  2 +-
->  drivers/video/fbdev/tgafb.c                   |  2 +-
->  drivers/video/fbdev/tmiofb.c                  |  2 +-
->  drivers/video/fbdev/tridentfb.c               |  2 +-
->  drivers/video/fbdev/udlfb.c                   |  1 -
->  drivers/video/fbdev/uvesafb.c                 |  2 +-
->  drivers/video/fbdev/valkyriefb.c              |  2 +-
->  drivers/video/fbdev/vesafb.c                  |  6 ++---
->  drivers/video/fbdev/vfb.c                     |  2 +-
->  drivers/video/fbdev/vga16fb.c                 |  2 +-
->  drivers/video/fbdev/vt8500lcdfb.c             |  2 +-
->  drivers/video/fbdev/vt8623fb.c                |  2 +-
->  drivers/video/fbdev/w100fb.c                  |  2 +-
->  drivers/video/fbdev/wm8505fb.c                |  2 +-
->  drivers/video/fbdev/xen-fbfront.c             |  2 +-
->  drivers/video/fbdev/xilinxfb.c                |  2 +-
->  include/linux/fb.h                            |  2 +-
->  samples/vfio-mdev/mdpy-fb.c                   |  2 +-
->  136 files changed, 156 insertions(+), 175 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
-
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
