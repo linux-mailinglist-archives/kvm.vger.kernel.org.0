@@ -2,248 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C837610DB0A
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 22:35:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6945610DB54
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 22:47:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387470AbfK2Vfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 16:35:40 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46604 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387457AbfK2Vfj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 16:35:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575063337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J/6Vnhm3Bnof3G6qR9jmImN6Mxny1Mm+SQ/fRHV6cvM=;
-        b=HkIssdS/tQH/+DRnKBjBGDBnGEcAfyOPNK6OLN4A+s5TGPiMA44NqmuJiEf6RYzFkPLWkN
-        NiMsw0r8GL+ttD7yvZya4+GpWeJlycCiLRqpxLP4beciCPPgGZXN3KoeY6GYSXSLovYPUp
-        z94M8eNoJYllfS68yFKcfUBqbTyW6WM=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-H8M-nMrMOTyf-L6sRIuU_g-1; Fri, 29 Nov 2019 16:35:33 -0500
-Received: by mail-qt1-f198.google.com with SMTP id r9so8017474qtc.4
-        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 13:35:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ABKV7wtXWm4O1KQ//VgIZzpF4hiWiXzcQGJHlUZJvqM=;
-        b=e6oUp9hJLp/5eVVhefAS10HPUd6VS80YRWPhkmzW0QRO0Q7r8uPAVBmHmarA0mJiSk
-         xCDQwbrVmPq9w1W/cNebxjw29VqfrtDNTyFUGHvLDycmgqo1sMWkBrtaIhjz99daNFyN
-         4ByeilP8dYgY9UO05tzVhRLFSiD6tdXO+phxddTZ5tlYvkHo/MixcqQuwxKcF39Fitbr
-         jjw6dNgaMxi43vtnCuOX4Zv6ywRRtw9amHaaXZAI+IUhXGFsbn9epoq1OVXb4ZbUI7yU
-         m3RR50FKSKchB7df0GwIGX0TKI3TvucivZ/CxlBvAnKqF0x+F8NZ/fq7Wmw5bOloL9hU
-         T7Yw==
-X-Gm-Message-State: APjAAAVxLG+BsSeponWA2dXx6kMX0hdjlFQkQq0+jJ+aOjUV0v+6EFVG
-        f370v220vKqWh9M8zXGW2aulO7uDulbkzuEcW9idApgiTA/2GwlbCgEryLB40pDtRipwhjIrxkV
-        dcaUjH0iMMG7q
-X-Received: by 2002:a0c:baa5:: with SMTP id x37mr19072002qvf.228.1575063332542;
-        Fri, 29 Nov 2019 13:35:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx0gzwjNokztQZ2uGe1W03JAxQU4oiBDN2ekwESAnlau3v7lb+68GzvJT2MYI6UKslZ39yUvA==
-X-Received: by 2002:a0c:baa5:: with SMTP id x37mr19071983qvf.228.1575063332220;
-        Fri, 29 Nov 2019 13:35:32 -0800 (PST)
-Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id h186sm10679046qkf.64.2019.11.29.13.35.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2019 13:35:31 -0800 (PST)
-From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH RFC 15/15] KVM: selftests: Test dirty ring waitqueue
-Date:   Fri, 29 Nov 2019 16:35:05 -0500
-Message-Id: <20191129213505.18472-16-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191129213505.18472-1-peterx@redhat.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
+        id S1727225AbfK2Vro (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 16:47:44 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:6093 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727073AbfK2Vro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Nov 2019 16:47:44 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5de192010000>; Fri, 29 Nov 2019 13:47:46 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Fri, 29 Nov 2019 13:47:42 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Fri, 29 Nov 2019 13:47:42 -0800
+Received: from [10.2.169.205] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 29 Nov
+ 2019 21:47:41 +0000
+Subject: Re: [PATCH v2 17/19] powerpc: book3s64: convert to pin_user_pages()
+ and put_user_page()
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+References: <20191125231035.1539120-1-jhubbard@nvidia.com>
+ <20191125231035.1539120-18-jhubbard@nvidia.com>
+ <20191129112315.GB1121@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <cb3e2acc-0a83-4053-fbcc-6d75dc47f174@nvidia.com>
+Date:   Fri, 29 Nov 2019 13:44:53 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-MC-Unique: H8M-nMrMOTyf-L6sRIuU_g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191129112315.GB1121@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1575064066; bh=tMvn6asqZgJ/8yczcC9lnf1pHEf7TJzCvRVZqLzUEIk=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=P515JTdy70KP3oimNK/fSAtObgW4JDQsh/LN+dj31w7qtgH6JUdGJYKS3j5J8enBM
+         oN04vymJSqszX58P75QNc1cW3k/Ll0LB9zwNlmlBWaR7zw2qd7/o9t2Cy3EugW3wgY
+         XBlQyEsBEMcfywkDPj201lclcvfOCs5gFzs/O+2QmSmHzciD31eTMBkNB0W6VGXEOL
+         BbnrGM91l0GAwjLm+XJmL4eoGQAce5JVCz6FfueQA4/sc24hO2mmz2R1mloKHyP2Ej
+         3q1StOVbP0t0OEBFEGay8puwUyC8jwyLEftGIYNcVrkaz5szmNasFETh2Ir0Xi5Q1g
+         8xDwDUM/1ii9A==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a bit tricky, but should still be reasonable.
+On 11/29/19 3:23 AM, Jan Kara wrote:
+> On Mon 25-11-19 15:10:33, John Hubbard wrote:
+>> 1. Convert from get_user_pages() to pin_user_pages().
+>>
+>> 2. As required by pin_user_pages(), release these pages via
+>> put_user_page(). In this case, do so via put_user_pages_dirty_lock().
+>>
+>> That has the side effect of calling set_page_dirty_lock(), instead
+>> of set_page_dirty(). This is probably more accurate.
+> 
+> Maybe more accurate but it doesn't work for mm_iommu_unpin(). As I'm
+> checking mm_iommu_unpin() gets called from RCU callback which is executed
+> interrupt context and you cannot lock pages from such context. So you need
+> to queue work from the RCU callback and then do the real work from the
+> workqueue...
+> 
+> 								Honza
 
-Firstly we introduce a totally new dirty log test type, because we
-need to force vcpu to go into a blocked state by dead loop on vcpu_run
-even if it wants to quit to userspace.
+ah yes, fixed locally. (In order to avoid  distracting people during the merge
+window, I won't post any more versions of the series until the merge window is
+over, unless a maintainer tells me that any of these patches are desired for
+5.5.)
 
-Here the tricky part is we need to read the procfs to make sure the
-vcpu thread is TASK_UNINTERRUPTIBLE.
+With that, we are back to a one-line diff for this part:
 
-After that, we reset the ring and the reset should kick the vcpu again
-by moving out of that state.
+@@ -215,7 +214,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+                 if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
+                         SetPageDirty(page);
+  
+-               put_page(page);
++               put_user_page(page);
+                 mem->hpas[i] = 0;
+         }
+  }
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 101 +++++++++++++++++++
- 1 file changed, 101 insertions(+)
+btw, I'm also working on your feedback for patch 17 (mm/gup: track FOLL_PIN pages [1]),
+from a few days earlier, it's not being ignored, I'm just trying to avoid distracting
+people during the merge window.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/s=
-elftests/kvm/dirty_log_test.c
-index c9db136a1f12..41bc015131e1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -16,6 +16,7 @@
- #include <sys/types.h>
- #include <signal.h>
- #include <errno.h>
-+#include <sys/syscall.h>
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
- #include <asm/barrier.h>
-@@ -151,12 +152,16 @@ enum log_mode_t {
- =09/* Use dirty ring for logging */
- =09LOG_MODE_DIRTY_RING =3D 2,
-=20
-+=09/* Dirty ring test but tailored for the waitqueue */
-+=09LOG_MODE_DIRTY_RING_WP =3D 3,
-+
- =09LOG_MODE_NUM,
- };
-=20
- /* Mode of logging.  Default is LOG_MODE_DIRTY_LOG */
- static enum log_mode_t host_log_mode;
- pthread_t vcpu_thread;
-+pid_t vcpu_thread_tid;
- static uint32_t test_dirty_ring_count =3D TEST_DIRTY_RING_COUNT;
-=20
- /* Only way to pass this to the signal handler */
-@@ -221,6 +226,18 @@ static void dirty_ring_create_vm_done(struct kvm_vm *v=
-m)
- =09=09=09     sizeof(struct kvm_dirty_gfn));
- }
-=20
-+static void dirty_ring_wq_create_vm_done(struct kvm_vm *vm)
-+{
-+=09/*
-+=09 * Force to use a relatively small ring size, so easier to get
-+=09 * full.  Better bigger than PML size, hence 1024.
-+=09 */
-+=09test_dirty_ring_count =3D 1024;
-+=09DEBUG("Forcing ring size: %u\n", test_dirty_ring_count);
-+=09vm_enable_dirty_ring(vm, test_dirty_ring_count *
-+=09=09=09     sizeof(struct kvm_dirty_gfn));
-+}
-+
- static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
- =09=09=09=09       struct kvm_dirty_ring_indexes *indexes,
- =09=09=09=09       int slot, void *bitmap,
-@@ -295,6 +312,81 @@ static void dirty_ring_collect_dirty_pages(struct kvm_=
-vm *vm, int slot,
- =09DEBUG("Iteration %ld collected %u pages\n", iteration, count);
- }
-=20
-+/*
-+ * Return 'D' for uninterruptible, 'R' for running, 'S' for
-+ * interruptible, etc.
-+ */
-+static char read_tid_status_char(unsigned int tid)
-+{
-+=09int fd, ret, line =3D 0;
-+=09char buf[128], *c;
-+
-+=09snprintf(buf, sizeof(buf) - 1, "/proc/%u/status", tid);
-+=09fd =3D open(buf, O_RDONLY);
-+=09TEST_ASSERT(fd >=3D 0, "open status file failed: %s", buf);
-+=09ret =3D read(fd, buf, sizeof(buf) - 1);
-+=09TEST_ASSERT(ret > 0, "read status file failed: %d, %d", ret, errno);
-+=09close(fd);
-+
-+=09/* Skip 2 lines */
-+=09for (c =3D buf; c < buf + sizeof(buf) && line < 2; c++) {
-+=09=09if (*c =3D=3D '\n') {
-+=09=09=09line++;
-+=09=09=09continue;
-+=09=09}
-+=09}
-+
-+=09/* Skip "Status:  " */
-+=09while (*c !=3D ':') c++;
-+=09c++;
-+=09while (*c =3D=3D ' ') c++;
-+=09c++;
-+
-+=09return *c;
-+}
-+
-+static void dirty_ring_wq_collect_dirty_pages(struct kvm_vm *vm, int slot,
-+=09=09=09=09=09      void *bitmap, uint32_t num_pages)
-+{
-+=09uint32_t count =3D test_dirty_ring_count;
-+=09struct kvm_run *state =3D vcpu_state(vm, VCPU_ID);
-+=09struct kvm_dirty_ring_indexes *indexes =3D &state->vcpu_ring_indexes;
-+=09uint32_t avail;
-+
-+=09while (count--) {
-+=09=09/*
-+=09=09 * Force vcpu to run enough time to make sure we
-+=09=09 * trigger the ring full case
-+=09=09 */
-+=09=09sem_post(&dirty_ring_vcpu_cont);
-+=09}
-+
-+=09/* Make sure it's stuck */
-+=09TEST_ASSERT(vcpu_thread_tid, "TID not inited");
-+        /*
-+=09 * Wait for /proc/pid/status "Status:" changes to "D". "D"
-+=09 * stands for "D (disk sleep)", TASK_UNINTERRUPTIBLE
-+=09 */
-+=09while (read_tid_status_char(vcpu_thread_tid) !=3D 'D') {
-+=09=09usleep(1000);
-+=09}
-+=09DEBUG("Now VCPU thread dirty ring full\n");
-+
-+=09avail =3D READ_ONCE(indexes->avail_index);
-+=09/* Assuming we've consumed all */
-+=09WRITE_ONCE(indexes->fetch_index, avail);
-+
-+=09kvm_vm_reset_dirty_ring(vm);
-+
-+=09/* Wait for it to be awake */
-+=09while (read_tid_status_char(vcpu_thread_tid) =3D=3D 'D') {
-+=09=09usleep(1000);
-+=09}
-+=09DEBUG("VCPU Thread is successfully waked up\n");
-+
-+=09exit(0);
-+}
-+
- static void dirty_ring_after_vcpu_run(struct kvm_vm *vm, int ret, int err)
- {
- =09struct kvm_run *run =3D vcpu_state(vm, VCPU_ID);
-@@ -353,6 +445,12 @@ struct log_mode {
- =09=09.before_vcpu_join =3D dirty_ring_before_vcpu_join,
- =09=09.after_vcpu_run =3D dirty_ring_after_vcpu_run,
- =09},
-+=09{
-+=09=09.name =3D "dirty-ring-wait-queue",
-+=09=09.create_vm_done =3D dirty_ring_wq_create_vm_done,
-+=09=09.collect_dirty_pages =3D dirty_ring_wq_collect_dirty_pages,
-+=09=09.after_vcpu_run =3D dirty_ring_after_vcpu_run,
-+=09},
- };
-=20
- /*
-@@ -422,6 +520,9 @@ static void *vcpu_worker(void *data)
- =09uint64_t *guest_array;
- =09struct sigaction sigact;
-=20
-+=09vcpu_thread_tid =3D syscall(SYS_gettid);
-+=09printf("VCPU Thread ID: %u\n", vcpu_thread_tid);
-+
- =09current_vm =3D vm;
- =09memset(&sigact, 0, sizeof(sigact));
- =09sigact.sa_handler =3D vcpu_sig_handler;
---=20
-2.21.0
+[1] https://lore.kernel.org/r/20191121093941.GA18190@quack2.suse.cz
 
+thanks,
+-- 
+John Hubbard
+NVIDIA
