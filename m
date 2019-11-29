@@ -2,189 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E4A8210D6F0
-	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 15:23:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BEEF10D706
+	for <lists+kvm@lfdr.de>; Fri, 29 Nov 2019 15:31:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727176AbfK2OXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 09:23:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29682 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726824AbfK2OXo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Nov 2019 09:23:44 -0500
+        id S1726963AbfK2Obv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Nov 2019 09:31:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40166 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726902AbfK2Obv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Nov 2019 09:31:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575037422;
+        s=mimecast20190719; t=1575037909;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BjGu5Y9IqwjrSunQ/XOztUtwME2j3+eRCCCFohsV410=;
-        b=h30soEZEoD8mbS1wIiA2nAapoN6RnKGOIA1TOtCyPQs3E4MIgShNsdPxCEaUyDp3M06S09
-        bOfVMgUs6f59w4XL5zV3him2F3phTlIuzzAb74qslK3uvJmc9+fu6+SmVEuHycRDm5rtOo
-        QRZ2IjZECCPB2epEI78Oduq0khbPCHA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-GgCdLEEKPKK0vlNZutJVyg-1; Fri, 29 Nov 2019 09:23:39 -0500
-Received: by mail-wr1-f71.google.com with SMTP id q6so15638377wrv.11
-        for <kvm@vger.kernel.org>; Fri, 29 Nov 2019 06:23:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=kaxeE+6S8sCxKLrCWJSud3mrPDlPxV80NahWl909qwo=;
-        b=c0UPwPMrU2PVw+26ybVpb/Rg3uoqAv8W0PpstUdWz56TuYOtGZ7EgQPx5aG+A5hNV0
-         JeVGpJpFPyievIKW3E6CQfl50ZACwdDHpXiXXJKtJd2JGTOELSGVWjGU7pqiLPgK7spt
-         qTqRGsUWyjpp2V/VQDpjctct2uokv9MisuW5egoJqMHWUJpXcZPfcaZSOMQMiESM9rSj
-         f5D8JI7ChNjM0bWGUjThNO5tla28Qh7Bj42MU4dRyPWCkQsDmIaXPqvjgrcshngu6Hnt
-         ciDrjlzw+HCgWAQz2E5DHCOElRgXR8uN44Cqo/c+lNI/HdjmfrR2jVtyGYhe431TMMLq
-         qljQ==
-X-Gm-Message-State: APjAAAXyvEggVBzwNoEbqXL5X9legmCM+p1p/cJS6o3v69NPaOjdvPsi
-        VnSslXBN1LVxo9W565PlvO8XyTOUCh+0tAVa0FTslg6B9EY355cGh3n292CukD4s8iM04P2FWtu
-        jYva6wvKWJXue
-X-Received: by 2002:adf:f5c2:: with SMTP id k2mr54051080wrp.118.1575037418920;
-        Fri, 29 Nov 2019 06:23:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyVv1y+4A+y/39GNkVZoElT6z5O0Pek/hv4gLlJdL8U5Xgc64spiRBOkAodEg1rJHQ8THPcgg==
-X-Received: by 2002:adf:f5c2:: with SMTP id k2mr54051050wrp.118.1575037418670;
-        Fri, 29 Nov 2019 06:23:38 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id b17sm3023411wrx.15.2019.11.29.06.23.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Nov 2019 06:23:37 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>
-Subject: Re: [PATCH] KVM: X86: Use APIC_DEST_* macros properly
-In-Reply-To: <20191128193211.32684-1-peterx@redhat.com>
-References: <20191128193211.32684-1-peterx@redhat.com>
-Date:   Fri, 29 Nov 2019 15:23:36 +0100
-Message-ID: <87sgm6damv.fsf@vitty.brq.redhat.com>
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=hP0oY4h6+KNu9YkOzZioE8MzsM9rYT+KCQ582wt/cEY=;
+        b=IhDVubQ8Qy/6mp057kzcq0A0B0GGZE9KGHVUfcY4s/muzZP65nbo8br70mhgQyxp8eaWtP
+        siIc2Z3ypTS6ZCFNisFYjUIKASQfVaVL5uT8G4nnHOV/R20lGNALasZ11SjX4b4PfRVjIz
+        4VEaKFRJkFpMm2XU93v/puI9uOfDFeA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-NLIvxqUXOEyDXLfLmgDUPg-1; Fri, 29 Nov 2019 09:31:45 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93F0B184CAA0;
+        Fri, 29 Nov 2019 14:31:43 +0000 (UTC)
+Received: from [10.36.118.44] (unknown [10.36.118.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12B025C3FA;
+        Fri, 29 Nov 2019 14:31:41 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: Add new reset vcpu API
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+References: <20191129142122.21528-1-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAj4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+ BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+ 8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+ xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+ jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+ s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+ m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+ MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+ z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+ dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+ UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+ 7ut6OL64oAq+uQINBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+ uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+ 0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+ 2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+ xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+ 8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+ hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+ u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+ gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+ rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABiQIl
+ BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+ KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+ NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+ YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+ lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+ qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+ C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+ W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+ TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+ +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <bc1d057f-03a0-b850-dff8-a7156bfe3274@redhat.com>
+Date:   Fri, 29 Nov 2019 15:31:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-MC-Unique: GgCdLEEKPKK0vlNZutJVyg-1
+In-Reply-To: <20191129142122.21528-1-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: NLIvxqUXOEyDXLfLmgDUPg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Peter Xu <peterx@redhat.com> writes:
-
-> Previously we were using either APIC_DEST_PHYSICAL|APIC_DEST_LOGICAL
-> or 0|1 to fill in kvm_lapic_irq.dest_mode, and it's done in an adhoc
-> way.  It's fine imho only because in most cases when we check against
-> dest_mode it's against APIC_DEST_PHYSICAL (which equals to 0).
-> However, that's not consistent, majorly because APIC_DEST_LOGICAL does
-> not equals to 1, so if one day we check irq.dest_mode against
-> APIC_DEST_LOGICAL we'll probably always get a false returned.
->
-> This patch replaces the 0/1 settings of irq.dest_mode with the macros
-> to make them consistent.
->
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Sean Christopherson <sean.j.christopherson@intel.com>
-> CC: Vitaly Kuznetsov <vkuznets@redhat.com>
-> CC: Nitesh Narayan Lal <nitesh@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 29.11.19 15:21, Janosch Frank wrote:
+> The architecture states that we need to reset local IRQs for all CPU
+> resets. Because the old reset interface did not support the normal CPU
+> reset we never did that.
+> 
+> Now that we have a new interface, let's properly clear out local IRQs
+> and let this commit be a reminder.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  arch/x86/kvm/ioapic.c   | 9 ++++++---
->  arch/x86/kvm/irq_comm.c | 7 ++++---
->  arch/x86/kvm/x86.c      | 2 +-
->  3 files changed, 11 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index 9fd2dd89a1c5..1e091637d5d5 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -331,7 +331,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *=
-ioapic, u32 val)
->  =09=09=09irq.vector =3D e->fields.vector;
->  =09=09=09irq.delivery_mode =3D e->fields.delivery_mode << 8;
->  =09=09=09irq.dest_id =3D e->fields.dest_id;
-> -=09=09=09irq.dest_mode =3D e->fields.dest_mode;
-> +=09=09=09irq.dest_mode =3D e->fields.dest_mode ?
-> +=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
->  =09=09=09bitmap_zero(&vcpu_bitmap, 16);
->  =09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
->  =09=09=09=09=09=09 &vcpu_bitmap);
-> @@ -343,7 +344,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *=
-ioapic, u32 val)
->  =09=09=09=09 * keep ioapic_handled_vectors synchronized.
->  =09=09=09=09 */
->  =09=09=09=09irq.dest_id =3D old_dest_id;
-> -=09=09=09=09irq.dest_mode =3D old_dest_mode;
-> +=09=09=09=09irq.dest_mode =3D old_dest_mode ?
-> +=09=09=09=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
->  =09=09=09=09kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
->  =09=09=09=09=09=09=09 &vcpu_bitmap);
->  =09=09=09}
-> @@ -369,7 +371,8 @@ static int ioapic_service(struct kvm_ioapic *ioapic, =
-int irq, bool line_status)
-> =20
->  =09irqe.dest_id =3D entry->fields.dest_id;
->  =09irqe.vector =3D entry->fields.vector;
-> -=09irqe.dest_mode =3D entry->fields.dest_mode;
-> +=09irqe.dest_mode =3D entry->fields.dest_mode ?
-> +=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
->  =09irqe.trig_mode =3D entry->fields.trig_mode;
->  =09irqe.delivery_mode =3D entry->fields.delivery_mode << 8;
->  =09irqe.level =3D 1;
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index 8ecd48d31800..673b6afd6dbf 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -52,8 +52,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kv=
-m_lapic *src,
->  =09unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
->  =09unsigned int dest_vcpus =3D 0;
-> =20
-> -=09if (irq->dest_mode =3D=3D 0 && irq->dest_id =3D=3D 0xff &&
-> -=09=09=09kvm_lowest_prio_delivery(irq)) {
-> +=09if (irq->dest_mode =3D=3D APIC_DEST_PHYSICAL &&
-> +=09    irq->dest_id =3D=3D 0xff && kvm_lowest_prio_delivery(irq)) {
->  =09=09printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
->  =09=09irq->delivery_mode =3D APIC_DM_FIXED;
->  =09}
-> @@ -114,7 +114,8 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kern=
-el_irq_routing_entry *e,
->  =09=09irq->dest_id |=3D MSI_ADDR_EXT_DEST_ID(e->msi.address_hi);
->  =09irq->vector =3D (e->msi.data &
->  =09=09=09MSI_DATA_VECTOR_MASK) >> MSI_DATA_VECTOR_SHIFT;
-> -=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_l=
-o;
-> +=09irq->dest_mode =3D (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_l=
-o ?
-> +=09    APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
->  =09irq->trig_mode =3D (1 << MSI_DATA_TRIGGER_SHIFT) & e->msi.data;
->  =09irq->delivery_mode =3D e->msi.data & 0x700;
->  =09irq->msi_redir_hint =3D ((e->msi.address_lo
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3ed167e039e5..3b00d662dc14 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7356,7 +7356,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, uns=
-igned long flags, int apicid)
->  =09struct kvm_lapic_irq lapic_irq;
-> =20
->  =09lapic_irq.shorthand =3D 0;
-> -=09lapic_irq.dest_mode =3D 0;
-> +=09lapic_irq.dest_mode =3D APIC_DEST_PHYSICAL;
->  =09lapic_irq.level =3D 0;
->  =09lapic_irq.dest_id =3D apicid;
->  =09lapic_irq.msi_redir_hint =3D false;
+>  arch/s390/kvm/kvm-s390.c | 25 ++++++++++++++++++++++++-
+>  include/uapi/linux/kvm.h |  7 +++++++
+>  2 files changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d9e6bf3d54f0..2f74ff46b176 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_S390_CMMA_MIGRATION:
+>  	case KVM_CAP_S390_AIS:
+>  	case KVM_CAP_S390_AIS_MIGRATION:
+> +	case KVM_CAP_S390_VCPU_RESETS:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_S390_HPAGE_1M:
+> @@ -3293,6 +3294,25 @@ static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static int kvm_arch_vcpu_ioctl_reset(struct kvm_vcpu *vcpu, unsigned long type)
+> +{
+> +	int rc = -EINVAL;
+> +
+> +	switch (type) {
+> +	case KVM_S390_VCPU_RESET_NORMAL:
+> +		rc = 0;
+> +		kvm_clear_async_pf_completion_queue(vcpu);
+> +		kvm_s390_clear_local_irqs(vcpu);
+> +		break;
+> +	case KVM_S390_VCPU_RESET_INITIAL:
+> +		/* fallthrough */
+> +	case KVM_S390_VCPU_RESET_CLEAR:
+> +		rc = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
 
-dest_mode is being passed to kvm_apic_match_dest() where we do:
+As we now have two interfaces to achieve the same thing (initial reset),
+I do wonder if we should simply introduce
 
-=09case APIC_DEST_NOSHORT:
-=09=09if (dest_mode =3D=3D APIC_DEST_PHYSICAL)
-=09=09=09return kvm_apic_match_physical_addr(target, mda);
-=09=09else
-=09=09=09return kvm_apic_match_logical_addr(target, mda);
+KVM_S390_NORMAL_RESET
+KVM_S390_CLEAR_RESET
 
-I'd suggest we fix this too then (and BUG() in case it's neither).
+instead ...
 
---=20
-Vitaly
+Then you can do KVM_S390_NORMAL_RESET for the bugfix and
+KVM_S390_CLEAR_RESET later for PV.
+
+Does anything speak against that?
+
+-- 
+Thanks,
+
+David / dhildenb
 
