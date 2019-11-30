@@ -2,108 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EC9610DC31
-	for <lists+kvm@lfdr.de>; Sat, 30 Nov 2019 03:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FB6A10DCE6
+	for <lists+kvm@lfdr.de>; Sat, 30 Nov 2019 08:20:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727198AbfK3Cp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Nov 2019 21:45:29 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:50510 "EHLO huawei.com"
+        id S1727012AbfK3HU1 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 30 Nov 2019 02:20:27 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2096 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727177AbfK3Cp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Nov 2019 21:45:28 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 96812B9628629FE8062D;
-        Sat, 30 Nov 2019 10:45:25 +0800 (CST)
-Received: from huawei.com (10.175.105.18) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Sat, 30 Nov 2019
- 10:45:17 +0800
+        id S1725811AbfK3HU1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Nov 2019 02:20:27 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 314F03BD4D38557D7AB9;
+        Sat, 30 Nov 2019 15:20:25 +0800 (CST)
+Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 30 Nov 2019 15:20:24 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Sat, 30 Nov 2019 15:20:24 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Sat, 30 Nov 2019 15:20:24 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
-To:     <maz@kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <james.morse@arm.com>, <julien.thierry.kdev@gmail.com>,
-        <suzuki.poulose@arm.com>, <christoffer.dall@arm.com>,
-        <catalin.marinas@arm.com>, <eric.auger@redhat.com>,
-        <gregkh@linuxfoundation.org>, <will@kernel.org>,
-        <andre.przywara@arm.com>, <tglx@linutronix.de>
-CC:     <steven.price@arm.com>, <linmiaohe@huawei.com>,
+To:     "maz@kernel.org" <maz@kernel.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "christoffer.dall@arm.com" <christoffer.dall@arm.com>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "andre.przywara@arm.com" <andre.przywara@arm.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>
+CC:     "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: [PATCH v3] KVM: vgic: Use wrapper function to lock/unlock all vcpus in kvm_vgic_create()
-Date:   Sat, 30 Nov 2019 10:45:18 +0800
-Message-ID: <1575081918-11401-1-git-send-email-linmiaohe@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] KVM: arm: get rid of unused arg in cpu_init_hyp_mode()
+Thread-Topic: [PATCH] KVM: arm: get rid of unused arg in cpu_init_hyp_mode()
+Thread-Index: AdWnTmGujmIRIVH4Q4a12QHyDyOpdA==
+Date:   Sat, 30 Nov 2019 07:20:24 +0000
+Message-ID: <8efe4ab7f8c44c48a70378247c511edc@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.184.189.20]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.105.18]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
-
-Use wrapper function lock_all_vcpus()/unlock_all_vcpus()
-in kvm_vgic_create() to remove duplicated code dealing
-with locking and unlocking all vcpus in a vm.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Steven Price <steven.price@arm.com>
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
----
--v2:
-	Fix some spelling mistake in patch title and commit log.
--v3:
-	Remove the comment that no longer makes sense.
----
- virt/kvm/arm/vgic/vgic-init.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index b3c5de48064c..22ff73ecac80 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -70,7 +70,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
-  */
- int kvm_vgic_create(struct kvm *kvm, u32 type)
- {
--	int i, vcpu_lock_idx = -1, ret;
-+	int i, ret;
- 	struct kvm_vcpu *vcpu;
- 
- 	if (irqchip_in_kernel(kvm))
-@@ -86,17 +86,9 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		!kvm_vgic_global_state.can_emulate_gicv2)
- 		return -ENODEV;
- 
--	/*
--	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
--	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
--	 * that no other VCPUs are run while we create the vgic.
--	 */
- 	ret = -EBUSY;
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (!mutex_trylock(&vcpu->mutex))
--			goto out_unlock;
--		vcpu_lock_idx = i;
--	}
-+	if (!lock_all_vcpus(kvm))
-+		return ret;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (vcpu->arch.has_run_once)
-@@ -125,10 +117,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
- 
- out_unlock:
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&vcpu->mutex);
--	}
-+	unlock_all_vcpus(kvm);
- 	return ret;
- }
- 
--- 
-2.19.1
-
+>From: Miaohe Lin <linmiaohe@huawei.com>
+>
+>As arg dummy is not really needed, there's no need to pass NULL when calling cpu_init_hyp_mode(). So clean it up.
+>
+>Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+>---
+> virt/kvm/arm/arm.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c index 86c6aa1cb58e..a5470f1b1a19 100644
+>--- a/virt/kvm/arm/arm.c
+>+++ b/virt/kvm/arm/arm.c
+>@@ -1315,7 +1315,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
+> 	}
+> }
+>
+>-static void cpu_init_hyp_mode(void *dummy)
+>+static void cpu_init_hyp_mode(void)
+> {
+> 	phys_addr_t pgd_ptr;
+> 	unsigned long hyp_stack_ptr;
+>@@ -1349,7 +1349,7 @@ static void cpu_hyp_reinit(void)
+> 	if (is_kernel_in_hyp_mode())
+> 		kvm_timer_init_vhe();
+> 	else
+>-		cpu_init_hyp_mode(NULL);
+>+		cpu_init_hyp_mode();
+> 
+> 	kvm_arm_init_debug();
+> 
+friendly ping ...
