@@ -2,153 +2,422 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7575710E0F2
-	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2019 08:05:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B97610E1C1
+	for <lists+kvm@lfdr.de>; Sun,  1 Dec 2019 12:46:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726162AbfLAHFL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Dec 2019 02:05:11 -0500
-Received: from mail-io1-f71.google.com ([209.85.166.71]:37721 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725844AbfLAHFK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 1 Dec 2019 02:05:10 -0500
-Received: by mail-io1-f71.google.com with SMTP id p2so23546628iof.4
-        for <kvm@vger.kernel.org>; Sat, 30 Nov 2019 23:05:08 -0800 (PST)
+        id S1726811AbfLALqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Dec 2019 06:46:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34945 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726186AbfLALqn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 1 Dec 2019 06:46:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575200801;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8vZSTFTClz+gFYFT8rY2rqTrpX2zFmVovSigmWOJuME=;
+        b=ZNiGtZDoy/VThjByNEdEI7s0RMiF+mfoAPUHQ6czxAj64UHY4SrQQoPeWKEOKfxThlsfJs
+        UZrZm6qWkuwuDnQD9h3L6b/cD6YQQWM8O3t8UbzVobVmtw+rFR6qCybgku+a0rElu80jTp
+        +4H6CQmgmLhcdjFU2mZW4NLzTcL66kQ=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-w483Cw8bNEyWv6jp1mTPug-1; Sun, 01 Dec 2019 06:46:38 -0500
+Received: by mail-qk1-f198.google.com with SMTP id a6so7488357qkl.7
+        for <kvm@vger.kernel.org>; Sun, 01 Dec 2019 03:46:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=sVJfn8rJ2gIp74tK7+hxDmMwjF/b8IMnVIXNefmEtNQ=;
-        b=VZgqQuWGrJ/cfTde+5VZYFaq4OGx1mkFLlNxwYuIf6XIua9PNaoFV00rjV35vlX7uK
-         nCz17hbp8u8lVGRNoqprbLurK5puOB1xvMOzMzMTBFLWlatEoSlyeHDGGv2j91x8TrUR
-         kRgQgBGEooB9QjYKEkvUlsr5TIQVajNmWtoAoVvSGLwcJbcUqRbgAQqXRfr6CoEbU6/0
-         /2X6Chvmi7TFrjfiD5c8aP8DjaxFWo2Ypt4XpywqWySwXNIHo4d13VJw8djtYlqAOUN9
-         M1aI6/ek+HGGkMPAr8l7spfdLmzMVKuyqcgym+2t4OfeAYr35/IeJkPUuXPbNjfVNvrn
-         yjUg==
-X-Gm-Message-State: APjAAAUnrByK+sseoQ3VC/NfowN88RgoWxVcXiUeH8yYEKG7ZPD2b91/
-        sMHFJIXMqT34kC9VUmJcABGRKZFDw81gsV+V0QwRvAWaFscm
-X-Google-Smtp-Source: APXvYqxwNXgzb30H6/92ZMPnaVi7ngNCOj4QuO9fnKu8jDWRPc7FjkkXJPGHU7gfk4lUbxnBr4Kqbmg6EAC8kZCcY3Ay2tfovrOd
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GZ2K4EhFx9VSHnQ9Db4nl7lYmDIyd3raQqWfh0qOyio=;
+        b=VGtm788YNFWJYesQQtR5AqC0Btxl1R29qmz2g5RdH5QML+QEm7zF2/qPXltkn9EBYt
+         2uokHRs6grshXVz6U+GK7HGzn0Ac4C9Ms3TWRqFvHNmoL4W7CZQaXCZoHz30q40ffetr
+         vA2TnyZtINl0rLJq14aFqjjW5sbbgemujJyT/OyU6Ie+YOMGjlHQ5Tb1sS3lG+KT6rJT
+         C+uxXvBPwwB7mwggeah4d7AHdTJGCzsOAClCdnWb0fWrn4/MSkXpqhaI2ZG+f8KyJzws
+         qLH8zHK7z5qgIhHqpUl3vY+Xp2KMSErV4PLIx2qHSre5lWvYR/gJMm1q1r3B9UZ3n8Lo
+         w2nw==
+X-Gm-Message-State: APjAAAWQJhp5RA8DoLoV7rPb5nlYIXnySGrv5SIoFs9E4uQU552EpFK/
+        83CffFRpLYc3S8zO1WdWDYfz+9vYMmmsc9s+w7kYaYaY44z5vkS/4LNDY4aUMcZc/zoPUfipRyo
+        LAIx/VFZj3zTw
+X-Received: by 2002:a37:a08d:: with SMTP id j135mr12380006qke.455.1575200797465;
+        Sun, 01 Dec 2019 03:46:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyPDBK8mIuf+qYJn0qUoYQhep/CKiZhygPm3sID1S27ff8V+Dyzk82ZcylZj+dvRZgbwXJX3Q==
+X-Received: by 2002:a37:a08d:: with SMTP id j135mr12379977qke.455.1575200796970;
+        Sun, 01 Dec 2019 03:46:36 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id d26sm2479811qka.28.2019.12.01.03.46.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Dec 2019 03:46:35 -0800 (PST)
+Date:   Sun, 1 Dec 2019 06:46:26 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Oscar Salvador <osalvador@suse.de>
+Subject: Re: [PATCH v14 6/6] virtio-balloon: Add support for providing unused
+ page reports to host
+Message-ID: <20191201041731-mutt-send-email-mst@kernel.org>
+References: <20191119214454.24996.66289.stgit@localhost.localdomain>
+ <20191119214653.24996.90695.stgit@localhost.localdomain>
+ <65de00cf-5969-ea2e-545b-2228a4c859b0@redhat.com>
+ <CAKgT0Uf8iebEXSovdWfXq1FvyGpqrF-X0VDrq-h8xavQkvA_9w@mail.gmail.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2806:: with SMTP id d6mr13018994ioe.299.1575183908296;
- Sat, 30 Nov 2019 23:05:08 -0800 (PST)
-Date:   Sat, 30 Nov 2019 23:05:08 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004f5ec705989f1585@google.com>
-Subject: BUG: unable to handle kernel paging request in __call_srcu
-From:   syzbot <syzbot+b16ea6c233022c222d63@syzkaller.appspotmail.com>
-To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+In-Reply-To: <CAKgT0Uf8iebEXSovdWfXq1FvyGpqrF-X0VDrq-h8xavQkvA_9w@mail.gmail.com>
+X-MC-Unique: w483Cw8bNEyWv6jp1mTPug-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-
-syzbot found the following crash on:
-
-HEAD commit:    131b7b67 Add linux-next specific files for 20191126
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12aa31f2e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=11aacf1d97714af4
-dashboard link: https://syzkaller.appspot.com/bug?extid=b16ea6c233022c222d63
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174cbb5ee00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+b16ea6c233022c222d63@syzkaller.appspotmail.com
-
-BUG: unable to handle page fault for address: ffffc90009080868
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD aa54b067 P4D aa54b067 PUD aa54c067 PMD 99900067 PTE 0
-Oops: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 31521 Comm: syz-executor.4 Not tainted  
-5.4.0-next-20191126-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-RIP: 0010:__lock_acquire+0x125e/0x4a00 kernel/locking/lockdep.c:3828
-Code: f0 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 48 b8 00 00 00 00 00 fc  
-ff df 4c 89 f2 48 c1 ea 03 80 3c 02 00 0f 85 0b 28 00 00 <49> 81 3e e0 dc  
-08 8a 0f 84 5f ee ff ff 83 fe 01 0f 87 62 ee ff ff
-RSP: 0018:ffff88809727f7f0 EFLAGS: 00010046
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 1ffff9200121010d RSI: 0000000000000000 RDI: 0000000000000001
-RBP: ffff88809727f908 R08: 0000000000000001 R09: 0000000000000001
-R10: fffffbfff139ebd0 R11: ffff88808e750540 R12: ffffc90009080868
-R13: 0000000000000000 R14: ffffc90009080868 R15: 0000000000000001
-FS:  00007ffb1ae47700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc90009080868 CR3: 000000009f42f000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4485
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0x95/0xcd kernel/locking/spinlock.c:159
-  srcu_funnel_gp_start kernel/rcu/srcutree.c:643 [inline]
-  __call_srcu kernel/rcu/srcutree.c:871 [inline]
-  __call_srcu+0x53f/0xcc0 kernel/rcu/srcutree.c:834
-  __synchronize_srcu+0x18d/0x250 kernel/rcu/srcutree.c:920
-  synchronize_srcu_expedited kernel/rcu/srcutree.c:946 [inline]
-  synchronize_srcu+0x239/0x3e8 kernel/rcu/srcutree.c:997
-  kvm_page_track_unregister_notifier+0xe7/0x130  
-arch/x86/kvm/mmu/page_track.c:212
-  kvm_mmu_uninit_vm+0x1e/0x30 arch/x86/kvm/mmu/mmu.c:5928
-  kvm_arch_destroy_vm+0x4a2/0x5f0 arch/x86/kvm/x86.c:9666
-  kvm_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:758 [inline]
-  kvm_dev_ioctl_create_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:3519  
-[inline]
-  kvm_dev_ioctl+0x1167/0x1770 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3571
-  vfs_ioctl fs/ioctl.c:47 [inline]
-  file_ioctl fs/ioctl.c:545 [inline]
-  do_vfs_ioctl+0x977/0x14e0 fs/ioctl.c:732
-  ksys_ioctl+0xab/0xd0 fs/ioctl.c:749
-  __do_sys_ioctl fs/ioctl.c:756 [inline]
-  __se_sys_ioctl fs/ioctl.c:754 [inline]
-  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:754
-  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x45a649
-Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ffb1ae46c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000045a649
-RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000003
-RBP: 000000000075bf20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffb1ae476d4
-R13: 00000000004c38f2 R14: 00000000004d7de8 R15: 00000000ffffffff
-Modules linked in:
-CR2: ffffc90009080868
----[ end trace e17de659c9276288 ]---
-RIP: 0010:__lock_acquire+0x125e/0x4a00 kernel/locking/lockdep.c:3828
-Code: f0 00 00 00 5b 41 5c 41 5d 41 5e 41 5f 5d c3 48 b8 00 00 00 00 00 fc  
-ff df 4c 89 f2 48 c1 ea 03 80 3c 02 00 0f 85 0b 28 00 00 <49> 81 3e e0 dc  
-08 8a 0f 84 5f ee ff ff 83 fe 01 0f 87 62 ee ff ff
-RSP: 0018:ffff88809727f7f0 EFLAGS: 00010046
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 1ffff9200121010d RSI: 0000000000000000 RDI: 0000000000000001
-RBP: ffff88809727f908 R08: 0000000000000001 R09: 0000000000000001
-R10: fffffbfff139ebd0 R11: ffff88808e750540 R12: ffffc90009080868
-R13: 0000000000000000 R14: ffffc90009080868 R15: 0000000000000001
-FS:  00007ffb1ae47700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc90009080868 CR3: 000000009f42f000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+On Fri, Nov 29, 2019 at 01:13:32PM -0800, Alexander Duyck wrote:
+> On Thu, Nov 28, 2019 at 7:26 AM David Hildenbrand <david@redhat.com> wrot=
+e:
+> >
+> > On 19.11.19 22:46, Alexander Duyck wrote:
+> > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > >
+> > > Add support for the page reporting feature provided by virtio-balloon=
+.
+> > > Reporting differs from the regular balloon functionality in that is i=
+s
+> > > much less durable than a standard memory balloon. Instead of creating=
+ a
+> > > list of pages that cannot be accessed the pages are only inaccessible
+> > > while they are being indicated to the virtio interface. Once the
+> > > interface has acknowledged them they are placed back into their respe=
+ctive
+> > > free lists and are once again accessible by the guest system.
+> >
+> > Maybe add something like "In contrast to ordinary balloon
+> > inflation/deflation, the guest can reuse all reported pages immediately
+> > after reporting has finished, without having to notify the hypervisor
+> > about it (e.g., VIRTIO_BALLOON_F_MUST_TELL_HOST does not apply)."
+>=20
+> Okay. I'll make a note of it for next version.
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+VIRTIO_BALLOON_F_MUST_TELL_HOST is IMHO misdocumented.
+It states:
+=09VIRTIO_BALLOON_F_MUST_TELL_HOST (0) Host has to be told before pages fro=
+m the balloon are
+=09used.
+but really balloon always told host. The difference is in timing,
+historically balloon gave up pages before sending the
+message and before waiting for the buffer to be used by host.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+I think this feature can be the same if we want.
+
+
+> > [...]
+> >
+> > >  /*
+> > >   * Balloon device works in 4K page units.  So each page is pointed t=
+o by
+> > > @@ -37,6 +38,9 @@
+> > >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
+> > >       (1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
+> > >
+> > > +/*  limit on the number of pages that can be on the reporting vq */
+> > > +#define VIRTIO_BALLOON_VRING_HINTS_MAX       16
+> >
+> > Maybe rename that from HINTS to REPORTS
+>=20
+> I'll fix it for the next version.
+>=20
+> > > +
+> > >  #ifdef CONFIG_BALLOON_COMPACTION
+> > >  static struct vfsmount *balloon_mnt;
+> > >  #endif
+> > > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
+> > >       VIRTIO_BALLOON_VQ_DEFLATE,
+> > >       VIRTIO_BALLOON_VQ_STATS,
+> > >       VIRTIO_BALLOON_VQ_FREE_PAGE,
+> > > +     VIRTIO_BALLOON_VQ_REPORTING,
+> > >       VIRTIO_BALLOON_VQ_MAX
+> > >  };
+> > >
+> > > @@ -113,6 +118,10 @@ struct virtio_balloon {
+> > >
+> > >       /* To register a shrinker to shrink memory upon memory pressure=
+ */
+> > >       struct shrinker shrinker;
+> > > +
+> > > +     /* Unused page reporting device */
+> >
+> > Sounds like the device is unused :D
+> >
+> > "Device info for reporting unused pages" ?
+> >
+> > I am in general wondering, should we rename "unused" to "free". I.e.,
+> > "free page reporting" instead of "unused page reporting"? Or what was
+> > the motivation behind using "unused" ?
+>=20
+> I honestly don't remember why I chose "unused" at this point. I can
+> switch over to "free" if that is what is preferred.
+>=20
+> Looking over the code a bit more I suspect the reason for avoiding it
+> is because free page hinting also mentioned reporting in a few spots.
+>=20
+> > > +     struct virtqueue *reporting_vq;
+> > > +     struct page_reporting_dev_info pr_dev_info;
+> > >  };
+> > >
+> > >  static struct virtio_device_id id_table[] =3D {
+> > > @@ -152,6 +161,32 @@ static void tell_host(struct virtio_balloon *vb,=
+ struct virtqueue *vq)
+> > >
+> > >  }
+> > >
+> > > +void virtballoon_unused_page_report(struct page_reporting_dev_info *=
+pr_dev_info,
+> > > +                                 unsigned int nents)
+> > > +{
+> > > +     struct virtio_balloon *vb =3D
+> > > +             container_of(pr_dev_info, struct virtio_balloon, pr_dev=
+_info);
+> > > +     struct virtqueue *vq =3D vb->reporting_vq;
+> > > +     unsigned int unused, err;
+> > > +
+> > > +     /* We should always be able to add these buffers to an empty qu=
+eue. */
+> >
+> > This comment somewhat contradicts the error handling (and comment)
+> > below. Maybe just drop it?
+> >
+> > > +     err =3D virtqueue_add_inbuf(vq, pr_dev_info->sg, nents, vb,
+> > > +                               GFP_NOWAIT | __GFP_NOWARN);
+> > > +
+> > > +     /*
+> > > +      * In the extremely unlikely case that something has changed an=
+d we
+> > > +      * are able to trigger an error we will simply display a warnin=
+g
+> > > +      * and exit without actually processing the pages.
+> > > +      */
+> > > +     if (WARN_ON(err))
+> > > +             return;
+> >
+> > Maybe WARN_ON_ONCE? (to not flood the log on recurring errors)
+>=20
+> Actually I might need to tweak things here a bit. It occurs to me that
+> this can fail for more than just there not being space in the ring. I
+> forgot that DMA mapping needs to also occur so in the case of a DMA
+> mapping failure we would also see an error.
+
+Balloon assumes DMA mapping is bypassed right now:
+
+static int virtballoon_validate(struct virtio_device *vdev)
+{
+        if (!page_poisoning_enabled())
+                __virtio_clear_bit(vdev, VIRTIO_BALLOON_F_PAGE_POISON);
+
+        __virtio_clear_bit(vdev, VIRTIO_F_IOMMU_PLATFORM);
+
+^^^^^^^^
+
+
+        return 0;
+}
+
+I don't think it can work with things like a bounce buffer.
+
+> I probably will switch it to a WARN_ON_ONCE. I may also need to add a
+> return value to the function so that we can indicate that an entire
+> batch has failed and that we need to abort.
+>=20
+> > > +
+> > > +     virtqueue_kick(vq);
+> > > +
+> > > +     /* When host has read buffer, this completes via balloon_ack */
+> > > +     wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
+> >
+> > Is it safe to rely on the same ack-ing mechanism as the inflate/deflate
+> > queue? What if both mechanisms are used concurrently and race/both wait
+> > for the hypervisor?
+> >
+> > Maybe we need a separate vb->acked + callback function.
+>=20
+> So if I understand correctly what is actually happening is that the
+> wait event is simply a trigger that will wake us up, and at that point
+> we check to see if the buffer we submitted is done. If not we go back
+> to sleep. As such all we are really waiting on is the notification
+> that the buffers we submitted have been processed. So it is using the
+> same function but on a different virtual queue.
+>=20
+> > > +}
+> > > +
+> > >  static void set_page_pfns(struct virtio_balloon *vb,
+> > >                         __virtio32 pfns[], struct page *page)
+> > >  {
+> > > @@ -476,6 +511,7 @@ static int init_vqs(struct virtio_balloon *vb)
+> > >       names[VIRTIO_BALLOON_VQ_DEFLATE] =3D "deflate";
+> > >       names[VIRTIO_BALLOON_VQ_STATS] =3D NULL;
+> > >       names[VIRTIO_BALLOON_VQ_FREE_PAGE] =3D NULL;
+> > > +     names[VIRTIO_BALLOON_VQ_REPORTING] =3D NULL;
+> > >
+> > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > >               names[VIRTIO_BALLOON_VQ_STATS] =3D "stats";
+> > > @@ -487,11 +523,19 @@ static int init_vqs(struct virtio_balloon *vb)
+> > >               callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] =3D NULL;
+> > >       }
+> > >
+> > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> > > +             names[VIRTIO_BALLOON_VQ_REPORTING] =3D "reporting_vq";
+> > > +             callbacks[VIRTIO_BALLOON_VQ_REPORTING] =3D balloon_ack;
+> > > +     }
+> > > +
+> > >       err =3D vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_=
+MAX,
+> > >                                        vqs, callbacks, names, NULL, N=
+ULL);
+> > >       if (err)
+> > >               return err;
+> > >
+> > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> > > +             vb->reporting_vq =3D vqs[VIRTIO_BALLOON_VQ_REPORTING];
+> > > +
+> >
+> > I'd register these in the same order they are defined (IOW, move this
+> > further down)
+>=20
+> done.
+>=20
+> > >       vb->inflate_vq =3D vqs[VIRTIO_BALLOON_VQ_INFLATE];
+> > >       vb->deflate_vq =3D vqs[VIRTIO_BALLOON_VQ_DEFLATE];
+> > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > > @@ -932,12 +976,30 @@ static int virtballoon_probe(struct virtio_devi=
+ce *vdev)
+> > >               if (err)
+> > >                       goto out_del_balloon_wq;
+> > >       }
+> > > +
+> > > +     vb->pr_dev_info.report =3D virtballoon_unused_page_report;
+> > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> > > +             unsigned int capacity;
+> > > +
+> > > +             capacity =3D min_t(unsigned int,
+> > > +                              virtqueue_get_vring_size(vb->reporting=
+_vq),
+> > > +                              VIRTIO_BALLOON_VRING_HINTS_MAX);
+> > > +             vb->pr_dev_info.capacity =3D capacity;
+> > > +
+> > > +             err =3D page_reporting_register(&vb->pr_dev_info);
+> > > +             if (err)
+> > > +                     goto out_unregister_shrinker;
+> > > +     }
+> >
+> > It can happen here that we start reporting before marking the device
+> > ready. Can that be problematic?
+> >
+> > Maybe we have to ignore any reports in virtballoon_unused_page_report()
+> > until ready...
+>=20
+> I don't think there is an issue with us putting buffers on the ring
+> before it is ready. I think it will just cause our function to sleep.
+>=20
+> I'm guessing that is the case since init_vqs will add a buffer to the
+> stats vq and that happens even earlier in virtballoon_probe.
+>=20
+> > > +
+> > >       virtio_device_ready(vdev);
+> > >
+> > >       if (towards_target(vb))
+> > >               virtballoon_changed(vdev);
+> > >       return 0;
+> > >
+> > > +out_unregister_shrinker:
+> > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OO=
+M))
+> > > +             virtio_balloon_unregister_shrinker(vb);
+> >
+> > A sync is done implicitly, right? So after this call, we won't get any
+> > new callbacks/are stuck in a callback.
+>=20
+> >From what I can tell a read/write semaphore is used in
+> unregister_shrinker when we delete it from the list so it shouldn't be
+> an issue.
+>=20
+> > >  out_del_balloon_wq:
+> > >       if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
+> > >               destroy_workqueue(vb->balloon_wq);
+> > > @@ -966,6 +1028,8 @@ static void virtballoon_remove(struct virtio_dev=
+ice *vdev)
+> > >  {
+> > >       struct virtio_balloon *vb =3D vdev->priv;
+> > >
+> > > +     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> > > +             page_reporting_unregister(&vb->pr_dev_info);
+> >
+> > Dito, same question regarding syncs.
+>=20
+> Yes, although for that one I was using pointer deletion, a barrier,
+> and a cancel_work_sync since I didn't support a list.
+>=20
+> > >       if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OO=
+M))
+> > >               virtio_balloon_unregister_shrinker(vb);
+> > >       spin_lock_irq(&vb->stop_update_lock);
+> > > @@ -1038,6 +1102,7 @@ static int virtballoon_validate(struct virtio_d=
+evice *vdev)
+> > >       VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> > >       VIRTIO_BALLOON_F_FREE_PAGE_HINT,
+> > >       VIRTIO_BALLOON_F_PAGE_POISON,
+> > > +     VIRTIO_BALLOON_F_REPORTING,
+> > >  };
+> > >
+> > >  static struct virtio_driver virtio_balloon_driver =3D {
+> > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux=
+/virtio_balloon.h
+> > > index a1966cd7b677..19974392d324 100644
+> > > --- a/include/uapi/linux/virtio_balloon.h
+> > > +++ b/include/uapi/linux/virtio_balloon.h
+> > > @@ -36,6 +36,7 @@
+> > >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM      2 /* Deflate balloon on=
+ OOM */
+> > >  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT      3 /* VQ to report free =
+pages */
+> > >  #define VIRTIO_BALLOON_F_PAGE_POISON 4 /* Guest is using page poison=
+ing */
+> > > +#define VIRTIO_BALLOON_F_REPORTING   5 /* Page reporting virtqueue *=
+/
+> > >
+> > >  /* Size of a PFN in the balloon interface. */
+> > >  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> > >
+> > >
+> >
+> > Small and powerful patch :)
+>=20
+> Agreed. Although we will have to see if we can keep it that way.
+> Ideally I want to leave this with the ability so specify what size
+> scatterlist we receive. However if we have to flip it around then it
+> will force us to add logic for chopping up the scatterlist for
+> processing in chunks.
+>=20
+> Thanks for the review.
+>=20
+> - Alex
+
