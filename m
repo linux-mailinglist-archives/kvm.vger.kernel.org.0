@@ -2,265 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A546510E477
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 03:13:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5C310E493
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 03:45:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727386AbfLBCNq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 1 Dec 2019 21:13:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52788 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727301AbfLBCNq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 1 Dec 2019 21:13:46 -0500
+        id S1727338AbfLBCoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 1 Dec 2019 21:44:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36114 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727285AbfLBCoy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 1 Dec 2019 21:44:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575252823;
+        s=mimecast20190719; t=1575254693;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MD/FUEK42oSHMB7hiycg0mH61x0MK91ak8z6OEH++Z0=;
-        b=T1Es0AUD4KcF/qxKdp285bBeB8O63KP2B5UQj8SshHdEOPIw7PsTEuqP2ezdvNyGSHkI3K
-        riuE30Fm1Y2XzGtMOhIva50LqVzPdTFJORm7nJzuEBAzIWgh9P5KVvVnHw4s87NbFjMRjl
-        KmCJuSa96bgCKTTpfQfuQdO8WAvMBhM=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-6CgXTCGOPWuTHb_sDhmXKw-1; Sun, 01 Dec 2019 21:13:40 -0500
-Received: by mail-qv1-f69.google.com with SMTP id y9so11367354qvi.10
-        for <kvm@vger.kernel.org>; Sun, 01 Dec 2019 18:13:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ZQnpA7RgxlDdEF2H0g9kRjOpdctax1cqipl0/e6Vazw=;
-        b=L370+PeFcm0M3b9NmcXP5BDcnrs4kkd+yb8yrDNLNPdsUAwVxz8h9ZbTVUcPFRJHvQ
-         LvlGgLCunQ88HHomDeQ1STlEfJ8qmfJOjzlzOuMFsZnDlyVWe0/FRvt8R9l9i4sRJMNR
-         HCwCxpvsOOLWLVAcN1o6xAXGgDL+E1NQu00I6afkgCvL3OSDE/8BKW7HGnEfRFPNRDVv
-         QX4LzUTrLYwuTbPeTNnGVjql2XeitPts40lNLjav1S+RO0x5V4PqNJO/1fbzBud6WLnn
-         KiLyvao617IXfbHnETtgZlG2BTN8ZLVS9vdqYPrAY8U3nASkS3GCufLFG+UL/POdmlDp
-         hQ0Q==
-X-Gm-Message-State: APjAAAVZ8X6qhHxSccJ3jgaB5VJFoglPDzNkP/ikCWZYUzFidcqBmUJ1
-        Mo5PCSHug1XoviAUWzMdkj75UgbcOzJG9bN7kckWrX9xt3E/bK1MzUPltGO/GKgrT+LZxpWF/bS
-        FihQBNtoYUB3K
-X-Received: by 2002:a05:620a:102c:: with SMTP id a12mr29206598qkk.95.1575252819786;
-        Sun, 01 Dec 2019 18:13:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwsdEchHsrOVaCZ8ufxraE/74iOHuQ4QYI2j0xs5NsWVwh/PU27/D7I8XoWwMEw91CB7nHisA==
-X-Received: by 2002:a05:620a:102c:: with SMTP id a12mr29206580qkk.95.1575252819395;
-        Sun, 01 Dec 2019 18:13:39 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::3])
-        by smtp.gmail.com with ESMTPSA id z4sm4262259qkz.62.2019.12.01.18.13.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Dec 2019 18:13:38 -0800 (PST)
-Date:   Sun, 1 Dec 2019 21:13:37 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 00/15] KVM: Dirty ring interface
-Message-ID: <20191202021337.GB18887@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <b8f28d8c-2486-2d66-04fd-a2674b598cfd@redhat.com>
+        bh=vSf88/Ymm45hVchy24xxnNDl7fg3cEgjk/44EM+Uozc=;
+        b=MobWEOH6wuagXBXOg+MkICgdw28yULk217TjIUy1dGSJP0KbYeG7SxKbx7rcyw8dPjn7/a
+        ymN4qoTU9428lcvINA7hBke2N73HFNZV4cIopcna8Mey5mNdsTQa7imSKFWVcWc9ibLi8G
+        LWeID1t2spY3TWwfxK6bM2DQYAOr/dg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-BAKKw8eROF-P6vqOzIgWug-1; Sun, 01 Dec 2019 21:44:50 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 877B18017CC;
+        Mon,  2 Dec 2019 02:44:47 +0000 (UTC)
+Received: from [10.72.12.226] (ovpn-12-226.pek2.redhat.com [10.72.12.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04E095D9CA;
+        Mon,  2 Dec 2019 02:44:38 +0000 (UTC)
+Subject: Re: [RFC net-next 07/18] tun: set offloaded xdp program
+To:     David Ahern <dsahern@gmail.com>,
+        Prashant Bhole <prashantbhole.linux@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ <20191126100744.5083-8-prashantbhole.linux@gmail.com>
+ <e0631f09-28ce-7d13-e58c-87a700a39353@gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <10625932-aa8b-f8ff-b835-7b142d9f45a2@redhat.com>
+Date:   Mon, 2 Dec 2019 10:44:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <b8f28d8c-2486-2d66-04fd-a2674b598cfd@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: 6CgXTCGOPWuTHb_sDhmXKw-1
+In-Reply-To: <e0631f09-28ce-7d13-e58c-87a700a39353@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: BAKKw8eROF-P6vqOzIgWug-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 30, 2019 at 09:29:42AM +0100, Paolo Bonzini wrote:
-> Hi Peter,
->=20
-> thanks for the RFC!  Just a couple comments before I look at the series
-> (for which I don't expect many surprises).
->=20
-> On 29/11/19 22:34, Peter Xu wrote:
-> > I marked this series as RFC because I'm at least uncertain on this
-> > change of vcpu_enter_guest():
-> >=20
-> >         if (kvm_check_request(KVM_REQ_DIRTY_RING_FULL, vcpu)) {
-> >                 vcpu->run->exit_reason =3D KVM_EXIT_DIRTY_RING_FULL;
-> >                 /*
-> >                         * If this is requested, it means that we've
-> >                         * marked the dirty bit in the dirty ring BUT
-> >                         * we've not written the date.  Do it now.
-> >                         */
-> >                 r =3D kvm_emulate_instruction(vcpu, 0);
-> >                 r =3D r >=3D 0 ? 0 : r;
-> >                 goto out;
-> >         }
->=20
-> This is not needed, it will just be a false negative (dirty page that
-> actually isn't dirty).  The dirty bit will be cleared when userspace
-> resets the ring buffer; then the instruction will be executed again and
-> mark the page dirty again.  Since ring full is not a common condition,
-> it's not a big deal.
 
-Actually I added this only because it failed one of the unit tests
-when verifying the dirty bits..  But now after a second thought, I
-probably agree with you that we can change the userspace too to fix
-this.
+On 2019/12/2 =E4=B8=8A=E5=8D=8812:35, David Ahern wrote:
+> On 11/26/19 4:07 AM, Prashant Bhole wrote:
+>> From: Jason Wang <jasowang@redhat.com>
+>>
+>> This patch introduces an ioctl way to set an offloaded XDP program
+>> to tun driver. This ioctl will be used by qemu to offload XDP program
+>> from virtio_net in the guest.
+>>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+>> ---
+>>   drivers/net/tun.c           | 19 ++++++++++++++-----
+>>   include/uapi/linux/if_tun.h |  1 +
+>>   2 files changed, 15 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index d078b4659897..ecb49101b0b5 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -241,6 +241,7 @@ struct tun_struct {
+>>   =09struct bpf_prog __rcu *xdp_prog;
+>>   =09struct tun_prog __rcu *steering_prog;
+>>   =09struct tun_prog __rcu *filter_prog;
+>> +=09struct tun_prog __rcu *offloaded_xdp_prog;
+> I have been looking into running XDP pograms in the TX path of a tap
+> device [1] where the program is installed and managed by a process in
+> the host. The code paths are the same as what you are doing with XDP
+> offload, so how about calling this xdp_prog_tx?
+>
+> [1]
+> https://github.com/dsahern/linux/commit/f2303d05187c8a604cdb70b288338e9b1=
+d1b0db6
+>
 
-I think the steps of the failed test case could be simplified into
-something like this (assuming the QEMU migration context, might be
-easier to understand):
+I think it's fine, btw, except for the netlink part there should be no=20
+much difference.
 
-  1. page P has data P1
-  2. vcpu writes to page P, with date P2
-  3. vmexit (P is still with data P1)
-  4. mark P as dirty, ring full, user exit
-  5. collect dirty bit P, migrate P with data P1
-  6. vcpu run due to some reason, P was written with P2, user exit again
-     (because ring is already reaching soft limit)
-  7. do KVM_RESET_DIRTY_RINGS
-  8. never write to P again
-
-Then P will be P1 always on destination, while it'll be P2 on source.
-
-I think maybe that's why we need to be very sure that when userspace
-exits happens (soft limit reached), we need to kick all the vcpus out,
-and more importantly we must _not_ let them run again before the
-KVM_RESET_DIRTY_PAGES otherwise we might face the data corrupt.  I'm
-not sure whether we should mention this in the document to let the
-userspace to be sure of the issue.
-
-On the other side, I tried to remove the emulate_instruction() above
-and fixed the test case, though I found that the last address before
-user exit is not really written again after the next vmenter right
-after KVM_RESET_DIRTY_RINGS, so the dirty bit was truly lost...  I'm
-pasting some traces below (I added some tracepoints too, I think I'll
-just keep them for v2):
-
-  ...
-  dirty_log_test-29003 [001] 184503.384328: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.384329: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.384329: kvm_page_fault:       address 7=
-fc036d000 error_code 582
-  dirty_log_test-29003 [001] 184503.384331: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.384332: kvm_exit: reason EPT_VIOLATION =
-rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.384332: kvm_page_fault:       address 7=
-fc036d000 error_code 582
-  dirty_log_test-29003 [001] 184503.384332: kvm_dirty_ring_push:  ring 1: d=
-irty 0x37f reset 0x1c0 slot 1 offset 0x37e ret 0 (used 447)
-  dirty_log_test-29003 [001] 184503.384333: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.384334: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.384334: kvm_page_fault:       address 7=
-fc036e000 error_code 582
-  dirty_log_test-29003 [001] 184503.384336: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.384336: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.384336: kvm_page_fault:       address 7=
-fc036e000 error_code 582
-  dirty_log_test-29003 [001] 184503.384337: kvm_dirty_ring_push:  ring 1: d=
-irty 0x380 reset 0x1c0 slot 1 offset 0x37f ret 1 (used 448)
-  dirty_log_test-29003 [001] 184503.384337: kvm_dirty_ring_exit:  vcpu 1
-  dirty_log_test-29003 [001] 184503.384338: kvm_fpu:              unload
-  dirty_log_test-29003 [001] 184503.384340: kvm_userspace_exit:   reason 0x=
-1d (29)
-  dirty_log_test-29000 [006] 184503.505103: kvm_dirty_ring_reset: ring 1: d=
-irty 0x380 reset 0x380 (used 0)
-  dirty_log_test-29003 [001] 184503.505184: kvm_fpu:              load
-  dirty_log_test-29003 [001] 184503.505187: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.505193: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.505194: kvm_page_fault:       address 7=
-fc036f000 error_code 582              <-------- [1]
-  dirty_log_test-29003 [001] 184503.505206: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.505207: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.505207: kvm_page_fault:       address 7=
-fc036f000 error_code 582
-  dirty_log_test-29003 [001] 184503.505226: kvm_dirty_ring_push:  ring 1: d=
-irty 0x381 reset 0x380 slot 1 offset 0x380 ret 0 (used 1)
-  dirty_log_test-29003 [001] 184503.505226: kvm_entry:            vcpu 1
-  dirty_log_test-29003 [001] 184503.505227: kvm_exit:             reason EP=
-T_VIOLATION rip 0x40359f info 582 0
-  dirty_log_test-29003 [001] 184503.505228: kvm_page_fault:       address 7=
-fc0370000 error_code 582
-  dirty_log_test-29003 [001] 184503.505231: kvm_entry:            vcpu 1
-  ...
-
-The test was trying to continuously write to pages, from above log
-starting from 7fc036d000. The reason 0x1d (29) is the new dirty ring
-full exit reason.
-
-So far I'm still unsure of two things:
-
-  1. Why for each page we faulted twice rather than once.  Take the
-     example of page at 7fc036e000 above, the first fault didn't
-     trigger the marking dirty path, while only until the 2nd ept
-     violation did we trigger kvm_dirty_ring_push.
-
-  2. Why we didn't get the last page written again after
-     kvm_userspace_exit (last page was 7fc036e000, and the test failed
-     because 7fc036e000 detected change however dirty bit unset).  In
-     this case the first write after KVM_RESET_DIRTY_RINGS is the line
-     pointed by [1], I thought it should be a rewritten of page
-     7fc036e000 because when the user exit happens logically the write
-     should not happen yet and eip should keep.  However at [1] it's
-     already writting to a new page.
-
-I'll continue to dig tomorrow, or quick answers will be greatly
-welcomed too. :)
-
->=20
-> > I did a kvm_emulate_instruction() when dirty ring reaches softlimit
-> > and want to exit to userspace, however I'm not really sure whether
-> > there could have any side effect.  I'd appreciate any comment of
-> > above, or anything else.
-> >=20
-> > Tests
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > I wanted to continue work on the QEMU part, but after I noticed that
-> > the interface might still prone to change, I posted this series first.
-> > However to make sure it's at least working, I've provided unit tests
-> > together with the series.  The unit tests should be able to test the
-> > series in at least three major paths:
-> >=20
-> >   (1) ./dirty_log_test -M dirty-ring
-> >=20
-> >       This tests async ring operations: this should be the major work
-> >       mode for the dirty ring interface, say, when the kernel is
-> >       queuing more data, the userspace is collecting too.  Ring can
-> >       hardly reaches full when working like this, because in most
-> >       cases the collection could be fast.
-> >=20
-> >   (2) ./dirty_log_test -M dirty-ring -c 1024
-> >=20
-> >       This set the ring size to be very small so that ring soft-full
-> >       always triggers (soft-full is a soft limit of the ring state,
-> >       when the dirty ring reaches the soft limit it'll do a userspace
-> >       exit and let the userspace to collect the data).
-> >=20
-> >   (3) ./dirty_log_test -M dirty-ring-wait-queue
-> >=20
-> >       This sololy test the extreme case where ring is full.  When the
-> >       ring is completely full, the thread (no matter vcpu or not) will
-> >       be put onto a per-vm waitqueue, and KVM_RESET_DIRTY_RINGS will
-> >       wake the threads up (assuming until which the ring will not be
-> >       full any more).
->=20
-> One question about this testcase: why does the task get into
-> uninterruptible wait?
-
-Because I'm using wait_event_killable() to wait when ring is
-completely full.  I thought we should be strict there because it's
-after all rare (even more rare than the soft-limit reached), and with
-that we will never have a change to lose a dirty bit accidentally.  Or
-do you think we should still respond to non fatal signals due to some
-reason even during that wait period?
-
-Thanks,
-
---=20
-Peter Xu
+Thanks
 
