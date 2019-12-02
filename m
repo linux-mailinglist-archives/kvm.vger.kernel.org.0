@@ -2,110 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EAE3510F256
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 22:48:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C199410F25F
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 22:50:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbfLBVsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 16:48:02 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38351 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbfLBVsC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Dec 2019 16:48:02 -0500
-Received: by mail-io1-f66.google.com with SMTP id u24so1193556iob.5;
-        Mon, 02 Dec 2019 13:48:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
-        b=aMsbcC4Boq/giplL1LvjNzNBE+1LBRESfzKVlx8v/rJ8ZA1f1TfzFCbI/1pyLvj7jb
-         x9S9ns7eF1jmYnTJVc7GRhmF8r0NqpE965lqqet+5wZy7VSPzuQgNp6PKqYCFdw5YzMJ
-         5u66QwYZn4FL+qtUb3Gq7V2U43QhwBY5ZWHRmGpxPEPZe/taKcsjeu7gMTFMBAFgToOY
-         LsINb6Xc+n985se0ivH0CStK1cS5N5a56+Sz2KJr+3xsOFx2IaygvfmFPPLglthTqEf1
-         Pe4tNmjK2BBFO3cjGljF30P2uuZYG6BVs49kQkJ25sILR5M4TEQN3gU5xQedhpMhzERX
-         u9Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=3Ms8zlHQJK2hwaXeaP4qZ/hAYQme4ETl6wKmDCNALCA=;
-        b=r6LsuHjKE6ltgVlAAJjzZjIclT/yxLYj3/ahlUcVSPTE/stRr21AFn79JiDm+cNDUK
-         rG8jMP2hErEaHeqyyvq77kwTxQeqyH2Am0KefV2vS6GMTOiBLVvDuC2Rj6YlSqry+KBH
-         6dDjWxDfpvm4IgLbp0KrUY8a8g67SrlvtcbEkOE7ZbII70I0anmfqSrV0Q4GrnV/MyQ1
-         y6hf/PUObZMAz/HnS/1vqgnXyPb2+iSLEi6+oYaP9Jdd42DJa3XtDULIqplMwwuDjmKm
-         hEop8c3ukI8a6NrvP1ksq/mrcmg3rhS1OM3EhCk6sbXR1HpuB+xAd2aWNMKKVLbw/uVU
-         6Paw==
-X-Gm-Message-State: APjAAAU4P5JLLIdqsfsHMuW9uI3Ug/5GYHk2FPjFZ8zyAtjRuRhiU+zv
-        2KIy/xsr0utlrKX2FFOFReMEj9c6ahjYaoEOJ+LUiiCo
-X-Google-Smtp-Source: APXvYqwoT5huCFrp42VNz1qNPTyyuAKGHcl/c3UforoZ8JkonNQxmRCDNFvLxknzveYZ8LKoRYlvFtJdZ4POHYDXfzc=
-X-Received: by 2002:a02:1d04:: with SMTP id 4mr2255009jaj.48.1575323281611;
- Mon, 02 Dec 2019 13:48:01 -0800 (PST)
+        id S1726024AbfLBVuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 16:50:50 -0500
+Received: from mga04.intel.com ([192.55.52.120]:63295 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725865AbfLBVuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Dec 2019 16:50:50 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Dec 2019 13:50:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,270,1571727600"; 
+   d="scan'208";a="242122776"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga002.fm.intel.com with ESMTP; 02 Dec 2019 13:50:49 -0800
+Date:   Mon, 2 Dec 2019 13:50:49 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191202215049.GB8120@linux.intel.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191202201036.GJ4063@linux.intel.com>
+ <20191202211640.GF31681@xz-x1>
 MIME-Version: 1.0
-From:   Wayne Li <waynli329@gmail.com>
-Date:   Mon, 2 Dec 2019 21:47:50 +0000
-Message-ID: <CAM2K0nqWjaPB3gFD4m6DjciJUCpix4MaGr0hZkp20PxObtL1Zw@mail.gmail.com>
-Subject: KVM Kernel Module not being built for Yocto Kernel
-To:     kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191202211640.GF31681@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear KVM community,
+On Mon, Dec 02, 2019 at 04:16:40PM -0500, Peter Xu wrote:
+> On Mon, Dec 02, 2019 at 12:10:36PM -0800, Sean Christopherson wrote:
+> > On Fri, Nov 29, 2019 at 04:34:54PM -0500, Peter Xu wrote:
+> > > Currently, we have N+1 rings for each VM of N vcpus:
+> > > 
+> > >   - for each vcpu, we have 1 per-vcpu dirty ring,
+> > >   - for each vm, we have 1 per-vm dirty ring
+> > 
+> > Why?  I assume the purpose of per-vcpu rings is to avoid contention between
+> > threads, but the motiviation needs to be explicitly stated.  And why is a
+> > per-vm fallback ring needed?
+> 
+> Yes, as explained in previous reply, the problem is there could have
+> guest memory writes without vcpu contexts.
+> 
+> > 
+> > If my assumption is correct, have other approaches been tried/profiled?
+> > E.g. using cmpxchg to reserve N number of entries in a shared ring.
+> 
+> Not yet, but I'd be fine to try anything if there's better
+> alternatives.  Besides, could you help explain why sharing one ring
+> and let each vcpu to reserve a region in the ring could be helpful in
+> the pov of performance?
 
-First of all I'd like mention I've posted this question on the Yocto
-mailing list as well as the KVM mailing list because my question has
-huge ties to the bitbake process (a concept related to the Yocto
-project).  Though I believe I'm mainly addressing the KVM community
-because my problem is more directly related to the intricacies of the
-KVM build process.
+The goal would be to avoid taking a lock, or at least to avoid holding a
+lock for an extended duration, e.g. some sort of multi-step process where
+entries in the ring are first reserved, then filled, and finally marked
+valid.  That'd allow the "fill" action to be done in parallel.
 
-So I am trying to build the kvm-kmod from source and I'm running into
-an issue where the compilation doesn't produce any kernel modules.
-But before I describe my issue and question any further, here's a
-little background information on my current endeavour.
+In case it isn't clear, I haven't thought through an actual solution :-).
 
-My goal right now is to get KVM to work on a T4240RDB running on a
-Yocto-based kernel.  For those of you who don't know what a Yocto
-kernel is, it is a kernel that you can build/customize yourself using
-a program called bitbake.  Anyway, the KVM kernel modules are supposed
-to be included in the Yocto kernel by default but they aren't there.
-And no tweaking of the configuration for the bitbake process to build
-the Yocto kernel has made the KVM kernel modules appear in the kernel
-(I've tried pretty much everything!  Just search my name in the Yocto
-mailing list archive haha...).  So my final solution was to download
-the kvm-kmod source code and write a custom recipe to bitbake it into
-the kernel module (in layman terms this means I just download the code
-and write a "recipe" to tell bitbake how to compile the kvm-kmod
-source code and insert the output files into the kernel).  Here's the
-recipe that I wrote for this:
+My point is that I think it's worth exploring and profiling other
+implementations because the dual per-vm and per-vcpu rings has a few warts
+that we'd be stuck with forever.
 
-LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://COPYING;md5=c616d0e7924e9e78ee192d99a3b26fbd"
+> > IMO,
+> > adding kvm_get_running_vcpu() is a hack that is just asking for future
+> > abuse and the vcpu/vm/as_id interactions in mark_page_dirty_in_ring()
+> > look extremely fragile.
+> 
+> I agree.  Another way is to put heavier traffic to the per-vm ring,
+> but the downside could be that the per-vm ring could get full easier
+> (but I haven't tested).
 
-inherit module
+There's nothing that prevents increasing the size of the common ring each
+time a new vCPU is added.  Alternatively, userspace could explicitly
+request or hint the desired ring size.
 
-SRC_URI = "file:///homead/QorIQ-SDK-V2.0-20160527-yocto/sources/meta-virtualization/recipes-kernel/kvm-kmodule/kvm-kmod-3.10.21.tar.bz2"
+> > I also dislike having two different mechanisms
+> > for accessing the ring (lock for per-vm, something else for per-vcpu).
+> 
+> Actually I proposed to drop the per-vm ring (actually I had a version
+> that implemented this.. and I just changed it back to the per-vm ring
+> later on, see below) and when there's no vcpu context I thought about:
+> 
+>   (1) use vcpu0 ring
+> 
+>   (2) or a better algo to pick up a per-vcpu ring (like, the less full
+>       ring, we can do many things here, e.g., we can easily maintain a
+>       structure track this so we can get O(1) search, I think)
+> 
+> I discussed this with Paolo, but I think Paolo preferred the per-vm
+> ring because there's no good reason to choose vcpu0 as what (1)
+> suggested.  While if to choose (2) we probably need to lock even for
+> per-cpu ring, so could be a bit slower.
 
-S = "${WORKDIR}/kvm-kmod-3.10.21"
-
-do_configure() {
-    ./configure --arch=ppc64
---kerneldir=/homead/QorIQ-SDK-V2.0-20160527-yocto/build_t4240rdb-64b/tmp/work/t4240rdb_64b-fsl-linux/kernel-devsrc/1.0-r0/image/usr/src/kernel
-}
-
-FILES_${PN} += "/lib/modules/4.1.8-rt8+gbd51baf"
-
-Anyway when I run "bitbake kvm-kmod", it runs fine with no errors.
-This runs the recipe I wrote (I conveniently named my recipe kvm-kmod)
-which runs the configure file present in the kvm-kmod source code and
-then runs make.  In other words I ran make on the kvm-kmod source code
-with no errors.  But the problem is there is no kvm.ko or anything
-like that anywhere in my project code.
-
-Compiling the kvm-kmod source code is supposed to produce kvm kernel
-modules right?  I mean kvm-kmod literally stands for kvm kernel
-module?  Could I have forgotten to do something when building the
-kvm-kmod source code?  Or maybe my problem has something to do with my
-recipe?  Let me know your thoughts.
-
--Thanks!, Wayne Li
+Ya, per-vm is definitely better than dumping on vcpu0.  I'm hoping we can
+find a third option that provides comparable performance without using any
+per-vcpu rings.
