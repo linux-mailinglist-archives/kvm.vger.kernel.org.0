@@ -2,214 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED5C310F32B
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 00:10:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D957310F33E
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 00:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbfLBXJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 18:09:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46085 "EHLO
+        id S1726057AbfLBXOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 18:14:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21960 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726673AbfLBXJy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Dec 2019 18:09:54 -0500
+        with ESMTP id S1725834AbfLBXOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Dec 2019 18:14:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575328193;
+        s=mimecast20190719; t=1575328448;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oz1cQV94PxiM/G4Z+sfRgat5IvN2eDSa2rOtbBG/y8Q=;
-        b=EtANF2Y2tev7dGkNYfuZHO1XIzL73eQfoodfij3QnSoJksHfLuBcHK0doEqlzjhaQwpwpi
-        /7P145VXv0BleEotIHVZ3rIQ8WaEq5ke56fcSjS26V9zCKcOVkCcRhCllY/HXxyBvq2hlJ
-        7DWcIMcYfS2FveveDYg3nOyMLKgwnLQ=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-hqL4vNA1P1qYxx7KSVsG_g-1; Mon, 02 Dec 2019 18:09:52 -0500
-Received: by mail-qk1-f200.google.com with SMTP id u3so892324qkk.4
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 15:09:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=U9BgLL41orfOTnHN7A5fR49RzpkIGJdIaBnfhTFr7uM=;
-        b=AY9aSmm99Dfa0j5bvDFlCTamLyML2u1dpU7+0/Ktvs3fj1Eq5r8xR8WRo7m+M3Srl3
-         bc44ya22FwGhl8wnHEzcxOEdVw4qNjN5GehuyLPBRwM/abBJGtnHWpes6LwK3RmWoyv+
-         AWllEc8vPzILpMEJeabj6vfenQ9xkeZmRXn95Qw4PbStywl31AXtSJho7KsmEFBO0SpU
-         gYv0LIqS1JTsQQeLUOU2uOeAJ1ITMPdvQmF3oB+qoHf6xxxdipnUT5nxvbxajvrPOwC+
-         2Vxc1wO2GY3XML55MdkvWxfTLl6u2HBT8AiI8SVAHUdVT5dq1OT8JYKRRCi3S/qysyCK
-         RlXQ==
-X-Gm-Message-State: APjAAAXFUvE4sMpaBsVYKDJXhsG9eO0wO8/ToSDsmy4ZWxoKotQAWi3V
-        WRSyj3XCPKYA4sP0DpWwd+EeeEI42f5UDys388nDsNK5GLf7Xv6myUbc60zt2lXNbj/1tAPNXhB
-        h+TmiHi5eXX3d
-X-Received: by 2002:ae9:e704:: with SMTP id m4mr1728811qka.153.1575328191342;
-        Mon, 02 Dec 2019 15:09:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwJBdXbKG+70OVb9A6rS8j4VSkatuTLwLDrgfnPaKyofNW1dVPXpxed1YOlrLiBUcYsh8+ObQ==
-X-Received: by 2002:ae9:e704:: with SMTP id m4mr1728769qka.153.1575328190930;
-        Mon, 02 Dec 2019 15:09:50 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::3])
-        by smtp.gmail.com with ESMTPSA id z62sm601538qtd.83.2019.12.02.15.09.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2019 15:09:50 -0800 (PST)
-Date:   Mon, 2 Dec 2019 18:09:48 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191202230948.GI31681@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <20191202201036.GJ4063@linux.intel.com>
- <20191202211640.GF31681@xz-x1>
- <20191202215049.GB8120@linux.intel.com>
+        bh=tAwoXaf+koWSufi/dRhjSH/eAtPIzFUnI9AFQ6G4Vdk=;
+        b=bRnFbr+0FIYPGGe6CyKMcfUiOYPv2PTybhKa00eWhyuQkjCYnGJGPp6Fl6klsfRZsNwOV9
+        jTTn/I1Q8QoowBQwM/i371BSuGmZ5HBReIk6BMlx/Wbnd1sxYewkRAQnoU+vJqLGEtR1gJ
+        rzaRDRIVLppX/DKuyASKVAGDU4GoLGg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-_XxVkZQfPG-SFlabSV-FKQ-1; Mon, 02 Dec 2019 18:14:05 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F41CDBA3;
+        Mon,  2 Dec 2019 23:14:03 +0000 (UTC)
+Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C3FA25C28C;
+        Mon,  2 Dec 2019 23:14:01 +0000 (UTC)
+Date:   Mon, 2 Dec 2019 16:14:01 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Jiang Yi <giangyi@amazon.com>, kvm@vger.kernel.org,
+        adulea@amazon.de, jschoenh@amazon.de, cohuck@redhat.com,
+        "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <michael@ellerman.id.au>
+Subject: Re: [PATCH] vfio: call irq_bypass_unregister_producer() before
+ freeing irq
+Message-ID: <20191202161401.7e532e34@x1.home>
+In-Reply-To: <86sgm9yye9.wl-maz@kernel.org>
+References: <20191127164910.15888-1-giangyi@amazon.com>
+        <86sgm9yye9.wl-maz@kernel.org>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20191202215049.GB8120@linux.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: hqL4vNA1P1qYxx7KSVsG_g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: _XxVkZQfPG-SFlabSV-FKQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 02, 2019 at 01:50:49PM -0800, Sean Christopherson wrote:
-> On Mon, Dec 02, 2019 at 04:16:40PM -0500, Peter Xu wrote:
-> > On Mon, Dec 02, 2019 at 12:10:36PM -0800, Sean Christopherson wrote:
-> > > On Fri, Nov 29, 2019 at 04:34:54PM -0500, Peter Xu wrote:
-> > > > Currently, we have N+1 rings for each VM of N vcpus:
-> > > >=20
-> > > >   - for each vcpu, we have 1 per-vcpu dirty ring,
-> > > >   - for each vm, we have 1 per-vm dirty ring
-> > >=20
-> > > Why?  I assume the purpose of per-vcpu rings is to avoid contention b=
-etween
-> > > threads, but the motiviation needs to be explicitly stated.  And why =
-is a
-> > > per-vm fallback ring needed?
-> >=20
-> > Yes, as explained in previous reply, the problem is there could have
-> > guest memory writes without vcpu contexts.
-> >=20
-> > >=20
-> > > If my assumption is correct, have other approaches been tried/profile=
-d?
-> > > E.g. using cmpxchg to reserve N number of entries in a shared ring.
-> >=20
-> > Not yet, but I'd be fine to try anything if there's better
-> > alternatives.  Besides, could you help explain why sharing one ring
-> > and let each vcpu to reserve a region in the ring could be helpful in
-> > the pov of performance?
->=20
-> The goal would be to avoid taking a lock, or at least to avoid holding a
-> lock for an extended duration, e.g. some sort of multi-step process where
-> entries in the ring are first reserved, then filled, and finally marked
-> valid.  That'd allow the "fill" action to be done in parallel.
+On Wed, 27 Nov 2019 18:20:14 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-Considering that per-vcpu ring should be no worst than this, so iiuc
-you prefer a single per-vm ring here, which is without per-vcpu ring.
-However I don't see a good reason to split a per-vm resource into
-per-vcpu manually somehow, instead of using the per-vcpu structure
-directly like what this series does...  Or could you show me what I've
-missed?
+> On Wed, 27 Nov 2019 16:49:10 +0000,
+> Jiang Yi <giangyi@amazon.com> wrote:
+> 
+> Hi Jiang,
+> 
+> Thanks for spotting this!
+> 
+> > Since irq_bypass_register_producer() is called after request_irq(), we
+> > should do tear-down in reverse order: irq_bypass_unregister_producer()
+> > then free_irq().  
+> 
+> More importantly, free_irq() is going to releases resources that can
+> still be required by the del_producer callback. Notably, for arm64 and
+> GICv4:
+> 
+> free_irq(irq)
+>   __free_irq(irq)
+>     irq_domain_deactivate_irq(irq)
+>       its_irq_domain_deactivate()
+>         [unmap the VLPI from the ITS]
+> 
+> kvm_arch_irq_bypass_del_producer(cons, prod)
+>   kvm_vgic_v4_unset_forwarding(kvm, irq, ...)
+>     its_unmap_vlpi(irq)
+>       [Unmap the VLPI from the ITS (again), remap the original LPI]
+> 
+> which isn't great, and has the potential to wedge the HW. Reversing
+> the two makes more sense: Unmap the VLPI, remap the LPI, and finally
+> unmap the LPI. I haven't checked what it does with VT-D.
 
-IMHO it's really a natural thought that we should use kvm_vcpu to
-split the ring as long as we still want to make it in parallel of the
-vcpus.
+Yep, it seems a lot safer to reverse this but we need to incorporate
+some of Marc's rationale above into the commit log to justify the
+stable and fixes tags.  Here's an attempt:
 
->=20
-> In case it isn't clear, I haven't thought through an actual solution :-).
+--
+free_irq() may release resources required by the irqbypass
+del_producer() callback.  Notably on arm64 with GICv4:
 
-Feel free to shoot when the ideas come. :) I'd be glad to test your
-idea, especially where it could be better!
+ free_irq(irq)
+   __free_irq(irq)
+     irq_domain_deactivate_irq(irq)
+       its_irq_domain_deactivate()
+         [unmap the VLPI from the ITS]
+ 
+ kvm_arch_irq_bypass_del_producer(cons, prod)
+   kvm_vgic_v4_unset_forwarding(kvm, irq, ...)
+     its_unmap_vlpi(irq)
+       [Unmap the VLPI from the ITS (again), remap the original LPI]
 
->=20
-> My point is that I think it's worth exploring and profiling other
-> implementations because the dual per-vm and per-vcpu rings has a few wart=
-s
-> that we'd be stuck with forever.
+This has the potential to wedge hardware.  Re-order to free the IRQ
+after unregistering the irqbypass producer, which also provides the
+proper mirror of setup ordering.
+--
 
-I do agree that the interface could be a bit awkward to keep these two
-rings.  Besides this, do you still have other concerns?
+Cc'ing some usual suspects from AMD, Intel, and Power where the
+kvm_arch_irq_bypass_del_producer() callback is also implemented.
+Thanks,
 
-And when you say about profiling, I hope I understand it right that it
-should be something unrelated to this specific issue that we're
-discussing (say, on whether to use per-vm ring, or per-vm + per-vcpu
-rings) because for performance imho it's really the layout of the ring
-that could matter more, and how the ring is shared and accessed
-between the userspace and kernel.
+Alex
 
-For current implementation (I'm not sure whether that's initial
-version from Lei, or Paolo, anyway...), IMHO it's good enough from
-perf pov in that it at least supports:
-
-  (1) zero copy
-  (2) complete async model
-  (3) per-vcpu isolations
-
-None of these is there for KVM_GET_DIRTY_LOG.  Not to mention that
-tracking dirty bits are not really that "performance critical" - if
-you see in QEMU we have plenty of ways to explicitly turn down the CPU
-like cpu-throttle, just because dirtying pages and even with the whole
-tracking overhead is too fast already even using KVM_GET_DIRTY_LOG,
-and the slow thing is QEMU when collecting and sending the pages! :)
-
->=20
-> > > IMO,
-> > > adding kvm_get_running_vcpu() is a hack that is just asking for futur=
-e
-> > > abuse and the vcpu/vm/as_id interactions in mark_page_dirty_in_ring()
-> > > look extremely fragile.
-> >=20
-> > I agree.  Another way is to put heavier traffic to the per-vm ring,
-> > but the downside could be that the per-vm ring could get full easier
-> > (but I haven't tested).
->=20
-> There's nothing that prevents increasing the size of the common ring each
-> time a new vCPU is added.  Alternatively, userspace could explicitly
-> request or hint the desired ring size.
-
-Yeah I don't have strong opinion on this, but I just don't see it
-greatly helpful to explicitly expose this API to userspace.  IMHO for
-now a global ring size should be good enough.  If userspace wants to
-make it fast, the ring can hardly gets full (because the collection of
-the dirty ring can be really, really fast if the userspace wants).
-
->=20
-> > > I also dislike having two different mechanisms
-> > > for accessing the ring (lock for per-vm, something else for per-vcpu)=
-.
-> >=20
-> > Actually I proposed to drop the per-vm ring (actually I had a version
-> > that implemented this.. and I just changed it back to the per-vm ring
-> > later on, see below) and when there's no vcpu context I thought about:
-> >=20
-> >   (1) use vcpu0 ring
-> >=20
-> >   (2) or a better algo to pick up a per-vcpu ring (like, the less full
-> >       ring, we can do many things here, e.g., we can easily maintain a
-> >       structure track this so we can get O(1) search, I think)
-> >=20
-> > I discussed this with Paolo, but I think Paolo preferred the per-vm
-> > ring because there's no good reason to choose vcpu0 as what (1)
-> > suggested.  While if to choose (2) we probably need to lock even for
-> > per-cpu ring, so could be a bit slower.
->=20
-> Ya, per-vm is definitely better than dumping on vcpu0.  I'm hoping we can
-> find a third option that provides comparable performance without using an=
-y
-> per-vcpu rings.
-
-I'm still uncertain on whether it's a good idea to drop the per-vcpu
-ring (as stated above).  But I'm still open to any further thoughts
-as long as I can start to understand when the only-per-vm ring would
-be better.
-
-Thanks!
-
---=20
-Peter Xu
+> > Signed-off-by: Jiang Yi <giangyi@amazon.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_intrs.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+> > index 3fa3f728fb39..2056f3f85f59 100644
+> > --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> > @@ -289,18 +289,18 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+> >  	int irq, ret;
+> >  
+> >  	if (vector < 0 || vector >= vdev->num_ctx)
+> >  		return -EINVAL;
+> >  
+> >  	irq = pci_irq_vector(pdev, vector);
+> >  
+> >  	if (vdev->ctx[vector].trigger) {
+> > -		free_irq(irq, vdev->ctx[vector].trigger);
+> >  		irq_bypass_unregister_producer(&vdev->ctx[vector].producer);
+> > +		free_irq(irq, vdev->ctx[vector].trigger);
+> >  		kfree(vdev->ctx[vector].name);
+> >  		eventfd_ctx_put(vdev->ctx[vector].trigger);
+> >  		vdev->ctx[vector].trigger = NULL;
+> >  	}
+> >  
+> >  	if (fd < 0)
+> >  		return 0;
+> >  
+> > -- 
+> > 2.17.1
+> > 
+> >   
+> 
+> FWIW:
+> 
+> Cc: stable@vger.kernel.org # v4.4+
+> Fixes: 6d7425f109d26 ("vfio: Register/unregister irq_bypass_producer")
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> 
+> Thanks again,
+> 
+> 	M.
+> 
 
