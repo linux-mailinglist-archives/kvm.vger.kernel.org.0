@@ -2,64 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA56910F15B
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 21:13:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69C9910F167
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 21:13:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728001AbfLBUNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 15:13:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26533 "EHLO
+        id S1728143AbfLBUN0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 15:13:26 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20166 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727586AbfLBUNT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 15:13:19 -0500
+        by vger.kernel.org with ESMTP id S1728099AbfLBUNV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 15:13:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575317598;
+        s=mimecast20190719; t=1575317600;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=AAoHzUyrY/MGtK6MVYph2Nv7coxAjaKdNzJNELfvGio=;
-        b=hh7zvWu/EmPaLwU0HVeOKSQ7vII0zoX82F31VxGcl5v/7449E86RR2Henbxri+G4+woJPa
-        HI8b0Q//tVW7I7pYw+IG1Pp4B+l8lyFk9LT7jbjsApmKuu3TslFkYnjszJ3jgRt16iVzMh
-        kk1tLCy5aMevOzV64oxfe8vgfzvvC2M=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-awn2022RPpKOQRa1kgr8Jw-1; Mon, 02 Dec 2019 15:13:17 -0500
-Received: by mail-qv1-f70.google.com with SMTP id g33so540954qvd.7
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 12:13:16 -0800 (PST)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1fy9n7dcmvJgMCcJNV0TpfIBPUc+H1bj0IMdTlJT67Y=;
+        b=TqtI2P+Fa1oxnOT/+wionTMWgXLs0df7qaJX9auauAp+SZ2jtrOMRpUixWEiVv5Jjm1PW4
+        oNKGgd0m2nyYMTu65/hXtw0zpIIZrLMlZNI4oH9q4zEStCy7Epmy9gWdKJM2AAKDWOUwbL
+        +imrhyakofO/2vUyxzCTCOtzvOPYui4=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-LNhikmsIO3yBFeFmnZLXVw-1; Mon, 02 Dec 2019 15:13:18 -0500
+Received: by mail-qt1-f200.google.com with SMTP id k27so689414qtu.12
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 12:13:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MeEk0ij29n0kTPi4OJez+UYNwIiLUI6R5zpd+TNY67M=;
-        b=ueUSj1dJ1A6E7BfZO5O9q0bG59xcYa65n7Rp8E7+dh73EVI7YziEFd5naU8T6n+Bli
-         Fv+epMu4Wnv9294Ix7cryWlWW+iQ9BQYwmUWau8D1BgaBa3M5tsBz9CHFNja8O6PCkp+
-         XCn1hMbIost4AHtaqKMB3NOPiVTFFHY2HODHfHbO9xxcjsCmlFe7GuROtzjRNl8Iwpws
-         oMptabuy7u2oo9Rld8dVBDOhuG6qSi881s6E8FjtirfLPdjpQgoYIE1U6FDOIgwYhjPS
-         IrO39A8D6txvu+p4SzjqCYTy9aljCE0xXeWmzdYyIhmjLNIhIOWg88cQ6SKus7+qy/6O
-         NiMg==
-X-Gm-Message-State: APjAAAXQtcc6i4cTf/ARrFCSPDWtXzFGiriWqQ0hVaGIc5W2seyd5YS/
-        fAUjRnGVuCQjEZF759Zh6fIH3uI56aqLtArt77Fbtz7/1HsvbpgZ5doTA8HlfsGe6XMLKfZQPCu
-        zdKIP8RK6M5v4
-X-Received: by 2002:ac8:607:: with SMTP id d7mr1330141qth.186.1575317596607;
-        Mon, 02 Dec 2019 12:13:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxEDymFkNuWxzKe4cUT0lCYk0JjSaaXOL4ga2ZDAhsswgDBqGmNFtJsj4EG2GiyhikKxlMgHA==
-X-Received: by 2002:ac8:607:: with SMTP id d7mr1330123qth.186.1575317596342;
-        Mon, 02 Dec 2019 12:13:16 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=G46phdLsdELb62aYURKq9FYQ6hJlvcecU9Mkr0WukfA=;
+        b=IUzhoBEwQm9Hh27iedzaGWxAt/e2DpfMmelFj3xpzz078YWZyXLjPP03NSsVocMZ+V
+         j4ofBMEZ88ZH5FeG5mSXKsJThafooLnfqtWVUSyI2Q+Pk62pl5iv3f73xjuSxgRBlFhH
+         qVDnxRv0hx45TMJUBKMkdJ9qCkZ2/G5KFMPfODp+6IQmuPuNvfgo9TDt0qJTvPPZciNB
+         /VTpmT//8KZQYTSrTnNMGnSb2aqoYstX5yB+RYXcK37LNv+CMZzZtT0cJ6tuWfP5nXMi
+         XLJci5QlygeimEov5wt/sU/KYtXoPkJps+QwgPt4Jiq5jw9CHJaef7gpbMxP/ktliQZY
+         /3lg==
+X-Gm-Message-State: APjAAAW8EnIeuW60sWoCHka4wZx+OQhVwfk/rJHV8orcimxPr9+hbk0l
+        emUIymv4Aj7ZYftiTaj9MfM7myEj3mln536thiod3Qm7t+u8hK89NsoIZ901ipVR6sZ2UJpzTTt
+        NYD4m7FKe529x
+X-Received: by 2002:a37:8fc7:: with SMTP id r190mr802090qkd.57.1575317598022;
+        Mon, 02 Dec 2019 12:13:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyyXV9FRZwo488kcpWWx8NKtpTc+Mn5z7ZJGiXXUVERX6ZlH3itwmcb06sFXIkKThyWsyuWdw==
+X-Received: by 2002:a37:8fc7:: with SMTP id r190mr802057qkd.57.1575317597756;
+        Mon, 02 Dec 2019 12:13:17 -0800 (PST)
 Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id b6sm342410qtp.5.2019.12.02.12.13.15
+        by smtp.gmail.com with ESMTPSA id b6sm342410qtp.5.2019.12.02.12.13.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Dec 2019 12:13:15 -0800 (PST)
+        Mon, 02 Dec 2019 12:13:16 -0800 (PST)
 From:   Peter Xu <peterx@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         peterx@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH v3 0/5] KVM: X86: Cleanups on dest_mode and headers
-Date:   Mon,  2 Dec 2019 15:13:09 -0500
-Message-Id: <20191202201314.543-1-peterx@redhat.com>
+Subject: [PATCH v3 1/5] KVM: X86: Fix kvm_bitmap_or_dest_vcpus() to use irq shorthand
+Date:   Mon,  2 Dec 2019 15:13:10 -0500
+Message-Id: <20191202201314.543-2-peterx@redhat.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191202201314.543-1-peterx@redhat.com>
+References: <20191202201314.543-1-peterx@redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: awn2022RPpKOQRa1kgr8Jw-1
+X-MC-Unique: LNhikmsIO3yBFeFmnZLXVw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -68,35 +71,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-v3:
-- address all the comments from both Vitaly and Sean
-- since at it, added patches:
-  "KVM: X86: Fix kvm_bitmap_or_dest_vcpus() to use irq shorthand"
-  "KVM: X86: Drop KVM_APIC_SHORT_MASK and KVM_APIC_DEST_MASK"
+The 3rd parameter of kvm_apic_match_dest() is the irq shorthand,
+rather than the irq delivery mode.
 
-Each patch explains itself.
+Fixes: 7ee30bc132c683d06a6d9e360e39e483e3990708
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please have a look, thanks.
-
-Peter Xu (5):
-  KVM: X86: Fix kvm_bitmap_or_dest_vcpus() to use irq shorthand
-  KVM: X86: Move irrelevant declarations out of ioapic.h
-  KVM: X86: Use APIC_DEST_* macros properly in kvm_lapic_irq.dest_mode
-  KVM: X86: Drop KVM_APIC_SHORT_MASK and KVM_APIC_DEST_MASK
-  KVM: X86: Fix callers of kvm_apic_match_dest() to use correct macros
-
- arch/x86/include/asm/kvm_host.h |  5 +++++
- arch/x86/kvm/hyperv.c           |  1 +
- arch/x86/kvm/ioapic.c           | 19 ++++++++++++-------
- arch/x86/kvm/ioapic.h           |  6 ------
- arch/x86/kvm/irq.h              |  3 +++
- arch/x86/kvm/irq_comm.c         | 10 ++++++----
- arch/x86/kvm/lapic.c            |  5 +----
- arch/x86/kvm/lapic.h            |  7 ++++---
- arch/x86/kvm/svm.c              |  4 ++--
- arch/x86/kvm/x86.c              |  2 +-
- 10 files changed, 35 insertions(+), 27 deletions(-)
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index cf9177b4a07f..1eabe58bb6d5 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1151,7 +1151,7 @@ void kvm_bitmap_or_dest_vcpus(struct kvm *kvm, struct=
+ kvm_lapic_irq *irq,
+ =09=09=09if (!kvm_apic_present(vcpu))
+ =09=09=09=09continue;
+ =09=09=09if (!kvm_apic_match_dest(vcpu, NULL,
+-=09=09=09=09=09=09 irq->delivery_mode,
++=09=09=09=09=09=09 irq->shorthand,
+ =09=09=09=09=09=09 irq->dest_id,
+ =09=09=09=09=09=09 irq->dest_mode))
+ =09=09=09=09continue;
 --=20
 2.21.0
 
