@@ -2,50 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7981010E958
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 12:11:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41E2C10E964
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 12:13:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727418AbfLBLLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 06:11:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44794 "EHLO
+        id S1727462AbfLBLNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 06:13:38 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27012 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727332AbfLBLLU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 06:11:20 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB2B6miK105386
-        for <kvm@vger.kernel.org>; Mon, 2 Dec 2019 06:11:20 -0500
+        by vger.kernel.org with ESMTP id S1727398AbfLBLNi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 06:13:38 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB2BCEZA029864
+        for <kvm@vger.kernel.org>; Mon, 2 Dec 2019 06:13:38 -0500
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wkrj497cy-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wm6s5083b-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 06:11:19 -0500
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 06:13:37 -0500
 Received: from localhost
         by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Mon, 2 Dec 2019 11:11:15 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        Mon, 2 Dec 2019 11:13:35 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
         by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 2 Dec 2019 11:11:12 -0000
+        Mon, 2 Dec 2019 11:13:33 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB2BAVC449479978
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB2BDW8O52166764
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 2 Dec 2019 11:10:31 GMT
+        Mon, 2 Dec 2019 11:13:32 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8C3D3AE057;
-        Mon,  2 Dec 2019 11:11:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C0056AE04D;
+        Mon,  2 Dec 2019 11:13:32 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DDB3AE056;
-        Mon,  2 Dec 2019 11:11:11 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6F877AE045;
+        Mon,  2 Dec 2019 11:13:32 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.35.210])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  2 Dec 2019 11:11:11 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 2/9] s390x: Define the PSW bits
+        Mon,  2 Dec 2019 11:13:32 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] s390x: export the clock
+ get_clock_ms() utility
 To:     David Hildenbrand <david@redhat.com>,
         Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, thuth@redhat.com, cohuck@redhat.com
 References: <1574945167-29677-1-git-send-email-pmorel@linux.ibm.com>
- <1574945167-29677-3-git-send-email-pmorel@linux.ibm.com>
- <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
+ <1574945167-29677-5-git-send-email-pmorel@linux.ibm.com>
+ <442f3d30-e61f-e884-096e-6ed47b4c6d7e@redhat.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -89,90 +90,80 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date:   Mon, 2 Dec 2019 12:11:10 +0100
+Date:   Mon, 2 Dec 2019 12:13:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <489b43a4-6f71-71bf-b936-e4c94e52387b@redhat.com>
+In-Reply-To: <442f3d30-e61f-e884-096e-6ed47b4c6d7e@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="kFDLF9V7ytEpy2gEToBd54ww1nCuKRV0e"
+ boundary="Xbdsg3TlufOH4nygJTfxXfMRXignmMzuq"
 X-TM-AS-GCONF: 00
-x-cbid: 19120211-4275-0000-0000-00000389BAE7
+x-cbid: 19120211-4275-0000-0000-00000389BB3B
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120211-4276-0000-0000-0000389D54AB
-Message-Id: <7daddc03-35ec-f376-c80a-a849f9e11714@linux.ibm.com>
+x-cbparentid: 19120211-4276-0000-0000-0000389D54FF
+Message-Id: <53c076ee-0b16-b990-b6d7-22903b8892b4@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-02_01:2019-11-29,2019-12-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- suspectscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- mlxscore=0 bulkscore=0 malwarescore=0 phishscore=0 impostorscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912020102
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ mlxlogscore=999 suspectscore=0 clxscore=1015 priorityscore=1501
+ phishscore=0 bulkscore=0 malwarescore=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912020103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kFDLF9V7ytEpy2gEToBd54ww1nCuKRV0e
-Content-Type: multipart/mixed; boundary="HPOffbTyHtg6DBIPGpKtVfAjV546SPotP"
+--Xbdsg3TlufOH4nygJTfxXfMRXignmMzuq
+Content-Type: multipart/mixed; boundary="eBSANhQmkXr9IRXHxP0nSFCVBCMcMlO4K"
 
---HPOffbTyHtg6DBIPGpKtVfAjV546SPotP
+--eBSANhQmkXr9IRXHxP0nSFCVBCMcMlO4K
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/28/19 3:36 PM, David Hildenbrand wrote:
+On 11/29/19 1:03 PM, David Hildenbrand wrote:
 > On 28.11.19 13:46, Pierre Morel wrote:
->> Let's define the PSW bits  explicitly, it will clarify their
->> usage.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>  lib/s390x/asm/arch_bits.h | 20 ++++++++++++++++++++
->>  lib/s390x/asm/arch_def.h  |  6 ++----
+>> To serve multiple times, the function get_clock_ms() is moved
+>> from intercept.c test to the new file asm/clock.h.
 >=20
-> I'm sorry, but I don't really see a reason to move these 4/5 defines to=
+> I'd probably call this "tod.h" instead. Nevermind.
 
-> a separate header. Can you just keep them in arch_def.h and extend?
+time.h / timing.h?
+I'm planning on adding cpu timer functions somewhen next year...
+
 >=20
-> (none of your other patches touch arch_bits.h - and it is somewhat a
-> weird name. Where to put something new: arch_def.h or arch_bits.h? I
-> would have understood "psw.h", but even that, I don't consider necessar=
-y)
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
 >=20
 
-On a related note:
-I'd still like to split up the file soonish, maybe moving the functions
-into a new file?
-
-@Thomas/David: What's your opinion on that?
 
 
---HPOffbTyHtg6DBIPGpKtVfAjV546SPotP--
+--eBSANhQmkXr9IRXHxP0nSFCVBCMcMlO4K--
 
---kFDLF9V7ytEpy2gEToBd54ww1nCuKRV0e
+--Xbdsg3TlufOH4nygJTfxXfMRXignmMzuq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3k8U4ACgkQ41TmuOI4
-ufiFDBAAlRvhLgwlf5tiQVjkJB5ZW2dqMQOmUmqK9/goww6YK2ZStUaWGPu4Ie1j
-wlP/Z21Z91MzKyHBqrF5l7GPdZPZpe1PvDfbd3KJ7O6Yt5Yf5AeI/1BxdjUmK0za
-MHReGxtkZzKIZhBz/eyKMc/aHSrDBwWssgyp+bx5U3t7eXlj9vVWYrBSaQx4CJmN
-26hYVuSk/q10hAESSmAtXA34iTWxonH2d3M9bIWkv6RMoeYFiEYklwrviAKPl/bx
-Sks5e0XFjdf1k7QWQbXBtqa5UFA/nxWylwh7uvHSTs2XpcHxmIWNAw1UHs+Rdmc9
-mUd6pcs3YgbSsIO9Rw361j7kWV6zneogOFpIWfv9WFZItTmJbVODIBlP1fWZRz3L
-ObhbUUUodpTd0QZlfTff/wW8HtWDc/S/dXdkGZFKnSZXaVY3+b3yiz7G3u4C23ez
-1WB1I222EVG++xBHOreHb543MeY0h549HrCKNnWYM6nzeVlFDREedVL3sGRDi84e
-NP4UU10r+cnY7JEi8XAjgXpc9TUuFpUZnUXOGghg29c59ZOO4573XtgM4u/op7rf
-cJnsHHfqr31p9on0FEZ/h4u8mH6y8Q7MViMP0eSNuspC24g9SBYhjGEyx8vQQI+6
-Yj7z4/GRsTesdJkMF8FWVmZR+QLXm7aQ0gC1VYtFSmYJqX3mRlA=
-=CIqY
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3k8dwACgkQ41TmuOI4
+ufgs/RAAqBv5kh9OriUqyavYoAZGhrcsV6ICb4vAfwzw2xuqWWYe1gMaKLhFBD4e
+Yj564cFcEjLnA8mXflUd2el6sP06CIO8bMN2eoFTnwjovenKppvvVuN0SncAXAfe
+OKgAJUnwHHEvMaX6HuCxlT3eWen6pdd6iI4DRCe6ygFptkJdOW9HdTbTB+/ToXdB
+KkPaVL9wKQjT3bnXQ3eh+VhEXgcNigW2D0Ddwh3nY0U2yIXfIidT5rkFopWVroOU
+m9lnm8J3dwF0JTvDyq3cvmcXfNozfDqS+nEc/ofyFhKjZRkXM5umTXC96/pOVdJK
+KMJI9feJkuTkzaT4Tfy5sa+QrR7Zo2CLFytM9LFL4Zn5ZPl8mRydEh8TwfC/W/Ol
+ViNS8IZpVHAgN7ZiTjPtlPtXrWGwf6O/qDBER4MCkkiwJ1aiN49HBMNiphu40Jss
+xMP9wGaUbvFev8Ry0C1rSogPxcjRThFCfPcCVJvhI0ol7ulogoxYABVZR0GHpS3k
+iy5onSgQ2Vbcz7dVjWEaFTnq9tXgVDe79L9V4tnomxgdym8xcaLy0Y2qUaNmxD1r
+HeRFXg+Ptulm2vLKrhDdYWF8F4D4icQfEfjPDvw/Vja6DSo2mShBh7uMPNnAGjKg
+rsbA/a4TrKq6eI1x97KVW5HGRjn+P1A8DHpAxrRCUmDyd/YEd9Y=
+=JoGx
 -----END PGP SIGNATURE-----
 
---kFDLF9V7ytEpy2gEToBd54ww1nCuKRV0e--
+--Xbdsg3TlufOH4nygJTfxXfMRXignmMzuq--
 
