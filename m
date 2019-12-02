@@ -2,177 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD9710EC07
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 16:03:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C6D310EC4F
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 16:29:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727471AbfLBPDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 10:03:52 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59245 "EHLO
+        id S1727468AbfLBP3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 10:29:50 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40888 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727417AbfLBPDw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 10:03:52 -0500
+        by vger.kernel.org with ESMTP id S1727362AbfLBP3t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 2 Dec 2019 10:29:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575299031;
+        s=mimecast20190719; t=1575300588;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zwiu4k4N1pSKduhjQSjgpy1dNfgDH4lSfwh55hWSVbo=;
-        b=S6L8HMwLUB+AYLCUGXldl2bCgFDPnrHNRhLMxDuP86NlQkz/p8P0vyhBG6Dy24vtxrWDg4
-        57J1uM8H6FjWUx2OOXuWSoOYYObEXZByUYCYZwOwqri4Hze7ZX16JdCbpwDdnqAz2+Bz7B
-        TXwWDr9cn+TZQXDs9Rx/pFNqBUxha1I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-fQKVT74JN2y3nUtrunTlTw-1; Mon, 02 Dec 2019 10:03:48 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21F3F107ACC7;
-        Mon,  2 Dec 2019 15:03:47 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 648C0600C8;
-        Mon,  2 Dec 2019 15:03:43 +0000 (UTC)
-Date:   Mon, 2 Dec 2019 16:03:41 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 9/9] s390x: css: ping pong
-Message-ID: <20191202160341.5e96fb81.cohuck@redhat.com>
-In-Reply-To: <1574945167-29677-10-git-send-email-pmorel@linux.ibm.com>
-References: <1574945167-29677-1-git-send-email-pmorel@linux.ibm.com>
-        <1574945167-29677-10-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=0z2tQm4iXkieh7Y2qc0PIyltREwM+PT4orb8BcP5pjQ=;
+        b=hRMlCTQXnuVQ3Nnqz0nxWgZFK9SweGw58EVWmJp0B9Ze0KHggQ+/g7VWhT58x2w6j2YOcM
+        +m2z50nzUJu1d/PKtX1SbHklTfXR4v/vqOhCQYLVBeQKrAdNAXwK/D++4VSWNw9MWKleK3
+        RdtDf0uTTh4vKrW20lOZVDlytqg2Nuo=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-VOwH637uP5CRBnuXZH8nYg-1; Mon, 02 Dec 2019 10:29:45 -0500
+Received: by mail-qv1-f70.google.com with SMTP id a4so18158729qvn.14
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 07:29:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UHNVZK66LNTKTGCBCYSRNRG2nM4kaD92FRubfSh9yTo=;
+        b=iJTguZqz9vypL9hBo8h9pSpq3xzAKWiNteEMCuU1148dsEjz4UWulpKzdLniJLhaUR
+         uM+d39sZjhyr1KUlhuiNTfLIoxmw8Xnr3IRSWsHachgpRqO3QGLMAFMzh+h3uaE5Pa/a
+         Nl3slUWYL/m5BD1K+Wn/9gDdb270cJHtvDYVg4GD2+W+XoRWSEHDdr41wAYDYvCnY7ok
+         tBiySVF2Fi3I1yAaQ/gRhFTM3lPv4P2s7j1t6FYGGfMfUyByT7XDOGlBxsnupPBeAQqJ
+         cAMF+CWkquc5bTfHPnd+anrYDoyhG8d3Yd/K5zxx0U8OFPhDYlvF7BkST/eAAF//CTWB
+         F7Og==
+X-Gm-Message-State: APjAAAWbx9Y7sXTlJ4AN1y5awmsofmbTnq7IFE5JZ817+visj8/POBN/
+        Mrm9nTtoDb0ngSeJDaetTrQo1idV6OofRdqTTt4ly71J2ACx5gkeLcJ40TLCUnxdbCP9zYmwX8x
+        ytDcNC6YKNGda
+X-Received: by 2002:a0c:f990:: with SMTP id t16mr16297118qvn.134.1575300584889;
+        Mon, 02 Dec 2019 07:29:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwiflZ/75vDGfgMJ5OKhk/kspL4JpVa3xIK//K0jByQmCbTNb/IuB45oI9Mm2q6ml+h0rnrOg==
+X-Received: by 2002:a0c:f990:: with SMTP id t16mr16297085qvn.134.1575300584679;
+        Mon, 02 Dec 2019 07:29:44 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id v7sm16794967qtk.89.2019.12.02.07.29.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2019 07:29:43 -0800 (PST)
+Date:   Mon, 2 Dec 2019 10:29:38 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>
+Cc:     Prashant Bhole <prashantbhole.linux@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
+Message-ID: <20191128024912-mutt-send-email-mst@kernel.org>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ <20191126123514.3bdf6d6f@cakuba.netronome.com>
+ <20191127152653-mutt-send-email-mst@kernel.org>
+ <20191127154014.2b91ecc2@cakuba.netronome.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: fQKVT74JN2y3nUtrunTlTw-1
+In-Reply-To: <20191127154014.2b91ecc2@cakuba.netronome.com>
+X-MC-Unique: VOwH637uP5CRBnuXZH8nYg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 28 Nov 2019 13:46:07 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Wed, Nov 27, 2019 at 03:40:14PM -0800, Jakub Kicinski wrote:
+> > For better or worse that's how userspace is written.
+>=20
+> HW offload requires modifying the user space, too. The offload is not
+> transparent. Do you know that?
 
-> To test a write command with the SSCH instruction we need a QEMU device,
-> with control unit type 0xC0CA. The PONG device is such a device.
+It's true, offload of program itself isn't transparent. Adding a 3rd
+interface (software/hardware/host) isn't welcome though, IMHO.
 
-"We want to test some read/write ccws via the SSCH instruction with a
-QEMU device with control unit type 0xC0CA." ?
-
-> 
-> This type of device respond to PONG_WRITE requests by incrementing an
-
-s/respond/responds/
-
-> integer, stored as a string at offset 0 of the CCW data.
-> 
-> This is only a success test, no error expected.
-
-Nobody expects the Spanish Inquisition^W^W^W an error :)
-
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  s390x/css.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 45 insertions(+), 1 deletion(-)
-> 
-> diff --git a/s390x/css.c b/s390x/css.c
-> index 534864f..0761e70 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -23,6 +23,10 @@
->  #define SID_ONE		0x00010000
->  #define PSW_PRG_MASK (PSW_MASK_IO | PSW_MASK_EA | PSW_MASK_BA)
->  
-> +/* Local Channel Commands */
-
-/* Channel commands for the PONG device */
-
-?
-
-> +#define PONG_WRITE	0x21 /* Write */
-> +#define PONG_READ	0x22 /* Read buffer */
-> +
->  struct lowcore *lowcore = (void *)0x0;
->  
->  static struct schib schib;
-> @@ -31,7 +35,8 @@ static struct ccw ccw[NB_CCW];
->  #define NB_ORB  100
->  static struct orb orb[NB_ORB];
->  static struct irb irb;
-> -static char buffer[0x1000] __attribute__ ((aligned(8)));
-> +#define BUF_SZ	0x1000
-> +static char buffer[BUF_SZ] __attribute__ ((aligned(8)));
-
-Merge this with the introduction of this variable?
-
->  static struct senseid senseid;
->  
->  static const char *Channel_type[3] = {
-> @@ -224,6 +229,44 @@ static void test_sense(void)
->  		report("cu_type: expect c0ca, got %04x", 0, senseid.cu_type);
->  }
->  
-> +static void test_ping(void)
-> +{
-> +	int success, result;
-> +	int cnt = 0, max = 4;
-> +
-> +	if (senseid.cu_type != PONG_CU) {
-> +		report_skip("No PONG, no ping-pong");
-
-:D
-
-> +		return;
-> +	}
-> +
-> +	enable_io_irq();
-
-Hasn't that been enabled already for doing SenseID?
-
-> +
-> +	while (cnt++ < max) {
-> +report_info("cnt..: %08x", cnt);
-
-Wrong indentation?
-
-> +		snprintf(buffer, BUF_SZ, "%08x\n", cnt);
-> +		success = start_subchannel(PONG_WRITE, buffer, 8);
-> +		if (!success) {
-> +			report("start_subchannel failed", 0);
-> +			return;
-> +		}
-> +		delay(100);
-> +		success = start_subchannel(PONG_READ, buffer, 8);
-> +		if (!success) {
-> +			report("start_subchannel failed", 0);
-> +			return;
-> +		}
-> +		result = atol(buffer);
-> +		if (result != (cnt + 1)) {
-> +			report("Bad answer from pong: %08x - %08x", 0, cnt, result);
-> +			return;
-> +		} else 
-> +			report_info("%08x - %08x", cnt, result);
-> +
-> +		delay(100);
-> +	}
-> +	report("ping-pong count 0x%08x", 1, cnt);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -231,6 +274,7 @@ static struct {
->  	{ "enumerate (stsch)", test_enumerate },
->  	{ "enable (msch)", test_enable },
->  	{ "sense (ssch/tsch)", test_sense },
-> +	{ "ping-pong (ssch/tsch)", test_ping },
->  	{ NULL, NULL }
->  };
->  
+--=20
+MST
 
