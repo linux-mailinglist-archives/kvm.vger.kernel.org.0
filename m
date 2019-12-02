@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1628110EF1A
-	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 19:22:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF3F310EF41
+	for <lists+kvm@lfdr.de>; Mon,  2 Dec 2019 19:24:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727979AbfLBSWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 13:22:20 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:37146 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727969AbfLBSWT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Dec 2019 13:22:19 -0500
-Received: by mail-oi1-f193.google.com with SMTP id x195so573064oix.4
-        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 10:22:18 -0800 (PST)
+        id S1727858AbfLBSYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 13:24:08 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:37338 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727644AbfLBSYI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Dec 2019 13:24:08 -0500
+Received: by mail-oi1-f196.google.com with SMTP id x195so578774oix.4
+        for <kvm@vger.kernel.org>; Mon, 02 Dec 2019 10:24:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Mt0ebUCDlDgmkudTT+9hpvbvHuHkrX1tE7sw2iHLAt8=;
-        b=gX4AoLyXiyO1zwgoVhMLAVZUSrYejSWLpTUCSkiBTM8KIGfGghefVqaLWftqvuy6Pj
-         4cuuh7ZuMbET9+Psx6/a854XuTdb/FIimeOv+hyIlMgKru2Z+gmys48h3M6bpd7qoo9S
-         ofXdaDOv6K9Q7aqJGX5dIVqwOB1BkpeOLnfajgNaAq1lWHNwWHsbeX+qxUNwQrkaw7IV
-         l0OBLF0KkTk+meKSgsBIoP0zg7mpiUegHM17p6gMhQsXdFTLCF/wxtN3J6eKS2ec8jk2
-         4TBtpVV9N/go9/UjgELqSmmQAQ9rNqyRMUgByISLZIzK99yXgFdKnM4GqV1aZa/UWhH4
-         j7Sw==
+        bh=N6tE3Gl+YL/gnN9cI/JoRh0/ptDCZUGoGmUrLUqtfPA=;
+        b=KIoVwB+g2xZRTRyivQl3lHKbHqDW7+fKT8JSbn9ycCIo5oC/NPXK98bIBiUDDtDmza
+         CoLmCMwYaDlZMdg9wSmfCPNXy7UgAG4OUuggUlpiFbj3DZ689stO+gTD5I4pj4xea15t
+         AB0ilFOUVV9UKBw/o5jiyrMKzPHp2W8Y4OHxM6j1dm3uFVJd14rpbrTsVetvVhOb7RVJ
+         qN3E8lvvNc6DTa1LaUWkIpjx5iafhUyPevmaZIC8pTOg5dhlEMB0WHXW6WrQwDwlr6eE
+         yD6/71+fz9AjiqA1MIVaqWd06m2BPuScvbh5hggXw+ia9dQCg/4q84kAX4Ov+hHkvmKp
+         GR3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Mt0ebUCDlDgmkudTT+9hpvbvHuHkrX1tE7sw2iHLAt8=;
-        b=EWeQXRlaUMtNADlZY3WbDgYsoel7Pm8ky+bSSmnBUX7px2KxNB1l81sNp8lHaIRjga
-         1lq79d2w3rCjSi4qnqNoOBYAUeNHnu4i4OKxHzekz40lhpVFaq+Jr0d+XzYanuCzdhkk
-         StqDsIKM9mdzxhsOLHhNW0E1EdmBtbAbA8tkAGD2afUeEm34cN///wRzrz564WkZDaBt
-         7nXVXe0wME8oPMtw7B6cDrLNJkl6QfgSXDr8hUfd9HKWY21ld9YfR5LP/rmZ7wL42E8u
-         T4cIOE97nu+rnWlveDTsT0ZYplaOCj4IXgx4qB7h/b8u5gfV9kiR7zKJiecW8pet++jj
-         WAsQ==
-X-Gm-Message-State: APjAAAWo/iaI2FoCZN8/ffVhhO8LtBkOxXcwKaWWdjTwe+9PeaU73blY
-        1sATEk64G05V0GgX6cTdszhOKFl8dZq6IiP8uzzuBA==
-X-Google-Smtp-Source: APXvYqyf9UhXEkFzj9oRHoU3UbqvOfk+HCMVWPzXh2Pv1uoa+7cfVmqFdqUILIrrmurrCqbtkC4dtlXxj6WLaa0+9Hc=
-X-Received: by 2002:aca:1a0a:: with SMTP id a10mr315133oia.146.1575310938470;
- Mon, 02 Dec 2019 10:22:18 -0800 (PST)
+        bh=N6tE3Gl+YL/gnN9cI/JoRh0/ptDCZUGoGmUrLUqtfPA=;
+        b=r57HFfJhHU9rtOkWjkCR1IfgdrxnQj/v7HE5uSS0mnnh7AASEpA6ENnTc4YHO9+qLN
+         2O5Hg7oQgLgBOk88xtba7H+nR6nJkq/R+1DkqG4w1VqAsXGNdHsYer+PCKveYdYF6bJq
+         mSlQHvq4Y3l782IdWulJbHF/nT6qQplhTcBKqwMr2bLgICVD3EkuB3VrYauuflLZvmAh
+         /mhnVGjDl8qB35PvwiO2r7WmfpORgukp3LunWlKi/RvUDb8CEixOtR6EeIZ0a4wJn1my
+         A+zh+27oWaIM8JNQ6BRVAYQ0U5oI7KImRAiYDQW22/tbotP5LrX26uUdD1fCXaSqk1hX
+         vuIw==
+X-Gm-Message-State: APjAAAUeWKzdyrnUvnC/YVk1n+E1hFQfZufQVN+iBta8nXjRahbLUROD
+        cALxvqSM9dHjM4jZZbRa2WGCxgiX1EkEY6+PsRMVTQ==
+X-Google-Smtp-Source: APXvYqw0vqAYx40bDkI5iYCYuymZq09hHslD8P+AVC8IjBFIdxz6qxqVUAusAje5nsc//jcgd/17CJBqsVxWqeUeD6o=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr349470oih.48.1575311046960;
+ Mon, 02 Dec 2019 10:24:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20191111014048.21296-1-zhengxiang9@huawei.com> <20191111014048.21296-2-zhengxiang9@huawei.com>
-In-Reply-To: <20191111014048.21296-2-zhengxiang9@huawei.com>
+References: <20191111014048.21296-1-zhengxiang9@huawei.com> <20191111014048.21296-5-zhengxiang9@huawei.com>
+In-Reply-To: <20191111014048.21296-5-zhengxiang9@huawei.com>
 From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 2 Dec 2019 18:22:07 +0000
-Message-ID: <CAFEAcA8fkc+0RhOH7780sREPUOaCvE-rpUkwFN0-hwsVD7RiMg@mail.gmail.com>
-Subject: Re: [RESEND PATCH v21 1/6] hw/arm/virt: Introduce a RAS machine option
+Date:   Mon, 2 Dec 2019 18:23:56 +0000
+Message-ID: <CAFEAcA8Bve1TF0VdDJExx9AoWbhNPivSYzg=CVba_EbdRoaECQ@mail.gmail.com>
+Subject: Re: [RESEND PATCH v21 4/6] KVM: Move hwpoison page related functions
+ into kvm-all.c
 To:     Xiang Zheng <zhengxiang9@huawei.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -73,62 +74,17 @@ On Mon, 11 Nov 2019 at 01:44, Xiang Zheng <zhengxiang9@huawei.com> wrote:
 >
 > From: Dongjiu Geng <gengdongjiu@huawei.com>
 >
-> RAS Virtualization feature is not supported now, so add a RAS machine
-> option and disable it by default.
+> kvm_hwpoison_page_add() and kvm_unpoison_all() will both be used by X86
+> and ARM platforms, so moving them into "accel/kvm/kvm-all.c" to avoid
+> duplicate code.
+>
+> For architectures that don't use the poison-list functionality the
+> reset handler will harmlessly do nothing, so let's register the
+> kvm_unpoison_all() function in the generic kvm_init() function.
 >
 > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  hw/arm/virt.c         | 23 +++++++++++++++++++++++
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 24 insertions(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d4bedc2607..ea0fbf82be 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1819,6 +1819,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
->      vms->its = value;
->  }
->
-> +static bool virt_get_ras(Object *obj, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    return vms->ras;
-> +}
-> +
-> +static void virt_set_ras(Object *obj, bool value, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    vms->ras = value;
-> +}
-> +
->  static char *virt_get_gic_version(Object *obj, Error **errp)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(obj);
-> @@ -2122,6 +2136,15 @@ static void virt_instance_init(Object *obj)
->                                      "Valid values are none and smmuv3",
->                                      NULL);
->
-> +    /* Default disallows RAS instantiation */
-> +    vms->ras = false;
-> +    object_property_add_bool(obj, "ras", virt_get_ras,
-> +                             virt_set_ras, NULL);
-> +    object_property_set_description(obj, "ras",
-> +                                    "Set on/off to enable/disable "
-> +                                    "RAS instantiation",
-> +                                    NULL);
 
-I think we could make the user-facing description of
-the option a little clearer: something like
-"Set on/off to enable/disable reporting host memory errors
-to a KVM guest using ACPI and guest external abort exceptions"
-
-?
-
-Otherwise
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
