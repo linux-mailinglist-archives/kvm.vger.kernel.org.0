@@ -2,189 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EB3D110220
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:24:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A36D11022B
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:25:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727127AbfLCQYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 11:24:41 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44092 "EHLO
+        id S1726645AbfLCQZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 11:25:37 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52027 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727060AbfLCQYl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:24:41 -0500
+        by vger.kernel.org with ESMTP id S1726319AbfLCQZh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:25:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575390278;
+        s=mimecast20190719; t=1575390336;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=1vyNRx2/ZFnD+GpctA00Rq4g97zyFJ3PtUMWIHFYHB8=;
-        b=c7HoWFcX7T1lxcX+CyzdNTDIAY4UHQJeDgFzxiCufO/EJ1CoqXfO/97UaTjxRBgDxurmAI
-        2AEXqnODFoZ8GwlsDSLvewqMIWpxkpPL6neFzima4ZfIAR6pxnimETOCDLmDpObx8sy1tD
-        Aqon0VR7tv0TY0526aVq86QcRWiIXbw=
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7gp/NLDCHcPBD7rTXpXJJ7UH2Y3VhuqxCT8Tk+uSXDc=;
+        b=bJfW38MX9V+G2cXjA4pJrBQUu/NdjkcVIVg58uNp5jlWqEwXvjU1GFD/i58xudyFQnMhEu
+        nNsZBhkbn/1O6k4HsWg0j3ergAuv+KSEAyV3NhaiNwfM2HIW8L5pBF7pmaUntaROZzd30P
+        MuQVTtaMYXq+IZlOIltBSErKo2JlOs4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-42T-GaogPui9ZDYHbbzE8w-1; Tue, 03 Dec 2019 11:24:35 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-35-HUL4w6-mOSKNPFPUgCa3sw-1; Tue, 03 Dec 2019 11:25:35 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9D95107BAB4;
-        Tue,  3 Dec 2019 16:24:33 +0000 (UTC)
-Received: from [10.36.117.236] (ovpn-117-236.ams2.redhat.com [10.36.117.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96AFF5D77F;
-        Tue,  3 Dec 2019 16:24:28 +0000 (UTC)
-Subject: Re: [PATCH v2] KVM: s390: Add new reset vcpu API
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     thuth@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20191203162055.3519-1-frankja@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <f08ed440-b159-84f5-13cf-03165765f7e6@redhat.com>
-Date:   Tue, 3 Dec 2019 17:24:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E61C18A07C1
+        for <kvm@vger.kernel.org>; Tue,  3 Dec 2019 16:25:34 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-121-180.rdu2.redhat.com [10.10.121.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B71F1600C8;
+        Tue,  3 Dec 2019 16:25:33 +0000 (UTC)
+From:   Cathy Avery <cavery@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: [PATCH kvm-unit-tests v2] svm: Verify the effect of V_INTR_MASKING on INTR interrupts
+Date:   Tue,  3 Dec 2019 11:25:32 -0500
+Message-Id: <20191203162532.24209-1-cavery@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191203162055.3519-1-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 42T-GaogPui9ZDYHbbzE8w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: HUL4w6-mOSKNPFPUgCa3sw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.12.19 17:20, Janosch Frank wrote:
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that.
-> 
-> Now that we have a new interface, let's properly clear out local IRQs
-> and let this commit be a reminder.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 13 +++++++++++++
->  include/uapi/linux/kvm.h |  4 ++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d9e6bf3d54f0..602214c5616c 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_S390_CMMA_MIGRATION:
->  	case KVM_CAP_S390_AIS:
->  	case KVM_CAP_S390_AIS_MIGRATION:
-> +	case KVM_CAP_S390_VCPU_RESETS:
->  		r = 1;
->  		break;
->  	case KVM_CAP_S390_HPAGE_1M:
-> @@ -3287,6 +3288,13 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu,
->  	return r;
->  }
->  
-> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
-> +{
-> +	kvm_clear_async_pf_completion_queue(vcpu);
-> +	kvm_s390_clear_local_irqs(vcpu);
-> +	return 0;
-> +}
-> +
->  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->  {
->  	kvm_s390_vcpu_initial_reset(vcpu);
-> @@ -4363,7 +4371,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
->  		break;
->  	}
-> +	case KVM_S390_NORMAL_RESET:
-> +		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
-> +		break;
->  	case KVM_S390_INITIAL_RESET:
-> +		/* fallthrough */
-> +	case KVM_S390_CLEAR_RESET:
->  		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
->  		break;
->  	case KVM_SET_ONE_REG:
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 52641d8ca9e8..f4fc865775a5 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PMU_EVENT_FILTER 173
->  #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
->  #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
-> +#define KVM_CAP_S390_VCPU_RESETS 180
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> @@ -1461,6 +1462,9 @@ struct kvm_enc_region {
->  /* Available with KVM_CAP_ARM_SVE */
->  #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
->  
+The test confirms the influence of the V_INTR_MASKING bit
+on RFLAGS.IF. The expectation is while running a guest
+with V_INTR_MASKING cleared to zero:
 
-Maybe also a comment like
+- EFLAGS.IF controls both virtual and physical interrupts.
 
-"Available with KVM_CAP_S390_VCPU_RESETS" ?
+While running a guest with V_INTR_MASKING set to 1:
 
-> +#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
-> +#define KVM_S390_CLEAR_RESET    _IO(KVMIO,   0xc4)
-> +
->  /* Secure Encrypted Virtualization command */
->  enum sev_cmd_id {
->  	/* Guest initialization commands */
-> 
+- The host EFLAGS.IF at the time of the VMRUN is saved and
+  controls physical interrupts while the guest is running.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+- The guest value of EFLAGS.IF controls virtual interrupts only.
 
--- 
-Thanks,
+As discussed previously, this patch also modifies the vmrun
+loop ( test_run ) to allow running with HIF=3D0
 
-David / dhildenb
+Signed-off-by: Cathy Avery <cavery@redhat.com>
+---
+
+v2: Added suggested changes to set_host_if etc.
+---
+ x86/svm.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 103 insertions(+), 2 deletions(-)
+
+diff --git a/x86/svm.c b/x86/svm.c
+index 0360d8d..626179c 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -44,6 +44,8 @@ u64 runs;
+ u8 *io_bitmap;
+ u8 io_bitmap_area[16384];
+=20
++u8 set_host_if;
++
+ #define MSR_BITMAP_SIZE 8192
+=20
+ u8 *msr_bitmap;
+@@ -258,6 +260,7 @@ static void test_run(struct test *test, struct vmcb *vm=
+cb)
+=20
+     irq_disable();
+     test->vmcb =3D vmcb;
++    set_host_if =3D 1;
+     test->prepare(test);
+     vmcb->save.rip =3D (ulong)test_thunk;
+     vmcb->save.rsp =3D (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+@@ -266,21 +269,24 @@ static void test_run(struct test *test, struct vmcb *=
+vmcb)
+         tsc_start =3D rdtsc();
+         asm volatile (
+             "clgi \n\t"
++            "cmpb $0, set_host_if\n\t"
++            "jz 1f\n\t"
++            "sti \n\t"
++            "1: \n\t"
+             "vmload \n\t"
+             "mov regs+0x80, %%r15\n\t"  // rflags
+             "mov %%r15, 0x170(%0)\n\t"
+             "mov regs, %%r15\n\t"       // rax
+             "mov %%r15, 0x1f8(%0)\n\t"
+             LOAD_GPR_C
+-            "sti \n\t"=09=09// only used if V_INTR_MASKING=3D1
+             "vmrun \n\t"
+-            "cli \n\t"
+             SAVE_GPR_C
+             "mov 0x170(%0), %%r15\n\t"  // rflags
+             "mov %%r15, regs+0x80\n\t"
+             "mov 0x1f8(%0), %%r15\n\t"  // rax
+             "mov %%r15, regs\n\t"
+             "vmsave \n\t"
++            "cli \n\t"
+             "stgi"
+             : : "a"(vmcb_phys)
+             : "rbx", "rcx", "rdx", "rsi",
+@@ -1386,6 +1392,98 @@ static bool pending_event_check(struct test *test)
+     return get_test_stage(test) =3D=3D 2;
+ }
+=20
++static void pending_event_prepare_vmask(struct test *test)
++{
++    default_prepare(test);
++
++    pending_event_ipi_fired =3D false;
++
++    set_host_if =3D 0;
++
++    handle_irq(0xf1, pending_event_ipi_isr);
++
++    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
++              APIC_DM_FIXED | 0xf1, 0);
++
++    set_test_stage(test, 0);
++}
++
++static void pending_event_test_vmask(struct test *test)
++{
++    if (pending_event_ipi_fired =3D=3D true) {
++        set_test_stage(test, -1);
++        report("Interrupt preceeded guest", false);
++        vmmcall();
++    }
++
++    irq_enable();
++    asm volatile ("nop");
++    irq_disable();
++
++    if (pending_event_ipi_fired !=3D true) {
++        set_test_stage(test, -1);
++        report("Interrupt not triggered by guest", false);
++    }
++
++    vmmcall();
++
++    irq_enable();
++    asm volatile ("nop");
++    irq_disable();
++}
++
++static bool pending_event_finished_vmask(struct test *test)
++{
++    if ( test->vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
++        report("VM_EXIT return to host is not EXIT_VMMCALL exit reason 0x%=
+x", false,
++                test->vmcb->control.exit_code);
++        return true;
++    }
++
++    switch (get_test_stage(test)) {
++    case 0:
++        test->vmcb->save.rip +=3D 3;
++
++        pending_event_ipi_fired =3D false;
++
++        test->vmcb->control.int_ctl |=3D V_INTR_MASKING_MASK;
++
++        apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
++              APIC_DM_FIXED | 0xf1, 0);
++
++        break;
++
++    case 1:
++        if (pending_event_ipi_fired =3D=3D true) {
++            report("Interrupt triggered by guest", false);
++            return true;
++        }
++
++        irq_enable();
++        asm volatile ("nop");
++        irq_disable();
++
++        if (pending_event_ipi_fired !=3D true) {
++            report("Interrupt not triggered by host", false);
++            return true;
++        }
++
++        break;
++
++    default:
++        return true;
++    }
++
++    inc_test_stage(test);
++
++    return get_test_stage(test) =3D=3D 2;
++}
++
++static bool pending_event_check_vmask(struct test *test)
++{
++    return get_test_stage(test) =3D=3D 2;
++}
++
+ static struct test tests[] =3D {
+     { "null", default_supported, default_prepare, null_test,
+       default_finished, null_check },
+@@ -1438,6 +1536,9 @@ static struct test tests[] =3D {
+       lat_svm_insn_finished, lat_svm_insn_check },
+     { "pending_event", default_supported, pending_event_prepare,
+       pending_event_test, pending_event_finished, pending_event_check },
++    { "pending_event_vmask", default_supported, pending_event_prepare_vmas=
+k,
++      pending_event_test_vmask, pending_event_finished_vmask,
++      pending_event_check_vmask },
+ };
+=20
+ int main(int ac, char **av)
+--=20
+2.20.1
 
