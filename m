@@ -2,146 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F046911064E
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 22:08:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44782111B59
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 23:08:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727483AbfLCVIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 16:08:30 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:42493 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727416AbfLCVIa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Dec 2019 16:08:30 -0500
-Received: by mail-pg1-f201.google.com with SMTP id x189so2317450pgd.9
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 13:08:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DASVXSs5oWILH0sAvzGTTCKaB1RC91AoYiNLZyw2dxI=;
-        b=gHZaPldSI9LEKFQ/ihgZl1LgWH5jVT3dO0odaKXcPGrstFHtODiy+L2QmfdAtImI86
-         Z6dpEqR4MivzNR1to2+1UJbAXaZp+SQxYSFpPVRJyFtC+IwPKTTmLnvtD3CHwI2TII2N
-         ufasLwR43qkTiAxEtrJP2zdKjcj8ICmpiTCESgtK1tWpLk7D8/RZ7NeDt8BqjgzI0oEF
-         +woZg4+8XwIdg8jAOfA29TUgZ5jZquT6rjrZVe9Vr5M4NvWNDfCHJ4ndvRtYXFs8YgcR
-         N6DfTGX2I1MRblm/F3rirWAp3Gpr/CwgXm6JcSi4nrdrcN4Yx7HBWoN0nylYYmKcar2t
-         Vhzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DASVXSs5oWILH0sAvzGTTCKaB1RC91AoYiNLZyw2dxI=;
-        b=Cli8v+yz9JDPw4RXE4UFxIDS2S1H2p+loraXmAh5/nQz3GCEZCaGKeZ7VPCkqYO0k/
-         GPUiMgcUQe/vC0y4qaM5lFTG69LnvThbwTjPN0zLxeiJ3q00V8HsJuXjM5b5ApV0TPwV
-         0cboxiMEIUZSzt1QoTMz7TGunSrfzgHMtXHpvuGpxDgvQE5hl+IVz1KrkaUxBPWH1c3d
-         7N79qiofJv8EFHcbm5r/2kIhQD8z5g1D1I6Y/IX2oH/qnKc3dqD+X67wyg1gZeTIsDjX
-         JSoaCQSQ1swBs41As082TO+k0gje66hg06Jgsl8R2HvLqlPF9lAb/BYu/PYm3+jY2Vuc
-         OWSg==
-X-Gm-Message-State: APjAAAUvXLXWnqWtk43PWxUaFsn89icYsbpm9cboDfaxtdMwSybyIIYY
-        hitwC30IgprUSEI+fnxwQWKVW9QjTOz3AGyDsZMjXjw1JRB4mQ0XXtzgTOSgiUdgG4tDnEmMtl+
-        48DLNUGELJxwxpaVn8KI+jNMJWJcaidVop8pRIWoVePvMTtNLDOL2olgfr8Em/lA=
-X-Google-Smtp-Source: APXvYqzDdPCX/Axm2kbMjLuWjQBtU1S0fU+UOxex/V+hWf66/Q5FtBzUMP5UAtGRCyLwP/pKA3VUgBiDs3le2g==
-X-Received: by 2002:a65:66d7:: with SMTP id c23mr7740607pgw.40.1575407309430;
- Tue, 03 Dec 2019 13:08:29 -0800 (PST)
-Date:   Tue,  3 Dec 2019 13:08:25 -0800
-Message-Id: <20191203210825.26827-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
-Subject: [PATCH] kvm: vmx: Stop wasting a page for guest_msrs
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727601AbfLCWHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 17:07:54 -0500
+Received: from mga07.intel.com ([134.134.136.100]:13784 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727516AbfLCWHy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Dec 2019 17:07:54 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Dec 2019 14:07:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,275,1571727600"; 
+   d="scan'208";a="208640056"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
+  by fmsmga007.fm.intel.com with ESMTP; 03 Dec 2019 14:07:52 -0800
+Date:   Tue, 3 Dec 2019 14:07:52 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v4 3/6] KVM: X86: Use APIC_DEST_* macros properly in
+ kvm_lapic_irq.dest_mode
+Message-ID: <20191203220752.GJ19877@linux.intel.com>
+References: <20191203165903.22917-1-peterx@redhat.com>
+ <20191203165903.22917-4-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191203165903.22917-4-peterx@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We will never need more guest_msrs than there are indices in
-vmx_msr_index. Thus, at present, the guest_msrs array will not exceed
-168 bytes.
+On Tue, Dec 03, 2019 at 11:59:00AM -0500, Peter Xu wrote:
+> We were using either APIC_DEST_PHYSICAL|APIC_DEST_LOGICAL or 0|1 to
+> fill in kvm_lapic_irq.dest_mode.  It's fine only because in most cases
+> when we check against dest_mode it's against APIC_DEST_PHYSICAL (which
+> equals to 0).  However, that's not consistent.  We'll have problem
+> when we want to start checking against APIC_DEST_LOGICAL, which does
+> not equals to 1.
+> 
+> This patch firstly introduces kvm_lapic_irq_dest_mode() helper to take
+> any boolean of destination mode and return the APIC_DEST_* macro.
+> Then, it replaces the 0|1 settings of irq.dest_mode with the helper.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 5 +++++
+>  arch/x86/kvm/ioapic.c           | 9 ++++++---
+>  arch/x86/kvm/irq_comm.c         | 7 ++++---
+>  arch/x86/kvm/x86.c              | 2 +-
+>  4 files changed, 16 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b79cd6aa4075..f815c97b1b57 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1022,6 +1022,11 @@ struct kvm_lapic_irq {
+>  	bool msi_redir_hint;
+>  };
+>  
+> +static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode)
+> +{
+> +	return dest_mode ? APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 14 ++------------
- arch/x86/kvm/vmx/vmx.h |  8 +++++++-
- 2 files changed, 9 insertions(+), 13 deletions(-)
+IMO this belongs in ioapic.c as it's specifically provided for converting
+an I/O APIC redirection entry into a local APIC destination mode.  Without
+the I/O APIC context, %true==APIC_DEST_LOGICAL looks like a completely
+arbitrary decision.  And if it's in ioapic.c, it can take the union
+of a bool, which avoids the casting and shortens the callers.  E.g.:
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1b9ab4166397d..0b3c7524456f1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -443,7 +443,7 @@ static unsigned long host_idt_base;
-  * support this emulation, IA32_STAR must always be included in
-  * vmx_msr_index[], even in i386 builds.
-  */
--const u32 vmx_msr_index[] = {
-+const u32 vmx_msr_index[NR_GUEST_MSRS] = {
- #ifdef CONFIG_X86_64
- 	MSR_SYSCALL_MASK, MSR_LSTAR, MSR_CSTAR,
- #endif
-@@ -6666,7 +6666,6 @@ static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
- 	free_vpid(vmx->vpid);
- 	nested_vmx_free_vcpu(vcpu);
- 	free_loaded_vmcs(vmx->loaded_vmcs);
--	kfree(vmx->guest_msrs);
- 	kvm_vcpu_uninit(vcpu);
- 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.user_fpu);
- 	kmem_cache_free(x86_fpu_cache, vmx->vcpu.arch.guest_fpu);
-@@ -6723,13 +6722,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 			goto uninit_vcpu;
- 	}
- 
--	vmx->guest_msrs = kmalloc(PAGE_SIZE, GFP_KERNEL_ACCOUNT);
--	BUILD_BUG_ON(ARRAY_SIZE(vmx_msr_index) * sizeof(vmx->guest_msrs[0])
--		     > PAGE_SIZE);
--
--	if (!vmx->guest_msrs)
--		goto free_pml;
--
- 	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i) {
- 		u32 index = vmx_msr_index[i];
- 		u32 data_low, data_high;
-@@ -6760,7 +6752,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 
- 	err = alloc_loaded_vmcs(&vmx->vmcs01);
- 	if (err < 0)
--		goto free_msrs;
-+		goto free_pml;
- 
- 	msr_bitmap = vmx->vmcs01.msr_bitmap;
- 	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_TSC, MSR_TYPE_R);
-@@ -6822,8 +6814,6 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 
- free_vmcs:
- 	free_loaded_vmcs(vmx->loaded_vmcs);
--free_msrs:
--	kfree(vmx->guest_msrs);
- free_pml:
- 	vmx_destroy_pml_buffer(vmx);
- uninit_vcpu:
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 7c1b978b2df44..08bc24fa59909 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -22,6 +22,12 @@ extern u32 get_umwait_control_msr(void);
- 
- #define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
- 
-+#ifdef CONFIG_X86_64
-+#define NR_GUEST_MSRS	7
-+#else
-+#define NR_GUEST_MSRS	4
-+#endif
-+
- #define NR_LOADSTORE_MSRS 8
- 
- struct vmx_msrs {
-@@ -206,7 +212,7 @@ struct vcpu_vmx {
- 	u32                   idt_vectoring_info;
- 	ulong                 rflags;
- 
--	struct shared_msr_entry *guest_msrs;
-+	struct shared_msr_entry guest_msrs[NR_GUEST_MSRS];
- 	int                   nmsrs;
- 	int                   save_nmsrs;
- 	bool                  guest_msrs_ready;
--- 
-2.24.0.393.g34dc348eaf-goog
+static u64 ioapic_to_lapic_dest_mode(union kvm_ioapic_redirect_entry *e)
+{
+	return e->fields.dest_mode ?  APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
+}
 
+The other option would be to use the same approach as delivery_mode and
+open code the shift.
+
+> +}
+> +
+>  struct kvm_x86_ops {
+>  	int (*cpu_has_kvm_support)(void);          /* __init */
+>  	int (*disabled_by_bios)(void);             /* __init */
+> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> index 9fd2dd89a1c5..e623a4f8d27e 100644
+> --- a/arch/x86/kvm/ioapic.c
+> +++ b/arch/x86/kvm/ioapic.c
+> @@ -331,7 +331,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>  			irq.vector = e->fields.vector;
+>  			irq.delivery_mode = e->fields.delivery_mode << 8;
+>  			irq.dest_id = e->fields.dest_id;
+> -			irq.dest_mode = e->fields.dest_mode;
+> +			irq.dest_mode =
+> +			    kvm_lapic_irq_dest_mode(!!e->fields.dest_mode);
+>  			bitmap_zero(&vcpu_bitmap, 16);
+>  			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+>  						 &vcpu_bitmap);
+> @@ -343,7 +344,9 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+>  				 * keep ioapic_handled_vectors synchronized.
+>  				 */
+>  				irq.dest_id = old_dest_id;
+> -				irq.dest_mode = old_dest_mode;
+> +				irq.dest_mode =
+> +				    kvm_lapic_irq_dest_mode(
+> +					!!e->fields.dest_mode);
+>  				kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+>  							 &vcpu_bitmap);
+>  			}
+> @@ -369,7 +372,7 @@ static int ioapic_service(struct kvm_ioapic *ioapic, int irq, bool line_status)
+>  
+>  	irqe.dest_id = entry->fields.dest_id;
+>  	irqe.vector = entry->fields.vector;
+> -	irqe.dest_mode = entry->fields.dest_mode;
+> +	irqe.dest_mode = kvm_lapic_irq_dest_mode(!!entry->fields.dest_mode);
+>  	irqe.trig_mode = entry->fields.trig_mode;
+>  	irqe.delivery_mode = entry->fields.delivery_mode << 8;
+>  	irqe.level = 1;
+> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> index 8ecd48d31800..22108ed66a76 100644
+> --- a/arch/x86/kvm/irq_comm.c
+> +++ b/arch/x86/kvm/irq_comm.c
+> @@ -52,8 +52,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+>  	unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
+>  	unsigned int dest_vcpus = 0;
+>  
+> -	if (irq->dest_mode == 0 && irq->dest_id == 0xff &&
+> -			kvm_lowest_prio_delivery(irq)) {
+> +	if (irq->dest_mode == APIC_DEST_PHYSICAL &&
+> +	    irq->dest_id == 0xff && kvm_lowest_prio_delivery(irq)) {
+>  		printk(KERN_INFO "kvm: apic: phys broadcast and lowest prio\n");
+>  		irq->delivery_mode = APIC_DM_FIXED;
+>  	}
+> @@ -114,7 +114,8 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel_irq_routing_entry *e,
+>  		irq->dest_id |= MSI_ADDR_EXT_DEST_ID(e->msi.address_hi);
+>  	irq->vector = (e->msi.data &
+>  			MSI_DATA_VECTOR_MASK) >> MSI_DATA_VECTOR_SHIFT;
+> -	irq->dest_mode = (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_lo;
+> +	irq->dest_mode = kvm_lapic_irq_dest_mode(
+> +	    !!((1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_lo));
+>  	irq->trig_mode = (1 << MSI_DATA_TRIGGER_SHIFT) & e->msi.data;
+>  	irq->delivery_mode = e->msi.data & 0x700;
+>  	irq->msi_redir_hint = ((e->msi.address_lo
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3ed167e039e5..3b00d662dc14 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7356,7 +7356,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, unsigned long flags, int apicid)
+>  	struct kvm_lapic_irq lapic_irq;
+>  
+>  	lapic_irq.shorthand = 0;
+> -	lapic_irq.dest_mode = 0;
+> +	lapic_irq.dest_mode = APIC_DEST_PHYSICAL;
+>  	lapic_irq.level = 0;
+>  	lapic_irq.dest_id = apicid;
+>  	lapic_irq.msi_redir_hint = false;
+> -- 
+> 2.21.0
+> 
