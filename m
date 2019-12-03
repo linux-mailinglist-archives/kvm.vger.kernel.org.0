@@ -2,159 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7006A110246
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2596C110248
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:28:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727326AbfLCQ15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 11:27:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53946 "EHLO
+        id S1727166AbfLCQ2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 11:28:15 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44529 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725848AbfLCQ14 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:27:56 -0500
+        by vger.kernel.org with ESMTP id S1727073AbfLCQ2P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:28:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575390475;
+        s=mimecast20190719; t=1575390494;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+WnczAKQed6YpiIJYxujDrMx6sZk/yhl75EFdTgUL8M=;
-        b=gdIh/rdVY65cI1DlG71v4+gY9BEhLTT+2OwBZeICFk63rPc+zWkuZSywdMvSW2tMy8y5PN
-        +iP5+nbHchueW3K5VeMUGyDScUShQCBCOQYtmV83yeSQn+vYnvzRKL+mkisj6Kxyo78y6g
-        QOcpcJcI4RMQOWpeu6qBIKZAhDTAq14=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-BHu4-0LYM5abuY-wQfFXTg-1; Tue, 03 Dec 2019 11:27:51 -0500
-Received: by mail-qk1-f198.google.com with SMTP id q16so2527632qkc.20
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 08:27:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ZSHaj65Ct3ZOf9flXzApJ7gvW4At2V+yKIUimhT/dHk=;
-        b=SIS4uXnapc2ocUkrdyi7vtoWc5BYw1anELJSabfxpOGG4H1oQ9t/jIuqlT5rj25yI/
-         G77YzDUsw5VdJYh4dWDwqKTOxPCpQkB9iAeWJ7Clcj1tF0JjaPzxNp0ukJF9pd/yGvv9
-         wTfZdw0ozDHZSSmF4rZW2HGHl192MHl8Hrg3dZz7JH23u5zZAd2Cw3JMeeu4wD3Ok+c3
-         jF6Xgtd7lSiA/yg2Erx7tApo3Gf9Nlx1yTNcJtb+uD4RgyBEOF5CRL87v3NjQZ7FXy1B
-         G4SGfxA52efxMgmIt7fVH54md1wCWzIXRPtxi+KfX0SOfH10BcdCRKnw02MOfLuxqMcn
-         Sedw==
-X-Gm-Message-State: APjAAAVAtsxWbYB6Ib2jHjDmT5c4KiQtQqwBkDkY21LFtzUU07Uvch1w
-        QjZBw8QoyLAnX+GRRb2TKAUbKXwfZ65IItyHp7UUwwNL6O9e3oOj+NbI/ycG/5Wx85rdWuRTR1r
-        geKRCBhv50vaP
-X-Received: by 2002:a37:9485:: with SMTP id w127mr3842687qkd.128.1575390470111;
-        Tue, 03 Dec 2019 08:27:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyKKy4GZEoSBTWv3SIwooKspLWb4cJDbiCQx+onygw7OYAriklZioQoVK71vPsrpm59rrXIhA==
-X-Received: by 2002:a37:9485:: with SMTP id w127mr3842643qkd.128.1575390469634;
-        Tue, 03 Dec 2019 08:27:49 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id k50sm2086333qtc.90.2019.12.03.08.27.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 08:27:48 -0800 (PST)
-Date:   Tue, 3 Dec 2019 11:27:47 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Nitesh Narayan Lal <nitesh@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] KVM: X86: Fix callers of kvm_apic_match_dest() to
- use correct macros
-Message-ID: <20191203162747.GD17275@xz-x1>
-References: <20191202201314.543-1-peterx@redhat.com>
- <20191202201314.543-6-peterx@redhat.com>
- <87r21lbl0c.fsf@vitty.brq.redhat.com>
+        bh=YqwpuKtnDubpLXH4usVkrSMU1DYBVfWJge8/U62NBA0=;
+        b=hzmHJC8dbUqeXecNteLRjm0+1y0oS9l9G5ZubL/JOjLLmwSnDFSy338dnFvOL9WuJ3I4t/
+        tQkRBn9tVg8TzS8ryup81SliXQSD0Cv6NLu86xhNUCWxrWZR4qeKqY5ybr56m3jVv7pwVM
+        qXTTddH6wHOFVDqpt51yA8TlqCcNxBU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-qE2RYTeFMXO4sV2prbycvw-1; Tue, 03 Dec 2019 11:28:10 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 835EB18042C5;
+        Tue,  3 Dec 2019 16:28:09 +0000 (UTC)
+Received: from gondolin (ovpn-116-214.ams2.redhat.com [10.36.116.214])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F9EE1001902;
+        Tue,  3 Dec 2019 16:28:04 +0000 (UTC)
+Date:   Tue, 3 Dec 2019 17:28:02 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: s390: Add new reset vcpu API
+Message-ID: <20191203172802.7d67d31d.cohuck@redhat.com>
+In-Reply-To: <20191203162055.3519-1-frankja@linux.ibm.com>
+References: <20191203162055.3519-1-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <87r21lbl0c.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: BHu4-0LYM5abuY-wQfFXTg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: qE2RYTeFMXO4sV2prbycvw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 03, 2019 at 02:23:47PM +0100, Vitaly Kuznetsov wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > Callers of kvm_apic_match_dest() should always pass in APIC_DEST_*
-> > macros for either dest_mode and short_hand parameters.  Fix up all the
-> > callers of kvm_apic_match_dest() that are not following the rule.
-> >
-> > Reported-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  arch/x86/kvm/ioapic.c   | 11 +++++++----
-> >  arch/x86/kvm/irq_comm.c |  3 ++-
-> >  2 files changed, 9 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> > index 901d85237d1c..1082ca8d11e5 100644
-> > --- a/arch/x86/kvm/ioapic.c
-> > +++ b/arch/x86/kvm/ioapic.c
-> > @@ -108,8 +108,9 @@ static void __rtc_irq_eoi_tracking_restore_one(stru=
-ct kvm_vcpu *vcpu)
-> >  =09union kvm_ioapic_redirect_entry *e;
-> > =20
-> >  =09e =3D &ioapic->redirtbl[RTC_GSI];
-> > -=09if (!kvm_apic_match_dest(vcpu, NULL, 0,=09e->fields.dest_id,
-> > -=09=09=09=09e->fields.dest_mode))
-> > +=09if (!kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
-> > +=09=09=09=09 e->fields.dest_id,
-> > +=09=09=09=09 kvm_lapic_irq_dest_mode(e->fields.dest_mode)))
-> >  =09=09return;
-> > =20
-> >  =09new_val =3D kvm_apic_pending_eoi(vcpu, e->fields.vector);
-> > @@ -237,6 +238,7 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, u=
-long *ioapic_handled_vectors)
-> >  =09struct dest_map *dest_map =3D &ioapic->rtc_status.dest_map;
-> >  =09union kvm_ioapic_redirect_entry *e;
-> >  =09int index;
-> > +=09u16 dm;
-> > =20
-> >  =09spin_lock(&ioapic->lock);
-> > =20
-> > @@ -250,8 +252,9 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, u=
-long *ioapic_handled_vectors)
-> >  =09=09if (e->fields.trig_mode =3D=3D IOAPIC_LEVEL_TRIG ||
-> >  =09=09    kvm_irq_has_notifier(ioapic->kvm, KVM_IRQCHIP_IOAPIC, index)=
- ||
-> >  =09=09    index =3D=3D RTC_GSI) {
-> > -=09=09=09if (kvm_apic_match_dest(vcpu, NULL, 0,
-> > -=09=09=09             e->fields.dest_id, e->fields.dest_mode) ||
-> > +=09=09=09dm =3D kvm_lapic_irq_dest_mode(e->fields.dest_mode);
->=20
-> Nit: you could've defined 'dm' right here in the block (after '{') but
-> in any case I'd suggest to stick to 'dest_mode' and not shorten it to
-> 'dm' for consistency.
->=20
-> > +=09=09=09if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
-> > +=09=09=09=09=09=09e->fields.dest_id, dm) ||
-> >  =09=09=09    kvm_apic_pending_eoi(vcpu, e->fields.vector))
-> >  =09=09=09=09__set_bit(e->fields.vector,
-> >  =09=09=09=09=09  ioapic_handled_vectors);
-> > diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> > index 5f59e5ebdbed..e89c2160b39f 100644
-> > --- a/arch/x86/kvm/irq_comm.c
-> > +++ b/arch/x86/kvm/irq_comm.c
-> > @@ -417,7 +417,8 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
-> > =20
-> >  =09=09=09kvm_set_msi_irq(vcpu->kvm, entry, &irq);
-> > =20
-> > -=09=09=09if (irq.level && kvm_apic_match_dest(vcpu, NULL, 0,
-> > +=09=09=09if (irq.level &&
-> > +=09=09=09    kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
-> >  =09=09=09=09=09=09irq.dest_id, irq.dest_mode))
-> >  =09=09=09=09__set_bit(irq.vector, ioapic_handled_vectors);
-> >  =09=09}
->=20
-> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Tue,  3 Dec 2019 11:20:55 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-I'll move the declaration in with your r-b.  'dm' is a silly trick of
-mine to avoid the 80-char line limit.  Thanks,
+> The architecture states that we need to reset local IRQs for all CPU
+> resets. Because the old reset interface did not support the normal CPU
+> reset we never did that.
+> 
+> Now that we have a new interface, let's properly clear out local IRQs
+> and let this commit be a reminder.
 
---=20
-Peter Xu
+Well, the new interface did not appear magically, this patch introduces
+it :) (The whole sentence is a bit confusing; what is this commit
+supposed to remind us of?)
+
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c | 13 +++++++++++++
+>  include/uapi/linux/kvm.h |  4 ++++
+>  2 files changed, 17 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index d9e6bf3d54f0..602214c5616c 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_S390_CMMA_MIGRATION:
+>  	case KVM_CAP_S390_AIS:
+>  	case KVM_CAP_S390_AIS_MIGRATION:
+> +	case KVM_CAP_S390_VCPU_RESETS:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_S390_HPAGE_1M:
+> @@ -3287,6 +3288,13 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu,
+>  	return r;
+>  }
+>  
+> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_clear_async_pf_completion_queue(vcpu);
+> +	kvm_s390_clear_local_irqs(vcpu);
+> +	return 0;
+> +}
+> +
+>  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>  {
+>  	kvm_s390_vcpu_initial_reset(vcpu);
+> @@ -4363,7 +4371,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
+>  		break;
+>  	}
+> +	case KVM_S390_NORMAL_RESET:
+> +		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
+> +		break;
+>  	case KVM_S390_INITIAL_RESET:
+> +		/* fallthrough */
+> +	case KVM_S390_CLEAR_RESET:
+>  		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+
+The cover letter probably should also mention that clear reset falls
+back to initial reset for now?
+
+>  		break;
+>  	case KVM_SET_ONE_REG:
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 52641d8ca9e8..f4fc865775a5 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_PMU_EVENT_FILTER 173
+>  #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+>  #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
+> +#define KVM_CAP_S390_VCPU_RESETS 180
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1461,6 +1462,9 @@ struct kvm_enc_region {
+>  /* Available with KVM_CAP_ARM_SVE */
+>  #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
+>  
+> +#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+> +#define KVM_S390_CLEAR_RESET    _IO(KVMIO,   0xc4)
+> +
+>  /* Secure Encrypted Virtualization command */
+>  enum sev_cmd_id {
+>  	/* Guest initialization commands */
+
+Looks sane, but please also document the new ioctls and the new cap.
 
