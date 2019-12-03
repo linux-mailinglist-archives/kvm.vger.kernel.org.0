@@ -2,114 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5431101F0
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:17:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6D211020B
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:21:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbfLCQQ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 11:16:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42056 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726138AbfLCQQy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:16:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575389812;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l5DRPz75FYfbi6k56DuDWzncPOz5zbOpOMHv3gX9mR0=;
-        b=fLjS3fJEwFeoRRC6Xxkiiw6gUYV6gY116biCWxuAH2fCt3ic6T1Lz1lFlUYRmrB4rkqcvq
-        E4cjjros13hEs62DxeUTWaZ5fCk4h26gq4DzT1Coebw612xQEQoZAJGaNVOojM7IMcuM8+
-        YjlYSwXS53g4ndsgW3ZXRBWgGmFFyaA=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-IvE-VOuCMHmwKAtxL4QwXw-1; Tue, 03 Dec 2019 11:16:47 -0500
-Received: by mail-qk1-f198.google.com with SMTP id q125so2548535qka.1
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 08:16:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=OAvig8M7YhwpuhEupgjTLkU7y0yDFNJcrooMFpTalaM=;
-        b=bBbeT5oyUup8pt2cEb2z3FRGW31xEYJZvGkVdnxvFHtLzgxYR9ZFPYUA2ENxftEjRm
-         ZkIJj/t9u5l1ZWrqfcGCgeHxiC2B11RmJWjC+9UlPYhO/VL/WLhYud0+y+b29yPvoZns
-         Tr8o9CynVEq6uV+BZywXO0RLZA0cygo04a4b/UqzA8cUk9ZrotSv/zLXmHouHRINeIqy
-         5eV6qGBlb7I4q2AuGViWlMrZpBQN3sUmKHrOVKZNWudz76LtWiqqwJISklPvsIXxt1SL
-         GD6C/wVK99lYqqfgy1KvnWla2y66ayis4j//roAf7Sy7zPFO+ZfU03k2QFKTyR48rrVI
-         FSMg==
-X-Gm-Message-State: APjAAAXdmgxRdeQYcZj0NlNQQrDMcFapi4wxTxum4LYwj7PD8lJldHei
-        N3v7t9QeoWfFv+E0cWDK2AdK9npdDk/4nqqYPLzfr6BFECmWY7G4yHq7uuodQ/eGopZl7hbkvBB
-        mtpCggf7xSO2d
-X-Received: by 2002:a37:5c02:: with SMTP id q2mr5848879qkb.72.1575389806787;
-        Tue, 03 Dec 2019 08:16:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzADuhWD+oXo0EFAH6UvLZQnyzJStpL8OpOHP4ltkZ4Yg/RluWK8PFf/WihKlf1cIBL/pBGtw==
-X-Received: by 2002:a37:5c02:: with SMTP id q2mr5848850qkb.72.1575389806486;
-        Tue, 03 Dec 2019 08:16:46 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id s20sm1938085qkj.100.2019.12.03.08.16.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 08:16:45 -0800 (PST)
-Date:   Tue, 3 Dec 2019 11:16:44 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v3 3/5] KVM: X86: Use APIC_DEST_* macros properly in
- kvm_lapic_irq.dest_mode
-Message-ID: <20191203161644.GB17275@xz-x1>
-References: <20191202201314.543-1-peterx@redhat.com>
- <20191202201314.543-4-peterx@redhat.com>
- <87wobdblda.fsf@vitty.brq.redhat.com>
+        id S1726319AbfLCQVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 11:21:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54274 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725848AbfLCQVN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:21:13 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB3GHo7Z006557
+        for <kvm@vger.kernel.org>; Tue, 3 Dec 2019 11:21:12 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wnp8rqxu2-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 11:21:11 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Tue, 3 Dec 2019 16:21:10 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 3 Dec 2019 16:21:08 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB3GL6HD51577060
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 3 Dec 2019 16:21:06 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C997C11C064;
+        Tue,  3 Dec 2019 16:21:06 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFADC11C052;
+        Tue,  3 Dec 2019 16:21:04 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.18.156])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  3 Dec 2019 16:21:04 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
+        mihajlov@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+Subject: [PATCH v2] KVM: s390: Add new reset vcpu API
+Date:   Tue,  3 Dec 2019 11:20:55 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <87wobdblda.fsf@vitty.brq.redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: IvE-VOuCMHmwKAtxL4QwXw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120316-0028-0000-0000-000003C42D3C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120316-0029-0000-0000-00002487480C
+Message-Id: <20191203162055.3519-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-03_04:2019-12-02,2019-12-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=1 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
+ spamscore=0 phishscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912030123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 03, 2019 at 02:16:01PM +0100, Vitaly Kuznetsov wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > We were using either APIC_DEST_PHYSICAL|APIC_DEST_LOGICAL or 0|1 to
-> > fill in kvm_lapic_irq.dest_mode.  It's fine only because in most cases
-> > when we check against dest_mode it's against APIC_DEST_PHYSICAL (which
-> > equals to 0).  However, that's not consistent.  We'll have problem
-> > when we want to start checking against APIC_DEST_PHYSICAL
->=20
-> APIC_DEST_LOGICAL
+The architecture states that we need to reset local IRQs for all CPU
+resets. Because the old reset interface did not support the normal CPU
+reset we never did that.
 
-Fixed.
+Now that we have a new interface, let's properly clear out local IRQs
+and let this commit be a reminder.
 
-> > +=09irq->dest_mode =3D kvm_lapic_irq_dest_mode(
-> > +=09    (1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.address_lo);
->=20
-> This usage is a bit fishy (I understand that it works, but),
-> kvm_lapic_irq_dest_mode()'s input is bool (0/1) but here we're passing
-> something different.
->=20
-> I'm not sure kvm_lapic_irq_dest_mode() is even needed here, but in case
-> it is I'd suggest to add '!!':
->=20
->  kvm_lapic_irq_dest_mode(!!((1 << MSI_ADDR_DEST_MODE_SHIFT) & e->msi.addr=
-ess_lo))
->=20
-> to make things explicit. I don't like how it looks though.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 13 +++++++++++++
+ include/uapi/linux/kvm.h |  4 ++++
+ 2 files changed, 17 insertions(+)
 
-IMHO it's the same (converting uint to _Bool will be the same as "!!",
-also A ? B : C will be another, so we probably wrote this three times,
-each of them will translate to a similar pattern of "cmpl + setne" asm
-code).  But sure I can add them if you prefer.
-
-Thanks,
-
---=20
-Peter Xu
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index d9e6bf3d54f0..602214c5616c 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_CMMA_MIGRATION:
+ 	case KVM_CAP_S390_AIS:
+ 	case KVM_CAP_S390_AIS_MIGRATION:
++	case KVM_CAP_S390_VCPU_RESETS:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_S390_HPAGE_1M:
+@@ -3287,6 +3288,13 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struct kvm_vcpu *vcpu,
+ 	return r;
+ }
+ 
++static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
++{
++	kvm_clear_async_pf_completion_queue(vcpu);
++	kvm_s390_clear_local_irqs(vcpu);
++	return 0;
++}
++
+ static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_s390_vcpu_initial_reset(vcpu);
+@@ -4363,7 +4371,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
+ 		break;
+ 	}
++	case KVM_S390_NORMAL_RESET:
++		r = kvm_arch_vcpu_ioctl_normal_reset(vcpu);
++		break;
+ 	case KVM_S390_INITIAL_RESET:
++		/* fallthrough */
++	case KVM_S390_CLEAR_RESET:
+ 		r = kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+ 		break;
+ 	case KVM_SET_ONE_REG:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52641d8ca9e8..f4fc865775a5 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PMU_EVENT_FILTER 173
+ #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+ #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
++#define KVM_CAP_S390_VCPU_RESETS 180
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1461,6 +1462,9 @@ struct kvm_enc_region {
+ /* Available with KVM_CAP_ARM_SVE */
+ #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
+ 
++#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
++#define KVM_S390_CLEAR_RESET    _IO(KVMIO,   0xc4)
++
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+ 	/* Guest initialization commands */
+-- 
+2.20.1
 
