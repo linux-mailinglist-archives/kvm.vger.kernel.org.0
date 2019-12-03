@@ -2,236 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A36D11022B
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:25:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7006A110246
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:28:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726645AbfLCQZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 11:25:37 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52027 "EHLO
+        id S1727326AbfLCQ15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 11:27:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53946 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726319AbfLCQZh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:25:37 -0500
+        by vger.kernel.org with ESMTP id S1725848AbfLCQ14 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 3 Dec 2019 11:27:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575390336;
+        s=mimecast20190719; t=1575390475;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7gp/NLDCHcPBD7rTXpXJJ7UH2Y3VhuqxCT8Tk+uSXDc=;
-        b=bJfW38MX9V+G2cXjA4pJrBQUu/NdjkcVIVg58uNp5jlWqEwXvjU1GFD/i58xudyFQnMhEu
-        nNsZBhkbn/1O6k4HsWg0j3ergAuv+KSEAyV3NhaiNwfM2HIW8L5pBF7pmaUntaROZzd30P
-        MuQVTtaMYXq+IZlOIltBSErKo2JlOs4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-HUL4w6-mOSKNPFPUgCa3sw-1; Tue, 03 Dec 2019 11:25:35 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E61C18A07C1
-        for <kvm@vger.kernel.org>; Tue,  3 Dec 2019 16:25:34 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-121-180.rdu2.redhat.com [10.10.121.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B71F1600C8;
-        Tue,  3 Dec 2019 16:25:33 +0000 (UTC)
-From:   Cathy Avery <cavery@redhat.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: [PATCH kvm-unit-tests v2] svm: Verify the effect of V_INTR_MASKING on INTR interrupts
-Date:   Tue,  3 Dec 2019 11:25:32 -0500
-Message-Id: <20191203162532.24209-1-cavery@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+WnczAKQed6YpiIJYxujDrMx6sZk/yhl75EFdTgUL8M=;
+        b=gdIh/rdVY65cI1DlG71v4+gY9BEhLTT+2OwBZeICFk63rPc+zWkuZSywdMvSW2tMy8y5PN
+        +iP5+nbHchueW3K5VeMUGyDScUShQCBCOQYtmV83yeSQn+vYnvzRKL+mkisj6Kxyo78y6g
+        QOcpcJcI4RMQOWpeu6qBIKZAhDTAq14=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-BHu4-0LYM5abuY-wQfFXTg-1; Tue, 03 Dec 2019 11:27:51 -0500
+Received: by mail-qk1-f198.google.com with SMTP id q16so2527632qkc.20
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 08:27:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ZSHaj65Ct3ZOf9flXzApJ7gvW4At2V+yKIUimhT/dHk=;
+        b=SIS4uXnapc2ocUkrdyi7vtoWc5BYw1anELJSabfxpOGG4H1oQ9t/jIuqlT5rj25yI/
+         G77YzDUsw5VdJYh4dWDwqKTOxPCpQkB9iAeWJ7Clcj1tF0JjaPzxNp0ukJF9pd/yGvv9
+         wTfZdw0ozDHZSSmF4rZW2HGHl192MHl8Hrg3dZz7JH23u5zZAd2Cw3JMeeu4wD3Ok+c3
+         jF6Xgtd7lSiA/yg2Erx7tApo3Gf9Nlx1yTNcJtb+uD4RgyBEOF5CRL87v3NjQZ7FXy1B
+         G4SGfxA52efxMgmIt7fVH54md1wCWzIXRPtxi+KfX0SOfH10BcdCRKnw02MOfLuxqMcn
+         Sedw==
+X-Gm-Message-State: APjAAAVAtsxWbYB6Ib2jHjDmT5c4KiQtQqwBkDkY21LFtzUU07Uvch1w
+        QjZBw8QoyLAnX+GRRb2TKAUbKXwfZ65IItyHp7UUwwNL6O9e3oOj+NbI/ycG/5Wx85rdWuRTR1r
+        geKRCBhv50vaP
+X-Received: by 2002:a37:9485:: with SMTP id w127mr3842687qkd.128.1575390470111;
+        Tue, 03 Dec 2019 08:27:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyKKy4GZEoSBTWv3SIwooKspLWb4cJDbiCQx+onygw7OYAriklZioQoVK71vPsrpm59rrXIhA==
+X-Received: by 2002:a37:9485:: with SMTP id w127mr3842643qkd.128.1575390469634;
+        Tue, 03 Dec 2019 08:27:49 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id k50sm2086333qtc.90.2019.12.03.08.27.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2019 08:27:48 -0800 (PST)
+Date:   Tue, 3 Dec 2019 11:27:47 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Nitesh Narayan Lal <nitesh@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/5] KVM: X86: Fix callers of kvm_apic_match_dest() to
+ use correct macros
+Message-ID: <20191203162747.GD17275@xz-x1>
+References: <20191202201314.543-1-peterx@redhat.com>
+ <20191202201314.543-6-peterx@redhat.com>
+ <87r21lbl0c.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: HUL4w6-mOSKNPFPUgCa3sw-1
+In-Reply-To: <87r21lbl0c.fsf@vitty.brq.redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: BHu4-0LYM5abuY-wQfFXTg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The test confirms the influence of the V_INTR_MASKING bit
-on RFLAGS.IF. The expectation is while running a guest
-with V_INTR_MASKING cleared to zero:
+On Tue, Dec 03, 2019 at 02:23:47PM +0100, Vitaly Kuznetsov wrote:
+> Peter Xu <peterx@redhat.com> writes:
+>=20
+> > Callers of kvm_apic_match_dest() should always pass in APIC_DEST_*
+> > macros for either dest_mode and short_hand parameters.  Fix up all the
+> > callers of kvm_apic_match_dest() that are not following the rule.
+> >
+> > Reported-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  arch/x86/kvm/ioapic.c   | 11 +++++++----
+> >  arch/x86/kvm/irq_comm.c |  3 ++-
+> >  2 files changed, 9 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> > index 901d85237d1c..1082ca8d11e5 100644
+> > --- a/arch/x86/kvm/ioapic.c
+> > +++ b/arch/x86/kvm/ioapic.c
+> > @@ -108,8 +108,9 @@ static void __rtc_irq_eoi_tracking_restore_one(stru=
+ct kvm_vcpu *vcpu)
+> >  =09union kvm_ioapic_redirect_entry *e;
+> > =20
+> >  =09e =3D &ioapic->redirtbl[RTC_GSI];
+> > -=09if (!kvm_apic_match_dest(vcpu, NULL, 0,=09e->fields.dest_id,
+> > -=09=09=09=09e->fields.dest_mode))
+> > +=09if (!kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+> > +=09=09=09=09 e->fields.dest_id,
+> > +=09=09=09=09 kvm_lapic_irq_dest_mode(e->fields.dest_mode)))
+> >  =09=09return;
+> > =20
+> >  =09new_val =3D kvm_apic_pending_eoi(vcpu, e->fields.vector);
+> > @@ -237,6 +238,7 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, u=
+long *ioapic_handled_vectors)
+> >  =09struct dest_map *dest_map =3D &ioapic->rtc_status.dest_map;
+> >  =09union kvm_ioapic_redirect_entry *e;
+> >  =09int index;
+> > +=09u16 dm;
+> > =20
+> >  =09spin_lock(&ioapic->lock);
+> > =20
+> > @@ -250,8 +252,9 @@ void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu, u=
+long *ioapic_handled_vectors)
+> >  =09=09if (e->fields.trig_mode =3D=3D IOAPIC_LEVEL_TRIG ||
+> >  =09=09    kvm_irq_has_notifier(ioapic->kvm, KVM_IRQCHIP_IOAPIC, index)=
+ ||
+> >  =09=09    index =3D=3D RTC_GSI) {
+> > -=09=09=09if (kvm_apic_match_dest(vcpu, NULL, 0,
+> > -=09=09=09             e->fields.dest_id, e->fields.dest_mode) ||
+> > +=09=09=09dm =3D kvm_lapic_irq_dest_mode(e->fields.dest_mode);
+>=20
+> Nit: you could've defined 'dm' right here in the block (after '{') but
+> in any case I'd suggest to stick to 'dest_mode' and not shorten it to
+> 'dm' for consistency.
+>=20
+> > +=09=09=09if (kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+> > +=09=09=09=09=09=09e->fields.dest_id, dm) ||
+> >  =09=09=09    kvm_apic_pending_eoi(vcpu, e->fields.vector))
+> >  =09=09=09=09__set_bit(e->fields.vector,
+> >  =09=09=09=09=09  ioapic_handled_vectors);
+> > diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+> > index 5f59e5ebdbed..e89c2160b39f 100644
+> > --- a/arch/x86/kvm/irq_comm.c
+> > +++ b/arch/x86/kvm/irq_comm.c
+> > @@ -417,7 +417,8 @@ void kvm_scan_ioapic_routes(struct kvm_vcpu *vcpu,
+> > =20
+> >  =09=09=09kvm_set_msi_irq(vcpu->kvm, entry, &irq);
+> > =20
+> > -=09=09=09if (irq.level && kvm_apic_match_dest(vcpu, NULL, 0,
+> > +=09=09=09if (irq.level &&
+> > +=09=09=09    kvm_apic_match_dest(vcpu, NULL, APIC_DEST_NOSHORT,
+> >  =09=09=09=09=09=09irq.dest_id, irq.dest_mode))
+> >  =09=09=09=09__set_bit(irq.vector, ioapic_handled_vectors);
+> >  =09=09}
+>=20
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-- EFLAGS.IF controls both virtual and physical interrupts.
+I'll move the declaration in with your r-b.  'dm' is a silly trick of
+mine to avoid the 80-char line limit.  Thanks,
 
-While running a guest with V_INTR_MASKING set to 1:
-
-- The host EFLAGS.IF at the time of the VMRUN is saved and
-  controls physical interrupts while the guest is running.
-
-- The guest value of EFLAGS.IF controls virtual interrupts only.
-
-As discussed previously, this patch also modifies the vmrun
-loop ( test_run ) to allow running with HIF=3D0
-
-Signed-off-by: Cathy Avery <cavery@redhat.com>
----
-
-v2: Added suggested changes to set_host_if etc.
----
- x86/svm.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 103 insertions(+), 2 deletions(-)
-
-diff --git a/x86/svm.c b/x86/svm.c
-index 0360d8d..626179c 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -44,6 +44,8 @@ u64 runs;
- u8 *io_bitmap;
- u8 io_bitmap_area[16384];
-=20
-+u8 set_host_if;
-+
- #define MSR_BITMAP_SIZE 8192
-=20
- u8 *msr_bitmap;
-@@ -258,6 +260,7 @@ static void test_run(struct test *test, struct vmcb *vm=
-cb)
-=20
-     irq_disable();
-     test->vmcb =3D vmcb;
-+    set_host_if =3D 1;
-     test->prepare(test);
-     vmcb->save.rip =3D (ulong)test_thunk;
-     vmcb->save.rsp =3D (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
-@@ -266,21 +269,24 @@ static void test_run(struct test *test, struct vmcb *=
-vmcb)
-         tsc_start =3D rdtsc();
-         asm volatile (
-             "clgi \n\t"
-+            "cmpb $0, set_host_if\n\t"
-+            "jz 1f\n\t"
-+            "sti \n\t"
-+            "1: \n\t"
-             "vmload \n\t"
-             "mov regs+0x80, %%r15\n\t"  // rflags
-             "mov %%r15, 0x170(%0)\n\t"
-             "mov regs, %%r15\n\t"       // rax
-             "mov %%r15, 0x1f8(%0)\n\t"
-             LOAD_GPR_C
--            "sti \n\t"=09=09// only used if V_INTR_MASKING=3D1
-             "vmrun \n\t"
--            "cli \n\t"
-             SAVE_GPR_C
-             "mov 0x170(%0), %%r15\n\t"  // rflags
-             "mov %%r15, regs+0x80\n\t"
-             "mov 0x1f8(%0), %%r15\n\t"  // rax
-             "mov %%r15, regs\n\t"
-             "vmsave \n\t"
-+            "cli \n\t"
-             "stgi"
-             : : "a"(vmcb_phys)
-             : "rbx", "rcx", "rdx", "rsi",
-@@ -1386,6 +1392,98 @@ static bool pending_event_check(struct test *test)
-     return get_test_stage(test) =3D=3D 2;
- }
-=20
-+static void pending_event_prepare_vmask(struct test *test)
-+{
-+    default_prepare(test);
-+
-+    pending_event_ipi_fired =3D false;
-+
-+    set_host_if =3D 0;
-+
-+    handle_irq(0xf1, pending_event_ipi_isr);
-+
-+    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-+              APIC_DM_FIXED | 0xf1, 0);
-+
-+    set_test_stage(test, 0);
-+}
-+
-+static void pending_event_test_vmask(struct test *test)
-+{
-+    if (pending_event_ipi_fired =3D=3D true) {
-+        set_test_stage(test, -1);
-+        report("Interrupt preceeded guest", false);
-+        vmmcall();
-+    }
-+
-+    irq_enable();
-+    asm volatile ("nop");
-+    irq_disable();
-+
-+    if (pending_event_ipi_fired !=3D true) {
-+        set_test_stage(test, -1);
-+        report("Interrupt not triggered by guest", false);
-+    }
-+
-+    vmmcall();
-+
-+    irq_enable();
-+    asm volatile ("nop");
-+    irq_disable();
-+}
-+
-+static bool pending_event_finished_vmask(struct test *test)
-+{
-+    if ( test->vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
-+        report("VM_EXIT return to host is not EXIT_VMMCALL exit reason 0x%=
-x", false,
-+                test->vmcb->control.exit_code);
-+        return true;
-+    }
-+
-+    switch (get_test_stage(test)) {
-+    case 0:
-+        test->vmcb->save.rip +=3D 3;
-+
-+        pending_event_ipi_fired =3D false;
-+
-+        test->vmcb->control.int_ctl |=3D V_INTR_MASKING_MASK;
-+
-+        apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-+              APIC_DM_FIXED | 0xf1, 0);
-+
-+        break;
-+
-+    case 1:
-+        if (pending_event_ipi_fired =3D=3D true) {
-+            report("Interrupt triggered by guest", false);
-+            return true;
-+        }
-+
-+        irq_enable();
-+        asm volatile ("nop");
-+        irq_disable();
-+
-+        if (pending_event_ipi_fired !=3D true) {
-+            report("Interrupt not triggered by host", false);
-+            return true;
-+        }
-+
-+        break;
-+
-+    default:
-+        return true;
-+    }
-+
-+    inc_test_stage(test);
-+
-+    return get_test_stage(test) =3D=3D 2;
-+}
-+
-+static bool pending_event_check_vmask(struct test *test)
-+{
-+    return get_test_stage(test) =3D=3D 2;
-+}
-+
- static struct test tests[] =3D {
-     { "null", default_supported, default_prepare, null_test,
-       default_finished, null_check },
-@@ -1438,6 +1536,9 @@ static struct test tests[] =3D {
-       lat_svm_insn_finished, lat_svm_insn_check },
-     { "pending_event", default_supported, pending_event_prepare,
-       pending_event_test, pending_event_finished, pending_event_check },
-+    { "pending_event_vmask", default_supported, pending_event_prepare_vmas=
-k,
-+      pending_event_test_vmask, pending_event_finished_vmask,
-+      pending_event_check_vmask },
- };
-=20
- int main(int ac, char **av)
 --=20
-2.20.1
+Peter Xu
 
