@@ -2,295 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2798710F4E1
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 03:15:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10CF210F4E8
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 03:19:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfLCCPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Dec 2019 21:15:18 -0500
-Received: from mga18.intel.com ([134.134.136.126]:35025 "EHLO mga18.intel.com"
+        id S1726079AbfLCCTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Dec 2019 21:19:40 -0500
+Received: from mga07.intel.com ([134.134.136.100]:24453 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725899AbfLCCPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Dec 2019 21:15:18 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725941AbfLCCTk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Dec 2019 21:19:40 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Dec 2019 18:15:17 -0800
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Dec 2019 18:19:38 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,271,1571727600"; 
-   d="scan'208";a="204797838"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga008.jf.intel.com with ESMTP; 02 Dec 2019 18:15:14 -0800
-Date:   Mon, 2 Dec 2019 18:15:14 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [RFC PATCH 13/28] kvm: mmu: Add an iterator for concurrent
- paging structure walks
-Message-ID: <20191203021514.GK8120@linux.intel.com>
-References: <20190926231824.149014-1-bgardon@google.com>
- <20190926231824.149014-14-bgardon@google.com>
+   d="scan'208";a="222654206"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by orsmga002.jf.intel.com with ESMTP; 02 Dec 2019 18:19:35 -0800
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        ashok.raj@intel.com, sanjay.k.kumar@intel.com,
+        kevin.tian@intel.com, yi.l.liu@intel.com, yi.y.sun@intel.com,
+        Peter Xu <peterx@redhat.com>, iommu@lists.linux-foundation.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/8] Use 1st-level for DMA remapping
+To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
+References: <20191128022550.9832-1-baolu.lu@linux.intel.com>
+ <20191202121927.2fef85ba@jacob-builder>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <608f472b-3eb1-8ea9-1561-cdf2e8191793@linux.intel.com>
+Date:   Tue, 3 Dec 2019 10:19:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190926231824.149014-14-bgardon@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191202121927.2fef85ba@jacob-builder>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 26, 2019 at 04:18:09PM -0700, Ben Gardon wrote:
-> Add a utility for concurrent paging structure traversals. This iterator
-> uses several mechanisms to ensure that its accesses to paging structure
-> memory are safe, and that memory can be freed safely in the face of
-> lockless access. The purpose of the iterator is to create a unified
-> pattern for concurrent paging structure traversals and simplify the
-> implementation of other MMU functions.
+Hi Jacob,
+
+Thanks for reviewing it.
+
+On 12/3/19 4:19 AM, Jacob Pan wrote:
+> On Thu, 28 Nov 2019 10:25:42 +0800
+> Lu Baolu <baolu.lu@linux.intel.com> wrote:
 > 
-> This iterator implements a pre-order traversal of PTEs for a given GFN
-> range within a given address space. The iterator abstracts away
-> bookkeeping on successful changes to PTEs, retrying on failed PTE
-> modifications, TLB flushing, and yielding during long operations.
+>> Intel VT-d in scalable mode supports two types of page talbes
+> tables
+
+Got it, thanks!
+
+>> for DMA translation: the first level page table and the second
+>> level page table. The first level page table uses the same
+>> format as the CPU page table, while the second level page table
+>> keeps compatible with previous formats. The software is able
+>> to choose any one of them for DMA remapping according to the use
+>> case.
+>>
+>> This patchset aims to move IOVA (I/O Virtual Address) translation
+> move guest IOVA only, right?
+
+No. In v1, only for guest IOVA. This has been changed since v2 according
+to comments during v1 review period. v2 will use first level for both
+host and guest unless nested mode.
+
+>> to 1st-level page table in scalable mode. This will simplify vIOMMU
+>> (IOMMU simulated by VM hypervisor) design by using the two-stage
+>> translation, a.k.a. nested mode translation.
+>>
+>> As Intel VT-d architecture offers caching mode, guest IOVA (GIOVA)
+>> support is now implemented in a shadow page manner. The device
+>> simulation software, like QEMU, has to figure out GIOVA->GPA mappings
+>> and write them to a shadowed page table, which will be used by the
+>> physical IOMMU. Each time when mappings are created or destroyed in
+>> vIOMMU, the simulation software has to intervene. Hence, the changes
+>> on GIOVA->GPA could be shadowed to host.
+>>
+>>
+>>       .-----------.
+>>       |  vIOMMU   |
+>>       |-----------|                 .--------------------.
+>>       |           |IOTLB flush trap |        QEMU        |
+>>       .-----------. (map/unmap)     |--------------------|
+>>       |GIOVA->GPA |---------------->|    .------------.  |
+>>       '-----------'                 |    | GIOVA->HPA |  |
+>>       |           |                 |    '------------'  |
+>>       '-----------'                 |                    |
+>>                                     |                    |
+>>                                     '--------------------'
+>>                                                  |
+>>              <------------------------------------
+>>              |
+>>              v VFIO/IOMMU API
+>>        .-----------.
+>>        |  pIOMMU   |
+>>        |-----------|
+>>        |           |
+>>        .-----------.
+>>        |GIOVA->HPA |
+>>        '-----------'
+>>        |           |
+>>        '-----------'
+>>
+>> In VT-d 3.0, scalable mode is introduced, which offers two-level
+>> translation page tables and nested translation mode. Regards to
+>> GIOVA support, it can be simplified by 1) moving the GIOVA support
+>> over 1st-level page table to store GIOVA->GPA mapping in vIOMMU,
+>> 2) binding vIOMMU 1st level page table to the pIOMMU, 3) using pIOMMU
+>> second level for GPA->HPA translation, and 4) enable nested (a.k.a.
+>> dual-stage) translation in host. Compared with current shadow GIOVA
+>> support, the new approach makes the vIOMMU design simpler and more
+>> efficient as we only need to flush the pIOMMU IOTLB and possible
+>> device-IOTLB when an IOVA mapping in vIOMMU is torn down.
+>>
+>>       .-----------.
+>>       |  vIOMMU   |
+>>       |-----------|                 .-----------.
+>>       |           |IOTLB flush trap |   QEMU    |
+>>       .-----------.    (unmap)      |-----------|
+>>       |GIOVA->GPA |---------------->|           |
+>>       '-----------'                 '-----------'
+>>       |           |                       |
+>>       '-----------'                       |
+>>             <------------------------------
+>>             |      VFIO/IOMMU
+>>             |  cache invalidation and
+>>             | guest gpd bind interfaces
+>>             v
+>>       .-----------.
+>>       |  pIOMMU   |
+>>       |-----------|
+>>       .-----------.
+>>       |GIOVA->GPA |<---First level
+>>       '-----------'
+>>       | GPA->HPA  |<---Scond level
+>>       '-----------'
+>>       '-----------'
+>>
+>> This patch set includes two parts. The former part implements the
+>> per-domain page table abstraction, which makes the page table
+>> difference transparent to various map/unmap APIs. The later part
+> s/later/latter/
+>> applies the first level page table for IOVA translation unless the
+>> DOMAIN_ATTR_NESTING domain attribution has been set, which indicates
+>> nested mode in use.
+>>
+> Maybe I am reading this wrong, but shouldn't it be the opposite?
+> i.e. Use FL page table for IOVA if it is a nesting domain?
+
+My description seems to a bit confusing. If DOMAIN_ATTR_NESTING is set
+for a domain, the second level will be used to map gPA (guest physical
+address) to hPA (host physical address), and the mappings between gVA (
+guest virtual address) and gPA will be maintained by the guest with the
+page table address binding to host's first level. Otherwise, first level
+will be used for mapping between gPA and hPA, or IOVA and DMA address.
+
+Best regards,
+baolu
+
 > 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/kvm/mmu.c      | 455 ++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/mmutrace.h |  50 +++++
->  2 files changed, 505 insertions(+)
-
-...
-
-> +/*
-> + * Sets a direct walk iterator to seek the gfn range [start, end).
-> + * If end is greater than the maximum possible GFN, it will be changed to the
-> + * maximum possible gfn + 1. (Note that start/end is and inclusive/exclusive
-> + * range, so the last gfn to be interated over would be the largest possible
-> + * GFN, in this scenario.)
-> + */
-> +__attribute__((unused))
-> +static void direct_walk_iterator_setup_walk(struct direct_walk_iterator *iter,
-> +	struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
-> +	enum mmu_lock_mode lock_mode)
-
-Echoing earlier patches, please introduce variables/flags/functions along
-with their users.  I have a feeling you're adding some of the unused
-functions so that all flags/variables in struct direct_walk_iterator can
-be in place from the get-go, but that actually makes everything much harder
-to review.
-
-> +{
-> +	BUG_ON(!kvm->arch.direct_mmu_enabled);
-> +	BUG_ON((lock_mode & MMU_WRITE_LOCK) && (lock_mode & MMU_READ_LOCK));
-> +	BUG_ON(as_id < 0);
-> +	BUG_ON(as_id >= KVM_ADDRESS_SPACE_NUM);
-> +	BUG_ON(!VALID_PAGE(kvm->arch.direct_root_hpa[as_id]));
-> +
-> +	/* End cannot be greater than the maximum possible gfn. */
-> +	end = min(end, 1ULL << (PT64_ROOT_4LEVEL * PT64_PT_BITS));
-> +
-> +	iter->as_id = as_id;
-> +	iter->pt_path[PT64_ROOT_4LEVEL - 1] =
-> +			(u64 *)__va(kvm->arch.direct_root_hpa[as_id]);
-> +
-> +	iter->walk_start = start;
-> +	iter->walk_end = end;
-> +	iter->target_gfn = start;
-> +
-> +	iter->lock_mode = lock_mode;
-> +	iter->kvm = kvm;
-> +	iter->tlbs_dirty = 0;
-> +
-> +	direct_walk_iterator_start_traversal(iter);
-> +}
-
-...
-
-> +static void direct_walk_iterator_cond_resched(struct direct_walk_iterator *iter)
-> +{
-> +	if (!(iter->lock_mode & MMU_LOCK_MAY_RESCHED) || !need_resched())
-> +		return;
-> +
-> +	direct_walk_iterator_prepare_cond_resched(iter);
-> +	cond_resched();
-> +	direct_walk_iterator_finish_cond_resched(iter);
-> +}
-> +
-> +static bool direct_walk_iterator_next_pte(struct direct_walk_iterator *iter)
-> +{
-> +	/*
-> +	 * This iterator could be iterating over a large number of PTEs, such
-> +	 * that if this thread did not yield, it would cause scheduler\
-> +	 * problems. To avoid this, yield if needed. Note the check on
-> +	 * MMU_LOCK_MAY_RESCHED in direct_walk_iterator_cond_resched. This
-> +	 * iterator will not yield unless that flag is set in its lock_mode.
-> +	 */
-> +	direct_walk_iterator_cond_resched(iter);
-
-This looks very fragile, e.g. one of the future patches even has to avoid
-problems with this code by limiting the number of PTEs it processes.
-
-> +
-> +	while (true) {
-> +		if (!direct_walk_iterator_next_pte_raw(iter))
-
-Implicitly initializing the iterator during next_pte_raw() is asking for
-problems, e.g. @walk_in_progress should not exist.  The standard kernel
-pattern for fancy iterators is to wrap the initialization, deref, and
-advancement operators in a macro, e.g. something like:
-
-	for_each_direct_pte(...) {
-
-	}
-
-That might require additional control flow logic in the users of the
-iterator, but if so that's probably a good thing in terms of readability
-and robustness.  E.g. verifying that rcu_read_unlock() is guaranteed to
-be called is extremely difficult as rcu_read_lock() is buried in this
-low level helper but the iterator relies on the top-level caller to
-terminate traversal.
-
-See mem_cgroup_iter_break() for one example of handling an iter walk
-where an action needs to taken when the walk terminates early.
-
-> +			return false;
-> +
-> +		direct_walk_iterator_recalculate_output_fields(iter);
-> +		if (iter->old_pte != DISCONNECTED_PTE)
-> +			break;
-> +
-> +		/*
-> +		 * The iterator has encountered a disconnected pte, so it is in
-> +		 * a page that has been disconnected from the root. Restart the
-> +		 * traversal from the root in this case.
-> +		 */
-> +		direct_walk_iterator_reset_traversal(iter);
-
-I understand wanting to hide details to eliminate copy-paste, but this
-goes too far and makes it too difficult to understand the flow of the
-top-level walks.  Ditto for burying retry_pte() in set_pte().  I'd say it
-also applies to skip_step_down(), but AFAICT that's dead code.
-
-Off-topic for a second, the super long direct_walk_iterator_... names
-make me want to simply call this new MMU the "tdp MMU" and just live with
-the discrepancy until the old shadow-based TDP MMU can be nuked.  Then we
-could have tdp_iter_blah_blah_blah(), for_each_tdp_present_pte(), etc...
-
-Back to the iterator, I think it can be massaged into a standard for loop
-approach without polluting the top level walkers much.  The below code is
-the basic idea, e.g. the macros won't compile, probably doesn't terminate
-the walk correct, rescheduling is missing, etc...
-
-Note, open coding the down/sideways/up helpers is 50% personal preference,
-50% because gfn_start and gfn_end are now local variables, and 50% because
-it was the easiest way to learn the code.  I wouldn't argue too much about
-having one or more of the helpers.
-
-
-static void tdp_iter_break(struct tdp_iter *iter)
-{
-	/* TLB flush, RCU unlock, etc...)
-}
-
-static void tdp_iter_next(struct tdp_iter *iter, bool *retry)
-{
-	gfn_t gfn_start, gfn_end;
-	u64 *child_pt;
-
-	if (*retry) {
-		*retry = false;
-		return;
-	}
-
-	/*
-	 * Reread the pte before stepping down to avoid traversing into page
-	 * tables that are no longer linked from this entry. This is not
-	 * needed for correctness - just a small optimization.
-	 */
-	iter->old_pte = READ_ONCE(*iter->ptep);
-
-	/* Try to step down. */
-	child_pt = pte_to_child_pt(iter->old_pte, iter->level);
-	if (child_pt) {
-		child_pt = rcu_dereference(child_pt);
-		iter->level--;
-		iter->pt_path[iter->level - 1] = child_pt;
-		return;
-	}
-
-step_sideways:
-	/* Try to step sideways. */
-	gfn_start = ALIGN_DOWN(iter->target_gfn,
-			       KVM_PAGES_PER_HPAGE(iter->level));
-	gfn_end = gfn_start + KVM_PAGES_PER_HPAGE(iter->level)
-
-	/*
-	 * If the current gfn maps past the target gfn range, the next entry in
-	 * the current page table will be outside the target range.
-	 */
-	if (gfn_end >= iter->walk_end ||
-	    !(gfn_end % KVM_PAGES_PER_HPAGE(iter->level + 1))) {
-		/* Try to step up. */
-		iter->level++;
-
-		if (iter->level > PT64_ROOT_4LEVEL; {
-			/* This is ugly, there's probably a better solution. */
-			tdp_iter_break(iter);
-			return;
-		}
-		goto step_sideways;
-	}
-
-	iter->target_gfn = gfn_end;
-	iter->ptep = iter->pt_path[iter->level - 1] +
-			PT64_INDEX(iter->target_gfn << PAGE_SHIFT, iter->level);
-	iter->old_pte = READ_ONCE(*iter->ptep);
-}
-
-#define for_each_tdp_pte(iter, start, end, retry)
-	for (tdp_iter_start(&iter, start, end);
-	     iter->level <= PT64_ROOT_4LEVEL;
-	     tdp_iter_next(&iter, &retry))
-
-#define for_each_tdp_present_pte(iter, start, end, retry)
-	for_each_tdp_pte(iter, start, end, retry)
-		if (!is_present_direct_pte(iter->old_pte)) {
-
-		} else
-
-#define for_each_tdp_present_leaf_pte(iter, start, end, retry)
-	for_each_tdp_pte(iter, start, end, retry)
-		if (!is_present_direct_pte(iter->old_pte) ||
-		    !is_last_spte(iter->old_pte, iter->level))
-		{
-
-		} else
-
-/*
- * Marks the range of gfns, [start, end), non-present.
- */
-static bool zap_direct_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
-				 gfn_t end, enum mmu_lock_mode lock_mode)
-{
-	struct direct_walk_iterator iter;
-	bool retry;
-
-	tdp_iter_init(&iter, kvm, as_id, lock_mode);
-
-restart:
-	retry = false;
-	for_each_tdp_present_pte(iter, start, end, retry) {
-		if (tdp_iter_set_pte(&iter, 0))
-			retry = true;
-
-		if (tdp_iter_disconnected(&iter)) {
-			tdp_iter_break(&iter);
-			goto restart;
-		}
-	}
-}
-
+>> Based-on-idea-by: Ashok Raj <ashok.raj@intel.com>
+>> Based-on-idea-by: Kevin Tian <kevin.tian@intel.com>
+>> Based-on-idea-by: Liu Yi L <yi.l.liu@intel.com>
+>> Based-on-idea-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Based-on-idea-by: Sanjay Kumar <sanjay.k.kumar@intel.com>
+>> Based-on-idea-by: Lu Baolu <baolu.lu@linux.intel.com>
+>>
+>> Change log:
+>>
+>>   v1->v2
+>>   - The first series was posted here
+>>     https://lkml.org/lkml/2019/9/23/297
+>>   - Use per domain page table ops to handle different page tables.
+>>   - Use first level for DMA remapping by default on both bare metal
+>>     and vm guest.
+>>   - Code refine according to code review comments for v1.
+>>
+>> Lu Baolu (8):
+>>    iommu/vt-d: Add per domain page table ops
+>>    iommu/vt-d: Move domain_flush_cache helper into header
+>>    iommu/vt-d: Implement second level page table ops
+>>    iommu/vt-d: Apply per domain second level page table ops
+>>    iommu/vt-d: Add first level page table interfaces
+>>    iommu/vt-d: Implement first level page table ops
+>>    iommu/vt-d: Identify domains using first level page table
+>>    iommu/vt-d: Add set domain DOMAIN_ATTR_NESTING attr
+>>
+>>   drivers/iommu/Makefile             |   2 +-
+>>   drivers/iommu/intel-iommu.c        | 412
+>> +++++++++++++++++++++++------ drivers/iommu/intel-pgtable.c      |
+>> 376 ++++++++++++++++++++++++++ include/linux/intel-iommu.h        |
+>> 64 ++++- include/trace/events/intel_iommu.h |  60 +++++
+>>   5 files changed, 837 insertions(+), 77 deletions(-)
+>>   create mode 100644 drivers/iommu/intel-pgtable.c
+>>
+> 
+> [Jacob Pan]
+> 
