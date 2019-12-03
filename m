@@ -2,136 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E98DA10FABB
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 10:26:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB12310FAD0
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 10:36:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726350AbfLCJ0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 04:26:55 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43990 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbfLCJ0y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Dec 2019 04:26:54 -0500
-Received: by mail-wr1-f67.google.com with SMTP id n1so2676399wra.10;
-        Tue, 03 Dec 2019 01:26:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=SZdfC+gFtVklBpHF7XF3yKS4xbagQBubfYPugqhRugk=;
-        b=aDs2YAsOEnOy5MORl6ZJIiOEESJ7SrV+tBNsG7s0DhwI8IAa+WmSS2HHd4QyjWGSJ/
-         ldRTToqQ7fQK307trD2DA1pagxWm6spcShdYjO1bCT5zkFNurwT8D0qFsmSSEUBqQVn9
-         Z2Zj1HZOONpz9ZI8OlPB6cYCLrisPtiHZPkN+kZ/Qkwrv6OYQdkg4ifUYV0RgQrtxBHy
-         Ngqwe37IcYAgs+JB/PBz+qMv8mc+6lkEbD2x5TcMRk7CuL/LFUSdqB1iMLYZ4bG1D9G2
-         wj0QR3TKc67oNoo5knJzrwdTSto5TOtorlUqVKc7rBt0YKFHYhH+mW0TIY8+1NlWPXWq
-         fHAQ==
+        id S1726075AbfLCJgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 04:36:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29462 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725907AbfLCJgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Dec 2019 04:36:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575365806;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=G7W/BEttJw33HncNG+QW+oMA8U8SyQxme1y4KXgd/4w=;
+        b=XlUXLFyfYJq8tfcghw0aIEM/oeb9Q8SMasiHGFHurUwStLn1QrJb4xZW/peEXIgc6LuSIB
+        kfvHQi01dxKxKpcjMM8LH5n+sDsRJpGT2zE9HFEbPS7bSANbKzxmWy+NlARLmVmV/eZdGy
+        k9RcXcc4W2z4kcNk2C4reIIFR6BSQ2U=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-xgYVQ0LxOEGpW1aTO68YJQ-1; Tue, 03 Dec 2019 04:36:45 -0500
+Received: by mail-wr1-f71.google.com with SMTP id h7so1490529wrb.2
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 01:36:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=SZdfC+gFtVklBpHF7XF3yKS4xbagQBubfYPugqhRugk=;
-        b=c1AdemUnx3odErCdLs+LsxlPTyI49QecveN/sDr4pYlv1bTx+tBjxZua0Z+sO6RbkR
-         BLqV+rkAx12Pxyo7NHFe0hw7feRtOhOXrr3r+HPD652yaaiP9yDYsbGXom7XxBJeDAT5
-         un3YcuudF2Oh84ITlNBGmltQ2TWfNIN6AZD0CNI4i6jhrMCALri4xfo91ZnbETbGwZYV
-         mUD3YsxHKGlYJanSXo6M9NWO7v/i/SUpIBsuUh8c+8Mm+/RCjievx+yXCp7r5Hb95dbq
-         vBTLJkdffJc4hA2taQ89kJf/mUabLrVoHIh6WWmpq0aOJhnEWVVC03we6SjAoXpTdGeO
-         Nxzg==
-X-Gm-Message-State: APjAAAX3SAyo34SWOyIVUxxYy27w3qJqh3oSsO6a/BsSCGUETXteo/1x
-        TF142FSfwbpTs9ULp4+KQDg=
-X-Google-Smtp-Source: APXvYqyWUu9z3na0YvFr46Iqp7ei5QNeidd0TaMx3re4eCOYeNXe9t/Q0pvxheWa/uyUnaKqbmgSNw==
-X-Received: by 2002:a5d:43c7:: with SMTP id v7mr3806207wrr.32.1575365212035;
-        Tue, 03 Dec 2019 01:26:52 -0800 (PST)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id v17sm2696979wrt.91.2019.12.03.01.26.50
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=PYrn284OnyQbwOX3aztUCmwgxQvrGOQTIkrwcm0f+tU=;
+        b=ib2z3JDpPuBEe7KtN4lDfr0MPxA5peJKy8x6Nq1/eb7aBwSJqF5F/3pR1+cX+VuKa9
+         lYaOPY3LI8uju+DS1qzyEVrKgj6iywLvej05AmaOewBchuY064sQW6cpoG8AViJIPXEC
+         W3YVEqX4i4svrsy/M7aliWnZUwzk4dsK/iSeQCLd4/PAjZPoUXgXicsTdHEIsj8qVqLu
+         vZU1FJ9wfghdfd1JS0K9z/GR/evj0m9XylLPKwogRmfnX5156zjVi9JPXo5KPk7z4xWU
+         C3ALyaPt8oBGiyjtsEoc6/5ucfEaOIeyKtJFa99HXwYkkKC7tf7rJhkilRFgiAO1LK0p
+         P1Fg==
+X-Gm-Message-State: APjAAAWAdM6Piu87OmNyI4gCSjuCFDSjA/ceKM25Yu2t/SxX9V7q3wF0
+        Cd59KPTuNkJuzfQFEucdC8igelMJibvLSYeX96XZ0jm8gmTEWXhtWnPkPSQiF2aZxX2XZ4KB7rW
+        B51bswVX0dTLb
+X-Received: by 2002:adf:fc0c:: with SMTP id i12mr4327213wrr.74.1575365804430;
+        Tue, 03 Dec 2019 01:36:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzPFWXKDRpoZf/KCKfb5i8PwcpIMWn5vZ9LAaSrgN4RGhU6QMmDMyKz6URhOnw9kJ41TEjIhQ==
+X-Received: by 2002:adf:fc0c:: with SMTP id i12mr4327192wrr.74.1575365804191;
+        Tue, 03 Dec 2019 01:36:44 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id c136sm2517681wme.23.2019.12.03.01.36.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 01:26:50 -0800 (PST)
-Date:   Tue, 3 Dec 2019 09:26:49 +0000
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jorgen Hansen <jhansen@vmware.com>
-Subject: Re: [RFC PATCH 0/3] vsock: support network namespace
-Message-ID: <20191203092649.GB153510@stefanha-x1.localdomain>
-References: <20191128171519.203979-1-sgarzare@redhat.com>
+        Tue, 03 Dec 2019 01:36:43 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        peterx@redhat.com
+Subject: Re: [PATCH v3 2/5] KVM: X86: Move irrelevant declarations out of ioapic.h
+In-Reply-To: <20191202201314.543-3-peterx@redhat.com>
+References: <20191202201314.543-1-peterx@redhat.com> <20191202201314.543-3-peterx@redhat.com>
+Date:   Tue, 03 Dec 2019 10:36:42 +0100
+Message-ID: <8736e1da39.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="XOIedfhf+7KOe/yw"
-Content-Disposition: inline
-In-Reply-To: <20191128171519.203979-1-sgarzare@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-MC-Unique: xgYVQ0LxOEGpW1aTO68YJQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Peter Xu <peterx@redhat.com> writes:
 
---XOIedfhf+7KOe/yw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> kvm_apic_match_dest() is declared in both ioapic.h and lapic.h.
+> Removing the declaration in ioapic.h.
+>
+> kvm_apic_compare_prio() is declared in ioapic.h but defined in
+> lapic.c.  Moving the declaration to lapic.h.
+>
+> kvm_irq_delivery_to_apic() is declared in ioapic.h but defined in
+> irq_comm.c.  Moving the declaration to irq.h.
 
-On Thu, Nov 28, 2019 at 06:15:16PM +0100, Stefano Garzarella wrote:
-> Hi,
-> now that we have multi-transport upstream, I started to take a look to
-> support network namespace (netns) in vsock.
->=20
-> As we partially discussed in the multi-transport proposal [1], it could
-> be nice to support network namespace in vsock to reach the following
-> goals:
-> - isolate host applications from guest applications using the same ports
->   with CID_ANY
-> - assign the same CID of VMs running in different network namespaces
-> - partition VMs between VMMs or at finer granularity
->=20
-> This preliminary implementation provides the following behavior:
-> - packets received from the host (received by G2H transports) are
->   assigned to the default netns (init_net)
-> - packets received from the guest (received by H2G - vhost-vsock) are
->   assigned to the netns of the process that opens /dev/vhost-vsock
->   (usually the VMM, qemu in my tests, opens the /dev/vhost-vsock)
->     - for vmci I need some suggestions, because I don't know how to do
->       and test the same in the vmci driver, for now vmci uses the
->       init_net
-> - loopback packets are exchanged only in the same netns
->=20
-> Questions:
-> 1. Should we make configurable the netns (now it is init_net) where
->    packets from the host should be delivered?
+Nitpicking: 'imperative mode' requested by Sean would be "remove the
+declaration", "move the declaration",...
 
-Yes, it should be possible to have multiple G2H (e.g. virtio-vsock)
-devices and to assign them to different net namespaces.  Something like
-net/core/dev.c:dev_change_net_namespace() will eventually be needed.
+>
+> While at it, include irq.h in hyperv.c because it needs to use
+> kvm_irq_delivery_to_apic().
 
-> 2. Should we provide an ioctl in vhost-vsock to configure the netns
->    to use? (instead of using the netns of the process that opens
->    /dev/vhost-vsock)
+"While at it" is being used when you are trying to squeeze in a (small)
+unrelated change (fix a typo, rename a variable,...) but here it's not
+the case: including irq.h to hyperv.c is mandatory (to not break the
+build).
 
-Creating the vhost-vsock instance in the process' net namespace makes
-sense.  Maybe wait for a use case before adding an ioctl.
+"Include irq.h in hyperv.c to support the change" would do (but honestly
+I don't see much value in the statement so I'd rather omit in in the
+changelog).
 
-> 3. Should we provide a way to disable the netns support in vsock?
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  arch/x86/kvm/hyperv.c | 1 +
+>  arch/x86/kvm/ioapic.h | 6 ------
+>  arch/x86/kvm/irq.h    | 3 +++
+>  arch/x86/kvm/lapic.h  | 2 +-
+>  4 files changed, 5 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 23ff65504d7e..c7d4640b7b1c 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -33,6 +33,7 @@
+>  #include <trace/events/kvm.h>
+> =20
+>  #include "trace.h"
+> +#include "irq.h"
+> =20
+>  #define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 64)
+> =20
+> diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
+> index ea1a4e0297da..2fb2e3c80724 100644
+> --- a/arch/x86/kvm/ioapic.h
+> +++ b/arch/x86/kvm/ioapic.h
+> @@ -116,9 +116,6 @@ static inline int ioapic_in_kernel(struct kvm *kvm)
+>  }
+> =20
+>  void kvm_rtc_eoi_tracking_restore_one(struct kvm_vcpu *vcpu);
+> -bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source=
+,
+> -=09=09int short_hand, unsigned int dest, int dest_mode);
+> -int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2=
+);
+>  void kvm_ioapic_update_eoi(struct kvm_vcpu *vcpu, int vector,
+>  =09=09=09int trigger_mode);
+>  int kvm_ioapic_init(struct kvm *kvm);
+> @@ -126,9 +123,6 @@ void kvm_ioapic_destroy(struct kvm *kvm);
+>  int kvm_ioapic_set_irq(struct kvm_ioapic *ioapic, int irq, int irq_sourc=
+e_id,
+>  =09=09       int level, bool line_status);
+>  void kvm_ioapic_clear_all(struct kvm_ioapic *ioapic, int irq_source_id);
+> -int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+> -=09=09=09     struct kvm_lapic_irq *irq,
+> -=09=09=09     struct dest_map *dest_map);
+>  void kvm_get_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
+>  void kvm_set_ioapic(struct kvm *kvm, struct kvm_ioapic_state *state);
+>  void kvm_ioapic_scan_entry(struct kvm_vcpu *vcpu,
+> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+> index 7c6233d37c64..f173ab6b407e 100644
+> --- a/arch/x86/kvm/irq.h
+> +++ b/arch/x86/kvm/irq.h
+> @@ -113,5 +113,8 @@ int apic_has_pending_timer(struct kvm_vcpu *vcpu);
+> =20
+>  int kvm_setup_default_irq_routing(struct kvm *kvm);
+>  int kvm_setup_empty_irq_routing(struct kvm *kvm);
+> +int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+> +=09=09=09     struct kvm_lapic_irq *irq,
+> +=09=09=09     struct dest_map *dest_map);
+> =20
+>  #endif
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 39925afdfcdc..0b9bbadd1f3c 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -83,7 +83,7 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offs=
+et, int len,
+>  =09=09       void *data);
+>  bool kvm_apic_match_dest(struct kvm_vcpu *vcpu, struct kvm_lapic *source=
+,
+>  =09=09=09   int short_hand, unsigned int dest, int dest_mode);
+> -
+> +int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2=
+);
+>  bool __kvm_apic_update_irr(u32 *pir, void *regs, int *max_irr);
+>  bool kvm_apic_update_irr(struct kvm_vcpu *vcpu, u32 *pir, int *max_irr);
+>  void kvm_apic_update_ppr(struct kvm_vcpu *vcpu);
 
-The code should follow CONFIG_NET_NS semantics.  I'm not sure what they
-are exactly since struct net is always defined, regardless of whether
-network namespaces are enabled.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
---XOIedfhf+7KOe/yw
-Content-Type: application/pgp-signature; name="signature.asc"
+--=20
+Vitaly
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3mKlkACgkQnKSrs4Gr
-c8h54wf/eNE48AsDKZkZl+68dw3paeS7KLIQEPgUklUhfhqp/IHdX9uG2R88hvCl
-rMCQbGHSMQ+yb7gPxN1+0tVXFX7Rf2Cqed4Lwqfq0VvufS80FUk4GiQZKKgk4LRv
-/8x4or61TnKGbApxbJnQ+zdj1OirmGwrO8jEt4beMPgsfY80yzl6GcKwYwsOYzeg
-w+28vrKtnprab8l8D0DnVIggTtyep72rsGdeOi4KtSmrUoM8GVExUDmwBQtUJ4xo
-5+OJJjQ+EzPuKWxGIahFrZAHDGerrVHWyltH/LTq+BU0VNR+Ta726WWzDKVx7v6d
-YQm7/TdSAT3l9Id0uVC9+DEM455UIw==
-=v5qS
------END PGP SIGNATURE-----
-
---XOIedfhf+7KOe/yw--
