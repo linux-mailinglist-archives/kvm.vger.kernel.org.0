@@ -2,97 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C0A10F782
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 06:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C898310F917
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 08:45:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726955AbfLCFu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 00:50:56 -0500
-Received: from mga03.intel.com ([134.134.136.65]:28046 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726661AbfLCFuz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Dec 2019 00:50:55 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Dec 2019 21:50:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,272,1571727600"; 
-   d="scan'208";a="213289692"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.41])
-  by orsmga006.jf.intel.com with ESMTP; 02 Dec 2019 21:50:54 -0800
-Date:   Mon, 2 Dec 2019 21:50:54 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 03/15] KVM: Add build-time error check on kvm_run size
-Message-ID: <20191203055054.GL8120@linux.intel.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-4-peterx@redhat.com>
- <20191202193027.GH4063@linux.intel.com>
- <20191202205315.GD31681@xz-x1>
- <20191202221949.GD8120@linux.intel.com>
- <20191202224034.GH31681@xz-x1>
+        id S1727497AbfLCHo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 02:44:56 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:7192 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727459AbfLCHoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Dec 2019 02:44:55 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 2F25094BB710449FBC82;
+        Tue,  3 Dec 2019 15:44:53 +0800 (CST)
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 3 Dec 2019 15:44:46 +0800
+From:   Zenghui Yu <yuzenghui@huawei.com>
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wanghaibin.wang@huawei.com>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: Remove duplicated declaration of kvm_vcpu_kick
+Date:   Tue, 3 Dec 2019 15:44:08 +0800
+Message-ID: <20191203074408.1758-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191202224034.GH31681@xz-x1>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 02, 2019 at 05:40:34PM -0500, Peter Xu wrote:
-> On Mon, Dec 02, 2019 at 02:19:49PM -0800, Sean Christopherson wrote:
-> > On Mon, Dec 02, 2019 at 03:53:15PM -0500, Peter Xu wrote:
-> > > On Mon, Dec 02, 2019 at 11:30:27AM -0800, Sean Christopherson wrote:
-> > > > On Fri, Nov 29, 2019 at 04:34:53PM -0500, Peter Xu wrote:
-> > > > > It's already going to reach 2400 Bytes (which is over half of page
-> > > > > size on 4K page archs), so maybe it's good to have this build-time
-> > > > > check in case it overflows when adding new fields.
-> > > > 
-> > > > Please explain why exceeding PAGE_SIZE is a bad thing.  I realize it's
-> > > > almost absurdly obvious when looking at the code, but a) the patch itself
-> > > > does not provide that context and b) the changelog should hold up on its
-> > > > own,
-> > > 
-> > > Right, I'll enhance the commit message.
-> > > 
-> > > > e.g. in a mostly hypothetical case where the allocation of vcpu->run
-> > > > were changed to something else.
-> > > 
-> > > And that's why I added BUILD_BUG_ON right beneath that allocation. :)
-> > 
-> > My point is that if the allocation were changed to no longer be a
-> > straightforward alloc_page() then someone reading the combined code would
-> > have no idea why the BUILD_BUG_ON() exists.  It's a bit ridiculous for
-> > this case because the specific constraints of vcpu->run make it highly
-> > unlikely to use anything else, but that's beside the point.
-> > 
-> > > It's just a helper for developers when adding new kvm_run fields, not
-> > > a risk for anyone who wants to start allocating more pages for it.
-> > 
-> > But by adding a BUILD_BUG_ON without explaining *why*, you're placing an
-> > extra burden on someone that wants to increase the size of kvm->run, e.g.
-> > it's not at all obvious from the changelog whether this patch is adding
-> > the BUILD_BUG_ON purely because the code allocates memory for vcpu->run
-> > via alloc_page(), or if there is some fundamental aspect of vcpu->run that
-> > requires it to never span multiple pages.
-> 
-> How about I add a comment above it?
-> 
->   /*
->    * Currently kvm_run only uses one physical page.  Warn the develper
->    * if kvm_run accidentaly grows more than that.
->    */
->   BUILD_BUG_ON(...);
+There are two declarations of kvm_vcpu_kick() in kvm_host.h where
+one of them is redundant. Remove to keep the git grep a bit cleaner.
 
-No need for a comment, adding a blurb in the changelog is sufficient.
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+---
+ include/linux/kvm_host.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-The lengthy response was just trying to explain why it's helpful to
-explicitly justify a change that may seem obvious in the current codebase.
-Apologies if it only confused things.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7ed1e2f8641e..92ce5e205622 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -982,7 +982,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm);
+ void kvm_arch_sync_events(struct kvm *kvm);
+ 
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
+-void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+ 
+ bool kvm_is_reserved_pfn(kvm_pfn_t pfn);
+ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn);
+-- 
+2.19.1
+
+
