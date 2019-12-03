@@ -2,136 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B872B110308
-	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 17:59:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCEF3110320
+	for <lists+kvm@lfdr.de>; Tue,  3 Dec 2019 18:04:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727312AbfLCQ7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Dec 2019 11:59:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38657 "EHLO
+        id S1727064AbfLCREm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Dec 2019 12:04:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27708 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727287AbfLCQ7T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Dec 2019 11:59:19 -0500
+        with ESMTP id S1726449AbfLCREk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Dec 2019 12:04:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575392358;
+        s=mimecast20190719; t=1575392679;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CokILJJqXdrHsv0tjIebaIYM+c7ZHf6WdfuYQQUg9IQ=;
-        b=FsgU13+IIBIcOL+HuIboMe54DBKzdFnlf38fswG+IvCmvipPkt2j8cdrFub+RvznYBF59k
-        qxrsg4A1kb+2Hbb2kVo1ZBMbQvST22tN/Fdp8PnldYm/R5iF+8TbtpiuHTqExObFBGb3no
-        i77ezpnKUzi2qCs+sCmMfLnTKquB3zY=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-dpJotGpbMdy_N_UBCgOtrw-1; Tue, 03 Dec 2019 11:59:15 -0500
-Received: by mail-qv1-f72.google.com with SMTP id g33so2588945qvd.7
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 08:59:15 -0800 (PST)
+        bh=t8DvubUvc77D7QCd7w64sRjJyRVQE6dAmn4FvsDL5hw=;
+        b=Zwge6x1Cpd4kSfnN+vFCPy8cyr1lqsJ02b2KIJkVLr84j1ZgLOyOnibGSJJMrRxC890dYU
+        z2OimvDujGGZTLHRTnkYhzihaCZHeCbNl+zsBMg7whHWU07Vr17IskH+afRj6iUFTU0YVP
+        sobin6L0Okzt8P5fJlsGM+fRahtOrN4=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-vqH3Sj27OYSwzZzJqNIBmg-1; Tue, 03 Dec 2019 12:04:36 -0500
+Received: by mail-qv1-f70.google.com with SMTP id p9so2576380qvq.22
+        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 09:04:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rby7OAxJWRGIY59KJwhRvRc4bijIHbG4l5NvhzcAxK8=;
-        b=dGRf/6UPgbM+p/W3w4CyJrmPAS0kY32jCUjUC8B3c+2ldjpyrQjWJYT6U4Wt4sTEf+
-         euWORAlZ1Yyw1tz6qrjp8K5XURVZxxUy4LLlC7JQuLzcOtA312fOvleueEhZ5763Kq9E
-         UBRVahiVToLNrqy8xk7UjGonkZPkN/NqB56Ug8qoTxsnCqQMz6UyGghOsbQ7yIcTjI0I
-         yRAJCvu1Zc/8f+UqunIrIX3ES06yRuQB2LUj7npp0mnDW4rAnR+ktS6xcTAq+v+qNhiw
-         utisgD3A7Fm1/o3g/wrCuN9qlkn5aPRODAbLYWA5RIg3y8N2Kn1/CPW3z/bhyHSfkClc
-         /qDg==
-X-Gm-Message-State: APjAAAXUwFo8x/1vUxIg0UTuL7U9ToojFFN5p09MWkw/0udv2FkB2fJJ
-        bgnxiyKfMvHWjPKeWgTcOJt3NEwlFRgU2ARMLfwWXKMdzsbMLb/j82X7Ch6v0VHkYhtzuQP1xoV
-        L6Pl9bwEOkG3t
-X-Received: by 2002:a05:620a:2010:: with SMTP id c16mr5938044qka.386.1575392354612;
-        Tue, 03 Dec 2019 08:59:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzQfVoMDRqDnxNfwvnqyaXyIDMNqHRLocnfax32ITgCaGfDAssMZDEsbnRydHQ5WTxKScDc7A==
-X-Received: by 2002:a05:620a:2010:: with SMTP id c16mr5938019qka.386.1575392354373;
-        Tue, 03 Dec 2019 08:59:14 -0800 (PST)
-Received: from xz-x1.yyz.redhat.com ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id a16sm482585qkn.48.2019.12.03.08.59.12
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GwSc2v/NazflzpFrOlkNA8IEQZUbi7+GF+4oI30XE/w=;
+        b=U1wDxJY9BglmeiBXpBEaqCwfT1SIUyVozLe9/7xrHUMTykBpi70e5wqW6z5Lv4+zhh
+         Mmh2ss93967Alr8L9lRYjM9CFjoyDYgWCCMeFi/TkQDDbZpGB6/Cg9/VheyVRBhy21nS
+         sJwWQcaTVbltR4TfjHyae6FCWZVog8Nwn0nrx/I91SkQbtf2Z6jNx55/3eTVoFfW15UT
+         KmdNk424AV92hYWlX6GEbxBFVjlnAvNrAH9wXmhP/nUmIlWhDyyZvt5s50XVGqzsR5QG
+         nwxlAJhjnQ9vZEIRMCnz1rQk2/kJGIVG46VdCXKvwVy6rHpkZV/2iIcG/IyWHwgz4bUS
+         xJwQ==
+X-Gm-Message-State: APjAAAUVI1gM2esAIOAGQb2xmdBOt5h14RcgMtcUgY5FNo62y4eZZG6Q
+        huUbAp8RHpEiZoJ23CJlgcGQWk9e3OFk93/df0CcKLXZOuElxSabh2Pfp7GeUfPNFgr1Hck3zmV
+        wYSbkpY/F5Au+
+X-Received: by 2002:ae9:ed43:: with SMTP id c64mr5709438qkg.78.1575392675444;
+        Tue, 03 Dec 2019 09:04:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxETwyoGLSM2JBWDT+YiR0hnGqeVSXHwTu0/n3KH8ZbAv41W1TPnYnRnlWUEQgCwYJO0Iavvw==
+X-Received: by 2002:ae9:ed43:: with SMTP id c64mr5709327qkg.78.1575392674409;
+        Tue, 03 Dec 2019 09:04:34 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id l130sm2062530qke.33.2019.12.03.09.04.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 08:59:13 -0800 (PST)
+        Tue, 03 Dec 2019 09:04:33 -0800 (PST)
+Date:   Tue, 3 Dec 2019 12:04:32 -0500
 From:   Peter Xu <peterx@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        peterx@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH v4 6/6] KVM: X86: Conert the last users of "shorthand = 0" to use macros
-Date:   Tue,  3 Dec 2019 11:59:03 -0500
-Message-Id: <20191203165903.22917-7-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191203165903.22917-1-peterx@redhat.com>
-References: <20191203165903.22917-1-peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 03/15] KVM: Add build-time error check on kvm_run size
+Message-ID: <20191203170432.GF17275@xz-x1>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-4-peterx@redhat.com>
+ <20191202193027.GH4063@linux.intel.com>
+ <20191202205315.GD31681@xz-x1>
+ <20191202221949.GD8120@linux.intel.com>
+ <ee107756-12d2-2de0-bb05-a23616346b6d@redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: dpJotGpbMdy_N_UBCgOtrw-1
+In-Reply-To: <ee107756-12d2-2de0-bb05-a23616346b6d@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: vqH3Sj27OYSwzZzJqNIBmg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change the last users of "shorthand =3D 0" to use APIC_DEST_NOSHORT.
+On Tue, Dec 03, 2019 at 02:41:58PM +0100, Paolo Bonzini wrote:
+> On 02/12/19 23:19, Sean Christopherson wrote:
+> >>> e.g. in a mostly hypothetical case where the allocation of vcpu->run
+> >>> were changed to something else.
+> >> And that's why I added BUILD_BUG_ON right beneath that allocation. :)
+>=20
+> It's not exactly beneath it (it's out of the patch context at least).  I
+> think a comment is not strictly necessary, but a better commit message
+> is and, since you are at it, I would put the BUILD_BUG_ON *before* the
+> allocation.  That makes it more obvious that you are checking the
+> invariant before allocating.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- arch/x86/kvm/ioapic.c   | 4 ++--
- arch/x86/kvm/irq_comm.c | 2 +-
- arch/x86/kvm/x86.c      | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Makes sense, will do.  Thanks for both of your reviews.
 
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index f53daeaaeb37..77538fd77dc2 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -330,7 +330,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *io=
-apic, u32 val)
- =09=09if (e->fields.delivery_mode =3D=3D APIC_DM_FIXED) {
- =09=09=09struct kvm_lapic_irq irq;
-=20
--=09=09=09irq.shorthand =3D 0;
-+=09=09=09irq.shorthand =3D APIC_DEST_NOSHORT;
- =09=09=09irq.vector =3D e->fields.vector;
- =09=09=09irq.delivery_mode =3D e->fields.delivery_mode << 8;
- =09=09=09irq.dest_id =3D e->fields.dest_id;
-@@ -379,7 +379,7 @@ static int ioapic_service(struct kvm_ioapic *ioapic, in=
-t irq, bool line_status)
- =09irqe.trig_mode =3D entry->fields.trig_mode;
- =09irqe.delivery_mode =3D entry->fields.delivery_mode << 8;
- =09irqe.level =3D 1;
--=09irqe.shorthand =3D 0;
-+=09irqe.shorthand =3D APIC_DEST_NOSHORT;
- =09irqe.msi_redir_hint =3D false;
-=20
- =09if (irqe.trig_mode =3D=3D IOAPIC_EDGE_TRIG)
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index 7d083f71fc8e..9d711c2451c7 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -121,7 +121,7 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kernel=
-_irq_routing_entry *e,
- =09irq->msi_redir_hint =3D ((e->msi.address_lo
- =09=09& MSI_ADDR_REDIRECTION_LOWPRI) > 0);
- =09irq->level =3D 1;
--=09irq->shorthand =3D 0;
-+=09irq->shorthand =3D APIC_DEST_NOSHORT;
- }
- EXPORT_SYMBOL_GPL(kvm_set_msi_irq);
-=20
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3b00d662dc14..f6d778436e15 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7355,7 +7355,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, unsig=
-ned long flags, int apicid)
- {
- =09struct kvm_lapic_irq lapic_irq;
-=20
--=09lapic_irq.shorthand =3D 0;
-+=09lapic_irq.shorthand =3D APIC_DEST_NOSHORT;
- =09lapic_irq.dest_mode =3D APIC_DEST_PHYSICAL;
- =09lapic_irq.level =3D 0;
- =09lapic_irq.dest_id =3D apicid;
 --=20
-2.21.0
+Peter Xu
 
