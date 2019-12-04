@@ -2,109 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B19AC112FE7
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 17:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D1661130EB
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 18:38:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728681AbfLDQX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 11:23:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39712 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727008AbfLDQX5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 11:23:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575476635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zi3siVzuD0gF9Jfvrp7PZuuqYsCl8OlTBWpf/P1Jdb4=;
-        b=c7wZGyMtO0CjaAKMMJgSiBLSfDihIgw+c8m0Q0UEtSysiwsTaDO49dyEVQDfTx4hIjpC2k
-        iJn4EPCvvc85XkZrCIHgOMw5gFWriC32Co+CyRai2mxLgxijAPgld/jCao0b80pwJlA1TG
-        U2UfIBCatsKwEaOZ35WzaRdSLx8B7qs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-oisfIGxPPY65zC4_vfnz_g-1; Wed, 04 Dec 2019 11:23:54 -0500
-Received: by mail-wm1-f71.google.com with SMTP id b131so2366141wmd.9
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 08:23:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zi3siVzuD0gF9Jfvrp7PZuuqYsCl8OlTBWpf/P1Jdb4=;
-        b=XoZ8bhzwgUt7sjncgc4OqGVrRsTPSZnGoNAKf6F+gH3cOoeR+eBy67pAOLwm6jSp7G
-         tVjC9duX8ap27F57DmBnwP5QWwKBZ35M/Rjs8vU68i8OoZHErMHkfWl4hQjnT2csLc4u
-         JPCz2xmNR4rDWAHHCKlaNFPc0s3LHg/Cf5snoycPH+AVfrxRXRvgyM3a93WrwXYVLyAE
-         Wg5yvxrweq7QfOPP5FICovqcZQ/xFNKVb6aeuaDllGtAF0y/VuaskORRWZacyS4wnbm+
-         BGRtSmEZGReJnc5DUAPMxHtd0nejX5aP2w20KXhtwoChAJaZL/JltJBfXaoVvUoJfsS3
-         YGjg==
-X-Gm-Message-State: APjAAAU1ajntVl47s96nDck57Pd9OF5saFRLxKRegqDT7biggGL7GMOm
-        z+7VuTdsU8ffUDReCyPoRVFPphIxI5Ywl1uScTWrj+/lkLFYqX5CSKd4lGvhP7QuWEVwn5/4NZQ
-        kGq3H0ABbH9kp
-X-Received: by 2002:a05:600c:230d:: with SMTP id 13mr327281wmo.13.1575476633258;
-        Wed, 04 Dec 2019 08:23:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzoFwrdUicKLCGUQqrBsC2FVxrG+lTaEvzg61cWLPm1vNon91CH0Ovxt4OsLfpSLXlAn2oIJA==
-X-Received: by 2002:a05:600c:230d:: with SMTP id 13mr327269wmo.13.1575476633007;
-        Wed, 04 Dec 2019 08:23:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
-        by smtp.gmail.com with ESMTPSA id h124sm7729871wme.30.2019.12.04.08.23.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2019 08:23:52 -0800 (PST)
-Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
- include msrs
-To:     Eduardo Habkost <ehabkost@redhat.com>
-Cc:     Catherine Ho <catherine.hecx@gmail.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
-References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
- <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
- <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
- <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
- <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
- <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
- <20191204154730.GB498046@habkost.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4bec2f12-63d7-928e-2e3e-137c68b2a435@redhat.com>
-Date:   Wed, 4 Dec 2019 17:23:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191204154730.GB498046@habkost.net>
+        id S1728064AbfLDRiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 12:38:03 -0500
+Received: from mail-eopbgr80081.outbound.protection.outlook.com ([40.107.8.81]:45693
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726934AbfLDRiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 12:38:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gV3AyiSqiKvgdJKSwSKG3bX6tOgQld+yhWn6JncPpjhi/Mfaq95RT0KsnaV63+zEmw1iGSK32yfXSBxq2UPvtEi7egvSbdolRR0KAEaq32ii+5We20PgrhS5f1BgrHGG4GphOs57EmGBr5Kpse7pNxyV9+MObtnxdYQThAgw6riH87Sgm/8lIZw/tS8dNHS31n5ASTjCqANz47u7wiZBgDght/gq397KMjY17z8D9CQIZjpsvB6vNxx6j1V73CyZk/8Ss8ffNO1fM2pRR+9+RFhII4wa6TCdBpMChCq+JkyK3mPCYOyUv5QUXmiYUltnMv5MxehVkWrESNKtCA9ckA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mi7Turn64v8yzcVNQ/vh4qCJq/Gh6AGYltjMOep9X4E=;
+ b=Um2ECD86F/rYtwN2G7KWULcWLhjojmHipW3PJx+E/a7BH3UUyBT8cFPG8oQiDeEo5EM+2E+/L1VgzQYhsYLhtVkKNeN+6mxs6pG2oj+3Vx7xfsMMSinTOTCtEqcAye9+mLeX+cHuRsdDNsSdxGM0IjX8SMT2rwsP4E6sPz8FnqySYz7bYvmpvRi+U1xEUsKBy01M68OBUsU9eP3lij2ThTmR12n718gRx/1O5Ad4aJGSE2bJ4BuTj13kBjjDvtnl/veJapLE9rcXemI7KvmJxWPkuTX5sZzvjSdBRGqz5FsTau26pqL9cnwKQBM+Gxth481P4dBo/Nj/la7fg6Vklg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mi7Turn64v8yzcVNQ/vh4qCJq/Gh6AGYltjMOep9X4E=;
+ b=qKANXMbJlRYgYxc0cE71WDzseRR/ZAgAwU0IADymDnWdbIn1eZLZjOKuHjbCz/H+y+tyX8dQlVhn4wUuLAW8BggLeTfEGbCmEGl0NjwQxnwErkMAi38mcZj8lfI6+59sXak2SmmWMXN3OlXqPbEKAoWelf+gJhGAClSBHEXih4A=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB4850.eurprd05.prod.outlook.com (20.177.41.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2495.21; Wed, 4 Dec 2019 17:36:13 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::16:9951:5a4b:9ec6]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::16:9951:5a4b:9ec6%7]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
+ 17:36:13 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: [PATCH 0/6] VFIO mdev aggregated resources handling
+Thread-Topic: [PATCH 0/6] VFIO mdev aggregated resources handling
+Thread-Index: AQHViikX93ntAS7QxEa+ZUX9CByqKKeAQaYwgADEfoCAKW0u8A==
+Date:   Wed, 4 Dec 2019 17:36:12 +0000
+Message-ID: <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
+ <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108081925.GH4196@zhen-hp.sh.intel.com>
+In-Reply-To: <20191108081925.GH4196@zhen-hp.sh.intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-MC-Unique: oisfIGxPPY65zC4_vfnz_g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [208.176.44.194]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: bbed7904-17c4-49bc-287c-08d778e07541
+x-ms-traffictypediagnostic: AM0PR05MB4850:|AM0PR05MB4850:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB4850FDEDDF7C9CA10B1DF515D15D0@AM0PR05MB4850.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0241D5F98C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(13464003)(189003)(199004)(8676002)(9686003)(76176011)(6246003)(6506007)(6306002)(74316002)(54906003)(26005)(6436002)(229853002)(81156014)(53546011)(55016002)(7696005)(102836004)(25786009)(6116002)(14444005)(66446008)(186003)(76116006)(14454004)(81166006)(4326008)(8936002)(99286004)(316002)(66946007)(71190400001)(71200400001)(5660300002)(305945005)(6916009)(7736002)(33656002)(64756008)(66476007)(66556008)(478600001)(2906002)(86362001)(52536014)(966005)(3846002)(11346002)(21314003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4850;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tXFfFaKOMrRDM4zpCzw+qSpxjPH/lKndabKG4hID6q9jSTBn9qgmr2oerqmH2vAnDOeR1dDuQuCZx4QwscEywO9dSXEg2pQB2gz4V6wWw2/PvUqOhW0yBUW7EwZS/hfakEpP45JtiCngJbw+295zudggtAIUE2kdM2g5ekGMuUs+v/9nDDewzWenQwPXiTUwM8AWAyXtLxsrNcH93JaHaDSwNuTleZR2m3qJMa811YM0/vsYJZwKA/Qo2x7C7BUcOOuQLSoFtNSK0kLEDI852mG22pe7a5l0vXmiqTEdcNOm3NoQJq5GgBYgPIjozQlTrOUD6fTIVSpXUHCO7t+b3xg65Gv1ggDCDQtCUwr6bbJqXKvFr+DIZD260Ho6fWXk06UamxAXG7CbgiTPJPJkp7G9XanQLcQep6yX11iqpAo+/Pco/Iifvjr5yG2Fpi1OcXgQlj0e3qMh3yvoqts+5YFvUOU2dMm33uLyFAy2MvnOLx1TA43U0jfHjttgOIC2LbgtnyCR5tg3VRzOM5z+uZA2af0UwX84oEFyW+0dEMk=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bbed7904-17c4-49bc-287c-08d778e07541
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2019 17:36:13.0097
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /nT8MD+n/cf1GmonYP1mi9UevDuqRnNy5fvb8xK06gTXbQtKQgwfnRTre4fx5ZvX1j/3yq4GD62NuQCnXbTUng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4850
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/12/19 16:47, Eduardo Habkost wrote:
-> On Wed, Dec 04, 2019 at 04:34:45PM +0100, Paolo Bonzini wrote:
->> On 04/12/19 16:07, Catherine Ho wrote:
->>>> Ok, so the problem is that some MSR didn't exist in that version.  Which
->>> I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BASIC
->>> (0x480). If I remove this kvm_msr_entry_add(), everything is ok, the guest can
->>> be boot up successfully.
->>>
->>
->> MSR_IA32_VMX_BASIC was added in kvm-4.10.  Maybe the issue is the
->> _value_ that is being written to the VM is not valid?  Can you check
->> what's happening in vmx_restore_vmx_basic?
-> 
-> I believe env->features[FEAT_VMX_BASIC] will be initialized to 0
-> if the host kernel doesn't have KVM_CAP_GET_MSR_FEATURES.
++ Jiri + Netdev since you mentioned netdev queue.
 
-But the host must have MSR features if the MSRs are added:
++ Jason Wang and Michael as we had similar discussion in vdpa discussion th=
+read.
 
-        if (kvm_feature_msrs && cpu_has_vmx(env)) {
-            kvm_msr_entry_add_vmx(cpu, env->features);
-        }
+> From: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Sent: Friday, November 8, 2019 2:19 AM
+> To: Parav Pandit <parav@mellanox.com>
+>=20
 
-Looks like feature MSRs were backported to 4.14, but
-1389309c811b0c954bf3b591b761d79b1700283d and the previous commit weren't.
+My apologies to reply late.
+Something bad with my email client, due to which I found this patch under s=
+pam folder today.
+More comments below.
 
-Paolo
+> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
+> > Hi,
+> >
+> > > -----Original Message-----
+> > > From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On
+> > > Behalf Of Zhenyu Wang
+> > > Sent: Thursday, October 24, 2019 12:08 AM
+> > > To: kvm@vger.kernel.org
+> > > Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
+> > > kevin.tian@intel.com; cohuck@redhat.com
+> > > Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
+> > >
+> > > Hi,
+> > >
+> > > This is a refresh for previous send of this series. I got impression
+> > > that some SIOV drivers would still deploy their own create and
+> > > config method so stopped effort on this. But seems this would still
+> > > be useful for some other SIOV driver which may simply want
+> > > capability to aggregate resources. So here's refreshed series.
+> > >
+> > > Current mdev device create interface depends on fixed mdev type,
+> > > which get uuid from user to create instance of mdev device. If user
+> > > wants to use customized number of resource for mdev device, then
+> > > only can create new
+> > Can you please give an example of 'resource'?
+> > When I grep [1], [2] and [3], I couldn't find anything related to ' agg=
+regate'.
+>=20
+> The resource is vendor device specific, in SIOV spec there's ADI (Assigna=
+ble
+> Device Interface) definition which could be e.g queue for net device, con=
+text
+> for gpu, etc. I just named this interface as 'aggregate'
+> for aggregation purpose, it's not used in spec doc.
+>=20
 
+Some 'unknown/undefined' vendor specific resource just doesn't work.
+Orchestration tool doesn't know which resource and what/how to configure fo=
+r which vendor.
+It has to be well defined.
+
+You can also find such discussion in recent lgpu DRM cgroup patches series =
+v4.
+
+Exposing networking resource configuration in non-net namespace aware mdev =
+sysfs at PCI device level is no-go.
+Adding per file NET_ADMIN or other checks is not the approach we follow in =
+kernel.
+
+devlink has been a subsystem though under net, that has very rich interface=
+ for syscaller, device health, resource management and many more.
+Even though it is used by net driver today, its written for generic device =
+management at bus/device level.
+
+Yuval has posted patches to manage PCI sub-devices [1] and updated version =
+will be posted soon which addresses comments.
+
+For any device slice resource management of mdev, sub-function etc, we shou=
+ld be using single kernel interface as devlink [2], [3].
+
+[1] https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-yuvala=
+v@mellanox.com/
+[2] http://man7.org/linux/man-pages/man8/devlink-dev.8.html
+[3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
+
+Most modern device configuration that I am aware of is usually done via wel=
+l defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and mor=
+e) or via netlink commands (net, devlink, rdma and more) not via sysfs.
+
+> Thanks
+>=20
+> >
+> > > mdev type for that which may not be flexible. This requirement comes
+> > > not only from to be able to allocate flexible resources for KVMGT,
+> > > but also from Intel scalable IO virtualization which would use
+> > > vfio/mdev to be able to allocate arbitrary resources on mdev instance=
+.
+> More info on [1] [2] [3].
+> > >
+> > > To allow to create user defined resources for mdev, it trys to
+> > > extend mdev create interface by adding new "aggregate=3Dxxx" paramete=
+r
+> > > following UUID, for target mdev type if aggregation is supported, it
+> > > can create new mdev device which contains resources combined by
+> > > number of instances, e.g
+> > >
+> > >     echo "<uuid>,aggregate=3D10" > create
+> > >
+> > > VM manager e.g libvirt can check mdev type with "aggregation"
+> > > attribute which can support this setting. If no "aggregation"
+> > > attribute found for mdev type, previous behavior is still kept for
+> > > one instance allocation. And new sysfs attribute
+> > > "aggregated_instances" is created for each mdev device to show alloca=
+ted
+> number.
+> > >
+> > > References:
+> > > [1]
+> > > https://software.intel.com/en-us/download/intel-virtualization-techn
+> > > ology- for-directed-io-architecture-specification
+> > > [2]
+> > > https://software.intel.com/en-us/download/intel-scalable-io-virtuali
+> > > zation-
+> > > technical-specification
+> > > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
+> > >
+> > > Zhenyu Wang (6):
+> > >   vfio/mdev: Add new "aggregate" parameter for mdev create
+> > >   vfio/mdev: Add "aggregation" attribute for supported mdev type
+> > >   vfio/mdev: Add "aggregated_instances" attribute for supported mdev
+> > >     device
+> > >   Documentation/driver-api/vfio-mediated-device.rst: Update for
+> > >     vfio/mdev aggregation support
+> > >   Documentation/ABI/testing/sysfs-bus-vfio-mdev: Update for vfio/mdev
+> > >     aggregation support
+> > >   drm/i915/gvt: Add new type with aggregation support
+> > >
+> > >  Documentation/ABI/testing/sysfs-bus-vfio-mdev | 24 ++++++
+> > >  .../driver-api/vfio-mediated-device.rst       | 23 ++++++
+> > >  drivers/gpu/drm/i915/gvt/gvt.c                |  4 +-
+> > >  drivers/gpu/drm/i915/gvt/gvt.h                | 11 ++-
+> > >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 53 ++++++++++++-
+> > >  drivers/gpu/drm/i915/gvt/vgpu.c               | 56 ++++++++++++-
+> > >  drivers/vfio/mdev/mdev_core.c                 | 36 ++++++++-
+> > >  drivers/vfio/mdev/mdev_private.h              |  6 +-
+> > >  drivers/vfio/mdev/mdev_sysfs.c                | 79 +++++++++++++++++=
++-
+> > >  include/linux/mdev.h                          | 19 +++++
+> > >  10 files changed, 294 insertions(+), 17 deletions(-)
+> > >
+> > > --
+> > > 2.24.0.rc0
+> >
+>=20
+> --
+> Open Source Technology Center, Intel ltd.
+>=20
+> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
