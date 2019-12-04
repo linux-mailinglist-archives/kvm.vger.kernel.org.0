@@ -2,104 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7B511129D1
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 12:05:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 809B6112A02
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 12:20:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727452AbfLDLE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 06:04:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31318 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727268AbfLDLE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 06:04:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575457498;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T19X4nvS8o6/QCGqV5cYH9dB5ySF6S5McpcQOxAuM1Y=;
-        b=WaKq0K9uEeAV32YBa3Vuc0SroHENyed+erglxIQonqjKpfDUtp0ReeinMOCgJ8Kbgy58e9
-        0R4EGw6m+nPduNRqK4xUiTx+eRg+HOFBPTSdwjLgDJkgOy4OetEXAYrktfACZd/tmsoDCp
-        XzcAgclldbFrdZkBsxvSpH6WJ5uX0a8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-rR7vLXFiNBa2ck36I8dhIQ-1; Wed, 04 Dec 2019 06:04:56 -0500
-Received: by mail-wm1-f70.google.com with SMTP id s12so2022784wmc.6
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 03:04:56 -0800 (PST)
+        id S1727638AbfLDLUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 06:20:18 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34650 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727577AbfLDLUS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 06:20:18 -0500
+Received: by mail-wm1-f65.google.com with SMTP id f4so4599045wmj.1;
+        Wed, 04 Dec 2019 03:20:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=H33X4AK+u43gUnhB1O2fMOEJjx19wp0DYd+Rf48fRQA=;
+        b=pHnQ75nqMQUj1Idg8y+ZdY1KcmPx6nqGQxnOGR/QcMRyLiHYKfdEj1ke5yQ/IkLbDT
+         dFBvQrbFgk5v0GajNDVSsYtO5oKaW2cSVSQ/GyKBYp/raOWVXQqB2NPPkWJa86xd/L1h
+         2ex+i7D9+VKq+7dyCFQMDECnwxYMePPLth2iJZfR9dZ09v8XZFtmuEIZqHBsuxZd5Xhh
+         ZPicdGxQmS6b+47dkvCkBOItW6o9Zdps+snIQsyWqOk2lUFNSEkxKFxCus4PeM+zG4gr
+         SpjON49YzWFFzNetDesRpBFwWioDykVupisiI0w2WSHUZWEGPdKi4gKMT/IjP29WsHWv
+         qPew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/mPzTUYV/4/AeMFkskqxn26gUIegqrDV8tBrRpiOjJE=;
-        b=eQazAzjJ6oPdm1+mrC7D1ab6Y4DHsVBVvjTwEkmWkmjqeUQoEJnBdYAh/7F2BJPgix
-         1nS4RD9yx9rTI303n/QIkPG+Xay6P79dpnRSivkB85RggmQ3JcWUazib10p82UaPpG5o
-         1fMFRMYSZhtfTQUMSkeS6T0EQleVhapTOrY+pSBQPqVb2R6tl8vmfwHTS73S65ydoSVV
-         ppttfNc6eOAx0TIlL+m+htX731bR4yiHeKghcgtESQ2ACi8ZVSbBFfKq8F+Py+UNLQbI
-         GpREMPTfTb2GPXHl9YMzHoUjtTeNcLo4vN8whiINTNzL9PUSY1nrf9YhRm7bt2ezZaCK
-         8adQ==
-X-Gm-Message-State: APjAAAVHt/xijV32LXAo+y1mrwS4f2HV0P1j9dmKc6nspVR5N/wPs7/R
-        BpNE8RJRmk7Qtit1WLLNrIQ3CgRC2FEnpRSUoAWwHNMy9s5eq9zoZCvr1dfSjnI6NPrU+tZeThr
-        a/I6UIYvHyGDv
-X-Received: by 2002:adf:cf0a:: with SMTP id o10mr3157135wrj.325.1575457495740;
-        Wed, 04 Dec 2019 03:04:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxZej/ubogLxmoGHCyzT2M4jWD3RKQn+Hr3K0Odb3wHdjAp8chAUWwQGUSBl7gRSN6mqYV+jA==
-X-Received: by 2002:adf:cf0a:: with SMTP id o10mr3157105wrj.325.1575457495413;
-        Wed, 04 Dec 2019 03:04:55 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
-        by smtp.gmail.com with ESMTPSA id k19sm6238150wmi.42.2019.12.04.03.04.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2019 03:04:54 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-To:     Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=H33X4AK+u43gUnhB1O2fMOEJjx19wp0DYd+Rf48fRQA=;
+        b=hO2JJJrIMEwM7k1lsqng4oCHR/bKP4in9ahbTMTFycdeE0MPrrlefqZEwm6HAEmp7L
+         8T9fms70s8uWryd13yl5+ydMq3kFQyygw2OW1UAOkoVJYl79EcLuIYr2WvBTF7dR77U+
+         8udoGeoR5DeTWWNG3FGspLDxc8hyfkkP4H7iffi0O+EF+sPjqyB/Hd3R20SZ1FQr6wOX
+         huL/nHpuNrAq7o7zf5ZnwIg1puTSyPR6t2f+0zck3qtkQRmMoUE6s8As3nL2Y8ArfMv4
+         7NlFSvvJbmqCDvE7H/HukONK+rhT+WCdscJ6opj6YiVK01xXN20r9YWuMTKQvhoChj+d
+         3pkQ==
+X-Gm-Message-State: APjAAAXbhemyRiYSXwnvZ8TrasV/hIPnnuVcaLW0pxV6rYaLJPbtrCRn
+        BAeh+phKJw+dV4diq5i0OB53xRt5
+X-Google-Smtp-Source: APXvYqx3sfx7h6wlSw+Zba7Lzr+rEDFkJ3LR55qcg6m9TLRL50Y7jecyIWXGAsuY7uEkIcwsZvWnkg==
+X-Received: by 2002:a7b:ce19:: with SMTP id m25mr20006752wmc.6.1575458415389;
+        Wed, 04 Dec 2019 03:20:15 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id z13sm6595440wmi.18.2019.12.04.03.20.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Dec 2019 03:20:14 -0800 (PST)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a3e83e6b-4bfa-3a6b-4b43-5dd451e03254@redhat.com>
-Date:   Wed, 4 Dec 2019 12:04:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
-Content-Language: en-US
-X-MC-Unique: rR7vLXFiNBa2ck36I8dhIQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     bp@alien8.de
+Subject: [PATCH] KVM: x86: fix out-of-bounds write in KVM_GET_EMULATED_CPUID (CVE-2019-19332)
+Date:   Wed,  4 Dec 2019 12:20:12 +0100
+Message-Id: <1575458412-10241-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/12/19 11:38, Jason Wang wrote:
->>
->> +=C2=A0=C2=A0=C2=A0 entry =3D &ring->dirty_gfns[ring->dirty_index & (rin=
-g->size - 1)];
->> +=C2=A0=C2=A0=C2=A0 entry->slot =3D slot;
->> +=C2=A0=C2=A0=C2=A0 entry->offset =3D offset;
->=20
->=20
-> Haven't gone through the whole series, sorry if it was a silly question
-> but I wonder things like this will suffer from similar issue on
-> virtually tagged archs as mentioned in [1].
+The bounds check was present in KVM_GET_SUPPORTED_CPUID but not
+KVM_GET_EMULATED_CPUID.
 
-There is no new infrastructure to track the dirty pages---it's just a
-different way to pass them to userspace.
+Reported-by: syzbot+e3f4897236c4eeb8af4f@syzkaller.appspotmail.com
+Fixes: 84cffe499b94 ("kvm: Emulate MOVBE", 2013-10-29)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/cpuid.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> Is this better to allocate the ring from userspace and set to KVM
-> instead? Then we can use copy_to/from_user() friends (a little bit slow
-> on recent CPUs).
-
-Yeah, I don't think that would be better than mmap.
-
-Paolo
-
-
-> [1] https://lkml.org/lkml/2019/4/9/5
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 813a4d2e5c0c..cfafa320a8cf 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -504,7 +504,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 
+ 	r = -E2BIG;
+ 
+-	if (*nent >= maxnent)
++	if (WARN_ON(*nent >= maxnent))
+ 		goto out;
+ 
+ 	do_host_cpuid(entry, function, 0);
+@@ -815,6 +815,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ static int do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 func,
+ 			 int *nent, int maxnent, unsigned int type)
+ {
++	if (*nent >= maxnent)
++		return -E2BIG;
++
+ 	if (type == KVM_GET_EMULATED_CPUID)
+ 		return __do_cpuid_func_emulated(entry, func, nent, maxnent);
+ 
+-- 
+1.8.3.1
 
