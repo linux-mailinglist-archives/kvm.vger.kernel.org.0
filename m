@@ -2,93 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2646D112E8B
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 16:34:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3188A112E93
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 16:36:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728324AbfLDPeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 10:34:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53776 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728238AbfLDPeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 10:34:50 -0500
+        id S1728358AbfLDPg1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 10:36:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55363 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728256AbfLDPgX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 10:36:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575473689;
+        s=mimecast20190719; t=1575473781;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ohr+K9Wr9L1SwB4XbeQinW5OsnRUbekzuVwYWSF3DGY=;
-        b=U8xbtYu4hl9nLHUcZWrbnMQWIbi12Rb2pfuB9OMDx//m1L6Urb8evIpi3rQbAZJrmu+QM7
-        ttXCSFIv92Xw+ljs/mCp1pm7yRZG5usFnsLmoKP5n/MsMg6m/sJXEeV+JLC9bhBzf4LNfU
-        jW2w1gE+pAxpHOZpkW8hNhFzII0Huw4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-89a8gExoPg-g5ckrsK2prQ-1; Wed, 04 Dec 2019 10:34:48 -0500
-Received: by mail-wr1-f71.google.com with SMTP id u18so23192wrn.11
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 07:34:48 -0800 (PST)
+        bh=iQOOeXeSC4acVeDbgVDeAqxSN0LyEEhsWxQonnVcIBc=;
+        b=S8ZW8EwdT7uzSYnGXRFwP/tzp0mHsw82eFOF1pnJhOO/5jDzBLVdtzYMqoGcTqn799z+ev
+        JGGpnefNZueaRoeEJX6+4Tiqal1E7TtGEc6YmKo52BSQwoiOUauORtY7ypWaDk4J2wE67B
+        FaPswPC/wIJ1yFw3OtZfqkkHTfGq2fU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-NyBIbXopMnyBh7Y1mZTlRQ-1; Wed, 04 Dec 2019 10:36:20 -0500
+Received: by mail-wm1-f70.google.com with SMTP id g26so525831wmk.6
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 07:36:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ohr+K9Wr9L1SwB4XbeQinW5OsnRUbekzuVwYWSF3DGY=;
-        b=iiRnIv3UG0Nrevvry94qlFH2k/Yw1vgVmVKgZVEDhdcLwpf20UJb3Zpp+QBB25c16o
-         A11Fp7cXaIwyXTcOVuG+gXAii0E0yojkY9nNR8Hfxs96I7uH5bkqC/lxHtTplhi8R1/L
-         F2XQUZ1+MyJ1clUDuFnFxD2qIy986qHNPOeTBVMixOj3zX7j41uCQo53kyjvfxwYTpGL
-         QbGu6vNHQRhms5gS/IuIOi2gGqUsjevaozAe0A8t+pDUen2U8Oy31wGaWktd/9/AzsGU
-         1PwjvL1K0RiHIraabDj5oXS0KLn6sKrpaRD+ek9LtcX4HfkOOTaRqlY9EwXcupx/eSFK
-         973g==
-X-Gm-Message-State: APjAAAVbTexqPgv2349qdwth7m0wmKmOrekMMT+GteALszBHlF+u3arz
-        1Z+pZAxaiNtJLbTw+VmS0gNsEIEe0m8yUdmRDsNIPY8mHl8M4fDGpks0c6I3b0tDgevgUyCKhN4
-        Ec2dMHycV8NAY
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4615814wrv.144.1575473687068;
-        Wed, 04 Dec 2019 07:34:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzCwDAGc25fHrVIgk3hM96SB/lE+J0Sx+odhAXM45pVbtAz8iw4flzaRpnlM2iJmSz78wu3Ng==
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4615796wrv.144.1575473686830;
-        Wed, 04 Dec 2019 07:34:46 -0800 (PST)
+        bh=iQOOeXeSC4acVeDbgVDeAqxSN0LyEEhsWxQonnVcIBc=;
+        b=fL8wNUxAxweXfurjpxET3xP52YLYrFh+9/1YAlSJwYq2RG3/aV/Pcqq8TXvkl0rnft
+         SzHKOY1zrHpRFLcwRzRs3qVbbaRoQtmdZHr9uyxGWUkFDpici6p+UmtxTMMkTbVNrF2s
+         dJUaXFwW6RsUSlAqxXzUmhUUHRV3MPEzSHbSv30xSId/t3cCJNUBPyGVRO/3EDnrdhh+
+         WbfkS+UNBFaGHbV0zGIffmXw2pNhIU9WLGvWeGOyQYJNtjKZyfyr+PrYJAeHwxc9sGZI
+         tOsiNSxl5+54KDX+kr1OHtytH7Dxkfdb/8DB1RRTh/6lWdU9igo5LIVFu8kAe30x1T5o
+         uaAg==
+X-Gm-Message-State: APjAAAWa2+3nyC2nolrtcUpPT8gyUK5GZOFjlPjSk2DEyxM8slCXTOa8
+        MwMYNLHKavFhXR7OYuooERGUjfrgxd+XmjWLk/bu+SNEOAf5eyZVhz98sM8ILgsYgPnE6xgU7CI
+        AsyLoJ/K0xWEA
+X-Received: by 2002:adf:e984:: with SMTP id h4mr4581506wrm.275.1575473779565;
+        Wed, 04 Dec 2019 07:36:19 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy/M5MWOKcaMYIoGibWVUMRdDrTEapMHfZlP1x2J2svqUsmIkTvIxs8nBkMZJD5A0y+qXkVRg==
+X-Received: by 2002:adf:e984:: with SMTP id h4mr4581491wrm.275.1575473779351;
+        Wed, 04 Dec 2019 07:36:19 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
-        by smtp.gmail.com with ESMTPSA id c6sm6959402wmb.9.2019.12.04.07.34.45
+        by smtp.gmail.com with ESMTPSA id n188sm8242847wme.14.2019.12.04.07.36.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2019 07:34:46 -0800 (PST)
-Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
- include msrs
-To:     Catherine Ho <catherine.hecx@gmail.com>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
-References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
- <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
- <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
- <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
- <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
+        Wed, 04 Dec 2019 07:36:18 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: use CPUID to locate host page table reserved
+ bits
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+References: <1575471060-55790-1-git-send-email-pbonzini@redhat.com>
+ <20191204152942.GB6323@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
-Date:   Wed, 4 Dec 2019 16:34:45 +0100
+Message-ID: <d46bd0a8-5743-4665-85ea-14351fd85cdd@redhat.com>
+Date:   Wed, 4 Dec 2019 16:36:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
+In-Reply-To: <20191204152942.GB6323@linux.intel.com>
 Content-Language: en-US
-X-MC-Unique: 89a8gExoPg-g5ckrsK2prQ-1
+X-MC-Unique: NyBIbXopMnyBh7Y1mZTlRQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/12/19 16:07, Catherine Ho wrote:
->> Ok, so the problem is that some MSR didn't exist in that version.  Which
-> I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BASIC
-> (0x480). If I remove this kvm_msr_entry_add(), everything is ok, the guest can
-> be boot up successfully.
+On 04/12/19 16:29, Sean Christopherson wrote:
 > 
+> The extra bit of paranoia doesn't cost much, so play it safe?  E.g.:
+> 
+> 	if (unlikely(boot_cpu_data.extended_cpuid_level < 0x80000008)) {
+> 		WARN_ON_ONCE(boot_cpu_has(X86_FEATURE_TME) || SME?);
+> 		return boot_cpu_data.x86_phys_bits;
+> 	}
+> 
+> 	return cpuid_eax(0x80000008) & 0xff;
 
-MSR_IA32_VMX_BASIC was added in kvm-4.10.  Maybe the issue is the
-_value_ that is being written to the VM is not valid?  Can you check
-what's happening in vmx_restore_vmx_basic?
+Sounds good.  I wouldn't bother with the WARN even.
 
 Paolo
 
