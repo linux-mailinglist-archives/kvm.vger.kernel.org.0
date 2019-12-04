@@ -2,102 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16882112312
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 07:54:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43E111125F3
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 09:52:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726856AbfLDGyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 01:54:07 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:46372 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbfLDGyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 01:54:06 -0500
-Received: by mail-qk1-f194.google.com with SMTP id f5so6097081qkm.13
-        for <kvm@vger.kernel.org>; Tue, 03 Dec 2019 22:54:06 -0800 (PST)
+        id S1726893AbfLDIwU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 03:52:20 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:45752 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725830AbfLDIwU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 03:52:20 -0500
+Received: by mail-qt1-f196.google.com with SMTP id p5so6911571qtq.12
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 00:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NPK31KT4fxLwD0F1AZDz2V/fu+xIHdUgpNu7HrMjbFw=;
-        b=BOkMzCMzR5sKMnF42GmwGVTEJc+LOb23dsZlRHel6sRqIWvouhTx3uSjuj56W+eI6i
-         WKFjyajdaq7/klhycZJpOZ1C5uY21UsOGiG3SpNpVOEnp0+cjCk+LYKRMS3fgkriAub8
-         nlHDa2FMR8/XmMhwk20tOkMU7HMQ5vmevU7ui4yNMQ51MSLv6jRXrtVe2iukGrm6XIBU
-         vGbD2kLuak4JrxMh1o/1pLHbGaeWJKVG7AbvqgJWVtMDRZkN1JqlAgO8mU4Ox2Exa1tC
-         Mj5rKh2JP3pCY5Jxm8w4XU444Krqs9wk1QO+o+2WiulmzqgHnVKwfLTC/2Na+ibHlTMY
-         OeNA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=EOhS8JDsg867aMPTPPeteOvbmqqjsw5vk6vXxMRaXi4=;
+        b=pxvE9MO5f9p/yUNdCgDLZQPjNTm3GpliVlCjX11Hc+NODaKH6B35Fyscwpgn+cqcL7
+         zgpfCuNw51xheY4xzL8Y/cgbvP6WlKdZaPbxpSYadkpH0eOPZyVMUet8SINxpFRAT5C5
+         8j1P+Zuhjznd1SmYvp+uwrQ1JYs6dhjkzGCBzq9SbfWoGrSeZbbJrHDRuqLjtbZMrLtJ
+         qkg6dWhdASyMNvhH2pr3ApZYbmEXt5U2Zn/8K3L2ljh7h/hrcc0+R+vHa0C7+5xaH6LU
+         AM5skbDP2Holn90xSPgdwTNonumP/m7RHu92H28cMcYVjPihj0ltD2J+iW6sO6ZjRqWP
+         MQKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NPK31KT4fxLwD0F1AZDz2V/fu+xIHdUgpNu7HrMjbFw=;
-        b=kGJj6fZEKPUTD4iGe+v1ReECq2XzT787vKbbI6HBMskeh6GGYpXOdRNpkw/e4JTMup
-         IYsBnzHfDgFBh1GNE68SwiqHopRg7GeUepQ4uXr3XbreXymOAx/KP8axbd8kL3E8C3Hi
-         wSJUaIiHEAVathfgg2b/HoCKdFsMXSTiNv8cy/mUrdMPQ49kyZqOlaUsNqmywfivxXyd
-         3K7zMK5Mzvhugmw+lndX+tQhWXkHpNnH4w1dU+hjRfSf6aqIH4WIkVkQQmTCYg7lvxC7
-         7DQwKDQmb7OD2L9Y1jkIYQoV4FgiuvCcuWYKcGNSSV+MUc/Wr/rQY7oMJ19eQMn05Zkt
-         Jhhg==
-X-Gm-Message-State: APjAAAU1xvNoY1GUKzqxwwpW4w6MXhszi+zOp7PQ3eibh5jP88P0Vtq/
-        hQDHusZhIU6SAPTbhhQix2Ld9o9iiKUW+i7AaUrVmg==
-X-Google-Smtp-Source: APXvYqyKONKPMM3S6T9nyyBFpC5NnDRt2Bm9tOCUttMMCINdvVilsB2+tf+V3DS0oKZWvWvW5H/afsAEiU8hht6KyQ0=
-X-Received: by 2002:a37:9d12:: with SMTP id g18mr1356251qke.43.1575442445437;
- Tue, 03 Dec 2019 22:54:05 -0800 (PST)
-MIME-Version: 1.0
-References: <000000000000dd04830598d50133@google.com> <0000000000009574da0598d7ccfa@google.com>
-In-Reply-To: <0000000000009574da0598d7ccfa@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Wed, 4 Dec 2019 07:53:54 +0100
-Message-ID: <CACT4Y+aEzDb2r=wjAD=qWyE=_JCfH8pzdoWCdLQsCmWmahLhaw@mail.gmail.com>
-Subject: Re: KASAN: use-after-free Read in tty_open
-To:     syzbot <syzbot+9af6d43c1beabec8fd05@syzkaller.appspotmail.com>
-Cc:     Gleb Natapov <gleb@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        gwshan@linux.vnet.ibm.com, "H. Peter Anvin" <hpa@zytor.com>,
-        Jiri Slaby <jslaby@suse.com>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Russell Currey <ruscur@russell.cc>, stewart@linux.vnet.ibm.com,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=EOhS8JDsg867aMPTPPeteOvbmqqjsw5vk6vXxMRaXi4=;
+        b=XNt3ch2fqnnsaUYjCOzPQR2xi4x47DrgGBwmPiEj6idkZ46aij0mao3Mwr0U8QwhEA
+         i6nx8k+343ouOjbfstZW4osqlgfP4JByeBlM2Wd/mJqH/oqxr0QSQj+d6QCYMAYhmqXT
+         ppnXyA25Cdxrf3TOyCG5U+dk5YmqKrNrwzJRPEiQTCCMWlpm+cYB1WpXKyuleKOnZ9fb
+         Zn6jaPj/tPO6oO07p7Vb05K0Jf1L8G8vDWOMtE9zpd/VmdHsFXXkQEr65lhjy+1h4kzn
+         y+5L93AJAc4hqoaidkjq3rYbpreStdmZzQzymKfLq6PilKmx5+pM6RNujB3d8xqNFSzC
+         Royw==
+X-Gm-Message-State: APjAAAXPJbetp7N+jkamEwHn5Ru/ifBfxTadYw7G7n78tjtdQEomxDhU
+        ylWsm+1o3QzhfUez+mY32Io=
+X-Google-Smtp-Source: APXvYqzTEn4f5QtgZACc5msyimnIHXttn0a0OY37DJuQ0hHUQX9gHuGApLqlXXYZrGFZEr/p65/7TQ==
+X-Received: by 2002:ac8:23a5:: with SMTP id q34mr1570560qtq.83.1575449539835;
+        Wed, 04 Dec 2019 00:52:19 -0800 (PST)
+Received: from host.localdomain (104.129.187.94.16clouds.com. [104.129.187.94])
+        by smtp.gmail.com with ESMTPSA id q187sm3351795qkd.92.2019.12.04.00.52.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 04 Dec 2019 00:52:19 -0800 (PST)
+From:   Catherine Ho <catherine.hecx@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+Cc:     Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Catherine Ho <catherine.hecx@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] target/i386: relax assert when old host kernels don't include msrs
+Date:   Wed,  4 Dec 2019 03:50:30 -0500
+Message-Id: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+X-Mailer: git-send-email 1.7.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 4, 2019 at 3:45 AM syzbot
-<syzbot+9af6d43c1beabec8fd05@syzkaller.appspotmail.com> wrote:
->
-> syzbot has bisected this bug to:
->
-> commit 2de50e9674fc4ca3c6174b04477f69eb26b4ee31
-> Author: Russell Currey <ruscur@russell.cc>
-> Date:   Mon Feb 8 04:08:20 2016 +0000
->
->      powerpc/powernv: Remove support for p5ioc2
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15e5fc32e00000
-> start commit:   76bb8b05 Merge tag 'kbuild-v5.5' of git://git.kernel.org/p..
-> git tree:       upstream
-> final crash:    https://syzkaller.appspot.com/x/report.txt?x=17e5fc32e00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13e5fc32e00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=dd226651cb0f364b
-> dashboard link: https://syzkaller.appspot.com/bug?extid=9af6d43c1beabec8fd05
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d15061e00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14b69aeae00000
->
-> Reported-by: syzbot+9af6d43c1beabec8fd05@syzkaller.appspotmail.com
-> Fixes: 2de50e9674fc ("powerpc/powernv: Remove support for p5ioc2")
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
+add vmx msr entry although older host kernels don't include them.
 
-This should have been detected as "does not affect binary", but there
-is something I don't understand/missing:
-This is bisected to 2de50e9674fc4ca3c6174b04477f69eb26b4ee31
-and it has this parent:
-$ git log -n 1 --format="%P" 2de50e9674fc4ca3c6174b04477f69eb26b4ee31
-388f7b1d6e8ca06762e2454d28d6c3c55ad0fe95
-But the parent was never tested during bisection... how is this possible?
-Mentioned this here:
-https://github.com/google/syzkaller/issues/1271#issuecomment-561504032
+But old host kernel + newest qemu will cause a qemu crash as follows:
+qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
+cpu->kvm_msr_buf->nmsrs' failed.
+
+This fixes it by relaxing the condition.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+---
+ target/i386/kvm.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index bf16556..a8c44bf 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2936,7 +2936,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                      (uint32_t)e->index, (uint64_t)e->data);
+     }
+ 
+-    assert(ret == cpu->kvm_msr_buf->nmsrs);
++    assert(ret <= cpu->kvm_msr_buf->nmsrs);
+     return 0;
+ }
+ 
+-- 
+1.7.1
+
