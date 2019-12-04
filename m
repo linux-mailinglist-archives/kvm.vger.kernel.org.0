@@ -2,209 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C93D31128D2
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 11:05:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F08F1128D8
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 11:06:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727508AbfLDKFy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 05:05:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50057 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727420AbfLDKFx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 05:05:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575453951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3bzkOfkSPb6+yZQ19D8wPgL9epYwdepj3FzmNzcMCF4=;
-        b=Xo2ZxuP+ZKMjMSxS1uzldPjtQhA5s9X9771JbYmCuVyysTd7CFa4oYgcZsLXud/GZqFIUt
-        PRyOeKAYXPcOcUxzHdfGyW1vtpbn9fd2Vf9zPwaVtkmlBqeg+xHjOrNYPNmXAu8wK5dvPl
-        ewdtWVFM9kZX3v4TCO8G71jN/dq6vxg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-cuY3rbKBPQ2j1I_VVRCCZA-1; Wed, 04 Dec 2019 05:05:51 -0500
-Received: by mail-wm1-f72.google.com with SMTP id b131so2026312wmd.9
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 02:05:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3bzkOfkSPb6+yZQ19D8wPgL9epYwdepj3FzmNzcMCF4=;
-        b=kvC1rRNnMW8WjKImMY7RtJFQq55Tkc6o8iUZgS08sQ4xiBksqehqXpFPeq+/hLzn61
-         CKmqyvDK3Wr8l4vkpQIxsEAsq05BdDrgc2Ycea6QiRU+OzUJF9B/A1fU7EtNPluFKoUA
-         vVPZ5lyPVoE71KI8wqeiWJLfYdFPvRTXZpuNAbS4aETtS1FshAVoNm0CKdMWhtj0lMTK
-         ROE8EFZLGJTn9/+0sqAKnqt+uBTjVig3wsd+xKE0PtTrHigMBlLWv51fTZCvopSYOM0D
-         BoSYevzI5s9D/EyhghR3cyknDYbbw0Kw0ibzSJF6CXiBDn5ecktyXEa/RexP3mfPKQl5
-         RaYA==
-X-Gm-Message-State: APjAAAX5NFOXaS/p0QYZ3t44HNGUaMdWzw9LwxJTq6ASMTFl7qSA599M
-        SRuXx1hEQl0TWwGLYfUS/v9QsvS2rzOMZ44W3/CXW6/JSIH8oVZlnw1V/BbT6Ar1Lgb5LyHa35d
-        44gYSx3ceqsqK
-X-Received: by 2002:a1c:6389:: with SMTP id x131mr24167545wmb.174.1575453949342;
-        Wed, 04 Dec 2019 02:05:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzAiISuDcUWRbEN4GA4CkChNhzcGczIBRYMip+8ZZRMkK0DKzpZdJ6CixN1sArGDUdLUzH2jQ==
-X-Received: by 2002:a1c:6389:: with SMTP id x131mr24167500wmb.174.1575453948930;
-        Wed, 04 Dec 2019 02:05:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
-        by smtp.gmail.com with ESMTPSA id k4sm6458033wmk.26.2019.12.04.02.05.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Dec 2019 02:05:48 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <20191202201036.GJ4063@linux.intel.com> <20191202211640.GF31681@xz-x1>
- <20191202215049.GB8120@linux.intel.com>
- <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
- <20191203184600.GB19877@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
-Date:   Wed, 4 Dec 2019 11:05:47 +0100
+        id S1727555AbfLDKG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 05:06:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63922 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727331AbfLDKG1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 05:06:27 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB4A38Ao189530
+        for <kvm@vger.kernel.org>; Wed, 4 Dec 2019 05:06:26 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wnp8spg4h-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 05:06:25 -0500
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 4 Dec 2019 10:06:24 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 4 Dec 2019 10:06:22 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB4A6Ka143975018
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Dec 2019 10:06:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 810B242047;
+        Wed,  4 Dec 2019 10:06:20 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4301042045;
+        Wed,  4 Dec 2019 10:06:20 +0000 (GMT)
+Received: from dyn-9-152-224-146.boeblingen.de.ibm.com (unknown [9.152.224.146])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  4 Dec 2019 10:06:20 +0000 (GMT)
+Subject: Re: [PATCH v2] KVM: s390: Add new reset vcpu API
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+References: <20191203162055.3519-1-frankja@linux.ibm.com>
+ <c22eefd7-2c99-ec8e-3b5c-fabb343230a9@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
+ qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
+ 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
+ zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
+ lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
+ Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
+ 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
+ cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
+ Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
+ HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
+ YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
+ CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
+ AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
+ bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
+ eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
+ CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
+ EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
+ rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
+ UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
+ RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
+ dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
+ jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
+ cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
+ JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
+ iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
+ tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
+ 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
+ v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
+ HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
+ 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
+ gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
+ BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
+ 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
+ jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
+ IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
+ katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
+ dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
+ FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
+ DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
+ Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
+ phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
+Date:   Wed, 4 Dec 2019 11:06:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191203184600.GB19877@linux.intel.com>
-Content-Language: en-US
-X-MC-Unique: cuY3rbKBPQ2j1I_VVRCCZA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <c22eefd7-2c99-ec8e-3b5c-fabb343230a9@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ExzxFqnbt3eXJ62bVySFXO6EKLyH0uwqt"
+X-TM-AS-GCONF: 00
+x-cbid: 19120410-0008-0000-0000-0000033CE216
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120410-0009-0000-0000-00004A5C00C4
+Message-Id: <26845508-9a35-7ec6-fc01-49ab4b7e3473@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-04_03:2019-12-04,2019-12-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=3 clxscore=1015 impostorscore=0 bulkscore=0 adultscore=0
+ spamscore=0 phishscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912040078
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/12/19 19:46, Sean Christopherson wrote:
-> On Tue, Dec 03, 2019 at 02:48:10PM +0100, Paolo Bonzini wrote:
->> On 02/12/19 22:50, Sean Christopherson wrote:
->>>>
->>>> I discussed this with Paolo, but I think Paolo preferred the per-vm
->>>> ring because there's no good reason to choose vcpu0 as what (1)
->>>> suggested.  While if to choose (2) we probably need to lock even for
->>>> per-cpu ring, so could be a bit slower.
->>> Ya, per-vm is definitely better than dumping on vcpu0.  I'm hoping we can
->>> find a third option that provides comparable performance without using any
->>> per-vcpu rings.
->>>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ExzxFqnbt3eXJ62bVySFXO6EKLyH0uwqt
+Content-Type: multipart/mixed; boundary="GPdkDX2PbElgakyMyjFk2AgB9GNHvM5TW"
+
+--GPdkDX2PbElgakyMyjFk2AgB9GNHvM5TW
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 12/4/19 10:32 AM, Thomas Huth wrote:
+> On 03/12/2019 17.20, Janosch Frank wrote:
+>> The architecture states that we need to reset local IRQs for all CPU
+>> resets. Because the old reset interface did not support the normal CPU=
+
+>> reset we never did that.
 >>
->> The advantage of per-vCPU rings is that it naturally: 1) parallelizes
->> the processing of dirty pages; 2) makes userspace vCPU thread do more
->> work on vCPUs that dirty more pages.
+>> Now that we have a new interface, let's properly clear out local IRQs
+>> and let this commit be a reminder.
 >>
->> I agree that on the producer side we could reserve multiple entries in
->> the case of PML (and without PML only one entry should be added at a
->> time).  But I'm afraid that things get ugly when the ring is full,
->> because you'd have to wait for all vCPUs to finish publishing the
->> entries they have reserved.
-> 
-> Ah, I take it the intended model is that userspace will only start pulling
-> entries off the ring when KVM explicitly signals that the ring is "full"?
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  arch/s390/kvm/kvm-s390.c | 13 +++++++++++++
+>>  include/uapi/linux/kvm.h |  4 ++++
+>>  2 files changed, 17 insertions(+)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index d9e6bf3d54f0..602214c5616c 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, =
+long ext)
+>>  	case KVM_CAP_S390_CMMA_MIGRATION:
+>>  	case KVM_CAP_S390_AIS:
+>>  	case KVM_CAP_S390_AIS_MIGRATION:
+>> +	case KVM_CAP_S390_VCPU_RESETS:
+>>  		r =3D 1;
+>>  		break;
+>>  	case KVM_CAP_S390_HPAGE_1M:
+>> @@ -3287,6 +3288,13 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(stru=
+ct kvm_vcpu *vcpu,
+>>  	return r;
+>>  }
+>> =20
+>> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
+>> +{
+>> +	kvm_clear_async_pf_completion_queue(vcpu);
+>> +	kvm_s390_clear_local_irqs(vcpu);
+>> +	return 0;
+>> +}
+>> +
+>>  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
+>>  {
+>>  	kvm_s390_vcpu_initial_reset(vcpu);
+>> @@ -4363,7 +4371,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>  		r =3D kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
+>>  		break;
+>>  	}
+>> +	case KVM_S390_NORMAL_RESET:
+>> +		r =3D kvm_arch_vcpu_ioctl_normal_reset(vcpu);
+>> +		break;
+>>  	case KVM_S390_INITIAL_RESET:
+>> +		/* fallthrough */
+>> +	case KVM_S390_CLEAR_RESET:
+>>  		r =3D kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+>>  		break;
+>=20
+> Isn't clear reset supposed to do more than the initial reset? If so, I'=
+d
+> rather expect it the other way round:
 
-No, it's not.  But perhaps in the asynchronous case you can delay
-pushing the reserved entries to the consumer until a moment where no
-CPUs have left empty slots in the ring buffer (somebody must have done
-multi-producer ring buffers before).  In the ring-full case that is
-harder because it requires synchronization.
+In the PV patch I remove the fallthrough and add a function for the
+clear reset. I add the UV reset calls into the
+kvm_arch_vcpu_ioctl_*_reset() functions, therefore I can't fallthrough
+because the Ultravisor does currently not allow staged resets (i.e.
+first initial then clear if a clear reset is needed)
 
-> Rather than reserve entries, what if vCPUs reserved an entire ring?  Create
-> a pool of N=nr_vcpus rings that are shared by all vCPUs.  To mark pages
-> dirty, a vCPU claims a ring, pushes the pages into the ring, and then
-> returns the ring to the pool.  If pushing pages hits the soft limit, a
-> request is made to drain the ring and the ring is not returned to the pool
-> until it is drained.
-> 
-> Except for acquiring a ring, which likely can be heavily optimized, that'd
-> allow parallel processing (#1), and would provide a facsimile of #2 as
-> pushing more pages onto a ring would naturally increase the likelihood of
-> triggering a drain.  And it might be interesting to see the effect of using
-> different methods of ring selection, e.g. pure round robin, LRU, last used
-> on the current vCPU, etc...
+>=20
+> 	case KVM_S390_CLEAR_RESET:
+> 		/* fallthrough */
+> 	case KVM_S390_INITIAL_RESET:
+> 		r =3D kvm_arch_vcpu_ioctl_initial_reset(vcpu);
+> 		break;
+>=20
+> ... so you can later add the additional stuff before the "/* fallthroug=
+h
+> */"?
+>=20
+>  Thomas
+>=20
 
-If you are creating nr_vcpus rings, and draining is done on the vCPU
-thread that has filled the ring, why not create nr_vcpus+1?  The current
-code then is exactly the same as pre-claiming a ring per vCPU and never
-releasing it, and using a spinlock to claim the per-VM ring.
 
-However, we could build on top of my other suggestion to add
-slot->as_id, and wrap kvm_get_running_vcpu() with a nice API, mimicking
-exactly what you've suggested.  Maybe even add a scary comment around
-kvm_get_running_vcpu() suggesting that users only do so to avoid locking
-and wrap it with a nice API.  Similar to what get_cpu/put_cpu do with
-smp_processor_id.
 
-1) Add a pointer from struct kvm_dirty_ring to struct
-kvm_dirty_ring_indexes:
+--GPdkDX2PbElgakyMyjFk2AgB9GNHvM5TW--
 
-vcpu->dirty_ring->data = &vcpu->run->vcpu_ring_indexes;
-kvm->vm_dirty_ring->data = *kvm->vm_run->vm_ring_indexes;
+--ExzxFqnbt3eXJ62bVySFXO6EKLyH0uwqt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-2) push the ring choice and locking to two new functions
+-----BEGIN PGP SIGNATURE-----
 
-struct kvm_ring *kvm_get_dirty_ring(struct kvm *kvm)
-{
-	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3nhRsACgkQ41TmuOI4
+ufgFkRAAwNIEGdeEBZGd8XPkNrABROS1n6A8Al2gsi/gXIU94pLgh+VX0JhTByuL
+m3uKbABDr9i2L8rfcKVW2EwXcMGBHtCnGS/fHyvjgNnTvbGFyBNOcYNi5QrQv9iy
+2zxPgPFdUr9QO0EdjAf5j6M4LQwZm3SLz5dVD6zvaACGSYg4zFuDDEg9HLtq2D6Z
+e5hbAijwfCkdBjiZNLtMC6hMtJn1srO0w/IbGTjCBt1ItkrYXNrR64ZmP0Bsfj6w
+N42ohiBD1VCJ9KV42/P7I0b+uO38Db+7fUAp8wqJiMGUrEK9eZdYbXbLiRoYEteK
+HbsDAmmoKgZaP7y2RhxQYKHdN0XyBHy/afUhANsDEWBaHJ6IOG64EosCdmiShw6J
+qPzMAA0F4W2tEwEmpQj/hVR5ruXhGVZxRMSvvoUGn+PZBzHnoJjRDsAuZwO7Qro0
+ss0FEHb9RCuth55nlMPIoUvoNRwhXO38QUjZrjmJ3Z+Yy6JWJO06Tz3JqAln8G25
+tY3aV9p98uN+9kXTyFZd4BOSQpdWQMmRsytAGfucIkU0yI+iaqvY2yMwQchsawmq
+9pj5j3+rOp1iUJKJq5CpQubPwDdadMiPJek/nvvvSM6Ai4VftYlFM1osRzk6ApgQ
+D/xavQBZRFf9P3Taiiqrd5Izcqjrx5jWHoYc15ARl9XEkN8VZko=
+=uT3n
+-----END PGP SIGNATURE-----
 
-	if (vcpu && !WARN_ON_ONCE(vcpu->kvm != kvm)) {
-		return &vcpu->dirty_ring;
-	} else {
-		/*
-		 * Put onto per vm ring because no vcpu context.
-		 * We'll kick vcpu0 if ring is full.
-		 */
-		spin_lock(&kvm->vm_dirty_ring->lock);
-		return &kvm->vm_dirty_ring;
-	}
-}
-
-void kvm_put_dirty_ring(struct kvm *kvm,
-			struct kvm_dirty_ring *ring)
-{
-	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-	bool full = kvm_dirty_ring_used(ring) >= ring->soft_limit;
-
-	if (ring == &kvm->vm_dirty_ring) {
-		if (vcpu == NULL)
-			vcpu = kvm->vcpus[0];
-		spin_unlock(&kvm->vm_dirty_ring->lock);
-	}
-
-	if (full)
-		kvm_make_request(KVM_REQ_DIRTY_RING_FULL, vcpu);
-}
-
-3) simplify kvm_dirty_ring_push to
-
-void kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
-			 u32 slot, u64 offset)
-{
-	/* left as an exercise to the reader */
-}
-
-and mark_page_dirty_in_ring to
-
-static void mark_page_dirty_in_ring(struct kvm *kvm,
-				    struct kvm_memory_slot *slot,
-				    gfn_t gfn)
-{
-	struct kvm_dirty_ring *ring;
-
-	if (!kvm->dirty_ring_size)
-		return;
-
-	ring = kvm_get_dirty_ring(kvm);
-	kvm_dirty_ring_push(ring, (slot->as_id << 16) | slot->id,
-			    gfn - slot->base_gfn);
-	kvm_put_dirty_ring(kvm, ring);
-}
-
-Paolo
-
->> It's ugly that we _also_ need a per-VM ring, but unfortunately some
->> operations do not really have a vCPU that they can refer to.
-> 
+--ExzxFqnbt3eXJ62bVySFXO6EKLyH0uwqt--
 
