@@ -2,247 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D1661130EB
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 18:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AD0111310F
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 18:49:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbfLDRiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 12:38:03 -0500
-Received: from mail-eopbgr80081.outbound.protection.outlook.com ([40.107.8.81]:45693
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726934AbfLDRiD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 12:38:03 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gV3AyiSqiKvgdJKSwSKG3bX6tOgQld+yhWn6JncPpjhi/Mfaq95RT0KsnaV63+zEmw1iGSK32yfXSBxq2UPvtEi7egvSbdolRR0KAEaq32ii+5We20PgrhS5f1BgrHGG4GphOs57EmGBr5Kpse7pNxyV9+MObtnxdYQThAgw6riH87Sgm/8lIZw/tS8dNHS31n5ASTjCqANz47u7wiZBgDght/gq397KMjY17z8D9CQIZjpsvB6vNxx6j1V73CyZk/8Ss8ffNO1fM2pRR+9+RFhII4wa6TCdBpMChCq+JkyK3mPCYOyUv5QUXmiYUltnMv5MxehVkWrESNKtCA9ckA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mi7Turn64v8yzcVNQ/vh4qCJq/Gh6AGYltjMOep9X4E=;
- b=Um2ECD86F/rYtwN2G7KWULcWLhjojmHipW3PJx+E/a7BH3UUyBT8cFPG8oQiDeEo5EM+2E+/L1VgzQYhsYLhtVkKNeN+6mxs6pG2oj+3Vx7xfsMMSinTOTCtEqcAye9+mLeX+cHuRsdDNsSdxGM0IjX8SMT2rwsP4E6sPz8FnqySYz7bYvmpvRi+U1xEUsKBy01M68OBUsU9eP3lij2ThTmR12n718gRx/1O5Ad4aJGSE2bJ4BuTj13kBjjDvtnl/veJapLE9rcXemI7KvmJxWPkuTX5sZzvjSdBRGqz5FsTau26pqL9cnwKQBM+Gxth481P4dBo/Nj/la7fg6Vklg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mi7Turn64v8yzcVNQ/vh4qCJq/Gh6AGYltjMOep9X4E=;
- b=qKANXMbJlRYgYxc0cE71WDzseRR/ZAgAwU0IADymDnWdbIn1eZLZjOKuHjbCz/H+y+tyX8dQlVhn4wUuLAW8BggLeTfEGbCmEGl0NjwQxnwErkMAi38mcZj8lfI6+59sXak2SmmWMXN3OlXqPbEKAoWelf+gJhGAClSBHEXih4A=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB4850.eurprd05.prod.outlook.com (20.177.41.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.21; Wed, 4 Dec 2019 17:36:13 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::16:9951:5a4b:9ec6]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::16:9951:5a4b:9ec6%7]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
- 17:36:13 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Topic: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Index: AQHViikX93ntAS7QxEa+ZUX9CByqKKeAQaYwgADEfoCAKW0u8A==
-Date:   Wed, 4 Dec 2019 17:36:12 +0000
-Message-ID: <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108081925.GH4196@zhen-hp.sh.intel.com>
-In-Reply-To: <20191108081925.GH4196@zhen-hp.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: bbed7904-17c4-49bc-287c-08d778e07541
-x-ms-traffictypediagnostic: AM0PR05MB4850:|AM0PR05MB4850:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB4850FDEDDF7C9CA10B1DF515D15D0@AM0PR05MB4850.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0241D5F98C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(13464003)(189003)(199004)(8676002)(9686003)(76176011)(6246003)(6506007)(6306002)(74316002)(54906003)(26005)(6436002)(229853002)(81156014)(53546011)(55016002)(7696005)(102836004)(25786009)(6116002)(14444005)(66446008)(186003)(76116006)(14454004)(81166006)(4326008)(8936002)(99286004)(316002)(66946007)(71190400001)(71200400001)(5660300002)(305945005)(6916009)(7736002)(33656002)(64756008)(66476007)(66556008)(478600001)(2906002)(86362001)(52536014)(966005)(3846002)(11346002)(21314003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4850;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tXFfFaKOMrRDM4zpCzw+qSpxjPH/lKndabKG4hID6q9jSTBn9qgmr2oerqmH2vAnDOeR1dDuQuCZx4QwscEywO9dSXEg2pQB2gz4V6wWw2/PvUqOhW0yBUW7EwZS/hfakEpP45JtiCngJbw+295zudggtAIUE2kdM2g5ekGMuUs+v/9nDDewzWenQwPXiTUwM8AWAyXtLxsrNcH93JaHaDSwNuTleZR2m3qJMa811YM0/vsYJZwKA/Qo2x7C7BUcOOuQLSoFtNSK0kLEDI852mG22pe7a5l0vXmiqTEdcNOm3NoQJq5GgBYgPIjozQlTrOUD6fTIVSpXUHCO7t+b3xg65Gv1ggDCDQtCUwr6bbJqXKvFr+DIZD260Ho6fWXk06UamxAXG7CbgiTPJPJkp7G9XanQLcQep6yX11iqpAo+/Pco/Iifvjr5yG2Fpi1OcXgQlj0e3qMh3yvoqts+5YFvUOU2dMm33uLyFAy2MvnOLx1TA43U0jfHjttgOIC2LbgtnyCR5tg3VRzOM5z+uZA2af0UwX84oEFyW+0dEMk=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1728017AbfLDRs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 12:48:56 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:38999 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727852AbfLDRs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 12:48:56 -0500
+Received: by mail-io1-f66.google.com with SMTP id c16so527428ioh.6;
+        Wed, 04 Dec 2019 09:48:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=efwyYDVEiM7aGDZKhgrFkRs+3EAMj4oWKFlAtJhblEI=;
+        b=ItoU88XZuzrZO3bd6W+JkwY8rfR0JDmQyDRLJ68ui3CPx+xeIPZ7iS55ewh7T7Oe+2
+         7paueF4MTjXbVG8rSQtr61c0KgwiHevS8vAvtIbZq1Gs8YPuROZzzgoqnZ+xiVMWPB5L
+         mk3O4jaqPLlg1kGHabfG/udlMaV1dYiLtiDq01MJV+s0vPQmAx0ieKo/IhQRjFGe6aBU
+         PuUxn9VPLfDhcAhOn3qBVQqdXkSA6DBzGovCkdhuaxKAF5i/bhCvNDMfP69Jt9ilRw79
+         zdGS62OnO0oyfEmBtH3OFeLUbS6Z8UlzhFPMWqYSNtwps714Lp6/TB/yBKsWXWI+YnIk
+         SoNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=efwyYDVEiM7aGDZKhgrFkRs+3EAMj4oWKFlAtJhblEI=;
+        b=aHWdSAahgTQybN9/OWltGNlvpqnsapUvDsRIIOMTwYHqi8jJYRvO1nyYbjnpkRChBD
+         ii6ulIDsYIqXMZLmQDoZEEPRB49wa5gY/Xk1X11XCTv1oRMzwVBRusQ3BbOrQGnndnDR
+         i0eflmBSiSZlZgK6XLn1aQo3Lrxt0s2DWI8Pup7VJBpOIhN79wxi0NdLruZrSRoE4aqE
+         a7FndgBDIB7dbKADZ9Lc4CWSDYvdmJSyqpmqvzR12hZSV1W4UQaOwXIsP+PROC+HNT+M
+         72JDoVazCH7YbYJqAIl83piUWOwpipGA10zc23E+/AFwbuiWhG7P8okdId4JFSXu2MoM
+         QLeg==
+X-Gm-Message-State: APjAAAU73BVHvQCjwt19bgBAAvW+Ery6i6Y//Qwb6votWzztnin0kU/w
+        zWpbkP3qnZTqoVubWxSRtG/Z8yYmIrpSjvZjUH0=
+X-Google-Smtp-Source: APXvYqx+HiNOZY/r+DvcC0thyFzKBj6fe/NmVDty9GuUTcYoZ/bJj6+o/WNB1el+D0yRPX6IZnoj/cUJ8jKynfWRSR8=
+X-Received: by 2002:a02:7f54:: with SMTP id r81mr4203735jac.121.1575481734573;
+ Wed, 04 Dec 2019 09:48:54 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbed7904-17c4-49bc-287c-08d778e07541
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2019 17:36:13.0097
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /nT8MD+n/cf1GmonYP1mi9UevDuqRnNy5fvb8xK06gTXbQtKQgwfnRTre4fx5ZvX1j/3yq4GD62NuQCnXbTUng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4850
+References: <20191119214454.24996.66289.stgit@localhost.localdomain>
+ <20191119214653.24996.90695.stgit@localhost.localdomain> <65de00cf-5969-ea2e-545b-2228a4c859b0@redhat.com>
+ <20191128115436-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20191128115436-mutt-send-email-mst@kernel.org>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Wed, 4 Dec 2019 09:48:43 -0800
+Message-ID: <CAKgT0Uc7g2iOSwwVMZtKg2e2S6SehNoZnOLPiRUfb0PxotUkbw@mail.gmail.com>
+Subject: Re: [PATCH v14 6/6] virtio-balloon: Add support for providing unused
+ page reports to host
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Mel Gorman <mgorman@techsingularity.net>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Nitesh Narayan Lal <nitesh@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Pankaj Gupta <pagupta@redhat.com>,
+        Rik van Riel <riel@surriel.com>, lcapitulino@redhat.com,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Oscar Salvador <osalvador@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ Jiri + Netdev since you mentioned netdev queue.
-
-+ Jason Wang and Michael as we had similar discussion in vdpa discussion th=
-read.
-
-> From: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Sent: Friday, November 8, 2019 2:19 AM
-> To: Parav Pandit <parav@mellanox.com>
->=20
-
-My apologies to reply late.
-Something bad with my email client, due to which I found this patch under s=
-pam folder today.
-More comments below.
-
-> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
-> > Hi,
+On Thu, Nov 28, 2019 at 9:00 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Nov 28, 2019 at 04:25:54PM +0100, David Hildenbrand wrote:
+> > On 19.11.19 22:46, Alexander Duyck wrote:
+> > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > >
+> > > Add support for the page reporting feature provided by virtio-balloon.
+> > > Reporting differs from the regular balloon functionality in that is is
+> > > much less durable than a standard memory balloon. Instead of creating a
+> > > list of pages that cannot be accessed the pages are only inaccessible
+> > > while they are being indicated to the virtio interface. Once the
+> > > interface has acknowledged them they are placed back into their respective
+> > > free lists and are once again accessible by the guest system.
 > >
-> > > -----Original Message-----
-> > > From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On
-> > > Behalf Of Zhenyu Wang
-> > > Sent: Thursday, October 24, 2019 12:08 AM
-> > > To: kvm@vger.kernel.org
-> > > Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
-> > > kevin.tian@intel.com; cohuck@redhat.com
-> > > Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
-> > >
-> > > Hi,
-> > >
-> > > This is a refresh for previous send of this series. I got impression
-> > > that some SIOV drivers would still deploy their own create and
-> > > config method so stopped effort on this. But seems this would still
-> > > be useful for some other SIOV driver which may simply want
-> > > capability to aggregate resources. So here's refreshed series.
-> > >
-> > > Current mdev device create interface depends on fixed mdev type,
-> > > which get uuid from user to create instance of mdev device. If user
-> > > wants to use customized number of resource for mdev device, then
-> > > only can create new
-> > Can you please give an example of 'resource'?
-> > When I grep [1], [2] and [3], I couldn't find anything related to ' agg=
-regate'.
->=20
-> The resource is vendor device specific, in SIOV spec there's ADI (Assigna=
-ble
-> Device Interface) definition which could be e.g queue for net device, con=
-text
-> for gpu, etc. I just named this interface as 'aggregate'
-> for aggregation purpose, it's not used in spec doc.
->=20
-
-Some 'unknown/undefined' vendor specific resource just doesn't work.
-Orchestration tool doesn't know which resource and what/how to configure fo=
-r which vendor.
-It has to be well defined.
-
-You can also find such discussion in recent lgpu DRM cgroup patches series =
-v4.
-
-Exposing networking resource configuration in non-net namespace aware mdev =
-sysfs at PCI device level is no-go.
-Adding per file NET_ADMIN or other checks is not the approach we follow in =
-kernel.
-
-devlink has been a subsystem though under net, that has very rich interface=
- for syscaller, device health, resource management and many more.
-Even though it is used by net driver today, its written for generic device =
-management at bus/device level.
-
-Yuval has posted patches to manage PCI sub-devices [1] and updated version =
-will be posted soon which addresses comments.
-
-For any device slice resource management of mdev, sub-function etc, we shou=
-ld be using single kernel interface as devlink [2], [3].
-
-[1] https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-yuvala=
-v@mellanox.com/
-[2] http://man7.org/linux/man-pages/man8/devlink-dev.8.html
-[3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
-
-Most modern device configuration that I am aware of is usually done via wel=
-l defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and mor=
-e) or via netlink commands (net, devlink, rdma and more) not via sysfs.
-
-> Thanks
->=20
+> > Maybe add something like "In contrast to ordinary balloon
+> > inflation/deflation, the guest can reuse all reported pages immediately
+> > after reporting has finished, without having to notify the hypervisor
+> > about it (e.g., VIRTIO_BALLOON_F_MUST_TELL_HOST does not apply)."
+>
+> Maybe we can make apply. The effect of reporting a page is effectively
+> putting it in a balloon then immediately taking it out. Maybe without
+> VIRTIO_BALLOON_F_MUST_TELL_HOST the pages can be reused before host
+> marked buffers used?
+>
+> We didn't teach existing page hinting to behave like this, but maybe we
+> should, and maybe it's not too late, not a long time passed
+> since it was merged, and the whole shrinker based thing
+> seems to have been broken ...
+>
+>
+> BTW generally UAPI patches will have to be sent to virtio-dev
+> mailing list before they are merged.
+>
+> > [...]
 > >
-> > > mdev type for that which may not be flexible. This requirement comes
-> > > not only from to be able to allocate flexible resources for KVMGT,
-> > > but also from Intel scalable IO virtualization which would use
-> > > vfio/mdev to be able to allocate arbitrary resources on mdev instance=
-.
-> More info on [1] [2] [3].
+> > >  /*
+> > >   * Balloon device works in 4K page units.  So each page is pointed to by
+> > > @@ -37,6 +38,9 @@
+> > >  #define VIRTIO_BALLOON_FREE_PAGE_SIZE \
+> > >     (1 << (VIRTIO_BALLOON_FREE_PAGE_ORDER + PAGE_SHIFT))
 > > >
-> > > To allow to create user defined resources for mdev, it trys to
-> > > extend mdev create interface by adding new "aggregate=3Dxxx" paramete=
-r
-> > > following UUID, for target mdev type if aggregation is supported, it
-> > > can create new mdev device which contains resources combined by
-> > > number of instances, e.g
-> > >
-> > >     echo "<uuid>,aggregate=3D10" > create
-> > >
-> > > VM manager e.g libvirt can check mdev type with "aggregation"
-> > > attribute which can support this setting. If no "aggregation"
-> > > attribute found for mdev type, previous behavior is still kept for
-> > > one instance allocation. And new sysfs attribute
-> > > "aggregated_instances" is created for each mdev device to show alloca=
-ted
-> number.
-> > >
-> > > References:
-> > > [1]
-> > > https://software.intel.com/en-us/download/intel-virtualization-techn
-> > > ology- for-directed-io-architecture-specification
-> > > [2]
-> > > https://software.intel.com/en-us/download/intel-scalable-io-virtuali
-> > > zation-
-> > > technical-specification
-> > > [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
-> > >
-> > > Zhenyu Wang (6):
-> > >   vfio/mdev: Add new "aggregate" parameter for mdev create
-> > >   vfio/mdev: Add "aggregation" attribute for supported mdev type
-> > >   vfio/mdev: Add "aggregated_instances" attribute for supported mdev
-> > >     device
-> > >   Documentation/driver-api/vfio-mediated-device.rst: Update for
-> > >     vfio/mdev aggregation support
-> > >   Documentation/ABI/testing/sysfs-bus-vfio-mdev: Update for vfio/mdev
-> > >     aggregation support
-> > >   drm/i915/gvt: Add new type with aggregation support
-> > >
-> > >  Documentation/ABI/testing/sysfs-bus-vfio-mdev | 24 ++++++
-> > >  .../driver-api/vfio-mediated-device.rst       | 23 ++++++
-> > >  drivers/gpu/drm/i915/gvt/gvt.c                |  4 +-
-> > >  drivers/gpu/drm/i915/gvt/gvt.h                | 11 ++-
-> > >  drivers/gpu/drm/i915/gvt/kvmgt.c              | 53 ++++++++++++-
-> > >  drivers/gpu/drm/i915/gvt/vgpu.c               | 56 ++++++++++++-
-> > >  drivers/vfio/mdev/mdev_core.c                 | 36 ++++++++-
-> > >  drivers/vfio/mdev/mdev_private.h              |  6 +-
-> > >  drivers/vfio/mdev/mdev_sysfs.c                | 79 +++++++++++++++++=
-+-
-> > >  include/linux/mdev.h                          | 19 +++++
-> > >  10 files changed, 294 insertions(+), 17 deletions(-)
-> > >
-> > > --
-> > > 2.24.0.rc0
+> > > +/*  limit on the number of pages that can be on the reporting vq */
+> > > +#define VIRTIO_BALLOON_VRING_HINTS_MAX     16
 > >
->=20
-> --
-> Open Source Technology Center, Intel ltd.
->=20
-> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+> > Maybe rename that from HINTS to REPORTS
+> >
+> > > +
+> > >  #ifdef CONFIG_BALLOON_COMPACTION
+> > >  static struct vfsmount *balloon_mnt;
+> > >  #endif
+> > > @@ -46,6 +50,7 @@ enum virtio_balloon_vq {
+> > >     VIRTIO_BALLOON_VQ_DEFLATE,
+> > >     VIRTIO_BALLOON_VQ_STATS,
+> > >     VIRTIO_BALLOON_VQ_FREE_PAGE,
+> > > +   VIRTIO_BALLOON_VQ_REPORTING,
+> > >     VIRTIO_BALLOON_VQ_MAX
+> > >  };
+> > >
+> > > @@ -113,6 +118,10 @@ struct virtio_balloon {
+> > >
+> > >     /* To register a shrinker to shrink memory upon memory pressure */
+> > >     struct shrinker shrinker;
+> > > +
+> > > +   /* Unused page reporting device */
+> >
+> > Sounds like the device is unused :D
+> >
+> > "Device info for reporting unused pages" ?
+> >
+> > I am in general wondering, should we rename "unused" to "free". I.e.,
+> > "free page reporting" instead of "unused page reporting"? Or what was
+> > the motivation behind using "unused" ?
+> >
+> > > +   struct virtqueue *reporting_vq;
+> > > +   struct page_reporting_dev_info pr_dev_info;
+> > >  };
+> > >
+> > >  static struct virtio_device_id id_table[] = {
+> > > @@ -152,6 +161,32 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
+> > >
+> > >  }
+> > >
+> > > +void virtballoon_unused_page_report(struct page_reporting_dev_info *pr_dev_info,
+> > > +                               unsigned int nents)
+> > > +{
+> > > +   struct virtio_balloon *vb =
+> > > +           container_of(pr_dev_info, struct virtio_balloon, pr_dev_info);
+> > > +   struct virtqueue *vq = vb->reporting_vq;
+> > > +   unsigned int unused, err;
+> > > +
+> > > +   /* We should always be able to add these buffers to an empty queue. */
+> >
+> > This comment somewhat contradicts the error handling (and comment)
+> > below. Maybe just drop it?
+> >
+> > > +   err = virtqueue_add_inbuf(vq, pr_dev_info->sg, nents, vb,
+> > > +                             GFP_NOWAIT | __GFP_NOWARN);
+> > > +
+> > > +   /*
+> > > +    * In the extremely unlikely case that something has changed and we
+> > > +    * are able to trigger an error we will simply display a warning
+> > > +    * and exit without actually processing the pages.
+> > > +    */
+> > > +   if (WARN_ON(err))
+> > > +           return;
+> >
+> > Maybe WARN_ON_ONCE? (to not flood the log on recurring errors)
+> >
+> > > +
+> > > +   virtqueue_kick(vq);
+> > > +
+> > > +   /* When host has read buffer, this completes via balloon_ack */
+> > > +   wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
+> >
+> > Is it safe to rely on the same ack-ing mechanism as the inflate/deflate
+> > queue? What if both mechanisms are used concurrently and race/both wait
+> > for the hypervisor?
+> >
+> > Maybe we need a separate vb->acked + callback function.
+> >
+> > > +}
+> > > +
+> > >  static void set_page_pfns(struct virtio_balloon *vb,
+> > >                       __virtio32 pfns[], struct page *page)
+> > >  {
+> > > @@ -476,6 +511,7 @@ static int init_vqs(struct virtio_balloon *vb)
+> > >     names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
+> > >     names[VIRTIO_BALLOON_VQ_STATS] = NULL;
+> > >     names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+> > > +   names[VIRTIO_BALLOON_VQ_REPORTING] = NULL;
+> > >
+> > >     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > >             names[VIRTIO_BALLOON_VQ_STATS] = "stats";
+> > > @@ -487,11 +523,19 @@ static int init_vqs(struct virtio_balloon *vb)
+> > >             callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
+> > >     }
+> > >
+> > > +   if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> > > +           names[VIRTIO_BALLOON_VQ_REPORTING] = "reporting_vq";
+> > > +           callbacks[VIRTIO_BALLOON_VQ_REPORTING] = balloon_ack;
+> > > +   }
+> > > +
+> > >     err = vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_MAX,
+> > >                                      vqs, callbacks, names, NULL, NULL);
+> > >     if (err)
+> > >             return err;
+> > >
+> > > +   if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> > > +           vb->reporting_vq = vqs[VIRTIO_BALLOON_VQ_REPORTING];
+> > > +
+> >
+> > I'd register these in the same order they are defined (IOW, move this
+> > further down)
+> >
+> > >     vb->inflate_vq = vqs[VIRTIO_BALLOON_VQ_INFLATE];
+> > >     vb->deflate_vq = vqs[VIRTIO_BALLOON_VQ_DEFLATE];
+> > >     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
+> > > @@ -932,12 +976,30 @@ static int virtballoon_probe(struct virtio_device *vdev)
+> > >             if (err)
+> > >                     goto out_del_balloon_wq;
+> > >     }
+> > > +
+> > > +   vb->pr_dev_info.report = virtballoon_unused_page_report;
+> > > +   if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> > > +           unsigned int capacity;
+> > > +
+> > > +           capacity = min_t(unsigned int,
+> > > +                            virtqueue_get_vring_size(vb->reporting_vq),
+> > > +                            VIRTIO_BALLOON_VRING_HINTS_MAX);
+> > > +           vb->pr_dev_info.capacity = capacity;
+> > > +
+> > > +           err = page_reporting_register(&vb->pr_dev_info);
+> > > +           if (err)
+> > > +                   goto out_unregister_shrinker;
+> > > +   }
+> >
+> > It can happen here that we start reporting before marking the device
+> > ready. Can that be problematic?
+> >
+> > Maybe we have to ignore any reports in virtballoon_unused_page_report()
+> > until ready...
+> >
+> > > +
+> > >     virtio_device_ready(vdev);
+> > >
+> > >     if (towards_target(vb))
+> > >             virtballoon_changed(vdev);
+> > >     return 0;
+> > >
+> > > +out_unregister_shrinker:
+> > > +   if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+> > > +           virtio_balloon_unregister_shrinker(vb);
+> >
+> > A sync is done implicitly, right? So after this call, we won't get any
+> > new callbacks/are stuck in a callback.
+> >
+> > >  out_del_balloon_wq:
+> > >     if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
+> > >             destroy_workqueue(vb->balloon_wq);
+> > > @@ -966,6 +1028,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
+> > >  {
+> > >     struct virtio_balloon *vb = vdev->priv;
+> > >
+> > > +   if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
+> > > +           page_reporting_unregister(&vb->pr_dev_info);
+> >
+> > Dito, same question regarding syncs.
+> >
+> > >     if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+> > >             virtio_balloon_unregister_shrinker(vb);
+> > >     spin_lock_irq(&vb->stop_update_lock);
+> > > @@ -1038,6 +1102,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
+> > >     VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> > >     VIRTIO_BALLOON_F_FREE_PAGE_HINT,
+> > >     VIRTIO_BALLOON_F_PAGE_POISON,
+> > > +   VIRTIO_BALLOON_F_REPORTING,
+> > >  };
+> > >
+> > >  static struct virtio_driver virtio_balloon_driver = {
+> > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> > > index a1966cd7b677..19974392d324 100644
+> > > --- a/include/uapi/linux/virtio_balloon.h
+> > > +++ b/include/uapi/linux/virtio_balloon.h
+> > > @@ -36,6 +36,7 @@
+> > >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM    2 /* Deflate balloon on OOM */
+> > >  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT    3 /* VQ to report free pages */
+> > >  #define VIRTIO_BALLOON_F_PAGE_POISON       4 /* Guest is using page poisoning */
+> > > +#define VIRTIO_BALLOON_F_REPORTING 5 /* Page reporting virtqueue */
+> > >
+> > >  /* Size of a PFN in the balloon interface. */
+> > >  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> > >
+> > >
+> >
+> > Small and powerful patch :)
+> >
+> > --
+> > Thanks,
+> >
+> > David / dhildenb
+>
+>
