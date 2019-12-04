@@ -2,91 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 809B6112A02
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 12:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76720112A07
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 12:23:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727638AbfLDLUS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 06:20:18 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:34650 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727577AbfLDLUS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 06:20:18 -0500
-Received: by mail-wm1-f65.google.com with SMTP id f4so4599045wmj.1;
-        Wed, 04 Dec 2019 03:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=H33X4AK+u43gUnhB1O2fMOEJjx19wp0DYd+Rf48fRQA=;
-        b=pHnQ75nqMQUj1Idg8y+ZdY1KcmPx6nqGQxnOGR/QcMRyLiHYKfdEj1ke5yQ/IkLbDT
-         dFBvQrbFgk5v0GajNDVSsYtO5oKaW2cSVSQ/GyKBYp/raOWVXQqB2NPPkWJa86xd/L1h
-         2ex+i7D9+VKq+7dyCFQMDECnwxYMePPLth2iJZfR9dZ09v8XZFtmuEIZqHBsuxZd5Xhh
-         ZPicdGxQmS6b+47dkvCkBOItW6o9Zdps+snIQsyWqOk2lUFNSEkxKFxCus4PeM+zG4gr
-         SpjON49YzWFFzNetDesRpBFwWioDykVupisiI0w2WSHUZWEGPdKi4gKMT/IjP29WsHWv
-         qPew==
+        id S1727577AbfLDLXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 06:23:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42101 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727331AbfLDLXB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 06:23:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575458579;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QZnLrosPfN9d8D/YgQSkPEoCOg9aABTUH81VkBYisN8=;
+        b=Di5bARyAgrI+Us3iQhfJhiZOYqezQqA0/ClATPzfLlZGbZhLbDIwhbYaueGUycqM88Jaas
+        Ua2XE3ITLNNk89j8cnbwnicnstFshnsy4moJ/TdV3K51xT+89sIAU5EcxVJe8nDokKkII4
+        tMayaKZZkT1Fe4HGYIclAnqBjcWf3Wo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-zXXsox1ZPA-rXBn2mqZfxg-1; Wed, 04 Dec 2019 06:22:58 -0500
+Received: by mail-wr1-f71.google.com with SMTP id b2so3500615wrj.9
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 03:22:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=H33X4AK+u43gUnhB1O2fMOEJjx19wp0DYd+Rf48fRQA=;
-        b=hO2JJJrIMEwM7k1lsqng4oCHR/bKP4in9ahbTMTFycdeE0MPrrlefqZEwm6HAEmp7L
-         8T9fms70s8uWryd13yl5+ydMq3kFQyygw2OW1UAOkoVJYl79EcLuIYr2WvBTF7dR77U+
-         8udoGeoR5DeTWWNG3FGspLDxc8hyfkkP4H7iffi0O+EF+sPjqyB/Hd3R20SZ1FQr6wOX
-         huL/nHpuNrAq7o7zf5ZnwIg1puTSyPR6t2f+0zck3qtkQRmMoUE6s8As3nL2Y8ArfMv4
-         7NlFSvvJbmqCDvE7H/HukONK+rhT+WCdscJ6opj6YiVK01xXN20r9YWuMTKQvhoChj+d
-         3pkQ==
-X-Gm-Message-State: APjAAAXbhemyRiYSXwnvZ8TrasV/hIPnnuVcaLW0pxV6rYaLJPbtrCRn
-        BAeh+phKJw+dV4diq5i0OB53xRt5
-X-Google-Smtp-Source: APXvYqx3sfx7h6wlSw+Zba7Lzr+rEDFkJ3LR55qcg6m9TLRL50Y7jecyIWXGAsuY7uEkIcwsZvWnkg==
-X-Received: by 2002:a7b:ce19:: with SMTP id m25mr20006752wmc.6.1575458415389;
-        Wed, 04 Dec 2019 03:20:15 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id z13sm6595440wmi.18.2019.12.04.03.20.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Dec 2019 03:20:14 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QZnLrosPfN9d8D/YgQSkPEoCOg9aABTUH81VkBYisN8=;
+        b=BdCpYFPicl2HEO1eFPcBuMwJW7rKHIy6JHg0j7VaA0OfBiT+UnAmbudRdphP8iInmB
+         1YkdoYWoq9exMNv5QGzLc8dIYr3ufbJQ/WWZKiwJdQ2g7xmC1Tkgb61gPqQJxGBKqs/X
+         NoWoaULSb54DFinaZ2dxF75oxXva9j/hjhN4nV3WrkNsHhDQFqlkuPLd0MEeZCbeRU2j
+         p3ut+deLq59M8fqVPzCvGe/8TE+rp0j7DeP7o/aHLLQuujn6QXM07oAvodJ/3ueWFWcX
+         gt0ELml2f1NobuDB1mjvh9bRVQPZE8V7X3Yl6ni7Dj3luto8PyrRcmB9Y5Eo42GZQLM1
+         Pz6w==
+X-Gm-Message-State: APjAAAUKZ50e8mVKP4HIv5yzu+XCGBeucGsytGZywBc09JO+kBzE9wHS
+        SSI3VlPUCix+Iw4fRMYR3soIP2g/tVVESmYi65SLCLhChbhDouDqzoO5x0S1gxA/G2rmZ0jHPYD
+        sp4BjqXb2EUnE
+X-Received: by 2002:a7b:c95a:: with SMTP id i26mr9940542wml.67.1575458577688;
+        Wed, 04 Dec 2019 03:22:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx7Jo9io1wZIZy+j2roCX4NAjKvWVYd89R4kHLpvIwvZkqe8KChoscrIhJVbZvjSZ/EQ8wO+w==
+X-Received: by 2002:a7b:c95a:: with SMTP id i26mr9940521wml.67.1575458577443;
+        Wed, 04 Dec 2019 03:22:57 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
+        by smtp.gmail.com with ESMTPSA id e6sm6978993wru.44.2019.12.04.03.22.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2019 03:22:56 -0800 (PST)
+Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
+ include msrs
+To:     Catherine Ho <catherine.hecx@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+Cc:     Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     bp@alien8.de
-Subject: [PATCH] KVM: x86: fix out-of-bounds write in KVM_GET_EMULATED_CPUID (CVE-2019-19332)
-Date:   Wed,  4 Dec 2019 12:20:12 +0100
-Message-Id: <1575458412-10241-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+Date:   Wed, 4 Dec 2019 12:22:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+Content-Language: en-US
+X-MC-Unique: zXXsox1ZPA-rXBn2mqZfxg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bounds check was present in KVM_GET_SUPPORTED_CPUID but not
-KVM_GET_EMULATED_CPUID.
+On 04/12/19 09:50, Catherine Ho wrote:
+> Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
+> add vmx msr entry although older host kernels don't include them.
+> 
+> But old host kernel + newest qemu will cause a qemu crash as follows:
+> qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+> target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
+> cpu->kvm_msr_buf->nmsrs' failed.
+> 
+> This fixes it by relaxing the condition.
 
-Reported-by: syzbot+e3f4897236c4eeb8af4f@syzkaller.appspotmail.com
-Fixes: 84cffe499b94 ("kvm: Emulate MOVBE", 2013-10-29)
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/cpuid.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+This is intentional.  The VMX MSR entries should not have been added.
+What combination of host kernel/QEMU are you using, and what QEMU
+command line?
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 813a4d2e5c0c..cfafa320a8cf 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -504,7 +504,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 
- 	r = -E2BIG;
- 
--	if (*nent >= maxnent)
-+	if (WARN_ON(*nent >= maxnent))
- 		goto out;
- 
- 	do_host_cpuid(entry, function, 0);
-@@ -815,6 +815,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- static int do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 func,
- 			 int *nent, int maxnent, unsigned int type)
- {
-+	if (*nent >= maxnent)
-+		return -E2BIG;
-+
- 	if (type == KVM_GET_EMULATED_CPUID)
- 		return __do_cpuid_func_emulated(entry, func, nent, maxnent);
- 
--- 
-1.8.3.1
+Paolo
 
