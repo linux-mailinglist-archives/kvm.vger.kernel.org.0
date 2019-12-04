@@ -2,176 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82E1E112964
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 11:37:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC2A6112969
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 11:39:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbfLDKhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 05:37:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21251 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727529AbfLDKhd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 05:37:33 -0500
+        id S1727529AbfLDKi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 05:38:58 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20110 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727446AbfLDKi6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 05:38:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575455851;
+        s=mimecast20190719; t=1575455937;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=nLt4HFCMZdjN5fYw9xFdC17/DzxDFC8QzLeH5bh/084=;
-        b=IE+YCK5VSHfRLmC1Z512t5ClsV+lQ/wIYFresfBZcYdrvEyZA9BniSEkmGmQrDXxP0d1rV
-        FggUEiZFq7PTXPo7fJulxXYphh24nBzPqGrojlDVbkcQf22i1foCRXH3ltvp/y9C5n+grf
-        44+CAQhpxufrRyepG5AqF0ATGiqvvyE=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qyYnPmXfgI61ReQeMn/+NTEgEMEEZXrZpt8TBXvPtWs=;
+        b=PBV9A8K/tIfbfS9wJYChjoNSb9X+xXIEAHaNTucE75HhJ7gElP7WBMO+BMZ5ZJcM0UeGI4
+        XaHG5X/VApWjw7K0qxyt1BdIrHaMcY5pzLlUdJsIuU+mdrndbOiZStICt5QPsrqbshaJJP
+        oZtT1b8uBtnQrNbljCEsgOb7tyQs7II=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-kvO5j03IMfSBU-JrVP5b1g-1; Wed, 04 Dec 2019 05:37:28 -0500
-X-MC-Unique: kvO5j03IMfSBU-JrVP5b1g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-207-GMxku97lOqKb5wfj8JYdEQ-1; Wed, 04 Dec 2019 05:38:56 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA7EEA053D;
-        Wed,  4 Dec 2019 10:37:26 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-39.ams2.redhat.com [10.36.117.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 486845DA70;
-        Wed,  4 Dec 2019 10:37:22 +0000 (UTC)
-Subject: Re: [PATCH v2] KVM: s390: Add new reset vcpu API
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20191203162055.3519-1-frankja@linux.ibm.com>
- <c22eefd7-2c99-ec8e-3b5c-fabb343230a9@redhat.com>
- <26845508-9a35-7ec6-fc01-49ab4b7e3473@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ac908a16-9b00-9c86-42f2-88cff497ed5c@redhat.com>
-Date:   Wed, 4 Dec 2019 11:37:15 +0100
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3388D107ACC4;
+        Wed,  4 Dec 2019 10:38:55 +0000 (UTC)
+Received: from [10.72.12.45] (ovpn-12-45.pek2.redhat.com [10.72.12.45])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0763E101E811;
+        Wed,  4 Dec 2019 10:38:47 +0000 (UTC)
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
+Date:   Wed, 4 Dec 2019 18:38:35 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <26845508-9a35-7ec6-fc01-49ab4b7e3473@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20191129213505.18472-5-peterx@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: GMxku97lOqKb5wfj8JYdEQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qR7wqTKRxEjnmAonEU9nCTVzn0nEQX453"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qR7wqTKRxEjnmAonEU9nCTVzn0nEQX453
-Content-Type: multipart/mixed; boundary="XOTxow7ibzXRVYbHlE1y7VQsmzPAjTnA7";
- protected-headers="v1"
-From: Thomas Huth <thuth@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc: david@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
- cohuck@redhat.com, linux-s390@vger.kernel.org
-Message-ID: <ac908a16-9b00-9c86-42f2-88cff497ed5c@redhat.com>
-Subject: Re: [PATCH v2] KVM: s390: Add new reset vcpu API
-References: <20191203162055.3519-1-frankja@linux.ibm.com>
- <c22eefd7-2c99-ec8e-3b5c-fabb343230a9@redhat.com>
- <26845508-9a35-7ec6-fc01-49ab4b7e3473@linux.ibm.com>
-In-Reply-To: <26845508-9a35-7ec6-fc01-49ab4b7e3473@linux.ibm.com>
 
---XOTxow7ibzXRVYbHlE1y7VQsmzPAjTnA7
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 04/12/2019 11.06, Janosch Frank wrote:
-> On 12/4/19 10:32 AM, Thomas Huth wrote:
->> On 03/12/2019 17.20, Janosch Frank wrote:
->>> The architecture states that we need to reset local IRQs for all CPU
->>> resets. Because the old reset interface did not support the normal CPU
->>> reset we never did that.
->>>
->>> Now that we have a new interface, let's properly clear out local IRQs
->>> and let this commit be a reminder.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>  arch/s390/kvm/kvm-s390.c | 13 +++++++++++++
->>>  include/uapi/linux/kvm.h |  4 ++++
->>>  2 files changed, 17 insertions(+)
->>>
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index d9e6bf3d54f0..602214c5616c 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -529,6 +529,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
->>>  =09case KVM_CAP_S390_CMMA_MIGRATION:
->>>  =09case KVM_CAP_S390_AIS:
->>>  =09case KVM_CAP_S390_AIS_MIGRATION:
->>> +=09case KVM_CAP_S390_VCPU_RESETS:
->>>  =09=09r =3D 1;
->>>  =09=09break;
->>>  =09case KVM_CAP_S390_HPAGE_1M:
->>> @@ -3287,6 +3288,13 @@ static int kvm_arch_vcpu_ioctl_set_one_reg(struc=
-t kvm_vcpu *vcpu,
->>>  =09return r;
->>>  }
->>> =20
->>> +static int kvm_arch_vcpu_ioctl_normal_reset(struct kvm_vcpu *vcpu)
->>> +{
->>> +=09kvm_clear_async_pf_completion_queue(vcpu);
->>> +=09kvm_s390_clear_local_irqs(vcpu);
->>> +=09return 0;
->>> +}
->>> +
->>>  static int kvm_arch_vcpu_ioctl_initial_reset(struct kvm_vcpu *vcpu)
->>>  {
->>>  =09kvm_s390_vcpu_initial_reset(vcpu);
->>> @@ -4363,7 +4371,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>>  =09=09r =3D kvm_arch_vcpu_ioctl_set_initial_psw(vcpu, psw);
->>>  =09=09break;
->>>  =09}
->>> +=09case KVM_S390_NORMAL_RESET:
->>> +=09=09r =3D kvm_arch_vcpu_ioctl_normal_reset(vcpu);
->>> +=09=09break;
->>>  =09case KVM_S390_INITIAL_RESET:
->>> +=09=09/* fallthrough */
->>> +=09case KVM_S390_CLEAR_RESET:
->>>  =09=09r =3D kvm_arch_vcpu_ioctl_initial_reset(vcpu);
->>>  =09=09break;
->>
->> Isn't clear reset supposed to do more than the initial reset? If so, I'd
->> rather expect it the other way round:
->=20
-> In the PV patch I remove the fallthrough and add a function for the
-> clear reset. I add the UV reset calls into the
-> kvm_arch_vcpu_ioctl_*_reset() functions, therefore I can't fallthrough
-> because the Ultravisor does currently not allow staged resets (i.e.
-> first initial then clear if a clear reset is needed)
-
-Ok, then it's fine. But in case you respin your patch, it's maybe less
-confusing if you swap it.
-
- Thomas
+On 2019/11/30 =E4=B8=8A=E5=8D=885:34, Peter Xu wrote:
+> +int kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
+> +=09=09=09struct kvm_dirty_ring_indexes *indexes,
+> +=09=09=09u32 slot, u64 offset, bool lock)
+> +{
+> +=09int ret;
+> +=09struct kvm_dirty_gfn *entry;
+> +
+> +=09if (lock)
+> +=09=09spin_lock(&ring->lock);
+> +
+> +=09if (kvm_dirty_ring_full(ring)) {
+> +=09=09ret =3D -EBUSY;
+> +=09=09goto out;
+> +=09}
+> +
+> +=09entry =3D &ring->dirty_gfns[ring->dirty_index & (ring->size - 1)];
+> +=09entry->slot =3D slot;
+> +=09entry->offset =3D offset;
 
 
---XOTxow7ibzXRVYbHlE1y7VQsmzPAjTnA7--
+Haven't gone through the whole series, sorry if it was a silly question=20
+but I wonder things like this will suffer from similar issue on=20
+virtually tagged archs as mentioned in [1].
 
---qR7wqTKRxEjnmAonEU9nCTVzn0nEQX453
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Is this better to allocate the ring from userspace and set to KVM=20
+instead? Then we can use copy_to/from_user() friends (a little bit slow=20
+on recent CPUs).
 
------BEGIN PGP SIGNATURE-----
+[1] https://lkml.org/lkml/2019/4/9/5
 
-iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl3njGAACgkQLtnXdP5w
-LbVn6Q/8CnGgKZzCuHCOdW6qjfakbo/fIfuAPbPOA5zm14avRLAUMJP/eJKZGcQl
-U1gAILLeQ6QcTsi0WGvS2qm7kdbKJKDKzy2N3/wboTV/huFGvLXdvUEu/wLMw8mQ
-ozieP2gD+TLCvI6NKHISoAfm65IgMrzhL+b6c3aZx9brIbsgD87sZrSum4F6XxMW
-jjxr+0dg/tvHu1hSU+VlTBrxhj5z6+Ix+gcGwgafnJ4V/gN0SFyHOfx5bwudHAHD
-oAF4RUXOcHnnJ3Sp9KttingpAGGsU7pSZWbYmQJsyQEvIM7X4qu485FOEkfRSFll
-hToZcVnSMISMM7Rdb+XpIRAen7095re3jI4YL6Xsrw/bOfR0+f11YUMcDQowbL+y
-FrnZa3PsEJqeOqtbXzY52uuhZLZlx5kkDXqNwvlvaYgTE5qPW7/3yu3wKZk8i2fi
-MM8uGSWKTi9Oajj5djm7XrODQZJZKLOuxKOVsJjBOmygcC2JF2aNbgPppzQ2KbRu
-Gz9JjDEGOxYrw9QZBWAaWc7Y+P7rMK2ZjnLyEB2b2npbZfBb3a/qSssXBaYOUbeF
-VztexG66N0PK5tOIieIE0nnkqJ+Zkw3VM9ICgMxCJZWBPVcE8LV2sGFC6LcCeYGv
-7eS6jHvWvDEslwMYwhfgGXG9Bbnl7+kQ8LjC4nMG7jUg5/mnT5E=
-=nXSx
------END PGP SIGNATURE-----
+Thanks
 
---qR7wqTKRxEjnmAonEU9nCTVzn0nEQX453--
+
+> +=09smp_wmb();
+> +=09ring->dirty_index++;
+> +=09WRITE_ONCE(indexes->avail_index, ring->dirty_index);
+> +=09ret =3D kvm_dirty_ring_used(ring) >=3D ring->soft_limit;
+> +=09pr_info("%s: slot %u offset %llu used %u\n",
+> +=09=09__func__, slot, offset, kvm_dirty_ring_used(ring));
+> +
+> +out:
 
