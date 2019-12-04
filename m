@@ -2,144 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFD98112FBC
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 17:12:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B19AC112FE7
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 17:23:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728735AbfLDQMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 11:12:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43793 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728564AbfLDQMt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 11:12:49 -0500
+        id S1728681AbfLDQX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 11:23:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39712 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727008AbfLDQX5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 4 Dec 2019 11:23:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575475967;
+        s=mimecast20190719; t=1575476635;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iBPKZZ1S6h+pflfRLsbt4YQvZfduXk93viwFWwQMor4=;
-        b=aGSA02pwwzytN8y3tE4HRa5Prop91D5RQcHkzqEKQUWG74dsOjwZ4mWy7xvt5ul9pgrsvu
-        q3Y/8oTQNQPGZPab2R6sVXq+r4pAM1V5gyOClhxVwFpP8Rgh/IRwdNm29YW7yTIZziO5OE
-        ToWQA/EM+SdH1wscfLqvnH237NX7JBQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-xANbEaMvMmm7smrQHkwycA-1; Wed, 04 Dec 2019 11:12:46 -0500
-Received: by mail-wr1-f72.google.com with SMTP id l20so67595wrc.13
-        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 08:12:46 -0800 (PST)
+        bh=zi3siVzuD0gF9Jfvrp7PZuuqYsCl8OlTBWpf/P1Jdb4=;
+        b=c7wZGyMtO0CjaAKMMJgSiBLSfDihIgw+c8m0Q0UEtSysiwsTaDO49dyEVQDfTx4hIjpC2k
+        iJn4EPCvvc85XkZrCIHgOMw5gFWriC32Co+CyRai2mxLgxijAPgld/jCao0b80pwJlA1TG
+        U2UfIBCatsKwEaOZ35WzaRdSLx8B7qs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-oisfIGxPPY65zC4_vfnz_g-1; Wed, 04 Dec 2019 11:23:54 -0500
+Received: by mail-wm1-f71.google.com with SMTP id b131so2366141wmd.9
+        for <kvm@vger.kernel.org>; Wed, 04 Dec 2019 08:23:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=az7yGx5mjj6saclgmtqUq3bomG8Y9h4yXQPUO7zazjU=;
-        b=BmUjQifRx16oqCIfhfppwff7jnQ6FF/fIr4YBR6xbs/VXgUENBb0Y/Ftyf2S73PbB3
-         A5p5nu1inXBZnBODEjG/vROjtaRihScZGWqploJ8ynzDOinDXLiAHtfEhE8eGfj8bb3H
-         Qn+FZkBr6Qq5u7TWQFz67Xkph9CcSYTegZnXY4t4DhvFQDlipskaDw0II6Pj73MtWvAf
-         QJYf5AzPpWKGmhGOVDOD8KbOoKbySdxBBbGESCVAlu7R9DJE4NNNRwKXYtheilScdCqa
-         SR4PpJr79JG2jAkGDpWxOzWrO/xEavG85OEOsO+w/YaDI/vcssXHK0DNySvJWQPr/BaJ
-         fQlg==
-X-Gm-Message-State: APjAAAVR453o9E5deJy6q6QENDWDwimb7HljHRs81YaxuNpTz43Iy9Fb
-        g42PAzmiYViP23ciD/xDCeCckrZeji2j9Uc5qzUliA62kdsmdTdpQUcmmQMMU8yqyO/I4qNMRk5
-        jJewa6o14iDY9
-X-Received: by 2002:adf:f18b:: with SMTP id h11mr4779045wro.56.1575475964972;
-        Wed, 04 Dec 2019 08:12:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxTJH5SA3fe8QAEzL29ciROHFyN3zU3Fi4M6fp77QL0tF0/UnHDFahXlLgvuujaCUbQPRN9pw==
-X-Received: by 2002:adf:f18b:: with SMTP id h11mr4779023wro.56.1575475964785;
-        Wed, 04 Dec 2019 08:12:44 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f1sm8745843wrp.93.2019.12.04.08.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2019 08:12:44 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] KVM: X86: Conert the last users of "shorthand = 0" to use macros
-In-Reply-To: <20191203165903.22917-7-peterx@redhat.com>
-References: <20191203165903.22917-1-peterx@redhat.com> <20191203165903.22917-7-peterx@redhat.com>
-Date:   Wed, 04 Dec 2019 17:12:43 +0100
-Message-ID: <875ziwt6h0.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zi3siVzuD0gF9Jfvrp7PZuuqYsCl8OlTBWpf/P1Jdb4=;
+        b=XoZ8bhzwgUt7sjncgc4OqGVrRsTPSZnGoNAKf6F+gH3cOoeR+eBy67pAOLwm6jSp7G
+         tVjC9duX8ap27F57DmBnwP5QWwKBZ35M/Rjs8vU68i8OoZHErMHkfWl4hQjnT2csLc4u
+         JPCz2xmNR4rDWAHHCKlaNFPc0s3LHg/Cf5snoycPH+AVfrxRXRvgyM3a93WrwXYVLyAE
+         Wg5yvxrweq7QfOPP5FICovqcZQ/xFNKVb6aeuaDllGtAF0y/VuaskORRWZacyS4wnbm+
+         BGRtSmEZGReJnc5DUAPMxHtd0nejX5aP2w20KXhtwoChAJaZL/JltJBfXaoVvUoJfsS3
+         YGjg==
+X-Gm-Message-State: APjAAAU1ajntVl47s96nDck57Pd9OF5saFRLxKRegqDT7biggGL7GMOm
+        z+7VuTdsU8ffUDReCyPoRVFPphIxI5Ywl1uScTWrj+/lkLFYqX5CSKd4lGvhP7QuWEVwn5/4NZQ
+        kGq3H0ABbH9kp
+X-Received: by 2002:a05:600c:230d:: with SMTP id 13mr327281wmo.13.1575476633258;
+        Wed, 04 Dec 2019 08:23:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzoFwrdUicKLCGUQqrBsC2FVxrG+lTaEvzg61cWLPm1vNon91CH0Ovxt4OsLfpSLXlAn2oIJA==
+X-Received: by 2002:a05:600c:230d:: with SMTP id 13mr327269wmo.13.1575476633007;
+        Wed, 04 Dec 2019 08:23:53 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a? ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
+        by smtp.gmail.com with ESMTPSA id h124sm7729871wme.30.2019.12.04.08.23.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Dec 2019 08:23:52 -0800 (PST)
+Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
+ include msrs
+To:     Eduardo Habkost <ehabkost@redhat.com>
+Cc:     Catherine Ho <catherine.hecx@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Richard Henderson <rth@twiddle.net>, kvm@vger.kernel.org
+References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+ <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+ <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
+ <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
+ <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
+ <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
+ <20191204154730.GB498046@habkost.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4bec2f12-63d7-928e-2e3e-137c68b2a435@redhat.com>
+Date:   Wed, 4 Dec 2019 17:23:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-MC-Unique: xANbEaMvMmm7smrQHkwycA-1
+In-Reply-To: <20191204154730.GB498046@habkost.net>
+Content-Language: en-US
+X-MC-Unique: oisfIGxPPY65zC4_vfnz_g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Peter Xu <peterx@redhat.com> writes:
+On 04/12/19 16:47, Eduardo Habkost wrote:
+> On Wed, Dec 04, 2019 at 04:34:45PM +0100, Paolo Bonzini wrote:
+>> On 04/12/19 16:07, Catherine Ho wrote:
+>>>> Ok, so the problem is that some MSR didn't exist in that version.  Which
+>>> I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BASIC
+>>> (0x480). If I remove this kvm_msr_entry_add(), everything is ok, the guest can
+>>> be boot up successfully.
+>>>
+>>
+>> MSR_IA32_VMX_BASIC was added in kvm-4.10.  Maybe the issue is the
+>> _value_ that is being written to the VM is not valid?  Can you check
+>> what's happening in vmx_restore_vmx_basic?
+> 
+> I believe env->features[FEAT_VMX_BASIC] will be initialized to 0
+> if the host kernel doesn't have KVM_CAP_GET_MSR_FEATURES.
 
-> Change the last users of "shorthand =3D 0" to use APIC_DEST_NOSHORT.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  arch/x86/kvm/ioapic.c   | 4 ++--
->  arch/x86/kvm/irq_comm.c | 2 +-
->  arch/x86/kvm/x86.c      | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-> index f53daeaaeb37..77538fd77dc2 100644
-> --- a/arch/x86/kvm/ioapic.c
-> +++ b/arch/x86/kvm/ioapic.c
-> @@ -330,7 +330,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *=
-ioapic, u32 val)
->  =09=09if (e->fields.delivery_mode =3D=3D APIC_DM_FIXED) {
->  =09=09=09struct kvm_lapic_irq irq;
-> =20
-> -=09=09=09irq.shorthand =3D 0;
-> +=09=09=09irq.shorthand =3D APIC_DEST_NOSHORT;
->  =09=09=09irq.vector =3D e->fields.vector;
->  =09=09=09irq.delivery_mode =3D e->fields.delivery_mode << 8;
->  =09=09=09irq.dest_id =3D e->fields.dest_id;
-> @@ -379,7 +379,7 @@ static int ioapic_service(struct kvm_ioapic *ioapic, =
-int irq, bool line_status)
->  =09irqe.trig_mode =3D entry->fields.trig_mode;
->  =09irqe.delivery_mode =3D entry->fields.delivery_mode << 8;
->  =09irqe.level =3D 1;
-> -=09irqe.shorthand =3D 0;
-> +=09irqe.shorthand =3D APIC_DEST_NOSHORT;
->  =09irqe.msi_redir_hint =3D false;
-> =20
->  =09if (irqe.trig_mode =3D=3D IOAPIC_EDGE_TRIG)
-> diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-> index 7d083f71fc8e..9d711c2451c7 100644
-> --- a/arch/x86/kvm/irq_comm.c
-> +++ b/arch/x86/kvm/irq_comm.c
-> @@ -121,7 +121,7 @@ void kvm_set_msi_irq(struct kvm *kvm, struct kvm_kern=
-el_irq_routing_entry *e,
->  =09irq->msi_redir_hint =3D ((e->msi.address_lo
->  =09=09& MSI_ADDR_REDIRECTION_LOWPRI) > 0);
->  =09irq->level =3D 1;
-> -=09irq->shorthand =3D 0;
-> +=09irq->shorthand =3D APIC_DEST_NOSHORT;
->  }
->  EXPORT_SYMBOL_GPL(kvm_set_msi_irq);
-> =20
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 3b00d662dc14..f6d778436e15 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7355,7 +7355,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, uns=
-igned long flags, int apicid)
->  {
->  =09struct kvm_lapic_irq lapic_irq;
-> =20
-> -=09lapic_irq.shorthand =3D 0;
-> +=09lapic_irq.shorthand =3D APIC_DEST_NOSHORT;
->  =09lapic_irq.dest_mode =3D APIC_DEST_PHYSICAL;
->  =09lapic_irq.level =3D 0;
->  =09lapic_irq.dest_id =3D apicid;
+But the host must have MSR features if the MSRs are added:
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+        if (kvm_feature_msrs && cpu_has_vmx(env)) {
+            kvm_msr_entry_add_vmx(cpu, env->features);
+        }
 
-And, while on it, and if you're not yet tired I just noticed that
-kvm_apic_match_dest()'s parameter is called 'short_hand' while
-everywhere else we use 'shorthand'. Value the consistency we should :-)
+Looks like feature MSRs were backported to 4.14, but
+1389309c811b0c954bf3b591b761d79b1700283d and the previous commit weren't.
 
---=20
-Vitaly
+Paolo
 
