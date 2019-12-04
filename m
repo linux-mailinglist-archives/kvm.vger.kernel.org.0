@@ -2,124 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 611BC112AC6
-	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 12:54:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 069F6112C0B
+	for <lists+kvm@lfdr.de>; Wed,  4 Dec 2019 13:50:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727693AbfLDLyb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 06:54:31 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37333 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727445AbfLDLyb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 06:54:31 -0500
-Received: by mail-wr1-f65.google.com with SMTP id w15so8260971wru.4;
-        Wed, 04 Dec 2019 03:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=ytPbAgq8jfy9JeU4hgqnWTRgViqMNOx0ju4A9bE7cvc=;
-        b=l50GFiDGVkOlKxLSE4U4bT28VrlDfrXZ0M72HBJVo2c/1IzoQjh94GnIObzj36mhjJ
-         vX4kkubF5de83RdF861RMYSdCK4gW/Aoqah5Y8bSxEbj6ezEzKwbRUXbghYDoGlShEu+
-         FwvEhKv6956hvUrm0LfIo+nfGvDObhKu7UJq2LG1jVqajSv+hZnKu05A6aez5ioAnMqP
-         MrGd+jhNMPSTEuO2476WwH6F7xJ39Ng3X+U27XuzNfQr2CydNJXdOEj/voz0u1QPSpYQ
-         itR6VxyRzu6m0YPBTeh43seIlZRMjK8J9wmPSGe7UHwSlC+mr1DQP4vCjVlqnGYPE+Op
-         GUeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=ytPbAgq8jfy9JeU4hgqnWTRgViqMNOx0ju4A9bE7cvc=;
-        b=E5x1nhJUvd0rAZn6+uU9ocahzcb/R6FfW0QLooctpn5J0fVrGcJePQpLsZafWlnvGe
-         xhReiUVS2Ng7PsdCXq6EhY1q5+4hub7Xtew1zejDfwIjSUYC+iGfRQsuU7U1MRvM+Qgz
-         lBVdbooFR+xiUSCdIZeiizEuHiqnwzayzMwCJIA6eape5s8Asf6vhuwFEB/WOBbIPghA
-         Z9k8wACFy+DjB6ysi3Z2vlM7bvMxLAm7UdYIh08SX4ks48QmVNeY3IZ+rPufFlirHWDY
-         zma2voaG6Zr3s7ZNWBrBZeEG8CtMAucKj29r99lTuVpTCbpEJsT6+cbC5DgpcPs1oOdJ
-         637g==
-X-Gm-Message-State: APjAAAV1Gs6NPuuFgetzcpY50uUAQCf4TmWIfBoyIaWn0JatLJekt3Bb
-        LUdlg61WJp+EIBDl/bT+mvoogg/S
-X-Google-Smtp-Source: APXvYqz3dG4Uk+JSz8YAx7xiJc5jlmHdRe2HmLe/sUlEvyLgEHQc2Uo+Uu3QMzlav/L5W5CKrOzzDg==
-X-Received: by 2002:a5d:5452:: with SMTP id w18mr3422738wrv.333.1575460468945;
-        Wed, 04 Dec 2019 03:54:28 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id w17sm8087952wrt.89.2019.12.04.03.54.28
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 04 Dec 2019 03:54:28 -0800 (PST)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@kernel.org,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] Second batch of KVM changes for 5.5 merge window
-Date:   Wed,  4 Dec 2019 12:54:27 +0100
-Message-Id: <1575460467-29531-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727508AbfLDMuY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 07:50:24 -0500
+Received: from ozlabs.org ([203.11.71.1]:54621 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726010AbfLDMuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 07:50:24 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47Sdx93ltvz9sRD;
+        Wed,  4 Dec 2019 23:50:21 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1575463821;
+        bh=TpLuQ4gPjW6F39pyE6T8j3XT7+Ol6XEeWwPWNAd3FK8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=oIcJTdsX7P4bQiXg/tTwok99d45W5LG8vhZbS3jZ2IDoK5vSK6779PFUygL6+6e6t
+         YseypujJqMaRpanRUqwi5HSiSSPoWxCh+VoBE7bMgz9QvsIV0/pCo8TMuzuVV885rU
+         3h6+Vje0IlrehlOdddR3/64JgCAfaS9mOMEQ0xeHvzu/jbGbJXU1ubpR3aoXQj4b+j
+         64hI9CsWa5DX79/p7ID7LbVQJ4LkYPF2WKMtcW0gRkzpG85YLGa3NsQrYEnBOdVW8e
+         zmABco2lnt8h0wnfmncflxWZmSaKtJQtZAzfG7+TUUUFT9+oURhBCn2Jqf9AGXgZI8
+         NgmfyD0TWa2jQ==
+Date:   Wed, 4 Dec 2019 23:50:20 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm tree
+Message-ID: <20191204235020.2e8e39bf@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/=oXvCgMglnVwzMn/jFTcJzI";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+--Sig_/=oXvCgMglnVwzMn/jFTcJzI
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit 96710247298df52a4b8150a62a6fe87083093ff3:
+Hi all,
 
-  Merge tag 'kvm-ppc-next-5.5-2' of git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc into HEAD (2019-11-25 11:29:05 +0100)
+In commit
 
-are available in the git repository at:
+  433f4ba19041 ("KVM: x86: fix out-of-bounds write in KVM_GET_EMULATED_CPUI=
+D (CVE-2019-19332)")
 
+Fixes tag
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+  Fixes: 84cffe499b94 ("kvm: Emulate MOVBE", 2013-10-29)
 
-for you to fetch changes up to 7d73710d9ca2564f29d291d0b3badc09efdf25e9:
+has these problem(s):
 
-  kvm: vmx: Stop wasting a page for guest_msrs (2019-12-04 12:23:27 +0100)
+  - Unexpected trailing date
+    Just use
+	git log -1 --format=3D'Fixes: %h ("%s")'
 
-----------------------------------------------------------------
-* PPC secure guest support
-* small x86 cleanup
-* fix for an x86-specific out-of-bounds write on a ioctl (not guest triggerable,
-  data not attacker-controlled)
+--=20
+Cheers,
+Stephen Rothwell
 
-----------------------------------------------------------------
-Anshuman Khandual (1):
-      powerpc: Ultravisor: Add PPC_UV config option
+--Sig_/=oXvCgMglnVwzMn/jFTcJzI
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Bharata B Rao (6):
-      mm: ksm: Export ksm_madvise()
-      KVM: PPC: Book3S HV: Support for running secure guests
-      KVM: PPC: Book3S HV: Shared pages support for secure guests
-      KVM: PPC: Book3S HV: Radix changes for secure guest
-      KVM: PPC: Book3S HV: Handle memory plug/unplug to secure VM
-      KVM: PPC: Book3S HV: Support reset of secure guest
+-----BEGIN PGP SIGNATURE-----
 
-Jim Mattson (1):
-      kvm: vmx: Stop wasting a page for guest_msrs
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3nq4wACgkQAVBC80lX
+0GyLCgf/bz9XfQ76XEXH606Q1BRNkazO6byyzlPbTvrIGALWRZafyoiL+Ph8C5+1
+sVvoTNH5dX942Ji+5vr6l1btPlVyE1ZtD8YAAnOBdIdN0vZJkSLMnMnto9wHqmy4
+fNv+gEu1k6E78rRT+SXVk5NSog5G76jOePOcVkF/zbMbwUvvzD0W4A+vCXLDwvDb
+/QIH+XHU2CUz3tWdYAdixDCY3DvHMQpBiovMFvmp6sjIeXgAHvEpvm/lv4YRH/7M
+gO3xJcJi3sexhXVkvJUJY7hT3aaZGAxqAFuR6y4tLH0xwrTwuQjonwamfctN6qvH
+uow2vA3r8dY0/w5jxE5lbg1SjaF81Q==
+=cNbv
+-----END PGP SIGNATURE-----
 
-Paolo Bonzini (2):
-      Merge tag 'kvm-ppc-uvmem-5.5-2' of git://git.kernel.org/.../paulus/powerpc into HEAD
-      KVM: x86: fix out-of-bounds write in KVM_GET_EMULATED_CPUID (CVE-2019-19332)
-
-Peter Gonda (1):
-      KVM x86: Move kvm cpuid support out of svm
-
-Wainer dos Santos Moschetta (1):
-      Documentation: kvm: Fix mention to number of ioctls classes
-
- Documentation/virt/kvm/api.txt              |  20 +-
- arch/powerpc/Kconfig                        |  17 +
- arch/powerpc/include/asm/hvcall.h           |   9 +
- arch/powerpc/include/asm/kvm_book3s_uvmem.h |  74 +++
- arch/powerpc/include/asm/kvm_host.h         |   6 +
- arch/powerpc/include/asm/kvm_ppc.h          |   1 +
- arch/powerpc/include/asm/ultravisor-api.h   |   6 +
- arch/powerpc/include/asm/ultravisor.h       |  36 ++
- arch/powerpc/kvm/Makefile                   |   3 +
- arch/powerpc/kvm/book3s_64_mmu_radix.c      |  25 +
- arch/powerpc/kvm/book3s_hv.c                | 143 +++++
- arch/powerpc/kvm/book3s_hv_uvmem.c          | 785 ++++++++++++++++++++++++++++
- arch/powerpc/kvm/powerpc.c                  |  12 +
- arch/x86/kvm/cpuid.c                        |  10 +-
- arch/x86/kvm/svm.c                          |   7 -
- arch/x86/kvm/vmx/vmx.c                      |  12 +-
- arch/x86/kvm/vmx/vmx.h                      |   8 +-
- include/uapi/linux/kvm.h                    |   1 +
- mm/ksm.c                                    |   1 +
- 19 files changed, 1156 insertions(+), 20 deletions(-)
- create mode 100644 arch/powerpc/include/asm/kvm_book3s_uvmem.h
- create mode 100644 arch/powerpc/kvm/book3s_hv_uvmem.c
+--Sig_/=oXvCgMglnVwzMn/jFTcJzI--
