@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF68E113A58
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 04:27:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7ED7B113A5A
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 04:28:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728560AbfLED1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 22:27:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54005 "EHLO
+        id S1728470AbfLED2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 22:28:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31933 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728522AbfLED1U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 22:27:20 -0500
+        with ESMTP id S1728132AbfLED2V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 22:28:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575516437;
+        s=mimecast20190719; t=1575516499;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
-        bh=GcY8GGydx6Ta/3suGUp+zIMf6vyfnPvzjHY+LRaaH94=;
-        b=IwiC7+u/moYHsE1Fj0gkbDqbSGfjOSZf4fwvlIjyFSh7gYT90VSDASvU6U791jiNviExLH
-        GeO9sQoIbZ3Ayb5rBPpBtZYPruvnHcMywtZ8Dq5gmzSrYMAvFQBCDGxbjVm/p9trfuRqbB
-        sTfqTGSYjbVQe0ZnxXnB2ix/6spwvPQ=
+        bh=5rXDkwa1pKPwOp3k84tGGr+IGg9j4HXgJqyCzBqu+Ng=;
+        b=ZXyHptZcYD5n4b5xNTxdsZ156snrDugKB0XI+7rljgqCDDwbnKFSCC0LNks+pd54XK/56V
+        nIrVHP6bHT++dcpoRL2afLKfUm0GfJ8yNyNtz49dVKlNsfNrDjVVjHqI44sL3x1r2RBtfF
+        bGMwaYsBPSw8kLVhrAO25Nn9b20F7Q4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-fM5VLnwUP3qb6IeQHhCKRw-1; Wed, 04 Dec 2019 22:27:16 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-32-pHIEREgNPTaO6L0eaybjWA-1; Wed, 04 Dec 2019 22:28:16 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9731100551D
-        for <kvm@vger.kernel.org>; Thu,  5 Dec 2019 03:27:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21614800EB8;
+        Thu,  5 Dec 2019 03:28:15 +0000 (UTC)
 Received: from [10.72.12.152] (ovpn-12-152.pek2.redhat.com [10.72.12.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6D6A60C85;
-        Thu,  5 Dec 2019 03:27:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A4AD1600D5;
+        Thu,  5 Dec 2019 03:28:09 +0000 (UTC)
 Subject: Re: [kvm-unit-tests Patch v1 2/2] x86: ioapic: Test physical and
  logical destination mode
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, mtosatti@redhat.com
+To:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
+        mtosatti@redhat.com
 References: <1573044429-7390-1-git-send-email-nitesh@redhat.com>
  <1573044429-7390-3-git-send-email-nitesh@redhat.com>
- <821842d1-2faf-074e-8639-80405efa26e4@redhat.com>
+ <7hblsw8fji.fsf@crazypad.dinechin.lan>
 From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
@@ -85,55 +86,139 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <013ebe87-1d2f-d63e-a540-d47daf09cea9@redhat.com>
-Date:   Wed, 4 Dec 2019 22:26:57 -0500
+Message-ID: <5fac8c7b-ddcd-de22-568d-bc7ab6c7c71f@redhat.com>
+Date:   Wed, 4 Dec 2019 22:28:05 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <821842d1-2faf-074e-8639-80405efa26e4@redhat.com>
+In-Reply-To: <7hblsw8fji.fsf@crazypad.dinechin.lan>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: fM5VLnwUP3qb6IeQHhCKRw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: pHIEREgNPTaO6L0eaybjWA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 11/28/19 1:38 AM, Thomas Huth wrote:
-> On 06/11/2019 13.47, Nitesh Narayan Lal wrote:
+On 11/28/19 5:25 AM, Christophe de Dinechin wrote:
+> Nitesh Narayan Lal writes:
+>
 >> This patch tests the physical destination mode by sending an
 >> interrupt to one of the vcpus and logical destination mode by
 >> sending an interrupt to more than one vcpus.
 >>
 >> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
 >> ---
->> =C2=A0 x86/ioapic.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++=
-+++++++++++++
->> =C2=A0 1 file changed, 65 insertions(+)
->
-> =C2=A0Hi,
->
-> I think this patch likely broke the possibility to run the ioapic test un=
-der
-> TCG (it was still working some weeks ago):
->
-> =C2=A0https://gitlab.com/huth/kvm-unit-tests/-/jobs/363553211#L1815
+>>  x86/ioapic.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 65 insertions(+)
+>>
+>> diff --git a/x86/ioapic.c b/x86/ioapic.c
+>> index c32dabd..31aec03 100644
+>> --- a/x86/ioapic.c
+>> +++ b/x86/ioapic.c
+>> @@ -405,12 +405,73 @@ static void test_ioapic_self_reconfigure(void)
+>>  	report("Reconfigure self", g_isr_84 == 1 && e.remote_irr == 0);
+>>  }
+>>
+>> +static volatile int g_isr_85;
+>> +
+>> +static void ioapic_isr_85(isr_regs_t *regs)
+>> +{
+>> +	++g_isr_85;
+>> +	set_irq_line(0x0e, 0);
+>> +	eoi();
+>> +}
+>> +
+>> +static void test_ioapic_physical_destination_mode(void)
+>> +{
+>> +	ioapic_redir_entry_t e = {
+>> +		.vector = 0x85,
+>> +		.delivery_mode = 0,
+>> +		.dest_mode = 0,
+>> +		.dest_id = 0x1,
+>> +		.trig_mode = TRIGGER_LEVEL,
+>> +	};
+>> +	handle_irq(0x85, ioapic_isr_85);
+>> +	ioapic_write_redir(0xe, e);
+>> +	set_irq_line(0x0e, 1);
+>> +	do {
+>> +		pause();
+>> +	} while(g_isr_85 != 1);
+> Does this loop (and the next one) end up running forever if the test
+> fails? Would it be worth adding some timeout to detect failure?
 
-Hi Thomas,
-
-Not sure about the cause of it. I will take a look.
+AFAIK there is already a timeout in place. i.e., if we don't receive an
+interrupt then eventually the timeout will occur and the test will terminate.
 
 >
-> Do you care about this test to be runnable under TCG, or shall I simply c=
-ook a
-> patch to disable it in the gitlab CI?
+>> +	report("ioapic physical destination mode", g_isr_85 == 1);
+>> +}
+>> +
+>> +static volatile int g_isr_86;
+>> +
+>> +static void ioapic_isr_86(isr_regs_t *regs)
+>> +{
+>> +	++g_isr_86;
+>> +	set_irq_line(0x0e, 0);
+>> +	eoi();
+>> +}
+>> +
+>> +static void test_ioapic_logical_destination_mode(void)
+>> +{
+>> +	/* Number of vcpus which are configured/set in dest_id */
+>> +	int nr_vcpus = 3;
+>> +	ioapic_redir_entry_t e = {
+>> +		.vector = 0x86,
+>> +		.delivery_mode = 0,
+>> +		.dest_mode = 1,
+>> +		.dest_id = 0xd,
+>> +		.trig_mode = TRIGGER_LEVEL,
+>> +	};
+>> +	handle_irq(0x86, ioapic_isr_86);
+>> +	ioapic_write_redir(0xe, e);
+>> +	set_irq_line(0x0e, 1);
+>> +	do {
+>> +		pause();
+>> +	} while(g_isr_86 < nr_vcpus);
+>> +	report("ioapic logical destination mode", g_isr_86 == nr_vcpus);
+>> +}
+>> +
+>> +static void update_cr3(void *cr3)
+>> +{
+>> +	write_cr3((ulong)cr3);
+>> +}
+>>
+>>  int main(void)
+>>  {
+>>  	setup_vm();
+>>  	smp_init();
+>>
+>> +	on_cpus(update_cr3, (void *)read_cr3());
+>>  	mask_pic_interrupts();
+>>
+>>  	if (enable_x2apic())
+>> @@ -448,7 +509,11 @@ int main(void)
+>>  		test_ioapic_edge_tmr_smp(true);
+>>
+>>  		test_ioapic_self_reconfigure();
+>> +		test_ioapic_physical_destination_mode();
+>>  	}
+>>
+>> +	if (cpu_count() > 3)
+>> +		test_ioapic_logical_destination_mode();
+>> +
+>>  	return report_summary();
+>>  }
 >
-> =C2=A0Thomas
---=20
+> --
+> Cheers,
+> Christophe de Dinechin (IRC c3d)
+>
+-- 
 Thanks
 Nitesh
 
