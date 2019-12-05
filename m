@@ -2,117 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BFD4114037
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:37:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 816DF11404A
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:46:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729359AbfLELhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 06:37:09 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36292 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729109AbfLELhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 06:37:09 -0500
-Received: by mail-qt1-f195.google.com with SMTP id k11so3229207qtm.3
-        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TfYIZA1x1hWCQA6g7oQ19DH7tEX6ualy3pbm/P3Lk+A=;
-        b=FjAqSfZWtL5kJIRnjAfh3psbkl8pAdn9kqdwrkrc6B4f8S1BQX57V7yNhGnG0BgwL4
-         z15JyoonOBeE0tT3TytWPHa3CYQzBD9Tx1POq43C8+CKKbYgMmPV0L4s8BZLCisZW0Pm
-         f5LkYEtNxM7sPloRggdzD8iVN6W49sZsR+I/jfJbS6KjWa+Z1FJ1NvmgxtfYC2CLp305
-         w4/Zdw6lu3ne6ZYwhPkYooh4vLuzcrPNHP7Rj3jkgz7jaVzaahUIH1/iG1bVjXkBegYp
-         /DU83BC87lTZAbNf8X47Bpt+FqvVbEZvFIVSsSmXIuUebjxYpvSkwl+OHCAaL0gmPODj
-         tlXQ==
+        id S1729180AbfLELqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 06:46:06 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25280 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729017AbfLELqG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 06:46:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575546364;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=brfZ3p50zIdamnJ/W/WXUy+dYL7Eu1xgZlHRzKOlYxA=;
+        b=Gu//v4VEC4yRlIN4a0fmXT+7W/C3B+PtvNOk64xaYFBeBlUa41caOl68r4s1x9In90O/Pn
+        EtuxODwjUdbG72pP9E5KUok8S9KzN2wLwRC23ju6FvoMn2ZV0Oj6g4pG1fZytP7AIfTKHF
+        stDi9U8iumEql3nkyAI1q/vXGApSlj8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-44Co00RmNz6j7SCjqeTHwA-1; Thu, 05 Dec 2019 06:46:00 -0500
+Received: by mail-wr1-f69.google.com with SMTP id u12so1414307wrt.15
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:46:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TfYIZA1x1hWCQA6g7oQ19DH7tEX6ualy3pbm/P3Lk+A=;
-        b=NpBs0bvziHppDPVWTYRe7ZFQLR+qRMEu15kJ0p6Ad7+FWy2afKsboWAZUdjOwic3mg
-         BZZrOzsSxopgLLp1fv+4Lavead1jaeostgGj+ZPyGfRlvxEyWZrd0nkOohUPhrN0UeBf
-         O+JkuBUmShWHIG3gadUwq8dMDs0yhOT1CSM7+SiyfbNzfFrvbKoUe5JVvGLAdx5xh5Fj
-         H0j5/w6cAFBrrz6D/sNC2BJGqLf2rB9+YJo5ZZ3rOlvOgfE9NXbk7b6XrO+ZH/Rsdfzy
-         mwkfwgzFMk57ZEAPZRXl55oia7Q1DXOkKCzPzBYejyObKTOxPHafw2KWngaTqpn7GMxn
-         rHMA==
-X-Gm-Message-State: APjAAAXuZb/Hgfsq/mzNldvPaZ6QehMhJCn6EZeYGvQ3zvYoKz/YYaMP
-        Ryb1DQ87MopZZxpONNBVtrb0+exU54fKMarZWbFMng==
-X-Google-Smtp-Source: APXvYqzfgZJ9l6UJOOMZ2Qo7SFoVkzP/jw5YHvEyX7L/cw3KsXRUm/icBbPq7v443TCg8aD8BOA0xHa3BtNpRac5BEo=
-X-Received: by 2002:ac8:ccf:: with SMTP id o15mr7086616qti.380.1575545828141;
- Thu, 05 Dec 2019 03:37:08 -0800 (PST)
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=brfZ3p50zIdamnJ/W/WXUy+dYL7Eu1xgZlHRzKOlYxA=;
+        b=opTbzoAyTr28E3Y0mvVvzE51Lt79iHRBPT8X7vKKrTivGJdFFUceScSmqrl/k5p7lF
+         Occnpvs2cjMxmu5bVVXlgSYdNLA3KmOFGosUMRDHBtL3Sd5Q485xaNsHkvqHpLeMd6XZ
+         MwAxAK++r9HnBUAkqkVvzf/KgQr9Vq6EctYOLINczOvx9C4IoDKZ73HLDRSEuGIyXZX3
+         UYpqNZpEAJTxFwQ+lasIWhIROhSqWGOYfFG2+FwN5UgwLe7GO0p+G5wDk1d9f/fLF6sl
+         avk/Z2Ljt43Nwg89jHO9YNNvgOgM3C5Rb9aa0/5tU644MZO/7RlHOA6zD+Ay1lM1/452
+         YbXg==
+X-Gm-Message-State: APjAAAV8PQNVTReiOZmwlSxpk/UR4DACiiPh/ICTBphpSG5n6F2epB5F
+        rHc0CQ0J4+gucZirhewm0WFyzPy8xlkROaPzSpzwzKRDC4NrHq4zaQ7fvDFCA7/AwVJwqpEYvlm
+        cK28r7PoNtaMo
+X-Received: by 2002:a05:600c:2150:: with SMTP id v16mr4352598wml.156.1575546359843;
+        Thu, 05 Dec 2019 03:45:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwhRAsh6ngjB5xE95s4DSTmRr59zIQF4ZIHs4bxPO/zhd6D4TXtfqIp84FdKUOMo1pySojIQw==
+X-Received: by 2002:a05:600c:2150:: with SMTP id v16mr4352579wml.156.1575546359566;
+        Thu, 05 Dec 2019 03:45:59 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:541f:a977:4b60:6802? ([2001:b07:6468:f312:541f:a977:4b60:6802])
+        by smtp.gmail.com with ESMTPSA id t8sm11951791wrp.69.2019.12.05.03.45.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2019 03:45:58 -0800 (PST)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
+ field
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Liran Alon <liran.alon@oracle.com>
+References: <20191204214027.85958-1-jmattson@google.com>
+Message-ID: <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
+Date:   Thu, 5 Dec 2019 12:45:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <0000000000003e640e0598e7abc3@google.com> <41c082f5-5d22-d398-3bdd-3f4bf69d7ea3@redhat.com>
- <CACT4Y+bCHOCLYF+TW062n8+tqfK9vizaRvyjUXNPdneciq0Ahg@mail.gmail.com>
- <f4db22f2-53a3-68ed-0f85-9f4541530f5d@redhat.com> <397ad276-ee2b-3883-9ed4-b5b1a2f8cf67@i-love.sakura.ne.jp>
-In-Reply-To: <397ad276-ee2b-3883-9ed4-b5b1a2f8cf67@i-love.sakura.ne.jp>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 5 Dec 2019 12:36:56 +0100
-Message-ID: <CACT4Y+bUkzJAezH9Pk=c1amtzO0-r1Hcn3WmDuS+Drn-R3GAQA@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in fbcon_get_font
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        syzbot <syzbot+4455ca3b3291de891abc@syzkaller.appspotmail.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI <dri-devel@lists.freedesktop.org>, ghalat@redhat.com,
-        Gleb Natapov <gleb@kernel.org>, gwshan@linux.vnet.ibm.com,
-        "H. Peter Anvin" <hpa@zytor.com>, James Morris <jmorris@namei.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Russell Currey <ruscur@russell.cc>,
-        Sam Ravnborg <sam@ravnborg.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, stewart@linux.vnet.ibm.com,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Kentaro Takeda <takedakn@nttdata.co.jp>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191204214027.85958-1-jmattson@google.com>
+Content-Language: en-US
+X-MC-Unique: 44Co00RmNz6j7SCjqeTHwA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 5, 2019 at 11:41 AM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> On 2019/12/05 19:22, Paolo Bonzini wrote:
-> > Ah, and because the machine is a KVM guest, kvm_wait appears in a lot of
-> > backtrace and I get to share syzkaller's joy every time. :)
-> >
-> > This bisect result is bogus, though Tetsuo found the bug anyway.
-> > Perhaps you can exclude commits that only touch architectures other than
-> > x86?
-> >
->
-> It would be nice if coverage functionality can extract filenames in the source
-> code and supply the list of filenames as arguments for bisect operation.
->
-> Also, (unrelated but) it would be nice if we can have "make yes2modconfig"
-> target which converts CONFIG_FOO=y to CONFIG_FOO=m if FOO is tristate.
-> syzbot is testing kernel configs close to "make allyesconfig" but I want to
-> save kernel rebuild time by disabling unrelated functionality when manually
-> "debug printk()ing" kernels.
+On 04/12/19 22:40, Jim Mattson wrote:
+> According to the SDM, a VMWRITE in VMX non-root operation with an
+> invalid VMCS-link pointer results in VMfailInvalid before the validity
+> of the VMCS field in the secondary source operand is checked.
+> 
+> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 if running L2")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 38 +++++++++++++++++++-------------------
+>  1 file changed, 19 insertions(+), 19 deletions(-)
 
-I thought that maybe sed "s#=y#=m#g" && make olddefconfig will do, but
-unfortunately, it turns off non-tristate configs...
+As Vitaly pointed out, the test must be split in two, like this:
 
-$ egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
-CONFIG_MEMORY_HOTPLUG=y
-CONFIG_TCP_CONG_DCTCP=y
-# sed -i "s/CONFIG_MEMORY_HOTPLUG=y/CONFIG_MEMORY_HOTPLUG=m/g" .config
-# sed -i "s/CONFIG_TCP_CONG_DCTCP=y/CONFIG_TCP_CONG_DCTCP=m/g" .config
-# egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
-CONFIG_MEMORY_HOTPLUG=m
-CONFIG_TCP_CONG_DCTCP=m
-# make olddefconfig
-# egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
-# CONFIG_MEMORY_HOTPLUG is not set
-CONFIG_TCP_CONG_DCTCP=m
+---------------- 8< -----------------------
+From 3b9d87060e800ffae2bd19da94ede05018066c87 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 5 Dec 2019 12:39:07 +0100
+Subject: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS field
+
+According to the SDM, a VMWRITE in VMX non-root operation with an
+invalid VMCS-link pointer results in VMfailInvalid before the validity
+of the VMCS field in the secondary source operand is checked.
+
+While cleaning up handle_vmwrite, make the code of handle_vmread look
+the same, too.
+
+Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 if running L2")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Cc: Liran Alon <liran.alon@oracle.com>
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4aea7d304beb..c080a879b95d 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4767,14 +4767,13 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 	if (to_vmx(vcpu)->nested.current_vmptr == -1ull)
+ 		return nested_vmx_failInvalid(vcpu);
+
+-	if (!is_guest_mode(vcpu))
+-		vmcs12 = get_vmcs12(vcpu);
+-	else {
++	vmcs12 = get_vmcs12(vcpu);
++	if (is_guest_mode(vcpu)) {
+ 		/*
+ 		 * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
+ 		 * to shadowed-field sets the ALU flags for VMfailInvalid.
+ 		 */
+-		if (get_vmcs12(vcpu)->vmcs_link_pointer == -1ull)
++		if (vmcs12->vmcs_link_pointer == -1ull)
+ 			return nested_vmx_failInvalid(vcpu);
+ 		vmcs12 = get_shadow_vmcs12(vcpu);
+ 	}
+@@ -4878,8 +4877,19 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+
++	vmcs12 = get_vmcs12(vcpu);
++	if (is_guest_mode(vcpu)) {
++		/*
++		 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
++		 * to shadowed-field sets the ALU flags for VMfailInvalid.
++		 */
++		if (vmcs12->vmcs_link_pointer == -1ull)
++			return nested_vmx_failInvalid(vcpu);
++		vmcs12 = get_shadow_vmcs12(vcpu);
++	}
+
+ 	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
++
+ 	/*
+ 	 * If the vCPU supports "VMWRITE to any supported field in the
+ 	 * VMCS," then the "read-only" fields are actually read/write.
+@@ -4889,24 +4899,12 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 		return nested_vmx_failValid(vcpu,
+ 			VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+
+-	if (!is_guest_mode(vcpu)) {
+-		vmcs12 = get_vmcs12(vcpu);
+-
+-		/*
+-		 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
+-		 * vmcs12, else we may crush a field or consume a stale value.
+-		 */
+-		if (!is_shadow_field_rw(field))
+-			copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+-	} else {
+-		/*
+-		 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
+-		 * to shadowed-field sets the ALU flags for VMfailInvalid.
+-		 */
+-		if (get_vmcs12(vcpu)->vmcs_link_pointer == -1ull)
+-			return nested_vmx_failInvalid(vcpu);
+-		vmcs12 = get_shadow_vmcs12(vcpu);
+-	}
++	/*
++	 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
++	 * vmcs12, else we may crush a field or consume a stale value.
++	 */
++	if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
++		copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+
+ 	offset = vmcs_field_to_offset(field);
+ 	if (offset < 0)
+
+
+... and also, do you have a matching kvm-unit-tests patch?
+
+Thanks,
+
+Paolo
+
