@@ -2,147 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1F881140DC
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 13:35:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 410C61140F2
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 13:43:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729236AbfLEMfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 07:35:13 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46721 "EHLO
+        id S1729240AbfLEMnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 07:43:20 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60795 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729048AbfLEMfN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 07:35:13 -0500
+        by vger.kernel.org with ESMTP id S1729096AbfLEMnU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 07:43:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575549311;
+        s=mimecast20190719; t=1575549799;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1Z745T1ohTOchsX6AbDB+JziaT12T48bxF0g+IBboGs=;
-        b=AqLb6csSrKkegdxgxEd42R9eSpioGvTEmW4gin+2zDd+Hy5fKjfjanP2HGZolPx7bCWNky
-        QkSjN1Sg5WZYKD/9BKMVX8/G8UzcY+0rXPsEiWwaUjLIJfLyMv1/ISsSFEPeoiLKf1XIpR
-        bcxJ/TYHkRys4Djbz/m9nssxVolg7j4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-wdiLG1NdOEmALVfnB_bfZw-1; Thu, 05 Dec 2019 07:35:10 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62A3E100550E;
-        Thu,  5 Dec 2019 12:35:09 +0000 (UTC)
-Received: from gondolin (unknown [10.36.118.1])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1551B60C85;
-        Thu,  5 Dec 2019 12:35:07 +0000 (UTC)
-Date:   Thu, 5 Dec 2019 13:35:05 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, thuth@redhat.com, borntraeger@de.ibm.com,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v4] KVM: s390: Add new reset vcpu API
-Message-ID: <20191205133505.7f3c4859.cohuck@redhat.com>
-In-Reply-To: <20191205122810.10672-1-frankja@linux.ibm.com>
-References: <20191205131930.1b78f78b.cohuck@redhat.com>
-        <20191205122810.10672-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=Q1WWgL8RuF7Fs6ltC0qLeONxSmgpXtqUlxEFsxvFm70=;
+        b=h2L4BFikSImluv5NCO4YEZKZ/j4mlAJiQ0u6WWdISl7FwmVA3rMqBUTDp+Y955wsfhv52g
+        H2s9x7mVvT9DLXe3esxEWjzFdnULQ/TNwMj0Q8pXvxS7bAozh8SQJLtSoxAjbua6YTW0YR
+        QalTzyh/q/5WSZGcixRQ+yYMjlFG3Cg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-Pyk_hMW8NQC3jl6bMKqF7w-1; Thu, 05 Dec 2019 07:43:16 -0500
+Received: by mail-wr1-f70.google.com with SMTP id o6so1481272wrp.8
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 04:43:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Q1WWgL8RuF7Fs6ltC0qLeONxSmgpXtqUlxEFsxvFm70=;
+        b=Hb2k8FrmwNUYzekeusn0sW9+P5NFDDwMnO9p0tOhkrJVY9tqRHJi0Pa3EpYOSfP2sM
+         UB7iG+qdV0w7H3u24bC9cKrOHQXhmXRr5x/pUS7p/A7I+1Wo9HXTIldUn4dFBrElAqZ8
+         hLsSaCFJQgi9P8cdJKn8WOgtxOmaRKXkXubmacYCZSWaEPBa2ZWpWY6x3I7Xdcc1PSQr
+         L2SPX7qf5acuG4NWRs8nzS4XUlO39DuKyyCR5wfle7qfjjjuFyYmmEmU3YfruO9qLDEP
+         VG5S7ntoh2LfeCaueCGOxFj7qqVU/dIdTdF0VwlRxegLng7wqL+7qhVznWqAbUMvX33t
+         O6SQ==
+X-Gm-Message-State: APjAAAWA2qybkCmEulI6bECbJibY0Nvwmc4YOVVhBSsd6yv0WVNL+AZd
+        xwd1pm81G+YlAgTJlMvLI+72pYAYeSJYxu0brVf05qWg21FGBMPZEXq1FzfDjdggcnYhGeaTt5S
+        Lcg3Lw4alULzk
+X-Received: by 2002:a7b:cf16:: with SMTP id l22mr5136175wmg.79.1575549795077;
+        Thu, 05 Dec 2019 04:43:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxtlO4z7GX9u/dCNLdQj6viEVF9+IodBKkT+pZtFOZQY3Da/hnmj69WiiFuDi52LhUSCM+UcA==
+X-Received: by 2002:a7b:cf16:: with SMTP id l22mr5136156wmg.79.1575549794833;
+        Thu, 05 Dec 2019 04:43:14 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:541f:a977:4b60:6802? ([2001:b07:6468:f312:541f:a977:4b60:6802])
+        by smtp.gmail.com with ESMTPSA id d10sm11953556wrw.64.2019.12.05.04.43.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2019 04:43:14 -0800 (PST)
+Subject: Re: [PATCH v5 0/6] KVM: X86: Cleanups on dest_mode and headers
+To:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20191204190721.29480-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9359243b-eaaa-99aa-af75-371587e75eb5@redhat.com>
+Date:   Thu, 5 Dec 2019 13:43:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: wdiLG1NdOEmALVfnB_bfZw-1
+In-Reply-To: <20191204190721.29480-1-peterx@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Pyk_hMW8NQC3jl6bMKqF7w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  5 Dec 2019 07:28:10 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+I actually prefer 0 to APIC_DEST_NOSHORT, but who am I to complain if
+someone else is actually cleaning things up.
 
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that. Now that we have a new interface, let's
-> properly clear out local IRQs.
+Queued, thanks.
+
+Paolo
+
+On 04/12/19 20:07, Peter Xu wrote:
+> v5:
+> - rename param of ioapic_to_lapic_dest_mode to dest_mode_logical [Sean]
+> - in patch 5, also do s/short_hand/shorthand/ for kvm_apic_match_dest [Vitaly]
+> - one more r-b picked
 > 
-> Also we add a ioctl for the clear reset to have all resets exposed to
-> userspace. Currently the clear reset falls back to the initial reset,
-> but we plan to have clear reset specific code in the future.
+> v4:
+> - address all comments from Vitaly, adding r-bs properly
+> - added one more trivial patch:
+>   "KVM: X86: Conert the last users of "shorthand = 0" to use macros"
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  Documentation/virt/kvm/api.txt | 48 ++++++++++++++++++++++++++++++++++
->  arch/s390/kvm/kvm-s390.c       | 14 ++++++++++
->  include/uapi/linux/kvm.h       |  5 ++++
->  3 files changed, 67 insertions(+)
+> v3:
+> - address all the comments from both Vitaly and Sean
+> - since at it, added patches:
+>   "KVM: X86: Fix kvm_bitmap_or_dest_vcpus() to use irq shorthand"
+>   "KVM: X86: Drop KVM_APIC_SHORT_MASK and KVM_APIC_DEST_MASK"
 > 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index 4833904d32a5..296e51f9df70 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -4126,6 +4126,47 @@ Valid values for 'action':
->  #define KVM_PMU_EVENT_ALLOW 0
->  #define KVM_PMU_EVENT_DENY 1
->  
-> +4.121 KVM_S390_NORMAL_RESET
-> +
-> +Capability: KVM_CAP_S390_VCPU_RESETS
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures that userspace
-> +can't access via the kvm_run structure. It is intended to be called
-> +when a normal reset is performed on the vcpu and clears local
-> +interrupts, the riccb and PSW bit 24.
-> +
-> +4.122 KVM_S390_INITIAL_RESET
-> +
-> +Capability: none
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures that userspace
-> +can't access via the kvm_run structure. It is intended to be called
-> +when an initial reset (which is a superset of the normal reset) is
-> +performed on the vcpu and additionally clears the psw, prefix, timing
-> +related registers, as well as setting the control registers to their
-> +initial value.
-> +
-> +4.123 KVM_S390_CLEAR_RESET
-> +
-> +Capability: KVM_CAP_S390_VCPU_RESETS
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures that userspace
-> +can't access via the kvm_run structure. It is intended to be called
-> +when an initial reset (which is a superset of the normal reset) is
-
-s/initial/clear/
-s/normal/initial/
-
-(no need to respin, just fix up while applying :)
-
-> +performed on the vcpu and additionally clears general, access,
-> +floating and vector registers.
->  
->  5. The kvm_run structure
->  ------------------------
-> @@ -5322,3 +5363,10 @@ handling by KVM (as some KVM hypercall may be mistakenly treated as TLB
->  flush hypercalls by Hyper-V) so userspace should disable KVM identification
->  in CPUID and only exposes Hyper-V identification. In this case, guest
->  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
-> +
-> +8.22 KVM_CAP_S390_VCPU_RESETS
-> +
-> +Architectures: s390
-> +
-> +This capability indicates that the KVM_S390_NORMAL_RESET and
-> +KVM_S390_CLEAR_RESET ioctls are available.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Each patch explains itself.
+> 
+> Please have a look, thanks.
+> 
+> Peter Xu (6):
+>   KVM: X86: Fix kvm_bitmap_or_dest_vcpus() to use irq shorthand
+>   KVM: X86: Move irrelevant declarations out of ioapic.h
+>   KVM: X86: Use APIC_DEST_* macros properly in kvm_lapic_irq.dest_mode
+>   KVM: X86: Drop KVM_APIC_SHORT_MASK and KVM_APIC_DEST_MASK
+>   KVM: X86: Fix callers of kvm_apic_match_dest() to use correct macros
+>   KVM: X86: Conert the last users of "shorthand = 0" to use macros
+> 
+>  arch/x86/include/asm/kvm_host.h |  5 +++++
+>  arch/x86/kvm/hyperv.c           |  1 +
+>  arch/x86/kvm/ioapic.c           | 24 +++++++++++++++---------
+>  arch/x86/kvm/ioapic.h           |  6 ------
+>  arch/x86/kvm/irq.h              |  3 +++
+>  arch/x86/kvm/irq_comm.c         | 12 +++++++-----
+>  arch/x86/kvm/lapic.c            |  9 +++------
+>  arch/x86/kvm/lapic.h            |  9 +++++----
+>  arch/x86/kvm/svm.c              |  4 ++--
+>  arch/x86/kvm/x86.c              |  4 ++--
+>  10 files changed, 43 insertions(+), 34 deletions(-)
+> 
 
