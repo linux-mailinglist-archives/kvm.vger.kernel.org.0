@@ -2,235 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD87D11476C
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 20:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77AEB1147A6
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 20:31:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730020AbfLETCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 14:02:19 -0500
-Received: from mail-eopbgr40040.outbound.protection.outlook.com ([40.107.4.40]:36161
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726589AbfLETCT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 14:02:19 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W3B37UPwNi9u9u2QWNStgOnxWQAbUMkyBel+d7PcTY4y2Yz1vg8pVqj4DN/hTbHSQ4ep7D7Ovb+6UlonrjcX6lqsTDj8mPQ3DKilvGfioX8IKUEDYbxCysAFrb76DHquf3XHBLOQxphqkqMnYohO8FlGWid+/8zJ6yVnRcW0Nx5lMKTg1iRmU2RPMa3NxlOtPJIpKNohDGxYfEA+XWZt0VanLedJvgmOWDfL8kvIqb9pl68yBAvW9DeTLDQiH04UA7SJZyhtFiQgtAwTXdGgef9E4DNp3DWI518wFxtVUSRxABSRUAORsejjHwNAJNd+1S7Aq0TEuVXAzzqMHwxWGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bTAyymT77vkUN+uT6Cbu8b+GhzL0B4A8bVOIA7X/6Ms=;
- b=GvU5IOTQnEsJXK8iDjWp28bpWx3EybxY6c/z3AwrBGJyEBvoqOhY2nDhcAJz2ZmMAOTDfSwERuzmpIBm5W6FEPzs5vf6MLtW4kpWxTBxtgt6Gbhp4ZaYdf51LqottHj5YY4mnbL6iOxosWwKb4976jBBMKfBI4nNY0Hf9f/xw7UCtliQr2t2KhCWwI35/x5ezbxvD5lLQOBqR4atMtY7xY17FSXeJ67ON/WE02cZJkvalkwbIkXSpltEnQVTCBh1jiFavGfxKR7UEfSyR3xA2lCNSqs7PoW4AFsLRWIIc4R2Sis5XaKsdCajr7uWIyuVbLwGysihQ8iZC7mDXDOyQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
- dkim=pass header.d=mellanox.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bTAyymT77vkUN+uT6Cbu8b+GhzL0B4A8bVOIA7X/6Ms=;
- b=AqMG5mG4CY4WWHMG6PvijynbaC41xbbCILPhFLSNMfypsCkWvEfRXiBUOLV+qaEGi0jM45N7H5xoGHjZA89XYW94zOSm+4VvFGVsdqsEemlOP6ETAkpmsGMP7TWNYklgJ9UjttBcagnRqYwXMwe2vg7qx2dRhTfUkoPSnqP1bZ8=
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
- AM0PR05MB6516.eurprd05.prod.outlook.com (20.179.35.84) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2516.14; Thu, 5 Dec 2019 19:02:13 +0000
-Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::16:9951:5a4b:9ec6]) by AM0PR05MB4866.eurprd05.prod.outlook.com
- ([fe80::16:9951:5a4b:9ec6%7]) with mapi id 15.20.2516.014; Thu, 5 Dec 2019
- 19:02:13 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Topic: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Index: AQHViikX93ntAS7QxEa+ZUX9CByqKKeAQaYwgADEfoCAKW0u8IAA3JMAgAAJlICAAM59kA==
-Date:   Thu, 5 Dec 2019 19:02:13 +0000
-Message-ID: <AM0PR05MB48669DBAFD6AD3565544AC36D15C0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108081925.GH4196@zhen-hp.sh.intel.com>
- <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191205060618.GD4196@zhen-hp.sh.intel.com>
- <b15ae698-cd5e-dfb9-0478-b865cc0c2262@redhat.com>
-In-Reply-To: <b15ae698-cd5e-dfb9-0478-b865cc0c2262@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: fddd1636-4840-4e8a-347f-08d779b5a3b1
-x-ms-traffictypediagnostic: AM0PR05MB6516:|AM0PR05MB6516:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR05MB6516416D872C89C1C0945994D15C0@AM0PR05MB6516.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 02426D11FE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(346002)(376002)(136003)(366004)(39860400002)(13464003)(189003)(199004)(25786009)(7696005)(99286004)(76176011)(11346002)(54906003)(186003)(316002)(110136005)(4326008)(14444005)(478600001)(71190400001)(53546011)(71200400001)(14454004)(966005)(102836004)(6506007)(81156014)(66556008)(76116006)(66476007)(66946007)(66446008)(64756008)(8936002)(74316002)(33656002)(5660300002)(229853002)(55016002)(81166006)(9686003)(52536014)(8676002)(2906002)(305945005)(26005)(86362001)(21314003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB6516;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ymue+VBwOmDgTLloCceyGgU4VnbCN9CrpMSe7qVKJJu7YfpUy8Zy56O/1cKuWXpc7zs6TqMxQnOc25eOvzoaOCIVSXO6wuKP6om11NEchHTE/OWpnwwdchBaXVQzLLvtXO/6gfHjE010C8SfVvONlH+74f9u/QaJ6xi8ZoIpDD/hBcn3y43wF0G+GcyyQg0BPfJ6qRRhoOP5E9Zo8YXzj3WY3lUfdyljp2KvZX8pFUkxMgZul0Ubk/QxMPOW7p5BFUj7yak8GplNPuMAnPA1VoTrh05xFEkdRiLeagAH2mkUpKrXKMa+TRK3JxRStc6ljqC1n6TNzJnmc34cpyxzSYUMOE3Tjd58LPpWTKWRENw9o9U1Ybbs9nFOIty1WoqSSemExIM37YabOQHKziFmY39fHRTN6etfQ9UkjFVL70q2r3oehl/xR0F2K1+7Y5WwwCQ8zN/5ozwnquQ74ySi09oR7X1TwNmNP85TG4EQ8386y7vr1ZSyroCfE2TskzUxZZtuIl0gC9gBcBb9g3R/Nbai7N3A1zBSbnyRMiNB+gU=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1729816AbfLETbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 14:31:05 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22469 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726589AbfLETbD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 14:31:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575574261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u8Hn6V4xZsuhZskjbMnVwI4YXgtPw6vOPW0xXiTZfTE=;
+        b=iId9owsnxbR5m4LlS1zBwSXafbh+S6Lx3/zZ5o5Bmj1HHBGEwtWQAM5M7+oK9L/aZe+3iO
+        Ihz3zIEludLPCGNqWKSQrqNGuVBP/1rvx8U0tYhz1oQW8yPpbAbWATTgtCy2DkYer0Gmuo
+        8pBvYpbMOlu7sBV/tYT/h0jpMJIP0yw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-9KWFnLSgPHCzTeIbH7WXsA-1; Thu, 05 Dec 2019 14:30:58 -0500
+Received: by mail-qt1-f199.google.com with SMTP id h14so3281156qtq.11
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 11:30:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1U5LLMCJYsaS3NRWFAvsUrEB3QRcXFbIGnRHSgYXow0=;
+        b=W8Qt5612LkFlImY8uEpZ4HSfh7AyhTyaymSYCDdCerO64/XhlOpGbpa07+f/QFAsjx
+         0rbY+t8Qoj5DhoAKxFr+Fpy4VxNpzNYfWvq31BcBVgcp0kada4RdU2hgx4KRmcVTD+l/
+         G+1olLz4psSJ5ACWQ7DrgG5Y8ACT7EPdqSIlNTOP570zAec14XH9oc1VTp4jlhH1b4zp
+         cZgs0tA2Qid05or+jhW1J5qQy8m++4HGVLUP661KXT0SHApteFbWf+sL+QDqxfg9tntQ
+         kaslEYbZpChcyEkLoj0jBqegbUlLwZeemZjjqYGpFvisbgZKxY/n87mXjDXolALktzJW
+         xM0g==
+X-Gm-Message-State: APjAAAVD7i8qp0op/ogmcUeSHGCS5KRG5UyFd5HpD6eOJxjdMVrYSV3L
+        sofkMumSPpULAoMbnIFS2A11edIrRI26zpshjAebwvfBxNFKcloo4wpO5Vsy392/RJpRKx87bul
+        Qnh2A5wAeZlE0
+X-Received: by 2002:ac8:7698:: with SMTP id g24mr9087561qtr.200.1575574258073;
+        Thu, 05 Dec 2019 11:30:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwkpVoVUz3h5zS5xwC/ju/ihohoRopafm52tKSbPSkxG8tN5YoTguSF+NAKckwaCdGYC1NwIg==
+X-Received: by 2002:ac8:7698:: with SMTP id g24mr9087522qtr.200.1575574257677;
+        Thu, 05 Dec 2019 11:30:57 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id q35sm5665033qta.19.2019.12.05.11.30.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2019 11:30:56 -0800 (PST)
+Date:   Thu, 5 Dec 2019 14:30:55 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 00/15] KVM: Dirty ring interface
+Message-ID: <20191205193055.GA7201@xz-x1>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <b8f28d8c-2486-2d66-04fd-a2674b598cfd@redhat.com>
+ <20191202021337.GB18887@xz-x1>
+ <b893745e-96c1-d8e4-85ec-9da257d0d44e@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fddd1636-4840-4e8a-347f-08d779b5a3b1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 19:02:13.6776
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zQfpxXXDiSrLKk5lD5FhLktURTyMk1u6sDZ1iu22U3TRjWga8TCjFioQAb9fxSTB6oLiVoFfMLBQB9g6a2nKFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB6516
+In-Reply-To: <b893745e-96c1-d8e4-85ec-9da257d0d44e@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: 9KWFnLSgPHCzTeIbH7WXsA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgSmFzb24sDQoNCj4gRnJvbTogSmFzb24gV2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT4NCj4g
-U2VudDogVGh1cnNkYXksIERlY2VtYmVyIDUsIDIwMTkgMTI6NDEgQU0NCj4gDQo+IA0KPiBPbiAy
-MDE5LzEyLzUg5LiL5Y2IMjowNiwgWmhlbnl1IFdhbmcgd3JvdGU6DQo+ID4gT24gMjAxOS4xMi4w
-NCAxNzozNjoxMiArMDAwMCwgUGFyYXYgUGFuZGl0IHdyb3RlOg0KPiA+PiArIEppcmkgKyBOZXRk
-ZXYgc2luY2UgeW91IG1lbnRpb25lZCBuZXRkZXYgcXVldWUuDQo+ID4+DQo+ID4+ICsgSmFzb24g
-V2FuZyBhbmQgTWljaGFlbCBhcyB3ZSBoYWQgc2ltaWxhciBkaXNjdXNzaW9uIGluIHZkcGEgZGlz
-Y3Vzc2lvbg0KPiB0aHJlYWQuDQo+ID4+DQo+ID4+PiBGcm9tOiBaaGVueXUgV2FuZyA8emhlbnl1
-d0BsaW51eC5pbnRlbC5jb20+DQo+ID4+PiBTZW50OiBGcmlkYXksIE5vdmVtYmVyIDgsIDIwMTkg
-MjoxOSBBTQ0KPiA+Pj4gVG86IFBhcmF2IFBhbmRpdCA8cGFyYXZAbWVsbGFub3guY29tPg0KPiA+
-Pj4NCj4gPj4gTXkgYXBvbG9naWVzIHRvIHJlcGx5IGxhdGUuDQo+ID4+IFNvbWV0aGluZyBiYWQg
-d2l0aCBteSBlbWFpbCBjbGllbnQsIGR1ZSB0byB3aGljaCBJIGZvdW5kIHRoaXMgcGF0Y2ggdW5k
-ZXINCj4gc3BhbSBmb2xkZXIgdG9kYXkuDQo+ID4+IE1vcmUgY29tbWVudHMgYmVsb3cuDQo+ID4+
-DQo+ID4+PiBPbiAyMDE5LjExLjA3IDIwOjM3OjQ5ICswMDAwLCBQYXJhdiBQYW5kaXQgd3JvdGU6
-DQo+ID4+Pj4gSGksDQo+ID4+Pj4NCj4gPj4+Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
-Cj4gPj4+Pj4gRnJvbToga3ZtLW93bmVyQHZnZXIua2VybmVsLm9yZyA8a3ZtLW93bmVyQHZnZXIu
-a2VybmVsLm9yZz4gT24NCj4gPj4+Pj4gQmVoYWxmIE9mIFpoZW55dSBXYW5nDQo+ID4+Pj4+IFNl
-bnQ6IFRodXJzZGF5LCBPY3RvYmVyIDI0LCAyMDE5IDEyOjA4IEFNDQo+ID4+Pj4+IFRvOiBrdm1A
-dmdlci5rZXJuZWwub3JnDQo+ID4+Pj4+IENjOiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsg
-a3dhbmtoZWRlQG52aWRpYS5jb207DQo+ID4+Pj4+IGtldmluLnRpYW5AaW50ZWwuY29tOyBjb2h1
-Y2tAcmVkaGF0LmNvbQ0KPiA+Pj4+PiBTdWJqZWN0OiBbUEFUQ0ggMC82XSBWRklPIG1kZXYgYWdn
-cmVnYXRlZCByZXNvdXJjZXMgaGFuZGxpbmcNCj4gPj4+Pj4NCj4gPj4+Pj4gSGksDQo+ID4+Pj4+
-DQo+ID4+Pj4+IFRoaXMgaXMgYSByZWZyZXNoIGZvciBwcmV2aW91cyBzZW5kIG9mIHRoaXMgc2Vy
-aWVzLiBJIGdvdA0KPiA+Pj4+PiBpbXByZXNzaW9uIHRoYXQgc29tZSBTSU9WIGRyaXZlcnMgd291
-bGQgc3RpbGwgZGVwbG95IHRoZWlyIG93bg0KPiA+Pj4+PiBjcmVhdGUgYW5kIGNvbmZpZyBtZXRo
-b2Qgc28gc3RvcHBlZCBlZmZvcnQgb24gdGhpcy4gQnV0IHNlZW1zIHRoaXMNCj4gPj4+Pj4gd291
-bGQgc3RpbGwgYmUgdXNlZnVsIGZvciBzb21lIG90aGVyIFNJT1YgZHJpdmVyIHdoaWNoIG1heSBz
-aW1wbHkNCj4gPj4+Pj4gd2FudCBjYXBhYmlsaXR5IHRvIGFnZ3JlZ2F0ZSByZXNvdXJjZXMuIFNv
-IGhlcmUncyByZWZyZXNoZWQgc2VyaWVzLg0KPiA+Pj4+Pg0KPiA+Pj4+PiBDdXJyZW50IG1kZXYg
-ZGV2aWNlIGNyZWF0ZSBpbnRlcmZhY2UgZGVwZW5kcyBvbiBmaXhlZCBtZGV2IHR5cGUsDQo+ID4+
-Pj4+IHdoaWNoIGdldCB1dWlkIGZyb20gdXNlciB0byBjcmVhdGUgaW5zdGFuY2Ugb2YgbWRldiBk
-ZXZpY2UuIElmDQo+ID4+Pj4+IHVzZXIgd2FudHMgdG8gdXNlIGN1c3RvbWl6ZWQgbnVtYmVyIG9m
-IHJlc291cmNlIGZvciBtZGV2IGRldmljZSwNCj4gPj4+Pj4gdGhlbiBvbmx5IGNhbiBjcmVhdGUg
-bmV3DQo+ID4+Pj4gQ2FuIHlvdSBwbGVhc2UgZ2l2ZSBhbiBleGFtcGxlIG9mICdyZXNvdXJjZSc/
-DQo+ID4+Pj4gV2hlbiBJIGdyZXAgWzFdLCBbMl0gYW5kIFszXSwgSSBjb3VsZG4ndCBmaW5kIGFu
-eXRoaW5nIHJlbGF0ZWQgdG8gJw0KPiBhZ2dyZWdhdGUnLg0KPiA+Pj4gVGhlIHJlc291cmNlIGlz
-IHZlbmRvciBkZXZpY2Ugc3BlY2lmaWMsIGluIFNJT1Ygc3BlYyB0aGVyZSdzIEFESQ0KPiA+Pj4g
-KEFzc2lnbmFibGUgRGV2aWNlIEludGVyZmFjZSkgZGVmaW5pdGlvbiB3aGljaCBjb3VsZCBiZSBl
-LmcgcXVldWUNCj4gPj4+IGZvciBuZXQgZGV2aWNlLCBjb250ZXh0IGZvciBncHUsIGV0Yy4gSSBq
-dXN0IG5hbWVkIHRoaXMgaW50ZXJmYWNlIGFzDQo+ICdhZ2dyZWdhdGUnDQo+ID4+PiBmb3IgYWdn
-cmVnYXRpb24gcHVycG9zZSwgaXQncyBub3QgdXNlZCBpbiBzcGVjIGRvYy4NCj4gPj4+DQo+ID4+
-IFNvbWUgJ3Vua25vd24vdW5kZWZpbmVkJyB2ZW5kb3Igc3BlY2lmaWMgcmVzb3VyY2UganVzdCBk
-b2Vzbid0IHdvcmsuDQo+ID4+IE9yY2hlc3RyYXRpb24gdG9vbCBkb2Vzbid0IGtub3cgd2hpY2gg
-cmVzb3VyY2UgYW5kIHdoYXQvaG93IHRvIGNvbmZpZ3VyZQ0KPiBmb3Igd2hpY2ggdmVuZG9yLg0K
-PiA+PiBJdCBoYXMgdG8gYmUgd2VsbCBkZWZpbmVkLg0KPiA+Pg0KPiA+PiBZb3UgY2FuIGFsc28g
-ZmluZCBzdWNoIGRpc2N1c3Npb24gaW4gcmVjZW50IGxncHUgRFJNIGNncm91cCBwYXRjaGVzIHNl
-cmllcw0KPiB2NC4NCj4gPj4NCj4gPj4gRXhwb3NpbmcgbmV0d29ya2luZyByZXNvdXJjZSBjb25m
-aWd1cmF0aW9uIGluIG5vbi1uZXQgbmFtZXNwYWNlIGF3YXJlDQo+IG1kZXYgc3lzZnMgYXQgUENJ
-IGRldmljZSBsZXZlbCBpcyBuby1nby4NCj4gPj4gQWRkaW5nIHBlciBmaWxlIE5FVF9BRE1JTiBv
-ciBvdGhlciBjaGVja3MgaXMgbm90IHRoZSBhcHByb2FjaCB3ZSBmb2xsb3cgaW4NCj4ga2VybmVs
-Lg0KPiA+Pg0KPiA+PiBkZXZsaW5rIGhhcyBiZWVuIGEgc3Vic3lzdGVtIHRob3VnaCB1bmRlciBu
-ZXQsIHRoYXQgaGFzIHZlcnkgcmljaCBpbnRlcmZhY2UNCj4gZm9yIHN5c2NhbGxlciwgZGV2aWNl
-IGhlYWx0aCwgcmVzb3VyY2UgbWFuYWdlbWVudCBhbmQgbWFueSBtb3JlLg0KPiA+PiBFdmVuIHRo
-b3VnaCBpdCBpcyB1c2VkIGJ5IG5ldCBkcml2ZXIgdG9kYXksIGl0cyB3cml0dGVuIGZvciBnZW5l
-cmljIGRldmljZQ0KPiBtYW5hZ2VtZW50IGF0IGJ1cy9kZXZpY2UgbGV2ZWwuDQo+ID4+DQo+ID4+
-IFl1dmFsIGhhcyBwb3N0ZWQgcGF0Y2hlcyB0byBtYW5hZ2UgUENJIHN1Yi1kZXZpY2VzIFsxXSBh
-bmQgdXBkYXRlZCB2ZXJzaW9uDQo+IHdpbGwgYmUgcG9zdGVkIHNvb24gd2hpY2ggYWRkcmVzc2Vz
-IGNvbW1lbnRzLg0KPiA+Pg0KPiA+PiBGb3IgYW55IGRldmljZSBzbGljZSByZXNvdXJjZSBtYW5h
-Z2VtZW50IG9mIG1kZXYsIHN1Yi1mdW5jdGlvbiBldGMsIHdlDQo+IHNob3VsZCBiZSB1c2luZyBz
-aW5nbGUga2VybmVsIGludGVyZmFjZSBhcyBkZXZsaW5rIFsyXSwgWzNdLg0KPiA+Pg0KPiA+PiBb
-MV0NCj4gPj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzE1NzMyMjk5MjYtMzAwNDAt
-MS1naXQtc2VuZC1lbWFpbC15dXZhDQo+ID4+IGxhdkBtZWxsYW5veC5jb20vIFsyXQ0KPiA+PiBo
-dHRwOi8vbWFuNy5vcmcvbGludXgvbWFuLXBhZ2VzL21hbjgvZGV2bGluay1kZXYuOC5odG1sDQo+
-ID4+IFszXSBodHRwOi8vbWFuNy5vcmcvbGludXgvbWFuLXBhZ2VzL21hbjgvZGV2bGluay1yZXNv
-dXJjZS44Lmh0bWwNCj4gPj4NCj4gPj4gTW9zdCBtb2Rlcm4gZGV2aWNlIGNvbmZpZ3VyYXRpb24g
-dGhhdCBJIGFtIGF3YXJlIG9mIGlzIHVzdWFsbHkgZG9uZSB2aWENCj4gd2VsbCBkZWZpbmVkIGlv
-Y3RsKCkgb2YgdGhlIHN1YnN5c3RlbSAodmhvc3QsIHZpcnRpbywgdmZpbywgcmRtYSwgbnZtZSBh
-bmQgbW9yZSkNCj4gb3IgdmlhIG5ldGxpbmsgY29tbWFuZHMgKG5ldCwgZGV2bGluaywgcmRtYSBh
-bmQgbW9yZSkgbm90IHZpYSBzeXNmcy4NCj4gPj4NCj4gPiBDdXJyZW50IHZmaW8vbWRldiBjb25m
-aWd1cmF0aW9uIGlzIHZpYSBkb2N1bWVudGVkIHN5c2ZzIEFCSSBpbnN0ZWFkIG9mDQo+ID4gb3Ro
-ZXIgd2F5cy4gU28gdGhpcyBhZGhlcmUgdG8gdGhhdCB3YXkgdG8gaW50cm9kdWNlIG1vcmUgY29u
-ZmlndXJhYmxlDQo+ID4gbWV0aG9kIG9uIG1kZXYgZGV2aWNlIGZvciBzdGFuZGFyZCwgaXQncyBv
-cHRpb25hbCBhbmQgbm90IGFjdHVhbGx5DQo+ID4gdmVuZG9yIHNwZWNpZmljIGUuZyB2ZmlvLWFw
-Lg0KPiA+DQo+ID4gSSdtIG5vdCBzdXJlIGhvdyBtYW55IGRldmljZXMgc3VwcG9ydCBkZXZsaW5r
-IG5vdywgb3IgaWYgcmVhbGx5IG1ha2UNCj4gPiBzZW5zZSB0byB1dGlsaXplIGRldmxpbmsgZm9y
-IG90aGVyIGRldmljZXMgZXhjZXB0IG5ldCwgb3IgaWYgcmVhbGx5DQo+ID4gbWFrZSBzZW5zZSB0
-byB0YWtlIG1kZXYgcmVzb3VyY2UgY29uZmlndXJhdGlvbiBmcm9tIHRoZXJlLi4uDQo+IA0KPiAN
-Cj4gSXQgbWF5IG1ha2Ugc2Vuc2UgdG8gYWxsb3cgb3RoZXIgdHlwZXMgb2YgQVBJIHRvIG1hbmFn
-ZSBtZGV2IG90aGVyIHRoYW4NCj4gc3lzZnMuIEJ1dCBJJ20gbm90IHN1cmUgd2hldGhlciBvciBu
-b3QgaXQgd2lsbCBiZSBhIGNoYWxsZW5nZSBmb3Igb3JjaGVzdHJhdGlvbi4NCj4gDQoNClRoZXJl
-IGFyZSB0d28gcGFydHMuDQoxLiBIb3cgeW91IHNwZWNpZnkgcmVzb3VyY2UgY29uZmlnIChzeXNm
-cy9uZXRsaW5rL2RldmxpbmsvaW9jdGwgZXRjKQ0KMi4gZGVmaW5pdGlvbiBvZiB0aGUgcmVzb3Vy
-Y2UgaXRzZWxmLiBJdCBoYXMgdG8gYmUgd2VsbCBkZWZpbmVkLiBPciBpdCBzaG91bGQgYmUgY2F0
-ZWdvcml6ZWQgYXMgbWlzY2VsbGFuZW91cy4NCkl0IGNhbm5vdCBiZSBzb21lIHVuZGVmaW5lZC92
-YWd1ZSBuYW1lIGFzICdhZ2dyZWdhdGUnLg0KIA0KPiBUaGFua3MNCj4gDQo+IA0KPiA+Pj4+PiBt
-ZGV2IHR5cGUgZm9yIHRoYXQgd2hpY2ggbWF5IG5vdCBiZSBmbGV4aWJsZS4gVGhpcyByZXF1aXJl
-bWVudA0KPiA+Pj4+PiBjb21lcyBub3Qgb25seSBmcm9tIHRvIGJlIGFibGUgdG8gYWxsb2NhdGUg
-ZmxleGlibGUgcmVzb3VyY2VzIGZvcg0KPiA+Pj4+PiBLVk1HVCwgYnV0IGFsc28gZnJvbSBJbnRl
-bCBzY2FsYWJsZSBJTyB2aXJ0dWFsaXphdGlvbiB3aGljaCB3b3VsZA0KPiA+Pj4+PiB1c2UgdmZp
-by9tZGV2IHRvIGJlIGFibGUgdG8gYWxsb2NhdGUgYXJiaXRyYXJ5IHJlc291cmNlcyBvbiBtZGV2
-DQo+IGluc3RhbmNlLg0KPiA+Pj4gTW9yZSBpbmZvIG9uIFsxXSBbMl0gWzNdLg0KPiA+Pj4+PiBU
-byBhbGxvdyB0byBjcmVhdGUgdXNlciBkZWZpbmVkIHJlc291cmNlcyBmb3IgbWRldiwgaXQgdHJ5
-cyB0bw0KPiA+Pj4+PiBleHRlbmQgbWRldiBjcmVhdGUgaW50ZXJmYWNlIGJ5IGFkZGluZyBuZXcg
-ImFnZ3JlZ2F0ZT14eHgiDQo+ID4+Pj4+IHBhcmFtZXRlciBmb2xsb3dpbmcgVVVJRCwgZm9yIHRh
-cmdldCBtZGV2IHR5cGUgaWYgYWdncmVnYXRpb24gaXMNCj4gPj4+Pj4gc3VwcG9ydGVkLCBpdCBj
-YW4gY3JlYXRlIG5ldyBtZGV2IGRldmljZSB3aGljaCBjb250YWlucyByZXNvdXJjZXMNCj4gPj4+
-Pj4gY29tYmluZWQgYnkgbnVtYmVyIG9mIGluc3RhbmNlcywgZS5nDQo+ID4+Pj4+DQo+ID4+Pj4+
-ICAgICAgZWNobyAiPHV1aWQ+LGFnZ3JlZ2F0ZT0xMCIgPiBjcmVhdGUNCj4gPj4+Pj4NCj4gPj4+
-Pj4gVk0gbWFuYWdlciBlLmcgbGlidmlydCBjYW4gY2hlY2sgbWRldiB0eXBlIHdpdGggImFnZ3Jl
-Z2F0aW9uIg0KPiA+Pj4+PiBhdHRyaWJ1dGUgd2hpY2ggY2FuIHN1cHBvcnQgdGhpcyBzZXR0aW5n
-LiBJZiBubyAiYWdncmVnYXRpb24iDQo+ID4+Pj4+IGF0dHJpYnV0ZSBmb3VuZCBmb3IgbWRldiB0
-eXBlLCBwcmV2aW91cyBiZWhhdmlvciBpcyBzdGlsbCBrZXB0IGZvcg0KPiA+Pj4+PiBvbmUgaW5z
-dGFuY2UgYWxsb2NhdGlvbi4gQW5kIG5ldyBzeXNmcyBhdHRyaWJ1dGUNCj4gPj4+Pj4gImFnZ3Jl
-Z2F0ZWRfaW5zdGFuY2VzIiBpcyBjcmVhdGVkIGZvciBlYWNoIG1kZXYgZGV2aWNlIHRvIHNob3cN
-Cj4gPj4+Pj4gYWxsb2NhdGVkDQo+ID4+PiBudW1iZXIuDQo+ID4+Pj4+IFJlZmVyZW5jZXM6DQo+
-ID4+Pj4+IFsxXQ0KPiA+Pj4+PiBodHRwczovL3NvZnR3YXJlLmludGVsLmNvbS9lbi11cy9kb3du
-bG9hZC9pbnRlbC12aXJ0dWFsaXphdGlvbi10ZWMNCj4gPj4+Pj4gaG4NCj4gPj4+Pj4gb2xvZ3kt
-IGZvci1kaXJlY3RlZC1pby1hcmNoaXRlY3R1cmUtc3BlY2lmaWNhdGlvbg0KPiA+Pj4+PiBbMl0N
-Cj4gPj4+Pj4gaHR0cHM6Ly9zb2Z0d2FyZS5pbnRlbC5jb20vZW4tdXMvZG93bmxvYWQvaW50ZWwt
-c2NhbGFibGUtaW8tdmlydHVhDQo+ID4+Pj4+IGxpDQo+ID4+Pj4+IHphdGlvbi0NCj4gPj4+Pj4g
-dGVjaG5pY2FsLXNwZWNpZmljYXRpb24NCj4gPj4+Pj4gWzNdIGh0dHBzOi8vc2NoZC53cy9ob3N0
-ZWRfZmlsZXMvbGMzMjAxOC8wMC9MQzMtU0lPVi1maW5hbC5wZGYNCj4gPj4+Pj4NCj4gPj4+Pj4g
-Wmhlbnl1IFdhbmcgKDYpOg0KPiA+Pj4+PiAgICB2ZmlvL21kZXY6IEFkZCBuZXcgImFnZ3JlZ2F0
-ZSIgcGFyYW1ldGVyIGZvciBtZGV2IGNyZWF0ZQ0KPiA+Pj4+PiAgICB2ZmlvL21kZXY6IEFkZCAi
-YWdncmVnYXRpb24iIGF0dHJpYnV0ZSBmb3Igc3VwcG9ydGVkIG1kZXYgdHlwZQ0KPiA+Pj4+PiAg
-ICB2ZmlvL21kZXY6IEFkZCAiYWdncmVnYXRlZF9pbnN0YW5jZXMiIGF0dHJpYnV0ZSBmb3Igc3Vw
-cG9ydGVkIG1kZXYNCj4gPj4+Pj4gICAgICBkZXZpY2UNCj4gPj4+Pj4gICAgRG9jdW1lbnRhdGlv
-bi9kcml2ZXItYXBpL3ZmaW8tbWVkaWF0ZWQtZGV2aWNlLnJzdDogVXBkYXRlIGZvcg0KPiA+Pj4+
-PiAgICAgIHZmaW8vbWRldiBhZ2dyZWdhdGlvbiBzdXBwb3J0DQo+ID4+Pj4+ICAgIERvY3VtZW50
-YXRpb24vQUJJL3Rlc3Rpbmcvc3lzZnMtYnVzLXZmaW8tbWRldjogVXBkYXRlIGZvciB2ZmlvL21k
-ZXYNCj4gPj4+Pj4gICAgICBhZ2dyZWdhdGlvbiBzdXBwb3J0DQo+ID4+Pj4+ICAgIGRybS9pOTE1
-L2d2dDogQWRkIG5ldyB0eXBlIHdpdGggYWdncmVnYXRpb24gc3VwcG9ydA0KPiA+Pj4+Pg0KPiA+
-Pj4+PiAgIERvY3VtZW50YXRpb24vQUJJL3Rlc3Rpbmcvc3lzZnMtYnVzLXZmaW8tbWRldiB8IDI0
-ICsrKysrKw0KPiA+Pj4+PiAgIC4uLi9kcml2ZXItYXBpL3ZmaW8tbWVkaWF0ZWQtZGV2aWNlLnJz
-dCAgICAgICB8IDIzICsrKysrKw0KPiA+Pj4+PiAgIGRyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC9n
-dnQuYyAgICAgICAgICAgICAgICB8ICA0ICstDQo+ID4+Pj4+ICAgZHJpdmVycy9ncHUvZHJtL2k5
-MTUvZ3Z0L2d2dC5oICAgICAgICAgICAgICAgIHwgMTEgKystDQo+ID4+Pj4+ICAgZHJpdmVycy9n
-cHUvZHJtL2k5MTUvZ3Z0L2t2bWd0LmMgICAgICAgICAgICAgIHwgNTMgKysrKysrKysrKysrLQ0K
-PiA+Pj4+PiAgIGRyaXZlcnMvZ3B1L2RybS9pOTE1L2d2dC92Z3B1LmMgICAgICAgICAgICAgICB8
-IDU2ICsrKysrKysrKysrKy0NCj4gPj4+Pj4gICBkcml2ZXJzL3ZmaW8vbWRldi9tZGV2X2NvcmUu
-YyAgICAgICAgICAgICAgICAgfCAzNiArKysrKysrKy0NCj4gPj4+Pj4gICBkcml2ZXJzL3ZmaW8v
-bWRldi9tZGV2X3ByaXZhdGUuaCAgICAgICAgICAgICAgfCAgNiArLQ0KPiA+Pj4+PiAgIGRyaXZl
-cnMvdmZpby9tZGV2L21kZXZfc3lzZnMuYyAgICAgICAgICAgICAgICB8IDc5ICsrKysrKysrKysr
-KysrKysrKy0NCj4gPj4+Pj4gICBpbmNsdWRlL2xpbnV4L21kZXYuaCAgICAgICAgICAgICAgICAg
-ICAgICAgICAgfCAxOSArKysrKw0KPiA+Pj4+PiAgIDEwIGZpbGVzIGNoYW5nZWQsIDI5NCBpbnNl
-cnRpb25zKCspLCAxNyBkZWxldGlvbnMoLSkNCj4gPj4+Pj4NCj4gPj4+Pj4gLS0NCj4gPj4+Pj4g
-Mi4yNC4wLnJjMA0KPiA+Pj4gLS0NCj4gPj4+IE9wZW4gU291cmNlIFRlY2hub2xvZ3kgQ2VudGVy
-LCBJbnRlbCBsdGQuDQo+ID4+Pg0KPiA+Pj4gJGdwZyAtLWtleXNlcnZlciB3d3drZXlzLnBncC5u
-ZXQgLS1yZWN2LWtleXMgNEQ3ODE4MjcNCg0K
+On Tue, Dec 03, 2019 at 02:59:14PM +0100, Paolo Bonzini wrote:
+> On 02/12/19 03:13, Peter Xu wrote:
+> >> This is not needed, it will just be a false negative (dirty page that
+> >> actually isn't dirty).  The dirty bit will be cleared when userspace
+> >> resets the ring buffer; then the instruction will be executed again an=
+d
+> >> mark the page dirty again.  Since ring full is not a common condition,
+> >> it's not a big deal.
+> >=20
+> > Actually I added this only because it failed one of the unit tests
+> > when verifying the dirty bits..  But now after a second thought, I
+> > probably agree with you that we can change the userspace too to fix
+> > this.
+>=20
+> I think there is already a similar case in dirty_log_test when a page is
+> dirty but we called KVM_GET_DIRTY_LOG just before it got written to.
+
+If you mean the host_bmap_track (in dirty_log_test.c), that should be
+a reversed version of this race (that's where the data is written,
+while we didn't see the dirty bit set).  But yes I think I can
+probably use the same bitmap to fix the test case, because in both
+cases what we want to do is to make sure "the dirty bit of this page
+should be set in next round".
+
+>=20
+> > I think the steps of the failed test case could be simplified into
+> > something like this (assuming the QEMU migration context, might be
+> > easier to understand):
+> >=20
+> >   1. page P has data P1
+> >   2. vcpu writes to page P, with date P2
+> >   3. vmexit (P is still with data P1)
+> >   4. mark P as dirty, ring full, user exit
+> >   5. collect dirty bit P, migrate P with data P1
+> >   6. vcpu run due to some reason, P was written with P2, user exit agai=
+n
+> >      (because ring is already reaching soft limit)
+> >   7. do KVM_RESET_DIRTY_RINGS
+>=20
+> Migration should only be done after KVM_RESET_DIRTY_RINGS (think of
+> KVM_RESET_DIRTY_RINGS as the equivalent of KVM_CLEAR_DIRTY_LOG).
+
+Totally agree for migration.  It's probably just that the test case
+needs fixing.
+
+>=20
+> >   dirty_log_test-29003 [001] 184503.384328: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.384329: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.384329: kvm_page_fault:       addre=
+ss 7fc036d000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.384331: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.384332: kvm_exit: reason EPT_VIOLAT=
+ION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.384332: kvm_page_fault:       addre=
+ss 7fc036d000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.384332: kvm_dirty_ring_push:  ring =
+1: dirty 0x37f reset 0x1c0 slot 1 offset 0x37e ret 0 (used 447)
+> >   dirty_log_test-29003 [001] 184503.384333: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.384334: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.384334: kvm_page_fault:       addre=
+ss 7fc036e000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.384336: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.384336: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.384336: kvm_page_fault:       addre=
+ss 7fc036e000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.384337: kvm_dirty_ring_push:  ring =
+1: dirty 0x380 reset 0x1c0 slot 1 offset 0x37f ret 1 (used 448)
+> >   dirty_log_test-29003 [001] 184503.384337: kvm_dirty_ring_exit:  vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.384338: kvm_fpu:              unloa=
+d
+> >   dirty_log_test-29003 [001] 184503.384340: kvm_userspace_exit:   reaso=
+n 0x1d (29)
+> >   dirty_log_test-29000 [006] 184503.505103: kvm_dirty_ring_reset: ring =
+1: dirty 0x380 reset 0x380 (used 0)
+> >   dirty_log_test-29003 [001] 184503.505184: kvm_fpu:              load
+> >   dirty_log_test-29003 [001] 184503.505187: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.505193: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.505194: kvm_page_fault:       addre=
+ss 7fc036f000 error_code 582              <-------- [1]
+> >   dirty_log_test-29003 [001] 184503.505206: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.505207: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.505207: kvm_page_fault:       addre=
+ss 7fc036f000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.505226: kvm_dirty_ring_push:  ring =
+1: dirty 0x381 reset 0x380 slot 1 offset 0x380 ret 0 (used 1)
+> >   dirty_log_test-29003 [001] 184503.505226: kvm_entry:            vcpu =
+1
+> >   dirty_log_test-29003 [001] 184503.505227: kvm_exit:             reaso=
+n EPT_VIOLATION rip 0x40359f info 582 0
+> >   dirty_log_test-29003 [001] 184503.505228: kvm_page_fault:       addre=
+ss 7fc0370000 error_code 582
+> >   dirty_log_test-29003 [001] 184503.505231: kvm_entry:            vcpu =
+1
+> >   ...
+> >=20
+> > The test was trying to continuously write to pages, from above log
+> > starting from 7fc036d000. The reason 0x1d (29) is the new dirty ring
+> > full exit reason.
+> >=20
+> > So far I'm still unsure of two things:
+> >=20
+> >   1. Why for each page we faulted twice rather than once.  Take the
+> >      example of page at 7fc036e000 above, the first fault didn't
+> >      trigger the marking dirty path, while only until the 2nd ept
+> >      violation did we trigger kvm_dirty_ring_push.
+>=20
+> Not sure about that.  Try enabling kvmmmu tracepoints too, it will tell
+> you more of the path that was taken while processing the EPT violation.
+
+These new tracepoints are extremely useful (which I didn't notice
+before).
+
+So here's the final culprit...
+
+void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
+{
+        ...
+=09spin_lock(&kvm->mmu_lock);
+=09/* FIXME: we should use a single AND operation, but there is no
+=09 * applicable atomic API.
+=09 */
+=09while (mask) {
+=09=09clear_bit_le(offset + __ffs(mask), memslot->dirty_bitmap);
+=09=09mask &=3D mask - 1;
+=09}
+
+=09kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot, offset, mask);
+=09spin_unlock(&kvm->mmu_lock);
+}
+
+The mask is cleared before reaching
+kvm_arch_mmu_enable_log_dirty_pt_masked()..
+
+The funny thing is that I did have a few more patches to even skip
+allocate the dirty_bitmap when dirty ring is enabled (hence in that
+tree I removed this while loop too, so that has no such problem).
+However I dropped those patches when I posted the RFC because I don't
+think it's mature, and the selftest didn't complain about that
+either..  Though, I do plan to redo that in v2 if you don't disagree.
+The major question would be whether the dirty_bitmap could still be
+for any use if dirty ring is enabled.
+
+>=20
+> If your machine has PML, what you're seeing is likely not-present
+> violation, not dirty-protect violation.  Try disabling pml and see if
+> the trace changes.
+>=20
+> >   2. Why we didn't get the last page written again after
+> >      kvm_userspace_exit (last page was 7fc036e000, and the test failed
+> >      because 7fc036e000 detected change however dirty bit unset).  In
+> >      this case the first write after KVM_RESET_DIRTY_RINGS is the line
+> >      pointed by [1], I thought it should be a rewritten of page
+> >      7fc036e000 because when the user exit happens logically the write
+> >      should not happen yet and eip should keep.  However at [1] it's
+> >      already writting to a new page.
+>=20
+> IIUC you should get, with PML enabled:
+>=20
+> - guest writes to page
+> - PML marks dirty bit, causes vmexit
+> - host copies PML log to ring, causes userspace exit
+> - userspace calls KVM_RESET_DIRTY_RINGS
+>   - host marks page as clean
+> - userspace calls KVM_RUN
+>   - guest writes again to page
+>=20
+> but the page won't be in the ring until after another vmexit happens.
+> Therefore, it's okay to reap the pages in the ring asynchronously, but
+> there must be a synchronization point in the testcase sooner or later,
+> where all CPUs are kicked out of KVM_RUN.  This synchronization point
+> corresponds to the migration downtime.
+
+Yep, currently in the test case I used the same signal trick to kick
+the vcpu out to make sure PML buffers are flushed during the vmexit,
+before the main thread starts to collect dirty bits.
+
+Thanks,
+
+--=20
+Peter Xu
+
