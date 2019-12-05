@@ -2,149 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F74114017
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:28:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2FD811401C
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:29:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729274AbfLEL24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 06:28:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42384 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728735AbfLEL24 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 06:28:56 -0500
+        id S1729332AbfLEL31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 06:29:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24140 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729260AbfLEL31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 06:29:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575545334;
+        s=mimecast20190719; t=1575545365;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=liZrG3Fn6h7uMjS+YfxewlCVTm5jR/cWippWU216Gkk=;
-        b=KFGg4rfg2i5NvMAWHpZEUpJ8yG80DCu7nuEbQEOg568Gr75vT7GMjY1RuI9xakF1JeoR07
-        /zMtSk4SZu42qzMhG6rbWYnHx3msOTAC+JHd2IWUq6IGjBVBc5VG+a+O/Na4SYini9VwXX
-        vskET+TU92Jrjar+b9QK5cw48JYeZpw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-Vms8zM8BPmqjnSVHkfD0eA-1; Thu, 05 Dec 2019 06:28:51 -0500
-Received: by mail-wr1-f69.google.com with SMTP id b2so1411052wrj.9
-        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:28:51 -0800 (PST)
+        bh=lbaSGfutZwhZA116gvr95IAUlIVoaJxPvvW+eFCW8zI=;
+        b=IzY4lWJ02IVaJJJGslndTf8BDY46nd7Yux36O755xN8sRn5RPtHbLIOS/Pi3dXGLpeBN5s
+        sH+frMP5Ldc39L3WgjKVWhvD6Id3IrhErLPzJ6ECww7ujcZmsV1KTeBAWvCpBkRhFOA5HJ
+        2bcRa9KEPa1qQSzatlezDGJZWqcVr5s=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-hpcJYH5PPdeF0_jJC2E-wg-1; Thu, 05 Dec 2019 06:29:24 -0500
+Received: by mail-wm1-f72.google.com with SMTP id n4so751902wmd.7
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:29:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=zSnkBwCsQJ7IefvCVUNxVwkOy0ntVxUAJCVEAOGBUtU=;
-        b=pGVjgSmWlVoPGL7uvL37h38Pg+U0BnRw9+YeXPL/g0FFkCRhBIyI9s6bNMK9nbDzmA
-         iu7dut/1/oLhsAoKd4IuxAsauI9LN5tfc9ZEB0h6gIacPq2/pcafaPpKWt8MDIQ/L56+
-         hfwGlVJFJmkUpZ91/Ty4bS7mOm3CAJFh9+ksJ+cCt9lW7ml2HJ6HVbTPV6N8ESuh+GDl
-         SBMmDkZDiys63Nu4ayazITKB5C+j62Y4J8e1dm05DFIhN0j9PwLxFr5TRxpqpypFlxxB
-         xTmI7aH+ATomlbuA9X2UYa9xnegsbYYmLM3Ktr+H3rOtjze508MU60jDa9FMhcgLbHEA
-         AVpQ==
-X-Gm-Message-State: APjAAAXNypeZ3Cx3E9JconfWZK6vZk3ahEqScACIHrcROtc4kl/nzaZL
-        IL4+HeFvs1+8F2RvbWM0h40r8WP/l3iFAiRE93+pgEwIC7+lJwGpckhr3xB9natEDyuz8QuMWtc
-        1dfeAL3xAAI28
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr9314550wrv.144.1575545330262;
-        Thu, 05 Dec 2019 03:28:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzxLLTdnvIJnf4LX7EfqXSFi7UbnY72jsv0qrNnOYd7HBdQqdtgxaukvd8wMn2ZmLTXZgccng==
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr9314531wrv.144.1575545330048;
-        Thu, 05 Dec 2019 03:28:50 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o4sm12042283wrx.25.2019.12.05.03.28.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2019 03:28:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS field
-In-Reply-To: <20191204214027.85958-1-jmattson@google.com>
-References: <20191204214027.85958-1-jmattson@google.com>
-Date:   Thu, 05 Dec 2019 12:28:48 +0100
-Message-ID: <87o8wnroy7.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lbaSGfutZwhZA116gvr95IAUlIVoaJxPvvW+eFCW8zI=;
+        b=pMBnS+50vdAJVlgTPGXLjGIqlgQSqRRMYiOCGfl01MokdhBuOnObd+rV6JN8BAw4rf
+         SLp/0QwmVhryt/6Bsycbjzg11ZH3Rl4xSC97hVXtzJhmh+tl02q7xl9Q21SMLdGhoeVy
+         y7QgAmbNuby1vs9sgkVG6bd75l7PR8DmWwc8TW9f6hKZHbf/jgz8gTRHEsfe8GzOZSP5
+         wdw0cuWEF/uwC1op3D906KZq68xSh28riwI2IjMNkK6Z9ic0KduENrU4thXjOtVfXInR
+         dAcNMkZQ1DS8Nkl15cmLfLsKwfQ2Eyv0PISISvEnaLyKXbRhaRo0LzOC6v9MvsL5bMDU
+         Vz4w==
+X-Gm-Message-State: APjAAAW/2Ti/qPj4/Mffvz78Wfa069bbLR5JjHz2MqF7T08pdcpW1tbq
+        IdYSCTXfCu5JPA11WnWiiW71Ik4mlZx7R3JWRZScTw4TZCY6swzUa6iKxYoW9zsmGIEL9Dk6Ywv
+        GdwJ30p6Oe06w
+X-Received: by 2002:a1c:1dc4:: with SMTP id d187mr4900396wmd.46.1575545363049;
+        Thu, 05 Dec 2019 03:29:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx9Xt8ZW3hE0/KfrEcZYT8qrPPraxHN0nr72IWYS5MoUhQN15mYYzXu7Q6Ai0EaHlN2GKcQ5w==
+X-Received: by 2002:a1c:1dc4:: with SMTP id d187mr4900356wmd.46.1575545362806;
+        Thu, 05 Dec 2019 03:29:22 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:541f:a977:4b60:6802? ([2001:b07:6468:f312:541f:a977:4b60:6802])
+        by smtp.gmail.com with ESMTPSA id e18sm11632611wrr.95.2019.12.05.03.29.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2019 03:29:22 -0800 (PST)
+Subject: Re: KASAN: slab-out-of-bounds Read in fbcon_get_font
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     syzbot <syzbot+4455ca3b3291de891abc@syzkaller.appspotmail.com>,
+        Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI <dri-devel@lists.freedesktop.org>, ghalat@redhat.com,
+        Gleb Natapov <gleb@kernel.org>, gwshan@linux.vnet.ibm.com,
+        "H. Peter Anvin" <hpa@zytor.com>, James Morris <jmorris@namei.org>,
+        kasan-dev <kasan-dev@googlegroups.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Russell Currey <ruscur@russell.cc>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>, stewart@linux.vnet.ibm.com,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        the arch/x86 maintainers <x86@kernel.org>
+References: <0000000000003e640e0598e7abc3@google.com>
+ <41c082f5-5d22-d398-3bdd-3f4bf69d7ea3@redhat.com>
+ <CACT4Y+bCHOCLYF+TW062n8+tqfK9vizaRvyjUXNPdneciq0Ahg@mail.gmail.com>
+ <f4db22f2-53a3-68ed-0f85-9f4541530f5d@redhat.com>
+ <CACT4Y+ZHCmTu4tdfP+iCswU3r6+_NBM9M-pAZEypVSZ9DEq3TQ@mail.gmail.com>
+ <e03140c6-8ff5-9abb-1af6-17a5f68d1829@redhat.com>
+ <CACT4Y+YopHoCFDRHCE6brnWfHb5YUsTJS1Mc+58GgO8CDEcgHQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bf93410c-7e59-a679-c00d-5333a9879128@redhat.com>
+Date:   Thu, 5 Dec 2019 12:29:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-MC-Unique: Vms8zM8BPmqjnSVHkfD0eA-1
+In-Reply-To: <CACT4Y+YopHoCFDRHCE6brnWfHb5YUsTJS1Mc+58GgO8CDEcgHQ@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: hpcJYH5PPdeF0_jJC2E-wg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+On 05/12/19 12:27, Dmitry Vyukov wrote:
+> Oh, you mean the final bisection crash. Indeed it contains a kvm frame
+> and it turns out to be a bug in syzkaller code that indeed
+> misattributed it to kvm instead of netfilter.
+> Should be fixed now, you may read the commit message for details:
+> https://github.com/google/syzkaller/commit/4fb74474cf0af2126be3a8989d770c3947ae9478
+> 
+> Overall this "making sense out of kernel output" task is the ultimate
+> insanity, you may skim through this file to get a taste of amount of
+> hardcoding and special corner cases that need to be handled:
+> https://github.com/google/syzkaller/blob/master/pkg/report/linux.go
+> And this is never done, such "exception from exception corner case"
+> things pop up every week. There is always something to shuffle and
+> tune. It only keeps functioning due to 500+ test cases for all
+> possible insane kernel outputs:
+> https://github.com/google/syzkaller/tree/master/pkg/report/testdata/linux/report
+> https://github.com/google/syzkaller/tree/master/pkg/report/testdata/linux/guilty
+> 
+> So thanks for persisting and questioning! We are getting better with
+> each new test.
 
-> According to the SDM, a VMWRITE in VMX non-root operation with an
-> invalid VMCS-link pointer results in VMfailInvalid before the validity
-> of the VMCS field in the secondary source operand is checked.
->
-> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 if ru=
-nning L2")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Cc: Liran Alon <liran.alon@oracle.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 38 +++++++++++++++++++-------------------
->  1 file changed, 19 insertions(+), 19 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 4aea7d304beb..146e1b40c69f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4864,6 +4864,25 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  =09if (vmx->nested.current_vmptr =3D=3D -1ull)
->  =09=09return nested_vmx_failInvalid(vcpu);
-> =20
-> +=09if (!is_guest_mode(vcpu)) {
-> +=09=09vmcs12 =3D get_vmcs12(vcpu);
-> +
-> +=09=09/*
-> +=09=09 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
-> +=09=09 * vmcs12, else we may crush a field or consume a stale value.
-> +=09=09 */
-> +=09=09if (!is_shadow_field_rw(field))
-> +=09=09=09copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+Thanks to you!  I "complain" because I know you're so responsive. :)
 
-But (unless I'm missing some pre-requisite patch) we haven't set 'field'
-yet, it happens later when we do
-
-field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-
-> +=09} else {
-> +=09=09/*
-> +=09=09 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
-> +=09=09 * to shadowed-field sets the ALU flags for VMfailInvalid.
-> +=09=09 */
-> +=09=09if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D -1ull)
-> +=09=09=09return nested_vmx_failInvalid(vcpu);
-> +=09=09vmcs12 =3D get_shadow_vmcs12(vcpu);
-> +=09}
-> +
->  =09if (vmx_instruction_info & (1u << 10))
->  =09=09field_value =3D kvm_register_readl(vcpu,
->  =09=09=09(((vmx_instruction_info) >> 3) & 0xf));
-> @@ -4889,25 +4908,6 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  =09=09return nested_vmx_failValid(vcpu,
->  =09=09=09VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
-> =20
-> -=09if (!is_guest_mode(vcpu)) {
-> -=09=09vmcs12 =3D get_vmcs12(vcpu);
-> -
-> -=09=09/*
-> -=09=09 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
-> -=09=09 * vmcs12, else we may crush a field or consume a stale value.
-> -=09=09 */
-> -=09=09if (!is_shadow_field_rw(field))
-> -=09=09=09copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
-> -=09} else {
-> -=09=09/*
-> -=09=09 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
-> -=09=09 * to shadowed-field sets the ALU flags for VMfailInvalid.
-> -=09=09 */
-> -=09=09if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D -1ull)
-> -=09=09=09return nested_vmx_failInvalid(vcpu);
-> -=09=09vmcs12 =3D get_shadow_vmcs12(vcpu);
-> -=09}
-> -
->  =09offset =3D vmcs_field_to_offset(field);
->  =09if (offset < 0)
->  =09=09return nested_vmx_failValid(vcpu,
-
---=20
-Vitaly
+Paolo
 
