@@ -2,223 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7ED7B113A5A
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 04:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2C67113A66
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 04:32:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728470AbfLED2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 22:28:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31933 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728132AbfLED2V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 22:28:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575516499;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
-        bh=5rXDkwa1pKPwOp3k84tGGr+IGg9j4HXgJqyCzBqu+Ng=;
-        b=ZXyHptZcYD5n4b5xNTxdsZ156snrDugKB0XI+7rljgqCDDwbnKFSCC0LNks+pd54XK/56V
-        nIrVHP6bHT++dcpoRL2afLKfUm0GfJ8yNyNtz49dVKlNsfNrDjVVjHqI44sL3x1r2RBtfF
-        bGMwaYsBPSw8kLVhrAO25Nn9b20F7Q4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-pHIEREgNPTaO6L0eaybjWA-1; Wed, 04 Dec 2019 22:28:16 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21614800EB8;
-        Thu,  5 Dec 2019 03:28:15 +0000 (UTC)
-Received: from [10.72.12.152] (ovpn-12-152.pek2.redhat.com [10.72.12.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A4AD1600D5;
-        Thu,  5 Dec 2019 03:28:09 +0000 (UTC)
-Subject: Re: [kvm-unit-tests Patch v1 2/2] x86: ioapic: Test physical and
- logical destination mode
-To:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, thuth@redhat.com,
-        mtosatti@redhat.com
-References: <1573044429-7390-1-git-send-email-nitesh@redhat.com>
- <1573044429-7390-3-git-send-email-nitesh@redhat.com>
- <7hblsw8fji.fsf@crazypad.dinechin.lan>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- VujM7c/b4pps
-Organization: Red Hat Inc,
-Message-ID: <5fac8c7b-ddcd-de22-568d-bc7ab6c7c71f@redhat.com>
-Date:   Wed, 4 Dec 2019 22:28:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <7hblsw8fji.fsf@crazypad.dinechin.lan>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: pHIEREgNPTaO6L0eaybjWA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+        id S1728847AbfLEDcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 22:32:50 -0500
+Received: from mga04.intel.com ([192.55.52.120]:20226 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728098AbfLEDct (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 22:32:49 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Dec 2019 19:32:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,279,1571727600"; 
+   d="scan'208";a="205628942"
+Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.9])
+  by orsmga008.jf.intel.com with ESMTP; 04 Dec 2019 19:32:45 -0800
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        libvir-list@redhat.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        kevin.tian@intel.com, shaopeng.he@intel.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [RFC PATCH 0/9] Introduce mediate ops in vfio-pci
+Date:   Wed,  4 Dec 2019 22:24:19 -0500
+Message-Id: <20191205032419.29606-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+For SRIOV devices, VFs are passthroughed into guest directly without host
+driver mediation. However, when VMs migrating with passthroughed VFs,
+dynamic host mediation is required to  (1) get device states, (2) get
+dirty pages. Since device states as well as other critical information
+required for dirty page tracking for VFs are usually retrieved from PFs,
+it is handy to provide an extension in PF driver to centralizingly control
+VFs' migration.
 
-On 11/28/19 5:25 AM, Christophe de Dinechin wrote:
-> Nitesh Narayan Lal writes:
->
->> This patch tests the physical destination mode by sending an
->> interrupt to one of the vcpus and logical destination mode by
->> sending an interrupt to more than one vcpus.
->>
->> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
->> ---
->>  x86/ioapic.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 65 insertions(+)
->>
->> diff --git a/x86/ioapic.c b/x86/ioapic.c
->> index c32dabd..31aec03 100644
->> --- a/x86/ioapic.c
->> +++ b/x86/ioapic.c
->> @@ -405,12 +405,73 @@ static void test_ioapic_self_reconfigure(void)
->>  	report("Reconfigure self", g_isr_84 == 1 && e.remote_irr == 0);
->>  }
->>
->> +static volatile int g_isr_85;
->> +
->> +static void ioapic_isr_85(isr_regs_t *regs)
->> +{
->> +	++g_isr_85;
->> +	set_irq_line(0x0e, 0);
->> +	eoi();
->> +}
->> +
->> +static void test_ioapic_physical_destination_mode(void)
->> +{
->> +	ioapic_redir_entry_t e = {
->> +		.vector = 0x85,
->> +		.delivery_mode = 0,
->> +		.dest_mode = 0,
->> +		.dest_id = 0x1,
->> +		.trig_mode = TRIGGER_LEVEL,
->> +	};
->> +	handle_irq(0x85, ioapic_isr_85);
->> +	ioapic_write_redir(0xe, e);
->> +	set_irq_line(0x0e, 1);
->> +	do {
->> +		pause();
->> +	} while(g_isr_85 != 1);
-> Does this loop (and the next one) end up running forever if the test
-> fails? Would it be worth adding some timeout to detect failure?
+Therefore, in order to realize (1) passthrough VFs at normal time, (2)
+dynamically trap VFs' bars for dirty page tracking and (3) centralizing
+VF critical states retrieving and VF controls into one driver, we propose
+to introduce mediate ops on top of current vfio-pci device driver.
 
-AFAIK there is already a timeout in place. i.e., if we don't receive an
-interrupt then eventually the timeout will occur and the test will terminate.
 
->
->> +	report("ioapic physical destination mode", g_isr_85 == 1);
->> +}
->> +
->> +static volatile int g_isr_86;
->> +
->> +static void ioapic_isr_86(isr_regs_t *regs)
->> +{
->> +	++g_isr_86;
->> +	set_irq_line(0x0e, 0);
->> +	eoi();
->> +}
->> +
->> +static void test_ioapic_logical_destination_mode(void)
->> +{
->> +	/* Number of vcpus which are configured/set in dest_id */
->> +	int nr_vcpus = 3;
->> +	ioapic_redir_entry_t e = {
->> +		.vector = 0x86,
->> +		.delivery_mode = 0,
->> +		.dest_mode = 1,
->> +		.dest_id = 0xd,
->> +		.trig_mode = TRIGGER_LEVEL,
->> +	};
->> +	handle_irq(0x86, ioapic_isr_86);
->> +	ioapic_write_redir(0xe, e);
->> +	set_irq_line(0x0e, 1);
->> +	do {
->> +		pause();
->> +	} while(g_isr_86 < nr_vcpus);
->> +	report("ioapic logical destination mode", g_isr_86 == nr_vcpus);
->> +}
->> +
->> +static void update_cr3(void *cr3)
->> +{
->> +	write_cr3((ulong)cr3);
->> +}
->>
->>  int main(void)
->>  {
->>  	setup_vm();
->>  	smp_init();
->>
->> +	on_cpus(update_cr3, (void *)read_cr3());
->>  	mask_pic_interrupts();
->>
->>  	if (enable_x2apic())
->> @@ -448,7 +509,11 @@ int main(void)
->>  		test_ioapic_edge_tmr_smp(true);
->>
->>  		test_ioapic_self_reconfigure();
->> +		test_ioapic_physical_destination_mode();
->>  	}
->>
->> +	if (cpu_count() > 3)
->> +		test_ioapic_logical_destination_mode();
->> +
->>  	return report_summary();
->>  }
->
-> --
-> Cheers,
-> Christophe de Dinechin (IRC c3d)
->
+                                   _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+                                  
+ __________   register mediate ops|  ___________     ___________    |
+|          |<-----------------------|     VF    |   |           |   
+| vfio-pci |                      | |  mediate  |   | PF driver |   |
+|__________|----------------------->|   driver  |   |___________|   
+     |            open(pdev)      |  -----------          |         |
+     |                                                    |         
+     |                            |_ _ _ _ _ _ _ _ _ _ _ _|_ _ _ _ _|
+    \|/                                                  \|/
+-----------                                         ------------
+|    VF   |                                         |    PF    |
+-----------                                         ------------
+
+
+VF mediate driver could be a standalone driver that does not bind to
+any devices (as in demo code in patches 5-6) or it could be a built-in
+extension of PF driver (as in patches 7-9) .
+
+Rather than directly bind to VF, VF mediate driver register a mediate
+ops into vfio-pci in driver init. vfio-pci maintains a list of such
+mediate ops.
+(Note that: VF mediate driver can register mediate ops into vfio-pci
+before vfio-pci binding to any devices. And VF mediate driver can
+support mediating multiple devices.)
+
+When opening a device (e.g. a VF), vfio-pci goes through the mediate ops
+list and calls each vfio_pci_mediate_ops->open() with pdev of the opening
+device as a parameter.
+VF mediate driver should return success or failure depending on it
+supports the pdev or not.
+E.g. VF mediate driver would compare its supported VF devfn with the
+devfn of the passed-in pdev.
+Once vfio-pci finds a successful vfio_pci_mediate_ops->open(), it will
+stop querying other mediate ops and bind the opening device with this
+mediate ops using the returned mediate handle.
+
+Further vfio-pci ops (VFIO_DEVICE_GET_REGION_INFO ioctl, rw, mmap) on the
+VF will be intercepted into VF mediate driver as
+vfio_pci_mediate_ops->get_region_info(),
+vfio_pci_mediate_ops->rw,
+vfio_pci_mediate_ops->mmap, and get customized.
+For vfio_pci_mediate_ops->rw and vfio_pci_mediate_ops->mmap, they will
+further return 'pt' to indicate whether vfio-pci should further
+passthrough data to hw.
+
+when vfio-pci closes the VF, it calls its vfio_pci_mediate_ops->release()
+with a mediate handle as parameter.
+
+The mediate handle returned from vfio_pci_mediate_ops->open() lets VF
+mediate driver be able to differentiate two opening VFs of the same device
+id and vendor id.
+
+When VF mediate driver exits, it unregisters its mediate ops from
+vfio-pci.
+
+
+In this patchset, we enable vfio-pci to provide 3 things:
+(1) calling mediate ops to allow vendor driver customizing default
+region info/rw/mmap of a region.
+(2) provide a migration region to support migration
+(3) provide a dynamic trap bar info region to allow vendor driver
+control trap/untrap of device pci bars
+
+This vfio-pci + mediate ops way differs from mdev way in that
+(1) medv way needs to create a 1:1 mdev device on top of one VF, device
+specific mdev parent driver is bound to VF directly.
+(2) vfio-pci + mediate ops way does not create mdev devices and VF
+mediate driver does not bind to VFs. Instead, vfio-pci binds to VFs.
+
+The reason why we don't choose the way of writing mdev parent driver is
+that
+(1) VFs are almost all the time directly passthroughed. Directly binding
+to vfio-pci can make most of the code shared/reused. If we write a
+vendor specific mdev parent driver, most of the code (like passthrough
+style of rw/mmap) still needs to be copied from vfio-pci driver, which is
+actually a duplicated and tedious work.
+(2) For features like dynamically trap/untrap pci bars, if they are in
+vfio-pci, they can be available to most people without repeated code
+copying and re-testing.
+(3) with a 1:1 mdev driver which passthrough VFs most of the time, people
+have to decide whether to bind VFs to vfio-pci or mdev parent driver before
+it runs into a real migration need. However, if vfio-pci is bound
+initially, they have no chance to do live migration when there's a need
+later. 
+
+In this patchset,
+- patches 1-4 enable vfio-pci to call mediate ops registered by vendor
+  driver to mediate/customize region info/rw/mmap.
+
+- patches 5-6 provide a standalone sample driver to register a mediate ops
+  for Intel Graphics Devices. It does not bind to IGDs directly but decides
+  what devices it supports via its pciidlist. It also demonstrates how to
+  dynamic trap a device's PCI bars. (by adding more pciids in its
+  pciidlist, this sample driver actually is not necessarily limited to
+  support IGDs)
+
+- patch 7-9 provide a sample on i40e driver that supports Intel(R)
+  Ethernet Controller XL710 Family of devices. It supports VF precopy live
+  migration on Intel's 710 SRIOV. (but we commented out the real
+  implementation of dirty page tracking and device state retrieving part
+  to focus on demonstrating framework part. Will send out them in future
+  versions)
+ 
+  patch 7 registers/unregisters VF mediate ops when PF driver
+  probes/removes. It specifies its supporting VFs via
+  vfio_pci_mediate_ops->open(pdev)
+
+  patch 8 reports device cap of VFIO_PCI_DEVICE_CAP_MIGRATION and
+  provides a sample implementation of migration region.
+  The QEMU part of vfio migration is based on v8
+  https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html.
+  We do not based on recent v9 because we think there are still opens in
+  dirty page track part in that series.
+
+  patch 9 reports device cap of VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR and
+  provides an example on how to trap part of bar0 when migration starts
+  and passthrough this part of bar0 again when migration fails.
+
+Yan Zhao (9):
+  vfio/pci: introduce mediate ops to intercept vfio-pci ops
+  vfio/pci: test existence before calling region->ops
+  vfio/pci: register a default migration region
+  vfio-pci: register default dynamic-trap-bar-info region
+  samples/vfio-pci/igd_dt: sample driver to mediate a passthrough IGD
+  sample/vfio-pci/igd_dt: dynamically trap/untrap subregion of IGD bar0
+  i40e/vf_migration: register mediate_ops to vfio-pci
+  i40e/vf_migration: mediate migration region
+  i40e/vf_migration: support dynamic trap of bar0
+
+ drivers/net/ethernet/intel/Kconfig            |   2 +-
+ drivers/net/ethernet/intel/i40e/Makefile      |   3 +-
+ drivers/net/ethernet/intel/i40e/i40e.h        |   2 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +
+ .../ethernet/intel/i40e/i40e_vf_migration.c   | 626 ++++++++++++++++++
+ .../ethernet/intel/i40e/i40e_vf_migration.h   |  78 +++
+ drivers/vfio/pci/vfio_pci.c                   | 189 +++++-
+ drivers/vfio/pci/vfio_pci_private.h           |   2 +
+ include/linux/vfio.h                          |  18 +
+ include/uapi/linux/vfio.h                     | 160 +++++
+ samples/Kconfig                               |   6 +
+ samples/Makefile                              |   1 +
+ samples/vfio-pci/Makefile                     |   2 +
+ samples/vfio-pci/igd_dt.c                     | 367 ++++++++++
+ 14 files changed, 1455 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
+ create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
+ create mode 100644 samples/vfio-pci/Makefile
+ create mode 100644 samples/vfio-pci/igd_dt.c
+
 -- 
-Thanks
-Nitesh
+2.17.1
 
