@@ -2,103 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A35114101
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 13:50:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27241114104
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 13:51:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729327AbfLEMuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 07:50:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50086 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729236AbfLEMuV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 07:50:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575550220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=Hyb3ibAkZAYbAECyFhbWYbuR4iitZbKy1OZQ/jhZU9E=;
-        b=Ls+umEusCq1YTRmx57goWvT1xzqQvRa2hy1A6XsSFHep/dYDQHO83eoSMUzqmpDnBhMrXv
-        tLmkZMgidr2PlAKj/At1YR2nVuEIHPBXjf2jSovZPbid6SKhHdxhsvDvmgou257Wj+DIxy
-        zNJy17AKed8Y8IiT2m7DQMOHyyBFCkA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-wu3KczLdMO2YjAEPyeCztg-1; Thu, 05 Dec 2019 07:50:17 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8F40911E8;
-        Thu,  5 Dec 2019 12:50:15 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-87.ams2.redhat.com [10.36.116.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 969806106B;
-        Thu,  5 Dec 2019 12:50:14 +0000 (UTC)
-Subject: Re: [PATCH v4] KVM: s390: Add new reset vcpu API
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-References: <20191205131930.1b78f78b.cohuck@redhat.com>
- <20191205122810.10672-1-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <081eebc2-fbe4-d928-ad54-7e90fa06e0b2@redhat.com>
-Date:   Thu, 5 Dec 2019 13:50:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1729385AbfLEMv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 07:51:56 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26690 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729260AbfLEMvz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 07:51:55 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB5ClW24139278
+        for <kvm@vger.kernel.org>; Thu, 5 Dec 2019 07:51:54 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wq1ky1ym3-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 07:51:54 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Thu, 5 Dec 2019 12:51:51 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 5 Dec 2019 12:51:49 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB5Cp7E343778516
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 5 Dec 2019 12:51:07 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28E5242042;
+        Thu,  5 Dec 2019 12:51:48 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 139534203F;
+        Thu,  5 Dec 2019 12:51:48 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  5 Dec 2019 12:51:48 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id AB58BE0193; Thu,  5 Dec 2019 13:51:47 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Julian Wiedmann <jwi@linux.ibm.com>
+Subject: [PATCH] KVM: s390: ENOTSUPP -> EOPNOTSUPP fixups
+Date:   Thu,  5 Dec 2019 13:51:47 +0100
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191205122810.10672-1-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: wu3KczLdMO2YjAEPyeCztg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120512-0012-0000-0000-000003719A08
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120512-0013-0000-0000-000021AD5E69
+Message-Id: <20191205125147.229367-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-05_03:2019-12-04,2019-12-05 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ mlxlogscore=585 malwarescore=0 priorityscore=1501 impostorscore=0
+ mlxscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912050108
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/12/2019 13.28, Janosch Frank wrote:
-> The architecture states that we need to reset local IRQs for all CPU
-> resets. Because the old reset interface did not support the normal CPU
-> reset we never did that. Now that we have a new interface, let's
-> properly clear out local IRQs.
->=20
-> Also we add a ioctl for the clear reset to have all resets exposed to
-> userspace. Currently the clear reset falls back to the initial reset,
-> but we plan to have clear reset specific code in the future.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  Documentation/virt/kvm/api.txt | 48 ++++++++++++++++++++++++++++++++++
->  arch/s390/kvm/kvm-s390.c       | 14 ++++++++++
->  include/uapi/linux/kvm.h       |  5 ++++
->  3 files changed, 67 insertions(+)
-[...]
-> +4.123 KVM_S390_CLEAR_RESET
-> +
-> +Capability: KVM_CAP_S390_VCPU_RESETS
-> +Architectures: s390
-> +Type: vcpu ioctl
-> +Parameters: none
-> +Returns: 0
-> +
-> +This ioctl resets VCPU registers and control structures that userspace
-> +can't access via the kvm_run structure. It is intended to be called
-> +when an initial reset (which is a superset of the normal reset) is
-> +performed on the vcpu and additionally clears general, access,
-> +floating and vector registers.
+There is no ENOTSUPP for userspace
 
-So now you've documented that this ioctl clears the GPRs, ARs and
-FRs/VRs ... but the implementation does not! That's quite ugly.
-Can you please state clearly that it is the job of userspace to clear
-these registers (in the default, non-protected case) and that this ioctl
-should be called on top?
+Reported-by: Julian Wiedmann <jwi@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/kvm/interrupt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Same problem with the PSW bit 24 and riccb during normal reset.
-
-Or should the kernel code maybe also clear these in addition to
-userspace, just to be in line with the initial reset?
-
- Thomas
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 2a711bae69a7..bd9b339bbb5e 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -2312,7 +2312,7 @@ static int flic_ais_mode_get_all(struct kvm *kvm, struct kvm_device_attr *attr)
+ 		return -EINVAL;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	mutex_lock(&fi->ais_lock);
+ 	ais.simm = fi->simm;
+@@ -2621,7 +2621,7 @@ static int modify_ais_mode(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	int ret = 0;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	if (copy_from_user(&req, (void __user *)attr->addr, sizeof(req)))
+ 		return -EFAULT;
+@@ -2701,7 +2701,7 @@ static int flic_ais_mode_set_all(struct kvm *kvm, struct kvm_device_attr *attr)
+ 	struct kvm_s390_ais_all ais;
+ 
+ 	if (!test_kvm_facility(kvm, 72))
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	if (copy_from_user(&ais, (void __user *)attr->addr, sizeof(ais)))
+ 		return -EFAULT;
+-- 
+2.24.0
 
