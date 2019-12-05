@@ -2,105 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BC181141D6
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 14:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1890511420A
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 14:59:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729426AbfLENo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 08:44:59 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:36766 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729165AbfLENo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 08:44:59 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB5DYmh4186732;
-        Thu, 5 Dec 2019 13:43:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=brsXaC0VRHRwZqPZpGYZ7XL2fHsN26kLdCH5fW1y8tQ=;
- b=h05b834cY//3Xz7W17CnMMvLsJbuSVaca/Bu2F2onCLkfB9Df1KaIGdX51SwH0kS41Ea
- MJIFx9oZNJIbRXoDW0/ZPGoo3JtVlUBsy/OtsH5mKHj6Mp1h/sGnjlM/mR8zeTngFHzG
- hfRphqYKJwjt7g+OOXNv4qf1/hK4yUdb+uJ8JMyROwS1iCbtH/L7hQyLqVjDxsnUbHsD
- gZECoCch8ZxM9gGsmshhIDJCXQy/Eb723FJjm5OyUTD1fbMJU762vWWPcER+VvhSxAqT
- dlvUnQu9HyUKcEWVay2upKh+arVvpUK+QSLQGH+8fGbtsHzYbxCq8RwIwWbNgy1yCXoM Tg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2wkfuunbs1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Dec 2019 13:43:25 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB5DYiIk196384;
-        Thu, 5 Dec 2019 13:43:24 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2wpp745bfe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Dec 2019 13:43:24 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xB5DhJ0q029345;
-        Thu, 5 Dec 2019 13:43:19 GMT
-Received: from [192.168.14.112] (/79.183.203.182)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 05 Dec 2019 05:43:19 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] KVM: vmx: remove unreachable statement in
- vmx_get_msr_feature()
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <1575512678-22058-1-git-send-email-linmiaohe@huawei.com>
-Date:   Thu, 5 Dec 2019 15:43:13 +0200
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        sean.j.christopherson@intel.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+        id S1729489AbfLEN7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 08:59:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48522 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729099AbfLEN73 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 08:59:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575554367;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
+        bh=cu2JQJ4IWywqxiZR1BEoODjKGGS1zz0mL9D42TBLwP8=;
+        b=L0pRW+bbGgIz0fwmvtR51Tq/PgbpBCW2UuPYcWl6GHFh4/0xzzG4c2/kMX+WwggJdRVhse
+        YJ6K+nYCxk9mVmUUPvtnYUNId30f+7fCJca7jI8bxXoGta6EOrYU3hebEn+VpATwaNFDfe
+        JOTmEUkjGOQjPWn36I231bMfI4UOmeA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-hY54m9kuOwa48G_2ruB_DA-1; Thu, 05 Dec 2019 08:59:26 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC9B4801E72
+        for <kvm@vger.kernel.org>; Thu,  5 Dec 2019 13:59:25 +0000 (UTC)
+Received: from [10.10.120.186] (ovpn-120-186.rdu2.redhat.com [10.10.120.186])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AA7C5D6A5;
+        Thu,  5 Dec 2019 13:59:23 +0000 (UTC)
+Subject: Re: [kvm-unit-tests Patch v1 2/2] x86: ioapic: Test physical and
+ logical destination mode
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, mtosatti@redhat.com
+References: <1573044429-7390-1-git-send-email-nitesh@redhat.com>
+ <1573044429-7390-3-git-send-email-nitesh@redhat.com>
+ <821842d1-2faf-074e-8639-80405efa26e4@redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <030fd716-6e87-7c7c-4cd2-0f6128611f2d@redhat.com>
+Date:   Thu, 5 Dec 2019 08:59:20 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <821842d1-2faf-074e-8639-80405efa26e4@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: hY54m9kuOwa48G_2ruB_DA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <DFEE8544-A246-45D0-A2DD-4AC4E7EC415E@oracle.com>
-References: <1575512678-22058-1-git-send-email-linmiaohe@huawei.com>
-To:     linmiaohe <linmiaohe@huawei.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9461 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912050115
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9461 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912050115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 11/28/19 1:38 AM, Thomas Huth wrote:
+> On 06/11/2019 13.47, Nitesh Narayan Lal wrote:
+>> This patch tests the physical destination mode by sending an
+>> interrupt to one of the vcpus and logical destination mode by
+>> sending an interrupt to more than one vcpus.
+>>
+>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+>> ---
+>> =C2=A0 x86/ioapic.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++=
++++++++++++++
+>> =C2=A0 1 file changed, 65 insertions(+)
+>
+> =C2=A0Hi,
+>
+> I think this patch likely broke the possibility to run the ioapic test un=
+der
+> TCG (it was still working some weeks ago):
+>
+> =C2=A0https://gitlab.com/huth/kvm-unit-tests/-/jobs/363553211#L1815
+>
+> Do you care about this test to be runnable under TCG, or shall I simply c=
+ook a
+> patch to disable it in the gitlab CI?
 
-> On 5 Dec 2019, at 4:24, linmiaohe <linmiaohe@huawei.com> wrote:
->=20
-> From: Miaohe Lin <linmiaohe@huawei.com>
->=20
-> We have no way to reach the final statement, remove it.
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
-> arch/x86/kvm/vmx/vmx.c | 2 --
-> 1 file changed, 2 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e7ea332ad1e8..e58a0daf0f86 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1781,8 +1781,6 @@ static int vmx_get_msr_feature(struct =
-kvm_msr_entry *msr)
-> 	default:
-> 		return 1;
-> 	}
-> -
-> -	return 0;
-> }
 
-I personally just prefer to remove the =E2=80=9Cdefault=E2=80=9D case =
-and change this =E2=80=9Creturn 0;=E2=80=9D to =E2=80=9Creturn 1;=E2=80=9D=
-.
-But it=E2=80=99s a matter of taste of course.
+Hi Thomas,
+
+I don't think there is a need for this test to be runnable under TCG. So we=
+ can
+skip this for it.
+
+>
+> =C2=A0Thomas
+--=20
+Thanks
+Nitesh
 
