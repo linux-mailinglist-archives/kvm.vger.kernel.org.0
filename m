@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71B0111402C
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:35:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BFD4114037
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:37:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729146AbfLELfb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 06:35:31 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:46090 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729017AbfLELfb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 06:35:31 -0500
-Received: by mail-qt1-f196.google.com with SMTP id 38so3158486qtb.13
-        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:35:30 -0800 (PST)
+        id S1729359AbfLELhJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 06:37:09 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:36292 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729109AbfLELhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 06:37:09 -0500
+Received: by mail-qt1-f195.google.com with SMTP id k11so3229207qtm.3
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=XFj7/o8CY27u2EP/Ii6IWyV6V/qKCHo8NGPo9OoyP2o=;
-        b=VLVyGXFmunojbceinV2tb/wrcOELq58HBQBO3PG1yIVJE9cJvQrEbuqEZfs1I80KNB
-         NpsR6uAqwQ1je6sENpKTPDm/ZPRPYiyWVyhKhz0Gkvv7qxp0qEVtFkBBxA6A80T2TXsl
-         X7m1sn9D0K3nhXLdO1yN+hrVDQu5/hiurh8lYBgW2BPj5Yycs6wAmQwzKT1tL8kEMsPy
-         K0NR8MTeoPaHhZSlq8XJVOGWI8DaOELPIF19c03IuvUui/HejI8FD0EVyWCqT64GrbmK
-         +X5RQyE6wCiiWL0oRAogajCglCRovqnXNNoySkGhPdL0ztR8wC2vD0Gl8PA4lCPMJHcV
-         sd3A==
+        bh=TfYIZA1x1hWCQA6g7oQ19DH7tEX6ualy3pbm/P3Lk+A=;
+        b=FjAqSfZWtL5kJIRnjAfh3psbkl8pAdn9kqdwrkrc6B4f8S1BQX57V7yNhGnG0BgwL4
+         z15JyoonOBeE0tT3TytWPHa3CYQzBD9Tx1POq43C8+CKKbYgMmPV0L4s8BZLCisZW0Pm
+         f5LkYEtNxM7sPloRggdzD8iVN6W49sZsR+I/jfJbS6KjWa+Z1FJ1NvmgxtfYC2CLp305
+         w4/Zdw6lu3ne6ZYwhPkYooh4vLuzcrPNHP7Rj3jkgz7jaVzaahUIH1/iG1bVjXkBegYp
+         /DU83BC87lTZAbNf8X47Bpt+FqvVbEZvFIVSsSmXIuUebjxYpvSkwl+OHCAaL0gmPODj
+         tlXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=XFj7/o8CY27u2EP/Ii6IWyV6V/qKCHo8NGPo9OoyP2o=;
-        b=PrcHHFgHrRLPq53oc/+izp31OJWRPzAANXmNq3Mjq9esHrPkF+iT6xjh2/4bbhGUiZ
-         9gr/rewNWokS4qwGnl3NRaTWHr6IcbCacWf1CM9Bedwg489lC4MHVPqv2OMitV77Asud
-         vplEh6cj9A0UaIiLJFtGNYE4JdaCqSfXTZF5IeWxL7+Ami6ScjShxxmVqb/Ps2yzOb9o
-         Eej1p2/b9CgDDjYTKdHop8YqN4LVMBTGlD5O5mT/P2sWPBg53xTcHfzA4J2wEwXNMdkd
-         fn+d2YQhLckp97z/pnw+ATDwHZ1nkaNGqH46Rj9YYI1JQgT6kaFP7ij3+kKnYYXRevma
-         2/sA==
-X-Gm-Message-State: APjAAAVzIcCpxH+4911OhZY4gjUuwJUJllh8Wc19EgJBWVHzsHCVDoXl
-        mLHPDErl2U6cfIa3n4YcFAM86fQQjMxLixcB82OFHA==
-X-Google-Smtp-Source: APXvYqywdNT7YtUlcyhBayK1c5G6KgoYnokHv4gbK83yKRI9KmJz2M3nmPsIV9emnEuu9bBpOrULeU5+4XFCmFaRuPs=
-X-Received: by 2002:ac8:2489:: with SMTP id s9mr7043538qts.257.1575545729972;
- Thu, 05 Dec 2019 03:35:29 -0800 (PST)
+        bh=TfYIZA1x1hWCQA6g7oQ19DH7tEX6ualy3pbm/P3Lk+A=;
+        b=NpBs0bvziHppDPVWTYRe7ZFQLR+qRMEu15kJ0p6Ad7+FWy2afKsboWAZUdjOwic3mg
+         BZZrOzsSxopgLLp1fv+4Lavead1jaeostgGj+ZPyGfRlvxEyWZrd0nkOohUPhrN0UeBf
+         O+JkuBUmShWHIG3gadUwq8dMDs0yhOT1CSM7+SiyfbNzfFrvbKoUe5JVvGLAdx5xh5Fj
+         H0j5/w6cAFBrrz6D/sNC2BJGqLf2rB9+YJo5ZZ3rOlvOgfE9NXbk7b6XrO+ZH/Rsdfzy
+         mwkfwgzFMk57ZEAPZRXl55oia7Q1DXOkKCzPzBYejyObKTOxPHafw2KWngaTqpn7GMxn
+         rHMA==
+X-Gm-Message-State: APjAAAXuZb/Hgfsq/mzNldvPaZ6QehMhJCn6EZeYGvQ3zvYoKz/YYaMP
+        Ryb1DQ87MopZZxpONNBVtrb0+exU54fKMarZWbFMng==
+X-Google-Smtp-Source: APXvYqzfgZJ9l6UJOOMZ2Qo7SFoVkzP/jw5YHvEyX7L/cw3KsXRUm/icBbPq7v443TCg8aD8BOA0xHa3BtNpRac5BEo=
+X-Received: by 2002:ac8:ccf:: with SMTP id o15mr7086616qti.380.1575545828141;
+ Thu, 05 Dec 2019 03:37:08 -0800 (PST)
 MIME-Version: 1.0
 References: <0000000000003e640e0598e7abc3@google.com> <41c082f5-5d22-d398-3bdd-3f4bf69d7ea3@redhat.com>
  <CACT4Y+bCHOCLYF+TW062n8+tqfK9vizaRvyjUXNPdneciq0Ahg@mail.gmail.com>
  <f4db22f2-53a3-68ed-0f85-9f4541530f5d@redhat.com> <397ad276-ee2b-3883-9ed4-b5b1a2f8cf67@i-love.sakura.ne.jp>
 In-Reply-To: <397ad276-ee2b-3883-9ed4-b5b1a2f8cf67@i-love.sakura.ne.jp>
 From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 5 Dec 2019 12:35:18 +0100
-Message-ID: <CACT4Y+YqNtRdUo4pDX8HeNubOJYWNfsqcQs_XueRNLPozw=g-Q@mail.gmail.com>
+Date:   Thu, 5 Dec 2019 12:36:56 +0100
+Message-ID: <CACT4Y+bUkzJAezH9Pk=c1amtzO0-r1Hcn3WmDuS+Drn-R3GAQA@mail.gmail.com>
 Subject: Re: KASAN: slab-out-of-bounds Read in fbcon_get_font
 To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -94,8 +94,25 @@ On Thu, Dec 5, 2019 at 11:41 AM Tetsuo Handa
 >
 > It would be nice if coverage functionality can extract filenames in the source
 > code and supply the list of filenames as arguments for bisect operation.
+>
+> Also, (unrelated but) it would be nice if we can have "make yes2modconfig"
+> target which converts CONFIG_FOO=y to CONFIG_FOO=m if FOO is tristate.
+> syzbot is testing kernel configs close to "make allyesconfig" but I want to
+> save kernel rebuild time by disabling unrelated functionality when manually
+> "debug printk()ing" kernels.
 
-What is the criteria for file name extraction? What will bisect
-operation do with the set of files?
-If you have a feature/improvement request, please file it at:
-https://github.com/google/syzkaller/issues/new
+I thought that maybe sed "s#=y#=m#g" && make olddefconfig will do, but
+unfortunately, it turns off non-tristate configs...
+
+$ egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
+CONFIG_MEMORY_HOTPLUG=y
+CONFIG_TCP_CONG_DCTCP=y
+# sed -i "s/CONFIG_MEMORY_HOTPLUG=y/CONFIG_MEMORY_HOTPLUG=m/g" .config
+# sed -i "s/CONFIG_TCP_CONG_DCTCP=y/CONFIG_TCP_CONG_DCTCP=m/g" .config
+# egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
+CONFIG_MEMORY_HOTPLUG=m
+CONFIG_TCP_CONG_DCTCP=m
+# make olddefconfig
+# egrep "CONFIG_MEMORY_HOTPLUG|CONFIG_TCP_CONG_DCTCP" .config
+# CONFIG_MEMORY_HOTPLUG is not set
+CONFIG_TCP_CONG_DCTCP=m
