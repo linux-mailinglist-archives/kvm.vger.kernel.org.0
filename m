@@ -2,115 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DB68114015
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:27:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2F74114017
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 12:28:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729187AbfLEL1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 06:27:49 -0500
-Received: from mail-qv1-f66.google.com ([209.85.219.66]:32802 "EHLO
-        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729120AbfLEL1t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 06:27:49 -0500
-Received: by mail-qv1-f66.google.com with SMTP id z3so1151817qvn.0
-        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:27:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RN4UxK4XX/wD+FOSD/QSslR64zPY0NoSPi7sfqEDTcg=;
-        b=HcygGCX60Afhxpnw9ZYlpuKkkt5wdM44SN/KOzDuDxVXQAJYVla5vHk6t3E4umUT94
-         WY3Uy/DUPWgjn0jDpNuvlQTfbRf6E7c08Qp9KQdy8d9VELeRNDHm65ZdVHDB3uZSyxM7
-         eHufFLkzIjwZBrX6+UXDf4ik+qPNtMwBIdCqJDm4sA2uNoBYHBhVnpbaMdg/VJS1UEn8
-         AM0jTK3oFUhIZANAHf2pmaFrBnf0iz7jtAqeryjk6H+rOQm8s1DrQnC4hXGmy2QVdwbA
-         KebmWYKIj3F0ms5Jw0G2v2v3JX7QX7bocZ4OdEkrQzuV2CoGugRaRRbvp9/fH59JF56p
-         S+Zw==
+        id S1729274AbfLEL24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 06:28:56 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42384 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728735AbfLEL24 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 5 Dec 2019 06:28:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575545334;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=liZrG3Fn6h7uMjS+YfxewlCVTm5jR/cWippWU216Gkk=;
+        b=KFGg4rfg2i5NvMAWHpZEUpJ8yG80DCu7nuEbQEOg568Gr75vT7GMjY1RuI9xakF1JeoR07
+        /zMtSk4SZu42qzMhG6rbWYnHx3msOTAC+JHd2IWUq6IGjBVBc5VG+a+O/Na4SYini9VwXX
+        vskET+TU92Jrjar+b9QK5cw48JYeZpw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-Vms8zM8BPmqjnSVHkfD0eA-1; Thu, 05 Dec 2019 06:28:51 -0500
+Received: by mail-wr1-f69.google.com with SMTP id b2so1411052wrj.9
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 03:28:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RN4UxK4XX/wD+FOSD/QSslR64zPY0NoSPi7sfqEDTcg=;
-        b=qdLrG5TYjfbWG4JqLlJTaWj2p83YPuWOUfZwX9J4w+1J7mNnPcDQ5mls52IEwArAYC
-         k+HWqrzmFaXQ7hVsGD72vDgyAt5XpPB3wJeTYt3BcPA15iKAEfRp35+FQd0cE/SJHhHa
-         M2t4OTiwln6cuLRAzP3YQgtNsrUHn1gGMBf4O+VEM1CyJ51MHFGOd+llPcM3R4Ed/ojO
-         ctj49WP/8JfDRTHMJ/n3CtJfSKMh1+EbmmY965bOWuGu8BEgngycn2KQI+PykAfd9Q7w
-         KpZyi57CEpdp/EW2xl5gAeOTZWKEYA3x0SCd3TyssHTt08j+9I58H1pg6ozV72cU94E4
-         mp7g==
-X-Gm-Message-State: APjAAAX364Yuoq/UapzdfERQ9hVXdCv/QS/0KdWX2lhh3ek77wWy2RA8
-        LwcoFfWC5vh2dtuw3z0Nj4jqZ+ufGHhC5pqTZ/eKxg==
-X-Google-Smtp-Source: APXvYqxH9YNJe5L8BxMqoB1aZ+mLyrbeKewaHX+sfn84IGKLFUtHvCbxNr7Nz7Mt9VNZMqmAAHeTZG/lcpsKaNbOTFE=
-X-Received: by 2002:a0c:f8d1:: with SMTP id h17mr7099085qvo.80.1575545267533;
- Thu, 05 Dec 2019 03:27:47 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=zSnkBwCsQJ7IefvCVUNxVwkOy0ntVxUAJCVEAOGBUtU=;
+        b=pGVjgSmWlVoPGL7uvL37h38Pg+U0BnRw9+YeXPL/g0FFkCRhBIyI9s6bNMK9nbDzmA
+         iu7dut/1/oLhsAoKd4IuxAsauI9LN5tfc9ZEB0h6gIacPq2/pcafaPpKWt8MDIQ/L56+
+         hfwGlVJFJmkUpZ91/Ty4bS7mOm3CAJFh9+ksJ+cCt9lW7ml2HJ6HVbTPV6N8ESuh+GDl
+         SBMmDkZDiys63Nu4ayazITKB5C+j62Y4J8e1dm05DFIhN0j9PwLxFr5TRxpqpypFlxxB
+         xTmI7aH+ATomlbuA9X2UYa9xnegsbYYmLM3Ktr+H3rOtjze508MU60jDa9FMhcgLbHEA
+         AVpQ==
+X-Gm-Message-State: APjAAAXNypeZ3Cx3E9JconfWZK6vZk3ahEqScACIHrcROtc4kl/nzaZL
+        IL4+HeFvs1+8F2RvbWM0h40r8WP/l3iFAiRE93+pgEwIC7+lJwGpckhr3xB9natEDyuz8QuMWtc
+        1dfeAL3xAAI28
+X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr9314550wrv.144.1575545330262;
+        Thu, 05 Dec 2019 03:28:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzxLLTdnvIJnf4LX7EfqXSFi7UbnY72jsv0qrNnOYd7HBdQqdtgxaukvd8wMn2ZmLTXZgccng==
+X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr9314531wrv.144.1575545330048;
+        Thu, 05 Dec 2019 03:28:50 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o4sm12042283wrx.25.2019.12.05.03.28.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2019 03:28:49 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Liran Alon <liran.alon@oracle.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS field
+In-Reply-To: <20191204214027.85958-1-jmattson@google.com>
+References: <20191204214027.85958-1-jmattson@google.com>
+Date:   Thu, 05 Dec 2019 12:28:48 +0100
+Message-ID: <87o8wnroy7.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-References: <0000000000003e640e0598e7abc3@google.com> <41c082f5-5d22-d398-3bdd-3f4bf69d7ea3@redhat.com>
- <CACT4Y+bCHOCLYF+TW062n8+tqfK9vizaRvyjUXNPdneciq0Ahg@mail.gmail.com>
- <f4db22f2-53a3-68ed-0f85-9f4541530f5d@redhat.com> <CACT4Y+ZHCmTu4tdfP+iCswU3r6+_NBM9M-pAZEypVSZ9DEq3TQ@mail.gmail.com>
- <e03140c6-8ff5-9abb-1af6-17a5f68d1829@redhat.com>
-In-Reply-To: <e03140c6-8ff5-9abb-1af6-17a5f68d1829@redhat.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 5 Dec 2019 12:27:35 +0100
-Message-ID: <CACT4Y+YopHoCFDRHCE6brnWfHb5YUsTJS1Mc+58GgO8CDEcgHQ@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in fbcon_get_font
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     syzbot <syzbot+4455ca3b3291de891abc@syzkaller.appspotmail.com>,
-        Andrey Ryabinin <aryabinin@virtuozzo.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI <dri-devel@lists.freedesktop.org>, ghalat@redhat.com,
-        Gleb Natapov <gleb@kernel.org>, gwshan@linux.vnet.ibm.com,
-        "H. Peter Anvin" <hpa@zytor.com>, James Morris <jmorris@namei.org>,
-        kasan-dev <kasan-dev@googlegroups.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Russell Currey <ruscur@russell.cc>,
-        Sam Ravnborg <sam@ravnborg.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>, stewart@linux.vnet.ibm.com,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Kentaro Takeda <takedakn@nttdata.co.jp>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MC-Unique: Vms8zM8BPmqjnSVHkfD0eA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 5, 2019 at 11:53 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 05/12/19 11:31, Dmitry Vyukov wrote:
-> >> Ah, and because the machine is a KVM guest, kvm_wait appears in a lot of
-> >> backtrace and I get to share syzkaller's joy every time. :)
-> > I don't see any mention of "kvm" in the crash report.
->
-> It's there in the stack trace, not sure if this is what triggered my Cc:
->
->  [<ffffffff810c7c3a>] kvm_wait+0xca/0xe0 arch/x86/kernel/kvm.c:612
->
-> Paolo
+Jim Mattson <jmattson@google.com> writes:
 
+> According to the SDM, a VMWRITE in VMX non-root operation with an
+> invalid VMCS-link pointer results in VMfailInvalid before the validity
+> of the VMCS field in the secondary source operand is checked.
+>
+> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 if ru=
+nning L2")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 38 +++++++++++++++++++-------------------
+>  1 file changed, 19 insertions(+), 19 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 4aea7d304beb..146e1b40c69f 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4864,6 +4864,25 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+>  =09if (vmx->nested.current_vmptr =3D=3D -1ull)
+>  =09=09return nested_vmx_failInvalid(vcpu);
+> =20
+> +=09if (!is_guest_mode(vcpu)) {
+> +=09=09vmcs12 =3D get_vmcs12(vcpu);
+> +
+> +=09=09/*
+> +=09=09 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
+> +=09=09 * vmcs12, else we may crush a field or consume a stale value.
+> +=09=09 */
+> +=09=09if (!is_shadow_field_rw(field))
+> +=09=09=09copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
 
-Oh, you mean the final bisection crash. Indeed it contains a kvm frame
-and it turns out to be a bug in syzkaller code that indeed
-misattributed it to kvm instead of netfilter.
-Should be fixed now, you may read the commit message for details:
-https://github.com/google/syzkaller/commit/4fb74474cf0af2126be3a8989d770c3947ae9478
+But (unless I'm missing some pre-requisite patch) we haven't set 'field'
+yet, it happens later when we do
 
-Overall this "making sense out of kernel output" task is the ultimate
-insanity, you may skim through this file to get a taste of amount of
-hardcoding and special corner cases that need to be handled:
-https://github.com/google/syzkaller/blob/master/pkg/report/linux.go
-And this is never done, such "exception from exception corner case"
-things pop up every week. There is always something to shuffle and
-tune. It only keeps functioning due to 500+ test cases for all
-possible insane kernel outputs:
-https://github.com/google/syzkaller/tree/master/pkg/report/testdata/linux/report
-https://github.com/google/syzkaller/tree/master/pkg/report/testdata/linux/guilty
+field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
 
-So thanks for persisting and questioning! We are getting better with
-each new test.
+> +=09} else {
+> +=09=09/*
+> +=09=09 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
+> +=09=09 * to shadowed-field sets the ALU flags for VMfailInvalid.
+> +=09=09 */
+> +=09=09if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D -1ull)
+> +=09=09=09return nested_vmx_failInvalid(vcpu);
+> +=09=09vmcs12 =3D get_shadow_vmcs12(vcpu);
+> +=09}
+> +
+>  =09if (vmx_instruction_info & (1u << 10))
+>  =09=09field_value =3D kvm_register_readl(vcpu,
+>  =09=09=09(((vmx_instruction_info) >> 3) & 0xf));
+> @@ -4889,25 +4908,6 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+>  =09=09return nested_vmx_failValid(vcpu,
+>  =09=09=09VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+> =20
+> -=09if (!is_guest_mode(vcpu)) {
+> -=09=09vmcs12 =3D get_vmcs12(vcpu);
+> -
+> -=09=09/*
+> -=09=09 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
+> -=09=09 * vmcs12, else we may crush a field or consume a stale value.
+> -=09=09 */
+> -=09=09if (!is_shadow_field_rw(field))
+> -=09=09=09copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+> -=09} else {
+> -=09=09/*
+> -=09=09 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
+> -=09=09 * to shadowed-field sets the ALU flags for VMfailInvalid.
+> -=09=09 */
+> -=09=09if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D -1ull)
+> -=09=09=09return nested_vmx_failInvalid(vcpu);
+> -=09=09vmcs12 =3D get_shadow_vmcs12(vcpu);
+> -=09}
+> -
+>  =09offset =3D vmcs_field_to_offset(field);
+>  =09if (offset < 0)
+>  =09=09return nested_vmx_failValid(vcpu,
+
+--=20
+Vitaly
+
