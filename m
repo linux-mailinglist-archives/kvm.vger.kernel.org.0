@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 95F821144C2
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 17:24:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B3481144D0
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 17:26:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730106AbfLEQYh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 11:24:37 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36654 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730025AbfLEQYf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 11:24:35 -0500
-Received: by mail-qt1-f195.google.com with SMTP id k11so4080933qtm.3;
-        Thu, 05 Dec 2019 08:24:34 -0800 (PST)
+        id S1729723AbfLEQ00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 11:26:26 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:43493 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729708AbfLEQ00 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 11:26:26 -0500
+Received: by mail-qk1-f195.google.com with SMTP id q28so3797653qkn.10;
+        Thu, 05 Dec 2019 08:26:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=IYnIZF3ya8GRMyw0Z8v44wRFjachYcZ/Qaw0Oz7Yqys=;
-        b=rZy8V/vYjGvdbgJlSFDtmo8ogCsBeJGr6yuSCLQteDkgYJTOlDnBamwOQxlrK2xI3Z
-         EoqHXHkvYA5Rzl8VAkLsvudDATzeFfXjQK4e+rRSVN8xUoBXBxS1xlzH0lWDP1DdM+mC
-         +v5Zkh5NMc1XHazTbBnfZIQSpjiC129hvAyrRhiLSSpKg/pyMTiZVoteLjnYb1Sy5LG7
-         tTRhQ7OIWfag0kwcI2RCK2UVftjRGuaLUIATqtm97TbEQ7JvLl6fS4qmQKeIVt5mKBtr
-         SfWzRbSkTLAsLHjLFn8IWi7YYje8A4y2fygga4aBsVmNy9zlMJFttmKhMf8KPoksWYL/
-         duTg==
+        bh=R+UOvEIvAKvV92s1Oao0n2zpHAWrzhC1LqeTb2UW2HA=;
+        b=t9/xggbgalebn6gtzdADEpP2/88JmWDKLzkeui44+kXEH3yIEPk1BxlAMh11unW+I2
+         qftiJxiIjiuVECscqgrDeB9oxETvsz7r5Khvd9/YHQ1qQzx82VBHaBb1u9b6trQmHI7l
+         e172VxQDb8t7ysTyKdE4i9Mei2eFccxv8FNDvhNtrvAdCHaYIjllf4BTlVpEkDHgCT3j
+         x1qWbuT1O8gT/LcSoJATuT/8kngQdCHQPtAfW11Inded8NvkEnqlvyumbR4UJuiKkEne
+         bJoGbxGyyL7S53BXenqdFXLK+oGd0/WFLIkBVrOEOWzFedrqt1zwNT2gJOYMMKaaAOv1
+         mCCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=IYnIZF3ya8GRMyw0Z8v44wRFjachYcZ/Qaw0Oz7Yqys=;
-        b=DOnCwxzwwp/wF8uNmifg3j0T3VfnBNYVA7wQc1TkRuYa5pGRXjWfUww13Gfjex8H2c
-         WzW5xpUEGXQBnrfgSiAyFGP4nC4HvY+a5YUmevdX1IK0icYabfDUdS+q4TeessnXzOv/
-         bi2NCuO6V3yh1aG2seNM9+TX9bNCtyS6TG9nDay2VNjM9CxNoFJZeMQwf/a0VKznUnKc
-         QvvgnqafqyKRa2QoRxhGCxJ9ThjuVFuPxKc+WFHkBQA/dblCpPZQ1vQjwvPAArRWvkKa
-         OpqdkkiyFn+fnzAgXdnvHYntoTHTYYFQfIWcaqhC4Pg2+9qiBUrclj/fgTrsS2AXPLH+
-         x5XA==
-X-Gm-Message-State: APjAAAUy8sBsEJkRN/DlIHD1MSA6iTPH4cRhQRQFOxo8wYWCxh+UJmJ1
-        UEr89++v82Q1Zbplx7oBaik=
-X-Google-Smtp-Source: APXvYqyHkpEt+nyTFEI72kz7jPPyhHyR1sq3FFWTrrVMlKqbT1JWZmRDdTHVkJmw4SOSMOkOJJlhSw==
-X-Received: by 2002:aed:3344:: with SMTP id u62mr8242458qtd.73.1575563074222;
-        Thu, 05 Dec 2019 08:24:34 -0800 (PST)
+        bh=R+UOvEIvAKvV92s1Oao0n2zpHAWrzhC1LqeTb2UW2HA=;
+        b=cPXZb3O5XdHA4Xr/HeKtk1uktXo5XaAPSP4gg3W48pDzOsCYYDOerv6tpVdEpiiT0D
+         dAkBhyFB9heZGcul5avJtEYDWVwcKYRWFIricE14Fb36HbC8k3NxhyKqrFCkinTCl/nM
+         ldQcVK+d7J1gsqDklK/F2iDRREUpAfpbip8sAIRDt+Qcan5Nc0ylHXp204DOIk6FhZN1
+         CZK3b2BsNOYkozyvSwiELgAa449t9PjIUbjFEYYCg7dm0fu+re9pJwt8WQ7CkqBKWkIM
+         GKl4GrISN4EaDXzQEcnvnMp7SHqFoPDOLmovdCf8kew+WHppjV/HdFrl9/an2mjb5JZ9
+         s1qg==
+X-Gm-Message-State: APjAAAU4eiVVoKEw0dWChhB9gEO815GmbcyTqNGqlzJwnokEKmvz+Q4F
+        C++g9YiRyd8hlMhWp1vWvvDvvXQoQLM=
+X-Google-Smtp-Source: APXvYqxQsrpv2glIesTz+k0UmeB6q7vj3K9YresKbkETkdYqb3mZ9tuz2kYKduaGva/09sx0k0qxng==
+X-Received: by 2002:a37:aa11:: with SMTP id t17mr9525332qke.60.1575563184711;
+        Thu, 05 Dec 2019 08:26:24 -0800 (PST)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id w40sm5442163qtw.26.2019.12.05.08.24.31
+        by smtp.gmail.com with ESMTPSA id j1sm3758151qkl.86.2019.12.05.08.26.21
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 05 Dec 2019 08:24:33 -0800 (PST)
-Subject: [PATCH v15 QEMU 3/3] virtio-balloon: Provide a interface for unused
- page reporting
+        Thu, 05 Dec 2019 08:26:23 -0800 (PST)
+Subject: [PATCH v15 QEMU 4/3 RFC] memory: Add support for MADV_FREE as
+ mechanism to lazy discard pages
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org,
         mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
@@ -57,8 +57,8 @@ Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
         osalvador@suse.de
-Date:   Thu, 05 Dec 2019 08:24:30 -0800
-Message-ID: <20191205162430.19737.266.stgit@localhost.localdomain>
+Date:   Thu, 05 Dec 2019 08:26:21 -0800
+Message-ID: <20191205162506.19787.9449.stgit@localhost.localdomain>
 In-Reply-To: <20191205161928.19548.41654.stgit@localhost.localdomain>
 References: <20191205161928.19548.41654.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -72,120 +72,115 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Add support for what I am referring to as "unused page reporting".
-Basically the idea is to function very similar to how the balloon works
-in that we basically end up madvising the page as not being used. However
-we don't really need to bother with any deflate type logic since the page
-will be faulted back into the guest when it is read or written to.
+Add support for the MADV_FREE advice argument when discarding pages.
+Specifically we add an option to perform a lazy discard for use with free
+page reporting as this allows us to avoid expensive page zeroing in the
+case that the system is not under memory pressure.
 
-This is meant to be a simplification of the existing balloon interface
-to use for providing hints to what memory needs to be freed. I am assuming
-this is safe to do as the deflate logic does not actually appear to do very
-much other than tracking what subpages have been released and which ones
-haven't.
+To enable this I simply extended the ram_block_discard_range function to
+add an extra parameter for "lazy" freeing. I then renamed the function,
+wrapped it in a function defined using the original name and defaulting
+lazy to false. From there I created a second wrapper for
+ram_block_free_range and updated the page reporting code to use that.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- hw/virtio/virtio-balloon.c         |   46 ++++++++++++++++++++++++++++++++++--
- include/hw/virtio/virtio-balloon.h |    2 +-
- 2 files changed, 45 insertions(+), 3 deletions(-)
+ exec.c                     |   39 +++++++++++++++++++++++++++------------
+ hw/virtio/virtio-balloon.c |    2 +-
+ include/exec/cpu-common.h  |    1 +
+ 3 files changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 6ecfec422309..47f253d016db 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -321,6 +321,40 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-     balloon_stats_change_timer(s, 0);
+diff --git a/exec.c b/exec.c
+index ffdb5185353b..14eda993058c 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3843,15 +3843,8 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
+     return ret;
  }
  
-+static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
+-/*
+- * Unmap pages of memory from start to start+length such that
+- * they a) read as 0, b) Trigger whatever fault mechanism
+- * the OS provides for postcopy.
+- * The pages must be unmapped by the end of the function.
+- * Returns: 0 on success, none-0 on failure
+- *
+- */
+-int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
++static int __ram_block_discard_range(RAMBlock *rb, uint64_t start,
++                                     size_t length, bool lazy)
+ {
+     int ret = -1;
+ 
+@@ -3904,13 +3897,18 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+ #endif
+         }
+         if (need_madvise) {
+-            /* For normal RAM this causes it to be unmapped,
++#ifdef CONFIG_MADVISE
++#ifdef MADV_FREE
++            int advice = (lazy && !need_fallocate) ? MADV_FREE : MADV_DONTNEED;
++#else
++            int advice = MADV_DONTNEED;
++#endif
++            /* For normal RAM this causes it to be lazy freed or unmapped,
+              * for shared memory it causes the local mapping to disappear
+              * and to fall back on the file contents (which we just
+              * fallocate'd away).
+              */
+-#if defined(CONFIG_MADVISE)
+-            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
++            ret =  madvise(host_startaddr, length, advice);
+             if (ret) {
+                 ret = -errno;
+                 error_report("ram_block_discard_range: Failed to discard range "
+@@ -3938,6 +3936,23 @@ err:
+     return ret;
+ }
+ 
++/*
++ * Unmap pages of memory from start to start+length such that
++ * they a) read as 0, b) Trigger whatever fault mechanism
++ * the OS provides for postcopy.
++ * The pages must be unmapped by the end of the function.
++ * Returns: 0 on success, none-0 on failure
++ *
++ */
++int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
 +{
-+    VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-+    VirtQueueElement *elem;
-+
-+    while ((elem = virtqueue_pop(vq, sizeof(VirtQueueElement)))) {
-+    	unsigned int i;
-+
-+        for (i = 0; i < elem->in_num; i++) {
-+            void *addr = elem->in_sg[i].iov_base;
-+            size_t size = elem->in_sg[i].iov_len;
-+            ram_addr_t ram_offset;
-+            size_t rb_page_size;
-+            RAMBlock *rb;
-+
-+            if (qemu_balloon_is_inhibited() || dev->poison_val)
-+                continue;
-+
-+            rb = qemu_ram_block_from_host(addr, false, &ram_offset);
-+            rb_page_size = qemu_ram_pagesize(rb);
-+
-+            /* For now we will simply ignore unaligned memory regions */
-+            if ((ram_offset | size) & (rb_page_size - 1))
-+                continue;
-+
-+            ram_block_discard_range(rb, ram_offset, size);
-+        }
-+
-+        virtqueue_push(vq, elem, 0);
-+        virtio_notify(vdev, vq);
-+        g_free(elem);
-+    }
++    return __ram_block_discard_range(rb, start, length, false);
 +}
 +
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++int ram_block_free_range(RAMBlock *rb, uint64_t start, size_t length)
++{
++    return __ram_block_discard_range(rb, start, length, true);
++}
+ bool ramblock_is_pmem(RAMBlock *rb)
  {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-@@ -628,7 +662,8 @@ static size_t virtio_balloon_config_size(VirtIOBalloon *s)
-         return sizeof(struct virtio_balloon_config);
-     }
-     if (virtio_has_feature(features, VIRTIO_BALLOON_F_PAGE_POISON) ||
--        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(features, VIRTIO_BALLOON_F_REPORTING)) {
-         return sizeof(struct virtio_balloon_config);
-     }
-     return offsetof(struct virtio_balloon_config, free_page_report_cmd_id);
-@@ -716,7 +751,8 @@ static uint64_t virtio_balloon_get_features(VirtIODevice *vdev, uint64_t f,
-     VirtIOBalloon *dev = VIRTIO_BALLOON(vdev);
-     f |= dev->host_features;
-     virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
--    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-+    if (virtio_has_feature(f, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-+        virtio_has_feature(f, VIRTIO_BALLOON_F_REPORTING)) {
-         virtio_add_feature(&f, VIRTIO_BALLOON_F_PAGE_POISON);
-     }
+     return rb->flags & RAM_PMEM;
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 47f253d016db..b904bdde8b1b 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -346,7 +346,7 @@ static void virtio_balloon_handle_report(VirtIODevice *vdev, VirtQueue *vq)
+             if ((ram_offset | size) & (rb_page_size - 1))
+                 continue;
  
-@@ -806,6 +842,10 @@ static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
-     s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
-     s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
+-            ram_block_discard_range(rb, ram_offset, size);
++            ram_block_free_range(rb, ram_offset, size);
+         }
  
-+    if (virtio_has_feature(s->host_features, VIRTIO_BALLOON_F_REPORTING)) {
-+        s->rvq = virtio_add_queue(vdev, 32, virtio_balloon_handle_report);
-+    }
-+
-     if (virtio_has_feature(s->host_features,
-                            VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
-         s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE,
-@@ -932,6 +972,8 @@ static Property virtio_balloon_properties[] = {
-      */
-     DEFINE_PROP_BOOL("qemu-4-0-config-size", VirtIOBalloon,
-                      qemu_4_0_config_size, false),
-+    DEFINE_PROP_BIT("unused-page-reporting", VirtIOBalloon, host_features,
-+                    VIRTIO_BALLOON_F_REPORTING, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBalloon, iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 7fe78e5c14d7..db5bf7127112 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -42,7 +42,7 @@ enum virtio_balloon_free_page_report_status {
+         virtqueue_push(vq, elem, 0);
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 81753bbb3431..2bbd26784c63 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -104,6 +104,7 @@ typedef int (RAMBlockIterFunc)(RAMBlock *rb, void *opaque);
  
- typedef struct VirtIOBalloon {
-     VirtIODevice parent_obj;
--    VirtQueue *ivq, *dvq, *svq, *free_page_vq;
-+    VirtQueue *ivq, *dvq, *svq, *free_page_vq, *rvq;
-     uint32_t free_page_report_status;
-     uint32_t num_pages;
-     uint32_t actual;
+ int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length);
++int ram_block_free_range(RAMBlock *rb, uint64_t start, size_t length);
+ 
+ #endif
+ 
 
