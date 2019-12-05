@@ -2,177 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BFE911395B
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 02:36:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06CA411397D
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 03:03:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728321AbfLEBgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Dec 2019 20:36:50 -0500
-Received: from mga03.intel.com ([134.134.136.65]:3577 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727146AbfLEBgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Dec 2019 20:36:50 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Dec 2019 17:36:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,279,1571727600"; 
-   d="scan'208";a="294386012"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by orsmga001.jf.intel.com with ESMTP; 04 Dec 2019 17:36:44 -0800
-Date:   Wed, 4 Dec 2019 20:28:35 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Message-ID: <20191205012835.GB31791@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
- <20191112153020.71406c44@x1.home>
- <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
- <20191113130705.32c6b663@x1.home>
- <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
- <20191114140625.213e8a99@x1.home>
- <20191126005739.GA31144@joy-OptiPlex-7040>
- <20191203110412.055c38df@x1.home>
- <cce08ca5-79df-2839-16cd-15723b995c07@nvidia.com>
- <20191204113457.16c1316d@x1.home>
+        id S1728638AbfLECDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Dec 2019 21:03:54 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:60062 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728121AbfLECDy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Dec 2019 21:03:54 -0500
+Received: from fsav301.sakura.ne.jp (fsav301.sakura.ne.jp [153.120.85.132])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id xB51xvft020982;
+        Thu, 5 Dec 2019 10:59:57 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav301.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav301.sakura.ne.jp);
+ Thu, 05 Dec 2019 10:59:57 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav301.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id xB51xvmN020973;
+        Thu, 5 Dec 2019 10:59:57 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: (from i-love@localhost)
+        by www262.sakura.ne.jp (8.15.2/8.15.2/Submit) id xB51xuco020972;
+        Thu, 5 Dec 2019 10:59:56 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Message-Id: <201912050159.xB51xuco020972@www262.sakura.ne.jp>
+X-Authentication-Warning: www262.sakura.ne.jp: i-love set sender to penguin-kernel@i-love.sakura.ne.jp using -f
+Subject: Re: KASAN: slab-out-of-bounds Read in =?ISO-2022-JP?B?ZmJjb25fZ2V0X2Zv?=
+ =?ISO-2022-JP?B?bnQ=?=
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        Grzegorz Halat <ghalat@redhat.com>
+Cc:     syzbot <syzbot+4455ca3b3291de891abc@syzkaller.appspotmail.com>,
+        aryabinin@virtuozzo.com, daniel.thompson@linaro.org,
+        dri-devel@lists.freedesktop.org, dvyukov@google.com,
+        gleb@kernel.org, gwshan@linux.vnet.ibm.com, hpa@zytor.com,
+        jmorris@namei.org, kasan-dev@googlegroups.com, kvm@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, mingo@redhat.com,
+        mpe@ellerman.id.au, pbonzini@redhat.com, ruscur@russell.cc,
+        serge@hallyn.com, stewart@linux.vnet.ibm.com,
+        syzkaller-bugs@googlegroups.com, takedakn@nttdata.co.jp,
+        tglx@linutronix.de, x86@kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191204113457.16c1316d@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Date:   Thu, 05 Dec 2019 10:59:56 +0900
+References: <0000000000002cfc3a0598d42b70@google.com> <0000000000003e640e0598e7abc3@google.com>
+In-Reply-To: <0000000000003e640e0598e7abc3@google.com>
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 05, 2019 at 02:34:57AM +0800, Alex Williamson wrote:
-> On Wed, 4 Dec 2019 23:40:25 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > On 12/3/2019 11:34 PM, Alex Williamson wrote:
-> > > On Mon, 25 Nov 2019 19:57:39 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > >> On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:  
-> > >>> On Fri, 15 Nov 2019 00:26:07 +0530
-> > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >>>      
-> > >>>> On 11/14/2019 1:37 AM, Alex Williamson wrote:  
-> > >>>>> On Thu, 14 Nov 2019 01:07:21 +0530
-> > >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >>>>>        
-> > >>>>>> On 11/13/2019 4:00 AM, Alex Williamson wrote:  
-> > >>>>>>> On Tue, 12 Nov 2019 22:33:37 +0530
-> > >>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > >>>>>>>           
-> > >>>>>>>> All pages pinned by vendor driver through vfio_pin_pages API should be
-> > >>>>>>>> considered as dirty during migration. IOMMU container maintains a list of
-> > >>>>>>>> all such pinned pages. Added an ioctl defination to get bitmap of such  
-> > >>>>>>>
-> > >>>>>>> definition
-> > >>>>>>>           
-> > >>>>>>>> pinned pages for requested IO virtual address range.  
-> > >>>>>>>
-> > >>>>>>> Additionally, all mapped pages are considered dirty when physically
-> > >>>>>>> mapped through to an IOMMU, modulo we discussed devices opting in to
-> > >>>>>>> per page pinning to indicate finer granularity with a TBD mechanism to
-> > >>>>>>> figure out if any non-opt-in devices remain.
-> > >>>>>>>           
-> > >>>>>>
-> > >>>>>> You mean, in case of device direct assignment (device pass through)?  
-> > >>>>>
-> > >>>>> Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
-> > >>>>> pinned and mapped, then the correct dirty page set is all mapped pages.
-> > >>>>> We discussed using the vpfn list as a mechanism for vendor drivers to
-> > >>>>> reduce their migration footprint, but we also discussed that we would
-> > >>>>> need a way to determine that all participants in the container have
-> > >>>>> explicitly pinned their working pages or else we must consider the
-> > >>>>> entire potential working set as dirty.
-> > >>>>>        
-> > >>>>
-> > >>>> How can vendor driver tell this capability to iommu module? Any suggestions?  
-> > >>>
-> > >>> I think it does so by pinning pages.  Is it acceptable that if the
-> > >>> vendor driver pins any pages, then from that point forward we consider
-> > >>> the IOMMU group dirty page scope to be limited to pinned pages?  There  
-> > >> we should also be aware of that dirty page scope is pinned pages + unpinned pages,
-> > >> which means ever since a page is pinned, it should be regarded as dirty
-> > >> no matter whether it's unpinned later. only after log_sync is called and
-> > >> dirty info retrieved, its dirty state should be cleared.  
-> > > 
-> > > Yes, good point.  We can't just remove a vpfn when a page is unpinned
-> > > or else we'd lose information that the page potentially had been
-> > > dirtied while it was pinned.  Maybe that vpfn needs to move to a dirty
-> > > list and both the currently pinned vpfns and the dirty vpfns are walked
-> > > on a log_sync.  The dirty vpfns list would be cleared after a log_sync.
-> > > The container would need to know that dirty tracking is enabled and
-> > > only manage the dirty vpfns list when necessary.  Thanks,
-> > >   
-> > 
-> > If page is unpinned, then that page is available in free page pool for 
-> > others to use, then how can we say that unpinned page has valid data?
-> > 
-> > If suppose, one driver A unpins a page and when driver B of some other 
-> > device gets that page and he pins it, uses it, and then unpins it, then 
-> > how can we say that page has valid data for driver A?
-> > 
-> > Can you give one example where unpinned page data is considered reliable 
-> > and valid?
-> 
-> We can only pin pages that the user has already allocated* and mapped
-> through the vfio DMA API.  The pinning of the page simply locks the
-> page for the vendor driver to access it and unpinning that page only
-> indicates that access is complete.  Pages are not freed when a vendor
-> driver unpins them, they still exist and at this point we're now
-> assuming the device dirtied the page while it was pinned.  Thanks,
-> 
-> Alex
-> 
-> * An exception here is that the page might be demand allocated and the
->   act of pinning the page could actually allocate the backing page for
->   the user if they have not faulted the page to trigger that allocation
->   previously.  That page remains mapped for the user's virtual address
->   space even after the unpinning though.
->
+Hello.
 
-Yes, I can give an example in GVT.
-when a gem_object is allocated in guest, before submitting it to guest
-vGPU, gfx cmds in its ring buffer need to be pinned into GGTT to get a
-global graphics address for hardware access. At that time, we shadow
-those cmds and pin pages through vfio pin_pages(), and submit the shadow
-gem_object to physial hardware.
-After guest driver thinks the submitted gem_object has completed hardware
-DMA, it unnpinnd those pinned GGTT graphics memory addresses. Then in
-host, we unpin the shadow pages through vfio unpin_pages.
-But, at this point, guest driver is still free to access the gem_object
-through vCPUs, and guest user space is probably still mapping an object
-into the gem_object in guest driver.
-So, missing the dirty page tracking for unpinned pages would cause
-data inconsitency.
+syzbot is reporting that memory allocation size at fbcon_set_font() is too small
+because font's height is rounded up from 10 to 16 after memory allocation.
 
-Thanks
-Yan
+----------
+diff --git a/drivers/video/fbdev/core/fbcon.c b/drivers/video/fbdev/core/fbcon.c
+index c9235a2f42f8..68fe66e435d3 100644
+--- a/drivers/video/fbdev/core/fbcon.c
++++ b/drivers/video/fbdev/core/fbcon.c
+@@ -2461,6 +2461,7 @@ static int fbcon_get_font(struct vc_data *vc, struct console_font *font)
+ 
+ 	if (font->width <= 8) {
+ 		j = vc->vc_font.height;
++		printk("ksize(fontdata)=%lu font->charcount=%d vc->vc_font.height=%d font->width=%u\n", ksize(fontdata), font->charcount, j, font->width);
+ 		for (i = 0; i < font->charcount; i++) {
+ 			memcpy(data, fontdata, j);
+ 			memset(data + j, 0, 32 - j);
+@@ -2661,6 +2662,8 @@ static int fbcon_set_font(struct vc_data *vc, struct console_font *font,
+ 	size = h * pitch * charcount;
+ 
+ 	new_data = kmalloc(FONT_EXTRA_WORDS * sizeof(int) + size, GFP_USER);
++	if (new_data)
++		printk("ksize(new_data)=%lu h=%u pitch=%u charcount=%u font->width=%u\n", ksize(new_data), h, pitch, charcount, font->width);
+ 
+ 	if (!new_data)
+ 		return -ENOMEM;
+----------
+
+Normal usage:
+
+[   27.305293] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.328527] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.362551] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.385084] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.387653] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.417562] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.437808] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.440738] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.461157] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.495346] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.607372] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.655674] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.675310] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+[   27.702193] ksize(new_data)=8192 h=16 pitch=1 charcount=256 font->width=8
+
+syzbot's testcase:
+
+[  115.784893] ksize(new_data)=4096 h=10 pitch=1 charcount=256 font->width=8
+[  115.790269] ksize(fontdata)=4096 font->charcount=256 vc->vc_font.height=16 font->width=8
