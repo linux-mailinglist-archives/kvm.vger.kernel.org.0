@@ -2,72 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD077113F31
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 11:16:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F4FF113F35
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 11:18:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729213AbfLEKQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 05:16:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49374 "EHLO
+        id S1729120AbfLEKR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 05:17:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44897 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729074AbfLEKQV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 05:16:21 -0500
+        with ESMTP id S1728735AbfLEKR6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 05:17:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575540980;
+        s=mimecast20190719; t=1575541076;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oCu+v7Ov3efBPpGgrHHDYgqYZqM3nvcg/fPq5Gsmc/Q=;
-        b=UYe62Ne73r7Fuf6dzJPlyoT/tktLQ4f17VNxgzVy3sheuJfyKtRdR8bJ6rknXe+cSFF3da
-        ZW1c3Asx9XZJLTnP6lDvIAyn1GtC6/s+y1FyPMg3Rx8jbKMQstvW68gSfcrTy6CbuwwrZx
-        3KMwAkftOjeHKgHBMuHtzxVbWcaGYWA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-dg6iBEzWOqaXx865zCDCeg-1; Thu, 05 Dec 2019 05:16:19 -0500
-Received: by mail-wr1-f70.google.com with SMTP id l20so1321852wrc.13
-        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 02:16:18 -0800 (PST)
+        bh=aVe+hiB0NVm35IcQxjwnWoKy5LGQA3iypj6zaIVprpM=;
+        b=CHMhhTKdWKdUjrawSozoYlKx3odSfyqN6T+30601BZlW6Ts8JTvLlHOiWhkTpgDfC0lXjO
+        GPqHkGYtQv87GNZRLIB2r2VYjUr6+lUdLG6y2BBjHVcLAj+/hwOwV90A3DPmBvxtJEMEGs
+        NyCfxXfRMjgk6gUgBONxCVu5QJhR9QU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-dvFEoOs1NUSq13a5vBnguw-1; Thu, 05 Dec 2019 05:17:55 -0500
+Received: by mail-wm1-f70.google.com with SMTP id o135so700095wme.2
+        for <kvm@vger.kernel.org>; Thu, 05 Dec 2019 02:17:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=oCu+v7Ov3efBPpGgrHHDYgqYZqM3nvcg/fPq5Gsmc/Q=;
-        b=FMOfsYzaf7PavP30cKZX+9o7C/0+cH0UOejeGVgHiwn5/71lU+hqbyQ+IeZZMO4vVV
-         TF76tqVqeSXR9nwktam35iJVQtT8FyxEmF/41Ks+NyR1GrVKOE2hMVuM1lK/o1oAHzal
-         vNGvkGUo3HlbW/Fux2rNulR1Jwu0Ppd8KyZ/gy2OvlrBZYQ9Z+gTr627GX4xIIv9Cj2h
-         LL+GF7xMcWTVgEctWArbhoEmzfRdE9xHN35St9FWP02yyF6r0hC5XL4esE7Wo2k+R/oP
-         m8rre7bg9fjw9Yop5wophDXZZsXQjCyu7kE7WZB+ip71jyoD215E730H0T/tR4DiyWyD
-         Dyjw==
-X-Gm-Message-State: APjAAAUpbzuNOp6i01/ceJ/kJxaSjQImusLyITRPP6/R7Dz2vHwS6eGy
-        95KCDUs6w0brMja5wCOnabbTt+PenQqLhdLx6ceokb82TBiP3VnQMdDVy4T0ePZHyVoytPZ3X7G
-        N067AuGby/Qdb
-X-Received: by 2002:a5d:4a91:: with SMTP id o17mr9807359wrq.232.1575540977651;
-        Thu, 05 Dec 2019 02:16:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy6dzszP8w8p/bgdrENDTQp3RYlrXCG812A+kw447RAi90Njay97UlqFJCBmx5nQMLIEbcfZw==
-X-Received: by 2002:a5d:4a91:: with SMTP id o17mr9807334wrq.232.1575540977425;
-        Thu, 05 Dec 2019 02:16:17 -0800 (PST)
+        bh=aVe+hiB0NVm35IcQxjwnWoKy5LGQA3iypj6zaIVprpM=;
+        b=dLvteVIynN7X49V+pRDAQXNJzJYtBK42fYY3e6WyqSjDQBSbOuK6vTZ8qaolROeBC7
+         HDhTzHqHOR/rivDRqpJLBfM+az4Fguh/IxhpDStgSX9GuLGSdi7maTA+tp3oSPcZtbKg
+         J8H22O5muTGHDrm1oblQBtElgguNPFLAcjqKSIzA9ytZ7lZZ9pLVOKiMRHe6PAHPFZRJ
+         AvwxqROWsECvamPoM6a6dAC374JoWIRNDr2Ez6GLKW71pwttyFF2ua5xKrKBiszNTJ13
+         TFNq/dvtm9ZCPl3fF1lVbNm2YhIL8lA5r/G5dqP+km32ZQ1sYbVL1aK3P6UpCbo6oFY9
+         I50g==
+X-Gm-Message-State: APjAAAVacpGhDhHEim5blgnM4FX8PTy/TZe0XUmFbxMjSSb1uUkWlBS/
+        oTagJKd7vCT2xDrK1oGffN5r00/ViiP+U+ZVOAXr5DSSuwgLJ6WWSbml8kYIfO70Ok6nTCq70M6
+        47ucK9BWwKbc6
+X-Received: by 2002:adf:fd91:: with SMTP id d17mr9674004wrr.340.1575541074813;
+        Thu, 05 Dec 2019 02:17:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyGdy2vE00g8ehE5AMbdnywSsS5LuhGHxYsDEhmqo75DP8TLwpiW3ASkcpj5mz5XJVf2fE86g==
+X-Received: by 2002:adf:fd91:: with SMTP id d17mr9673984wrr.340.1575541074592;
+        Thu, 05 Dec 2019 02:17:54 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:541f:a977:4b60:6802? ([2001:b07:6468:f312:541f:a977:4b60:6802])
-        by smtp.gmail.com with ESMTPSA id a64sm10949477wmc.18.2019.12.05.02.16.16
+        by smtp.gmail.com with ESMTPSA id y10sm1264712wmm.3.2019.12.05.02.17.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2019 02:16:16 -0800 (PST)
-Subject: Re: [PATCH 4/5] KVM: vmx: implement MSR_IA32_TSX_CTRL disable RTM
- functionality
-To:     Jim Mattson <jmattson@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <1574101067-5638-1-git-send-email-pbonzini@redhat.com>
- <1574101067-5638-5-git-send-email-pbonzini@redhat.com>
- <CALMp9eTKMzg2pNEZxhqAejAquFg8NxKRrBzzNUKRY78JLGjS5A@mail.gmail.com>
+        Thu, 05 Dec 2019 02:17:54 -0800 (PST)
+Subject: Re: [PATCH] KVM: vmx: remove unreachable statement in
+ vmx_get_msr_feature()
+To:     linmiaohe <linmiaohe@huawei.com>, rkrcmar@redhat.com,
+        sean.j.christopherson@intel.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+References: <1575512678-22058-1-git-send-email-linmiaohe@huawei.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0653777-55c6-ebb9-7be7-5bdd259b66fa@redhat.com>
-Date:   Thu, 5 Dec 2019 11:16:16 +0100
+Message-ID: <8d252227-4993-d387-1c78-62ac8c32ebd9@redhat.com>
+Date:   Thu, 5 Dec 2019 11:17:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eTKMzg2pNEZxhqAejAquFg8NxKRrBzzNUKRY78JLGjS5A@mail.gmail.com>
+In-Reply-To: <1575512678-22058-1-git-send-email-linmiaohe@huawei.com>
 Content-Language: en-US
-X-MC-Unique: dg6iBEzWOqaXx865zCDCeg-1
+X-MC-Unique: dvFEoOs1NUSq13a5vBnguw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -76,24 +75,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/12/19 00:49, Jim Mattson wrote:
->>         if (!boot_cpu_has(X86_FEATURE_RTM))
->> -               data &= ~ARCH_CAP_TAA_NO;
->> +               data &= ~(ARCH_CAP_TAA_NO | ARCH_CAP_TSX_CTRL_MSR);
->>         else if (!boot_cpu_has_bug(X86_BUG_TAA))
->>                 data |= ARCH_CAP_TAA_NO;
->> -       else if (data & ARCH_CAP_TSX_CTRL_MSR)
->> -               data &= ~ARCH_CAP_MDS_NO;
->>
->> -       /* KVM does not emulate MSR_IA32_TSX_CTRL.  */
->> -       data &= ~ARCH_CAP_TSX_CTRL_MSR;
-> Shouldn't kvm be masking off any bits that it doesn't know about here?
-> Who knows what future features we may claim to support?
+On 05/12/19 03:24, linmiaohe wrote:
+> From: Miaohe Lin <linmiaohe@huawei.com>
+> 
+> We have no way to reach the final statement, remove it.
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e7ea332ad1e8..e58a0daf0f86 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1781,8 +1781,6 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+>  	default:
+>  		return 1;
+>  	}
+> -
+> -	return 0;
+>  }
+>  
+>  /*
+> 
 
-Good question, in the past the ARCH_CAPABILITIES were just "we don't
-have this bug" so it made sense to pass everything through.  Now we have
-TSX_CTRL that is of a different kind and arguably should have been a
-CPUID bit, so we should indeed mask unknown capabilties.
+Queued, thanks.
 
 Paolo
 
