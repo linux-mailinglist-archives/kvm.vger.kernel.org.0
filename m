@@ -2,64 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7202B113BDA
-	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 07:40:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA301113BED
+	for <lists+kvm@lfdr.de>; Thu,  5 Dec 2019 07:49:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726059AbfLEGkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Dec 2019 01:40:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39100 "EHLO
+        id S1726007AbfLEGtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Dec 2019 01:49:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23301 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725974AbfLEGkv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Dec 2019 01:40:51 -0500
+        with ESMTP id S1725905AbfLEGtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Dec 2019 01:49:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575528049;
+        s=mimecast20190719; t=1575528582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/J6KCYE9jeJZfzKbxa345PuEniQRQjk1Uf3CJ5cJfng=;
-        b=fVJL5noxiHfZMt+pemhiCoxHPxYcrhLJqXbxzBsNNS42jGNVnV8FQfDrqxHXHNxAZfAlpm
-        6VWNTt5N22lk/lq51S2mLJbjtu6qO+EeEhnKr7hiINmOW5bp2V+mv499g8XQ7rLkIn/Sb4
-        knSP7qcCiBb/FTDU9pg80e3MyGKB8RU=
+        bh=PN2kaQNnGa1We4eEVYDGchvloPKew2Z0oPxF8rZIDrk=;
+        b=Fn2cowhJkJVDo34R4ijjBG34Rqrll+3FGrCbMG7j4c2cE7IqdFKrqzBDpes4t70bU/24a8
+        HpvlwEQELymUqw3sbnyuSokEgRQ4SuRjj09NgdxOkSUrcuLXEiFrFTxPskvVxvDzcW7190
+        h7XmgGUQ9EalHL21YJhlPXUZldVY78Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-8SOlyITkPfqygQAmfmuEgg-1; Thu, 05 Dec 2019 01:40:46 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-190-as2qfbUSPIK-R_i6Z0vlEQ-1; Thu, 05 Dec 2019 01:49:41 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6467D800D54;
-        Thu,  5 Dec 2019 06:40:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ACE1107ACCA;
+        Thu,  5 Dec 2019 06:49:40 +0000 (UTC)
 Received: from [10.72.12.247] (ovpn-12-247.pek2.redhat.com [10.72.12.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AC13B5DA32;
-        Thu,  5 Dec 2019 06:40:37 +0000 (UTC)
-Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
-To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Parav Pandit <parav@mellanox.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11D7E10013A1;
+        Thu,  5 Dec 2019 06:49:32 +0000 (UTC)
+Subject: Re: [PATCH RFC 00/15] KVM: Dirty ring interface
+To:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108081925.GH4196@zhen-hp.sh.intel.com>
- <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191205060618.GD4196@zhen-hp.sh.intel.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <776732ca-06c8-c529-0899-9d2ffacf7789@redhat.com>
+ <20191204193357.GE19939@xz-x1>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <b15ae698-cd5e-dfb9-0478-b865cc0c2262@redhat.com>
-Date:   Thu, 5 Dec 2019 14:40:35 +0800
+Message-ID: <d24d7100-0100-b74f-0761-37196ce16f7f@redhat.com>
+Date:   Thu, 5 Dec 2019 14:49:30 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191205060618.GD4196@zhen-hp.sh.intel.com>
+In-Reply-To: <20191204193357.GE19939@xz-x1>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 8SOlyITkPfqygQAmfmuEgg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: as2qfbUSPIK-R_i6Z0vlEQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -67,167 +61,64 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/12/5 =E4=B8=8B=E5=8D=882:06, Zhenyu Wang wrote:
-> On 2019.12.04 17:36:12 +0000, Parav Pandit wrote:
->> + Jiri + Netdev since you mentioned netdev queue.
->>
->> + Jason Wang and Michael as we had similar discussion in vdpa discussion=
- thread.
->>
->>> From: Zhenyu Wang <zhenyuw@linux.intel.com>
->>> Sent: Friday, November 8, 2019 2:19 AM
->>> To: Parav Pandit <parav@mellanox.com>
+On 2019/12/5 =E4=B8=8A=E5=8D=883:33, Peter Xu wrote:
+> On Wed, Dec 04, 2019 at 06:39:48PM +0800, Jason Wang wrote:
+>> On 2019/11/30 =E4=B8=8A=E5=8D=885:34, Peter Xu wrote:
+>>> Branch is here:https://github.com/xzpeter/linux/tree/kvm-dirty-ring
 >>>
->> My apologies to reply late.
->> Something bad with my email client, due to which I found this patch unde=
-r spam folder today.
->> More comments below.
->>
->>> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
->>>> Hi,
->>>>
->>>>> -----Original Message-----
->>>>> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On
->>>>> Behalf Of Zhenyu Wang
->>>>> Sent: Thursday, October 24, 2019 12:08 AM
->>>>> To: kvm@vger.kernel.org
->>>>> Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
->>>>> kevin.tian@intel.com; cohuck@redhat.com
->>>>> Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
->>>>>
->>>>> Hi,
->>>>>
->>>>> This is a refresh for previous send of this series. I got impression
->>>>> that some SIOV drivers would still deploy their own create and
->>>>> config method so stopped effort on this. But seems this would still
->>>>> be useful for some other SIOV driver which may simply want
->>>>> capability to aggregate resources. So here's refreshed series.
->>>>>
->>>>> Current mdev device create interface depends on fixed mdev type,
->>>>> which get uuid from user to create instance of mdev device. If user
->>>>> wants to use customized number of resource for mdev device, then
->>>>> only can create new
->>>> Can you please give an example of 'resource'?
->>>> When I grep [1], [2] and [3], I couldn't find anything related to ' ag=
-gregate'.
->>> The resource is vendor device specific, in SIOV spec there's ADI (Assig=
-nable
->>> Device Interface) definition which could be e.g queue for net device, c=
-ontext
->>> for gpu, etc. I just named this interface as 'aggregate'
->>> for aggregation purpose, it's not used in spec doc.
+>>> Overview
+>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 >>>
->> Some 'unknown/undefined' vendor specific resource just doesn't work.
->> Orchestration tool doesn't know which resource and what/how to configure=
- for which vendor.
->> It has to be well defined.
+>>> This is a continued work from Lei Cao<lei.cao@stratus.com>  and Paolo
+>>> on the KVM dirty ring interface.  To make it simple, I'll still start
+>>> with version 1 as RFC.
+>>>
+>>> The new dirty ring interface is another way to collect dirty pages for
+>>> the virtual machine, but it is different from the existing dirty
+>>> logging interface in a few ways, majorly:
+>>>
+>>>     - Data format: The dirty data was in a ring format rather than a
+>>>       bitmap format, so the size of data to sync for dirty logging does
+>>>       not depend on the size of guest memory any more, but speed of
+>>>       dirtying.  Also, the dirty ring is per-vcpu (currently plus
+>>>       another per-vm ring, so total ring number is N+1), while the dirt=
+y
+>>>       bitmap is per-vm.
+>>>
+>>>     - Data copy: The sync of dirty pages does not need data copy any mo=
+re,
+>>>       but instead the ring is shared between the userspace and kernel b=
+y
+>>>       page sharings (mmap() on either the vm fd or vcpu fd)
+>>>
+>>>     - Interface: Instead of using the old KVM_GET_DIRTY_LOG,
+>>>       KVM_CLEAR_DIRTY_LOG interfaces, the new ring uses a new interface
+>>>       called KVM_RESET_DIRTY_RINGS when we want to reset the collected
+>>>       dirty pages to protected mode again (works like
+>>>       KVM_CLEAR_DIRTY_LOG, but ring based)
+>>>
+>>> And more.
 >>
->> You can also find such discussion in recent lgpu DRM cgroup patches seri=
-es v4.
->>
->> Exposing networking resource configuration in non-net namespace aware md=
-ev sysfs at PCI device level is no-go.
->> Adding per file NET_ADMIN or other checks is not the approach we follow =
-in kernel.
->>
->> devlink has been a subsystem though under net, that has very rich interf=
-ace for syscaller, device health, resource management and many more.
->> Even though it is used by net driver today, its written for generic devi=
-ce management at bus/device level.
->>
->> Yuval has posted patches to manage PCI sub-devices [1] and updated versi=
-on will be posted soon which addresses comments.
->>
->> For any device slice resource management of mdev, sub-function etc, we s=
-hould be using single kernel interface as devlink [2], [3].
->>
->> [1] https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-yuv=
-alav@mellanox.com/
->> [2] http://man7.org/linux/man-pages/man8/devlink-dev.8.html
->> [3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
->>
->> Most modern device configuration that I am aware of is usually done via =
-well defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and =
-more) or via netlink commands (net, devlink, rdma and more) not via sysfs.
->>
-> Current vfio/mdev configuration is via documented sysfs ABI instead of
-> other ways. So this adhere to that way to introduce more configurable
-> method on mdev device for standard, it's optional and not actually
-> vendor specific e.g vfio-ap.
+>> Looks really interesting, I wonder if we can make this as a library then=
+ we
+>> can reuse it for vhost.
+> So iiuc this ring will majorly for (1) data exchange between kernel
+> and user, and (2) shared memory.  I think from that pov yeh it should
+> work even for vhost.
 >
-> I'm not sure how many devices support devlink now, or if really make
-> sense to utilize devlink for other devices except net, or if really make
-> sense to take mdev resource configuration from there...
+> It shouldn't be hard to refactor the interfaces to avoid kvm elements,
+> however I'm not sure how to do that best.  Maybe like irqbypass and
+> put it into virt/lib/ as a standlone module?  Would it worth it?
 
 
-It may make sense to allow other types of API to manage mdev other than=20
-sysfs. But I'm not sure whether or not it will be a challenge for=20
-orchestration.
+Maybe, and it looks to me some dirty pages reporting API for VFIO is=20
+proposed in the same time. It will be helpful to unify them (or at least=20
+leave a chance for other users).
 
 Thanks
 
 
->>>>> mdev type for that which may not be flexible. This requirement comes
->>>>> not only from to be able to allocate flexible resources for KVMGT,
->>>>> but also from Intel scalable IO virtualization which would use
->>>>> vfio/mdev to be able to allocate arbitrary resources on mdev instance=
-.
->>> More info on [1] [2] [3].
->>>>> To allow to create user defined resources for mdev, it trys to
->>>>> extend mdev create interface by adding new "aggregate=3Dxxx" paramete=
-r
->>>>> following UUID, for target mdev type if aggregation is supported, it
->>>>> can create new mdev device which contains resources combined by
->>>>> number of instances, e.g
->>>>>
->>>>>      echo "<uuid>,aggregate=3D10" > create
->>>>>
->>>>> VM manager e.g libvirt can check mdev type with "aggregation"
->>>>> attribute which can support this setting. If no "aggregation"
->>>>> attribute found for mdev type, previous behavior is still kept for
->>>>> one instance allocation. And new sysfs attribute
->>>>> "aggregated_instances" is created for each mdev device to show alloca=
-ted
->>> number.
->>>>> References:
->>>>> [1]
->>>>> https://software.intel.com/en-us/download/intel-virtualization-techn
->>>>> ology- for-directed-io-architecture-specification
->>>>> [2]
->>>>> https://software.intel.com/en-us/download/intel-scalable-io-virtuali
->>>>> zation-
->>>>> technical-specification
->>>>> [3] https://schd.ws/hosted_files/lc32018/00/LC3-SIOV-final.pdf
->>>>>
->>>>> Zhenyu Wang (6):
->>>>>    vfio/mdev: Add new "aggregate" parameter for mdev create
->>>>>    vfio/mdev: Add "aggregation" attribute for supported mdev type
->>>>>    vfio/mdev: Add "aggregated_instances" attribute for supported mdev
->>>>>      device
->>>>>    Documentation/driver-api/vfio-mediated-device.rst: Update for
->>>>>      vfio/mdev aggregation support
->>>>>    Documentation/ABI/testing/sysfs-bus-vfio-mdev: Update for vfio/mde=
-v
->>>>>      aggregation support
->>>>>    drm/i915/gvt: Add new type with aggregation support
->>>>>
->>>>>   Documentation/ABI/testing/sysfs-bus-vfio-mdev | 24 ++++++
->>>>>   .../driver-api/vfio-mediated-device.rst       | 23 ++++++
->>>>>   drivers/gpu/drm/i915/gvt/gvt.c                |  4 +-
->>>>>   drivers/gpu/drm/i915/gvt/gvt.h                | 11 ++-
->>>>>   drivers/gpu/drm/i915/gvt/kvmgt.c              | 53 ++++++++++++-
->>>>>   drivers/gpu/drm/i915/gvt/vgpu.c               | 56 ++++++++++++-
->>>>>   drivers/vfio/mdev/mdev_core.c                 | 36 ++++++++-
->>>>>   drivers/vfio/mdev/mdev_private.h              |  6 +-
->>>>>   drivers/vfio/mdev/mdev_sysfs.c                | 79 ++++++++++++++++=
-++-
->>>>>   include/linux/mdev.h                          | 19 +++++
->>>>>   10 files changed, 294 insertions(+), 17 deletions(-)
->>>>>
->>>>> --
->>>>> 2.24.0.rc0
->>> --
->>> Open Source Technology Center, Intel ltd.
->>>
->>> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+>
+> Paolo, what's your take?
+>
 
