@@ -2,142 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B9901159C5
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:49:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 11C141159BF
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:46:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726464AbfLFXtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 18:49:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56392 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726397AbfLFXtp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 18:49:45 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB6Nnajv086259;
-        Fri, 6 Dec 2019 23:49:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=M2ZmxtepfkEQAKsamj7tE+Rd2mHwl5/582CpOGHbwBA=;
- b=oQU8EMWFEKimzqsr+a3pu/rpQw8AlQgmIlYD95UQvd4HOk1QV50Ir/vrH6AL8GHahfWG
- ZWaiWyjzkCs1DlggepQlCnapU3TB3dr4QfxEQ2VS4m8nFPrRx9hsoTaffwfK0TZvIcoH
- +TEbK7lFclMn3jTtFwCY43+YpVUm14f9QfaoxIKkJx3T6zcSp3r669qYLVJ41aDHIffV
- G5hTDrFvrAG7C8W05cMZmCQXVTYPHxpOeyy8UmoK10Q36nxDQnxv22njEE1szu6M1J4P
- pzrX/q0EHx2rMPKsYDXGYV20ZY4EI9+LI2U4EfOqoGC8m2CXaltFnMmFDNvCZ97ujCNx TQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2wkfuuy24h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Dec 2019 23:49:40 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB6Nn7m8023633;
-        Fri, 6 Dec 2019 23:49:40 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2wqt45jt9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 06 Dec 2019 23:49:40 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xB6NndrC025849;
-        Fri, 6 Dec 2019 23:49:39 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 06 Dec 2019 15:49:39 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+        id S1726403AbfLFXqs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 18:46:48 -0500
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:56765 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726375AbfLFXqs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 18:46:48 -0500
+Received: by mail-pf1-f202.google.com with SMTP id j7so4902318pfh.23
+        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 15:46:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=y+19aKtY4EbBtyHli0gL/tj0TPv6Yayq8480kA5pLQM=;
+        b=Q/Bw9UGvsan3MQgEECqz5rz8WNiHQEfJ9kQVCGEQJqiYZdN7EDRRj2X9oq/NNxRUtr
+         amcDCuTnkR0lUSzstsIOxo6y7T78WJy7hAaaQPu05YDA/fKXw82dswmVSKaBlnkKAGVe
+         ozjXPj8xxtwL0hT62VcpZy35c4qnKsdgPi0UMxs/O2zPveISWYffhdL4QEhUQfiCNMUy
+         wj4TZWZXDCebqRab7X9L0J4aQKWJPTezfu0gb7bU6FzEjKbZXkkBO10Tg42sopP6ZK/0
+         oMpcc2oiGxodgrKgg+RxYiFJidXtD2PDpRBuILvyyMIMI3S2HMZuUGdQV8MFKADdQd8r
+         D0mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=y+19aKtY4EbBtyHli0gL/tj0TPv6Yayq8480kA5pLQM=;
+        b=FSHe5SFUiE5JNC3J+3pzDaoQd9PXJGf8vwSoRwo01A+ZtvKwXgqJpp7mQaT5CEF9CM
+         thr2k0UrgeBcF4jzVwJrtqtVZ27L0eL+uVk4MzvJ14AToxXGyUZP8xUuHha6aQomTR2s
+         qd87t+bsktFgPiy2YEnlVSI/aYwVrDsygAS8OyMlpYzkMF8ZwrToYdMNYybQdr3g8XEj
+         Y57Le7ydFhGpP3yyXAUXaD4JUai9fYRbcb7Fm0vqRzTRFgAO1gfsJneC8YGfmhaVM/Oc
+         k7EOayJRDa4vRev1jgNtNDqfzM073Nb7clZaTyZj5Vd8gzGusVEXFhTQ8fZCOC5FTBkH
+         ocJg==
+X-Gm-Message-State: APjAAAX92URGL3KoBtwbnJjYrPWUs9o+neTJk959QW+siQ8+3mp70rgh
+        m5W7WkCOR4OYK0+MBryZLAWfkin7BAeilvJnV8xYSvUH/BseZYQbwcz5CcsbGnvEevckvpcwbtP
+        7pZvpDJhNSHNMreZ1Gj/5omfMn5kF8XjnYhxqeImHhuQqEn6QtfGkbxAHEUazSqQ=
+X-Google-Smtp-Source: APXvYqw39BeYdk7jH0zVdelpeLBdC4zRpUvP8KvdtXmV8mrLSW6bHeCDxEGMuQ6TUkxHkClH+aJItPWkuaLCwQ==
+X-Received: by 2002:a63:7311:: with SMTP id o17mr6103845pgc.29.1575676007030;
+ Fri, 06 Dec 2019 15:46:47 -0800 (PST)
+Date:   Fri,  6 Dec 2019 15:46:35 -0800
+Message-Id: <20191206234637.237698-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
+Subject: [PATCH v3 1/3] kvm: nVMX: VMWRITE checks VMCS-link pointer before
+ VMCS field
+From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH 4/4] kvm-unit-test: nVMX: Test GUEST_SYSENTER_ESP and GUEST_SYSENTER_EIP on vmentry of nested guests
-Date:   Fri,  6 Dec 2019 18:13:02 -0500
-Message-Id: <20191206231302.3466-5-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191206231302.3466-1-krish.sadhukhan@oracle.com>
-References: <20191206231302.3466-1-krish.sadhukhan@oracle.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9463 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912060190
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9463 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912060190
+Cc:     Jim Mattson <jmattson@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jon Cargille <jcargill@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to section "Checks on Guest Control Registers, Debug Registers, and
-and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
-of nested guests:
+According to the SDM, a VMWRITE in VMX non-root operation with an
+invalid VMCS-link pointer results in VMfailInvalid before the validity
+of the VMCS field in the secondary source operand is checked.
 
-    "The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field must each
-    contain a canonical address."
+For consistency, modify both handle_vmwrite and handle_vmread, even
+though there was no problem with the latter.
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 if running L2")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Cc: Liran Alon <liran.alon@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Jon Cargille <jcargill@google.com>
 ---
- x86/vmx_tests.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+v1 -> v2:
+ * Split the invalid VMCS-link pointer check from the conditional call to
+   copy_vmcs02_to_vmcs12_rare.
+ * Hoisted the assignment of vmcs12 to its declaration.
+ * Modified handle_vmread to maintain consistency with handle_vmwrite.
+v2 -> v3:
+ * No changes
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 5f836d4..2dbc0bf 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -7219,9 +7219,9 @@ static void test_canonical(u64 field, const char * field_name, bool host)
- 			report_prefix_pop();
- 		} else {
- 			enter_guest();
--			report_guest_state_test("%s",
-+			report_guest_state_test("Test canonical address",
- 						VMX_VMCALL, addr_saved,
--						"GUEST_XXXXXXX");
-+						field_name);
- 		}
+ arch/x86/kvm/vmx/nested.c | 59 +++++++++++++++++----------------------
+ 1 file changed, 25 insertions(+), 34 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 4aea7d304beb..ee1bf9710e86 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4753,32 +4753,28 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long field;
+ 	u64 field_value;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
+ 	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
+ 	int len;
+ 	gva_t gva = 0;
+-	struct vmcs12 *vmcs12;
++	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
++						    : get_vmcs12(vcpu);
+ 	struct x86_exception e;
+ 	short offset;
  
- 		vmcs_write(field, NONCANONICAL);
-@@ -7232,11 +7232,9 @@ static void test_canonical(u64 field, const char * field_name, bool host)
- 			report_prefix_pop();
- 		} else {
- 			enter_guest_with_invalid_guest_state();
--			report_guest_state_test("ENT_LOAD_PAT "
--					        "enabled",
-+			report_guest_state_test("Test canonical address",
- 					        VMX_FAIL_STATE | VMX_ENTRY_FAILURE,
--					        addr_saved,
--					        "GUEST_PAT");
-+					        NONCANONICAL, field_name);
- 		}
+ 	if (!nested_vmx_check_permission(vcpu))
+ 		return 1;
  
- 		vmcs_write(field, addr_saved);
-@@ -7247,11 +7245,9 @@ static void test_canonical(u64 field, const char * field_name, bool host)
- 			report_prefix_pop();
- 		} else {
- 			enter_guest_with_invalid_guest_state();
--			report_guest_state_test("ENT_LOAD_PAT "
--					        "enabled",
-+			report_guest_state_test("Test canonical address",
- 					        VMX_FAIL_STATE | VMX_ENTRY_FAILURE,
--					        addr_saved,
--					        "GUEST_PAT");
-+					        NONCANONICAL, field_name);
- 		}
- 	}
- }
-@@ -7450,6 +7446,13 @@ static void vmx_guest_state_area_test(void)
- 	vmx_set_test_stage(1);
- 	test_set_guest(guest_state_test_main);
- 
+-	if (to_vmx(vcpu)->nested.current_vmptr == -1ull)
 +	/*
-+	 * The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field
-+	 * must each contain a canonical address.
++	 * In VMX non-root operation, when the VMCS-link pointer is -1ull,
++	 * any VMREAD sets the ALU flags for VMfailInvalid.
 +	 */
-+	test_canonical(GUEST_SYSENTER_ESP, "GUEST_SYSENTER_ESP", false);
-+	test_canonical(GUEST_SYSENTER_EIP, "GUEST_SYSENTER_EIP", false);
-+
- 	test_load_guest_pat();
- 	test_guest_efer();
- 	test_load_guest_perf_global_ctrl();
++	if (vmx->nested.current_vmptr == -1ull ||
++	    (is_guest_mode(vcpu) &&
++	     get_vmcs12(vcpu)->vmcs_link_pointer == -1ull))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+-	if (!is_guest_mode(vcpu))
+-		vmcs12 = get_vmcs12(vcpu);
+-	else {
+-		/*
+-		 * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
+-		 * to shadowed-field sets the ALU flags for VMfailInvalid.
+-		 */
+-		if (get_vmcs12(vcpu)->vmcs_link_pointer == -1ull)
+-			return nested_vmx_failInvalid(vcpu);
+-		vmcs12 = get_shadow_vmcs12(vcpu);
+-	}
+-
+ 	/* Decode instruction info and find the field to read */
+ 	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
+ 
+@@ -4855,13 +4851,20 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 	 */
+ 	u64 field_value = 0;
+ 	struct x86_exception e;
+-	struct vmcs12 *vmcs12;
++	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
++						    : get_vmcs12(vcpu);
+ 	short offset;
+ 
+ 	if (!nested_vmx_check_permission(vcpu))
+ 		return 1;
+ 
+-	if (vmx->nested.current_vmptr == -1ull)
++	/*
++	 * In VMX non-root operation, when the VMCS-link pointer is -1ull,
++	 * any VMWRITE sets the ALU flags for VMfailInvalid.
++	 */
++	if (vmx->nested.current_vmptr == -1ull ||
++	    (is_guest_mode(vcpu) &&
++	     get_vmcs12(vcpu)->vmcs_link_pointer == -1ull))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+ 	if (vmx_instruction_info & (1u << 10))
+@@ -4889,24 +4892,12 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 		return nested_vmx_failValid(vcpu,
+ 			VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+ 
+-	if (!is_guest_mode(vcpu)) {
+-		vmcs12 = get_vmcs12(vcpu);
+-
+-		/*
+-		 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
+-		 * vmcs12, else we may crush a field or consume a stale value.
+-		 */
+-		if (!is_shadow_field_rw(field))
+-			copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+-	} else {
+-		/*
+-		 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
+-		 * to shadowed-field sets the ALU flags for VMfailInvalid.
+-		 */
+-		if (get_vmcs12(vcpu)->vmcs_link_pointer == -1ull)
+-			return nested_vmx_failInvalid(vcpu);
+-		vmcs12 = get_shadow_vmcs12(vcpu);
+-	}
++	/*
++	 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
++	 * vmcs12, else we may crush a field or consume a stale value.
++	 */
++	if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
++		copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+ 
+ 	offset = vmcs_field_to_offset(field);
+ 	if (offset < 0)
 -- 
-2.20.1
+2.24.0.393.g34dc348eaf-goog
 
