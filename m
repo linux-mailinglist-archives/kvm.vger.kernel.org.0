@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FD56115677
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 18:28:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A612115678
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 18:28:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726460AbfLFR2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 12:28:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26282 "EHLO
+        id S1726465AbfLFR2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 12:28:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59982 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726366AbfLFR2H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 12:28:07 -0500
+        with ESMTP id S1726365AbfLFR2K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 12:28:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575653286;
+        s=mimecast20190719; t=1575653289;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ws3xaERf1779J4gNkymE+bAzmPMolefs3O1wIlcUpJo=;
-        b=Z+c9/k5WUxFlrmhMZtZIT+HdTL9dU7irnnTOFtvHyN5hxLOWZSJio+BU8Uo02k4z86vHkV
-        +qSjZOH+EIgGUKwz6ebGJKUAeVwX2SoBs7AjVV92lzEMUcoVnIiUCD5etKDnanq2qhkie/
-        ZEy/ZyTItvVVdR19edkVaNBuNjlnrLE=
+        bh=lX67DIL+lZaCTnHkDq82inRHfTC6JJtSh3OkkISzfmY=;
+        b=TCuLAlb3qiZZwH0YHSf/UdIwo2UnTKom8PX3jNxaCPdKhwz5QTndRSJF1ewCf/LJI8j18J
+        ZdJI6vXY3kFvTwt5wA77Ttwqvmm+Vh10pXvT4RP51M/uDkrE1DieX5DqwRsLkVpK/SiPmX
+        YUuaDG5CT+68qD3Q0YKhJ0ddA7Zn6FM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-F-9tv1RVOcePy6CWYZVclw-1; Fri, 06 Dec 2019 12:28:05 -0500
+ us-mta-165-ZjMCxGmWPFqGGTt0nhH_nA-1; Fri, 06 Dec 2019 12:28:08 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 697F7107ACC4;
-        Fri,  6 Dec 2019 17:28:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A79D107ACC4;
+        Fri,  6 Dec 2019 17:28:06 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3D7160BF4;
-        Fri,  6 Dec 2019 17:28:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C04AC60BF4;
+        Fri,  6 Dec 2019 17:28:03 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc:     drjones@redhat.com, andrew.murray@arm.com, andre.przywara@arm.com,
         peter.maydell@linaro.org
-Subject: [kvm-unit-tests RFC 07/10] arm: pmu: test 32-bit <-> 64-bit transitions
-Date:   Fri,  6 Dec 2019 18:27:21 +0100
-Message-Id: <20191206172724.947-8-eric.auger@redhat.com>
+Subject: [kvm-unit-tests RFC 08/10] arm: gic: Provide per-IRQ helper functions
+Date:   Fri,  6 Dec 2019 18:27:22 +0100
+Message-Id: <20191206172724.947-9-eric.auger@redhat.com>
 In-Reply-To: <20191206172724.947-1-eric.auger@redhat.com>
 References: <20191206172724.947-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: F-9tv1RVOcePy6CWYZVclw-1
+X-MC-Unique: ZjMCxGmWPFqGGTt0nhH_nA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -54,207 +54,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
----
- arm/pmu.c         | 125 +++++++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg |   6 +++
- 2 files changed, 130 insertions(+), 1 deletion(-)
+From: Andre Przywara <andre.przywara@arm.com>
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index e185809..47d46a2 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -116,6 +116,7 @@ static void test_basic_event_count(void) {}
- static void test_mem_access(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
-+static void test_chain_promotion(void) {}
+A common theme when accessing per-IRQ parameters in the GIC distributor
+is to set fields of a certain bit width in a range of MMIO registers.
+Examples are the enabled status (one bit per IRQ), the level/edge
+configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
+
+Add a generic helper function which is able to mask and set the
+respective number of bits, given the IRQ number and the MMIO offset.
+Provide wrappers using this function to easily allow configuring an IRQ.
+
+For now assume that private IRQ numbers always refer to the current CPU.
+In a GICv2 accessing the "other" private IRQs is not easily doable (the
+registers are banked per CPU on the same MMIO address), so we impose the
+same limitation on GICv3, even though those registers are not banked
+there anymore.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+---
+
+initialize reg
+---
+ lib/arm/asm/gic-v3.h |  2 +
+ lib/arm/asm/gic.h    |  9 +++++
+ lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 101 insertions(+)
+
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 347be2f..4a445a5 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -23,6 +23,8 @@
+ #define GICD_CTLR_ENABLE_G1A=09=09(1U << 1)
+ #define GICD_CTLR_ENABLE_G1=09=09(1U << 0)
 =20
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -262,7 +263,6 @@ asm volatile(
- =09: );
++#define GICD_IROUTER=09=09=090x6000
++
+ /* Re-Distributor registers, offsets from RD_base */
+ #define GICR_TYPER=09=09=090x0008
+=20
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 1fc10a0..21cdb58 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -15,6 +15,7 @@
+ #define GICD_IIDR=09=09=090x0008
+ #define GICD_IGROUPR=09=09=090x0080
+ #define GICD_ISENABLER=09=09=090x0100
++#define GICD_ICENABLER=09=09=090x0180
+ #define GICD_ISPENDR=09=09=090x0200
+ #define GICD_ICPENDR=09=09=090x0280
+ #define GICD_ISACTIVER=09=09=090x0300
+@@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+=20
++void gic_set_irq_bit(int irq, int offset);
++void gic_enable_irq(int irq);
++void gic_disable_irq(int irq);
++void gic_set_irq_priority(int irq, u8 prio);
++void gic_set_irq_target(int irq, int cpu);
++void gic_set_irq_group(int irq, int group);
++int gic_get_irq_group(int irq);
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 9430116..aa9cb86 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *dest)
+ =09assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ =09gic_common_ops->ipi_send_mask(irq, dest);
  }
-=20
--
- static void pmu_reset(void)
- {
- =09/* reset all counters, counting disabled at PMCR level*/
-@@ -571,6 +571,126 @@ static void test_chained_sw_incr(void)
- =09=09    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
- }
-=20
-+static void test_chain_promotion(void)
++
++enum gic_bit_access {
++=09ACCESS_READ,
++=09ACCESS_SET,
++=09ACCESS_RMW
++};
++
++static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
++=09=09=09      enum gic_bit_access access)
 +{
-+=09uint32_t events[] =3D { 0x13 /* MEM_ACCESS */, 0x1E /* CHAIN */};
-+=09void *addr =3D malloc(PAGE_SIZE);
++=09void *base;
++=09int split =3D 32 / bits;
++=09int shift =3D (irq % split) * bits;
++=09u32 reg =3D 0, mask =3D ((1U << bits) - 1) << shift;
 +
-+=09if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+=09=09return;
++=09switch (gic_version()) {
++=09case 2:
++=09=09base =3D gicv2_dist_base();
++=09=09break;
++=09case 3:
++=09=09if (irq < 32)
++=09=09=09base =3D gicv3_sgi_base();
++=09=09else
++=09=09=09base =3D gicv3_dist_base();
++=09=09break;
++=09default:
++=09=09return 0;
++=09}
++=09base +=3D offset + (irq / split) * 4;
 +
-+=09/* Only enable CHAIN counter */
-+=09pmu_reset();
-+        write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+        write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+=09write_sysreg_s(0x2, PMCNTENSET_EL0);
-+=09isb();
++=09switch (access) {
++=09case ACCESS_READ:
++=09=09return (readl(base) & mask) >> shift;
++=09case ACCESS_SET:
++=09=09reg =3D 0;
++=09=09break;
++=09case ACCESS_RMW:
++=09=09reg =3D readl(base) & ~mask;
++=09=09break;
++=09}
 +
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("chain counter not counting if even counter is disabled",
-+=09=09!read_regn(pmevcntr, 0));
++=09writel(reg | ((u32)value << shift), base);
 +
-+=09/* Only enable even counter */
-+=09pmu_reset();
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_sysreg_s(0x1, PMCNTENSET_EL0);
-+=09isb();
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("odd counter did not increment on overflow if disabled",
-+=09=09!read_regn(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) =3D=3D 0x1));
-+=09report_info("MEM_ACCESS counter #0 has value %ld", read_regn(pmevcntr, =
-0));=20
-+=09report_info("CHAIN counter #1 has value %ld", read_regn(pmevcntr, 1));=
-=20
-+=09report_info("overflow counter %ld", read_sysreg(pmovsclr_el0));
-+
-+=09/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled=
- */
-+=09pmu_reset();
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFDC);
-+=09isb();
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+
-+=09/* disable the CHAIN event */
-+=09write_sysreg_s(0x2, PMCNTENCLR_EL0);
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+=09report("should have triggered an overflow on #0", read_sysreg(pmovsclr_=
-el0) =3D=3D 0x1);
-+=09report("CHAIN counter #1 shouldn't have incremented", !read_regn(pmevcn=
-tr, 1));
-+
-+=09/* start at 0xFFFFFFDC, +20 with CHAIN disabled, +20 with CHAIN enabled=
- */
-+
-+=09pmu_reset();
-+=09write_sysreg_s(0x1, PMCNTENSET_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFDC);
-+=09isb();
-+=09report_info("counter #0 =3D 0x%lx, counter #1 =3D 0x%lx overflow=3D0x%l=
-x",
-+=09=09    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
-+=09=09    read_sysreg(pmovsclr_el0));
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+
-+=09/* enable the CHAIN event */
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+=09isb();
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+
-+=09report("CHAIN counter #1 should have incremented and no overflow expect=
-ed",
-+=09=09(read_regn(pmevcntr, 1) =3D=3D 1) && !read_sysreg(pmovsclr_el0));
-+
-+=09report_info("CHAIN counter #1 =3D 0x%lx, overflow=3D0x%lx",
-+=09=09read_regn(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-+
-+=09/* start as MEM_ACCESS/CPU_CYCLES and move to CHAIN/MEM_ACCESS */
-+=09pmu_reset();
-+        write_regn(pmevtyper, 0, 0x13 /* MEM_ACCESS */ | PMEVTYPER_EXCLUDE=
-_EL0);
-+        write_regn(pmevtyper, 1, 0x11 /* CPU_CYCLES */ | PMEVTYPER_EXCLUDE=
-_EL0);
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFDC);
-+=09isb();
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+
-+=09/* 0 becomes CHAINED */
-+=09write_sysreg_s(0x0, PMCNTENSET_EL0);
-+        write_regn(pmevtyper, 1, 0x1E /* CHAIN */ | PMEVTYPER_EXCLUDE_EL0)=
-;
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("MEM_ACCESS counter #0 has value 0x%lx", read_regn(pmevcntr=
-, 0));=20
-+
-+=09report("CHAIN counter #1 should have incremented and no overflow expect=
-ed",
-+=09=09(read_regn(pmevcntr, 1) =3D=3D 1) && !read_sysreg(pmovsclr_el0));
-+
-+=09report_info("CHAIN counter #1 =3D 0x%lx, overflow=3D0x%lx",
-+=09=09read_regn(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-+
-+=09/* start as CHAIN/MEM_ACCESS and move to MEM_ACCESS/CPU_CYCLES */
-+=09pmu_reset();
-+        write_regn(pmevtyper, 0, 0x13 /* MEM_ACCESS */ | PMEVTYPER_EXCLUDE=
-_EL0);
-+        write_regn(pmevtyper, 1, 0x1E /* CHAIN */ | PMEVTYPER_EXCLUDE_EL0)=
-;
-+=09write_regn(pmevcntr, 0, 0xFFFFFFDC);
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report_info("counter #0=3D0x%lx, counter #1=3D0x%lx",
-+=09=09=09read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
-+
-+=09write_sysreg_s(0x0, PMCNTENSET_EL0);
-+        write_regn(pmevtyper, 1, 0x11 /* CPU_CYCLES */ | PMEVTYPER_EXCLUDE=
-_EL0);
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+
-+=09mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("overflow is expected on counter 0", read_sysreg(pmovsclr_el0) =
-=3D=3D 1);
-+=09report_info("counter #0=3D0x%lx, counter #1=3D0x%lx overflow=3D0x%lx",
-+=09=09=09read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
-+=09=09=09read_sysreg(pmovsclr_el0));
++=09return 0;
 +}
 +
- #endif
-=20
- /*
-@@ -773,6 +893,9 @@ int main(int argc, char *argv[])
- =09} else if (strcmp(argv[1], "chained-sw-incr") =3D=3D 0) {
- =09=09report_prefix_push(argv[1]);
- =09=09test_chained_sw_incr();
-+=09} else if (strcmp(argv[1], "chain-promotion") =3D=3D 0) {
-+=09=09report_prefix_push(argv[1]);
-+=09=09test_chain_promotion();
- =09} else {
- =09=09report_abort("Unknown subtest '%s'", argv[1]);
- =09}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 1bd4319..eb6e87e 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -102,6 +102,12 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'chained-sw-incr'
-=20
-+[pmu-chain-promotion]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'chain-promotion'
++void gic_set_irq_bit(int irq, int offset)
++{
++=09gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
++}
 +
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
++void gic_enable_irq(int irq)
++{
++=09gic_set_irq_bit(irq, GICD_ISENABLER);
++}
++
++void gic_disable_irq(int irq)
++{
++=09gic_set_irq_bit(irq, GICD_ICENABLER);
++}
++
++void gic_set_irq_priority(int irq, u8 prio)
++{
++=09gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
++}
++
++void gic_set_irq_target(int irq, int cpu)
++{
++=09if (irq < 32)
++=09=09return;
++
++=09if (gic_version() =3D=3D 2) {
++=09=09gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
++=09=09=09=09    ACCESS_RMW);
++
++=09=09return;
++=09}
++
++=09writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++=09gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
++}
++
++int gic_get_irq_group(int irq)
++{
++=09return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
++}
 --=20
 2.20.1
 
