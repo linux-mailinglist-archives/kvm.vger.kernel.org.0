@@ -2,190 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 71A841157CE
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 20:32:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3138B115805
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 20:55:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726403AbfLFTcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 14:32:16 -0500
-Received: from mail-vs1-f73.google.com ([209.85.217.73]:43367 "EHLO
-        mail-vs1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726321AbfLFTcQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 14:32:16 -0500
-Received: by mail-vs1-f73.google.com with SMTP id j8so1072138vsm.10
-        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 11:32:15 -0800 (PST)
+        id S1726420AbfLFTzz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 14:55:55 -0500
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:37027 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726370AbfLFTzz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 14:55:55 -0500
+Received: by mail-vs1-f65.google.com with SMTP id x18so5921701vsq.4
+        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 11:55:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=RcvscsMIfpYbjq4X9AKXrVogIUHEvrO+W/QnGXNMzfk=;
-        b=dY6tBvjdFkIIUPknFq9Egln7Q7YL1nDQumi8uUcBlE25nlIKBDl7J7aCWu63hDSPrN
-         TJupYGmuu3i5m1C8tiggIEKJSBycfPCC1X5jwbPK1Pj/qjV2t9h+XYyvuOOL42GHIxq3
-         /6xVaDORXNPUqwAK8q6rhKrXSiof9A2GhSleesWZ1z2+VSbzmaZpqzpGsEBM5prIEx5T
-         iDDORHjldDxLZAe95CDBQ4+nOuXxyfd9plHkBL3G9vWoGrhs/BeMCH2U5YIdbfKLz6J8
-         F2qzt/ma2mQnjRummkeTxOu/12Mh30gSyzwR7Eby9+SgnfL/z73UHHXREFm+8rexYBiG
-         Cwng==
+        bh=g/Z29mZblhao4OKhaXfAMsgfFNTJQzmAxsp62b99KrM=;
+        b=KpNfi2vpudS8k1BofgP1u+Sw7UgUV1gKHYXAfLM+pb4BQnedFBeS7OKkYCCycJSoG+
+         xOAXNN19cQrRtr+AoMMXcWd3Z1nfvQ1lJx626eMA+0KoDp2gEwbc/qP6G6Xj9RWERJ6+
+         dhhcrhx5ngptFOtDVgxD7sSsTEPoyihu97fArE/yAWTg3/fufNjBdUCDQaqIIj341XeY
+         mtrJmdvy5W+6nwC7TcpTK2c2/Vuxogj4edXY6BjsNV7wkUmVhK4KOlWHyM+jgbkuNGZ0
+         ctwx/NLJjh0HcWxEm2mm42dqZD0eU+RLACUo9CdWUtlAGT7AalgryjhcOUjpAvVO5UGo
+         PHTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=RcvscsMIfpYbjq4X9AKXrVogIUHEvrO+W/QnGXNMzfk=;
-        b=MsDrvHjkHSWxqIvWU/4xKVCkbDw0By2VslEFjTV9Cfr1+LhGFu9y7tI4dLFuOYf0mk
-         8Q9g1Oyp560t8O1xSQoxfil+oKO89yO9a6Cs4N+A59wuVf+8kwJtCFn1rCYqVwirfkvK
-         6lYB+PVp3ZQGbg/KVDjWwMUaqx75gyosEz68rohaIEgtBCujh8NZT7TapQG/yt1MM09R
-         g9jNJzKGcaJq3t4OsM+1DyyospkXm6uFudC2jIf7Ze1/bUJaFIgp9lPVhdU7N/mifdPo
-         +yHDI4n9rgUZVKW02EBlh8bsODkCKb6ObjjZ2our1DONhi65pFI1uBSlqYSSNZvrNV2l
-         inLA==
-X-Gm-Message-State: APjAAAWxx8ssIxpOGkC4qY8m0WY3JZHh2mXviIGFu5dn+LdSBIAJej9S
-        ShTXuXrn37nAS1oi7FC4RvMGJokv/tbD5DR1e7DtPcoldB0siFzAgfoLGgWAlWaY45VrI2REGnW
-        DM8XPguvpk9YEnTqTqoPmwl1f5+7REOWzga9dFri33hBJM7ytra+5W/Bmq6z0xOI=
-X-Google-Smtp-Source: APXvYqz7Eih+OR7fAhDjKbiJOYcLSQIhIkDETCurItjNcVx1GTknFvvuChJsTrBxT10GzUSuCAuzlvLQb5CZow==
-X-Received: by 2002:a1f:bf86:: with SMTP id p128mr13030403vkf.3.1575660734499;
- Fri, 06 Dec 2019 11:32:14 -0800 (PST)
-Date:   Fri,  6 Dec 2019 11:31:44 -0800
-In-Reply-To: <20191206193144.33209-1-jmattson@google.com>
-Message-Id: <20191206193144.33209-3-jmattson@google.com>
-Mime-Version: 1.0
-References: <20191206193144.33209-1-jmattson@google.com>
-X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
-Subject: [PATCH v2 3/3] kvm: nVMX: Aesthetic cleanup of handle_vmread and handle_vmwrite
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jon Cargille <jcargill@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g/Z29mZblhao4OKhaXfAMsgfFNTJQzmAxsp62b99KrM=;
+        b=ATw2g7hRhqn52JdYrxE8LgTeH4HaiYYh1jViJCX2q3S8Kw8oHNvzxjLiyscKr0ki+t
+         7SxcaK4RulkHvK8XkB9r0QtuzL1OcqGj2oZZXDXGApk/3x5Q64UBWeI2Zl7GdKfC5LaB
+         TUkpleWHAMN2BjTX04LhpPXmp1tmdOxvjjVy9SVl7KNOds8ax8ld33x7zf0nuSqf6uRV
+         tJFeQCOxqzhP8EgSO1GTqDVyXRVxcFXA6AgkK3Kjvf7HMrUR6t1ahDP6eiAqc0G6IlS1
+         nL+L0N3HgQ1znuYdHE/uFBSklXmjm9giPxA4h8hQxDXksJBSLlNFfGdz6KgL7vtcO5Gy
+         KKHg==
+X-Gm-Message-State: APjAAAUo+NzN0QrjaHUWlbpG9wg5dyivGp0c57NSP2dMatL3NvNbgrTN
+        mLoOAq7LiuYUzb7UItrR+Nk7M1EeI3c3JWRiWwzAfQ==
+X-Google-Smtp-Source: APXvYqz4ctErYqr8ovFQ4LYDuo1lt2DMbswbj9wvvX9cDpDd/10zooIczllttOpKJ5GmWo6TNLbys36WEl7es2xnV14=
+X-Received: by 2002:a67:c592:: with SMTP id h18mr1118342vsk.235.1575662154029;
+ Fri, 06 Dec 2019 11:55:54 -0800 (PST)
+MIME-Version: 1.0
+References: <20190926231824.149014-1-bgardon@google.com> <20191127190922.GH22227@linux.intel.com>
+In-Reply-To: <20191127190922.GH22227@linux.intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Fri, 6 Dec 2019 11:55:42 -0800
+Message-ID: <CANgfPd-XR0ZpbTtV21KrM_Ud1d0ntHxE6M4JzcFVZ4M0zG8XYQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/28] kvm: mmu: Rework the x86 TDP direct mapped case
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Apply reverse fir tree declaration order, wrap long lines, reformat a
-block comment, delete an extra blank line, and use BIT_ULL(10) instead
-of (1u << 10i).
+I'm finally back in the office. Sorry for not getting back to you sooner.
+I don't think it would be easy to send the synchronization changes
+first. The reason they seem so small is that they're all handled by
+the iterator. If we tried to put the synchronization changes in
+without the iterator we'd have to 1.) deal with struct kvm_mmu_pages,
+2.) deal with the rmap, and 3.) change a huge amount of code to insert
+the synchronization changes into the existing framework. The changes
+wouldn't be mechanical or easy to insert either since a lot of
+bookkeeping is currently done before PTEs are updated, with no
+facility for rolling back the bookkeeping on PTE cmpxchg failure. We
+could start with the iterator changes and then do the synchronization
+changes, but the other way around would be very difficult.
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Jon Cargille <jcargill@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 47 +++++++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 22 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 94ec089d6d1a..aff163192369 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4751,17 +4751,17 @@ static int handle_vmresume(struct kvm_vcpu *vcpu)
- 
- static int handle_vmread(struct kvm_vcpu *vcpu)
- {
--	unsigned long field;
--	u64 field_value;
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
--	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
--	int len;
--	gva_t gva = 0;
- 	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
- 						    : get_vmcs12(vcpu);
-+	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-+	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct x86_exception e;
-+	unsigned long field;
-+	u64 field_value;
-+	gva_t gva = 0;
- 	short offset;
-+	int len;
- 
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
-@@ -4776,7 +4776,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 		return nested_vmx_failInvalid(vcpu);
- 
- 	/* Decode instruction info and find the field to read */
--	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-+	field = kvm_register_readl(vcpu,
-+				   (((vmx_instruction_info) >> 28) & 0xf));
- 
- 	offset = vmcs_field_to_offset(field);
- 	if (offset < 0)
-@@ -4794,7 +4795,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 	 * Note that the number of bits actually copied is 32 or 64 depending
- 	 * on the guest's mode (32 or 64 bit), not on the given field's length.
- 	 */
--	if (vmx_instruction_info & (1u << 10)) {
-+	if (vmx_instruction_info & BIT_ULL(10)) {
- 		kvm_register_writel(vcpu, (((vmx_instruction_info) >> 3) & 0xf),
- 			field_value);
- 	} else {
-@@ -4803,7 +4804,8 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 				vmx_instruction_info, true, len, &gva))
- 			return 1;
- 		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
--		if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len, &e))
-+		if (kvm_write_guest_virt_system(vcpu, gva, &field_value,
-+						len, &e))
- 			kvm_inject_page_fault(vcpu, &e);
- 	}
- 
-@@ -4836,24 +4838,25 @@ static bool is_shadow_field_ro(unsigned long field)
- 
- static int handle_vmwrite(struct kvm_vcpu *vcpu)
- {
--	unsigned long field;
--	int len;
--	gva_t gva;
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-+						    : get_vmcs12(vcpu);
- 	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
- 	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct x86_exception e;
-+	unsigned long field;
-+	short offset;
-+	gva_t gva;
-+	int len;
- 
--	/* The value to write might be 32 or 64 bits, depending on L1's long
-+	/*
-+	 * The value to write might be 32 or 64 bits, depending on L1's long
- 	 * mode, and eventually we need to write that into a field of several
- 	 * possible lengths. The code below first zero-extends the value to 64
- 	 * bit (field_value), and then copies only the appropriate number of
- 	 * bits into the vmcs12 field.
- 	 */
- 	u64 field_value = 0;
--	struct x86_exception e;
--	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
--						    : get_vmcs12(vcpu);
--	short offset;
- 
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
-@@ -4867,7 +4870,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 	     get_vmcs12(vcpu)->vmcs_link_pointer == -1ull))
- 		return nested_vmx_failInvalid(vcpu);
- 
--	if (vmx_instruction_info & (1u << 10))
-+	if (vmx_instruction_info & BIT_ULL(10))
- 		field_value = kvm_register_readl(vcpu,
- 			(((vmx_instruction_info) >> 3) & 0xf));
- 	else {
-@@ -4881,8 +4884,8 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--
--	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-+	field = kvm_register_readl(vcpu,
-+				   (((vmx_instruction_info) >> 28) & 0xf));
- 
- 	offset = vmcs_field_to_offset(field);
- 	if (offset < 0)
--- 
-2.24.0.393.g34dc348eaf-goog
-
+On Wed, Nov 27, 2019 at 11:09 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Thu, Sep 26, 2019 at 04:17:56PM -0700, Ben Gardon wrote:
+> > The goal of this  RFC is to demonstrate and gather feedback on the
+> > iterator pattern, the memory savings it enables for the "direct case"
+> > and the changes to the synchronization model. Though they are interwoven
+> > in this series, I will separate the iterator from the synchronization
+> > changes in a future series. I recognize that some feature work will be
+> > needed to make this patch set ready for merging. That work is detailed
+> > at the end of this cover letter.
+>
+> How difficult would it be to send the synchronization changes as a separate
+> series in the not-too-distant future?  At a brief glance, those changes
+> appear to be tiny relative to the direct iterator changes.  From a stability
+> perspective, it would be nice if the locking changes can get upstreamed and
+> tested in the wild for a few kernel versions before the iterator code is
+> introduced.
