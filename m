@@ -2,84 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC0BC115833
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 21:31:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 86D18115835
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 21:31:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726374AbfLFUbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 15:31:20 -0500
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:41232 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbfLFUbU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 15:31:20 -0500
-Received: by mail-ua1-f65.google.com with SMTP id f7so3381858uaa.8
-        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 12:31:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yvnlefSqRj8i0igFAJ0ONce7TCwxEReu/pZBV8W+whM=;
-        b=oVW0Fjp+B5MaZg11s3cmhK2aPQ1KWcfXtaMo6a8oQoocMXcGGXrWvRapGr2S0f/7rf
-         ZFItv/Cn4o1R8rWJuU/iNYdsknxij1UXF5pvzKW1QYOSFCRvbYPPZ2fizjm8bYWNj5wN
-         Co7tkrePnRD7GVA45qKFaaB1T2Donqpz6WdLrOOjHe5ehIRhJlwEJuYgVZaCzQH8BuW+
-         QrtwHaV6IQSd8jLDERLD/yehsZPOfqaez6EGXnFUXlwbL3DdbjRbe+zrArTBC36BPXqz
-         Zrgdt4YZ9sjXmGrhyrJoZOvnO01jmXZcx+MLky3mhyw9xkAaQh9VhzsnVVtTu5dlXw3P
-         /vig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yvnlefSqRj8i0igFAJ0ONce7TCwxEReu/pZBV8W+whM=;
-        b=mCrai0g3TuWLHrEk1ozA323A73fHlwCmUn3YcGBX3MI3bOjTQZH5zCdlriRE3T9iHc
-         DQDUDyRrEM3L3gRuPuBCfH1I7QD/AZLrQdsk8su2XZS2nwlhdsTp0r1YYm7qg9XLIDNL
-         Z72lfxAnNnIXr3D0VQoZZ2wytjtKKMeAiM7oSxR1D839drw5sartf+YkuPm212j1/kMN
-         g8snBECKXFSnGGO/WSkamh0rJVwcqK1UD6qZZskS/+bunZW1e0rKRsDio76dBLaIUzAd
-         KA3c4Yi7MKMQIIabZCWfwUCiZb/7MSJIPR1Tv5C8rw9Cjst9pdX8XN2867qe5aiPJmYh
-         jcgg==
-X-Gm-Message-State: APjAAAU9UbdXISbVmhQfPaVR98llWr7WFfifd8m6yB0GpHG4fEqIaf/P
-        Hgtqi4NL5vS5Y8fntUDXm6NzAXhzMSSyj8ZmYPCsjw==
-X-Google-Smtp-Source: APXvYqzf3jTI6h7lt1Mt/MOickYrAea19ceZAoDPqv/hnTaPiVrWUmY/zVXRwmWDLADaCQP5XzmRaOuYyJKExF/wIt4=
-X-Received: by 2002:a9f:2304:: with SMTP id 4mr14146577uae.69.1575664278931;
- Fri, 06 Dec 2019 12:31:18 -0800 (PST)
+        id S1726416AbfLFUb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 15:31:26 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:47908 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726332AbfLFUb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 15:31:26 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB6KTUCc140204;
+        Fri, 6 Dec 2019 20:31:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=4nf1xKRn/USEHl15TdqwrDmyONfL6v+Du/F1d+Pr7+A=;
+ b=Is/2io88nqEO+7vVxnk1NivaVaTP/E03UwABfCBvwkLELnLoOD2RXb32A7NRCF9DG5Lv
+ irxff3HSlunuvSCKhFflOq3ymHv7Rs3cJMJ2gYXOUE5jQ07h+yQ/SQDI8xxGXttlUWBx
+ MOpPDfpw+z2Pkstcvr3LXWwnQeEPosvRJtWcmYylPmYTDxfh3I1dcsMG0IbuPHAeW+sz
+ xDX1BVr/63MTFcAf6QG69afDinjxkKTMTXuo21zEd5MMeL9YFTfKFPfp2KWgvWW3ZhBK
+ iGGdX990wNjburHJU6545Zj3aYK2jjBHDcYX6pxcTX6tYq+LhU19xrUP05H2tNpAjT8T Lg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2wkfuuxdmr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Dec 2019 20:31:02 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB6KTTUA194845;
+        Fri, 6 Dec 2019 20:31:02 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2wqt45bap0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Dec 2019 20:31:02 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xB6KUqJc024064;
+        Fri, 6 Dec 2019 20:30:58 GMT
+Received: from [10.156.74.184] (/10.156.74.184)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 06 Dec 2019 12:30:52 -0800
+Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
+ trustworthy
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20191105161737.21395-1-vkuznets@redhat.com>
+ <de3cade3-c069-dc6b-1d2d-aa10abe365b8@redhat.com>
+ <4f835a11-1528-a04e-9e06-1b8cdb97a04d@oracle.com>
+ <87wob9d0t3.fsf@vitty.brq.redhat.com>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <2e16b707-f020-22a3-a618-4960db917dfa@oracle.com>
+Date:   Fri, 6 Dec 2019 12:31:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20190926231824.149014-1-bgardon@google.com> <20190926231824.149014-11-bgardon@google.com>
- <20191202234644.GH8120@linux.intel.com>
-In-Reply-To: <20191202234644.GH8120@linux.intel.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Fri, 6 Dec 2019 12:31:08 -0800
-Message-ID: <CANgfPd-TFE8kgicJBXw8JZs6YHGCzRKCenRHeFOSHHkWVVXZnA@mail.gmail.com>
-Subject: Re: [RFC PATCH 10/28] kvm: mmu: Flush TLBs before freeing direct MMU
- page table memory
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Peter Shier <pshier@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87wob9d0t3.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9463 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912060164
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9463 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912060164
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We've tested this on Skylake, Broadwell, Haswell, Ivybridge,
-Sandybridge, and probably some newer platforms. I haven't gone digging
-for any super old hardware to test on.
 
-On Mon, Dec 2, 2019 at 3:46 PM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Thu, Sep 26, 2019 at 04:18:06PM -0700, Ben Gardon wrote:
-> > If page table memory is freed before a TLB flush, it can result in
-> > improper guest access to memory through paging structure caches.
-> > Specifically, until a TLB flush, memory that was part of the paging
-> > structure could be used by the hardware for address translation if a
-> > partial walk leading to it is stored in the paging structure cache. Ensure
-> > that there is a TLB flush before page table memory is freed by
-> > transferring disconnected pages to a disconnected list, and on a flush
-> > transferring a snapshot of the disconnected list to a free list. The free
-> > list is processed asynchronously to avoid slowing TLB flushes.
->
-> Tangentially realted to TLB flushing, what generations of CPUs have you
-> tested this on?  I don't have any specific concerns, but ideally it'd be
-> nice to get testing cycles on older hardware before merging.  Thankfully
-> TDP-only eliminates ridiculously old hardware :-)
+
+On 12/6/19 5:46 AM, Vitaly Kuznetsov wrote:
+> Ankur Arora <ankur.a.arora@oracle.com> writes:
+> 
+>> On 2019-11-05 3:56 p.m., Paolo Bonzini wrote:
+>>> On 05/11/19 17:17, Vitaly Kuznetsov wrote:
+>>>> There is also one additional piece of the information missing. A VM can be
+>>>> sharing physical cores with other VMs (or other userspace tasks on the
+>>>> host) so does KVM_FEATURE_TRUSTWORTHY_SMT imply that it's not the case or
+>>>> not? It is unclear if this changes anything and can probably be left out
+>>>> of scope (just don't do that).
+>>>>
+>>>> Similar to the already existent 'NoNonArchitecturalCoreSharing' Hyper-V
+>>>> enlightenment, the default value of KVM_HINTS_TRUSTWORTHY_SMT is set to
+>>>> !cpu_smt_possible(). KVM userspace is thus supposed to pass it to guest's
+>>>> CPUIDs in case it is '1' (meaning no SMT on the host at all) or do some
+>>>> extra work (like CPU pinning and exposing the correct topology) before
+>>>> passing '1' to the guest.
+>>>>
+>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>>> ---
+>>>>    Documentation/virt/kvm/cpuid.rst     | 27 +++++++++++++++++++--------
+>>>>    arch/x86/include/uapi/asm/kvm_para.h |  2 ++
+>>>>    arch/x86/kvm/cpuid.c                 |  7 ++++++-
+>>>>    3 files changed, 27 insertions(+), 9 deletions(-)
+>>>>
+>>>> diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+>>>> index 01b081f6e7ea..64b94103fc90 100644
+>>>> --- a/Documentation/virt/kvm/cpuid.rst
+>>>> +++ b/Documentation/virt/kvm/cpuid.rst
+>>>> @@ -86,6 +86,10 @@ KVM_FEATURE_PV_SCHED_YIELD        13          guest checks this feature bit
+>>>>                                                  before using paravirtualized
+>>>>                                                  sched yield.
+>>>>    
+>>>> +KVM_FEATURE_TRUSTWORTHY_SMT       14          set when host supports 'SMT
+>>>> +                                              topology is trustworthy' hint
+>>>> +                                              (KVM_HINTS_TRUSTWORTHY_SMT).
+>>>> +
+>>>
+>>> Instead of defining a one-off bit, can we make:
+>>>
+>>> ecx = the set of known "hints" (defaults to edx if zero)
+>>>
+>>> edx = the set of hints that apply to the virtual machine
+>>>
+>> Just to resurrect this thread, the guest could explicitly ACK
+>> a KVM_FEATURE_DYNAMIC_HINT at init. This would allow the host
+>> to change the hints whenever with the guest not needing to separately
+>> ACK the changed hints.
+> 
+> (I apologize for dropping the ball on this, I'm intended to do RFCv2 in
+> a nearby future)
+> 
+> Regarding this particular hint (let's call it 'no nonarchitectural
+> coresharing' for now) I don't see much value in communicating change to
+> guest when it happens. Imagine our host for some reason is not able to
+> guarantee that anymore e.g. we've migrated to a host with less pCPUs
+> and/or special restrictions and have to start sharing. What we, as a
+> guest, are supposed to do when we receive a notification? "You're now
+> insecure, deal with it!" :-) Equally, I don't see much value in
+> pre-acking such change. "I'm fine with becoming insecure at some point".
+True, for that use-case pre-ACK seems like exactly the thing you would
+not want.
+I do see some value in the guest receiving the notification though.
+Maybe it could print a big fat printk or something :). Or, it could
+change to a different security-policy-that-I-just-made-up.
+
+
+> If we, however, discuss other hints such 'pre-ACK' mechanism may make
+> sense, however, I'd make it an option to a 'challenge/response'
+> protocol: if host wants to change a hint it notifies the guest and waits
+> for an ACK from it (e.g. a pair of MSRs + an interrupt). I, however,
+My main reason for this 'pre-ACK' approach is some discomfort with
+changing the CPUID edx from under the guest.
+
+The MSR+interrupt approach would work as well but then we have the
+same set of hints spread across CPUID and the MSR. What do you think
+is the right handling for a guest that refuses to ACK the MSR?
+
+> have no good candidate from the existing hints which would require guest
+> to ACK (e.g revoking PV EOI would probably do but why would we do that?)
+> As I said before, challenge/response protocol is needed if we'd like to
+> make TSC frequency change the way Hyper-V does it (required for updating
+> guest TSC pages in nested case) but this is less and less important with
+> the appearance of TSC scaling. I'm still not sure if this is an
+> over-engineering or not. We can wait for the first good candidate to
+> decide.
+As we've discussed offlist, the particular hint I'm interested in is
+KVM_HINT_REALTIME. That's not a particularly good candidate though
+because there's no correctness problem if the host does switch it
+off suddenly.
+
+
+Ankur
