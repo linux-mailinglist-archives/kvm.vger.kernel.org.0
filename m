@@ -2,161 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBD8011553D
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 17:26:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB7C111553B
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 17:26:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbfLFQ0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 11:26:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34376 "EHLO
+        id S1726395AbfLFQ0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 11:26:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37850 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726352AbfLFQ0h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Dec 2019 11:26:37 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB6GESlB004824
-        for <kvm@vger.kernel.org>; Fri, 6 Dec 2019 11:26:36 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wq8ujnq4e-1
+        by vger.kernel.org with ESMTP id S1726315AbfLFQ0g (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Dec 2019 11:26:36 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB6GEoLl068873
+        for <kvm@vger.kernel.org>; Fri, 6 Dec 2019 11:26:35 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wq9g6c90b-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
         for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 11:26:35 -0500
 Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 6 Dec 2019 16:26:32 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Fri, 6 Dec 2019 16:26:33 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 6 Dec 2019 16:26:30 -0000
+        Fri, 6 Dec 2019 16:26:31 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB6GQTQF32309716
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB6GQUi352232390
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Dec 2019 16:26:29 GMT
+        Fri, 6 Dec 2019 16:26:30 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B385A52051;
-        Fri,  6 Dec 2019 16:26:29 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 23AD452052;
+        Fri,  6 Dec 2019 16:26:30 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.175.63])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5A29F5204E;
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id BE02D52054;
         Fri,  6 Dec 2019 16:26:29 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v3 0/9] s390x: Testing the Channel Subsystem I/O
-Date:   Fri,  6 Dec 2019 17:26:19 +0100
+Subject: [kvm-unit-tests PATCH v3 1/9] s390x: saving regs for interrupts
+Date:   Fri,  6 Dec 2019 17:26:20 +0100
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19120616-0028-0000-0000-000003C60CC6
+x-cbid: 19120616-0020-0000-0000-0000039509A5
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120616-0029-0000-0000-00002489331A
-Message-Id: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+x-cbparentid: 19120616-0021-0000-0000-000021EC3DE7
+Message-Id: <1575649588-6127-2-git-send-email-pmorel@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-06_05:2019-12-05,2019-12-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 priorityscore=1501 phishscore=0 mlxlogscore=722 bulkscore=0
- impostorscore=0 adultscore=0 clxscore=1015 suspectscore=1 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1912060136
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 impostorscore=0 bulkscore=0
+ mlxlogscore=696 suspectscore=1 adultscore=0 phishscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912060136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Goal of the series is to have a framwork to test Channel-Subsystem I/O with
-QEMU/KVM.
-  
-To be able to support interrupt for CSS I/O and for SCLP we need to modify
-the interrupt framework to allow re-entrant interruptions.
-  
-We add a registration for IRQ callbacks to the test programm to define its own
-interrupt handler. We need to do special work under interrupt like acknoledging
-the interrupt.
-  
-Being working on PSW bits to allow I/O interrupt, we define new PSW bits
-in arch_def.h and use __ASSEMBLER__ define to be able to include this header
-in an assembler source file.
+If we use multiple source of interrupts, for exemple, using SCLP
+console to print information while using I/O interrupts, we need
+to have a re-entrant register saving interruption handling.
+
+Instead of saving at a static memory address, let's save the base
+registers and the floating point registers on the stack.
+
+Note that we keep the static register saving to recover from the
+RESET tests.
+
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+---
+ s390x/cstart64.S | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+index 86dd4c4..ff05f9b 100644
+--- a/s390x/cstart64.S
++++ b/s390x/cstart64.S
+@@ -118,6 +118,25 @@ memsetxc:
+ 	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
+ 	.endm
  
-This series presents four major tests:
-- Enumeration:
-	The CSS is enumerated using the STSCH instruction recursively on all
-	potentially existing channels.
-	Keeping the first channel found as a reference for future use.
-	Checks STSCH
-
-- Enable:
-	If the enumeration succeeded the tests enables the reference
-	channel with MSCH and verifies with STSCH that the channel is
-	effectively enabled
-	Checks MSCH
-
-- Sense:
-	If the channel is enabled this test sends a SENSE_ID command
-	to the reference channel, analysing the answer and expecting
-	the Control unit type being 0xc0ca
-	Checks SSCH(READ) and IO-IRQ
-
-- ping-pong:
-	If the reference channel leads to the PONG device (0xc0ca),
-	the test exchanges a string containing a 9 digit number with
-	the PONG device and expecting this number to be incremented
-	by the PONG device.
-	Checks SSCH(WRITE)
-
-
-Pierre Morel (9):
-  s390x: saving regs for interrupts
-  s390x: Define the PSW bits
-  s390: interrupt registration
-  s390x: export the clock get_clock_ms() utility
-  s390x: Library resources for CSS tests
-  s390x: css: stsch, enumeration test
-  s390x: css: msch, enable test
-  s390x: css: ssch/tsch with sense and interrupt
-  s390x: css: ping pong
-
- lib/s390x/asm/arch_def.h | 127 ++++++++-------
- lib/s390x/asm/time.h     |  27 ++++
- lib/s390x/css.h          | 273 +++++++++++++++++++++++++++++++
- lib/s390x/css_dump.c     | 156 ++++++++++++++++++
- lib/s390x/interrupt.c    |  23 ++-
- lib/s390x/interrupt.h    |   7 +
- s390x/Makefile           |   2 +
- s390x/css.c              | 335 +++++++++++++++++++++++++++++++++++++++
- s390x/cstart64.S         |  38 ++++-
- s390x/intercept.c        |  11 +-
- s390x/unittests.cfg      |   4 +
- 11 files changed, 924 insertions(+), 79 deletions(-)
- create mode 100644 lib/s390x/asm/time.h
- create mode 100644 lib/s390x/css.h
- create mode 100644 lib/s390x/css_dump.c
- create mode 100644 lib/s390x/interrupt.h
- create mode 100644 s390x/css.c
-
++	.macro SAVE_IRQ_REGS
++	slgfi   %r15, 15 * 8
++	stmg    %r0, %r14, 0(%r15)
++	slgfi   %r15, 16 * 8
++	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
++	std	\i, \i * 8(%r15)
++	.endr
++	lgr     %r2, %r15
++	.endm
++
++	.macro RESTORE_IRQ_REGS
++	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
++	ld	\i, \i * 8(%r15)
++	.endr
++	algfi   %r15, 16 * 8
++	lmg     %r0, %r14, 0(%r15)
++	algfi   %r15, 15 * 8
++	.endm
++
+ .section .text
+ /*
+  * load_reset calling convention:
+@@ -154,6 +173,8 @@ diag308_load_reset:
+ 	lpswe	GEN_LC_SW_INT_PSW
+ 1:	br	%r14
+ 
++
++
+ .globl smp_cpu_setup_state
+ smp_cpu_setup_state:
+ 	xgr	%r1, %r1
+@@ -180,9 +201,9 @@ mcck_int:
+ 	lpswe	GEN_LC_MCCK_OLD_PSW
+ 
+ io_int:
+-	SAVE_REGS
++	SAVE_IRQ_REGS
+ 	brasl	%r14, handle_io_int
+-	RESTORE_REGS
++	RESTORE_IRQ_REGS
+ 	lpswe	GEN_LC_IO_OLD_PSW
+ 
+ svc_int:
 -- 
 2.17.0
-
-Changelog:
-from v2 to v3:
-- Rework spelling
-  (Connie)
-- More descriptions
-  (Connie)
-- use __ASSEMBLER__ preprocessing to keep
-  bits definitions and C structures in the same file
-  (David)
-- rename the new file clock.h as time.h
-  (Janosch, David?)
-- use registration for the IO interruption
-  (David, Thomas)
-- test the SCHIB to verify it has really be modified
-  (Connie)
-- Lot of simplifications in the tests
-  (Connie)
-
-from v1 to v2:
-- saving floating point registers (David, Janosh)
-- suppress unused PSW bits defintions (Janosh)
-- added Thomas reviewed-by
-- style and comments modifications (Connie, Janosh)
-- moved get_clock_ms() into headers and use it (Thomas)
-- separate header and library utility from tests
-- Suppress traces, separate tests, make better usage of reports
 
