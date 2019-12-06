@@ -2,86 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 790A311571B
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 19:22:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44F31115772
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 19:53:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726350AbfLFSWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 13:22:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25747 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726298AbfLFSWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 13:22:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575656551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pkO2zZFmgQehl/A8nk21THxwcIqs5vjrYyeZ+q3C/Nk=;
-        b=Cr93jeQWMdg5kBFM60+z+DPcRbgSN0FTk6PDmNRt5GOonNKi4fxcmpkXPK6b8BBCTGjqzU
-        Ru/o9Vt8yZFNt33a/pD4EvWP1+LFApQo+OxP1iE5o5a+rsKqaX7MVy0ZYYLaFYz4Jg58xT
-        87DqN2CqjzsT9QCT1GOGS5HIESVP1+4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-S58x6o8wPNCLHbUrxi5mBA-1; Fri, 06 Dec 2019 13:22:30 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D070800D4C;
-        Fri,  6 Dec 2019 18:22:29 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD5D6608A5;
-        Fri,  6 Dec 2019 18:22:28 +0000 (UTC)
-Date:   Fri, 6 Dec 2019 11:22:27 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO updates for v5.5-rc1
-Message-ID: <20191206112227.53e15607@x1.home>
-Organization: Red Hat
+        id S1726388AbfLFSxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 13:53:07 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:46323 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726317AbfLFSxH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 13:53:07 -0500
+Received: by mail-pf1-f196.google.com with SMTP id y14so3762962pfm.13
+        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 10:53:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=K3ULS82TM5X3oy+N7bLM5wCXYGvU66vvX1ioV7TywQA=;
+        b=ExSOppud6x7oyh7jQafYUvPvNOXeUGL6Tfs3axjJWXXEm7+DGmcpWm8uUuwQWjiKsw
+         4DjGbjcvL1SBYWbmQpIom/13VK14MV/ANsxs/0s4iCCkZ76s1Sl18Vhfhtn8LX/WPqJ+
+         n+fTieTyvg5PXprzNJYdOguIF8yOjsAf0CpvuVnXL7DPDYJDdxZ8a/exvEKNp86KhrhZ
+         IIa6KnJ9KuGTdQ/XUGYiALS0YPjRRMxY8uRhKCjTf8aVs+sP4Kvk4gqza6tXGgtLX9tq
+         esQx6v+KQw0qrhBwJb66uhgu1RgYTqWUK1wlICYCm3tCe3rBwm1OGllhwXUh9AcrGXA3
+         7eyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=K3ULS82TM5X3oy+N7bLM5wCXYGvU66vvX1ioV7TywQA=;
+        b=MwdTFt+2v2ujsMLvuVWhlzORghXRErG1aPCJjCP6+7tk1Ko4zcz5s4WK+wxGWDYS9L
+         vBMzdUukDszh3J0xjSahpGC0XUadzLtwWR9QNLluFGIkZmf6wdYvWqe46bAvKDedgTQT
+         PZLpzqYIrmcue2lWhG83P5M3vo1mnd/XYNdDIl+NGgT3wMg3hW6LUgA8eLKDXFroj+f2
+         aSpgQX56YFFpiglaVAFjakjLoivqXOMJVh/rc9N5MpnCMwq2olOe9kTtP1dItIujcJRH
+         nX9W2283eF4vOA82+N+EETHeSp8hBYgjhV63x8dW5axAwZWY+KbOPXhNgul1LmrPyxjE
+         iIXg==
+X-Gm-Message-State: APjAAAVg+9Q4ijwcosrhhyS+lUOqjokOfMIALWXzb7k4AyoClej1mITw
+        XzQm5NYfq+NMkBgPxOc8tPBT/w==
+X-Google-Smtp-Source: APXvYqxmgKQUom0IC5pFsT4lzSuFsQPzwlPTXfnMVHpgbstIu3U8KPunAzMuP13hE8dxBSRjmv7kqw==
+X-Received: by 2002:a63:c12:: with SMTP id b18mr5041685pgl.156.1575658386217;
+        Fri, 06 Dec 2019 10:53:06 -0800 (PST)
+Received: from google.com ([2620:15c:100:202:d78:d09d:ec00:5fa7])
+        by smtp.gmail.com with ESMTPSA id h14sm10333962pfn.174.2019.12.06.10.53.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Dec 2019 10:53:05 -0800 (PST)
+Date:   Fri, 6 Dec 2019 10:53:01 -0800
+From:   Oliver Upton <oupton@google.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: expose "load IA32_PERF_GLOBAL_CTRL" controls
+Message-ID: <20191206185301.GA93531@google.com>
+References: <1574346557-18344-1-git-send-email-pbonzini@redhat.com>
+ <7fea1f06-9abb-cdd1-9cb9-8655fe207e96@oracle.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: S58x6o8wPNCLHbUrxi5mBA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7fea1f06-9abb-cdd1-9cb9-8655fe207e96@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+Hi Paolo,
 
-The following changes since commit 4f5cafb5cb8471e54afdc9054d973535614f7675:
+Sorry I didn't see this earlier. Thank you for addressing this!
 
-  Linux 5.4-rc3 (2019-10-13 16:37:36 -0700)
-
-are available in the Git repository at:
-
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.5-rc1
-
-for you to fetch changes up to 9917b54aded12dff9beb9e709981617b788e44b0:
-
-  Merge branch 'v5.5/vfio/jiang-yi-irq-bypass-unregister-v1' into v5.5/vfio/next (2019-12-04 10:15:56 -0700)
-
-----------------------------------------------------------------
-VFIO updates for v5.5-rc1
-
- - Remove hugepage checks for reserved pfns (Ben Luo)
-
- - Fix irq-bypass unregister ordering (Jiang Yi)
-
-----------------------------------------------------------------
-Alex Williamson (1):
-      Merge branch 'v5.5/vfio/jiang-yi-irq-bypass-unregister-v1' into v5.5/vfio/next
-
-Ben Luo (1):
-      vfio/type1: remove hugepage checks in is_invalid_reserved_pfn()
-
-Jiang Yi (1):
-      vfio/pci: call irq_bypass_unregister_producer() before freeing irq
-
- drivers/vfio/pci/vfio_pci_intrs.c |  2 +-
- drivers/vfio/vfio_iommu_type1.c   | 26 ++++----------------------
- 2 files changed, 5 insertions(+), 23 deletions(-)
-
+On Thu, Nov 21, 2019 at 10:42:18AM -0800, Krish Sadhukhan wrote:
+> 
+> On 11/21/19 6:29 AM, Paolo Bonzini wrote:
+> > These controls were added by the recent commit 03a8871add95 ("KVM:
+> > nVMX: Expose load IA32_PERF_GLOBAL_CTRL VM-{Entry,Exit} control",
+> > 2019-11-13), so we should advertise them to userspace from
+> > KVM_GET_MSR_FEATURE_INDEX_LIST, as well.
+> > 
+> > Cc: Oliver Upton <oupton@google.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/x86/kvm/vmx/nested.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 4aea7d304beb..4b4ce6a804ff 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -5982,6 +5982,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
+> >   #ifdef CONFIG_X86_64
+> >   		VM_EXIT_HOST_ADDR_SPACE_SIZE |
+> >   #endif
+> > +		VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+> >   		VM_EXIT_LOAD_IA32_PAT | VM_EXIT_SAVE_IA32_PAT;
+> >   	msrs->exit_ctls_high |=
+> >   		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
+> > @@ -6001,6 +6002,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
+> >   #ifdef CONFIG_X86_64
+> >   		VM_ENTRY_IA32E_MODE |
+> >   #endif
+> > +		VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
+> >   		VM_ENTRY_LOAD_IA32_PAT;
+> >   	msrs->entry_ctls_high |=
+> >   		(VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR | VM_ENTRY_LOAD_IA32_EFER);
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
