@@ -2,72 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42A471159C2
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:49:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8EFB1159EC
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:59:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726388AbfLFXtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 18:49:10 -0500
-Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21036 "EHLO
-        sender4-of-o50.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726375AbfLFXtK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 18:49:10 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1575676138; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=AmH8Mzg7pWaYVEzE4knc/JjgZCnz/U9oRW7aaFLkcu4CBSbKEB9IJC96+p2X82+Wb1+iziy34LvGEUGH6fD/0eFLBexvc4HdA9PB227QDtgPgy1J83/Fdz8cy3op6NFMLlIBm9SAdGOzosv40262ZYDj/3xSuajxwFUzQInYVTE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1575676138; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=E1jlx6HZE4rmafsjKWjU2SJkYMh4I37w9SK1XsVquGA=; 
-        b=OA/FACuChlwaat1dUMe8IHWhiYVzhS32kIlPtoRlMjU+LIp2dHDY8GmBSM+8RsiOwYnCXSO7yFlugO9IMweL99ABkkZUl/CqfqeIxhWyGeJLwaQNMqHzmyQYfCNHx8p4nu0sRWMhNGqjR2RVJ/68e8j3+pokhqQc3fCi+h6fDJ0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=patchew.org;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1575676137139446.59853742157395; Fri, 6 Dec 2019 15:48:57 -0800 (PST)
-In-Reply-To: <1575627817-24625-1-git-send-email-catherine.hecx@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH] target/i386: skip kvm_msr_entry_add when kvm_vmx_basic is 0
-Message-ID: <157567613553.744.12283750572800820793@37313f22b938>
+        id S1726410AbfLFX5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 18:57:36 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55584 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726374AbfLFX5g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 18:57:36 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Dec 2019 15:57:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,286,1571727600"; 
+   d="scan'208";a="219530319"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by fmsmga001.fm.intel.com with ESMTP; 06 Dec 2019 15:57:34 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 00/16] KVM: x86: MMU page fault clean-up
+Date:   Fri,  6 Dec 2019 15:57:13 -0800
+Message-Id: <20191206235729.29263-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     catherine.hecx@gmail.com
-Cc:     pbonzini@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
-        pbonzini@redhat.com, catherine.hecx@gmail.com, ehabkost@redhat.com,
-        kvm@vger.kernel.org, rth@twiddle.net
-Date:   Fri, 6 Dec 2019 15:48:57 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc1NjI3ODE3LTI0NjI1LTEt
-Z2l0LXNlbmQtZW1haWwtY2F0aGVyaW5lLmhlY3hAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2Vy
-aWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQg
-YmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHRhcmdldC9pMzg2
-OiBza2lwIGt2bV9tc3JfZW50cnlfYWRkIHdoZW4ga3ZtX3ZteF9iYXNpYyBpcyAwClR5cGU6IHNl
-cmllcwpNZXNzYWdlLWlkOiAxNTc1NjI3ODE3LTI0NjI1LTEtZ2l0LXNlbmQtZW1haWwtY2F0aGVy
-aW5lLmhlY3hAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4NzQ0MWYgdGFyZ2V0L2kzODY6IHNraXAga3ZtX21z
-cl9lbnRyeV9hZGQgd2hlbiBrdm1fdm14X2Jhc2ljIGlzIDAKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM4OiBGSUxFOiB0YXJn
-ZXQvaTM4Ni9rdm0uYzoyNjM3OgorXkkvKiBPbmx5IGFkZCB0aGUgZW50cnkgd2hlbiBob3N0IHN1
-cHBvcnRzIGl0ICovJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNCBsaW5lcyBjaGVj
-a2VkCgpDb21taXQgOTg3NDQxZjc0MjRjICh0YXJnZXQvaTM4Njogc2tpcCBrdm1fbXNyX2VudHJ5
-X2FkZCB3aGVuIGt2bV92bXhfYmFzaWMgaXMgMCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3NTYy
-NzgxNy0yNDYyNS0xLWdpdC1zZW5kLWVtYWlsLWNhdGhlcmluZS5oZWN4QGdtYWlsLmNvbS90ZXN0
-aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
-aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
-ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The original purpose of this series was to call thp_adjust() from
+__direct_map() and FNAME(fetch) to eliminate a page refcounting quirk[*].
+Before doing that, I wanted to clean up the large page handling so that
+the map/fetch funtions weren't being passed multiple booleans that tracked
+the same basic info.  While trying to decipher all the the interactions,
+I stumbled across a handful of fun things:
+
+  - 32-bit KVM w/ TDP is completely broken with respect to 64-bit GPAs due
+    to the page fault handlers and all related flows dropping bits 63:32
+    of the GPA.  As a result, KVM inserts the wrong GPA and the guest hangs
+    because it generates EPT/NPT faults until it's killed.
+
+  - The TDP and non-paging page fault flows are identical except for
+    one-off constraints on guest page size.
+
+  - The !VALID_PAGE(root_hpa) checks in the page fault flows are bogus.
+    They were added a few years ago to "fix" a nVMX bug and are no longer
+    needed now that nVMX is in much better shape.
+
+Patch 1 fixes the 32-bit KVM w/ TDP issue.  More details below.
+
+Patches 2-12 are 99% refactoring to merge TDP and non-paging page fault
+handling, and to do the thp_adjust() move.  These are basically nops from
+a functional perspective.  There are technically functional changes in a
+few patches, but they are very superficial and in theory won't be
+observable in normal usage.
+
+Patches 13-16 add WARNs on the !VALID_PAGE(root_hpa) checks to make it
+clear that root_hpa is expected to be valid when handling page faults,
+e.g. for the longest time I thought KVM relied on the checks in map/fetch
+to correctly handle kvm_mmu_zap_all().
+
+
+32-bit KVM w/ TDP:
+
+I marked this patch for stable because it's obviously a bug fix, but I'm
+entirely not sure we want to backport the fix.  Obviously no userspace VMM
+is actually exposing 64-bit GPAs to its guests, i.e. odds are this won't
+actually fix any real world use cases.  And, the scope of the changes are
+likely going to make backporting a pain.  But, on the other hand, if it's
+not backported then future bug fixes in related code are likely to
+conflict, and it does fix the case where a buggy guest kernel accesses a
+non-existent 64-bit GPA (crashes instead of hanging indefinitely).
+
+I'm also not confident I found all the cases where KVM is truncating the
+GPA.  AFAIK, 32-bit Qemu simply doesn't support 64-bit GPAs.  To confirm
+the bug and verify the fix, I hacked KVM and the guest kernel to generate
+64-bit GPAs when remapping MMIO, which covers a tiny fragment of KVM.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index fa46fbed60013..49a59bcb32117 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5737,7 +5737,7 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
+        vcpu->run->mmio.len = min(8u, vcpu->mmio_fragments[0].len);
+        vcpu->run->mmio.is_write = vcpu->mmio_is_write = ops->write;
+        vcpu->run->exit_reason = KVM_EXIT_MMIO;
+-       vcpu->run->mmio.phys_addr = gpa;
++       vcpu->run->mmio.phys_addr = gpa & 0xffffffffull;
+ 
+        return ops->read_write_exit_mmio(vcpu, gpa, val, bytes);
+ }
+
+
+diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
+index b9c78f3bcd673..e22f254987bea 100644
+--- a/arch/x86/mm/ioremap.c
++++ b/arch/x86/mm/ioremap.c
+@@ -184,7 +184,10 @@ static void __iomem *__ioremap_caller(resource_size_t phys_addr,
+        if (kernel_map_sync_memtype(phys_addr, size, pcm))
+                goto err_free_area;
+ 
+-       if (ioremap_page_range(vaddr, vaddr + size, phys_addr, prot))
++       BUG_ON(!boot_cpu_data.x86_phys_bits);
++
++       if (ioremap_page_range(vaddr, vaddr + size,
++                              phys_addr | BIT_ULL(boot_cpu_data.x86_phys_bits - 1), prot))
+                goto err_free_area;
+ 
+        ret_addr = (void __iomem *) (vaddr + offset);
+
+[*] https://lkml.kernel.org/r/20191126174603.GB22233@linux.intel.com
+
+Sean Christopherson (16):
+  KVM: x86: Use gpa_t for cr2/gpa to fix TDP support on 32-bit KVM
+  KVM: x86/mmu: Move definition of make_mmu_pages_available() up
+  KVM: x86/mmu: Fold nonpaging_map() into nonpaging_page_fault()
+  KVM: x86/mmu: Move nonpaging_page_fault() below try_async_pf()
+  KVM: x86/mmu: Refactor handling of cache consistency with TDP
+  KVM: x86/mmu: Refactor the per-slot level calculation in
+    mapping_level()
+  KVM: x86/mmu: Refactor handling of forced 4k pages in page faults
+  KVM: x86/mmu: Incorporate guest's page level into max level for shadow
+    MMU
+  KVM: x86/mmu: Persist gfn_lpage_is_disallowed() to max_level
+  KVM: x86/mmu: Rename lpage_disallowed to account_disallowed_nx_lpage
+  KVM: x86/mmu: Consolidate tdp_page_fault() and nonpaging_page_fault()
+  KVM: x86/mmu: Move transparent_hugepage_adjust() above __direct_map()
+  KVM: x86/mmu: Move calls to thp_adjust() down a level
+  KVM: x86/mmu: Move root_hpa validity checks to top of page fault
+    handler
+  KVM: x86/mmu: WARN on an invalid root_hpa
+  KVM: x86/mmu: WARN if root_hpa is invalid when handling a page fault
+
+ arch/x86/include/asm/kvm_host.h |   8 +-
+ arch/x86/kvm/mmu/mmu.c          | 438 ++++++++++++++------------------
+ arch/x86/kvm/mmu/paging_tmpl.h  |  58 +++--
+ arch/x86/kvm/mmutrace.h         |  12 +-
+ arch/x86/kvm/x86.c              |  40 ++-
+ arch/x86/kvm/x86.h              |   2 +-
+ include/linux/kvm_host.h        |   6 +-
+ virt/kvm/async_pf.c             |  10 +-
+ 8 files changed, 259 insertions(+), 315 deletions(-)
+
+-- 
+2.24.0
 
