@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 512351159D8
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:58:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C23361159D4
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:57:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbfLFX5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 18:57:55 -0500
-Received: from mga07.intel.com ([134.134.136.100]:55586 "EHLO mga07.intel.com"
+        id S1726720AbfLFX5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 18:57:53 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55584 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726605AbfLFX5m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726608AbfLFX5m (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 Dec 2019 18:57:42 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,7 +17,7 @@ Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Dec 2019 15:57:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,286,1571727600"; 
-   d="scan'208";a="219530368"
+   d="scan'208";a="219530371"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga001.fm.intel.com with ESMTP; 06 Dec 2019 15:57:40 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -29,9 +29,9 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 14/16] KVM: x86/mmu: Move root_hpa validity checks to top of page fault handler
-Date:   Fri,  6 Dec 2019 15:57:27 -0800
-Message-Id: <20191206235729.29263-15-sean.j.christopherson@intel.com>
+Subject: [PATCH 15/16] KVM: x86/mmu: WARN on an invalid root_hpa
+Date:   Fri,  6 Dec 2019 15:57:28 -0800
+Message-Id: <20191206235729.29263-16-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191206235729.29263-1-sean.j.christopherson@intel.com>
 References: <20191206235729.29263-1-sean.j.christopherson@intel.com>
@@ -42,91 +42,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a check on root_hpa at the beginning of the page fault handler to
-consolidate several checks on root_hpa that are scattered throughout the
-page fault code.  This is a preparatory step towards eventually removing
-such checks altogether, or at the very least WARNing if an invalid root
-is encountered.  Remove only the checks that can be easily audited to
-confirm that root_hpa cannot be invalidated between their current
-location and the new check in kvm_mmu_page_fault(), and aren't currently
-protected by mmu_lock, i.e. keep the checks in __direct_map() and
-FNAME(fetch) for the time being.
+WARN on the existing invalid root_hpa checks in __direct_map() and
+FNAME(fetch).  The "legitimate" path that invalidated root_hpa in the
+middle of a page fault is long since gone, i.e. it should no longer be
+impossible to invalidate in the middle of a page fault[*].
 
-The root_hpa checks that are consolidate were all added by commit
-
-  37f6a4e237303 ("KVM: x86: handle invalid root_hpa everywhere")
-
-which was a follow up to a bug fix for __direct_map(), commit
+The root_hpa checks were added by two related commits
 
   989c6b34f6a94 ("KVM: MMU: handle invalid root_hpa at __direct_map")
+  37f6a4e237303 ("KVM: x86: handle invalid root_hpa everywhere")
 
-At the time, nested VMX had, in hindsight, crazy handling of nested
-interrupts and would trigger a nested VM-Exit in ->interrupt_allowed(),
-and thus unexpectedly reset the MMU in flows such as can_do_async_pf().
+to fix a bug where nested_vmx_vmexit() could be called *in the middle*
+of a page fault.  At the time, vmx_interrupt_allowed(), which was and
+still is used by kvm_can_do_async_pf() via ->interrupt_allowed(),
+directly invoked nested_vmx_vmexit() to switch from L2 to L1 to emulate
+a VM-Exit on a pending interrupt.  Emulating the nested VM-Exit resulted
+in root_hpa being invalidated by kvm_mmu_reset_context() without
+explicitly terminating the page fault.
 
-Now that the wonky nested VM-Exit behavior is gone, the root_hpa checks
-are bogus and confusing, e.g. it's not at all obvious what they actually
-protect against, and at first glance they appear to be broken since many
-of them run without holding mmu_lock.
+Now that root_hpa is checked for validity by kvm_mmu_page_fault(), WARN
+on an invalid root_hpa to detect any flows that reset the MMU while
+handling a page fault.  The broken vmx_interrupt_allowed() behavior has
+long since been fixed and resetting the MMU during a page fault should
+not be considered legal behavior.
+
+[*] It's actually technically possible in FNAME(page_fault)() because it
+    calls inject_page_fault() when the guest translation is invalid, but
+    in that case the page fault handling is immediately terminated.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         | 2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 904fb466dd24..5e8666d25053 100644
+index 5e8666d25053..88fd1022731f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3561,9 +3561,6 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, int level,
- 	u64 spte = 0ull;
- 	uint retry_count = 0;
+@@ -3387,7 +3387,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
+ 	gfn_t gfn = gpa >> PAGE_SHIFT;
+ 	gfn_t base_gfn = gfn;
  
 -	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
--		return false;
--
- 	if (!page_fault_can_be_fast(error_code))
- 		return false;
++	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
+ 		return RET_PF_RETRY;
  
-@@ -4007,9 +4004,6 @@ walk_shadow_page_get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
- 	int root, leaf;
- 	bool reserved = false;
- 
--	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
--		goto exit;
--
- 	walk_shadow_page_lockless_begin(vcpu);
- 
- 	for (shadow_walk_init(&iterator, vcpu, addr),
-@@ -4039,7 +4033,7 @@ walk_shadow_page_get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
- 			root--;
- 		}
- 	}
--exit:
-+
- 	*sptep = spte;
- 	return reserved;
- }
-@@ -4103,9 +4097,6 @@ static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
- 	struct kvm_shadow_walk_iterator iterator;
- 	u64 spte;
+ 	if (likely(max_level > PT_PAGE_TABLE_LEVEL))
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 3b0ba2a77e28..b53bed3c901c 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -637,7 +637,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gpa_t addr,
+ 	if (FNAME(gpte_changed)(vcpu, gw, top_level))
+ 		goto out_gpte_changed;
  
 -	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
--		return;
--
- 	walk_shadow_page_lockless_begin(vcpu);
- 	for_each_shadow_entry_lockless(vcpu, addr, iterator, spte) {
- 		clear_sp_write_flooding_count(iterator.sptep);
-@@ -5468,6 +5459,9 @@ int kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 error_code,
- 	int r, emulation_type = 0;
- 	bool direct = vcpu->arch.mmu->direct_map;
++	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root_hpa)))
+ 		goto out_gpte_changed;
  
-+	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
-+		return RET_PF_RETRY;
-+
- 	/* With shadow page tables, fault_address contains a GVA or nGPA.  */
- 	if (vcpu->arch.mmu->direct_map) {
- 		vcpu->arch.gpa_available = true;
+ 	for (shadow_walk_init(&it, vcpu, addr);
 -- 
 2.24.0
 
