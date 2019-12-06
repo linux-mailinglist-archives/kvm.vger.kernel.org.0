@@ -2,224 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23220115557
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 17:29:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B339A115669
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 18:27:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbfLFQ3u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 11:29:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49394 "EHLO
+        id S1726315AbfLFR1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 12:27:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54715 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726284AbfLFQ3u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 11:29:50 -0500
+        with ESMTP id S1726287AbfLFR1k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 12:27:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575649788;
+        s=mimecast20190719; t=1575653258;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=nIc3QmX5OsicCoX5Sghs82Aa7hli4Q3q0hp16ZiCmqo=;
-        b=WiAdFSZzZCRmOf9x2muoOcJb9HqSR+8OhXzM5awewGrO15lnBGmovNTz9co7v9YMssrjMM
-        JWvknq4Zo98fGHrpGexfSv7W0qgzt6e36AU2V68tQzwVLCOH5Mrfasbv37XJ8udXNZHQIh
-        X2YPVqFsPW4RwA590F2Artkpff6Hrg8=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aakNe6ZpWKcgBnsHkUK2g0Vs/5LZCUeTONSVZshyz7w=;
+        b=g/cX5IFRjINdqnxG1fMspMs+PpzWmjtELZ8nBFyg8kMZz/Sx+bvoPJIL7qMEXGtJrhgidB
+        WKjACNnmknIXE3GAgSzNtTaRRGJOolLxvo91HSFowz6udq3s1af2r3ohGdoCtYsz+xz9ZV
+        SRPQLMoEc9wPeoFRvYEvhG/riBV5XOg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-Pg5luO2KOFmotTd0Ri3bmQ-1; Fri, 06 Dec 2019 11:29:45 -0500
+ us-mta-268-mx1TiMz0PQSCxMj6L9ao7A-1; Fri, 06 Dec 2019 12:27:35 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDACE107ACC4;
-        Fri,  6 Dec 2019 16:29:44 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-205.ams2.redhat.com [10.36.116.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 911B360BF4;
-        Fri,  6 Dec 2019 16:29:40 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 2/9] s390x: Define the PSW bits
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
- <1575649588-6127-3-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <4d034f27-0449-08ea-5b45-be91a788bd6d@redhat.com>
-Date:   Fri, 6 Dec 2019 17:29:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBC14800597;
+        Fri,  6 Dec 2019 17:27:33 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C6426CE40;
+        Fri,  6 Dec 2019 17:27:28 +0000 (UTC)
+From:   Eric Auger <eric.auger@redhat.com>
+To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc:     drjones@redhat.com, andrew.murray@arm.com, andre.przywara@arm.com,
+        peter.maydell@linaro.org
+Subject: [kvm-unit-tests RFC 00/10] KVM: arm64: PMUv3 Event Counter Tests
+Date:   Fri,  6 Dec 2019 18:27:14 +0100
+Message-Id: <20191206172724.947-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1575649588-6127-3-git-send-email-pmorel@linux.ibm.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Pg5luO2KOFmotTd0Ri3bmQ-1
+X-MC-Unique: mx1TiMz0PQSCxMj6L9ao7A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/12/2019 17.26, Pierre Morel wrote:
-> Let's define the PSW bits explicitly, it will clarify their
-> usage.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/asm/arch_def.h | 127 +++++++++++++++++++++------------------
->  s390x/cstart64.S         |  13 ++--
->  2 files changed, 74 insertions(+), 66 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index cf6e1ca..1293640 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -10,20 +10,81 @@
->  #ifndef _ASM_S390X_ARCH_DEF_H_
->  #define _ASM_S390X_ARCH_DEF_H_
->  
-> -struct psw {
-> -	uint64_t	mask;
-> -	uint64_t	addr;
-> -};
-> -
->  #define PSW_MASK_EXT			0x0100000000000000UL
->  #define PSW_MASK_DAT			0x0400000000000000UL
->  #define PSW_MASK_PSTATE			0x0001000000000000UL
-> +#define PSW_MASK_IO			0x0200000000000000
-> +#define PSW_MASK_EA			0x0000000100000000
-> +#define PSW_MASK_BA			0x0000000080000000
-> +
-> +#define PSW_EXCEPTION_MASK (PSW_MASK_EA|PSW_MASK_BA)
->  
->  #define CR0_EXTM_SCLP			0X0000000000000200UL
->  #define CR0_EXTM_EXTC			0X0000000000002000UL
->  #define CR0_EXTM_EMGC			0X0000000000004000UL
->  #define CR0_EXTM_MASK			0X0000000000006200UL
->  
-> +#define PGM_INT_CODE_OPERATION			0x01
-> +#define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
-> +#define PGM_INT_CODE_EXECUTE			0x03
-> +#define PGM_INT_CODE_PROTECTION			0x04
-> +#define PGM_INT_CODE_ADDRESSING			0x05
-> +#define PGM_INT_CODE_SPECIFICATION		0x06
-> +#define PGM_INT_CODE_DATA			0x07
-> +#define PGM_INT_CODE_FIXED_POINT_OVERFLOW	0x08
-> +#define PGM_INT_CODE_FIXED_POINT_DIVIDE		0x09
-> +#define PGM_INT_CODE_DECIMAL_OVERFLOW		0x0a
-> +#define PGM_INT_CODE_DECIMAL_DIVIDE		0x0b
-> +#define PGM_INT_CODE_HFP_EXPONENT_OVERFLOW	0x0c
-> +#define PGM_INT_CODE_HFP_EXPONENT_UNDERFLOW	0x0d
-> +#define PGM_INT_CODE_HFP_SIGNIFICANCE		0x0e
-> +#define PGM_INT_CODE_HFP_DIVIDE			0x0f
-> +#define PGM_INT_CODE_SEGMENT_TRANSLATION	0x10
-> +#define PGM_INT_CODE_PAGE_TRANSLATION		0x11
-> +#define PGM_INT_CODE_TRANSLATION_SPEC		0x12
-> +#define PGM_INT_CODE_SPECIAL_OPERATION		0x13
-> +#define PGM_INT_CODE_OPERAND			0x15
-> +#define PGM_INT_CODE_TRACE_TABLE		0x16
-> +#define PGM_INT_CODE_VECTOR_PROCESSING		0x1b
-> +#define PGM_INT_CODE_SPACE_SWITCH_EVENT		0x1c
-> +#define PGM_INT_CODE_HFP_SQUARE_ROOT		0x1d
-> +#define PGM_INT_CODE_PC_TRANSLATION_SPEC	0x1f
-> +#define PGM_INT_CODE_AFX_TRANSLATION		0x20
-> +#define PGM_INT_CODE_ASX_TRANSLATION		0x21
-> +#define PGM_INT_CODE_LX_TRANSLATION		0x22
-> +#define PGM_INT_CODE_EX_TRANSLATION		0x23
-> +#define PGM_INT_CODE_PRIMARY_AUTHORITY		0x24
-> +#define PGM_INT_CODE_SECONDARY_AUTHORITY	0x25
-> +#define PGM_INT_CODE_LFX_TRANSLATION		0x26
-> +#define PGM_INT_CODE_LSX_TRANSLATION		0x27
-> +#define PGM_INT_CODE_ALET_SPECIFICATION		0x28
-> +#define PGM_INT_CODE_ALEN_TRANSLATION		0x29
-> +#define PGM_INT_CODE_ALE_SEQUENCE		0x2a
-> +#define PGM_INT_CODE_ASTE_VALIDITY		0x2b
-> +#define PGM_INT_CODE_ASTE_SEQUENCE		0x2c
-> +#define PGM_INT_CODE_EXTENDED_AUTHORITY		0x2d
-> +#define PGM_INT_CODE_LSTE_SEQUENCE		0x2e
-> +#define PGM_INT_CODE_ASTE_INSTANCE		0x2f
-> +#define PGM_INT_CODE_STACK_FULL			0x30
-> +#define PGM_INT_CODE_STACK_EMPTY		0x31
-> +#define PGM_INT_CODE_STACK_SPECIFICATION	0x32
-> +#define PGM_INT_CODE_STACK_TYPE			0x33
-> +#define PGM_INT_CODE_STACK_OPERATION		0x34
-> +#define PGM_INT_CODE_ASCE_TYPE			0x38
-> +#define PGM_INT_CODE_REGION_FIRST_TRANS		0x39
-> +#define PGM_INT_CODE_REGION_SECOND_TRANS	0x3a
-> +#define PGM_INT_CODE_REGION_THIRD_TRANS		0x3b
-> +#define PGM_INT_CODE_MONITOR_EVENT		0x40
-> +#define PGM_INT_CODE_PER			0x80
-> +#define PGM_INT_CODE_CRYPTO_OPERATION		0x119
-> +#define PGM_INT_CODE_TX_ABORTED_EVENT		0x200
-> +
-> +#ifndef __ASSEMBLER__
-> +struct psw {
-> +	uint64_t	mask;
-> +	uint64_t	addr;
-> +};
-> +
->  struct lowcore {
->  	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
->  	uint32_t	ext_int_param;			/* 0x0080 */
-> @@ -101,61 +162,6 @@ struct lowcore {
->  } __attribute__ ((__packed__));
->  _Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
->  
-> -#define PGM_INT_CODE_OPERATION			0x01
-> -#define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
-> -#define PGM_INT_CODE_EXECUTE			0x03
-> -#define PGM_INT_CODE_PROTECTION			0x04
-> -#define PGM_INT_CODE_ADDRESSING			0x05
-> -#define PGM_INT_CODE_SPECIFICATION		0x06
-> -#define PGM_INT_CODE_DATA			0x07
-> -#define PGM_INT_CODE_FIXED_POINT_OVERFLOW	0x08
-> -#define PGM_INT_CODE_FIXED_POINT_DIVIDE		0x09
-> -#define PGM_INT_CODE_DECIMAL_OVERFLOW		0x0a
-> -#define PGM_INT_CODE_DECIMAL_DIVIDE		0x0b
-> -#define PGM_INT_CODE_HFP_EXPONENT_OVERFLOW	0x0c
-> -#define PGM_INT_CODE_HFP_EXPONENT_UNDERFLOW	0x0d
-> -#define PGM_INT_CODE_HFP_SIGNIFICANCE		0x0e
-> -#define PGM_INT_CODE_HFP_DIVIDE			0x0f
-> -#define PGM_INT_CODE_SEGMENT_TRANSLATION	0x10
-> -#define PGM_INT_CODE_PAGE_TRANSLATION		0x11
-> -#define PGM_INT_CODE_TRANSLATION_SPEC		0x12
-> -#define PGM_INT_CODE_SPECIAL_OPERATION		0x13
-> -#define PGM_INT_CODE_OPERAND			0x15
-> -#define PGM_INT_CODE_TRACE_TABLE		0x16
-> -#define PGM_INT_CODE_VECTOR_PROCESSING		0x1b
-> -#define PGM_INT_CODE_SPACE_SWITCH_EVENT		0x1c
-> -#define PGM_INT_CODE_HFP_SQUARE_ROOT		0x1d
-> -#define PGM_INT_CODE_PC_TRANSLATION_SPEC	0x1f
-> -#define PGM_INT_CODE_AFX_TRANSLATION		0x20
-> -#define PGM_INT_CODE_ASX_TRANSLATION		0x21
-> -#define PGM_INT_CODE_LX_TRANSLATION		0x22
-> -#define PGM_INT_CODE_EX_TRANSLATION		0x23
-> -#define PGM_INT_CODE_PRIMARY_AUTHORITY		0x24
-> -#define PGM_INT_CODE_SECONDARY_AUTHORITY	0x25
-> -#define PGM_INT_CODE_LFX_TRANSLATION		0x26
-> -#define PGM_INT_CODE_LSX_TRANSLATION		0x27
-> -#define PGM_INT_CODE_ALET_SPECIFICATION		0x28
-> -#define PGM_INT_CODE_ALEN_TRANSLATION		0x29
-> -#define PGM_INT_CODE_ALE_SEQUENCE		0x2a
-> -#define PGM_INT_CODE_ASTE_VALIDITY		0x2b
-> -#define PGM_INT_CODE_ASTE_SEQUENCE		0x2c
-> -#define PGM_INT_CODE_EXTENDED_AUTHORITY		0x2d
-> -#define PGM_INT_CODE_LSTE_SEQUENCE		0x2e
-> -#define PGM_INT_CODE_ASTE_INSTANCE		0x2f
-> -#define PGM_INT_CODE_STACK_FULL			0x30
-> -#define PGM_INT_CODE_STACK_EMPTY		0x31
-> -#define PGM_INT_CODE_STACK_SPECIFICATION	0x32
-> -#define PGM_INT_CODE_STACK_TYPE			0x33
-> -#define PGM_INT_CODE_STACK_OPERATION		0x34
-> -#define PGM_INT_CODE_ASCE_TYPE			0x38
-> -#define PGM_INT_CODE_REGION_FIRST_TRANS		0x39
-> -#define PGM_INT_CODE_REGION_SECOND_TRANS	0x3a
-> -#define PGM_INT_CODE_REGION_THIRD_TRANS		0x3b
-> -#define PGM_INT_CODE_MONITOR_EVENT		0x40
-> -#define PGM_INT_CODE_PER			0x80
-> -#define PGM_INT_CODE_CRYPTO_OPERATION		0x119
-> -#define PGM_INT_CODE_TX_ABORTED_EVENT		0x200
+This series implements tests exercising the PMUv3 event counters.
+It tests both the 32-bit and 64-bit versions. Overflow interrupts
+also are checked. Those tests only are written for arm64.
 
-This patch definitely does more than you've mentioned in the patch
-description. Please avoid the movement of the PGM definitions here and
-move that into a separate patch (if it is really necessary).
+It allowed to reveal some issues related to SW_INCR implementation
+(esp. related to 64-bit implementation), some problems related to
+32-bit <-> 64-bit transitions and consistency of enabled states
+of odd and event counters.
 
- Thomas
+Overflow interrupt testing relies of one patch from Andre
+("arm: gic: Provide per-IRQ helper functions") to enable the
+PPI 23, coming from "arm: gic: Test SPIs and interrupt groups"
+(https://patchwork.kernel.org/cover/11234975/). Drew kindly
+provided "arm64: Provide read/write_sysreg_s".
+
+All PMU tests can be launched with:
+./run_tests.sh -g pmu
+Tests also can be launched individually. For example:
+./arm-run arm/pmu.flat -append 'chained-sw-incr'
+
+With KVM:
+- chain-promotion and chained-sw-incr are known to be failing.
+- Problems were reported upstream.
+With TCG:
+- pmu-event-introspection is failing due to missing required events
+  (we may remove this from TCG actually)
+- chained-sw-incr also fails. I haven't investigated yet.
+
+Andre Przywara (1):
+  arm: gic: Provide per-IRQ helper functions
+
+Andrew Jones (1):
+  arm64: Provide read/write_sysreg_s
+
+Eric Auger (8):
+  pmu: Let pmu tests take a sub-test parameter
+  pmu: Add a pmu struct
+  pmu: Check Required Event Support
+  pmu: Basic event counter Tests
+  pmu: Test chained counter
+  arm: pmu: test 32-bit <-> 64-bit transitions
+  arm/arm64: gic: Introduce setup_irq() helper
+  pmu: Test overflow interrupts
+
+ arm/gic.c              |  24 +-
+ arm/pmu.c              | 754 ++++++++++++++++++++++++++++++++++++++++-
+ arm/unittests.cfg      |  55 ++-
+ lib/arm/asm/gic-v3.h   |   2 +
+ lib/arm/asm/gic.h      |  12 +
+ lib/arm/gic.c          | 101 ++++++
+ lib/arm64/asm/sysreg.h |  11 +
+ 7 files changed, 922 insertions(+), 37 deletions(-)
+
+--=20
+2.20.1
 
