@@ -2,143 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80D54115416
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 16:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBD8011553D
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 17:26:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726261AbfLFPUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 10:20:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23670 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726256AbfLFPUq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 6 Dec 2019 10:20:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575645646;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pfl977vnjhBWvFbZf/0f4eWRm+7D+y6Nr6bdSL6ElAo=;
-        b=FVutT6I8snFSZRnzOAVnkeqkVf6TF203ltNXybo8Ml0bFZ8iEA1yl/1pBGtbOyRlidA7Li
-        rYRK2XNRVCdJhQ5f4od2GSyc1cW3b+82A+VYx57y6UWsyS/InolHxizUbHM3PBZc+H3oGj
-        hYSIm+wk33HEsFy2gHNA60+du6rguIU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-6Lh95lYzNf-q7nqL4q1hig-1; Fri, 06 Dec 2019 10:20:45 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AB1A800D4C;
-        Fri,  6 Dec 2019 15:20:43 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4A3960135;
-        Fri,  6 Dec 2019 15:20:39 +0000 (UTC)
-Date:   Fri, 6 Dec 2019 08:20:38 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [RFC PATCH 4/9] vfio-pci: register default
- dynamic-trap-bar-info region
-Message-ID: <20191206082038.2b1078d9@x1.home>
-In-Reply-To: <20191206060407.GF31791@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
-        <20191205032650.29794-1-yan.y.zhao@intel.com>
-        <20191205165530.1f29fe85@x1.home>
-        <20191206060407.GF31791@joy-OptiPlex-7040>
-Organization: Red Hat
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 6Lh95lYzNf-q7nqL4q1hig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1726442AbfLFQ0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 11:26:38 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34376 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726352AbfLFQ0h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Dec 2019 11:26:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB6GESlB004824
+        for <kvm@vger.kernel.org>; Fri, 6 Dec 2019 11:26:36 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wq8ujnq4e-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 11:26:35 -0500
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Fri, 6 Dec 2019 16:26:32 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 6 Dec 2019 16:26:30 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB6GQTQF32309716
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 Dec 2019 16:26:29 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B385A52051;
+        Fri,  6 Dec 2019 16:26:29 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.175.63])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5A29F5204E;
+        Fri,  6 Dec 2019 16:26:29 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/9] s390x: Testing the Channel Subsystem I/O
+Date:   Fri,  6 Dec 2019 17:26:19 +0100
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+x-cbid: 19120616-0028-0000-0000-000003C60CC6
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120616-0029-0000-0000-00002489331A
+Message-Id: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-06_05:2019-12-05,2019-12-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 mlxlogscore=722 bulkscore=0
+ impostorscore=0 adultscore=0 clxscore=1015 suspectscore=1 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1912060136
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 6 Dec 2019 01:04:07 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+Goal of the series is to have a framwork to test Channel-Subsystem I/O with
+QEMU/KVM.
+  
+To be able to support interrupt for CSS I/O and for SCLP we need to modify
+the interrupt framework to allow re-entrant interruptions.
+  
+We add a registration for IRQ callbacks to the test programm to define its own
+interrupt handler. We need to do special work under interrupt like acknoledging
+the interrupt.
+  
+Being working on PSW bits to allow I/O interrupt, we define new PSW bits
+in arch_def.h and use __ASSEMBLER__ define to be able to include this header
+in an assembler source file.
+ 
+This series presents four major tests:
+- Enumeration:
+	The CSS is enumerated using the STSCH instruction recursively on all
+	potentially existing channels.
+	Keeping the first channel found as a reference for future use.
+	Checks STSCH
 
-> On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:
-> > On Wed,  4 Dec 2019 22:26:50 -0500
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > Dynamic trap bar info region is a channel for QEMU and vendor driver to
-> > > communicate dynamic trap info. It is of type
-> > > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
-> > > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
-> > > 
-> > > This region has two fields: dt_fd and trap.
-> > > When QEMU detects a device regions of this type, it will create an
-> > > eventfd and write its eventfd id to dt_fd field.
-> > > When vendor drivre signals this eventfd, QEMU reads trap field of this
-> > > info region.
-> > > - If trap is true, QEMU would search the device's PCI BAR
-> > > regions and disable all the sparse mmaped subregions (if the sparse
-> > > mmaped subregion is disablable).
-> > > - If trap is false, QEMU would re-enable those subregions.
-> > > 
-> > > A typical usage is
-> > > 1. vendor driver first cuts its bar 0 into several sections, all in a
-> > > sparse mmap array. So initally, all its bar 0 are passthroughed.
-> > > 2. vendor driver specifys part of bar 0 sections to be disablable.
-> > > 3. on migration starts, vendor driver signals dt_fd and set trap to true
-> > > to notify QEMU disabling the bar 0 sections of disablable flags on.
-> > > 4. QEMU disables those bar 0 section and hence let vendor driver be able
-> > > to trap access of bar 0 registers and make dirty page tracking possible.
-> > > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
-> > > QEMU reads trap field of this info region which is false and QEMU
-> > > re-passthrough the whole bar 0 region.
-> > > 
-> > > Vendor driver specifies whether it supports dynamic-trap-bar-info region
-> > > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
-> > > vfio_pci_mediate_ops->open().
-> > > 
-> > > If vfio-pci detects this cap, it will create a default
-> > > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
-> > > and region->ops=null.
-> > > Vvendor driver should override this region's len, flags, rw, mmap in its
-> > > vfio_pci_mediate_ops.  
-> > 
-> > TBH, I don't like this interface at all.  Userspace doesn't pass data
-> > to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
-> > configuring user signaling with eventfds.  I think we only need to
-> > define an IRQ type that tells the user to re-evaluate the sparse mmap
-> > information for a region.  The user would enumerate the device IRQs via
-> > GET_IRQ_INFO, find one of this type where the IRQ info would also
-> > indicate which region(s) should be re-evaluated on signaling.  The user
-> > would enable that signaling via SET_IRQS and simply re-evaluate the  
-> ok. I'll try to switch to this way. Thanks for this suggestion.
-> 
-> > sparse mmap capability for the associated regions when signaled.  
-> 
-> Do you like the "disablable" flag of sparse mmap ?
-> I think it's a lightweight way for user to switch mmap state of a whole region,
-> otherwise going through a complete flow of GET_REGION_INFO and re-setup
-> region might be too heavy.
+- Enable:
+	If the enumeration succeeded the tests enables the reference
+	channel with MSCH and verifies with STSCH that the channel is
+	effectively enabled
+	Checks MSCH
 
-No, I don't like the disable-able flag.  At what frequency do we expect
-regions to change?  It seems like we'd only change when switching into
-and out of the _SAVING state, which is rare.  It seems easy for
-userspace, at least QEMU, to drop the entire mmap configuration and
-re-read it.  Another concern here is how do we synchronize the event?
-Are we assuming that this event would occur when a user switch to
-_SAVING mode on the device?  That operation is synchronous, the device
-must be in saving mode after the write to device state completes, but
-it seems like this might be trying to add an asynchronous dependency.
-Will the write to device_state only complete once the user handles the
-eventfd?  How would the kernel know when the mmap re-evaluation is
-complete.  It seems like there are gaps here that the vendor driver
-could miss traps required for migration because the user hasn't
-completed the mmap transition yet.  Thanks,
+- Sense:
+	If the channel is enabled this test sends a SENSE_ID command
+	to the reference channel, analysing the answer and expecting
+	the Control unit type being 0xc0ca
+	Checks SSCH(READ) and IO-IRQ
 
-Alex
+- ping-pong:
+	If the reference channel leads to the PONG device (0xc0ca),
+	the test exchanges a string containing a 9 digit number with
+	the PONG device and expecting this number to be incremented
+	by the PONG device.
+	Checks SSCH(WRITE)
+
+
+Pierre Morel (9):
+  s390x: saving regs for interrupts
+  s390x: Define the PSW bits
+  s390: interrupt registration
+  s390x: export the clock get_clock_ms() utility
+  s390x: Library resources for CSS tests
+  s390x: css: stsch, enumeration test
+  s390x: css: msch, enable test
+  s390x: css: ssch/tsch with sense and interrupt
+  s390x: css: ping pong
+
+ lib/s390x/asm/arch_def.h | 127 ++++++++-------
+ lib/s390x/asm/time.h     |  27 ++++
+ lib/s390x/css.h          | 273 +++++++++++++++++++++++++++++++
+ lib/s390x/css_dump.c     | 156 ++++++++++++++++++
+ lib/s390x/interrupt.c    |  23 ++-
+ lib/s390x/interrupt.h    |   7 +
+ s390x/Makefile           |   2 +
+ s390x/css.c              | 335 +++++++++++++++++++++++++++++++++++++++
+ s390x/cstart64.S         |  38 ++++-
+ s390x/intercept.c        |  11 +-
+ s390x/unittests.cfg      |   4 +
+ 11 files changed, 924 insertions(+), 79 deletions(-)
+ create mode 100644 lib/s390x/asm/time.h
+ create mode 100644 lib/s390x/css.h
+ create mode 100644 lib/s390x/css_dump.c
+ create mode 100644 lib/s390x/interrupt.h
+ create mode 100644 s390x/css.c
+
+-- 
+2.17.0
+
+Changelog:
+from v2 to v3:
+- Rework spelling
+  (Connie)
+- More descriptions
+  (Connie)
+- use __ASSEMBLER__ preprocessing to keep
+  bits definitions and C structures in the same file
+  (David)
+- rename the new file clock.h as time.h
+  (Janosch, David?)
+- use registration for the IO interruption
+  (David, Thomas)
+- test the SCHIB to verify it has really be modified
+  (Connie)
+- Lot of simplifications in the tests
+  (Connie)
+
+from v1 to v2:
+- saving floating point registers (David, Janosh)
+- suppress unused PSW bits defintions (Janosh)
+- added Thomas reviewed-by
+- style and comments modifications (Connie, Janosh)
+- moved get_clock_ms() into headers and use it (Thomas)
+- separate header and library utility from tests
+- Suppress traces, separate tests, make better usage of reports
 
