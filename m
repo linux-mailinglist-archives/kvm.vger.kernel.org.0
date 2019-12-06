@@ -2,241 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 227E41159C1
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:46:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42A471159C2
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 00:49:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbfLFXq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 18:46:56 -0500
-Received: from mail-ua1-f74.google.com ([209.85.222.74]:37702 "EHLO
-        mail-ua1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726375AbfLFXq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 18:46:56 -0500
-Received: by mail-ua1-f74.google.com with SMTP id q23so2765711uar.4
-        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 15:46:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=Omb2N8rapJnlYgPKGBZO4Ry7yz4/k07W4Hzsyqy3ZaM=;
-        b=lHwyLBJwhrr4gPxzXyzMccQQw9vsFkcOnXAogBbnAVAQm9rW4CNQWvuETiJ4xlYMoU
-         WZ4aGisOTMrQQDFodmhpm5l8qo3f6pIfGKaGrJlzptnYfkVvS/wVsLbsYZRR+/9+8NuS
-         /g816Vzc15F7t/Quu2dwtFT/2SumwOYT3l8JGCtMG6TX4qolxvEqH7EUijJa6E2YOtpt
-         0GWNgTIvZo00T1RPb4ewCcOpUUtABiIZNN8iaDWoPBU6FwT7a2OIZ4LvYvLtXcg2q8c7
-         uGZK/RcJNeCZJR1JDtKQjHZHRATmaTVZGnWs75jHdXNjMU9nANMvlSuqUR6YDJ1pABpT
-         l+sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Omb2N8rapJnlYgPKGBZO4Ry7yz4/k07W4Hzsyqy3ZaM=;
-        b=tnD2ovJtVWgIniW4pEvW4uXtWc8Fviwi5JkUEn4yrgnCSP5bjLtaCwIAhsRf4RSpx1
-         XqyqUJ81K2LEEZBA/D+oCsLPlu2JE/nSGS3lNHWByaKKfquXgoyQPZ5EfXBziAoqwY05
-         at8bxE7+57M0dBjtogKXyLdXc0w+Xm9M/0wXI6mnsyyBfEsbKhDyrZRYQ405qnZK9rRB
-         RXeYKwdiWHPfvkOBzTD+ZX2BPK0OjoLbCsSWsk7ItPYTIVQFU3dZ3nG8pjKUekXsC+ST
-         40sadzrm7k0JbzJwUuqyaUByYgLdA4/F3hcAyikGvwJ2MrYn6ToS56Ntp2UclfMFUUn0
-         C9Aw==
-X-Gm-Message-State: APjAAAX6zQz/wiN1fo3vHZS5shvZYy4BO8nQEnW/F+dIO7pPPci2mheo
-        a9G7relmUUhZzC6NkJgI3oSAMpv6Ok4o3kwwqxF4vF8DQ9ST+fR4jibUxYZNYudq/s0xIrYfZcy
-        D/XY6jVAyYt+so/2edNwsTpqmfIg8CnCvz345t0cZPgO4TGf+aZuklhBpePThLRA=
-X-Google-Smtp-Source: APXvYqyt2hiQ+CIvgYbjyO/iv0e6k7ndZqFly+crPeXSRzXTyzzO22OdhzyPtLQG4hkjZBEpsrjTDiL+XUqaIQ==
-X-Received: by 2002:a9f:3e84:: with SMTP id x4mr14843414uai.83.1575676015004;
- Fri, 06 Dec 2019 15:46:55 -0800 (PST)
-Date:   Fri,  6 Dec 2019 15:46:37 -0800
-In-Reply-To: <20191206234637.237698-1-jmattson@google.com>
-Message-Id: <20191206234637.237698-3-jmattson@google.com>
-Mime-Version: 1.0
-References: <20191206234637.237698-1-jmattson@google.com>
-X-Mailer: git-send-email 2.24.0.393.g34dc348eaf-goog
-Subject: [PATCH v3 3/3] kvm: nVMX: Aesthetic cleanup of handle_vmread and handle_vmwrite
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jon Cargille <jcargill@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726388AbfLFXtK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 18:49:10 -0500
+Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21036 "EHLO
+        sender4-of-o50.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726375AbfLFXtK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 18:49:10 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575676138; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=AmH8Mzg7pWaYVEzE4knc/JjgZCnz/U9oRW7aaFLkcu4CBSbKEB9IJC96+p2X82+Wb1+iziy34LvGEUGH6fD/0eFLBexvc4HdA9PB227QDtgPgy1J83/Fdz8cy3op6NFMLlIBm9SAdGOzosv40262ZYDj/3xSuajxwFUzQInYVTE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1575676138; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=E1jlx6HZE4rmafsjKWjU2SJkYMh4I37w9SK1XsVquGA=; 
+        b=OA/FACuChlwaat1dUMe8IHWhiYVzhS32kIlPtoRlMjU+LIp2dHDY8GmBSM+8RsiOwYnCXSO7yFlugO9IMweL99ABkkZUl/CqfqeIxhWyGeJLwaQNMqHzmyQYfCNHx8p4nu0sRWMhNGqjR2RVJ/68e8j3+pokhqQc3fCi+h6fDJ0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=patchew.org;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1575676137139446.59853742157395; Fri, 6 Dec 2019 15:48:57 -0800 (PST)
+In-Reply-To: <1575627817-24625-1-git-send-email-catherine.hecx@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Subject: Re: [PATCH] target/i386: skip kvm_msr_entry_add when kvm_vmx_basic is 0
+Message-ID: <157567613553.744.12283750572800820793@37313f22b938>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     catherine.hecx@gmail.com
+Cc:     pbonzini@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, catherine.hecx@gmail.com, ehabkost@redhat.com,
+        kvm@vger.kernel.org, rth@twiddle.net
+Date:   Fri, 6 Dec 2019 15:48:57 -0800 (PST)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Apply reverse fir tree declaration order, shorten some variable names
-to avoid line wrap, reformat a block comment, delete an extra blank
-line, and use BIT(10) instead of (1u << 10).
-
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Jon Cargille <jcargill@google.com>
----
-v1 -> v2:
- * New commit in v2.
-v2 -> v3:
- * Shortened some variable names instead of wrapping long lines.
- * Changed BIT_ULL to BIT.
-
- arch/x86/kvm/vmx/nested.c | 70 +++++++++++++++++++--------------------
- 1 file changed, 34 insertions(+), 36 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 94ec089d6d1a..336fe366a25f 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4751,17 +4751,17 @@ static int handle_vmresume(struct kvm_vcpu *vcpu)
- 
- static int handle_vmread(struct kvm_vcpu *vcpu)
- {
--	unsigned long field;
--	u64 field_value;
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
--	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
--	int len;
--	gva_t gva = 0;
- 	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
- 						    : get_vmcs12(vcpu);
-+	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-+	u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct x86_exception e;
-+	unsigned long field;
-+	u64 value;
-+	gva_t gva = 0;
- 	short offset;
-+	int len;
- 
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
-@@ -4776,7 +4776,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 		return nested_vmx_failInvalid(vcpu);
- 
- 	/* Decode instruction info and find the field to read */
--	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-+	field = kvm_register_readl(vcpu, (((instr_info) >> 28) & 0xf));
- 
- 	offset = vmcs_field_to_offset(field);
- 	if (offset < 0)
-@@ -4786,24 +4786,23 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 	if (!is_guest_mode(vcpu) && is_vmcs12_ext_field(field))
- 		copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
- 
--	/* Read the field, zero-extended to a u64 field_value */
--	field_value = vmcs12_read_any(vmcs12, field, offset);
-+	/* Read the field, zero-extended to a u64 value */
-+	value = vmcs12_read_any(vmcs12, field, offset);
- 
- 	/*
- 	 * Now copy part of this value to register or memory, as requested.
- 	 * Note that the number of bits actually copied is 32 or 64 depending
- 	 * on the guest's mode (32 or 64 bit), not on the given field's length.
- 	 */
--	if (vmx_instruction_info & (1u << 10)) {
--		kvm_register_writel(vcpu, (((vmx_instruction_info) >> 3) & 0xf),
--			field_value);
-+	if (instr_info & BIT(10)) {
-+		kvm_register_writel(vcpu, (((instr_info) >> 3) & 0xf), value);
- 	} else {
- 		len = is_64_bit_mode(vcpu) ? 8 : 4;
- 		if (get_vmx_mem_address(vcpu, exit_qualification,
--				vmx_instruction_info, true, len, &gva))
-+					instr_info, true, len, &gva))
- 			return 1;
- 		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
--		if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len, &e))
-+		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e))
- 			kvm_inject_page_fault(vcpu, &e);
- 	}
- 
-@@ -4836,24 +4835,25 @@ static bool is_shadow_field_ro(unsigned long field)
- 
- static int handle_vmwrite(struct kvm_vcpu *vcpu)
- {
-+	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-+						    : get_vmcs12(vcpu);
-+	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-+	u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct x86_exception e;
- 	unsigned long field;
--	int len;
-+	short offset;
- 	gva_t gva;
--	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
--	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-+	int len;
- 
--	/* The value to write might be 32 or 64 bits, depending on L1's long
-+	/*
-+	 * The value to write might be 32 or 64 bits, depending on L1's long
- 	 * mode, and eventually we need to write that into a field of several
- 	 * possible lengths. The code below first zero-extends the value to 64
--	 * bit (field_value), and then copies only the appropriate number of
-+	 * bit (value), and then copies only the appropriate number of
- 	 * bits into the vmcs12 field.
- 	 */
--	u64 field_value = 0;
--	struct x86_exception e;
--	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
--						    : get_vmcs12(vcpu);
--	short offset;
-+	u64 value = 0;
- 
- 	if (!nested_vmx_check_permission(vcpu))
- 		return 1;
-@@ -4867,22 +4867,20 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 	     get_vmcs12(vcpu)->vmcs_link_pointer == -1ull))
- 		return nested_vmx_failInvalid(vcpu);
- 
--	if (vmx_instruction_info & (1u << 10))
--		field_value = kvm_register_readl(vcpu,
--			(((vmx_instruction_info) >> 3) & 0xf));
-+	if (instr_info & BIT(10))
-+		value = kvm_register_readl(vcpu, (((instr_info) >> 3) & 0xf));
- 	else {
- 		len = is_64_bit_mode(vcpu) ? 8 : 4;
- 		if (get_vmx_mem_address(vcpu, exit_qualification,
--				vmx_instruction_info, false, len, &gva))
-+					instr_info, false, len, &gva))
- 			return 1;
--		if (kvm_read_guest_virt(vcpu, gva, &field_value, len, &e)) {
-+		if (kvm_read_guest_virt(vcpu, gva, &value, len, &e)) {
- 			kvm_inject_page_fault(vcpu, &e);
- 			return 1;
- 		}
- 	}
- 
--
--	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-+	field = kvm_register_readl(vcpu, (((instr_info) >> 28) & 0xf));
- 
- 	offset = vmcs_field_to_offset(field);
- 	if (offset < 0)
-@@ -4914,9 +4912,9 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 	 * the stripped down value, L2 sees the full value as stored by KVM).
- 	 */
- 	if (field >= GUEST_ES_AR_BYTES && field <= GUEST_TR_AR_BYTES)
--		field_value &= 0x1f0ff;
-+		value &= 0x1f0ff;
- 
--	vmcs12_write_any(vmcs12, field, offset, field_value);
-+	vmcs12_write_any(vmcs12, field, offset, value);
- 
- 	/*
- 	 * Do not track vmcs12 dirty-state if in guest-mode as we actually
-@@ -4933,7 +4931,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
- 			preempt_disable();
- 			vmcs_load(vmx->vmcs01.shadow_vmcs);
- 
--			__vmcs_writel(field, field_value);
-+			__vmcs_writel(field, value);
- 
- 			vmcs_clear(vmx->vmcs01.shadow_vmcs);
- 			vmcs_load(vmx->loaded_vmcs->vmcs);
--- 
-2.24.0.393.g34dc348eaf-goog
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc1NjI3ODE3LTI0NjI1LTEt
+Z2l0LXNlbmQtZW1haWwtY2F0aGVyaW5lLmhlY3hAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2Vy
+aWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQg
+YmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHRhcmdldC9pMzg2
+OiBza2lwIGt2bV9tc3JfZW50cnlfYWRkIHdoZW4ga3ZtX3ZteF9iYXNpYyBpcyAwClR5cGU6IHNl
+cmllcwpNZXNzYWdlLWlkOiAxNTc1NjI3ODE3LTI0NjI1LTEtZ2l0LXNlbmQtZW1haWwtY2F0aGVy
+aW5lLmhlY3hAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4NzQ0MWYgdGFyZ2V0L2kzODY6IHNraXAga3ZtX21z
+cl9lbnRyeV9hZGQgd2hlbiBrdm1fdm14X2Jhc2ljIGlzIDAKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM4OiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9rdm0uYzoyNjM3OgorXkkvKiBPbmx5IGFkZCB0aGUgZW50cnkgd2hlbiBob3N0IHN1
+cHBvcnRzIGl0ICovJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNCBsaW5lcyBjaGVj
+a2VkCgpDb21taXQgOTg3NDQxZjc0MjRjICh0YXJnZXQvaTM4Njogc2tpcCBrdm1fbXNyX2VudHJ5
+X2FkZCB3aGVuIGt2bV92bXhfYmFzaWMgaXMgMCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3NTYy
+NzgxNy0yNDYyNS0xLWdpdC1zZW5kLWVtYWlsLWNhdGhlcmluZS5oZWN4QGdtYWlsLmNvbS90ZXN0
+aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
