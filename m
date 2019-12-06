@@ -2,74 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 75D0D1150C6
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 14:03:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ED5B1150E0
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 14:15:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726328AbfLFNDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 08:03:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58028 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726245AbfLFNDv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 08:03:51 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726244AbfLFNPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 08:15:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47405 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726128AbfLFNPp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 6 Dec 2019 08:15:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575638144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MLDnBsWA2sFSFtoTw/NU467cHCiZwmFim8KHvfPZ3+E=;
+        b=ZC/KaW7Ik22wtHI+WJXm9q9PTNK+WSN7FzUZ/bEBs3uvn2MHpi/yy7e19v1g2cTJfGpEbG
+        DDGyhKVjFBtP+PCTwWhahpyRYdLGEX6Vy/01cEHa0gmY1SjxtMTQE6F7Ce84j2xhkuD9GU
+        eyLPrXlwXsbJt22w+bgBCPYbtnJlRYI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48--0ksnmB9PiW1ROw1eCvRsw-1; Fri, 06 Dec 2019 08:15:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2591321835;
-        Fri,  6 Dec 2019 13:03:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575637430;
-        bh=FzzokkCcsl2DCADaSPwOIroR+3F5YdUB7UOvT1k/t0s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=knZBFrdnZxQK9YfYLjhMkJD99VKX+jihYEEYGQOeS09PK4lUz6HiSsTxOP29zLYPZ
-         d5NaPkp/R83BBLNEfH/6AmVSaWshlTm7KVtlvu56sdURwpEbfqd870oUGGG6yl7n76
-         sdrh/x9Ja+kOzY/6X4QniRNSEU+p33voG2TH3I9c=
-Date:   Fri, 6 Dec 2019 14:03:48 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Pavel Machek <pavel@denx.de>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Eric Biggers <ebiggers@kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Sasha Levin <sashal@kernel.org>,
-        syzbot+7857962b4d45e602b8ad@syzkaller.appspotmail.com
-Subject: Re: [PATCH 4.19 242/321] kvm: properly check debugfs dentry before
- using it
-Message-ID: <20191206130348.GC1399220@kroah.com>
-References: <20191203223427.103571230@linuxfoundation.org>
- <20191203223439.731003476@linuxfoundation.org>
- <20191205222928.GD25107@duo.ucw.cz>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8A3518036B3;
+        Fri,  6 Dec 2019 13:15:42 +0000 (UTC)
+Received: from thuth.com (ovpn-116-205.ams2.redhat.com [10.36.116.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 85EC25DA32;
+        Fri,  6 Dec 2019 13:15:38 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     rkrcmar@redhat.com, radimkrcmar@gmail.com, drjones@redhat.com
+Subject: [kvm-unit-tests PATCH] MAINTAINERS: Radim is no longer available as kvm-unit-tests maintainer
+Date:   Fri,  6 Dec 2019 14:15:34 +0100
+Message-Id: <20191206131534.18509-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191205222928.GD25107@duo.ucw.cz>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -0ksnmB9PiW1ROw1eCvRsw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 05, 2019 at 11:29:28PM +0100, Pavel Machek wrote:
-> Hi!
-> 
-> > From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > 
-> > [ Upstream commit 8ed0579c12b2fe56a1fac2f712f58fc26c1dc49b ]
-> > 
-> > debugfs can now report an error code if something went wrong instead of
-> > just NULL.  So if the return value is to be used as a "real" dentry, it
-> > needs to be checked if it is an error before dereferencing it.
-> > 
-> > This is now happening because of ff9fb72bc077 ("debugfs: return error
-> > values, not NULL").  syzbot has found a way to trigger multiple debugfs
-> > files attempting to be created, which fails, and then the error code
-> > gets passed to dentry_path_raw() which obviously does not like it.
-> 
-> 4.19-stable does not contain patch ff9fb72bc077, so is this still good
-> idea? It should not break anything, as it still uses IS_ERR_OR_NULL,
-> but...
+Radim's mail address @redhat.com is not valid anymore, so we should
+remove this line from the MAINTAINERS file.
 
-Yes it should as just testing for NULL was incorrect in the first place.
+Thanks for all your work on kvm-unit-tests during the past years, Radim!
 
-thanks,
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 2 --
+ 1 file changed, 2 deletions(-)
 
-greg k-h
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d195826..48da1db 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -54,7 +54,6 @@ Descriptions of section entries:
+ Maintainers
+ -----------
+ M: Paolo Bonzini <pbonzini@redhat.com>
+-M: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+ L: kvm@vger.kernel.org
+ T: git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+=20
+@@ -88,7 +87,6 @@ F: lib/s390x/*
+=20
+ X86
+ M: Paolo Bonzini <pbonzini@redhat.com>
+-M: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+ L: kvm@vger.kernel.org
+ F: x86/*
+ F: lib/x86/*
+--=20
+2.18.1
+
