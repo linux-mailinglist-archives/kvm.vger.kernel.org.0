@@ -2,271 +2,233 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6550111567D
-	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 18:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58961115692
+	for <lists+kvm@lfdr.de>; Fri,  6 Dec 2019 18:34:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbfLFR2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 12:28:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29446 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726473AbfLFR2T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 12:28:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575653297;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uHy6JtDFNgRRZUOE/EOkjvVUEne6jqUvFOy591Cbfrs=;
-        b=h47tVp+4Tc3SrZw+tDX0LUm6aXF0pOMfmv17POB1nphloPJPl8RyvKxB8UgODdFdMl/157
-        b7UPOFIeD/Mdkuy1hL51B7TskLoDapmRfJEMmseKXOjVsi5NzfbtJjNfibPj0yZZ+5vkXX
-        XB+fId0uzLRbyYM3xHahohw5dTrvnQY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-BOXZZEcbPF-QJRXfsfQH8w-1; Fri, 06 Dec 2019 12:28:16 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 925BC800EB9;
-        Fri,  6 Dec 2019 17:28:14 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 15F6560BF4;
-        Fri,  6 Dec 2019 17:28:11 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc:     drjones@redhat.com, andrew.murray@arm.com, andre.przywara@arm.com,
-        peter.maydell@linaro.org
-Subject: [kvm-unit-tests RFC 10/10] pmu: Test overflow interrupts
-Date:   Fri,  6 Dec 2019 18:27:24 +0100
-Message-Id: <20191206172724.947-11-eric.auger@redhat.com>
-In-Reply-To: <20191206172724.947-1-eric.auger@redhat.com>
-References: <20191206172724.947-1-eric.auger@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: BOXZZEcbPF-QJRXfsfQH8w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+        id S1726410AbfLFReA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Dec 2019 12:34:00 -0500
+Received: from mail-eopbgr130057.outbound.protection.outlook.com ([40.107.13.57]:36598
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726287AbfLFRd7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Dec 2019 12:33:59 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FOntT5ivJaCfcT9VJBMYKFWaPeDvO6W/s//Zk1YZzaiKCfFPBdf9ufiVTz9izK3L9hgDXsmN0M8m3OfZ1j226Q7if5HUBLPfaU1PvwO/AI2oCzSThwGyO3NJSWJResljQVtdzGBGXmpLHhvvG1FKrnAdDoqLYVErKGzfhzuIJvcHt3/d+KeFzh7TmeFbT4SDEeLt/Kzxe5ns+Kh0cpQMqKGgVKPoqnvj7iOATiHqO3APL2ADquoGLWO7sfjswCuzRcU2ayBwTqkDoGs0mkNUpnZtXxW3t3u0azeyuDRlPRDNq3OnAQ0cN/WeQ/5KUu+7GigDc2j+CsjzjwPXzsjXag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vAKZ0oWtelkQx810IA/Eb7iqWUUJGx792MVrIgTL1mM=;
+ b=Mw3Zggrh8jy8GNS/Fd56Q2+bFOjiwgBayMT3y8Dewj1Kte8/4U6/nZtbn0WWPk2Qsmz8dzubzFA7p5G6kAXMT9sLEhT/o3yQdEH7aV5BzZj8k6OVdw0/URswJbnMDUeM+1NG7ig03q9OQFB11kuSxKRHPPopYShYG5AAC5mV8sBWkQYBh9Bbk/ZxE3S9x0tL0V1zcMdM1/TFlUk3Uy8zT/sdKG3F+ZQTm1JhRL9isVDQKXayDFr/E3YX6oev66/EqsKWMpLAwD3YHFah/cp5Um5rtdM/+7PkfxxZqKpfoquu2SZsOTWUv8nrQ4Z9SWv8chnnf9dNd4Vrx/bDPDElSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vAKZ0oWtelkQx810IA/Eb7iqWUUJGx792MVrIgTL1mM=;
+ b=WACglOtTbkSjA5Dw577+Emq+ugvRA+3+OGacwrLXATDyx6OA64wIafhJeQVsHfloECuK2xWWD046/gqtxRayhzBp04PWA1KZo/QDUbDVzu/06SqJ7zRF2/YZ4TFslfvhjjLx/V7ty78emubxKBVoKsKwXePTYMbGiTnO4MvMRfw=
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com (20.176.214.160) by
+ AM0PR05MB5028.eurprd05.prod.outlook.com (20.177.40.158) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.15; Fri, 6 Dec 2019 17:33:53 +0000
+Received: from AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::16:9951:5a4b:9ec6]) by AM0PR05MB4866.eurprd05.prod.outlook.com
+ ([fe80::16:9951:5a4b:9ec6%7]) with mapi id 15.20.2516.014; Fri, 6 Dec 2019
+ 17:33:53 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
+Thread-Topic: [PATCH 0/6] VFIO mdev aggregated resources handling
+Thread-Index: AQHViikX93ntAS7QxEa+ZUX9CByqKKeAQaYwgADEfoCAKW0u8IAA3JMAgADWE0CAAN0dAIAAnz6A
+Date:   Fri, 6 Dec 2019 17:33:52 +0000
+Message-ID: <79d0ca87-c6c7-18d5-6429-bb20041646ff@mellanox.com>
+References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
+ <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191108081925.GH4196@zhen-hp.sh.intel.com>
+ <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191205060618.GD4196@zhen-hp.sh.intel.com>
+ <AM0PR05MB4866C265B6C9D521A201609DD15C0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+ <20191206080354.GA15502@zhen-hp.sh.intel.com>
+In-Reply-To: <20191206080354.GA15502@zhen-hp.sh.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [208.176.44.194]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 908fdc5d-7605-4318-6940-08d77a727701
+x-ms-traffictypediagnostic: AM0PR05MB5028:|AM0PR05MB5028:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR05MB50287019BECB1478822CBA46D15F0@AM0PR05MB5028.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0243E5FD68
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(346002)(376002)(396003)(189003)(199004)(13464003)(71200400001)(316002)(36756003)(5660300002)(2616005)(6916009)(81156014)(4326008)(81166006)(8676002)(229853002)(71190400001)(305945005)(86362001)(2906002)(8936002)(31696002)(66446008)(66556008)(66476007)(6506007)(53546011)(966005)(76116006)(31686004)(76176011)(91956017)(6512007)(26005)(186003)(64756008)(66946007)(102836004)(6486002)(54906003)(478600001)(99286004);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB5028;H:AM0PR05MB4866.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: hb7Ff16AouavwMPOSyFd6Tnj/wVu7vHGuTGXBbWn3dK4CPKNo/BVN+B42PP9mbw4Xhuq8CBf4uCYb8fopmvV86OMmoOAVEzhM56Arw9XTWee2CDzMdvvRl74K8xQ9TcqMW652tLVw/lKIh8RpKzWyN6e/qMDLmMRbSrlLNgTHHu1sECl+zQ6+wv54FhLMTzBJYb8CFZsui/zxjdUtlV8dEUzqZdHq8BQ5tBNuuz5vW+upzYK+2hzNREYz2FpEKJJnV2dKewC9fZYuzkZ7vqkTE5ZkjWdZkjx+2zdCXt85A/ur8oXQYYAxMTds/xA8zx0QQXSR0kmLM6iwlCxFyGZY9HZY2aspkPeXEkvXnkKVvz+CaXZhXYuQMObLrUeOd2/NbpyARHSr/vkIRESDutb6mG8H/SSnXE8j/31EyRZuRSepZSikNeSGe5Rhhkj/RiRQ4/3GU0PBZ16/0dVJVSbS6sNgvR+RNbwSB8s3Xrt0aRT8QQ27/b4SwqVrvnyaqr/WD9JbhlHrcBtoFaCgjIK84qqiPfnT//TlTyAqZ6gR4M=
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <60C677C4420B3143B19C5A9F95F66D38@eurprd05.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 908fdc5d-7605-4318-6940-08d77a727701
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Dec 2019 17:33:52.8811
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TWwZqlRdjpp1x56x0wplgj/pJff56HPd/PsimPlpLSBzhn21cZfZeZ+opB5QJQ664tnPWyZ4FwCP/M1QByTmbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB5028
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test overflows for MEM_ACESS and SW_INCR events. Also tests
-overflows with 64-bit events.
+On 12/6/2019 2:03 AM, Zhenyu Wang wrote:
+> On 2019.12.05 18:59:36 +0000, Parav Pandit wrote:
+>>>>
+>>>>> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>>> -----Original Message-----
+>>>>>>> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org> On
+>>>>>>> Behalf Of Zhenyu Wang
+>>>>>>> Sent: Thursday, October 24, 2019 12:08 AM
+>>>>>>> To: kvm@vger.kernel.org
+>>>>>>> Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
+>>>>>>> kevin.tian@intel.com; cohuck@redhat.com
+>>>>>>> Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
+>>>>>>>
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> This is a refresh for previous send of this series. I got
+>>>>>>> impression that some SIOV drivers would still deploy their own
+>>>>>>> create and config method so stopped effort on this. But seems
+>>>>>>> this would still be useful for some other SIOV driver which may
+>>>>>>> simply want capability to aggregate resources. So here's refreshed
+>>> series.
+>>>>>>>
+>>>>>>> Current mdev device create interface depends on fixed mdev type,
+>>>>>>> which get uuid from user to create instance of mdev device. If
+>>>>>>> user wants to use customized number of resource for mdev device,
+>>>>>>> then only can create new
+>>>>>> Can you please give an example of 'resource'?
+>>>>>> When I grep [1], [2] and [3], I couldn't find anything related to '
+>>> aggregate'.
+>>>>>
+>>>>> The resource is vendor device specific, in SIOV spec there's ADI
+>>>>> (Assignable Device Interface) definition which could be e.g queue
+>>>>> for net device, context for gpu, etc. I just named this interface as
+>>> 'aggregate'
+>>>>> for aggregation purpose, it's not used in spec doc.
+>>>>>
+>>>>
+>>>> Some 'unknown/undefined' vendor specific resource just doesn't work.
+>>>> Orchestration tool doesn't know which resource and what/how to configu=
+re
+>>> for which vendor.
+>>>> It has to be well defined.
+>>>>
+>>>> You can also find such discussion in recent lgpu DRM cgroup patches se=
+ries
+>>> v4.
+>>>>
+>>>> Exposing networking resource configuration in non-net namespace aware
+>>> mdev sysfs at PCI device level is no-go.
+>>>> Adding per file NET_ADMIN or other checks is not the approach we follo=
+w in
+>>> kernel.
+>>>>
+>>>> devlink has been a subsystem though under net, that has very rich inte=
+rface
+>>> for syscaller, device health, resource management and many more.
+>>>> Even though it is used by net driver today, its written for generic de=
+vice
+>>> management at bus/device level.
+>>>>
+>>>> Yuval has posted patches to manage PCI sub-devices [1] and updated ver=
+sion
+>>> will be posted soon which addresses comments.
+>>>>
+>>>> For any device slice resource management of mdev, sub-function etc, we
+>>> should be using single kernel interface as devlink [2], [3].
+>>>>
+>>>> [1]
+>>>> https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-yuval
+>>>> av@mellanox.com/ [2]
+>>>> http://man7.org/linux/man-pages/man8/devlink-dev.8.html
+>>>> [3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
+>>>>
+>>>> Most modern device configuration that I am aware of is usually done vi=
+a well
+>>> defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and m=
+ore) or
+>>> via netlink commands (net, devlink, rdma and more) not via sysfs.
+>>>>
+>>>
+>>> Current vfio/mdev configuration is via documented sysfs ABI instead of =
+other
+>>> ways. So this adhere to that way to introduce more configurable method =
+on
+>>> mdev device for standard, it's optional and not actually vendor specifi=
+c e.g vfio-
+>>> ap.
+>>>
+>> Some unknown/undefined resource as 'aggregate' is just not an ABI.
+>> It has to be well defined, as 'hardware_address', 'num_netdev_sqs' or so=
+mething similar appropriate to that mdev device class.
+>> If user wants to set a parameter for a mdev regardless of vendor, they m=
+ust have single way to do so.
+>=20
+> The idea is not specific for some device class, but for each mdev
+> type's resource, and be optional for each vendor. If more device class
+> specific way is preferred, then we might have very different ways for
+> different vendors. Better to avoid that, so here means to aggregate
+> number of mdev type's resources for target instance, instead of defining
+> kinds of mdev types for those number of resources.
+>=20
+Parameter or attribute certainly can be optional.
+But the way to aggregate them should not be vendor specific.
+Look for some excellent existing examples across subsystems, for example
+how you create aggregated netdev or block device is not depend on vendor
+or underlying device type.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/pmu.c         | 133 +++++++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg |   6 +++
- 2 files changed, 138 insertions(+), 1 deletion(-)
+>>
+>>> I'm not sure how many devices support devlink now, or if really make se=
+nse to
+>>> utilize devlink for other devices except net, or if really make sense t=
+o take
+>>> mdev resource configuration from there...
+>>>
+>> This is about adding new knobs not the existing one.
+>> It has to be well defined. 'aggregate' is not the word that describes it=
+.
+>> If this is something very device specific, it should be prefixed with 'm=
+isc_' something.. or it should be misc_X ioctl().
+>> Miscellaneous not so well defined class of devices are usually registere=
+d using misc_register().
+>> Similarly attributes has to be well defined, otherwise, it should fall u=
+nder misc category specially when you are pointing to 3 well defined specif=
+ications.
+>>
+>=20
+> Any suggestion for naming it?
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 47d46a2..a63b93e 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -45,8 +45,12 @@ struct pmu {
- =09uint32_t pmcr_ro;
- };
-=20
--static struct pmu pmu;
-+struct pmu_stats {
-+=09unsigned long bitmap;
-+=09uint32_t interrupts[32];
-+};
-=20
-+static struct pmu pmu;
-=20
- #if defined(__arm__)
- #define ID_DFR0_PERFMON_SHIFT 24
-@@ -117,6 +121,7 @@ static void test_mem_access(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
- static void test_chain_promotion(void) {}
-+static void test_overflow_interrupt(void) {}
-=20
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -263,6 +268,43 @@ asm volatile(
- =09: );
- }
-=20
-+static struct pmu_stats pmu_stats;
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+        uint32_t irqstat, irqnr;
-+
-+        irqstat =3D gic_read_iar();
-+        irqnr =3D gic_iar_irqnr(irqstat);
-+        gic_write_eoir(irqstat);
-+
-+        if (irqnr =3D=3D 23) {
-+                unsigned long overflows =3D read_sysreg(pmovsclr_el0);
-+=09=09int i;
-+
-+                report_info("--> PMU overflow interrupt %d (counter bitmas=
-k 0x%lx)", irqnr, overflows);
-+=09=09for (i =3D 0; i < 32; i++) {
-+=09=09=09if (test_and_clear_bit(i, &overflows)) {
-+=09=09=09=09pmu_stats.interrupts[i]++;
-+=09=09=09=09pmu_stats.bitmap |=3D 1 << i;
-+=09=09=09}
-+=09=09}
-+                write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-+        } else {
-+                report_info("Unexpected interrupt: %d\n", irqnr);
-+        }
-+}
-+
-+static void pmu_reset_stats(void)
-+{
-+=09int i;
-+
-+=09for (i =3D 0; i < 32; i++) {
-+=09=09pmu_stats.interrupts[i] =3D 0;
-+=09}
-+=09pmu_stats.bitmap =3D 0;
-+}
-+
- static void pmu_reset(void)
- {
- =09/* reset all counters, counting disabled at PMCR level*/
-@@ -273,6 +315,7 @@ static void pmu_reset(void)
- =09write_sysreg(0xFFFFFFFF, pmovsclr_el0);
- =09/* disable overflow interrupts on all counters */
- =09write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-+=09pmu_reset_stats();
- =09isb();
- }
-=20
-@@ -691,8 +734,93 @@ static void test_chain_promotion(void)
- =09=09=09read_sysreg(pmovsclr_el0));
- }
-=20
-+static bool expect_interrupts(uint32_t bitmap)
-+{
-+=09int i;
-+
-+=09if (pmu_stats.bitmap ^ bitmap)
-+=09=09return false;
-+
-+=09for (i =3D 0; i < 32; i++) {
-+=09=09if (test_and_clear_bit(i, &pmu_stats.bitmap))
-+=09=09=09if (pmu_stats.interrupts[i] !=3D 1)
-+=09=09=09=09return false;
-+=09}
-+=09return true;
-+}
-+
-+static void test_overflow_interrupt(void)
-+{
-+=09uint32_t events[] =3D { 0x13 /* MEM_ACCESS */, 0x00 /* SW_INCR */};
-+=09void *addr =3D malloc(PAGE_SIZE);
-+=09int i;
-+
-+=09if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+=09=09return;
-+
-+=09setup_irq(irq_handler);
-+=09gic_enable_irq(23);
-+
-+=09pmu_reset();
-+
-+        write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+        write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+=09isb();
-+
-+=09/* interrupts are disabled */
-+
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("no overflow interrupt received", expect_interrupts(0));
-+
-+=09set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+=09for (i =3D 0; i < 100; i++) {
-+=09=09write_sysreg(0x2, pmswinc_el0);
-+=09}
-+=09set_pmcr(pmu.pmcr_ro);
-+=09report("no overflow interrupt received", expect_interrupts(0));
-+
-+=09/* enable interrupts */
-+
-+=09pmu_reset_stats();
-+
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+=09write_sysreg(0xFFFFFFFF, pmintenset_el1);
-+=09isb();
-+
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09for (i =3D 0; i < 100; i++) {
-+=09=09write_sysreg(0x3, pmswinc_el0);
-+=09}
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro);
-+=09report_info("overflow=3D0x%lx", read_sysreg(pmovsclr_el0));
-+=09report("overflow interrupts expected on #0 and #1", expect_interrupts(0=
-x3));
-+
-+=09/* promote to 64-b */
-+
-+=09pmu_reset_stats();
-+
-+=09events[1] =3D 0x1E /* CHAIN */;
-+        write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09isb();
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("no overflow interrupt expected on 32b boundary", expect_interru=
-pts(0));
-+
-+=09/* overflow on odd counter */
-+=09pmu_reset_stats();
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFFF);
-+=09isb();
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("expect overflow interrupt on odd counter", expect_interrupts(0x=
-2));
-+}
- #endif
-=20
-+
- /*
-  * As a simple sanity check on the PMCR_EL0, ensure the implementer field =
-isn't
-  * null. Also print out a couple other interesting fields for diagnostic
-@@ -896,6 +1024,9 @@ int main(int argc, char *argv[])
- =09} else if (strcmp(argv[1], "chain-promotion") =3D=3D 0) {
- =09=09report_prefix_push(argv[1]);
- =09=09test_chain_promotion();
-+=09} else if (strcmp(argv[1], "overflow-interrupt") =3D=3D 0) {
-+=09=09report_prefix_push(argv[1]);
-+=09=09test_overflow_interrupt();
- =09} else {
- =09=09report_abort("Unknown subtest '%s'", argv[1]);
- =09}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index eb6e87e..31b4c7a 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -108,6 +108,12 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'chain-promotion'
-=20
-+[pmu-chain-promotion]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'overflow-interrupt'
-+
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
---=20
-2.20.1
-
+If parameter is miscellaneous, please prefix it with misc in mdev
+ioctl() or in sysfs.
+If parameter/attribute is max_netdev_txqs for netdev, name as that,
+If its max_dedicated_wqs of some dsa device, please name is that way.
