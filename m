@@ -2,64 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B249115B7F
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 08:21:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFC1B115BAF
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 10:26:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726289AbfLGHVF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 7 Dec 2019 02:21:05 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2527 "EHLO huawei.com"
+        id S1726453AbfLGJZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Dec 2019 04:25:46 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44760 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725935AbfLGHVF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Dec 2019 02:21:05 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 8417D6B030C277E91752;
-        Sat,  7 Dec 2019 15:21:03 +0800 (CST)
-Received: from dggeme715-chm.china.huawei.com (10.1.199.111) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 7 Dec 2019 15:21:03 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme715-chm.china.huawei.com (10.1.199.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Sat, 7 Dec 2019 15:21:03 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Sat, 7 Dec 2019 15:21:02 +0800
+        id S1726196AbfLGJZp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Dec 2019 04:25:45 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 2B0D329604AED8DAEFE3;
+        Sat,  7 Dec 2019 17:25:42 +0800 (CST)
+Received: from huawei.com (10.175.105.18) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Sat, 7 Dec 2019
+ 17:25:32 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: get rid of var page in kvm_set_pfn_dirty()
-Thread-Topic: [PATCH] KVM: get rid of var page in kvm_set_pfn_dirty()
-Thread-Index: AdWszoDtsWxJ/gWEQkaDkTQc5F3KgQ==
-Date:   Sat, 7 Dec 2019 07:21:02 +0000
-Message-ID: <488cb59fccb74338aa7b8b7dcfc0c4fc@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.184.189.20]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>
+CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>
+Subject: [PATCH 0/6] remove unnecessary return val of kvm pit
+Date:   Sat, 7 Dec 2019 17:25:17 +0800
+Message-ID: <1575710723-32094-1-git-send-email-linmiaohe@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.105.18]
 X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson wrote:
->On Thu, Dec 05, 2019 at 11:05:05AM +0800, linmiaohe wrote:
->> From: Miaohe Lin <linmiaohe@huawei.com>
->> 
->> We can get rid of unnecessary var page in
->> kvm_set_pfn_dirty() , thus make code style similar with 
->> kvm_set_pfn_accessed().
->
->For future reference, there's no need to wrap so aggressively, preferred kernel style is to wrap at 75 columns (though for some reason I am in the habit of wrapping changelogs at 73 columns), e.g.:
->
->We can get rid of unnecessary var page in kvm_set_pfn_dirty(), thus make code style similar with kvm_set_pfn_accessed().
->
-Many thanks for your remind. I would try to wrap changelogs at about 75 columns.
-Thanks again.
+From: Miaohe Lin <linmiaohe@huawei.com>
+
+The return val of kvm pit function is always equal to 0, which means there
+is no way to failed with this function. So remove the return val as it's
+unnecessary to check against it. Also add BUILD_BUG_ON to guard against
+channels size changed unexpectly.
+
+Miaohe Lin (6):
+  KVM: x86: remove always equal to 0 return val of
+    kvm_vm_ioctl_get_pit()
+  KVM: x86: remove always equal to 0 return val of
+    kvm_vm_ioctl_set_pit()
+  KVM: x86: remove always equal to 0 return val of
+    kvm_vm_ioctl_get_pit2()
+  KVM: x86: remove always equal to 0 return val of
+    kvm_vm_ioctl_set_pit2()
+  KVM: x86: check kvm_pit outside kvm_vm_ioctl_reinject()
+  KVM: x86: remove always equal to 0 return val of
+    kvm_vm_ioctl_reinject()
+
+ arch/x86/kvm/x86.c | 46 +++++++++++++++++++++++-----------------------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
+
+-- 
+2.19.1
+
