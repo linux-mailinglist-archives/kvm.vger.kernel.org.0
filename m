@@ -2,51 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8920E115B6F
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 07:53:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF0E115B76
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 08:14:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726289AbfLGGxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 7 Dec 2019 01:53:06 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:60264 "EHLO huawei.com"
+        id S1726465AbfLGHOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Dec 2019 02:14:05 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2526 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725869AbfLGGxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 7 Dec 2019 01:53:06 -0500
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
-        by Forcepoint Email with ESMTP id 389A7A547C66DEA8BCE8;
-        Sat,  7 Dec 2019 14:53:03 +0800 (CST)
-Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 7 Dec 2019 14:53:03 +0800
+        id S1725869AbfLGHOE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Dec 2019 02:14:04 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.53])
+        by Forcepoint Email with ESMTP id 9DFD3EAF984A1CA80CEC;
+        Sat,  7 Dec 2019 15:13:59 +0800 (CST)
+Received: from dggeme766-chm.china.huawei.com (10.3.19.112) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 7 Dec 2019 15:13:59 +0800
 Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
+ dggeme766-chm.china.huawei.com (10.3.19.112) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Sat, 7 Dec 2019 14:53:02 +0800
+ 15.1.1713.5; Sat, 7 Dec 2019 15:13:59 +0800
 Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
  dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Sat, 7 Dec 2019 14:53:02 +0800
+ Sat, 7 Dec 2019 15:13:59 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <kernellwp@gmail.com>
-CC:     Liran Alon <liran.alon@oracle.com>,
+To:     Marc Zyngier <maz@kernel.org>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "james.morse@arm.com" <james.morse@arm.com>,
+        "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>,
+        "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH] KVM: vmx: remove unreachable statement in
- vmx_get_msr_feature()
-Thread-Topic: [PATCH] KVM: vmx: remove unreachable statement in
- vmx_get_msr_feature()
-Thread-Index: AdWsyg0ykRpYj0RCSySPadjbFxdshg==
-Date:   Sat, 7 Dec 2019 06:53:02 +0000
-Message-ID: <de7e3807522a493c8cb6012063491a96@huawei.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] KVM: arm: fix missing free_percpu_irq in
+ kvm_timer_hyp_init()
+Thread-Topic: [PATCH] KVM: arm: fix missing free_percpu_irq in
+ kvm_timer_hyp_init()
+Thread-Index: AdWszcSfbfmyPnL7QOOWA4e8Y3r2BA==
+Date:   Sat, 7 Dec 2019 07:13:58 +0000
+Message-ID: <c856fab1586545cf9779e06aeaca294a@huawei.com>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
@@ -61,26 +57,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQpQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiB3cm90ZToNCj4+IFdhbnBlbmcg
-TGkgPGtlcm5lbGx3cEBnbWFpbC5jb20+IHdyb3RlOg0KPj4+Pg0KPj4+Pj4NCj4+Pj4+IEkgcGVy
-c29uYWxseSBqdXN0IHByZWZlciB0byByZW1vdmUgdGhlIOKAnGRlZmF1bHTigJ0gY2FzZSBhbmQg
-Y2hhbmdlIHRoaXMg4oCccmV0dXJuIDA74oCdIHRvIOKAnHJldHVybiAxO+KAnS4NCj4+Pj4+IEJ1
-dCBpdOKAmXMgYSBtYXR0ZXIgb2YgdGFzdGUgb2YgY291cnNlLg0KPj4+Pj4NCj4+Pj4gWWVzLiBB
-cyB3aGF0ICIgVHVybmlwIGdyZWVucywgYWxsIGhhdmUgbG92ZSAiIHNhaWQuIF5fXg0KPj4+DQo+
-Pj4gQWN0dWFsbHkgaXQgaXMgYSBncmVhdCBhcHByZWNpYXRlZCB0byBpbnRyb2R1Y2Ugc29tZXRo
-aW5nIG1vcmUgdXNlZnVsIGluc3RlYWQgb2YgdG9ucyBvZiBjbGVhbnVwcywgSSBzYXcgZ3V5cyBk
-aWQgb25lIGNsZWFudXAgYW5kIGNhbiBpbmN1ciBzZXZlcmFsIGJ1Z3MgYmVmb3JlLg0KPj4+DQo+
-PiBJJ2QgbGlrZSB0byBpbnRyb2R1Y2Ugc29tZXRoaW5nIG1vcmUgdXNlZnVsLCBidXQgc2lkZSBj
-b3JuZXIgY2xlYW51cHMgDQo+PiBtYXkgYmUgaGFyZCB0byBmb3VuZCBvdXQgc29tZXRoaW5nIHRv
-IGludHJvZHVjZS4gQW5kIHN1Y2ggY2xlYW51cHMgY2FuIA0KPj4gYWxzbyBiZSB2YWxpZGF0ZWQg
-YnkgY29kZSBpbnNwZWN0aW9uIHRvIGF2b2lkIHNvbWV0aGluZyBiYWQuIE1hbnkgdGhhbmtzLg0K
-Pj4gDQo+DQo+WWVhaCwgSSB0aGluayB5b3UgaGF2ZSBiZWVuIGRvaW5nIGEgZ29vZCBqb2IuICBV
-c3VhbGx5LCB3aGVuIHRoZSBjbGVhbnVwcyBpbnRyb2R1Y2UgYnVncyB0aGVyZSBhcmUgbWFueSBv
-dGhlciAic3VzcGljaW91cyIgdGhpbmdzLiAgRm9yIG1lIGl0J3MgY2xlYXIgdGhhdCB5b3UncmUg
-bGVhcm5pbmcgdGhlIGNvZGUgYW5kIG5vdCBqdXN0IG1lc3NpbmcgYXJvdW5kLg0KPg0KPlBhb2xv
-DQoNCk1hbnkgdGhhbmtzIGZvciB5b3VyIGFwcHJvdmUuIEkgcmVhbGx5IGZlZWwgZ3JhdGVmdWwg
-Zm9yIGl0LiBJbiBmYWN0LCBJIGFtIGludmVzdGlnYXRpbmcgdGhlDQpjb2RlIGFuZCBleHBlY3Qg
-YSBkZWVwIHVuZGVyc3RhbmRpbmcuIEJ1dCBpdCdzIHJlYWxseSBhIGVub3Jtb3VzLCBzb3BoaXN0
-aWNhdGVkIGFuZA0Kd29uZGVyZnVsIHdvcmxkLCB3aGF0IEkgY2FuIGRvIG5vdyBpcyB0cnkgdG8g
-a2VlcCB0aGUgY29kZSBjbGVhbi4gTWF5YmUgSSBjb3VsZCBpbnRyb2R1Y2Ugc29tZSB1c2VmdWwN
-CmZlYXR1cmVzIHNvbWVkYXkuIE1hbnkgdGhhbmtzIGFnYWluLg0KDQpCZXN0IHdpc2hlcy4NCg==
+TWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4gd3JvdGU6DQo+T24gMjAxOS0xMS0yMyAwMjoz
+MCwgbGlubWlhb2hlIHdyb3RlOg0KPj4gRnJvbTogTWlhb2hlIExpbiA8bGlubWlhb2hlQGh1YXdl
+aS5jb20+DQo+Pg0KPj4gV2hlbiBob3N0X3B0aW1lcl9pcnEgcmVxdWVzdCBpcnEgcmVzb3VyY2Ug
+ZmFpbGVkLCB3ZSBmb3JnZXQgdG8gcmVsZWFzZSANCj4+IHRoZSBob3N0X3Z0aW1lcl9pcnEgcmVz
+b3VyY2UgYWxyZWFkeSByZXF1ZXN0ZWQuDQo+PiBGaXggdGhpcyBtaXNzaW5nIGlycSByZWxlYXNl
+IGFuZCBvdGhlciBzaW1pbGFyIHNjZW5hcmlvLg0KPg0KPlRoYXQncyByZWFsbHkgbm90IGEgYmln
+IGRlYWwsIGFzIG5vdGhpbmcgYnV0IEtWTSBjYW4gdXNlIHRoZSB0aW1lcnMgYW55d2F5LCBidXQg
+SSBndWVzcyBpdCBkb2Vzbid0IGh1cnQgdG8gYmUgY29ycmVjdC4NCg0KSSB0aGluayBJdCdzIGEg
+Z29vZCBwcmFjdGljZSB0byByZWxlYXNlIHRoZSBuZXZlciB1c2VkIHJlc291cmNlcyB0aG91Z2gg
+aXQgbWF5IGJlIGhhcm1sZXNzLg0KDQo+Pg0KPj4gLW91dF9mcmVlX2lycToNCj4+ICsNCj4+ICtv
+dXRfZnJlZV9wdGltZXJfaXJxOg0KPj4gKwlmcmVlX3BlcmNwdV9pcnEoaG9zdF9wdGltZXJfaXJx
+LCBrdm1fZ2V0X3J1bm5pbmdfdmNwdXMoKSk7DQo+PiArb3V0X2Rpc2FibGVfZ2ljX3N0YXRlOg0K
+Pj4gKwlpZiAoaGFzX2dpYykNCj4+ICsJCXN0YXRpY19icmFuY2hfZGlzYWJsZSgmaGFzX2dpY19h
+Y3RpdmVfc3RhdGUpOw0KPg0KPkdpdmVuIHRoYXQgd2UncmUgZmFpbGluZyB0aGUgaW5pdCBvZiBL
+Vk0sIHRoaXMgaXMgdG90YWxseSBzdXBlcmZsdW91cy4gQWxzbywgdGhpcyBzdGF0ZSBpcyBzdGls
+bCB2YWxpZCwgbm8gbWF0dGVyIHdoYXQgaGFwcGVucyAodGhlIEdJQyBpcyBub3QgZ29pbmcgYXdh
+eSBmcm9tIHVuZGVyIG91ciBmZWV0KS4NCj4NCg0KV291bGQgeW91IGxpa2UgYSB2MiBwYXRjaCB3
+aXRob3V0IG91dF9kaXNhYmxlX2dpY19zdGF0ZSBjbGVhbnVwID8gSWYgc28sIEkgd291bGQgc2Vu
+ZCBhIG5ldyBvbmUuIEJ1dCBpZiB5b3UNCnRoaW5rIHRoaXMgcGF0Y2ggaXNuJ3Qgd29ydGggdG8g
+cGljayB1cCwgSSB3b3VsZCBkcm9wIGl0Lg0KDQpNYW55IHRoYW5rcyBmb3IgeW91ciByZXZpZXcu
+DQoNCj4+ICtvdXRfZnJlZV92dGltZXJfaXJxOg0KPj4gIAlmcmVlX3BlcmNwdV9pcnEoaG9zdF92
+dGltZXJfaXJxLCBrdm1fZ2V0X3J1bm5pbmdfdmNwdXMoKSk7DQo+PiArDQo=
