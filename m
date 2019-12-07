@@ -2,61 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2688115A21
-	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 01:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8920E115B6F
+	for <lists+kvm@lfdr.de>; Sat,  7 Dec 2019 07:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726461AbfLGA3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Dec 2019 19:29:08 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34485 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726374AbfLGA3H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Dec 2019 19:29:07 -0500
-Received: by mail-wr1-f68.google.com with SMTP id t2so9682151wrr.1
-        for <kvm@vger.kernel.org>; Fri, 06 Dec 2019 16:29:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=S7m9By4/eRnSy0vxdfJ6TocT5eJ8gcKLceyHvlHTn3o=;
-        b=EPs0MDvQCu2JRw6fNlQKFEE4HhT5C8P2rw6wfANlGKM+9jRDZunUllNdEkqw7Uid2o
-         xQL1X4Q++vN/lY6K60fwgBkamDqo2nu6iSsPwDMy45Y1p9OdIVtxG6acaO9rAWfl7uwW
-         dlvYw2f5BH+0UUnp0bYXYZn2A+iTP2Gxxz4DO8iO9ckHwwffye4MFiAVsc4f3ZXdxNPW
-         swQ+/9EbFCBJKGURxfoMVpSbwYb2g0yVXYx7uO/ZDEPP+oULeIiLDTzRzRu3bYwso8pB
-         zJLIcPof/UHGhQ+t6Bgq2/0EmOMJk49zelvJ+Akfwh5ef5ZPecBEa0DiAPQZ3qhvuwWa
-         6dWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=S7m9By4/eRnSy0vxdfJ6TocT5eJ8gcKLceyHvlHTn3o=;
-        b=aa70QqKp9S+W6OZzhKiVf20aRcqTjsnjmRsKB/g1IXznH3naZ17fkSrxyk5MJVSj0j
-         fkpNO2M/gsiMSByY4snqOGxdp444sbJ6PJ1GUGVgTt+pFyvM2p0E5Gz7+2tf5lYOv7yT
-         QGgprNdIEqeTuhdOPt2oCjEC2R2w/i3bUfMoPRB19KOnzfUHWZvzkAu7euCKT0BnECkP
-         0DuNa2+s5CafpksY2Mb/lCq5JgNqABxqkTSCtYqDSqfLb/LzCpvkUDQeAoENF08AIqnE
-         WZOs4H1qJdHBqxwFI8kiXLGcbgCJfFHPmA8zNeYmUuwf4j65/ouiSLR9oz3j5RAgZK28
-         drRA==
-X-Gm-Message-State: APjAAAX4DHen9oliObLzapByOOxyBxFHXfQHGl8PsaGE/82NuiwclKty
-        abF4qMPaUStYKEP5oHV7fh1GBqFWEzYx1AZjI6Y=
-X-Google-Smtp-Source: APXvYqwC+DXALPV+ZIp1hvBbROkbbIMUYxN9sAkyLMA6ghDgM/vRmZMQB8+Ka1VS/+khtJ5ehMN7e5mQmwIVZ2mvTls=
-X-Received: by 2002:a05:6000:cf:: with SMTP id q15mr17701427wrx.393.1575678546174;
- Fri, 06 Dec 2019 16:29:06 -0800 (PST)
+        id S1726289AbfLGGxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 7 Dec 2019 01:53:06 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:60264 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725869AbfLGGxG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 7 Dec 2019 01:53:06 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 389A7A547C66DEA8BCE8;
+        Sat,  7 Dec 2019 14:53:03 +0800 (CST)
+Received: from dggeme713-chm.china.huawei.com (10.1.199.109) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 7 Dec 2019 14:53:03 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme713-chm.china.huawei.com (10.1.199.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Sat, 7 Dec 2019 14:53:02 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Sat, 7 Dec 2019 14:53:02 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+CC:     Liran Alon <liran.alon@oracle.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH] KVM: vmx: remove unreachable statement in
+ vmx_get_msr_feature()
+Thread-Topic: [PATCH] KVM: vmx: remove unreachable statement in
+ vmx_get_msr_feature()
+Thread-Index: AdWsyg0ykRpYj0RCSySPadjbFxdshg==
+Date:   Sat, 7 Dec 2019 06:53:02 +0000
+Message-ID: <de7e3807522a493c8cb6012063491a96@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.184.189.20]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Received: by 2002:a5d:678e:0:0:0:0:0 with HTTP; Fri, 6 Dec 2019 16:29:05 -0800 (PST)
-Reply-To: mrs.aalia.ahmed@gmail.com
-From:   "Mrs.Aalia.Ahmed" <adamhana1907@gmail.com>
-Date:   Sat, 7 Dec 2019 00:29:05 +0000
-Message-ID: <CAOGreOnHJRmwGSfOJzjseniMd1-NT6FjbfPUKH+Q0D+uQYBP=g@mail.gmail.com>
-Subject: OK
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings My Dearest One.
-
-My name is Mrs.Aalia.Ahmed, i saw your profile and became interested
-in you, please contact me through my email address
-(mrs.aalia.ahmed@gmail.com) to know each other and i have something
-very important to tell you, i wait for your response to my email ID.
-(mrs.aalia.ahmed@gmail.com
+DQpQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPiB3cm90ZToNCj4+IFdhbnBlbmcg
+TGkgPGtlcm5lbGx3cEBnbWFpbC5jb20+IHdyb3RlOg0KPj4+Pg0KPj4+Pj4NCj4+Pj4+IEkgcGVy
+c29uYWxseSBqdXN0IHByZWZlciB0byByZW1vdmUgdGhlIOKAnGRlZmF1bHTigJ0gY2FzZSBhbmQg
+Y2hhbmdlIHRoaXMg4oCccmV0dXJuIDA74oCdIHRvIOKAnHJldHVybiAxO+KAnS4NCj4+Pj4+IEJ1
+dCBpdOKAmXMgYSBtYXR0ZXIgb2YgdGFzdGUgb2YgY291cnNlLg0KPj4+Pj4NCj4+Pj4gWWVzLiBB
+cyB3aGF0ICIgVHVybmlwIGdyZWVucywgYWxsIGhhdmUgbG92ZSAiIHNhaWQuIF5fXg0KPj4+DQo+
+Pj4gQWN0dWFsbHkgaXQgaXMgYSBncmVhdCBhcHByZWNpYXRlZCB0byBpbnRyb2R1Y2Ugc29tZXRo
+aW5nIG1vcmUgdXNlZnVsIGluc3RlYWQgb2YgdG9ucyBvZiBjbGVhbnVwcywgSSBzYXcgZ3V5cyBk
+aWQgb25lIGNsZWFudXAgYW5kIGNhbiBpbmN1ciBzZXZlcmFsIGJ1Z3MgYmVmb3JlLg0KPj4+DQo+
+PiBJJ2QgbGlrZSB0byBpbnRyb2R1Y2Ugc29tZXRoaW5nIG1vcmUgdXNlZnVsLCBidXQgc2lkZSBj
+b3JuZXIgY2xlYW51cHMgDQo+PiBtYXkgYmUgaGFyZCB0byBmb3VuZCBvdXQgc29tZXRoaW5nIHRv
+IGludHJvZHVjZS4gQW5kIHN1Y2ggY2xlYW51cHMgY2FuIA0KPj4gYWxzbyBiZSB2YWxpZGF0ZWQg
+YnkgY29kZSBpbnNwZWN0aW9uIHRvIGF2b2lkIHNvbWV0aGluZyBiYWQuIE1hbnkgdGhhbmtzLg0K
+Pj4gDQo+DQo+WWVhaCwgSSB0aGluayB5b3UgaGF2ZSBiZWVuIGRvaW5nIGEgZ29vZCBqb2IuICBV
+c3VhbGx5LCB3aGVuIHRoZSBjbGVhbnVwcyBpbnRyb2R1Y2UgYnVncyB0aGVyZSBhcmUgbWFueSBv
+dGhlciAic3VzcGljaW91cyIgdGhpbmdzLiAgRm9yIG1lIGl0J3MgY2xlYXIgdGhhdCB5b3UncmUg
+bGVhcm5pbmcgdGhlIGNvZGUgYW5kIG5vdCBqdXN0IG1lc3NpbmcgYXJvdW5kLg0KPg0KPlBhb2xv
+DQoNCk1hbnkgdGhhbmtzIGZvciB5b3VyIGFwcHJvdmUuIEkgcmVhbGx5IGZlZWwgZ3JhdGVmdWwg
+Zm9yIGl0LiBJbiBmYWN0LCBJIGFtIGludmVzdGlnYXRpbmcgdGhlDQpjb2RlIGFuZCBleHBlY3Qg
+YSBkZWVwIHVuZGVyc3RhbmRpbmcuIEJ1dCBpdCdzIHJlYWxseSBhIGVub3Jtb3VzLCBzb3BoaXN0
+aWNhdGVkIGFuZA0Kd29uZGVyZnVsIHdvcmxkLCB3aGF0IEkgY2FuIGRvIG5vdyBpcyB0cnkgdG8g
+a2VlcCB0aGUgY29kZSBjbGVhbi4gTWF5YmUgSSBjb3VsZCBpbnRyb2R1Y2Ugc29tZSB1c2VmdWwN
+CmZlYXR1cmVzIHNvbWVkYXkuIE1hbnkgdGhhbmtzIGFnYWluLg0KDQpCZXN0IHdpc2hlcy4NCg==
