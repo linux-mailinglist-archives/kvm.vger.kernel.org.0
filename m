@@ -2,104 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F191174BC
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 19:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B5A1174EA
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 19:53:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727163AbfLISnt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 13:43:49 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:5028 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726911AbfLISnr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 13:43:47 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dee95dd0000>; Mon, 09 Dec 2019 10:43:41 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 09 Dec 2019 10:43:46 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 09 Dec 2019 10:43:46 -0800
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 9 Dec
- 2019 18:43:46 +0000
-Received: from [10.40.101.166] (10.124.1.5) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 9 Dec 2019
- 18:43:43 +0000
-Subject: Re: [PATCH v3 11/12] samples: vfio-mdev: constify fb ops
-To:     Jani Nikula <jani.nikula@intel.com>,
-        <dri-devel@lists.freedesktop.org>, <linux-fbdev@vger.kernel.org>
-CC:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>
-References: <cover.1575390740.git.jani.nikula@intel.com>
- <ddb10df1316ef585930cda7718643a580f4fe37b.1575390741.git.jani.nikula@intel.com>
- <87tv694myu.fsf@intel.com>
-X-Nvconfidentiality: public
-From:   Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <0d5434e0-3d86-bbb8-6377-94e00b4f0d78@nvidia.com>
-Date:   Tue, 10 Dec 2019 00:13:39 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1726824AbfLISxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 13:53:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43299 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726335AbfLISxB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 13:53:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575917580;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=CWcZRJEpZKDqCIG7TiqGR99UZOB6+8bAvDVIMbEFGq0=;
+        b=ZjhefA+lcxesTLkAFiCNs9cspzZYANv8zChnL09tad7T+lNKIeSteesDyByFpE1V3VtCPq
+        USM9RHQiwQp+/i6WVr1KEeTNt/1qYIlMCObwzgErURvhtVHs8DGmiERn2QCTskmlB3lm56
+        W9HTKCbml9gDbfB6/Y/L0PYHX1XnP1o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-F8WGKYxLODKlBgLPf7mNbA-1; Mon, 09 Dec 2019 13:52:59 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27CA710054E3
+        for <kvm@vger.kernel.org>; Mon,  9 Dec 2019 18:52:58 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-86.ams2.redhat.com [10.36.116.86])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C97B60BE1;
+        Mon,  9 Dec 2019 18:52:57 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] travis.yml: Run 32-bit tests with KVM, too
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20191205170439.11607-1-thuth@redhat.com>
+ <699a350a-3956-5757-758c-0e246d698a7d@redhat.com>
+ <e319993e-4732-d3ed-bca6-054c78103a61@redhat.com>
+ <75b0e3d3-4d74-de4b-822f-e125711dbf56@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <077bbd45-7db6-83d8-88f2-100111db4775@redhat.com>
+Date:   Mon, 9 Dec 2019 19:52:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <87tv694myu.fsf@intel.com>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <75b0e3d3-4d74-de4b-822f-e125711dbf56@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: F8WGKYxLODKlBgLPf7mNbA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1575917021; bh=/7RvFJCUG4iQV+IDvVpbMgXKzJOkAMSMaevIPIjioqo=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=Y6wZDvVdMVatstmzKu5SutbP2nXXb/rNT7RvDQBaUBpwel/Ppk8RHXTPSUsY2JLEI
-         GPHAGnnjRUNVizRoR8Bik/EAkJv1xkvimXAesz8C2O1+4klexm8wQ8Z8yaXj+b1rRe
-         c2DJ3atEyFticNm2EfmFogYLEVO30JoyzqWFA7g/xLNwAFICp1XbuysYXsrFqTTaIe
-         WnmR99W4Z45WDhf3Hm7c8UcaSe8GU3sTXSiKOMqsR9q0oM/QX/Xk7J1NroSifpKyH4
-         6zfoBCmb1xYefKzninwV27B8XFwLuBGgpIkFtsmaBxU/k/iDVguLzezRXylNSPloeg
-         F1vJUI8bn7FaQ==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 12/9/2019 7:31 PM, Jani Nikula wrote:
-> On Tue, 03 Dec 2019, Jani Nikula <jani.nikula@intel.com> wrote:
->> Now that the fbops member of struct fb_info is const, we can start
->> making the ops const as well.
+On 09/12/2019 18.42, Paolo Bonzini wrote:
+> On 09/12/19 18:14, Thomas Huth wrote:
+>> On 09/12/2019 18.07, Paolo Bonzini wrote:
+>>> On 05/12/19 18:04, Thomas Huth wrote:
+>>>> KVM works on Travis in 32-bit, too, so we can enable more tests there.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  .travis.yml | 10 +++++++---
+>>>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/.travis.yml b/.travis.yml
+>>>> index 4162366..75bcf08 100644
+>>>> --- a/.travis.yml
+>>>> +++ b/.travis.yml
+>>>> @@ -34,15 +34,19 @@ matrix:
+>>>>        env:
+>>>>        - CONFIG="--arch=i386"
+>>>>        - BUILD_DIR="."
+>>>> -      - TESTS="eventinj port80 sieve tsc taskswitch umip vmexit_ple_round_robin"
+>>>> +      - TESTS="asyncpf hyperv_stimer hyperv_synic kvmclock_test msr pmu realmode
+>>>> +               s3 sieve smap smptest smptest3 taskswitch taskswitch2 tsc_adjust"
 >>
->> v2: fix	typo (Christophe de Dinechin)
->>
->> Cc: Kirti Wankhede <kwankhede@nvidia.com>
->> Cc: kvm@vger.kernel.org
->> Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
->> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+>> taskswitch and taskswitch2 are here ----------------^
 > 
-> Kirti, may I have your ack to merge this through drm-misc please?
-> 
-> BR,
-> Jani.
-> 
->> ---
->>   samples/vfio-mdev/mdpy-fb.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
->> index 2719bb259653..21dbf63d6e41 100644
->> --- a/samples/vfio-mdev/mdpy-fb.c
->> +++ b/samples/vfio-mdev/mdpy-fb.c
->> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
->>   		iounmap(info->screen_base);
->>   }
->>   
->> -static struct fb_ops mdpy_fb_ops = {
->> +static const struct fb_ops mdpy_fb_ops = {
->>   	.owner		= THIS_MODULE,
->>   	.fb_destroy	= mdpy_fb_destroy,
->>   	.fb_setcolreg	= mdpy_fb_setcolreg,
-> 
+> You're right, but I'm confused: what are the two separate configurations
+> for?  Worth a comment?
 
-Acked-by : Kirti Wankhede <kwankhede@nvidia.com>
+For all architectures we've got one entry for in-tree builds and one
+in-tree entry for out-of-tree builds. Since we've got these two entries
+anyway, I simply split up the set of tests to speed up the CI process a
+little bit.
+
+ Thomas
 
