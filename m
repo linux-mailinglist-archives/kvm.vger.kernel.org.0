@@ -2,68 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2F4B117268
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 18:05:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF5BE117271
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 18:08:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbfLIRFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 12:05:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56991 "EHLO
+        id S1726477AbfLIRIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 12:08:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25745 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726408AbfLIRFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 12:05:43 -0500
+        with ESMTP id S1726230AbfLIRIG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 12:08:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575911141;
+        s=mimecast20190719; t=1575911284;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wIL9P9E+t0Af0cB2lnnGX6O0iOj+o/yCtp56yQPQwkQ=;
-        b=EwdI6Sjpz58nDF6eCBW3Xxa/xaG/KB1vkHoM7rqakJXJdluKNRJ894NVPVqAbuYSx6bgQ7
-        W5G8NNPTQNBTEXNCS6UGInl6S4gywdP+sY30WuK/Ol/TCHqvL4oXD2X7vE60NEf6QSG9l2
-        ziAtD6YFh8z6SsCVgaA6VlQHA2FiyVE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-YS7EUktANNKAVTN8AmBIpA-1; Mon, 09 Dec 2019 12:05:38 -0500
-Received: by mail-wr1-f70.google.com with SMTP id l20so7793600wrc.13
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 09:05:38 -0800 (PST)
+        bh=Hc7Y6g0yjTZ9XoXaqWide8ysWgzKcR0UkXKsv7vM0Ns=;
+        b=dm1kNFFNRPiAZlD8LC2o3Qso0QxSUzugV2Vv4KOQap4uPp/bWB2W15+xF6DnqTDkcMWGNK
+        wke6Qgyp08huOjEqPzKEmEHu/jYbPdfDL3CT4GMWFEVjW1KHhORp9tq4ixfbCt7DimEuuF
+        OrczBUDLBeU7oxUrPEhhQQtwH34mHS0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-gbnqPQ7FMamynVquXlDrDA-1; Mon, 09 Dec 2019 12:08:01 -0500
+Received: by mail-wm1-f70.google.com with SMTP id l13so13137wmj.8
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 09:08:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=wIL9P9E+t0Af0cB2lnnGX6O0iOj+o/yCtp56yQPQwkQ=;
-        b=aAWPlRe+ntLoPDPOgsa7zVJYms4UBCuPf1prQdgbrs3aEctj8c8XLrxu88WDd3Kk7t
-         ihLt+vkibSusF3ERX+1H99hI5QKDmuHs1sqftgXOKlgqeqako+dLpB4UEhnF+gne1W92
-         uAZJdIkhrk4RRSpdTu6JtVkkfkjMWNm92aQCkIeHyBiY4r2DT04miKFZAjg1FxnFFOCR
-         w2Ve8OS5fYx9bZBVgSjfs3SgWDy15g4BewYEMSgSYYAK+haQDwO5RkY0iG9uNRVkM4Ej
-         l2Dg/CDMJS836HJe6KHhbwn9sAx8fsR4+m2o5kThfHUyTQHyIcSaYDODz/2PExU3JK5x
-         8Y6w==
-X-Gm-Message-State: APjAAAX3aK+4zTSMiTw85a64ekykmseUHkg++KFL/LkyUasuVqIS/wLi
-        lcwKnHxD4Aex60I5GXnD5wytnQjiYcEqSkmx8Fs3IliSSu4JENmtUC8dUw8ZQgLn5Tu/fcjRjwx
-        K2JhCyvp4txIN
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr34135wmk.1.1575911137566;
-        Mon, 09 Dec 2019 09:05:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxKwynLR6vYeRDh6BKaDO4EA5HcVr4+oiiNnycyJhRCVOHGm6bTC7g+DgAPIxwaEfhVjnQv4w==
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr34113wmk.1.1575911137320;
-        Mon, 09 Dec 2019 09:05:37 -0800 (PST)
+        bh=Hc7Y6g0yjTZ9XoXaqWide8ysWgzKcR0UkXKsv7vM0Ns=;
+        b=Qu8w7ex6uGUBotCdSbZZm3rVi6gp47fokVb8hahehXqDqi8JDpRN4qGhjrImEKDfq6
+         Gj/O0rZdAHHD4eovxNhsTCKQ9CNi8WpWItPnsGkQP0WSipuC1nmtpcqb4bHJb79CtuRW
+         No0x3pr0BAZ33iugL+oekAE5xIbt1KSiEKGvV1SFqkYdIwZ1p1U25hO+YnSf81Orp2AP
+         s3olin3RvurjJuWZMv7OZbl8y3n+H9QSDHrmG6hh9+GkgV46mWLi8eHwWRN6jlD8TLBt
+         nPOUNXSCTEEZ+aJkK+yBl3YyVkUYcSFQfUCGLIOGlDAwpeA9NHPfAMLS1aSJyho+zyy1
+         nb0Q==
+X-Gm-Message-State: APjAAAXLhpka/eK4L64Ewu6iWHa+TW1cBKTvLTSmEqYRdZ+kDXcP9NCe
+        sbUM/1R95VGQfrfFv8eIRrLt6HWMksY7HXKTVcCHKwaIWWJs+qRJGkXK29MHfss9Wfm7IAMwL/E
+        8Q8KrHsGMehYI
+X-Received: by 2002:adf:fc4b:: with SMTP id e11mr3273477wrs.326.1575911280026;
+        Mon, 09 Dec 2019 09:08:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxD+PP6v5nLXTHHBzsFyAqa5JV/1UiwEvWozXK8XXMHtVK8UZyMqhpjC1encwUqCyeozsPxSA==
+X-Received: by 2002:adf:fc4b:: with SMTP id e11mr3273438wrs.326.1575911279694;
+        Mon, 09 Dec 2019 09:07:59 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id x18sm72699wrr.75.2019.12.09.09.05.36
+        by smtp.gmail.com with ESMTPSA id t12sm63254wrs.96.2019.12.09.09.07.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2019 09:05:36 -0800 (PST)
-Subject: Re: [PATCH 0/2] use jump label to handle resource release in
- irq_bypass_register_*
-To:     linmiaohe <linmiaohe@huawei.com>, alex.williamson@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1575600833-12839-1-git-send-email-linmiaohe@huawei.com>
+        Mon, 09 Dec 2019 09:07:59 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] travis.yml: Run 32-bit tests with KVM, too
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+References: <20191205170439.11607-1-thuth@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2900fcd4-f08e-0508-8b6a-4e7d82fbba78@redhat.com>
-Date:   Mon, 9 Dec 2019 18:05:36 +0100
+Message-ID: <699a350a-3956-5757-758c-0e246d698a7d@redhat.com>
+Date:   Mon, 9 Dec 2019 18:07:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1575600833-12839-1-git-send-email-linmiaohe@huawei.com>
+In-Reply-To: <20191205170439.11607-1-thuth@redhat.com>
 Content-Language: en-US
-X-MC-Unique: YS7EUktANNKAVTN8AmBIpA-1
+X-MC-Unique: gbnqPQ7FMamynVquXlDrDA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -72,24 +70,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/12/19 03:53, linmiaohe wrote:
-> From: Miaohe Lin <linmiaohe@huawei.com>
+On 05/12/19 18:04, Thomas Huth wrote:
+> KVM works on Travis in 32-bit, too, so we can enable more tests there.
 > 
-> Use out_err jump label to help handle resource release.
-> It's a good practice to release resource in one place
-> and help eliminate some duplicated code.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .travis.yml | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 > 
-> Miaohe Lin (2):
->   KVM: lib: use jump label to handle resource release in
->     irq_bypass_register_consumer()
->   KVM: lib: use jump label to handle resource release in
->     irq_bypass_register_producer()
-> 
->  virt/lib/irqbypass.c | 38 ++++++++++++++++++++------------------
->  1 file changed, 20 insertions(+), 18 deletions(-)
+> diff --git a/.travis.yml b/.travis.yml
+> index 4162366..75bcf08 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -34,15 +34,19 @@ matrix:
+>        env:
+>        - CONFIG="--arch=i386"
+>        - BUILD_DIR="."
+> -      - TESTS="eventinj port80 sieve tsc taskswitch umip vmexit_ple_round_robin"
+> +      - TESTS="asyncpf hyperv_stimer hyperv_synic kvmclock_test msr pmu realmode
+> +               s3 sieve smap smptest smptest3 taskswitch taskswitch2 tsc_adjust"
+> +      - ACCEL="kvm"
+>  
+>      - addons:
+>          apt_packages: gcc gcc-multilib qemu-system-x86
+>        env:
+>        - CONFIG="--arch=i386"
+>        - BUILD_DIR="i386-builddir"
+> -      - TESTS="vmexit_mov_from_cr8 vmexit_ipi vmexit_ipi_halt vmexit_mov_to_cr8
+> -               vmexit_cpuid vmexit_tscdeadline vmexit_tscdeadline_immed"
+> +      - TESTS="tsx-ctrl umip vmexit_cpuid vmexit_ipi vmexit_ipi_halt
+> +               vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ple_round_robin
+> +               vmexit_tscdeadline vmexit_tscdeadline_immed vmexit_vmcall"
+> +      - ACCEL="kvm"
+>  
+>      - addons:
+>          apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
 > 
 
-Queued, thanks.
+Applied, thanks.  But there are also some 32-bit specific tests
+(taskswitch, taskswitch2, cmpxchg8b) that we may want to add.
 
 Paolo
 
