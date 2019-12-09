@@ -2,111 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CEFD2116456
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 01:25:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23EC2116564
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 04:26:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726665AbfLIAZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Dec 2019 19:25:32 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41942 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726422AbfLIAZc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Dec 2019 19:25:32 -0500
-Received: by mail-pg1-f196.google.com with SMTP id x8so6210943pgk.8;
-        Sun, 08 Dec 2019 16:25:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
-        b=BSJaBm2ePbXg4/8QJEoez2M+93ZFU9CFwMm/wY/y3fH5J2FICxXg8f4R5L+w9xefYo
-         PTGQ5sPuVVu1AV7xJKYeCg6mPH6PVz6KvEF8AbZ9eS+0NQxwvSeZoSJ0gsdnjh5e3mZd
-         4OV2ibZ7dlTjDdmWZs9VKt9th1QoncUz5eCiV15AFzTuuUzDIycxQz83ZjnnSyOHTLvG
-         gNhSKdu3VCuezUFhphqXSBBClXUtu5jz8Eox0dKJp7rCb00Jjm9tpLfrC1ESWJfUKiB3
-         fcljUfI7jtssvTxptrRqIjOtU4i3FJLBvy518UbNZPY3iY5ZWRC+AEUvH9qqTosHGlXb
-         ywvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
-        b=M4qZJMGBLAnZK3DV3sxFcCNkkGHLtwOUI2pW5dT88oJ/mcxRL3STrtzhlLNcbFxUMl
-         CSYCkbDmlPeOKl/IO/y9Auj0C4RRMNWu2I1tsvtCCwqWn+mL6Ko/vBExFF4CI+94RpL6
-         ueEPeTFt6nkO+3286CfZFIJ/+5V1Pv9RR2mBqduo14u9a7mfJLdA87fmYjK0+uzNT8sO
-         ajpC5PVGnlnYIfWsf1tsOzJ/fg1aTIj4GqJKQXAxLzsAa5g54zHJ2hy7ri6P2RqP60TZ
-         w3Ac9iHulHyHd+ytTEC2GHt6RvH2JExSQH1vQHkrWXNkAirnxieIrelut9PJMNPn1UNu
-         P9jQ==
-X-Gm-Message-State: APjAAAX5l3MCJV7agHSWhnMyp/xJluuxgCHqzQc3ANa3LRRSeQm0Dmz0
-        ssa+pcmvF/lYX0uvXVjRyJ1JhzHG
-X-Google-Smtp-Source: APXvYqyLOx/NbgYchmoB1mb0Ueb/tUuLtaKFry8cwej7RBw1g78+6E329FnE4TSyZJDGD6IMKOF7vQ==
-X-Received: by 2002:a62:6381:: with SMTP id x123mr26519913pfb.75.1575851131060;
-        Sun, 08 Dec 2019 16:25:31 -0800 (PST)
-Received: from [172.20.20.156] ([222.151.198.97])
-        by smtp.gmail.com with ESMTPSA id o3sm9802750pju.13.2019.12.08.16.25.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Dec 2019 16:25:30 -0800 (PST)
-Subject: Re: [RFC net-next 07/18] tun: set offloaded xdp program
-To:     Jason Wang <jasowang@redhat.com>, David Ahern <dsahern@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>
-Cc:     Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        Andrii Nakryiko <andriin@fb.com>, netdev@vger.kernel.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126100744.5083-8-prashantbhole.linux@gmail.com>
- <3ff23a11-c979-32ed-b55d-9213c2c64bc4@gmail.com>
- <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
-From:   Prashant Bhole <prashantbhole.linux@gmail.com>
-Message-ID: <ba0c0d5f-fbb4-ff92-c7d8-403dbb757758@gmail.com>
-Date:   Mon, 9 Dec 2019 09:24:34 +0900
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1726955AbfLIDZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Dec 2019 22:25:55 -0500
+Received: from mga05.intel.com ([192.55.52.43]:54662 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726748AbfLIDZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Dec 2019 22:25:55 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Dec 2019 19:25:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; 
+   d="scan'208";a="244303960"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Dec 2019 19:25:52 -0800
+Date:   Sun, 8 Dec 2019 22:17:42 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Eric Blake <eblake@redhat.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
+ vfio-pci ops
+Message-ID: <20191209031742.GJ31791@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+ <20191205032536.29653-1-yan.y.zhao@intel.com>
+ <9461f821-73fd-a66f-e142-c1a55e38e7a0@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9461f821-73fd-a66f-e142-c1a55e38e7a0@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sorry about that. I'll pay attention to them next time and thank you for
+pointing them out :)
 
-
-On 12/2/19 11:47 AM, Jason Wang wrote:
+On Sat, Dec 07, 2019 at 07:13:30AM +0800, Eric Blake wrote:
+> On 12/4/19 9:25 PM, Yan Zhao wrote:
+> > when vfio-pci is bound to a physical device, almost all the hardware
+> > resources are passthroughed.
 > 
-> On 2019/12/2 上午12:45, David Ahern wrote:
->> On 11/26/19 4:07 AM, Prashant Bhole wrote:
->>> From: Jason Wang <jasowang@redhat.com>
->>>
->>> This patch introduces an ioctl way to set an offloaded XDP program
->>> to tun driver. This ioctl will be used by qemu to offload XDP program
->>> from virtio_net in the guest.
->>>
->> Seems like you need to set / reset the SOCK_XDP flag on tfile->sk since
->> this is an XDP program.
->>
->> Also, why not add this program using netlink instead of ioctl? e.g., as
->> part of a generic XDP in the egress path like I am looking into for the
->> host side.
+> The intent is obvious, but it sounds awkward to a native speaker.
+> s/passthroughed/passed through/
 > 
+> > Sometimes, vendor driver of this physcial device may want to mediate some
 > 
-> Maybe both, otherwise, qemu may need netlink as a dependency.
+> physical
 > 
-> Thanks
+> > hardware resource access for a short period of time, e.g. dirty page
+> > tracking during live migration.
+> > 
+> > Here we introduce mediate ops in vfio-pci for this purpose.
+> > 
+> > Vendor driver can register a mediate ops to vfio-pci.
+> > But rather than directly bind to the passthroughed device, the
 > 
-
-Thank you all for reviewing. We will continue to improve this set.
-
-If we split this work, Tx path XDP is one of the necessary part
-which can be developed first. As suggested by David Ahern it will be
-a netlink way but we will still need ioctl way for tap. I will try
-to come up with Tx path XDP set next time.
-
-Thanks.
+> passed-through
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
