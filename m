@@ -2,80 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC73B116EC2
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 15:12:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B1E0116EDC
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 15:21:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727903AbfLIOMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 09:12:46 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38252 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727572AbfLIOMq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 09:12:46 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D162478339045A5766C6;
-        Mon,  9 Dec 2019 22:12:42 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 9 Dec 2019
- 22:12:37 +0800
-Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
- from kernel or KVM
-To:     Beata Michalska <beata.michalska@linaro.org>
-CC:     Xiang Zheng <zhengxiang9@huawei.com>, <pbonzini@redhat.com>,
-        <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-        <shannon.zhaosl@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        "Laszlo Ersek" <lersek@redhat.com>, <james.morse@arm.com>,
-        <mtosatti@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
-        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>,
-        <wanghaibin.wang@huawei.com>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-6-zhengxiang9@huawei.com>
- <CADSWDztF=eaUDNnq8bhnPyTKW1YjAWm4UBaH-NBPkzjnzx0bxg@mail.gmail.com>
- <238ea7b3-9d6d-e3f7-40c9-e3e62b5fb477@huawei.com>
- <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <650e26cf-e007-1e31-cd0a-4042bb9fa6a8@huawei.com>
-Date:   Mon, 9 Dec 2019 22:12:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1727734AbfLIOVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 09:21:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31313 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727496AbfLIOVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 09:21:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575901275;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+        bh=zgj9vQF/fTAeoDAjrX8bS4Of9yiIqtQcuuBd/16/UWA=;
+        b=Mu7ShQKURK8RNbgWkU1/E5rJtgLS6+ThrqLd9Tz0LBLAcUqKFbpUrn5bm1FRCoXp5qFOyZ
+        iKeGrnEFHOjitElZ/tEh6ozMC2dUQ1wEaIShChd2hg2+Ghbh/cm1eDgX9Vd5NmzUqd7cz2
+        dELoqL0cYhirHojJKy5TLtP/mbOR1sg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-sgoQYwgSOqyfxY19qHDWhQ-1; Mon, 09 Dec 2019 09:21:14 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 242461005502;
+        Mon,  9 Dec 2019 14:21:13 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-121.ams2.redhat.com [10.36.116.121])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF01D60484;
+        Mon,  9 Dec 2019 14:21:04 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 03/18] lib: Add WRITE_ONCE and READ_ONCE
+ implementations in compiler.h
+To:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
+        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com, Laurent Vivier <lvivier@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20191128180418.6938-1-alexandru.elisei@arm.com>
+ <20191128180418.6938-4-alexandru.elisei@arm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <df974420-5853-245a-c616-eeb7a54dd35e@redhat.com>
+Date:   Mon, 9 Dec 2019 15:21:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191128180418.6938-4-alexandru.elisei@arm.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: sgoQYwgSOqyfxY19qHDWhQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 28/11/2019 19.04, Alexandru Elisei wrote:
+> Add the WRITE_ONCE and READ_ONCE macros which are used to prevent to
 
+Duplicated "prevent to" - please remove one.
 
-On 2019/12/9 21:05, Beata Michalska wrote:
->> Here we set the FnV to not valid, not to set it to valid.
->> because Guest will use the physical address that recorded in APEI table.
->>
-> To be precise : the FnV is  giving the status of FAR - so what you are setting
-> here is status of 0b0 which means FAR is valid, not FnV on it's own.
-> And my point was that you are changing the prototype for syn_data_abort_no_iss
-> just for this case only so I was just thinking that it might not be
-> worth that, instead
-> you could just set it here ... or to be more flexible , provide a way
-> to set specific bits
-> on demand.
+> prevent the compiler from optimizing a store or a load, respectively, into
+> something else.
 
-No, I set the FnV to 0b1, not 0b0, the whole esr_el1's value is 0x96000410, as shown below log:
-I remember changing the prototype for syn_data_abort_no_iss is suggested by Peter Maydell.
+Could you please also add a note here in the commit message about the
+kernel version that you used as a base? ... the file seems to have
+changed quite a bit in the course of time, so I think it would be good
+if we know the right base later.
 
-
-[1]:
-[   62.851830] Internal error: synchronous external abort: 96000410 [#1] PREEMPT SMP
-[   62.854465] Modules linked in:
-
-
-
-> 
+ Thomas
 
