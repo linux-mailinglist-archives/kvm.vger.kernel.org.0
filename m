@@ -2,164 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B18A117218
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 17:45:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED514117220
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 17:49:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726783AbfLIQpD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 11:45:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34226 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726673AbfLIQpD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 11:45:03 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB9GMAQZ168838
-        for <kvm@vger.kernel.org>; Mon, 9 Dec 2019 11:45:02 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wr8kwda9j-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 11:45:02 -0500
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Mon, 9 Dec 2019 16:45:00 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 9 Dec 2019 16:44:57 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB9GivEw38076762
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Dec 2019 16:44:57 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E7BB1AE056;
-        Mon,  9 Dec 2019 16:44:56 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1FD2AE045;
-        Mon,  9 Dec 2019 16:44:56 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Dec 2019 16:44:56 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 3/9] s390: interrupt registration
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
+        id S1726335AbfLIQtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 11:49:49 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55109 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbfLIQtt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 11:49:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575910187;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MsWyS7b8JEqHRYm7lpV/7W+au5U3elDWM+xrFzPleL8=;
+        b=QoL0l14dfBx5/laxPJFF7veY/cYsyFzHLypg7Zbib07EKGU3QCzHx5Kq3RNuGkwbgjnoJm
+        1onARkUSm0X6Cy2b7g1KzGgKri3+bi78LKPfn+bfykM9upHlTtO1vFko/GyDqBgjry+/vV
+        erE8TyLOd7SRE5dM07DLs6mmtZU35gY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-wd8SUIZ4P7mfs15wMKRBVQ-1; Mon, 09 Dec 2019 11:49:46 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29F4F800D24;
+        Mon,  9 Dec 2019 16:49:45 +0000 (UTC)
+Received: from gondolin (ovpn-116-43.ams2.redhat.com [10.36.116.43])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51C4866848;
+        Mon,  9 Dec 2019 16:49:41 +0000 (UTC)
+Date:   Mon, 9 Dec 2019 17:49:38 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 6/9] s390x: css: stsch, enumeration
+ test
+Message-ID: <20191209174938.7df1ffa2.cohuck@redhat.com>
+In-Reply-To: <1575649588-6127-7-git-send-email-pmorel@linux.ibm.com>
 References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
- <1575649588-6127-4-git-send-email-pmorel@linux.ibm.com>
- <c2decfb9-71e3-556d-2b91-4cd19ad9312a@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Mon, 9 Dec 2019 17:44:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        <1575649588-6127-7-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <c2decfb9-71e3-556d-2b91-4cd19ad9312a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: wd8SUIZ4P7mfs15wMKRBVQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19120916-0028-0000-0000-000003C6EF72
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120916-0029-0000-0000-0000248A1BE7
-Message-Id: <997516f1-acda-446c-1359-e0125a306db2@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-09_04:2019-12-09,2019-12-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=939
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- phishscore=0 bulkscore=0 clxscore=1015 adultscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912090141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri,  6 Dec 2019 17:26:25 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-
-On 2019-12-09 12:40, Thomas Huth wrote:
-> On 06/12/2019 17.26, Pierre Morel wrote:
->> Define two functions to register and to unregister a call back for IO
->> Interrupt handling.
->>
->> Per default we keep the old behavior, so does a successful unregister
->> of the callback.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/interrupt.c | 23 ++++++++++++++++++++++-
->>   lib/s390x/interrupt.h |  7 +++++++
->>   2 files changed, 29 insertions(+), 1 deletion(-)
->>   create mode 100644 lib/s390x/interrupt.h
->>
->> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
->> index 3e07867..e0eae4d 100644
->> --- a/lib/s390x/interrupt.c
->> +++ b/lib/s390x/interrupt.c
->> @@ -10,9 +10,9 @@
->>    * under the terms of the GNU Library General Public License version 2.
->>    */
->>   #include <libcflat.h>
->> -#include <asm/interrupt.h>
->>   #include <asm/barrier.h>
->>   #include <sclp.h>
->> +#include <interrupt.h>
->>   
->>   static bool pgm_int_expected;
->>   static bool ext_int_expected;
->> @@ -140,12 +140,33 @@ void handle_mcck_int(void)
->>   		     lc->mcck_old_psw.addr);
->>   }
->>   
->> +static void (*io_int_func)(void);
->> +
->>   void handle_io_int(void)
->>   {
->> +	if (*io_int_func)
->> +		return (*io_int_func)();
->> +
->>   	report_abort("Unexpected io interrupt: at %#lx",
->>   		     lc->io_old_psw.addr);
->>   }
->>   
->> +int register_io_int_func(void (*f)(void))
->> +{
->> +	if (io_int_func)
->> +		return -1;
->> +	io_int_func = f;
->> +	return 0;
->> +}
->> +
->> +int unregister_io_int_func(void (*f)(void))
->> +{
->> +	if (io_int_func != f)
->> +		return -1;
->> +	io_int_func = NULL;
->> +	return 0;
->> +}
->> +
->>   void handle_svc_int(void)
->>   {
->>   	report_abort("Unexpected supervisor call interrupt: at %#lx",
->> diff --git a/lib/s390x/interrupt.h b/lib/s390x/interrupt.h
->> new file mode 100644
->> index 0000000..e945ef7
->> --- /dev/null
->> +++ b/lib/s390x/interrupt.h
->> @@ -0,0 +1,7 @@
->> +#ifndef __INTERRUPT_H
->> +#include <asm/interrupt.h>
->> +
->> +int register_io_int_func(void (*f)(void));
->> +int unregister_io_int_func(void (*f)(void));
->> +
->> +#endif
->>
+> First step for testing the channel subsystem is to enumerate the css and
+> retrieve the css devices.
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> This tests the success of STSCH I/O instruction.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     |  1 +
+>  s390x/Makefile      |  2 ++
+>  s390x/css.c         | 82 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  4 +++
+>  4 files changed, 89 insertions(+)
+>  create mode 100644 s390x/css.c
 > 
 
-Thanks,
-Pierre
+> +static void test_enumerate(void)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int scn;
+> +	int cc, i;
+> +	int found = 0;
+> +
+> +	for (scn = 0; scn < 0xffff; scn++) {
+> +		cc = stsch(scn|SID_ONE, &schib);
+> +		if (!cc && (pmcw->flags & PMCW_DNV)) {
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Not sure when dnv is actually applicable... it is used for I/O
+subchannels; chsc subchannels don't have a device; message subchannels
+use a different bit IIRC; not sure about EADM subchannels.
+
+[Not very relevant as long as we run under KVM, but should be
+considered if you plan to run this test under z/VM or LPAR as well.]
+
+> +			report_info("SID %04x Type %s PIM %x", scn,
+> +				     Channel_type[PMCW_CHANNEL_TYPE(pmcw)],
+> +				     pmcw->pim);
+> +			for (i = 0; i < 8; i++)  {
+> +				if ((pmcw->pim << i) & 0x80) {
+> +					report_info("CHPID[%d]: %02x", i,
+> +						    pmcw->chpid[i]);
+> +					break;
+
+That 'break;' seems odd -- won't you end up printing the first chpid in
+the pim only?
+
+Maybe modify this loop to print the chpid if the path is in the pim,
+and 'n/a' or so if not?
+
+> +				}
+> +			}
+> +			found++;
+> +		}
+> +		if (cc == 3) /* cc = 3 means no more channel in CSS */
+
+s/channel/subchannels/
+
+> +			break;
+> +		if (found && !test_device_sid)
+> +			test_device_sid = scn|SID_ONE;
+> +	}
+> +	if (!found) {
+> +		report("Tested %d devices, none found", 0, scn);
+> +		return;
+> +	}
+> +	report("Tested %d devices, %d found", 1, scn, found);
+> +}
 
