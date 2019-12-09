@@ -2,74 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3482F116E69
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 15:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC73B116EC2
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 15:12:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727352AbfLIOBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 09:01:48 -0500
-Received: from mga06.intel.com ([134.134.136.31]:35912 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726687AbfLIOBs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 09:01:48 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Dec 2019 06:01:35 -0800
-X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; 
-   d="scan'208";a="206899935"
-Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Dec 2019 06:01:32 -0800
-From:   Jani Nikula <jani.nikula@intel.com>
-To:     dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        intel-gfx@lists.freedesktop.org,
-        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 11/12] samples: vfio-mdev: constify fb ops
-In-Reply-To: <ddb10df1316ef585930cda7718643a580f4fe37b.1575390741.git.jani.nikula@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <cover.1575390740.git.jani.nikula@intel.com> <ddb10df1316ef585930cda7718643a580f4fe37b.1575390741.git.jani.nikula@intel.com>
-Date:   Mon, 09 Dec 2019 16:01:29 +0200
-Message-ID: <87tv694myu.fsf@intel.com>
+        id S1727903AbfLIOMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 09:12:46 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38252 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727572AbfLIOMq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 09:12:46 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id D162478339045A5766C6;
+        Mon,  9 Dec 2019 22:12:42 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 9 Dec 2019
+ 22:12:37 +0800
+Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
+ from kernel or KVM
+To:     Beata Michalska <beata.michalska@linaro.org>
+CC:     Xiang Zheng <zhengxiang9@huawei.com>, <pbonzini@redhat.com>,
+        <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+        <shannon.zhaosl@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        "Laszlo Ersek" <lersek@redhat.com>, <james.morse@arm.com>,
+        <mtosatti@redhat.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>,
+        <wanghaibin.wang@huawei.com>
+References: <20191111014048.21296-1-zhengxiang9@huawei.com>
+ <20191111014048.21296-6-zhengxiang9@huawei.com>
+ <CADSWDztF=eaUDNnq8bhnPyTKW1YjAWm4UBaH-NBPkzjnzx0bxg@mail.gmail.com>
+ <238ea7b3-9d6d-e3f7-40c9-e3e62b5fb477@huawei.com>
+ <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <650e26cf-e007-1e31-cd0a-4042bb9fa6a8@huawei.com>
+Date:   Mon, 9 Dec 2019 22:12:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 03 Dec 2019, Jani Nikula <jani.nikula@intel.com> wrote:
-> Now that the fbops member of struct fb_info is const, we can start
-> making the ops const as well.
->
-> v2: fix	typo (Christophe de Dinechin)
->
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: kvm@vger.kernel.org
-> Reviewed-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> Signed-off-by: Jani Nikula <jani.nikula@intel.com>
 
-Kirti, may I have your ack to merge this through drm-misc please?
 
-BR,
-Jani.
+On 2019/12/9 21:05, Beata Michalska wrote:
+>> Here we set the FnV to not valid, not to set it to valid.
+>> because Guest will use the physical address that recorded in APEI table.
+>>
+> To be precise : the FnV is  giving the status of FAR - so what you are setting
+> here is status of 0b0 which means FAR is valid, not FnV on it's own.
+> And my point was that you are changing the prototype for syn_data_abort_no_iss
+> just for this case only so I was just thinking that it might not be
+> worth that, instead
+> you could just set it here ... or to be more flexible , provide a way
+> to set specific bits
+> on demand.
 
-> ---
->  samples/vfio-mdev/mdpy-fb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> index 2719bb259653..21dbf63d6e41 100644
-> --- a/samples/vfio-mdev/mdpy-fb.c
-> +++ b/samples/vfio-mdev/mdpy-fb.c
-> @@ -86,7 +86,7 @@ static void mdpy_fb_destroy(struct fb_info *info)
->  		iounmap(info->screen_base);
->  }
->  
-> -static struct fb_ops mdpy_fb_ops = {
-> +static const struct fb_ops mdpy_fb_ops = {
->  	.owner		= THIS_MODULE,
->  	.fb_destroy	= mdpy_fb_destroy,
->  	.fb_setcolreg	= mdpy_fb_setcolreg,
+No, I set the FnV to 0b1, not 0b0, the whole esr_el1's value is 0x96000410, as shown below log:
+I remember changing the prototype for syn_data_abort_no_iss is suggested by Peter Maydell.
 
--- 
-Jani Nikula, Intel Open Source Graphics Center
+
+[1]:
+[   62.851830] Internal error: synchronous external abort: 96000410 [#1] PREEMPT SMP
+[   62.854465] Modules linked in:
+
+
+
+> 
+
