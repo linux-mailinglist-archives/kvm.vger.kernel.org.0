@@ -2,147 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F10E9117A44
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 23:55:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE679117B1D
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 00:00:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727686AbfLIWzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 17:55:04 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:19976 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727543AbfLIWyO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 17:54:14 -0500
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5deed08f0000>; Mon, 09 Dec 2019 14:54:07 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Mon, 09 Dec 2019 14:54:13 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Mon, 09 Dec 2019 14:54:13 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 9 Dec
- 2019 22:54:12 +0000
-Received: from rnnvemgw01.nvidia.com (10.128.109.123) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 9 Dec 2019 22:54:11 +0000
-Received: from blueforge.nvidia.com (Not Verified[10.110.48.28]) by rnnvemgw01.nvidia.com with Trustwave SEG (v7,5,8,10121)
-        id <B5deed0920003>; Mon, 09 Dec 2019 14:54:11 -0800
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v8 26/26] selftests/vm: run_vmtests: invoke gup_benchmark with basic FOLL_PIN coverage
-Date:   Mon, 9 Dec 2019 14:53:44 -0800
-Message-ID: <20191209225344.99740-27-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191209225344.99740-1-jhubbard@nvidia.com>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
-MIME-Version: 1.0
-X-NVConfidentiality: public
+        id S1726956AbfLIW7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 17:59:34 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52908 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726207AbfLIW7d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 17:59:33 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB9Mx6Mg181410;
+        Mon, 9 Dec 2019 22:59:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=9VZDHEjKb44R0kGXgHcpv25sNTdn8W73zHkU+s8maME=;
+ b=K2IS/UzNfmuquvJeQ0oChE6YnDOFCmrskiuO6Ny0x+pne42fWuNZHdJGPrXi+8Ln9ZQK
+ agmCOvvavgCWhFipW1K7VrqSqovOR32z7MrmurV/65Jzn5HiY8KBcBDJNyW4LAOx8P5d
+ r2uvtNlEPIkcGkHOxw7czdhHRzeNyVQd+XccqIfX/ihjF583L8VkJKl9lKaKv4YgenKa
+ buwaOFXGryEyNYEyphuMYgZYvR4SkuM22iVDWnrGWmfZcm4kUadTrjhFIUXN72x6mq92
+ z3BfJU0TsI7IbzSSbvrf+sAQkBvZxQ3+5B5uudR8At1DdvkbM8sjqpibjr4nyQEmH0bM nA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2wr41q2pvw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 09 Dec 2019 22:59:28 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB9MxD1v193145;
+        Mon, 9 Dec 2019 22:59:28 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2wsfv3ecen-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 09 Dec 2019 22:59:26 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xB9MwKWJ002364;
+        Mon, 9 Dec 2019 22:58:20 GMT
+Received: from [192.168.14.112] (/79.183.210.197)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 09 Dec 2019 14:58:20 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
+ field
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <F709B998-3A28-4BA0-B9DD-0AEF4D6B26C1@gmail.com>
+Date:   Tue, 10 Dec 2019 00:58:17 +0200
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1575932047; bh=efjW/rF0EGuRthlOGEU05IQnyHi57jZRzyopoxtDk8c=;
-        h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-         In-Reply-To:References:MIME-Version:X-NVConfidentiality:
-         Content-Transfer-Encoding:Content-Type;
-        b=qV3uJB7VZRPn8h/t1hIu8YevHEQMbA6ytY7EXlbIwT+Y5aVa6SSMTKDXGhoau+Np9
-         SXj+sUF5Zt1nGzc+gDnMftMZ783jkTGZpbgnOkcctnZX3s3d6WXHEohuIVF7yzZeGR
-         ygw/gKI58lE2sUc35Cy0UmpJw+FO/2bcReyZzeD70yLGqvf4tS0EdeF8RZfC0ASFL8
-         7kuLYQ1Ps+1sWrXxax9z07GSCOo44qcTHbB3lxAH77qnnhMi2B1hjBCUkNOq6E9/ek
-         Op/wTYdOnk2+V0dbVmV+gE5zCnUDp7xm+aIrH1mszn1QnNw72uwtRJfg/zkFxFZtTv
-         8OVY/MKZ8u6pw==
+Message-Id: <C9182191-EE97-4F1B-A672-010BC160C07D@oracle.com>
+References: <20191204214027.85958-1-jmattson@google.com>
+ <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
+ <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
+ <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
+ <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
+ <F709B998-3A28-4BA0-B9DD-0AEF4D6B26C1@gmail.com>
+To:     Nadav Amit <nadav.amit@gmail.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9466 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912090180
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9466 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912090181
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's good to have basic unit test coverage of the new FOLL_PIN
-behavior. Fortunately, the gup_benchmark unit test is extremely
-fast (a few milliseconds), so adding it the the run_vmtests suite
-is going to cause no noticeable change in running time.
 
-So, add two new invocations to run_vmtests:
 
-1) Run gup_benchmark with normal get_user_pages().
+> On 9 Dec 2019, at 17:28, Nadav Amit <nadav.amit@gmail.com> wrote:
+>=20
+>> On Dec 5, 2019, at 1:54 PM, Liran Alon <liran.alon@oracle.com> wrote:
+>>=20
+>>=20
+>>=20
+>>> On 5 Dec 2019, at 23:30, Jim Mattson <jmattson@google.com> wrote:
+>>>=20
+>>> On Thu, Dec 5, 2019 at 5:11 AM Jim Mattson <jmattson@google.com> =
+wrote:
+>>>> On Thu, Dec 5, 2019 at 3:46 AM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>>>>> On 04/12/19 22:40, Jim Mattson wrote:
+>>>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
+>>>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>>>> of the VMCS field in the secondary source operand is checked.
+>>>>>>=20
+>>>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
+vmcs12 if running L2")
+>>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>>> ---
+>>>>>> arch/x86/kvm/vmx/nested.c | 38 =
++++++++++++++++++++-------------------
+>>>>>> 1 file changed, 19 insertions(+), 19 deletions(-)
+>>>>>=20
+>>>>> As Vitaly pointed out, the test must be split in two, like this:
+>>>>=20
+>>>> Right. Odd that no kvm-unit-tests noticed.
+>>>>=20
+>>>>> ---------------- 8< -----------------------
+>>>>> =46rom 3b9d87060e800ffae2bd19da94ede05018066c87 Mon Sep 17 =
+00:00:00 2001
+>>>>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>>>> Date: Thu, 5 Dec 2019 12:39:07 +0100
+>>>>> Subject: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer =
+before VMCS field
+>>>>>=20
+>>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
+>>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>>> of the VMCS field in the secondary source operand is checked.
+>>>>>=20
+>>>>> While cleaning up handle_vmwrite, make the code of handle_vmread =
+look
+>>>>> the same, too.
+>>>>=20
+>>>> Okay.
+>>>>=20
+>>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
+vmcs12 if running L2")
+>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>>=20
+>>>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>>>>> index 4aea7d304beb..c080a879b95d 100644
+>>>>> --- a/arch/x86/kvm/vmx/nested.c
+>>>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>>>> @@ -4767,14 +4767,13 @@ static int handle_vmread(struct kvm_vcpu =
+*vcpu)
+>>>>>      if (to_vmx(vcpu)->nested.current_vmptr =3D=3D -1ull)
+>>>>>              return nested_vmx_failInvalid(vcpu);
+>>>>>=20
+>>>>> -       if (!is_guest_mode(vcpu))
+>>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>>> -       else {
+>>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>>> +       if (is_guest_mode(vcpu)) {
+>>>>>              /*
+>>>>>               * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
+>>>>>               * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>>               */
+>>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>>>                      return nested_vmx_failInvalid(vcpu);
+>>>>>              vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>>      }
+>>>>> @@ -4878,8 +4877,19 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>>              }
+>>>>>      }
+>>>>>=20
+>>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>>> +       if (is_guest_mode(vcpu)) {
+>>>>> +               /*
+>>>>> +                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>>> +                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>> +                */
+>>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>>> +                       return nested_vmx_failInvalid(vcpu);
+>>>>> +               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>> +       }
+>>>>>=20
+>>>>>      field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) =
+>> 28) & 0xf));
+>>>>> +
+>>>>>      /*
+>>>>>       * If the vCPU supports "VMWRITE to any supported field in =
+the
+>>>>>       * VMCS," then the "read-only" fields are actually =
+read/write.
+>>>>> @@ -4889,24 +4899,12 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>>              return nested_vmx_failValid(vcpu,
+>>>>>                      VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+>>>>>=20
+>>>>> -       if (!is_guest_mode(vcpu)) {
+>>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>>> -
+>>>>> -               /*
+>>>>> -                * Ensure vmcs12 is up-to-date before any VMWRITE =
+that dirties
+>>>>> -                * vmcs12, else we may crush a field or consume a =
+stale value.
+>>>>> -                */
+>>>>> -               if (!is_shadow_field_rw(field))
+>>>>> -                       copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>>> -       } else {
+>>>>> -               /*
+>>>>> -                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>>> -                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>> -                */
+>>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>>> -                       return nested_vmx_failInvalid(vcpu);
+>>>>> -               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>> -       }
+>>>>> +       /*
+>>>>> +        * Ensure vmcs12 is up-to-date before any VMWRITE that =
+dirties
+>>>>> +        * vmcs12, else we may crush a field or consume a stale =
+value.
+>>>>> +        */
+>>>>> +       if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
+>>>>> +               copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>>>=20
+>>>>>      offset =3D vmcs_field_to_offset(field);
+>>>>>      if (offset < 0)
+>>>>>=20
+>>>>>=20
+>>>>> ... and also, do you have a matching kvm-unit-tests patch?
+>>>>=20
+>>>> I'll put one together, along with a test that shows the current
+>>>> priority inversion between read-only and unsupported VMCS fields.
+>>>=20
+>>> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so =
+I'm
+>>> going to add the test to tools/testing/selftests/kvm instead.
+>>=20
+>> Please don=E2=80=99t.
+>>=20
+>> I wish that we keep clear separation between kvm-unit-tests and =
+self-tests.
+>> In the sense that kvm-unit-tests tests for correct CPU behaviour =
+semantics
+>> and self-tests tests for correctness of KVM userspace API.
+>>=20
+>> In the future, I wish to change kvm-unit-tests to cpu-unit-tests. As =
+there is no
+>> real connection to KVM. It=E2=80=99s a bunch of tests that can be run =
+on top of any CPU
+>> Implementation (weather vCPU by some hypervisor or bare-metal CPU) =
+and
+>> test for it=E2=80=99s semantics.
+>> I have already used this to find semantic issues on Hyper-V vCPU =
+implementation for example.
+>=20
+> Did you use for the matter the =E2=80=9Cinfrastructure=E2=80=9D that I =
+added?
+>=20
 
-2) Run gup_benchmark with pin_user_pages(). This is much like
-the first call, except that it sets FOLL_PIN.
+No. It=E2=80=99s possible to just change QEMU to run with WHPX.
+But it=E2=80=99s true that the =E2=80=9Cinfra=E2=80=9D you added for =
+running on Bare-Metal should work as-well.
+This is why I wish to change kvm-unit-tests to cpu-unit-tests. :)
 
-Running these two in quick succession also provide a visual
-comparison of the running times, which is convenient.
+-Liran
 
-The new invocations are fairly early in the run_vmtests script,
-because with test suites, it's usually preferable to put the
-shorter, faster tests first, all other things being equal.
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- tools/testing/selftests/vm/run_vmtests | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/tools/testing/selftests/vm/run_vmtests b/tools/testing/selftes=
-ts/vm/run_vmtests
-index a692ea828317..df6a6bf3f238 100755
---- a/tools/testing/selftests/vm/run_vmtests
-+++ b/tools/testing/selftests/vm/run_vmtests
-@@ -112,6 +112,28 @@ echo "NOTE: The above hugetlb tests provide minimal co=
-verage.  Use"
- echo "      https://github.com/libhugetlbfs/libhugetlbfs.git for"
- echo "      hugetlb regression testing."
-=20
-+echo "--------------------------------------------"
-+echo "running 'gup_benchmark -U' (normal/slow gup)"
-+echo "--------------------------------------------"
-+./gup_benchmark -U
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+	exitcode=3D1
-+else
-+	echo "[PASS]"
-+fi
-+
-+echo "------------------------------------------"
-+echo "running gup_benchmark -b (pin_user_pages)"
-+echo "------------------------------------------"
-+./gup_benchmark -b
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+	exitcode=3D1
-+else
-+	echo "[PASS]"
-+fi
-+
- echo "-------------------"
- echo "running userfaultfd"
- echo "-------------------"
---=20
-2.24.0
 
