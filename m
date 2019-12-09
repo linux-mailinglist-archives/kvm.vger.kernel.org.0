@@ -2,109 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7383C1168F9
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 10:15:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56E0311697B
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 10:37:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727491AbfLIJPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 04:15:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22965 "EHLO
+        id S1727495AbfLIJhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 04:37:06 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30038 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727370AbfLIJPM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 04:15:12 -0500
+        by vger.kernel.org with ESMTP id S1727160AbfLIJhF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 04:37:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575882911;
+        s=mimecast20190719; t=1575884224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YfELO45T0KxxEI+GHyVFfpIjRmClA+hBogWql5/W6SQ=;
-        b=f4yX73UzOXwC/5HsOrgxhBCaj3AvQmeGI+KH/Fdt9sVxnojb/KwLb2xmcDGeX3S/hggy9G
-        /CYlvOqIsGxcJJx4tNGD7PnM1A/EExkq8bCUepRNr1+qp70ny7ABOyYSX58VtTqocU63TK
-        tvbJvkHSTlzoLGqYqk5VmBJLJo0GxB4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-100-ycsPezmHPnOwdQEk2RoEfQ-1; Mon, 09 Dec 2019 04:15:09 -0500
-Received: by mail-wr1-f72.google.com with SMTP id r2so7228924wrp.7
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 01:15:09 -0800 (PST)
+        bh=Yz/Z2Uyi82Tsm+Aa8fxJXMQfCMt+llfBcTS4k9m0UwA=;
+        b=NLboOS2m/G+Zd6wUxfu/3bT0gSWQrJhZqtQpoBV8hTT+YPqMVHqoC4fu3+jl8iFiJDLtPx
+        3DEGtgHblFLW9E5Zb1QFamIsQOPoJf6hTVZfDMhuUKAHmb/PeZG1wYtcCdAyyLYD8CQfBF
+        kPomYTQBylJA8bpncxs4LxkfNcDYras=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-Bt1ECc4YP9iZ_QrEkeRT6Q-1; Mon, 09 Dec 2019 04:37:03 -0500
+Received: by mail-wm1-f71.google.com with SMTP id q21so3630091wmc.7
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 01:37:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=YfELO45T0KxxEI+GHyVFfpIjRmClA+hBogWql5/W6SQ=;
-        b=NSSsr/Tk2AdJDjX2TxFLkTKsgZjtbp/vEbN4gtfXB2UKm3702HTre9BeUokrcbO2mv
-         xBD3de2DpChwbBZVX/qUfbTib7FgvH+QyHQtFdpAW0dbD+6VUfXZ3uces6PeBQrPO4ji
-         +SyX56w1CJDo57YzwNtrOm6Pc1bd0DGAu9X3y2hwFlbpPyXWQir7++3saOPwP0bfh5cz
-         DSNVRK8U2cxTabEGVFLXjyol1JtngaeK0ns/XMtAAFqJsc9wRTlJ9jKxI4Os3Pd+5pIS
-         qpxyDRZRVNkfgKzdSJV4EYouijkh09WQzOPqLEL2RNPNlU5rgcEWrrGZZGT+6QU2Gs2/
-         GOdg==
-X-Gm-Message-State: APjAAAXy5R6xkk93TGK++W23xb3fkxVjQGnx3XBC1BLCRw+ZUZX1cock
-        vM1YlQElnC69Ilz2D4wiM78RHFeyTenU+yPF5xpn3iNMDNLpUR51pqD692IFPD5QoIfAb4uK7mw
-        CD0LZ4YhPXeDG
-X-Received: by 2002:adf:df8e:: with SMTP id z14mr906545wrl.190.1575882908454;
-        Mon, 09 Dec 2019 01:15:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzx+0F73j75Sg0V4zv67J/A/gwFnTAMcfnz17PTb7O/+EUxA4H0I9/yLw8pcSUGf1X5vymqMA==
-X-Received: by 2002:adf:df8e:: with SMTP id z14mr906513wrl.190.1575882908118;
-        Mon, 09 Dec 2019 01:15:08 -0800 (PST)
+        bh=Yz/Z2Uyi82Tsm+Aa8fxJXMQfCMt+llfBcTS4k9m0UwA=;
+        b=dQ/wQobn9za+R2+523FGwlBh3ll3YdxoIPi/K8LmRFeXwyHebJz3BlX3Cm7u1DkArz
+         q8geDKh3OtYZcRt1YyDUg+/z2R60MzItTr6ie055Cba0QxXwUQKMy81JOSATDJsFIua6
+         mx69wZBEnHbwaiIRRFBEq+FesfuhFjA/Kb5HmH1AclSm53HJw3zZgETec/5YQ5y2JrEa
+         Oe6AfQn9ZENYX65s1WvbKdgx3bApGpieVngj2UZOdJMDQX29De/DqYPDUbqvByf4twOr
+         LIXpomhMky87cR08r9SO0CIWuEzHpCll5vYe44kdMjxRTFlVztVal2ANlnVxUah9zEbM
+         p6bA==
+X-Gm-Message-State: APjAAAX4dQkZw9VekAR7lS5cF5MV1wY/dIVXsDW63zrzQ6x30/h8O2+6
+        7WbGE69HfZ0v8U03aS/egV7ZJ1RiidykJsqhzgYk81BuP1ckwckKBNdBUNkrxACtrCG1PV3P9NG
+        Urk+XJrXqEw2D
+X-Received: by 2002:a1c:e909:: with SMTP id q9mr24499559wmc.30.1575884221781;
+        Mon, 09 Dec 2019 01:37:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzAW5LiyEF46zD4Bc+SWJqctxeL2ft11pv6kleMPxWl5MUVH4VkiuoT9F9bBt7G0hp8RX36XA==
+X-Received: by 2002:a1c:e909:: with SMTP id q9mr24499533wmc.30.1575884221452;
+        Mon, 09 Dec 2019 01:37:01 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id t81sm13500137wmg.6.2019.12.09.01.15.07
+        by smtp.gmail.com with ESMTPSA id n30sm12564626wmd.3.2019.12.09.01.37.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2019 01:15:07 -0800 (PST)
-Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
- trustworthy
-To:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Mon, 09 Dec 2019 01:37:00 -0800 (PST)
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        kvm@vger.kernel.org
-References: <20191105161737.21395-1-vkuznets@redhat.com>
- <de3cade3-c069-dc6b-1d2d-aa10abe365b8@redhat.com>
- <4f835a11-1528-a04e-9e06-1b8cdb97a04d@oracle.com>
- <87wob9d0t3.fsf@vitty.brq.redhat.com>
- <2e16b707-f020-22a3-a618-4960db917dfa@oracle.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191202201036.GJ4063@linux.intel.com> <20191202211640.GF31681@xz-x1>
+ <20191202215049.GB8120@linux.intel.com>
+ <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
+ <20191203184600.GB19877@linux.intel.com>
+ <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
+ <20191207002904.GA29396@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a8e0cd22-f61f-88e4-1594-6784fb39e41f@redhat.com>
-Date:   Mon, 9 Dec 2019 10:15:12 +0100
+Message-ID: <224ef677-4f25-fb61-2450-b95816333876@redhat.com>
+Date:   Mon, 9 Dec 2019 10:37:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <2e16b707-f020-22a3-a618-4960db917dfa@oracle.com>
+In-Reply-To: <20191207002904.GA29396@linux.intel.com>
 Content-Language: en-US
-X-MC-Unique: ycsPezmHPnOwdQEk2RoEfQ-1
+X-MC-Unique: Bt1ECc4YP9iZ_QrEkeRT6Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/12/19 21:31, Ankur Arora wrote:
->> If we, however, discuss other hints such 'pre-ACK' mechanism may make
->> sense, however, I'd make it an option to a 'challenge/response'
->> protocol: if host wants to change a hint it notifies the guest and waits
->> for an ACK from it (e.g. a pair of MSRs + an interrupt). I, however,
->
-> My main reason for this 'pre-ACK' approach is some discomfort with
-> changing the CPUID edx from under the guest.
+On 07/12/19 01:29, Sean Christopherson wrote:
+> On Wed, Dec 04, 2019 at 11:05:47AM +0100, Paolo Bonzini wrote:
+>> On 03/12/19 19:46, Sean Christopherson wrote:
+>>> Rather than reserve entries, what if vCPUs reserved an entire ring?  Create
+>>> a pool of N=nr_vcpus rings that are shared by all vCPUs.  To mark pages
+>>> dirty, a vCPU claims a ring, pushes the pages into the ring, and then
+>>> returns the ring to the pool.  If pushing pages hits the soft limit, a
+>>> request is made to drain the ring and the ring is not returned to the pool
+>>> until it is drained.
+>>>
+>>> Except for acquiring a ring, which likely can be heavily optimized, that'd
+>>> allow parallel processing (#1), and would provide a facsimile of #2 as
+>>> pushing more pages onto a ring would naturally increase the likelihood of
+>>> triggering a drain.  And it might be interesting to see the effect of using
+>>> different methods of ring selection, e.g. pure round robin, LRU, last used
+>>> on the current vCPU, etc...
+>>
+>> If you are creating nr_vcpus rings, and draining is done on the vCPU
+>> thread that has filled the ring, why not create nr_vcpus+1?  The current
+>> code then is exactly the same as pre-claiming a ring per vCPU and never
+>> releasing it, and using a spinlock to claim the per-VM ring.
+> 
+> Because I really don't like kvm_get_running_vcpu() :-)
 
-Changing the CPUID is fine, if we document which CPUID can change.
-There are CPUID leaves that change at runtime, for example in leaf 0Dh
-(though in that case it's based on XCR0 and not on external circumstances).
+I also don't like it particularly, but I think it's okay to wrap it into
+a nicer API.
 
-> As we've discussed offlist, the particular hint I'm interested in is
-> KVM_HINT_REALTIME. That's not a particularly good candidate though
-> because there's no correctness problem if the host does switch it
-> off suddenly. 
+> Binding the rings to vCPUs also makes for an inflexible API, e.g. the
+> amount of memory required for the rings scales linearly with the number of
+> vCPUs, or maybe there's a use case for having M:N vCPUs:rings.
 
-Or perhaps it's a good candidate, exactly because there's no correctness
-problem.  For SMT topology, there are security issues if the host
-doesn't respect it anymore, so making it changeable is of limited utility.
+If we can get rid of the dirty bitmap, the amount of memory is probably
+going to be smaller anyway.  For example at 64k per ring, 256 rings
+occupy 16 MiB of memory, and that is the cost of dirty bitmaps for 512
+GiB of guest memory, and that's probably what you can expect for the
+memory of a 256-vCPU guest (at least roughly: if the memory is 128 GiB,
+the extra 12 MiB for dirty page rings don't really matter).
 
 Paolo
+
+> That being said, I'm pretty clueless when it comes to implementing and
+> tuning the userspace side of this type of stuff, so feel free to ignore my
+> thoughts on the API.
+> 
 
