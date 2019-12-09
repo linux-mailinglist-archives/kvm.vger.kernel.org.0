@@ -2,259 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE2DB117058
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 16:26:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B93C117065
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 16:28:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726584AbfLIP0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 10:26:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32777 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726197AbfLIP0A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 10:26:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575905158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HG0F2juZ36JfdXhTGYpL+xnjYJicEBnT0mtVQz3eXXk=;
-        b=VueNnRZLcxAjnF4Xn43UgVXgVIny1NETUWAnQewCjt4HF6xcl3QQ4ejYpDpCTM/1lKTX+d
-        wvFDlBW8slDuA5hw3/wtz42+o6PYLnjbYgs0jL80rAMRGl+QYNEcOyMQda2PAmiMfB/2+x
-        Yd1Bw+JrjQzsuxdFxbUa0B6KhIm0lM4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-BxfnDRkmMd66uCmmWr71AQ-1; Mon, 09 Dec 2019 10:25:56 -0500
-Received: by mail-wr1-f71.google.com with SMTP id 90so7598253wrq.6
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 07:25:56 -0800 (PST)
+        id S1726677AbfLIP2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 10:28:11 -0500
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:46589 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726197AbfLIP2K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 10:28:10 -0500
+Received: by mail-pj1-f67.google.com with SMTP id z21so6031098pjq.13
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 07:28:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=iTU+qyv+S6GMb3NJReH+nniW7gLdqbjiplgB2H7+kGw=;
+        b=VY+nEGLdiFbkA9ZLW7jRgvuZ57i/vWtgoXsgAop3wkK+tRfSAWjRHgd+ct+Yq3i4R4
+         mMp/BKMNLXh73qp4Stb3b3CWhnUJpo9hIy3wxtIn+gcep2bATipcYd1t7QM6QSqKRdpX
+         sAUsMCWkfiv/e4vNKrOqciCwmS419qcY+KKFTjiI16H2G2dOdIfyQGRONCbpNaNOicTR
+         xxQ5OxaODtljgIZBfXanDi66PCc5u6kOpEdxtL8rVNnLhI+mAn7GNQSaXtyK2Iuc9W+Z
+         GWZhrhhqLuL8B1KLayrDx9Ns2Zg8B8IHybLbm+q3jSR81ZASivMMPeqMYVyJFUIjTYij
+         97ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HG0F2juZ36JfdXhTGYpL+xnjYJicEBnT0mtVQz3eXXk=;
-        b=E1MlLURupkJ6M5rl5TyLaUDRGfTYZ+phAkuyJv0DXAozo+rb3sIwa1L8B4dGTwDuJ2
-         YSum3yOehoG1P7lSK/8563EP1unCdZzUFDzcG/xnjKrgaf+B0q/NeFUrRAnksRdEVtcw
-         DQHv5+Bk+4ZGQvyUF8cuGUbQUQYdUx7k4K6txzJ1kFMofNg3sJlk7vPZKDR2yOoyo78h
-         GuGQ23gHdZPC1T548kymrAxKlKFu5XCHdo5RdfQEkjh9M3MgNELnkuJmVf0czxI+A7pL
-         IvXCBgXSunlKorPMKHReBcTdhx2nxix81Nm40B26tABrKYBjFHbniWGjshuSTOrknTTt
-         wgQA==
-X-Gm-Message-State: APjAAAXweOTOcwtbgnArzxjgziuncNuGkaI914y6cGWA2446a0LCRBty
-        FSlOfPEnKY9CEp81qwtWPIdwJ8nH6jiNB4PtIU4pKGFo94Tdcco/BJjm7Cp1bSaU6k90Km44s3E
-        50HOZBCnaKyoS
-X-Received: by 2002:adf:f70b:: with SMTP id r11mr2963061wrp.388.1575905155224;
-        Mon, 09 Dec 2019 07:25:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzhG97fssrcBK2f8brLRzZIKABACUSRiEiNmiXmQ2IIp6Xnn2ZAuO70x3BUwmkXW8OZzgsCfA==
-X-Received: by 2002:adf:f70b:: with SMTP id r11mr2963021wrp.388.1575905154855;
-        Mon, 09 Dec 2019 07:25:54 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id m7sm71336wma.39.2019.12.09.07.25.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2019 07:25:54 -0800 (PST)
-Subject: Re: [PATCH v3 3/3] kvm: nVMX: Aesthetic cleanup of handle_vmread and
- handle_vmwrite
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jon Cargille <jcargill@google.com>
-References: <20191206234637.237698-1-jmattson@google.com>
- <20191206234637.237698-3-jmattson@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3de38099-e94b-58d5-4bf4-56d2fd0d0956@redhat.com>
-Date:   Mon, 9 Dec 2019 16:25:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191206234637.237698-3-jmattson@google.com>
-Content-Language: en-US
-X-MC-Unique: BxfnDRkmMd66uCmmWr71AQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=iTU+qyv+S6GMb3NJReH+nniW7gLdqbjiplgB2H7+kGw=;
+        b=CCiQdF4oS4da1GLqYgUtmajr6yuFZiq1fxC8X5+d+8NCckleSJlAQOFu9TxRfRyJbU
+         W2lA2nEdLizGiT2OgA1QxY9Ulqyh8E81axYllvFQE6cX8CTRBShap5qoVyZzFs8kdrTs
+         X+Z3RWxrtIJSOyuzk8nk780HvvcnXtGWiL4WwNjfoA+ZOUz9zPEDRoylMsCEsQ2ob28E
+         JTDMJMwUFanThkmZsf1EpT4P4qK+KfIW2Ey+pbqbE/fsKZOQlQdADMCJ84kdveYO5gIV
+         /ZkQE2SvDJPbX09BstAk0ut+NQbLh0WToQX+TWJ7pdQ9DuWxVff1cS4X2u8ZYzvMDbCT
+         7pWA==
+X-Gm-Message-State: APjAAAV80cK6BllUIJCVxX2KcgNQccBurWI0BqIkXMuexxOx+mUdDb+p
+        VuGVkuLY63npnd5jmchFTuQ=
+X-Google-Smtp-Source: APXvYqwo+3D3pnOhtPLeqaNp6w3lrQJrSkJQsb/uyKC+KuQmFoHfiWg+/rcuFjUbisgJVKHkqIxO3A==
+X-Received: by 2002:a17:90a:cc10:: with SMTP id b16mr24249707pju.55.1575905289549;
+        Mon, 09 Dec 2019 07:28:09 -0800 (PST)
+Received: from [10.2.144.69] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id 100sm69124pjo.17.2019.12.09.07.28.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Dec 2019 07:28:08 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
+ field
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
+Date:   Mon, 9 Dec 2019 07:28:06 -0800
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F709B998-3A28-4BA0-B9DD-0AEF4D6B26C1@gmail.com>
+References: <20191204214027.85958-1-jmattson@google.com>
+ <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
+ <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
+ <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
+ <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
+To:     Liran Alon <liran.alon@oracle.com>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/12/19 00:46, Jim Mattson wrote:
-> Apply reverse fir tree declaration order, shorten some variable names
-> to avoid line wrap, reformat a block comment, delete an extra blank
-> line, and use BIT(10) instead of (1u << 10).
-> 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
-> Reviewed-by: Jon Cargille <jcargill@google.com>
-> ---
-> v1 -> v2:
->  * New commit in v2.
-> v2 -> v3:
->  * Shortened some variable names instead of wrapping long lines.
->  * Changed BIT_ULL to BIT.
-> 
->  arch/x86/kvm/vmx/nested.c | 70 +++++++++++++++++++--------------------
->  1 file changed, 34 insertions(+), 36 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 94ec089d6d1a..336fe366a25f 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4751,17 +4751,17 @@ static int handle_vmresume(struct kvm_vcpu *vcpu)
->  
->  static int handle_vmread(struct kvm_vcpu *vcpu)
->  {
-> -	unsigned long field;
-> -	u64 field_value;
-> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-> -	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-> -	int len;
-> -	gva_t gva = 0;
->  	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
->  						    : get_vmcs12(vcpu);
-> +	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-> +	u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	struct x86_exception e;
-> +	unsigned long field;
-> +	u64 value;
-> +	gva_t gva = 0;
->  	short offset;
-> +	int len;
->  
->  	if (!nested_vmx_check_permission(vcpu))
->  		return 1;
-> @@ -4776,7 +4776,7 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->  		return nested_vmx_failInvalid(vcpu);
->  
->  	/* Decode instruction info and find the field to read */
-> -	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-> +	field = kvm_register_readl(vcpu, (((instr_info) >> 28) & 0xf));
->  
->  	offset = vmcs_field_to_offset(field);
->  	if (offset < 0)
-> @@ -4786,24 +4786,23 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->  	if (!is_guest_mode(vcpu) && is_vmcs12_ext_field(field))
->  		copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->  
-> -	/* Read the field, zero-extended to a u64 field_value */
-> -	field_value = vmcs12_read_any(vmcs12, field, offset);
-> +	/* Read the field, zero-extended to a u64 value */
-> +	value = vmcs12_read_any(vmcs12, field, offset);
->  
->  	/*
->  	 * Now copy part of this value to register or memory, as requested.
->  	 * Note that the number of bits actually copied is 32 or 64 depending
->  	 * on the guest's mode (32 or 64 bit), not on the given field's length.
->  	 */
-> -	if (vmx_instruction_info & (1u << 10)) {
-> -		kvm_register_writel(vcpu, (((vmx_instruction_info) >> 3) & 0xf),
-> -			field_value);
-> +	if (instr_info & BIT(10)) {
-> +		kvm_register_writel(vcpu, (((instr_info) >> 3) & 0xf), value);
->  	} else {
->  		len = is_64_bit_mode(vcpu) ? 8 : 4;
->  		if (get_vmx_mem_address(vcpu, exit_qualification,
-> -				vmx_instruction_info, true, len, &gva))
-> +					instr_info, true, len, &gva))
->  			return 1;
->  		/* _system ok, nested_vmx_check_permission has verified cpl=0 */
-> -		if (kvm_write_guest_virt_system(vcpu, gva, &field_value, len, &e))
-> +		if (kvm_write_guest_virt_system(vcpu, gva, &value, len, &e))
->  			kvm_inject_page_fault(vcpu, &e);
->  	}
->  
-> @@ -4836,24 +4835,25 @@ static bool is_shadow_field_ro(unsigned long field)
->  
->  static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  {
-> +	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-> +						    : get_vmcs12(vcpu);
-> +	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-> +	u32 instr_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	struct x86_exception e;
->  	unsigned long field;
-> -	int len;
-> +	short offset;
->  	gva_t gva;
-> -	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	unsigned long exit_qualification = vmcs_readl(EXIT_QUALIFICATION);
-> -	u32 vmx_instruction_info = vmcs_read32(VMX_INSTRUCTION_INFO);
-> +	int len;
->  
-> -	/* The value to write might be 32 or 64 bits, depending on L1's long
-> +	/*
-> +	 * The value to write might be 32 or 64 bits, depending on L1's long
->  	 * mode, and eventually we need to write that into a field of several
->  	 * possible lengths. The code below first zero-extends the value to 64
-> -	 * bit (field_value), and then copies only the appropriate number of
-> +	 * bit (value), and then copies only the appropriate number of
->  	 * bits into the vmcs12 field.
->  	 */
-> -	u64 field_value = 0;
-> -	struct x86_exception e;
-> -	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-> -						    : get_vmcs12(vcpu);
-> -	short offset;
-> +	u64 value = 0;
->  
->  	if (!nested_vmx_check_permission(vcpu))
->  		return 1;
-> @@ -4867,22 +4867,20 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  	     get_vmcs12(vcpu)->vmcs_link_pointer == -1ull))
->  		return nested_vmx_failInvalid(vcpu);
->  
-> -	if (vmx_instruction_info & (1u << 10))
-> -		field_value = kvm_register_readl(vcpu,
-> -			(((vmx_instruction_info) >> 3) & 0xf));
-> +	if (instr_info & BIT(10))
-> +		value = kvm_register_readl(vcpu, (((instr_info) >> 3) & 0xf));
->  	else {
->  		len = is_64_bit_mode(vcpu) ? 8 : 4;
->  		if (get_vmx_mem_address(vcpu, exit_qualification,
-> -				vmx_instruction_info, false, len, &gva))
-> +					instr_info, false, len, &gva))
->  			return 1;
-> -		if (kvm_read_guest_virt(vcpu, gva, &field_value, len, &e)) {
-> +		if (kvm_read_guest_virt(vcpu, gva, &value, len, &e)) {
->  			kvm_inject_page_fault(vcpu, &e);
->  			return 1;
->  		}
->  	}
->  
-> -
-> -	field = kvm_register_readl(vcpu, (((vmx_instruction_info) >> 28) & 0xf));
-> +	field = kvm_register_readl(vcpu, (((instr_info) >> 28) & 0xf));
->  
->  	offset = vmcs_field_to_offset(field);
->  	if (offset < 0)
-> @@ -4914,9 +4912,9 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  	 * the stripped down value, L2 sees the full value as stored by KVM).
->  	 */
->  	if (field >= GUEST_ES_AR_BYTES && field <= GUEST_TR_AR_BYTES)
-> -		field_value &= 0x1f0ff;
-> +		value &= 0x1f0ff;
->  
-> -	vmcs12_write_any(vmcs12, field, offset, field_value);
-> +	vmcs12_write_any(vmcs12, field, offset, value);
->  
->  	/*
->  	 * Do not track vmcs12 dirty-state if in guest-mode as we actually
-> @@ -4933,7 +4931,7 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  			preempt_disable();
->  			vmcs_load(vmx->vmcs01.shadow_vmcs);
->  
-> -			__vmcs_writel(field, field_value);
-> +			__vmcs_writel(field, value);
->  
->  			vmcs_clear(vmx->vmcs01.shadow_vmcs);
->  			vmcs_load(vmx->loaded_vmcs->vmcs);
-> 
+> On Dec 5, 2019, at 1:54 PM, Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+>=20
+>=20
+>> On 5 Dec 2019, at 23:30, Jim Mattson <jmattson@google.com> wrote:
+>>=20
+>> On Thu, Dec 5, 2019 at 5:11 AM Jim Mattson <jmattson@google.com> =
+wrote:
+>>> On Thu, Dec 5, 2019 at 3:46 AM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>>>> On 04/12/19 22:40, Jim Mattson wrote:
+>>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
+>>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>>> of the VMCS field in the secondary source operand is checked.
+>>>>>=20
+>>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
+vmcs12 if running L2")
+>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>> ---
+>>>>> arch/x86/kvm/vmx/nested.c | 38 =
++++++++++++++++++++-------------------
+>>>>> 1 file changed, 19 insertions(+), 19 deletions(-)
+>>>>=20
+>>>> As Vitaly pointed out, the test must be split in two, like this:
+>>>=20
+>>> Right. Odd that no kvm-unit-tests noticed.
+>>>=20
+>>>> ---------------- 8< -----------------------
+>>>> =46rom 3b9d87060e800ffae2bd19da94ede05018066c87 Mon Sep 17 00:00:00 =
+2001
+>>>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Date: Thu, 5 Dec 2019 12:39:07 +0100
+>>>> Subject: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before =
+VMCS field
+>>>>=20
+>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
+>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>> of the VMCS field in the secondary source operand is checked.
+>>>>=20
+>>>> While cleaning up handle_vmwrite, make the code of handle_vmread =
+look
+>>>> the same, too.
+>>>=20
+>>> Okay.
+>>>=20
+>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 =
+if running L2")
+>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>=20
+>>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>>>> index 4aea7d304beb..c080a879b95d 100644
+>>>> --- a/arch/x86/kvm/vmx/nested.c
+>>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>>> @@ -4767,14 +4767,13 @@ static int handle_vmread(struct kvm_vcpu =
+*vcpu)
+>>>>       if (to_vmx(vcpu)->nested.current_vmptr =3D=3D -1ull)
+>>>>               return nested_vmx_failInvalid(vcpu);
+>>>>=20
+>>>> -       if (!is_guest_mode(vcpu))
+>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>> -       else {
+>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>> +       if (is_guest_mode(vcpu)) {
+>>>>               /*
+>>>>                * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
+>>>>                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>                */
+>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>>                       return nested_vmx_failInvalid(vcpu);
+>>>>               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>       }
+>>>> @@ -4878,8 +4877,19 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>               }
+>>>>       }
+>>>>=20
+>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>> +       if (is_guest_mode(vcpu)) {
+>>>> +               /*
+>>>> +                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>> +                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>> +                */
+>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>> +                       return nested_vmx_failInvalid(vcpu);
+>>>> +               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>> +       }
+>>>>=20
+>>>>       field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) =
+>> 28) & 0xf));
+>>>> +
+>>>>       /*
+>>>>        * If the vCPU supports "VMWRITE to any supported field in =
+the
+>>>>        * VMCS," then the "read-only" fields are actually =
+read/write.
+>>>> @@ -4889,24 +4899,12 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>               return nested_vmx_failValid(vcpu,
+>>>>                       VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+>>>>=20
+>>>> -       if (!is_guest_mode(vcpu)) {
+>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>> -
+>>>> -               /*
+>>>> -                * Ensure vmcs12 is up-to-date before any VMWRITE =
+that dirties
+>>>> -                * vmcs12, else we may crush a field or consume a =
+stale value.
+>>>> -                */
+>>>> -               if (!is_shadow_field_rw(field))
+>>>> -                       copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>> -       } else {
+>>>> -               /*
+>>>> -                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>> -                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>> -                */
+>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>> -                       return nested_vmx_failInvalid(vcpu);
+>>>> -               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>> -       }
+>>>> +       /*
+>>>> +        * Ensure vmcs12 is up-to-date before any VMWRITE that =
+dirties
+>>>> +        * vmcs12, else we may crush a field or consume a stale =
+value.
+>>>> +        */
+>>>> +       if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
+>>>> +               copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>>=20
+>>>>       offset =3D vmcs_field_to_offset(field);
+>>>>       if (offset < 0)
+>>>>=20
+>>>>=20
+>>>> ... and also, do you have a matching kvm-unit-tests patch?
+>>>=20
+>>> I'll put one together, along with a test that shows the current
+>>> priority inversion between read-only and unsupported VMCS fields.
+>>=20
+>> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so I'm
+>> going to add the test to tools/testing/selftests/kvm instead.
+>=20
+> Please don=E2=80=99t.
+>=20
+> I wish that we keep clear separation between kvm-unit-tests and =
+self-tests.
+> In the sense that kvm-unit-tests tests for correct CPU behaviour =
+semantics
+> and self-tests tests for correctness of KVM userspace API.
+>=20
+> In the future, I wish to change kvm-unit-tests to cpu-unit-tests. As =
+there is no
+> real connection to KVM. It=E2=80=99s a bunch of tests that can be run =
+on top of any CPU
+> Implementation (weather vCPU by some hypervisor or bare-metal CPU) and
+> test for it=E2=80=99s semantics.
+> I have already used this to find semantic issues on Hyper-V vCPU =
+implementation for example.
 
-Queued, thanks.
-
-Paolo
+Did you use for the matter the =E2=80=9Cinfrastructure=E2=80=9D that I =
+added?
 
