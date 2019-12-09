@@ -2,142 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 432F7117238
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 17:54:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA5BB117259
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 18:03:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfLIQyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 11:54:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49972 "EHLO
+        id S1726538AbfLIRDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 12:03:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32733 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726342AbfLIQyn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 11:54:43 -0500
+        with ESMTP id S1726342AbfLIRDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 12:03:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575910481;
+        s=mimecast20190719; t=1575911015;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qyTDNt9dcVhgpPpYvZfl+wuXkSEUUPLFfNjqTrmJ1GA=;
-        b=fplIkMzNN37kIa8wb3UGin9YVy3rSRlR7GBeaKSmDf5XSdSRAkKYfmLlJ885OLY3kqPFpB
-        WCFWxu3y4rU4+Qn2ZjR3+YDsAgVbjd6p60wV2Bue5h55rtQdXF1Vk2rJ4eT5wzUQEqynCb
-        IFTdbY4cLkUN0Z3dlmzcHBi2YY6siHM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-5SgfpZgQNXOVzLTBOVvASw-1; Mon, 09 Dec 2019 11:54:38 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CCA48017DF;
-        Mon,  9 Dec 2019 16:54:37 +0000 (UTC)
-Received: from gondolin (ovpn-116-43.ams2.redhat.com [10.36.116.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DEA565C21B;
-        Mon,  9 Dec 2019 16:54:32 +0000 (UTC)
-Date:   Mon, 9 Dec 2019 17:54:30 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 7/9] s390x: css: msch, enable test
-Message-ID: <20191209175430.5381b328.cohuck@redhat.com>
-In-Reply-To: <1575649588-6127-8-git-send-email-pmorel@linux.ibm.com>
-References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
-        <1575649588-6127-8-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=XZscNEm/8S7rYYR2nNxSKnziRbIDnKfxgL2hsBGVmf0=;
+        b=PMrt/sQBnArGLIPTmegCW1ktQ87IKFbHJLRQM74GW9BnKoJR/H2PDYlI2Q/kznnaVmB2TE
+        HLkWORSbOenpi++WWCdhRsQgW5MbLiqqsCY03bUL2nIEUsNH5BmHk66wSXDjfqtcd8xlqk
+        WZ/uE36R+zOPyeKJYPhIIi9atZ7wGWY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-OqQ_I0h7OJiyevt3yePYYQ-1; Mon, 09 Dec 2019 12:03:34 -0500
+Received: by mail-wr1-f69.google.com with SMTP id j13so7744684wrr.20
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 09:03:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XZscNEm/8S7rYYR2nNxSKnziRbIDnKfxgL2hsBGVmf0=;
+        b=DZX8nGDqOB4ZteUpZzEmqvI65fKJ/76RLafP2Qx8pQyJ9Zea+YcyHtnYgq7KA3uVt0
+         JmWTNO5J7C/iJExseJF5d+yTVnbtc4urcDz8f7fZKPgFFfX5Xifdk4QFbFWIeBxAF87f
+         obm/AQuU6MBnxhIZsPeprIJBNZg5M53Nl3Ni9OwhMg20ZYrZFmRs5vbIbdpcbqDFKqHu
+         6ECDRSD+OihlG2LNhITLuiAmcxI75UjcJhoCMabU6Fg8M0j49pwIPdXDl7gF2pTergfy
+         xrBt56wI3c3eO1YNHrm2dOT6Zlq3waya3VwlSlZ+RFXCjbZIfPPXAaA4WTdYeD8H3od6
+         ZKxA==
+X-Gm-Message-State: APjAAAVFVOSL6uYwAue050ZIiAo7/IfHeUnH1nn5GSwkbOOoXk7kCHWh
+        OznTIGiyKv+7jiKzw/4JwYg9sEnevoLl2+CAE9jnvu8u7XcunBbPSsra6YiV8SSwY3+Bk7TPEhI
+        GlPsxy8/u77WP
+X-Received: by 2002:a7b:ce98:: with SMTP id q24mr9566wmj.41.1575911013014;
+        Mon, 09 Dec 2019 09:03:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzDpR0s5SjlfMtDdgShxfdl9maDu+Un6Z+SFZJ5fcGr598GSHGZuwP95n0rBAgJvv9SZhP8JA==
+X-Received: by 2002:a7b:ce98:: with SMTP id q24mr9536wmj.41.1575911012749;
+        Mon, 09 Dec 2019 09:03:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id d12sm72894wrp.62.2019.12.09.09.03.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2019 09:03:31 -0800 (PST)
+Subject: Re: [PATCH v4 1/2] KVM: VMX: FIXED+PHYSICAL mode single target IPI
+ fastpath
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Liran Alon <liran.alon@oracle.com>
+References: <1574306232-872-1-git-send-email-wanpengli@tencent.com>
+ <CANRm+CxYpPftErvk=JJdWZikKSn-PYsVRVP3LpF+Q3yBF8ypxg@mail.gmail.com>
+ <CANRm+Cy_Aq4HY9vYDtBfoNyo8wikf8Mi3u7NBm=U78w1VtTFMA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9bc78a4c-6023-2566-d5ce-af611b199603@redhat.com>
+Date:   Mon, 9 Dec 2019 18:03:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 5SgfpZgQNXOVzLTBOVvASw-1
+In-Reply-To: <CANRm+Cy_Aq4HY9vYDtBfoNyo8wikf8Mi3u7NBm=U78w1VtTFMA@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: OqQ_I0h7OJiyevt3yePYYQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  6 Dec 2019 17:26:26 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 09/12/19 09:15, Wanpeng Li wrote:
+> kindly ping after the merge window. :)
 
-> A second step when testing the channel subsystem is to prepare a channel
-> for use.
-> This includes:
-> - Get the current SubCHannel Information Block (SCHIB) using STSCH
-> - Update it in memory to set the ENABLE bit
-> - Tell the CSS that the SCHIB has been modified using MSCH
-> - Get the SCHIB from the CSS again to verify that the subchannel is
->   enabled.
-> 
-> This tests the success of the MSCH instruction by enabling a channel.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  s390x/css.c | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/s390x/css.c b/s390x/css.c
-> index 3d4a986..4c0031c 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -58,11 +58,50 @@ static void test_enumerate(void)
->  	report("Tested %d devices, %d found", 1, scn, found);
->  }
->  
-> +static void test_enable(void)
-> +{
-> +	struct pmcw *pmcw = &schib.pmcw;
-> +	int cc;
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		return;
-> +	}
-> +	/* Read the SCIB for this subchannel */
+Looks good.  Naming is hard, and I don't like very much the "accel"
+part.  As soon as I come up with some names I prefer I will propose them
+and apply the patch.
 
-s/SCIB/SCHIB/
-
-> +	cc = stsch(test_device_sid, &schib);
-> +	if (cc) {
-> +		report("stsch cc=%d", 0, cc);
-> +		return;
-> +	}
-> +	/* Update the SCHIB to enable the channel */
-> +	pmcw->flags |= PMCW_ENABLE;
-> +
-> +	/* Tell the CSS we want to modify the subchannel */
-> +	cc = msch(test_device_sid, &schib);
-> +	if (cc) {
-> +		report("msch cc=%d", 0, cc);
-
-So you expect the subchannel to be idle? Probably true, especially as
-QEMU has no reason to post an unsolicited interrupt for a test device.
-
-> +		return;
-> +	}
-> +
-> +	/* Read the SCHIB again to verify the enablement */
-> +	cc = stsch(test_device_sid, &schib);
-> +	if (cc) {
-> +		report("stsch cc=%d", 0, cc);
-> +		return;
-> +	}
-> +	if (!(pmcw->flags & PMCW_ENABLE)) {
-> +		report("Enable failed. pmcw: %x", 0, pmcw->flags);
-
-This check is fine when running under KVM. If this test is modified to
-run under z/VM in the future, you probably should retry here: I've seen
-the enable bit 'stick' only after the second msch() there.
-
-> +		return;
-> +	}
-> +	report("Tested", 1);
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
->  } tests[] = {
->  	{ "enumerate (stsch)", test_enumerate },
-> +	{ "enable (msch)", test_enable },
->  	{ NULL, NULL }
->  };
->  
+Paolo
 
