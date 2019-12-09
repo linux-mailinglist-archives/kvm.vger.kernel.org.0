@@ -2,88 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A4D8117134
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 17:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BDC411720A
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 17:43:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726584AbfLIQMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 11:12:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38766 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726379AbfLIQMW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 11:12:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575907942;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uazzBTvhiErZt4quZMZBb1n6U9fDkqWNydS9BBYidxQ=;
-        b=HLH4c0uSyDZOqe+dqPHTpzegiL+9GIpN7r3QC9zs/wVfbPomvkNntV4TlGA/iqHAm2Gpz/
-        wwlzSfT+85C/BFJL4XEbo4BsIjPsF28tnwS1gmmd0WM6drj9wz+6SFNFRqY+H/GZ2Zo2pg
-        EwFLw+550SyMaYXGcPVDaaTUrh7tTW4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-pIF2pZr0PgO0yjeuz7g03g-1; Mon, 09 Dec 2019 11:12:21 -0500
-Received: by mail-wr1-f69.google.com with SMTP id f15so7757606wrr.2
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 08:12:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uazzBTvhiErZt4quZMZBb1n6U9fDkqWNydS9BBYidxQ=;
-        b=iU2SA9HhACtxaNHsksfFRG0h1ObrIUT7Yer4+6qKv1rqKYMbHeJPF5kw7jM0zzZafB
-         OlHFZRBjxTpyrczEp6xkXk/ah3s5eAT8q+2rx57Fb0inZDY969L7/Saj6yDX3JGVEheW
-         3hkhSqh18IMYiv/NAUaJRdztfG2ld+UBooYUrZAewEujXP9vnOt2Ad4d6/AQKbg5UATh
-         g7v84kzNJEB5GKjMTHZvGsjsHG1tQmcvzwds+/grfIW0xzWSC29v1p24lKD6ysd7WSz1
-         jQ/32F1GlHcvhaU71GxQGl/RZ9A9BovvaDUCw+a92zR2ge1V3R1KcJyX6Z5zN8uPZlzf
-         bjWA==
-X-Gm-Message-State: APjAAAWRqwlaTwCNpPV/oSGeawyvvCOW0UMVgdJIAcDPLyg9899FToWf
-        MBejlPfyEGFuWLJeYQGEifzftSIfv6sxNk91xVl/2bXd/hhakWttwX1Movtudj4+RLFQaBxk1Kf
-        znZPdA7aD063B
-X-Received: by 2002:a5d:670a:: with SMTP id o10mr3141209wru.227.1575907939741;
-        Mon, 09 Dec 2019 08:12:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxnWdi9kaO0bh1QNNzpywSBvNFURzXoRc13mamZ/UEHx0E6wlcPDH9TOAFGPiARCDf+HaQopQ==
-X-Received: by 2002:a5d:670a:: with SMTP id o10mr3141183wru.227.1575907939503;
-        Mon, 09 Dec 2019 08:12:19 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id c15sm27522103wrt.1.2019.12.09.08.12.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Dec 2019 08:12:18 -0800 (PST)
-Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
- field
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>
-References: <20191204214027.85958-1-jmattson@google.com>
- <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
- <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
- <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f20972b7-ea45-6177-afa6-f980c9bd6d0f@redhat.com>
-Date:   Mon, 9 Dec 2019 17:12:17 +0100
+        id S1726647AbfLIQnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 11:43:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17102 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726342AbfLIQnC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 11:43:02 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB9GMIaq078543
+        for <kvm@vger.kernel.org>; Mon, 9 Dec 2019 11:43:01 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wrtfqgx6g-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 11:43:01 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Mon, 9 Dec 2019 16:42:59 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 9 Dec 2019 16:42:55 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB9GgsRF51118158
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 Dec 2019 16:42:54 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C412DAE055;
+        Mon,  9 Dec 2019 16:42:54 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8CFB8AE053;
+        Mon,  9 Dec 2019 16:42:54 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  9 Dec 2019 16:42:54 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v3 6/9] s390x: css: stsch, enumeration test
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com
+References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+ <1575649588-6127-7-git-send-email-pmorel@linux.ibm.com>
+ <977b5622-4890-19b5-693a-ae0295fcb883@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Mon, 9 Dec 2019 17:42:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
+In-Reply-To: <977b5622-4890-19b5-693a-ae0295fcb883@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MC-Unique: pIF2pZr0PgO0yjeuz7g03g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120916-0012-0000-0000-0000037336D4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120916-0013-0000-0000-000021AF0645
+Message-Id: <5e76b341-1cb2-62bc-6fd7-260673d07bb9@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-09_04:2019-12-09,2019-12-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ spamscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912090141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/12/19 22:30, Jim Mattson wrote:
->> I'll put one together, along with a test that shows the current
->> priority inversion between read-only and unsupported VMCS fields.
-> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so I'm
-> going to add the test to tools/testing/selftests/kvm instead.
+
+
+On 2019-12-09 12:52, Thomas Huth wrote:
+> On 06/12/2019 17.26, Pierre Morel wrote:
+>> First step for testing the channel subsystem is to enumerate the css and
+>> retrieve the css devices.
+>>
+>> This tests the success of STSCH I/O instruction.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h     |  1 +
+>>   s390x/Makefile      |  2 ++
+>>   s390x/css.c         | 82 +++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg |  4 +++
+>>   4 files changed, 89 insertions(+)
+>>   create mode 100644 s390x/css.c
+>>
+>> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+>> index 6f19bb5..d37227b 100644
+>> --- a/lib/s390x/css.h
+>> +++ b/lib/s390x/css.h
+>> @@ -82,6 +82,7 @@ struct pmcw {
+>>   	uint8_t  chpid[8];
+>>   	uint16_t flags2;
+>>   };
+>> +#define PMCW_CHANNEL_TYPE(pmcw) (pmcw->flags >> 21)
+>>   
+>>   struct schib {
+>>   	struct pmcw pmcw;
+>> diff --git a/s390x/Makefile b/s390x/Makefile
+>> index 3744372..9ebbb84 100644
+>> --- a/s390x/Makefile
+>> +++ b/s390x/Makefile
+>> @@ -16,6 +16,7 @@ tests += $(TEST_DIR)/diag288.elf
+>>   tests += $(TEST_DIR)/stsi.elf
+>>   tests += $(TEST_DIR)/skrf.elf
+>>   tests += $(TEST_DIR)/smp.elf
+>> +tests += $(TEST_DIR)/css.elf
+>>   tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>>   
+>>   all: directories test_cases test_cases_binary
+>> @@ -50,6 +51,7 @@ cflatobjs += lib/s390x/sclp-console.o
+>>   cflatobjs += lib/s390x/interrupt.o
+>>   cflatobjs += lib/s390x/mmu.o
+>>   cflatobjs += lib/s390x/smp.o
+>> +cflatobjs += lib/s390x/css_dump.o
+>>   
+>>   OBJDIRS += lib/s390x
+>>   
+>> diff --git a/s390x/css.c b/s390x/css.c
+>> new file mode 100644
+>> index 0000000..3d4a986
+>> --- /dev/null
+>> +++ b/s390x/css.c
+>> @@ -0,0 +1,82 @@
+>> +/*
+>> + * Channel Subsystem tests
+>> + *
+>> + * Copyright (c) 2019 IBM Corp
+>> + *
+>> + * Authors:
+>> + *  Pierre Morel <pmorel@linux.ibm.com>
+>> + *
+>> + * This code is free software; you can redistribute it and/or modify it
+>> + * under the terms of the GNU General Public License version 2.
+>> + */
+>> +
+>> +#include <libcflat.h>
+>> +
+>> +#include <css.h>
+>> +
+>> +#define SID_ONE		0x00010000
+>> +
+>> +static struct schib schib;
+>> +
+>> +static const char *Channel_type[4] = {
+>> +	"I/O", "CHSC", "MSG", "EADM"
+>> +};
+>> +
+>> +static int test_device_sid;
+>> +
+>> +static void test_enumerate(void)
+>> +{
+>> +	struct pmcw *pmcw = &schib.pmcw;
+>> +	int scn;
+>> +	int cc, i;
+>> +	int found = 0;
+>> +
+>> +	for (scn = 0; scn < 0xffff; scn++) {
+>> +		cc = stsch(scn|SID_ONE, &schib);
+>> +		if (!cc && (pmcw->flags & PMCW_DNV)) {
+>> +			report_info("SID %04x Type %s PIM %x", scn,
+>> +				     Channel_type[PMCW_CHANNEL_TYPE(pmcw)],
+>> +				     pmcw->pim);
+>> +			for (i = 0; i < 8; i++)  {
+>> +				if ((pmcw->pim << i) & 0x80) {
+>> +					report_info("CHPID[%d]: %02x", i,
+>> +						    pmcw->chpid[i]);
+>> +					break;
+>> +				}
+>> +			}
+>> +			found++;
+>> +		}
+>> +		if (cc == 3) /* cc = 3 means no more channel in CSS */
+>> +			break;
+>> +		if (found && !test_device_sid)
+>> +			test_device_sid = scn|SID_ONE;
+>> +	}
+>> +	if (!found) {
+>> +		report("Tested %d devices, none found", 0, scn);
+>> +		return;
+>> +	}
+>> +	report("Tested %d devices, %d found", 1, scn, found);
+> 
+> I'm sorry, but since last Friday, you now have to swap the first two
+> parameters of the report() function. (that was unfortunately necessary
+> to fix an issue with Clang)
+> 
+>   Thomas
 > 
 
-With the next version of QEMU it will be "-cpu
-host,-vmx-vmwrite-vmexit-fields".
+grrr.   :)
 
-Paolo
+OK, will do.
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
