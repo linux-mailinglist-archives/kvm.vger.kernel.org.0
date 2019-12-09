@@ -2,243 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B93C117065
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 16:28:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 800BB11707C
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 16:31:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726677AbfLIP2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 10:28:11 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:46589 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726197AbfLIP2K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 10:28:10 -0500
-Received: by mail-pj1-f67.google.com with SMTP id z21so6031098pjq.13
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 07:28:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iTU+qyv+S6GMb3NJReH+nniW7gLdqbjiplgB2H7+kGw=;
-        b=VY+nEGLdiFbkA9ZLW7jRgvuZ57i/vWtgoXsgAop3wkK+tRfSAWjRHgd+ct+Yq3i4R4
-         mMp/BKMNLXh73qp4Stb3b3CWhnUJpo9hIy3wxtIn+gcep2bATipcYd1t7QM6QSqKRdpX
-         sAUsMCWkfiv/e4vNKrOqciCwmS419qcY+KKFTjiI16H2G2dOdIfyQGRONCbpNaNOicTR
-         xxQ5OxaODtljgIZBfXanDi66PCc5u6kOpEdxtL8rVNnLhI+mAn7GNQSaXtyK2Iuc9W+Z
-         GWZhrhhqLuL8B1KLayrDx9Ns2Zg8B8IHybLbm+q3jSR81ZASivMMPeqMYVyJFUIjTYij
-         97ng==
+        id S1726801AbfLIPbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 10:31:22 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40053 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726491AbfLIPbU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 10:31:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575905478;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hcabZguFWz6HawJeliIVVxXf5dnNiReFkMH/8uh3XWg=;
+        b=dc5wag12W8djR99Rn0+L4pMEJ9rze+e/5q3JKlPZLySbv1ZPZfHXRc8LSK/kwRWAg2Mtl0
+        bLhussneuuAJoJ/If0/hYurG//ubFgFl0PgHfjCn4hzgW/DFuYuRyvjBw7qKGZiBJedu9g
+        C26Q67YlgUNokawVkXuJJ82JaHk8JXc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-Wrmw2mwcPPiO1huGIo6q_Q-1; Mon, 09 Dec 2019 10:31:16 -0500
+Received: by mail-wm1-f72.google.com with SMTP id f11so564271wmh.1
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 07:31:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=iTU+qyv+S6GMb3NJReH+nniW7gLdqbjiplgB2H7+kGw=;
-        b=CCiQdF4oS4da1GLqYgUtmajr6yuFZiq1fxC8X5+d+8NCckleSJlAQOFu9TxRfRyJbU
-         W2lA2nEdLizGiT2OgA1QxY9Ulqyh8E81axYllvFQE6cX8CTRBShap5qoVyZzFs8kdrTs
-         X+Z3RWxrtIJSOyuzk8nk780HvvcnXtGWiL4WwNjfoA+ZOUz9zPEDRoylMsCEsQ2ob28E
-         JTDMJMwUFanThkmZsf1EpT4P4qK+KfIW2Ey+pbqbE/fsKZOQlQdADMCJ84kdveYO5gIV
-         /ZkQE2SvDJPbX09BstAk0ut+NQbLh0WToQX+TWJ7pdQ9DuWxVff1cS4X2u8ZYzvMDbCT
-         7pWA==
-X-Gm-Message-State: APjAAAV80cK6BllUIJCVxX2KcgNQccBurWI0BqIkXMuexxOx+mUdDb+p
-        VuGVkuLY63npnd5jmchFTuQ=
-X-Google-Smtp-Source: APXvYqwo+3D3pnOhtPLeqaNp6w3lrQJrSkJQsb/uyKC+KuQmFoHfiWg+/rcuFjUbisgJVKHkqIxO3A==
-X-Received: by 2002:a17:90a:cc10:: with SMTP id b16mr24249707pju.55.1575905289549;
-        Mon, 09 Dec 2019 07:28:09 -0800 (PST)
-Received: from [10.2.144.69] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id 100sm69124pjo.17.2019.12.09.07.28.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 09 Dec 2019 07:28:08 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
-Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
- field
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
-Date:   Mon, 9 Dec 2019 07:28:06 -0800
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F709B998-3A28-4BA0-B9DD-0AEF4D6B26C1@gmail.com>
-References: <20191204214027.85958-1-jmattson@google.com>
- <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
- <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
- <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
- <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
-To:     Liran Alon <liran.alon@oracle.com>
-X-Mailer: Apple Mail (2.3601.0.10)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hcabZguFWz6HawJeliIVVxXf5dnNiReFkMH/8uh3XWg=;
+        b=rPnxUgXfs3G0neFXeqDeChWm1xJEiqUQMg8mMdBt44A213YnqBS1Ze2tnzh8+ce2Lg
+         a/4KHOab0hZ+aIEVpg8mWp17uFiNdyXbFR0/9MWEpHKKZ+2jp5RpLa8jEafVIL5fMBqS
+         61+323VK2rp2vsfilCpJ+qEpZaffZ35jggi6dNaH/R4zgSXUP2zHKX3nqCkqpcCprEOn
+         nYSeh8KAJe6zjoaZ+ghII2cKRt9fLEaCvY2xroQw+td1RVumu+wM+KB81LPdH0WTdU1a
+         UlAw01ms6PrJsOt15kEyTLZN3DgET4faSfaXfBTr+shK5PD/z+iDKekngsbNLVKhmoPI
+         pHgQ==
+X-Gm-Message-State: APjAAAVl3HvHvFzR0vBUdv50q5mL8niogNnOye5T8+T4SSIY7d3UF/Tb
+        EG4sacigZFXiG+sym4gWXuqaEh0+Dp5J1e2F7NLjXQtnAq/FB9in8y2G5662gFCeOtVY1kmKF+L
+        22emcKMqxpSvg
+X-Received: by 2002:a05:600c:2101:: with SMTP id u1mr25385269wml.43.1575905475309;
+        Mon, 09 Dec 2019 07:31:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwUgHCTV4jCZ380MrUbnKulMEgtMrmyFd2pt+SGYutioQNOgnVxofbmjebn8P2X7z15AWUA2g==
+X-Received: by 2002:a05:600c:2101:: with SMTP id u1mr25385231wml.43.1575905474987;
+        Mon, 09 Dec 2019 07:31:14 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id s10sm27833316wrw.12.2019.12.09.07.31.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2019 07:31:14 -0800 (PST)
+Subject: Re: [PATCH 00/16] KVM: x86: MMU page fault clean-up
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20191206235729.29263-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3b1d2093-eb1f-2c80-4104-3b33a5d764cc@redhat.com>
+Date:   Mon, 9 Dec 2019 16:31:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191206235729.29263-1-sean.j.christopherson@intel.com>
+Content-Language: en-US
+X-MC-Unique: Wrmw2mwcPPiO1huGIo6q_Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Dec 5, 2019, at 1:54 PM, Liran Alon <liran.alon@oracle.com> wrote:
->=20
->=20
->=20
->> On 5 Dec 2019, at 23:30, Jim Mattson <jmattson@google.com> wrote:
->>=20
->> On Thu, Dec 5, 2019 at 5:11 AM Jim Mattson <jmattson@google.com> =
-wrote:
->>> On Thu, Dec 5, 2019 at 3:46 AM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->>>> On 04/12/19 22:40, Jim Mattson wrote:
->>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
->>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
-validity
->>>>> of the VMCS field in the secondary source operand is checked.
->>>>>=20
->>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
-vmcs12 if running L2")
->>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>>>> Cc: Liran Alon <liran.alon@oracle.com>
->>>>> ---
->>>>> arch/x86/kvm/vmx/nested.c | 38 =
-+++++++++++++++++++-------------------
->>>>> 1 file changed, 19 insertions(+), 19 deletions(-)
->>>>=20
->>>> As Vitaly pointed out, the test must be split in two, like this:
->>>=20
->>> Right. Odd that no kvm-unit-tests noticed.
->>>=20
->>>> ---------------- 8< -----------------------
->>>> =46rom 3b9d87060e800ffae2bd19da94ede05018066c87 Mon Sep 17 00:00:00 =
-2001
->>>> From: Paolo Bonzini <pbonzini@redhat.com>
->>>> Date: Thu, 5 Dec 2019 12:39:07 +0100
->>>> Subject: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before =
-VMCS field
->>>>=20
->>>> According to the SDM, a VMWRITE in VMX non-root operation with an
->>>> invalid VMCS-link pointer results in VMfailInvalid before the =
-validity
->>>> of the VMCS field in the secondary source operand is checked.
->>>>=20
->>>> While cleaning up handle_vmwrite, make the code of handle_vmread =
-look
->>>> the same, too.
->>>=20
->>> Okay.
->>>=20
->>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow vmcs12 =
-if running L2")
->>>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>>> Cc: Liran Alon <liran.alon@oracle.com>
->>>>=20
->>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->>>> index 4aea7d304beb..c080a879b95d 100644
->>>> --- a/arch/x86/kvm/vmx/nested.c
->>>> +++ b/arch/x86/kvm/vmx/nested.c
->>>> @@ -4767,14 +4767,13 @@ static int handle_vmread(struct kvm_vcpu =
-*vcpu)
->>>>       if (to_vmx(vcpu)->nested.current_vmptr =3D=3D -1ull)
->>>>               return nested_vmx_failInvalid(vcpu);
->>>>=20
->>>> -       if (!is_guest_mode(vcpu))
->>>> -               vmcs12 =3D get_vmcs12(vcpu);
->>>> -       else {
->>>> +       vmcs12 =3D get_vmcs12(vcpu);
->>>> +       if (is_guest_mode(vcpu)) {
->>>>               /*
->>>>                * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
->>>>                * to shadowed-field sets the ALU flags for =
-VMfailInvalid.
->>>>                */
->>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
--1ull)
->>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
->>>>                       return nested_vmx_failInvalid(vcpu);
->>>>               vmcs12 =3D get_shadow_vmcs12(vcpu);
->>>>       }
->>>> @@ -4878,8 +4877,19 @@ static int handle_vmwrite(struct kvm_vcpu =
-*vcpu)
->>>>               }
->>>>       }
->>>>=20
->>>> +       vmcs12 =3D get_vmcs12(vcpu);
->>>> +       if (is_guest_mode(vcpu)) {
->>>> +               /*
->>>> +                * When vmcs->vmcs_link_pointer is -1ull, any =
-VMWRITE
->>>> +                * to shadowed-field sets the ALU flags for =
-VMfailInvalid.
->>>> +                */
->>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
->>>> +                       return nested_vmx_failInvalid(vcpu);
->>>> +               vmcs12 =3D get_shadow_vmcs12(vcpu);
->>>> +       }
->>>>=20
->>>>       field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) =
->> 28) & 0xf));
->>>> +
->>>>       /*
->>>>        * If the vCPU supports "VMWRITE to any supported field in =
-the
->>>>        * VMCS," then the "read-only" fields are actually =
-read/write.
->>>> @@ -4889,24 +4899,12 @@ static int handle_vmwrite(struct kvm_vcpu =
-*vcpu)
->>>>               return nested_vmx_failValid(vcpu,
->>>>                       VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
->>>>=20
->>>> -       if (!is_guest_mode(vcpu)) {
->>>> -               vmcs12 =3D get_vmcs12(vcpu);
->>>> -
->>>> -               /*
->>>> -                * Ensure vmcs12 is up-to-date before any VMWRITE =
-that dirties
->>>> -                * vmcs12, else we may crush a field or consume a =
-stale value.
->>>> -                */
->>>> -               if (!is_shadow_field_rw(field))
->>>> -                       copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->>>> -       } else {
->>>> -               /*
->>>> -                * When vmcs->vmcs_link_pointer is -1ull, any =
-VMWRITE
->>>> -                * to shadowed-field sets the ALU flags for =
-VMfailInvalid.
->>>> -                */
->>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
--1ull)
->>>> -                       return nested_vmx_failInvalid(vcpu);
->>>> -               vmcs12 =3D get_shadow_vmcs12(vcpu);
->>>> -       }
->>>> +       /*
->>>> +        * Ensure vmcs12 is up-to-date before any VMWRITE that =
-dirties
->>>> +        * vmcs12, else we may crush a field or consume a stale =
-value.
->>>> +        */
->>>> +       if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
->>>> +               copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
->>>>=20
->>>>       offset =3D vmcs_field_to_offset(field);
->>>>       if (offset < 0)
->>>>=20
->>>>=20
->>>> ... and also, do you have a matching kvm-unit-tests patch?
->>>=20
->>> I'll put one together, along with a test that shows the current
->>> priority inversion between read-only and unsupported VMCS fields.
->>=20
->> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so I'm
->> going to add the test to tools/testing/selftests/kvm instead.
->=20
-> Please don=E2=80=99t.
->=20
-> I wish that we keep clear separation between kvm-unit-tests and =
-self-tests.
-> In the sense that kvm-unit-tests tests for correct CPU behaviour =
-semantics
-> and self-tests tests for correctness of KVM userspace API.
->=20
-> In the future, I wish to change kvm-unit-tests to cpu-unit-tests. As =
-there is no
-> real connection to KVM. It=E2=80=99s a bunch of tests that can be run =
-on top of any CPU
-> Implementation (weather vCPU by some hypervisor or bare-metal CPU) and
-> test for it=E2=80=99s semantics.
-> I have already used this to find semantic issues on Hyper-V vCPU =
-implementation for example.
+On 07/12/19 00:57, Sean Christopherson wrote:
+> The original purpose of this series was to call thp_adjust() from
+> __direct_map() and FNAME(fetch) to eliminate a page refcounting quirk[*].
+> Before doing that, I wanted to clean up the large page handling so that
+> the map/fetch funtions weren't being passed multiple booleans that tracked
+> the same basic info.  While trying to decipher all the the interactions,
+> I stumbled across a handful of fun things:
+> 
+>   - 32-bit KVM w/ TDP is completely broken with respect to 64-bit GPAs due
+>     to the page fault handlers and all related flows dropping bits 63:32
+>     of the GPA.  As a result, KVM inserts the wrong GPA and the guest hangs
+>     because it generates EPT/NPT faults until it's killed.
+> 
+>   - The TDP and non-paging page fault flows are identical except for
+>     one-off constraints on guest page size.
+> 
+>   - The !VALID_PAGE(root_hpa) checks in the page fault flows are bogus.
+>     They were added a few years ago to "fix" a nVMX bug and are no longer
+>     needed now that nVMX is in much better shape.
+> 
+> Patch 1 fixes the 32-bit KVM w/ TDP issue.  More details below.
+> 
+> Patches 2-12 are 99% refactoring to merge TDP and non-paging page fault
+> handling, and to do the thp_adjust() move.  These are basically nops from
+> a functional perspective.  There are technically functional changes in a
+> few patches, but they are very superficial and in theory won't be
+> observable in normal usage.
+> 
+> Patches 13-16 add WARNs on the !VALID_PAGE(root_hpa) checks to make it
+> clear that root_hpa is expected to be valid when handling page faults,
+> e.g. for the longest time I thought KVM relied on the checks in map/fetch
+> to correctly handle kvm_mmu_zap_all().
+> 
+> 
+> 32-bit KVM w/ TDP:
+> 
+> I marked this patch for stable because it's obviously a bug fix, but I'm
+> entirely not sure we want to backport the fix.  Obviously no userspace VMM
+> is actually exposing 64-bit GPAs to its guests, i.e. odds are this won't
+> actually fix any real world use cases.  And, the scope of the changes are
+> likely going to make backporting a pain.  But, on the other hand, if it's
+> not backported then future bug fixes in related code are likely to
+> conflict, and it does fix the case where a buggy guest kernel accesses a
+> non-existent 64-bit GPA (crashes instead of hanging indefinitely).
+> 
+> I'm also not confident I found all the cases where KVM is truncating the
+> GPA.  AFAIK, 32-bit Qemu simply doesn't support 64-bit GPAs.  To confirm
+> the bug and verify the fix, I hacked KVM and the guest kernel to generate
+> 64-bit GPAs when remapping MMIO, which covers a tiny fragment of KVM.
 
-Did you use for the matter the =E2=80=9Cinfrastructure=E2=80=9D that I =
-added?
+Queued, thanks!
+
+Paolo
+
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fa46fbed60013..49a59bcb32117 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5737,7 +5737,7 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
+>         vcpu->run->mmio.len = min(8u, vcpu->mmio_fragments[0].len);
+>         vcpu->run->mmio.is_write = vcpu->mmio_is_write = ops->write;
+>         vcpu->run->exit_reason = KVM_EXIT_MMIO;
+> -       vcpu->run->mmio.phys_addr = gpa;
+> +       vcpu->run->mmio.phys_addr = gpa & 0xffffffffull;
+>  
+>         return ops->read_write_exit_mmio(vcpu, gpa, val, bytes);
+>  }
+> 
+> 
+> diff --git a/arch/x86/mm/ioremap.c b/arch/x86/mm/ioremap.c
+> index b9c78f3bcd673..e22f254987bea 100644
+> --- a/arch/x86/mm/ioremap.c
+> +++ b/arch/x86/mm/ioremap.c
+> @@ -184,7 +184,10 @@ static void __iomem *__ioremap_caller(resource_size_t phys_addr,
+>         if (kernel_map_sync_memtype(phys_addr, size, pcm))
+>                 goto err_free_area;
+>  
+> -       if (ioremap_page_range(vaddr, vaddr + size, phys_addr, prot))
+> +       BUG_ON(!boot_cpu_data.x86_phys_bits);
+> +
+> +       if (ioremap_page_range(vaddr, vaddr + size,
+> +                              phys_addr | BIT_ULL(boot_cpu_data.x86_phys_bits - 1), prot))
+>                 goto err_free_area;
+>  
+>         ret_addr = (void __iomem *) (vaddr + offset);
+> 
+> [*] https://lkml.kernel.org/r/20191126174603.GB22233@linux.intel.com
+> 
+> Sean Christopherson (16):
+>   KVM: x86: Use gpa_t for cr2/gpa to fix TDP support on 32-bit KVM
+>   KVM: x86/mmu: Move definition of make_mmu_pages_available() up
+>   KVM: x86/mmu: Fold nonpaging_map() into nonpaging_page_fault()
+>   KVM: x86/mmu: Move nonpaging_page_fault() below try_async_pf()
+>   KVM: x86/mmu: Refactor handling of cache consistency with TDP
+>   KVM: x86/mmu: Refactor the per-slot level calculation in
+>     mapping_level()
+>   KVM: x86/mmu: Refactor handling of forced 4k pages in page faults
+>   KVM: x86/mmu: Incorporate guest's page level into max level for shadow
+>     MMU
+>   KVM: x86/mmu: Persist gfn_lpage_is_disallowed() to max_level
+>   KVM: x86/mmu: Rename lpage_disallowed to account_disallowed_nx_lpage
+>   KVM: x86/mmu: Consolidate tdp_page_fault() and nonpaging_page_fault()
+>   KVM: x86/mmu: Move transparent_hugepage_adjust() above __direct_map()
+>   KVM: x86/mmu: Move calls to thp_adjust() down a level
+>   KVM: x86/mmu: Move root_hpa validity checks to top of page fault
+>     handler
+>   KVM: x86/mmu: WARN on an invalid root_hpa
+>   KVM: x86/mmu: WARN if root_hpa is invalid when handling a page fault
+> 
+>  arch/x86/include/asm/kvm_host.h |   8 +-
+>  arch/x86/kvm/mmu/mmu.c          | 438 ++++++++++++++------------------
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  58 +++--
+>  arch/x86/kvm/mmutrace.h         |  12 +-
+>  arch/x86/kvm/x86.c              |  40 ++-
+>  arch/x86/kvm/x86.h              |   2 +-
+>  include/linux/kvm_host.h        |   6 +-
+>  virt/kvm/async_pf.c             |  10 +-
+>  8 files changed, 259 insertions(+), 315 deletions(-)
+> 
 
