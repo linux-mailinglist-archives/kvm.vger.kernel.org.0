@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F58C1165A0
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 04:50:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D8501166ED
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 07:30:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727067AbfLIDui (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Dec 2019 22:50:38 -0500
-Received: from mga04.intel.com ([192.55.52.120]:41836 "EHLO mga04.intel.com"
+        id S1727096AbfLIGa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 01:30:26 -0500
+Received: from mga18.intel.com ([134.134.136.126]:1907 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726748AbfLIDui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Dec 2019 22:50:38 -0500
+        id S1727023AbfLIGa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 01:30:26 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Dec 2019 19:50:37 -0800
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Dec 2019 22:30:25 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; 
-   d="scan'208";a="244308757"
+   d="scan'208";a="206791936"
 Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by fmsmga002.fm.intel.com with ESMTP; 08 Dec 2019 19:50:35 -0800
-Date:   Sun, 8 Dec 2019 22:42:25 -0500
+  by orsmga008.jf.intel.com with ESMTP; 08 Dec 2019 22:30:23 -0800
+Date:   Mon, 9 Dec 2019 01:22:12 -0500
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -33,520 +33,152 @@ Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "Wang, Zhi A" <zhi.a.wang@intel.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
- vfio-pci ops
-Message-ID: <20191209034225.GK31791@joy-OptiPlex-7040>
+Subject: Re: [RFC PATCH 4/9] vfio-pci: register default dynamic-trap-bar-info
+ region
+Message-ID: <20191209062212.GL31791@joy-OptiPlex-7040>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <20191205032536.29653-1-yan.y.zhao@intel.com>
- <20191205165519.106bd210@x1.home>
- <20191206075655.GG31791@joy-OptiPlex-7040>
- <20191206142226.2698a2be@x1.home>
+ <20191205032650.29794-1-yan.y.zhao@intel.com>
+ <20191205165530.1f29fe85@x1.home>
+ <20191206060407.GF31791@joy-OptiPlex-7040>
+ <20191206082038.2b1078d9@x1.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191206142226.2698a2be@x1.home>
+In-Reply-To: <20191206082038.2b1078d9@x1.home>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 07, 2019 at 05:22:26AM +0800, Alex Williamson wrote:
-> On Fri, 6 Dec 2019 02:56:55 -0500
+On Fri, Dec 06, 2019 at 11:20:38PM +0800, Alex Williamson wrote:
+> On Fri, 6 Dec 2019 01:04:07 -0500
 > Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> > On Fri, Dec 06, 2019 at 07:55:19AM +0800, Alex Williamson wrote:
-> > > On Wed,  4 Dec 2019 22:25:36 -0500
+> > On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:
+> > > On Wed,  4 Dec 2019 22:26:50 -0500
 > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
 > > >   
-> > > > when vfio-pci is bound to a physical device, almost all the hardware
-> > > > resources are passthroughed.
-> > > > Sometimes, vendor driver of this physcial device may want to mediate some
-> > > > hardware resource access for a short period of time, e.g. dirty page
-> > > > tracking during live migration.
+> > > > Dynamic trap bar info region is a channel for QEMU and vendor driver to
+> > > > communicate dynamic trap info. It is of type
+> > > > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
+> > > > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
 > > > > 
-> > > > Here we introduce mediate ops in vfio-pci for this purpose.
+> > > > This region has two fields: dt_fd and trap.
+> > > > When QEMU detects a device regions of this type, it will create an
+> > > > eventfd and write its eventfd id to dt_fd field.
+> > > > When vendor drivre signals this eventfd, QEMU reads trap field of this
+> > > > info region.
+> > > > - If trap is true, QEMU would search the device's PCI BAR
+> > > > regions and disable all the sparse mmaped subregions (if the sparse
+> > > > mmaped subregion is disablable).
+> > > > - If trap is false, QEMU would re-enable those subregions.
 > > > > 
-> > > > Vendor driver can register a mediate ops to vfio-pci.
-> > > > But rather than directly bind to the passthroughed device, the
-> > > > vendor driver is now either a module that does not bind to any device or
-> > > > a module binds to other device.
-> > > > E.g. when passing through a VF device that is bound to vfio-pci modules,
-> > > > PF driver that binds to PF device can register to vfio-pci to mediate
-> > > > VF's regions, hence supporting VF live migration.
+> > > > A typical usage is
+> > > > 1. vendor driver first cuts its bar 0 into several sections, all in a
+> > > > sparse mmap array. So initally, all its bar 0 are passthroughed.
+> > > > 2. vendor driver specifys part of bar 0 sections to be disablable.
+> > > > 3. on migration starts, vendor driver signals dt_fd and set trap to true
+> > > > to notify QEMU disabling the bar 0 sections of disablable flags on.
+> > > > 4. QEMU disables those bar 0 section and hence let vendor driver be able
+> > > > to trap access of bar 0 registers and make dirty page tracking possible.
+> > > > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
+> > > > QEMU reads trap field of this info region which is false and QEMU
+> > > > re-passthrough the whole bar 0 region.
 > > > > 
-> > > > The sequence goes like this:
-> > > > 1. Vendor driver register its vfio_pci_mediate_ops to vfio-pci driver
+> > > > Vendor driver specifies whether it supports dynamic-trap-bar-info region
+> > > > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
+> > > > vfio_pci_mediate_ops->open().
 > > > > 
-> > > > 2. vfio-pci maintains a list of those registered vfio_pci_mediate_ops
-> > > > 
-> > > > 3. Whenever vfio-pci opens a device, it searches the list and call
-> > > > vfio_pci_mediate_ops->open() to check whether a vendor driver supports
-> > > > mediating this device.
-> > > > Upon a success return value of from vfio_pci_mediate_ops->open(),
-> > > > vfio-pci will stop list searching and store a mediate handle to
-> > > > represent this open into vendor driver.
-> > > > (so if multiple vendor drivers support mediating a device through
-> > > > vfio_pci_mediate_ops, only one will win, depending on their registering
-> > > > sequence)
-> > > > 
-> > > > 4. Whenever a VFIO_DEVICE_GET_REGION_INFO ioctl is received in vfio-pci
-> > > > ops, it will chain into vfio_pci_mediate_ops->get_region_info(), so that
-> > > > vendor driver is able to override a region's default flags and caps,
-> > > > e.g. adding a sparse mmap cap to passthrough only sub-regions of a whole
-> > > > region.
-> > > > 
-> > > > 5. vfio_pci_rw()/vfio_pci_mmap() first calls into
-> > > > vfio_pci_mediate_ops->rw()/vfio_pci_mediate_ops->mmaps().
-> > > > if pt=true is rteturned, vfio_pci_rw()/vfio_pci_mmap() will further
-> > > > passthrough this read/write/mmap to physical device, otherwise it just
-> > > > returns without touch physical device.
-> > > > 
-> > > > 6. When vfio-pci closes a device, vfio_pci_release() chains into
-> > > > vfio_pci_mediate_ops->release() to close the reference in vendor driver.
-> > > > 
-> > > > 7. Vendor driver unregister its vfio_pci_mediate_ops when driver exits
-> > > > 
-> > > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > > 
-> > > > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > > > ---
-> > > >  drivers/vfio/pci/vfio_pci.c         | 146 ++++++++++++++++++++++++++++
-> > > >  drivers/vfio/pci/vfio_pci_private.h |   2 +
-> > > >  include/linux/vfio.h                |  16 +++
-> > > >  3 files changed, 164 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > > > index 02206162eaa9..55080ff29495 100644
-> > > > --- a/drivers/vfio/pci/vfio_pci.c
-> > > > +++ b/drivers/vfio/pci/vfio_pci.c
-> > > > @@ -54,6 +54,14 @@ module_param(disable_idle_d3, bool, S_IRUGO | S_IWUSR);
-> > > >  MODULE_PARM_DESC(disable_idle_d3,
-> > > >  		 "Disable using the PCI D3 low power state for idle, unused devices");
-> > > >  
-> > > > +static LIST_HEAD(mediate_ops_list);
-> > > > +static DEFINE_MUTEX(mediate_ops_list_lock);
-> > > > +struct vfio_pci_mediate_ops_list_entry {
-> > > > +	struct vfio_pci_mediate_ops	*ops;
-> > > > +	int				refcnt;
-> > > > +	struct list_head		next;
-> > > > +};
-> > > > +
-> > > >  static inline bool vfio_vga_disabled(void)
-> > > >  {
-> > > >  #ifdef CONFIG_VFIO_PCI_VGA
-> > > > @@ -472,6 +480,10 @@ static void vfio_pci_release(void *device_data)
-> > > >  	if (!(--vdev->refcnt)) {
-> > > >  		vfio_spapr_pci_eeh_release(vdev->pdev);
-> > > >  		vfio_pci_disable(vdev);
-> > > > +		if (vdev->mediate_ops && vdev->mediate_ops->release) {
-> > > > +			vdev->mediate_ops->release(vdev->mediate_handle);
-> > > > +			vdev->mediate_ops = NULL;
-> > > > +		}
-> > > >  	}
-> > > >  
-> > > >  	mutex_unlock(&vdev->reflck->lock);
-> > > > @@ -483,6 +495,7 @@ static int vfio_pci_open(void *device_data)
-> > > >  {
-> > > >  	struct vfio_pci_device *vdev = device_data;
-> > > >  	int ret = 0;
-> > > > +	struct vfio_pci_mediate_ops_list_entry *mentry;
-> > > >  
-> > > >  	if (!try_module_get(THIS_MODULE))
-> > > >  		return -ENODEV;
-> > > > @@ -495,6 +508,30 @@ static int vfio_pci_open(void *device_data)
-> > > >  			goto error;
-> > > >  
-> > > >  		vfio_spapr_pci_eeh_open(vdev->pdev);
-> > > > +		mutex_lock(&mediate_ops_list_lock);
-> > > > +		list_for_each_entry(mentry, &mediate_ops_list, next) {
-> > > > +			u64 caps;
-> > > > +			u32 handle;  
+> > > > If vfio-pci detects this cap, it will create a default
+> > > > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
+> > > > and region->ops=null.
+> > > > Vvendor driver should override this region's len, flags, rw, mmap in its
+> > > > vfio_pci_mediate_ops.  
 > > > 
-> > > Wouldn't it seem likely that the ops provider might use this handle as
-> > > a pointer, so we'd want it to be an opaque void*?
-> > >  
-> > yes, you are right, handle as a pointer is much better. will change it.
-> > Thanks :)
+> > > TBH, I don't like this interface at all.  Userspace doesn't pass data
+> > > to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
+> > > configuring user signaling with eventfds.  I think we only need to
+> > > define an IRQ type that tells the user to re-evaluate the sparse mmap
+> > > information for a region.  The user would enumerate the device IRQs via
+> > > GET_IRQ_INFO, find one of this type where the IRQ info would also
+> > > indicate which region(s) should be re-evaluated on signaling.  The user
+> > > would enable that signaling via SET_IRQS and simply re-evaluate the  
+> > ok. I'll try to switch to this way. Thanks for this suggestion.
 > > 
-> > > > +
-> > > > +			memset(&caps, 0, sizeof(caps));  
-> > > 
-> > > @caps has no purpose here, add it if/when we do something with it.
-> > > It's also a standard type, why are we memset'ing it rather than just
-> > > =0??
-> > >   
-> > > > +			ret = mentry->ops->open(vdev->pdev, &caps, &handle);
-> > > > +			if (!ret)  {
-> > > > +				vdev->mediate_ops = mentry->ops;
-> > > > +				vdev->mediate_handle = handle;
-> > > > +
-> > > > +				pr_info("vfio pci found mediate_ops %s, caps=%llx, handle=%x for %x:%x\n",
-> > > > +						vdev->mediate_ops->name, caps,
-> > > > +						handle, vdev->pdev->vendor,
-> > > > +						vdev->pdev->device);  
-> > > 
-> > > Generally not advisable to make user accessible printks.
-> > >  
-> > ok.
+> > > sparse mmap capability for the associated regions when signaled.  
 > > 
-> > > > +				/*
-> > > > +				 * only find the first matching mediate_ops,
-> > > > +				 * and add its refcnt
-> > > > +				 */
-> > > > +				mentry->refcnt++;
-> > > > +				break;
-> > > > +			}
-> > > > +		}
-> > > > +		mutex_unlock(&mediate_ops_list_lock);
-> > > >  	}
-> > > >  	vdev->refcnt++;
-> > > >  error:
-> > > > @@ -736,6 +773,14 @@ static long vfio_pci_ioctl(void *device_data,
-> > > >  			info.size = pdev->cfg_size;
-> > > >  			info.flags = VFIO_REGION_INFO_FLAG_READ |
-> > > >  				     VFIO_REGION_INFO_FLAG_WRITE;
-> > > > +
-> > > > +			if (vdev->mediate_ops &&
-> > > > +					vdev->mediate_ops->get_region_info) {
-> > > > +				vdev->mediate_ops->get_region_info(
-> > > > +						vdev->mediate_handle,
-> > > > +						&info, &caps, NULL);
-> > > > +			}  
-> > > 
-> > > These would be a lot cleaner if we could just call a helper function:
-> > > 
-> > > void vfio_pci_region_info_mediation_hook(vdev, info, caps, etc...)
-> > > {
-> > >    if (vdev->mediate_ops 
-> > >        vdev->mediate_ops->get_region_info)
-> > > 	vdev->mediate_ops->get_region_info(vdev->mediate_handle,
-> > > 					   &info, &caps, NULL);
-> > > }
-> > > 
-> > > I'm not thrilled with all these hooks, but not open coding every one of
-> > > them might help.  
-> > 
-> > ok. got it.
-> > >   
-> > > > +
-> > > >  			break;
-> > > >  		case VFIO_PCI_BAR0_REGION_INDEX ... VFIO_PCI_BAR5_REGION_INDEX:
-> > > >  			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
-> > > > @@ -756,6 +801,13 @@ static long vfio_pci_ioctl(void *device_data,
-> > > >  				}
-> > > >  			}
-> > > >  
-> > > > +			if (vdev->mediate_ops &&
-> > > > +					vdev->mediate_ops->get_region_info) {
-> > > > +				vdev->mediate_ops->get_region_info(
-> > > > +						vdev->mediate_handle,
-> > > > +						&info, &caps, NULL);
-> > > > +			}
-> > > > +
-> > > >  			break;
-> > > >  		case VFIO_PCI_ROM_REGION_INDEX:
-> > > >  		{
-> > > > @@ -794,6 +846,14 @@ static long vfio_pci_ioctl(void *device_data,
-> > > >  			}
-> > > >  
-> > > >  			pci_write_config_word(pdev, PCI_COMMAND, orig_cmd);
-> > > > +
-> > > > +			if (vdev->mediate_ops &&
-> > > > +					vdev->mediate_ops->get_region_info) {
-> > > > +				vdev->mediate_ops->get_region_info(
-> > > > +						vdev->mediate_handle,
-> > > > +						&info, &caps, NULL);
-> > > > +			}
-> > > > +
-> > > >  			break;
-> > > >  		}
-> > > >  		case VFIO_PCI_VGA_REGION_INDEX:
-> > > > @@ -805,6 +865,13 @@ static long vfio_pci_ioctl(void *device_data,
-> > > >  			info.flags = VFIO_REGION_INFO_FLAG_READ |
-> > > >  				     VFIO_REGION_INFO_FLAG_WRITE;
-> > > >  
-> > > > +			if (vdev->mediate_ops &&
-> > > > +					vdev->mediate_ops->get_region_info) {
-> > > > +				vdev->mediate_ops->get_region_info(
-> > > > +						vdev->mediate_handle,
-> > > > +						&info, &caps, NULL);
-> > > > +			}
-> > > > +
-> > > >  			break;
-> > > >  		default:
-> > > >  		{
-> > > > @@ -839,6 +906,13 @@ static long vfio_pci_ioctl(void *device_data,
-> > > >  				if (ret)
-> > > >  					return ret;
-> > > >  			}
-> > > > +
-> > > > +			if (vdev->mediate_ops &&
-> > > > +					vdev->mediate_ops->get_region_info) {
-> > > > +				vdev->mediate_ops->get_region_info(
-> > > > +						vdev->mediate_handle,
-> > > > +						&info, &caps, &cap_type);
-> > > > +			}
-> > > >  		}
-> > > >  		}
-> > > >  
-> > > > @@ -1151,6 +1225,16 @@ static ssize_t vfio_pci_rw(void *device_data, char __user *buf,
-> > > >  	if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
-> > > >  		return -EINVAL;
-> > > >  
-> > > > +	if (vdev->mediate_ops && vdev->mediate_ops->rw) {
-> > > > +		int ret;
-> > > > +		bool pt = true;
-> > > > +
-> > > > +		ret = vdev->mediate_ops->rw(vdev->mediate_handle,
-> > > > +				buf, count, ppos, iswrite, &pt);
-> > > > +		if (!pt)
-> > > > +			return ret;
-> > > > +	}
-> > > > +
-> > > >  	switch (index) {
-> > > >  	case VFIO_PCI_CONFIG_REGION_INDEX:
-> > > >  		return vfio_pci_config_rw(vdev, buf, count, ppos, iswrite);
-> > > > @@ -1200,6 +1284,15 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
-> > > >  	u64 phys_len, req_len, pgoff, req_start;
-> > > >  	int ret;
-> > > >  
-> > > > +	if (vdev->mediate_ops && vdev->mediate_ops->mmap) {
-> > > > +		int ret;
-> > > > +		bool pt = true;
-> > > > +
-> > > > +		ret = vdev->mediate_ops->mmap(vdev->mediate_handle, vma, &pt);
-> > > > +		if (!pt)
-> > > > +			return ret;
-> > > > +	}  
-> > > 
-> > > There must be a better way to do all these.  Do we really want to call
-> > > into ops for every rw or mmap, have the vendor code decode a region,
-> > > and maybe or maybe not have it handle it?  It's pretty ugly.  Do we  
-> > 
-> > do you think below flow is good ?
-> > 1. in mediate_ops->open(), return
-> > (1) region[] indexed by region index, if a mediate driver supports mediating
-> > region[i], region[i].ops->get_region_info, regions[i].ops->rw, or
-> > regions[i].ops->mmap is not null.
-> > (2) irq_info[] indexed by irq index, if a mediate driver supports mediating
-> > irq_info[i], irq_info[i].ops->get_irq_info or irq_info[i].ops->set_irq_info
-> > is not null.
-> > 
-> > Then, vfio_pci_rw/vfio_pci_mmap/vfio_pci_ioctl only call into those
-> > non-null hooks.
+> > Do you like the "disablable" flag of sparse mmap ?
+> > I think it's a lightweight way for user to switch mmap state of a whole region,
+> > otherwise going through a complete flow of GET_REGION_INFO and re-setup
+> > region might be too heavy.
 > 
-> Or would it be better to always call into the hooks and the vendor
-> driver is allowed to selectively replace the hooks for regions they
-> want to mediate.  For example, region[i].ops->rw could by default point
-> to vfio_pci_default_rw() and the mediation driver would have a
-> mechanism to replace that with its own vendorABC_vfio_pci_rw().  We
-> could export vfio_pci_default_rw() such that the vendor driver would be
-> responsible for calling it as necessary.
->
-good idea :)
+> No, I don't like the disable-able flag.  At what frequency do we expect
+> regions to change?  It seems like we'd only change when switching into
+> and out of the _SAVING state, which is rare.  It seems easy for
+> userspace, at least QEMU, to drop the entire mmap configuration and
+ok. I'll try this way.
 
-> > > need the mediation provider to be able to dynamically setup the ops per  
-> > May I confirm that you are not saying dynamic registering mediate ops
-> > after vfio-pci already opened a device, right?
+> re-read it.  Another concern here is how do we synchronize the event?
+> Are we assuming that this event would occur when a user switch to
+> _SAVING mode on the device?  That operation is synchronous, the device
+> must be in saving mode after the write to device state completes, but
+> it seems like this might be trying to add an asynchronous dependency.
+> Will the write to device_state only complete once the user handles the
+> eventfd?  How would the kernel know when the mmap re-evaluation is
+> complete.  It seems like there are gaps here that the vendor driver
+> could miss traps required for migration because the user hasn't
+> completed the mmap transition yet.  Thanks,
 > 
-> I'm not necessarily excluding or advocating for that.
-> 
-ok. got it.
+> Alex
 
-> > > region and export the default handlers out for them to call?
-> > >  
-> > could we still keep checking return value of the hooks rather than
-> > export default handlers? Otherwise at least vfio_pci_default_ioctl(),
-> > vfio_pci_default_rw(), and vfio_pci_default_mmap() need to be exported.
-> 
-> The ugliness of vfio-pci having all these vendor branches is what I'm
-> trying to avoid, so I really am not a fan of the idea or mechanism that
-> the vfio-pci core code is directly involving a mediation driver and
-> handling the return for every entry point.
->
-I see :)
-> > > > +
-> > > >  	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-> > > >  
-> > > >  	if (vma->vm_end < vma->vm_start)
-> > > > @@ -1629,8 +1722,17 @@ static void vfio_pci_try_bus_reset(struct vfio_pci_device *vdev)
-> > > >  
-> > > >  static void __exit vfio_pci_cleanup(void)
-> > > >  {
-> > > > +	struct vfio_pci_mediate_ops_list_entry *mentry, *n;
-> > > > +
-> > > >  	pci_unregister_driver(&vfio_pci_driver);
-> > > >  	vfio_pci_uninit_perm_bits();
-> > > > +
-> > > > +	mutex_lock(&mediate_ops_list_lock);
-> > > > +	list_for_each_entry_safe(mentry, n,  &mediate_ops_list, next) {
-> > > > +		list_del(&mentry->next);
-> > > > +		kfree(mentry);
-> > > > +	}
-> > > > +	mutex_unlock(&mediate_ops_list_lock);  
-> > > 
-> > > Is it even possible to unload vfio-pci while there are mediation
-> > > drivers registered?  I don't think the module interactions are well
-> > > thought out here, ex. do you really want i40e to have build and runtime
-> > > dependencies on vfio-pci?  I don't think so.
-> > >   
-> > Currently, yes, i40e has build dependency on vfio-pci.
-> > It's like this, if i40e decides to support SRIOV and compiles in vf
-> > related code who depends on vfio-pci, it will also have build dependency
-> > on vfio-pci. isn't it natural?
-> 
-> No, this is not natural.  There are certainly i40e VF use cases that
-> have no interest in vfio and having dependencies between the two
-> modules is unacceptable.  I think you probably want to modularize the
-> i40e vfio support code and then perhaps register a table in vfio-pci
-> that the vfio-pci code can perform a module request when using a
-> compatible device.  Just and idea, there might be better options.  I
-> will not accept a solution that requires unloading the i40e driver in
-> order to unload the vfio-pci driver.  It's inconvenient with just one
-> NIC driver, imagine how poorly that scales.
-> 
-what about this way:
-mediate driver registers a module notifier and every time when
-vfio_pci is loaded, register to vfio_pci its mediate ops?
-(Just like in below sample code)
-This way vfio-pci is free to unload and this registering only gives
-vfio-pci a name of what module to request.
-After that,
-in vfio_pci_open(), vfio-pci requests the mediate driver. (or puts
-the mediate driver when mediate driver does not support mediating the
-device)
-in vfio_pci_release(), vfio-pci puts the mediate driver.
+yes, this asynchronous event notification will cause vendor driver miss
+traps. But it's supposed to be of very short period time. That's also a
+reason for us to wish the re-evaluation to be lightweight. E.g. if it's
+able to be finished before the first iterate, it's still safe.
 
-static void register_mediate_ops(void)
-{
-        int (*func)(struct vfio_pci_mediate_ops *ops) = NULL;
+But I agree, the timing is not guaranteed, and so it's best for kernel
+to wait for mmap re-evaluation to complete. 
 
-        func = symbol_get(vfio_pci_register_mediate_ops);
-
-        if (func) {
-                func(&igd_dt_ops);
-                symbol_put(vfio_pci_register_mediate_ops);
-        }
-}
-
-static int igd_module_notify(struct notifier_block *self,
-                              unsigned long val, void *data)
-{
-        struct module *mod = data;
-        int ret = 0;
-
-        switch (val) {
-        case MODULE_STATE_LIVE:
-                if (!strcmp(mod->name, "vfio_pci"))
-                        register_mediate_ops();
-                break;
-        case MODULE_STATE_GOING:
-                break;
-        default:
-                break;
-        }
-        return ret;
-}
-
-static struct notifier_block igd_module_nb = {
-        .notifier_call = igd_module_notify,
-        .priority = 0,
-};
+migration_thread
+    |->qemu_savevm_state_setup
+    |   |->ram_save_setup
+    |   |   |->migration_bitmap_sync
+    |   |       |->kvm_log_sync
+    |   |       |->vfio_log_sync
+    |   |
+    |   |->vfio_save_setup
+    |       |->set_device_state(_SAVING)
+    |
+    |->qemu_savevm_state_pending
+    |   |->ram_save_pending
+    |   |   |->migration_bitmap_sync 
+    |   |      |->kvm_log_sync
+    |   |      |->vfio_log_sync
+    |   |->vfio_save_pending
+    |
+    |->qemu_savevm_state_iterate
+    |   |->ram_save_iterate //send pages
+    |   |->vfio_save_iterate
+    ...
 
 
-
-static int __init igd_dt_init(void)
-{
-	...
-	register_mediate_ops();
-	register_module_notifier(&igd_module_nb);
-	...
-	return 0;
-}
-
-
-> > > >  }
-> > > >  
-> > > >  static void __init vfio_pci_fill_ids(void)
-> > > > @@ -1697,6 +1799,50 @@ static int __init vfio_pci_init(void)
-> > > >  	return ret;
-> > > >  }
-> > > >  
-> > > > +int vfio_pci_register_mediate_ops(struct vfio_pci_mediate_ops *ops)
-> > > > +{
-> > > > +	struct vfio_pci_mediate_ops_list_entry *mentry;
-> > > > +
-> > > > +	mutex_lock(&mediate_ops_list_lock);
-> > > > +	mentry = kzalloc(sizeof(*mentry), GFP_KERNEL);
-> > > > +	if (!mentry) {
-> > > > +		mutex_unlock(&mediate_ops_list_lock);
-> > > > +		return -ENOMEM;
-> > > > +	}
-> > > > +
-> > > > +	mentry->ops = ops;
-> > > > +	mentry->refcnt = 0;  
-> > > 
-> > > It's kZalloc'd, this is unnecessary.
-> > >  
-> > right :) 
-> > > > +	list_add(&mentry->next, &mediate_ops_list);  
-> > > 
-> > > Check for duplicates?
-> > >   
-> > ok. will do it.
-> > > > +
-> > > > +	pr_info("registered dm ops %s\n", ops->name);
-> > > > +	mutex_unlock(&mediate_ops_list_lock);
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +EXPORT_SYMBOL(vfio_pci_register_mediate_ops);
-> > > > +
-> > > > +void vfio_pci_unregister_mediate_ops(struct vfio_pci_mediate_ops *ops)
-> > > > +{
-> > > > +	struct vfio_pci_mediate_ops_list_entry *mentry, *n;
-> > > > +
-> > > > +	mutex_lock(&mediate_ops_list_lock);
-> > > > +	list_for_each_entry_safe(mentry, n,  &mediate_ops_list, next) {
-> > > > +		if (mentry->ops != ops)
-> > > > +			continue;
-> > > > +
-> > > > +		mentry->refcnt--;  
-> > > 
-> > > Whose reference is this removing?
-> > >   
-> > I intended to prevent mediate driver from calling unregister mediate ops
-> > while there're still opened devices in it.
-> > after a successful mediate_ops->open(), mentry->refcnt++.
-> > after calling mediate_ops->release(). mentry->refcnt--.
-> > 
-> > (seems in this RFC, I missed a mentry->refcnt-- after calling
-> > mediate_ops->release())
-> > 
-> > 
-> > > > +		if (!mentry->refcnt) {
-> > > > +			list_del(&mentry->next);
-> > > > +			kfree(mentry);
-> > > > +		} else
-> > > > +			pr_err("vfio_pci unregister mediate ops %s error\n",
-> > > > +					mentry->ops->name);  
-> > > 
-> > > This is bad, we should hold a reference to the module providing these
-> > > ops for each use of it such that the module cannot be removed while
-> > > it's in use.  Otherwise we enter a very bad state here and it's
-> > > trivially accessible by an admin remove the module while in use.  
-> > mediate driver is supposed to ref its own module on a success
-> > mediate_ops->open(), and deref its own module on mediate_ops->release().
-> > so, it can't be accidentally removed.
-> 
-> Where was that semantic expressed in this series?  We should create
-> interfaces that are hard to use incorrectly.  It is far too easy for a
-> vendor driver to overlook such a requirement, which means fixing the
-> same bugs repeatedly for each vendor.  It needs to be improved.  Thanks,
-
-right. will improve it.
+Actually, we previously let qemu trigger the re-evaluation when migration starts.
+And now the reason for we to wish kernel to trigger the mmap re-evaluation is that
+there're other two possible use cases:
+(1) keep passing through devices when migration starts and track dirty pages
+    using hardware IOMMU. Then when migration is about to complete, stop the
+    device and start trap PCI BARs for software emulation. (we made some
+    changes to let device stop ahead of vcpu )
+(2) performance optimization. There's an example in GVT (mdev case): 
+    PCI BARs are passed through on vGPU initialization and are mmaped to a host
+    dummy buffer. Then after initialization done, start trap of PCI BARs of
+    vGPUs and start normal host mediation. The initial pass-through can save
+    1000000 times of mmio trap.
 
 Thanks
 Yan
+
+
+
