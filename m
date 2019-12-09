@@ -2,93 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4B5A1174EA
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 19:53:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 301F2117724
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 21:13:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfLISxC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 13:53:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43299 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726335AbfLISxB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 13:53:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575917580;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references:openpgp:openpgp;
-        bh=CWcZRJEpZKDqCIG7TiqGR99UZOB6+8bAvDVIMbEFGq0=;
-        b=ZjhefA+lcxesTLkAFiCNs9cspzZYANv8zChnL09tad7T+lNKIeSteesDyByFpE1V3VtCPq
-        USM9RHQiwQp+/i6WVr1KEeTNt/1qYIlMCObwzgErURvhtVHs8DGmiERn2QCTskmlB3lm56
-        W9HTKCbml9gDbfB6/Y/L0PYHX1XnP1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-F8WGKYxLODKlBgLPf7mNbA-1; Mon, 09 Dec 2019 13:52:59 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27CA710054E3
-        for <kvm@vger.kernel.org>; Mon,  9 Dec 2019 18:52:58 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-86.ams2.redhat.com [10.36.116.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C97B60BE1;
-        Mon,  9 Dec 2019 18:52:57 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Run 32-bit tests with KVM, too
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20191205170439.11607-1-thuth@redhat.com>
- <699a350a-3956-5757-758c-0e246d698a7d@redhat.com>
- <e319993e-4732-d3ed-bca6-054c78103a61@redhat.com>
- <75b0e3d3-4d74-de4b-822f-e125711dbf56@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <077bbd45-7db6-83d8-88f2-100111db4775@redhat.com>
-Date:   Mon, 9 Dec 2019 19:52:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726911AbfLIUNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 15:13:15 -0500
+Received: from mga12.intel.com ([192.55.52.136]:20612 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726230AbfLIUNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 15:13:15 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Dec 2019 12:05:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,296,1571727600"; 
+   d="scan'208";a="387357088"
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 09 Dec 2019 12:05:18 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: Add a WARN on TIF_NEED_FPU_LOAD in kvm_load_guest_fpu()
+Date:   Mon,  9 Dec 2019 12:05:17 -0800
+Message-Id: <20191209200517.13382-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <75b0e3d3-4d74-de4b-822f-e125711dbf56@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: F8WGKYxLODKlBgLPf7mNbA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/12/2019 18.42, Paolo Bonzini wrote:
-> On 09/12/19 18:14, Thomas Huth wrote:
->> On 09/12/2019 18.07, Paolo Bonzini wrote:
->>> On 05/12/19 18:04, Thomas Huth wrote:
->>>> KVM works on Travis in 32-bit, too, so we can enable more tests there.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  .travis.yml | 10 +++++++---
->>>>  1 file changed, 7 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/.travis.yml b/.travis.yml
->>>> index 4162366..75bcf08 100644
->>>> --- a/.travis.yml
->>>> +++ b/.travis.yml
->>>> @@ -34,15 +34,19 @@ matrix:
->>>>        env:
->>>>        - CONFIG="--arch=i386"
->>>>        - BUILD_DIR="."
->>>> -      - TESTS="eventinj port80 sieve tsc taskswitch umip vmexit_ple_round_robin"
->>>> +      - TESTS="asyncpf hyperv_stimer hyperv_synic kvmclock_test msr pmu realmode
->>>> +               s3 sieve smap smptest smptest3 taskswitch taskswitch2 tsc_adjust"
->>
->> taskswitch and taskswitch2 are here ----------------^
-> 
-> You're right, but I'm confused: what are the two separate configurations
-> for?  Worth a comment?
+WARN once in kvm_load_guest_fpu() if TIF_NEED_FPU_LOAD is observed, as
+that would mean that KVM is corrupting userspace's FPU by saving
+unknown register state into arch.user_fpu.  Add a comment to explain
+why KVM WARNs on TIF_NEED_FPU_LOAD instead of implementing logic
+similar to fpu__copy().
 
-For all architectures we've got one entry for in-tree builds and one
-in-tree entry for out-of-tree builds. Since we've got these two entries
-anyway, I simply split up the set of tests to speed up the CI process a
-little bit.
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
- Thomas
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3ed167e039e5..f2c8a053b017 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8474,6 +8474,13 @@ static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
+ {
+ 	fpregs_lock();
+ 
++	/*
++	 * Reloading userspace's FPU is handled by kvm_arch_vcpu_load(), both
++	 * for direct calls from userspace (via vcpu_load()) and if this task
++	 * is preempted (via kvm_arch_sched_in()) between vcpu_load() and now.
++	 */
++	WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD));
++
+ 	copy_fpregs_to_fpstate(vcpu->arch.user_fpu);
+ 	/* PKRU is separately restored in kvm_x86_ops->run.  */
+ 	__copy_kernel_to_fpregs(&vcpu->arch.guest_fpu->state,
+-- 
+2.24.0
 
