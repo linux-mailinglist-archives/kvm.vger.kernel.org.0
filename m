@@ -2,175 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5C47116C84
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 12:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E98BE116C86
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 12:49:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727554AbfLILt0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Dec 2019 06:49:26 -0500
-Received: from mga04.intel.com ([192.55.52.120]:9885 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727385AbfLILt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 06:49:26 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Dec 2019 03:49:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; 
-   d="scan'208";a="215071935"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga006.jf.intel.com with ESMTP; 09 Dec 2019 03:49:25 -0800
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 9 Dec 2019 03:49:24 -0800
-Received: from shsmsx102.ccr.corp.intel.com (10.239.4.154) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 9 Dec 2019 03:49:24 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
- shsmsx102.ccr.corp.intel.com ([169.254.2.109]) with mapi id 14.03.0439.000;
- Mon, 9 Dec 2019 19:49:22 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v3 00/10] vfio_pci: wrap pci device as a mediated device
-Thread-Topic: [PATCH v3 00/10] vfio_pci: wrap pci device as a mediated device
-Thread-Index: AQHVoSnnPAUPlFDoLUWP4k6NXkkQUaexRcCQ
-Date:   Mon, 9 Dec 2019 11:49:21 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A12A846@SHSMSX104.ccr.corp.intel.com>
-References: <1574335427-3763-1-git-send-email-yi.l.liu@intel.com>
-In-Reply-To: <1574335427-3763-1-git-send-email-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDZhNTkzNmQtYTM3Ni00M2MwLWI2OTAtOTI5MTIwMTEzY2Y2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK01hV0F5Qm1wenE0YTNuNno2YWVDNGtoUmNid3JOZ2hmU3hJU1lNN0hhaVwvcVwvRzdVT0t1RWs2MnVZVjV6RFdTIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727604AbfLILtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 06:49:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38560 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727589AbfLILtc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 06:49:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575892170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=MsZfXCrVmegm4TrnIW/AvCmulnRFplPb1eVJJuYKu8g=;
+        b=NwXQbJOmMDkqG8x2ISPTkmVLGJjZafIN1OIgANhRsSiojF0hptE4XSNJFB5h7i2UUCbhJt
+        UzQC2zLo+dL9vYTVC5CSgJ0yAmv1CVg2YW6BhAVtiG83UMqBI4BOBmJSoyzXB7MfUt2ugU
+        poMLhEOwHHrXoUF1kq2OCaa9deYRgMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-LD6yPy2mNkeY32rJm4NwnQ-1; Mon, 09 Dec 2019 06:49:27 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 680C68E7A9;
+        Mon,  9 Dec 2019 11:49:26 +0000 (UTC)
+Received: from [10.36.117.245] (ovpn-117-245.ams2.redhat.com [10.36.117.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 050F060C18;
+        Mon,  9 Dec 2019 11:49:24 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 4/9] s390x: export the clock
+ get_clock_ms() utility
+To:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        cohuck@redhat.com
+References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+ <1575649588-6127-5-git-send-email-pmorel@linux.ibm.com>
+ <fc6e103d-100b-151b-4a6e-359f3103d5fa@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <94cfa43e-de04-c00b-4a07-28b72937e7fc@redhat.com>
+Date:   Mon, 9 Dec 2019 12:49:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <fc6e103d-100b-151b-4a6e-359f3103d5fa@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: LD6yPy2mNkeY32rJm4NwnQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On 09.12.19 12:42, Thomas Huth wrote:
+> On 06/12/2019 17.26, Pierre Morel wrote:
+>> To serve multiple times, the function get_clock_ms() is moved
+>> from intercept.c test to the new file asm/time.h.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  lib/s390x/asm/time.h | 27 +++++++++++++++++++++++++++
+>>  s390x/intercept.c    | 11 +----------
+>>  2 files changed, 28 insertions(+), 10 deletions(-)
+>>  create mode 100644 lib/s390x/asm/time.h
+>>
+>> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+>> new file mode 100644
+>> index 0000000..b07ccbd
+>> --- /dev/null
+>> +++ b/lib/s390x/asm/time.h
+>> @@ -0,0 +1,27 @@
+>> +/*
+>> + * Clock utilities for s390
+>> + *
+>> + * Authors:
+>> + *  Thomas Huth <thuth@redhat.com>
+>> + *
+>> + * Copied from the s390/intercept test by:
+>> + *  Pierre Morel <pmorel@linux.ibm.com>
+>> + *
+>> + * This code is free software; you can redistribute it and/or modify it
+>> + * under the terms of the GNU General Public License version 2.
+>> + */
+>> +#ifndef _ASM_S390X_TIME_H_
+>> +#define _ASM_S390X_TIME_H_
+>> +
+>> +static inline uint64_t get_clock_ms(void)
+>> +{
+>> +	uint64_t clk;
+>> +
+>> +	asm volatile(" stck %0 " : : "Q"(clk) : "memory");
+>> +
+>> +	/* Bit 51 is incrememented each microsecond */
+>> +	return (clk >> (63 - 51)) / 1000;
+>> +}
+>> +
+>> +
+> 
+> Please remove one of the two empty lines.
+> 
+> With that cosmetic nit fixed:
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Any comments on this version? If any, please feel free let me know.
+-- 
+Thanks,
 
-Regards,
-Yi Liu
-
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Thursday, November 21, 2019 7:24 PM
-> To: alex.williamson@redhat.com; kwankhede@nvidia.com
-> Subject: [PATCH v3 00/10] vfio_pci: wrap pci device as a mediated device
-> 
-> This patchset aims to add a vfio-pci-like meta driver as a demo
-> user of the vfio changes introduced in "vfio/mdev: IOMMU aware
-> mediated device" patchset from Baolu Lu. Besides the test purpose,
-> per Alex's comments, it could also be a good base driver for
-> experimenting with device specific mdev migration.
-> 
-> Specific interface tested in this proposal:
->  *) int mdev_set_iommu_device(struct device *dev,
->  				struct device *iommu_device)
->     introduced in the patch as below:
->     "[PATCH v5 6/8] vfio/mdev: Add iommu related member in mdev_device"
-> 
-> Patch Overview:
->  *) patch 1 ~ 7: code refactor for existing vfio-pci module
->                  move the common codes from vfio_pci.c to
->                  vfio_pci_common.c
->  *) patch 8: add protection to perm_bits alloc/free
->  *) patch 9: add vfio-mdev-pci sample driver
->  *) patch 10: refine the sample driver
-> 
-> Links:
->  *) Link of "vfio/mdev: IOMMU aware mediated device"
->          https://lwn.net/Articles/780522/
->  *) Previous versions:
->          Patch v2: https://lkml.org/lkml/2019/9/6/115
->          Patch v1: https://www.spinics.net/lists/kvm/msg188952.html
->          RFC v3: https://lkml.org/lkml/2019/4/24/495
->          RFC v2: https://lkml.org/lkml/2019/3/13/113
->          RFC v1: https://lkml.org/lkml/2019/3/4/529
->  *) may try it with the codes in below repo
->     https://github.com/luxis1999/vfio-mdev-pci-sample-driver.git : v5.4-rc7-pci-mdev
-> 
-> Please feel free give your comments.
-> 
-> Thanks,
-> Yi Liu
-> 
-> Change log:
->   patch v2 -> patch v3:
->   - refresh the disable_idle_d3, disable_vga and nointxmask config
->     according to user config in device open.
->   - add a semaphore around the vfio-pci cap/ecap perm bits allocation/free
->   - drop the non-singleton iommu group support to keep it simple as it's
->     a sample driver for now.
-> 
->   patch v1 -> patch v2:
->   - the sample driver implementation refined
->   - the sample driver can work on non-singleton iommu groups
->   - the sample driver can work with vfio-pci, devices from a non-singleton
->     group can either be bound to vfio-mdev-pci or vfio-pci, and the
->     assignment of this group still follows current vfio assignment rule.
-> 
->   RFC v3 -> patch v1:
->   - split the patchset from 3 patches to 9 patches to better demonstrate
->     the changes step by step
-> 
->   rfc v2->v3:
->   - use vfio-mdev-pci instead of vfio-pci-mdev
->   - place the new driver under drivers/vfio/pci while define
->     Kconfig in samples/Kconfig to clarify it is a sample driver
-> 
->   rfc v1->v2:
->   - instead of adding kernel option to existing vfio-pci
->     module in v1, v2 follows Alex's suggestion to add a
->     separate vfio-pci-mdev module.
->   - new patchset subject: "vfio/pci: wrap pci device as a mediated device"
-> 
-> 
-> Alex Williamson (1):
->   samples: refine vfio-mdev-pci driver
-> 
-> Liu Yi L (9):
->   vfio_pci: move vfio_pci_is_vga/vfio_vga_disabled to header
->   vfio_pci: refine user config reference in vfio-pci module
->   vfio_pci: refine vfio_pci_driver reference in vfio_pci.c
->   vfio_pci: make common functions be extern
->   vfio_pci: duplicate vfio_pci.c
->   vfio_pci: shrink vfio_pci_common.c
->   vfio_pci: shrink vfio_pci.c
->   vfio/pci: protect cap/ecap_perm bits alloc/free
->   samples: add vfio-mdev-pci driver
-> 
->  drivers/vfio/pci/Makefile           |    9 +-
->  drivers/vfio/pci/vfio_mdev_pci.c    |  430 ++++++++++
->  drivers/vfio/pci/vfio_pci.c         | 1460 +---------------------------------
->  drivers/vfio/pci/vfio_pci_common.c  | 1471
-> +++++++++++++++++++++++++++++++++++
->  drivers/vfio/pci/vfio_pci_config.c  |   33 +-
->  drivers/vfio/pci/vfio_pci_private.h |   39 +
->  samples/Kconfig                     |   11 +
->  7 files changed, 2000 insertions(+), 1453 deletions(-)
->  create mode 100644 drivers/vfio/pci/vfio_mdev_pci.c
->  create mode 100644 drivers/vfio/pci/vfio_pci_common.c
-> 
-> --
-> 2.7.4
+David / dhildenb
 
