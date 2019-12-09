@@ -2,248 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C97E71168AD
-	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 09:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7383C1168F9
+	for <lists+kvm@lfdr.de>; Mon,  9 Dec 2019 10:15:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727122AbfLIIx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 03:53:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9600 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727044AbfLIIx3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 03:53:29 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xB98qIYf184468
-        for <kvm@vger.kernel.org>; Mon, 9 Dec 2019 03:53:28 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wrt9whfs7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 03:53:27 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Mon, 9 Dec 2019 08:53:26 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 9 Dec 2019 08:53:24 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xB98rNgZ42074182
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Dec 2019 08:53:23 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D4A05204F;
-        Mon,  9 Dec 2019 08:53:23 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C40955205A;
-        Mon,  9 Dec 2019 08:53:22 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 2/9] s390x: Define the PSW bits
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com
-References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
- <1575649588-6127-3-git-send-email-pmorel@linux.ibm.com>
- <4d034f27-0449-08ea-5b45-be91a788bd6d@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Mon, 9 Dec 2019 09:53:22 +0100
+        id S1727491AbfLIJPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 04:15:16 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22965 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727370AbfLIJPM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 9 Dec 2019 04:15:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575882911;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YfELO45T0KxxEI+GHyVFfpIjRmClA+hBogWql5/W6SQ=;
+        b=f4yX73UzOXwC/5HsOrgxhBCaj3AvQmeGI+KH/Fdt9sVxnojb/KwLb2xmcDGeX3S/hggy9G
+        /CYlvOqIsGxcJJx4tNGD7PnM1A/EExkq8bCUepRNr1+qp70ny7ABOyYSX58VtTqocU63TK
+        tvbJvkHSTlzoLGqYqk5VmBJLJo0GxB4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-ycsPezmHPnOwdQEk2RoEfQ-1; Mon, 09 Dec 2019 04:15:09 -0500
+Received: by mail-wr1-f72.google.com with SMTP id r2so7228924wrp.7
+        for <kvm@vger.kernel.org>; Mon, 09 Dec 2019 01:15:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YfELO45T0KxxEI+GHyVFfpIjRmClA+hBogWql5/W6SQ=;
+        b=NSSsr/Tk2AdJDjX2TxFLkTKsgZjtbp/vEbN4gtfXB2UKm3702HTre9BeUokrcbO2mv
+         xBD3de2DpChwbBZVX/qUfbTib7FgvH+QyHQtFdpAW0dbD+6VUfXZ3uces6PeBQrPO4ji
+         +SyX56w1CJDo57YzwNtrOm6Pc1bd0DGAu9X3y2hwFlbpPyXWQir7++3saOPwP0bfh5cz
+         DSNVRK8U2cxTabEGVFLXjyol1JtngaeK0ns/XMtAAFqJsc9wRTlJ9jKxI4Os3Pd+5pIS
+         qpxyDRZRVNkfgKzdSJV4EYouijkh09WQzOPqLEL2RNPNlU5rgcEWrrGZZGT+6QU2Gs2/
+         GOdg==
+X-Gm-Message-State: APjAAAXy5R6xkk93TGK++W23xb3fkxVjQGnx3XBC1BLCRw+ZUZX1cock
+        vM1YlQElnC69Ilz2D4wiM78RHFeyTenU+yPF5xpn3iNMDNLpUR51pqD692IFPD5QoIfAb4uK7mw
+        CD0LZ4YhPXeDG
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr906545wrl.190.1575882908454;
+        Mon, 09 Dec 2019 01:15:08 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzx+0F73j75Sg0V4zv67J/A/gwFnTAMcfnz17PTb7O/+EUxA4H0I9/yLw8pcSUGf1X5vymqMA==
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr906513wrl.190.1575882908118;
+        Mon, 09 Dec 2019 01:15:08 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id t81sm13500137wmg.6.2019.12.09.01.15.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Dec 2019 01:15:07 -0800 (PST)
+Subject: Re: [PATCH RFC] KVM: x86: tell guests if the exposed SMT topology is
+ trustworthy
+To:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Jim Mattson <jmattson@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        kvm@vger.kernel.org
+References: <20191105161737.21395-1-vkuznets@redhat.com>
+ <de3cade3-c069-dc6b-1d2d-aa10abe365b8@redhat.com>
+ <4f835a11-1528-a04e-9e06-1b8cdb97a04d@oracle.com>
+ <87wob9d0t3.fsf@vitty.brq.redhat.com>
+ <2e16b707-f020-22a3-a618-4960db917dfa@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a8e0cd22-f61f-88e4-1594-6784fb39e41f@redhat.com>
+Date:   Mon, 9 Dec 2019 10:15:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <4d034f27-0449-08ea-5b45-be91a788bd6d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <2e16b707-f020-22a3-a618-4960db917dfa@oracle.com>
 Content-Language: en-US
+X-MC-Unique: ycsPezmHPnOwdQEk2RoEfQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19120908-0012-0000-0000-000003730C5D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120908-0013-0000-0000-000021AED9AE
-Message-Id: <36847ac9-fef4-1eea-8b3a-d8a94a989a6e@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-09_01:2019-12-09,2019-12-08 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- suspectscore=0 mlxscore=0 spamscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912090077
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 06/12/19 21:31, Ankur Arora wrote:
+>> If we, however, discuss other hints such 'pre-ACK' mechanism may make
+>> sense, however, I'd make it an option to a 'challenge/response'
+>> protocol: if host wants to change a hint it notifies the guest and waits
+>> for an ACK from it (e.g. a pair of MSRs + an interrupt). I, however,
+>
+> My main reason for this 'pre-ACK' approach is some discomfort with
+> changing the CPUID edx from under the guest.
 
+Changing the CPUID is fine, if we document which CPUID can change.
+There are CPUID leaves that change at runtime, for example in leaf 0Dh
+(though in that case it's based on XCR0 and not on external circumstances).
 
-On 2019-12-06 17:29, Thomas Huth wrote:
-> On 06/12/2019 17.26, Pierre Morel wrote:
->> Let's define the PSW bits explicitly, it will clarify their
->> usage.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/asm/arch_def.h | 127 +++++++++++++++++++++------------------
->>   s390x/cstart64.S         |  13 ++--
->>   2 files changed, 74 insertions(+), 66 deletions(-)
->>
->> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
->> index cf6e1ca..1293640 100644
->> --- a/lib/s390x/asm/arch_def.h
->> +++ b/lib/s390x/asm/arch_def.h
->> @@ -10,20 +10,81 @@
->>   #ifndef _ASM_S390X_ARCH_DEF_H_
->>   #define _ASM_S390X_ARCH_DEF_H_
->>   
->> -struct psw {
->> -	uint64_t	mask;
->> -	uint64_t	addr;
->> -};
->> -
->>   #define PSW_MASK_EXT			0x0100000000000000UL
->>   #define PSW_MASK_DAT			0x0400000000000000UL
->>   #define PSW_MASK_PSTATE			0x0001000000000000UL
->> +#define PSW_MASK_IO			0x0200000000000000
->> +#define PSW_MASK_EA			0x0000000100000000
->> +#define PSW_MASK_BA			0x0000000080000000
->> +
->> +#define PSW_EXCEPTION_MASK (PSW_MASK_EA|PSW_MASK_BA)
->>   
->>   #define CR0_EXTM_SCLP			0X0000000000000200UL
->>   #define CR0_EXTM_EXTC			0X0000000000002000UL
->>   #define CR0_EXTM_EMGC			0X0000000000004000UL
->>   #define CR0_EXTM_MASK			0X0000000000006200UL
->>   
->> +#define PGM_INT_CODE_OPERATION			0x01
->> +#define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
->> +#define PGM_INT_CODE_EXECUTE			0x03
->> +#define PGM_INT_CODE_PROTECTION			0x04
->> +#define PGM_INT_CODE_ADDRESSING			0x05
->> +#define PGM_INT_CODE_SPECIFICATION		0x06
->> +#define PGM_INT_CODE_DATA			0x07
->> +#define PGM_INT_CODE_FIXED_POINT_OVERFLOW	0x08
->> +#define PGM_INT_CODE_FIXED_POINT_DIVIDE		0x09
->> +#define PGM_INT_CODE_DECIMAL_OVERFLOW		0x0a
->> +#define PGM_INT_CODE_DECIMAL_DIVIDE		0x0b
->> +#define PGM_INT_CODE_HFP_EXPONENT_OVERFLOW	0x0c
->> +#define PGM_INT_CODE_HFP_EXPONENT_UNDERFLOW	0x0d
->> +#define PGM_INT_CODE_HFP_SIGNIFICANCE		0x0e
->> +#define PGM_INT_CODE_HFP_DIVIDE			0x0f
->> +#define PGM_INT_CODE_SEGMENT_TRANSLATION	0x10
->> +#define PGM_INT_CODE_PAGE_TRANSLATION		0x11
->> +#define PGM_INT_CODE_TRANSLATION_SPEC		0x12
->> +#define PGM_INT_CODE_SPECIAL_OPERATION		0x13
->> +#define PGM_INT_CODE_OPERAND			0x15
->> +#define PGM_INT_CODE_TRACE_TABLE		0x16
->> +#define PGM_INT_CODE_VECTOR_PROCESSING		0x1b
->> +#define PGM_INT_CODE_SPACE_SWITCH_EVENT		0x1c
->> +#define PGM_INT_CODE_HFP_SQUARE_ROOT		0x1d
->> +#define PGM_INT_CODE_PC_TRANSLATION_SPEC	0x1f
->> +#define PGM_INT_CODE_AFX_TRANSLATION		0x20
->> +#define PGM_INT_CODE_ASX_TRANSLATION		0x21
->> +#define PGM_INT_CODE_LX_TRANSLATION		0x22
->> +#define PGM_INT_CODE_EX_TRANSLATION		0x23
->> +#define PGM_INT_CODE_PRIMARY_AUTHORITY		0x24
->> +#define PGM_INT_CODE_SECONDARY_AUTHORITY	0x25
->> +#define PGM_INT_CODE_LFX_TRANSLATION		0x26
->> +#define PGM_INT_CODE_LSX_TRANSLATION		0x27
->> +#define PGM_INT_CODE_ALET_SPECIFICATION		0x28
->> +#define PGM_INT_CODE_ALEN_TRANSLATION		0x29
->> +#define PGM_INT_CODE_ALE_SEQUENCE		0x2a
->> +#define PGM_INT_CODE_ASTE_VALIDITY		0x2b
->> +#define PGM_INT_CODE_ASTE_SEQUENCE		0x2c
->> +#define PGM_INT_CODE_EXTENDED_AUTHORITY		0x2d
->> +#define PGM_INT_CODE_LSTE_SEQUENCE		0x2e
->> +#define PGM_INT_CODE_ASTE_INSTANCE		0x2f
->> +#define PGM_INT_CODE_STACK_FULL			0x30
->> +#define PGM_INT_CODE_STACK_EMPTY		0x31
->> +#define PGM_INT_CODE_STACK_SPECIFICATION	0x32
->> +#define PGM_INT_CODE_STACK_TYPE			0x33
->> +#define PGM_INT_CODE_STACK_OPERATION		0x34
->> +#define PGM_INT_CODE_ASCE_TYPE			0x38
->> +#define PGM_INT_CODE_REGION_FIRST_TRANS		0x39
->> +#define PGM_INT_CODE_REGION_SECOND_TRANS	0x3a
->> +#define PGM_INT_CODE_REGION_THIRD_TRANS		0x3b
->> +#define PGM_INT_CODE_MONITOR_EVENT		0x40
->> +#define PGM_INT_CODE_PER			0x80
->> +#define PGM_INT_CODE_CRYPTO_OPERATION		0x119
->> +#define PGM_INT_CODE_TX_ABORTED_EVENT		0x200
->> +
->> +#ifndef __ASSEMBLER__
->> +struct psw {
->> +	uint64_t	mask;
->> +	uint64_t	addr;
->> +};
->> +
->>   struct lowcore {
->>   	uint8_t		pad_0x0000[0x0080 - 0x0000];	/* 0x0000 */
->>   	uint32_t	ext_int_param;			/* 0x0080 */
->> @@ -101,61 +162,6 @@ struct lowcore {
->>   } __attribute__ ((__packed__));
->>   _Static_assert(sizeof(struct lowcore) == 0x1900, "Lowcore size");
->>   
->> -#define PGM_INT_CODE_OPERATION			0x01
->> -#define PGM_INT_CODE_PRIVILEGED_OPERATION	0x02
->> -#define PGM_INT_CODE_EXECUTE			0x03
->> -#define PGM_INT_CODE_PROTECTION			0x04
->> -#define PGM_INT_CODE_ADDRESSING			0x05
->> -#define PGM_INT_CODE_SPECIFICATION		0x06
->> -#define PGM_INT_CODE_DATA			0x07
->> -#define PGM_INT_CODE_FIXED_POINT_OVERFLOW	0x08
->> -#define PGM_INT_CODE_FIXED_POINT_DIVIDE		0x09
->> -#define PGM_INT_CODE_DECIMAL_OVERFLOW		0x0a
->> -#define PGM_INT_CODE_DECIMAL_DIVIDE		0x0b
->> -#define PGM_INT_CODE_HFP_EXPONENT_OVERFLOW	0x0c
->> -#define PGM_INT_CODE_HFP_EXPONENT_UNDERFLOW	0x0d
->> -#define PGM_INT_CODE_HFP_SIGNIFICANCE		0x0e
->> -#define PGM_INT_CODE_HFP_DIVIDE			0x0f
->> -#define PGM_INT_CODE_SEGMENT_TRANSLATION	0x10
->> -#define PGM_INT_CODE_PAGE_TRANSLATION		0x11
->> -#define PGM_INT_CODE_TRANSLATION_SPEC		0x12
->> -#define PGM_INT_CODE_SPECIAL_OPERATION		0x13
->> -#define PGM_INT_CODE_OPERAND			0x15
->> -#define PGM_INT_CODE_TRACE_TABLE		0x16
->> -#define PGM_INT_CODE_VECTOR_PROCESSING		0x1b
->> -#define PGM_INT_CODE_SPACE_SWITCH_EVENT		0x1c
->> -#define PGM_INT_CODE_HFP_SQUARE_ROOT		0x1d
->> -#define PGM_INT_CODE_PC_TRANSLATION_SPEC	0x1f
->> -#define PGM_INT_CODE_AFX_TRANSLATION		0x20
->> -#define PGM_INT_CODE_ASX_TRANSLATION		0x21
->> -#define PGM_INT_CODE_LX_TRANSLATION		0x22
->> -#define PGM_INT_CODE_EX_TRANSLATION		0x23
->> -#define PGM_INT_CODE_PRIMARY_AUTHORITY		0x24
->> -#define PGM_INT_CODE_SECONDARY_AUTHORITY	0x25
->> -#define PGM_INT_CODE_LFX_TRANSLATION		0x26
->> -#define PGM_INT_CODE_LSX_TRANSLATION		0x27
->> -#define PGM_INT_CODE_ALET_SPECIFICATION		0x28
->> -#define PGM_INT_CODE_ALEN_TRANSLATION		0x29
->> -#define PGM_INT_CODE_ALE_SEQUENCE		0x2a
->> -#define PGM_INT_CODE_ASTE_VALIDITY		0x2b
->> -#define PGM_INT_CODE_ASTE_SEQUENCE		0x2c
->> -#define PGM_INT_CODE_EXTENDED_AUTHORITY		0x2d
->> -#define PGM_INT_CODE_LSTE_SEQUENCE		0x2e
->> -#define PGM_INT_CODE_ASTE_INSTANCE		0x2f
->> -#define PGM_INT_CODE_STACK_FULL			0x30
->> -#define PGM_INT_CODE_STACK_EMPTY		0x31
->> -#define PGM_INT_CODE_STACK_SPECIFICATION	0x32
->> -#define PGM_INT_CODE_STACK_TYPE			0x33
->> -#define PGM_INT_CODE_STACK_OPERATION		0x34
->> -#define PGM_INT_CODE_ASCE_TYPE			0x38
->> -#define PGM_INT_CODE_REGION_FIRST_TRANS		0x39
->> -#define PGM_INT_CODE_REGION_SECOND_TRANS	0x3a
->> -#define PGM_INT_CODE_REGION_THIRD_TRANS		0x3b
->> -#define PGM_INT_CODE_MONITOR_EVENT		0x40
->> -#define PGM_INT_CODE_PER			0x80
->> -#define PGM_INT_CODE_CRYPTO_OPERATION		0x119
->> -#define PGM_INT_CODE_TX_ABORTED_EVENT		0x200
-> 
-> This patch definitely does more than you've mentioned in the patch
-> description. Please avoid the movement of the PGM definitions here and
-> move that into a separate patch (if it is really necessary).
-> 
->   Thomas
-> 
+> As we've discussed offlist, the particular hint I'm interested in is
+> KVM_HINT_REALTIME. That's not a particularly good candidate though
+> because there's no correctness problem if the host does switch it
+> off suddenly. 
 
-OK, thanks,
+Or perhaps it's a good candidate, exactly because there's no correctness
+problem.  For SMT topology, there are security issues if the host
+doesn't respect it anymore, so making it changeable is of limited utility.
 
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Paolo
 
