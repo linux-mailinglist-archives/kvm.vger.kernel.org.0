@@ -2,76 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F596118D13
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 16:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64AA9118D28
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 17:02:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727519AbfLJPxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 10:53:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39754 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727440AbfLJPxE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 10:53:04 -0500
+        id S1727411AbfLJQCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 11:02:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20897 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727178AbfLJQCQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 11:02:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575993182;
+        s=mimecast20190719; t=1575993735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q7Wkuo5DOrROzVyUdQcO7Id9YJhb4KcA4EFLGC9qzM8=;
-        b=V9A8Is0U3DRFP8i6swiFb+jykQmeWthfs8OmOuyqiR77nokwjNWU1tKxqyvdjQhb5Uqpqy
-        6xATPgaIPdTKWTsKQY0FbKPVZHDox3mNB9DpA0HzfjgVtQoNURAlqnIJRetj1MBhbSHk9k
-        N0pRG24GIRNKGudysFlmTQUu1FWXROA=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-HD24bgSTOzmiPyNvotEeZA-1; Tue, 10 Dec 2019 10:53:01 -0500
-Received: by mail-qt1-f200.google.com with SMTP id m8so2152558qta.20
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 07:53:01 -0800 (PST)
+        bh=cmrUnVVfu+gicASXeQuwmvLpG3WehUtcphinC4uDACQ=;
+        b=Efr32DHdgvCyp/iJ1nYyqdMPtPhvgJhEHfKlrm58ZZSfPEM31oQhaeBFcyxsXc1/rUFzGT
+        dSyEonrqep5RrWOGF+QlxQ2YRsPPg6sOZf6qwOgimbHRTbKLbcTzTkv8VQ/7ZuZlOrfim4
+        wPZ/tV/DIp0ZoTRuZ9hXAUHYz/eI9Lw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-8Vcujk8jPumyUNV9fPe-Nw-1; Tue, 10 Dec 2019 11:02:14 -0500
+Received: by mail-qt1-f197.google.com with SMTP id d9so2193840qtq.13
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 08:02:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=CTMg4TU0Xzm9Sp3cKGL3NKbE9vCAJaofWeL0HT4DNMU=;
-        b=Cu+V4l8UVis6l1fGe6F7bOVQxABaYEepPNf21fkIaEGGWKg6GgQUixoY+bbl0NL4OQ
-         cEfagoFjllY6QryVop+8bb7PAkpWRbEgR6qsfC9Gtji4ux95hwybxx1WmjbpEi4ZgKik
-         lx+hCTFgbwHuM5PVnB/vMTBuCX01LpAus9YLHbWSCD3HX0+CzVDMmQEgvrDYmBRjxxcC
-         QoP0YlLEgD3xZNqCW/Rz3Nlw+yd+XVWLqM7o8hILBrUQvEt1KoKinuFGFQT4uUNP1dVX
-         kyUZoCnWnWhVdhsdN959LM1CxJtLSn+2rGNNxikJUp948ca4gBr+Lxr6eJoNwx7dBEVu
-         U0EA==
-X-Gm-Message-State: APjAAAWL/7magvDfl33qnmWDjwPcGWVVLACLghrlxUy2yKRxrcRQwgqq
-        eRuD7RdZqNbKb4cbgTV2kuDSFQ7mxfjoR316Yk/fObxoUZr0otiB49tD9AZvh7hmNCMwMwNscTH
-        /0c6HxKTWbY9E
-X-Received: by 2002:aed:2469:: with SMTP id s38mr4423845qtc.172.1575993181257;
-        Tue, 10 Dec 2019 07:53:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyQcTBiI7P3OeRYMxxzIss87EQVvdXW+O/wzbi1TnkUtQrmno9BbevPH1mBp0ZhCa/2sQMpbA==
-X-Received: by 2002:aed:2469:: with SMTP id s38mr4423817qtc.172.1575993180966;
-        Tue, 10 Dec 2019 07:53:00 -0800 (PST)
+        bh=KTRO4sKa0TSsx0s4k8rd2usE0Lc8/iEKmdicKPLyJcY=;
+        b=Fys/ISOCwV5Ut6mp/7f+jpUcNCUPyxYBhB+WvG13Hu8PZsPYXtrjOOQ4WzxMIOxTzx
+         ULe8KrNOjYtr+fRrfyKNbqyoOm7LpChLmQmhb4HOHg7pmJ6RNZfVG2F00yalOFpwfRdy
+         Vv5mvsKDGPK2YW6zUMWKTB75VHzrgqLvcOIpEFD/fpM1B7wC2thtTgsUa2YYM8OxBxtU
+         lb9Aiv10SkaoTMwvIAt4IEB/uE8LI8T2mQpDWQHjKI7tbDPWz6k/DgXwnGXe4HA6WJA+
+         jcOJQ088sqS6I8AXAKDfYqh26ALNzZKwZQgCuLgFl45WYAL57VB0Dropw5e2a4U8YBUC
+         YrRA==
+X-Gm-Message-State: APjAAAXTYMtMcz+K8BFdzI2GAcUejXQRgIbqA1/ZIkiBsEXuUtTTAK7D
+        T9RSe+fWTOkM+h/1o7QfNywtt25LCSQp3uXMs7G9XWdAmrlIPQF8mNyrCTsDUA0s05QZEEro/EY
+        HE/0Kp0ua3RBN
+X-Received: by 2002:ac8:6908:: with SMTP id e8mr18354345qtr.124.1575993733841;
+        Tue, 10 Dec 2019 08:02:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzFY9Zu4KFA0Cgq3rNYhbKTV85FtEH60qO0JD/0nPDQokpcMpqEq1wyebMhUioLku1+qtqLKg==
+X-Received: by 2002:ac8:6908:: with SMTP id e8mr18354311qtr.124.1575993733549;
+        Tue, 10 Dec 2019 08:02:13 -0800 (PST)
 Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id 4sm1040383qki.51.2019.12.10.07.52.59
+        by smtp.gmail.com with ESMTPSA id x32sm1237252qtx.84.2019.12.10.08.02.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2019 07:53:00 -0800 (PST)
-Date:   Tue, 10 Dec 2019 10:52:59 -0500
+        Tue, 10 Dec 2019 08:02:12 -0800 (PST)
+Date:   Tue, 10 Dec 2019 11:02:11 -0500
 From:   Peter Xu <peterx@redhat.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
 Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191210155259.GD3352@xz-x1>
+Message-ID: <20191210160211.GE3352@xz-x1>
 References: <20191129213505.18472-1-peterx@redhat.com>
  <20191129213505.18472-5-peterx@redhat.com>
- <20191202201036.GJ4063@linux.intel.com>
- <20191202211640.GF31681@xz-x1>
- <20191202215049.GB8120@linux.intel.com>
- <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
- <20191203184600.GB19877@linux.intel.com>
- <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
- <20191209215400.GA3352@xz-x1>
- <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
+ <a3e83e6b-4bfa-3a6b-4b43-5dd451e03254@redhat.com>
+ <20191210081958-mutt-send-email-mst@kernel.org>
+ <8843d1c8-1c87-e789-9930-77e052bf72f9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+In-Reply-To: <8843d1c8-1c87-e789-9930-77e052bf72f9@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-MC-Unique: HD24bgSTOzmiPyNvotEeZA-1
+X-MC-Unique: 8Vcujk8jPumyUNV9fPe-Nw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -81,86 +79,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 11:07:31AM +0100, Paolo Bonzini wrote:
-> > I'm thinking whether I can start
-> > to use this information in the next post on solving an issue I
-> > encountered with the waitqueue.
-> >=20
-> > Current waitqueue is still problematic in that it could wait even with
-> > the mmu lock held when with vcpu context.
+On Tue, Dec 10, 2019 at 02:31:54PM +0100, Paolo Bonzini wrote:
+> On 10/12/19 14:25, Michael S. Tsirkin wrote:
+> >> There is no new infrastructure to track the dirty pages---it's just a
+> >> different way to pass them to userspace.
+> > Did you guys consider using one of the virtio ring formats?
+> > Maybe reusing vhost code?
 >=20
-> I think the idea of the soft limit is that the waiting just cannot
-> happen.  That is, the number of dirtied pages _outside_ the guest (guest
-> accesses are taken care of by PML, and are subtracted from the soft
-> limit) cannot exceed hard_limit - (soft_limit + pml_size).
+> There are no used/available entries here, it's unidirectional
+> (kernel->user).
 
-So the question go backs to, whether this is guaranteed somehow?  Or
-do you prefer us to keep the warn_on_once until it triggers then we
-can analyze (which I doubt..)?
-
-One thing to mention is that for with-vcpu cases, we probably can even
-stop KVM_RUN immediately as long as either the per-vm or per-vcpu ring
-reaches the softlimit, then for vcpu case it should be easier to
-guarantee that.  What I want to know is the rest of cases like ioctls
-or even something not from the userspace (which I think I should read
-more later..).
-
-If the answer is yes, I'd be more than glad to drop the waitqueue.
+Agreed.  Vring could be an overkill IMHO (the whole dirty_ring.c is
+100+ LOC only).
 
 >=20
-> > The issue is KVM_RESET_DIRTY_RINGS needs the mmu lock to manipulate
-> > the write bits, while it's the only interface to also wake up the
-> > dirty ring sleepers.  They could dead lock like this:
+> > If you did and it's not a good fit, this is something good to mention
+> > in the commit log.
 > >=20
-> >       main thread                            vcpu thread
-> >       =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D                            =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >                                              kvm page fault
-> >                                                mark_page_dirty_in_slot
-> >                                                mmu lock taken
-> >                                                mark dirty, ring full
-> >                                                queue on waitqueue
-> >                                                (with mmu lock)
-> >       KVM_RESET_DIRTY_RINGS
-> >         take mmu lock               <------------ deadlock here
-> >         reset ring gfns
-> >         wakeup dirty ring sleepers
-> >=20
-> > And if we see if the mark_page_dirty_in_slot() is not with a vcpu
-> > context (e.g. kvm_mmu_page_fault) but with an ioctl context (those
-> > cases we'll use per-vm dirty ring) then it's probably fine.
-> >=20
-> > My planned solution:
-> >=20
-> > - When kvm_get_running_vcpu() !=3D NULL, we postpone the waitqueue wait=
-s
-> >   until we finished handling this page fault, probably in somewhere
-> >   around vcpu_enter_guest, so that we can do wait_event() after the
-> >   mmu lock released
+> > I also wonder about performance numbers - any data here?
 >=20
-> I think this can cause a race:
->=20
-> =09vCPU 1=09=09=09vCPU 2=09=09host
-> =09---------------------------------------------------------------
-> =09mark page dirty
-> =09=09=09=09write to page
-> =09=09=09=09=09=09treat page as not dirty
-> =09add page to ring
->=20
-> where vCPU 2 skips the clean-page slow path entirely.
+> Yes some numbers would be useful.  Note however that the improvement is
+> asymptotical, O(#dirtied pages) vs O(#total pages) so it may differ
+> depending on the workload.
 
-If we're still with the rule in userspace that we first do RESET then
-collect and send the pages (just like what we've discussed before),
-then IMHO it's fine to have vcpu2 to skip the slow path?  Because
-RESET happens at "treat page as not dirty", then if we are sure that
-we only collect and send pages after that point, then the latest
-"write to page" data from vcpu2 won't be lost even if vcpu2 is not
-blocked by vcpu1's ring full?
-
-Maybe we can also consider to let mark_page_dirty_in_slot() return a
-value, then the upper layer could have a chance to skip the spte
-update if mark_page_dirty_in_slot() fails to mark the dirty bit, so it
-can return directly with RET_PF_RETRY.
+Yes.  I plan to give some numbers when start to work on the QEMU
+series (after this lands).  However as Paolo said, those numbers would
+probably only be with some special case where I know the dirty ring
+could win.  Frankly speaking I don't even know whether we should
+change the default logging mode when the QEMU work is done - I feel
+like the old logging interface is still good in many major cases
+(small vms, or high dirty rates).  It could be that we just offer
+another option when the user could consider to solve specific problems.
 
 Thanks,
 
