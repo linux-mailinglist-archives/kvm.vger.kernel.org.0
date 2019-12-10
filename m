@@ -2,98 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED177118262
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 09:39:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 008401182A6
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 09:45:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726888AbfLJIj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 03:39:29 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57395 "EHLO
+        id S1726974AbfLJIpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 03:45:31 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53648 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726750AbfLJIj3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 03:39:29 -0500
+        by vger.kernel.org with ESMTP id S1726847AbfLJIpb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 03:45:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575967167;
+        s=mimecast20190719; t=1575967530;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GjTTvpt6PobdsvvlIPtldg7usxW7jcyhRVwzKlCfqFM=;
-        b=NKzG5H3+PPtAvJqN2hgv5Gjw7reNjhvtDnU7qzNC+Q+OwGarENBXt/pd2pVtXYCpRU3ZXo
-        /3y4ObjtUdsXsG8IhMxF7hiz3vkAY9BTOx9+x1rmjWHOK7rVH7SoIwFgLy9ylnHZ6XtcJg
-        XTIVikH2aEysLNy7PUeQnvUhFrSFHSc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-pP2HBSdMOpaFQP90V5sBQA-1; Tue, 10 Dec 2019 03:39:24 -0500
-Received: by mail-wr1-f71.google.com with SMTP id b13so8639805wrx.22
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 00:39:24 -0800 (PST)
+        bh=EHXP5t+IM2uhgjKRfv/wbmhkBiYk2XdPfXl9QksfvlM=;
+        b=KatolIN1cHLaczICZaIKPlIgc9FZeYueUDNyaoiOzDJF2+2FFz4MikODvW4rnpylETC+63
+        wKwAEuLImgMLN57GRsBo3WjBqmMiiVYcfE1Od2qBf5ZwAfY0gBDUARBa1ZtTuKZcEBs8dk
+        AIKEJys9KzJsCE/rJ1EoN6aJNnJ1IAU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-Z_veY5N_NUi2heCMpgpsHw-1; Tue, 10 Dec 2019 03:45:29 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c6so8615282wrm.18
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 00:45:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GjTTvpt6PobdsvvlIPtldg7usxW7jcyhRVwzKlCfqFM=;
-        b=FwtWEyJJ9+auFNU0iqbrUcGCdoHG3PWHBzYRhMRF8xVRvvOSyJpwlTG9RLm/wFUMNf
-         vDkz39MYA3hahfY1Rbb7F+PUg6KHWbTQghzLrVRAbp+NddMVxqJBvihFQMXwjXpR96gk
-         Jc05hA7eotDNzomaVXSVMOZDlHRn5yavyn6zVOSfCoIKNTG/Sz8eL+Ogug02XRasaZTU
-         S68yCymFtDlQibuOsUbAy4RWA6eVvr+YR4BNQ4jywz9i3l+jUfnTyZqiM6p6N+13ufFd
-         Z74Kz3BHnyi2j2zmyTNnbKQquda6rpuUg253g+68yUQXqbjRgIcDv2gUQD1FdtGaPdYM
-         zo5Q==
-X-Gm-Message-State: APjAAAVVntGBasFMunk1XCre2ZQ0nS9wupkF8ze5ANzvZaabf/xltM+3
-        MR6nMj+bu0dn/9gOyePoK9ICvGc4wm7B0iUr7g8dMuKChasC4yzlNgR+/LbEhNQpubnb4pmhcSC
-        3HBLDOwvA1yDf
-X-Received: by 2002:adf:cd03:: with SMTP id w3mr1707603wrm.191.1575967163444;
-        Tue, 10 Dec 2019 00:39:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzU1FBt3vbHWbnkN03vACZhNOppfQeC0toEpmCVEttiJubR5galA/9amse/PQ6hN2pPzkBTjA==
-X-Received: by 2002:adf:cd03:: with SMTP id w3mr1707583wrm.191.1575967163132;
-        Tue, 10 Dec 2019 00:39:23 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id i11sm2433522wrs.10.2019.12.10.00.39.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 00:39:22 -0800 (PST)
-Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
- field
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>
-References: <20191204214027.85958-1-jmattson@google.com>
- <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
- <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
- <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
- <f20972b7-ea45-6177-afa6-f980c9bd6d0f@redhat.com>
- <CALMp9eRag2YFfK-2y-e12NdP+EE068nC+Sv_=BVtBdPXV-FE7Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d1ff0d0a-a7b1-970c-3755-559f89a90713@redhat.com>
-Date:   Tue, 10 Dec 2019 09:39:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=VokcWwHWpp/e0pbVRBSEYqvNuANdyNAiEOTcGwXXE2w=;
+        b=FpThEm6MSKsIFQlZPQOierNU2Dvmyi4c8EcjoLH8ScFSJlDCbPRPngnR38UgOeh1pU
+         gITGNVcrssVFydJsntbm+2QhgXi+GZRfyXCpU1Pvk93Xm60xFJlHIurIxcKlqxYd/9E0
+         23ttBYggoDnuN+2NMqvznLVQMDfdgvL20BkalYGF0TloU3uxzxWW27nTw/yEo+C+vKAw
+         rteIyTFea1Dio7yqE+2IkADVFNmr6YOUDaSMqk5L/tOZl6cvtxgezoEemoWB5RRabXhT
+         XeR4nQD3SY5XCEbkZLSbCNVHojJ2SsvyujIvE/Pk+woqfzI6YNCswo13q6UzxZN02OUB
+         OwTA==
+X-Gm-Message-State: APjAAAWbDS2cm6ksY1D9W5aJEgg6WdHjSceyA3e8ebcadRGW3bgTCQKO
+        v2QOhLdBWdMPjpOsP85j05XlGRXk3ZyNCZkGkTNsjUQWR8HsoWqPxoga3eLiAac2Q/mgnGnAHAK
+        1e6Tn8MMsmiZx
+X-Received: by 2002:adf:fc0c:: with SMTP id i12mr1933194wrr.74.1575967528510;
+        Tue, 10 Dec 2019 00:45:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyIp7r0+7xXZilpVXZLekeS10O68sMVivmUq43xh4m2WJkFH6LFJJFSQebYaSTyZIF9OhpDow==
+X-Received: by 2002:adf:fc0c:: with SMTP id i12mr1933169wrr.74.1575967528224;
+        Tue, 10 Dec 2019 00:45:28 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id s1sm2289452wmc.23.2019.12.10.00.45.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2019 00:45:27 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
+        gshan@redhat.com
+Subject: Re: [PATCH] tools/kvm_stat: Fix kvm_exit filter name
+In-Reply-To: <20191210044829.180122-1-gshan@redhat.com>
+References: <20191210044829.180122-1-gshan@redhat.com>
+Date:   Tue, 10 Dec 2019 09:45:27 +0100
+Message-ID: <871rtcd0wo.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRag2YFfK-2y-e12NdP+EE068nC+Sv_=BVtBdPXV-FE7Q@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: pP2HBSdMOpaFQP90V5sBQA-1
+X-MC-Unique: Z_veY5N_NUi2heCMpgpsHw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/12/19 00:34, Jim Mattson wrote:
-> On Mon, Dec 9, 2019 at 8:12 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 05/12/19 22:30, Jim Mattson wrote:
->>>> I'll put one together, along with a test that shows the current
->>>> priority inversion between read-only and unsupported VMCS fields.
->>> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so I'm
->>> going to add the test to tools/testing/selftests/kvm instead.
->>>
->>
->> With the next version of QEMU it will be "-cpu
->> host,-vmx-vmwrite-vmexit-fields".
-> 
-> Or, presumably, -cpu Westmere?
+Gavin Shan <gshan@redhat.com> writes:
 
-Yes, more precisely -cpu Westmere,+vmx because nested is still not the
-default for named CPU models.
+> The filter name is fixed to "exit_reason" for some kvm_exit events, no
+> matter what architect we have. Actually, the filter name ("exit_reason")
+> is only applicable to x86, meaning it's broken on other architects
+> including aarch64.
+>
+> This fixes the issue by providing various kvm_exit filter names, dependin=
+g
+> on architect we're on. Afterwards, the variable filter name is picked and
+> applied through ioctl(fd, SET_FILTER).
 
-Paolo
+Would it actually make sense to standardize (to certain extent) kvm_exit
+tracepoints instead?
+
+>
+> Reported-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  tools/kvm/kvm_stat/kvm_stat | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+> index ad1b9e646c49..f9273614b7e3 100755
+> --- a/tools/kvm/kvm_stat/kvm_stat
+> +++ b/tools/kvm/kvm_stat/kvm_stat
+> @@ -270,6 +270,7 @@ class ArchX86(Arch):
+>      def __init__(self, exit_reasons):
+>          self.sc_perf_evt_open =3D 298
+>          self.ioctl_numbers =3D IOCTL_NUMBERS
+> +        self.exit_field =3D 'exit_reason'
+
+Also, 'exit_field' name is confusing (probably because I'm thinking of
+VMCS fields)
+
+>          self.exit_reasons =3D exit_reasons
+> =20
+>      def debugfs_is_child(self, field):
+> @@ -289,6 +290,7 @@ class ArchPPC(Arch):
+>          # numbers depend on the wordsize.
+>          char_ptr_size =3D ctypes.sizeof(ctypes.c_char_p)
+>          self.ioctl_numbers['SET_FILTER'] =3D 0x80002406 | char_ptr_size =
+<< 16
+> +        self.exit_field =3D 'exit_nr'
+>          self.exit_reasons =3D {}
+> =20
+>      def debugfs_is_child(self, field):
+> @@ -300,6 +302,7 @@ class ArchA64(Arch):
+>      def __init__(self):
+>          self.sc_perf_evt_open =3D 241
+>          self.ioctl_numbers =3D IOCTL_NUMBERS
+> +        self.exit_field =3D 'ret'
+
+And this is the most confusing part. Why do we have 'ret' as an exit
+reason in the first place?
+
+>          self.exit_reasons =3D AARCH64_EXIT_REASONS
+> =20
+>      def debugfs_is_child(self, field):
+> @@ -311,6 +314,7 @@ class ArchS390(Arch):
+>      def __init__(self):
+>          self.sc_perf_evt_open =3D 331
+>          self.ioctl_numbers =3D IOCTL_NUMBERS
+> +        self.exit_field =3D None
+>          self.exit_reasons =3D None
+> =20
+>      def debugfs_is_child(self, field):
+> @@ -541,8 +545,8 @@ class TracepointProvider(Provider):
+>          """
+>          filters =3D {}
+>          filters['kvm_userspace_exit'] =3D ('reason', USERSPACE_EXIT_REAS=
+ONS)
+> -        if ARCH.exit_reasons:
+> -            filters['kvm_exit'] =3D ('exit_reason', ARCH.exit_reasons)
+> +        if ARCH.exit_field and ARCH.exit_reasons:
+> +            filters['kvm_exit'] =3D (ARCH.exit_field, ARCH.exit_reasons)
+>          return filters
+> =20
+>      def _get_available_fields(self):
+
+--=20
+Vitaly
 
