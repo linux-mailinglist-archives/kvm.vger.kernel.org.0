@@ -2,257 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DE57118321
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 10:12:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55C4011835E
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 10:18:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726971AbfLJJMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 04:12:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38026 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726911AbfLJJMg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 04:12:36 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBA9CWTo132087
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 04:12:35 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wsrdn9ab7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 04:12:35 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 10 Dec 2019 09:12:32 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 10 Dec 2019 09:12:31 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBA9CUUR58065052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 09:12:30 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 147B8A4057;
-        Tue, 10 Dec 2019 09:12:30 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D20C5A4040;
-        Tue, 10 Dec 2019 09:12:29 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Dec 2019 09:12:29 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 8/9] s390x: css: ssch/tsch with sense
- and interrupt
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
- <1575649588-6127-9-git-send-email-pmorel@linux.ibm.com>
- <20191209182213.69e14263.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Tue, 10 Dec 2019 10:12:29 +0100
+        id S1727187AbfLJJSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 04:18:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29596 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726983AbfLJJSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 04:18:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575969482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LwMyxUw+/mSFbkl5BEsUf1e5k5JSpB6gcLmT1T2v/3Y=;
+        b=IOet0ZAnyvlJmP7Ko117kD2vruHe/OHn4o5bdlglDvNBrOO2cvKjpEK0aye38cSEtErvW3
+        9Imb8uC+QMW2LUUCknhMRjjMTGmqn9z0gWVPkFmE0e5iQFmeayOFxQN5/c2L1y4BKLhvlL
+        2icFIlhsNuTexPT060FX+6471F0yVM0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-6k8OkTw2Pj26SODgzYeFBA-1; Tue, 10 Dec 2019 04:17:58 -0500
+Received: by mail-wm1-f69.google.com with SMTP id g26so394382wmk.6
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 01:17:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LwMyxUw+/mSFbkl5BEsUf1e5k5JSpB6gcLmT1T2v/3Y=;
+        b=nhkxvT7YL1E4a89cPjhvhRQl9e+2JJSW5SFfPNuziP97ZzAn7sbDaeYXuiI3f7wQRt
+         TTsWXYasJw1lbmJz0oXSHj9PBHvrZihn4OpOhnCIbzrJdt/oUtVWYfr4rC+1RoieNLgt
+         7MLfJE2GF20MIz9/VNjsLSXW0TrVKBrBIAa0GEZnJLFg2wTcJc0+Nrn1o681lLLVxCu/
+         oqJ6ovj1+sJ+TBpUkt6FfzfoATF8LNlLGF4sBnjI/kpKA+3XUJGBTRrwS0vJPPmJQiuW
+         EUDMNRT8HAnEtcY7Y++75+XbzdNx3Bwt5lqFCngX6mlaMJWGtM3hOubbJGOyHv9bACE6
+         DvIQ==
+X-Gm-Message-State: APjAAAVq9xVAe6lJSWKgiYkfvAnzHc6iPaJgEAHP7rQWGOEZiUDe9HI9
+        gnuuA9b/K7LBp95yrmVzhngD6oKwp1CjX2kzMnmnsi/kHLBixQjN8vEO8030SfpvI4XaNI2xiDc
+        PReeBmKbH+nTz
+X-Received: by 2002:a5d:4fd0:: with SMTP id h16mr1868029wrw.255.1575969477748;
+        Tue, 10 Dec 2019 01:17:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyT0r5sAsbVRhAQAWw4X6A3mFDEuojh7E3PXeWsyr9m82fngl68lEwBeshDLcB23QXVcTSFww==
+X-Received: by 2002:a5d:4fd0:: with SMTP id h16mr1868009wrw.255.1575969477478;
+        Tue, 10 Dec 2019 01:17:57 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id h127sm2412586wme.31.2019.12.10.01.17.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2019 01:17:56 -0800 (PST)
+Subject: Re: [PATCH v2] KVM: x86: use CPUID to locate host page table reserved
+ bits
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     sean.j.christopherson@intel.com, stable@vger.kernel.org
+References: <1575474037-7903-1-git-send-email-pbonzini@redhat.com>
+ <8f7e3e87-15dc-2269-f5ee-c3155f91983c@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7b885f53-e0d3-2036-6a06-9cdcbb738ae2@redhat.com>
+Date:   Tue, 10 Dec 2019 10:17:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191209182213.69e14263.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <8f7e3e87-15dc-2269-f5ee-c3155f91983c@amd.com>
 Content-Language: en-US
+X-MC-Unique: 6k8OkTw2Pj26SODgzYeFBA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121009-4275-0000-0000-0000038D8AB0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121009-4276-0000-0000-000038A13AB4
-Message-Id: <502977b7-ad73-3468-92c9-7798cff6f754@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-10_01:2019-12-10,2019-12-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- impostorscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
- bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912100083
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2019-12-09 18:22, Cornelia Huck wrote:
-> On Fri,  6 Dec 2019 17:26:27 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 04/12/19 16:57, Tom Lendacky wrote:
+> On 12/4/19 9:40 AM, Paolo Bonzini wrote:
+>> The comment in kvm_get_shadow_phys_bits refers to MKTME, but the same is actually
+>> true of SME and SEV.  Just use CPUID[0x8000_0008].EAX[7:0] unconditionally if
+>> available, it is simplest and works even if memory is not encrypted.
 > 
->> When a channel is enabled we can start a SENSE command using the SSCH
->> instruction to recognize the control unit and device.
+> This isn't correct for AMD. The reduction in physical addressing is
+> correct. You can't set, e.g. bit 45, in the nested page table, because
+> that will be considered a reserved bit and generate an NPF. When memory
+> encryption is enabled today, bit 47 is the encryption indicator bit and
+> bits 46:43 must be zero or else an NPF is generated. The hardware uses
+> these bits internally based on the whether running as the hypervisor or
+> based on the ASID of the guest.
+
+kvm_get_shadow_phys_bits() must be conservative in that:
+
+1) if a bit is reserved it _can_ return a value higher than its index
+
+2) if a bit is used by the processor (for physical address or anything
+else) it _must_ return a value higher than its index.
+
+In the SEV case we're not obeying (2), because the function returns 43
+when the C bit is bit 47.  The patch fixes that.
+
+Paolo
+
+> 
+> Thanks,
+> Tom
+> 
 >>
->> This tests the success of SSCH, the I/O interruption and the TSCH
->> instructions.
->>
->> The test expects a device with a control unit type of 0xC0CA as the
->> first subchannel of the CSS.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 >> ---
->>   lib/s390x/css.h |  13 ++++
->>   s390x/css.c     | 164 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 177 insertions(+)
+>>  arch/x86/kvm/mmu/mmu.c | 20 ++++++++++++--------
+>>  1 file changed, 12 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+>> index 6f92b40d798c..1e4ee4f8de5f 100644
+>> --- a/arch/x86/kvm/mmu/mmu.c
+>> +++ b/arch/x86/kvm/mmu/mmu.c
+>> @@ -538,16 +538,20 @@ void kvm_mmu_set_mask_ptes(u64 user_mask, u64 accessed_mask,
+>>  static u8 kvm_get_shadow_phys_bits(void)
+>>  {
+>>  	/*
+>> -	 * boot_cpu_data.x86_phys_bits is reduced when MKTME is detected
+>> -	 * in CPU detection code, but MKTME treats those reduced bits as
+>> -	 * 'keyID' thus they are not reserved bits. Therefore for MKTME
+>> -	 * we should still return physical address bits reported by CPUID.
+>> +	 * boot_cpu_data.x86_phys_bits is reduced when MKTME or SME are detected
+>> +	 * in CPU detection code, but the processor treats those reduced bits as
+>> +	 * 'keyID' thus they are not reserved bits. Therefore KVM needs to look at
+>> +	 * the physical address bits reported by CPUID.
+>>  	 */
+>> -	if (!boot_cpu_has(X86_FEATURE_TME) ||
+>> -	    WARN_ON_ONCE(boot_cpu_data.extended_cpuid_level < 0x80000008))
+>> -		return boot_cpu_data.x86_phys_bits;
+>> +	if (likely(boot_cpu_data.extended_cpuid_level >= 0x80000008))
+>> +		return cpuid_eax(0x80000008) & 0xff;
+>>  
+>> -	return cpuid_eax(0x80000008) & 0xff;
+>> +	/*
+>> +	 * Quite weird to have VMX or SVM but not MAXPHYADDR; probably a VM with
+>> +	 * custom CPUID.  Proceed with whatever the kernel found since these features
+>> +	 * aren't virtualizable (SME/SEV also require CPUIDs higher than 0x80000008).
+>> +	 */
+>> +	return boot_cpu_data.x86_phys_bits;
+>>  }
+>>  
+>>  static void kvm_mmu_reset_all_pte_masks(void)
 >>
 > 
->> +static void irq_io(void)
->> +{
->> +	int ret = 0;
->> +	char *flags;
->> +
->> +	report_prefix_push("Interrupt");
->> +	if (lowcore->io_int_param != 0xcafec0ca) {
->> +		report("Bad io_int_param: %x", 0, lowcore->io_int_param);
-> 
-> Use a #define for the intparm and print got vs. expected on mismatch?
-
-OK
-
-> 
->> +		report_prefix_pop();
->> +		return;
->> +	}
->> +	report("io_int_param: %x", 1, lowcore->io_int_param);
-> 
-> Well, at that moment you already know what the intparm is, don't you? :)
-
-Yes, I can remove this, was for debug purpose.
-
-> 
->> +	report_prefix_pop();
->> +
->> +	ret = tsch(lowcore->subsys_id_word, &irb);
->> +	dump_irb(&irb);
->> +	flags = dump_scsw_flags(irb.scsw.ctrl);
->> +
->> +	if (ret)
->> +		report("IRB scsw flags: %s", 0, flags);
-> 
-> I think you should also distinguish between cc 1 (not status pending)
-> and cc 3 (not operational) here (or at least also print that info).
-
-Yes, right, thanks.
-
-> 
->> +	else
->> +		report("IRB scsw flags: %s", 1, flags);
->> +	report_prefix_pop();
->> +}
->> +
->> +static int start_subchannel(int code, char *data, int count)
->> +{
->> +	int ret;
->> +	struct pmcw *p = &schib.pmcw;
->> +	struct orb *orb_p = &orb[0];
->> +
->> +	/* Verify that a test subchannel has been set */
->> +	if (!test_device_sid) {
->> +		report_skip("No device");
->> +		return 0;
->> +	}
->> +
->> +	/* Verify that the subchannel has been enabled */
->> +	ret = stsch(test_device_sid, &schib);
->> +	if (ret) {
->> +		report("Err %d on stsch on sid %08x", 0, ret, test_device_sid);
->> +		return 0;
->> +	}
->> +	if (!(p->flags & PMCW_ENABLE)) {
->> +		report_skip("Device (sid %08x) not enabled", test_device_sid);
->> +		return 0;
->> +	}
->> +
->> +	report_prefix_push("Start Subchannel");
->> +	/* Build the CCW chain with a single CCW */
->> +	ccw[0].code = code;
->> +	ccw[0].flags = 0; /* No flags need to be set */
->> +	ccw[0].count = count;
->> +	ccw[0].data_address = (int)(unsigned long)data;
->> +	orb_p->intparm = 0xcafec0ca;
->> +	orb_p->ctrl = ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
->> +	if ((unsigned long)&ccw[0] >= 0x80000000UL) {
->> +		report("Data above 2G! %016lx", 0, (unsigned long)&ccw[0]);
-> 
-> Check for data under 2G before you set up data_address as well?
-
-yes. Even more important since it is a parameter.
-
-> 
->> +		report_prefix_pop();
->> +		return 0;
->> +	}
->> +	orb_p->cpa = (unsigned int) (unsigned long)&ccw[0];
->> +
->> +	ret = ssch(test_device_sid, orb_p);
->> +	if (ret) {
->> +		report("ssch cc=%d", 0, ret);
->> +		report_prefix_pop();
->> +		return 0;
->> +	}
->> +	report_prefix_pop();
->> +	return 1;
->> +}
->> +
->> +/*
->> + * test_sense
->> + * Pre-requisits:
->> + * 	We need the QEMU PONG device as the first recognized
->> + *	device by the enumeration.
->> + *	./s390x-run s390x/css.elf -device ccw-pong,cu_type=0xc0ca
->> + */
->> +static void test_sense(void)
->> +{
->> +	int ret;
->> +
->> +	ret = register_io_int_func(irq_io);
->> +	if (ret) {
->> +		report("Could not register IRQ handler", 0);
->> +		goto unreg_cb;
->> +	}
->> +
->> +	enable_io_irq();
->> +
->> +	ret = start_subchannel(CCW_CMD_SENSE_ID, buffer, sizeof(senseid));
->> +	if (!ret) {
->> +		report("start_subchannel failed", 0);
->> +		goto unreg_cb;
->> +	}
->> +
->> +	senseid.cu_type = buffer[2] | (buffer[1] << 8);
->> +	delay(100);
-> 
-> Hm... registering an interrupt handler and then doing a random delay
-> seems a bit odd. I'd rather expect something like
-> 
-> (a) check for an indication that an interrupt has arrived (global
->      variable)
-> (b) wait for a bit
-> (c) if timeout has not yet been hit: goto (a)
-> 
-> Or do a tpi loop, if this can't be done fully asynchronous?
-
-Currently the test is done on the io_int_parameter.
-And you are right there is a problem, if no interrupt happen the test is 
-silently skipped
-
-> 
-> Also, I don't understand what you are doing with the buffer and
-> senseid: Can't you make senseid a pointer to buffer, so that it can
-> simply access the fields after they have been filled by sense id?
-> 
-> Lastly, it might make sense if the reserved field of senseid has been
-> filled with 0xff; that way you can easily distinguish 'device is not a
-> pong device' from 'senseid has not been filled out correctly'.
-
-yes, thanks.
-
-
-Thanks for comemnts,
-Regards
-
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
 
