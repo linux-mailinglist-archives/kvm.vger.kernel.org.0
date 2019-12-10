@@ -2,67 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3471C118E6E
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 18:01:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF9EC118E94
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 18:09:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727786AbfLJRAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 12:00:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38979 "EHLO
+        id S1727787AbfLJRJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 12:09:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33525 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727606AbfLJRAy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 12:00:54 -0500
+        with ESMTP id S1727568AbfLJRJK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 12:09:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575997252;
+        s=mimecast20190719; t=1575997748;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dKxEj3WwsfHlb/kelIrf9EZIufYGgkLGW1jwzvfC5Uw=;
-        b=SoDxIZh2M2NeqoFU/gnc2vC6i7uXCLZguMAHtcLNJ10+hmMlvHFHy/GufgjpUE22gt7aNY
-        Vee/g2/JyrD3iLfbTmYuDEjx9LiHjcX8fS4M9V/AEGlRfbfjOx5wJ2emUqbUC30rZOQRI8
-        noGgnsabtcinaOi4L5cgZoBJVIBXRp4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-wic6y8OtP1Wt4lQxSsbpbA-1; Tue, 10 Dec 2019 12:00:50 -0500
-Received: by mail-wr1-f72.google.com with SMTP id r2so9182153wrp.7
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 09:00:50 -0800 (PST)
+        bh=NXxho2+moB3q4emfPLCIy0aqQdPGESMV1WStV4dfJqw=;
+        b=JeDe/GEgUJ5Aso0fDfvFMsjo/nfS4CJM7oqxGzGmPHicB1peM3L/HYmAPUy7lOJUhZBAVO
+        FAFCuWuapa47bPUXRS5DNWzAu9sxvp/3SMWxXrULQVJAoueI/Bekj9r2bgqrF/KnJwndDv
+        92sIrlNbP/lX7C4G3WiQX/gOb1wdEEc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-NIhcv_VWMN-DhjnLSBF42A-1; Tue, 10 Dec 2019 12:09:06 -0500
+Received: by mail-wr1-f71.google.com with SMTP id y7so8440180wrm.3
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 09:09:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=dKxEj3WwsfHlb/kelIrf9EZIufYGgkLGW1jwzvfC5Uw=;
-        b=QYy+In+q/caiNZRVbbK+ZeJc3E9IHyAM7Hmy8naODe4asEsAgMYwJDi+SCUWQFUhX7
-         uYx2qAZQ6t5d5ZfeLYD3dloAr8Ra8L8b8JNd80HROnQPyxJlP3wSR+XQrhHtRRomc2ot
-         btLNM32IauUUWXB3Z6TK6bwJhbh/NAAf0u7E0NTpJ9aGWBqqH5Lzaez0ucttXwgIkDLA
-         8HxSO/RUsbDATGT1+0kbsMynGvQl1nn3nDwa4aY8mQJ61JMQ/CE93M77K0T60jpKNhLp
-         2pP+R9yC73F1YeF8o9ndoIt5Tpud0m6LZnkSXrqrpyvD2oMAmmiQPICS9UtplAsMzNVd
-         6LfA==
-X-Gm-Message-State: APjAAAWxBz20gJ+tec7rayf9ll44iaZjD2Q7SDJTmoaC3bwmw9XZdUJs
-        Chj9C+uF5/cTJYibvJumPPZMYHhfOQ7c7VK2mZENTw3EbB3mPfOuo7F22iCJrH/n3TSf3Pqbjsz
-        O16nzplCI9qn8
-X-Received: by 2002:a5d:4c85:: with SMTP id z5mr4311386wrs.42.1575997249316;
-        Tue, 10 Dec 2019 09:00:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwNFD+9XgtGjK0XwbykUplrVYPSBT+0UNOjmKl3zb2/57RmhXl4Fz+511rgJWkTPt0EMu4hhw==
-X-Received: by 2002:a5d:4c85:: with SMTP id z5mr4311367wrs.42.1575997249049;
-        Tue, 10 Dec 2019 09:00:49 -0800 (PST)
+        bh=NXxho2+moB3q4emfPLCIy0aqQdPGESMV1WStV4dfJqw=;
+        b=BG3VOh3C/BoEioD7ab0JO7RSRKmwcRJNO9sByAWlKTsAEgyqo55rJY1WeeTf8aUZA9
+         9Tw9FqV4qUMxAUPXKO8cZdR72fQLgmCMZpQ/WOn+g7/+0sdx/DkHegGbhq/Mbj8Re00r
+         bEJgeecyK+R1HiLr9WMYsf+NGp7bwdc22dR8ouXog/YIyD2nsi/0/b8t15bCG+6ue3Yc
+         A0pcRly26sPEKxjY5ihFd9DLtWjlUIb5vzrLqlAGc+3iyI4lfMZz4+0HyRYi4+OhtaVY
+         cKW1cHPBfrmCrarxiULs1eEo+jPkqQ0ugIcVLZNb6Wa2zQ9i4zptbdnwWRUJ+1ISfjwI
+         rNvg==
+X-Gm-Message-State: APjAAAW5omPRaIuWNPnNO4xrb4lh/fjTiRTwlB3KzsIN7va//CgtCOvQ
+        yhwi67Vxccma1KRqDHfQ3/CFuMZIOS1Huc/0YMPwBZVXVb7QwQlszmJnyo/XMbCe/VRCHc5P/zC
+        RIukPwBU346N3
+X-Received: by 2002:a05:6000:50:: with SMTP id k16mr4374365wrx.145.1575997745409;
+        Tue, 10 Dec 2019 09:09:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy9nchDEcg45soiRcdejf+OOxAa804wXiUcBytrefwfUcCfNZpbSd7acrlluPxVsSWOCc39xA==
+X-Received: by 2002:a05:6000:50:: with SMTP id k16mr4374328wrx.145.1575997745044;
+        Tue, 10 Dec 2019 09:09:05 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id b67sm3862505wmc.38.2019.12.10.09.00.47
+        by smtp.gmail.com with ESMTPSA id z6sm3838566wmz.12.2019.12.10.09.09.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 09:00:48 -0800 (PST)
-Subject: Re: [PATCH kvm-unit-tests v2] svm: Verify the effect of
- V_INTR_MASKING on INTR interrupts
-To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
-References: <20191203162532.24209-1-cavery@redhat.com>
+        Tue, 10 Dec 2019 09:09:04 -0800 (PST)
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191202201036.GJ4063@linux.intel.com> <20191202211640.GF31681@xz-x1>
+ <20191202215049.GB8120@linux.intel.com>
+ <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
+ <20191203184600.GB19877@linux.intel.com>
+ <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
+ <20191209215400.GA3352@xz-x1>
+ <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <20191210155259.GD3352@xz-x1>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4b6217e1-8e52-67e6-5420-a74136d28cc1@redhat.com>
-Date:   Tue, 10 Dec 2019 18:00:47 +0100
+Message-ID: <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+Date:   Tue, 10 Dec 2019 18:09:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191203162532.24209-1-cavery@redhat.com>
+In-Reply-To: <20191210155259.GD3352@xz-x1>
 Content-Language: en-US
-X-MC-Unique: wic6y8OtP1Wt4lQxSsbpbA-1
+X-MC-Unique: NIhcv_VWMN-DhjnLSBF42A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -71,191 +83,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/12/19 17:25, Cathy Avery wrote:
-> The test confirms the influence of the V_INTR_MASKING bit
-> on RFLAGS.IF. The expectation is while running a guest
-> with V_INTR_MASKING cleared to zero:
+On 10/12/19 16:52, Peter Xu wrote:
+> On Tue, Dec 10, 2019 at 11:07:31AM +0100, Paolo Bonzini wrote:
+>>> I'm thinking whether I can start
+>>> to use this information in the next post on solving an issue I
+>>> encountered with the waitqueue.
+>>>
+>>> Current waitqueue is still problematic in that it could wait even with
+>>> the mmu lock held when with vcpu context.
+>>
+>> I think the idea of the soft limit is that the waiting just cannot
+>> happen.  That is, the number of dirtied pages _outside_ the guest (guest
+>> accesses are taken care of by PML, and are subtracted from the soft
+>> limit) cannot exceed hard_limit - (soft_limit + pml_size).
 > 
-> - EFLAGS.IF controls both virtual and physical interrupts.
-> 
-> While running a guest with V_INTR_MASKING set to 1:
-> 
-> - The host EFLAGS.IF at the time of the VMRUN is saved and
->   controls physical interrupts while the guest is running.
-> 
-> - The guest value of EFLAGS.IF controls virtual interrupts only.
-> 
-> As discussed previously, this patch also modifies the vmrun
-> loop ( test_run ) to allow running with HIF=0
-> 
-> Signed-off-by: Cathy Avery <cavery@redhat.com>
-> ---
-> 
-> v2: Added suggested changes to set_host_if etc.
-> ---
->  x86/svm.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 103 insertions(+), 2 deletions(-)
-> 
-> diff --git a/x86/svm.c b/x86/svm.c
-> index 0360d8d..626179c 100644
-> --- a/x86/svm.c
-> +++ b/x86/svm.c
-> @@ -44,6 +44,8 @@ u64 runs;
->  u8 *io_bitmap;
->  u8 io_bitmap_area[16384];
->  
-> +u8 set_host_if;
-> +
->  #define MSR_BITMAP_SIZE 8192
->  
->  u8 *msr_bitmap;
-> @@ -258,6 +260,7 @@ static void test_run(struct test *test, struct vmcb *vmcb)
->  
->      irq_disable();
->      test->vmcb = vmcb;
-> +    set_host_if = 1;
->      test->prepare(test);
->      vmcb->save.rip = (ulong)test_thunk;
->      vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
-> @@ -266,21 +269,24 @@ static void test_run(struct test *test, struct vmcb *vmcb)
->          tsc_start = rdtsc();
->          asm volatile (
->              "clgi \n\t"
-> +            "cmpb $0, set_host_if\n\t"
-> +            "jz 1f\n\t"
-> +            "sti \n\t"
-> +            "1: \n\t"
->              "vmload \n\t"
->              "mov regs+0x80, %%r15\n\t"  // rflags
->              "mov %%r15, 0x170(%0)\n\t"
->              "mov regs, %%r15\n\t"       // rax
->              "mov %%r15, 0x1f8(%0)\n\t"
->              LOAD_GPR_C
-> -            "sti \n\t"		// only used if V_INTR_MASKING=1
->              "vmrun \n\t"
-> -            "cli \n\t"
->              SAVE_GPR_C
->              "mov 0x170(%0), %%r15\n\t"  // rflags
->              "mov %%r15, regs+0x80\n\t"
->              "mov 0x1f8(%0), %%r15\n\t"  // rax
->              "mov %%r15, regs\n\t"
->              "vmsave \n\t"
-> +            "cli \n\t"
->              "stgi"
->              : : "a"(vmcb_phys)
->              : "rbx", "rcx", "rdx", "rsi",
-> @@ -1386,6 +1392,98 @@ static bool pending_event_check(struct test *test)
->      return get_test_stage(test) == 2;
->  }
->  
-> +static void pending_event_prepare_vmask(struct test *test)
-> +{
-> +    default_prepare(test);
-> +
-> +    pending_event_ipi_fired = false;
-> +
-> +    set_host_if = 0;
-> +
-> +    handle_irq(0xf1, pending_event_ipi_isr);
-> +
-> +    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-> +              APIC_DM_FIXED | 0xf1, 0);
-> +
-> +    set_test_stage(test, 0);
-> +}
-> +
-> +static void pending_event_test_vmask(struct test *test)
-> +{
-> +    if (pending_event_ipi_fired == true) {
-> +        set_test_stage(test, -1);
-> +        report("Interrupt preceeded guest", false);
-> +        vmmcall();
-> +    }
-> +
-> +    irq_enable();
-> +    asm volatile ("nop");
-> +    irq_disable();
-> +
-> +    if (pending_event_ipi_fired != true) {
-> +        set_test_stage(test, -1);
-> +        report("Interrupt not triggered by guest", false);
-> +    }
-> +
-> +    vmmcall();
-> +
-> +    irq_enable();
-> +    asm volatile ("nop");
-> +    irq_disable();
-> +}
-> +
-> +static bool pending_event_finished_vmask(struct test *test)
-> +{
-> +    if ( test->vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
-> +        report("VM_EXIT return to host is not EXIT_VMMCALL exit reason 0x%x", false,
-> +                test->vmcb->control.exit_code);
-> +        return true;
-> +    }
-> +
-> +    switch (get_test_stage(test)) {
-> +    case 0:
-> +        test->vmcb->save.rip += 3;
-> +
-> +        pending_event_ipi_fired = false;
-> +
-> +        test->vmcb->control.int_ctl |= V_INTR_MASKING_MASK;
-> +
-> +        apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
-> +              APIC_DM_FIXED | 0xf1, 0);
-> +
-> +        break;
-> +
-> +    case 1:
-> +        if (pending_event_ipi_fired == true) {
-> +            report("Interrupt triggered by guest", false);
-> +            return true;
-> +        }
-> +
-> +        irq_enable();
-> +        asm volatile ("nop");
-> +        irq_disable();
-> +
-> +        if (pending_event_ipi_fired != true) {
-> +            report("Interrupt not triggered by host", false);
-> +            return true;
-> +        }
-> +
-> +        break;
-> +
-> +    default:
-> +        return true;
-> +    }
-> +
-> +    inc_test_stage(test);
-> +
-> +    return get_test_stage(test) == 2;
-> +}
-> +
-> +static bool pending_event_check_vmask(struct test *test)
-> +{
-> +    return get_test_stage(test) == 2;
-> +}
-> +
->  static struct test tests[] = {
->      { "null", default_supported, default_prepare, null_test,
->        default_finished, null_check },
-> @@ -1438,6 +1536,9 @@ static struct test tests[] = {
->        lat_svm_insn_finished, lat_svm_insn_check },
->      { "pending_event", default_supported, pending_event_prepare,
->        pending_event_test, pending_event_finished, pending_event_check },
-> +    { "pending_event_vmask", default_supported, pending_event_prepare_vmask,
-> +      pending_event_test_vmask, pending_event_finished_vmask,
-> +      pending_event_check_vmask },
->  };
->  
->  int main(int ac, char **av)
-> 
+> So the question go backs to, whether this is guaranteed somehow?  Or
+> do you prefer us to keep the warn_on_once until it triggers then we
+> can analyze (which I doubt..)?
 
-Applied, thanks.
+Yes, I would like to keep the WARN_ON_ONCE just because you never know.
+
+Of course it would be much better to audit the calls to kvm_write_guest
+and figure out how many could trigger (e.g. two from the operands of an
+emulated instruction, 5 from a nested EPT walk, 1 from a page walk, etc.).
+
+> One thing to mention is that for with-vcpu cases, we probably can even
+> stop KVM_RUN immediately as long as either the per-vm or per-vcpu ring
+> reaches the softlimit, then for vcpu case it should be easier to
+> guarantee that.  What I want to know is the rest of cases like ioctls
+> or even something not from the userspace (which I think I should read
+> more later..).
+
+Which ioctls?  Most ioctls shouldn't dirty memory at all.
+
+>>> And if we see if the mark_page_dirty_in_slot() is not with a vcpu
+>>> context (e.g. kvm_mmu_page_fault) but with an ioctl context (those
+>>> cases we'll use per-vm dirty ring) then it's probably fine.
+>>>
+>>> My planned solution:
+>>>
+>>> - When kvm_get_running_vcpu() != NULL, we postpone the waitqueue waits
+>>>   until we finished handling this page fault, probably in somewhere
+>>>   around vcpu_enter_guest, so that we can do wait_event() after the
+>>>   mmu lock released
+>>
+>> I think this can cause a race:
+>>
+>> 	vCPU 1			vCPU 2		host
+>> 	---------------------------------------------------------------
+>> 	mark page dirty
+>> 				write to page
+>> 						treat page as not dirty
+>> 	add page to ring
+>>
+>> where vCPU 2 skips the clean-page slow path entirely.
+> 
+> If we're still with the rule in userspace that we first do RESET then
+> collect and send the pages (just like what we've discussed before),
+> then IMHO it's fine to have vcpu2 to skip the slow path?  Because
+> RESET happens at "treat page as not dirty", then if we are sure that
+> we only collect and send pages after that point, then the latest
+> "write to page" data from vcpu2 won't be lost even if vcpu2 is not
+> blocked by vcpu1's ring full?
+
+Good point, the race would become
+
+ 	vCPU 1			vCPU 2		host
+ 	---------------------------------------------------------------
+ 	mark page dirty
+ 				write to page
+						reset rings
+						  wait for mmu lock
+ 	add page to ring
+	release mmu lock
+						  ...do reset...
+						  release mmu lock
+						page is now dirty
+
+> Maybe we can also consider to let mark_page_dirty_in_slot() return a
+> value, then the upper layer could have a chance to skip the spte
+> update if mark_page_dirty_in_slot() fails to mark the dirty bit, so it
+> can return directly with RET_PF_RETRY.
+
+I don't think that's possible, most writes won't come from a page fault
+path and cannot retry.
 
 Paolo
 
