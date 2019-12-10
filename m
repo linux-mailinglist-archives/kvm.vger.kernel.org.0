@@ -2,139 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 012F41191F3
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 21:30:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90443119231
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 21:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726856AbfLJU3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 15:29:49 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:35718 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbfLJU3s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 15:29:48 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBAKTiUj053896;
-        Tue, 10 Dec 2019 20:29:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=X0NRXY1z5PEhGQy4tdDhQxEEB6ElYlIMOUeIx0Iv8aE=;
- b=agvKs4UEcyNPMv9VwgUoX2dbE5RYLrcdKVMe7XhERYaLfQRPC2/s66uyLlqV16pFzSsy
- Aqy0iTz/OYGz25XSSarfbu3F3d89KvfpZz5oMj92TH4qi/uO4oGM3MY70bbdzWTZVhcJ
- VqSbkaObiQHMhaaYfE1ubEycis7BMu/1wqLEAzpb8H4EqR5m8IFqjUqyvA33OApIhFek
- 7Yo3YeX2I+kG4rFt96S6QLc4dTGT8as7gKFitqUVH2Cam+HQutUV8ojHdFL072zcZ9zw
- SmQ3uT0KS/ieTQX9C1m+9T45xbveVNAxc7T7p47Oqpd6ruF/CaDm5oFpzhFsdzd3chcW /w== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2wrw4n5f2t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 20:29:44 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBAKSexo169213;
-        Tue, 10 Dec 2019 20:29:41 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2wsv8cchq8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 20:29:41 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBAKTeN7000449;
-        Tue, 10 Dec 2019 20:29:40 GMT
-Received: from [10.159.229.173] (/10.159.229.173)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 10 Dec 2019 12:29:40 -0800
+        id S1726890AbfLJUgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 15:36:52 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32381 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726366AbfLJUgw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 15:36:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576010210;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=akibSntb0ZDkV7c+opTsEO1BzvpSU5bY4v8e9ukM1GE=;
+        b=SX7yGghK5E5C9FAJv4Nibr+Y+DB0S/HlOsTorjZUc4ASmli2aD2MGPwKImtZX3H9eSv+xN
+        9tXaucq1+46EhOupFRkQmMGDFqcZN4KWm6YjhZj7c9zeYBCWmvIAXlk0yTOZi7hGdWX/KQ
+        DnR/VbUJ/Maq8QthBGEp9TCZJIlULUo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-PWoA-g2yPfGnE-QS9Nf6wg-1; Tue, 10 Dec 2019 15:36:49 -0500
+Received: by mail-wm1-f71.google.com with SMTP id l13so1415063wmj.8
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 12:36:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=akibSntb0ZDkV7c+opTsEO1BzvpSU5bY4v8e9ukM1GE=;
+        b=TpyUBYnF+9nCM4b+kuZLpSpVCzP4QYpiTfafek/kmiOjd6tbTn3l/Kr9ip47BrTBvB
+         +IZt4yj5IcuKwW0UOquQTyLcixATtdpi1c1KdnYqUP6XdW118N01Zbxro6VyBz0fijfN
+         OqlQNDp2bPGk0Anmm2C+gNdrmzi2Oab22x//Y5+FjwegNAZBUHoB+eMXSsaU6IVKHmNO
+         1KdcDPdxuf1qbCBdXIx+sBmP0uvEcccbpQYriMXDplOb/IdILOt68lkqmPnCWjKfLf03
+         fiFhJh3tizu8/ltymmRx7oEtAWqH8yE0PN7FpVDb23+GxHT6cggPuOxYo7xe4HudZqtw
+         ORRw==
+X-Gm-Message-State: APjAAAWjjv4qRrUFbTci/OcEjGanXvP3TA57B8ggH3n3IGnrLJ8PxKue
+        /x+G+TsOHcGGkNKW4IOe2AsRxYEgkgNt36+XGrS6LXxOzuuPU/MSmk1eBOIlzB2aiNHSRdjVQx2
+        34SOqCddqZ2cd
+X-Received: by 2002:a1c:4483:: with SMTP id r125mr7099883wma.97.1576010207668;
+        Tue, 10 Dec 2019 12:36:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxYr+zuzjwED+9pyLW7KY5uR7R30bnx2UXOE6OT9T94lgOIR2M7BmTt9+tM4NWQz5ZIe+xOlg==
+X-Received: by 2002:a1c:4483:: with SMTP id r125mr7099868wma.97.1576010207423;
+        Tue, 10 Dec 2019 12:36:47 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id x10sm4630061wrv.60.2019.12.10.12.36.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2019 12:36:46 -0800 (PST)
 Subject: Re: [PATCH 1/4] KVM: nVMX: Check GUEST_SYSENTER_ESP and
  GUEST_SYSENTER_EIP on vmentry of nested guests
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
 References: <20191206231302.3466-1-krish.sadhukhan@oracle.com>
  <20191206231302.3466-2-krish.sadhukhan@oracle.com>
  <CALMp9eQ4_qtcO1BbraOwXHamXwi4M3AOq1NE7X84wgxxm=ismA@mail.gmail.com>
  <47daeae4-6836-9d60-729a-d5e2d5810edd@oracle.com>
  <CALMp9eRaX-bdyxAP4C=mdSOFLjCpT+f5RTAb+DchTVktZ+_xfQ@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <43382539-7646-c913-e3cd-bf696e524ea3@oracle.com>
-Date:   Tue, 10 Dec 2019 12:29:39 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ <43382539-7646-c913-e3cd-bf696e524ea3@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6db4b31c-08f4-c01c-34c3-e307324fc4d2@redhat.com>
+Date:   Tue, 10 Dec 2019 21:36:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRaX-bdyxAP4C=mdSOFLjCpT+f5RTAb+DchTVktZ+_xfQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <43382539-7646-c913-e3cd-bf696e524ea3@oracle.com>
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9467 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912100169
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9467 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912100169
+X-MC-Unique: PWoA-g2yPfGnE-QS9Nf6wg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 10/12/19 21:29, Krish Sadhukhan wrote:
+> 
+> Thanks for the explanation !
+> 
+> So the kvm-unit-test is still needed to verify that hardware does the
+> check. Right ?
 
-On 12/10/19 11:48 AM, Jim Mattson wrote:
-> On Tue, Dec 10, 2019 at 11:36 AM Krish Sadhukhan
-> <krish.sadhukhan@oracle.com> wrote:
->>
->> On 12/10/19 9:57 AM, Jim Mattson wrote:
->>> On Fri, Dec 6, 2019 at 3:49 PM Krish Sadhukhan
->>> <krish.sadhukhan@oracle.com> wrote:
->>>> According to section "Checks on Guest Control Registers, Debug Registers, and
->>>> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
->>>> of nested guests:
->>>>
->>>>       "The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field must each
->>>>        contain a canonical address."
->>>>
->>>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->>>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->>>> ---
->>>>    arch/x86/kvm/vmx/nested.c | 4 ++++
->>>>    1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->>>> index 0e7c9301fe86..a2d1c305a7d8 100644
->>>> --- a/arch/x86/kvm/vmx/nested.c
->>>> +++ b/arch/x86/kvm/vmx/nested.c
->>>> @@ -2770,6 +2770,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->>>>               CC(!nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4)))
->>>>                   return -EINVAL;
->>>>
->>>> +       if (CC(!is_noncanonical_address(vmcs12->guest_sysenter_esp)) ||
->>>> +           CC(!is_noncanonical_address(vmcs12->guest_sysenter_eip)))
->>>> +               return -EINVAL;
->>>> +
->>> Don't the hardware checks on the corresponding vmcs02 fields suffice
->>> in this case?
->> In prepare_vmcs02(), we have the following code:
->>
->>           if (vmx->nested.dirty_vmcs12 || hv_evmcs) {
->>                   prepare_vmcs02_rare(vmx, vmcs12);
->>
->> If vmcs12 is dirty, we are setting these two fields from vmcs12 and I
->> thought the values needed to be checked in software. Did I miss something ?
-> Typically, "guest state" doesn't have to be checked in software, as
-> long as (a) the vmcs12 field is copied unmodified to the corresponding
-> vmcs02 field, and (b) the virtual CPU enforces the same constraints as
-> the physical CPU. In this case, if there is a problem with the guest
-> state, the VM-entry to vmcs02 will immediately VM-exit with "VM-entry
-> failure due to invalid guest state," and L0 will reflect this exit
-> reason to L1.
+Yes, and I've queued that part.
 
+Paolo
 
-Thanks for the explanation !
-
-So the kvm-unit-test is still needed to verify that hardware does the 
-check. Right ?
-
->
->>>>           if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
->>>>               CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
->>>>                   return -EINVAL;
->>>> --
->>>> 2.20.1
->>>>
