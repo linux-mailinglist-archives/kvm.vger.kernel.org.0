@@ -2,90 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90443119231
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 21:36:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA20511929A
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 22:00:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbfLJUgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 15:36:52 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32381 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726366AbfLJUgw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 15:36:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576010210;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=akibSntb0ZDkV7c+opTsEO1BzvpSU5bY4v8e9ukM1GE=;
-        b=SX7yGghK5E5C9FAJv4Nibr+Y+DB0S/HlOsTorjZUc4ASmli2aD2MGPwKImtZX3H9eSv+xN
-        9tXaucq1+46EhOupFRkQmMGDFqcZN4KWm6YjhZj7c9zeYBCWmvIAXlk0yTOZi7hGdWX/KQ
-        DnR/VbUJ/Maq8QthBGEp9TCZJIlULUo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-PWoA-g2yPfGnE-QS9Nf6wg-1; Tue, 10 Dec 2019 15:36:49 -0500
-Received: by mail-wm1-f71.google.com with SMTP id l13so1415063wmj.8
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 12:36:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=akibSntb0ZDkV7c+opTsEO1BzvpSU5bY4v8e9ukM1GE=;
-        b=TpyUBYnF+9nCM4b+kuZLpSpVCzP4QYpiTfafek/kmiOjd6tbTn3l/Kr9ip47BrTBvB
-         +IZt4yj5IcuKwW0UOquQTyLcixATtdpi1c1KdnYqUP6XdW118N01Zbxro6VyBz0fijfN
-         OqlQNDp2bPGk0Anmm2C+gNdrmzi2Oab22x//Y5+FjwegNAZBUHoB+eMXSsaU6IVKHmNO
-         1KdcDPdxuf1qbCBdXIx+sBmP0uvEcccbpQYriMXDplOb/IdILOt68lkqmPnCWjKfLf03
-         fiFhJh3tizu8/ltymmRx7oEtAWqH8yE0PN7FpVDb23+GxHT6cggPuOxYo7xe4HudZqtw
-         ORRw==
-X-Gm-Message-State: APjAAAWjjv4qRrUFbTci/OcEjGanXvP3TA57B8ggH3n3IGnrLJ8PxKue
-        /x+G+TsOHcGGkNKW4IOe2AsRxYEgkgNt36+XGrS6LXxOzuuPU/MSmk1eBOIlzB2aiNHSRdjVQx2
-        34SOqCddqZ2cd
-X-Received: by 2002:a1c:4483:: with SMTP id r125mr7099883wma.97.1576010207668;
-        Tue, 10 Dec 2019 12:36:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxYr+zuzjwED+9pyLW7KY5uR7R30bnx2UXOE6OT9T94lgOIR2M7BmTt9+tM4NWQz5ZIe+xOlg==
-X-Received: by 2002:a1c:4483:: with SMTP id r125mr7099868wma.97.1576010207423;
-        Tue, 10 Dec 2019 12:36:47 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id x10sm4630061wrv.60.2019.12.10.12.36.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 12:36:46 -0800 (PST)
-Subject: Re: [PATCH 1/4] KVM: nVMX: Check GUEST_SYSENTER_ESP and
- GUEST_SYSENTER_EIP on vmentry of nested guests
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-References: <20191206231302.3466-1-krish.sadhukhan@oracle.com>
- <20191206231302.3466-2-krish.sadhukhan@oracle.com>
- <CALMp9eQ4_qtcO1BbraOwXHamXwi4M3AOq1NE7X84wgxxm=ismA@mail.gmail.com>
- <47daeae4-6836-9d60-729a-d5e2d5810edd@oracle.com>
- <CALMp9eRaX-bdyxAP4C=mdSOFLjCpT+f5RTAb+DchTVktZ+_xfQ@mail.gmail.com>
- <43382539-7646-c913-e3cd-bf696e524ea3@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6db4b31c-08f4-c01c-34c3-e307324fc4d2@redhat.com>
-Date:   Tue, 10 Dec 2019 21:36:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1726898AbfLJVAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 16:00:46 -0500
+Received: from mga03.intel.com ([134.134.136.65]:2974 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725999AbfLJVAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:00:46 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 13:00:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,300,1571727600"; 
+   d="scan'208";a="387708359"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga005.jf.intel.com with ESMTP; 10 Dec 2019 13:00:44 -0800
+Date:   Tue, 10 Dec 2019 13:00:44 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 2/7] KVM: VMX: Define CET VMCS fields and #CP flag
+Message-ID: <20191210210044.GK15758@linux.intel.com>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191101085222.27997-3-weijiang.yang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <43382539-7646-c913-e3cd-bf696e524ea3@oracle.com>
-Content-Language: en-US
-X-MC-Unique: PWoA-g2yPfGnE-QS9Nf6wg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191101085222.27997-3-weijiang.yang@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/12/19 21:29, Krish Sadhukhan wrote:
+On Fri, Nov 01, 2019 at 04:52:17PM +0800, Yang Weijiang wrote:
+> CET(Control-flow Enforcement Technology) is an upcoming Intel(R)
+> processor feature that blocks Return/Jump-Oriented Programming(ROP)
+> attacks. It provides the following capabilities to defend
+> against ROP/JOP style control-flow subversion attacks:
 > 
-> Thanks for the explanation !
+> Shadow Stack (SHSTK):
+>   A second stack for program which is used exclusively for
+>   control transfer operations.
 > 
-> So the kvm-unit-test is still needed to verify that hardware does the
-> check. Right ?
+> Indirect Branch Tracking (IBT):
+>   Code branching protection to defend against jump/call oriented
+>   programming.
+> 
+> Several new CET MSRs are defined in kernel to support CET:
+>   MSR_IA32_{U,S}_CET: Controls the CET settings for user
+>                       mode and suervisor mode respectively.
+> 
+>   MSR_IA32_PL{0,1,2,3}_SSP: Stores shadow stack pointers for
+>                             CPL-0,1,2,3 level respectively.
+> 
+>   MSR_IA32_INT_SSP_TAB: Stores base address of shadow stack
+>                         pointer table.
+> 
+> Two XSAVES state bits are introduced for CET:
+>   IA32_XSS:[bit 11]: For saving/restoring user mode CET states
+>   IA32_XSS:[bit 12]: For saving/restoring supervisor mode CET states.
+> 
+> Six VMCS fields are introduced for CET:
+>   {HOST,GUEST}_S_CET: Stores CET settings for supervisor mode.
+>   {HOST,GUEST}_SSP: Stores shadow stack pointer for supervisor mode.
+>   {HOST,GUEST}_INTR_SSP_TABLE: Stores base address of shadow stack pointer
+>                                table.
+> 
+> If VM_EXIT_LOAD_HOST_CET_STATE = 1, the host's CET MSRs are restored
+> from below VMCS fields at VM-Exit:
+>   HOST_S_CET
+>   HOST_SSP
+>   HOST_INTR_SSP_TABLE
+> 
+> If VM_ENTRY_LOAD_GUEST_CET_STATE = 1, the guest's CET MSRs are loaded
+> from below VMCS fields at VM-Entry:
+>   GUEST_S_CET
+>   GUEST_SSP
+>   GUEST_INTR_SSP_TABLE
+> 
+> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/include/asm/vmx.h      | 8 ++++++++
+>  arch/x86/include/uapi/asm/kvm.h | 1 +
+>  arch/x86/kvm/x86.c              | 1 +
+>  arch/x86/kvm/x86.h              | 5 +++--
+>  4 files changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index a39136b0d509..68bca290a203 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -90,6 +90,7 @@
+>  #define VM_EXIT_CLEAR_BNDCFGS                   0x00800000
+>  #define VM_EXIT_PT_CONCEAL_PIP			0x01000000
+>  #define VM_EXIT_CLEAR_IA32_RTIT_CTL		0x02000000
+> +#define VM_EXIT_LOAD_HOST_CET_STATE             0x10000000
+>  
+>  #define VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR	0x00036dff
+>  
+> @@ -103,6 +104,7 @@
+>  #define VM_ENTRY_LOAD_BNDCFGS                   0x00010000
+>  #define VM_ENTRY_PT_CONCEAL_PIP			0x00020000
+>  #define VM_ENTRY_LOAD_IA32_RTIT_CTL		0x00040000
+> +#define VM_ENTRY_LOAD_GUEST_CET_STATE           0x00100000
+>  
+>  #define VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR	0x000011ff
+>  
+> @@ -321,6 +323,9 @@ enum vmcs_field {
+>  	GUEST_PENDING_DBG_EXCEPTIONS    = 0x00006822,
+>  	GUEST_SYSENTER_ESP              = 0x00006824,
+>  	GUEST_SYSENTER_EIP              = 0x00006826,
+> +	GUEST_S_CET                     = 0x00006828,
+> +	GUEST_SSP                       = 0x0000682a,
+> +	GUEST_INTR_SSP_TABLE            = 0x0000682c,
+>  	HOST_CR0                        = 0x00006c00,
+>  	HOST_CR3                        = 0x00006c02,
+>  	HOST_CR4                        = 0x00006c04,
+> @@ -333,6 +338,9 @@ enum vmcs_field {
+>  	HOST_IA32_SYSENTER_EIP          = 0x00006c12,
+>  	HOST_RSP                        = 0x00006c14,
+>  	HOST_RIP                        = 0x00006c16,
+> +	HOST_S_CET                      = 0x00006c18,
+> +	HOST_SSP                        = 0x00006c1a,
+> +	HOST_INTR_SSP_TABLE             = 0x00006c1c
+>  };
+>  
+>  /*
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 503d3f42da16..e68d6b448730 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -31,6 +31,7 @@
+>  #define MC_VECTOR 18
+>  #define XM_VECTOR 19
+>  #define VE_VECTOR 20
+> +#define CP_VECTOR 21
+>  
+>  /* Select x86 specific features in <linux/kvm.h> */
+>  #define __KVM_HAVE_PIT
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 290c3c3efb87..540490d5385f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -378,6 +378,7 @@ static int exception_class(int vector)
+>  	case NP_VECTOR:
+>  	case SS_VECTOR:
+>  	case GP_VECTOR:
+> +	case CP_VECTOR:
+>  		return EXCPT_CONTRIBUTORY;
+>  	default:
+>  		break;
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index f10c12b5197d..7e7b5b5cc956 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -114,7 +114,7 @@ static inline bool x86_exception_has_error_code(unsigned int vector)
+>  {
+>  	static u32 exception_has_error_code = BIT(DF_VECTOR) | BIT(TS_VECTOR) |
+>  			BIT(NP_VECTOR) | BIT(SS_VECTOR) | BIT(GP_VECTOR) |
+> -			BIT(PF_VECTOR) | BIT(AC_VECTOR);
+> +			BIT(PF_VECTOR) | BIT(AC_VECTOR) | BIT(CP_VECTOR);
+>  
+>  	return (1U << vector) & exception_has_error_code;
+>  }
+> @@ -298,7 +298,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, unsigned long cr2,
+>   * Right now, no XSS states are used on x86 platform,
+>   * expand the macro for new features.
 
-Yes, and I've queued that part.
+I assume this comment needs to be updated?
 
-Paolo
-
+>   */
+> -#define KVM_SUPPORTED_XSS	0
+> +#define KVM_SUPPORTED_XSS	(XFEATURE_MASK_CET_USER \
+> +				| XFEATURE_MASK_CET_KERNEL)
+>  
+>  extern u64 host_xcr0;
+>  
+> -- 
+> 2.17.2
+> 
