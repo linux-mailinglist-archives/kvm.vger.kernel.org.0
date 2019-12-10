@@ -2,334 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5797B119B7E
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 23:12:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F215119C47
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 23:23:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730274AbfLJWIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 17:08:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32055 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729524AbfLJWIh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 17:08:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576015715;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kY3BO5aFYrGkSGGBQRkUuW9yofnr10ys5NZJbMnM5fE=;
-        b=XoONUhyzURnoCiHateOJuPvgQ0isVU4ZenkPToAZeK758wJH2vsjcM/Mbz2fudV5k+pgU0
-        hfakSYHZb4f/zngLkIVAsaQPPRUOC/7TRchLqI9Zh/q/zfq12yO15Pr71V0wN4dZVnu8go
-        TY/vOVhYqj+xhl5heBYNslOZUV4X11I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-YoiQpxrPOlGCVDNV8ybz_w-1; Tue, 10 Dec 2019 17:08:32 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A35B1005514;
-        Tue, 10 Dec 2019 22:08:30 +0000 (UTC)
-Received: from x1.home (ovpn04.gateway.prod.ext.phx2.redhat.com [10.5.9.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 258D919C6A;
-        Tue, 10 Dec 2019 22:08:27 +0000 (UTC)
-Date:   Tue, 10 Dec 2019 15:08:26 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
-Message-ID: <20191210150826.4783496c@x1.home>
-In-Reply-To: <bb995805-eb50-83e4-883f-c8907a53af16@mellanox.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
-        <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20191108081925.GH4196@zhen-hp.sh.intel.com>
-        <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20191205060618.GD4196@zhen-hp.sh.intel.com>
-        <AM0PR05MB4866C265B6C9D521A201609DD15C0@AM0PR05MB4866.eurprd05.prod.outlook.com>
-        <20191206080354.GA15502@zhen-hp.sh.intel.com>
-        <79d0ca87-c6c7-18d5-6429-bb20041646ff@mellanox.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D636944@SHSMSX104.ccr.corp.intel.com>
-        <20191210120747.4530f046@x1.home>
-        <bb995805-eb50-83e4-883f-c8907a53af16@mellanox.com>
-Organization: Red Hat
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YoiQpxrPOlGCVDNV8ybz_w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1727068AbfLJWWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 17:22:44 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:42834 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbfLJWWo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 17:22:44 -0500
+Received: by mail-pg1-f194.google.com with SMTP id s64so2861978pgb.9
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 14:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Qch1l8KF90lo9VxFpsbc1dlSY7m9TzYWt7RDlak72I8=;
+        b=YLb0KiS8GeV9eb0tVGz7tVYc17VNJjfRnNINSPWd0kxUtM7wf42S5CUGFY4mt6Pp8M
+         itgH770s7vVE9bapkr+LaL9vZ1FvwY5jNv7LI423juPjotWKle8/VgrCUFP+pIw0Q4gK
+         qTxAH5Ae+VvLINb1R2wIUKOW45lM6u/V7VYe5vgAhfm8GlFlbWAyER3RvK7MYScU3F/n
+         tLJJSUQf0zSDedKH1gX5SwkG6d5+zeUI61KU8C0eEvu5OICqShHTj0B42XEWq2tFaLAl
+         fTrK+rVaKI5r0tj+5fg2Zaj5f4GHLJCo/lvzWdntKuMUU1JCDSV4BhA3UKKOOcQVeQ2N
+         qxnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Qch1l8KF90lo9VxFpsbc1dlSY7m9TzYWt7RDlak72I8=;
+        b=bA/74KAwNewyG4v411JvukmH93k4nHgGVs/RAh5CbFmIrXiGFLYTF45HPsdOslz6bd
+         6McMECEnfdCOKMIqvBe5IFjlvbvbJozAxCkEhR6CWZt7S+wwSqnSU/3i4sJjjxzlt+Ez
+         VxDTmj0ZuWRxlBv1ofv2WdVahiQs+wEQ4PCesDa5ZCZlEAbZrfvtPnxkUKAsBlPeVRV/
+         kdzzMEkEsdvfjo+T07D7BfMlcGYznpWXEM3LkKX6DXyqlZdJRqXz4iLGWrV2LAq13GUN
+         3fXW9tyVhEr7S+V4uNotcFR8RWiaXUW/oaFdqOH1s2NnEKaM4HNvRQaqo18Ox8k7eqLs
+         2q1g==
+X-Gm-Message-State: APjAAAUnGhNj54eNUU9WcnRwyw9tXlT4eSLljraIp1ywCB+DbNSKe4RL
+        /ZQrgE/Fd3pT7q/5U947zCc=
+X-Google-Smtp-Source: APXvYqxrOkwovxdL1hFYex2u7NojsIAf919o5xD2401jGD2XlQ/nwr6+ahaX0hbQnqpt3RdTB63yDw==
+X-Received: by 2002:a62:8782:: with SMTP id i124mr236283pfe.22.1576016563126;
+        Tue, 10 Dec 2019 14:22:43 -0800 (PST)
+Received: from [10.2.144.69] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id x13sm32465pfc.171.2019.12.10.14.22.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 10 Dec 2019 14:22:42 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3601.0.10\))
+Subject: Re: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer before VMCS
+ field
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <C9182191-EE97-4F1B-A672-010BC160C07D@oracle.com>
+Date:   Tue, 10 Dec 2019 14:22:41 -0800
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A29A1722-046B-4EE5-98B9-09D5FB300B96@gmail.com>
+References: <20191204214027.85958-1-jmattson@google.com>
+ <b9067562-bbba-7904-84f0-593f90577fca@redhat.com>
+ <CALMp9eRbiKnH15NBFk0hrh8udcqZvu6RHm0Nrfh4TikQ3xF6OA@mail.gmail.com>
+ <CALMp9eTyhRwqsriLGg1xoO2sOPkgnKK1hV1U3C733xCjW7+VCA@mail.gmail.com>
+ <C2F9C5D9-F106-4B89-BEFA-B3CCC0B004DE@oracle.com>
+ <F709B998-3A28-4BA0-B9DD-0AEF4D6B26C1@gmail.com>
+ <C9182191-EE97-4F1B-A672-010BC160C07D@oracle.com>
+To:     Liran Alon <liran.alon@oracle.com>
+X-Mailer: Apple Mail (2.3601.0.10)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 10 Dec 2019 21:08:29 +0000
-Parav Pandit <parav@mellanox.com> wrote:
+> On Dec 9, 2019, at 2:58 PM, Liran Alon <liran.alon@oracle.com> wrote:
+>=20
+>=20
+>=20
+>> On 9 Dec 2019, at 17:28, Nadav Amit <nadav.amit@gmail.com> wrote:
+>>=20
+>>> On Dec 5, 2019, at 1:54 PM, Liran Alon <liran.alon@oracle.com> =
+wrote:
+>>>=20
+>>>=20
+>>>=20
+>>>> On 5 Dec 2019, at 23:30, Jim Mattson <jmattson@google.com> wrote:
+>>>>=20
+>>>> On Thu, Dec 5, 2019 at 5:11 AM Jim Mattson <jmattson@google.com> =
+wrote:
+>>>>> On Thu, Dec 5, 2019 at 3:46 AM Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
+>>>>>> On 04/12/19 22:40, Jim Mattson wrote:
+>>>>>>> According to the SDM, a VMWRITE in VMX non-root operation with =
+an
+>>>>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>>>>> of the VMCS field in the secondary source operand is checked.
+>>>>>>>=20
+>>>>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
+vmcs12 if running L2")
+>>>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>>>> ---
+>>>>>>> arch/x86/kvm/vmx/nested.c | 38 =
++++++++++++++++++++-------------------
+>>>>>>> 1 file changed, 19 insertions(+), 19 deletions(-)
+>>>>>>=20
+>>>>>> As Vitaly pointed out, the test must be split in two, like this:
+>>>>>=20
+>>>>> Right. Odd that no kvm-unit-tests noticed.
+>>>>>=20
+>>>>>> ---------------- 8< -----------------------
+>>>>>> =46rom 3b9d87060e800ffae2bd19da94ede05018066c87 Mon Sep 17 =
+00:00:00 2001
+>>>>>> From: Paolo Bonzini <pbonzini@redhat.com>
+>>>>>> Date: Thu, 5 Dec 2019 12:39:07 +0100
+>>>>>> Subject: [PATCH] kvm: nVMX: VMWRITE checks VMCS-link pointer =
+before VMCS field
+>>>>>>=20
+>>>>>> According to the SDM, a VMWRITE in VMX non-root operation with an
+>>>>>> invalid VMCS-link pointer results in VMfailInvalid before the =
+validity
+>>>>>> of the VMCS field in the secondary source operand is checked.
+>>>>>>=20
+>>>>>> While cleaning up handle_vmwrite, make the code of handle_vmread =
+look
+>>>>>> the same, too.
+>>>>>=20
+>>>>> Okay.
+>>>>>=20
+>>>>>> Fixes: 6d894f498f5d1 ("KVM: nVMX: vmread/vmwrite: Use shadow =
+vmcs12 if running L2")
+>>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>>>>> Cc: Liran Alon <liran.alon@oracle.com>
+>>>>>>=20
+>>>>>> diff --git a/arch/x86/kvm/vmx/nested.c =
+b/arch/x86/kvm/vmx/nested.c
+>>>>>> index 4aea7d304beb..c080a879b95d 100644
+>>>>>> --- a/arch/x86/kvm/vmx/nested.c
+>>>>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>>>>> @@ -4767,14 +4767,13 @@ static int handle_vmread(struct kvm_vcpu =
+*vcpu)
+>>>>>>     if (to_vmx(vcpu)->nested.current_vmptr =3D=3D -1ull)
+>>>>>>             return nested_vmx_failInvalid(vcpu);
+>>>>>>=20
+>>>>>> -       if (!is_guest_mode(vcpu))
+>>>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>>>> -       else {
+>>>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>>>> +       if (is_guest_mode(vcpu)) {
+>>>>>>             /*
+>>>>>>              * When vmcs->vmcs_link_pointer is -1ull, any VMREAD
+>>>>>>              * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>>>              */
+>>>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>>>>                     return nested_vmx_failInvalid(vcpu);
+>>>>>>             vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>>>     }
+>>>>>> @@ -4878,8 +4877,19 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>>>             }
+>>>>>>     }
+>>>>>>=20
+>>>>>> +       vmcs12 =3D get_vmcs12(vcpu);
+>>>>>> +       if (is_guest_mode(vcpu)) {
+>>>>>> +               /*
+>>>>>> +                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>>>> +                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>>> +                */
+>>>>>> +               if (vmcs12->vmcs_link_pointer =3D=3D -1ull)
+>>>>>> +                       return nested_vmx_failInvalid(vcpu);
+>>>>>> +               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>>> +       }
+>>>>>>=20
+>>>>>>     field =3D kvm_register_readl(vcpu, (((vmx_instruction_info) =
+>> 28) & 0xf));
+>>>>>> +
+>>>>>>     /*
+>>>>>>      * If the vCPU supports "VMWRITE to any supported field in =
+the
+>>>>>>      * VMCS," then the "read-only" fields are actually =
+read/write.
+>>>>>> @@ -4889,24 +4899,12 @@ static int handle_vmwrite(struct kvm_vcpu =
+*vcpu)
+>>>>>>             return nested_vmx_failValid(vcpu,
+>>>>>>                     VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
+>>>>>>=20
+>>>>>> -       if (!is_guest_mode(vcpu)) {
+>>>>>> -               vmcs12 =3D get_vmcs12(vcpu);
+>>>>>> -
+>>>>>> -               /*
+>>>>>> -                * Ensure vmcs12 is up-to-date before any VMWRITE =
+that dirties
+>>>>>> -                * vmcs12, else we may crush a field or consume a =
+stale value.
+>>>>>> -                */
+>>>>>> -               if (!is_shadow_field_rw(field))
+>>>>>> -                       copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>>>> -       } else {
+>>>>>> -               /*
+>>>>>> -                * When vmcs->vmcs_link_pointer is -1ull, any =
+VMWRITE
+>>>>>> -                * to shadowed-field sets the ALU flags for =
+VMfailInvalid.
+>>>>>> -                */
+>>>>>> -               if (get_vmcs12(vcpu)->vmcs_link_pointer =3D=3D =
+-1ull)
+>>>>>> -                       return nested_vmx_failInvalid(vcpu);
+>>>>>> -               vmcs12 =3D get_shadow_vmcs12(vcpu);
+>>>>>> -       }
+>>>>>> +       /*
+>>>>>> +        * Ensure vmcs12 is up-to-date before any VMWRITE that =
+dirties
+>>>>>> +        * vmcs12, else we may crush a field or consume a stale =
+value.
+>>>>>> +        */
+>>>>>> +       if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field))
+>>>>>> +               copy_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+>>>>>>=20
+>>>>>>     offset =3D vmcs_field_to_offset(field);
+>>>>>>     if (offset < 0)
+>>>>>>=20
+>>>>>>=20
+>>>>>> ... and also, do you have a matching kvm-unit-tests patch?
+>>>>>=20
+>>>>> I'll put one together, along with a test that shows the current
+>>>>> priority inversion between read-only and unsupported VMCS fields.
+>>>>=20
+>>>> I can't figure out how to clear IA32_VMX_MISC[bit 29] in qemu, so =
+I'm
+>>>> going to add the test to tools/testing/selftests/kvm instead.
+>>>=20
+>>> Please don=E2=80=99t.
+>>>=20
+>>> I wish that we keep clear separation between kvm-unit-tests and =
+self-tests.
+>>> In the sense that kvm-unit-tests tests for correct CPU behaviour =
+semantics
+>>> and self-tests tests for correctness of KVM userspace API.
+>>>=20
+>>> In the future, I wish to change kvm-unit-tests to cpu-unit-tests. As =
+there is no
+>>> real connection to KVM. It=E2=80=99s a bunch of tests that can be =
+run on top of any CPU
+>>> Implementation (weather vCPU by some hypervisor or bare-metal CPU) =
+and
+>>> test for it=E2=80=99s semantics.
+>>> I have already used this to find semantic issues on Hyper-V vCPU =
+implementation for example.
+>>=20
+>> Did you use for the matter the =E2=80=9Cinfrastructure=E2=80=9D that =
+I added?
+>=20
+> No. It=E2=80=99s possible to just change QEMU to run with WHPX.
+> But it=E2=80=99s true that the =E2=80=9Cinfra=E2=80=9D you added for =
+running on Bare-Metal should work as-well.
+> This is why I wish to change kvm-unit-tests to cpu-unit-tests. :)
 
-> On 12/10/2019 1:07 PM, Alex Williamson wrote:
-> > On Tue, 10 Dec 2019 03:33:23 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >   
-> >>> From: Parav Pandit <parav@mellanox.com>
-> >>> Sent: Saturday, December 7, 2019 1:34 AM
-> >>>
-> >>> On 12/6/2019 2:03 AM, Zhenyu Wang wrote:    
-> >>>> On 2019.12.05 18:59:36 +0000, Parav Pandit wrote:    
-> >>>>>>>    
-> >>>>>>>> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:    
-> >>>>>>>>> Hi,
-> >>>>>>>>>    
-> >>>>>>>>>> -----Original Message-----
-> >>>>>>>>>> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org>    
-> >>> On    
-> >>>>>>>>>> Behalf Of Zhenyu Wang
-> >>>>>>>>>> Sent: Thursday, October 24, 2019 12:08 AM
-> >>>>>>>>>> To: kvm@vger.kernel.org
-> >>>>>>>>>> Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
-> >>>>>>>>>> kevin.tian@intel.com; cohuck@redhat.com
-> >>>>>>>>>> Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
-> >>>>>>>>>>
-> >>>>>>>>>> Hi,
-> >>>>>>>>>>
-> >>>>>>>>>> This is a refresh for previous send of this series. I got
-> >>>>>>>>>> impression that some SIOV drivers would still deploy their own
-> >>>>>>>>>> create and config method so stopped effort on this. But seems
-> >>>>>>>>>> this would still be useful for some other SIOV driver which may
-> >>>>>>>>>> simply want capability to aggregate resources. So here's refreshed    
-> >>>>>> series.    
-> >>>>>>>>>>
-> >>>>>>>>>> Current mdev device create interface depends on fixed mdev type,
-> >>>>>>>>>> which get uuid from user to create instance of mdev device. If
-> >>>>>>>>>> user wants to use customized number of resource for mdev device,
-> >>>>>>>>>> then only can create new    
-> >>>>>>>>> Can you please give an example of 'resource'?
-> >>>>>>>>> When I grep [1], [2] and [3], I couldn't find anything related to '    
-> >>>>>> aggregate'.    
-> >>>>>>>>
-> >>>>>>>> The resource is vendor device specific, in SIOV spec there's ADI
-> >>>>>>>> (Assignable Device Interface) definition which could be e.g queue
-> >>>>>>>> for net device, context for gpu, etc. I just named this interface as    
-> >>>>>> 'aggregate'    
-> >>>>>>>> for aggregation purpose, it's not used in spec doc.
-> >>>>>>>>    
-> >>>>>>>
-> >>>>>>> Some 'unknown/undefined' vendor specific resource just doesn't work.
-> >>>>>>> Orchestration tool doesn't know which resource and what/how to    
-> >>> configure    
-> >>>>>> for which vendor.    
-> >>>>>>> It has to be well defined.
-> >>>>>>>
-> >>>>>>> You can also find such discussion in recent lgpu DRM cgroup patches    
-> >>> series    
-> >>>>>> v4.    
-> >>>>>>>
-> >>>>>>> Exposing networking resource configuration in non-net namespace    
-> >>> aware    
-> >>>>>> mdev sysfs at PCI device level is no-go.    
-> >>>>>>> Adding per file NET_ADMIN or other checks is not the approach we    
-> >>> follow in    
-> >>>>>> kernel.    
-> >>>>>>>
-> >>>>>>> devlink has been a subsystem though under net, that has very rich    
-> >>> interface    
-> >>>>>> for syscaller, device health, resource management and many more.    
-> >>>>>>> Even though it is used by net driver today, its written for generic device    
-> >>>>>> management at bus/device level.    
-> >>>>>>>
-> >>>>>>> Yuval has posted patches to manage PCI sub-devices [1] and updated    
-> >>> version    
-> >>>>>> will be posted soon which addresses comments.    
-> > 
-> > Always good to see tools that intend to manage arbitrary devices posted
-> > only to the netdev list :-\
-> >   
-> >>>>>>>
-> >>>>>>> For any device slice resource management of mdev, sub-function etc,    
-> >>> we    
-> >>>>>> should be using single kernel interface as devlink [2], [3].    
-> > 
-> > This seems impractical, mdevs and SR-IOV are both enumerated,
-> > inspected, created, and removed in sysfs,   
-> Both enumerated via sysfs, but VFs are not configured via sysfs.
-> 
-> > where do we define what
-> > features are manipulated vis sysfs versus devlink?  
-> 
-> VFs are configured via well defined, vendor neutral tool
-> iproute2/ip link set <pf_netdev> vf <vf_index> <attribute> <value>
-> 
-> This falls short lately for few cases and non-networking or generic VF
-> property configuration, are proposed to be handled by similar 'VF'
-> object using devlink, because they are either pure 'pci vf' property or
-> more device class type VF property such as MAC address or
-> number_of_queues etc.
-> 
-> More advance mode of networking VFs, are controlled using netdev
-> representors again in vendor neutral way for last few years.
-> 
-> It may be fair to say that mdev subsystem wants to invent new sysfs
-> files for configuration.
-
-It seems you're trying to apply rules for classes of devices where
-configuration features are well defined to an environment where we
-don't even have classes of devices, let alone agreed features.
- 
->  mdevs, by
-> > definition, are vendor defined "chunks" of a thing.  We allow vendor
-> > drivers to define different types, representing different
-> > configurations of these chunks.  Often these different types are
-> > incrementally bigger or smaller chunks of these things, but defining
-> > what bigger and smaller means generically across vendors is an
-> > impossible task.  Orchestration tools already need to know vendor
-> > specific information in terms of what type of mdev device they want to
-> > create and make use of.  The aggregation seems to simply augment that
-> > vendor information, ie. 'type' and 'scale' are separate rather than
-> > combined only behind just 'type'.
-> >   
-> >>>>>>>
-> >>>>>>> [1]
-> >>>>>>> https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-    
-> >>> yuval    
-> >>>>>>> av@mellanox.com/ [2]
-> >>>>>>> http://man7.org/linux/man-pages/man8/devlink-dev.8.html
-> >>>>>>> [3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
-> >>>>>>>
-> >>>>>>> Most modern device configuration that I am aware of is usually done    
-> >>> via well    
-> >>>>>> defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and    
-> >>> more) or    
-> >>>>>> via netlink commands (net, devlink, rdma and more) not via sysfs.    
-> >>>>>>>    
-> >>>>>>
-> >>>>>> Current vfio/mdev configuration is via documented sysfs ABI instead of    
-> >>> other    
-> >>>>>> ways. So this adhere to that way to introduce more configurable method    
-> >>> on    
-> >>>>>> mdev device for standard, it's optional and not actually vendor specific    
-> >>> e.g vfio-    
-> >>>>>> ap.
-> >>>>>>    
-> >>>>> Some unknown/undefined resource as 'aggregate' is just not an ABI.
-> >>>>> It has to be well defined, as 'hardware_address', 'num_netdev_sqs' or    
-> >>> something similar appropriate to that mdev device class.    
-> >>>>> If user wants to set a parameter for a mdev regardless of vendor, they    
-> >>> must have single way to do so.  
-> > 
-> > Aggregation augments type, which is by definition vendor specific.
-> >     
-> >>>>
-> >>>> The idea is not specific for some device class, but for each mdev
-> >>>> type's resource, and be optional for each vendor. If more device class
-> >>>> specific way is preferred, then we might have very different ways for
-> >>>> different vendors. Better to avoid that, so here means to aggregate
-> >>>> number of mdev type's resources for target instance, instead of defining
-> >>>> kinds of mdev types for those number of resources.
-> >>>>    
-> >>> Parameter or attribute certainly can be optional.
-> >>> But the way to aggregate them should not be vendor specific.
-> >>> Look for some excellent existing examples across subsystems, for example
-> >>> how you create aggregated netdev or block device is not depend on vendor
-> >>> or underlying device type.    
-> >>
-> >> I'd like to hear Alex's opinion on this. Today VFIO mdev supports two styles
-> >> of "types" imo: fixed resource definition (most cases) and dynamic resource 
-> >> definition (vfio-ap). In fixed style, a type has fixed association to a set of 
-> >> vendor specific resources (resourceX=M, resourceY=N, ...). In dynamic case, 
-> >> the user is allowed to specify actual resource X/Y/... backing the mdev 
-> >> instance post its creation. In either case, the way to identify such association 
-> >> or configurable knobs is vendor specific, maybe contained in optional 
-> >> attributes (name and description) plus additional info in vendor documents.
-> >>
-> >> Then the user is assumed to clearly understand the implication of the resource
-> >> allocation under a given type, when creating a new mdev under this type.
-> >>
-> >> If this assumption holds true, the aggregated attribute simply provides an
-> >> extension in the same direction of fixed-style types but allowing for more 
-> >> flexible linearly-increasing resource allocation. e.g. when using aggregate=2, 
-> >> it means creating a instance with resourceX=2M, resourceY=2N, ... under 
-> >> the specified type. Along this direction I didn't see the need of well-defined 
-> >> vendor specific attributes here. When those are actually required, I suppose 
-> >> the dynamic style would better fit. Or if the vendor driver thinks implementing 
-> >> such aggregate feature will confuse its type definition, it's optional to not 
-> >> doing so anyway.  
-> > 
-> > Yep, though I don't think we can even define that aggregate=2 indicates
-> > that every resources is doubled, it's going to have vendor specific
-> > meaning.  Maybe this is what Parav is rejecting, but I don't see an
-> > alternative.  For example, an mdev vGPU might have high level resources
-> > like the number of execution units, graphics memory, display heads,
-> > maximum resolution, etc.  Aggregation could affect one or all of these.
-> > Orchestration tools already need to know the vendor specific type of
-> > device they want to create, so it doesn't seem unreasonable that if
-> > they use aggregation that they choose a type that aggregates the
-> > resource(s) they need, but that aggregation is going to be specific to
-> > the type.  Potentially as we think about adding "defined" sysfs
-> > attributes for devices we could start with
-> > $SYSFS_DEV_PATH/mdev/aggregation/type, where value written to type is a
-> > vendor specific aggregation of that mdev type.  This allows us the
-> > option that we might someday agree on specific resources that might be
-> > aggregated in a common way (ex. ./aggregation/graphics_memory), but I'm
-> > somewhat doubtful those would ever be pursued.  Thanks,
-> >   
-> 
-> My point is, from Zhenyu Wang's example it is certainly incorrect to
-> define mdev sysfs files, as,
-> 
-> vendor_foo_mdev.netdev_mac_addr=X
-> vendor_bar_mdev.resource_addr=Y
-> 
-> vendor_foo_mdev.netdev_queues=4
-> vendor_bar_mdev.aggregate=8
-> 
-> Unless this is a miscellaneous (not well defined) parameter of a vendor
-> device.
-
-I certainly think it's wrong to associate a "netdev" property with
-something that the kernel only knows as an opaque device.  But that's
-really the issue, mdevs are opaque devices as far as the host kernel is
-concerned.  Since we seem to have landed on mdev being used exclusively
-for vfio, the only thing we really know about an mdev generically is
-which vfio bus driver API the device uses.  Any association of an mdev
-to a GPU, NIC, HBA, or other accelerator or I/O interface is strictly
-known by the user/admin's interpretation of the vendor specific type.
- 
-> I am 100% sure that consumers of network devices where a PCI PF is
-> sliced into multiple smaller devices, wants to configure these devices
-> in unified way regardless of vendor type.
-> That may not be the case with vGPU mdevs.
-
-I don't know about devlink, but iirc the ip command operates on a
-netdev PF in order to, for example, assign MAC addresses to the VFs.
-We have no guarantee with mdevs that there's a parent netdev device for
-such an interface.  The parent device might be an FPGA where one type
-it's able to expose looks like a NIC.  How do you envision devlink/ip
-interacting with something like that?  Using common tools to set
-networking properties on a device that the host kernel fundamentally
-does not know is a networking device is... difficult.
-
-> If Zhenyu Wang proposed to use networking class of mdev device,
-> attributes should have well defined meaning, as it is well known class
-> in linux kernel.
-> mdev should be providing an API to define such mdev config object and
-> all sysfs for such mdev to be created by the mdev core, not by vendor
-> driver.
-
-But of course there is no "networking class of mdev device".  Instead
-there are mdev devices that might be NICs, but that's for the admin and
-user to care about.  If you have an interface in mind for how devlink
-is going to learn about mdev device and set properties, please share.
-It's not clear to me if we need to design something to be compatible
-with devlink or devlink needs to learn how to do certain things on mdev
-devices (does devlink want to become a vfio userspace device driver in
-order to probe the type of an mdev device?  That'll be hard given some
-of the backdoor userspace dependencies of existing vGPU mdevs).  Thanks,
-
-Alex
+Thanks for the explanation. I may give QEMU+WHPX a try just to see how =
+many
+bugs it reports.
 
