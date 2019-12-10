@@ -2,179 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8389118F20
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 18:35:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E16C2118F60
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 18:57:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727608AbfLJRft (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 12:35:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43070 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727527AbfLJRft (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 12:35:49 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBAHMdtP176487
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 12:35:48 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wr8kxtn9v-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 12:35:47 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 10 Dec 2019 17:35:44 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 10 Dec 2019 17:35:41 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBAHZfTl60620840
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 17:35:41 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F15BDA4051;
-        Tue, 10 Dec 2019 17:35:40 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB24EA4053;
-        Tue, 10 Dec 2019 17:35:40 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Dec 2019 17:35:40 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 7/9] s390x: css: msch, enable test
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
- <1575649588-6127-8-git-send-email-pmorel@linux.ibm.com>
- <20191209175430.5381b328.cohuck@redhat.com>
- <a19d7e91-4048-3eaa-a819-51e95dd922de@linux.ibm.com>
- <20191210100950.466e6211.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Tue, 10 Dec 2019 18:35:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727598AbfLJR5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 12:57:23 -0500
+Received: from mail-il1-f194.google.com ([209.85.166.194]:47030 "EHLO
+        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727455AbfLJR5W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 12:57:22 -0500
+Received: by mail-il1-f194.google.com with SMTP id t17so16874944ilm.13
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 09:57:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=F5GBQVg48b5VsOIQpufm20CNN3LYpyLqTajosSboWeU=;
+        b=lqimS6JKMLtVxp2Epms9wvg0N4KBcih7YIkPKttizUDR5v32IJqHD3mZlz1yrfkalZ
+         ZVRX9PRBrAkxjyNPb1G3pBCw791QbfhvYVGven1Wvfv1FxDOYtyv+qSMDbig5hU7AQqT
+         bNhjJGBfBTgwckLsShVDdectpd0pvmIOnn0SYsdNokCg7q/+1/ba+BEmlKZ/+86Sy8hT
+         k5tUVhMEbWpXQwqYmI7MPyrRlh3IUIRNxbJgaQbhq0deBVoVC86z9s7QL3a6vydXoH/l
+         0XPLFO2WeY5+GaXpWYr8I6AoNAbCFQEW8liuSsEcTNR5QgluDNVaeKVa8qLwXx0RnNKX
+         tpgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=F5GBQVg48b5VsOIQpufm20CNN3LYpyLqTajosSboWeU=;
+        b=n4EdTVUgiyU8aIpL6JzAGl2/FhxRBTFlPuSsJ9ElbKrcT5lF+2B6NzvhMs/YhMQxRn
+         pwFXMBqQUFEROnbFHz2o4qa7XLc8Ii2d7WctC4LKOVVbgKaRK4EqQoypxTMsTN/u5N3j
+         7rLU8hlONMSCzHTauMdlMI6xZ064xJJF5hi5Ok4VHWltk9Fo1LICqG4WAAN5QJ9VQhIy
+         lvauO3BwX51NVxqTfHtNZ+hKR4eB4Y2W9ntpzWq99ssyl6fOgP1KFWcP2NlAKfqoQpzY
+         ixnt9ExfAW4N/TUFulCKqh4awEapj6BoEYLg1ELMHlF7mHpaJy2e+QjwVGYjVEC5JF1d
+         rVdg==
+X-Gm-Message-State: APjAAAVFNNRMU4+tu4yQoTvU1GEQ0H9vP2PG8I/lNfz54NlaKu3OkU8m
+        DXDLlx1lGCa73gGIbE1vmBnVSeHKlbWEVc+dbJnHYQ==
+X-Google-Smtp-Source: APXvYqxU+ZjButpypBkRV9jDQajjTJQJmgoXAGqmA+EbjCH+03P3OdPFHSefkQY+vnlZEbw7cV/WXgs9Fzq31RDCQ18=
+X-Received: by 2002:a92:d30e:: with SMTP id x14mr35764797ila.108.1576000641934;
+ Tue, 10 Dec 2019 09:57:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191210100950.466e6211.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121017-4275-0000-0000-0000038DB1DC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121017-4276-0000-0000-000038A163BE
-Message-Id: <bf954926-fd77-9255-497b-44b825016a6f@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-10_05:2019-12-10,2019-12-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- phishscore=0 bulkscore=0 clxscore=1015 adultscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912100149
+References: <20191206231302.3466-1-krish.sadhukhan@oracle.com> <20191206231302.3466-2-krish.sadhukhan@oracle.com>
+In-Reply-To: <20191206231302.3466-2-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 10 Dec 2019 09:57:10 -0800
+Message-ID: <CALMp9eQ4_qtcO1BbraOwXHamXwi4M3AOq1NE7X84wgxxm=ismA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: nVMX: Check GUEST_SYSENTER_ESP and
+ GUEST_SYSENTER_EIP on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Dec 6, 2019 at 3:49 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+> According to section "Checks on Guest Control Registers, Debug Registers, and
+> and MSRs" in Intel SDM vol 3C, the following checks are performed on vmentry
+> of nested guests:
+>
+>     "The IA32_SYSENTER_ESP field and the IA32_SYSENTER_EIP field must each
+>      contain a canonical address."
+>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 0e7c9301fe86..a2d1c305a7d8 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2770,6 +2770,10 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+>             CC(!nested_guest_cr4_valid(vcpu, vmcs12->guest_cr4)))
+>                 return -EINVAL;
+>
+> +       if (CC(!is_noncanonical_address(vmcs12->guest_sysenter_esp)) ||
+> +           CC(!is_noncanonical_address(vmcs12->guest_sysenter_eip)))
+> +               return -EINVAL;
+> +
 
+Don't the hardware checks on the corresponding vmcs02 fields suffice
+in this case?
 
-On 2019-12-10 10:09, Cornelia Huck wrote:
-> On Tue, 10 Dec 2019 10:01:46 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> On 2019-12-09 17:54, Cornelia Huck wrote:
->>> On Fri,  6 Dec 2019 17:26:26 +0100
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>    
->>>> A second step when testing the channel subsystem is to prepare a channel
->>>> for use.
->>>> This includes:
->>>> - Get the current SubCHannel Information Block (SCHIB) using STSCH
->>>> - Update it in memory to set the ENABLE bit
->>>> - Tell the CSS that the SCHIB has been modified using MSCH
->>>> - Get the SCHIB from the CSS again to verify that the subchannel is
->>>>     enabled.
->>>>
->>>> This tests the success of the MSCH instruction by enabling a channel.
->>>>
->>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>> ---
->>>>    s390x/css.c | 39 +++++++++++++++++++++++++++++++++++++++
->>>>    1 file changed, 39 insertions(+)
->>>>
->>>> diff --git a/s390x/css.c b/s390x/css.c
->>>> index 3d4a986..4c0031c 100644
->>>> --- a/s390x/css.c
->>>> +++ b/s390x/css.c
->>>> @@ -58,11 +58,50 @@ static void test_enumerate(void)
->>>>    	report("Tested %d devices, %d found", 1, scn, found);
->>>>    }
->>>>    
->>>> +static void test_enable(void)
->>>> +{
->>>> +	struct pmcw *pmcw = &schib.pmcw;
->>>> +	int cc;
->>>> +
->>>> +	if (!test_device_sid) {
->>>> +		report_skip("No device");
->>>> +		return;
->>>> +	}
->>>> +	/* Read the SCIB for this subchannel */
->>>
->>> s/SCIB/SCHIB/
->>
->> yes
->>
->>>    
->>>> +	cc = stsch(test_device_sid, &schib);
->>>> +	if (cc) {
->>>> +		report("stsch cc=%d", 0, cc);
->>>> +		return;
->>>> +	}
->>>> +	/* Update the SCHIB to enable the channel */
->>>> +	pmcw->flags |= PMCW_ENABLE;
->>>> +
->>>> +	/* Tell the CSS we want to modify the subchannel */
->>>> +	cc = msch(test_device_sid, &schib);
->>>> +	if (cc) {
->>>> +		report("msch cc=%d", 0, cc);
->>>
->>> So you expect the subchannel to be idle? Probably true, especially as
->>> QEMU has no reason to post an unsolicited interrupt for a test device.
->>>    
->>>> +		return;
->>>> +	}
->>>> +
->>>> +	/* Read the SCHIB again to verify the enablement */
->>>> +	cc = stsch(test_device_sid, &schib);
->>>> +	if (cc) {
->>>> +		report("stsch cc=%d", 0, cc);
->>>> +		return;
->>>> +	}
->>>> +	if (!(pmcw->flags & PMCW_ENABLE)) {
->>>> +		report("Enable failed. pmcw: %x", 0, pmcw->flags);
->>>
->>> This check is fine when running under KVM. If this test is modified to
->>> run under z/VM in the future, you probably should retry here: I've seen
->>> the enable bit 'stick' only after the second msch() there.
->>
->> Oh. Thanks, may be I can loop with a delay and count.
-> 
-> FWIW, the Linux kernel code is trying 5 times.
-> 
->> If I need to do this may be I need to create dedicated sub-functions to
->> include the sanity tests.
-> 
-> I'm not sure how worthwhile investing time here is, actually: If you
-> don't plan to run under anything but KVM, you won't need it. I'm not
-> sure if current versions of z/VM still display the same behaviour (it
-> has been some time...); on the other hand, it is compliant with the
-> architecture...
-
-OK, I just insert the retry.
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
-
+>         if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
+>             CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
+>                 return -EINVAL;
+> --
+> 2.20.1
+>
