@@ -2,172 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B11D118E62
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 17:58:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3471C118E6E
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 18:01:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727709AbfLJQ6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 11:58:37 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35167 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727534AbfLJQ6g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 11:58:36 -0500
+        id S1727786AbfLJRAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 12:00:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38979 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727606AbfLJRAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 12:00:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575997114;
+        s=mimecast20190719; t=1575997252;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kloBvw8RGWK1lP3SGtf1eARoYVSiVMuq6V2S364vtNA=;
-        b=MrvvEQqZ9IjHgdWhnGrLfZ9sNtPcN7QYa1fx9SLjWFrM5vYLWv2tHPpYLgVrzVzLR9Mt93
-        oF0QnKIa1ktTt5G6g2N8U99IPbE+/LcM4C1oABEXzZOzmIG2EYg/Ty5figCyC44hy41q/G
-        mZ4DYI5GFbu5TfY51ILoUVQvk2rjFJA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-a3Q0C6xYPXGoFovyHN5gSQ-1; Tue, 10 Dec 2019 11:58:31 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38AA41005512;
-        Tue, 10 Dec 2019 16:58:30 +0000 (UTC)
-Received: from x1.home (ovpn04.gateway.prod.ext.phx2.redhat.com [10.5.9.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3154360BE1;
-        Tue, 10 Dec 2019 16:58:25 +0000 (UTC)
-Date:   Tue, 10 Dec 2019 09:58:24 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
- vfio-pci ops
-Message-ID: <20191210095824.5c4cdad7@x1.home>
-In-Reply-To: <20191210024422.GA27331@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
-        <20191205032536.29653-1-yan.y.zhao@intel.com>
-        <20191205165519.106bd210@x1.home>
-        <20191206075655.GG31791@joy-OptiPlex-7040>
-        <20191206142226.2698a2be@x1.home>
-        <20191209034225.GK31791@joy-OptiPlex-7040>
-        <20191209170339.2cb3d06e@x1.home>
-        <20191210024422.GA27331@joy-OptiPlex-7040>
-Organization: Red Hat
+        bh=dKxEj3WwsfHlb/kelIrf9EZIufYGgkLGW1jwzvfC5Uw=;
+        b=SoDxIZh2M2NeqoFU/gnc2vC6i7uXCLZguMAHtcLNJ10+hmMlvHFHy/GufgjpUE22gt7aNY
+        Vee/g2/JyrD3iLfbTmYuDEjx9LiHjcX8fS4M9V/AEGlRfbfjOx5wJ2emUqbUC30rZOQRI8
+        noGgnsabtcinaOi4L5cgZoBJVIBXRp4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-wic6y8OtP1Wt4lQxSsbpbA-1; Tue, 10 Dec 2019 12:00:50 -0500
+Received: by mail-wr1-f72.google.com with SMTP id r2so9182153wrp.7
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 09:00:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dKxEj3WwsfHlb/kelIrf9EZIufYGgkLGW1jwzvfC5Uw=;
+        b=QYy+In+q/caiNZRVbbK+ZeJc3E9IHyAM7Hmy8naODe4asEsAgMYwJDi+SCUWQFUhX7
+         uYx2qAZQ6t5d5ZfeLYD3dloAr8Ra8L8b8JNd80HROnQPyxJlP3wSR+XQrhHtRRomc2ot
+         btLNM32IauUUWXB3Z6TK6bwJhbh/NAAf0u7E0NTpJ9aGWBqqH5Lzaez0ucttXwgIkDLA
+         8HxSO/RUsbDATGT1+0kbsMynGvQl1nn3nDwa4aY8mQJ61JMQ/CE93M77K0T60jpKNhLp
+         2pP+R9yC73F1YeF8o9ndoIt5Tpud0m6LZnkSXrqrpyvD2oMAmmiQPICS9UtplAsMzNVd
+         6LfA==
+X-Gm-Message-State: APjAAAWxBz20gJ+tec7rayf9ll44iaZjD2Q7SDJTmoaC3bwmw9XZdUJs
+        Chj9C+uF5/cTJYibvJumPPZMYHhfOQ7c7VK2mZENTw3EbB3mPfOuo7F22iCJrH/n3TSf3Pqbjsz
+        O16nzplCI9qn8
+X-Received: by 2002:a5d:4c85:: with SMTP id z5mr4311386wrs.42.1575997249316;
+        Tue, 10 Dec 2019 09:00:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwNFD+9XgtGjK0XwbykUplrVYPSBT+0UNOjmKl3zb2/57RmhXl4Fz+511rgJWkTPt0EMu4hhw==
+X-Received: by 2002:a5d:4c85:: with SMTP id z5mr4311367wrs.42.1575997249049;
+        Tue, 10 Dec 2019 09:00:49 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id b67sm3862505wmc.38.2019.12.10.09.00.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Dec 2019 09:00:48 -0800 (PST)
+Subject: Re: [PATCH kvm-unit-tests v2] svm: Verify the effect of
+ V_INTR_MASKING on INTR interrupts
+To:     Cathy Avery <cavery@redhat.com>, kvm@vger.kernel.org
+References: <20191203162532.24209-1-cavery@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4b6217e1-8e52-67e6-5420-a74136d28cc1@redhat.com>
+Date:   Tue, 10 Dec 2019 18:00:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: a3Q0C6xYPXGoFovyHN5gSQ-1
+In-Reply-To: <20191203162532.24209-1-cavery@redhat.com>
+Content-Language: en-US
+X-MC-Unique: wic6y8OtP1Wt4lQxSsbpbA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 9 Dec 2019 21:44:23 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 03/12/19 17:25, Cathy Avery wrote:
+> The test confirms the influence of the V_INTR_MASKING bit
+> on RFLAGS.IF. The expectation is while running a guest
+> with V_INTR_MASKING cleared to zero:
+> 
+> - EFLAGS.IF controls both virtual and physical interrupts.
+> 
+> While running a guest with V_INTR_MASKING set to 1:
+> 
+> - The host EFLAGS.IF at the time of the VMRUN is saved and
+>   controls physical interrupts while the guest is running.
+> 
+> - The guest value of EFLAGS.IF controls virtual interrupts only.
+> 
+> As discussed previously, this patch also modifies the vmrun
+> loop ( test_run ) to allow running with HIF=0
+> 
+> Signed-off-by: Cathy Avery <cavery@redhat.com>
+> ---
+> 
+> v2: Added suggested changes to set_host_if etc.
+> ---
+>  x86/svm.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 103 insertions(+), 2 deletions(-)
+> 
+> diff --git a/x86/svm.c b/x86/svm.c
+> index 0360d8d..626179c 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -44,6 +44,8 @@ u64 runs;
+>  u8 *io_bitmap;
+>  u8 io_bitmap_area[16384];
+>  
+> +u8 set_host_if;
+> +
+>  #define MSR_BITMAP_SIZE 8192
+>  
+>  u8 *msr_bitmap;
+> @@ -258,6 +260,7 @@ static void test_run(struct test *test, struct vmcb *vmcb)
+>  
+>      irq_disable();
+>      test->vmcb = vmcb;
+> +    set_host_if = 1;
+>      test->prepare(test);
+>      vmcb->save.rip = (ulong)test_thunk;
+>      vmcb->save.rsp = (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+> @@ -266,21 +269,24 @@ static void test_run(struct test *test, struct vmcb *vmcb)
+>          tsc_start = rdtsc();
+>          asm volatile (
+>              "clgi \n\t"
+> +            "cmpb $0, set_host_if\n\t"
+> +            "jz 1f\n\t"
+> +            "sti \n\t"
+> +            "1: \n\t"
+>              "vmload \n\t"
+>              "mov regs+0x80, %%r15\n\t"  // rflags
+>              "mov %%r15, 0x170(%0)\n\t"
+>              "mov regs, %%r15\n\t"       // rax
+>              "mov %%r15, 0x1f8(%0)\n\t"
+>              LOAD_GPR_C
+> -            "sti \n\t"		// only used if V_INTR_MASKING=1
+>              "vmrun \n\t"
+> -            "cli \n\t"
+>              SAVE_GPR_C
+>              "mov 0x170(%0), %%r15\n\t"  // rflags
+>              "mov %%r15, regs+0x80\n\t"
+>              "mov 0x1f8(%0), %%r15\n\t"  // rax
+>              "mov %%r15, regs\n\t"
+>              "vmsave \n\t"
+> +            "cli \n\t"
+>              "stgi"
+>              : : "a"(vmcb_phys)
+>              : "rbx", "rcx", "rdx", "rsi",
+> @@ -1386,6 +1392,98 @@ static bool pending_event_check(struct test *test)
+>      return get_test_stage(test) == 2;
+>  }
+>  
+> +static void pending_event_prepare_vmask(struct test *test)
+> +{
+> +    default_prepare(test);
+> +
+> +    pending_event_ipi_fired = false;
+> +
+> +    set_host_if = 0;
+> +
+> +    handle_irq(0xf1, pending_event_ipi_isr);
+> +
+> +    apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
+> +              APIC_DM_FIXED | 0xf1, 0);
+> +
+> +    set_test_stage(test, 0);
+> +}
+> +
+> +static void pending_event_test_vmask(struct test *test)
+> +{
+> +    if (pending_event_ipi_fired == true) {
+> +        set_test_stage(test, -1);
+> +        report("Interrupt preceeded guest", false);
+> +        vmmcall();
+> +    }
+> +
+> +    irq_enable();
+> +    asm volatile ("nop");
+> +    irq_disable();
+> +
+> +    if (pending_event_ipi_fired != true) {
+> +        set_test_stage(test, -1);
+> +        report("Interrupt not triggered by guest", false);
+> +    }
+> +
+> +    vmmcall();
+> +
+> +    irq_enable();
+> +    asm volatile ("nop");
+> +    irq_disable();
+> +}
+> +
+> +static bool pending_event_finished_vmask(struct test *test)
+> +{
+> +    if ( test->vmcb->control.exit_code != SVM_EXIT_VMMCALL) {
+> +        report("VM_EXIT return to host is not EXIT_VMMCALL exit reason 0x%x", false,
+> +                test->vmcb->control.exit_code);
+> +        return true;
+> +    }
+> +
+> +    switch (get_test_stage(test)) {
+> +    case 0:
+> +        test->vmcb->save.rip += 3;
+> +
+> +        pending_event_ipi_fired = false;
+> +
+> +        test->vmcb->control.int_ctl |= V_INTR_MASKING_MASK;
+> +
+> +        apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL |
+> +              APIC_DM_FIXED | 0xf1, 0);
+> +
+> +        break;
+> +
+> +    case 1:
+> +        if (pending_event_ipi_fired == true) {
+> +            report("Interrupt triggered by guest", false);
+> +            return true;
+> +        }
+> +
+> +        irq_enable();
+> +        asm volatile ("nop");
+> +        irq_disable();
+> +
+> +        if (pending_event_ipi_fired != true) {
+> +            report("Interrupt not triggered by host", false);
+> +            return true;
+> +        }
+> +
+> +        break;
+> +
+> +    default:
+> +        return true;
+> +    }
+> +
+> +    inc_test_stage(test);
+> +
+> +    return get_test_stage(test) == 2;
+> +}
+> +
+> +static bool pending_event_check_vmask(struct test *test)
+> +{
+> +    return get_test_stage(test) == 2;
+> +}
+> +
+>  static struct test tests[] = {
+>      { "null", default_supported, default_prepare, null_test,
+>        default_finished, null_check },
+> @@ -1438,6 +1536,9 @@ static struct test tests[] = {
+>        lat_svm_insn_finished, lat_svm_insn_check },
+>      { "pending_event", default_supported, pending_event_prepare,
+>        pending_event_test, pending_event_finished, pending_event_check },
+> +    { "pending_event_vmask", default_supported, pending_event_prepare_vmask,
+> +      pending_event_test_vmask, pending_event_finished_vmask,
+> +      pending_event_check_vmask },
+>  };
+>  
+>  int main(int ac, char **av)
+> 
 
-> > > > > Currently, yes, i40e has build dependency on vfio-pci.
-> > > > > It's like this, if i40e decides to support SRIOV and compiles in vf
-> > > > > related code who depends on vfio-pci, it will also have build dependency
-> > > > > on vfio-pci. isn't it natural?    
-> > > > 
-> > > > No, this is not natural.  There are certainly i40e VF use cases that
-> > > > have no interest in vfio and having dependencies between the two
-> > > > modules is unacceptable.  I think you probably want to modularize the
-> > > > i40e vfio support code and then perhaps register a table in vfio-pci
-> > > > that the vfio-pci code can perform a module request when using a
-> > > > compatible device.  Just and idea, there might be better options.  I
-> > > > will not accept a solution that requires unloading the i40e driver in
-> > > > order to unload the vfio-pci driver.  It's inconvenient with just one
-> > > > NIC driver, imagine how poorly that scales.
-> > > >     
-> > > what about this way:
-> > > mediate driver registers a module notifier and every time when
-> > > vfio_pci is loaded, register to vfio_pci its mediate ops?
-> > > (Just like in below sample code)
-> > > This way vfio-pci is free to unload and this registering only gives
-> > > vfio-pci a name of what module to request.
-> > > After that,
-> > > in vfio_pci_open(), vfio-pci requests the mediate driver. (or puts
-> > > the mediate driver when mediate driver does not support mediating the
-> > > device)
-> > > in vfio_pci_release(), vfio-pci puts the mediate driver.
-> > > 
-> > > static void register_mediate_ops(void)
-> > > {
-> > >         int (*func)(struct vfio_pci_mediate_ops *ops) = NULL;
-> > > 
-> > >         func = symbol_get(vfio_pci_register_mediate_ops);
-> > > 
-> > >         if (func) {
-> > >                 func(&igd_dt_ops);
-> > >                 symbol_put(vfio_pci_register_mediate_ops);
-> > >         }
-> > > }
-> > > 
-> > > static int igd_module_notify(struct notifier_block *self,
-> > >                               unsigned long val, void *data)
-> > > {
-> > >         struct module *mod = data;
-> > >         int ret = 0;
-> > > 
-> > >         switch (val) {
-> > >         case MODULE_STATE_LIVE:
-> > >                 if (!strcmp(mod->name, "vfio_pci"))
-> > >                         register_mediate_ops();
-> > >                 break;
-> > >         case MODULE_STATE_GOING:
-> > >                 break;
-> > >         default:
-> > >                 break;
-> > >         }
-> > >         return ret;
-> > > }
-> > > 
-> > > static struct notifier_block igd_module_nb = {
-> > >         .notifier_call = igd_module_notify,
-> > >         .priority = 0,
-> > > };
-> > > 
-> > > 
-> > > 
-> > > static int __init igd_dt_init(void)
-> > > {
-> > > 	...
-> > > 	register_mediate_ops();
-> > > 	register_module_notifier(&igd_module_nb);
-> > > 	...
-> > > 	return 0;
-> > > }  
-> > 
-> > 
-> > No, this is bad.  Please look at MODULE_ALIAS() and request_module() as
-> > used in the vfio-platform for loading reset driver modules.  I think
-> > the correct approach is that vfio-pci should perform a request_module()
-> > based on the device being probed.  Having the mediation provider
-> > listening for vfio-pci and registering itself regardless of whether we
-> > intend to use it assumes that we will want to use it and assumes that
-> > the mediation provider module is already loaded.  We should be able to
-> > support demand loading of modules that may serve no other purpose than
-> > providing this mediation.  Thanks,  
-> hi Alex
-> Thanks for this message.
-> So is it good to create a separate module as mediation provider driver,
-> and alias its module name to "vfio-pci-mediate-vid-did".
-> Then when vfio-pci probes the device, it requests module of that name ?
+Applied, thanks.
 
-I think this would give us an option to have the mediator as a separate
-module, but not require it.  Maybe rather than a request_module(),
-where if we follow the platform reset example we'd then expect the init
-code for the module to register into a list, we could do a
-symbol_request().  AIUI, this would give us a reference to the symbol
-if the module providing it is already loaded, and request a module
-(perhaps via an alias) if it's not already load.  Thanks,
-
-Alex
+Paolo
 
