@@ -2,193 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8550E1188D5
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 13:50:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C61531189B1
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 14:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727326AbfLJMuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 07:50:04 -0500
-Received: from mx2.suse.de ([195.135.220.15]:37718 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727131AbfLJMuE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 07:50:04 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E26C9AF76;
-        Tue, 10 Dec 2019 12:49:59 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 84F101E0B23; Tue, 10 Dec 2019 13:49:57 +0100 (CET)
-Date:   Tue, 10 Dec 2019 13:49:57 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v8 23/26] mm/gup: pass flags arg to __gup_device_*
- functions
-Message-ID: <20191210124957.GG1551@quack2.suse.cz>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
- <20191209225344.99740-24-jhubbard@nvidia.com>
+        id S1727551AbfLJNZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 08:25:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49549 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727482AbfLJNZu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 08:25:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575984349;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=n00JJ/T4yzKQXwRZ4QxpKz4nx3mh99h11BJMbwluGO0=;
+        b=W6CqnBuhL6HCkd9ohBUxRMPy9Q+PIbANNzZGx7h2iAsXLM1ufq924Rt2kcSOUV9t2Ud2bU
+        D+CzFYoHeYKtq3C2GEDxtUXjhBDjJsFPN346gjR+dTOqchDks3q08BIaqJ7EHMB25Y1tsr
+        iFGn6citLXe4zkHw6rsUVlqVwiafxm8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-6FclueA2PMe1pSCetGh9Iw-1; Tue, 10 Dec 2019 08:25:48 -0500
+Received: by mail-wm1-f70.google.com with SMTP id p5so604209wmc.4
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 05:25:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=h/LUwbgV6TmsnuImnzKLy4kXaRWB507qnk8lk81yvpI=;
+        b=oZu5J4nJISRcnYVEwWH5Wgz2lMrUKSX0ZxtIT+8O4fYvr6+NUujj4BUrn4QZan888U
+         wEWSYA2kFwyD0GmHWjpc2xwGTfsmx+w04yNLIXEJJGhfdLdzv3kiCJt2/pR5uovKgajU
+         2vEU8aAROl1dKbaQ08NLF4N3qZJ5M1mGUEW30RWSdBFtmWWQpE4m0vbws21aJqcOsbw9
+         dwb7JcK09lgJ+Mw8s6GCIZvPzKx1E+BwFq5bkRIF7IpwtiLBFOBhy425ziUC64XY6ZPc
+         lwFd/3HT0vIMhIB71UPRC1WWHNSrrBUxChRCkQDG74Xij6Qs5eJyNI2xX0TbxbbdvSB7
+         205w==
+X-Gm-Message-State: APjAAAWGbVWrwtf5TspZtem1lkeXh7ayjnjbDcVfzkD7YruYAD6QemGU
+        jcMgfef1sSbf/FKHRV+F4KtyOdP5d1blTkgyM9OzqYMQAyfpzFXM1Agy8QS4700XgDuwQ4hn2XP
+        uyhAwVILg0iw8
+X-Received: by 2002:adf:b602:: with SMTP id f2mr3125150wre.99.1575984347508;
+        Tue, 10 Dec 2019 05:25:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqycwvEm+aXyU7FL7AtjcKlWZq1DB7Nbgrk/qYzyK5Qdvd+vvqukZEz1jI6Kz5T5LwoE0oYz+Q==
+X-Received: by 2002:adf:b602:: with SMTP id f2mr3125139wre.99.1575984347323;
+        Tue, 10 Dec 2019 05:25:47 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id w17sm3212357wrt.89.2019.12.10.05.25.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2019 05:25:46 -0800 (PST)
+Date:   Tue, 10 Dec 2019 08:25:43 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Peter Xu <peterx@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191210081958-mutt-send-email-mst@kernel.org>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
+ <a3e83e6b-4bfa-3a6b-4b43-5dd451e03254@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <a3e83e6b-4bfa-3a6b-4b43-5dd451e03254@redhat.com>
+X-MC-Unique: 6FclueA2PMe1pSCetGh9Iw-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191209225344.99740-24-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon 09-12-19 14:53:41, John Hubbard wrote:
-> A subsequent patch requires access to gup flags, so pass the flags
-> argument through to the __gup_device_* functions.
-> 
-> Also placate checkpatch.pl by shortening a nearby line.
-> 
-> TODO: Christoph Hellwig requested folding this into the patch the uses
-> the gup flags arguments.
+On Wed, Dec 04, 2019 at 12:04:53PM +0100, Paolo Bonzini wrote:
+> On 04/12/19 11:38, Jason Wang wrote:
+> >>
+> >> +=A0=A0=A0 entry =3D &ring->dirty_gfns[ring->dirty_index & (ring->size=
+ - 1)];
+> >> +=A0=A0=A0 entry->slot =3D slot;
+> >> +=A0=A0=A0 entry->offset =3D offset;
+> >=20
+> >=20
+> > Haven't gone through the whole series, sorry if it was a silly question
+> > but I wonder things like this will suffer from similar issue on
+> > virtually tagged archs as mentioned in [1].
+>=20
+> There is no new infrastructure to track the dirty pages---it's just a
+> different way to pass them to userspace.
 
-You should probably implement this TODO? :)
+Did you guys consider using one of the virtio ring formats?
+Maybe reusing vhost code?
 
-								Honza
+If you did and it's not a good fit, this is something good to mention
+in the commit log.
 
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Reviewed-by: Jérôme Glisse <jglisse@redhat.com>
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  mm/gup.c | 28 ++++++++++++++++++----------
->  1 file changed, 18 insertions(+), 10 deletions(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 73aedcefa4bd..687d48506f04 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -1957,7 +1957,8 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
->  
->  #if defined(CONFIG_ARCH_HAS_PTE_DEVMAP) && defined(CONFIG_TRANSPARENT_HUGEPAGE)
->  static int __gup_device_huge(unsigned long pfn, unsigned long addr,
-> -		unsigned long end, struct page **pages, int *nr)
-> +			     unsigned long end, unsigned int flags,
-> +			     struct page **pages, int *nr)
->  {
->  	int nr_start = *nr;
->  	struct dev_pagemap *pgmap = NULL;
-> @@ -1983,13 +1984,14 @@ static int __gup_device_huge(unsigned long pfn, unsigned long addr,
->  }
->  
->  static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-> -		unsigned long end, struct page **pages, int *nr)
-> +				 unsigned long end, unsigned int flags,
-> +				 struct page **pages, int *nr)
->  {
->  	unsigned long fault_pfn;
->  	int nr_start = *nr;
->  
->  	fault_pfn = pmd_pfn(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
-> -	if (!__gup_device_huge(fault_pfn, addr, end, pages, nr))
-> +	if (!__gup_device_huge(fault_pfn, addr, end, flags, pages, nr))
->  		return 0;
->  
->  	if (unlikely(pmd_val(orig) != pmd_val(*pmdp))) {
-> @@ -2000,13 +2002,14 @@ static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
->  }
->  
->  static int __gup_device_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
-> -		unsigned long end, struct page **pages, int *nr)
-> +				 unsigned long end, unsigned int flags,
-> +				 struct page **pages, int *nr)
->  {
->  	unsigned long fault_pfn;
->  	int nr_start = *nr;
->  
->  	fault_pfn = pud_pfn(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
-> -	if (!__gup_device_huge(fault_pfn, addr, end, pages, nr))
-> +	if (!__gup_device_huge(fault_pfn, addr, end, flags, pages, nr))
->  		return 0;
->  
->  	if (unlikely(pud_val(orig) != pud_val(*pudp))) {
-> @@ -2017,14 +2020,16 @@ static int __gup_device_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
->  }
->  #else
->  static int __gup_device_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
-> -		unsigned long end, struct page **pages, int *nr)
-> +				 unsigned long end, unsigned int flags,
-> +				 struct page **pages, int *nr)
->  {
->  	BUILD_BUG();
->  	return 0;
->  }
->  
->  static int __gup_device_huge_pud(pud_t pud, pud_t *pudp, unsigned long addr,
-> -		unsigned long end, struct page **pages, int *nr)
-> +				 unsigned long end, unsigned int flags,
-> +				 struct page **pages, int *nr)
->  {
->  	BUILD_BUG();
->  	return 0;
-> @@ -2136,7 +2141,8 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
->  	if (pmd_devmap(orig)) {
->  		if (unlikely(flags & FOLL_LONGTERM))
->  			return 0;
-> -		return __gup_device_huge_pmd(orig, pmdp, addr, end, pages, nr);
-> +		return __gup_device_huge_pmd(orig, pmdp, addr, end, flags,
-> +					     pages, nr);
->  	}
->  
->  	page = pmd_page(orig) + ((addr & ~PMD_MASK) >> PAGE_SHIFT);
-> @@ -2157,7 +2163,8 @@ static int gup_huge_pmd(pmd_t orig, pmd_t *pmdp, unsigned long addr,
->  }
->  
->  static int gup_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
-> -		unsigned long end, unsigned int flags, struct page **pages, int *nr)
-> +			unsigned long end, unsigned int flags,
-> +			struct page **pages, int *nr)
->  {
->  	struct page *head, *page;
->  	int refs;
-> @@ -2168,7 +2175,8 @@ static int gup_huge_pud(pud_t orig, pud_t *pudp, unsigned long addr,
->  	if (pud_devmap(orig)) {
->  		if (unlikely(flags & FOLL_LONGTERM))
->  			return 0;
-> -		return __gup_device_huge_pud(orig, pudp, addr, end, pages, nr);
-> +		return __gup_device_huge_pud(orig, pudp, addr, end, flags,
-> +					     pages, nr);
->  	}
->  
->  	page = pud_page(orig) + ((addr & ~PUD_MASK) >> PAGE_SHIFT);
-> -- 
-> 2.24.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I also wonder about performance numbers - any data here?
+
+
+> > Is this better to allocate the ring from userspace and set to KVM
+> > instead? Then we can use copy_to/from_user() friends (a little bit slow
+> > on recent CPUs).
+>=20
+> Yeah, I don't think that would be better than mmap.
+>=20
+> Paolo
+>=20
+>=20
+> > [1] https://lkml.org/lkml/2019/4/9/5
+
