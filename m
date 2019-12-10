@@ -2,70 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55C4011835E
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 10:18:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0217A118361
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 10:19:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727187AbfLJJSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 04:18:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29596 "EHLO
+        id S1727198AbfLJJTA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 04:19:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24619 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726983AbfLJJSC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 04:18:02 -0500
+        with ESMTP id S1727199AbfLJJS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 04:18:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575969482;
+        s=mimecast20190719; t=1575969538;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LwMyxUw+/mSFbkl5BEsUf1e5k5JSpB6gcLmT1T2v/3Y=;
-        b=IOet0ZAnyvlJmP7Ko117kD2vruHe/OHn4o5bdlglDvNBrOO2cvKjpEK0aye38cSEtErvW3
-        9Imb8uC+QMW2LUUCknhMRjjMTGmqn9z0gWVPkFmE0e5iQFmeayOFxQN5/c2L1y4BKLhvlL
-        2icFIlhsNuTexPT060FX+6471F0yVM0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-6k8OkTw2Pj26SODgzYeFBA-1; Tue, 10 Dec 2019 04:17:58 -0500
-Received: by mail-wm1-f69.google.com with SMTP id g26so394382wmk.6
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 01:17:58 -0800 (PST)
+        bh=Ys5nveUnuHlqyfAjmjcLopzAQQGr7aebD6b5Em3ISs8=;
+        b=IWGsGQJ7AWozFF/Amd43B61F+rgl92alDHJ28/dsrpTr7XugNLhmC6QxyXTBbaD/6Y/k2g
+        kUaONLZCbV2Nndsh4ok6ab8GfY7uPH5rMM1Kzyy+zl8R61DczU5bCTYNrNvF+fciRfbU/e
+        rvwTpLD7XNYHE16B+HM+HbnY275U/HA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-jyhyIy3FMYKZq4N08jkD4g-1; Tue, 10 Dec 2019 04:18:54 -0500
+Received: by mail-wr1-f70.google.com with SMTP id y7so7939700wrm.3
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 01:18:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=LwMyxUw+/mSFbkl5BEsUf1e5k5JSpB6gcLmT1T2v/3Y=;
-        b=nhkxvT7YL1E4a89cPjhvhRQl9e+2JJSW5SFfPNuziP97ZzAn7sbDaeYXuiI3f7wQRt
-         TTsWXYasJw1lbmJz0oXSHj9PBHvrZihn4OpOhnCIbzrJdt/oUtVWYfr4rC+1RoieNLgt
-         7MLfJE2GF20MIz9/VNjsLSXW0TrVKBrBIAa0GEZnJLFg2wTcJc0+Nrn1o681lLLVxCu/
-         oqJ6ovj1+sJ+TBpUkt6FfzfoATF8LNlLGF4sBnjI/kpKA+3XUJGBTRrwS0vJPPmJQiuW
-         EUDMNRT8HAnEtcY7Y++75+XbzdNx3Bwt5lqFCngX6mlaMJWGtM3hOubbJGOyHv9bACE6
-         DvIQ==
-X-Gm-Message-State: APjAAAVq9xVAe6lJSWKgiYkfvAnzHc6iPaJgEAHP7rQWGOEZiUDe9HI9
-        gnuuA9b/K7LBp95yrmVzhngD6oKwp1CjX2kzMnmnsi/kHLBixQjN8vEO8030SfpvI4XaNI2xiDc
-        PReeBmKbH+nTz
-X-Received: by 2002:a5d:4fd0:: with SMTP id h16mr1868029wrw.255.1575969477748;
-        Tue, 10 Dec 2019 01:17:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyT0r5sAsbVRhAQAWw4X6A3mFDEuojh7E3PXeWsyr9m82fngl68lEwBeshDLcB23QXVcTSFww==
-X-Received: by 2002:a5d:4fd0:: with SMTP id h16mr1868009wrw.255.1575969477478;
-        Tue, 10 Dec 2019 01:17:57 -0800 (PST)
+        bh=Ys5nveUnuHlqyfAjmjcLopzAQQGr7aebD6b5Em3ISs8=;
+        b=ZabL7XpWjNMAK5pa3SnmlYzqgyVuBjPkp+SjMIkRp88jaPZL+Pf69zeG446i8gGyl8
+         UBKziohoKFlp9BzO5Eg0LonNrWuFTqQA+SHDje9jyxDEqow6x+OPmACDlZ00MZ95D708
+         dAzk+G0TzvpsrcjZyM3qGH4uFbGsI3sqv7G0jF1JpBAI+xZ42OdUe5+WwfRr+ZjuRo+4
+         wcWeva+8VKWT1wnTm88P7BYZVmbkgflxKfw3gU8uAoqWqsuQ/36zyVPofW6UgTyX+Kjl
+         JF2uHSXpV1xyKVH2DwM9YNJf9WH0/A2OJam08aWH+F9OceS/sZ4j/b0lYKs7tizU6Vdx
+         RNSA==
+X-Gm-Message-State: APjAAAXxR7LRAefVnZDlPz/r9FAnjN5uKoLpmJUIZTDQaelv/IGYedm/
+        ZV3puAt5prK7NBGlLnl5E6WNyc53Ol7rvngiv36BW0hpYAzao7n8EsWIwblmNOTZzDxCM0poDHj
+        iXJLdYOWK8RXf
+X-Received: by 2002:a1c:a750:: with SMTP id q77mr3754380wme.76.1575969533787;
+        Tue, 10 Dec 2019 01:18:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4nJ+vwaF+bCpT4bALJsG39v2xr4nUwAmxvKVeYBNvjHHX20eM5yfU1XaBY4K1oQQjOdJ04Q==
+X-Received: by 2002:a1c:a750:: with SMTP id q77mr3754346wme.76.1575969533563;
+        Tue, 10 Dec 2019 01:18:53 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id h127sm2412586wme.31.2019.12.10.01.17.56
+        by smtp.gmail.com with ESMTPSA id r6sm2437618wrq.92.2019.12.10.01.18.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 01:17:56 -0800 (PST)
+        Tue, 10 Dec 2019 01:18:53 -0800 (PST)
 Subject: Re: [PATCH v2] KVM: x86: use CPUID to locate host page table reserved
  bits
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, stable@vger.kernel.org
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
 References: <1575474037-7903-1-git-send-email-pbonzini@redhat.com>
  <8f7e3e87-15dc-2269-f5ee-c3155f91983c@amd.com>
+ <2f3d8c9b146301183b891d8a441aa4a5c33b4c9d.camel@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7b885f53-e0d3-2036-6a06-9cdcbb738ae2@redhat.com>
-Date:   Tue, 10 Dec 2019 10:17:56 +0100
+Message-ID: <c1012d42-6e60-66c9-80ea-f6c26db37172@redhat.com>
+Date:   Tue, 10 Dec 2019 10:18:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <8f7e3e87-15dc-2269-f5ee-c3155f91983c@amd.com>
+In-Reply-To: <2f3d8c9b146301183b891d8a441aa4a5c33b4c9d.camel@intel.com>
 Content-Language: en-US
-X-MC-Unique: 6k8OkTw2Pj26SODgzYeFBA-1
+X-MC-Unique: jyhyIy3FMYKZq4N08jkD4g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -74,77 +78,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/12/19 16:57, Tom Lendacky wrote:
-> On 12/4/19 9:40 AM, Paolo Bonzini wrote:
->> The comment in kvm_get_shadow_phys_bits refers to MKTME, but the same is actually
->> true of SME and SEV.  Just use CPUID[0x8000_0008].EAX[7:0] unconditionally if
->> available, it is simplest and works even if memory is not encrypted.
+On 10/12/19 04:53, Huang, Kai wrote:
+> Right. Alghouth both MKTME and SME/SEV reduce physical bits, but they treat
+> those reduced bits differently: MKTME treats those as keyID thus they can be
+> set, but SME/SEV treats those as reserved bits so you cannot set any of them.
 > 
-> This isn't correct for AMD. The reduction in physical addressing is
-> correct. You can't set, e.g. bit 45, in the nested page table, because
-> that will be considered a reserved bit and generate an NPF. When memory
-> encryption is enabled today, bit 47 is the encryption indicator bit and
-> bits 46:43 must be zero or else an NPF is generated. The hardware uses
-> these bits internally based on the whether running as the hypervisor or
-> based on the ASID of the guest.
+> Maybe the naming of shadow_phys_bits is a little bit confusing here. The purpose
+> of it was to determine first reserved bits, but not actual physical address bits
+> . Therefore for MKTME it should include the keyID bits, but for SME/SEV it
+> should not.
 
-kvm_get_shadow_phys_bits() must be conservative in that:
-
-1) if a bit is reserved it _can_ return a value higher than its index
-
-2) if a bit is used by the processor (for physical address or anything
-else) it _must_ return a value higher than its index.
-
-In the SEV case we're not obeying (2), because the function returns 43
-when the C bit is bit 47.  The patch fixes that.
+Not just the first reserved bit, but _some_ reserved bit such that all
+consecutive bits up to bit 51 are reserved.
 
 Paolo
-
-> 
-> Thanks,
-> Tom
-> 
->>
->> Cc: stable@vger.kernel.org
->> Reported-by: Tom Lendacky <thomas.lendacky@amd.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  arch/x86/kvm/mmu/mmu.c | 20 ++++++++++++--------
->>  1 file changed, 12 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
->> index 6f92b40d798c..1e4ee4f8de5f 100644
->> --- a/arch/x86/kvm/mmu/mmu.c
->> +++ b/arch/x86/kvm/mmu/mmu.c
->> @@ -538,16 +538,20 @@ void kvm_mmu_set_mask_ptes(u64 user_mask, u64 accessed_mask,
->>  static u8 kvm_get_shadow_phys_bits(void)
->>  {
->>  	/*
->> -	 * boot_cpu_data.x86_phys_bits is reduced when MKTME is detected
->> -	 * in CPU detection code, but MKTME treats those reduced bits as
->> -	 * 'keyID' thus they are not reserved bits. Therefore for MKTME
->> -	 * we should still return physical address bits reported by CPUID.
->> +	 * boot_cpu_data.x86_phys_bits is reduced when MKTME or SME are detected
->> +	 * in CPU detection code, but the processor treats those reduced bits as
->> +	 * 'keyID' thus they are not reserved bits. Therefore KVM needs to look at
->> +	 * the physical address bits reported by CPUID.
->>  	 */
->> -	if (!boot_cpu_has(X86_FEATURE_TME) ||
->> -	    WARN_ON_ONCE(boot_cpu_data.extended_cpuid_level < 0x80000008))
->> -		return boot_cpu_data.x86_phys_bits;
->> +	if (likely(boot_cpu_data.extended_cpuid_level >= 0x80000008))
->> +		return cpuid_eax(0x80000008) & 0xff;
->>  
->> -	return cpuid_eax(0x80000008) & 0xff;
->> +	/*
->> +	 * Quite weird to have VMX or SVM but not MAXPHYADDR; probably a VM with
->> +	 * custom CPUID.  Proceed with whatever the kernel found since these features
->> +	 * aren't virtualizable (SME/SEV also require CPUIDs higher than 0x80000008).
->> +	 */
->> +	return boot_cpu_data.x86_phys_bits;
->>  }
->>  
->>  static void kvm_mmu_reset_all_pte_masks(void)
->>
-> 
 
