@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 019B4119E6C
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 23:44:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3BF7119E65
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 23:44:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728828AbfLJWoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 17:44:21 -0500
+        id S1729264AbfLJWoW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 17:44:22 -0500
 Received: from mga09.intel.com ([134.134.136.24]:9123 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727170AbfLJWoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 17:44:19 -0500
+        id S1728333AbfLJWoU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 17:44:20 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 14:44:18 -0800
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 14:44:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
-   d="scan'208";a="413279324"
+   d="scan'208";a="413279327"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
   by fmsmga005.fm.intel.com with ESMTP; 10 Dec 2019 14:44:18 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
@@ -28,10 +28,12 @@ Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jun Nakajima <jun.nakajima@intel.com>
-Subject: [PATCH 0/4] KVM: x86: Add checks on host-reserved cr4 bits
-Date:   Tue, 10 Dec 2019 14:44:12 -0800
-Message-Id: <20191210224416.10757-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 1/4] KVM: x86: Don't let userspace set host-reserved cr4 bits
+Date:   Tue, 10 Dec 2019 14:44:13 -0800
+Message-Id: <20191210224416.10757-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191210224416.10757-1-sean.j.christopherson@intel.com>
+References: <20191210224416.10757-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -39,41 +41,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM currently doesn't incorporate the platform's capabilities in its cr4
-reserved bit checks and instead checks only whether KVM is aware of the
-feature in general and whether or not userspace has advertised the feature
-to the guest.
+Calculate the host-reserved cr4 bits at runtime based on the system's
+capabilities (using logic similar to __do_cpuid_func()), and use the
+dynamically generated mask for the reserved bit check in kvm_set_cr4()
+instead using of the static CR4_RESERVED_BITS define.  This prevents
+userspace from "enabling" features in cr4 that are not supported by the
+system, e.g. by ignoring KVM_GET_SUPPORTED_CPUID and specifying a bogus
+CPUID for the vCPU.
 
-Lack of checking allows userspace/guest to set unsupported bits in cr4.
-For the most part, setting unsupported bits will simply cause VM-Enter to
-fail.  The one existing exception is OSXSAVE, which is conditioned on host
-support as checking only guest_cpuid_has() would result in KVM attempting
-XSAVE, leading to faults and WARNs.
+Allowing userspace to set unsupported bits in cr4 can lead to a variety
+of undesirable behavior, e.g. failed VM-Enter, and in general increases
+KVM's attack surface.  A crafty userspace can even abuse CR4.LA57 to
+induce an unchecked #GP on a WRMSR.
 
-57-bit virtual addressing has introduced another case where setting an
-unsupported bit (cr4.LA57) can induce a fault in the host.  In the LA57
-case, userspace can set the guest's cr4.LA57 by advertising LA57 support
-via CPUID and abuse the bogus cr4.LA57 to effectively bypass KVM's
-non-canonical address check, ultimately causing a #GP when VMX writes
-the guest's bogus address to MSR_KERNEL_GS_BASE during VM-Enter.
+On a platform without LA57 support:
 
-Given that the best case scenario is a failed VM-Enter, there's no sane
-reason to allow setting unsupported bits in cr4.  Fix the LA57 bug by not
-allowing userspace or the guest to set cr4 bits that are not supported
-by the platform.
+  KVM_SET_CPUID2 // CPUID_7_0_ECX.LA57 = 1
+  KVM_SET_SREGS  // CR4.LA57 = 1
+  KVM_SET_MSRS   // KERNEL_GS_BASE = 0x0004000000000000
+  KVM_RUN
 
-Sean Christopherson (4):
-  KVM: x86: Don't let userspace set host-reserved cr4 bits
-  KVM: x86: Ensure all logical CPUs have consistent reserved cr4 bits
-  KVM: x86: Drop special XSAVE handling from guest_cpuid_has()
-  KVM: x86: Add macro to ensure reserved cr4 bits checks stay in sync
+leads to a #GP when writing KERNEL_GS_BASE into hardware:
 
- arch/x86/kvm/cpuid.h   |  4 ---
- arch/x86/kvm/svm.c     |  1 +
- arch/x86/kvm/vmx/vmx.c |  1 +
- arch/x86/kvm/x86.c     | 65 +++++++++++++++++++++++++++++-------------
- 4 files changed, 47 insertions(+), 24 deletions(-)
+  unchecked MSR access error: WRMSR to 0xc0000102 (tried to write 0x0004000000000000)
+  at rIP: 0xffffffffa00f239a (vmx_prepare_switch_to_guest+0x10a/0x1d0 [kvm_intel])
+  Call Trace:
+   kvm_arch_vcpu_ioctl_run+0x671/0x1c70 [kvm]
+   kvm_vcpu_ioctl+0x36b/0x5d0 [kvm]
+   do_vfs_ioctl+0xa1/0x620
+   ksys_ioctl+0x66/0x70
+   __x64_sys_ioctl+0x16/0x20
+   do_syscall_64+0x4c/0x170
+   entry_SYSCALL_64_after_hwframe+0x44/0xa9
+  RIP: 0033:0x7fc08133bf47
 
+Note, the above sequence fails VM-Enter due to invalid guest state.
+Userspace can allow VM-Enter to succeed (after the WRMSR #GP) by adding
+a KVM_SET_SREGS w/ CR4.LA57=0 after KVM_SET_MSRS, in which case KVM will
+technically leak the host's KERNEL_GS_BASE into the guest.  But, as
+KERNEL_GS_BASE is a userspace-defined value/address, the leak is largely
+benign as a malicious userspace would simply be exposing its own data to
+the guest, and attacking a benevolent userspace would require multiple
+bugs in the userspace VMM.
+
+Cc: stable@vger.kernel.org
+Cc: Jun Nakajima <jun.nakajima@intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/x86.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8bb2fb1705ff..321eecb4cffd 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -92,6 +92,8 @@ u64 __read_mostly efer_reserved_bits = ~((u64)(EFER_SCE | EFER_LME | EFER_LMA));
+ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+ #endif
+ 
++static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
++
+ #define VM_STAT(x, ...) offsetof(struct kvm, stat.x), KVM_STAT_VM, ## __VA_ARGS__
+ #define VCPU_STAT(x, ...) offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU, ## __VA_ARGS__
+ 
+@@ -878,9 +880,38 @@ int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_xcr);
+ 
++static u64 kvm_host_cr4_reserved_bits(struct cpuinfo_x86 *c)
++{
++	u64 reserved_bits = CR4_RESERVED_BITS;
++
++	if (!cpu_has(c, X86_FEATURE_XSAVE))
++		reserved_bits |= X86_CR4_OSXSAVE;
++
++	if (!cpu_has(c, X86_FEATURE_SMEP))
++		reserved_bits |= X86_CR4_SMEP;
++
++	if (!cpu_has(c, X86_FEATURE_SMAP))
++		reserved_bits |= X86_CR4_SMAP;
++
++	if (!cpu_has(c, X86_FEATURE_FSGSBASE))
++		reserved_bits |= X86_CR4_FSGSBASE;
++
++	if (!cpu_has(c, X86_FEATURE_PKU))
++		reserved_bits |= X86_CR4_PKE;
++
++	if (!cpu_has(c, X86_FEATURE_LA57) &&
++	    !(cpuid_ecx(0x7) & bit(X86_FEATURE_LA57)))
++		reserved_bits |= X86_CR4_LA57;
++
++	if (!cpu_has(c, X86_FEATURE_UMIP) && !kvm_x86_ops->umip_emulated())
++		reserved_bits |= X86_CR4_UMIP;
++
++	return reserved_bits;
++}
++
+ static int kvm_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ {
+-	if (cr4 & CR4_RESERVED_BITS)
++	if (cr4 & cr4_reserved_bits)
+ 		return -EINVAL;
+ 
+ 	if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) && (cr4 & X86_CR4_OSXSAVE))
+@@ -9354,6 +9385,8 @@ int kvm_arch_hardware_setup(void)
+ 	if (r != 0)
+ 		return r;
+ 
++	cr4_reserved_bits = kvm_host_cr4_reserved_bits(&boot_cpu_data);
++
+ 	if (kvm_has_tsc_control) {
+ 		/*
+ 		 * Make sure the user can only configure tsc_khz values that
 -- 
 2.24.0
 
