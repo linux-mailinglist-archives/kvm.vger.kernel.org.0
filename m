@@ -2,103 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B2B37117C99
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 01:44:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8636A117CCA
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 01:57:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727459AbfLJAoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Dec 2019 19:44:37 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:34871 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727213AbfLJAoh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 19:44:37 -0500
-Received: by mail-oi1-f195.google.com with SMTP id k196so8249904oib.2;
-        Mon, 09 Dec 2019 16:44:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VUGiVOpo+ESHTZ/q7ZXEUplweHGdxyWpw0bewKvKrKo=;
-        b=HJ9uvRByiIhcvlGFLAHIo3zMt4Bje8/0vzIZNo1QGmiVYLM6CmrM02L5Aa5UGwxX/y
-         KHhHo/C6Td7K4qbcProiLzKd6BKblDRDsqoaeYh/qIOWRPQGo3OxmXiYU/uzdFCeRaKp
-         UeAjDdXnhEPe+FwHRCTsw4148aTuISMtFE1qzMOtpvrxfQeC3eSpAodTKOXa8D/HIn/U
-         eFxPghOlpHFFabkmcygBN926ZrR4AE6vUJ9U6mG94WJhziyQ2tVEW6L9w4WzEg8ntK8A
-         aypYKtpXvik972wulYD4sleX8awhjUBrG/xoQ+1OHAnP1KaI50QqtuDmCJfLWOX5qriu
-         l7hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VUGiVOpo+ESHTZ/q7ZXEUplweHGdxyWpw0bewKvKrKo=;
-        b=j3fFaBllJaaknEK1q8f441Ilrr9zmwzpdAWJt1eW3h8SQRSR4HZzlgYDk197wI5jAK
-         xnKCIIJnk2v0dBsWtWyEZ1MPua7PmCSsUwG7DuJHb32GxsDu9HW7NdhZ/KXqO7VeubAe
-         vMFVX07R74iVaQqDRrHD/sww4cWlHdPwMXFLkdc5Z0K9FId46Ub0N46nZk70I71Rv2Z7
-         YcVzbrSwrWgSgrsSFmIJ+6JBlYi9Q9V8hmmc0U3PdB+Qx1v0FifaiABdIAB/9lF8EnCh
-         tZ9Euurtd0DUO6D/p36gfuXOathlo40Wa8KK8Jbwp/GIoJAmu3r5d4NLOLR1I6GmFpok
-         fD8Q==
-X-Gm-Message-State: APjAAAU6zMo5RJxokSnY7xW4kTldem62fNv6AAViKPJ+7EUe77eMsx03
-        Mz5Kv8MLArD6iwP5ITJpJt4tApMZiKLlYMhczGo=
-X-Google-Smtp-Source: APXvYqz9kY5TLOFKFpF1u4hNcfjzipnq6KIGaqx/5OX1I/CehdbbdgEHMfJc0amvv3RA+MkRDHMbyuTBgTw84WZ+F38=
-X-Received: by 2002:aca:758c:: with SMTP id q134mr1786606oic.33.1575938676514;
- Mon, 09 Dec 2019 16:44:36 -0800 (PST)
-MIME-Version: 1.0
-References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
- <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
- <20190626145413.GE6753@char.us.oracle.com> <20190626161608.GM3419@hirez.programming.kicks-ass.net>
- <20190626183016.GA16439@char.us.oracle.com> <alpine.DEB.2.21.1906262038040.32342@nanos.tec.linutronix.de>
- <1561575336.25880.7.camel@amazon.de> <20190626192100.GP3419@hirez.programming.kicks-ass.net>
- <1561577254.25880.15.camel@amazon.de>
-In-Reply-To: <1561577254.25880.15.camel@amazon.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 10 Dec 2019 08:44:25 +0800
-Message-ID: <CANRm+Cx2gEf5G3W5yPrgmz0qVkgB+eWM+RCAji=PYvKvAOrHkw@mail.gmail.com>
-Subject: Re: cputime takes cstate into consideration
-To:     "Raslan, KarimAllah" <karahmed@amazon.de>
-Cc:     "peterz@infradead.org" <peterz@infradead.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
-        Frederic Weisbecker <frederic@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727425AbfLJA4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 19:56:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43384 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726743AbfLJA4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 19:56:30 -0500
+Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CE73720637;
+        Tue, 10 Dec 2019 00:56:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575939389;
+        bh=BbLBjR8wcrsANoTlWrEqQPyK+DvAKxv254F1InccAcs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=uQ6utAA370KB9xY5+qeGGsoo1HH/Hnt/LDZgeHbTSoRMRHkI8VQJNf4H7ZKlSmj42
+         WZSNKaK/IM6JgWSl9QfalBJQuyJfmeZpwpLLwj0NmbsOrQL4FJSoG0TjuPsUzwfCOi
+         N9YkLgu4ONG2hyyuwLyRSMczlQwBZdl/iQWpJ6W0=
+Date:   Mon, 9 Dec 2019 16:56:27 -0800
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?ISO-8859-1?Q?J=E9r?= =?ISO-8859-1?Q?=F4me?= Glisse 
+        <jglisse@redhat.com>, Magnus Karlsson <magnus.karlsson@intel.com>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Christoph Hellwig" <hch@lst.de>,
+        Hans Verkuil <hverkuil-cisco@xs4all.nl>,
+        <stable@vger.kernel.org>
+Subject: Re: [PATCH v8 17/26] media/v4l2-core: set pages dirty upon
+ releasing DMA buffers
+Message-Id: <20191209165627.bf657cb8fdf660e8f91e966c@linux-foundation.org>
+In-Reply-To: <20191209225344.99740-18-jhubbard@nvidia.com>
+References: <20191209225344.99740-1-jhubbard@nvidia.com>
+        <20191209225344.99740-18-jhubbard@nvidia.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jun 2019 at 03:27, Raslan, KarimAllah <karahmed@amazon.de> wrote:
->
-> On Wed, 2019-06-26 at 21:21 +0200, Peter Zijlstra wrote:
-> > On Wed, Jun 26, 2019 at 06:55:36PM +0000, Raslan, KarimAllah wrote:
-> >
-> > >
-> > > If the host is completely in no_full_hz mode and the pCPU is dedicated to a
-> > > single vCPU/task (and the guest is 100% CPU bound and never exits), you would
-> > > still be ticking in the host once every second for housekeeping, right? Would
-> > > not updating the mwait-time once a second be enough here?
-> >
-> > People are trying very hard to get rid of that remnant tick. Lets not
-> > add dependencies to it.
-> >
-> > IMO this is a really stupid issue, 100% time is correct if the guest
-> > does idle in pinned vcpu mode.
->
-> One use case for proper accounting (obviously for a slightly relaxed definition
-> or *proper*) is *external* monitoring of CPU utilization for scaling group
-> (i.e. more VMs will be launched when you reach a certain CPU utilization).
-> These external monitoring tools needs to account CPU utilization properly.
+On Mon, 9 Dec 2019 14:53:35 -0800 John Hubbard <jhubbard@nvidia.com> wrote:
 
-Except cputime accounting, the other gordian knot is qemu main loop,
-libvirt, kthreads etc can't be offload to the other hardware like
-smart nic, these stuff will contend with vCPUs even if MWAIT/HLT
-instructions are executing in the guest. There is a HLT activity state
-in CPU VMCS which indicates the logical processor is inactive because
-it executed the HLT instruction, but SDM 24.4.2 mentioned that
-execution of the MWAIT instruction may put a logical processor into an
-inactive state, however, this VMCS field never reflects this state.
+> After DMA is complete, and the device and CPU caches are synchronized,
+> it's still required to mark the CPU pages as dirty, if the data was
+> coming from the device. However, this driver was just issuing a
+> bare put_page() call, without any set_page_dirty*() call.
+> 
+> Fix the problem, by calling set_page_dirty_lock() if the CPU pages
+> were potentially receiving data from the device.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: <stable@vger.kernel.org>
 
-    Wanpeng
+What are the user-visible effects of this change?
+
+As it's cc:stable I'd normally send this to Linus within 1-2 weeks, or
+sooner.  Please confirm that this is a standalone fix, independent of
+the rest of this series.
+
+
