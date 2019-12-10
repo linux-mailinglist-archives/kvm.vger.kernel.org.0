@@ -2,92 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BFC5118515
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 11:29:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51ED1118576
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 11:44:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727402AbfLJK3F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 05:29:05 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32749 "EHLO
+        id S1727222AbfLJKoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 05:44:00 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57985 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727116AbfLJK3F (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 05:29:05 -0500
+        by vger.kernel.org with ESMTP id S1727411AbfLJKnU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 05:43:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575973744;
+        s=mimecast20190719; t=1575974599;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iYRdhx94lZEfdmmjolViEp26vremOEQhwyKs35+L2rM=;
-        b=c77gJqOYUsQL1d9KSg+A03qtUipZ8AXGNTqjDnUbwLIINBTvVSahW8ANhm41V8tVWDl7pg
-        I/1K4yohJvhMRhSCytYEJroREsLotrp4OYCE5rQvfu9Esltz1SbO+XFM/UqNAU/7FLBpg0
-        0CAJ1TLIcjF4ZlzHpP2/rG0+mJUJGFQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-56ZsMUwiPvCumw3t-H6MIw-1; Tue, 10 Dec 2019 05:29:02 -0500
-Received: by mail-wm1-f69.google.com with SMTP id q21so832816wmc.7
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 02:29:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=iYRdhx94lZEfdmmjolViEp26vremOEQhwyKs35+L2rM=;
-        b=QrHO+g21JIKHnlMdf3h1oB8VM3aU2aHC4K8Xoo+Ch3I6Q8Tqx8Hm7GqhcIDseuC238
-         xnhuyJ4thKDFQ2kbH8dmZ/02K8CEfrS6ggUg1Cdk0BEXlD+Iqxtv1PPVwjOG/QCPvLwj
-         yEyyrOTse+DNU+PDUggzv+rc9RFirDxLMp098GDoJbAvkZkxAM5NIpEHRRDEgE6dH1LV
-         44D9IaGcexkmR73XVrCgD3WfkDCQV72lJJq4gBgjX1/dLp6fI/Q92qgTGF9B3nANa/f4
-         eh34psDmGpKuRK5pKPHD4hZDnZwCxG+WECztSBScWWvxgan0XhDske1hbp6U64pjxqnO
-         v8Kw==
-X-Gm-Message-State: APjAAAWBG0cJsL13na8IMWXr8NYLsOhobjGNpTE4mQD1gXcZY3A8y/rJ
-        d02pCwB1VIaAyq0VGHky89DENtkqesBo0+dZ3efVybCN5dbTYbooUKmLK8zqo/sKl43OKWCz2rM
-        mU6+ipcwwOBUR
-X-Received: by 2002:a5d:6284:: with SMTP id k4mr2304026wru.398.1575973740917;
-        Tue, 10 Dec 2019 02:29:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzuMgkVYc+esWPIvGo0F5L891J0fK0Q3nskPFxv2CWHs5OO4BgCv23sK914Q45HzzW2+5D5HQ==
-X-Received: by 2002:a5d:6284:: with SMTP id k4mr2303997wru.398.1575973740718;
-        Tue, 10 Dec 2019 02:29:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id f1sm2551482wml.11.2019.12.10.02.29.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 02:29:00 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Add a WARN on TIF_NEED_FPU_LOAD in
- kvm_load_guest_fpu()
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191209200517.13382-1-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf494125-1de6-dc41-1438-0ee5f802c229@redhat.com>
-Date:   Tue, 10 Dec 2019 11:29:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mP35JmqQ9E99xN9+azImIkT0EtvsAAz/WVB37DGVDWA=;
+        b=Dhc96tRAENHWGyzHJMOlFIobmwvMom3CQgEXMIAUfzSTAouBPLHnMKBiE0kixD/yglcZmL
+        yvyxmh5iqy2K+LOmo6YvIQKVRsVKW7jgz5vwPUtL3N6764G4gzBMTM0wlzsWo17RHjR5Dm
+        PWPH+xJfIGguww88hVog/s7VUbVPBFM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-144-bddPvOfPNauR0dU7DHbVGQ-1; Tue, 10 Dec 2019 05:43:16 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11167802B7D;
+        Tue, 10 Dec 2019 10:43:13 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-168.ams2.redhat.com [10.36.117.168])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F18F60568;
+        Tue, 10 Dec 2019 10:43:07 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org, davem@davemloft.net
+Cc:     Dexuan Cui <decui@microsoft.com>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH net-next v2 0/6] vsock: add local transport support
+Date:   Tue, 10 Dec 2019 11:43:01 +0100
+Message-Id: <20191210104307.89346-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191209200517.13382-1-sean.j.christopherson@intel.com>
-Content-Language: en-US
-X-MC-Unique: 56ZsMUwiPvCumw3t-H6MIw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: bddPvOfPNauR0dU7DHbVGQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/12/19 21:05, Sean Christopherson wrote:
-> +	/*
-> +	 * Reloading userspace's FPU is handled by kvm_arch_vcpu_load(), both
-> +	 * for direct calls from userspace (via vcpu_load()) and if this task
-> +	 * is preempted (via kvm_arch_sched_in()) between vcpu_load() and now.
+v2:
+ - style fixes [Dave]
+ - removed RCU sync and changed 'the_vsock_loopback' in a global
+   static variable [Stefan]
+ - use G2H transport when local transport is not loaded and remote cid
+   is VMADDR_CID_LOCAL [Stefan]
+ - rebased on net-next
 
-via kvm_sched_in (not the arch_ function).  Applied with that change.
+v1: https://patchwork.kernel.org/cover/11251735/
 
-Paolo
+This series introduces a new transport (vsock_loopback) to handle
+local communication.
+This could be useful to test vsock core itself and to allow developers
+to test their applications without launching a VM.
 
-> +	 */
-> +	WARN_ON_ONCE(test_thread_flag(TIF_NEED_FPU_LOAD));
-> +
+Before this series, vmci and virtio transports allowed this behavior,
+but only in the guest.
+We are moving the loopback handling in a new transport, because it
+might be useful to provide this feature also in the host or when
+no H2G/G2H transports (hyperv, virtio, vmci) are loaded.
+
+The user can use the loopback with the new VMADDR_CID_LOCAL (that
+replaces VMADDR_CID_RESERVED) in any condition.
+Otherwise, if the G2H transport is loaded, it can also use the guest
+local CID as previously supported by vmci and virtio transports.
+If G2H transport is not loaded, the user can also use VMADDR_CID_HOST
+for local communication.
+
+Patch 1 is a cleanup to build virtio_transport_common without virtio
+Patch 2 adds the new VMADDR_CID_LOCAL, replacing VMADDR_CID_RESERVED
+Patch 3 adds a new feature flag to register a loopback transport
+Patch 4 adds the new vsock_loopback transport based on the loopback
+        implementation of virtio_transport
+Patch 5 implements the logic to use the local transport for loopback
+        communication
+Patch 6 removes the loopback from virtio_transport
+
+Stefano Garzarella (6):
+  vsock/virtio_transport_common: remove unused virtio header includes
+  vsock: add VMADDR_CID_LOCAL definition
+  vsock: add local transport support in the vsock core
+  vsock: add vsock_loopback transport
+  vsock: use local transport when it is loaded
+  vsock/virtio: remove loopback handling
+
+ MAINTAINERS                             |   1 +
+ include/net/af_vsock.h                  |   2 +
+ include/uapi/linux/vm_sockets.h         |   8 +-
+ net/vmw_vsock/Kconfig                   |  12 ++
+ net/vmw_vsock/Makefile                  |   1 +
+ net/vmw_vsock/af_vsock.c                |  45 +++++-
+ net/vmw_vsock/virtio_transport.c        |  61 +-------
+ net/vmw_vsock/virtio_transport_common.c |   3 -
+ net/vmw_vsock/vmci_transport.c          |   2 +-
+ net/vmw_vsock/vsock_loopback.c          | 180 ++++++++++++++++++++++++
+ 10 files changed, 243 insertions(+), 72 deletions(-)
+ create mode 100644 net/vmw_vsock/vsock_loopback.c
+
+--=20
+2.23.0
 
