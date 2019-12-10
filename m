@@ -2,133 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 040BB1184E8
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 11:22:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F28C11850C
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 11:28:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727493AbfLJKWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 05:22:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35072 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726574AbfLJKWu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 05:22:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575973369;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1hYi5eS0bvVMUP0KaJ0gTC9c1AaBzYooRd9sn22yfd4=;
-        b=ijlcLlMWuEzZo8em564b93MJ6lgjB6vX3OsC1zqKkTDsQAjMwWuPMo6NiXcvJ/WErHSoZt
-        lZbVg6y/jNqIMXvJZlCQwSTU2Re1oKV3tAtPYxUC9sZ+tKo3/hq04ny+4Y/8EFeZLPLvuG
-        gMydTIq3hKS17c9eU4DmAZGcL9XPMmw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-_1DjeiWaOfON0H6DeWMiKQ-1; Tue, 10 Dec 2019 05:22:46 -0500
-Received: by mail-wr1-f69.google.com with SMTP id l20so8792298wrc.13
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 02:22:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1hYi5eS0bvVMUP0KaJ0gTC9c1AaBzYooRd9sn22yfd4=;
-        b=k6NS/kB5yNo7qltRifHvV2dgRy5gCXhBoH/GdSX+JsKATFAiIWwtG0TiM6MCU5UF3J
-         3vfOZFQpyDOWyzk0LJI35Veed+wGUFNCPa3K5cBnwmPoS+fjqGAV8weH1RbnqBBLqNv5
-         8iyymm2isrj2YkMnE6PhgelOLBbHy21gvMhKoGbFMeuI1BHbSSnF5xgiB8RMtPIeWIQs
-         G+tCaAoJUwOOU5tIZb/Kif1BYx5tuAcVpgGr8IgRcFdp6rrFOVGUeX2aewUIXrTVmEzO
-         Nn6k1iibWKjaRzABF/jF6bMr/kfEXRo1/QBASsZAjC34vNbuG9A1XBAa6SGhOIKXaMWk
-         P75g==
-X-Gm-Message-State: APjAAAXmp/d+7KD8S5dFG0mRfmTtT3X1dmrAsirUfWqLyBJE0AkAalxb
-        R/rOJBIJm0lJEWjXzvMnLQ1189+ulgzKqmD+rTZIXAUaSLGboF/jKwwwLPmqmk2w6de1b3gezGe
-        DPvQ/ndLlSaQB
-X-Received: by 2002:adf:ec83:: with SMTP id z3mr2272240wrn.133.1575973365550;
-        Tue, 10 Dec 2019 02:22:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxBitfZdf/RJEPq1dZzPfkb453HjvEVJ0+/v+Z4WoHLXSV9FfeJBqhYpzRlJBzCwH1tt+vBvw==
-X-Received: by 2002:adf:ec83:: with SMTP id z3mr2272216wrn.133.1575973365287;
-        Tue, 10 Dec 2019 02:22:45 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id n3sm2520674wmc.27.2019.12.10.02.22.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Dec 2019 02:22:44 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: x86: Skip zeroing of MPX state on reset event
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191209201932.14259-1-sean.j.christopherson@intel.com>
- <20191209201932.14259-3-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c0589c5-f7c5-604c-3090-56dc886cb817@redhat.com>
-Date:   Tue, 10 Dec 2019 11:22:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727365AbfLJK2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 05:28:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:58544 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726574AbfLJK2Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 05:28:24 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 769B2B280;
+        Tue, 10 Dec 2019 10:28:20 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id E89EB1E0B23; Tue, 10 Dec 2019 11:28:18 +0100 (CET)
+Date:   Tue, 10 Dec 2019 11:28:18 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leonro@mellanox.com>
+Subject: Re: [PATCH v8 08/26] mm/gup: allow FOLL_FORCE for
+ get_user_pages_fast()
+Message-ID: <20191210102818.GF1551@quack2.suse.cz>
+References: <20191209225344.99740-1-jhubbard@nvidia.com>
+ <20191209225344.99740-9-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191209201932.14259-3-sean.j.christopherson@intel.com>
-Content-Language: en-US
-X-MC-Unique: _1DjeiWaOfON0H6DeWMiKQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191209225344.99740-9-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/12/19 21:19, Sean Christopherson wrote:
-> Don't bother zeroing out MPX state in the guest's FPU on a reset event,
-> the guest's FPU is always zero allocated and there is no path between
-> kvm_arch_vcpu_create() and kvm_arch_vcpu_setup() that can lead to guest
-> MPX state being modified.
+On Mon 09-12-19 14:53:26, John Hubbard wrote:
+> Commit 817be129e6f2 ("mm: validate get_user_pages_fast flags") allowed
+> only FOLL_WRITE and FOLL_LONGTERM to be passed to get_user_pages_fast().
+> This, combined with the fact that get_user_pages_fast() falls back to
+> "slow gup", which *does* accept FOLL_FORCE, leads to an odd situation:
+> if you need FOLL_FORCE, you cannot call get_user_pages_fast().
 > 
-> No functional change intended.
+> There does not appear to be any reason for filtering out FOLL_FORCE.
+> There is nothing in the _fast() implementation that requires that we
+> avoid writing to the pages. So it appears to have been an oversight.
 > 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Fix by allowing FOLL_FORCE to be set for get_user_pages_fast().
+> 
+> Fixes: 817be129e6f2 ("mm: validate get_user_pages_fast flags")
+> Cc: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Leon Romanovsky <leonro@mellanox.com>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Makes sense, but it's a bit weird to have INIT reset _less_ state than
-RESET...  I've queued patch 1 only for now.
+Looks good to me. You can add:
 
-Paolo
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 
 > ---
->  arch/x86/kvm/x86.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
+>  mm/gup.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 854ae27bb021..e6f4174f55cd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9194,15 +9194,14 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	kvm_async_pf_hash_reset(vcpu);
->  	vcpu->arch.apf.halted = false;
+> diff --git a/mm/gup.c b/mm/gup.c
+> index c0c56888e7cc..958ab0757389 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2414,7 +2414,8 @@ int get_user_pages_fast(unsigned long start, int nr_pages,
+>  	unsigned long addr, len, end;
+>  	int nr = 0, ret = 0;
 >  
-> -	if (kvm_mpx_supported()) {
-> +	if (kvm_mpx_supported() && init_event) {
->  		void *mpx_state_buffer;
+> -	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM)))
+> +	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
+> +				       FOLL_FORCE)))
+>  		return -EINVAL;
 >  
->  		/*
-> -		 * To avoid have the INIT path from kvm_apic_has_events() that be
-> -		 * called with loaded FPU and does not let userspace fix the state.
-> +		 * Temporarily flush the guest's FPU to memory so that zeroing
-> +		 * out the MPX areas is done using up-to-date state.
->  		 */
-> -		if (init_event)
-> -			kvm_put_guest_fpu(vcpu);
-> +		kvm_put_guest_fpu(vcpu);
->  		mpx_state_buffer = get_xsave_addr(&vcpu->arch.guest_fpu->state.xsave,
->  					XFEATURE_BNDREGS);
->  		if (mpx_state_buffer)
-> @@ -9211,8 +9210,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  					XFEATURE_BNDCSR);
->  		if (mpx_state_buffer)
->  			memset(mpx_state_buffer, 0, sizeof(struct mpx_bndcsr));
-> -		if (init_event)
-> -			kvm_load_guest_fpu(vcpu);
-> +		kvm_load_guest_fpu(vcpu);
->  	}
->  
->  	if (!init_event) {
+>  	start = untagged_addr(start) & PAGE_MASK;
+> -- 
+> 2.24.0
 > 
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
