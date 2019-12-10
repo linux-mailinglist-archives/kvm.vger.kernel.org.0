@@ -2,152 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 008401182A6
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 09:45:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C83B1182DF
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 09:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbfLJIpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 03:45:31 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53648 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726847AbfLJIpb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 03:45:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575967530;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EHXP5t+IM2uhgjKRfv/wbmhkBiYk2XdPfXl9QksfvlM=;
-        b=KatolIN1cHLaczICZaIKPlIgc9FZeYueUDNyaoiOzDJF2+2FFz4MikODvW4rnpylETC+63
-        wKwAEuLImgMLN57GRsBo3WjBqmMiiVYcfE1Od2qBf5ZwAfY0gBDUARBa1ZtTuKZcEBs8dk
-        AIKEJys9KzJsCE/rJ1EoN6aJNnJ1IAU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-Z_veY5N_NUi2heCMpgpsHw-1; Tue, 10 Dec 2019 03:45:29 -0500
-Received: by mail-wr1-f69.google.com with SMTP id c6so8615282wrm.18
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 00:45:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=VokcWwHWpp/e0pbVRBSEYqvNuANdyNAiEOTcGwXXE2w=;
-        b=FpThEm6MSKsIFQlZPQOierNU2Dvmyi4c8EcjoLH8ScFSJlDCbPRPngnR38UgOeh1pU
-         gITGNVcrssVFydJsntbm+2QhgXi+GZRfyXCpU1Pvk93Xm60xFJlHIurIxcKlqxYd/9E0
-         23ttBYggoDnuN+2NMqvznLVQMDfdgvL20BkalYGF0TloU3uxzxWW27nTw/yEo+C+vKAw
-         rteIyTFea1Dio7yqE+2IkADVFNmr6YOUDaSMqk5L/tOZl6cvtxgezoEemoWB5RRabXhT
-         XeR4nQD3SY5XCEbkZLSbCNVHojJ2SsvyujIvE/Pk+woqfzI6YNCswo13q6UzxZN02OUB
-         OwTA==
-X-Gm-Message-State: APjAAAWbDS2cm6ksY1D9W5aJEgg6WdHjSceyA3e8ebcadRGW3bgTCQKO
-        v2QOhLdBWdMPjpOsP85j05XlGRXk3ZyNCZkGkTNsjUQWR8HsoWqPxoga3eLiAac2Q/mgnGnAHAK
-        1e6Tn8MMsmiZx
-X-Received: by 2002:adf:fc0c:: with SMTP id i12mr1933194wrr.74.1575967528510;
-        Tue, 10 Dec 2019 00:45:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyIp7r0+7xXZilpVXZLekeS10O68sMVivmUq43xh4m2WJkFH6LFJJFSQebYaSTyZIF9OhpDow==
-X-Received: by 2002:adf:fc0c:: with SMTP id i12mr1933169wrr.74.1575967528224;
-        Tue, 10 Dec 2019 00:45:28 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id s1sm2289452wmc.23.2019.12.10.00.45.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2019 00:45:27 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
-        gshan@redhat.com
-Subject: Re: [PATCH] tools/kvm_stat: Fix kvm_exit filter name
-In-Reply-To: <20191210044829.180122-1-gshan@redhat.com>
-References: <20191210044829.180122-1-gshan@redhat.com>
-Date:   Tue, 10 Dec 2019 09:45:27 +0100
-Message-ID: <871rtcd0wo.fsf@vitty.brq.redhat.com>
+        id S1726951AbfLJI4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 03:56:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33650 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726847AbfLJI4m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 03:56:42 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBA8qUQY034896
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 03:56:41 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wrtkt6jfn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 03:56:40 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Tue, 10 Dec 2019 08:56:39 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 10 Dec 2019 08:56:37 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBA8uaOO25297002
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Dec 2019 08:56:36 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58E01A4057;
+        Tue, 10 Dec 2019 08:56:36 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 23DE4A4055;
+        Tue, 10 Dec 2019 08:56:36 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Dec 2019 08:56:36 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v3 6/9] s390x: css: stsch, enumeration test
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+References: <1575649588-6127-1-git-send-email-pmorel@linux.ibm.com>
+ <1575649588-6127-7-git-send-email-pmorel@linux.ibm.com>
+ <20191209174938.7df1ffa2.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Tue, 10 Dec 2019 09:56:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-MC-Unique: Z_veY5N_NUi2heCMpgpsHw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191209174938.7df1ffa2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121008-0020-0000-0000-000003961E1E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121008-0021-0000-0000-000021ED5D98
+Message-Id: <e2d4611a-f702-36b9-9344-fdc4f4e771bf@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-10_01:2019-12-10,2019-12-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912100080
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gavin Shan <gshan@redhat.com> writes:
 
-> The filter name is fixed to "exit_reason" for some kvm_exit events, no
-> matter what architect we have. Actually, the filter name ("exit_reason")
-> is only applicable to x86, meaning it's broken on other architects
-> including aarch64.
->
-> This fixes the issue by providing various kvm_exit filter names, dependin=
-g
-> on architect we're on. Afterwards, the variable filter name is picked and
-> applied through ioctl(fd, SET_FILTER).
 
-Would it actually make sense to standardize (to certain extent) kvm_exit
-tracepoints instead?
+On 2019-12-09 17:49, Cornelia Huck wrote:
+> On Fri,  6 Dec 2019 17:26:25 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> First step for testing the channel subsystem is to enumerate the css and
+>> retrieve the css devices.
+>>
+>> This tests the success of STSCH I/O instruction.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h     |  1 +
+>>   s390x/Makefile      |  2 ++
+>>   s390x/css.c         | 82 +++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/unittests.cfg |  4 +++
+>>   4 files changed, 89 insertions(+)
+>>   create mode 100644 s390x/css.c
+>>
+> 
+>> +static void test_enumerate(void)
+>> +{
+>> +	struct pmcw *pmcw = &schib.pmcw;
+>> +	int scn;
+>> +	int cc, i;
+>> +	int found = 0;
+>> +
+>> +	for (scn = 0; scn < 0xffff; scn++) {
+>> +		cc = stsch(scn|SID_ONE, &schib);
+>> +		if (!cc && (pmcw->flags & PMCW_DNV)) {
+> 
+> Not sure when dnv is actually applicable... it is used for I/O
+> subchannels; chsc subchannels don't have a device; message subchannels
+> use a different bit IIRC; not sure about EADM subchannels.
+> 
+> [Not very relevant as long as we run under KVM, but should be
+> considered if you plan to run this test under z/VM or LPAR as well.]
 
->
-> Reported-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  tools/kvm/kvm_stat/kvm_stat | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
-> index ad1b9e646c49..f9273614b7e3 100755
-> --- a/tools/kvm/kvm_stat/kvm_stat
-> +++ b/tools/kvm/kvm_stat/kvm_stat
-> @@ -270,6 +270,7 @@ class ArchX86(Arch):
->      def __init__(self, exit_reasons):
->          self.sc_perf_evt_open =3D 298
->          self.ioctl_numbers =3D IOCTL_NUMBERS
-> +        self.exit_field =3D 'exit_reason'
+Hum, interresting, I will check and modify accordingly.
 
-Also, 'exit_field' name is confusing (probably because I'm thinking of
-VMCS fields)
+> 
+>> +			report_info("SID %04x Type %s PIM %x", scn,
+>> +				     Channel_type[PMCW_CHANNEL_TYPE(pmcw)],
+>> +				     pmcw->pim);
+>> +			for (i = 0; i < 8; i++)  {
+>> +				if ((pmcw->pim << i) & 0x80) {
+>> +					report_info("CHPID[%d]: %02x", i,
+>> +						    pmcw->chpid[i]);
+>> +					break;
+> 
+> That 'break;' seems odd -- won't you end up printing the first chpid in
+> the pim only?
+yes
+> 
+> Maybe modify this loop to print the chpid if the path is in the pim,
+> and 'n/a' or so if not?
 
->          self.exit_reasons =3D exit_reasons
-> =20
->      def debugfs_is_child(self, field):
-> @@ -289,6 +290,7 @@ class ArchPPC(Arch):
->          # numbers depend on the wordsize.
->          char_ptr_size =3D ctypes.sizeof(ctypes.c_char_p)
->          self.ioctl_numbers['SET_FILTER'] =3D 0x80002406 | char_ptr_size =
-<< 16
-> +        self.exit_field =3D 'exit_nr'
->          self.exit_reasons =3D {}
-> =20
->      def debugfs_is_child(self, field):
-> @@ -300,6 +302,7 @@ class ArchA64(Arch):
->      def __init__(self):
->          self.sc_perf_evt_open =3D 241
->          self.ioctl_numbers =3D IOCTL_NUMBERS
-> +        self.exit_field =3D 'ret'
+OK
 
-And this is the most confusing part. Why do we have 'ret' as an exit
-reason in the first place?
+> 
+>> +				}
+>> +			}
+>> +			found++;
+>> +		}
+>> +		if (cc == 3) /* cc = 3 means no more channel in CSS */
+> 
+> s/channel/subchannels/
 
->          self.exit_reasons =3D AARCH64_EXIT_REASONS
-> =20
->      def debugfs_is_child(self, field):
-> @@ -311,6 +314,7 @@ class ArchS390(Arch):
->      def __init__(self):
->          self.sc_perf_evt_open =3D 331
->          self.ioctl_numbers =3D IOCTL_NUMBERS
-> +        self.exit_field =3D None
->          self.exit_reasons =3D None
-> =20
->      def debugfs_is_child(self, field):
-> @@ -541,8 +545,8 @@ class TracepointProvider(Provider):
->          """
->          filters =3D {}
->          filters['kvm_userspace_exit'] =3D ('reason', USERSPACE_EXIT_REAS=
-ONS)
-> -        if ARCH.exit_reasons:
-> -            filters['kvm_exit'] =3D ('exit_reason', ARCH.exit_reasons)
-> +        if ARCH.exit_field and ARCH.exit_reasons:
-> +            filters['kvm_exit'] =3D (ARCH.exit_field, ARCH.exit_reasons)
->          return filters
-> =20
->      def _get_available_fields(self):
+thanks
 
---=20
-Vitaly
+> 
+>> +			break;
+>> +		if (found && !test_device_sid)
+>> +			test_device_sid = scn|SID_ONE;
+>> +	}
+>> +	if (!found) {
+>> +		report("Tested %d devices, none found", 0, scn);
+>> +		return;
+>> +	}
+>> +	report("Tested %d devices, %d found", 1, scn, found);
+>> +}
+> 
+
+Thanks for the reviewing,
+Regards,
+
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
