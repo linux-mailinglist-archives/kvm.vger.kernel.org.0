@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EC787118A62
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 15:06:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3E0F118AF2
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 15:32:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727456AbfLJOGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 09:06:06 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48058 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727320AbfLJOGG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 09:06:06 -0500
+        id S1727466AbfLJOc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 09:32:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32928 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727272AbfLJOc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 09:32:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575986764;
+        s=mimecast20190719; t=1575988376;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9cYSQHCTDQkKzmRIgQpyk3DnPt+k/A4ckdhU2f8Or6g=;
-        b=aezCjhcsuEiduFAdc2wCO4KzHE3M4abW/uEsH5HsjXtSuy6FEqIWYh3Pf+Es31LRm+pv/q
-        YHSbh1oOxAs3iQFQ7P3W6gwoFy94IO6Lp6MT6DLcskqtS82l2juVYq+lq1/xigsCaX1UG8
-        18WGMfbaf+xKp/XTw6M9U0KXdNRrLpQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-2ljB4v-zNo-9ifNeWLMFpA-1; Tue, 10 Dec 2019 09:06:03 -0500
-Received: by mail-wm1-f69.google.com with SMTP id p2so1049290wma.3
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 06:06:03 -0800 (PST)
+        bh=oltekNksYL0JppEwk+sb0PIOexNRJT7sk8bU9jqVsg4=;
+        b=QU8uEPJoFeaAU13A7xsOSR4otPE3OZRrNZPhhSTp9FMrPqXfbKl8+eJh8Vwygw4/0s1Job
+        PECIPR/ZfyDgNTN9q9wh8Jj530nx6crXrr1MIFxHReoBrDoPh+XfRteRQZ9tUjud5Ghme3
+        7ptaOKdfgZGYpIOSSK9NcFzqF6tFI7w=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-1TyFiPE2O5Wxzkhw_kuIRg-1; Tue, 10 Dec 2019 09:32:55 -0500
+Received: by mail-wr1-f69.google.com with SMTP id h30so9017086wrh.5
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 06:32:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=CI3qbc7xp4DF6AaDOfblCvC5kTkzEe7UO4aRTK6V7jk=;
-        b=ASNWJm4yH/HSH2pw8dQePih+Tm4kTd4iG0442iclzxPq9+W+0qCVcsDxZ+SDtRW2iC
-         3kikIyMaHfciBY1mpb+VGSkp5FaFoSXy+AoQz34nsv4r8T8u2c+M8n847N1qu/SgYjJX
-         nXf1ij4yQEUXSKZAasaDzkycP9kU118HaPsV4s+Thl1+W2DPGz6NjymRn4V38223cZ2Y
-         ROV2fYYWaezwcVxvdH+0sQd9vnzeXJsoVOIE7F3uTyFnBI4BEalvH/NQZaAl4WtVh21Q
-         NiadkSyBJiCq7T5upnicEC8d2SfqFeLgVTyIDnfnRgnG7nWM0LEzfm7pdBajgjXjhvu4
-         9pjw==
-X-Gm-Message-State: APjAAAWjVUkCn6DdLw4JdpMTaWFwc2OzVn1Qi37gkz99kL/4yFzls9te
-        oD60AVI8TIf7YR2prlS4DvptdgnT0r2onUMyVEEcClON37fh6a9xiMv9/iAgTmoPl5V/tqsEsH+
-        /ormcApqX2zLF
-X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr5415229wmm.70.1575986762125;
-        Tue, 10 Dec 2019 06:06:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzt2DwRGDx/tfuLDX74AYEnOhZaQrk2tBhSVe7oGiWrvR5kBtkcogM60airAVN4tsBt+f/Tiw==
-X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr5415198wmm.70.1575986761941;
-        Tue, 10 Dec 2019 06:06:01 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
-        by smtp.gmail.com with ESMTPSA id a5sm3131833wmb.37.2019.12.10.06.06.00
+        bh=ZX5clcawRs9HvyErreGyUr6byz6y4hiLe4x5yy5XB+w=;
+        b=fwbdFF1fjFk5nEHRILXPDfIFax4GUY5hgGZbxg8QvwtXi/jdH9MOadmtD4P6b5sLYw
+         hl4RdweUTiV8y2OSjW2Sg80EX1ucLxleS3l50QvIfPzMXHaVUN60Zmd25RgbebctL047
+         hYh51Ad/r50dcDdKJyzEK64wtvBTNmNFFQshU/9OzpGoV3GvFZK77h4CNrMXIBjxdgyJ
+         aZ66bdEf0T/fy+4bNEm7PeDHlCJz0JNCS+QjFTUeBDA9+wjIph0YYaAe48m6Lz9B2qfN
+         9zs7MlHIysU6MSZ2FbzHqFJXbWF9X3RLLTQRM7R5+a+voUMjmZsA8egGsMt4dLoeF5YQ
+         iRqA==
+X-Gm-Message-State: APjAAAVsaH/9W36Nvp74wyP6nqLzMPuIFD4xSOQDNkHTkALtU7XTGv/A
+        aeQkzYA5YFJtw3n8jbNy4WfGgi7Xy2KKsF2T6fEsoQrtl1Ay56C2BvcTKw20HvwrqtRkYcgCIuT
+        qIee94t5MV82i
+X-Received: by 2002:a05:600c:2947:: with SMTP id n7mr5228101wmd.156.1575988374114;
+        Tue, 10 Dec 2019 06:32:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5osq8iXaghf+DSPEJ+fI9zhfAtq/jAq/Ozou/cbeXTMCvexsR8V2x1X6t2Pp1+8eyRY0ljg==
+X-Received: by 2002:a05:600c:2947:: with SMTP id n7mr5228075wmd.156.1575988373894;
+        Tue, 10 Dec 2019 06:32:53 -0800 (PST)
+Received: from steredhat ([95.235.120.92])
+        by smtp.gmail.com with ESMTPSA id b185sm3483015wme.36.2019.12.10.06.32.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2019 06:06:01 -0800 (PST)
-Date:   Tue, 10 Dec 2019 09:05:58 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
+        Tue, 10 Dec 2019 06:32:53 -0800 (PST)
+Date:   Tue, 10 Dec 2019 15:32:51 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: [PATCH] vhost/vsock: accept only packets with the right dst_cid
-Message-ID: <20191210090505-mutt-send-email-mst@kernel.org>
+Message-ID: <20191210143251.szkicty23b6pojxh@steredhat>
 References: <20191206143912.153583-1-sgarzare@redhat.com>
+ <20191210090505-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191206143912.153583-1-sgarzare@redhat.com>
-X-MC-Unique: 2ljB4v-zNo-9ifNeWLMFpA-1
+In-Reply-To: <20191210090505-mutt-send-email-mst@kernel.org>
+X-MC-Unique: 1TyFiPE2O5Wxzkhw_kuIRg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
@@ -71,39 +72,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 06, 2019 at 03:39:12PM +0100, Stefano Garzarella wrote:
-> When we receive a new packet from the guest, we check if the
-> src_cid is correct, but we forgot to check the dst_cid.
+On Tue, Dec 10, 2019 at 09:05:58AM -0500, Michael S. Tsirkin wrote:
+> On Fri, Dec 06, 2019 at 03:39:12PM +0100, Stefano Garzarella wrote:
+> > When we receive a new packet from the guest, we check if the
+> > src_cid is correct, but we forgot to check the dst_cid.
+> >=20
+> > The host should accept only packets where dst_cid is
+> > equal to the host CID.
+> >=20
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 >=20
-> The host should accept only packets where dst_cid is
-> equal to the host CID.
->=20
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> what's the implication of processing incorrect dst cid?
+> I think mostly it's malformed guests, right?
 
-what's the implication of processing incorrect dst cid?
-I think mostly it's malformed guests, right?
-Everyone else just passes the known host cid ...
+Exaclty, as for the src_cid.
 
-> ---
->  drivers/vhost/vsock.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 50de0642dea6..c2d7d57e98cf 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -480,7 +480,9 @@ static void vhost_vsock_handle_tx_kick(struct vhost_w=
-ork *work)
->  =09=09virtio_transport_deliver_tap_pkt(pkt);
-> =20
->  =09=09/* Only accept correctly addressed packets */
-> -=09=09if (le64_to_cpu(pkt->hdr.src_cid) =3D=3D vsock->guest_cid)
-> +=09=09if (le64_to_cpu(pkt->hdr.src_cid) =3D=3D vsock->guest_cid &&
-> +=09=09    le64_to_cpu(pkt->hdr.dst_cid) =3D=3D
-> +=09=09    vhost_transport_get_local_cid())
->  =09=09=09virtio_transport_recv_pkt(&vhost_transport, pkt);
->  =09=09else
->  =09=09=09virtio_transport_free_pkt(pkt);
-> --=20
-> 2.23.0
+In both cases the packet may be delivered to the wrong socket in the
+host, because in the virtio_transport_recv_pkt() we are using the
+src_cid and dst_cid to look for the socket where to queue the packet.
+
+> Everyone else just passes the known host cid ...
+
+Yes, good guests should do it, and we do it :-)
+
+Thanks,
+Stefano
 
