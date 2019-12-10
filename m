@@ -2,217 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 249A4117E31
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 04:33:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3B5F117E4A
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 04:40:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbfLJDd1 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 9 Dec 2019 22:33:27 -0500
-Received: from mga01.intel.com ([192.55.52.88]:36612 "EHLO mga01.intel.com"
+        id S1726771AbfLJDkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Dec 2019 22:40:40 -0500
+Received: from foss.arm.com ([217.140.110.172]:55806 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726619AbfLJDd0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Dec 2019 22:33:26 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Dec 2019 19:33:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,298,1571727600"; 
-   d="scan'208";a="264436382"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Dec 2019 19:33:26 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 9 Dec 2019 19:33:26 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Mon, 9 Dec 2019 19:33:25 -0800
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Mon, 9 Dec 2019 19:33:25 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.19]) with mapi id 14.03.0439.000;
- Tue, 10 Dec 2019 11:33:23 +0800
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Parav Pandit <parav@mellanox.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        Jiri Pirko <jiri@mellanox.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Topic: [PATCH 0/6] VFIO mdev aggregated resources handling
-Thread-Index: AQHViikbbkH6FUlQ7kukEPc4R6T+S6d/vAGAgADEB4CAKXgtAIAA0ZQAgADYDgCAANsiAIAAnz8AgAXdxLA=
-Date:   Tue, 10 Dec 2019 03:33:23 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D636944@SHSMSX104.ccr.corp.intel.com>
-References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
- <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191108081925.GH4196@zhen-hp.sh.intel.com>
- <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191205060618.GD4196@zhen-hp.sh.intel.com>
- <AM0PR05MB4866C265B6C9D521A201609DD15C0@AM0PR05MB4866.eurprd05.prod.outlook.com>
- <20191206080354.GA15502@zhen-hp.sh.intel.com>
- <79d0ca87-c6c7-18d5-6429-bb20041646ff@mellanox.com>
-In-Reply-To: <79d0ca87-c6c7-18d5-6429-bb20041646ff@mellanox.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGE5NDBkNjUtODZmMC00OWU5LThlMjMtYTY4MDY0NWE0NWRjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNXNnKzB2eU8waGZ1UnRERk1ocktSeGtXUDNJMW00TXdzS0RuQU9FRzBXWlFFWTArcUd0Y0s4ZHNmSXdoS3I1ZSJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+        id S1726623AbfLJDkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Dec 2019 22:40:40 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 592601FB;
+        Mon,  9 Dec 2019 19:40:39 -0800 (PST)
+Received: from entos-d05.shanghai.arm.com (entos-d05.shanghai.arm.com [10.169.40.35])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 27C973F52E;
+        Mon,  9 Dec 2019 19:40:33 -0800 (PST)
+From:   Jianyong Wu <jianyong.wu@arm.com>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, maz@kernel.org,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, steven.price@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, Kaly.Xin@arm.com, justin.he@arm.com,
+        jianyong.wu@arm.com, nd@arm.com
+Subject: [RFC PATCH v9 0/8] Enable ptp_kvm for arm64
+Date:   Tue, 10 Dec 2019 11:40:18 +0800
+Message-Id: <20191210034026.45229-1-jianyong.wu@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Parav Pandit <parav@mellanox.com>
-> Sent: Saturday, December 7, 2019 1:34 AM
-> 
-> On 12/6/2019 2:03 AM, Zhenyu Wang wrote:
-> > On 2019.12.05 18:59:36 +0000, Parav Pandit wrote:
-> >>>>
-> >>>>> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:
-> >>>>>> Hi,
-> >>>>>>
-> >>>>>>> -----Original Message-----
-> >>>>>>> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org>
-> On
-> >>>>>>> Behalf Of Zhenyu Wang
-> >>>>>>> Sent: Thursday, October 24, 2019 12:08 AM
-> >>>>>>> To: kvm@vger.kernel.org
-> >>>>>>> Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
-> >>>>>>> kevin.tian@intel.com; cohuck@redhat.com
-> >>>>>>> Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
-> >>>>>>>
-> >>>>>>> Hi,
-> >>>>>>>
-> >>>>>>> This is a refresh for previous send of this series. I got
-> >>>>>>> impression that some SIOV drivers would still deploy their own
-> >>>>>>> create and config method so stopped effort on this. But seems
-> >>>>>>> this would still be useful for some other SIOV driver which may
-> >>>>>>> simply want capability to aggregate resources. So here's refreshed
-> >>> series.
-> >>>>>>>
-> >>>>>>> Current mdev device create interface depends on fixed mdev type,
-> >>>>>>> which get uuid from user to create instance of mdev device. If
-> >>>>>>> user wants to use customized number of resource for mdev device,
-> >>>>>>> then only can create new
-> >>>>>> Can you please give an example of 'resource'?
-> >>>>>> When I grep [1], [2] and [3], I couldn't find anything related to '
-> >>> aggregate'.
-> >>>>>
-> >>>>> The resource is vendor device specific, in SIOV spec there's ADI
-> >>>>> (Assignable Device Interface) definition which could be e.g queue
-> >>>>> for net device, context for gpu, etc. I just named this interface as
-> >>> 'aggregate'
-> >>>>> for aggregation purpose, it's not used in spec doc.
-> >>>>>
-> >>>>
-> >>>> Some 'unknown/undefined' vendor specific resource just doesn't work.
-> >>>> Orchestration tool doesn't know which resource and what/how to
-> configure
-> >>> for which vendor.
-> >>>> It has to be well defined.
-> >>>>
-> >>>> You can also find such discussion in recent lgpu DRM cgroup patches
-> series
-> >>> v4.
-> >>>>
-> >>>> Exposing networking resource configuration in non-net namespace
-> aware
-> >>> mdev sysfs at PCI device level is no-go.
-> >>>> Adding per file NET_ADMIN or other checks is not the approach we
-> follow in
-> >>> kernel.
-> >>>>
-> >>>> devlink has been a subsystem though under net, that has very rich
-> interface
-> >>> for syscaller, device health, resource management and many more.
-> >>>> Even though it is used by net driver today, its written for generic device
-> >>> management at bus/device level.
-> >>>>
-> >>>> Yuval has posted patches to manage PCI sub-devices [1] and updated
-> version
-> >>> will be posted soon which addresses comments.
-> >>>>
-> >>>> For any device slice resource management of mdev, sub-function etc,
-> we
-> >>> should be using single kernel interface as devlink [2], [3].
-> >>>>
-> >>>> [1]
-> >>>> https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-
-> yuval
-> >>>> av@mellanox.com/ [2]
-> >>>> http://man7.org/linux/man-pages/man8/devlink-dev.8.html
-> >>>> [3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
-> >>>>
-> >>>> Most modern device configuration that I am aware of is usually done
-> via well
-> >>> defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and
-> more) or
-> >>> via netlink commands (net, devlink, rdma and more) not via sysfs.
-> >>>>
-> >>>
-> >>> Current vfio/mdev configuration is via documented sysfs ABI instead of
-> other
-> >>> ways. So this adhere to that way to introduce more configurable method
-> on
-> >>> mdev device for standard, it's optional and not actually vendor specific
-> e.g vfio-
-> >>> ap.
-> >>>
-> >> Some unknown/undefined resource as 'aggregate' is just not an ABI.
-> >> It has to be well defined, as 'hardware_address', 'num_netdev_sqs' or
-> something similar appropriate to that mdev device class.
-> >> If user wants to set a parameter for a mdev regardless of vendor, they
-> must have single way to do so.
-> >
-> > The idea is not specific for some device class, but for each mdev
-> > type's resource, and be optional for each vendor. If more device class
-> > specific way is preferred, then we might have very different ways for
-> > different vendors. Better to avoid that, so here means to aggregate
-> > number of mdev type's resources for target instance, instead of defining
-> > kinds of mdev types for those number of resources.
-> >
-> Parameter or attribute certainly can be optional.
-> But the way to aggregate them should not be vendor specific.
-> Look for some excellent existing examples across subsystems, for example
-> how you create aggregated netdev or block device is not depend on vendor
-> or underlying device type.
+kvm ptp targets to provide high precision time sync between guest
+and host in virtualization environment. Here, we enable kvm ptp
+for arm64.
+This patch set base on [1][2][3]
 
-I'd like to hear Alex's opinion on this. Today VFIO mdev supports two styles
-of "types" imo: fixed resource definition (most cases) and dynamic resource 
-definition (vfio-ap). In fixed style, a type has fixed association to a set of 
-vendor specific resources (resourceX=M, resourceY=N, ...). In dynamic case, 
-the user is allowed to specify actual resource X/Y/... backing the mdev 
-instance post its creation. In either case, the way to identify such association 
-or configurable knobs is vendor specific, maybe contained in optional 
-attributes (name and description) plus additional info in vendor documents.
+change log:
 
-Then the user is assumed to clearly understand the implication of the resource
-allocation under a given type, when creating a new mdev under this type.
+from v8 to v9:
+	(1) move ptp_kvm.h to driver/ptp/
+	(2) replace license declaration of ptp_kvm.h the same with other
+header files in the same directory.
 
-If this assumption holds true, the aggregated attribute simply provides an
-extension in the same direction of fixed-style types but allowing for more 
-flexible linearly-increasing resource allocation. e.g. when using aggregate=2, 
-it means creating a instance with resourceX=2M, resourceY=2N, ... under 
-the specified type. Along this direction I didn't see the need of well-defined 
-vendor specific attributes here. When those are actually required, I suppose 
-the dynamic style would better fit. Or if the vendor driver thinks implementing 
-such aggregate feature will confuse its type definition, it's optional to not 
-doing so anyway.
+from v7 to v8:
+        (1) separate adding clocksource id for arm_arch_counter as a
+single patch.
+        (2) update commit message for patch 4/8.
+        (3) refine patch 7/8 and patch 8/8 to make them more independent.
 
-Thanks
-Kevin
+from v6 to v7:
+        (1) include the omitted clocksource_id.h in last version.
+        (2) reorder the header file in patch.
+        (3) refine some words in commit message to make it more impersonal.
+
+from v5 to v6:
+        (1) apply Mark's patch[4] to get SMCCC conduit.
+        (2) add mechanism to recognize current clocksource by add
+clocksouce_id value into struct clocksource instead of method in patch-v5.
+        (3) rename kvm_arch_ptp_get_clock_fn into
+kvm_arch_ptp_get_crosststamp.
+
+from v4 to v5:
+        (1) remove hvc delay compensasion as it should leave to userspace.
+        (2) check current clocksource in hvc call service.
+        (3) expose current clocksource by adding it to
+system_time_snapshot.
+        (4) add helper to check if clocksource is arm_arch_counter.
+        (5) rename kvm_ptp.c to ptp_kvm_common.c
+
+from v3 to v4:
+        (1) fix clocksource of ptp_kvm to arch_sys_counter.
+        (2) move kvm_arch_ptp_get_clock_fn into arm_arch_timer.c
+        (3) subtract cntvoff before return cycles from host.
+        (4) use ktime_get_snapshot instead of getnstimeofday and
+get_current_counterval to return time and counter value.
+        (5) split ktime and counter into two 32-bit block respectively
+to avoid Y2038-safe issue.
+        (6) set time compensation to device time as half of the delay of
+hvc call.
+        (7) add ARM_ARCH_TIMER as dependency of ptp_kvm for
+arm64.
+
+from v2 to v3:
+        (1) fix some issues in commit log.
+        (2) add some receivers in send list.
+
+from v1 to v2:
+        (1) move arch-specific code from arch/ to driver/ptp/
+        (2) offer mechanism to inform userspace if ptp_kvm service is
+available.
+        (3) separate ptp_kvm code for arm64 into hypervisor part and
+guest part.
+        (4) add API to expose monotonic clock and counter value.
+        (5) refine code: remove no necessary part and reconsitution.
+
+[1]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=125ea89e4a21e2fc5235410f966a996a1a7148bf
+[2]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=464f5a1741e5959c3e4d2be1966ae0093b4dce06
+[3]https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/
+commit/?h=kvm/hvc&id=6597490e005d0eeca8ed8c1c1d7b4318ee014681
+[4]https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/
+commit/?h=for-next/smccc-conduit-cleanup&id=6b7fe77c334ae59fed9500140e08f4f896b36871
+
+Jianyong Wu (6):
+  psci: let arm_smccc_1_1_invoke available by modules
+  ptp: Reorganize ptp_kvm modules to make it arch-independent.
+  clocksource: Add clocksource id for arm arch counter
+  psci: Add hvc call service for ptp_kvm.
+  ptp: arm64: Enable ptp_kvm for arm64
+  kvm: arm64: Add capability check extension for ptp_kvm
+
+Mark Rutland (1):
+  arm/arm64: smccc/psci: add arm_smccc_1_1_get_conduit()
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+ drivers/clocksource/arm_arch_timer.c        | 24 ++++++
+ drivers/firmware/psci/psci.c                | 16 ++++
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  1 +
+ drivers/ptp/ptp_kvm.h                       | 11 +++
+ drivers/ptp/ptp_kvm_arm64.c                 | 53 +++++++++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 77 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 87 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 30 ++++++-
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 13 +++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  3 +
+ kernel/time/timekeeping.c                   |  1 +
+ virt/kvm/arm/arm.c                          |  1 +
+ virt/kvm/arm/psci.c                         | 22 ++++++
+ 17 files changed, 294 insertions(+), 66 deletions(-)
+ create mode 100644 drivers/ptp/ptp_kvm.h
+ create mode 100644 drivers/ptp/ptp_kvm_arm64.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (63%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+
+-- 
+2.17.1
+
