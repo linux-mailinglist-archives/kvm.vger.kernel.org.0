@@ -2,117 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 64AA9118D28
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 17:02:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9749118D40
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 17:08:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727411AbfLJQCR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 11:02:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20897 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727178AbfLJQCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 11:02:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575993735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cmrUnVVfu+gicASXeQuwmvLpG3WehUtcphinC4uDACQ=;
-        b=Efr32DHdgvCyp/iJ1nYyqdMPtPhvgJhEHfKlrm58ZZSfPEM31oQhaeBFcyxsXc1/rUFzGT
-        dSyEonrqep5RrWOGF+QlxQ2YRsPPg6sOZf6qwOgimbHRTbKLbcTzTkv8VQ/7ZuZlOrfim4
-        wPZ/tV/DIp0ZoTRuZ9hXAUHYz/eI9Lw=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-8Vcujk8jPumyUNV9fPe-Nw-1; Tue, 10 Dec 2019 11:02:14 -0500
-Received: by mail-qt1-f197.google.com with SMTP id d9so2193840qtq.13
-        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 08:02:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=KTRO4sKa0TSsx0s4k8rd2usE0Lc8/iEKmdicKPLyJcY=;
-        b=Fys/ISOCwV5Ut6mp/7f+jpUcNCUPyxYBhB+WvG13Hu8PZsPYXtrjOOQ4WzxMIOxTzx
-         ULe8KrNOjYtr+fRrfyKNbqyoOm7LpChLmQmhb4HOHg7pmJ6RNZfVG2F00yalOFpwfRdy
-         Vv5mvsKDGPK2YW6zUMWKTB75VHzrgqLvcOIpEFD/fpM1B7wC2thtTgsUa2YYM8OxBxtU
-         lb9Aiv10SkaoTMwvIAt4IEB/uE8LI8T2mQpDWQHjKI7tbDPWz6k/DgXwnGXe4HA6WJA+
-         jcOJQ088sqS6I8AXAKDfYqh26ALNzZKwZQgCuLgFl45WYAL57VB0Dropw5e2a4U8YBUC
-         YrRA==
-X-Gm-Message-State: APjAAAXTYMtMcz+K8BFdzI2GAcUejXQRgIbqA1/ZIkiBsEXuUtTTAK7D
-        T9RSe+fWTOkM+h/1o7QfNywtt25LCSQp3uXMs7G9XWdAmrlIPQF8mNyrCTsDUA0s05QZEEro/EY
-        HE/0Kp0ua3RBN
-X-Received: by 2002:ac8:6908:: with SMTP id e8mr18354345qtr.124.1575993733841;
-        Tue, 10 Dec 2019 08:02:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzFY9Zu4KFA0Cgq3rNYhbKTV85FtEH60qO0JD/0nPDQokpcMpqEq1wyebMhUioLku1+qtqLKg==
-X-Received: by 2002:ac8:6908:: with SMTP id e8mr18354311qtr.124.1575993733549;
-        Tue, 10 Dec 2019 08:02:13 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id x32sm1237252qtx.84.2019.12.10.08.02.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Dec 2019 08:02:12 -0800 (PST)
-Date:   Tue, 10 Dec 2019 11:02:11 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191210160211.GE3352@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <1355422f-ab62-9dc3-2b48-71a6e221786b@redhat.com>
- <a3e83e6b-4bfa-3a6b-4b43-5dd451e03254@redhat.com>
- <20191210081958-mutt-send-email-mst@kernel.org>
- <8843d1c8-1c87-e789-9930-77e052bf72f9@redhat.com>
+        id S1727514AbfLJQIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 11:08:19 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:7041 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727178AbfLJQIT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 11:08:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1575994097; x=1607530097;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=uvB7xnkSnsEw+GrrnNatJiopzdUBiH1mP8A1khdgfVI=;
+  b=Mh+0ErAW8SdVRdQ4svgoU39+ylssuV0MFp1kNTCsyowgOuhXxy41fVzk
+   sgTmsF2talYcmd+DJvpmHVT0tgRNiCc7Yf3XaUpy+M/EXmchZMjkKcM3t
+   wYNkEhH8ZUfrGZGXLxZotdxItuXqJFXC+xecgFRwjbOcObFfqVpp0ujgd
+   8=;
+IronPort-SDR: 2VVPu23ZC1Ja977LBpFcQX7CisdfapsSVh/YguNp0QzWR639Z6+3Fvyz1Ocs4PG6vwoiLHz/is
+ nJOZ+fxbVFQw==
+X-IronPort-AV: E=Sophos;i="5.69,300,1571702400"; 
+   d="scan'208";a="12699808"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 10 Dec 2019 16:07:38 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan3.pdx.amazon.com [10.170.41.166])
+        by email-inbound-relay-2a-90c42d1d.us-west-2.amazon.com (Postfix) with ESMTPS id 3295FA0376;
+        Tue, 10 Dec 2019 16:07:38 +0000 (UTC)
+Received: from EX13D27EUB004.ant.amazon.com (10.43.166.152) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 10 Dec 2019 16:07:37 +0000
+Received: from uc3ce012741425f.ant.amazon.com (10.43.162.171) by
+ EX13D27EUB004.ant.amazon.com (10.43.166.152) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 10 Dec 2019 16:07:34 +0000
+From:   Milan Pandurov <milanpa@amazon.de>
+To:     <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <graf@amazon.de>,
+        <borntraeger@de.ibm.com>
+Subject: [PATCH] kvm: Refactor handling of VM debugfs files
+Date:   Tue, 10 Dec 2019 17:07:24 +0100
+Message-ID: <20191210160724.1030-1-milanpa@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <8843d1c8-1c87-e789-9930-77e052bf72f9@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-MC-Unique: 8Vcujk8jPumyUNV9fPe-Nw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain
+X-Originating-IP: [10.43.162.171]
+X-ClientProxiedBy: EX13D07UWB003.ant.amazon.com (10.43.161.66) To
+ EX13D27EUB004.ant.amazon.com (10.43.166.152)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 02:31:54PM +0100, Paolo Bonzini wrote:
-> On 10/12/19 14:25, Michael S. Tsirkin wrote:
-> >> There is no new infrastructure to track the dirty pages---it's just a
-> >> different way to pass them to userspace.
-> > Did you guys consider using one of the virtio ring formats?
-> > Maybe reusing vhost code?
->=20
-> There are no used/available entries here, it's unidirectional
-> (kernel->user).
+By storing kvm_stat_kind inside kvm_stat_data struct we can remove
+duplicated code and remove usage of temporary kvm_stat_data struct
+inside vm_stat_get et al.
 
-Agreed.  Vring could be an overkill IMHO (the whole dirty_ring.c is
-100+ LOC only).
+Signed-off-by: Milan Pandurov <milanpa@amazon.de>
+---
+ include/linux/kvm_host.h |   1 +
+ virt/kvm/kvm_main.c      | 118 +++++++++++++++++----------------------
+ 2 files changed, 53 insertions(+), 66 deletions(-)
 
->=20
-> > If you did and it's not a good fit, this is something good to mention
-> > in the commit log.
-> >=20
-> > I also wonder about performance numbers - any data here?
->=20
-> Yes some numbers would be useful.  Note however that the improvement is
-> asymptotical, O(#dirtied pages) vs O(#total pages) so it may differ
-> depending on the workload.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7ed1e2f8641e..212d5117efda 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1112,6 +1112,7 @@ struct kvm_stat_data {
+ 	int offset;
+ 	int mode;
+ 	struct kvm *kvm;
++	enum kvm_stat_kind kind;
+ };
+ 
+ struct kvm_stats_debugfs_item {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 00268290dcbd..155f144fcc7c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -113,7 +113,7 @@ struct dentry *kvm_debugfs_dir;
+ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+ 
+ static int kvm_debugfs_num_entries;
+-static const struct file_operations *stat_fops_per_vm[];
++static const struct file_operations stat_fops_per_vm;
+ 
+ static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+ 			   unsigned long arg);
+@@ -652,9 +652,10 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 		stat_data->kvm = kvm;
+ 		stat_data->offset = p->offset;
+ 		stat_data->mode = p->mode ? p->mode : 0644;
++		stat_data->kind = p->kind;
+ 		kvm->debugfs_stat_data[p - debugfs_entries] = stat_data;
+ 		debugfs_create_file(p->name, stat_data->mode, kvm->debugfs_dentry,
+-				    stat_data, stat_fops_per_vm[p->kind]);
++				    stat_data, &stat_fops_per_vm);
+ 	}
+ 	return 0;
+ }
+@@ -4033,105 +4034,96 @@ static int kvm_debugfs_release(struct inode *inode, struct file *file)
+ 	return 0;
+ }
+ 
+-static int vm_stat_get_per_vm(void *data, u64 *val)
++static int kvm_get_stat_per_vm(struct kvm *kvm, size_t offset, u64 *val)
+ {
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+-
+-	*val = *(ulong *)((void *)stat_data->kvm + stat_data->offset);
++	*val = *(ulong *)((void *)kvm + offset);
+ 
+ 	return 0;
+ }
+ 
+-static int vm_stat_clear_per_vm(void *data, u64 val)
++static int kvm_clear_stat_per_vm(struct kvm *kvm, size_t offset)
+ {
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+-
+-	if (val)
+-		return -EINVAL;
+-
+-	*(ulong *)((void *)stat_data->kvm + stat_data->offset) = 0;
++	*(ulong *)((void *)kvm + offset) = 0;
+ 
+ 	return 0;
+ }
+ 
+-static int vm_stat_get_per_vm_open(struct inode *inode, struct file *file)
+-{
+-	__simple_attr_check_format("%llu\n", 0ull);
+-	return kvm_debugfs_open(inode, file, vm_stat_get_per_vm,
+-				vm_stat_clear_per_vm, "%llu\n");
+-}
+-
+-static const struct file_operations vm_stat_get_per_vm_fops = {
+-	.owner   = THIS_MODULE,
+-	.open    = vm_stat_get_per_vm_open,
+-	.release = kvm_debugfs_release,
+-	.read    = simple_attr_read,
+-	.write   = simple_attr_write,
+-	.llseek  = no_llseek,
+-};
+-
+-static int vcpu_stat_get_per_vm(void *data, u64 *val)
++static int kvm_get_stat_per_vcpu(struct kvm *kvm, size_t offset, u64 *val)
+ {
+ 	int i;
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+ 	struct kvm_vcpu *vcpu;
+ 
+ 	*val = 0;
+ 
+-	kvm_for_each_vcpu(i, vcpu, stat_data->kvm)
+-		*val += *(u64 *)((void *)vcpu + stat_data->offset);
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		*val += *(u64 *)((void *)vcpu + offset);
+ 
+ 	return 0;
+ }
+ 
+-static int vcpu_stat_clear_per_vm(void *data, u64 val)
++static int kvm_clear_stat_per_vcpu(struct kvm *kvm, size_t offset)
+ {
+ 	int i;
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+ 	struct kvm_vcpu *vcpu;
+ 
+-	if (val)
+-		return -EINVAL;
+-
+-	kvm_for_each_vcpu(i, vcpu, stat_data->kvm)
+-		*(u64 *)((void *)vcpu + stat_data->offset) = 0;
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		*(u64 *)((void *)vcpu + offset) = 0;
+ 
+ 	return 0;
+ }
+ 
+-static int vcpu_stat_get_per_vm_open(struct inode *inode, struct file *file)
++struct kvm_stat_operations {
++	int (*get)(struct kvm *kvm, size_t offset, u64 *val);
++	int (*clear)(struct kvm *kvm, size_t offset);
++};
++
++static const struct kvm_stat_operations kvm_stat_ops[] = {
++	[KVM_STAT_VM] = { .get = kvm_get_stat_per_vm,
++			  .clear = kvm_clear_stat_per_vm },
++	[KVM_STAT_VCPU] = { .get = kvm_get_stat_per_vcpu,
++			    .clear = kvm_clear_stat_per_vcpu },
++};
++
++static int kvm_stat_data_get(void *data, u64 *val)
++{
++	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
++	return kvm_stat_ops[stat_data->kind].get(stat_data->kvm,
++						 stat_data->offset, val);
++}
++
++static int kvm_stat_data_clear(void *data, u64 val)
++{
++	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
++	return kvm_stat_ops[stat_data->kind].clear(stat_data->kvm,
++						   stat_data->offset);
++}
++
++static int kvm_stat_data_open(struct inode *inode, struct file *file)
+ {
+ 	__simple_attr_check_format("%llu\n", 0ull);
+-	return kvm_debugfs_open(inode, file, vcpu_stat_get_per_vm,
+-				 vcpu_stat_clear_per_vm, "%llu\n");
++	return kvm_debugfs_open(inode, file, kvm_stat_data_get,
++				kvm_stat_data_clear, "%llu\n");
+ }
+ 
+-static const struct file_operations vcpu_stat_get_per_vm_fops = {
+-	.owner   = THIS_MODULE,
+-	.open    = vcpu_stat_get_per_vm_open,
++static const struct file_operations stat_fops_per_vm = {
++	.owner = THIS_MODULE,
++	.open = kvm_stat_data_open,
+ 	.release = kvm_debugfs_release,
+-	.read    = simple_attr_read,
+-	.write   = simple_attr_write,
+-	.llseek  = no_llseek,
+-};
+-
+-static const struct file_operations *stat_fops_per_vm[] = {
+-	[KVM_STAT_VCPU] = &vcpu_stat_get_per_vm_fops,
+-	[KVM_STAT_VM]   = &vm_stat_get_per_vm_fops,
++	.read = simple_attr_read,
++	.write = simple_attr_write,
++	.llseek = no_llseek,
+ };
+ 
+ static int vm_stat_get(void *_offset, u64 *val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+ 
+ 	*val = 0;
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vm_stat_get_per_vm((void *)&stat_tmp, &tmp_val);
++		vm_stat_get_per_vm(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+ 	mutex_unlock(&kvm_lock);
+@@ -4142,15 +4134,13 @@ static int vm_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vm_stat_clear_per_vm((void *)&stat_tmp, 0);
++		vm_stat_clear_per_vm(kvm, offset);
+ 	}
+ 	mutex_unlock(&kvm_lock);
+ 
+@@ -4163,14 +4153,12 @@ static int vcpu_stat_get(void *_offset, u64 *val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+ 
+ 	*val = 0;
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vcpu_stat_get_per_vm((void *)&stat_tmp, &tmp_val);
++		vcpu_stat_get_per_vm(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+ 	mutex_unlock(&kvm_lock);
+@@ -4181,15 +4169,13 @@ static int vcpu_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vcpu_stat_clear_per_vm((void *)&stat_tmp, 0);
++		kvm_clear_stat_per_vcpu(kvm, offset);
+ 	}
+ 	mutex_unlock(&kvm_lock);
+ 
+-- 
+2.17.1
 
-Yes.  I plan to give some numbers when start to work on the QEMU
-series (after this lands).  However as Paolo said, those numbers would
-probably only be with some special case where I know the dirty ring
-could win.  Frankly speaking I don't even know whether we should
-change the default logging mode when the QEMU work is done - I feel
-like the old logging interface is still good in many major cases
-(small vms, or high dirty rates).  It could be that we just offer
-another option when the user could consider to solve specific problems.
 
-Thanks,
 
---=20
-Peter Xu
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
