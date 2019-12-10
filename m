@@ -2,204 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E0CA118A08
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 14:39:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC787118A62
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 15:06:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727381AbfLJNjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 08:39:41 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40646 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727145AbfLJNjk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 08:39:40 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 816B4B016;
-        Tue, 10 Dec 2019 13:39:35 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id AF0221E0B23; Tue, 10 Dec 2019 14:39:32 +0100 (CET)
-Date:   Tue, 10 Dec 2019 14:39:32 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v8 24/26] mm/gup: track FOLL_PIN pages
-Message-ID: <20191210133932.GH1551@quack2.suse.cz>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
- <20191209225344.99740-25-jhubbard@nvidia.com>
+        id S1727456AbfLJOGG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 09:06:06 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48058 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727320AbfLJOGG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 09:06:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1575986764;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9cYSQHCTDQkKzmRIgQpyk3DnPt+k/A4ckdhU2f8Or6g=;
+        b=aezCjhcsuEiduFAdc2wCO4KzHE3M4abW/uEsH5HsjXtSuy6FEqIWYh3Pf+Es31LRm+pv/q
+        YHSbh1oOxAs3iQFQ7P3W6gwoFy94IO6Lp6MT6DLcskqtS82l2juVYq+lq1/xigsCaX1UG8
+        18WGMfbaf+xKp/XTw6M9U0KXdNRrLpQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-2ljB4v-zNo-9ifNeWLMFpA-1; Tue, 10 Dec 2019 09:06:03 -0500
+Received: by mail-wm1-f69.google.com with SMTP id p2so1049290wma.3
+        for <kvm@vger.kernel.org>; Tue, 10 Dec 2019 06:06:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=CI3qbc7xp4DF6AaDOfblCvC5kTkzEe7UO4aRTK6V7jk=;
+        b=ASNWJm4yH/HSH2pw8dQePih+Tm4kTd4iG0442iclzxPq9+W+0qCVcsDxZ+SDtRW2iC
+         3kikIyMaHfciBY1mpb+VGSkp5FaFoSXy+AoQz34nsv4r8T8u2c+M8n847N1qu/SgYjJX
+         nXf1ij4yQEUXSKZAasaDzkycP9kU118HaPsV4s+Thl1+W2DPGz6NjymRn4V38223cZ2Y
+         ROV2fYYWaezwcVxvdH+0sQd9vnzeXJsoVOIE7F3uTyFnBI4BEalvH/NQZaAl4WtVh21Q
+         NiadkSyBJiCq7T5upnicEC8d2SfqFeLgVTyIDnfnRgnG7nWM0LEzfm7pdBajgjXjhvu4
+         9pjw==
+X-Gm-Message-State: APjAAAWjVUkCn6DdLw4JdpMTaWFwc2OzVn1Qi37gkz99kL/4yFzls9te
+        oD60AVI8TIf7YR2prlS4DvptdgnT0r2onUMyVEEcClON37fh6a9xiMv9/iAgTmoPl5V/tqsEsH+
+        /ormcApqX2zLF
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr5415229wmm.70.1575986762125;
+        Tue, 10 Dec 2019 06:06:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzt2DwRGDx/tfuLDX74AYEnOhZaQrk2tBhSVe7oGiWrvR5kBtkcogM60airAVN4tsBt+f/Tiw==
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr5415198wmm.70.1575986761941;
+        Tue, 10 Dec 2019 06:06:01 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id a5sm3131833wmb.37.2019.12.10.06.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2019 06:06:01 -0800 (PST)
+Date:   Tue, 10 Dec 2019 09:05:58 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: accept only packets with the right dst_cid
+Message-ID: <20191210090505-mutt-send-email-mst@kernel.org>
+References: <20191206143912.153583-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20191206143912.153583-1-sgarzare@redhat.com>
+X-MC-Unique: 2ljB4v-zNo-9ifNeWLMFpA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191209225344.99740-25-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon 09-12-19 14:53:42, John Hubbard wrote:
-> Add tracking of pages that were pinned via FOLL_PIN.
-> 
-> As mentioned in the FOLL_PIN documentation, callers who effectively set
-> FOLL_PIN are required to ultimately free such pages via unpin_user_page().
-> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
-> for DIO and/or RDMA use".
-> 
-> Pages that have been pinned via FOLL_PIN are identifiable via a
-> new function call:
-> 
->    bool page_dma_pinned(struct page *page);
-> 
-> What to do in response to encountering such a page, is left to later
-> patchsets. There is discussion about this in [1], [2], and [3].
-> 
-> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
-> 
-> [1] Some slow progress on get_user_pages() (Apr 2, 2019):
->     https://lwn.net/Articles/784574/
-> [2] DMA and get_user_pages() (LPC: Dec 12, 2018):
->     https://lwn.net/Articles/774411/
-> [3] The trouble with get_user_pages() (Apr 30, 2018):
->     https://lwn.net/Articles/753027/
-> 
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+On Fri, Dec 06, 2019 at 03:39:12PM +0100, Stefano Garzarella wrote:
+> When we receive a new packet from the guest, we check if the
+> src_cid is correct, but we forgot to check the dst_cid.
+>=20
+> The host should accept only packets where dst_cid is
+> equal to the host CID.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Looks nice, some comments below...
+what's the implication of processing incorrect dst cid?
+I think mostly it's malformed guests, right?
+Everyone else just passes the known host cid ...
 
-> +/*
-> + * try_grab_compound_head() - attempt to elevate a page's refcount, by a
-> + * flags-dependent amount.
-> + *
-> + * This has a default assumption of "use FOLL_GET behavior, if FOLL_PIN is not
-> + * set".
-> + *
-> + * "grab" names in this file mean, "look at flags to decide with to use FOLL_PIN
-> + * or FOLL_GET behavior, when incrementing the page's refcount.
-> + */
-> +static struct page *try_grab_compound_head(struct page *page, int refs,
-> +					   unsigned int flags)
-> +{
-> +	if (flags & FOLL_PIN)
-> +		return try_pin_compound_head(page, refs);
-> +
-> +	return try_get_compound_head(page, refs);
-> +}
-> +
-> +/**
-> + * grab_page() - elevate a page's refcount by a flag-dependent amount
-> + *
-> + * This might not do anything at all, depending on the flags argument.
-> + *
-> + * "grab" names in this file mean, "look at flags to decide with to use FOLL_PIN
-                                                               ^^^ whether
+> ---
+>  drivers/vhost/vsock.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index 50de0642dea6..c2d7d57e98cf 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -480,7 +480,9 @@ static void vhost_vsock_handle_tx_kick(struct vhost_w=
+ork *work)
+>  =09=09virtio_transport_deliver_tap_pkt(pkt);
+> =20
+>  =09=09/* Only accept correctly addressed packets */
+> -=09=09if (le64_to_cpu(pkt->hdr.src_cid) =3D=3D vsock->guest_cid)
+> +=09=09if (le64_to_cpu(pkt->hdr.src_cid) =3D=3D vsock->guest_cid &&
+> +=09=09    le64_to_cpu(pkt->hdr.dst_cid) =3D=3D
+> +=09=09    vhost_transport_get_local_cid())
+>  =09=09=09virtio_transport_recv_pkt(&vhost_transport, pkt);
+>  =09=09else
+>  =09=09=09virtio_transport_free_pkt(pkt);
+> --=20
+> 2.23.0
 
-> + * or FOLL_GET behavior, when incrementing the page's refcount.
-> + *
-> + * @page:	pointer to page to be grabbed
-> + * @flags:	gup flags: these are the FOLL_* flag values.
-> + *
-> + * Either FOLL_PIN or FOLL_GET (or neither) may be set, but not both at the same
-> + * time. (That's true throughout the get_user_pages*() and pin_user_pages*()
-> + * APIs.) Cases:
-> + *
-> + *	FOLL_GET: page's refcount will be incremented by 1.
-> + *	FOLL_PIN: page's refcount will be incremented by GUP_PIN_COUNTING_BIAS.
-> + */
-> +void grab_page(struct page *page, unsigned int flags)
-> +{
-> +	if (flags & FOLL_GET)
-> +		get_page(page);
-> +	else if (flags & FOLL_PIN) {
-> +		get_page(page);
-> +		WARN_ON_ONCE(flags & FOLL_GET);
-> +		/*
-> +		 * Use get_page(), above, to do the refcount error
-> +		 * checking. Then just add in the remaining references:
-> +		 */
-> +		page_ref_add(page, GUP_PIN_COUNTING_BIAS - 1);
-
-This is wrong for two reasons:
-
-1) You miss compound_head() indirection from get_page() for this
-page_ref_add().
-
-2) page_ref_add() could overflow the counter without noticing.
-
-Especially with GUP_PIN_COUNTING_BIAS being non-trivial, it is realistic
-that an attacker might try to overflow the page refcount and we have to
-protect the kernel against that. So I think that all the places that would
-use grab_page() actually need to use try_grab_page() and then gracefully
-deal with the failure.
-
-> @@ -278,11 +425,23 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
->  		goto retry;
->  	}
->  
-> -	if (flags & FOLL_GET) {
-> +	if (flags & (FOLL_PIN | FOLL_GET)) {
-> +		/*
-> +		 * Allow try_get_page() to take care of error handling, for
-> +		 * both cases: FOLL_GET or FOLL_PIN:
-> +		 */
->  		if (unlikely(!try_get_page(page))) {
->  			page = ERR_PTR(-ENOMEM);
->  			goto out;
->  		}
-> +
-> +		if (flags & FOLL_PIN) {
-> +			WARN_ON_ONCE(flags & FOLL_GET);
-> +
-> +			/* We got a +1 refcount from try_get_page(), above. */
-> +			page_ref_add(page, GUP_PIN_COUNTING_BIAS - 1);
-> +			__update_proc_vmstat(page, NR_FOLL_PIN_REQUESTED, 1);
-> +		}
->  	}
-
-The same problem here as above, plus this place should use the same
-try_grab..() helper, shouldn't it?
-
-> @@ -544,8 +703,8 @@ static struct page *follow_page_mask(struct vm_area_struct *vma,
->  	/* make this handle hugepd */
->  	page = follow_huge_addr(mm, address, flags & FOLL_WRITE);
->  	if (!IS_ERR(page)) {
-> -		BUG_ON(flags & FOLL_GET);
-> -		return page;
-> +		WARN_ON_ONCE(flags & (FOLL_GET | FOLL_PIN));
-> +		return NULL;
-
-I agree with the change to WARN_ON_ONCE but why is correct the change of
-the return value? Note that this is actually a "success branch".
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
