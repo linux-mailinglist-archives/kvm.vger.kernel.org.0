@@ -2,272 +2,334 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 86896119A7D
-	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 22:59:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5797B119B7E
+	for <lists+kvm@lfdr.de>; Tue, 10 Dec 2019 23:12:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726975AbfLJV7B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 16:59:01 -0500
-Received: from mga09.intel.com ([134.134.136.24]:4479 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726417AbfLJV7B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:59:01 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 13:59:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
-   d="scan'208";a="238317765"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Dec 2019 13:58:59 -0800
-Date:   Tue, 10 Dec 2019 13:58:59 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
-Subject: Re: [PATCH v8 7/7] KVM: X86: Add user-space access interface for CET
- MSRs
-Message-ID: <20191210215859.GO15758@linux.intel.com>
-References: <20191101085222.27997-1-weijiang.yang@intel.com>
- <20191101085222.27997-8-weijiang.yang@intel.com>
+        id S1730274AbfLJWIj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 17:08:39 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32055 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729524AbfLJWIh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 10 Dec 2019 17:08:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576015715;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kY3BO5aFYrGkSGGBQRkUuW9yofnr10ys5NZJbMnM5fE=;
+        b=XoONUhyzURnoCiHateOJuPvgQ0isVU4ZenkPToAZeK758wJH2vsjcM/Mbz2fudV5k+pgU0
+        hfakSYHZb4f/zngLkIVAsaQPPRUOC/7TRchLqI9Zh/q/zfq12yO15Pr71V0wN4dZVnu8go
+        TY/vOVhYqj+xhl5heBYNslOZUV4X11I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-YoiQpxrPOlGCVDNV8ybz_w-1; Tue, 10 Dec 2019 17:08:32 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A35B1005514;
+        Tue, 10 Dec 2019 22:08:30 +0000 (UTC)
+Received: from x1.home (ovpn04.gateway.prod.ext.phx2.redhat.com [10.5.9.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 258D919C6A;
+        Tue, 10 Dec 2019 22:08:27 +0000 (UTC)
+Date:   Tue, 10 Dec 2019 15:08:26 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        Jiri Pirko <jiri@mellanox.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 0/6] VFIO mdev aggregated resources handling
+Message-ID: <20191210150826.4783496c@x1.home>
+In-Reply-To: <bb995805-eb50-83e4-883f-c8907a53af16@mellanox.com>
+References: <20191024050829.4517-1-zhenyuw@linux.intel.com>
+        <AM0PR05MB4866CA9B70A8BEC1868AF8C8D1780@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191108081925.GH4196@zhen-hp.sh.intel.com>
+        <AM0PR05MB4866757033043CC007B5C9CBD15D0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191205060618.GD4196@zhen-hp.sh.intel.com>
+        <AM0PR05MB4866C265B6C9D521A201609DD15C0@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <20191206080354.GA15502@zhen-hp.sh.intel.com>
+        <79d0ca87-c6c7-18d5-6429-bb20041646ff@mellanox.com>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D636944@SHSMSX104.ccr.corp.intel.com>
+        <20191210120747.4530f046@x1.home>
+        <bb995805-eb50-83e4-883f-c8907a53af16@mellanox.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191101085222.27997-8-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: YoiQpxrPOlGCVDNV8ybz_w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 01, 2019 at 04:52:22PM +0800, Yang Weijiang wrote:
-> There're two different places storing Guest CET states, states
-> managed with XSAVES/XRSTORS, as restored/saved
-> in previous patch, can be read/write directly from/to the MSRs.
-> For those stored in VMCS fields, they're access via vmcs_read/
-> vmcs_write.
+On Tue, 10 Dec 2019 21:08:29 +0000
+Parav Pandit <parav@mellanox.com> wrote:
+
+> On 12/10/2019 1:07 PM, Alex Williamson wrote:
+> > On Tue, 10 Dec 2019 03:33:23 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >   
+> >>> From: Parav Pandit <parav@mellanox.com>
+> >>> Sent: Saturday, December 7, 2019 1:34 AM
+> >>>
+> >>> On 12/6/2019 2:03 AM, Zhenyu Wang wrote:    
+> >>>> On 2019.12.05 18:59:36 +0000, Parav Pandit wrote:    
+> >>>>>>>    
+> >>>>>>>> On 2019.11.07 20:37:49 +0000, Parav Pandit wrote:    
+> >>>>>>>>> Hi,
+> >>>>>>>>>    
+> >>>>>>>>>> -----Original Message-----
+> >>>>>>>>>> From: kvm-owner@vger.kernel.org <kvm-owner@vger.kernel.org>    
+> >>> On    
+> >>>>>>>>>> Behalf Of Zhenyu Wang
+> >>>>>>>>>> Sent: Thursday, October 24, 2019 12:08 AM
+> >>>>>>>>>> To: kvm@vger.kernel.org
+> >>>>>>>>>> Cc: alex.williamson@redhat.com; kwankhede@nvidia.com;
+> >>>>>>>>>> kevin.tian@intel.com; cohuck@redhat.com
+> >>>>>>>>>> Subject: [PATCH 0/6] VFIO mdev aggregated resources handling
+> >>>>>>>>>>
+> >>>>>>>>>> Hi,
+> >>>>>>>>>>
+> >>>>>>>>>> This is a refresh for previous send of this series. I got
+> >>>>>>>>>> impression that some SIOV drivers would still deploy their own
+> >>>>>>>>>> create and config method so stopped effort on this. But seems
+> >>>>>>>>>> this would still be useful for some other SIOV driver which may
+> >>>>>>>>>> simply want capability to aggregate resources. So here's refreshed    
+> >>>>>> series.    
+> >>>>>>>>>>
+> >>>>>>>>>> Current mdev device create interface depends on fixed mdev type,
+> >>>>>>>>>> which get uuid from user to create instance of mdev device. If
+> >>>>>>>>>> user wants to use customized number of resource for mdev device,
+> >>>>>>>>>> then only can create new    
+> >>>>>>>>> Can you please give an example of 'resource'?
+> >>>>>>>>> When I grep [1], [2] and [3], I couldn't find anything related to '    
+> >>>>>> aggregate'.    
+> >>>>>>>>
+> >>>>>>>> The resource is vendor device specific, in SIOV spec there's ADI
+> >>>>>>>> (Assignable Device Interface) definition which could be e.g queue
+> >>>>>>>> for net device, context for gpu, etc. I just named this interface as    
+> >>>>>> 'aggregate'    
+> >>>>>>>> for aggregation purpose, it's not used in spec doc.
+> >>>>>>>>    
+> >>>>>>>
+> >>>>>>> Some 'unknown/undefined' vendor specific resource just doesn't work.
+> >>>>>>> Orchestration tool doesn't know which resource and what/how to    
+> >>> configure    
+> >>>>>> for which vendor.    
+> >>>>>>> It has to be well defined.
+> >>>>>>>
+> >>>>>>> You can also find such discussion in recent lgpu DRM cgroup patches    
+> >>> series    
+> >>>>>> v4.    
+> >>>>>>>
+> >>>>>>> Exposing networking resource configuration in non-net namespace    
+> >>> aware    
+> >>>>>> mdev sysfs at PCI device level is no-go.    
+> >>>>>>> Adding per file NET_ADMIN or other checks is not the approach we    
+> >>> follow in    
+> >>>>>> kernel.    
+> >>>>>>>
+> >>>>>>> devlink has been a subsystem though under net, that has very rich    
+> >>> interface    
+> >>>>>> for syscaller, device health, resource management and many more.    
+> >>>>>>> Even though it is used by net driver today, its written for generic device    
+> >>>>>> management at bus/device level.    
+> >>>>>>>
+> >>>>>>> Yuval has posted patches to manage PCI sub-devices [1] and updated    
+> >>> version    
+> >>>>>> will be posted soon which addresses comments.    
+> > 
+> > Always good to see tools that intend to manage arbitrary devices posted
+> > only to the netdev list :-\
+> >   
+> >>>>>>>
+> >>>>>>> For any device slice resource management of mdev, sub-function etc,    
+> >>> we    
+> >>>>>> should be using single kernel interface as devlink [2], [3].    
+> > 
+> > This seems impractical, mdevs and SR-IOV are both enumerated,
+> > inspected, created, and removed in sysfs,   
+> Both enumerated via sysfs, but VFs are not configured via sysfs.
 > 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 140 +++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c     |   3 +
->  2 files changed, 143 insertions(+)
+> > where do we define what
+> > features are manipulated vis sysfs versus devlink?  
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index bfb1b922a9ac..71aba264b5d2 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1671,6 +1671,98 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
->  	return 0;
->  }
->  
-> +#define CET_MSR_RSVD_BITS_1    0x3
-> +#define CET_MSR_RSVD_BITS_2   (0xF << 6)
-> +
-> +static bool cet_msr_write_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-> +{
-> +	u32 index = msr->index;
-> +	u64 data = msr->data;
-> +	u32 high_word = data >> 32;
-> +
-> +	if ((index == MSR_IA32_U_CET || index == MSR_IA32_S_CET) &&
-> +	    (data & CET_MSR_RSVD_BITS_2))
-> +		return false;
-> +
-> +	if (is_64_bit_mode(vcpu)) {
-> +		if (is_noncanonical_address(data & PAGE_MASK, vcpu))
-
-I don't think this is correct.  MSRs that contain an address usually only
-fault on a non-canonical value and do the non-canonical check regardless
-of mode.  E.g. VM-Enter's consistency checks on SYSENTER_E{I,S}P only care
-about a canonical address and are not dependent on mode, and SYSENTER
-itself states that bits 63:32 are ignored in 32-bit mode.  I assume the
-same is true here.
-
-If that is indeed the case, what about adding these to the common canonical
-check in __kvm_set_msr()?  That'd cut down on the boilerplate here and
-might make it easier to audit KVM's canonical checks.
-
-> +			return false;
-> +		else if ((index == MSR_IA32_PL0_SSP ||
-> +			  index == MSR_IA32_PL1_SSP ||
-> +			  index == MSR_IA32_PL2_SSP ||
-> +			  index == MSR_IA32_PL3_SSP) &&
-> +			  (data & CET_MSR_RSVD_BITS_1))
-> +			return false;
-> +	} else {
-> +		if (msr->index == MSR_IA32_INT_SSP_TAB)
-> +			return false;
-> +		else if ((index == MSR_IA32_U_CET ||
-> +			  index == MSR_IA32_S_CET ||
-> +			  index == MSR_IA32_PL0_SSP ||
-> +			  index == MSR_IA32_PL1_SSP ||
-> +			  index == MSR_IA32_PL2_SSP ||
-> +			  index == MSR_IA32_PL3_SSP) &&
-> +			  (high_word & ~0ul))
-> +			return false;
-> +	}
-> +
-> +	return true;
-> +}
-
-This helper seems like overkill, e.g. it's filled with index-specific
-checks, but is called from code that has already switched on the index.
-Open coding the individual checks is likely more readable and would require
-less code, especially if the canonical checks are cleaned up.
-
-> +
-> +static bool cet_msr_access_allowed(struct kvm_vcpu *vcpu, struct msr_data *msr)
-> +{
-> +	u64 kvm_xss;
-> +	u32 index = msr->index;
-> +
-> +	if (is_guest_mode(vcpu))
-> +		return false;
-
-I may have missed this in an earlier discussion, does CET not support
-nesting?
-
-> +
-> +	kvm_xss = kvm_supported_xss();
-> +
-> +	switch (index) {
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> +		if (!boot_cpu_has(X86_FEATURE_SHSTK))
-> +			return false;
-> +		if (!msr->host_initiated) {
-> +			if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> +				return false;
-> +		} else {
-
-This looks wrong, WRMSR from the guest only checks CPUID, it doesn't check
-kvm_xss.
-
-> +			if (index == MSR_IA32_PL3_SSP) {
-> +				if (!(kvm_xss & XFEATURE_MASK_CET_USER))
-> +					return false;
-> +			} else {
-> +				if (!(kvm_xss & XFEATURE_MASK_CET_KERNEL))
-> +					return false;
-> +			}
-> +		}
-> +		break;
-> +	case MSR_IA32_U_CET:
-> +	case MSR_IA32_S_CET:
-
-Rather than bundle everything in a single access_allowed() helper, it might
-be easier to have separate helpers for each class of MSR.   Except for the
-guest_mode() check, there's no overlap between the classes.
-
-> +		if (!boot_cpu_has(X86_FEATURE_SHSTK) &&
-> +		    !boot_cpu_has(X86_FEATURE_IBT))
-> +			return false;
-> +
-> +		if (!msr->host_initiated) {
-> +			if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) &&
-> +			    !guest_cpuid_has(vcpu, X86_FEATURE_IBT))
-> +				return false;
-> +		} else if (index == MSR_IA32_U_CET &&
-> +			   !(kvm_xss & XFEATURE_MASK_CET_USER))
-
-Same comment about guest not checking kvm_xss.
-
-> +			return false;
-> +		break;
-> +	case MSR_IA32_INT_SSP_TAB:
-> +		if (!boot_cpu_has(X86_FEATURE_SHSTK))
-> +			return false;
-> +
-> +		if (!msr->host_initiated &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> +			return false;
-> +		break;
-> +	default:
-> +		return false;
-> +	}
-> +	return true;
-> +}
->  /*
->   * Reads an msr value (of 'msr_index') into 'pdata'.
->   * Returns 0 on success, non-0 otherwise.
-> @@ -1788,6 +1880,26 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		else
->  			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
->  		break;
-> +	case MSR_IA32_S_CET:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		msr_info->data = vmcs_readl(GUEST_S_CET);
-> +		break;
-> +	case MSR_IA32_INT_SSP_TAB:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
-> +		break;
-> +	case MSR_IA32_U_CET:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		rdmsrl(MSR_IA32_U_CET, msr_info->data);
-> +		break;
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		rdmsrl(msr_info->index, msr_info->data);
-> +		break;
->  	case MSR_TSC_AUX:
->  		if (!msr_info->host_initiated &&
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> @@ -2039,6 +2151,34 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		else
->  			vmx->pt_desc.guest.addr_a[index / 2] = data;
->  		break;
-> +	case MSR_IA32_S_CET:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		if (!cet_msr_write_allowed(vcpu, msr_info))
-> +			return 1;
-> +		vmcs_writel(GUEST_S_CET, data);
-> +		break;
-> +	case MSR_IA32_INT_SSP_TAB:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		if (!cet_msr_write_allowed(vcpu, msr_info))
-> +			return 1;
-> +		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
-> +		break;
-> +	case MSR_IA32_U_CET:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		if (!cet_msr_write_allowed(vcpu, msr_info))
-> +			return 1;
-> +		wrmsrl(MSR_IA32_U_CET, data);
-> +		break;
-> +	case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
-> +		if (!cet_msr_access_allowed(vcpu, msr_info))
-> +			return 1;
-> +		if (!cet_msr_write_allowed(vcpu, msr_info))
-> +			return 1;
-> +		wrmsrl(msr_info->index, data);
-> +		break;
->  	case MSR_TSC_AUX:
->  		if (!msr_info->host_initiated &&
->  		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 6275a75d5802..1bbe4550da90 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1143,6 +1143,9 @@ static u32 msrs_to_save[] = {
->  	MSR_IA32_RTIT_ADDR1_A, MSR_IA32_RTIT_ADDR1_B,
->  	MSR_IA32_RTIT_ADDR2_A, MSR_IA32_RTIT_ADDR2_B,
->  	MSR_IA32_RTIT_ADDR3_A, MSR_IA32_RTIT_ADDR3_B,
-> +	MSR_IA32_XSS, MSR_IA32_U_CET, MSR_IA32_S_CET,
-> +	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP,
-> +	MSR_IA32_PL3_SSP, MSR_IA32_INT_SSP_TAB,
->  };
->  
->  static unsigned num_msrs_to_save;
-> -- 
-> 2.17.2
+> VFs are configured via well defined, vendor neutral tool
+> iproute2/ip link set <pf_netdev> vf <vf_index> <attribute> <value>
 > 
+> This falls short lately for few cases and non-networking or generic VF
+> property configuration, are proposed to be handled by similar 'VF'
+> object using devlink, because they are either pure 'pci vf' property or
+> more device class type VF property such as MAC address or
+> number_of_queues etc.
+> 
+> More advance mode of networking VFs, are controlled using netdev
+> representors again in vendor neutral way for last few years.
+> 
+> It may be fair to say that mdev subsystem wants to invent new sysfs
+> files for configuration.
+
+It seems you're trying to apply rules for classes of devices where
+configuration features are well defined to an environment where we
+don't even have classes of devices, let alone agreed features.
+ 
+>  mdevs, by
+> > definition, are vendor defined "chunks" of a thing.  We allow vendor
+> > drivers to define different types, representing different
+> > configurations of these chunks.  Often these different types are
+> > incrementally bigger or smaller chunks of these things, but defining
+> > what bigger and smaller means generically across vendors is an
+> > impossible task.  Orchestration tools already need to know vendor
+> > specific information in terms of what type of mdev device they want to
+> > create and make use of.  The aggregation seems to simply augment that
+> > vendor information, ie. 'type' and 'scale' are separate rather than
+> > combined only behind just 'type'.
+> >   
+> >>>>>>>
+> >>>>>>> [1]
+> >>>>>>> https://lore.kernel.org/netdev/1573229926-30040-1-git-send-email-    
+> >>> yuval    
+> >>>>>>> av@mellanox.com/ [2]
+> >>>>>>> http://man7.org/linux/man-pages/man8/devlink-dev.8.html
+> >>>>>>> [3] http://man7.org/linux/man-pages/man8/devlink-resource.8.html
+> >>>>>>>
+> >>>>>>> Most modern device configuration that I am aware of is usually done    
+> >>> via well    
+> >>>>>> defined ioctl() of the subsystem (vhost, virtio, vfio, rdma, nvme and    
+> >>> more) or    
+> >>>>>> via netlink commands (net, devlink, rdma and more) not via sysfs.    
+> >>>>>>>    
+> >>>>>>
+> >>>>>> Current vfio/mdev configuration is via documented sysfs ABI instead of    
+> >>> other    
+> >>>>>> ways. So this adhere to that way to introduce more configurable method    
+> >>> on    
+> >>>>>> mdev device for standard, it's optional and not actually vendor specific    
+> >>> e.g vfio-    
+> >>>>>> ap.
+> >>>>>>    
+> >>>>> Some unknown/undefined resource as 'aggregate' is just not an ABI.
+> >>>>> It has to be well defined, as 'hardware_address', 'num_netdev_sqs' or    
+> >>> something similar appropriate to that mdev device class.    
+> >>>>> If user wants to set a parameter for a mdev regardless of vendor, they    
+> >>> must have single way to do so.  
+> > 
+> > Aggregation augments type, which is by definition vendor specific.
+> >     
+> >>>>
+> >>>> The idea is not specific for some device class, but for each mdev
+> >>>> type's resource, and be optional for each vendor. If more device class
+> >>>> specific way is preferred, then we might have very different ways for
+> >>>> different vendors. Better to avoid that, so here means to aggregate
+> >>>> number of mdev type's resources for target instance, instead of defining
+> >>>> kinds of mdev types for those number of resources.
+> >>>>    
+> >>> Parameter or attribute certainly can be optional.
+> >>> But the way to aggregate them should not be vendor specific.
+> >>> Look for some excellent existing examples across subsystems, for example
+> >>> how you create aggregated netdev or block device is not depend on vendor
+> >>> or underlying device type.    
+> >>
+> >> I'd like to hear Alex's opinion on this. Today VFIO mdev supports two styles
+> >> of "types" imo: fixed resource definition (most cases) and dynamic resource 
+> >> definition (vfio-ap). In fixed style, a type has fixed association to a set of 
+> >> vendor specific resources (resourceX=M, resourceY=N, ...). In dynamic case, 
+> >> the user is allowed to specify actual resource X/Y/... backing the mdev 
+> >> instance post its creation. In either case, the way to identify such association 
+> >> or configurable knobs is vendor specific, maybe contained in optional 
+> >> attributes (name and description) plus additional info in vendor documents.
+> >>
+> >> Then the user is assumed to clearly understand the implication of the resource
+> >> allocation under a given type, when creating a new mdev under this type.
+> >>
+> >> If this assumption holds true, the aggregated attribute simply provides an
+> >> extension in the same direction of fixed-style types but allowing for more 
+> >> flexible linearly-increasing resource allocation. e.g. when using aggregate=2, 
+> >> it means creating a instance with resourceX=2M, resourceY=2N, ... under 
+> >> the specified type. Along this direction I didn't see the need of well-defined 
+> >> vendor specific attributes here. When those are actually required, I suppose 
+> >> the dynamic style would better fit. Or if the vendor driver thinks implementing 
+> >> such aggregate feature will confuse its type definition, it's optional to not 
+> >> doing so anyway.  
+> > 
+> > Yep, though I don't think we can even define that aggregate=2 indicates
+> > that every resources is doubled, it's going to have vendor specific
+> > meaning.  Maybe this is what Parav is rejecting, but I don't see an
+> > alternative.  For example, an mdev vGPU might have high level resources
+> > like the number of execution units, graphics memory, display heads,
+> > maximum resolution, etc.  Aggregation could affect one or all of these.
+> > Orchestration tools already need to know the vendor specific type of
+> > device they want to create, so it doesn't seem unreasonable that if
+> > they use aggregation that they choose a type that aggregates the
+> > resource(s) they need, but that aggregation is going to be specific to
+> > the type.  Potentially as we think about adding "defined" sysfs
+> > attributes for devices we could start with
+> > $SYSFS_DEV_PATH/mdev/aggregation/type, where value written to type is a
+> > vendor specific aggregation of that mdev type.  This allows us the
+> > option that we might someday agree on specific resources that might be
+> > aggregated in a common way (ex. ./aggregation/graphics_memory), but I'm
+> > somewhat doubtful those would ever be pursued.  Thanks,
+> >   
+> 
+> My point is, from Zhenyu Wang's example it is certainly incorrect to
+> define mdev sysfs files, as,
+> 
+> vendor_foo_mdev.netdev_mac_addr=X
+> vendor_bar_mdev.resource_addr=Y
+> 
+> vendor_foo_mdev.netdev_queues=4
+> vendor_bar_mdev.aggregate=8
+> 
+> Unless this is a miscellaneous (not well defined) parameter of a vendor
+> device.
+
+I certainly think it's wrong to associate a "netdev" property with
+something that the kernel only knows as an opaque device.  But that's
+really the issue, mdevs are opaque devices as far as the host kernel is
+concerned.  Since we seem to have landed on mdev being used exclusively
+for vfio, the only thing we really know about an mdev generically is
+which vfio bus driver API the device uses.  Any association of an mdev
+to a GPU, NIC, HBA, or other accelerator or I/O interface is strictly
+known by the user/admin's interpretation of the vendor specific type.
+ 
+> I am 100% sure that consumers of network devices where a PCI PF is
+> sliced into multiple smaller devices, wants to configure these devices
+> in unified way regardless of vendor type.
+> That may not be the case with vGPU mdevs.
+
+I don't know about devlink, but iirc the ip command operates on a
+netdev PF in order to, for example, assign MAC addresses to the VFs.
+We have no guarantee with mdevs that there's a parent netdev device for
+such an interface.  The parent device might be an FPGA where one type
+it's able to expose looks like a NIC.  How do you envision devlink/ip
+interacting with something like that?  Using common tools to set
+networking properties on a device that the host kernel fundamentally
+does not know is a networking device is... difficult.
+
+> If Zhenyu Wang proposed to use networking class of mdev device,
+> attributes should have well defined meaning, as it is well known class
+> in linux kernel.
+> mdev should be providing an API to define such mdev config object and
+> all sysfs for such mdev to be created by the mdev core, not by vendor
+> driver.
+
+But of course there is no "networking class of mdev device".  Instead
+there are mdev devices that might be NICs, but that's for the admin and
+user to care about.  If you have an interface in mind for how devlink
+is going to learn about mdev device and set properties, please share.
+It's not clear to me if we need to design something to be compatible
+with devlink or devlink needs to learn how to do certain things on mdev
+devices (does devlink want to become a vfio userspace device driver in
+order to probe the type of an mdev device?  That'll be hard given some
+of the backdoor userspace dependencies of existing vGPU mdevs).  Thanks,
+
+Alex
+
