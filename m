@@ -2,151 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 98F5211B425
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 16:46:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8224711B43F
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 16:47:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388746AbfLKPqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 10:46:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65372 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2388744AbfLKPqT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 10:46:19 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBBFhQVt043095
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 10:46:17 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wsqc2fdgw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 10:46:17 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Wed, 11 Dec 2019 15:46:16 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 11 Dec 2019 15:46:14 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBBFkDdh22347780
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Dec 2019 15:46:13 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A09D4C044;
-        Wed, 11 Dec 2019 15:46:13 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 430754C052;
-        Wed, 11 Dec 2019 15:46:13 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Dec 2019 15:46:13 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH v4 9/9] s390x: css: ping pong
-Date:   Wed, 11 Dec 2019 16:46:10 +0100
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19121115-4275-0000-0000-0000038DFFD7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121115-4276-0000-0000-000038A1B655
-Message-Id: <1576079170-7244-10-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-11_04:2019-12-11,2019-12-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- malwarescore=0 suspectscore=1 clxscore=1015 mlxscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912110132
+        id S2387421AbfLKPqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 10:46:39 -0500
+Received: from mga03.intel.com ([134.134.136.65]:39228 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732678AbfLKPqj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 10:46:39 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 07:46:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
+   d="scan'208";a="414898225"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga006.fm.intel.com with ESMTP; 11 Dec 2019 07:46:37 -0800
+Date:   Wed, 11 Dec 2019 07:46:37 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     linmiaohe <linmiaohe@huawei.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 3/6] KVM: Fix some comment typos and missing parentheses
+Message-ID: <20191211154637.GA5044@linux.intel.com>
+References: <1576045585-8536-1-git-send-email-linmiaohe@huawei.com>
+ <1576045585-8536-4-git-send-email-linmiaohe@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1576045585-8536-4-git-send-email-linmiaohe@huawei.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To test a write command with the SSCH instruction we need a QEMU device,
-with control unit type 0xC0CA. The PONG device is such a device.
+On Wed, Dec 11, 2019 at 02:26:22PM +0800, linmiaohe wrote:
+> From: Miaohe Lin <linmiaohe@huawei.com>
+> 
+> Fix some typos and add missing parentheses in the comments.
+> 
+> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> ---
+>  arch/x86/kvm/hyperv.c     | 2 +-
+>  arch/x86/kvm/lapic.c      | 2 +-
+>  arch/x86/kvm/vmx/nested.c | 2 +-
+>  arch/x86/kvm/vmx/vmx.c    | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index c7d4640b7b1c..a48d5708f1f8 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1122,7 +1122,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+>  			return 1;
+>  
+>  		/*
+> -		 * Clear apic_assist portion of f(struct hv_vp_assist_page
+> +		 * Clear apic_assist portion of struct hv_vp_assist_page
+>  		 * only, there can be valuable data in the rest which needs
+>  		 * to be preserved e.g. on migration.
+>  		 */
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 679692b55f6d..ea402e741bd5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -969,7 +969,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+>   * - For single-destination interrupts, handle it in posted mode
+>   * - Else if vector hashing is enabled and it is a lowest-priority
+>   *   interrupt, handle it in posted mode and use the following mechanism
+> - *   to find the destinaiton vCPU.
+> + *   to find the destination vCPU.
+>   *	1. For lowest-priority interrupts, store all the possible
+>   *	   destination vCPUs in an array.
+>   *	2. Use "guest vector % max number of destination vCPUs" to find
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 7b01ef1d87e6..63ab49de324d 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3427,7 +3427,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  
+>  /*
+>   * On a nested exit from L2 to L1, vmcs12.guest_cr0 might not be up-to-date
+> - * because L2 may have changed some cr0 bits directly (CRO_GUEST_HOST_MASK).
+> + * because L2 may have changed some cr0 bits directly (CR0_GUEST_HOST_MASK).
 
-This type of device responds to PONG_WRITE requests by incrementing an
-integer, stored as a string at offset 0 of the CCW data.
+Holy cow this one is hard to see :-)
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- s390x/css.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
-
-diff --git a/s390x/css.c b/s390x/css.c
-index 7b9bdb1..a09cdff 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -26,6 +26,9 @@
- 
- #define CSS_TEST_INT_PARAM	0xcafec0ca
- #define PONG_CU_TYPE		0xc0ca
-+/* Channel Commands for PONG device */
-+#define PONG_WRITE	0x21 /* Write */
-+#define PONG_READ	0x22 /* Read buffer */
- 
- struct lowcore *lowcore = (void *)0x0;
- 
-@@ -302,6 +305,48 @@ unreg_cb:
- 	unregister_io_int_func(irq_io);
- }
- 
-+static void test_ping(void)
-+{
-+	int success, result;
-+	int cnt = 0, max = 4;
-+
-+	if (senseid.cu_type != PONG_CU) {
-+		report_skip("No PONG, no ping-pong");
-+		return;
-+	}
-+
-+	result = register_io_int_func(irq_io);
-+	if (result) {
-+		report(0, "Could not register IRQ handler");
-+		return;
-+	}
-+
-+	while (cnt++ < max) {
-+		snprintf(buffer, BUF_SZ, "%08x\n", cnt);
-+		success = start_subchannel(PONG_WRITE, buffer, 8);
-+		if (!success) {
-+			report(0, "start_subchannel failed");
-+			goto unreg_cb;
-+		}
-+		delay(100);
-+		success = start_subchannel(PONG_READ, buffer, 8);
-+		if (!success) {
-+			report(0, "start_subchannel failed");
-+			goto unreg_cb;
-+		}
-+		result = atol(buffer);
-+		if (result != (cnt + 1)) {
-+			report(0, "Bad answer from pong: %08x - %08x",
-+			       cnt, result);
-+			goto unreg_cb;
-+		}
-+	}
-+	report(1, "ping-pong count 0x%08x", cnt);
-+
-+unreg_cb:
-+	unregister_io_int_func(irq_io);
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
-@@ -309,6 +354,7 @@ static struct {
- 	{ "enumerate (stsch)", test_enumerate },
- 	{ "enable (msch)", test_enable },
- 	{ "sense (ssch/tsch)", test_sense },
-+	{ "ping-pong (ssch/tsch)", test_ping },
- 	{ NULL, NULL }
- };
- 
--- 
-2.17.0
-
+>   * This function returns the new value we should put in vmcs12.guest_cr0.
+>   * It's not enough to just return the vmcs02 GUEST_CR0. Rather,
+>   *  1. Bits that neither L0 nor L1 trapped, were set directly by L2 and are now
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index bf24fbb2056c..1be3854f1090 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6720,7 +6720,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>  	 * If PML is turned on, failure on enabling PML just results in failure
+>  	 * of creating the vcpu, therefore we can simplify PML logic (by
+>  	 * avoiding dealing with cases, such as enabling PML partially on vcpus
+> -	 * for the guest, etc.
+> +	 * for the guest), etc.
+>  	 */
+>  	if (enable_pml) {
+>  		vmx->pml_pg = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> -- 
+> 2.19.1
+> 
