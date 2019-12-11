@@ -2,114 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A4AFE11BCC4
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 20:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D241E11BDCB
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 21:23:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726872AbfLKTST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 14:18:19 -0500
-Received: from mga18.intel.com ([134.134.136.126]:23830 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726312AbfLKTST (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 14:18:19 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 11:18:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,302,1571727600"; 
-   d="scan'208";a="245399141"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 11 Dec 2019 11:18:17 -0800
-Date:   Wed, 11 Dec 2019 11:18:17 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] KVM: x86: Add build-time assertion on usage of bit()
-Message-ID: <20191211191817.GJ5044@linux.intel.com>
-References: <20191211175822.1925-1-sean.j.christopherson@intel.com>
- <20191211175822.1925-2-sean.j.christopherson@intel.com>
- <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
+        id S1726592AbfLKUXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 15:23:01 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:33818 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726345AbfLKUXB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 15:23:01 -0500
+Received: by mail-io1-f66.google.com with SMTP id z193so219959iof.1
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 12:23:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IKRIXWRJNR/et1ORAaFvhmZJFe5scHCBMbx4VrCqp2w=;
+        b=RSiPCeGsHxOpGzSzI1iKMCLJA8BbxqIaDPf41YD6z/lwA6bcXinfh2UWwtTQD6/Roi
+         Sbul1zpqtHeBm/uKr7khJD1dPfCGOIilAL6/ZJl+iJRqkxeUYOAHhwgjWSOwx5S3rE3c
+         95bcPYV38LyOI9I9VMqmGbnRW37B0qqpNVnFiYSLUF3MeMY/wS1JTvvrZdnAqdQ60sCk
+         KhYW5tQBRgPqap3zj7TBwE+bzXUlJMED4Ym+1lzSyrqhy/e0csOiqnmO3q7x95Hps1ZU
+         XNdkQfaWAxhGsLY+E7x5o9nZkp924D0FKZ8//8Dbh8H67nuRVO2pfqG6eyYPUbNI+mTa
+         jClw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IKRIXWRJNR/et1ORAaFvhmZJFe5scHCBMbx4VrCqp2w=;
+        b=THQjNWmBX5STZR8ATTFLvLSTzn4tOieXfSqtstLIibpzbW+K4CNr2/OCUGTfTPJ8Fq
+         EK5K+QsY3Vs7URHb9l5qOQW1iDgwFmNglaXY90TRohyw260fzDzg6QdUqMENLUXSw/S2
+         vmIoPMZkWVYtXcQvGJjnqKFhxoTIaFlEGEOtCaxuIk+UXL9LB+oajdyg/Ekp5Z+W33Rn
+         QlgX9olxX1byAvqyb+GOf0jE9sU+wcLCyg9BmrKEl/hUuRp1dzlItnqylfpr14UOdy2S
+         WYebMTDnjtQfDICfiAVRMdF2m1PNJiyGccR0Rz5OBBIHOmSYwXHxpRLiKsrmlxrsIp0m
+         fseA==
+X-Gm-Message-State: APjAAAXN+nVq9j3dZvyQ3Yy2k5Etc61kTKlGQCZ7CZHeRFhv4+RKFou3
+        bI+InP+tbifuPfEu7B4VJJZYkcu3V2hSU5gYUiHmkg==
+X-Google-Smtp-Source: APXvYqz0XMTQRjsAcJT7qleb0nHWKF4Jr1rC4NJJg9TYZd8SXVWZDiojyQOvm4O8X+FK9scVGDM2xTSG2p3dyEurFZ4=
+X-Received: by 2002:a5d:9904:: with SMTP id x4mr2531718iol.119.1576095780017;
+ Wed, 11 Dec 2019 12:23:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190220202442.145494-1-pshier@google.com>
+In-Reply-To: <20190220202442.145494-1-pshier@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 11 Dec 2019 12:22:49 -0800
+Message-ID: <CALMp9eRMbht+7xHXJV90MSs52LtjjdCtVeCdd_=5nqeSms8VxQ@mail.gmail.com>
+Subject: Re: [PATCH kvm-unit-tests] Update AMD instructions to conform to LLVM assembler
+To:     Peter Shier <pshier@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>, drjones@redhat.com,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 10:24:36AM -0800, Jim Mattson wrote:
-> On Wed, Dec 11, 2019 at 9:58 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > Add build-time checks to ensure KVM isn't trying to do a reverse CPUID
-> > lookup on Linux-defined feature bits, along with comments to explain
-> > the gory details of X86_FEATUREs and bit().
-> >
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > ---
-> >
-> > Note, the premature newline in the first line of the second comment is
-> > intentional to reduce churn in the next patch.
-> >
-> >  arch/x86/kvm/x86.h | 23 +++++++++++++++++++++--
-> >  1 file changed, 21 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > index cab5e71f0f0f..4ee4175c66a7 100644
-> > --- a/arch/x86/kvm/x86.h
-> > +++ b/arch/x86/kvm/x86.h
-> > @@ -144,9 +144,28 @@ static inline bool is_pae_paging(struct kvm_vcpu *vcpu)
-> >         return !is_long_mode(vcpu) && is_pae(vcpu) && is_paging(vcpu);
-> >  }
-> >
-> > -static inline u32 bit(int bitno)
-> > +/*
-> > + * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
-> > + * the hardware defined bit number (stored in bits 4:0) and a software defined
-> > + * "word" (stored in bits 31:5).  The word is used to index into arrays of
-> > + * bit masks that hold the per-cpu feature capabilities, e.g. this_cpu_has().
-> > + */
-> > +static __always_inline u32 bit(int feature)
-> >  {
-> > -       return 1 << (bitno & 31);
-> > +       /*
-> > +        * bit() is intended to be used only for hardware-defined
-> > +        * words, i.e. words whose bits directly correspond to a CPUID leaf.
-> > +        * Retrieving the bit mask from a Linux-defined word is nonsensical
-> > +        * as the bit number/mask is an arbitrary software-defined value and
-> > +        * can't be used by KVM to query/control guest capabilities.
-> > +        */
-> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_1);
-> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_2);
-> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_3);
-> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_4);
-> > +       BUILD_BUG_ON((feature >> 5) > CPUID_7_EDX);
-> 
-> What is magical about CPUID_7_EDX?
+On Wed, Feb 20, 2019 at 12:25 PM Peter Shier <pshier@google.com> wrote:
+>
+> The GNU assembler (gas) allows omitting operands where there is only a
+> single choice e.g. "VMRUN rAX".The LLVM assembler requires those operands
+> even though they are the default and only choice.
+>
+> In addition, LLVM does not allow a CLGI instruction with a terminating
+> \n\t. Adding a ; separator after the instruction is a workaround.
+>
+> Signed-off-by: Peter Shier <pshier@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> ---
+>  x86/svm.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/x86/svm.c b/x86/svm.c
+> index bc74e7c690a8..e5cb730b08cb 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -154,7 +154,7 @@ static void vmcb_ident(struct vmcb *vmcb)
+>      struct descriptor_table_ptr desc_table_ptr;
+>
+>      memset(vmcb, 0, sizeof(*vmcb));
+> -    asm volatile ("vmsave" : : "a"(vmcb_phys) : "memory");
+> +    asm volatile ("vmsave %0" : : "a"(vmcb_phys) : "memory");
+>      vmcb_set_seg(&save->es, read_es(), 0, -1U, data_seg_attr);
+>      vmcb_set_seg(&save->cs, read_cs(), 0, -1U, code_seg_attr);
+>      vmcb_set_seg(&save->ss, read_ss(), 0, -1U, data_seg_attr);
+> @@ -262,20 +262,20 @@ static void test_run(struct test *test, struct vmcb *vmcb)
+>      do {
+>          tsc_start = rdtsc();
+>          asm volatile (
+> -            "clgi \n\t"
+> -            "vmload \n\t"
+> +            "clgi;\n\t" // semi-colon needed for LLVM compatibility
+> +            "vmload %0\n\t"
+>              "mov regs+0x80, %%r15\n\t"  // rflags
+>              "mov %%r15, 0x170(%0)\n\t"
+>              "mov regs, %%r15\n\t"       // rax
+>              "mov %%r15, 0x1f8(%0)\n\t"
+>              LOAD_GPR_C
+> -            "vmrun \n\t"
+> +            "vmrun %0\n\t"
+>              SAVE_GPR_C
+>              "mov 0x170(%0), %%r15\n\t"  // rflags
+>              "mov %%r15, regs+0x80\n\t"
+>              "mov 0x1f8(%0), %%r15\n\t"  // rax
+>              "mov %%r15, regs\n\t"
+> -            "vmsave \n\t"
+> +            "vmsave %0\n\t"
+>              "stgi"
+>              : : "a"(vmcb_phys)
+>              : "rbx", "rcx", "rdx", "rsi",
+> @@ -330,7 +330,7 @@ static bool check_no_vmrun_int(struct test *test)
+>
+>  static void test_vmrun(struct test *test)
+>  {
+> -    asm volatile ("vmrun" : : "a"(virt_to_phys(test->vmcb)));
+> +    asm volatile ("vmrun %0" : : "a"(virt_to_phys(test->vmcb)));
+>  }
+>
+>  static bool check_vmrun(struct test *test)
+> @@ -1241,7 +1241,7 @@ static bool lat_svm_insn_finished(struct test *test)
+>
+>      for ( ; runs != 0; runs--) {
+>          tsc_start = rdtsc();
+> -        asm volatile("vmload\n\t" : : "a"(vmcb_phys) : "memory");
+> +        asm volatile("vmload %0\n\t" : : "a"(vmcb_phys) : "memory");
+>          cycles = rdtsc() - tsc_start;
+>          if (cycles > latvmload_max)
+>              latvmload_max = cycles;
+> @@ -1250,7 +1250,7 @@ static bool lat_svm_insn_finished(struct test *test)
+>          vmload_sum += cycles;
+>
+>          tsc_start = rdtsc();
+> -        asm volatile("vmsave\n\t" : : "a"(vmcb_phys) : "memory");
+> +        asm volatile("vmsave %0\n\t" : : "a"(vmcb_phys) : "memory");
+>          cycles = rdtsc() - tsc_start;
+>          if (cycles > latvmsave_max)
+>              latvmsave_max = cycles;
 
-It's currently the last cpufeatures word.  My thought was to force this to
-be updated in order to do reverse lookup on the next new word.  I didn't
-want to use NCAPINTS because that gets updated when a new word is added to
-cpufeatures, i.e. wouldn't catch the case where the next new word is a
-Linux-defined word, which is extremely unlikely but theoretically possible.
-
-> > +
-> > +       return 1 << (feature & 31);
-> 
-> Why not BIT(feature & 31)?
-
-That's a very good question.
-
-> >  }
-> >
-> >  static inline u8 vcpu_virt_addr_bits(struct kvm_vcpu *vcpu)
-> > --
-> > 2.24.0
-> >
+Ping.
