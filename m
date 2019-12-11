@@ -2,114 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8224711B43F
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 16:47:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84C7611B51E
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 16:52:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387421AbfLKPqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 10:46:39 -0500
-Received: from mga03.intel.com ([134.134.136.65]:39228 "EHLO mga03.intel.com"
+        id S1732413AbfLKPv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 10:51:56 -0500
+Received: from mga18.intel.com ([134.134.136.126]:5282 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732678AbfLKPqj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 10:46:39 -0500
+        id S1730499AbfLKPvy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 10:51:54 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 07:46:38 -0800
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 07:51:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
-   d="scan'208";a="414898225"
+   d="scan'208";a="225568792"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga006.fm.intel.com with ESMTP; 11 Dec 2019 07:46:37 -0800
-Date:   Wed, 11 Dec 2019 07:46:37 -0800
+  by orsmga002.jf.intel.com with ESMTP; 11 Dec 2019 07:51:51 -0800
+Date:   Wed, 11 Dec 2019 07:51:51 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     linmiaohe <linmiaohe@huawei.com>
 Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH 3/6] KVM: Fix some comment typos and missing parentheses
-Message-ID: <20191211154637.GA5044@linux.intel.com>
+Subject: Re: [PATCH 6/6] KVM: Fix some writing mistakes
+Message-ID: <20191211155151.GB5044@linux.intel.com>
 References: <1576045585-8536-1-git-send-email-linmiaohe@huawei.com>
- <1576045585-8536-4-git-send-email-linmiaohe@huawei.com>
+ <1576045585-8536-7-git-send-email-linmiaohe@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1576045585-8536-4-git-send-email-linmiaohe@huawei.com>
+In-Reply-To: <1576045585-8536-7-git-send-email-linmiaohe@huawei.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 02:26:22PM +0800, linmiaohe wrote:
+On Wed, Dec 11, 2019 at 02:26:25PM +0800, linmiaohe wrote:
 > From: Miaohe Lin <linmiaohe@huawei.com>
 > 
-> Fix some typos and add missing parentheses in the comments.
+> Fix some writing mistakes in the comments.
 > 
 > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 > ---
->  arch/x86/kvm/hyperv.c     | 2 +-
->  arch/x86/kvm/lapic.c      | 2 +-
->  arch/x86/kvm/vmx/nested.c | 2 +-
->  arch/x86/kvm/vmx/vmx.c    | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
+>  arch/x86/include/asm/kvm_host.h | 2 +-
+>  arch/x86/kvm/vmx/vmx.c          | 2 +-
+>  virt/kvm/kvm_main.c             | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index c7d4640b7b1c..a48d5708f1f8 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1122,7 +1122,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
->  			return 1;
->  
->  		/*
-> -		 * Clear apic_assist portion of f(struct hv_vp_assist_page
-> +		 * Clear apic_assist portion of struct hv_vp_assist_page
->  		 * only, there can be valuable data in the rest which needs
->  		 * to be preserved e.g. on migration.
->  		 */
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 679692b55f6d..ea402e741bd5 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -969,7 +969,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
->   * - For single-destination interrupts, handle it in posted mode
->   * - Else if vector hashing is enabled and it is a lowest-priority
->   *   interrupt, handle it in posted mode and use the following mechanism
-> - *   to find the destinaiton vCPU.
-> + *   to find the destination vCPU.
->   *	1. For lowest-priority interrupts, store all the possible
->   *	   destination vCPUs in an array.
->   *	2. Use "guest vector % max number of destination vCPUs" to find
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 7b01ef1d87e6..63ab49de324d 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3427,7 +3427,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
->  
->  /*
->   * On a nested exit from L2 to L1, vmcs12.guest_cr0 might not be up-to-date
-> - * because L2 may have changed some cr0 bits directly (CRO_GUEST_HOST_MASK).
-> + * because L2 may have changed some cr0 bits directly (CR0_GUEST_HOST_MASK).
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 159a28512e4c..efba864ed42d 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -606,7 +606,7 @@ struct kvm_vcpu_arch {
+>  	 * Paging state of an L2 guest (used for nested npt)
+>  	 *
+>  	 * This context will save all necessary information to walk page tables
+> -	 * of the an L2 guest. This context is only initialized for page table
+> +	 * of the L2 guest. This context is only initialized for page table
 
-Holy cow this one is hard to see :-)
+I'd whack "the" instead of "and", i.e. ...walk page tables of an L2 guest,
+as KVM isn't limited to just one L2 guest.
 
->   * This function returns the new value we should put in vmcs12.guest_cr0.
->   * It's not enough to just return the vmcs02 GUEST_CR0. Rather,
->   *  1. Bits that neither L0 nor L1 trapped, were set directly by L2 and are now
+>  	 * walking and not for faulting since we never handle l2 page faults on
+
+While you're here, want to change "l2" to "L2"?
+
+>  	 * the host.
+>  	 */
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index bf24fbb2056c..1be3854f1090 100644
+> index 1be3854f1090..dae712c8785e 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6720,7 +6720,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
->  	 * If PML is turned on, failure on enabling PML just results in failure
->  	 * of creating the vcpu, therefore we can simplify PML logic (by
->  	 * avoiding dealing with cases, such as enabling PML partially on vcpus
-> -	 * for the guest, etc.
-> +	 * for the guest), etc.
->  	 */
->  	if (enable_pml) {
->  		vmx->pml_pg = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> @@ -1922,7 +1922,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  }
+>  
+>  /*
+> - * Writes msr value into into the appropriate "register".
+> + * Writes msr value into the appropriate "register".
+>   * Returns 0 on success, non-0 otherwise.
+>   * Assumes vcpu_load() was already called.
+>   */
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index f0501272268f..1a6d5ebd5c42 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1519,7 +1519,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
+>  /*
+>   * The fast path to get the writable pfn which will be stored in @pfn,
+>   * true indicates success, otherwise false is returned.  It's also the
+> - * only part that runs if we can are in atomic context.
+> + * only part that runs if we can in atomic context.
+
+This should remove "can" instead of "are", i.e. ...part that runs if we are
+in atomic context.  The comment is calling out that hva_to_pfn() will return
+immediately if hva_to_pfn_fast() and the kernel is atomic context.
+
+>   */
+>  static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+>  			    bool *writable, kvm_pfn_t *pfn)
 > -- 
 > 2.19.1
 > 
