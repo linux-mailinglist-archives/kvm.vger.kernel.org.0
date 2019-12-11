@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3226811A47C
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 07:27:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A39E11A478
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 07:27:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728003AbfLKG1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 01:27:05 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7667 "EHLO huawei.com"
+        id S1727922AbfLKG0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 01:26:53 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:40718 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727891AbfLKG0x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727904AbfLKG0x (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 11 Dec 2019 01:26:53 -0500
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 6482EFD870D407DBC639;
+        by Forcepoint Email with ESMTP id 892D2E27760C2FD8C2D2;
         Wed, 11 Dec 2019 14:26:50 +0800 (CST)
 Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
  (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Wed, 11 Dec 2019
- 14:26:40 +0800
+ 14:26:41 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
 To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
@@ -25,9 +25,9 @@ To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <hpa@zytor.com>
 CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH 3/6] KVM: Fix some comment typos and missing parentheses
-Date:   Wed, 11 Dec 2019 14:26:22 +0800
-Message-ID: <1576045585-8536-4-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH 4/6] KVM: Fix some grammar mistakes
+Date:   Wed, 11 Dec 2019 14:26:23 +0800
+Message-ID: <1576045585-8536-5-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576045585-8536-1-git-send-email-linmiaohe@huawei.com>
 References: <1576045585-8536-1-git-send-email-linmiaohe@huawei.com>
@@ -42,68 +42,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-Fix some typos and add missing parentheses in the comments.
+Fix some grammar mistakes in the comments.
 
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- arch/x86/kvm/hyperv.c     | 2 +-
- arch/x86/kvm/lapic.c      | 2 +-
- arch/x86/kvm/vmx/nested.c | 2 +-
- arch/x86/kvm/vmx/vmx.c    | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/ioapic.c | 2 +-
+ arch/x86/kvm/lapic.c  | 2 +-
+ virt/kvm/kvm_main.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index c7d4640b7b1c..a48d5708f1f8 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1122,7 +1122,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
- 			return 1;
- 
- 		/*
--		 * Clear apic_assist portion of f(struct hv_vp_assist_page
-+		 * Clear apic_assist portion of struct hv_vp_assist_page
- 		 * only, there can be valuable data in the rest which needs
- 		 * to be preserved e.g. on migration.
- 		 */
+diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+index 77538fd77dc2..7312aab33298 100644
+--- a/arch/x86/kvm/ioapic.c
++++ b/arch/x86/kvm/ioapic.c
+@@ -189,7 +189,7 @@ static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
+ 	/*
+ 	 * Return 0 for coalesced interrupts; for edge-triggered interrupts,
+ 	 * this only happens if a previous edge has not been delivered due
+-	 * do masking.  For level interrupts, the remote_irr field tells
++	 * to masking.  For level interrupts, the remote_irr field tells
+ 	 * us if the interrupt is waiting for an EOI.
+ 	 *
+ 	 * RTC is special: it is edge-triggered, but userspace likes to know
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 679692b55f6d..ea402e741bd5 100644
+index ea402e741bd5..88c3c0c6d1e3 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -969,7 +969,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
-  * - For single-destination interrupts, handle it in posted mode
-  * - Else if vector hashing is enabled and it is a lowest-priority
-  *   interrupt, handle it in posted mode and use the following mechanism
-- *   to find the destinaiton vCPU.
-+ *   to find the destination vCPU.
-  *	1. For lowest-priority interrupts, store all the possible
-  *	   destination vCPUs in an array.
-  *	2. Use "guest vector % max number of destination vCPUs" to find
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 7b01ef1d87e6..63ab49de324d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3427,7 +3427,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+@@ -964,7 +964,7 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+ }
  
  /*
-  * On a nested exit from L2 to L1, vmcs12.guest_cr0 might not be up-to-date
-- * because L2 may have changed some cr0 bits directly (CRO_GUEST_HOST_MASK).
-+ * because L2 may have changed some cr0 bits directly (CR0_GUEST_HOST_MASK).
-  * This function returns the new value we should put in vmcs12.guest_cr0.
-  * It's not enough to just return the vmcs02 GUEST_CR0. Rather,
-  *  1. Bits that neither L0 nor L1 trapped, were set directly by L2 and are now
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index bf24fbb2056c..1be3854f1090 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6720,7 +6720,7 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
- 	 * If PML is turned on, failure on enabling PML just results in failure
- 	 * of creating the vcpu, therefore we can simplify PML logic (by
- 	 * avoiding dealing with cases, such as enabling PML partially on vcpus
--	 * for the guest, etc.
-+	 * for the guest), etc.
+- * This routine tries to handler interrupts in posted mode, here is how
++ * This routine tries to handle interrupts in posted mode, here is how
+  * it deals with different cases:
+  * - For single-destination interrupts, handle it in posted mode
+  * - Else if vector hashing is enabled and it is a lowest-priority
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 63df3586f062..f0501272268f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -964,7 +964,7 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+ 
+ 	/*
+ 	 * Increment the new memslot generation a second time, dropping the
+-	 * update in-progress flag and incrementing then generation based on
++	 * update in-progress flag and incrementing the generation based on
+ 	 * the number of address spaces.  This provides a unique and easily
+ 	 * identifiable generation number while the memslots are in flux.
  	 */
- 	if (enable_pml) {
- 		vmx->pml_pg = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
 -- 
 2.19.1
 
