@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 549BE11BE61
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 21:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DBF311BE63
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 21:49:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727224AbfLKUsm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 15:48:42 -0500
-Received: from mail-qk1-f201.google.com ([209.85.222.201]:47048 "EHLO
-        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727220AbfLKUsl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 15:48:41 -0500
-Received: by mail-qk1-f201.google.com with SMTP id u30so3046212qke.13
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 12:48:41 -0800 (PST)
+        id S1727254AbfLKUsr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 15:48:47 -0500
+Received: from mail-pj1-f73.google.com ([209.85.216.73]:36505 "EHLO
+        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726973AbfLKUsq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 15:48:46 -0500
+Received: by mail-pj1-f73.google.com with SMTP id h6so8821647pju.3
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 12:48:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=xrwWZr7+yzERFLJE/Z3uSFj6cr0eIdhI9uswQFoegFk=;
-        b=jxEdKEYtgfZbjl/vkHg9Kg0KK+voQHEZ6fX8otH6OE0Lwrd/nBAOBuJn5BCMqpY0T2
-         uJV1WGHgri9bp47i8kJ9fmrOGDK/vAzeqD7TM11RD/UnLXEc30Qoe3dnOB2nJz20Bbhf
-         33A8ZrId+JQRPAzKq9MgBEGpJOpu5GGdTLqSX1ZLDvlA+245HmH7zc0ZJ8OhhtgKZNTj
-         JIeuxNUzbuMb5xNWkSnA4mqHF6SU1bpaW8rlyl4dZ3Z5ymSV7QB8Jc5OwClDBwV6LRbz
-         4ERfYgNY3I7QMk6yJ3AkGovrZfBIU7X9n0PPx3tLpGXv7UtbYosNxyIFIn9uL7AZowwu
-         UTeA==
+        bh=V8+gZI//oIJHuoz/ZeRsxsnZlGzWnWp3v3uXjbH3p+g=;
+        b=WTNM2YjpCbOyYnBe9GT6fAZ1ArYu0wM3PiT+MJmFZGX6j+F8TohfOS2bKnExtHAhss
+         Z0wWHPuiV3y0OHS+dzvFjIkhQBtl1jgYtgD+DMaDO64qu8xjHXWzYMz4u9laBgReuh1q
+         6FiksdGos2cOH213T7Ezyyj/rlbw0DhKdpcWx+xlBMbrt4dvbrBiorj/i5uN+T2lyNe+
+         YgNVLqGfUYzq9yAyJZGTVdfcAlLrxXJlQekcwwL1MiTS8UNXE3NTCW+DhItBkqUXhFkV
+         U5RE/C/rX/Y87x45223li/KA2CtK5BJnjzm3QQ0yxHr6zlrue4tb4lQc0XP1sRmWZtNW
+         nwfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=xrwWZr7+yzERFLJE/Z3uSFj6cr0eIdhI9uswQFoegFk=;
-        b=I47hpZMaucUMwXiyUbk/TCTYiNHSkURXHzFjwZ7+gCAbxOoooygWgHHI9XGcY0fCcd
-         0v3swS6+bK85Xa8iklV9SoyFRgDYkm5mddyC1Kv2HydJcqeLm8VYObPVZQXUIiof4AH+
-         ID1Ts/Bcnt4SE5N4MLv++ghQ7kSpbIXyKXGVWfA+C/sdOwWL1bW/JIn1Fi9YMdwDGtTV
-         vSU2FNRPyY5htAvNP+tcmOgPS1NZ6v04/2YUi/pleLnNe5JZ29cVmq0h7WLKU/EE1Jt6
-         kWB5oyuNQXMRlp1C1gmPiQTDH1FMjO5x5eCYrP5jjHG3uf7qmu77mawwrWEZWoYdAlRH
-         Retg==
-X-Gm-Message-State: APjAAAXmPJ/Rn0Zgob3Zj3Qh4BzYAj+HPckKoeDZORG9czo9xMGR4bLG
-        Vcyk77TDmpIMKsixwb01+VWkXU9mnH8N
-X-Google-Smtp-Source: APXvYqx8uEo2IEqmN5Sh6hvDJC10bKAoPxZmbscTg7BYMNdwPv/+mGXNI+Ahl6O/HftZUPZhDUbBNq7vBOZ9
-X-Received: by 2002:aed:3f32:: with SMTP id p47mr409813qtf.374.1576097320529;
- Wed, 11 Dec 2019 12:48:40 -0800 (PST)
-Date:   Wed, 11 Dec 2019 12:47:44 -0800
+        bh=V8+gZI//oIJHuoz/ZeRsxsnZlGzWnWp3v3uXjbH3p+g=;
+        b=DsqvaJ3H5wHFqdj81DLGQZ8r3sMgM9x63yslt+KS2R6T0GzuMJfISOxDAcFkjEO2Uu
+         lNDM8pdr8J62tnMylj9HBEFFN+cZ0+6SVV/0l1PVjFIOQTHtYZv/rdGKQujbJU+0EO/v
+         XHNJ5llhiUR9hRJEXhw6zwNH7b6E7Vs+njn67dmjclbSLTQfjLYJIfQbM0iR3wx47LYf
+         N4uLWFtm4GPdhueCVCxGRkA6CzRtEODJ3FzTbkk4FWV+T6V2pWaZzD+dMu6ILR1XINpG
+         3Qv4di1m3OvTLmLLC86j6/3rQFtayS4UgEz+UHSwzJe3F+4/7ObyNndwTxqhJTU08J+w
+         zx0A==
+X-Gm-Message-State: APjAAAXH1oNmyjKFsAJT+yQDSvUQZ8Cy+PCSMJtwVnE3wJrPr+793Wm1
+        +ZXDdwosCWYESn6VgCX5lwGHwDv/OVDy
+X-Google-Smtp-Source: APXvYqxM2bhaZfdgEAP320RojcgymxqaM2uW7VBYzwsTTen8mf2FPyZN6CH3k6mxVBkkuLCmC/7U7+ulQ3cX
+X-Received: by 2002:a63:e608:: with SMTP id g8mr6182692pgh.448.1576097325332;
+ Wed, 11 Dec 2019 12:48:45 -0800 (PST)
+Date:   Wed, 11 Dec 2019 12:47:45 -0800
 In-Reply-To: <20191211204753.242298-1-pomonis@google.com>
-Message-Id: <20191211204753.242298-5-pomonis@google.com>
+Message-Id: <20191211204753.242298-6-pomonis@google.com>
 Mime-Version: 1.0
 References: <20191211204753.242298-1-pomonis@google.com>
 X-Mailer: git-send-email 2.24.0.525.g8f36a354ae-goog
-Subject: [PATCH v2 04/13] KVM: x86: Protect ioapic_read_indirect() from
+Subject: [PATCH v2 05/13] KVM: x86: Protect ioapic_write_indirect() from
  Spectre-v1/L1TF attacks
 From:   Marios Pomonis <pomonis@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
@@ -67,53 +67,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This fixes a Spectre-v1/L1TF vulnerability in ioapic_read_indirect().
+This fixes a Spectre-v1/L1TF vulnerability in ioapic_write_indirect().
 This function contains index computations based on the
 (attacker-controlled) IOREGSEL register.
 
-Fixes: commit a2c118bfab8b ("KVM: Fix bounds checking in ioapic indirect register reads (CVE-2013-1798)")
+This patch depends on patch
+"KVM: x86: Protect ioapic_read_indirect() from Spectre-v1/L1TF attacks".
+
+Fixes: commit 70f93dae32ac ("KVM: Use temporary variable to shorten lines.")
 
 Signed-off-by: Nick Finco <nifi@google.com>
 Signed-off-by: Marios Pomonis <pomonis@google.com>
 Reviewed-by: Andrew Honig <ahonig@google.com>
 Cc: stable@vger.kernel.org
 ---
- arch/x86/kvm/ioapic.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ arch/x86/kvm/ioapic.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 9fd2dd89a1c5..0c672eefaabe 100644
+index 0c672eefaabe..8aa58727045e 100644
 --- a/arch/x86/kvm/ioapic.c
 +++ b/arch/x86/kvm/ioapic.c
-@@ -36,6 +36,7 @@
- #include <linux/io.h>
- #include <linux/slab.h>
- #include <linux/export.h>
-+#include <linux/nospec.h>
- #include <asm/processor.h>
- #include <asm/page.h>
- #include <asm/current.h>
-@@ -68,13 +69,14 @@ static unsigned long ioapic_read_indirect(struct kvm_ioapic *ioapic,
- 	default:
- 		{
- 			u32 redir_index = (ioapic->ioregsel - 0x10) >> 1;
--			u64 redir_content;
-+			u64 redir_content = ~0ULL;
+@@ -294,6 +294,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
  
--			if (redir_index < IOAPIC_NUM_PINS)
--				redir_content =
--					ioapic->redirtbl[redir_index].bits;
--			else
--				redir_content = ~0ULL;
-+			if (redir_index < IOAPIC_NUM_PINS) {
-+				u32 index = array_index_nospec(
-+					redir_index, IOAPIC_NUM_PINS);
-+
-+				redir_content = ioapic->redirtbl[index].bits;
-+			}
- 
- 			result = (ioapic->ioregsel & 0x1) ?
- 			    (redir_content >> 32) & 0xffffffff :
+ 		if (index >= IOAPIC_NUM_PINS)
+ 			return;
++		index = array_index_nospec(index, IOAPIC_NUM_PINS);
+ 		e = &ioapic->redirtbl[index];
+ 		mask_before = e->fields.mask;
+ 		/* Preserve read-only fields */
 -- 
 2.24.0.525.g8f36a354ae-goog
 
