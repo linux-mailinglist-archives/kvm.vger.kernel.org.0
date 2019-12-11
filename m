@@ -2,133 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F88111C074
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 00:16:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2DD811C08C
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 00:28:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbfLKXQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 18:16:45 -0500
-Received: from mga17.intel.com ([192.55.52.151]:11770 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726589AbfLKXQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 18:16:44 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 15:16:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,303,1571727600"; 
-   d="scan'208";a="265035973"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by FMSMGA003.fm.intel.com with ESMTP; 11 Dec 2019 15:16:43 -0800
-Received: from orsmsx154.amr.corp.intel.com (10.22.226.12) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 11 Dec 2019 15:16:42 -0800
-Received: from ORSEDG001.ED.cps.intel.com (10.7.248.4) by
- ORSMSX154.amr.corp.intel.com (10.22.226.12) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 11 Dec 2019 15:16:42 -0800
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (104.47.45.54) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 11 Dec 2019 15:16:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jKBEHUByGKhay8KbDfASAxBFk6XFsx4xL+jWQ5gOoQ4Nn8mzxq/7yg6Lc5iA30u2PahP/FPqSMtf9YRnPULSvKAXt10xqlS2tvQopvkoBH5YzWpM4/inspHX+7qnE8wB6byJa42/JyDrzfmdyH4aixy96tJ1bkIbWLGVom3+xeJMc/qHKIQFyRkO5ju32/qdzbPIAlL3amlVEXgKXy3ny90zq/Z6+6jMTnvjstphP5ApAh1DWuqtrhtuVioKoJn+bu9raWL1ER5EQ6X2phW7AUGln4JN8fdzmimtsuHRcuscNV1RXZiuZ3SuPZjNILX4s/B31zBNTPRvO6DNjVhK0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ny6bMwq+ynSGfdWaos5ieYsRDvt/KF366ftVV/JMNXE=;
- b=BMNgWYjcGTG+g+Mydn+IezITwC5RWmxlceTfsIcBbighKr5+NoJNtY9J3bRXEaTJLVPX9RSpeDj7DA1RormKlajHRgd/1DlOHCQ6YvycaOcwG5PvJA6SyRURRcNXPmGsQJGsgmto/2G3jia+rCp8dIXXpaZ1ywpMSLe/dxcaim9Jvjz8PNVYzmuHQtq/aZz0nAd7XoBxerogjLbktqIhlmXVIh4DHXldlvRQNOTZ2Pi4TLTfA+9m3LVjoc/UM0InaJMX1DldNmiFvSvs8P71NXwtrRAyTxsJzJ0cR7eOPQ2u27/jK8hLxkoNFssRvfKTr8SyWRkOWhzloMoHk2fNHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ny6bMwq+ynSGfdWaos5ieYsRDvt/KF366ftVV/JMNXE=;
- b=oU5edUI2BOTM95+Pb85Wgmge+KSKY1UBOkBpHq/60WRYFLjvcCtQwpLaIrqZ7InRF6VK7g3o9ghCh0FzL5gTXi/yW/y8ttSILqBGtCu/PMXMr/nR1zVhVdjlaLDmLEa3MxCaxYq+BLq9e7kjUlgB1nrSlBWNes2h5xHza8ma1Vc=
-Received: from CY4PR1101MB2198.namprd11.prod.outlook.com (10.172.78.149) by
- CY4PR1101MB2197.namprd11.prod.outlook.com (10.172.76.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2516.13; Wed, 11 Dec 2019 23:16:41 +0000
-Received: from CY4PR1101MB2198.namprd11.prod.outlook.com
- ([fe80::1d41:a622:82f0:201b]) by CY4PR1101MB2198.namprd11.prod.outlook.com
- ([fe80::1d41:a622:82f0:201b%7]) with mapi id 15.20.2516.018; Wed, 11 Dec 2019
- 23:16:41 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] KVM: x86: use CPUID to locate host page table reserved
- bits
-Thread-Topic: [PATCH v2] KVM: x86: use CPUID to locate host page table
- reserved bits
-Thread-Index: AQHVqrlhvKAEwPvqBUOb/a6h3IUJt6eqIY0AgAj+agCAAPmDAIAAlgWAgADDvYCAAClkAA==
-Date:   Wed, 11 Dec 2019 23:16:41 +0000
-Message-ID: <86bb95b84a0006fbce49201d5c37f997714884ed.camel@intel.com>
-References: <1575474037-7903-1-git-send-email-pbonzini@redhat.com>
-         <8f7e3e87-15dc-2269-f5ee-c3155f91983c@amd.com>
-         <7b885f53-e0d3-2036-6a06-9cdcbb738ae2@redhat.com>
-         <3efabf0da4954239662e90ea08d99212a654977a.camel@intel.com>
-         <62438ac9-e186-32a7-d12f-5806054d56b2@redhat.com>
-         <4faef0e9-72aa-9328-9110-fc67b2580f91@amd.com>
-In-Reply-To: <4faef0e9-72aa-9328-9110-fc67b2580f91@amd.com>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.30.5 (3.30.5-1.fc29) 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=kai.huang@intel.com; 
-x-originating-ip: [192.198.147.206]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2f9d3b95-9e8c-4c1b-86c1-08d77e902e39
-x-ms-traffictypediagnostic: CY4PR1101MB2197:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CY4PR1101MB2197E4F8277947A75C1BCD4AF75A0@CY4PR1101MB2197.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 024847EE92
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(376002)(39860400002)(346002)(366004)(136003)(189003)(199004)(26005)(54906003)(71200400001)(91956017)(64756008)(76116006)(36756003)(66446008)(66476007)(66946007)(66556008)(6486002)(110136005)(478600001)(81156014)(6512007)(81166006)(186003)(4326008)(316002)(2616005)(2906002)(53546011)(8676002)(5660300002)(6506007)(8936002)(86362001)(4001150100001)(60764002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR1101MB2197;H:CY4PR1101MB2198.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2g7DzDLBKoUrsrbfaCb/FaPtcbHaJj8qYZelM4v7iX717U8WTk9idB+/Uy0wahmnW/yKp6Nq8KB3ZTX/8mZ0FvpniVZNFF+h7pzjNCnsQcy5ZQf3Oa5GreYKgI0wyzVcKVP9JAnEVNAeIOBagh3SP5SGS4OXbnW9kN5CajxhdzDeeeDL28T6J0ugcxHgQPgR+3JeCFEB3UVeOwdBi2k9slO0/q33U6DJZ5xKOihzUyi2/B3RNgj+0jeKJGIEGhXQ++lk2mhObmpmgU+QBmkmq6kGElZxO6yLkXMt9l362rNAUFbJEuwloCx8CRTghLevltsFlEf+NzAiEwyGSaAkz9TdzbtOUvUtU4jMmiZw+ouP0LAnAq1HZXayML73bS7qL6s5OSFQhpBY/hCLC/ZTpKpJOQPNL5rcaAWrf7t+/5Jgu6AJAi4wvoB8IDQG5lN/taN1bbptt7EYVnpTViYrWer3wAiiuB2VwAS264J09hM=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9861527B257B11408BB452C452F1E0A6@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1727059AbfLKX2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 18:28:34 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48824 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726890AbfLKX2d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 18:28:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576106912;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8N2VTWKYaoek2MhT9jeNFkodFByKtGdL7R1oeX08/MU=;
+        b=Gkhj8uzPSk2wy0svmnPIzzDoqaQz+KeDI5j2D28sSES81l0Xvow4B5xlc7lq/Kv0quNC5g
+        q2tARvZ4i3rUzB8SH5GcmoeaZU8q1rGMIQonoOZzWSZSNIX6sXOS3BrW1dB0A58dtFg+wE
+        b3sQKRUjfw1UA6xwaLyX5HtPWV/BY/g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-04i6izvaNMSzM6QR9agA1Q-1; Wed, 11 Dec 2019 18:28:30 -0500
+X-MC-Unique: 04i6izvaNMSzM6QR9agA1Q-1
+Received: by mail-wr1-f70.google.com with SMTP id b13so235834wrx.22
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:28:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8N2VTWKYaoek2MhT9jeNFkodFByKtGdL7R1oeX08/MU=;
+        b=A4Pks3NjUUZqo0sHIfM94GxSIVrUe36fHej06YF9FeR6sRS9x4DUcPUCaPO086iQ6R
+         yWKbcHZELvxNFl3awMrMww2gGeo23PsJ75gHmCH7StomwO7U0AEogjZHjWmgR/jtYZKM
+         HPUQYhQ6gtkWNb1Lwxec2gzOteOSVahqcps9/zmoGwevune55p5pnMDCV3KDc/DkPFE8
+         vk386KrOkaBIMUeXCPtecNFmCMS7MC+NZzLqHOkSa+PGe2XMbpBOjoMMtQtxdrsaQHpv
+         hDc2se76Xs6Wbx98uZrQe5O6gqH9J3KziBDVvV7Q/3y3+UHhB1zwYeqMvPiq+THWHJeY
+         pD8g==
+X-Gm-Message-State: APjAAAUtRmZKAVe2llBps6uXXHFIwep1AilLI+dnhjRae3yi7YgGTpIV
+        dMEyQuyZbWgCM5OqRm6OTxWvjHHLbuXwOaAp/6ALA4uATQ8IzZ1Z8ruooOnr0GteqNM0ZSLhH2N
+        8+9AzVQhY2JCl
+X-Received: by 2002:a5d:4651:: with SMTP id j17mr2661083wrs.237.1576106909758;
+        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwtDih10uBkUdWYAfbe65JA1ATiOMPLbwKMKCsUlC7MesSRuyAIYC2eS4f1nsy/Ltf04UErOw==
+X-Received: by 2002:a5d:4651:: with SMTP id j17mr2661056wrs.237.1576106909460;
+        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id j21sm4545674wmj.39.2019.12.11.15.28.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: x86: assign two bits to track SPTE kinds
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Junaid Shahid <junaids@google.com>
+References: <1569582943-13476-1-git-send-email-pbonzini@redhat.com>
+ <1569582943-13476-2-git-send-email-pbonzini@redhat.com>
+ <CANgfPd8G194y1Bo-6HR-jP8wh4DvdAsaijue_pnhetjduyzn4A@mail.gmail.com>
+ <20191211191327.GI5044@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4e850c10-ff14-d95e-df22-0d0fd7427509@redhat.com>
+Date:   Thu, 12 Dec 2019 00:28:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f9d3b95-9e8c-4c1b-86c1-08d77e902e39
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2019 23:16:41.0717
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2pqcPavu0x7yO4kvkBWBycFnFH4pP06OwVINFCWI3oVYEaMq7LT7e/Y651ePwoAKlk6AUXnmnM3QHLWWZieRNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1101MB2197
-X-OriginatorOrg: intel.com
+In-Reply-To: <20191211191327.GI5044@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDE5LTEyLTExIGF0IDE0OjQ4IC0wNjAwLCBUb20gTGVuZGFja3kgd3JvdGU6DQo+
-IE9uIDEyLzExLzE5IDM6MDcgQU0sIFBhb2xvIEJvbnppbmkgd3JvdGU6DQo+ID4gT24gMTEvMTIv
-MTkgMDE6MTEsIEh1YW5nLCBLYWkgd3JvdGU6DQo+ID4gPiA+IGt2bV9nZXRfc2hhZG93X3BoeXNf
-Yml0cygpIG11c3QgYmUgY29uc2VydmF0aXZlIGluIHRoYXQ6DQo+ID4gPiA+IA0KPiA+ID4gPiAx
-KSBpZiBhIGJpdCBpcyByZXNlcnZlZCBpdCBfY2FuXyByZXR1cm4gYSB2YWx1ZSBoaWdoZXIgdGhh
-biBpdHMgaW5kZXgNCj4gPiA+ID4gDQo+ID4gPiA+IDIpIGlmIGEgYml0IGlzIHVzZWQgYnkgdGhl
-IHByb2Nlc3NvciAoZm9yIHBoeXNpY2FsIGFkZHJlc3Mgb3IgYW55dGhpbmcNCj4gPiA+ID4gZWxz
-ZSkgaXQgX211c3RfIHJldHVybiBhIHZhbHVlIGhpZ2hlciB0aGFuIGl0cyBpbmRleC4NCj4gPiA+
-ID4gDQo+ID4gPiA+IEluIHRoZSBTRVYgY2FzZSB3ZSdyZSBub3Qgb2JleWluZyAoMiksIGJlY2F1
-c2UgdGhlIGZ1bmN0aW9uIHJldHVybnMgNDMNCj4gPiA+ID4gd2hlbiB0aGUgQyBiaXQgaXMgYml0
-IDQ3LiAgVGhlIHBhdGNoIGZpeGVzIHRoYXQuDQo+ID4gPiBDb3VsZCB3ZSBndWFyYW50ZWUgdGhh
-dCBDLWJpdCBpcyBhbHdheXMgYmVsb3cgYml0cyByZXBvcnRlZCBieSBDUFVJRD8NCj4gPiANCj4g
-PiBUaGF0J3MgYSBxdWVzdGlvbiBmb3IgQU1ELiA6KSAgVGhlIEMgYml0IGNhbiBtb3ZlIChhbmQg
-cHJvYmFibHkgd2lsbCwNCj4gPiBvdGhlcndpc2UgdGhleSB3b3VsZG4ndCBoYXZlIGJvdGhlcmVk
-IGFkZGluZyBpdCB0byBDUFVJRCkgaW4gZnV0dXJlDQo+ID4gZ2VuZXJhdGlvbnMgb2YgdGhlIHBy
-b2Nlc3Nvci4NCj4gDQo+IFJpZ2h0LCB0aGVyZSdzIG5vIHdheSB0byBndWFyYW50ZWUgdGhhdCBp
-dCBpcyBhbHdheXMgYmVsb3cgYml0cyByZXBvcnRlZA0KPiBieSBDUFVJRC4gQXMgUGFvbG8gc3Rh
-dGVkLCB0aGUgcG9zaXRpb24gaXMgcmVwb3J0ZWQgYnkgQ1BVSUQgc28gdGhhdCBpdA0KPiBjYW4g
-ZWFzaWx5IG1vdmUgYW5kIGJlIGFjY291bnRlZCBmb3IgcHJvZ3JhbW1hdGljYWxseS4NCg0KVGhl
-biBJIGRvbid0IHRoaW5rIHRoaXMgcGF0Y2ggY291bGQgZml4IHRoZSBpc3N1ZSBQYW9sbyBkaXNj
-cmliZWQ/DQoNClRoYW5rcywNCi1LYWkNCg0K
+On 11/12/19 20:13, Sean Christopherson wrote:
+> Assuming we haven't missed something, the easiest fix would be to reduce
+> the MMIO generation by one bit and use bits 62:54 for the MMIO generation.
+
+Yes, and I mistakenly thought it would be done just by adjusting 
+PT64_SECOND_AVAIL_BITS_SHIFT.
+
+I will test and send formally something like this:
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6f92b40d798c..aa2d86f42b9a 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -405,11 +405,13 @@ static inline bool is_access_track_spte(u64 spte)
+ }
+ 
+ /*
+- * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
++ * Due to limited space in PTEs, the MMIO generation is a 18 bit subset of
+  * the memslots generation and is derived as follows:
+  *
+  * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
+- * Bits 9-18 of the MMIO generation are propagated to spte bits 52-61
++ * Bits 9-17 of the MMIO generation are propagated to spte bits 54-62
+  *
++ * We don't use bit 63 to avoid conflicting with the SVE bit in EPT PTEs.
++ *
+  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
+  * the MMIO generation number, as doing so would require stealing a bit from
+@@ -418,15 +418,16 @@ static inline bool is_access_track_spte(u64 spte)
+  * requires a full MMU zap).  The flag is instead explicitly queried when
+  * checking for MMIO spte cache hits.
+  */
+-#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(18, 0)
++#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(17, 0)
+ 
+ #define MMIO_SPTE_GEN_LOW_START		3
+ #define MMIO_SPTE_GEN_LOW_END		11
+ #define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
+ 						    MMIO_SPTE_GEN_LOW_START)
+ 
+-#define MMIO_SPTE_GEN_HIGH_START	52
+-#define MMIO_SPTE_GEN_HIGH_END		61
++/* Leave room for SPTE_SPECIAL_MASK.  */
++#define MMIO_SPTE_GEN_HIGH_START	PT64_SECOND_AVAIL_BITS_SHIFT
++#define MMIO_SPTE_GEN_HIGH_END		62
+ #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
+ 						    MMIO_SPTE_GEN_HIGH_START)
+ static u64 generation_mmio_spte_mask(u64 gen)
+
+
+Paolo
+
