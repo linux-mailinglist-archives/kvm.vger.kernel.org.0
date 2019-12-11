@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6719711BB9D
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 19:24:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8CBA11BBBB
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 19:28:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730070AbfLKSYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 13:24:48 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:40421 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728912AbfLKSYs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 13:24:48 -0500
-Received: by mail-il1-f195.google.com with SMTP id b15so20297259ila.7
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 10:24:47 -0800 (PST)
+        id S1731254AbfLKS2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 13:28:08 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46490 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730255AbfLKS2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 13:28:08 -0500
+Received: by mail-io1-f65.google.com with SMTP id t26so12277661ioi.13
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 10:28:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=M9tA+Tr9ovbWOXuGiYbM0B2FW2ZyDkx7Yvdcfc6MPLs=;
-        b=idAqrZS5yOYwdeK/lgm7YpOyYtpiEJT5h1P6uhhaane+g2Xn7IV2dkSWP53z017gAQ
-         /AlG0kqHi/x8IM6vj96WukdMd3t7bSnKbqp5avoga1TPrk8lNOneJRYi9DrVcClaM5rV
-         uMgh5WkX8h3tYuTaK69vJOzJm8f0+V4ZPUEOhI47JT+9C8E3vc27FsRZS2QoQ5OC8p33
-         kbpTVseXf9aflsmpw57dqgtpsIZKmbXYkuNctxJ6lcFkdTeQNFXDHSSF5LUtNox/2mDw
-         OXWH7XGEe8tn/Bqh0f1qD3KYZ0F3d9lblN/7QzTO+cw7ICLs84AwE3dnQQJ8lYLgRFxE
-         SRDw==
+        bh=GYZ+lGswFVXkExunAAAaOydIGqZJAHmJZ1GU8MypIx8=;
+        b=YgOzV4v6I/TJVJydU7kTxVhF0VMLBMt2iNdLA+J1hNO6gC79rsTSsyFWoBw6gMfalQ
+         jpz8UmB5Ox1hpBkwq/d5lES/48ikNJgOpc0sq6kUr0dcFaX5KyrXM1n1CPCxuMQmEDdF
+         3Z7w09S39qzud1kYHF4BXd0Lo3dWITtHys7ilImYhq601hu7LNc2r6nhX/rRIceQFEP5
+         1VY4h1GZsm/4GtPXsbWOCrcfTnOZlhQ1NH/FEkDjWWcOTFWnrxu1ioaPwIVlzjS53fKh
+         f3jAWpXen+JUdXQ0LDpScWpevyZbsFXNnrDfH2y+9sw+YQURKrXTJJ56cWRLir8caxGV
+         y9Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=M9tA+Tr9ovbWOXuGiYbM0B2FW2ZyDkx7Yvdcfc6MPLs=;
-        b=FB7GIctyaoC2GvqxS6fGNUJZ1SpjXbTkbIw2+aghufdLHNq1nQTt6Rg8tlfDvsn1kM
-         6B9YCVFOSnM8n1SYs21/KqrjcT7pgitpQktf4ObrHE8y7x8P3yMKREB12Eq6gib4gUKp
-         kh/MbRq62LKMbpPrLtd88uY0DjZMFhEsvuU65ucLjU6d+5eJGOC0plm+SQN27USDgwg5
-         fuh/80lhbNBm2irJDQdDE5siHQ+k2Tzc1dsIh/zgmncNlvHJ0sms4hfh4uXDl2iP5MgW
-         pqGbwa1ZcFbWzEMsIT01SBKd6PxLTLk7viHYBsIOyPsDiaZldJH73T6Anc0WLEXc2F+8
-         lIow==
-X-Gm-Message-State: APjAAAXJcLRZt/DrwXwbsSDygv0K0H3K4CJYHk4GvNQYJbEgqBtjhYqt
-        Gr/4N2mXnsslRC9JZIDnwnAU3Fz15Kg02cGC5DlYfA==
-X-Google-Smtp-Source: APXvYqxOHiPfhWhJpgBQfI8f+K8kysFSEhs5Wj6CkL1K/PdLyHuY9O+4ujMgXwhSuP9+2dxlkR4HblBXuFY0uukuZlg=
-X-Received: by 2002:a05:6e02:8eb:: with SMTP id n11mr4519653ilt.26.1576088687084;
- Wed, 11 Dec 2019 10:24:47 -0800 (PST)
+        bh=GYZ+lGswFVXkExunAAAaOydIGqZJAHmJZ1GU8MypIx8=;
+        b=L+CAwG9Tj5+oOzE+2dKJvlf6DCFpVaFAXs37Wo75TX5zhyqgTQfOkHN37JmgqyIeZX
+         zzGPoSE5fhjmuOWVRy7D76vUyCBKlwPtzUabEGUxtM/I6fHax2b1tr0dZPY8kn+hfoW7
+         dt7xjWPSfR3bjWOdyO8Iw0XFZ9j3MyS50NteTTybUfWtcqR3Fxk5JegVwqsRZvh8s2UG
+         sWf//Ydu7NCWwaGrXq4DURNAWcNng8ow4bqJdR/dfX8I5jMLZCV6um5CUuZrxfVapz3/
+         gic/U4JM7Fsls7OPh/4QjSKHGZsTzFqDIik0+/fMNWmsU6wCun6YWjNWUp2G9TCEyA4D
+         PxeQ==
+X-Gm-Message-State: APjAAAUz6kK3TNIAJdka7NM5uT+UiUVFXZOf+pP5vBcf+HPU5pnU7ssW
+        MvSLuqk3ct1+RhbgBqJjE38C57hMcqKpilFx7HD7Lg==
+X-Google-Smtp-Source: APXvYqxIDlpEs2zoJLhRiXAXqzWo0oO6DflPW5rIoWl9fbpISlPNO+TX2x2qqejGkIbmidkvc94EXMb/3GXV1Hu5hYQ=
+X-Received: by 2002:a6b:3b49:: with SMTP id i70mr3977659ioa.108.1576088887157;
+ Wed, 11 Dec 2019 10:28:07 -0800 (PST)
 MIME-Version: 1.0
-References: <20191211175822.1925-1-sean.j.christopherson@intel.com> <20191211175822.1925-2-sean.j.christopherson@intel.com>
-In-Reply-To: <20191211175822.1925-2-sean.j.christopherson@intel.com>
+References: <20191211175822.1925-1-sean.j.christopherson@intel.com> <20191211175822.1925-3-sean.j.christopherson@intel.com>
+In-Reply-To: <20191211175822.1925-3-sean.j.christopherson@intel.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 11 Dec 2019 10:24:36 -0800
-Message-ID: <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add build-time assertion on usage of bit()
+Date:   Wed, 11 Dec 2019 10:27:56 -0800
+Message-ID: <CALMp9eTqtTRgQZaCdbkEkL6bChCTOgVPgbYTjBi5iOqsTn4r-Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Refactor and rename bit() to feature_bit() macro
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -62,60 +62,11 @@ X-Mailing-List: kvm@vger.kernel.org
 On Wed, Dec 11, 2019 at 9:58 AM Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> Add build-time checks to ensure KVM isn't trying to do a reverse CPUID
-> lookup on Linux-defined feature bits, along with comments to explain
-> the gory details of X86_FEATUREs and bit().
+> Rename bit() to __feature_bit() to give it a more descriptive name, and
+> add a macro, feature_bit(), to stuff the X68_FEATURE_ prefix to keep
+> line lengths manageable for code that hardcodes the bit to be retrieved.
+>
+> No functional change intended.
 >
 > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
->
-> Note, the premature newline in the first line of the second comment is
-> intentional to reduce churn in the next patch.
->
->  arch/x86/kvm/x86.h | 23 +++++++++++++++++++++--
->  1 file changed, 21 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index cab5e71f0f0f..4ee4175c66a7 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -144,9 +144,28 @@ static inline bool is_pae_paging(struct kvm_vcpu *vcpu)
->         return !is_long_mode(vcpu) && is_pae(vcpu) && is_paging(vcpu);
->  }
->
-> -static inline u32 bit(int bitno)
-> +/*
-> + * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
-> + * the hardware defined bit number (stored in bits 4:0) and a software defined
-> + * "word" (stored in bits 31:5).  The word is used to index into arrays of
-> + * bit masks that hold the per-cpu feature capabilities, e.g. this_cpu_has().
-> + */
-> +static __always_inline u32 bit(int feature)
->  {
-> -       return 1 << (bitno & 31);
-> +       /*
-> +        * bit() is intended to be used only for hardware-defined
-> +        * words, i.e. words whose bits directly correspond to a CPUID leaf.
-> +        * Retrieving the bit mask from a Linux-defined word is nonsensical
-> +        * as the bit number/mask is an arbitrary software-defined value and
-> +        * can't be used by KVM to query/control guest capabilities.
-> +        */
-> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_1);
-> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_2);
-> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_3);
-> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_4);
-> +       BUILD_BUG_ON((feature >> 5) > CPUID_7_EDX);
-
-What is magical about CPUID_7_EDX?
-
-> +
-> +       return 1 << (feature & 31);
-
-Why not BIT(feature & 31)?
-
->  }
->
->  static inline u8 vcpu_virt_addr_bits(struct kvm_vcpu *vcpu)
-> --
-> 2.24.0
->
+Reviewed-by: Jim Mattson <jmattson@google.com>
