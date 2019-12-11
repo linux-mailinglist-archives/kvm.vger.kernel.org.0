@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CFCD11AB53
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 13:54:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D2CE11AB57
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 13:54:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729307AbfLKMyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 07:54:17 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23781 "EHLO
+        id S1728991AbfLKMym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 07:54:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47594 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729298AbfLKMyR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 07:54:17 -0500
+        by vger.kernel.org with ESMTP id S1727477AbfLKMyl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 07:54:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576068855;
+        s=mimecast20190719; t=1576068880;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=zGMp8EI3hMZAQ5fcumKUUDkbARPscgpRhdUGMtzBq9k=;
-        b=Bwb/QTqcZ7UWATMV0W7bOWtDNLrUQiZlpHghXXXNEHoVbwyZtdAuo10toedRdHY1BWr/j6
-        BNYU46ChyBkY51/+L5WGJu4UoD+caM3EtkYgm6S8dRHQJJlIYLzYgxUIH2fKm2hnOjERob
-        v+1JBtDTV/SVKAcpj9SYL3hHcr8nF/M=
+        bh=WSvraGF2+D/PekAcKGNPbQQ5y96fxPMN3Pty1ObOovI=;
+        b=QKuKcvEikrV6tN4VM1Nmes7+6f3pNCXZUXgfwVmDQCrzAFjTPLEmH55JQIlDKhqndb/Jj+
+        o1oGKz6ZBE+f9wgvYyA0sGzUAvS8tSAy7pM2KHy2qYHbJeE1Yaelhg9DMemTkKP6bCU69s
+        Z1dXvvK1qSYCtdenwyNhpHYPnAyhcHc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-8H6cxRFoMDWzbC-eFRtewg-1; Wed, 11 Dec 2019 07:54:14 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-58-SlxCU5NDPoeYWssCf900VQ-1; Wed, 11 Dec 2019 07:54:38 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C7FD801E78;
-        Wed, 11 Dec 2019 12:54:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2865E801E7A;
+        Wed, 11 Dec 2019 12:54:37 +0000 (UTC)
 Received: from [10.36.117.148] (ovpn-117-148.ams2.redhat.com [10.36.117.148])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1800576FF9;
-        Wed, 11 Dec 2019 12:54:11 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: smp: Setup CRs from cpu 0
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C1671001902;
+        Wed, 11 Dec 2019 12:54:35 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: smp: Use full PSW to bringup
+ new cpu
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
 References: <20191211115923.9191-1-frankja@linux.ibm.com>
- <20191211115923.9191-3-frankja@linux.ibm.com>
- <75eadbf8-1159-1c3f-12c4-bda518adb2ef@redhat.com>
- <15cd9f10-a56b-949d-dc0f-2d5aa175222a@linux.ibm.com>
+ <20191211115923.9191-2-frankja@linux.ibm.com>
+ <6433a418-e42f-0cf6-9cd4-bbe9912b901d@redhat.com>
+ <7391e55e-7be5-c69b-a1e5-5e1ddadbc06c@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -84,15 +85,15 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <03e80db5-dee7-b646-dd01-f713cdecbc29@redhat.com>
-Date:   Wed, 11 Dec 2019 13:54:11 +0100
+Message-ID: <49ab9c97-c7f6-5e66-f086-f71c807fd3c2@redhat.com>
+Date:   Wed, 11 Dec 2019 13:54:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <15cd9f10-a56b-949d-dc0f-2d5aa175222a@linux.ibm.com>
+In-Reply-To: <7391e55e-7be5-c69b-a1e5-5e1ddadbc06c@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 8H6cxRFoMDWzbC-eFRtewg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: SlxCU5NDPoeYWssCf900VQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
@@ -101,46 +102,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.12.19 13:37, Janosch Frank wrote:
-> On 12/11/19 1:32 PM, David Hildenbrand wrote:
+On 11.12.19 13:34, Janosch Frank wrote:
+> On 12/11/19 1:31 PM, David Hildenbrand wrote:
 >> On 11.12.19 12:59, Janosch Frank wrote:
->>> Grab the CRs (currently only 0, 1, 7, 13) from cpu 0, so we can
->>> bringup the new cpu in DAT mode or set other control options.
+>>> Up to now we ignored the psw mask and only used the psw address when
+>>> bringing up a new cpu. For DAT we need to also load the mask, so let's
+>>> do that.
 >>>
 >>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >>> ---
->>>  lib/s390x/smp.c  | 5 ++++-
+>>>  lib/s390x/smp.c  | 2 ++
 >>>  s390x/cstart64.S | 2 +-
->>>  2 files changed, 5 insertions(+), 2 deletions(-)
+>>>  2 files changed, 3 insertions(+), 1 deletion(-)
 >>>
 >>> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
->>> index e17751a..4dfe7c6 100644
+>>> index f57f420..e17751a 100644
 >>> --- a/lib/s390x/smp.c
 >>> +++ b/lib/s390x/smp.c
->>> @@ -191,7 +191,10 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>>> @@ -185,6 +185,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>>>  	cpu->stack = (uint64_t *)alloc_pages(2);
+>>>  
+>>>  	/* Start without DAT and any other mask bits. */
+>>> +	cpu->lowcore->sw_int_psw.mask = psw.mask;
+>>> +	cpu->lowcore->sw_int_psw.addr = psw.addr;
+>>>  	cpu->lowcore->sw_int_grs[14] = psw.addr;
+>>
+>> Not looking at the code (sorry :D ), do we still need this then? (you
+>> drop the br bewlo)
+> 
+> r14 is the return address, saving/initialising it doesn't sound like a
+> bad idea to me. If we ever have stack traces, it might show up, or won't it?
+> 
+>>
 >>>  	cpu->lowcore->sw_int_grs[15] = (uint64_t)cpu->stack + (PAGE_SIZE * 4);
 >>>  	lc->restart_new_psw.mask = 0x0000000180000000UL;
->>>  	lc->restart_new_psw.addr = (uint64_t)smp_cpu_setup_state;
->>> -	lc->sw_int_crs[0] = 0x0000000000040000UL;
->>> +	lc->sw_int_crs[0] = stctg(0);
->>> +	lc->sw_int_crs[1] = stctg(1);
->>> +	lc->sw_int_crs[7] = stctg(7);
->>> +	lc->sw_int_crs[13] = stctg(13);
->>
->> Wouldn't it be better to also be able to specify the CRs explicitly here?
->>
-> 
-> Yes, but currently there are no users for something like that and it
-> would mean that we might need to add more code to support it.
-> 
-> As I said in the cover letter, this is a good first step to allow DAT on
-> additional cpus without any real setup needed in a test. Later we could
-> add a function to specify the CRs explicitly.
-> 
+>>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>>> index 86dd4c4..e6a6bdb 100644
+>>> --- a/s390x/cstart64.S
+>>> +++ b/s390x/cstart64.S
+>>> @@ -159,7 +159,7 @@ smp_cpu_setup_state:
+>>>  	xgr	%r1, %r1
+>>>  	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
+>>>  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
+>>> -	br	%r14
+>>> +	lpswe	GEN_LC_SW_INT_PSW
+>>>  
 
-Can you clarify why we need this patch now (e.g., DAT)? This patch
-sounds like it would make sense in the future only (it is easier to
-review with future changes IMHO).
+Makes sense
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
 
 -- 
 Thanks,
