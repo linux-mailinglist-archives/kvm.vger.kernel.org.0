@@ -2,1225 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2CCD11BEBA
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 22:00:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC54711BF25
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 22:25:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbfLKVAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 16:00:03 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54293 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726141AbfLKVAD (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 16:00:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576097998;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=11RvuL9ggNWrE7J3oSua4tYKjme+QOxxTqkzu9utsBI=;
-        b=hpLdGE9Z7R5MWmtw3ykHPw8xcVH/1fUY/xm8SRWT6DvMvdr9Mr4c5U9g4lVqoHCLhxYTaF
-        U1rwMl26ZfQnuYUW8o6V266sEe3zAqwCZ/tj16EwzHInEtwsXa29gWmP/ANQnCS3Ll8l+D
-        fvLHFbkOTPP91Ovqk1eSI8ZzaQy4V0k=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-2VYy0wcqPia5OneBnpyFYw-1; Wed, 11 Dec 2019 15:59:57 -0500
-X-MC-Unique: 2VYy0wcqPia5OneBnpyFYw-1
-Received: by mail-qt1-f198.google.com with SMTP id l25so5311322qtu.0
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 12:59:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=11RvuL9ggNWrE7J3oSua4tYKjme+QOxxTqkzu9utsBI=;
-        b=DOy6JfJutHRMCx27ZiLtOe7zHwN1CHiGc6eX1J2RwJla4BrUNMLHktbZ5VIqf+hOHv
-         RXfjkGcHbVFscjMm7DB5vFwtRFZZv7QQTX7MEonQ/t8KdkhWKOVhKL+LeJ2cUXPcpkUK
-         HhIDLhJa4B2BaAMveGg56mhILXi7RRdrCexg4vyocI56/uI37++1U6u+ywzKJqr9svAP
-         lXJUSUy97vFDMfij96y9WaJAqONtwHNdZmbbHzod/eRG39yc23sUtXHZlzjQAkPU9i9+
-         MyVeMiKBU4j1J1NOypErnPKiGnQyAdVidyoB+/X7XKRPZ6a7Cy3Ol6D+kmxfayXLQhGF
-         Bkqg==
-X-Gm-Message-State: APjAAAXODAwD1tcyzyv0/Yn7bJ/uV6lT8mloOJuBxzrxKfD56QlAPHka
-        DYbNfcUHCOjqMnTUgx9MI52+la5QsGopz6F/h+8qV1WRpPl7Qf0fYZCG3KPrbWVgnmRhkxY4jV5
-        O8qhNOHpYYCuy
-X-Received: by 2002:ac8:1198:: with SMTP id d24mr4560380qtj.105.1576097996257;
-        Wed, 11 Dec 2019 12:59:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwMZU6Zc/SZEBINNDGk0Sv/ZUrZAXeUCwM+QtfpsrWlRwvGFM4/mm/vZqaoZJrD45J/AjUK4Q==
-X-Received: by 2002:ac8:1198:: with SMTP id d24mr4560316qtj.105.1576097995116;
-        Wed, 11 Dec 2019 12:59:55 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id t15sm1024447qkg.49.2019.12.11.12.59.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 12:59:54 -0800 (PST)
-Date:   Wed, 11 Dec 2019 15:59:52 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191211205952.GA5091@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <20191211063830-mutt-send-email-mst@kernel.org>
+        id S1726674AbfLKVZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 16:25:37 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:1456 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726313AbfLKVZg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 16:25:36 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df15eb80000>; Wed, 11 Dec 2019 13:25:12 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 11 Dec 2019 13:25:34 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 11 Dec 2019 13:25:34 -0800
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 11 Dec
+ 2019 21:25:34 +0000
+Subject: Re: [PATCH v9 10/25] mm/gup: introduce pin_user_pages*() and FOLL_PIN
+To:     Jonathan Corbet <corbet@lwn.net>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        Mike Rapoport <rppt@linux.ibm.com>
+References: <20191211025318.457113-1-jhubbard@nvidia.com>
+ <20191211025318.457113-11-jhubbard@nvidia.com>
+ <20191211135737.581add2f@lwn.net>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <c8930e77-9c99-2d3d-743d-9d58176ea690@nvidia.com>
+Date:   Wed, 11 Dec 2019 13:25:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191211063830-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191211135737.581add2f@lwn.net>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576099513; bh=h8WoxBOtUL7d4aBHwikvS71dFoLle6Q1qJcgfYlGzoI=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=n8ng2gW+8yccOTJ0sb0qKZBSBkMzrO2w+mX1jwAwhVYYv3FE21MXjsfMjjhApcnib
+         wo8d+ZRlDZwi9+66AYkoZtFFMIJupZ7au9saOmm/kNh3KbsRApo1SSaYZzqpFUg9dv
+         APDY2cvczFMX0P05ANDG9Wpe8w2DHHN7/JdQsO1AuudRaAw4keF3jV1uyq3uA82xUI
+         ieCnDqXdxIHT69mdMVDE/JA7qgs+lLHW/JROAhLDlkZchTV8THtwKre9xUIr3vtdDd
+         8O/vqZHRFo4GrCktOUJaI0JiNxox7/Ns2xEUIaiCnKWdDSbo4DOz0JmZdD1qJCvncm
+         kDdssHEUgirjg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 07:53:48AM -0500, Michael S. Tsirkin wrote:
-> On Fri, Nov 29, 2019 at 04:34:54PM -0500, Peter Xu wrote:
-> > This patch is heavily based on previous work from Lei Cao
-> > <lei.cao@stratus.com> and Paolo Bonzini <pbonzini@redhat.com>. [1]
-> > 
-> > KVM currently uses large bitmaps to track dirty memory.  These bitmaps
-> > are copied to userspace when userspace queries KVM for its dirty page
-> > information.  The use of bitmaps is mostly sufficient for live
-> > migration, as large parts of memory are be dirtied from one log-dirty
-> > pass to another.  However, in a checkpointing system, the number of
-> > dirty pages is small and in fact it is often bounded---the VM is
-> > paused when it has dirtied a pre-defined number of pages. Traversing a
-> > large, sparsely populated bitmap to find set bits is time-consuming,
-> > as is copying the bitmap to user-space.
-> > 
-> > A similar issue will be there for live migration when the guest memory
-> > is huge while the page dirty procedure is trivial.  In that case for
-> > each dirty sync we need to pull the whole dirty bitmap to userspace
-> > and analyse every bit even if it's mostly zeros.
-> > 
-> > The preferred data structure for above scenarios is a dense list of
-> > guest frame numbers (GFN).  This patch series stores the dirty list in
-> > kernel memory that can be memory mapped into userspace to allow speedy
-> > harvesting.
-> > 
-> > We defined two new data structures:
-> > 
-> >   struct kvm_dirty_ring;
-> >   struct kvm_dirty_ring_indexes;
-> > 
-> > Firstly, kvm_dirty_ring is defined to represent a ring of dirty
-> > pages.  When dirty tracking is enabled, we can push dirty gfn onto the
-> > ring.
-> > 
-> > Secondly, kvm_dirty_ring_indexes is defined to represent the
-> > user/kernel interface of each ring.  Currently it contains two
-> > indexes: (1) avail_index represents where we should push our next
-> > PFN (written by kernel), while (2) fetch_index represents where the
-> > userspace should fetch the next dirty PFN (written by userspace).
-> > 
-> > One complete ring is composed by one kvm_dirty_ring plus its
-> > corresponding kvm_dirty_ring_indexes.
-> > 
-> > Currently, we have N+1 rings for each VM of N vcpus:
-> > 
-> >   - for each vcpu, we have 1 per-vcpu dirty ring,
-> >   - for each vm, we have 1 per-vm dirty ring
-> > 
-> > Please refer to the documentation update in this patch for more
-> > details.
-> > 
-> > Note that this patch implements the core logic of dirty ring buffer.
-> > It's still disabled for all archs for now.  Also, we'll address some
-> > of the other issues in follow up patches before it's firstly enabled
-> > on x86.
-> > 
-> > [1] https://patchwork.kernel.org/patch/10471409/
-> > 
-> > Signed-off-by: Lei Cao <lei.cao@stratus.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
+On 12/11/19 12:57 PM, Jonathan Corbet wrote:
+> On Tue, 10 Dec 2019 18:53:03 -0800
+> John Hubbard <jhubbard@nvidia.com> wrote:
 > 
+>> Introduce pin_user_pages*() variations of get_user_pages*() calls,
+>> and also pin_longterm_pages*() variations.
 > 
-> Thanks, that's interesting.
+> Just a couple of nits on the documentation patch
+> 
+>> +++ b/Documentation/core-api/pin_user_pages.rst
+>> @@ -0,0 +1,232 @@
+>> +.. SPDX-License-Identifier: GPL-2.0
+>> +
+>> +====================================================
+>> +pin_user_pages() and related calls
+>> +====================================================
+>> +
+>> +.. contents:: :local:
+>> +
+>> +Overview
+>> +========
+>> +
+>> +This document describes the following functions: ::
+>> +
+>> + pin_user_pages
+>> + pin_user_pages_fast
+>> + pin_user_pages_remote
+> 
+> You could just say "the following functions::" and get the result you're
+> after with a slightly less alien plain-text reading experience.
 
-Hi, Michael,
-
-Thanks for reading the series.
+I see. That works nicely: same result with fewer :'s. 
 
 > 
-> > ---
-> >  Documentation/virt/kvm/api.txt | 109 +++++++++++++++
-> >  arch/x86/kvm/Makefile          |   3 +-
-> >  include/linux/kvm_dirty_ring.h |  67 +++++++++
-> >  include/linux/kvm_host.h       |  33 +++++
-> >  include/linux/kvm_types.h      |   1 +
-> >  include/uapi/linux/kvm.h       |  36 +++++
-> >  virt/kvm/dirty_ring.c          | 156 +++++++++++++++++++++
-> >  virt/kvm/kvm_main.c            | 240 ++++++++++++++++++++++++++++++++-
-> >  8 files changed, 642 insertions(+), 3 deletions(-)
-> >  create mode 100644 include/linux/kvm_dirty_ring.h
-> >  create mode 100644 virt/kvm/dirty_ring.c
-> > 
-> > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> > index 49183add44e7..fa622c9a2eb8 100644
-> > --- a/Documentation/virt/kvm/api.txt
-> > +++ b/Documentation/virt/kvm/api.txt
-> > @@ -231,6 +231,7 @@ Based on their initialization different VMs may have different capabilities.
-> >  It is thus encouraged to use the vm ioctl to query for capabilities (available
-> >  with KVM_CAP_CHECK_EXTENSION_VM on the vm fd)
-> >  
-> > +
-> >  4.5 KVM_GET_VCPU_MMAP_SIZE
-> >  
-> >  Capability: basic
-> > @@ -243,6 +244,18 @@ The KVM_RUN ioctl (cf.) communicates with userspace via a shared
-> >  memory region.  This ioctl returns the size of that region.  See the
-> >  KVM_RUN documentation for details.
-> >  
-> > +Besides the size of the KVM_RUN communication region, other areas of
-> > +the VCPU file descriptor can be mmap-ed, including:
-> > +
-> > +- if KVM_CAP_COALESCED_MMIO is available, a page at
-> > +  KVM_COALESCED_MMIO_PAGE_OFFSET * PAGE_SIZE; for historical reasons,
-> > +  this page is included in the result of KVM_GET_VCPU_MMAP_SIZE.
-> > +  KVM_CAP_COALESCED_MMIO is not documented yet.
-> > +
-> > +- if KVM_CAP_DIRTY_LOG_RING is available, a number of pages at
-> > +  KVM_DIRTY_LOG_PAGE_OFFSET * PAGE_SIZE.  For more information on
-> > +  KVM_CAP_DIRTY_LOG_RING, see section 8.3.
-> > +
-> >  
-> >  4.6 KVM_SET_MEMORY_REGION
-> >  
-> 
-> PAGE_SIZE being which value? It's not always trivial for
-> userspace to know what's the PAGE_SIZE for the kernel ...
+> Of course, you could also just say "This document describes
+> pin_user_pages(), pin_user_pages_fast(), and pin_user_pages_remote()." But
+> that's a matter of personal taste, I guess.  Using the function() notation
+> will cause the docs system to automatically link to the kerneldoc info,
+> though.  
 
-I thought it can be easily fetched from getpagesize() or
-sysconf(PAGE_SIZE)?  Especially considering that the document should
-be for kvm userspace, I'd say it should be common that a hypervisor
-process will need to know this probably in other tons of places.. no?
+OK. I did try the single-sentence approach just now, but to me the one-per-line
+seems to make both the text and the generated HTML slightly easier to look at. 
+Of course, like you say, different people will have different preferences. So 
+in the end I've combined the tips, like this:
+
++Overview
++========
++
++This document describes the following functions::
++
++ pin_user_pages()
++ pin_user_pages_fast()
++ pin_user_pages_remote()
+
 
 > 
+>> +Basic description of FOLL_PIN
+>> +=============================
+>> +
+>> +FOLL_PIN and FOLL_LONGTERM are flags that can be passed to the get_user_pages*()
+>> +("gup") family of functions. FOLL_PIN has significant interactions and
+>> +interdependencies with FOLL_LONGTERM, so both are covered here.
+>> +
+>> +FOLL_PIN is internal to gup, meaning that it should not appear at the gup call
+>> +sites. This allows the associated wrapper functions  (pin_user_pages*() and
+>> +others) to set the correct combination of these flags, and to check for problems
+>> +as well.
+>> +
+>> +FOLL_LONGTERM, on the other hand, *is* allowed to be set at the gup call sites.
+>> +This is in order to avoid creating a large number of wrapper functions to cover
+>> +all combinations of get*(), pin*(), FOLL_LONGTERM, and more. Also, the
+>> +pin_user_pages*() APIs are clearly distinct from the get_user_pages*() APIs, so
+>> +that's a natural dividing line, and a good point to make separate wrapper calls.
+>> +In other words, use pin_user_pages*() for DMA-pinned pages, and
+>> +get_user_pages*() for other cases. There are four cases described later on in
+>> +this document, to further clarify that concept.
+>> +
+>> +FOLL_PIN and FOLL_GET are mutually exclusive for a given gup call. However,
+>> +multiple threads and call sites are free to pin the same struct pages, via both
+>> +FOLL_PIN and FOLL_GET. It's just the call site that needs to choose one or the
+>> +other, not the struct page(s).
+>> +
+>> +The FOLL_PIN implementation is nearly the same as FOLL_GET, except that FOLL_PIN
+>> +uses a different reference counting technique.
+>> +
+>> +FOLL_PIN is a prerequisite to FOLL_LONGTGERM. Another way of saying that is,
 > 
-> > @@ -5358,6 +5371,7 @@ CPU when the exception is taken. If this virtual SError is taken to EL1 using
-> >  AArch64, this value will be reported in the ISS field of ESR_ELx.
-> >  
-> >  See KVM_CAP_VCPU_EVENTS for more details.
-> > +
-> >  8.20 KVM_CAP_HYPERV_SEND_IPI
-> >  
-> >  Architectures: x86
-> > @@ -5365,6 +5379,7 @@ Architectures: x86
-> >  This capability indicates that KVM supports paravirtualized Hyper-V IPI send
-> >  hypercalls:
-> >  HvCallSendSyntheticClusterIpi, HvCallSendSyntheticClusterIpiEx.
-> > +
-> >  8.21 KVM_CAP_HYPERV_DIRECT_TLBFLUSH
-> >  
-> >  Architecture: x86
-> > @@ -5378,3 +5393,97 @@ handling by KVM (as some KVM hypercall may be mistakenly treated as TLB
-> >  flush hypercalls by Hyper-V) so userspace should disable KVM identification
-> >  in CPUID and only exposes Hyper-V identification. In this case, guest
-> >  thinks it's running on Hyper-V and only use Hyper-V hypercalls.
-> > +
-> > +8.22 KVM_CAP_DIRTY_LOG_RING
-> > +
-> > +Architectures: x86
-> > +Parameters: args[0] - size of the dirty log ring
-> > +
-> > +KVM is capable of tracking dirty memory using ring buffers that are
-> > +mmaped into userspace; there is one dirty ring per vcpu and one global
-> > +ring per vm.
-> > +
-> > +One dirty ring has the following two major structures:
-> > +
-> > +struct kvm_dirty_ring {
-> > +	u16 dirty_index;
-> > +	u16 reset_index;
-> > +	u32 size;
-> > +	u32 soft_limit;
-> > +	spinlock_t lock;
-> > +	struct kvm_dirty_gfn *dirty_gfns;
-> > +};
-> > +
-> > +struct kvm_dirty_ring_indexes {
-> > +	__u32 avail_index; /* set by kernel */
-> > +	__u32 fetch_index; /* set by userspace */
+> FOLL_LONGTERM typoed there.
 > 
-> Sticking these next to each other seems to guarantee cache conflicts.
-> 
-> Avail/Fetch seems to mimic Virtio's avail/used exactly.  I am not saying
-> you must reuse the code really, but I think you should take a hard look
-> at e.g. the virtio packed ring structure. We spent a bunch of time
-> optimizing it for cache utilization. It seems kernel is the driver,
-> making entries available, and userspace the device, using them.
-> Again let's not develop a thread about this, but I think
-> this is something to consider and discuss in future versions
-> of the patches.
 
-I think I completely understand your concern.  We should avoid wasting
-time on those are already there.  I'm just afraid that it'll took even
-more time to use virtio for this use case while at last we don't
-really get much benefit out of it (e.g. most of the virtio features
-are not used).
+Good catch. Fixed.
 
-Yeh let's not develop a thread for this topic - I will read more on
-virtio before my next post to see whether there's any chance we can
-share anything with virtio ring.
-
-> 
-> 
-> > +};
-> > +
-> > +While for each of the dirty entry it's defined as:
-> > +
-> > +struct kvm_dirty_gfn {
-> 
-> What does GFN stand for?
-
-It's guest frame number, iiuc.  I'm not the one who named this, but
-that's what I understand..
-
-> 
-> > +        __u32 pad;
-> > +        __u32 slot; /* as_id | slot_id */
-> > +        __u64 offset;
-> > +};
-> 
-> offset of what? a 4K page right? Seems like a waste e.g. for
-> hugetlbfs... How about replacing pad with size instead?
-
-As Paolo explained, it's the page frame number of the guest.  IIUC
-even for hugetlbfs we track dirty bits in 4k size.
-
-> 
-> > +
-> > +The fields in kvm_dirty_ring will be only internal to KVM itself,
-> > +while the fields in kvm_dirty_ring_indexes will be exposed to
-> > +userspace to be either read or written.
-> 
-> I'm not sure what you are trying to say here. kvm_dirty_gfn
-> seems to be part of UAPI.
-
-It was talking about kvm_dirty_ring, which is kvm internal and not
-exposed to uapi.  While kvm_dirty_gfn is exposed to the users.
-
-> 
-> > +
-> > +The two indices in the ring buffer are free running counters.
-> > +
-> > +In pseudocode, processing the ring buffer looks like this:
-> > +
-> > +	idx = load-acquire(&ring->fetch_index);
-> > +	while (idx != ring->avail_index) {
-> > +		struct kvm_dirty_gfn *entry;
-> > +		entry = &ring->dirty_gfns[idx & (size - 1)];
-> > +		...
-> > +
-> > +		idx++;
-> > +	}
-> > +	ring->fetch_index = idx;
-> > +
-> > +Userspace calls KVM_ENABLE_CAP ioctl right after KVM_CREATE_VM ioctl
-> > +to enable this capability for the new guest and set the size of the
-> > +rings.  It is only allowed before creating any vCPU, and the size of
-> > +the ring must be a power of two.
-> 
-> All these seem like arbitrary limitations to me.
-
-The dependency of vcpu is partly because we need to create per-vcpu
-ring, so it's easier that we don't allow it to change after that.
-
-> 
-> Sizing the ring correctly might prove to be a challenge.
-> 
-> Thus I think there's value in resizing the rings
-> without destroying VCPU.
-
-Do you have an example on when we could use this feature?  My wild
-guess is that even if we try hard to allow resizing (assuming that
-won't bring more bugs, but I hightly doubt...), people may not use it
-at all.
-
-The major scenario here is that kvm userspace will be collecting the
-dirty bits quickly, so the ring should not really get full easily.
-Then the ring size does not really matter much either, as long as it
-is bigger than some specific value to avoid vmexits due to full.
-
-How about we start with the simple that we don't allow it to change?
-We can do that when the requirement comes.
-
-> 
-> Also, power of two just saves a branch here and there,
-> but wastes lots of memory. Just wrap the index around to
-> 0 and then users can select any size?
-
-Same as above to postpone until we need it?
-
-> 
-> 
-> 
-> >  The larger the ring buffer, the less
-> > +likely the ring is full and the VM is forced to exit to userspace. The
-> > +optimal size depends on the workload, but it is recommended that it be
-> > +at least 64 KiB (4096 entries).
-> 
-> OTOH larger buffers put lots of pressure on the system cache.
-> 
-> > +
-> > +After the capability is enabled, userspace can mmap the global ring
-> > +buffer (kvm_dirty_gfn[], offset KVM_DIRTY_LOG_PAGE_OFFSET) and the
-> > +indexes (kvm_dirty_ring_indexes, offset 0) from the VM file
-> > +descriptor.  The per-vcpu dirty ring instead is mmapped when the vcpu
-> > +is created, similar to the kvm_run struct (kvm_dirty_ring_indexes
-> > +locates inside kvm_run, while kvm_dirty_gfn[] at offset
-> > +KVM_DIRTY_LOG_PAGE_OFFSET).
-> > +
-> > +Just like for dirty page bitmaps, the buffer tracks writes to
-> > +all user memory regions for which the KVM_MEM_LOG_DIRTY_PAGES flag was
-> > +set in KVM_SET_USER_MEMORY_REGION.  Once a memory region is registered
-> > +with the flag set, userspace can start harvesting dirty pages from the
-> > +ring buffer.
-> > +
-> > +To harvest the dirty pages, userspace accesses the mmaped ring buffer
-> > +to read the dirty GFNs up to avail_index, and sets the fetch_index
-> > +accordingly.  This can be done when the guest is running or paused,
-> > +and dirty pages need not be collected all at once.  After processing
-> > +one or more entries in the ring buffer, userspace calls the VM ioctl
-> > +KVM_RESET_DIRTY_RINGS to notify the kernel that it has updated
-> > +fetch_index and to mark those pages clean.  Therefore, the ioctl
-> > +must be called *before* reading the content of the dirty pages.
-> > +
-> > +However, there is a major difference comparing to the
-> > +KVM_GET_DIRTY_LOG interface in that when reading the dirty ring from
-> > +userspace it's still possible that the kernel has not yet flushed the
-> > +hardware dirty buffers into the kernel buffer.  To achieve that, one
-> > +needs to kick the vcpu out for a hardware buffer flush (vmexit).
-> > +
-> > +If one of the ring buffers is full, the guest will exit to userspace
-> > +with the exit reason set to KVM_EXIT_DIRTY_LOG_FULL, and the
-> > +KVM_RUN ioctl will return -EINTR. Once that happens, userspace
-> > +should pause all the vcpus, then harvest all the dirty pages and
-> > +rearm the dirty traps. It can unpause the guest after that.
-> 
-> This last item means that the performance impact of the feature is
-> really hard to predict. Can improve some workloads drastically. Or can
-> slow some down.
-> 
-> 
-> One solution could be to actually allow using this together with the
-> existing bitmap. Userspace can then decide whether it wants to block
-> VCPU on ring full, or just record ring full condition and recover by
-> bitmap scanning.
-
-That's true, but again allowing mixture use of the two might bring
-extra complexity as well (especially when after adding
-KVM_CLEAR_DIRTY_LOG).
-
-My understanding of this is that normally we do only want either one
-of them depending on the major workload and the configuration of the
-guest.  It's not trivial to try to provide a one-for-all solution.  So
-again I would hope we can start from easy, then we extend when we have
-better ideas on how to leverage the two interfaces when the ideas
-really come, and then we can justify whether it's worth it to work on
-that complexity.
-
-> 
-> 
-> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> > index b19ef421084d..0acee817adfb 100644
-> > --- a/arch/x86/kvm/Makefile
-> > +++ b/arch/x86/kvm/Makefile
-> > @@ -5,7 +5,8 @@ ccflags-y += -Iarch/x86/kvm
-> >  KVM := ../../../virt/kvm
-> >  
-> >  kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
-> > -				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
-> > +				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o \
-> > +				$(KVM)/dirty_ring.o
-> >  kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
-> >  
-> >  kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
-> > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-> > new file mode 100644
-> > index 000000000000..8335635b7ff7
-> > --- /dev/null
-> > +++ b/include/linux/kvm_dirty_ring.h
-> > @@ -0,0 +1,67 @@
-> > +#ifndef KVM_DIRTY_RING_H
-> > +#define KVM_DIRTY_RING_H
-> > +
-> > +/*
-> > + * struct kvm_dirty_ring is defined in include/uapi/linux/kvm.h.
-> > + *
-> > + * dirty_ring:  shared with userspace via mmap. It is the compact list
-> > + *              that holds the dirty pages.
-> > + * dirty_index: free running counter that points to the next slot in
-> > + *              dirty_ring->dirty_gfns  where a new dirty page should go.
-> > + * reset_index: free running counter that points to the next dirty page
-> > + *              in dirty_ring->dirty_gfns for which dirty trap needs to
-> > + *              be reenabled
-> > + * size:        size of the compact list, dirty_ring->dirty_gfns
-> > + * soft_limit:  when the number of dirty pages in the list reaches this
-> > + *              limit, vcpu that owns this ring should exit to userspace
-> > + *              to allow userspace to harvest all the dirty pages
-> > + * lock:        protects dirty_ring, only in use if this is the global
-> > + *              ring
-> > + *
-> > + * The number of dirty pages in the ring is calculated by,
-> > + * dirty_index - reset_index
-> > + *
-> > + * kernel increments dirty_ring->indices.avail_index after dirty index
-> > + * is incremented. When userspace harvests the dirty pages, it increments
-> > + * dirty_ring->indices.fetch_index up to dirty_ring->indices.avail_index.
-> > + * When kernel reenables dirty traps for the dirty pages, it increments
-> > + * reset_index up to dirty_ring->indices.fetch_index.
-> > + *
-> > + */
-> > +struct kvm_dirty_ring {
-> > +	u32 dirty_index;
-> > +	u32 reset_index;
-> > +	u32 size;
-> > +	u32 soft_limit;
-> > +	spinlock_t lock;
-> > +	struct kvm_dirty_gfn *dirty_gfns;
-> > +};
-> > +
-> > +u32 kvm_dirty_ring_get_rsvd_entries(void);
-> > +int kvm_dirty_ring_alloc(struct kvm *kvm, struct kvm_dirty_ring *ring);
-> > +
-> > +/*
-> > + * called with kvm->slots_lock held, returns the number of
-> > + * processed pages.
-> > + */
-> > +int kvm_dirty_ring_reset(struct kvm *kvm,
-> > +			 struct kvm_dirty_ring *ring,
-> > +			 struct kvm_dirty_ring_indexes *indexes);
-> > +
-> > +/*
-> > + * returns 0: successfully pushed
-> > + *         1: successfully pushed, soft limit reached,
-> > + *            vcpu should exit to userspace
-> > + *         -EBUSY: unable to push, dirty ring full.
-> > + */
-> > +int kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
-> > +			struct kvm_dirty_ring_indexes *indexes,
-> > +			u32 slot, u64 offset, bool lock);
-> > +
-> > +/* for use in vm_operations_struct */
-> > +struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 i);
-> > +
-> > +void kvm_dirty_ring_free(struct kvm_dirty_ring *ring);
-> > +bool kvm_dirty_ring_full(struct kvm_dirty_ring *ring);
-> > +
-> > +#endif
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 498a39462ac1..7b747bc9ff3e 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -34,6 +34,7 @@
-> >  #include <linux/kvm_types.h>
-> >  
-> >  #include <asm/kvm_host.h>
-> > +#include <linux/kvm_dirty_ring.h>
-> >  
-> >  #ifndef KVM_MAX_VCPU_ID
-> >  #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
-> > @@ -146,6 +147,7 @@ static inline bool is_error_page(struct page *page)
-> >  #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> >  #define KVM_REQ_PENDING_TIMER     2
-> >  #define KVM_REQ_UNHALT            3
-> > +#define KVM_REQ_DIRTY_RING_FULL   4
-> >  #define KVM_REQUEST_ARCH_BASE     8
-> >  
-> >  #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
-> > @@ -321,6 +323,7 @@ struct kvm_vcpu {
-> >  	bool ready;
-> >  	struct kvm_vcpu_arch arch;
-> >  	struct dentry *debugfs_dentry;
-> > +	struct kvm_dirty_ring dirty_ring;
-> >  };
-> >  
-> >  static inline int kvm_vcpu_exiting_guest_mode(struct kvm_vcpu *vcpu)
-> > @@ -501,6 +504,10 @@ struct kvm {
-> >  	struct srcu_struct srcu;
-> >  	struct srcu_struct irq_srcu;
-> >  	pid_t userspace_pid;
-> > +	/* Data structure to be exported by mmap(kvm->fd, 0) */
-> > +	struct kvm_vm_run *vm_run;
-> > +	u32 dirty_ring_size;
-> > +	struct kvm_dirty_ring vm_dirty_ring;
-> >  };
-> >  
-> >  #define kvm_err(fmt, ...) \
-> > @@ -832,6 +839,8 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
-> >  					gfn_t gfn_offset,
-> >  					unsigned long mask);
-> >  
-> > +void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask);
-> > +
-> >  int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
-> >  				struct kvm_dirty_log *log);
-> >  int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
-> > @@ -1411,4 +1420,28 @@ int kvm_vm_create_worker_thread(struct kvm *kvm, kvm_vm_thread_fn_t thread_fn,
-> >  				uintptr_t data, const char *name,
-> >  				struct task_struct **thread_ptr);
-> >  
-> > +/*
-> > + * This defines how many reserved entries we want to keep before we
-> > + * kick the vcpu to the userspace to avoid dirty ring full.  This
-> > + * value can be tuned to higher if e.g. PML is enabled on the host.
-> > + */
-> > +#define  KVM_DIRTY_RING_RSVD_ENTRIES  64
-> > +
-> > +/* Max number of entries allowed for each kvm dirty ring */
-> > +#define  KVM_DIRTY_RING_MAX_ENTRIES  65536
-> > +
-> > +/*
-> > + * Arch needs to define these macro after implementing the dirty ring
-> > + * feature.  KVM_DIRTY_LOG_PAGE_OFFSET should be defined as the
-> > + * starting page offset of the dirty ring structures,
-> 
-> Confused. Offset where? You set a default for everyone - where does arch
-> want to override it?
-
-If arch defines KVM_DIRTY_LOG_PAGE_OFFSET then below will be a no-op,
-please see [1] on #ifndef.
-
-> 
-> > while
-> > + * KVM_DIRTY_RING_VERSION should be defined as >=1.  By default, this
-> > + * feature is off on all archs.
-> > + */
-> > +#ifndef KVM_DIRTY_LOG_PAGE_OFFSET
-
-[1]
-
-> > +#define KVM_DIRTY_LOG_PAGE_OFFSET 0
-> > +#endif
-> > +#ifndef KVM_DIRTY_RING_VERSION
-> > +#define KVM_DIRTY_RING_VERSION 0
-> > +#endif
-> 
-> One way versioning, with no bits and negotiation
-> will make it hard to change down the road.
-> what's wrong with existing KVM capabilities that
-> you feel there's a need for dedicated versioning for this?
-
-Frankly speaking I don't even think it'll change in the near
-future.. :)
-
-Yeh kvm versioning could work too.  Here we can also return a zero
-just like the most of the caps (or KVM_DIRTY_LOG_PAGE_OFFSET as in the
-original patchset, but it's really helpless either because it's
-defined in uapi), but I just don't see how it helps...  So I returned
-a version number just in case we'd like to change the layout some day
-and when we don't want to bother introducing another cap bit for the
-same feature (like KVM_CAP_MANUAL_DIRTY_LOG_PROTECT and
-KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2).
-
-> 
-> > +
-> >  #endif
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index 1c88e69db3d9..d9d03eea145a 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -11,6 +11,7 @@ struct kvm_irq_routing_table;
-> >  struct kvm_memory_slot;
-> >  struct kvm_one_reg;
-> >  struct kvm_run;
-> > +struct kvm_vm_run;
-> >  struct kvm_userspace_memory_region;
-> >  struct kvm_vcpu;
-> >  struct kvm_vcpu_init;
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index e6f17c8e2dba..0b88d76d6215 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -236,6 +236,7 @@ struct kvm_hyperv_exit {
-> >  #define KVM_EXIT_IOAPIC_EOI       26
-> >  #define KVM_EXIT_HYPERV           27
-> >  #define KVM_EXIT_ARM_NISV         28
-> > +#define KVM_EXIT_DIRTY_RING_FULL  29
-> >  
-> >  /* For KVM_EXIT_INTERNAL_ERROR */
-> >  /* Emulate instruction failed. */
-> > @@ -247,6 +248,11 @@ struct kvm_hyperv_exit {
-> >  /* Encounter unexpected vm-exit reason */
-> >  #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
-> >  
-> > +struct kvm_dirty_ring_indexes {
-> > +	__u32 avail_index; /* set by kernel */
-> > +	__u32 fetch_index; /* set by userspace */
-> > +};
-> > +
-> >  /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
-> >  struct kvm_run {
-> >  	/* in */
-> > @@ -421,6 +427,13 @@ struct kvm_run {
-> >  		struct kvm_sync_regs regs;
-> >  		char padding[SYNC_REGS_SIZE_BYTES];
-> >  	} s;
-> > +
-> > +	struct kvm_dirty_ring_indexes vcpu_ring_indexes;
-> > +};
-> > +
-> > +/* Returned by mmap(kvm->fd, offset=0) */
-> > +struct kvm_vm_run {
-> > +	struct kvm_dirty_ring_indexes vm_ring_indexes;
-> >  };
-> >  
-> >  /* for KVM_REGISTER_COALESCED_MMIO / KVM_UNREGISTER_COALESCED_MMIO */
-> > @@ -1009,6 +1022,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
-> >  #define KVM_CAP_ARM_NISV_TO_USER 177
-> >  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
-> > +#define KVM_CAP_DIRTY_LOG_RING 179
-> >  
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >  
-> > @@ -1472,6 +1486,9 @@ struct kvm_enc_region {
-> >  /* Available with KVM_CAP_ARM_SVE */
-> >  #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
-> >  
-> > +/* Available with KVM_CAP_DIRTY_LOG_RING */
-> > +#define KVM_RESET_DIRTY_RINGS     _IO(KVMIO, 0xc3)
-> > +
-> >  /* Secure Encrypted Virtualization command */
-> >  enum sev_cmd_id {
-> >  	/* Guest initialization commands */
-> > @@ -1622,4 +1639,23 @@ struct kvm_hyperv_eventfd {
-> >  #define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
-> >  #define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
-> >  
-> > +/*
-> > + * The following are the requirements for supporting dirty log ring
-> > + * (by enabling KVM_DIRTY_LOG_PAGE_OFFSET).
-> > + *
-> > + * 1. Memory accesses by KVM should call kvm_vcpu_write_* instead
-> > + *    of kvm_write_* so that the global dirty ring is not filled up
-> > + *    too quickly.
-> > + * 2. kvm_arch_mmu_enable_log_dirty_pt_masked should be defined for
-> > + *    enabling dirty logging.
-> > + * 3. There should not be a separate step to synchronize hardware
-> > + *    dirty bitmap with KVM's.
-> > + */
-> > +
-> > +struct kvm_dirty_gfn {
-> > +	__u32 pad;
-> > +	__u32 slot;
-> > +	__u64 offset;
-> > +};
-> > +
-> >  #endif /* __LINUX_KVM_H */
-> > diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> > new file mode 100644
-> > index 000000000000..9264891f3c32
-> > --- /dev/null
-> > +++ b/virt/kvm/dirty_ring.c
-> > @@ -0,0 +1,156 @@
-> > +#include <linux/kvm_host.h>
-> > +#include <linux/kvm.h>
-> > +#include <linux/vmalloc.h>
-> > +#include <linux/kvm_dirty_ring.h>
-> > +
-> > +u32 kvm_dirty_ring_get_rsvd_entries(void)
-> > +{
-> > +	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
-> > +}
-> > +
-> > +int kvm_dirty_ring_alloc(struct kvm *kvm, struct kvm_dirty_ring *ring)
-> > +{
-> > +	u32 size = kvm->dirty_ring_size;
-> > +
-> > +	ring->dirty_gfns = vmalloc(size);
-> 
-> So 1/2 a megabyte of kernel memory per VM that userspace locks up.
-> Do we really have to though? Why not get a userspace pointer,
-> write it with copy to user, and sidestep all this?
-
-I'd say it won't be a big issue on locking 1/2M of host mem for a
-vm...
-
-Also note that if dirty ring is enabled, I plan to evaporate the
-dirty_bitmap in the next post. The old kvm->dirty_bitmap takes
-$GUEST_MEM/32K*2 mem.  E.g., for 64G guest it's 64G/32K*2=4M.  If with
-dirty ring of 8 vcpus, that could be 64K*8=0.5M, which could be even
-less memory used.
-
-> 
-> > +	if (!ring->dirty_gfns)
-> > +		return -ENOMEM;
-> > +	memset(ring->dirty_gfns, 0, size);
-> > +
-> > +	ring->size = size / sizeof(struct kvm_dirty_gfn);
-> > +	ring->soft_limit =
-> > +	    (kvm->dirty_ring_size / sizeof(struct kvm_dirty_gfn)) -
-> > +	    kvm_dirty_ring_get_rsvd_entries();
-> > +	ring->dirty_index = 0;
-> > +	ring->reset_index = 0;
-> > +	spin_lock_init(&ring->lock);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +int kvm_dirty_ring_reset(struct kvm *kvm,
-> > +			 struct kvm_dirty_ring *ring,
-> > +			 struct kvm_dirty_ring_indexes *indexes)
-> > +{
-> > +	u32 cur_slot, next_slot;
-> > +	u64 cur_offset, next_offset;
-> > +	unsigned long mask;
-> > +	u32 fetch;
-> > +	int count = 0;
-> > +	struct kvm_dirty_gfn *entry;
-> > +
-> > +	fetch = READ_ONCE(indexes->fetch_index);
-> > +	if (fetch == ring->reset_index)
-> > +		return 0;
-> > +
-> > +	entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
-> > +	/*
-> > +	 * The ring buffer is shared with userspace, which might mmap
-> > +	 * it and concurrently modify slot and offset.  Userspace must
-> > +	 * not be trusted!  READ_ONCE prevents the compiler from changing
-> > +	 * the values after they've been range-checked (the checks are
-> > +	 * in kvm_reset_dirty_gfn).
-> 
-> What it doesn't is prevent speculative attacks.  That's why things like
-> copy from user have a speculation barrier.  Instead of worrying about
-> that, unless it's really critical, I think you'd do well do just use
-> copy to/from user.
-
-IMHO I would really hope these data be there without swapped out of
-memory, just like what we did with kvm->dirty_bitmap... it's on the
-hot path of mmu page fault, even we could be with mmu lock held if
-copy_to_user() page faulted.  But indeed I've no experience on
-avoiding speculative attacks, suggestions would be greatly welcomed on
-that.  In our case we do (index & (size - 1)), so is it still
-suffering from speculative attacks?
-
-> 
-> > +	 */
-> > +	smp_read_barrier_depends();
-> 
-> What depends on what here? Looks suspicious ...
-
-Hmm, I think maybe it can be removed because the entry pointer
-reference below should be an ordering constraint already?
-
-> 
-> > +	cur_slot = READ_ONCE(entry->slot);
-> > +	cur_offset = READ_ONCE(entry->offset);
-> > +	mask = 1;
-> > +	count++;
-> > +	ring->reset_index++;
-> > +	while (ring->reset_index != fetch) {
-> > +		entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
-> > +		smp_read_barrier_depends();
-> 
-> same concerns here
-> 
-> > +		next_slot = READ_ONCE(entry->slot);
-> > +		next_offset = READ_ONCE(entry->offset);
-> > +		ring->reset_index++;
-> > +		count++;
-> > +		/*
-> > +		 * Try to coalesce the reset operations when the guest is
-> > +		 * scanning pages in the same slot.
-> 
-> what does guest scanning mean?
-
-My wild guess is that it means when the guest is accessing the pages
-continuously so the dirty gfns are continuous too.  Anyway I agree
-it's not clear, where I can try to rephrase.
-
-> 
-> > +		 */
-> > +		if (next_slot == cur_slot) {
-> > +			int delta = next_offset - cur_offset;
-> > +
-> > +			if (delta >= 0 && delta < BITS_PER_LONG) {
-> > +				mask |= 1ull << delta;
-> > +				continue;
-> > +			}
-> > +
-> > +			/* Backwards visit, careful about overflows!  */
-> > +			if (delta > -BITS_PER_LONG && delta < 0 &&
-> > +			    (mask << -delta >> -delta) == mask) {
-> > +				cur_offset = next_offset;
-> > +				mask = (mask << -delta) | 1;
-> > +				continue;
-> > +			}
-> > +		}
-> > +		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
-> > +		cur_slot = next_slot;
-> > +		cur_offset = next_offset;
-> > +		mask = 1;
-> > +	}
-> > +	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
-> > +
-> > +	return count;
-> > +}
-> > +
-> > +static inline u32 kvm_dirty_ring_used(struct kvm_dirty_ring *ring)
-> > +{
-> > +	return ring->dirty_index - ring->reset_index;
-> > +}
-> > +
-> > +bool kvm_dirty_ring_full(struct kvm_dirty_ring *ring)
-> > +{
-> > +	return kvm_dirty_ring_used(ring) >= ring->size;
-> > +}
-> > +
-> > +/*
-> > + * Returns:
-> > + *   >0 if we should kick the vcpu out,
-> > + *   =0 if the gfn pushed successfully, or,
-> > + *   <0 if error (e.g. ring full)
-> > + */
-> > +int kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
-> > +			struct kvm_dirty_ring_indexes *indexes,
-> > +			u32 slot, u64 offset, bool lock)
-> > +{
-> > +	int ret;
-> > +	struct kvm_dirty_gfn *entry;
-> > +
-> > +	if (lock)
-> > +		spin_lock(&ring->lock);
-> 
-> what's the story around locking here? Why is it safe
-> not to take the lock sometimes?
-
-kvm_dirty_ring_push() will be with lock==true only when the per-vm
-ring is used.  For per-vcpu ring, because that will only happen with
-the vcpu context, then we don't need locks (so kvm_dirty_ring_push()
-is called with lock==false).
-
-> 
-> > +
-> > +	if (kvm_dirty_ring_full(ring)) {
-> > +		ret = -EBUSY;
-> > +		goto out;
-> > +	}
-> > +
-> > +	entry = &ring->dirty_gfns[ring->dirty_index & (ring->size - 1)];
-> > +	entry->slot = slot;
-> > +	entry->offset = offset;
-> > +	smp_wmb();
-> > +	ring->dirty_index++;
-> > +	WRITE_ONCE(indexes->avail_index, ring->dirty_index);
-> > +	ret = kvm_dirty_ring_used(ring) >= ring->soft_limit;
-> > +	pr_info("%s: slot %u offset %llu used %u\n",
-> > +		__func__, slot, offset, kvm_dirty_ring_used(ring));
-> > +
-> > +out:
-> > +	if (lock)
-> > +		spin_unlock(&ring->lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 i)
-> > +{
-> > +	return vmalloc_to_page((void *)ring->dirty_gfns + i * PAGE_SIZE);
-> > +}
-> > +
-> > +void kvm_dirty_ring_free(struct kvm_dirty_ring *ring)
-> > +{
-> > +	if (ring->dirty_gfns) {
-> > +		vfree(ring->dirty_gfns);
-> > +		ring->dirty_gfns = NULL;
-> > +	}
-> > +}
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 681452d288cd..8642c977629b 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -64,6 +64,8 @@
-> >  #define CREATE_TRACE_POINTS
-> >  #include <trace/events/kvm.h>
-> >  
-> > +#include <linux/kvm_dirty_ring.h>
-> > +
-> >  /* Worst case buffer size needed for holding an integer. */
-> >  #define ITOA_MAX_LEN 12
-> >  
-> > @@ -149,6 +151,10 @@ static void mark_page_dirty_in_slot(struct kvm *kvm,
-> >  				    struct kvm_vcpu *vcpu,
-> >  				    struct kvm_memory_slot *memslot,
-> >  				    gfn_t gfn);
-> > +static void mark_page_dirty_in_ring(struct kvm *kvm,
-> > +				    struct kvm_vcpu *vcpu,
-> > +				    struct kvm_memory_slot *slot,
-> > +				    gfn_t gfn);
-> >  
-> >  __visible bool kvm_rebooting;
-> >  EXPORT_SYMBOL_GPL(kvm_rebooting);
-> > @@ -359,11 +365,22 @@ int kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
-> >  	vcpu->preempted = false;
-> >  	vcpu->ready = false;
-> >  
-> > +	if (kvm->dirty_ring_size) {
-> > +		r = kvm_dirty_ring_alloc(vcpu->kvm, &vcpu->dirty_ring);
-> > +		if (r) {
-> > +			kvm->dirty_ring_size = 0;
-> > +			goto fail_free_run;
-> > +		}
-> > +	}
-> > +
-> >  	r = kvm_arch_vcpu_init(vcpu);
-> >  	if (r < 0)
-> > -		goto fail_free_run;
-> > +		goto fail_free_ring;
-> >  	return 0;
-> >  
-> > +fail_free_ring:
-> > +	if (kvm->dirty_ring_size)
-> > +		kvm_dirty_ring_free(&vcpu->dirty_ring);
-> >  fail_free_run:
-> >  	free_page((unsigned long)vcpu->run);
-> >  fail:
-> > @@ -381,6 +398,8 @@ void kvm_vcpu_uninit(struct kvm_vcpu *vcpu)
-> >  	put_pid(rcu_dereference_protected(vcpu->pid, 1));
-> >  	kvm_arch_vcpu_uninit(vcpu);
-> >  	free_page((unsigned long)vcpu->run);
-> > +	if (vcpu->kvm->dirty_ring_size)
-> > +		kvm_dirty_ring_free(&vcpu->dirty_ring);
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_vcpu_uninit);
-> >  
-> > @@ -690,6 +709,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> >  	struct kvm *kvm = kvm_arch_alloc_vm();
-> >  	int r = -ENOMEM;
-> >  	int i;
-> > +	struct page *page;
-> >  
-> >  	if (!kvm)
-> >  		return ERR_PTR(-ENOMEM);
-> > @@ -705,6 +725,14 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> >  
-> >  	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
-> >  
-> > +	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-> > +	if (!page) {
-> > +		r = -ENOMEM;
-> > +		goto out_err_alloc_page;
-> > +	}
-> > +	kvm->vm_run = page_address(page);
-> 
-> So 4K with just 8 bytes used. Not as bad as 1/2Mbyte for the ring but
-> still. What is wrong with just a pointer and calling put_user?
-
-I want to make it the start point for sharing fields between
-user/kernel per-vm.  Just like kvm_run for per-vcpu.
-
-IMHO it'll be awkward if we always introduce a new interface just to
-take a pointer of the userspace buffer and cache it...  I'd say so far
-I like the design of kvm_run and alike because it's efficient, easy to
-use, and easy for extensions.
-
-> 
-> > +	BUILD_BUG_ON(sizeof(struct kvm_vm_run) > PAGE_SIZE);
-> > +
-> >  	if (init_srcu_struct(&kvm->srcu))
-> >  		goto out_err_no_srcu;
-> >  	if (init_srcu_struct(&kvm->irq_srcu))
-> > @@ -775,6 +803,9 @@ static struct kvm *kvm_create_vm(unsigned long type)
-> >  out_err_no_irq_srcu:
-> >  	cleanup_srcu_struct(&kvm->srcu);
-> >  out_err_no_srcu:
-> > +	free_page((unsigned long)page);
-> > +	kvm->vm_run = NULL;
-> > +out_err_alloc_page:
-> >  	kvm_arch_free_vm(kvm);
-> >  	mmdrop(current->mm);
-> >  	return ERR_PTR(r);
-> > @@ -800,6 +831,15 @@ static void kvm_destroy_vm(struct kvm *kvm)
-> >  	int i;
-> >  	struct mm_struct *mm = kvm->mm;
-> >  
-> > +	if (kvm->dirty_ring_size) {
-> > +		kvm_dirty_ring_free(&kvm->vm_dirty_ring);
-> > +	}
-> > +
-> > +	if (kvm->vm_run) {
-> > +		free_page((unsigned long)kvm->vm_run);
-> > +		kvm->vm_run = NULL;
-> > +	}
-> > +
-> >  	kvm_uevent_notify_change(KVM_EVENT_DESTROY_VM, kvm);
-> >  	kvm_destroy_vm_debugfs(kvm);
-> >  	kvm_arch_sync_events(kvm);
-> > @@ -2301,7 +2341,7 @@ static void mark_page_dirty_in_slot(struct kvm *kvm,
-> >  {
-> >  	if (memslot && memslot->dirty_bitmap) {
-> >  		unsigned long rel_gfn = gfn - memslot->base_gfn;
-> > -
-> > +		mark_page_dirty_in_ring(kvm, vcpu, memslot, gfn);
-> >  		set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> >  	}
-> >  }
-> > @@ -2649,6 +2689,13 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_vcpu_on_spin);
-> >  
-> > +static bool kvm_fault_in_dirty_ring(struct kvm *kvm, struct vm_fault *vmf)
-> > +{
-> > +	return (vmf->pgoff >= KVM_DIRTY_LOG_PAGE_OFFSET) &&
-> > +	    (vmf->pgoff < KVM_DIRTY_LOG_PAGE_OFFSET +
-> > +	     kvm->dirty_ring_size / PAGE_SIZE);
-> > +}
-> > +
-> >  static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
-> >  {
-> >  	struct kvm_vcpu *vcpu = vmf->vma->vm_file->private_data;
-> > @@ -2664,6 +2711,10 @@ static vm_fault_t kvm_vcpu_fault(struct vm_fault *vmf)
-> >  	else if (vmf->pgoff == KVM_COALESCED_MMIO_PAGE_OFFSET)
-> >  		page = virt_to_page(vcpu->kvm->coalesced_mmio_ring);
-> >  #endif
-> > +	else if (kvm_fault_in_dirty_ring(vcpu->kvm, vmf))
-> > +		page = kvm_dirty_ring_get_page(
-> > +		    &vcpu->dirty_ring,
-> > +		    vmf->pgoff - KVM_DIRTY_LOG_PAGE_OFFSET);
-> >  	else
-> >  		return kvm_arch_vcpu_fault(vcpu, vmf);
-> >  	get_page(page);
-> > @@ -3259,12 +3310,162 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
-> >  #endif
-> >  	case KVM_CAP_NR_MEMSLOTS:
-> >  		return KVM_USER_MEM_SLOTS;
-> > +	case KVM_CAP_DIRTY_LOG_RING:
-> > +		/* Version will be zero if arch didn't implement it */
-> > +		return KVM_DIRTY_RING_VERSION;
-> >  	default:
-> >  		break;
-> >  	}
-> >  	return kvm_vm_ioctl_check_extension(kvm, arg);
-> >  }
-> >  
-> > +static void mark_page_dirty_in_ring(struct kvm *kvm,
-> > +				    struct kvm_vcpu *vcpu,
-> > +				    struct kvm_memory_slot *slot,
-> > +				    gfn_t gfn)
-> > +{
-> > +	u32 as_id = 0;
-> > +	u64 offset;
-> > +	int ret;
-> > +	struct kvm_dirty_ring *ring;
-> > +	struct kvm_dirty_ring_indexes *indexes;
-> > +	bool is_vm_ring;
-> > +
-> > +	if (!kvm->dirty_ring_size)
-> > +		return;
-> > +
-> > +	offset = gfn - slot->base_gfn;
-> > +
-> > +	if (vcpu) {
-> > +		as_id = kvm_arch_vcpu_memslots_id(vcpu);
-> > +	} else {
-> > +		as_id = 0;
-> > +		vcpu = kvm_get_running_vcpu();
-> > +	}
-> > +
-> > +	if (vcpu) {
-> > +		ring = &vcpu->dirty_ring;
-> > +		indexes = &vcpu->run->vcpu_ring_indexes;
-> > +		is_vm_ring = false;
-> > +	} else {
-> > +		/*
-> > +		 * Put onto per vm ring because no vcpu context.  Kick
-> > +		 * vcpu0 if ring is full.
-> 
-> What about tasks on vcpu 0? Do guests realize it's a bad idea to put
-> critical tasks there, they will be penalized disproportionally?
-
-Reasonable question.  So far we can't avoid it because vcpu exit is
-the event mechanism to say "hey please collect dirty bits".  Maybe
-someway is better than this, but I'll need to rethink all these
-over...
-
-> 
-> > +		 */
-> > +		vcpu = kvm->vcpus[0];
-> > +		ring = &kvm->vm_dirty_ring;
-> > +		indexes = &kvm->vm_run->vm_ring_indexes;
-> > +		is_vm_ring = true;
-> > +	}
-> > +
-> > +	ret = kvm_dirty_ring_push(ring, indexes,
-> > +				  (as_id << 16)|slot->id, offset,
-> > +				  is_vm_ring);
-> > +	if (ret < 0) {
-> > +		if (is_vm_ring)
-> > +			pr_warn_once("vcpu %d dirty log overflow\n",
-> > +				     vcpu->vcpu_id);
-> > +		else
-> > +			pr_warn_once("per-vm dirty log overflow\n");
-> > +		return;
-> > +	}
-> > +
-> > +	if (ret)
-> > +		kvm_make_request(KVM_REQ_DIRTY_RING_FULL, vcpu);
-> > +}
-> > +
-> > +void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
-> > +{
-> > +	struct kvm_memory_slot *memslot;
-> > +	int as_id, id;
-> > +
-> > +	as_id = slot >> 16;
-> > +	id = (u16)slot;
-> > +	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-> > +		return;
-> > +
-> > +	memslot = id_to_memslot(__kvm_memslots(kvm, as_id), id);
-> > +	if (offset >= memslot->npages)
-> > +		return;
-> > +
-> > +	spin_lock(&kvm->mmu_lock);
-> > +	/* FIXME: we should use a single AND operation, but there is no
-> > +	 * applicable atomic API.
-> > +	 */
-> > +	while (mask) {
-> > +		clear_bit_le(offset + __ffs(mask), memslot->dirty_bitmap);
-> > +		mask &= mask - 1;
-> > +	}
-> > +
-> > +	kvm_arch_mmu_enable_log_dirty_pt_masked(kvm, memslot, offset, mask);
-> > +	spin_unlock(&kvm->mmu_lock);
-> > +}
-> > +
-> > +static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
-> > +{
-> > +	int r;
-> > +
-> > +	/* the size should be power of 2 */
-> > +	if (!size || (size & (size - 1)))
-> > +		return -EINVAL;
-> > +
-> > +	/* Should be bigger to keep the reserved entries, or a page */
-> > +	if (size < kvm_dirty_ring_get_rsvd_entries() *
-> > +	    sizeof(struct kvm_dirty_gfn) || size < PAGE_SIZE)
-> > +		return -EINVAL;
-> > +
-> > +	if (size > KVM_DIRTY_RING_MAX_ENTRIES *
-> > +	    sizeof(struct kvm_dirty_gfn))
-> > +		return -E2BIG;
-> 
-> KVM_DIRTY_RING_MAX_ENTRIES is not part of UAPI.
-> So how does userspace know what's legal?
-> Do you expect it to just try?
-
-Yep that's what I thought. :)
-
-Please grep E2BIG in QEMU repo target/i386/kvm.c...  won't be hard to
-do imho..
-
-> More likely it will just copy the number from kernel and can
-> never ever make it smaller.
-
-Not sure, but for sure I can probably move KVM_DIRTY_RING_MAX_ENTRIES
-to uapi too.
-
-Thanks,
-
+thanks,
 -- 
-Peter Xu
+John Hubbard
+NVIDIA
+
 
