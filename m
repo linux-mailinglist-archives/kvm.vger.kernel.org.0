@@ -2,42 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A8AB11AAD7
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 13:31:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B58BD11AAFD
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 13:33:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729117AbfLKMbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 07:31:22 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29131 "EHLO
+        id S1729223AbfLKMdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 07:33:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50875 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728991AbfLKMbW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 07:31:22 -0500
+        by vger.kernel.org with ESMTP id S1729131AbfLKMc7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 07:32:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576067480;
+        s=mimecast20190719; t=1576067579;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=eFhhScAJ/MfEohbNCSZ2f9opvBtOkbjZFTZa6MiRxQI=;
-        b=RJwXM4iTDVp2ZzzWlbdHxcS9wbp5jzBQfGZybj1FD8T8j9OydWaGsU7+zh7heP+Dr4PP2D
-        pCXPCGJ2S3IRRrnocHkmNvxVCm2M4lauIjvqE/FDEYM6gW7MmOTNbruaJJHQWTWNW+F78R
-        3A/S43AQTeoLwWq4+B/gV+/KHfCSVJY=
+        bh=j4thHy1/p8hAKDYMVxr6ZAjMzmygzv79PIHxzS48xkQ=;
+        b=RZwIG87cdiLZ7T6d2vgCL9ARwDruiakC5wbFC3GexDJ7+VC5ref/+qbgHwD1OH8PwL/PYD
+        I6txKdQQqTwSXQYfn9GaxhxQ+E/Vuw+wTD8tfMGRrsc27+wbYLW3twpYJqIWmWeohuE5Dn
+        1w+GZHQkoVYODzdXXb86V42U4xX7Mro=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-LaiIw3pVPuCpnrkB4MsaeA-1; Wed, 11 Dec 2019 07:31:16 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-43-XXiikjGMPJOKpjJZ833UDA-1; Wed, 11 Dec 2019 07:32:57 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92B7966F;
-        Wed, 11 Dec 2019 12:31:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD351801E76;
+        Wed, 11 Dec 2019 12:32:56 +0000 (UTC)
 Received: from [10.36.117.148] (ovpn-117-148.ams2.redhat.com [10.36.117.148])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E59019756;
-        Wed, 11 Dec 2019 12:31:14 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: smp: Use full PSW to bringup
- new cpu
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AB8C06013D;
+        Wed, 11 Dec 2019 12:32:55 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 2/2] s390x: smp: Setup CRs from cpu 0
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
 References: <20191211115923.9191-1-frankja@linux.ibm.com>
- <20191211115923.9191-2-frankja@linux.ibm.com>
+ <20191211115923.9191-3-frankja@linux.ibm.com>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -83,15 +82,15 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <6433a418-e42f-0cf6-9cd4-bbe9912b901d@redhat.com>
-Date:   Wed, 11 Dec 2019 13:31:13 +0100
+Message-ID: <75eadbf8-1159-1c3f-12c4-bda518adb2ef@redhat.com>
+Date:   Wed, 11 Dec 2019 13:32:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191211115923.9191-2-frankja@linux.ibm.com>
+In-Reply-To: <20191211115923.9191-3-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: LaiIw3pVPuCpnrkB4MsaeA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: XXiikjGMPJOKpjJZ833UDA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
@@ -101,48 +100,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 11.12.19 12:59, Janosch Frank wrote:
-> Up to now we ignored the psw mask and only used the psw address when
-> bringing up a new cpu. For DAT we need to also load the mask, so let's
-> do that.
+> Grab the CRs (currently only 0, 1, 7, 13) from cpu 0, so we can
+> bringup the new cpu in DAT mode or set other control options.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  lib/s390x/smp.c  | 2 ++
+>  lib/s390x/smp.c  | 5 ++++-
 >  s390x/cstart64.S | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 > 
 > diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
-> index f57f420..e17751a 100644
+> index e17751a..4dfe7c6 100644
 > --- a/lib/s390x/smp.c
 > +++ b/lib/s390x/smp.c
-> @@ -185,6 +185,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
->  	cpu->stack = (uint64_t *)alloc_pages(2);
->  
->  	/* Start without DAT and any other mask bits. */
-> +	cpu->lowcore->sw_int_psw.mask = psw.mask;
-> +	cpu->lowcore->sw_int_psw.addr = psw.addr;
->  	cpu->lowcore->sw_int_grs[14] = psw.addr;
-
-Not looking at the code (sorry :D ), do we still need this then? (you
-drop the br bewlo)
-
+> @@ -191,7 +191,10 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
 >  	cpu->lowcore->sw_int_grs[15] = (uint64_t)cpu->stack + (PAGE_SIZE * 4);
 >  	lc->restart_new_psw.mask = 0x0000000180000000UL;
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 86dd4c4..e6a6bdb 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -159,7 +159,7 @@ smp_cpu_setup_state:
->  	xgr	%r1, %r1
->  	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
->  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
-> -	br	%r14
-> +	lpswe	GEN_LC_SW_INT_PSW
->  
->  pgm_int:
->  	SAVE_REGS
-> 
+>  	lc->restart_new_psw.addr = (uint64_t)smp_cpu_setup_state;
+> -	lc->sw_int_crs[0] = 0x0000000000040000UL;
+> +	lc->sw_int_crs[0] = stctg(0);
+> +	lc->sw_int_crs[1] = stctg(1);
+> +	lc->sw_int_crs[7] = stctg(7);
+> +	lc->sw_int_crs[13] = stctg(13);
 
+Wouldn't it be better to also be able to specify the CRs explicitly here?
 
 -- 
 Thanks,
