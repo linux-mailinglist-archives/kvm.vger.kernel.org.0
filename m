@@ -2,108 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EC9611A7A4
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 10:42:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5B0E11A929
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 11:42:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728692AbfLKJmg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 04:42:36 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28980 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728605AbfLKJmf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 04:42:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576057354;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kVF+fz1ywtiAYHxQZ2KvFTuGKQt/bQcp8p2wEMicvdo=;
-        b=GcMdXq73EAxOSZkhSRnP/H+jn6k7a6a4pIqdxs65O7bJ94P+bfghbbgNdwCrL8eJI4coAb
-        NM2DdM+IdkL/0A0dx98RV47w22EfnQPoxbG/k3pfyu5Yks66f1zaPV7/NJmr+EhciGa1T1
-        zMJVpz2yWGToSxS0YP+11hc3bS8S880=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-zTJgb5QKPvmALwIzM7kvOg-1; Wed, 11 Dec 2019 04:42:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CA7C1005510
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 09:42:31 +0000 (UTC)
-Received: from thuth.com (ovpn-117-11.ams2.redhat.com [10.36.117.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB5B463629;
-        Wed, 11 Dec 2019 09:42:30 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Drew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH 4/4] x86: Add the cmpxchg8b test to the CI
-Date:   Wed, 11 Dec 2019 10:42:21 +0100
-Message-Id: <20191211094221.7030-5-thuth@redhat.com>
-In-Reply-To: <20191211094221.7030-1-thuth@redhat.com>
-References: <20191211094221.7030-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: zTJgb5QKPvmALwIzM7kvOg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+        id S1729001AbfLKKmn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 05:42:43 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59588 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728030AbfLKKmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 05:42:43 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D483FB178;
+        Wed, 11 Dec 2019 10:42:38 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id F3EB81E0B23; Wed, 11 Dec 2019 11:42:36 +0100 (CET)
+Date:   Wed, 11 Dec 2019 11:42:36 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v9 20/25] powerpc: book3s64: convert to pin_user_pages()
+ and put_user_page()
+Message-ID: <20191211104236.GM1551@quack2.suse.cz>
+References: <20191211025318.457113-1-jhubbard@nvidia.com>
+ <20191211025318.457113-21-jhubbard@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211025318.457113-21-jhubbard@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an entry for this test to the unittests.cfg file and
-enable it in the CI pipelines.
+On Tue 10-12-19 18:53:13, John Hubbard wrote:
+> 1. Convert from get_user_pages() to pin_user_pages().
+> 
+> 2. As required by pin_user_pages(), release these pages via
+> put_user_page().
+> 
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml    | 2 +-
- .travis.yml       | 2 +-
- x86/unittests.cfg | 4 ++++
- 3 files changed, 6 insertions(+), 2 deletions(-)
+The patch looks good to me. You can add:
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ea1aeaf..67f7d80 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -77,6 +77,6 @@ build-i386:
-  - ./configure --arch=3Di386
-  - make -j2
-  - ACCEL=3Dtcg ./run_tests.sh
--     eventinj port80 setjmp sieve tsc taskswitch taskswitch2 umip
-+     cmpxchg8b eventinj port80 setjmp sieve tsc taskswitch taskswitch2 umi=
-p
-      | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
-diff --git a/.travis.yml b/.travis.yml
-index 53f8d7d..091d071 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -43,7 +43,7 @@ matrix:
-       env:
-       - CONFIG=3D"--arch=3Di386"
-       - BUILD_DIR=3D"i386-builddir"
--      - TESTS=3D"tsx-ctrl umip vmexit_cpuid vmexit_ipi vmexit_ipi_halt
-+      - TESTS=3D"cmpxchg8b tsx-ctrl umip vmexit_cpuid vmexit_ipi vmexit_ip=
-i_halt
-                vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ple_round_robi=
-n
-                vmexit_tscdeadline vmexit_tscdeadline_immed vmexit_vmcall s=
-etjmp"
-       - ACCEL=3D"kvm"
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index acdde10..51e4ba5 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -49,6 +49,10 @@ smp =3D 4
- extra_params =3D -cpu qemu64
- arch =3D x86_64
-=20
-+[cmpxchg8b]
-+file =3D cmpxchg8b.flat
-+arch =3D i386
-+
- [smptest]
- file =3D smptest.flat
- smp =3D 2
---=20
-2.18.1
+Reviewed-by: Jan Kara <jack@suse.cz>
 
+I'd just note that mm_iommu_do_alloc() has a pre-existing bug that the last
+jump to 'free_exit' (at line 157) happens already after converting page
+pointers to physical addresses so put_page() calls there will just crash.
+But that's completely unrelated to your change. I'll send a fix separately.
+
+								Honza
+
+> ---
+>  arch/powerpc/mm/book3s64/iommu_api.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
+> index 56cc84520577..a86547822034 100644
+> --- a/arch/powerpc/mm/book3s64/iommu_api.c
+> +++ b/arch/powerpc/mm/book3s64/iommu_api.c
+> @@ -103,7 +103,7 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
+>  	for (entry = 0; entry < entries; entry += chunk) {
+>  		unsigned long n = min(entries - entry, chunk);
+>  
+> -		ret = get_user_pages(ua + (entry << PAGE_SHIFT), n,
+> +		ret = pin_user_pages(ua + (entry << PAGE_SHIFT), n,
+>  				FOLL_WRITE | FOLL_LONGTERM,
+>  				mem->hpages + entry, NULL);
+>  		if (ret == n) {
+> @@ -167,9 +167,8 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
+>  	return 0;
+>  
+>  free_exit:
+> -	/* free the reference taken */
+> -	for (i = 0; i < pinned; i++)
+> -		put_page(mem->hpages[i]);
+> +	/* free the references taken */
+> +	put_user_pages(mem->hpages, pinned);
+>  
+>  	vfree(mem->hpas);
+>  	kfree(mem);
+> @@ -215,7 +214,8 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+>  		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
+>  			SetPageDirty(page);
+>  
+> -		put_page(page);
+> +		put_user_page(page);
+> +
+>  		mem->hpas[i] = 0;
+>  	}
+>  }
+> -- 
+> 2.24.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
