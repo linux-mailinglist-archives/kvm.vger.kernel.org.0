@@ -2,106 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A658E11BAEC
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 19:02:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6719711BB9D
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 19:24:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730594AbfLKSCC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 13:02:02 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:59292 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729512AbfLKSCC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 13:02:02 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1if6JA-0000Td-Ug; Wed, 11 Dec 2019 19:01:56 +0100
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device  mappings
-X-PHP-Originating-Script: 0:main.inc
+        id S1730070AbfLKSYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 13:24:48 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:40421 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728912AbfLKSYs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 13:24:48 -0500
+Received: by mail-il1-f195.google.com with SMTP id b15so20297259ila.7
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 10:24:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=M9tA+Tr9ovbWOXuGiYbM0B2FW2ZyDkx7Yvdcfc6MPLs=;
+        b=idAqrZS5yOYwdeK/lgm7YpOyYtpiEJT5h1P6uhhaane+g2Xn7IV2dkSWP53z017gAQ
+         /AlG0kqHi/x8IM6vj96WukdMd3t7bSnKbqp5avoga1TPrk8lNOneJRYi9DrVcClaM5rV
+         uMgh5WkX8h3tYuTaK69vJOzJm8f0+V4ZPUEOhI47JT+9C8E3vc27FsRZS2QoQ5OC8p33
+         kbpTVseXf9aflsmpw57dqgtpsIZKmbXYkuNctxJ6lcFkdTeQNFXDHSSF5LUtNox/2mDw
+         OXWH7XGEe8tn/Bqh0f1qD3KYZ0F3d9lblN/7QzTO+cw7ICLs84AwE3dnQQJ8lYLgRFxE
+         SRDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=M9tA+Tr9ovbWOXuGiYbM0B2FW2ZyDkx7Yvdcfc6MPLs=;
+        b=FB7GIctyaoC2GvqxS6fGNUJZ1SpjXbTkbIw2+aghufdLHNq1nQTt6Rg8tlfDvsn1kM
+         6B9YCVFOSnM8n1SYs21/KqrjcT7pgitpQktf4ObrHE8y7x8P3yMKREB12Eq6gib4gUKp
+         kh/MbRq62LKMbpPrLtd88uY0DjZMFhEsvuU65ucLjU6d+5eJGOC0plm+SQN27USDgwg5
+         fuh/80lhbNBm2irJDQdDE5siHQ+k2Tzc1dsIh/zgmncNlvHJ0sms4hfh4uXDl2iP5MgW
+         pqGbwa1ZcFbWzEMsIT01SBKd6PxLTLk7viHYBsIOyPsDiaZldJH73T6Anc0WLEXc2F+8
+         lIow==
+X-Gm-Message-State: APjAAAXJcLRZt/DrwXwbsSDygv0K0H3K4CJYHk4GvNQYJbEgqBtjhYqt
+        Gr/4N2mXnsslRC9JZIDnwnAU3Fz15Kg02cGC5DlYfA==
+X-Google-Smtp-Source: APXvYqxOHiPfhWhJpgBQfI8f+K8kysFSEhs5Wj6CkL1K/PdLyHuY9O+4ujMgXwhSuP9+2dxlkR4HblBXuFY0uukuZlg=
+X-Received: by 2002:a05:6e02:8eb:: with SMTP id n11mr4519653ilt.26.1576088687084;
+ Wed, 11 Dec 2019 10:24:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 11 Dec 2019 18:01:56 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        <stable@vger.kernel.org>
-In-Reply-To: <a8dbd580-ed09-8d46-6ec5-a54bac3a6695@arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
- <a8dbd580-ed09-8d46-6ec5-a54bac3a6695@arm.com>
-Message-ID: <4b504f8d380e3587fab197921ab0c7e8@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, christoffer.dall@arm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+References: <20191211175822.1925-1-sean.j.christopherson@intel.com> <20191211175822.1925-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20191211175822.1925-2-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 11 Dec 2019 10:24:36 -0800
+Message-ID: <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Add build-time assertion on usage of bit()
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-On 2019-12-11 17:53, Alexandru Elisei wrote:
-> Hi,
+On Wed, Dec 11, 2019 at 9:58 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> On 12/11/19 4:56 PM, Marc Zyngier wrote:
->> A device mapping is normally always mapped at Stage-2, since there
->> is very little gain in having it faulted in.
->>
->> Nonetheless, it is possible to end-up in a situation where the 
->> device
->> mapping has been removed from Stage-2 (userspace munmaped the VFIO
->> region, and the MMU notifier did its job), but present in a 
->> userspace
->> mapping (userpace has mapped it back at the same address). In such
->> a situation, the device mapping will be demand-paged as the guest
->> performs memory accesses.
->>
->> This requires to be careful when dealing with mapping size, cache
->> management, and to handle potential execution of a device mapping.
->>
->> Cc: stable@vger.kernel.org
->> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
->>  1 file changed, 17 insertions(+), 4 deletions(-)
-
-[...]
-
-> I've tested this patch using the scenario that you described in the 
-> commit
-> message. I've also tested it with the following scenarios:
+> Add build-time checks to ensure KVM isn't trying to do a reverse CPUID
+> lookup on Linux-defined feature bits, along with comments to explain
+> the gory details of X86_FEATUREs and bit().
 >
-> - The region is mmap'ed as backed by a VFIO device fd and the memslot
-> is created,
-> it is munmap'ed, then mmap'ed as anonymous.
-> - The region is mmap'ed as anonymous and the memslot is created, it
-> is munmap'ed,
-> then mmap'ed as backed by a VFIO device fd.
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
 >
-> Everything worked as expected, so:
+> Note, the premature newline in the first line of the second comment is
+> intentional to reduce churn in the next patch.
 >
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>  arch/x86/kvm/x86.h | 23 +++++++++++++++++++++--
+>  1 file changed, 21 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index cab5e71f0f0f..4ee4175c66a7 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -144,9 +144,28 @@ static inline bool is_pae_paging(struct kvm_vcpu *vcpu)
+>         return !is_long_mode(vcpu) && is_pae(vcpu) && is_paging(vcpu);
+>  }
+>
+> -static inline u32 bit(int bitno)
+> +/*
+> + * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
+> + * the hardware defined bit number (stored in bits 4:0) and a software defined
+> + * "word" (stored in bits 31:5).  The word is used to index into arrays of
+> + * bit masks that hold the per-cpu feature capabilities, e.g. this_cpu_has().
+> + */
+> +static __always_inline u32 bit(int feature)
+>  {
+> -       return 1 << (bitno & 31);
+> +       /*
+> +        * bit() is intended to be used only for hardware-defined
+> +        * words, i.e. words whose bits directly correspond to a CPUID leaf.
+> +        * Retrieving the bit mask from a Linux-defined word is nonsensical
+> +        * as the bit number/mask is an arbitrary software-defined value and
+> +        * can't be used by KVM to query/control guest capabilities.
+> +        */
+> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_1);
+> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_2);
+> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_3);
+> +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_4);
+> +       BUILD_BUG_ON((feature >> 5) > CPUID_7_EDX);
 
-Thanks for that!
+What is magical about CPUID_7_EDX?
 
-> Just a nitpick, but stage2_set_pte has a local variable iomap which 
-> can be
-> replaced with a call to is_iomap.
+> +
+> +       return 1 << (feature & 31);
 
-Yeah, I noticed. I'm just trying to keep the patch relatively small so
-that it can be easily backported. The cleanup can come later! ;-)
+Why not BIT(feature & 31)?
 
-Cheers,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+>  }
+>
+>  static inline u8 vcpu_virt_addr_bits(struct kvm_vcpu *vcpu)
+> --
+> 2.24.0
+>
