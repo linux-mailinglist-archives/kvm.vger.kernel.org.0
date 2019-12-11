@@ -2,93 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F3EA111A0C1
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 02:51:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E451F11A0C4
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 02:53:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727324AbfLKBvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 20:51:22 -0500
-Received: from mga14.intel.com ([192.55.52.115]:9829 "EHLO mga14.intel.com"
+        id S1726913AbfLKBxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 20:53:04 -0500
+Received: from mga06.intel.com ([134.134.136.31]:8970 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726062AbfLKBvV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 20:51:21 -0500
+        id S1726062AbfLKBxE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 20:53:04 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 17:50:53 -0800
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 17:53:03 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
-   d="scan'208";a="238373018"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Dec 2019 17:50:52 -0800
-Date:   Tue, 10 Dec 2019 17:50:52 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
-Subject: Re: [PATCH v8 3/7] KVM: VMX: Pass through CET related MSRs
-Message-ID: <20191211015052.GF23765@linux.intel.com>
+   d="scan'208";a="203392706"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga007.jf.intel.com with ESMTP; 10 Dec 2019 17:53:01 -0800
+Date:   Wed, 11 Dec 2019 09:54:23 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 4/7] KVM: VMX: Load CET states on vmentry/vmexit
+Message-ID: <20191211015423.GC12845@local-michael-cet-test>
 References: <20191101085222.27997-1-weijiang.yang@intel.com>
- <20191101085222.27997-4-weijiang.yang@intel.com>
- <20191210211821.GL15758@linux.intel.com>
- <20191211013207.GA12845@local-michael-cet-test>
+ <20191101085222.27997-5-weijiang.yang@intel.com>
+ <20191210212305.GM15758@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191211013207.GA12845@local-michael-cet-test>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20191210212305.GM15758@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 09:32:07AM +0800, Yang Weijiang wrote:
-> On Tue, Dec 10, 2019 at 01:18:21PM -0800, Sean Christopherson wrote:
-> > On Fri, Nov 01, 2019 at 04:52:18PM +0800, Yang Weijiang wrote:
-> > > CET MSRs pass through Guest directly to enhance performance.
-> > > CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
-> > > Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
-> > > SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
-> > > these MSRs are defined in kernel and re-used here.
-> > > 
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index dd387a785c1e..4166c4fcad1e 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -371,13 +371,13 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
-> > >  		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ |
-> > >  		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
-> > >  		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
-> > > -		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B);
-> > > +		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | F(SHSTK);
-> > >  
-> > >  	/* cpuid 7.0.edx*/
-> > >  	const u32 kvm_cpuid_7_0_edx_x86_features =
-> > >  		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
-> > >  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
-> > > -		F(MD_CLEAR);
-> > > +		F(MD_CLEAR) | F(IBT);
-> > 
-> > Advertising CET to userspace/guest needs to be done at the end of the
-> > series, or at least after CR4.CET is no longer reserved, e.g. KVM_SET_SREGS
-> > will fail and the guest will get a #GP when trying to set CR4.CET.
-> > 
-> > I'm pretty sure I've said this at least twice in previous versions of
-> > this series...
+On Tue, Dec 10, 2019 at 01:23:05PM -0800, Sean Christopherson wrote:
+> On Fri, Nov 01, 2019 at 04:52:19PM +0800, Yang Weijiang wrote:
+> > @@ -2834,6 +2837,9 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	unsigned long hw_cr0;
+> >  
+> > +	if (!(cr0 & X86_CR0_WP) && kvm_read_cr4_bits(vcpu, X86_CR4_CET))
+> > +		cr0 |= X86_CR0_WP;
 > 
-> Thanks Sean for picking these up!
-> The reason is, starting from this patch, I'm using guest_cpuid_has(CET)
-> to check the availability of guest CET CPUID, so logically I would like to let
-> the readers understand CET related CPUID word is
-> defined as above. But no problem, I can move these definitions to a
-> latter patch as the patchset only meaningful as a whole. 
+> Huh?  What's the interaction between CR4.CET and CR0.WP?  If there really
+> is some non-standard interaction then it needs to be documented in at least
+> the changelog and probably with a comment as well.
+>
+The processor does not allow CR4.CET to be set if CR0.WP = 0 (similarly, it does not allow CR0.WP to be
+cleared while CR4.CET = 1).
 
-Adding usage of guest_cpuid_has(CET) without advertising CET is perfectly
-ok from a functionality perspective.  Having a user without a consumer
-isn't ideal, but it's better than having one gigantic patch.
+> > +
+> >  	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
+> >  	if (enable_unrestricted_guest)
+> >  		hw_cr0 |= KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST;
+> > @@ -2936,6 +2942,22 @@ static bool guest_cet_allowed(struct kvm_vcpu *vcpu, u32 feature, u32 mode)
+> >  	return false;
+> >  }
+> >  
+> > +bool is_cet_bit_allowed(struct kvm_vcpu *vcpu)
+> > +{
+> > +	unsigned long cr0;
+> > +	bool cet_allowed;
+> > +
+> > +	cr0 = kvm_read_cr0(vcpu);
+> > +	cet_allowed = guest_cet_allowed(vcpu, X86_FEATURE_SHSTK,
+> > +					XFEATURE_MASK_CET_USER) ||
+> > +		      guest_cet_allowed(vcpu, X86_FEATURE_IBT,
+> > +					XFEATURE_MASK_CET_USER);
+> > +	if ((cr0 & X86_CR0_WP) && cet_allowed)
+> > +		return true;
+> 
+> So, attempting to set CR4.CET if CR0.WP=0 takes a #GP?  But attempting
+> to clear CR0.WP if CR4.CET=1 is ignored?
+> 
+Per above words in spec., inject #GP to guest in either case?
 
-The problem with advertising CET when it's not fully supported is that it
-will break bisection, e.g. trying to boot a CET-enabled guest would get a
-#GP during boot and likely crash.  Whether or not a series is useful when
-taken as a whole is orthogonal to the integrity of each invidiual patch.
+> > +
+> > +	return false;
+> > +}
+> > +
+> >  int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > @@ -2976,6 +2998,9 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+> >  			return 1;
+> >  	}
+> >  
+> > +	if ((cr4 & X86_CR4_CET) && !is_cet_bit_allowed(vcpu))
+> > +		return 1;
+> > +
+> >  	if (vmx->nested.vmxon && !nested_cr4_valid(vcpu, cr4))
+> >  		return 1;
+> >  
+> > @@ -3839,6 +3864,12 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
+> >  
+> >  	if (cpu_has_load_ia32_efer())
+> >  		vmcs_write64(HOST_IA32_EFER, host_efer);
+> > +
+> > +	if (cpu_has_load_host_cet_states_ctrl()) {
+> > +		vmcs_writel(HOST_S_CET, 0);
+> > +		vmcs_writel(HOST_INTR_SSP_TABLE, 0);
+> > +		vmcs_writel(HOST_SSP, 0);
+> > +	}
+> >  }
+> >  
+> >  void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
+> > @@ -6436,6 +6467,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  {
+> >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> >  	unsigned long cr3, cr4;
+> > +	bool cet_allowed;
+> >  
+> >  	/* Record the guest's net vcpu time for enforced NMI injections. */
+> >  	if (unlikely(!enable_vnmi &&
+> > @@ -6466,6 +6498,25 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  		vmx->loaded_vmcs->host_state.cr3 = cr3;
+> >  	}
+> >  
+> > +	/* To be aligned with kernel code, only user mode is supported now. */
+> > +	cet_allowed = guest_cet_allowed(vcpu, X86_FEATURE_SHSTK,
+> > +					XFEATURE_MASK_CET_USER) ||
+> > +		      guest_cet_allowed(vcpu, X86_FEATURE_IBT,
+> > +					XFEATURE_MASK_CET_USER);
+> > +	if (cpu_has_load_guest_cet_states_ctrl() && cet_allowed)
+> > +		vmcs_set_bits(VM_ENTRY_CONTROLS,
+> > +			      VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > +	else
+> > +		vmcs_clear_bits(VM_ENTRY_CONTROLS,
+> > +				VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > +
+> > +	if (cpu_has_load_host_cet_states_ctrl() && cet_allowed)
+> > +		vmcs_set_bits(VM_EXIT_CONTROLS,
+> > +			      VM_EXIT_LOAD_HOST_CET_STATE);
+> > +	else
+> > +		vmcs_clear_bits(VM_EXIT_CONTROLS,
+> > +				VM_EXIT_LOAD_HOST_CET_STATE);
+> > +
+> >  	cr4 = cr4_read_shadow();
+> >  	if (unlikely(cr4 != vmx->loaded_vmcs->host_state.cr4)) {
+> >  		vmcs_writel(HOST_CR4, cr4);
+> > -- 
+> > 2.17.2
+> > 
