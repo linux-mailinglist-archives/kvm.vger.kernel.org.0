@@ -2,123 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B75011BCA5
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 20:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4AFE11BCC4
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 20:18:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728326AbfLKTN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 14:13:29 -0500
-Received: from mga03.intel.com ([134.134.136.65]:56799 "EHLO mga03.intel.com"
+        id S1726872AbfLKTST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 14:18:19 -0500
+Received: from mga18.intel.com ([134.134.136.126]:23830 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726312AbfLKTN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 14:13:29 -0500
+        id S1726312AbfLKTST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 14:18:19 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 11:13:28 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 11:18:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,302,1571727600"; 
-   d="scan'208";a="245397493"
+   d="scan'208";a="245399141"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by fmsmga002.fm.intel.com with ESMTP; 11 Dec 2019 11:13:27 -0800
-Date:   Wed, 11 Dec 2019 11:13:27 -0800
+  by fmsmga002.fm.intel.com with ESMTP; 11 Dec 2019 11:18:17 -0800
+Date:   Wed, 11 Dec 2019 11:18:17 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Junaid Shahid <junaids@google.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: assign two bits to track SPTE kinds
-Message-ID: <20191211191327.GI5044@linux.intel.com>
-References: <1569582943-13476-1-git-send-email-pbonzini@redhat.com>
- <1569582943-13476-2-git-send-email-pbonzini@redhat.com>
- <CANgfPd8G194y1Bo-6HR-jP8wh4DvdAsaijue_pnhetjduyzn4A@mail.gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] KVM: x86: Add build-time assertion on usage of bit()
+Message-ID: <20191211191817.GJ5044@linux.intel.com>
+References: <20191211175822.1925-1-sean.j.christopherson@intel.com>
+ <20191211175822.1925-2-sean.j.christopherson@intel.com>
+ <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd8G194y1Bo-6HR-jP8wh4DvdAsaijue_pnhetjduyzn4A@mail.gmail.com>
+In-Reply-To: <CALMp9eR93otezrDot23oODV1S6M9kUAF9oB5UD7+E765cHRXjw@mail.gmail.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 10:39:22AM -0800, Ben Gardon wrote:
-> Has anyone tested this patch on a long-running machine? It looks like
-> the SPTE_MMIO_MASK overlaps with the bits used to track MMIO
-> generation number, which makes me think that on a long running VM, a
-> high enough generation number would overwrite the SPTE_SPECIAL_MASK
-> region and cause the MMIO SPTE to be misinterpreted. It seems like
-> setting bits 52 and 53 would also cause an incorrect generation number
-> to be read from the PTE.
-
-Hmm, the MMIO SPTE won't be misintrepreted as MMIO SPTEs will always have
-bits 53:52=11b, i.e. bits 10:9 of the generation number effectively get
-ignored.  It does mean that check_mmio_spte() could theoretically consume
-stale MMIO entries due those bits being ignored, but only if a SPTE lived
-across 512 memslot updates, which is impossible given that KVM currently
-zaps all SPTEs on a memslot update (fast zapping can let a stale SPTE live
-for while the memslot update is in progress, but not longer than that).
-
-There is/was the pass-through issue that cropped up when I tried to stop
-zapping all SPTEs on a memslot update, but I doubt this would explain that
-problem.
-
-Assuming we haven't missed something, the easiest fix would be to reduce
-the MMIO generation by one bit and use bits 62:54 for the MMIO generation.
-
-> On Fri, Sep 27, 2019 at 4:16 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Dec 11, 2019 at 10:24:36AM -0800, Jim Mattson wrote:
+> On Wed, Dec 11, 2019 at 9:58 AM Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
 > >
-> > Currently, we are overloading SPTE_SPECIAL_MASK to mean both
-> > "A/D bits unavailable" and MMIO, where the difference between the
-> > two is determined by mio_mask and mmio_value.
+> > Add build-time checks to ensure KVM isn't trying to do a reverse CPUID
+> > lookup on Linux-defined feature bits, along with comments to explain
+> > the gory details of X86_FEATUREs and bit().
 > >
-> > However, the next patch will need two bits to distinguish
-> > availability of A/D bits from write protection.  So, while at
-> > it give MMIO its own bit pattern, and move the two bits from
-> > bit 62 to bits 52..53 since Intel is allocating EPT page table
-> > bits from the top.
-> >
-> > Reviewed-by: Junaid Shahid <junaids@google.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > > ---
-> >  arch/x86/include/asm/kvm_host.h |  7 -------
-> >  arch/x86/kvm/mmu.c              | 28 ++++++++++++++++++----------
-> >  2 files changed, 18 insertions(+), 17 deletions(-)
 > >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 23edf56cf577..50eb430b0ad8 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -219,13 +219,6 @@ enum {
-> >                                  PFERR_WRITE_MASK |             \
-> >                                  PFERR_PRESENT_MASK)
+> > Note, the premature newline in the first line of the second comment is
+> > intentional to reduce churn in the next patch.
 > >
-> > -/*
-> > - * The mask used to denote special SPTEs, which can be either MMIO SPTEs or
-> > - * Access Tracking SPTEs. We use bit 62 instead of bit 63 to avoid conflicting
-> > - * with the SVE bit in EPT PTEs.
-> > - */
-> > -#define SPTE_SPECIAL_MASK (1ULL << 62)
-> > -
-> >  /* apic attention bits */
-> >  #define KVM_APIC_CHECK_VAPIC   0
-> >  /*
-> > diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-> > index 5269aa057dfa..bac8d228d82b 100644
-> > --- a/arch/x86/kvm/mmu.c
-> > +++ b/arch/x86/kvm/mmu.c
-> > @@ -83,7 +83,16 @@ enum {
-> >  #define PTE_PREFETCH_NUM               8
+> >  arch/x86/kvm/x86.h | 23 +++++++++++++++++++++--
+> >  1 file changed, 21 insertions(+), 2 deletions(-)
 > >
-> >  #define PT_FIRST_AVAIL_BITS_SHIFT 10
-> > -#define PT64_SECOND_AVAIL_BITS_SHIFT 52
-> > +#define PT64_SECOND_AVAIL_BITS_SHIFT 54
-> > +
+> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> > index cab5e71f0f0f..4ee4175c66a7 100644
+> > --- a/arch/x86/kvm/x86.h
+> > +++ b/arch/x86/kvm/x86.h
+> > @@ -144,9 +144,28 @@ static inline bool is_pae_paging(struct kvm_vcpu *vcpu)
+> >         return !is_long_mode(vcpu) && is_pae(vcpu) && is_paging(vcpu);
+> >  }
+> >
+> > -static inline u32 bit(int bitno)
 > > +/*
-> > + * The mask used to denote special SPTEs, which can be either MMIO SPTEs or
-> > + * Access Tracking SPTEs.
+> > + * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
+> > + * the hardware defined bit number (stored in bits 4:0) and a software defined
+> > + * "word" (stored in bits 31:5).  The word is used to index into arrays of
+> > + * bit masks that hold the per-cpu feature capabilities, e.g. this_cpu_has().
 > > + */
-> > +#define SPTE_SPECIAL_MASK (3ULL << 52)
-> > +#define SPTE_AD_ENABLED_MASK (0ULL << 52)
-> > +#define SPTE_AD_DISABLED_MASK (1ULL << 52)
-> > +#define SPTE_MMIO_MASK (3ULL << 52)
+> > +static __always_inline u32 bit(int feature)
+> >  {
+> > -       return 1 << (bitno & 31);
+> > +       /*
+> > +        * bit() is intended to be used only for hardware-defined
+> > +        * words, i.e. words whose bits directly correspond to a CPUID leaf.
+> > +        * Retrieving the bit mask from a Linux-defined word is nonsensical
+> > +        * as the bit number/mask is an arbitrary software-defined value and
+> > +        * can't be used by KVM to query/control guest capabilities.
+> > +        */
+> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_1);
+> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_2);
+> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_3);
+> > +       BUILD_BUG_ON((feature >> 5) == CPUID_LNX_4);
+> > +       BUILD_BUG_ON((feature >> 5) > CPUID_7_EDX);
+> 
+> What is magical about CPUID_7_EDX?
+
+It's currently the last cpufeatures word.  My thought was to force this to
+be updated in order to do reverse lookup on the next new word.  I didn't
+want to use NCAPINTS because that gets updated when a new word is added to
+cpufeatures, i.e. wouldn't catch the case where the next new word is a
+Linux-defined word, which is extremely unlikely but theoretically possible.
+
+> > +
+> > +       return 1 << (feature & 31);
+> 
+> Why not BIT(feature & 31)?
+
+That's a very good question.
+
+> >  }
+> >
+> >  static inline u8 vcpu_virt_addr_bits(struct kvm_vcpu *vcpu)
+> > --
+> > 2.24.0
+> >
