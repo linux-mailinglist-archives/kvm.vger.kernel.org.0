@@ -2,84 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E29B11A030
-	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 01:49:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D655911A078
+	for <lists+kvm@lfdr.de>; Wed, 11 Dec 2019 02:28:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbfLKAtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Dec 2019 19:49:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34076 "EHLO mail.kernel.org"
+        id S1727113AbfLKB1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Dec 2019 20:27:55 -0500
+Received: from mga17.intel.com ([192.55.52.151]:32077 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725999AbfLKAtc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Dec 2019 19:49:32 -0500
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2ACEC206D5;
-        Wed, 11 Dec 2019 00:49:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576025371;
-        bh=mS7zyk9RzK8MLQp+5nvdMy6P3ysyYQCDC3Bah6kmlfs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UvC0RIny6iqVEumpqrPw6rq1+xZGMHezDVxIFrfIHyEiEEKaKQc5hGaYaeoZSLVqv
-         OiKjZB9JvOrs5D8lM5PO+WX7OQOLW/u0awaO48QIwAJPLeFa0zJF2HELO5AISWbm2x
-         nMOoibFNiErcex5Kfzt1sOkhZk08/M0uQclzXbn4=
-Date:   Tue, 10 Dec 2019 16:49:29 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?ISO-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?ISO-8859-1?Q?J=E9r?= =?ISO-8859-1?Q?=F4me?= Glisse 
-        <jglisse@redhat.com>, Magnus Karlsson <magnus.karlsson@intel.com>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        "Paul Mackerras" <paulus@samba.org>, Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v8 20/26] powerpc: book3s64: convert to pin_user_pages()
- and put_user_page()
-Message-Id: <20191210164929.b3f54fe95c3fc4b6c756e65e@linux-foundation.org>
-In-Reply-To: <61e0c3a5-992e-4571-e22d-d63286ce10ec@nvidia.com>
-References: <20191209225344.99740-1-jhubbard@nvidia.com>
-        <20191209225344.99740-21-jhubbard@nvidia.com>
-        <08f5d716-8b31-b016-4994-19fbe829dc28@nvidia.com>
-        <61e0c3a5-992e-4571-e22d-d63286ce10ec@nvidia.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1726362AbfLKB1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Dec 2019 20:27:54 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Dec 2019 17:27:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; 
+   d="scan'208";a="245060376"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by fmsmga002.fm.intel.com with ESMTP; 10 Dec 2019 17:27:52 -0800
+Date:   Tue, 10 Dec 2019 20:19:41 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
+ vfio-pci ops
+Message-ID: <20191211011941.GB28339@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+ <20191205032536.29653-1-yan.y.zhao@intel.com>
+ <20191205165519.106bd210@x1.home>
+ <20191206075655.GG31791@joy-OptiPlex-7040>
+ <20191206142226.2698a2be@x1.home>
+ <20191209034225.GK31791@joy-OptiPlex-7040>
+ <20191209170339.2cb3d06e@x1.home>
+ <20191210024422.GA27331@joy-OptiPlex-7040>
+ <20191210095824.5c4cdad7@x1.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191210095824.5c4cdad7@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 9 Dec 2019 21:53:00 -0800 John Hubbard <jhubbard@nvidia.com> wrote:
-
-> > Correction: this is somehow missing the fixes that resulted from Jan Kara's review (he
-> > noted that we can't take a page lock in this context). I must have picked up the
-> > wrong version of it, when I rebased for -rc1.
-> > 
+On Wed, Dec 11, 2019 at 12:58:24AM +0800, Alex Williamson wrote:
+> On Mon, 9 Dec 2019 21:44:23 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> Andrew, given that the series is now in -mm, what's the preferred way for me to fix this?
-> Send a v9 version of the whole series? Or something else?
+> > > > > > Currently, yes, i40e has build dependency on vfio-pci.
+> > > > > > It's like this, if i40e decides to support SRIOV and compiles in vf
+> > > > > > related code who depends on vfio-pci, it will also have build dependency
+> > > > > > on vfio-pci. isn't it natural?    
+> > > > > 
+> > > > > No, this is not natural.  There are certainly i40e VF use cases that
+> > > > > have no interest in vfio and having dependencies between the two
+> > > > > modules is unacceptable.  I think you probably want to modularize the
+> > > > > i40e vfio support code and then perhaps register a table in vfio-pci
+> > > > > that the vfio-pci code can perform a module request when using a
+> > > > > compatible device.  Just and idea, there might be better options.  I
+> > > > > will not accept a solution that requires unloading the i40e driver in
+> > > > > order to unload the vfio-pci driver.  It's inconvenient with just one
+> > > > > NIC driver, imagine how poorly that scales.
+> > > > >     
+> > > > what about this way:
+> > > > mediate driver registers a module notifier and every time when
+> > > > vfio_pci is loaded, register to vfio_pci its mediate ops?
+> > > > (Just like in below sample code)
+> > > > This way vfio-pci is free to unload and this registering only gives
+> > > > vfio-pci a name of what module to request.
+> > > > After that,
+> > > > in vfio_pci_open(), vfio-pci requests the mediate driver. (or puts
+> > > > the mediate driver when mediate driver does not support mediating the
+> > > > device)
+> > > > in vfio_pci_release(), vfio-pci puts the mediate driver.
+> > > > 
+> > > > static void register_mediate_ops(void)
+> > > > {
+> > > >         int (*func)(struct vfio_pci_mediate_ops *ops) = NULL;
+> > > > 
+> > > >         func = symbol_get(vfio_pci_register_mediate_ops);
+> > > > 
+> > > >         if (func) {
+> > > >                 func(&igd_dt_ops);
+> > > >                 symbol_put(vfio_pci_register_mediate_ops);
+> > > >         }
+> > > > }
+> > > > 
+> > > > static int igd_module_notify(struct notifier_block *self,
+> > > >                               unsigned long val, void *data)
+> > > > {
+> > > >         struct module *mod = data;
+> > > >         int ret = 0;
+> > > > 
+> > > >         switch (val) {
+> > > >         case MODULE_STATE_LIVE:
+> > > >                 if (!strcmp(mod->name, "vfio_pci"))
+> > > >                         register_mediate_ops();
+> > > >                 break;
+> > > >         case MODULE_STATE_GOING:
+> > > >                 break;
+> > > >         default:
+> > > >                 break;
+> > > >         }
+> > > >         return ret;
+> > > > }
+> > > > 
+> > > > static struct notifier_block igd_module_nb = {
+> > > >         .notifier_call = igd_module_notify,
+> > > >         .priority = 0,
+> > > > };
+> > > > 
+> > > > 
+> > > > 
+> > > > static int __init igd_dt_init(void)
+> > > > {
+> > > > 	...
+> > > > 	register_mediate_ops();
+> > > > 	register_module_notifier(&igd_module_nb);
+> > > > 	...
+> > > > 	return 0;
+> > > > }  
+> > > 
+> > > 
+> > > No, this is bad.  Please look at MODULE_ALIAS() and request_module() as
+> > > used in the vfio-platform for loading reset driver modules.  I think
+> > > the correct approach is that vfio-pci should perform a request_module()
+> > > based on the device being probed.  Having the mediation provider
+> > > listening for vfio-pci and registering itself regardless of whether we
+> > > intend to use it assumes that we will want to use it and assumes that
+> > > the mediation provider module is already loaded.  We should be able to
+> > > support demand loading of modules that may serve no other purpose than
+> > > providing this mediation.  Thanks,  
+> > hi Alex
+> > Thanks for this message.
+> > So is it good to create a separate module as mediation provider driver,
+> > and alias its module name to "vfio-pci-mediate-vid-did".
+> > Then when vfio-pci probes the device, it requests module of that name ?
+> 
+> I think this would give us an option to have the mediator as a separate
+> module, but not require it.  Maybe rather than a request_module(),
+> where if we follow the platform reset example we'd then expect the init
+> code for the module to register into a list, we could do a
+> symbol_request().  AIUI, this would give us a reference to the symbol
+> if the module providing it is already loaded, and request a module
+> (perhaps via an alias) if it's not already load.  Thanks,
+> 
+ok. got it!
+Thank you :)
 
-I think a full resend is warranted at this time - it's only been in
-there a day and there seem to be quite a number of changes to be made.
-
+Yan
