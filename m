@@ -2,130 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A2DD811C08C
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 00:28:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7186E11C09F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 00:34:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbfLKX2e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 18:28:34 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48824 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726890AbfLKX2d (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 18:28:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576106912;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8N2VTWKYaoek2MhT9jeNFkodFByKtGdL7R1oeX08/MU=;
-        b=Gkhj8uzPSk2wy0svmnPIzzDoqaQz+KeDI5j2D28sSES81l0Xvow4B5xlc7lq/Kv0quNC5g
-        q2tARvZ4i3rUzB8SH5GcmoeaZU8q1rGMIQonoOZzWSZSNIX6sXOS3BrW1dB0A58dtFg+wE
-        b3sQKRUjfw1UA6xwaLyX5HtPWV/BY/g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-04i6izvaNMSzM6QR9agA1Q-1; Wed, 11 Dec 2019 18:28:30 -0500
-X-MC-Unique: 04i6izvaNMSzM6QR9agA1Q-1
-Received: by mail-wr1-f70.google.com with SMTP id b13so235834wrx.22
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:28:30 -0800 (PST)
+        id S1727077AbfLKXeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 18:34:46 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:45084 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726890AbfLKXep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 18:34:45 -0500
+Received: by mail-lf1-f65.google.com with SMTP id 203so171362lfa.12
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:34:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=McF4m/OHEBC1L05eglJmJ+UhN+oTS3o4fcogIM9KyH0=;
+        b=gPoCDuRLA2ViDUzUbkM3G3Kyn0SFQNWxjT+whG12NfO7GiTrZs/LjMAzjC0Xif25VD
+         fq6sTmg1Yrl4llSnmU7pKgyBrAv8MqwjdvELYIXpadZjLbzb4KXmj8Ie8UQlqYmvr1cT
+         RwIe3aqLO3jmw0ep20qFbwAmmxLrgQUADoSKc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8N2VTWKYaoek2MhT9jeNFkodFByKtGdL7R1oeX08/MU=;
-        b=A4Pks3NjUUZqo0sHIfM94GxSIVrUe36fHej06YF9FeR6sRS9x4DUcPUCaPO086iQ6R
-         yWKbcHZELvxNFl3awMrMww2gGeo23PsJ75gHmCH7StomwO7U0AEogjZHjWmgR/jtYZKM
-         HPUQYhQ6gtkWNb1Lwxec2gzOteOSVahqcps9/zmoGwevune55p5pnMDCV3KDc/DkPFE8
-         vk386KrOkaBIMUeXCPtecNFmCMS7MC+NZzLqHOkSa+PGe2XMbpBOjoMMtQtxdrsaQHpv
-         hDc2se76Xs6Wbx98uZrQe5O6gqH9J3KziBDVvV7Q/3y3+UHhB1zwYeqMvPiq+THWHJeY
-         pD8g==
-X-Gm-Message-State: APjAAAUtRmZKAVe2llBps6uXXHFIwep1AilLI+dnhjRae3yi7YgGTpIV
-        dMEyQuyZbWgCM5OqRm6OTxWvjHHLbuXwOaAp/6ALA4uATQ8IzZ1Z8ruooOnr0GteqNM0ZSLhH2N
-        8+9AzVQhY2JCl
-X-Received: by 2002:a5d:4651:: with SMTP id j17mr2661083wrs.237.1576106909758;
-        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwtDih10uBkUdWYAfbe65JA1ATiOMPLbwKMKCsUlC7MesSRuyAIYC2eS4f1nsy/Ltf04UErOw==
-X-Received: by 2002:a5d:4651:: with SMTP id j17mr2661056wrs.237.1576106909460;
-        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id j21sm4545674wmj.39.2019.12.11.15.28.27
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=McF4m/OHEBC1L05eglJmJ+UhN+oTS3o4fcogIM9KyH0=;
+        b=sQfn1qBKBQ5Nb/Xyuj/XK/8tNQphdwi0kbaBlIJS+8wIVlHt97mmLUA5dF6tgH/Fmy
+         P76wEwMBK9+909ucJ5h4DOn3HzmqdT6Lh8rUfspb7e5oNNBo2/kV2EjFulXPQTlF1cu9
+         VEinyGZ13ZRfGA3Wnmjz41cxeKl16nBHZLDhxYpy7WE6j8aPFZk+ESHmA3LVeH25/M84
+         q1aB9xkwW8T41SqeiAfqwDiyWT7LZMe3NtKOzdveWQklfG0M86Ovs77120s4E1tv244g
+         Fzhb12/DdOMBQkGRiBpx0lH26SLXLPVnR36HDn9YxpUU4g4JOU0hu+6EiPwWaj1XVxmB
+         yt5w==
+X-Gm-Message-State: APjAAAUPhfVZdptKgIExPGOnZLaae6WMRITTfLR5S87rGocWvwNMy7db
+        +6+8718reqfWVJHxzeIOm19RFR7Qn28=
+X-Google-Smtp-Source: APXvYqyKyekNl+VEvD9LTCj5yptZU+QySST03oFfmJ9ejFh7fDlo+Yk/9mFyASsvnwqfz/3shD6LLA==
+X-Received: by 2002:ac2:4d04:: with SMTP id r4mr3818738lfi.77.1576107282860;
+        Wed, 11 Dec 2019 15:34:42 -0800 (PST)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
+        by smtp.gmail.com with ESMTPSA id a24sm1886560ljp.97.2019.12.11.15.34.42
+        for <kvm@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 15:28:29 -0800 (PST)
-Subject: Re: [PATCH v2 1/3] KVM: x86: assign two bits to track SPTE kinds
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Junaid Shahid <junaids@google.com>
-References: <1569582943-13476-1-git-send-email-pbonzini@redhat.com>
- <1569582943-13476-2-git-send-email-pbonzini@redhat.com>
- <CANgfPd8G194y1Bo-6HR-jP8wh4DvdAsaijue_pnhetjduyzn4A@mail.gmail.com>
- <20191211191327.GI5044@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4e850c10-ff14-d95e-df22-0d0fd7427509@redhat.com>
-Date:   Thu, 12 Dec 2019 00:28:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        Wed, 11 Dec 2019 15:34:42 -0800 (PST)
+Received: by mail-lf1-f48.google.com with SMTP id m30so185089lfp.8
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:34:42 -0800 (PST)
+X-Received: by 2002:a05:6512:c7:: with SMTP id c7mr4092706lfp.120.1576107281798;
+ Wed, 11 Dec 2019 15:34:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191211191327.GI5044@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAAfnVB=8aWSHXHOP8erepbuxOO_-yz04tm8ToA7pLwNAYqA-xQ@mail.gmail.com>
+ <dee7353e807f5ea2c8a7e84623332f1b@www.loen.fr>
+In-Reply-To: <dee7353e807f5ea2c8a7e84623332f1b@www.loen.fr>
+From:   Gurchetan Singh <gurchetansingh@chromium.org>
+Date:   Wed, 11 Dec 2019 15:34:30 -0800
+X-Gmail-Original-Message-ID: <CAAfnVBmhusVt5yTGvh2KtcH_Q6gDdb-FXqY8JBuTKSPDXvGJOw@mail.gmail.com>
+Message-ID: <CAAfnVBmhusVt5yTGvh2KtcH_Q6gDdb-FXqY8JBuTKSPDXvGJOw@mail.gmail.com>
+Subject: Re: How to expose caching policy to a para-virtualized guest?
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
+        Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/12/19 20:13, Sean Christopherson wrote:
-> Assuming we haven't missed something, the easiest fix would be to reduce
-> the MMIO generation by one bit and use bits 62:54 for the MMIO generation.
+On Wed, Dec 11, 2019 at 3:08 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Gurchetan,
+>
+> I don't know anything about graphics API, so please bear with me.
 
-Yes, and I mistakenly thought it would be done just by adjusting 
-PT64_SECOND_AVAIL_BITS_SHIFT.
+Vulkan exposes the concept of memory types to userspace.  These memory
+types describe the memory properties of a heap.  For example, any
+memory type with the HOST_COHERENT_BIT specifies the application isn't
+required to send certain cache management commands
+(vkFlushMappedMemoryRanges, vkInvalidateMappedMemoryRanges).
 
-I will test and send formally something like this:
+1) HOST_CACHED => cached, no cache management
+2) HOST_COHERENT_BIT => write combine, no cache management, no snooping
+3) HOST_COHERENT_BIT | HOST_CACHED => cached, gpu snoops cpu caches,
+no cache management
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6f92b40d798c..aa2d86f42b9a 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -405,11 +405,13 @@ static inline bool is_access_track_spte(u64 spte)
- }
- 
- /*
-- * Due to limited space in PTEs, the MMIO generation is a 19 bit subset of
-+ * Due to limited space in PTEs, the MMIO generation is a 18 bit subset of
-  * the memslots generation and is derived as follows:
-  *
-  * Bits 0-8 of the MMIO generation are propagated to spte bits 3-11
-- * Bits 9-18 of the MMIO generation are propagated to spte bits 52-61
-+ * Bits 9-17 of the MMIO generation are propagated to spte bits 54-62
-  *
-+ * We don't use bit 63 to avoid conflicting with the SVE bit in EPT PTEs.
-+ *
-  * The KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS flag is intentionally not included in
-  * the MMIO generation number, as doing so would require stealing a bit from
-@@ -418,15 +418,16 @@ static inline bool is_access_track_spte(u64 spte)
-  * requires a full MMU zap).  The flag is instead explicitly queried when
-  * checking for MMIO spte cache hits.
-  */
--#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(18, 0)
-+#define MMIO_SPTE_GEN_MASK		GENMASK_ULL(17, 0)
- 
- #define MMIO_SPTE_GEN_LOW_START		3
- #define MMIO_SPTE_GEN_LOW_END		11
- #define MMIO_SPTE_GEN_LOW_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_END, \
- 						    MMIO_SPTE_GEN_LOW_START)
- 
--#define MMIO_SPTE_GEN_HIGH_START	52
--#define MMIO_SPTE_GEN_HIGH_END		61
-+/* Leave room for SPTE_SPECIAL_MASK.  */
-+#define MMIO_SPTE_GEN_HIGH_START	PT64_SECOND_AVAIL_BITS_SHIFT
-+#define MMIO_SPTE_GEN_HIGH_END		62
- #define MMIO_SPTE_GEN_HIGH_MASK		GENMASK_ULL(MMIO_SPTE_GEN_HIGH_END, \
- 						    MMIO_SPTE_GEN_HIGH_START)
- static u64 generation_mmio_spte_mask(u64 gen)
+Here's some more reading on that:
 
+https://static.docs.arm.com/100019/0100/arm_mali_application_developer_best_practices_developer_guide_100019_0100_00_en2.pdf
 
-Paolo
+(1) and (3) aren't too difficult -- just use
+KVM_SET_USER_MEMORY_REGION. (2) is, since it may lead to inconsistent
+mappings.
 
+vmware has a very nice emulated solution for this:
+
+https://lwn.net/Articles/804114/
+
+We're planning on building off vmware's solution, and if possible, add
+some additional optimizations.
+
+>
+> On 2019-12-11 01:32, Gurchetan Singh wrote:
+> > Hi,
+> >
+> > We're trying to implement Vulkan with virtio-gpu, and that API
+> > exposes
+> > the difference between cached and uncached mappings to userspace
+> > (i.e,
+> > some older GPUs can't snoop the CPU's caches).
+> >
+> > We need to make sure that the guest and host caching attributes are
+> > aligned, or there's a proper API between the virtio driver and device
+> > to ensure coherence.
+>
+> I think you trying to cross two barriers at once here.
+>
+> Virtio is always coherent between host and guest, and the guest should
+> use cacheable mappings. That's at least my expectation, and I don't
+> know of any exception to this rule.
+
+Where is this ruled stated?  We may need to modify the spec.  At the
+very least, we need anything mapped on the host with HOST_COHERENT_BIT
+only to be write combine in the guest.
+
+However, there's an additional caveat: on x86, cache management
+(clflush) is available to the guest.  So it's possible to map host
+cached memory as write-combine, and import guest memory to Vulkan.
+This is an optimization limited to non-zero amount of x86 devices.
+
+So, something like arch_does_guest_attribute_matter() or
+arch_can_guest_flush() in the guest kernel would be useful.  But it
+doesn't sound like this is readily available?
+
+> You have then the coherency of the physical device, and that's a host
+> kernel (and maybe userspace) matter. Why should the guest ever know
+> about
+> this constraint?
+>
+> > One issue that needs to be addressed is the caching policy is
+> > variable
+> > dependent on the VM configuration and architecture.  For example, on
+> > x86, it looks like a MTRR controls whether the guest caching
+> > attribute
+> > predominates[1].  On ARM, it looks like the MMU registers control
+> > whether the guest can override the host attribute, but in general
+> > it's
+> > most restrictive attribute that makes a difference[2].  Let me if
+> > that's incorrect.
+>
+> For ARM, this is true up to ARMv8.3. Starting with ARMv8.4, FWB gives
+> the hypervisor the opportunity to force memory mappings as cacheable
+> write-back. None of that is visible to userspace, thankfully.
+
+Is there some open-source code available on ARM showing how the MMU is
+configured (which forces guest attribute override)?
+
+>
+> > I'm wondering if there's some standard kernel API to query such
+> > attributes.  For example, something like
+> > arch_does_guest_attribute_matter() or arch_can_guest_flush() would do
+> > the trick.  Without this, we may need to introduce VIRTIO_GPU_F_*
+> > flags set by the host, but that may make the already giant QEMU
+> > command line even bigger.
+>
+> If something has to manage the coherency, it should be the host that
+> knows how the memory traffic flows between host and guest, and apply
+> cache management as required. Note that on arm64, cache management
+> instructions are available from userspace. On systems that are
+> fully coherent, they are expected to be little more than NOPs.
+>
+>  From the above, it is pretty obvious that I don't understand what
+> problem you are trying to solve. Maybe you could explain how
+> you envisage things to work, who maps what where, and the expected
+> semantics. Once we have a common understanding of the problem,
+> maybe we can think of a decent solution.
+>
+> Thanks,
+>
+>          M.
+> --
+> Jazz is not dead. It just smells funny...
