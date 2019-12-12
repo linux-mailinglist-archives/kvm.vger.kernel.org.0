@@ -2,60 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C60511D545
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E02D11D563
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:25:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730338AbfLLSX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 13:23:57 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55832 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730235AbfLLSXx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 13:23:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576175032;
+        id S1730513AbfLLSY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 13:24:59 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:45940 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730387AbfLLSY6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 13:24:58 -0500
+Received: from zn.tnic (p200300EC2F0A5A0010289BED6992E3B4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:5a00:1028:9bed:6992:e3b4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0F9D91EC0D00;
+        Thu, 12 Dec 2019 19:24:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1576175096;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8xkoB5cjmgUHQdkZ5cb+CrM+r0RqlkKkbDVU3rOPMZ8=;
-        b=JcItyIfj/ySD9uWUPCvrl4ESbK3qVeGGdJiQYrXIiqrFScSpqXU0hxBeb/wGBj9j6cKK3l
-        FCEtEdpFnCiLDWdKeBwZQKAaNgiV+/YZM5HR6/9lZ9agA8re3OUynk6CvW5IPCPsnEGrsr
-        oh1yU8mWaTVnOjY940BHN/8qjeWBUuA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-deipDtTQPf-NBJW3Tu1aUg-1; Thu, 12 Dec 2019 13:23:50 -0500
-X-MC-Unique: deipDtTQPf-NBJW3Tu1aUg-1
-Received: by mail-wr1-f71.google.com with SMTP id u12so1340696wrt.15
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:23:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8xkoB5cjmgUHQdkZ5cb+CrM+r0RqlkKkbDVU3rOPMZ8=;
-        b=kAyBoPK8tNAeWNaUAz2m0TxNb4OGpZlA7m4ArAW5dhLHn4q7KFJuxgGw9+KnzTM8Jo
-         A0r1WIpTTrmLdJgqtXyyd87MQGUzPJlsMSesjDh0/HuWwmXZt0BIV7mxLnqpJOHJRYZP
-         qXuWWn+pDAI64v6OY1fUKL3KNOqhK473NInV1mPyWEVq2rfyMJ1PmWcKJNVLL1fmpWDa
-         Csgj+btpqmUBZUsb8dI2QdJ26qdRFq21ZcOz8oRm2DFiaPKk2KuYLdW9kGJcA2vQ926M
-         E27ECDGZhzzsXWo1axShQUdCzSlErMpx/OYWBNfyftyLEtMWbKHtIgDgwloPLZ7pIPS2
-         lhZQ==
-X-Gm-Message-State: APjAAAXhljwbb1iM2M551QqOeN95lxIsTCjGLFsf0KgdozY20u1lF2U9
-        jlIJUAy2cMCFMI95QGheSsED9IPZyltX8X2F628w2hjKf0Fw+JQhNkMxKM77YekYB6ZkUrBuLVF
-        4Qnf/DZOral+o
-X-Received: by 2002:a05:600c:214f:: with SMTP id v15mr1926341wml.110.1576175028867;
-        Thu, 12 Dec 2019 10:23:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwd0K98LLLLMzVZpxkLM2pTQcUwdjipnXu8DaxkR8GuX/5jLVy+o+UUfsD7E3+5ZFzP6L279w==
-X-Received: by 2002:a05:600c:214f:: with SMTP id v15mr1926312wml.110.1576175028600;
-        Thu, 12 Dec 2019 10:23:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id h2sm6896950wrv.66.2019.12.12.10.23.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 10:23:47 -0800 (PST)
-Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
- VMX_FEATURES_*
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=2TIUuWa9aevx3nEsXKaaJadXZODvPPCYg3qJs/3YyTc=;
+        b=RUPwEtc2CyutYOTrS9uUbw0IzlfZzeDWyGpy0WBgpf3SauLu0oZsdtWZ3BZQsU2nKP7gGj
+        5/E6w07e/8PMng4lFhpGy3IG+UdEDJzSUlUV+xwqgXfC9rCs1iaXMv0tJjXB5yIIkPKYm/
+        5k0uPzwn4ZqpQ4gImaqfM5EdnwounOs=
+Date:   Thu, 12 Dec 2019 19:24:55 +0100
+From:   Borislav Petkov <bp@alien8.de>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -64,7 +37,8 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Jiri Olsa <jolsa@redhat.com>,
         Namhyung Kim <namhyung@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -76,68 +50,39 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
         linux-kselftest@vger.kernel.org,
         Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Subject: Re: [PATCH v4 10/19] x86/cpu: Detect VMX features on Intel, Centaur
+ and Zhaoxin CPUs
+Message-ID: <20191212182455.GH4991@zn.tnic>
 References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
- <20191128014016.4389-12-sean.j.christopherson@intel.com>
- <20191212122646.GE4991@zn.tnic>
- <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
- <20191212181802.GH3163@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d6c0344-ccfa-13fc-695b-1e69298507dc@redhat.com>
-Date:   Thu, 12 Dec 2019 19:23:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191128014016.4389-11-sean.j.christopherson@intel.com>
+ <20191212113838.GD4991@zn.tnic>
+ <20191212175511.GG3163@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212181802.GH3163@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191212175511.GG3163@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/19 19:18, Sean Christopherson wrote:
-> Using v<feature> across the board makes sense to keep things consistent,
-> i.e. vnmi, vtpr, vapic, etc...
+On Thu, Dec 12, 2019 at 09:55:11AM -0800, Sean Christopherson wrote:
+> The reasoning behind using vanilla rdmsr() on PROC and PIN controls is that
+> those MSRs should exist on any CPU that supports VMX, i.e. we want the WARN.
 > 
-> Anyone have thoughts on how to shorten "APIC-register virtualization"
-> without colliding with vapic or apicv?  I currently have apic_reg_virt,
-> which is a bit wordy.  apic_regv isn't awful, but I don't love it.
+> The alternative would be to use rdmsr_safe() for everything and then
+> explicitly disable VMX if a fault on PROC or PIN occurs, but that circles
+> us back to the handling a fault on rdmsr(MSR_IA32_FEAT_CTL), i.e. is it
+> really worth gracefully handling a fault that should never occur?
 
-Perhaps vapic_access and vapic_register?
+No but pls put a comment above it explaining why we're doing rdmsr()
+only with those two MSRs.
 
-> 
-> The other control that will be awkard is "Virtual Interrupt Delivery".
-> vint_delivery?
+Thx.
 
-We can just use vid I think.  And posted_intr.
+-- 
+Regards/Gruss,
+    Boris.
 
->>> unrestricted_guest	-> unres_guest
->>
->> Full? Or just unrestricted
-> 
-> I prefer unrestricted_guest, a bare unrestricted just makes me wonder
-> "unrestricted what?".   But I can live with "unrestricted" if that's the
-> consensus.
-
-I do prefer unrestricted_guest actually.
-
->> In general I would stick to the same names as kvm_intel module
->> parameters (sans "enable_" if applicable) and not even bother publishing
->> the others.  Some features are either not used by KVM or available on
->> all VMX processors.
-> 
-> IMO there's value in printing features that are not 1:1 with module params.
-> 
-> I also think it makes sense to print features of interest even if KVM
-> doesn't (yet) support the feature, e.g. to allow a user/developer to check
-> if they can use/test a KVM build with support for a new feature without
-> having to build and install the new kernel.
-> 
->> Paolo
->>
->>> and so on. Those are just my examples - I betcha the SDM is more
->>> creative here with abbreviations. But you guys are going to grep for
->>> them. If it were me, I'd save on typing. :-)
-> 
-
+https://people.kernel.org/tglx/notes-about-netiquette
