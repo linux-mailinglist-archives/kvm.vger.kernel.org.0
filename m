@@ -2,129 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3874D11D472
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4C1911D488
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:49:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730280AbfLLRrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 12:47:55 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11754 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730264AbfLLRrx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 12:47:53 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCHgGAQ152920
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 12:47:53 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wr8m1a667-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 12:47:52 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Dec 2019 17:47:49 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 17:47:43 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCHlgCn1966354
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 17:47:42 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BC6FA405C;
-        Thu, 12 Dec 2019 17:47:42 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 076DDA4054;
-        Thu, 12 Dec 2019 17:47:42 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.212])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 17:47:41 +0000 (GMT)
-Subject: Re: [PATCH v2 02/13] KVM: x86: Protect
- kvm_hv_msr_[get|set]_crash_data() from Spectre-v1/L1TF attacks
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Marios Pomonis <pomonis@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        id S1730255AbfLLRtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 12:49:32 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53738 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729771AbfLLRtc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 12:49:32 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCHijtl032917;
+        Thu, 12 Dec 2019 17:48:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=209O+3Xe8wnGXL8s/3e5RLbnSLi6zch/ZA2bLBFzw5k=;
+ b=D9Ypnds+tQTjBQGTQIEeJCcGvTNeF9gbB0luV0hEZsxC6+/RwzXtgkkbWvWUPmInuihf
+ 7b2NNY071RtRuhyE7nERl7VUh8eMzxFg6Lpa4oRd5MxuE4BW/tTSP9Z4ku2//O0qmI17
+ 8I3rqYbDY8USDlsxSFsypeDczQV/nf0RlNqmMBnVoqC/iUNozGASW5kTFpe1L079/K0R
+ Mz8PsfX0HvRVrvioXCUM4ibgk6rXBboq69ebCwSYwUYv5lp+ZO7DEoIcbmCe/Ll//4rS
+ 2YSwr0OXT+iRa/umdy6P5bw6arI3aPtFHdrOBt/sOyenQcs//VZk5HYRt/9WDn8nhu2Z 3A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2wrw4nhe5r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 17:48:01 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCHhg0D177364;
+        Thu, 12 Dec 2019 17:48:01 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2wumw0nwp2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 17:48:00 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBCHm0EX022395;
+        Thu, 12 Dec 2019 17:48:00 GMT
+Received: from [192.168.14.112] (/109.65.223.49)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Dec 2019 09:47:59 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
+ VMX_FEATURES_*
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20191212174357.GE3163@linux.intel.com>
+Date:   Thu, 12 Dec 2019 19:47:51 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Nick Finco <nifi@google.com>, Andrew Honig <ahonig@google.com>,
-        stable@vger.kernel.org
-References: <20191211204753.242298-1-pomonis@google.com>
- <20191211204753.242298-3-pomonis@google.com>
- <314f6d96-b75f-e159-d94d-1d30a5140e40@de.ibm.com>
- <CALMp9eTOD6r13sPZ3skz_YkSFn2ZKbsr5zbLP9LgzjpHnsebkQ@mail.gmail.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 12 Dec 2019 18:47:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eTOD6r13sPZ3skz_YkSFn2ZKbsr5zbLP9LgzjpHnsebkQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121217-4275-0000-0000-0000038E57CD
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121217-4276-0000-0000-000038A212C3
-Message-Id: <73a7a1ce-7e68-7b15-70eb-7b6217af5e1a@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_05:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- phishscore=0 bulkscore=0 clxscore=1015 adultscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120139
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <407604A2-354E-4358-91EC-E04A57F506C1@oracle.com>
+References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
+ <20191128014016.4389-12-sean.j.christopherson@intel.com>
+ <20191212122646.GE4991@zn.tnic>
+ <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
+ <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
+ <17c6569e-d0af-539c-6d63-f4c07367d8d1@redhat.com>
+ <20191212174357.GE3163@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=601
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912120139
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=668 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912120139
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -132,61 +100,51 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12.12.19 18:44, Jim Mattson wrote:
-> On Thu, Dec 12, 2019 at 9:31 AM Christian Borntraeger
-> <borntraeger@de.ibm.com> wrote:
->>
->>
->>
->> On 11.12.19 21:47, Marios Pomonis wrote:
->>> This fixes Spectre-v1/L1TF vulnerabilities in kvm_hv_msr_get_crash_data()
->>> and kvm_hv_msr_set_crash_data().
->>> These functions contain index computations that use the
->>> (attacker-controlled) MSR number.
->>>
->>> Fixes: commit e7d9513b60e8 ("kvm/x86: added hyper-v crash msrs into kvm hyperv context")
->>>
->>> Signed-off-by: Nick Finco <nifi@google.com>
->>> Signed-off-by: Marios Pomonis <pomonis@google.com>
->>> Reviewed-by: Andrew Honig <ahonig@google.com>
->>> Cc: stable@vger.kernel.org
->>> ---
->>>  arch/x86/kvm/hyperv.c | 10 ++++++----
->>>  1 file changed, 6 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->>> index 23ff65504d7e..26408434b9bc 100644
->>> --- a/arch/x86/kvm/hyperv.c
->>> +++ b/arch/x86/kvm/hyperv.c
->>> @@ -809,11 +809,12 @@ static int kvm_hv_msr_get_crash_data(struct kvm_vcpu *vcpu,
->>>                                    u32 index, u64 *pdata)
->>>  {
->>>       struct kvm_hv *hv = &vcpu->kvm->arch.hyperv;
->>> +     size_t size = ARRAY_SIZE(hv->hv_crash_param);
->>>
->>> -     if (WARN_ON_ONCE(index >= ARRAY_SIZE(hv->hv_crash_param)))
->>> +     if (WARN_ON_ONCE(index >= size))
->>>               return -EINVAL;
->>
->> The fact that we do a WARN_ON_ONCE here, should actually tell that index is not
->> user controllable. Otherwise this would indicate the possibility to trigger a
->> kernel warning from a malicious user space. So
->> a: we do not need this change
->> or
->> b: we must also fix the WARN_ON_ONCE
-> 
-> That isn't quite true. The issue is *speculative* execution down this path.
-> 
-> The call site does constrain the *actual* value of index:
-> 
-> case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
->         return kvm_hv_msr_get_crash_data(...);
-> 
-> However, it is possible to train the branch predictor to go down this
-> path using valid indices and subsequently pass what would be an
-> invalid index. The CPU will speculatively follow this path and may
-> pull interesting data into the cache before it realizes its mistake
-> and corrects.
+> On 12 Dec 2019, at 19:43, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Thu, Dec 12, 2019 at 04:57:10PM +0100, Paolo Bonzini wrote:
+>> On 12/12/19 16:52, Liran Alon wrote:
+>>>>> virt_apic_accesses	-> vapic
+>>>> apicv
+>>> Frankly, I dislike APICv terminology. I prefer to enumerate the
+>>> various VMX features which are collectively called APICv by KVM.=20
+>>> APICv currently represents in KVM terminology the combination of
+>>> APIC-register virtualization, virtual-interrupt-delivery and
+>>> posted-interrupts (See cpu_has_vmx_apicv()).
+>>>=20
+>>> In fact, the coupling of =E2=80=9Cenable_apicv=E2=80=9D module =
+parameter have made me
+>>> multiple times to need to disable entire APICv features when there
+>>> for example was only a bug in posted-interrupts.
+>>>=20
+>>> Even you got confused as virtualize-apic-access is not part of =
+KVM=E2=80=99s
+>>> APICv terminology but rather it=E2=80=99s enablement depend on
+>>> flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e.
+>>> It can be used for faster intercept handling of accesses to guest
+>>> xAPIC MMIO page.
+>>=20
+>> Right, I got confused with APIC-register virtualization.  Virtualize
+>> APIC accesses is another one I wouldn't bother putting in =
+/proc/cpuinfo,
+>> since it's usually present together with flexpriority.
+>=20
+> Key word being "usually".  My intent in printing out partially =
+redundant
+> flags was to help users debug/understand why the combined feature =
+isn't
+> supported.  E.g. userspace can already easily (relatively speaking) =
+query
+> flexpriority support via =
+/sys/module/kvm_intel/parameters/flexpriority.
+> But if that comes back "N", the user has no way to determine exactly =
+why
+> flexpriority is disabled.
 
-Yes, you are right.
++1 on that.
+
+/proc/cpuinfo should just dump supported VMX features that kernel is =
+aware of as exposed from CPU.
+Without further processing.
 
