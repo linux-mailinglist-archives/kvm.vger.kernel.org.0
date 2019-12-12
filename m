@@ -2,301 +2,389 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 33EB311CF6A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:10:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADA8C11CF74
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:13:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729648AbfLLOKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 09:10:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10926 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729392AbfLLOKW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 09:10:22 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCE7rcT073845
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 09:10:20 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wtbt3dpn4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 09:10:20 -0500
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 12 Dec 2019 14:10:18 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 14:10:16 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCEAF8h61800550
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 14:10:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6BE65A405F;
-        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 34DD3A4054;
-        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 8/9] s390x: css: ssch/tsch with sense
- and interrupt
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
- <1576079170-7244-9-git-send-email-pmorel@linux.ibm.com>
- <20191212132634.3a16a389.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Thu, 12 Dec 2019 15:10:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1729568AbfLLONG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 09:13:06 -0500
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:30583 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729392AbfLLONG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 09:13:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1576159984; x=1607695984;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=VnXQ/si/PddmaiLs9SIOVqc3GYuruP9Nne1F7PseBys=;
+  b=pqHAih/214RSYut+ToaZTj70YmmhEyiEdAmsA961SDi23Nyl2HU1uMrV
+   +E0lmhPVViSMc4FaS/KXw1huENuIijunGpEvLGze6WsL7B8p84EBvT9Sv
+   aOaTXGry6Eq65TH4z+7q3WLVqCHDsDpWXdFCFOoDMjyIHLGMiRa2Obio3
+   k=;
+IronPort-SDR: sVSq0e3UkGRwoYoS2r1ozjmorsPv47o8gnqqR7aV+1Pl1H19rEemIZhxr8ay/Qb27gv0X5NbFq
+ wsmN/3gbmeyA==
+X-IronPort-AV: E=Sophos;i="5.69,306,1571702400"; 
+   d="scan'208";a="13143525"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 12 Dec 2019 14:12:52 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1a-7d76a15f.us-east-1.amazon.com (Postfix) with ESMTPS id D831DA1919;
+        Thu, 12 Dec 2019 14:12:50 +0000 (UTC)
+Received: from EX13D27EUB004.ant.amazon.com (10.43.166.152) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 12 Dec 2019 14:12:50 +0000
+Received: from uc3ce012741425f.ant.amazon.com (10.43.161.179) by
+ EX13D27EUB004.ant.amazon.com (10.43.166.152) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 12 Dec 2019 14:12:47 +0000
+From:   Milan Pandurov <milanpa@amazon.de>
+To:     <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <graf@amazon.de>,
+        <borntraeger@de.ibm.com>
+Subject: [PATCH v4] kvm: Refactor handling of VM debugfs files
+Date:   Thu, 12 Dec 2019 15:12:36 +0100
+Message-ID: <20191212141236.21832-1-milanpa@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20191212132634.3a16a389.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121214-0020-0000-0000-00000397793A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121214-0021-0000-0000-000021EE8263
-Message-Id: <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1912120108
+Content-Type: text/plain
+X-Originating-IP: [10.43.161.179]
+X-ClientProxiedBy: EX13D10UWA004.ant.amazon.com (10.43.160.64) To
+ EX13D27EUB004.ant.amazon.com (10.43.166.152)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We can store reference to kvm_stats_debugfs_item instead of copying
+its values to kvm_stat_data.
+This allows us to remove duplicated code and usage of temporary
+kvm_stat_data inside vm_stat_get et al.
 
+Signed-off-by: Milan Pandurov <milanpa@amazon.de>
 
-On 2019-12-12 13:26, Cornelia Huck wrote:
-> On Wed, 11 Dec 2019 16:46:09 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> When a channel is enabled we can start a SENSE command using the SSCH
-> 
-> s/SENSE/SENSE ID/
-> 
-> SENSE is for getting sense data after a unit check :)
+---
+v1 -> v2:
+ - fix compile issues
+ - add reference to kvm_stats_debugfs_item in kvm_stat_data
+ - return -EINVAL when writing !0
+ - use explicit switch case instead of ops indirection
+ - fix checkpatch warning: Change S_IWUGO to 0222
 
-Yes, thanks.
+v2 -> v3:
+ - remove unused kvm_stat_ops
+ - fix style issues
 
-> 
->> instruction to recognize the control unit and device.
->>
->> This tests the success of SSCH, the I/O interruption and the TSCH
->> instructions.
->>
->> The test expects a device with a control unit type of 0xC0CA as the
->> first subchannel of the CSS.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h |  13 ++++
->>   s390x/css.c     | 175 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 188 insertions(+)
-> 
->> +static void irq_io(void)
->> +{
->> +	int ret = 0;
->> +	char *flags;
->> +	int sid;
->> +
->> +	report_prefix_push("Interrupt");
->> +	if (lowcore->io_int_param != CSS_TEST_INT_PARAM) {
->> +		report(0, "Bad io_int_param: %x", lowcore->io_int_param);
->> +		report_prefix_pop();
->> +		return;
->> +	}
->> +	report_prefix_pop();
->> +
->> +	report_prefix_push("tsch");
->> +	sid = lowcore->subsys_id_word;
->> +	ret = tsch(sid, &irb);
->> +	switch (ret) {
->> +	case 1:
->> +		dump_irb(&irb);
->> +		flags = dump_scsw_flags(irb.scsw.ctrl);
->> +		report(0, "IRB scsw flags: %s", flags);
-> 
-> I guess that should only happen if the I/O interrupt was for another
-> subchannel, and we only enable one subchannel, right?
-> 
-> Maybe log "I/O interrupt, but sch not status pending: <flags>"? (No
-> idea how log the logged messages can be for kvm unit tests.)
+v3 -> v4:
+ - revert: Change S_IWUGO to 0222
+---
+ include/linux/kvm_host.h |   7 +-
+ virt/kvm/kvm_main.c      | 142 +++++++++++++++++++--------------------
+ 2 files changed, 76 insertions(+), 73 deletions(-)
 
-Yes, the log message I had was not very useful at first sight.
-
-> 
->> +		goto pop;
->> +	case 2:
->> +		report(0, "TSCH return unexpected CC 2");
-> 
-> s/return/returns/
-> 
->> +		goto pop;
->> +	case 3:
->> +		report(0, "Subchannel %08x not operational", sid);
->> +		goto pop;
->> +	case 0:
->> +		/* Stay humble on success */
-> 
-> :)
-> 
->> +		break;
->> +	}
->> +pop:
->> +	report_prefix_pop();
->> +}
->> +
->> +static int start_subchannel(int code, char *data, int count)
->> +{
->> +	int ret;
->> +	struct pmcw *p = &schib.pmcw;
->> +	struct orb *orb_p = &orb[0];
->> +
->> +	/* Verify that a test subchannel has been set */
->> +	if (!test_device_sid) {
->> +		report_skip("No device");
->> +		return 0;
->> +	}
->> +
->> +	if ((unsigned long)data >= 0x80000000UL) {
->> +		report(0, "Data above 2G! %p", data);
->> +		return 0;
->> +	}
->> +
->> +	/* Verify that the subchannel has been enabled */
->> +	ret = stsch(test_device_sid, &schib);
->> +	if (ret) {
->> +		report(0, "Err %d on stsch on sid %08x", ret, test_device_sid);
->> +		return 0;
->> +	}
->> +	if (!(p->flags & PMCW_ENABLE)) {
->> +		report_skip("Device (sid %08x) not enabled", test_device_sid);
->> +		return 0;
->> +	}
->> +
->> +	report_prefix_push("ssch");
->> +	/* Build the CCW chain with a single CCW */
->> +	ccw[0].code = code;
->> +	ccw[0].flags = 0; /* No flags need to be set */
->> +	ccw[0].count = count;
->> +	ccw[0].data_address = (int)(unsigned long)data;
->> +	orb_p->intparm = CSS_TEST_INT_PARAM;
->> +	orb_p->ctrl = ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
->> +	if ((unsigned long)&ccw[0] >= 0x80000000UL) {
->> +		report(0, "CCW above 2G! %016lx", (unsigned long)&ccw[0]);
-> 
-> Maybe check before filling out the ccw?
-
-Yes. Also I wonder if we should not make sure the all kvm-test-text and 
-data are under 2G by construct, because I am quite sure that this sort 
-of tests will repeat all over the kvm-unit-test code.
-
-Will provide a separate patch for this, in between just do as you said, 
-it is the logical thing to do here.
-
-> 
->> +		report_prefix_pop();
->> +		return 0;
->> +	}
->> +	orb_p->cpa = (unsigned int) (unsigned long)&ccw[0];
->> +
->> +	ret = ssch(test_device_sid, orb_p);
->> +	if (ret) {
->> +		report(0, "ssch cc=%d", ret);
->> +		report_prefix_pop();
->> +		return 0;
->> +	}
->> +	report_prefix_pop();
->> +	return 1;
->> +}
->> +
->> +/*
->> + * test_sense
->> + * Pre-requisits:
->> + * - We need the QEMU PONG device as the first recognized
->> + * - device by the enumeration.
->> + * - ./s390x-run s390x/css.elf -device ccw-pong,cu_type=0xc0ca
->> + */
->> +static void test_sense(void)
->> +{
->> +	int ret;
->> +
->> +	ret = register_io_int_func(irq_io);
->> +	if (ret) {
->> +		report(0, "Could not register IRQ handler");
->> +		goto unreg_cb;
->> +	}
->> +
->> +	enable_io_irq();
->> +	lowcore->io_int_param = 0;
->> +
->> +	ret = start_subchannel(CCW_CMD_SENSE_ID, buffer, sizeof(senseid));
->> +	if (!ret) {
->> +		report(0, "start_subchannel failed");
->> +		goto unreg_cb;
->> +	}
->> +
->> +	delay(100);
->> +	if (lowcore->io_int_param != CSS_TEST_INT_PARAM) {
->> +		report(0, "cu_type: expect 0x%08x, got 0x%08x",
->> +		       CSS_TEST_INT_PARAM, lowcore->io_int_param);
->> +		goto unreg_cb;
->> +	}
-> 
-> This still looks like that odd "delay and hope an interrupt has arrived
-> in the mean time" pattern.
-
-yes.
-
-> 
-> Also, doesn't the interrupt handler check for the intparm already?
-
-Yes, if the interrupt fires.
-
-> 
->> +
->> +	senseid.cu_type = buffer[2] | (buffer[1] << 8);
-> 
-> This still looks odd; why not have the ccw fill out the senseid
-> structure directly?
-
-Oh sorry, you already said and I forgot to modify this.
-thanks
-
-> 
->> +
->> +	/* Sense ID is non packed cut_type is at offset +1 byte */
-> 
-> I have trouble parsing this sentence...
-> 
->> +	if (senseid.cu_type == PONG_CU)
->> +		report(1, "cu_type: expect 0x%04x got 0x%04x",
->> +		       PONG_CU_TYPE, senseid.cu_type);
->> +	else
->> +		report(0, "cu_type: expect 0x%04x got 0x%04x",
->> +		       PONG_CU_TYPE, senseid.cu_type);
-> 
-> Didn't you want to check for ff in the reserved field as well?
-
-It was not intended as a check for SENSE_ID but for STSCH/READ.
-But, while at this... why not.
-
-Thanks for the review.
-Regards,
-
-Pierre
-
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7ed1e2f8641e..d3f2c0eae857 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1109,9 +1109,8 @@ enum kvm_stat_kind {
+ };
+ 
+ struct kvm_stat_data {
+-	int offset;
+-	int mode;
+ 	struct kvm *kvm;
++	struct kvm_stats_debugfs_item *dbgfs_item;
+ };
+ 
+ struct kvm_stats_debugfs_item {
+@@ -1120,6 +1119,10 @@ struct kvm_stats_debugfs_item {
+ 	enum kvm_stat_kind kind;
+ 	int mode;
+ };
++
++#define KVM_DBGFS_GET_MODE(dbgfs_item)                                         \
++	((dbgfs_item)->mode ? (dbgfs_item)->mode : 0644)
++
+ extern struct kvm_stats_debugfs_item debugfs_entries[];
+ extern struct dentry *kvm_debugfs_dir;
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 00268290dcbd..286bca3804b1 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -113,7 +113,7 @@ struct dentry *kvm_debugfs_dir;
+ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+ 
+ static int kvm_debugfs_num_entries;
+-static const struct file_operations *stat_fops_per_vm[];
++static const struct file_operations stat_fops_per_vm;
+ 
+ static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+ 			   unsigned long arg);
+@@ -650,11 +650,11 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 			return -ENOMEM;
+ 
+ 		stat_data->kvm = kvm;
+-		stat_data->offset = p->offset;
+-		stat_data->mode = p->mode ? p->mode : 0644;
++		stat_data->dbgfs_item = p;
+ 		kvm->debugfs_stat_data[p - debugfs_entries] = stat_data;
+-		debugfs_create_file(p->name, stat_data->mode, kvm->debugfs_dentry,
+-				    stat_data, stat_fops_per_vm[p->kind]);
++		debugfs_create_file(p->name, KVM_DBGFS_GET_MODE(p),
++				    kvm->debugfs_dentry, stat_data,
++				    &stat_fops_per_vm);
+ 	}
+ 	return 0;
+ }
+@@ -4013,8 +4013,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+ 		return -ENOENT;
+ 
+ 	if (simple_attr_open(inode, file, get,
+-			     stat_data->mode & S_IWUGO ? set : NULL,
+-			     fmt)) {
++		    KVM_DBGFS_GET_MODE(stat_data->dbgfs_item) & S_IWUGO
++		    ? set : NULL,
++		    fmt)) {
+ 		kvm_put_kvm(stat_data->kvm);
+ 		return -ENOMEM;
+ 	}
+@@ -4033,105 +4034,111 @@ static int kvm_debugfs_release(struct inode *inode, struct file *file)
+ 	return 0;
+ }
+ 
+-static int vm_stat_get_per_vm(void *data, u64 *val)
++static int kvm_get_stat_per_vm(struct kvm *kvm, size_t offset, u64 *val)
+ {
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
++	*val = *(ulong *)((void *)kvm + offset);
+ 
+-	*val = *(ulong *)((void *)stat_data->kvm + stat_data->offset);
++	return 0;
++}
++
++static int kvm_clear_stat_per_vm(struct kvm *kvm, size_t offset)
++{
++	*(ulong *)((void *)kvm + offset) = 0;
+ 
+ 	return 0;
+ }
+ 
+-static int vm_stat_clear_per_vm(void *data, u64 val)
++static int kvm_get_stat_per_vcpu(struct kvm *kvm, size_t offset, u64 *val)
+ {
+-	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
++	int i;
++	struct kvm_vcpu *vcpu;
+ 
+-	if (val)
+-		return -EINVAL;
++	*val = 0;
+ 
+-	*(ulong *)((void *)stat_data->kvm + stat_data->offset) = 0;
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		*val += *(u64 *)((void *)vcpu + offset);
+ 
+ 	return 0;
+ }
+ 
+-static int vm_stat_get_per_vm_open(struct inode *inode, struct file *file)
++static int kvm_clear_stat_per_vcpu(struct kvm *kvm, size_t offset)
+ {
+-	__simple_attr_check_format("%llu\n", 0ull);
+-	return kvm_debugfs_open(inode, file, vm_stat_get_per_vm,
+-				vm_stat_clear_per_vm, "%llu\n");
+-}
++	int i;
++	struct kvm_vcpu *vcpu;
+ 
+-static const struct file_operations vm_stat_get_per_vm_fops = {
+-	.owner   = THIS_MODULE,
+-	.open    = vm_stat_get_per_vm_open,
+-	.release = kvm_debugfs_release,
+-	.read    = simple_attr_read,
+-	.write   = simple_attr_write,
+-	.llseek  = no_llseek,
+-};
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		*(u64 *)((void *)vcpu + offset) = 0;
++
++	return 0;
++}
+ 
+-static int vcpu_stat_get_per_vm(void *data, u64 *val)
++static int kvm_stat_data_get(void *data, u64 *val)
+ {
+-	int i;
++	int r = -EFAULT;
+ 	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+-	struct kvm_vcpu *vcpu;
+-
+-	*val = 0;
+ 
+-	kvm_for_each_vcpu(i, vcpu, stat_data->kvm)
+-		*val += *(u64 *)((void *)vcpu + stat_data->offset);
++	switch (stat_data->dbgfs_item->kind) {
++	case KVM_STAT_VM:
++		r = kvm_get_stat_per_vm(stat_data->kvm,
++					stat_data->dbgfs_item->offset, val);
++		break;
++	case KVM_STAT_VCPU:
++		r = kvm_get_stat_per_vcpu(stat_data->kvm,
++					  stat_data->dbgfs_item->offset, val);
++		break;
++	}
+ 
+-	return 0;
++	return r;
+ }
+ 
+-static int vcpu_stat_clear_per_vm(void *data, u64 val)
++static int kvm_stat_data_clear(void *data, u64 val)
+ {
+-	int i;
++	int r = -EFAULT;
+ 	struct kvm_stat_data *stat_data = (struct kvm_stat_data *)data;
+-	struct kvm_vcpu *vcpu;
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+-	kvm_for_each_vcpu(i, vcpu, stat_data->kvm)
+-		*(u64 *)((void *)vcpu + stat_data->offset) = 0;
++	switch (stat_data->dbgfs_item->kind) {
++	case KVM_STAT_VM:
++		r = kvm_clear_stat_per_vm(stat_data->kvm,
++					  stat_data->dbgfs_item->offset);
++		break;
++	case KVM_STAT_VCPU:
++		r = kvm_clear_stat_per_vcpu(stat_data->kvm,
++					    stat_data->dbgfs_item->offset);
++		break;
++	}
+ 
+-	return 0;
++	return r;
+ }
+ 
+-static int vcpu_stat_get_per_vm_open(struct inode *inode, struct file *file)
++static int kvm_stat_data_open(struct inode *inode, struct file *file)
+ {
+ 	__simple_attr_check_format("%llu\n", 0ull);
+-	return kvm_debugfs_open(inode, file, vcpu_stat_get_per_vm,
+-				 vcpu_stat_clear_per_vm, "%llu\n");
++	return kvm_debugfs_open(inode, file, kvm_stat_data_get,
++				kvm_stat_data_clear, "%llu\n");
+ }
+ 
+-static const struct file_operations vcpu_stat_get_per_vm_fops = {
+-	.owner   = THIS_MODULE,
+-	.open    = vcpu_stat_get_per_vm_open,
++static const struct file_operations stat_fops_per_vm = {
++	.owner = THIS_MODULE,
++	.open = kvm_stat_data_open,
+ 	.release = kvm_debugfs_release,
+-	.read    = simple_attr_read,
+-	.write   = simple_attr_write,
+-	.llseek  = no_llseek,
+-};
+-
+-static const struct file_operations *stat_fops_per_vm[] = {
+-	[KVM_STAT_VCPU] = &vcpu_stat_get_per_vm_fops,
+-	[KVM_STAT_VM]   = &vm_stat_get_per_vm_fops,
++	.read = simple_attr_read,
++	.write = simple_attr_write,
++	.llseek = no_llseek,
+ };
+ 
+ static int vm_stat_get(void *_offset, u64 *val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+ 
+ 	*val = 0;
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vm_stat_get_per_vm((void *)&stat_tmp, &tmp_val);
++		kvm_get_stat_per_vm(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+ 	mutex_unlock(&kvm_lock);
+@@ -4142,15 +4149,13 @@ static int vm_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vm_stat_clear_per_vm((void *)&stat_tmp, 0);
++		kvm_clear_stat_per_vm(kvm, offset);
+ 	}
+ 	mutex_unlock(&kvm_lock);
+ 
+@@ -4163,14 +4168,12 @@ static int vcpu_stat_get(void *_offset, u64 *val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 	u64 tmp_val;
+ 
+ 	*val = 0;
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vcpu_stat_get_per_vm((void *)&stat_tmp, &tmp_val);
++		kvm_get_stat_per_vcpu(kvm, offset, &tmp_val);
+ 		*val += tmp_val;
+ 	}
+ 	mutex_unlock(&kvm_lock);
+@@ -4181,15 +4184,13 @@ static int vcpu_stat_clear(void *_offset, u64 val)
+ {
+ 	unsigned offset = (long)_offset;
+ 	struct kvm *kvm;
+-	struct kvm_stat_data stat_tmp = {.offset = offset};
+ 
+ 	if (val)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm_lock);
+ 	list_for_each_entry(kvm, &vm_list, vm_list) {
+-		stat_tmp.kvm = kvm;
+-		vcpu_stat_clear_per_vm((void *)&stat_tmp, 0);
++		kvm_clear_stat_per_vcpu(kvm, offset);
+ 	}
+ 	mutex_unlock(&kvm_lock);
+ 
+@@ -4262,9 +4263,8 @@ static void kvm_init_debug(void)
+ 
+ 	kvm_debugfs_num_entries = 0;
+ 	for (p = debugfs_entries; p->name; ++p, kvm_debugfs_num_entries++) {
+-		int mode = p->mode ? p->mode : 0644;
+-		debugfs_create_file(p->name, mode, kvm_debugfs_dir,
+-				    (void *)(long)p->offset,
++		debugfs_create_file(p->name, KVM_DBGFS_GET_MODE(p),
++				    kvm_debugfs_dir, (void *)(long)p->offset,
+ 				    stat_fops[p->kind]);
+ 	}
+ }
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.17.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
