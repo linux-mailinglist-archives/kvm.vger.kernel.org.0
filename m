@@ -2,97 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B69911D457
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:44:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E570311D45F
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:44:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730017AbfLLRoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 12:44:00 -0500
-Received: from mga18.intel.com ([134.134.136.126]:32104 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730235AbfLLRn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 12:43:58 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 09:43:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,306,1571727600"; 
-   d="scan'208";a="216367838"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga003.jf.intel.com with ESMTP; 12 Dec 2019 09:43:57 -0800
-Date:   Thu, 12 Dec 2019 09:43:57 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        id S1730262AbfLLRot (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 12:44:49 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:42813 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730196AbfLLRos (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 12:44:48 -0500
+Received: by mail-io1-f67.google.com with SMTP id f82so3674391ioa.9
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 09:44:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NZUkuLltWHAaMt9PiF7re5SLQkc/j51hQPwRCUKb9Mw=;
+        b=Zcvq/j0dfcg82cX+jYcHpmIcVtvtDsWFmkRO4oumpHMJBzVvRQUTs/a+SdZiryhxTt
+         0zzz71YUxyr6JKp3Riotyq8Nacg2OvjaTqLG9Xqfu8ia62nzd/Ez5/pkR3q4gWDBR7Tp
+         MuspoypVdYRvucBFx3gOeBzKWoabO1APnY27Go0vENPxdx97lvA1Zgo/hY0hCMr4DvbY
+         gE4cuFY4cECLbNUHNggMwvoACSoA/V5htVau63pTIHbubNesuuoU3LRh/Of0K3M089hd
+         /NTiWoftyfnBxI2qXB9ksSS6YIk1Y2idkO86qwlw55yX03BbTg0sUea3Q/llueiJXMZD
+         cqaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NZUkuLltWHAaMt9PiF7re5SLQkc/j51hQPwRCUKb9Mw=;
+        b=ttcO3GTJ7BXcGCLJmhR5QA/RFSckDxgHdwTqku9ewg5B3St/uHbid9QX0wevz/Vb0k
+         Oiw/dfNzTDcZzU0l5zMEAx4g4zZUWOP7HgXghXsTgn74icv9dhTY1HYWFVG3ffMKAKCz
+         Q5LEI8K2ULNQMDIYvK7Q8S0GjYPkcJ4aVcD+puHlZ7Vy4Tywwtm/GE1i+bxNMiIOVST/
+         wK0Nx9KWqWZu8iRsNnKFJHCG/od/kMszqnS9L4XpawPfI8TmWpTcRJ8/q0WCZjDJAI8M
+         vr9X7qdjAzb8N0aliYwqH37kv1xbiYiqdS0W1ePpCTqtXWz25Wh2uaHPmJUY5e9gVIHv
+         QPDw==
+X-Gm-Message-State: APjAAAX+NsqGP2UcxIhoP49AyFjvxcIJtzDFukmljIKltT+SlzN2n3zS
+        uU3+pAZzVtrdhk7ZA57ZWVs1P8eDYdXPBYPIrfHaSQ==
+X-Google-Smtp-Source: APXvYqyP11Avt7fW6f3c7v+tjDwdWe3evb7j+D31QfTjrBzg1C5L1u2gm1VV7aaniEW69FxObtJ77JATYAKYJi6EgCc=
+X-Received: by 2002:a5d:8cda:: with SMTP id k26mr4127162iot.26.1576172687645;
+ Thu, 12 Dec 2019 09:44:47 -0800 (PST)
+MIME-Version: 1.0
+References: <20191211204753.242298-1-pomonis@google.com> <20191211204753.242298-3-pomonis@google.com>
+ <314f6d96-b75f-e159-d94d-1d30a5140e40@de.ibm.com>
+In-Reply-To: <314f6d96-b75f-e159-d94d-1d30a5140e40@de.ibm.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 12 Dec 2019 09:44:36 -0800
+Message-ID: <CALMp9eTOD6r13sPZ3skz_YkSFn2ZKbsr5zbLP9LgzjpHnsebkQ@mail.gmail.com>
+Subject: Re: [PATCH v2 02/13] KVM: x86: Protect kvm_hv_msr_[get|set]_crash_data()
+ from Spectre-v1/L1TF attacks
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Marios Pomonis <pomonis@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
- VMX_FEATURES_*
-Message-ID: <20191212174357.GE3163@linux.intel.com>
-References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
- <20191128014016.4389-12-sean.j.christopherson@intel.com>
- <20191212122646.GE4991@zn.tnic>
- <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
- <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
- <17c6569e-d0af-539c-6d63-f4c07367d8d1@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <17c6569e-d0af-539c-6d63-f4c07367d8d1@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Nick Finco <nifi@google.com>, Andrew Honig <ahonig@google.com>,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 04:57:10PM +0100, Paolo Bonzini wrote:
-> On 12/12/19 16:52, Liran Alon wrote:
-> >>> virt_apic_accesses	-> vapic
-> >> apicv
-> > Frankly, I dislike APICv terminology. I prefer to enumerate the
-> > various VMX features which are collectively called APICv by KVM. 
-> > APICv currently represents in KVM terminology the combination of
-> > APIC-register virtualization, virtual-interrupt-delivery and
-> > posted-interrupts (See cpu_has_vmx_apicv()).
-> > 
-> > In fact, the coupling of “enable_apicv” module parameter have made me
-> > multiple times to need to disable entire APICv features when there
-> > for example was only a bug in posted-interrupts.
-> > 
-> > Even you got confused as virtualize-apic-access is not part of KVM’s
-> > APICv terminology but rather it’s enablement depend on
-> > flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e.
-> > It can be used for faster intercept handling of accesses to guest
-> > xAPIC MMIO page.
-> 
-> Right, I got confused with APIC-register virtualization.  Virtualize
-> APIC accesses is another one I wouldn't bother putting in /proc/cpuinfo,
-> since it's usually present together with flexpriority.
+On Thu, Dec 12, 2019 at 9:31 AM Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+>
+>
+>
+> On 11.12.19 21:47, Marios Pomonis wrote:
+> > This fixes Spectre-v1/L1TF vulnerabilities in kvm_hv_msr_get_crash_data()
+> > and kvm_hv_msr_set_crash_data().
+> > These functions contain index computations that use the
+> > (attacker-controlled) MSR number.
+> >
+> > Fixes: commit e7d9513b60e8 ("kvm/x86: added hyper-v crash msrs into kvm hyperv context")
+> >
+> > Signed-off-by: Nick Finco <nifi@google.com>
+> > Signed-off-by: Marios Pomonis <pomonis@google.com>
+> > Reviewed-by: Andrew Honig <ahonig@google.com>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/x86/kvm/hyperv.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> > index 23ff65504d7e..26408434b9bc 100644
+> > --- a/arch/x86/kvm/hyperv.c
+> > +++ b/arch/x86/kvm/hyperv.c
+> > @@ -809,11 +809,12 @@ static int kvm_hv_msr_get_crash_data(struct kvm_vcpu *vcpu,
+> >                                    u32 index, u64 *pdata)
+> >  {
+> >       struct kvm_hv *hv = &vcpu->kvm->arch.hyperv;
+> > +     size_t size = ARRAY_SIZE(hv->hv_crash_param);
+> >
+> > -     if (WARN_ON_ONCE(index >= ARRAY_SIZE(hv->hv_crash_param)))
+> > +     if (WARN_ON_ONCE(index >= size))
+> >               return -EINVAL;
+>
+> The fact that we do a WARN_ON_ONCE here, should actually tell that index is not
+> user controllable. Otherwise this would indicate the possibility to trigger a
+> kernel warning from a malicious user space. So
+> a: we do not need this change
+> or
+> b: we must also fix the WARN_ON_ONCE
 
-Key word being "usually".  My intent in printing out partially redundant
-flags was to help users debug/understand why the combined feature isn't
-supported.  E.g. userspace can already easily (relatively speaking) query
-flexpriority support via /sys/module/kvm_intel/parameters/flexpriority.
-But if that comes back "N", the user has no way to determine exactly why
-flexpriority is disabled.
+That isn't quite true. The issue is *speculative* execution down this path.
+
+The call site does constrain the *actual* value of index:
+
+case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
+        return kvm_hv_msr_get_crash_data(...);
+
+However, it is possible to train the branch predictor to go down this
+path using valid indices and subsequently pass what would be an
+invalid index. The CPU will speculatively follow this path and may
+pull interesting data into the cache before it realizes its mistake
+and corrects.
