@@ -2,139 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF6EC11D53E
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:23:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C60511D545
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:23:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730168AbfLLSXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 13:23:02 -0500
-Received: from mail-pj1-f74.google.com ([209.85.216.74]:43686 "EHLO
-        mail-pj1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730210AbfLLSXB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 13:23:01 -0500
-Received: by mail-pj1-f74.google.com with SMTP id b23so1581356pjz.10
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:23:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=QJzS5cf1va+nrqwiPMy+1/CZ1shjgAqUeBFnOuHAc2s=;
-        b=Ba0ZrxLur6jY5/yOkxJ3TztRuqj4f0wSiJ88PrOZrz6TKvyfeg1L/B0CGclVQMSKMS
-         fKntKcN+MxF41ny/fjJJQzA/TxZnRfVwqE4Abw4zWB1eEXysAMU83K8rIwXbt5IfGWXL
-         rTV7A36Z09p7odDbSD00a4mbTY0Lvu0IyNj4tT49mjw31Q5L9IhFdG8cXyX4r40FjVEo
-         hjq3LR16hnJ3NKy94C2uwvo9okl0CTJT0ZPXdKG5OjVbxKPM8y7IX0CWAy14neVt1hO7
-         4Os1UMSWnkdTVnbXe37U4lvvoG1ujSbhU8yfBrGa1meSA02y74bsiSjr7iBssE0ojlWA
-         XmTg==
+        id S1730338AbfLLSX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 13:23:57 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55832 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730235AbfLLSXx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 13:23:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576175032;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8xkoB5cjmgUHQdkZ5cb+CrM+r0RqlkKkbDVU3rOPMZ8=;
+        b=JcItyIfj/ySD9uWUPCvrl4ESbK3qVeGGdJiQYrXIiqrFScSpqXU0hxBeb/wGBj9j6cKK3l
+        FCEtEdpFnCiLDWdKeBwZQKAaNgiV+/YZM5HR6/9lZ9agA8re3OUynk6CvW5IPCPsnEGrsr
+        oh1yU8mWaTVnOjY940BHN/8qjeWBUuA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-208-deipDtTQPf-NBJW3Tu1aUg-1; Thu, 12 Dec 2019 13:23:50 -0500
+X-MC-Unique: deipDtTQPf-NBJW3Tu1aUg-1
+Received: by mail-wr1-f71.google.com with SMTP id u12so1340696wrt.15
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:23:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=QJzS5cf1va+nrqwiPMy+1/CZ1shjgAqUeBFnOuHAc2s=;
-        b=Z3dUoHwY35ohFoQ6bbxPx6sZZ6yPOna6lAKc8GmW3ZPd2uWx3UkeThRBHx4p6Tp8DP
-         kd8CC3VH2qt+/HloW0TBaqc1pW5EANYS+br3v3Vo56qIMmkrSbgrt+tB13kGOv4WafuQ
-         tytvOOVV7HT6Q51rT4uLSOQE6rsvnOTkTxHOyy6JHpGI4xXnJAw5izgmggghTAl+46mH
-         2O4DryzwMbO67bPP/38kswas0bfAKTYeDDGudsWNH0FfbCvEdDQPfrH1uT5yPnR5+uHz
-         7VLkH0/b6Aqw+n0dvjcyZWBdN8496CY6BukaXsComI5SJrQTaA5Zm5hr6namcy/8Wmm2
-         0wZg==
-X-Gm-Message-State: APjAAAVvuSzsPJKbHwLz1aVLvWiWMnWAP4CdQERVjMbjrujWATeJ8tAo
-        V+QqfTRtz2qU3VbAZr7An/w1jQj8
-X-Google-Smtp-Source: APXvYqx3OSYyAEpeU1hpMzeLCwi0nWCUbjiyweJI73Oot2AiHdC93XItct57lFn8p5M9ukNOGXwyBoTV
-X-Received: by 2002:a65:5a4d:: with SMTP id z13mr11986210pgs.21.1576174981140;
- Thu, 12 Dec 2019 10:23:01 -0800 (PST)
-Date:   Thu, 12 Dec 2019 13:22:38 -0500
-In-Reply-To: <20191212182238.46535-1-brho@google.com>
-Message-Id: <20191212182238.46535-3-brho@google.com>
-Mime-Version: 1.0
-References: <20191212182238.46535-1-brho@google.com>
-X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
-Subject: [PATCH v5 2/2] kvm: Use huge pages for DAX-backed files
-From:   Barret Rhoden <brho@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jason.zeng@intel.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8xkoB5cjmgUHQdkZ5cb+CrM+r0RqlkKkbDVU3rOPMZ8=;
+        b=kAyBoPK8tNAeWNaUAz2m0TxNb4OGpZlA7m4ArAW5dhLHn4q7KFJuxgGw9+KnzTM8Jo
+         A0r1WIpTTrmLdJgqtXyyd87MQGUzPJlsMSesjDh0/HuWwmXZt0BIV7mxLnqpJOHJRYZP
+         qXuWWn+pDAI64v6OY1fUKL3KNOqhK473NInV1mPyWEVq2rfyMJ1PmWcKJNVLL1fmpWDa
+         Csgj+btpqmUBZUsb8dI2QdJ26qdRFq21ZcOz8oRm2DFiaPKk2KuYLdW9kGJcA2vQ926M
+         E27ECDGZhzzsXWo1axShQUdCzSlErMpx/OYWBNfyftyLEtMWbKHtIgDgwloPLZ7pIPS2
+         lhZQ==
+X-Gm-Message-State: APjAAAXhljwbb1iM2M551QqOeN95lxIsTCjGLFsf0KgdozY20u1lF2U9
+        jlIJUAy2cMCFMI95QGheSsED9IPZyltX8X2F628w2hjKf0Fw+JQhNkMxKM77YekYB6ZkUrBuLVF
+        4Qnf/DZOral+o
+X-Received: by 2002:a05:600c:214f:: with SMTP id v15mr1926341wml.110.1576175028867;
+        Thu, 12 Dec 2019 10:23:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwd0K98LLLLMzVZpxkLM2pTQcUwdjipnXu8DaxkR8GuX/5jLVy+o+UUfsD7E3+5ZFzP6L279w==
+X-Received: by 2002:a05:600c:214f:: with SMTP id v15mr1926312wml.110.1576175028600;
+        Thu, 12 Dec 2019 10:23:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id h2sm6896950wrv.66.2019.12.12.10.23.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 10:23:47 -0800 (PST)
+Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
+ VMX_FEATURES_*
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
+ <20191128014016.4389-12-sean.j.christopherson@intel.com>
+ <20191212122646.GE4991@zn.tnic>
+ <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
+ <20191212181802.GH3163@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2d6c0344-ccfa-13fc-695b-1e69298507dc@redhat.com>
+Date:   Thu, 12 Dec 2019 19:23:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191212181802.GH3163@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change allows KVM to map DAX-backed files made of huge pages with
-huge mappings in the EPT/TDP.
+On 12/12/19 19:18, Sean Christopherson wrote:
+> Using v<feature> across the board makes sense to keep things consistent,
+> i.e. vnmi, vtpr, vapic, etc...
+> 
+> Anyone have thoughts on how to shorten "APIC-register virtualization"
+> without colliding with vapic or apicv?  I currently have apic_reg_virt,
+> which is a bit wordy.  apic_regv isn't awful, but I don't love it.
 
-DAX pages are not PageTransCompound.  The existing check is trying to
-determine if the mapping for the pfn is a huge mapping or not.  For
-non-DAX maps, e.g. hugetlbfs, that means checking PageTransCompound.
-For DAX, we can check the page table itself.
+Perhaps vapic_access and vapic_register?
 
-Note that KVM already faulted in the page (or huge page) in the host's
-page table, and we hold the KVM mmu spinlock.  We grabbed that lock in
-kvm_mmu_notifier_invalidate_range_end, before checking the mmu seq.
+> 
+> The other control that will be awkard is "Virtual Interrupt Delivery".
+> vint_delivery?
 
-Signed-off-by: Barret Rhoden <brho@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+We can just use vid I think.  And posted_intr.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7269130ea5e2..ea8f6951398b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3328,6 +3328,30 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
- 	__direct_pte_prefetch(vcpu, sp, sptep);
- }
- 
-+static bool pfn_is_huge_mapped(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
-+{
-+	struct page *page = pfn_to_page(pfn);
-+	unsigned long hva;
-+
-+	if (!is_zone_device_page(page))
-+		return PageTransCompoundMap(page);
-+
-+	/*
-+	 * DAX pages do not use compound pages.  The page should have already
-+	 * been mapped into the host-side page table during try_async_pf(), so
-+	 * we can check the page tables directly.
-+	 */
-+	hva = gfn_to_hva(kvm, gfn);
-+	if (kvm_is_error_hva(hva))
-+		return false;
-+
-+	/*
-+	 * Our caller grabbed the KVM mmu_lock with a successful
-+	 * mmu_notifier_retry, so we're safe to walk the page table.
-+	 */
-+	return dev_pagemap_mapping_shift(hva, current->mm) > PAGE_SHIFT;
-+}
-+
- static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
- 					gfn_t gfn, kvm_pfn_t *pfnp,
- 					int *levelp)
-@@ -3342,8 +3366,8 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
- 	 * here.
- 	 */
- 	if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
--	    !kvm_is_zone_device_pfn(pfn) && level == PT_PAGE_TABLE_LEVEL &&
--	    PageTransCompoundMap(pfn_to_page(pfn))) {
-+	    level == PT_PAGE_TABLE_LEVEL &&
-+	    pfn_is_huge_mapped(vcpu->kvm, gfn, pfn)) {
- 		unsigned long mask;
- 
- 		/*
-@@ -5957,8 +5981,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 		 * mapping if the indirect sp has level = 1.
- 		 */
- 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
--		    !kvm_is_zone_device_pfn(pfn) &&
--		    PageTransCompoundMap(pfn_to_page(pfn))) {
-+		    pfn_is_huge_mapped(kvm, sp->gfn, pfn)) {
- 			pte_list_remove(rmap_head, sptep);
- 
- 			if (kvm_available_flush_tlb_with_range())
--- 
-2.24.0.525.g8f36a354ae-goog
+>>> unrestricted_guest	-> unres_guest
+>>
+>> Full? Or just unrestricted
+> 
+> I prefer unrestricted_guest, a bare unrestricted just makes me wonder
+> "unrestricted what?".   But I can live with "unrestricted" if that's the
+> consensus.
+
+I do prefer unrestricted_guest actually.
+
+>> In general I would stick to the same names as kvm_intel module
+>> parameters (sans "enable_" if applicable) and not even bother publishing
+>> the others.  Some features are either not used by KVM or available on
+>> all VMX processors.
+> 
+> IMO there's value in printing features that are not 1:1 with module params.
+> 
+> I also think it makes sense to print features of interest even if KVM
+> doesn't (yet) support the feature, e.g. to allow a user/developer to check
+> if they can use/test a KVM build with support for a new feature without
+> having to build and install the new kernel.
+> 
+>> Paolo
+>>
+>>> and so on. Those are just my examples - I betcha the SDM is more
+>>> creative here with abbreviations. But you guys are going to grep for
+>>> them. If it were me, I'd save on typing. :-)
+> 
 
