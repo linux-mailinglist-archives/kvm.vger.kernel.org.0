@@ -2,97 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4734611C196
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 01:43:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7CB511C1D0
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 02:03:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727334AbfLLAnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 19:43:32 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50284 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727310AbfLLAnb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 19:43:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576111410;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uMTt4P7d36pnEFbDiN7mzg6AD2d8TOg4wJ1H72G231o=;
-        b=iRcT+/h1IENQe7zKPR2jHA7JkhyYrZwMR309/vT9fzuLU1h3nnWP1Ce5atWjaxTh7pF231
-        SRligh+M4u0L9HBoh7UkhEUmct+WTSnhB9jyIHq+Oj/TKBUA+JWJ0G79XSlzOMHYzpw0Nl
-        /WOuJcCr/gVtVfIqJPv2a3bHSNhgI6s=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-ywu6eN0pMdyikuWjwPeDSw-1; Wed, 11 Dec 2019 19:43:28 -0500
-X-MC-Unique: ywu6eN0pMdyikuWjwPeDSw-1
-Received: by mail-wr1-f70.google.com with SMTP id z10so310331wrt.21
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 16:43:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uMTt4P7d36pnEFbDiN7mzg6AD2d8TOg4wJ1H72G231o=;
-        b=YehQ7CxsFwzFo8EyHyqUpktQVM2auMvIAMTdfjVR2pT/fu+B5LcgwamfYpvsAZax/e
-         6LZjk7bekFXipeppZg78w1bff15L3xvr+bV0QgN6ihJWR4PM1gU9bcVnDfC6gqWdDQA6
-         WvmYZoj9QvXsXqA3WgDictDMALN1EcX9ANX/uMN/uVF0OHOeClpBFqGYd28tdiuNcEhh
-         vqTq0VHbYz01S6dbRtnXdfY909TDph0boAQ8QAyfNylc6e7zL5XpIqgKIYr2E1iTFjgI
-         ttrlEXaUEqXFvqrOK/XrsVZ+zuAtlii2iU0IGe2nZOVINh5Ze6zeypCPveaj2atKqkCn
-         sz1g==
-X-Gm-Message-State: APjAAAWafw1prkp32Q5aCzvZ7k0Kh6ba7DR13ZX0E/hbcMdQlLogMVX5
-        siPoGi5XMkUVs2Hm/rAnqCOzv/XFUD+VMAu5zuLNyZcfOglI1iryJ5ev1ZTbA8iAa92mh4LUTqe
-        /hUqsBsMLrGnH
-X-Received: by 2002:adf:ebc1:: with SMTP id v1mr2721752wrn.351.1576111407577;
-        Wed, 11 Dec 2019 16:43:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyAG8v29TjQlQvlgTUDLDcUEpDpbXdEqNoHJ28eJX4lOvtMJsmOrk2LpSU/LDlsXrSj31N8Iw==
-X-Received: by 2002:adf:ebc1:: with SMTP id v1mr2721728wrn.351.1576111407300;
-        Wed, 11 Dec 2019 16:43:27 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id a84sm4259190wme.44.2019.12.11.16.43.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 16:43:26 -0800 (PST)
-Subject: Re: [PATCH] KVM: nVMX: Use SET_MSR_OR_WARN() to simplify failure
- logging
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     kvm@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20191128094609.22161-1-oupton@google.com>
- <20191202212148.GA8120@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2070ffde-5724-df7e-4845-1a4eac129756@redhat.com>
-Date:   Thu, 12 Dec 2019 01:43:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1727504AbfLLBDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 20:03:05 -0500
+Received: from mga05.intel.com ([192.55.52.43]:61888 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727403AbfLLBDF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 20:03:05 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 17:03:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,303,1571727600"; 
+   d="scan'208";a="210945278"
+Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
+  by fmsmga008.fm.intel.com with ESMTP; 11 Dec 2019 17:03:03 -0800
+Date:   Thu, 12 Dec 2019 09:04:24 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 4/7] KVM: VMX: Load CET states on vmentry/vmexit
+Message-ID: <20191212010423.GB17570@local-michael-cet-test.sh.intel.com>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191101085222.27997-5-weijiang.yang@intel.com>
+ <20191210212305.GM15758@linux.intel.com>
+ <20191211015423.GC12845@local-michael-cet-test>
+ <20191211163510.GF5044@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191202212148.GA8120@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211163510.GF5044@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/12/19 22:21, Sean Christopherson wrote:
-> As for the original code, arguably it *should* do a full WARN and not
-> simply log the error, as kvm_set_msr() should never fail if
-> VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL was exposed to L1, unlike the above two
-> cases where KVM is processing an L1-controlled MSR list, e.g.:
+On Wed, Dec 11, 2019 at 08:35:10AM -0800, Sean Christopherson wrote:
+> On Wed, Dec 11, 2019 at 09:54:23AM +0800, Yang Weijiang wrote:
+> > On Tue, Dec 10, 2019 at 01:23:05PM -0800, Sean Christopherson wrote:
+> > > On Fri, Nov 01, 2019 at 04:52:19PM +0800, Yang Weijiang wrote:
+> > > > @@ -2834,6 +2837,9 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+> > > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > > >  	unsigned long hw_cr0;
+> > > >  
+> > > > +	if (!(cr0 & X86_CR0_WP) && kvm_read_cr4_bits(vcpu, X86_CR4_CET))
+> > > > +		cr0 |= X86_CR0_WP;
+> > > 
+> > > Huh?  What's the interaction between CR4.CET and CR0.WP?  If there really
+> > > is some non-standard interaction then it needs to be documented in at least
+> > > the changelog and probably with a comment as well.
+> > >
+> > The processor does not allow CR4.CET to be set if CR0.WP = 0 (similarly, it
+> > does not allow CR0.WP to be cleared while CR4.CET = 1).
 > 
-> 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
-> 		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
-> 					 vmcs12->host_ia32_perf_global_ctrl));
-> 
-> Back to this patch, this isn't simply consolidating code, it's promoting
-> L1-controlled messages from pr_debug() to pr_warn().
-> 
-> What if you add a patch to remove SET_MSR_OR_WARN() and instead manually
-> do the WARN_ON_ONCE() as above, and then introduce a new macro to
-> consolidate the pr_debug_ratelimited() stuff in this patch?
+> Ya, as you surmised below, this needs to be a #GP condition.
+>
+OK, will do it.
 
-Should go without saying (Sean is a Certified Reviewer according to
-MAINTAINERS :)) but I agree.
+> Have you tested SMM at all?  The interaction between CR0 and CR4 may be
+> problematic for em_rsm() and/or rsm_enter_protected_mode().
+>
+Not yet, what's an easy way to test code in SMM mode?
+Thanks!
 
-Paolo
-
+> > > > +
+> > > >  	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
+> > > >  	if (enable_unrestricted_guest)
+> > > >  		hw_cr0 |= KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST;
+> > > > @@ -2936,6 +2942,22 @@ static bool guest_cet_allowed(struct kvm_vcpu *vcpu, u32 feature, u32 mode)
+> > > >  	return false;
+> > > >  }
+> > > >  
+> > > > +bool is_cet_bit_allowed(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	unsigned long cr0;
+> > > > +	bool cet_allowed;
+> > > > +
+> > > > +	cr0 = kvm_read_cr0(vcpu);
+> > > > +	cet_allowed = guest_cet_allowed(vcpu, X86_FEATURE_SHSTK,
+> > > > +					XFEATURE_MASK_CET_USER) ||
+> > > > +		      guest_cet_allowed(vcpu, X86_FEATURE_IBT,
+> > > > +					XFEATURE_MASK_CET_USER);
+> > > > +	if ((cr0 & X86_CR0_WP) && cet_allowed)
+> > > > +		return true;
+> > > 
+> > > So, attempting to set CR4.CET if CR0.WP=0 takes a #GP?  But attempting
+> > > to clear CR0.WP if CR4.CET=1 is ignored?
+> > > 
+> > Per above words in spec., inject #GP to guest in either case?
+> > 
+> > > > +
+> > > > +	return false;
+> > > > +}
+> > > > +
