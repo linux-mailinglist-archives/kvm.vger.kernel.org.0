@@ -2,158 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6737A11CF68
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:10:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33EB311CF6A
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:10:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729603AbfLLOKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 09:10:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37484 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729582AbfLLOKO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:10:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576159813;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EylYr8blwwL63nt4ZFSkgJ0yu+xa6ILLxonI0Hi4q9A=;
-        b=Z4+PN07xRFCP/YTcriOmsMWYH9TQLz+lif//VwitvhdSDghdr03vJSI+4uTxYhEo/+sFpz
-        DEZwMpGP/nKV7cHaBa0bU53Vh/y02eMvRMEYIGf9GMzLh4aM5EdINjfv3qw4dAypUq/eet
-        ACeOYkvCBBHGIfSGUmTrbO+7IFK+1AM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155--DwG0L_3Ps-XG9QAgsLWFQ-1; Thu, 12 Dec 2019 09:10:09 -0500
-X-MC-Unique: -DwG0L_3Ps-XG9QAgsLWFQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 508D8800D5B;
-        Thu, 12 Dec 2019 14:10:08 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF9D76013D;
-        Thu, 12 Dec 2019 14:10:04 +0000 (UTC)
-Date:   Thu, 12 Dec 2019 15:10:02 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
+        id S1729648AbfLLOKW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 09:10:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10926 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729392AbfLLOKW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 09:10:22 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCE7rcT073845
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 09:10:20 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wtbt3dpn4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 09:10:20 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 12 Dec 2019 14:10:18 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Dec 2019 14:10:16 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCEAF8h61800550
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 14:10:15 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BE65A405F;
+        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 34DD3A4054;
+        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Dec 2019 14:10:15 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 8/9] s390x: css: ssch/tsch with sense
+ and interrupt
+To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 7/9] s390x: css: msch, enable test
-Message-ID: <20191212151002.1c7ca4eb.cohuck@redhat.com>
-In-Reply-To: <83d45c31-30c3-36e1-1d68-51b88448f4af@linux.ibm.com>
 References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
-        <1576079170-7244-8-git-send-email-pmorel@linux.ibm.com>
-        <20191212130111.0f75fe7f.cohuck@redhat.com>
-        <83d45c31-30c3-36e1-1d68-51b88448f4af@linux.ibm.com>
-Organization: Red Hat GmbH
+ <1576079170-7244-9-git-send-email-pmorel@linux.ibm.com>
+ <20191212132634.3a16a389.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 12 Dec 2019 15:10:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191212132634.3a16a389.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-TM-AS-GCONF: 00
+x-cbid: 19121214-0020-0000-0000-00000397793A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121214-0021-0000-0000-000021EE8263
+Message-Id: <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1912120108
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Dec 2019 15:01:07 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> On 2019-12-12 13:01, Cornelia Huck wrote:
-> > On Wed, 11 Dec 2019 16:46:08 +0100
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-> >   
-> >> A second step when testing the channel subsystem is to prepare a channel
-> >> for use.
-> >> This includes:
-> >> - Get the current SubCHannel Information Block (SCHIB) using STSCH
-> >> - Update it in memory to set the ENABLE bit
-> >> - Tell the CSS that the SCHIB has been modified using MSCH
-> >> - Get the SCHIB from the CSS again to verify that the subchannel is
-> >>    enabled.
-> >>
-> >> This tests the success of the MSCH instruction by enabling a channel.
-> >>
-> >> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> >> ---
-> >>   s390x/css.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   1 file changed, 65 insertions(+)
 
-> >> +	/* Read the SCHIB for this subchannel */
-> >> +	cc = stsch(test_device_sid, &schib);
-> >> +	if (cc) {
-> >> +		report(0, "stsch cc=%d", cc);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	/* Update the SCHIB to enable the channel */
-> >> +	pmcw->flags |= PMCW_ENABLE;
-> >> +
-> >> +	/* Tell the CSS we want to modify the subchannel */
-> >> +	cc = msch(test_device_sid, &schib);
-> >> +	if (cc) {
-> >> +		/*
-> >> +		 * If the subchannel is status pending or
-> >> +		 * if a function is in progress,
-> >> +		 * we consider both cases as errors.
-> >> +		 */
-> >> +		report(0, "msch cc=%d", cc);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	/*
-> >> +	 * Read the SCHIB again to verify the enablement
-> >> +	 * insert a little delay and try 5 times.
-> >> +	 */
-> >> +	do {
-> >> +		cc = stsch(test_device_sid, &schib);
-> >> +		if (cc) {
-> >> +			report(0, "stsch cc=%d", cc);
-> >> +			return;
-> >> +		}
-> >> +		delay(10);  
-> > 
-> > That's just a short delay to avoid a busy loop, right? msch should be
-> > immediate,  
+On 2019-12-12 13:26, Cornelia Huck wrote:
+> On Wed, 11 Dec 2019 16:46:09 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> Thought you told to me that it may not be immediate in zVM did I 
-> misunderstand?
+>> When a channel is enabled we can start a SENSE command using the SSCH
+> 
+> s/SENSE/SENSE ID/
+> 
+> SENSE is for getting sense data after a unit check :)
 
-Maybe I have been confusing... what I'm referring to is this
-programming note for msch:
-
-"It is recommended that the program inspect the
-contents of the subchannel by subsequently
-issuing STORE SUBCHANNEL when MODIFY
-SUBCHANNEL sets condition code 0. Use of
-STORE SUBCHANNEL is a method for deter-
-mining if the designated subchannel was
-changed or not. Failure to inspect the subchan-
-nel following the setting of condition code 0 by
-MODIFY SUBCHANNEL may result in conditions
-that the program does not expect to occur."
-
-That's exactly what we had to do under z/VM back then: do the msch,
-check via stsch, redo the msch if needed, check again via stsch. It
-usually worked with the second msch the latest.
+Yes, thanks.
 
 > 
-> > and you probably should not delay on success?  
+>> instruction to recognize the control unit and device.
+>>
+>> This tests the success of SSCH, the I/O interruption and the TSCH
+>> instructions.
+>>
+>> The test expects a device with a control unit type of 0xC0CA as the
+>> first subchannel of the CSS.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h |  13 ++++
+>>   s390x/css.c     | 175 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 188 insertions(+)
 > 
-> yes, it is not optimized, I can test PMCW_ENABLE in the loop this way we 
-> can see if, in the zVM case we need to do retries or not.
+>> +static void irq_io(void)
+>> +{
+>> +	int ret = 0;
+>> +	char *flags;
+>> +	int sid;
+>> +
+>> +	report_prefix_push("Interrupt");
+>> +	if (lowcore->io_int_param != CSS_TEST_INT_PARAM) {
+>> +		report(0, "Bad io_int_param: %x", lowcore->io_int_param);
+>> +		report_prefix_pop();
+>> +		return;
+>> +	}
+>> +	report_prefix_pop();
+>> +
+>> +	report_prefix_push("tsch");
+>> +	sid = lowcore->subsys_id_word;
+>> +	ret = tsch(sid, &irb);
+>> +	switch (ret) {
+>> +	case 1:
+>> +		dump_irb(&irb);
+>> +		flags = dump_scsw_flags(irb.scsw.ctrl);
+>> +		report(0, "IRB scsw flags: %s", flags);
 > 
+> I guess that should only happen if the I/O interrupt was for another
+> subchannel, and we only enable one subchannel, right?
 > 
-> >   
-> >> +	} while (!(pmcw->flags & PMCW_ENABLE) && count++ < 5);  
-> > 
-> > How is this supposed to work? Doesn't the stsch overwrite the control
-> > block again, so you need to re-set the enable bit before you retry?  
-> 
-> I do not think so, there is no msch() in the loop.
-> Do I miss something?
+> Maybe log "I/O interrupt, but sch not status pending: <flags>"? (No
+> idea how log the logged messages can be for kvm unit tests.)
 
-Well, _I_ missed that the msch() was missing :) You need it (see above);
-just waiting and re-doing the stsch is useless, as msch is a
-synchronous instruction which has finished its processing after the cc
-has been set.
+Yes, the log message I had was not very useful at first sight.
+
+> 
+>> +		goto pop;
+>> +	case 2:
+>> +		report(0, "TSCH return unexpected CC 2");
+> 
+> s/return/returns/
+> 
+>> +		goto pop;
+>> +	case 3:
+>> +		report(0, "Subchannel %08x not operational", sid);
+>> +		goto pop;
+>> +	case 0:
+>> +		/* Stay humble on success */
+> 
+> :)
+> 
+>> +		break;
+>> +	}
+>> +pop:
+>> +	report_prefix_pop();
+>> +}
+>> +
+>> +static int start_subchannel(int code, char *data, int count)
+>> +{
+>> +	int ret;
+>> +	struct pmcw *p = &schib.pmcw;
+>> +	struct orb *orb_p = &orb[0];
+>> +
+>> +	/* Verify that a test subchannel has been set */
+>> +	if (!test_device_sid) {
+>> +		report_skip("No device");
+>> +		return 0;
+>> +	}
+>> +
+>> +	if ((unsigned long)data >= 0x80000000UL) {
+>> +		report(0, "Data above 2G! %p", data);
+>> +		return 0;
+>> +	}
+>> +
+>> +	/* Verify that the subchannel has been enabled */
+>> +	ret = stsch(test_device_sid, &schib);
+>> +	if (ret) {
+>> +		report(0, "Err %d on stsch on sid %08x", ret, test_device_sid);
+>> +		return 0;
+>> +	}
+>> +	if (!(p->flags & PMCW_ENABLE)) {
+>> +		report_skip("Device (sid %08x) not enabled", test_device_sid);
+>> +		return 0;
+>> +	}
+>> +
+>> +	report_prefix_push("ssch");
+>> +	/* Build the CCW chain with a single CCW */
+>> +	ccw[0].code = code;
+>> +	ccw[0].flags = 0; /* No flags need to be set */
+>> +	ccw[0].count = count;
+>> +	ccw[0].data_address = (int)(unsigned long)data;
+>> +	orb_p->intparm = CSS_TEST_INT_PARAM;
+>> +	orb_p->ctrl = ORB_F_INIT_IRQ|ORB_F_FORMAT|ORB_F_LPM_DFLT;
+>> +	if ((unsigned long)&ccw[0] >= 0x80000000UL) {
+>> +		report(0, "CCW above 2G! %016lx", (unsigned long)&ccw[0]);
+> 
+> Maybe check before filling out the ccw?
+
+Yes. Also I wonder if we should not make sure the all kvm-test-text and 
+data are under 2G by construct, because I am quite sure that this sort 
+of tests will repeat all over the kvm-unit-test code.
+
+Will provide a separate patch for this, in between just do as you said, 
+it is the logical thing to do here.
+
+> 
+>> +		report_prefix_pop();
+>> +		return 0;
+>> +	}
+>> +	orb_p->cpa = (unsigned int) (unsigned long)&ccw[0];
+>> +
+>> +	ret = ssch(test_device_sid, orb_p);
+>> +	if (ret) {
+>> +		report(0, "ssch cc=%d", ret);
+>> +		report_prefix_pop();
+>> +		return 0;
+>> +	}
+>> +	report_prefix_pop();
+>> +	return 1;
+>> +}
+>> +
+>> +/*
+>> + * test_sense
+>> + * Pre-requisits:
+>> + * - We need the QEMU PONG device as the first recognized
+>> + * - device by the enumeration.
+>> + * - ./s390x-run s390x/css.elf -device ccw-pong,cu_type=0xc0ca
+>> + */
+>> +static void test_sense(void)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = register_io_int_func(irq_io);
+>> +	if (ret) {
+>> +		report(0, "Could not register IRQ handler");
+>> +		goto unreg_cb;
+>> +	}
+>> +
+>> +	enable_io_irq();
+>> +	lowcore->io_int_param = 0;
+>> +
+>> +	ret = start_subchannel(CCW_CMD_SENSE_ID, buffer, sizeof(senseid));
+>> +	if (!ret) {
+>> +		report(0, "start_subchannel failed");
+>> +		goto unreg_cb;
+>> +	}
+>> +
+>> +	delay(100);
+>> +	if (lowcore->io_int_param != CSS_TEST_INT_PARAM) {
+>> +		report(0, "cu_type: expect 0x%08x, got 0x%08x",
+>> +		       CSS_TEST_INT_PARAM, lowcore->io_int_param);
+>> +		goto unreg_cb;
+>> +	}
+> 
+> This still looks like that odd "delay and hope an interrupt has arrived
+> in the mean time" pattern.
+
+yes.
+
+> 
+> Also, doesn't the interrupt handler check for the intparm already?
+
+Yes, if the interrupt fires.
+
+> 
+>> +
+>> +	senseid.cu_type = buffer[2] | (buffer[1] << 8);
+> 
+> This still looks odd; why not have the ccw fill out the senseid
+> structure directly?
+
+Oh sorry, you already said and I forgot to modify this.
+thanks
+
+> 
+>> +
+>> +	/* Sense ID is non packed cut_type is at offset +1 byte */
+> 
+> I have trouble parsing this sentence...
+> 
+>> +	if (senseid.cu_type == PONG_CU)
+>> +		report(1, "cu_type: expect 0x%04x got 0x%04x",
+>> +		       PONG_CU_TYPE, senseid.cu_type);
+>> +	else
+>> +		report(0, "cu_type: expect 0x%04x got 0x%04x",
+>> +		       PONG_CU_TYPE, senseid.cu_type);
+> 
+> Didn't you want to check for ff in the reserved field as well?
+
+It was not intended as a check for SENSE_ID but for STSCH/READ.
+But, while at this... why not.
+
+Thanks for the review.
+Regards,
+
+Pierre
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
