@@ -2,52 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C6F11D187
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:54:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C46AC11D197
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:57:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729633AbfLLPyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 10:54:21 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:43810 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729247AbfLLPyU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 10:54:20 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCFnTus110391;
-        Thu, 12 Dec 2019 15:52:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2019-08-05; bh=Xn0flDReye6aR5I2+sBndrykdJvUw4tnWd/w/4iOE8I=;
- b=UvraykOmy/BoiCbihwwgJ9btFSG162/cAbspyKksvLqIfIz0sm/fcwN/Gh1TU8kKyEUj
- +khYN0y5CXpHVcYEjqXaSIei8vQ1QgWIWCpgwC1ikZDB8Pha17oHp0GKxmz/UfTGG2W7
- wh3T0gzDIKcrgo1Ge2TS5UL0ec2RBxiWz8xGDixlkp9tDVfocrwpeC8lOHwGD0fd+njU
- dadP0SS6RDLhOsTe/H0rlNOsTA8V3VmSkw2jkHRcYtF8NpqSesV5uk8r3rkQA2G1ocjb
- hg0SYIEQ87hRJEKJKvT4CSDqTnJZSkk1QSJ5GJ4xsT1EFly2YdF5V5A4etvD6eKpJWR7 IQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2wr41qkw18-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 15:52:29 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCFnQJW135560;
-        Thu, 12 Dec 2019 15:52:28 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2wumk6cv32-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 15:52:28 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBCFqJbt028969;
-        Thu, 12 Dec 2019 15:52:20 GMT
-Received: from [192.168.14.112] (/109.65.223.49)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 12 Dec 2019 07:52:19 -0800
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+        id S1729658AbfLLP5U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 10:57:20 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28375 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729383AbfLLP5T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 10:57:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576166238;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rRNrufMF5ZmcT+/5HZMlWib9qPtBnpXc+naU09rmhxc=;
+        b=OpNWRtOsaH3Av2oZEgSE/JKPJMiYoUyluTwBmc+8VZv6/T2n16sYSRduhKCzf94igpwKvJ
+        pvlT6ZA+U4VFAMvUe0hsLKk4dzmvey7yAzgVwdufK89/tM1DVWrV7DGdPvEsvyqAB/IpOE
+        FkHpIT+sy5sLLCHKSrljj7J/znOlF7U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-gmu5PsWyPd63En1kFzkt-A-1; Thu, 12 Dec 2019 10:57:16 -0500
+X-MC-Unique: gmu5PsWyPd63En1kFzkt-A-1
+Received: by mail-wr1-f69.google.com with SMTP id u18so1194747wrn.11
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 07:57:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rRNrufMF5ZmcT+/5HZMlWib9qPtBnpXc+naU09rmhxc=;
+        b=bNp2WJptkMbAy85B/C5DWC+MXOuzf0D68c0j89dwq5c33UxrjrVRd7GOp9t2IUlQ8j
+         LbMxUbRko/fPf5ZL1nDZjZb1wu/VcrDE8hBRwBWsduZdEvimGXRqoOGcw3T1oMS10rXh
+         De6vRE71kjcU/5QUm4T0+vzLwBY78r2+q8CVg0iPkJs4szTLdcU0S8bz0SQsvhpqCIPZ
+         kalI2PaKUZiRB4cLiHuwefNLJd1qhbf4a9IlpEdx5b86TqnnNc+2ijnDRYXou72oFwbt
+         VhT1mcj/xrUPZLDtERo0Ki28Pw9G9vxE3CZUFUOlYS4t9vLn0L+xC8BvegWmCs5fTSMa
+         mn/A==
+X-Gm-Message-State: APjAAAWypjTqTbmkHouxLGr+961JM8gWXO2j4DQOZbLUposC8v7CbB4g
+        mHr15zWWnEr5M+k1Z9OcfD0I9Pwqbz0j4kX89UlQ2XxdRjbzVYZLu5ZpWxFzqISdlW1RXcMwpyp
+        s9sv77ywkyBg8
+X-Received: by 2002:adf:e6c6:: with SMTP id y6mr7226960wrm.284.1576166235415;
+        Thu, 12 Dec 2019 07:57:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxCcJblbdBpu6fVRmTMMxd9YCps91vlO3a/KrWqDMJ5D1GjIwC7bcnVpKVuMe+qGktQ2LnvbA==
+X-Received: by 2002:adf:e6c6:: with SMTP id y6mr7226922wrm.284.1576166235182;
+        Thu, 12 Dec 2019 07:57:15 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id s10sm6451431wrw.12.2019.12.12.07.57.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 07:57:14 -0800 (PST)
 Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
  VMX_FEATURES_*
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
-Date:   Thu, 12 Dec 2019 17:52:12 +0200
+To:     Liran Alon <liran.alon@oracle.com>
 Cc:     Borislav Petkov <bp@alien8.de>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -59,7 +65,7 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Jiri Olsa <jolsa@redhat.com>,
         Namhyung Kim <namhyung@kernel.org>,
-        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -71,99 +77,48 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
         linux-kselftest@vger.kernel.org,
         Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
 References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
  <20191128014016.4389-12-sean.j.christopherson@intel.com>
  <20191212122646.GE4991@zn.tnic>
  <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=610
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912120123
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=677 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912120123
+ <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <17c6569e-d0af-539c-6d63-f4c07367d8d1@redhat.com>
+Date:   Thu, 12 Dec 2019 16:57:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/12/19 16:52, Liran Alon wrote:
+>>> virt_apic_accesses	-> vapic
+>> apicv
+> Frankly, I dislike APICv terminology. I prefer to enumerate the
+> various VMX features which are collectively called APICv by KVM. 
+> APICv currently represents in KVM terminology the combination of
+> APIC-register virtualization, virtual-interrupt-delivery and
+> posted-interrupts (See cpu_has_vmx_apicv()).
+> 
+> In fact, the coupling of “enable_apicv” module parameter have made me
+> multiple times to need to disable entire APICv features when there
+> for example was only a bug in posted-interrupts.
+> 
+> Even you got confused as virtualize-apic-access is not part of KVM’s
+> APICv terminology but rather it’s enablement depend on
+> flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e.
+> It can be used for faster intercept handling of accesses to guest
+> xAPIC MMIO page.
 
+Right, I got confused with APIC-register virtualization.  Virtualize
+APIC accesses is another one I wouldn't bother putting in /proc/cpuinfo,
+since it's usually present together with flexpriority.
 
-> On 12 Dec 2019, at 16:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 12/12/19 13:26, Borislav Petkov wrote:
->>=20
->> vmx flags       : virtual_nmis preemption_timer invvpid ept_x_only =
-ept_ad ept_1gb flexpriority tsc_offsetting virtual_tpr mtf =
-virt_apic_accesses ept vpid unrestricted_guest ple shadow_vmcs pml =
-mode_based_ept_exec
->>=20
->> virtual_nmis		-> vnmis
->=20
-> Even vnmi
->=20
->> preemption_timer	-> preempt_tmr
->=20
-> I would prefer the full one here.
->=20
->> flexpriority		-> flexprio
->=20
-> Full name?
->=20
->> tsc_offsetting		-> tsc_ofs
->=20
-> tsc_offset?
->=20
->> virtual_tpr		-> vtpr
->=20
-> Do we need this?  It's usually included together with flexpriority.
->=20
->> virt_apic_accesses	-> vapic
->=20
-> apicv
-
-Frankly, I dislike APICv terminology. I prefer to enumerate the various =
-VMX features which are collectively called APICv by KVM.
-APICv currently represents in KVM terminology the combination of =
-APIC-register virtualization, virtual-interrupt-delivery and =
-posted-interrupts (See cpu_has_vmx_apicv()).
-
-In fact, the coupling of =E2=80=9Cenable_apicv=E2=80=9D module parameter =
-have made me multiple times to need to disable entire APICv features =
-when there for example was only a bug in posted-interrupts.
-
-Even you got confused as virtualize-apic-access is not part of KVM=E2=80=99=
-s APICv terminology but rather it=E2=80=99s enablement depend on =
-flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e. It =
-can be used for faster intercept handling of accesses to guest xAPIC =
-MMIO page.
-
->=20
->> unrestricted_guest	-> unres_guest
->=20
-> Full? Or just unrestricted
-
-I prefer unrestricted_guest.
-
->=20
-> In general I would stick to the same names as kvm_intel module
-> parameters (sans "enable_" if applicable) and not even bother =
-publishing
-> the others.  Some features are either not used by KVM or available on
-> all VMX processors.
->=20
-> Paolo
->=20
->> and so on. Those are just my examples - I betcha the SDM is more
->> creative here with abbreviations. But you guys are going to grep for
->> them. If it were me, I'd save on typing. :-)
->=20
+Paolo
 
