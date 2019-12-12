@@ -2,67 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63DA411D8B4
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 22:44:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B1B911D9BF
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 00:00:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731146AbfLLVnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 16:43:51 -0500
-Received: from cloudserver094114.home.pl ([79.96.170.134]:62980 "EHLO
-        cloudserver094114.home.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731086AbfLLVnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 16:43:51 -0500
-Received: from 79.184.255.82.ipv4.supernova.orange.pl (79.184.255.82) (HELO kreacher.localnet)
- by serwer1319399.home.pl (79.96.170.134) with SMTP (IdeaSmtpServer 0.83.320)
- id c3b75eb5d16eb454; Thu, 12 Dec 2019 22:43:48 +0100
-From:   "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org
-Subject: Re: [PATCH RFC v4 01/13] ACPI: NUMA: export pxm_to_node
-Date:   Thu, 12 Dec 2019 22:43:48 +0100
-Message-ID: <5687328.t4MNS9KDDX@kreacher>
-In-Reply-To: <20191212171137.13872-2-david@redhat.com>
-References: <20191212171137.13872-1-david@redhat.com> <20191212171137.13872-2-david@redhat.com>
+        id S1731307AbfLLXAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 18:00:05 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:44039 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731292AbfLLXAF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 18:00:05 -0500
+Received: by mail-io1-f68.google.com with SMTP id b10so385942iof.11
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 15:00:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gCJ7ZxXwgS+9RY8KtPwmKt5PjyIuKpAMa6t5nExF4bM=;
+        b=i1J+z884+fGFa6WTQnFBApLNkqaOJHgfuKSBy1BswUEEEHDqHoOXylv4GjIJh6Hez1
+         E+PAXIZa6XBY/JFobaMlZ3wpmWkkpLvuiCD3M8F8GIflw5CJQ7LEDV+AcWW67LUM2GDf
+         J6iKE2iTTiTaeREl40sOhVypc2eQhIWhF6uYllXjLiSM5Mc0PRIbf4qYOHVBCSKfF8ez
+         lQfroElIgIMWVTRomYXOSG4MoudsNcXKqPyu1YumzS76f8u1Y4IsD1FHIZ1zsEoAYfbT
+         1O+4mkAhu2iiZoUz7sA1eNEDKK0pN1Ix6HQNqyCww901iCRBwuP3PqJ2NnPAR7Yo0dpC
+         fWQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gCJ7ZxXwgS+9RY8KtPwmKt5PjyIuKpAMa6t5nExF4bM=;
+        b=N2SFsGpqSVcOFDRkN30+irG5f+JEQ3nTRvEjjTPUMxcDWBj8n8p5vA0RbpeNkqO2JE
+         TiAA5KUP6zQLiBoUt4GzhcprHB9rtAFZjm4STA2DlR/AvK33POi1kFKR2ZVsevsE397w
+         8+EHD2PGsrw7QyMunHqUs87AkF887GHuKK/TDrh/U/aTABKQNPTGkeSiijxLNIMBoO8b
+         kksqlvP8+Tnz23L670Gx/Pbo4y/L5tuvNIwVp5t2rcxxj9Y0e4Qv47gFMlXt1EwGkPJ+
+         WeSi+pAz9GqsPu/yZqDKbDGfe2abXsvaXFlnApRpOVCl8ad42Iq8Lz5fkjesQ+/T8JJX
+         6JcA==
+X-Gm-Message-State: APjAAAXSx9YOdcrgWDkKXKUitciyPdGQPOgFLPVtIMvauBR0PyvehxjA
+        RjphJEuz8vEkzBNr4kAu4DZbm6hZoFd3wRzm3zoaJA==
+X-Google-Smtp-Source: APXvYqz02KVp5fnxaK/aDgjS37Ek6f+VytNKRRKi7353A7sSlXWkmigB3XcSDJYl/k12aofFSaWKz15KOp/lnxAgOuk=
+X-Received: by 2002:a5e:9b15:: with SMTP id j21mr4909632iok.108.1576191604631;
+ Thu, 12 Dec 2019 15:00:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20190518163743.5396-1-nadav.amit@gmail.com>
+In-Reply-To: <20190518163743.5396-1-nadav.amit@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 12 Dec 2019 14:59:53 -0800
+Message-ID: <CALMp9eQOKX6m0ih6bH5Oyqq5hFbSs7vn0MAZXka3RcOCrC+sUg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix max VMCS field encoding index check
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday, December 12, 2019 6:11:25 PM CET David Hildenbrand wrote:
-> Will be needed by virtio-mem to identify the node from a pxm.
-> 
-> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-> Cc: Len Brown <lenb@kernel.org>
-> Cc: linux-acpi@vger.kernel.org
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  drivers/acpi/numa/srat.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/acpi/numa/srat.c b/drivers/acpi/numa/srat.c
-> index eadbf90e65d1..d5847fa7ac69 100644
-> --- a/drivers/acpi/numa/srat.c
-> +++ b/drivers/acpi/numa/srat.c
-> @@ -35,6 +35,7 @@ int pxm_to_node(int pxm)
->  		return NUMA_NO_NODE;
->  	return pxm_to_node_map[pxm];
->  }
-> +EXPORT_SYMBOL(pxm_to_node);
->  
->  int node_to_pxm(int node)
->  {
-> 
+On Sat, May 18, 2019 at 4:58 PM Nadav Amit <nadav.amit@gmail.com> wrote:
+>
+> The test that checks the maximum VMCS field encoding does not probe all
+> possible VMCS fields. As a result it might fail since the actual
+> IA32_VMX_VMCS_ENUM.MAX_INDEX would be higher than the expected value.
+>
+> Change the test to check that the maximum of the supported probed
+> VMCS fields is lower/equal than the actual reported
+> IA32_VMX_VMCS_ENUM.MAX_INDEX.
 
-This is fine by me FWIW.
-
-
-
-
+Wouldn't it be better to probe all possible VMCS fields and keep the
+test for equality?
