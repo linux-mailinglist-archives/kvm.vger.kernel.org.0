@@ -2,329 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C54411CA6C
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 11:18:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FAF011CA72
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 11:18:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728548AbfLLKRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 05:17:52 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33086 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726382AbfLLKRv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 05:17:51 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 340DEB16C;
-        Thu, 12 Dec 2019 10:17:45 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 66CA41E0B8F; Thu, 12 Dec 2019 11:17:41 +0100 (CET)
-Date:   Thu, 12 Dec 2019 11:17:41 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v10 23/25] mm/gup: track FOLL_PIN pages
-Message-ID: <20191212101741.GD10065@quack2.suse.cz>
-References: <20191212081917.1264184-1-jhubbard@nvidia.com>
- <20191212081917.1264184-24-jhubbard@nvidia.com>
+        id S1728523AbfLLKSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 05:18:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57436 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728345AbfLLKSi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 05:18:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576145916;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RhdheA6GpZI1OFubnN+r2hJUi2ulCpehuF17tpTSN/o=;
+        b=bzFqCfUv5pNexqrLWNwEQTfNih1MK85SJhyuhOsWA1q3Hu0lZ7aYKh3tAIdx5M5rJ5bLPb
+        NeIbmt/04bU4th5XZS/wvKT0Zecdj5ADeNAB87erfDS6bn9lKr/lsQCOyAapd1Br8x/msW
+        +4hOXJXsuvfgqNZQdIM1nRx2XAW4wX4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-CVy3HQ8DMMqcqcKpoJ4YBQ-1; Thu, 12 Dec 2019 05:18:34 -0500
+X-MC-Unique: CVy3HQ8DMMqcqcKpoJ4YBQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC419800EC0;
+        Thu, 12 Dec 2019 10:18:33 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 289AF60BB9;
+        Thu, 12 Dec 2019 10:18:30 +0000 (UTC)
+Date:   Thu, 12 Dec 2019 11:18:27 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 6/9] s390x: css: stsch, enumeration
+ test
+Message-ID: <20191212111827.21f64fa3.cohuck@redhat.com>
+In-Reply-To: <1576079170-7244-7-git-send-email-pmorel@linux.ibm.com>
+References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
+        <1576079170-7244-7-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191212081917.1264184-24-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 12-12-19 00:19:15, John Hubbard wrote:
-> Add tracking of pages that were pinned via FOLL_PIN.
+On Wed, 11 Dec 2019 16:46:07 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> First step for testing the channel subsystem is to enumerate the css and
+> retrieve the css devices.
 > 
-> As mentioned in the FOLL_PIN documentation, callers who effectively set
-> FOLL_PIN are required to ultimately free such pages via unpin_user_page().
-> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
-> for DIO and/or RDMA use".
+> This tests the success of STSCH I/O instruction, we do not test the
+> reaction of the VM for an instruction with wrong parameters.
 > 
-> Pages that have been pinned via FOLL_PIN are identifiable via a
-> new function call:
-> 
->    bool page_dma_pinned(struct page *page);
-> 
-> What to do in response to encountering such a page, is left to later
-> patchsets. There is discussion about this in [1], [2], and [3].
-> 
-> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
-> 
-> [1] Some slow progress on get_user_pages() (Apr 2, 2019):
->     https://lwn.net/Articles/784574/
-> [2] DMA and get_user_pages() (LPC: Dec 12, 2018):
->     https://lwn.net/Articles/774411/
-> [3] The trouble with get_user_pages() (Apr 30, 2018):
->     https://lwn.net/Articles/753027/
-> 
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     |  1 +
+>  s390x/Makefile      |  2 ++
+>  s390x/css.c         | 88 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  4 +++
+>  4 files changed, 95 insertions(+)
+>  create mode 100644 s390x/css.c
 
-Thanks for the patch. As a side note, given this series is rather big, it
-may be better to send just individual updated patches (as replies to the
-review comments) instead of resending the whole series every time. And then
-you can resend the whole series once enough changes accumulate or we reach
-seemingly final state.  That way people don't have to crawl through lots of
-uninteresing emails...  Just something to keep in mind for the future.
-
-I've spotted just one issue in this patch (see below), the rest are just
-small style nits.
-
-> +#define page_ref_zero_or_close_to_bias_overflow(page) \
-> +	((unsigned int) page_ref_count(page) + \
-> +		GUP_PIN_COUNTING_BIAS <= GUP_PIN_COUNTING_BIAS)
-> +
-
-...
-
-> +/**
-> + * page_dma_pinned() - report if a page is pinned for DMA.
-> + *
-> + * This function checks if a page has been pinned via a call to
-> + * pin_user_pages*().
-> + *
-> + * The return value is partially fuzzy: false is not fuzzy, because it means
-> + * "definitely not pinned for DMA", but true means "probably pinned for DMA, but
-> + * possibly a false positive due to having at least GUP_PIN_COUNTING_BIAS worth
-> + * of normal page references".
-> + *
-> + * False positives are OK, because: a) it's unlikely for a page to get that many
-> + * refcounts, and b) all the callers of this routine are expected to be able to
-> + * deal gracefully with a false positive.
-> + *
-> + * For more information, please see Documentation/vm/pin_user_pages.rst.
-> + *
-> + * @page:	pointer to page to be queried.
-> + * @Return:	True, if it is likely that the page has been "dma-pinned".
-> + *		False, if the page is definitely not dma-pinned.
-> + */
-> +static inline bool page_dma_pinned(struct page *page)
-> +{
-> +	return (page_ref_count(compound_head(page))) >= GUP_PIN_COUNTING_BIAS;
-> +}
-> +
-
-I realized one think WRT handling of page refcount overflow: Page refcount is
-signed and e.g. try_get_page() fails once the refcount is negative. That
-means that:
-
-a) page_ref_zero_or_close_to_bias_overflow() is not necessary - all places
-that use pinning (i.e., advance refcount by GUP_PIN_COUNTING_BIAS) are not
-necesary, we should just rely on the check for negative value for
-consistency.
-
-b) page_dma_pinned() has to be careful and type page_ref_count() to
-unsigned type for comparison as otherwise overflowed refcount would
-suddently appear as not-pinned.
-
-> +/**
-> + * try_pin_compound_head() - mark a compound page as being used by
-> + * pin_user_pages*().
-> + *
-> + * This is the FOLL_PIN counterpart to try_get_compound_head().
-> + *
-> + * @page:	pointer to page to be marked
-> + * @Return:	the compound head page, with ref appropriately incremented,
-> + * or NULL upon failure.
-> + */
-> +__must_check struct page *try_pin_compound_head(struct page *page, int refs)
-> +{
-> +	struct page *head = try_get_compound_head(page,
-> +						  GUP_PIN_COUNTING_BIAS * refs);
-> +	if (!head)
-> +		return NULL;
-> +
-> +	__update_proc_vmstat(page, NR_FOLL_PIN_REQUESTED, refs);
-> +	return head;
-> +}
-> +
+> diff --git a/s390x/css.c b/s390x/css.c
+> new file mode 100644
+> index 0000000..dfab35f
+> --- /dev/null
+> +++ b/s390x/css.c
+> @@ -0,0 +1,88 @@
 > +/*
-> + * try_grab_compound_head() - attempt to elevate a page's refcount, by a
-> + * flags-dependent amount.
+> + * Channel Subsystem tests
 > + *
-> + * "grab" names in this file mean, "look at flags to decide whether to use
-> + * FOLL_PIN or FOLL_GET behavior, when incrementing the page's refcount.
+> + * Copyright (c) 2019 IBM Corp
 > + *
-> + * Either FOLL_PIN or FOLL_GET (or neither) must be set, but not both at the
-> + * same time. (That's true throughout the get_user_pages*() and
-> + * pin_user_pages*() APIs.) Cases:
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
 > + *
-> + *	FOLL_GET: page's refcount will be incremented by 1.
-> + *      FOLL_PIN: page's refcount will be incremented by GUP_PIN_COUNTING_BIAS.
-
-Some tab vs space issue here... Generally we don't use tabs inside comments
-for indenting so I'd wote for using just spaces.
-
-> + *
-> + * Return: head page (with refcount appropriately incremented) for success, or
-> + * NULL upon failure. If neither FOLL_GET nor FOLL_PIN was set, that's
-> + * considered failure, and furthermore, a likely bug in the caller, so a warning
-> + * is also emitted.
+> + * This code is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License version 2.
 > + */
-> +static __maybe_unused struct page *try_grab_compound_head(struct page *page,
-> +							  int refs,
-> +							  unsigned int flags)
+> +
+> +#include <libcflat.h>
+> +#include <alloc_phys.h>
+> +#include <asm/page.h>
+> +#include <string.h>
+> +#include <interrupt.h>
+> +#include <asm/arch_def.h>
+> +#include <asm/time.h>
+> +
+> +#include <css.h>
+> +
+> +#define SID_ONE		0x00010000
+> +
+> +static struct schib schib;
+> +static int test_device_sid;
+> +
+> +static void test_enumerate(void)
 > +{
-> +	if (flags & FOLL_GET)
-> +		return try_get_compound_head(page, refs);
-> +	else if (flags & FOLL_PIN)
-> +		return try_pin_compound_head(page, refs);
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int cc;
+> +	int scn;
+> +	int scn_found = 0;
 > +
-> +	WARN_ON_ONCE((flags & (FOLL_GET | FOLL_PIN)) == 0);
+> +	for (scn = 0; scn < 0xffff; scn++) {
+> +		cc = stsch(scn|SID_ONE, &schib);
+> +		switch (cc) {
+> +		case 0:		/* 0 means SCHIB stored */
+> +			break;
+> +		case 3:		/* 3 means no more channels */
+> +			goto out;
+> +		default:	/* 1 or 2 should never happened for STSCH */
+> +			report(0, "Unexpected cc=%d on scn 0x%x", cc, scn);
 
-This could be just WARN_ON_ONCE(1), right?
+Spell out "subchannel number"?
 
-> +	return NULL;
-> +}
-> +
-> +/**
-> + * try_grab_page() - elevate a page's refcount by a flag-dependent amount
-> + *
-> + * This might not do anything at all, depending on the flags argument.
-> + *
-> + * "grab" names in this file mean, "look at flags to decide whether to use
-> + * FOLL_PIN or FOLL_GET behavior, when incrementing the page's refcount.
-> + *
-> + * @page:	pointer to page to be grabbed
-> + * @flags:	gup flags: these are the FOLL_* flag values.
-> + *
-> + * Either FOLL_PIN or FOLL_GET (or neither) may be set, but not both at the same
-> + * time. Cases:
-> + *
-> + *	FOLL_GET: page's refcount will be incremented by 1.
-> + *      FOLL_PIN: page's refcount will be incremented by GUP_PIN_COUNTING_BIAS.
+> +			return;
+> +		}
+> +		if (cc)
+> +			break;
 
-Again tab vs space difference here.
+Isn't that redundant?
 
-> + *
-> + * Return: true for success, or if no action was required (if neither FOLL_PIN
-> + * nor FOLL_GET was set, nothing is done). False for failure: FOLL_GET or
-> + * FOLL_PIN was set, but the page could not be grabbed.
-> + */
-> +bool __must_check try_grab_page(struct page *page, unsigned int flags)
-> +{
-> +	if (flags & FOLL_GET)
-> +		return try_get_page(page);
-> +	else if (flags & FOLL_PIN) {
-> +		page = compound_head(page);
-> +		WARN_ON_ONCE(flags & FOLL_GET);
-> +
-> +		if (WARN_ON_ONCE(page_ref_zero_or_close_to_bias_overflow(page)))
-> +			return false;
+> +		/* We silently only support type 0, a.k.a. I/O channels */
 
-As I mentioned above, this will need "negative refcount" check instead...
+s/silently/currently/ ?
 
-> +
-> +		page_ref_add(page, GUP_PIN_COUNTING_BIAS);
-> +		__update_proc_vmstat(page, NR_FOLL_PIN_REQUESTED, 1);
+> +		if (PMCW_CHANNEL_TYPE(pmcw) != 0)
+> +			continue;
+> +		/* We ignore I/O channels without valid devices */
+> +		if (!(pmcw->flags & PMCW_DNV))
+> +			continue;
+> +		/* We keep track of the first device as our test device */
+> +		if (!test_device_sid)
+> +			test_device_sid = scn|SID_ONE;
+> +		scn_found++;
 > +	}
+> +out:
+> +	if (!scn_found) {
+> +		report(0, "Devices, Tested: %d, no I/O type found", scn);
+
+It's no I/O _devices_ found, isn't it? There might have been I/O
+subchannels, but none with a valid device...
+
+> +		return;
+> +	}
+> +	report(1, "Devices, tested: %d, I/O type: %d", scn, scn_found);
+
+As you're testing this anyway: what about tracking _all_ numbers here?
+I.e., advance a counter for I/O subchannels as well, even if !dnv, and
+have an output like
+
+"Tested subchannels: 20, I/O subchannels: 18, I/O devices: 10"
+
+or so?
+
+> +}
 > +
-> +	return true;
+> +static struct {
+> +	const char *name;
+> +	void (*func)(void);
+> +} tests[] = {
+> +	{ "enumerate (stsch)", test_enumerate },
+> +	{ NULL, NULL }
+> +};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	int i;
+> +
+> +	report_prefix_push("Channel Sub-System");
+
+s/Channel Sub-System/Channel Subsystem/ ?
+
+> +	for (i = 0; tests[i].name; i++) {
+> +		report_prefix_push(tests[i].name);
+> +		tests[i].func();
+> +		report_prefix_pop();
+> +	}
+> +	report_prefix_pop();
+> +
+> +	return report_summary();
 > +}
 
-...
+This basically looks sane to me now.
 
-> @@ -1468,6 +1482,7 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
->  {
->  	struct mm_struct *mm = vma->vm_mm;
->  	struct page *page = NULL;
-> +	struct page *subpage = NULL;
->  
->  	assert_spin_locked(pmd_lockptr(mm, pmd));
->  
-> @@ -1486,6 +1501,14 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
->  	VM_BUG_ON_PAGE(!PageHead(page) && !is_zone_device_page(page), page);
->  	if (flags & FOLL_TOUCH)
->  		touch_pmd(vma, addr, pmd, flags);
-> +
-> +	subpage = page;
-> +	subpage += (addr & ~HPAGE_PMD_MASK) >> PAGE_SHIFT;
-> +	VM_BUG_ON_PAGE(!PageCompound(subpage) &&
-> +		       !is_zone_device_page(subpage), subpage);
-> +	if (!try_grab_page(subpage, flags))
-> +		return ERR_PTR(-EFAULT);
-> +
+Just some additional considerations (we can do that on top, no need to
+do surgery here right now):
 
-Hum, I think you've made this change more complex than it has to be.
-try_grab_page() is the same for head page or subpage because we increment
-the refcount on the compound_head(page) anyway. So I'd leave this function
-as is (not add subpage or move VM_BUG_ON_PAGE()), just have at this place:
+I currently have the (not sure how sensible) idea to add some optional
+testing for vfio-ccw, and this would obviously need some I/O routines as
+well. So, in the long run, it would be good if something like this
+stsch-loop could be factored out to a kind of library function. Just
+some thoughts for now :)
 
-	if (!try_grab_page(page, flags))
-		return ERR_PTR(-EFAULT);
-
-Also one comment regarding the error code. Some places seem to return -ENOMEM
-when they fail to grab page reference. Shouldn't we rather return that one
-for consistency?
-
->  	if ((flags & FOLL_MLOCK) && (vma->vm_flags & VM_LOCKED)) {
->  		/*
->  		 * We don't mlock() pte-mapped THPs. This way we can avoid
-> @@ -1509,24 +1532,18 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
->  		 */
->  
->  		if (PageAnon(page) && compound_mapcount(page) != 1)
-> -			goto skip_mlock;
-> +			goto out;
->  		if (PageDoubleMap(page) || !page->mapping)
-> -			goto skip_mlock;
-> +			goto out;
->  		if (!trylock_page(page))
-> -			goto skip_mlock;
-> +			goto out;
->  		lru_add_drain();
->  		if (page->mapping && !PageDoubleMap(page))
->  			mlock_vma_page(page);
->  		unlock_page(page);
->  	}
-> -skip_mlock:
-> -	page += (addr & ~HPAGE_PMD_MASK) >> PAGE_SHIFT;
-> -	VM_BUG_ON_PAGE(!PageCompound(page) && !is_zone_device_page(page), page);
-> -	if (flags & FOLL_GET)
-> -		get_page(page);
-> -
->  out:
-> -	return page;
-> +	return subpage;
->  }
->  
-
-									Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
