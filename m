@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40CD611D3D3
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:28:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C6B011D3DE
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:28:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730145AbfLLR2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 12:28:47 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:45384 "EHLO
+        id S1730178AbfLLR2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 12:28:52 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:35258 "EHLO
         inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730023AbfLLR2r (ORCPT
+        by vger.kernel.org with ESMTP id S1730114AbfLLR2r (ORCPT
         <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 12:28:47 -0500
 Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
         by cheepnis.misterjones.org with esmtpsa (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.80)
         (envelope-from <maz@kernel.org>)
-        id 1ifSGX-00069s-7R; Thu, 12 Dec 2019 18:28:41 +0100
+        id 1ifSGY-00069s-0w; Thu, 12 Dec 2019 18:28:42 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -31,9 +31,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 3/8] KVM: arm/arm64: vgic: Use wrapper function to lock/unlock all vcpus in kvm_vgic_create()
-Date:   Thu, 12 Dec 2019 17:28:19 +0000
-Message-Id: <20191212172824.11523-4-maz@kernel.org>
+Subject: [PATCH 4/8] KVM: arm64: Sanely ratelimit sysreg messages
+Date:   Thu, 12 Dec 2019 17:28:20 +0000
+Message-Id: <20191212172824.11523-5-maz@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212172824.11523-1-maz@kernel.org>
 References: <20191212172824.11523-1-maz@kernel.org>
@@ -48,66 +48,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Miaohe Lin <linmiaohe@huawei.com>
+From: Mark Rutland <mark.rutland@arm.com>
 
-Use wrapper function lock_all_vcpus()/unlock_all_vcpus()
-in kvm_vgic_create() to remove duplicated code dealing
-with locking and unlocking all vcpus in a vm.
+Currently kvm_pr_unimpl() is ratelimited, so print_sys_reg_instr() won't
+spam the console. However, someof its callers try to print some
+contextual information with kvm_err(), which is not ratelimited. This
+means that in some cases the context may be printed without the sysreg
+encoding, which isn't all that useful.
 
-Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+Let's ensure that both are consistently printed together and
+ratelimited, by refactoring print_sys_reg_instr() so that some callers
+can provide it with an arbitrary format string.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Steven Price <steven.price@arm.com>
-Link: https://lore.kernel.org/r/1575081918-11401-1-git-send-email-linmiaohe@huawei.com
+Link: https://lore.kernel.org/r/20191205180652.18671-2-mark.rutland@arm.com
 ---
- virt/kvm/arm/vgic/vgic-init.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 12 ++++++------
+ arch/arm64/kvm/sys_regs.h | 17 +++++++++++++++--
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
-index 7c58112ae67c..a963b9d766b7 100644
---- a/virt/kvm/arm/vgic/vgic-init.c
-+++ b/virt/kvm/arm/vgic/vgic-init.c
-@@ -70,7 +70,7 @@ void kvm_vgic_early_init(struct kvm *kvm)
-  */
- int kvm_vgic_create(struct kvm *kvm, u32 type)
- {
--	int i, vcpu_lock_idx = -1, ret;
-+	int i, ret;
- 	struct kvm_vcpu *vcpu;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2071260a275b..e8bf08e09f78 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2094,9 +2094,9 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
+ 		WARN_ON(1);
+ 	}
  
- 	if (irqchip_in_kernel(kvm))
-@@ -86,17 +86,9 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		!kvm_vgic_global_state.can_emulate_gicv2)
- 		return -ENODEV;
- 
--	/*
--	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
--	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
--	 * that no other VCPUs are run while we create the vgic.
--	 */
- 	ret = -EBUSY;
--	kvm_for_each_vcpu(i, vcpu, kvm) {
--		if (!mutex_trylock(&vcpu->mutex))
--			goto out_unlock;
--		vcpu_lock_idx = i;
--	}
-+	if (!lock_all_vcpus(kvm))
-+		return ret;
- 
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (vcpu->arch.has_run_once)
-@@ -125,10 +117,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
- 
- out_unlock:
--	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
--		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
--		mutex_unlock(&vcpu->mutex);
--	}
-+	unlock_all_vcpus(kvm);
- 	return ret;
+-	kvm_err("Unsupported guest CP%d access at: %08lx [%08lx]\n",
+-		cp, *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+-	print_sys_reg_instr(params);
++	print_sys_reg_msg(params,
++			  "Unsupported guest CP%d access at: %08lx [%08lx]\n",
++			  cp, *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+ 	kvm_inject_undefined(vcpu);
  }
  
+@@ -2245,9 +2245,9 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+ 	if (likely(r)) {
+ 		perform_access(vcpu, params, r);
+ 	} else {
+-		kvm_err("Unsupported guest sys_reg access at: %lx [%08lx]\n",
+-			*vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+-		print_sys_reg_instr(params);
++		print_sys_reg_msg(params,
++				  "Unsupported guest sys_reg access at: %lx [%08lx]\n",
++				  *vcpu_pc(vcpu), *vcpu_cpsr(vcpu));
+ 		kvm_inject_undefined(vcpu);
+ 	}
+ 	return 1;
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index 9bca0312d798..5a6fc30f5989 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -62,11 +62,24 @@ struct sys_reg_desc {
+ #define REG_HIDDEN_USER		(1 << 0) /* hidden from userspace ioctls */
+ #define REG_HIDDEN_GUEST	(1 << 1) /* hidden from guest */
+ 
+-static inline void print_sys_reg_instr(const struct sys_reg_params *p)
++static __printf(2, 3)
++inline void print_sys_reg_msg(const struct sys_reg_params *p,
++				       char *fmt, ...)
+ {
++	va_list va;
++
++	va_start(va, fmt);
+ 	/* Look, we even formatted it for you to paste into the table! */
+-	kvm_pr_unimpl(" { Op0(%2u), Op1(%2u), CRn(%2u), CRm(%2u), Op2(%2u), func_%s },\n",
++	kvm_pr_unimpl("%pV { Op0(%2u), Op1(%2u), CRn(%2u), CRm(%2u), Op2(%2u), func_%s },\n",
++		      &(struct va_format){ fmt, &va },
+ 		      p->Op0, p->Op1, p->CRn, p->CRm, p->Op2, p->is_write ? "write" : "read");
++	va_end(va);
++}
++
++static inline void print_sys_reg_instr(const struct sys_reg_params *p)
++{
++	/* GCC warns on an empty format string */
++	print_sys_reg_msg(p, "%s", "");
+ }
+ 
+ static inline bool ignore_write(struct kvm_vcpu *vcpu,
 -- 
 2.20.1
 
