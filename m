@@ -2,123 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C46AC11D197
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:57:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22EBE11D1B4
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 17:02:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729658AbfLLP5U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 10:57:20 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28375 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729383AbfLLP5T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 10:57:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576166238;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rRNrufMF5ZmcT+/5HZMlWib9qPtBnpXc+naU09rmhxc=;
-        b=OpNWRtOsaH3Av2oZEgSE/JKPJMiYoUyluTwBmc+8VZv6/T2n16sYSRduhKCzf94igpwKvJ
-        pvlT6ZA+U4VFAMvUe0hsLKk4dzmvey7yAzgVwdufK89/tM1DVWrV7DGdPvEsvyqAB/IpOE
-        FkHpIT+sy5sLLCHKSrljj7J/znOlF7U=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-gmu5PsWyPd63En1kFzkt-A-1; Thu, 12 Dec 2019 10:57:16 -0500
-X-MC-Unique: gmu5PsWyPd63En1kFzkt-A-1
-Received: by mail-wr1-f69.google.com with SMTP id u18so1194747wrn.11
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 07:57:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rRNrufMF5ZmcT+/5HZMlWib9qPtBnpXc+naU09rmhxc=;
-        b=bNp2WJptkMbAy85B/C5DWC+MXOuzf0D68c0j89dwq5c33UxrjrVRd7GOp9t2IUlQ8j
-         LbMxUbRko/fPf5ZL1nDZjZb1wu/VcrDE8hBRwBWsduZdEvimGXRqoOGcw3T1oMS10rXh
-         De6vRE71kjcU/5QUm4T0+vzLwBY78r2+q8CVg0iPkJs4szTLdcU0S8bz0SQsvhpqCIPZ
-         kalI2PaKUZiRB4cLiHuwefNLJd1qhbf4a9IlpEdx5b86TqnnNc+2ijnDRYXou72oFwbt
-         VhT1mcj/xrUPZLDtERo0Ki28Pw9G9vxE3CZUFUOlYS4t9vLn0L+xC8BvegWmCs5fTSMa
-         mn/A==
-X-Gm-Message-State: APjAAAWypjTqTbmkHouxLGr+961JM8gWXO2j4DQOZbLUposC8v7CbB4g
-        mHr15zWWnEr5M+k1Z9OcfD0I9Pwqbz0j4kX89UlQ2XxdRjbzVYZLu5ZpWxFzqISdlW1RXcMwpyp
-        s9sv77ywkyBg8
-X-Received: by 2002:adf:e6c6:: with SMTP id y6mr7226960wrm.284.1576166235415;
-        Thu, 12 Dec 2019 07:57:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxCcJblbdBpu6fVRmTMMxd9YCps91vlO3a/KrWqDMJ5D1GjIwC7bcnVpKVuMe+qGktQ2LnvbA==
-X-Received: by 2002:adf:e6c6:: with SMTP id y6mr7226922wrm.284.1576166235182;
-        Thu, 12 Dec 2019 07:57:15 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id s10sm6451431wrw.12.2019.12.12.07.57.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 07:57:14 -0800 (PST)
-Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
- VMX_FEATURES_*
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
- <20191128014016.4389-12-sean.j.christopherson@intel.com>
- <20191212122646.GE4991@zn.tnic>
- <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
- <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17c6569e-d0af-539c-6d63-f4c07367d8d1@redhat.com>
-Date:   Thu, 12 Dec 2019 16:57:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1729776AbfLLQC0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 11:02:26 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:46576 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729247AbfLLQCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 11:02:25 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCG0o5u121018;
+        Thu, 12 Dec 2019 16:02:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=f7AVG1lyL0yNfd+//JV/XgNkQxufThH6oQbBgh5a/Ww=;
+ b=Sj0Wn+YL4klICcznGm6I71xp21V+X5XUBe6wB6k6sOlBPMO9KyhfBYA08sxyElTN8AGb
+ g//51JVWibxwezuxAndAOvGoqx0Amnr4EKxGsiPL5GWEPfcGeC3iBrfCI69dRJr/AIpv
+ dvazGiJxCvLSViJ8cQAyF4yPhVkx+nxCQna2x2Glsg/ieS3bMVesGfzq/71PoU5jDTyv
+ /SMvldgrHrc7Fnvk1ihMdpgfbOCK/GuKQP4xzp17iWYvirVOm6QAfWt20qMdYjwYIh/i
+ al+KeiXzEx37QzYyPpUcRZYgWeX2WfMc7fzlaxDzCYNfPHMIa8LiFWMatkEbPIjjxx8N Dg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2wr4qruvmd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 16:02:18 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCFsKHv101098;
+        Thu, 12 Dec 2019 16:00:18 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2wums9kqwk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 16:00:17 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBCG0GdA008664;
+        Thu, 12 Dec 2019 16:00:16 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Dec 2019 08:00:16 -0800
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id B081A6A0119; Thu, 12 Dec 2019 11:03:45 -0500 (EST)
+Date:   Thu, 12 Dec 2019 11:03:45 -0500
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 0/7] Introduce support for guest CET feature
+Message-ID: <20191212160345.GA13420@char.us.oracle.com>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191101085222.27997-1-weijiang.yang@intel.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912120124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912120125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/19 16:52, Liran Alon wrote:
->>> virt_apic_accesses	-> vapic
->> apicv
-> Frankly, I dislike APICv terminology. I prefer to enumerate the
-> various VMX features which are collectively called APICv by KVM. 
-> APICv currently represents in KVM terminology the combination of
-> APIC-register virtualization, virtual-interrupt-delivery and
-> posted-interrupts (See cpu_has_vmx_apicv()).
+On Fri, Nov 01, 2019 at 04:52:15PM +0800, Yang Weijiang wrote:
+> Control-flow Enforcement Technology (CET) provides protection against
+> Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
+> sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
 > 
-> In fact, the coupling of “enable_apicv” module parameter have made me
-> multiple times to need to disable entire APICv features when there
-> for example was only a bug in posted-interrupts.
+> KVM change is required to support guest CET feature.
+> This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
+> and vmentry/vmexit configuration etc.so that guest kernel can setup CET
+> runtime infrastructure based on them. Some CET MSRs and related feature
+> flags used reference the definitions in kernel patchset.
 > 
-> Even you got confused as virtualize-apic-access is not part of KVM’s
-> APICv terminology but rather it’s enablement depend on
-> flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e.
-> It can be used for faster intercept handling of accesses to guest
-> xAPIC MMIO page.
+> CET kernel patches is here:
+> https://lkml.org/lkml/2019/8/13/1110
+> https://lkml.org/lkml/2019/8/13/1109
 
-Right, I got confused with APIC-register virtualization.  Virtualize
-APIC accesses is another one I wouldn't bother putting in /proc/cpuinfo,
-since it's usually present together with flexpriority.
+Is there a git tree with all of them against v5.5-rc1 (so all three series)?
+I tried your github tree: https://github.com/yyu168/linux_cet.git #cet
+but sadly that does not apply against 5.5-rc1 :-(
 
-Paolo
-
+Thanks!
