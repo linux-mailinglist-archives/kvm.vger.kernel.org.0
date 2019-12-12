@@ -2,104 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7CB511C1D0
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 02:03:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE84011C2DC
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 03:02:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727504AbfLLBDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 20:03:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:61888 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727403AbfLLBDF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 20:03:05 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2019 17:03:04 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,303,1571727600"; 
-   d="scan'208";a="210945278"
-Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.128])
-  by fmsmga008.fm.intel.com with ESMTP; 11 Dec 2019 17:03:03 -0800
-Date:   Thu, 12 Dec 2019 09:04:24 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
+        id S1727628AbfLLCCU convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 11 Dec 2019 21:02:20 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2534 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727584AbfLLCCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 21:02:20 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
+        by Forcepoint Email with ESMTP id 31B2679CAB7D093DF318;
+        Thu, 12 Dec 2019 10:02:17 +0800 (CST)
+Received: from dggeme765-chm.china.huawei.com (10.3.19.111) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 12 Dec 2019 10:02:16 +0800
+Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
+ dggeme765-chm.china.huawei.com (10.3.19.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Thu, 12 Dec 2019 10:02:16 +0800
+Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
+ dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
+ Thu, 12 Dec 2019 10:02:16 +0800
+From:   linmiaohe <linmiaohe@huawei.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        jmattson@google.com, yu.c.zhang@linux.intel.com,
-        yu-cheng.yu@intel.com
-Subject: Re: [PATCH v8 4/7] KVM: VMX: Load CET states on vmentry/vmexit
-Message-ID: <20191212010423.GB17570@local-michael-cet-test.sh.intel.com>
-References: <20191101085222.27997-1-weijiang.yang@intel.com>
- <20191101085222.27997-5-weijiang.yang@intel.com>
- <20191210212305.GM15758@linux.intel.com>
- <20191211015423.GC12845@local-michael-cet-test>
- <20191211163510.GF5044@linux.intel.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH 6/6] KVM: Fix some writing mistakes
+Thread-Topic: [PATCH 6/6] KVM: Fix some writing mistakes
+Thread-Index: AdWwj3wg8ae1y0yjTKygu5joUnhHkg==
+Date:   Thu, 12 Dec 2019 02:02:16 +0000
+Message-ID: <64b60a489d1f405285781a6105a06f2d@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.184.189.20]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191211163510.GF5044@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 08:35:10AM -0800, Sean Christopherson wrote:
-> On Wed, Dec 11, 2019 at 09:54:23AM +0800, Yang Weijiang wrote:
-> > On Tue, Dec 10, 2019 at 01:23:05PM -0800, Sean Christopherson wrote:
-> > > On Fri, Nov 01, 2019 at 04:52:19PM +0800, Yang Weijiang wrote:
-> > > > @@ -2834,6 +2837,9 @@ void vmx_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
-> > > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> > > >  	unsigned long hw_cr0;
-> > > >  
-> > > > +	if (!(cr0 & X86_CR0_WP) && kvm_read_cr4_bits(vcpu, X86_CR4_CET))
-> > > > +		cr0 |= X86_CR0_WP;
-> > > 
-> > > Huh?  What's the interaction between CR4.CET and CR0.WP?  If there really
-> > > is some non-standard interaction then it needs to be documented in at least
-> > > the changelog and probably with a comment as well.
-> > >
-> > The processor does not allow CR4.CET to be set if CR0.WP = 0 (similarly, it
-> > does not allow CR0.WP to be cleared while CR4.CET = 1).
-> 
-> Ya, as you surmised below, this needs to be a #GP condition.
+Sean Christopherson wrote:
+>On Wed, Dec 11, 2019 at 02:26:25PM +0800, linmiaohe wrote:
+>> From: Miaohe Lin <linmiaohe@huawei.com>
+>> 
+>> Fix some writing mistakes in the comments.
+>> 
+>> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+>> ---
+>>  	 * This context will save all necessary information to walk page tables
+>> -	 * of the an L2 guest. This context is only initialized for page table
+>> +	 * of the L2 guest. This context is only initialized for page table
 >
-OK, will do it.
+>I'd whack "the" instead of "and", i.e. ...walk page tables of an L2 guest, as KVM isn't limited to just one L2 guest.
 
-> Have you tested SMM at all?  The interaction between CR0 and CR4 may be
-> problematic for em_rsm() and/or rsm_enter_protected_mode().
+I'd change this.
+
+>>  	 * walking and not for faulting since we never handle l2 page faults 
+>> on
 >
-Not yet, what's an easy way to test code in SMM mode?
-Thanks!
+>While you're here, want to change "l2" to "L2"?
 
-> > > > +
-> > > >  	hw_cr0 = (cr0 & ~KVM_VM_CR0_ALWAYS_OFF);
-> > > >  	if (enable_unrestricted_guest)
-> > > >  		hw_cr0 |= KVM_VM_CR0_ALWAYS_ON_UNRESTRICTED_GUEST;
-> > > > @@ -2936,6 +2942,22 @@ static bool guest_cet_allowed(struct kvm_vcpu *vcpu, u32 feature, u32 mode)
-> > > >  	return false;
-> > > >  }
-> > > >  
-> > > > +bool is_cet_bit_allowed(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +	unsigned long cr0;
-> > > > +	bool cet_allowed;
-> > > > +
-> > > > +	cr0 = kvm_read_cr0(vcpu);
-> > > > +	cet_allowed = guest_cet_allowed(vcpu, X86_FEATURE_SHSTK,
-> > > > +					XFEATURE_MASK_CET_USER) ||
-> > > > +		      guest_cet_allowed(vcpu, X86_FEATURE_IBT,
-> > > > +					XFEATURE_MASK_CET_USER);
-> > > > +	if ((cr0 & X86_CR0_WP) && cet_allowed)
-> > > > +		return true;
-> > > 
-> > > So, attempting to set CR4.CET if CR0.WP=0 takes a #GP?  But attempting
-> > > to clear CR0.WP if CR4.CET=1 is ignored?
-> > > 
-> > Per above words in spec., inject #GP to guest in either case?
-> > 
-> > > > +
-> > > > +	return false;
-> > > > +}
-> > > > +
+I do nothing here. :)
+
+>>  	 * the host.
+>>  	 */
+>> check_user_page_hwpoison(unsigned long addr)
+>>  /*
+>>   * The fast path to get the writable pfn which will be stored in @pfn,
+>>   * true indicates success, otherwise false is returned.  It's also 
+>> the
+>> - * only part that runs if we can are in atomic context.
+>> + * only part that runs if we can in atomic context.
+>
+>This should remove "can" instead of "are", i.e. ...part that runs if we are in atomic context.  The comment is calling out that hva_to_pfn() will return immediately if hva_to_pfn_fast() and the kernel is atomic context.
+>
+
+Many thanks for your explanation, I would change this too. And many thanks for your review.
