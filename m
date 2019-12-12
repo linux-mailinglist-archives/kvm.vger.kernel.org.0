@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89C8D11D09E
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EA6311D0B1
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:16:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729139AbfLLPMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 10:12:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27018 "EHLO
+        id S1729009AbfLLPQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 10:16:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6940 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728581AbfLLPMc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 10:12:32 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCF7YQx013227
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:12:31 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wugd2gqf5-1
+        by vger.kernel.org with ESMTP id S1728654AbfLLPQe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 10:16:34 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCF7Nv5131833
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:16:33 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wtfbyrcwf-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:12:30 -0500
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:16:32 -0500
 Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 12 Dec 2019 15:12:28 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 12 Dec 2019 15:16:30 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 15:12:26 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCFCP2I47906968
+        Thu, 12 Dec 2019 15:16:27 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCFGQUb10092692
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 15:12:25 GMT
+        Thu, 12 Dec 2019 15:16:26 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5246E4204C;
-        Thu, 12 Dec 2019 15:12:25 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id BF9ED42049;
+        Thu, 12 Dec 2019 15:16:26 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19DEA42047;
-        Thu, 12 Dec 2019 15:12:25 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 907EC42056;
+        Thu, 12 Dec 2019 15:16:26 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.212])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 15:12:25 +0000 (GMT)
+        Thu, 12 Dec 2019 15:16:26 +0000 (GMT)
 Subject: Re: [PATCH v2] kvm: Refactor handling of VM debugfs files
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     "Pandurov, Milan" <milanpa@amazon.com>,
         Alexander Graf <graf@amazon.de>,
         Milan Pandurov <milanpa@amazon.de>, kvm@vger.kernel.org
@@ -47,7 +48,7 @@ Cc:     pbonzini@redhat.com, rkrcmar@redhat.com
 References: <20191212092206.7732-1-milanpa@amazon.de>
  <26e0da0e-6509-f359-5628-20c33820267c@amazon.de>
  <125b06d6-3d60-5844-b6e7-ef2995c8ec32@amazon.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <748111cc-ea6e-3677-47e4-d4fc98dabcbb@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
  J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
@@ -91,26 +92,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Thu, 12 Dec 2019 16:12:24 +0100
+Date:   Thu, 12 Dec 2019 16:16:26 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <125b06d6-3d60-5844-b6e7-ef2995c8ec32@amazon.com>
+In-Reply-To: <748111cc-ea6e-3677-47e4-d4fc98dabcbb@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19121215-4275-0000-0000-0000038E4C71
+x-cbid: 19121215-0008-0000-0000-000003402D47
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121215-4276-0000-0000-000038A206C2
-Message-Id: <748111cc-ea6e-3677-47e4-d4fc98dabcbb@de.ibm.com>
+x-cbparentid: 19121215-0009-0000-0000-00004A602FF8
+Message-Id: <43118c34-85c9-61b9-26e2-67fc689cc867@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 clxscore=1015 adultscore=0 malwarescore=0
- priorityscore=1501 spamscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120117
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 phishscore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1912120117
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -118,23 +119,27 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12.12.19 15:08, Pandurov, Milan wrote:
+On 12.12.19 16:12, Christian Borntraeger wrote:
 > 
-> On 12.12.19 10:34, Alexander Graf wrote:
-
->>> @@ -4013,8 +4013,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
->>>           return -ENOENT;
->>>         if (simple_attr_open(inode, file, get,
->>> -                 stat_data->mode & S_IWUGO ? set : NULL,
->>> -                 fmt)) {
->>> +            KVM_DBGFS_GET_MODE(stat_data->dbgfs_item) & 0222
+> 
+> On 12.12.19 15:08, Pandurov, Milan wrote:
 >>
->> Why do you change the mask from S_IWUGO to 0222?
-> checkpatch was complaining: "Symbolic permissions 'S_IWUGO' are not preferred. Consider using octal permissions '0222'."
-> I will change it back to S_IWUGO in next revision to avoid confusion.
+>> On 12.12.19 10:34, Alexander Graf wrote:
+> 
+>>>> @@ -4013,8 +4013,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
+>>>>           return -ENOENT;
+>>>>         if (simple_attr_open(inode, file, get,
+>>>> -                 stat_data->mode & S_IWUGO ? set : NULL,
+>>>> -                 fmt)) {
+>>>> +            KVM_DBGFS_GET_MODE(stat_data->dbgfs_item) & 0222
+>>>
+>>> Why do you change the mask from S_IWUGO to 0222?
+>> checkpatch was complaining: "Symbolic permissions 'S_IWUGO' are not preferred. Consider using octal permissions '0222'."
+>> I will change it back to S_IWUGO in next revision to avoid confusion.
+> 
+> 
+> I think most people prefer the octal ones. Linus was very vocal about the S_xxxxx being
+> incomprehensible, so please keep it octal.
 
-
-I think most people prefer the octal ones. Linus was very vocal about the S_xxxxx being
-incomprehensible, so please keep it octal.
-
+https://lwn.net/Articles/696229/
 
