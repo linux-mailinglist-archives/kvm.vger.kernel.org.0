@@ -2,88 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3692B11C2F6
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 03:08:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E9511C377
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 03:45:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727699AbfLLCIi convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 11 Dec 2019 21:08:38 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2478 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726793AbfLLCIg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 21:08:36 -0500
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id A2873810A3D0E9DE0606;
-        Thu, 12 Dec 2019 10:08:33 +0800 (CST)
-Received: from dggeme716-chm.china.huawei.com (10.1.199.112) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 12 Dec 2019 10:08:32 +0800
-Received: from dggeme763-chm.china.huawei.com (10.3.19.109) by
- dggeme716-chm.china.huawei.com (10.1.199.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Thu, 12 Dec 2019 10:08:33 +0800
-Received: from dggeme763-chm.china.huawei.com ([10.6.66.36]) by
- dggeme763-chm.china.huawei.com ([10.6.66.36]) with mapi id 15.01.1713.004;
- Thu, 12 Dec 2019 10:08:32 +0800
-From:   linmiaohe <linmiaohe@huawei.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH 0/6] Fix various comment errors
-Thread-Topic: [PATCH 0/6] Fix various comment errors
-Thread-Index: AdWwkIVWFlZnSMe+cUqN78tMuV49Xw==
-Date:   Thu, 12 Dec 2019 02:08:32 +0000
-Message-ID: <88f5931859484959bd80a48edbbe1104@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.184.189.20]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727877AbfLLCp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 21:45:26 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30812 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727705AbfLLCp0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 11 Dec 2019 21:45:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576118725;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kn1ymEsIwqFhOaQmJJrBrdgBfZaZLt84rJ0YsSsfEE0=;
+        b=dx/UAx652RMxAdp5Py9rL9mQ4ohV7rB/ivMhZGnRn8y42gL6ifAwLoOlIXAHVHk8p5CYr2
+        sdnbIZiCF3bDxzu9IlFFH1XvMN8niPAHZA8FIqlmOpvacyWCQPifKj72iwfbMZ292b6Oq5
+        IPfnfvN2IOrAkTSugIyNgy4h+ey3vDU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-m7tiwnYoMNWSXDhCrk-rfw-1; Wed, 11 Dec 2019 21:45:24 -0500
+X-MC-Unique: m7tiwnYoMNWSXDhCrk-rfw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1F2E1800D63;
+        Thu, 12 Dec 2019 02:45:22 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-40.bne.redhat.com [10.64.54.40])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 589426609A;
+        Thu, 12 Dec 2019 02:45:17 +0000 (UTC)
+From:   Gavin Shan <gshan@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, paulus@ozlabs.org,
+        maz@kernel.org, jhogan@kernel.org, drjones@redhat.com,
+        vkuznets@redhat.com, gshan@redhat.com
+Subject: [PATCH 0/3] Standardize kvm exit reason field
+Date:   Thu, 12 Dec 2019 13:45:09 +1100
+Message-Id: <20191212024512.39930-1-gshan@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson wrote:
-> On Wed, Dec 11, 2019 at 02:26:19PM +0800, linmiaohe wrote:
->> From: Miaohe Lin <linmiaohe@huawei.com>
->> 
->> Miaohe Lin (6):
->>   KVM: Fix some wrong function names in comment
->>   KVM: Fix some out-dated function names in comment
->>   KVM: Fix some comment typos and missing parentheses
->>   KVM: Fix some grammar mistakes
->>   KVM: hyperv: Fix some typos in vcpu unimpl info
->>   KVM: Fix some writing mistakes
->
->Regarding the patch organizing, I'd probably group the comment changes based on what files they touch as opposed to what type of comment issue they're fixing.
->
->E.g. three patches for the comments
->
->   KVM: VMX: Fix comment blah blah blah
->   KVM: x86: Fix comment blah blah blah
->   KVM: Fix comment blah blah blah
->
->and one patch for the print typo in hyperv
->
->   KVM: hyperv: Fix some typos in vcpu unimpl info
->
->For KVM, the splits don't matter _that_ much since they more or less all get routed through the maintainers/reviewers, but it is nice when patches can be contained to specific subsystems/areas as it allows people to easily skip over patches that aren't relevant to them.
->
+Some utilities (e.g. kvm_stat) have the assumption that same filter
+field "exit_reason" for kvm exit tracepoint. However, they're varied
+on different architects. It can be fixed for the utilities to pick
+different filter names, or standardize it to have unified name "exit_reas=
+on",
+The series takes the second approach, suggested by Vitaly Kuznetsov.
 
-Many thanks for your advice and patient explanation. I feel sorry for my poor patch organizing.
-I would reorganize my patches. Thanks again.
- 
+I'm not sure which git tree this will go, so I have one separate patch
+for each architect in case they are merged to different git tree.
+
+Gavin Shan (3):
+  kvm/mips: Standardize kvm exit reason field
+  kvm/powerpc: Standardize kvm exit reason field
+  kvm/aarch64: Standardize kvm exit reason field
+
+ arch/mips/kvm/trace.h          | 10 +++++-----
+ arch/powerpc/kvm/trace_booke.h | 10 +++++-----
+ arch/powerpc/kvm/trace_pr.h    | 10 +++++-----
+ virt/kvm/arm/trace.h           | 14 ++++++++------
+ 4 files changed, 23 insertions(+), 21 deletions(-)
+
+--=20
+2.23.0
+
