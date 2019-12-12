@@ -2,134 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A64C411CDF5
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 14:15:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D60F311CE59
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 14:32:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729407AbfLLNPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 08:15:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56746 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729399AbfLLNO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 08:14:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576156499;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fLjEJ9DPJesgnmsDD/FbLzKF663mvixPtyFrapicoaw=;
-        b=Yr6Udbc1Kth7FNdlFtMjkRKjtZyQY646zYn8Lby2VVGZg58+YEpt/cV23SOSUs8LWd3vHi
-        zuidZWyqiIE4bNprXQmJFKMImBZF9oFsASSWPG1boT7IFa8Q7Qi2hTS3yRenzWn4EpD2CZ
-        h7xrXEM2823LGkaFqVLJYwOI1TgBdhg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-U6lU0SXvMIiuwwAbwr6svw-1; Thu, 12 Dec 2019 08:14:58 -0500
-X-MC-Unique: U6lU0SXvMIiuwwAbwr6svw-1
-Received: by mail-wm1-f71.google.com with SMTP id l13so831588wmj.8
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 05:14:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fLjEJ9DPJesgnmsDD/FbLzKF663mvixPtyFrapicoaw=;
-        b=VCGjbtCwGKAnaatM2FqbPTL+P1wipBYvftaD4Hlso9UlFraTnb9tVV9K6CBLf48ZOO
-         wnhY8b8KBNhMxnap9E75nnjvuRc24RyAcBKNw2ZQ7qeoq84EVeHZCJMUYR5T96ZAa+x7
-         RmQJmA5KKkzz++acUnE3hLzFjvn48SSbRegFngK/I5inkdObDlQekjJ10D1s76Fha5cW
-         yWLGLiJ221AgVruy6rSHEljqi9oU/uBL2xnWsTHLgwfUtLw38KqSGdrVSM7zo1CgvylV
-         pW8WYeNktQvNle5LFFOo1VVkgrIkESA/dEkrjq/aH4UEBEbY37Lt8vlppfcqC7A8DJ37
-         FcNw==
-X-Gm-Message-State: APjAAAV+J07amahA0XqDmsMq6nVo4Zrg7lm/KK/HpJHsLgCJnZGQjZNK
-        gGRKrCpvIVgCyO7b0uFLlQUDcjfP5lpAOFZkWfKZ7DKfztMJ2wSh0+hFnL4eYmmpMSLCI7OJHD0
-        YPSjgkToOiqt9
-X-Received: by 2002:a5d:6708:: with SMTP id o8mr6343832wru.296.1576156496980;
-        Thu, 12 Dec 2019 05:14:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwfIILiE0bsGuZKwQ+0ufP4htjxim2PfR+3JovR5iPj+PI79E6uhhtXaVikmm1YgkD8oUUC6Q==
-X-Received: by 2002:a5d:6708:: with SMTP id o8mr6343805wru.296.1576156496681;
-        Thu, 12 Dec 2019 05:14:56 -0800 (PST)
-Received: from steredhat ([95.235.120.92])
-        by smtp.gmail.com with ESMTPSA id e18sm5965389wrr.95.2019.12.12.05.14.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2019 05:14:56 -0800 (PST)
-Date:   Thu, 12 Dec 2019 14:14:53 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>, davem@davemloft.net
-Cc:     virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: accept only packets with the right dst_cid
-Message-ID: <20191212131453.yocx6wckoluwofbb@steredhat>
-References: <20191206143912.153583-1-sgarzare@redhat.com>
- <20191211110235-mutt-send-email-mst@kernel.org>
- <20191212123624.ahyhrny7u6ntn3xt@steredhat>
- <20191212075356-mutt-send-email-mst@kernel.org>
+        id S1729439AbfLLNcY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 08:32:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13948 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729302AbfLLNcY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 08:32:24 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCDWJdC041270
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 08:32:23 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wthkk20rt-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 08:32:22 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 12 Dec 2019 13:32:19 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Dec 2019 13:32:17 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCDWGsl36110556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 13:32:16 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 66E8DA4062;
+        Thu, 12 Dec 2019 13:32:16 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D988A405C;
+        Thu, 12 Dec 2019 13:32:16 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Dec 2019 13:32:16 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 1/9] s390x: saving regs for interrupts
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com
+References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
+ <1576079170-7244-2-git-send-email-pmorel@linux.ibm.com>
+ <19f572f1-5855-154a-af2b-1273d485be51@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 12 Dec 2019 14:32:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191212075356-mutt-send-email-mst@kernel.org>
+In-Reply-To: <19f572f1-5855-154a-af2b-1273d485be51@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121213-0020-0000-0000-0000039775DC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121213-0021-0000-0000-000021EE7EE0
+Message-Id: <eada4a92-afab-c6fa-a125-fdcc254643dd@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 mlxscore=0 suspectscore=0
+ spamscore=0 mlxlogscore=764 bulkscore=0 phishscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120103
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 07:56:26AM -0500, Michael S. Tsirkin wrote:
-> On Thu, Dec 12, 2019 at 01:36:24PM +0100, Stefano Garzarella wrote:
-> > On Wed, Dec 11, 2019 at 11:03:07AM -0500, Michael S. Tsirkin wrote:
-> > > On Fri, Dec 06, 2019 at 03:39:12PM +0100, Stefano Garzarella wrote:
-> > > > When we receive a new packet from the guest, we check if the
-> > > > src_cid is correct, but we forgot to check the dst_cid.
-> > > > 
-> > > > The host should accept only packets where dst_cid is
-> > > > equal to the host CID.
-> > > > 
-> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > 
-> > > Stefano can you clarify the impact pls?
-> > 
-> > Sure, I'm sorry I didn't do it earlier.
-> > 
-> > > E.g. is this needed on stable? Etc.
-> > 
-> > This is a better analysis (I hope) when there is a malformed guest
-> > that sends a packet with a wrong dst_cid:
-> > - before v5.4 we supported only one transport at runtime, so the sockets
-> >   in the host can only receive packets from guests. In this case, if
-> >   the dst_cid is wrong, maybe the only issue is that the getsockname()
-> >   returns an inconsistent address (the cid returned is the one received
-> >   from the guest)
-> > 
-> > - from v5.4 we support multi-transport, so the L1 VM (e.g. L0 assigned
-> >   cid 5 to this VM) can have both Guest2Host and Host2Guest transports.
-> >   In this case, we have these possible issues:
-> >   - L2 (or L1) guest can use cid 0, 1, and 2 to reach L1 (or L0),
-> >     instead we should allow only CID_HOST (2) to reach the level below.
-> >     Note: this happens also with not malformed guest that runs Linux v5.4
-> >   - if a malformed L2 guest sends a packet with the wrong dst_cid, for example
-> >     instead of CID_HOST, it uses the cid assigned by L0 to L1 (5 in this
-> >     example), this packets can wrongly queued to a socket on L1 bound to cid 5,
-> >     that only expects connections from L0.
+
+
+On 2019-12-12 10:24, Janosch Frank wrote:
+> On 12/11/19 4:46 PM, Pierre Morel wrote:
+>> If we use multiple source of interrupts, for exemple, using SCLP
 > 
-> Oh so a security issue?
+> s/exemple/example/
+
+OK, thanks
+
 > 
-
-It seems so, I'll try to see if I can get a real example,
-maybe I missed a few checks.
-
-> > 
-> > Maybe we really need this only on stable v5.4, but the patch is very simple
-> > and should apply cleanly to all stable branches.
-> > 
-> > What do you think?
-> > 
-> > Thanks,
-> > Stefano
+>> console to print information while using I/O interrupts, we need
+>> to have a re-entrant register saving interruption handling.
+>>
+>> Instead of saving at a static memory address, let's save the base
+>> registers and the floating point registers on the stack.
+>>
+>> Note that we keep the static register saving to recover from the
+>> RESET tests.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/cstart64.S | 25 +++++++++++++++++++++++--
+>>   1 file changed, 23 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+>> index 86dd4c4..ff05f9b 100644
+>> --- a/s390x/cstart64.S
+>> +++ b/s390x/cstart64.S
+>> @@ -118,6 +118,25 @@ memsetxc:
+>>   	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
+>>   	.endm
+>>> +	.macro SAVE_IRQ_REGS
 > 
-> I'd say it's better to backport to all stable releases where it applies,
-> but yes it's only a security issue in 5.4.  Dave could you forward pls?
+> Maybe add comments to the start of the macros like:
+> "Save registers on the stack, so we can have stacked interrupts."
 
-Yes, I agree with you.
+OK.
 
-@Dave let me know if I should do it.
+> 
+>> +	slgfi   %r15, 15 * 8
+>> +	stmg    %r0, %r14, 0(%r15)
+>> +	slgfi   %r15, 16 * 8
+>> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> +	std	\i, \i * 8(%r15)
+>> +	.endr
+>> +	lgr     %r2, %r15
+> 
+> What's that doing?
 
-Thanks,
-Stefano
+Passing a parameter to the saved registers to the handler.
+makes me think that since I reworked the interrupt handler to add 
+registration the parameter disappeared...
+
+I will remove this line and come back with a new series at the time we 
+need to access the registers.
+
+> 
+>> +	.endm
+>> +
+>> +	.macro RESTORE_IRQ_REGS
+>> +	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> +	ld	\i, \i * 8(%r15)
+>> +	.endr
+>> +	algfi   %r15, 16 * 8
+>> +	lmg     %r0, %r14, 0(%r15)
+>> +	algfi   %r15, 15 * 8
+>> +	.endm
+>> +
+>>   .section .text
+>>   /*
+>>    * load_reset calling convention:
+>> @@ -154,6 +173,8 @@ diag308_load_reset:
+>>   	lpswe	GEN_LC_SW_INT_PSW
+>>   1:	br	%r14
+>>   
+>> +
+>> +
+> 
+> Still not fixed
+
+sorry I did not see this
+
+Thanks for review,
+Regards,
+Pierre
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
