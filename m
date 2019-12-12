@@ -2,120 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 67B5C11CD22
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 13:27:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FA0511CD49
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 13:35:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729226AbfLLM0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 07:26:53 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:47930 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729092AbfLLM0x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 07:26:53 -0500
-Received: from zn.tnic (p200300EC2F0A5A00CC48E6B3BEAE7272.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:5a00:cc48:e6b3:beae:7272])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7E6341EC0CF2;
-        Thu, 12 Dec 2019 13:26:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1576153611;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=4nnUQORr01dv2OD8c5wfMXkKjRS70BcFeDE2vIOENyE=;
-        b=GGQjyQxlr2BIjMsm/DkgrYML2PlbdeQ23AAj8AL8zZsLdEGFpqWklMdrOSA1p6kXHl+0TD
-        4PVP3GRB/BU+2Op9INl4DrlIzJ+CHVnIuFZKeWSOLRXXKPlcR5QLp51FWpJ2Z1kEbJ5f/a
-        PRoHbEAVfhpA3Ic5/DUpTCVH6h3re90=
-Date:   Thu, 12 Dec 2019 13:26:46 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
- VMX_FEATURES_*
-Message-ID: <20191212122646.GE4991@zn.tnic>
-References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
- <20191128014016.4389-12-sean.j.christopherson@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191128014016.4389-12-sean.j.christopherson@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1729207AbfLLMfb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 07:35:31 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:57008 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729177AbfLLMfb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 07:35:31 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCCTpGa128359;
+        Thu, 12 Dec 2019 12:34:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=n1JBRyyfCwsCHYv3CHqoGwd85kLedGZ22Wnm/zj+jG0=;
+ b=OT/1j1tK0abiy5wwnE5NhUn83CiDA9dfgm1NfceOVUHSKUPTBAcIbhrXPAXH9jRLaP5L
+ sEeIBsq33bMGm5iaRBN3uIHjy/67+I+GDiHF46ySgbH4ClSK4DurTiNi/FT9gr/SHq2/
+ 8j5f7gtDq5k/Wbqs4mpz9JC29JEqEBSR6bgOaHZ3QO2BjkthdbIDYafAGTVdNwpnKVd5
+ 8/kuWWFDeL/tFVS2aZLaQeXw89An+FXsY/Gk+MiTtbNXlJCiyEkZAOOfVKgUaYeSE7wd
+ wsBk/hW/fociplvOOdTgHM8eFK2D7gYK5AWqEJRaKrKCtUpV8B7ahVz0voPx6UD/o02b tg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2wr4qrtn4f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 12:34:21 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCCYBjl123101;
+        Thu, 12 Dec 2019 12:34:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2wumvy3ffe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 12:34:20 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBCCXhC4029770;
+        Thu, 12 Dec 2019 12:33:43 GMT
+Received: from [192.168.14.112] (/109.65.223.49)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Dec 2019 04:33:42 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v4 2/2] kvm: Use huge pages for DAX-backed files
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20191211213207.215936-3-brho@google.com>
+Date:   Thu, 12 Dec 2019 14:33:36 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <376DB19A-4EF1-42BF-A73C-741558E397D4@oracle.com>
+References: <20191211213207.215936-1-brho@google.com>
+ <20191211213207.215936-3-brho@google.com>
+To:     Barret Rhoden <brho@google.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9468 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912120094
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9468 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912120094
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 05:40:08PM -0800, Sean Christopherson wrote:
-> Add support for generating VMX feature names in capflags.c and use the
-> resulting x86_vmx_flags to print the VMX flags in /proc/cpuinfo.  Don't
-> print VMX flags if no bits are set in word 0, which holds Pin Controls.
-> Pin Control's INTR and NMI exiting are fundamental pillars of VMX, if
-> they are not supported then the CPU is broken, it does not actually
-> support VMX, or the kernel wasn't built with support for the target CPU.
-> 
-> Print the features in a dedicated "vmx flags" line to avoid polluting
-> the common "flags" and to avoid having to prefix all flags with "vmx_",
-> which results in horrendously long names.
-> 
-> Keep synthetic VMX flags in cpufeatures to preserve /proc/cpuinfo's ABI
-> for those flags.  This means that "flags" and "vmx flags" will have
-> duplicate entries for tpr_shadow (virtual_tpr), vnmi (virtual_nmis),
-> ept, flexpriority, vpid and ept_ad, but caps the pollution of "flags" at
-> those six VMX features.  The vendor specific code that populates the
-> synthetic flags will be consolidated in a future patch to futher
-								^
 
-further
 
-> +#ifdef CONFIG_X86_VMX_FEATURE_NAMES
-> +	if (cpu_has(c, X86_FEATURE_VMX) && c->vmx_capability[0]) {
-> +		seq_puts(m, "\nvmx flags\t:");
-> +		for (i = 0; i < 32*NVMXINTS; i++) {
-> +			if (test_bit(i, (unsigned long *)c->vmx_capability) &&
-> +			    x86_vmx_flags[i] != NULL)
-> +				seq_printf(m, " %s", x86_vmx_flags[i]);
-> +		}
+> On 11 Dec 2019, at 23:32, Barret Rhoden <brho@google.com> wrote:
+>=20
+> This change allows KVM to map DAX-backed files made of huge pages with
+> huge mappings in the EPT/TDP.
+>=20
+> DAX pages are not PageTransCompound.  The existing check is trying to
+> determine if the mapping for the pfn is a huge mapping or not.  For
+> non-DAX maps, e.g. hugetlbfs, that means checking PageTransCompound.
+> For DAX, we can check the page table itself.
+
+For hugetlbfs pages, tdp_page_fault() -> mapping_level() -> =
+host_mapping_level() -> kvm_host_page_size() -> vma_kernel_pagesize()
+will return the page-size of the hugetlbfs without the need to parse the =
+page-tables.
+See vma->vm_ops->pagesize() callback implementation at =
+hugetlb_vm_ops->pagesize()=3D=3Dhugetlb_vm_op_pagesize().
+
+Only for pages that were originally mapped as small-pages and later =
+merged to larger pages by THP, there is a need to check for =
+PageTransCompound(). Again, instead of parsing page-tables.
+
+Therefore, it seems more logical to me that:
+(a) If DAX-backed files are mapped as large-pages to userspace, it =
+should be reflected in vma->vm_ops->page_size() of that mapping. Causing =
+kvm_host_page_size() to return the right size without the need to parse =
+the page-tables.
+(b) If DAX-backed files small-pages can be later merged to large-pages =
+by THP, then the =E2=80=9Cstruct page=E2=80=9D of these pages should be =
+modified as usual to make PageTransCompound() return true for them. =
+I=E2=80=99m not highly familiar with this mechanism, but I would expect =
+THP to be able to merge DAX-backed files small-pages to large-pages in =
+case DAX provides =E2=80=9Cstruct page=E2=80=9D for the DAX pages.
+
+>=20
+> Note that KVM already faulted in the page (or huge page) in the host's
+> page table, and we hold the KVM mmu spinlock.  We grabbed that lock in
+> kvm_mmu_notifier_invalidate_range_end, before checking the mmu seq.
+>=20
+> Signed-off-by: Barret Rhoden <brho@google.com>
+> ---
+> arch/x86/kvm/mmu/mmu.c | 36 ++++++++++++++++++++++++++++++++----
+> 1 file changed, 32 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f92b40d798c..cd07bc4e595f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3384,6 +3384,35 @@ static int kvm_handle_bad_page(struct kvm_vcpu =
+*vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> 	return -EFAULT;
+> }
+>=20
+> +static bool pfn_is_huge_mapped(struct kvm *kvm, gfn_t gfn, kvm_pfn_t =
+pfn)
+> +{
+> +	struct page *page =3D pfn_to_page(pfn);
+> +	unsigned long hva;
+> +
+> +	if (!is_zone_device_page(page))
+> +		return PageTransCompoundMap(page);
+> +
+> +	/*
+> +	 * DAX pages do not use compound pages.  The page should have =
+already
+> +	 * been mapped into the host-side page table during =
+try_async_pf(), so
+> +	 * we can check the page tables directly.
+> +	 */
+> +	hva =3D gfn_to_hva(kvm, gfn);
+> +	if (kvm_is_error_hva(hva))
+> +		return false;
+> +
+> +	/*
+> +	 * Our caller grabbed the KVM mmu_lock with a successful
+> +	 * mmu_notifier_retry, so we're safe to walk the page table.
+> +	 */
+> +	switch (dev_pagemap_mapping_shift(hva, current->mm)) {
+
+Doesn=E2=80=99t dev_pagemap_mapping_shift() get =E2=80=9Cstruct page=E2=80=
+=9D as first parameter?
+Was this changed by a commit I missed?
+
+-Liran
+
+> +	case PMD_SHIFT:
+> +	case PUD_SIZE:
+> +		return true;
 > +	}
-> +#endif
+> +	return false;
+> +}
+> +
+> static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
+> 					gfn_t gfn, kvm_pfn_t *pfnp,
+> 					int *levelp)
+> @@ -3398,8 +3427,8 @@ static void transparent_hugepage_adjust(struct =
+kvm_vcpu *vcpu,
+> 	 * here.
+> 	 */
+> 	if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
+> -	    !kvm_is_zone_device_pfn(pfn) && level =3D=3D =
+PT_PAGE_TABLE_LEVEL &&
+> -	    PageTransCompoundMap(pfn_to_page(pfn)) &&
+> +	    level =3D=3D PT_PAGE_TABLE_LEVEL &&
+> +	    pfn_is_huge_mapped(vcpu->kvm, gfn, pfn) &&
+> 	    !mmu_gfn_lpage_is_disallowed(vcpu, gfn, PT_DIRECTORY_LEVEL)) =
+{
+> 		unsigned long mask;
+> 		/*
+> @@ -6015,8 +6044,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct =
+kvm *kvm,
+> 		 * mapping if the indirect sp has level =3D 1.
+> 		 */
+> 		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
+> -		    !kvm_is_zone_device_pfn(pfn) &&
+> -		    PageTransCompoundMap(pfn_to_page(pfn))) {
+> +		    pfn_is_huge_mapped(kvm, sp->gfn, pfn)) {
+> 			pte_list_remove(rmap_head, sptep);
+>=20
+> 			if (kvm_available_flush_tlb_with_range())
+> --=20
+> 2.24.0.525.g8f36a354ae-goog
+>=20
 
-Oh well, some could be shorter:
-
-vmx flags       : virtual_nmis preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offsetting virtual_tpr mtf virt_apic_accesses ept vpid unrestricted_guest ple shadow_vmcs pml mode_based_ept_exec
-
-virtual_nmis		-> vnmis
-preemption_timer	-> preempt_tmr
-flexpriority		-> flexprio
-tsc_offsetting		-> tsc_ofs
-virtual_tpr		-> vtpr
-virt_apic_accesses	-> vapic
-unrestricted_guest	-> unres_guest
-
-and so on. Those are just my examples - I betcha the SDM is more
-creative here with abbreviations. But you guys are going to grep for
-them. If it were me, I'd save on typing. :-)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
