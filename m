@@ -2,84 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 885B011D52A
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:20:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 24E7711D52E
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:20:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730339AbfLLSUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 13:20:02 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:44930 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730168AbfLLSUB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 13:20:01 -0500
-Received: from zn.tnic (p200300EC2F0A5A0010289BED6992E3B4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:5a00:1028:9bed:6992:e3b4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id E054F1EC0CF2;
-        Thu, 12 Dec 2019 19:19:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1576174800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=x5mt3r12Tts+nYmDdCkFyw/k0XG+AEctVRLj3FhJsXw=;
-        b=Fg+X3WpDaehpIoSZ3uWhY53LeiHccCwa6Q2r81vWJ72MY4EtE8JXhUKeBkmQe8o/hqC6tB
-        vS5BR3qVfq4vnKYdXvUrqlk9IvCHPHvr2wAF0l0StcjWWYnfWQ92Ch4Wkr4Ma9jqJi6cvN
-        qAEt6sA4z1iA0J31l9aVJM66CnYaNas=
-Date:   Thu, 12 Dec 2019 19:19:52 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Subject: Re: [PATCH v4 01/19] x86/msr-index: Clean up bit defines for
- IA32_FEATURE_CONTROL MSR
-Message-ID: <20191212181952.GG4991@zn.tnic>
-References: <20191128014016.4389-2-sean.j.christopherson@intel.com>
- <201912010347.7tMb4moN%lkp@intel.com>
- <20191202190633.GG4063@linux.intel.com>
- <20191212092509.GB4991@zn.tnic>
- <20191212174801.GF3163@linux.intel.com>
+        id S1730361AbfLLSUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 13:20:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8324 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730349AbfLLSUP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 13:20:15 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCI9FH5081858
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 13:20:14 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf70t2wn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 13:20:14 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 12 Dec 2019 18:20:11 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 12 Dec 2019 18:20:08 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCIK7an39322082
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 18:20:08 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D73D2A405F;
+        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AB5CCA406A;
+        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 8/9] s390x: css: ssch/tsch with sense
+ and interrupt
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
+ <1576079170-7244-9-git-send-email-pmorel@linux.ibm.com>
+ <20191212132634.3a16a389.cohuck@redhat.com>
+ <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
+Date:   Thu, 12 Dec 2019 19:20:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191212174801.GF3163@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121218-0012-0000-0000-000003743795
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121218-0013-0000-0000-000021B014CF
+Message-Id: <96034dbc-489a-7f76-0402-d5c0c42d20b3@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_06:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 malwarescore=0
+ suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=777 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120140
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 09:48:01AM -0800, Sean Christopherson wrote:
-> I caught all the tools updates and addressed them in patch 03/19, "tools
-> arch x86: Sync msr-index.h from kernel sources".  Do you want those changes
-> folded into the rename itself?
 
-Nah, it's ok as it is.
 
-Thx.
+On 2019-12-12 15:10, Pierre Morel wrote:
+> 
+> 
+> On 2019-12-12 13:26, Cornelia Huck wrote:
+>> On Wed, 11 Dec 2019 16:46:09 +0100
+>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>
+
+...
+
+
+> 
+>>
+>> Also, doesn't the interrupt handler check for the intparm already?
+> 
+> Yes, if the interrupt fires.
+> 
+>>
+>>> +
+>>> +    senseid.cu_type = buffer[2] | (buffer[1] << 8);
+>>
+>> This still looks odd; why not have the ccw fill out the senseid
+>> structure directly?
+> 
+> Oh sorry, you already said and I forgot to modify this.
+> thanks
+
+hum, sorry, I forgot, the sense structure is not padded so I need this.
+
+Regards,
+Pierre
 
 -- 
-Regards/Gruss,
-    Boris.
+Pierre Morel
+IBM Lab Boeblingen
 
-https://people.kernel.org/tglx/notes-about-netiquette
