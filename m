@@ -2,178 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7186E11C09F
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 00:34:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3D011C119
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 01:08:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbfLKXeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Dec 2019 18:34:46 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:45084 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726890AbfLKXep (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Dec 2019 18:34:45 -0500
-Received: by mail-lf1-f65.google.com with SMTP id 203so171362lfa.12
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:34:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=McF4m/OHEBC1L05eglJmJ+UhN+oTS3o4fcogIM9KyH0=;
-        b=gPoCDuRLA2ViDUzUbkM3G3Kyn0SFQNWxjT+whG12NfO7GiTrZs/LjMAzjC0Xif25VD
-         fq6sTmg1Yrl4llSnmU7pKgyBrAv8MqwjdvELYIXpadZjLbzb4KXmj8Ie8UQlqYmvr1cT
-         RwIe3aqLO3jmw0ep20qFbwAmmxLrgQUADoSKc=
+        id S1727183AbfLLAIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Dec 2019 19:08:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38965 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727119AbfLLAIU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Dec 2019 19:08:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576109298;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3xw60aYtXUN1xhUN7efVaOJ9r/v7ZD0Ejg67xKxlTVk=;
+        b=Pmy9RZGe4BLtNLT8GcsUTPGVx9k4ko92viE26VkfxPDqY3sqYtAZCU6U8j3qYgi/GpOMmf
+        eA2pMPJ9lC7NmvUchmtj3Nt67ZTw+VZP38zJiBkdS9AXm5p6Fxb0RlURziaGQA4meFyRGA
+        qXCsbLJzd5XDemzC7goKYjemjgkq01I=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-WK2dQDzMPpSHukdfq_CIAQ-1; Wed, 11 Dec 2019 19:08:17 -0500
+X-MC-Unique: WK2dQDzMPpSHukdfq_CIAQ-1
+Received: by mail-wr1-f70.google.com with SMTP id u18so282251wrn.11
+        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 16:08:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=McF4m/OHEBC1L05eglJmJ+UhN+oTS3o4fcogIM9KyH0=;
-        b=sQfn1qBKBQ5Nb/Xyuj/XK/8tNQphdwi0kbaBlIJS+8wIVlHt97mmLUA5dF6tgH/Fmy
-         P76wEwMBK9+909ucJ5h4DOn3HzmqdT6Lh8rUfspb7e5oNNBo2/kV2EjFulXPQTlF1cu9
-         VEinyGZ13ZRfGA3Wnmjz41cxeKl16nBHZLDhxYpy7WE6j8aPFZk+ESHmA3LVeH25/M84
-         q1aB9xkwW8T41SqeiAfqwDiyWT7LZMe3NtKOzdveWQklfG0M86Ovs77120s4E1tv244g
-         Fzhb12/DdOMBQkGRiBpx0lH26SLXLPVnR36HDn9YxpUU4g4JOU0hu+6EiPwWaj1XVxmB
-         yt5w==
-X-Gm-Message-State: APjAAAUPhfVZdptKgIExPGOnZLaae6WMRITTfLR5S87rGocWvwNMy7db
-        +6+8718reqfWVJHxzeIOm19RFR7Qn28=
-X-Google-Smtp-Source: APXvYqyKyekNl+VEvD9LTCj5yptZU+QySST03oFfmJ9ejFh7fDlo+Yk/9mFyASsvnwqfz/3shD6LLA==
-X-Received: by 2002:ac2:4d04:: with SMTP id r4mr3818738lfi.77.1576107282860;
-        Wed, 11 Dec 2019 15:34:42 -0800 (PST)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
-        by smtp.gmail.com with ESMTPSA id a24sm1886560ljp.97.2019.12.11.15.34.42
-        for <kvm@vger.kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3xw60aYtXUN1xhUN7efVaOJ9r/v7ZD0Ejg67xKxlTVk=;
+        b=qeCVlUUqaPYZfmnfPKPcebjQdcoACXs08ssVk0WSKK2H03zqz7brqpDNGZ/+ZwoLVw
+         6cYD9SrxwBl9DIH9DIbL2QruHyBJbC65ADQfSkVSgKSWphH9+ubr5ZvBuhbps0hNun5Q
+         IPJv4xCWu82XxS7hUtHKKhBbJupBMnpmWXDbAUoeDlhK0lVrxGLKKDzMTXErAbTzCbM3
+         O6Gq3kYcOlGhZRCZpgCiaRt93uhCJFJGqkOSPD2q68TClvY4jxJAsq7KGzCEC9dXbCgY
+         ioy++09XZJV94uf2Xo9GQarNU7MnfJRiBOD3sjl4Csba6F7lonUZuIIPWurnHoosEgF5
+         hb0A==
+X-Gm-Message-State: APjAAAUdLgEC/tfmPXdSiyYrU8LrXhAn2w2tnkjZocNxXJBcHOj8O2PK
+        gaxP1pDYZLEj+9XzgOI6mBYzgQuZioVEFqw3Pk9Mjt+XmObHjcK5wIK4AfPtlsKNiS0WYTopaaE
+        JAHt3ndODF6UW
+X-Received: by 2002:a1c:49c3:: with SMTP id w186mr2906789wma.53.1576109295714;
+        Wed, 11 Dec 2019 16:08:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxoVRrcAD0KhLpnMl2le6nvx6cu8ZcWU4cMIAJiKSk9I63sxr2UQvQ2yso9I3jDHvbduYI06w==
+X-Received: by 2002:a1c:49c3:: with SMTP id w186mr2906747wma.53.1576109295300;
+        Wed, 11 Dec 2019 16:08:15 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+        by smtp.gmail.com with ESMTPSA id n12sm4202078wmd.1.2019.12.11.16.08.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Dec 2019 15:34:42 -0800 (PST)
-Received: by mail-lf1-f48.google.com with SMTP id m30so185089lfp.8
-        for <kvm@vger.kernel.org>; Wed, 11 Dec 2019 15:34:42 -0800 (PST)
-X-Received: by 2002:a05:6512:c7:: with SMTP id c7mr4092706lfp.120.1576107281798;
- Wed, 11 Dec 2019 15:34:41 -0800 (PST)
+        Wed, 11 Dec 2019 16:08:14 -0800 (PST)
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+To:     "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191211063830-mutt-send-email-mst@kernel.org> <20191211205952.GA5091@xz-x1>
+ <20191211172713-mutt-send-email-mst@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <46ceb88c-0ddd-0d9a-7128-3aa5a7d9d233@redhat.com>
+Date:   Thu, 12 Dec 2019 01:08:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <CAAfnVB=8aWSHXHOP8erepbuxOO_-yz04tm8ToA7pLwNAYqA-xQ@mail.gmail.com>
- <dee7353e807f5ea2c8a7e84623332f1b@www.loen.fr>
-In-Reply-To: <dee7353e807f5ea2c8a7e84623332f1b@www.loen.fr>
-From:   Gurchetan Singh <gurchetansingh@chromium.org>
-Date:   Wed, 11 Dec 2019 15:34:30 -0800
-X-Gmail-Original-Message-ID: <CAAfnVBmhusVt5yTGvh2KtcH_Q6gDdb-FXqY8JBuTKSPDXvGJOw@mail.gmail.com>
-Message-ID: <CAAfnVBmhusVt5yTGvh2KtcH_Q6gDdb-FXqY8JBuTKSPDXvGJOw@mail.gmail.com>
-Subject: Re: How to expose caching policy to a para-virtualized guest?
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191211172713-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 3:08 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Gurchetan,
->
-> I don't know anything about graphics API, so please bear with me.
+On 11/12/19 23:57, Michael S. Tsirkin wrote:
+>>> All these seem like arbitrary limitations to me.
+>>>
+>>> Sizing the ring correctly might prove to be a challenge.
+>>>
+>>> Thus I think there's value in resizing the rings
+>>> without destroying VCPU.
+>>
+>> Do you have an example on when we could use this feature?
+> 
+> So e.g. start with a small ring, and if you see stalls too often
+> increase it? Otherwise I don't see how does one decide
+> on ring size.
 
-Vulkan exposes the concept of memory types to userspace.  These memory
-types describe the memory properties of a heap.  For example, any
-memory type with the HOST_COHERENT_BIT specifies the application isn't
-required to send certain cache management commands
-(vkFlushMappedMemoryRanges, vkInvalidateMappedMemoryRanges).
+If you see stalls often, it means the guest is dirtying memory very
+fast.  Harvesting the ring puts back pressure on the guest, you may
+prefer a smaller ring size to avoid a bufferbloat-like situation.
 
-1) HOST_CACHED => cached, no cache management
-2) HOST_COHERENT_BIT => write combine, no cache management, no snooping
-3) HOST_COHERENT_BIT | HOST_CACHED => cached, gpu snoops cpu caches,
-no cache management
+Note that having a larger ring is better, even though it does incur a
+memory cost, because it means the migration thread will be able to reap
+the ring buffer asynchronously with no vmexits.
 
-Here's some more reading on that:
+With smaller ring sizes the cost of flushing the TLB when resetting the
+rings goes up, but the initial bulk copy phase _will_ have vmexits and
+then having to reap more dirty rings becomes more expensive and
+introduces some jitter.  So it will require some experimentation to find
+an optimal value.
 
-https://static.docs.arm.com/100019/0100/arm_mali_application_developer_best_practices_developer_guide_100019_0100_00_en2.pdf
+Anyway if in the future we go for resizable rings, KVM_ENABLE_CAP can be
+passed the largest desired size and then another ioctl can be introduced
+to set the mask for indices.
 
-(1) and (3) aren't too difficult -- just use
-KVM_SET_USER_MEMORY_REGION. (2) is, since it may lead to inconsistent
-mappings.
+>>> Also, power of two just saves a branch here and there,
+>>> but wastes lots of memory. Just wrap the index around to
+>>> 0 and then users can select any size?
+>>
+>> Same as above to postpone until we need it?
+> 
+> It's to save memory, don't we always need to do that?
 
-vmware has a very nice emulated solution for this:
+Does it really save that much memory?  Would it really be so beneficial
+to choose 12K entries rather than 8K or 16K in the ring?
 
-https://lwn.net/Articles/804114/
+>> My understanding of this is that normally we do only want either one
+>> of them depending on the major workload and the configuration of the
+>> guest.
+> 
+> And again how does one know which to enable? No one has the
+> time to fine-tune gazillion parameters.
 
-We're planning on building off vmware's solution, and if possible, add
-some additional optimizations.
+Hopefully we can always use just the ring buffer.
 
->
-> On 2019-12-11 01:32, Gurchetan Singh wrote:
-> > Hi,
-> >
-> > We're trying to implement Vulkan with virtio-gpu, and that API
-> > exposes
-> > the difference between cached and uncached mappings to userspace
-> > (i.e,
-> > some older GPUs can't snoop the CPU's caches).
-> >
-> > We need to make sure that the guest and host caching attributes are
-> > aligned, or there's a proper API between the virtio driver and device
-> > to ensure coherence.
->
-> I think you trying to cross two barriers at once here.
->
-> Virtio is always coherent between host and guest, and the guest should
-> use cacheable mappings. That's at least my expectation, and I don't
-> know of any exception to this rule.
+> IMHO a huge amount of benchmarking has to happen if you just want to
+> set this loose on users as default with these kind of
+> limitations. We need to be sure that even though in theory
+> it can be very bad, in practice it's actually good.
+> If it's auto-tuning then it's a much easier sell to upstream
+> even if there's a chance of some regressions.
 
-Where is this ruled stated?  We may need to modify the spec.  At the
-very least, we need anything mapped on the host with HOST_COHERENT_BIT
-only to be write combine in the guest.
+Auto-tuning is not a silver bullet, it requires just as much
+benchmarking to make sure that it doesn't oscillate crazily and that it
+actually outperforms a simple fixed size.
 
-However, there's an additional caveat: on x86, cache management
-(clflush) is available to the guest.  So it's possible to map host
-cached memory as write-combine, and import guest memory to Vulkan.
-This is an optimization limited to non-zero amount of x86 devices.
+>> Yeh kvm versioning could work too.  Here we can also return a zero
+>> just like the most of the caps (or KVM_DIRTY_LOG_PAGE_OFFSET as in the
+>> original patchset, but it's really helpless either because it's
+>> defined in uapi), but I just don't see how it helps...  So I returned
+>> a version number just in case we'd like to change the layout some day
+>> and when we don't want to bother introducing another cap bit for the
+>> same feature (like KVM_CAP_MANUAL_DIRTY_LOG_PROTECT and
+>> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2).
+> 
+> I guess it's up to Paolo but really I don't see the point.
+> You can add a version later when it means something ...
 
-So, something like arch_does_guest_attribute_matter() or
-arch_can_guest_flush() in the guest kernel would be useful.  But it
-doesn't sound like this is readily available?
+Yeah, we can return the maximum size of the ring buffer, too.
 
-> You have then the coherency of the physical device, and that's a host
-> kernel (and maybe userspace) matter. Why should the guest ever know
-> about
-> this constraint?
->
-> > One issue that needs to be addressed is the caching policy is
-> > variable
-> > dependent on the VM configuration and architecture.  For example, on
-> > x86, it looks like a MTRR controls whether the guest caching
-> > attribute
-> > predominates[1].  On ARM, it looks like the MMU registers control
-> > whether the guest can override the host attribute, but in general
-> > it's
-> > most restrictive attribute that makes a difference[2].  Let me if
-> > that's incorrect.
->
-> For ARM, this is true up to ARMv8.3. Starting with ARMv8.4, FWB gives
-> the hypervisor the opportunity to force memory mappings as cacheable
-> write-back. None of that is visible to userspace, thankfully.
+>> I'd say it won't be a big issue on locking 1/2M of host mem for a
+>> vm...
+>> Also note that if dirty ring is enabled, I plan to evaporate the
+>> dirty_bitmap in the next post. The old kvm->dirty_bitmap takes
+>> $GUEST_MEM/32K*2 mem.  E.g., for 64G guest it's 64G/32K*2=4M.  If with
+>> dirty ring of 8 vcpus, that could be 64K*8=0.5M, which could be even
+>> less memory used.
+> 
+> Right - I think Avi described the bitmap in kernel memory as one of
+> design mistakes. Why repeat that with the new design?
 
-Is there some open-source code available on ARM showing how the MMU is
-configured (which forces guest attribute override)?
+Do you have a source for that?  At least the dirty bitmap has to be
+accessed from atomic context so it seems unlikely that it can be moved
+to user memory.
 
->
-> > I'm wondering if there's some standard kernel API to query such
-> > attributes.  For example, something like
-> > arch_does_guest_attribute_matter() or arch_can_guest_flush() would do
-> > the trick.  Without this, we may need to introduce VIRTIO_GPU_F_*
-> > flags set by the host, but that may make the already giant QEMU
-> > command line even bigger.
->
-> If something has to manage the coherency, it should be the host that
-> knows how the memory traffic flows between host and guest, and apply
-> cache management as required. Note that on arm64, cache management
-> instructions are available from userspace. On systems that are
-> fully coherent, they are expected to be little more than NOPs.
->
->  From the above, it is pretty obvious that I don't understand what
-> problem you are trying to solve. Maybe you could explain how
-> you envisage things to work, who maps what where, and the expected
-> semantics. Once we have a common understanding of the problem,
-> maybe we can think of a decent solution.
->
-> Thanks,
->
->          M.
-> --
-> Jazz is not dead. It just smells funny...
+The dirty ring could use user memory indeed, but it would be much harder
+to set up (multiple ioctls for each ring?  what to do if userspace
+forgets one? etc.).  The mmap API is easier to use.
+
+>>>> +	entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+>>>> +	/*
+>>>> +	 * The ring buffer is shared with userspace, which might mmap
+>>>> +	 * it and concurrently modify slot and offset.  Userspace must
+>>>> +	 * not be trusted!  READ_ONCE prevents the compiler from changing
+>>>> +	 * the values after they've been range-checked (the checks are
+>>>> +	 * in kvm_reset_dirty_gfn).
+>>>
+>>> What it doesn't is prevent speculative attacks.  That's why things like
+>>> copy from user have a speculation barrier.  Instead of worrying about
+>>> that, unless it's really critical, I think you'd do well do just use
+>>> copy to/from user.
+
+An unconditional speculation barrier (lfence) is also expensive.  We
+already have macros to add speculation checks with array_index_nospec at
+the right places, for example __kvm_memslots.  We should add an
+array_index_nospec to id_to_memslot as well.  I'll send a patch for that.
+
+>>> What depends on what here? Looks suspicious ...
+>>
+>> Hmm, I think maybe it can be removed because the entry pointer
+>> reference below should be an ordering constraint already?
+
+entry->xxx depends on ring->reset_index.
+
+>>> what's the story around locking here? Why is it safe
+>>> not to take the lock sometimes?
+>>
+>> kvm_dirty_ring_push() will be with lock==true only when the per-vm
+>> ring is used.  For per-vcpu ring, because that will only happen with
+>> the vcpu context, then we don't need locks (so kvm_dirty_ring_push()
+>> is called with lock==false).
+
+FWIW this will be done much more nicely in v2.
+
+>>>> +	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+>>>> +	if (!page) {
+>>>> +		r = -ENOMEM;
+>>>> +		goto out_err_alloc_page;
+>>>> +	}
+>>>> +	kvm->vm_run = page_address(page);
+>>>
+>>> So 4K with just 8 bytes used. Not as bad as 1/2Mbyte for the ring but
+>>> still. What is wrong with just a pointer and calling put_user?
+>>
+>> I want to make it the start point for sharing fields between
+>> user/kernel per-vm.  Just like kvm_run for per-vcpu.
+
+This page is actually not needed at all.  Userspace can just map at
+KVM_DIRTY_LOG_PAGE_OFFSET, the indices reside there.  You can drop
+kvm_vm_run completely.
+
+>>>> +	} else {
+>>>> +		/*
+>>>> +		 * Put onto per vm ring because no vcpu context.  Kick
+>>>> +		 * vcpu0 if ring is full.
+>>>
+>>> What about tasks on vcpu 0? Do guests realize it's a bad idea to put
+>>> critical tasks there, they will be penalized disproportionally?
+>>
+>> Reasonable question.  So far we can't avoid it because vcpu exit is
+>> the event mechanism to say "hey please collect dirty bits".  Maybe
+>> someway is better than this, but I'll need to rethink all these
+>> over...
+> 
+> Maybe signal an eventfd, and let userspace worry about deciding what to
+> do.
+
+This has to be done synchronously.  But the vm ring should be used very
+rarely (it's for things like kvmclock updates that write to guest memory
+outside a vCPU), possibly a handful of times in the whole run of the VM.
+
+>>> KVM_DIRTY_RING_MAX_ENTRIES is not part of UAPI.
+>>> So how does userspace know what's legal?
+>>> Do you expect it to just try?
+>>
+>> Yep that's what I thought. :)
+
+We should return it for KVM_CHECK_EXTENSION.
+
+Paolo
+
