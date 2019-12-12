@@ -2,138 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B7B211CF79
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:13:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D164911CF86
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 15:16:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729673AbfLLONw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 09:13:52 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44901 "EHLO
+        id S1729678AbfLLOQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 09:16:39 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31472 "EHLO
         us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729560AbfLLONv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 09:13:51 -0500
+        by vger.kernel.org with ESMTP id S1729392AbfLLOQj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 09:16:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576160031;
+        s=mimecast20190719; t=1576160197;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+ZExjJXZmAxrisVlHnSSzmAF44okPSODnrWMGgB8ZBE=;
-        b=aIqcQsQXNrc8tYiriXSHQ1CbdhuKI8HlTnqvaMlqbOIjrBauLTjC+ySlulhogYTZ6KsOFU
-        pgThq5RA7DydALkyWOVHc3YETtY/Yxzvzc3Oa6wcl9Y+mozyQ3Thk2wR4txvwLS/GtfA7b
-        seZVWJXXOTiTrKj0UHepLmNxgeB9njU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-KKe_USCbPROCz7MNQh6q_w-1; Thu, 12 Dec 2019 09:13:49 -0500
-X-MC-Unique: KKe_USCbPROCz7MNQh6q_w-1
-Received: by mail-wm1-f69.google.com with SMTP id p2so906022wma.3
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 06:13:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+ZExjJXZmAxrisVlHnSSzmAF44okPSODnrWMGgB8ZBE=;
-        b=bIlDWEoouZwE/cFc/Ws5TVh9bZAlfVrWu4LaahR+sS3Em3FXDCg8T2gcletMGuYNh6
-         41vddZhg/1rF/MrSGxy5YgBGPOnJ6mgqF9Cg9EPg1zCDcD8m1KrOa/tD78smvOWdtDAb
-         ctQ9SYntvq07VQSgxXtKGH1OwQmFSqA/NywTdIpSJ9370cL7Yja/j3T2RfqB6uXuc1FI
-         jUQKP3p02U8H+LukwZjIlkS17pFlfAB6qTab+aEw5x7EneW5bApdRi6dFTGa0R0jAv/z
-         T/+nU8aMgCmF7bokxXv4GxpyTpJH1Um+X8P6txv50lb5m6+tqNtkpB64L622oxEPtFSh
-         pqig==
-X-Gm-Message-State: APjAAAWshHl3I8GJNyMxuVKXY/kaaCd/6HAB2X/z5jnggBPTKR2A+quh
-        fIFctAy/neS6L+3PhJuKjJ2U0xZq0ciiUyMon/resnpkqpmO4Bjmwoh6NnOTED8aD2lQ8zHrjCt
-        VZQ7T0fiTMN8c
-X-Received: by 2002:a1c:1d16:: with SMTP id d22mr7146068wmd.158.1576160028582;
-        Thu, 12 Dec 2019 06:13:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzXF4yU0mb+JGHuD4jVpmfrMhrWl7mkfC0/B+dcZzKjBOfKW3ZFj8XtTi3XukYIj/A/1colAQ==
-X-Received: by 2002:a1c:1d16:: with SMTP id d22mr7146033wmd.158.1576160028358;
-        Thu, 12 Dec 2019 06:13:48 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id v3sm6151298wml.47.2019.12.12.06.13.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Dec 2019 06:13:47 -0800 (PST)
-Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
- VMX_FEATURES_*
-To:     Borislav Petkov <bp@alien8.de>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
- <20191128014016.4389-12-sean.j.christopherson@intel.com>
- <20191212122646.GE4991@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
-Date:   Thu, 12 Dec 2019 15:13:45 +0100
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=phld+d0+NqsIs+aUQHmRnWvBC+6LlMl1TcBvnjd2Hcs=;
+        b=apW4R4kmJ9JjKNQTcAk/ndbL17Gi5W7LM7oxDLN6qqmCmAScMgg1jN26gsXq5U8PXJlCA0
+        h7HNHw4ZbCUoXrAsc6tb5xWGEN2ybkiiSjG+nwRj1O2J0j/urp2mWx+nIt/qPj7JnnD7Ap
+        IrncxVtu8rF6+303kw1XGoYVo26aLRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190--W6_lyBTNd6lSBLUHMg1zw-1; Thu, 12 Dec 2019 09:16:35 -0500
+X-MC-Unique: -W6_lyBTNd6lSBLUHMg1zw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97383DB69;
+        Thu, 12 Dec 2019 14:16:34 +0000 (UTC)
+Received: from [10.36.117.65] (ovpn-117-65.ams2.redhat.com [10.36.117.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 112FC6767D;
+        Thu, 12 Dec 2019 14:16:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 1/2] s390x: smp: Use full PSW to bringup
+ new cpu
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, linux-s390@vger.kernel.org
+References: <20191211115923.9191-1-frankja@linux.ibm.com>
+ <20191211115923.9191-2-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <fd066ef5-7255-be67-d280-9c6c2b23089e@redhat.com>
+Date:   Thu, 12 Dec 2019 15:16:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191212122646.GE4991@zn.tnic>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191211115923.9191-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/19 13:26, Borislav Petkov wrote:
+On 11.12.19 12:59, Janosch Frank wrote:
+> Up to now we ignored the psw mask and only used the psw address when
+> bringing up a new cpu. For DAT we need to also load the mask, so let's
+> do that.
 > 
-> vmx flags       : virtual_nmis preemption_timer invvpid ept_x_only ept_ad ept_1gb flexpriority tsc_offsetting virtual_tpr mtf virt_apic_accesses ept vpid unrestricted_guest ple shadow_vmcs pml mode_based_ept_exec
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/smp.c  | 2 ++
+>  s390x/cstart64.S | 2 +-
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> virtual_nmis		-> vnmis
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index f57f420..e17751a 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -185,6 +185,8 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>  	cpu->stack = (uint64_t *)alloc_pages(2);
+>  
+>  	/* Start without DAT and any other mask bits. */
+> +	cpu->lowcore->sw_int_psw.mask = psw.mask;
+> +	cpu->lowcore->sw_int_psw.addr = psw.addr;
+>  	cpu->lowcore->sw_int_grs[14] = psw.addr;
+>  	cpu->lowcore->sw_int_grs[15] = (uint64_t)cpu->stack + (PAGE_SIZE * 4);
+>  	lc->restart_new_psw.mask = 0x0000000180000000UL;
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 86dd4c4..e6a6bdb 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -159,7 +159,7 @@ smp_cpu_setup_state:
+>  	xgr	%r1, %r1
+>  	lmg     %r0, %r15, GEN_LC_SW_INT_GRS
+>  	lctlg   %c0, %c0, GEN_LC_SW_INT_CRS
+> -	br	%r14
+> +	lpswe	GEN_LC_SW_INT_PSW
+>  
+>  pgm_int:
+>  	SAVE_REGS
+> 
 
-Even vnmi
+Queued to
 
-> preemption_timer	-> preempt_tmr
+https://github.com/davidhildenbrand/kvm-unit-tests.git s390x-next
 
-I would prefer the full one here.
+Thanks!
 
-> flexpriority		-> flexprio
+-- 
+Thanks,
 
-Full name?
-
-> tsc_offsetting		-> tsc_ofs
-
-tsc_offset?
-
-> virtual_tpr		-> vtpr
-
-Do we need this?  It's usually included together with flexpriority.
-
-> virt_apic_accesses	-> vapic
-
-apicv
-
-> unrestricted_guest	-> unres_guest
-
-Full? Or just unrestricted
-
-In general I would stick to the same names as kvm_intel module
-parameters (sans "enable_" if applicable) and not even bother publishing
-the others.  Some features are either not used by KVM or available on
-all VMX processors.
-
-Paolo
-
-> and so on. Those are just my examples - I betcha the SDM is more
-> creative here with abbreviations. But you guys are going to grep for
-> them. If it were me, I'd save on typing. :-)
+David / dhildenb
 
