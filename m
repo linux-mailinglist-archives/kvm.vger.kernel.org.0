@@ -2,248 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB75811D421
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:35:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C102311D417
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 18:34:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730110AbfLLRfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 12:35:15 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24544 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730088AbfLLRfP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 12:35:15 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCHYju9053844
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 12:35:14 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t7edqq-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 12:35:08 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 12 Dec 2019 17:33:19 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 17:33:16 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCHXF3S45285574
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 17:33:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E9ECA4054;
-        Thu, 12 Dec 2019 17:33:15 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 36727A405B;
-        Thu, 12 Dec 2019 17:33:15 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 17:33:15 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 7/9] s390x: css: msch, enable test
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
- <1576079170-7244-8-git-send-email-pmorel@linux.ibm.com>
- <20191212130111.0f75fe7f.cohuck@redhat.com>
- <83d45c31-30c3-36e1-1d68-51b88448f4af@linux.ibm.com>
- <20191212151002.1c7ca4eb.cohuck@redhat.com>
- <c92089cf-39f4-3b64-79a8-3264654130b1@linux.ibm.com>
- <20191212153303.6444697e.cohuck@redhat.com>
- <a29048f4-1783-54c6-8bf3-91d573b2d49d@linux.ibm.com>
-Date:   Thu, 12 Dec 2019 18:33:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1730175AbfLLReO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 12:34:14 -0500
+Received: from mga09.intel.com ([134.134.136.24]:46445 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730104AbfLLReO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 12:34:14 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 09:34:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,306,1571727600"; 
+   d="scan'208";a="364042068"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga004.jf.intel.com with ESMTP; 12 Dec 2019 09:34:13 -0800
+Date:   Thu, 12 Dec 2019 09:34:13 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Barret Rhoden <brho@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+Subject: Re: [PATCH v4 2/2] kvm: Use huge pages for DAX-backed files
+Message-ID: <20191212173413.GC3163@linux.intel.com>
+References: <20191211213207.215936-1-brho@google.com>
+ <20191211213207.215936-3-brho@google.com>
 MIME-Version: 1.0
-In-Reply-To: <a29048f4-1783-54c6-8bf3-91d573b2d49d@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121217-4275-0000-0000-0000038E56E3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121217-4276-0000-0000-000038A211D3
-Message-Id: <d34fdb07-c2ff-3a1e-eb31-cf9d160ebac9@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_05:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 suspectscore=0
- mlxscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120137
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211213207.215936-3-brho@google.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2019-12-12 17:05, Pierre Morel wrote:
+On Wed, Dec 11, 2019 at 04:32:07PM -0500, Barret Rhoden wrote:
+> This change allows KVM to map DAX-backed files made of huge pages with
+> huge mappings in the EPT/TDP.
 > 
+> DAX pages are not PageTransCompound.  The existing check is trying to
+> determine if the mapping for the pfn is a huge mapping or not.  For
+> non-DAX maps, e.g. hugetlbfs, that means checking PageTransCompound.
+> For DAX, we can check the page table itself.
 > 
-> On 2019-12-12 15:33, Cornelia Huck wrote:
->> On Thu, 12 Dec 2019 15:21:21 +0100
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
->>> On 2019-12-12 15:10, Cornelia Huck wrote:
->>>> On Thu, 12 Dec 2019 15:01:07 +0100
->>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>> On 2019-12-12 13:01, Cornelia Huck wrote:
->>>>>> On Wed, 11 Dec 2019 16:46:08 +0100
->>>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>>>> A second step when testing the channel subsystem is to prepare a 
->>>>>>> channel
->>>>>>> for use.
->>>>>>> This includes:
->>>>>>> - Get the current SubCHannel Information Block (SCHIB) using STSCH
->>>>>>> - Update it in memory to set the ENABLE bit
->>>>>>> - Tell the CSS that the SCHIB has been modified using MSCH
->>>>>>> - Get the SCHIB from the CSS again to verify that the subchannel is
->>>>>>>      enabled.
->>>>>>>
->>>>>>> This tests the success of the MSCH instruction by enabling a 
->>>>>>> channel.
->>>>>>>
->>>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>>> ---
->>>>>>>     s390x/css.c | 65 
->>>>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>     1 file changed, 65 insertions(+)
->>>>>>> +    /* Read the SCHIB for this subchannel */
->>>>>>> +    cc = stsch(test_device_sid, &schib);
->>>>>>> +    if (cc) {
->>>>>>> +        report(0, "stsch cc=%d", cc);
->>>>>>> +        return;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    /* Update the SCHIB to enable the channel */
->>>>>>> +    pmcw->flags |= PMCW_ENABLE;
->>>>>>> +
->>>>>>> +    /* Tell the CSS we want to modify the subchannel */
->>>>>>> +    cc = msch(test_device_sid, &schib);
->>>>>>> +    if (cc) {
->>>>>>> +        /*
->>>>>>> +         * If the subchannel is status pending or
->>>>>>> +         * if a function is in progress,
->>>>>>> +         * we consider both cases as errors.
->>>>>>> +         */
->>>>>>> +        report(0, "msch cc=%d", cc);
->>>>>>> +        return;
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    /*
->>>>>>> +     * Read the SCHIB again to verify the enablement
->>>>>>> +     * insert a little delay and try 5 times.
->>>>>>> +     */
->>>>>>> +    do {
->>>>>>> +        cc = stsch(test_device_sid, &schib);
->>>>>>> +        if (cc) {
->>>>>>> +            report(0, "stsch cc=%d", cc);
->>>>>>> +            return;
->>>>>>> +        }
->>>>>>> +        delay(10);
->>>>>>
->>>>>> That's just a short delay to avoid a busy loop, right? msch should be
->>>>>> immediate,
->>>>>
->>>>> Thought you told to me that it may not be immediate in zVM did I
->>>>> misunderstand?
->>>>
->>>> Maybe I have been confusing... what I'm referring to is this
->>>> programming note for msch:
->>>>
->>>> "It is recommended that the program inspect the
->>>> contents of the subchannel by subsequently
->>>> issuing STORE SUBCHANNEL when MODIFY
->>>> SUBCHANNEL sets condition code 0. Use of
->>>> STORE SUBCHANNEL is a method for deter-
->>>> mining if the designated subchannel was
->>>> changed or not. Failure to inspect the subchan-
->>>> nel following the setting of condition code 0 by
->>>> MODIFY SUBCHANNEL may result in conditions
->>>> that the program does not expect to occur."
->>>>
->>>> That's exactly what we had to do under z/VM back then: do the msch,
->>>> check via stsch, redo the msch if needed, check again via stsch. It
->>>> usually worked with the second msch the latest.
->>>
->>> OK, I understand, then it is a bug in zVM that this test could 
->>> enlighten.
->>
->> Probably more a quirk than a bug... the explanation there is not
->> explicit about that :)
->>
->>>
->>> I think we should keep it so, it allows to recognize 3 cases (after I
->>> change to test ENABLE in the loop as I said I will):
->>> - immediate ENABLE
->>
->> This is the good case.
->>
->>> - asynchrone ENABLE
->>
->> This one I would consider an architecture violation.
->>
->>> - failure to ENABLE
->>
->> This is the quirk above.
->>
->> But I'm not quite sure how you would be able to distinguish the last
->> two cases?
+> Note that KVM already faulted in the page (or huge page) in the host's
+> page table, and we hold the KVM mmu spinlock.  We grabbed that lock in
+> kvm_mmu_notifier_invalidate_range_end, before checking the mmu seq.
 > 
-> This is where the delay can help.
-> But yes, not sure that we can differentiate this without to know how 
-> long we should delay.
+> Signed-off-by: Barret Rhoden <brho@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 36 ++++++++++++++++++++++++++++++++----
+>  1 file changed, 32 insertions(+), 4 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6f92b40d798c..cd07bc4e595f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3384,6 +3384,35 @@ static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+>  	return -EFAULT;
+>  }
+>  
+> +static bool pfn_is_huge_mapped(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
+> +{
+> +	struct page *page = pfn_to_page(pfn);
+> +	unsigned long hva;
+> +
+> +	if (!is_zone_device_page(page))
+> +		return PageTransCompoundMap(page);
+> +
+> +	/*
+> +	 * DAX pages do not use compound pages.  The page should have already
+> +	 * been mapped into the host-side page table during try_async_pf(), so
+> +	 * we can check the page tables directly.
+> +	 */
+> +	hva = gfn_to_hva(kvm, gfn);
+> +	if (kvm_is_error_hva(hva))
+> +		return false;
+> +
+> +	/*
+> +	 * Our caller grabbed the KVM mmu_lock with a successful
+> +	 * mmu_notifier_retry, so we're safe to walk the page table.
+> +	 */
+> +	switch (dev_pagemap_mapping_shift(hva, current->mm)) {
+> +	case PMD_SHIFT:
+> +	case PUD_SIZE:
+
+I assume this means DAX can have 1GB pages?  I ask because KVM's THP logic
+has historically relied on THP only supporting 2MB.  I cleaned this up in
+a recent series[*], which is in kvm/queue, but I obviously didn't actually
+test whether or not KVM would correctly handle 1GB non-hugetlbfs pages.
+
+The easiest thing is probably to rebase on kvm/queue.  You'll need to do
+that anyways, and I suspect doing so will help shake out any hiccups.
+
+[*] https://lkml.kernel.org/r/20191206235729.29263-1-sean.j.christopherson@intel.com
+
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
+>  					gfn_t gfn, kvm_pfn_t *pfnp,
+>  					int *levelp)
+> @@ -3398,8 +3427,8 @@ static void transparent_hugepage_adjust(struct kvm_vcpu *vcpu,
+>  	 * here.
+>  	 */
+>  	if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn) &&
+> -	    !kvm_is_zone_device_pfn(pfn) && level == PT_PAGE_TABLE_LEVEL &&
+> -	    PageTransCompoundMap(pfn_to_page(pfn)) &&
+> +	    level == PT_PAGE_TABLE_LEVEL &&
+> +	    pfn_is_huge_mapped(vcpu->kvm, gfn, pfn) &&
+>  	    !mmu_gfn_lpage_is_disallowed(vcpu, gfn, PT_DIRECTORY_LEVEL)) {
+>  		unsigned long mask;
+>  		/*
+> @@ -6015,8 +6044,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>  		 * mapping if the indirect sp has level = 1.
+>  		 */
+>  		if (sp->role.direct && !kvm_is_reserved_pfn(pfn) &&
+> -		    !kvm_is_zone_device_pfn(pfn) &&
+> -		    PageTransCompoundMap(pfn_to_page(pfn))) {
+> +		    pfn_is_huge_mapped(kvm, sp->gfn, pfn)) {
+>  			pte_list_remove(rmap_head, sptep);
+>  
+>  			if (kvm_available_flush_tlb_with_range())
+> -- 
+> 2.24.0.525.g8f36a354ae-goog
 > 
->>
->>>>>> and you probably should not delay on success?
->>>>>
->>>>> yes, it is not optimized, I can test PMCW_ENABLE in the loop this 
->>>>> way we
->>>>> can see if, in the zVM case we need to do retries or not.
->>>>>
->>>>>>> +    } while (!(pmcw->flags & PMCW_ENABLE) && count++ < 5);
->>>>>>
->>>>>> How is this supposed to work? Doesn't the stsch overwrite the control
->>>>>> block again, so you need to re-set the enable bit before you retry?
->>>>>
->>>>> I do not think so, there is no msch() in the loop.
->>>>> Do I miss something?
->>>>
->>>> Well, _I_ missed that the msch() was missing :) You need it (see 
->>>> above);
->>>> just waiting and re-doing the stsch is useless, as msch is a
->>>> synchronous instruction which has finished its processing after the cc
->>>> has been set.
->>>
->>> Since kvm-unit-test is a test system, not an OS so I think that here we
->>> have one more point to leverage the enable function:
->>> - We need to test the enable (what I did (partially))
->>
->> Maybe also log if you needed to retry? Not as an error, but as
->> additional information?
-> 
-> Yes.
-> 
-> Regards,
-> Pierre
-> 
-
-After all, I make it simple by testing if the MSCH works as expected, no 
-retry, no delay.
-This is just a test.
-
-I will add a new patch to add a library function to enable the channel, 
-with retry to serve when we really need to enable the channel, not to test.
-
-Regards,
-Pierre
-
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
-
