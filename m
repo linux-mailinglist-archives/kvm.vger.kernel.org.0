@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A173011C823
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 09:24:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B601211C821
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 09:24:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728201AbfLLITU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728286AbfLLITU (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 12 Dec 2019 03:19:20 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7223 "EHLO huawei.com"
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7224 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728266AbfLLITS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 03:19:18 -0500
+        id S1728267AbfLLITT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 03:19:19 -0500
 Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 0DD7949115BDF9A61BEA;
+        by Forcepoint Email with ESMTP id 15CED9057459FCEC7938;
         Thu, 12 Dec 2019 16:19:17 +0800 (CST)
 Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
  (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 12 Dec 2019
- 16:19:05 +0800
+ 16:19:07 +0800
 From:   linmiaohe <linmiaohe@huawei.com>
 To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <sean.j.christopherson@intel.com>, <vkuznets@redhat.com>,
@@ -25,9 +25,9 @@ To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <hpa@zytor.com>
 CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2 3/4] KVM: Fix some writing mistakes and wrong function name in comments
-Date:   Thu, 12 Dec 2019 16:18:37 +0800
-Message-ID: <1576138718-32728-4-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH v2 4/4] KVM: hyperv: Fix some typos in vcpu unimpl info
+Date:   Thu, 12 Dec 2019 16:18:38 +0800
+Message-ID: <1576138718-32728-5-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576138718-32728-1-git-send-email-linmiaohe@huawei.com>
 References: <1576138718-32728-1-git-send-email-linmiaohe@huawei.com>
@@ -42,46 +42,44 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-Fix some writing mistakes in the comments. And mmu_check_roots is a typo
-for mmu_check_root.
+Fix some typos in vcpu unimpl info and a writing error in the comment.
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- virt/kvm/kvm_main.c | 6 +++---
+ arch/x86/kvm/hyperv.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3aa21bec028d..94ec01af708b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -964,7 +964,7 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index c7d4640b7b1c..b255b9e865e5 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1059,7 +1059,7 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+ 			return 1;
+ 		break;
+ 	default:
+-		vcpu_unimpl(vcpu, "Hyper-V uhandled wrmsr: 0x%x data 0x%llx\n",
++		vcpu_unimpl(vcpu, "Hyper-V unhandled wrmsr: 0x%x data 0x%llx\n",
+ 			    msr, data);
+ 		return 1;
+ 	}
+@@ -1122,7 +1122,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 			return 1;
  
- 	/*
- 	 * Increment the new memslot generation a second time, dropping the
--	 * update in-progress flag and incrementing then generation based on
-+	 * update in-progress flag and incrementing the generation based on
- 	 * the number of address spaces.  This provides a unique and easily
- 	 * identifiable generation number while the memslots are in flux.
- 	 */
-@@ -1117,7 +1117,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		 *
- 		 * validation of sp->gfn happens in:
- 		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
--		 *	- kvm_is_visible_gfn (mmu_check_roots)
-+		 *	- kvm_is_visible_gfn (mmu_check_root)
+ 		/*
+-		 * Clear apic_assist portion of f(struct hv_vp_assist_page
++		 * Clear apic_assist portion of struct hv_vp_assist_page
+ 		 * only, there can be valuable data in the rest which needs
+ 		 * to be preserved e.g. on migration.
  		 */
- 		kvm_arch_flush_shadow_memslot(kvm, slot);
- 
-@@ -1519,7 +1519,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
- /*
-  * The fast path to get the writable pfn which will be stored in @pfn,
-  * true indicates success, otherwise false is returned.  It's also the
-- * only part that runs if we can are in atomic context.
-+ * only part that runs if we are in atomic context.
-  */
- static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
- 			    bool *writable, kvm_pfn_t *pfn)
+@@ -1179,7 +1179,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 			return 1;
+ 		break;
+ 	default:
+-		vcpu_unimpl(vcpu, "Hyper-V uhandled wrmsr: 0x%x data 0x%llx\n",
++		vcpu_unimpl(vcpu, "Hyper-V unhandled wrmsr: 0x%x data 0x%llx\n",
+ 			    msr, data);
+ 		return 1;
+ 	}
 -- 
 2.19.1
 
