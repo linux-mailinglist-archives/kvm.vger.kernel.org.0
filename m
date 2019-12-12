@@ -2,113 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24E7711D52E
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50F9611D539
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 19:23:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730361AbfLLSUQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 13:20:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8324 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730349AbfLLSUP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 13:20:15 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCI9FH5081858
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 13:20:14 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf70t2wn-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 13:20:14 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 12 Dec 2019 18:20:11 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 18:20:08 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCIK7an39322082
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 18:20:08 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D73D2A405F;
-        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AB5CCA406A;
-        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 18:20:07 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 8/9] s390x: css: ssch/tsch with sense
- and interrupt
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
- <1576079170-7244-9-git-send-email-pmorel@linux.ibm.com>
- <20191212132634.3a16a389.cohuck@redhat.com>
- <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
-Date:   Thu, 12 Dec 2019 19:20:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121218-0012-0000-0000-000003743795
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121218-0013-0000-0000-000021B014CF
-Message-Id: <96034dbc-489a-7f76-0402-d5c0c42d20b3@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_06:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 clxscore=1015 malwarescore=0
- suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0 spamscore=0
- mlxscore=0 mlxlogscore=777 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120140
+        id S1730346AbfLLSWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 13:22:54 -0500
+Received: from mail-qv1-f74.google.com ([209.85.219.74]:52070 "EHLO
+        mail-qv1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730110AbfLLSWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 13:22:54 -0500
+Received: by mail-qv1-f74.google.com with SMTP id x22so2004656qvc.18
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 10:22:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=rEnziU9nLlHlYc/tf137lSRc7sdTqh5wg35Mf+C3wB0=;
+        b=wOmXzfFazrugxZCYf410kz6njqqI2ZayPQ3Zp1rCCJAl61eXIHZJMLIXKd7ipcL41R
+         Sm+Wcca2Q6JqgT++kdbvjzbjYq0FYVW/lmi7QB7yJwkVuo4MV424+x+d7yCwKx0ttep0
+         Lptl32SFvhXt0TyRQZlvv9SqXlyRFpCG1TsG3O7/iQ2t4vkLUnHSfRpXrHshDh35/gFo
+         c/KEVVI0neOaMUy1YUeklfjbepAMeO7ukOv7HLZ0ISIwDFMKd/GAqrrKh7r8JeBNqa+r
+         SbafHPrcaqVH22AN6GG+pQawROsiZA4u3mp/RCCP/9BjFwd9lIMMNNZaOz5x++hHZB3m
+         2fSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=rEnziU9nLlHlYc/tf137lSRc7sdTqh5wg35Mf+C3wB0=;
+        b=Vac+jCaLPo+iIsWxTr0grRNKfD8qF8MEUOg0zXsCNuBGJPvxYSytDZj3Jed4pwOc+r
+         /t/nBMZrFwx2RYvX6dY7x0rcQFAnNIjMEqn5D3nEVeR/mn6vrbpnclPvygulObmHpqu0
+         8llTCramnZb12W7CIygkoG4u5ptbnME38lI1s8aOGewQpTVYA3jQrrLA7eQUbb2Gov3E
+         LaR7kjS0nirhUI0ecMFU9zGVmbVpsS75+cpXab6WZQ+H3mVCessWIKTd8a3LZf01d7OT
+         KNRh5gEt2RuB0ljRF58lAKUUrl4XsoEWXyEAiapq+W2Fu4UCH8qd3kCE/Fe60BKYauqL
+         ZAZg==
+X-Gm-Message-State: APjAAAXljZ5pNG31Re8XrZ+vI07HSLi9wwh7sx3CP0+GW5ayc9l3Rt4S
+        s/PDEWgaEA4fOPGaHZl3aLw5UmVr
+X-Google-Smtp-Source: APXvYqzcW/ZghkfJqEYc4rFEK2YkEyqYYEYYl+bxHBfcPF4MTg+EIi+2m6XM7rKZ/g0d94tGM2bioMma
+X-Received: by 2002:ac8:5308:: with SMTP id t8mr8677688qtn.51.1576174973189;
+ Thu, 12 Dec 2019 10:22:53 -0800 (PST)
+Date:   Thu, 12 Dec 2019 13:22:36 -0500
+Message-Id: <20191212182238.46535-1-brho@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
+Subject: [PATCH v5 0/2] kvm: Use huge pages for DAX-backed files
+From:   Barret Rhoden <brho@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This patchset allows KVM to map huge pages for DAX-backed files.
 
+v4 -> v5:
+v4: https://lore.kernel.org/lkml/20191211213207.215936-1-brho@google.com/
+- Rebased onto kvm/queue
+- Removed the switch statement and fixed PUD_SIZE; just use
+  dev_pagemap_mapping_shift() > PAGE_SHIFT
+- Added explanation of parameter changes to patch 1's commit message
 
-On 2019-12-12 15:10, Pierre Morel wrote:
-> 
-> 
-> On 2019-12-12 13:26, Cornelia Huck wrote:
->> On Wed, 11 Dec 2019 16:46:09 +0100
->> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>
+v3 -> v4:
+v3: https://lore.kernel.org/lkml/20190404202345.133553-1-brho@google.com/
+- Rebased onto linus/master
 
-...
+v2 -> v3:
+v2: https://lore.kernel.org/lkml/20181114215155.259978-1-brho@google.com/
+- Updated Acks/Reviewed-by
+- Rebased onto linux-next
 
+v1 -> v2:
+https://lore.kernel.org/lkml/20181109203921.178363-1-brho@google.com/
+- Updated Acks/Reviewed-by
+- Minor touchups
+- Added patch to remove redundant PageReserved() check
+- Rebased onto linux-next
 
-> 
->>
->> Also, doesn't the interrupt handler check for the intparm already?
-> 
-> Yes, if the interrupt fires.
-> 
->>
->>> +
->>> +    senseid.cu_type = buffer[2] | (buffer[1] << 8);
->>
->> This still looks odd; why not have the ccw fill out the senseid
->> structure directly?
-> 
-> Oh sorry, you already said and I forgot to modify this.
-> thanks
+RFC/discussion thread:
+https://lore.kernel.org/lkml/20181029210716.212159-1-brho@google.com/
 
-hum, sorry, I forgot, the sense structure is not padded so I need this.
+Barret Rhoden (2):
+  mm: make dev_pagemap_mapping_shift() externally visible
+  kvm: Use huge pages for DAX-backed files
 
-Regards,
-Pierre
+ arch/x86/kvm/mmu/mmu.c | 31 +++++++++++++++++++++++++++----
+ include/linux/mm.h     |  3 +++
+ mm/memory-failure.c    | 38 +++-----------------------------------
+ mm/util.c              | 34 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 67 insertions(+), 39 deletions(-)
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.24.0.525.g8f36a354ae-goog
 
