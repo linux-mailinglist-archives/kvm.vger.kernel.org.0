@@ -2,151 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4BC711D136
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:40:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C6F11D187
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 16:54:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729432AbfLLPk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 10:40:58 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:42907 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729013AbfLLPk6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 10:40:58 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1ifQaG-0003ws-9n; Thu, 12 Dec 2019 16:40:56 +0100
-To:     James Morse <james.morse@arm.com>
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: Re-check VMA on detecting a  poisoned page
-X-PHP-Originating-Script: 0:main.inc
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Thu, 12 Dec 2019 15:40:56 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>
-In-Reply-To: <b0a2b074-b80f-84ee-bfaa-f81ab345b8c2@arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-3-maz@kernel.org>
- <88f65ab4ac87f53534fbbfd2410d1cc5@www.loen.fr>
- <b0a2b074-b80f-84ee-bfaa-f81ab345b8c2@arm.com>
-Message-ID: <238ff4a1b763f51cc1f8670bfc72fc15@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: james.morse@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+        id S1729633AbfLLPyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 10:54:21 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:43810 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729247AbfLLPyU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 10:54:20 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCFnTus110391;
+        Thu, 12 Dec 2019 15:52:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=Xn0flDReye6aR5I2+sBndrykdJvUw4tnWd/w/4iOE8I=;
+ b=UvraykOmy/BoiCbihwwgJ9btFSG162/cAbspyKksvLqIfIz0sm/fcwN/Gh1TU8kKyEUj
+ +khYN0y5CXpHVcYEjqXaSIei8vQ1QgWIWCpgwC1ikZDB8Pha17oHp0GKxmz/UfTGG2W7
+ wh3T0gzDIKcrgo1Ge2TS5UL0ec2RBxiWz8xGDixlkp9tDVfocrwpeC8lOHwGD0fd+njU
+ dadP0SS6RDLhOsTe/H0rlNOsTA8V3VmSkw2jkHRcYtF8NpqSesV5uk8r3rkQA2G1ocjb
+ hg0SYIEQ87hRJEKJKvT4CSDqTnJZSkk1QSJ5GJ4xsT1EFly2YdF5V5A4etvD6eKpJWR7 IQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2wr41qkw18-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 15:52:29 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBCFnQJW135560;
+        Thu, 12 Dec 2019 15:52:28 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2wumk6cv32-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Dec 2019 15:52:28 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBCFqJbt028969;
+        Thu, 12 Dec 2019 15:52:20 GMT
+Received: from [192.168.14.112] (/109.65.223.49)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 12 Dec 2019 07:52:19 -0800
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v4 11/19] x86/cpu: Print VMX flags in /proc/cpuinfo using
+ VMX_FEATURES_*
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
+Date:   Thu, 12 Dec 2019 17:52:12 +0200
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+        Len Brown <lenb@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4A24DE75-4E68-4EC6-B3F3-4ACB0EE82BF0@oracle.com>
+References: <20191128014016.4389-1-sean.j.christopherson@intel.com>
+ <20191128014016.4389-12-sean.j.christopherson@intel.com>
+ <20191212122646.GE4991@zn.tnic>
+ <d0b21e7e-69f5-09f9-3e1c-14d49fa42b9f@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=610
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912120123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9469 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=677 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912120123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi James,
 
-On 2019-12-12 15:34, James Morse wrote:
-> Hi Marc,
->
-> On 12/12/2019 11:33, Marc Zyngier wrote:
->> On 2019-12-11 16:56, Marc Zyngier wrote:
->>> When we check for a poisoned page, we use the VMA to tell userspace
->>> about the looming disaster. But we pass a pointer to this VMA
->>> after having released the mmap_sem, which isn't a good idea.
->
-> Sounds like a bug! The vma-size might not match the poisoned pfn.
->
->
->>> Instead, re-check that we have still have a VMA, and that this
->>> VMA still points to a poisoned page. If the VMA isn't there,
->>> userspace is playing with our nerves, so lety's give it a -EFAULT
->>> (it deserves it). If the PFN isn't poisoned anymore, let's restart
->>> from the top and handle the fault again.
->
->
->>>  virt/kvm/arm/mmu.c | 25 +++++++++++++++++++++++--
->>>  1 file changed, 23 insertions(+), 2 deletions(-)
->
-> ... yeah ...
->
 
-[...]
+> On 12 Dec 2019, at 16:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 12/12/19 13:26, Borislav Petkov wrote:
+>>=20
+>> vmx flags       : virtual_nmis preemption_timer invvpid ept_x_only =
+ept_ad ept_1gb flexpriority tsc_offsetting virtual_tpr mtf =
+virt_apic_accesses ept vpid unrestricted_guest ple shadow_vmcs pml =
+mode_based_ept_exec
+>>=20
+>> virtual_nmis		-> vnmis
+>=20
+> Even vnmi
+>=20
+>> preemption_timer	-> preempt_tmr
+>=20
+> I would prefer the full one here.
+>=20
+>> flexpriority		-> flexprio
+>=20
+> Full name?
+>=20
+>> tsc_offsetting		-> tsc_ofs
+>=20
+> tsc_offset?
+>=20
+>> virtual_tpr		-> vtpr
+>=20
+> Do we need this?  It's usually included together with flexpriority.
+>=20
+>> virt_apic_accesses	-> vapic
+>=20
+> apicv
 
-> How about (untested):
-> -------------------------%<-------------------------
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 38b4c910b6c3..80212d4935bd 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1591,16 +1591,8 @@ static void
-> invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned
-> long size)
->         __invalidate_icache_guest_page(pfn, size);
->  }
->
-> -static void kvm_send_hwpoison_signal(unsigned long address,
-> -                                    struct vm_area_struct *vma)
-> +static void kvm_send_hwpoison_signal(unsigned long address, short 
-> lsb)
->  {
-> -       short lsb;
-> -
-> -       if (is_vm_hugetlb_page(vma))
-> -               lsb = huge_page_shift(hstate_vma(vma));
-> -       else
-> -               lsb = PAGE_SHIFT;
-> -
->         send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, 
-> current);
->  }
->
-> @@ -1673,6 +1665,7 @@ static int user_mem_abort(struct kvm_vcpu
-> *vcpu, phys_addr_t fault_ipa,
->         struct kvm *kvm = vcpu->kvm;
->         struct kvm_mmu_memory_cache *memcache = 
-> &vcpu->arch.mmu_page_cache;
->         struct vm_area_struct *vma;
-> +       short stage1_vma_size;
->         kvm_pfn_t pfn;
->         pgprot_t mem_type = PAGE_S2;
->         bool logging_active = memslot_is_logging(memslot);
->
-> @@ -1703,6 +1696,12 @@ static int user_mem_abort(struct kvm_vcpu
-> *vcpu, phys_addr_t fault_ipa,
->                 vma_pagesize = PAGE_SIZE;
->         }
->
-> +       /* For signals due to hwpoison, we need to use the stage1 
-> size */
-> +       if (is_vm_hugetlb_page(vma))
-> +               stage1_vma_size = huge_page_shift(hstate_vma(vma));
-> +       else
-> +               stage1_vma_size = PAGE_SHIFT;
-> +
->         /*
->          * The stage2 has a minimum of 2 level table (For arm64 see
->          * kvm_arm_setup_stage2()). Hence, we are guaranteed that we 
-> can
-> @@ -1735,7 +1734,7 @@ static int user_mem_abort(struct kvm_vcpu
-> *vcpu, phys_addr_t fault_ipa,
->
->         pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
->         if (pfn == KVM_PFN_ERR_HWPOISON) {
-> -               kvm_send_hwpoison_signal(hva, vma);
-> +               kvm_send_hwpoison_signal(hva, stage1_vma_size);
->                 return 0;
->         }
->         if (is_error_noslot_pfn(pfn))
-> -------------------------%<-------------------------
->
-> Its possible this could even be the original output of
-> vma_kernel_pagesize()... (Punit supplied the original
-> huge_page_shift(hstate_vma()) runes...)
+Frankly, I dislike APICv terminology. I prefer to enumerate the various =
+VMX features which are collectively called APICv by KVM.
+APICv currently represents in KVM terminology the combination of =
+APIC-register virtualization, virtual-interrupt-delivery and =
+posted-interrupts (See cpu_has_vmx_apicv()).
 
-I'd be happy with something along these lines. Any chance you could
-a proper patch?
+In fact, the coupling of =E2=80=9Cenable_apicv=E2=80=9D module parameter =
+have made me multiple times to need to disable entire APICv features =
+when there for example was only a bug in posted-interrupts.
 
-Thanks,
+Even you got confused as virtualize-apic-access is not part of KVM=E2=80=99=
+s APICv terminology but rather it=E2=80=99s enablement depend on =
+flexpriority_enabled (See cpu_need_virtualize_apic_accesses()). i.e. It =
+can be used for faster intercept handling of accesses to guest xAPIC =
+MMIO page.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+>=20
+>> unrestricted_guest	-> unres_guest
+>=20
+> Full? Or just unrestricted
+
+I prefer unrestricted_guest.
+
+>=20
+> In general I would stick to the same names as kvm_intel module
+> parameters (sans "enable_" if applicable) and not even bother =
+publishing
+> the others.  Some features are either not used by KVM or available on
+> all VMX processors.
+>=20
+> Paolo
+>=20
+>> and so on. Those are just my examples - I betcha the SDM is more
+>> creative here with abbreviations. But you guys are going to grep for
+>> them. If it were me, I'd save on typing. :-)
+>=20
+
