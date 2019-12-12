@@ -2,18 +2,18 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7101011C828
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 09:24:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A173011C823
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 09:24:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728230AbfLLITO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 03:19:14 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45340 "EHLO huawei.com"
+        id S1728201AbfLLITU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 03:19:20 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7223 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728207AbfLLITN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 03:19:13 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 3D6F785B90A2B857FD5C;
-        Thu, 12 Dec 2019 16:19:12 +0800 (CST)
+        id S1728266AbfLLITS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 03:19:18 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 0DD7949115BDF9A61BEA;
+        Thu, 12 Dec 2019 16:19:17 +0800 (CST)
 Received: from huawei.com (10.175.105.18) by DGGEMS407-HUB.china.huawei.com
  (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 12 Dec 2019
  16:19:05 +0800
@@ -25,9 +25,9 @@ To:     <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
         <hpa@zytor.com>
 CC:     <linmiaohe@huawei.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <x86@kernel.org>
-Subject: [PATCH v2 2/4] KVM: x86: Fix some comment typos and grammar mistakes
-Date:   Thu, 12 Dec 2019 16:18:36 +0800
-Message-ID: <1576138718-32728-3-git-send-email-linmiaohe@huawei.com>
+Subject: [PATCH v2 3/4] KVM: Fix some writing mistakes and wrong function name in comments
+Date:   Thu, 12 Dec 2019 16:18:37 +0800
+Message-ID: <1576138718-32728-4-git-send-email-linmiaohe@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576138718-32728-1-git-send-email-linmiaohe@huawei.com>
 References: <1576138718-32728-1-git-send-email-linmiaohe@huawei.com>
@@ -42,61 +42,46 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Miaohe Lin <linmiaohe@huawei.com>
 
-Fix some typos and grammar mistakes in comments.
+Fix some writing mistakes in the comments. And mmu_check_roots is a typo
+for mmu_check_root.
 
 Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 +-
- arch/x86/kvm/ioapic.c           | 2 +-
- arch/x86/kvm/lapic.c            | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ virt/kvm/kvm_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 159a28512e4c..e714e281e17a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -606,7 +606,7 @@ struct kvm_vcpu_arch {
- 	 * Paging state of an L2 guest (used for nested npt)
- 	 *
- 	 * This context will save all necessary information to walk page tables
--	 * of the an L2 guest. This context is only initialized for page table
-+	 * of an L2 guest. This context is only initialized for page table
- 	 * walking and not for faulting since we never handle l2 page faults on
- 	 * the host.
- 	 */
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 77538fd77dc2..7312aab33298 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -189,7 +189,7 @@ static int ioapic_set_irq(struct kvm_ioapic *ioapic, unsigned int irq,
- 	/*
- 	 * Return 0 for coalesced interrupts; for edge-triggered interrupts,
- 	 * this only happens if a previous edge has not been delivered due
--	 * do masking.  For level interrupts, the remote_irr field tells
-+	 * to masking.  For level interrupts, the remote_irr field tells
- 	 * us if the interrupt is waiting for an EOI.
- 	 *
- 	 * RTC is special: it is edge-triggered, but userspace likes to know
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 679692b55f6d..88c3c0c6d1e3 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -964,12 +964,12 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
- }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3aa21bec028d..94ec01af708b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -964,7 +964,7 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
  
+ 	/*
+ 	 * Increment the new memslot generation a second time, dropping the
+-	 * update in-progress flag and incrementing then generation based on
++	 * update in-progress flag and incrementing the generation based on
+ 	 * the number of address spaces.  This provides a unique and easily
+ 	 * identifiable generation number while the memslots are in flux.
+ 	 */
+@@ -1117,7 +1117,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		 *
+ 		 * validation of sp->gfn happens in:
+ 		 *	- gfn_to_hva (kvm_read_guest, gfn_to_pfn)
+-		 *	- kvm_is_visible_gfn (mmu_check_roots)
++		 *	- kvm_is_visible_gfn (mmu_check_root)
+ 		 */
+ 		kvm_arch_flush_shadow_memslot(kvm, slot);
+ 
+@@ -1519,7 +1519,7 @@ static inline int check_user_page_hwpoison(unsigned long addr)
  /*
-- * This routine tries to handler interrupts in posted mode, here is how
-+ * This routine tries to handle interrupts in posted mode, here is how
-  * it deals with different cases:
-  * - For single-destination interrupts, handle it in posted mode
-  * - Else if vector hashing is enabled and it is a lowest-priority
-  *   interrupt, handle it in posted mode and use the following mechanism
-- *   to find the destinaiton vCPU.
-+ *   to find the destination vCPU.
-  *	1. For lowest-priority interrupts, store all the possible
-  *	   destination vCPUs in an array.
-  *	2. Use "guest vector % max number of destination vCPUs" to find
+  * The fast path to get the writable pfn which will be stored in @pfn,
+  * true indicates success, otherwise false is returned.  It's also the
+- * only part that runs if we can are in atomic context.
++ * only part that runs if we are in atomic context.
+  */
+ static bool hva_to_pfn_fast(unsigned long addr, bool write_fault,
+ 			    bool *writable, kvm_pfn_t *pfn)
 -- 
 2.19.1
 
