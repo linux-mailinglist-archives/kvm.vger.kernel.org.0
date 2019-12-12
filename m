@@ -2,233 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9648B11D1D4
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 17:05:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2389E11D257
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 17:31:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729805AbfLLQFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 11:05:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32402 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729772AbfLLQFR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 11:05:17 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBCG2cAR049003
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 11:05:16 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wuj60qhrw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 11:05:16 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 12 Dec 2019 16:05:14 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 12 Dec 2019 16:05:11 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBCG5A8142795206
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Dec 2019 16:05:10 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 381CDA4064;
-        Thu, 12 Dec 2019 16:05:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08B5CA405B;
-        Thu, 12 Dec 2019 16:05:10 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.89])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Dec 2019 16:05:09 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 7/9] s390x: css: msch, enable test
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
- <1576079170-7244-8-git-send-email-pmorel@linux.ibm.com>
- <20191212130111.0f75fe7f.cohuck@redhat.com>
- <83d45c31-30c3-36e1-1d68-51b88448f4af@linux.ibm.com>
- <20191212151002.1c7ca4eb.cohuck@redhat.com>
- <c92089cf-39f4-3b64-79a8-3264654130b1@linux.ibm.com>
- <20191212153303.6444697e.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Thu, 12 Dec 2019 17:05:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1729916AbfLLQbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 11:31:53 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:43249 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729863AbfLLQbw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 11:31:52 -0500
+Received: by mail-qt1-f194.google.com with SMTP id b3so2749302qti.10
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 08:31:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5nxGnUdtw58bWHogUzbvsjBU/PDGHKaobG6uElnGLno=;
+        b=oa9rL5G/dbfnIV/LzrzoNnyRhtYmlptMoi+t69zugwSNSWgp9blS+XEl+9/0hsU8g4
+         wEvlkxhrXfv//LqB2RXF1LitoGfhsbCkWj/Z5CkEmM96cg+UQbdGImwjCbcHoIJMMNj+
+         sljAkxcEM8qhYEWlMb93V1Xx85g7RTRnV35Wu3xroUX1iVIdvJLWKvrBy79W0q0hUiVi
+         X3/dugi+HFn6kRO6XlCj5Wu2KE6/5NrV285cbLrOGt6N6OYzb6ULcMDIc/F6pZ2s7ZbE
+         VSVXgaZMKyImgmEl28wIXQzlvsJ5qIjNjk1tyKd4jJLcuPBrdarAFLv/PrC8tUBEusL0
+         wt2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5nxGnUdtw58bWHogUzbvsjBU/PDGHKaobG6uElnGLno=;
+        b=LP9Ym3Zy8hS0MUYKXilzibm8MhnS7aRtOV0FgxIBcvKIndgqS3tzDekhy9yUIO0Y7U
+         SU3vlkDZKzAVmQnTn1UL8P1Awsj8y75p/dokMDCjxaL+epcX58CHd/faxi6v0Z53eWBa
+         pshTevCQlF5jr3Cp7c2V5QdSbQ0SBo6zIYZ8DqoHSM96nKqmnHBwBJdFG417dmcBJawL
+         S+u0WY6MKXWqduWTl09swE3x/gGyxnjqw3igwFJuXMLCI6Zs7fOl3ZO1z2WdcRC1npfX
+         rFkscusVzTNJkEHOuiLd3cJUGwdHqthUnkr7lt1KCyBI0hP0oJi2Dxey/p59cHxRIic7
+         VdsQ==
+X-Gm-Message-State: APjAAAXJDtmnq805ejLC/dCPrweZJkDgyfet5gMVm7TI6ohVuiRp40hJ
+        bE+yaD/b2sy3QT0QmBQf9ThvJQ==
+X-Google-Smtp-Source: APXvYqyfo7q7u1Qo2RWrsYPgxg4cCPsnEGuVFjYRp2T2M/zKAnej0anX24hFu358xW7EyeiV/RdLyw==
+X-Received: by 2002:ac8:3177:: with SMTP id h52mr8535747qtb.264.1576168311701;
+        Thu, 12 Dec 2019 08:31:51 -0800 (PST)
+Received: from ?IPv6:2620:0:1004:a:6e2b:60f7:b51b:3b04? ([2620:0:1004:a:6e2b:60f7:b51b:3b04])
+        by smtp.gmail.com with ESMTPSA id t38sm2355441qta.78.2019.12.12.08.31.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 08:31:51 -0800 (PST)
+Subject: Re: [PATCH v4 2/2] kvm: Use huge pages for DAX-backed files
+To:     David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc:     linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+References: <20191211213207.215936-1-brho@google.com>
+ <20191211213207.215936-3-brho@google.com>
+ <eb9ef218-1bbc-83e6-ec84-c6aae245e62b@redhat.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <c203f44c-d5b0-429d-0c13-5723c09ec243@google.com>
+Date:   Thu, 12 Dec 2019 11:31:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191212153303.6444697e.cohuck@redhat.com>
+In-Reply-To: <eb9ef218-1bbc-83e6-ec84-c6aae245e62b@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121216-0008-0000-0000-0000034031E1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121216-0009-0000-0000-00004A6034E0
-Message-Id: <a29048f4-1783-54c6-8bf3-91d573b2d49d@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 mlxscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 clxscore=1015 lowpriorityscore=0 impostorscore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120125
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/12/19 7:22 AM, David Hildenbrand wrote:
+>> +	/*
+>> +	 * Our caller grabbed the KVM mmu_lock with a successful
+>> +	 * mmu_notifier_retry, so we're safe to walk the page table.
+>> +	 */
+>> +	switch (dev_pagemap_mapping_shift(hva, current->mm)) {
+>> +	case PMD_SHIFT:
+>> +	case PUD_SIZE:
+> 
+> Shouldn't this be PUD_SHIFT?
+> 
+> But I agree with Paolo, that this is simply
+> 
+> return dev_pagemap_mapping_shift(hva, current->mm) > PAGE_SHIFT;
 
-
-On 2019-12-12 15:33, Cornelia Huck wrote:
-> On Thu, 12 Dec 2019 15:21:21 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> On 2019-12-12 15:10, Cornelia Huck wrote:
->>> On Thu, 12 Dec 2019 15:01:07 +0100
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>    
->>>> On 2019-12-12 13:01, Cornelia Huck wrote:
->>>>> On Wed, 11 Dec 2019 16:46:08 +0100
->>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>>       
->>>>>> A second step when testing the channel subsystem is to prepare a channel
->>>>>> for use.
->>>>>> This includes:
->>>>>> - Get the current SubCHannel Information Block (SCHIB) using STSCH
->>>>>> - Update it in memory to set the ENABLE bit
->>>>>> - Tell the CSS that the SCHIB has been modified using MSCH
->>>>>> - Get the SCHIB from the CSS again to verify that the subchannel is
->>>>>>      enabled.
->>>>>>
->>>>>> This tests the success of the MSCH instruction by enabling a channel.
->>>>>>
->>>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>>>>> ---
->>>>>>     s390x/css.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>     1 file changed, 65 insertions(+)
->>>    
->>>>>> +	/* Read the SCHIB for this subchannel */
->>>>>> +	cc = stsch(test_device_sid, &schib);
->>>>>> +	if (cc) {
->>>>>> +		report(0, "stsch cc=%d", cc);
->>>>>> +		return;
->>>>>> +	}
->>>>>> +
->>>>>> +	/* Update the SCHIB to enable the channel */
->>>>>> +	pmcw->flags |= PMCW_ENABLE;
->>>>>> +
->>>>>> +	/* Tell the CSS we want to modify the subchannel */
->>>>>> +	cc = msch(test_device_sid, &schib);
->>>>>> +	if (cc) {
->>>>>> +		/*
->>>>>> +		 * If the subchannel is status pending or
->>>>>> +		 * if a function is in progress,
->>>>>> +		 * we consider both cases as errors.
->>>>>> +		 */
->>>>>> +		report(0, "msch cc=%d", cc);
->>>>>> +		return;
->>>>>> +	}
->>>>>> +
->>>>>> +	/*
->>>>>> +	 * Read the SCHIB again to verify the enablement
->>>>>> +	 * insert a little delay and try 5 times.
->>>>>> +	 */
->>>>>> +	do {
->>>>>> +		cc = stsch(test_device_sid, &schib);
->>>>>> +		if (cc) {
->>>>>> +			report(0, "stsch cc=%d", cc);
->>>>>> +			return;
->>>>>> +		}
->>>>>> +		delay(10);
->>>>>
->>>>> That's just a short delay to avoid a busy loop, right? msch should be
->>>>> immediate,
->>>>
->>>> Thought you told to me that it may not be immediate in zVM did I
->>>> misunderstand?
->>>
->>> Maybe I have been confusing... what I'm referring to is this
->>> programming note for msch:
->>>
->>> "It is recommended that the program inspect the
->>> contents of the subchannel by subsequently
->>> issuing STORE SUBCHANNEL when MODIFY
->>> SUBCHANNEL sets condition code 0. Use of
->>> STORE SUBCHANNEL is a method for deter-
->>> mining if the designated subchannel was
->>> changed or not. Failure to inspect the subchan-
->>> nel following the setting of condition code 0 by
->>> MODIFY SUBCHANNEL may result in conditions
->>> that the program does not expect to occur."
->>>
->>> That's exactly what we had to do under z/VM back then: do the msch,
->>> check via stsch, redo the msch if needed, check again via stsch. It
->>> usually worked with the second msch the latest.
->>
->> OK, I understand, then it is a bug in zVM that this test could enlighten.
-> 
-> Probably more a quirk than a bug... the explanation there is not
-> explicit about that :)
-> 
->>
->> I think we should keep it so, it allows to recognize 3 cases (after I
->> change to test ENABLE in the loop as I said I will):
->> - immediate ENABLE
-> 
-> This is the good case.
-> 
->> - asynchrone ENABLE
-> 
-> This one I would consider an architecture violation.
-> 
->> - failure to ENABLE
-> 
-> This is the quirk above.
-> 
-> But I'm not quite sure how you would be able to distinguish the last
-> two cases?
-
-This is where the delay can help.
-But yes, not sure that we can differentiate this without to know how 
-long we should delay.
-
-
-> 
->>>    
->>>>   
->>>>> and you probably should not delay on success?
->>>>
->>>> yes, it is not optimized, I can test PMCW_ENABLE in the loop this way we
->>>> can see if, in the zVM case we need to do retries or not.
->>>>
->>>>   
->>>>>       
->>>>>> +	} while (!(pmcw->flags & PMCW_ENABLE) && count++ < 5);
->>>>>
->>>>> How is this supposed to work? Doesn't the stsch overwrite the control
->>>>> block again, so you need to re-set the enable bit before you retry?
->>>>
->>>> I do not think so, there is no msch() in the loop.
->>>> Do I miss something?
->>>
->>> Well, _I_ missed that the msch() was missing :) You need it (see above);
->>> just waiting and re-doing the stsch is useless, as msch is a
->>> synchronous instruction which has finished its processing after the cc
->>> has been set.
->>>    
->>
->> Since kvm-unit-test is a test system, not an OS so I think that here we
->> have one more point to leverage the enable function:
->> - We need to test the enable (what I did (partially))
-> 
-> Maybe also log if you needed to retry? Not as an error, but as
-> additional information?
-
-Yes.
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Yes, good call.  I'll fix that in the next version.
 
