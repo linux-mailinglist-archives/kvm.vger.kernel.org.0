@@ -2,70 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B1B911D9BF
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 00:00:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C90D111DA32
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 00:47:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731307AbfLLXAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 18:00:05 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:44039 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731292AbfLLXAF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 18:00:05 -0500
-Received: by mail-io1-f68.google.com with SMTP id b10so385942iof.11
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 15:00:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gCJ7ZxXwgS+9RY8KtPwmKt5PjyIuKpAMa6t5nExF4bM=;
-        b=i1J+z884+fGFa6WTQnFBApLNkqaOJHgfuKSBy1BswUEEEHDqHoOXylv4GjIJh6Hez1
-         E+PAXIZa6XBY/JFobaMlZ3wpmWkkpLvuiCD3M8F8GIflw5CJQ7LEDV+AcWW67LUM2GDf
-         J6iKE2iTTiTaeREl40sOhVypc2eQhIWhF6uYllXjLiSM5Mc0PRIbf4qYOHVBCSKfF8ez
-         lQfroElIgIMWVTRomYXOSG4MoudsNcXKqPyu1YumzS76f8u1Y4IsD1FHIZ1zsEoAYfbT
-         1O+4mkAhu2iiZoUz7sA1eNEDKK0pN1Ix6HQNqyCww901iCRBwuP3PqJ2NnPAR7Yo0dpC
-         fWQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gCJ7ZxXwgS+9RY8KtPwmKt5PjyIuKpAMa6t5nExF4bM=;
-        b=N2SFsGpqSVcOFDRkN30+irG5f+JEQ3nTRvEjjTPUMxcDWBj8n8p5vA0RbpeNkqO2JE
-         TiAA5KUP6zQLiBoUt4GzhcprHB9rtAFZjm4STA2DlR/AvK33POi1kFKR2ZVsevsE397w
-         8+EHD2PGsrw7QyMunHqUs87AkF887GHuKK/TDrh/U/aTABKQNPTGkeSiijxLNIMBoO8b
-         kksqlvP8+Tnz23L670Gx/Pbo4y/L5tuvNIwVp5t2rcxxj9Y0e4Qv47gFMlXt1EwGkPJ+
-         WeSi+pAz9GqsPu/yZqDKbDGfe2abXsvaXFlnApRpOVCl8ad42Iq8Lz5fkjesQ+/T8JJX
-         6JcA==
-X-Gm-Message-State: APjAAAXSx9YOdcrgWDkKXKUitciyPdGQPOgFLPVtIMvauBR0PyvehxjA
-        RjphJEuz8vEkzBNr4kAu4DZbm6hZoFd3wRzm3zoaJA==
-X-Google-Smtp-Source: APXvYqz02KVp5fnxaK/aDgjS37Ek6f+VytNKRRKi7353A7sSlXWkmigB3XcSDJYl/k12aofFSaWKz15KOp/lnxAgOuk=
-X-Received: by 2002:a5e:9b15:: with SMTP id j21mr4909632iok.108.1576191604631;
- Thu, 12 Dec 2019 15:00:04 -0800 (PST)
-MIME-Version: 1.0
-References: <20190518163743.5396-1-nadav.amit@gmail.com>
-In-Reply-To: <20190518163743.5396-1-nadav.amit@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 12 Dec 2019 14:59:53 -0800
-Message-ID: <CALMp9eQOKX6m0ih6bH5Oyqq5hFbSs7vn0MAZXka3RcOCrC+sUg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: Fix max VMCS field encoding index check
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        id S1731383AbfLLXrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 18:47:19 -0500
+Received: from mga05.intel.com ([192.55.52.43]:18520 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726427AbfLLXrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 18:47:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 15:47:19 -0800
+X-IronPort-AV: E=Sophos;i="5.69,307,1571727600"; 
+   d="scan'208";a="216278692"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 15:47:18 -0800
+Message-ID: <d85d5ca1ae621ad3f4c80d0dcd146a50bd7409fd.camel@linux.intel.com>
+Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
+ reporting
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, osalvador@suse.de
+Date:   Thu, 12 Dec 2019 15:47:18 -0800
+In-Reply-To: <20191205161928.19548.41654.stgit@localhost.localdomain>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 18, 2019 at 4:58 PM Nadav Amit <nadav.amit@gmail.com> wrote:
->
-> The test that checks the maximum VMCS field encoding does not probe all
-> possible VMCS fields. As a result it might fail since the actual
-> IA32_VMX_VMCS_ENUM.MAX_INDEX would be higher than the expected value.
->
-> Change the test to check that the maximum of the supported probed
-> VMCS fields is lower/equal than the actual reported
-> IA32_VMX_VMCS_ENUM.MAX_INDEX.
+On Thu, 2019-12-05 at 08:22 -0800, Alexander Duyck wrote:
+> This series provides an asynchronous means of reporting free guest pages
+> to a hypervisor so that the memory associated with those pages can be
+> dropped and reused by other processes and/or guests on the host. Using
+> this it is possible to avoid unnecessary I/O to disk and greatly improve
+> performance in the case of memory overcommit on the host.
 
-Wouldn't it be better to probe all possible VMCS fields and keep the
-test for equality?
+<snip>
+
+> Changes from v14:
+> https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
+> Renamed "unused page reporting" to "free page reporting"
+>   Updated code, kconfig, and patch descriptions
+> Split out patch for __free_isolated_page
+>   Renamed function to __putback_isolated_page
+> Rewrote core reporting functionality
+>   Added logic to reschedule worker in 2 seconds instead of run to completion
+>   Removed reported_pages statistics
+>   Removed REPORTING_REQUESTED bit used in zone flags
+>   Replaced page_reporting_dev_info refcount with state variable
+>   Removed scatterlist from page_reporting_dev_info
+>   Removed capacity from page reporting device
+>   Added dynamic scatterlist allocation/free at start/end of reporting process
+>   Updated __free_one_page so that reported pages are not always added to tail
+>   Added logic to handle error from report function
+> Updated virtio-balloon patch that adds support for page reporting
+>   Updated patch description to try and highlight differences in approaches
+>   Updated logic to reflect that we cannot limit the scatterlist from device
+>   Added logic to return error from report function
+> Moved documentation patch to end of patch set
+
+It has been about a week since I posted v15 and haven't heard anything.
+Consider this a gentle ping.
+
+I'm looking for input on patches 3 and 4 in this set as I updated them to
+address most of the concerns Mel had. Just wondering if the set needs
+additional work or if we are good with this as a starting point for this
+feature?
+
+Thanks.
+
+- Alex
+
