@@ -2,113 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC80D11D76D
-	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 20:48:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 319B811D785
+	for <lists+kvm@lfdr.de>; Thu, 12 Dec 2019 20:55:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730715AbfLLTs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 14:48:27 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:34976 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730284AbfLLTsY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 14:48:24 -0500
-Received: by mail-ot1-f65.google.com with SMTP id o9so3237258ote.2
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 11:48:23 -0800 (PST)
+        id S1730751AbfLLTzI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 14:55:08 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38726 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730654AbfLLTzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 14:55:08 -0500
+Received: by mail-pf1-f194.google.com with SMTP id x185so1401301pfc.5
+        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 11:55:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lCyIPGmm9pZuYaQMe79zFMPFkP+ZmU5MS9AqbrmOwNc=;
-        b=LmjiQ6Y3tpZugdSlcd+rg78aUn32879Bmxoumcf4KtU4qEAgEeHxpK3vJ4j9jpWpMh
-         JsLVy7vBtDiZk4VOuSzIhNw+9K06juyjGnCjyhs7/uXCpyz631P3upDuCVpFgK2V30sp
-         tKtBuYVRFL4i3YF+l2aDofmf2mK6zJHfA5320/V6GNaGIvm/PqzywZrsKsZc4jlmITKC
-         7R5mNM5l6eYcYrg3mHWmSmY8L6/+uimFf0EZYK1MJD9sBfvRH/BwyszifUjKV+QQWPGm
-         dk679DjdoxZI1D9tifTljqmV8jAY5/R1qgvveZ7l9+q7CPsdFBPIhM0T45oNcJhJWRfd
-         bG9g==
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TLCOxEuE47kolkwbHmkJmj7IG2EMMJZxExvD4wbLras=;
+        b=N5Jbii9lOcX8HpdB4OvQNSGLnmOeT6+/+rlmV3f2zodsX95/IUChnGHQM5ZR9+7otx
+         xCv/jmEbc6D93pFCnCpXU2SDw93JebTnMOgIuJ8ohn6QjYcL69Xjt3FqJzI3CVS4nRQH
+         dADcWC3VtCEZek6JWFoIvthRNIVETi0gLpefyHByeARkuqPnRxYLMzsYiTzOzVg31tfq
+         96TlL/xxXNaX2fQL+xu6IO8Y8p/8MMwUJ/7l+NfyTuhTMzsDds+ZEGokpkgCOXhaXCFH
+         DVWOptf/VRWwif3t/hocRA2xwwTLgxuIoHH49eObl34a++JppwPR8IgcvfeN0I67KWsr
+         t1/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lCyIPGmm9pZuYaQMe79zFMPFkP+ZmU5MS9AqbrmOwNc=;
-        b=uhX94t5SFSzPfgEf83X5MpfIXIdIiXvERcqTkYRr2XVt2LQ1OSRDJctJ2r2TmbVhLo
-         mMRZmv9JZgZXH6j2brbMAJnHDxUlWjiwFG0xATKvMYJEEl+n3Yqq5npLNlOrcb+WNpmm
-         MLep4rhJ8AcaoL4Cq0LPkdywKrXOJnNwlaprbrOI9LkZVKzaLS4jIo1KNcIR1hg/Knfr
-         eRJuYauhKdr0ivNImo2RdNYEuCE/OkN3l12qUetbtTS6AAvFQREcvJxD5lOXvlZGpSIL
-         jxUylVUdu2cXWxUbBcg2r/8KDiphOYfX51piSUdLojvwI1ztINwjfPGzpAvoPmgXsELg
-         IkKQ==
-X-Gm-Message-State: APjAAAVvmZA3z3jzv5c6eQhXDds6JpXe6qIojRYRTW2v4tZ3OzSC3HmR
-        H0pFlYsxV1Ck0rjxr2dcML043J/HZUOx5JXbmTrZBA==
-X-Google-Smtp-Source: APXvYqzSgglPxYBD4ccergwRG+u4Anxgb6meYuHJx5pCaklA2pqhIlpF+AZ2F0oXzqKQ2x/j6OoRxHdmvgE++DyDBmA=
-X-Received: by 2002:a9d:4e99:: with SMTP id v25mr10276651otk.363.1576180103398;
- Thu, 12 Dec 2019 11:48:23 -0800 (PST)
-MIME-Version: 1.0
-References: <20191211213207.215936-1-brho@google.com> <20191211213207.215936-3-brho@google.com>
- <20191212173413.GC3163@linux.intel.com> <CAPcyv4hkz8XCETELBaUOjHQf3=VyVB=KWeRVEPYejvdsg3_MWA@mail.gmail.com>
- <b50720a2-5358-19ea-a45e-a0c0628c68b0@google.com>
-In-Reply-To: <b50720a2-5358-19ea-a45e-a0c0628c68b0@google.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Thu, 12 Dec 2019 11:48:12 -0800
-Message-ID: <CAPcyv4h19dKGpz0XzEHz0nOddnRAefE=rOuhGTHEL6FPhqk8GQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] kvm: Use huge pages for DAX-backed files
-To:     Barret Rhoden <brho@google.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TLCOxEuE47kolkwbHmkJmj7IG2EMMJZxExvD4wbLras=;
+        b=JVxB9iyEakjEnev5k0kFNoFTWHN90xYb0VOjzh84Izt++aIsCJ4zrG/kT23cCIRlvA
+         oa9IMbiXdCVTx7fOtpMsdVrZ2boF8E2GtE3G3C+3Wsa68K3rjDiWPgWXcgAnWEMjj4EL
+         Ws5C5o6o+t7NNSpdDJCnnKgRF0WGN4zQlBC1Bcx/zzPOCvi8E+E/dEA49amBzQGVy2cr
+         24PScUjJTR5h3zIpNsft+LcG8N3YLOU4OPWxVPEthD5tZNgFxHb/QSwNm2LeZtL2zEcX
+         /unsfAvHEW0QkMOacfDPnGXs6CjWNUO/MwB2PgG1RgvO7RNYhe/47qDJdn8mfmACzirH
+         79IQ==
+X-Gm-Message-State: APjAAAXEQktQ4rcrKHZV1UQx6WG38mD+4h7hZ/YM40UI5pmvyCfv/Arf
+        R4bkK5Hod8gQnUULsbjLk+XlaA==
+X-Google-Smtp-Source: APXvYqzP+jxLfixRO0D1nTZH+cRkJXpZ998x7ZGYoS+/0WJqNhlcS/ivhuQFxS8xf2CuDrwiSQmJSw==
+X-Received: by 2002:a65:640e:: with SMTP id a14mr11505680pgv.402.1576180507093;
+        Thu, 12 Dec 2019 11:55:07 -0800 (PST)
+Received: from gnomeregan.cam.corp.google.com ([2620:15c:6:14:ad22:1cbb:d8fa:7d55])
+        by smtp.googlemail.com with ESMTPSA id g10sm7549833pgh.35.2019.12.12.11.55.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2019 11:55:06 -0800 (PST)
+Subject: Re: [PATCH v5 2/2] kvm: Use huge pages for DAX-backed files
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
         David Hildenbrand <david@redhat.com>,
         Dave Jiang <dave.jiang@intel.com>,
         Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Zeng, Jason" <jason.zeng@intel.com>,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+References: <20191212182238.46535-1-brho@google.com>
+ <20191212182238.46535-3-brho@google.com>
+ <06108004-1720-41EB-BCAB-BFA8FEBF4772@oracle.com>
+ <ED482280-CB47-4AB6-9E7E-EEE7848E0F8B@oracle.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <f8e948ff-6a2a-a6d6-9d8e-92b93003354a@google.com>
+Date:   Thu, 12 Dec 2019 14:55:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <ED482280-CB47-4AB6-9E7E-EEE7848E0F8B@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 11:16 AM Barret Rhoden <brho@google.com> wrote:
->
-> On 12/12/19 12:37 PM, Dan Williams wrote:
-> > Yeah, since device-dax is the only path to support longterm page
-> > pinning for vfio device assignment, testing with device-dax + 1GB
-> > pages would be a useful sanity check.
->
-> What are the issues with fs-dax and page pinning?  Is that limitation
-> something that is permanent and unfixable (by me or anyone)?
+Hi -
 
-It's a surprisingly painful point of contention...
+On 12/12/19 1:49 PM, Liran Alon wrote:
+> 
+> 
+>> On 12 Dec 2019, at 20:47, Liran Alon <liran.alon@oracle.com> wrote:
+>>
+>>
+>>
+>>> On 12 Dec 2019, at 20:22, Barret Rhoden <brho@google.com> wrote:
+>>>
+>>> This change allows KVM to map DAX-backed files made of huge pages with
+>>> huge mappings in the EPT/TDP.
+>>
+>> This change isn’t only relevant for TDP. It also affects when KVM use shadow-paging.
+>> See how FNAME(page_fault)() calls transparent_hugepage_adjust().
 
-File backed DAX pages cannot be truncated while the page is pinned
-because the pin may indicate that DMA is ongoing to the file block /
-DAX page. When that pin is from RDMA or VFIO that creates a situation
-where filesystem operations are blocked indefinitely. More details
-here: 94db151dc892 "vfio: disable filesystem-dax page pinning".
+Cool, I'll drop references to the EPT/TDP from the commit message.
 
-Currently, to prevent the deadlock, RDMA, VFIO, and IO_URING memory
-registration is blocked if the mapping is filesystem-dax backed (see
-the FOLL_LONGTERM flag to get_user_pages).
+>>> DAX pages are not PageTransCompound.  The existing check is trying to
+>>> determine if the mapping for the pfn is a huge mapping or not.
+>>
+>> I would rephrase “The existing check is trying to determine if the pfn
+>> is mapped as part of a transparent huge-page”.
 
-One of the proposals to break the impasse was to allow the filesystem
-to forcibly revoke the mapping. I.e. to use the IOMMU to forcibly kick
-the RDMA device out of its registration. That was rejected by RDMA
-folks because RDMA applications are not prepared for this revocation
-to happen and the application that performed the registration may not
-be the application that uses the registration. There was an attempt to
-use a file lease to indicate the presence of a file /
-memory-registration that is blocking file-system operations, but that
-was still less palatable to filesystem folks than just keeping the
-status quo of blocking longterm pinning.
+Can do.
 
-That said, the VFIO use case seems a different situation than RDMA.
-There's often a 1:1 relationship between the application performing
-the memory registration and the application consuming it, the VMM, and
-there is always an IOMMU present that could revoke access and kill the
-guest is the mapping got truncated. It seems in theory that VFIO could
-tolerate a "revoke pin on truncate" mechanism where RDMA could not.
+>>
+>>> For
+>>> non-DAX maps, e.g. hugetlbfs, that means checking PageTransCompound.
+>>
+>> This is not related to hugetlbfs but rather THP.
 
-> I'd like to put a lot more in a DAX/pmem region than just a guest's
-> memory, and having a mountable filesystem would be extremely convenient.
+I thought that PageTransCompound also returned true for hugetlbfs (based 
+off of comments in page-flags.h).  Though I do see the comment about the 
+'level == PT_PAGE_TABLE_LEVEL' check excluding hugetlbfs pages.
 
-Why would page pinning be involved in allowing the guest to mount a
-filesystem on guest-pmem? That already works today, it's just the
-device-passthrough that causes guest memory to be pinned indefinitely.
+Anyway, I'll remove the "e.g. hugetlbfs" from the commit message.
+
+>>
+>>> For DAX, we can check the page table itself.
+>>>
+>>> Note that KVM already faulted in the page (or huge page) in the host's
+>>> page table, and we hold the KVM mmu spinlock.  We grabbed that lock in
+>>> kvm_mmu_notifier_invalidate_range_end, before checking the mmu seq.
+>>>
+>>> Signed-off-by: Barret Rhoden <brho@google.com>
+>>
+>> I don’t think the right place to change for this functionality is transparent_hugepage_adjust()
+>> which is meant to handle PFNs that are mapped as part of a transparent huge-page.
+>>
+>> For example, this would prevent mapping DAX-backed file page as 1GB.
+>> As transparent_hugepage_adjust() only handles the case (level == PT_PAGE_TABLE_LEVEL).
+>>
+>> As you are parsing the page-tables to discover the page-size the PFN is mapped in,
+>> I think you should instead modify kvm_host_page_size() to parse page-tables instead
+>> of rely on vma_kernel_pagesize() (Which relies on vma->vm_ops->pagesize()) in case
+>> of is_zone_device_page().
+>> The main complication though of doing this is that at this point you don’t yet have the PFN
+>> that is retrieved by try_async_pf(). So maybe you should consider modifying the order of calls
+>> in tdp_page_fault() & FNAME(page_fault)().
+>>
+>> -Liran
+> 
+> Or alternatively when thinking about it more, maybe just rename transparent_hugepage_adjust()
+> to not be specific to THP and better handle the case of parsing page-tables changing mapping-level to 1GB.
+> That is probably easier and more elegant.
+
+I can rename it to hugepage_adjust(), since it's not just THP anymore.
+
+I was a little hesitant to change the this to handle 1 GB pages with 
+this patchset at first.  I didn't want to break the non-DAX case stuff 
+by doing so.
+
+Specifically, can a THP page be 1 GB, and if so, how can you tell?  If 
+you can't tell easily, I could walk the page table for all cases, 
+instead of just zone_device().
+
+I'd also have to drop the "level == PT_PAGE_TABLE_LEVEL" check, I think, 
+which would open this up to hugetlbfs pages (based on the comments).  Is 
+there any reason why that would be a bad idea?
+
+Thanks,
+
+Barret
+
