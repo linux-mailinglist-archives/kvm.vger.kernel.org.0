@@ -2,283 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0FE611DE6B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 08:08:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7666911DEAA
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 08:30:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbfLMHIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 02:08:32 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38607 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725799AbfLMHIc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 02:08:32 -0500
+        id S1725809AbfLMHaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 02:30:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58399 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725497AbfLMHaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 02:30:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576220910;
+        s=mimecast20190719; t=1576222222;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oBlv4ywWgkJYXtDeeADcPj7WCyLjtwh55MItuKZW2P0=;
-        b=EBFWUdWeOh9yPc12cXkPu7i8YRaOWHj6aBmcY0CGfbiS0YeVumSmdHPnEW5S8hTeW64f4P
-        R7aYpBk1taMvQrp1O4A7KYcaFgiFoRtLm1D82i+Hu2NhBuHF7reqf/R18vrPXi225JHH8w
-        EmIU+AseqIZRDpXkCHvziY3LBRpha68=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-Iy2dGsTKNfeDgXO_FdlgYA-1; Fri, 13 Dec 2019 02:08:29 -0500
-X-MC-Unique: Iy2dGsTKNfeDgXO_FdlgYA-1
-Received: by mail-qk1-f199.google.com with SMTP id d1so854828qkk.15
-        for <kvm@vger.kernel.org>; Thu, 12 Dec 2019 23:08:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oBlv4ywWgkJYXtDeeADcPj7WCyLjtwh55MItuKZW2P0=;
-        b=GAhNoNVhxQH+FXrpwMUCZ4825CnFYqoGUcKvFw7/AT4x+9sIY/fAZgXrDgYq6Tblqd
-         C2S8NT38CS6X2BnjHGQCITaYgmoxrVTX9SfAQDsRDtnDmQbNZvlR7WCPj2R6BRL6Y4gm
-         zp5S1uzIg4n7FgD8Yq8h7tgTN3SM4SEyCkDGmjfpzHC+7/Hr8Oguq0DsBhHdGC1c9fha
-         PgFnigIfu1paJpMFz/3/Xtcgh2VHa4USeCtt1GH1NgDxUxueJppxrdSUQL0D4XdtyGQ2
-         7ioPLP42f3fdluxwDYfePDwqrT4Jy4pgVcWy4YK50rCGQMqhJfytRvxFwgB+1mSF2/D2
-         toMQ==
-X-Gm-Message-State: APjAAAUuzJfp51vkDXh3yTYjnGksyFCDd1qqNHNpaOzvLdS3fUPcYpgV
-        2ch1T4pHiUj0ZfvUb1S01cpiM/OHrNpralEyjkblTJIPFFpWobcDezr+QFy2Er6Hx4W8o7TnnjY
-        ugJ7eQiIn43w2
-X-Received: by 2002:a37:9a46:: with SMTP id c67mr12240590qke.308.1576220908597;
-        Thu, 12 Dec 2019 23:08:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyt3kva4WsUrDCrBsJ2k7DQlxNrX76Ho1G+4kNuMA/uA1IN7qHBnmRB2pDTUOOR1aMxEC4LtA==
-X-Received: by 2002:a37:9a46:: with SMTP id c67mr12240558qke.308.1576220908241;
-        Thu, 12 Dec 2019 23:08:28 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
-        by smtp.gmail.com with ESMTPSA id c20sm3186746qtc.13.2019.12.12.23.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2019 23:08:27 -0800 (PST)
-Date:   Fri, 13 Dec 2019 02:08:19 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz, yang.zhang.wz@gmail.com, nitesh@redhat.com,
-        konrad.wilk@oracle.com, david@redhat.com, pagupta@redhat.com,
-        riel@surriel.com, lcapitulino@redhat.com, dave.hansen@intel.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
-        osalvador@suse.de
-Subject: Re: [PATCH v15 6/7] virtio-balloon: Add support for providing free
- page reports to host
-Message-ID: <20191213020553-mutt-send-email-mst@kernel.org>
-References: <20191205161928.19548.41654.stgit@localhost.localdomain>
- <20191205162255.19548.63866.stgit@localhost.localdomain>
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:openpgp:openpgp:autocrypt:autocrypt;
+        bh=9hwiiyN1KJdWHhlwI1KLJbA27fEpzOsoAP8kksWQY1s=;
+        b=T60WZQ49Rb1dQTYqsMb6KIwbxoT9XdsDUOJT2zkGzpePFzptG0xyJ7H4NMG/thxaD9SGB/
+        HstKye69I1PSMKWbk+RrCWwiFmE/EXCWnRmZdtFXwFxIL0T8XffN7s/yaSm/tdsDKTRTIv
+        4D02kaO3h8LBWvl71vBQWwb51r0JzYM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-quN173ZlNAaRMPJqrnKfEw-1; Fri, 13 Dec 2019 02:30:19 -0500
+X-MC-Unique: quN173ZlNAaRMPJqrnKfEw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9278B800053
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 07:30:18 +0000 (UTC)
+Received: from [10.72.12.228] (ovpn-12-228.pek2.redhat.com [10.72.12.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A6ED25C3FA;
+        Fri, 13 Dec 2019 07:30:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Remove ioapic from the x86
+ tests
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+References: <20191205151610.19299-1-thuth@redhat.com>
+ <d592da1d-2a5f-a005-0002-9fde866ed421@redhat.com>
+ <7a9b05a0-37e3-91ba-de23-84fd968ca185@redhat.com>
+ <fdbe37df-216f-65bd-cd82-fd46afd278ec@redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <a16aa7e0-dd47-a126-2b81-ff92caf3ea60@redhat.com>
+Date:   Fri, 13 Dec 2019 02:30:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191205162255.19548.63866.stgit@localhost.localdomain>
+In-Reply-To: <fdbe37df-216f-65bd-cd82-fd46afd278ec@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 05, 2019 at 08:22:55AM -0800, Alexander Duyck wrote:
-> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-> 
-> Add support for the page reporting feature provided by virtio-balloon.
-> Reporting differs from the regular balloon functionality in that is is
-> much less durable than a standard memory balloon. Instead of creating a
-> list of pages that cannot be accessed the pages are only inaccessible
-> while they are being indicated to the virtio interface. Once the
-> interface has acknowledged them they are placed back into their respective
-> free lists and are once again accessible by the guest system.
-> 
-> Unlike a standard balloon we don't inflate and deflate the pages. Instead
-> we perform the reporting, and once the reporting is completed it is
-> assumed that the page has been dropped from the guest and will be faulted
-> back in the next time the page is accessed.
-> 
-> For this reason when I had originally introduced the patch set I referred
-> to this behavior as a "bubble" instead of a "balloon" since the duration
-> is short lived, and when the page is touched the "bubble" is popped and
-> the page is faulted back in.
-> 
-> Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+
+On 12/9/19 12:45 PM, Paolo Bonzini wrote:
+> On 09/12/19 18:33, Thomas Huth wrote:
+>>> It works for me though:
+>>>
+>>> $ /usr/bin/qemu-system-x86_64 -nodefaults -device pc-testdev -device
+>>> isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device
+>>> pci-testdev -machine accel=tcg -kernel x86/ioapic.flat
+>> You have to run the test with "-smp 4" (like in x86/unittests.cfg), then
+>> it hangs.
+> The problem was actually that I hadn't recompiled x86/ioapic.flat.  Now
+> I can see the hang even with "-machine
+> accel=kvm,kernel_irqchip=off|split", I'll take a look if Nitesh doesn't
+> beat me.
 
 
-virtio POV is fine here:
+Sorry for the delay in response, I am currently on PTO.
+I haven't specifically tried with 'kernel_irqchip=off|split', previously I have
+only tried with -machine accel=kvm.
+I can give it a try once I am back.
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-However please copy virtio-comment on UAPI changes.
-If possible isolate the last chunk in a patch by itself
-to make it easier for non-kernel developers to review.
-
-> ---
->  drivers/virtio/Kconfig              |    1 +
->  drivers/virtio/virtio_balloon.c     |   64 +++++++++++++++++++++++++++++++++++
->  include/uapi/linux/virtio_balloon.h |    1 +
->  3 files changed, 66 insertions(+)
-> 
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 078615cf2afc..4b2dd8259ff5 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -58,6 +58,7 @@ config VIRTIO_BALLOON
->  	tristate "Virtio balloon driver"
->  	depends on VIRTIO
->  	select MEMORY_BALLOON
-> +	select PAGE_REPORTING
->  	---help---
->  	 This driver supports increasing and decreasing the amount
->  	 of memory within a KVM guest.
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> index 252591bc7e01..ecd54edba968 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -19,6 +19,7 @@
->  #include <linux/mount.h>
->  #include <linux/magic.h>
->  #include <linux/pseudo_fs.h>
-> +#include <linux/page_reporting.h>
->  
->  /*
->   * Balloon device works in 4K page units.  So each page is pointed to by
-> @@ -47,6 +48,7 @@ enum virtio_balloon_vq {
->  	VIRTIO_BALLOON_VQ_DEFLATE,
->  	VIRTIO_BALLOON_VQ_STATS,
->  	VIRTIO_BALLOON_VQ_FREE_PAGE,
-> +	VIRTIO_BALLOON_VQ_REPORTING,
->  	VIRTIO_BALLOON_VQ_MAX
->  };
->  
-> @@ -114,6 +116,10 @@ struct virtio_balloon {
->  
->  	/* To register a shrinker to shrink memory upon memory pressure */
->  	struct shrinker shrinker;
-> +
-> +	/* Free page reporting device */
-> +	struct virtqueue *reporting_vq;
-> +	struct page_reporting_dev_info pr_dev_info;
->  };
->  
->  static struct virtio_device_id id_table[] = {
-> @@ -153,6 +159,33 @@ static void tell_host(struct virtio_balloon *vb, struct virtqueue *vq)
->  
->  }
->  
-> +int virtballoon_free_page_report(struct page_reporting_dev_info *pr_dev_info,
-> +				   struct scatterlist *sg, unsigned int nents)
-> +{
-> +	struct virtio_balloon *vb =
-> +		container_of(pr_dev_info, struct virtio_balloon, pr_dev_info);
-> +	struct virtqueue *vq = vb->reporting_vq;
-> +	unsigned int unused, err;
-> +
-> +	/* We should always be able to add these buffers to an empty queue. */
-> +	err = virtqueue_add_inbuf(vq, sg, nents, vb, GFP_NOWAIT | __GFP_NOWARN);
-> +
-> +	/*
-> +	 * In the extremely unlikely case that something has occurred and we
-> +	 * are able to trigger an error we will simply display a warning
-> +	 * and exit without actually processing the pages.
-> +	 */
-> +	if (WARN_ON_ONCE(err))
-> +		return err;
-> +
-> +	virtqueue_kick(vq);
-> +
-> +	/* When host has read buffer, this completes via balloon_ack */
-> +	wait_event(vb->acked, virtqueue_get_buf(vq, &unused));
-> +
-> +	return 0;
-> +}
-> +
->  static void set_page_pfns(struct virtio_balloon *vb,
->  			  __virtio32 pfns[], struct page *page)
->  {
-> @@ -477,6 +510,7 @@ static int init_vqs(struct virtio_balloon *vb)
->  	names[VIRTIO_BALLOON_VQ_DEFLATE] = "deflate";
->  	names[VIRTIO_BALLOON_VQ_STATS] = NULL;
->  	names[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
-> +	names[VIRTIO_BALLOON_VQ_REPORTING] = NULL;
->  
->  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
->  		names[VIRTIO_BALLOON_VQ_STATS] = "stats";
-> @@ -488,6 +522,11 @@ static int init_vqs(struct virtio_balloon *vb)
->  		callbacks[VIRTIO_BALLOON_VQ_FREE_PAGE] = NULL;
->  	}
->  
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
-> +		names[VIRTIO_BALLOON_VQ_REPORTING] = "reporting_vq";
-> +		callbacks[VIRTIO_BALLOON_VQ_REPORTING] = balloon_ack;
-> +	}
-> +
->  	err = vb->vdev->config->find_vqs(vb->vdev, VIRTIO_BALLOON_VQ_MAX,
->  					 vqs, callbacks, names, NULL, NULL);
->  	if (err)
-> @@ -520,6 +559,9 @@ static int init_vqs(struct virtio_balloon *vb)
->  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
->  		vb->free_page_vq = vqs[VIRTIO_BALLOON_VQ_FREE_PAGE];
->  
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
-> +		vb->reporting_vq = vqs[VIRTIO_BALLOON_VQ_REPORTING];
-> +
->  	return 0;
->  }
->  
-> @@ -939,12 +981,31 @@ static int virtballoon_probe(struct virtio_device *vdev)
->  		if (err)
->  			goto out_del_balloon_wq;
->  	}
-> +
-> +	vb->pr_dev_info.report = virtballoon_free_page_report;
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
-> +		unsigned int capacity;
-> +
-> +		capacity = virtqueue_get_vring_size(vb->reporting_vq);
-> +		if (capacity < PAGE_REPORTING_CAPACITY) {
-> +			err = -ENOSPC;
-> +			goto out_unregister_shrinker;
-> +		}
-> +
-> +		err = page_reporting_register(&vb->pr_dev_info);
-> +		if (err)
-> +			goto out_unregister_shrinker;
-> +	}
-> +
->  	virtio_device_ready(vdev);
->  
->  	if (towards_target(vb))
->  		virtballoon_changed(vdev);
->  	return 0;
->  
-> +out_unregister_shrinker:
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
-> +		virtio_balloon_unregister_shrinker(vb);
->  out_del_balloon_wq:
->  	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT))
->  		destroy_workqueue(vb->balloon_wq);
-> @@ -973,6 +1034,8 @@ static void virtballoon_remove(struct virtio_device *vdev)
->  {
->  	struct virtio_balloon *vb = vdev->priv;
->  
-> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING))
-> +		page_reporting_unregister(&vb->pr_dev_info);
->  	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
->  		virtio_balloon_unregister_shrinker(vb);
->  	spin_lock_irq(&vb->stop_update_lock);
-> @@ -1045,6 +1108,7 @@ static int virtballoon_validate(struct virtio_device *vdev)
->  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
->  	VIRTIO_BALLOON_F_FREE_PAGE_HINT,
->  	VIRTIO_BALLOON_F_PAGE_POISON,
-> +	VIRTIO_BALLOON_F_REPORTING,
->  };
->  
->  static struct virtio_driver virtio_balloon_driver = {
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> index a1966cd7b677..19974392d324 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -36,6 +36,7 @@
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
->  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
->  #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
-> +#define VIRTIO_BALLOON_F_REPORTING	5 /* Page reporting virtqueue */
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> Paolo
+>
+-- 
+Thanks
+Nitesh
 
