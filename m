@@ -2,128 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A7C111E284
+	by mail.lfdr.de (Postfix) with ESMTP id DC7D811E286
 	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:09:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726687AbfLMLHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 06:07:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24996 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725948AbfLMLHu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 06:07:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576235269;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9YVwxsrA7bHU0ZxobUQ7B9E7z5AaZfc5ooyfIz7vtGg=;
-        b=AC1y87w2JjQDb94mQxvye37nJ6TRi02WuodYhTxpIxKpwbo4SzdeIxuU8hkVC4S10eGhKl
-        5W9Tc05ICP57ICFvaelUqAYHtm6QPkpfVKa6KnKs5iltUmw/qxfc5kELdN5Y/7iMurfujf
-        yiYzkhKcrSjaSe4Lt4VMPaR5HjrxDxo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-S5e_EUE5MiSWKFOHK0hUeA-1; Fri, 13 Dec 2019 06:07:48 -0500
-X-MC-Unique: S5e_EUE5MiSWKFOHK0hUeA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52FA6107ACC7;
-        Fri, 13 Dec 2019 11:07:47 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-134.brq.redhat.com [10.40.204.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 814145D6BE;
-        Fri, 13 Dec 2019 11:07:39 +0000 (UTC)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH] hw/i386: De-duplicate gsi_handler() to remove kvm_pc_gsi_handler()
-Date:   Fri, 13 Dec 2019 12:07:36 +0100
-Message-Id: <20191213110736.10767-1-philmd@redhat.com>
+        id S1726759AbfLMLIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 06:08:21 -0500
+Received: from outbound-smtp09.blacknight.com ([46.22.139.14]:40572 "EHLO
+        outbound-smtp09.blacknight.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726708AbfLMLIV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 06:08:21 -0500
+Received: from mail.blacknight.com (pemlinmail05.blacknight.ie [81.17.254.26])
+        by outbound-smtp09.blacknight.com (Postfix) with ESMTPS id B479E1C26C1
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 11:08:17 +0000 (GMT)
+Received: (qmail 3412 invoked from network); 13 Dec 2019 11:08:17 -0000
+Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.18.57])
+  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 13 Dec 2019 11:08:17 -0000
+Date:   Fri, 13 Dec 2019 11:08:06 +0000
+From:   Mel Gorman <mgorman@techsingularity.net>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        vbabka@suse.cz, yang.zhang.wz@gmail.com, nitesh@redhat.com,
+        konrad.wilk@oracle.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
+        osalvador@suse.de
+Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
+ reporting
+Message-ID: <20191213110806.GA3178@techsingularity.net>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+ <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+In-Reply-To: <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both gsi_handler() and kvm_pc_gsi_handler() have the same content,
-except one comment. Move the comment, and de-duplicate the code.
+On Fri, Dec 13, 2019 at 11:00:42AM +0100, David Hildenbrand wrote:
+> > A brief history on the background of free page reporting can be found at:
+> > https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com/
+> > 
+> > Changes from v13:
+> > https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost.localdomain/
+> > Rewrote core reporting functionality
+> >   Merged patches 3 & 4
+> >   Dropped boundary list and related code
+> >   Folded get_reported_page into page_reporting_fill
+> >   Folded page_reporting_fill into page_reporting_cycle
+> > Pulled reporting functionality out of free_reported_page
+> >   Renamed it to __free_isolated_page
+> >   Moved page reporting specific bits to page_reporting_drain
+> > Renamed phdev to prdev since we aren't "hinting" we are "reporting"
+> > Added documentation to describe the usage of unused page reporting
+> > Updated cover page and patch descriptions to avoid mention of boundary
+> > 
+> > Changes from v14:
+> > https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
+> > Renamed "unused page reporting" to "free page reporting"
+> >   Updated code, kconfig, and patch descriptions
+> > Split out patch for __free_isolated_page
+> >   Renamed function to __putback_isolated_page
+> > Rewrote core reporting functionality
+> >   Added logic to reschedule worker in 2 seconds instead of run to completion
+> >   Removed reported_pages statistics
+> >   Removed REPORTING_REQUESTED bit used in zone flags
+> >   Replaced page_reporting_dev_info refcount with state variable
+> >   Removed scatterlist from page_reporting_dev_info
+> >   Removed capacity from page reporting device
+> >   Added dynamic scatterlist allocation/free at start/end of reporting process
+> >   Updated __free_one_page so that reported pages are not always added to tail
+> >   Added logic to handle error from report function
+> > Updated virtio-balloon patch that adds support for page reporting
+> >   Updated patch description to try and highlight differences in approaches
+> >   Updated logic to reflect that we cannot limit the scatterlist from device
+> 
+> Last time Mel said
+> 
+> "Ok, I'm ok with how this hooks into the allocator as the overhead is
+> minimal. However, the patch itself still includes a number of
+> optimisations instead of being a bare-boned implementation of the
+> feature with optimisations layered on top."
+> 
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- include/sysemu/kvm.h |  1 -
- hw/i386/kvm/ioapic.c | 12 ------------
- hw/i386/pc.c         |  5 ++---
- 3 files changed, 2 insertions(+), 16 deletions(-)
+I didn't get the chance to take a close look as I'm trying to clear as
+much as possible from my table on the run-up to Christmas so I don't come
+back to a disaster inbox. I also noted that the Acks for earlier patches
+were not included so I was uncertain if doing a full review would still
+be a good use of time when time was tight.
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 9fe233b9bf..f5d0d0d710 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -515,7 +515,6 @@ int kvm_irqchip_add_irqfd_notifier(KVMState *s, Event=
-Notifier *n,
- int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n,
-                                       qemu_irq irq);
- void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
--void kvm_pc_gsi_handler(void *opaque, int n, int level);
- void kvm_pc_setup_irq_routing(bool pci_enabled);
- void kvm_init_irq_routing(KVMState *s);
-=20
-diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-index f94729c565..bae7413a39 100644
---- a/hw/i386/kvm/ioapic.c
-+++ b/hw/i386/kvm/ioapic.c
-@@ -48,18 +48,6 @@ void kvm_pc_setup_irq_routing(bool pci_enabled)
-     }
- }
-=20
--void kvm_pc_gsi_handler(void *opaque, int n, int level)
--{
--    GSIState *s =3D opaque;
--
--    if (n < ISA_NUM_IRQS) {
--        /* Kernel will forward to both PIC and IOAPIC */
--        qemu_set_irq(s->i8259_irq[n], level);
--    } else {
--        qemu_set_irq(s->ioapic_irq[n], level);
--    }
--}
--
- typedef struct KVMIOAPICState KVMIOAPICState;
-=20
- struct KVMIOAPICState {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ac08e63604..97e9049b71 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -350,6 +350,7 @@ void gsi_handler(void *opaque, int n, int level)
-=20
-     DPRINTF("pc: %s GSI %d\n", level ? "raising" : "lowering", n);
-     if (n < ISA_NUM_IRQS) {
-+        /* Under KVM, Kernel will forward to both PIC and IOAPIC */
-         qemu_set_irq(s->i8259_irq[n], level);
-     }
-     qemu_set_irq(s->ioapic_irq[n], level);
-@@ -362,10 +363,8 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_en=
-abled)
-     s =3D g_new0(GSIState, 1);
-     if (kvm_ioapic_in_kernel()) {
-         kvm_pc_setup_irq_routing(pci_enabled);
--        *irqs =3D qemu_allocate_irqs(kvm_pc_gsi_handler, s, GSI_NUM_PINS=
-);
--    } else {
--        *irqs =3D qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
-     }
-+    *irqs =3D qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
-=20
-     return s;
- }
---=20
-2.21.0
+That said, some optimisations are still included but much reduced. For
+example, list rotations are still there but it's very straight-forward.
+The refcount is gone which is good and replaced by a state, which could be
+be better documented, but is more straight forward and the zone->lock is
+back protecting the free lists primarily and not zone metadata or prdev
+metadata (at least not obviously). I didn't put in the time to see if
+the atomic_set in page_reporting_process() is ok or whether state could
+be lost but I *think* it's ok because it should be called from just one
+workqueue request and they shouldn't be stacked. A comment there explaining
+why atomic_set is definitely correct would be helpful.
 
+I'm inclined to decide that yes, this version is potentially ok as a
+bare minimum but didn't put in the time to be 100% sure.
+ 
+-- 
+Mel Gorman
+SUSE Labs
