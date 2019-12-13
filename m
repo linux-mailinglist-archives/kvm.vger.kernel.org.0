@@ -2,94 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E0CA511EABC
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 19:52:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D618211EACF
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 20:00:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728619AbfLMSwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 13:52:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48597 "EHLO
+        id S1728878AbfLMS7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 13:59:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45702 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728489AbfLMSwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 13:52:09 -0500
+        with ESMTP id S1728591AbfLMS7j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 13:59:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576263128;
+        s=mimecast20190719; t=1576263577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=P3ZEIhPIn6Z1Gd4TQtzF4BdjV6X2XjIymWao54He2LU=;
-        b=hLmM0Pu4hBN3eqofKq76fZmv7uviMPSiTGiwJS67aMroEwh/OX43zrdpegTN7CkWbqyJQC
-        ig7IjeK98beOiP1vStDLfVQgZQpXelS3vpwvZHoNV24KTdo/gAowo8hjVajuvHLCgse8hS
-        Y8K2VsE1Hu3jv8RgMop+/JqXB2BIQXc=
+        bh=BTVCt4lo2+JVoxNzS8jAAe82HqlgpftwzzDCvcWKC0o=;
+        b=C0i1ltvFqwe4zeI7v6E/GFBRKbO6Uy4u0Y2gvP4Ib/JW99SpfBOOD35qBfUk8XZjT3+7z5
+        5YyILYHVT2VUhBzNRJhZRtsXVFN/PWBDgTY2wjwV56CNrfN4UyX5aBLA7EzWW9Qf+abQzP
+        jI3wMJfrNU/fQIif6jKYSk0iZYEmNq0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-p3zr2D7mOIuZ-rkiLB8eZQ-1; Fri, 13 Dec 2019 13:52:07 -0500
-X-MC-Unique: p3zr2D7mOIuZ-rkiLB8eZQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-143-nejDi4YpNM-3UQq70rGOwA-1; Fri, 13 Dec 2019 13:59:33 -0500
+X-MC-Unique: nejDi4YpNM-3UQq70rGOwA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4754DB2D;
-        Fri, 13 Dec 2019 18:52:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D53785B6FD;
+        Fri, 13 Dec 2019 18:59:31 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6976610016DA;
-        Fri, 13 Dec 2019 18:51:51 +0000 (UTC)
-Date:   Fri, 13 Dec 2019 19:51:41 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 63C8466851;
+        Fri, 13 Dec 2019 18:59:18 +0000 (UTC)
+Date:   Fri, 13 Dec 2019 19:59:15 +0100
 From:   Andrew Jones <drjones@redhat.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
-        mark.rutland@arm.com
-Subject: Re: [kvm-unit-tests PATCH v2 00/18] arm/arm64: Various fixes
-Message-ID: <20191213185141.swqwi3jbkheakk3f@kamzik.brq.redhat.com>
-References: <20191128180418.6938-1-alexandru.elisei@arm.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     eric.auger.pro@gmail.com, maz@kernel.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, andrew.murray@arm.com,
+        andre.przywara@arm.com, peter.maydell@linaro.org
+Subject: Re: [kvm-unit-tests RFC 03/10] pmu: Add a pmu struct
+Message-ID: <20191213185915.7txbnxybupszis7r@kamzik.brq.redhat.com>
+References: <20191206172724.947-1-eric.auger@redhat.com>
+ <20191206172724.947-4-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191128180418.6938-1-alexandru.elisei@arm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20191206172724.947-4-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 28, 2019 at 06:04:00PM +0000, Alexandru Elisei wrote:
-> This is a combination of the fixes from my EL2 series [1] and other new
-> fixes.
+On Fri, Dec 06, 2019 at 06:27:17PM +0100, Eric Auger wrote:
+> This struct aims at storing information potentially used by
+> all tests such as the pmu version, the read-only part of the
+> PMCR, the number of implemented event counters, ...
 > 
-> Changes in v2:
-> * Fixed the prefetch abort test on QEMU by changing the address used to
->   cause the abort.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/pmu.c | 29 ++++++++++++++++++++++++-----
+>  1 file changed, 24 insertions(+), 5 deletions(-)
 > 
-> Summary of the patches:
-> * Patch 1 adds coherent translation table walks for ARMv7 and removes
->   unneeded dcache maintenance.
-> * Patches 2-4 make translation table updates more robust.
-> * Patches 5-6 fix a pretty serious bug in our PSCI test, which was causing
->   an infinite loop of prefetch aborts.
-> * Patches 7-10 add a proper test for prefetch aborts. The test now uses
->   mmu_clear_user.
-> * Patches 11-13 are fixes for the timer test.
-> * Patches 14-15 fix turning the MMU off.
-> * Patches 16-18 are small fixes to make the code more robust, and perhaps
->   more important, remove unnecessary operations that might hide real bugs
->   in KVM.
-> 
-> Patches 1-4, 9, 18 are new. The rest are taken from the EL2 series, and
-> I've kept the Reviewed-by tag where appropriate. There are no major
-> changes, only those caused by rebasing on top of the current kvm-unit-tests
-> version.
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 2ad6469..8e95251 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -33,7 +33,15 @@
+>  
+>  #define NR_SAMPLES 10
+>  
+> -static unsigned int pmu_version;
+> +struct pmu {
+> +	unsigned int version;
+> +	unsigned int nb_implemented_counters;
+> +	uint32_t pmcr_ro;
+> +};
+> +
+> +static struct pmu pmu;
+> +
+> +
+>  #if defined(__arm__)
+>  #define ID_DFR0_PERFMON_SHIFT 24
+>  #define ID_DFR0_PERFMON_MASK  0xf
+> @@ -265,7 +273,7 @@ static bool check_cpi(int cpi)
+>  static void pmccntr64_test(void)
+>  {
+>  #ifdef __arm__
+> -	if (pmu_version == 0x3) {
+> +	if (pmu.version == 0x3) {
+>  		if (ERRATA(9e3f7a296940)) {
+>  			write_sysreg(0xdead, PMCCNTR64);
+>  			report("pmccntr64", read_sysreg(PMCCNTR64) == 0xdead);
+> @@ -278,9 +286,20 @@ static void pmccntr64_test(void)
+>  /* Return FALSE if no PMU found, otherwise return TRUE */
+>  static bool pmu_probe(void)
+>  {
+> -	pmu_version = get_pmu_version();
+> -	report_info("PMU version: %d", pmu_version);
+> -	return pmu_version != 0 && pmu_version != 0xf;
+> +	uint32_t pmcr;
+> +
+> +	pmu.version = get_pmu_version();
+> +	report_info("PMU version: %d", pmu.version);
+> +
+> +	if (pmu.version == 0 || pmu.version  == 0xF)
+                                            ^ stray space
 
-This series looks good to me, but it needs another rebase due to 
-a299895b7abb ("Switch the order of the parameters in report() and
-report_xfail()") and there are a few minor comments to address.
-
+> +		return false;
+> +
+> +	pmcr = get_pmcr();
+> +	pmu.pmcr_ro = pmcr & 0xFFFFFF80;
+> +	pmu.nb_implemented_counters = (pmcr >> PMU_PMCR_N_SHIFT) & PMU_PMCR_N_MASK;
+> +	report_info("Implements %d event counters", pmu.nb_implemented_counters);
+> +
+> +	return true;
+>  }
+>  
+>  int main(int argc, char *argv[])
+> -- 
+> 2.20.1
 > 
-> Please review.
-> 
-> [1] https://www.spinics.net/lists/kvm/msg196797.html
-
-It's almost at the top of the TODO! I might even get to it during the
-holidays. Of course it could probably use a rebase now too.
-
-Thanks,
-drew
 
