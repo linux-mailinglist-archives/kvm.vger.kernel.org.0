@@ -2,114 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DC7D811E286
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:09:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CCC011E298
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:14:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbfLMLIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 06:08:21 -0500
-Received: from outbound-smtp09.blacknight.com ([46.22.139.14]:40572 "EHLO
-        outbound-smtp09.blacknight.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726708AbfLMLIV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 06:08:21 -0500
-Received: from mail.blacknight.com (pemlinmail05.blacknight.ie [81.17.254.26])
-        by outbound-smtp09.blacknight.com (Postfix) with ESMTPS id B479E1C26C1
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 11:08:17 +0000 (GMT)
-Received: (qmail 3412 invoked from network); 13 Dec 2019 11:08:17 -0000
-Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.18.57])
-  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 13 Dec 2019 11:08:17 -0000
-Date:   Fri, 13 Dec 2019 11:08:06 +0000
-From:   Mel Gorman <mgorman@techsingularity.net>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        vbabka@suse.cz, yang.zhang.wz@gmail.com, nitesh@redhat.com,
-        konrad.wilk@oracle.com, pagupta@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, dave.hansen@intel.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com,
-        osalvador@suse.de
-Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
- reporting
-Message-ID: <20191213110806.GA3178@techsingularity.net>
-References: <20191205161928.19548.41654.stgit@localhost.localdomain>
- <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
+        id S1726713AbfLMLOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 06:14:03 -0500
+Received: from foss.arm.com ([217.140.110.172]:55148 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726090AbfLMLOD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 06:14:03 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1B231FB;
+        Fri, 13 Dec 2019 03:14:01 -0800 (PST)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 656FC3F718;
+        Fri, 13 Dec 2019 03:14:01 -0800 (PST)
+Date:   Fri, 13 Dec 2019 12:14:00 +0100
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
+ mappings
+Message-ID: <20191213111400.GI28840@e113682-lin.lund.arm.com>
+References: <20191211165651.7889-1-maz@kernel.org>
+ <20191211165651.7889-2-maz@kernel.org>
+ <20191213082920.GA28840@e113682-lin.lund.arm.com>
+ <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
+In-Reply-To: <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 13, 2019 at 11:00:42AM +0100, David Hildenbrand wrote:
-> > A brief history on the background of free page reporting can be found at:
-> > https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com/
+On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
+> Hi Christoffer,
+> 
+> On 2019-12-13 08:29, Christoffer Dall wrote:
+> > Hi Marc,
 > > 
-> > Changes from v13:
-> > https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost.localdomain/
-> > Rewrote core reporting functionality
-> >   Merged patches 3 & 4
-> >   Dropped boundary list and related code
-> >   Folded get_reported_page into page_reporting_fill
-> >   Folded page_reporting_fill into page_reporting_cycle
-> > Pulled reporting functionality out of free_reported_page
-> >   Renamed it to __free_isolated_page
-> >   Moved page reporting specific bits to page_reporting_drain
-> > Renamed phdev to prdev since we aren't "hinting" we are "reporting"
-> > Added documentation to describe the usage of unused page reporting
-> > Updated cover page and patch descriptions to avoid mention of boundary
+> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
+> > > A device mapping is normally always mapped at Stage-2, since there
+> > > is very little gain in having it faulted in.
 > > 
-> > Changes from v14:
-> > https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
-> > Renamed "unused page reporting" to "free page reporting"
-> >   Updated code, kconfig, and patch descriptions
-> > Split out patch for __free_isolated_page
-> >   Renamed function to __putback_isolated_page
-> > Rewrote core reporting functionality
-> >   Added logic to reschedule worker in 2 seconds instead of run to completion
-> >   Removed reported_pages statistics
-> >   Removed REPORTING_REQUESTED bit used in zone flags
-> >   Replaced page_reporting_dev_info refcount with state variable
-> >   Removed scatterlist from page_reporting_dev_info
-> >   Removed capacity from page reporting device
-> >   Added dynamic scatterlist allocation/free at start/end of reporting process
-> >   Updated __free_one_page so that reported pages are not always added to tail
-> >   Added logic to handle error from report function
-> > Updated virtio-balloon patch that adds support for page reporting
-> >   Updated patch description to try and highlight differences in approaches
-> >   Updated logic to reflect that we cannot limit the scatterlist from device
+> > It is actually becoming less clear to me what the real benefits of
+> > pre-populating the stage 2 page table are, especially given that we can
+> > provoke a situation where they're faulted in anyhow.  Do you recall if
+> > we had any specific case that motivated us to pre-fault in the pages?
 > 
-> Last time Mel said
+> It's only a minor performance optimization that was introduced by Ard in
+> 8eef91239e57d. Which makes sense for platform devices that have a single
+> fixed location in memory. It makes slightly less sense for PCI, where
+> you can move things around.
+
+User space could still decide to move things around in its VA map even
+if the device is fixed.
+
+Anyway, I was thinking more if there was some sort of device, like a
+frambuffer, which for example crosses page boundaries and where it would
+be visible to the user that there's a sudden performance drop while
+operating the device over page boundaries.  Anything like that?
+
 > 
-> "Ok, I'm ok with how this hooks into the allocator as the overhead is
-> minimal. However, the patch itself still includes a number of
-> optimisations instead of being a bare-boned implementation of the
-> feature with optimisations layered on top."
+> > > Nonetheless, it is possible to end-up in a situation where the
+> > > device
+> > > mapping has been removed from Stage-2 (userspace munmaped the VFIO
+> > > region, and the MMU notifier did its job), but present in a
+> > > userspace
+> > > mapping (userpace has mapped it back at the same address). In such
+> > > a situation, the device mapping will be demand-paged as the guest
+> > > performs memory accesses.
+> > > 
+> > > This requires to be careful when dealing with mapping size, cache
+> > > management, and to handle potential execution of a device mapping.
+> > > 
+> > > Cc: stable@vger.kernel.org
+> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+> > >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> > > index a48994af70b8..0b32a904a1bb 100644
+> > > --- a/virt/kvm/arm/mmu.c
+> > > +++ b/virt/kvm/arm/mmu.c
+> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
+> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+> > > 
+> > > +static bool is_iomap(unsigned long flags)
+> > > +{
+> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+> > > +}
+> > > +
+> > 
+> > nit: I'm not really sure this indirection makes the code more readable,
+> > but I guess that's a matter of taste.
+> > 
+> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+> > >  {
+> > >  	return memslot->dirty_bitmap && !(memslot->flags &
+> > > KVM_MEM_READONLY);
+> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
+> > > *vcpu, phys_addr_t fault_ipa,
+> > > 
+> > >  	vma_pagesize = vma_kernel_pagesize(vma);
+> > >  	if (logging_active ||
+> > > +	    (vma->vm_flags & VM_PFNMAP) ||
+> > 
+> > WHat is actually the rationale for this?
+> > 
+> > Why is a huge mapping not permitted to device memory?
+> > 
+> > Are we guaranteed that VM_PFNMAP on the vma results in device mappings?
+> > I'm not convinced this is the case, and it would be better if we can
+> > stick to a single primitive (either kvm_is_device_pfn, or VM_PFNMAP) to
+> > detect device mappings.
+> 
+> For now, I've tried to keep the two paths that deal with mapping devices
+> (or rather, things that we interpret as devices) as close as possible.
+> If we drop the "eager" mapping, then we're at liberty to restructure
+> this in creative ways.
+> 
+> This includes potential huge mappings, but I'm not sure the rest of the
+> kernel uses them for devices anyway (I need to find out).
+> 
+> > As a subsequent patch, I'd like to make sure that at the very least our
+> > memslot prepare function follows the exact same logic for mapping device
+> > memory as a fault-in approach does, or that we simply always fault pages
+> > in.
+> 
+> As far as I can see, the two approach are now identical. Am I missing
+> something?
+> And yes, getting rid of the eager mapping works for me.
 > 
 
-I didn't get the chance to take a close look as I'm trying to clear as
-much as possible from my table on the run-up to Christmas so I don't come
-back to a disaster inbox. I also noted that the Acks for earlier patches
-were not included so I was uncertain if doing a full review would still
-be a good use of time when time was tight.
+As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() which
+goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
+might result in doing the same offset calculation that we do in
+kvm_arch_prepare_memory_region(), but it also considers other scenarios.
 
-That said, some optimisations are still included but much reduced. For
-example, list rotations are still there but it's very straight-forward.
-The refcount is gone which is good and replaced by a state, which could be
-be better documented, but is more straight forward and the zone->lock is
-back protecting the free lists primarily and not zone metadata or prdev
-metadata (at least not obviously). I didn't put in the time to see if
-the atomic_set in page_reporting_process() is ok or whether state could
-be lost but I *think* it's ok because it should be called from just one
-workqueue request and they shouldn't be stacked. A comment there explaining
-why atomic_set is definitely correct would be helpful.
+Even if we analyze all that and convince oursleves it's always all the
+same on arm64, the two code paths could change, leading to really hard
+to debug differing behavior, and nobody will actively keep the two paths
+in sync.  I'd be fine with keeping the performance optimization if we
+have good grounds for that though, and using the same translation
+mechanism for VM_PFNMAP as user_mem_abort.
 
-I'm inclined to decide that yes, this version is potentially ok as a
-bare minimum but didn't put in the time to be 100% sure.
- 
--- 
-Mel Gorman
-SUSE Labs
+Am I missing something?
+
+> > 
+> > >  	    !fault_supports_stage2_huge_mapping(memslot, hva,
+> > > vma_pagesize)) {
+> > >  		force_pte = true;
+> > >  		vma_pagesize = PAGE_SIZE;
+> > > @@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu
+> > > *vcpu, phys_addr_t fault_ipa,
+> > >  			writable = false;
+> > >  	}
+> > > 
+> > > +	if (exec_fault && is_iomap(flags))
+> > > +		return -ENOEXEC;
+> > > +
+> > 
+> > nit: why don't you just do this when checking kvm_is_device_pfn() and
+> > avoid having logic in two places to deal with this case?
+> 
+> Good point. I've already sent the PR, but that could be a further cleanup.
+> 
+
+Sure, I can have a look when we agree on the above.
+
+> > 
+> > >  	spin_lock(&kvm->mmu_lock);
+> > >  	if (mmu_notifier_retry(kvm, mmu_seq))
+> > >  		goto out_unlock;
+> > > @@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu
+> > > *vcpu, phys_addr_t fault_ipa,
+> > >  	if (writable)
+> > >  		kvm_set_pfn_dirty(pfn);
+> > > 
+> > > -	if (fault_status != FSC_PERM)
+> > > +	if (fault_status != FSC_PERM && !is_iomap(flags))
+> > >  		clean_dcache_guest_page(pfn, vma_pagesize);
+> > > 
+> > >  	if (exec_fault)
+> > > @@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu
+> > > *vcpu, struct kvm_run *run)
+> > >  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+> > >  		if (is_iabt) {
+> > >  			/* Prefetch Abort on I/O address */
+> > > -			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> > > -			ret = 1;
+> > > -			goto out_unlock;
+> > > +			ret = -ENOEXEC;
+> > > +			goto out;
+> > >  		}
+> > > 
+> > >  		/*
+> > > @@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu
+> > > *vcpu, struct kvm_run *run)
+> > >  	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
+> > >  	if (ret == 0)
+> > >  		ret = 1;
+> > > +out:
+> > > +	if (ret == -ENOEXEC) {
+> > > +		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> > > +		ret = 1;
+> > > +	}
+> > >  out_unlock:
+> > >  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > >  	return ret;
+> > > --
+> > > 2.20.1
+> > > 
+> > 
+> > I can't seem to decide for myself if I think there's a sematic
+> > difference between trying to execute from somewhere the VMM has
+> > explicitly told us is device memory and from somewhere which we happen
+> > to have mapped with VM_PFNMAP from user space.  But I also can't seem to
+> > really fault it (pun intended).  Thoughts?
+> 
+> The issue is that the VMM never really tells us whether something is a
+> device mapping or not (the only exception being the GICv2 cpuif). Even
+> with PFNMAP, we guess it (it could well be memory that lives outside
+> of the linear mapping). I don't see a way to lift this ambiguity.
+> 
+> Ideally, faulting on executing a non-mapping should be offloaded to
+> userspace for emulation, in line with your patches that offload
+> non-emulated data accesses. That'd be a new ABI, and I can't imagine
+> anyone willing to deal with it.
+
+So what I was asking was if it makes sense to report the Prefetch Abort
+in the case where the VMM has already told us that it doesn't want to
+register anything backing the IPA (no memslot), and instead return an
+error to user space, so that it can make a decision (for example inject
+an external abort, which may have been the right thing to do in the
+former case as well, but that could be considered ABI now, so let's not
+kick that hornet's nest).
+
+In any case, no strong feelings here, I just have a vague feeling that
+injecting more prefetch aborts on execute-from-some-device is not
+necessarily the right thing to do.
+
+
+Thanks,
+
+    Christoffer
