@@ -2,122 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B042211EAAC
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 19:48:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0CA511EABC
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 19:52:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728890AbfLMSsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 13:48:17 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53222 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728827AbfLMSsP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 13:48:15 -0500
+        id S1728619AbfLMSwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 13:52:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48597 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728489AbfLMSwJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 13:52:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576262894;
+        s=mimecast20190719; t=1576263128;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VSDDjKTdNjIjYY9lNEGudZN4ZxbNPvX2QUzIT/T3/bU=;
-        b=H+RNfMxdNvTysBCOEmbPOGorcnkdQWR0n9YwUpYf65m+E0ejY7abgtQ04kHLSiM0UHU2Az
-        BWCe4hrJHp904ycXffWHXpDCVGBoLFmMWifQXPHMZYB9ZUI3ZUjE5r6bEQvZko5mrr7fTa
-        QDe+Owf7cMPRb/BLYrOL/nrCTXYhrwI=
+        bh=P3ZEIhPIn6Z1Gd4TQtzF4BdjV6X2XjIymWao54He2LU=;
+        b=hLmM0Pu4hBN3eqofKq76fZmv7uviMPSiTGiwJS67aMroEwh/OX43zrdpegTN7CkWbqyJQC
+        ig7IjeK98beOiP1vStDLfVQgZQpXelS3vpwvZHoNV24KTdo/gAowo8hjVajuvHLCgse8hS
+        Y8K2VsE1Hu3jv8RgMop+/JqXB2BIQXc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-arex5kL_PveUSWwTT-l1-A-1; Fri, 13 Dec 2019 13:48:12 -0500
-X-MC-Unique: arex5kL_PveUSWwTT-l1-A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-276-p3zr2D7mOIuZ-rkiLB8eZQ-1; Fri, 13 Dec 2019 13:52:07 -0500
+X-MC-Unique: p3zr2D7mOIuZ-rkiLB8eZQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 657F1107ACC4;
-        Fri, 13 Dec 2019 18:48:11 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-123.ams2.redhat.com [10.36.117.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CDC1460474;
-        Fri, 13 Dec 2019 18:48:09 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     davem@davemloft.net
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: [PATCH net 2/2] vsock/virtio: add WARN_ON check on virtio_transport_get_ops()
-Date:   Fri, 13 Dec 2019 19:48:01 +0100
-Message-Id: <20191213184801.486675-3-sgarzare@redhat.com>
-In-Reply-To: <20191213184801.486675-1-sgarzare@redhat.com>
-References: <20191213184801.486675-1-sgarzare@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4754DB2D;
+        Fri, 13 Dec 2019 18:52:05 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-115.brq.redhat.com [10.40.204.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6976610016DA;
+        Fri, 13 Dec 2019 18:51:51 +0000 (UTC)
+Date:   Fri, 13 Dec 2019 19:51:41 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        maz@kernel.org, andre.przywara@arm.com, vladimir.murzin@arm.com,
+        mark.rutland@arm.com
+Subject: Re: [kvm-unit-tests PATCH v2 00/18] arm/arm64: Various fixes
+Message-ID: <20191213185141.swqwi3jbkheakk3f@kamzik.brq.redhat.com>
+References: <20191128180418.6938-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191128180418.6938-1-alexandru.elisei@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-virtio_transport_get_ops() and virtio_transport_send_pkt_info()
-can only be used on connecting/connected sockets, since a socket
-assigned to a transport is required.
+On Thu, Nov 28, 2019 at 06:04:00PM +0000, Alexandru Elisei wrote:
+> This is a combination of the fixes from my EL2 series [1] and other new
+> fixes.
+> 
+> Changes in v2:
+> * Fixed the prefetch abort test on QEMU by changing the address used to
+>   cause the abort.
+> 
+> Summary of the patches:
+> * Patch 1 adds coherent translation table walks for ARMv7 and removes
+>   unneeded dcache maintenance.
+> * Patches 2-4 make translation table updates more robust.
+> * Patches 5-6 fix a pretty serious bug in our PSCI test, which was causing
+>   an infinite loop of prefetch aborts.
+> * Patches 7-10 add a proper test for prefetch aborts. The test now uses
+>   mmu_clear_user.
+> * Patches 11-13 are fixes for the timer test.
+> * Patches 14-15 fix turning the MMU off.
+> * Patches 16-18 are small fixes to make the code more robust, and perhaps
+>   more important, remove unnecessary operations that might hide real bugs
+>   in KVM.
+> 
+> Patches 1-4, 9, 18 are new. The rest are taken from the EL2 series, and
+> I've kept the Reviewed-by tag where appropriate. There are no major
+> changes, only those caused by rebasing on top of the current kvm-unit-tests
+> version.
 
-This patch adds a WARN_ON() on virtio_transport_get_ops() to check
-this requirement, a comment and a returned error on
-virtio_transport_send_pkt_info(),
+This series looks good to me, but it needs another rebase due to 
+a299895b7abb ("Switch the order of the parameters in report() and
+report_xfail()") and there are a few minor comments to address.
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport_common.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> Please review.
+> 
+> [1] https://www.spinics.net/lists/kvm/msg196797.html
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virt=
-io_transport_common.c
-index f5991006190e..6abec3fc81d1 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -34,6 +34,9 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
- {
- 	const struct vsock_transport *t =3D vsock_core_get_transport(vsk);
-=20
-+	if (WARN_ON(!t))
-+		return NULL;
-+
- 	return container_of(t, struct virtio_transport, transport);
- }
-=20
-@@ -161,15 +164,25 @@ void virtio_transport_deliver_tap_pkt(struct virtio=
-_vsock_pkt *pkt)
- }
- EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
-=20
-+/* This function can only be used on connecting/connected sockets,
-+ * since a socket assigned to a transport is required.
-+ *
-+ * Do not use on listener sockets!
-+ */
- static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 					  struct virtio_vsock_pkt_info *info)
- {
- 	u32 src_cid, src_port, dst_cid, dst_port;
-+	const struct virtio_transport *t_ops;
- 	struct virtio_vsock_sock *vvs;
- 	struct virtio_vsock_pkt *pkt;
- 	u32 pkt_len =3D info->pkt_len;
-=20
--	src_cid =3D virtio_transport_get_ops(vsk)->transport.get_local_cid();
-+	t_ops =3D virtio_transport_get_ops(vsk);
-+	if (unlikely(!t_ops))
-+		return -EFAULT;
-+
-+	src_cid =3D t_ops->transport.get_local_cid();
- 	src_port =3D vsk->local_addr.svm_port;
- 	if (!info->remote_cid) {
- 		dst_cid	=3D vsk->remote_addr.svm_cid;
-@@ -202,7 +215,7 @@ static int virtio_transport_send_pkt_info(struct vsoc=
-k_sock *vsk,
-=20
- 	virtio_transport_inc_tx_pkt(vvs, pkt);
-=20
--	return virtio_transport_get_ops(vsk)->send_pkt(pkt);
-+	return t_ops->send_pkt(pkt);
- }
-=20
- static bool virtio_transport_inc_rx_pkt(struct virtio_vsock_sock *vvs,
---=20
-2.23.0
+It's almost at the top of the TODO! I might even get to it during the
+holidays. Of course it could probably use a rebase now too.
+
+Thanks,
+drew
 
