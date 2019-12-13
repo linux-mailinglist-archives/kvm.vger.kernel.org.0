@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F91611E15E
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 11:01:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 220BD11E1C9
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 11:16:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726676AbfLMKBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 05:01:01 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55494 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726016AbfLMKBA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 05:01:00 -0500
+        id S1726090AbfLMKPy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 05:15:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31183 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725818AbfLMKPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 05:15:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576231259;
+        s=mimecast20190719; t=1576232152;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=sDfkzegf+YvU6Y6VD7ofOSD/W9ZKRpULuRJ7odfg5Qk=;
-        b=ErjWMT1oAUxs6f/EXs2eWbJn5ZVruktT2CsjZHm3ZzgRf+qOAeupVCYDsCQDRPG8O2DrPP
-        k6ryOHDqQCV4N+JTKOqcaFoae99xFLYcsCGf20rnR+WDE6/+biysz0aOilyJQSqe/ZmvLr
-        SvlwYd0Xw0Rh5kdWpyxhIFFA7Xwdsk0=
+        bh=fCyK+54C5dUu3rxHfQ2rgrM75MMeC+qMoOYiIQMgb+E=;
+        b=WsHy+czNgckWs8lws1s2Z5k/PfFt6v5xr7Unc8aQtSDQJqydJxGnfhqWu3JeFIQqJeu2iz
+        CWGoqM6++2iDHOXYktxkPE+noz4CyJ47Kg13MInn9j8uKLW01XvF5GhyDaPhnfYyv6C7xo
+        nvwCuH3PPG6o8uUqJ/VquuF5xr/9J6M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-BtdW1kXHN1m_wH_pGN9QnA-1; Fri, 13 Dec 2019 05:00:57 -0500
-X-MC-Unique: BtdW1kXHN1m_wH_pGN9QnA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-44-3JRo0FVoPCmbP0CwGCLrOQ-1; Fri, 13 Dec 2019 05:15:51 -0500
+X-MC-Unique: 3JRo0FVoPCmbP0CwGCLrOQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 423FE1005510;
-        Fri, 13 Dec 2019 10:00:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1859D8024D3;
+        Fri, 13 Dec 2019 10:15:49 +0000 (UTC)
 Received: from [10.36.117.150] (ovpn-117-150.ams2.redhat.com [10.36.117.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 232B2601B6;
-        Fri, 13 Dec 2019 10:00:42 +0000 (UTC)
-Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
- reporting
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 57AED5C1D4;
+        Fri, 13 Dec 2019 10:15:35 +0000 (UTC)
+Subject: Re: [PATCH v15 6/7] virtio-balloon: Add support for providing free
+ page reports to host
 To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
         mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
         mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
@@ -45,6 +45,7 @@ Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
         pbonzini@redhat.com, dan.j.williams@intel.com,
         alexander.h.duyck@linux.intel.com, osalvador@suse.de
 References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+ <20191205162255.19548.63866.stgit@localhost.localdomain>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -90,208 +91,71 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
-Date:   Fri, 13 Dec 2019 11:00:42 +0100
+Message-ID: <ca305a98-864e-ccb0-5393-f73997645acf@redhat.com>
+Date:   Fri, 13 Dec 2019 11:15:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191205161928.19548.41654.stgit@localhost.localdomain>
+In-Reply-To: <20191205162255.19548.63866.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 05.12.19 17:22, Alexander Duyck wrote:
-> This series provides an asynchronous means of reporting free guest page=
-s
-> to a hypervisor so that the memory associated with those pages can be
-> dropped and reused by other processes and/or guests on the host. Using
-> this it is possible to avoid unnecessary I/O to disk and greatly improv=
-e
-> performance in the case of memory overcommit on the host.
->=20
-> When enabled we will be performing a scan of free memory every 2 second=
-s
-> while pages of sufficiently high order are being freed. Currently the o=
-rder
-> used is pageblock_order so that this feature will not interfere with th=
-e
-> use of Transparent Huge Pages in the case of virtualization.
->=20
-> Currently this is only in use by virtio-balloon however there is the ho=
-pe
-> that at some point in the future other hypervisors might be able to mak=
-e
-> use of it. In the virtio-balloon/QEMU implementation the hypervisor is
-> currently using MADV_DONTNEED to indicate to the host kernel that the p=
-age
-> is currently free. It will be zeroed and faulted back into the guest th=
-e
-> next time the page is accessed.
->=20
-> To track if a page is reported or not the Uptodate flag was repurposed =
-and
-> used as a Reported flag for Buddy pages. We walk though the free list
-> isolating pages and adding them to the scatterlist until we either
-> encounter the end of the list, processed as many pages as were listed i=
-n
-> nr_free prior to us starting, or have filled the scatterlist with pages=
- to
-> be reported. If we fill the scatterlist before we reach the end of the
-> list we rotate the list so that the first unreported page we encounter =
-is
-> moved to the head of the list as that is where we will resume after we
-> have freed the reported pages back into the tail of the list.
->=20
-> Below are the results from various benchmarks. I primarily focused on t=
-wo
-> tests. The first is the will-it-scale/page_fault2 test, and the other i=
-s
-> a modified version of will-it-scale/page_fault1 that was enabled to use
-> THP. I did this as it allows for better visibility into different parts
-> of the memory subsystem. The guest is running with 32G for RAM on one
-> node of a E5-2630 v3. The host has had some power saving features disab=
-led
-> by setting the /dev/cpu_dma_latency value to 10ms.
->=20
-> Test                   page_fault1 (THP)    page_fault2
-> Name            tasks  Process Iter  STDEV  Process Iter  STDEV
-> Baseline            1    1208307.25  0.10%     408596.00  0.19%
->                    16    8865204.75  0.16%    3344169.00  0.60%
->=20
-> Patches applied     1    1206809.00  0.26%     412558.25  0.32%
->                    16    8814350.50  0.78%    3420102.00  1.16%
->=20
-> Patches enabled     1    1201386.25  0.21%     407903.75  0.32%
->                    16    8880178.00  0.08%    3396700.50  0.54%
->=20
-> Patches enabled     1    1173529.00  1.04%     409006.50  0.45%
->  page shuffle      16    8384540.25  0.74%    3288289.25  0.41%
->=20
-> Patches enabled     1    1193411.00  0.33%     406333.50  0.09%
->  shuffle w/ RFC    16    8812639.75  0.73%    3321706.25  0.53%
->=20
-> The results above are for a baseline with a linux-next-20191203 kernel,
-> that kernel with this patch set applied but page reporting disabled in
-> virtio-balloon, the patches applied and page reporting fully enabled, t=
-he
-> patches enabled with page shuffling enabled, and the patches applied wi=
-th
-> page shuffling enabled and an RFC patch that makes used of MADV_FREE in
-> QEMU. These results include the deviation seen between the average valu=
-e
-> reported here versus the high and/or low value. I observed that during =
-the
-> test memory usage for the first three tests never dropped whereas with =
-the
-> patches fully enabled the VM would drop to using only a few GB of the
-> host's memory when switching from memhog to page fault tests.
->=20
-> Any of the overhead visible with this patch set enabled seems due to pa=
-ge
-> faults caused by accessing the reported pages and the host zeroing the =
-page
-> before giving it back to the guest. This overhead is much more visible =
-when
-> using THP than with standard 4K pages. In addition page shuffling seeme=
-d to
-> increase the amount of faults generated due to an increase in memory ch=
-urn.
-> As seen in the data above, using MADV_FREE in QEMU mostly eliminates th=
-is
-> overhead.
->=20
-> The overall guest size is kept fairly small to only a few GB while the =
-test
-> is running. If the host memory were oversubscribed this patch set shoul=
-d
-> result in a performance improvement as swapping memory in the host can =
-be
-> avoided.
->=20
-> A brief history on the background of free page reporting can be found a=
-t:
-> https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.c=
-amel@linux.intel.com/
->=20
-> Changes from v13:
-> https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost=
-.localdomain/
-> Rewrote core reporting functionality
->   Merged patches 3 & 4
->   Dropped boundary list and related code
->   Folded get_reported_page into page_reporting_fill
->   Folded page_reporting_fill into page_reporting_cycle
-> Pulled reporting functionality out of free_reported_page
->   Renamed it to __free_isolated_page
->   Moved page reporting specific bits to page_reporting_drain
-> Renamed phdev to prdev since we aren't "hinting" we are "reporting"
-> Added documentation to describe the usage of unused page reporting
-> Updated cover page and patch descriptions to avoid mention of boundary
->=20
-> Changes from v14:
-> https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost=
-.localdomain/
-> Renamed "unused page reporting" to "free page reporting"
->   Updated code, kconfig, and patch descriptions
-> Split out patch for __free_isolated_page
->   Renamed function to __putback_isolated_page
-> Rewrote core reporting functionality
->   Added logic to reschedule worker in 2 seconds instead of run to compl=
-etion
->   Removed reported_pages statistics
->   Removed REPORTING_REQUESTED bit used in zone flags
->   Replaced page_reporting_dev_info refcount with state variable
->   Removed scatterlist from page_reporting_dev_info
->   Removed capacity from page reporting device
->   Added dynamic scatterlist allocation/free at start/end of reporting p=
-rocess
->   Updated __free_one_page so that reported pages are not always added t=
-o tail
->   Added logic to handle error from report function
-> Updated virtio-balloon patch that adds support for page reporting
->   Updated patch description to try and highlight differences in approac=
-hes
->   Updated logic to reflect that we cannot limit the scatterlist from de=
-vice
+> From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> 
+> Add support for the page reporting feature provided by virtio-balloon.
+> Reporting differs from the regular balloon functionality in that is is
+> much less durable than a standard memory balloon. Instead of creating a
+> list of pages that cannot be accessed the pages are only inaccessible
+> while they are being indicated to the virtio interface. Once the
+> interface has acknowledged them they are placed back into their respective
+> free lists and are once again accessible by the guest system.
+> 
+> Unlike a standard balloon we don't inflate and deflate the pages. Instead
+> we perform the reporting, and once the reporting is completed it is
+> assumed that the page has been dropped from the guest and will be faulted
+> back in the next time the page is accessed.
+> 
+> For this reason when I had originally introduced the patch set I referred
+> to this behavior as a "bubble" instead of a "balloon" since the duration
+> is short lived, and when the page is touched the "bubble" is popped and
+> the page is faulted back in.
 
-Last time Mel said
+While an interesting read, I would drop that comment as it isn't really
+of value for the code/codebase itself.
 
-"Ok, I'm ok with how this hooks into the allocator as the overhead is
-minimal. However, the patch itself still includes a number of
-optimisations instead of being a bare-boned implementation of the
-feature with optimisations layered on top."
+[...]
 
-and
+> +
+> +	vb->pr_dev_info.report = virtballoon_free_page_report;
+> +	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_REPORTING)) {
+> +		unsigned int capacity;
+> +
+> +		capacity = virtqueue_get_vring_size(vb->reporting_vq);
+> +		if (capacity < PAGE_REPORTING_CAPACITY) {
+> +			err = -ENOSPC;
+> +			goto out_unregister_shrinker;
 
-"Either way, the separate patch could have supporting data on how much
-it improves the speed of reporting pages so it can be compared to any
-other optimisation that may be proposed. Supporting data would also help
-make the case that any complexity introduced by the optimisation is
-worthwhile."
+It's somewhat strange to fail loading the balloon completely here.
+Wouldn't it be better to print e.g. a warning but continue without free
+page reporting?
 
-But I was only partially following that discussion.
+(I guess splitting up the list can be done in an addon patch if ever
+really needed for virtio-balloon)
 
-I can see that there is only one additional patch (before the reporting
-one) compared to the previous series on the MM side. Does that comment
-no longer apply (I can see e.g., "Removed REPORTING_REQUESTED bit used
-in zone flags" in the changelog) - IOW, did you drop all the
-optimizations in question for now? If so, can you share some performance
-differences with and without the previous optimizations? (just out of
-personal interest :) )
+Apart from that
 
-Christmas is getting closer, and at least in Europe/Germany that usually
-means that things will slow down ... or however you want to call that.
-So I wouldn't expect too much review happening before next year (but I
-might be wrong of course).
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Cheers!
+Thanks!
 
---=20
+-- 
 Thanks,
 
 David / dhildenb
