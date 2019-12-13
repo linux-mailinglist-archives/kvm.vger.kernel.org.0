@@ -2,176 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1480D11DF73
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 09:29:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE44C11E06A
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:13:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbfLMI3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 03:29:23 -0500
-Received: from foss.arm.com ([217.140.110.172]:49962 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbfLMI3W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 03:29:22 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 11AF8328;
-        Fri, 13 Dec 2019 00:29:22 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 75CA43F52E;
-        Fri, 13 Dec 2019 00:32:35 -0800 (PST)
-Date:   Fri, 13 Dec 2019 09:29:20 +0100
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
- mappings
-Message-ID: <20191213082920.GA28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191211165651.7889-2-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726680AbfLMJNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 04:13:48 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:33481 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbfLMJNs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 04:13:48 -0500
+Received: by mail-lf1-f66.google.com with SMTP id n25so1428090lfl.0
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 01:13:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=miSOuBuBS8hzmgNagLT6jYURcwUJ/tPdE04TWcJPNdY=;
+        b=HT9/AiaU3mYcL0cIpmPZIoyzF9E8bX5R4SvbzX9gwLjzL1S++jGnYd/pQS9vXrpWWw
+         pqHXn7C0m2yypqEvZ9zwYIQetr5XhX9BSuykSc7eSrMia6m6NbWhxvWoe8RPafyTBhEz
+         UXA5MNwDVQL4zjcl26wuU31afh2etYj/fKhV86towRCh5zJXMl+e/kZxV4sfmyUANYoB
+         i8uTlUxDbx/ngXENHLAVTpFgXSgcCLPxTmb77ce5f4mGoJO1ynufTEyPdF1AJWcbaRmU
+         ni2hRmvVMxdCKQXbI9R0EJ/mtuJiRZUMQz4rRxBQUF6UOJBG31Qx8SCZ54wTl5f7/PD3
+         GKcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=miSOuBuBS8hzmgNagLT6jYURcwUJ/tPdE04TWcJPNdY=;
+        b=ST3yCElY39Soxy/DogwaPMLrEv6BYSU3P6bjldX5EKXxFSZMtKLH1S0sN4zlP04dyn
+         Eoo4Q+nd/PUWC5rLAS7f/yJgBzSRNbiq86T3hcKF/dS/GaSQig+xNcw130bSxh6mrSFI
+         jMnbvMHa/oZOaljRxw96EQUj2lrma/dyfVKbw8bB16Y/IG1NF9lxZjiyPnxmC8UeFXqo
+         GCyNk7Hwv6gY+84CrSaDvxP/fLi8MkUZSmGLHW6+rtYhGn3eUxaVGbTXb4ybJyAFyjKT
+         mui09cIzfshRRKp65t4ab/WIv56df91RBWeZZDbF8fphyJHJx34kLhfhxdt9igzS6HeI
+         dEIg==
+X-Gm-Message-State: APjAAAVLcEAYlhZJUdaiK4xBWN24eWAgjPXPUqR096vMau9y937+OOFb
+        y29em17CWBSS1/MaX/GhcD4=
+X-Google-Smtp-Source: APXvYqxfCcrlPkcZ2A/oGPQji/dcEMZ83vMuepl1Bpm1APuzzLBKliLTVe5moUfEEKxEqZr0rFJEFA==
+X-Received: by 2002:ac2:51de:: with SMTP id u30mr8175010lfm.69.1576228426272;
+        Fri, 13 Dec 2019 01:13:46 -0800 (PST)
+Received: from [192.168.1.28] ([77.137.83.197])
+        by smtp.gmail.com with ESMTPSA id t9sm4137015lfl.51.2019.12.13.01.13.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Dec 2019 01:13:45 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [kvm-unit-tests PATCH] x86: Fix max VMCS field encoding index
+ check
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <CALMp9eQOKX6m0ih6bH5Oyqq5hFbSs7vn0MAZXka3RcOCrC+sUg@mail.gmail.com>
+Date:   Fri, 13 Dec 2019 11:13:42 +0200
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <51BBC492-AD4F-4AA4-B9AD-8E0AAFFC276F@gmail.com>
+References: <20190518163743.5396-1-nadav.amit@gmail.com>
+ <CALMp9eQOKX6m0ih6bH5Oyqq5hFbSs7vn0MAZXka3RcOCrC+sUg@mail.gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+> On Dec 13, 2019, at 12:59 AM, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> On Sat, May 18, 2019 at 4:58 PM Nadav Amit <nadav.amit@gmail.com> =
+wrote:
+>> The test that checks the maximum VMCS field encoding does not probe =
+all
+>> possible VMCS fields. As a result it might fail since the actual
+>> IA32_VMX_VMCS_ENUM.MAX_INDEX would be higher than the expected value.
+>>=20
+>> Change the test to check that the maximum of the supported probed
+>> VMCS fields is lower/equal than the actual reported
+>> IA32_VMX_VMCS_ENUM.MAX_INDEX.
+>=20
+> Wouldn't it be better to probe all possible VMCS fields and keep the
+> test for equality?
 
-On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
-> A device mapping is normally always mapped at Stage-2, since there
-> is very little gain in having it faulted in.
+It might take a while though=E2=80=A6
 
-It is actually becoming less clear to me what the real benefits of
-pre-populating the stage 2 page table are, especially given that we can
-provoke a situation where they're faulted in anyhow.  Do you recall if
-we had any specific case that motivated us to pre-fault in the pages?
+How about probing VMREAD/VMWRITE to MAX_INDEX in addition to all the =
+known
+VMCS fields and then checking for equation?
 
-> 
-> Nonetheless, it is possible to end-up in a situation where the device
-> mapping has been removed from Stage-2 (userspace munmaped the VFIO
-> region, and the MMU notifier did its job), but present in a userspace
-> mapping (userpace has mapped it back at the same address). In such
-> a situation, the device mapping will be demand-paged as the guest
-> performs memory accesses.
-> 
-> This requires to be careful when dealing with mapping size, cache
-> management, and to handle potential execution of a device mapping.
-> 
-> Cc: stable@vger.kernel.org
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index a48994af70b8..0b32a904a1bb 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -38,6 +38,11 @@ static unsigned long io_map_base;
->  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
->  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
->  
-> +static bool is_iomap(unsigned long flags)
-> +{
-> +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
-> +}
-> +
-
-nit: I'm not really sure this indirection makes the code more readable,
-but I guess that's a matter of taste.
-
->  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->  {
->  	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
-> @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	vma_pagesize = vma_kernel_pagesize(vma);
->  	if (logging_active ||
-> +	    (vma->vm_flags & VM_PFNMAP) ||
-
-WHat is actually the rationale for this?
-
-Why is a huge mapping not permitted to device memory?
-
-Are we guaranteed that VM_PFNMAP on the vma results in device mappings?
-I'm not convinced this is the case, and it would be better if we can
-stick to a single primitive (either kvm_is_device_pfn, or VM_PFNMAP) to
-detect device mappings.
-
-As a subsequent patch, I'd like to make sure that at the very least our
-memslot prepare function follows the exact same logic for mapping device
-memory as a fault-in approach does, or that we simply always fault pages
-in.
-
->  	    !fault_supports_stage2_huge_mapping(memslot, hva, vma_pagesize)) {
->  		force_pte = true;
->  		vma_pagesize = PAGE_SIZE;
-> @@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			writable = false;
->  	}
->  
-> +	if (exec_fault && is_iomap(flags))
-> +		return -ENOEXEC;
-> +
-
-nit: why don't you just do this when checking kvm_is_device_pfn() and
-avoid having logic in two places to deal with this case?
-
->  	spin_lock(&kvm->mmu_lock);
->  	if (mmu_notifier_retry(kvm, mmu_seq))
->  		goto out_unlock;
-> @@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (writable)
->  		kvm_set_pfn_dirty(pfn);
->  
-> -	if (fault_status != FSC_PERM)
-> +	if (fault_status != FSC_PERM && !is_iomap(flags))
->  		clean_dcache_guest_page(pfn, vma_pagesize);
->  
->  	if (exec_fault)
-> @@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
->  		if (is_iabt) {
->  			/* Prefetch Abort on I/O address */
-> -			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> -			ret = 1;
-> -			goto out_unlock;
-> +			ret = -ENOEXEC;
-> +			goto out;
->  		}
->  
->  		/*
-> @@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
->  	if (ret == 0)
->  		ret = 1;
-> +out:
-> +	if (ret == -ENOEXEC) {
-> +		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +		ret = 1;
-> +	}
->  out_unlock:
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
->  	return ret;
-> -- 
-> 2.20.1
-> 
-
-I can't seem to decide for myself if I think there's a sematic
-difference between trying to execute from somewhere the VMM has
-explicitly told us is device memory and from somewhere which we happen
-to have mapped with VM_PFNMAP from user space.  But I also can't seem to
-really fault it (pun intended).  Thoughts?
-
-
-Thanks,
-
-    Christoffer
