@@ -2,88 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C90D111DA32
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 00:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ADB211DB3B
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 01:46:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731383AbfLLXrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 18:47:19 -0500
-Received: from mga05.intel.com ([192.55.52.43]:18520 "EHLO mga05.intel.com"
+        id S1731689AbfLMAna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 19:43:30 -0500
+Received: from mga06.intel.com ([134.134.136.31]:19840 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726427AbfLLXrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 18:47:19 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1731593AbfLMAn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Dec 2019 19:43:29 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 15:47:19 -0800
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 16:43:28 -0800
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,307,1571727600"; 
-   d="scan'208";a="216278692"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 15:47:18 -0800
-Message-ID: <d85d5ca1ae621ad3f4c80d0dcd146a50bd7409fd.camel@linux.intel.com>
-Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
-        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
-        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mgorman@techsingularity.net, vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
-        lcapitulino@redhat.com, dave.hansen@intel.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, osalvador@suse.de
-Date:   Thu, 12 Dec 2019 15:47:18 -0800
-In-Reply-To: <20191205161928.19548.41654.stgit@localhost.localdomain>
-References: <20191205161928.19548.41654.stgit@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+   d="scan'208";a="216472424"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga003.jf.intel.com with ESMTP; 12 Dec 2019 16:43:26 -0800
+Date:   Fri, 13 Dec 2019 08:44:45 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        sean.j.christopherson@intel.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 0/7] Introduce support for guest CET feature
+Message-ID: <20191213004445.GA2822@local-michael-cet-test>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191212160345.GA13420@char.us.oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191212160345.GA13420@char.us.oracle.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2019-12-05 at 08:22 -0800, Alexander Duyck wrote:
-> This series provides an asynchronous means of reporting free guest pages
-> to a hypervisor so that the memory associated with those pages can be
-> dropped and reused by other processes and/or guests on the host. Using
-> this it is possible to avoid unnecessary I/O to disk and greatly improve
-> performance in the case of memory overcommit on the host.
-
-<snip>
-
-> Changes from v14:
-> https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
-> Renamed "unused page reporting" to "free page reporting"
->   Updated code, kconfig, and patch descriptions
-> Split out patch for __free_isolated_page
->   Renamed function to __putback_isolated_page
-> Rewrote core reporting functionality
->   Added logic to reschedule worker in 2 seconds instead of run to completion
->   Removed reported_pages statistics
->   Removed REPORTING_REQUESTED bit used in zone flags
->   Replaced page_reporting_dev_info refcount with state variable
->   Removed scatterlist from page_reporting_dev_info
->   Removed capacity from page reporting device
->   Added dynamic scatterlist allocation/free at start/end of reporting process
->   Updated __free_one_page so that reported pages are not always added to tail
->   Added logic to handle error from report function
-> Updated virtio-balloon patch that adds support for page reporting
->   Updated patch description to try and highlight differences in approaches
->   Updated logic to reflect that we cannot limit the scatterlist from device
->   Added logic to return error from report function
-> Moved documentation patch to end of patch set
-
-It has been about a week since I posted v15 and haven't heard anything.
-Consider this a gentle ping.
-
-I'm looking for input on patches 3 and 4 in this set as I updated them to
-address most of the concerns Mel had. Just wondering if the set needs
-additional work or if we are good with this as a starting point for this
-feature?
-
-Thanks.
-
-- Alex
+On Thu, Dec 12, 2019 at 11:03:45AM -0500, Konrad Rzeszutek Wilk wrote:
+> On Fri, Nov 01, 2019 at 04:52:15PM +0800, Yang Weijiang wrote:
+> > Control-flow Enforcement Technology (CET) provides protection against
+> > Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
+> > sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
+> > 
+> > KVM change is required to support guest CET feature.
+> > This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
+> > and vmentry/vmexit configuration etc.so that guest kernel can setup CET
+> > runtime infrastructure based on them. Some CET MSRs and related feature
+> > flags used reference the definitions in kernel patchset.
+> > 
+> > CET kernel patches is here:
+> > https://lkml.org/lkml/2019/8/13/1110
+> > https://lkml.org/lkml/2019/8/13/1109
+> 
+> Is there a git tree with all of them against v5.5-rc1 (so all three series)?
+> I tried your github tree: https://github.com/yyu168/linux_cet.git #cet
+> but sadly that does not apply against 5.5-rc1 :-(
+> 
+> Thanks!
+Hi, 
+The CET patch includes two parts: one from kernel side the other from KVM,
+the kernel patch in github is maintained by my peer, he'll rebase
+it to the latest kernel tree shortly after resolve some issues.
+Thank you for having interest!
 
