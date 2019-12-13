@@ -2,260 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CCC011E298
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:14:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E4B511E2F5
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:44:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726713AbfLMLOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 06:14:03 -0500
-Received: from foss.arm.com ([217.140.110.172]:55148 "EHLO foss.arm.com"
+        id S1726830AbfLMLmn convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 13 Dec 2019 06:42:43 -0500
+Received: from mga03.intel.com ([134.134.136.65]:4505 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726090AbfLMLOD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 06:14:03 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1B231FB;
-        Fri, 13 Dec 2019 03:14:01 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 656FC3F718;
-        Fri, 13 Dec 2019 03:14:01 -0800 (PST)
-Date:   Fri, 13 Dec 2019 12:14:00 +0100
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device
- mappings
-Message-ID: <20191213111400.GI28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
- <20191213082920.GA28840@e113682-lin.lund.arm.com>
- <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
+        id S1725980AbfLMLmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 06:42:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Dec 2019 03:42:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,309,1571727600"; 
+   d="scan'208";a="204302347"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by orsmga007.jf.intel.com with ESMTP; 13 Dec 2019 03:42:42 -0800
+Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 13 Dec 2019 03:42:41 -0800
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 13 Dec 2019 03:42:41 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.19]) with mapi id 14.03.0439.000;
+ Fri, 13 Dec 2019 19:42:39 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova
+ over first level
+Thread-Topic: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova
+ over first level
+Thread-Index: AQHVr8iiJX/bvAPmK0eIArQDcTD6yKe33K3Q
+Date:   Fri, 13 Dec 2019 11:42:38 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A130C08@SHSMSX104.ccr.corp.intel.com>
+References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
+ <20191211021219.8997-6-baolu.lu@linux.intel.com>
+In-Reply-To: <20191211021219.8997-6-baolu.lu@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDg4NzIyYWEtNjkzMy00ZTMyLTk5M2YtM2EwYWEyYmM4MzA1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiTzVPakZYSkZyRW5KZE5ZZVQ2NVpvR0lEZUdmbklPTWhSbWVVMkFZMno4WnNNeFwvRGhwVFg5XC9zUW9weWpxYWFnIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
-> Hi Christoffer,
+Hi Allen,
+
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
+> Of Lu Baolu
+> Sent: Wednesday, December 11, 2019 10:12 AM
+> To: Joerg Roedel <joro@8bytes.org>; David Woodhouse <dwmw2@infradead.org>;
+> Subject: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova over first level
 > 
-> On 2019-12-13 08:29, Christoffer Dall wrote:
-> > Hi Marc,
-> > 
-> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
-> > > A device mapping is normally always mapped at Stage-2, since there
-> > > is very little gain in having it faulted in.
-> > 
-> > It is actually becoming less clear to me what the real benefits of
-> > pre-populating the stage 2 page table are, especially given that we can
-> > provoke a situation where they're faulted in anyhow.  Do you recall if
-> > we had any specific case that motivated us to pre-fault in the pages?
+> When software has changed first-level tables, it should invalidate
+> the affected IOTLB and the paging-structure-caches using the PASID-
+> based-IOTLB Invalidate Descriptor defined in spec 6.5.2.4.
 > 
-> It's only a minor performance optimization that was introduced by Ard in
-> 8eef91239e57d. Which makes sense for platform devices that have a single
-> fixed location in memory. It makes slightly less sense for PCI, where
-> you can move things around.
-
-User space could still decide to move things around in its VA map even
-if the device is fixed.
-
-Anyway, I was thinking more if there was some sort of device, like a
-frambuffer, which for example crosses page boundaries and where it would
-be visible to the user that there's a sudden performance drop while
-operating the device over page boundaries.  Anything like that?
-
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+> ---
+>  drivers/iommu/dmar.c        | 41 ++++++++++++++++++++++++++++++++++
+>  drivers/iommu/intel-iommu.c | 44 ++++++++++++++++++++++++-------------
+>  include/linux/intel-iommu.h |  2 ++
+>  3 files changed, 72 insertions(+), 15 deletions(-)
 > 
-> > > Nonetheless, it is possible to end-up in a situation where the
-> > > device
-> > > mapping has been removed from Stage-2 (userspace munmaped the VFIO
-> > > region, and the MMU notifier did its job), but present in a
-> > > userspace
-> > > mapping (userpace has mapped it back at the same address). In such
-> > > a situation, the device mapping will be demand-paged as the guest
-> > > performs memory accesses.
-> > > 
-> > > This requires to be careful when dealing with mapping size, cache
-> > > management, and to handle potential execution of a device mapping.
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
-> > >  1 file changed, 17 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> > > index a48994af70b8..0b32a904a1bb 100644
-> > > --- a/virt/kvm/arm/mmu.c
-> > > +++ b/virt/kvm/arm/mmu.c
-> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
-> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
-> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
-> > > 
-> > > +static bool is_iomap(unsigned long flags)
-> > > +{
-> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
-> > > +}
-> > > +
-> > 
-> > nit: I'm not really sure this indirection makes the code more readable,
-> > but I guess that's a matter of taste.
-> > 
-> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
-> > >  {
-> > >  	return memslot->dirty_bitmap && !(memslot->flags &
-> > > KVM_MEM_READONLY);
-> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
-> > > *vcpu, phys_addr_t fault_ipa,
-> > > 
-> > >  	vma_pagesize = vma_kernel_pagesize(vma);
-> > >  	if (logging_active ||
-> > > +	    (vma->vm_flags & VM_PFNMAP) ||
-> > 
-> > WHat is actually the rationale for this?
-> > 
-> > Why is a huge mapping not permitted to device memory?
-> > 
-> > Are we guaranteed that VM_PFNMAP on the vma results in device mappings?
-> > I'm not convinced this is the case, and it would be better if we can
-> > stick to a single primitive (either kvm_is_device_pfn, or VM_PFNMAP) to
-> > detect device mappings.
+> diff --git a/drivers/iommu/dmar.c b/drivers/iommu/dmar.c
+> index 3acfa6a25fa2..fb30d5053664 100644
+> --- a/drivers/iommu/dmar.c
+> +++ b/drivers/iommu/dmar.c
+> @@ -1371,6 +1371,47 @@ void qi_flush_dev_iotlb(struct intel_iommu *iommu, u16
+> sid, u16 pfsid,
+>  	qi_submit_sync(&desc, iommu);
+>  }
 > 
-> For now, I've tried to keep the two paths that deal with mapping devices
-> (or rather, things that we interpret as devices) as close as possible.
-> If we drop the "eager" mapping, then we're at liberty to restructure
-> this in creative ways.
+> +/* PASID-based IOTLB invalidation */
+> +void qi_flush_piotlb(struct intel_iommu *iommu, u16 did, u32 pasid, u64 addr,
+> +		     unsigned long npages, bool ih)
+> +{
+> +	struct qi_desc desc = {.qw2 = 0, .qw3 = 0};
+> +
+> +	/*
+> +	 * npages == -1 means a PASID-selective invalidation, otherwise,
+> +	 * a positive value for Page-selective-within-PASID invalidation.
+> +	 * 0 is not a valid input.
+> +	 */
+> +	if (WARN_ON(!npages)) {
+> +		pr_err("Invalid input npages = %ld\n", npages);
+> +		return;
+> +	}
+> +
+> +	if (npages == -1) {
+> +		desc.qw0 = QI_EIOTLB_PASID(pasid) |
+> +				QI_EIOTLB_DID(did) |
+> +				QI_EIOTLB_GRAN(QI_GRAN_NONG_PASID) |
+> +				QI_EIOTLB_TYPE;
+> +		desc.qw1 = 0;
+> +	} else {
+> +		int mask = ilog2(__roundup_pow_of_two(npages));
+> +		unsigned long align = (1ULL << (VTD_PAGE_SHIFT + mask));
+> +
+> +		if (WARN_ON_ONCE(!ALIGN(addr, align)))
+> +			addr &= ~(align - 1);
+> +
+> +		desc.qw0 = QI_EIOTLB_PASID(pasid) |
+> +				QI_EIOTLB_DID(did) |
+> +				QI_EIOTLB_GRAN(QI_GRAN_PSI_PASID) |
+> +				QI_EIOTLB_TYPE;
+> +		desc.qw1 = QI_EIOTLB_ADDR(addr) |
+> +				QI_EIOTLB_IH(ih) |
+> +				QI_EIOTLB_AM(mask);
+> +	}
+> +
+> +	qi_submit_sync(&desc, iommu);
+> +}
+> +
+>  /*
+>   * Disable Queued Invalidation interface.
+>   */
+> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+> index 83a7abf0c4f0..e47f5fe37b59 100644
+> --- a/drivers/iommu/intel-iommu.c
+> +++ b/drivers/iommu/intel-iommu.c
+> @@ -1520,18 +1520,24 @@ static void iommu_flush_iotlb_psi(struct intel_iommu
+> *iommu,
 > 
-> This includes potential huge mappings, but I'm not sure the rest of the
-> kernel uses them for devices anyway (I need to find out).
-> 
-> > As a subsequent patch, I'd like to make sure that at the very least our
-> > memslot prepare function follows the exact same logic for mapping device
-> > memory as a fault-in approach does, or that we simply always fault pages
-> > in.
-> 
-> As far as I can see, the two approach are now identical. Am I missing
-> something?
-> And yes, getting rid of the eager mapping works for me.
-> 
+>  	if (ih)
+>  		ih = 1 << 6;
+> -	/*
+> -	 * Fallback to domain selective flush if no PSI support or the size is
+> -	 * too big.
+> -	 * PSI requires page size to be 2 ^ x, and the base address is naturally
+> -	 * aligned to the size
+> -	 */
+> -	if (!cap_pgsel_inv(iommu->cap) || mask > cap_max_amask_val(iommu-
+> >cap))
+> -		iommu->flush.flush_iotlb(iommu, did, 0, 0,
+> -						DMA_TLB_DSI_FLUSH);
+> -	else
+> -		iommu->flush.flush_iotlb(iommu, did, addr | ih, mask,
+> -						DMA_TLB_PSI_FLUSH);
+> +
+> +	if (domain_use_first_level(domain)) {
+> +		qi_flush_piotlb(iommu, did, domain->default_pasid,
+> +				addr, pages, ih);
 
-As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() which
-goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
-might result in doing the same offset calculation that we do in
-kvm_arch_prepare_memory_region(), but it also considers other scenarios.
+I'm not sure if my understanding is correct. But let me tell a story.
+Assuming we assign a mdev and a PF/VF to a single VM, then there
+will be p_iotlb tagged with PASID_RID2PASID and p_iotlb tagged with
+default_pasid. We may want to flush both... If this operation is
+invoked per-device, then need to pass in a hint to indicate whether
+to use PASID_RID2PASID or default_pasid, or you may just issue two
+flush with the two PASID values. Thoughts?
 
-Even if we analyze all that and convince oursleves it's always all the
-same on arm64, the two code paths could change, leading to really hard
-to debug differing behavior, and nobody will actively keep the two paths
-in sync.  I'd be fine with keeping the performance optimization if we
-have good grounds for that though, and using the same translation
-mechanism for VM_PFNMAP as user_mem_abort.
-
-Am I missing something?
-
-> > 
-> > >  	    !fault_supports_stage2_huge_mapping(memslot, hva,
-> > > vma_pagesize)) {
-> > >  		force_pte = true;
-> > >  		vma_pagesize = PAGE_SIZE;
-> > > @@ -1760,6 +1766,9 @@ static int user_mem_abort(struct kvm_vcpu
-> > > *vcpu, phys_addr_t fault_ipa,
-> > >  			writable = false;
-> > >  	}
-> > > 
-> > > +	if (exec_fault && is_iomap(flags))
-> > > +		return -ENOEXEC;
-> > > +
-> > 
-> > nit: why don't you just do this when checking kvm_is_device_pfn() and
-> > avoid having logic in two places to deal with this case?
-> 
-> Good point. I've already sent the PR, but that could be a further cleanup.
-> 
-
-Sure, I can have a look when we agree on the above.
-
-> > 
-> > >  	spin_lock(&kvm->mmu_lock);
-> > >  	if (mmu_notifier_retry(kvm, mmu_seq))
-> > >  		goto out_unlock;
-> > > @@ -1781,7 +1790,7 @@ static int user_mem_abort(struct kvm_vcpu
-> > > *vcpu, phys_addr_t fault_ipa,
-> > >  	if (writable)
-> > >  		kvm_set_pfn_dirty(pfn);
-> > > 
-> > > -	if (fault_status != FSC_PERM)
-> > > +	if (fault_status != FSC_PERM && !is_iomap(flags))
-> > >  		clean_dcache_guest_page(pfn, vma_pagesize);
-> > > 
-> > >  	if (exec_fault)
-> > > @@ -1948,9 +1957,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu
-> > > *vcpu, struct kvm_run *run)
-> > >  	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-> > >  		if (is_iabt) {
-> > >  			/* Prefetch Abort on I/O address */
-> > > -			kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> > > -			ret = 1;
-> > > -			goto out_unlock;
-> > > +			ret = -ENOEXEC;
-> > > +			goto out;
-> > >  		}
-> > > 
-> > >  		/*
-> > > @@ -1992,6 +2000,11 @@ int kvm_handle_guest_abort(struct kvm_vcpu
-> > > *vcpu, struct kvm_run *run)
-> > >  	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
-> > >  	if (ret == 0)
-> > >  		ret = 1;
-> > > +out:
-> > > +	if (ret == -ENOEXEC) {
-> > > +		kvm_inject_pabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> > > +		ret = 1;
-> > > +	}
-> > >  out_unlock:
-> > >  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> > >  	return ret;
-> > > --
-> > > 2.20.1
-> > > 
-> > 
-> > I can't seem to decide for myself if I think there's a sematic
-> > difference between trying to execute from somewhere the VMM has
-> > explicitly told us is device memory and from somewhere which we happen
-> > to have mapped with VM_PFNMAP from user space.  But I also can't seem to
-> > really fault it (pun intended).  Thoughts?
-> 
-> The issue is that the VMM never really tells us whether something is a
-> device mapping or not (the only exception being the GICv2 cpuif). Even
-> with PFNMAP, we guess it (it could well be memory that lives outside
-> of the linear mapping). I don't see a way to lift this ambiguity.
-> 
-> Ideally, faulting on executing a non-mapping should be offloaded to
-> userspace for emulation, in line with your patches that offload
-> non-emulated data accesses. That'd be a new ABI, and I can't imagine
-> anyone willing to deal with it.
-
-So what I was asking was if it makes sense to report the Prefetch Abort
-in the case where the VMM has already told us that it doesn't want to
-register anything backing the IPA (no memslot), and instead return an
-error to user space, so that it can make a decision (for example inject
-an external abort, which may have been the right thing to do in the
-former case as well, but that could be considered ABI now, so let's not
-kick that hornet's nest).
-
-In any case, no strong feelings here, I just have a vague feeling that
-injecting more prefetch aborts on execute-from-some-device is not
-necessarily the right thing to do.
-
-
-Thanks,
-
-    Christoffer
+Regards,
+Yi Liu
