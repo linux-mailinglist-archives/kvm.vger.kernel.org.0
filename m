@@ -2,147 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F346D11E07B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:22:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C144711E080
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:23:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725906AbfLMJWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 04:22:42 -0500
-Received: from foss.arm.com ([217.140.110.172]:51578 "EHLO foss.arm.com"
+        id S1726004AbfLMJXT convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 13 Dec 2019 04:23:19 -0500
+Received: from mga18.intel.com ([134.134.136.126]:57593 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725793AbfLMJWm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 04:22:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90D2E1FB;
-        Fri, 13 Dec 2019 01:22:41 -0800 (PST)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.145.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 255743F52E;
-        Fri, 13 Dec 2019 01:22:41 -0800 (PST)
-Date:   Fri, 13 Dec 2019 10:22:39 +0100
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: Re-check VMA on detecting a poisoned
- page
-Message-ID: <20191213092239.GB28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-3-maz@kernel.org>
+        id S1725928AbfLMJXT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 04:23:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Dec 2019 01:23:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,309,1571727600"; 
+   d="scan'208";a="211393966"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+  by fmsmga008.fm.intel.com with ESMTP; 13 Dec 2019 01:23:18 -0800
+Received: from fmsmsx122.amr.corp.intel.com (10.18.125.37) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 13 Dec 2019 01:23:18 -0800
+Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
+ fmsmsx122.amr.corp.intel.com (10.18.125.37) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 13 Dec 2019 01:23:18 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
+ SHSMSX107.ccr.corp.intel.com ([169.254.9.164]) with mapi id 14.03.0439.000;
+ Fri, 13 Dec 2019 17:23:16 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "Raj, Ashok" <ashok.raj@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over
+ first level
+Thread-Topic: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over
+ first level
+Thread-Index: AQHVr8iyIh/47oarrk2lLODWaUc1kqe3zByg
+Date:   Fri, 13 Dec 2019 09:23:15 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1309A9@SHSMSX104.ccr.corp.intel.com>
+References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
+ <20191211021219.8997-5-baolu.lu@linux.intel.com>
+In-Reply-To: <20191211021219.8997-5-baolu.lu@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzQxZGNkNzItOTI2OC00OGJmLWExYzMtODFlZjE2ODZmOTI3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiU0ptUHhqUkVidllOY0lhMzJsdm1ZTnR1em9jbEdza0FDNW9wQ05RbnhGTHQrbHNjb2FzMjNYbStkZ3FMMHBlMiJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191211165651.7889-3-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 04:56:49PM +0000, Marc Zyngier wrote:
-> When we check for a poisoned page, we use the VMA to tell userspace
-> about the looming disaster. But we pass a pointer to this VMA
-> after having released the mmap_sem, which isn't a good idea.
+Hi Allen,
+
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
+> Of Lu Baolu
+> Sent: Wednesday, December 11, 2019 10:12 AM
+> Subject: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over first level
 > 
-> Instead, re-check that we have still have a VMA, and that this
-> VMA still points to a poisoned page. If the VMA isn't there,
-> userspace is playing with our nerves, so lety's give it a -EFAULT
-> (it deserves it). If the PFN isn't poisoned anymore, let's restart
-> from the top and handle the fault again.
+> Intel VT-d in scalable mode supports two types of page tables for IOVA translation:
+> first level and second level. The IOMMU driver can choose one from both for IOVA
+> translation according to the use case. This sets up the pasid entry if a domain is
+> selected to use the first-level page table for iova translation.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 > ---
->  virt/kvm/arm/mmu.c | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
+>  drivers/iommu/intel-iommu.c | 48 +++++++++++++++++++++++++++++++++++--
+>  include/linux/intel-iommu.h | 10 ++++----
+>  2 files changed, 52 insertions(+), 6 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 0b32a904a1bb..f73393f5ddb7 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1741,9 +1741,30 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
->  	if (pfn == KVM_PFN_ERR_HWPOISON) {
-> -		kvm_send_hwpoison_signal(hva, vma);
-> -		return 0;
-> +		/*
-> +		 * Search for the VMA again, as it may have been
-> +		 * removed in the interval...
-> +		 */
-> +		down_read(&current->mm->mmap_sem);
-> +		vma = find_vma_intersection(current->mm, hva, hva + 1);
-> +		if (vma) {
-> +			/*
-> +			 * Recheck for a poisoned page. If something changed
-> +			 * behind our back, don't do a thing and take the
-> +			 * fault again.
-> +			 */
-> +			pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
-> +			if (pfn == KVM_PFN_ERR_HWPOISON)
-> +				kvm_send_hwpoison_signal(hva, vma);
-> +
-> +			ret = 0;
-> +		} else {
-> +			ret = -EFAULT;
-> +		}
-> +		up_read(&current->mm->mmap_sem);
-> +		return ret;
->  	}
-> +
->  	if (is_error_noslot_pfn(pfn))
->  		return -EFAULT;
->  
-> -- 
-> 2.20.1
+> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c index
+> 2b5a47584baf..83a7abf0c4f0 100644
+> --- a/drivers/iommu/intel-iommu.c
+> +++ b/drivers/iommu/intel-iommu.c
+> @@ -571,6 +571,11 @@ static inline int domain_type_is_si(struct dmar_domain
+> *domain)
+>  	return domain->flags & DOMAIN_FLAG_STATIC_IDENTITY;  }
 > 
+> +static inline bool domain_use_first_level(struct dmar_domain *domain) {
+> +	return domain->flags & DOMAIN_FLAG_USE_FIRST_LEVEL; }
+> +
+>  static inline int domain_pfn_supported(struct dmar_domain *domain,
+>  				       unsigned long pfn)
+>  {
+> @@ -2288,6 +2293,8 @@ static int __domain_mapping(struct dmar_domain
+> *domain, unsigned long iov_pfn,
+>  		return -EINVAL;
+> 
+>  	prot &= DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP;
+> +	if (domain_use_first_level(domain))
+> +		prot |= DMA_FL_PTE_PRESENT;
 
-If I read this code correctly, then all we use the VMA for is to find
-the page size used by the MMU to back the VMA, which we've already
-established in the vma_pagesize (and possibly adjusted to something more
-accurate based on our constraints in stage 2 which generated the error),
-so all we need is the size and a way to convert that into a shift.
+For DMA_PTE_SNP bit, I think there needs some work. The bit 11 of prot
+should be cleared when FLPT is used for IOVA.
 
-Not being 100% confident about the semantics of the lsb bit we pass to
-user space (is it indicating the size of the mapping which caused the
-error or the size of the mapping where user space could potentially
-trigger an error?), or wheter we care enough at that level, could we
-consider something like the following instead?
+Also, we need to set bit 63 "XD" properly. e.g. If bit 11 of prot is set, it
+means snoop required, then "XD" bit is "0". If bit 11 of prot is "0", it means
+this domain is not snooping, so you may want to set "XD" bit as "1". With
+such enhancement, I think IOVA over FLPT would have as less difference
+with IOVA over SLPT.
 
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 38b4c910b6c3..2509d9dec42d 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -1592,15 +1592,9 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
- }
- 
- static void kvm_send_hwpoison_signal(unsigned long address,
--				     struct vm_area_struct *vma)
-+				     unsigned long vma_pagesize)
- {
--	short lsb;
--
--	if (is_vm_hugetlb_page(vma))
--		lsb = huge_page_shift(hstate_vma(vma));
--	else
--		lsb = PAGE_SHIFT;
--
-+	short lsb = __ffs(vma_pagesize);
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
- }
- 
-@@ -1735,7 +1729,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
--		kvm_send_hwpoison_signal(hva, vma);
-+		kvm_send_hwpoison_signal(hva, vma_pagesize);
- 		return 0;
- 	}
- 	if (is_error_noslot_pfn(pfn))
-
-
-Thanks,
-
-    Christoffer
+Regards,
+Yi Liu
