@@ -2,150 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B637C11E124
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:47:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CDC411E12B
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:50:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbfLMJrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 04:47:39 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:45984 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725799AbfLMJrj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 04:47:39 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1ifhXs-0002Pq-GE; Fri, 13 Dec 2019 10:47:36 +0100
-To:     Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 3/3] kvm/arm: Standardize kvm exit reason field
-X-PHP-Originating-Script: 0:main.inc
+        id S1725793AbfLMJuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 04:50:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54878 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725799AbfLMJuV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 04:50:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576230619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sb1dTjMZ9HzpDhd/n04vmVM+Q+wH13AKDyjIlsf+IvM=;
+        b=bIafQFo65v6xU7/m69oh9XCF7L9OtqeY71gwuMfPtpsI9179SKZVs3D8mZkgtOYKQB0fwF
+        wH7XCPyzk5Qvv+1ms7qhhh33A5iZBlnYt90vCcrwsgQam3xa0W6KvBBQNuYjEuRmeU4ddG
+        J4hS2v967hW5CEVtLNtuXCXq6gKyadM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-r4ErXIL1P9OcdSq93F0IVQ-1; Fri, 13 Dec 2019 04:50:16 -0500
+X-MC-Unique: r4ErXIL1P9OcdSq93F0IVQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B5891883522;
+        Fri, 13 Dec 2019 09:50:15 +0000 (UTC)
+Received: from gondolin (ovpn-116-226.ams2.redhat.com [10.36.116.226])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A5C5F5D9C9;
+        Fri, 13 Dec 2019 09:50:11 +0000 (UTC)
+Date:   Fri, 13 Dec 2019 10:50:09 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 9/9] s390x: css: ping pong
+Message-ID: <20191213105009.482bab48.cohuck@redhat.com>
+In-Reply-To: <1576079170-7244-10-git-send-email-pmorel@linux.ibm.com>
+References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
+        <1576079170-7244-10-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Fri, 13 Dec 2019 09:47:36 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <paulus@ozlabs.org>, <jhogan@kernel.org>, <drjones@redhat.com>,
-        <vkuznets@redhat.com>
-In-Reply-To: <f101e4a6-bebf-d30f-3dfe-99ded0644836@redhat.com>
-References: <20191212024512.39930-4-gshan@redhat.com>
- <2e960d77afc7ac75f1be73a56a9aca66@www.loen.fr>
- <f101e4a6-bebf-d30f-3dfe-99ded0644836@redhat.com>
-Message-ID: <30c0da369a898143246106205cb3af59@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, paulus@ozlabs.org, jhogan@kernel.org, drjones@redhat.com, vkuznets@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,
+On Wed, 11 Dec 2019 16:46:10 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 2019-12-13 00:50, Gavin Shan wrote:
-> On 12/12/19 8:23 PM, Marc Zyngier wrote:
->> On 2019-12-12 02:45, Gavin Shan wrote:
->>> This standardizes kvm exit reason field name by replacing "esr_ec"
->>> with "exit_reason".
->>>
->>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>> ---
->>>  virt/kvm/arm/trace.h | 14 ++++++++------
->>>  1 file changed, 8 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
->>> index 204d210d01c2..0ac774fd324d 100644
->>> --- a/virt/kvm/arm/trace.h
->>> +++ b/virt/kvm/arm/trace.h
->>> @@ -27,25 +27,27 @@ TRACE_EVENT(kvm_entry,
->>>  );
->>>
->>>  TRACE_EVENT(kvm_exit,
->>> -    TP_PROTO(int ret, unsigned int esr_ec, unsigned long vcpu_pc),
->>> -    TP_ARGS(ret, esr_ec, vcpu_pc),
->>> +    TP_PROTO(int ret, unsigned int exit_reason, unsigned long 
->>> vcpu_pc),
->>> +    TP_ARGS(ret, exit_reason, vcpu_pc),
->>>
->>>      TP_STRUCT__entry(
->>>          __field(    int,        ret        )
->>> -        __field(    unsigned int,    esr_ec        )
->>> +        __field(    unsigned int,    exit_reason    )
->> I don't think the two are the same thing. The exit reason should be
->> exactly that: why has the guest exited (exception, host interrupt, 
->> trap).
->> What we're reporting here is the exception class, which doesn't 
->> apply to
->> interrupts, for example (hence the 0 down below, which we treat as a
->> catch-all).
->>
->
-> Marc, thanks a lot for your reply. Yeah, the combination (ret and 
-> esr_ec) is
-> complete to indicate the exit reasons if I'm understanding correctly.
->
-> The exit reasons seen by kvm_stat is exactly the ESR_EL1[EC]. It's 
-> declared
-> by marcro AARCH64_EXIT_REASONS in tools/kvm/kvm_stat/kvm_stat. So
-> it's precise
-> and complete from perspective of kvm_stat.
->
-> For the patch itself, it standardizes the filter name by renaming 
-> "esr_ec"
-> to "exit_reason", no functional changes introduced and I think it 
-> would be
-> fine.
+> To test a write command with the SSCH instruction we need a QEMU device,
+> with control unit type 0xC0CA. The PONG device is such a device.
+> 
+> This type of device responds to PONG_WRITE requests by incrementing an
+> integer, stored as a string at offset 0 of the CCW data.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  s390x/css.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
+> diff --git a/s390x/css.c b/s390x/css.c
+> index 7b9bdb1..a09cdff 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -26,6 +26,9 @@
+>  
+>  #define CSS_TEST_INT_PARAM	0xcafec0ca
+>  #define PONG_CU_TYPE		0xc0ca
+> +/* Channel Commands for PONG device */
+> +#define PONG_WRITE	0x21 /* Write */
+> +#define PONG_READ	0x22 /* Read buffer */
+>  
+>  struct lowcore *lowcore = (void *)0x0;
+>  
+> @@ -302,6 +305,48 @@ unreg_cb:
+>  	unregister_io_int_func(irq_io);
+>  }
+>  
+> +static void test_ping(void)
+> +{
+> +	int success, result;
+> +	int cnt = 0, max = 4;
+> +
+> +	if (senseid.cu_type != PONG_CU) {
+> +		report_skip("No PONG, no ping-pong");
+> +		return;
+> +	}
+> +
+> +	result = register_io_int_func(irq_io);
+> +	if (result) {
+> +		report(0, "Could not register IRQ handler");
+> +		return;
+> +	}
+> +
+> +	while (cnt++ < max) {
+> +		snprintf(buffer, BUF_SZ, "%08x\n", cnt);
+> +		success = start_subchannel(PONG_WRITE, buffer, 8);
 
-It may not be a functional change, but it is a semantic change. To me,
-'exit_reason' means something, and esr_ec something entirely different.
+Magic value? Maybe introduce a #define for the lengths of the
+reads/writes?
 
-But the real blocker is below.
+[This also got me thinking about your start_subchannel function
+again... do you also want to allow flags like e.g. SLI? It's not
+unusual for commands to return different lengths of data depending on
+what features are available; it might be worthwhile to allow short data
+if you're not sure that e.g. a command returns either the short or the
+long version of a structure.]
 
->>>          __field(    unsigned long,    vcpu_pc        )
->>>      ),
->>>
->>>      TP_fast_assign(
->>>          __entry->ret            = ARM_EXCEPTION_CODE(ret);
->>> -        __entry->esr_ec = ARM_EXCEPTION_IS_TRAP(ret) ? esr_ec : 0;
->>> +        __entry->exit_reason =
->>> +            ARM_EXCEPTION_IS_TRAP(ret) ? exit_reason: 0;
->>>          __entry->vcpu_pc        = vcpu_pc;
->>>      ),
->>>
->>>      TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
->>>            __print_symbolic(__entry->ret, kvm_arm_exception_type),
->>> -          __entry->esr_ec,
->>> -          __print_symbolic(__entry->esr_ec, 
->>> kvm_arm_exception_class),
->>> +          __entry->exit_reason,
->>> +          __print_symbolic(__entry->exit_reason,
->>> +                   kvm_arm_exception_class),
->>>            __entry->vcpu_pc)
->>>  );
->> The last thing is whether such a change is an ABI change or not. 
->> I've been very
->> reluctant to change any of this for that reason.
->>
->
-> Yeah, I think it is ABI change unfortunately, but I'm not sure how
-> many applications are using this filter.
 
-Nobody can tell. The problem is that someone will write a script that
-parses this trace point based on an older kernel release (such as
-what the distros are shipping today), and two years from now will
-shout at you (and me) for having broken their toy.
+> +		if (!success) {
+> +			report(0, "start_subchannel failed");
+> +			goto unreg_cb;
+> +		}
+> +		delay(100);
+> +		success = start_subchannel(PONG_READ, buffer, 8);
+> +		if (!success) {
+> +			report(0, "start_subchannel failed");
+> +			goto unreg_cb;
+> +		}
+> +		result = atol(buffer);
+> +		if (result != (cnt + 1)) {
+> +			report(0, "Bad answer from pong: %08x - %08x",
+> +			       cnt, result);
+> +			goto unreg_cb;
+> +		}
+> +	}
+> +	report(1, "ping-pong count 0x%08x", cnt);
+> +
+> +unreg_cb:
+> +	unregister_io_int_func(irq_io);
+> +}
+> +
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+> @@ -309,6 +354,7 @@ static struct {
+>  	{ "enumerate (stsch)", test_enumerate },
+>  	{ "enable (msch)", test_enable },
+>  	{ "sense (ssch/tsch)", test_sense },
+> +	{ "ping-pong (ssch/tsch)", test_ping },
+>  	{ NULL, NULL }
+>  };
+>  
 
-> However, the fixed filter name ("exit_reason") is beneficial in long 
-> run.
-> The application needn't distinguish architects to provide different
-> tracepoint filters at least.
-
-Well, you certainly need to understand the actual semantic behind the
-fields if you want to draw any meaningful conclusion. Otherwise, all
-you need is to measure the frequency of such event.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
