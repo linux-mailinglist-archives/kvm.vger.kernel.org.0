@@ -2,89 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F204011E114
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:44:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FCAF11E121
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 10:47:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725980AbfLMJoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 04:44:04 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58981 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725906AbfLMJoE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 04:44:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576230243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gOgJdnJ609aVF577TfLUwbjtrkAenVSxQ2coKhi0JW4=;
-        b=JZbVJciGQgA4cUZHrbokTv5qfm1+nKLRK+FLh1+n3K0N07E407EiQqPMXo/IP80/k27gS5
-        r6ssU5jxKONc7SSoTFJtLu2puqgoj62UJ6PT5rA0Uqr1Wt94rte+Op/M3ZmOGdOqQPo/fc
-        YNRFTQ9hBvNMo6HVDzcjs13MUbklLqM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-Vl9TlJfBN_u9-i2pG6v0LA-1; Fri, 13 Dec 2019 04:44:02 -0500
-X-MC-Unique: Vl9TlJfBN_u9-i2pG6v0LA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C433E1883525;
-        Fri, 13 Dec 2019 09:44:00 +0000 (UTC)
-Received: from gondolin (ovpn-116-226.ams2.redhat.com [10.36.116.226])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B96B45D9C9;
-        Fri, 13 Dec 2019 09:43:52 +0000 (UTC)
-Date:   Fri, 13 Dec 2019 10:43:50 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v4 8/9] s390x: css: ssch/tsch with sense
- and interrupt
-Message-ID: <20191213104350.6ebe4aa6.cohuck@redhat.com>
-In-Reply-To: <96034dbc-489a-7f76-0402-d5c0c42d20b3@linux.ibm.com>
-References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
-        <1576079170-7244-9-git-send-email-pmorel@linux.ibm.com>
-        <20191212132634.3a16a389.cohuck@redhat.com>
-        <1ea58644-9f24-f547-92d5-a99dcb041502@linux.ibm.com>
-        <96034dbc-489a-7f76-0402-d5c0c42d20b3@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726090AbfLMJrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 04:47:20 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:44861 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725793AbfLMJrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 04:47:19 -0500
+Received: by mail-ot1-f66.google.com with SMTP id x3so5714433oto.11;
+        Fri, 13 Dec 2019 01:47:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LrgOuy/9sPvzhX64/ManuYWOHaw5/qKpeJcMH1l0dJw=;
+        b=ucbY6U5i8iqwKIzDam7juPFkESzPvu0Nt8Zw7vbAfvrJ0Y2MmuE5qnHyZjzKko8KGT
+         9bmH+IGTMX2gWt5jCkhhaJ8CCu2aRNSoWZ6obh3YBKkaRe0/KQIFVaffpZvDH/pok2pg
+         wdjzY0HL2qZ/XyjBXmm3prMfc+axkzjgPc0mba2RCUhsgPx931WfO+wk2MKf9HeyVPK7
+         yKB7xkmF28LtidaMUskmSe29l8CdGEk15l4/tBREkWhgMU2FCZDX01Ra31D83J1Lcgu4
+         nbDhuryen6RtncKNk+zsK7JA2uEfQZLr6dD5qunPw0q3mS7JxiUBSggi3Au7yicia2U5
+         tB+Q==
+X-Gm-Message-State: APjAAAXaDJOH97oLfFTRPfA2v9KHkxRTwmC4dZhvG2HjdSj1bu8iTKR7
+        4iENu6jUfaHFdUsicfXG4KXlmJx/jIkzPBP/pkE=
+X-Google-Smtp-Source: APXvYqyTYrRZu/3wd+jVnsU9fJlU3qWbi4XDyl6SoSVPdfbCj6mQh4LJVDI5doZGlsmV/j5Q03mkCLX7+C1j0mvjiyg=
+X-Received: by 2002:a05:6830:18cd:: with SMTP id v13mr13098278ote.118.1576230438826;
+ Fri, 13 Dec 2019 01:47:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20191212171137.13872-1-david@redhat.com> <20191212171137.13872-2-david@redhat.com>
+ <5687328.t4MNS9KDDX@kreacher> <ec81db03-b970-420a-9c1b-29849b5e8902@redhat.com>
+In-Reply-To: <ec81db03-b970-420a-9c1b-29849b5e8902@redhat.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Fri, 13 Dec 2019 10:47:07 +0100
+Message-ID: <CAJZ5v0iqgnhOF1UQQBfv7C_b5RyoAz=U3JYLt3a0U+UnZ48DUA@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 01/13] ACPI: NUMA: export pxm_to_node
+To:     David Hildenbrand <david@redhat.com>
+Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org,
+        kvm-devel <kvm@vger.kernel.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Len Brown <lenb@kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Dec 2019 19:20:07 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> On 2019-12-12 15:10, Pierre Morel wrote:
-> >=20
-> >=20
-> > On 2019-12-12 13:26, Cornelia Huck wrote: =20
-> >> On Wed, 11 Dec 2019 16:46:09 +0100
-> >> Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> >>> +
-> >>> +=C2=A0=C2=A0=C2=A0 senseid.cu_type =3D buffer[2] | (buffer[1] << 8);=
- =20
+On Fri, Dec 13, 2019 at 10:41 AM David Hildenbrand <david@redhat.com> wrote:
+>
+> On 12.12.19 22:43, Rafael J. Wysocki wrote:
+> > On Thursday, December 12, 2019 6:11:25 PM CET David Hildenbrand wrote:
+> >> Will be needed by virtio-mem to identify the node from a pxm.
 > >>
-> >> This still looks odd; why not have the ccw fill out the senseid
-> >> structure directly? =20
-> >=20
-> > Oh sorry, you already said and I forgot to modify this.
-> > thanks =20
->=20
-> hum, sorry, I forgot, the sense structure is not padded so I need this.
+> >> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+> >> Cc: Len Brown <lenb@kernel.org>
+> >> Cc: linux-acpi@vger.kernel.org
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  drivers/acpi/numa/srat.c | 1 +
+> >>  1 file changed, 1 insertion(+)
+> >>
+> >> diff --git a/drivers/acpi/numa/srat.c b/drivers/acpi/numa/srat.c
+> >> index eadbf90e65d1..d5847fa7ac69 100644
+> >> --- a/drivers/acpi/numa/srat.c
+> >> +++ b/drivers/acpi/numa/srat.c
+> >> @@ -35,6 +35,7 @@ int pxm_to_node(int pxm)
+> >>              return NUMA_NO_NODE;
+> >>      return pxm_to_node_map[pxm];
+> >>  }
+> >> +EXPORT_SYMBOL(pxm_to_node);
+> >>
+> >>  int node_to_pxm(int node)
+> >>  {
+> >>
+> >
+> > This is fine by me FWIW.
+>
+> Can I count that as an Acked-by and carry it along? Thanks!
 
-Very confused; I see padding in the senseid structure? (And what does
-padding have to do with it?)
-
-Also, you only copy the cu type... it would really be much better if
-you looked at the whole structure you got back from the hypervisor;
-that would also allow you to do some more sanity checks etc. If you
-really can't pass in a senseid structure directly, just copy everything
-you got?
-
+Yes, please.
