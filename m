@@ -2,211 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C013211E8A6
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 17:46:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCA3711E8AA
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 17:47:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728256AbfLMQqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 11:46:12 -0500
-Received: from mga01.intel.com ([192.55.52.88]:47341 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726404AbfLMQqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 11:46:11 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Dec 2019 08:46:11 -0800
-X-IronPort-AV: E=Sophos;i="5.69,309,1571727600"; 
-   d="scan'208";a="204368997"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Dec 2019 08:46:10 -0800
-Message-ID: <4d67ffe7a334d283d2641dbcae53bbc5123e70ad.camel@linux.intel.com>
-Subject: Re: [PATCH v15 0/7] mm / virtio: Provide support for free page
- reporting
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, mgorman@techsingularity.net,
-        vbabka@suse.cz
-Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
-        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
-        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
-        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
-Date:   Fri, 13 Dec 2019 08:46:10 -0800
-In-Reply-To: <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
-References: <20191205161928.19548.41654.stgit@localhost.localdomain>
-         <ead08075-c886-dc7d-2c7b-47b20e00b515@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
+        id S1728202AbfLMQre (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 11:47:34 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47772 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728102AbfLMQre (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 13 Dec 2019 11:47:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576255653;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xx4QpyhPJ7ddFApM5tN1aOYUoAAOoJoWqAv5YuUSmrQ=;
+        b=CgVrk7AmKrZ3TesMgXwv4LjjQvZiqygXyJ2LW33tCzXjIPos/htJWlzZr4uP74/g45YF94
+        OtD3CjptlZRS+jni6AC/7X284pxl7DYA6sLKMpDHpBQ2EVdn+NIBK3ZHY9X6HFPGzBiGry
+        9NAj5fmagyxiOG0rJYizhcrVDpH28VE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-H15Gj9zDMRywur4bMTnjSw-1; Fri, 13 Dec 2019 11:47:32 -0500
+X-MC-Unique: H15Gj9zDMRywur4bMTnjSw-1
+Received: by mail-wm1-f70.google.com with SMTP id o24so51128wmh.0
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 08:47:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xx4QpyhPJ7ddFApM5tN1aOYUoAAOoJoWqAv5YuUSmrQ=;
+        b=jpadeDSw3fT9VpklLcCDK/D/9qArntostvLa31ppjOB7cbZLfDAs784Dqu5KJK0+nf
+         AsTFHmWM5HlZrQr5lrBF+r1pinPpJmp5KdTOanPM5lLtldKw621U+XfFLqRi7rU5yJ3i
+         kfwhkSbAl6Kzl9WCyR3dKbryDdTapAAPP7sBU2jCm6d3ZQuWzUP8CUx3pW3c1CH8Z6jZ
+         IgWqAberO4yH+y00BEGIK/TDVcZXm9zXrdA+FcSDOLkBsRU8WlR1kh7A+KATTYVwXwqF
+         C0FAV851E+Moh2ywjOHCHVzxGZO7ME1RJPbxlMiQALUaBm9FUZi+YICSzMtmuR+aTvu+
+         8JjA==
+X-Gm-Message-State: APjAAAUkggOcegrLFvRuia7LPHLwJhp2E2pnZeNycK3nA1Beo/n3izky
+        5gDF3Momq5s4grJSA2AYkg6sjoO/1zKTyXW2NrRCzVAgIhRV/dsPGL0+fM+wjLB3sBBzo+xTZs6
+        X586VBwJEEkTr
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr14931585wmm.57.1576255651300;
+        Fri, 13 Dec 2019 08:47:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzyANQJHgFGh+Kl0t/Tp4kzuWcPKmbHesl5SsB4LGdPrxk9Inysuhlbrs/E4yJYrUC92LmqzA==
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr14931547wmm.57.1576255651048;
+        Fri, 13 Dec 2019 08:47:31 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net. [83.42.66.34])
+        by smtp.gmail.com with ESMTPSA id p17sm10589868wrx.20.2019.12.13.08.47.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Dec 2019 08:47:30 -0800 (PST)
+Subject: Re: [PATCH 12/12] hw/i386/pc: Move PC-machine specific declarations
+ to 'pc_internal.h'
+To:     qemu-devel@nongnu.org
+Cc:     John Snow <jsnow@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Paul Durrant <paul@xen.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, Stefano Stabellini <sstabellini@kernel.org>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        xen-devel@lists.xenproject.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sergio Lopez <slp@redhat.com>
+References: <20191213161753.8051-1-philmd@redhat.com>
+ <20191213161753.8051-13-philmd@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d9792ff4-bada-fbb9-301d-aeb19826235c@redhat.com>
+Date:   Fri, 13 Dec 2019 17:47:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191213161753.8051-13-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2019-12-13 at 11:00 +0100, David Hildenbrand wrote:
-> On 05.12.19 17:22, Alexander Duyck wrote:
-> > This series provides an asynchronous means of reporting free guest pages
-> > to a hypervisor so that the memory associated with those pages can be
-> > dropped and reused by other processes and/or guests on the host. Using
-> > this it is possible to avoid unnecessary I/O to disk and greatly improve
-> > performance in the case of memory overcommit on the host.
-> > 
-> > When enabled we will be performing a scan of free memory every 2 seconds
-> > while pages of sufficiently high order are being freed. Currently the order
-> > used is pageblock_order so that this feature will not interfere with the
-> > use of Transparent Huge Pages in the case of virtualization.
-> > 
-> > Currently this is only in use by virtio-balloon however there is the hope
-> > that at some point in the future other hypervisors might be able to make
-> > use of it. In the virtio-balloon/QEMU implementation the hypervisor is
-> > currently using MADV_DONTNEED to indicate to the host kernel that the page
-> > is currently free. It will be zeroed and faulted back into the guest the
-> > next time the page is accessed.
-> > 
-> > To track if a page is reported or not the Uptodate flag was repurposed and
-> > used as a Reported flag for Buddy pages. We walk though the free list
-> > isolating pages and adding them to the scatterlist until we either
-> > encounter the end of the list, processed as many pages as were listed in
-> > nr_free prior to us starting, or have filled the scatterlist with pages to
-> > be reported. If we fill the scatterlist before we reach the end of the
-> > list we rotate the list so that the first unreported page we encounter is
-> > moved to the head of the list as that is where we will resume after we
-> > have freed the reported pages back into the tail of the list.
-> > 
-> > Below are the results from various benchmarks. I primarily focused on two
-> > tests. The first is the will-it-scale/page_fault2 test, and the other is
-> > a modified version of will-it-scale/page_fault1 that was enabled to use
-> > THP. I did this as it allows for better visibility into different parts
-> > of the memory subsystem. The guest is running with 32G for RAM on one
-> > node of a E5-2630 v3. The host has had some power saving features disabled
-> > by setting the /dev/cpu_dma_latency value to 10ms.
-> > 
-> > Test                   page_fault1 (THP)    page_fault2
-> > Name            tasks  Process Iter  STDEV  Process Iter  STDEV
-> > Baseline            1    1208307.25  0.10%     408596.00  0.19%
-> >                    16    8865204.75  0.16%    3344169.00  0.60%
-> > 
-> > Patches applied     1    1206809.00  0.26%     412558.25  0.32%
-> >                    16    8814350.50  0.78%    3420102.00  1.16%
-> > 
-> > Patches enabled     1    1201386.25  0.21%     407903.75  0.32%
-> >                    16    8880178.00  0.08%    3396700.50  0.54%
-> > 
-> > Patches enabled     1    1173529.00  1.04%     409006.50  0.45%
-> >  page shuffle      16    8384540.25  0.74%    3288289.25  0.41%
-> > 
-> > Patches enabled     1    1193411.00  0.33%     406333.50  0.09%
-> >  shuffle w/ RFC    16    8812639.75  0.73%    3321706.25  0.53%
-> > 
-> > The results above are for a baseline with a linux-next-20191203 kernel,
-> > that kernel with this patch set applied but page reporting disabled in
-> > virtio-balloon, the patches applied and page reporting fully enabled, the
-> > patches enabled with page shuffling enabled, and the patches applied with
-> > page shuffling enabled and an RFC patch that makes used of MADV_FREE in
-> > QEMU. These results include the deviation seen between the average value
-> > reported here versus the high and/or low value. I observed that during the
-> > test memory usage for the first three tests never dropped whereas with the
-> > patches fully enabled the VM would drop to using only a few GB of the
-> > host's memory when switching from memhog to page fault tests.
-> > 
-> > Any of the overhead visible with this patch set enabled seems due to page
-> > faults caused by accessing the reported pages and the host zeroing the page
-> > before giving it back to the guest. This overhead is much more visible when
-> > using THP than with standard 4K pages. In addition page shuffling seemed to
-> > increase the amount of faults generated due to an increase in memory churn.
-> > As seen in the data above, using MADV_FREE in QEMU mostly eliminates this
-> > overhead.
-> > 
-> > The overall guest size is kept fairly small to only a few GB while the test
-> > is running. If the host memory were oversubscribed this patch set should
-> > result in a performance improvement as swapping memory in the host can be
-> > avoided.
-> > 
-> > A brief history on the background of free page reporting can be found at:
-> > https://lore.kernel.org/lkml/29f43d5796feed0dec8e8bb98b187d9dac03b900.camel@linux.intel.com/
-> > 
-> > Changes from v13:
-> > https://lore.kernel.org/lkml/20191105215940.15144.65968.stgit@localhost.localdomain/
-> > Rewrote core reporting functionality
-> >   Merged patches 3 & 4
-> >   Dropped boundary list and related code
-> >   Folded get_reported_page into page_reporting_fill
-> >   Folded page_reporting_fill into page_reporting_cycle
-> > Pulled reporting functionality out of free_reported_page
-> >   Renamed it to __free_isolated_page
-> >   Moved page reporting specific bits to page_reporting_drain
-> > Renamed phdev to prdev since we aren't "hinting" we are "reporting"
-> > Added documentation to describe the usage of unused page reporting
-> > Updated cover page and patch descriptions to avoid mention of boundary
-> > 
-> > Changes from v14:
-> > https://lore.kernel.org/lkml/20191119214454.24996.66289.stgit@localhost.localdomain/
-> > Renamed "unused page reporting" to "free page reporting"
-> >   Updated code, kconfig, and patch descriptions
-> > Split out patch for __free_isolated_page
-> >   Renamed function to __putback_isolated_page
-> > Rewrote core reporting functionality
-> >   Added logic to reschedule worker in 2 seconds instead of run to completion
-> >   Removed reported_pages statistics
-> >   Removed REPORTING_REQUESTED bit used in zone flags
-> >   Replaced page_reporting_dev_info refcount with state variable
-> >   Removed scatterlist from page_reporting_dev_info
-> >   Removed capacity from page reporting device
-> >   Added dynamic scatterlist allocation/free at start/end of reporting process
-> >   Updated __free_one_page so that reported pages are not always added to tail
-> >   Added logic to handle error from report function
-> > Updated virtio-balloon patch that adds support for page reporting
-> >   Updated patch description to try and highlight differences in approaches
-> >   Updated logic to reflect that we cannot limit the scatterlist from device
+On 12/13/19 5:17 PM, Philippe Mathieu-Daudé wrote:
+> Historically, QEMU started with only one X86 machine: the PC.
+> The 'hw/i386/pc.h' header was used to store all X86 and PC
+> declarations. Since we have now multiple machines based on the
+> X86 architecture, move the PC-specific declarations in a new
+> header.
+> We use 'internal' in the name to explicit this header is restricted
+> to the X86 architecture. Other architecture can not access it.
 > 
-> Last time Mel said
-> 
-> "Ok, I'm ok with how this hooks into the allocator as the overhead is
-> minimal. However, the patch itself still includes a number of
-> optimisations instead of being a bare-boned implementation of the
-> feature with optimisations layered on top."
-> 
-> and
-> 
-> "Either way, the separate patch could have supporting data on how much
-> it improves the speed of reporting pages so it can be compared to any
-> other optimisation that may be proposed. Supporting data would also help
-> make the case that any complexity introduced by the optimisation is
-> worthwhile."
-> 
-> But I was only partially following that discussion.
-> 
-> I can see that there is only one additional patch (before the reporting
-> one) compared to the previous series on the MM side. Does that comment
-> no longer apply (I can see e.g., "Removed REPORTING_REQUESTED bit used
-> in zone flags" in the changelog) - IOW, did you drop all the
-> optimizations in question for now? If so, can you share some performance
-> differences with and without the previous optimizations? (just out of
-> personal interest :) )
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Maybe name it 'pc_machine.h'?
 
-I found alternative approaches and did away with most of them. What I had
-done is replaced the REPORTING_REQUESTED and reference count logic with
-the state in order to guarantee that we will make our way through the list
-and rearm the reporting thread if the work isn't completed.
+I forgot to describe here (and in the cover), what's follow after this 
+patch.
 
-One thing I still think I need to split out based on Mel's comments is the
-list rotation and probably the new budget value I added.
+Patch #13 moves PCMachineClass to
 
-As far as performance this new patch set performs better than the old one
-did. Most of that is due to the fact that I increased the delay between
-passes and dropped any optimizations for the shuffling code.
+If you ignore PCMachineState, "hw/i386/pc.h" now only contains 76 lines, 
+and it is easier to see what is PC machine specific, what is X86 
+specific, and what is device generic (not X86 related at all):
 
-> Christmas is getting closer, and at least in Europe/Germany that usually
-> means that things will slow down ... or however you want to call that.
-> So I wouldn't expect too much review happening before next year (but I
-> might be wrong of course).
-> 
-> Cheers!
+- GSI is common to X86 (Paolo sent [3], [6])
+- IOAPIC is common to X86
+- i8259 is multiarch (Paolo [2])
+- PCI_HOST definitions and pc_pci_hole64_start() are X86
+- pc_machine_is_smm_enabled() is X86 (Paolo sent [5])
+- hpet
+- tsc (Paolo sent [3])
+- 3 more functions
 
-That is one of the reasons why I wanted to see if there were any comments
-I could get before the break. It gives me a chance to address them and
-push one last patch set before I head out on Christmas break myself.
+So we can move half of this file to "pc_internal.h" and the other to
+
+One problem is the Q35 MCH north bridge which directly sets the PCI 
+PCMachineState->bus in q35_host_realize(). This seems a QOM violation 
+and is probably easily fixable.
+
+Maybe I can apply Paolo's patches instead of this #12, move X86-generic 
+declarations to "hw/i386/x86.h", and directly git-move what's left of 
+"hw/i386/pc.h" to "pc_internal.h".
+
+[3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664627.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664765.html
+[5] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664754.html
+[6] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664766.html
+
+> ---
+>   hw/i386/pc_internal.h | 144 ++++++++++++++++++++++++++++++++++++++++++
+>   include/hw/i386/pc.h  | 128 -------------------------------------
+>   hw/i386/acpi-build.c  |   1 +
+>   hw/i386/pc.c          |   1 +
+>   hw/i386/pc_piix.c     |   1 +
+>   hw/i386/pc_q35.c      |   1 +
+>   hw/i386/pc_sysfw.c    |   1 +
+>   hw/i386/xen/xen-hvm.c |   1 +
+>   8 files changed, 150 insertions(+), 128 deletions(-)
+>   create mode 100644 hw/i386/pc_internal.h
 
