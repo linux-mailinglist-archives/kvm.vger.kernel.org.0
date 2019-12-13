@@ -2,80 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 349B011E490
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 14:28:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A02F411E55E
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 15:13:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727390AbfLMN2c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 08:28:32 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:28751 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbfLMN2c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 08:28:32 -0500
+        id S1727678AbfLMONJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 09:13:09 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:40067 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727497AbfLMONJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 09:13:09 -0500
+Received: by mail-qk1-f196.google.com with SMTP id c17so1766640qkg.7
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 06:13:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1576243711; x=1607779711;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:mime-version:content-transfer-encoding;
-  bh=coJqal6mOMw8DkKrznC66iIkrprgAV0OHP70UFVq8Pw=;
-  b=SQEK6IH6HujGUZtBO5xaft6DzAY6sl53sska1OvbklN9iU/QF5KlAAGl
-   v4hDcvftDVPi6ULZ3bT94+FW+WTkushkSZAxtWGzlQQD6aO+18w8wKfjS
-   1Jja0C3FjpB2RMHoqQ/rLjEwMyW9kTaUBzGWuWLD1wg2gHaCxYGcFxOFs
-   k=;
-IronPort-SDR: ctoadH9cS6UHy8JxlW76ZMIS7yq4lMny506SUMtie2Tb4ouyhZvbvjAfcBuN0fJCAOqWX+mWMA
- sjocSkspeMRA==
-X-IronPort-AV: E=Sophos;i="5.69,309,1571702400"; 
-   d="scan'208";a="7498710"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 13 Dec 2019 13:28:30 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id 70073A1F89;
-        Fri, 13 Dec 2019 13:28:29 +0000 (UTC)
-Received: from EX13D27EUB004.ant.amazon.com (10.43.166.152) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 13 Dec 2019 13:28:28 +0000
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13D27EUB004.ant.amazon.com (10.43.166.152) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 13 Dec 2019 13:28:27 +0000
-Received: from EX13D20UWC001.ant.amazon.com ([10.43.162.244]) by
- EX13D20UWC001.ant.amazon.com ([10.43.162.244]) with mapi id 15.00.1367.000;
- Fri, 13 Dec 2019 13:28:25 +0000
-From:   "Graf (AWS), Alexander" <graf@amazon.de>
-To:     "Pandurov, Milan" <milanpa@amazon.de>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v5] kvm: Refactor handling of VM debugfs files
-Thread-Topic: [PATCH v5] kvm: Refactor handling of VM debugfs files
-Thread-Index: AQHVsbZKzoJR28kSxEmKOK4zZncRCqe4DvkM
-Date:   Fri, 13 Dec 2019 13:28:25 +0000
-Message-ID: <B319D8F1-3E42-4ADA-9EA5-05C6A535D7CA@amazon.de>
-References: <20191213130721.7942-1-milanpa@amazon.de>
-In-Reply-To: <20191213130721.7942-1-milanpa@amazon.de>
-Accept-Language: en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="utf-8"
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Nid8tA47CgGN/j7YlqJfGqUykgFGi6RHG/gnONQyj4E=;
+        b=iiL3UdjaR/ciA0kSMNs852p8OTlOiquuE5fH159L/f/kyYZSKGWMWVam+pUVGCkXzn
+         9bgt3SEbd3pKnEhCeny9C42+mC0KXfiMLBQgpimffHI86crwzaVM/11h7Y8coEKA38o+
+         tCVCdPV56qNiZgx3KgERpcRrNrVWUEs+0alaL5KGOlujfPecyMF86opv0mn3yFtlMhi/
+         HSFudy4nXLFhq55ZzOCCgbDw0syt6JyzB7F1//hQ+zzHl5IqhR2XQhaFKSX6W7QnskC+
+         6wTsaWtttmI+TDa2Sz4IrzVt+oKSBMj5Bnc1BiFbug2PEg9RfDO5OiVAlqxNQb7ozfcK
+         /Ebg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Nid8tA47CgGN/j7YlqJfGqUykgFGi6RHG/gnONQyj4E=;
+        b=Mcv1zLSqKty9d8YsU+zO9wAsiFKqLA423WMZ7a9OgORmLff2FLhncJ1ETJRslmXB+O
+         ywX2EnJwbscHQ1pMpa/rXkk0lkNyCl1YVyEQMJma1S4dvjvQ4GzM0zHJoTomElqWnQhH
+         2WJWUXUhGlKURSLIYPwMuEnWJbSbJz1jeKAIexqg5aNtYXafR5tCiLbG70IbQ6IsvQ0K
+         kuV0KctpjjRvfyuHQZhUueNJmm4snJI4JgsgvwUpwCa1KhGlb9woullorIYtRwaIAh/a
+         qGXx5mWXYU4Z08tcnbKb71qXKJQ9B11w+YhwmozV36VQN715rD0r8O31P8vVZfN3ZYSb
+         wN3w==
+X-Gm-Message-State: APjAAAVzLZTzTBC53HH/3/IP20QLqB7jwU2T59bd9owsevUMg7yT3oPE
+        xFyvrWUcgAA5ncPUMMiWqm15Ow==
+X-Google-Smtp-Source: APXvYqym2ajF5omuu9eNtqjRTVEFjAXQV+T4/+DYjZkhvWoajaXY+wFuOq6d8uOBMk6PvGM6fJu4eg==
+X-Received: by 2002:a05:620a:12ae:: with SMTP id x14mr14203983qki.5.1576246387524;
+        Fri, 13 Dec 2019 06:13:07 -0800 (PST)
+Received: from [192.168.1.10] (c-66-30-119-151.hsd1.ma.comcast.net. [66.30.119.151])
+        by smtp.gmail.com with ESMTPSA id z28sm3463658qtz.69.2019.12.13.06.13.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Dec 2019 06:13:06 -0800 (PST)
+Subject: Re: [PATCH v5 2/2] kvm: Use huge pages for DAX-backed files
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jason.zeng@intel.com
+References: <20191212182238.46535-1-brho@google.com>
+ <20191212182238.46535-3-brho@google.com>
+ <06108004-1720-41EB-BCAB-BFA8FEBF4772@oracle.com>
+ <ED482280-CB47-4AB6-9E7E-EEE7848E0F8B@oracle.com>
+ <f8e948ff-6a2a-a6d6-9d8e-92b93003354a@google.com>
+ <65FB6CC1-3AD2-4D6F-9481-500BD7037203@oracle.com>
+From:   Barret Rhoden <brho@google.com>
+Message-ID: <90a9af31-304c-e8d5-b17c-0ddb4c98fddb@google.com>
+Date:   Fri, 13 Dec 2019 09:13:05 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+In-Reply-To: <65FB6CC1-3AD2-4D6F-9481-500BD7037203@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gQW0gMTMuMTIuMjAxOSB1bSAxNDowNyBzY2hyaWViIFBhbmR1cm92LCBNaWxhbiA8bWls
-YW5wYUBhbWF6b24uZGU+Og0KPiANCj4g77u/V2UgY2FuIHN0b3JlIHJlZmVyZW5jZSB0byBrdm1f
-c3RhdHNfZGVidWdmc19pdGVtIGluc3RlYWQgb2YgY29weWluZw0KPiBpdHMgdmFsdWVzIHRvIGt2
-bV9zdGF0X2RhdGEuDQo+IFRoaXMgYWxsb3dzIHVzIHRvIHJlbW92ZSBkdXBsaWNhdGVkIGNvZGUg
-YW5kIHVzYWdlIG9mIHRlbXBvcmFyeQ0KPiBrdm1fc3RhdF9kYXRhIGluc2lkZSB2bV9zdGF0X2dl
-dCBldCBhbC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE1pbGFuIFBhbmR1cm92IDxtaWxhbnBhQGFt
-YXpvbi5kZT4NCj4gUmV2aWV3ZWQtYnk6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFuYXpvbi5jb20+
-DQoNCklmIHRoZXJlIGFyZSBubyBmdXJ0aGVyIGNvbW1lbnRzIGNvdWxkIHdob2V2ZXIgYXBwbGll
-cyB0aGlzIHBsZWFzZSBmaXggbXkgdHlwbz8gOikNCg0KDQpUaGFua3MsDQoNCkFsZXgNCg0KCgoK
-QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
-MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgUmFsZiBI
-ZXJicmljaApFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBI
-UkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On 12/12/19 8:07 PM, Liran Alon wrote:
+>> I was a little hesitant to change the this to handle 1 GB pages with this patchset at first.  I didn't want to break the non-DAX case stuff by doing so.
+> 
+> Why would it affect non-DAX case?
+> Your patch should just make hugepage_adjust() to parse page-tables only in case is_zone_device_page(). Otherwise, page tables shouldn’t be parsed.
+> i.e. THP merged pages should still be detected by PageTransCompoundMap().
+
+That's what I already do.  But if I wanted to make the hugepage_adjust() 
+function also handle the change to 1 GB, then that code would apply to 
+THP too.  I didn't want to do that without knowing the implications for THP.
+
+>> Specifically, can a THP page be 1 GB, and if so, how can you tell?  If you can't tell easily, I could walk the page table for all cases, instead of just zone_device().
+> 
+> I prefer to walk page-tables only for is_zone_device_page().
+
+Is there another way to tell if a THP page is 1 GB?  Anyway, this is the 
+sort of stuff I didn't want to mess around with.
+
+hugepage_adjust() seemed like a reasonable place to get a huge (2MB) 
+page table entry out of a DAX mapping.  I didn't want to proliferate 
+another special case for upgrading to a larger PTE size (i.e. how 
+hugetlbfs and THP have separate mechanisms), so I hopped on to the "can 
+we do a 2MB mapping even though host_mapping_level() didn't say so" case 
+- which is my interpretation of what huge_adjust() is for.
+
+Barret
+
 
