@@ -2,70 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ADB211DB3B
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 01:46:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCD1111DB45
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 01:50:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731689AbfLMAna (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Dec 2019 19:43:30 -0500
-Received: from mga06.intel.com ([134.134.136.31]:19840 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731593AbfLMAn3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Dec 2019 19:43:29 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Dec 2019 16:43:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,307,1571727600"; 
-   d="scan'208";a="216472424"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga003.jf.intel.com with ESMTP; 12 Dec 2019 16:43:26 -0800
-Date:   Fri, 13 Dec 2019 08:44:45 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, jmattson@google.com,
-        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
-Subject: Re: [PATCH v8 0/7] Introduce support for guest CET feature
-Message-ID: <20191213004445.GA2822@local-michael-cet-test>
-References: <20191101085222.27997-1-weijiang.yang@intel.com>
- <20191212160345.GA13420@char.us.oracle.com>
+        id S1727091AbfLMAuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Dec 2019 19:50:18 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44844 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726897AbfLMAuS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 12 Dec 2019 19:50:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576198216;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vUaVXuLemLT2U2WNL56jj+lKMFOF8eSW7XMIEYuqX9M=;
+        b=DgUsIBygVm5RRqezkdMf28+ngWoOJlIeIs6xwV9cnPfDhMvf5li7rKvuErYB7gQUZEIHT1
+        8+hqi28R5IW6fvghRLfZjvmzrgtNzhyWHmGnMrGLjNsN+JKKKdsNAr8oIYRptnr+ws+GJP
+        /Y/WOrJC5NQQCaAQQhP19g2D01YzegM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-leUMgiPINfOG3x_nIvnK1g-1; Thu, 12 Dec 2019 19:50:14 -0500
+X-MC-Unique: leUMgiPINfOG3x_nIvnK1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4DE0107ACC4;
+        Fri, 13 Dec 2019 00:50:13 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-52.bne.redhat.com [10.64.54.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC0DD39C;
+        Fri, 13 Dec 2019 00:50:08 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 3/3] kvm/arm: Standardize kvm exit reason field
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        paulus@ozlabs.org, jhogan@kernel.org, drjones@redhat.com,
+        vkuznets@redhat.com
+References: <20191212024512.39930-4-gshan@redhat.com>
+ <2e960d77afc7ac75f1be73a56a9aca66@www.loen.fr>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <f101e4a6-bebf-d30f-3dfe-99ded0644836@redhat.com>
+Date:   Fri, 13 Dec 2019 11:50:06 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191212160345.GA13420@char.us.oracle.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <2e960d77afc7ac75f1be73a56a9aca66@www.loen.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 11:03:45AM -0500, Konrad Rzeszutek Wilk wrote:
-> On Fri, Nov 01, 2019 at 04:52:15PM +0800, Yang Weijiang wrote:
-> > Control-flow Enforcement Technology (CET) provides protection against
-> > Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
-> > sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
-> > 
-> > KVM change is required to support guest CET feature.
-> > This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs
-> > and vmentry/vmexit configuration etc.so that guest kernel can setup CET
-> > runtime infrastructure based on them. Some CET MSRs and related feature
-> > flags used reference the definitions in kernel patchset.
-> > 
-> > CET kernel patches is here:
-> > https://lkml.org/lkml/2019/8/13/1110
-> > https://lkml.org/lkml/2019/8/13/1109
-> 
-> Is there a git tree with all of them against v5.5-rc1 (so all three series)?
-> I tried your github tree: https://github.com/yyu168/linux_cet.git #cet
-> but sadly that does not apply against 5.5-rc1 :-(
-> 
-> Thanks!
-Hi, 
-The CET patch includes two parts: one from kernel side the other from KVM,
-the kernel patch in github is maintained by my peer, he'll rebase
-it to the latest kernel tree shortly after resolve some issues.
-Thank you for having interest!
+On 12/12/19 8:23 PM, Marc Zyngier wrote:
+> On 2019-12-12 02:45, Gavin Shan wrote:
+>> This standardizes kvm exit reason field name by replacing "esr_ec"
+>> with "exit_reason".
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> =C2=A0virt/kvm/arm/trace.h | 14 ++++++++------
+>> =C2=A01 file changed, 8 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+>> index 204d210d01c2..0ac774fd324d 100644
+>> --- a/virt/kvm/arm/trace.h
+>> +++ b/virt/kvm/arm/trace.h
+>> @@ -27,25 +27,27 @@ TRACE_EVENT(kvm_entry,
+>> =C2=A0);
+>>
+>> =C2=A0TRACE_EVENT(kvm_exit,
+>> -=C2=A0=C2=A0=C2=A0 TP_PROTO(int ret, unsigned int esr_ec, unsigned lo=
+ng vcpu_pc),
+>> -=C2=A0=C2=A0=C2=A0 TP_ARGS(ret, esr_ec, vcpu_pc),
+>> +=C2=A0=C2=A0=C2=A0 TP_PROTO(int ret, unsigned int exit_reason, unsign=
+ed long vcpu_pc),
+>> +=C2=A0=C2=A0=C2=A0 TP_ARGS(ret, exit_reason, vcpu_pc),
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 TP_STRUCT__entry(
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __field(=C2=A0=C2=A0=C2=
+=A0 int,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 )
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __field(=C2=A0=C2=A0=C2=A0=
+ unsigned int,=C2=A0=C2=A0=C2=A0 esr_ec=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 )
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __field(=C2=A0=C2=A0=C2=A0=
+ unsigned int,=C2=A0=C2=A0=C2=A0 exit_reason=C2=A0=C2=A0=C2=A0 )
+>=20
+> I don't think the two are the same thing. The exit reason should be
+> exactly that: why has the guest exited (exception, host interrupt, trap=
+).
+>=20
+> What we're reporting here is the exception class, which doesn't apply t=
+o
+> interrupts, for example (hence the 0 down below, which we treat as a
+> catch-all).
+>=20
+
+Marc, thanks a lot for your reply. Yeah, the combination (ret and esr_ec)=
+ is
+complete to indicate the exit reasons if I'm understanding correctly.
+
+The exit reasons seen by kvm_stat is exactly the ESR_EL1[EC]. It's declar=
+ed
+by marcro AARCH64_EXIT_REASONS in tools/kvm/kvm_stat/kvm_stat. So it's pr=
+ecise
+and complete from perspective of kvm_stat.
+
+For the patch itself, it standardizes the filter name by renaming "esr_ec=
+"
+to "exit_reason", no functional changes introduced and I think it would b=
+e
+fine.
+
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __field(=C2=A0=C2=A0=C2=
+=A0 unsigned long,=C2=A0=C2=A0=C2=A0 vcpu_pc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 )
+>> =C2=A0=C2=A0=C2=A0=C2=A0 ),
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 TP_fast_assign(
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->ret=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D ARM_EXCEPTI=
+ON_CODE(ret);
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->esr_ec =3D ARM_EX=
+CEPTION_IS_TRAP(ret) ? esr_ec : 0;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->exit_reason =3D
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AR=
+M_EXCEPTION_IS_TRAP(ret) ? exit_reason: 0;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->vcpu_pc=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D vcpu_pc;
+>> =C2=A0=C2=A0=C2=A0=C2=A0 ),
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0 TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08=
+lx",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __print_s=
+ymbolic(__entry->ret, kvm_arm_exception_type),
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->esr_e=
+c,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __print_symbol=
+ic(__entry->esr_ec, kvm_arm_exception_class),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->exit_=
+reason,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __print_symbol=
+ic(__entry->exit_reason,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_arm_exception_class),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __entry->=
+vcpu_pc)
+>> =C2=A0);
+>=20
+> The last thing is whether such a change is an ABI change or not. I've b=
+een very
+> reluctant to change any of this for that reason.
+>=20
+
+Yeah, I think it is ABI change unfortunately, but I'm not sure how many a=
+pplications
+are using this filter. However, the fixed filter name ("exit_reason") is =
+beneficial
+in long run. The application needn't distinguish architects to provide di=
+fferent
+tracepoint filters at least.
+
+Regards,
+Gavin
 
