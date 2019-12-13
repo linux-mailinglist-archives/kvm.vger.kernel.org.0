@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD66E11E308
-	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 12:54:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 325CE11E321
+	for <lists+kvm@lfdr.de>; Fri, 13 Dec 2019 13:02:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfLMLx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 06:53:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33653 "EHLO
+        id S1726874AbfLMMCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 07:02:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54096 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726798AbfLMLx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 06:53:57 -0500
+        with ESMTP id S1726717AbfLMMCn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 07:02:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576238035;
+        s=mimecast20190719; t=1576238562;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
         bh=KFc9zrc0lnaWTXScDbTfhkxNxQpAVklGF7JvKKV46Yw=;
-        b=NIq0g6l6ZE9JoL1iTfZRt6SKdKhDsLEwn8jkibl/ymV+B47vsIFhA2iark6dfWMV8r1/QO
-        h3ihU0G/MC9rHCTV5hD1qgRBNboisq39CcBbGpFOneXC82AiHJv1E46xi10UI9RJGD60Vt
-        4nIN+UTiEEXsZIA9Jk1PxiNvfCcuT2o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-9c81xAPaMoiZ3xjovl76rg-1; Fri, 13 Dec 2019 06:53:54 -0500
-X-MC-Unique: 9c81xAPaMoiZ3xjovl76rg-1
-Received: by mail-wm1-f70.google.com with SMTP id q21so2247815wmc.7
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 03:53:53 -0800 (PST)
+        b=VZKWoBzUQB1Khb4k0JSPkgCfH1S0j/mk5SLL5WB0IOGUBep6L0nuFHph1b1rPdh1ppcPdk
+        glYc2KJ/netvFjHyzxcdzyeHIGypJdnCAEIhJ6ONvow6NQyN9ou8ziYjDyXqy6nyfr2jSj
+        80zpKfZv2hshbRwnrljfvQF4Yue3RP8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-Sa6w3k9QMti5v0EG2gVDQw-1; Fri, 13 Dec 2019 07:02:41 -0500
+X-MC-Unique: Sa6w3k9QMti5v0EG2gVDQw-1
+Received: by mail-wr1-f70.google.com with SMTP id t3so2475552wrm.23
+        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 04:02:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=KFc9zrc0lnaWTXScDbTfhkxNxQpAVklGF7JvKKV46Yw=;
-        b=klE10IWl7sOYioW7Z2L1o5we/ZS9FtzjPuF9HDRkokbG5PhRzHr5f26halHoTE8v3y
-         NEtnORVuCnK6co2H7efxUu+87rE1T0QsYSb7zm1lUJ2kmBTSEPHEjdb8YvGdgfFOivXB
-         PruQNNQqntDycRCgmLIVshs/+g2gdl1hzTUKvl4wKIOYP2Dt2SL0VJ4kleZPQb181BXl
-         oGBniGCKtkarbmXm8bCj9/hwxcWd7z9mcYhgtvv9bkbvxdl7sRUwuA0TzVhCpwaqaDbT
-         I4ZLS6/oTL+p0McF702f3RqftPraopumGsxYn/8KQzNFGUm6MiyJ/+6b5Mfchrktg6GB
-         3mug==
-X-Gm-Message-State: APjAAAXO+LCW3sggItQfRbhUkP6csHavcfkOHiLVBo8sT+U/wQnIw8hB
-        xMHK+9NvVX9Tkx6U5Qfb8XOhJ//DlM/vbVeEG5w9ZJwVvVeevKaRKEj5OWvvNyFw41hec/IxHDA
-        oBFiUxQLKBqop
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr12627052wrq.196.1576238032828;
-        Fri, 13 Dec 2019 03:53:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxE7FtlDzOpp15v3gB8QZ5NmgbfFuNJttdfg1aRcxPzTDf+i1ne4B/nU2LrXS9RYAUmFXdN7A==
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr12627035wrq.196.1576238032554;
-        Fri, 13 Dec 2019 03:53:52 -0800 (PST)
+        b=VOKb259y4sGFFgTj5PCTf7nFibBOyDlKlCdYyxoHUl3INx7XnNAP90Iq52hBtk2RCa
+         8BGUIxJRKNu2pERMgD/edS4IvAI0qy8VGnJn8dg/+et93CoZUHsM2R1qYPWdCJhJuo94
+         dRB3jzyO6PhCMUmsLongs8CQBp/JAzhf5sRjRmLuRsZLbFmug/i05wE/f2icCrBc3sd0
+         j1pdl6SY9FPYajB1Fip1+ib9H+aG+P/nElQ/JKrEvk3PS51/uCdOwH1A5ikAEhslc7D1
+         KjL2w/iiz6kwQsT2H6UiRS1Cye3VkgF8Yv0+YDRdNn6K0rGV+h0tDLKe4g2QDfHMAJ83
+         61Zw==
+X-Gm-Message-State: APjAAAW6o9Yru/8TJ/kfw2pMDlltw/fuKoGnn0efYbGcFEiItEslT8P6
+        i+W+JaIrMuQIBtPKWvSKBDCpzplSSmI9oG4e0B5BtU9y1S5xTbUo/iuPsH1/1LUVkEWL8nJC7PQ
+        aePUNCw+Tt+g2
+X-Received: by 2002:a05:600c:21da:: with SMTP id x26mr12626474wmj.4.1576238559917;
+        Fri, 13 Dec 2019 04:02:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwoCftRM04qYwi72pC5q921M1Ds05cpN5tdRSlsIAa2FJQ3rJ756T/keW2JOQHWPggqcz0ujA==
+X-Received: by 2002:a05:600c:21da:: with SMTP id x26mr12626438wmj.4.1576238559671;
+        Fri, 13 Dec 2019 04:02:39 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9? ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
-        by smtp.gmail.com with ESMTPSA id g18sm9437905wmh.48.2019.12.13.03.53.51
+        by smtp.gmail.com with ESMTPSA id u8sm9915651wmm.15.2019.12.13.04.02.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2019 03:53:51 -0800 (PST)
+        Fri, 13 Dec 2019 04:02:39 -0800 (PST)
 Subject: Re: [PATCH] hw/i386: De-duplicate gsi_handler() to remove
  kvm_pc_gsi_handler()
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
@@ -61,8 +61,8 @@ Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>
 References: <20191213110736.10767-1-philmd@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3d1afe84-9d17-eaea-bddf-62f1c6064ee9@redhat.com>
-Date:   Fri, 13 Dec 2019 12:53:50 +0100
+Message-ID: <02225320-0c42-33d2-6e30-16935eaaa5d2@redhat.com>
+Date:   Fri, 13 Dec 2019 13:02:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
