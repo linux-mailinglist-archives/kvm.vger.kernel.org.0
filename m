@@ -2,79 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0482811F39F
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 20:16:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AA2411F3C0
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 21:01:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726541AbfLNTF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Dec 2019 14:05:29 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:44041 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726358AbfLNTF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Dec 2019 14:05:28 -0500
-Received: by mail-pj1-f65.google.com with SMTP id w5so1158985pjh.11
-        for <kvm@vger.kernel.org>; Sat, 14 Dec 2019 11:05:28 -0800 (PST)
+        id S1726781AbfLNUB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Dec 2019 15:01:58 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:45792 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726541AbfLNUB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Dec 2019 15:01:57 -0500
+Received: by mail-oi1-f195.google.com with SMTP id v10so2513072oiv.12
+        for <kvm@vger.kernel.org>; Sat, 14 Dec 2019 12:01:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=L6Ag2VBHQuyYKlLF6xopn+ObtOOk20kt2kwMNta1TZ4=;
-        b=dBfPnvea4ivJLjWYoK0YZTJZ6ymafU2UOw/hMu72wx68w1+8PJYUMOtHC993pd0xEU
-         twB04Qf1uW+LDDosnn3vQMVPL+PYHn/zzw7y/EaJhcQHy+kZUwJu8eUi1KxrrFInnkJJ
-         JXdOylA2CLz0gxeQ28lGedcAuexitrMZuj0+S2KtsCj+eyKgkVyEP0FF4qSdOkuBhdf7
-         nX7DKKUDs6hwTtM4mUVAixzCwDBMhMQejnHpgUVGzXA1lcKjo4fctGp67cxz2wRyF9ru
-         61u+RgZM5ohRGZnemQarrFh6kLXQfxq2uDmwJeCecEdzNG8L6rTddy4BFV07xjRiiw4m
-         wjuA==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RMrXhnl08yOQWoHsGq/Mqy6tAi/gvfJoz02znJajxJM=;
+        b=n2Ba4DCcTtQy+TuObNMMxs6W75KYEp7QP4qYVJefSlzwufoqhGmr69lW7Y0J7nBj53
+         NuQ+7XCu3ltts5rk+7ISqXvQ3xyzBoPY6Ii6wmrnZM3UxXbr40UU7IwrgC7I0P0bHIJk
+         LTwV/92yIa74Qi+WpqOjSNELSVLjkJo8l/Nv2hzzMIuOVu7bc1WqJQ9RQQTn0yLspap7
+         QyW9A+TWkC1Dk6x5DPa7YZ1g+4mOuMRqmjU/HiuM+CvZorTbWbibyjYhDe5PZwP7QI7S
+         iw9ROzPqsjxlY9Bn2L+ipJXy1iV/044q866OBk6qd3XVi1zI0nFNmBQEn1oTSPfOw1np
+         f0oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=L6Ag2VBHQuyYKlLF6xopn+ObtOOk20kt2kwMNta1TZ4=;
-        b=M8X/jT0VuF71q0OBYxIY++HZtv8qtEkUMDHEsBkzj4MUo5ogfdKAxRhaRV3i79IKcM
-         gCnE63e4kI+TfMu+Ga3W9uYwVVi6KXdRZI30IuWOzVcC7OFqoxyY7bOAkU/QUsZ45WSI
-         zUjxC9VuIDt8U07aq375PWaVaEhPFTk64VZQjnjfBfA4sDYORoHxQWSfPCk/+aH2MhzN
-         y4WZU7s7jgKlCFunVh5O50pXS9oLhvRcr7WRjIV8ve3UiBXCLnA70SWK77T48EqiCxL9
-         eg4mz9H02FSq546uElghkvL1FsG0KtYWdpo8pjGkhV44ARnQ3iQEz8+oNVavTuWuweB9
-         XRkg==
-X-Gm-Message-State: APjAAAU3H4+mRwFQa47jUboOVLPwGyoZGKalrhFon5qr7NTbbAG1W/DL
-        vPJkL4vzkY49QJZspLeqSLOMKw==
-X-Google-Smtp-Source: APXvYqzxuHjwdPrNa4nj3JStR1j9VmsiCOfNY/yVNIel4uPhFiwULXaMO5uqnw3bTrEcaP2mIzW4oQ==
-X-Received: by 2002:a17:90a:3243:: with SMTP id k61mr6885687pjb.55.1576350327883;
-        Sat, 14 Dec 2019 11:05:27 -0800 (PST)
-Received: from google.com ([2620:15c:2ce:0:9efe:9f1:9267:2b27])
-        by smtp.gmail.com with ESMTPSA id d23sm15906004pfo.176.2019.12.14.11.05.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Dec 2019 11:05:27 -0800 (PST)
-Date:   Sat, 14 Dec 2019 11:05:23 -0800
-From:   Fangrui Song <maskray@google.com>
-To:     Peter Shier <pshier@google.com>
-Cc:     kvm@vger.kernel.org, drjones@redhat.com,
-        Marc Orr <marcorr@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH kvm-unit-tests] Update AMD instructions to conform to
- LLVM assembler
-Message-ID: <20191214190523.pinshqv2fdbmuotg@google.com>
-References: <20190220202442.145494-1-pshier@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RMrXhnl08yOQWoHsGq/Mqy6tAi/gvfJoz02znJajxJM=;
+        b=Mbq31kGdzfGsqGVVvsgiEG2nHbRAt4/YqlKa8CWYbE4DvrMkGLQDBAs2umk+/Wb6PX
+         rewljlXYDqMtVyvpM33xHXrw/VSmYzuXr1Fxv5ROiYiSWi4qAFvymezoBqYKwCHL9llL
+         OG/2QDOSNS6gyocvrnfqr9V/OxXL2BmRZxk4BSdF+pL99qtMf5IketbQHijadJC6jbaW
+         U9ZGDtXtk6yISr5oLbWeBmqXtVjorrmYuEAA9dsHREl8sFHMlR4+SGmtM3sT9GBmlcit
+         Os1Dx6rschbFaQsmjBkaBZ4rAsGleptEWnRxSKKkObXgXF8avcVjFgf2bPfB27JfUNUx
+         J5dw==
+X-Gm-Message-State: APjAAAVs+ltdyaVlfuhep99lr0+c24X1szf8UBNRm/zyGTYeT+T6WXgg
+        +BWjnPboXBlNkki6kW9P+kMtbkXrIMn32j592OtFLQ==
+X-Google-Smtp-Source: APXvYqzzYIkxNYHSaWs+IMMqyvA2I2sxvou+3EOiMc1p3klHz2Q0lFygIlhZJZ4ZtzbhteGwQHNqN3WCW60QXniIRH4=
+X-Received: by 2002:a05:6808:996:: with SMTP id a22mr8108069oic.146.1576353716975;
+ Sat, 14 Dec 2019 12:01:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190220202442.145494-1-pshier@google.com>
+References: <20191214155614.19004-1-philmd@redhat.com> <CAFEAcA_QZtU9X4fxZk2oWAkN-zxXdQZejrSKZbDxPKLMwdFWgw@mail.gmail.com>
+ <31acb07b-a61b-1bc4-ee6e-faa511745a61@redhat.com>
+In-Reply-To: <31acb07b-a61b-1bc4-ee6e-faa511745a61@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Sat, 14 Dec 2019 20:01:46 +0000
+Message-ID: <CAFEAcA-UdDF2pd24NoOqpXSTnHHFWdvcexi5bRzq6ewt5vrrWQ@mail.gmail.com>
+Subject: Re: [PATCH 0/8] Simplify memory_region_add_subregion_overlap(..., priority=0)
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Andrew Baumann <Andrew.Baumann@microsoft.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Aleksandar Markovic <amarkovic@wavecomp.com>,
+        Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        Paul Burton <pburton@wavecomp.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> I am applying it, but I'm seriously puzzled by the clgi one.  Can you
-> open a bug on LLVM?
-> 
-> Paolo
+On Sat, 14 Dec 2019 at 18:17, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+> Maybe we can a warning if priority=3D0, to force board designers to use
+> explicit priority (explicit overlap).
 
-The clgi change does not appear to be needed.
+Priority 0 is fine, it's just one of the possible positive and
+negative values. I think what ideally we would complain about
+is where we see an overlap and both the regions involved
+have the same priority value, because in that case which
+one the guest sees is implicitly dependent on (I think) which
+order the subregions were added, which is fragile if we move
+code around. I'm not sure how easy that is to test for or how
+much of our existing code violates it, though.
 
-- "clgi \n\t"
-+ "clgi;\n\t"
-
-clang 7.0.0, 8.0.0 (downloaded from releases.llvm.org) and HEAD (built from source) compile
-"clgi" fine.
-
-% ~/ccls/build/clang+llvm-7.0.0-x86_64-linux-gnu-ubuntu-16.04/bin/clang -mno-red-zone -mno-sse -mno-sse2 -m64 -O1 -g -MMD -MF x86/.emulator.d -Wall -Wwrite-strings -Wempty-body -Wuninitialized -Wignored-qualifiers -fno-omit-frame-pointer -fno-pic -Woverride-init -Wmissing-prototypes -Wstrict-prototypes -std=gnu99 -ffreestanding -I /tmp/p/kvm-unit-tests/lib -I /tmp/p/kvm-unit-tests/lib/x86 -I lib -c -o x86/svm.o x86/svm.c -w
-# succeeded
+thanks
+-- PMM
