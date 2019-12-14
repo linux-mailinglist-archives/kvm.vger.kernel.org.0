@@ -2,99 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1DA011F0D3
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 08:57:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02F2311F0DC
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 09:13:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbfLNH5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Dec 2019 02:57:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22030 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725871AbfLNH5b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Dec 2019 02:57:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576310249;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x9Bb0Zg6nYlZHmt3Jv+uUkpX8UNR1qjNTKqsdhP1H0A=;
-        b=gDZ/rVIuePzwNsQmYfSDMzGmiHy7uBjuW4lXM8D8R3GlWX+h+DdAwLgiCIjHdMMlo7UIlH
-        Osq4VOLjtOeMTNIGjU3x452IZZTc4tSpJlRXPhzzZUBEgzyVy+pRY97OUNmSsxIiW1YGsA
-        Po1J1u0QgQM0bsm3bZT3zSQpAQTQJIY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-1W9AXZuHMgynL_F5mYmoOA-1; Sat, 14 Dec 2019 02:57:28 -0500
-X-MC-Unique: 1W9AXZuHMgynL_F5mYmoOA-1
-Received: by mail-wr1-f71.google.com with SMTP id 90so675864wrq.6
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 23:57:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x9Bb0Zg6nYlZHmt3Jv+uUkpX8UNR1qjNTKqsdhP1H0A=;
-        b=KC5D4iPh9QB+0Hwo8pbcYvWv/8KXsBGqKT0vfD+YMGIJzxk40vdJdmxC3TwQE1Is/R
-         B3U+nmswNVf5oJtL1jk7n7Gaf+HxC2QyyYaLVw75et2qtj9XTQdYR+94jpyNrJI8VltK
-         6RN3oCI8DDVUWU2HFwiEhgBrosIvGtlinu5WMosXPDdomqF2Bq6ynBEPSVkJ+7+nx9Ii
-         m9zCzwbaqlx8sa30oMrZ0TEyRl2CJqYb5XaWS3sNVHTmDrLUukfGNyFrqk15Uvjg4A87
-         QM5iMqACmWfqB2x6ESDA1kGJ8v0XfmvpRM8VYtToDvNkABWzhZ27kt37vy+4uD4BeSyf
-         LLVg==
-X-Gm-Message-State: APjAAAUyaXeSlxo5DI9BdV77AFON9LfqFeygSwDzf+mWxYZBLu0J6U8k
-        81GU4K0/Hcj9lNF7etSwmrQH26XCaNp7A6X0sCpdNqPgjJrMYOcoibtxiWR06Jwatp26mWu4wI9
-        IPU1zNiraNpf6
-X-Received: by 2002:a7b:c1d8:: with SMTP id a24mr18263331wmj.130.1576310247425;
-        Fri, 13 Dec 2019 23:57:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxUPZl8ZJUZZxd6OiscWyJHrZpVYfPirrw/vPJCsP1enhyrIyTxhigfjg1mAw+ULmy66b/+CA==
-X-Received: by 2002:a7b:c1d8:: with SMTP id a24mr18263308wmj.130.1576310247108;
-        Fri, 13 Dec 2019 23:57:27 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:cde8:2463:95a9:1d81? ([2001:b07:6468:f312:cde8:2463:95a9:1d81])
-        by smtp.gmail.com with ESMTPSA id n3sm13470462wmc.27.2019.12.13.23.57.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Dec 2019 23:57:26 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-To:     Peter Xu <peterx@redhat.com>,
-        Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com> <m1lfrihj2n.fsf@dinechin.org>
- <20191213202324.GI16429@xz-x1>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bc15650b-df59-f508-1090-21dafc6e8ad1@redhat.com>
-Date:   Sat, 14 Dec 2019 08:57:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191213202324.GI16429@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1725990AbfLNINj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Dec 2019 03:13:39 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:53682 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725372AbfLNINj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Dec 2019 03:13:39 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBE0uPks053683;
+        Sat, 14 Dec 2019 01:10:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=bZRzVXC1A2mQlyRmK7P/0EUj8XT3R/nW+ZLzlRiU8PU=;
+ b=Ey4LU3d//I4ZiH8padOxxy1Hice50cFjdE5MAlO77l68b8757fek5dNaqiT7HPpLxoDU
+ rOZ1t+Su9yJKYgIgry46NeUu/OwaOJD/tjlK293OzgryLz4oKTe3xD1lwT4QMsH+9MAm
+ W9zbNrirgLob6We3kff9hv4bS5L0NeXiaHF3s7HVSdKcxlYdTKdHLOTOUmxgBMqOlZKh
+ 46Y4GJQf0Gocdb486lyrFUikESeDH6aIvuM/bs6DrJpirarCacxfppo9d6uxPTc9rX8/
+ ezJ5ZtGoE3FuzanAvVNOvNYplV4+2hu+wZHMTTaxj+eqw1Eik4irD7EjKLJJR8jHXKSx Kg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2wr4qs3vfr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 14 Dec 2019 01:10:26 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBE0rxmT092146;
+        Sat, 14 Dec 2019 01:10:25 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2wvd1hax2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 14 Dec 2019 01:10:25 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBE1AOsK025861;
+        Sat, 14 Dec 2019 01:10:25 GMT
+Received: from [192.168.14.112] (/109.65.223.49)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 13 Dec 2019 17:10:24 -0800
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v2] kvm: x86: Add logical CPU to KVM_EXIT_FAIL_ENTRY info
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20191214002014.144430-1-jmattson@google.com>
+Date:   Sat, 14 Dec 2019 03:10:21 +0200
+Cc:     kvm@vger.kernel.org, Oliver Upton <oupton@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <81C338F8-851B-471C-8707-646283167D57@oracle.com>
+References: <20191214002014.144430-1-jmattson@google.com>
+To:     Jim Mattson <jmattson@google.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9470 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912140002
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9470 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912140002
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/12/19 21:23, Peter Xu wrote:
->> What is the benefit of using u16 for that? That means with 4K pages, you
->> can share at most 256M of dirty memory each time? That seems low to me,
->> especially since it's sufficient to touch one byte in a page to dirty it.
->>
->> Actually, this is not consistent with the definition in the code ;-)
->> So I'll assume it's actually u32.
-> Yes it's u32 now.  Actually I believe at least Paolo would prefer u16
-> more. :)
 
-It has to be u16, because it overlaps the padding of the first entry.
 
-Paolo
+> On 14 Dec 2019, at 2:20, Jim Mattson <jmattson@google.com> wrote:
+>=20
+> More often than not, a failed VM-entry in a production environment is
+> the result of a defective CPU (at least, insofar as Intel x86 is
+> concerned). To aid in identifying the bad hardware, add the logical
+> CPU to the information provided to userspace on a KVM exit with reason
+> KVM_EXIT_FAIL_ENTRY. The presence of this additional information is
+> indicated by a new capability, KVM_CAP_FAILED_ENTRY_CPU.
+>=20
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Oliver Upton <oupton@google.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-> I think even u16 would be mostly enough (if you see, the maximum
-> allowed value currently is 64K entries only, not a big one).  Again,
-> the thing is that the userspace should be collecting the dirty bits,
-> so the ring shouldn't reach full easily.  Even if it does, we should
-> probably let it stop for a while as explained above.  It'll be
-> inefficient only if we set it to a too-small value, imho.
-> 
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+
+BTW, one could argue that receiving an unexpected exit-reason (i.e. =
+KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON)
+could also only occur in production either from a KVM bug or from a =
+defective CPU. Similar to failed VM-entry.
+Should we add similar behaviour to that as-well?
+
+-Liran
+
+> ---
+> Documentation/virt/kvm/api.txt | 1 +
+> arch/x86/kvm/svm.c             | 1 +
+> arch/x86/kvm/vmx/vmx.c         | 2 ++
+> arch/x86/kvm/x86.c             | 1 +
+> include/uapi/linux/kvm.h       | 2 ++
+> 5 files changed, 7 insertions(+)
+>=20
+> diff --git a/Documentation/virt/kvm/api.txt =
+b/Documentation/virt/kvm/api.txt
+> index ebb37b34dcfc..6e5d92406b65 100644
+> --- a/Documentation/virt/kvm/api.txt
+> +++ b/Documentation/virt/kvm/api.txt
+> @@ -4245,6 +4245,7 @@ hardware_exit_reason.
+> 		/* KVM_EXIT_FAIL_ENTRY */
+> 		struct {
+> 			__u64 hardware_entry_failure_reason;
+> +			__u32 cpu; /* if KVM_CAP_FAILED_ENTRY_CPU */
+> 		} fail_entry;
+>=20
+> If exit_reason is KVM_EXIT_FAIL_ENTRY, the vcpu could not be run due
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 122d4ce3b1ab..e07c5ce3ac93 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -4980,6 +4980,7 @@ static int handle_exit(struct kvm_vcpu *vcpu)
+> 		kvm_run->exit_reason =3D KVM_EXIT_FAIL_ENTRY;
+> 		kvm_run->fail_entry.hardware_entry_failure_reason
+> 			=3D svm->vmcb->control.exit_code;
+> +		kvm_run->fail_entry.cpu =3D vcpu->cpu;
+> 		dump_vmcb(vcpu);
+> 		return 0;
+> 	}
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index e3394c839dea..17d1a1676fc0 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5846,6 +5846,7 @@ static int vmx_handle_exit(struct kvm_vcpu =
+*vcpu)
+> 		vcpu->run->exit_reason =3D KVM_EXIT_FAIL_ENTRY;
+> 		vcpu->run->fail_entry.hardware_entry_failure_reason
+> 			=3D exit_reason;
+> +		vcpu->run->fail_entry.cpu =3D vcpu->cpu;
+> 		return 0;
+> 	}
+>=20
+> @@ -5854,6 +5855,7 @@ static int vmx_handle_exit(struct kvm_vcpu =
+*vcpu)
+> 		vcpu->run->exit_reason =3D KVM_EXIT_FAIL_ENTRY;
+> 		vcpu->run->fail_entry.hardware_entry_failure_reason
+> 			=3D vmcs_read32(VM_INSTRUCTION_ERROR);
+> +		vcpu->run->fail_entry.cpu =3D vcpu->cpu;
+> 		return 0;
+> 	}
+>=20
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index cf917139de6b..9e89a32056d1 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3273,6 +3273,7 @@ int kvm_vm_ioctl_check_extension(struct kvm =
+*kvm, long ext)
+> 	case KVM_CAP_GET_MSR_FEATURES:
+> 	case KVM_CAP_MSR_PLATFORM_INFO:
+> 	case KVM_CAP_EXCEPTION_PAYLOAD:
+> +	case KVM_CAP_FAILED_ENTRY_CPU:
+> 		r =3D 1;
+> 		break;
+> 	case KVM_CAP_SYNC_REGS:
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f0a16b4adbbd..09ba7174456d 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -277,6 +277,7 @@ struct kvm_run {
+> 		/* KVM_EXIT_FAIL_ENTRY */
+> 		struct {
+> 			__u64 hardware_entry_failure_reason;
+> +			__u32 cpu;
+> 		} fail_entry;
+> 		/* KVM_EXIT_EXCEPTION */
+> 		struct {
+> @@ -1009,6 +1010,7 @@ struct kvm_ppc_resize_hpt {
+> #define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
+> #define KVM_CAP_ARM_NISV_TO_USER 177
+> #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+> +#define KVM_CAP_FAILED_ENTRY_CPU 179
+>=20
+> #ifdef KVM_CAP_IRQ_ROUTING
+>=20
+> --=20
+> 2.24.1.735.g03f4e72817-goog
+>=20
 
