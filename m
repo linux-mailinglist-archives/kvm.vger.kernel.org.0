@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8704911F2AD
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 16:57:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BBC011F2AE
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 16:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726825AbfLNP50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Dec 2019 10:57:26 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48655 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726757AbfLNP5Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 14 Dec 2019 10:57:25 -0500
+        id S1726794AbfLNP5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Dec 2019 10:57:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29790 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726757AbfLNP5g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Dec 2019 10:57:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576339045;
+        s=mimecast20190719; t=1576339056;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MiLtQtAFIR7WooqjFNP7RA7pxFuVPXkVzD1becE3SHU=;
-        b=Ll43n+D1FitT+k9IpwIm5jGEFts9W5C5JtNFhj1exmAuN+weshRSKK0942a+hyW2/55DHk
-        xovQdD15XPluA7I55lBUNRTfnUkzS8kAiVipe1nKkWCnzwO8aY2R6gesiL0lC7z7+LsGqn
-        BJ3w0qyou8NDiPUvK09m1IU3O5WTFSY=
+        bh=7SlorlqSNo6p31H7HgBYKxDoBhr5Y5T4+whsDnKxCwo=;
+        b=WkaGCgLA5aQ/4Dwf7BpSTUQuQD0OqJ/DknzWKRSZ0Sp1QhADzX88nY/0LjJDUpLQjhR5zI
+        XB8yCAntSwZxnUwk3Up2xFOHRqxREfHDd7GAoSTtG7YPxWyW+4o2IwMEKS0yhy9sQ1LsAF
+        9QUpCc0P6Mdq024wMUxvBOoC4tgc4Hc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-GUjV9-9vPW2uksM1tC2tFw-1; Sat, 14 Dec 2019 10:57:21 -0500
-X-MC-Unique: GUjV9-9vPW2uksM1tC2tFw-1
+ us-mta-245-uNUZ_QilNLChRElt76KaAQ-1; Sat, 14 Dec 2019 10:57:34 -0500
+X-MC-Unique: uNUZ_QilNLChRElt76KaAQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B6CA801E53;
-        Sat, 14 Dec 2019 15:57:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61F701852E2A;
+        Sat, 14 Dec 2019 15:57:32 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F5D75D6A7;
-        Sat, 14 Dec 2019 15:57:09 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0764F5D6A7;
+        Sat, 14 Dec 2019 15:57:19 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Peter Maydell <peter.maydell@linaro.org>,
@@ -52,9 +52,9 @@ Cc:     Peter Maydell <peter.maydell@linaro.org>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 3/8] hw/arm/xlnx-versal: Use memory_region_add_subregion() when priority is 0
-Date:   Sat, 14 Dec 2019 16:56:09 +0100
-Message-Id: <20191214155614.19004-4-philmd@redhat.com>
+Subject: [PATCH 4/8] hw/i386/intel_iommu: Use memory_region_add_subregion when priority is 0
+Date:   Sat, 14 Dec 2019 16:56:10 +0100
+Message-Id: <20191214155614.19004-5-philmd@redhat.com>
 In-Reply-To: <20191214155614.19004-1-philmd@redhat.com>
 References: <20191214155614.19004-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -81,43 +81,42 @@ This patch was produced with the following spatch script:
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/xlnx-versal-virt.c | 3 +--
- hw/arm/xlnx-versal.c      | 4 ++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ hw/i386/intel_iommu.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 462493c467..901e9ed86c 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -437,8 +437,7 @@ static void versal_virt_init(MachineState *machine)
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 43c94b993b..afa7e07b05 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3363,11 +3363,9 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *=
+s, PCIBus *bus, int devfn)
+          * switch between DMAR & noDMAR by enable/disable
+          * corresponding sub-containers
+          */
+-        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+-                                            MEMORY_REGION(&vtd_dev_as->i=
+ommu),
+-                                            0);
+-        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+-                                            &vtd_dev_as->nodmar, 0);
++        memory_region_add_subregion(&vtd_dev_as->root, 0,
++                                    MEMORY_REGION(&vtd_dev_as->iommu));
++        memory_region_add_subregion(&vtd_dev_as->root, 0, &vtd_dev_as->n=
+odmar);
 =20
-     /* Make the APU cpu address space visible to virtio and other
-      * modules unaware of muliple address-spaces.  */
--    memory_region_add_subregion_overlap(get_system_memory(),
--                                        0, &s->soc.fpd.apu.mr, 0);
-+    memory_region_add_subregion(get_system_memory(), 0, &s->soc.fpd.apu.=
-mr);
-=20
-     s->binfo.ram_size =3D machine->ram_size;
-     s->binfo.loader_start =3D 0x0;
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index 8b3d8d85b8..538d907f8a 100644
---- a/hw/arm/xlnx-versal.c
-+++ b/hw/arm/xlnx-versal.c
-@@ -281,8 +281,8 @@ static void versal_realize(DeviceState *dev, Error **=
-errp)
-     memory_region_init_ram(&s->lpd.mr_ocm, OBJECT(s), "ocm",
-                            MM_OCM_SIZE, &error_fatal);
-=20
--    memory_region_add_subregion_overlap(&s->mr_ps, MM_OCM, &s->lpd.mr_oc=
-m, 0);
--    memory_region_add_subregion_overlap(&s->fpd.apu.mr, 0, &s->mr_ps, 0)=
-;
-+    memory_region_add_subregion(&s->mr_ps, MM_OCM, &s->lpd.mr_ocm);
-+    memory_region_add_subregion(&s->fpd.apu.mr, 0, &s->mr_ps);
- }
-=20
- static void versal_init(Object *obj)
+         vtd_switch_address_space(vtd_dev_as);
+     }
+@@ -3764,8 +3762,7 @@ static void vtd_realize(DeviceState *dev, Error **e=
+rrp)
+     memory_region_init_alias(&s->mr_sys_alias, OBJECT(s),
+                              "vtd-sys-alias", get_system_memory(), 0,
+                              memory_region_size(get_system_memory()));
+-    memory_region_add_subregion_overlap(&s->mr_nodmar, 0,
+-                                        &s->mr_sys_alias, 0);
++    memory_region_add_subregion(&s->mr_nodmar, 0, &s->mr_sys_alias);
+     memory_region_add_subregion_overlap(&s->mr_nodmar,
+                                         VTD_INTERRUPT_ADDR_FIRST,
+                                         &s->mr_ir, 1);
 --=20
 2.21.0
 
