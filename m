@@ -2,114 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D918A11EF3E
-	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 01:34:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0494211F015
+	for <lists+kvm@lfdr.de>; Sat, 14 Dec 2019 04:04:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbfLNAeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Dec 2019 19:34:11 -0500
-Received: from mail-pj1-f73.google.com ([209.85.216.73]:45892 "EHLO
-        mail-pj1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726590AbfLNAeL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Dec 2019 19:34:11 -0500
-Received: by mail-pj1-f73.google.com with SMTP id f62so640368pjg.12
-        for <kvm@vger.kernel.org>; Fri, 13 Dec 2019 16:34:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=zK9Y4nx0Rj/ARKOrR+GneC6HR8RpVxfAwxr1k/suMxQ=;
-        b=dGlbP5YJCTlQwkz63/EM/Xh64ZL03NpqjvX4hLy0TyEAL1uzjNi0qhjL9/ZAzpYuSW
-         uvs2j5rmZetl8F7/qNmL62ho2BCQKbUjK68bbhcomU7u/4gfypDF1Mo/mIYGu71weaLJ
-         8nmWzaJUnt5TdKncGrefEoNuAGR3ezD1EeOc9ofzmSAlnXNvWQIXaTxRHnyADkoxsCPv
-         plVvl/9/7RURTAZrxkSQrEHPKtJP8qBc06MCOatg5CNdEyWC3v3k0eckOkErOlO0Zhpy
-         kTwxlNrqugvyjkXglZ4ZOlWeURaIcRjvMvxqhPDD9i95ZaqQ9IJ/kLIVan4OhvKjzVWh
-         cjDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=zK9Y4nx0Rj/ARKOrR+GneC6HR8RpVxfAwxr1k/suMxQ=;
-        b=laqk1lCTrP+gRv7uz0iSfno+0cLqaK4pDeTdyWF/rjtZPATS5qbroWbvttHkN++JmD
-         Qs0y4jFNeRfcTg1NigYf9s99Dj1QSSAoIJQQinIoFsdQ9rQtIo31D+Vd1oAeLuNxYyhk
-         M4pqmuDU0NwuV/9NiP17LtKhrsWwHx5AdVlRJr4FZA4mcNBdeixmfGLuCeZD+0SMiJvB
-         azfHQKtxl+hY7+ohEPuuVIoNhFb2AUAK/SAYY2ploCLwX2PNVdg7RZpVSLzlQe4v/jRe
-         9BQrGunXp2aIXi3dXspOlByOEyzuPQ6OsJfEnyGUl3ZV7TEU0jZGInEyqHMjZQ9abWvN
-         dTTQ==
-X-Gm-Message-State: APjAAAW9aq2Zutu93c33ndsB8qqnNXdKLMqRf/Jg3N5HY8o19aiA0cvb
-        wJZxtaImtezPaqJcWPNRnw9ooomcrCqG9ao+jtLVUgFQIvRUyVSSSx857FXHEBy5RjOfmTbfrnp
-        2daHdY2ROB/kz+qkKyhoB0+KPy+q9q099BStjjqUaoweB0Q1lKbpyqKgK2Q==
-X-Google-Smtp-Source: APXvYqwvK+qjeL33M1SlGRaGvZbj7HIQN/w09HixIxWeFsSObMPL1SVMYciHFve4t597E/WLHS9zdvPPvrE=
-X-Received: by 2002:a65:6842:: with SMTP id q2mr2676955pgt.345.1576283649114;
- Fri, 13 Dec 2019 16:34:09 -0800 (PST)
-Date:   Fri, 13 Dec 2019 16:33:58 -0800
-Message-Id: <20191214003358.169496-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
-Subject: [PATCH] KVM: nVMX: WARN on failure to set IA32_PERF_GLOBAL_CTRL
-From:   Oliver Upton <oupton@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Oliver Upton <oupton@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726676AbfLNDEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Dec 2019 22:04:42 -0500
+Received: from mga12.intel.com ([192.55.52.136]:59120 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726170AbfLNDEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Dec 2019 22:04:42 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Dec 2019 19:04:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,312,1571727600"; 
+   d="scan'208";a="226476032"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by orsmga002.jf.intel.com with ESMTP; 13 Dec 2019 19:04:38 -0800
+Cc:     baolu.lu@linux.intel.com, "Raj, Ashok" <ashok.raj@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over
+ first level
+To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>
+References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
+ <20191211021219.8997-5-baolu.lu@linux.intel.com>
+ <A2975661238FB949B60364EF0F2C25743A1309A9@SHSMSX104.ccr.corp.intel.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <acb93807-7a78-b81a-3b27-fde9ee4d7edb@linux.intel.com>
+Date:   Sat, 14 Dec 2019 11:03:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
+MIME-Version: 1.0
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1309A9@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Writes to MSR_CORE_PERF_GLOBAL_CONTROL should never fail if the VM-exit
-and VM-entry controls are exposed to L1. Promote the checks to perform a
-full WARN if kvm_set_msr() fails and remove the now unused macro
-SET_MSR_OR_WARN().
+Hi Liu Yi,
 
-Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/x86/kvm/vmx/nested.c | 18 ++++--------------
- 1 file changed, 4 insertions(+), 14 deletions(-)
+Thanks for reviewing my patch.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4aea7d304beb..fb502c62ee94 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -28,16 +28,6 @@ module_param(nested_early_check, bool, S_IRUGO);
- 	failed;								\
- })
- 
--#define SET_MSR_OR_WARN(vcpu, idx, data)				\
--({									\
--	bool failed = kvm_set_msr(vcpu, idx, data);			\
--	if (failed)							\
--		pr_warn_ratelimited(					\
--				"%s cannot write MSR (0x%x, 0x%llx)\n",	\
--				__func__, idx, data);			\
--	failed;								\
--})
--
- /*
-  * Hyper-V requires all of these, so mark them as supported even though
-  * they are just treated the same as all-context.
-@@ -2550,8 +2540,8 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 		vcpu->arch.walk_mmu->inject_page_fault = vmx_inject_page_fault_nested;
- 
- 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
--	    SET_MSR_OR_WARN(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
--			    vmcs12->guest_ia32_perf_global_ctrl))
-+	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
-+				     vmcs12->guest_ia32_perf_global_ctrl)))
- 		return -EINVAL;
- 
- 	kvm_rsp_write(vcpu, vmcs12->guest_rsp);
-@@ -3999,8 +3989,8 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
- 		vcpu->arch.pat = vmcs12->host_ia32_pat;
- 	}
- 	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
--		SET_MSR_OR_WARN(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
--				vmcs12->host_ia32_perf_global_ctrl);
-+		WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
-+					 vmcs12->host_ia32_perf_global_ctrl));
- 
- 	/* Set L1 segment info according to Intel SDM
- 	    27.5.2 Loading Host Segment and Descriptor-Table Registers */
--- 
-2.24.1.735.g03f4e72817-goog
+On 12/13/19 5:23 PM, Liu, Yi L wrote:
+>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
+>> Of Lu Baolu
+>> Sent: Wednesday, December 11, 2019 10:12 AM
+>> Subject: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over first level
+>>
+>> Intel VT-d in scalable mode supports two types of page tables for IOVA translation:
+>> first level and second level. The IOMMU driver can choose one from both for IOVA
+>> translation according to the use case. This sets up the pasid entry if a domain is
+>> selected to use the first-level page table for iova translation.
+>>
+>> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+>> ---
+>>   drivers/iommu/intel-iommu.c | 48 +++++++++++++++++++++++++++++++++++--
+>>   include/linux/intel-iommu.h | 10 ++++----
+>>   2 files changed, 52 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c index
+>> 2b5a47584baf..83a7abf0c4f0 100644
+>> --- a/drivers/iommu/intel-iommu.c
+>> +++ b/drivers/iommu/intel-iommu.c
+>> @@ -571,6 +571,11 @@ static inline int domain_type_is_si(struct dmar_domain
+>> *domain)
+>>   	return domain->flags & DOMAIN_FLAG_STATIC_IDENTITY;  }
+>>
+>> +static inline bool domain_use_first_level(struct dmar_domain *domain) {
+>> +	return domain->flags & DOMAIN_FLAG_USE_FIRST_LEVEL; }
+>> +
+>>   static inline int domain_pfn_supported(struct dmar_domain *domain,
+>>   				       unsigned long pfn)
+>>   {
+>> @@ -2288,6 +2293,8 @@ static int __domain_mapping(struct dmar_domain
+>> *domain, unsigned long iov_pfn,
+>>   		return -EINVAL;
+>>
+>>   	prot &= DMA_PTE_READ | DMA_PTE_WRITE | DMA_PTE_SNP;
+>> +	if (domain_use_first_level(domain))
+>> +		prot |= DMA_FL_PTE_PRESENT;
+> 
+> For DMA_PTE_SNP bit, I think there needs some work. The bit 11 of prot
+> should be cleared when FLPT is used for IOVA.
 
+SNP (bit 11) is only for second level. This bit is ignored for first
+level page table walk. We should clear this bit for first level anyway.
+
+> 
+> Also, we need to set bit 63 "XD" properly. e.g. If bit 11 of prot is set, it
+> means snoop required, then "XD" bit is "0". If bit 11 of prot is "0", it means
+> this domain is not snooping, so you may want to set "XD" bit as "1". With
+> such enhancement, I think IOVA over FLPT would have as less difference
+> with IOVA over SLPT.
+
+XD (bit 63) is only for the first level, and SNP (bit 11) is only for
+second level, right? I think we need to always set XD bit for IOVA over
+FL case. thoughts?
+
+Best regards,
+baolu
