@@ -2,182 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDF8811F6F1
-	for <lists+kvm@lfdr.de>; Sun, 15 Dec 2019 10:23:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25E9B11F6FB
+	for <lists+kvm@lfdr.de>; Sun, 15 Dec 2019 10:29:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726089AbfLOJXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Dec 2019 04:23:00 -0500
-Received: from mga12.intel.com ([192.55.52.136]:7574 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726078AbfLOJXA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Dec 2019 04:23:00 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Dec 2019 01:22:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,317,1571727600"; 
-   d="scan'208";a="217119280"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
-  by orsmga003.jf.intel.com with ESMTP; 15 Dec 2019 01:22:58 -0800
-Received: from shsmsx107.ccr.corp.intel.com (10.239.4.96) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sun, 15 Dec 2019 01:22:57 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
- SHSMSX107.ccr.corp.intel.com ([169.254.9.164]) with mapi id 14.03.0439.000;
- Sun, 15 Dec 2019 17:22:55 +0800
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova
- over first level
-Thread-Topic: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova
- over first level
-Thread-Index: AQHVr8iiJX/bvAPmK0eIArQDcTD6yKe33K3QgACZjICAAndaMA==
-Date:   Sun, 15 Dec 2019 09:22:54 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A132C50@SHSMSX104.ccr.corp.intel.com>
-References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
- <20191211021219.8997-6-baolu.lu@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A130C08@SHSMSX104.ccr.corp.intel.com>
- <f1e5cfea-8b11-6d72-8e57-65daea51c050@linux.intel.com>
-In-Reply-To: <f1e5cfea-8b11-6d72-8e57-65daea51c050@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDU3MTUyN2EtZWEzNC00MWYxLThlNjEtYTdjZjkyZmI5YTkxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib21rQVZoUEpRYTlNa0p4ZnNTdlAxVHFrTmQrSnhyeWsraFBVUHh2ZGNGZ2NFbjRcL2x1a1J0cjNFdEowUDNKNHIifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726099AbfLOJ3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Dec 2019 04:29:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53765 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726049AbfLOJ3e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Dec 2019 04:29:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576402173;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/cbRoYQjVF9Fb6jVOjdPPWTnHMqlJsBUDXZ6cVmV9Xc=;
+        b=CquhJ5gV11LNer1GrzKXKJisTff06IQGSaPIEjqFVGDQLtHXfa7rUiDhnF10TMRsQczlpo
+        uk5XWr1OcX+bwjnCM4Hzn4hDRUPpTlec9qTRHcntZCXQnQQDGTCG+OJM+DPbhS8dweedFc
+        rto919BmwWGXKTEXEpocFet3PATt6CM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-1Ht6FeBYP-iitFvyTfKXXg-1; Sun, 15 Dec 2019 04:29:31 -0500
+X-MC-Unique: 1Ht6FeBYP-iitFvyTfKXXg-1
+Received: by mail-wr1-f72.google.com with SMTP id d8so1373711wrq.12
+        for <kvm@vger.kernel.org>; Sun, 15 Dec 2019 01:29:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/cbRoYQjVF9Fb6jVOjdPPWTnHMqlJsBUDXZ6cVmV9Xc=;
+        b=Jpp+YamgNywD/iiKEoHR1DjPc/SbfuDPxrVGeqZz3SyuwHNqYZRd98jsVtFxBcBQVn
+         aTim1A/WgTPgDkGdx7zb0oHQgIe7BLYrxW/ArGopXPzuKNjWMgn1vBZZLrcPPU/0rJaN
+         TBncnZv4G71Rg8c5d6Gxu451UnNMap5o/RtHBtB9bV87so4NRyCTBwKGIPgaj1wkHZrc
+         kTTmrBW33iPvkts+PCNpm5GmmezS/nAGsx1jNwYP+pvWEkG810cs8pSujz8hEHYErYSS
+         lneJFu9LYsliV8uwWhN4Yes9mXMpmTcNoqFNjRPXom/fGhXypctO6SbHrBchXZNE91Nl
+         5iQQ==
+X-Gm-Message-State: APjAAAUbxC1m/AdssCW8gAd6M0/Nxu8dxUVo1rfOtrs80SpWz7RAuHHs
+        T3Vo20F3p9GUQjm4gqWtj09HVhT6Azh78Sc7SS4YLkswCb9gpQZNn+8wSeuXaeh12ObzfqlK3s5
+        xWtaUz/7Xlppz
+X-Received: by 2002:adf:f508:: with SMTP id q8mr23869153wro.334.1576402169972;
+        Sun, 15 Dec 2019 01:29:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxSQuoeSXK2JQ2a3NYGSOG+IKU4rIEY4e8d8n4cgPva88Rr6fI9uU2IyMvMty0zVO7CDBdDhQ==
+X-Received: by 2002:adf:f508:: with SMTP id q8mr23869104wro.334.1576402169688;
+        Sun, 15 Dec 2019 01:29:29 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+        by smtp.gmail.com with ESMTPSA id p17sm17373292wmk.30.2019.12.15.01.29.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Dec 2019 01:29:28 -0800 (PST)
+Date:   Sun, 15 Dec 2019 04:29:25 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz,
+        yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        david@redhat.com, pagupta@redhat.com, riel@surriel.com,
+        lcapitulino@redhat.com, dave.hansen@intel.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, osalvador@suse.de
+Subject: Re: [PATCH v15 6/7] virtio-balloon: Add support for providing free
+ page reports to host
+Message-ID: <20191215042538-mutt-send-email-mst@kernel.org>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+ <20191205162255.19548.63866.stgit@localhost.localdomain>
+ <20191213020553-mutt-send-email-mst@kernel.org>
+ <de779bcc6ccae238dbdedcc61db88abbdb8f291e.camel@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de779bcc6ccae238dbdedcc61db88abbdb8f291e.camel@linux.intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGkgQmFvbHUsDQoNClBsZWFzZSBjaGVjayByZXBsaWVzIGJlbG93Og0KDQo+IEZyb206IEx1IEJh
-b2x1IFttYWlsdG86YmFvbHUubHVAbGludXguaW50ZWwuY29tXQ0KPiBTZW50OiBTYXR1cmRheSwg
-RGVjZW1iZXIgMTQsIDIwMTkgMTE6MjQgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50
-ZWwuY29tPjsgSm9lcmcgUm9lZGVsIDxqb3JvQDhieXRlcy5vcmc+OyBEYXZpZA0KPiBXb29kaG91
-c2UgPGR3bXcyQGluZnJhZGVhZC5vcmc+OyBBbGV4IFdpbGxpYW1zb24NCj4gPGFsZXgud2lsbGlh
-bXNvbkByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYzIDUvNl0gaW9tbXUvdnQt
-ZDogRmx1c2ggUEFTSUQtYmFzZWQgaW90bGIgZm9yIGlvdmEgb3ZlciBmaXJzdA0KPiBsZXZlbA0K
-PiANCj4gSGkgTGl1IFlpLA0KPiANCj4gT24gMTIvMTMvMTkgNzo0MiBQTSwgTGl1LCBZaSBMIHdy
-b3RlOg0KPiA+PiBGcm9tOiBrdm0tb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86a3ZtLW93
-bmVyQHZnZXIua2VybmVsLm9yZ10gT24NCj4gQmVoYWxmDQo+ID4+IE9mIEx1IEJhb2x1DQo+ID4+
-IFNlbnQ6IFdlZG5lc2RheSwgRGVjZW1iZXIgMTEsIDIwMTkgMTA6MTIgQU0NCj4gPj4gVG86IEpv
-ZXJnIFJvZWRlbCA8am9yb0A4Ynl0ZXMub3JnPjsgRGF2aWQgV29vZGhvdXNlDQo+IDxkd213MkBp
-bmZyYWRlYWQub3JnPjsNCj4gPj4gU3ViamVjdDogW1BBVENIIHYzIDUvNl0gaW9tbXUvdnQtZDog
-Rmx1c2ggUEFTSUQtYmFzZWQgaW90bGIgZm9yIGlvdmEgb3ZlciBmaXJzdA0KPiBsZXZlbA0KPiA+
-Pg0KPiA+PiBXaGVuIHNvZnR3YXJlIGhhcyBjaGFuZ2VkIGZpcnN0LWxldmVsIHRhYmxlcywgaXQg
-c2hvdWxkIGludmFsaWRhdGUNCj4gPj4gdGhlIGFmZmVjdGVkIElPVExCIGFuZCB0aGUgcGFnaW5n
-LXN0cnVjdHVyZS1jYWNoZXMgdXNpbmcgdGhlIFBBU0lELQ0KPiA+PiBiYXNlZC1JT1RMQiBJbnZh
-bGlkYXRlIERlc2NyaXB0b3IgZGVmaW5lZCBpbiBzcGVjIDYuNS4yLjQuDQo+ID4+DQo+ID4+IFNp
-Z25lZC1vZmYtYnk6IEx1IEJhb2x1IDxiYW9sdS5sdUBsaW51eC5pbnRlbC5jb20+DQo+ID4+IC0t
-LQ0KPiA+PiAgIGRyaXZlcnMvaW9tbXUvZG1hci5jICAgICAgICB8IDQxICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysNCj4gPj4gICBkcml2ZXJzL2lvbW11L2ludGVsLWlvbW11LmMg
-fCA0NCArKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tDQo+ID4+ICAgaW5jbHVk
-ZS9saW51eC9pbnRlbC1pb21tdS5oIHwgIDIgKysNCj4gPj4gICAzIGZpbGVzIGNoYW5nZWQsIDcy
-IGluc2VydGlvbnMoKyksIDE1IGRlbGV0aW9ucygtKQ0KPiA+Pg0KPiA+PiBkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy9pb21tdS9kbWFyLmMgYi9kcml2ZXJzL2lvbW11L2RtYXIuYw0KPiA+PiBpbmRleCAz
-YWNmYTZhMjVmYTIuLmZiMzBkNTA1MzY2NCAxMDA2NDQNCj4gPj4gLS0tIGEvZHJpdmVycy9pb21t
-dS9kbWFyLmMNCj4gPj4gKysrIGIvZHJpdmVycy9pb21tdS9kbWFyLmMNCj4gPj4gQEAgLTEzNzEs
-NiArMTM3MSw0NyBAQCB2b2lkIHFpX2ZsdXNoX2Rldl9pb3RsYihzdHJ1Y3QgaW50ZWxfaW9tbXUg
-KmlvbW11LA0KPiB1MTYNCj4gPj4gc2lkLCB1MTYgcGZzaWQsDQo+ID4+ICAgCXFpX3N1Ym1pdF9z
-eW5jKCZkZXNjLCBpb21tdSk7DQo+ID4+ICAgfQ0KPiA+Pg0KPiA+PiArLyogUEFTSUQtYmFzZWQg
-SU9UTEIgaW52YWxpZGF0aW9uICovDQo+ID4+ICt2b2lkIHFpX2ZsdXNoX3Bpb3RsYihzdHJ1Y3Qg
-aW50ZWxfaW9tbXUgKmlvbW11LCB1MTYgZGlkLCB1MzIgcGFzaWQsIHU2NCBhZGRyLA0KPiA+PiAr
-CQkgICAgIHVuc2lnbmVkIGxvbmcgbnBhZ2VzLCBib29sIGloKQ0KPiA+PiArew0KPiA+PiArCXN0
-cnVjdCBxaV9kZXNjIGRlc2MgPSB7LnF3MiA9IDAsIC5xdzMgPSAwfTsNCj4gPj4gKw0KPiA+PiAr
-CS8qDQo+ID4+ICsJICogbnBhZ2VzID09IC0xIG1lYW5zIGEgUEFTSUQtc2VsZWN0aXZlIGludmFs
-aWRhdGlvbiwgb3RoZXJ3aXNlLA0KPiA+PiArCSAqIGEgcG9zaXRpdmUgdmFsdWUgZm9yIFBhZ2Ut
-c2VsZWN0aXZlLXdpdGhpbi1QQVNJRCBpbnZhbGlkYXRpb24uDQo+ID4+ICsJICogMCBpcyBub3Qg
-YSB2YWxpZCBpbnB1dC4NCj4gPj4gKwkgKi8NCj4gPj4gKwlpZiAoV0FSTl9PTighbnBhZ2VzKSkg
-ew0KPiA+PiArCQlwcl9lcnIoIkludmFsaWQgaW5wdXQgbnBhZ2VzID0gJWxkXG4iLCBucGFnZXMp
-Ow0KPiA+PiArCQlyZXR1cm47DQo+ID4+ICsJfQ0KPiA+PiArDQo+ID4+ICsJaWYgKG5wYWdlcyA9
-PSAtMSkgew0KPiA+PiArCQlkZXNjLnF3MCA9IFFJX0VJT1RMQl9QQVNJRChwYXNpZCkgfA0KPiA+
-PiArCQkJCVFJX0VJT1RMQl9ESUQoZGlkKSB8DQo+ID4+ICsJCQkJUUlfRUlPVExCX0dSQU4oUUlf
-R1JBTl9OT05HX1BBU0lEKSB8DQo+ID4+ICsJCQkJUUlfRUlPVExCX1RZUEU7DQo+ID4+ICsJCWRl
-c2MucXcxID0gMDsNCj4gPj4gKwl9IGVsc2Ugew0KPiA+PiArCQlpbnQgbWFzayA9IGlsb2cyKF9f
-cm91bmR1cF9wb3dfb2ZfdHdvKG5wYWdlcykpOw0KPiA+PiArCQl1bnNpZ25lZCBsb25nIGFsaWdu
-ID0gKDFVTEwgPDwgKFZURF9QQUdFX1NISUZUICsgbWFzaykpOw0KPiA+PiArDQo+ID4+ICsJCWlm
-IChXQVJOX09OX09OQ0UoIUFMSUdOKGFkZHIsIGFsaWduKSkpDQo+ID4+ICsJCQlhZGRyICY9IH4o
-YWxpZ24gLSAxKTsNCj4gPj4gKw0KPiA+PiArCQlkZXNjLnF3MCA9IFFJX0VJT1RMQl9QQVNJRChw
-YXNpZCkgfA0KPiA+PiArCQkJCVFJX0VJT1RMQl9ESUQoZGlkKSB8DQo+ID4+ICsJCQkJUUlfRUlP
-VExCX0dSQU4oUUlfR1JBTl9QU0lfUEFTSUQpIHwNCj4gPj4gKwkJCQlRSV9FSU9UTEJfVFlQRTsN
-Cj4gPj4gKwkJZGVzYy5xdzEgPSBRSV9FSU9UTEJfQUREUihhZGRyKSB8DQo+ID4+ICsJCQkJUUlf
-RUlPVExCX0lIKGloKSB8DQo+ID4+ICsJCQkJUUlfRUlPVExCX0FNKG1hc2spOw0KPiA+PiArCX0N
-Cj4gPj4gKw0KPiA+PiArCXFpX3N1Ym1pdF9zeW5jKCZkZXNjLCBpb21tdSk7DQo+ID4+ICt9DQo+
-ID4+ICsNCj4gPj4gICAvKg0KPiA+PiAgICAqIERpc2FibGUgUXVldWVkIEludmFsaWRhdGlvbiBp
-bnRlcmZhY2UuDQo+ID4+ICAgICovDQo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lvbW11L2lu
-dGVsLWlvbW11LmMgYi9kcml2ZXJzL2lvbW11L2ludGVsLWlvbW11LmMNCj4gPj4gaW5kZXggODNh
-N2FiZjBjNGYwLi5lNDdmNWZlMzdiNTkgMTAwNjQ0DQo+ID4+IC0tLSBhL2RyaXZlcnMvaW9tbXUv
-aW50ZWwtaW9tbXUuYw0KPiA+PiArKysgYi9kcml2ZXJzL2lvbW11L2ludGVsLWlvbW11LmMNCj4g
-Pj4gQEAgLTE1MjAsMTggKzE1MjAsMjQgQEAgc3RhdGljIHZvaWQgaW9tbXVfZmx1c2hfaW90bGJf
-cHNpKHN0cnVjdA0KPiBpbnRlbF9pb21tdQ0KPiA+PiAqaW9tbXUsDQo+ID4+DQo+ID4+ICAgCWlm
-IChpaCkNCj4gPj4gICAJCWloID0gMSA8PCA2Ow0KPiA+PiAtCS8qDQo+ID4+IC0JICogRmFsbGJh
-Y2sgdG8gZG9tYWluIHNlbGVjdGl2ZSBmbHVzaCBpZiBubyBQU0kgc3VwcG9ydCBvciB0aGUgc2l6
-ZSBpcw0KPiA+PiAtCSAqIHRvbyBiaWcuDQo+ID4+IC0JICogUFNJIHJlcXVpcmVzIHBhZ2Ugc2l6
-ZSB0byBiZSAyIF4geCwgYW5kIHRoZSBiYXNlIGFkZHJlc3MgaXMgbmF0dXJhbGx5DQo+ID4+IC0J
-ICogYWxpZ25lZCB0byB0aGUgc2l6ZQ0KPiA+PiAtCSAqLw0KPiA+PiAtCWlmICghY2FwX3Bnc2Vs
-X2ludihpb21tdS0+Y2FwKSB8fCBtYXNrID4gY2FwX21heF9hbWFza192YWwoaW9tbXUtDQo+ID4+
-PiBjYXApKQ0KPiA+PiAtCQlpb21tdS0+Zmx1c2guZmx1c2hfaW90bGIoaW9tbXUsIGRpZCwgMCwg
-MCwNCj4gPj4gLQkJCQkJCURNQV9UTEJfRFNJX0ZMVVNIKTsNCj4gPj4gLQllbHNlDQo+ID4+IC0J
-CWlvbW11LT5mbHVzaC5mbHVzaF9pb3RsYihpb21tdSwgZGlkLCBhZGRyIHwgaWgsIG1hc2ssDQo+
-ID4+IC0JCQkJCQlETUFfVExCX1BTSV9GTFVTSCk7DQo+ID4+ICsNCj4gPj4gKwlpZiAoZG9tYWlu
-X3VzZV9maXJzdF9sZXZlbChkb21haW4pKSB7DQo+ID4+ICsJCXFpX2ZsdXNoX3Bpb3RsYihpb21t
-dSwgZGlkLCBkb21haW4tPmRlZmF1bHRfcGFzaWQsDQo+ID4+ICsJCQkJYWRkciwgcGFnZXMsIGlo
-KTsNCj4gPg0KPiA+IEknbSBub3Qgc3VyZSBpZiBteSB1bmRlcnN0YW5kaW5nIGlzIGNvcnJlY3Qu
-IEJ1dCBsZXQgbWUgdGVsbCBhIHN0b3J5Lg0KPiA+IEFzc3VtaW5nIHdlIGFzc2lnbiBhIG1kZXYg
-YW5kIGEgUEYvVkYgdG8gYSBzaW5nbGUgVk0sIHRoZW4gdGhlcmUNCj4gPiB3aWxsIGJlIHBfaW90
-bGIgdGFnZ2VkIHdpdGggUEFTSURfUklEMlBBU0lEIGFuZCBwX2lvdGxiIHRhZ2dlZCB3aXRoDQo+
-ID4gZGVmYXVsdF9wYXNpZC4gV2UgbWF5IHdhbnQgdG8gZmx1c2ggYm90aC4uLiBJZiB0aGlzIG9w
-ZXJhdGlvbiBpcw0KPiANCj4gSSBhc3N1bWUgdGhhdCBTUklPViBhbmQgU0lPViBhcmUgZXhjbHVz
-aXZlLiBZb3UgY2FuJ3QgZW5hYmxlIGJvdGggU1JJT1YNCj4gYW5kIFNJT1Ygb24gYSBzaW5nbGUg
-ZGV2aWNlLg0KDQp5ZXMsIGJ1dCBJJ20gbm90IHRhbGtpbmcgdXNlIHRoZW0gb24gYSBzaW5nbGUg
-ZGV2aWNlLi4uDQoNCj4gU28gdGhlIG1kZXYgYW5kIFBGL1ZGIGFyZSBmcm9tIGRpZmZlcmVudA0K
-PiBkZXZpY2VzLCByaWdodD8NCg0KeWVzLCB0aGUgY2FzZSBJIG1lbnRpb25lZCBhYm92ZSBpczog
-YSBtZGV2IGZyb20gYSBkZXZpY2UgKHNheSBkZXZBKSwNCmFuZCBhbm90aGVyIGRldmljZSAoc2F5
-IGRldkIpLiBDcmVhdGUgbWRldiBvbiBkZXZBIGFuZCBhc3NpZ24gaXQgdG8NCmEgVk0gdG9nZXRo
-ZXIgd2l0aCBkZXZCLg0KDQo+IA0KPiBPciwgaW4gU1JJT1YgY2FzZSwgeW91IGNhbiB3cmFwIGEg
-UEYgb3IgVkYgYXMgYSBtZWRpYXRlZCBkZXZpY2UuIEJ1dA0KPiB0aGlzIG1kZXYgc3RpbGwgYmUg
-YmFja2VkIHdpdGggYSBwYXNpZCBvZiBSSUQyUEFTSUQuDQoNCk15IGNvbW1lbnQgaGFzIG5vIGJ1
-c2luZXNzIHdpdGggd3JhcHBpbmcgUEYvVlIgYXMgbWRldi4uLg0KDQo+IA0KPiA+IGludm9rZWQg
-cGVyLWRldmljZSwgdGhlbiBuZWVkIHRvIHBhc3MgaW4gYSBoaW50IHRvIGluZGljYXRlIHdoZXRo
-ZXINCj4gPiB0byB1c2UgUEFTSURfUklEMlBBU0lEIG9yIGRlZmF1bHRfcGFzaWQsIG9yIHlvdSBt
-YXkganVzdCBpc3N1ZSB0d28NCj4gPiBmbHVzaCB3aXRoIHRoZSB0d28gUEFTSUQgdmFsdWVzLiBU
-aG91Z2h0cz8NCj4gDQo+IFRoaXMgaXMgcGVyLWRvbWFpbiBhbmQgZWFjaCBkb21haW4gaGFzIHNw
-ZWNpZmljIGRvbWFpbiBpZCBhbmQgZGVmYXVsdA0KPiBwYXNpZCAoYXNzdW1lIGRlZmF1bHQgZG9t
-YWluIGlzIDAgaW4gUklEMlBBU0lEIGNhc2UpLg0KDQpPaywgbGV0IG1lIGV4cGxhaW4gbW9yZS4u
-LiBkZWZhdWx0IHBhc2lkIGlzIG1lYW5pbmdmdWwgb25seSB3aGVuDQp0aGUgZG9tYWluIGhhcyBi
-ZWVuIGF0dGFjaGVkIHRvIGEgZGV2aWNlIGFzIGFuIGF1eC1kb21haW4uIHJpZ2h0Pw0KSWYgYSBk
-b21haW4gb25seSBoYXMgb25lIGRldmljZSwgYW5kIGl0IGlzIGF0dGFjaGVkIHRvIHRoaXMgZGV2
-aWNlIGFzDQpub3JtYWwgZG9tYWluIChub3JtYWwgZG9tYWluIG1lYW5zIG5vbiBhdXgtZG9tYWlu
-IGhlcmUpLiBUaGVuDQp5b3Ugc2hvdWxkIGZsdXNoIGNhY2hlIHdpdGggZG9tYWluLWlkIGFuZCBS
-SUQyUEFTSUQgdmFsdWUuDQpJZiBhIGRvbWFpbiBoYXMgb25lIGRldmljZSwgYW5kIGl0IGlzIGF0
-dGFjaGVkIHRvIHRoaXMgZGV2aWNlIGFzDQphdXgtZG9tYWluLiBUaGVuIHlvdSBtYXkgd2FudCB0
-byBmbHVzaCBjYWNoZSB3aXRoIGRvbWFpbi1pZA0KYW5kIGRlZmF1bHQgcGFzaWQuIHJpZ2h0Pw0K
-VGhlbiBsZXQncyBjb21lIHRvIHRoZSBjYXNlIEkgbWVudGlvbmVkIGluIHByZXZpb3VzIGVtYWls
-LiBhIG1kZXYNCmFuZCBhbm90aGVyIGRldmljZSBhc3NpZ25lZCB0byBhIHNpbmdsZSBWTS4gSW4g
-aG9zdCwgeW91IHdpbGwgaGF2ZQ0KYSBkb21haW4gd2hpY2ggaGFzIHR3byBkZXZpY2VzLCBvbmUg
-ZGV2aWNlKGRldmEpIGlzIGF0dGFjaGVkIGFzDQpub3JtYWwgZG9tYWluLCBhbm90aGVyIG9uZSAo
-ZGV2QikgaXMgYXR0YWNoZWQgYXMgYXV4LWRvbWFpbi4gVGhlbg0Kd2hpY2ggcGFzaWQgc2hvdWxk
-IGJlIHVzZWQgd2hlbiB0aGUgbWFwcGluZyBpbiBJT1ZBIHBhZ2UgdGFibGUgaXMNCm1vZGlmaWVk
-PyBSSUQyUEFTSUQgb3IgZGVmYXVsdCBwYXNpZD8gSSB0aGluayBib3RoIHNob3VsZCBiZSB1c2Vk
-DQpzaW5jZSB0aGUgZG9tYWluIG1lYW5zIGRpZmZlcmVudGx5IHRvIHRoZSB0d28gZGV2aWNlcy4g
-SWYgeW91IGp1c3QNCnVzZSBkZWZhdWx0IHBhc2lkLCB0aGVuIGRldmEgbWF5IHN0aWxsIGJlIGFi
-bGUgdG8gdXNlIHN0YWxlIGNhY2hlcy4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+On Fri, Dec 13, 2019 at 08:35:13AM -0800, Alexander Duyck wrote:
+> On Fri, 2019-12-13 at 02:08 -0500, Michael S. Tsirkin wrote:
+> > On Thu, Dec 05, 2019 at 08:22:55AM -0800, Alexander Duyck wrote:
+> > > From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > > 
+> > > Add support for the page reporting feature provided by virtio-balloon.
+> > > Reporting differs from the regular balloon functionality in that is is
+> > > much less durable than a standard memory balloon. Instead of creating a
+> > > list of pages that cannot be accessed the pages are only inaccessible
+> > > while they are being indicated to the virtio interface. Once the
+> > > interface has acknowledged them they are placed back into their respective
+> > > free lists and are once again accessible by the guest system.
+> > > 
+> > > Unlike a standard balloon we don't inflate and deflate the pages. Instead
+> > > we perform the reporting, and once the reporting is completed it is
+> > > assumed that the page has been dropped from the guest and will be faulted
+> > > back in the next time the page is accessed.
+> > > 
+> > > For this reason when I had originally introduced the patch set I referred
+> > > to this behavior as a "bubble" instead of a "balloon" since the duration
+> > > is short lived, and when the page is touched the "bubble" is popped and
+> > > the page is faulted back in.
+> > > 
+> > > Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+> > 
+> > virtio POV is fine here:
+> > 
+> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > However please copy virtio-comment on UAPI changes.
+> 
+> So I have been avoiding copying virtio-dev on the kernel changes as I had
+> gotten feedback that it was annoying some people as they were getting
+> bounces since they were not subscribed. Will the same type of thing happen
+> with virtio-comment?
+
+Same thing.
+
+> > If possible isolate the last chunk in a patch by itself
+> > to make it easier for non-kernel developers to review.
+> 
+> Are you talking about the change in "include/uapi/linux/virtio_balloon.h"?
+> 
+> I have it as a standalone patch in the QEMU set, and for the QEMU set I
+> had included virtio-dev.
+
+That's enough then.
+
+> Would you prefer I include virtio-comment instead
+> or in addition to virtio-dev? My thought is that I would prefer to keep
+> the virtio people focused on the QEMU code since they are probably more
+> comfortable with that, and the kernel people focused on the kernel code.
+
+virtio-dev is enough too.
+
+
+> > > ---
+> > >  drivers/virtio/Kconfig              |    1 +
+> > >  drivers/virtio/virtio_balloon.c     |   64 +++++++++++++++++++++++++++++++++++
+> > >  include/uapi/linux/virtio_balloon.h |    1 +
+> > >  3 files changed, 66 insertions(+)
+> 
+> <snip>
+> 
+> > > 
+> > > diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> > > index a1966cd7b677..19974392d324 100644
+> > > --- a/include/uapi/linux/virtio_balloon.h
+> > > +++ b/include/uapi/linux/virtio_balloon.h
+> > > @@ -36,6 +36,7 @@
+> > >  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> > >  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT	3 /* VQ to report free pages */
+> > >  #define VIRTIO_BALLOON_F_PAGE_POISON	4 /* Guest is using page poisoning */
+> > > +#define VIRTIO_BALLOON_F_REPORTING	5 /* Page reporting virtqueue */
+> > >  
+> > >  /* Size of a PFN in the balloon interface. */
+> > >  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> 
+> If this is the bit we are talking about I have it split out already into a
+> QEMU specific patch as well, it can be found here:
+> https://lore.kernel.org/lkml/20191205162422.19737.57728.stgit@localhost.localdomain/
+> 
+> If needed I could probably add a cover page and/or update the comments in
+> that patch if that is needed to better explain the change.
+> 
+> Thanks.
+> 
+> - Alex
+
+Updating comment in this patch can't hurt.
+But yes, this is OK as is, too, I just missed that you did it.
+
+-- 
+MST
+
