@@ -2,217 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9589211F72D
-	for <lists+kvm@lfdr.de>; Sun, 15 Dec 2019 11:28:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0CAD11F872
+	for <lists+kvm@lfdr.de>; Sun, 15 Dec 2019 16:28:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726099AbfLOK2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Dec 2019 05:28:03 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:57743 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726061AbfLOK2D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 15 Dec 2019 05:28:03 -0500
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why)
-        by cheepnis.misterjones.org with esmtpsa (TLSv1.2:AES256-GCM-SHA384:256)
-        (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1igR7x-0007eF-3A; Sun, 15 Dec 2019 11:27:53 +0100
-Date:   Sun, 15 Dec 2019 10:27:51 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     kvm-ppc@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        kvm@vger.kernel.org, James Hogan <jhogan@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, linux-mips@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 1/7] KVM: Pass mmu_notifier_range down to
- kvm_unmap_hva_range()
-Message-ID: <20191215102751.197b7d81@why>
-In-Reply-To: <20191213182503.14460-2-maz@kernel.org>
-References: <20191213182503.14460-1-maz@kernel.org>
-        <20191213182503.14460-2-maz@kernel.org>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1726437AbfLOP1Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Dec 2019 10:27:24 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:34180 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726282AbfLOP1Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Dec 2019 10:27:24 -0500
+Received: by mail-ot1-f67.google.com with SMTP id a15so5621724otf.1
+        for <kvm@vger.kernel.org>; Sun, 15 Dec 2019 07:27:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7RRaL3Yvu+i2tlgto54WRPCcxOMll246e8ITYnRGwDI=;
+        b=afNFnLcrQzgm3wKSvboSfSwxBBar1xP6aIEXir1TfRJQmEcuWTD8m3Prm2Zq1+sUXn
+         mufCXi5v4RO9S72Bxj7dEdCY5OMGgbnL9SHZPMT4lPDfwGWZCW6xGMjfFKwSSeGp468G
+         YRwhcW4YLUfvSJhZ/z/W9In99fNBrOcoAY+fPrMzi6LvpiP9gaH4MLQ3TmKbVl/mG5dC
+         gNafKso8pqii1V/qe69nCCWYxcY7r/G0x7cTtKThfdT3IrXKQMmv1S5zO/bcFFPL3gQk
+         ennG+TzktZvgs3k5QvrL37Gf+inJjSzJTez2gfFOsECR4j63ThkjNmuSzGA84iPqgYQy
+         GofA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7RRaL3Yvu+i2tlgto54WRPCcxOMll246e8ITYnRGwDI=;
+        b=kTyRxjci76yYPxAw4eqDb6AkogXWAHM6J7/tLs5lf38Ds/Ce2UxatKSs6Ul1TPspb4
+         oNtBjEBGmUEbK/jlM3AMHNSJL9HbyIXHR6vRLE7IOHvhi03D5sD+N09+nZzO1CeuHxkV
+         7O+j3XvX40BlayGGhh5ysCH55w1erlt3c6uEsYpXYaAj5JE9NyIF+I9Rs2aOAp68jLLc
+         0z+ZQiQcuWhRBd0YmzqArMK1h/GB4ZSzrf+ir22EcZhvAl8wT9vcLr5eiVu0Nq5Et5UV
+         aFVqB1HCop5woHPICdymI6gKfHnlAjTs+SBzR+nGyoCdpq2M12migV1LOy8L0LFXQCs3
+         19nQ==
+X-Gm-Message-State: APjAAAWGap7gsvvWZjBmz/mmhPbCSo3twVRUN04ZTlLIlra4VxEQncuo
+        qVVF8cCz8RC72x8q28etkl3KmoFtmH+upP2nggdHaw==
+X-Google-Smtp-Source: APXvYqzcSSJVTCjIUsx/inzBCCcsnE8pmcRF5dwcpzLSHO9Pe90yz4G+qrRUaeTTS0bQzZw43vk7O2hwjIga6wmmd6k=
+X-Received: by 2002:a05:6830:2001:: with SMTP id e1mr25512778otp.97.1576423643528;
+ Sun, 15 Dec 2019 07:27:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: kvm-ppc@vger.kernel.org, wanpengli@tencent.com, kvm@vger.kernel.org, jhogan@kernel.org, joro@8bytes.org, linux-mips@vger.kernel.org, sean.j.christopherson@intel.com, paulus@ozlabs.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu, jmattson@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
-To:     unlisted-recipients:; (no To-header on input)
+References: <20191214155614.19004-1-philmd@redhat.com> <CAFEAcA_QZtU9X4fxZk2oWAkN-zxXdQZejrSKZbDxPKLMwdFWgw@mail.gmail.com>
+ <20191215044759-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20191215044759-mutt-send-email-mst@kernel.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Sun, 15 Dec 2019 15:27:12 +0000
+Message-ID: <CAFEAcA9ZF3VTR7kG_D-cJ+vPFTgd8zjmt2VPfJC7urNemF-5AQ@mail.gmail.com>
+Subject: Re: [PATCH 0/8] Simplify memory_region_add_subregion_overlap(..., priority=0)
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        Andrew Baumann <Andrew.Baumann@microsoft.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Aleksandar Markovic <amarkovic@wavecomp.com>,
+        Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+        Paul Burton <pburton@wavecomp.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 13 Dec 2019 18:24:57 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+On Sun, 15 Dec 2019 at 09:51, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Sat, Dec 14, 2019 at 04:28:08PM +0000, Peter Maydell wrote:
+> > (It doesn't actually assert that it doesn't
+> > overlap because we have some legacy uses, notably
+> > in the x86 PC machines, which do overlap without using
+> > the right function, which we've never tried to tidy up.)
+>
+> It's not exactly legacy uses.
+>
+> To be more exact, the way the non overlap versions
+> are *used* is to mean "I don't care what happens when they overlap"
+> as opposed to "will never overlap".
 
-> kvm_unmap_hva_range() is currently passed both start and end
-> fields from the mmu_notifier_range structure. As this struct
-> now contains important information about the reason of the
-> unmap (the event field), replace the start/end parameters
-> with the range struct, and update all architectures.
-> 
-> No functionnal change.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm/include/asm/kvm_host.h     | 2 +-
->  arch/arm64/include/asm/kvm_host.h   | 2 +-
->  arch/mips/include/asm/kvm_host.h    | 2 +-
->  arch/mips/kvm/mmu.c                 | 6 ++++--
->  arch/powerpc/include/asm/kvm_host.h | 2 +-
->  arch/powerpc/kvm/book3s.c           | 5 +++--
->  arch/powerpc/kvm/e500_mmu_host.c    | 4 ++--
->  arch/x86/include/asm/kvm_host.h     | 3 ++-
->  arch/x86/kvm/mmu/mmu.c              | 5 +++--
->  arch/x86/kvm/x86.c                  | 4 ++--
->  include/linux/kvm_host.h            | 2 +-
->  virt/kvm/arm/mmu.c                  | 8 ++++----
->  virt/kvm/kvm_main.c                 | 7 +++----
->  13 files changed, 28 insertions(+), 24 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 556cd818eccf..621c71594499 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -276,7 +276,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  
->  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index c61260cf63c5..dd850f5e81e3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -441,7 +441,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-> index 41204a49cf95..0ed065870f1b 100644
-> --- a/arch/mips/include/asm/kvm_host.h
-> +++ b/arch/mips/include/asm/kvm_host.h
-> @@ -935,7 +935,7 @@ enum kvm_mips_fault_result kvm_trap_emul_gva_fault(struct kvm_vcpu *vcpu,
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  int kvm_unmap_hva_range(struct kvm *kvm,
-> -			unsigned long start, unsigned long end);
-> +			const struct mmu_notifier_range *range);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
-> diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-> index 7dad7a293eae..32ef868258b9 100644
-> --- a/arch/mips/kvm/mmu.c
-> +++ b/arch/mips/kvm/mmu.c
-> @@ -518,9 +518,11 @@ static int kvm_unmap_hva_handler(struct kvm *kvm, gfn_t gfn, gfn_t gfn_end,
->  	return 1;
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range)
->  {
-> -	handle_hva_to_gpa(kvm, start, end, &kvm_unmap_hva_handler, NULL);
-> +	handle_hva_to_gpa(kvm, range->start, range->end,
-> +			  &kvm_unmap_hva_handler, NULL);
->  
->  	kvm_mips_callbacks->flush_shadow_all(kvm);
->  	return 0;
-> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-> index 0a398f2321c2..8cef585e0abe 100644
-> --- a/arch/powerpc/include/asm/kvm_host.h
-> +++ b/arch/powerpc/include/asm/kvm_host.h
-> @@ -58,7 +58,7 @@
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
->  
->  extern int kvm_unmap_hva_range(struct kvm *kvm,
-> -			       unsigned long start, unsigned long end);
-> +			       const struct mmu_notifier_range *range);
->  extern int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  extern int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  extern int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-> index 58a59ee998e2..a1529a0dd656 100644
-> --- a/arch/powerpc/kvm/book3s.c
-> +++ b/arch/powerpc/kvm/book3s.c
-> @@ -842,9 +842,10 @@ void kvmppc_core_commit_memory_region(struct kvm *kvm,
->  	kvm->arch.kvm_ops->commit_memory_region(kvm, mem, old, new, change);
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range)
->  {
-> -	return kvm->arch.kvm_ops->unmap_hva_range(kvm, start, end);
-> +	return kvm->arch.kvm_ops->unmap_hva_range(kvm, range->start, range->end);
->  }
->  
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
-> diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
-> index 425d13806645..5a7211901063 100644
-> --- a/arch/powerpc/kvm/e500_mmu_host.c
-> +++ b/arch/powerpc/kvm/e500_mmu_host.c
-> @@ -734,10 +734,10 @@ static int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
->  	return 0;
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm, const struct mmu_notifier_range *range)
->  {
->  	/* kvm_unmap_hva flushes everything anyways */
-> -	kvm_unmap_hva(kvm, start);
-> +	kvm_unmap_hva(kvm, range->start);
->  
->  	return 0;
->  }
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b79cd6aa4075..c479fa845d72 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1569,7 +1569,8 @@ asmlinkage void kvm_spurious_fault(void);
->  	_ASM_EXTABLE(666b, 667b)
->  
->  #define KVM_ARCH_WANT_MMU_NOTIFIER
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end);
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range);
->  int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end);
->  int kvm_test_age_hva(struct kvm *kvm, unsigned long hva);
->  int kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6f92b40d798c..86831be07c17 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2040,9 +2040,10 @@ static int kvm_handle_hva(struct kvm *kvm, unsigned long hva,
->  	return kvm_handle_hva_range(kvm, hva, hva + 1, data, handler);
->  }
->  
-> -int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end)
-> +int kvm_unmap_hva_range(struct kvm *kvm,
-> +			const struct mmu_notifier_range *range);
->  {
-> -	return kvm_handle_hva_range(kvm, start, end, 0, kvm_unmap_rmapp);
-> +	return kvm_handle_hva_range(kvm, range->start, range->end, 0, kvm_unmap_rmapp);
->  }
+Almost all of the use of the non-overlap versions is
+for "these are never going to overlap" -- devices or ram at
+fixed addresses in the address space that can't
+ever be mapped over by anything else. If you want
+"can overlap but I don't care which one wins" then
+that would be more clearly expressed by using the _overlap()
+version but just giving everything that can overlap there
+the same priority.
 
-As kindly pointed out by the kbuild robot, this doesn't even compile...
-I've fixed it locally, incorporating Suzuki's feedback at the same time.
+> There are lots of regions where guest can make things overlapping
+> but doesn't, e.g. PCI BARs can be programmed to overlap
+> almost anything.
+>
+> What happens on real hardware if you then access one of
+> the BARs is undefined, but programming itself is harmless.
+> That's why we can't assert.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Yeah, good point, for the special case where it's the
+guest that's determining the addresses where something's
+mapped we might want to allow the behaviour to fall out
+of the implementation. (You could instead specify set of
+priorities that makes the undefined-behaviour something
+specific, rather than just an emergent property of
+the implementation QEMU happens to have, but it seems
+a bit hard to justify.)
+
+thanks
+-- PMM
