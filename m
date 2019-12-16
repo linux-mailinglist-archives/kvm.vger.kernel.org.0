@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EEB711FF51
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 09:04:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AF6011FFA6
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 09:25:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726734AbfLPIE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 03:04:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57220 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726664AbfLPIE2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 03:04:28 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBG81afG117047
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 03:04:27 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wwe89xx4x-1
+        id S1726855AbfLPIZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 03:25:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55960 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726769AbfLPIZh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 03:25:37 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBG8Mgds001515
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 03:25:35 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2wwe35rt99-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 03:04:26 -0500
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 03:25:35 -0500
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 16 Dec 2019 08:04:24 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Mon, 16 Dec 2019 08:25:33 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 16 Dec 2019 08:04:18 -0000
+        Mon, 16 Dec 2019 08:25:26 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBG83ZAN50594110
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBG8PPQ143647108
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Dec 2019 08:03:35 GMT
+        Mon, 16 Dec 2019 08:25:25 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E0676A4066;
-        Mon, 16 Dec 2019 08:04:17 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 91DDAA405B;
+        Mon, 16 Dec 2019 08:25:25 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E28DA4064;
-        Mon, 16 Dec 2019 08:04:17 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E7EEEA405F;
+        Mon, 16 Dec 2019 08:25:24 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.212])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Dec 2019 08:04:16 +0000 (GMT)
-Subject: Re: [PATCH v3 05/15] KVM: Drop kvm_arch_create_memslot()
+        Mon, 16 Dec 2019 08:25:24 +0000 (GMT)
+Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
 To:     Sean Christopherson <sean.j.christopherson@intel.com>,
         James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -61,7 +61,8 @@ Cc:     David Hildenbrand <david@redhat.com>,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>
 References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191024230744.14543-6-sean.j.christopherson@intel.com>
+ <20191203221433.GK19877@linux.intel.com>
+ <20191213200151.GF31552@linux.intel.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -106,26 +107,26 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
  ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
  nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Mon, 16 Dec 2019 09:04:16 +0100
+Date:   Mon, 16 Dec 2019 09:25:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191024230744.14543-6-sean.j.christopherson@intel.com>
+In-Reply-To: <20191213200151.GF31552@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19121608-0016-0000-0000-000002D54584
+x-cbid: 19121608-0008-0000-0000-000003414B55
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121608-0017-0000-0000-0000333777A7
-Message-Id: <5a09195e-68a5-0f33-4c69-b7d1d249037f@de.ibm.com>
+x-cbparentid: 19121608-0009-0000-0000-00004A6156B0
+Message-Id: <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-16_01:2019-12-16,2019-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=2 bulkscore=0
- phishscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 mlxscore=0 clxscore=1015 mlxlogscore=787 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912160072
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 mlxlogscore=999 malwarescore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912160075
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -133,172 +134,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 25.10.19 01:07, Sean Christopherson wrote:
-> Remove kvm_arch_create_memslot() now that all arch implementations are
-> effectively nops.  Removing kvm_arch_create_memslot() eliminates the
-> possibility for arch specific code to allocate memory prior to setting
-> a memslot, which sets the stage for simplifying kvm_free_memslot().
+On 13.12.19 21:01, Sean Christopherson wrote:
+> On Tue, Dec 03, 2019 at 02:14:33PM -0800, Sean Christopherson wrote:
+>> On Thu, Oct 24, 2019 at 04:07:29PM -0700, Sean Christopherson wrote:
+>>> The end goal of this series is to dynamically size the memslot array so
+>>> that KVM allocates memory based on the number of memslots in use, as
+>>> opposed to unconditionally allocating memory for the maximum number of
+>>> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 address
+>>> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
+>>> E.g. given a VM that uses a total of 30 memslots, dynamic sizing reduces
+>>> the memory footprint from 90k to ~2.6k bytes.
+>>>
+>>> The changes required to support dynamic sizing are relatively small,
+>>> e.g. are essentially contained in patches 14/15 and 15/15.  Patches 1-13
+>>> clean up the memslot code, which has gotten quite crusty, especially
+>>> __kvm_set_memory_region().  The clean up is likely not strictly necessary
+>>> to switch to dynamic sizing, but I didn't have a remotely reasonable
+>>> level of confidence in the correctness of the dynamic sizing without first
+>>> doing the clean up.
+>>>
+>>> Christoffer, I added your Tested-by to the patches that I was confident
+>>> would be fully tested based on the desription of what you tested.  Let me
+>>> know if you disagree with any of 'em.
+>>>
+>>> v3:
+>>>   - Fix build errors on PPC and MIPS due to missed params during
+>>>     refactoring [kbuild test robot].
+>>>   - Rename the helpers for update_memslots() and add comments describing
+>>>     the new algorithm and how it interacts with searching [Paolo].
+>>>   - Remove the unnecessary and obnoxious warning regarding memslots being
+>>>     a flexible array [Paolo].
+>>>   - Fix typos in the changelog of patch 09/15 [Christoffer].
+>>>   - Collect tags [Christoffer].
+>>>
+>>> v2:
+>>>   - Split "Drop kvm_arch_create_memslot()" into three patches to move
+>>>     minor functional changes to standalone patches [Janosch].
+>>>   - Rebase to latest kvm/queue (f0574a1cea5b, "KVM: x86: fix ...")
+>>>   - Collect an Acked-by and a Reviewed-by
+>>
+>> Paolo, do you want me to rebase this to the latest kvm/queue?
 > 
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
-> ---
->  arch/mips/kvm/mips.c       |  6 ------
->  arch/powerpc/kvm/powerpc.c |  6 ------
->  arch/s390/kvm/kvm-s390.c   |  6 ------
->  arch/x86/kvm/x86.c         |  6 ------
->  include/linux/kvm_host.h   |  2 --
->  virt/kvm/arm/mmu.c         |  6 ------
->  virt/kvm/kvm_main.c        | 21 +++++++--------------
->  7 files changed, 7 insertions(+), 46 deletions(-)
+> Ping.
 > 
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index 1109924560d8..713e5465edb0 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -188,12 +188,6 @@ long kvm_arch_dev_ioctl(struct file *filp, unsigned int ioctl,
->  	return -ENOIOCTLCMD;
->  }
->  
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages)
-> -{
-> -	return 0;
-> -}
-> -
->  void kvm_arch_flush_shadow_all(struct kvm *kvm)
->  {
->  	/* Flush whole GPA */
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 95b4a766b6cb..bb427543f8a3 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -687,12 +687,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
->  	kvmppc_core_free_memslot(kvm, free, dont);
->  }
->  
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages)
-> -{
-> -	return 0;
-> -}
-> -
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				   struct kvm_memory_slot *memslot,
->  				   const struct kvm_userspace_memory_region *mem,
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index d047e846e1b9..21f61dae7db1 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4494,12 +4494,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
->  	return VM_FAULT_SIGBUS;
->  }
->  
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages)
-> -{
-> -	return 0;
-> -}
-> -
->  /* Section: memory related */
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				   struct kvm_memory_slot *memslot,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fc63b1f07ba9..aed1a4c5c999 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9626,12 +9626,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
->  	kvm_page_track_free_memslot(free, dont);
->  }
->  
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages)
-> -{
-> -	return 0;
-> -}
-> -
->  static int kvm_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
->  			      unsigned long npages)
->  {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index a817e446c9aa..273fa081ae91 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -679,8 +679,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  			    const struct kvm_userspace_memory_region *mem);
->  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
->  			   struct kvm_memory_slot *dont);
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages);
->  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
->  int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  				struct kvm_memory_slot *memslot,
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 38b4c910b6c3..f264de85f648 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -2358,12 +2358,6 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
->  {
->  }
->  
-> -int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
-> -			    unsigned long npages)
-> -{
-> -	return 0;
-> -}
-> -
->  void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->  {
->  }
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2d354fa11934..9d6af9044304 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -977,12 +977,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  	new.base_gfn = base_gfn;
->  	new.npages = npages;
->  	new.flags = mem->flags;
-> +	new.userspace_addr = mem->userspace_addr;
->  
->  	if (npages) {
->  		if (!old.npages)
->  			change = KVM_MR_CREATE;
->  		else { /* Modify an existing slot. */
-> -			if ((mem->userspace_addr != old.userspace_addr) ||
-> +			if ((new.userspace_addr != old.userspace_addr) ||
->  			    (npages != old.npages) ||
->  			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
->  				goto out;
-> @@ -1017,22 +1018,14 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  		}
->  	}
->  
-> -	/* Free page dirty bitmap if unneeded */
-> +	r = -ENOMEM;
-> +
-> +	/* Allocate/free page dirty bitmap as needed */
->  	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
->  		new.dirty_bitmap = NULL;
-> -
-> -	r = -ENOMEM;
-> -	if (change == KVM_MR_CREATE) {
-> -		new.userspace_addr = mem->userspace_addr;
-> -
-> -		if (kvm_arch_create_memslot(kvm, &new, npages))
-> -			goto out;
-> -	}
-> -
-> -	/* Allocate page dirty bitmap if needed */
-> -	if ((new.flags & KVM_MEM_LOG_DIRTY_PAGES) && !new.dirty_bitmap) {
-> +	else if (!new.dirty_bitmap) {
->  		if (kvm_create_dirty_bitmap(&new) < 0)
-> -			goto out_free;
-> +			goto out;
->  	}
->  
->  	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
-> 
+> Applies cleanly on the current kvm/queue and nothing caught fire in
+> testing (though I only re-tested the series as a whole).
+
+Do you have the latest version somewhere on a branch? The version on the
+list no longer applies cleanly.  
 
