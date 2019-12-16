@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E943121B40
+	by mail.lfdr.de (Postfix) with ESMTP id 7D4F1121B41
 	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 21:52:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbfLPUun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 15:50:43 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:5833 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbfLPUun (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 15:50:43 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5df7ee070000>; Mon, 16 Dec 2019 12:50:15 -0800
+        id S1726834AbfLPUuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 15:50:51 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:6547 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726730AbfLPUuu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 15:50:50 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df7ee200001>; Mon, 16 Dec 2019 12:50:40 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
   by hqpgpgate101.nvidia.com (PGP Universal service);
-  Mon, 16 Dec 2019 12:50:42 -0800
+  Mon, 16 Dec 2019 12:50:49 -0800
 X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 12:50:42 -0800
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
- 2019 20:50:41 +0000
+        by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 12:50:49 -0800
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
+ 2019 20:50:48 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 16 Dec 2019 20:50:35 +0000
+ Transport; Mon, 16 Dec 2019 20:50:42 +0000
 From:   Kirti Wankhede <kwankhede@nvidia.com>
 To:     <alex.williamson@redhat.com>, <cjia@nvidia.com>
 CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
@@ -36,9 +36,9 @@ CC:     <kevin.tian@intel.com>, <ziye.yang@intel.com>,
         <zhi.a.wang@intel.com>, <yan.y.zhao@intel.com>,
         <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
         "Kirti Wankhede" <kwankhede@nvidia.com>
-Subject: [PATCH v10 Kernel 2/5] vfio iommu: Adds flag to indicate dirty pages tracking capability support
-Date:   Tue, 17 Dec 2019 01:51:37 +0530
-Message-ID: <1576527700-21805-3-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v10 Kernel 3/5] vfio iommu: Add ioctl defination for dirty pages tracking.
+Date:   Tue, 17 Dec 2019 01:51:38 +0530
+Message-ID: <1576527700-21805-4-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
 References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
@@ -46,61 +46,90 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576529415; bh=UPYFmaFN47EhcHp79NnQF+QfSPH8G2xOgEgl05wOr30=;
+        t=1576529440; bh=9C0wkz7uJE+YfhvUbgMBGA/2c9koZ9iDMNMc32hwsoY=;
         h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
          In-Reply-To:References:X-NVConfidentiality:MIME-Version:
          Content-Type;
-        b=CrqJtDjsHuk0X/9bY4qyk9X5shvfKasBWgI4KMZZQKJl18ZOZqc6IXdaoHQ80/OrI
-         oCsPRvnik5oqjdzbUAsoHxWwCzGaELpVLVvyvK/fG8siBeqO4bVakyRVTdtP+DmSRx
-         3dbK5OoRjhzbDH8AhdBCim1tjOAKQtumQoAxZQLqLdcG4JsIa38gv8LxxVGkO6bEE4
-         5s7N+7NdLh5n6CDUff/SIS43mmir+Xrqq/x9/c0t1D3eH/ppa9fEZhtTAcxADTI/hR
-         BPdgn3xJdOFDlFxWnQttmgPX7l5IpDj9U3D2hXcN2h40IuHMlkuxdpIHVjJgYwKtoP
-         DdLNNMkZNjDvA==
+        b=qI27Qpt3JBLOI2H89/9kaubuoatwhL+/O4x4/DPVQMypeIUcg3c7oxQ+Z/EDTabTy
+         3tUcgQLb7rtsZEYKsUVIawZe0mn61y3Uq+Jt1ndX3tdbo3bnd1hWSnkb0hzmwUA1zV
+         CPO3tGxVHPRAJUf2oq+53GOrM8N3yG/g4vXqFW9BX2kwoSBoOncwVoTdDvt9BCXhQ5
+         db54xxK7je6CBeRTrmwT9XxJX0bUh30yKOrnlmh2xQrBjdYwIMKc0JZvrKyet/7dXp
+         vLMR2ktqs/55O+ihVrAaGDAcvAfoVq1ViIQCLaIWCS8KHaPQ9RS8kDVRrjz+xz9v+a
+         nR+LD0Iy5teMw==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flag VFIO_IOMMU_INFO_DIRTY_PGS in VFIO_IOMMU_GET_INFO indicates that driver
-support dirty pages tracking.
+IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+All pages pinned by vendor driver through this API should be considered as
+dirty during migration. When container consists of IOMMU capable device and
+all pages are pinned and mapped, then all pages are marked dirty.
+Added support to start/stop unpinned pages tracking and to get bitmap of
+all dirtied pages for requested IO virtual address range. Unpinned page
+tracking is cleared either when bitmap is read by user application or
+unpinned page tracking is stopped.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 3 ++-
- include/uapi/linux/vfio.h       | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ include/uapi/linux/vfio.h | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 2ada8e6cdb88..3f6b04f2334f 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2234,7 +2234,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 			info.cap_offset = 0; /* output, no-recopy necessary */
- 		}
- 
--		info.flags = VFIO_IOMMU_INFO_PGSIZES;
-+		info.flags = VFIO_IOMMU_INFO_PGSIZES |
-+			     VFIO_IOMMU_INFO_DIRTY_PGS;
- 
- 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
- 
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index a0817ba267c1..81847ed54eb7 100644
+index 81847ed54eb7..4ad54fbb4698 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -900,8 +900,9 @@ struct vfio_device_ioeventfd {
- struct vfio_iommu_type1_info {
- 	__u32	argsz;
- 	__u32	flags;
--#define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
--#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
-+#define VFIO_IOMMU_INFO_PGSIZES   (1 << 0) /* supported page sizes info */
-+#define VFIO_IOMMU_INFO_CAPS      (1 << 1) /* Info supports caps */
-+#define VFIO_IOMMU_INFO_DIRTY_PGS (1 << 2) /* supports dirty page tracking */
- 	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
- 	__u32   cap_offset;	/* Offset within info struct of first cap */
- };
+@@ -975,6 +975,49 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++/**
++ * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
++ *                                     struct vfio_iommu_type1_dirty_bitmap)
++ * IOCTL is used for dirty pages tracking. Caller sets argsz, which is size of
++ * struct vfio_iommu_type1_dirty_bitmap. Caller set flag depend on which
++ * operation to perform, details as below:
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
++ * migration is active and IOMMU module should track pages which are being
++ * unpinned. Unpinned pages are tracked until bitmap for that range is queried
++ * or tracking is stopped by user application by setting
++ * VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
++ * IOMMU should stop tracking unpinned pages and also free previously tracked
++ * unpinned pages data.
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
++ * IOCTL returns dirty pages bitmap for IOMMU container during migration for
++ * given IOVA range. User must allocate memory to get bitmap, zero the bitmap
++ * memory and set size of allocated memory in bitmap_size field. One bit is
++ * used to represent one page consecutively starting from iova offset. User
++ * should provide page size in 'pgsize'. Bit set in bitmap indicates page at
++ * that offset from iova is dirty.
++ *
++ * Only one flag should be set at a time.
++ *
++ */
++struct vfio_iommu_type1_dirty_bitmap {
++	__u32        argsz;
++	__u32        flags;
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
++	__u64        iova;		/* IO virtual address */
++	__u64        size;		/* Size of iova range */
++	__u64	     pgsize;		/* page size for bitmap */
++	__u64        bitmap_size;	/* in bytes */
++	void __user *bitmap;		/* one bit per page */
++};
++
++#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.7.0
 
