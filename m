@@ -2,130 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA6061209C0
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 16:32:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C02851209C6
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 16:34:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728327AbfLPPb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 10:31:58 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50999 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728225AbfLPPb6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 10:31:58 -0500
+        id S1728328AbfLPPdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 10:33:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22880 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728259AbfLPPdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 10:33:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576510317;
+        s=mimecast20190719; t=1576510430;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b4ukn9jg5iLQIvGzXAVPG9KPLZpvMGtjikA+c6QsDvA=;
-        b=hJVc+R9+/TiZe3hnaBI2XKmeoRfJMqiFauOZYEqYCoBVofozMsSBIeK1Y7W+Tdy/HeZjcG
-        XLTrtuWVt/+WWbTmpd/40i9dFSaySlsQhF2AUU5mcjelVGHDptfCsC7rtJ/62jrQvP6TYE
-        1S7h76RqMCuBBJjYvVYWyfNpjICaGIc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-8aFhhfhwM2-bPnAMjG7gPw-1; Mon, 16 Dec 2019 10:31:56 -0500
-X-MC-Unique: 8aFhhfhwM2-bPnAMjG7gPw-1
-Received: by mail-wm1-f70.google.com with SMTP id b9so960959wmj.6
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 07:31:53 -0800 (PST)
+        bh=Z0ykzv4O9XDflANBBucUp6ssbent/uqQftfOjZxhGN0=;
+        b=CvItLLLFf9H0OcxsysiMIYLsVR993UsqrVKMkYsTASsyRTNbjoURpshFMP1kK9iGXKnGaQ
+        mg5uX2nXfGMYeE3HPJlDj7wxZ9s3bQy4jMzWVKalFf4vzitTXsxrQ/SHuBWBh4HWbtdnWz
+        Aq0+rKZ8agxql3pc30/68RGVyfBb0AU=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-NfvDKqAgPr6CxT3BceY57g-1; Mon, 16 Dec 2019 10:33:49 -0500
+X-MC-Unique: NfvDKqAgPr6CxT3BceY57g-1
+Received: by mail-qv1-f71.google.com with SMTP id z12so1926455qvk.14
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 07:33:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=b4ukn9jg5iLQIvGzXAVPG9KPLZpvMGtjikA+c6QsDvA=;
-        b=gRM+64hkQiw77kdgT/ahNynyD1t0zq+Ip1l1y3//DXM7P/xxsvY0IeLAxUtH2SK2fb
-         K8ir7Ooa4icsFwd9eFZpeGRAG0eXPKFS9+ZVZfGVtnorLHEPxkApnthEIm5nv3K1AyYw
-         F4WNmOAEMCXVJy/Cc3Cp6z0IEDzux1mjw4QLOMB7a8fYa9ef+/39KAcSDaXHdApemalg
-         irIRZlW8r4ZO9JMnO/9CbSOObafPWb2pE90QUlUIePhTobE79nTlOvhEIW7bOQr78Q3/
-         gCXvjP7CibHMlM4nVp0uYpAoCwnairktgSL9abmQ9q/OCwHTkRuoBaHb8m98TUEW1KuG
-         UkXA==
-X-Gm-Message-State: APjAAAWW7O1uUWUQ0wzzQSPY//xCOu9wDPMZmHAyREXjsArpBt7BWy1d
-        C7Ba0n9frrYo4Mz/hl13e1wwPYoSHknCiPKOKSmE3RiXc2bjBZ7xcUEj0K+qBq6o63Wpmq02BpX
-        GDj7usx9bMvJi
-X-Received: by 2002:a5d:4c85:: with SMTP id z5mr30176066wrs.42.1576510312172;
-        Mon, 16 Dec 2019 07:31:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzSt8LzC5weKbJysR0X7nBKyx8pcDL+THj78l8aUphiEurT2I+K1QUcSiZnvcelJLAhVItfpA==
-X-Received: by 2002:a5d:4c85:: with SMTP id z5mr30176037wrs.42.1576510311911;
-        Mon, 16 Dec 2019 07:31:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:cde8:2463:95a9:1d81? ([2001:b07:6468:f312:cde8:2463:95a9:1d81])
-        by smtp.gmail.com with ESMTPSA id t190sm12991878wmt.44.2019.12.16.07.31.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2019 07:31:51 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Z0ykzv4O9XDflANBBucUp6ssbent/uqQftfOjZxhGN0=;
+        b=ULyMG+88Z026M3WdEGLhbR1nMOJ/aMgBI3pmfvDFAFEEYqB15GAD/vcT7GzoQ5fcqw
+         Ozz0sXATXV0aelasjr8s8SVj0htPM4uKxKLn/44BvkC/ElWjGUss66XTgHmc/12twrFs
+         oKfduo56VQOzvkwAtk9Kc3XWDA8VFJr9UzEmbH8POvxqrnEz8J/Z7AUj0ELus3oX1Pdm
+         66tmztd87FqFWzT5YEXDq3gEiDZhOqiXKOPQ0zs/0BoBU+lR4pwtFTTzKhttV9hyntwu
+         X39YYPhJ1IkZcm0O4xDxQUpq27SJlH0UGyz1DGSI79To9ZloDLzgRB0ZezFgPAZklC2N
+         +2aw==
+X-Gm-Message-State: APjAAAVwzz4PchHNuGyaBGETy7SI6htljdWKo7jVi+iSaCqBCnimSZO9
+        li0RSg+knHt9YheCYfa2qs3qhd6IEfoGiRDkfhCkRJEWPfPkxW92NNhH0nlCf5nfOL6Ei5p6Djn
+        r9VzzOnwtAYcq
+X-Received: by 2002:a05:620a:b18:: with SMTP id t24mr27387984qkg.341.1576510428730;
+        Mon, 16 Dec 2019 07:33:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwYwsAN4Q+QC29+/ynoBvhgn+sVgs19/Aa51xUTnXtyYxuSUmHPy54H02pcDC57nW5rMIQk2w==
+X-Received: by 2002:a05:620a:b18:: with SMTP id t24mr27387965qkg.341.1576510428508;
+        Mon, 16 Dec 2019 07:33:48 -0800 (PST)
+Received: from redhat.com ([212.199.108.238])
+        by smtp.gmail.com with ESMTPSA id b191sm6118550qkg.43.2019.12.16.07.33.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2019 07:33:47 -0800 (PST)
+Date:   Mon, 16 Dec 2019 10:33:42 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Peter Xu <peterx@redhat.com>
-Cc:     Christophe de Dinechin <christophe.de.dinechin@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191216103251-mutt-send-email-mst@kernel.org>
 References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com> <m1lfrihj2n.fsf@dinechin.org>
- <20191213202324.GI16429@xz-x1>
- <bc15650b-df59-f508-1090-21dafc6e8ad1@redhat.com>
- <20191214162644.GK16429@xz-x1>
- <0f084179-2a5d-e8d9-5870-3cc428105596@redhat.com>
- <20191216152647.GD83861@xz-x1>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fa25d729-a2fb-85af-a968-1dedc754a55d@redhat.com>
-Date:   Mon, 16 Dec 2019 16:31:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191211063830-mutt-send-email-mst@kernel.org>
+ <20191211205952.GA5091@xz-x1>
+ <20191211172713-mutt-send-email-mst@kernel.org>
+ <46ceb88c-0ddd-0d9a-7128-3aa5a7d9d233@redhat.com>
+ <20191215173302.GB83861@xz-x1>
+ <20191216044619-mutt-send-email-mst@kernel.org>
+ <20191216150754.GC83861@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20191216152647.GD83861@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216150754.GC83861@xz-x1>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/12/19 16:26, Peter Xu wrote:
-> On Mon, Dec 16, 2019 at 10:29:36AM +0100, Paolo Bonzini wrote:
->> On 14/12/19 17:26, Peter Xu wrote:
->>> On Sat, Dec 14, 2019 at 08:57:26AM +0100, Paolo Bonzini wrote:
->>>> On 13/12/19 21:23, Peter Xu wrote:
->>>>>> What is the benefit of using u16 for that? That means with 4K pages, you
->>>>>> can share at most 256M of dirty memory each time? That seems low to me,
->>>>>> especially since it's sufficient to touch one byte in a page to dirty it.
->>>>>>
->>>>>> Actually, this is not consistent with the definition in the code ;-)
->>>>>> So I'll assume it's actually u32.
->>>>> Yes it's u32 now.  Actually I believe at least Paolo would prefer u16
->>>>> more. :)
->>>>
->>>> It has to be u16, because it overlaps the padding of the first entry.
->>>
->>> Hmm, could you explain?
->>>
->>> Note that here what Christophe commented is on dirty_index,
->>> reset_index of "struct kvm_dirty_ring", so imho it could really be
->>> anything we want as long as it can store a u32 (which is the size of
->>> the elements in kvm_dirty_ring_indexes).
->>>
->>> If you were instead talking about the previous union definition of
->>> "struct kvm_dirty_gfns" rather than "struct kvm_dirty_ring", iiuc I've
->>> moved those indices out of it and defined kvm_dirty_ring_indexes which
->>> we expose via kvm_run, so we don't have that limitation as well any
->>> more?
->>
->> Yeah, I meant that since the size has (had) to be u16 in the union, it
->> need not be bigger in kvm_dirty_ring.
->>
->> I don't think having more than 2^16 entries in the *per-CPU* ring buffer
->> makes sense; lagging in recording dirty memory by more than 256 MiB per
->> CPU would mean a large pause later on resetting the ring buffers (your
->> KVM_CLEAR_DIRTY_LOG patches found the sweet spot to be around 1 GiB for
->> the whole system).
+On Mon, Dec 16, 2019 at 10:07:54AM -0500, Peter Xu wrote:
+> On Mon, Dec 16, 2019 at 04:47:36AM -0500, Michael S. Tsirkin wrote:
+> > On Sun, Dec 15, 2019 at 12:33:02PM -0500, Peter Xu wrote:
+> > > On Thu, Dec 12, 2019 at 01:08:14AM +0100, Paolo Bonzini wrote:
+> > > > >>> What depends on what here? Looks suspicious ...
+> > > > >>
+> > > > >> Hmm, I think maybe it can be removed because the entry pointer
+> > > > >> reference below should be an ordering constraint already?
+> > > > 
+> > > > entry->xxx depends on ring->reset_index.
+> > > 
+> > > Yes that's true, but...
+> > > 
+> > >         entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+> > >         /* barrier? */
+> > >         next_slot = READ_ONCE(entry->slot);
+> > >         next_offset = READ_ONCE(entry->offset);
+> > > 
+> > > ... I think entry->xxx depends on entry first, then entry depends on
+> > > reset_index.  So it seems fine because all things have a dependency?
+> > 
+> > Is reset_index changed from another thread then?
+> > If yes then you want to read reset_index with READ_ONCE.
+> > That includes a dependency barrier.
 > 
-> That's right, 1G could probably be a "common flavor" for guests in
-> that case.
-> 
-> Though I wanted to use u64 only because I wanted to prepare even
-> better for future potential changes as long as it won't hurt much.
+> There're a few readers, but only this function will change it
+> (kvm_dirty_ring_reset).  Thanks,
 
-No u64, please.  u32 I can agree with, 16-bit *should* be enough but it
-is a bit tight, so let's make it 32-bit if we drop the union idea.
+Then you don't need any barriers in this function.
+readers need at least READ_ONCE.
 
-Paolo
+> -- 
+> Peter Xu
 
