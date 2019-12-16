@@ -2,103 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D82B1200C0
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 10:18:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8587F1200C3
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 10:18:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbfLPJOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 04:14:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25290 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727166AbfLPJOV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 04:14:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576487659;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zgh8B5UVVhJ0kb2aJHbZhSX9CjHmzX3Tc0hUU8X+B0k=;
-        b=dw3DA+QKWLJv+H/d1j+osckC/ggAZvEJHMXDI6q7YzkkGlJjETWBF9d+RheFcpPjlFIn8b
-        DyJxmW1PBHkNk1vmxV8tpobFbHvaz/CaJbWB9u9+XJ3u7FG8k2+LE7v1GrS8ix+9SZLr0o
-        ycPUvYwaLI68TyGuRMFIPqyHLJpKSd0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-MRTJvcWZOfCwwEpmZbNmSQ-1; Mon, 16 Dec 2019 04:14:18 -0500
-X-MC-Unique: MRTJvcWZOfCwwEpmZbNmSQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f15so3463634wrr.2
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 01:14:18 -0800 (PST)
+        id S1726959AbfLPJPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 04:15:18 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:38391 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726942AbfLPJPS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 04:15:18 -0500
+Received: by mail-lf1-f65.google.com with SMTP id r14so3660232lfm.5
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 01:15:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=rj0lGpd3yaUxGRTGZvxPWnnnjGnW8gKPN7KeoAgqNTM=;
+        b=P4hSaHlupp/IyXcENyYnh8QhbcDUnjZCPsS7UfzRTZcDn018IUlCkE/RwisPdi8uZ5
+         UfSzV4BFjxT/FxmHdxbufulAVu6NMkkXCKiYkG9hIBnzRtFtAB+6zCdGjXdREzWkCLGn
+         LB/5EY3fZsnGIYRpykQ4PLkYKSNz4EnlaYKEjRwqcahkYmxHdciurF/0JDsR4929Sbfp
+         rAz1WwzDVPd+l4pIIRB1Wx3Jxbz0K+bgG4KxCvEusA/MuNnFeq4GaANstyVN47kOxAQY
+         AzLfjamjN0QGvWAmP6x8Se3MTCiAS1iKRSGIUicwNzhL6U8yIwJkjOVIgmxNOiryQCXs
+         i3YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=zgh8B5UVVhJ0kb2aJHbZhSX9CjHmzX3Tc0hUU8X+B0k=;
-        b=CQ3blf7YIgF8hXdC+Mx4ISsgOGEuQcLUmCuk4BxmuqEI7aeJor5v/u5jJGzjZKL5oc
-         GsCjstmnngYSzS7yLQg7Yt9NbHPfIqfQJ2MjFogu8AeMh90WXXwh4ChhLSomzafsOVHT
-         0JCqiMU+K0IMjAn+f1SvQan4L4oX/9GkJWuOpamJr8EO5OAt8E9fJTuiIZehbOJneMrl
-         uAVImC+jyhx5kx/bnimT5JspP4n5XjLQbYNP0/oE0xY7dbs40GEPka4fi9A00o8NMOFA
-         OQUcgDSbT9lN41Cf+2Q5MmHC8ZZnZtpeKcGWaRq7A/hXFDV2ZZZce4MAL2xGvEmkM4c7
-         4MpQ==
-X-Gm-Message-State: APjAAAWpunTETiZ6ctaCRg08BLg311r/OFAdKHObkZ4Sm2ik85IZYrYp
-        BSHVwDPPdXeb+HtGUCtKe+N8v3bS1kbPnVcUMRGuOKuivKQLbLMFGqip3M/Q1YeOsNRyx5oBkst
-        x48EaQ3FIAaAT
-X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr16935304wma.6.1576487657439;
-        Mon, 16 Dec 2019 01:14:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxXoQiyltOeC7M9BlpXK4XdsqqaREp6LjN+cHXuu5VqMmNwvD7OlJzLsprEYJzn+O3p3AgavQ==
-X-Received: by 2002:a05:600c:2549:: with SMTP id e9mr16935286wma.6.1576487657225;
-        Mon, 16 Dec 2019 01:14:17 -0800 (PST)
-Received: from vitty.brq.redhat.com ([95.82.135.38])
-        by smtp.gmail.com with ESMTPSA id k4sm20814513wmk.26.2019.12.16.01.14.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2019 01:14:16 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        paulus@ozlabs.org, jhogan@kernel.org, drjones@redhat.com,
-        Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/3] kvm/arm: Standardize kvm exit reason field
-In-Reply-To: <b7b6b18c-1d51-b0c2-32df-95e0b7a7c1e5@redhat.com>
-References: <20191212024512.39930-4-gshan@redhat.com> <2e960d77afc7ac75f1be73a56a9aca66@www.loen.fr> <f101e4a6-bebf-d30f-3dfe-99ded0644836@redhat.com> <30c0da369a898143246106205cb3af59@www.loen.fr> <b7b6b18c-1d51-b0c2-32df-95e0b7a7c1e5@redhat.com>
-Date:   Mon, 16 Dec 2019 10:14:16 +0100
-Message-ID: <87r214aazb.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=rj0lGpd3yaUxGRTGZvxPWnnnjGnW8gKPN7KeoAgqNTM=;
+        b=Jq2WNlkDgLbgraBoYljxBb45p9bZSDqKZUn85NpPYNnA7NIqryq/Gbgelq5n2DdHIL
+         YB8aiRAYyOl1AGtwFEESkyO0WbBqLi+GFFQZsKd6yCiZTHbNHgucsKjEu8G90t1kiZcJ
+         PnhwtRv5iNF7HoZ/MwgnDmPPQEdfVH2wavqJ2xBrQSqCQ8JHTLeSOSo17ktfCXSiWhDY
+         78c+rF3K7haggkjIbWw8/2WUyZXIEmkTnRy9xqOHTIJwHgrUdyhtBdkVjr4rO68JbczG
+         SF3qCH4DjgR+ehR9VKanU+9ZcmriIF9P6ySeg/PJ6YGNVNMLqilB8rreIWjzdpyUORia
+         DUcg==
+X-Gm-Message-State: APjAAAWfJw7xPAf2V5zEu9gbczFYFfISWHH/PwerqeWGlAx2sIh+b0Xg
+        UXqDKEEwcFtj5AfTiEtm84lBxJJN7Q2VHxK8vkVicrVf2IU=
+X-Google-Smtp-Source: APXvYqyehN/Xs5RL2OuF672CaHnDupDsIMF34lzkZlx71dQkwBQRLFaLmkgEdHVRSAhH6YE5de5QGFBuVLBhGSvxTEo=
+X-Received: by 2002:ac2:54b4:: with SMTP id w20mr16281646lfk.67.1576487715866;
+ Mon, 16 Dec 2019 01:15:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Mon, 16 Dec 2019 14:45:04 +0530
+Message-ID: <CA+G9fYuO7vMjsqkyXHZSU-pKEk0L0t9kQTfnd5xopVADyGwprw@mail.gmail.com>
+Subject: mainline-5.5.0-rc1: do_mount_root+0x6c/0x10d - kernel crash while
+ mounting rootfs
+To:     kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, lkft-triage@lists.linaro.org,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Gavin Shan <gshan@redhat.com> writes:
+The following kernel crash reported on qemu_x86_64 boot running
+5.5.0-rc1 mainline kernel.
 
-> On 12/13/19 8:47 PM, Marc Zyngier wrote:
->> On 2019-12-13 00:50, Gavin Shan wrote:
->>>
->>> Yeah, I think it is ABI change unfortunately, but I'm not sure how
->>> many applications are using this filter.
->> 
->> Nobody can tell. The problem is that someone will write a script that
->> parses this trace point based on an older kernel release (such as
->> what the distros are shipping today), and two years from now will
->> shout at you (and me) for having broken their toy.
->> 
->
-> Well, I would like to receive Vitaly's comments here. Vitaly, it seems it's
-> more realistic to fix the issue from kvm_stat side according to the comments
-> given by Marc?
->
+Regressions detected on arm64, arm, qemu_x86_64, and qemu_i386.
+Where as x86_64 and i386 boot pass on devices.
 
-Sure, if we decide to treat tracepoints as ABI then fixing users is
-likely the way to go. Personally, I think that we should have certain
-freedom with them and consider only tools which live in linux.git when
-making changes (and changing the tool to match in the same patch series
-is OK from this PoV, no need to support all possible versions of the
-tool). 
+qemu_x86_64 kernel crash log,
+-------------------------------------------
+[    1.680229] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[    1.681148] #PF: supervisor read access in kernel mode
+[    1.681150] #PF: error_code(0x0000) - not-present page
+[    1.681150] PGD 0 P4D 0
+[    1.681150] Oops: 0000 [#1] SMP NOPTI
+[    1.681150] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.5.0-rc1 #1
+[    1.681150] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.12.0-1 04/01/2014
+[    1.681150] RIP: 0010:strncpy+0x12/0x30
+[    1.681150] Code: 89 e5 48 83 c6 01 0f b6 4e ff 48 83 c2 01 84 c9
+88 4a ff 75 ed 5d c3 90 55 48 85 d2 48 89 f8 48 89 e5 74 1e 48 01 fa
+48 89 f9 <44> 0f b6 06 41 80 f8 01 44 88 01 48 83 de ff 48 83 c1 01 48
+39 d1
+[    1.681150] RSP: 0018:ffffacea40013e00 EFLAGS: 00010286
+[    1.681150] RAX: ffff9eff78f4f000 RBX: ffffd91104e3d3c0 RCX: ffff9eff78f4f000
+[    1.681150] RDX: ffff9eff78f4ffff RSI: 0000000000000000 RDI: ffff9eff78f4f000
+[    1.681150] RBP: ffffacea40013e00 R08: ffff9eff78f4f000 R09: 0000000000000000
+[    1.681150] R10: ffffd91104e3d3c0 R11: 0000000000000000 R12: 0000000000008001
+[    1.681150] R13: 00000000fffffff4 R14: ffffffffa5d9aa89 R15: ffff9eff78f4e000
+[    1.681150] FS:  0000000000000000(0000) GS:ffff9eff7bc00000(0000)
+knlGS:0000000000000000
+[    1.681150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.681150] CR2: 0000000000000000 CR3: 0000000113010000 CR4: 00000000003406f0
+[    1.681150] Call Trace:
+[    1.681150]  do_mount_root+0x6c/0x10d
+[    1.681150]  mount_block_root+0x103/0x226
+[    1.681150]  ? do_mknodat+0x16e/0x200
+[    1.681150]  ? set_debug_rodata+0x17/0x17
+[    1.681150]  mount_root+0x114/0x133
+[    1.681150]  prepare_namespace+0x139/0x16a
+[    1.681150]  kernel_init_freeable+0x21b/0x22f
+[    1.681150]  ? rest_init+0x250/0x250
+[    1.681150]  kernel_init+0xe/0x110
+[    1.681150]  ret_from_fork+0x27/0x50
+[    1.681150] Modules linked in:
+[    1.681150] CR2: 0000000000000000
+[    1.681150] ---[ end trace d7ad8453a7546454 ]---
+[    1.681150] RIP: 0010:strncpy+0x12/0x30
+[    1.681150] Code: 89 e5 48 83 c6 01 0f b6 4e ff 48 83 c2 01 84 c9
+88 4a ff 75 ed 5d c3 90 55 48 85 d2 48 89 f8 48 89 e5 74 1e 48 01 fa
+48 89 f9 <44> 0f b6 06 41 80 f8 01 44 88 01 48 83 de ff 48 83 c1 01 48
+39 d1
+[    1.681150] RSP: 0018:ffffacea40013e00 EFLAGS: 00010286
+[    1.681150] RAX: ffff9eff78f4f000 RBX: ffffd91104e3d3c0 RCX: ffff9eff78f4f000
+[    1.681150] RDX: ffff9eff78f4ffff RSI: 0000000000000000 RDI: ffff9eff78f4f000
+[    1.681150] RBP: ffffacea40013e00 R08: ffff9eff78f4f000 R09: 0000000000000000
+[    1.681150] R10: ffffd91104e3d3c0 R11: 0000000000000000 R12: 0000000000008001
+[    1.681150] R13: 00000000fffffff4 R14: ffffffffa5d9aa89 R15: ffff9eff78f4e000
+[    1.681150] FS:  0000000000000000(0000) GS:ffff9eff7bc00000(0000)
+knlGS:0000000000000000
+[    1.681150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.681150] CR2: 0000000000000000 CR3: 0000000113010000 CR4: 00000000003406f0
+[    1.681150] BUG: sleeping function called from invalid context at
+/usr/src/kernel/include/linux/percpu-rwsem.h:38
+[    1.681150] in_atomic(): 0, irqs_disabled(): 1, non_block: 0, pid:
+1, name: swapper/0
+[    1.681150] INFO: lockdep is turned off.
+[    1.681150] irq event stamp: 2360074
+[    1.681150] hardirqs last  enabled at (2360073):
+[<ffffffffa48f4c8c>] get_page_from_freelist+0x21c/0x1430
+[    1.681150] hardirqs last disabled at (2360074):
+[<ffffffffa4601eab>] trace_hardirqs_off_thunk+0x1a/0x1c
+[    1.681150] softirqs last  enabled at (2359990):
+[<ffffffffa5800338>] __do_softirq+0x338/0x43a
+[    1.681150] softirqs last disabled at (2359975):
+[<ffffffffa4701828>] irq_exit+0xb8/0xc0
+[    1.681150] CPU: 0 PID: 1 Comm: swapper/0 Tainted: G      D
+  5.5.0-rc1 #1
+[    1.681150] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.12.0-1 04/01/2014
+[    1.681150] Call Trace:
+[    1.681150]  dump_stack+0x7a/0xa5
+[    1.681150]  ___might_sleep+0x163/0x250
+[    1.681150]  __might_sleep+0x4a/0x80
+[    1.681150]  exit_signals+0x33/0x2d0
+[    1.681150]  do_exit+0xb6/0xcd0
+[    1.681150]  ? prepare_namespace+0x139/0x16a
+[    1.681150]  ? kernel_init_freeable+0x21b/0x22f
+[    1.681150]  ? rest_init+0x250/0x250
+[    1.681150]  rewind_stack_do_exit+0x17/0x20
+[    1.736632] Kernel panic - not syncing: Attempted to kill init!
+exitcode=0x00000009
+[    1.737579] Kernel Offset: 0x23600000 from 0xffffffff81000000
+(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
 
-Also, we can be a bit more conservative and in this particular case
-instead of renaming fields just add 'exit_reason' to all architectures
-where it's missing. For ARM, 'esr_ec' will then stay with what it is and
-'exit_reason' may contain something different (like the information why
-the guest exited actually). But I don't know much about ARM specifics
-and I'm not sure how feasible the suggestion would be.
+Full log,
+qemu_x86_64,
+https://lkft.validation.linaro.org/scheduler/job/1054430#L573
+qemu_i386:
+https://lkft.validation.linaro.org/scheduler/job/1054335#L571
 
--- 
-Vitaly
+metadata:
+  git branch: master
+  git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+  git commit: 9603e22104439ddfa6a077f1a0e5d8c662beec6c
+  git describe: v5.5-rc1-308-g9603e2210443
+  make_kernelversion: 5.5.0-rc1
+  kernel-config:
+http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-mainline/2325/config
+  build-url: https://ci.linaro.org/job/openembedded-lkft-linux-mainline/DISTRO=lkft,MACHINE=intel-corei7-64,label=docker-lkft/2325/
+  build-location:
+http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-mainline/2325
 
+--
+Linaro LKFT
+https://lkft.linaro.org
