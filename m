@@ -2,93 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F37C6120EC6
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 17:05:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0E7E120F49
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 17:23:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726445AbfLPQFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 11:05:31 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:33104 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725805AbfLPQFa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 11:05:30 -0500
-Received: by mail-qk1-f196.google.com with SMTP id d71so3759772qkc.0
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 08:05:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+lKQBDpzDPcg15QBEHobBzdq4ppx02T+T0NScAe4/rA=;
-        b=QsIADyvzRl9qoNxQVFr7adBzvQjOsTJR7jI2oGaHKBK2GYda2oFKhnUM4xsOl/UMeZ
-         bv3vJ75KMRCZfpDFk0zrSDBcVzpxUeN9Re6zIr5fB/AhTVSxcq5SWQyxUXf1VhA3JQ38
-         OtXjHCD7meb2uorDQ4B8xW1i0pURq1ZiCyEKVoudzSWAC7/ETU95NvFX161h2xTesLtu
-         4CKCXS25EHzRA2iiyARcykUTfWjbc8j7uq0YAG6OfWm3eSPsxturRhZ1hQmkFlcMsE+k
-         THvZZRA5PRenWMpOZSycSBezhCZaOOfS/SpDxP7Y8oey3DrqEVkfsXSpow6ryeiYCngM
-         HWFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+lKQBDpzDPcg15QBEHobBzdq4ppx02T+T0NScAe4/rA=;
-        b=qhKmvfV8EzKqPih+ElG1mPEH/uhFJTq5c9a2MHkvv4tm7D2p1VcGHXLKAfoYcMh7wm
-         GkQhK8xvB/dSvXP2ZmvoZQ1mw8dibvIr3lGHmvua9qzn+4WHbfhPKwTrMml6L1KQigol
-         EmGMAAUhkxF3Y2dW4XS71rgsIg6FRLNlE9Tm0YIZHUHwkBzfutDggtFcL3JP4OqfprpF
-         tDLQ0M9myQklSM9EeqKPoJ9N/YqRjmwrHrHjlod/HuLYr5DHTgq5dhkC9cCRlFDu+Kiq
-         p62jWfk/Oj9U32Gx9NTHwPrFuo+N5HB28KGWmsyI0VkShARPGFmtG8Nv/cRmo4xJikVM
-         gwKg==
-X-Gm-Message-State: APjAAAUJDWDXW1vBsO9TNqjN4dGD5Aq4oTfDlYNOXP6WrxLr5Zrwv71D
-        52nXLMFBd5/XANy91VtyfIBm7w==
-X-Google-Smtp-Source: APXvYqwzTOp0qWhlavl8UpEOrZOd6WkqWpFywuJjzXs13a42ZVBjXmBZSsWQfNbKB9CjvluM06GlvQ==
-X-Received: by 2002:a37:6d5:: with SMTP id 204mr25587692qkg.448.1576512328086;
-        Mon, 16 Dec 2019 08:05:28 -0800 (PST)
-Received: from ?IPv6:2620:0:1004:a:6e2b:60f7:b51b:3b04? ([2620:0:1004:a:6e2b:60f7:b51b:3b04])
-        by smtp.gmail.com with ESMTPSA id r37sm6992733qtj.44.2019.12.16.08.05.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2019 08:05:27 -0800 (PST)
-Subject: Re: [PATCH v5 2/2] kvm: Use huge pages for DAX-backed files
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        linux-nvdimm@lists.01.org, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jason.zeng@intel.com
-References: <20191212182238.46535-1-brho@google.com>
- <20191212182238.46535-3-brho@google.com>
- <06108004-1720-41EB-BCAB-BFA8FEBF4772@oracle.com>
- <ED482280-CB47-4AB6-9E7E-EEE7848E0F8B@oracle.com>
- <f8e948ff-6a2a-a6d6-9d8e-92b93003354a@google.com>
- <65FB6CC1-3AD2-4D6F-9481-500BD7037203@oracle.com>
- <20191213171950.GA31552@linux.intel.com>
-From:   Barret Rhoden <brho@google.com>
-Message-ID: <e012696f-f13e-5af1-2b14-084607d69bfa@google.com>
-Date:   Mon, 16 Dec 2019 11:05:26 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1726655AbfLPQWx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 11:22:53 -0500
+Received: from mga05.intel.com ([192.55.52.43]:38295 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726092AbfLPQWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 11:22:53 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 08:22:53 -0800
+X-IronPort-AV: E=Sophos;i="5.69,322,1571727600"; 
+   d="scan'208";a="217212376"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 08:22:52 -0800
+Message-ID: <9eb9173278370dd604c4cefd30ed10be36600854.camel@linux.intel.com>
+Subject: Re: [PATCH v15 3/7] mm: Add function __putback_isolated_page
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Mon, 16 Dec 2019 08:22:52 -0800
+In-Reply-To: <cb49bbc7-b0c0-65cc-1d9d-a3aaef075650@redhat.com>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+         <20191205162230.19548.70198.stgit@localhost.localdomain>
+         <cb49bbc7-b0c0-65cc-1d9d-a3aaef075650@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-In-Reply-To: <20191213171950.GA31552@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/19 12:19 PM, Sean Christopherson wrote:
-> Teaching thp_adjust() how to handle 1GB wouldn't be a bad thing.  It's
-> unlikely THP itself will support 1GB pages any time soon, but having the
-> logic there wouldn't hurt anything.
+On Mon, 2019-12-16 at 12:36 +0100, David Hildenbrand wrote:
+> [...]
+> > +/**
+> > + * __putback_isolated_page - Return a now-isolated page back where we got it
+> > + * @page: Page that was isolated
+> > + * @order: Order of the isolated page
+> > + *
+> > + * This function is meant to return a page pulled from the free lists via
+> > + * __isolate_free_page back to the free lists they were pulled from.
+> > + */
+> > +void __putback_isolated_page(struct page *page, unsigned int order)
+> > +{
+> > +	struct zone *zone = page_zone(page);
+> > +	unsigned long pfn;
+> > +	unsigned int mt;
+> > +
+> > +	/* zone lock should be held when this function is called */
+> > +	lockdep_assert_held(&zone->lock);
+> > +
+> > +	pfn = page_to_pfn(page);
+> > +	mt = get_pfnblock_migratetype(page, pfn);
 > 
+> IMHO get_pageblock_migratetype() would be nicer - I guess the compiler
+> will optimize out the double page_to_pfn().
 
-Cool.  This was my main concern - I didn't want to break THP.
+The thing is I need the page_to_pfn call already in order to pass the
+value to __free_one_page. With that being the case why not juse use
+get_pfnblock_migratetype?
 
-I'll rework the series based on all of your comments.
+Also there are some scenarios where __page_to_pfn is not that simple a
+call with us having to get the node ID so we can find the pgdat structure
+to perform the calculation. I'm not sure the compiler would be ble to
+figure out that the result is the same for both calls, so it is better to
+make it explicit.
 
-Thanks,
+> > +
+> > +	/* Return isolated page to tail of freelist. */
+> > +	__free_one_page(page, pfn, zone, order, mt);
+> > +}
+> > +
+> >  /*
+> >   * Update NUMA hit/miss statistics
+> >   *
+> > diff --git a/mm/page_isolation.c b/mm/page_isolation.c
+> > index 04ee1663cdbe..d93d2be0070f 100644
+> > --- a/mm/page_isolation.c
+> > +++ b/mm/page_isolation.c
+> > @@ -134,13 +134,11 @@ static void unset_migratetype_isolate(struct page *page, unsigned migratetype)
+> >  		__mod_zone_freepage_state(zone, nr_pages, migratetype);
+> >  	}
+> >  	set_pageblock_migratetype(page, migratetype);
+> > +	if (isolated_page)
+> > +		__putback_isolated_page(page, order);
+> >  	zone->nr_isolate_pageblock--;
+> >  out:
+> >  	spin_unlock_irqrestore(&zone->lock, flags);
+> > -	if (isolated_page) {
+> > -		post_alloc_hook(page, order, __GFP_MOVABLE);
+> > -		__free_pages(page, order);
+> > -	}
+> 
+> So If I get it right:
+> 
+> post_alloc_hook() does quite some stuff like
+> - arch_alloc_page(page, order);
+> - kernel_map_pages(page, 1 << order, 1)
+> - kasan_alloc_pages()
+> - kernel_poison_pages(1)
+> - set_page_owner()
+> 
+> Which free_pages_prepare() will undo, like
+> - reset_page_owner()
+> - kernel_poison_pages(0)
+> - arch_free_page()
+> - kernel_map_pages()
+> - kasan_free_nondeferred_pages()
+> 
+> Both would be skipped now - which sounds like the right thing to do IMHO
+> (and smells like quite a performance improvement). I haven't verified if
+> actually everything we skip in free_pages_prepare() is safe (I think it
+> is, it seems to be mostly relevant for actually used/allocated pages).
 
-Barret
-
+That was kind of my thought on this. Basically the logic I was following
+was that the code path will call move_freepages_block that bypasses all of
+the above mentioned calls if the pages it is moving will not be merged. If
+it is safe in that case my assumption is that it should be safe to just
+call __putback_isolated_page in such a case as it also bypasses the block
+above, but it supports merging the page with other pages that are already
+on the freelist.
 
