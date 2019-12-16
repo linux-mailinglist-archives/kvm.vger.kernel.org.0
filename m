@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 88D371207E0
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 15:03:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4044212080E
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 15:05:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728025AbfLPODf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 09:03:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23115 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727894AbfLPODf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 09:03:35 -0500
+        id S1728086AbfLPOFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 09:05:16 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48218 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727952AbfLPOFQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 09:05:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576505014;
+        s=mimecast20190719; t=1576505114;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t6+fViJWtutY+mnVSFTppbDOaIGnV3IhxBHpKWV/0xQ=;
-        b=LDc6WR51wNInv8gAo6dIG2p4Qwracdn5fkDCl2v5mv6i63VkxMq3JkVw5wmwzW1wrqfSuG
-        LcL5vKs5QhTwzxKYRTQbz89hFjMJ9A3RdyuGC+dTC5iBbld1eyoNvVs2dPLeCoAxZY80HQ
-        0qMLhUGDd2WmPFbW3ssUt/kBL51S7Ug=
+        bh=xlSr73pKSiopKdILGn5ZrLva3IOgBSdl74YTmPimHio=;
+        b=EceEQl2S/7DB5qxiHsjqBoLyzNjSpZMoz0SCSrFLtPTx4N3Ps/cL0odiVpcnVuKYcpK0/v
+        XhaHEI3zE8pm7ZIH3WcUlr2kk0+hxoHjfTGprKhhh7cLZRtRst0EFecn5zD6JrKkY1AVHE
+        zOBXcrdJ75t/mFKdNL1qcwepP+K1dT8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-EIXWn0LVPAK0NyPECAhhcQ-1; Mon, 16 Dec 2019 09:03:33 -0500
-X-MC-Unique: EIXWn0LVPAK0NyPECAhhcQ-1
+ us-mta-275-iwcwYKPnPgyNrdKse5Nt7w-1; Mon, 16 Dec 2019 09:03:40 -0500
+X-MC-Unique: iwcwYKPnPgyNrdKse5Nt7w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 060CF8024DA;
-        Mon, 16 Dec 2019 14:03:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D9DDB33;
+        Mon, 16 Dec 2019 14:03:38 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 24908675BF;
-        Mon, 16 Dec 2019 14:03:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 58BE1675B9;
+        Mon, 16 Dec 2019 14:03:31 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -40,9 +40,9 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
 Cc:     drjones@redhat.com, andre.przywara@arm.com,
         peter.maydell@linaro.org, yuzenghui@huawei.com,
         alexandru.elisei@arm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH 01/16] libcflat: Add other size defines
-Date:   Mon, 16 Dec 2019 15:02:20 +0100
-Message-Id: <20191216140235.10751-2-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 02/16] arm: gic: Provide per-IRQ helper functions
+Date:   Mon, 16 Dec 2019 15:02:21 +0100
+Message-Id: <20191216140235.10751-3-eric.auger@redhat.com>
 In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -53,29 +53,172 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce additional SZ_256, SZ_8K, SZ_16K macros that will
-be used by ITS tests.
+From: Andre Przywara <andre.przywara@arm.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+A common theme when accessing per-IRQ parameters in the GIC distributor
+is to set fields of a certain bit width in a range of MMIO registers.
+Examples are the enabled status (one bit per IRQ), the level/edge
+configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
+
+Add a generic helper function which is able to mask and set the
+respective number of bits, given the IRQ number and the MMIO offset.
+Provide wrappers using this function to easily allow configuring an IRQ.
+
+For now assume that private IRQ numbers always refer to the current CPU.
+In a GICv2 accessing the "other" private IRQs is not easily doable (the
+registers are banked per CPU on the same MMIO address), so we impose the
+same limitation on GICv3, even though those registers are not banked
+there anymore.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
 ---
- lib/libcflat.h | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index ea19f61..7092af2 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -36,7 +36,10 @@
- #define ALIGN(x, a)		__ALIGN((x), (a))
- #define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) =3D=3D 0)
+initialize reg
+---
+ lib/arm/asm/gic-v3.h |  2 +
+ lib/arm/asm/gic.h    |  9 +++++
+ lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 101 insertions(+)
+
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 347be2f..4a445a5 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -23,6 +23,8 @@
+ #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+ #define GICD_CTLR_ENABLE_G1		(1U << 0)
 =20
-+#define SZ_256			(1 << 8)
- #define SZ_4K			(1 << 12)
-+#define SZ_8K			(1 << 13)
-+#define SZ_16K			(1 << 14)
- #define SZ_64K			(1 << 16)
- #define SZ_2M			(1 << 21)
- #define SZ_1G			(1 << 30)
++#define GICD_IROUTER			0x6000
++
+ /* Re-Distributor registers, offsets from RD_base */
+ #define GICR_TYPER			0x0008
+=20
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 1fc10a0..21cdb58 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -15,6 +15,7 @@
+ #define GICD_IIDR			0x0008
+ #define GICD_IGROUPR			0x0080
+ #define GICD_ISENABLER			0x0100
++#define GICD_ICENABLER			0x0180
+ #define GICD_ISPENDR			0x0200
+ #define GICD_ICPENDR			0x0280
+ #define GICD_ISACTIVER			0x0300
+@@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+=20
++void gic_set_irq_bit(int irq, int offset);
++void gic_enable_irq(int irq);
++void gic_disable_irq(int irq);
++void gic_set_irq_priority(int irq, u8 prio);
++void gic_set_irq_target(int irq, int cpu);
++void gic_set_irq_group(int irq, int group);
++int gic_get_irq_group(int irq);
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 9430116..aa9cb86 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
+t)
+ 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ 	gic_common_ops->ipi_send_mask(irq, dest);
+ }
++
++enum gic_bit_access {
++	ACCESS_READ,
++	ACCESS_SET,
++	ACCESS_RMW
++};
++
++static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
++			      enum gic_bit_access access)
++{
++	void *base;
++	int split =3D 32 / bits;
++	int shift =3D (irq % split) * bits;
++	u32 reg =3D 0, mask =3D ((1U << bits) - 1) << shift;
++
++	switch (gic_version()) {
++	case 2:
++		base =3D gicv2_dist_base();
++		break;
++	case 3:
++		if (irq < 32)
++			base =3D gicv3_sgi_base();
++		else
++			base =3D gicv3_dist_base();
++		break;
++	default:
++		return 0;
++	}
++	base +=3D offset + (irq / split) * 4;
++
++	switch (access) {
++	case ACCESS_READ:
++		return (readl(base) & mask) >> shift;
++	case ACCESS_SET:
++		reg =3D 0;
++		break;
++	case ACCESS_RMW:
++		reg =3D readl(base) & ~mask;
++		break;
++	}
++
++	writel(reg | ((u32)value << shift), base);
++
++	return 0;
++}
++
++void gic_set_irq_bit(int irq, int offset)
++{
++	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
++}
++
++void gic_enable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ISENABLER);
++}
++
++void gic_disable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ICENABLER);
++}
++
++void gic_set_irq_priority(int irq, u8 prio)
++{
++	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
++}
++
++void gic_set_irq_target(int irq, int cpu)
++{
++	if (irq < 32)
++		return;
++
++	if (gic_version() =3D=3D 2) {
++		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
++				    ACCESS_RMW);
++
++		return;
++	}
++
++	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
++}
++
++int gic_get_irq_group(int irq)
++{
++	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
++}
 --=20
 2.20.1
 
