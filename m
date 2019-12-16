@@ -2,110 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D9B1120147
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 10:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AEC612016F
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 10:47:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727119AbfLPJff (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 04:35:35 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:42492 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726881AbfLPJff (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 04:35:35 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1igmmr-0002J4-NM; Mon, 16 Dec 2019 10:35:33 +0100
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 3/3] kvm/arm: Standardize kvm exit reason field
-X-PHP-Originating-Script: 0:main.inc
+        id S1727140AbfLPJrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 04:47:52 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32406 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727086AbfLPJrv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 04:47:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576489669;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=x4F0S6F+puErRf/9qNGD3qSr4YnaGP1lnAVzdVRgZvU=;
+        b=Jy+o8ZQuRmQ8vKzrcpvwvJd+xs2mCiWaZEeCTCpdvwaiD07b7Z+7zIbztGLvwlsiZkINJU
+        6amBgNC/CprrQI6ymKmHkChmBgmIyhbCRkVuseeEtlo3YIN/2DtO6hQRVnE9eroUs7AYD9
+        68j/U64C8mFRoWxP8ZY83xvAjwr+rco=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-_9ZehERyOFypDcgpSOsFPA-1; Mon, 16 Dec 2019 04:47:43 -0500
+X-MC-Unique: _9ZehERyOFypDcgpSOsFPA-1
+Received: by mail-qv1-f71.google.com with SMTP id w13so4966178qvb.4
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 01:47:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=x4F0S6F+puErRf/9qNGD3qSr4YnaGP1lnAVzdVRgZvU=;
+        b=OJoLNZXJxLtYUSwYq++02itPGhRX+6IQJpMxzV0qDfCztCZL7Rr/zpTH9gTBmG2gui
+         zSSCtaWY6a3gCsErvYvICnAcaUr9zUAa4LZdhL7MrWR83bNKJ3NflAHrHtlo1pAGRjdf
+         VtON0/1vxYCMzKWRggJJn38nwQoLDkqfiYLP2Kcfw0ZcsmFRFmFhH7PUmEfZx/0sDNmS
+         B5KZjAwDMecEuZZTfGPijjy8bLUyH9Wje+WI8E4Ztkgjop4zBNO/qGx7JtSKmMsWC+Z4
+         pTb8aFf/iRi31addZgZB6vtEpJk48A/UofqH4A1+8mM8FTBpNDQiP6ZVQmuPtaMbEA1J
+         ByOA==
+X-Gm-Message-State: APjAAAUWFevl1QPTiE1TA5pxbvMkh7yRkO5rIM3yUXCsDoAZYMqnIV2+
+        y6Cq9lr84hodM494fG1cpivsrOdhET3U+631LuuRw4cep7j8u+udtyzZtDNw7K7iuxrWmZX1mwY
+        x8C/1KZaoLqoy
+X-Received: by 2002:aed:256f:: with SMTP id w44mr7069752qtc.331.1576489663040;
+        Mon, 16 Dec 2019 01:47:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxIZNYdabqmI0CG0aOJ0NQEhESVmckgU7vVqS63tN6mOzzA5VFGb+hnjE+Zgtxy3Azad9N/Jw==
+X-Received: by 2002:aed:256f:: with SMTP id w44mr7069748qtc.331.1576489662780;
+        Mon, 16 Dec 2019 01:47:42 -0800 (PST)
+Received: from redhat.com (bzq-111-168-31-5.red.bezeqint.net. [31.168.111.5])
+        by smtp.gmail.com with ESMTPSA id r10sm5762779qkm.23.2019.12.16.01.47.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Dec 2019 01:47:41 -0800 (PST)
+Date:   Mon, 16 Dec 2019 04:47:36 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191216044619-mutt-send-email-mst@kernel.org>
+References: <20191129213505.18472-1-peterx@redhat.com>
+ <20191129213505.18472-5-peterx@redhat.com>
+ <20191211063830-mutt-send-email-mst@kernel.org>
+ <20191211205952.GA5091@xz-x1>
+ <20191211172713-mutt-send-email-mst@kernel.org>
+ <46ceb88c-0ddd-0d9a-7128-3aa5a7d9d233@redhat.com>
+ <20191215173302.GB83861@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 16 Dec 2019 09:35:33 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     Gavin Shan <gshan@redhat.com>, <kvm@vger.kernel.org>,
-        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <paulus@ozlabs.org>,
-        <jhogan@kernel.org>, <drjones@redhat.com>
-In-Reply-To: <87r214aazb.fsf@vitty.brq.redhat.com>
-References: <20191212024512.39930-4-gshan@redhat.com>
- <2e960d77afc7ac75f1be73a56a9aca66@www.loen.fr>
- <f101e4a6-bebf-d30f-3dfe-99ded0644836@redhat.com>
- <30c0da369a898143246106205cb3af59@www.loen.fr>
- <b7b6b18c-1d51-b0c2-32df-95e0b7a7c1e5@redhat.com>
- <87r214aazb.fsf@vitty.brq.redhat.com>
-Message-ID: <e1765768e2cd51f28211335e96fa3a31@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: vkuznets@redhat.com, gshan@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com, paulus@ozlabs.org, jhogan@kernel.org, drjones@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191215173302.GB83861@xz-x1>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-12-16 09:14, Vitaly Kuznetsov wrote:
-> Gavin Shan <gshan@redhat.com> writes:
->
->> On 12/13/19 8:47 PM, Marc Zyngier wrote:
->>> On 2019-12-13 00:50, Gavin Shan wrote:
->>>>
->>>> Yeah, I think it is ABI change unfortunately, but I'm not sure how
->>>> many applications are using this filter.
->>>
->>> Nobody can tell. The problem is that someone will write a script 
->>> that
->>> parses this trace point based on an older kernel release (such as
->>> what the distros are shipping today), and two years from now will
->>> shout at you (and me) for having broken their toy.
->>>
->>
->> Well, I would like to receive Vitaly's comments here. Vitaly, it 
->> seems it's
->> more realistic to fix the issue from kvm_stat side according to the 
->> comments
->> given by Marc?
->>
->
-> Sure, if we decide to treat tracepoints as ABI then fixing users is
-> likely the way to go. Personally, I think that we should have certain
-> freedom with them and consider only tools which live in linux.git 
-> when
-> making changes (and changing the tool to match in the same patch 
-> series
-> is OK from this PoV, no need to support all possible versions of the
-> tool).
+On Sun, Dec 15, 2019 at 12:33:02PM -0500, Peter Xu wrote:
+> On Thu, Dec 12, 2019 at 01:08:14AM +0100, Paolo Bonzini wrote:
+> > >>> What depends on what here? Looks suspicious ...
+> > >>
+> > >> Hmm, I think maybe it can be removed because the entry pointer
+> > >> reference below should be an ordering constraint already?
+> > 
+> > entry->xxx depends on ring->reset_index.
+> 
+> Yes that's true, but...
+> 
+>         entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+>         /* barrier? */
+>         next_slot = READ_ONCE(entry->slot);
+>         next_offset = READ_ONCE(entry->offset);
+> 
+> ... I think entry->xxx depends on entry first, then entry depends on
+> reset_index.  So it seems fine because all things have a dependency?
 
-So far, the approach has been a pretty conservative one, and there was
-countless discussions (including a pretty heated one at KS two years 
-ago,
-see [1] which did set the tone for the whole of the discussion).
+Is reset_index changed from another thread then?
+If yes then you want to read reset_index with READ_ONCE.
+That includes a dependency barrier.
 
-So as far as I have something to say about this, we're not renaming 
-fields
-in existing tracepoints.
+> > 
+> > >>> what's the story around locking here? Why is it safe
+> > >>> not to take the lock sometimes?
+> > >>
+> > >> kvm_dirty_ring_push() will be with lock==true only when the per-vm
+> > >> ring is used.  For per-vcpu ring, because that will only happen with
+> > >> the vcpu context, then we don't need locks (so kvm_dirty_ring_push()
+> > >> is called with lock==false).
+> > 
+> > FWIW this will be done much more nicely in v2.
+> > 
+> > >>>> +	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
+> > >>>> +	if (!page) {
+> > >>>> +		r = -ENOMEM;
+> > >>>> +		goto out_err_alloc_page;
+> > >>>> +	}
+> > >>>> +	kvm->vm_run = page_address(page);
+> > >>>
+> > >>> So 4K with just 8 bytes used. Not as bad as 1/2Mbyte for the ring but
+> > >>> still. What is wrong with just a pointer and calling put_user?
+> > >>
+> > >> I want to make it the start point for sharing fields between
+> > >> user/kernel per-vm.  Just like kvm_run for per-vcpu.
+> > 
+> > This page is actually not needed at all.  Userspace can just map at
+> > KVM_DIRTY_LOG_PAGE_OFFSET, the indices reside there.  You can drop
+> > kvm_vm_run completely.
+> 
+> I changed it because otherwise we use one entry of the padding, and
+> all the rest of paddings are a waste of memory because we can never
+> really use the padding as new fields only for the 1st entry which
+> overlaps with the indices.  IMHO that could even waste more than 4k.
+> 
+> (for now we only "waste" 4K for per-vm, kvm_run is already mapped so
+>  no waste there, not to say potentially I still think we can use the
+>  kvm_vm_run in the future)
+> 
+> > 
+> > >>>> +	} else {
+> > >>>> +		/*
+> > >>>> +		 * Put onto per vm ring because no vcpu context.  Kick
+> > >>>> +		 * vcpu0 if ring is full.
+> > >>>
+> > >>> What about tasks on vcpu 0? Do guests realize it's a bad idea to put
+> > >>> critical tasks there, they will be penalized disproportionally?
+> > >>
+> > >> Reasonable question.  So far we can't avoid it because vcpu exit is
+> > >> the event mechanism to say "hey please collect dirty bits".  Maybe
+> > >> someway is better than this, but I'll need to rethink all these
+> > >> over...
+> > > 
+> > > Maybe signal an eventfd, and let userspace worry about deciding what to
+> > > do.
+> > 
+> > This has to be done synchronously.  But the vm ring should be used very
+> > rarely (it's for things like kvmclock updates that write to guest memory
+> > outside a vCPU), possibly a handful of times in the whole run of the VM.
+> 
+> I've summarized a list of callers who might dirty guest memory in the
+> other thread, it seems to me that even the kvm clock is using per-vcpu
+> contexts.
+> 
+> > 
+> > >>> KVM_DIRTY_RING_MAX_ENTRIES is not part of UAPI.
+> > >>> So how does userspace know what's legal?
+> > >>> Do you expect it to just try?
+> > >>
+> > >> Yep that's what I thought. :)
+> > 
+> > We should return it for KVM_CHECK_EXTENSION.
+> 
+> OK.  I'll drop the versioning.
+> 
+> -- 
+> Peter Xu
 
-> Also, we can be a bit more conservative and in this particular case
-> instead of renaming fields just add 'exit_reason' to all 
-> architectures
-> where it's missing. For ARM, 'esr_ec' will then stay with what it is 
-> and
-> 'exit_reason' may contain something different (like the information 
-> why
-> the guest exited actually). But I don't know much about ARM specifics
-> and I'm not sure how feasible the suggestion would be.
-
-It should be possible to /extend/ tracepoints without breaking 
-compatibility,
-and I don't have any issue with that. This could either report the 
-unmodified
-'ret' value, or something more synthetic. It really depends on what you 
-want
-this information for.
-
-         M.
-
-[1] https://lwn.net/Articles/737532/
--- 
-Jazz is not dead. It just smells funny...
