@@ -2,282 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DAA631202A4
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 11:32:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B6471203D0
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 12:24:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727562AbfLPKbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 05:31:25 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:54822 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727319AbfLPKbY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 05:31:24 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1igneq-0003dz-DA; Mon, 16 Dec 2019 11:31:20 +0100
-To:     Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device  mappings
-X-PHP-Originating-Script: 0:main.inc
+        id S1727621AbfLPLYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 06:24:42 -0500
+Received: from isilmar-4.linta.de ([136.243.71.142]:49676 "EHLO
+        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727138AbfLPLYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 06:24:00 -0500
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from light.dominikbrodowski.net (brodo.linta [10.1.0.102])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 165DF200A62;
+        Mon, 16 Dec 2019 11:23:58 +0000 (UTC)
+Received: by light.dominikbrodowski.net (Postfix, from userid 1000)
+        id 7AEA020BC9; Mon, 16 Dec 2019 11:53:38 +0100 (CET)
+Date:   Mon, 16 Dec 2019 11:53:38 +0100
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        kvm list <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        lkft-triage@lists.linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: mainline-5.5.0-rc1: do_mount_root+0x6c/0x10d - kernel crash
+ while mounting rootfs
+Message-ID: <20191216105338.GA163642@light.dominikbrodowski.net>
+References: <CA+G9fYuO7vMjsqkyXHZSU-pKEk0L0t9kQTfnd5xopVADyGwprw@mail.gmail.com>
+ <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 16 Dec 2019 10:31:19 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        <stable@vger.kernel.org>
-In-Reply-To: <20191213111400.GI28840@e113682-lin.lund.arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-2-maz@kernel.org>
- <20191213082920.GA28840@e113682-lin.lund.arm.com>
- <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
- <20191213111400.GI28840@e113682-lin.lund.arm.com>
-Message-ID: <4889a4894f13c67f7e48466afb0763f6@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-12-13 11:14, Christoffer Dall wrote:
-> On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
->> Hi Christoffer,
->>
->> On 2019-12-13 08:29, Christoffer Dall wrote:
->> > Hi Marc,
->> >
->> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
->> > > A device mapping is normally always mapped at Stage-2, since 
->> there
->> > > is very little gain in having it faulted in.
->> >
->> > It is actually becoming less clear to me what the real benefits of
->> > pre-populating the stage 2 page table are, especially given that 
->> we can
->> > provoke a situation where they're faulted in anyhow.  Do you 
->> recall if
->> > we had any specific case that motivated us to pre-fault in the 
->> pages?
->>
->> It's only a minor performance optimization that was introduced by 
->> Ard in
->> 8eef91239e57d. Which makes sense for platform devices that have a 
->> single
->> fixed location in memory. It makes slightly less sense for PCI, 
->> where
->> you can move things around.
->
-> User space could still decide to move things around in its VA map 
-> even
-> if the device is fixed.
->
-> Anyway, I was thinking more if there was some sort of device, like a
-> frambuffer, which for example crosses page boundaries and where it 
-> would
-> be visible to the user that there's a sudden performance drop while
-> operating the device over page boundaries.  Anything like that?
->
->>
->> > > Nonetheless, it is possible to end-up in a situation where the
->> > > device
->> > > mapping has been removed from Stage-2 (userspace munmaped the 
->> VFIO
->> > > region, and the MMU notifier did its job), but present in a
->> > > userspace
->> > > mapping (userpace has mapped it back at the same address). In 
->> such
->> > > a situation, the device mapping will be demand-paged as the 
->> guest
->> > > performs memory accesses.
->> > >
->> > > This requires to be careful when dealing with mapping size, 
->> cache
->> > > management, and to handle potential execution of a device 
->> mapping.
->> > >
->> > > Cc: stable@vger.kernel.org
->> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
->> > > ---
->> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
->> > >  1 file changed, 17 insertions(+), 4 deletions(-)
->> > >
->> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
->> > > index a48994af70b8..0b32a904a1bb 100644
->> > > --- a/virt/kvm/arm/mmu.c
->> > > +++ b/virt/kvm/arm/mmu.c
->> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
->> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
->> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
->> > >
->> > > +static bool is_iomap(unsigned long flags)
->> > > +{
->> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
->> > > +}
->> > > +
->> >
->> > nit: I'm not really sure this indirection makes the code more 
->> readable,
->> > but I guess that's a matter of taste.
->> >
->> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->> > >  {
->> > >  	return memslot->dirty_bitmap && !(memslot->flags &
->> > > KVM_MEM_READONLY);
->> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
->> > > *vcpu, phys_addr_t fault_ipa,
->> > >
->> > >  	vma_pagesize = vma_kernel_pagesize(vma);
->> > >  	if (logging_active ||
->> > > +	    (vma->vm_flags & VM_PFNMAP) ||
->> >
->> > WHat is actually the rationale for this?
->> >
->> > Why is a huge mapping not permitted to device memory?
->> >
->> > Are we guaranteed that VM_PFNMAP on the vma results in device 
->> mappings?
->> > I'm not convinced this is the case, and it would be better if we 
->> can
->> > stick to a single primitive (either kvm_is_device_pfn, or 
->> VM_PFNMAP) to
->> > detect device mappings.
->>
->> For now, I've tried to keep the two paths that deal with mapping 
->> devices
->> (or rather, things that we interpret as devices) as close as 
->> possible.
->> If we drop the "eager" mapping, then we're at liberty to restructure
->> this in creative ways.
->>
->> This includes potential huge mappings, but I'm not sure the rest of 
->> the
->> kernel uses them for devices anyway (I need to find out).
->>
->> > As a subsequent patch, I'd like to make sure that at the very 
->> least our
->> > memslot prepare function follows the exact same logic for mapping 
->> device
->> > memory as a fault-in approach does, or that we simply always fault 
->> pages
->> > in.
->>
->> As far as I can see, the two approach are now identical. Am I 
->> missing
->> something?
->> And yes, getting rid of the eager mapping works for me.
->>
->
-> As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() 
-> which
-> goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
-> might result in doing the same offset calculation that we do in
-> kvm_arch_prepare_memory_region(), but it also considers other 
-> scenarios.
->
-> Even if we analyze all that and convince oursleves it's always all 
-> the
-> same on arm64, the two code paths could change, leading to really 
-> hard
-> to debug differing behavior, and nobody will actively keep the two 
-> paths
-> in sync.  I'd be fine with keeping the performance optimization if we
-> have good grounds for that though, and using the same translation
-> mechanism for VM_PFNMAP as user_mem_abort.
->
-> Am I missing something?
+On Mon, Dec 16, 2019 at 11:22:04AM +0100, Arnd Bergmann wrote:
+> On Mon, Dec 16, 2019 at 10:15 AM Naresh Kamboju
+> <naresh.kamboju@linaro.org> wrote:
+> >
+> > The following kernel crash reported on qemu_x86_64 boot running
+> > 5.5.0-rc1 mainline kernel.
+> 
+> I looked for too long at v5.5-rc1 completely puzzled by how you got to this
+> object code before realizing that this is a git snapshot between -rc1 and -rc2.
+> 
+> The code in question was changed by a recent series from Dominik Brodowski,
+> the main difference being commit cccaa5e33525 ("init: use do_mount() instead
+> of ksys_mount()").
+> 
+> It looks like the NULL-check in ksys_mount()/copy_mount_options() is missing
+> from the new mount_block_root, so it passes a NULL pointer into strncpy().
+> 
+> Something like this should fix it (not tested):
 
-I'm not disputing any of the above. I'm only trying to keep this patch
-minimal so that we can easily backport it (although it is arguable that
-deleting code isn't that big a deal).
+This equivalent patch by Linus already got some testing:
 
-[...]
+https://lore.kernel.org/lkml/CAHk-=wh8VLe3AEKhz=1bzSO=1fv4EM71EhufxuC=Gp=+bLhXoA@mail.gmail.com/
 
->> > I can't seem to decide for myself if I think there's a sematic
->> > difference between trying to execute from somewhere the VMM has
->> > explicitly told us is device memory and from somewhere which we 
->> happen
->> > to have mapped with VM_PFNMAP from user space.  But I also can't 
->> seem to
->> > really fault it (pun intended).  Thoughts?
->>
->> The issue is that the VMM never really tells us whether something is 
->> a
->> device mapping or not (the only exception being the GICv2 cpuif). 
->> Even
->> with PFNMAP, we guess it (it could well be memory that lives outside
->> of the linear mapping). I don't see a way to lift this ambiguity.
->>
->> Ideally, faulting on executing a non-mapping should be offloaded to
->> userspace for emulation, in line with your patches that offload
->> non-emulated data accesses. That'd be a new ABI, and I can't imagine
->> anyone willing to deal with it.
->
-> So what I was asking was if it makes sense to report the Prefetch 
-> Abort
-> in the case where the VMM has already told us that it doesn't want to
-> register anything backing the IPA (no memslot), and instead return an
-> error to user space, so that it can make a decision (for example 
-> inject
-> an external abort, which may have been the right thing to do in the
-> former case as well, but that could be considered ABI now, so let's 
-> not
-> kick that hornet's nest).
->
-> In any case, no strong feelings here, I just have a vague feeling 
-> that
-> injecting more prefetch aborts on execute-from-some-device is not
-> necessarily the right thing to do.
-
-The ARMv8 ARM has the following stuff in B2.7.2 (Device Memory):
-
-<quote>
-Hardware does not prevent speculative instruction fetches from a memory 
-location with any of the Device
-memory attributes unless the memory location is also marked as 
-Execute-never for all Exception levels.
-
-Note
-
-This means that to prevent speculative instruction fetches from memory 
-locations with Device memory
-attributes, any location that is assigned any Device memory type must 
-also be marked as Execute-never for
-all Exception levels. Failure to mark a memory location with any Device 
-memory attribute as Execute-never
-for all Exception levels is a programming error.
-</quote>
-
-and
-
-<quote>
-For instruction fetches, if branches cause the program counter to point 
-to an area of memory with the Device
-attribute which is not marked as Execute-never for the current 
-Exception level, an implementation can either:
-
-- Treat the instruction fetch as if it were to a memory location with 
-the Normal Non-cacheable attribute.
-
-- Take a Permission fault.
-</quote>
-
-My reading here is that a prefetch abort is the right thing to do.
-What we don't do correctly is that we qualify it as an external abort
-instead of a permission fault (which is annoying as it requires us
-to find out about the S1 translation level).
-
-Happy to revisit this once we get a S1 PTW.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+	Dominik
