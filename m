@@ -2,122 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46308121BFE
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 22:39:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66933121CA3
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 23:22:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727964AbfLPVj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 16:39:28 -0500
-Received: from mail-pg1-f201.google.com ([209.85.215.201]:44862 "EHLO
-        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727951AbfLPVjY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 16:39:24 -0500
-Received: by mail-pg1-f201.google.com with SMTP id o21so4750478pgm.11
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 13:39:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=rowy0fulnWlicWAYnRVZ1Dd1A8eU5tnc0eErNEZ+z80=;
-        b=MuHMhVLT/JPmloUwrLfNYvZW2n4et7Jp6otDiIOqsAgsXxhPw0pD+sf+K2Wz1bcwcE
-         umHcmexYa3XVrNTFitMJMBYyqjDaET0ivXVKpA1RqVyD8V4224NfFmieT+WL8wxCP9Uf
-         TeyVGVkrZUBRPuOJOeUyhrRYRParc+bz/foA7OITtQlAv8YjLXySbTVB+rFX/btl5eqr
-         XV2jZIQBXqTrzmvmmJ11xow6XVm8OAB0UlReGxO9v7l0id98TbLh6QDJoZETRv2fkiPo
-         RwZ+5HAYVciPWg/rBIsxuRno1YegprlFb+LVfcvaBjDfj2oNEeKU+ibtPCaeMIQ0tu6z
-         r+BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=rowy0fulnWlicWAYnRVZ1Dd1A8eU5tnc0eErNEZ+z80=;
-        b=avqdvW8KaeDKzUf3zB4A1+0MjhEA4bYhbZ1WCqfH7uOHLkv6QNKH5cErnIDG34Vhbg
-         YHdOk83ifWfhW1yA071Q0a5bkSqjHUrf/JKHD2cMhF6Up600mypd42/wIXKaqiG6rMF4
-         TReuoVF7AlRQUX7yJ3utGa6lj042e2DtvoDQypOA8JQfRNNg/QCova2WpPif6e8aV1Ns
-         +3Dfz6QD77Q/PXrIb6pLG1s70TrHHN5N3NzZfv7MoCqxbWbA3JYjBgHKOt/y4rKUvMq+
-         Sb9HX5z/AoY9p5iMg+KfVBaJFjOdJO0uFQHbSJjbAAhekiLSdwbXfrWlaDrrTIQFDcHJ
-         L54g==
-X-Gm-Message-State: APjAAAUYYpr8IX5N4ZXVBEb6DdiIYul2xkUnYUtUVrejEETGKteeQR4w
-        uUaw/uFmCeHTCE3ejJzy1y+/KNHLcSod
-X-Google-Smtp-Source: APXvYqzpGDXOtRuYa0WgsWK7wz+wgL2YlTBvmIVTv2h8YGbeupjQc/AMbR9FD0fpw5V/MIPOI8j2lg0uDdbH
-X-Received: by 2002:a63:1c13:: with SMTP id c19mr21194582pgc.450.1576532362335;
- Mon, 16 Dec 2019 13:39:22 -0800 (PST)
-Date:   Mon, 16 Dec 2019 13:39:01 -0800
-In-Reply-To: <20191216213901.106941-1-bgardon@google.com>
-Message-Id: <20191216213901.106941-9-bgardon@google.com>
-Mime-Version: 1.0
-References: <20191216213901.106941-1-bgardon@google.com>
-X-Mailer: git-send-email 2.24.1.735.g03f4e72817-goog
-Subject: [PATCH v3 8/8] KVM: selftests: Move large memslots above KVM internal
- memslots in _vm_create
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726794AbfLPWV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 17:21:56 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11660 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726141AbfLPWVz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 17:21:55 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5df803630000>; Mon, 16 Dec 2019 14:21:23 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 16 Dec 2019 14:21:50 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 14:21:50 -0800
+Received: from [10.2.165.205] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
+ 2019 22:21:49 +0000
+Subject: Re: [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
+To:     Jan Kara <jack@suse.cz>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+References: <20191212101741.GD10065@quack2.suse.cz>
+ <20191214032617.1670759-1-jhubbard@nvidia.com>
+ <20191216125353.GF22157@quack2.suse.cz>
+From:   John Hubbard <jhubbard@nvidia.com>
+X-Nvconfidentiality: public
+Message-ID: <86297621-0200-01db-923b-9f8d3ee87354@nvidia.com>
+Date:   Mon, 16 Dec 2019 14:18:59 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <20191216125353.GF22157@quack2.suse.cz>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1576534883; bh=YMhg/Haff63lefKvHJkcKDJlwsa7xb5b4lrnUemlU7g=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=amsVlFr4hw9MYNrHr5/DYyX51JWA4Fkp/OrGL5Hbx4jMwoyI9BWBiyVnsOuxsMRIB
+         iaLSTfEX4Yqo/iVj68XTBu0YqNDpOKgLZv4iJJL9jXaVCKbZ5JRpa2udb5A5igVcw2
+         1sJ9NO2FUwaGqY/GZOYBsW4L6j0KjdlhAuITY2UHIyczf/OJ5Ld/YorqU0JPKNcd1d
+         I994/z/XcmSLl51Zt+AHfBnbzOf+k0FilaRTGpdBKRUjSH3tUdnc5ed7upp7HB/ZdP
+         yPbbF1+4hTs972ehSF2pBSOHKp1BKWsgCDOuYbNfow5D4LRa3DPocQgihOq0BFqmMR
+         WOmZ1eSWqtu/A==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM creates internal memslots between 3 and 4 GiB paddrs on the first
-vCPU creation. If memslot 0 is large enough it collides with these
-memslots an causes vCPU creation to fail. When requesting more than 3G,
-start memslot 0 at 4G in _vm_create.
+On 12/16/19 4:53 AM, Jan Kara wrote:
+...
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- tools/testing/selftests/kvm/lib/kvm_util.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+> I'd move this still a bit higher - just after VM_BUG_ON_PAGE() and before
+> if (flags & FOLL_TOUCH) test. Because touch_pmd() can update page tables
+> and we don't won't that if we're going to fail the fault.
+> 
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 41cf45416060f..886d58e6cac39 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -113,6 +113,8 @@ const char * const vm_guest_mode_string[] = {
- _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
- 	       "Missing new mode strings?");
- 
-+#define KVM_INTERNAL_MEMSLOTS_START_PADDR (3UL << 30)
-+#define KVM_INTERNAL_MEMSLOTS_END_PADDR (4UL << 30)
- /*
-  * VM Create
-  *
-@@ -128,13 +130,16 @@ _Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
-  *
-  * Creates a VM with the mode specified by mode (e.g. VM_MODE_P52V48_4K).
-  * When phy_pages is non-zero, a memory region of phy_pages physical pages
-- * is created and mapped starting at guest physical address 0.  The file
-- * descriptor to control the created VM is created with the permissions
-- * given by perm (e.g. O_RDWR).
-+ * is created. If phy_pages is less that 3G, it is mapped starting at guest
-+ * physical address 0. If phy_pages is greater than 3G it is mapped starting
-+ * 4G into the guest physical address space to avoid KVM internal memslots
-+ * which map the region between 3G and 4G. The file descriptor to control the
-+ * created VM is created with the permissions given by perm (e.g. O_RDWR).
-  */
- struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- {
- 	struct kvm_vm *vm;
-+	uint64_t guest_paddr = 0;
- 
- 	DEBUG("Testing guest mode: %s\n", vm_guest_mode_string(mode));
- 
-@@ -227,9 +232,11 @@ struct kvm_vm *_vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- 
- 	/* Allocate and setup memory for guest. */
- 	vm->vpages_mapped = sparsebit_alloc();
-+	if (guest_paddr + phy_pages > KVM_INTERNAL_MEMSLOTS_START_PADDR)
-+		guest_paddr = KVM_INTERNAL_MEMSLOTS_END_PADDR;
- 	if (phy_pages != 0)
- 		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
--					    0, 0, phy_pages, 0);
-+					    guest_paddr, 0, phy_pages, 0);
- 
- 	return vm;
- }
+Done. I'll post a full v11 series shortly.
+
+> With this fixed, the patch looks good to me so you can then add:
+> 
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> 
+> 								Honza
+> 
+
+btw, thanks for the thorough review of this critical patch (and for your
+patience with my mistakes). I really appreciate it, and this patchset would
+not have made it this far without your detailed help and explanations.
+
+
+thanks,
 -- 
-2.24.1.735.g03f4e72817-goog
-
+John Hubbard
+NVIDIA
