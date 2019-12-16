@@ -2,127 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB5CD120667
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 13:55:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26C3D1206A1
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 14:09:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727656AbfLPMyA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 07:54:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39022 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727550AbfLPMx7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 07:53:59 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 29D62AFAF;
-        Mon, 16 Dec 2019 12:53:55 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 69B531E0B2E; Mon, 16 Dec 2019 13:53:53 +0100 (CET)
-Date:   Mon, 16 Dec 2019 13:53:53 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH v11 23/25] mm/gup: track FOLL_PIN pages
-Message-ID: <20191216125353.GF22157@quack2.suse.cz>
-References: <20191212101741.GD10065@quack2.suse.cz>
- <20191214032617.1670759-1-jhubbard@nvidia.com>
+        id S1727742AbfLPNI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 08:08:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51449 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727576AbfLPNIz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 08:08:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576501734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qVps0ksEeffzPKmQcVs/p+Pjxq+Vz+TDTh2GnN60Xxw=;
+        b=QaA0YpNGA4s0bEgnFdYlxAsNQbLAykr36zszp2vwqGsPeJlAqRk1gteLGwyNFHZG5aSdUC
+        aFsWRPQ8RrWkrEh+tGVRsGtA3sUeTXRMkyBNAIRrz9RSLmDWIctn/HuoLaEV8EvhT1078D
+        alTBbS+sc4AUOp8Hax1A3+2Pl05DIUM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-_YPUuulqPgSuW3lSvrvz0g-1; Mon, 16 Dec 2019 08:08:53 -0500
+X-MC-Unique: _YPUuulqPgSuW3lSvrvz0g-1
+Received: by mail-wr1-f69.google.com with SMTP id l20so3697464wrc.13
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 05:08:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qVps0ksEeffzPKmQcVs/p+Pjxq+Vz+TDTh2GnN60Xxw=;
+        b=fvu7Ej5W5PsBv99DLz16KlzcW/RZMq+e9vfDeF2ydfJ/sN0VL7Keb5T0ZX00rKPzcB
+         lRCGKLEC65P9G3s96DF7/l8Yxki0zjtfQqsmuCaCO6PiYs6WzIBh3iKk1X1xmIlh3H2x
+         BXOyiWENhAMa1Vn+qPEkDPIFk0ZcEC34QZeVf6U4oJTengSRXUgu1coo16/PxhzyxXTO
+         89MJR4l+oSWX375AP1aOUMJDNP4MZvvmWJD7o3eAsh8H8bQOganDQbHPRW9vBkA3K+xA
+         HWGaqJMa8WKu3VIVFmtED1UIYWxTj9Eb/IWi4cdFprwutFh59XWOkGcjs0s6kSHibcpS
+         Lp5w==
+X-Gm-Message-State: APjAAAWKWYk04t01EgB6QQB6ekFNr/PsoyeCIxOS9YtTQX78vklNFqoR
+        hAB+NuNoa3n3Ct4kbR3cjCW1S2ajAgcUBO8AhXmD3l7Q7wYiLg6JJSj+/M8apyhA7IWHof52t90
+        5CDvgh8bU8gBf
+X-Received: by 2002:adf:b648:: with SMTP id i8mr30617222wre.91.1576501731217;
+        Mon, 16 Dec 2019 05:08:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw5r6BjWyq15DIgwSERvxbOhPXbbbeovtPSwMIC0Ga4pAhcnI6btOTfyyoXbuuWBe0pFwLUzg==
+X-Received: by 2002:adf:b648:: with SMTP id i8mr30617202wre.91.1576501731026;
+        Mon, 16 Dec 2019 05:08:51 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id x11sm21078428wmg.46.2019.12.16.05.08.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2019 05:08:50 -0800 (PST)
+Subject: Re: [PATCH 03/12] hw/i386/pc: Remove obsolete pc_pci_device_init()
+ declaration
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     John Snow <jsnow@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Paul Durrant <paul@xen.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, Stefano Stabellini <sstabellini@kernel.org>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        xen-devel@lists.xenproject.org, Sergio Lopez <slp@redhat.com>
+References: <20191213161753.8051-1-philmd@redhat.com>
+ <20191213161753.8051-4-philmd@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <39ca6020-193e-294b-2845-f5bab35609ef@redhat.com>
+Date:   Mon, 16 Dec 2019 14:08:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20191213161753.8051-4-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191214032617.1670759-1-jhubbard@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri 13-12-19 19:26:17, John Hubbard wrote:
-> Add tracking of pages that were pinned via FOLL_PIN.
+On 13/12/19 17:17, Philippe Mathieu-DaudÃ© wrote:
+> In commit 1454509726 we removed the pc_pci_device_init()
+> deprecated function and its calls, but we forgot to remove
+> its prototype. Do that now.
 > 
-> As mentioned in the FOLL_PIN documentation, callers who effectively set
-> FOLL_PIN are required to ultimately free such pages via unpin_user_page().
-> The effect is similar to FOLL_GET, and may be thought of as "FOLL_GET
-> for DIO and/or RDMA use".
-> 
-> Pages that have been pinned via FOLL_PIN are identifiable via a
-> new function call:
-> 
->    bool page_dma_pinned(struct page *page);
-> 
-> What to do in response to encountering such a page, is left to later
-> patchsets. There is discussion about this in [1], [2], and [3].
-> 
-> This also changes a BUG_ON(), to a WARN_ON(), in follow_page_mask().
-> 
-> [1] Some slow progress on get_user_pages() (Apr 2, 2019):
->     https://lwn.net/Articles/784574/
-> [2] DMA and get_user_pages() (LPC: Dec 12, 2018):
->     https://lwn.net/Articles/774411/
-> [3] The trouble with get_user_pages() (Apr 30, 2018):
->     https://lwn.net/Articles/753027/
-> 
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> Signed-off-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
 > ---
+>  include/hw/i386/pc.h | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> Hi Jan,
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 9866dfbd60..bc7d855aaa 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -211,7 +211,6 @@ void pc_cmos_init(PCMachineState *pcms,
+>                    BusState *ide0, BusState *ide1,
+>                    ISADevice *s);
+>  void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus);
+> -void pc_pci_device_init(PCIBus *pci_bus);
+>  
+>  typedef void (*cpu_set_smm_t)(int smm, void *arg);
+>  
 > 
-> This should address all of your comments for patch 23!
 
-Thanks. One comment below:
+Queued, thanks.
 
-> @@ -1486,6 +1500,10 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
->  	VM_BUG_ON_PAGE(!PageHead(page) && !is_zone_device_page(page), page);
->  	if (flags & FOLL_TOUCH)
->  		touch_pmd(vma, addr, pmd, flags);
-> +
-> +	if (!try_grab_page(page, flags))
-> +		return ERR_PTR(-ENOMEM);
-> +
->  	if ((flags & FOLL_MLOCK) && (vma->vm_flags & VM_LOCKED)) {
->  		/*
->  		 * We don't mlock() pte-mapped THPs. This way we can avoid
+Paolo
 
-I'd move this still a bit higher - just after VM_BUG_ON_PAGE() and before
-if (flags & FOLL_TOUCH) test. Because touch_pmd() can update page tables
-and we don't won't that if we're going to fail the fault.
-
-With this fixed, the patch looks good to me so you can then add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
