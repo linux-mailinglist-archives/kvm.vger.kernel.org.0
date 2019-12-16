@@ -2,74 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 27144120344
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 12:04:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2553B120413
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 12:36:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727600AbfLPLDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 06:03:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39977 "EHLO
+        id S1727329AbfLPLgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 06:36:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25430 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727591AbfLPLDv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 06:03:51 -0500
+        with ESMTP id S1727265AbfLPLgc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 06:36:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576494229;
+        s=mimecast20190719; t=1576496191;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-        bh=p2RmlOI11xjoTh4Dpq+Ljz66BvE8FSYAOiBa1w/vy/Y=;
-        b=R3b/heiVfXBM8H3+4CBNRAmvBXAx185L2DEqbbQZV9K278dL1tAvgAn6fStb1ro80xBtoP
-        nWMqScvunhXOtlnCWncMlblZpHc4uKyHyq62z8vbBorDfY8V4fDpWTh+MzVasP7JanwWwF
-        X4NbNIIEwwDj0w27n3mZEj2BqA1KVhs=
+        bh=Er/8pNvuw26EZL7HzjIG9/8FEfEud3wLh5aaY/cbU8I=;
+        b=jApbEeSZtIqD2VdivpsxDQ7WEsmQX/qy3TGooiLZ0zUz2wFPPdHycw0CZl3ppBYwRAmPpQ
+        Aro/c1k+zb3lOQTvHZWwY1Rp25MMtwFsRFT7gyjp0N05m84Rqd9IGau+827X9NunSzQgni
+        VhX5LXaH9xoQv75+U934+fJJyjh4/sU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-81QW0wMKOQyAWOo-d9MEaQ-1; Mon, 16 Dec 2019 06:03:45 -0500
-X-MC-Unique: 81QW0wMKOQyAWOo-d9MEaQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-175-PEfzjuqGOt-OiTW4PPEuXQ-1; Mon, 16 Dec 2019 06:36:29 -0500
+X-MC-Unique: PEfzjuqGOt-OiTW4PPEuXQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A751107ACCD;
-        Mon, 16 Dec 2019 11:03:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08498911E9;
+        Mon, 16 Dec 2019 11:36:27 +0000 (UTC)
 Received: from [10.36.118.132] (unknown [10.36.118.132])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93B105D9C5;
-        Mon, 16 Dec 2019 11:03:22 +0000 (UTC)
-Subject: Re: [PATCH RFC v4 00/13] virtio-mem: paravirtualized memory
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Michal Hocko <mhocko@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Samuel Ortiz <samuel.ortiz@intel.com>,
-        Robert Bradford <robert.bradford@intel.com>,
-        Luiz Capitulino <lcapitulino@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Alexander Potapenko <glider@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Young <dyoung@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Juergen Gross <jgross@suse.com>, Len Brown <lenb@kernel.org>,
-        Mel Gorman <mgorman@techsingularity.net>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Rapoport <rppt@linux.ibm.com>,
-        Oscar Salvador <osalvador@suse.com>,
-        Oscar Salvador <osalvador@suse.de>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Pavel Tatashin <pavel.tatashin@microsoft.com>,
-        Pingfan Liu <kernelfans@gmail.com>, Qian Cai <cai@lca.pw>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Wei Yang <richard.weiyang@gmail.com>
-References: <20191212171137.13872-1-david@redhat.com>
- <20191213201556.GC26990@char.us.oracle.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 390B460BF7;
+        Mon, 16 Dec 2019 11:36:15 +0000 (UTC)
+Subject: Re: [PATCH v15 3/7] mm: Add function __putback_isolated_page
+To:     Alexander Duyck <alexander.duyck@gmail.com>, kvm@vger.kernel.org,
+        mst@redhat.com, linux-kernel@vger.kernel.org, willy@infradead.org,
+        mhocko@kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mgorman@techsingularity.net, vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com,
+        alexander.h.duyck@linux.intel.com, osalvador@suse.de
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+ <20191205162230.19548.70198.stgit@localhost.localdomain>
 From:   David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -115,77 +90,94 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <178a5e94-f1f1-130c-9a28-2b8dd2be2abe@redhat.com>
-Date:   Mon, 16 Dec 2019 12:03:21 +0100
+Message-ID: <cb49bbc7-b0c0-65cc-1d9d-a3aaef075650@redhat.com>
+Date:   Mon, 16 Dec 2019 12:36:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191213201556.GC26990@char.us.oracle.com>
+In-Reply-To: <20191205162230.19548.70198.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.12.19 21:15, Konrad Rzeszutek Wilk wrote:
-> On Thu, Dec 12, 2019 at 06:11:24PM +0100, David Hildenbrand wrote:
->> This series is based on latest linux-next. The patches are located at:
->>     https://github.com/davidhildenbrand/linux.git virtio-mem-rfc-v4
-> Heya!
+[...]
+> +/**
+> + * __putback_isolated_page - Return a now-isolated page back where we =
+got it
+> + * @page: Page that was isolated
+> + * @order: Order of the isolated page
+> + *
+> + * This function is meant to return a page pulled from the free lists =
+via
+> + * __isolate_free_page back to the free lists they were pulled from.
+> + */
+> +void __putback_isolated_page(struct page *page, unsigned int order)
+> +{
+> +	struct zone *zone =3D page_zone(page);
+> +	unsigned long pfn;
+> +	unsigned int mt;
+> +
+> +	/* zone lock should be held when this function is called */
+> +	lockdep_assert_held(&zone->lock);
+> +
+> +	pfn =3D page_to_pfn(page);
+> +	mt =3D get_pfnblock_migratetype(page, pfn);
 
-Hi Konrad!
+IMHO get_pageblock_migratetype() would be nicer - I guess the compiler
+will optimize out the double page_to_pfn().
 
->=20
-> Would there be by any chance a virtio-spec git tree somewhere?
+> +
+> +	/* Return isolated page to tail of freelist. */
+> +	__free_one_page(page, pfn, zone, order, mt);
+> +}
+> +
+>  /*
+>   * Update NUMA hit/miss statistics
+>   *
+> diff --git a/mm/page_isolation.c b/mm/page_isolation.c
+> index 04ee1663cdbe..d93d2be0070f 100644
+> --- a/mm/page_isolation.c
+> +++ b/mm/page_isolation.c
+> @@ -134,13 +134,11 @@ static void unset_migratetype_isolate(struct page=
+ *page, unsigned migratetype)
+>  		__mod_zone_freepage_state(zone, nr_pages, migratetype);
+>  	}
+>  	set_pageblock_migratetype(page, migratetype);
+> +	if (isolated_page)
+> +		__putback_isolated_page(page, order);
+>  	zone->nr_isolate_pageblock--;
+>  out:
+>  	spin_unlock_irqrestore(&zone->lock, flags);
+> -	if (isolated_page) {
+> -		post_alloc_hook(page, order, __GFP_MOVABLE);
+> -		__free_pages(page, order);
+> -	}
 
-I haven't started working on a spec yet - it's on my todo list but has
-low priority (one-man-team). I'll focus on the QEMU pieces next, once
-the kernel part is in an acceptable state.
+So If I get it right:
 
-The uapi file contains quite some documentation - if somebody wants to
-start hacking on an alternative hypervisor implementation, I'm happy to
-answer questions until I have a spec ready.
+post_alloc_hook() does quite some stuff like
+- arch_alloc_page(page, order);
+- kernel_map_pages(page, 1 << order, 1)
+- kasan_alloc_pages()
+- kernel_poison_pages(1)
+- set_page_owner()
 
->=20
-> ..snip..
->> ----------------------------------------------------------------------=
-----
->> 5. Future work
->> ----------------------------------------------------------------------=
-----
->>
->> The separate patches contain a lot of future work items. One of the ne=
-xt
->> steps is to make memory unplug more likely to succeed - currently, the=
-re
->> are no guarantees on how much memory can get unplugged again. I have
->=20
->=20
-> Or perhaps tell the caller why we can't and let them sort it out?
-> For example: "Application XYZ is mlocked. Can't offload'.
+Which free_pages_prepare() will undo, like
+- reset_page_owner()
+- kernel_poison_pages(0)
+- arch_free_page()
+- kernel_map_pages()
+- kasan_free_nondeferred_pages()
 
-Yes, it might in general be interesting for the guest to indicate
-persistent errors, both when hotplugging and hotunplugging memory.
-Indicating why unplugging is not able to succeed in that detail is,
-however, non-trivial.
-
-The hypervisor sets the requested size can can watch over the actual
-size of a virtio-mem device. Right now, after it updated the requested
-size, it can wait some time (e.g., 1-5 minutes). If the requested size
-was not reached after that time, it knows there is a persistent issue
-limiting plug/unplug. In the future, this could be extended by a rough
-or detailed root cause indication. In the worst case, the guest crashed
-and is no longer able to respond (not even with an error indication).
-
-One interesting piece of the current hypervisor (QEMU) design is that
-the maximum memory size a VM can consume is always known and QEMU will
-send QMP events to upper layers whenever that size changes. This means
-that you can e.g., reliably charge a customer how much memory a VM is
-actually able to consume over time (independent of hotplug/unplug
-errors). But yeah, the QEMU bits are still in a very early stage.
+Both would be skipped now - which sounds like the right thing to do IMHO
+(and smells like quite a performance improvement). I haven't verified if
+actually everything we skip in free_pages_prepare() is safe (I think it
+is, it seems to be mostly relevant for actually used/allocated pages).
 
 --=20
 Thanks,
