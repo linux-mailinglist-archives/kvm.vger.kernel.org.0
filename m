@@ -2,129 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E42121669
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 19:29:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43BF0121962
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 19:51:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731365AbfLPS3E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 13:29:04 -0500
-Received: from foss.arm.com ([217.140.110.172]:37022 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731465AbfLPS3E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 13:29:04 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2955C1007;
-        Mon, 16 Dec 2019 10:29:03 -0800 (PST)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 088123F719;
-        Mon, 16 Dec 2019 10:29:01 -0800 (PST)
-Subject: Re: [PATCH 2/3] KVM: arm/arm64: Re-check VMA on detecting a poisoned
- page
-To:     Christoffer Dall <christoffer.dall@arm.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-References: <20191211165651.7889-1-maz@kernel.org>
- <20191211165651.7889-3-maz@kernel.org>
- <20191213092239.GB28840@e113682-lin.lund.arm.com>
-From:   James Morse <james.morse@arm.com>
-Message-ID: <1723e51d-28a2-d2e5-e45a-12acc2991bcc@arm.com>
-Date:   Mon, 16 Dec 2019 18:29:00 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1727822AbfLPSuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 13:50:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24145 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727223AbfLPRv4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 12:51:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576518715;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=agJTA0FhEzzrZiShheQLO++OwGjG46qf1y0t3cPS+yM=;
+        b=UMBoMRt6c5yN98+hr/Qi3Nbe9ncRpMmdCLc5u/2vncAFnWwV95QUL9e9FdtnXVcguZS8vT
+        Q7O08e87ePBL+kq00Zwksep0D5MuG11VVhNWe87xNkkjtM0MxD+zhnxsCzsjmNFuNeSDQ6
+        U6xjnWeE8cTWDpSLiNcml3aD9Uy4bX8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-iuNC3rBHPDKcV7UbG8mI_Q-1; Mon, 16 Dec 2019 12:51:54 -0500
+X-MC-Unique: iuNC3rBHPDKcV7UbG8mI_Q-1
+Received: by mail-wr1-f70.google.com with SMTP id c6so4060988wrm.18
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 09:51:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=agJTA0FhEzzrZiShheQLO++OwGjG46qf1y0t3cPS+yM=;
+        b=OswKqzQSiGsjq2UWaLwRXjm8yqjZog7qzFZ030slJnHAvRoad7/3TTXySZh5j+wow/
+         XNb0VUGl0UKFwyYB+TGDRaEI/Q3XeG4BHmFSum0dP0zJJTcM7OGsQRDX33COWUiMPsJW
+         bUawGY6XM6OmX3gFOCLntQ6sO1K3KdKY+/g8ECmIbrEVVBUlsEiCHPi/vwr9DnM5f81B
+         wQ0upDoJyuk6Z+pusa4Iarn0DU+mcZ1vmk6xanIknWVH1tuhJUxx8q9b3hS9wNeWun4Q
+         7jvy4OMQaQRxGxQztIEQl1iHjRrWC8Gvlrwt34oLinIFAaOh9xE4qrpVWk6jpqNnvarg
+         xoUg==
+X-Gm-Message-State: APjAAAVcypD7zW+s7+dAX7uYlV8b628m2me55PeaBN3C7E5wbPHLdVAa
+        +HAWYxaxHJBRB4KTScqa+gfFbN3+rAV83ipj1E0gbMHG+kIUeQ5pHPk7J27ITm8454e73c3X3A3
+        7Y9Rw6ZPkM8+1
+X-Received: by 2002:a1c:488a:: with SMTP id v132mr178977wma.153.1576518712717;
+        Mon, 16 Dec 2019 09:51:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqysP1+iegsWK4ZyImuYtLx05AvxMKrQzL/7fehKa36BQ68KaunRHEYunty3fNBokVJqTe4QIA==
+X-Received: by 2002:a1c:488a:: with SMTP id v132mr178955wma.153.1576518712515;
+        Mon, 16 Dec 2019 09:51:52 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id n67sm166187wmb.8.2019.12.16.09.51.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2019 09:51:51 -0800 (PST)
+Subject: Re: [PATCH v2] kvm: x86: Add logical CPU to KVM_EXIT_FAIL_ENTRY info
+To:     Jim Mattson <jmattson@google.com>,
+        Liran Alon <liran.alon@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Oliver Upton <oupton@google.com>
+References: <20191214002014.144430-1-jmattson@google.com>
+ <81C338F8-851B-471C-8707-646283167D57@oracle.com>
+ <CALMp9eTQf-htu-6R=VM+r8VmeBPwrVZArJaU6MnGD2m3hn+6jQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a319d0be-db7e-9650-62da-d70b2cc53709@redhat.com>
+Date:   Mon, 16 Dec 2019 18:51:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191213092239.GB28840@e113682-lin.lund.arm.com>
+In-Reply-To: <CALMp9eTQf-htu-6R=VM+r8VmeBPwrVZArJaU6MnGD2m3hn+6jQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Christoffer,
+On 16/12/19 18:43, Jim Mattson wrote:
+> That's a good point. We had one case of numerous VM-exits for INIT,
+> and I'm pretty sure that was a defective CPU too.
 
-On 13/12/2019 09:22, Christoffer Dall wrote:
-> On Wed, Dec 11, 2019 at 04:56:49PM +0000, Marc Zyngier wrote:
->> When we check for a poisoned page, we use the VMA to tell userspace
->> about the looming disaster. But we pass a pointer to this VMA
->> after having released the mmap_sem, which isn't a good idea.
->>
->> Instead, re-check that we have still have a VMA, and that this
->> VMA still points to a poisoned page. If the VMA isn't there,
->> userspace is playing with our nerves, so lety's give it a -EFAULT
->> (it deserves it). If the PFN isn't poisoned anymore, let's restart
->> from the top and handle the fault again.
+We too, and that's the only conclusion we could reach.  And the other
+one that I can remember was KVM_INTERNAL_ERROR_DELIVERY_EV with
+EPT_VIOLATION exits, so I would add it to all KVM_EXIT_INTERNAL_ERROR.
 
-> If I read this code correctly, then all we use the VMA for is to find
-> the page size used by the MMU to back the VMA, which we've already
-> established in the vma_pagesize (and possibly adjusted to something more
-> accurate based on our constraints in stage 2 which generated the error),
-> so all we need is the size and a way to convert that into a shift.
-> 
-> Not being 100% confident about the semantics of the lsb bit we pass to
-> user space (is it indicating the size of the mapping which caused the
-> error or the size of the mapping where user space could potentially
+Nowadays KVM_EXIT_FAIL_ENTRY would probably also be an internal error,
+however it was somewhat more frequent back before Intel CPUs had
+unrestricted guest support.
 
-Its the size of the hole that has opened up in the address map. The error was very likely
-to be much smaller, but all we can do is unmap pages.
-Transparent huge-pages are split up to minimise the impact. This code is for hugetlbfs
-(?), whose pages are dedicated for that use, so don't get split.
+Paolo
 
-arch/arm64/mm/fault.c::do_page_fault() has:
-|	lsb = PAGE_SHIFT;
-|	if (fault & VM_FAULT_HWPOISON_LARGE)
-|		lsb = hstate_index_to_shift(VM_FAULT_GET_HINDEX(fault));
-|
-|	arm64_force_sig_mceerr(BUS_MCEERR_AR, (void __user *)addr, lsb,
-
-(I assume its a shift because bytes in the signal union are precious)
-
-
-> trigger an error?), or wheter we care enough at that level, could we
-> consider something like the following instead?
-
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 38b4c910b6c3..2509d9dec42d 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -1592,15 +1592,9 @@ static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
->  }
->  
->  static void kvm_send_hwpoison_signal(unsigned long address,
-> -				     struct vm_area_struct *vma)
-> +				     unsigned long vma_pagesize)
->  {
-> -	short lsb;
-> -
-> -	if (is_vm_hugetlb_page(vma))
-> -		lsb = huge_page_shift(hstate_vma(vma));
-> -	else
-> -		lsb = PAGE_SHIFT;
-> -
-> +	short lsb = __ffs(vma_pagesize);
->  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
->  }
->  
-> @@ -1735,7 +1729,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	pfn = gfn_to_pfn_prot(kvm, gfn, write_fault, &writable);
->  	if (pfn == KVM_PFN_ERR_HWPOISON) {
-> -		kvm_send_hwpoison_signal(hva, vma);
-> +		kvm_send_hwpoison_signal(hva, vma_pagesize);
->  		return 0;
->  	}
->  	if (is_error_noslot_pfn(pfn))
-
-This changes the meaning, vma_pagesize is a value like 4K, not a shift like 12.
-
-But yes, caching the shift value under the mmap_sem and passing it in is the
-right-thing-to-do(tm). I have a patch which I'll post, once I remember how to test this thing!
-
-
-
-Thanks,
-
-James
