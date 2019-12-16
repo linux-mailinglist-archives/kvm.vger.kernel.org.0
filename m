@@ -2,175 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AEC612016F
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 10:47:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB4571201FE
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 11:08:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727140AbfLPJrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 04:47:52 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32406 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727086AbfLPJrv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 04:47:51 -0500
+        id S1727151AbfLPKIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 05:08:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45165 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727114AbfLPKIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 05:08:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576489669;
+        s=mimecast20190719; t=1576490900;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=x4F0S6F+puErRf/9qNGD3qSr4YnaGP1lnAVzdVRgZvU=;
-        b=Jy+o8ZQuRmQ8vKzrcpvwvJd+xs2mCiWaZEeCTCpdvwaiD07b7Z+7zIbztGLvwlsiZkINJU
-        6amBgNC/CprrQI6ymKmHkChmBgmIyhbCRkVuseeEtlo3YIN/2DtO6hQRVnE9eroUs7AYD9
-        68j/U64C8mFRoWxP8ZY83xvAjwr+rco=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-_9ZehERyOFypDcgpSOsFPA-1; Mon, 16 Dec 2019 04:47:43 -0500
-X-MC-Unique: _9ZehERyOFypDcgpSOsFPA-1
-Received: by mail-qv1-f71.google.com with SMTP id w13so4966178qvb.4
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 01:47:43 -0800 (PST)
+        bh=09JiSv25cdJaJ4KBuEFbebJuRN+Qs0ExALLgw9H0+YM=;
+        b=gLSGVXNVTlE/f9aq9j2GLoTYVkhS5oucCTPDOaQKvFhnhxyrj57teLqE4uC6VTZkc+snRS
+        Fots+TQnKdrfMwkvaHSxFRb0HWmS/msZvKsXwnqpP4m1dZ/ImnKGj84IlJWK/9YL31jwPf
+        Ielzg2/JIcZi5LBkeADAr3tr0LUGi20=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-FVT0FLX6PoifWLwzBa_7hw-1; Mon, 16 Dec 2019 05:08:19 -0500
+X-MC-Unique: FVT0FLX6PoifWLwzBa_7hw-1
+Received: by mail-wm1-f70.google.com with SMTP id l13so859788wmj.8
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 02:08:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=x4F0S6F+puErRf/9qNGD3qSr4YnaGP1lnAVzdVRgZvU=;
-        b=OJoLNZXJxLtYUSwYq++02itPGhRX+6IQJpMxzV0qDfCztCZL7Rr/zpTH9gTBmG2gui
-         zSSCtaWY6a3gCsErvYvICnAcaUr9zUAa4LZdhL7MrWR83bNKJ3NflAHrHtlo1pAGRjdf
-         VtON0/1vxYCMzKWRggJJn38nwQoLDkqfiYLP2Kcfw0ZcsmFRFmFhH7PUmEfZx/0sDNmS
-         B5KZjAwDMecEuZZTfGPijjy8bLUyH9Wje+WI8E4Ztkgjop4zBNO/qGx7JtSKmMsWC+Z4
-         pTb8aFf/iRi31addZgZB6vtEpJk48A/UofqH4A1+8mM8FTBpNDQiP6ZVQmuPtaMbEA1J
-         ByOA==
-X-Gm-Message-State: APjAAAUWFevl1QPTiE1TA5pxbvMkh7yRkO5rIM3yUXCsDoAZYMqnIV2+
-        y6Cq9lr84hodM494fG1cpivsrOdhET3U+631LuuRw4cep7j8u+udtyzZtDNw7K7iuxrWmZX1mwY
-        x8C/1KZaoLqoy
-X-Received: by 2002:aed:256f:: with SMTP id w44mr7069752qtc.331.1576489663040;
-        Mon, 16 Dec 2019 01:47:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxIZNYdabqmI0CG0aOJ0NQEhESVmckgU7vVqS63tN6mOzzA5VFGb+hnjE+Zgtxy3Azad9N/Jw==
-X-Received: by 2002:aed:256f:: with SMTP id w44mr7069748qtc.331.1576489662780;
-        Mon, 16 Dec 2019 01:47:42 -0800 (PST)
-Received: from redhat.com (bzq-111-168-31-5.red.bezeqint.net. [31.168.111.5])
-        by smtp.gmail.com with ESMTPSA id r10sm5762779qkm.23.2019.12.16.01.47.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2019 01:47:41 -0800 (PST)
-Date:   Mon, 16 Dec 2019 04:47:36 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=09JiSv25cdJaJ4KBuEFbebJuRN+Qs0ExALLgw9H0+YM=;
+        b=PcoxO1CijFsHCAXB5GGv/6Vx0OlkkyoHBu/lj9qHDlaFJNadyEyvYiL1SvzrzZOmtG
+         K3Qjj2yByxXxAeVTyFhJDdlDzss8TiJHNx9FU082Nq7G1ZlcQj7RgUmBV5bv98up5kAu
+         be7CdNcJTPx/0MetENoQqdpuuw+NL53WXnr/Sw8fb2NJpxO4RaOnQGytPHcIoL53gR2e
+         5k0RzduWx6+XZucnU9rrw303oLHlX1uveqwQWa6Fucw79/xbM7F7d8j4tZEnwuXVk+yr
+         OJ2AMtU0Xl8pnuyfEGrS+zimCPt3hl199SDL2Klfil2GW2nukH6slUAjHXNGqZCmus4j
+         h6mg==
+X-Gm-Message-State: APjAAAXmcFpgOcnHVy8USS6dygURsFBXne0oLpIeBxgd+3L2kJ9iihLZ
+        09aDLVs2ZD+mdlatsLge1i55pQWqnRJnqb5rI+rUynSXrjjHvsXZShDOJiIOt0FiLPikez4igKI
+        +pKugzGff44+z
+X-Received: by 2002:a7b:c216:: with SMTP id x22mr28107090wmi.51.1576490898312;
+        Mon, 16 Dec 2019 02:08:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzSe+0hde9uu9y/6Xw0eqWx6m1WenCodQYxucyi2EicOiyc0vMVkWi/pULhbKmEDqNwkYYwsw==
+X-Received: by 2002:a7b:c216:: with SMTP id x22mr28107055wmi.51.1576490897952;
+        Mon, 16 Dec 2019 02:08:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:cde8:2463:95a9:1d81? ([2001:b07:6468:f312:cde8:2463:95a9:1d81])
+        by smtp.gmail.com with ESMTPSA id q6sm22169932wrx.72.2019.12.16.02.08.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2019 02:08:17 -0800 (PST)
 Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191216044619-mutt-send-email-mst@kernel.org>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <20191211063830-mutt-send-email-mst@kernel.org>
- <20191211205952.GA5091@xz-x1>
- <20191211172713-mutt-send-email-mst@kernel.org>
- <46ceb88c-0ddd-0d9a-7128-3aa5a7d9d233@redhat.com>
- <20191215173302.GB83861@xz-x1>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+References: <20191202201036.GJ4063@linux.intel.com>
+ <20191202211640.GF31681@xz-x1> <20191202215049.GB8120@linux.intel.com>
+ <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
+ <20191203184600.GB19877@linux.intel.com>
+ <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
+ <20191209215400.GA3352@xz-x1>
+ <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <20191210155259.GD3352@xz-x1>
+ <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+ <20191215172124.GA83861@xz-x1>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
+Date:   Mon, 16 Dec 2019 11:08:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191215173302.GB83861@xz-x1>
+In-Reply-To: <20191215172124.GA83861@xz-x1>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Dec 15, 2019 at 12:33:02PM -0500, Peter Xu wrote:
-> On Thu, Dec 12, 2019 at 01:08:14AM +0100, Paolo Bonzini wrote:
-> > >>> What depends on what here? Looks suspicious ...
-> > >>
-> > >> Hmm, I think maybe it can be removed because the entry pointer
-> > >> reference below should be an ordering constraint already?
-> > 
-> > entry->xxx depends on ring->reset_index.
-> 
-> Yes that's true, but...
-> 
->         entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
->         /* barrier? */
->         next_slot = READ_ONCE(entry->slot);
->         next_offset = READ_ONCE(entry->offset);
-> 
-> ... I think entry->xxx depends on entry first, then entry depends on
-> reset_index.  So it seems fine because all things have a dependency?
+[Alex and Kevin: there are doubts below regarding dirty page tracking
+from VFIO and mdev devices, which perhaps you can help with]
 
-Is reset_index changed from another thread then?
-If yes then you want to read reset_index with READ_ONCE.
-That includes a dependency barrier.
+On 15/12/19 18:21, Peter Xu wrote:
+>                 init_rmode_tss
+>                     vmx_set_tss_addr
+>                         kvm_vm_ioctl_set_tss_addr [*]
+>                 init_rmode_identity_map
+>                     vmx_create_vcpu [*]
 
-> > 
-> > >>> what's the story around locking here? Why is it safe
-> > >>> not to take the lock sometimes?
-> > >>
-> > >> kvm_dirty_ring_push() will be with lock==true only when the per-vm
-> > >> ring is used.  For per-vcpu ring, because that will only happen with
-> > >> the vcpu context, then we don't need locks (so kvm_dirty_ring_push()
-> > >> is called with lock==false).
-> > 
-> > FWIW this will be done much more nicely in v2.
-> > 
-> > >>>> +	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
-> > >>>> +	if (!page) {
-> > >>>> +		r = -ENOMEM;
-> > >>>> +		goto out_err_alloc_page;
-> > >>>> +	}
-> > >>>> +	kvm->vm_run = page_address(page);
-> > >>>
-> > >>> So 4K with just 8 bytes used. Not as bad as 1/2Mbyte for the ring but
-> > >>> still. What is wrong with just a pointer and calling put_user?
-> > >>
-> > >> I want to make it the start point for sharing fields between
-> > >> user/kernel per-vm.  Just like kvm_run for per-vcpu.
-> > 
-> > This page is actually not needed at all.  Userspace can just map at
-> > KVM_DIRTY_LOG_PAGE_OFFSET, the indices reside there.  You can drop
-> > kvm_vm_run completely.
+These don't matter because their content is not visible to userspace
+(the backing storage is mmap-ed by __x86_set_memory_region).  In fact, d
+
+>                 vmx_write_pml_buffer
+>                     kvm_arch_write_log_dirty [&]
+>                 kvm_write_guest
+>                     kvm_hv_setup_tsc_page
+>                         kvm_guest_time_update [&]
+>                     nested_flush_cached_shadow_vmcs12 [&]
+>                     kvm_write_wall_clock [&]
+>                     kvm_pv_clock_pairing [&]
+>                     kvmgt_rw_gpa [?]
+
+This then expands (partially) to
+
+intel_gvt_hypervisor_write_gpa
+    emulate_csb_update
+        emulate_execlist_ctx_schedule_out
+            complete_execlist_workload
+                complete_current_workload
+                     workload_thread
+        emulate_execlist_ctx_schedule_in
+            prepare_execlist_workload
+                prepare_workload
+                    dispatch_workload
+                        workload_thread
+
+So KVMGT is always writing to GPAs instead of IOVAs and basically
+bypassing a guest IOMMU.  So here it would be better if kvmgt was
+changed not use kvm_write_guest (also because I'd probably have nacked
+that if I had known :)).
+
+As far as I know, there is some work on live migration with both VFIO
+and mdev, and that probably includes some dirty page tracking API.
+kvmgt could switch to that API, or there could be VFIO APIs similar to
+kvm_write_guest but taking IOVAs instead of GPAs.  Advantage: this would
+fix the GPA/IOVA confusion.  Disadvantage: userspace would lose the
+tracking of writes from mdev devices.  Kevin, are these writes used in
+any way?  Do the calls to intel_gvt_hypervisor_write_gpa covers all
+writes from kvmgt vGPUs, or can the hardware write to memory as well
+(which would be my guess if I didn't know anything about kvmgt, which I
+pretty much don't)?
+
+> We should only need to look at the leaves of the traces because
+> they're where the dirty request starts.  I'm marking all the leaves
+> with below criteria then it'll be easier to focus:
 > 
-> I changed it because otherwise we use one entry of the padding, and
-> all the rest of paddings are a waste of memory because we can never
-> really use the padding as new fields only for the 1st entry which
-> overlaps with the indices.  IMHO that could even waste more than 4k.
+> Cases with [*]: should not matter much
+>            [&]: actually with a per-vcpu context in the upper layer
+>            [?]: uncertain...
 > 
-> (for now we only "waste" 4K for per-vm, kvm_run is already mapped so
->  no waste there, not to say potentially I still think we can use the
->  kvm_vm_run in the future)
+> I'm a bit amazed after I took these notes, since I found that besides
+> those that could probbaly be ignored (marked as [*]), most of the rest
+> per-vm dirty requests are actually with a vcpu context.
 > 
-> > 
-> > >>>> +	} else {
-> > >>>> +		/*
-> > >>>> +		 * Put onto per vm ring because no vcpu context.  Kick
-> > >>>> +		 * vcpu0 if ring is full.
-> > >>>
-> > >>> What about tasks on vcpu 0? Do guests realize it's a bad idea to put
-> > >>> critical tasks there, they will be penalized disproportionally?
-> > >>
-> > >> Reasonable question.  So far we can't avoid it because vcpu exit is
-> > >> the event mechanism to say "hey please collect dirty bits".  Maybe
-> > >> someway is better than this, but I'll need to rethink all these
-> > >> over...
-> > > 
-> > > Maybe signal an eventfd, and let userspace worry about deciding what to
-> > > do.
-> > 
-> > This has to be done synchronously.  But the vm ring should be used very
-> > rarely (it's for things like kvmclock updates that write to guest memory
-> > outside a vCPU), possibly a handful of times in the whole run of the VM.
+> Although now because we have kvm_get_running_vcpu() all cases for [&]
+> should be fine without changing anything, but I tend to add another
+> patch in the next post to convert all the [&] cases explicitly to pass
+> vcpu pointer instead of kvm pointer to be clear if no one disagrees,
+> then we verify that against kvm_get_running_vcpu().
+
+This is a good idea but remember not to convert those to
+kvm_vcpu_write_guest, because you _don't_ want these writes to touch
+SMRAM (most of the addresses are OS-controlled rather than
+firmware-controlled).
+
+> init_rmode_tss or init_rmode_identity_map.  But I've marked them as
+> unimportant because they should only happen once at boot.
+
+We need to check if userspace can add an arbitrary number of entries by
+calling KVM_SET_TSS_ADDR repeatedly.  I think it can; we'd have to
+forbid multiple calls to KVM_SET_TSS_ADDR which is not a problem in general.
+
+>>> If we're still with the rule in userspace that we first do RESET then
+>>> collect and send the pages (just like what we've discussed before),
+>>> then IMHO it's fine to have vcpu2 to skip the slow path?  Because
+>>> RESET happens at "treat page as not dirty", then if we are sure that
+>>> we only collect and send pages after that point, then the latest
+>>> "write to page" data from vcpu2 won't be lost even if vcpu2 is not
+>>> blocked by vcpu1's ring full?
+>>
+>> Good point, the race would become
+>>
+>>  	vCPU 1			vCPU 2		host
+>>  	---------------------------------------------------------------
+>>  	mark page dirty
+>>  				write to page
+>> 						reset rings
+>> 						  wait for mmu lock
+>>  	add page to ring
+>> 	release mmu lock
+>> 						  ...do reset...
+>> 						  release mmu lock
+>> 						page is now dirty
 > 
-> I've summarized a list of callers who might dirty guest memory in the
-> other thread, it seems to me that even the kvm clock is using per-vcpu
-> contexts.
+> Hmm, the page will be dirty after the reset, but is that an issue?
 > 
-> > 
-> > >>> KVM_DIRTY_RING_MAX_ENTRIES is not part of UAPI.
-> > >>> So how does userspace know what's legal?
-> > >>> Do you expect it to just try?
-> > >>
-> > >> Yep that's what I thought. :)
-> > 
-> > We should return it for KVM_CHECK_EXTENSION.
+> Or, could you help me to identify what I've missed?
+
+Nothing: the race is always solved in such a way that there's no issue.
+
+>> I don't think that's possible, most writes won't come from a page fault
+>> path and cannot retry.
 > 
-> OK.  I'll drop the versioning.
-> 
-> -- 
-> Peter Xu
+> Yep, maybe I should say it in the other way round: we only wait if
+> kvm_get_running_vcpu() == NULL.  Then in somewhere near
+> vcpu_enter_guest(), we add a check to wait if per-vcpu ring is full.
+> Would that work?
+
+Yes, that should work, especially if we know that kvmgt is the only case
+that can wait.  And since:
+
+1) kvmgt doesn't really need dirty page tracking (because VFIO devices
+generally don't track dirty pages, and because kvmgt shouldn't be using
+kvm_write_guest anyway)
+
+2) the real mode TSS and identity map shouldn't even be tracked, as they
+are invisible to userspace
+
+it seems to me that kvm_get_running_vcpu() lets us get rid of the per-VM
+ring altogether.
+
+Paolo
 
