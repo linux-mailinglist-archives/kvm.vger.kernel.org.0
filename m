@@ -2,81 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B6471203D0
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 12:24:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84494120303
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 11:54:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727621AbfLPLYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 06:24:42 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:49676 "EHLO
-        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727138AbfLPLYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 06:24:00 -0500
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from light.dominikbrodowski.net (brodo.linta [10.1.0.102])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 165DF200A62;
-        Mon, 16 Dec 2019 11:23:58 +0000 (UTC)
-Received: by light.dominikbrodowski.net (Postfix, from userid 1000)
-        id 7AEA020BC9; Mon, 16 Dec 2019 11:53:38 +0100 (CET)
-Date:   Mon, 16 Dec 2019 11:53:38 +0100
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        lkft-triage@lists.linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: mainline-5.5.0-rc1: do_mount_root+0x6c/0x10d - kernel crash
- while mounting rootfs
-Message-ID: <20191216105338.GA163642@light.dominikbrodowski.net>
-References: <CA+G9fYuO7vMjsqkyXHZSU-pKEk0L0t9kQTfnd5xopVADyGwprw@mail.gmail.com>
- <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
+        id S1727566AbfLPKyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 05:54:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45081 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727436AbfLPKyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 05:54:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576493660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NKfanrHwOpmLcOycHLXxbfC4P1nz4bcChNMeZN9SUEc=;
+        b=HqzcwU//qB1L3daKsu/Zqxse0toCaV6VLTqONCWDsR4A3XUxWApPNS9ns8c8pbBb3G3Qfc
+        mc3jqjVYMliWMWldAXsRlIY7B0Nxk9AhAeHS6bdP33YIUtFt78OQgVNHS3TqOOuXlcgZy9
+        IdoMX2yLd7AQYNlqtFysCHJeOLBgwOc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-LsjyBCTiNTSq51hB6-ezjA-1; Mon, 16 Dec 2019 05:54:16 -0500
+X-MC-Unique: LsjyBCTiNTSq51hB6-ezjA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 862261005502;
+        Mon, 16 Dec 2019 10:54:15 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BCB346759E;
+        Mon, 16 Dec 2019 10:54:11 +0000 (UTC)
+Date:   Mon, 16 Dec 2019 11:54:09 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v4 9/9] s390x: css: ping pong
+Message-ID: <20191216115409.3a89717a.cohuck@redhat.com>
+In-Reply-To: <bb6c04a1-501c-16c4-107b-f10ac9d1e41d@linux.ibm.com>
+References: <1576079170-7244-1-git-send-email-pmorel@linux.ibm.com>
+        <1576079170-7244-10-git-send-email-pmorel@linux.ibm.com>
+        <20191213105009.482bab48.cohuck@redhat.com>
+        <bb6c04a1-501c-16c4-107b-f10ac9d1e41d@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 11:22:04AM +0100, Arnd Bergmann wrote:
-> On Mon, Dec 16, 2019 at 10:15 AM Naresh Kamboju
-> <naresh.kamboju@linaro.org> wrote:
-> >
-> > The following kernel crash reported on qemu_x86_64 boot running
-> > 5.5.0-rc1 mainline kernel.
-> 
-> I looked for too long at v5.5-rc1 completely puzzled by how you got to this
-> object code before realizing that this is a git snapshot between -rc1 and -rc2.
-> 
-> The code in question was changed by a recent series from Dominik Brodowski,
-> the main difference being commit cccaa5e33525 ("init: use do_mount() instead
-> of ksys_mount()").
-> 
-> It looks like the NULL-check in ksys_mount()/copy_mount_options() is missing
-> from the new mount_block_root, so it passes a NULL pointer into strncpy().
-> 
-> Something like this should fix it (not tested):
+On Fri, 13 Dec 2019 17:50:02 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-This equivalent patch by Linus already got some testing:
+> On 2019-12-13 10:50, Cornelia Huck wrote:
 
-https://lore.kernel.org/lkml/CAHk-=wh8VLe3AEKhz=1bzSO=1fv4EM71EhufxuC=Gp=+bLhXoA@mail.gmail.com/
+> > [This also got me thinking about your start_subchannel function
+> > again... do you also want to allow flags like e.g. SLI? It's not
+> > unusual for commands to return different lengths of data depending on
+> > what features are available; it might be worthwhile to allow short data
+> > if you're not sure that e.g. a command returns either the short or the
+> > long version of a structure.]  
+> 
+> I would prefer to keep simple it in this series if you agree.
 
-Thanks,
-	Dominik
+Sure, that's fine.
+
+> 
+> AFAIU the current QEMU implementation use a fix length and if a short 
+> read occurs it is an error.
+> Since we test on PONG, there should be no error.
+
+It all depends on how the QEMU device is supposed to work. For a
+command reading/writing some data, I'd usually expect the following:
+
+- If SLI is not set, require the length to be the exact value expected
+  by the device; otherwise, generate an error.
+- If SLI is set, require the length to be between the minimum length
+  that makes sense and the full length of the buffer; otherwise,
+  generate an error.
+
+Of course, if minimum length == full length, SLI has no real effect :)
+
+> 
+> I agree that for a general test we should change this, but currently the 
+> goal is just to verify that the remote device is PONG.
+> 
+> If we accept variable length, we need to check the length of what we 
+> received, and this could need some infrastructure changes that I would 
+> like to do later.
+
+You mean at the device level? At the driver level (== here), you should
+simply get an error or not, I guess.
+
+> 
+> When the series is accepted I will begin to do more complicated things like:
+> - checking the exceptions for wrong parameters
+>    This is the first I will add.
+
+Agreed, that's probably the most useful one.
+
+> - checking the response difference on flags (SLI, SKP)
+> - using CC and CD flags for chaining
+> - TIC, NOP, suspend/resume and PCI
+> 
+> These last one will be fun, we can also trying to play with prefetch 
+> while at it. :)
+
+I think any kind of ccw chain will already be fun :) It's probably not
+so well tested anyway, as virtio is basically single-command.
+
