@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 894431206B2
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 14:11:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF5FE1206B3
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 14:11:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727757AbfLPNLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 08:11:31 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38763 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727402AbfLPNLb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 08:11:31 -0500
+        id S1727790AbfLPNLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 08:11:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56115 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727782AbfLPNLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 08:11:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576501890;
+        s=mimecast20190719; t=1576501895;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FXYYP7m5x86Bk37M1YJB4xh6R0fOUNpBlIMCqcUij+E=;
-        b=YOwSkv3hwTn52Q8KmzcMXD8vTB5bvikw2DHtbMr6UQeiL/s5Ki8nnsdAJnRUu4A//mwMkQ
-        A7GaIh9KDhHn3MOOzZRSCFPazwgREBcA0nVIRMcI/hu7euBzzO+IItOlarPmO5gD/n65LX
-        lIVNFZ/wmql0GiYb3sCHnEvTJQJT8cY=
+        bh=O9cATtB6pbYt1/J3PE5x5GGao7scjTW4c1UJnxl2UqM=;
+        b=W/j+sjF6TYN3HD4fx8ALAbj/jQi14awOjjBZjpVJMyCDFKDqjlBb9MkcDEUfBkdlbe1QvA
+        6ha1mukMIfHik6v2yGNHHc0E1YGVZn32EsAfHlUQb02xR7ue6Slyhxx04/dRUWSlvjAXmU
+        ovHc070RgyByJludaKgXIuaF3FD/SI4=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-_-lpanDvMc6GvzWYHzrsJA-1; Mon, 16 Dec 2019 08:11:29 -0500
-X-MC-Unique: _-lpanDvMc6GvzWYHzrsJA-1
-Received: by mail-wr1-f70.google.com with SMTP id d8so3043031wrq.12
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 05:11:28 -0800 (PST)
+ us-mta-102-RZ3ZNu5GMTaDeh7TLpkepg-1; Mon, 16 Dec 2019 08:11:34 -0500
+X-MC-Unique: RZ3ZNu5GMTaDeh7TLpkepg-1
+Received: by mail-wr1-f70.google.com with SMTP id z10so600879wrt.21
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 05:11:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=FXYYP7m5x86Bk37M1YJB4xh6R0fOUNpBlIMCqcUij+E=;
-        b=q3i9lHf8NDOMLOoN/VXWe/gHTpge/4dyXf4vOjVJybOJE4bfC0W9LlZekdb0arcpZ+
-         R011RjqCqS3jgTYVQAO0+kdTwGXrDLu81TalOC0Zc0PgkolhyNuJQbjQmn12F2oYo7mN
-         UNsZJ/CewR5if75c3o/fi5q19YH05qTzGwa3dNoWAJ8juw79I6sSU9WuuNSkYCPdXgb6
-         DTRMP6lL/fs8h780xsu505OGhYLnhDSkVRA+rcMMe2Qe2OcoRzAiGsTFwKtT+x+iFn0f
-         is4hGH0ZqmuJbmuXUCyd4y8M5tE4w7ib7qYMzkhSXwgySL0D6B10plffUS1Chns7GFAs
-         gCFA==
-X-Gm-Message-State: APjAAAUH4zgRqcUnRucK3kYBT42+k/droeSTRZpJpUG6w+fCIJBBOnMt
-        GFVu+4emWhEtAK8d6f8/Nc6Fr6izOT7aIGKqFkvIIceZMhIJeDpAN1I20oxUN5iBLQ6bEve1CcC
-        c0X89oErtiiOf
-X-Received: by 2002:a1c:8086:: with SMTP id b128mr30614676wmd.80.1576501887766;
-        Mon, 16 Dec 2019 05:11:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxdE9VroDhn6zSvqLM+CRCLzGyJou2Umxg4Ryp4vAVu7qRvR4LrFZvhR++1aIuoI0i+slJgYw==
-X-Received: by 2002:a1c:8086:: with SMTP id b128mr30614636wmd.80.1576501887535;
-        Mon, 16 Dec 2019 05:11:27 -0800 (PST)
+        bh=O9cATtB6pbYt1/J3PE5x5GGao7scjTW4c1UJnxl2UqM=;
+        b=AmfNfv6nwtDcwLFfNO5F2DOlB23ww7xoYWFZ8BoCIaNwhFFYW8uSU8QgiQibT3S5MM
+         iJHKATzED9MH52pcLqwBuJ4+0RQd6c0LNtWjPseBc7t3vh5E9pjon5rdVs4fM6Hm8frS
+         8inKvZ2i+z3iBWk1PxZsfQpT9gKrUz7kdJfZnm0khdY+dcOYTNkbrvdyT04+h+bHYmXf
+         Vs58ENamxdgBT6OJPnyTDWxo6c7pcc3Rxyg9v93plvQKRd1BkKGKxBo/YRXLACpytxCV
+         VDSX+SK6YuwVfW4OQkiEUcj//dS3kfE4ttljU8ka1QKgOqjzUMmSCXtKkakmk/26BQFQ
+         bmJQ==
+X-Gm-Message-State: APjAAAVMiJYU394zgZDs2+HHKNTgcOgEGdVEAUClDRYC97XlG+V2V1wA
+        BOzV1FSas+a/pAvLL5omBQS1pnUYP+QfgiOP9BO/P3A/8/6rQaHDQAxyi5VB6TX1bwZIdqZYEOz
+        PceGv0iIenDQ/
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr29964674wrl.190.1576501893619;
+        Mon, 16 Dec 2019 05:11:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzQRXuwtsErZVb6m+PpFDPU/O5P8Uccsrb7klFy/bxWKMqwMlqFrlhlnta+/vHq8ERR9JDVmQ==
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr29964634wrl.190.1576501893313;
+        Mon, 16 Dec 2019 05:11:33 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:cde8:2463:95a9:1d81? ([2001:b07:6468:f312:cde8:2463:95a9:1d81])
-        by smtp.gmail.com with ESMTPSA id d16sm23348661wrg.27.2019.12.16.05.11.26
+        by smtp.gmail.com with ESMTPSA id b16sm22033755wrj.23.2019.12.16.05.11.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Dec 2019 05:11:27 -0800 (PST)
-Subject: Re: [PATCH 05/12] hw/i386/ich9: Remove unused include
+        Mon, 16 Dec 2019 05:11:32 -0800 (PST)
+Subject: Re: [PATCH 06/12] hw/i386/ich9: Move unnecessary "pci_bridge.h"
+ include
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
         qemu-devel@nongnu.org
 Cc:     John Snow <jsnow@redhat.com>,
@@ -65,14 +66,14 @@ Cc:     John Snow <jsnow@redhat.com>,
         qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>,
         xen-devel@lists.xenproject.org, Sergio Lopez <slp@redhat.com>
 References: <20191213161753.8051-1-philmd@redhat.com>
- <20191213161753.8051-6-philmd@redhat.com>
+ <20191213161753.8051-7-philmd@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4f195401-f896-75cd-f590-0c1f4bd6c46f@redhat.com>
-Date:   Mon, 16 Dec 2019 14:11:25 +0100
+Message-ID: <622546ed-9117-0be8-1631-dfba81a9353d@redhat.com>
+Date:   Mon, 16 Dec 2019 14:11:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191213161753.8051-6-philmd@redhat.com>
+In-Reply-To: <20191213161753.8051-7-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -82,27 +83,53 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 13/12/19 17:17, Philippe Mathieu-Daudé wrote:
-> The "pcie_host.h" header is used by devices providing a PCI-e bus,
-> usually North Bridges. The ICH9 is a South Bridge.
-> Since we don't need this header, do not include it.
+> While the ICH9 chipset is a 'South Bridge', it is not a PCI bridge.
+> Nothing in "hw/i386/ich9.h" requires definitions from "pci_bridge.h"
+> so move its inclusion where it is required.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  include/hw/i386/ich9.h | 1 -
->  1 file changed, 1 deletion(-)
+>  include/hw/i386/ich9.h    | 1 -
+>  hw/i386/acpi-build.c      | 1 +
+>  hw/pci-bridge/i82801b11.c | 1 +
+>  3 files changed, 2 insertions(+), 1 deletion(-)
 > 
 > diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-> index 72e803f6e2..eeb79ac1fe 100644
+> index eeb79ac1fe..369bc64671 100644
 > --- a/include/hw/i386/ich9.h
 > +++ b/include/hw/i386/ich9.h
 > @@ -7,7 +7,6 @@
 >  #include "hw/isa/apm.h"
 >  #include "hw/i386/ioapic.h"
 >  #include "hw/pci/pci.h"
-> -#include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci_bridge.h"
+> -#include "hw/pci/pci_bridge.h"
 >  #include "hw/acpi/acpi.h"
 >  #include "hw/acpi/ich9.h"
+>  #include "hw/pci/pci_bus.h"
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 12ff55fcfb..291909fa05 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/bitmap.h"
+>  #include "qemu/error-report.h"
+>  #include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bridge.h"
+>  #include "hw/core/cpu.h"
+>  #include "target/i386/cpu.h"
+>  #include "hw/misc/pvpanic.h"
+> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+> index 2b3907655b..033b3c43c4 100644
+> --- a/hw/pci-bridge/i82801b11.c
+> +++ b/hw/pci-bridge/i82801b11.c
+> @@ -43,6 +43,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bridge.h"
+>  #include "migration/vmstate.h"
+>  #include "qemu/module.h"
+>  #include "hw/i386/ich9.h"
 > 
 
 Queued, thanks.
