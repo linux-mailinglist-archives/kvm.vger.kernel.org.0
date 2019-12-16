@@ -2,241 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14B7D120241
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 11:22:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAA631202A4
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 11:32:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727484AbfLPKWY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 05:22:24 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:43777 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727099AbfLPKWY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 05:22:24 -0500
-Received: from mail-qv1-f50.google.com ([209.85.219.50]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1Mdevh-1i7Slb1FYH-00ZetK; Mon, 16 Dec 2019 11:22:22 +0100
-Received: by mail-qv1-f50.google.com with SMTP id d17so2506779qvs.2;
-        Mon, 16 Dec 2019 02:22:21 -0800 (PST)
-X-Gm-Message-State: APjAAAVnixKY2K1AijPtPI8cn5PBubZxuBTsML7F40/fB/Yd/AGqYu4x
-        UwgunJK4+kd1JmgWGcwoLb1NJWGzX6Cm02dbXAE=
-X-Google-Smtp-Source: APXvYqxPGSK6LeyO+gRi/v38BhaWvjYVHEXiuyvyhofiGg3YMMrBq53W9Xc9WoTfO3zKoL1kD1MAvEvJdd8d1f9tMg8=
-X-Received: by 2002:a0c:e7c7:: with SMTP id c7mr3192857qvo.222.1576491740858;
- Mon, 16 Dec 2019 02:22:20 -0800 (PST)
+        id S1727562AbfLPKbZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 05:31:25 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:54822 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727319AbfLPKbY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 05:31:24 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1igneq-0003dz-DA; Mon, 16 Dec 2019 11:31:20 +0100
+To:     Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Properly handle faulting of device  mappings
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-References: <CA+G9fYuO7vMjsqkyXHZSU-pKEk0L0t9kQTfnd5xopVADyGwprw@mail.gmail.com>
-In-Reply-To: <CA+G9fYuO7vMjsqkyXHZSU-pKEk0L0t9kQTfnd5xopVADyGwprw@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 16 Dec 2019 11:22:04 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
-Message-ID: <CAK8P3a38ZhQcA0Vj-EtNzmH7+iuoOhPrQUzN-avxJn9iU2K5=Q@mail.gmail.com>
-Subject: Re: mainline-5.5.0-rc1: do_mount_root+0x6c/0x10d - kernel crash while
- mounting rootfs
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        lkft-triage@lists.linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:skxAi3myck29pudFFtj7zTCUAssaNOTHAcJszHz89Z8cvZ8g8KM
- 2WJZAaKR7U6VpPJFQ18WMfcUKjqgxSYM+muAwKsh94vvSXeMDR9QkrtVWY3VPB3lYpoPo1W
- oQLclGQqX/YhymFmwK4rVNT/9X6vG6zvqNiFAN4RM2OFkvgA5dM3WZZJ4uHeXBg/S0vOkDp
- Fv6Vvqa3cfZ9WY76gpTng==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:o04HCeEeGtw=:nqN2I7636F+bGurANvbLYF
- gauWg/sMYpQcGbzCdS/VQ/xPDikArki9PXQpoWJzq+S0diOB7vTSh5SSzzFIlU3FWE2If1JXG
- JKUeFHiH1X3qdv3ONxfVA9GQ6qDvxLY3fN7eVjsqtCiRkep30G7CKzuNLSopsNjAp/2SI1UpF
- 0fokUBbY8fEKLTBXTtbVNevYBZYlgcCRhO5xF+VfSsWsG75TkURUSinNLSDFuSdKbTrNvSyPW
- W0Nu5VAGmtkHihwNwdsSoi6ett5mmJ5iNNzRU50npV5DsOnMkGuXo/0yEiH+MVDbl+oQZ6C4Q
- HqDUCnIZXQpLePgsDGbPUAFMzet41A7w/6q4xlPd9qjbgjrK1miLsQ1ethJSgS/BvVsyc98nh
- jrxrpXqnMHjywN/RQNHHXC2+5IWYfgCx1SjAgS4n8PYVDkvhzGyBbpDocQEUmh3HTVppPR9Qy
- pYpH/Wj7oazaJ4yHvBJOFGzuH0PS72t2gJoI4XMd45yZKRsYsJ7bzK9wYCC+ddBs7csMs5h4b
- yYl+0KPGedh2MHkVrU0KkUgrv6pK8iBB8apktQhD3hTSDbM4FBw0gUNdIEaHRyB3N4kXi9gry
- Q5ciO94hOlTs84qWqaTiy1sCYNJBwZJeuL3oT6ZzbnX28kqOTAwZgh3F/07Yd7jd+TsEXvN1p
- 5O723T+TVvB5GlJaRw15jlcp1C2SQk5MW9lWYjhMuhdt1UyOHttyQPhZ9y9kw5GK/oK6EOLA2
- ttpaOOKlE9nKko3BaZQmfcbX7wnK8tpofM4gl7buOSZYB6w2zSeyPF62JNlQawiQ6S77siL8+
- 7LvlVZZjNKtuIz/lVuDuNQEUeGlipU3Pt3YEwIyMrGvo9lnJjXhrT11r/rdiuvHFUKRDCwfgh
- dX7/AWyjsp0FCmsG6pMw==
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 16 Dec 2019 10:31:19 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        <stable@vger.kernel.org>
+In-Reply-To: <20191213111400.GI28840@e113682-lin.lund.arm.com>
+References: <20191211165651.7889-1-maz@kernel.org>
+ <20191211165651.7889-2-maz@kernel.org>
+ <20191213082920.GA28840@e113682-lin.lund.arm.com>
+ <7f86824f4cbd17cd75ef347473e34278@www.loen.fr>
+ <20191213111400.GI28840@e113682-lin.lund.arm.com>
+Message-ID: <4889a4894f13c67f7e48466afb0763f6@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: christoffer.dall@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 10:15 AM Naresh Kamboju
-<naresh.kamboju@linaro.org> wrote:
+On 2019-12-13 11:14, Christoffer Dall wrote:
+> On Fri, Dec 13, 2019 at 09:28:59AM +0000, Marc Zyngier wrote:
+>> Hi Christoffer,
+>>
+>> On 2019-12-13 08:29, Christoffer Dall wrote:
+>> > Hi Marc,
+>> >
+>> > On Wed, Dec 11, 2019 at 04:56:48PM +0000, Marc Zyngier wrote:
+>> > > A device mapping is normally always mapped at Stage-2, since 
+>> there
+>> > > is very little gain in having it faulted in.
+>> >
+>> > It is actually becoming less clear to me what the real benefits of
+>> > pre-populating the stage 2 page table are, especially given that 
+>> we can
+>> > provoke a situation where they're faulted in anyhow.  Do you 
+>> recall if
+>> > we had any specific case that motivated us to pre-fault in the 
+>> pages?
+>>
+>> It's only a minor performance optimization that was introduced by 
+>> Ard in
+>> 8eef91239e57d. Which makes sense for platform devices that have a 
+>> single
+>> fixed location in memory. It makes slightly less sense for PCI, 
+>> where
+>> you can move things around.
 >
-> The following kernel crash reported on qemu_x86_64 boot running
-> 5.5.0-rc1 mainline kernel.
-
-I looked for too long at v5.5-rc1 completely puzzled by how you got to this
-object code before realizing that this is a git snapshot between -rc1 and -rc2.
-
-The code in question was changed by a recent series from Dominik Brodowski,
-the main difference being commit cccaa5e33525 ("init: use do_mount() instead
-of ksys_mount()").
-
-It looks like the NULL-check in ksys_mount()/copy_mount_options() is missing
-from the new mount_block_root, so it passes a NULL pointer into strncpy().
-
-Something like this should fix it (not tested):
-
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index f55cbd9cb818..be6c8dae6ec0 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -392,16 +392,20 @@ static int __init do_mount_root(const char
-*name, const char *fs,
- {
-        struct super_block *s;
-        char *data_page;
--       struct page *p;
-+       struct page *p = NULL;
-        int ret;
-
--       /* do_mount() requires a full page as fifth argument */
--       p = alloc_page(GFP_KERNEL);
--       if (!p)
--               return -ENOMEM;
-+       if (data) {
-+               /* do_mount() requires a full page as fifth argument */
-+               p = alloc_page(GFP_KERNEL);
-+               if (!p)
-+                       return -ENOMEM;
-
--       data_page = page_address(p);
--       strncpy(data_page, data, PAGE_SIZE - 1);
-+               data_page = page_address(p);
-+               strncpy(data_page, data, PAGE_SIZE - 1);
-+       } else {
-+               data_page = NULL;
-+       }
-
-        ret = do_mount(name, "/root", fs, flags, data_page);
-        if (ret)
-@@ -417,7 +421,9 @@ static int __init do_mount_root(const char *name,
-const char *fs,
-               MAJOR(ROOT_DEV), MINOR(ROOT_DEV));
-
- out:
--       put_page(p);
-+       if (p)
-+               put_page(p);
-+
-        return ret;
- }
-
-> Regressions detected on arm64, arm, qemu_x86_64, and qemu_i386.
-> Where as x86_64 and i386 boot pass on devices.
+> User space could still decide to move things around in its VA map 
+> even
+> if the device is fixed.
 >
-> qemu_x86_64 kernel crash log,
-> -------------------------------------------
-> [    1.680229] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [    1.681148] #PF: supervisor read access in kernel mode
-> [    1.681150] #PF: error_code(0x0000) - not-present page
-> [    1.681150] PGD 0 P4D 0
-> [    1.681150] Oops: 0000 [#1] SMP NOPTI
-> [    1.681150] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.5.0-rc1 #1
-> [    1.681150] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS 1.12.0-1 04/01/2014
-> [    1.681150] RIP: 0010:strncpy+0x12/0x30
-> [    1.681150] Code: 89 e5 48 83 c6 01 0f b6 4e ff 48 83 c2 01 84 c9
-> 88 4a ff 75 ed 5d c3 90 55 48 85 d2 48 89 f8 48 89 e5 74 1e 48 01 fa
-> 48 89 f9 <44> 0f b6 06 41 80 f8 01 44 88 01 48 83 de ff 48 83 c1 01 48
-> 39 d1
-> [    1.681150] RSP: 0018:ffffacea40013e00 EFLAGS: 00010286
-> [    1.681150] RAX: ffff9eff78f4f000 RBX: ffffd91104e3d3c0 RCX: ffff9eff78f4f000
-> [    1.681150] RDX: ffff9eff78f4ffff RSI: 0000000000000000 RDI: ffff9eff78f4f000
-> [    1.681150] RBP: ffffacea40013e00 R08: ffff9eff78f4f000 R09: 0000000000000000
-> [    1.681150] R10: ffffd91104e3d3c0 R11: 0000000000000000 R12: 0000000000008001
-> [    1.681150] R13: 00000000fffffff4 R14: ffffffffa5d9aa89 R15: ffff9eff78f4e000
-> [    1.681150] FS:  0000000000000000(0000) GS:ffff9eff7bc00000(0000)
-> knlGS:0000000000000000
-> [    1.681150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.681150] CR2: 0000000000000000 CR3: 0000000113010000 CR4: 00000000003406f0
-> [    1.681150] Call Trace:
-> [    1.681150]  do_mount_root+0x6c/0x10d
-> [    1.681150]  mount_block_root+0x103/0x226
-> [    1.681150]  ? do_mknodat+0x16e/0x200
-> [    1.681150]  ? set_debug_rodata+0x17/0x17
-> [    1.681150]  mount_root+0x114/0x133
-> [    1.681150]  prepare_namespace+0x139/0x16a
-> [    1.681150]  kernel_init_freeable+0x21b/0x22f
-> [    1.681150]  ? rest_init+0x250/0x250
-> [    1.681150]  kernel_init+0xe/0x110
-> [    1.681150]  ret_from_fork+0x27/0x50
-> [    1.681150] Modules linked in:
-> [    1.681150] CR2: 0000000000000000
-> [    1.681150] ---[ end trace d7ad8453a7546454 ]---
-> [    1.681150] RIP: 0010:strncpy+0x12/0x30
-> [    1.681150] Code: 89 e5 48 83 c6 01 0f b6 4e ff 48 83 c2 01 84 c9
-> 88 4a ff 75 ed 5d c3 90 55 48 85 d2 48 89 f8 48 89 e5 74 1e 48 01 fa
-> 48 89 f9 <44> 0f b6 06 41 80 f8 01 44 88 01 48 83 de ff 48 83 c1 01 48
-> 39 d1
-> [    1.681150] RSP: 0018:ffffacea40013e00 EFLAGS: 00010286
-> [    1.681150] RAX: ffff9eff78f4f000 RBX: ffffd91104e3d3c0 RCX: ffff9eff78f4f000
-> [    1.681150] RDX: ffff9eff78f4ffff RSI: 0000000000000000 RDI: ffff9eff78f4f000
-> [    1.681150] RBP: ffffacea40013e00 R08: ffff9eff78f4f000 R09: 0000000000000000
-> [    1.681150] R10: ffffd91104e3d3c0 R11: 0000000000000000 R12: 0000000000008001
-> [    1.681150] R13: 00000000fffffff4 R14: ffffffffa5d9aa89 R15: ffff9eff78f4e000
-> [    1.681150] FS:  0000000000000000(0000) GS:ffff9eff7bc00000(0000)
-> knlGS:0000000000000000
-> [    1.681150] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.681150] CR2: 0000000000000000 CR3: 0000000113010000 CR4: 00000000003406f0
-> [    1.681150] BUG: sleeping function called from invalid context at
-> /usr/src/kernel/include/linux/percpu-rwsem.h:38
-> [    1.681150] in_atomic(): 0, irqs_disabled(): 1, non_block: 0, pid:
-> 1, name: swapper/0
-> [    1.681150] INFO: lockdep is turned off.
-> [    1.681150] irq event stamp: 2360074
-> [    1.681150] hardirqs last  enabled at (2360073):
-> [<ffffffffa48f4c8c>] get_page_from_freelist+0x21c/0x1430
-> [    1.681150] hardirqs last disabled at (2360074):
-> [<ffffffffa4601eab>] trace_hardirqs_off_thunk+0x1a/0x1c
-> [    1.681150] softirqs last  enabled at (2359990):
-> [<ffffffffa5800338>] __do_softirq+0x338/0x43a
-> [    1.681150] softirqs last disabled at (2359975):
-> [<ffffffffa4701828>] irq_exit+0xb8/0xc0
-> [    1.681150] CPU: 0 PID: 1 Comm: swapper/0 Tainted: G      D
->   5.5.0-rc1 #1
-> [    1.681150] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS 1.12.0-1 04/01/2014
-> [    1.681150] Call Trace:
-> [    1.681150]  dump_stack+0x7a/0xa5
-> [    1.681150]  ___might_sleep+0x163/0x250
-> [    1.681150]  __might_sleep+0x4a/0x80
-> [    1.681150]  exit_signals+0x33/0x2d0
-> [    1.681150]  do_exit+0xb6/0xcd0
-> [    1.681150]  ? prepare_namespace+0x139/0x16a
-> [    1.681150]  ? kernel_init_freeable+0x21b/0x22f
-> [    1.681150]  ? rest_init+0x250/0x250
-> [    1.681150]  rewind_stack_do_exit+0x17/0x20
-> [    1.736632] Kernel panic - not syncing: Attempted to kill init!
-> exitcode=0x00000009
-> [    1.737579] Kernel Offset: 0x23600000 from 0xffffffff81000000
-> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> Anyway, I was thinking more if there was some sort of device, like a
+> frambuffer, which for example crosses page boundaries and where it 
+> would
+> be visible to the user that there's a sudden performance drop while
+> operating the device over page boundaries.  Anything like that?
 >
-> Full log,
-> qemu_x86_64,
-> https://lkft.validation.linaro.org/scheduler/job/1054430#L573
-> qemu_i386:
-> https://lkft.validation.linaro.org/scheduler/job/1054335#L571
+>>
+>> > > Nonetheless, it is possible to end-up in a situation where the
+>> > > device
+>> > > mapping has been removed from Stage-2 (userspace munmaped the 
+>> VFIO
+>> > > region, and the MMU notifier did its job), but present in a
+>> > > userspace
+>> > > mapping (userpace has mapped it back at the same address). In 
+>> such
+>> > > a situation, the device mapping will be demand-paged as the 
+>> guest
+>> > > performs memory accesses.
+>> > >
+>> > > This requires to be careful when dealing with mapping size, 
+>> cache
+>> > > management, and to handle potential execution of a device 
+>> mapping.
+>> > >
+>> > > Cc: stable@vger.kernel.org
+>> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> > > ---
+>> > >  virt/kvm/arm/mmu.c | 21 +++++++++++++++++----
+>> > >  1 file changed, 17 insertions(+), 4 deletions(-)
+>> > >
+>> > > diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+>> > > index a48994af70b8..0b32a904a1bb 100644
+>> > > --- a/virt/kvm/arm/mmu.c
+>> > > +++ b/virt/kvm/arm/mmu.c
+>> > > @@ -38,6 +38,11 @@ static unsigned long io_map_base;
+>> > >  #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+>> > >  #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
+>> > >
+>> > > +static bool is_iomap(unsigned long flags)
+>> > > +{
+>> > > +	return flags & KVM_S2PTE_FLAG_IS_IOMAP;
+>> > > +}
+>> > > +
+>> >
+>> > nit: I'm not really sure this indirection makes the code more 
+>> readable,
+>> > but I guess that's a matter of taste.
+>> >
+>> > >  static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>> > >  {
+>> > >  	return memslot->dirty_bitmap && !(memslot->flags &
+>> > > KVM_MEM_READONLY);
+>> > > @@ -1698,6 +1703,7 @@ static int user_mem_abort(struct kvm_vcpu
+>> > > *vcpu, phys_addr_t fault_ipa,
+>> > >
+>> > >  	vma_pagesize = vma_kernel_pagesize(vma);
+>> > >  	if (logging_active ||
+>> > > +	    (vma->vm_flags & VM_PFNMAP) ||
+>> >
+>> > WHat is actually the rationale for this?
+>> >
+>> > Why is a huge mapping not permitted to device memory?
+>> >
+>> > Are we guaranteed that VM_PFNMAP on the vma results in device 
+>> mappings?
+>> > I'm not convinced this is the case, and it would be better if we 
+>> can
+>> > stick to a single primitive (either kvm_is_device_pfn, or 
+>> VM_PFNMAP) to
+>> > detect device mappings.
+>>
+>> For now, I've tried to keep the two paths that deal with mapping 
+>> devices
+>> (or rather, things that we interpret as devices) as close as 
+>> possible.
+>> If we drop the "eager" mapping, then we're at liberty to restructure
+>> this in creative ways.
+>>
+>> This includes potential huge mappings, but I'm not sure the rest of 
+>> the
+>> kernel uses them for devices anyway (I need to find out).
+>>
+>> > As a subsequent patch, I'd like to make sure that at the very 
+>> least our
+>> > memslot prepare function follows the exact same logic for mapping 
+>> device
+>> > memory as a fault-in approach does, or that we simply always fault 
+>> pages
+>> > in.
+>>
+>> As far as I can see, the two approach are now identical. Am I 
+>> missing
+>> something?
+>> And yes, getting rid of the eager mapping works for me.
+>>
 >
-> metadata:
->   git branch: master
->   git repo: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->   git commit: 9603e22104439ddfa6a077f1a0e5d8c662beec6c
->   git describe: v5.5-rc1-308-g9603e2210443
->   make_kernelversion: 5.5.0-rc1
->   kernel-config:
-> http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-mainline/2325/config
->   build-url: https://ci.linaro.org/job/openembedded-lkft-linux-mainline/DISTRO=lkft,MACHINE=intel-corei7-64,label=docker-lkft/2325/
->   build-location:
-> http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-mainline/2325
+> As far as I can tell, our user_mem_abort() uses gfn_to_pfn_prot() 
+> which
+> goes doesn a long trail which ends up at hva_to_pfn_remapped(), which
+> might result in doing the same offset calculation that we do in
+> kvm_arch_prepare_memory_region(), but it also considers other 
+> scenarios.
 >
-> --
-> Linaro LKFT
-> https://lkft.linaro.org
+> Even if we analyze all that and convince oursleves it's always all 
+> the
+> same on arm64, the two code paths could change, leading to really 
+> hard
+> to debug differing behavior, and nobody will actively keep the two 
+> paths
+> in sync.  I'd be fine with keeping the performance optimization if we
+> have good grounds for that though, and using the same translation
+> mechanism for VM_PFNMAP as user_mem_abort.
+>
+> Am I missing something?
+
+I'm not disputing any of the above. I'm only trying to keep this patch
+minimal so that we can easily backport it (although it is arguable that
+deleting code isn't that big a deal).
+
+[...]
+
+>> > I can't seem to decide for myself if I think there's a sematic
+>> > difference between trying to execute from somewhere the VMM has
+>> > explicitly told us is device memory and from somewhere which we 
+>> happen
+>> > to have mapped with VM_PFNMAP from user space.  But I also can't 
+>> seem to
+>> > really fault it (pun intended).  Thoughts?
+>>
+>> The issue is that the VMM never really tells us whether something is 
+>> a
+>> device mapping or not (the only exception being the GICv2 cpuif). 
+>> Even
+>> with PFNMAP, we guess it (it could well be memory that lives outside
+>> of the linear mapping). I don't see a way to lift this ambiguity.
+>>
+>> Ideally, faulting on executing a non-mapping should be offloaded to
+>> userspace for emulation, in line with your patches that offload
+>> non-emulated data accesses. That'd be a new ABI, and I can't imagine
+>> anyone willing to deal with it.
+>
+> So what I was asking was if it makes sense to report the Prefetch 
+> Abort
+> in the case where the VMM has already told us that it doesn't want to
+> register anything backing the IPA (no memslot), and instead return an
+> error to user space, so that it can make a decision (for example 
+> inject
+> an external abort, which may have been the right thing to do in the
+> former case as well, but that could be considered ABI now, so let's 
+> not
+> kick that hornet's nest).
+>
+> In any case, no strong feelings here, I just have a vague feeling 
+> that
+> injecting more prefetch aborts on execute-from-some-device is not
+> necessarily the right thing to do.
+
+The ARMv8 ARM has the following stuff in B2.7.2 (Device Memory):
+
+<quote>
+Hardware does not prevent speculative instruction fetches from a memory 
+location with any of the Device
+memory attributes unless the memory location is also marked as 
+Execute-never for all Exception levels.
+
+Note
+
+This means that to prevent speculative instruction fetches from memory 
+locations with Device memory
+attributes, any location that is assigned any Device memory type must 
+also be marked as Execute-never for
+all Exception levels. Failure to mark a memory location with any Device 
+memory attribute as Execute-never
+for all Exception levels is a programming error.
+</quote>
+
+and
+
+<quote>
+For instruction fetches, if branches cause the program counter to point 
+to an area of memory with the Device
+attribute which is not marked as Execute-never for the current 
+Exception level, an implementation can either:
+
+- Treat the instruction fetch as if it were to a memory location with 
+the Normal Non-cacheable attribute.
+
+- Take a Permission fault.
+</quote>
+
+My reading here is that a prefetch abort is the right thing to do.
+What we don't do correctly is that we qualify it as an external abort
+instead of a permission fault (which is annoying as it requires us
+to find out about the S1 translation level).
+
+Happy to revisit this once we get a S1 PTW.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
