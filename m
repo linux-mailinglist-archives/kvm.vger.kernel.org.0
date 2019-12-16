@@ -2,121 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C7C8120A07
-	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 16:47:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0C1B120A10
+	for <lists+kvm@lfdr.de>; Mon, 16 Dec 2019 16:48:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728408AbfLPPrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 10:47:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53957 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728328AbfLPPrr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 16 Dec 2019 10:47:47 -0500
+        id S1728590AbfLPPsm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 10:48:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43646 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728421AbfLPPsl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 10:48:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576511266;
+        s=mimecast20190719; t=1576511321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RgWQhpsAIADMZAP/1x3HqNJ9NVK8air/mo1dw8k/m4w=;
-        b=KP8P9neQEi/etdg9XiABiSrbkHbNwpX6R74F+WffydS1P/hI1y3Q3Vwm9BaReN2hM2wjXk
-        T8zsFe8AYYcY4ukTRF+JTTohguoO9+CNNSJCKAeyQPEqiz+5iRxXYaCFI+qnyP7zCu8WB7
-        XDGmdQbGdd7ooRhnQUBtshs6oO+Iiy8=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-1BezqNWlP-eIpya79w9K6g-1; Mon, 16 Dec 2019 10:47:44 -0500
-X-MC-Unique: 1BezqNWlP-eIpya79w9K6g-1
-Received: by mail-qv1-f70.google.com with SMTP id p3so5526648qvt.9
-        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 07:47:44 -0800 (PST)
+        bh=NK24jcfG9UBuY8rN//ofB2n49byardjTFM1RJjyjWnM=;
+        b=iafF5h0bdQQH3rx3VZL5EU6/YOBWx61aG85Z32pgkJ93q/SVveI4kdUXDvEAS98CPubS5x
+        vp+bCgsjFVkDWs9tQ+SmAQpSC4BU5LW6DLrFHRhCV1x0GJkz3w5oGLVaADnziqU4/CGz7P
+        Jso3nIhBlVHM0uBGScvQWWHtmM+QX8E=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-rjjdNHtWN5Cl-s8hl6h9vA-1; Mon, 16 Dec 2019 10:48:39 -0500
+X-MC-Unique: rjjdNHtWN5Cl-s8hl6h9vA-1
+Received: by mail-wr1-f70.google.com with SMTP id l20so3931545wrc.13
+        for <kvm@vger.kernel.org>; Mon, 16 Dec 2019 07:48:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RgWQhpsAIADMZAP/1x3HqNJ9NVK8air/mo1dw8k/m4w=;
-        b=AoUPC7vCJwS8YxbiWjcXLchcnrc9+lSWWp4PEbXznUhjRPBmj3kykZN2RL/ErDjzyP
-         ELeutOmBx1vZG6iUsI2oTiBnsGj3Z9NjrxkxkBowgHP/TFdbDnOlweKOvZJs6ZE9qDwm
-         BAQ6kIZdLgDY8vIkENVqxltAmq02GevRt9WNJDpbWMeYssBJWyu7hJPl56KhOHdCVYTb
-         qZtD8+nGpK0NV5N6SFlKdPB9pcpBFLAUZ+z9E+x8hHpcGc1O8A4+dRp9tbpr35MhB4NB
-         KjT0ZSU1qHT2U1QIh3VCVReq5slLDpXVkmHypOO7sXTxeLtzmW2efY2jOMM4Juil099f
-         kXdg==
-X-Gm-Message-State: APjAAAXrmR6dWCF2FhVj7X4Q8bSBtbcDjOpfx4yRcrNDUN43c/ArbdQ+
-        pTuRtFma3IW/iOKelDpAxFPOrwb5zz3Bst6LLJBA0agMQ9QXYXwqcy7+cg17D95xkqU7m5D6icG
-        wFHFUqNykKwAZ
-X-Received: by 2002:a05:6214:108a:: with SMTP id o10mr26486290qvr.246.1576511264400;
-        Mon, 16 Dec 2019 07:47:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx1PDmhMHZHSnB6wuEZN9qkZjX10yPTV1uCaDq6nRhK2p6zGEl4P7bhy8kKpOy1w0Z1WWcikg==
-X-Received: by 2002:a05:6214:108a:: with SMTP id o10mr26486280qvr.246.1576511264193;
-        Mon, 16 Dec 2019 07:47:44 -0800 (PST)
-Received: from xz-x1 ([104.156.64.75])
-        by smtp.gmail.com with ESMTPSA id b7sm6059467qkh.106.2019.12.16.07.47.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2019 07:47:42 -0800 (PST)
-Date:   Mon, 16 Dec 2019 10:47:42 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191216154742.GF83861@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <20191211063830-mutt-send-email-mst@kernel.org>
- <20191211205952.GA5091@xz-x1>
- <20191211172713-mutt-send-email-mst@kernel.org>
- <46ceb88c-0ddd-0d9a-7128-3aa5a7d9d233@redhat.com>
- <20191215173302.GB83861@xz-x1>
- <20191216044619-mutt-send-email-mst@kernel.org>
- <20191216150754.GC83861@xz-x1>
- <20191216103251-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NK24jcfG9UBuY8rN//ofB2n49byardjTFM1RJjyjWnM=;
+        b=DWTRN/SjVmPlhffQOHThasfnZfs1EQPEM6EdwnXXKfsDArqQF3VtEQ7nRY0ToMd+81
+         +gYnaAcJRXSpoFFjb5lE+XywMcnnMjgnZmI4aPkwwTm5O5kcY1Wy95A5s3qoGMEFhaN/
+         HVlr23GR0QYUr2rN3hHRmZrkTHA05BMQqprGZq3otMruf45esXpd4CJtsihDz6Okr2u1
+         qgNyfDXKuFN5TOjwZCXJBlKLDunWx4g6Pdam/uIy9uaVnCpXdkESgHmDldmCXEyhI0I8
+         x29aKJKFfAuhISbisP0tcP+I89PGXcR6JAtUMZVRR4FnIm85B8xWj5gM15FocwbjG0mS
+         sepA==
+X-Gm-Message-State: APjAAAX2udOmm2Qd/g8M0L383FdelVw7qPZA7VhGZCsqTKVxYJ9ImFYi
+        zNIT0bNX4+Y6i+ctv/C/N20aen2UnHQjhvOve4eLFwtKhPamWfE/bIOnSMgFaQGPF0Z0/MT+8d7
+        ONIn9s8+nE3yB
+X-Received: by 2002:a05:600c:1003:: with SMTP id c3mr30651555wmc.120.1576511317838;
+        Mon, 16 Dec 2019 07:48:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw91mpCMXRzNUnMlilO04dgXju+Jt835qTjzpZhengzNi+a5MHx1NtPbwEpwmIXe3771MmoCQ==
+X-Received: by 2002:a05:600c:1003:: with SMTP id c3mr30651518wmc.120.1576511317615;
+        Mon, 16 Dec 2019 07:48:37 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net. [83.42.66.34])
+        by smtp.gmail.com with ESMTPSA id 4sm21037599wmg.22.2019.12.16.07.48.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Dec 2019 07:48:36 -0800 (PST)
+Subject: Re: [PATCH 12/12] hw/i386/pc: Move PC-machine specific declarations
+ to 'pc_internal.h'
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Paul Durrant <paul@xen.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, Stefano Stabellini <sstabellini@kernel.org>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-block@nongnu.org, Richard Henderson <rth@twiddle.net>,
+        xen-devel@lists.xenproject.org, Sergio Lopez <slp@redhat.com>
+References: <20191213161753.8051-1-philmd@redhat.com>
+ <20191213161753.8051-13-philmd@redhat.com>
+ <d9792ff4-bada-fbb9-301d-aeb19826235c@redhat.com>
+ <20191215045812-mutt-send-email-mst@kernel.org>
+ <0d15c735-73b4-7875-ec0f-8c181508f0d4@redhat.com>
+ <90d54a3b-ae96-43ac-0f8e-268c1257f7d0@redhat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <76162c3a-1b66-dd49-901e-7435efc21873@redhat.com>
+Date:   Mon, 16 Dec 2019 16:48:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191216103251-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <90d54a3b-ae96-43ac-0f8e-268c1257f7d0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 10:33:42AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 16, 2019 at 10:07:54AM -0500, Peter Xu wrote:
-> > On Mon, Dec 16, 2019 at 04:47:36AM -0500, Michael S. Tsirkin wrote:
-> > > On Sun, Dec 15, 2019 at 12:33:02PM -0500, Peter Xu wrote:
-> > > > On Thu, Dec 12, 2019 at 01:08:14AM +0100, Paolo Bonzini wrote:
-> > > > > >>> What depends on what here? Looks suspicious ...
-> > > > > >>
-> > > > > >> Hmm, I think maybe it can be removed because the entry pointer
-> > > > > >> reference below should be an ordering constraint already?
-> > > > > 
-> > > > > entry->xxx depends on ring->reset_index.
-> > > > 
-> > > > Yes that's true, but...
-> > > > 
-> > > >         entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
-> > > >         /* barrier? */
-> > > >         next_slot = READ_ONCE(entry->slot);
-> > > >         next_offset = READ_ONCE(entry->offset);
-> > > > 
-> > > > ... I think entry->xxx depends on entry first, then entry depends on
-> > > > reset_index.  So it seems fine because all things have a dependency?
-> > > 
-> > > Is reset_index changed from another thread then?
-> > > If yes then you want to read reset_index with READ_ONCE.
-> > > That includes a dependency barrier.
-> > 
-> > There're a few readers, but only this function will change it
-> > (kvm_dirty_ring_reset).  Thanks,
+
+
+On 12/16/19 4:41 PM, Paolo Bonzini wrote:
+> On 16/12/19 16:37, Philippe Mathieu-Daudé wrote:
+>> On 12/15/19 10:58 AM, Michael S. Tsirkin wrote:
+>>> On Fri, Dec 13, 2019 at 05:47:28PM +0100, Philippe Mathieu-Daudé wrote:
+>>>> On 12/13/19 5:17 PM, Philippe Mathieu-Daudé wrote:
+>>>>> Historically, QEMU started with only one X86 machine: the PC.
+>>>>> The 'hw/i386/pc.h' header was used to store all X86 and PC
+>>>>> declarations. Since we have now multiple machines based on the
+>>>>> X86 architecture, move the PC-specific declarations in a new
+>>>>> header.
+>>>>> We use 'internal' in the name to explicit this header is restricted
+>>>>> to the X86 architecture. Other architecture can not access it.
+>>>>>
+>>>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>>>> ---
+>>>>> Maybe name it 'pc_machine.h'?
+>>>>
+>>>> I forgot to describe here (and in the cover), what's follow after this
+>>>> patch.
+>>>>
+>>>> Patch #13 moves PCMachineClass to
+>>>>
+>>>> If you ignore PCMachineState, "hw/i386/pc.h" now only contains 76
+>>>> lines, and
+>>>> it is easier to see what is PC machine specific, what is X86
+>>>> specific, and
+>>>> what is device generic (not X86 related at all):
+>>>>
+>>>> - GSI is common to X86 (Paolo sent [3], [6])
+>>>> - IOAPIC is common to X86
+>>>> - i8259 is multiarch (Paolo [2])
+>>>> - PCI_HOST definitions and pc_pci_hole64_start() are X86
+>>>> - pc_machine_is_smm_enabled() is X86 (Paolo sent [5])
+>>>> - hpet
+>>>> - tsc (Paolo sent [3])
+>>>> - 3 more functions
+>>>>
+>>>> So we can move half of this file to "pc_internal.h" and the other to
+>>>>
+>>>> One problem is the Q35 MCH north bridge which directly sets the PCI
+>>>> PCMachineState->bus in q35_host_realize(). This seems a QOM violation
+>>>> and is
+>>>> probably easily fixable.
+>>>>
+>>>> Maybe I can apply Paolo's patches instead of this #12, move X86-generic
+>>>> declarations to "hw/i386/x86.h", and directly git-move what's left of
+>>>> "hw/i386/pc.h" to "pc_internal.h".
+>>>
+>>> Yea that sounds a bit better.
+>>
+>> OK, I'll wait for Paolo's next pull get in, then continue based on that,
+>> including Paolo's "x86: allow building without PC machine types" series.
+>>
+>> (Thanks Paolo for picking most of this series!)
 > 
-> Then you don't need any barriers in this function.
-> readers need at least READ_ONCE.
+> FWIW I don't think kvm_i8259_init should be in sysemu/kvm.h, since it's
+> x86-specific and that would be something like the same mistake already
+> done with hw/i386/pc.h.
 
-In our case even an old reset_index should not matter much here imho
-because the worst case is we read an old reset so we stop pushing to a
-ring when it's just being reset and at the same time it's soft-full
-(so an extra user exit even race happened).  But I agree it's clearer
-to READ_ONCE() on readers.  Thanks!
-
--- 
-Peter Xu
+Hmm OK.
+So to follow your reasoning, 
+kvm_pc_gsi_handler/kvm_pc_setup_irq_routing() are x86-specific and could 
+be moved out.
+I'll figure that out when I rework the last patches.
 
