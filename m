@@ -2,73 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 757431233F6
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 18:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B5F751234BF
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 19:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727590AbfLQRzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 12:55:09 -0500
-Received: from mga14.intel.com ([192.55.52.115]:47079 "EHLO mga14.intel.com"
+        id S1727843AbfLQSYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 13:24:47 -0500
+Received: from mga12.intel.com ([192.55.52.136]:58527 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726722AbfLQRzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Dec 2019 12:55:09 -0500
-X-Amp-Result: UNSCANNABLE
+        id S1726813AbfLQSYr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 13:24:47 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 09:55:08 -0800
-X-ExtLoop1: 1
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 10:24:46 -0800
 X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; 
-   d="scan'208";a="227576274"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by orsmga002.jf.intel.com with ESMTP; 17 Dec 2019 09:55:08 -0800
-Date:   Tue, 17 Dec 2019 09:55:08 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v3 00/15] KVM: Dynamically size memslot arrays
-Message-ID: <20191217175507.GA8052@linux.intel.com>
-References: <20191024230744.14543-1-sean.j.christopherson@intel.com>
- <20191203221433.GK19877@linux.intel.com>
- <20191213200151.GF31552@linux.intel.com>
- <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
+   d="scan'208";a="209789792"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 10:24:46 -0800
+Message-ID: <1a6e4646f570bf193924e099557841eb6e77a80d.camel@linux.intel.com>
+Subject: Re: [PATCH v15 3/7] mm: Add function __putback_isolated_page
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Tue, 17 Dec 2019 10:24:46 -0800
+In-Reply-To: <1fc997cf-b1f3-3fe6-b699-efb9ef7f17cf@redhat.com>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+         <20191205162230.19548.70198.stgit@localhost.localdomain>
+         <cb49bbc7-b0c0-65cc-1d9d-a3aaef075650@redhat.com>
+         <9eb9173278370dd604c4cefd30ed10be36600854.camel@linux.intel.com>
+         <8a4b0337-0bad-2978-32e8-6f90c7365f00@redhat.com>
+         <753e2991e3e632b9c179c45197bfb05669625e9a.camel@linux.intel.com>
+         <1fc997cf-b1f3-3fe6-b699-efb9ef7f17cf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca928a38-4bc0-88cd-dc70-62aec8695c77@de.ibm.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 09:25:24AM +0100, Christian Borntraeger wrote:
+On Tue, 2019-12-17 at 18:24 +0100, David Hildenbrand wrote:
+>  >>> Also there are some scenarios where __page_to_pfn is not that simple a
+> > > > call with us having to get the node ID so we can find the pgdat structure
+> > > > to perform the calculation. I'm not sure the compiler would be ble to
+> > > > figure out that the result is the same for both calls, so it is better to
+> > > > make it explicit.
+> > > 
+> > > Only in case of CONFIG_SPARSEMEM we have to go via the section - but I
+> > > doubt this is really worth optimizing here.
+> > > 
+> > > But yeah, I'm fine with this change, only "IMHO
+> > > get_pageblock_migratetype() would be nicer" :)
+> > 
+> > Aren't most distros running with CONFIG_SPARSEMEM enabled? If that is the
+> > case why not optimize for it?
 > 
-> On 13.12.19 21:01, Sean Christopherson wrote:
-> > Applies cleanly on the current kvm/queue and nothing caught fire in
-> > testing (though I only re-tested the series as a whole).
+> Because I tend to dislike micro-optimizations without performance
+> numbers for code that is not on a hot path. But I mean in this case, as
+> you said, you need the pfn either way, so it's completely fine with.
 > 
-> Do you have the latest version somewhere on a branch? The version on the
-> list no longer applies cleanly.
+> I do wonder, however, if you should just pass in the migratetype from
+> the caller. That would be even faster ;)
 
-Ah, I only tested with my sparse x86-only tree.  The result with three-way
-merging, i.e. 'git am -3', looks correct at a glance.
+The problem is page isolation. We can end up with a page being moved to an
+isolate pageblock while we aren't holding the zone lock, and as such we
+likely need to test it again anyway. So there isn't value in storing and
+reusing the value for cases like page reporting.
 
-Regardless, I need to spin a new version to handle a conflict with an
-unrelated in-flight memslots bug fix, I'll get that sent out today.
+In addition, the act of isolating the page can cause the migratetype to
+change as __isolate_free_page will attempt to change the migratetype to
+movable if it is one of the standard percpu types and we are pulling at
+least half a pageblock out. So storing the value before we isolate it
+would be problematic as well.
+
+Undoing page isolation is the exception to the issues pointed out above,
+but in that case we are overwriting the pageblock migratetype anyway so
+the cache lines involved should all be warm from having just set the
+value.
+
