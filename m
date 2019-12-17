@@ -2,121 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E33F122B43
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 13:19:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E559122DA4
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 14:56:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbfLQMTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 07:19:12 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51204 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726164AbfLQMTM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Dec 2019 07:19:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576585150;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dqg01LKWcSSGVHIQsUHqk7EvSOdnDyxLHyBMZ00zNzI=;
-        b=WkaUI7LW13p0lEcYyEw3KI0XVKySCHobANJgCH3dwOGJ/CnCDPvPIGBMOlX1QWUFM4D7vX
-        9rf/5B6kVmiEnVwGBoUF1+Om6vCsJn0qZhJ+1vDY6EKRfZz5w/TBxZWgVbSMl5xrUFA4MO
-        lgRiAxsGMt7ZlGYbrUOxkdWl92u9Y88=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-aNMEuxFmPYedqg4ap2qH3Q-1; Tue, 17 Dec 2019 07:19:08 -0500
-X-MC-Unique: aNMEuxFmPYedqg4ap2qH3Q-1
-Received: by mail-wr1-f71.google.com with SMTP id u12so3584388wrt.15
-        for <kvm@vger.kernel.org>; Tue, 17 Dec 2019 04:19:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Dqg01LKWcSSGVHIQsUHqk7EvSOdnDyxLHyBMZ00zNzI=;
-        b=rbpKesrcmn3S4Id/k2+0tb0A1VNqHjkus1KkOlhu1/zE5TMzLxkxkrEvZx4vcoseBn
-         ptVTIh6gSMGFtdasBR5Lo/EpbDpvc23MEbcFFz0AgEGtlJf+IGhGHHGUPYJcpqg8AgCQ
-         yrLH2OUHH94EaaP8Y25VokjrptjRU7BkpAy/VpPe0fF9ZTaK+hu0pe90E1uj8yoKTlh2
-         of2Yzm652Q8TzFMpjqxZlUZ9DMkNJwe3XPs5ysb4zVOXBWMEvru9g+NvWdM37j2185oP
-         n+T19Yr2NtG0kqtMScSI53facIss5LEgy/U2NZAxCLYsIMKrTIs8Ii9EOW+551qxMBEw
-         lmKQ==
-X-Gm-Message-State: APjAAAX50eaQY4EAsgX4RwlTQTlrjxHnHydz/NGshWxfx7GygzFOrUID
-        2F91L0W1WJ/u/TGe8+H3kV+prYu993fZ42EWMkNXGdct4KYce78dae7QD2hpmCatmOWqEWxxnWH
-        NTfquIR6Wmdtn
-X-Received: by 2002:adf:fa0b:: with SMTP id m11mr36185371wrr.98.1576585147125;
-        Tue, 17 Dec 2019 04:19:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwaiitjL7kRxtCYWSVVnB8Pj3l3qeQjc4n4PlSKBP2tfw9KS5qKi2jIS35RGTD+4QTB8cSseg==
-X-Received: by 2002:adf:fa0b:: with SMTP id m11mr36185356wrr.98.1576585146887;
-        Tue, 17 Dec 2019 04:19:06 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:503f:4ffc:fc4a:f29a? ([2001:b07:6468:f312:503f:4ffc:fc4a:f29a])
-        by smtp.gmail.com with ESMTPSA id o6sm2949280wmb.4.2019.12.17.04.19.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Dec 2019 04:19:06 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-To:     Christophe de Dinechin <dinechin@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Christophe de Dinechin <christophe.de.dinechin@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com> <m1lfrihj2n.fsf@dinechin.org>
- <20191213202324.GI16429@xz-x1>
- <bc15650b-df59-f508-1090-21dafc6e8ad1@redhat.com>
- <E167A793-B42A-422D-8D46-B992CB6EBE69@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d59ac0eb-e65a-a46f-886e-6df80a2b142f@redhat.com>
-Date:   Tue, 17 Dec 2019 13:19:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        id S1728679AbfLQN4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 08:56:35 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:8136 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728573AbfLQN4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 08:56:34 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 7104DDED043953C7AA42;
+        Tue, 17 Dec 2019 21:56:30 +0800 (CST)
+Received: from DESKTOP-1NISPDV.china.huawei.com (10.173.221.248) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 17 Dec 2019 21:56:21 +0800
+From:   <yezengruan@huawei.com>
+To:     <yezengruan@huawei.com>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <maz@kernel.org>, <james.morse@arm.com>, <linux@armlinux.org.uk>,
+        <suzuki.poulose@arm.com>, <julien.thierry.kdev@gmail.com>,
+        <catalin.marinas@arm.com>, <mark.rutland@arm.com>,
+        <will@kernel.org>, <steven.price@arm.com>,
+        <daniel.lezcano@linaro.org>
+Subject: [PATCH 0/5] KVM: arm64: vcpu preempted check support
+Date:   Tue, 17 Dec 2019 21:55:44 +0800
+Message-ID: <20191217135549.3240-1-yezengruan@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-In-Reply-To: <E167A793-B42A-422D-8D46-B992CB6EBE69@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.173.221.248]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/19 13:16, Christophe de Dinechin wrote:
-> 
-> 
->> On 14 Dec 2019, at 08:57, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 13/12/19 21:23, Peter Xu wrote:
->>>> What is the benefit of using u16 for that? That means with 4K pages, you
->>>> can share at most 256M of dirty memory each time? That seems low to me,
->>>> especially since it's sufficient to touch one byte in a page to dirty it.
->>>>
->>>> Actually, this is not consistent with the definition in the code ;-)
->>>> So I'll assume it's actually u32.
->>> Yes it's u32 now.  Actually I believe at least Paolo would prefer u16
->>> more. :)
->>
->> It has to be u16, because it overlaps the padding of the first entry.
-> 
-> Wow, now that’s subtle.
-> 
-> That definitely needs a union with the padding to make this explicit.
-> 
-> (My guess is you do that to page-align the whole thing and avoid adding a
-> page just for the counters)
+From: Zengruan Ye <yezengruan@huawei.com>
 
-Yes, that was the idea but Peter decided to scrap it. :)
+This patch set aims to support the vcpu_is_preempted() functionality
+under KVM/arm64, which allowing the guest to obtain the vcpu is
+currently running or not. This will enhance lock performance on
+overcommitted hosts (more runnable vcpus than physical cpus in the
+system) as doing busy waits for preempted vcpus will hurt system
+performance far worse than early yielding.
 
-Paolo
+We have observed some performace improvements in uninx benchmark tests.
 
->>
->> Paolo
->>
->>> I think even u16 would be mostly enough (if you see, the maximum
->>> allowed value currently is 64K entries only, not a big one).  Again,
->>> the thing is that the userspace should be collecting the dirty bits,
->>> so the ring shouldn't reach full easily.  Even if it does, we should
->>> probably let it stop for a while as explained above.  It'll be
->>> inefficient only if we set it to a too-small value, imho.
->>>
->>
-> 
+unix benchmark result:
+  host:  kernel 5.5.0-rc1, HiSilicon Kunpeng920, 8 cpus
+  guest: kernel 5.5.0-rc1, 16 vcpus
+
+               test-case                |    after-patch    |   before-patch
+----------------------------------------+-------------------+------------------
+ Dhrystone 2 using register variables   | 334600751.0 lps   | 335319028.3 lps
+ Double-Precision Whetstone             |     32856.1 MWIPS |   32849.6 MWIPS
+ Execl Throughput                       |      3662.1 lps   |    2718.0 lps
+ File Copy 1024 bufsize 2000 maxblocks  |    432906.4 KBps  |  158011.8 KBps
+ File Copy 256 bufsize 500 maxblocks    |    116023.0 KBps  |   37664.0 KBps
+ File Copy 4096 bufsize 8000 maxblocks  |   1432769.8 KBps  |  441108.8 KBps
+ Pipe Throughput                        |   6405029.6 lps   | 6021457.6 lps
+ Pipe-based Context Switching           |    185872.7 lps   |  184255.3 lps
+ Process Creation                       |      4025.7 lps   |    3706.6 lps
+ Shell Scripts (1 concurrent)           |      6745.6 lpm   |    6436.1 lpm
+ Shell Scripts (8 concurrent)           |       998.7 lpm   |     931.1 lpm
+ System Call Overhead                   |   3913363.1 lps   | 3883287.8 lps
+----------------------------------------+-------------------+------------------
+ System Benchmarks Index Score          |      1835.1       |    1327.6
+
+Zengruan Ye (5):
+  KVM: arm64: Document PV-lock interface
+  KVM: arm64: Implement PV_LOCK_FEATURES call
+  KVM: arm64: Support pvlock preempted via shared structure
+  KVM: arm64: Add interface to support vcpu preempted check
+  KVM: arm64: Support the vcpu preemption check
+
+ Documentation/virt/kvm/arm/pvlock.rst  | 31 +++++++++
+ arch/arm/include/asm/kvm_host.h        | 13 ++++
+ arch/arm64/include/asm/kvm_host.h      | 17 +++++
+ arch/arm64/include/asm/paravirt.h      | 15 ++++
+ arch/arm64/include/asm/pvlock-abi.h    | 16 +++++
+ arch/arm64/include/asm/spinlock.h      |  7 ++
+ arch/arm64/kernel/Makefile             |  2 +-
+ arch/arm64/kernel/paravirt-spinlocks.c | 13 ++++
+ arch/arm64/kernel/paravirt.c           | 95 +++++++++++++++++++++++++-
+ arch/arm64/kernel/setup.c              |  2 +
+ arch/arm64/kvm/Makefile                |  1 +
+ include/linux/arm-smccc.h              | 13 ++++
+ include/linux/cpuhotplug.h             |  1 +
+ virt/kvm/arm/arm.c                     |  8 +++
+ virt/kvm/arm/hypercalls.c              |  7 ++
+ virt/kvm/arm/pvlock.c                  | 21 ++++++
+ 16 files changed, 260 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pvlock.rst
+ create mode 100644 arch/arm64/include/asm/pvlock-abi.h
+ create mode 100644 arch/arm64/kernel/paravirt-spinlocks.c
+ create mode 100644 virt/kvm/arm/pvlock.c
+
+-- 
+2.19.1
+
 
