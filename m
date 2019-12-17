@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECE8B1237BB
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 21:43:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C202F1237C7
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 21:43:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728718AbfLQUla (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 15:41:30 -0500
-Received: from mga07.intel.com ([134.134.136.100]:63051 "EHLO mga07.intel.com"
+        id S1728774AbfLQUlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 15:41:45 -0500
+Received: from mga07.intel.com ([134.134.136.100]:63047 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728482AbfLQUkp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728496AbfLQUkp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 17 Dec 2019 15:40:45 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,9 +17,9 @@ Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 12:40:43 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; 
-   d="scan'208";a="389952603"
+   d="scan'208";a="389952606"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:42 -0800
+  by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 12:40:43 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -42,9 +42,9 @@ Cc:     David Hildenbrand <david@redhat.com>,
         kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
         Christoffer Dall <christoffer.dall@arm.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v4 10/19] KVM: Drop "const" attribute from old memslot in commit_memory_region()
-Date:   Tue, 17 Dec 2019 12:40:32 -0800
-Message-Id: <20191217204041.10815-11-sean.j.christopherson@intel.com>
+Subject: [PATCH v4 11/19] KVM: x86: Free arrays for old memslot when moving memslot's base gfn
+Date:   Tue, 17 Dec 2019 12:40:33 -0800
+Message-Id: <20191217204041.10815-12-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
 References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
@@ -55,114 +55,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the "const" attribute from @old in kvm_arch_commit_memory_region()
-to allow arch specific code to free arch specific resources in the old
-memslot without having to cast away the attribute.  Freeing resources in
-kvm_arch_commit_memory_region() paves the way for simplifying
-kvm_free_memslot() by eliminating the last usage of its @dont param.
+Explicitly free the metadata arrays (stored in slot->arch) in the old
+memslot structure when moving the memslot's base gfn is committed.  This
+eliminates x86's dependency on kvm_free_memslot() being called when a
+memlsot move is committed, and paves the way for removing the funky code
+in kvm_free_memslot() that conditionally frees structures based on its
+@dont param.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/mips/kvm/mips.c       | 2 +-
- arch/powerpc/kvm/powerpc.c | 2 +-
- arch/s390/kvm/kvm-s390.c   | 2 +-
- arch/x86/kvm/x86.c         | 2 +-
- include/linux/kvm_host.h   | 2 +-
- virt/kvm/arm/mmu.c         | 2 +-
- virt/kvm/kvm_main.c        | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 713e5465edb0..108ed14cbcac 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -224,7 +224,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_userspace_memory_region *mem,
--				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index c922711a6dd8..6fd61b9dd783 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -701,7 +701,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_userspace_memory_region *mem,
--				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 1be45bad7849..a5b917b72ca0 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4516,7 +4516,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
--				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *old,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change)
- {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4892ded361b3..0911b2f634c5 100644
+index 0911b2f634c5..5f890812fac3 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9842,7 +9842,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+@@ -9884,6 +9884,10 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	 */
+ 	if (change != KVM_MR_DELETE)
+ 		kvm_mmu_slot_apply_flags(kvm, (struct kvm_memory_slot *) new);
++
++	/* Free the arrays associated with the old memslot. */
++	if (change == KVM_MR_MOVE)
++		kvm_arch_free_memslot(kvm, old, NULL);
+ }
  
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
--				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *old,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change)
- {
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 46dd713da634..7d86dbb467f7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -681,7 +681,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				enum kvm_mr_change change);
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_userspace_memory_region *mem,
--				const struct kvm_memory_slot *old,
-+				struct kvm_memory_slot *old,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change);
- bool kvm_largepages_enabled(void);
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index f264de85f648..4941746929ab 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -2246,7 +2246,7 @@ int kvm_mmu_init(void)
- 
- void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				   const struct kvm_userspace_memory_region *mem,
--				   const struct kvm_memory_slot *old,
-+				   struct kvm_memory_slot *old,
- 				   const struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
- {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 3663ac229c4d..acf52fa16500 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -988,7 +988,7 @@ static struct kvm_memslots *install_new_memslots(struct kvm *kvm,
- 
- static int kvm_set_memslot(struct kvm *kvm,
- 			   const struct kvm_userspace_memory_region *mem,
--			   const struct kvm_memory_slot *old,
-+			   struct kvm_memory_slot *old,
- 			   struct kvm_memory_slot *new, int as_id,
- 			   enum kvm_mr_change change)
- {
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
 -- 
 2.24.1
 
