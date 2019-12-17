@@ -2,146 +2,401 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2401222EC
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 05:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41BF6122395
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 06:23:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbfLQENk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 23:13:40 -0500
-Received: from mga14.intel.com ([192.55.52.115]:45244 "EHLO mga14.intel.com"
+        id S1726143AbfLQFXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 00:23:32 -0500
+Received: from mga01.intel.com ([192.55.52.88]:18187 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725836AbfLQENk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 23:13:40 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1725796AbfLQFXb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 00:23:31 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 20:13:37 -0800
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 21:23:30 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,324,1571727600"; 
-   d="scan'208";a="227349930"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.215.47]) ([10.254.215.47])
-  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2019 20:13:36 -0800
-Subject: Re: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova over
- first level
-To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+   d="scan'208";a="365258184"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by orsmga004.jf.intel.com with ESMTP; 16 Dec 2019 21:23:26 -0800
+Date:   Tue, 17 Dec 2019 00:15:13 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
- <20191211021219.8997-6-baolu.lu@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A130C08@SHSMSX104.ccr.corp.intel.com>
- <f1e5cfea-8b11-6d72-8e57-65daea51c050@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A132C50@SHSMSX104.ccr.corp.intel.com>
- <6a5f6695-d1fd-e7d1-3ea3-f222a1ef0e54@linux.intel.com>
- <b4a879b2-a5c7-b0bf-8cd4-7397aeebc381@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A135CAB@SHSMSX104.ccr.corp.intel.com>
- <A2975661238FB949B60364EF0F2C25743A135D05@SHSMSX104.ccr.corp.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <e6ba7689-92a9-e332-d364-24e324bdad38@linux.intel.com>
-Date:   Tue, 17 Dec 2019 12:13:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191217051513.GE21868@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A135D05@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
+> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> - Start unpinned pages dirty pages tracking while migration is active and
+>   device is running, i.e. during pre-copy phase.
+> - Stop unpinned pages dirty pages tracking. This is required to stop
+>   unpinned dirty pages tracking if migration failed or cancelled during
+>   pre-copy phase. Unpinned pages tracking is clear.
+> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
+>   unpinned pages information on bitmap read. This ioctl returns bitmap of
+>   dirty pages, its user space application responsibility to copy content
+>   of dirty pages from source to destination during migration.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 203 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 3f6b04f2334f..264449654d3f 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -70,6 +70,7 @@ struct vfio_iommu {
+>  	unsigned int		dma_avail;
+>  	bool			v2;
+>  	bool			nesting;
+> +	bool			dirty_page_tracking;
+>  };
+>  
+>  struct vfio_domain {
+> @@ -112,6 +113,7 @@ struct vfio_pfn {
+>  	dma_addr_t		iova;		/* Device address */
+>  	unsigned long		pfn;		/* Host pfn */
+>  	atomic_t		ref_count;
+> +	bool			unpinned;
+>  };
+>  
+>  struct vfio_regions {
+> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
+>  	kfree(vpfn);
+>  }
+>  
+> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
+> +{
+> +	struct rb_node *n = rb_first(&dma->pfn_list);
+> +
+> +	for (; n; n = rb_next(n)) {
+> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
+> +
+> +		if (warn)
+> +			WARN_ON_ONCE(vpfn->unpinned);
+> +
+> +		if (vpfn->unpinned)
+> +			vfio_remove_from_pfn_list(dma, vpfn);
+> +	}
+> +}
+> +
+> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
+> +{
+> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> +
+> +	for (; n; n = rb_next(n)) {
+> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> +
+> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> +	}
+> +}
+> +
+>  static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+>  					       unsigned long iova)
+>  {
+> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+>  	return vpfn;
+>  }
+>  
+> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
+> +				  bool dirty_tracking)
+>  {
+>  	int ret = 0;
+>  
+>  	if (atomic_dec_and_test(&vpfn->ref_count)) {
+>  		ret = put_pfn(vpfn->pfn, dma->prot);
+if physical page here is put, it may cause problem when pin this iova
+next time:
+vfio_iommu_type1_pin_pages {
+    ...
+    vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+    if (vpfn) {
+        phys_pfn[i] = vpfn->pfn;
+        continue;
+    }
+    ...
+}
 
-On 2019/12/17 10:36, Liu, Yi L wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Tuesday, December 17, 2019 10:26 AM
->> To: Lu Baolu <baolu.lu@linux.intel.com>; Joerg Roedel <joro@8bytes.org>; David
->> Woodhouse <dwmw2@infradead.org>; Alex Williamson
->> <alex.williamson@redhat.com>
->> Subject: RE: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova over first
->> level
->>
->>> From: Lu Baolu [mailto:baolu.lu@linux.intel.com]
->>> Sent: Tuesday, December 17, 2019 9:37 AM
->>> To: Liu, Yi L <yi.l.liu@intel.com>; Joerg Roedel <joro@8bytes.org>; David
->>> Woodhouse <dwmw2@infradead.org>; Alex Williamson
->>> <alex.williamson@redhat.com>
->>> Subject: Re: [PATCH v3 5/6] iommu/vt-d: Flush PASID-based iotlb for iova over first
->>> level
->>>
->>> Hi again,
->>>
->>> On 12/17/19 9:19 AM, Lu Baolu wrote:
->>>> Hi Yi,
->>>>
->>>> On 12/15/19 5:22 PM, Liu, Yi L wrote:
->>>>> Ok, let me explain more... default pasid is meaningful only when
->>>>> the domain has been attached to a device as an aux-domain. right?
->>>> No exactly. Each domain has a specific default pasid, no matter normal
->>>> domain (RID based) or aux-domain (PASID based). The difference is for a
->>>> normal domain RID2PASID value is used, for an aux-domain the pasid is
->>>> allocated from a global pool.
->>>>
->>>> The same concept used in VT-d 3.x scalable mode. For RID based DMA
->>>> translation RID2PASID value is used when walking the tables; For PASID
->>>> based DMA translation a real pasid in the transaction is used.
->>>>
->>>>> If a domain only has one device, and it is attached to this device as
->>>>> normal domain (normal domain means non aux-domain here). Then
->>>>> you should flush cache with domain-id and RID2PASID value.
->>>>> If a domain has one device, and it is attached to this device as
->>>>> aux-domain. Then you may want to flush cache with domain-id
->>>>> and default pasid. right?
->>>> A domain's counterpart is IOMMU group. So we say attach/detach domain
->>>> to/from devices in a group. We don't allow devices with different
->>>> default pasid sitting in a same group, right?
->>>>
->>>>> Then let's come to the case I mentioned in previous email. a mdev
->>>>> and another device assigned to a single VM. In host, you will have
->>>>> a domain which has two devices, one device(deva) is attached as
->>>> No. We will have two IOMMU groups and two domains. Correct me if my
->>>> understanding is not right.
->>> Reconsidered this. Unfortunately, my understanding is not right. :-(
->>>
->>> A single domain could be attached to multiple IOMMU groups. So it
->>> comes to the issue you concerned. Do I understand it right?
->> yes. Device within the same group has no such issue since such
->> devices are not able to enabled aux-domain. Now our understanding
->> are aligned. :-)
->>
->>>>> normal domain, another one (devB) is attached as aux-domain. Then
->>>>> which pasid should be used when the mapping in IOVA page table is
->>>>> modified? RID2PASID or default pasid? I think both should be used
->>>>> since the domain means differently to the two devices. If you just
->>>>> use default pasid, then deva may still be able to use stale caches.
->>> You are right. I will change it accordingly. The logic should look
->>> like:
->>>
->>> if (domain attached to physical device)
->>> 	flush_piotlb_with_RID2PASID()
->>> else if (domain_attached_to_mdev_device)
->>> 	flush_piotlb_with_default_pasid()
->>>
->>> Does this work for you? Thanks for catching this!
->> If no else, it would work for scalable mode. ^_^ I noticed you've
->> already corrected by yourself in another reply. :-) Look forward to
->> your next version.
-> BTW. The discussion in this thread may apply to other cache flush
-> in your series. Please have a check. At least, there are two places which
-> need to be updated in this single patch.
+> -		vfio_remove_from_pfn_list(dma, vpfn);
+> +		if (dirty_tracking)
+> +			vpfn->unpinned = true;
+> +		else
+> +			vfio_remove_from_pfn_list(dma, vpfn);
+so the unpinned pages before dirty page tracking is not treated as
+dirty?
 
-Sure. I will.
+>  	}
+>  	return ret;
+>  }
+> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+>  }
+>  
+>  static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> -				    bool do_accounting)
+> +				    bool do_accounting, bool dirty_tracking)
+>  {
+>  	int unlocked;
+>  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+>  	if (!vpfn)
+>  		return 0;
+>  
+> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+> +	if (vpfn->unpinned)
+> +		return 0;
+> +
+> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+>  
+>  	if (do_accounting)
+>  		vfio_lock_acct(dma, -unlocked, true);
+> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  
+>  		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+>  		if (ret) {
+> -			vfio_unpin_page_external(dma, iova, do_accounting);
+> +			vfio_unpin_page_external(dma, iova, do_accounting,
+> +						 false);
+>  			goto pin_unwind;
+>  		}
+>  	}
+> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  
+>  		iova = user_pfn[j] << PAGE_SHIFT;
+>  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
+>  		phys_pfn[j] = 0;
+>  	}
+>  pin_done:
+> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+>  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+>  		if (!dma)
+>  			goto unpin_exit;
+> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> +		vfio_unpin_page_external(dma, iova, do_accounting,
+> +					 iommu->dirty_page_tracking);
+>  	}
+>  
+>  unpin_exit:
+> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+>  	return bitmap;
+>  }
+>  
+> +/*
+> + * start_iova is the reference from where bitmaping started. This is called
+> + * from DMA_UNMAP where start_iova can be different than iova
+> + */
+> +
+> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> +				  size_t size, uint64_t pgsize,
+> +				  dma_addr_t start_iova, unsigned long *bitmap)
+> +{
+> +	struct vfio_dma *dma;
+> +	dma_addr_t i = iova;
+> +	unsigned long pgshift = __ffs(pgsize);
+> +
+> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
+> +		/* mark all pages dirty if all pages are pinned and mapped. */
+> +		if (dma->iommu_mapped) {
+This prevents pass-through devices from calling vfio_pin_pages to do
+fine grained log dirty.
+> +			dma_addr_t iova_limit;
+> +
+> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
+> +				     (dma->iova + dma->size) : (iova + size);
+> +
+> +			for (; i < iova_limit; i += pgsize) {
+> +				unsigned int start;
+> +
+> +				start = (i - start_iova) >> pgshift;
+> +
+> +				__bitmap_set(bitmap, start, 1);
+> +			}
+> +			if (i >= iova + size)
+> +				return;
+> +		} else {
+> +			struct rb_node *n = rb_first(&dma->pfn_list);
+> +			bool found = false;
+> +
+> +			for (; n; n = rb_next(n)) {
+> +				struct vfio_pfn *vpfn = rb_entry(n,
+> +							struct vfio_pfn, node);
+> +				if (vpfn->iova >= i) {
+> +					found = true;
+> +					break;
+> +				}
+> +			}
+> +
+> +			if (!found) {
+> +				i += dma->size;
+> +				continue;
+> +			}
+> +
+> +			for (; n; n = rb_next(n)) {
+> +				unsigned int start;
+> +				struct vfio_pfn *vpfn = rb_entry(n,
+> +							struct vfio_pfn, node);
+> +
+> +				if (vpfn->iova >= iova + size)
+> +					return;
+> +
+> +				start = (vpfn->iova - start_iova) >> pgshift;
+> +
+> +				__bitmap_set(bitmap, start, 1);
+> +
+> +				i = vpfn->iova + pgsize;
+> +			}
+> +		}
+> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> +	}
+> +}
+> +
+> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
+> +{
+> +	long bsize;
+> +
+> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
+> +		return -EINVAL;
+> +
+> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
+> +
+> +	if (bitmap_size < bsize)
+> +		return -EINVAL;
+> +
+> +	return bsize;
+> +}
+> +
+>  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>  			     struct vfio_iommu_type1_dma_unmap *unmap)
+>  {
+> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  
+>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>  			-EFAULT : 0;
+> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> +		struct vfio_iommu_type1_dirty_bitmap range;
+> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> +		int ret;
+> +
+> +		if (!iommu->v2)
+> +			return -EACCES;
+> +
+> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> +				    bitmap);
+> +
+> +		if (copy_from_user(&range, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (range.argsz < minsz || range.flags & ~mask)
+> +			return -EINVAL;
+> +
+> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> +			iommu->dirty_page_tracking = true;
+> +			return 0;
+> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> +			iommu->dirty_page_tracking = false;
+> +
+> +			mutex_lock(&iommu->lock);
+> +			vfio_remove_unpinned_from_dma_list(iommu);
+> +			mutex_unlock(&iommu->lock);
+> +			return 0;
+> +
+> +		} else if (range.flags &
+> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> +			uint64_t iommu_pgmask;
+> +			unsigned long pgshift = __ffs(range.pgsize);
+> +			unsigned long *bitmap;
+> +			long bsize;
+> +
+> +			iommu_pgmask =
+> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> +
+> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> +			    (range.pgsize - 1))
+> +				return -EINVAL;
+> +
+> +			if (range.iova & iommu_pgmask)
+> +				return -EINVAL;
+> +			if (!range.size || range.size > SIZE_MAX)
+> +				return -EINVAL;
+> +			if (range.iova + range.size < range.iova)
+> +				return -EINVAL;
+> +
+> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> +						   range.bitmap_size);
+> +			if (bsize)
+> +				return ret;
+> +
+> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> +			if (!bitmap)
+> +				return -ENOMEM;
+> +
+> +			ret = copy_from_user(bitmap,
+> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> +			if (ret)
+> +				goto bitmap_exit;
+> +
+> +			iommu->dirty_page_tracking = false;
+why iommu->dirty_page_tracking is false here?
+suppose this ioctl can be called several times.
 
-Best regards,
-
-baolu
->   
-> Regards,
-> Yi Liu
+Thanks
+Yan
+> +			mutex_lock(&iommu->lock);
+> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
+> +					     range.pgsize, range.iova, bitmap);
+> +			mutex_unlock(&iommu->lock);
+> +
+> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
+> +					   range.bitmap_size) ? -EFAULT : 0;
+> +bitmap_exit:
+> +			kfree(bitmap);
+> +			return ret;
+> +		}
+>  	}
+>  
+>  	return -ENOTTY;
+> -- 
+> 2.7.0
+> 
