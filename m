@@ -2,122 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E95E31230A1
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 16:38:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FB641231F2
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 17:18:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727549AbfLQPim (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 10:38:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40513 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727370AbfLQPim (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Dec 2019 10:38:42 -0500
+        id S1729393AbfLQQSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 11:18:49 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28410 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729069AbfLQQSt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 17 Dec 2019 11:18:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576597121;
+        s=mimecast20190719; t=1576599526;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oe8wx3LqrRs6+5QV/gvDiaHevjNBAUocaR3nOV3H/ec=;
-        b=J4qd/iIHOX2ViDj6HmF5Xhk1QzHMURO+Fv9PWwUpTuZcqvkSZYWGoppYHYzgDbId5dnGp9
-        2TTKdv9FPhy5OVzpL0AcVdTwTJRj+HrVje00DVgDq63O6xOXK5n1lJJBAfktKF8/kNGMFc
-        bEdfVWFsQ6Q+tvzHJi7baMUFub2qNok=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-cT1jxE3kOUuGT7v0wimzWg-1; Tue, 17 Dec 2019 10:38:40 -0500
-X-MC-Unique: cT1jxE3kOUuGT7v0wimzWg-1
-Received: by mail-qv1-f71.google.com with SMTP id v5so848166qvn.21
-        for <kvm@vger.kernel.org>; Tue, 17 Dec 2019 07:38:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=oe8wx3LqrRs6+5QV/gvDiaHevjNBAUocaR3nOV3H/ec=;
-        b=Ns+5pilivIJcm4iqf8X9v2qK3CK8JZEtsWZfYtUT34c2Pwj/yldzVWkFs4UCWi5BOR
-         nAQHkmIUJphlC8QsvhxnwaDVwHOjIbrtAitcONV5AlHjnuTWhpBQ75Sxb43Srq7VKsTO
-         hCObW9648ZMVuDkUC4x3n5U90icBVhgV6IiRwOLsiWzppTbrKnmFwWdFhLDQER/jEl5B
-         ywBEp7uXPj/ekI/dohZ7HCApyqmGwJ3ewSOXjr6sx54mMq8nxwgj5CDpIrg5cHsCPuoL
-         XXZClJ0OEg37ns+93u9Oa886FMFrJcPfPyzPVpMyGTxE6ZnQG69xJV81/9l0OUUx+jlX
-         gfFQ==
-X-Gm-Message-State: APjAAAV1LB9hh+m0KAD1KyNJ4LybuaFGfTROkI+YJlCS66VPbnUDB23w
-        Fryz1rBJam4Xly6CD4kpKKBrymQil88tke2YTlzA7hAfmi0rF9DEf22dNav5onyUqDyvgvncL8m
-        LKdR4nNCGk94l
-X-Received: by 2002:ac8:4151:: with SMTP id e17mr5184991qtm.234.1576597119904;
-        Tue, 17 Dec 2019 07:38:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyOzAD8USssim+OrRbQDGZuuA6bLMYmSzkOFB1tXv7s1A1ojilmiaIx2TMYZyPHAFnmkbw/+w==
-X-Received: by 2002:ac8:4151:: with SMTP id e17mr5184971qtm.234.1576597119698;
-        Tue, 17 Dec 2019 07:38:39 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
-        by smtp.gmail.com with ESMTPSA id b7sm7172621qkh.106.2019.12.17.07.38.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2019 07:38:38 -0800 (PST)
-Date:   Tue, 17 Dec 2019 10:38:37 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christophe de Dinechin <dinechin@redhat.com>,
-        Christophe de Dinechin <christophe.de.dinechin@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
+        bh=vK5NDcBxim7yNbmFnJiOrQ1gwFPi/J/vE1JJF/ionzc=;
+        b=HZbZ22750qr61IBA33Ps03ASUNsRAUZc72HiDowOpMNCfK9XmPYFDc4hcUgXys9Gra1aAX
+        cdGzFs9WoJ/Cl6od1px0Z4H/6jgiew2KjNegR+VzxcQLJi5QyqEBKZKujbVYUZJPdENoj1
+        REHyGUDYAG3VUvO91ib66JbBusBiHqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-AFz6fOSUM3alHFfb2t83Tg-1; Tue, 17 Dec 2019 11:18:42 -0500
+X-MC-Unique: AFz6fOSUM3alHFfb2t83Tg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E8DF800D24;
+        Tue, 17 Dec 2019 16:18:41 +0000 (UTC)
+Received: from x1.home (ovpn-116-53.phx2.redhat.com [10.3.116.53])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83C2F68872;
+        Tue, 17 Dec 2019 16:18:38 +0000 (UTC)
+Date:   Tue, 17 Dec 2019 09:18:37 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-Message-ID: <20191217153837.GC7258@xz-x1>
-References: <20191129213505.18472-1-peterx@redhat.com>
- <20191129213505.18472-5-peterx@redhat.com>
- <m1lfrihj2n.fsf@dinechin.org>
- <20191213202324.GI16429@xz-x1>
- <bc15650b-df59-f508-1090-21dafc6e8ad1@redhat.com>
- <E167A793-B42A-422D-8D46-B992CB6EBE69@redhat.com>
- <d59ac0eb-e65a-a46f-886e-6df80a2b142f@redhat.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Wang, Zhenyu Z" <zhenyu.z.wang@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory
+ tracking
+Message-ID: <20191217091837.744982d3@x1.home>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D645E55@SHSMSX104.ccr.corp.intel.com>
+References: <20191202201036.GJ4063@linux.intel.com>
+        <20191202211640.GF31681@xz-x1>
+        <20191202215049.GB8120@linux.intel.com>
+        <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
+        <20191203184600.GB19877@linux.intel.com>
+        <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
+        <20191209215400.GA3352@xz-x1>
+        <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+        <20191210155259.GD3352@xz-x1>
+        <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+        <20191215172124.GA83861@xz-x1>
+        <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
+        <AADFC41AFE54684AB9EE6CBC0274A5D19D645E55@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d59ac0eb-e65a-a46f-886e-6df80a2b142f@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 01:19:05PM +0100, Paolo Bonzini wrote:
-> On 17/12/19 13:16, Christophe de Dinechin wrote:
-> > 
-> > 
-> >> On 14 Dec 2019, at 08:57, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >>
-> >> On 13/12/19 21:23, Peter Xu wrote:
-> >>>> What is the benefit of using u16 for that? That means with 4K pages, you
-> >>>> can share at most 256M of dirty memory each time? That seems low to me,
-> >>>> especially since it's sufficient to touch one byte in a page to dirty it.
-> >>>>
-> >>>> Actually, this is not consistent with the definition in the code ;-)
-> >>>> So I'll assume it's actually u32.
-> >>> Yes it's u32 now.  Actually I believe at least Paolo would prefer u16
-> >>> more. :)
-> >>
-> >> It has to be u16, because it overlaps the padding of the first entry.
-> > 
-> > Wow, now that’s subtle.
-> > 
-> > That definitely needs a union with the padding to make this explicit.
-> > 
-> > (My guess is you do that to page-align the whole thing and avoid adding a
-> > page just for the counters)
+On Tue, 17 Dec 2019 02:28:33 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-(Just to make sure this is clear... Paolo was talking about the
- previous version.  This version does not have this limitation because
- we don't have that union definition any more)
-
+> > From: Paolo Bonzini
+> > Sent: Monday, December 16, 2019 6:08 PM
+> > 
+> > [Alex and Kevin: there are doubts below regarding dirty page tracking
+> > from VFIO and mdev devices, which perhaps you can help with]
+> > 
+> > On 15/12/19 18:21, Peter Xu wrote:  
+> > >                 init_rmode_tss
+> > >                     vmx_set_tss_addr
+> > >                         kvm_vm_ioctl_set_tss_addr [*]
+> > >                 init_rmode_identity_map
+> > >                     vmx_create_vcpu [*]  
+> > 
+> > These don't matter because their content is not visible to userspace
+> > (the backing storage is mmap-ed by __x86_set_memory_region).  In fact, d
+> >   
+> > >                 vmx_write_pml_buffer
+> > >                     kvm_arch_write_log_dirty [&]
+> > >                 kvm_write_guest
+> > >                     kvm_hv_setup_tsc_page
+> > >                         kvm_guest_time_update [&]
+> > >                     nested_flush_cached_shadow_vmcs12 [&]
+> > >                     kvm_write_wall_clock [&]
+> > >                     kvm_pv_clock_pairing [&]
+> > >                     kvmgt_rw_gpa [?]  
+> > 
+> > This then expands (partially) to
+> > 
+> > intel_gvt_hypervisor_write_gpa
+> >     emulate_csb_update
+> >         emulate_execlist_ctx_schedule_out
+> >             complete_execlist_workload
+> >                 complete_current_workload
+> >                      workload_thread
+> >         emulate_execlist_ctx_schedule_in
+> >             prepare_execlist_workload
+> >                 prepare_workload
+> >                     dispatch_workload
+> >                         workload_thread
+> > 
+> > So KVMGT is always writing to GPAs instead of IOVAs and basically
+> > bypassing a guest IOMMU.  So here it would be better if kvmgt was
+> > changed not use kvm_write_guest (also because I'd probably have nacked
+> > that if I had known :)).  
 > 
-> Yes, that was the idea but Peter decided to scrap it. :)
+> I agree. 
+> 
+> > 
+> > As far as I know, there is some work on live migration with both VFIO
+> > and mdev, and that probably includes some dirty page tracking API.
+> > kvmgt could switch to that API, or there could be VFIO APIs similar to
+> > kvm_write_guest but taking IOVAs instead of GPAs.  Advantage: this would
+> > fix the GPA/IOVA confusion.  Disadvantage: userspace would lose the
+> > tracking of writes from mdev devices.  Kevin, are these writes used in
+> > any way?  Do the calls to intel_gvt_hypervisor_write_gpa covers all
+> > writes from kvmgt vGPUs, or can the hardware write to memory as well
+> > (which would be my guess if I didn't know anything about kvmgt, which I
+> > pretty much don't)?  
+> 
+> intel_gvt_hypervisor_write_gpa covers all writes due to software mediation.
+> 
+> for hardware updates, it needs be mapped in IOMMU through vfio_pin_pages 
+> before any DMA happens. The ongoing dirty tracking effort in VFIO will take
+> every pinned page through that API as dirtied.
+> 
+> However, currently VFIO doesn't implement any vfio_read/write_guest
+> interface yet. and it doesn't make sense to use vfio_pin_pages for software
+> dirtied pages, as pin is unnecessary and heavy involving iommu invalidation.
+> 
+> Alex, if you are OK we'll work on such interface and move kvmgt to use it.
+> After it's accepted, we can also mark pages dirty through this new interface
+> in Kirti's dirty page tracking series.
 
-There's still time to persuade me to going back to it. :)
+I'm not sure what you're asking for, is it an interface for the host
+CPU to read/write the memory backing of a mapped IOVA range without
+pinning pages?  That seems like something like that would make sense for
+an emulation model where a page does not need to be pinned for physical
+DMA.  If you're asking more for an interface that understands the
+userspace driver is a VM (ie. implied using a _guest postfix on the
+function name) and knows about GPA mappings beyond the windows directly
+mapped for device access, I'd not look fondly on such a request.
+Thanks,
 
-(Though, yes I still like current solution... if we can get rid of the
- only kvmgt ugliness, we can even throw away the per-vm ring with its
- "extra" 4k page.  Then I suppose it'll be even harder to persuade me :)
-
--- 
-Peter Xu
+Alex
 
