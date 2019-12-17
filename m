@@ -2,78 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 811D71221CD
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 03:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80B7A1221CF
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 03:06:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbfLQCEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Dec 2019 21:04:35 -0500
-Received: from mga07.intel.com ([134.134.136.100]:26146 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726133AbfLQCEf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Dec 2019 21:04:35 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 18:04:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,323,1571727600"; 
-   d="scan'208";a="227326453"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
-  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2019 18:04:32 -0800
-Cc:     baolu.lu@linux.intel.com, "Raj, Ashok" <ashok.raj@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>, Peter Xu <peterx@redhat.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 4/6] iommu/vt-d: Setup pasid entries for iova over
- first level
-To:     "Liu, Yi L" <yi.l.liu@intel.com>, Joerg Roedel <joro@8bytes.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>
-References: <20191211021219.8997-1-baolu.lu@linux.intel.com>
- <20191211021219.8997-5-baolu.lu@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A1309A9@SHSMSX104.ccr.corp.intel.com>
- <acb93807-7a78-b81a-3b27-fde9ee4d7edb@linux.intel.com>
- <A2975661238FB949B60364EF0F2C25743A132C9A@SHSMSX104.ccr.corp.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <b883602c-ecdf-11ea-c26c-4b221bf7634d@linux.intel.com>
-Date:   Tue, 17 Dec 2019 10:03:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+        id S1726313AbfLQCGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Dec 2019 21:06:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57729 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726133AbfLQCGN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Dec 2019 21:06:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576548372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=bYXs4y+7UYR5FEMuno/b/WUb7xe9pnd08JpgREnT/sQ=;
+        b=BwVWjQPsEldxm3eGma/ELLnOILGhve8E2V53njqWa/mE23kV1xeX8LXm1F6pHo5VhRHCyO
+        /53STlMFQx1N9IiiOM92T2j7JBkmNvMauaOfRNJ4sItDnA0TV8pWncMTxJnFytiGnSXTBo
+        h1xPyvhGERsQLlJEdTZb+TsbdrPnOjs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-24oA3peAO2-8M3YhsPXvkw-1; Mon, 16 Dec 2019 21:06:10 -0500
+X-MC-Unique: 24oA3peAO2-8M3YhsPXvkw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CEA01809A2F;
+        Tue, 17 Dec 2019 02:06:09 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-16.bne.redhat.com [10.64.54.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 900497C834;
+        Tue, 17 Dec 2019 02:06:04 +0000 (UTC)
+From:   Gavin Shan <gshan@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, drjones@redhat.com,
+        vkuznets@redhat.com, maz@kernel.org
+Subject: [PATCH v2] tools/kvm_stat: Fix kvm_exit filter name
+Date:   Tue, 17 Dec 2019 13:06:00 +1100
+Message-Id: <20191217020600.10268-1-gshan@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A132C9A@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+The filter name is fixed to "exit_reason" for some kvm_exit events, no
+matter what architect we have. Actually, the filter name ("exit_reason")
+is only applicable to x86, meaning it's broken on other architects
+including aarch64.
 
-On 12/15/19 5:37 PM, Liu, Yi L wrote:
->> XD (bit 63) is only for the first level, and SNP (bit 11) is only for second level, right? I
->> think we need to always set XD bit for IOVA over FL case. thoughts?
-> Oops, I made a mistake here. Please forget SNP bit, there is no way to control SNP
-> with first level page table.:-)
-> 
-> Actually, it is execute (bit 1) of second level page table which I wanted to say.
-> If software sets R/W/X permission to an IOVA, with IOVA over second level
-> page table, it will set bit 1. However, if IOVA is over first level page table, it
-> may need to clear XD bit. This is what I want to say here. If IOVA doesn’t allow
-> execute permission, it's ok to always set XD bit for IOVA over FL case. But I
-> would like to do it just as what we did for R/W permission. R/W permission
-> relies on the permission configured by the page map caller. right?
+This fixes the issue by providing various kvm_exit filter names, dependin=
+g
+on architect we're on. Afterwards, the variable filter name is picked and
+applied by ioctl(fd, SET_FILTER).
 
-Got your point.
+Reported-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+v2: Rename exit_field to exit_reason_field
+    Fix the name to esr_ec for aarch64
+---
+ tools/kvm/kvm_stat/kvm_stat | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Current driver always cleard X (bit 2) in the second level page table.
-So we will always set XD bit (bit 63) in the first level page table.
-If we decide to use the X permission, we need a separated patch, right?
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index ad1b9e646c49..4cf93110c259 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -270,6 +270,7 @@ class ArchX86(Arch):
+     def __init__(self, exit_reasons):
+         self.sc_perf_evt_open =3D 298
+         self.ioctl_numbers =3D IOCTL_NUMBERS
++        self.exit_reason_field =3D 'exit_reason'
+         self.exit_reasons =3D exit_reasons
+=20
+     def debugfs_is_child(self, field):
+@@ -289,6 +290,7 @@ class ArchPPC(Arch):
+         # numbers depend on the wordsize.
+         char_ptr_size =3D ctypes.sizeof(ctypes.c_char_p)
+         self.ioctl_numbers['SET_FILTER'] =3D 0x80002406 | char_ptr_size =
+<< 16
++        self.exit_reason_field =3D 'exit_nr'
+         self.exit_reasons =3D {}
+=20
+     def debugfs_is_child(self, field):
+@@ -300,6 +302,7 @@ class ArchA64(Arch):
+     def __init__(self):
+         self.sc_perf_evt_open =3D 241
+         self.ioctl_numbers =3D IOCTL_NUMBERS
++        self.exit_reason_field =3D 'esr_ec'
+         self.exit_reasons =3D AARCH64_EXIT_REASONS
+=20
+     def debugfs_is_child(self, field):
+@@ -311,6 +314,7 @@ class ArchS390(Arch):
+     def __init__(self):
+         self.sc_perf_evt_open =3D 331
+         self.ioctl_numbers =3D IOCTL_NUMBERS
++        self.exit_reason_field =3D None
+         self.exit_reasons =3D None
+=20
+     def debugfs_is_child(self, field):
+@@ -541,8 +545,8 @@ class TracepointProvider(Provider):
+         """
+         filters =3D {}
+         filters['kvm_userspace_exit'] =3D ('reason', USERSPACE_EXIT_REAS=
+ONS)
+-        if ARCH.exit_reasons:
+-            filters['kvm_exit'] =3D ('exit_reason', ARCH.exit_reasons)
++        if ARCH.exit_reason_field and ARCH.exit_reasons:
++            filters['kvm_exit'] =3D (ARCH.exit_reason_field, ARCH.exit_r=
+easons)
+         return filters
+=20
+     def _get_available_fields(self):
+--=20
+2.23.0
 
-Best regards,
-baolu
