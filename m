@@ -2,167 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3220123253
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 17:24:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FA1612325F
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 17:26:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728241AbfLQQYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 11:24:25 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55776 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728299AbfLQQYZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 17 Dec 2019 11:24:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576599863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UaYxxpQ+7yMxn9ORHCOWMBFO7RIyafsf5c6/e+ioEqg=;
-        b=Kylvoz584eWl5Snvi1sZa5103QMnWg01475hZ2MX58rJvRx40HNm+f04EcSkxz7dJ8bjRl
-        EZVk78X0kClq4OkMUu7cZU4H/2gRadDXCw/kMhD9iuuVROhL6Tu9y9DKr2P3P+gSzJIfia
-        ttlTPgvyP6DMZvzlDlXBmBoSRuHE9yE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-Iv3ZR-nEMGWfuzbhq_B8Eg-1; Tue, 17 Dec 2019 11:24:22 -0500
-X-MC-Unique: Iv3ZR-nEMGWfuzbhq_B8Eg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43E00800EBF;
-        Tue, 17 Dec 2019 16:24:21 +0000 (UTC)
-Received: from x1.home (ovpn-116-53.phx2.redhat.com [10.3.116.53])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B144620CC;
-        Tue, 17 Dec 2019 16:24:18 +0000 (UTC)
-Date:   Tue, 17 Dec 2019 09:24:17 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        'Paolo Bonzini' <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Wang, Zhenyu Z" <zhenyu.z.wang@intel.com>
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory
- tracking
-Message-ID: <20191217092417.1c4f4586@x1.home>
-In-Reply-To: <20191217052502.GF21868@joy-OptiPlex-7040>
-References: <20191203184600.GB19877@linux.intel.com>
-        <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
-        <20191209215400.GA3352@xz-x1>
-        <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
-        <20191210155259.GD3352@xz-x1>
-        <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
-        <20191215172124.GA83861@xz-x1>
-        <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D645E5F@SHSMSX104.ccr.corp.intel.com>
-        <AADFC41AFE54684AB9EE6CBC0274A5D19D646148@SHSMSX104.ccr.corp.intel.com>
-        <20191217052502.GF21868@joy-OptiPlex-7040>
-Organization: Red Hat
+        id S1728229AbfLQQ0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 11:26:10 -0500
+Received: from mga04.intel.com ([192.55.52.120]:60305 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728179AbfLQQ0K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 11:26:10 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 08:26:09 -0800
+X-IronPort-AV: E=Sophos;i="5.69,326,1571727600"; 
+   d="scan'208";a="389882638"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 08:26:09 -0800
+Message-ID: <753e2991e3e632b9c179c45197bfb05669625e9a.camel@linux.intel.com>
+Subject: Re: [PATCH v15 3/7] mm: Add function __putback_isolated_page
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        kvm@vger.kernel.org, mst@redhat.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, mhocko@kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mgorman@techsingularity.net,
+        vbabka@suse.cz
+Cc:     yang.zhang.wz@gmail.com, nitesh@redhat.com, konrad.wilk@oracle.com,
+        pagupta@redhat.com, riel@surriel.com, lcapitulino@redhat.com,
+        dave.hansen@intel.com, wei.w.wang@intel.com, aarcange@redhat.com,
+        pbonzini@redhat.com, dan.j.williams@intel.com, osalvador@suse.de
+Date:   Tue, 17 Dec 2019 08:26:09 -0800
+In-Reply-To: <8a4b0337-0bad-2978-32e8-6f90c7365f00@redhat.com>
+References: <20191205161928.19548.41654.stgit@localhost.localdomain>
+         <20191205162230.19548.70198.stgit@localhost.localdomain>
+         <cb49bbc7-b0c0-65cc-1d9d-a3aaef075650@redhat.com>
+         <9eb9173278370dd604c4cefd30ed10be36600854.camel@linux.intel.com>
+         <8a4b0337-0bad-2978-32e8-6f90c7365f00@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.5 (3.32.5-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 Dec 2019 00:25:02 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Tue, Dec 17, 2019 at 01:17:29PM +0800, Tian, Kevin wrote:
-> > > From: Tian, Kevin
-> > > Sent: Tuesday, December 17, 2019 10:29 AM
-> > >   
-> > > > From: Paolo Bonzini
-> > > > Sent: Monday, December 16, 2019 6:08 PM
-> > > >
-> > > > [Alex and Kevin: there are doubts below regarding dirty page tracking
-> > > > from VFIO and mdev devices, which perhaps you can help with]
-> > > >
-> > > > On 15/12/19 18:21, Peter Xu wrote:  
-> > > > >                 init_rmode_tss
-> > > > >                     vmx_set_tss_addr
-> > > > >                         kvm_vm_ioctl_set_tss_addr [*]
-> > > > >                 init_rmode_identity_map
-> > > > >                     vmx_create_vcpu [*]  
-> > > >
-> > > > These don't matter because their content is not visible to userspace
-> > > > (the backing storage is mmap-ed by __x86_set_memory_region).  In fact, d
-> > > >  
-> > > > >                 vmx_write_pml_buffer
-> > > > >                     kvm_arch_write_log_dirty [&]
-> > > > >                 kvm_write_guest
-> > > > >                     kvm_hv_setup_tsc_page
-> > > > >                         kvm_guest_time_update [&]
-> > > > >                     nested_flush_cached_shadow_vmcs12 [&]
-> > > > >                     kvm_write_wall_clock [&]
-> > > > >                     kvm_pv_clock_pairing [&]
-> > > > >                     kvmgt_rw_gpa [?]  
-> > > >
-> > > > This then expands (partially) to
-> > > >
-> > > > intel_gvt_hypervisor_write_gpa
-> > > >     emulate_csb_update
-> > > >         emulate_execlist_ctx_schedule_out
-> > > >             complete_execlist_workload
-> > > >                 complete_current_workload
-> > > >                      workload_thread
-> > > >         emulate_execlist_ctx_schedule_in
-> > > >             prepare_execlist_workload
-> > > >                 prepare_workload
-> > > >                     dispatch_workload
-> > > >                         workload_thread
-> > > >
-> > > > So KVMGT is always writing to GPAs instead of IOVAs and basically
-> > > > bypassing a guest IOMMU.  So here it would be better if kvmgt was
-> > > > changed not use kvm_write_guest (also because I'd probably have nacked
-> > > > that if I had known :)).  
+On Tue, 2019-12-17 at 11:58 +0100, David Hildenbrand wrote:
+> On 16.12.19 17:22, Alexander Duyck wrote:
+> > On Mon, 2019-12-16 at 12:36 +0100, David Hildenbrand wrote:
+> > > [...]
+> > > > +/**
+> > > > + * __putback_isolated_page - Return a now-isolated page back where we got it
+> > > > + * @page: Page that was isolated
+> > > > + * @order: Order of the isolated page
+> > > > + *
+> > > > + * This function is meant to return a page pulled from the free lists via
+> > > > + * __isolate_free_page back to the free lists they were pulled from.
+> > > > + */
+> > > > +void __putback_isolated_page(struct page *page, unsigned int order)
+> > > > +{
+> > > > +	struct zone *zone = page_zone(page);
+> > > > +	unsigned long pfn;
+> > > > +	unsigned int mt;
+> > > > +
+> > > > +	/* zone lock should be held when this function is called */
+> > > > +	lockdep_assert_held(&zone->lock);
+> > > > +
+> > > > +	pfn = page_to_pfn(page);
+> > > > +	mt = get_pfnblock_migratetype(page, pfn);
 > > > 
-> > > I agree.
-> > >   
-> > > >
-> > > > As far as I know, there is some work on live migration with both VFIO
-> > > > and mdev, and that probably includes some dirty page tracking API.
-> > > > kvmgt could switch to that API, or there could be VFIO APIs similar to
-> > > > kvm_write_guest but taking IOVAs instead of GPAs.  Advantage: this would
-> > > > fix the GPA/IOVA confusion.  Disadvantage: userspace would lose the
-> > > > tracking of writes from mdev devices.  Kevin, are these writes used in
-> > > > any way?  Do the calls to intel_gvt_hypervisor_write_gpa covers all
-> > > > writes from kvmgt vGPUs, or can the hardware write to memory as well
-> > > > (which would be my guess if I didn't know anything about kvmgt, which I
-> > > > pretty much don't)?  
-> > > 
-> > > intel_gvt_hypervisor_write_gpa covers all writes due to software mediation.
-> > > 
-> > > for hardware updates, it needs be mapped in IOMMU through
-> > > vfio_pin_pages
-> > > before any DMA happens. The ongoing dirty tracking effort in VFIO will take
-> > > every pinned page through that API as dirtied.
-> > > 
-> > > However, currently VFIO doesn't implement any vfio_read/write_guest
-> > > interface yet. and it doesn't make sense to use vfio_pin_pages for software
-> > > dirtied pages, as pin is unnecessary and heavy involving iommu invalidation.  
+> > > IMHO get_pageblock_migratetype() would be nicer - I guess the compiler
+> > > will optimize out the double page_to_pfn().
 > > 
-> > One correction. vfio_pin_pages doesn't involve iommu invalidation. I should
-> > just mean that pinning the page is not necessary. We just need a kvm-like
-> > interface based on hva to access.
-> >  
-> And can we propose to differentiate read and write when calling vfio_pin_pages, e.g.
-> vfio_pin_pages_read, vfio_pin_pages_write? Otherwise, calling to
-> vfio_pin_pages will unnecessarily cause read pages to be dirty and
-> sometimes reading guest pages is a way for device model to track dirty
-> pages.
+> > The thing is I need the page_to_pfn call already in order to pass the
+> > value to __free_one_page. With that being the case why not juse use
+> > get_pfnblock_migratetype?
+> 
+> I was reading
+> 	set_pageblock_migratetype(page, migratetype);
+> And wondered why we don't use straight forward
+> 	get_pageblock_migratetype()
+> but instead something that looks like a micro-optimization
 
-Yes, I've discussed this with Kirti, when devices add more fine grained
-dirty tracking we'll probably need to extend the mdev pinned pages
-interface to allow vendor drivers to indicate a pinning is intended to
-be used as read-only and perhaps also a way to unpin a page that was
-pinned as read-write as clean, if the device did not write to it.  So
-perhaps vfio_pin_pages_for_read() and vfio_unpin_pages_clean().  Thanks,
+So there ends up being a some other optimizations you may not have
+noticed.
 
-Alex
+For instance, the fact that get_pfnblock_migratetype is an inline
+function, whereas get_pageblock_migratetype calls get_pfnblock_flags_mask
+which is not an inline function. So you end up having to take the overhead
+for a call/return.
+
+I hadn't noticed that myself until taking a look at the code.
+
+> > Also there are some scenarios where __page_to_pfn is not that simple a
+> > call with us having to get the node ID so we can find the pgdat structure
+> > to perform the calculation. I'm not sure the compiler would be ble to
+> > figure out that the result is the same for both calls, so it is better to
+> > make it explicit.
+> 
+> Only in case of CONFIG_SPARSEMEM we have to go via the section - but I
+> doubt this is really worth optimizing here.
+> 
+> But yeah, I'm fine with this change, only "IMHO
+> get_pageblock_migratetype() would be nicer" :)
+
+Aren't most distros running with CONFIG_SPARSEMEM enabled? If that is the
+case why not optimize for it?
+
+As I stated earlier, in my case I already have to pull out the PFN as a
+part of freeing the page anyway, so why not reuse the value instead of
+having it be computed twice? It is in keeping with how the other handlers
+are dealing with this such as free_one_page, __free_pages_ok, and
+free_unref_page_prepare. I suspect it has to do with the fact that it is
+an inline like I pointed out above.
+
+> > > > +
+> > > > +	/* Return isolated page to tail of freelist. */
+> > > > +	__free_one_page(page, pfn, zone, order, mt);
+> > > > +}
+> > > > +
+> > > >  /*
+> > > >   * Update NUMA hit/miss statistics
+> > > >   *
+> > > > diff --git a/mm/page_isolation.c b/mm/page_isolation.c
+> > > > index 04ee1663cdbe..d93d2be0070f 100644
+> > > > --- a/mm/page_isolation.c
+> > > > +++ b/mm/page_isolation.c
+> > > > @@ -134,13 +134,11 @@ static void unset_migratetype_isolate(struct page *page, unsigned migratetype)
+> > > >  		__mod_zone_freepage_state(zone, nr_pages, migratetype);
+> > > >  	}
+> > > >  	set_pageblock_migratetype(page, migratetype);
+> > > > +	if (isolated_page)
+> > > > +		__putback_isolated_page(page, order);
+> > > >  	zone->nr_isolate_pageblock--;
+> > > >  out:
+> > > >  	spin_unlock_irqrestore(&zone->lock, flags);
+> > > > -	if (isolated_page) {
+> > > > -		post_alloc_hook(page, order, __GFP_MOVABLE);
+> > > > -		__free_pages(page, order);
+> > > > -	}
+> > > 
+> > > So If I get it right:
+> > > 
+> > > post_alloc_hook() does quite some stuff like
+> > > - arch_alloc_page(page, order);
+> > > - kernel_map_pages(page, 1 << order, 1)
+> > > - kasan_alloc_pages()
+> > > - kernel_poison_pages(1)
+> > > - set_page_owner()
+> > > 
+> > > Which free_pages_prepare() will undo, like
+> > > - reset_page_owner()
+> > > - kernel_poison_pages(0)
+> > > - arch_free_page()
+> > > - kernel_map_pages()
+> > > - kasan_free_nondeferred_pages()
+> > > 
+> > > Both would be skipped now - which sounds like the right thing to do IMHO
+> > > (and smells like quite a performance improvement). I haven't verified if
+> > > actually everything we skip in free_pages_prepare() is safe (I think it
+> > > is, it seems to be mostly relevant for actually used/allocated pages).
+> > 
+> > That was kind of my thought on this. Basically the logic I was following
+> > was that the code path will call move_freepages_block that bypasses all of
+> > the above mentioned calls if the pages it is moving will not be merged. If
+> > it is safe in that case my assumption is that it should be safe to just
+> > call __putback_isolated_page in such a case as it also bypasses the block
+> > above, but it supports merging the page with other pages that are already
+> > on the freelist.
+> 
+> Makes sense to me
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
+
+Thanks. I will add the Ack to the patch for v16.
 
