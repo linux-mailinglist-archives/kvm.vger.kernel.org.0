@@ -2,401 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41BF6122395
-	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 06:23:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD1C1122385
+	for <lists+kvm@lfdr.de>; Tue, 17 Dec 2019 06:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726143AbfLQFXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 00:23:32 -0500
-Received: from mga01.intel.com ([192.55.52.88]:18187 "EHLO mga01.intel.com"
+        id S1726205AbfLQFRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 00:17:32 -0500
+Received: from mga11.intel.com ([192.55.52.93]:44870 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725796AbfLQFXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Dec 2019 00:23:31 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725796AbfLQFRc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 00:17:32 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 21:23:30 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Dec 2019 21:17:32 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,324,1571727600"; 
-   d="scan'208";a="365258184"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by orsmga004.jf.intel.com with ESMTP; 16 Dec 2019 21:23:26 -0800
-Date:   Tue, 17 Dec 2019 00:15:13 -0500
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20191217051513.GE21868@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
- <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+   d="scan'208";a="266469839"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by FMSMGA003.fm.intel.com with ESMTP; 16 Dec 2019 21:17:32 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 21:17:32 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 16 Dec 2019 21:17:31 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Mon, 16 Dec 2019 21:17:31 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.90]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.195]) with mapi id 14.03.0439.000;
+ Tue, 17 Dec 2019 13:17:30 +0800
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     'Paolo Bonzini' <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+CC:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Alex Williamson" <alex.williamson@redhat.com>,
+        "Wang, Zhenyu Z" <zhenyu.z.wang@intel.com>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: RE: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory
+ tracking
+Thread-Topic: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory
+ tracking
+Thread-Index: AQHVpv0PhLjsXcMNH0yRgZXkCE4uD6emxQcAgAASdgCAAAmKgIABC3sAgABTNwCAAQD8gIAIoYgAgADM8YCAAGCGgIAAFT8AgAffHQCAARlPgIABgxAQgABDsWA=
+Date:   Tue, 17 Dec 2019 05:17:29 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D646148@SHSMSX104.ccr.corp.intel.com>
+References: <20191202201036.GJ4063@linux.intel.com>
+ <20191202211640.GF31681@xz-x1> <20191202215049.GB8120@linux.intel.com>
+ <fd882b9f-e510-ff0d-db43-eced75427fc6@redhat.com>
+ <20191203184600.GB19877@linux.intel.com>
+ <374f18f1-0592-9b70-adbb-0a72cc77d426@redhat.com>
+ <20191209215400.GA3352@xz-x1>
+ <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <20191210155259.GD3352@xz-x1>
+ <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+ <20191215172124.GA83861@xz-x1>
+ <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D645E5F@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D645E5F@SHSMSX104.ccr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYjQ4ZWYwMjEtYTg2OS00MDllLTllZGMtZjdjZDkyMTJmMWVmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibWtHNnhSNlpVN1FnTjNtUzF5WG1lbVI4VWlyMVNpanJacmZpWDY3akhmdGR6eXhvd2JIdTJvUnJBZVZcL3VTR1QifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start unpinned pages dirty pages tracking while migration is active and
->   device is running, i.e. during pre-copy phase.
-> - Stop unpinned pages dirty pages tracking. This is required to stop
->   unpinned dirty pages tracking if migration failed or cancelled during
->   pre-copy phase. Unpinned pages tracking is clear.
-> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
->   unpinned pages information on bitmap read. This ioctl returns bitmap of
->   dirty pages, its user space application responsibility to copy content
->   of dirty pages from source to destination during migration.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 203 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3f6b04f2334f..264449654d3f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -70,6 +70,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -112,6 +113,7 @@ struct vfio_pfn {
->  	dma_addr_t		iova;		/* Device address */
->  	unsigned long		pfn;		/* Host pfn */
->  	atomic_t		ref_count;
-> +	bool			unpinned;
->  };
->  
->  struct vfio_regions {
-> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
->  	kfree(vpfn);
->  }
->  
-> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
-> +{
-> +	struct rb_node *n = rb_first(&dma->pfn_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
-> +
-> +		if (warn)
-> +			WARN_ON_ONCE(vpfn->unpinned);
-> +
-> +		if (vpfn->unpinned)
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-> +	}
-> +}
-> +
-> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
->  static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  					       unsigned long iova)
->  {
-> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  	return vpfn;
->  }
->  
-> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
-> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
-> +				  bool dirty_tracking)
->  {
->  	int ret = 0;
->  
->  	if (atomic_dec_and_test(&vpfn->ref_count)) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
-if physical page here is put, it may cause problem when pin this iova
-next time:
-vfio_iommu_type1_pin_pages {
-    ...
-    vpfn = vfio_iova_get_vfio_pfn(dma, iova);
-    if (vpfn) {
-        phys_pfn[i] = vpfn->pfn;
-        continue;
-    }
-    ...
-}
-
-> -		vfio_remove_from_pfn_list(dma, vpfn);
-> +		if (dirty_tracking)
-> +			vpfn->unpinned = true;
-> +		else
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-so the unpinned pages before dirty page tracking is not treated as
-dirty?
-
->  	}
->  	return ret;
->  }
-> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->  }
->  
->  static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
-> -				    bool do_accounting)
-> +				    bool do_accounting, bool dirty_tracking)
->  {
->  	int unlocked;
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
-> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  	if (!vpfn)
->  		return 0;
->  
-> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
-> +	if (vpfn->unpinned)
-> +		return 0;
-> +
-> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
->  
->  	if (do_accounting)
->  		vfio_lock_acct(dma, -unlocked, true);
-> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
->  		if (ret) {
-> -			vfio_unpin_page_external(dma, iova, do_accounting);
-> +			vfio_unpin_page_external(dma, iova, do_accounting,
-> +						 false);
->  			goto pin_unwind;
->  		}
->  	}
-> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		iova = user_pfn[j] << PAGE_SHIFT;
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
->  		phys_pfn[j] = 0;
->  	}
->  pin_done:
-> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->  		if (!dma)
->  			goto unpin_exit;
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting,
-> +					 iommu->dirty_page_tracking);
->  	}
->  
->  unpin_exit:
-> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +/*
-> + * start_iova is the reference from where bitmaping started. This is called
-> + * from DMA_UNMAP where start_iova can be different than iova
-> + */
-> +
-> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  dma_addr_t start_iova, unsigned long *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	dma_addr_t i = iova;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +
-> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> +		/* mark all pages dirty if all pages are pinned and mapped. */
-> +		if (dma->iommu_mapped) {
-This prevents pass-through devices from calling vfio_pin_pages to do
-fine grained log dirty.
-> +			dma_addr_t iova_limit;
-> +
-> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
-> +				     (dma->iova + dma->size) : (iova + size);
-> +
-> +			for (; i < iova_limit; i += pgsize) {
-> +				unsigned int start;
-> +
-> +				start = (i - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-> +			}
-> +			if (i >= iova + size)
-> +				return;
-> +		} else {
-> +			struct rb_node *n = rb_first(&dma->pfn_list);
-> +			bool found = false;
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +				if (vpfn->iova >= i) {
-> +					found = true;
-> +					break;
-> +				}
-> +			}
-> +
-> +			if (!found) {
-> +				i += dma->size;
-> +				continue;
-> +			}
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				unsigned int start;
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +
-> +				if (vpfn->iova >= iova + size)
-> +					return;
-> +
-> +				start = (vpfn->iova - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-> +
-> +				i = vpfn->iova + pgsize;
-> +			}
-> +		}
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
-> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
-> +{
-> +	long bsize;
-> +
-> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
-> +		return -EINVAL;
-> +
-> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return bsize;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap range;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    bitmap);
-> +
-> +		if (copy_from_user(&range, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (range.argsz < minsz || range.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			iommu->dirty_page_tracking = true;
-> +			return 0;
-> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			iommu->dirty_page_tracking = false;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			vfio_remove_unpinned_from_dma_list(iommu);
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +
-> +		} else if (range.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			uint64_t iommu_pgmask;
-> +			unsigned long pgshift = __ffs(range.pgsize);
-> +			unsigned long *bitmap;
-> +			long bsize;
-> +
-> +			iommu_pgmask =
-> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> +
-> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> +			    (range.pgsize - 1))
-> +				return -EINVAL;
-> +
-> +			if (range.iova & iommu_pgmask)
-> +				return -EINVAL;
-> +			if (!range.size || range.size > SIZE_MAX)
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +
-> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> +						   range.bitmap_size);
-> +			if (bsize)
-> +				return ret;
-> +
-> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-> +			if (!bitmap)
-> +				return -ENOMEM;
-> +
-> +			ret = copy_from_user(bitmap,
-> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
-> +			if (ret)
-> +				goto bitmap_exit;
-> +
-> +			iommu->dirty_page_tracking = false;
-why iommu->dirty_page_tracking is false here?
-suppose this ioctl can be called several times.
-
-Thanks
-Yan
-> +			mutex_lock(&iommu->lock);
-> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
-> +					     range.pgsize, range.iova, bitmap);
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
-> +					   range.bitmap_size) ? -EFAULT : 0;
-> +bitmap_exit:
-> +			kfree(bitmap);
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> -- 
-> 2.7.0
-> 
+PiBGcm9tOiBUaWFuLCBLZXZpbg0KPiBTZW50OiBUdWVzZGF5LCBEZWNlbWJlciAxNywgMjAxOSAx
+MDoyOSBBTQ0KPiANCj4gPiBGcm9tOiBQYW9sbyBCb256aW5pDQo+ID4gU2VudDogTW9uZGF5LCBE
+ZWNlbWJlciAxNiwgMjAxOSA2OjA4IFBNDQo+ID4NCj4gPiBbQWxleCBhbmQgS2V2aW46IHRoZXJl
+IGFyZSBkb3VidHMgYmVsb3cgcmVnYXJkaW5nIGRpcnR5IHBhZ2UgdHJhY2tpbmcNCj4gPiBmcm9t
+IFZGSU8gYW5kIG1kZXYgZGV2aWNlcywgd2hpY2ggcGVyaGFwcyB5b3UgY2FuIGhlbHAgd2l0aF0N
+Cj4gPg0KPiA+IE9uIDE1LzEyLzE5IDE4OjIxLCBQZXRlciBYdSB3cm90ZToNCj4gPiA+ICAgICAg
+ICAgICAgICAgICBpbml0X3Jtb2RlX3Rzcw0KPiA+ID4gICAgICAgICAgICAgICAgICAgICB2bXhf
+c2V0X3Rzc19hZGRyDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgICAgICBrdm1fdm1faW9jdGxf
+c2V0X3Rzc19hZGRyIFsqXQ0KPiA+ID4gICAgICAgICAgICAgICAgIGluaXRfcm1vZGVfaWRlbnRp
+dHlfbWFwDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgIHZteF9jcmVhdGVfdmNwdSBbKl0NCj4g
+Pg0KPiA+IFRoZXNlIGRvbid0IG1hdHRlciBiZWNhdXNlIHRoZWlyIGNvbnRlbnQgaXMgbm90IHZp
+c2libGUgdG8gdXNlcnNwYWNlDQo+ID4gKHRoZSBiYWNraW5nIHN0b3JhZ2UgaXMgbW1hcC1lZCBi
+eSBfX3g4Nl9zZXRfbWVtb3J5X3JlZ2lvbikuICBJbiBmYWN0LCBkDQo+ID4NCj4gPiA+ICAgICAg
+ICAgICAgICAgICB2bXhfd3JpdGVfcG1sX2J1ZmZlcg0KPiA+ID4gICAgICAgICAgICAgICAgICAg
+ICBrdm1fYXJjaF93cml0ZV9sb2dfZGlydHkgWyZdDQo+ID4gPiAgICAgICAgICAgICAgICAga3Zt
+X3dyaXRlX2d1ZXN0DQo+ID4gPiAgICAgICAgICAgICAgICAgICAgIGt2bV9odl9zZXR1cF90c2Nf
+cGFnZQ0KPiA+ID4gICAgICAgICAgICAgICAgICAgICAgICAga3ZtX2d1ZXN0X3RpbWVfdXBkYXRl
+IFsmXQ0KPiA+ID4gICAgICAgICAgICAgICAgICAgICBuZXN0ZWRfZmx1c2hfY2FjaGVkX3NoYWRv
+d192bWNzMTIgWyZdDQo+ID4gPiAgICAgICAgICAgICAgICAgICAgIGt2bV93cml0ZV93YWxsX2Ns
+b2NrIFsmXQ0KPiA+ID4gICAgICAgICAgICAgICAgICAgICBrdm1fcHZfY2xvY2tfcGFpcmluZyBb
+Jl0NCj4gPiA+ICAgICAgICAgICAgICAgICAgICAga3ZtZ3RfcndfZ3BhIFs/XQ0KPiA+DQo+ID4g
+VGhpcyB0aGVuIGV4cGFuZHMgKHBhcnRpYWxseSkgdG8NCj4gPg0KPiA+IGludGVsX2d2dF9oeXBl
+cnZpc29yX3dyaXRlX2dwYQ0KPiA+ICAgICBlbXVsYXRlX2NzYl91cGRhdGUNCj4gPiAgICAgICAg
+IGVtdWxhdGVfZXhlY2xpc3RfY3R4X3NjaGVkdWxlX291dA0KPiA+ICAgICAgICAgICAgIGNvbXBs
+ZXRlX2V4ZWNsaXN0X3dvcmtsb2FkDQo+ID4gICAgICAgICAgICAgICAgIGNvbXBsZXRlX2N1cnJl
+bnRfd29ya2xvYWQNCj4gPiAgICAgICAgICAgICAgICAgICAgICB3b3JrbG9hZF90aHJlYWQNCj4g
+PiAgICAgICAgIGVtdWxhdGVfZXhlY2xpc3RfY3R4X3NjaGVkdWxlX2luDQo+ID4gICAgICAgICAg
+ICAgcHJlcGFyZV9leGVjbGlzdF93b3JrbG9hZA0KPiA+ICAgICAgICAgICAgICAgICBwcmVwYXJl
+X3dvcmtsb2FkDQo+ID4gICAgICAgICAgICAgICAgICAgICBkaXNwYXRjaF93b3JrbG9hZA0KPiA+
+ICAgICAgICAgICAgICAgICAgICAgICAgIHdvcmtsb2FkX3RocmVhZA0KPiA+DQo+ID4gU28gS1ZN
+R1QgaXMgYWx3YXlzIHdyaXRpbmcgdG8gR1BBcyBpbnN0ZWFkIG9mIElPVkFzIGFuZCBiYXNpY2Fs
+bHkNCj4gPiBieXBhc3NpbmcgYSBndWVzdCBJT01NVS4gIFNvIGhlcmUgaXQgd291bGQgYmUgYmV0
+dGVyIGlmIGt2bWd0IHdhcw0KPiA+IGNoYW5nZWQgbm90IHVzZSBrdm1fd3JpdGVfZ3Vlc3QgKGFs
+c28gYmVjYXVzZSBJJ2QgcHJvYmFibHkgaGF2ZSBuYWNrZWQNCj4gPiB0aGF0IGlmIEkgaGFkIGtu
+b3duIDopKS4NCj4gDQo+IEkgYWdyZWUuDQo+IA0KPiA+DQo+ID4gQXMgZmFyIGFzIEkga25vdywg
+dGhlcmUgaXMgc29tZSB3b3JrIG9uIGxpdmUgbWlncmF0aW9uIHdpdGggYm90aCBWRklPDQo+ID4g
+YW5kIG1kZXYsIGFuZCB0aGF0IHByb2JhYmx5IGluY2x1ZGVzIHNvbWUgZGlydHkgcGFnZSB0cmFj
+a2luZyBBUEkuDQo+ID4ga3ZtZ3QgY291bGQgc3dpdGNoIHRvIHRoYXQgQVBJLCBvciB0aGVyZSBj
+b3VsZCBiZSBWRklPIEFQSXMgc2ltaWxhciB0bw0KPiA+IGt2bV93cml0ZV9ndWVzdCBidXQgdGFr
+aW5nIElPVkFzIGluc3RlYWQgb2YgR1BBcy4gIEFkdmFudGFnZTogdGhpcyB3b3VsZA0KPiA+IGZp
+eCB0aGUgR1BBL0lPVkEgY29uZnVzaW9uLiAgRGlzYWR2YW50YWdlOiB1c2Vyc3BhY2Ugd291bGQg
+bG9zZSB0aGUNCj4gPiB0cmFja2luZyBvZiB3cml0ZXMgZnJvbSBtZGV2IGRldmljZXMuICBLZXZp
+biwgYXJlIHRoZXNlIHdyaXRlcyB1c2VkIGluDQo+ID4gYW55IHdheT8gIERvIHRoZSBjYWxscyB0
+byBpbnRlbF9ndnRfaHlwZXJ2aXNvcl93cml0ZV9ncGEgY292ZXJzIGFsbA0KPiA+IHdyaXRlcyBm
+cm9tIGt2bWd0IHZHUFVzLCBvciBjYW4gdGhlIGhhcmR3YXJlIHdyaXRlIHRvIG1lbW9yeSBhcyB3
+ZWxsDQo+ID4gKHdoaWNoIHdvdWxkIGJlIG15IGd1ZXNzIGlmIEkgZGlkbid0IGtub3cgYW55dGhp
+bmcgYWJvdXQga3ZtZ3QsIHdoaWNoIEkNCj4gPiBwcmV0dHkgbXVjaCBkb24ndCk/DQo+IA0KPiBp
+bnRlbF9ndnRfaHlwZXJ2aXNvcl93cml0ZV9ncGEgY292ZXJzIGFsbCB3cml0ZXMgZHVlIHRvIHNv
+ZnR3YXJlIG1lZGlhdGlvbi4NCj4gDQo+IGZvciBoYXJkd2FyZSB1cGRhdGVzLCBpdCBuZWVkcyBi
+ZSBtYXBwZWQgaW4gSU9NTVUgdGhyb3VnaA0KPiB2ZmlvX3Bpbl9wYWdlcw0KPiBiZWZvcmUgYW55
+IERNQSBoYXBwZW5zLiBUaGUgb25nb2luZyBkaXJ0eSB0cmFja2luZyBlZmZvcnQgaW4gVkZJTyB3
+aWxsIHRha2UNCj4gZXZlcnkgcGlubmVkIHBhZ2UgdGhyb3VnaCB0aGF0IEFQSSBhcyBkaXJ0aWVk
+Lg0KPiANCj4gSG93ZXZlciwgY3VycmVudGx5IFZGSU8gZG9lc24ndCBpbXBsZW1lbnQgYW55IHZm
+aW9fcmVhZC93cml0ZV9ndWVzdA0KPiBpbnRlcmZhY2UgeWV0LiBhbmQgaXQgZG9lc24ndCBtYWtl
+IHNlbnNlIHRvIHVzZSB2ZmlvX3Bpbl9wYWdlcyBmb3Igc29mdHdhcmUNCj4gZGlydGllZCBwYWdl
+cywgYXMgcGluIGlzIHVubmVjZXNzYXJ5IGFuZCBoZWF2eSBpbnZvbHZpbmcgaW9tbXUgaW52YWxp
+ZGF0aW9uLg0KDQpPbmUgY29ycmVjdGlvbi4gdmZpb19waW5fcGFnZXMgZG9lc24ndCBpbnZvbHZl
+IGlvbW11IGludmFsaWRhdGlvbi4gSSBzaG91bGQNCmp1c3QgbWVhbiB0aGF0IHBpbm5pbmcgdGhl
+IHBhZ2UgaXMgbm90IG5lY2Vzc2FyeS4gV2UganVzdCBuZWVkIGEga3ZtLWxpa2UNCmludGVyZmFj
+ZSBiYXNlZCBvbiBodmEgdG8gYWNjZXNzLg0KDQo+IA0KPiBBbGV4LCBpZiB5b3UgYXJlIE9LIHdl
+J2xsIHdvcmsgb24gc3VjaCBpbnRlcmZhY2UgYW5kIG1vdmUga3ZtZ3QgdG8gdXNlIGl0Lg0KPiBB
+ZnRlciBpdCdzIGFjY2VwdGVkLCB3ZSBjYW4gYWxzbyBtYXJrIHBhZ2VzIGRpcnR5IHRocm91Z2gg
+dGhpcyBuZXcgaW50ZXJmYWNlDQo+IGluIEtpcnRpJ3MgZGlydHkgcGFnZSB0cmFja2luZyBzZXJp
+ZXMuDQo+IA0K
