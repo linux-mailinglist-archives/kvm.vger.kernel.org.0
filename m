@@ -2,131 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C9688125683
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 23:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 337571256A0
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 23:24:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726783AbfLRWSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 17:18:49 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8926 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726594AbfLRWSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 17:18:47 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5dfaa5ba0000>; Wed, 18 Dec 2019 14:18:34 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 18 Dec 2019 14:18:44 -0800
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 18 Dec 2019 14:18:44 -0800
-Received: from [10.2.165.11] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 18 Dec
- 2019 22:18:43 +0000
-Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
- routines
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+        id S1726536AbfLRWYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 17:24:22 -0500
+Received: from mga06.intel.com ([134.134.136.31]:25121 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726387AbfLRWYW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 17:24:22 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 14:24:21 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
+   d="scan'208";a="213054124"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by fmsmga008.fm.intel.com with ESMTP; 18 Dec 2019 14:24:20 -0800
+Date:   Wed, 18 Dec 2019 14:24:20 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, <bpf@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <netdev@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-2-jhubbard@nvidia.com>
- <20191218155211.emcegdp5uqgorfwe@box>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <5719efc4-e560-b3d9-8d1f-3ae289bed289@nvidia.com>
-Date:   Wed, 18 Dec 2019 14:15:53 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
+Message-ID: <20191218222420.GH25201@linux.intel.com>
+References: <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
+ <20191210155259.GD3352@xz-x1>
+ <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
+ <20191215172124.GA83861@xz-x1>
+ <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
+ <20191216185454.GG83861@xz-x1>
+ <815923d9-2d48-2915-4acb-97eb90996403@redhat.com>
+ <20191217162405.GD7258@xz-x1>
+ <c01d0732-2172-2573-8251-842e94da4cfc@redhat.com>
+ <20191218215857.GE26669@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20191218155211.emcegdp5uqgorfwe@box>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1576707514; bh=A0thRHEqnXg6dZZRQ3XItHq709pByy7GtW01Hq1OCoc=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=ScM+7x8q8mWlcIQciYsHkNMCacR+c0EXHDYwd9LQIuUPf7aoJ2FVBW026iU1SWAnl
-         ltogqGk6aIee+Km4SQR7f32cksncAyW4lNLn2TYKFrtJdbIHsrOldxBh5IaPhHdDqE
-         sdIpDxyyx+Jf8CyjrZWs/sYEpgdFVpjkjtWEpt4nJp1e7SjqwB5Cu2GqZfKBuKVEar
-         BRhkAV/MDLjwytEs34akliPwG7VvslpNx0c0XwWMRq9z3Nwumj3m+z4SVir8YPvZEf
-         vV7cvsqLQ3VGt46WIl4RoFGnV1Qa4B1dL2lodfVBrgXk2TIEVopJfv3Sggeyd8NtB5
-         Kn8oXib8wW5/w==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218215857.GE26669@xz-x1>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/18/19 7:52 AM, Kirill A. Shutemov wrote:
-> On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
->> +static void put_compound_head(struct page *page, int refs)
->> +{
->> +	/* Do a get_page() first, in case refs == page->_refcount */
->> +	get_page(page);
->> +	page_ref_sub(page, refs);
->> +	put_page(page);
->> +}
+On Wed, Dec 18, 2019 at 04:58:57PM -0500, Peter Xu wrote:
+> On Tue, Dec 17, 2019 at 05:28:54PM +0100, Paolo Bonzini wrote:
+> > On 17/12/19 17:24, Peter Xu wrote:
+> > >> No, please pass it all the way down to the [&] functions but not to
+> > >> kvm_write_guest_page.  Those should keep using vcpu->kvm.
+> > > Actually I even wanted to refactor these helpers.  I mean, we have two
+> > > sets of helpers now, kvm_[vcpu]_{read|write}*(), so one set is per-vm,
+> > > the other set is per-vcpu.  IIUC the only difference of these two are
+> > > whether we should consider ((vcpu)->arch.hflags & HF_SMM_MASK) or we
+> > > just write to address space zero always.
+> > 
+> > Right.
+> > 
+> > > Could we unify them into a
+> > > single set of helper (I'll just drop the *_vcpu_* helpers because it's
+> > > longer when write) but we always pass in vcpu* as the first parameter?
+> > > Then we add another parameter "vcpu_smm" to show whether we want to
+> > > consider the HF_SMM_MASK flag.
+> > 
+> > You'd have to check through all KVM implementations whether you always
+> > have the vCPU.  Also non-x86 doesn't have address spaces, and by the
+> > time you add ", true" or ", false" it's longer than the "_vcpu_" you
+> > have removed.  So, not a good idea in my opinion. :D
 > 
-> It's not terribly efficient. Maybe something like:
+> Well, now I've changed my mind. :) (considering that we still have
+> many places that will not have vcpu*...)
 > 
-> 	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
-> 	if (refs > 2)
-> 		page_ref_sub(page, refs - 1);
-> 	put_page(page);
+> I can simply add that "vcpu_smm" parameter to kvm_vcpu_write_*()
+> without removing the kvm_write_*() helpers.  Then I'll be able to
+> convert most of the kvm_write_*() (or its family) callers to
+> kvm_vcpu_write*(..., vcpu_smm=false) calls where proper.
 > 
-> ?
+> Would that be good?
 
-OK, but how about this instead? I don't see the need for a "2", as that
-is a magic number that requires explanation. Whereas "1" is not a magic
-number--here it means: either there are "many" (>1) refs, or not.
+I've lost track of the problem you're trying to solve, but if you do
+something like "vcpu_smm=false", explicitly pass an address space ID
+instead of hardcoding x86 specific SMM crud, e.g.
 
-And the routine won't be called with refs less than about 32 (2MB huge
-page, 64KB base page == 32 subpages) anyway.
-
-	VM_BUG_ON_PAGE(page_ref_count(page) < refs, page);
-	/*
-	 * Calling put_page() for each ref is unnecessarily slow. Only the last
-	 * ref needs a put_page().
-	 */
-	if (refs > 1)
-		page_ref_sub(page, refs - 1);
-	put_page(page);
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
-  
+	kvm_vcpu_write*(..., as_id=0);
