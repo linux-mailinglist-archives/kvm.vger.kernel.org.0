@@ -2,100 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41F32125703
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 23:37:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03576125722
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 23:45:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbfLRWhg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 17:37:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45442 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726518AbfLRWhg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 17:37:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576708655;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nyKH+GG9maQ/CDdFzTvDDSeKNGA19czyfBwyFBCr+TI=;
-        b=LBsr8JY8MijAQhcTV37vyfMEcc58qGcVOA71/gUHp+GWkuGz7sNhmcklJ0E7AkcDoj/xwx
-        mjT7vNhMkoKaXGq+W4sPeZ3lk2lx67tT+K0egxbLQl3AB9z6YP7J7T2XJP8BPggQ/+cmdn
-        lfKv2m9kqJW6Vy3+avSc2UpBtwNMdzc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-cW-aFMbYOyi2zlh3V-xNIg-1; Wed, 18 Dec 2019 17:37:34 -0500
-X-MC-Unique: cW-aFMbYOyi2zlh3V-xNIg-1
-Received: by mail-wm1-f72.google.com with SMTP id g26so932620wmk.6
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 14:37:34 -0800 (PST)
+        id S1726700AbfLRWpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 17:45:18 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:34489 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726622AbfLRWpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 17:45:09 -0500
+Received: by mail-lf1-f68.google.com with SMTP id l18so2904374lfc.1
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 14:45:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=YrrQW+o6yoR9HJnH1mwKSC9v5iWno6eigHp0EBk4LR0=;
+        b=bdF7Zv0VTafIoorJswX48t2yxXJBYxcvjHgrT2SGIIMh8SxTaUWksloPDk4hj8pN+b
+         8Wy7ZGVYH0fWsHmH/IMJnBSfIeVts/sOmiy4I/nlOeq68AiZoaQ1Mqh2e43FlXq9gRLG
+         KshnO+IUvlyZD7e2bgfiCpZOkUn91XMsyCwRx9hGVqlfs3W1si7CDXXM3vtqSXuMWY78
+         Tae1sOhSYoNDJLrJgal+3cpj+/6xa05u+pWrMRgdVnIo9FZyRNB0aI0+sHon8/zGouR0
+         pqwpw4LUVoV4NK9FktzSrs+SeQWsHdxx0QqmCUwextJEn9FOXazhfjjyb53FWNWWcUXk
+         GNTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nyKH+GG9maQ/CDdFzTvDDSeKNGA19czyfBwyFBCr+TI=;
-        b=jtE4e6eIMJxwKGhidTRtRR82Sid1bpsSJ1KvvMw3Cw8dBeL5Gk0739zq4h6JTwQMW3
-         A0u9Us7yMMA52xsX8k1Qeu1pISFxcM9dJ5KHRQOPxNw3V4je+9TBKE6dOPjgU7mXu2O/
-         QSIjLiit7vnEvHB8c11CcQuxmCY+c0alS0UyNzD7R034e+pI5tDRwqVnIZN6idOY23Yt
-         m0U9BdsOAucGtSFAG1N/oQrwp4uNAbQONU98mGgBGyVtsm7YAB61UyUMHzsjamKac2Al
-         XB7HXdT7A9eTsty6F/D19eyc/7QBmPP6D66z2aAh0J/Y8pGlOPy7c6hcfTpWsa8x65Ub
-         XotA==
-X-Gm-Message-State: APjAAAUvI4hTrWLxatzLdOXN9iIgmRxyw99s/9AhuiecS+sAWO3iwXaa
-        3OVZ9kiXFKVD73+Kj+PxN8IFmDxR5wixdsPk/PlMMTDYkJWMruFlB33JlY7TQ9ofdKQrBjiy0z8
-        UfCRHOv1TT4+Q
-X-Received: by 2002:a1c:770e:: with SMTP id t14mr6364242wmi.101.1576708653479;
-        Wed, 18 Dec 2019 14:37:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqybTuTVWzLqRLznVN+zxwbM+9s5N0zqn7/jFC4IyZ6tn5C5ybLXwXLHlPz+5TyRSgXHUStnoA==
-X-Received: by 2002:a1c:770e:: with SMTP id t14mr6364216wmi.101.1576708653263;
-        Wed, 18 Dec 2019 14:37:33 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:ac09:bce1:1c26:264c? ([2001:b07:6468:f312:ac09:bce1:1c26:264c])
-        by smtp.gmail.com with ESMTPSA id w8sm4110638wmm.0.2019.12.18.14.37.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Dec 2019 14:37:32 -0800 (PST)
-Subject: Re: [PATCH RFC 04/15] KVM: Implement ring-based dirty memory tracking
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Xu <peterx@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=YrrQW+o6yoR9HJnH1mwKSC9v5iWno6eigHp0EBk4LR0=;
+        b=DW43+mDCKelY1RIh+r9jxNah0XLZCJpxOlX1VccYhR1+CtOowMuGuC95D7x03r49rE
+         P0IakGXC2lEPrAU1CCwlSQDfDIK3Hy9PlL/Z4DqdlHxcn+hbDegGRRSduI1yoyQ4F+oX
+         8q+VRhV59IW+Q5pZnETKg0sl9qqQ0CCMeZEaBp33PbDyokJG17wQyXgZpUWatxMnmSEn
+         cSWbmKXlcHP591SoK366KPTfSTH+IFf2RtvYK76RYQeCGZY7GpE/Y+dMG1c1M1puLyg7
+         9OOhlERtK/0/uKFStzNGo+7kXXaCidaRaIT5eVtZG6bGAE3Sa1FTJjbrf/aid6WrWEAp
+         PZXQ==
+X-Gm-Message-State: APjAAAWcwZIH+D+uxLh4Xut1xApoeGurLwLoXBAd59YOEkCvMnfr2sAv
+        jZT/tDM5gA2ucC1rhIarG1+uZA==
+X-Google-Smtp-Source: APXvYqwPbC3mnICecXB2mktdTfANDFTtD1oSKWMGw8lhRk6/u/eXjGq156/mWoszLGq/OpGErs59TQ==
+X-Received: by 2002:a19:6a06:: with SMTP id u6mr3341913lfu.187.1576709107276;
+        Wed, 18 Dec 2019 14:45:07 -0800 (PST)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id t6sm1792834ljj.62.2019.12.18.14.45.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Dec 2019 14:45:06 -0800 (PST)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 380451012E3; Thu, 19 Dec 2019 01:45:07 +0300 (+03)
+Date:   Thu, 19 Dec 2019 01:45:07 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Alex Williamson <alex.williamson@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-References: <affd9d84-1b84-0c25-c431-a075c58c33dc@redhat.com>
- <20191210155259.GD3352@xz-x1>
- <3e6cb5ec-66c0-00ab-b75e-ad2beb1d216d@redhat.com>
- <20191215172124.GA83861@xz-x1>
- <f117d46a-7528-ce32-8e46-4f3f35937079@redhat.com>
- <20191216185454.GG83861@xz-x1>
- <815923d9-2d48-2915-4acb-97eb90996403@redhat.com>
- <20191217162405.GD7258@xz-x1>
- <c01d0732-2172-2573-8251-842e94da4cfc@redhat.com>
- <20191218215857.GE26669@xz-x1> <20191218222420.GH25201@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <77b497c8-3939-58d1-166f-6c862d3a8d5b@redhat.com>
-Date:   Wed, 18 Dec 2019 23:37:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Chinner <david@fromorbit.com>,
+        David Airlie <airlied@linux.ie>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Corbet <corbet@lwn.net>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Hocko <mhocko@suse.com>,
+        Mike Kravetz <mike.kravetz@oracle.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>
+Subject: Re: [PATCH v11 01/25] mm/gup: factor out duplicate code from four
+ routines
+Message-ID: <20191218224507.nayxmx7vvsjvyzsc@box>
+References: <20191216222537.491123-1-jhubbard@nvidia.com>
+ <20191216222537.491123-2-jhubbard@nvidia.com>
+ <20191218155211.emcegdp5uqgorfwe@box>
+ <5719efc4-e560-b3d9-8d1f-3ae289bed289@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191218222420.GH25201@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5719efc4-e560-b3d9-8d1f-3ae289bed289@nvidia.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/12/19 23:24, Sean Christopherson wrote:
-> I've lost track of the problem you're trying to solve, but if you do
-> something like "vcpu_smm=false", explicitly pass an address space ID
-> instead of hardcoding x86 specific SMM crud, e.g.
+On Wed, Dec 18, 2019 at 02:15:53PM -0800, John Hubbard wrote:
+> On 12/18/19 7:52 AM, Kirill A. Shutemov wrote:
+> > On Mon, Dec 16, 2019 at 02:25:13PM -0800, John Hubbard wrote:
+> > > +static void put_compound_head(struct page *page, int refs)
+> > > +{
+> > > +	/* Do a get_page() first, in case refs == page->_refcount */
+> > > +	get_page(page);
+> > > +	page_ref_sub(page, refs);
+> > > +	put_page(page);
+> > > +}
+> > 
+> > It's not terribly efficient. Maybe something like:
+> > 
+> > 	VM_BUG_ON_PAGE(page_ref_count(page) < ref, page);
+> > 	if (refs > 2)
+> > 		page_ref_sub(page, refs - 1);
+> > 	put_page(page);
+> > 
+> > ?
 > 
-> 	kvm_vcpu_write*(..., as_id=0);
+> OK, but how about this instead? I don't see the need for a "2", as that
+> is a magic number that requires explanation. Whereas "1" is not a magic
+> number--here it means: either there are "many" (>1) refs, or not.
 
-And the point of having kvm_vcpu_* vs. kvm_write_* was exactly to not
-having to hardcode the address space ID.  If anything you could add a
-__kvm_vcpu_write_* API that takes vcpu+as_id, but really I'd prefer to
-keep kvm_get_running_vcpu() for now and then it can be refactored later.
- There are already way too many memory r/w APIs...
+Yeah, it's my thinko. Sure, it has to be '1' (or >= 2, which is less readable).
 
-Paolo
+> And the routine won't be called with refs less than about 32 (2MB huge
+> page, 64KB base page == 32 subpages) anyway.
 
+It's hard to make predictions about future :P
+
+> 	VM_BUG_ON_PAGE(page_ref_count(page) < refs, page);
+> 	/*
+> 	 * Calling put_page() for each ref is unnecessarily slow. Only the last
+> 	 * ref needs a put_page().
+> 	 */
+> 	if (refs > 1)
+> 		page_ref_sub(page, refs - 1);
+> 	put_page(page);
+
+Looks good to me.
+
+-- 
+ Kirill A. Shutemov
