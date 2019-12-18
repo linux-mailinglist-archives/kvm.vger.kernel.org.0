@@ -2,138 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 286A1124894
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 14:42:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDE061248C6
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 14:54:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbfLRNmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 08:42:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44298 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726912AbfLRNmH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 08:42:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1576676525;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OdHalUnD/LlSuJgEwaYsX1mkBoQV0c3hJtbxl/WylGs=;
-        b=GKKe8Wnkk3LSuRhqmWlqMgTtFK2baLIFOAFOa4NLWfAlGqmLc7lhEPAE+gzSsyoVXjPmWC
-        i3ceUSy3cIAc0GBhQAp8VYQ1ydGAYF+r1MEU19uerwYrdMbN9EficVTIWl5Un2cikHxkHk
-        ZEvBW2j6tJUUbt+lSX0lt+l0+SaM/nE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-0Nj8KE41MFywJg36bkXfQw-1; Wed, 18 Dec 2019 08:42:01 -0500
-X-MC-Unique: 0Nj8KE41MFywJg36bkXfQw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEACF88127E;
-        Wed, 18 Dec 2019 13:41:59 +0000 (UTC)
-Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C52C15C1B0;
-        Wed, 18 Dec 2019 13:41:55 +0000 (UTC)
-Subject: Re: [PATCH] vfio: platform: fix __iomem in vfio_platform_amdxgbe.c
-To:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Allison Randal <allison@lohutok.net>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191218133525.2608583-1-ben.dooks@codethink.co.uk>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <29859d29-dd51-1b27-8606-0e2eb1f6578c@redhat.com>
-Date:   Wed, 18 Dec 2019 14:41:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726977AbfLRNyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 08:54:07 -0500
+Received: from mga11.intel.com ([192.55.52.93]:5017 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726856AbfLRNyH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 08:54:07 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 05:54:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,329,1571727600"; 
+   d="scan'208";a="390195126"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga005.jf.intel.com with ESMTP; 18 Dec 2019 05:54:04 -0800
+Date:   Wed, 18 Dec 2019 21:55:13 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        jmattson@google.com, yu.c.zhang@linux.intel.com,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 3/7] KVM: VMX: Pass through CET related MSRs
+Message-ID: <20191218135513.GB7926@local-michael-cet-test>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191101085222.27997-4-weijiang.yang@intel.com>
+ <20191210211821.GL15758@linux.intel.com>
+ <20191216021816.GA10764@local-michael-cet-test>
+ <20191218003455.GP11771@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191218133525.2608583-1-ben.dooks@codethink.co.uk>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218003455.GP11771@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ben,
+On Tue, Dec 17, 2019 at 04:34:55PM -0800, Sean Christopherson wrote:
+> On Mon, Dec 16, 2019 at 10:18:16AM +0800, Yang Weijiang wrote:
+> > On Tue, Dec 10, 2019 at 01:18:21PM -0800, Sean Christopherson wrote:
+> > > On Fri, Nov 01, 2019 at 04:52:18PM +0800, Yang Weijiang wrote:
+> > > > CET MSRs pass through Guest directly to enhance performance.
+> > > > CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
+> > > > Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
+> > > > SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
+> > > > these MSRs are defined in kernel and re-used here.
+> > > > 
+> >  > +
+> > > >  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > > > @@ -7025,6 +7087,9 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+> > > >  	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
+> > > >  			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
+> > > >  		update_intel_pt_cfg(vcpu);
+> > > > +
+> > > > +	if (!is_guest_mode(vcpu))
+> > > > +		vmx_pass_cet_msrs(vcpu);
+> > > 
+> > > Hmm, this looks insufficent, e.g. deliberately toggling CET from on->off
+> > > while in guest mode would put KVM in a weird state as the msr bitmap for
+> > > L1 would still allow L1 to access the CET MSRs.
+> > >
+> > Hi, Sean,
+> > I don't get you, there's guest mode check before access CET msrs, it'll
+> > fail if it's in guest mode.
+> 
+> KVM can exit to userspae while L2 is active.  If userspace then did a
+> KVM_SET_CPUID2, e.g. instead of KVM_RUN, vmx_cpuid_update() would skip
+> vmx_pass_cet_msrs() and KVM would never update L1's MSR bitmaps.
+>
+Thanks, it makes sense to me. Given current implementation, how about
+removing above check and adding it in CET CPUID
+enumeration for L2 so that no CET msrs passed through to L2 when
+is_guest_mode() is true?
 
-On 12/18/19 2:35 PM, Ben Dooks (Codethink) wrote:
-> The ioaddr should have __iomem marker on it, so add that to fix
-> the following sparse warnings:
+> > > Allowing KVM_SET_CPUID{2} while running a nested guest seems bogus, can we
+> > > kill that path entirely with -EINVAL?
+> > >
+> > Do you mean don't expose CET cpuids to L2 guest?
 > 
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44: warning: incorrect type in argument 2 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44:    expected void volatile [noderef] <asn:2> *addr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44:    got void *
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33:    expected void const volatile [noderef] <asn:2> *addr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33:    got void *
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44: warning: incorrect type in argument 2 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44:    expected void volatile [noderef] <asn:2> *addr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44:    got void *
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33: warning: incorrect type in argument 2 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33:    expected void volatile [noderef] <asn:2> *addr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33:    got void *
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30:    got void [noderef] <asn:2> *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30: warning: incorrect type in argument 1 (different address spaces)
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30:    expected void *ioaddr
-> drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30:    got void [noderef] <asn:2> *ioaddr
-> 
-> Signed-off-by: Ben Dooks (Codethink) <ben.dooks@codethink.co.uk>
-> ---
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Allison Randal <allison@lohutok.net>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  drivers/vfio/platform/reset/vfio_platform_amdxgbe.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> index 2d2babe21b2f..ecfc908de30f 100644
-> --- a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> +++ b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
-> @@ -24,7 +24,7 @@
->  #define MDIO_AN_INT		0x8002
->  #define MDIO_AN_INTMASK		0x8001
->  
-> -static unsigned int xmdio_read(void *ioaddr, unsigned int mmd,
-> +static unsigned int xmdio_read(void __iomem *ioaddr, unsigned int mmd,
->  			       unsigned int reg)
->  {
->  	unsigned int mmd_address, value;
-> @@ -35,7 +35,7 @@ static unsigned int xmdio_read(void *ioaddr, unsigned int mmd,
->  	return value;
->  }
->  
-> -static void xmdio_write(void *ioaddr, unsigned int mmd,
-> +static void xmdio_write(void __iomem *ioaddr, unsigned int mmd,
->  			unsigned int reg, unsigned int value)
->  {
->  	unsigned int mmd_address;
-> 
-Acked-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+> I mean completely disallow KVM_SET_CPUID and KVM_SET_CPUID2 if
+> is_guest_mode() is true.  My question is mostly directed at Paolo and
+> anyone else that has an opinion on whether we can massage the ABI to
+> retroactively change KVM_SET_CPUID{2} behavior.
+This sounds like something deserving an individual patch after get
+agreement in community. I'll put it aside right now.
 
