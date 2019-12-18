@@ -2,182 +2,505 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9245123C06
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 01:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1178123C3F
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 02:13:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726587AbfLRAzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Dec 2019 19:55:20 -0500
-Received: from mga06.intel.com ([134.134.136.31]:21852 "EHLO mga06.intel.com"
+        id S1726382AbfLRBNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Dec 2019 20:13:10 -0500
+Received: from mga06.intel.com ([134.134.136.31]:22829 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725940AbfLRAzU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Dec 2019 19:55:20 -0500
+        id S1726167AbfLRBNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Dec 2019 20:13:10 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 16:55:19 -0800
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2019 17:13:08 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,327,1571727600"; 
-   d="scan'208";a="266734571"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
-  by FMSMGA003.fm.intel.com with ESMTP; 17 Dec 2019 16:55:18 -0800
-Date:   Tue, 17 Dec 2019 16:55:18 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     syzbot <syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com>,
-        Dmitry Vyukov <dvyukov@google.com>
-Cc:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, pbonzini@redhat.com, rkrcmar@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
-        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
-Subject: Re: kernel BUG at arch/x86/kvm/mmu/mmu.c:LINE!
-Message-ID: <20191218005518.GQ11771@linux.intel.com>
-References: <0000000000003cffc30599d3d1a0@google.com>
+   d="scan'208";a="390015335"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by orsmga005.jf.intel.com with ESMTP; 17 Dec 2019 17:13:05 -0800
+Date:   Tue, 17 Dec 2019 20:04:51 -0500
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191218010451.GI21868@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+ <20191217095110.GH21868@joy-OptiPlex-7040>
+ <0d9604d9-3bb2-6944-9858-983366f332bb@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0000000000003cffc30599d3d1a0@google.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <0d9604d9-3bb2-6944-9858-983366f332bb@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 07:25:11AM -0800, syzbot wrote:
-> Hello,
+On Tue, Dec 17, 2019 at 07:47:05PM +0800, Kirti Wankhede wrote:
 > 
-> syzbot found the following crash on:
 > 
-> HEAD commit:    ae4b064e Merge tag 'afs-fixes-20191211' of git://git.kerne..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=149c0cfae00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=79f79de2a27d3e3d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c9d1fb51ac9d0d10c39d
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17a97b7ee00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15128396e00000
+> On 12/17/2019 3:21 PM, Yan Zhao wrote:
+> > On Tue, Dec 17, 2019 at 05:24:14PM +0800, Kirti Wankhede wrote:
+> >>
+> >>
+> >> On 12/17/2019 10:45 AM, Yan Zhao wrote:
+> >>> On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
+> >>>> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> >>>> - Start unpinned pages dirty pages tracking while migration is active and
+> >>>>     device is running, i.e. during pre-copy phase.
+> >>>> - Stop unpinned pages dirty pages tracking. This is required to stop
+> >>>>     unpinned dirty pages tracking if migration failed or cancelled during
+> >>>>     pre-copy phase. Unpinned pages tracking is clear.
+> >>>> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
+> >>>>     unpinned pages information on bitmap read. This ioctl returns bitmap of
+> >>>>     dirty pages, its user space application responsibility to copy content
+> >>>>     of dirty pages from source to destination during migration.
+> >>>>
+> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >>>> ---
+> >>>>    drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
+> >>>>    1 file changed, 203 insertions(+), 7 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >>>> index 3f6b04f2334f..264449654d3f 100644
+> >>>> --- a/drivers/vfio/vfio_iommu_type1.c
+> >>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >>>> @@ -70,6 +70,7 @@ struct vfio_iommu {
+> >>>>    	unsigned int		dma_avail;
+> >>>>    	bool			v2;
+> >>>>    	bool			nesting;
+> >>>> +	bool			dirty_page_tracking;
+> >>>>    };
+> >>>>    
+> >>>>    struct vfio_domain {
+> >>>> @@ -112,6 +113,7 @@ struct vfio_pfn {
+> >>>>    	dma_addr_t		iova;		/* Device address */
+> >>>>    	unsigned long		pfn;		/* Host pfn */
+> >>>>    	atomic_t		ref_count;
+> >>>> +	bool			unpinned;
+> >>>>    };
+> >>>>    
+> >>>>    struct vfio_regions {
+> >>>> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
+> >>>>    	kfree(vpfn);
+> >>>>    }
+> >>>>    
+> >>>> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
+> >>>> +{
+> >>>> +	struct rb_node *n = rb_first(&dma->pfn_list);
+> >>>> +
+> >>>> +	for (; n; n = rb_next(n)) {
+> >>>> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
+> >>>> +
+> >>>> +		if (warn)
+> >>>> +			WARN_ON_ONCE(vpfn->unpinned);
+> >>>> +
+> >>>> +		if (vpfn->unpinned)
+> >>>> +			vfio_remove_from_pfn_list(dma, vpfn);
+> >>>> +	}
+> >>>> +}
+> >>>> +
+> >>>> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
+> >>>> +{
+> >>>> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> >>>> +
+> >>>> +	for (; n; n = rb_next(n)) {
+> >>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> >>>> +
+> >>>> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> >>>> +	}
+> >>>> +}
+> >>>> +
+> >>>>    static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> >>>>    					       unsigned long iova)
+> >>>>    {
+> >>>> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> >>>>    	return vpfn;
+> >>>>    }
+> >>>>    
+> >>>> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+> >>>> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
+> >>>> +				  bool dirty_tracking)
+> >>>>    {
+> >>>>    	int ret = 0;
+> >>>>    
+> >>>>    	if (atomic_dec_and_test(&vpfn->ref_count)) {
+> >>>>    		ret = put_pfn(vpfn->pfn, dma->prot);
+> >>> if physical page here is put, it may cause problem when pin this iova
+> >>> next time:
+> >>> vfio_iommu_type1_pin_pages {
+> >>>       ...
+> >>>       vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> >>>       if (vpfn) {
+> >>>           phys_pfn[i] = vpfn->pfn;
+> >>>           continue;
+> >>>       }
+> >>>       ...
+> >>> }
+> >>>
+> >>
+> >> Good point. Fixing it as:
+> >>
+> >>                   vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> >>                   if (vpfn) {
+> >> -                       phys_pfn[i] = vpfn->pfn;
+> >> -                       continue;
+> >> +                       if (vpfn->unpinned)
+> >> +                               vfio_remove_from_pfn_list(dma, vpfn);
+> > what about updating vpfn instead?
+> > 
+> 
+> vfio_pin_page_external() takes care of verification checks and mem lock 
+> accounting. I prefer to free existing and add new node with existing 
+> functions.
+> 
+> >> +                       else {
+> >> +                               phys_pfn[i] = vpfn->pfn;
+> >> +                               continue;
+> >> +                       }
+> >>                   }
+> >>
+> >>
+> >>
+> >>>> -		vfio_remove_from_pfn_list(dma, vpfn);
+> >>>> +		if (dirty_tracking)
+> >>>> +			vpfn->unpinned = true;
+> >>>> +		else
+> >>>> +			vfio_remove_from_pfn_list(dma, vpfn);
+> >>> so the unpinned pages before dirty page tracking is not treated as
+> >>> dirty?
+> >>>
+> >>
+> >> Yes. That's we agreed on previous version:
+> >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg663157.html
+> >>
+> >>>>    	}
+> >>>>    	return ret;
+> >>>>    }
+> >>>> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+> >>>>    }
+> >>>>    
+> >>>>    static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> >>>> -				    bool do_accounting)
+> >>>> +				    bool do_accounting, bool dirty_tracking)
+> >>>>    {
+> >>>>    	int unlocked;
+> >>>>    	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+> >>>> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> >>>>    	if (!vpfn)
+> >>>>    		return 0;
+> >>>>    
+> >>>> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+> >>>> +	if (vpfn->unpinned)
+> >>>> +		return 0;
+> >>>> +
+> >>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+> >>>>    
+> >>>>    	if (do_accounting)
+> >>>>    		vfio_lock_acct(dma, -unlocked, true);
+> >>>> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>>>    
+> >>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> >>>>    		if (ret) {
+> >>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
+> >>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
+> >>>> +						 false);
+> >>>>    			goto pin_unwind;
+> >>>>    		}
+> >>>>    	}
+> >>>> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>>>    
+> >>>>    		iova = user_pfn[j] << PAGE_SHIFT;
+> >>>>    		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> >>>> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> >>>> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
+> >>>>    		phys_pfn[j] = 0;
+> >>>>    	}
+> >>>>    pin_done:
+> >>>> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+> >>>>    		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> >>>>    		if (!dma)
+> >>>>    			goto unpin_exit;
+> >>>> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> >>>> +		vfio_unpin_page_external(dma, iova, do_accounting,
+> >>>> +					 iommu->dirty_page_tracking);
+> >>>>    	}
+> >>>>    
+> >>>>    unpin_exit:
+> >>>> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> >>>>    	return bitmap;
+> >>>>    }
+> >>>>    
+> >>>> +/*
+> >>>> + * start_iova is the reference from where bitmaping started. This is called
+> >>>> + * from DMA_UNMAP where start_iova can be different than iova
+> >>>> + */
+> >>>> +
+> >>>> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> >>>> +				  size_t size, uint64_t pgsize,
+> >>>> +				  dma_addr_t start_iova, unsigned long *bitmap)
+> >>>> +{
+> >>>> +	struct vfio_dma *dma;
+> >>>> +	dma_addr_t i = iova;
+> >>>> +	unsigned long pgshift = __ffs(pgsize);
+> >>>> +
+> >>>> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
+> >>>> +		/* mark all pages dirty if all pages are pinned and mapped. */
+> >>>> +		if (dma->iommu_mapped) {
+> >>> This prevents pass-through devices from calling vfio_pin_pages to do
+> >>> fine grained log dirty.
+> >>
+> >> Yes, I mentioned that in yet TODO item in cover letter:
+> >>
+> >> "If IOMMU capable device is present in the container, then all pages are
+> >> marked dirty. Need to think smart way to know if IOMMU capable device's
+> >> driver is smart to report pages to be marked dirty by pinning those
+> >> pages externally."
+> >>
+> > why not just check first if any vpfn present for IOMMU capable devices?
+> > 
+> 
+> vfio_pin_pages(dev, ...) calls driver->ops->pin_pages(iommu, ...)
+> 
+> In vfio_iommu_type1 module, vfio_iommu_type1_pin_pages() doesn't know 
+> the device. vpfn are tracked against container->iommu, not against 
+> device. Need to think of smart way to know if devices in container are 
+> all smart which report pages dirty ny pinning those pages manually.
+>
+I believe in such case, the mdev on top of device is in the same iommu
+group (i.e. 1:1 mdev on top of device).
+device vendor driver calls vfio_pin_pages to notify vfio which pages are dirty. 
+> 
+> >>
+> >>>> +			dma_addr_t iova_limit;
+> >>>> +
+> >>>> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
+> >>>> +				     (dma->iova + dma->size) : (iova + size);
+> >>>> +
+> >>>> +			for (; i < iova_limit; i += pgsize) {
+> >>>> +				unsigned int start;
+> >>>> +
+> >>>> +				start = (i - start_iova) >> pgshift;
+> >>>> +
+> >>>> +				__bitmap_set(bitmap, start, 1);
+> >>>> +			}
+> >>>> +			if (i >= iova + size)
+> >>>> +				return;
+> >>>> +		} else {
+> >>>> +			struct rb_node *n = rb_first(&dma->pfn_list);
+> >>>> +			bool found = false;
+> >>>> +
+> >>>> +			for (; n; n = rb_next(n)) {
+> >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >>>> +							struct vfio_pfn, node);
+> >>>> +				if (vpfn->iova >= i) {
+> >>>> +					found = true;
+> >>>> +					break;
+> >>>> +				}
+> >>>> +			}
+> >>>> +
+> >>>> +			if (!found) {
+> >>>> +				i += dma->size;
+> >>>> +				continue;
+> >>>> +			}
+> >>>> +
+> >>>> +			for (; n; n = rb_next(n)) {
+> >>>> +				unsigned int start;
+> >>>> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >>>> +							struct vfio_pfn, node);
+> >>>> +
+> >>>> +				if (vpfn->iova >= iova + size)
+> >>>> +					return;
+> >>>> +
+> >>>> +				start = (vpfn->iova - start_iova) >> pgshift;
+> >>>> +
+> >>>> +				__bitmap_set(bitmap, start, 1);
+> >>>> +
+> >>>> +				i = vpfn->iova + pgsize;
+> >>>> +			}
+> >>>> +		}
+> >>>> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> >>>> +	}
+> >>>> +}
+> >>>> +
+> >>>> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
+> >>>> +{
+> >>>> +	long bsize;
+> >>>> +
+> >>>> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
+> >>>> +
+> >>>> +	if (bitmap_size < bsize)
+> >>>> +		return -EINVAL;
+> >>>> +
+> >>>> +	return bsize;
+> >>>> +}
+> >>>> +
+> >>>>    static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>>>    			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>>>    {
+> >>>> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>>>    
+> >>>>    		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >>>>    			-EFAULT : 0;
+> >>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> >>>> +		struct vfio_iommu_type1_dirty_bitmap range;
+> >>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> >>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> >>>> +		int ret;
+> >>>> +
+> >>>> +		if (!iommu->v2)
+> >>>> +			return -EACCES;
+> >>>> +
+> >>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> >>>> +				    bitmap);
+> >>>> +
+> >>>> +		if (copy_from_user(&range, (void __user *)arg, minsz))
+> >>>> +			return -EFAULT;
+> >>>> +
+> >>>> +		if (range.argsz < minsz || range.flags & ~mask)
+> >>>> +			return -EINVAL;
+> >>>> +
+> >>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> >>>> +			iommu->dirty_page_tracking = true;
+> >>>> +			return 0;
+> >>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> >>>> +			iommu->dirty_page_tracking = false;
+> >>>> +
+> >>>> +			mutex_lock(&iommu->lock);
+> >>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+> >>>> +			mutex_unlock(&iommu->lock);
+> >>>> +			return 0;
+> >>>> +
+> >>>> +		} else if (range.flags &
+> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >>>> +			uint64_t iommu_pgmask;
+> >>>> +			unsigned long pgshift = __ffs(range.pgsize);
+> >>>> +			unsigned long *bitmap;
+> >>>> +			long bsize;
+> >>>> +
+> >>>> +			iommu_pgmask =
+> >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> >>>> +
+> >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> >>>> +			    (range.pgsize - 1))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			if (range.iova & iommu_pgmask)
+> >>>> +				return -EINVAL;
+> >>>> +			if (!range.size || range.size > SIZE_MAX)
+> >>>> +				return -EINVAL;
+> >>>> +			if (range.iova + range.size < range.iova)
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> >>>> +						   range.bitmap_size);
+> >>>> +			if (bsize)
+> >>>> +				return ret;
+> >>>> +
+> >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> >>>> +			if (!bitmap)
+> >>>> +				return -ENOMEM;
+> >>>> +
+> >>>> +			ret = copy_from_user(bitmap,
+> >>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> >>>> +			if (ret)
+> >>>> +				goto bitmap_exit;
+> >>>> +
+> >>>> +			iommu->dirty_page_tracking = false;
+> >>> why iommu->dirty_page_tracking is false here?
+> >>> suppose this ioctl can be called several times.
+> >>>
+> >>
+> >> This ioctl can be called several times, but once this ioctl is called
+> >> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
+> >> stop-and-copy phase) and dirty pages bitmap are being queried by user.
+> >>
+> > can't agree that VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP can only be
+> > called in stop-and-copy phase.
+> > As stated in last version, this will cause QEMU to get a wrong expectation
+> > of VM downtime and this is also the reason for previously pinned pages
+> > before log_sync cannot be treated as dirty. If this get bitmap ioctl can
+> > be called early in save_setup phase, then it's no problem even all ram
+> > is dirty.
+> > 
+> 
+> Device can also write to pages which are pinned, and then there is no 
+> way to know pages dirtied by device during pre-copy phase.
+> If user ask dirty bitmap in per-copy phase, even then user will have to 
+> query dirty bitmap in stop-and-copy phase where this will be superset 
+> including all pages reported during pre-copy. Then instead of copying 
+> all pages twice, its better to do it once during stop-and-copy phase.
+>
+I think the flow should be like this:
+1. save_setup --> GET_BITMAP ioctl --> return bitmap for currently + previously
+pinned pages and clean all previously pinned pages
 
-Looks like the crash is basically 100% reproducible in syzkaller's
-environment, but bisection went off into the weeds because it hit a random
-unrelated failure.
+2. save_pending --> GET_BITMAP ioctl  --> return bitmap of (currently
+pinned pages + previously pinned pages since last clean) and clean all
+previously pinned pages
 
-I've tried the C reproducer without "success".  Is it possible to adjust
-the bisection for this crash so that it can home in on the actual bug?
+3. save_complete_precopy --> GET_BITMAP ioctl --> return bitmap of (currently
+pinned pages + previously pinned pages since last clean) and clean all
+previously pinned pages
 
-  kernel signature: 77bc4f2c8b034884ef0b5f4a64115ae7447012ed
-  run #0: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #1: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #2: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #3: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #4: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #5: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #6: crashed: kernel BUG at arch/x86/kvm/mmu.c:LINE!
-  run #7: boot failed: KASAN: use-after-free Write in call_usermodehelper_exec_work
-  run #8: boot failed: KASAN: use-after-free Write in call_usermodehelper_exec_work
-  run #9: boot failed: KASAN: use-after-free Write in call_usermodehelper_exec_work
-  # git bisect bad f39c6b29ae1d3727d9c65a4ab99d5150b558be5e
-  Bisecting: 901 revisions left to test after this (roughly 10 steps)
-  [7d6541fba19c970cf5ebbc2c56b0fb04eab89f98] Merge tag 'mlx5e-updates-2018-05-14'
-  testing commit 7d6541fba19c970cf5ebbc2c56b0fb04eab89f98 with gcc (GCC) 8.1.0
-  kernel signature: 6d4fcd644552059ed7f799240ae8f63e4634fa35
-  all runs: OK
-  # git bisect good 7d6541fba19c970cf5ebbc2c56b0fb04eab89f98
-  Bisecting: 450 revisions left to test after this (roughly 9 steps)
-  [73bf1fc58dc4376d0111a4c1c9eab27e2759f468] Merge branch 'net-ipv6-Fix-route'
-  testing commit 73bf1fc58dc4376d0111a4c1c9eab27e2759f468 with gcc (GCC) 8.1.0
-  kernel signature: b651b65951b60c06906f2717756395fc5176e7b5
-  run #0: OK
-  run #1: OK
-  run #2: OK
-  run #3: OK
-  run #4: OK
-  run #5: OK
-  run #6: OK
-  run #7: OK
-  run #8: OK
-  run #9: crashed: WARNING in __static_key_slow_dec_cpuslocked
-  # git bisect bad 73bf1fc58dc4376d0111a4c1c9eab27e2759f468
 
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+c9d1fb51ac9d0d10c39d@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> kernel BUG at arch/x86/kvm/mmu/mmu.c:3416!
-> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-> CPU: 0 PID: 9988 Comm: syz-executor218 Not tainted 5.5.0-rc1-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-> Google 01/01/2011
-> RIP: 0010:transparent_hugepage_adjust+0x4c8/0x550
-> arch/x86/kvm/mmu/mmu.c:3416
-> Code: ff ff e8 eb 5d 5e 00 48 8b 45 b8 48 83 e8 01 48 89 45 c8 e9 a3 fd ff
-> ff 48 89 df e8 c2 f8 9b 00 e9 7b fb ff ff e8 c8 5d 5e 00 <0f> 0b 48 8b 7d c8
-> e8 ad f8 9b 00 e9 ba fc ff ff 49 8d 7f 30 e8 7f
-> RSP: 0018:ffffc90001f27678 EFLAGS: 00010293
-> RAX: ffff8880a875a200 RBX: ffffc90001f27768 RCX: ffffffff8116cc87
-> RDX: 0000000000000000 RSI: ffffffff8116cdc8 RDI: 0000000000000007
-> RBP: ffffc90001f276c0 R08: ffff8880a875a200 R09: ffffed1010d79682
-> R10: ffffed1010d79681 R11: ffff888086bcb40b R12: 00000000000001d3
-> R13: 0000000000094dd3 R14: 0000000000094dd1 R15: 0000000000000000
-> FS:  0000000000fff880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 000000009af1b000 CR4: 00000000001426f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  tdp_page_fault+0x580/0x6a0 arch/x86/kvm/mmu/mmu.c:4315
->  kvm_mmu_page_fault+0x1dd/0x1800 arch/x86/kvm/mmu/mmu.c:5539
->  handle_ept_violation+0x259/0x560 arch/x86/kvm/vmx/vmx.c:5163
->  vmx_handle_exit+0x29f/0x1730 arch/x86/kvm/vmx/vmx.c:5921
->  vcpu_enter_guest+0x334f/0x6110 arch/x86/kvm/x86.c:8290
->  vcpu_run arch/x86/kvm/x86.c:8354 [inline]
->  kvm_arch_vcpu_ioctl_run+0x430/0x17b0 arch/x86/kvm/x86.c:8561
->  kvm_vcpu_ioctl+0x4dc/0xfc0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2847
->  vfs_ioctl fs/ioctl.c:47 [inline]
->  file_ioctl fs/ioctl.c:545 [inline]
->  do_vfs_ioctl+0x977/0x14e0 fs/ioctl.c:732
->  ksys_ioctl+0xab/0xd0 fs/ioctl.c:749
->  __do_sys_ioctl fs/ioctl.c:756 [inline]
->  __se_sys_ioctl fs/ioctl.c:754 [inline]
->  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:754
->  do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> RIP: 0033:0x440359
-> Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7
-> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff
-> 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-> RSP: 002b:00007ffc16334278 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440359
-> RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000006
-> RBP: 00000000006ca018 R08: 00000000004002c8 R09: 00000000004002c8
-> R10: 00000000004002c8 R11: 0000000000000246 R12: 0000000000401be0
-> R13: 0000000000401c70 R14: 0000000000000000 R15: 0000000000000000
-> Modules linked in:
-> ---[ end trace e1a5b9c09fef2e33 ]---
-> RIP: 0010:transparent_hugepage_adjust+0x4c8/0x550
-> arch/x86/kvm/mmu/mmu.c:3416
-> Code: ff ff e8 eb 5d 5e 00 48 8b 45 b8 48 83 e8 01 48 89 45 c8 e9 a3 fd ff
-> ff 48 89 df e8 c2 f8 9b 00 e9 7b fb ff ff e8 c8 5d 5e 00 <0f> 0b 48 8b 7d c8
-> e8 ad f8 9b 00 e9 ba fc ff ff 49 8d 7f 30 e8 7f
-> RSP: 0018:ffffc90001f27678 EFLAGS: 00010293
-> RAX: ffff8880a875a200 RBX: ffffc90001f27768 RCX: ffffffff8116cc87
-> RDX: 0000000000000000 RSI: ffffffff8116cdc8 RDI: 0000000000000007
-> RBP: ffffc90001f276c0 R08: ffff8880a875a200 R09: ffffed1010d79682
-> R10: ffffed1010d79681 R11: ffff888086bcb40b R12: 00000000000001d3
-> R13: 0000000000094dd3 R14: 0000000000094dd1 R15: 0000000000000000
-> FS:  0000000000fff880(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 000000009af1b000 CR4: 00000000001426f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 
-> 
-> ---
-> This bug is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this bug report. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> syzbot can test patches for this bug, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
+Copying pinned pages multiple times is unavoidable because those pinned pages
+are always treated as dirty. That's per vendor's implementation.
+But if the pinned pages are not reported as dirty before stop-and-copy phase,
+QEMU would think dirty pages has converged
+and enter blackout phase, making downtime_limit severely incorrect.
+
+Thanks
+Yan
+
+> >>>> +			mutex_lock(&iommu->lock);
+> >>>> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
+> >>>> +					     range.pgsize, range.iova, bitmap);
+> >>>> +			mutex_unlock(&iommu->lock);
+> >>>> +
+> >>>> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
+> >>>> +					   range.bitmap_size) ? -EFAULT : 0;
+> >>>> +bitmap_exit:
+> >>>> +			kfree(bitmap);
+> >>>> +			return ret;
+> >>>> +		}
+> >>>>    	}
+> >>>>    
+> >>>>    	return -ENOTTY;
+> >>>> -- 
+> >>>> 2.7.0
+> >>>>
