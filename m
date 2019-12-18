@@ -2,266 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 349A4124C64
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 17:04:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C0F4124CF5
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 17:18:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbfLRQEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 11:04:23 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:42042 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727421AbfLRQEX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 11:04:23 -0500
-Received: by mail-lj1-f193.google.com with SMTP id e28so2725468ljo.9
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 08:04:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=lx2tYrxH76TzOflvrZdMYwmw6kPdiwBO2AoS02kSF8I=;
-        b=z5wPjhUP09OUtbjMjcfRXuIHIwQ6JsCqdqDQrpkHeR2FGTJKRgTZuRVpd8Ejot/uzW
-         WkIRJ1o23H1rHR8qrWtCj6uBitDImUrGPYpJ5mMWyp3EmJAhL7rYh6HpljzRDkNNAPx0
-         LUjYdc/PK8ZbQZUps8imW7pyun+gW90XpZ53fBcBIDiOV27gBLz+BEehaTKZC5uM8Oqa
-         ydjJOsIeBdrZtGFXR3Ff0Wal0p2P05zNibodcJL9uNUAN8pxDWcLGNcXSYNkE83Lm4vk
-         MRxOsdbgin+Oe/MgK9nfd0EbUF6BgvQFFgBekQTNtwPB0Nh3TqyAfgcwxiXCuXBEgxgt
-         8yAA==
+        id S1726984AbfLRQSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 11:18:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60220 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727217AbfLRQSC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 11:18:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576685881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P88rx9cd9kQKZ8dguxvhOHW4MjtfLZb0Tzz3Us5jasg=;
+        b=EUPZQd1VCV0DH9rFSYDzGzlFodhCmm9T2duBN4l/y1NxEgQYlO9monx0SCCRxQfSxLbYm4
+        YsR7qLetI0/1tb/cVJXVwHkLhBl/qtPZpq1b7mLLbJQBNZF7hGCgLAvSDxfOfVTTZMB7yB
+        zRD4F9aOBYZBWDLl3LYyOBMuEu1Y4X0=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-HhQwE7ulNj6VJ2NnsKRtLg-1; Wed, 18 Dec 2019 11:17:58 -0500
+X-MC-Unique: HhQwE7ulNj6VJ2NnsKRtLg-1
+Received: by mail-qt1-f197.google.com with SMTP id 69so1691290qtb.15
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 08:17:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=lx2tYrxH76TzOflvrZdMYwmw6kPdiwBO2AoS02kSF8I=;
-        b=tF9/sPWbg/5kFcYYVHsv0yu2MCuCIY+vZxag7FPfHgvFGBlSia13OMPpaugJ4d3r0P
-         3LqPpS7n7BgbW1xTa0WGAUlCh5gcyoono7waUWGD8WpFeu74hR+gMgUx9Ls1V1ISkDb9
-         cp9heNUoCXfgonaRVBwfdyoHzXzbqkqrfWniW5HDANijG0mCEbW87VobI66zDUTiT8Ax
-         lUlu5ETUHjFjVfnvES8rQpNrpHI2HewgkBJalqwTj94AEAX5h3CZHp5+93isRp2ZUHCn
-         hPJxp56eBUTOQb8TP7XG9s5LhyuuJQYQiHgCxrSvdzm645rWTG6rcRI8E7pJ2v1ZOhSA
-         gRxw==
-X-Gm-Message-State: APjAAAXnwASRgiDY/Jz6uSbOrJXftEENK/zlMsH6KyRbdtwG7CpM52HW
-        twLoi0pOCvErBuEE/spWNZCWFQ==
-X-Google-Smtp-Source: APXvYqwF7pecGZBZMkXKVp15IXhXZo2PGYpkUgZNZl53wUwEdzClRBwVejnpDULy6WyyjOVSSgygvA==
-X-Received: by 2002:a2e:9284:: with SMTP id d4mr2361276ljh.226.1576685060830;
-        Wed, 18 Dec 2019 08:04:20 -0800 (PST)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id j19sm1730231lfb.90.2019.12.18.08.04.19
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=P88rx9cd9kQKZ8dguxvhOHW4MjtfLZb0Tzz3Us5jasg=;
+        b=Y7rx71CiM1zPsvDi0UwY9Q6IymSkLrY0pp4kX0tLy4RBLkxUxH4upimjPZeC25G+4S
+         uqolHaBFKVli79ZNs4nADvggRgpCjLACPE0NcxUJlagS42OHl1w2L1038d0kFnpBMXY4
+         EX4MUF/ItdhHyOQK5XAORLr6nADohUqcvuHmeEt3yc3FnV/OqMEnJ5WaDeBMHRg9pl3K
+         cyryzmhrt32OzUYQlOR3+XkEjlisjEgpu3p+LdgamRPFFGOEB4JtGbguDqqxbZ7ibRXS
+         LwQnUGdyVKg68EOaLcmEC5OrJBlwpsL7L1H2ZXBn5G3lHnrmLn95z5rk+jFxRoT6ui44
+         k32A==
+X-Gm-Message-State: APjAAAWpvqzqbk/A6/TkRsqFwswxGsd2lnkG/Bt0pjcH6np5oZqQ6DKA
+        fVVdqErObOdH1xPALBsC6SgRHr7go8QSXoey5CHFhdmtLoTppcFkGMikU14COCZZUtGzw3cRRi+
+        GEeS36yRo0xB7
+X-Received: by 2002:ac8:7a70:: with SMTP id w16mr2877835qtt.154.1576685877631;
+        Wed, 18 Dec 2019 08:17:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy4qHGhFCQSr/jP29aEubtfbaj7wEV9G/hOTID6lKw6YyGvv0dEeZDPR8BH6CrL2bXiQvdTHQ==
+X-Received: by 2002:ac8:7a70:: with SMTP id w16mr2877791qtt.154.1576685877330;
+        Wed, 18 Dec 2019 08:17:57 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+        by smtp.gmail.com with ESMTPSA id o16sm769610qkj.91.2019.12.18.08.17.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Dec 2019 08:04:19 -0800 (PST)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 5A04D1012CF; Wed, 18 Dec 2019 19:04:20 +0300 (+03)
-Date:   Wed, 18 Dec 2019 19:04:20 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dave Chinner <david@fromorbit.com>,
-        David Airlie <airlied@linux.ie>,
-        "David S . Miller" <davem@davemloft.net>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Jonathan Corbet <corbet@lwn.net>,
-        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Hocko <mhocko@suse.com>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Vlastimil Babka <vbabka@suse.cz>, bpf@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v11 04/25] mm: devmap: refactor 1-based refcounting for
- ZONE_DEVICE pages
-Message-ID: <20191218160420.gyt4c45e6zsnxqv6@box>
-References: <20191216222537.491123-1-jhubbard@nvidia.com>
- <20191216222537.491123-5-jhubbard@nvidia.com>
+        Wed, 18 Dec 2019 08:17:56 -0800 (PST)
+Date:   Wed, 18 Dec 2019 11:17:55 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     James Hogan <jhogan@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v4 07/19] KVM: Explicitly free allocated-but-unused dirty
+ bitmap
+Message-ID: <20191218161755.GB26669@xz-x1>
+References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
+ <20191217204041.10815-8-sean.j.christopherson@intel.com>
+ <20191217222446.GK7258@xz-x1>
+ <20191217225118.GF11771@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191216222537.491123-5-jhubbard@nvidia.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20191217225118.GF11771@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 16, 2019 at 02:25:16PM -0800, John Hubbard wrote:
-> An upcoming patch changes and complicates the refcounting and
-> especially the "put page" aspects of it. In order to keep
-> everything clean, refactor the devmap page release routines:
+On Tue, Dec 17, 2019 at 02:51:18PM -0800, Sean Christopherson wrote:
+> On Tue, Dec 17, 2019 at 05:24:46PM -0500, Peter Xu wrote:
+> > On Tue, Dec 17, 2019 at 12:40:29PM -0800, Sean Christopherson wrote:
+> > > Explicitly free an allocated-but-unused dirty bitmap instead of relying
+> > > on kvm_free_memslot() if an error occurs in __kvm_set_memory_region().
+> > > There is no longer a need to abuse kvm_free_memslot() to free arch
+> > > specific resources as arch specific code is now called only after the
+> > > common flow is guaranteed to succeed.  Arch code can still fail, but
+> > > it's responsible for its own cleanup in that case.
+> > > 
+> > > Eliminating the error path's abuse of kvm_free_memslot() paves the way
+> > > for simplifying kvm_free_memslot(), i.e. dropping its @dont param.
+> > > 
+> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > ---
+> > >  virt/kvm/kvm_main.c | 7 ++++---
+> > >  1 file changed, 4 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index d403e93e3028..6b2261a9e139 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -1096,7 +1096,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > >  
+> > >  	slots = kvzalloc(sizeof(struct kvm_memslots), GFP_KERNEL_ACCOUNT);
+> > >  	if (!slots)
+> > > -		goto out_free;
+> > > +		goto out_bitmap;
+> > >  	memcpy(slots, __kvm_memslots(kvm, as_id), sizeof(struct kvm_memslots));
+> > >  
+> > >  	if ((change == KVM_MR_DELETE) || (change == KVM_MR_MOVE)) {
+> > > @@ -1144,8 +1144,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > >  	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
+> > >  		slots = install_new_memslots(kvm, as_id, slots);
+> > >  	kvfree(slots);
+> > > -out_free:
+> > > -	kvm_free_memslot(kvm, &new, &old);
+> > > +out_bitmap:
+> > > +	if (new.dirty_bitmap && !old.dirty_bitmap)
+> > > +		kvm_destroy_dirty_bitmap(&new);
+> > 
+> > What if both the old and new have KVM_MEM_LOG_DIRTY_PAGES set?
+> > kvm_free_memslot() did cover that but I see that you explicitly
+> > dropped it.  Could I ask why?  Thanks,
 > 
-> * Rename put_devmap_managed_page() to page_is_devmap_managed(),
->   and limit the functionality to "read only": return a bool,
->   with no side effects.
+> In that case, old.dirty_bitmap == new.dirty_bitmap, i.e. shouldn't be freed
+> by this error path since doing so would result in a use-after-free via the
+> old memslot.
 > 
-> * Add a new routine, put_devmap_managed_page(), to handle checking
->   what kind of page it is, and what kind of refcount handling it
->   requires.
-> 
-> * Rename __put_devmap_managed_page() to free_devmap_managed_page(),
->   and limit the functionality to unconditionally freeing a devmap
->   page.
+> The kvm_free_memslot() logic is the same, albeit in a very twisted way.
 
-What the reason to separate put_devmap_managed_page() from
-free_devmap_managed_page() if free_devmap_managed_page() has exacly one
-caller? Is it preparation for the next patches?
+Yes it is. :)
 
-> This is originally based on a separate patch by Ira Weiny, which
-> applied to an early version of the put_user_page() experiments.
-> Since then, Jérôme Glisse suggested the refactoring described above.
 > 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Suggested-by: Jérôme Glisse <jglisse@redhat.com>
-> Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Ira Weiny <ira.weiny@intel.com>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  include/linux/mm.h | 17 +++++++++++++----
->  mm/memremap.c      | 16 ++--------------
->  mm/swap.c          | 24 ++++++++++++++++++++++++
->  3 files changed, 39 insertions(+), 18 deletions(-)
+> In __kvm_set_memory_region(), @old and @new start with the same dirty_bitmap.
 > 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index c97ea3b694e6..77a4df06c8a7 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -952,9 +952,10 @@ static inline bool is_zone_device_page(const struct page *page)
->  #endif
->  
->  #ifdef CONFIG_DEV_PAGEMAP_OPS
-> -void __put_devmap_managed_page(struct page *page);
-> +void free_devmap_managed_page(struct page *page);
->  DECLARE_STATIC_KEY_FALSE(devmap_managed_key);
-> -static inline bool put_devmap_managed_page(struct page *page)
-> +
-> +static inline bool page_is_devmap_managed(struct page *page)
->  {
->  	if (!static_branch_unlikely(&devmap_managed_key))
->  		return false;
-> @@ -963,7 +964,6 @@ static inline bool put_devmap_managed_page(struct page *page)
->  	switch (page->pgmap->type) {
->  	case MEMORY_DEVICE_PRIVATE:
->  	case MEMORY_DEVICE_FS_DAX:
-> -		__put_devmap_managed_page(page);
->  		return true;
->  	default:
->  		break;
-> @@ -971,7 +971,14 @@ static inline bool put_devmap_managed_page(struct page *page)
->  	return false;
->  }
->  
-> +bool put_devmap_managed_page(struct page *page);
-> +
->  #else /* CONFIG_DEV_PAGEMAP_OPS */
-> +static inline bool page_is_devmap_managed(struct page *page)
-> +{
-> +	return false;
-> +}
-> +
->  static inline bool put_devmap_managed_page(struct page *page)
->  {
->  	return false;
-> @@ -1028,8 +1035,10 @@ static inline void put_page(struct page *page)
->  	 * need to inform the device driver through callback. See
->  	 * include/linux/memremap.h and HMM for details.
->  	 */
-> -	if (put_devmap_managed_page(page))
-> +	if (page_is_devmap_managed(page)) {
-> +		put_devmap_managed_page(page);
-
-put_devmap_managed_page() has yet another page_is_devmap_managed() check
-inside. It looks strange.
-
->  		return;
-> +	}
->  
->  	if (put_page_testzero(page))
->  		__put_page(page);
-> diff --git a/mm/memremap.c b/mm/memremap.c
-> index e899fa876a62..2ba773859031 100644
-> --- a/mm/memremap.c
-> +++ b/mm/memremap.c
-> @@ -411,20 +411,8 @@ struct dev_pagemap *get_dev_pagemap(unsigned long pfn,
->  EXPORT_SYMBOL_GPL(get_dev_pagemap);
->  
->  #ifdef CONFIG_DEV_PAGEMAP_OPS
-> -void __put_devmap_managed_page(struct page *page)
-> +void free_devmap_managed_page(struct page *page)
->  {
-> -	int count = page_ref_dec_return(page);
-> -
-> -	/* still busy */
-> -	if (count > 1)
-> -		return;
-> -
-> -	/* only triggered by the dev_pagemap shutdown path */
-> -	if (count == 0) {
-> -		__put_page(page);
-> -		return;
-> -	}
-> -
->  	/* notify page idle for dax */
->  	if (!is_device_private_page(page)) {
->  		wake_up_var(&page->_refcount);
-> @@ -461,5 +449,5 @@ void __put_devmap_managed_page(struct page *page)
->  	page->mapping = NULL;
->  	page->pgmap->ops->page_free(page);
->  }
-> -EXPORT_SYMBOL(__put_devmap_managed_page);
-> +EXPORT_SYMBOL(free_devmap_managed_page);
->  #endif /* CONFIG_DEV_PAGEMAP_OPS */
-> diff --git a/mm/swap.c b/mm/swap.c
-> index 5341ae93861f..49f7c2eea0ba 100644
-> --- a/mm/swap.c
-> +++ b/mm/swap.c
-> @@ -1102,3 +1102,27 @@ void __init swap_setup(void)
->  	 * _really_ don't want to cluster much more
->  	 */
->  }
-> +
-> +#ifdef CONFIG_DEV_PAGEMAP_OPS
-> +bool put_devmap_managed_page(struct page *page)
-> +{
-> +	bool is_devmap = page_is_devmap_managed(page);
-> +
-> +	if (is_devmap) {
-
-Reversing the condition would save you an indentation level.
-
-> +		int count = page_ref_dec_return(page);
-> +
-> +		/*
-> +		 * devmap page refcounts are 1-based, rather than 0-based: if
-> +		 * refcount is 1, then the page is free and the refcount is
-> +		 * stable because nobody holds a reference on the page.
-> +		 */
-> +		if (count == 1)
-> +			free_devmap_managed_page(page);
-> +		else if (!count)
-> +			__put_page(page);
-> +	}
-> +
-> +	return is_devmap;
-> +}
-> +EXPORT_SYMBOL(put_devmap_managed_page);
-> +#endif
-> -- 
-> 2.24.1
+> 	new = old = *slot;
+> 
+> And @new is modified based on KVM_MEM_LOG_DIRTY_PAGES.  If LOG_DIRTY_PAGES
+> is set in both @new and @old, then both the "if" and "else if" evaluate
+> false, i.e. new.dirty_bitmap == old.dirty_bitmap.
+> 
+> 	/* Allocate/free page dirty bitmap as needed */
+> 	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
+> 		new.dirty_bitmap = NULL;
+> 	else if (!new.dirty_bitmap) {
+> 		r = kvm_create_dirty_bitmap(&new);
+> 		if (r)
+> 			return r;
+> 	}
+> 
+> Subbing "@free <= @new" and "@dont <= @old" in kvm_free_memslot()
+> 
+>   static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+> 			       struct kvm_memory_slot *dont)
+>   {
+> 	if (!dont || free->dirty_bitmap != dont->dirty_bitmap)
+> 		kvm_destroy_dirty_bitmap(free);
 > 
 > 
+> yeids this, since @old is obviously non-NULL
+> 
+> 	if (new.dirty_bitmap != old.dirty_bitmap)
+> 		kvm_destroy_dirty_bitmap(&new);
+> 
+> The dirty_bitmap allocation logic guarantees that new.dirty_bitmap is
+>   a) NULL (the "if" case")
+>   b) != old.dirty_bitmap iff old.dirty_bitmap == NULL (the "else if" case)
+>   c) == old.dirty_bitmap (the implicit "else" case).
+> 
+> kvm_free_memslot() frees @new.dirty_bitmap iff its != @old.dirty_bitmap,
+> thus the explicit destroy only needs to check for (b).
+
+Thanks for explaining with such a detail.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
 -- 
- Kirill A. Shutemov
+Peter Xu
+
