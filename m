@@ -2,58 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A6731247EF
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 14:19:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDC12124883
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 14:35:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbfLRNTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 08:19:07 -0500
-Received: from mga05.intel.com ([192.55.52.43]:36888 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726749AbfLRNTH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 08:19:07 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 05:19:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,329,1571727600"; 
-   d="scan'208";a="266886586"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by FMSMGA003.fm.intel.com with ESMTP; 18 Dec 2019 05:19:05 -0800
-Date:   Wed, 18 Dec 2019 21:20:14 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        jmattson@google.com, yu.c.zhang@linux.intel.com,
-        yu-cheng.yu@intel.com
-Subject: Re: [PATCH v8 4/7] KVM: VMX: Load CET states on vmentry/vmexit
-Message-ID: <20191218132014.GA7926@local-michael-cet-test>
-References: <20191101085222.27997-1-weijiang.yang@intel.com>
- <20191101085222.27997-5-weijiang.yang@intel.com>
- <20191210212305.GM15758@linux.intel.com>
- <20191211015423.GC12845@local-michael-cet-test>
- <20191211163510.GF5044@linux.intel.com>
- <20191212010423.GB17570@local-michael-cet-test.sh.intel.com>
- <20191218003005.GO11771@linux.intel.com>
+        id S1727145AbfLRNfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 08:35:36 -0500
+Received: from imap2.colo.codethink.co.uk ([78.40.148.184]:43398 "EHLO
+        imap2.colo.codethink.co.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726735AbfLRNfg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 08:35:36 -0500
+Received: from [167.98.27.226] (helo=rainbowdash.codethink.co.uk)
+        by imap2.colo.codethink.co.uk with esmtpsa  (Exim 4.92 #3 (Debian))
+        id 1ihZU8-0004Uz-Ll; Wed, 18 Dec 2019 13:35:28 +0000
+Received: from ben by rainbowdash.codethink.co.uk with local (Exim 4.92.3)
+        (envelope-from <ben@rainbowdash.codethink.co.uk>)
+        id 1ihZU6-00Awcg-Pc; Wed, 18 Dec 2019 13:35:26 +0000
+From:   "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
+To:     ben.dooks@codethink.co.uk
+Cc:     Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Allison Randal <allison@lohutok.net>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio: platform: fix __iomem in vfio_platform_amdxgbe.c
+Date:   Wed, 18 Dec 2019 13:35:25 +0000
+Message-Id: <20191218133525.2608583-1-ben.dooks@codethink.co.uk>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191218003005.GO11771@linux.intel.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 04:30:05PM -0800, Sean Christopherson wrote:
-> On Thu, Dec 12, 2019 at 09:04:24AM +0800, Yang Weijiang wrote:
-> > On Wed, Dec 11, 2019 at 08:35:10AM -0800, Sean Christopherson wrote:
-> > > Have you tested SMM at all?  The interaction between CR0 and CR4 may be
-> > > problematic for em_rsm() and/or rsm_enter_protected_mode().
-> > >
-> > Not yet, what's an easy way to test code in SMM mode?
-> 
-> IIRC, SeaBIOS does SMM stuff by default.
-Thanks Sean. I'll check this part.
+The ioaddr should have __iomem marker on it, so add that to fix
+the following sparse warnings:
+
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44: warning: incorrect type in argument 2 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44:    expected void volatile [noderef] <asn:2> *addr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:33:44:    got void *
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33:    expected void const volatile [noderef] <asn:2> *addr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:34:33:    got void *
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44: warning: incorrect type in argument 2 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44:    expected void volatile [noderef] <asn:2> *addr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:44:44:    got void *
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33: warning: incorrect type in argument 2 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33:    expected void volatile [noderef] <asn:2> *addr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:45:33:    got void *
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:69:41:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:71:30:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:76:49:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:85:37:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:87:30:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:90:30:    got void [noderef] <asn:2> *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30: warning: incorrect type in argument 1 (different address spaces)
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30:    expected void *ioaddr
+drivers/vfio/platform/reset/vfio_platform_amdxgbe.c:93:30:    got void [noderef] <asn:2> *ioaddr
+
+Signed-off-by: Ben Dooks (Codethink) <ben.dooks@codethink.co.uk>
+---
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Allison Randal <allison@lohutok.net>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ drivers/vfio/platform/reset/vfio_platform_amdxgbe.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
+index 2d2babe21b2f..ecfc908de30f 100644
+--- a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
++++ b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
+@@ -24,7 +24,7 @@
+ #define MDIO_AN_INT		0x8002
+ #define MDIO_AN_INTMASK		0x8001
+ 
+-static unsigned int xmdio_read(void *ioaddr, unsigned int mmd,
++static unsigned int xmdio_read(void __iomem *ioaddr, unsigned int mmd,
+ 			       unsigned int reg)
+ {
+ 	unsigned int mmd_address, value;
+@@ -35,7 +35,7 @@ static unsigned int xmdio_read(void *ioaddr, unsigned int mmd,
+ 	return value;
+ }
+ 
+-static void xmdio_write(void *ioaddr, unsigned int mmd,
++static void xmdio_write(void __iomem *ioaddr, unsigned int mmd,
+ 			unsigned int reg, unsigned int value)
+ {
+ 	unsigned int mmd_address;
+-- 
+2.24.0
+
