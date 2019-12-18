@@ -2,105 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BC3D12505B
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 19:11:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D15D712508C
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 19:25:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727198AbfLRSLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 13:11:12 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:44619 "EHLO
-        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726960AbfLRSLM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 13:11:12 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
-        (envelope-from <maz@kernel.org>)
-        id 1ihdmZ-0007pw-8W; Wed, 18 Dec 2019 19:10:47 +0100
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v4 00/19] KVM: Dynamically size memslot arrays
-X-PHP-Originating-Script: 0:main.inc
+        id S1727341AbfLRSZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 13:25:58 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:35101 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726960AbfLRSZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 13:25:58 -0500
+Received: by mail-vs1-f66.google.com with SMTP id x123so2040258vsc.2
+        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 10:25:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ANFUqV44LV+TokqrtQ+KQkVNoxyE4pPdjsE0CSiKyqw=;
+        b=v+vfjrEMHxzjtcG6z/k/L+Ai3TVfA0LL1v5xLnt2cMbJtWWMWxei2GmE1xIc74MzVA
+         Z50fapmDUwJxhBO9Bz0WSiyPkvYqW1VYCttEjJvzx/hIyYhZ39suyetph2IqzXcGn0jg
+         hfYp8ZFBqy8BxZynUOhZL7DwpQ/JIsvZIs74NhPzm8s80HFmWtOKPB3wKMMLQ13ML/kc
+         sGQmmrQqvcqM0i4pahVrIGmhLcLQqcAwbLAWiGbLaMYQi6BUf+3iGNN2KgSHLyufHM/3
+         qZcWpMHVmehU7S2zEf5b6Si17ZVaJKzcW0D+ie3GC6s5QKCutqI0cYZMvdVzVLNWSBbB
+         O1Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ANFUqV44LV+TokqrtQ+KQkVNoxyE4pPdjsE0CSiKyqw=;
+        b=BNEpJzZm5y7Lf/YHUlSofWRBji70+8neIUHEain7rp+JO0CMg2FR2Fwh2a9E5BlOdX
+         akAKFMaQb3jHTqwOT70SdJ17MbhfKBIhM0XBZfq9FOkp0qbIirR7SEjWjIG/CGYU1aW1
+         XZjo+ipiZ3ZI2asEzWj55lBOSJq5XSrzD4GwOZatQfPVPdvdyUuKsGLgcoYe+wRBgt/c
+         7u92CWH+v187LBue9WrJE9LQSAgd6qqbndKy4m2T1aQ3eJWLzpSO85Kp93nB39Iphwa9
+         6hZIaaPULG+FPFFIuJ1Wxlyn+0GBdzRtLjgCeaHJklLM+xl4JQxNYmgxIo7lygthstkM
+         S/6g==
+X-Gm-Message-State: APjAAAVnW2vZ8IbYFmsZcPTmTEVPR+7yVp6JhHQopfb7djsAdLasxbPW
+        e1vJAJMo25/Dn9584Bly5t7NBVH5purKrxJnYtlv6Ugw
+X-Google-Smtp-Source: APXvYqzenqqwBWnMdvxo4AvX/aTn8rQMrL2w+zEKhwKzkJy6QsNh+nRF2AgOzDvlpo+Xu6wmWhSNct6BKiZpKcQA54Q=
+X-Received: by 2002:a67:1104:: with SMTP id 4mr2438118vsr.117.1576693556449;
+ Wed, 18 Dec 2019 10:25:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 18 Dec 2019 18:10:47 +0000
-From:   Marc Zyngier <maz@kernel.org>
-Cc:     James Hogan <jhogan@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <linux-mips@vger.kernel.org>, <kvm-ppc@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-In-Reply-To: <20191217204041.10815-1-sean.j.christopherson@intel.com>
-References: <20191217204041.10815-1-sean.j.christopherson@intel.com>
-Message-ID: <3a6b03cc1300bc3cffd3904e22c09478@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: sean.j.christopherson@intel.com, jhogan@kernel.org, paulus@ozlabs.org, borntraeger@de.ibm.com, frankja@linux.ibm.com, pbonzini@redhat.com, david@redhat.com, cohuck@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, christoffer.dall@arm.com, f4bug@amsat.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
+References: <20190926231824.149014-1-bgardon@google.com> <20190926231824.149014-14-bgardon@google.com>
+ <20191203021514.GK8120@linux.intel.com>
+In-Reply-To: <20191203021514.GK8120@linux.intel.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 18 Dec 2019 10:25:45 -0800
+Message-ID: <CANgfPd_9KpwOuk1pQ7jzhmFksE-FBaFMPP-yhmG1yu9txUBi3Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 13/28] kvm: mmu: Add an iterator for concurrent paging
+ structure walks
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Peter Shier <pshier@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-12-17 20:40, Sean Christopherson wrote:
-> The end goal of this series is to dynamically size the memslot array 
-> so
-> that KVM allocates memory based on the number of memslots in use, as
-> opposed to unconditionally allocating memory for the maximum number 
-> of
-> memslots.  On x86, each memslot consumes 88 bytes, and so with 2 
-> address
-> spaces of 512 memslots, each VM consumes ~90k bytes for the memslots.
-> E.g. given a VM that uses a total of 30 memslots, dynamic sizing 
-> reduces
-> the memory footprint from 90k to ~2.6k bytes.
+On Mon, Dec 2, 2019 at 6:15 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> The changes required to support dynamic sizing are relatively small,
-> e.g. are essentially contained in patches 17/19 and 18/19.
+> On Thu, Sep 26, 2019 at 04:18:09PM -0700, Ben Gardon wrote:
+> > Add a utility for concurrent paging structure traversals. This iterator
+> > uses several mechanisms to ensure that its accesses to paging structure
+> > memory are safe, and that memory can be freed safely in the face of
+> > lockless access. The purpose of the iterator is to create a unified
+> > pattern for concurrent paging structure traversals and simplify the
+> > implementation of other MMU functions.
+> >
+> > This iterator implements a pre-order traversal of PTEs for a given GFN
+> > range within a given address space. The iterator abstracts away
+> > bookkeeping on successful changes to PTEs, retrying on failed PTE
+> > modifications, TLB flushing, and yielding during long operations.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu.c      | 455 ++++++++++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/mmutrace.h |  50 +++++
+> >  2 files changed, 505 insertions(+)
 >
-> Patches 2-16 clean up the memslot code, which has gotten quite 
-> crusty,
-> especially __kvm_set_memory_region().  The clean up is likely not 
-> strictly
-> necessary to switch to dynamic sizing, but I didn't have a remotely
-> reasonable level of confidence in the correctness of the dynamic 
-> sizing
-> without first doing the clean up.
+> ...
 >
-> The only functional change in v4 is the addition of an x86-specific 
-> bug
-> fix in x86's handling of KVM_MR_MOVE.  The bug fix is not directly 
-> related
-> to dynamically allocating memslots, but it has subtle and hidden 
-> conflicts
-> with the cleanup patches, and the fix is higher priority than 
-> anything
-> else in the series, i.e. should be merged first.
+> > +/*
+> > + * Sets a direct walk iterator to seek the gfn range [start, end).
+> > + * If end is greater than the maximum possible GFN, it will be changed to the
+> > + * maximum possible gfn + 1. (Note that start/end is and inclusive/exclusive
+> > + * range, so the last gfn to be interated over would be the largest possible
+> > + * GFN, in this scenario.)
+> > + */
+> > +__attribute__((unused))
+> > +static void direct_walk_iterator_setup_walk(struct direct_walk_iterator *iter,
+> > +     struct kvm *kvm, int as_id, gfn_t start, gfn_t end,
+> > +     enum mmu_lock_mode lock_mode)
 >
-> On non-x86 architectures, v3 and v4 should be functionally 
-> equivalent,
-> the only non-x86 change in v4 is the dropping of a "const" in
-> kvm_arch_commit_memory_region().
+> Echoing earlier patches, please introduce variables/flags/functions along
+> with their users.  I have a feeling you're adding some of the unused
+> functions so that all flags/variables in struct direct_walk_iterator can
+> be in place from the get-go, but that actually makes everything much harder
+> to review.
+>
+> > +{
+> > +     BUG_ON(!kvm->arch.direct_mmu_enabled);
+> > +     BUG_ON((lock_mode & MMU_WRITE_LOCK) && (lock_mode & MMU_READ_LOCK));
+> > +     BUG_ON(as_id < 0);
+> > +     BUG_ON(as_id >= KVM_ADDRESS_SPACE_NUM);
+> > +     BUG_ON(!VALID_PAGE(kvm->arch.direct_root_hpa[as_id]));
+> > +
+> > +     /* End cannot be greater than the maximum possible gfn. */
+> > +     end = min(end, 1ULL << (PT64_ROOT_4LEVEL * PT64_PT_BITS));
+> > +
+> > +     iter->as_id = as_id;
+> > +     iter->pt_path[PT64_ROOT_4LEVEL - 1] =
+> > +                     (u64 *)__va(kvm->arch.direct_root_hpa[as_id]);
+> > +
+> > +     iter->walk_start = start;
+> > +     iter->walk_end = end;
+> > +     iter->target_gfn = start;
+> > +
+> > +     iter->lock_mode = lock_mode;
+> > +     iter->kvm = kvm;
+> > +     iter->tlbs_dirty = 0;
+> > +
+> > +     direct_walk_iterator_start_traversal(iter);
+> > +}
+>
+> ...
+>
+> > +static void direct_walk_iterator_cond_resched(struct direct_walk_iterator *iter)
+> > +{
+> > +     if (!(iter->lock_mode & MMU_LOCK_MAY_RESCHED) || !need_resched())
+> > +             return;
+> > +
+> > +     direct_walk_iterator_prepare_cond_resched(iter);
+> > +     cond_resched();
+> > +     direct_walk_iterator_finish_cond_resched(iter);
+> > +}
+> > +
+> > +static bool direct_walk_iterator_next_pte(struct direct_walk_iterator *iter)
+> > +{
+> > +     /*
+> > +      * This iterator could be iterating over a large number of PTEs, such
+> > +      * that if this thread did not yield, it would cause scheduler\
+> > +      * problems. To avoid this, yield if needed. Note the check on
+> > +      * MMU_LOCK_MAY_RESCHED in direct_walk_iterator_cond_resched. This
+> > +      * iterator will not yield unless that flag is set in its lock_mode.
+> > +      */
+> > +     direct_walk_iterator_cond_resched(iter);
+>
+> This looks very fragile, e.g. one of the future patches even has to avoid
+> problems with this code by limiting the number of PTEs it processes.
+With this, functions either need to limit the number of PTEs they
+process or pass the MMU_LOCK_MAY_RESCHED to the iterator. It would
+probably be safer to invert the flag and make it
+MMU_LOCK_MAY_NOT_RESCHED for functions that can self-regulate the
+number of PTEs they process or have weird synchronization
+requirements. For example, the page fault handler can't reschedule and
+we know it won't process many entries, so we could pass
+MMU_LOCK_MAY_NOT_RESCHED in there.
 
-Gave it another go on top of 5.5-rc2 on an arm64 box, and nothing
-exploded. So thumbs up from me.
 
-Thanks,
-
-        M.
--- 
-Jazz is not dead. It just smells funny...
+>
+> > +
+> > +     while (true) {
+> > +             if (!direct_walk_iterator_next_pte_raw(iter))
+>
+> Implicitly initializing the iterator during next_pte_raw() is asking for
+> problems, e.g. @walk_in_progress should not exist.  The standard kernel
+> pattern for fancy iterators is to wrap the initialization, deref, and
+> advancement operators in a macro, e.g. something like:
+>
+>         for_each_direct_pte(...) {
+>
+>         }
+>
+> That might require additional control flow logic in the users of the
+> iterator, but if so that's probably a good thing in terms of readability
+> and robustness.  E.g. verifying that rcu_read_unlock() is guaranteed to
+> be called is extremely difficult as rcu_read_lock() is buried in this
+> low level helper but the iterator relies on the top-level caller to
+> terminate traversal.
+>
+> See mem_cgroup_iter_break() for one example of handling an iter walk
+> where an action needs to taken when the walk terminates early.
+>
+> > +                     return false;
+> > +
+> > +             direct_walk_iterator_recalculate_output_fields(iter);
+> > +             if (iter->old_pte != DISCONNECTED_PTE)
+> > +                     break;
+> > +
+> > +             /*
+> > +              * The iterator has encountered a disconnected pte, so it is in
+> > +              * a page that has been disconnected from the root. Restart the
+> > +              * traversal from the root in this case.
+> > +              */
+> > +             direct_walk_iterator_reset_traversal(iter);
+>
+> I understand wanting to hide details to eliminate copy-paste, but this
+> goes too far and makes it too difficult to understand the flow of the
+> top-level walks.  Ditto for burying retry_pte() in set_pte().  I'd say it
+> also applies to skip_step_down(), but AFAICT that's dead code.
+>
+> Off-topic for a second, the super long direct_walk_iterator_... names
+> make me want to simply call this new MMU the "tdp MMU" and just live with
+> the discrepancy until the old shadow-based TDP MMU can be nuked.  Then we
+> could have tdp_iter_blah_blah_blah(), for_each_tdp_present_pte(), etc...
+>
+> Back to the iterator, I think it can be massaged into a standard for loop
+> approach without polluting the top level walkers much.  The below code is
+> the basic idea, e.g. the macros won't compile, probably doesn't terminate
+> the walk correct, rescheduling is missing, etc...
+>
+> Note, open coding the down/sideways/up helpers is 50% personal preference,
+> 50% because gfn_start and gfn_end are now local variables, and 50% because
+> it was the easiest way to learn the code.  I wouldn't argue too much about
+> having one or more of the helpers.
+>
+>
+> static void tdp_iter_break(struct tdp_iter *iter)
+> {
+>         /* TLB flush, RCU unlock, etc...)
+> }
+>
+> static void tdp_iter_next(struct tdp_iter *iter, bool *retry)
+> {
+>         gfn_t gfn_start, gfn_end;
+>         u64 *child_pt;
+>
+>         if (*retry) {
+>                 *retry = false;
+>                 return;
+>         }
+>
+>         /*
+>          * Reread the pte before stepping down to avoid traversing into page
+>          * tables that are no longer linked from this entry. This is not
+>          * needed for correctness - just a small optimization.
+>          */
+>         iter->old_pte = READ_ONCE(*iter->ptep);
+>
+>         /* Try to step down. */
+>         child_pt = pte_to_child_pt(iter->old_pte, iter->level);
+>         if (child_pt) {
+>                 child_pt = rcu_dereference(child_pt);
+>                 iter->level--;
+>                 iter->pt_path[iter->level - 1] = child_pt;
+>                 return;
+>         }
+>
+> step_sideways:
+>         /* Try to step sideways. */
+>         gfn_start = ALIGN_DOWN(iter->target_gfn,
+>                                KVM_PAGES_PER_HPAGE(iter->level));
+>         gfn_end = gfn_start + KVM_PAGES_PER_HPAGE(iter->level)
+>
+>         /*
+>          * If the current gfn maps past the target gfn range, the next entry in
+>          * the current page table will be outside the target range.
+>          */
+>         if (gfn_end >= iter->walk_end ||
+>             !(gfn_end % KVM_PAGES_PER_HPAGE(iter->level + 1))) {
+>                 /* Try to step up. */
+>                 iter->level++;
+>
+>                 if (iter->level > PT64_ROOT_4LEVEL; {
+>                         /* This is ugly, there's probably a better solution. */
+>                         tdp_iter_break(iter);
+>                         return;
+>                 }
+>                 goto step_sideways;
+>         }
+>
+>         iter->target_gfn = gfn_end;
+>         iter->ptep = iter->pt_path[iter->level - 1] +
+>                         PT64_INDEX(iter->target_gfn << PAGE_SHIFT, iter->level);
+>         iter->old_pte = READ_ONCE(*iter->ptep);
+> }
+>
+> #define for_each_tdp_pte(iter, start, end, retry)
+>         for (tdp_iter_start(&iter, start, end);
+>              iter->level <= PT64_ROOT_4LEVEL;
+>              tdp_iter_next(&iter, &retry))
+>
+> #define for_each_tdp_present_pte(iter, start, end, retry)
+>         for_each_tdp_pte(iter, start, end, retry)
+>                 if (!is_present_direct_pte(iter->old_pte)) {
+>
+>                 } else
+>
+> #define for_each_tdp_present_leaf_pte(iter, start, end, retry)
+>         for_each_tdp_pte(iter, start, end, retry)
+>                 if (!is_present_direct_pte(iter->old_pte) ||
+>                     !is_last_spte(iter->old_pte, iter->level))
+>                 {
+>
+>                 } else
+>
+> /*
+>  * Marks the range of gfns, [start, end), non-present.
+>  */
+> static bool zap_direct_gfn_range(struct kvm *kvm, int as_id, gfn_t start,
+>                                  gfn_t end, enum mmu_lock_mode lock_mode)
+> {
+>         struct direct_walk_iterator iter;
+>         bool retry;
+>
+>         tdp_iter_init(&iter, kvm, as_id, lock_mode);
+>
+> restart:
+>         retry = false;
+>         for_each_tdp_present_pte(iter, start, end, retry) {
+>                 if (tdp_iter_set_pte(&iter, 0))
+>                         retry = true;
+>
+>                 if (tdp_iter_disconnected(&iter)) {
+>                         tdp_iter_break(&iter);
+>                         goto restart;
+>                 }
+>         }
+> }
+>
