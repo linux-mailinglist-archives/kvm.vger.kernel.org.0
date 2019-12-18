@@ -2,149 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C581124C4F
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 16:59:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E821124C57
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 17:02:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727086AbfLRP7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 10:59:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2066 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726980AbfLRP7L (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 18 Dec 2019 10:59:11 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBIFq7DO138805
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 10:59:10 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wyp9etj2v-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 18 Dec 2019 10:59:10 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Wed, 18 Dec 2019 15:59:08 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 18 Dec 2019 15:59:03 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBIFx3v532636994
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Dec 2019 15:59:03 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08A6A52057;
-        Wed, 18 Dec 2019 15:59:03 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.119])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C0F5F52051;
-        Wed, 18 Dec 2019 15:59:02 +0000 (GMT)
-Subject: Re: vhost changes (batched) in linux-next after 12/13 trigger random
- crashes in KVM guests after reboot
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>
-References: <c022e1d6-0d57-ae07-5e6b-8e40d3b01f4b@de.ibm.com>
- <20191218100926-mutt-send-email-mst@kernel.org>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date:   Wed, 18 Dec 2019 16:59:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        id S1727135AbfLRQCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 11:02:30 -0500
+Received: from mga02.intel.com ([134.134.136.20]:30328 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727021AbfLRQCa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 11:02:30 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 08:02:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
+   d="scan'208";a="217895963"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.202])
+  by orsmga006.jf.intel.com with ESMTP; 18 Dec 2019 08:02:28 -0800
+Date:   Wed, 18 Dec 2019 08:02:28 -0800
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com,
+        yu.c.zhang@linux.intel.com, yu-cheng.yu@intel.com
+Subject: Re: [PATCH v8 3/7] KVM: VMX: Pass through CET related MSRs
+Message-ID: <20191218160228.GB25201@linux.intel.com>
+References: <20191101085222.27997-1-weijiang.yang@intel.com>
+ <20191101085222.27997-4-weijiang.yang@intel.com>
+ <20191210211821.GL15758@linux.intel.com>
+ <20191216021816.GA10764@local-michael-cet-test>
+ <20191218003455.GP11771@linux.intel.com>
+ <20191218135513.GB7926@local-michael-cet-test>
 MIME-Version: 1.0
-In-Reply-To: <20191218100926-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121815-4275-0000-0000-000003906242
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121815-4276-0000-0000-000038A42C5A
-Message-Id: <2ffdbd95-e375-a627-55a1-6990b0a0e37a@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-18_04:2019-12-17,2019-12-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- clxscore=1015 impostorscore=0 mlxlogscore=999 priorityscore=1501
- malwarescore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912180131
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191218135513.GB7926@local-michael-cet-test>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.12.19 16:10, Michael S. Tsirkin wrote:
-> On Wed, Dec 18, 2019 at 03:43:43PM +0100, Christian Borntraeger wrote:
->> Michael,
->>
->> with 
->> commit db7286b100b503ef80612884453bed53d74c9a16 (refs/bisect/skip-db7286b100b503ef80612884453bed53d74c9a16)
->>     vhost: use batched version by default
->> plus
->> commit 6bd262d5eafcdf8cdfae491e2e748e4e434dcda6 (HEAD, refs/bisect/bad)
->>     Revert "vhost/net: add an option to test new code"
->> to make things compile (your next tree is not easily bisectable, can you fix that as well?).
-> 
-> I'll try.
-> 
->>
->> I get random crashes in my s390 KVM guests after reboot.
->> Reverting both patches together with commit decd9b8 "vhost: use vhost_desc instead of vhost_log" to
->> make it compile again) on top of linux-next-1218 makes the problem go away.
->>
->> Looks like the batched version is not yet ready for prime time. Can you drop these patches until
->> we have fixed the issues?
->>
->> Christian
->>
-> 
-> Will do, thanks for letting me know.
+On Wed, Dec 18, 2019 at 09:55:13PM +0800, Yang Weijiang wrote:
+> On Tue, Dec 17, 2019 at 04:34:55PM -0800, Sean Christopherson wrote:
+> > On Mon, Dec 16, 2019 at 10:18:16AM +0800, Yang Weijiang wrote:
+> > > On Tue, Dec 10, 2019 at 01:18:21PM -0800, Sean Christopherson wrote:
+> > > > On Fri, Nov 01, 2019 at 04:52:18PM +0800, Yang Weijiang wrote:
+> > > > > CET MSRs pass through Guest directly to enhance performance.
+> > > > > CET runtime control settings are stored in MSR_IA32_{U,S}_CET,
+> > > > > Shadow Stack Pointer(SSP) are stored in MSR_IA32_PL{0,1,2,3}_SSP,
+> > > > > SSP table base address is stored in MSR_IA32_INT_SSP_TAB,
+> > > > > these MSRs are defined in kernel and re-used here.
+> > > > > 
+> > >  > +
+> > > > >  static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+> > > > >  {
+> > > > >  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > > > > @@ -7025,6 +7087,9 @@ static void vmx_cpuid_update(struct kvm_vcpu *vcpu)
+> > > > >  	if (boot_cpu_has(X86_FEATURE_INTEL_PT) &&
+> > > > >  			guest_cpuid_has(vcpu, X86_FEATURE_INTEL_PT))
+> > > > >  		update_intel_pt_cfg(vcpu);
+> > > > > +
+> > > > > +	if (!is_guest_mode(vcpu))
+> > > > > +		vmx_pass_cet_msrs(vcpu);
+> > > > 
+> > > > Hmm, this looks insufficent, e.g. deliberately toggling CET from on->off
+> > > > while in guest mode would put KVM in a weird state as the msr bitmap for
+> > > > L1 would still allow L1 to access the CET MSRs.
+> > > >
+> > > Hi, Sean,
+> > > I don't get you, there's guest mode check before access CET msrs, it'll
+> > > fail if it's in guest mode.
+> > 
+> > KVM can exit to userspae while L2 is active.  If userspace then did a
+> > KVM_SET_CPUID2, e.g. instead of KVM_RUN, vmx_cpuid_update() would skip
+> > vmx_pass_cet_msrs() and KVM would never update L1's MSR bitmaps.
+> >
+> Thanks, it makes sense to me. Given current implementation, how about
+> removing above check and adding it in CET CPUID
+> enumeration for L2 so that no CET msrs passed through to L2 when
+> is_guest_mode() is true?
 
-I have confirmed with the initial reporter (internal test team) that <driver name='qemu'/> 
-with a known to be broken linux next kernel also fixes the problem, so it is really the
-vhost changes.
+But you still need to update L1's MSR bitmaps.  That can obviously be done
+all at once, but it's annoying and IMO unnecessarily complex.
 
+> > > > Allowing KVM_SET_CPUID{2} while running a nested guest seems bogus, can we
+> > > > kill that path entirely with -EINVAL?
+> > > >
+> > > Do you mean don't expose CET cpuids to L2 guest?
+> > 
+> > I mean completely disallow KVM_SET_CPUID and KVM_SET_CPUID2 if
+> > is_guest_mode() is true.  My question is mostly directed at Paolo and
+> > anyone else that has an opinion on whether we can massage the ABI to
+> > retroactively change KVM_SET_CPUID{2} behavior.
+>
+> This sounds like something deserving an individual patch after get
+> agreement in community. I'll put it aside right now.
+
+Normally I would agree, but I think in this case it would significantly
+reduce the complexity and implementation cost of CET support.  I'll send a
+patch to kickstart the conversation, it's a tiny change in terms of code.
