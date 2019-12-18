@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B72A71255A9
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 22:57:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 004D41255C8
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 22:58:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbfLRVzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 16:55:46 -0500
-Received: from mga02.intel.com ([134.134.136.20]:54847 "EHLO mga02.intel.com"
+        id S1727209AbfLRV6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 16:58:07 -0500
+Received: from mga02.intel.com ([134.134.136.20]:54840 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726905AbfLRVzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726907AbfLRVzq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 18 Dec 2019 16:55:46 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -17,9 +17,9 @@ Received: from fmsmga001.fm.intel.com ([10.253.24.23])
   by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 13:55:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="222108099"
+   d="scan'208";a="222108102"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:41 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 18 Dec 2019 13:55:42 -0800
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Marc Zyngier <maz@kernel.org>, James Hogan <jhogan@kernel.org>,
         Paul Mackerras <paulus@ozlabs.org>,
@@ -40,9 +40,9 @@ Cc:     James Morse <james.morse@arm.com>,
         linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Greg Kurz <groug@kaod.org>
-Subject: [PATCH v2 21/45] KVM: x86: Remove spurious clearing of async #PF MSR
-Date:   Wed, 18 Dec 2019 13:55:06 -0800
-Message-Id: <20191218215530.2280-22-sean.j.christopherson@intel.com>
+Subject: [PATCH v2 22/45] KVM: x86: Drop kvm_arch_vcpu_free()
+Date:   Wed, 18 Dec 2019 13:55:07 -0800
+Message-Id: <20191218215530.2280-23-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191218215530.2280-1-sean.j.christopherson@intel.com>
 References: <20191218215530.2280-1-sean.j.christopherson@intel.com>
@@ -53,37 +53,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove a bogus clearing of apf.msr_val from kvm_arch_vcpu_destroy().
+Remove the superfluous kvm_arch_vcpu_free() as it is no longer called
+from commmon KVM code.  Note, kvm_arch_vcpu_destroy() *is* called from
+common code, i.e. choosing which function to whack is not completely
+arbitrary.
 
-apf.msr_val is only set to a non-zero value by kvm_pv_enable_async_pf(),
-which is only reachable by kvm_set_msr_common(), i.e. by writing
-MSR_KVM_ASYNC_PF_EN.  KVM does not autonomously write said MSR, i.e.
-can only be written via KVM_SET_MSRS or KVM_RUN.  Since KVM_SET_MSRS and
-KVM_RUN are vcpu ioctls, they require a valid vcpu file descriptor.
-kvm_arch_vcpu_destroy() is only called if KVM_CREATE_VCPU fails, and KVM
-declares KVM_CREATE_VCPU successful once the vcpu fd is installed and
-thus visible to userspace.  Ergo, apf.msr_val cannot be non-zero when
-kvm_arch_vcpu_destroy() is called.
-
-Fixes: 344d9588a9df0 ("KVM: Add PV MSR to enable asynchronous page faults delivery.")
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/x86.c | 2 --
- 1 file changed, 2 deletions(-)
+ arch/x86/kvm/x86.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 19c14b786255..46626b52a4da 100644
+index 46626b52a4da..cf35169733cd 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9176,8 +9176,6 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+@@ -9089,20 +9089,6 @@ static void fx_init(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.cr0 |= X86_CR0_ET;
+ }
+ 
+-void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+-{
+-	kvmclock_reset(vcpu);
+-
+-	kvm_x86_ops->vcpu_free(vcpu);
+-
+-	kvm_vcpu_uninit(vcpu);
+-
+-	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
+-	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
+-	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
+-	kmem_cache_free(kvm_vcpu_cache, vcpu);
+-}
+-
+ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+ 						unsigned int id)
+ {
+@@ -9176,7 +9162,16 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
  
  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  {
--	vcpu->arch.apf.msr_val = 0;
--
- 	kvm_arch_vcpu_free(vcpu);
+-	kvm_arch_vcpu_free(vcpu);
++	kvmclock_reset(vcpu);
++
++	kvm_x86_ops->vcpu_free(vcpu);
++
++	kvm_vcpu_uninit(vcpu);
++
++	free_cpumask_var(vcpu->arch.wbinvd_dirty_mask);
++	kmem_cache_free(x86_fpu_cache, vcpu->arch.user_fpu);
++	kmem_cache_free(x86_fpu_cache, vcpu->arch.guest_fpu);
++	kmem_cache_free(kvm_vcpu_cache, vcpu);
  }
  
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+@@ -9591,7 +9586,7 @@ static void kvm_free_vcpus(struct kvm *kvm)
+ 		kvm_unload_vcpu_mmu(vcpu);
+ 	}
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+-		kvm_arch_vcpu_free(vcpu);
++		kvm_arch_vcpu_destroy(vcpu);
+ 
+ 	mutex_lock(&kvm->lock);
+ 	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
 -- 
 2.24.1
 
