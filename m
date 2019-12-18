@@ -2,96 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0325F124F97
-	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 18:43:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3370125023
+	for <lists+kvm@lfdr.de>; Wed, 18 Dec 2019 19:07:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727188AbfLRRnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Dec 2019 12:43:01 -0500
-Received: from mga05.intel.com ([192.55.52.43]:57072 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726939AbfLRRnB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Dec 2019 12:43:01 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2019 09:42:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,330,1571727600"; 
-   d="scan'208";a="298450983"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.202])
-  by orsmga001.jf.intel.com with ESMTP; 18 Dec 2019 09:42:56 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        id S1727490AbfLRSH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Dec 2019 13:07:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60860 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727437AbfLRSH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Dec 2019 13:07:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576692446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=nmdGUwTvoHp9zBzsfUh31MNBzW9ZhcHvi1/dZfx3TSc=;
+        b=hE6eWyud09yIZAHi4k6KGVy7oUMtKDydHL1aFOERgg7xlCJxUchVtymjBwzJVO4+nFyD57
+        m8+UBKdGaaI/h1pXT/U3OjKHk2hiLtlxgSg1piSkBg+gc1YbvN1w8AGBx7qGEdPpy1Gm/X
+        +kFYbVLsZviXXGCGX+yERL5dRkIawhI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-50-bjYQnByeNymkKKOVYrH73A-1; Wed, 18 Dec 2019 13:07:17 -0500
+X-MC-Unique: bjYQnByeNymkKKOVYrH73A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1626E1088381;
+        Wed, 18 Dec 2019 18:07:16 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-218.ams2.redhat.com [10.36.117.218])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1592E5D9E2;
+        Wed, 18 Dec 2019 18:07:08 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     davem@davemloft.net
+Cc:     Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
-        Weijiang Yang <weijiang.yang@intel.com>
-Subject: [RFC PATCH] KVM: x86: Disallow KVM_SET_CPUID{2} if the vCPU is in guest mode
-Date:   Wed, 18 Dec 2019 09:42:55 -0800
-Message-Id: <20191218174255.30773-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.24.1
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH net-next v3 00/11] VSOCK: add vsock_test test suite
+Date:   Wed, 18 Dec 2019 19:06:57 +0100
+Message-Id: <20191218180708.120337-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reject KVM_SET_CPUID{2} with -EBUSY if the vCPU is in guest mode (L2) to
-avoid complications and potentially undesirable KVM behavior.  Allowing
-userspace to change a guest's capabilities while L2 is active would at
-best result in unexpected behavior in the guest (L1 or L2), and at worst
-induce bad KVM behavior by breaking fundamental assumptions regarding
-transitions between L0, L1 and L2.
+The vsock_diag.ko module already has a test suite but the core AF_VSOCK
+functionality has no tests. This patch series adds several test cases tha=
+t
+exercise AF_VSOCK SOCK_STREAM socket semantics (send/recv, connect/accept=
+,
+half-closed connections, simultaneous connections).
 
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Weijiang Yang <weijiang.yang@intel.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
+The v1 of this series was originally sent by Stefan.
 
-This came up in the context of the CET series, where passing through MSRs
-to L1 depends on the CPUID-based capabilities of the guest[*].  The CET
-problem is solvable, but IMO unnecessarily complex.   And I'm more
-concerned that userspace would be able to induce bad behavior in KVM by
-changing core capabilites while L2 is active, e.g. VMX, LM, LA57, etc...
+v3:
+- Patch 6:
+  * check the byte received in the recv_byte()
+  * use send(2)/recv(2) instead of write(2)/read(2) to test also flags
+    (e.g. MSG_PEEK)
+- Patch 8:
+  * removed unnecessary control_expectln("CLOSED") [Stefan].
+- removed patches 9,10,11 added in the v2
+- new Patch 9 add parameters to list and skip tests (e.g. useful for vmci
+  that doesn't support half-closed socket in the host)
+- new Patch 10 prints a list of options in the help
+- new Patch 11 tests MSG_PEEK flags of recv(2)
 
-Tagged RFC as this is an ABI change, though I highly doubt it actually
-affects a real world VMM.
+v2: https://patchwork.ozlabs.org/cover/1140538/
+v1: https://patchwork.ozlabs.org/cover/847998/
 
-[*] https://lkml.kernel.org/r/20191218160228.GB25201@linux.intel.com/
+Stefan Hajnoczi (7):
+  VSOCK: fix header include in vsock_diag_test
+  VSOCK: add SPDX identifiers to vsock tests
+  VSOCK: extract utility functions from vsock_diag_test.c
+  VSOCK: extract connect/accept functions from vsock_diag_test.c
+  VSOCK: add full barrier between test cases
+  VSOCK: add send_byte()/recv_byte() test utilities
+  VSOCK: add AF_VSOCK test cases
 
- arch/x86/kvm/x86.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Stefano Garzarella (4):
+  vsock_test: wait for the remote to close the connection
+  testing/vsock: add parameters to list and skip tests
+  testing/vsock: print list of options and description
+  vsock_test: add SOCK_STREAM MSG_PEEK test
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8bb2fb1705ff..974983140e42 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4189,6 +4189,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid __user *cpuid_arg = argp;
- 		struct kvm_cpuid cpuid;
- 
-+		r = -EBUSY;
-+		if (is_guest_mode(vcpu))
-+			goto out;
-+
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
-@@ -4199,6 +4203,10 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		struct kvm_cpuid2 __user *cpuid_arg = argp;
- 		struct kvm_cpuid2 cpuid;
- 
-+		r = -EBUSY;
-+		if (is_guest_mode(vcpu))
-+			goto out;
-+
- 		r = -EFAULT;
- 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
- 			goto out;
--- 
+ tools/testing/vsock/.gitignore        |   1 +
+ tools/testing/vsock/Makefile          |   9 +-
+ tools/testing/vsock/README            |   3 +-
+ tools/testing/vsock/control.c         |  15 +-
+ tools/testing/vsock/control.h         |   2 +
+ tools/testing/vsock/timeout.h         |   1 +
+ tools/testing/vsock/util.c            | 376 +++++++++++++++++++++++++
+ tools/testing/vsock/util.h            |  49 ++++
+ tools/testing/vsock/vsock_diag_test.c | 202 ++++----------
+ tools/testing/vsock/vsock_test.c      | 379 ++++++++++++++++++++++++++
+ 10 files changed, 883 insertions(+), 154 deletions(-)
+ create mode 100644 tools/testing/vsock/util.c
+ create mode 100644 tools/testing/vsock/util.h
+ create mode 100644 tools/testing/vsock/vsock_test.c
+
+--=20
 2.24.1
 
